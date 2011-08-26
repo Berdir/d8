@@ -878,9 +878,10 @@ function bootstrap_invoke_all($hook) {
   // first time during the bootstrap that module_list() is called, we want to
   // make sure that its internal cache is primed with the bootstrap modules
   // only.
+  $args = func_get_args();
   foreach (module_list(FALSE, TRUE) as $module) {
     drupal_load('module', $module);
-    module_invoke($module, $hook);
+    call_user_func_array('module_invoke', array_merge(array($module), $args));
   }
 }
 
@@ -1174,7 +1175,7 @@ function drupal_serve_page_from_cache(stdClass $cache) {
  * Define the critical hooks that force modules to always be loaded.
  */
 function bootstrap_hooks() {
-  return array('boot', 'exit', 'watchdog', 'language_init');
+  return array('boot', 'exit', 'watchdog', 'language_init', 'context_init');
 }
 
 /**
@@ -2133,6 +2134,14 @@ function _drupal_bootstrap_variables() {
   // Load bootstrap modules.
   require_once DRUPAL_ROOT . '/includes/module.inc';
   module_load_all(TRUE);
+
+  require_once DRUPAL_ROOT . '/includes/common.inc';
+  require_once DRUPAL_ROOT . '/includes/context.inc';
+
+  // Initialize the context system (temporary version).
+  $context = new DrupalContext(new DrupalRequestHttp());
+  bootstrap_invoke_all('context_init', $context);
+  $context->lock();
 }
 
 /**
