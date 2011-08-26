@@ -2141,6 +2141,9 @@ function _drupal_bootstrap_variables() {
   // Initialize the context system (temporary version).
   $context = new DrupalContext(new DrupalRequestHttp());
   bootstrap_invoke_all('context_init', $context);
+
+  // We do not need to keep the tracker here, because the DrupalContext
+  // destructor will never remove the root item from the stack.
   $context->lock();
 }
 
