@@ -1913,6 +1913,7 @@ function system_init() {
   // Initialize the context system (temporary version).
   $context = new DrupalContext(new DrupalRequestHttp());
   module_invoke_all('context_init', $context);
+  $context->lock();
 }
 
 /**
