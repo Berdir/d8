@@ -411,6 +411,8 @@ class DrupalContext implements DrupalContextInterface {
     $me = spl_object_hash($this);
 
     $offset = array_search($me, array_keys(self::$contextStack));
+    
+    // never remove the root item from the stack
     if ($offset) {
       self::$contextStack = array_slice(self::$contextStack, 0, $offset, TRUE);
     }
