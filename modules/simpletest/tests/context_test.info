@@ -1,0 +1,5 @@
+name = Context Tests
+description = Central context handling system for Drupal, unit test file
+core = 8.x
+files[] = context_test.module
+hidden = TRUE

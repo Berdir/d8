@@ -1,0 +1,69 @@
+<?php
+
+
+class ButlerTestCaseHelperOne extends ContextHandlerAbstract {
+
+  public function getValue(array $args = array()) {
+    return 'one';
+  }
+}
+
+class ButlerTestCaseHelperTwo extends ContextHandlerAbstract {
+
+  /**
+   * A dummy increment counter.
+   */
+  protected $i = 1;
+
+  public function getValue(array $args = array()) {
+    // This increases every time it's called.  If we ever get back something
+    // other than 1, it means the result caching is broken because we were
+    // called a second time.
+    return $this->i++;
+  }
+}
+
+class ButlerTestCaseHelperThree extends ContextHandlerAbstract {
+  public function getValue(array $args = array()) {
+    $param = $args[0];
+    return isset($this->params[$param]) ? $this->params[$param] : NULL;
+  }
+}
+
+class ButlerFakeRequest extends DrupalRequestHttp {
+
+  public function __construct($get = array(), $post = array()) {
+    parent::__construct();
+
+    $get += array(
+      'q' => '',
+    );
+
+    $this->getQuery = $get;
+    $this->postQuery = $post;
+  }
+
+}
+
+/**
+ * Basic implementation of a ContextValueInterface.
+ */
+class ContextValueExample implements ContextValueInterface {
+
+  public $id = 0;
+  public $foo = 0;
+  public $bar = '';
+
+  public function __construct($id) {
+    $this->id = $id;
+  }
+
+  public function contextKey() {
+    return $this->id();
+  }
+
+  public function id() {
+    return $this->id;
+  }
+}
+

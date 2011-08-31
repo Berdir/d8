@@ -1,0 +1,324 @@
+<?php
+
+class ButlerTestCase extends DrupalUnitTestCase {
+  public static function getInfo() {
+    return array(
+      'name' => 'Context functionality',
+      'description' => 'Test the Context context object.',
+      'group' => 'Context',
+    );
+  }
+
+  function setUp() {
+    parent::setUp();
+
+    require_once(DRUPAL_ROOT . '/includes/context.inc');
+    require_once(DRUPAL_ROOT . '/modules/simpletest/tests/context_test.module');
+  }
+
+  /**
+   * Test simple handler registration.
+   */
+  function testSimpleRegistration() {
+    $_GET['foo'] = 'bar';
+
+    $butler = new DrupalContext(new ButlerFakeRequest(array('foo' => 'bar')));
+
+    $butler->registerHandler('http:get', 'ContextHandlerHttp', array('query' => 'GET'));
+    $butler->lock();
+
+    $param = $butler['http:get:foo'];
+
+    $this->assertEqual($param, 'bar', t('Correct Http GET fragment found.'));
+  }
+
+  function testExplicitContext() {
+    $butler = new DrupalContext(new ButlerFakeRequest());
+
+    $butler['foo:bar'] = 'baz';
+
+    $butler->lock();
+
+    $this->assertEqual($butler['foo:bar'], 'baz', t('Explicit context set correctly.'));
+  }
+
+  function testExplicitContextOverride() {
+    $butler = new DrupalContext(new ButlerFakeRequest());
+
+    // This handler would return "one".
+    $butler->registerHandler('foo:bar', 'ButlerTestCaseHelperOne');
+
+    // But we override it to "two".
+    $butler['foo:bar'] = 'two';
+
+    $butler->lock();
+
+    $this->assertEqual($butler['foo:bar'], 'two', t('Explicit context overridden correctly.'));
+  }
+
+  /**
+   * Test that we can lock a context object against modification.
+   */
+  function testLockStatusExplcit() {
+    $butler = new DrupalContext(new ButlerFakeRequest());
+
+    try {
+      $butler->lock();
+      // This should throw an exception.
+      $butler['foo:bar'] = 'baz';
+
+      $this->fail(t('Exception not thrown when setting context on a locked object.'));
+    }
+    catch (ButlerLockedException $e) {
+      $this->pass(t('Proper exception thrown when setting context on a locked object.'));
+    }
+    catch (Exception $e) {
+      $this->fail(t('Incorrect exception thrown when modifying a locked object.'));
+    }
+  }
+
+  /**
+   * Test that we can lock a context object against modification.
+   */
+  function testLockStatusDerived() {
+    $butler = new DrupalContext(new ButlerFakeRequest());
+
+    try {
+      $butler->lock();
+      // This should throw an exception.
+      $butler->registerHandler('foo:bar', 'ButlerTestCaseHelperOne');
+
+      $this->fail(t('Exception not thrown when setting context on a locked object.'));
+    }
+    catch (ButlerLockedException $e) {
+      $this->pass(t('Proper exception thrown when setting context handler on a locked object.'));
+    }
+    catch (Exception $e) {
+      $this->fail(t('Incorrect exception thrown when modifying a locked object.'));
+    }
+  }
+
+  /**
+   * Test the result caching logic.
+   */
+  function testResultCaching() {
+    $butler = new DrupalContext(new ButlerFakeRequest());
+
+    // This handler should return 1, then 2, then 3, each time it's called.
+    $butler->registerHandler('foo:bar', 'ButlerTestCaseHelperTwo');
+    $butler->lock();
+
+    // Calling the same context variable should always give the same value
+    // due to immutable caching.
+    $this->assertEqual($butler['foo:bar'], $butler['foo:bar'], t('Identical context keys always return the same value.'));
+    // Classes should be cached
+    $this->assertNotEqual($butler['foo:bar'], $butler['foo:bar:baz'], t('Handler classes are cached.'));
+  }
+}
+
+class ButlerValueObjectTestCase extends DrupalUnitTestCase {
+  public static function getInfo() {
+    return array(
+      'name' => 'Context Value Object functionality',
+      'description' => 'Test the Context system\'s handling of objects.',
+      'group' => 'Context',
+    );
+  }
+
+  function setUp() {
+    parent::setUp();
+
+    require_once(DRUPAL_ROOT . '/includes/context.inc');
+    require_once(DRUPAL_ROOT . '/modules/simpletest/tests/context_test.module');
+  }
+
+  /**
+   * Test the retrieval of context values of objects.
+   */
+  function testContextValues() {
+    $butler = new DrupalContext(new ButlerFakeRequest());
+
+    // Add a handler for this test to mimic to create an example (E.g. from url arguments)
+    $butler->registerHandler('example', 'ContextHandlerExample', array('id' => 1));
+
+    $t1 = $butler->lock();
+
+    // Catch the id from the url.
+    $this->assertEqual($butler['example']->id, 1, t('ContextValueNode property id in context retrieved from request correctly.'));
+    $this->assertEqual($butler['example']->foo, 10, t('ContextValueNode property foo in context retrieved from request correctly.'));
+
+    // Add a context layer to the butler context.
+    $b2 = $butler->addLayer();
+    $b2['test'] = 'test';
+
+    // Override with another instance of ContextValueInterface.
+    $n1 = $this->createExampleObject(2);
+    $b2['example'] = $n1;
+    // This will cause the error, which needs to be fixed.
+    //$b2['example:id'] = 2;
+    $t2 = $b2->lock();
+
+    $this->assertEqual($b2['test'], 'test', t('Explicit context assigned correctly in layer 2.'));
+    $this->assertEqual($b2['example']->foo, 20, t('ContextValueNode property in in layer 2 overridden correctly.'));
+    //$this->assertEqual($b2['example:id'], 2, t('Explicit context (example:id) overridden correctly in layer 2.'));
+
+    // Add a context layer to the butler context.
+    $b3 = $butler->addLayer();
+    $b3['test'] = 'testischanged';
+    $b3['test:foo'] = 'newtest';
+    $n2 = $this->createExampleObject(3);
+    $b3['example'] = $n2;
+    // Setting the example:id as contextKey:offset will add that property to the context.
+    $b3['example:id'] = 3;
+    $t3 = $b3->lock();
+
+    $this->assertEqual($b3['test'], 'testischanged', t('Explicit context overridden correctly in layer 3.'));
+    $this->assertEqual($b3['test:foo'], 'newtest', t('Explicit context retrieved correctly in layer 3.'));
+    $this->assertEqual($b3['example']->foo, 30, t('ContextValueNode property in in layer overridden correctly.'));
+    $this->assertEqual($b3['example:id'], 3, t('Explicit context (example:id) overridden correctly in layer 3.'));
+  }
+
+  /**
+   * Test that we can track the keys we've used.
+   */
+  public function testUsedKeys() {
+    $butler = new DrupalContext(new ButlerFakeRequest());
+
+    // Add a handler for this test to mimic to create an example (E.g. from url arguments)
+    $butler->registerHandler('example', 'ContextHandlerExample', array('id' => 1));
+    $butler['test'] = 'test';
+
+    $t1 = $butler->lock();
+
+    // Add a context layer to the butler context.
+    $b2 = $butler->addLayer();
+    $b2['test'] = 'test2';
+
+    // Override with another instance of ContextValueInterface.
+    $n1 = $this->createExampleObject(2);
+    $b2['example'] = $n1;
+    $t2 = $b2->lock();
+
+    // Now try using the context values.
+    $b2['example'];
+    $b2['test'];
+
+    $used = $b2->usedKeys();
+
+    $this->assertTrue(in_array('test', 'test2'), t('Used keys includes primitive key value.'));
+    $this->assertTrue(in_array('example', 2), t('Used keys includes primitive key value.'));
+  }
+
+  /**
+   * Utility method for an example value object.
+   *
+   * The property values are predictable and can be used for testing.
+   */
+  protected function createExampleObject($id) {
+    $c = new ContextValueExample($id);
+    $c->foo = $id * 10;
+    $c->bar = 'Baz ' . $id;
+
+    return $c;
+  }
+}
+
+class ButlerMockTestCase extends DrupalUnitTestCase {
+  public static function getInfo() {
+    return array(
+      'name' => 'Context Mocking functionality',
+      'description' => 'Test the Context object\'s override capability.',
+      'group' => 'Context',
+    );
+  }
+
+  function setUp() {
+    parent::setUp();
+
+    require_once(DRUPAL_ROOT . '/includes/context.inc');
+    require_once(DRUPAL_ROOT . '/modules/simpletest/tests/context_test.module');
+  }
+
+  /**
+   * Test basic context overrides.
+   */
+  function testOverrides() {
+    $butler = new DrupalContext(new ButlerFakeRequest(array('foo' => 'bar')));
+
+    $butler->registerHandler('http:get', 'ContextHandlerHttp', array('query' => 'GET'));
+
+    $t1 = $butler->lock();
+
+    $foo1 = $butler['http:get:foo'];
+
+    $this->assertEqual($foo1, 'bar', t('Correct Http GET fragment found.'));
+
+    // Now check cloning.
+    $b2 = $butler->addLayer();
+    $b2['test'] = 'test';
+    $t2 = $b2->lock();
+
+    $this->assertNotIdentical($butler, $b2, t('New context object created properly.'));
+
+    $this->assertEqual($b2['http:get:foo'], 'bar', t('Inherited property works.'));
+    $this->assertEqual($b2['test'], 'test', t('Explicit context property in mocked object is correct.'));
+
+    $b3 = $b2->addLayer();
+    $b3['test'] = 'test_again';
+    $t3 = $b3->lock();
+
+    $this->assertEqual($b3['test'], 'test_again', t('Explicitly overriden property works.'));
+  }
+
+  /**
+   * Test access to the "active" context.
+   */
+  public function testActiveContext() {
+    $butler = new DrupalContext(new ButlerFakeRequest(array('foo' => 'bar')));
+    $t1 = $butler->lock();
+    $b2 = $butler->addLayer();
+    $t2 = $b2->lock();
+
+    $this->assertEqual($b2, DrupalContext::getActiveContext(), t('Active context is correct when adding context objects.'));
+
+    unset($t2);
+
+    $this->assertEqual($butler, DrupalContext::getActiveContext(), t('Active context is correct when removing context objects.'));
+  }
+
+  public function testGarbageCollection() {
+    // create a simple butler object
+    $butler = new DrupalContext(new ButlerFakeRequest(array()));
+    $butler->registerHandler('foo', 'ButlerTestCaseHelperThree', array('bar' => 'butler'));
+    $t1 = $butler->lock();
+
+    // create a new layer on top of that, which overrides some information
+    $b2 = $butler->addLayer();
+    $b2->registerHandler('foo', 'ButlerTestCaseHelperThree', array('bar' => 'b2'));
+    $t2 = $b2->lock();
+
+    // create a new layer on top of that, which actually does nothing at all
+    $b3 = $b2->addLayer();
+    $t3 = $b3->lock();
+
+    // get rid of the tracker for b3
+    unset($t3);
+
+    // get rid of b2 entirely
+    unset($t2);
+    unset($b2);
+
+    try {
+      // this should throw an exception
+      $b3['foo:bar'];
+
+      $this->fail(t('Exception not thrown when getting data from a context that should have been destroyed.'));
+    }
+    catch (ButlerParentContextNotExistsException $e) {
+      $this->pass(t('Proper exception thrown when getting data from a context that should have been destroyed.'));
+    }
+    catch (Exception $e) {
+      $this->fail(t('Incorrect exception thrown when getting data from a context that should have been destroyed.'));
+    }
+  }
+}
