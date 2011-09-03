@@ -16,6 +16,12 @@ class ButlerNotLockedException extends Exception {}
  */
 class ButlerParentContextNotExistsException extends Exception {}
 
+/**
+ * Generic wrapper for an HTTP request.
+ *
+ * @deprecated.  This will be removed as soon as the Symfony HTTP library is
+ *   in place.
+ */
 interface DrupalRequestInterface {
   /**
    * Retrieves a value from the GET query.
@@ -65,6 +71,12 @@ interface DrupalRequestInterface {
 
 }
 
+/**
+ * Generic wrapper for an HTTP request.
+ *
+ * @deprecated.  This will be removed as soon as the Symfony HTTP library is
+ *   in place.
+ */
 class DrupalRequestHttp implements DrupalRequestInterface {
 
   protected $getQuery;
@@ -331,7 +343,7 @@ class DrupalContext implements DrupalContextInterface {
       }
     }
 
-    // Store the value for key retrieval
+    // Store the value for key retrieval.
     $this->usedKeys[$offset] = $offset;
 
     return $this->context[$offset];
@@ -423,10 +435,8 @@ class DrupalContext implements DrupalContextInterface {
   public function __destruct() {
     $me = spl_object_hash($this);
 
-   // never remove the root item from the stack
+    // Never remove the root item from the stack.
     $offset = array_search($me, array_keys(self::$contextStack));
-
-    // never remove the root item from the stack
     if ($offset) {
       self::$contextStack = array_slice(self::$contextStack, 0, $offset, TRUE);
     }
