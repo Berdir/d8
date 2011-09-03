@@ -1,14 +1,14 @@
 <?php
 
 
-class ButlerTestCaseHelperOne extends ContextHandlerAbstract {
+class ContextTestCaseHelperOne extends ContextHandlerAbstract {
 
   public function getValue(array $args = array()) {
     return 'one';
   }
 }
 
-class ButlerTestCaseHelperTwo extends ContextHandlerAbstract {
+class ContextTestCaseHelperTwo extends ContextHandlerAbstract {
 
   /**
    * A dummy increment counter.
@@ -23,14 +23,14 @@ class ButlerTestCaseHelperTwo extends ContextHandlerAbstract {
   }
 }
 
-class ButlerTestCaseHelperThree extends ContextHandlerAbstract {
+class ContextTestCaseHelperThree extends ContextHandlerAbstract {
   public function getValue(array $args = array()) {
     $param = $args[0];
     return isset($this->params[$param]) ? $this->params[$param] : NULL;
   }
 }
 
-class ButlerFakeRequest extends DrupalRequestHttp {
+class ContextFakeRequest extends DrupalRequestHttp {
 
   public function __construct($get = array(), $post = array()) {
     parent::__construct();

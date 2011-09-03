@@ -1,6 +1,6 @@
 <?php
 
-class ButlerTestCase extends DrupalUnitTestCase {
+class ContextTestCase extends DrupalUnitTestCase {
   public static function getInfo() {
     return array(
       'name' => 'Context functionality',
@@ -22,7 +22,7 @@ class ButlerTestCase extends DrupalUnitTestCase {
   function testSimpleRegistration() {
     $_GET['foo'] = 'bar';
 
-    $butler = new DrupalContext(new ButlerFakeRequest(array('foo' => 'bar')));
+    $butler = new DrupalContext(new ContextFakeRequest(array('foo' => 'bar')));
 
     $butler->registerHandler('http:get', 'ContextHandlerHttp', array('query' => 'GET'));
     $butler->lock();
@@ -33,7 +33,7 @@ class ButlerTestCase extends DrupalUnitTestCase {
   }
 
   function testExplicitContext() {
-    $butler = new DrupalContext(new ButlerFakeRequest());
+    $butler = new DrupalContext(new ContextFakeRequest());
 
     $butler['foo:bar'] = 'baz';
 
@@ -43,10 +43,10 @@ class ButlerTestCase extends DrupalUnitTestCase {
   }
 
   function testExplicitContextOverride() {
-    $butler = new DrupalContext(new ButlerFakeRequest());
+    $butler = new DrupalContext(new ContextFakeRequest());
 
     // This handler would return "one".
-    $butler->registerHandler('foo:bar', 'ButlerTestCaseHelperOne');
+    $butler->registerHandler('foo:bar', 'ContextTestCaseHelperOne');
 
     // But we override it to "two".
     $butler['foo:bar'] = 'two';
@@ -60,7 +60,7 @@ class ButlerTestCase extends DrupalUnitTestCase {
    * Test that we can lock a context object against modification.
    */
   function testLockStatusExplcit() {
-    $butler = new DrupalContext(new ButlerFakeRequest());
+    $butler = new DrupalContext(new ContextFakeRequest());
 
     try {
       $butler->lock();
@@ -69,7 +69,7 @@ class ButlerTestCase extends DrupalUnitTestCase {
 
       $this->fail(t('Exception not thrown when setting context on a locked object.'));
     }
-    catch (ButlerLockedException $e) {
+    catch (ContextLockedException $e) {
       $this->pass(t('Proper exception thrown when setting context on a locked object.'));
     }
     catch (Exception $e) {
@@ -81,16 +81,16 @@ class ButlerTestCase extends DrupalUnitTestCase {
    * Test that we can lock a context object against modification.
    */
   function testLockStatusDerived() {
-    $butler = new DrupalContext(new ButlerFakeRequest());
+    $butler = new DrupalContext(new ContextFakeRequest());
 
     try {
       $butler->lock();
       // This should throw an exception.
-      $butler->registerHandler('foo:bar', 'ButlerTestCaseHelperOne');
+      $butler->registerHandler('foo:bar', 'ContextTestCaseHelperOne');
 
       $this->fail(t('Exception not thrown when setting context on a locked object.'));
     }
-    catch (ButlerLockedException $e) {
+    catch (ContextLockedException $e) {
       $this->pass(t('Proper exception thrown when setting context handler on a locked object.'));
     }
     catch (Exception $e) {
@@ -102,10 +102,10 @@ class ButlerTestCase extends DrupalUnitTestCase {
    * Test the result caching logic.
    */
   function testResultCaching() {
-    $butler = new DrupalContext(new ButlerFakeRequest());
+    $butler = new DrupalContext(new ContextFakeRequest());
 
     // This handler should return 1, then 2, then 3, each time it's called.
-    $butler->registerHandler('foo:bar', 'ButlerTestCaseHelperTwo');
+    $butler->registerHandler('foo:bar', 'ContextTestCaseHelperTwo');
     $butler->lock();
 
     // Calling the same context variable should always give the same value
@@ -116,7 +116,7 @@ class ButlerTestCase extends DrupalUnitTestCase {
   }
 }
 
-class ButlerValueObjectTestCase extends DrupalUnitTestCase {
+class ContextValueObjectTestCase extends DrupalUnitTestCase {
   public static function getInfo() {
     return array(
       'name' => 'Context Value Object functionality',
@@ -136,7 +136,7 @@ class ButlerValueObjectTestCase extends DrupalUnitTestCase {
    * Test the retrieval of context values of objects.
    */
   function testContextValues() {
-    $butler = new DrupalContext(new ButlerFakeRequest());
+    $butler = new DrupalContext(new ContextFakeRequest());
 
     // Add a handler for this test to mimic to create an example (E.g. from url arguments)
     $butler->registerHandler('example', 'ContextHandlerExample', array('id' => 1));
@@ -182,7 +182,7 @@ class ButlerValueObjectTestCase extends DrupalUnitTestCase {
    * Test that we can track the keys we've used.
    */
   public function testUsedKeys() {
-    $butler = new DrupalContext(new ButlerFakeRequest());
+    $butler = new DrupalContext(new ContextFakeRequest());
 
     // Add a handler for this test to mimic to create an example (E.g. from url arguments)
     $butler->registerHandler('example', 'ContextHandlerExample', array('id' => 1));
@@ -224,7 +224,7 @@ class ButlerValueObjectTestCase extends DrupalUnitTestCase {
   }
 }
 
-class ButlerMockTestCase extends DrupalUnitTestCase {
+class ContextMockTestCase extends DrupalUnitTestCase {
   public static function getInfo() {
     return array(
       'name' => 'Context Mocking functionality',
@@ -244,7 +244,7 @@ class ButlerMockTestCase extends DrupalUnitTestCase {
    * Test basic context overrides.
    */
   function testOverrides() {
-    $butler = new DrupalContext(new ButlerFakeRequest(array('foo' => 'bar')));
+    $butler = new DrupalContext(new ContextFakeRequest(array('foo' => 'bar')));
 
     $butler->registerHandler('http:get', 'ContextHandlerHttp', array('query' => 'GET'));
 
@@ -275,7 +275,7 @@ class ButlerMockTestCase extends DrupalUnitTestCase {
    * Test access to the "active" context.
    */
   public function testActiveContext() {
-    $butler = new DrupalContext(new ButlerFakeRequest(array('foo' => 'bar')));
+    $butler = new DrupalContext(new ContextFakeRequest(array('foo' => 'bar')));
     $t1 = $butler->lock();
     $b2 = $butler->addLayer();
     $t2 = $b2->lock();
@@ -289,13 +289,13 @@ class ButlerMockTestCase extends DrupalUnitTestCase {
 
   public function testGarbageCollection() {
     // create a simple butler object
-    $butler = new DrupalContext(new ButlerFakeRequest(array()));
-    $butler->registerHandler('foo', 'ButlerTestCaseHelperThree', array('bar' => 'butler'));
+    $butler = new DrupalContext(new ContextFakeRequest(array()));
+    $butler->registerHandler('foo', 'ContextTestCaseHelperThree', array('bar' => 'butler'));
     $t1 = $butler->lock();
 
     // create a new layer on top of that, which overrides some information
     $b2 = $butler->addLayer();
-    $b2->registerHandler('foo', 'ButlerTestCaseHelperThree', array('bar' => 'b2'));
+    $b2->registerHandler('foo', 'ContextTestCaseHelperThree', array('bar' => 'b2'));
     $t2 = $b2->lock();
 
     // create a new layer on top of that, which actually does nothing at all
@@ -315,7 +315,7 @@ class ButlerMockTestCase extends DrupalUnitTestCase {
 
       $this->fail(t('Exception not thrown when getting data from a context that should have been destroyed.'));
     }
-    catch (ButlerParentContextNotExistsException $e) {
+    catch (ContextParentContextNotExistsException $e) {
       $this->pass(t('Proper exception thrown when getting data from a context that should have been destroyed.'));
     }
     catch (Exception $e) {

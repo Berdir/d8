@@ -3,18 +3,18 @@
 /**
  * Exception thrown when attempting to modify a locked context object.
  */
-class ButlerLockedException extends Exception {}
+class ContextLockedException extends Exception {}
 
 /**
  * Exception thrown when attempting to use an unlocked context object.
  */
-class ButlerNotLockedException extends Exception {}
+class ContextNotLockedException extends Exception {}
 
 /**
  * Exception thrown when attempting to fall through to a parent context object
  * that already got garbace collected
  */
-class ButlerParentContextNotExistsException extends Exception {}
+class ContextParentContextNotExistsException extends Exception {}
 
 /**
  * Generic wrapper for an HTTP request.
@@ -194,7 +194,7 @@ interface DrupalContextInterface extends ArrayAccess {
 }
 
 /**
- * Default Drupal context Butler.
+ * Default Drupal context object.
  *
  * It handles routing of context requests to handlers.
  */
@@ -309,7 +309,7 @@ class DrupalContext implements DrupalContextInterface {
    */
   public function offsetGet($offset) {
     if (!$this->locked) {
-      throw new ButlerNotLockedException(t('This butler object has not been locked. It must be locked before it can be used.'));
+      throw new ContextNotLockedException(t('This context object has not been locked. It must be locked before it can be used.'));
     }
 
     if (!isset($this->context[$offset])) {
@@ -335,7 +335,7 @@ class DrupalContext implements DrupalContextInterface {
         } else {
           $this->context[$offset] = NULL;
 
-          throw new ButlerParentContextNotExistsException('The parent of the current butler object does not exist anymore');
+          throw new ContextParentContextNotExistsException('The parent of the current context object does not exist anymore');
         }
       }
       else {
@@ -354,7 +354,7 @@ class DrupalContext implements DrupalContextInterface {
    */
   public function offsetSet($offset, $value) {
     if ($this->locked) {
-      throw new ButlerLockedException(t('This butler object has been locked. It no longer accepts new explicit context sets.'));
+      throw new ContextLockedException(t('This context object has been locked. It no longer accepts new explicit context sets.'));
     }
     // Set an explicit override for a given context value.
     $this->context[$offset] = $value;
@@ -365,7 +365,7 @@ class DrupalContext implements DrupalContextInterface {
    */
   public function offsetUnset($offset) {
     if ($this->locked) {
-      throw new ButlerLockedException(t('This butler object has been locked. It no longer accepts context clears.'));
+      throw new ContextLockedException(t('This context object has been locked. It no longer accepts context clears.'));
     }
 
     // Remove this value from the usedKeys
@@ -383,7 +383,7 @@ class DrupalContext implements DrupalContextInterface {
    */
   public function registerHandler($context, $class, $params = array()) {
     if ($this->locked) {
-      throw new ButlerLockedException(t('This butler object has been locked. It no longer accepts new handler registrations.'));
+      throw new ContextLockedException(t('This context object has been locked. It no longer accepts new handler registrations.'));
     }
     $this->handlerClasses[$context] = array('class' => $class, 'params' => $params);
   }
