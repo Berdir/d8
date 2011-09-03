@@ -32,6 +32,9 @@ class ContextTestCase extends DrupalUnitTestCase {
     $this->assertEqual($param, 'bar', t('Correct Http GET fragment found.'));
   }
 
+  /**
+   * Test explicit specification of a context value.
+   */
   function testExplicitContext() {
     $butler = new DrupalContext(new ContextFakeRequest());
 
@@ -42,6 +45,9 @@ class ContextTestCase extends DrupalUnitTestCase {
     $this->assertEqual($butler['foo:bar'], 'baz', t('Explicit context set correctly.'));
   }
 
+  /**
+   * Test explicit overriding of a context value.
+   */
   function testExplicitContextOverride() {
     $butler = new DrupalContext(new ContextFakeRequest());
 
@@ -224,6 +230,9 @@ class ContextValueObjectTestCase extends DrupalUnitTestCase {
   }
 }
 
+/**
+ * Test class for the mocking/overriding capability of the context system.
+ */
 class ContextMockTestCase extends DrupalUnitTestCase {
   public static function getInfo() {
     return array(
@@ -287,30 +296,33 @@ class ContextMockTestCase extends DrupalUnitTestCase {
     $this->assertEqual($butler, DrupalContext::getActiveContext(), t('Active context is correct when removing context objects.'));
   }
 
+  /**
+   * Test that cotext values are removed from the stack properly.
+   */
   public function testGarbageCollection() {
-    // create a simple butler object
+    // Create a simple butler object.
     $butler = new DrupalContext(new ContextFakeRequest(array()));
     $butler->registerHandler('foo', 'ContextTestCaseHelperThree', array('bar' => 'butler'));
     $t1 = $butler->lock();
 
-    // create a new layer on top of that, which overrides some information
+    // Create a new layer on top of that, which overrides some information.
     $b2 = $butler->addLayer();
     $b2->registerHandler('foo', 'ContextTestCaseHelperThree', array('bar' => 'b2'));
     $t2 = $b2->lock();
 
-    // create a new layer on top of that, which actually does nothing at all
+    // Create a new layer on top of that, which actually does nothing at all.
     $b3 = $b2->addLayer();
     $t3 = $b3->lock();
 
-    // get rid of the tracker for b3
+    // Get rid of the tracker for b3.
     unset($t3);
 
-    // get rid of b2 entirely
+    // Get rid of b2 entirely.
     unset($t2);
     unset($b2);
 
     try {
-      // this should throw an exception
+      // This should throw an exception.
       $b3['foo:bar'];
 
       $this->fail(t('Exception not thrown when getting data from a context that should have been destroyed.'));
