@@ -2008,6 +2008,19 @@ function _drupal_bootstrap_configuration() {
   timer_start('page');
   // Initialize the configuration, including variables from settings.php.
   drupal_settings_initialize();
+
+  // Hook up the Symfony ClassLoader for loading PSR-0-compatible classes.
+  require_once(DRUPAL_ROOT . '/includes/Symfony/Component/ClassLoader/UniversalClassLoader.php');
+  $loader = new \Symfony\Component\ClassLoader\UniversalClassLoader();
+
+  // Register classes with namespaces.
+  $loader->registerNamespaces(array(
+    // All Symfony-borrowed code lives in /includes/Symfony.
+    'Symfony' => DRUPAL_ROOT . '/includes',
+  ));
+
+  // Activate the autoloader.
+  $loader->register();
 }
 
 /**
