@@ -10,6 +10,12 @@ class ButlerLockedException extends Exception {}
  */
 class ButlerNotLockedException extends Exception {}
 
+/**
+ * Exception thrown when attempting to fall through to a parent context object
+ * that already got garbace collected
+ */
+class ButlerParentContextNotExistsException extends Exception {}
+
 interface DrupalRequestInterface {
   /**
    * Retrieves a value from the GET query.
@@ -241,19 +247,20 @@ class DrupalContext implements DrupalContextInterface {
   protected $locked = FALSE;
 
   /**
-   * The parent context object from which this object will inherit data.
+   * The hash of the parent context object from which this object will inherit
+   * data.
    *
-   * @var DrupalContextInterface
+   * @var string
    */
-  protected $parent = NULL;
+  protected $parentId = NULL;
 
-  public function __construct(DrupalRequestInterface $request, DrupalContextInterface $parent = NULL) {
+  public function __construct(DrupalRequestInterface $request, $parent_id = NULL) {
     $this->request = $request;
 
     $this->queryString = $this->request->get('q');
 
-    if ($parent) {
-      $this->parentContext = $parent;
+    if ($parent_id) {
+      $this->parentId = $parent_id;
     }
   }
 
@@ -310,8 +317,14 @@ class DrupalContext implements DrupalContextInterface {
       if (isset($this->handlers[$context_key])) {
         $this->context[$offset] = $this->handlers[$context_key]->getValue($args);
       }
-      else if (isset($this->parentContext)) {
-        $this->context[$offset] = $this->parentContext->offsetGet($offset);
+      else if (isset($this->parentId)) {
+        if (isset(self::$contextStack[$this->parentId])) {
+          $this->context[$offset] = self::$contextStack[$this->parentId]->offsetGet($offset);
+        } else {
+          $this->context[$offset] = NULL;
+
+          throw new ButlerParentContextNotExistsException('The parent of the current butler object does not exist anymore');
+        }
       }
       else {
         $this->context[$offset] = NULL;
@@ -396,7 +409,7 @@ class DrupalContext implements DrupalContextInterface {
    */
   public function addLayer() {
 
-    $layer = new self($this->request, $this);
+    $layer = new self($this->request, spl_object_hash($this));
     return $layer;
   }
 
@@ -410,6 +423,7 @@ class DrupalContext implements DrupalContextInterface {
   public function __destruct() {
     $me = spl_object_hash($this);
 
+   // never remove the root item from the stack
     $offset = array_search($me, array_keys(self::$contextStack));
     if ($offset) {
       self::$contextStack = array_slice(self::$contextStack, 0, $offset, TRUE);
