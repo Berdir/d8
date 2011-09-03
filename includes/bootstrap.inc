@@ -2011,7 +2011,13 @@ function _drupal_bootstrap_configuration() {
 
   // Hook up the Symfony ClassLoader for loading PSR-0-compatible classes.
   require_once(DRUPAL_ROOT . '/includes/Symfony/Component/ClassLoader/UniversalClassLoader.php');
-  $loader = new \Symfony\Component\ClassLoader\UniversalClassLoader();
+  if (function_exists('apc_store')) {
+    require_once(DRUPAL_ROOT . '/includes/Symfony/Component/ClassLoader/ApcUniversalClassLoader.php');
+    $loader = new \Symfony\Component\ClassLoader\ApcUniversalClassLoader('drupal.' . $GLOBALS['drupal_hash_salt']);
+  }
+  else {
+    $loader = new \Symfony\Component\ClassLoader\UniversalClassLoader();
+  }
 
   // Register classes with namespaces.
   $loader->registerNamespaces(array(
