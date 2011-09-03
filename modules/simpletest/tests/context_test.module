@@ -67,3 +67,29 @@ class ContextValueExample implements ContextValueInterface {
   }
 }
 
+/**
+ * ContextHandlerExample
+ */
+class ContextHandlerExample extends ContextHandlerAbstract {
+
+  public function getValue(array $args = array()) {
+    if (isset($this->params['id'])) {
+      $contextValueExample =  $this->createExampleObject($this->params['id']);
+      $param = !empty($args) ? $args[0] : NULL;
+      return isset($contextValueExample->$param) ? $contextValueExample->$param : $contextValueExample;
+    }
+  }
+
+  /**
+   * Utility method for an example value object.
+   *
+   * The property values are predictable and can be used for testing.
+   */
+  protected function createExampleObject($id) {
+    $c = new ContextValueExample($id);
+    $c->foo = $id * 10;
+    $c->bar = 'Baz ' . $id;
+
+    return $c;
+  }
+}

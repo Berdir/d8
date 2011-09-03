@@ -205,8 +205,9 @@ class ButlerValueObjectTestCase extends DrupalUnitTestCase {
 
     $used = $b2->usedKeys();
 
-    $this->assertTrue(in_array('test', 'test2'), t('Used keys includes primitive key value.'));
-    $this->assertTrue(in_array('example', 2), t('Used keys includes primitive key value.'));
+    $this->assertEqual(count($used), 2, t('Correct number of keys in used keys array.'));
+    $this->assertEqual($used['test'], 'test2', t('Used keys includes primitive key correctly.'));
+    $this->assertEqual($used['example'], 2, t('Used keys includes object key correctly.'));
   }
 
   /**
