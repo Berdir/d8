@@ -312,34 +312,46 @@ class DrupalContext implements DrupalContextInterface {
       throw new ContextNotLockedException(t('This context object has not been locked. It must be locked before it can be used.'));
     }
 
-    if (!isset($this->context[$offset])) {
+    // we do not have data for this offset yet. use array_key_exists, because
+    // the value can be NULL. We do not want to rerun all handlerClasses for a
+    // variable with data
+    if (!array_key_exists($offset, $this->context)) {
+      // loop over the possible context_keys
       $context_key = $offset;
       $offset_elements = explode(':', $offset);
       $args = array();
-      while ($offset_elements && !isset($this->handlerClasses[$context_key])) {
-        $args[] = array_pop($offset_elements);
+      while ($offset_elements) {
+        if (isset($this->handlerClasses[$context_key])) {
+          if (!isset($this->handlers[$context_key]) && class_exists($this->handlerClasses[$context_key]['class'])) {
+            $this->handlers[$context_key] = new $this->handlerClasses[$context_key]['class']($this, $this->handlerClasses[$context_key]['params']);
+          }
+
+          if (isset($this->handlers[$context_key])) {
+            $this->context[$offset] = $this->handlers[$context_key]->getValue($args);
+
+            if (isset($this->context[$offset])) {
+              break;
+            }
+          }
+        }
+
+        array_unshift($args, array_pop($offset_elements));
         $context_key = implode(':', $offset_elements);
       }
 
-      $context_key = implode(':', $offset_elements);
-      if (!isset($this->handlers[$context_key]) && isset($this->handlerClasses[$context_key]) && class_exists($this->handlerClasses[$context_key]['class'])) {
-        $this->handlers[$context_key] = new $this->handlerClasses[$context_key]['class']($this, $this->handlerClasses[$context_key]['params']);
-      }
+      if (!isset($this->context[$offset])) {
+        if (isset($this->parentId)) {
+          if (isset(self::$contextStack[$this->parentId])) {
+            $this->context[$offset] = self::$contextStack[$this->parentId]->offsetGet($offset);
+          } else {
+            $this->context[$offset] = NULL;
 
-      if (isset($this->handlers[$context_key])) {
-        $this->context[$offset] = $this->handlers[$context_key]->getValue($args);
-      }
-      else if (isset($this->parentId)) {
-        if (isset(self::$contextStack[$this->parentId])) {
-          $this->context[$offset] = self::$contextStack[$this->parentId]->offsetGet($offset);
-        } else {
-          $this->context[$offset] = NULL;
-
-          throw new ContextParentContextNotExistsException('The parent of the current context object does not exist anymore');
+            throw new ButlerParentContextNotExistsException('The parent of the current butler object does not exist anymore');
+          }
         }
-      }
-      else {
-        $this->context[$offset] = NULL;
+        else {
+          $this->context[$offset] = NULL;
+        }
       }
     }
 

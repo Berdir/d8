@@ -334,4 +334,42 @@ class ContextMockTestCase extends DrupalUnitTestCase {
       $this->fail(t('Incorrect exception thrown when getting data from a context that should have been destroyed.'));
     }
   }
+
+  public function testContextArguments() {
+    $butler = new DrupalContext(new ButlerFakeRequest());
+    $butler->registerHandler('foo', 'ContextTestCaseHelperArguments');
+    $butler->lock();
+
+    $this->assertEqual($butler['foo:bar:baz'], array('bar', 'baz'), t('ContextHandler gets the correct arguments.'));
+  }
+
+  public function testInheritanceContexts() {
+    $butler = new DrupalContext(new ButlerFakeRequest());
+    $butler->registerHandler('foo:bar', 'ContextTestCaseHelperThree', array('baz' => 1));
+    $t1 = $butler->lock();
+
+    $b2 = $butler->addLayer();
+    $b2->registerHandler('foo', 'ContextTestCaseHelperThree', array('bar' => 3));
+    $t2 = $b2->lock();
+
+    $this->assertEqual($b2['foo:bar:baz'], 3, t('Context overrides even when more generic.'));
+
+    unset($t2); unset($b2);
+
+    $b3 = $butler->addLayer();
+    $b3->registerHandler('foo', 'ContextTestCaseHelperThree', array('baz' => 5));
+    $t3 = $b3->lock();
+
+    $this->assertEqual($b3['foo:bar:baz'], 1, t('If a context handler does not return data, the parent handler gets a change to return data'));
+
+    unset($t3); unset($b3);
+
+    $b4 = $butler->addLayer();
+    $b4->registerHandler('foo:bar:baz', 'ContextTestCaseHelperThree', array('bax' => 7));
+    $b4->registerHandler('foo:bar', 'ContextTestCaseHelperThree', array('baz' => 9));
+    $t4 = $b4->lock();
+
+    $this->assertEqual($b4['foo:bar:baz:boo'], 9, t('A more generic handler in the same context should be called if the less generic handler does not return data.'));
+  }
+
 }
