@@ -560,7 +560,9 @@ interface ContextHandlerInterface {
    *   the portion of the context key after the key fragment that led to this
    *   handler.
    * @return mixed
-   *   The corresponding value for this context.
+   *   The corresponding value for this context. Return here an new instance of
+   *   ContextOffsetDoesNotExists if you don't have any value corresponding to
+   *   the given arguments to provide.
    */
   public function getValue(array $args = array());
 }
