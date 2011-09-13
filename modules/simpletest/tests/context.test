@@ -380,19 +380,19 @@ class ContextMockTestCase extends DrupalUnitTestCase {
     $tutler = $butler->lock();
 
     // Normal behavior, with no derivation.
-    $this->assertTrue(isset($butler['foo:bar']), t("Value exists"));
-    $this->assertFalse(isset($butler['I:Do:Not:Exist']), t("Value does not exists"));
-    $this->assertTrue(isset($butler['foo:bar']), t("Value exists (caching does not break anything)"));
-    $this->assertFalse(isset($butler['I:Do:Not:Exist']), t("Value does not exists (caching does not break anything)"));
+    $this->assertTrue(isset($butler['foo:bar']), t("foo:bar exists"));
+    $this->assertFalse(isset($butler['I:Do:Not:Exist']), t("I:Do:Not:Exist does not exists"));
+    $this->assertTrue(isset($butler['foo:bar']), t("foo:bar exists (caching does not break anything)"));
+    $this->assertFalse(isset($butler['I:Do:Not:Exist']), t("I:Do:Not:Exist does not exists (caching does not break anything)"));
 
     // Now derivate, and test the same over the new layer. Results should be
     // the exact same.
     $b1 = $butler->addLayer();
     $t1 = $b1->lock();
-    $this->assertTrue(isset($b1['foo:bar']), t("Value exists in new layer"));
-    $this->assertFalse(isset($b1['I:Do:Not:Exist']), t("Value does not exists in new layer"));
+    $this->assertTrue(isset($b1['foo:bar']), t("foo:bar exists in new layer"));
+    $this->assertFalse(isset($b1['I:Do:Not:Exist']), t("I:Do:Not:Exist does not exists in new layer"));
     $this->assertTrue(isset($b1['foo:bar']), t("Value exists in new layer (caching does not break anything)"));
-    $this->assertFalse(isset($b1['I:Do:Not:Exist']), t("Value does not exists in new layer (caching does not break anything)"));
+    $this->assertFalse(isset($b1['I:Do:Not:Exist']), t("I:Do:Not:Exist does not exists in new layer (caching does not break anything)"));
 
     unset($t1, $b1);
 
@@ -400,9 +400,9 @@ class ContextMockTestCase extends DrupalUnitTestCase {
     $b2 = $butler->addLayer();
     $b2->registerHandler('May:I', 'ContextTestCaseHelperThree', array('Exist' => 5));
     $t2 = $b2->lock();
-    $this->assertTrue(isset($b2['foo:bar']), t("Value exists in new layer"));
-    $this->assertFalse(isset($b2['I:Do:Not:Exist']), t("Value does not exists in new layer"));
-    $this->assertTrue(isset($b2['May:I:Exist']), t("Local value exists in new layer"));
+    $this->assertTrue(isset($b2['foo:bar']), t("foo:bar exists in new layer"));
+    $this->assertFalse(isset($b2['I:Do:Not:Exist']), t("I:Do:Not:Exist does not exists in new layer"));
+    $this->assertTrue(isset($b2['May:I:Exist']), t("May:I:Exist value exists in new layer"));
 
     unset($t2, $tutler);
   }
