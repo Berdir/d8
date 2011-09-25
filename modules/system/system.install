@@ -493,7 +493,7 @@ function system_install() {
   // Clear out module list and hook implementation statics before calling
   // system_rebuild_theme_data().
   module_list(TRUE);
-  module_implements('', FALSE, TRUE);
+  module_implements_reset();
 
   // Load system theme data appropriately.
   system_rebuild_theme_data();
@@ -1623,10 +1623,10 @@ function system_update_last_removed() {
  */
 
 /**
- * Placeholder update to set the schema version to 8000.
+ * Enable entity module.
  */
 function system_update_8000() {
-  // Fill in the first update to Drupal 8 when needed.
+  update_module_enable(array('entity'));
 }
 
 /**
