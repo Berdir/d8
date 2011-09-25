@@ -155,13 +155,6 @@ interface DrupalContextInterface extends ArrayAccess {
   public function request();
 
   /**
-   * Get parent context.
-   * 
-   * @return DrupalContextInterface
-   */
-  public function getParent();
-
-  /**
    * Register a class as the handler for a given context.
    *
    * @param string $context
@@ -206,44 +199,6 @@ interface DrupalContextInterface extends ArrayAccess {
  * Do not use elsewhere.
  */
 class ContextOffsetDoesNotExists {}
-
-/**
- * Null object implementation for context.
- */
-class DrupalContextNull implements DrupalContextInterface {
-
-  public function request() {
-    return NULL;
-  }
-
-  public function getParent() {
-    return $this;
-  }
-
-  public function registerHandler($context, $class, $params = array()) {}
-
-  public function usedKeys() {
-    return array();
-  }
-
-  public function lock() {}
-
-  public function addLayer() {
-    return $this;
-  }
-
-  public function offsetExists($offset) {
-    return FALSE;
-  }
-
-  public function offsetGet($offset) {
-    return new ContextOffsetDoesNotExists;
-  }
-
-  public function offsetSet($offset, $value) {}
-
-  public function offsetUnset($offset) {}
-}
 
 /**
  * Default Drupal context object.
@@ -311,16 +266,21 @@ class DrupalContext implements DrupalContextInterface {
   protected $locked = FALSE;
 
   /**
-   * Parent context object from which this object will inherit data.
+   * The hash of the parent context object from which this object will inherit
+   * data.
    *
-   * @var DrupalContextInterface
+   * @var string
    */
-  protected $parent = NULL;
+  protected $parentId = NULL;
 
-  public function __construct(DrupalRequestInterface $request, DrupalContextInterface $context = NULL) {
+  public function __construct(DrupalRequestInterface $request, $parent_id = NULL) {
     $this->request = $request;
+
     $this->queryString = $this->request->get('q');
-    $this->parent = $context;
+
+    if ($parent_id) {
+      $this->parentId = $parent_id;
+    }
   }
 
   /**
@@ -337,13 +297,6 @@ class DrupalContext implements DrupalContextInterface {
    */
   public function request() {
     return $this->request;
-  }
-
-  public function getParent() {
-    if (!isset($this->parent)) {
-      $this->parent = new DrupalContextNull;
-    }
-    return $this->parent;
   }
 
   public function arg($index) {
@@ -394,7 +347,21 @@ class DrupalContext implements DrupalContextInterface {
 
       // If we did not found a value using local handlers, check for parents.
       if (!array_key_exists($offset, $this->context)) {
-        $this->context[$offset] = $this->getParent()->offsetGet($offset);
+        if (isset($this->parentId)) {
+          if (isset(self::$contextStack[$this->parentId])) {
+            $this->context[$offset] = self::$contextStack[$this->parentId]->offsetGet($offset);
+          } else {
+            $this->context[$offset] = new ContextOffsetDoesNotExists;
+            // FIXME: pounard: This exception masks the affectation uper, should
+            // it be kept? Is that exception fatal for runtime or not? Another
+            // problem is that another hit to this method won't throw the
+            // exception another time if key exists in array, this is a weird
+            // and inconsistent behavior?
+            throw new ContextParentContextNotExistsException('The parent of the current butler object does not exist anymore');
+          }
+        } else {
+          $this->context[$offset] = new ContextOffsetDoesNotExists;
+        }
       }
     }
 
@@ -472,7 +439,8 @@ class DrupalContext implements DrupalContextInterface {
    * Implements DrupalContextInterface::addLayer();
    */
   public function addLayer() {
-    $layer = new self($this->request, $this);
+
+    $layer = new self($this->request, spl_object_hash($this));
     return $layer;
   }
 
