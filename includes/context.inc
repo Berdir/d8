@@ -338,8 +338,6 @@ class DrupalContext implements DrupalContextInterface {
 
           if (isset($this->handlers[$context_key])) {
             $this->context[$offset] = $this->handlers[$context_key]->getValue($args);
-          } else {
-            $this->context[$offset] = new ContextOffsetDoesNotExists;
           }
         }
 
