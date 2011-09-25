@@ -198,7 +198,7 @@ interface DrupalContextInterface extends ArrayAccess {
  * 
  * Do not use elsewhere.
  */
-class ContextOffsetDoesNotExists {}
+class ContextOffsetIsNull {}
 
 /**
  * Default Drupal context object.
@@ -308,10 +308,7 @@ class DrupalContext implements DrupalContextInterface {
    * Implements ArrayAccess::offsetExists().
    */
   public function offsetExists($offset) {
-    if (!array_key_exists($offset, $this->context)) {
-      $this->offsetGet($offset);
-    }
-    return !$this->context[$offset] instanceof ContextOffsetDoesNotExists;
+    return $this->offsetGet($offset) !== NULL;
   }
 
   /**
@@ -332,12 +329,24 @@ class DrupalContext implements DrupalContextInterface {
       $args = array();
       while ($offset_elements) {
         if (isset($this->handlerClasses[$context_key])) {
+          // Lazzy handler instanciation.
           if (!isset($this->handlers[$context_key]) && class_exists($this->handlerClasses[$context_key]['class'])) {
             $this->handlers[$context_key] = new $this->handlerClasses[$context_key]['class']($this, $this->handlerClasses[$context_key]['params']);
           }
 
           if (isset($this->handlers[$context_key])) {
-            $this->context[$offset] = $this->handlers[$context_key]->getValue($args);
+            $handlerValue = $this->handlers[$context_key]->getValue($args);
+            // NULL value here means the context pass, and let potential parent
+            // overrides happen.
+            if (NULL !== $handlerValue) {
+              // The null object here means it's definitely a NULL and parent
+              // cannot override it.
+              if ($handlerValue instanceof ContextOffsetIsNull) {
+                $this->context[$offset] = NULL;
+              } else {
+                $this->context[$offset] = $handlerValue;
+              }
+            }
           }
         }
 
@@ -351,16 +360,10 @@ class DrupalContext implements DrupalContextInterface {
           if (isset(self::$contextStack[$this->parentId])) {
             $this->context[$offset] = self::$contextStack[$this->parentId]->offsetGet($offset);
           } else {
-            $this->context[$offset] = new ContextOffsetDoesNotExists;
-            // FIXME: pounard: This exception masks the affectation uper, should
-            // it be kept? Is that exception fatal for runtime or not? Another
-            // problem is that another hit to this method won't throw the
-            // exception another time if key exists in array, this is a weird
-            // and inconsistent behavior?
             throw new ContextParentContextNotExistsException('The parent of the current butler object does not exist anymore');
           }
         } else {
-          $this->context[$offset] = new ContextOffsetDoesNotExists;
+          $this->context[$offset] = null;
         }
       }
     }
@@ -527,7 +530,7 @@ interface ContextHandlerInterface {
    *   handler.
    * @return mixed
    *   The corresponding value for this context. Return here an new instance of
-   *   ContextOffsetDoesNotExists if you don't have any value corresponding to
+   *   ContextOffsetIsNull if you don't have any value corresponding to
    *   the given arguments to provide: this will cause the context to stop
    *   value lookup for this offset.
    */
