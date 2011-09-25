@@ -322,11 +322,11 @@ class DrupalContext implements DrupalContextInterface {
       throw new ContextNotLockedException(t('This context object has not been locked. It must be locked before it can be used.'));
     }
 
-    // we do not have data for this offset yet. use array_key_exists, because
-    // the value can be NULL. We do not want to rerun all handlerClasses for a
-    // variable with data
+    // We do not have data for this offset yet: use array_key_exists() because
+    // the value can be NULL. We do not want to re-run all handlerClasses for a
+    // variable with data.
     if (!array_key_exists($offset, $this->context)) {
-      // loop over the possible context_keys
+      // Loop over the possible context keys.
       $context_key = $offset;
       $offset_elements = explode(':', $offset);
       $args = array();
