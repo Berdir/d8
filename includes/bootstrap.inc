@@ -2354,7 +2354,7 @@ function _drupal_bootstrap_variables() {
   require_once DRUPAL_ROOT . '/includes/context.inc';
 
   // Initialize the context system (temporary version).
-  $context = new DrupalContext(new DrupalRequestHttp());
+  $context = new DrupalContext();
   bootstrap_invoke_all('context_init', $context);
 
   // We do not need to keep the tracker here, because the DrupalContext

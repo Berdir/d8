@@ -17,142 +17,9 @@ class ContextNotLockedException extends Exception {}
 class ContextParentContextNotExistsException extends Exception {}
 
 /**
- * Generic wrapper for an HTTP request.
- *
- * @deprecated.  This will be removed as soon as the Symfony HTTP library is
- *   in place.
- */
-interface DrupalRequestInterface {
-  /**
-   * Retrieves a value from the GET query.
-   *
-   * See the PHP ext/filter documentation for details.
-   *
-   * @link http://www.php.net/manual/en/book.filter.php
-   *
-   * @param string $param
-   *   The name of the GET parameter to retrieve.
-   * @param int $filter
-   *   The PHP filter rules to apply to the filter. See the ext/filter
-   *   documentation for a complete list of available settings.
-   * @param array $options
-   *   An array of options to customize $filter.  See the ext/filter
-   *   documentation for a complete list of available settings.
-   * @return mixed
-   */
-  public function get($param, $filter = FILTER_UNSAFE_RAW, $options = array());
-
-  /**
-   * Retrieves a value from the POST query.
-   *
-   * See the PHP ext/filter documentation for details.
-   *
-   * @link http://www.php.net/manual/en/book.filter.php
-   *
-   * @param int $filter
-   *   The PHP filter rules to apply to the filter. See the ext/filter
-   *   documentation for a complete list of available settings.
-   * @param array $options
-   *   An array of options to customize $filter.  See the ext/filter
-   *   documentation for a complete list of available settings.
-   *
-   * @return mixed
-   */
-  public function post($param, $filter = FILTER_UNSAFE_RAW, $options = array());
-
-  /**
-   * Retrives an arbitrary HTTP header.
-   *
-   * @param string $header
-   *   The name of the header to request.
-   * @return mixed
-   */
-  public function header($header);
-
-}
-
-/**
- * Generic wrapper for an HTTP request.
- *
- * @deprecated.  This will be removed as soon as the Symfony HTTP library is
- *   in place.
- */
-class DrupalRequestHttp implements DrupalRequestInterface {
-
-  protected $getQuery;
-
-  protected $postQuery;
-
-  protected $filesQuery;
-
-  protected $cookieQuery;
-
-  protected $requestQuery;
-
-  protected $requestHeaders;
-
-  public function __construct() {
-    $this->getQuery = $_GET;
-    $this->postQuery = $_POST;
-    $this->filesQuery = $_FILES;
-    $this->cookieQuery = $_COOKIE;
-    $this->requestQuery = $_REQUEST;
-
-    array_walk($this->getQuery, '_fix_gpc_magic');
-    array_walk($this->postQuery, '_fix_gpc_magic');
-    array_walk($this->filesQuery, '_fix_gpc_magic');
-    array_walk($this->cookieQuery, '_fix_gpc_magic');
-    array_walk($this->requestQuery, '_fix_gpc_magic');
-  }
-
-  /**
-   * Implements DrupalRequestInterface::get().
-   */
-  public function get($param, $filter = FILTER_UNSAFE_RAW, $options = array()) {
-    if (!empty($this->getQuery[$param])) {
-      return filter_var($this->getQuery[$param], $filter, $options);
-    }
-    return FALSE;
-  }
-
-  /**
-   * Implements DrupalRequestInterface::post().
-   */
-  public function post($param, $filter = FILTER_UNSAFE_RAW, $options = array()) {
-    if (!empty($this->postQuery[$param])) {
-      return filter_var($this->postQuery[$param], $filter, $options);
-    }
-    return FALSE;
-  }
-
-
-  /**
-   * Implements DrupalRequestInterface::header().
-   */
-  public function header($header) {
-    // @todo This is, of course, Apache-specific.  We need to find the IIS
-    // equilvalent, too.  Maybe that's even an alternate class implementation?
-    if (!$this->headers) {
-      $this->requestHeaders = apache_request_headers();
-    }
-
-    // @todo This needs proper escaping.  I'm not entirely sure how to do that.
-    return isset($this->requestHeaders[$header]) ? $this->requestHeaders[$header] : NULL;
-  }
-
-}
-
-/**
  * Interface definition for all context objects.
  */
 interface DrupalContextInterface extends ArrayAccess {
-
-  /**
-   * Access the HTTP request information.
-   *
-   * @return DrupalRequestInterface
-   */
-  public function request();
 
   /**
    * Register a class as the handler for a given context.
@@ -195,7 +62,7 @@ interface DrupalContextInterface extends ArrayAccess {
 
 /**
  * Internal class that is meant for context values existence check optimization.
- * 
+ *
  * Do not use elsewhere.
  */
 class ContextOffsetIsNull {}
@@ -253,13 +120,6 @@ class DrupalContext implements DrupalContextInterface {
   protected $usedKeys = array();
 
   /**
-   * The initial request object that started this page request.
-   *
-   * @var DrupalRequestInterface
-   */
-  protected $request = NULL;
-
-  /**
    * Whether or not this object has been locked against further changes.
    * @var boolean
    */
@@ -273,11 +133,7 @@ class DrupalContext implements DrupalContextInterface {
    */
   protected $parentId = NULL;
 
-  public function __construct(DrupalRequestInterface $request, $parent_id = NULL) {
-    $this->request = $request;
-
-    $this->queryString = $this->request->get('q');
-
+  public function __construct($parent_id = NULL) {
     if ($parent_id) {
       $this->parentId = $parent_id;
     }
@@ -290,18 +146,6 @@ class DrupalContext implements DrupalContextInterface {
    */
   public static function getActiveContext() {
    return end(self::$contextStack);
-  }
-
-  /**
-   * Implmenents DrupalContextInterface::request().
-   */
-  public function request() {
-    return $this->request;
-  }
-
-  public function arg($index) {
-    // @todo Eventually reverse this, so arg() calls context->arg().
-    return arg($index, $this->queryString);
   }
 
   /**
@@ -443,7 +287,7 @@ class DrupalContext implements DrupalContextInterface {
    */
   public function addLayer() {
 
-    $layer = new self($this->request, spl_object_hash($this));
+    $layer = new self(spl_object_hash($this));
     return $layer;
   }
 
@@ -566,23 +410,6 @@ abstract class ContextHandlerAbstract implements ContextHandlerInterface {
   public function __construct(DrupalContextInterface $context, $params) {
     $this->context = $context;
     $this->params = $params;
-  }
-}
-
-/**
- * ContextHandlerHttp
- */
-class ContextHandlerHttp extends ContextHandlerAbstract {
-
-  public function getValue(array $args = array()) {
-    // @todo Make this actually generic.
-    $param = $args[0];
-    if ($this->params['query'] == 'GET') {
-      return $this->context->request()->get($param);
-    }
-    if ($this->params['query'] == 'POST') {
-      return $this->context->request()->post($param);
-    }
   }
 }
 

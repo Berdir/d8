@@ -1,5 +1,13 @@
 <?php
 
+class ContextMockHandler extends ContextHandlerAbstract {
+
+  public function getValue(array $args = array()) {
+
+    return $this->params['values'][implode(':', $args)];
+  }
+
+}
 
 class ContextTestCaseHelperOne extends ContextHandlerAbstract {
 
@@ -34,21 +42,6 @@ class ContextTestCaseHelperArguments extends ContextHandlerAbstract {
   public function getValue(array $args = array()) {
     return $args;
   }
-}
-
-class ContextFakeRequest extends DrupalRequestHttp {
-
-  public function __construct($get = array(), $post = array()) {
-    parent::__construct();
-
-    $get += array(
-      'q' => '',
-    );
-
-    $this->getQuery = $get;
-    $this->postQuery = $post;
-  }
-
 }
 
 /**
