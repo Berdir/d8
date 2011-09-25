@@ -121,7 +121,7 @@ function system_help($path, $arg) {
     case 'admin/config/development/maintenance':
       global $user;
       if ($user->uid == 1) {
-        return '<p>' . t('If you are upgrading to a newer version of Drupal or upgrading contributed modules or themes, you may need to run the <a href="@update-php">update script</a>.', array('@update-php' => $base_url . '/update.php')) . '</p>';
+        return '<p>' . t('Use maintenance mode when making major updates, particularly if the updates could disrupt visitors or the update process. Examples include upgrading, importing or exporting content, modifying a theme, modifying content types, and making backups.') . '</p>';
       }
       break;
     case 'admin/config/system/actions':
@@ -1075,9 +1075,9 @@ function _system_batch_theme() {
 }
 
 /**
- * Implements hook_library().
+ * Implements hook_library_info().
  */
-function system_library() {
+function system_library_info() {
   // Drupal's Ajax framework.
   $libraries['drupal.ajax'] = array(
     'title' => 'Drupal AJAX',
@@ -1359,7 +1359,7 @@ function system_library() {
     ),
   );
   $libraries['ui.mouse'] = array(
-    'title' => 'jQuery UI: Droppable',
+    'title' => 'jQuery UI: Mouse',
     'website' => 'http://docs.jquery.com/UI/Mouse',
     'version' => '1.8.7',
     'js' => array(
@@ -3016,10 +3016,10 @@ function system_cron() {
     }
   }
 
-  $core = array('cache', 'cache_path', 'cache_filter', 'cache_page', 'cache_form', 'cache_menu');
-  $cache_tables = array_merge(module_invoke_all('flush_caches'), $core);
-  foreach ($cache_tables as $table) {
-    cache_clear_all(NULL, $table);
+  $core = array('cache', 'path', 'filter', 'page', 'form', 'menu');
+  $cache_bins = array_merge(module_invoke_all('flush_caches'), $core);
+  foreach ($cache_bins as $bin) {
+    cache($bin)->expire();
   }
 
   // Cleanup the batch table and the queue for failed batches.

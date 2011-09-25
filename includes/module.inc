@@ -129,12 +129,12 @@ function system_list($type) {
     if (isset($lists['bootstrap'])) {
       return $lists['bootstrap'];
     }
-    if ($cached = cache_get('bootstrap_modules', 'cache_bootstrap')) {
+    if ($cached = cache('bootstrap')->get('bootstrap_modules')) {
       $bootstrap_list = $cached->data;
     }
     else {
       $bootstrap_list = db_query("SELECT name, filename FROM {system} WHERE status = 1 AND bootstrap = 1 AND type = 'module' ORDER BY weight ASC, name ASC")->fetchAllAssoc('name');
-      cache_set('bootstrap_modules', $bootstrap_list, 'cache_bootstrap');
+      cache('bootstrap')->set('bootstrap_modules', $bootstrap_list);
     }
     // To avoid a separate database lookup for the filepath, prime the
     // drupal_get_filename() static cache for bootstrap modules only.
@@ -148,7 +148,7 @@ function system_list($type) {
   }
   // Otherwise build the list for enabled modules and themes.
   elseif (!isset($lists['module_enabled'])) {
-    if ($cached = cache_get('system_list', 'cache_bootstrap')) {
+    if ($cached = cache('bootstrap')->get('system_list')) {
       $lists = $cached->data;
     }
     else {
@@ -178,7 +178,7 @@ function system_list($type) {
           $lists['filepaths'][] = array('type' => $record->type, 'name' => $record->name, 'filepath' => $record->filename);
         }
       }
-      cache_set('system_list', $lists, 'cache_bootstrap');
+      cache('bootstrap')->set('system_list', $lists);
     }
     // To avoid a separate database lookup for the filepath, prime the
     // drupal_get_filename() static cache with all enabled modules and themes.
@@ -197,8 +197,7 @@ function system_list_reset() {
   drupal_static_reset('system_list');
   drupal_static_reset('system_rebuild_module_data');
   drupal_static_reset('list_themes');
-  cache_clear_all('bootstrap_modules', 'cache_bootstrap');
-  cache_clear_all('system_list', 'cache_bootstrap');
+  cache('bootstrap')->deleteMultiple(array('bootstrap_modules', 'system_list'));
 }
 
 /**
@@ -419,14 +418,15 @@ function module_enable($module_list, $enable_dependencies = TRUE) {
       // Refresh the module list to include it.
       system_list_reset();
       module_list(TRUE);
-      module_implements('', FALSE, TRUE);
+      module_implements_reset();
       _system_update_bootstrap_status();
       // Update the registry to include it.
       registry_update();
       // Refresh the schema to include it.
       drupal_get_schema(NULL, TRUE);
-      // Clear entity cache.
-      entity_info_cache_clear();
+
+      // Allow modules to react prior to the installation of a module.
+      module_invoke_all('modules_preinstall', array($module));
 
       // Now install the module if necessary.
       if (drupal_get_installed_schema_version($module, TRUE) == SCHEMA_UNINSTALLED) {
@@ -450,6 +450,9 @@ function module_enable($module_list, $enable_dependencies = TRUE) {
         $modules_installed[] = $module;
         watchdog('system', '%module module installed.', array('%module' => $module), WATCHDOG_INFO);
       }
+
+      // Allow modules to react prior to the enabling of a module.
+      module_invoke_all('modules_preenable', array($module));
 
       // Enable the module.
       module_invoke($module, 'enable');
@@ -538,7 +541,7 @@ function module_disable($module_list, $disable_dependents = TRUE) {
     // Refresh the module list to exclude the disabled modules.
     system_list_reset();
     module_list(TRUE);
-    module_implements('', FALSE, TRUE);
+    module_implements_reset();
     // Invoke hook_modules_disabled before disabling modules,
     // so we can still call module hooks to get information.
     module_invoke_all('modules_disabled', $invoke_modules);
@@ -618,17 +621,13 @@ function module_hook($module, $hook) {
  * @param $sort
  *   By default, modules are ordered by weight and filename, settings this option
  *   to TRUE, module list will be ordered by module name.
- * @param $reset
- *   For internal use only: Whether to force the stored list of hook
- *   implementations to be regenerated (such as after enabling a new module,
- *   before processing hook_enable).
  *
  * @return
  *   An array with the names of the modules which are implementing this hook.
  *
  * @see module_implements_write_cache()
  */
-function module_implements($hook, $sort = FALSE, $reset = FALSE) {
+function module_implements($hook, $sort = FALSE) {
   // Use the advanced drupal_static() pattern, since this is called very often.
   static $drupal_static_fast;
   if (!isset($drupal_static_fast)) {
@@ -636,28 +635,9 @@ function module_implements($hook, $sort = FALSE, $reset = FALSE) {
   }
   $implementations = &$drupal_static_fast['implementations'];
 
-  // We maintain a persistent cache of hook implementations in addition to the
-  // static cache to avoid looping through every module and every hook on each
-  // request. Benchmarks show that the benefit of this caching outweighs the
-  // additional database hit even when using the default database caching
-  // backend and only a small number of modules are enabled. The cost of the
-  // cache_get() is more or less constant and reduced further when non-database
-  // caching backends are used, so there will be more significant gains when a
-  // large number of modules are installed or hooks invoked, since this can
-  // quickly lead to module_hook() being called several thousand times
-  // per request.
-  if ($reset) {
-    $implementations = array();
-    cache_set('module_implements', array(), 'cache_bootstrap');
-    drupal_static_reset('module_hook_info');
-    drupal_static_reset('drupal_alter');
-    cache_clear_all('hook_info', 'cache_bootstrap');
-    return;
-  }
-
   // Fetch implementations from cache.
   if (empty($implementations)) {
-    $implementations = cache_get('module_implements', 'cache_bootstrap');
+    $implementations = cache('bootstrap')->get('module_implements');
     if ($implementations === FALSE) {
       $implementations = array();
     }
@@ -712,6 +692,27 @@ function module_implements($hook, $sort = FALSE, $reset = FALSE) {
 }
 
 /**
+ * Regenerate the stored list of hook implementations.
+ */
+function module_implements_reset() {
+  // We maintain a persistent cache of hook implementations in addition to the
+  // static cache to avoid looping through every module and every hook on each
+  // request. Benchmarks show that the benefit of this caching outweighs the
+  // additional database hit even when using the default database caching
+  // backend and only a small number of modules are enabled. The cost of the
+  // cache_get() is more or less constant and reduced further when non-database
+  // caching backends are used, so there will be more significant gains when a
+  // large number of modules are installed or hooks invoked, since this can
+  // quickly lead to module_hook() being called several thousand times
+  // per request.
+  drupal_static_reset('module_implements');
+  cache('bootstrap')->set('module_implements', array());
+  drupal_static_reset('module_hook_info');
+  drupal_static_reset('drupal_alter');
+  cache('bootstrap')->delete('hook_info');
+}
+
+/**
  * Retrieve a list of what hooks are explicitly declared.
  */
 function module_hook_info() {
@@ -726,7 +727,7 @@ function module_hook_info() {
 
   if (!isset($hook_info)) {
     $hook_info = array();
-    $cache = cache_get('hook_info', 'cache_bootstrap');
+    $cache = cache('bootstrap')->get('hook_info');
     if ($cache === FALSE) {
       // Rebuild the cache and save it.
       // We can't use module_invoke_all() here or it would cause an infinite
@@ -747,7 +748,7 @@ function module_hook_info() {
           $function($hook_info);
         }
       }
-      cache_set('hook_info', $hook_info, 'cache_bootstrap');
+      cache('bootstrap')->set('hook_info', $hook_info);
     }
     else {
       $hook_info = $cache->data;
@@ -769,7 +770,7 @@ function module_implements_write_cache() {
   // optimized as tightly, and not doing so keeps the cache entry smaller.
   if (isset($implementations['#write_cache']) && ($_SERVER['REQUEST_METHOD'] == 'GET' || $_SERVER['REQUEST_METHOD'] == 'HEAD')) {
     unset($implementations['#write_cache']);
-    cache_set('module_implements', $implementations, 'cache_bootstrap');
+    cache('bootstrap')->set('module_implements', $implementations);
   }
 }
 

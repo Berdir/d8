@@ -1238,6 +1238,10 @@ class DrupalWebTestCase extends DrupalTestCase {
       ->condition('test_id', $this->testId)
       ->execute();
 
+    // Reset all statics and variables to perform tests in a clean environment.
+    $conf = array();
+    drupal_static_reset();
+
     // Clone the current connection and replace the current prefix.
     $connection_info = Database::getConnectionInfo('default');
     Database::renameConnection('default', 'simpletest_original_default');
@@ -1284,10 +1288,6 @@ class DrupalWebTestCase extends DrupalTestCase {
     // Log fatal errors.
     ini_set('log_errors', 1);
     ini_set('error_log', $public_files_directory . '/error.log');
-
-    // Reset all statics and variables to perform tests in a clean environment.
-    $conf = array();
-    drupal_static_reset();
 
     // Set the test information for use in other parts of Drupal.
     $test_info = &$GLOBALS['drupal_test_info'];
@@ -1435,7 +1435,7 @@ class DrupalWebTestCase extends DrupalTestCase {
    */
   protected function refreshVariables() {
     global $conf;
-    cache_clear_all('variables', 'cache_bootstrap');
+    cache('bootstrap')->delete('variables');
     $conf = variable_initialize();
   }
 
@@ -1446,7 +1446,7 @@ class DrupalWebTestCase extends DrupalTestCase {
   protected function tearDown() {
     global $user, $language;
 
-    // In case a fatal error occured that was not in the test process read the
+    // In case a fatal error occurred that was not in the test process read the
     // log to pick up any fatal errors.
     simpletest_log_read($this->testId, $this->databasePrefix, get_class($this), TRUE);
 
@@ -1485,7 +1485,7 @@ class DrupalWebTestCase extends DrupalTestCase {
     // Reload module list and implementations to ensure that test module hooks
     // aren't called after tests.
     module_list(TRUE);
-    module_implements('', FALSE, TRUE);
+    module_implements_reset();
 
     // Reset the Field API.
     field_cache_clear();

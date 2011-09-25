@@ -231,7 +231,7 @@ function update_info_page() {
   _drupal_flush_css_js();
   // Flush the cache of all data for the update status module.
   if (db_table_exists('cache_update')) {
-    cache_clear_all('*', 'cache_update', TRUE);
+    cache('update')->flush();
   }
 
   update_task_list('info');
@@ -345,7 +345,6 @@ require_once DRUPAL_ROOT . '/includes/bootstrap.inc';
 require_once DRUPAL_ROOT . '/includes/update.inc';
 require_once DRUPAL_ROOT . '/includes/common.inc';
 require_once DRUPAL_ROOT . '/includes/file.inc';
-require_once DRUPAL_ROOT . '/includes/entity.inc';
 require_once DRUPAL_ROOT . '/includes/unicode.inc';
 update_prepare_d8_bootstrap();
 
@@ -368,7 +367,7 @@ if (empty($op) && update_access_allowed()) {
 
   // Reset the module_implements() cache so that any new hook implementations
   // in updated code are picked up.
-  module_implements('', FALSE, TRUE);
+  module_implements_reset();
 
   // Set up $language, since the installer components require it.
   drupal_language_initialize();
@@ -447,7 +446,7 @@ else {
   $output = update_access_denied_page();
 }
 if (isset($output) && $output) {
-  // Explictly start a session so that the update.php token will be accepted.
+  // Explicitly start a session so that the update.php token will be accepted.
   drupal_session_start();
   // We defer the display of messages until all updates are done.
   $progress_page = ($batch = batch_get()) && isset($batch['running']);
