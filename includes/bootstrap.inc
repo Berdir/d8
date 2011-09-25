@@ -2220,6 +2220,8 @@ function _drupal_bootstrap_configuration() {
   $loader->registerNamespaces(array(
     // All Symfony-borrowed code lives in /includes/Symfony.
     'Symfony' => DRUPAL_ROOT . '/includes',
+    // All Drupal-namespaced code in core lives in /includes/Drupal.
+    'Drupal' => DRUPAL_ROOT . '/includes',
   ));
 
   // Activate the autoloader.
@@ -2351,10 +2353,9 @@ function _drupal_bootstrap_variables() {
   module_load_all(TRUE);
 
   require_once DRUPAL_ROOT . '/includes/common.inc';
-  require_once DRUPAL_ROOT . '/includes/context.inc';
 
   // Initialize the context system (temporary version).
-  $context = new DrupalContext();
+  $context = new \Drupal\Context\Context();
   bootstrap_invoke_all('context_init', $context);
 
   // We do not need to keep the tracker here, because the DrupalContext
@@ -2372,6 +2373,19 @@ function _drupal_bootstrap_page_header() {
     ob_start();
     drupal_page_header();
   }
+}
+
+/**
+ * Returns the currently active context object.
+ *
+ * The return value from this funciton should never be statically cached. Doing
+ * so could lead to strange behavior if it has been removed from the stack, as
+ * it may no longer be valid and the object may even have been deleted.
+ *
+ * @return DrupalContextInterface
+ */
+function drupal_get_context() {
+  return \Drupal\Context::getActiveContext();
 }
 
 /**

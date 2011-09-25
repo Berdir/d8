@@ -1,78 +1,13 @@
 <?php
 
-/**
- * Exception thrown when attempting to modify a locked context object.
- */
-class ContextLockedException extends Exception {}
-
-/**
- * Exception thrown when attempting to use an unlocked context object.
- */
-class ContextNotLockedException extends Exception {}
-
-/**
- * Exception thrown when attempting to fall through to a parent context object
- * that already got garbace collected
- */
-class ContextParentContextNotExistsException extends Exception {}
-
-/**
- * Interface definition for all context objects.
- */
-interface DrupalContextInterface extends ArrayAccess {
-
-  /**
-   * Register a class as the handler for a given context.
-   *
-   * @param string $context
-   *   The context key to register for, such as "http:get".
-   * @param string $class
-   *   The name of the class that will handle this context key, unless overridden.
-   *   The class must implement ContextHandlerInterface.
-   * @param array $params
-   *   An array of configuration options for the class.
-   */
-  public function registerHandler($context, $class, $params = array());
-
-  /**
-   * Return a set of keys to objects used in the current context
-   *
-   * This converts any context values referenced in the current scope into
-   * a normalised array.
-   *
-   * @return an array of context keys and their corresponding values
-   */
-  public function usedKeys();
-
-  /**
-   * Lock this context object against futher modification.
-   *
-   * This allows us to setup a mocked context object very easily, and then
-   * make it immutable so we know that it won't change out from under us.
-   */
-  public function lock();
-
-  /**
-   * Spawns a new context object that is pushed to the context stack.
-   *
-   * @return DrualContextInterface
-   */
-  public function addLayer();
-}
-
-/**
- * Internal class that is meant for context values existence check optimization.
- *
- * Do not use elsewhere.
- */
-class ContextOffsetIsNull {}
+namespace Drupal\Context;
 
 /**
  * Default Drupal context object.
  *
  * It handles routing of context requests to handlers.
  */
-class DrupalContext implements DrupalContextInterface {
+class Context implements ContextInterface {
 
   /**
    * The stack of context objects in the system.
@@ -142,7 +77,7 @@ class DrupalContext implements DrupalContextInterface {
   /**
    * Returns the top-most context object, which is the active object.
    *
-   * @return DrupalContextInterface
+   * @return ContextInterface
    */
   public static function getActiveContext() {
    return end(self::$contextStack);
@@ -160,7 +95,7 @@ class DrupalContext implements DrupalContextInterface {
    */
   public function offsetGet($offset) {
     if (!$this->locked) {
-      throw new ContextNotLockedException(t('This context object has not been locked. It must be locked before it can be used.'));
+      throw new NotLockedException(t('This context object has not been locked. It must be locked before it can be used.'));
     }
 
     // We do not have data for this offset yet: use array_key_exists() because
@@ -185,7 +120,7 @@ class DrupalContext implements DrupalContextInterface {
             if (NULL !== $handlerValue) {
               // The null object here means it's definitely a NULL and parent
               // cannot override it.
-              if ($handlerValue instanceof ContextOffsetIsNull) {
+              if ($handlerValue instanceof OffsetIsNull) {
                 $this->context[$offset] = NULL;
               } else {
                 $this->context[$offset] = $handlerValue;
@@ -204,7 +139,7 @@ class DrupalContext implements DrupalContextInterface {
           if (isset(self::$contextStack[$this->parentId])) {
             $this->context[$offset] = self::$contextStack[$this->parentId]->offsetGet($offset);
           } else {
-            throw new ContextParentContextNotExistsException('Parent context does not exists anymore.');
+            throw new ParentContextNotExistsException('Parent context does not exists anymore.');
           }
         } else {
           $this->context[$offset] = null;
@@ -225,7 +160,7 @@ class DrupalContext implements DrupalContextInterface {
    */
   public function offsetSet($offset, $value) {
     if ($this->locked) {
-      throw new ContextLockedException(t('This context object has been locked. It no longer accepts new explicit context sets.'));
+      throw new LockedException(t('This context object has been locked. It no longer accepts new explicit context sets.'));
     }
     // Set an explicit override for a given context value.
     $this->context[$offset] = $value;
@@ -236,7 +171,7 @@ class DrupalContext implements DrupalContextInterface {
    */
   public function offsetUnset($offset) {
     if ($this->locked) {
-      throw new ContextLockedException(t('This context object has been locked. It no longer accepts context clears.'));
+      throw new LockedException(t('This context object has been locked. It no longer accepts context clears.'));
     }
 
     // Remove this value from the usedKeys and unset any saved context so that
@@ -249,7 +184,7 @@ class DrupalContext implements DrupalContextInterface {
    */
   public function registerHandler($context, $class, $params = array()) {
     if ($this->locked) {
-      throw new ContextLockedException(t('This context object has been locked. It no longer accepts new handler registrations.'));
+      throw new LockedException(t('This context object has been locked. It no longer accepts new handler registrations.'));
     }
     $this->handlerClasses[$context] = array('class' => $class, 'params' => $params);
   }
@@ -262,7 +197,7 @@ class DrupalContext implements DrupalContextInterface {
 
     foreach ($this->usedKeys as $key) {
       $value = $this->context[$key];
-      if ($value instanceof ContextValueInterface) {
+      if ($value instanceof ValueInterface) {
         $key_list[$key] = $value->contextKey();
       }
       else {
@@ -279,7 +214,7 @@ class DrupalContext implements DrupalContextInterface {
   public function lock() {
     $this->locked = TRUE;
     self::$contextStack[spl_object_hash($this)] = $this;
-    return new ContextTracker($this);
+    return new Tracker($this);
   }
 
   /**
@@ -307,127 +242,4 @@ class DrupalContext implements DrupalContextInterface {
       self::$contextStack = array_slice(self::$contextStack, 0, $offset, TRUE);
     }
   }
-}
-
-/**
- * Transaction-like class for the context stack.
- *
- * When this class is destroyed, so its its corresponding context object.
- */
-class ContextTracker {
-
-  /**
-   * The context object we're tracking.
-   *
-   * @var DrupalContext
-   */
-  protected $context;
-
-  /**
-   * Constructor
-   *
-   * @var DrupalContext $context
-   *   The context object we should be tracking.
-   */
-  public function __construct($context) {
-    $this->context = $context;
-  }
-
-  /**
-   * Destructor
-   *
-   * Destroys the corresponding context object, too.
-   */
-  public function __destruct() {
-    if (isset($this->context)) {
-      $this->context->__destruct();
-    }
-  }
-}
-
-/**
- * Returns the currently active context object.
- *
- * The return value from this funciton should never be statically cached. Doing
- * so could lead to strange behavior if it has been removed from the stack, as
- * it may no longer be valid and the object may even have been deleted.
- *
- * @return DrupalContextInterface
- */
-function drupal_get_context() {
-  return DrupalContext::getActiveContext();
-}
-
-/**
- * Interface for context handler objects.
- */
-interface ContextHandlerInterface {
-
-  /**
-   * Retrieves the value for this context key.
-   *
-   * This value must be assumed to be immutable within a given request.
-   *
-   * @param array $args
-   *   Arguments to pass into the context handler.  Arguments are derived from
-   *   the portion of the context key after the key fragment that led to this
-   *   handler.
-   * @return mixed
-   *   The corresponding value for this context. Return here an new instance of
-   *   ContextOffsetIsNull if you don't have any value corresponding to
-   *   the given arguments to provide: this will cause the context to stop
-   *   value lookup for this offset.
-   */
-  public function getValue(array $args = array());
-}
-
-/**
- * Base implementation of a Context Handler.
- *
- * Other handlers may extend this class to make their job easier.
- */
-abstract class ContextHandlerAbstract implements ContextHandlerInterface {
-
-  /**
-   * Reference to the context object.
-   *
-   * Note: This creates a circular reference.  We should probably get rid of it
-   * and pass it every time.
-   *
-   * @todo Get rid of this property and avoid the circular dependency.
-   *
-   * @var DrupalContextInterface
-   */
-  protected $context;
-
-  /**
-   * Parameters for the context handler.
-   *
-   * @var array
-   */
-  protected $params;
-
-  public function __construct(DrupalContextInterface $context, $params) {
-    $this->context = $context;
-    $this->params = $params;
-  }
-}
-
-/**
- * Interface for context value objects.
- *
- * ContextValueInterface includes a method - contextKey() - that will return a
- * load key for that object. It is up to the object to return something
- * meaningful. The load key is the value by which we can load that object later,
- * such as nid, view machine name, etc.
- */
-interface ContextValueInterface {
-
-  /**
-   * Retrieves the key for the object to be loaded
-   *
-   * @return mixed
-   *   A key for the object to be returned by the appropriate handler
-   */
-  public function contextKey();
 }

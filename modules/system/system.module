@@ -1914,12 +1914,10 @@ function system_init() {
 /**
  * Implements hook_context_init().
  *
- * This won't say as the implementation, but it works for the time being.
+ * This won't stay as the implementation, but it works for the time being.
  */
-function system_context_init(DrupalContextInterface $butler) {
-  $butler->registerHandler('http:get', 'ContextHandlerHttp', array('query' => 'GET'));
-  $butler->registerHandler('http:post', 'ContextHandlerHttp', array('query' => 'POST'));
-  $butler->registerHandler('http:header', 'ContextHandlerHeader');
+function system_context_init(\Drupal\Context\ContextInterface $butler) {
+
 }
 
 
