@@ -357,9 +357,7 @@ class ContextMockTestCase extends DrupalUnitTestCase {
     unset($t2, $b2);
 
     $b3 = $butler->addLayer();
-    // FIXME: pounard: This caused the test below to fail, and that seems quite
-    // normal. What did you want to achieve?
-    //$b3->registerHandler('foo', 'ContextTestCaseHelperThree', array('baz' => 5));
+    $b3->registerHandler('foo', 'ContextTestCaseHelperThree', array('baz' => 5));
     $t3 = $b3->lock();
     $this->assertEqual($b3['foo:bar:baz'], 1, t('If a context handler does not return data, the parent handler gets a chance to return data'));
 
