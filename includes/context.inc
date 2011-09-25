@@ -360,7 +360,7 @@ class DrupalContext implements DrupalContextInterface {
           if (isset(self::$contextStack[$this->parentId])) {
             $this->context[$offset] = self::$contextStack[$this->parentId]->offsetGet($offset);
           } else {
-            throw new ContextParentContextNotExistsException('The parent of the current butler object does not exist anymore');
+            throw new ContextParentContextNotExistsException('Parent context does not exists anymore.');
           }
         } else {
           $this->context[$offset] = null;
