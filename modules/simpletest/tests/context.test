@@ -373,6 +373,9 @@ class ContextMockTestCase extends DrupalUnitTestCase {
     $this->assertEqual($b4['foo:bar:baz:boo'], 9, t('A more generic handler in the same context should be called if the less generic handler does not return data.'));
   }
 
+  /**
+   * Test the offsetExists() method behavior.
+   */
   public function testOffsetExists() {
     $butler = new DrupalContext(new ContextFakeRequest());
     $butler->registerHandler('foo', 'ContextTestCaseHelperThree', array('bar' => 3));
@@ -384,9 +387,19 @@ class ContextMockTestCase extends DrupalUnitTestCase {
     $this->assertFalse(isset($butler['I:Do:Not:Exist']), t("I:Do:Not:Exist does not exists"));
     $this->assertTrue(isset($butler['foo:bar']), t("foo:bar exists (caching does not break anything)"));
     $this->assertFalse(isset($butler['I:Do:Not:Exist']), t("I:Do:Not:Exist does not exists (caching does not break anything)"));
+  }
 
-    // Now derivate, and test the same over the new layer. Results should be
-    // the exact same.
+  /**
+   * Test the offsetExists() method behavior after multiple context derivation
+   * (through multiple layers over the same root context).
+   */
+  public function testOffsetExistsWithDerivation() {
+    $butler = new DrupalContext(new ContextFakeRequest());
+    $butler->registerHandler('foo', 'ContextTestCaseHelperThree', array('bar' => 3));
+    // B1: T1, B2: T2, Butler: Tutler :)
+    $tutler = $butler->lock();
+
+    // Derivate and test over the new layer. Results should be the exact same.
     $b1 = $butler->addLayer();
     $t1 = $b1->lock();
     $this->assertTrue(isset($b1['foo:bar']), t("foo:bar exists in new layer"));
