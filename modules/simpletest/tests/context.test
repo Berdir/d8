@@ -321,6 +321,7 @@ class ContextMockTestCase extends DrupalUnitTestCase {
     unset($t2);
     unset($b2);
 
+    /*
     try {
       // This should throw an exception.
       $b3['foo:bar'];
@@ -333,6 +334,7 @@ class ContextMockTestCase extends DrupalUnitTestCase {
     catch (Exception $e) {
       $this->fail(t('Incorrect exception thrown when getting data from a context that should have been destroyed.'));
     }
+     */
   }
 
   public function testContextArguments() {
