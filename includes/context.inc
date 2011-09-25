@@ -198,24 +198,7 @@ interface DrupalContextInterface extends ArrayAccess {
  * 
  * Do not use elsewhere.
  */
-class ContextOffsetDoesNotExists {
-  /**
-   * @var ContextOffsetDoesNotExists
-   */
-  private static $instance;
-
-  /**
-   * @return ContextOffsetDoesNotExists
-   */
-  public static function getInstance() {
-    if (!isset(self::$instance)) {
-      self::$instance = new self;
-    }
-    return self::$instance;
-  }
-
-  private final function __construct() {} 
-}
+class ContextOffsetDoesNotExists {}
 
 /**
  * Default Drupal context object.
@@ -356,11 +339,7 @@ class DrupalContext implements DrupalContextInterface {
           if (isset($this->handlers[$context_key])) {
             $this->context[$offset] = $this->handlers[$context_key]->getValue($args);
           } else {
-            // FIXME: We could even use a singleton for this object. Singletons
-            // are generally bad, but in this case it could be used as a pure
-            // "constant". I can revert this easily if anyone yells by doing:
-            // $this->context[$offset] = new ContextOffsetDoesNotExists;
-            $this->context[$offset] = ContextOffsetDoesNotExists::getInstance();
+            $this->context[$offset] = new ContextOffsetDoesNotExists;
           }
         }
 
@@ -374,7 +353,7 @@ class DrupalContext implements DrupalContextInterface {
           if (isset(self::$contextStack[$this->parentId])) {
             $this->context[$offset] = self::$contextStack[$this->parentId]->offsetGet($offset);
           } else {
-            $this->context[$offset] = ContextOffsetDoesNotExists::getInstance();
+            $this->context[$offset] = new ContextOffsetDoesNotExists;
             // FIXME: pounard: This exception masks the affectation uper, should
             // it be kept? Is that exception fatal for runtime or not? Another
             // problem is that another hit to this method won't throw the
@@ -383,7 +362,7 @@ class DrupalContext implements DrupalContextInterface {
             throw new ContextParentContextNotExistsException('The parent of the current butler object does not exist anymore');
           }
         } else {
-          $this->context[$offset] = ContextOffsetDoesNotExists::getInstance();
+          $this->context[$offset] = new ContextOffsetDoesNotExists;
         }
       }
     }
@@ -551,7 +530,8 @@ interface ContextHandlerInterface {
    * @return mixed
    *   The corresponding value for this context. Return here an new instance of
    *   ContextOffsetDoesNotExists if you don't have any value corresponding to
-   *   the given arguments to provide.
+   *   the given arguments to provide: this will cause the context to stop
+   *   value lookup for this offset.
    */
   public function getValue(array $args = array());
 }
