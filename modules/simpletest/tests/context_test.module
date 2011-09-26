@@ -1,6 +1,6 @@
 <?php
 
-class ContextMockHandler extends ContextHandlerAbstract {
+class ContextMockHandler extends \Drupal\Context\Handler\HandlerAbstract {
 
   public function getValue(array $args = array()) {
 
@@ -9,14 +9,14 @@ class ContextMockHandler extends ContextHandlerAbstract {
 
 }
 
-class ContextTestCaseHelperOne extends ContextHandlerAbstract {
+class ContextTestCaseHelperOne extends \Drupal\Context\Handler\HandlerAbstract {
 
   public function getValue(array $args = array()) {
     return 'one';
   }
 }
 
-class ContextTestCaseHelperTwo extends ContextHandlerAbstract {
+class ContextTestCaseHelperTwo extends \Drupal\Context\Handler\HandlerAbstract {
 
   /**
    * A dummy increment counter.
@@ -31,14 +31,14 @@ class ContextTestCaseHelperTwo extends ContextHandlerAbstract {
   }
 }
 
-class ContextTestCaseHelperThree extends ContextHandlerAbstract {
+class ContextTestCaseHelperThree extends \Drupal\Context\Handler\HandlerAbstract {
   public function getValue(array $args = array()) {
     $param = $args[0];
     return isset($this->params[$param]) ? $this->params[$param] : NULL;
   }
 }
 
-class ContextTestCaseHelperArguments extends ContextHandlerAbstract {
+class ContextTestCaseHelperArguments extends \Drupal\Context\Handler\HandlerAbstract {
   public function getValue(array $args = array()) {
     return $args;
   }
@@ -47,7 +47,7 @@ class ContextTestCaseHelperArguments extends ContextHandlerAbstract {
 /**
  * Basic implementation of a ContextValueInterface.
  */
-class ContextValueExample implements ContextValueInterface {
+class ContextValueExample implements \Drupal\Context\ValueInterface {
 
   public $id = 0;
   public $foo = 0;
@@ -69,7 +69,7 @@ class ContextValueExample implements ContextValueInterface {
 /**
  * ContextHandlerExample
  */
-class ContextHandlerExample extends ContextHandlerAbstract {
+class ContextHandlerExample extends \Drupal\Context\Handler\HandlerAbstract {
 
   public function getValue(array $args = array()) {
     if (isset($this->params['id'])) {
