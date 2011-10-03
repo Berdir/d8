@@ -2201,18 +2201,26 @@ function _drupal_bootstrap_configuration() {
   drupal_settings_initialize();
 
   // Hook up the Symfony ClassLoader for loading PSR-0-compatible classes.
-  // @todo Note that the APC cache is not self-healing.  That means if we start
-  // allowing multiple \Drupal namespace roots, say for modules, we'll need a
-  // "dev mode" toggle of some kind to switch back to the UniversalClassLoader,
-  // which is appropriate for development. For now the Symfony classes are not
-  // moving, so it's not an issue.
   require_once(DRUPAL_ROOT . '/includes/Symfony/Component/ClassLoader/UniversalClassLoader.php');
-  if (function_exists('apc_store')) {
-    require_once(DRUPAL_ROOT . '/includes/Symfony/Component/ClassLoader/ApcUniversalClassLoader.php');
-    $loader = new \Symfony\Component\ClassLoader\ApcUniversalClassLoader('drupal.' . $GLOBALS['drupal_hash_salt']);
-  }
-  else {
-    $loader = new \Symfony\Component\ClassLoader\UniversalClassLoader();
+
+  // By default, use the UniversalClassLoader which is best for development,
+  // as it does not break when code moves around. It is slow, however, so
+  // for production the Apc class loader should be used instead.
+  // @todo Switch to a cleaner way to switch autoloaders than variable_get().
+  switch (variable_get('autoloader_mode', 'default')) {
+    case 'apc':
+      if (function_exists('apc_store')) {
+        require_once(DRUPAL_ROOT . '/includes/Symfony/Component/ClassLoader/ApcUniversalClassLoader.php');
+        $loader = new \Symfony\Component\ClassLoader\ApcUniversalClassLoader('drupal.' . $GLOBALS['drupal_hash_salt']);
+        break;
+      }
+      // If APC was not loaded, fall through to the default loader so that
+      // the site does not fail completely.
+    case 'dev':
+    case 'default':
+    default:
+      $loader = new \Symfony\Component\ClassLoader\UniversalClassLoader();
+      break;
   }
 
   // Register classes with namespaces.
