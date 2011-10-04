@@ -425,3 +425,29 @@ class ContextMockTestCase extends ContextTestCases {
     unset($t2, $tutler);
   }
 }
+
+/**
+ * Test class for the HTTP Handler.
+ */
+class ContextHTTPTestCase extends ContextTestCases {
+  public static function getInfo() {
+    return array(
+      'name' => 'Context HTTP Handler',
+      'description' => 'Test the HTTP Handler.',
+      'group' => 'Context',
+    );
+  }
+
+  function testGetHTTPProperty() {
+    $butler = new \Drupal\Context\Context();
+
+    $butler->registerHandler('http', '\Drupal\Context\Handler\HandlerHTTP');
+    $butler->lock();
+
+    $method = $butler['http:method'];
+
+    $this->assertEqual($method, 'POST', t('Correct Http method propertry found.'));
+
+    debug($butler['http:domain']);
+  }
+}
