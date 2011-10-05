@@ -441,7 +441,7 @@ class ContextHTTPTestCase extends ContextTestCases {
   function testGetHTTPProperty() {
     $butler = new \Drupal\Context\Context();
 
-    $butler->registerHandler('http', '\Drupal\Context\Handler\HandlerHTTP');
+    $butler->registerHandler('http', '\Drupal\Context\Handler\HandlerHttp');
     $butler->lock();
 
     $method = $butler['http:method'];
