@@ -438,7 +438,10 @@ class ContextHTTPTestCase extends ContextTestCases {
     );
   }
 
-  function testGetHTTPProperty() {
+  /**
+   * Get method HTTP property.
+   */
+  function testGetHttpProperty() {
     $butler = new \Drupal\Context\Context();
 
     $butler->registerHandler('http', '\Drupal\Context\Handler\HandlerHttp');
@@ -446,8 +449,24 @@ class ContextHTTPTestCase extends ContextTestCases {
 
     $method = $butler['http:method'];
 
-    $this->assertEqual($method, 'POST', t('Correct Http method propertry found.'));
+    $this->assertEqual($method, 'POST', t('Correct Http method property found.'));
 
     debug($butler['http:domain']);
+  }
+
+  /**
+   * Mock HTTP property.
+   */
+  function testMockHttpProperty() {
+    $butler = new \Drupal\Context\Context();
+
+    $params = array('method' => $this->randomName());
+
+    $butler->registerHandler('http', '\Drupal\Context\Handler\HandlerHttp', $params);
+    $butler->lock();
+
+    $method = $butler['http:method'];
+
+    $this->assertEqual($method, $params['method'], t('Http method property mocked successfully.'));
   }
 }
