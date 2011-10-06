@@ -2419,7 +2419,7 @@ function _drupal_bootstrap_page_header() {
  * @return DrupalContextInterface
  */
 function drupal_get_context() {
-  return \Drupal\Context::getActiveContext();
+  return \Drupal\Context\Context::getActiveContext();
 }
 
 /**
