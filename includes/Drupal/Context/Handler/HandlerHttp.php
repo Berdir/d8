@@ -2,7 +2,9 @@
 
 namespace Drupal\Context\Handler;
 
-use \Drupal\Context\Handler;
+use \Drupal\Context\ContextInterface as ContextInterface,
+    \Symfony\Component\HttpFoundation\Request as Request,
+    \Drupal\Context\Handler;
 
 /**
  * HTTP Context Handler implementation.
@@ -26,11 +28,28 @@ class HandlerHTTP extends HandlerAbstract {
     'languages', 'files', 'cookies', 'headers', 'server', 'request_body'
   );
 
-  public function __construct(\Drupal\Context\ContextInterface $context, $params = array()) {
-    parent::__construct($context, $params);
+  public function __construct(ContextInterface $context, $params = array()) {
+    $this->context = $context;
 
     // Init Symfony Request.
-    $this->request = \Symfony\Component\HttpFoundation\Request::createFromGlobals();
+    if (!empty($params)) {
+      // Default values.
+      $uri = 'http://localhost';
+      $method = 'GET';
+      $parameters = array();
+      $cookies = array();
+      $files = array();
+      $server = array();
+      $content = NULL;
+
+      // Extract values.
+      extract($params);
+
+      $this->request = Request::create($uri, $method, $parameters, $cookies, $files, $server, $content);
+    }
+    else {
+      $this->request = Request::createFromGlobals();
+    }
   }
 
   public function getValue(array $args = array()) {
@@ -73,6 +92,7 @@ class HandlerHTTP extends HandlerAbstract {
           break;
         case 'headers':
           $this->params[$property] = $this->request->headers->all();
+          $this->arrayCleanup($this->params[$property]);
           break;
         case 'server':
           $this->params[$property] = $this->request->server->all();
@@ -83,6 +103,24 @@ class HandlerHTTP extends HandlerAbstract {
       }
     }
 
-    return $this->params[$property];
+    if (!is_array($this->params[$property])) {
+      return $this->params[$property];
+    }
+    // If parameter is array we use $args to get proper value of the array.
+    array_shift($args);
+    return drupal_array_get_nested_value($this->params[$property], $args);
+  }
+
+  /**
+   * Remove not necessary nesting level.
+   *
+   * @param array $array
+   */
+  public function arrayCleanup(&$array) {
+    foreach ($array as &$item) {
+      if (is_array($item)) {
+        $item = current($item);
+      }
+    }
   }
 }

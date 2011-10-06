@@ -447,11 +447,11 @@ class ContextHTTPTestCase extends ContextTestCases {
     $butler->registerHandler('http', '\Drupal\Context\Handler\HandlerHttp');
     $butler->lock();
 
-    $method = $butler['http:method'];
+    $this->assertEqual($butler['http:method'], 'POST', t('Correct Http method property found.'));
 
-    $this->assertEqual($method, 'POST', t('Correct Http method property found.'));
-
-    debug($butler['http:domain']);
+    // Test headers and server properties.
+    $this->assertEqual($butler['http:headers:host'], $_SERVER['HTTP_HOST'], t('Host header fetched successfully.'));
+    $this->assertEqual($butler['http:server:HTTP_USER_AGENT'], $_SERVER['HTTP_USER_AGENT'], t('User agent server variable fetched successfully'));
   }
 
   /**
@@ -460,13 +460,32 @@ class ContextHTTPTestCase extends ContextTestCases {
   function testMockHttpProperty() {
     $butler = new \Drupal\Context\Context();
 
-    $params = array('method' => $this->randomName());
+    $params = array('method' => 'PUT');
 
     $butler->registerHandler('http', '\Drupal\Context\Handler\HandlerHttp', $params);
     $butler->lock();
 
-    $method = $butler['http:method'];
+    $this->assertEqual($butler['http:method'], $params['method'], t('Http method property mocked successfully.'));
+  }
 
-    $this->assertEqual($method, $params['method'], t('Http method property mocked successfully.'));
+  /**
+   * Access array property.
+   */
+  function testArrayHttpProperty() {
+    $butler = new \Drupal\Context\Context();
+
+    // Mock arguments as nested array.
+    $params = array('parameters' => array('foo' => array('bar' => 'baz')));
+
+    $butler->registerHandler('http', '\Drupal\Context\Handler\HandlerHttp', $params);
+    $butler->lock();
+
+    // Different nesting level values.
+    $this->assertEqual($butler['http:query_args'], $params['parameters'], t('Query args fetched successfully.'));
+    $this->assertEqual($butler['http:query_args:foo'], $params['parameters']['foo'], t('First level value from query_args fetched successfully.'));
+    $this->assertEqual($butler['http:query_args:foo:bar'], $params['parameters']['foo']['bar'], t('Second level value from query_args fetched successfully.'));
+
+    // Non existing value.
+    $this->assertNull($butler['http:query_args:baz'], t('Non existent value fetched as NULL'));
   }
 }
