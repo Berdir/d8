@@ -2197,8 +2197,9 @@ function url($path = NULL, array $options = array()) {
  */
 function url_is_external($path) {
   $colonpos = strpos($path, ':');
-  // Only call the slow drupal_strip_dangerous_protocols() if $path contains a
-  // ':' before any / ? or #.
+  // Avoid calling drupal_strip_dangerous_protocols() if there is any
+  // slash (/), hash (#) or question_mark (?) before the colon (:)
+  // occurrence - if any - as this would clearly mean it is not a URL.
   return $colonpos !== FALSE && !preg_match('![/?#]!', substr($path, 0, $colonpos)) && drupal_strip_dangerous_protocols($path) == $path;
 }
 
@@ -6144,9 +6145,16 @@ function element_children(&$elements, $sort = FALSE) {
   $sortable = FALSE;
   foreach ($elements as $key => $value) {
     if ($key === '' || $key[0] !== '#') {
-      $children[$key] = $value;
-      if (is_array($value) && isset($value['#weight'])) {
-        $sortable = TRUE;
+      if (is_array($value)) {
+        $children[$key] = $value;
+        if (isset($value['#weight'])) {
+          $sortable = TRUE;
+        }
+      }
+      // Only trigger an error if the value is not null.
+      // @see http://drupal.org/node/1283892
+      elseif (isset($value)) {
+        trigger_error(t('"@key" is an invalid render array key', array('@key' => $key)), E_USER_ERROR);
       }
     }
   }
@@ -6458,7 +6466,7 @@ function drupal_common_theme() {
       'variables' => array('type' => MARK_NEW),
     ),
     'item_list' => array(
-      'variables' => array('items' => array(), 'title' => NULL, 'type' => 'ul', 'attributes' => array()),
+      'variables' => array('items' => array(), 'title' => '', 'type' => 'ul', 'attributes' => array()),
     ),
     'more_help_link' => array(
       'variables' => array('url' => NULL),

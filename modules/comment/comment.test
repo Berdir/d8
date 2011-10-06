@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @file 
+ * @file
  * Tests for comment.module.
  */
 
@@ -331,6 +331,8 @@ class CommentInterfaceTest extends CommentHelperCase {
     $comment = $this->postComment($this->node, $comment_text);
     $comment_loaded = comment_load($comment->id);
     $this->assertTrue($this->commentExists($comment), t('Comment found.'));
+    $by_viewer_class = $this->xpath('//a[@id=:comment_id]/following-sibling::div[1][contains(@class, "comment-by-viewer")]', array(':comment_id' => 'comment-' . $comment->id));
+    $this->assertTrue(!empty($by_viewer_class), t('HTML class for comments by viewer found.'));
 
     // Set comments to have subject and preview to required.
     $this->drupalLogout();
@@ -416,6 +418,11 @@ class CommentInterfaceTest extends CommentHelperCase {
     $this->drupalGet('node/' . $this->node->nid, array('query' => array('page' => 1)));
     $this->assertTrue($this->commentExists($reply, TRUE), t('Page two exists. %s'));
     $this->setCommentsPerPage(50);
+
+    // Create comment #5 to assert HTML class.
+    $comment = $this->postComment($this->node, $this->randomName(), $this->randomName());
+    $by_node_author_class = $this->xpath('//a[@id=:comment_id]/following-sibling::div[1][contains(@class, "comment-by-node-author")]', array(':comment_id' => 'comment-' . $comment->id));
+    $this->assertTrue(!empty($by_node_author_class), t('HTML class for node author found.'));
 
     // Attempt to post to node with comments disabled.
     $this->node = $this->drupalCreateNode(array('type' => 'article', 'promote' => 1, 'comment' => COMMENT_NODE_HIDDEN));
@@ -562,8 +569,8 @@ class CommentInterfaceTest extends CommentHelperCase {
    */
   function testCommentLinks() {
     // Bartik theme alters comment links, so use a different theme.
-    theme_enable(array('garland'));
-    variable_set('theme_default', 'garland');
+    theme_enable(array('stark'));
+    variable_set('theme_default', 'stark');
 
     // Remove additional user permissions from $this->web_user added by setUp(),
     // since this test is limited to anonymous and authenticated roles only.
@@ -963,6 +970,8 @@ class CommentAnonymous extends CommentHelperCase {
     // Post anonymous comment without contact info.
     $anonymous_comment1 = $this->postComment($this->node, $this->randomName(), $this->randomName());
     $this->assertTrue($this->commentExists($anonymous_comment1), t('Anonymous comment without contact info found.'));
+    $anonymous_class = $this->xpath('//a[@id=:comment_id]/following-sibling::div[1][contains(@class, "comment-by-anonymous")]', array(':comment_id' => 'comment-' . $anonymous_comment1->id));
+    $this->assertTrue(!empty($anonymous_class), t('HTML class for anonymous comments found.'));
 
     // Allow contact info.
     $this->drupalLogin($this->admin_user);
@@ -1580,6 +1589,9 @@ class CommentBlockFunctionalTest extends CommentHelperCase {
     // block.
     $this->drupalLogout();
     user_role_revoke_permissions(DRUPAL_ANONYMOUS_RID, array('access comments'));
+    // drupalCreateNode() does not automatically flush content caches unlike
+    // posting a node from a node form.
+    cache_clear_all();
     $this->drupalGet('');
     $this->assertNoText($block['title'], t('Block was not found.'));
     user_role_grant_permissions(DRUPAL_ANONYMOUS_RID, array('access comments'));

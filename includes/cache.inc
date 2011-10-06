@@ -348,6 +348,50 @@ interface DrupalCacheInterface {
 }
 
 /**
+ * A stub cache implementation.
+ *
+ * The stub implementation is needed when database access is not yet available.
+ * Because Drupal's caching system never requires that cached data be present,
+ * these stub functions can short-circuit the process and sidestep the need for
+ * any persistent storage. Using this cache implementation during normal
+ * operations would have a negative impact on performance.
+ *
+ * This also can be used for testing purposes.
+ */
+class DrupalNullCache implements DrupalCacheInterface {
+
+  function __construct($bin) {}
+
+  function get($cid) {
+    return FALSE;
+  }
+
+  function getMultiple(&$cids) {
+    return array();
+  }
+
+  function set($cid, $data, $expire = CACHE_PERMANENT) {}
+
+  function delete($cid) {}
+
+  function deleteMultiple(array $cids) {}
+
+  function deletePrefix($prefix) {}
+
+  function flush() {}
+
+  function expire() {}
+
+  function garbageCollection() {}
+
+  function clear($cid = NULL, $wildcard = FALSE) {}
+
+  function isEmpty() {
+    return TRUE;
+  }
+}
+
+/**
  * Default cache implementation.
  *
  * This is Drupal's default cache implementation. It uses the database to store

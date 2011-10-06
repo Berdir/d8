@@ -418,7 +418,7 @@ abstract class DrupalCacheArray implements ArrayAccess {
  * Start the timer with the specified name. If you start and stop the same
  * timer multiple times, the measured intervals will be accumulated.
  *
- * @param name
+ * @param $name
  *   The name of the timer.
  */
 function timer_start($name) {
@@ -431,8 +431,9 @@ function timer_start($name) {
 /**
  * Read the current timer value without stopping the timer.
  *
- * @param name
+ * @param $name
  *   The name of the timer.
+ *
  * @return
  *   The current timer value in ms.
  */
@@ -454,8 +455,9 @@ function timer_read($name) {
 /**
  * Stop the timer with the specified name.
  *
- * @param name
+ * @param $name
  *   The name of the timer.
+ *
  * @return
  *   A timer array. The array contains the number of times the timer has been
  *   started and stopped (count) and the accumulated timer value in ms (time).
@@ -549,6 +551,30 @@ function conf_path($require_settings = TRUE, $reset = FALSE) {
     return $conf;
   }
 
+  $script_name = $_SERVER['SCRIPT_NAME'];
+  if (!$script_name) {
+    $script_name = $_SERVER['SCRIPT_FILENAME'];
+  }
+  $http_host = $_SERVER['HTTP_HOST'];
+  $conf = find_conf_path($http_host, $script_name, $require_settings);
+  return $conf;
+}
+
+/**
+ * Finds the appropriate configuration directory for a given host and path.
+ *
+ * @param $http_host
+ *   The hostname and optional port number, e.g. "www.example.com" or
+ *   "www.example.com:8080".
+ * @param $script_name
+ *   The part of the url following the hostname, including the leading slash.
+ *
+ * @return
+ *   The path of the matching configuration directory.
+ *
+ * @see conf_path()
+ */
+function find_conf_path($http_host, $script_name, $require_settings = TRUE) {
   $confdir = 'sites';
 
   $sites = array();
@@ -557,8 +583,8 @@ function conf_path($require_settings = TRUE, $reset = FALSE) {
     include(DRUPAL_ROOT . '/' . $confdir . '/sites.php');
   }
 
-  $uri = explode('/', $_SERVER['SCRIPT_NAME'] ? $_SERVER['SCRIPT_NAME'] : $_SERVER['SCRIPT_FILENAME']);
-  $server = explode('.', implode('.', array_reverse(explode(':', rtrim($_SERVER['HTTP_HOST'], '.')))));
+  $uri = explode('/', $script_name);
+  $server = explode('.', implode('.', array_reverse(explode(':', rtrim($http_host, '.')))));
   for ($i = count($uri) - 1; $i > 0; $i--) {
     for ($j = count($server); $j > 0; $j--) {
       $dir = implode('.', array_slice($server, -$j)) . implode('.', array_slice($uri, 0, $i));
@@ -2587,6 +2613,7 @@ function language_list($field = 'language') {
   $languages = &drupal_static(__FUNCTION__);
   // Init language list
   if (!isset($languages)) {
+    $default = language_default();
     if (drupal_multilingual() || module_exists('locale')) {
       $languages['language'] = db_query('SELECT * FROM {languages} ORDER BY weight ASC, name ASC')->fetchAllAssoc('language');
       // Users cannot uninstall the native English language. However, we allow
@@ -2598,8 +2625,13 @@ function language_list($field = 'language') {
     }
     else {
       // No locale module, so use the default language only.
-      $default = language_default();
       $languages['language'][$default->language] = $default;
+    }
+
+    // Initialize default property so callers have an easy reference and
+    // can save the same object without data loss.
+    foreach ($languages['language'] as $langcode => $language) {
+      $languages['language'][$langcode]->default = ($langcode == $default->language);
     }
   }
 
