@@ -110,11 +110,11 @@ class Context implements ContextInterface {
         if (isset($this->handlerClasses[$local_key])) {
           // Lazy handler instanciation.
           if (!isset($this->handlers[$local_key]) && class_exists($this->handlerClasses[$local_key]['class'])) {
-            $this->handlers[$local_key] = new $this->handlerClasses[$local_key]['class']($this, $this->handlerClasses[$local_key]['params']);
+            $this->handlers[$local_key] = new $this->handlerClasses[$local_key]['class']($this->handlerClasses[$local_key]['params']);
           }
 
           if (isset($this->handlers[$local_key])) {
-            $handler_value = $this->handlers[$local_key]->getValue($args);
+            $handler_value = $this->handlers[$local_key]->getValue($args, $this);
             // NULL value here means the context pass, and let potential parent
             // overrides happen.
             if (NULL !== $handler_value) {
