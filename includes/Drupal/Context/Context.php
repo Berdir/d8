@@ -44,7 +44,7 @@ class Context implements ContextInterface {
    *
    * @var array
    */
-  protected $context = array();
+  protected $contextValues = array();
 
   /**
    * An array of keys for all the values and objects in $context accessed in
@@ -86,14 +86,14 @@ class Context implements ContextInterface {
   /**
    * Implements ArrayAccess::offsetExists().
    */
-  public function offsetExists($offset) {
-    return $this->offsetGet($offset) !== NULL;
+  public function offsetExists($context_key) {
+    return $this->offsetGet($context_key) !== NULL;
   }
 
   /**
    * Implements ArrayAccess:offsetGet().
    */
-  public function offsetGet($offset) {
+  public function offsetGet($context_key) {
     if (!$this->locked) {
       throw new NotLockedException(t('This context object has not been locked. It must be locked before it can be used.'));
     }
@@ -101,102 +101,102 @@ class Context implements ContextInterface {
     // We do not have data for this offset yet: use array_key_exists() because
     // the value can be NULL. We do not want to re-run all handlerClasses for a
     // variable with data.
-    if (!array_key_exists($offset, $this->context)) {
+    if (!array_key_exists($context_key, $this->contextValues)) {
       // Loop over the possible context keys.
-      $context_key = $offset;
-      $offset_elements = explode(':', $offset);
+      $local_key = $context_key;
+      $key_elements = explode(':', $context_key);
       $args = array();
-      while ($offset_elements) {
-        if (isset($this->handlerClasses[$context_key])) {
-          // Lazzy handler instanciation.
-          if (!isset($this->handlers[$context_key]) && class_exists($this->handlerClasses[$context_key]['class'])) {
-            $this->handlers[$context_key] = new $this->handlerClasses[$context_key]['class']($this, $this->handlerClasses[$context_key]['params']);
+      while ($key_elements) {
+        if (isset($this->handlerClasses[$local_key])) {
+          // Lazy handler instanciation.
+          if (!isset($this->handlers[$local_key]) && class_exists($this->handlerClasses[$local_key]['class'])) {
+            $this->handlers[$local_key] = new $this->handlerClasses[$local_key]['class']($this, $this->handlerClasses[$local_key]['params']);
           }
 
-          if (isset($this->handlers[$context_key])) {
-            $handlerValue = $this->handlers[$context_key]->getValue($args);
+          if (isset($this->handlers[$local_key])) {
+            $handler_value = $this->handlers[$local_key]->getValue($args);
             // NULL value here means the context pass, and let potential parent
             // overrides happen.
-            if (NULL !== $handlerValue) {
+            if (NULL !== $handler_value) {
               // The null object here means it's definitely a NULL and parent
               // cannot override it.
-              if ($handlerValue instanceof OffsetIsNull) {
-                $this->context[$offset] = NULL;
+              if ($handler_value instanceof OffsetIsNull) {
+                $this->contextValues[$context_key] = NULL;
               } else {
-                $this->context[$offset] = $handlerValue;
+                $this->contextValues[$context_key] = $handler_value;
               }
             }
           }
         }
 
-        array_unshift($args, array_pop($offset_elements));
-        $context_key = implode(':', $offset_elements);
+        array_unshift($args, array_pop($key_elements));
+        $local_key = implode(':', $key_elements);
       }
 
       // If we did not found a value using local handlers, check for parents.
-      if (!array_key_exists($offset, $this->context)) {
+      if (!array_key_exists($context_key, $this->contextValues)) {
         if (isset($this->parentId)) {
           if (isset(self::$contextStack[$this->parentId])) {
-            $this->context[$offset] = self::$contextStack[$this->parentId]->offsetGet($offset);
+            $this->contextValues[$context_key] = self::$contextStack[$this->parentId]->offsetGet($context_key);
           } else {
             throw new ParentContextNotExistsException('Parent context does not exists anymore.');
           }
         } else {
-          $this->context[$offset] = null;
+          $this->contextValues[$context_key] = null;
         }
       }
     }
 
     // Store the value for key retrieval.
-    if (!isset($this->usedKeys[$offset])) {
-      $this->usedKeys[$offset] = $offset;
+    if (!isset($this->usedKeys[$context_key])) {
+      $this->usedKeys[$context_key] = $context_key;
     }
 
-    return $this->context[$offset];
+    return $this->contextValues[$context_key];
   }
 
   /**
    * Implements ArrayAccess:offsetSet().
    */
-  public function offsetSet($offset, $value) {
+  public function offsetSet($context_key, $value) {
     if ($this->locked) {
       throw new LockedException(t('This context object has been locked. It no longer accepts new explicit context sets.'));
     }
     // Set an explicit override for a given context value.
-    $this->context[$offset] = $value;
+    $this->contextValues[$context_key] = $value;
   }
 
   /**
    * Implements ArrayAccess:offsetUnset().
    */
-  public function offsetUnset($offset) {
+  public function offsetUnset($context_key) {
     if ($this->locked) {
       throw new LockedException(t('This context object has been locked. It no longer accepts context clears.'));
     }
 
     // Remove this value from the usedKeys and unset any saved context so that
     // it can be regenerated by the context handler as needed.
-    unset($this->usedKeys[$offset], $this->context[$offset]);
+    unset($this->usedKeys[$context_key], $this->contextValues[$context_key]);
   }
 
   /**
    * Implmenents DrupalContextInterface::registerHandler().
    */
-  public function registerHandler($context, $class, $params = array()) {
+  public function registerHandler($context_key, $class, $params = array()) {
     if ($this->locked) {
       throw new LockedException(t('This context object has been locked. It no longer accepts new handler registrations.'));
     }
-    $this->handlerClasses[$context] = array('class' => $class, 'params' => $params);
+    $this->handlerClasses[$context_key] = array('class' => $class, 'params' => $params);
   }
 
   /**
    * Implements DrupalContextInterface::usedKeys().
-  */
+   */
   function usedKeys() {
     $key_list = array();
 
     foreach ($this->usedKeys as $key) {
-      $value = $this->context[$key];
+      $value = $this->contextValues[$key];
       if ($value instanceof ValueInterface) {
         $key_list[$key] = $value->contextKey();
       }
@@ -237,9 +237,9 @@ class Context implements ContextInterface {
     $me = spl_object_hash($this);
 
     // Never remove the root item from the stack.
-    $offset = array_search($me, array_keys(self::$contextStack));
-    if ($offset) {
-      self::$contextStack = array_slice(self::$contextStack, 0, $offset, TRUE);
+    $context_key = array_search($me, array_keys(self::$contextStack));
+    if ($context_key) {
+      self::$contextStack = array_slice(self::$contextStack, 0, $context_key, TRUE);
     }
   }
 }

@@ -10,7 +10,7 @@ interface ContextInterface extends \ArrayAccess {
   /**
    * Register a class as the handler for a given context.
    *
-   * @param string $context
+   * @param string $context_key
    *   The context key to register for, such as "http:get".
    * @param string $class
    *   The name of the class that will handle this context key, unless overridden.
@@ -18,7 +18,7 @@ interface ContextInterface extends \ArrayAccess {
    * @param array $params
    *   An array of configuration options for the class.
    */
-  public function registerHandler($context, $class, $params = array());
+  public function registerHandler($context_key, $class, $params = array());
 
   /**
    * Return a set of keys to objects used in the current context
