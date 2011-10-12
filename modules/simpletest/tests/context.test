@@ -59,7 +59,7 @@ class ContextTestCase extends ContextTestCases {
   function testExplicitContext() {
     $butler = new \Drupal\Context\Context();
 
-    $butler['foo:bar'] = 'baz';
+    $butler->setValue('foo:bar', 'baz');
 
     $butler->lock();
 
@@ -76,7 +76,7 @@ class ContextTestCase extends ContextTestCases {
     $butler->setHandler('foo:bar', 'ContextTestCaseHelperOne');
 
     // But we override it to "two".
-    $butler['foo:bar'] = 'two';
+    $butler->setValue('foo:bar', 'two');
 
     $butler->lock();
 
@@ -92,7 +92,7 @@ class ContextTestCase extends ContextTestCases {
     try {
       $butler->lock();
       // This should throw an exception.
-      $butler['foo:bar'] = 'baz';
+      $butler->setValue('foo:bar', 'baz');
 
       $this->fail(t('Exception not thrown when setting context on a locked object.'));
     }
@@ -169,11 +169,11 @@ class ContextValueObjectTestCase extends ContextTestCases {
 
     // Add a context layer to the butler context.
     $b2 = $butler->addLayer();
-    $b2['test'] = 'test';
+    $b2->setValue('test', 'test');
 
     // Override with another instance of ContextValueInterface.
     $n1 = $this->createExampleObject(2);
-    $b2['example'] = $n1;
+    $b2->setValue('example', $n1);
     // This will cause the error, which needs to be fixed.
     //$b2['example:id'] = 2;
     $t2 = $b2->lock();
@@ -184,12 +184,12 @@ class ContextValueObjectTestCase extends ContextTestCases {
 
     // Add a context layer to the butler context.
     $b3 = $butler->addLayer();
-    $b3['test'] = 'testischanged';
-    $b3['test:foo'] = 'newtest';
+    $b3->setValue('test', 'testischanged');
+    $b3->setValue('test:foo', 'newtest');
     $n2 = $this->createExampleObject(3);
-    $b3['example'] = $n2;
+    $b3->setValue('example', $n2);
     // Setting the example:id as contextKey:offset will add that property to the context.
-    $b3['example:id'] = 3;
+    $b3->setValue('example:id', 3);
     $t3 = $b3->lock();
 
     $this->assertEqual($b3['test'], 'testischanged', t('Explicit context overridden correctly in layer 3.'));
@@ -206,17 +206,17 @@ class ContextValueObjectTestCase extends ContextTestCases {
 
     // Add a handler for this test to mimic to create an example (E.g. from url arguments)
     $butler->setHandler('example', 'ContextHandlerExample', array('id' => 1));
-    $butler['test'] = 'test';
+    $butler->setValue('test', 'test');
 
     $t1 = $butler->lock();
 
     // Add a context layer to the butler context.
     $b2 = $butler->addLayer();
-    $b2['test'] = 'test2';
+    $b2->setValue('test', 'test2');
 
     // Override with another instance of ContextValueInterface.
     $n1 = $this->createExampleObject(2);
-    $b2['example'] = $n1;
+    $b2->setValue('example', $n1);
     $t2 = $b2->lock();
 
     // Now try using the context values.
@@ -272,7 +272,7 @@ class ContextMockTestCase extends ContextTestCases {
 
     // Now check cloning.
     $b2 = $butler->addLayer();
-    $b2['test'] = 'test';
+    $b2->setValue('test', 'test');
     $t2 = $b2->lock();
 
     $this->assertNotIdentical($butler, $b2, t('New context object created properly.'));
@@ -281,7 +281,7 @@ class ContextMockTestCase extends ContextTestCases {
     $this->assertEqual($b2['test'], 'test', t('Explicit context property in mocked object is correct.'));
 
     $b3 = $b2->addLayer();
-    $b3['test'] = 'test_again';
+    $b3->setValue('test', 'test_again');
     $t3 = $b3->lock();
 
     $this->assertEqual($b3['test'], 'test_again', t('Explicitly overriden property works.'));

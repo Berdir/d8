@@ -156,14 +156,21 @@ class Context implements ContextInterface {
   }
 
   /**
-   * Implements ArrayAccess:offsetSet().
+   * Implements ContextInterface::setValue().
    */
-  public function offsetSet($context_key, $value) {
+  public function setValue($context_key, $value) {
     if ($this->locked) {
       throw new LockedException(t('This context object has been locked. It no longer accepts new explicit context sets.'));
     }
     // Set an explicit override for a given context value.
     $this->contextValues[$context_key] = $value;
+  }
+
+  /**
+   * Implements ArrayAccess:offsetSet().
+   */
+  public function offsetSet($context_key, $value) {
+    return $this->setValue($context_key, $value);
   }
 
   /**
@@ -221,7 +228,6 @@ class Context implements ContextInterface {
    * Implements DrupalContextInterface::addLayer();
    */
   public function addLayer() {
-
     $layer = new self(spl_object_hash($this));
     return $layer;
   }

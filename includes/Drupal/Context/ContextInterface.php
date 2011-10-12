@@ -21,6 +21,17 @@ interface ContextInterface extends \ArrayAccess {
   public function setHandler($context_key, $class, $params = array());
 
   /**
+   * Sets an explict value for a context key.
+   *
+   * @param string $context_key
+   *   The context key to set.
+   * @param mixed $value
+   *   The value to which to set the context key.  It may be any primitive value
+   *   or an instance of \Drupal\Context\ValueInterface.
+   */
+  public function setValue($context_key, $value);
+
+  /**
    * Return a set of keys to objects used in the current context
    *
    * This converts any context values referenced in the current scope into
