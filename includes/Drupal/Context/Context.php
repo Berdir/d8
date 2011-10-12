@@ -115,7 +115,8 @@ class Context implements ContextInterface {
               // cannot override it.
               if ($handler_value instanceof OffsetIsNull) {
                 $this->contextValues[$context_key] = NULL;
-              } else {
+              }
+              else {
                 $this->contextValues[$context_key] = $handler_value;
               }
             }
@@ -131,10 +132,12 @@ class Context implements ContextInterface {
         if (isset($this->parentId)) {
           if (isset(self::$contextStack[$this->parentId])) {
             $this->contextValues[$context_key] = self::$contextStack[$this->parentId]->getValue($context_key);
-          } else {
+          }
+          else {
             throw new ParentContextNotExistsException('Parent context does not exists anymore.');
           }
-        } else {
+        }
+        else {
           $this->contextValues[$context_key] = null;
         }
       }
