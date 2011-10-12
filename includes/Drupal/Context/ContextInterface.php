@@ -5,7 +5,7 @@ namespace Drupal\Context;
 /**
  * Interface definition for all context objects.
  */
-interface ContextInterface extends \ArrayAccess {
+interface ContextInterface {
 
   /**
    * Registers a class as the handler for a given context.
