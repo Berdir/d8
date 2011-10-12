@@ -2,14 +2,14 @@
 
 namespace Drupal\Context\Handler;
 
-use \Drupal\Context\ContextInterface as ContextInterface,
-    \Symfony\Component\HttpFoundation\Request as Request,
-    \Drupal\Context\Handler;
+use \Drupal\Context\ContextInterface;
+use \Symfony\Component\HttpFoundation\Request;
+use \Drupal\Context\Handler;
 
 /**
  * HTTP Context Handler implementation.
  */
-class HandlerHTTP extends HandlerAbstract {
+class HandlerHttp extends HandlerAbstract {
 
   /**
    * Symfony Request object.
@@ -28,34 +28,31 @@ class HandlerHTTP extends HandlerAbstract {
     'languages', 'files', 'cookies', 'headers', 'server', 'request_body'
   );
 
-  public function __construct(ContextInterface $context, $params = array()) {
-    $this->context = $context;
-
+  public function __construct($params = array()) {
     // Init Symfony Request.
     if (!empty($params)) {
-      // Default values.
-      $uri = 'http://localhost';
-      $method = 'GET';
-      $parameters = array();
-      $cookies = array();
-      $files = array();
-      $server = array();
-      $content = NULL;
+      // Set default values.
+      $params += array(
+        'uri' => 'http://localhost',
+        'method' => 'GET',
+        'parameters' => array(),
+        'cookies' => array(),
+        'files' => array(),
+        'server' => array(),
+        'content' => NULL,
+      );
 
-      // Extract values.
-      extract($params);
-
-      $this->request = Request::create($uri, $method, $parameters, $cookies, $files, $server, $content);
+      $this->request = Request::create($params['uri'], $params['method'], $params['parameters'], $params['cookies'], $params['files'], $params['server'], $params['content']);
     }
     else {
       $this->request = Request::createFromGlobals();
     }
   }
 
-  public function getValue(array $args = array()) {
+  public function getValue(array $args = array(), ContextInterface $context = null) {
     $property = $args[0];
 
-    // Check whether requested prperty is known.
+    // Check whether requested property is known.
     if (!in_array($property, self::$httpProperties)) {
       return;
     }
@@ -103,12 +100,21 @@ class HandlerHTTP extends HandlerAbstract {
       }
     }
 
-    if (!is_array($this->params[$property])) {
+    // If $this->params[$property] is value and
+    // we don't have second argument passed.
+    if (!is_array($this->params[$property]) || !isset($args[1])) {
       return $this->params[$property];
     }
-    // If parameter is array we use $args to get proper value of the array.
-    array_shift($args);
-    return drupal_array_get_nested_value($this->params[$property], $args);
+    else {
+      if (!empty($args[1]) && isset($this->params[$property][$args[1]])) {
+        return $this->params[$property][$args[1]];
+      }
+      else {
+        // We return empty string if there is no
+        // second argument key in $this->params[$property].
+        return '';
+      }
+    }
   }
 
   /**
