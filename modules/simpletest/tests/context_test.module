@@ -1,9 +1,10 @@
 <?php
 
+use Drupal\Context\ContextInterface;
+
 class ContextMockHandler extends \Drupal\Context\Handler\HandlerAbstract {
 
-  public function getValue(array $args = array()) {
-
+  public function getValue(array $args = array(), ContextInterface $context = null) {
     return $this->params['values'][implode(':', $args)];
   }
 
@@ -11,7 +12,7 @@ class ContextMockHandler extends \Drupal\Context\Handler\HandlerAbstract {
 
 class ContextTestCaseHelperOne extends \Drupal\Context\Handler\HandlerAbstract {
 
-  public function getValue(array $args = array()) {
+  public function getValue(array $args = array(), ContextInterface $context = null) {
     return 'one';
   }
 }
@@ -23,7 +24,7 @@ class ContextTestCaseHelperTwo extends \Drupal\Context\Handler\HandlerAbstract {
    */
   protected $i = 1;
 
-  public function getValue(array $args = array()) {
+  public function getValue(array $args = array(), ContextInterface $context = null) {
     // This increases every time it's called.  If we ever get back something
     // other than 1, it means the result caching is broken because we were
     // called a second time.
@@ -32,14 +33,14 @@ class ContextTestCaseHelperTwo extends \Drupal\Context\Handler\HandlerAbstract {
 }
 
 class ContextTestCaseHelperThree extends \Drupal\Context\Handler\HandlerAbstract {
-  public function getValue(array $args = array()) {
+  public function getValue(array $args = array(), ContextInterface $context = null) {
     $param = $args[0];
     return isset($this->params[$param]) ? $this->params[$param] : NULL;
   }
 }
 
 class ContextTestCaseHelperArguments extends \Drupal\Context\Handler\HandlerAbstract {
-  public function getValue(array $args = array()) {
+  public function getValue(array $args = array(), ContextInterface $context = null) {
     return $args;
   }
 }
@@ -71,7 +72,7 @@ class ContextValueExample implements \Drupal\Context\ValueInterface {
  */
 class ContextHandlerExample extends \Drupal\Context\Handler\HandlerAbstract {
 
-  public function getValue(array $args = array()) {
+  public function getValue(array $args = array(), ContextInterface $context = null) {
     if (isset($this->params['id'])) {
       $contextValueExample =  $this->createExampleObject($this->params['id']);
       $param = !empty($args) ? $args[0] : NULL;
