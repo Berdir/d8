@@ -48,7 +48,7 @@ class ContextTestCase extends ContextTestCases {
     $butler->setHandler('http:get', 'ContextMockHandler', array('values' => array('foo' => 'bar')));
     $butler->lock();
 
-    $param = $butler['http:get:foo'];
+    $param = $butler->getValue('http:get:foo');
 
     $this->assertEqual($param, 'bar', t('Correct Http GET fragment found.'));
   }
@@ -63,7 +63,7 @@ class ContextTestCase extends ContextTestCases {
 
     $butler->lock();
 
-    $this->assertEqual($butler['foo:bar'], 'baz', t('Explicit context set correctly.'));
+    $this->assertEqual($butler->getValue('foo:bar'), 'baz', t('Explicit context set correctly.'));
   }
 
   /**
@@ -80,7 +80,7 @@ class ContextTestCase extends ContextTestCases {
 
     $butler->lock();
 
-    $this->assertEqual($butler['foo:bar'], 'two', t('Explicit context overridden correctly.'));
+    $this->assertEqual($butler->getValue('foo:bar'), 'two', t('Explicit context overridden correctly.'));
   }
 
   /**
@@ -137,9 +137,9 @@ class ContextTestCase extends ContextTestCases {
 
     // Calling the same context variable should always give the same value
     // due to immutable caching.
-    $this->assertEqual($butler['foo:bar'], $butler['foo:bar'], t('Identical context keys always return the same value.'));
+    $this->assertEqual($butler->getValue('foo:bar'), $butler->getValue('foo:bar'), t('Identical context keys always return the same value.'));
     // Classes should be cached
-    $this->assertNotEqual($butler['foo:bar'], $butler['foo:bar:baz'], t('Handler classes are cached.'));
+    $this->assertNotEqual($butler->getValue('foo:bar'), $butler->getValue('foo:bar:baz'), t('Handler classes are cached.'));
   }
 }
 
@@ -164,8 +164,8 @@ class ContextValueObjectTestCase extends ContextTestCases {
     $t1 = $butler->lock();
 
     // Catch the id from the url.
-    $this->assertEqual($butler['example']->id, 1, t('ContextValueNode property id in context retrieved from request correctly.'));
-    $this->assertEqual($butler['example']->foo, 10, t('ContextValueNode property foo in context retrieved from request correctly.'));
+    $this->assertEqual($butler->getValue('example')->id, 1, t('ContextValueNode property id in context retrieved from request correctly.'));
+    $this->assertEqual($butler->getValue('example')->foo, 10, t('ContextValueNode property foo in context retrieved from request correctly.'));
 
     // Add a context layer to the butler context.
     $b2 = $butler->addLayer();
@@ -178,9 +178,9 @@ class ContextValueObjectTestCase extends ContextTestCases {
     //$b2['example:id'] = 2;
     $t2 = $b2->lock();
 
-    $this->assertEqual($b2['test'], 'test', t('Explicit context assigned correctly in layer 2.'));
-    $this->assertEqual($b2['example']->foo, 20, t('ContextValueNode property in in layer 2 overridden correctly.'));
-    //$this->assertEqual($b2['example:id'], 2, t('Explicit context (example:id) overridden correctly in layer 2.'));
+    $this->assertEqual($b2->getValue('test'), 'test', t('Explicit context assigned correctly in layer 2.'));
+    $this->assertEqual($b2->getValue('example')->foo, 20, t('ContextValueNode property in in layer 2 overridden correctly.'));
+    //$this->assertEqual($b2->getValue('example:id'), 2, t('Explicit context (example:id) overridden correctly in layer 2.'));
 
     // Add a context layer to the butler context.
     $b3 = $butler->addLayer();
@@ -192,10 +192,10 @@ class ContextValueObjectTestCase extends ContextTestCases {
     $b3->setValue('example:id', 3);
     $t3 = $b3->lock();
 
-    $this->assertEqual($b3['test'], 'testischanged', t('Explicit context overridden correctly in layer 3.'));
-    $this->assertEqual($b3['test:foo'], 'newtest', t('Explicit context retrieved correctly in layer 3.'));
-    $this->assertEqual($b3['example']->foo, 30, t('ContextValueNode property in in layer overridden correctly.'));
-    $this->assertEqual($b3['example:id'], 3, t('Explicit context (example:id) overridden correctly in layer 3.'));
+    $this->assertEqual($b3->getValue('test'), 'testischanged', t('Explicit context overridden correctly in layer 3.'));
+    $this->assertEqual($b3->getValue('test:foo'), 'newtest', t('Explicit context retrieved correctly in layer 3.'));
+    $this->assertEqual($b3->getValue('example')->foo, 30, t('ContextValueNode property in in layer overridden correctly.'));
+    $this->assertEqual($b3->getValue('example:id'), 3, t('Explicit context (example:id) overridden correctly in layer 3.'));
   }
 
   /**
@@ -220,8 +220,8 @@ class ContextValueObjectTestCase extends ContextTestCases {
     $t2 = $b2->lock();
 
     // Now try using the context values.
-    $b2['example'];
-    $b2['test'];
+    $b2->getValue('example');
+    $b2->getValue('test');
 
     $used = $b2->usedKeys();
 
@@ -266,7 +266,7 @@ class ContextMockTestCase extends ContextTestCases {
 
     $t1 = $butler->lock();
 
-    $foo1 = $butler['http:get:foo'];
+    $foo1 = $butler->getValue('http:get:foo');
 
     $this->assertEqual($foo1, 'bar', t('Correct Http GET fragment found.'));
 
@@ -277,14 +277,14 @@ class ContextMockTestCase extends ContextTestCases {
 
     $this->assertNotIdentical($butler, $b2, t('New context object created properly.'));
 
-    $this->assertEqual($b2['http:get:foo'], 'bar', t('Inherited property works.'));
-    $this->assertEqual($b2['test'], 'test', t('Explicit context property in mocked object is correct.'));
+    $this->assertEqual($b2->getValue('http:get:foo'), 'bar', t('Inherited property works.'));
+    $this->assertEqual($b2->getValue('test'), 'test', t('Explicit context property in mocked object is correct.'));
 
     $b3 = $b2->addLayer();
     $b3->setValue('test', 'test_again');
     $t3 = $b3->lock();
 
-    $this->assertEqual($b3['test'], 'test_again', t('Explicitly overriden property works.'));
+    $this->assertEqual($b3->getValue('test'), 'test_again', t('Explicitly overriden property works.'));
   }
 
   /**
@@ -330,7 +330,7 @@ class ContextMockTestCase extends ContextTestCases {
 
     try {
       // This should throw an exception.
-      $b3['foo:bar'];
+      $b3->getValue('foo:bar');
 
       $this->fail(t('Exception not thrown when getting data from a context that should have been destroyed.'));
     }
@@ -347,7 +347,7 @@ class ContextMockTestCase extends ContextTestCases {
     $butler->setHandler('foo', 'ContextTestCaseHelperArguments');
     $butler->lock();
 
-    $this->assertEqual($butler['foo:bar:baz'], array('bar', 'baz'), t('ContextHandler gets the correct arguments.'));
+    $this->assertEqual($butler->getValue('foo:bar:baz'), array('bar', 'baz'), t('ContextHandler gets the correct arguments.'));
   }
 
   public function testInheritanceContexts() {
@@ -359,14 +359,14 @@ class ContextMockTestCase extends ContextTestCases {
     $b2->setHandler('foo', 'ContextTestCaseHelperThree', array('bar' => 3));
     $t2 = $b2->lock();
 
-    $this->assertEqual($b2['foo:bar:baz'], 3, t('Context overrides even when more generic.'));
+    $this->assertEqual($b2->getValue('foo:bar:baz'), 3, t('Context overrides even when more generic.'));
 
     unset($t2, $b2);
 
     $b3 = $butler->addLayer();
     $b3->setHandler('foo', 'ContextTestCaseHelperThree', array('baz' => 5));
     $t3 = $b3->lock();
-    $this->assertEqual($b3['foo:bar:baz'], 1, t('If a context handler does not return data, the parent handler gets a chance to return data'));
+    $this->assertEqual($b3->getValue('foo:bar:baz'), 1, t('If a context handler does not return data, the parent handler gets a chance to return data'));
 
     unset($t3, $b3);
 
@@ -375,7 +375,7 @@ class ContextMockTestCase extends ContextTestCases {
     $b4->setHandler('foo:bar', 'ContextTestCaseHelperThree', array('baz' => 9));
     $t4 = $b4->lock();
 
-    $this->assertEqual($b4['foo:bar:baz:boo'], 9, t('A more generic handler in the same context should be called if the less generic handler does not return data.'));
+    $this->assertEqual($b4->getValue('foo:bar:baz:boo'), 9, t('A more generic handler in the same context should be called if the less generic handler does not return data.'));
   }
 
   /**
@@ -388,10 +388,10 @@ class ContextMockTestCase extends ContextTestCases {
     $tutler = $butler->lock();
 
     // Normal behavior, with no derivation.
-    $this->assertTrue(isset($butler['foo:bar']), t("foo:bar exists"));
-    $this->assertFalse(isset($butler['I:Do:Not:Exist']), t("I:Do:Not:Exist does not exists"));
-    $this->assertTrue(isset($butler['foo:bar']), t("foo:bar exists (caching does not break anything)"));
-    $this->assertFalse(isset($butler['I:Do:Not:Exist']), t("I:Do:Not:Exist does not exists (caching does not break anything)"));
+    $this->assertNotNull($butler->getValue('foo:bar'), t("foo:bar exists"));
+    $this->assertNull($butler->getValue('I:Do:Not:Exist'), t("I:Do:Not:Exist does not exists"));
+    $this->assertNotNull($butler->getValue('foo:bar'), t("foo:bar exists (caching does not break anything)"));
+    $this->assertNull($butler->getValue('I:Do:Not:Exist'), t("I:Do:Not:Exist does not exists (caching does not break anything)"));
   }
 
   /**
@@ -407,10 +407,10 @@ class ContextMockTestCase extends ContextTestCases {
     // Derivate and test over the new layer. Results should be the exact same.
     $b1 = $butler->addLayer();
     $t1 = $b1->lock();
-    $this->assertTrue(isset($b1['foo:bar']), t("foo:bar exists in new layer"));
-    $this->assertFalse(isset($b1['I:Do:Not:Exist']), t("I:Do:Not:Exist does not exists in new layer"));
-    $this->assertTrue(isset($b1['foo:bar']), t("Value exists in new layer (caching does not break anything)"));
-    $this->assertFalse(isset($b1['I:Do:Not:Exist']), t("I:Do:Not:Exist does not exists in new layer (caching does not break anything)"));
+    $this->assertNotNull($b1->getValue('foo:bar'), t("foo:bar exists in new layer"));
+    $this->assertNull($b1->getValue('I:Do:Not:Exist'), t("I:Do:Not:Exist does not exists in new layer"));
+    $this->assertNotNull($b1->getValue('foo:bar'), t("Value exists in new layer (caching does not break anything)"));
+    $this->assertNull($b1->getValue('I:Do:Not:Exist'), t("I:Do:Not:Exist does not exists in new layer (caching does not break anything)"));
 
     unset($t1, $b1);
 
@@ -418,9 +418,9 @@ class ContextMockTestCase extends ContextTestCases {
     $b2 = $butler->addLayer();
     $b2->setHandler('May:I', 'ContextTestCaseHelperThree', array('Exist' => 5));
     $t2 = $b2->lock();
-    $this->assertTrue(isset($b2['foo:bar']), t("foo:bar exists in new layer"));
-    $this->assertFalse(isset($b2['I:Do:Not:Exist']), t("I:Do:Not:Exist does not exists in new layer"));
-    $this->assertTrue(isset($b2['May:I:Exist']), t("May:I:Exist value exists in new layer"));
+    $this->assertNotNull($b2->getValue('foo:bar'), t("foo:bar exists in new layer"));
+    $this->assertNull($b2->getValue('I:Do:Not:Exist'), t("I:Do:Not:Exist does not exists in new layer"));
+    $this->assertNotNull($b2->getValue('May:I:Exist'), t("May:I:Exist value exists in new layer"));
 
     unset($t2, $tutler);
   }

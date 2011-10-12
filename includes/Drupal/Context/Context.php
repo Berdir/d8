@@ -94,6 +94,13 @@ class Context implements ContextInterface {
    * Implements ArrayAccess:offsetGet().
    */
   public function offsetGet($context_key) {
+    return $this->getValue($context_key);
+  }
+
+  /**
+   * Implements ContextInterface::getValue().
+   */
+  public function getValue($context_key) {
     if (!$this->locked) {
       throw new NotLockedException(t('This context object has not been locked. It must be locked before it can be used.'));
     }
@@ -137,7 +144,7 @@ class Context implements ContextInterface {
       if (!array_key_exists($context_key, $this->contextValues)) {
         if (isset($this->parentId)) {
           if (isset(self::$contextStack[$this->parentId])) {
-            $this->contextValues[$context_key] = self::$contextStack[$this->parentId]->offsetGet($context_key);
+            $this->contextValues[$context_key] = self::$contextStack[$this->parentId]->getValue($context_key);
           } else {
             throw new ParentContextNotExistsException('Parent context does not exists anymore.');
           }
