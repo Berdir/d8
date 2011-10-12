@@ -180,9 +180,9 @@ class Context implements ContextInterface {
   }
 
   /**
-   * Implmenents DrupalContextInterface::registerHandler().
+   * Implmenents DrupalContextInterface::setHandler().
    */
-  public function registerHandler($context_key, $class, $params = array()) {
+  public function setHandler($context_key, $class, $params = array()) {
     if ($this->locked) {
       throw new LockedException(t('This context object has been locked. It no longer accepts new handler registrations.'));
     }

@@ -8,7 +8,7 @@ namespace Drupal\Context;
 interface ContextInterface extends \ArrayAccess {
 
   /**
-   * Register a class as the handler for a given context.
+   * Registers a class as the handler for a given context.
    *
    * @param string $context_key
    *   The context key to register for, such as "http:get".
@@ -18,7 +18,7 @@ interface ContextInterface extends \ArrayAccess {
    * @param array $params
    *   An array of configuration options for the class.
    */
-  public function registerHandler($context_key, $class, $params = array());
+  public function setHandler($context_key, $class, $params = array());
 
   /**
    * Return a set of keys to objects used in the current context

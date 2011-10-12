@@ -45,7 +45,7 @@ class ContextTestCase extends ContextTestCases {
   function testSimpleRegistration() {
     $butler = new \Drupal\Context\Context();
 
-    $butler->registerHandler('http:get', 'ContextMockHandler', array('values' => array('foo' => 'bar')));
+    $butler->setHandler('http:get', 'ContextMockHandler', array('values' => array('foo' => 'bar')));
     $butler->lock();
 
     $param = $butler['http:get:foo'];
@@ -73,7 +73,7 @@ class ContextTestCase extends ContextTestCases {
     $butler = new \Drupal\Context\Context();
 
     // This handler would return "one".
-    $butler->registerHandler('foo:bar', 'ContextTestCaseHelperOne');
+    $butler->setHandler('foo:bar', 'ContextTestCaseHelperOne');
 
     // But we override it to "two".
     $butler['foo:bar'] = 'two';
@@ -113,7 +113,7 @@ class ContextTestCase extends ContextTestCases {
     try {
       $butler->lock();
       // This should throw an exception.
-      $butler->registerHandler('foo:bar', 'ContextTestCaseHelperOne');
+      $butler->setHandler('foo:bar', 'ContextTestCaseHelperOne');
 
       $this->fail(t('Exception not thrown when setting context on a locked object.'));
     }
@@ -132,7 +132,7 @@ class ContextTestCase extends ContextTestCases {
     $butler = new \Drupal\Context\Context();
 
     // This handler should return 1, then 2, then 3, each time it's called.
-    $butler->registerHandler('foo:bar', 'ContextTestCaseHelperTwo');
+    $butler->setHandler('foo:bar', 'ContextTestCaseHelperTwo');
     $butler->lock();
 
     // Calling the same context variable should always give the same value
@@ -159,7 +159,7 @@ class ContextValueObjectTestCase extends ContextTestCases {
     $butler = new \Drupal\Context\Context();
 
     // Add a handler for this test to mimic to create an example (E.g. from url arguments)
-    $butler->registerHandler('example', 'ContextHandlerExample', array('id' => 1));
+    $butler->setHandler('example', 'ContextHandlerExample', array('id' => 1));
 
     $t1 = $butler->lock();
 
@@ -205,7 +205,7 @@ class ContextValueObjectTestCase extends ContextTestCases {
     $butler = new \Drupal\Context\Context();
 
     // Add a handler for this test to mimic to create an example (E.g. from url arguments)
-    $butler->registerHandler('example', 'ContextHandlerExample', array('id' => 1));
+    $butler->setHandler('example', 'ContextHandlerExample', array('id' => 1));
     $butler['test'] = 'test';
 
     $t1 = $butler->lock();
@@ -262,7 +262,7 @@ class ContextMockTestCase extends ContextTestCases {
   function testOverrides() {
     $butler = new \Drupal\Context\Context();
 
-    $butler->registerHandler('http:get', 'ContextMockHandler', array('values' => array('foo' => 'bar')));
+    $butler->setHandler('http:get', 'ContextMockHandler', array('values' => array('foo' => 'bar')));
 
     $t1 = $butler->lock();
 
@@ -309,12 +309,12 @@ class ContextMockTestCase extends ContextTestCases {
   public function testGarbageCollection() {
     // Create a simple butler object.
     $butler = new \Drupal\Context\Context();
-    $butler->registerHandler('foo', 'ContextTestCaseHelperThree', array('bar' => 'butler'));
+    $butler->setHandler('foo', 'ContextTestCaseHelperThree', array('bar' => 'butler'));
     $t1 = $butler->lock();
 
     // Create a new layer on top of that, which overrides some information.
     $b2 = $butler->addLayer();
-    $b2->registerHandler('foo', 'ContextTestCaseHelperThree', array('bar' => 'b2'));
+    $b2->setHandler('foo', 'ContextTestCaseHelperThree', array('bar' => 'b2'));
     $t2 = $b2->lock();
 
     // Create a new layer on top of that, which actually does nothing at all.
@@ -344,7 +344,7 @@ class ContextMockTestCase extends ContextTestCases {
 
   public function testContextArguments() {
     $butler = new \Drupal\Context\Context();
-    $butler->registerHandler('foo', 'ContextTestCaseHelperArguments');
+    $butler->setHandler('foo', 'ContextTestCaseHelperArguments');
     $butler->lock();
 
     $this->assertEqual($butler['foo:bar:baz'], array('bar', 'baz'), t('ContextHandler gets the correct arguments.'));
@@ -352,11 +352,11 @@ class ContextMockTestCase extends ContextTestCases {
 
   public function testInheritanceContexts() {
     $butler = new \Drupal\Context\Context();
-    $butler->registerHandler('foo:bar', 'ContextTestCaseHelperThree', array('baz' => 1));
+    $butler->setHandler('foo:bar', 'ContextTestCaseHelperThree', array('baz' => 1));
     $t1 = $butler->lock();
 
     $b2 = $butler->addLayer();
-    $b2->registerHandler('foo', 'ContextTestCaseHelperThree', array('bar' => 3));
+    $b2->setHandler('foo', 'ContextTestCaseHelperThree', array('bar' => 3));
     $t2 = $b2->lock();
 
     $this->assertEqual($b2['foo:bar:baz'], 3, t('Context overrides even when more generic.'));
@@ -364,15 +364,15 @@ class ContextMockTestCase extends ContextTestCases {
     unset($t2, $b2);
 
     $b3 = $butler->addLayer();
-    $b3->registerHandler('foo', 'ContextTestCaseHelperThree', array('baz' => 5));
+    $b3->setHandler('foo', 'ContextTestCaseHelperThree', array('baz' => 5));
     $t3 = $b3->lock();
     $this->assertEqual($b3['foo:bar:baz'], 1, t('If a context handler does not return data, the parent handler gets a chance to return data'));
 
     unset($t3, $b3);
 
     $b4 = $butler->addLayer();
-    $b4->registerHandler('foo:bar:baz', 'ContextTestCaseHelperThree', array('bax' => 7));
-    $b4->registerHandler('foo:bar', 'ContextTestCaseHelperThree', array('baz' => 9));
+    $b4->setHandler('foo:bar:baz', 'ContextTestCaseHelperThree', array('bax' => 7));
+    $b4->setHandler('foo:bar', 'ContextTestCaseHelperThree', array('baz' => 9));
     $t4 = $b4->lock();
 
     $this->assertEqual($b4['foo:bar:baz:boo'], 9, t('A more generic handler in the same context should be called if the less generic handler does not return data.'));
@@ -383,7 +383,7 @@ class ContextMockTestCase extends ContextTestCases {
    */
   public function testOffsetExists() {
     $butler = new \Drupal\Context\Context();
-    $butler->registerHandler('foo', 'ContextTestCaseHelperThree', array('bar' => 3));
+    $butler->setHandler('foo', 'ContextTestCaseHelperThree', array('bar' => 3));
     // B1: T1, B2: T2, Butler: Tutler :)
     $tutler = $butler->lock();
 
@@ -400,7 +400,7 @@ class ContextMockTestCase extends ContextTestCases {
    */
   public function testOffsetExistsWithDerivation() {
     $butler = new \Drupal\Context\Context();
-    $butler->registerHandler('foo', 'ContextTestCaseHelperThree', array('bar' => 3));
+    $butler->setHandler('foo', 'ContextTestCaseHelperThree', array('bar' => 3));
     // B1: T1, B2: T2, Butler: Tutler :)
     $tutler = $butler->lock();
 
@@ -416,7 +416,7 @@ class ContextMockTestCase extends ContextTestCases {
 
     // Derivate again, add a new value, and test for all other existence.
     $b2 = $butler->addLayer();
-    $b2->registerHandler('May:I', 'ContextTestCaseHelperThree', array('Exist' => 5));
+    $b2->setHandler('May:I', 'ContextTestCaseHelperThree', array('Exist' => 5));
     $t2 = $b2->lock();
     $this->assertTrue(isset($b2['foo:bar']), t("foo:bar exists in new layer"));
     $this->assertFalse(isset($b2['I:Do:Not:Exist']), t("I:Do:Not:Exist does not exists in new layer"));
