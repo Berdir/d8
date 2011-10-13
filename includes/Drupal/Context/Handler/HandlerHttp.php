@@ -89,7 +89,12 @@ class HandlerHttp extends HandlerAbstract {
           break;
         case 'headers':
           $this->params[$property] = $this->request->headers->all();
-          $this->arrayCleanup($this->params[$property]);
+          // Cleanup from not necessary nesting level.
+          foreach ($this->params[$property] as &$item) {
+            if (is_array($item)) {
+              $item = current($item);
+            }
+          }
           break;
         case 'server':
           $this->params[$property] = $this->request->server->all();
@@ -113,19 +118,6 @@ class HandlerHttp extends HandlerAbstract {
         // We return empty string if there is no
         // second argument key in $this->params[$property].
         return '';
-      }
-    }
-  }
-
-  /**
-   * Remove not necessary nesting level.
-   *
-   * @param array $array
-   */
-  public function arrayCleanup(&$array) {
-    foreach ($array as &$item) {
-      if (is_array($item)) {
-        $item = current($item);
       }
     }
   }
