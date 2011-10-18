@@ -244,22 +244,16 @@ function locale_languages_custom_form($form) {
  * @param $langcode
  *   Language code of the language to edit.
  */
-function locale_languages_edit_form($form, &$form_state, $langcode) {
-  if ($language = db_query("SELECT * FROM {languages} WHERE language = :language", array(':language' => $langcode))->fetchObject()) {
-    _locale_languages_common_controls($form, $language);
-    $form['actions'] = array('#type' => 'actions');
-    $form['actions']['submit'] = array(
-      '#type' => 'submit',
-      '#value' => t('Save language')
-    );
-    $form['#submit'][] = 'locale_languages_edit_form_submit';
-    $form['#validate'][] = 'locale_languages_edit_form_validate';
-    return $form;
-  }
-  else {
-    drupal_not_found();
-    drupal_exit();
-  }
+function locale_languages_edit_form($form, &$form_state, $language) {
+  _locale_languages_common_controls($form, $language);
+  $form['actions'] = array('#type' => 'actions');
+  $form['actions']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save language')
+  );
+  $form['#submit'][] = 'locale_languages_edit_form_submit';
+  $form['#validate'][] = 'locale_languages_edit_form_validate';
+  return $form;
 }
 
 /**
@@ -326,7 +320,7 @@ function _locale_languages_common_controls(&$form, $language = NULL) {
 function locale_languages_predefined_form_validate($form, &$form_state) {
   $langcode = $form_state['values']['langcode'];
 
-  if (($duplicate = db_query("SELECT COUNT(*) FROM {languages} WHERE language = :language", array(':language' => $langcode))->fetchField()) != 0) {
+  if (language_load($langcode)) {
     form_set_error('langcode', t('The language %language (%code) already exists.', array('%language' => $form_state['values']['name'], '%code' => $langcode)));
   }
 
@@ -415,8 +409,8 @@ function locale_languages_edit_form_submit($form, &$form_state) {
 /**
  * User interface for the language deletion confirmation screen.
  */
-function locale_languages_delete_form($form, &$form_state, $langcode) {
-
+function locale_languages_delete_form($form, &$form_state, $language) {
+  $langcode = $language->language;
   // Do not allow deletion of English locale.
   if ($langcode == 'en') {
     drupal_set_message(t('The English language cannot be deleted.'));
