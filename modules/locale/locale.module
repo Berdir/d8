@@ -269,26 +269,6 @@ function language_load($langcode) {
 }
 
 /**
- * Loads a language objects from the database.
- *
- * @param $langcodes
- *   The language codes.
- *
- * @return
- *    An array of language objects indexed by language code.
- */
-function language_load_multiple($langcodes = array()) {
-  $languages = language_list();
-  $result = array();
-  foreach ($langcodes as $langcode) {
-    if (isset($languages[$langcode])) {
-      $result = $languages[$langcode];
-    }
-  }
-  return $result;
-}
-
-/**
  * Form builder callback to display language selection widget.
  *
  * @ingroup forms
