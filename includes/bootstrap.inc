@@ -2230,8 +2230,8 @@ function _drupal_bootstrap_configuration() {
   require_once(DRUPAL_ROOT . '/includes/Symfony/Component/ClassLoader/UniversalClassLoader.php');
 
   // By default, use the UniversalClassLoader which is best for development,
-  // as it does not break when code moves around. It is slow, however, so
-  // for production the Apc class loader should be used instead.
+  // as it does not break when code is moved on the file system. It is slow,
+  // however, so for production the APC class loader should be used instead.
   // @todo Switch to a cleaner way to switch autoloaders than variable_get().
   switch (variable_get('autoloader_mode', 'default')) {
     case 'apc':
