@@ -850,7 +850,7 @@ function drupal_settings_initialize() {
 function drupal_get_filename($type, $name, $filename = NULL) {
   // The location of files will not change during the request, so do not use
   // drupal_static().
-  static $files = array();
+  static $files = array(), $dirs = array();
 
   if (!isset($files[$type])) {
     $files[$type] = array();
@@ -896,16 +896,19 @@ function drupal_get_filename($type, $name, $filename = NULL) {
         $extension = $type;
       }
 
-      if (!function_exists('drupal_system_listing')) {
-        require_once DRUPAL_ROOT . '/includes/common.inc';
-      }
-      // Scan the appropriate directories for all files with the requested
-      // extension, not just the file we are currently looking for. This
-      // prevents unnecessary scans from being repeated when this function is
-      // called more than once in the same page request.
-      $matches = drupal_system_listing("/^" . DRUPAL_PHP_FUNCTION_PATTERN . "\.$extension$/", $dir, 'name', 0);
-      foreach ($matches as $matched_name => $file) {
-        $files[$type][$matched_name] = $file->uri;
+      if (!isset($dirs[$dir][$extension])) {
+        $dirs[$dir][$extension] = TRUE;
+        if (!function_exists('drupal_system_listing')) {
+          require_once DRUPAL_ROOT . '/includes/common.inc';
+        }
+        // Scan the appropriate directories for all files with the requested
+        // extension, not just the file we are currently looking for. This
+        // prevents unnecessary scans from being repeated when this function is
+        // called more than once in the same page request.
+        $matches = drupal_system_listing("/^" . DRUPAL_PHP_FUNCTION_PATTERN . "\.$extension$/", $dir, 'name', 0);
+        foreach ($matches as $matched_name => $file) {
+          $files[$type][$matched_name] = $file->uri;
+        }
       }
     }
   }
@@ -2231,8 +2234,8 @@ function _drupal_bootstrap_configuration() {
   require_once(DRUPAL_ROOT . '/includes/Symfony/Component/ClassLoader/UniversalClassLoader.php');
 
   // By default, use the UniversalClassLoader which is best for development,
-  // as it does not break when code moves around. It is slow, however, so
-  // for production the Apc class loader should be used instead.
+  // as it does not break when code is moved on the file system. It is slow,
+  // however, so for production the APC class loader should be used instead.
   // @todo Switch to a cleaner way to switch autoloaders than variable_get().
   switch (variable_get('autoloader_mode', 'default')) {
     case 'apc':
@@ -2577,6 +2580,7 @@ function get_t() {
  * Initialize all the defined language types.
  */
 function drupal_language_initialize() {
+  global $language;
   $types = language_types();
 
   // Ensure the language is correctly returned, even without multilanguage
@@ -2596,6 +2600,9 @@ function drupal_language_initialize() {
     // environments.
     bootstrap_invoke_all('language_init');
   }
+
+  // Send appropriate HTTP-Header for browsers and search engines.
+  header('Content-Language: ' . $language->language);
 }
 
 /**
@@ -2631,9 +2638,18 @@ function language_types() {
 }
 
 /**
- * Get a list of languages set up indexed by the specified key
+ * Returns a list of installed languages, indexed by the specified key.
  *
- * @param $field The field to index the list with.
+ * @param $field
+ *   (optional) The field to index the list with.
+ *
+ * @return
+ *   An associative array, keyed on the values of $field.
+ *   - If $field is 'weight' or 'enabled', the array is nested, with the outer
+ *     array's values each being associative arrays with language codes as
+ *     keys and language objects as values.
+ *   - For all other values of $field, the array is only one level deep, and
+ *     the array's values are language objects.
  */
 function language_list($field = 'language') {
   $languages = &drupal_static(__FUNCTION__);

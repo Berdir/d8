@@ -221,6 +221,9 @@ require_once DRUPAL_ROOT . '/modules/field/field.form.inc';
  *     - other_mode
  *        - ...
  *
+ * The (default) render arrays produced for field instances are documented at
+ * field_attach_view().
+ *
  * Bundles are represented by two strings, an entity type and a bundle name.
  *
  * - @link field_types Field Types API @endlink. Defines field types,
@@ -515,7 +518,6 @@ function field_get_default_value($entity_type, $entity, $field, $instance, $lang
  */
 function _field_filter_items($field, $items) {
   $function = $field['module'] . '_field_is_empty';
-  function_exists($function);
   foreach ((array) $items as $delta => $item) {
     // Explicitly break if the function is undefined.
     if ($function($item, $field)) {
@@ -611,16 +613,12 @@ function _field_sort_items_value_helper($a, $b) {
  *   If no $settings are passed, the current settings are returned.
  */
 function field_bundle_settings($entity_type, $bundle, $settings = NULL) {
-  $stored_settings = variable_get('field_bundle_settings', array());
-
   if (isset($settings)) {
-    $stored_settings[$entity_type][$bundle] = $settings;
-
-    variable_set('field_bundle_settings', $stored_settings);
+    variable_set('field_bundle_settings_' . $entity_type . '__' . $bundle, $settings);
     field_info_cache_clear();
   }
   else {
-    $settings = isset($stored_settings[$entity_type][$bundle]) ? $stored_settings[$entity_type][$bundle] : array();
+    $settings = variable_get('field_bundle_settings_' . $entity_type . '__' . $bundle, array());
     $settings += array(
       'view_modes' => array(),
       'extra_fields' => array(),

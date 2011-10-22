@@ -1111,7 +1111,7 @@ class DrupalGotoTest extends DrupalWebTestCase {
     $destination = 'common-test/drupal_goto/destination?foo=%2525&bar=123';
     $this->drupalGet('common-test/drupal_goto/redirect', array('query' => array('destination' => $destination)));
     $this->assertText('drupal_goto', t('Drupal goto redirect with destination succeeded.'));
-    $this->assertEqual($this->getUrl(), url('common-test/drupal_goto/destination', array('query' => array('foo' => '%25', 'bar' => '123'), 'absolute' => TRUE)), t('Drupal goto redirected to given query string destination. '));
+    $this->assertEqual($this->getUrl(), url('common-test/drupal_goto/destination', array('query' => array('foo' => '%25', 'bar' => '123'), 'absolute' => TRUE)), t('Drupal goto redirected to given query string destination.'));
   }
 
   /**
@@ -2246,13 +2246,17 @@ class FormatDateUnitTest extends DrupalWebTestCase {
     $admin_user = $this->drupalCreateUser(array('administer languages'));
     $this->drupalLogin($admin_user);
     $edit = array(
+      'predefined_langcode' => 'custom',
       'langcode' => self::LANGCODE,
       'name' => self::LANGCODE,
       'native' => self::LANGCODE,
       'direction' => LANGUAGE_LTR,
-      'prefix' => self::LANGCODE,
     );
     $this->drupalPost('admin/config/regional/language/add', $edit, t('Add custom language'));
+
+    // Set language prefix.
+    $edit = array('prefix[' . self::LANGCODE . ']' => self::LANGCODE);
+    $this->drupalPost('admin/config/regional/language/configure/url', $edit, t('Save configuration'));
 
     // Create a test user to carry out the tests.
     $test_user = $this->drupalCreateUser();
