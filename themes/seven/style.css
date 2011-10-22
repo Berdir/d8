@@ -105,6 +105,9 @@ ul,
   list-style-image: none;
   margin: 0.25em 0 0.25em 1.5em; /* LTR */
 }
+.item-list .pager li {
+  padding: 0.5em;
+}
 .item-list ul li,
 li.leaf,
 ul.menu li {
@@ -315,7 +318,7 @@ ul.secondary {
 }
 ul.secondary li {
   margin: 0 5px;
-  float: right; /* LTR */
+  float: none; /* LTR */
 }
 ul.secondary li a {
   background-color: #ddd;
@@ -776,19 +779,6 @@ div.admin-panel h3 {
 }
 .system-themes-list-enabled .theme-selector h3 {
   margin-top: 0;
-}
-
-/* admin/content and admin/people */
-dl.multiselect,
-dl.multiselect dt,
-dl.multiselect dd {
-  margin: 0 10px 0 0; /* LTR */
-}
-dl.multiselect select,
-dl.multiselect dd select {
-  font-size: 0.923em;
-  background: #fff;
-  border: 1px solid #ccc;
 }
 
 /* Update options. */

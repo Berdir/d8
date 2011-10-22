@@ -570,25 +570,24 @@ function hook_node_load($nodes, $types) {
  * block access, return NODE_ACCESS_IGNORE or simply return nothing.
  * Blindly returning FALSE will break other node access modules.
  *
- * @link http://api.drupal.org/api/group/node_access/7 More on the node access system @endlink
- * @ingroup node_access
- * @param $node
- *   The node on which the operation is to be performed, or, if it does
- *   not yet exist, the type of node to be created.
- * @param $op
+ * @param object|string $node
+ *   Either a node object or a (machine-readable) content type on which to
+ *   perform the access check.
+ * @param string $op
  *   The operation to be performed. Possible values:
  *   - "create"
  *   - "delete"
  *   - "update"
  *   - "view"
- * @param $account
- *   A user object representing the user for whom the operation is to be
- *   performed.
+ * @param object $account
+ *   The user object to perform the access check operation on.
  *
- * @return
+ * @return integer
  *   NODE_ACCESS_ALLOW if the operation is to be allowed;
  *   NODE_ACCESS_DENY if the operation is to be denied;
  *   NODE_ACCESS_IGNORE to not affect this operation at all.
+ *
+ * @ingroup node_access
  */
 function hook_node_access($node, $op, $account) {
   $type = is_string($node) ? $node : $node->type;
@@ -859,9 +858,9 @@ function hook_node_view_alter(&$build) {
  *
  * @return
  *   An array of information defining the module's node types. The array
- *   contains a sub-array for each node type, with the machine-readable type
- *   name as the key. Each sub-array has up to 10 attributes. Possible
- *   attributes:
+ *   contains a sub-array for each node type, with the the machine name of a
+ *   content type as the key. Each sub-array has up to 10 attributes.
+ *   Possible attributes:
  *   - "name": the human-readable name of the node type. Required.
  *   - "base": the base string used to construct callbacks corresponding to
  *      this node type.
@@ -879,9 +878,9 @@ function hook_node_view_alter(&$build) {
  *      machine name of this type. FALSE = changeable (not locked),
  *      TRUE = unchangeable (locked). Optional (defaults to TRUE).
  *
- * The machine-readable name of a node type should contain only letters,
- * numbers, and underscores. Underscores will be converted into hyphens for the
- * purpose of constructing URLs.
+ * The machine name of a node type should contain only letters, numbers, and
+ * underscores. Underscores will be converted into hyphens for the purpose of
+ * constructing URLs.
  *
  * All attributes of a node type that are defined through this hook (except for
  * 'locked') can be edited by a site administrator. This includes the
