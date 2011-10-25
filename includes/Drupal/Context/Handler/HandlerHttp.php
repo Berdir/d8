@@ -30,9 +30,9 @@ class HandlerHttp extends HandlerAbstract {
 
   public function __construct($params = array()) {
     // Init Symfony Request.
-    if (!empty($params)) {
+    if (isset($params['values'])) {
       // Set default values.
-      $params += array(
+      $params['values'] += array(
         'uri' => 'http://localhost',
         'method' => 'GET',
         'parameters' => array(),
@@ -42,7 +42,8 @@ class HandlerHttp extends HandlerAbstract {
         'content' => NULL,
       );
 
-      $this->request = Request::create($params['uri'], $params['method'], $params['parameters'], $params['cookies'], $params['files'], $params['server'], $params['content']);
+      $values = $params['values'];
+      $this->request = Request::create($values['uri'], $values['method'], $values['parameters'], $values['cookies'], $values['files'], $values['server'], $values['content']);
     }
     else {
       $this->request = Request::createFromGlobals();
@@ -79,7 +80,7 @@ class HandlerHttp extends HandlerAbstract {
           $this->params[$property] = $this->request->query->all();
           break;
         case 'languages':
-          $this->params[$property] = $this->request->getLanguages();
+          $this->params[$property] = $this->request->splitHttpAcceptHeader($this->request->headers->get('Accept-Language'));
           break;
         case 'files':
           $this->params[$property] = $this->request->files->all();
@@ -105,12 +106,14 @@ class HandlerHttp extends HandlerAbstract {
       }
     }
 
-    // If $this->params[$property] is value and
-    // we don't have second argument passed.
+    // We support only two levels of nexting.
+    // Return first level value if it is not array or only first level
+    // requested (second nesting level key does not exist)
     if (!is_array($this->params[$property]) || !isset($args[1])) {
       return $this->params[$property];
     }
     else {
+      // Return second nesting level value if it exists.
       if (!empty($args[1]) && isset($this->params[$property][$args[1]])) {
         return $this->params[$property][$args[1]];
       }

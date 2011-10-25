@@ -444,14 +444,14 @@ class ContextHTTPTestCase extends ContextTestCases {
   function testGetHttpProperty() {
     $butler = new \Drupal\Context\Context();
 
-    $butler->registerHandler('http', '\Drupal\Context\Handler\HandlerHttp');
+    $butler->setHandler('http', '\Drupal\Context\Handler\HandlerHttp');
     $butler->lock();
 
-    $this->assertEqual($butler['http:method'], 'POST', t('Correct Http method property found.'));
+    $this->assertEqual($butler->getValue('http:method'), 'POST', t('Correct Http method property found.'));
 
     // Test headers and server properties.
-    $this->assertEqual($butler['http:headers:host'], $_SERVER['HTTP_HOST'], t('Host header fetched successfully.'));
-    $this->assertEqual($butler['http:server:HTTP_USER_AGENT'], $_SERVER['HTTP_USER_AGENT'], t('User agent server variable fetched successfully'));
+    $this->assertEqual($butler->getValue('http:headers:host'), $_SERVER['HTTP_HOST'], t('Host header fetched successfully.'));
+    $this->assertEqual($butler->getValue('http:server:HTTP_USER_AGENT'), $_SERVER['HTTP_USER_AGENT'], t('User agent server variable fetched successfully'));
   }
 
   /**
@@ -460,12 +460,12 @@ class ContextHTTPTestCase extends ContextTestCases {
   function testMockHttpProperty() {
     $butler = new \Drupal\Context\Context();
 
-    $params = array('method' => 'PUT');
+    $params = array('values' => array('method' => 'PUT'));
 
-    $butler->registerHandler('http', '\Drupal\Context\Handler\HandlerHttp', $params);
+    $butler->setHandler('http', '\Drupal\Context\Handler\HandlerHttp', $params);
     $butler->lock();
 
-    $this->assertEqual($butler['http:method'], $params['method'], t('Http method property mocked successfully.'));
+    $this->assertEqual($butler->getValue('http:method'), $params['values']['method'], t('Http method property mocked successfully.'));
   }
 
   /**
@@ -475,16 +475,16 @@ class ContextHTTPTestCase extends ContextTestCases {
     $butler = new \Drupal\Context\Context();
 
     // Mock arguments as nested array.
-    $params = array('parameters' => array('foo' => array('bar' => 'baz')));
+    $params = array('values' => array('parameters' => array('foo' => array('bar' => 'baz'))));
 
-    $butler->registerHandler('http', '\Drupal\Context\Handler\HandlerHttp', $params);
+    $butler->setHandler('http', '\Drupal\Context\Handler\HandlerHttp', $params);
     $butler->lock();
 
     // Different nesting level values.
-    $this->assertEqual($butler['http:query_args'], $params['parameters'], t('Query args fetched successfully.'));
-    $this->assertEqual($butler['http:query_args:foo'], $params['parameters']['foo'], t('First level value from query_args fetched successfully.'));
+    $this->assertEqual($butler->getValue('http:query_args'), $params['values']['parameters'], t('Query args fetched successfully.'));
+    $this->assertEqual($butler->getValue('http:query_args:foo'), $params['values']['parameters']['foo'], t('First level value from query_args fetched successfully.'));
 
     // Non existing value.
-    $this->assertEqual($butler['http:query_args:baz'], '', t('Non existent value fetched as empty string'));
+    $this->assertEqual($butler->getValue('http:query_args:baz'), '', t('Non existent value fetched as empty string'));
   }
 }
