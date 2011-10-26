@@ -60,13 +60,10 @@ class LocaleConfigurationTest extends DrupalWebTestCase {
     $langcode = 'xx';
     // The English name for the language.
     $name = $this->randomName(16);
-    // The native name for the language.
-    $native = $this->randomName(16);
     $edit = array(
       'predefined_langcode' => 'custom',
       'langcode' => $langcode,
       'name' => $name,
-      'native' => $native,
       'direction' => '0',
     );
     $this->drupalPost('admin/config/regional/language/add', $edit, t('Add custom language'));
@@ -200,43 +197,65 @@ class LocaleJavascriptTranslationTest extends DrupalWebTestCase {
 
     // Get all of the source strings that were found.
     $source_strings = db_select('locales_source', 's')
-      ->fields('s', array('source', 'lid'))
+      ->fields('s', array('source', 'context'))
       ->condition('s.location', $filename)
       ->execute()
       ->fetchAllKeyed();
 
     // List of all strings that should be in the file.
     $test_strings = array(
-      "Standard Call t",
-      "Whitespace Call t",
+      "Standard Call t" => '',
+      "Whitespace Call t" => '',
 
-      "Single Quote t",
-      "Single Quote \\'Escaped\\' t",
-      "Single Quote Concat strings t",
+      "Single Quote t" => '',
+      "Single Quote \\'Escaped\\' t" => '',
+      "Single Quote Concat strings t" => '',
 
-      "Double Quote t",
-      "Double Quote \\\"Escaped\\\" t",
-      "Double Quote Concat strings t",
+      "Double Quote t" => '',
+      "Double Quote \\\"Escaped\\\" t" => '',
+      "Double Quote Concat strings t" => '',
 
-      "Standard Call plural",
-      "Standard Call @count plural",
-      "Whitespace Call plural",
-      "Whitespace Call @count plural",
+      "Context !key Args t" => "Context string",
 
-      "Single Quote plural",
-      "Single Quote @count plural",
-      "Single Quote \\'Escaped\\' plural",
-      "Single Quote \\'Escaped\\' @count plural",
+      "Context Unquoted t" => "Context string unquoted",
+      "Context Single Quoted t" => "Context string single quoted",
+      "Context Double Quoted t" => "Context string double quoted",
 
-      "Double Quote plural",
-      "Double Quote @count plural",
-      "Double Quote \\\"Escaped\\\" plural",
-      "Double Quote \\\"Escaped\\\" @count plural",
+      "Standard Call plural" => '',
+      "Standard Call @count plural" => '',
+      "Whitespace Call plural" => '',
+      "Whitespace Call @count plural" => '',
+
+      "Single Quote plural" => '',
+      "Single Quote @count plural" => '',
+      "Single Quote \\'Escaped\\' plural" => '',
+      "Single Quote \\'Escaped\\' @count plural" => '',
+
+      "Double Quote plural" => '',
+      "Double Quote @count plural" => '',
+      "Double Quote \\\"Escaped\\\" plural" => '',
+      "Double Quote \\\"Escaped\\\" @count plural" => '',
+
+      "Context !key Args plural" => "Context string",
+      "Context !key Args @count plural" => "Context string",
+
+      "Context Unquoted plural" => "Context string unquoted",
+      "Context Unquoted @count plural" => "Context string unquoted",
+      "Context Single Quoted plural" => "Context string single quoted",
+      "Context Single Quoted @count plural" => "Context string single quoted",
+      "Context Double Quoted plural" => "Context string double quoted",
+      "Context Double Quoted @count plural" => "Context string double quoted",
     );
 
     // Assert that all strings were found properly.
-    foreach ($test_strings as $str) {
-      $this->assertTrue(isset($source_strings[$str]), t("Found source string: %source", array('%source' => $str)));
+    foreach ($test_strings as $str => $context) {
+      $args = array('%source' => $str, '%context' => $context);
+
+      // Make sure that the string was found in the file.
+      $this->assertTrue(isset($source_strings[$str]), t("Found source string: %source", $args));
+
+      // Make sure that the proper context was matched.
+      $this->assertTrue(isset($source_strings[$str]) && $source_strings[$str] === $context, strlen($context) > 0 ? t("Context for %source is %context", $args) : t("Context for %source is blank", $args));
     }
 
     $this->assertEqual(count($source_strings), count($test_strings), t("Found correct number of source strings."));
@@ -272,8 +291,6 @@ class LocaleTranslationFunctionalTest extends DrupalWebTestCase {
     $langcode = 'xx';
     // The English name for the language. This will be translated.
     $name = $this->randomName(16);
-    // The native name for the language.
-    $native = $this->randomName(16);
     // This is the language indicator on the translation search screen for
     // untranslated strings. Copied straight from locale.inc.
     $language_indicator = "<em class=\"locale-untranslated\">$langcode</em> ";
@@ -286,7 +303,6 @@ class LocaleTranslationFunctionalTest extends DrupalWebTestCase {
       'predefined_langcode' => 'custom',
       'langcode' => $langcode,
       'name' => $name,
-      'native' => $native,
       'direction' => '0',
     );
     $this->drupalPost('admin/config/regional/language/add', $edit, t('Add custom language'));
@@ -388,15 +404,12 @@ class LocaleTranslationFunctionalTest extends DrupalWebTestCase {
     $langcode = 'xx';
     // The English name for the language. This will be translated.
     $name = $this->randomName(16);
-    // The native name for the language.
-    $native = $this->randomName(16);
 
     // Add custom language.
     $edit = array(
       'predefined_langcode' => 'custom',
       'langcode' => $langcode,
       'name' => $name,
-      'native' => $native,
       'direction' => '0',
     );
     $this->drupalPost('admin/config/regional/language/add', $edit, t('Add custom language'));
@@ -448,8 +461,6 @@ class LocaleTranslationFunctionalTest extends DrupalWebTestCase {
     $langcode = 'xx';
     // The English name for the language. This will be translated.
     $name = $this->randomName(16);
-    // The native name for the language.
-    $native = $this->randomName(16);
     // This is the language indicator on the translation search screen for
     // untranslated strings. Copied straight from locale.inc.
     $language_indicator = "<em class=\"locale-untranslated\">$langcode</em> ";
@@ -468,7 +479,6 @@ class LocaleTranslationFunctionalTest extends DrupalWebTestCase {
       'predefined_langcode' => 'custom',
       'langcode' => $langcode,
       'name' => $name,
-      'native' => $native,
       'direction' => '0',
     );
     $this->drupalPost('admin/config/regional/language/add', $edit, t('Add custom language'));
@@ -512,8 +522,6 @@ class LocaleTranslationFunctionalTest extends DrupalWebTestCase {
     $langcode = 'xx';
     // The English name for the language. This will be translated.
     $name = $this->randomName(16);
-    // The native name for the language.
-    $native = $this->randomName(16);
     // This is the language indicator on the translation search screen for
     // untranslated strings. Copied straight from locale.inc.
     $language_indicator = "<em class=\"locale-untranslated\">$langcode</em> ";
@@ -526,7 +534,6 @@ class LocaleTranslationFunctionalTest extends DrupalWebTestCase {
       'predefined_langcode' => 'custom',
       'langcode' => $langcode,
       'name' => $name,
-      'native' => $native,
       'direction' => '0',
     );
     $this->drupalPost('admin/config/regional/language/add', $edit, t('Add custom language'));
@@ -759,15 +766,12 @@ class LocaleImportFunctionalTest extends DrupalWebTestCase {
     $langcode = 'xx';
     // The English name for the language.
     $name = $this->randomName(16);
-    // The native name for the language.
-    $native = $this->randomName(16);
 
     // Create a custom language.
     $edit = array(
       'predefined_langcode' => 'custom',
       'langcode' => $langcode,
       'name' => $name,
-      'native' => $native,
       'direction' => '0',
     );
     $this->drupalPost('admin/config/regional/language/add', $edit, t('Add custom language'));
@@ -1150,7 +1154,6 @@ class LocaleUninstallFunctionalTest extends DrupalWebTestCase {
     $language = (object) array(
       'language' => 'fr',
       'name' => 'French',
-      'native' => 'Français',
       'default' => $this->language == 'fr',
     );
     locale_language_save($language);
@@ -1497,13 +1500,10 @@ class LocaleUserLanguageFunctionalTest extends DrupalWebTestCase {
     $langcode = 'xx';
     // The English name for the language.
     $name = $this->randomName(16);
-    // The native name for the language.
-    $native = $this->randomName(16);
     $edit = array(
       'predefined_langcode' => 'custom',
       'langcode' => $langcode,
       'name' => $name,
-      'native' => $native,
       'direction' => '0',
     );
     $this->drupalPost('admin/config/regional/language/add', $edit, t('Add custom language'));
@@ -1513,13 +1513,10 @@ class LocaleUserLanguageFunctionalTest extends DrupalWebTestCase {
     $langcode_disabled = 'xx-yy';
     // The English name for the language. This will be translated.
     $name_disabled = $this->randomName(16);
-    // The native name for the language.
-    $native_disabled = $this->randomName(16);
     $edit = array(
       'predefined_langcode' => 'custom',
       'langcode' => $langcode_disabled,
       'name' => $name_disabled,
-      'native' => $native_disabled,
       'direction' => '0',
     );
     $this->drupalPost('admin/config/regional/language/add', $edit, t('Add custom language'));
@@ -1688,15 +1685,12 @@ class LocalePathFunctionalTest extends DrupalWebTestCase {
     $langcode = 'xx';
     // The English name for the language.
     $name = $this->randomName(16);
-    // The native name for the language.
-    $native = $this->randomName(16);
     // The domain prefix.
     $prefix = $langcode;
     $edit = array(
       'predefined_langcode' => 'custom',
       'langcode' => $langcode,
       'name' => $name,
-      'native' => $native,
       'direction' => '0',
     );
     $this->drupalPost('admin/config/regional/language/add', $edit, t('Add custom language'));
@@ -1835,13 +1829,10 @@ class LocaleContentFunctionalTest extends DrupalWebTestCase {
     $langcode = 'xx';
     // The English name for the language.
     $name = $this->randomName(16);
-    // The native name for the language.
-    $native = $this->randomName(16);
     $edit = array(
       'predefined_langcode' => 'custom',
       'langcode' => $langcode,
       'name' => $name,
-      'native' => $native,
       'direction' => '0',
     );
     $this->drupalPost('admin/config/regional/language/add', $edit, t('Add custom language'));
@@ -1851,13 +1842,10 @@ class LocaleContentFunctionalTest extends DrupalWebTestCase {
     $langcode_disabled = 'xx-yy';
     // The English name for the language.
     $name_disabled = $this->randomName(16);
-    // The native name for the language.
-    $native_disabled = $this->randomName(16);
     $edit = array(
       'predefined_langcode' => 'custom',
       'langcode' => $langcode_disabled,
       'name' => $name_disabled,
-      'native' => $native_disabled,
       'direction' => '0',
     );
     $this->drupalPost('admin/config/regional/language/add', $edit, t('Add custom language'));
@@ -2165,7 +2153,7 @@ class LocaleUILanguageNegotiationTest extends DrupalWebTestCase {
     // language.
     $args = array(':url' => base_path() . (!empty($GLOBALS['conf']['clean_url']) ? $langcode_browser_fallback : "?q=$langcode_browser_fallback"));
     $fields = $this->xpath('//div[@id="block-locale-language"]//a[@class="language-link active" and @href=:url]', $args);
-    $this->assertTrue($fields[0] == $languages[$langcode_browser_fallback]->native, t('The browser language is the URL active language'));
+    $this->assertTrue($fields[0] == $languages[$langcode_browser_fallback]->name, t('The browser language is the URL active language'));
 
     // Check that URLs are rewritten using the given browser language.
     $fields = $this->xpath('//div[@id="site-name"]//a[@rel="home" and @href=:url]//span', $args);
@@ -2278,7 +2266,6 @@ class LocaleMultilingualFieldsFunctionalTest extends DrupalWebTestCase {
     $language = (object) array(
       'language' => 'it',
       'name' => 'Italian',
-      'native' => 'Italiano',
     );
     locale_language_save($language);
 
@@ -2509,7 +2496,7 @@ class LocaleDateFormatsFunctionalTest extends DrupalWebTestCase {
 
     // Configure date formats.
     $this->drupalGet('admin/config/regional/date-time/locale');
-    $this->assertText('Français', 'Configured languages appear.');
+    $this->assertText('French', 'Configured languages appear.');
     $edit = array(
       'date_format_long' => 'd.m.Y - H:i',
       'date_format_medium' => 'd.m.Y - H:i',
