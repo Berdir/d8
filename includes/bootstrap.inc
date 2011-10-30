@@ -2224,12 +2224,6 @@ function _drupal_bootstrap_configuration() {
   set_error_handler('_drupal_error_handler');
   set_exception_handler('_drupal_exception_handler');
 
-  drupal_environment_initialize();
-  // Start a page timer:
-  timer_start('page');
-  // Initialize the configuration, including variables from settings.php.
-  drupal_settings_initialize();
-
   // Hook up the Symfony ClassLoader for loading PSR-0-compatible classes.
   require_once(DRUPAL_ROOT . '/includes/Symfony/Component/ClassLoader/UniversalClassLoader.php');
 
@@ -2263,6 +2257,12 @@ function _drupal_bootstrap_configuration() {
 
   // Activate the autoloader.
   $loader->register();
+ 
+  drupal_environment_initialize();
+  // Start a page timer:
+  timer_start('page');
+  // Initialize the configuration, including variables from settings.php.
+  drupal_settings_initialize();
 }
 
 /**
