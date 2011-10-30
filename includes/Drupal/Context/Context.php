@@ -119,6 +119,7 @@ class Context implements ContextInterface {
               else {
                 $this->contextValues[$context_key] = $handler_value;
               }
+              break;
             }
           }
         }

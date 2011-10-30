@@ -141,6 +141,56 @@ class ContextTestCase extends ContextTestCases {
     // Classes should be cached
     $this->assertNotEqual($butler->getValue('foo:bar'), $butler->getValue('foo:bar:baz'), t('Handler classes are cached.'));
   }
+
+  /**
+   * Test that the priority order of keys at different levels is stable.
+   */
+  function testTraversingLogic() {
+    $butler = new \Drupal\Context\Context;
+    // This handler will be more specific than the child one, but should not be
+    // found because the less specialized child one will hide it.
+    $butler->setHandler('foo:bar', 'ContextMockHandler', array('values' => array('baz' => 1)));
+
+    $t1 = $butler->lock();
+    $this->assertEqual(1, $butler->getValue('foo:bar:baz'), t('Asking for specialized value in root context.'));
+
+    $b2 = $butler->addLayer();
+    // This handler is less specialized than the parent one, but working on the
+    // same context key path tree than its parent. It should hide the parent
+    // more specialized one.
+    $b2->setHandler('foo', 'ContextMockHandler', array('values' => array('bar:baz' => 2)));
+    $t2 = $b2->lock();
+
+    $this->assertEqual(2, $b2->getValue('foo:bar:baz'), t('Less specialized handler in the overriding context hides the root more specialized one.'));
+
+    $b3 = $b2->addLayer();
+    // Test the other way arround, local context handlers should always hide
+    // the parent one if on the same context key path.
+    $b3->setHandler('foo:bar', 'ContextMockHandler', array('values' => array('baz' => 3)));
+    $t3 = $b3->lock();
+
+    $this->assertEqual(3, $b3->getValue('foo:bar:baz'), t('More specialized handler in the overriding context hides the root less specialized one.'));
+
+    $b4 = $b2->addLayer();
+
+    // Set two handlers on the same context key tree, one less specialized
+    // and one more specialized, and ensures that everything is ok.
+    $b4->setHandler('foo', 'ContextMockHandler', array('values' => array('bar:baz' => 5)));
+    $b4->setHandler('foo:bar', 'ContextMockHandler', array('values' => array('baz' => 7)));
+    $t4 = $b4->lock();
+
+    $this->assertEqual(7, $b4->getValue('foo:bar:baz'), t('Generic handler is overridden by the more specialized one in the fourth layer.'));
+
+    $b5 = $b2->addLayer();
+
+    // Set one handler and one value on the same context key tree, handler will
+    // be more generic than the value.
+    $b5->setHandler('foo', 'ContextMockHandler', array('values' => array('bar:baz' => 11)));
+    $b5->setValue('foo:bar:baz', 13);
+    $t5 = $b5->lock();
+
+    $this->assertEqual(13, $b5->getValue('foo:bar:baz'), t('Value overrides the generic handler in fifth layer.'));
+  }
 }
 
 class ContextValueObjectTestCase extends ContextTestCases {
