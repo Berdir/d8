@@ -425,3 +425,74 @@ class ContextMockTestCase extends ContextTestCases {
     unset($t2, $tutler);
   }
 }
+
+/**
+ * Test class for the HTTP Handler.
+ */
+class ContextHTTPTestCase extends ContextTestCases {
+  public static function getInfo() {
+    return array(
+      'name' => 'Context HTTP Handler',
+      'description' => 'Test the HTTP Handler.',
+      'group' => 'Context',
+    );
+  }
+
+  /**
+   * Get method HTTP property.
+   */
+  function testGetHttpProperty() {
+    // If we're running in a Drush/CLI environment, the default HTTP-related
+    // superglobals won't be available so this test will always fail. We're
+    // keeping it around, though, to ensure that the superglobals do get used
+    // when they should.
+    if (!isset($_SERVER['SERVER_SOFTWARE']) && (php_sapi_name() == 'cli' || (is_numeric($_SERVER['argc']) && $_SERVER['argc'] > 0))) {
+      return;
+    }
+
+    $butler = new \Drupal\Context\Context();
+
+    $butler->setHandler('http', '\Drupal\Context\Handler\HandlerHttp');
+    $butler->lock();
+
+    $this->assertEqual($butler->getValue('http:method'), 'POST', t('Correct Http method property found.'));
+
+    // Test headers and server properties.
+    $this->assertEqual($butler->getValue('http:headers:host'), $_SERVER['HTTP_HOST'], t('Host header fetched successfully.'));
+    $this->assertEqual($butler->getValue('http:server:HTTP_USER_AGENT'), $_SERVER['HTTP_USER_AGENT'], t('User agent server variable fetched successfully'));
+  }
+
+  /**
+   * Mock HTTP property.
+   */
+  function testMockHttpProperty() {
+    $butler = new \Drupal\Context\Context();
+
+    $params = array('values' => array('method' => 'PUT'));
+
+    $butler->setHandler('http', '\Drupal\Context\Handler\HandlerHttp', $params);
+    $butler->lock();
+
+    $this->assertEqual($butler->getValue('http:method'), $params['values']['method'], t('Http method property mocked successfully.'));
+  }
+
+  /**
+   * Access array property.
+   */
+  function testArrayHttpProperty() {
+    $butler = new \Drupal\Context\Context();
+
+    // Mock arguments as nested array.
+    $params = array('values' => array('parameters' => array('foo' => array('bar' => 'baz'))));
+
+    $butler->setHandler('http', '\Drupal\Context\Handler\HandlerHttp', $params);
+    $butler->lock();
+
+    // Different nesting level values.
+    $this->assertEqual($butler->getValue('http:query'), $params['values']['parameters'], t('Query args fetched successfully.'));
+    $this->assertEqual($butler->getValue('http:query:foo'), $params['values']['parameters']['foo'], t('First level value from query_args fetched successfully.'));
+
+    // Non existing value.
+    $this->assertEqual($butler->getValue('http:query:baz'), '', t('Non existent value fetched as empty string'));
+  }
+}

@@ -1916,7 +1916,9 @@ function system_init() {
  *
  * This won't stay as the implementation, but it works for the time being.
  */
-function system_context_init(\Drupal\Context\ContextInterface $butler) {
+function system_context_init(\Drupal\Context\ContextInterface $context) {
+
+  $context->setHandler('http', '\Drupal\Context\Handler\HandlerHttp');
 
 }
 
