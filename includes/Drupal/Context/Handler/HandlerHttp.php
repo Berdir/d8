@@ -29,7 +29,10 @@ class HandlerHttp extends HandlerAbstract {
   );
 
   public function __construct($params = array()) {
-    // Init Symfony Request.
+    // If the values key is set in $params, we assume the caller wants to inject
+    // HTTP information into the request object rather than using the
+    // superglobals.  Otherwise we assume that this is a "normal" request and
+    // simply wrap the superglobals per usual.
     if (isset($params['values'])) {
       // Set default values.
       $params['values'] += array(
@@ -80,6 +83,11 @@ class HandlerHttp extends HandlerAbstract {
           $this->params[$property] = $this->request->query->all();
           break;
         case 'languages':
+          // Although HttpFoundation has a getLanguages() method already, it
+          // does some case folding that is incompatible with Drupal's language
+          // string formats.
+          // @todo Revisit this after https://github.com/symfony/symfony/issues/2468
+          // is resolved
           $this->params[$property] = $this->request->splitHttpAcceptHeader($this->request->headers->get('Accept-Language'));
           break;
         case 'files':
@@ -106,9 +114,14 @@ class HandlerHttp extends HandlerAbstract {
       }
     }
 
-    // We support only two levels of nesting.
-    // Return first level value if it is not array or only first level
-    // requested (second nesting level key does not exist)
+    // Many of the properties of the HTTP handler are actually arrays that
+    // we never want directly, but want a specific element out of. For instance,
+    // http:query is an array of GET parameters.  The following routine lets us
+    // retrieve third-level properties consistently, so $_GET['foo'] would map
+    // to http:query:foo.  The same code also supports cookies, headers, and so
+    // forth.
+    // Only one level of nesting is supported.  If a GET parameter is itself an
+    // array, it will be returned as an array.
     if (!is_array($this->params[$property]) || !isset($args[1])) {
       return $this->params[$property];
     }
