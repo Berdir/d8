@@ -90,7 +90,7 @@ class HandlerHttp extends HandlerAbstract {
           break;
         case 'headers':
           $this->params[$property] = $this->request->headers->all();
-          // Cleanup from not necessary nesting level.
+          // Cleanup from unnecessary nesting level.
           foreach ($this->params[$property] as &$item) {
             if (is_array($item)) {
               $item = current($item);
@@ -106,7 +106,7 @@ class HandlerHttp extends HandlerAbstract {
       }
     }
 
-    // We support only two levels of nexting.
+    // We support only two levels of nesting.
     // Return first level value if it is not array or only first level
     // requested (second nesting level key does not exist)
     if (!is_array($this->params[$property]) || !isset($args[1])) {
