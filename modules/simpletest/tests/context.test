@@ -442,6 +442,14 @@ class ContextHTTPTestCase extends ContextTestCases {
    * Get method HTTP property.
    */
   function testGetHttpProperty() {
+    // If we're running in a Drush/CLI environment, the default HTTP-related
+    // superglobals won't be available so this test will always fail. We're
+    // keeping it around, though, to ensure that the superglobals do get used
+    // when they should.
+    if (!isset($_SERVER['SERVER_SOFTWARE']) && (php_sapi_name() == 'cli' || (is_numeric($_SERVER['argc']) && $_SERVER['argc'] > 0))) {
+      return;
+    }
+
     $butler = new \Drupal\Context\Context();
 
     $butler->setHandler('http', '\Drupal\Context\Handler\HandlerHttp');
