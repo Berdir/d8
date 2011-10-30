@@ -481,10 +481,10 @@ class ContextHTTPTestCase extends ContextTestCases {
     $butler->lock();
 
     // Different nesting level values.
-    $this->assertEqual($butler->getValue('http:query_args'), $params['values']['parameters'], t('Query args fetched successfully.'));
-    $this->assertEqual($butler->getValue('http:query_args:foo'), $params['values']['parameters']['foo'], t('First level value from query_args fetched successfully.'));
+    $this->assertEqual($butler->getValue('http:query'), $params['values']['parameters'], t('Query args fetched successfully.'));
+    $this->assertEqual($butler->getValue('http:query:foo'), $params['values']['parameters']['foo'], t('First level value from query_args fetched successfully.'));
 
     // Non existing value.
-    $this->assertEqual($butler->getValue('http:query_args:baz'), '', t('Non existent value fetched as empty string'));
+    $this->assertEqual($butler->getValue('http:query:baz'), '', t('Non existent value fetched as empty string'));
   }
 }

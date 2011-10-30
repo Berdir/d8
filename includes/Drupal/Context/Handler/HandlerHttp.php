@@ -24,7 +24,7 @@ class HandlerHttp extends HandlerAbstract {
    * @var array
    */
   static protected $httpProperties = array(
-    'method', 'url', 'accept_types', 'domain', 'request_args', 'query_args',
+    'method', 'url', 'accept_types', 'domain', 'request_args', 'query',
     'languages', 'files', 'cookies', 'headers', 'server', 'request_body'
   );
 
@@ -79,7 +79,7 @@ class HandlerHttp extends HandlerAbstract {
         case 'request_args':
           $this->params[$property] = $this->request->request->all();
           break;
-        case 'query_args':
+        case 'query':
           $this->params[$property] = $this->request->query->all();
           break;
         case 'languages':
