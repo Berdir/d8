@@ -2514,9 +2514,11 @@ function drupal_maintenance_theme() {
  */
 function drupal_fast_404() {
   $exclude_paths = variable_get('404_fast_paths_exclude', FALSE);
-  if ($exclude_paths && !preg_match($exclude_paths, $_GET['q'])) {
+  $context = drupal_get_context();
+  $q = $context->getValue('path:system');
+  if ($exclude_paths && !preg_match($exclude_paths, $q)) {
     $fast_paths = variable_get('404_fast_paths', FALSE);
-    if ($fast_paths && preg_match($fast_paths, $_GET['q'])) {
+    if ($fast_paths && preg_match($fast_paths, $q)) {
       drupal_add_http_header('Status', '404 Not Found');
       $fast_404_html = variable_get('404_fast_html', '<html xmlns="http://www.w3.org/1999/xhtml"><head><title>404 Not Found</title></head><body><h1>Not Found</h1><p>The requested URL "@path" was not found on this server.</p></body></html>');
       // Replace @path in the variable with the page path.
