@@ -10,18 +10,6 @@
  */
 
 /**
- * Initialize the $_GET['q'] variable to the proper normal path.
- */
-function drupal_path_initialize() {
-  if (!empty($_GET['q'])) {
-    $_GET['q'] = drupal_get_normal_path($_GET['q']);
-  }
-  else {
-    $_GET['q'] = drupal_get_normal_path(variable_get('site_frontpage', 'node'));
-  }
-}
-
-/**
  * Given an alias, return its Drupal system URL if one exists. Given a Drupal
  * system URL return one of its aliases if such a one exists. Otherwise,
  * return FALSE.

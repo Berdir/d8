@@ -4938,9 +4938,6 @@ function _drupal_bootstrap_full() {
     ini_set('error_log', 'public://error.log');
   }
 
-  // Initialize $_GET['q'] prior to invoking hook_init().
-  drupal_path_initialize();
-
   // Let all modules take action before the menu system handles the request.
   // We do not want this while running update.php.
   if (!defined('MAINTENANCE_MODE') || MAINTENANCE_MODE != 'update') {
