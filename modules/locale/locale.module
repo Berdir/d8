@@ -230,7 +230,8 @@ function locale_init() {
   // in $conf. This should happen on all pages except the date and time formats
   // settings page, where we want to display the site default and not the
   // localized version.
-  if (strpos($_GET['q'], 'admin/config/regional/date-time/formats') !== 0) {
+  $context = drupal_get_context();
+  if (strpos($context->getValue('path:system'), 'admin/config/regional/date-time/formats') !== 0) {
     $languages = array($language->language);
 
     // Setup appropriate date formats for this locale.
@@ -999,7 +1000,8 @@ function locale_block_info() {
  */
 function locale_block_view($type) {
   if (drupal_multilingual()) {
-    $path = drupal_is_front_page() ? '<front>' : $_GET['q'];
+    $context = drupal_get_context();
+    $path = drupal_is_front_page() ? '<front>' : $context->getValue('path:system');
     $links = language_negotiation_get_switch_links($type, $path);
 
     if (isset($links->links)) {

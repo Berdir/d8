@@ -411,7 +411,8 @@ function taxonomy_overview_terms($form, &$form_state, $vocabulary) {
       '#type' => 'submit',
       '#value' => t('Reset to alphabetical')
     );
-    $form_state['redirect'] = array($_GET['q'], (isset($_GET['page']) ? array('query' => array('page' => $_GET['page'])) : array()));
+    $context = drupal_get_context();
+    $form_state['redirect'] = array($context->getValue('path:system'), (isset($_GET['page']) ? array('query' => array('page' => $_GET['page'])) : array()));
   }
 
   return $form;
@@ -771,7 +772,8 @@ function taxonomy_form_term($form, &$form_state, $edit = array(), $vocabulary = 
     );
   }
   else {
-    $form_state['redirect'] = $_GET['q'];
+    $context = drupal_get_context();
+    $form_state['redirect'] = $context->getValue('path:system');
   }
 
   return $form;

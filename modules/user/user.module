@@ -1252,7 +1252,8 @@ function user_user_categories() {
 }
 
 function user_login_block($form) {
-  $form['#action'] = url($_GET['q'], array('query' => drupal_get_destination()));
+  $context = drupal_get_context();
+  $form['#action'] = url($context->getValue('path:system'), array('query' => drupal_get_destination()));
   $form['#id'] = 'user-login-form';
   $form['#validate'] = user_login_default_validators();
   $form['#submit'][] = 'user_login_submit';
@@ -3696,7 +3697,8 @@ function user_register_form($form, &$form_state) {
   if ($admin) {
     // Redirect back to page which initiated the create request;
     // usually admin/people/create.
-    $form_state['redirect'] = $_GET['q'];
+    $context = drupal_get_context();
+    $form_state['redirect'] = $context->getValue('path:system');
   }
 
   $form['actions'] = array('#type' => 'actions');

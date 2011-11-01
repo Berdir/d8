@@ -76,10 +76,11 @@ function statistics_exit() {
   if (variable_get('statistics_enable_access_log', 0)) {
     drupal_bootstrap(DRUPAL_BOOTSTRAP_SESSION);
     // Log this page access.
+    $context = drupal_get_context();
     db_insert('accesslog')
       ->fields(array(
         'title' => strip_tags(drupal_get_title()),
-        'path' => $_GET['q'],
+        'path' => $context->getValue('path:system'),
         'url' => isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '',
         'hostname' => ip_address(),
         'uid' => $user->uid,

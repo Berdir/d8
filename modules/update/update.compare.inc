@@ -739,7 +739,8 @@ function update_project_cache($cid) {
 
   // On certain paths, we should clear the cache and recompute the projects for
   // update status of the site to avoid presenting stale information.
-  $q = $_GET['q'];
+  $context = drupal_get_context();
+  $q = $context->getValue('path:system');
   $paths = array(
     'admin/modules',
     'admin/modules/update',

@@ -513,7 +513,8 @@ function drupal_get_destination() {
     $destination = array('destination' => $_GET['destination']);
   }
   else {
-    $path = $_GET['q'];
+    $context = drupal_get_context();
+    $path = $context->getValue('path:system');
     $query = drupal_http_build_query(drupal_get_query_parameters());
     if ($query != '') {
       $path .= '?' . $query;
@@ -2316,7 +2317,8 @@ function l($text, $path, array $options = array()) {
   );
 
   // Append active class.
-  if (($path == $_GET['q'] || ($path == '<front>' && drupal_is_front_page())) &&
+  $context = drupal_get_context();
+  if (($path == $context->getValue('path:system') || ($path == '<front>' && drupal_is_front_page())) &&
       (empty($options['language']) || $options['language']->language == $language_url->language)) {
     $options['attributes']['class'][] = 'active';
   }
@@ -2442,7 +2444,8 @@ function drupal_deliver_page($page_callback_result, $default_delivery_callback =
     // If a delivery callback is specified, but doesn't exist as a function,
     // something is wrong, but don't print anything, since it's not known
     // what format the response needs to be in.
-    watchdog('delivery callback not found', 'callback %callback not found: %q.', array('%callback' => $delivery_callback, '%q' => $_GET['q']), WATCHDOG_ERROR);
+    $context = drupal_get_context();
+    watchdog('delivery callback not found', 'callback %callback not found: %q.', array('%callback' => $delivery_callback, '%q' => $context->getValue('path:system')), WATCHDOG_ERROR);
   }
 }
 
@@ -2469,24 +2472,26 @@ function drupal_deliver_html_page($page_callback_result) {
 
   // Menu status constants are integers; page content is a string or array.
   if (is_int($page_callback_result)) {
+    $context = drupal_get_context();
+    $q = $context->getValue('path:system');
     // @todo: Break these up into separate functions?
     switch ($page_callback_result) {
       case MENU_NOT_FOUND:
         // Print a 404 page.
         drupal_add_http_header('Status', '404 Not Found');
 
-        watchdog('page not found', check_plain($_GET['q']), NULL, WATCHDOG_WARNING);
+        watchdog('page not found', check_plain($q), NULL, WATCHDOG_WARNING);
 
         // Check for and return a fast 404 page if configured.
         drupal_fast_404();
 
         // Keep old path for reference, and to allow forms to redirect to it.
         if (!isset($_GET['destination'])) {
-          $_GET['destination'] = $_GET['q'];
+          $_GET['destination'] = $q;
         }
 
         $path = drupal_get_normal_path(variable_get('site_404', ''));
-        if ($path && $path != $_GET['q']) {
+        if ($path && $path != $q) {
           // Custom 404 handler. Set the active item in case there are tabs to
           // display, or other dependencies on the path.
           menu_set_active_item($path);
@@ -2507,15 +2512,15 @@ function drupal_deliver_html_page($page_callback_result) {
       case MENU_ACCESS_DENIED:
         // Print a 403 page.
         drupal_add_http_header('Status', '403 Forbidden');
-        watchdog('access denied', check_plain($_GET['q']), NULL, WATCHDOG_WARNING);
+        watchdog('access denied', check_plain($q), NULL, WATCHDOG_WARNING);
 
         // Keep old path for reference, and to allow forms to redirect to it.
         if (!isset($_GET['destination'])) {
-          $_GET['destination'] = $_GET['q'];
+          $_GET['destination'] = $q;
         }
 
         $path = drupal_get_normal_path(variable_get('site_403', ''));
-        if ($path && $path != $_GET['q']) {
+        if ($path && $path != $q) {
           // Custom 403 handler. Set the active item in case there are tabs to
           // display or other dependencies on the path.
           menu_set_active_item($path);
@@ -4969,10 +4974,11 @@ function drupal_page_set_cache() {
   global $base_root;
 
   if (drupal_page_is_cacheable()) {
+    $context = drupal_get_context();
     $cache = (object) array(
       'cid' => $base_root . request_uri(),
       'data' => array(
-        'path' => $_GET['q'],
+        'path' => $context->getValue('path:system'),
         'body' => ob_get_clean(),
         'title' => drupal_get_title(),
         'headers' => array(),

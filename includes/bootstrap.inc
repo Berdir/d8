@@ -2812,7 +2812,8 @@ function arg($index = NULL, $path = NULL) {
   $arguments = &$drupal_static_fast['arguments'];
 
   if (!isset($path)) {
-    $path = $_GET['q'];
+    $context = drupal_get_context();
+    $path = $context->getValue('path:system');
   }
   if (!isset($arguments[$path])) {
     $arguments[$path] = explode('/', $path);

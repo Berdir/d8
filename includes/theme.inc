@@ -1588,7 +1588,8 @@ function theme_links($variables) {
       if ($i == $num_links) {
         $class[] = 'last';
       }
-      if (isset($link['href']) && ($link['href'] == $_GET['q'] || ($link['href'] == '<front>' && drupal_is_front_page()))
+      $context = drupal_get_context();
+      if (isset($link['href']) && ($link['href'] == $context->getValue('path:system') || ($link['href'] == '<front>' && drupal_is_front_page()))
           && (empty($link['language']) || $link['language']->language == $language_url->language)) {
         $class[] = 'active';
       }

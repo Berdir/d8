@@ -1236,7 +1236,8 @@ function drupal_redirect_form($form_state) {
         $function($form_state['redirect']);
       }
     }
-    drupal_goto($_GET['q']);
+    $context = drupal_get_context();
+    drupal_goto($context->getValue('path:system'));
   }
 }
 
@@ -4312,12 +4313,13 @@ function batch_process($redirect = NULL, $url = 'batch', $redirect_callback = 'd
 
   if (isset($batch)) {
     // Add process information
+    $context = drupal_get_context();
     $process_info = array(
       'current_set' => 0,
       'progressive' => TRUE,
       'url' => $url,
       'url_options' => array(),
-      'source_url' => $_GET['q'],
+      'source_url' => $context->getValue('path:system'),
       'redirect' => $redirect,
       'theme' => $GLOBALS['theme_key'],
       'redirect_callback' => $redirect_callback,

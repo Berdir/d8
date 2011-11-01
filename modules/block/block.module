@@ -802,11 +802,13 @@ function block_block_list_alter(&$blocks) {
       $pages = drupal_strtolower($block->pages);
       if ($block->visibility < BLOCK_VISIBILITY_PHP) {
         // Convert the Drupal path to lowercase
-        $path = drupal_strtolower(drupal_get_path_alias($_GET['q']));
+        $context = drupal_get_context();
+        $q = $context->getValue('path:system');
+        $path = drupal_strtolower(drupal_get_path_alias($q));
         // Compare the lowercase internal and lowercase path alias (if any).
         $page_match = drupal_match_path($path, $pages);
-        if ($path != $_GET['q']) {
-          $page_match = $page_match || drupal_match_path($_GET['q'], $pages);
+        if ($path != $q) {
+          $page_match = $page_match || drupal_match_path($q, $pages);
         }
         // When $block->visibility has a value of 0 (BLOCK_VISIBILITY_NOTLISTED),
         // the block is displayed on all pages except those listed in $block->pages.

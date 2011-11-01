@@ -630,7 +630,8 @@ function theme_pager_link($variables) {
     }
   }
 
-  return l($text, $_GET['q'], array('attributes' => $attributes, 'query' => $query));
+  $context = drupal_get_context();
+  return l($text, $context->getValue('path:system'), array('attributes' => $attributes, 'query' => $query));
 }
 
 /**

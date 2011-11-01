@@ -270,9 +270,9 @@ function locale_language_from_url($languages) {
 
   switch (variable_get('locale_language_negotiation_url_part', LOCALE_LANGUAGE_NEGOTIATION_URL_PREFIX)) {
     case LOCALE_LANGUAGE_NEGOTIATION_URL_PREFIX:
-      // $_GET['q'] might not be available at this time, because
-      // path initialization runs after the language bootstrap phase.
-      list($language, $_GET['q']) = language_url_split_prefix(isset($_GET['q']) ? $_GET['q'] : NULL, $languages);
+      $context = drupal_get_context();
+      $q = $context->getValue('path:system');
+      list($language, $q) = language_url_split_prefix($q, $languages);
       if ($language !== FALSE) {
         $language_url = $language->language;
       }

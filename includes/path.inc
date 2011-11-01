@@ -235,7 +235,8 @@ function drupal_cache_system_paths() {
 function drupal_get_path_alias($path = NULL, $path_language = NULL) {
   // If no path is specified, use the current page's path.
   if ($path == NULL) {
-    $path = $_GET['q'];
+    $context = drupal_get_context();
+    $path = $context->getValue('path:system');
   }
   $result = $path;
   if ($alias = drupal_lookup_path('alias', $path, $path_language)) {
@@ -290,9 +291,10 @@ function drupal_is_front_page() {
   $is_front_page = &$drupal_static_fast['is_front_page'];
 
   if (!isset($is_front_page)) {
-    // As drupal_path_initialize updates $_GET['q'] with the 'site_frontpage' path,
+    // As system path handler updates 'path:system' with the 'site_frontpage' path,
     // we can check it against the 'site_frontpage' variable.
-    $is_front_page = ($_GET['q'] == variable_get('site_frontpage', 'node'));
+    $context = drupal_get_context();
+    $is_front_page = ($context->getValue('path:system') == variable_get('site_frontpage', 'node'));
   }
 
   return $is_front_page;
@@ -352,7 +354,8 @@ function drupal_match_path($path, $patterns) {
  * @see request_path()
  */
 function current_path() {
-  return $_GET['q'];
+  $context = drupal_get_context();
+  return $context->getValue('path:system');
 }
 
 /**

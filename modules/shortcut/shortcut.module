@@ -648,7 +648,8 @@ function shortcut_preprocess_page(&$variables) {
   // we do not want to display it on "access denied" or "page not found"
   // pages).
   if (shortcut_set_edit_access() && ($item = menu_get_item()) && $item['access']) {
-    $link = $_GET['q'];
+    $context = drupal_get_context();
+    $link = $context->getValue('path:system');
     $query_parameters = drupal_get_query_parameters();
     if (!empty($query_parameters)) {
      $link .= '?' . drupal_http_build_query($query_parameters);

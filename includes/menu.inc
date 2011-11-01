@@ -425,7 +425,8 @@ function menu_set_item($path, $router_item) {
 function menu_get_item($path = NULL, $router_item = NULL) {
   $router_items = &drupal_static(__FUNCTION__);
   if (!isset($path)) {
-    $path = $_GET['q'];
+    $context = drupal_get_context();
+    $path = $context->getValue('path:system');
   }
   if (isset($router_item)) {
     $router_items[$path] = $router_item;
@@ -490,7 +491,8 @@ function menu_execute_active_handler($path = NULL, $deliver = TRUE) {
   // Allow other modules to change the site status but not the path because that
   // would not change the global variable. hook_url_inbound_alter() can be used
   // to change the path. Code later will not use the $read_only_path variable.
-  $read_only_path = !empty($path) ? $path : $_GET['q'];
+  $context = drupal_get_context();
+  $read_only_path = !empty($path) ? $path : $context->getValue('path:system');
   drupal_alter('menu_site_status', $page_callback_result, $read_only_path);
 
   // Only continue if the site status is not set.
@@ -1035,11 +1037,12 @@ function menu_tree_output($tree) {
       $class[] = 'active-trail';
       $data['link']['localized_options']['attributes']['class'][] = 'active-trail';
     }
-    // Normally, l() compares the href of every link with $_GET['q'] and sets
-    // the active class accordingly. But local tasks do not appear in menu
+    // Normally, l() compares the href of every link with the system path and
+    // sets the active class accordingly. But local tasks do not appear in menu
     // trees, so if the current path is a local task, and this link is its
     // tab root, then we have to set the class manually.
-    if ($data['link']['href'] == $router_item['tab_root_href'] && $data['link']['href'] != $_GET['q']) {
+    $context = drupal_get_context();
+    if ($data['link']['href'] == $router_item['tab_root_href'] && $data['link']['href'] != $context->getValue('path:system')) {
       $data['link']['localized_options']['attributes']['class'][] = 'active';
     }
 
@@ -1824,11 +1827,12 @@ function menu_navigation_links($menu_name, $level = 0) {
         $class = ' active-trail';
         $l['attributes']['class'][] = 'active-trail';
       }
-      // Normally, l() compares the href of every link with $_GET['q'] and sets
-      // the active class accordingly. But local tasks do not appear in menu
+      // Normally, l() compares the href of every link with the system path and
+      // sets the active class accordingly. But local tasks do not appear in menu
       // trees, so if the current path is a local task, and this link is its
       // tab root, then we have to set the class manually.
-      if ($item['link']['href'] == $router_item['tab_root_href'] && $item['link']['href'] != $_GET['q']) {
+      $context = drupal_get_context();
+      if ($item['link']['href'] == $router_item['tab_root_href'] && $item['link']['href'] != $context->getValue('path:system')) {
         $l['attributes']['class'][] = 'active';
       }
       // Keyed with the unique mlid to generate classes in theme_links().
@@ -1942,8 +1946,9 @@ function menu_local_tasks($level = 0) {
             // local tasks link to their parent, but the path of default local
             // tasks can still be accessed directly, in which case this link
             // would not be marked as active, since l() only compares the href
-            // with $_GET['q'].
-            if ($link['href'] != $_GET['q']) {
+            // with the system path.
+            $context = drupal_get_context();
+            if ($link['href'] != $context->getValue('path:system')) {
               $link['localized_options']['attributes']['class'][] = 'active';
             }
             $tabs_current[] = array(
@@ -2018,8 +2023,9 @@ function menu_local_tasks($level = 0) {
             // Mark the link as active, if the current path is a (second-level)
             // local task of a default local task. Since this default local task
             // links to its parent, l() will not mark it as active, as it only
-            // compares the link's href to $_GET['q'].
-            if ($link['href'] != $_GET['q']) {
+            // compares the link's href to the system path.
+            $context = drupal_get_context();
+            if ($link['href'] != $context->getValue('path:system')) {
               $link['localized_options']['attributes']['class'][] = 'active';
             }
             $tabs_current[] = array(
@@ -2385,7 +2391,8 @@ function menu_link_get_preferred($path = NULL) {
   $preferred_links = &drupal_static(__FUNCTION__);
 
   if (!isset($path)) {
-    $path = $_GET['q'];
+    $context = drupal_get_context();
+    $path = $context->getValue('path:system');
   }
 
   if (!isset($preferred_links[$path])) {
@@ -3777,7 +3784,8 @@ function _menu_site_is_offline($check_only = FALSE) {
       // Ensure that the maintenance mode message is displayed only once
       // (allowing for page redirects) and specifically suppress its display on
       // the maintenance mode settings page.
-      if (!$check_only && $_GET['q'] != 'admin/config/development/maintenance') {
+      $context = drupal_get_context();
+      if (!$check_only && $context->getValue('path:system') != 'admin/config/development/maintenance') {
         if (user_access('administer site configuration')) {
           drupal_set_message(t('Operating in maintenance mode. <a href="@url">Go online.</a>', array('@url' => url('admin/config/development/maintenance'))), 'status', FALSE);
         }
