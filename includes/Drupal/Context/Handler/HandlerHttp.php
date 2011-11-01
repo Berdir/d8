@@ -24,8 +24,9 @@ class HandlerHttp extends HandlerAbstract {
    * @var array
    */
   static protected $httpProperties = array(
-    'method', 'url', 'accept_types', 'domain', 'request_args', 'query',
-    'languages', 'files', 'cookies', 'headers', 'server', 'request_body'
+    'method', 'uri', 'accept_types', 'domain', 'request_args', 'query',
+    'languages', 'files', 'cookies', 'headers', 'server', 'request_body',
+    'base_url', 'base_path', 'request_uri', 'script_name', 'php_self'
   );
 
   public function __construct($params = array()) {
@@ -67,8 +68,23 @@ class HandlerHttp extends HandlerAbstract {
         case 'method':
           $this->params[$property] = $this->request->getMethod();
           break;
-        case 'url':
+        case 'uri':
           $this->params[$property] = $this->request->getUri();
+          break;
+        case 'base_url':
+          $this->params[$property] = $this->request->getScheme() . '://' . $this->request->getHost() . $this->request->getBaseUrl();
+          break;
+        case 'base_path':
+          $this->params[$property] = $this->request->getBasePath() . '/';
+          break;
+        case 'request_uri':
+          $this->params[$property] = $this->request->getRequestUri();
+          break;
+        case 'script_name':
+          $this->params[$property] = $this->request->getScriptName();
+          break;
+        case 'php_self':
+          $this->params[$property] = $this->request->server->get('PHP_SELF');
           break;
         case 'accept_types':
           $this->params[$property] = $this->request->getAcceptableContentTypes();

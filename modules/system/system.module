@@ -1919,6 +1919,8 @@ function system_init() {
 function system_context_init(\Drupal\Context\ContextInterface $context) {
 
   $context->setHandler('http', '\Drupal\Context\Handler\HandlerHttp');
+  $context->setHandler('path:raw', '\Drupal\Context\Handler\HandlerPathRaw');
+  $context->setHandler('path:system', '\Drupal\Context\Handler\HandlerPathSystem');
 
 }
 
