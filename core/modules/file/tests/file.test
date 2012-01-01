@@ -41,7 +41,7 @@ class FileFieldTestCase extends WebTestBase {
     // Add a filesize property to files as would be read by file_load().
     $file->filesize = filesize($file->uri);
 
-    return $file;
+    return entity_create('file', (array)$file);
   }
 
   /**
@@ -809,7 +809,7 @@ class FileFieldDisplayTestCase extends FileFieldTestCase {
 
     // Check that the default formatter is displaying with the file name.
     $node = node_load($nid, NULL, TRUE);
-    $node_file = (object) $node->{$field_name}[LANGUAGE_NOT_SPECIFIED][0];
+    $node_file = file_load($node->{$field_name}[LANGUAGE_NOT_SPECIFIED][0]['fid']);
     $default_output = theme('file_link', array('file' => $node_file));
     $this->assertRaw($default_output, t('Default formatter displaying correctly on full node view.'));
 

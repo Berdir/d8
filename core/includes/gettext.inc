@@ -7,6 +7,8 @@
  * @todo Decouple these functions from Locale API and put to gettext_ namespace.
  */
 
+use Drupal\Core\File\File;
+
 /**
  * @defgroup locale-api-import-export Translation import/export API.
  * @{
@@ -19,8 +21,8 @@
 /**
  * Parses Gettext Portable Object information and inserts it into the database.
  *
- * @param $file
- *   Drupal file object corresponding to the PO file to import.
+ * @param Drupal\Core\File\File $file
+ *   A file entity corresponding to the PO file to import.
  * @param $langcode
  *   Language code.
  * @param $overwrite_options
@@ -32,7 +34,7 @@
  *   Use LOCALE_CUSTOMIZED or LOCALE_NOT_CUSTOMIZED. All strings in the file
  *   will be saved with this customization flag.
  */
-function _locale_import_po($file, $langcode, $overwrite_options, $customized = LOCALE_NOT_CUSTOMIZED) {
+function _locale_import_po(File $file, $langcode, $overwrite_options, $customized = LOCALE_NOT_CUSTOMIZED) {
   // Try to allocate enough time to parse and import the data.
   drupal_set_time_limit(240);
 
@@ -83,8 +85,8 @@ function _locale_import_po($file, $langcode, $overwrite_options, $customized = L
  *
  * @param $op
  *   Storage operation type: db-store or mem-store.
- * @param $file
- *   Drupal file object corresponding to the PO file to import.
+ * @param Drupal\Core\File\File $file
+ *   A file entity corresponding to the PO file to import.
  * @param $overwrite_options
  *   An associative array indicating what data should be overwritten, if any.
  *   - not_customized: not customized strings should be overwritten.
@@ -95,7 +97,7 @@ function _locale_import_po($file, $langcode, $overwrite_options, $customized = L
  *   Whether the strings being imported should be saved as customized.
  *   Use LOCALE_CUSTOMIZED or LOCALE_NOT_CUSTOMIZED.
  */
-function _locale_import_read_po($op, $file, $overwrite_options = NULL, $lang = NULL, $customized = LOCALE_NOT_CUSTOMIZED) {
+function _locale_import_read_po($op, File $file, $overwrite_options = NULL, $lang = NULL, $customized = LOCALE_NOT_CUSTOMIZED) {
 
   // The file will get closed by PHP on returning from this function.
   $fd = fopen($file->uri, 'rb');
@@ -348,12 +350,12 @@ function _locale_import_read_po($op, $file, $overwrite_options = NULL, $lang = N
  *
  * @param $message
  *   The message to be translated.
- * @param $file
- *   Drupal file object corresponding to the PO file to import.
+ * @param Drupal\Core\File\File $file
+ *   A file entity corresponding to the PO file to import.
  * @param $lineno
  *   An optional line number argument.
  */
-function _locale_import_message($message, $file, $lineno = NULL) {
+function _locale_import_message($message, File $file, $lineno = NULL) {
   $vars = array('%filename' => $file->filename);
   if (isset($lineno)) {
     $vars['%line'] = $lineno;
@@ -375,14 +377,14 @@ function _locale_import_message($message, $file, $lineno = NULL) {
  *   - customized: customized strings should be overwritten.
  * @param $lang
  *   Language to store the string in.
- * @param $file
- *   Object representation of file being imported, only required when op is
- *   'db-store'.
+ * @param Drupal\Core\File\File $file
+ *   A file entity representing the file being imported, only required when op
+ *   is 'db-store'.
  * @param $customized
  *   Whether the strings being imported should be saved as customized.
  *   Use LOCALE_CUSTOMIZED or LOCALE_NOT_CUSTOMIZED.
  */
-function _locale_import_one_string($op, $value = NULL, $overwrite_options = NULL, $lang = NULL, $file = NULL, $customized = LOCALE_NOT_CUSTOMIZED) {
+function _locale_import_one_string($op, $value = NULL, $overwrite_options = NULL, $lang = NULL, File $file = NULL, $customized = LOCALE_NOT_CUSTOMIZED) {
   $report = &drupal_static(__FUNCTION__, array('additions' => 0, 'updates' => 0, 'deletes' => 0, 'skips' => 0));
   $header_done = &drupal_static(__FUNCTION__ . ':header_done', FALSE);
   $strings = &drupal_static(__FUNCTION__ . ':strings', array());

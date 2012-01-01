@@ -7,6 +7,7 @@
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Drupal\Core\File\File;
 
 /**
  * Image style constant for user presets in the database.
@@ -311,7 +312,7 @@ function image_file_download($uri) {
 /**
  * Implements hook_file_move().
  */
-function image_file_move($file, $source) {
+function image_file_move(File $file, File $source) {
   // Delete any image derivatives at the original image path.
   image_path_flush($source->uri);
 }
@@ -319,7 +320,7 @@ function image_file_move($file, $source) {
 /**
  * Implements hook_file_predelete().
  */
-function image_file_predelete($file) {
+function image_file_predelete(File $file) {
   // Delete any image derivatives of this image.
   image_path_flush($file->uri);
 }

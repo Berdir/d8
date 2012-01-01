@@ -926,7 +926,7 @@ function file_field_formatter_view($entity_type, $entity, $field, $instance, $la
       foreach ($items as $delta => $item) {
         $element[$delta] = array(
           '#theme' => 'file_link',
-          '#file' => (object) $item,
+          '#file' => file_load($item['fid']),
         );
       }
       break;
@@ -965,7 +965,7 @@ function theme_file_formatter_table($variables) {
   $rows = array();
   foreach ($variables['items'] as $delta => $item) {
     $rows[] = array(
-      theme('file_link', array('file' => (object) $item)),
+      theme('file_link', array('file' => file_load($item['fid']))),
       format_size($item['filesize']),
     );
   }

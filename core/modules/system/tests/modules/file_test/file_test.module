@@ -10,6 +10,7 @@
 
 use Drupal\Core\StreamWrapper\LocalStream;
 use Drupal\Core\StreamWrapper\PublicStream;
+use Drupal\Core\File\File;
 
 const FILE_URL_TEST_CDN_1 = 'http://cdn1.example.com';
 const FILE_URL_TEST_CDN_2 = 'http://cdn2.example.com';
@@ -263,7 +264,7 @@ function file_test_file_load($files) {
 /**
  * Implements hook_file_validate().
  */
-function file_test_file_validate($file) {
+function file_test_file_validate(File $file) {
   _file_test_log_call('validate', array($file));
   return _file_test_get_return('validate');
 }
@@ -279,35 +280,35 @@ function file_test_file_download($uri) {
 /**
  * Implements hook_file_insert().
  */
-function file_test_file_insert($file) {
+function file_test_file_insert(File $file) {
   _file_test_log_call('insert', array($file));
 }
 
 /**
  * Implements hook_file_update().
  */
-function file_test_file_update($file) {
+function file_test_file_update(File $file) {
   _file_test_log_call('update', array($file));
 }
 
 /**
  * Implements hook_file_copy().
  */
-function file_test_file_copy($file, $source) {
+function file_test_file_copy(File $file, $source) {
   _file_test_log_call('copy', array($file, $source));
 }
 
 /**
  * Implements hook_file_move().
  */
-function file_test_file_move($file, $source) {
+function file_test_file_move(File $file, File $source) {
   _file_test_log_call('move', array($file, $source));
 }
 
 /**
  * Implements hook_file_predelete().
  */
-function file_test_file_predelete($file) {
+function file_test_file_predelete(File $file) {
   _file_test_log_call('delete', array($file));
 }
 
