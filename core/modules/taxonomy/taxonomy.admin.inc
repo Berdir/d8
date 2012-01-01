@@ -105,12 +105,14 @@ function theme_taxonomy_overview_vocabularies($variables) {
  * @see taxonomy_form_vocabulary_submit()
  * @see taxonomy_form_vocabulary_validate()
  */
-function taxonomy_form_vocabulary($form, &$form_state, $edit = array()) {
+function taxonomy_form_vocabulary($form, &$form_state, $vocabulary = array()) {
   // During initial form build, add the entity to the form state for use
   // during form building and processing. During a rebuild, use what is in the
   // form state.
   if (!isset($form_state['vocabulary'])) {
-    $vocabulary = is_object($edit) ? $edit : (object) $edit;
+    if (!is_object($vocabulary) || !($vocabulary instanceof TaxonomyVocabulary)) {
+      $vocabulary = entity_create('taxonomy_vocabulary', (array)$vocabulary);
+    }
     $defaults = array(
       'name' => '',
       'machine_name' => '',
@@ -222,7 +224,7 @@ function taxonomy_form_vocabulary_submit($form, &$form_state) {
     case SAVED_NEW:
       drupal_set_message(t('Created new vocabulary %name.', array('%name' => $vocabulary->name)));
       watchdog('taxonomy', 'Created new vocabulary %name.', array('%name' => $vocabulary->name), WATCHDOG_NOTICE, l(t('edit'), 'admin/structure/taxonomy/' . $vocabulary->machine_name . '/edit'));
-      $form_state['redirect'] = 'admin/structure/taxonomy/' . $vocabulary->machine_name;
+  $form_state['redirect'] = 'admin/structure/taxonomy/' . $vocabulary->machine_name;
       break;
 
     case SAVED_UPDATED:
@@ -635,12 +637,14 @@ function theme_taxonomy_overview_terms($variables) {
  * @ingroup forms
  * @see taxonomy_form_term_submit()
  */
-function taxonomy_form_term($form, &$form_state, $edit = array(), $vocabulary = NULL) {
+function taxonomy_form_term($form, &$form_state, $term = array(), $vocabulary = NULL) {
   // During initial form build, add the term entity to the form state for use
   // during form building and processing. During a rebuild, use what is in the
   // form state.
   if (!isset($form_state['term'])) {
-    $term = is_object($edit) ? $edit : (object) $edit;
+    if (!is_object($term) || !($term instanceof TaxonomyTerm)) {
+      $term = entity_create('taxonomy_term', (array)$term);
+    }
     if (!isset($vocabulary) && isset($term->vid)) {
       $vocabulary = taxonomy_vocabulary_load($term->vid);
     }

@@ -66,7 +66,7 @@ $required  = array(0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1);
 $voc_id = 0;
 $term_id = 0;
 for ($i = 0; $i < 24; $i++) {
-  $vocabulary = new stdClass;
+  $vocabulary = new TaxonomyVocabulary();
   ++$voc_id;
   $vocabulary->name = "vocabulary $voc_id (i=$i)";
   $vocabulary->machine_name = 'vocabulary_' . $voc_id . '_' . $i;
