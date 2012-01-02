@@ -121,6 +121,9 @@ class User extends Entity {
    */
   public $roles = array();
 
+  public function __construct(array $values = array(), $entity_type = NULL) {
+    parent::__construct($values, 'user');
+  }
 }
 
 /**
@@ -237,6 +240,9 @@ class UserController extends EntityDatabaseStorageController {
           drupal_session_regenerate();
         }
       }
+
+      // Remove not enabled roles.
+      $account->roles = array_filter($account->roles);
 
       // Reload user roles if provided.
       if ($entity->roles != $entity->original->roles) {

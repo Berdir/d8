@@ -703,7 +703,7 @@ class FileFieldRevisionTestCase extends FileFieldTestCase {
 
     // Attach the second file to a user.
     $user = $this->drupalCreateUser();
-    $user->$field_name[LANGUAGE_NONE][0] = (array) $node_file_r3;
+    $user->{$field_name}[LANGUAGE_NONE][0] = (array) $node_file_r3;
     user_save($user);
     $this->drupalGet('user/' . $user->uid . '/edit');
 

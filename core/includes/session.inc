@@ -89,17 +89,21 @@ function _drupal_session_read($sid) {
   // a HTTPS session or we are about to log in so we check the sessions table
   // for an anonymous session with the non-HTTPS-only cookie.
   if ($is_https) {
-    $user = db_query("SELECT u.*, s.* FROM {users} u INNER JOIN {sessions} s ON u.uid = s.uid WHERE s.ssid = :ssid", array(':ssid' => $sid))->fetchObject();
+    $userdata = db_query("SELECT u.*, s.* FROM {users} u INNER JOIN {sessions} s ON u.uid = s.uid WHERE s.ssid = :ssid", array(':ssid' => $sid))->fetchAssoc();
     if (!$user) {
       if (isset($_COOKIE[$insecure_session_name])) {
-        $user = db_query("SELECT u.*, s.* FROM {users} u INNER JOIN {sessions} s ON u.uid = s.uid WHERE s.sid = :sid AND s.uid = 0", array(
+        $userdata = db_query("SELECT u.*, s.* FROM {users} u INNER JOIN {sessions} s ON u.uid = s.uid WHERE s.sid = :sid AND s.uid = 0", array(
         ':sid' => $_COOKIE[$insecure_session_name]))
-        ->fetchObject();
+        ->fetchAssoc();
       }
     }
   }
   else {
-    $user = db_query("SELECT u.*, s.* FROM {users} u INNER JOIN {sessions} s ON u.uid = s.uid WHERE s.sid = :sid", array(':sid' => $sid))->fetchObject();
+    $userdata = db_query("SELECT u.*, s.* FROM {users} u INNER JOIN {sessions} s ON u.uid = s.uid WHERE s.sid = :sid", array(':sid' => $sid))->fetchAssoc();
+  }
+
+  if (!empty($userdata)) {
+    $user = new User($userdata);
   }
 
   // We found the client's session record and they are an authenticated,

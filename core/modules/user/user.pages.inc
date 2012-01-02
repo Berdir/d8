@@ -263,12 +263,6 @@ function user_profile_form_submit($form, &$form_state) {
   // Remove unneeded values.
   form_state_values_clean($form_state);
 
-  // Before updating the account entity, keep an unchanged copy for use with
-  // user_save() later. This is necessary for modules implementing the user
-  // hooks to be able to react on changes by comparing the values of $account
-  // and $edit.
-  $account_unchanged = clone $account;
-
   entity_form_submit_build_entity('user', $account, $form, $form_state);
   user_save($account);
   $form_state['values']['uid'] = $account->uid;

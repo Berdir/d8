@@ -3145,7 +3145,7 @@ function user_build_filter_query(SelectQuery $query) {
     // the authenticated role. If so, then all users would be listed, and we can
     // skip adding it to the filter query.
     if ($key == 'permission') {
-      $account = new stdClass();
+      $account = entity_create('user', array());
       $account->uid = 'user_filter';
       $account->roles = array(DRUPAL_AUTHENTICATED_RID => 1);
       if (user_access($value, $account)) {
@@ -3397,7 +3397,7 @@ function user_block_user_action(&$entity, $context = array()) {
   }
   $account = user_load($uid);
   $account->status = 0;
-  $account = user_save($account);
+  user_save($account);
   watchdog('action', 'Blocked user %name.', array('%name' => $account->name));
 }
 

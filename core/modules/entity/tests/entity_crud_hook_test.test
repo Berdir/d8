@@ -355,7 +355,7 @@ class EntityCrudHookTestCase extends DrupalWebTestCase {
       'language' => 'en',
     ));
     $_SESSION['entity_crud_hook_test'] = array();
-    $account = user_save($account);
+    user_save($account);
 
     $this->assertHookMessageOrder(array(
       'entity_crud_hook_test_user_presave called',
@@ -374,7 +374,7 @@ class EntityCrudHookTestCase extends DrupalWebTestCase {
 
     $_SESSION['entity_crud_hook_test'] = array();
     $account->name = 'New name';
-    $account = user_save($account);
+    user_save($account);
 
     $this->assertHookMessageOrder(array(
       'entity_crud_hook_test_user_presave called',
