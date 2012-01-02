@@ -1792,7 +1792,7 @@ function node_ranking() {
 /**
  * Implements hook_user_cancel().
  */
-function node_user_cancel($edit, User $account, $method) {
+function node_user_cancel($edit, $account, $method) {
   switch ($method) {
     case 'user_cancel_block_unpublish':
       // Unpublish nodes (current revisions).
@@ -1830,7 +1830,7 @@ function node_user_cancel($edit, User $account, $method) {
 /**
  * Implements hook_user_predelete().
  */
-function node_user_predelete(User $account) {
+function node_user_predelete($account) {
   // Delete nodes (current revisions).
   // @todo Introduce node_mass_delete() or make node_mass_update() more flexible.
   $nodes = db_select('node', 'n')

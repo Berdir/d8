@@ -206,7 +206,7 @@ function statistics_menu() {
 /**
  * Implements hook_user_cancel().
  */
-function statistics_user_cancel($edit, User $account, $method) {
+function statistics_user_cancel($edit, $account, $method) {
   switch ($method) {
     case 'user_cancel_reassign':
       db_update('accesslog')
@@ -220,7 +220,7 @@ function statistics_user_cancel($edit, User $account, $method) {
 /**
  * Implements hook_user_predelete().
  */
-function statistics_user_predelete(User $account) {
+function statistics_user_predelete($account) {
   db_delete('accesslog')
     ->condition('uid', $account->uid)
     ->execute();

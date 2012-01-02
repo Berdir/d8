@@ -102,7 +102,7 @@ function overlay_form_user_profile_form_alter(&$form, &$form_state) {
 /**
  * Implements hook_user_presave().
  */
-function overlay_user_presave(User $account) {
+function overlay_user_presave($account) {
   if (isset($account->overlay)) {
     $account->data['overlay'] = $account->overlay;
   }

@@ -1979,7 +1979,7 @@ function system_form_user_register_form_alter(&$form, &$form_state) {
 /**
  * Implements hook_user_insert().
  */
-function system_user_presave(User $account) {
+function system_user_presave($account) {
   if (variable_get('configurable_timezones', 1) && empty($account->timezone) && !variable_get('user_default_timezone', DRUPAL_USER_TIMEZONE_DEFAULT)) {
     $account->timezone = variable_get('date_default_timezone', '');
   }
@@ -1989,7 +1989,7 @@ function system_user_presave(User $account) {
 /**
  * Implements hook_user_login().
  */
-function system_user_login(&$form_state, User $account) {
+function system_user_login(&$form_state, $account) {
   // If the user has a NULL time zone, notify them to set a time zone.
   if (!$account->timezone && variable_get('configurable_timezones', 1) && variable_get('empty_timezone_message', 0)) {
     drupal_set_message(t('Configure your <a href="@user-edit">account time zone setting</a>.', array('@user-edit' => url("user/$account->uid/edit", array('query' => drupal_get_destination(), 'fragment' => 'edit-timezone')))));

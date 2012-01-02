@@ -46,7 +46,7 @@ function hook_user_load($users) {
  * @see hook_user_delete()
  * @see user_delete_multiple()
  */
-function hook_user_predelete(User $account) {
+function hook_user_predelete($account) {
   db_delete('mytable')
     ->condition('uid', $account->uid)
     ->execute();
@@ -67,7 +67,7 @@ function hook_user_predelete(User $account) {
  * @see hook_user_predelete()
  * @see user_delete_multiple()
  */
-function hook_user_delete(User $account) {
+function hook_user_delete($account) {
   drupal_set_message(t('User: @name has been deleted.', array('@name' => $account->name)));
 }
 
@@ -97,7 +97,7 @@ function hook_user_delete(User $account) {
  * @see user_cancel_methods()
  * @see hook_user_cancel_methods_alter()
  */
-function hook_user_cancel($edit, User $account, $method) {
+function hook_user_cancel($edit, $account, $method) {
   switch ($method) {
     case 'user_cancel_block_unpublish':
       // Unpublish nodes (current revisions).
@@ -218,7 +218,7 @@ function hook_user_operations() {
  * @see hook_user_insert()
  * @see hook_user_update()
  */
-function hook_user_presave(User $account) {
+function hook_user_presave($account) {
   // Make sure that our form value 'mymodule_foo' is stored as 'mymodule_bar'.
   if (isset($account->mymodule_foo)) {
     $account->data['my_module_foo'] = $account->my_module_foo;
@@ -237,7 +237,7 @@ function hook_user_presave(User $account) {
  * @see hook_user_presave()
  * @see hook_user_update()
  */
-function hook_user_insert(User $account) {
+function hook_user_insert($account) {
   db_insert('mytable')
     ->fields(array(
       'myfield' => $account->myfield,
@@ -260,7 +260,7 @@ function hook_user_insert(User $account) {
  * @see hook_user_presave()
  * @see hook_user_insert()
  */
-function hook_user_update(User $account) {
+function hook_user_update($account) {
   db_insert('user_changes')
     ->fields(array(
       'uid' => $account->uid,
@@ -277,7 +277,7 @@ function hook_user_update(User $account) {
  * @param $account
  *   The user object on which the operation was just performed.
  */
-function hook_user_login(&$form_state, User $account) {
+function hook_user_login(&$form_state, $account) {
   // If the user has a NULL time zone, notify them to set a time zone.
   if (!$account->timezone && variable_get('configurable_timezones', 1) && variable_get('empty_timezone_message', 0)) {
     drupal_set_message(t('Configure your <a href="@user-edit">account time zone setting</a>.', array('@user-edit' => url("user/$account->uid/edit", array('query' => drupal_get_destination(), 'fragment' => 'edit-timezone')))));
@@ -290,7 +290,7 @@ function hook_user_login(&$form_state, User $account) {
  * @param $account
  *   The user object on which the operation was just performed.
  */
-function hook_user_logout(User $account) {
+function hook_user_logout($account) {
   db_insert('logouts')
     ->fields(array(
       'uid' => $account->uid,
@@ -315,7 +315,7 @@ function hook_user_logout(User $account) {
  * @see hook_user_view_alter()
  * @see hook_entity_view()
  */
-function hook_user_view(User $account, $view_mode, $langcode) {
+function hook_user_view($account, $view_mode, $langcode) {
   $account->content['user_picture'] = array(
     '#markup' => theme('user_picture', array('account' => $account)),
     '#weight' => -10,

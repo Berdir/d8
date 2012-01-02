@@ -363,7 +363,7 @@ function user_load_by_name($name) {
  * @param $account
  *   A User object.
  */
-function user_save(User $account) {
+function user_save($account) {
   $account->save();
 }
 
@@ -710,7 +710,7 @@ function user_search_execute($keys = NULL, $conditions = NULL) {
 /**
  * Implements hook_user_view().
  */
-function user_user_view(User $account) {
+function user_user_view($account) {
   $account->content['user_picture'] = array(
     '#markup' => theme('user_picture', array('account' => $account)),
     '#weight' => -10,

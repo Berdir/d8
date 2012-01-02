@@ -1228,7 +1228,7 @@ class DrupalWebTestCase extends DrupalTestCase {
    *
    * @see drupalCreateUser()
    */
-  protected function drupalLogin(User $user) {
+  protected function drupalLogin($user) {
     if ($this->loggedInUser) {
       $this->drupalLogout();
     }
