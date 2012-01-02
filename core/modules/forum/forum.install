@@ -59,13 +59,12 @@ function forum_enable() {
     field_create_field($field);
 
     // Create a default forum so forum posts can be created.
-    $edit = array(
+    $term = entity_create('taxonomy_term', array(
       'name' => t('General discussion'),
       'description' => '',
       'parent' => array(0),
       'vid' => $vocabulary->vid,
-    );
-    $term = (object) $edit;
+    ));
     taxonomy_term_save($term);
 
     // Create the instance on the bundle.

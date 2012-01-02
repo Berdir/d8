@@ -247,12 +247,12 @@ class EntityCrudHookTestCase extends DrupalWebTestCase {
     ));
     taxonomy_vocabulary_save($vocabulary);
 
-    $term = (object) array(
+    $term = entity_create('taxonomy_term', array(
       'vid' => $vocabulary->vid,
       'name' => 'Test term',
       'description' => NULL,
       'format' => 1,
-    );
+    ));
     $_SESSION['entity_crud_hook_test'] = array();
     taxonomy_term_save($term);
 

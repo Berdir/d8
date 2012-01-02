@@ -662,7 +662,7 @@ class TriggerOtherTestCase extends TriggerWebTestCase {
     // Create a taxonomy vocabulary and add a term to it.
 
     // Create a vocabulary.
-    $vocabulary = new TaxonomyVocabulary();
+    $vocabulary = entity_create('taxonomy_vocabulary', array());
     $vocabulary->name = $this->randomName();
     $vocabulary->description = $this->randomName();
     $vocabulary->machine_name = drupal_strtolower($this->randomName());
