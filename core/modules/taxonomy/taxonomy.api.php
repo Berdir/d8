@@ -35,7 +35,7 @@ function hook_taxonomy_vocabulary_load($vocabularies) {
  * @param $vocabulary
  *   A taxonomy vocabulary object.
  */
-function hook_taxonomy_vocabulary_presave(TaxonomyVocabulary $vocabulary) {
+function hook_taxonomy_vocabulary_presave($vocabulary) {
   $vocabulary->foo = 'bar';
 }
 
@@ -48,7 +48,7 @@ function hook_taxonomy_vocabulary_presave(TaxonomyVocabulary $vocabulary) {
  * @param $vocabulary
  *   A taxonomy vocabulary object.
  */
-function hook_taxonomy_vocabulary_insert(TaxonomyVocabulary $vocabulary) {
+function hook_taxonomy_vocabulary_insert($vocabulary) {
   if ($vocabulary->synonyms) {
     variable_set('taxonomy_' . $vocabulary->vid . '_synonyms', TRUE);
   }
@@ -62,7 +62,7 @@ function hook_taxonomy_vocabulary_insert(TaxonomyVocabulary $vocabulary) {
  * @param $vocabulary
  *   A taxonomy vocabulary object.
  */
-function hook_taxonomy_vocabulary_update(TaxonomyVocabulary $vocabulary) {
+function hook_taxonomy_vocabulary_update($vocabulary) {
   $status = $vocabulary->synonyms ? TRUE : FALSE;
   if ($vocabulary->synonyms) {
     variable_set('taxonomy_' . $vocabulary->vid . '_synonyms', $status);
@@ -83,7 +83,7 @@ function hook_taxonomy_vocabulary_update(TaxonomyVocabulary $vocabulary) {
  * @see hook_taxonomy_vocabulary_delete()
  * @see taxonomy_vocabulary_delete()
  */
-function hook_taxonomy_vocabulary_predelete(TaxonomyVocabulary $vocabulary) {
+function hook_taxonomy_vocabulary_predelete($vocabulary) {
   if (variable_get('taxonomy_' . $vocabulary->vid . '_synonyms', FALSE)) {
     variable_del('taxonomy_' . $vocabulary->vid . '_synonyms');
   }
@@ -102,7 +102,7 @@ function hook_taxonomy_vocabulary_predelete(TaxonomyVocabulary $vocabulary) {
  * @see hook_taxonomy_vocabulary_predelete()
  * @see taxonomy_vocabulary_delete()
  */
-function hook_taxonomy_vocabulary_delete(TaxonomyVocabulary $vocabulary) {
+function hook_taxonomy_vocabulary_delete($vocabulary) {
   if (variable_get('taxonomy_' . $vocabulary->vid . '_synonyms', FALSE)) {
     variable_del('taxonomy_' . $vocabulary->vid . '_synonyms');
   }
@@ -140,7 +140,7 @@ function hook_taxonomy_term_load($terms) {
  * @param $term
  *   A term object.
  */
-function hook_taxonomy_term_presave(TaxonomyTerm $term) {
+function hook_taxonomy_term_presave($term) {
   $term->foo = 'bar';
 }
 
@@ -153,7 +153,7 @@ function hook_taxonomy_term_presave(TaxonomyTerm $term) {
  * @param $term
  *   A taxonomy term object.
  */
-function hook_taxonomy_term_insert(TaxonomyTerm $term) {
+function hook_taxonomy_term_insert($term) {
   if (!empty($term->synonyms)) {
     foreach (explode ("\n", str_replace("\r", '', $term->synonyms)) as $synonym) {
       if ($synonym) {
@@ -176,7 +176,7 @@ function hook_taxonomy_term_insert(TaxonomyTerm $term) {
  * @param $term
  *   A taxonomy term object.
  */
-function hook_taxonomy_term_update(TaxonomyTerm $term) {
+function hook_taxonomy_term_update($term) {
   hook_taxonomy_term_delete($term);
   if (!empty($term->synonyms)) {
     foreach (explode ("\n", str_replace("\r", '', $term->synonyms)) as $synonym) {
@@ -204,7 +204,7 @@ function hook_taxonomy_term_update(TaxonomyTerm $term) {
  *
  * @see taxonomy_term_delete()
  */
-function hook_taxonomy_term_predelete(TaxonomyTerm $term) {
+function hook_taxonomy_term_predelete($term) {
   db_delete('term_synoynm')->condition('tid', $term->tid)->execute();
 }
 
@@ -219,7 +219,7 @@ function hook_taxonomy_term_predelete(TaxonomyTerm $term) {
  *
  * @see taxonomy_term_delete()
  */
-function hook_taxonomy_term_delete(TaxonomyTerm $term) {
+function hook_taxonomy_term_delete($term) {
   db_delete('term_synoynm')->condition('tid', $term->tid)->execute();
 }
 

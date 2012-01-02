@@ -671,7 +671,7 @@ class TriggerOtherTestCase extends TriggerWebTestCase {
     $vocabulary->weight = mt_rand(0, 10);
     taxonomy_vocabulary_save($vocabulary);
 
-    $term = new stdClass();
+    $term = entity_create('taxonomy_term', array());
     $term->name = $this->randomName();
     $term->vid = $vocabulary->vid;
     taxonomy_term_save($term);

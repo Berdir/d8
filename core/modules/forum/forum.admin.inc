@@ -79,7 +79,7 @@ function forum_form_submit($form, &$form_state) {
     $type = t('forum');
   }
 
-  $term = (object) $form_state['values'];
+  $term = entity_create('taxonomy_term', $form_state['values']);
   $status = taxonomy_term_save($term);
   switch ($status) {
     case SAVED_NEW:
