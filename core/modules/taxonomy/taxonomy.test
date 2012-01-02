@@ -64,7 +64,7 @@ class TaxonomyVocabularyFunctionalTest extends TaxonomyWebTestCase {
   /**
    * Create, edit and delete a vocabulary via the user interface.
    */
-  function dtestVocabularyInterface() {
+  function testVocabularyInterface() {
     // Visit the main taxonomy administration page.
     $this->drupalGet('admin/structure/taxonomy');
 
@@ -102,7 +102,7 @@ class TaxonomyVocabularyFunctionalTest extends TaxonomyWebTestCase {
   /**
    * Changing weights on the vocabulary overview with two or more vocabularies.
    */
-  function dtestTaxonomyAdminChangingWeights() {
+  function testTaxonomyAdminChangingWeights() {
     // Create some vocabularies.
     for ($i = 0; $i < 10; $i++) {
       $this->createVocabulary();
@@ -130,7 +130,7 @@ class TaxonomyVocabularyFunctionalTest extends TaxonomyWebTestCase {
   /**
    * Test the vocabulary overview with no vocabularies.
    */
-  function dtestTaxonomyAdminNoVocabularies() {
+  function testTaxonomyAdminNoVocabularies() {
     // Delete all vocabularies.
     $vocabularies = taxonomy_get_vocabularies();
     foreach ($vocabularies as $key => $vocabulary) {
@@ -146,7 +146,7 @@ class TaxonomyVocabularyFunctionalTest extends TaxonomyWebTestCase {
   /**
    * Deleting a vocabulary.
    */
-  function dtestTaxonomyAdminDeletingVocabulary() {
+  function testTaxonomyAdminDeletingVocabulary() {
     // Create a vocabulary.
     $edit = array(
       'name' => $this->randomName(),
@@ -201,7 +201,7 @@ class TaxonomyVocabularyUnitTest extends TaxonomyWebTestCase {
    * Ensure that when an invalid vocabulary vid is loaded, it is possible
    * to load the same vid successfully if it subsequently becomes valid.
    */
-  function dtestTaxonomyVocabularyLoadReturnFalse() {
+  function testTaxonomyVocabularyLoadReturnFalse() {
     // Load a vocabulary that doesn't exist.
     $vocabularies = taxonomy_get_vocabularies();
     $vid = count($vocabularies) + 1;
@@ -255,7 +255,7 @@ class TaxonomyVocabularyUnitTest extends TaxonomyWebTestCase {
   /**
    * Ensure that the vocabulary static reset works correctly.
    */
-  function dtestTaxonomyVocabularyLoadStaticReset() {
+  function testTaxonomyVocabularyLoadStaticReset() {
     $original_vocabulary = taxonomy_vocabulary_load($this->vocabulary->vid);
     $this->assertTrue(is_object($original_vocabulary), t('Vocabulary loaded successfully'));
     $this->assertEqual($this->vocabulary->name, $original_vocabulary->name, t('Vocabulary loaded successfully'));
@@ -280,7 +280,7 @@ class TaxonomyVocabularyUnitTest extends TaxonomyWebTestCase {
   /**
    * Tests for loading multiple vocabularies.
    */
-  function dtestTaxonomyVocabularyLoadMultiple() {
+  function testTaxonomyVocabularyLoadMultiple() {
 
     // Delete any existing vocabularies.
     foreach (taxonomy_get_vocabularies() as $vocabulary) {
@@ -328,7 +328,7 @@ class TaxonomyVocabularyUnitTest extends TaxonomyWebTestCase {
   /**
    * Tests that machine name changes are properly reflected.
    */
-  function dtestTaxonomyVocabularyChangeMachineName() {
+  function testTaxonomyVocabularyChangeMachineName() {
     // Add a field instance to the vocabulary.
     $field = array(
       'field_name' => 'field_test',
@@ -354,7 +354,7 @@ class TaxonomyVocabularyUnitTest extends TaxonomyWebTestCase {
   /**
    * Test uninstall and reinstall of the taxonomy module.
    */
-  function dtestUninstallReinstall() {
+  function testUninstallReinstall() {
     // Fields and field instances attached to taxonomy term bundles should be
     // removed when the module is uninstalled.
     $this->field_name = drupal_strtolower($this->randomName() . '_field_name');
@@ -399,7 +399,7 @@ class TaxonomyTermUnitTest extends TaxonomyWebTestCase {
     );
   }
 
-  function dtestTermDelete() {
+  function testTermDelete() {
     $vocabulary = $this->createVocabulary();
     $valid_term = $this->createTerm($vocabulary);
     // Delete a valid term.
@@ -434,7 +434,7 @@ class TaxonomyLegacyTestCase extends TaxonomyWebTestCase {
   /**
    * Test taxonomy functionality with nodes prior to 1970.
    */
-  function dtestTaxonomyLegacyNode() {
+  function testTaxonomyLegacyNode() {
     // Posts an article with a taxonomy term and a date prior to 1970.
     $langcode = LANGUAGE_NONE;
     $edit = array();
@@ -502,7 +502,7 @@ class TaxonomyTermTestCase extends TaxonomyWebTestCase {
   /**
    * Test terms in a single and multiple hierarchy.
    */
-  function dtestTaxonomyTermHierarchy() {
+  function testTaxonomyTermHierarchy() {
     // Create two taxonomy terms.
     $term1 = $this->createTerm($this->vocabulary);
     $term2 = $this->createTerm($this->vocabulary);
@@ -536,7 +536,7 @@ class TaxonomyTermTestCase extends TaxonomyWebTestCase {
    *
    * Save & edit a node and assert that taxonomy terms are saved/loaded properly.
    */
-  function dtestTaxonomyNode() {
+  function testTaxonomyNode() {
     // Create two taxonomy terms.
     $term1 = $this->createTerm($this->vocabulary);
     $term2 = $this->createTerm($this->vocabulary);
@@ -571,7 +571,7 @@ class TaxonomyTermTestCase extends TaxonomyWebTestCase {
   /**
    * Test term creation with a free-tagging vocabulary from the node form.
    */
-  function dtestNodeTermCreationAndDeletion() {
+  function testNodeTermCreationAndDeletion() {
     // Enable tags in the vocabulary.
     $instance = $this->instance;
     $instance['widget'] = array('type' => 'taxonomy_autocomplete');
@@ -646,7 +646,7 @@ class TaxonomyTermTestCase extends TaxonomyWebTestCase {
   /**
    * Save, edit and delete a term using the user interface.
    */
-  function dtestTermInterface() {
+  function testTermInterface() {
     $edit = array(
       'name' => $this->randomName(12),
       'description[value]' => $this->randomName(100),
@@ -718,7 +718,7 @@ class TaxonomyTermTestCase extends TaxonomyWebTestCase {
   /**
    * Save, edit and delete a term using the user interface.
    */
-  function dtestTermReorder() {
+  function testTermReorder() {
     $this->createTerm($this->vocabulary);
     $this->createTerm($this->vocabulary);
     $this->createTerm($this->vocabulary);
@@ -777,7 +777,7 @@ class TaxonomyTermTestCase extends TaxonomyWebTestCase {
   /**
    * Test saving a term with multiple parents through the UI.
    */
-  function dtestTermMultipleParentsInterface() {
+  function testTermMultipleParentsInterface() {
     // Add a new term to the vocabulary so that we can have multiple parents.
     $parent = $this->createTerm($this->vocabulary);
 
@@ -806,7 +806,7 @@ class TaxonomyTermTestCase extends TaxonomyWebTestCase {
   /**
    * Test taxonomy_get_term_by_name().
    */
-  function dtestTaxonomyGetTermByName() {
+  function testTaxonomyGetTermByName() {
     $term = $this->createTerm($this->vocabulary);
 
     // Load the term with the exact name.
@@ -922,7 +922,7 @@ class TaxonomyTermIndexTestCase extends TaxonomyWebTestCase {
   /**
    * Tests that the taxonomy index is maintained properly.
    */
-  function dtestTaxonomyIndex() {
+  function testTaxonomyIndex() {
     // Create terms in the vocabulary.
     $term_1 = $this->createTerm($this->vocabulary);
     $term_2 = $this->createTerm($this->vocabulary);
@@ -1060,7 +1060,7 @@ class TaxonomyLoadMultipleUnitTest extends TaxonomyWebTestCase {
    * Create a vocabulary and some taxonomy terms, ensuring they're loaded
    * correctly using taxonomy_term_load_multiple().
    */
-  function dtestTaxonomyTermMultipleLoad() {
+  function testTaxonomyTermMultipleLoad() {
     // Create a vocabulary.
     $vocabulary = $this->createVocabulary();
 
@@ -1125,7 +1125,7 @@ class TaxonomyHooksTestCase extends TaxonomyWebTestCase {
   /**
    * Test that hooks are run correctly on creating, editing and deleting a term.
    */
-  function dtestTaxonomyTermHooks() {
+  function testTaxonomyTermHooks() {
     $vocabulary = $this->createVocabulary();
 
     // Create a term with one antonym.
@@ -1211,7 +1211,7 @@ class TaxonomyTermFieldTestCase extends TaxonomyWebTestCase {
   /**
    * Test term field validation.
    */
-  function dtestTaxonomyTermFieldValidation() {
+  function testTaxonomyTermFieldValidation() {
     // Test valid and invalid values with field_attach_validate().
     $langcode = LANGUAGE_NONE;
     $entity = field_test_create_stub_entity();
@@ -1240,7 +1240,7 @@ class TaxonomyTermFieldTestCase extends TaxonomyWebTestCase {
   /**
    * Test widgets.
    */
-  function dtestTaxonomyTermFieldWidgets() {
+  function testTaxonomyTermFieldWidgets() {
     // Create a term in the vocabulary.
     $term = $this->createTerm($this->vocabulary);
 
@@ -1270,7 +1270,7 @@ class TaxonomyTermFieldTestCase extends TaxonomyWebTestCase {
   /**
    * Tests that vocabulary machine name changes are mirrored in field definitions.
    */
-  function dtestTaxonomyTermFieldChangeMachineName() {
+  function testTaxonomyTermFieldChangeMachineName() {
     // Add several entries in the 'allowed_values' setting, to make sure that
     // they all get updated.
     $this->field['settings']['allowed_values'] = array(
@@ -1355,7 +1355,7 @@ class TaxonomyTokenReplaceTestCase extends TaxonomyWebTestCase {
   /**
    * Creates some terms and a node, then tests the tokens generated from them.
    */
-  function dtestTaxonomyTokenReplacement() {
+  function testTaxonomyTokenReplacement() {
     global $language;
 
     // Create two taxonomy terms.
@@ -1476,7 +1476,7 @@ class TaxonomyThemeTestCase extends TaxonomyWebTestCase {
   /**
    * Test the theme used when adding, viewing and editing taxonomy terms.
    */
-  function dtestTaxonomyTermThemes() {
+  function testTaxonomyTermThemes() {
     // Adding a term to a vocabulary is considered an administrative action and
     // should use the administrative theme.
     $vocabulary = $this->createVocabulary();
