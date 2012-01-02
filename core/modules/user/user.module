@@ -143,7 +143,7 @@ function user_theme() {
  * Implements hook_entity_info().
  */
 function user_entity_info() {
-  $return = array(
+  return array(
     'user' => array(
       'label' => t('User'),
       'controller class' => 'UserController',
@@ -151,6 +151,7 @@ function user_entity_info() {
       'uri callback' => 'user_uri',
       'label callback' => 'user_label',
       'fieldable' => TRUE,
+      'entity class' => 'User',
       'entity keys' => array(
         'id' => 'uid',
       ),
@@ -171,7 +172,6 @@ function user_entity_info() {
       ),
     ),
   );
-  return $return;
 }
 
 /**
@@ -361,213 +361,10 @@ function user_load_by_name($name) {
  * Save changes to a user account or add a new user.
  *
  * @param $account
- *   (optional) The user object to modify or add. If you want to modify
- *   an existing user account, you will need to ensure that (a) $account
- *   is an object, and (b) you have set $account->uid to the numeric
- *   user ID of the user account you wish to modify. If you
- *   want to create a new user account, you can set $account->is_new to
- *   TRUE or omit the $account->uid field.
- * @param $edit
- *   An array of fields and values to save. For example array('name'
- *   => 'My name'). Key / value pairs added to the $edit['data'] will be
- *   serialized and saved in the {users.data} column.
- *
- * @return
- *   A fully-loaded $user object upon successful save or FALSE if the save failed.
- *
- * @todo D8: Drop $edit and fix user_save() to be consistent with others.
+ *   A User object.
  */
-function user_save($account, $edit = array()) {
-  $transaction = db_transaction();
-  try {
-    if (!empty($edit['pass'])) {
-      // Allow alternate password hashing schemes.
-      require_once DRUPAL_ROOT . '/' . variable_get('password_inc', 'core/includes/password.inc');
-      $edit['pass'] = user_hash_password(trim($edit['pass']));
-      // Abort if the hashing failed and returned FALSE.
-      if (!$edit['pass']) {
-        return FALSE;
-      }
-    }
-    else {
-      // Avoid overwriting an existing password with a blank password.
-      unset($edit['pass']);
-    }
-    if (isset($edit['mail'])) {
-      $edit['mail'] = trim($edit['mail']);
-    }
-
-    // Load the stored entity, if any.
-    if (!empty($account->uid) && !isset($account->original)) {
-      $account->original = entity_load_unchanged('user', $account->uid);
-    }
-
-    if (empty($account)) {
-      $account = new stdClass();
-    }
-    if (!isset($account->is_new)) {
-      $account->is_new = empty($account->uid);
-    }
-    // Prepopulate $edit['data'] with the current value of $account->data.
-    // Modules can add to or remove from this array in hook_user_presave().
-    if (!empty($account->data)) {
-      $edit['data'] = !empty($edit['data']) ? array_merge($account->data, $edit['data']) : $account->data;
-    }
-
-    // Invoke hook_user_presave() for all modules.
-    user_module_invoke('presave', $edit, $account);
-
-    // Invoke presave operations of Field Attach API and Entity API. Those APIs
-    // require a fully-fledged and updated entity object. Therefore, we need to
-    // copy any new property values of $edit into it.
-    foreach ($edit as $key => $value) {
-      $account->$key = $value;
-    }
-    field_attach_presave('user', $account);
-    module_invoke_all('entity_presave', $account, 'user');
-
-    if (is_object($account) && !$account->is_new) {
-      // Process picture uploads.
-      if (!empty($account->picture->fid) && (!isset($account->original->picture->fid) || $account->picture->fid != $account->original->picture->fid)) {
-        $picture = $account->picture;
-        // If the picture is a temporary file move it to its final location and
-        // make it permanent.
-        if (!$picture->status) {
-          $info = image_get_info($picture->uri);
-          $picture_directory =  file_default_scheme() . '://' . variable_get('user_picture_path', 'pictures');
-
-          // Prepare the pictures directory.
-          file_prepare_directory($picture_directory, FILE_CREATE_DIRECTORY);
-          $destination = file_stream_wrapper_uri_normalize($picture_directory . '/picture-' . $account->uid . '-' . REQUEST_TIME . '.' . $info['extension']);
-
-          // Move the temporary file into the final location.
-          if ($picture = file_move($picture, $destination, FILE_EXISTS_RENAME)) {
-            $picture->status = FILE_STATUS_PERMANENT;
-            $account->picture = file_save($picture);
-            file_usage_add($picture, 'user', 'user', $account->uid);
-          }
-        }
-        // Delete the previous picture if it was deleted or replaced.
-        if (!empty($account->original->picture->fid)) {
-          file_usage_delete($account->original->picture, 'user', 'user', $account->uid);
-          file_delete($account->original->picture);
-        }
-      }
-      $account->picture = empty($account->picture->fid) ? 0 : $account->picture->fid;
-
-      // Do not allow 'uid' to be changed.
-      $account->uid = $account->original->uid;
-      // Save changes to the user table.
-      $success = drupal_write_record('users', $account, 'uid');
-      if ($success === FALSE) {
-        // The query failed - better to abort the save than risk further
-        // data loss.
-        return FALSE;
-      }
-
-      // Reload user roles if provided.
-      if ($account->roles != $account->original->roles) {
-        db_delete('users_roles')
-          ->condition('uid', $account->uid)
-          ->execute();
-
-        $query = db_insert('users_roles')->fields(array('uid', 'rid'));
-        foreach (array_keys($account->roles) as $rid) {
-          if (!in_array($rid, array(DRUPAL_ANONYMOUS_RID, DRUPAL_AUTHENTICATED_RID))) {
-            $query->values(array(
-              'uid' => $account->uid,
-              'rid' => $rid,
-            ));
-          }
-        }
-        $query->execute();
-      }
-
-      // Delete a blocked user's sessions to kick them if they are online.
-      if ($account->original->status != $account->status && $account->status == 0) {
-        drupal_session_destroy_uid($account->uid);
-      }
-
-      // If the password changed, delete all open sessions and recreate
-      // the current one.
-      if ($account->pass != $account->original->pass) {
-        drupal_session_destroy_uid($account->uid);
-        if ($account->uid == $GLOBALS['user']->uid) {
-          drupal_session_regenerate();
-        }
-      }
-
-      // Save Field data.
-      field_attach_update('user', $account);
-
-      // Send emails after we have the new user object.
-      if ($account->status != $account->original->status) {
-        // The user's status is changing; conditionally send notification email.
-        $op = $account->status == 1 ? 'status_activated' : 'status_blocked';
-        _user_mail_notify($op, $account);
-      }
-
-      // Update $edit with any interim changes to $account.
-      foreach ($account as $key => $value) {
-        if (!property_exists($account->original, $key) || $value !== $account->original->$key) {
-          $edit[$key] = $value;
-        }
-      }
-      user_module_invoke('update', $edit, $account);
-      module_invoke_all('entity_update', $account, 'user');
-    }
-    else {
-      // Allow 'uid' to be set by the caller. There is no danger of writing an
-      // existing user as drupal_write_record will do an INSERT.
-      if (empty($account->uid)) {
-        $account->uid = db_next_id(db_query('SELECT MAX(uid) FROM {users}')->fetchField());
-      }
-      // Allow 'created' to be set by the caller.
-      if (!isset($account->created)) {
-        $account->created = REQUEST_TIME;
-      }
-      $success = drupal_write_record('users', $account);
-      if ($success === FALSE) {
-        // On a failed INSERT some other existing user's uid may be returned.
-        // We must abort to avoid overwriting their account.
-        return FALSE;
-      }
-
-      // Make sure $account is properly initialized.
-      $account->roles[DRUPAL_AUTHENTICATED_RID] = 'authenticated user';
-
-      field_attach_insert('user', $account);
-      $edit = (array) $account;
-      user_module_invoke('insert', $edit, $account);
-      module_invoke_all('entity_insert', $account, 'user');
-
-      // Save user roles.
-      if (count($account->roles) > 1) {
-        $query = db_insert('users_roles')->fields(array('uid', 'rid'));
-        foreach (array_keys($account->roles) as $rid) {
-          if (!in_array($rid, array(DRUPAL_ANONYMOUS_RID, DRUPAL_AUTHENTICATED_RID))) {
-            $query->values(array(
-              'uid' => $account->uid,
-              'rid' => $rid,
-            ));
-          }
-        }
-        $query->execute();
-      }
-    }
-    // Clear internal properties.
-    unset($account->is_new);
-    unset($account->original);
-    // Clear the static loading cache.
-    entity_get_controller('user')->resetCache(array($account->uid));
-
-    return $account;
-  }
-  catch (Exception $e) {
-    $transaction->rollback();
-    watchdog_exception('user', $e);
-    throw $e;
-  }
+function user_save(User $account) {
+  $account->save();
 }
 
 /**
@@ -913,7 +710,7 @@ function user_search_execute($keys = NULL, $conditions = NULL) {
 /**
  * Implements hook_user_view().
  */
-function user_user_view($account) {
+function user_user_view(User $account) {
   $account->content['user_picture'] = array(
     '#markup' => theme('user_picture', array('account' => $account)),
     '#weight' => -10,
@@ -1177,30 +974,6 @@ function user_account_form_validate($form, &$form_state) {
     $user_schema = drupal_get_schema('users');
     if (drupal_strlen($form_state['values']['signature']) > $user_schema['fields']['signature']['length']) {
       form_set_error('signature', t('The signature is too long: it must be %max characters or less.', array('%max' => $user_schema['fields']['signature']['length'])));
-    }
-  }
-}
-
-/**
- * Implements hook_user_presave().
- */
-function user_user_presave(&$edit, $account) {
-  if (!empty($edit['picture_upload'])) {
-    $edit['picture'] = $edit['picture_upload'];
-  }
-  // Delete picture if requested, and if no replacement picture was given.
-  elseif (!empty($edit['picture_delete'])) {
-    $edit['picture'] = NULL;
-  }
-  // Prepare user roles.
-  if (isset($edit['roles'])) {
-    $edit['roles'] = array_filter($edit['roles']);
-  }
-
-  // Move account cancellation information into $user->data.
-  foreach (array('user_cancel_method', 'user_cancel_notify') as $key) {
-    if (isset($edit[$key])) {
-      $edit['data'][$key] = $edit[$key];
     }
   }
 }
@@ -2184,7 +1957,8 @@ function user_authenticate($name, $password) {
 
         // Update user to new password scheme if needed.
         if (user_needs_new_hash($account)) {
-          user_save($account, array('pass' => $password));
+          $account->pass = $password;
+          user_save($account);
         }
       }
     }
@@ -2239,16 +2013,16 @@ function user_external_login_register($name, $module) {
   $account = user_external_load($name);
   if (!$account) {
     // Register this new user.
-    $userinfo = array(
+    $account = entity_create('user', array(
       'name' => $name,
       'pass' => user_password(),
       'init' => $name,
       'status' => 1,
       'access' => REQUEST_TIME
-    );
-    $account = user_save(drupal_anonymous_user(), $userinfo);
+    ));
+    $status = user_save($account);
     // Terminate if an error occurred during user_save().
-    if (!$account) {
+    if ($status != SAVED_NEW) {
       drupal_set_message(t("Error saving user account."), 'error');
       return;
     }
@@ -2396,7 +2170,8 @@ function _user_cancel($edit, $account, $method) {
       if (!empty($edit['user_cancel_notify'])) {
         _user_mail_notify('status_blocked', $account);
       }
-      user_save($account, array('status' => 0));
+      $account->status = 0;
+      user_save($account);
       drupal_set_message(t('%name has been disabled.', array('%name' => $account->name)));
       watchdog('user', 'Blocked user: %name %email.', array('%name' => $account->name, '%email' => '<' . $account->mail . '>'), WATCHDOG_NOTICE);
       break;
@@ -3150,7 +2925,8 @@ function user_user_operations_unblock($accounts) {
   foreach ($accounts as $account) {
     // Skip unblocking user if they are already unblocked.
     if ($account !== FALSE && $account->status == 0) {
-      user_save($account, array('status' => 1));
+      $account->status = 1;
+      user_save($account);
     }
   }
 }
@@ -3166,7 +2942,8 @@ function user_user_operations_block($accounts) {
       // For efficiency manually save the original account before applying any
       // changes.
       $account->original = clone $account;
-      user_save($account, array('status' => 0));
+      $account->status = 0;
+      user_save($account);
     }
   }
 }
@@ -3189,7 +2966,8 @@ function user_multiple_role_edit($accounts, $operation, $rid) {
           // For efficiency manually save the original account before applying
           // any changes.
           $account->original = clone $account;
-          user_save($account, array('roles' => $roles));
+          $account->roles = $roles;
+          user_save($account);
         }
       }
       break;
@@ -3202,7 +2980,8 @@ function user_multiple_role_edit($accounts, $operation, $rid) {
           // For efficiency manually save the original account before applying
           // any changes.
           $account->original = clone $account;
-          user_save($account, array('roles' => $roles));
+          $account->roles = $roles;
+          user_save($account);
         }
       }
       break;
@@ -3292,7 +3071,7 @@ function user_multiple_cancel_confirm_submit($form, &$form_state) {
       if ($uid == $user->uid) {
         $admin_form_state = $form_state;
         unset($admin_form_state['values']['user_cancel_confirm']);
-        $admin_form_state['values']['_account'] = $user;
+        $admin_form_state['values']['_account'] = user_load($user->uid);
         user_cancel_confirm_form_submit(array(), $admin_form_state);
       }
       else {
@@ -3617,7 +3396,8 @@ function user_block_user_action(&$entity, $context = array()) {
     $uid = $GLOBALS['user']->uid;
   }
   $account = user_load($uid);
-  $account = user_save($account, array('status' => 0));
+  $account->status = 0;
+  $account = user_save($account);
   watchdog('action', 'Blocked user %name.', array('%name' => $account->name));
 }
 
@@ -3688,7 +3468,7 @@ function user_register_form($form, &$form_state) {
     drupal_goto('user/' . $user->uid);
   }
 
-  $form['#user'] = drupal_anonymous_user();
+  $form['#user'] = entity_create('user', array());
 
   $form['#attached']['library'][] = array('system', 'jquery.cookie');
   $form['#attributes']['class'][] = 'user-info-from-cookie';
@@ -3759,14 +3539,10 @@ function user_register_submit($form, &$form_state) {
   $account = $form['#user'];
 
   entity_form_submit_build_entity('user', $account, $form, $form_state);
-
-  // Populate $edit with the properties of $account, which have been edited on
-  // this form by taking over all values, which appear in the form values too.
-  $edit = array_intersect_key((array) $account, $form_state['values']);
-  $account = user_save($account, $edit);
+  $status = user_save($account);
 
   // Terminate if an error occurred during user_save().
-  if (!$account) {
+  if ($status =! SAVED_NEW) {
     drupal_set_message(t("Error saving user account."), 'error');
     $form_state['redirect'] = '';
     return;

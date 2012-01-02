@@ -519,7 +519,8 @@ class TriggerUserActionTestCase extends TriggerActionTestCase {
     $comment_author_uid = $account->uid;
     // Now rehabilitate the comment author so it can be be blocked again when
     // the comment is updated.
-    user_save($account, array('status' => TRUE));
+    $account->status = 1;
+    user_save($account);
 
     $test_user = $this->drupalCreateUser(array('administer actions', 'create article content', 'access comments', 'administer comments', 'skip comment approval', 'edit own comments'));
     $this->drupalLogin($test_user);

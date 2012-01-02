@@ -46,7 +46,7 @@ function hook_user_load($users) {
  * @see hook_user_delete()
  * @see user_delete_multiple()
  */
-function hook_user_predelete($account) {
+function hook_user_predelete(User $account) {
   db_delete('mytable')
     ->condition('uid', $account->uid)
     ->execute();
@@ -67,7 +67,7 @@ function hook_user_predelete($account) {
  * @see hook_user_predelete()
  * @see user_delete_multiple()
  */
-function hook_user_delete($account) {
+function hook_user_delete(User $account) {
   drupal_set_message(t('User: @name has been deleted.', array('@name' => $account->name)));
 }
 
@@ -97,7 +97,7 @@ function hook_user_delete($account) {
  * @see user_cancel_methods()
  * @see hook_user_cancel_methods_alter()
  */
-function hook_user_cancel($edit, $account, $method) {
+function hook_user_cancel($edit, User $account, $method) {
   switch ($method) {
     case 'user_cancel_block_unpublish':
       // Unpublish nodes (current revisions).
@@ -209,21 +209,19 @@ function hook_user_operations() {
  *
  * This hook is primarily intended for modules that want to store properties in
  * the serialized {users}.data column, which is automatically loaded whenever a
- * user account object is loaded, modules may add to $edit['data'] in order
+ * user account object is loaded, modules may add to $account->data in order
  * to have their data serialized on save.
  *
- * @param $edit
- *   The array of form values submitted by the user.
  * @param $account
- *   The user object on which the operation is performed.
+ *   The User object on which the operation is performed.
  *
  * @see hook_user_insert()
  * @see hook_user_update()
  */
-function hook_user_presave(&$edit, $account) {
+function hook_user_presave(User $account) {
   // Make sure that our form value 'mymodule_foo' is stored as 'mymodule_bar'.
-  if (isset($edit['mymodule_foo'])) {
-    $edit['data']['my_module_foo'] = $edit['my_module_foo'];
+  if (isset($account->mymodule_foo)) {
+    $account->data['my_module_foo'] = $account->my_module_foo;
   }
 }
 
@@ -233,18 +231,16 @@ function hook_user_presave(&$edit, $account) {
  * The module should save its custom additions to the user object into the
  * database.
  *
- * @param $edit
- *   The array of form values submitted by the user.
  * @param $account
- *   The user object on which the operation is being performed.
+ *   The User object on which the operation is being performed.
  *
  * @see hook_user_presave()
  * @see hook_user_update()
  */
-function hook_user_insert(&$edit, $account) {
+function hook_user_insert(User $account) {
   db_insert('mytable')
     ->fields(array(
-      'myfield' => $edit['myfield'],
+      'myfield' => $account->myfield,
       'uid' => $account->uid,
     ))
     ->execute();
@@ -259,12 +255,12 @@ function hook_user_insert(&$edit, $account) {
  * @param $edit
  *   The array of form values submitted by the user.
  * @param $account
- *   The user object on which the operation is performed.
+ *   The User object on which the operation is performed.
  *
  * @see hook_user_presave()
  * @see hook_user_insert()
  */
-function hook_user_update(&$edit, $account) {
+function hook_user_update(User $account) {
   db_insert('user_changes')
     ->fields(array(
       'uid' => $account->uid,
@@ -276,12 +272,12 @@ function hook_user_update(&$edit, $account) {
 /**
  * The user just logged in.
  *
- * @param $edit
- *   The array of form values submitted by the user.
+ * @param $form_state
+ *   The form_state array of the login form, can be empty.
  * @param $account
  *   The user object on which the operation was just performed.
  */
-function hook_user_login(&$edit, $account) {
+function hook_user_login(&$form_state, User $account) {
   // If the user has a NULL time zone, notify them to set a time zone.
   if (!$account->timezone && variable_get('configurable_timezones', 1) && variable_get('empty_timezone_message', 0)) {
     drupal_set_message(t('Configure your <a href="@user-edit">account time zone setting</a>.', array('@user-edit' => url("user/$account->uid/edit", array('query' => drupal_get_destination(), 'fragment' => 'edit-timezone')))));
@@ -294,7 +290,7 @@ function hook_user_login(&$edit, $account) {
  * @param $account
  *   The user object on which the operation was just performed.
  */
-function hook_user_logout($account) {
+function hook_user_logout(User $account) {
   db_insert('logouts')
     ->fields(array(
       'uid' => $account->uid,
@@ -310,7 +306,7 @@ function hook_user_logout($account) {
  * $account->content array.
  *
  * @param $account
- *   The user object on which the operation is being performed.
+ *   The User object on which the operation is being performed.
  * @param $view_mode
  *   View mode, e.g. 'full'.
  * @param $langcode
@@ -319,7 +315,7 @@ function hook_user_logout($account) {
  * @see hook_user_view_alter()
  * @see hook_entity_view()
  */
-function hook_user_view($account, $view_mode, $langcode) {
+function hook_user_view(User $account, $view_mode, $langcode) {
   $account->content['user_picture'] = array(
     '#markup' => theme('user_picture', array('account' => $account)),
     '#weight' => -10,

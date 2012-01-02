@@ -270,12 +270,7 @@ function user_profile_form_submit($form, &$form_state) {
   $account_unchanged = clone $account;
 
   entity_form_submit_build_entity('user', $account, $form, $form_state);
-
-  // Populate $edit with the properties of $account, which have been edited on
-  // this form by taking over all values, which appear in the form values too.
-  $edit = array_intersect_key((array) $account, $form_state['values']);
-
-  user_save($account_unchanged, $edit);
+  user_save($account);
   $form_state['values']['uid'] = $account->uid;
 
   if (!empty($edit['pass'])) {
@@ -399,11 +394,9 @@ function user_cancel_confirm_form_submit($form, &$form_state) {
   else {
     // Store cancelling method and whether to notify the user in $account for
     // user_cancel_confirm().
-    $edit = array(
-      'user_cancel_method' => $form_state['values']['user_cancel_method'],
-      'user_cancel_notify' => $form_state['values']['user_cancel_notify'],
-    );
-    $account = user_save($account, $edit);
+    $account->user_cancel_method = $form_state['values']['user_cancel_method'];
+    $account->user_cancel_notify = $form_state['values']['user_cancel_notify'];
+    user_save($account);
     _user_mail_notify('cancel_confirm', $account);
     drupal_set_message(t('A confirmation request to cancel your account has been sent to your e-mail address.'));
     watchdog('user', 'Sent account cancellation request to %name %email.', array('%name' => $account->name, '%email' => '<' . $account->mail . '>'), WATCHDOG_NOTICE);

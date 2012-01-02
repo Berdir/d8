@@ -1532,16 +1532,15 @@ class UserSaveTestCase extends DrupalWebTestCase {
     $test_name = $this->randomName();
 
     // Create the base user, based on drupalCreateUser().
-    $user = array(
+    $user = entity_create('user', array(
       'name' => $test_name,
       'uid' => $test_uid,
       'mail' => $test_name . '@example.com',
       'is_new' => TRUE,
       'pass' => user_password(),
       'status' => 1,
-    );
-    $user_by_return = user_save(drupal_anonymous_user(), $user);
-    $this->assertTrue($user_by_return, t('Loading user by return of user_save().'));
+    ));
+    user_save($user);
 
     // Test if created user exists.
     $user_by_uid = user_load($test_uid);

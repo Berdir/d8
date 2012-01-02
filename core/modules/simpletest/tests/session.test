@@ -41,8 +41,8 @@ class SessionTestCase extends DrupalWebTestCase {
 
     // Verify that the session is regenerated if a module calls exit
     // in hook_user_login().
-    user_save($user, array('name' => 'session_test_user'));
     $user->name = 'session_test_user';
+    user_save($user);
     $this->drupalGet('session-test/id');
     $matches = array();
     preg_match('/\s*session_id:(.*)\n/', $this->drupalGetContent(), $matches);
@@ -455,7 +455,7 @@ class SessionHttpsTestCase extends DrupalWebTestCase {
       }
     }
 
-    // Test that session data saved before login is not available using the 
+    // Test that session data saved before login is not available using the
     // pre-login anonymous cookie.
     $this->cookies = array();
     $this->drupalGet('session-test/get', array('Cookie: ' . $anonymous_cookie));

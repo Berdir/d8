@@ -1381,7 +1381,7 @@ function comment_node_search_result($node) {
 /**
  * Implements hook_user_cancel().
  */
-function comment_user_cancel($edit, $account, $method) {
+function comment_user_cancel($edit, User $account, $method) {
   switch ($method) {
     case 'user_cancel_block_unpublish':
       $comments = comment_load_multiple(array(), array('uid' => $account->uid));
@@ -1404,7 +1404,7 @@ function comment_user_cancel($edit, $account, $method) {
 /**
  * Implements hook_user_predelete().
  */
-function comment_user_predelete($account) {
+function comment_user_predelete(User $account) {
   $cids = db_query('SELECT c.cid FROM {comment} c WHERE uid = :uid', array(':uid' => $account->uid))->fetchCol();
   comment_delete_multiple($cids);
 }

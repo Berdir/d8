@@ -1123,7 +1123,8 @@ class DrupalWebTestCase extends DrupalTestCase {
       $edit['roles'] = array($rid => $rid);
     }
 
-    $account = user_save(drupal_anonymous_user(), $edit);
+    $account = entity_create('user', $edit);
+    $account->save();
 
     $this->assertTrue(!empty($account->uid), t('User created with name %name and pass %pass', array('%name' => $edit['name'], '%pass' => $edit['pass'])), t('User login'));
     if (empty($account->uid)) {
@@ -1227,7 +1228,7 @@ class DrupalWebTestCase extends DrupalTestCase {
    *
    * @see drupalCreateUser()
    */
-  protected function drupalLogin(stdClass $user) {
+  protected function drupalLogin(User $user) {
     if ($this->loggedInUser) {
       $this->drupalLogout();
     }

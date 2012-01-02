@@ -366,5 +366,5 @@ function openid_test_openid_request_alter(&$request, $service) {
  */
 function openid_test_openid_response($response, $account) {
   variable_set('openid_test_hook_openid_response_response', $response);
-  variable_set('openid_test_hook_openid_response_account', $account ? $account : FALSE);
+  variable_set('openid_test_hook_openid_response_account', $account ? $account->uid : FALSE);
 }

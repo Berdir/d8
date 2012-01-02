@@ -463,39 +463,38 @@ function _trigger_normalize_user_context($type, $account) {
 /**
  * Implements hook_user_login().
  */
-function trigger_user_login(&$edit, $account) {
-  _trigger_user('user_login', $edit, $account);
+function trigger_user_login(&$form_state, User $account) {
+  _trigger_user('user_login', $account);
 }
 
 /**
  * Implements hook_user_logout().
  */
-function trigger_user_logout($account) {
-  $edit = array();
-  _trigger_user('user_logout', $edit, $account);
+function trigger_user_logout(User $account) {
+  _trigger_user('user_logout', $account);
 }
 
 /**
  * Implements hook_user_insert().
  */
-function trigger_user_insert(&$edit, $account) {
-  _trigger_user('user_insert', $edit, $account);
+function trigger_user_insert(User $account) {
+  _trigger_user('user_insert', $account);
 }
 
 /**
  * Implements hook_user_update().
  */
-function trigger_user_update(&$edit, $account) {
-  _trigger_user('user_update', $edit, $account);
+function trigger_user_update($account) {
+  _trigger_user('user_update', $account);
 }
 
 /**
  * Implements hook_user_cancel().
  */
-function trigger_user_cancel($edit, $account, $method) {
+function trigger_user_cancel($edit, User $account, $method) {
   switch ($method) {
     case 'user_cancel_reassign':
-      _trigger_user('user_delete', $edit, $account, $method);
+      _trigger_user('user_delete', $account, $method);
       break;
   }
 }
@@ -503,30 +502,27 @@ function trigger_user_cancel($edit, $account, $method) {
 /**
  * Implements hook_user_predelete().
  */
-function trigger_user_predelete($account) {
-  $edit = array();
-  _trigger_user('user_delete', $edit, $account);
+function trigger_user_predelete(User $account) {
+  _trigger_user('user_delete', $account);
 }
 
 /**
  * Implements hook_user_view().
  */
-function trigger_user_view($account) {
-  $edit = NULL;
-  _trigger_user('user_view', $edit, $account);
+function trigger_user_view(User $account) {
+  _trigger_user('user_view', $account);
 }
 
 /**
  * Calls action functions for user triggers.
  */
-function _trigger_user($hook, &$edit, $account, $method = NULL) {
+function _trigger_user($hook, $account, $method = NULL) {
   // Keep objects for reuse so that changes actions make to objects can persist.
   static $objects;
   $aids = trigger_get_assigned_actions($hook);
   $context = array(
     'group' => 'user',
     'hook' => $hook,
-    'form_values' => &$edit,
   );
   foreach ($aids as $aid => $info) {
     $type = $info['type'];

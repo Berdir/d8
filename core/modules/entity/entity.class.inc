@@ -163,7 +163,11 @@ class Entity implements EntityInterface {
    * Sets up the object instance on construction or unserialization.
    */
   protected function setUp() {
-    $this->entityInfo = entity_get_info($this->entityType);
+    // @todo: entity_get_info() is not yet defined if this function is called
+    // too early. This happens e.g. when saving entities with variable_set().
+    if (function_exists('entity_get_info')) {
+      $this->entityInfo = entity_get_info($this->entityType);
+    }
     $this->idKey = $this->entityInfo['entity keys']['id'];
     $this->bundleKey = isset($this->entityInfo['entity keys']['bundle']) ? $this->entityInfo['entity keys']['bundle'] : NULL;
   }

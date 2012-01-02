@@ -976,7 +976,7 @@ function poll_cancel($form, &$form_state) {
 /**
  * Implements hook_user_cancel().
  */
-function poll_user_cancel($edit, $account, $method) {
+function poll_user_cancel($edit, User $account, $method) {
   switch ($method) {
     case 'user_cancel_reassign':
       db_update('poll_vote')
@@ -990,7 +990,7 @@ function poll_user_cancel($edit, $account, $method) {
 /**
  * Implements hook_user_predelete().
  */
-function poll_user_predelete($account) {
+function poll_user_predelete(User $account) {
   db_delete('poll_vote')
     ->condition('uid', $account->uid)
     ->execute();

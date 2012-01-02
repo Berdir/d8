@@ -158,9 +158,9 @@ class OpenIDFunctionalTestCase extends OpenIDWebTestCase {
     $identity = url('openid-test/yadis/xrds', array('absolute' => TRUE));
     $this->addIdentity($identity);
     $response = variable_get('openid_test_hook_openid_response_response');
-    $account = variable_get('openid_test_hook_openid_response_account');
+    $account_uid = variable_get('openid_test_hook_openid_response_account');
     $this->assertEqual($response['openid.claimed_id'], $identity, t('hook_openid_response() was invoked.'));
-    $this->assertEqual($account->uid, $this->web_user->uid, t('Proper user object passed to hook_openid_response().'));
+    $this->assertEqual($account_uid, $this->web_user->uid, t('Proper user object passed to hook_openid_response().'));
 
     $this->drupalLogout();
 
@@ -170,9 +170,9 @@ class OpenIDFunctionalTestCase extends OpenIDWebTestCase {
     $this->submitLoginForm($identity);
     $this->assertLink(t('Log out'), 0, t('User was logged in.'));
     $response = variable_get('openid_test_hook_openid_response_response');
-    $account = variable_get('openid_test_hook_openid_response_account');
+    $account_uid = variable_get('openid_test_hook_openid_response_account');
     $this->assertEqual($response['openid.claimed_id'], $identity, t('hook_openid_response() was invoked.'));
-    $this->assertEqual($account->uid, $this->web_user->uid, t('Proper user object passed to hook_openid_response().'));
+    $this->assertEqual($account_uid, $this->web_user->uid, t('Proper user object passed to hook_openid_response().'));
 
     $this->drupalLogout();
 

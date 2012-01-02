@@ -228,6 +228,7 @@ function user_hash_password($password, $count_log2 = 0) {
  *   TRUE or FALSE.
  */
 function user_check_password($password, $account) {
+  debug($account->pass);
   if (substr($account->pass, 0, 2) == 'U$') {
     // This may be an updated password from user_update_7000(). Such hashes
     // have 'U' added as the first character and need an extra md5() (see the

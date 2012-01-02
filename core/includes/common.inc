@@ -2602,33 +2602,6 @@ function drupal_exit($destination = NULL) {
 }
 
 /**
- * Forms an associative array from a linear array.
- *
- * This function walks through the provided array and constructs an associative
- * array out of it. The keys of the resulting array will be the values of the
- * input array. The values will be the same as the keys unless a function is
- * specified, in which case the output of the function is used for the values
- * instead.
- *
- * @param $array
- *   A linear array.
- * @param $function
- *   A name of a function to apply to all values before output.
- *
- * @return
- *   An associative array.
- */
-function drupal_map_assoc($array, $function = NULL) {
-  // array_combine() fails with empty arrays:
-  // http://bugs.php.net/bug.php?id=34857.
-  $array = !empty($array) ? array_combine($array, $array) : array();
-  if (is_callable($function)) {
-    $array = array_map($function, $array);
-  }
-  return $array;
-}
-
-/**
  * Attempts to set the PHP maximum execution time.
  *
  * This function is a wrapper around the PHP function set_time_limit().
@@ -7008,6 +6981,12 @@ function drupal_write_record($table, &$record, $primary_keys = array()) {
   $object = (object) $record;
   $fields = array();
   $default_fields = array();
+
+  if (isset($object->picture)) {
+    //debug_print_backtrace();
+    //exit();
+  }
+
 
   // Go through the schema to determine fields to write.
   foreach ($schema['fields'] as $field => $info) {
