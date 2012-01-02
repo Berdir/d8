@@ -310,7 +310,7 @@ function hook_user_logout($account) {
  * $account->content array.
  *
  * @param $account
- *   The User object on which the operation is being performed.
+ *   The user object on which the operation is being performed.
  * @param $view_mode
  *   View mode, e.g. 'full'.
  * @param $langcode
