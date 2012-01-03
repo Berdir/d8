@@ -158,12 +158,12 @@ class UserController extends EntityDatabaseStorageController {
     // Add the full file objects for user pictures if enabled.
     if (!empty($picture_fids) && variable_get('user_pictures', 1) == 1) {
       $pictures = file_load_multiple($picture_fids);
-      foreach ($queried_users as $account) {
-        if (!empty($account->picture) && isset($pictures[$account->picture])) {
-          $account->picture = $pictures[$account->picture];
+      foreach ($queried_users as $entity) {
+        if (!empty($entity->picture) && isset($pictures[$entity->picture])) {
+          $entity->picture = $pictures[$entity->picture];
         }
         else {
-          $account->picture = NULL;
+          $entity->picture = NULL;
         }
       }
     }
@@ -242,7 +242,7 @@ class UserController extends EntityDatabaseStorageController {
       }
 
       // Remove not enabled roles.
-      $account->roles = array_filter($account->roles);
+      $entity->roles = array_filter($entity->roles);
 
       // Reload user roles if provided.
       if ($entity->roles != $entity->original->roles) {
@@ -280,7 +280,7 @@ class UserController extends EntityDatabaseStorageController {
         $entity->created = REQUEST_TIME;
       }
 
-      // Make sure $account is properly initialized.
+      // Make sure $entity is properly initialized.
       $entity->roles[DRUPAL_AUTHENTICATED_RID] = 'authenticated user';
 
       // Save user roles.
