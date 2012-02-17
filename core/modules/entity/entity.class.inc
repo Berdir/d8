@@ -174,6 +174,13 @@ interface EntityInterface {
 class Entity implements EntityInterface {
 
   /**
+   * The language code of the entity's default language.
+   *
+   * @var string
+   */
+  public $langcode = LANGUAGE_NONE;
+
+  /**
    * The entity type.
    *
    * @var string
@@ -219,7 +226,7 @@ class Entity implements EntityInterface {
   protected function setUp() {
     $this->entityInfo = entity_get_info($this->entityType);
     $this->idKey = $this->entityInfo['entity keys']['id'];
-    $this->bundleKey = isset($this->entityInfo['entity keys']['bundle']) ? $this->entityInfo['entity keys']['bundle'] : NULL;
+    $this->bundleKey = !empty($this->entityInfo['entity keys']['bundle']) ? $this->entityInfo['entity keys']['bundle'] : NULL;
   }
 
   /**
@@ -304,7 +311,7 @@ class Entity implements EntityInterface {
   public function language() {
     // @todo: Check for language.module instead, once field API language
     // handling depends upon it too.
-    if (module_exists('locale') && isset($this->langcode) && $this->langcode != LANGUAGE_NONE) {
+    if (module_exists('locale') && $this->langcode != LANGUAGE_NONE) {
       return language_load($this->langcode);
     }
   }
@@ -319,14 +326,14 @@ class Entity implements EntityInterface {
       // which translated values are available.
       foreach (field_info_instances($this->entityType, $this->bundle()) as $field_name => $instance) {
         $field = field_info_field($field_name);
-        if (field_is_translatable($this->entity_type, $field) && isset($this->$field_name)) {
+        if (field_is_translatable($this->entityType, $field) && isset($this->$field_name)) {
           foreach ($this->$field_name as $langcode => $value)  {
             $languages[$langcode] = TRUE;
           }
         }
       }
       // Remove the default language from the translations.
-      unset($languages[$default_language->language]);
+      unset($languages[$default_language->langcode]);
       $languages = array_intersect_key(language_list(), $languages);
     }
     return $languages;
@@ -338,14 +345,14 @@ class Entity implements EntityInterface {
   public function get($property_name, $langcode = NULL) {
     // Handle fields.
     if (field_info_instance($this->entityType, $property_name, $this->bundle())) {
-      $field = field_info_field($field_name);
+      $field = field_info_field($property_name);
       $langcode = $this->getFieldLangcode($field, $langcode);
-      return isset($this->$property_name[$langcode]) ? $this->$property_name[$langcode] : NULL;
+      return isset($this->{$property_name}[$langcode]) ? $this->{$property_name}[$langcode] : NULL;
     }
     else {
       // Handle properties being not fields.
       // @todo: Add support for translatable properties being not fields.
-      return isset($this->$property_name) ? $this->$property_name : NULL;
+      return isset($this->{$property_name}) ? $this->{$property_name} : NULL;
     }
   }
 
@@ -355,14 +362,14 @@ class Entity implements EntityInterface {
   public function set($property_name, $value, $langcode = NULL) {
     // Handle fields.
     if (field_info_instance($this->entityType, $property_name, $this->bundle())) {
-      $field = field_info_field($field_name);
+      $field = field_info_field($property_name);
       $langcode = $this->getFieldLangcode($field, $langcode);
-      $this->$property_name[$langcode] = $value;
+      $this->{$property_name}[$langcode] = $value;
     }
     else {
       // Handle properties being not fields.
       // @todo: Add support for translatable properties being not fields.
-      $this->$property_name = $value;
+      $this->{$property_name} = $value;
     }
   }
 
@@ -370,7 +377,7 @@ class Entity implements EntityInterface {
    * Determines the language code to use for a field.
    */
   protected function getFieldLangcode($field, $langcode = NULL) {
-    if (field_is_translatable($this->entity_type, $field) && ($default_language = $this->language())) {
+    if (field_is_translatable($this->entityType, $field) && ($default_language = $this->language())) {
       return isset($langcode) ? $langcode : $default_language->langcode;
     }
     else {
