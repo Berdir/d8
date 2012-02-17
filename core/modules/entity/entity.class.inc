@@ -338,15 +338,8 @@ class Entity implements EntityInterface {
   public function get($property_name, $langcode = NULL) {
     // Handle fields.
     if (field_info_instance($this->entityType, $property_name, $this->bundle())) {
-      $field = field_info_field($property_name);
-      $default_language = $this->language();
-      if ($default_language && field_is_translatable($this->entity_type, $field)) {
-        $langcode = isset($langcode) ? $langcode : $default_language->langcode;
-      }
-      else {
-        // Non-translatable fields always use LANGUAGE_NONE as language code.
-        $langcode = LANGUAGE_NONE;
-      }
+      $field = field_info_field($field_name);
+      $langcode = $this->getFieldLangcode($field, $langcode);
       return isset($this->$property_name[$langcode]) ? $this->$property_name[$langcode] : NULL;
     }
     else {
@@ -362,21 +355,27 @@ class Entity implements EntityInterface {
   public function set($property_name, $value, $langcode = NULL) {
     // Handle fields.
     if (field_info_instance($this->entityType, $property_name, $this->bundle())) {
-      $field = field_info_field($property_name);
-      $default_language = $this->language();
-      if ($default_language && field_is_translatable($this->entity_type, $field)) {
-        $langcode = isset($langcode) ? $langcode : $default_language->langcode;
-      }
-      else {
-        // Non-translatable fields always use LANGUAGE_NONE as language code.
-        $langcode = LANGUAGE_NONE;
-      }
+      $field = field_info_field($field_name);
+      $langcode = $this->getFieldLangcode($field, $langcode);
       $this->$property_name[$langcode] = $value;
     }
     else {
       // Handle properties being not fields.
       // @todo: Add support for translatable properties being not fields.
       $this->$property_name = $value;
+    }
+  }
+
+  /**
+   * Determines the language code to use for a field.
+   */
+  protected function getFieldLangcode($field, $langcode = NULL) {
+    if (field_is_translatable($this->entity_type, $field) && ($default_language = $this->language())) {
+      return isset($langcode) ? $langcode : $default_language->langcode;
+    }
+    else {
+      // Non-translatable fields always use LANGUAGE_NONE as language code.
+      return LANGUAGE_NONE;
     }
   }
 
