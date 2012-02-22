@@ -415,9 +415,17 @@ class DatabaseSchema_pgsql extends DatabaseSchema {
   }
 
   public function indexExists($table, $name) {
-    // Details http://www.postgresql.org/docs/8.3/interactive/view-pg-indexes.html
-    $index_name = '{' . $table . '}_' . $name . '_idx';
-    return (bool) $this->connection->query("SELECT 1 FROM pg_indexes WHERE indexname = '$index_name'")->fetchField();
+    if ($name == 'PRIMARY') {
+      // Add compatibility with MySQL's ability to look up the primary key.
+      // The PK is not stored as an index but as a constraint.
+      $pkey = '{' . $table . '}_pkey';
+      return (bool) db_query("SELECT 1 FROM pg_constraint WHERE conname = '$pkey' AND contype = 'p'")->fetchField();
+    }
+    else {
+      // Details http://www.postgresql.org/docs/8.3/interactive/view-pg-indexes.html
+      $index_name = '{' . $table . '}_' . $name . '_idx';
+      return (bool) $this->connection->query("SELECT 1 FROM pg_indexes WHERE indexname = '$index_name'")->fetchField();
+    }
   }
 
   /**

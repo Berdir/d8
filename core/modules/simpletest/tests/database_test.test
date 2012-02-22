@@ -2791,6 +2791,9 @@ class DatabaseRegressionTestCase extends DatabaseTestCase {
   function testDBIndexExists() {
     $this->assertIdentical(TRUE, db_index_exists('node', 'node_created'), t('Returns true for existent index.'));
     $this->assertIdentical(FALSE, db_index_exists('node', 'nosuchindex'), t('Returns false for nonexistent index.'));
+
+    //  Test db_index_exists() with PRIMARY.
+    $this->assertIdentical(TRUE, db_index_exists('node', 'PRIMARY'), t('Returns true for existing primary key.'));
   }
 }
 
