@@ -48,6 +48,10 @@ class Cookie
             throw new \InvalidArgumentException(sprintf('The cookie name "%s" contains invalid characters.', $name));
         }
 
+        if (preg_match("/[,; \t\r\n\013\014]/", $value)) {
+            throw new \InvalidArgumentException(sprintf('The cookie value "%s" contains invalid characters.', $value));
+        }
+
         if (empty($name)) {
             throw new \InvalidArgumentException('The cookie name cannot be empty.');
         }

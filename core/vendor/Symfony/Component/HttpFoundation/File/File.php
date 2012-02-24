@@ -428,7 +428,6 @@ class File extends \SplFileInfo
         'video/vnd.sealedmedia.softseal.mov' => 'smov',
         'video/vnd.vivo' => 'vivo',
         'video/x-fli' => 'fli',
-        'video/x-flv' => 'flv',
         'video/x-ms-asf' => 'asf',
         'video/x-ms-wmv' => 'wmv',
         'video/x-msvideo' => 'avi',
@@ -446,16 +445,15 @@ class File extends \SplFileInfo
     /**
      * Constructs a new file from the given path.
      *
-     * @param string  $path      The path to the file
-     * @param Boolean $checkPath Whether to check the path or not
+     * @param string $path The path to the file
      *
      * @throws FileNotFoundException If the given path is not a file
      *
      * @api
      */
-    public function __construct($path, $checkPath = true)
+    public function __construct($path)
     {
-        if ($checkPath && !is_file($path)) {
+        if (!is_file($path)) {
             throw new FileNotFoundException($path);
         }
 
