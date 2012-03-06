@@ -73,14 +73,6 @@ class Comment extends Entity {
    */
   public $homepage;
 
-  /**
-   * Overriddes Entity::language().
-   */
-  public function language() {
-    if (module_exists('locale') && $this->language != LANGUAGE_NONE) {
-      return language_load($this->language);
-    }
-  }
 }
 
 /**
