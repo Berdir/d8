@@ -147,7 +147,7 @@ class EntityTranslationTestCase extends DrupalWebTestCase {
       'name' => 'test',
       'uid' => $GLOBALS['user']->uid,
     ));
-    $this->assertNull($entity->language(), 'No entity language has been specified.');
+    $this->assertFalse($entity->language(), 'No entity language has been specified.');
     $this->assertFalse($entity->translations(), 'No translations are available');
 
     // Set the value in default language.
