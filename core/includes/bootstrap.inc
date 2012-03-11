@@ -2140,6 +2140,10 @@ function _drupal_bootstrap_configuration() {
     // All Symfony-borrowed code lives in /core/vendor/Symfony.
     'Symfony' => DRUPAL_ROOT . '/core/vendor',
   ));
+  $loader->registerPrefixes(array(
+    // All PEAR-borrowed code lives in /core/vendor/PEAR.
+    'Archive_Tar' => DRUPAL_ROOT . '/core/vendor/PEAR',
+  ));
   // Register the Drupal namespace for classes in core as a fallback.
   // This allows to register additional namespaces within the Drupal namespace
   // (e.g., for modules) and avoids an additional file_exists() on the Drupal
