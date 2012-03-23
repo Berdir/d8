@@ -161,6 +161,10 @@ abstract class LocalStream implements StreamWrapperInterface {
     if (!isset($uri)) {
       $uri = $this->uri;
     }
+
+    // URI can be url encoded, decode to be sure that it's a valid path.
+    $uri = rawurldecode($uri);
+
     $path = $this->getDirectoryPath() . '/' . $this->getTarget($uri);
     $realpath = realpath($path);
     if (!$realpath) {

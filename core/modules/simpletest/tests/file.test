@@ -2774,4 +2774,16 @@ class StreamWrapperTest extends DrupalWebTestCase {
     $this->assertTrue(file_stream_wrapper_valid_scheme(file_uri_scheme('public://asdf')), t('Got a valid stream scheme from public://asdf'));
     $this->assertFalse(file_stream_wrapper_valid_scheme(file_uri_scheme('foo://asdf')), t('Did not get a valid stream scheme from foo://asdf'));
   }
+
+  /**
+   * Verifies that both encoded and non-encoded URIs are accepted.
+   */
+  function testValidURIs() {
+    // Create a file with spaces.
+    $content = $this->randomString();
+    file_put_contents('public://file with space.txt', $content);
+
+    // Read the file using an encoded path.
+    $this->assertEqual($content, file_get_contents('public://' . rawurlencode('file with space.txt')), 'Encoded file was accepted.');
+  }
 }
