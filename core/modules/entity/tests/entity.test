@@ -157,7 +157,7 @@ class EntityTranslationTestCase extends DrupalWebTestCase {
     $this->assertEqual($value, array(0 => array('value' => 'default value')), 'Untranslated value retrieved.');
 
     // Set the value in a certain language. As the entity is not translatable it
-    // should use the default language.
+    // should use the default language and so ignore the specified language.
     $entity->set($this->field_name, array(0 => array('value' => 'default value2')), $this->langcodes[1]);
     $value = $entity->get($this->field_name);
     $this->assertEqual($value, array(0 => array('value' => 'default value2')), 'Untranslated value updated.');

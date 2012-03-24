@@ -76,9 +76,12 @@ interface EntityInterface {
   /**
    * Returns the language code associated with the entity.
    *
+   * The language code of the entity either refers to a language or to one of
+   * the system language constants, e.g. LANGUAGE_NOT_SPECIFIED,
+   * LANGUAGE_NOT_APPLICABLE or LANGUAGE_MULTIPLE.
+   *
    * @return
-   *   A valid language code, e.g. LANGUAGE_NOT_SPECIFIED,
-   *   LANGUAGE_NOT_APPLICABLE, 'en' or 'de'.
+   *   A valid language code.
    */
   public function languageCode();
 
@@ -86,8 +89,8 @@ interface EntityInterface {
    * Returns the default language of the entity.
    *
    * @return
-   *   The language object of the entity's default language, or FALSE if the
-   *   entity has no certain default language.
+   *   The language object of the entity's default language, or FALSE if no
+   *   valid language is assigned.
    *
    * @see EntityInterface::translations()
    * @see EntityInterface::languageCode()
@@ -392,6 +395,8 @@ class Entity implements EntityInterface {
    * Determines the language code to use for a field.
    */
   protected function getFieldLangcode($field, $langcode = NULL) {
+    // Only apply the langcode if the entity is language specific, thus has a
+    // language assigned.
     if (field_is_translatable($this->entityType, $field) && ($default_language = $this->language())) {
       return isset($langcode) ? $langcode : $default_language->langcode;
     }
