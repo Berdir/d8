@@ -82,7 +82,7 @@ class ShortcutTestCase extends DrupalWebTestCase {
 
   /**
    * Extracts information from shortcut set links.
-   * 
+   *
    * @param object $set
    *   The shortcut set object to extract information from.
    * @param string $key
@@ -326,7 +326,7 @@ class ShortcutSetsTestCase extends ShortcutTestCase {
    */
   function testShortcutSetRename() {
     $set = $this->set;
-    
+
     $new_title = $this->randomName(10);
     $this->drupalPost('admin/config/user-interface/shortcut/' . $set->set_name . '/edit', array('title' => $new_title), t('Save'));
     $set = shortcut_set_load($set->set_name);
@@ -367,13 +367,5 @@ class ShortcutSetsTestCase extends ShortcutTestCase {
     $this->drupalPost('admin/config/user-interface/shortcut/' . $new_set->set_name . '/delete', array(), t('Delete'));
     $sets = shortcut_sets();
     $this->assertFalse(isset($sets[$new_set->set_name]), 'Successfully deleted a shortcut set.');
-  }
-
-  /**
-   * Tests deleting the default shortcut set.
-   */
-  function testShortcutSetDeleteDefault() {
-    $this->drupalGet('admin/config/user-interface/shortcut/' . SHORTCUT_DEFAULT_SET_NAME . '/delete');
-    $this->assertResponse(403);
   }
 }
