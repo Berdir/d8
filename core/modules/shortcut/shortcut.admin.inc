@@ -669,7 +669,7 @@ function shortcut_set_delete_form($form, &$form_state, $shortcut_set) {
 
   // Find out how many users are directly assigned to this shortcut set, and
   // make a message.
-  $number = db_query('SELECT COUNT(*) FROM {shortcut_set_users} WHERE set_name = :name', array(':name' => $shortcut_set->set_name))->fetchField();
+  $number = isset($shortcut_set->uids) ? count($shortcut_set->uids) : 0;
   $info = '';
   if ($number) {
     $info .= '<p>' . format_plural($number,

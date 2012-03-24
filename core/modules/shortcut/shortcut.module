@@ -416,8 +416,12 @@ function shortcut_set_assign_user($shortcut_set, $account) {
  *   A user account that will be removed from the shortcut set assignment.
  */
 function shortcut_set_unassign_user($account) {
-  unset($shortcut_set->uids['uid_' . $account->uid]);
-  shortcut_set_save($shortcut_set);
+  foreach (shortcut_sets() as $shortcut_set) {
+    if (isset($shortcut_set->uids['uid_' . $account->uid])) {
+      unset($shortcut_set->uids['uid_' . $account->uid]);
+      shortcut_set_save($shortcut_set);
+    }
+  }
   drupal_static_reset('shortcut_current_displayed_set');
 }
 
