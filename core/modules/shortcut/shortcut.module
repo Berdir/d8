@@ -223,6 +223,7 @@ function shortcut_set_edit_access($shortcut_set = NULL) {
   if (user_access('administer shortcuts')) {
     return TRUE;
   }
+
   if (user_access('customize shortcut links')) {
     return !isset($shortcut_set) || $shortcut_set == shortcut_current_displayed_set();
   }
@@ -236,21 +237,12 @@ function shortcut_set_edit_access($shortcut_set = NULL) {
  *   The shortcut set to be deleted.
  *
  * @return
- *   TRUE if the current user has access to delete shortcut sets and this is
- *   not the site-wide default set; FALSE otherwise.
+ *   TRUE if the current user has access to delete shortcut sets, FALSE
+ *   otherwise.
  */
 function shortcut_set_delete_access($shortcut_set) {
   // Only admins can delete sets.
-  if (!user_access('administer shortcuts')) {
-    return FALSE;
-  }
-
-  // Never let the default shortcut set be deleted.
-  if ($shortcut_set->set_name == SHORTCUT_DEFAULT_SET_NAME) {
-    return FALSE;
-  }
-
-  return TRUE;
+  return user_access('administer shortcuts');
 }
 
 /**
@@ -313,14 +305,11 @@ function shortcut_link_access($menu_link) {
  *   If the shortcut set does not exist, the function returns FALSE.
  */
 function shortcut_set_load($set_name) {
-  $set = db_select('shortcut_set', 'ss')
-  ->fields('ss')
-  ->condition('set_name', $set_name)
-  ->execute()
-  ->fetchObject();
+  $set = config('shortcut.sets')->get($set_name);
   if (!$set) {
     return FALSE;
   }
+  $set = (object)$set;
   $set->links = menu_load_links($set_name);
   return $set;
 }
@@ -342,21 +331,18 @@ function shortcut_set_load($set_name) {
  *     - 'link_title': The title of the link.
  *     Any other keys accepted by menu_link_save() may also be provided.
  *
- * @return
- *   A constant which is either SAVED_NEW or SAVED_UPDATED depending on whether
- *   a new set was created or an existing one was updated.
- *
  * @see menu_link_save()
  */
-function shortcut_set_save(&$shortcut_set) {
+function shortcut_set_save($shortcut_set) {
   // First save the shortcut set itself.
-  if (isset($shortcut_set->set_name)) {
-    $return = drupal_write_record('shortcut_set', $shortcut_set, 'set_name');
-  }
-  else {
+  if (!isset($shortcut_set->set_name)) {
     $shortcut_set->set_name = shortcut_set_get_unique_name();
-    $return = drupal_write_record('shortcut_set', $shortcut_set);
   }
+  $config = config('shortcut.sets');
+  $set_without_links = (array)$shortcut_set;
+  unset($set_without_links['links']);
+  $config->set($shortcut_set->set_name, $set_without_links);
+  $config->save();
   // If links were provided for the set, save them.
   if (isset($shortcut_set->links)) {
     foreach ($shortcut_set->links as &$link) {
@@ -367,48 +353,23 @@ function shortcut_set_save(&$shortcut_set) {
       $link['plid'] = 0;
       menu_link_save($link);
     }
-    // Make sure that we have a return value, since if the links were updated
-    // but the shortcut set was not, the call to drupal_write_record() above
-    // would not return an indication that anything had changed.
-    if (empty($return)) {
-      $return = SAVED_UPDATED;
-    }
   }
-  return $return;
 }
 
 /**
  * Deletes a shortcut set.
  *
- * Note that the default set cannot be deleted.
- *
  * @param $shortcut_set
  *   An object representing the shortcut set to delete.
- *
- * @return
- *   TRUE if the set was deleted, FALSE otherwise.
  */
 function shortcut_set_delete($shortcut_set) {
-  // Don't allow deletion of the system default shortcut set.
-  if ($shortcut_set->set_name == SHORTCUT_DEFAULT_SET_NAME) {
-    return FALSE;
-  }
-
-  // First, delete any user assignments for this set, so that each of these
-  // users will go back to using whatever default set applies.
-  db_delete('shortcut_set_users')
-    ->condition('set_name', $shortcut_set->set_name)
-    ->execute();
-
-  // Next, delete the menu links for this set.
+  // Delete the menu links for this set.
   menu_delete_links($shortcut_set->set_name);
 
-  // Finally, delete the set itself.
-  $deleted = db_delete('shortcut_set')
-    ->condition('set_name', $shortcut_set->set_name)
-    ->execute();
-
-  return (bool) $deleted;
+  // Then delete the set itself.
+  $config = config('shortcut.sets');
+  $config->clear($shortcut_set->set_name);
+  $config->save();
 }
 
 /**
@@ -418,15 +379,17 @@ function shortcut_set_delete($shortcut_set) {
  * the set. If the link is added to the end of the array and this function is
  * called, it will force that link to display at the end of the list.
  *
- * @param object $shortcut_set
+ * @param $shortcut_set
  *   An object representing a shortcut set. The link weights of the passed-in
  *   object will be reset as described above.
  */
-function shortcut_set_reset_link_weights(&$shortcut_set) {
+function shortcut_set_reset_link_weights($shortcut_set) {
   $weight = -50;
-  foreach ($shortcut_set->links as &$link) {
-    $link['weight'] = $weight;
-    $weight++;
+  if ($shortcut_set) {
+    foreach ($shortcut_set->links as &$link) {
+      $link['weight'] = $weight;
+      $weight++;
+    }
   }
 }
 
@@ -439,10 +402,8 @@ function shortcut_set_reset_link_weights(&$shortcut_set) {
  *   A user account that will be assigned to use the set.
  */
 function shortcut_set_assign_user($shortcut_set, $account) {
-  db_merge('shortcut_set_users')
-    ->key(array('uid' => $account->uid))
-    ->fields(array('set_name' => $shortcut_set->set_name))
-    ->execute();
+  $shortcut_set->uids['uid_' . $account->uid] = $account->uid;
+  shortcut_set_save($shortcut_set);
   drupal_static_reset('shortcut_current_displayed_set');
 }
 
@@ -453,17 +414,11 @@ function shortcut_set_assign_user($shortcut_set, $account) {
  *
  * @param $account
  *   A user account that will be removed from the shortcut set assignment.
- *
- * @return
- *   TRUE if the user was previously assigned to a shortcut set and has been
- *   successfully removed from it. FALSE if the user was already not assigned
- *   to any set.
  */
 function shortcut_set_unassign_user($account) {
-  $deleted = db_delete('shortcut_set_users')
-    ->condition('uid', $account->uid)
-    ->execute();
-  return (bool) $deleted;
+  unset($shortcut_set->uids['uid_' . $account->uid]);
+  shortcut_set_save($shortcut_set);
+  drupal_static_reset('shortcut_current_displayed_set');
 }
 
 /**
@@ -490,16 +445,13 @@ function shortcut_current_displayed_set($account = NULL) {
   }
   // If none was found, try to find a shortcut set that is explicitly assigned
   // to this user.
-  $query = db_select('shortcut_set', 's');
-  $query->addField('s', 'set_name');
-  $query->join('shortcut_set_users', 'u', 's.set_name = u.set_name');
-  $query->condition('u.uid', $account->uid);
-  $shortcut_set_name = $query->execute()->fetchField();
-  if ($shortcut_set_name) {
-    $shortcut_set = shortcut_set_load($shortcut_set_name);
+  foreach (shortcut_sets() as $set) {
+    if (isset($set->uids['uid_' . $account->uid])) {
+      $shortcut_set = shortcut_set_load($set->set_name);
+    }
   }
   // Otherwise, use the default set.
-  else {
+  if (empty($shortcut_set)) {
     $shortcut_set = shortcut_default_set($account);
   }
 
@@ -548,7 +500,8 @@ function shortcut_set_get_unique_name() {
   // equal to one more than the current number of shortcut sets, so that if
   // no shortcut sets have been deleted from the database, this will
   // automatically give us the correct one.
-  $number = db_query("SELECT COUNT(*) FROM {shortcut_set}")->fetchField() + 1;
+  $config = config('shortcut.sets');
+  $number = count($config->get()) + 1;
   do {
     $name = shortcut_set_name($number);
     $number++;
@@ -581,10 +534,11 @@ function shortcut_set_name($number) {
  *   of menu links that belong to the set.
  */
 function shortcut_sets() {
-  return db_select('shortcut_set', 'ss')
-  ->fields('ss')
-  ->execute()
-  ->fetchAllAssoc('set_name');
+  $sets = array();
+  foreach(config('shortcut.sets')->get() as $set) {
+    $sets[$set['set_name']] = (object)$set;
+  }
+  return $sets;
 }
 
 /**
@@ -597,7 +551,12 @@ function shortcut_sets() {
  *   TRUE if a shortcut set with that title exists; FALSE otherwise.
  */
 function shortcut_set_title_exists($title) {
-  return (bool) db_query_range('SELECT 1 FROM {shortcut_set} WHERE title = :title', 0, 1, array(':title' => $title))->fetchField();
+  foreach (config('shortcut.sets')->get() as $set) {
+    if ($set['title'] == $title) {
+      return TRUE;
+    }
+  }
+  return FALSE;
 }
 
 /**
@@ -636,7 +595,9 @@ function shortcut_renderable_links($shortcut_set = NULL) {
   if (!isset($shortcut_set)) {
     $shortcut_set = shortcut_current_displayed_set();
   }
-  return menu_tree($shortcut_set->set_name);
+  if ($shortcut_set) {
+    return menu_tree($shortcut_set->set_name);
+  }
 }
 
 /**
@@ -669,6 +630,9 @@ function shortcut_preprocess_page(&$variables) {
     $query += drupal_get_destination();
 
     $shortcut_set = shortcut_current_displayed_set();
+    if (!$shortcut_set) {
+      return;
+    }
 
     // Check if $link is already a shortcut and set $link_mode accordingly.
     foreach ($shortcut_set->links as $shortcut) {
@@ -725,7 +689,7 @@ function shortcut_toolbar_pre_render($toolbar) {
   $links['#suffix'] = '</div>';
   $shortcut_set = shortcut_current_displayed_set();
   $configure_link = NULL;
-  if (shortcut_set_edit_access($shortcut_set)) {
+  if ($shortcut_set && shortcut_set_edit_access($shortcut_set)) {
     $configure_link = array(
       '#type' => 'link',
       '#title' => t('Edit shortcuts'),
