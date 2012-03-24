@@ -175,7 +175,7 @@ function node_form($form, &$form_state, $node) {
   // @todo D8: Remove. Modules should access the node using $form_state['node'].
   $form['#node'] = $node;
 
-  if (variable_get('node_type_language_' . $node->type, 0) && module_exists('language')) {
+  if (module_exists('language')) {
     $languages = language_list(TRUE);
     $language_options = array();
     foreach ($languages as $langcode => $language) {

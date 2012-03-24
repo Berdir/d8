@@ -1,0 +1,35 @@
+diff a/core/modules/node/node.pages.inc b/core/modules/node/node.pages.inc	(rejected hunks)
+@@ -81,7 +81,12 @@ function node_add($type) {
+   global $user;
+ 
+   $types = node_type_get_types();
+-  $node = (object) array('uid' => $user->uid, 'name' => (isset($user->name) ? $user->name : ''), 'type' => $type, 'langcode' => LANGUAGE_NONE);
++  $node = (object) array(
++    'uid' => $user->uid,
++    'name' => (isset($user->name) ? $user->name : ''),
++    'type' => $type,
++    'langcode' => node_type_get_default_langcode($type)
++  );
+   drupal_set_title(t('Create @name', array('@name' => $types[$type]->name)), PASS_THROUGH);
+   $output = drupal_get_form($type . '_node_form', $node);
+ 
+@@ -187,14 +192,16 @@ function node_form($form, &$form_state, $node) {
+       '#default_value' => (isset($node->langcode) ? $node->langcode : ''),
+       '#options' => $language_options,
+       '#empty_value' => LANGUAGE_NONE,
++      '#disabled' => !variable_get('node_type_language_selectable_' . $node->type, 0),
+     );
+   }
+   else {
+     $form['langcode'] = array(
+       '#type' => 'value',
+-      // New nodes without multilingual support get the default language, old
+-      // nodes keep their language if language.module is not available.
+-      '#value' => !isset($form['#node']->nid) ? language_default()->langcode : $node->langcode,
++      // New nodes without multilingual support get the default language of the
++      // content type (for new nodes already set in node_add), old nodes keep
++      // their language if language.module is not available.
++      '#value' => $node->langcode,
+     );
+   }
+ 

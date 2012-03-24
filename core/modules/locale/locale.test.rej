@@ -1,0 +1,19 @@
+diff a/core/modules/locale/locale.test b/core/modules/locale/locale.test	(rejected hunks)
+@@ -2567,7 +2567,7 @@ class LocaleMultilingualFieldsFunctionalTest extends DrupalWebTestCase {
+    */
+   function testMultilingualNodeForm() {
+     // Create "Basic page" content.
+-    $langcode = LANGUAGE_NONE;
++    $langcode = node_type_get_default_langcode('page');
+     $title_key = "title";
+     $title_value = $this->randomName(8);
+     $body_key = "body[$langcode][0][value]";
+@@ -2616,7 +2615,7 @@ class LocaleMultilingualFieldsFunctionalTest extends DrupalWebTestCase {
+    */
+   function testMultilingualDisplaySettings() {
+     // Create "Basic page" content.
+-    $langcode = LANGUAGE_NONE;
++    $langcode = node_type_get_default_langcode('page');
+     $title_key = "title";
+     $title_value = $this->randomName(8);
+     $body_key = "body[$langcode][0][value]";

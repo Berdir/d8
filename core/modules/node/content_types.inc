@@ -186,11 +186,48 @@ function node_type_form($form, &$form_state, $type = NULL) {
     '#description' => t('Users with the <em>Administer content</em> permission will be able to override these options.'),
   );
   if (module_exists('language')) {
-    $form['workflow']['node_type_language'] = array(
-      '#type' => 'checkbox',
-      '#title' => t('Multilingual support'),
-      '#default_value' => variable_get('node_type_language_' . $type->type, 0),
-      '#description' => t('Add a language selection field to the editing form, allowing you to select from one of the <a href="!languages">enabled languages</a>. If disabled, new posts are saved with the default language. Existing content will not be affected by changing this option.', array('!languages' => url('admin/config/regional/language'))),
+    $languages = language_list();
+    $grouped_languages = array();
+    foreach ($languages as $langcode => $language) {
+      $grouped_languages[(int) $language->enabled][$langcode] = $language;
+    }
+    $groups = array(t('Disabled'), t('Enabled'));
+    $defaults = array(
+      LANGUAGE_NONE => t('- None -'),
+      'site_default' => t("Site's default"),
+      'current' => t('Current language'),
+      'user_default' => t("User's default"),
+    );
+    $lang_options = array('Special options' => $defaults);
+    foreach (array(1, 0) as $status) {
+      if (isset($grouped_languages[$status])) {
+        $group = $groups[$status];
+        foreach ($grouped_languages[$status] as $langcode => $language) {
+          $lang_options[$group][$langcode] = $language->name;
+        }
+      }
+    }
+    $form['language'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Language settings'),
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+      '#group' => 'additional_settings',
+    );
+    $form['language']['node_type_language_default'] = array(
+      '#type' => 'select',
+      '#title' => t('Default language'),
+      '#options' => $lang_options,
+      '#default_value' => variable_get('node_type_language_default_' . $type->type, 'site_default'),
+    );
+    $form['language']['node_type_language_selectable'] = array(
+      '#type' => 'radios',
+      '#title' => t('Language selection on node edit form'),
+      '#options' => array(
+        0 => t('Locked'),
+        1 => t('Selectable'),
+      ),
+      '#default_value' => variable_get('node_type_language_selectable_' . $type->type, 0),
     );
   }
   $form['display'] = array(

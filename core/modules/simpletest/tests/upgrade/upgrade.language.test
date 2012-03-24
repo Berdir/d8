@@ -77,7 +77,7 @@ class LanguageUpgradePathTestCase extends UpgradePathTestCase {
     $this->drupalGet('node/add/article');
     $this->assertFieldByName('langcode');
     $this->drupalGet('node/add/page');
-    $this->assertNoFieldByName('langcode');
+    $this->assertFieldByName('langcode');
 
     // Check that the user language value was retained in both langcode and
     // preferred_langcode.

@@ -1,0 +1,10 @@
+diff a/core/modules/translation/translation.module b/core/modules/translation/translation.module	(rejected hunks)
+@@ -476,7 +473,7 @@ function translation_node_get_translations($tnid) {
+  *   Boolean value.
+  */
+ function translation_supported_type($type) {
+-  return variable_get('node_type_language_' . $type, 0) == TRANSLATION_ENABLED;
++  return variable_get('node_type_language_selectable_' . $type, 0) == TRANSLATION_ENABLED;
+ }
+ 
+ /**

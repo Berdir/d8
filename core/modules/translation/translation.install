@@ -1,0 +1,21 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the translation module.
+ */
+
+/**
+ * Implements hook_uninstall().
+ */
+function translation_uninstall() {
+  // Update node type language selectable variables, set to 'Selectable' from
+  // 'Selectable with translation support'.
+  $types = db_query('SELECT type FROM {node_type}')->fetchCol();
+  foreach ($types as $type) {
+    $translatable = variable_get('node_type_language_selectable_' . $type, 0);
+    if ($translatable == TRANSLATION_ENABLED) {
+      variable_set('node_type_language_selectable_' . $type, 1);
+    }
+  }
+}

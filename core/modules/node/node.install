@@ -458,7 +458,8 @@ function node_uninstall() {
         ->condition('name', 'node_options_' . $type)
         ->condition('name', 'node_submitted_' . $type)
         ->condition('name', 'node_permissions_' . $type)
-        ->condition('name', 'node_type_language_' . $type)
+        ->condition('name', 'node_type_language_default_' . $type)
+        ->condition('name', 'node_type_language_selectable_' . $type)
       )
       ->execute();
   }
@@ -555,6 +556,23 @@ function node_update_8002() {
     'default' => '',
   );
   db_change_field('node', 'language', 'langcode', $spec);
+}
+
+/**
+ * Rename node type language variable names.
+ *
+ * @see http://drupal.org/node/258785
+ */
+function node_update_8003() {
+  $types = db_query('SELECT type FROM {node_type}')->fetchCol();
+  foreach ($types as $type) {
+    $language = variable_get('node_type_language_' . $type, 0);
+    if (isset($language)) {
+      variable_set('node_type_language_default_' . $type, language_default()->langcode);
+      variable_set('node_type_language_selectable_' . $type, $language);
+    }
+    variable_del('node_type_language_' . $type);
+  }
 }
 
 /**
