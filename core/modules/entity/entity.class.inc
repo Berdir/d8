@@ -76,21 +76,25 @@ interface EntityInterface {
   /**
    * Returns the language code associated with the entity.
    *
-   * The language code of the entity either refers to a language or to one of
-   * the system language constants, e.g. LANGUAGE_NOT_SPECIFIED,
-   * LANGUAGE_NOT_APPLICABLE or LANGUAGE_MULTIPLE.
+   * If the entity is not specific to a certain language, the language code of
+   * an entity is one of the system language constants, e.g.
+   * LANGUAGE_NOT_SPECIFIED, LANGUAGE_NOT_APPLICABLE or LANGUAGE_MULTIPLE.
+   * Otherwise, for language-specific entities the language code refers to
+   * the default language as returned by EntityInterface::language().
    *
    * @return
    *   A valid language code.
+   *
+   * @see EntityInterface::language()
    */
   public function languageCode();
 
   /**
-   * Returns the default language of the entity.
+   * Returns the default language of a language-specific entity.
    *
    * @return
-   *   The language object of the entity's default language, or FALSE if no
-   *   valid language is assigned.
+   *   The language object of the entity's default language, or FALSE if the
+   *   entity is not language-specific.
    *
    * @see EntityInterface::translations()
    * @see EntityInterface::languageCode()
@@ -392,12 +396,14 @@ class Entity implements EntityInterface {
   }
 
   /**
-   * Determines the language code to use for a field.
+   * Determines the language code to use for accessing a field value in a certain language.
    */
   protected function getFieldLangcode($field, $langcode = NULL) {
-    // Only apply the langcode if the entity is language specific, thus has a
-    // language assigned.
+    // Only apply the given langcode if the entity is language-specific.
+    // Otherwise translatable fields are handled as non-translatable fields.
     if (field_is_translatable($this->entityType, $field) && ($default_language = $this->language())) {
+      // For translatable fields the values in default language are stored using
+      // the language code of the default language.
       return isset($langcode) ? $langcode : $default_language->langcode;
     }
     else {
