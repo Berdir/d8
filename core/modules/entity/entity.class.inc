@@ -329,7 +329,7 @@ class Entity implements EntityInterface {
    * Implements EntityInterface::language().
    */
   public function language() {
-    // @todo: Check for language.module instead, once field API language
+    // @todo: Check for language.module instead, once Field API language
     // handling depends upon it too.
     return module_exists('locale') ? language_load($this->languageCode()) : FALSE;
   }
