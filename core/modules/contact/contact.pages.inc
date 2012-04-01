@@ -76,6 +76,24 @@ function contact_site_form($form, &$form_state) {
     '#default_value' => $user->uid ? $user->mail : '',
     '#required' => TRUE,
   );
+  // We do not allow authenticated users to alter their name and email
+  // here because they could impersonate someone else.
+  if ($user->uid){
+    //Change form elements to values
+    $form['name']['#type'] = $form['mail']['#type'] = 'value';
+
+    // Display readonly name and mail address to the user.
+    $form['name_display'] = array(
+      '#type' => 'item',
+      '#title' => t('Your name'),
+      '#markup' => user_format_name($user),
+    );
+    $form['mail_display'] = array(
+      '#type' => 'item',
+      '#title' => t('Your e-mail address'),
+      '#markup' => $user->mail,
+    );
+  }
   $form['subject'] = array(
     '#type' => 'textfield',
     '#title' => t('Subject'),
@@ -129,7 +147,6 @@ function contact_site_form_validate($form, &$form_state) {
  */
 function contact_site_form_submit($form, &$form_state) {
   global $user, $language_interface;
-
   $values = $form_state['values'];
   $values['sender'] = $user;
   $values['sender']->name = $values['name'];
@@ -212,6 +229,24 @@ function contact_personal_form($form, &$form_state, $recipient) {
     '#default_value' => $user->uid ? $user->mail : '',
     '#required' => TRUE,
   );
+  // We do not allow authenticated users to alter their name and email
+  // here because they could impersonate someone else.
+  if ($user->uid){
+    // Change form elements to values.
+    $form['name']['#type'] = $form['mail']['#type'] = 'value';
+
+    // Display readonly name and mail address to the user.
+    $form['name_display'] = array(
+      '#type' => 'item',
+      '#title' => t('Your name'),
+      '#markup' => user_format_name($user),
+    );
+    $form['mail_display'] = array(
+      '#type' => 'item',
+      '#title' => t('Your e-mail address'),
+      '#markup' => $user->mail,
+    );
+  }
   $form['to'] = array(
     '#type' => 'item',
     '#title' => t('To'),
