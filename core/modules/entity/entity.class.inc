@@ -74,22 +74,6 @@ interface EntityInterface {
   public function uri();
 
   /**
-   * Returns the language code associated with the entity.
-   *
-   * If the entity is not specific to a certain language, the language code of
-   * an entity is one of the system language constants, e.g.
-   * LANGUAGE_NOT_SPECIFIED, LANGUAGE_NOT_APPLICABLE or LANGUAGE_MULTIPLE.
-   * Otherwise, for language-specific entities the language code refers to
-   * the default language as returned by EntityInterface::language().
-   *
-   * @return
-   *   A valid language code.
-   *
-   * @see EntityInterface::language()
-   */
-  public function languageCode();
-
-  /**
    * Returns the default language of a language-specific entity.
    *
    * @return
@@ -97,7 +81,6 @@ interface EntityInterface {
    *   entity is not language-specific.
    *
    * @see EntityInterface::translations()
-   * @see EntityInterface::languageCode()
    */
   public function language();
 
@@ -323,19 +306,12 @@ class Entity implements EntityInterface {
   }
 
   /**
-   * Implements EntityInterface::languageCode().
-   */
-  public function languageCode() {
-    return $this->langcode;
-  }
-
-  /**
    * Implements EntityInterface::language().
    */
   public function language() {
     // @todo: Check for language.module instead, once Field API language
     // handling depends upon it too.
-    return module_exists('locale') ? language_load($this->languageCode()) : FALSE;
+    return module_exists('locale') ? language_load($this->langcode) : FALSE;
   }
 
   /**
