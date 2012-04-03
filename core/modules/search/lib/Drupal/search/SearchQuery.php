@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\Search\SearchExtender.
+ * Definition of Drupal\search\SearchExtender.
  */
 
 namespace Drupal\search;
