@@ -292,10 +292,7 @@ class Select extends Query implements SelectInterface {
   /* Implementations of Drupal\Core\Database\Query\ExtendableInterface. */
 
   public function extend($extender_name) {
-    $override_class = $extender_name . '_' . $this->connection->driver();
-    if (class_exists($override_class)) {
-      $extender_name = $override_class;
-    }
+    $extender_name = $this->connection->getDriverClass($extender_name);
     return new $extender_name($this, $this->connection);
   }
 

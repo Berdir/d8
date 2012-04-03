@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * @file
+ * Definition of Drupal\Search\SearchExtender.
+ */
+
+namespace Drupal\search;
+
 use Drupal\Core\Database\Query\SelectExtender;
 use Drupal\Core\Database\StatementEmpty;
 

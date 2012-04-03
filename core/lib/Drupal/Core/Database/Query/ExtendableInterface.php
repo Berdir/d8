@@ -26,7 +26,8 @@ interface ExtendableInterface {
    *   The base name of the extending class.  The base name will be checked
    *   against the current database connection to allow driver-specific subclasses
    *   as well, using the same logic as the query objects themselves.  For example,
-   *   PagerDefault_mysql is the MySQL-specific override for PagerDefault.
+   *   Drupal\Core\Database\Driver\mysql\PagerDefault is the MySQL-specific
+   *   override for PagerDefault.
    * @return Drupal\Core\Database\Query\ExtendableInterface
    *   The extender object, which now contains a reference to this object.
    */
