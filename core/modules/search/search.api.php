@@ -162,10 +162,10 @@ function hook_search_admin() {
  *
  * If your module uses hook_update_index() and search_index() to index its
  * items, use table 'search_index' aliased to 'i' as the main table in your
- * query, with the 'SearchQuery' extension. You can join to your module's table
- * using the 'i.sid' field, which will contain the $sid values you provided to
- * search_index(). Add the main keywords to the query by using method
- * searchExpression(). The functions search_expression_extract() and
+ * query, with the 'Drupal\search\SearchQuery' extension. You can join to your
+ * module's table using the 'i.sid' field, which will contain the $sid values
+ * you provided to search_index(). Add the main keywords to the query by using
+ * method searchExpression(). The functions search_expression_extract() and
  * search_expression_insert() may also be helpful for adding custom search
  * parameters to the search expression.
  *
