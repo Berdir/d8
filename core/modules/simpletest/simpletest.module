@@ -8,6 +8,18 @@ use Drupal\Core\Database\Database;
  */
 
 /**
+ * Implements hook_init().
+ */
+function simpletest_init() {
+  // Assuming that every module that provides tests implements
+  // hook_simpletest_info().
+  $loader = drupal_classloader();
+  foreach (module_implements('simpletest_info') as $module) {
+    $loader->registerNamespace('Drupal\\' . $module . '\\Tests', DRUPAL_ROOT . '/' . drupal_get_path('module', $module) . '/tests');
+  }
+}
+
+/**
  * Implements hook_help().
  */
 function simpletest_help($path, $arg) {
@@ -339,6 +351,18 @@ function simpletest_test_get_all() {
 
           $groups[$info['group']][$class] = $info;
         }
+      }
+
+      foreach (module_invoke_all('simpletest_info') as $class => $info) {
+        // If this test class requires a non-existing module, skip it.
+        if (!empty($info['dependencies'])) {
+          foreach ($info['dependencies'] as $module) {
+            if (!drupal_get_filename('module', $module)) {
+              continue 2;
+            }
+          }
+        }
+        $groups[$info['group']][$class] = $info;
       }
 
       // Sort the groups and tests within the groups by name.
