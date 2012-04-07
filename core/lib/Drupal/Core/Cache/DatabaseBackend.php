@@ -25,7 +25,7 @@ class DatabaseBackend implements CacheBackendInterface {
   /**
    * A static cache of all tags checked during the request.
    */
-  protected static $tagCache;
+  protected static $tagCache = array();
 
   /**
    * Implements Drupal\Core\Cache\CacheBackendInterface::__construct().
@@ -349,7 +349,7 @@ class DatabaseBackend implements CacheBackendInterface {
    }
     if ($query_tags) {
       if ($db_tags = db_query('SELECT tag, invalidations FROM {cache_tags} WHERE tag IN (:tags)', array(':tags' => $query_tags))->fetchAllKeyed()) {
-        self::$tagCache = array_merge($this->tag_cache, $db_tags);
+        self::$tagCache = array_merge(self:$tagCache, $db_tags);
         $checksum += array_sum($db_tags);
       }
     }
