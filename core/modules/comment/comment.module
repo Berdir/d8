@@ -1467,10 +1467,10 @@ function comment_access($op, $comment) {
 /**
  * Accepts a submission of new or changed comment content.
  *
- * @param $comment
+ * @param Comment $comment
  *   A comment object.
  */
-function comment_save($comment) {
+function comment_save(Comment $comment) {
   $comment->save();
 }
 
@@ -1643,12 +1643,12 @@ function comment_get_display_page($cid, $node_type) {
 /**
  * Page callback: Displays the comment editing form.
  *
- * @param $comment
+ * @param Comment $comment
  *   The comment object representing the comment to be edited.
  *
  * @see comment_menu()
  */
-function comment_edit_page($comment) {
+function comment_edit_page(Comment $comment) {
   drupal_set_title(t('Edit comment %comment', array('%comment' => $comment->subject)), PASS_THROUGH);
   $node = node_load($comment->nid);
   return drupal_get_form("comment_node_{$node->type}_form", $comment);
@@ -1673,7 +1673,7 @@ function comment_forms() {
  * @see comment_form_build_preview()
  * @ingroup forms
  */
-function comment_form($form, &$form_state, $comment) {
+function comment_form($form, &$form_state, Comment $comment) {
   global $user, $language_content;
 
   // During initial form build, add the comment entity to the form state for
@@ -1887,9 +1887,12 @@ function comment_form_build_preview($form, &$form_state) {
 /**
  * Generates a comment preview.
  *
+ * @param Comment $comment
+ *   The Comment entity to be previewed.
+ *
  * @see comment_form_build_preview()
  */
-function comment_preview($comment) {
+function comment_preview(Comment $comment) {
   global $user;
 
   drupal_set_title(t('Preview comment'), PASS_THROUGH);
@@ -1986,8 +1989,11 @@ function comment_form_validate($form, &$form_state) {
 
 /**
  * Prepare a comment for submission.
+ *
+ * @param Comment $comment
+ *
  */
-function comment_submit($comment) {
+function comment_submit(Comment $comment) {
   if (empty($comment->date)) {
     $comment->date = 'now';
   }
@@ -2433,9 +2439,12 @@ function comment_unpublish_by_keyword_action_submit($form, $form_state) {
 /**
  * Saves a comment.
  *
+ * @param Comment $comment
+ *   The comment entity to be saved.
+ *
  * @ingroup actions
  */
-function comment_save_action($comment) {
+function comment_save_action(Comment $comment) {
   comment_save($comment);
   cache_clear_all();
   watchdog('action', 'Saved comment %title', array('%title' => $comment->subject));
