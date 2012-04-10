@@ -8,18 +8,6 @@ use Drupal\Core\Database\Database;
  */
 
 /**
- * Implements hook_init().
- */
-function simpletest_init() {
-  // Assuming that every module that provides tests implements
-  // hook_simpletest_info().
-  $loader = drupal_classloader();
-  foreach (module_implements('simpletest_info') as $module) {
-    $loader->registerNamespace('Drupal\\' . $module . '\\Tests', DRUPAL_ROOT . '/' . drupal_get_path('module', $module) . '/tests');
-  }
-}
-
-/**
  * Implements hook_help().
  */
 function simpletest_help($path, $arg) {
@@ -171,6 +159,7 @@ function simpletest_run_tests($test_list, $reporter = 'drupal') {
  * Batch operation callback.
  */
 function _simpletest_batch_operation($test_list_init, $test_id, &$context) {
+  simpletest_register_test_namespaces();
   // Get working values.
   if (!isset($context['sandbox']['max'])) {
     // First iteration: initialize working values.
@@ -303,6 +292,9 @@ function simpletest_log_read($test_id, $prefix, $test_class, $during_test = FALS
  * a static variable. In order to list tests provided by disabled modules
  * hook_registry_files_alter() is used to forcefully add them to the registry.
  *
+ * PSR-0 classes are found by searching the designated directory for each module
+ * for files matching the PSR-0 standard.
+ *
  * @return
  *   An array of tests keyed with the groups specified in each of the tests
  *   getInfo() method and then keyed by the test class. An example of the array
@@ -327,10 +319,44 @@ function simpletest_test_get_all() {
     // information from each tests getInfo() method.
     if ($cache = cache()->get('simpletest')) {
       $groups = $cache->data;
+      simpletest_register_test_namespaces();
     }
     else {
       // Select all clases in files ending with .test.
       $classes = db_query("SELECT name FROM {registry} WHERE type = :type AND filename LIKE :name", array(':type' => 'class', ':name' => '%.test'))->fetchCol();
+
+      // Select all PSR-0 classes in the tests folder of all available modules.
+      // @todo: can profiles/themes have tests as well?
+      $module_list = db_query("SELECT name, filename FROM {system} WHERE type = 'module' ORDER BY weight ASC, name ASC")->fetchAllKeyed();
+
+      // Prepare a list of modules which provide tests.
+      $test_modules = array();
+      foreach ($module_list as $name => $filename) {
+        // Build directory in which the test files would reside.
+        $tests_dir = DRUPAL_ROOT . '/' . dirname($filename) . '/tests/Drupal/' . $name . '/Tests';
+        // Scan it for test files if it exists.
+        if (is_dir($tests_dir)) {
+          $files = file_scan_directory($tests_dir, '/.*\.php/');
+          if (!empty($files)) {
+            $basedir = DRUPAL_ROOT . '/' . dirname($filename) . '/tests/';
+            $test_modules[] = $name;
+            foreach ($files as $file) {
+              // Convert the file name into the namespaced class name.
+              $replacements = array(
+                '/' => '\\',
+                $basedir => '',
+                '.php' => '',
+              );
+              $classes[] = strtr($file->uri, $replacements);
+            }
+          }
+        }
+      }
+
+      // Ensure that namespaces for newly found modules are registered so that
+      // the checks below work.
+      cache()->set('simpletest_modules', $test_modules);
+      simpletest_register_test_namespaces(TRUE);
 
       // Check that each class has a getInfo() method and store the information
       // in an array keyed with the group specified in the test information.
@@ -353,18 +379,6 @@ function simpletest_test_get_all() {
         }
       }
 
-      foreach (module_invoke_all('simpletest_info') as $class => $info) {
-        // If this test class requires a non-existing module, skip it.
-        if (!empty($info['dependencies'])) {
-          foreach ($info['dependencies'] as $module) {
-            if (!drupal_get_filename('module', $module)) {
-              continue 2;
-            }
-          }
-        }
-        $groups[$info['group']][$class] = $info;
-      }
-
       // Sort the groups and tests within the groups by name.
       uksort($groups, 'strnatcasecmp');
       foreach ($groups as $group => &$tests) {
@@ -377,6 +391,25 @@ function simpletest_test_get_all() {
     }
   }
   return $groups;
+}
+
+/**
+ * Registers test namespaces for all modules which provide tests.
+ */
+function simpletest_register_test_namespaces($force_register = FALSE) {
+  static $called = FALSE;
+
+  // Prevent multiple namespace registrations unless explicitly forced to do so.
+  if (!$called || $force_register) {
+    // Get the cached test modules list and register a test namespace for each.
+    if ($cache = cache()->get('simpletest_modules')) {
+      $loader = drupal_classloader();
+      foreach ($cache->data as $module) {
+        $loader->registerNamespace('Drupal\\' . $module . '\\Tests', DRUPAL_ROOT . '/' . drupal_get_path('module', $module) . '/tests');
+      }
+    }
+    $called = TRUE;
+  }
 }
 
 /**

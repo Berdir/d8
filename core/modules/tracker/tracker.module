@@ -396,15 +396,3 @@ function _tracker_remove($nid, $uid = NULL, $changed = NULL) {
       ->execute();
   }
 }
-
-/**
- * Implements hook_simpletest_info().
- */
-function tracker_simpletest_info() {
-  $tests['Drupal\tracker\Tests\TrackerTest'] = array(
-    'name' => 'Tracker',
-    'description' => 'Create and delete nodes and check for their display in the tracker listings.',
-    'group' => 'Tracker'
-  );
-  return $tests;
-}
