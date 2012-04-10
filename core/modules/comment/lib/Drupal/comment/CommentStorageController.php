@@ -2,89 +2,24 @@
 
 /**
  * @file
- * Entity controller and class for comments.
+ * Definition of Drupal\comment\CommentStorageController.
  */
 
-/**
- * Defines the comment entity class.
- */
-class Comment extends Entity {
+namespace Drupal\comment;
 
-  /**
-   * The comment ID.
-   *
-   * @var integer
-   */
-  public $cid;
-
-  /**
-   * The parent comment ID if this is a reply to a comment.
-   *
-   * @var integer
-   */
-  public $pid;
-
-  /**
-   * The comment language code.
-   *
-   * @var string
-   */
-  public $langcode = LANGUAGE_NOT_SPECIFIED;
-
-  /**
-   * The comment title.
-   *
-   * @var string
-   */
-  public $subject;
-
-
-  /**
-   * The comment author ID.
-   *
-   * @var integer
-   */
-  public $uid = 0;
-
-  /**
-   * The comment author's name.
-   *
-   * For anonymous authors, this is the value as typed in the comment form.
-   *
-   * @var string
-   */
-  public $name = '';
-
-  /**
-   * The comment author's e-mail address.
-   *
-   * For anonymous authors, this is the value as typed in the comment form.
-   *
-   * @var string
-   */
-  public $mail;
-
-  /**
-   * The comment author's home page address.
-   *
-   * For anonymous authors, this is the value as typed in the comment form.
-   *
-   * @var string
-   */
-  public $homepage;
-
-}
+use Drupal\entity\EntityInterface;
+use Drupal\entity\DatabaseStorageController;
 
 /**
  * Defines the controller class for comments.
  *
- * This extends the EntityDatabaseStorageController class, adding required
- * special handling for comment entities.
+ * This extends the DatabaseStorageController class, adding required special
+ * handling for comment entities.
  */
-class CommentStorageController extends EntityDatabaseStorageController {
+class CommentStorageController extends DatabaseStorageController {
 
   /**
-   * Overrides EntityDatabaseStorageController::buildQuery().
+   * Overrides DatabaseStorageController::buildQuery().
    */
   protected function buildQuery($ids, $conditions = array(), $revision_id = FALSE) {
     $query = parent::buildQuery($ids, $conditions, $revision_id);
@@ -98,7 +33,7 @@ class CommentStorageController extends EntityDatabaseStorageController {
   }
 
   /**
-   * Overrides EntityDatabaseStorageController::attachLoad().
+   * Overrides DatabaseStorageController::attachLoad().
    */
   protected function attachLoad(&$comments, $revision_id = FALSE) {
     // Set up standard comment properties.
@@ -112,7 +47,7 @@ class CommentStorageController extends EntityDatabaseStorageController {
   }
 
   /**
-   * Overrides EntityDatabaseStorageController::preSave().
+   * Overrides DatabaseStorageController::preSave().
    *
    * @see comment_int_to_alphadecimal()
    * @see comment_increment_alphadecimal()
@@ -194,7 +129,7 @@ class CommentStorageController extends EntityDatabaseStorageController {
   }
 
   /**
-   * Overrides EntityDatabaseStorageController::postSave().
+   * Overrides DatabaseStorageController::postSave().
    */
   protected function postSave(EntityInterface $comment, $update) {
     // Update the {node_comment_statistics} table prior to executing the hook.
@@ -205,7 +140,7 @@ class CommentStorageController extends EntityDatabaseStorageController {
   }
 
   /**
-   * Overrides EntityDatabaseStorageController::postDelete().
+   * Overrides DatabaseStorageController::postDelete().
    */
   protected function postDelete($comments) {
     // Delete the comments' replies.

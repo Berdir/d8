@@ -98,8 +98,8 @@ function comment_entity_info() {
       'base table' => 'comment',
       'uri callback' => 'comment_uri',
       'fieldable' => TRUE,
-      'controller class' => 'CommentStorageController',
-      'entity class' => 'Comment',
+      'controller class' => 'Drupal\comment\CommentStorageController',
+      'entity class' => 'Drupal\comment\Comment',
       'entity keys' => array(
         'id' => 'cid',
         'bundle' => 'node_type',
