@@ -167,7 +167,7 @@ class Entity implements EntityInterface {
    * Implements EntityInterface::id().
    */
   public function id() {
-    return $this->id;
+    return isset($this->id) ? $this->id : NULL;
   }
 
   /**

@@ -1532,7 +1532,7 @@ function taxonomy_field_presave($entity_type, $entity, $field, $instance, $langc
   foreach ($items as $delta => $item) {
     if ($item['tid'] == 'autocreate') {
       $term = entity_create('taxonomy_term', $item);
-      unset($term->tid);
+      $term->enforceIsNew();
       $term->langcode = $langcode;
       taxonomy_term_save($term);
       $items[$delta]['tid'] = $term->tid;
