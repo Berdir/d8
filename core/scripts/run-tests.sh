@@ -363,7 +363,7 @@ function simpletest_script_run_one_test($test_id, $test_class) {
     // Bootstrap Drupal.
     drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
 
-    simpletest_register_test_namespaces();
+    simpletest_register_disabled_modules();
 
     $test = new $test_class($test_id);
     $test->run();

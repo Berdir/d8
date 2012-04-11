@@ -234,7 +234,7 @@ function simpletest_result_form($form, &$form_state, $test_id) {
     '#debug' => 0,
   );
 
-  simpletest_register_test_namespaces();
+  simpletest_register_disabled_modules();
 
   // Cycle through each test group.
   $header = array(t('Message'), t('Group'), t('Filename'), t('Line'), t('Function'), array('colspan' => 2, 'data' => t('Status')));

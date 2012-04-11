@@ -8,13 +8,6 @@ use Drupal\Core\Database\Database;
  */
 
 /**
- * Implements hook_init().
- */
-function simpletest_init() {
-  simpletest_register_test_namespaces();
-}
-
-/**
  * Implements hook_help().
  */
 function simpletest_help($path, $arg) {
@@ -166,7 +159,7 @@ function simpletest_run_tests($test_list, $reporter = 'drupal') {
  * Batch operation callback.
  */
 function _simpletest_batch_operation($test_list_init, $test_id, &$context) {
-  simpletest_register_test_namespaces();
+  simpletest_register_disabled_modules();
   // Get working values.
   if (!isset($context['sandbox']['max'])) {
     // First iteration: initialize working values.
@@ -321,32 +314,32 @@ function simpletest_log_read($test_id, $prefix, $test_class, $during_test = FALS
 function simpletest_test_get_all() {
   $groups = &drupal_static(__FUNCTION__);
 
+  // Make sure that namespaces for disabled modules are registered so that the
+  // checks below will find them.
+  simpletest_register_disabled_modules();
+
   if (!$groups) {
     // Load test information from cache if available, otherwise retrieve the
     // information from each tests getInfo() method.
     if ($cache = cache()->get('simpletest')) {
       $groups = $cache->data;
-      simpletest_register_test_namespaces();
     }
     else {
       // Select all clases in files ending with .test.
       $classes = db_query("SELECT name FROM {registry} WHERE type = :type AND filename LIKE :name", array(':type' => 'class', ':name' => '%.test'))->fetchCol();
 
-      // Select all PSR-0 classes in the tests folder of all available modules.
+      // Select all PSR-0 classes in the test folder of all available modules.
       // @todo: can profiles/themes have tests as well?
-      $module_list = db_query("SELECT name, filename FROM {system} WHERE type = 'module' ORDER BY weight ASC, name ASC")->fetchAllKeyed();
+      $module_list = db_query("SELECT name, filename FROM {system} WHERE type = 'module'")->fetchAllKeyed();
 
-      // Prepare a list of modules which provide tests.
-      $test_modules = array();
       foreach ($module_list as $name => $filename) {
         // Build directory in which the test files would reside.
-        $tests_dir = DRUPAL_ROOT . '/' . dirname($filename) . '/tests/Drupal/' . $name . '/Test';
+        $tests_dir = DRUPAL_ROOT . '/' . dirname($filename) . '/lib/Drupal/' . $name . '/Test';
         // Scan it for test files if it exists.
         if (is_dir($tests_dir)) {
           $files = file_scan_directory($tests_dir, '/.*\.php/');
           if (!empty($files)) {
-            $basedir = DRUPAL_ROOT . '/' . dirname($filename) . '/tests/';
-            $test_modules[] = $name;
+            $basedir = DRUPAL_ROOT . '/' . dirname($filename) . '/lib/';
             foreach ($files as $file) {
               // Convert the file name into the namespaced class name.
               $replacements = array(
@@ -359,11 +352,6 @@ function simpletest_test_get_all() {
           }
         }
       }
-
-      // Ensure that namespaces for newly found modules are registered so that
-      // the checks below work.
-      cache()->set('simpletest_modules', $test_modules);
-      simpletest_register_test_namespaces(TRUE);
 
       // Check that each class has a getInfo() method and store the information
       // in an array keyed with the group specified in the test information.
@@ -401,26 +389,15 @@ function simpletest_test_get_all() {
 }
 
 /**
- * Registers test namespaces for all modules which provide tests.
+ * Registers namespaces for disabled modules.
  */
-function simpletest_register_test_namespaces($force_register = FALSE) {
-  static $called = FALSE;
-
-  // Prevent multiple namespace registrations unless explicitly forced to do so.
-  if (!$called || $force_register) {
-    // Get the cached test modules list and register a test namespace for each.
-    if ($cache = cache()->get('simpletest_modules')) {
-      $loader = drupal_classloader();
-      foreach ($cache->data as $module) {
-        $loader->registerNamespace('Drupal\\' . $module . '\\Test', DRUPAL_ROOT . '/' . drupal_get_path('module', $module) . '/tests');
-      }
+function simpletest_register_disabled_modules() {
+  // Get the cached test modules list and register a test namespace for each.
+  $disabled_modules = db_query("SELECT name, filename FROM {system} WHERE type = 'module' AND status = 0")->fetchAllKeyed();
+  if ($disabled_modules) {
+    foreach ($disabled_modules as $name => $filename) {
+      drupal_classloader_register($name, dirname($filename));
     }
-    $called = TRUE;
-  }
-  else {
-    // If the cache failed to load, rebuild the test information. This will also
-    // lead to a new call to this function.
-    simpletest_test_get_all();
   }
 }
 
