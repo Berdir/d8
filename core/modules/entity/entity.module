@@ -5,6 +5,8 @@
  * Entity API for handling entities like nodes or users.
  */
 
+use Drupal\entity;
+
 /**
  * Implements hook_help().
  */
@@ -146,7 +148,7 @@ function entity_extract_ids($entity_type, $entity) {
   if (!empty($info['entity keys']['bundle'])) {
     // Explicitly fail for malformed entities missing the bundle property.
     if (!isset($entity->{$info['entity keys']['bundle']}) || $entity->{$info['entity keys']['bundle']} === '') {
-      throw new EntityMalformedException(t('Missing bundle property on entity of type @entity_type.', array('@entity_type' => $entity_type)));
+      throw new MalformedException(t('Missing bundle property on entity of type @entity_type.', array('@entity_type' => $entity_type)));
     }
     $bundle = $entity->{$info['entity keys']['bundle']};
   }
@@ -472,8 +474,3 @@ function entity_form_submit_build_entity($entity_type, $entity, $form, &$form_st
     field_attach_submit($entity_type, $entity, $form, $form_state);
   }
 }
-
-/**
- * Defines an exception thrown when a malformed entity is passed.
- */
-class EntityMalformedException extends Exception { }
