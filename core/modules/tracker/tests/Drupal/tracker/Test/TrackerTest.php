@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Definition of Drupal\tracker\Tests\TrackerTests
+ * Definition of Drupal\tracker\Test\TrackerTests
  */
 
-namespace Drupal\tracker\Tests;
+namespace Drupal\tracker\Test;
 
 use DrupalWebTestCase;
 

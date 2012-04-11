@@ -8,6 +8,13 @@ use Drupal\Core\Database\Database;
  */
 
 /**
+ * Implements hook_init().
+ */
+function simpletest_init() {
+  simpletest_register_test_namespaces();
+}
+
+/**
  * Implements hook_help().
  */
 function simpletest_help($path, $arg) {
@@ -333,7 +340,7 @@ function simpletest_test_get_all() {
       $test_modules = array();
       foreach ($module_list as $name => $filename) {
         // Build directory in which the test files would reside.
-        $tests_dir = DRUPAL_ROOT . '/' . dirname($filename) . '/tests/Drupal/' . $name . '/Tests';
+        $tests_dir = DRUPAL_ROOT . '/' . dirname($filename) . '/tests/Drupal/' . $name . '/Test';
         // Scan it for test files if it exists.
         if (is_dir($tests_dir)) {
           $files = file_scan_directory($tests_dir, '/.*\.php/');
@@ -405,10 +412,15 @@ function simpletest_register_test_namespaces($force_register = FALSE) {
     if ($cache = cache()->get('simpletest_modules')) {
       $loader = drupal_classloader();
       foreach ($cache->data as $module) {
-        $loader->registerNamespace('Drupal\\' . $module . '\\Tests', DRUPAL_ROOT . '/' . drupal_get_path('module', $module) . '/tests');
+        $loader->registerNamespace('Drupal\\' . $module . '\\Test', DRUPAL_ROOT . '/' . drupal_get_path('module', $module) . '/tests');
       }
     }
     $called = TRUE;
+  }
+  else {
+    // If the cache failed to load, rebuild the test information. This will also
+    // lead to a new call to this function.
+    simpletest_test_get_all();
   }
 }
 
