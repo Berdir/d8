@@ -391,7 +391,7 @@ function simpletest_test_get_all() {
 /**
  * Registers namespaces for disabled modules.
  */
-function  simpletest_classloader_register() {
+function simpletest_classloader_register() {
   // Get the cached test modules list and register a test namespace for each.
   $disabled_modules = db_query("SELECT name, filename FROM {system} WHERE status = 0")->fetchAllKeyed();
   if ($disabled_modules) {

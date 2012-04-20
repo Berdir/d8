@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\tracker\Tests\TrackerTests
+ * Definition of Drupal\tracker\Tests\TrackerTests.
  */
 
 namespace Drupal\tracker\Tests;
