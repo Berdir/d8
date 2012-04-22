@@ -7690,5 +7690,50 @@ function queue($name, $reliable = FALSE) {
 }
 
 /**
+ * Adds a unique item to a queue.
+ *
+ * Queue items added this way need to be explictly removed again when the
+ * queue item is processed.
+ *
+ * @param Drupal\Core\Queue\QueueInterface $queue
+ *   The queue in which the item should be created.
+ * @param $data
+ *   The queue item data. Should contain the necessary information to rebuild
+ *   the key.
+ * @param string $key
+ *   A string that uniquely identifies the given queue item across all queues.
+ *
+ * @see drupal_unique_queue_item_remove()
+ */
+function drupal_unique_queue_item_create(QueueInterface $queue, $data, $key) {
+  $status = db_merge('unique_queue_item')
+    ->key(array('key' => $key))
+    ->insertFields(array(
+      'created' => REQUEST_TIME,
+    ))
+    ->updateFields(array(
+      'updated' => REQUEST_TIME,
+    ))
+    ->execute();
+
+  // If the row was inserted, this item does not yet exist, create it.
+  if ($status === DrupalCoreDatabaseMerge::STATUS_INSERT) {
+    $queue->createItem($data);
+  }
+}
+
+/**
+ * Removes a unique queue item identifier.
+ *
+ * @param string $key
+ *   A string that uniquely identifies the given queue item across all queues.
+ */
+function drupal_unique_queue_item_delete($key) {
+  db_delete('unique_queue_item')
+    ->condition('key', $key)
+    ->execute();
+}
+
+/**
  * @} End of "defgroup queue".
  */

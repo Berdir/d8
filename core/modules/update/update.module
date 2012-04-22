@@ -428,13 +428,37 @@ function update_get_available($refresh = FALSE) {
 }
 
 /**
- * Wrapper to load the include file and then create a new fetch task.
+ *  Add a task to the queue for fetching release history data for a project.
+ *
+ * We only create a new fetch task if there's no task already in the queue for
+ * this particular project (based on 'fetch_task::' entries in the
+ * {cache_update} table).
+ *
+ * @param $project
+ *   Associative array of information about a project as created by
+ *   update_get_projects(), including keys such as 'name' (short name),
+ *   and the 'info' array with data from a .info file for the project.
  *
  * @see _update_create_fetch_task()
  */
 function update_create_fetch_task($project) {
-  module_load_include('inc', 'update', 'update.fetch');
-  return _update_create_fetch_task($project);
+  $key = update_get_fetch_task_key($project);
+  drupal_unique_queue_item_create(queue('update_fetch_tasks'), $key, $project);
+}
+
+/**
+ * Returns a unique identifier for a given project.
+ *
+ * @param $project
+ *   Associative array of information about a project as created by
+ *   update_get_projects(), including keys such as 'name' (short name),
+ *   and the 'info' array with data from a .info file for the project.
+ *
+ * @return string
+ *   The unique key.
+ */
+function update_get_fetch_task_key($project) {
+  return 'update::fetch_task::' . $project['name'];
 }
 
 /**

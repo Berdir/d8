@@ -1397,6 +1397,30 @@ function system_schema() {
     ),
   );
 
+  $schema['unique_queue_item'] = array(
+    'description' => 'Contains a list of unique identifiers for queue items',
+    'fields' => array(
+      'name'   => array(
+        'description' => 'The unique identifier of the queue item',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'created' => array(
+        'description' => 'A Unix timestamp indicating when the queue item was created.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'updated' => array(
+        'description' => 'A Unix timestamp indicating when the last attempt to create the queue item was.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    )
+  );
+
   $schema['registry'] = array(
     'description' => "Each record is a function, class, or interface name and the file it is in.",
     'fields' => array(
@@ -1844,6 +1868,32 @@ function system_update_8007() {
       ));
     }
   }
+}
+
+function system_update_8008() {
+  db_create_table('unique_queue_item', array(
+    'description' => 'Contains a list of unique identifiers for queue items',
+    'fields' => array(
+      'name'   => array(
+        'description' => 'The unique identifier of the queue item',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'created' => array(
+        'description' => 'A Unix timestamp indicating when the queue item was created.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'updated' => array(
+        'description' => 'A Unix timestamp indicating when the last attempt to create the queue item was.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    )
+  ));
 }
 
 /**

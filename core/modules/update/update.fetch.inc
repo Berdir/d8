@@ -104,6 +104,7 @@ function _update_fetch_data() {
   while (time() < $end && ($item = $queue->claimItem())) {
     _update_process_fetch_task($item->data);
     $queue->deleteItem($item);
+    drupal_unique_queue_item_delete(update_get_fetch_task_key($item->data));
   }
 }
 
@@ -207,43 +208,6 @@ function _update_refresh() {
 
   foreach ($projects as $key => $project) {
     update_create_fetch_task($project);
-  }
-}
-
-/**
- * Add a task to the queue for fetching release history data for a project.
- *
- * We only create a new fetch task if there's no task already in the queue for
- * this particular project (based on 'fetch_task::' entries in the
- * {cache_update} table).
- *
- * @param $project
- *   Associative array of information about a project as created by
- *   update_get_projects(), including keys such as 'name' (short name),
- *   and the 'info' array with data from a .info file for the project.
- *
- * @see update_get_projects()
- * @see update_get_available()
- * @see update_refresh()
- * @see update_fetch_data()
- * @see _update_process_fetch_task()
- */
-function _update_create_fetch_task($project) {
-  $fetch_tasks = &drupal_static(__FUNCTION__, array());
-  if (empty($fetch_tasks)) {
-    $fetch_tasks = _update_get_cache_multiple('fetch_task');
-  }
-  $cid = 'fetch_task::' . $project['name'];
-  if (empty($fetch_tasks[$cid])) {
-    $queue = queue('update_fetch_tasks');
-    $queue->createItem($project);
-    db_insert('cache_update')
-      ->fields(array(
-        'cid' => $cid,
-        'created' => REQUEST_TIME,
-      ))
-      ->execute();
-    $fetch_tasks[$cid] = REQUEST_TIME;
   }
 }
 
