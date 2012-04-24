@@ -5,6 +5,8 @@
  * Tests for list.module.
  */
 
+use Drupal\field\FieldException;
+
 /**
  * Tests for the 'List' field types.
  */
