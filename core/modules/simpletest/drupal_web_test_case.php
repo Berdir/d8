@@ -1548,17 +1548,7 @@ class DrupalWebTestCase extends DrupalTestCase {
    * are enabled later.
    */
   protected function resetAll() {
-    // Reset all static variables.
-    drupal_static_reset();
-    // Reset the list of enabled modules.
-    module_list(TRUE);
-
-    // Reset cached schema for new database prefix. This must be done before
-    // drupal_flush_all_caches() so rebuilds can make use of the schema of
-    // modules enabled on the cURL side.
-    drupal_get_schema(NULL, TRUE);
-
-    // Perform rebuilds and flush remaining caches.
+    // Clear all database and static caches and rebuild data structures.
     drupal_flush_all_caches();
 
     // Reload global $conf array and permissions.

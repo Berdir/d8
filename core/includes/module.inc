@@ -444,10 +444,10 @@ function module_enable($module_list, $enable_dependencies = TRUE) {
         ->condition('name', $module)
         ->execute();
       // Refresh the module list to include it.
+      _system_update_bootstrap_status();
       system_list_reset();
       module_list(TRUE);
       module_implements_reset();
-      _system_update_bootstrap_status();
       // Update the registry to include it.
       registry_update();
       // Refresh the schema to include it.
@@ -567,6 +567,7 @@ function module_disable($module_list, $disable_dependents = TRUE) {
 
   if (!empty($invoke_modules)) {
     // Refresh the module list to exclude the disabled modules.
+    _system_update_bootstrap_status();
     system_list_reset();
     module_list(TRUE);
     module_implements_reset();
@@ -575,7 +576,6 @@ function module_disable($module_list, $disable_dependents = TRUE) {
     module_invoke_all('modules_disabled', $invoke_modules);
     // Update the registry to remove the newly-disabled module.
     registry_update();
-    _system_update_bootstrap_status();
     // Update the theme registry to remove the newly-disabled module.
     drupal_theme_rebuild();
   }
