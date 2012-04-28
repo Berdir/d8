@@ -994,7 +994,6 @@ class TaxonomyTermTestCase extends TaxonomyWebTestCase {
 
     // Load multiple terms with the same name.
     $terms = taxonomy_term_load_multiple_by_name($term->name);
-    debug($terms);
     $this->assertEqual(count($terms), 2, 'Two terms loaded with the same name.');
 
     // Load single term when restricted to one vocabulary.
