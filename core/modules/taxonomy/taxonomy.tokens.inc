@@ -166,7 +166,7 @@ function taxonomy_tokens($type, $tokens, array $data = array(), array $options =
 
         case 'term-count':
           $query = db_select('taxonomy_term_data');
-          $query->condition('vocabulary_machine_name', $vocabulary->vocabulary_machine_name);
+          $query->condition('vocabulary_machine_name', $vocabulary->machine_name);
           $query->addTag('vocabulary_term_count');
           $count = $query->countQuery()->execute()->fetchField();
           $replacements[$original] = $count;
@@ -176,7 +176,7 @@ function taxonomy_tokens($type, $tokens, array $data = array(), array $options =
           $query = db_select('taxonomy_index', 'ti');
           $query->addExpression('COUNT(DISTINCT ti.nid)');
           $query->leftJoin('taxonomy_term_data', 'td', 'ti.tid = td.tid');
-          $query->condition('td.vocabulary_machine_name', $vocabulary->vocabulary_machine_name);
+          $query->condition('td.vocabulary_machine_name', $vocabulary->machine_name);
           $query->addTag('vocabulary_node_count');
           $count = $query->execute()->fetchField();
           $replacements[$original] = $count;
