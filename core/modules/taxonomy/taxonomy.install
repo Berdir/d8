@@ -300,3 +300,41 @@ function taxonomy_update_8001() {
     }
   }
 }
+
+/**
+ * Add the {taxonomy_term_data}.vocabulary_machine_name field.
+ */
+function taxonomy_update_8002() {
+  // taxonomy_tree index needs to be deleted first.
+  db_drop_index('taxonomy_term_data', 'taxonomy_tree');
+  $keys_new = array(
+    'indexes' => array(
+      'taxonomy_tree' => array('vocabulary_machine_name', 'weight', 'name'),
+      'vocabulary_machine_name_name' => array('vocabulary_machine_name', 'name'),
+  ));
+  $spec = array(
+    'type' => 'varchar',
+    'length' => 255,
+    'not null' => TRUE,
+    'default' => '',
+    'description' => 'The vocabulary machine name.',
+  );
+  db_add_field('taxonomy_term_data', 'vocabulary_machine_name', $spec, $keys_new);
+}
+
+/**
+ * Convert bundle data from vid to vocabulary_machine_name.
+ */
+function taxonomy_update_8003() {
+  db_update('taxonomy_term_data')
+    ->expression('vocabulary_machine_name', '(SELECT machine_name FROM {taxonomy_vocabulary} v WHERE v.vid = taxonomy_term_data.vid)')
+    ->execute();
+}
+
+/**
+ * Remove {taxonomy_term_data}.vid.
+ */
+function taxonomy_update_8004() {
+  db_drop_index('taxonomy_term_data', 'vid_name');
+  db_drop_field('taxonomy_term_data', 'vid');
+}

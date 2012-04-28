@@ -53,7 +53,8 @@ function forum_form_forum($form, &$form_state, $edit = array()) {
     '#description' => t('Forums are displayed in ascending order by weight (forums with equal weights are displayed alphabetically).'),
   );
 
-  $form['vid'] = array('#type' => 'hidden', '#value' => variable_get('forum_nav_vocabulary', ''));
+  $vocabulary = taxonomy_vocabulary_load(variable_get('forum_nav_vocabulary', ''));
+  $form['vocabulary_machine_name'] = array('#type' => 'hidden', '#value' => $vocabulary->machine_name);
   $form['actions'] = array('#type' => 'actions');
   $form['actions']['submit'] = array('#type' => 'submit', '#value' => t('Save'));
   if ($edit['tid']) {
@@ -158,10 +159,8 @@ function forum_form_container($form, &$form_state, $edit = array()) {
     '#description' => t('Containers are displayed in ascending order by weight (containers with equal weights are displayed alphabetically).')
   );
 
-  $form['vid'] = array(
-    '#type' => 'hidden',
-    '#value' => variable_get('forum_nav_vocabulary', ''),
-  );
+  $vocabulary = taxonomy_vocabulary_load(variable_get('forum_nav_vocabulary', ''));
+  $form['vocabulary_machine_name'] = array('#type' => 'hidden', '#value' => $vocabulary->machine_name);
   $form['actions'] = array('#type' => 'actions');
   $form['actions']['submit'] = array(
     '#type' => 'submit',

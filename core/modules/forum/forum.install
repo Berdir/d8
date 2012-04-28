@@ -65,7 +65,7 @@ function forum_enable() {
       'langcode' => language_default()->langcode,
       'description' => '',
       'parent' => array(0),
-      'vid' => $vocabulary->vid,
+      'vocabulary_machine_name' => $vocabulary->machine_name,
     ));
     taxonomy_term_save($term);
 

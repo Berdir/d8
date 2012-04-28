@@ -754,11 +754,12 @@ function forum_forum_load($tid = NULL) {
   }
 
   $vid = variable_get('forum_nav_vocabulary', 0);
+  $vocabulary = taxonomy_vocabulary_load($vid);
 
   // Load and validate the parent term.
   if ($tid) {
     $forum_term = taxonomy_term_load($tid);
-    if (!$forum_term || ($forum_term->vid != $vid)) {
+    if (!$forum_term || ($forum_term->vocabulary_machine_name != $vocabulary->machine_name)) {
       return $cache[$tid] = FALSE;
     }
   }

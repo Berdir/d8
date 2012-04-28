@@ -353,7 +353,8 @@ class ForumTestCase extends DrupalWebTestCase {
     $this->assertRaw(t('Created new @type %term.', array('%term' => $name, '@type' => t($type))), t(ucfirst($type) . ' was created'));
 
     // Verify forum.
-    $term = db_query("SELECT * FROM {taxonomy_term_data} t WHERE t.vid = :vid AND t.name = :name AND t.description = :desc", array(':vid' => variable_get('forum_nav_vocabulary', ''), ':name' => $name, ':desc' => $description))->fetchAssoc();
+    $vocabulary = taxonomy_vocabulary_load(variable_get('forum_nav_vocabulary', ''));
+    $term = db_query("SELECT * FROM {taxonomy_term_data} t WHERE t.vocabulary_machine_name = :vocabulary_machine_name AND t.name = :name AND t.description = :desc", array(':vocabulary_machine_name' => $vocabulary->machine_name, ':name' => $name, ':desc' => $description))->fetchAssoc();
     $this->assertTrue(!empty($term), 'The ' . $type . ' exists in the database');
 
     // Verify forum hierarchy.
