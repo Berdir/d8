@@ -181,12 +181,13 @@ class UrlAlterFunctionalTest extends DrupalWebTestCase {
     $this->assertUrlInboundAlter('community', 'forum');
     $this->assertUrlOutboundAlter('forum', 'community');
     $forum_vid = variable_get('forum_nav_vocabulary');
-    $tid = db_insert('taxonomy_term_data')
-      ->fields(array(
-        'name' => $this->randomName(),
-        'vid' => $forum_vid,
-      ))
-      ->execute();
+    $vocabulary = taxonomy_vocabulary_load($forum_vid);
+    $term = entity_create('taxonomy_term', array(
+      'name' => $this->randomName(),
+      'vocabulary_machine_name' => $vocabulary->machine_name,
+    ));
+    $term->save();
+    $tid = $term->tid;
     $this->assertUrlInboundAlter("community/$tid", "forum/$tid");
     $this->assertUrlOutboundAlter("forum/$tid", "community/$tid");
   }
