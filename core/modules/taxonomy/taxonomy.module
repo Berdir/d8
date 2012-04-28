@@ -89,12 +89,12 @@ function taxonomy_permission() {
   );
   foreach (taxonomy_vocabulary_load_multiple(FALSE) as $vocabulary) {
     $permissions += array(
-      'edit terms in ' . $vocabulary->vid => array(
+      'edit terms in ' . $vocabulary->machine_name => array(
         'title' => t('Edit terms in %vocabulary', array('%vocabulary' => $vocabulary->name)),
       ),
     );
     $permissions += array(
-       'delete terms in ' . $vocabulary->vid => array(
+       'delete terms in ' . $vocabulary->machine_name => array(
          'title' => t('Delete terms from %vocabulary', array('%vocabulary' => $vocabulary->name)),
       ),
     );
@@ -420,7 +420,7 @@ function taxonomy_term_access($op, $term) {
     return FALSE;
   }
 
-  return user_access("$op terms in $term->vid") || user_access('administer taxonomy');
+  return user_access("$op terms in $term->vocabulary_machine_name") || user_access('administer taxonomy');
 }
 
 /**
@@ -758,14 +758,14 @@ function taxonomy_term_load_parents_all($tid) {
  *
  * @param $tid
  *   A taxonomy term ID.
- * @param $vid
- *   An optional vocabulary ID to restrict the child search.
+ * @param $vocabulary_machine_name
+ *   (Optional) A vocabulary machine name to restrict the child search.
  *
  * @return
  *   An array of term objects that are the children of the term $tid, or an
  *   empty array when no children exist.
  */
-function taxonomy_term_load_children($tid, $vid = 0) {
+function taxonomy_term_load_children($tid, $vocabulary_machine_name = NULL) {
   $children = &drupal_static(__FUNCTION__, array());
 
   if ($tid && !isset($children[$tid])) {
@@ -773,8 +773,8 @@ function taxonomy_term_load_children($tid, $vid = 0) {
     $query->join('taxonomy_term_hierarchy', 'h', 'h.tid = t.tid');
     $query->addField('t', 'tid');
     $query->condition('h.parent', $tid);
-    if ($vid) {
-      $query->condition('t.vid', $vid);
+    if ($vocabulary_machine_name) {
+      $query->condition('t.vocabulary_machine_name', $vocabulary_machine_name);
     }
     $query->addTag('term_access');
     $query->orderBy('t.weight');
@@ -813,6 +813,9 @@ function taxonomy_get_tree($vid, $parent = 0, $max_depth = NULL, $load_entities 
   $parents = &drupal_static(__FUNCTION__ . ':parents', array());
   $terms = &drupal_static(__FUNCTION__ . ':terms', array());
 
+  $vocabulary = taxonomy_vocabulary_load($vid);
+  $vocabulary_machine_name = $vocabulary->machine_name;
+
   // We cache trees, so it's not CPU-intensive to call get_tree() on a term
   // and its children, too.
   if (!isset($children[$vid])) {
@@ -827,7 +830,7 @@ function taxonomy_get_tree($vid, $parent = 0, $max_depth = NULL, $load_entities 
       ->addTag('term_access')
       ->fields('t')
       ->fields('h', array('parent'))
-      ->condition('t.vid', $vid)
+      ->condition('t.vocabulary_machine_name', $vocabulary_machine_name)
       ->orderBy('t.weight')
       ->orderBy('t.name')
       ->execute();
@@ -912,23 +915,16 @@ function taxonomy_get_tree($vid, $parent = 0, $max_depth = NULL, $load_entities 
  *
  * @param $name
  *   Name of the term to search for.
- * @param $vocabulary
+ * @param $vocabulary_machine_name
  *   (optional) Vocabulary machine name to limit the search. Defaults to NULL.
  *
  * @return
  *   An array of matching term objects.
  */
-function taxonomy_term_load_multiple_by_name($name, $vocabulary = NULL) {
+function taxonomy_term_load_multiple_by_name($name, $vocabulary_machine_name = NULL) {
   $conditions = array('name' => trim($name));
-  if (isset($vocabulary)) {
-    $vocabularies = taxonomy_vocabulary_get_names();
-    if (isset($vocabularies[$vocabulary])){
-      $conditions['vid'] = $vocabularies[$vocabulary]->vid;
-    }
-    else {
-      // Return an empty array when filtering by a non-existing vocabulary.
-      return array();
-    }
+  if ($vocabulary_machine_name) {
+    $conditions['vocabulary_machine_name'] = $vocabulary_machine_name;
   }
   return taxonomy_term_load_multiple(array(), $conditions);
 }
@@ -1044,11 +1040,11 @@ function _taxonomy_get_tid_from_term(TaxonomyTerm $term) {
  *
  * @see drupal_explode_tags()
  */
-function taxonomy_implode_tags($tags, $vid = NULL) {
+function taxonomy_implode_tags($tags, $vocabulary_machine_name = NULL) {
   $typed_tags = array();
   foreach ($tags as $tag) {
     // Extract terms belonging to the vocabulary in question.
-    if (!isset($vid) || $tag->vid == $vid) {
+    if (!isset($vocabulary_machine_name) || $tag->vocabulary_machine_name == $vocabulary_machine_name) {
       // Make sure we have a completed loaded taxonomy term.
       if (isset($tag->name)) {
         // Commas and quotes in tag names are special cases, so encode 'em.
@@ -1392,9 +1388,7 @@ function taxonomy_autocomplete_validate($element, &$form_state) {
     $field = field_widget_field($element, $form_state);
     $vocabularies = array();
     foreach ($field['settings']['allowed_values'] as $tree) {
-      if ($vocabulary = taxonomy_vocabulary_machine_name_load($tree['vocabulary'])) {
-        $vocabularies[$vocabulary->vid] = $vocabulary;
-      }
+      $vocabularies[] = $tree['vocabulary'];
     }
 
     // Translate term names into actual terms.
@@ -1402,16 +1396,15 @@ function taxonomy_autocomplete_validate($element, &$form_state) {
     foreach ($typed_terms as $typed_term) {
       // See if the term exists in the chosen vocabulary and return the tid;
       // otherwise, create a new 'autocreate' term for insert/update.
-      if ($possibilities = taxonomy_term_load_multiple(array(), array('name' => trim($typed_term), 'vid' => array_keys($vocabularies)))) {
+      if ($possibilities = taxonomy_term_load_multiple(array(), array('name' => trim($typed_term), 'vocabulary_machine_name' => $vocabularies))) {
         $term = array_pop($possibilities);
       }
       else {
-        $vocabulary = reset($vocabularies);
+        $vocabulary_machine_name = reset($vocabularies);
         $term = array(
           'tid' => 'autocreate',
-          'vid' => $vocabulary->vid,
           'name' => $typed_term,
-          'vocabulary_machine_name' => $vocabulary->machine_name,
+          'vocabulary_machine_name' => $vocabulary_machine_name,
         );
       }
       $value[] = (array)$term;
@@ -1479,7 +1472,7 @@ function taxonomy_rdf_mapping() {
         'description'   => array(
           'predicates' => array('skos:definition'),
         ),
-        'vid'   => array(
+        'vocabulary_machine_name'   => array(
           'predicates' => array('skos:inScheme'),
           'type' => 'rel',
         ),

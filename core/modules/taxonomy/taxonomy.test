@@ -51,7 +51,7 @@ class TaxonomyWebTestCase extends DrupalWebTestCase {
       'description' => $this->randomName(),
       // Use the first available text format.
       'format' => db_query_range('SELECT format FROM {filter_format}', 0, 1)->fetchField(),
-      'vid' => $vocabulary->vid,
+      'vocabulary_machine_name' => $vocabulary->machine_name,
       'langcode' => LANGUAGE_NOT_SPECIFIED,
     ));
     taxonomy_term_save($term);
@@ -429,7 +429,7 @@ class TaxonomyTermUnitTest extends TaxonomyWebTestCase {
     $valid_term = $this->createTerm($vocabulary);
     // Delete a valid term.
     taxonomy_term_delete($valid_term->tid);
-    $terms = taxonomy_term_load_multiple(array(), array('vid' => $vocabulary->vid));
+    $terms = taxonomy_term_load_multiple(array(), array('vocabulary_machine_name' => $vocabulary->machine_name));
     $this->assertTrue(empty($terms), 'Vocabulary is empty after deletion');
 
     // Delete an invalid term. Should not throw any notices.
@@ -988,12 +988,13 @@ class TaxonomyTermTestCase extends TaxonomyWebTestCase {
     $new_vocabulary = $this->createVocabulary();
     $new_term = entity_create('taxonomy_term', array(
       'name' => $term->name,
-      'vid' => $new_vocabulary->vid,
+      'vocabulary_machine_name' => $new_vocabulary->machine_name,
     ));
     taxonomy_term_save($new_term);
 
     // Load multiple terms with the same name.
     $terms = taxonomy_term_load_multiple_by_name($term->name);
+    debug($terms);
     $this->assertEqual(count($terms), 2, 'Two terms loaded with the same name.');
 
     // Load single term when restricted to one vocabulary.
@@ -1355,7 +1356,7 @@ class TaxonomyLoadMultipleUnitTest extends TaxonomyWebTestCase {
       $this->createTerm($vocabulary);
     }
     // Load the terms from the vocabulary.
-    $terms = taxonomy_term_load_multiple(FALSE, array('vid' => $vocabulary->vid));
+    $terms = taxonomy_term_load_multiple(FALSE, array('vocabulary_machine_name' => $vocabulary->machine_name));
     $count = count($terms);
     $this->assertTrue($count == 5, format_string('Correct number of terms were loaded. !count terms.', array('!count' => $count)));
 
@@ -1365,7 +1366,7 @@ class TaxonomyLoadMultipleUnitTest extends TaxonomyWebTestCase {
     $this->assertEqual($terms, $terms2, 'Both arrays contain the same terms.');
 
     // Load the terms by tid, with a condition on vid.
-    $terms3 = taxonomy_term_load_multiple(array_keys($terms2), array('vid' => $vocabulary->vid));
+    $terms3 = taxonomy_term_load_multiple(array_keys($terms2), array('vocabulary_machine_name' => $vocabulary->machine_name));
     $this->assertEqual($terms2, $terms3, 'Same terms found when limiting load to vocabulary.');
 
     // Remove one term from the array, then delete it.
@@ -1375,7 +1376,7 @@ class TaxonomyLoadMultipleUnitTest extends TaxonomyWebTestCase {
     $this->assertFalse($deleted_term);
 
     // Load terms from the vocabulary by vid.
-    $terms4 = taxonomy_term_load_multiple(FALSE, array('vid' => $vocabulary->vid));
+    $terms4 = taxonomy_term_load_multiple(FALSE, array('vocabulary_machine_name' => $vocabulary->machine_name));
     $this->assertTrue(count($terms4 == 4), 'Correct number of terms were loaded.');
     $this->assertFalse(isset($terms4[$deleted->tid]));
 

@@ -306,9 +306,9 @@ function forum_node_validate(Node $node, $form) {
           form_set_error('taxonomy_forums', t('Select a forum.'));
           continue;
         }
-        $used = db_query_range('SELECT 1 FROM {taxonomy_term_data} WHERE tid = :tid AND vid = :vid',0 , 1, array(
+        $used = db_query_range('SELECT 1 FROM {taxonomy_term_data} WHERE tid = :tid AND vocabulary_machine_name = :vid',0 , 1, array(
           ':tid' => $term->tid,
-          ':vid' => $term->vid,
+          ':vid' => $term->vocabulary_machine_name,
         ))->fetchField();
         if ($used && in_array($term->tid, $containers)) {
           form_set_error('taxonomy_forums', t('The item %forum is a forum container, not a forum. Select one of the forums below instead.', array('%forum' => $term->name)));

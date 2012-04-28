@@ -669,15 +669,15 @@ function taxonomy_form_term($form, &$form_state, TaxonomyTerm $term = NULL, Taxo
         'langcode' => language_default()->langcode,
       ));
     }
-    if (!isset($vocabulary) && isset($term->vid)) {
-      $vocabulary = taxonomy_vocabulary_load($term->vid);
+    if (!isset($vocabulary) && isset($term->vocabulary_machine_name)) {
+      $vocabulary = taxonomy_vocabulary_machine_name_load($term->vocabulary_machine_name);
     }
     $form_state['term'] = $term;
   }
   else {
     $term = $form_state['term'];
-    if (!isset($vocabulary) && isset($term->vid)) {
-      $vocabulary = taxonomy_vocabulary_load($term->vid);
+    if (!isset($vocabulary) && isset($term->vocabulary_machine_name)) {
+      $vocabulary = taxonomy_vocabulary_machine_name_load($term->vocabulary_machine_name);
     }
   }
 
@@ -894,7 +894,7 @@ function taxonomy_term_confirm_delete($form, &$form_state, $term) {
   $form['tid'] = array('#type' => 'value', '#value' => $term->tid);
 
   $form['#term'] = $term;
-  $form['#vocabulary'] = taxonomy_vocabulary_load($term->vid);;
+  $form['#vocabulary'] = taxonomy_vocabulary_machine_name_load($term->vocabulary_machine_name);
   $form['type'] = array('#type' => 'value', '#value' => 'term');
   $form['name'] = array('#type' => 'value', '#value' => $term->name);
   $form['vocabulary_machine_name'] = array('#type' => 'value', '#value' => $term->vocabulary_machine_name);
@@ -975,7 +975,6 @@ function taxonomy_vocabulary_confirm_reset_alphabetical($form, &$form_state, $vi
   $vocabulary = taxonomy_vocabulary_load($vid);
 
   $form['type'] = array('#type' => 'value', '#value' => 'vocabulary');
-  $form['vid'] = array('#type' => 'value', '#value' => $vid);
   $form['machine_name'] = array('#type' => 'value', '#value' => $vocabulary->machine_name);
   $form['name'] = array('#type' => 'value', '#value' => $vocabulary->name);
   $form['reset_alphabetical'] = array('#type' => 'value', '#value' => TRUE);
@@ -996,7 +995,7 @@ function taxonomy_vocabulary_confirm_reset_alphabetical($form, &$form_state, $vi
 function taxonomy_vocabulary_confirm_reset_alphabetical_submit($form, &$form_state) {
   db_update('taxonomy_term_data')
     ->fields(array('weight' => 0))
-    ->condition('vid', $form_state['values']['vid'])
+    ->condition('vocabulary_machine_name', $form_state['values']['machine_name'])
     ->execute();
   drupal_set_message(t('Reset vocabulary %name to alphabetical order.', array('%name' => $form_state['values']['name'])));
   watchdog('taxonomy', 'Reset vocabulary %name to alphabetical order.', array('%name' => $form_state['values']['name']), WATCHDOG_NOTICE);

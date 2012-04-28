@@ -128,9 +128,9 @@ function taxonomy_autocomplete($field_name, $tags_typed = '') {
 
     // Part of the criteria for the query come from the field's own settings.
     $vids = array();
-    $vocabularies = taxonomy_vocabulary_get_names();
+    $vocabulary_machine_names = array();
     foreach ($field['settings']['allowed_values'] as $tree) {
-      $vids[] = $vocabularies[$tree['vocabulary']]->vid;
+      $vocabulary_machine_names[] = $tree['vocabulary'];
     }
 
     $query = db_select('taxonomy_term_data', 't');
@@ -144,7 +144,7 @@ function taxonomy_autocomplete($field_name, $tags_typed = '') {
     // Select rows that match by term name.
     $tags_return = $query
       ->fields('t', array('tid', 'name'))
-      ->condition('t.vid', $vids)
+      ->condition('t.vocabulary_machine_name', $vocabulary_machine_names)
       ->condition('t.name', '%' . db_like($tag_last) . '%', 'LIKE')
       ->range(0, 10)
       ->execute()

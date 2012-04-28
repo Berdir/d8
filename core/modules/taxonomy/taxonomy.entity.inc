@@ -18,13 +18,6 @@ class TaxonomyTerm extends Entity {
   public $tid;
 
   /**
-   * The taxonomy vocabulary ID this term belongs to.
-   *
-   * @var integer
-   */
-  public $vid;
-
-  /**
    * Name of the term.
    *
    * @var string
@@ -68,9 +61,7 @@ class TaxonomyTerm extends Entity {
   public $parent;
 
   /**
-   * (optional) The machine name of the vocabulary the term is assigned to. If
-   * not given, this value will be set automatically by loading the vocabulary
-   * based on the $entity->vid property.
+   * The machine name of the vocabulary the term is assigned to.
    *
    * @var string
    */
@@ -100,19 +91,10 @@ class TaxonomyTermController extends EntityDatabaseStorageController {
    * Overrides EntityDatabaseStorageController::create().
    *
    * @param array $values
-   *   An array of values to set, keyed by property name. A value for the
-   *   vocabulary ID ('vid') is required.
+   *   An array of values to set, keyed by property name.
    */
   public function create(array $values) {
     $entity = parent::create($values);
-    // Ensure the vocabulary machine name is initialized as it is used as bundle
-    // key.
-    // @todo Move to TaxonomyTerm::bundle() once field API has been converted
-    // to make use of it.
-    if (!isset($entity->vocabulary_machine_name)) {
-      $vocabulary = taxonomy_vocabulary_load($entity->vid);
-      $entity->vocabulary_machine_name = $vocabulary->machine_name;
-    }
     // Save new terms with no parents by default.
     if (!isset($entity->parent)) {
       $entity->parent = array(0);
@@ -137,9 +119,6 @@ class TaxonomyTermController extends EntityDatabaseStorageController {
         }
       }
     }
-    // Add the machine name field from the {taxonomy_vocabulary} table.
-    $query->innerJoin('taxonomy_vocabulary', 'v', 'base.vid = v.vid');
-    $query->addField('v', 'machine_name', 'vocabulary_machine_name');
     return $query;
   }
 
@@ -319,7 +298,11 @@ class TaxonomyVocabularyController extends EntityDatabaseStorageController {
    */
   protected function preDelete($entities) {
     // Only load terms without a parent, child terms will get deleted too.
-    $tids = db_query('SELECT t.tid FROM {taxonomy_term_data} t INNER JOIN {taxonomy_term_hierarchy} th ON th.tid = t.tid WHERE t.vid IN (:vids) AND th.parent = 0', array(':vids' => array_keys($entities)))->fetchCol();
+    $vocabulary_machine_names = array();
+    foreach ($entities as $entity) {
+      $vocabulary_machine_names[$entity->machine_name] = $entity->machine_name;
+    }
+    $tids = db_query('SELECT t.tid FROM {taxonomy_term_data} t INNER JOIN {taxonomy_term_hierarchy} th ON th.tid = t.tid WHERE t.vocabulary_machine_name IN (:vocabulary_machine_names) AND th.parent = 0', array(':vocabulary_machine_names' => $vocabulary_machine_names))->fetchCol();
     taxonomy_term_delete_multiple($tids);
   }
 

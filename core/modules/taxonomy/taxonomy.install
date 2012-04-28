@@ -32,12 +32,12 @@ function taxonomy_schema() {
         'not null' => TRUE,
         'description' => 'Primary Key: Unique term ID.',
       ),
-      'vid' => array(
-        'type' => 'int',
-        'unsigned' => TRUE,
+      'vocabulary_machine_name' => array(
+        'type' => 'varchar',
+        'length' => 255,
         'not null' => TRUE,
-        'default' => 0,
-        'description' => 'The {taxonomy_vocabulary}.vid of the vocabulary to which the term is assigned.',
+        'default' => '',
+        'description' => 'The vocabulary machine name.',
       ),
       'langcode' => array(
         'description' => 'The {language}.langcode of this term.',
@@ -78,12 +78,12 @@ function taxonomy_schema() {
     'foreign keys' => array(
       'vocabulary' => array(
         'table' => 'taxonomy_vocabulary',
-        'columns' => array('vid' => 'vid'),
+        'columns' => array('vocabulary_machine_name' => 'machine_name'),
       ),
     ),
     'indexes' => array(
-      'taxonomy_tree' => array('vid', 'weight', 'name'),
-      'vid_name' => array('vid', 'name'),
+      'taxonomy_tree' => array('vocabulary_machine_name', 'weight', 'name'),
+      'vocabulary_machine_name_name' => array('vocabulary_machine_name', 'name'),
       'name' => array('name'),
     ),
   );
