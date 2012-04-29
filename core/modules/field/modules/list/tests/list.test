@@ -6,6 +6,7 @@
  */
 
 use Drupal\field\FieldException;
+use Drupal\field\FieldValidationException;
 
 /**
  * Tests for the 'List' field types.
