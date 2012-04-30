@@ -1,20 +1,15 @@
 <?php
 
-use Drupal\Core\Database\Query\Select;
-
 /**
  * @file
- * Entity query API.
+ * Definition of Drupal\entity\EntityFieldQuery.
  */
 
-/**
- * Exception thrown by EntityFieldQuery() on unsupported query syntax.
- *
- * Some storage modules might not support the full range of the syntax for
- * conditions, and will raise an EntityFieldQueryException when an unsupported
- * condition was specified.
- */
-class EntityFieldQueryException extends Exception {}
+namespace Drupal\entity\Query;
+
+use Drupal\entity\EntityFieldQueryException;
+use Drupal\Core\Database\Query\Select;
+use PagerDefault;
 
 /**
  * Retrieves entities matching a given set of conditions.
@@ -956,4 +951,3 @@ class EntityFieldQuery {
   }
 
 }
-
