@@ -1663,11 +1663,11 @@ function taxonomy_taxonomy_term_delete(TaxonomyTerm $term) {
 /**
  * Implements hook_entity_query_alter().
  *
- * Convert EntityFieldQuerys on taxonomy terms that have an entity condition
- * on term bundles (vocabulary machine names). Since the vocabulary machine
- * name is not present in the {taxonomy_term_data} table itself, we have to
- * convert the bundle condition into a proprety condition of vocabulary IDs to
- * match against {taxonomy_term_data}.vid.
+ * Converts EntityFieldQuery instances on taxonomy terms that have an entity
+ * condition on term bundles (vocabulary machine names). Since the vocabulary
+ * machine name is not present in the {taxonomy_term_data} table itself, we have
+ * to convert the bundle condition into a proprety condition of vocabulary IDs
+ * to match against {taxonomy_term_data}.vid.
  */
 function taxonomy_entity_query_alter($query) {
   $conditions = &$query->entityConditions;
@@ -1690,4 +1690,5 @@ function taxonomy_entity_query_alter($query) {
     $query->propertyCondition('vid', $vids, $conditions['bundle']['operator']);
     unset($conditions['bundle']);
   }
+
 }
