@@ -1690,5 +1690,4 @@ function taxonomy_entity_query_alter($query) {
     $query->propertyCondition('vid', $vids, $conditions['bundle']['operator']);
     unset($conditions['bundle']);
   }
-
 }

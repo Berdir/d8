@@ -1965,4 +1965,5 @@ class TaxonomyEFQTestCase extends TaxonomyWebTestCase {
     asort($result);
     $this->assertEqual(array_keys($terms2), array_keys($result), format_string('Taxonomy terms from the %name vocabulary were retrieved by EntityFieldQuery.', array('%name' => $vocabulary2->name)));
   }
+
 }
