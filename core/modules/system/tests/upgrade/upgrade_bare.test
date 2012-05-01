@@ -1,25 +1,42 @@
 <?php
 
 /**
- * Upgrade test for the bare database..
+ * Runs major version upgrade tests for the bare database.
  *
  * Load an empty installation of Drupal 7 and run the upgrade process on it.
  */
-class BareUpgradePathTestCase extends UpgradePathTestCase {
+class MajorBareUpgradePathTestCase extends MajorUpgradePathNGTestCase {
   public static function getInfo() {
     return array(
-      'name'  => 'Bare upgrade test',
-      'description'  => 'Bare upgrade test.',
+      'name'  => 'Major version bare upgrade test.',
+      'description'  => 'Bare upgrade test from 7.x to 8.x.',
       'group' => 'Upgrade path',
     );
   }
 
-  public function setUp() {
-    // Path to the database dump.
-    $this->databaseDumpFiles = array(
-      drupal_get_path('module', 'system') . '/tests/upgrade/drupal-7.bare.database.php.gz',
+  /**
+   * Tests a bare upgrade.
+   */
+  public function testBareUpgrade() {
+    $this->assertTrue($this->performUpgrade(), t('The upgrade was completed successfully.'));
+
+    // Ensure that the new Entity module is enabled after upgrade.
+    $this->assertTrue(module_exists('entity'), 'Entity module enabled after upgrade.');
+  }
+}
+
+/**
+ * Runs minor version upgrade tests for the bare database.
+ *
+ * Load an empty installation of Drupal 7 and run the upgrade process on it.
+ */
+class MinorBareUpgradePathTestCase extends MinorUpgradePathNGTestCase {
+  public static function getInfo() {
+    return array(
+      'name'  => 'Minor version bare upgrade test.',
+      'description'  => 'Bare upgrade test from 8.x to 8.x',
+      'group' => 'Upgrade path',
     );
-    parent::setUp();
   }
 
   /**

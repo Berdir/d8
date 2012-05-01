@@ -317,7 +317,7 @@ abstract class UpgradePathTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * Force uninstall all modules from a test database, except those listed.
+   * Forces uninstall all modules from a test database, except those listed.
    *
    * @param $modules
    *   The list of modules to keep installed. Required core modules will
@@ -334,4 +334,475 @@ abstract class UpgradePathTestCase extends DrupalWebTestCase {
       ->execute();
   }
 
+}
+
+/**
+ * Performs end-to-end tests of the upgrade path.
+ */
+abstract class MajorUpgradePathNGTestCase extends DrupalWebTestCase {
+  protected $profile = 'testing';
+
+  /**
+   * Installation profile of previous Drupal version to install.
+   *
+   * @todo Switch to Minimal.
+   */
+  protected $oldProfile = 'standard';
+
+  /**
+   * Stores the original cURL options.
+   *
+   * Drupal doesn't allow to install Drupal with a user agent containing
+   * "simpletest", so we need to temporarily switch it to something else.
+   */
+  protected $originalAdditionalCurlOptions = array();
+
+  /**
+   * Replaces DrupalWebTestCase::setUp().
+   */
+  protected function setUp() {
+    global $user;
+
+    // Setup verbose files directory etc.
+    // @todo Hm. We only need prepareEnvironment(), but without a databasePrefix
+    //   the test batch throws fatal errors, as it tries to access the original
+    //   db connection.
+    $this->prepareDatabasePrefix();
+    $this->prepareEnvironment();
+
+    $this->upgrade_root = variable_get('file_public_path', conf_path() . '/files') .'/upgrade_simpletest_'. $this->randomName(16);
+    $this->upgrade_url = $GLOBALS['base_url'] .'/'. $this->upgrade_root;
+
+    // Recreate the Drupal checkout root directory.
+    file_prepare_directory($this->upgrade_root, FILE_CREATE_DIRECTORY);
+
+    $this->prepareCheckout();
+    $this->prepareUpgradeEnvironment();
+
+    // install.core.inc actively prevents a user agent containing "simpletest"
+    // to install Drupal. This is because 'simpletest' agent is disallowed
+    // for security reasons.
+    $this->originalAdditionalCurlOptions = $this->additionalCurlOptions;
+    $this->additionalCurlOptions[CURLOPT_USERAGENT] = 'Drupal';
+
+    // Install the previous version of Drupal.
+    $this->installDrupal();
+    $this->setupDrupal();
+
+    // Generate any necessary content.
+    $this->upgrade_options = array(
+      'base_url' => $this->upgrade_url,
+    );
+    $this->generateContent();
+
+    // Revert everything we changed.
+    $this->additionalCurlOptions = $this->originalAdditionalCurlOptions;
+
+    // Lastly, change the database prefix to the one of the freshly installed
+    // child site, so we can perform the upgrade.
+    $this->changeDatabasePrefix();
+
+    // Log in with root $user.
+    $this->originalUser = $user;
+    drupal_save_session(FALSE);
+    drupal_flush_all_caches();
+    $user = $this->root_user;
+
+    $this->setup = TRUE;
+    $this->variable_set('simpletest_upgrade_bypass_ua', TRUE);
+  }
+
+  /**
+   * Replaces the use of variable_set() for the test site when not upgraded yet.
+   *
+   * @param $name
+   *   The name of the variable to set.
+   * @param $value
+   *   The value to set. This can be any PHP data type; these functions take care
+   *   of serialization as necessary.
+   */
+  protected function variable_set($name, $value) {
+    db_delete('variable')
+      ->condition('name', $name)
+      ->execute();
+    db_insert('variable')
+      ->fields(array(
+        'name' => $name,
+        'value' => serialize($value),
+      ))
+      ->execute();
+
+    try {
+      cache()->delete('variables');
+      cache('bootstrap')->delete('variables');
+    }
+    catch (Exception $e) {}
+  }
+
+  /**
+   * Executes a command or list of commands and debugs the result.
+   *
+   * In case of errors these are logged too. This helps developers
+   * and testers to check their test environment.
+   * Ie output too like "sh: git: command not found"
+   *
+   * @param $commands
+   *   The (list of) command string(s).
+   */
+  protected function shell_exec($commands) {
+    if (!is_array($commands)) {
+      $commands = array($commands);
+    }
+    foreach ($commands as $command) {
+      // @see http://php.net/manual/en/language.operators.execution.php
+      $result = shell_exec("$command 2>&1");
+      debug($result, $command);
+    }
+  }
+
+  protected function tearDown() {
+    parent::tearDown();
+    $this->shell_exec("chmod -R 0775 {$this->upgrade_root}");
+    // Delete temporary files directory.
+    file_unmanaged_delete_recursive($this->upgrade_root);
+  }
+
+  /**
+   * Clones a fresh Drupal 7 git checkout into the upgrade directory.
+   *
+   * For sanity checks we run a few environent tests to help local
+   * developers getting grip to their development environment.
+   *
+   * For example:
+   * - the location for git is system dependent.
+   * - the cleanup of the checkout directory failed a previous time.
+   * - mixing drush and apache is mixing access control attributes.
+   */
+  protected function prepareCheckout() {
+    $this->git_command = variable_get('simpletest_git_path', 'git');
+    //TODO: change commands to an OS agnostic version.
+    $this->shell_exec("chmod -R 0775 {$this->upgrade_root}");
+    $this->shell_exec("{$this->git_command} archive origin/7.x | tar -x -C {$this->upgrade_root}");
+  }
+
+  /**
+   * Prepares .htaccess and settings.php.
+   *
+   * We need to have write access for sites/default/settings.php of the test
+   * environment.
+   *
+   * As the tests are ran in a trusted environment we allow for insecure
+   * .htaccess settings.
+   *
+   * Note we only apply these settings when there is no 'SetHandler' set yet.
+   */
+  protected function prepareUpgradeEnvironment() {
+    // Revert public filesystem security.
+    $htaccess_file = $this->upgrade_root . '/.htaccess';
+    $htaccess = file_get_contents($htaccess_file);
+    if (strpos($htaccess, 'SetHandler') === FALSE) {
+      // We allow for all possible options.
+      $htaccess_insecure = "# Injected by " . __METHOD__;
+      $htaccess_insecure .= "\nSetHandler none";
+      $htaccess_insecure .= "\nOptions All";
+      $htaccess_insecure .= "\n# END Injected by " . __METHOD__;
+      $htaccess_insecure .= "\n\n\n";
+      $htaccess = $htaccess_insecure . $htaccess;
+      file_put_contents($htaccess_file, $htaccess);
+    }
+    else {
+      debug("Skipping 'SetHandler' $htaccess_file", 'prepareUpgradeEnvironment');
+    }
+
+    // Create the settings file.
+    $settings_file = $this->upgrade_root .'/sites/default/settings.php';
+    $settings = file_get_contents($this->upgrade_root .'/sites/default/default.settings.php');
+    $connection_info = Database::getConnectionInfo('default');
+    $connection_info['default']['prefix']['default'] = $connection_info['default']['prefix']['default'] . $this->databasePrefix;
+
+    $extra_settings = '$databases["default"] = '. var_export($connection_info, TRUE) .";\n";
+    $extra_settings .= '$conf["cache_backends"][] = "includes/cache-install.inc";' ."\n";
+    $extra_settings .= '$conf["cache_default_class"] = "DrupalFakeCache";';
+    $settings .= "\n$extra_settings\n";
+    file_put_contents($settings_file, $settings);
+  }
+
+  /**
+   * Installs a new Drupal using the upgrade url and database.
+   */
+  protected function installDrupal() {
+    $this->drupalGet("$this->upgrade_url/install.php", array('external' => TRUE));
+
+    // Profile selection.
+    $edit = array(
+      'profile' => $this->oldProfile,
+    );
+    $this->drupalPost(NULL, $edit, t('Save and continue'));
+
+    // Language selection.
+    $this->drupalPost(NULL, array(), t('Save and continue'));
+
+    // Site setup.
+    $this->root_user = (object) array(
+      'uid' => 1,
+      'name' => 'admin',
+      'mail' => 'simpletest@example.com',
+      'pass_raw' => $this->randomName(),
+    );
+    $edit = array(
+      'site_mail' => 'simpletest@example.com',
+      'account[name]' => $this->root_user->name,
+      'account[mail]' => $this->root_user->mail,
+      'account[pass][pass1]' => $this->root_user->pass_raw,
+      'account[pass][pass2]' => $this->root_user->pass_raw,
+      'update_status_module[1]' => FALSE,
+    );
+    $this->drupalPost(NULL, $edit, t('Save and continue'));
+
+    // Finally coming home.
+    $this->clickLink(t('Visit your new site'));
+
+  }
+
+  protected function setupDrupal() {
+  }
+
+  protected function generateContent() {
+  }
+
+  /**
+   * Performs the upgrade.
+   *
+   * @param $register_errors
+   *   Register the errors during the upgrade process as failures.
+   * @return
+   *   TRUE if the upgrade succeeded, FALSE otherwise.
+   */
+  protected function performUpgrade($register_errors = TRUE) {
+    $update_url = $GLOBALS['base_url'] . '/core/update.php';
+
+    // Load the first update screen.
+    $this->drupalGet($update_url, array('external' => TRUE));
+    if (!$this->assertResponse(200)) {
+      return FALSE;
+    }
+
+    // Continue.
+    $response = filter_xss($this->drupalPost(NULL, array(), t('Continue')), array());
+    if (!$this->assertResponse(200)) {
+      return FALSE;
+    }
+
+    // Check for any pending updates.
+    if (strpos($response, t('No pending updates.')) === FALSE) {
+      // Go!
+      $this->drupalPost(NULL, array(), t('Apply pending updates'));
+      if (!$this->assertText('Updates were attempted')) {
+        return FALSE;
+      }
+
+      // Check for errors during the update process.
+      foreach ($this->xpath('//li[@class=:class]', array(':class' => 'failure')) as $element) {
+        $message = strip_tags($element->asXML());
+        $this->upgradeErrors[] = $message;
+        if ($register_errors) {
+          $this->fail($message);
+        }
+      }
+
+      if (!empty($this->upgradeErrors)) {
+        // Upgrade failed, the installation might be in an inconsistent state,
+        // don't process.
+        return FALSE;
+      }
+    }
+
+    // Assert that there are no remaining updates.
+    $this->drupalGet($update_url, array('external' => TRUE));
+    $this->drupalPost(NULL, array(), t('Continue'));
+    if (!$this->assertText(t('No pending updates.'), t('No pending updates at the end of the update process.'))) {
+      return FALSE;
+    }
+
+    // Upgrade succeed, rebuild the environment so that we can call the API
+    // of the child site directly from this request.
+    $this->upgradedSite = TRUE;
+
+    // Reload hook implementations
+    module_implements_reset();
+
+    // Rebuild caches.
+    drupal_static_reset();
+    drupal_flush_all_caches();
+    module_list(TRUE);
+
+    // Reload global $conf array and permissions.
+    $this->refreshVariables();
+    $this->checkPermissions(array(), TRUE);
+
+    // Check we can load the front page of the new site.
+    $this->drupalGet('');
+    return $this->assertText('Powered by Drupal', t('The front page of the upgraded site loads successfully.'));
+  }
+
+  /**
+   * Force uninstall all modules from a test database, except those listed.
+   *
+   * @param $modules
+   *   The list of modules to keep installed. Required core modules will
+   *   always be kept.
+   */
+  protected function uninstallModulesExcept(array $keep_modules) {
+    $required_modules = array('block', 'dblog', 'filter', 'node', 'system', 'update', 'user');
+
+    $modules = array_merge($required_modules, $keep_modules);
+
+    db_delete('system')
+      ->condition('type', 'module')
+      ->condition('name', $modules, 'NOT IN')
+      ->execute();
+  }
+
+}
+
+/**
+ * Performs end-to-end tests of the upgrade path.
+ */
+abstract class MinorUpgradePathNGTestCase extends MajorUpgradePathNGTestCase {
+
+  protected function setUp() {
+    global $user;
+
+    // Setup verbose files directory etc.
+    $this->prepareDatabasePrefix();
+    $this->prepareEnvironment();
+
+    $this->upgrade_root = variable_get('file_public_path', conf_path() . '/files') .'/upgrade_simpletest_'. $this->randomName(16);
+    $this->upgrade_url = $GLOBALS['base_url'] .'/'. $this->upgrade_root;
+
+    // Recreate the Drupal checkout root directory.
+    file_prepare_directory($this->upgrade_root, FILE_CREATE_DIRECTORY);
+
+    $this->prepareCheckout();
+    $this->prepareUpgradeEnvironment();
+
+    // install.core.inc actively prevents a user agent containing "simpletest"
+    // to install Drupal.  DrupalWTF!
+    $this->originalAdditionalCurlOptions = $this->additionalCurlOptions;
+    $this->additionalCurlOptions[CURLOPT_USERAGENT] = 'Drupal';
+
+    // Install the previous version of Drupal.
+    $this->installDrupal();
+    $this->setupDrupal();
+
+    // Generate any necessary content.
+    $this->upgrade_options = array(
+      'base_url' => $this->upgrade_url,
+    );
+    $this->generateContent();
+
+    // Revert everything we changed.
+    $this->additionalCurlOptions = $this->originalAdditionalCurlOptions;
+
+    // Lastly, change the database prefix to the one of the freshly installed
+    // child site, so we can perform the upgrade.
+    $this->changeDatabasePrefix();
+
+    // Log in with root $user.
+    $this->originalUser = $user;
+    drupal_save_session(FALSE);
+    drupal_flush_all_caches();
+    $user = $this->root_user;
+
+    $this->setup = TRUE;
+    $this->variable_set('simpletest_upgrade_bypass_ua', TRUE);
+  }
+
+  /**
+   * Clones a fresh Drupal 8 git checkout into upgrade directory.
+   *
+   * For sanity checks we run a few environent tests to help local
+   * developers getting grip to their development environment.
+   *
+   * For example:
+   * - the location for git is system dependent.
+   * - the cleanup of the checkout directory failed a previous time.
+   * - mixing drush and apache is mixing access control attributes
+   */
+  protected function prepareCheckout() {
+    $this->git_command = variable_get('simpletest_git_path', 'git');
+    //TODO: change commands to an OS agnostic version.
+    $this->shell_exec("chmod -R 0775 {$this->upgrade_root}");
+    $this->shell_exec("{$this->git_command} archive origin/8.x | tar -x -C {$this->upgrade_root}");
+  }
+
+  /**
+   * Prepares .htaccess and settings.php.
+   */
+  protected function prepareUpgradeEnvironment() {
+    // Revert public filesystem security.
+    $htaccess_file = $this->upgrade_root . '/.htaccess';
+    $htaccess = file_get_contents($htaccess_file);
+    if (strpos($htaccess, 'SetHandler') === FALSE) {
+      $htaccess = 'SetHandler none
+Options All
+'. $htaccess;
+      file_put_contents($htaccess_file, $htaccess);
+    }
+
+    // Create the settings file.
+    $settings_file = $this->upgrade_root .'/sites/default/settings.php';
+    $settings = file_get_contents($this->upgrade_root .'/sites/default/default.settings.php');
+    $connection_info = Database::getConnectionInfo('default');
+    $connection_info['default']['prefix']['default'] = $connection_info['default']['prefix']['default'] . $this->databasePrefix;
+
+    $extra_settings = '$databases["default"] = '. var_export($connection_info, TRUE) .";\n";
+    $settings .= "\n$extra_settings\n";
+    file_put_contents($settings_file, $settings);
+  }
+
+  protected function installDrupal() {
+    $this->drupalGet("$this->upgrade_url/core/install.php", array('external' => TRUE));
+
+    // Language selection.
+    $this->drupalPost(NULL, array(), t('Save and continue'));
+
+    // Profile selection.
+    $edit = array(
+      'profile' => $this->oldProfile,
+    );
+    $this->drupalPost(NULL, $edit, t('Save and continue'));
+
+    // Site setup.
+    $this->root_user = (object) array(
+      'uid' => 1,
+      'name' => 'admin',
+      'mail' => 'simpletest@example.com',
+      'pass_raw' => $this->randomName(),
+    );
+    $edit = array(
+      'site_mail' => 'simpletest@example.com',
+      'account[name]' => $this->root_user->name,
+      'account[mail]' => $this->root_user->mail,
+      'account[pass][pass1]' => $this->root_user->pass_raw,
+      'account[pass][pass2]' => $this->root_user->pass_raw,
+      'update_status_module[1]' => FALSE,
+    );
+    $this->drupalPost(NULL, $edit, t('Save and continue'));
+
+    // Finally coming home.
+    $this->clickLink(t('Visit your new site'));
+  }
+
+  /**
+   * Performs the upgrade.
+   *
+   * @param $register_errors
+   *   Register the errors during the upgrade process as failures.
+   * @return
+   *   TRUE if the upgrade succeeded, FALSE otherwise.
+   */
+  protected function performUpgrade($register_errors = TRUE) {
+    return parent::performUpgrade($register_errors);
+  }
 }

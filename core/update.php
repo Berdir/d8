@@ -298,6 +298,10 @@ function update_access_allowed() {
   if (!empty($update_free_access)) {
     return TRUE;
   }
+  // Allow tests to access update.php.
+  if (drupal_valid_test_ua() && variable_get('simpletest_upgrade_bypass_ua', NULL)) {
+    return TRUE;
+  }
   // Calls to user_access() might fail during the Drupal 6 to 7 update process,
   // so we fall back on requiring that the user be logged in as user #1.
   try {

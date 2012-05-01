@@ -1,31 +1,77 @@
 <?php
 
 /**
- * Upgrade test for the filled database..
+ * Runs major version upgrade tests for a database with content.
  *
  * Load a filled installation of Drupal 7 and run the upgrade process on it.
  */
-class FilledUpgradePathTestCase extends UpgradePathTestCase {
+class MajorFilledUpgradePathTestCase extends MajorUpgradePathNGTestCase {
   public static function getInfo() {
     return array(
-      'name'  => 'Filled upgrade test',
-      'description'  => 'Filled upgrade test.',
+      'name'  => 'Major version filled upgrade test.',
+      'description'  => 'Upgrade test from 7.x to 8.x. with content.',
       'group' => 'Upgrade path',
     );
   }
 
-  public function setUp() {
-    // Path to the database dump.
-    $this->databaseDumpFiles = array(
-      drupal_get_path('module', 'system') . '/tests/upgrade/drupal-7.filled.database.php.gz',
-    );
-    parent::setUp();
+  protected function generateContent() {
+    parent::generateContent();
+    // Create a node.
+    for ($i = 0; $i < 50; $i++) {
+      $type = ($i < 25) ? 'page' : 'article';
+      $langcode = LANGUAGE_NOT_SPECIFIED;
+      $edit = array();
+      $edit["title"] = $this->randomName(8);
+      $edit["body[$langcode][0][value]"] = $this->randomName(16);
+      $this->drupalPost("node/add/$type", $edit, t('Save'), $this->upgrade_options);
+    }
   }
 
   /**
-   * Test a successful upgrade.
+   * Tests a successful upgrade.
    */
   public function testFilledUpgrade() {
     $this->assertTrue($this->performUpgrade(), t('The upgrade was completed successfully.'));
+
+    // Ensure that the new Entity module is enabled after upgrade.
+    $this->assertTrue(module_exists('entity'), 'Entity module enabled after upgrade.');
+  }
+}
+
+/**
+ * Runs minor version upgrade tests for a database with content.
+ *
+ * Load a filled installation of Drupal 7 and run the upgrade process on it.
+ */
+class MinorFilledUpgradePathTestCase extends MinorUpgradePathNGTestCase {
+  public static function getInfo() {
+    return array(
+      'name'  => 'Minor version filled upgrade test.',
+      'description'  => 'Upgrade test from 8.x to 8.x with content.',
+      'group' => 'Upgrade path',
+    );
+  }
+
+  protected function generateContent() {
+    parent::generateContent();
+    // Create a node.
+    for ($i = 0; $i < 50; $i++) {
+      $type = ($i < 25) ? 'page' : 'article';
+      $langcode = LANGUAGE_NOT_SPECIFIED;
+      $edit = array();
+      $edit["title"] = $this->randomName(8);
+      $edit["body[$langcode][0][value]"] = $this->randomName(16);
+      $this->drupalPost("node/add/$type", $edit, t('Save'), $this->upgrade_options);
+    }
+  }
+
+  /**
+   * Tests a successful upgrade.
+   */
+  public function testFilledUpgrade() {
+    $this->assertTrue($this->performUpgrade(), t('The upgrade was completed successfully.'));
+
+    // Ensure that the new Entity module is enabled after upgrade.
+    $this->assertTrue(module_exists('entity'), 'Entity module enabled after upgrade.');
   }
 }
