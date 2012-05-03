@@ -1232,7 +1232,7 @@ person@example.com or mailto:person2@example.com not ' . $too_long_email . '
 ' => array(
         '<a href="mailto:person@example.com">person@example.com</a>' => TRUE,
         '<a href="mailto:person2@example.com">mailto:person2@example.com</a>' => TRUE,
-        '<a href="' . $too_long_email . '">' . $too_long_email . '</a>' => FALSE,
+        '<a href="mailto:' . $too_long_email . '">' . $too_long_email . '</a>' => FALSE,
       ),
       // URI parts and special characters.
       '
