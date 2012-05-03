@@ -1234,6 +1234,7 @@ person@example.com or mailto:person2@example.com or ' . $long_email . ' but not 
 ' => array(
         '<a href="mailto:person@example.com">person@example.com</a>' => TRUE,
         '<a href="mailto:person2@example.com">mailto:person2@example.com</a>' => TRUE,
+        '<a href="mailto:' . $long_email . '">' . $long_email . '</a>' => FALSE,
         '<a href="mailto:' . $too_long_email . '">' . $too_long_email . '</a>' => FALSE,
       ),
       // URI parts and special characters.
