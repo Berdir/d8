@@ -1215,7 +1215,9 @@ class FilterUnitTestCase extends DrupalUnitTestCase {
     // - characters/encoding, surrounding markup, security
 
     // Create a e-mail that is too long.
-    $too_long_email = str_repeat('a', 243) . '@example.com';
+    $long_email = str_repeat('a', 254) . '@example.com';
+    $too_long_email = str_repeat('b', 255) . '@example.com';
+
 
     // Filter selection/pattern matching.
     $tests = array(
@@ -1228,7 +1230,7 @@ http://example.com or www.example.com
       ),
       // MAILTO URLs.
       '
-person@example.com or mailto:person2@example.com not ' . $too_long_email . '
+person@example.com or mailto:person2@example.com or ' . $long_email . ' but not ' . $too_long_email . '
 ' => array(
         '<a href="mailto:person@example.com">person@example.com</a>' => TRUE,
         '<a href="mailto:person2@example.com">mailto:person2@example.com</a>' => TRUE,
