@@ -1,6 +1,7 @@
 <?php
 
 use Drupal\Core\Database\Query\SelectInterface;
+
 /**
  * @file
  * Enables the user registration and login system.
