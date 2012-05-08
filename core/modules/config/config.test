@@ -6,15 +6,12 @@
  */
 
 use Drupal\Core\Config\FileStorage;
-use Drupal\Core\Config\SignedFileStorage;
 use Drupal\simpletest\WebTest;
 
 /**
  * Tests the secure file writer.
  */
 class ConfigFileSecurityTestCase extends WebTest {
-  protected $profile = 'testing';
-
   protected $filename = 'foo.bar';
 
   protected $testContent = 'Good morning, Denver!';
