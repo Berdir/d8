@@ -5,10 +5,12 @@
  * Tests for shortcut.module.
  */
 
+use Drupal\simpletest\WebTest;
+
 /**
  * Defines base class for shortcut test cases.
  */
-class ShortcutTestCase extends DrupalWebTestCase {
+class ShortcutTestCase extends WebTest {
 
   /**
    * User with permission to administer shortcuts.

@@ -1,11 +1,13 @@
 <?php
 
 use Drupal\Component\Uuid\Uuid;
+use Drupal\simpletest\WebTest;
+use Drupal\simpletest\UnitTest;
 
 /**
  * Tests the Drupal\Component\Uuid\Uuid class.
  */
-class UuidUnitTestCase extends DrupalUnitTestCase {
+class UuidUnitTestCase extends UnitTest {
 
   /**
    * The UUID object to be used for generating UUIDs.

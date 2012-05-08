@@ -7,12 +7,12 @@
 
 namespace Drupal\tracker\Tests;
 
-use DrupalWebTestCase;
+use Drupal\simpletest\WebTest;
 
 /**
  * Defines a base class for testing tracker.module.
  */
-class TrackerTest extends DrupalWebTestCase {
+class TrackerTest extends WebTest {
 
   /**
    * The main user for testing.

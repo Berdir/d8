@@ -5,6 +5,8 @@
  * Tests for options.module.
  */
 
+use Drupal\simpletest\WebTest;
+
 class OptionsWidgetsTestCase extends FieldTestCase {
   public static function getInfo() {
     return array(

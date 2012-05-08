@@ -5,7 +5,10 @@
  * Tests for dblog.module.
  */
 
-class DBLogTestCase extends DrupalWebTestCase {
+
+use Drupal\simpletest\WebTest;
+
+class DBLogTestCase extends WebTest {
   protected $profile = 'standard';
 
   protected $big_user;

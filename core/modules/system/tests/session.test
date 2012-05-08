@@ -5,7 +5,9 @@
  * Provides SimpleTests for core session handling functionality.
  */
 
-class SessionTestCase extends DrupalWebTestCase {
+use Drupal\simpletest\WebTest;
+
+class SessionTestCase extends WebTest {
   public static function getInfo() {
     return array(
       'name' => 'Session tests',
@@ -293,7 +295,7 @@ class SessionTestCase extends DrupalWebTestCase {
 /**
  * Ensure that when running under https two session cookies are generated.
  */
-class SessionHttpsTestCase extends DrupalWebTestCase {
+class SessionHttpsTestCase extends WebTest {
 
   public static function getInfo() {
     return array(

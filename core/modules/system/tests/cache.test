@@ -1,6 +1,8 @@
 <?php
 
-class CacheTestCase extends DrupalWebTestCase {
+use Drupal\simpletest\WebTest;
+
+class CacheTestCase extends WebTest {
   protected $default_bin = 'page';
   protected $default_cid = 'test_temporary';
   protected $default_value = 'CacheTest';

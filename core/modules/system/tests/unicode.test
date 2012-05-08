@@ -5,10 +5,13 @@
  * Various unicode handling tests.
  */
 
+use Drupal\simpletest\WebTest;
+use Drupal\simpletest\UnitTest;
+
 /**
  * Test unicode handling features implemented in unicode.inc.
  */
-class UnicodeUnitTest extends DrupalUnitTestCase {
+class UnicodeUnitTest extends UnitTest {
 
   /**
    * Whether to run the extended version of the tests (including non latin1 characters).

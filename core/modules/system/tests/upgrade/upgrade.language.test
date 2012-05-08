@@ -4,6 +4,8 @@
  * Upgrade tests for the Language module.
  */
 
+use Drupal\simpletest\WebTest;
+
 /**
  * Tests upgrading a filled database with language data.
  *
