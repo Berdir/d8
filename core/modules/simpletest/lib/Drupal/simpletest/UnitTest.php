@@ -30,7 +30,7 @@ abstract class UnitTest extends Test {
   /**
    * Sets up unit test environment.
    *
-   * Unlike WebTest::setUp(), UnitTest::setUp() does not
+   * Unlike Drupal\simpletest\WebTest::setUp(), UnitTest::setUp() does not
    * install modules because tests are performed without accessing the database.
    * Any required files must be explicitly included by the child class setUp()
    * method.

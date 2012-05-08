@@ -95,7 +95,7 @@ class PollWebTestCase extends WebTest {
    * @return
    *   An indexed array containing:
    *   - The generated POST values, suitable for
-   *     WebTest::drupalPost().
+   *     Drupal\simpletest\WebTest::drupalPost().
    *   - The number of poll choices contained in 'edit', for potential re-usage
    *     in subsequent invocations of this function.
    */

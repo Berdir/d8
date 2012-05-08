@@ -21,13 +21,14 @@ class MenuWebTestCase extends WebTest {
    * Assert that a given path shows certain breadcrumb links.
    *
    * @param string $goto
-   *   (optional) A system path to pass to WebTest::drupalGet().
+   *   (optional) A system path to pass to
+   *   Drupal\simpletest\WebTest::drupalGet().
    * @param array $trail
    *   An associative array whose keys are expected breadcrumb link paths and
    *   whose values are expected breadcrumb link texts (not sanitized).
    * @param string $page_title
    *   (optional) A page title to additionally assert via
-   *   WebTest::assertTitle(). Without site name suffix.
+   *   Drupal\simpletest\WebTest::assertTitle(). Without site name suffix.
    * @param array $tree
    *   (optional) An associative array whose keys are link paths and whose
    *   values are link titles (not sanitized) of an expected active trail in a

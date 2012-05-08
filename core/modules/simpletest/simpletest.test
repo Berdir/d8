@@ -341,7 +341,7 @@ class SimpleTestBrowserTestCase extends WebTest {
   }
 
   /**
-   * Test WebTest::getAbsoluteUrl().
+   * Test Drupal\simpletest\WebTest::getAbsoluteUrl().
    */
   function testGetAbsoluteUrl() {
     $url = 'user/login';
