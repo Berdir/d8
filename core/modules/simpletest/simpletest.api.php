@@ -59,9 +59,9 @@ function hook_test_group_finished() {
  * This hook is called when an individual test has finished.
  *
  * @param
- *   $results The results of the test as gathered by WebTest.
+ *   $results The results of the test as gathered by Drupal\simpletest\WebTest.
  *
- * @see WebTest->results
+ * @see Drupal\simpletest\WebTest->results()
  */
 function hook_test_finished($results) {
 }
