@@ -538,14 +538,14 @@ abstract class WebTest extends Test {
    *
    * The generated database table prefix is used for the Drupal installation
    * being performed for the test. It is also used as user agent HTTP header
-   * value by the cURL-based browser of DrupalWebTestCase, which is sent to the
-   * Drupal installation of the test. During early Drupal bootstrap, the user
-   * agent HTTP header is parsed, and if it matches, all database queries use
-   * the database table prefix that has been generated here.
+   * value by the cURL-based browser of Drupal\simpletest\WebTest, which is sent
+   * to the Drupal installation of the test. During early Drupal bootstrap, the
+   * user agent HTTP header is parsed, and if it matches, all database queries
+   * use the database table prefix that has been generated here.
    *
-   * @see DrupalWebTestCase::curlInitialize()
+   * @see Drupal\simpletest\WebTest::curlInitialize()
    * @see drupal_valid_test_ua()
-   * @see DrupalWebTestCase::setUp()
+   * @see Drupal\simpletest\WebTest::setUp()
    */
   protected function prepareDatabasePrefix() {
     $this->databasePrefix = 'simpletest' . mt_rand(1000, 1000000);
@@ -562,7 +562,7 @@ abstract class WebTest extends Test {
   /**
    * Changes the database connection to the prefixed one.
    *
-   * @see DrupalWebTestCase::setUp()
+   * @see Drupal\simpletest\WebTest::setUp()
    */
   protected function changeDatabasePrefix() {
     if (empty($this->databasePrefix)) {
@@ -590,8 +590,8 @@ abstract class WebTest extends Test {
    * Also sets up new resources for the testing environment, such as the public
    * filesystem and configuration directories.
    *
-   * @see DrupalWebTestCase::setUp()
-   * @see DrupalWebTestCase::tearDown()
+   * @see Drupal\simpletest\WebTest::setUp()
+   * @see Drupal\simpletest\WebTest::tearDown()
    */
   protected function prepareEnvironment() {
     global $user, $language_interface, $conf;
@@ -648,9 +648,9 @@ abstract class WebTest extends Test {
    * Sets up a Drupal site for running functional and integration tests.
    *
    * Generates a random database prefix and installs Drupal with the specified
-   * installation profile in DrupalWebTestCase::$profile into the prefixed
-   * database. Afterwards, installs any additional modules specified by the
-   * test.
+   * installation profile in Drupal\simpletest\WebTest::$profile into the
+   * prefixed database. Afterwards, installs any additional modules specified by
+   * the test.
    *
    * After installation all caches are flushed and several configuration values
    * are reset to the values of the parent site executing the test, since the
@@ -661,9 +661,9 @@ abstract class WebTest extends Test {
    *   List of modules to enable for the duration of the test. This can be
    *   either a single array or a variable number of string arguments.
    *
-   * @see DrupalWebTestCase::prepareDatabasePrefix()
-   * @see DrupalWebTestCase::changeDatabasePrefix()
-   * @see DrupalWebTestCase::prepareEnvironment()
+   * @see Drupal\simpletest\WebTest::prepareDatabasePrefix()
+   * @see Drupal\simpletest\WebTest::changeDatabasePrefix()
+   * @see Drupal\simpletest\WebTest::prepareEnvironment()
    */
   protected function setUp() {
     global $user, $language_interface, $conf;

@@ -2422,7 +2422,7 @@ class UserEntityCallbacksTestCase extends WebTest {
 /**
  * Functional tests for a user's ability to change their default language.
  */
-class UserLanguageFunctionalTest extends DrupalWebTestCase {
+class UserLanguageFunctionalTest extends WebTest {
   public static function getInfo() {
     return array(
       'name' => 'User language settings',
@@ -2487,7 +2487,7 @@ class UserLanguageFunctionalTest extends DrupalWebTestCase {
 /**
  * Functional test for language handling during user creation.
  */
-class UserLanguageCreationTest extends DrupalWebTestCase {
+class UserLanguageCreationTest extends WebTest {
 
   public static function getInfo() {
     return array(

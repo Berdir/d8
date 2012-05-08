@@ -63,11 +63,11 @@ abstract class UpgradePathTestCase extends WebTest {
   }
 
   /**
-   * Overrides DrupalWebTestCase::setUp() for upgrade testing.
+   * Overrides Drupal\simpletest\WebTest::setUp() for upgrade testing.
    *
-   * @see DrupalWebTestCase::prepareDatabasePrefix()
-   * @see DrupalWebTestCase::changeDatabasePrefix()
-   * @see DrupalWebTestCase::prepareEnvironment()
+   * @see Drupal\simpletest\WebTest::prepareDatabasePrefix()
+   * @see Drupal\simpletest\WebTest::changeDatabasePrefix()
+   * @see Drupal\simpletest\WebTest::prepareEnvironment()
    */
   protected function setUp() {
     global $user, $language_interface, $conf;
