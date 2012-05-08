@@ -15,7 +15,8 @@ use ReflectionObject;
 /**
  * Base class for Drupal tests.
  *
- * Do not extend this class, use one of the subclasses in this file.
+ * Do not extend this class directly, use either Drupal\simpletest\WebTest or
+ * Drupal\simpletest\UnitTest.
  */
 abstract class Test {
   /**

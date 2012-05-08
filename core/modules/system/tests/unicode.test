@@ -5,7 +5,6 @@
  * Various unicode handling tests.
  */
 
-use Drupal\simpletest\WebTest;
 use Drupal\simpletest\UnitTest;
 
 /**
