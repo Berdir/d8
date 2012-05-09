@@ -1,12 +1,12 @@
 <?php
 
 
-use Drupal\simpletest\WebTest;
+use Drupal\simpletest\WebTestBase;
 
 /**
  * Helper to verify tests in installation profile modules.
  */
-class DrupalSystemListingCompatibleTestCase extends WebTest {
+class DrupalSystemListingCompatibleTestCase extends WebTestBase {
   /**
    * Use the Minimal profile.
    *
