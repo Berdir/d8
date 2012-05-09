@@ -180,14 +180,14 @@ abstract class TestBase {
    * the test case has been destroyed, such as PHP fatal errors. The caller
    * information is not automatically gathered since the caller is most likely
    * inserting the assertion on behalf of other code. In all other respects
-   * the method behaves just like Test::assert() in terms of storing
-   * the assertion.
+   * the method behaves just like Drupal\simpletest\TestBase::assert() in terms
+   * of storing the assertion.
    *
    * @return
    *   Message ID of the stored assertion.
    *
-   * @see Test::assert()
-   * @see Test::deleteAssert()
+   * @see Drupal\simpletest\TestBase::assert()
+   * @see Drupal\simpletest\TestBase::deleteAssert()
    */
   public static function insertAssert($test_id, $test_class, $status, $message = '', $group = 'Other', array $caller = array()) {
     // Convert boolean status to string status.
@@ -225,7 +225,7 @@ abstract class TestBase {
    * @return
    *   TRUE if the assertion was deleted, FALSE otherwise.
    *
-   * @see Test::insertAssert()
+   * @see Drupal\simpletest\TestBase::insertAssert()
    */
   public static function deleteAssert($message_id) {
     return (bool) db_delete('simpletest')
@@ -499,7 +499,7 @@ abstract class TestBase {
         'file' => $missing_requirements_object->getFileName(),
       );
       foreach ($missing_requirements as $missing_requirement) {
-        Test::insertAssert($this->testId, $class, FALSE, $missing_requirement, 'Requirements check.', $caller);
+        TestBase::insertAssert($this->testId, $class, FALSE, $missing_requirement, 'Requirements check.', $caller);
       }
     }
     else {
@@ -514,7 +514,7 @@ abstract class TestBase {
             'line' => $method_info->getStartLine(),
             'function' => $class . '->' . $method . '()',
           );
-          $completion_check_id = Test::insertAssert($this->testId, $class, FALSE, t('The test did not complete due to a fatal error.'), 'Completion check', $caller);
+          $completion_check_id = TestBase::insertAssert($this->testId, $class, FALSE, t('The test did not complete due to a fatal error.'), 'Completion check', $caller);
           $this->setUp();
           if ($this->setup) {
             try {
@@ -530,7 +530,7 @@ abstract class TestBase {
             $this->fail(t("The test cannot be executed because it has not been set up properly."));
           }
           // Remove the completion check record.
-          Test::deleteAssert($completion_check_id);
+          TestBase::deleteAssert($completion_check_id);
         }
       }
     }
