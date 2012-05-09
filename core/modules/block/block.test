@@ -746,7 +746,7 @@ class BlockHTMLIdTestCase extends WebTestBase {
 /**
  * Unit tests for template_preprocess_block().
  */
-class BlockTemplateSuggestionsUnitTestBase extends UnitTestBase {
+class BlockTemplateSuggestionsUnitTest extends UnitTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Block template suggestions',

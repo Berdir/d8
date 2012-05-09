@@ -812,7 +812,7 @@ class FilterSecurityTestCase extends WebTestBase {
 /**
  * Unit tests for core filters.
  */
-class FilterUnitTestBaseCase extends UnitTestBase {
+class FilterUnitTestCase extends UnitTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Filter module filters',

@@ -124,7 +124,7 @@ class SimpleTestFunctionalTest extends WebTestBase {
    * Make sure that tests selected through the web interface are run and
    * that the results are displayed correctly.
    */
-  function testWebTestBaseRunner() {
+  function testWebTestRunner() {
     $this->pass = t('SimpleTest pass.');
     $this->fail = t('SimpleTest fail.');
     $this->valid_permission = 'access content';
@@ -486,7 +486,7 @@ class SimpleTestFolderTestCase extends WebTestBase {
 /**
  * Test required modules for tests.
  */
-class SimpleTestMissingDependentModuleUnitTestBase extends UnitTestBase {
+class SimpleTestMissingDependentModuleUnitTest extends UnitTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Testing dependent module test',

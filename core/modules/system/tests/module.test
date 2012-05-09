@@ -10,7 +10,7 @@ use Drupal\simpletest\WebTestBase;
 /**
  * Unit tests for the module API.
  */
-class ModuleUnitTestBase extends WebTestBase {
+class ModuleUnitTest extends WebTestBase {
   // Requires Standard profile modules/dependencies.
   protected $profile = 'standard';
 

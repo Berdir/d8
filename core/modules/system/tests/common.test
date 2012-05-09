@@ -76,7 +76,7 @@ class CommonDrupalAlterTestCase extends WebTestBase {
  * url() calls module_implements(), which may issue a db query, which requires
  * inheriting from a web test case rather than a unit test case.
  */
-class CommonURLUnitTestBaseCase extends WebTestBase {
+class CommonURLUnitTestCase extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'URL generation tests',
@@ -283,7 +283,7 @@ class CommonURLUnitTestBaseCase extends WebTestBase {
 /**
  * Tests for check_plain(), filter_xss(), format_string(), and check_url().
  */
-class CommonXssUnitTestBaseCase extends UnitTestBase {
+class CommonXssUnitTestCase extends UnitTestBase {
 
   public static function getInfo() {
     return array(
@@ -355,7 +355,7 @@ class CommonXssUnitTestBaseCase extends UnitTestBase {
 /**
  * Tests file size parsing and formatting functions.
  */
-class CommonSizeUnitTestBaseCase extends UnitTestBase {
+class CommonSizeUnitTestCase extends UnitTestBase {
   protected $exact_test_cases;
   protected $rounded_test_cases;
 
@@ -806,7 +806,7 @@ class CommonHTMLIdentifierTestCase extends UnitTestBase {
 /**
  * CSS Unit Tests.
  */
-class CommonCascadingStylesheetsUnitTestBaseCase extends UnitTestBase {
+class CommonCascadingStylesheetsUnitTestCase extends UnitTestBase {
   public static function getInfo() {
     return array(
       'name' => 'CSS Unit Tests',
@@ -1880,7 +1880,7 @@ class CommonDrupalRenderTestCase extends WebTestBase {
 /**
  * Tests URL validation by valid_url().
  */
-class CommonValidUrlUnitTestBaseCase extends UnitTestBase {
+class CommonValidUrlUnitTestCase extends UnitTestBase {
   public static function getInfo() {
     return array(
       'name' => 'URL validation',
@@ -1988,7 +1988,7 @@ class CommonValidUrlUnitTestBaseCase extends UnitTestBase {
 /**
  * Tests number step validation by valid_number_step().
  */
-class CommonValidNumberStepUnitTestBaseCase extends UnitTestBase {
+class CommonValidNumberStepUnitTestCase extends UnitTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Number step validation',
@@ -2489,7 +2489,7 @@ class CommonFormatDateTestCase extends WebTestBase {
 /**
  * Tests the drupal_attributes() functionality.
  */
-class CommonDrupalAttributesUnitTestBaseCase extends UnitTestBase {
+class CommonDrupalAttributesUnitTestCase extends UnitTestBase {
   public static function getInfo() {
     return array(
       'name' => 'HTML Attributes',
@@ -2529,7 +2529,7 @@ class CommonDrupalAttributesUnitTestBaseCase extends UnitTestBase {
 /**
  * Tests the various drupal_array_* helper functions.
  */
-class CommonDrupalArrayUnitTestBase extends UnitTestBase {
+class CommonDrupalArrayUnitTest extends UnitTestBase {
 
   /**
    * Form array to check.
@@ -2641,7 +2641,7 @@ class CommonDrupalArrayUnitTestBase extends UnitTestBase {
 /**
  * Tests the drupal_json_encode() and drupal_json_decode() functions.
  */
-class CommonJSONUnitTestBaseCase extends UnitTestBase {
+class CommonJSONUnitTestCase extends UnitTestBase {
   public static function getInfo() {
     return array(
       'name' => 'JSON',

@@ -2635,7 +2635,7 @@ class SystemAdminTestCase extends WebTestBase {
  *
  * @see Drupal\Component\Graph\Graph
  */
-class GraphUnitTestBase extends UnitTestBase {
+class GraphUnitTest extends UnitTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Directed acyclic graph manipulation',

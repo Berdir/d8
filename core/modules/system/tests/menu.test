@@ -8,7 +8,7 @@
 use Drupal\simpletest\WebTestBase;
 use Drupal\simpletest\UnitTestBase;
 
-class MenuWebTestBaseCase extends WebTestBase {
+class MenuWebTestCase extends WebTestBase {
   function setUp() {
     $modules = func_get_args();
     if (isset($modules[0]) && is_array($modules[0])) {
@@ -667,7 +667,7 @@ class MenuRouterTestCase extends WebTestBase {
 /**
  * Tests for menu links.
  */
-class MenuLinksUnitTestBaseCase extends WebTestBase {
+class MenuLinksUnitTestCase extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Menu links',
@@ -1034,7 +1034,7 @@ class MenuTreeOutputTestCase extends WebTestBase {
 /**
  * Menu breadcrumbs related tests.
  */
-class MenuBreadcrumbTestCase extends MenuWebTestBaseCase {
+class MenuBreadcrumbTestCase extends MenuWebTestCase {
   protected $profile = 'standard';
 
   public static function getInfo() {
@@ -1527,7 +1527,7 @@ class MenuBreadcrumbTestCase extends MenuWebTestBaseCase {
 /**
  * Tests active menu trails.
  */
-class MenuTrailTestCase extends MenuWebTestBaseCase {
+class MenuTrailTestCase extends MenuWebTestCase {
   public static function getInfo() {
     return array(
       'name' => 'Active trail',

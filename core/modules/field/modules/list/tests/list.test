@@ -7,7 +7,6 @@
 
 use Drupal\field\FieldException;
 use Drupal\field\FieldValidationException;
-use Drupal\simpletest\WebTestBase;
 
 /**
  * Tests for the 'List' field types.

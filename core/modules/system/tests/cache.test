@@ -177,7 +177,7 @@ class CacheSavingCase extends CacheTestCase {
 /**
  * Test getMultiple().
  */
-class CacheGetMultipleUnitTestBase extends CacheTestCase {
+class CacheGetMultipleUnitTest extends CacheTestCase {
 
   public static function getInfo() {
     return array(

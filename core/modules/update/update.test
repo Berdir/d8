@@ -728,7 +728,7 @@ class UpdateTestUploadCase extends UpdateTestHelper {
 
 }
 
-class UpdateCoreUnitTestBaseCase extends UnitTestBase {
+class UpdateCoreUnitTestCase extends UnitTestBase {
 
   public static function getInfo() {
     return array(

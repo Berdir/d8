@@ -11,7 +11,7 @@ use Drupal\simpletest\UnitTestBase;
 /**
  * Unit tests for the Theme API.
  */
-class ThemeUnitTestBase extends WebTestBase {
+class ThemeUnitTest extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Theme API',
@@ -175,7 +175,7 @@ class ThemeUnitTestBase extends WebTestBase {
 /**
  * Unit tests for theme_table().
  */
-class ThemeTableUnitTestBase extends WebTestBase {
+class ThemeTableUnitTest extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Theme Table',
@@ -493,7 +493,7 @@ class ThemeFunctionsTestCase extends WebTestBase {
 /**
  * Functional test for initialization of the theme system in hook_init().
  */
-class ThemeHookInitUnitTestBase extends WebTestBase {
+class ThemeHookInitUnitTest extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Theme initialization in hook_init()',

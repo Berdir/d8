@@ -281,7 +281,7 @@ class RdfCrudTestCase extends WebTestBase {
   }
 }
 
-class RdfMappingDefinitionTestCase extends TaxonomyWebTestBaseCase {
+class RdfMappingDefinitionTestCase extends TaxonomyWebTestCase {
   protected $profile = 'standard';
 
   public static function getInfo() {

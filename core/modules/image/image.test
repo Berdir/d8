@@ -121,7 +121,7 @@ class ImageFieldTestCase extends WebTestBase {
 /**
  * Tests the functions for generating paths and URLs for image styles.
  */
-class ImageStylesPathAndUrlUnitTestBase extends WebTestBase {
+class ImageStylesPathAndUrlUnitTest extends WebTestBase {
   protected $style_name;
   protected $image_info;
   protected $image_filepath;
@@ -238,7 +238,7 @@ class ImageStylesPathAndUrlUnitTestBase extends WebTestBase {
  * Use the image_test.module's mock toolkit to ensure that the effects are
  * properly passing parameters to the image toolkit.
  */
-class ImageEffectsUnitTestBase extends ImageToolkitTestCase {
+class ImageEffectsUnitTest extends ImageToolkitTestCase {
   public static function getInfo() {
     return array(
       'name' => 'Image effects',
@@ -340,7 +340,7 @@ class ImageEffectsUnitTestBase extends ImageToolkitTestCase {
 /**
  * Tests creation, deletion, and editing of image styles and effects.
  */
-class ImageAdminStylesUnitTestBase extends ImageFieldTestCase {
+class ImageAdminStylesUnitTest extends ImageFieldTestCase {
 
   public static function getInfo() {
     return array(
@@ -904,7 +904,7 @@ class ImageFieldValidateTestCase extends ImageFieldTestCase {
 /**
  * Tests that images have correct dimensions when styled.
  */
-class ImageDimensionsUnitTestBase extends WebTestBase {
+class ImageDimensionsUnitTest extends WebTestBase {
   protected $profile = 'testing';
 
   public static function getInfo() {

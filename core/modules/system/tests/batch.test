@@ -320,7 +320,7 @@ class BatchPageTestCase extends WebTestBase {
  * Tests the function _batch_api_percentage() to make sure that the rounding
  * works properly in all cases.
  */
-class BatchPercentagesUnitTestBaseCase extends UnitTestBase {
+class BatchPercentagesUnitTestCase extends UnitTestBase {
   protected $testCases = array();
 
   public static function getInfo() {

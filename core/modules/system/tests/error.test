@@ -6,7 +6,7 @@
 
 use Drupal\simpletest\WebTestBase;
 
-class DrupalErrorHandlerUnitTestBase extends WebTestBase {
+class DrupalErrorHandlerUnitTest extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Drupal error handlers',

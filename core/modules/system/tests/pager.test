@@ -10,7 +10,7 @@ use Drupal\simpletest\WebTestBase;
 /**
  * Tests pager functionality.
  */
-class PagerFunctionalWebTestBaseCase extends WebTestBase {
+class PagerFunctionalWebTestCase extends WebTestBase {
   protected $profile = 'testing';
 
   public static function getInfo() {

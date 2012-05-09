@@ -1518,7 +1518,7 @@ class UserAutocompleteTestCase extends WebTestBase {
 /**
  * Test user-links in secondary menu.
  */
-class UserAccountLinksUnitTestBases extends WebTestBase {
+class UserAccountLinksUnitTests extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'User account links',
@@ -1567,7 +1567,7 @@ class UserAccountLinksUnitTestBases extends WebTestBase {
 /**
  * Test user blocks.
  */
-class UserBlocksUnitTestBases extends WebTestBase {
+class UserBlocksUnitTests extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'User blocks',

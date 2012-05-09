@@ -71,7 +71,7 @@ class ImageToolkitTestCase extends WebTestBase {
 /**
  * Test that the functions in image.inc correctly pass data to the toolkit.
  */
-class ImageToolkitUnitTestBase extends ImageToolkitTestCase {
+class ImageToolkitUnitTest extends ImageToolkitTestCase {
   public static function getInfo() {
     return array(
       'name' => 'Image toolkit tests',

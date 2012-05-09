@@ -1789,7 +1789,7 @@ class CommentBlockFunctionalTest extends CommentHelperCase {
 /**
  * Unit tests for Comment module integration with RSS feeds.
  */
-class CommentRSSUnitTestBase extends CommentHelperCase {
+class CommentRSSUnitTest extends CommentHelperCase {
   public static function getInfo() {
     return array(
       'name' => 'Comment RSS',

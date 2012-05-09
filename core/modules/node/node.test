@@ -8,7 +8,7 @@ use Drupal\simpletest\WebTestBase;
  * Tests for node.module.
  */
 
-class NodeWebTestBaseCase extends WebTestBase {
+class NodeWebTestCase extends WebTestBase {
   function setUp() {
     $modules = func_get_args();
     if (isset($modules[0]) && is_array($modules[0])) {
@@ -28,7 +28,7 @@ class NodeWebTestBaseCase extends WebTestBase {
 /**
  * Tests the node_load_multiple() function.
  */
-class NodeLoadMultipleUnitTestBase extends NodeWebTestBaseCase {
+class NodeLoadMultipleUnitTest extends NodeWebTestCase {
 
   public static function getInfo() {
     return array(
@@ -108,7 +108,7 @@ class NodeLoadMultipleUnitTestBase extends NodeWebTestBaseCase {
 /**
  * Tests for the hooks invoked during node_load().
  */
-class NodeLoadHooksTestCase extends NodeWebTestBaseCase {
+class NodeLoadHooksTestCase extends NodeWebTestCase {
   public static function getInfo() {
     return array(
       'name' => 'Node load hooks',
@@ -149,7 +149,7 @@ class NodeLoadHooksTestCase extends NodeWebTestBaseCase {
   }
 }
 
-class NodeRevisionsTestCase extends NodeWebTestBaseCase {
+class NodeRevisionsTestCase extends NodeWebTestCase {
   protected $nodes;
   protected $logs;
 
@@ -278,7 +278,7 @@ class NodeRevisionsTestCase extends NodeWebTestBaseCase {
   }
 }
 
-class PageEditTestCase extends NodeWebTestBaseCase {
+class PageEditTestCase extends NodeWebTestCase {
   protected $web_user;
   protected $admin_user;
 
@@ -410,7 +410,7 @@ class PageEditTestCase extends NodeWebTestBaseCase {
   }
 }
 
-class PagePreviewTestCase extends NodeWebTestBaseCase {
+class PagePreviewTestCase extends NodeWebTestCase {
   public static function getInfo() {
     return array(
       'name' => 'Node preview',
@@ -481,7 +481,7 @@ class PagePreviewTestCase extends NodeWebTestBaseCase {
   }
 }
 
-class NodeCreationTestCase extends NodeWebTestBaseCase {
+class NodeCreationTestCase extends NodeWebTestCase {
   public static function getInfo() {
     return array(
       'name' => 'Node creation',
@@ -559,7 +559,7 @@ class NodeCreationTestCase extends NodeWebTestBaseCase {
   }
 }
 
-class PageViewTestCase extends NodeWebTestBaseCase {
+class PageViewTestCase extends NodeWebTestCase {
   public static function getInfo() {
     return array(
       'name' => 'Node edit permissions',
@@ -598,7 +598,7 @@ class PageViewTestCase extends NodeWebTestBaseCase {
   }
 }
 
-class SummaryLengthTestCase extends NodeWebTestBaseCase {
+class SummaryLengthTestCase extends NodeWebTestCase {
   public static function getInfo() {
     return array(
       'name' => 'Summary length',
@@ -640,7 +640,7 @@ class SummaryLengthTestCase extends NodeWebTestBaseCase {
   }
 }
 
-class NodeTitleXSSTestCase extends NodeWebTestBaseCase {
+class NodeTitleXSSTestCase extends NodeWebTestCase {
   public static function getInfo() {
     return array(
       'name' => 'Node title XSS filtering',
@@ -674,7 +674,7 @@ class NodeTitleXSSTestCase extends NodeWebTestBaseCase {
   }
 }
 
-class NodeBlockTestCase extends NodeWebTestBaseCase {
+class NodeBlockTestCase extends NodeWebTestCase {
   public static function getInfo() {
     return array(
       'name' => 'Block availability',
@@ -707,7 +707,7 @@ class NodeBlockTestCase extends NodeWebTestBaseCase {
 /**
  * Check that the post information displays when enabled for a content type.
  */
-class NodePostSettingsTestCase extends NodeWebTestBaseCase {
+class NodePostSettingsTestCase extends NodeWebTestCase {
   public static function getInfo() {
     return array(
       'name' => 'Node post information display',
@@ -776,7 +776,7 @@ class NodePostSettingsTestCase extends NodeWebTestBaseCase {
  * added to the node->content array, then verify that the data appears on the
  * sitewide RSS feed at rss.xml.
  */
-class NodeRSSContentTestCase extends NodeWebTestBaseCase {
+class NodeRSSContentTestCase extends NodeWebTestCase {
   public static function getInfo() {
     return array(
       'name' => 'Node RSS Content',
@@ -837,7 +837,7 @@ class NodeRSSContentTestCase extends NodeWebTestBaseCase {
  * @todo Cover hook_node_access in a separate test class.
  * hook_node_access_records is covered in another test class.
  */
-class NodeAccessUnitTestBase extends NodeWebTestBaseCase {
+class NodeAccessUnitTest extends NodeWebTestCase {
   public static function getInfo() {
     return array(
       'name' => 'Node access',
@@ -904,7 +904,7 @@ class NodeAccessUnitTestBase extends NodeWebTestBaseCase {
 /**
  * Test case to verify hook_node_access_records functionality.
  */
-class NodeAccessRecordsUnitTestBase extends NodeWebTestBaseCase {
+class NodeAccessRecordsUnitTest extends NodeWebTestCase {
   public static function getInfo() {
     return array(
       'name' => 'Node access records',
@@ -987,7 +987,7 @@ class NodeAccessRecordsUnitTestBase extends NodeWebTestBaseCase {
 /**
  * Tests for Node Access with a non-node base table.
  */
-class NodeAccessBaseTableTestCase extends NodeWebTestBaseCase {
+class NodeAccessBaseTableTestCase extends NodeWebTestCase {
   // Requires tags taxonomy field.
   protected $profile = 'standard';
 
@@ -1148,7 +1148,7 @@ class NodeAccessBaseTableTestCase extends NodeWebTestBaseCase {
 /**
  * Test case to check node save related functionality, including import-save
  */
-class NodeSaveTestCase extends NodeWebTestBaseCase {
+class NodeSaveTestCase extends NodeWebTestCase {
 
   public static function getInfo() {
     return array(
@@ -1291,7 +1291,7 @@ class NodeSaveTestCase extends NodeWebTestBaseCase {
 /**
  * Tests related to node types.
  */
-class NodeTypeTestCase extends NodeWebTestBaseCase {
+class NodeTypeTestCase extends NodeWebTestCase {
   public static function getInfo() {
     return array(
       'name' => 'Node types',
@@ -1449,7 +1449,7 @@ class NodeTypeTestCase extends NodeWebTestBaseCase {
 /**
  * Test node type customizations persistence.
  */
-class NodeTypePersistenceTestCase extends NodeWebTestBaseCase {
+class NodeTypePersistenceTestCase extends NodeWebTestCase {
   public static function getInfo() {
     return array(
       'name' => 'Node type persist',
@@ -1525,7 +1525,7 @@ class NodeTypePersistenceTestCase extends NodeWebTestBaseCase {
 /**
  * Rebuild the node_access table.
  */
-class NodeAccessRebuildTestCase extends NodeWebTestBaseCase {
+class NodeAccessRebuildTestCase extends NodeWebTestCase {
   public static function getInfo() {
     return array(
       'name' => 'Node access rebuild',
@@ -1553,7 +1553,7 @@ class NodeAccessRebuildTestCase extends NodeWebTestBaseCase {
 /**
  * Test node administration page functionality.
  */
-class NodeAdminTestCase extends NodeWebTestBaseCase {
+class NodeAdminTestCase extends NodeWebTestCase {
   public static function getInfo() {
     return array(
       'name' => 'Node administration',
@@ -1718,7 +1718,7 @@ class NodeAdminTestCase extends NodeWebTestBaseCase {
 /**
  * Test node title.
  */
-class NodeTitleTestCase extends NodeWebTestBaseCase {
+class NodeTitleTestCase extends NodeWebTestCase {
   protected $admin_user;
 
   public static function getInfo() {
@@ -1793,7 +1793,7 @@ class NodeFeedTestCase extends WebTestBase {
 /**
  * Functional tests for the node module blocks.
  */
-class NodeBlockFunctionalTest extends NodeWebTestBaseCase {
+class NodeBlockFunctionalTest extends NodeWebTestCase {
   public static function getInfo() {
     return array(
       'name' => 'Node blocks',
@@ -1966,7 +1966,7 @@ class MultiStepNodeFormBasicOptionsTest extends WebTestBase {
 /**
  * Test to ensure that a node's content is always rebuilt.
  */
-class NodeBuildContent extends NodeWebTestBaseCase {
+class NodeBuildContent extends NodeWebTestCase {
 
   public static function getInfo() {
     return array(
@@ -1994,7 +1994,7 @@ class NodeBuildContent extends NodeWebTestBaseCase {
 /**
  * Tests node_query_node_access_alter().
  */
-class NodeQueryAlter extends NodeWebTestBaseCase {
+class NodeQueryAlter extends NodeWebTestCase {
 
   public static function getInfo() {
     return array(
@@ -2185,7 +2185,7 @@ class NodeQueryAlter extends NodeWebTestBaseCase {
 /**
  * Tests node_query_entity_field_access_alter().
  */
-class NodeEntityFieldQueryAlter extends NodeWebTestBaseCase {
+class NodeEntityFieldQueryAlter extends NodeWebTestCase {
 
   public static function getInfo() {
     return array(
@@ -2249,7 +2249,7 @@ class NodeEntityFieldQueryAlter extends NodeWebTestBaseCase {
 /**
  * Test node token replacement in strings.
  */
-class NodeTokenReplaceTestCase extends NodeWebTestBaseCase {
+class NodeTokenReplaceTestCase extends NodeWebTestCase {
   public static function getInfo() {
     return array(
       'name' => 'Node token replacement',
@@ -2326,7 +2326,7 @@ class NodeTokenReplaceTestCase extends NodeWebTestBaseCase {
 /**
  * Tests user permissions for node revisions.
  */
-class NodeRevisionPermissionsTestCase extends NodeWebTestBaseCase {
+class NodeRevisionPermissionsTestCase extends NodeWebTestCase {
   protected $node_revisions = array();
   protected $accounts = array();
 
@@ -2510,7 +2510,7 @@ class NodeAccessPagerTestCase extends WebTestBase {
 /**
  * Tests the interaction of the node access system with fields.
  */
-class NodeAccessFieldTestCase extends NodeWebTestBaseCase {
+class NodeAccessFieldTestCase extends NodeWebTestCase {
 
   public static function getInfo() {
     return array(

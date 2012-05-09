@@ -6,7 +6,7 @@ use Drupal\simpletest\UnitTestBase;
 /**
  * Tests the Drupal\Component\Uuid\Uuid class.
  */
-class UuidUnitTestBaseCase extends UnitTestBase {
+class UuidUnitTestCase extends UnitTestBase {
 
   /**
    * The UUID object to be used for generating UUIDs.
