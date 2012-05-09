@@ -595,7 +595,7 @@ class ForumTestCase extends WebTestBase {
 /**
  * Tests the forum index listing.
  */
-class ForumIndexTestCase extends DrupalWebTestCase {
+class ForumIndexTestCase extends WebTestBase {
 
   public static function getInfo() {
     return array(
