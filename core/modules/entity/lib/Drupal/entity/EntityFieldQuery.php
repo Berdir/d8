@@ -5,7 +5,7 @@
  * Definition of Drupal\entity\EntityFieldQuery.
  */
 
-namespace Drupal\entity\Query;
+namespace Drupal\entity;
 
 use Drupal\entity\EntityFieldQueryException;
 use Drupal\Core\Database\Query\Select;

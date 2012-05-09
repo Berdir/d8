@@ -7,54 +7,8 @@
 
 namespace Drupal\comment;
 
-use Drupal\entity\Entity;
 use Drupal\entity\EntityInterface;
 use Drupal\entity\EntityDatabaseStorageController;
-
-/**
- * Defines the comment entity class.
- */
-class Comment extends Entity {
-
-  /**
-   * The comment ID.
-   *
-   * @var integer
-   */
-  public $cid;
-
-  /**
-   * The parent comment ID if this is a reply to a comment.
-   *
-   * @var integer
-   */
-  public $pid;
-
-  /**
-   * The comment language code.
-   *
-   * @var string
-   */
-  public $langcode = LANGUAGE_NOT_SPECIFIED;
-
-  /**
-   * The comment title.
-   *
-   * @var string
-   */
-  public $subject;
-
-
-  /**
-   * The comment author ID.
-   *
-   * @var integer
-   */
-  public $uid = 0;
->>>>>>> fixed namespaces:core/modules/comment/comment.entity.inc
-
-use EntityDatabaseStorageController;
-use EntityInterface;
 
 /**
  * Defines the controller class for comments.

@@ -5,7 +5,7 @@
  * Definition of Drupal\entity\EntityFieldQueryException.
  */
 
-namespace Drupal\entity\Query;
+namespace Drupal\entity;
 
 use Exception;
 
