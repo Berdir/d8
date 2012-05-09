@@ -6,12 +6,12 @@
  */
 
 use Drupal\field\FieldValidationException;
-use Drupal\simpletest\WebTest;
+use Drupal\simpletest\WebTestBase;
 
 /**
  * Provides common helper methods for Taxonomy module tests.
  */
-class TaxonomyWebTestCase extends WebTest {
+class TaxonomyWebTestBaseCase extends WebTestBase {
 
   function setUp() {
     $modules = func_get_args();
@@ -66,7 +66,7 @@ class TaxonomyWebTestCase extends WebTest {
 /**
  * Tests the taxonomy vocabulary interface.
  */
-class TaxonomyVocabularyFunctionalTest extends TaxonomyWebTestCase {
+class TaxonomyVocabularyFunctionalTest extends TaxonomyWebTestBaseCase {
 
   public static function getInfo() {
     return array(
@@ -202,7 +202,7 @@ class TaxonomyVocabularyFunctionalTest extends TaxonomyWebTestCase {
 /**
  * Tests for taxonomy vocabulary functions.
  */
-class TaxonomyVocabularyUnitTest extends TaxonomyWebTestCase {
+class TaxonomyVocabularyUnitTestBase extends TaxonomyWebTestBaseCase {
 
   public static function getInfo() {
     return array(
@@ -417,7 +417,7 @@ class TaxonomyVocabularyUnitTest extends TaxonomyWebTestCase {
 /**
  * Unit tests for taxonomy term functions.
  */
-class TaxonomyTermUnitTest extends TaxonomyWebTestCase {
+class TaxonomyTermUnitTestBase extends TaxonomyWebTestBaseCase {
 
   public static function getInfo() {
     return array(
@@ -497,7 +497,7 @@ class TaxonomyTermUnitTest extends TaxonomyWebTestCase {
 /**
  * Test for legacy node bug.
  */
-class TaxonomyLegacyTestCase extends TaxonomyWebTestCase {
+class TaxonomyLegacyTestCase extends TaxonomyWebTestBaseCase {
 
   protected $profile = 'standard';
 
@@ -537,7 +537,7 @@ class TaxonomyLegacyTestCase extends TaxonomyWebTestCase {
 /**
  * Tests for taxonomy term functions.
  */
-class TaxonomyTermTestCase extends TaxonomyWebTestCase {
+class TaxonomyTermTestCase extends TaxonomyWebTestBaseCase {
 
   public static function getInfo() {
     return array(
@@ -1022,7 +1022,7 @@ class TaxonomyTermTestCase extends TaxonomyWebTestCase {
 /**
  * Tests the rendering of term reference fields in RSS feeds.
  */
-class TaxonomyRSSTestCase extends TaxonomyWebTestCase {
+class TaxonomyRSSTestCase extends TaxonomyWebTestBaseCase {
 
   public static function getInfo() {
     return array(
@@ -1116,7 +1116,7 @@ class TaxonomyRSSTestCase extends TaxonomyWebTestCase {
 /**
  * Tests the hook implementations that maintain the taxonomy index.
  */
-class TaxonomyTermIndexTestCase extends TaxonomyWebTestCase {
+class TaxonomyTermIndexTestCase extends TaxonomyWebTestBaseCase {
 
   public static function getInfo() {
     return array(
@@ -1327,7 +1327,7 @@ class TaxonomyTermIndexTestCase extends TaxonomyWebTestCase {
 /**
  * Test the taxonomy_term_load_multiple() function.
  */
-class TaxonomyLoadMultipleUnitTest extends TaxonomyWebTestCase {
+class TaxonomyLoadMultipleUnitTestBase extends TaxonomyWebTestBaseCase {
 
   public static function getInfo() {
     return array(
@@ -1395,7 +1395,7 @@ class TaxonomyLoadMultipleUnitTest extends TaxonomyWebTestCase {
 /**
  * Tests for taxonomy hook invocation.
  */
-class TaxonomyHooksTestCase extends TaxonomyWebTestCase {
+class TaxonomyHooksTestCase extends TaxonomyWebTestBaseCase {
 
   public static function getInfo() {
     return array(
@@ -1448,7 +1448,7 @@ class TaxonomyHooksTestCase extends TaxonomyWebTestCase {
 /**
  * Tests for taxonomy term field and formatter.
  */
-class TaxonomyTermFieldTestCase extends TaxonomyWebTestCase {
+class TaxonomyTermFieldTestCase extends TaxonomyWebTestBaseCase {
 
   protected $instance;
   protected $vocabulary;
@@ -1602,7 +1602,7 @@ class TaxonomyTermFieldTestCase extends TaxonomyWebTestCase {
 /**
  * Tests a taxonomy term reference field that allows multiple vocabularies.
  */
-class TaxonomyTermFieldMultipleVocabularyTestCase extends TaxonomyWebTestCase {
+class TaxonomyTermFieldMultipleVocabularyTestCase extends TaxonomyWebTestBaseCase {
 
   protected $instance;
   protected $vocabulary1;
@@ -1724,7 +1724,7 @@ class TaxonomyTermFieldMultipleVocabularyTestCase extends TaxonomyWebTestCase {
 /**
  * Test taxonomy token replacement in strings.
  */
-class TaxonomyTokenReplaceTestCase extends TaxonomyWebTestCase {
+class TaxonomyTokenReplaceTestCase extends TaxonomyWebTestBaseCase {
 
   public static function getInfo() {
     return array(
@@ -1871,7 +1871,7 @@ class TaxonomyTokenReplaceTestCase extends TaxonomyWebTestCase {
 /**
  * Tests for verifying that taxonomy pages use the correct theme.
  */
-class TaxonomyThemeTestCase extends TaxonomyWebTestCase {
+class TaxonomyThemeTestCase extends TaxonomyWebTestBaseCase {
 
   public static function getInfo() {
     return array(
@@ -1920,7 +1920,7 @@ class TaxonomyThemeTestCase extends TaxonomyWebTestCase {
 /**
  * Tests the functionality of EntityFieldQuery for taxonomy entities.
  */
-class TaxonomyEFQTestCase extends TaxonomyWebTestCase {
+class TaxonomyEFQTestCase extends TaxonomyWebTestBaseCase {
   public static function getInfo() {
     return array(
       'name' => 'Taxonomy EntityFieldQuery',

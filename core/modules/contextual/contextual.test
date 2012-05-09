@@ -5,12 +5,12 @@
  * Tests for contextual.module.
  */
 
-use Drupal\simpletest\WebTest;
+use Drupal\simpletest\WebTestBase;
 
 /**
  * Tests accessible links after inaccessible links on dynamic context.
  */
-class ContextualDynamicContextTestCase extends WebTest {
+class ContextualDynamicContextTestCase extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Contextual links on node lists',

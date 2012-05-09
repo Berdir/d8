@@ -5,12 +5,12 @@
  * Entity CRUD API tests.
  */
 
-use Drupal\simpletest\WebTest;
+use Drupal\simpletest\WebTestBase;
 
 /**
  * Tests the basic Entity API.
  */
-class EntityAPITestCase extends WebTest {
+class EntityAPITestCase extends WebTestBase {
 
   public static function getInfo() {
     return array(
@@ -94,7 +94,7 @@ class EntityAPITestCase extends WebTest {
 /**
  * Tests entity translation.
  */
-class EntityTranslationTestCase extends WebTest {
+class EntityTranslationTestCase extends WebTestBase {
 
   public static function getInfo() {
     return array(
@@ -203,7 +203,7 @@ class EntityTranslationTestCase extends WebTest {
 /**
  * Tests Entity API base functionality.
  */
-class EntityAPIInfoTestCase extends WebTest  {
+class EntityAPIInfoTestCase extends WebTestBase  {
 
   public static function getInfo() {
     return array(

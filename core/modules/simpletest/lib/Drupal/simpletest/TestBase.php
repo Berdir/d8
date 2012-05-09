@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\simpletest\Test.
+ * Definition of Drupal\simpletest\TestBase.
  */
 
 namespace Drupal\simpletest;
@@ -15,10 +15,10 @@ use ReflectionObject;
 /**
  * Base class for Drupal tests.
  *
- * Do not extend this class directly, use either Drupal\simpletest\WebTest or
- * Drupal\simpletest\UnitTest.
+ * Do not extend this class directly, use either Drupal\simpletest\WebTestBaseBase
+ * or Drupal\simpletest\UnitTestBaseBase.
  */
-abstract class Test {
+abstract class TestBase {
   /**
    * The test run ID.
    *
@@ -68,7 +68,7 @@ abstract class Test {
    * This class is skipped when looking for the source of an assertion.
    *
    * When displaying which function an assert comes from, it's not too useful
-   * to see "WebTest->drupalLogin()', we would like to see the test
+   * to see "WebTestBase->drupalLogin()', we would like to see the test
    * that called it. So we need to skip the classes defining these helper
    * methods.
    */

@@ -5,8 +5,8 @@
  * Tests for image.module.
  */
 
-use Drupal\simpletest\WebTest;
-use Drupal\simpletest\UnitTest;
+use Drupal\simpletest\WebTestBase;
+use Drupal\simpletest\UnitTestBase;
 
 /**
  * TODO: Test the following functions.
@@ -31,7 +31,7 @@ use Drupal\simpletest\UnitTest;
 /**
  * This class provides methods specifically for testing Image's field handling.
  */
-class ImageFieldTestCase extends WebTest {
+class ImageFieldTestCase extends WebTestBase {
   protected $admin_user;
 
   function setUp() {
@@ -121,7 +121,7 @@ class ImageFieldTestCase extends WebTest {
 /**
  * Tests the functions for generating paths and URLs for image styles.
  */
-class ImageStylesPathAndUrlUnitTest extends WebTest {
+class ImageStylesPathAndUrlUnitTestBase extends WebTestBase {
   protected $style_name;
   protected $image_info;
   protected $image_filepath;
@@ -238,7 +238,7 @@ class ImageStylesPathAndUrlUnitTest extends WebTest {
  * Use the image_test.module's mock toolkit to ensure that the effects are
  * properly passing parameters to the image toolkit.
  */
-class ImageEffectsUnitTest extends ImageToolkitTestCase {
+class ImageEffectsUnitTestBase extends ImageToolkitTestCase {
   public static function getInfo() {
     return array(
       'name' => 'Image effects',
@@ -340,7 +340,7 @@ class ImageEffectsUnitTest extends ImageToolkitTestCase {
 /**
  * Tests creation, deletion, and editing of image styles and effects.
  */
-class ImageAdminStylesUnitTest extends ImageFieldTestCase {
+class ImageAdminStylesUnitTestBase extends ImageFieldTestCase {
 
   public static function getInfo() {
     return array(
@@ -904,7 +904,7 @@ class ImageFieldValidateTestCase extends ImageFieldTestCase {
 /**
  * Tests that images have correct dimensions when styled.
  */
-class ImageDimensionsUnitTest extends WebTest {
+class ImageDimensionsUnitTestBase extends WebTestBase {
   protected $profile = 'testing';
 
   public static function getInfo() {
@@ -1127,7 +1127,7 @@ class ImageDimensionsUnitTest extends WebTest {
 /**
  * Tests image_dimensions_scale().
  */
-class ImageDimensionsScaleTestCase extends UnitTest {
+class ImageDimensionsScaleTestCase extends UnitTestBase {
   public static function getInfo() {
     return array(
       'name' => 'image_dimensions_scale()',

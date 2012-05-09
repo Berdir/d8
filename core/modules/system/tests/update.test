@@ -5,12 +5,12 @@
  * Tests for the update system.
  */
 
-use Drupal\simpletest\WebTest;
+use Drupal\simpletest\WebTestBase;
 
 /**
  * Tests for the update dependency ordering system.
  */
-class UpdateDependencyOrderingTestCase extends WebTest {
+class UpdateDependencyOrderingTestCase extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Update dependency ordering',
@@ -60,7 +60,7 @@ class UpdateDependencyOrderingTestCase extends WebTest {
 /**
  * Tests for missing update dependencies.
  */
-class UpdateDependencyMissingTestCase extends WebTest {
+class UpdateDependencyMissingTestCase extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Missing update dependencies',
@@ -90,7 +90,7 @@ class UpdateDependencyMissingTestCase extends WebTest {
 /**
  * Tests for the invocation of hook_update_dependencies().
  */
-class UpdateDependencyHookInvocationTestCase extends WebTest {
+class UpdateDependencyHookInvocationTestCase extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Update dependency hook invocation',

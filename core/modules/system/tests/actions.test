@@ -1,8 +1,8 @@
 <?php
 
-use Drupal\simpletest\WebTest;
+use Drupal\simpletest\WebTestBase;
 
-class ActionsConfigurationTestCase extends WebTest {
+class ActionsConfigurationTestCase extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Actions configuration',
@@ -68,7 +68,7 @@ class ActionsConfigurationTestCase extends WebTest {
 /**
  * Test actions executing in a potential loop, and make sure they abort properly.
  */
-class ActionLoopTestCase extends WebTest {
+class ActionLoopTestCase extends WebTestBase {
   protected $aid;
 
   public static function getInfo() {

@@ -5,12 +5,12 @@
  * Tests for the Path module.
  */
 
-use Drupal\simpletest\WebTest;
+use Drupal\simpletest\WebTestBase;
 
 /**
  * Provides a base class for testing the Path module.
  */
-class PathTestCase extends WebTest {
+class PathTestCase extends WebTestBase {
   function setUp() {
     $modules = func_get_args();
     if (isset($modules[0]) && is_array($modules[0])) {

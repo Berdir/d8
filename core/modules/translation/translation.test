@@ -6,12 +6,12 @@
  */
 
 use Drupal\node\Node;
-use Drupal\simpletest\WebTest;
+use Drupal\simpletest\WebTestBase;
 
 /**
  * Functional tests for the Translation module.
  */
-class TranslationTestCase extends WebTest {
+class TranslationTestCase extends WebTestBase {
   protected $profile = 'standard';
 
   protected $book;

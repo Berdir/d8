@@ -6,12 +6,12 @@
  */
 
 
-use Drupal\simpletest\WebTest;
+use Drupal\simpletest\WebTestBase;
 
 /**
  * Tests the Dashboard module blocks.
  */
-class DashboardBlocksTestCase extends WebTest {
+class DashboardBlocksTestCase extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Dashboard blocks',
@@ -109,7 +109,7 @@ class DashboardBlocksTestCase extends WebTest {
   }
 }
 
-class DashboardBlockAvailabilityTestCase extends WebTest {
+class DashboardBlockAvailabilityTestCase extends WebTestBase {
   protected $profile = 'standard';
 
   public static function getInfo() {

@@ -1,7 +1,7 @@
 <?php
 
 use Drupal\Core\Database\Database;
-use Drupal\simpletest\Test;
+use Drupal\simpletest\TestBase;
 
 /**
  * @file
@@ -273,11 +273,11 @@ function simpletest_log_read($test_id, $prefix, $test_class, $during_test = FALS
           'line' => $match[4],
           'file' => $match[3],
         );
-        Test::insertAssert($test_id, $test_class, FALSE, $match[2], $match[1], $caller);
+        TestBase::insertAssert($test_id, $test_class, FALSE, $match[2], $match[1], $caller);
       }
       else {
         // Unknown format, place the entire message in the log.
-        Test::insertAssert($test_id, $test_class, FALSE, $line, 'Fatal error');
+        TestBase::insertAssert($test_id, $test_class, FALSE, $line, 'Fatal error');
       }
       $found = TRUE;
     }
@@ -584,8 +584,8 @@ function simpletest_mail_alter(&$message) {
  * @return
  *   The ID of the message to be placed in related assertion messages.
  *
- * @see Drupal\simpletest\Test->originalFileDirectory()
- * @see Drupal\simpletest\WebTest->verbose()
+ * @see Drupal\simpletest\TestBase->originalFileDirectory()
+ * @see Drupal\simpletest\WebTestBase->verbose()
  */
 function simpletest_verbose($message, $original_file_directory = NULL, $test_class = NULL) {
   static $file_directory = NULL, $class = NULL, $id = 1, $verbose = NULL;

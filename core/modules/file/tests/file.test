@@ -5,19 +5,19 @@
  * Tests for file.module.
  */
 
-use Drupal\simpletest\WebTest;
+use Drupal\simpletest\WebTestBase;
 
 /**
  * Provides methods specifically for testing File module's field handling.
  */
-class FileFieldTestCase extends WebTest {
+class FileFieldTestCase extends WebTestBase {
   protected $profile = 'standard';
 
   protected $admin_user;
 
   function setUp() {
     // Since this is a base class for many test cases, support the same
-    // flexibility that Drupal\simpletest\WebTest::setUp() has for the modules
+    // flexibility that Drupal\simpletest\WebTestBase::setUp() has for the modules
     // to be passed in as either an array or a variable number of string
     // arguments.
     $modules = func_get_args();

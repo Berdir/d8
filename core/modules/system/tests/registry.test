@@ -1,8 +1,8 @@
 <?php
 
-use Drupal\simpletest\WebTest;
+use Drupal\simpletest\WebTestBase;
 
-class RegistryParseFileTestCase extends WebTest {
+class RegistryParseFileTestCase extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Registry parse file test',
@@ -47,7 +47,7 @@ CONTENTS;
 
 }
 
-class RegistryParseFilesTestCase extends WebTest {
+class RegistryParseFilesTestCase extends WebTestBase {
   protected $fileTypes = array('new', 'existing_changed');
 
   public static function getInfo() {

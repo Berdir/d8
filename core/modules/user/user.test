@@ -5,9 +5,9 @@
  * Tests for user.module.
  */
 
-use Drupal\simpletest\WebTest;
+use Drupal\simpletest\WebTestBase;
 
-class UserRegistrationTestCase extends WebTest {
+class UserRegistrationTestCase extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'User registration',
@@ -260,7 +260,7 @@ class UserRegistrationTestCase extends WebTest {
   }
 }
 
-class UserValidationTestCase extends WebTest {
+class UserValidationTestCase extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Username/e-mail validation',
@@ -300,7 +300,7 @@ class UserValidationTestCase extends WebTest {
 /**
  * Functional tests for user logins, including rate limiting of login attempts.
  */
-class UserLoginTestCase extends WebTest {
+class UserLoginTestCase extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'User login',
@@ -443,7 +443,7 @@ class UserLoginTestCase extends WebTest {
 /**
  * Tests resetting a user password.
  */
-class UserPasswordResetTestCase extends WebTest {
+class UserPasswordResetTestCase extends WebTestBase {
   protected $profile = 'standard';
 
   public static function getInfo() {
@@ -495,7 +495,7 @@ class UserPasswordResetTestCase extends WebTest {
 /**
  * Test cancelling a user.
  */
-class UserCancelTestCase extends WebTest {
+class UserCancelTestCase extends WebTestBase {
   protected $profile = 'standard';
 
   public static function getInfo() {
@@ -921,7 +921,7 @@ class UserCancelTestCase extends WebTest {
   }
 }
 
-class UserPictureTestCase extends WebTest {
+class UserPictureTestCase extends WebTestBase {
   protected $user;
   protected $_directory_test;
 
@@ -1230,7 +1230,7 @@ class UserPictureTestCase extends WebTest {
 }
 
 
-class UserPermissionsTestCase extends WebTest {
+class UserPermissionsTestCase extends WebTestBase {
   protected $admin_user;
   protected $rid;
 
@@ -1328,7 +1328,7 @@ class UserPermissionsTestCase extends WebTest {
   }
 }
 
-class UserAdminTestCase extends WebTest {
+class UserAdminTestCase extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'User administration',
@@ -1417,7 +1417,7 @@ class UserAdminTestCase extends WebTest {
 /**
  * Tests for user-configurable time zones.
  */
-class UserTimeZoneFunctionalTest extends WebTest {
+class UserTimeZoneFunctionalTest extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'User time zones',
@@ -1477,7 +1477,7 @@ class UserTimeZoneFunctionalTest extends WebTest {
 /**
  * Test user autocompletion.
  */
-class UserAutocompleteTestCase extends WebTest {
+class UserAutocompleteTestCase extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'User autocompletion',
@@ -1518,7 +1518,7 @@ class UserAutocompleteTestCase extends WebTest {
 /**
  * Test user-links in secondary menu.
  */
-class UserAccountLinksUnitTests extends WebTest {
+class UserAccountLinksUnitTestBases extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'User account links',
@@ -1567,7 +1567,7 @@ class UserAccountLinksUnitTests extends WebTest {
 /**
  * Test user blocks.
  */
-class UserBlocksUnitTests extends WebTest {
+class UserBlocksUnitTestBases extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'User blocks',
@@ -1682,7 +1682,7 @@ class UserBlocksUnitTests extends WebTest {
 /**
  * Tests user_save() behavior.
  */
-class UserSaveTestCase extends WebTest {
+class UserSaveTestCase extends WebTestBase {
 
   public static function getInfo() {
     return array(
@@ -1724,7 +1724,7 @@ class UserSaveTestCase extends WebTest {
 /**
  * Test the create user administration page.
  */
-class UserCreateTestCase extends WebTest {
+class UserCreateTestCase extends WebTestBase {
 
   public static function getInfo() {
     return array(
@@ -1770,7 +1770,7 @@ class UserCreateTestCase extends WebTest {
 /**
  * Tests the user edit form.
  */
-class UserEditTestCase extends WebTest {
+class UserEditTestCase extends WebTestBase {
 
   public static function getInfo() {
     return array(
@@ -1862,7 +1862,7 @@ class UserEditTestCase extends WebTest {
 /**
  * Test case for user signatures.
  */
-class UserSignatureTestCase extends WebTest {
+class UserSignatureTestCase extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'User signatures',
@@ -1966,7 +1966,7 @@ class UserSignatureTestCase extends WebTest {
 /*
  * Test that a user, having editing their own account, can still log in.
  */
-class UserEditedOwnAccountTestCase extends WebTest {
+class UserEditedOwnAccountTestCase extends WebTestBase {
 
   public static function getInfo() {
     return array(
@@ -2002,7 +2002,7 @@ class UserEditedOwnAccountTestCase extends WebTest {
 /**
  * Test case to test adding, editing and deleting roles.
  */
-class UserRoleAdminTestCase extends WebTest {
+class UserRoleAdminTestCase extends WebTestBase {
 
   public static function getInfo() {
     return array(
@@ -2087,7 +2087,7 @@ class UserRoleAdminTestCase extends WebTest {
 /**
  * Test user token replacement in strings.
  */
-class UserTokenReplaceTestCase extends WebTest {
+class UserTokenReplaceTestCase extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'User token replacement',
@@ -2152,7 +2152,7 @@ class UserTokenReplaceTestCase extends WebTest {
 /**
  * Test user search.
  */
-class UserUserSearchTestCase extends WebTest {
+class UserUserSearchTestCase extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'User search',
@@ -2188,7 +2188,7 @@ class UserUserSearchTestCase extends WebTest {
 /**
  * Test role assignment.
  */
-class UserRolesAssignmentTestCase extends WebTest {
+class UserRolesAssignmentTestCase extends WebTestBase {
   protected $admin_user;
 
   public static function getInfo() {
@@ -2278,7 +2278,7 @@ class UserRolesAssignmentTestCase extends WebTest {
 /**
  * Unit test for authmap assignment.
  */
-class UserAuthmapAssignmentTestCase extends WebTest {
+class UserAuthmapAssignmentTestCase extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => t('Authmap assignment'),
@@ -2337,7 +2337,7 @@ class UserAuthmapAssignmentTestCase extends WebTest {
 /**
  * Tests user_validate_current_pass on a custom form.
  */
-class UserValidateCurrentPassCustomForm extends WebTest {
+class UserValidateCurrentPassCustomForm extends WebTestBase {
 
   public static function getInfo() {
     return array(
@@ -2382,7 +2382,7 @@ class UserValidateCurrentPassCustomForm extends WebTest {
 /**
  * Test user entity callbacks.
  */
-class UserEntityCallbacksTestCase extends WebTest {
+class UserEntityCallbacksTestCase extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'User entity callback tests',
@@ -2422,7 +2422,7 @@ class UserEntityCallbacksTestCase extends WebTest {
 /**
  * Functional tests for a user's ability to change their default language.
  */
-class UserLanguageFunctionalTest extends WebTest {
+class UserLanguageFunctionalTest extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'User language settings',
@@ -2487,7 +2487,7 @@ class UserLanguageFunctionalTest extends WebTest {
 /**
  * Functional test for language handling during user creation.
  */
-class UserLanguageCreationTest extends WebTest {
+class UserLanguageCreationTest extends WebTestBase {
 
   public static function getInfo() {
     return array(

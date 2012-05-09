@@ -11,10 +11,10 @@ const SEARCH_TYPE = '_test_';
 const SEARCH_TYPE_2 = '_test2_';
 const SEARCH_TYPE_JPN = '_test3_';
 
-use Drupal\simpletest\WebTest;
-use Drupal\simpletest\UnitTest;
+use Drupal\simpletest\WebTestBase;
+use Drupal\simpletest\UnitTestBase;
 
-class SearchWebTestCase extends WebTest {
+class SearchWebTestBaseCase extends WebTestBase {
   function setUp() {
     $modules = func_get_args();
     if (isset($modules[0]) && is_array($modules[0])) {
@@ -33,7 +33,7 @@ class SearchWebTestCase extends WebTest {
   }
 }
 
-class SearchMatchTestCase extends SearchWebTestCase {
+class SearchMatchTestCase extends SearchWebTestBaseCase {
   public static function getInfo() {
     return array(
       'name' => 'Search engine queries',
@@ -258,7 +258,7 @@ class SearchMatchTestCase extends SearchWebTestCase {
 /**
  * Tests the bike shed text on no results page, and text on the search page.
  */
-class SearchPageText extends SearchWebTestCase {
+class SearchPageText extends SearchWebTestBaseCase {
   protected $searching_user;
 
   public static function getInfo() {
@@ -322,7 +322,7 @@ class SearchPageText extends SearchWebTestCase {
   }
 }
 
-class SearchAdvancedSearchForm extends SearchWebTestCase {
+class SearchAdvancedSearchForm extends SearchWebTestBaseCase {
   protected $node;
 
   public static function getInfo() {
@@ -385,7 +385,7 @@ class SearchAdvancedSearchForm extends SearchWebTestCase {
   }
 }
 
-class SearchRankingTestCase extends SearchWebTestCase {
+class SearchRankingTestCase extends SearchWebTestBaseCase {
   public static function getInfo() {
     return array(
       'name' => 'Search engine ranking',
@@ -605,7 +605,7 @@ class SearchRankingTestCase extends SearchWebTestCase {
   }
 }
 
-class SearchBlockTestCase extends SearchWebTestCase {
+class SearchBlockTestCase extends SearchWebTestBaseCase {
   public static function getInfo() {
     return array(
       'name' => 'Block availability',
@@ -685,7 +685,7 @@ class SearchBlockTestCase extends SearchWebTestCase {
 /**
  * Tests that searching for a phrase gets the correct page count.
  */
-class SearchExactTestCase extends SearchWebTestCase {
+class SearchExactTestCase extends SearchWebTestBaseCase {
   public static function getInfo() {
     return array(
       'name' => 'Search engine phrase queries',
@@ -742,7 +742,7 @@ class SearchExactTestCase extends SearchWebTestCase {
 /**
  * Test integration searching comments.
  */
-class SearchCommentTestCase extends SearchWebTestCase {
+class SearchCommentTestCase extends SearchWebTestBaseCase {
   protected $profile = 'standard';
 
   protected $admin_user;
@@ -974,7 +974,7 @@ class SearchCommentTestCase extends SearchWebTestCase {
  *
  * @see http://drupal.org/node/419388 (issue)
  */
-class SearchExpressionInsertExtractTestCase extends UnitTest {
+class SearchExpressionInsertExtractTestCase extends UnitTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Search expression insert/extract',
@@ -1040,7 +1040,7 @@ class SearchExpressionInsertExtractTestCase extends UnitTest {
  *     only when there are comments
  * - Nodes with comment status set to Hidden should never show comment counts
  */
-class SearchCommentCountToggleTestCase extends SearchWebTestCase {
+class SearchCommentCountToggleTestCase extends SearchWebTestBaseCase {
   // Requires node types, comment config, filter formats.
   protected $profile = 'standard';
 
@@ -1128,7 +1128,7 @@ class SearchCommentCountToggleTestCase extends SearchWebTestCase {
 /**
  * Test search_simplify() on every Unicode character, and some other cases.
  */
-class SearchSimplifyTestCase extends SearchWebTestCase {
+class SearchSimplifyTestCase extends SearchWebTestBaseCase {
   public static function getInfo() {
     return array(
       'name' => 'Search simplify',
@@ -1211,7 +1211,7 @@ class SearchSimplifyTestCase extends SearchWebTestCase {
 /**
  * Tests keywords and conditions.
  */
-class SearchKeywordsConditions extends SearchWebTestCase {
+class SearchKeywordsConditions extends SearchWebTestBaseCase {
   public static function getInfo() {
     return array(
       'name' => 'Keywords and conditions',
@@ -1261,7 +1261,7 @@ class SearchKeywordsConditions extends SearchWebTestCase {
 /**
  * Tests that numbers can be searched.
  */
-class SearchNumbersTestCase extends SearchWebTestCase {
+class SearchNumbersTestCase extends SearchWebTestBaseCase {
   protected $test_user;
   protected $numbers;
   protected $nodes;
@@ -1349,7 +1349,7 @@ class SearchNumbersTestCase extends SearchWebTestCase {
 /**
  * Tests that numbers can be searched, with more complex matching.
  */
-class SearchNumberMatchingTestCase extends SearchWebTestCase {
+class SearchNumberMatchingTestCase extends SearchWebTestBaseCase {
   protected $test_user;
   protected $numbers;
   protected $nodes;
@@ -1432,7 +1432,7 @@ class SearchNumberMatchingTestCase extends SearchWebTestCase {
 /**
  * Test config page.
  */
-class SearchConfigSettingsForm extends SearchWebTestCase {
+class SearchConfigSettingsForm extends SearchWebTestBaseCase {
   public $search_user;
   public $search_node;
 
@@ -1592,7 +1592,7 @@ class SearchConfigSettingsForm extends SearchWebTestCase {
 /**
  * Tests the search_excerpt() function.
  */
-class SearchExcerptTestCase extends UnitTest {
+class SearchExcerptTestCase extends UnitTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Search excerpt extraction',
@@ -1696,7 +1696,7 @@ class SearchExcerptTestCase extends UnitTest {
 /**
  * Test the CJK tokenizer.
  */
-class SearchTokenizerTestCase extends SearchWebTestCase {
+class SearchTokenizerTestCase extends SearchWebTestBaseCase {
   public static function getInfo() {
     return array(
       'name' => 'CJK tokenizer',
@@ -1843,7 +1843,7 @@ class SearchTokenizerTestCase extends SearchWebTestCase {
 /**
  * Tests that we can embed a form in search results and submit it.
  */
-class SearchEmbedForm extends SearchWebTestCase {
+class SearchEmbedForm extends SearchWebTestBaseCase {
   /**
    * Node used for testing.
    */
@@ -1919,7 +1919,7 @@ class SearchEmbedForm extends SearchWebTestCase {
 /**
  * Tests that hook_search_page runs.
  */
-class SearchPageOverride extends SearchWebTestCase {
+class SearchPageOverride extends SearchWebTestBaseCase {
   public $search_user;
 
   public static function getInfo() {
@@ -1953,7 +1953,7 @@ class SearchPageOverride extends SearchWebTestCase {
 /**
  * Test node search with multiple languages.
  */
-class SearchLanguageTestCase extends SearchWebTestCase {
+class SearchLanguageTestCase extends SearchWebTestBaseCase {
   public static function getInfo() {
     return array(
       'name' => 'Search language selection',
@@ -2013,7 +2013,7 @@ class SearchLanguageTestCase extends SearchWebTestCase {
 /**
  * Tests node search with node access control.
  */
-class SearchNodeAccessTest extends SearchWebTestCase {
+class SearchNodeAccessTest extends SearchWebTestBaseCase {
   public $test_user;
 
   public static function getInfo() {

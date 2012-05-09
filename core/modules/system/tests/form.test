@@ -5,9 +5,9 @@
  * Unit tests for the Drupal Form API.
  */
 
-use Drupal\simpletest\WebTest;
+use Drupal\simpletest\WebTestBase;
 
-class FormsTestCase extends WebTest {
+class FormsTestCase extends WebTestBase {
 
   public static function getInfo() {
     return array(
@@ -560,7 +560,7 @@ class FormsTestCase extends WebTest {
 /**
  * Tests building and processing of core form elements.
  */
-class FormElementTestCase extends WebTest {
+class FormElementTestCase extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Element processing',
@@ -641,7 +641,7 @@ class FormElementTestCase extends WebTest {
 /**
  * Test form alter hooks.
  */
-class FormAlterTestCase extends WebTest {
+class FormAlterTestCase extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Form alter hooks',
@@ -675,7 +675,7 @@ class FormAlterTestCase extends WebTest {
 /**
  * Test form validation handlers.
  */
-class FormValidationTestCase extends WebTest {
+class FormValidationTestCase extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Form validation handlers',
@@ -850,7 +850,7 @@ class FormValidationTestCase extends WebTest {
 /**
  * Test form element labels, required markers and associated output.
  */
-class FormsElementsLabelsTestCase extends WebTest {
+class FormsElementsLabelsTestCase extends WebTestBase {
 
   public static function getInfo() {
     return array(
@@ -937,7 +937,7 @@ class FormsElementsLabelsTestCase extends WebTest {
 /**
  * Test the tableselect form element for expected behavior.
  */
-class FormsElementsTableSelectFunctionalTest extends WebTest {
+class FormsElementsTableSelectFunctionalTest extends WebTestBase {
 
   public static function getInfo() {
     return array(
@@ -1163,7 +1163,7 @@ class FormsElementsTableSelectFunctionalTest extends WebTest {
 /**
  * Test the vertical_tabs form element for expected behavior.
  */
-class FormsElementsVerticalTabsFunctionalTest extends WebTest {
+class FormsElementsVerticalTabsFunctionalTest extends WebTestBase {
 
   public static function getInfo() {
     return array(
@@ -1199,7 +1199,7 @@ class FormsElementsVerticalTabsFunctionalTest extends WebTest {
  * when a validation error occurs, it makes sure that changed form element
  * values aren't lost due to a wrong form rebuild.
  */
-class FormsFormStorageTestCase extends WebTest {
+class FormsFormStorageTestCase extends WebTestBase {
 
   public static function getInfo() {
     return array(
@@ -1343,7 +1343,7 @@ class FormsFormStorageTestCase extends WebTest {
 /**
  * Test wrapper form callbacks.
  */
-class FormsFormWrapperTestCase extends WebTest {
+class FormsFormWrapperTestCase extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Form wrapper callback',
@@ -1369,7 +1369,7 @@ class FormsFormWrapperTestCase extends WebTest {
 /**
  * Test $form_state clearance.
  */
-class FormStateValuesCleanTestCase extends WebTest {
+class FormStateValuesCleanTestCase extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Form state values clearance',
@@ -1417,7 +1417,7 @@ class FormStateValuesCleanTestCase extends WebTest {
 /**
  * Tests $form_state clearance with form elements having buttons.
  */
-class FormStateValuesCleanAdvancedTestCase extends WebTest {
+class FormStateValuesCleanAdvancedTestCase extends WebTestBase {
   /**
    * An image file path for uploading.
    */
@@ -1464,7 +1464,7 @@ class FormStateValuesCleanAdvancedTestCase extends WebTest {
  *
  * @todo Add tests for other aspects of form rebuilding.
  */
-class FormsRebuildTestCase extends WebTest {
+class FormsRebuildTestCase extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Form rebuilding',
@@ -1558,7 +1558,7 @@ class FormsRebuildTestCase extends WebTest {
 /**
  * Test the programmatic form submission behavior.
  */
-class FormsProgrammaticTestCase extends WebTest {
+class FormsProgrammaticTestCase extends WebTestBase {
 
   public static function getInfo() {
     return array(
@@ -1647,7 +1647,7 @@ class FormsProgrammaticTestCase extends WebTest {
 /**
  * Test that FAPI correctly determines $form_state['triggering_element'].
  */
-class FormsTriggeringElementTestCase extends WebTest {
+class FormsTriggeringElementTestCase extends WebTestBase {
 
   public static function getInfo() {
     return array(
@@ -1745,7 +1745,7 @@ class FormsTriggeringElementTestCase extends WebTest {
 /**
  * Tests rebuilding of arbitrary forms by altering them.
  */
-class FormsArbitraryRebuildTestCase extends WebTest {
+class FormsArbitraryRebuildTestCase extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Rebuild arbitrary forms',
@@ -1811,7 +1811,7 @@ class FormsArbitraryRebuildTestCase extends WebTest {
 /**
  * Tests form API file inclusion.
  */
-class FormsFileInclusionTestCase extends WebTest {
+class FormsFileInclusionTestCase extends WebTestBase {
 
   public static function getInfo() {
     return array(
@@ -1845,7 +1845,7 @@ class FormsFileInclusionTestCase extends WebTest {
 /**
  * Tests checkbox element.
  */
-class FormCheckboxTestCase extends WebTest {
+class FormCheckboxTestCase extends WebTestBase {
 
   public static function getInfo() {
     return array(
@@ -1926,7 +1926,7 @@ class FormCheckboxTestCase extends WebTest {
 /**
  * Tests email element.
  */
-class FormEmailTestCase extends WebTest {
+class FormEmailTestCase extends WebTestBase {
   protected $profile = 'testing';
 
   public static function getInfo() {
@@ -1970,7 +1970,7 @@ class FormEmailTestCase extends WebTest {
 /**
  * Tests url element.
  */
-class FormUrlTestCase extends WebTest {
+class FormUrlTestCase extends WebTestBase {
   protected $profile = 'testing';
 
   public static function getInfo() {

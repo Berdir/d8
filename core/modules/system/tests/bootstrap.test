@@ -1,9 +1,9 @@
 <?php
 
-use Drupal\simpletest\WebTest;
-use Drupal\simpletest\UnitTest;
+use Drupal\simpletest\WebTestBase;
+use Drupal\simpletest\UnitTestBase;
 
-class BootstrapIPAddressTestCase extends WebTest {
+class BootstrapIPAddressTestCase extends WebTestBase {
 
   public static function getInfo() {
     return array(
@@ -101,7 +101,7 @@ class BootstrapIPAddressTestCase extends WebTest {
   }
 }
 
-class BootstrapPageCacheTestCase extends WebTest {
+class BootstrapPageCacheTestCase extends WebTestBase {
 
   public static function getInfo() {
     return array(
@@ -234,7 +234,7 @@ class BootstrapPageCacheTestCase extends WebTest {
   }
 }
 
-class BootstrapVariableTestCase extends WebTest {
+class BootstrapVariableTestCase extends WebTestBase {
 
   function setUp() {
     parent::setUp('system_test');
@@ -284,7 +284,7 @@ class BootstrapVariableTestCase extends WebTest {
 /**
  * Test hook_boot() and hook_exit().
  */
-class HookBootExitTestCase extends WebTest {
+class HookBootExitTestCase extends WebTestBase {
 
   public static function getInfo() {
     return array(
@@ -339,7 +339,7 @@ class HookBootExitTestCase extends WebTest {
 /**
  * Test drupal_get_filename()'s availability.
  */
-class BootstrapGetFilenameTestCase extends UnitTest {
+class BootstrapGetFilenameTestCase extends UnitTestBase {
 
   public static function getInfo() {
     return array(
@@ -381,7 +381,7 @@ class BootstrapGetFilenameTestCase extends UnitTest {
   }
 }
 
-class BootstrapTimerTestCase extends UnitTest {
+class BootstrapTimerTestCase extends UnitTestBase {
 
   public static function getInfo() {
     return array(
@@ -416,7 +416,7 @@ class BootstrapTimerTestCase extends UnitTest {
 /**
  * Test that resetting static variables works.
  */
-class BootstrapResettableStaticTestCase extends UnitTest {
+class BootstrapResettableStaticTestCase extends UnitTestBase {
 
   public static function getInfo() {
     return array(
@@ -455,7 +455,7 @@ class BootstrapResettableStaticTestCase extends UnitTest {
 /**
  * Test miscellaneous functions in bootstrap.inc.
  */
-class BootstrapMiscTestCase extends UnitTest {
+class BootstrapMiscTestCase extends UnitTestBase {
 
   public static function getInfo() {
     return array(
@@ -501,7 +501,7 @@ class BootstrapMiscTestCase extends UnitTest {
 /**
  * Tests for overriding server variables via the API.
  */
-class BootstrapOverrideServerVariablesTestCase extends UnitTest {
+class BootstrapOverrideServerVariablesTestCase extends UnitTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Overriding server variables',

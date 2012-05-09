@@ -6,9 +6,9 @@
  */
 
 use Drupal\node\Node;
-use Drupal\simpletest\WebTest;
+use Drupal\simpletest\WebTestBase;
 
-class RdfMappingHookTestCase extends WebTest {
+class RdfMappingHookTestCase extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'RDF mapping hook',
@@ -44,7 +44,7 @@ class RdfMappingHookTestCase extends WebTest {
 /**
  * Test RDFa markup generation.
  */
-class RdfRdfaMarkupTestCase extends WebTest {
+class RdfRdfaMarkupTestCase extends WebTestBase {
   protected $profile = 'standard';
 
   public static function getInfo() {
@@ -213,7 +213,7 @@ class RdfRdfaMarkupTestCase extends WebTest {
   }
 }
 
-class RdfCrudTestCase extends WebTest {
+class RdfCrudTestCase extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'RDF mapping CRUD functions',
@@ -281,7 +281,7 @@ class RdfCrudTestCase extends WebTest {
   }
 }
 
-class RdfMappingDefinitionTestCase extends TaxonomyWebTestCase {
+class RdfMappingDefinitionTestCase extends TaxonomyWebTestBaseCase {
   protected $profile = 'standard';
 
   public static function getInfo() {
@@ -579,7 +579,7 @@ class RdfCommentAttributesTestCase extends CommentHelperCase {
   }
 }
 
-class RdfTrackerAttributesTestCase extends WebTest {
+class RdfTrackerAttributesTestCase extends WebTestBase {
   protected $profile = 'standard';
 
   public static function getInfo() {
@@ -696,7 +696,7 @@ class RdfTrackerAttributesTestCase extends WebTest {
 /**
  * Tests for RDF namespaces declaration with hook_rdf_namespaces().
  */
-class RdfGetRdfNamespacesTestCase extends WebTest {
+class RdfGetRdfNamespacesTestCase extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'RDF namespaces',
@@ -726,7 +726,7 @@ class RdfGetRdfNamespacesTestCase extends WebTest {
 /**
  * Tests for RDF namespaces XML serialization.
  */
-class DrupalGetRdfNamespacesTestCase extends WebTest {
+class DrupalGetRdfNamespacesTestCase extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'RDF namespaces serialization test',

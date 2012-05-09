@@ -5,12 +5,12 @@
  * Unit test file for the entity API.
  */
 
-use Drupal\simpletest\WebTest;
+use Drupal\simpletest\WebTestBase;
 
 /**
  * Tests EntityFieldQuery.
  */
-class EntityFieldQueryTestCase extends WebTest {
+class EntityFieldQueryTestCase extends WebTestBase {
 
 
   public static function getInfo() {

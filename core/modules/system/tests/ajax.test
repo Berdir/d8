@@ -1,9 +1,9 @@
 <?php
 
 
-use Drupal\simpletest\WebTest;
+use Drupal\simpletest\WebTestBase;
 
-class AJAXTestCase extends WebTest {
+class AJAXTestCase extends WebTestBase {
   function setUp() {
     $modules = func_get_args();
     if (isset($modules[0]) && is_array($modules[0])) {

@@ -20,13 +20,13 @@
  *  - a functional test fot language types/negotiation info.
  */
 
-use Drupal\simpletest\WebTest;
-use Drupal\simpletest\UnitTest;
+use Drupal\simpletest\WebTestBase;
+use Drupal\simpletest\UnitTestBase;
 
 /**
  * Functional tests for language configuration's effect on negotiation setup.
  */
-class LocaleConfigurationTest extends WebTest {
+class LocaleConfigurationTest extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Language negotiation autoconfiguration',
@@ -92,7 +92,7 @@ class LocaleConfigurationTest extends WebTest {
 /**
  * Functional tests for JavaScript parsing for translatable strings.
  */
-class LocaleJavascriptTranslationTest extends WebTest {
+class LocaleJavascriptTranslationTest extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Javascript translation',
@@ -181,7 +181,7 @@ class LocaleJavascriptTranslationTest extends WebTest {
 /**
  * Functional test for string translation and validation.
  */
-class LocaleTranslationFunctionalTest extends WebTest {
+class LocaleTranslationFunctionalTest extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'String translate, search and validate',
@@ -589,7 +589,7 @@ class LocaleTranslationFunctionalTest extends WebTest {
 /**
  * Tests plural format handling functionality.
  */
-class LocalePluralFormatTest extends WebTest {
+class LocalePluralFormatTest extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Plural handling',
@@ -902,7 +902,7 @@ EOF;
 /**
  * Functional tests for the import of translation files.
  */
-class LocaleImportFunctionalTest extends WebTest {
+class LocaleImportFunctionalTest extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Translation import',
@@ -1379,7 +1379,7 @@ EOF;
 /**
  * Functional tests for the export of translation files.
  */
-class LocaleExportFunctionalTest extends WebTest {
+class LocaleExportFunctionalTest extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Translation export',
@@ -1521,7 +1521,7 @@ EOF;
 /**
  * Tests for the st() function.
  */
-class LocaleInstallTest extends WebTest {
+class LocaleInstallTest extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'String translation using st()',
@@ -1550,7 +1550,7 @@ class LocaleInstallTest extends WebTest {
 /**
  * Locale uninstall with English UI functional test.
  */
-class LocaleUninstallFunctionalTest extends WebTest {
+class LocaleUninstallFunctionalTest extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Locale uninstall (EN)',
@@ -1696,7 +1696,7 @@ class LocaleUninstallFrenchFunctionalTest extends LocaleUninstallFunctionalTest 
 /**
  * Functional tests for the language switching feature.
  */
-class LocaleLanguageSwitchingFunctionalTest extends WebTest {
+class LocaleLanguageSwitchingFunctionalTest extends WebTestBase {
 
   public static function getInfo() {
     return array(
@@ -1774,7 +1774,7 @@ class LocaleLanguageSwitchingFunctionalTest extends WebTest {
 /**
  * Test browser language detection.
  */
-class LocaleBrowserDetectionTest extends UnitTest {
+class LocaleBrowserDetectionTest extends UnitTestBase {
 
   public static function getInfo() {
     return array(
@@ -1895,7 +1895,7 @@ class LocaleBrowserDetectionTest extends UnitTest {
 /**
  * Functional tests for configuring a different path alias per language.
  */
-class LocalePathFunctionalTest extends WebTest {
+class LocalePathFunctionalTest extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Path language settings',
@@ -2034,7 +2034,7 @@ class LocalePathFunctionalTest extends WebTest {
 /**
  * Functional tests for multilingual support on nodes.
  */
-class LocaleContentFunctionalTest extends WebTest {
+class LocaleContentFunctionalTest extends WebTestBase {
   protected $profile = 'standard';
 
   public static function getInfo() {
@@ -2257,7 +2257,7 @@ class LocaleContentFunctionalTest extends WebTest {
  *        http://example.cn/admin/config
  *          UI language in Chinese
  */
-class LocaleUILanguageNegotiationTest extends WebTest {
+class LocaleUILanguageNegotiationTest extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'UI language negotiation',
@@ -2551,7 +2551,7 @@ class LocaleUILanguageNegotiationTest extends WebTest {
 /**
  * Test that URL rewriting works as expected.
  */
-class LocaleUrlRewritingTest extends WebTest {
+class LocaleUrlRewritingTest extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'URL rewriting',
@@ -2623,7 +2623,7 @@ class LocaleUrlRewritingTest extends WebTest {
 /**
  * Functional test for multilingual fields.
  */
-class LocaleMultilingualFieldsFunctionalTest extends WebTest {
+class LocaleMultilingualFieldsFunctionalTest extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Multilingual fields',
@@ -2750,7 +2750,7 @@ class LocaleMultilingualFieldsFunctionalTest extends WebTest {
 /**
  * Functional tests for comment language.
  */
-class LocaleCommentLanguageFunctionalTest extends WebTest {
+class LocaleCommentLanguageFunctionalTest extends WebTestBase {
   protected $profile = 'standard';
 
   public static function getInfo() {
@@ -2845,7 +2845,7 @@ class LocaleCommentLanguageFunctionalTest extends WebTest {
 /**
  * Functional tests for localizing date formats.
  */
-class LocaleDateFormatsFunctionalTest extends WebTest {
+class LocaleDateFormatsFunctionalTest extends WebTestBase {
 
   public static function getInfo() {
     return array(
@@ -2917,7 +2917,7 @@ class LocaleDateFormatsFunctionalTest extends WebTest {
 /**
  * Functional test for language types/negotiation info.
  */
-class LocaleLanguageNegotiationInfoFunctionalTest extends WebTest {
+class LocaleLanguageNegotiationInfoFunctionalTest extends WebTestBase {
 
   public static function getInfo() {
     return array(

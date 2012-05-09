@@ -5,10 +5,10 @@
  * Provides SimpleTests for menu.inc.
  */
 
-use Drupal\simpletest\WebTest;
-use Drupal\simpletest\UnitTest;
+use Drupal\simpletest\WebTestBase;
+use Drupal\simpletest\UnitTestBase;
 
-class MenuWebTestCase extends WebTest {
+class MenuWebTestBaseCase extends WebTestBase {
   function setUp() {
     $modules = func_get_args();
     if (isset($modules[0]) && is_array($modules[0])) {
@@ -22,13 +22,13 @@ class MenuWebTestCase extends WebTest {
    *
    * @param string $goto
    *   (optional) A system path to pass to
-   *   Drupal\simpletest\WebTest::drupalGet().
+   *   Drupal\simpletest\WebTestBase::drupalGet().
    * @param array $trail
    *   An associative array whose keys are expected breadcrumb link paths and
    *   whose values are expected breadcrumb link texts (not sanitized).
    * @param string $page_title
    *   (optional) A page title to additionally assert via
-   *   Drupal\simpletest\WebTest::assertTitle(). Without site name suffix.
+   *   Drupal\simpletest\WebTestBase::assertTitle(). Without site name suffix.
    * @param array $tree
    *   (optional) An associative array whose keys are link paths and whose
    *   values are link titles (not sanitized) of an expected active trail in a
@@ -125,7 +125,7 @@ class MenuWebTestCase extends WebTest {
   }
 }
 
-class MenuRouterTestCase extends WebTest {
+class MenuRouterTestCase extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Menu router',
@@ -667,7 +667,7 @@ class MenuRouterTestCase extends WebTest {
 /**
  * Tests for menu links.
  */
-class MenuLinksUnitTestCase extends WebTest {
+class MenuLinksUnitTestBaseCase extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Menu links',
@@ -883,7 +883,7 @@ class MenuLinksUnitTestCase extends WebTest {
 /**
  * Tests rebuilding the menu by setting 'menu_rebuild_needed.'
  */
-class MenuRebuildTestCase extends WebTest {
+class MenuRebuildTestCase extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Menu rebuild test',
@@ -921,7 +921,7 @@ class MenuRebuildTestCase extends WebTest {
 /**
  * Menu tree data related tests.
  */
-class MenuTreeDataTestCase extends UnitTest {
+class MenuTreeDataTestCase extends UnitTestBase {
   /**
    * Dummy link structure acceptable for menu_tree_data().
    */
@@ -976,7 +976,7 @@ class MenuTreeDataTestCase extends UnitTest {
 /**
  * Menu tree output related tests.
  */
-class MenuTreeOutputTestCase extends WebTest {
+class MenuTreeOutputTestCase extends WebTestBase {
   /**
    * Dummy link structure acceptable for menu_tree_output().
    */
@@ -1034,7 +1034,7 @@ class MenuTreeOutputTestCase extends WebTest {
 /**
  * Menu breadcrumbs related tests.
  */
-class MenuBreadcrumbTestCase extends MenuWebTestCase {
+class MenuBreadcrumbTestCase extends MenuWebTestBaseCase {
   protected $profile = 'standard';
 
   public static function getInfo() {
@@ -1527,7 +1527,7 @@ class MenuBreadcrumbTestCase extends MenuWebTestCase {
 /**
  * Tests active menu trails.
  */
-class MenuTrailTestCase extends MenuWebTestCase {
+class MenuTrailTestCase extends MenuWebTestBaseCase {
   public static function getInfo() {
     return array(
       'name' => 'Active trail',

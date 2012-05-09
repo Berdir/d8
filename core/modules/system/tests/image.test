@@ -5,12 +5,12 @@
  * Tests for core image handling API.
  */
 
-use Drupal\simpletest\WebTest;
+use Drupal\simpletest\WebTestBase;
 
 /**
  * Base class for image manipulation testing.
  */
-class ImageToolkitTestCase extends WebTest {
+class ImageToolkitTestCase extends WebTestBase {
   protected $toolkit;
   protected $file;
   protected $image;
@@ -71,7 +71,7 @@ class ImageToolkitTestCase extends WebTest {
 /**
  * Test that the functions in image.inc correctly pass data to the toolkit.
  */
-class ImageToolkitUnitTest extends ImageToolkitTestCase {
+class ImageToolkitUnitTestBase extends ImageToolkitTestCase {
   public static function getInfo() {
     return array(
       'name' => 'Image toolkit tests',
@@ -196,7 +196,7 @@ class ImageToolkitUnitTest extends ImageToolkitTestCase {
 /**
  * Test the core GD image manipulation functions.
  */
-class ImageToolkitGdTestCase extends WebTest {
+class ImageToolkitGdTestCase extends WebTestBase {
   // Colors that are used in testing.
   protected $black       = array(0, 0, 0, 0);
   protected $red         = array(255, 0, 0, 0);

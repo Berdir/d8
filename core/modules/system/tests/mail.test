@@ -6,12 +6,12 @@
  */
 
 use Drupal\Core\Mail\MailInterface;
-use Drupal\simpletest\WebTest;
+use Drupal\simpletest\WebTestBase;
 
 /**
  * Defines a mail class used for testing.
  */
-class MailTestCase extends WebTest implements MailInterface {
+class MailTestCase extends WebTestBase implements MailInterface {
   /**
    * The most recent message that was sent through the test case.
    *
@@ -92,7 +92,7 @@ class MailTestCase extends WebTest implements MailInterface {
 /**
  * Unit tests for drupal_html_to_text().
  */
-class DrupalHtmlToTextTestCase extends WebTest {
+class DrupalHtmlToTextTestCase extends WebTestBase {
   public static function getInfo() {
     return array(
       'name'  => 'HTML to text conversion',

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\simpletest\UnitTest.
+ * Definition of Drupal\simpletest\UnitTestBase.
  */
 
 namespace Drupal\simpletest;
@@ -17,10 +17,10 @@ use Drupal\Core\Database\ConnectionNotDefinedException;
  * function that needs the database will throw exceptions. These include
  * watchdog(), module_implements(), module_invoke_all() etc.
  */
-abstract class UnitTest extends Test {
+abstract class UnitTestBase extends TestBase {
 
   /**
-   * Constructor for UnitTest.
+   * Constructor for UnitTestBase.
    */
   function __construct($test_id = NULL) {
     parent::__construct($test_id);
@@ -30,7 +30,7 @@ abstract class UnitTest extends Test {
   /**
    * Sets up unit test environment.
    *
-   * Unlike Drupal\simpletest\WebTest::setUp(), UnitTest::setUp() does not
+   * Unlike Drupal\simpletest\WebTestBase::setUp(), UnitTestBase::setUp() does not
    * install modules because tests are performed without accessing the database.
    * Any required files must be explicitly included by the child class setUp()
    * method.

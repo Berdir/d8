@@ -6,9 +6,9 @@
  */
 
 use Drupal\node\Node;
-use Drupal\simpletest\WebTest;
+use Drupal\simpletest\WebTestBase;
 
-class ForumTestCase extends WebTest {
+class ForumTestCase extends WebTestBase {
   protected $admin_user;
   protected $edit_own_topics_user;
   protected $edit_any_topics_user;

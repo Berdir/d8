@@ -4,9 +4,9 @@
  * Tests Drupal error and exception handlers.
  */
 
-use Drupal\simpletest\WebTest;
+use Drupal\simpletest\WebTestBase;
 
-class DrupalErrorHandlerUnitTest extends WebTest {
+class DrupalErrorHandlerUnitTestBase extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Drupal error handlers',

@@ -5,10 +5,10 @@
  * Tests for simpletest.module.
  */
 
-use Drupal\simpletest\WebTest;
-use Drupal\simpletest\UnitTest;
+use Drupal\simpletest\WebTestBase;
+use Drupal\simpletest\UnitTestBase;
 
-class SimpleTestFunctionalTest extends WebTest {
+class SimpleTestFunctionalTest extends WebTestBase {
   /**
    * The results array that has been parsed by getTestResults().
    */
@@ -124,7 +124,7 @@ class SimpleTestFunctionalTest extends WebTest {
    * Make sure that tests selected through the web interface are run and
    * that the results are displayed correctly.
    */
-  function testWebTestRunner() {
+  function testWebTestBaseRunner() {
     $this->pass = t('SimpleTest pass.');
     $this->fail = t('SimpleTest fail.');
     $this->valid_permission = 'access content';
@@ -326,7 +326,7 @@ class SimpleTestFunctionalTest extends WebTest {
 /**
  * Test internal testing framework browser.
  */
-class SimpleTestBrowserTestCase extends WebTest {
+class SimpleTestBrowserTestCase extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'SimpleTest browser',
@@ -341,7 +341,7 @@ class SimpleTestBrowserTestCase extends WebTest {
   }
 
   /**
-   * Test Drupal\simpletest\WebTest::getAbsoluteUrl().
+   * Test Drupal\simpletest\WebTestBase::getAbsoluteUrl().
    */
   function testGetAbsoluteUrl() {
     $url = 'user/login';
@@ -385,7 +385,7 @@ EOF;
   }
 }
 
-class SimpleTestMailCaptureTestCase extends WebTest {
+class SimpleTestMailCaptureTestCase extends WebTestBase {
   /**
    * Implement getInfo().
    */
@@ -464,7 +464,7 @@ class SimpleTestMailCaptureTestCase extends WebTest {
 /**
  * Test Folder creation
  */
-class SimpleTestFolderTestCase extends WebTest {
+class SimpleTestFolderTestCase extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Testing SimpleTest setUp',
@@ -486,7 +486,7 @@ class SimpleTestFolderTestCase extends WebTest {
 /**
  * Test required modules for tests.
  */
-class SimpleTestMissingDependentModuleUnitTest extends UnitTest {
+class SimpleTestMissingDependentModuleUnitTestBase extends UnitTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Testing dependent module test',
@@ -508,12 +508,13 @@ class SimpleTestMissingDependentModuleUnitTest extends UnitTest {
  * Tests a test case that does not run parent::setUp() in its setUp() method.
  *
  * If a test case does not call parent::setUp(), running
- * Test::tearDown() would destroy the main site's database tables.
- * Therefore, we ensure that tests which are not set up properly are skipped.
+ * Drupal\simpletest\WebTestBase::tearDown() would destroy the main site's
+ * database tables. Therefore, we ensure that tests which are not set up
+ * properly are skipped.
  *
- * @see Drupal\simpletest\Test
+ * @see Drupal\simpletest\WebTestBase
  */
-class SimpleTestBrokenSetUp extends WebTest {
+class SimpleTestBrokenSetUp extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Broken SimpleTest method',
@@ -574,7 +575,7 @@ class SimpleTestBrokenSetUp extends WebTest {
 /**
  * Tests missing requirements to run test.
  */
-class SimpleTestMissingCheckedRequirements extends WebTest {
+class SimpleTestMissingCheckedRequirements extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Broken requirements test',
@@ -623,7 +624,7 @@ class SimpleTestMissingCheckedRequirements extends WebTest {
 /**
  * Verifies that tests bundled with installation profile modules are found.
  */
-class SimpleTestInstallationProfileModuleTestsTestCase extends WebTest {
+class SimpleTestInstallationProfileModuleTestsTestCase extends WebTestBase {
   /**
    * Use the Testing profile.
    *
@@ -672,7 +673,7 @@ class SimpleTestInstallationProfileModuleTestsTestCase extends WebTest {
  *
  * @see SimpleTestInstallationProfileModuleTestsTestCase
  */
-class SimpleTestOtherInstallationProfileModuleTestsTestCase extends WebTest {
+class SimpleTestOtherInstallationProfileModuleTestsTestCase extends WebTestBase {
   /**
    * Use the Minimal profile.
    *

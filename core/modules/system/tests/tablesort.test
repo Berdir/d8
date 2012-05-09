@@ -5,13 +5,13 @@
  * Various tablesort tests.
  */
 
-use Drupal\simpletest\WebTest;
-use Drupal\simpletest\UnitTest;
+use Drupal\simpletest\WebTestBase;
+use Drupal\simpletest\UnitTestBase;
 
 /**
  * Test unicode handling features implemented in unicode.inc.
  */
-class TableSortTest extends UnitTest {
+class TableSortTest extends UnitTestBase {
 
   /**
    * Storage for initial value of $_GET.

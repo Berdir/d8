@@ -5,12 +5,12 @@
  * Tests for color module.
  */
 
-use Drupal\simpletest\WebTest;
+use Drupal\simpletest\WebTestBase;
 
 /**
  * Tests the Color module functionality.
  */
-class ColorTestCase extends WebTest {
+class ColorTestCase extends WebTestBase {
   protected $big_user;
   protected $themes;
   protected $colorTests;

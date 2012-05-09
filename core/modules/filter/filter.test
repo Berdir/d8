@@ -5,13 +5,13 @@
  * Tests for filter.module.
  */
 
-use Drupal\simpletest\WebTest;
-use Drupal\simpletest\UnitTest;
+use Drupal\simpletest\WebTestBase;
+use Drupal\simpletest\UnitTestBase;
 
 /**
  * Tests for text format and filter CRUD operations.
  */
-class FilterCRUDTestCase extends WebTest {
+class FilterCRUDTestCase extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Filter CRUD operations',
@@ -163,7 +163,7 @@ class FilterCRUDTestCase extends WebTest {
   }
 }
 
-class FilterAdminTestCase extends WebTest {
+class FilterAdminTestCase extends WebTestBase {
   protected $profile = 'standard';
 
   public static function getInfo() {
@@ -418,7 +418,7 @@ class FilterAdminTestCase extends WebTest {
   }
 }
 
-class FilterFormatAccessTestCase extends WebTest {
+class FilterFormatAccessTestCase extends WebTestBase {
   protected $admin_user;
   protected $filter_admin_user;
   protected $web_user;
@@ -665,7 +665,7 @@ class FilterFormatAccessTestCase extends WebTest {
   }
 }
 
-class FilterDefaultFormatTestCase extends WebTest {
+class FilterDefaultFormatTestCase extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Default text format functionality',
@@ -725,7 +725,7 @@ class FilterDefaultFormatTestCase extends WebTest {
   }
 }
 
-class FilterNoFormatTestCase extends WebTest {
+class FilterNoFormatTestCase extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Unassigned text format functionality',
@@ -748,7 +748,7 @@ class FilterNoFormatTestCase extends WebTest {
 /**
  * Security tests for missing/vanished text formats or filters.
  */
-class FilterSecurityTestCase extends WebTest {
+class FilterSecurityTestCase extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Security',
@@ -812,7 +812,7 @@ class FilterSecurityTestCase extends WebTest {
 /**
  * Unit tests for core filters.
  */
-class FilterUnitTestCase extends UnitTest {
+class FilterUnitTestBaseCase extends UnitTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Filter module filters',
@@ -1798,7 +1798,7 @@ body {color:red}
 /**
  * Tests for filter hook invocation.
  */
-class FilterHooksTestCase extends WebTest {
+class FilterHooksTestCase extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Filter format hooks',
@@ -1860,7 +1860,7 @@ class FilterHooksTestCase extends WebTest {
 /**
  * Tests filter settings.
  */
-class FilterSettingsTestCase extends WebTest {
+class FilterSettingsTestCase extends WebTestBase {
   protected $profile = 'testing';
 
   public static function getInfo() {

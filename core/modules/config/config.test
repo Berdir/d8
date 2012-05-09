@@ -6,12 +6,12 @@
  */
 
 use Drupal\Core\Config\FileStorage;
-use Drupal\simpletest\WebTest;
+use Drupal\simpletest\WebTestBase;
 
 /**
  * Tests the secure file writer.
  */
-class ConfigFileSecurityTestCase extends WebTest {
+class ConfigFileSecurityTestCase extends WebTestBase {
   protected $filename = 'foo.bar';
 
   protected $testContent = 'Good morning, Denver!';
@@ -51,7 +51,7 @@ class ConfigFileSecurityTestCase extends WebTest {
 /**
  * Tests reading and writing file contents.
  */
-class ConfigFileContentTestCase extends WebTest {
+class ConfigFileContentTestCase extends WebTestBase {
   protected $fileExtension = 'xml';
 
   public static function getInfo() {
@@ -232,7 +232,7 @@ class ConfigFileContentTestCase extends WebTest {
   /**
    * Tests configuration overriding from settings.php.
    */
-class ConfOverrideTestCase extends WebTest {
+class ConfOverrideTestCase extends WebTestBase {
   protected $testContent = 'Good morning, Denver!';
 
   public static function getInfo() {
@@ -260,7 +260,7 @@ class ConfOverrideTestCase extends WebTest {
 /**
  * Tests function providing configuration upgrade from Drupal 7 to 8.
  */
-class ConfUpdate7to8TestCase extends WebTest {
+class ConfUpdate7to8TestCase extends WebTestBase {
   protected $testContent = 'Olá, Sao Paulo!';
 
   public static function getInfo() {

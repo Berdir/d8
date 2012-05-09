@@ -6,9 +6,9 @@
  */
 
 
-use Drupal\simpletest\WebTest;
+use Drupal\simpletest\WebTestBase;
 
-class DBLogTestCase extends WebTest {
+class DBLogTestCase extends WebTestBase {
   protected $profile = 'standard';
 
   protected $big_user;

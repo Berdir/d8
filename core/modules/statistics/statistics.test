@@ -5,12 +5,12 @@
  * Tests for the Statistics module.
  */
 
-use Drupal\simpletest\WebTest;
+use Drupal\simpletest\WebTestBase;
 
 /**
  * Defines a base class for testing the Statistics module.
  */
-class StatisticsTestCase extends WebTest {
+class StatisticsTestCase extends WebTestBase {
 
   function setUp() {
     parent::setUp(array('node', 'block', 'statistics'));
@@ -55,10 +55,10 @@ class StatisticsTestCase extends WebTest {
 /**
  * Tests that logging via statistics_exit() works for all pages.
  *
- * We subclass WebTest rather than StatisticsTestCase, because we
+ * We subclass WebTestBase rather than StatisticsTestCase, because we
  * want to test requests from an anonymous user.
  */
-class StatisticsLoggingTestCase extends WebTest {
+class StatisticsLoggingTestCase extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Statistics logging tests',
@@ -321,7 +321,7 @@ class StatisticsBlockVisitorsTestCase extends StatisticsTestCase {
 /**
  * Tests the statistics administration screen.
  */
-class StatisticsAdminTestCase extends WebTest {
+class StatisticsAdminTestCase extends WebTestBase {
 
   /**
    * A user that has permission to administer and access statistics.

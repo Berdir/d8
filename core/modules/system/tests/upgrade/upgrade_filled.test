@@ -1,6 +1,6 @@
 <?php
 
-use Drupal\simpletest\WebTest;
+use Drupal\simpletest\WebTestBase;
 
 /**
  * Upgrade test for the filled database..

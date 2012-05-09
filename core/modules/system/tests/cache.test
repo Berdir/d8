@@ -1,8 +1,8 @@
 <?php
 
-use Drupal\simpletest\WebTest;
+use Drupal\simpletest\WebTestBase;
 
-class CacheTestCase extends WebTest {
+class CacheTestCase extends WebTestBase {
   protected $default_bin = 'page';
   protected $default_cid = 'test_temporary';
   protected $default_value = 'CacheTest';
@@ -177,7 +177,7 @@ class CacheSavingCase extends CacheTestCase {
 /**
  * Test getMultiple().
  */
-class CacheGetMultipleUnitTest extends CacheTestCase {
+class CacheGetMultipleUnitTestBase extends CacheTestCase {
 
   public static function getInfo() {
     return array(

@@ -6,9 +6,9 @@
  */
 
 use Drupal\comment\Comment;
-use Drupal\simpletest\WebTest;
+use Drupal\simpletest\WebTestBase;
 
-class CommentHelperCase extends WebTest {
+class CommentHelperCase extends WebTestBase {
   protected $profile = 'standard';
 
   protected $admin_user;
@@ -819,7 +819,7 @@ class CommentInterfaceTest extends CommentHelperCase {
     user_role_change_permissions($rid, $perms);
 
     // Output verbose debugging information.
-    // @see Drupal\simpletest\Test::error()
+    // @see Drupal\simpletest\TestBase::error()
     $t_form = array(
       COMMENT_FORM_BELOW => 'below',
       COMMENT_FORM_SEPARATE_PAGE => 'separate page',
@@ -1516,7 +1516,7 @@ class CommentNodeAccessTest extends CommentHelperCase {
   }
 
   function setUp() {
-    WebTest::setUp('comment', 'search', 'node_access_test');
+    WebTestBase::setUp('comment', 'search', 'node_access_test');
     node_access_rebuild();
 
     // Create users and test node.
@@ -1789,7 +1789,7 @@ class CommentBlockFunctionalTest extends CommentHelperCase {
 /**
  * Unit tests for Comment module integration with RSS feeds.
  */
-class CommentRSSUnitTest extends CommentHelperCase {
+class CommentRSSUnitTestBase extends CommentHelperCase {
   public static function getInfo() {
     return array(
       'name' => 'Comment RSS',

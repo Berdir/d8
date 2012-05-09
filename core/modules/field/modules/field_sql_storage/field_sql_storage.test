@@ -2,7 +2,7 @@
 
 use Drupal\Core\Database\Database;
 use Drupal\field\FieldException;
-use Drupal\simpletest\WebTest;
+use Drupal\simpletest\WebTestBase;
 
 /**
  * @file
@@ -15,7 +15,7 @@ use Drupal\simpletest\WebTest;
 /**
  * Tests field storage.
  */
-class FieldSqlStorageTestCase extends WebTest {
+class FieldSqlStorageTestCase extends WebTestBase {
   public static function getInfo() {
     return array(
       'name'  => 'Field SQL Storage tests',

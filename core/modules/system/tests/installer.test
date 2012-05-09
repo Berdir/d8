@@ -5,12 +5,12 @@
  * Tests for the installer.
  */
 
-use Drupal\simpletest\WebTest;
+use Drupal\simpletest\WebTestBase;
 
 /**
  * Tests installer language detection.
  */
-class InstallerLanguageTestCase extends WebTest {
+class InstallerLanguageTestCase extends WebTestBase {
 
   public static function getInfo() {
     return array(

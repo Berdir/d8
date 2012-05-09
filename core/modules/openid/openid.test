@@ -5,12 +5,12 @@
  * Tests for openid.module.
  */
 
-use Drupal\simpletest\WebTest;
+use Drupal\simpletest\WebTestBase;
 
 /**
  * Base class for OpenID tests.
  */
-abstract class OpenIDWebTestCase extends WebTest {
+abstract class OpenIDWebTestBaseCase extends WebTestBase {
   function setUp() {
     $modules = func_get_args();
     if (isset($modules[0]) && is_array($modules[0])) {
@@ -72,7 +72,7 @@ abstract class OpenIDWebTestCase extends WebTest {
 /**
  * Test discovery and login using OpenID
  */
-class OpenIDFunctionalTestCase extends OpenIDWebTestCase {
+class OpenIDFunctionalTestCase extends OpenIDWebTestBaseCase {
   protected $web_user;
 
   public static function getInfo() {
@@ -445,7 +445,7 @@ class OpenIDFunctionalTestCase extends OpenIDWebTestCase {
 /**
  * Test account registration using Simple Registration and Attribute Exchange.
  */
-class OpenIDRegistrationTestCase extends OpenIDWebTestCase {
+class OpenIDRegistrationTestCase extends OpenIDWebTestBaseCase {
   public static function getInfo() {
     return array(
       'name' => 'OpenID account registration',
@@ -697,7 +697,7 @@ class OpenIDRegistrationTestCase extends OpenIDWebTestCase {
 /**
  * Test internal helper functions.
  */
-class OpenIDUnitTest extends WebTest {
+class OpenIDUnitTestBase extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'OpenID helper functions',

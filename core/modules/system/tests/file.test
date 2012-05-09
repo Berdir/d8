@@ -6,7 +6,7 @@
  *  These include FileValidateTest and FileSaveTest.
  */
 
-use Drupal\simpletest\WebTest;
+use Drupal\simpletest\WebTestBase;
 
 /**
  * Helper validator that returns the $errors parameter.
@@ -48,7 +48,7 @@ function file_test_file_scan_callback_reset() {
  * Base class for file tests that adds some additional file specific
  * assertions and helper functions.
  */
-class FileTestCase extends WebTest {
+class FileTestCase extends WebTestBase {
 
   function setUp() {
     $modules = func_get_args();
@@ -376,7 +376,7 @@ class FileSpaceUsedTest extends FileTestCase {
 /**
  *  This will run tests against the file validation functions (file_validate_*).
  */
-class FileValidatorTest extends WebTest {
+class FileValidatorTest extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'File validator tests',
@@ -2631,7 +2631,7 @@ class FileNameMungingTest extends FileTestCase {
 /**
  * Tests for file_get_mimetype().
  */
-class FileMimeTypeTest extends WebTest {
+class FileMimeTypeTest extends WebTestBase {
   function setUp() {
     parent::setUp('file_test');
   }
@@ -2716,7 +2716,7 @@ class FileMimeTypeTest extends WebTest {
 /**
  * Tests stream wrapper functions.
  */
-class StreamWrapperTest extends WebTest {
+class StreamWrapperTest extends WebTestBase {
 
   protected $scheme = 'dummy';
   protected $classname = 'DrupalDummyStreamWrapper';
