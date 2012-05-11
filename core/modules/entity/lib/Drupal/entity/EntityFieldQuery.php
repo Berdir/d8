@@ -44,7 +44,7 @@ class EntityFieldQuery {
   /**
    * Indicates that both deleted and non-deleted fields should be returned.
    *
-   * @see EntityFieldQuery::deleted()
+   * @see Drupal\entity\EntityFieldQuery::deleted()
    */
   const RETURN_ALL = NULL;
 
@@ -63,7 +63,7 @@ class EntityFieldQuery {
    *
    * @var array
    *
-   * @see EntityFieldQuery::entityCondition()
+   * @see Drupal\entity\EntityFieldQuery::entityCondition()
    */
   public $entityConditions = array();
 
@@ -72,7 +72,7 @@ class EntityFieldQuery {
    *
    * @var array
    *
-   * @see EntityFieldQuery::fieldCondition()
+   * @see Drupal\entity\EntityFieldQuery::fieldCondition()
    */
   public $fieldConditions = array();
 
@@ -86,8 +86,8 @@ class EntityFieldQuery {
    *
    * @var array
    *
-   * @see EntityFieldQuery::fieldLanguageCondition()
-   * @see EntityFieldQuery::fieldDeltaCondition()
+   * @see Drupal\entity\EntityFieldQuery::fieldLanguageCondition()
+   * @see Drupal\entity\EntityFieldQuery::fieldDeltaCondition()
    */
   public $fieldMetaConditions = array();
 
@@ -96,7 +96,7 @@ class EntityFieldQuery {
    *
    * @var array
    *
-   * @see EntityFieldQuery::propertyCondition()
+   * @see Drupal\entity\EntityFieldQuery::propertyCondition()
    */
   public $propertyConditions = array();
 
@@ -112,7 +112,7 @@ class EntityFieldQuery {
    *
    * @var array
    *
-   * @see EntityFieldQuery::range()
+   * @see Drupal\entity\EntityFieldQuery::range()
    */
   public $range = array();
 
@@ -121,7 +121,7 @@ class EntityFieldQuery {
    *
    * @var array
    *
-   * @see EntityFieldQuery::pager()
+   * @see Drupal\entity\EntityFieldQuery::pager()
    */
   public $pager = array();
 
@@ -131,7 +131,7 @@ class EntityFieldQuery {
    * TRUE to return only deleted data, FALSE to return only non-deleted data,
    * EntityFieldQuery::RETURN_ALL to return everything.
    *
-   * @see EntityFieldQuery::deleted()
+   * @see Drupal\entity\EntityFieldQuery::deleted()
    */
   public $deleted = FALSE;
 
@@ -159,7 +159,7 @@ class EntityFieldQuery {
    *
    * @var int
    *
-   * @see EntityFieldQuery::age()
+   * @see Drupal\entity\EntityFieldQuery::age()
    */
   public $age = FIELD_LOAD_CURRENT;
 
@@ -168,7 +168,7 @@ class EntityFieldQuery {
    *
    * @var array
    *
-   * @see EntityFieldQuery::addTag()
+   * @see Drupal\entity\EntityFieldQuery::addTag()
    */
   public $tags = array();
 
@@ -177,7 +177,7 @@ class EntityFieldQuery {
    *
    * @var array
    *
-   * @see EntityFieldQuery::addMetaData()
+   * @see Drupal\entity\EntityFieldQuery::addMetaData()
    */
   public $metaData = array();
 
@@ -186,7 +186,7 @@ class EntityFieldQuery {
    *
    * @var array
    *
-   * @see EntityFieldQuery::execute().
+   * @see Drupal\entity\EntityFieldQuery::execute().
    */
   public $orderedResults = array();
 
@@ -195,7 +195,7 @@ class EntityFieldQuery {
    *
    * @var string
    *
-   * @see EntityFieldQuery::execute().
+   * @see Drupal\entity\EntityFieldQuery::execute()
    */
   public $executeCallback = '';
 
@@ -235,7 +235,7 @@ class EntityFieldQuery {
    *   The operator can be omitted, and will default to 'IN' if the value is an
    *   array, or to '=' otherwise.
    *
-   * @return EntityFieldQuery
+   * @return Drupal\entity\EntityFieldQuery
    *   The called object.
    */
   public function entityCondition($name, $value, $operator = NULL) {
@@ -264,11 +264,11 @@ class EntityFieldQuery {
    *   An arbitrary identifier: conditions in the same group must have the same
    *   $langcode_group.
    *
-   * @return EntityFieldQuery
+   * @return Drupal\entity\EntityFieldQuery
    *   The called object.
    *
-   * @see EntityFieldQuery::addFieldCondition
-   * @see EntityFieldQuery::deleted
+   * @see Drupal\entity\EntityFieldQuery::addFieldCondition()
+   * @see Drupal\entity\EntityFieldQuery::deleted()
    */
   public function fieldCondition($field, $column = NULL, $value = NULL, $operator = NULL, $delta_group = NULL, $langcode_group = NULL) {
     return $this->addFieldCondition($this->fieldConditions, $field, $column, $value, $operator, $delta_group, $langcode_group);
@@ -290,11 +290,11 @@ class EntityFieldQuery {
    *   An arbitrary identifier: conditions in the same group must have the same
    *   $langcode_group.
    *
-   * @return EntityFieldQuery
+   * @return Drupal\entity\EntityFieldQuery
    *   The called object.
    *
-   * @see EntityFieldQuery::addFieldCondition
-   * @see EntityFieldQuery::deleted
+   * @see Drupal\entity\EntityFieldQuery::addFieldCondition()
+   * @see Drupal\entity\EntityFieldQuery::deleted()
    */
   public function fieldLanguageCondition($field, $value = NULL, $operator = NULL, $delta_group = NULL, $langcode_group = NULL) {
     return $this->addFieldCondition($this->fieldMetaConditions, $field, 'langcode', $value, $operator, $delta_group, $langcode_group);
@@ -316,11 +316,11 @@ class EntityFieldQuery {
    *   An arbitrary identifier: conditions in the same group must have the same
    *   $langcode_group.
    *
-   * @return EntityFieldQuery
+   * @return Drupal\entity\EntityFieldQuery
    *   The called object.
    *
-   * @see EntityFieldQuery::addFieldCondition
-   * @see EntityFieldQuery::deleted
+   * @see Drupal\entity\EntityFieldQuery::addFieldCondition()
+   * @see Drupal\entity\EntityFieldQuery::deleted()
    */
   public function fieldDeltaCondition($field, $value = NULL, $operator = NULL, $delta_group = NULL, $langcode_group = NULL) {
     return $this->addFieldCondition($this->fieldMetaConditions, $field, 'delta', $value, $operator, $delta_group, $langcode_group);
@@ -366,7 +366,7 @@ class EntityFieldQuery {
    *   An arbitrary identifier: conditions in the same group must have the same
    *   $langcode_group.
    *
-   * @return EntityFieldQuery
+   * @return Drupal\entity\EntityFieldQuery
    *   The called object.
    */
   protected function addFieldCondition(&$conditions, $field, $column = NULL, $value = NULL, $operator = NULL, $delta_group = NULL, $langcode_group = NULL) {
@@ -420,7 +420,7 @@ class EntityFieldQuery {
    *   The operator can be omitted, and will default to 'IN' if the value is an
    *   array, or to '=' otherwise.
    *
-   * @return EntityFieldQuery
+   * @return Drupal\entity\EntityFieldQuery
    *   The called object.
    */
   public function propertyCondition($column, $value, $operator = NULL) {
@@ -446,7 +446,7 @@ class EntityFieldQuery {
    * @param $direction
    *   The direction to sort. Legal values are "ASC" and "DESC".
    *
-   * @return EntityFieldQuery
+   * @return Drupal\entity\EntityFieldQuery
    *   The called object.
    */
   public function entityOrderBy($name, $direction = 'ASC') {
@@ -472,7 +472,7 @@ class EntityFieldQuery {
    * @param $direction
    *   The direction to sort. Legal values are "ASC" and "DESC".
    *
-   * @return EntityFieldQuery
+   * @return Drupal\entity\EntityFieldQuery
    *   The called object.
    */
   public function fieldOrderBy($field, $column, $direction = 'ASC') {
@@ -513,7 +513,7 @@ class EntityFieldQuery {
    * @param $direction
    *   The direction to sort. Legal values are "ASC" and "DESC".
    *
-   * @return EntityFieldQuery
+   * @return Drupal\entity\EntityFieldQuery
    *   The called object.
    */
   public function propertyOrderBy($column, $direction = 'ASC') {
@@ -528,7 +528,7 @@ class EntityFieldQuery {
   /**
    * Sets the query to be a count query only.
    *
-   * @return EntityFieldQuery
+   * @return Drupal\entity\EntityFieldQuery
    *   The called object.
    */
   public function count() {
@@ -545,7 +545,7 @@ class EntityFieldQuery {
    * @param $length
    *   The number of entities to return from the result set.
    *
-   * @return EntityFieldQuery
+   * @return Drupal\entity\EntityFieldQuery
    *   The called object.
    */
   public function range($start = NULL, $length = NULL) {
@@ -566,7 +566,7 @@ class EntityFieldQuery {
    *   An optional integer to distinguish between multiple pagers on one page.
    *   If not provided, one is automatically calculated.
    *
-   * @return EntityFieldQuery
+   * @return Drupal\entity\EntityFieldQuery
    *   The called object.
    */
   public function pager($limit = 10, $element = NULL) {
@@ -591,7 +591,7 @@ class EntityFieldQuery {
    *   An EFQ Header array based on which the order clause is added to the
    *   query.
    *
-   * @return EntityFieldQuery
+   * @return Drupal\entity\EntityFieldQuery
    *   The called object.
    */
   public function tableSort(&$headers) {
@@ -626,7 +626,7 @@ class EntityFieldQuery {
    *   TRUE to only return deleted data, FALSE to return non-deleted data,
    *   EntityFieldQuery::RETURN_ALL to return everything. Defaults to FALSE.
    *
-   * @return EntityFieldQuery
+   * @return Drupal\entity\EntityFieldQuery
    *   The called object.
    */
   public function deleted($deleted = TRUE) {
@@ -647,7 +647,7 @@ class EntityFieldQuery {
    *   - FIELD_LOAD_REVISION: Query all revisions. The results will be keyed by
    *     entity type and entity revision ID.
    *
-   * @return EntityFieldQuery
+   * @return Drupal\entity\EntityFieldQuery
    *   The called object.
    */
   public function age($age) {
@@ -672,7 +672,7 @@ class EntityFieldQuery {
    * @param string $tag
    *   The tag to add.
    *
-   * @return EntityFieldQuery
+   * @return Drupal\entity\EntityFieldQuery
    *   The called object.
    */
   public function addTag($tag) {
@@ -693,7 +693,7 @@ class EntityFieldQuery {
    * @param $object
    *   The additional data to add to the query. May be any valid PHP variable.
    *
-   * @return EntityFieldQuery
+   * @return Drupal\entity\EntityFieldQuery
    *   The called object.
    */
   public function addMetaData($key, $object) {

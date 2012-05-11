@@ -7,17 +7,13 @@
 
 namespace Drupal\entity;
 
-use Drupal\entity\EntityController;
-use Drupal\entity\EntityStorageControllerInterface;
-use Drupal\entity\EntityInterface;
-
 /**
  * Implements the entity storage controller interface for the database.
  */
 class EntityDatabaseStorageController extends EntityController implements EntityStorageControllerInterface {
 
   /**
-   * Implements EntityStorageControllerInterface::create().
+   * Implements Drupal\entity\EntityStorageControllerInterface::create().
    */
   public function create(array $values) {
     $class = isset($this->entityInfo['entity class']) ? $this->entityInfo['entity class'] : 'Drupal\entity\Entity';
@@ -25,7 +21,7 @@ class EntityDatabaseStorageController extends EntityController implements Entity
   }
 
   /**
-   * Implements EntityStorageControllerInterface::delete().
+   * Implements Drupal\entity\EntityStorageControllerInterface::delete().
    */
   public function delete($ids) {
     $entities = $ids ? $this->load($ids) : FALSE;
@@ -63,7 +59,7 @@ class EntityDatabaseStorageController extends EntityController implements Entity
   }
 
   /**
-   * Implements EntityStorageControllerInterface::save().
+   * Implements Drupal\entity\EntityStorageControllerInterface::save().
    */
   public function save(EntityInterface $entity) {
     $transaction = db_transaction();

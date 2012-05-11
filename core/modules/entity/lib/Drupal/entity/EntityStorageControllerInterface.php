@@ -7,9 +7,6 @@
 
 namespace Drupal\entity;
 
-use Drupal\entity\EntityControllerInterface;
-use Drupal\entity\EntityInterface;
-
 /**
  * Defines a common interface for entity storage controllers.
  */
@@ -22,7 +19,7 @@ interface EntityStorageControllerInterface extends EntityControllerInterface {
    *   An array of values to set, keyed by property name. If the entity type has
    *   bundles the bundle key has to be specified.
    *
-   * @return EntityInterface
+   * @return Drupal\entity\EntityInterface
    *   A new entity object.
    */
   public function create(array $values);
@@ -41,7 +38,7 @@ interface EntityStorageControllerInterface extends EntityControllerInterface {
   /**
    * Saves the entity permanently.
    *
-   * @param EntityInterface $entity
+   * @param Drupal\entity\EntityInterface $entity
    *   The entity to save.
    *
    * @return

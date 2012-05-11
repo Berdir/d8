@@ -7,7 +7,6 @@
 
 namespace Drupal\entity;
 
-use Drupal\entity\EntityControllerInterface;
 use PDO;
 
 /**
@@ -165,7 +164,7 @@ class EntityController implements EntityControllerInterface {
       if (!empty($this->entityInfo['entity class'])) {
         // We provide the necessary arguments for PDO to create objects of the
         // specified entity class.
-        // @see EntityInterface::__construct()
+        // @see Drupal\entity\EntityInterface::__construct()
         $query_result->setFetchMode(PDO::FETCH_CLASS, $this->entityInfo['entity class'], array(array(), $this->entityType));
       }
       $queried_entities = $query_result->fetchAllAssoc($this->idKey);

@@ -129,7 +129,7 @@ class NodeStorageController extends EntityDatabaseStorageController {
   /**
    * Saves a node revision.
    *
-   * @param EntityInterface $node
+   * @param Drupal\entity\EntityInterface $node
    *   The node entity.
    */
   protected function saveRevision(EntityInterface $entity) {

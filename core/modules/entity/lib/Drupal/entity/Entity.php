@@ -7,8 +7,6 @@
 
 namespace Drupal\entity;
 
-use Drupal\entity\EntityInterface;
-
 /**
  * Defines a base entity class.
  *

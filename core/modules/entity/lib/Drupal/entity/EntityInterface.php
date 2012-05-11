@@ -41,7 +41,7 @@ interface EntityInterface {
    * @return
    *   TRUE if the entity is new, or FALSE if the entity has already been saved.
    *
-   * @see EntityInterface::enforceIsNew()
+   * @see Drupal\entity\EntityInterface::enforceIsNew()
    */
   public function isNew();
 
@@ -55,7 +55,7 @@ interface EntityInterface {
    *   (optional) Whether the entity should be forced to be new. Defaults to
    *   TRUE.
    *
-   * @see EntityInterface::isNew()
+   * @see Drupal\entity\EntityInterface::isNew()
    */
   public function enforceIsNew($value = TRUE);
 
@@ -101,7 +101,7 @@ interface EntityInterface {
    *   The language object of the entity's default language, or FALSE if the
    *   entity is not language-specific.
    *
-   * @see EntityInterface::translations()
+   * @see Drupal\entity\EntityInterface::translations()
    */
   public function language();
 
@@ -111,7 +111,7 @@ interface EntityInterface {
    * @return
    *   An array of language objects, keyed by language codes.
    *
-   * @see EntityInterface::language()
+   * @see Drupal\entity\EntityInterface::language()
    */
   public function translations();
 
@@ -128,7 +128,7 @@ interface EntityInterface {
    * @return
    *   The property value, or NULL if it is not defined.
    *
-   * @see EntityInterface::language()
+   * @see Drupal\entity\EntityInterface::language()
    */
   public function get($property_name, $langcode = NULL);
 
@@ -144,7 +144,7 @@ interface EntityInterface {
    *   language that should be used for getting the property. If set to
    *   NULL, the entity's default language is being used.
    *
-   * @see EntityInterface::language()
+   * @see Drupal\entity\EntityInterface::language()
    */
   public function set($property_name, $value, $langcode = NULL);
 
@@ -170,7 +170,7 @@ interface EntityInterface {
   /**
    * Creates a duplicate of the entity.
    *
-   * @return EntityInterface
+   * @return Drupal\entity\EntityInterface
    *   A clone of the current entity with all identifiers unset, so saving
    *   it inserts a new entity into the storage system.
    */

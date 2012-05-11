@@ -614,7 +614,7 @@ function _field_sql_storage_query_join_entity(Select $select_query, $entity_type
 /**
  * Adds field (meta) conditions to the given query objects respecting groupings.
  *
- * @param EntityFieldQuery $query
+ * @param Drupal\entity\EntityFieldQuery $query
  *   The field query object to be processed.
  * @param SelectQuery $select_query
  *   The SelectQuery that should get grouping conditions.
