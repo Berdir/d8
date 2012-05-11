@@ -22,18 +22,19 @@
  *   properties of those types that the system needs to know about:
  *   - label: The human-readable name of the type.
  *   - controller class: The name of the class that is used to load the objects.
- *     The class has to implement the EntityControllerInterface interface. Leave
- *     blank to use the EntityController implementation.
- *   - base table: (used by EntityController) The name of the entity type's base
- *     table.
- *   - static cache: (used by EntityController) FALSE to disable static caching
- *     of entities during a page request. Defaults to TRUE.
+ *     The class has to implement the Drupal\entity\EntityControllerInterface
+ *     interface. Leave blank to use the Drupal\entity\EntityController
+ *     implementation.
+ *   - base table: (used by Drupal\entity\EntityController) The name of the
+ *     entity type's base table.
+ *   - static cache: (used by Drupal\entity\EntityController) FALSE to disable
+ *     static caching of entities during a page request. Defaults to TRUE.
  *   - field cache: (used by Field API loading and saving of field data) FALSE
  *     to disable Field API's persistent cache of field data. Only recommended
  *     if a higher level persistent cache is available for the entity type.
  *     Defaults to TRUE.
  *   - load hook: The name of the hook which should be invoked by
- *     EntityController:attachLoad(), for example 'node_load'.
+ *     Drupal\entity\EntityController::attachLoad(), for example 'node_load'.
  *   - uri callback: A function taking an entity as argument and returning the
  *     uri elements of the entity, e.g. 'path' and 'options'. The actual entity
  *     uri can be constructed by passing these elements to url().

@@ -13,7 +13,7 @@ use PDO;
 /**
  * Defines a base entity controller class.
  *
- * Default implementation of DrupalEntityControllerInterface.
+ * Default implementation of Drupal\entity\EntityControllerInterface.
  *
  * This class can be used as-is by most simple entity types. Entity types
  * requiring special handling can extend the class.
@@ -46,7 +46,7 @@ class EntityController implements EntityControllerInterface {
   /**
    * Additional arguments to pass to hook_TYPE_load().
    *
-   * Set before calling DrupalDefaultEntityController::attachLoad().
+   * Set before calling Drupal\entity\EntityController::attachLoad().
    *
    * @var array
    */
@@ -85,7 +85,7 @@ class EntityController implements EntityControllerInterface {
   protected $cache;
 
   /**
-   * Implements DrupalEntityControllerInterface::__construct().
+   * Implements Drupal\entity\EntityController::__construct().
    *
    * Sets basic variables.
    */
@@ -110,7 +110,7 @@ class EntityController implements EntityControllerInterface {
   }
 
   /**
-   * Implements DrupalEntityControllerInterface::resetCache().
+   * Implements Drupal\entity\EntityControllerInterface::resetCache().
    */
   public function resetCache(array $ids = NULL) {
     if (isset($ids)) {
@@ -124,7 +124,7 @@ class EntityController implements EntityControllerInterface {
   }
 
   /**
-   * Implements DrupalEntityControllerInterface::load().
+   * Implements Drupal\entity\EntityControllerInterface::load().
    */
   public function load($ids = array(), $conditions = array()) {
     $entities = array();

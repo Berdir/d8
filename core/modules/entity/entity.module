@@ -92,7 +92,7 @@ function entity_get_info($entity_type = NULL) {
           $entity_info[$name]['bundles'] = array($name => array('label' => $entity_info[$name]['label']));
         }
         // Prepare entity schema fields SQL info for
-        // EntityControllerInterface::buildQuery().
+        // Drupal\entity\EntityControllerInterface::buildQuery().
         if (isset($entity_info[$name]['base table'])) {
           $entity_info[$name]['schema_fields_sql']['base table'] = drupal_schema_fields_sql($entity_info[$name]['base table']);
           if (isset($entity_info[$name]['revision table'])) {

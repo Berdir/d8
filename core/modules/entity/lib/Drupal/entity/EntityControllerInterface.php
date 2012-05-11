@@ -15,7 +15,7 @@ namespace Drupal\entity;
  * this interface.
  *
  * Most simple, SQL-based entity controllers will do better by extending
- * DrupalDefaultEntityController instead of implementing this interface
+ * Drupal\entity\EntityController instead of implementing this interface
  * directly.
  */
 interface EntityControllerInterface {
