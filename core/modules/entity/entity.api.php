@@ -211,8 +211,8 @@ function hook_entity_info() {
  */
 function hook_entity_info_alter(&$entity_info) {
   // Set the controller class for nodes to an alternate implementation of the
-  // DrupalEntityController interface.
-  $entity_info['node']['controller class'] = 'MyCustomNodeController';
+  // Drupal\entity\EntityController interface.
+  $entity_info['node']['controller class'] = 'Drupal\mymodule\MyCustomNodeController';
 }
 
 /**

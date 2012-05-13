@@ -21,7 +21,7 @@ namespace Drupal\entity;
 interface EntityControllerInterface {
 
   /**
-   * Constructs a new DrupalEntityControllerInterface object.
+   * Constructs a new Drupal\entity\EntityControllerInterface object.
    *
    * @param $entityType
    *   The entity type for which the instance is created.
