@@ -30,7 +30,7 @@ interface EntityStorageControllerInterface extends EntityControllerInterface {
    * @param $ids
    *   An array of entity IDs.
    *
-   * @throws EntityStorageException
+   * @throws Drupal\entity\EntityStorageException
    *   In case of failures, an exception is thrown.
    */
   public function delete($ids);
@@ -45,7 +45,7 @@ interface EntityStorageControllerInterface extends EntityControllerInterface {
    *   SAVED_NEW or SAVED_UPDATED is returned depending on the operation
    *   performed.
    *
-   * @throws EntityStorageException
+   * @throws Drupal\entity\EntityStorageException
    *   In case of failures, an exception is thrown.
    */
   public function save(EntityInterface $entity);

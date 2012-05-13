@@ -154,7 +154,7 @@ interface EntityInterface {
    * @return
    *   Either SAVED_NEW or SAVED_UPDATED, depending on the operation performed.
    *
-   * @throws EntityStorageException
+   * @throws Drupal\entity\EntityStorageException
    *   In case of failures an exception is thrown.
    */
   public function save();
@@ -162,7 +162,7 @@ interface EntityInterface {
   /**
    * Deletes an entity permanently.
    *
-   * @throws EntityStorageException
+   * @throws Drupal\entity\EntityStorageException
    *   In case of failures an exception is thrown.
    */
   public function delete();
