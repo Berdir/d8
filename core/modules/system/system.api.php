@@ -2400,8 +2400,6 @@ function hook_file_validate(File $file) {
  *
  * @param Drupal\Core\File\File $file
  *   The file entity that has just been created.
- *
- * @see file_save()
  */
 function hook_file_presave(File $file) {
   // Change the file timestamp to an hour prior.
@@ -2417,8 +2415,6 @@ function hook_file_presave(File $file) {
  *
  * @param Drupal\Core\File\File $file
  *   The file that has been added.
- *
- * @see file_save()
  */
 function hook_file_insert(File $file) {
   // Add a message to the log, if the file is a jpg
@@ -2431,12 +2427,10 @@ function hook_file_insert(File $file) {
 /**
  * Respond to a file being updated.
  *
- * This hook is called when file_save() is called on an existing file.
+ * This hook is called when an existing file is saved.
  *
  * @param Drupal\Core\File\File $file
  *   The file that has just been updated.
- *
- * @see file_save()
  */
 function hook_file_update(File $file) {
 

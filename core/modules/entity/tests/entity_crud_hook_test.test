@@ -148,7 +148,7 @@ class EntityCrudHookTestCase extends WebTestBase {
       'timestamp' => REQUEST_TIME,
     ));
     $_SESSION['entity_crud_hook_test'] = array();
-    file_save($file);
+    $file->save();
 
     $this->assertHookMessageOrder(array(
       'entity_crud_hook_test_file_presave called',
@@ -167,7 +167,7 @@ class EntityCrudHookTestCase extends WebTestBase {
 
     $_SESSION['entity_crud_hook_test'] = array();
     $file->filename = 'new.entity_crud_hook_test.file';
-    file_save($file);
+    $file->save();
 
     $this->assertHookMessageOrder(array(
       'entity_crud_hook_test_file_presave called',

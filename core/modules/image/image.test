@@ -1291,7 +1291,7 @@ class ImageFieldDefaultImagesTestCase extends ImageFieldTestCase {
     $default_images = array();
     foreach (array('field', 'instance', 'instance2', 'field_new', 'instance_new') as $image_target) {
       $file = array_pop($files);
-      $file = file_save($file);
+      $file->save();
       $default_images[$image_target] = $file;
     }
 

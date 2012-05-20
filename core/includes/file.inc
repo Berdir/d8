@@ -621,17 +621,6 @@ function file_load($fid) {
 }
 
 /**
- * Saves a file entity to the database.
- *
- * @param Drupal\Core\File\File $file
- *   A file entity.
- *
- */
-function file_save(File $file) {
-  $file->save();
-}
-
-/**
  * Determines where a file is used.
  *
  * @param Drupal\Core\File\File $file
@@ -697,7 +686,7 @@ function file_usage_add(File $file, $module, $type, $id, $count = 1) {
   // Make sure that a used file is permament.
   if ($file->status != FILE_STATUS_PERMANENT) {
     $file->status = FILE_STATUS_PERMANENT;
-    file_save($file);
+    $file->save();
   }
 }
 
@@ -757,7 +746,7 @@ function file_usage_delete(File $file, $module, $type = NULL, $id = NULL, $count
   $usage = file_usage_list($file);
   if (empty($usage)) {
     $file->status = 0;
-    file_save($file);
+    $file->save();
   }
 }
 
@@ -828,7 +817,7 @@ function file_copy(File $source, $destination = NULL, $replace = FILE_EXISTS_REN
       $file->filename = drupal_basename($destination);
     }
 
-    file_save($file);
+    $file->save();
 
     // Inform modules that the file has been copied.
     module_invoke_all('file_copy', $file, $source);
@@ -1077,7 +1066,7 @@ function file_move(File $source, $destination = NULL, $replace = FILE_EXISTS_REN
       $file->filename = drupal_basename($destination);
     }
 
-    file_save($file);
+    $file->save();
 
     // Inform modules that the file has been moved.
     module_invoke_all('file_move', $file, $source);
@@ -1584,13 +1573,10 @@ function file_save_upload($source, $validators = array(), $destination = FALSE, 
   }
 
   // If we made it this far it's safe to record this file in the database.
-  file_save($file);
-  if ($file) {
-    // Add file to the cache.
-    $upload_cache[$source] = $file;
-    return $file;
-  }
-  return FALSE;
+  $file->save();
+  // Add file to the cache.
+  $upload_cache[$source] = $file;
+  return $file;
 }
 
 /**
@@ -1888,7 +1874,7 @@ function file_save_data($data, $destination = NULL, $replace = FILE_EXISTS_RENAM
       $file->filename = drupal_basename($destination);
     }
 
-    file_save($file);
+    $file->save();
     return $file;
   }
   return FALSE;

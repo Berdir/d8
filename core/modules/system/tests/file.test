@@ -239,8 +239,8 @@ class FileTestCase extends WebTestBase {
     $file->timestamp = REQUEST_TIME;
     $file->filesize = filesize($file->uri);
     $file->status = 0;
-    // Write the record directly rather than calling file_save() so we don't
-    // invoke the hooks.
+    // Write the record directly rather than using the API so we don't/ invoke
+    // the hooks.
     $this->assertNotIdentical(drupal_write_record('file_managed', $file), FALSE, t('The file was added to the database.'), 'Create test file');
 
     return entity_create('file', (array)$file);
@@ -1562,14 +1562,8 @@ class FileDeleteTest extends FileHookTestCase {
 
     // Check that deletion removes the file and database record.
     $this->assertTrue(is_file($file->uri), t('File exists.'));
-<<<<<<< HEAD
-    file_delete($file);
+    $file->delete();
     $this->assertFileHooksCalled(array('delete'));
-=======
-    file_delete($file->fid);
-    // Load is called inside the delete() implementation.
-    $this->assertFileHooksCalled(array('delete', 'load'));
->>>>>>> ported existing code to new File class.
     $this->assertFalse(file_exists($file->uri), t('Test file has actually been deleted.'));
     $this->assertFalse(file_load($file->fid), t('File was removed from the database.'));
   }
@@ -1583,10 +1577,6 @@ class FileDeleteTest extends FileHookTestCase {
     file_usage_add($file, 'testing', 'test', 1);
 
     file_usage_delete($file, 'testing', 'test', 1);
-<<<<<<< HEAD
-=======
-    file_delete($file->fid);
->>>>>>> ported existing code to new File class.
     $usage = file_usage_list($file);
     $this->assertEqual($usage['testing']['test'], array(1 => 1), t('Test file is still in use.'));
     $this->assertTrue(file_exists($file->uri), t('File still exists on the disk.'));
@@ -1596,14 +1586,8 @@ class FileDeleteTest extends FileHookTestCase {
     file_test_reset();
 
     file_usage_delete($file, 'testing', 'test', 1);
-<<<<<<< HEAD
     $usage = file_usage_list($file);
     $this->assertFileHooksCalled(array('load', 'update'));
-=======
-    file_delete($file->fid);
-    $usage = file_usage_list($file);
-    $this->assertFileHooksCalled(array('delete', 'load'));
->>>>>>> ported existing code to new File class.
     $this->assertTrue(empty($usage), t('File usage data was removed.'));
     $this->assertTrue(file_exists($file->uri), 'File still exists on the disk.');
     $file = file_load($file->fid);
@@ -2020,13 +2004,13 @@ class FileLoadTest extends FileHookTestCase {
 }
 
 /**
- * Tests the file_save() function.
+ * Tests saving files.
  */
 class FileSaveTest extends FileHookTestCase {
   public static function getInfo() {
     return array(
       'name' => 'File saving',
-      'description' => 'Tests the file_save() function.',
+      'description' => 'File saving tests',
       'group' => 'File API',
     );
   }
@@ -2044,7 +2028,7 @@ class FileSaveTest extends FileHookTestCase {
     file_put_contents($file->uri, 'hello world');
 
     // Save it, inserting a new record.
-    file_save($file);
+    $file->save();
 
     // Check that the correct hooks were called.
     $this->assertFileHooksCalled(array('insert'));
@@ -2062,7 +2046,7 @@ class FileSaveTest extends FileHookTestCase {
     file_test_reset();
     $file->status = 7;
     $file->langcode = 'en';
-    file_save($file);
+    $file->save();
 
     // Check that the correct hooks were called.
     $this->assertFileHooksCalled(array('load', 'update'));
@@ -2085,7 +2069,7 @@ class FileSaveTest extends FileHookTestCase {
       'status' => FILE_STATUS_PERMANENT,
     );
     file_put_contents($file->uri, 'hello world');
-    file_save($file);
+    $file->save();
   }
 }
 

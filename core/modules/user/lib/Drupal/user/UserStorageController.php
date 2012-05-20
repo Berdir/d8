@@ -106,7 +106,6 @@ class UserStorageController extends EntityDatabaseStorageController {
     elseif (!empty($entity->picture_delete)) {
       $entity->picture = 0;
       file_usage_delete($entity->original->picture, 'user', 'user', $entity->uid);
-      file_delete($entity->original->picture);
     }
 
     if (!$entity->isNew()) {
@@ -125,15 +124,13 @@ class UserStorageController extends EntityDatabaseStorageController {
 
           // Move the temporary file into the final location.
           if ($picture = file_move($picture, $destination, FILE_EXISTS_RENAME)) {
-            $picture->status = FILE_STATUS_PERMANENT;
-            $entity->picture = file_save($picture);
+            $entity->picture = $picture;
             file_usage_add($picture, 'user', 'user', $entity->uid);
           }
         }
         // Delete the previous picture if it was deleted or replaced.
         if (!empty($entity->original->picture->fid)) {
           file_usage_delete($entity->original->picture, 'user', 'user', $entity->uid);
-          file_delete($entity->original->picture);
         }
       }
       $entity->picture = empty($entity->picture->fid) ? 0 : $entity->picture->fid;
