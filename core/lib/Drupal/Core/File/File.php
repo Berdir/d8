@@ -85,7 +85,7 @@ class File extends Entity {
   public $timestamp;
 
   /**
-   * Overrides Entity::id().
+   * Overrides Drupal\entity\Entity::id().
    */
   public function id() {
     return $this->fid;

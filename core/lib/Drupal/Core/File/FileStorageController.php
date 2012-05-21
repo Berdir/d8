@@ -16,7 +16,7 @@ use Drupal\entity\EntityInterface;
 class FileStorageController extends EntityDatabaseStorageController {
 
   /**
-   * Overrides EntityDatabaseStorageController::presave().
+   * Overrides Drupal\entity\EntityDatabaseStorageController::presave().
    */
   protected function preSave(EntityInterface $entity) {
     $entity->timestamp = REQUEST_TIME;
@@ -24,7 +24,7 @@ class FileStorageController extends EntityDatabaseStorageController {
   }
 
   /**
-   * Overrides EntityDatabaseStorageController::delete().
+   * Overrides Drupal\entity\EntityDatabaseStorageController::delete().
    *
    * file_usage_list() is called to determine if the file is being used by any
    * modules. If the file is being used the delete will be canceled.
