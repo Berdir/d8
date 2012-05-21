@@ -10,7 +10,7 @@ namespace Drupal\Core\File;
 use Drupal\entity\Entity;
 
 /**
- * Defines the comment entity class.
+ * Defines the file entity class.
  */
 class File extends Entity {
 
@@ -22,7 +22,7 @@ class File extends Entity {
   public $fid;
 
   /**
-   * The comment language code.
+   * The file language code.
    *
    * @var string
    */

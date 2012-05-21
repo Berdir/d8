@@ -2378,7 +2378,7 @@ function hook_file_load($files) {
  *
  * @see file_validate()
  */
-function hook_file_validate(File $file) {
+function hook_file_validate(Drupal\Core\File\File $file) {
   $errors = array();
 
   if (empty($file->filename)) {
@@ -2401,7 +2401,7 @@ function hook_file_validate(File $file) {
  * @param Drupal\Core\File\File $file
  *   The file entity that has just been created.
  */
-function hook_file_presave(File $file) {
+function hook_file_presave(Drupal\Core\File\File $file) {
   // Change the file timestamp to an hour prior.
   $file->timestamp -= 3600;
 }
@@ -2416,7 +2416,7 @@ function hook_file_presave(File $file) {
  * @param Drupal\Core\File\File $file
  *   The file that has been added.
  */
-function hook_file_insert(File $file) {
+function hook_file_insert(Drupal\Core\File\File $file) {
   // Add a message to the log, if the file is a jpg
   $validate = file_validate_extensions($file, 'jpg');
   if (empty($validate)) {
@@ -2432,7 +2432,7 @@ function hook_file_insert(File $file) {
  * @param Drupal\Core\File\File $file
  *   The file that has just been updated.
  */
-function hook_file_update(File $file) {
+function hook_file_update(Drupal\Core\File\File $file) {
 
 }
 
@@ -2446,7 +2446,7 @@ function hook_file_update(File $file) {
  *
  * @see file_copy()
  */
-function hook_file_copy(File $file, File $source) {
+function hook_file_copy(Drupal\Core\File\File $file, Drupal\Core\File\File $source) {
 
 }
 
@@ -2460,7 +2460,7 @@ function hook_file_copy(File $file, File $source) {
  *
  * @see file_move()
  */
-function hook_file_move(File $file, File $source) {
+function hook_file_move(Drupal\Core\File\File $file, Drupal\Core\File\File $source) {
 
 }
 
@@ -2477,7 +2477,7 @@ function hook_file_move(File $file, File $source) {
  * @see Drupal\Core\File\FileStorageController::delete()
  * @see upload_file_delete()
  */
-function hook_file_predelete(File $file) {
+function hook_file_predelete(Drupal\Core\File\File $file) {
   // Delete all information associated with the file.
   db_delete('upload')->condition('fid', $file->fid)->execute();
 }
@@ -2494,7 +2494,7 @@ function hook_file_predelete(File $file) {
  * @see hook_file_predelete()
  * @see Drupal\Core\File\FileStorageController::delete()
  */
-function hook_file_delete(File $file) {
+function hook_file_delete(Drupal\Core\File\File $file) {
   // Delete all information associated with the file.
   db_delete('upload')->condition('fid', $file->fid)->execute();
 }
