@@ -106,6 +106,7 @@ class UserStorageController extends EntityDatabaseStorageController {
     elseif (!empty($entity->picture_delete)) {
       $entity->picture = 0;
       file_usage_delete($entity->original->picture, 'user', 'user', $entity->uid);
+      file_delete($entity->original->picture->fid);
     }
 
     if (!$entity->isNew()) {
@@ -131,6 +132,7 @@ class UserStorageController extends EntityDatabaseStorageController {
         // Delete the previous picture if it was deleted or replaced.
         if (!empty($entity->original->picture->fid)) {
           file_usage_delete($entity->original->picture, 'user', 'user', $entity->uid);
+          file_delete($entity->original->picture->fid);
         }
       }
       $entity->picture = empty($entity->picture->fid) ? 0 : $entity->picture->fid;
