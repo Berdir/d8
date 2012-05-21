@@ -2467,14 +2467,14 @@ function hook_file_move(File $file, File $source) {
 /**
  * Act prior to file deletion.
  *
- * This hook is invoked from file_delete() before the file is removed from the
+ * This hook is invoked when deleting a file before the file is removed from the
  * filesystem and before its records are removed from the database.
  *
  * @param Drupal\Core\File\File $file
  *   The file that is about to be deleted.
  *
  * @see hook_file_delete()
- * @see file_delete()
+ * @see Drupal\Core\File\FileStorageController::delete()
  * @see upload_file_delete()
  */
 function hook_file_predelete(File $file) {
@@ -2485,14 +2485,14 @@ function hook_file_predelete(File $file) {
 /**
  * Respond to file deletion.
  *
- * This hook is invoked from file_delete() after the file has been removed from
+ * This hook is invoked after the file has been removed from
  * the filesystem and after its records have been removed from the database.
  *
  * @param Drupal\Core\File\File $file
  *   The file that has just been deleted.
  *
  * @see hook_file_predelete()
- * @see file_delete()
+ * @see Drupal\Core\File\FileStorageController::delete()
  */
 function hook_file_delete(File $file) {
   // Delete all information associated with the file.

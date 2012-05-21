@@ -177,7 +177,7 @@ class EntityCrudHookTestCase extends WebTestBase {
     ));
 
     $_SESSION['entity_crud_hook_test'] = array();
-    file_delete($file->fid);
+    $file->delete();
 
     $this->assertHookMessageOrder(array(
       'entity_crud_hook_test_file_predelete called',

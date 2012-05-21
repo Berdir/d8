@@ -710,7 +710,6 @@ function file_usage_add(File $file, $module, $type, $id, $count = 1) {
  *
  * @see file_usage_add()
  * @see file_usage_list()
- * @see file_delete()
  */
 function file_usage_delete(File $file, $module, $type = NULL, $id = NULL, $count = 1) {
   // Delete rows that have a exact or less value to prevent empty rows.
@@ -1021,7 +1020,7 @@ function file_destination($destination, $replace) {
  *   Replace behavior when the destination file already exists:
  *   - FILE_EXISTS_REPLACE - Replace the existing file. If a managed file with
  *       the destination name exists then its database entry will be updated and
- *       file_delete() called on the source file after hook_file_move is called.
+ *       $source->delete() called after invoking hook_file_move().
  *       If no database entry is found then the source files record will be
  *       updated.
  *   - FILE_EXISTS_RENAME - Append _{incrementing number} until the filename is
@@ -1073,7 +1072,7 @@ function file_move(File $source, $destination = NULL, $replace = FILE_EXISTS_REN
 
     // Delete the original if it's not in use elsewhere.
     if ($delete_source && !file_usage_list($source)) {
-      file_delete($source->fid);
+      $source->delete();
     }
 
     return $file;

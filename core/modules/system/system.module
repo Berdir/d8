@@ -3097,7 +3097,7 @@ function system_cron() {
       $references = file_usage_list($file);
       if (empty($references)) {
         if (file_exists($file->uri)) {
-          file_delete($file->fid);
+          $file->delete();
         }
         else {
           watchdog('file system', 'Could not delete temporary file "%path" during garbage collection', array('%path' => $file->uri), WATCHDOG_ERROR);
