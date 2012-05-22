@@ -578,7 +578,7 @@ function file_save_htaccess($directory, $private = TRUE) {
 }
 
 /**
- * Loads File entities from the database.
+ * Loads file entities from the database.
  *
  * @param array|bool $fids
  *   An array of file IDs, or FALSE to load all files.
@@ -590,7 +590,7 @@ function file_save_htaccess($directory, $private = TRUE) {
  *   loadable by this function.
  *
  * @return array
- *   An array of File entities, indexed by fid.
+ *   An array of file entities, indexed by fid.
  *
  * @todo Remove $conditions in Drupal 8.
  *
@@ -1259,11 +1259,11 @@ function file_delete($fid) {
 }
 
 /**
- * Delete files.
+ * Deletes files.
  *
- * file_usage_list() will be called to
- * determine if the file is being used by any modules. If the file is being
- * used the delete will be canceled.
+ * Instead of directly deleting a file, it is strongly recommended to delete
+ * file usages instead. That will automatically mark the file as temporary and
+ * remove it during cleanup.
  *
  * @param $fid
  *   The file id.
@@ -1763,8 +1763,7 @@ function file_validate_is_image(File $file) {
  * will be scaled to fit within the desired maximum dimensions.
  *
  * @param Drupal\Core\File\File $file
- *   A file entity. This function may resize the file affecting its
- *   size.
+ *   A file entity. This function may resize the file affecting its size.
  * @param $maximum_dimensions
  *   An optional string in the form WIDTHxHEIGHT e.g. '640x480' or '85x85'. If
  *   an image toolkit is installed the image will be resized down to these
