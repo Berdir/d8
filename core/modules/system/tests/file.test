@@ -239,11 +239,11 @@ class FileTestCase extends WebTestBase {
     $file->timestamp = REQUEST_TIME;
     $file->filesize = filesize($file->uri);
     $file->status = 0;
-    // Write the record directly rather than using the API so we don't/ invoke
+    // Write the record directly rather than using the API so we don't invoke
     // the hooks.
     $this->assertNotIdentical(drupal_write_record('file_managed', $file), FALSE, t('The file was added to the database.'), 'Create test file');
 
-    return entity_create('file', (array)$file);
+    return entity_create('file', (array) $file);
   }
 }
 
@@ -610,7 +610,7 @@ class FileSaveUploadTest extends FileHookTestCase {
     $this->drupalLogin($account);
 
     $image_files = $this->drupalGetTestFiles('image');
-    $this->image = entity_create('file', (array)current($image_files));
+    $this->image = entity_create('file', (array) current($image_files));
 
     list(, $this->image_extension) = explode('.', $this->image->filename);
     $this->assertTrue(is_file($this->image->uri), t("The image file we're going to upload exists."));

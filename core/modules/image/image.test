@@ -1290,7 +1290,7 @@ class ImageFieldDefaultImagesTestCase extends ImageFieldTestCase {
     $files = $this->drupalGetTestFiles('image');
     $default_images = array();
     foreach (array('field', 'instance', 'instance2', 'field_new', 'instance_new') as $image_target) {
-      $file = entity_create('file', (array)array_pop($files));
+      $file = entity_create('file', (array) array_pop($files));
       $file->save();
       $default_images[$image_target] = $file;
     }
