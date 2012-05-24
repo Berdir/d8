@@ -22,7 +22,7 @@ class FileStorageController extends EntityDatabaseStorageController {
 
     // Automatically detect filename if not set.
     if (!isset($values['filename']) && isset($values['uri'])) {
-      $values['filemime'] = drupal_basename($values['uri']);
+      $values['filename'] = drupal_basename($values['uri']);
     }
 
     // Automatically detect filemime if not set.
