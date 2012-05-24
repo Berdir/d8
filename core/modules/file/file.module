@@ -736,7 +736,8 @@ function theme_file_link($variables) {
   $icon_directory = $variables['icon_directory'];
 
   $url = file_create_url($file->uri);
-  $icon = theme('file_icon', array('file' => $file, 'icon_directory' => $icon_directory));
+  // theme_file_icon() requires a file entity, make sure it gets one.
+  $icon = theme('file_icon', array('file' => ($file instanceof File) ? $file : file_load($file->fid), 'icon_directory' => $icon_directory));
 
   // Set options as per anchor format described at
   // http://microformats.org/wiki/file-format-examples
