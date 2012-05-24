@@ -29,7 +29,7 @@ class FileStorageController extends EntityDatabaseStorageController {
     if (!isset($values['filemime']) && isset($values['filename'])) {
       $values['filemime'] = file_get_mimetype($values['filename']);
     }
-    parent::create($values);
+    return parent::create($values);
   }
 
   /**
