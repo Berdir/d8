@@ -1854,7 +1854,6 @@ function file_save_data($data, $destination = NULL, $replace = FILE_EXISTS_RENAM
       'uid' => $user->uid,
       'status' => FILE_STATUS_PERMANENT,
     ));
-    debug($file);
     // If we are replacing an existing file re-use its database record.
     if ($replace == FILE_EXISTS_REPLACE) {
       $existing_files = file_load_multiple(array(), array('uri' => $uri));
