@@ -18,7 +18,7 @@ class FileStorageController extends EntityDatabaseStorageController {
   /**
    * Overrides Drupal\entity\EntityDatabaseStorageController::create().
    */
-  protected function create(array $values) {
+  public function create(array $values) {
 
     // Automatically detect filename if not set.
     if (!isset($values['filename']) && isset($values['uri'])) {
