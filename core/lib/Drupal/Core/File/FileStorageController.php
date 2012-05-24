@@ -16,6 +16,23 @@ use Drupal\entity\EntityInterface;
 class FileStorageController extends EntityDatabaseStorageController {
 
   /**
+   * Overrides Drupal\entity\EntityDatabaseStorageController::create().
+   */
+  protected function create(array $values) {
+
+    // Automatically detect filename if not set.
+    if (!isset($values['filename']) && isset($values['uri'])) {
+      $values['filemime'] = drupal_basename($values['uri']);
+    }
+
+    // Automatically detect filemime if not set.
+    if (!isset($values['filemime']) && isset($values['filename'])) {
+      $values['filemime'] = file_get_mimetype($values['filename']);
+    }
+    parent::create($values);
+  }
+
+  /**
    * Overrides Drupal\entity\EntityDatabaseStorageController::presave().
    */
   protected function preSave(EntityInterface $entity) {
@@ -25,9 +42,6 @@ class FileStorageController extends EntityDatabaseStorageController {
 
   /**
    * Overrides Drupal\entity\EntityDatabaseStorageController::delete().
-   *
-   * file_usage_list() is called to determine if the file is being used by any
-   * modules. If the file is being used the delete will be canceled.
    */
   public function delete($ids) {
     foreach (file_load_multiple($ids) as $file) {

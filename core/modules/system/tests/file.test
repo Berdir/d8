@@ -2033,9 +2033,8 @@ class FileSaveTest extends FileHookTestCase {
     // Check that the correct hooks were called.
     $this->assertFileHooksCalled(array('insert'));
 
-    $this->assertNotNull($file, t("Saving the file should give us back a file entity."), 'File');
     $this->assertTrue($file->fid > 0, t("A new file ID is set when saving a new file to the database."), 'File');
-    $loaded_file = db_query('SELECT * FROM {file_managed} f WHERE f.fid = :fid', array(':fid' => $file->fid))->fetch(PDO::FETCH_OBJ);
+    $loaded_file = db_query('SELECT * FROM {file_managed} f WHERE f.fid = :fid', array(':fid' => $file->fid))->fetchObject('Drupal\Core\File\File');
     $this->assertNotNull($loaded_file, t("Record exists in the database."));
     $this->assertEqual($loaded_file->status, $file->status, t("Status was saved correctly."));
     $this->assertEqual($file->filesize, filesize($file->uri), t("File size was set correctly."), 'File');
@@ -2053,7 +2052,7 @@ class FileSaveTest extends FileHookTestCase {
 
     $this->assertEqual($file->fid, $file->fid, t("The file ID of an existing file is not changed when updating the database."), 'File');
     $this->assertTrue($file->timestamp >= $file->timestamp, t("Timestamp didn't go backwards."), 'File');
-    $loaded_file = db_query('SELECT * FROM {file_managed} f WHERE f.fid = :fid', array(':fid' => $file->fid))->fetch(PDO::FETCH_OBJ);
+    $loaded_file = db_query('SELECT * FROM {file_managed} f WHERE f.fid = :fid', array(':fid' => $file->fid))->fetchObject('Drupal\Core\File\File');
     $this->assertNotNull($loaded_file, t("Record still exists in the database."), 'File');
     $this->assertEqual($loaded_file->status, $file->status, t("Status was saved correctly."));
     $this->assertEqual($loaded_file->langcode, 'en', t("Langcode was saved correctly."));

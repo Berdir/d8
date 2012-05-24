@@ -1460,7 +1460,6 @@ function file_save_upload($source, $validators = array(), $destination = FALSE, 
     'uri' => $_FILES['files']['tmp_name'][$source],
     'filesize' => $_FILES['files']['size'][$source],
   ));
-  $file->filemime = file_get_mimetype($file->filename);
 
   $extensions = '';
   if (isset($validators['file_validate_extensions'])) {
@@ -1850,13 +1849,11 @@ function file_save_data($data, $destination = NULL, $replace = FILE_EXISTS_RENAM
 
   if ($uri = file_unmanaged_save_data($data, $destination, $replace)) {
     // Create a file entity.
-    $file = entity_create('file', array());
-    $file->fid = NULL;
-    $file->uri = $uri;
-    $file->filename = drupal_basename($uri);
-    $file->filemime = file_get_mimetype($file->uri);
-    $file->uid      = $user->uid;
-    $file->status   = FILE_STATUS_PERMANENT;
+    $file = entity_create('file', array(
+      'uri' => $uri,
+      'uid' => $user->uid,
+      'status' => FILE_STATUS_PERMANENT,
+    ));
     // If we are replacing an existing file re-use its database record.
     if ($replace == FILE_EXISTS_REPLACE) {
       $existing_files = file_load_multiple(array(), array('uri' => $uri));
