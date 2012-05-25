@@ -1453,13 +1453,15 @@ function file_save_upload($source, $validators = array(), $destination = FALSE, 
       return FALSE;
   }
   // Begin building file entity.
-  $file = entity_create('file', array(
+  $values = array(
     'uid' => $user->uid,
     'status' => 0,
     'filename' => trim(drupal_basename($_FILES['files']['name'][$source]), '.'),
     'uri' => $_FILES['files']['tmp_name'][$source],
     'filesize' => $_FILES['files']['size'][$source],
-  ));
+  );
+  $values['filemime'] = file_get_mimetype($values['filename']);
+  $file = entity_create('file', $values);
 
   $extensions = '';
   if (isset($validators['file_validate_extensions'])) {
@@ -1635,7 +1637,7 @@ function drupal_move_uploaded_file($filename, $uri) {
  *
  * @see hook_file_validate()
  */
-function file_validate(File &$file, $validators = array()) {
+function file_validate(File $file, $validators = array()) {
   // Call the validation functions specified by this function's caller.
   $errors = array();
   foreach ($validators as $function => $args) {

@@ -26,8 +26,8 @@ class FileStorageController extends EntityDatabaseStorageController {
     }
 
     // Automatically detect filemime if not set.
-    if (!isset($values['filemime']) && isset($values['filename'])) {
-      $values['filemime'] = file_get_mimetype($values['filename']);
+    if (!isset($values['filemime']) && isset($values['uri'])) {
+      $values['filemime'] = file_get_mimetype($values['uri']);
     }
     return parent::create($values);
   }

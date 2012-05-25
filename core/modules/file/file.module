@@ -725,7 +725,7 @@ function file_managed_file_pre_render($element) {
  *
  * @param $variables
  *   An associative array containing:
- *   - file: A file entity to which the link will be created.
+ *   - file: A file object to which the link will be created.
  *   - icon_directory: (optional) A path to a directory of icons to be used for
  *     files. Defaults to the value of the "file_icon_directory" variable.
  *
