@@ -21,10 +21,6 @@ class SearchExcerptTest extends UnitTestBase {
     );
   }
 
-  /*function setUp() {
-    parent::setUp(array('search'));
-  }*/
-
   /**
    * Tests search_excerpt() with several simulated search keywords.
    *
