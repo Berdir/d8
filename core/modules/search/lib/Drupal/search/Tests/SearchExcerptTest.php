@@ -21,6 +21,11 @@ class SearchExcerptTest extends UnitTestBase {
     );
   }
 
+  function setUp() {
+    drupal_load('module', 'search');
+    parent::setUp();
+  }
+
   /**
    * Tests search_excerpt() with several simulated search keywords.
    *
