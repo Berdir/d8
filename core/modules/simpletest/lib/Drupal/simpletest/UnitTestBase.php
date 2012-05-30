@@ -56,7 +56,7 @@ abstract class UnitTestBase extends TestBase {
     $has_run = TRUE;
 
     // Re-implant theme registry.
-    // Required to l() and other functions to work correctly and not trigger
+    // Required for l() and other functions to work correctly and not trigger
     // database lookups.
     $theme_get_registry = &drupal_static('theme_get_registry');
     $theme_get_registry[FALSE] = $this->originalThemeRegistry;
