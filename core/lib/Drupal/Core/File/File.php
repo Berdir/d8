@@ -62,7 +62,7 @@ class File extends Entity {
   /**
    * The size of the file in bytes.
    *
-   * @var string
+   * @var integer
    */
   public $filesize;
 
@@ -78,7 +78,7 @@ class File extends Entity {
   public $status;
 
   /**
-   * UNIX timestamp for when the file was added.
+   * UNIX timestamp for when the file was last saved.
    *
    * @var integer
    */
