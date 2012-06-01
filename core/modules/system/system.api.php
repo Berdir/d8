@@ -2399,7 +2399,7 @@ function hook_file_validate(Drupal\Core\File\File $file) {
  * created by an upload.
  *
  * @param Drupal\Core\File\File $file
- *   The file entity that has just been created.
+ *   The file entity that is about the be created or updated.
  */
 function hook_file_presave(Drupal\Core\File\File $file) {
   // Change the file timestamp to an hour prior.
