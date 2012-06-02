@@ -88,7 +88,7 @@ function file_element_info() {
 /**
  * Implements hook_entity_info().
  */
-function system_entity_info() {
+function file_entity_info() {
   return array(
     'file' => array(
       'label' => t('File'),
