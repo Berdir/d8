@@ -91,6 +91,13 @@ abstract class TestBase {
   protected $setupEnvironment = FALSE;
 
   /**
+   * TRUE if verbose debugging is enabled.
+   *
+   * @var boolean
+   */
+  protected $verbose = FALSE;
+
+  /**
    * Incrementing identifier for verbose output filenames.
    *
    * @var integer
@@ -124,6 +131,7 @@ abstract class TestBase {
 
     if (variable_get('simpletest_verbose', TRUE)) {
       // Initialize verbose debugging.
+      $this->verbose = TRUE;
       $this->verboseDirectory = variable_get('file_public_path', conf_path() . '/files') . '/simpletest/verbose';
       if (file_prepare_directory($this->verboseDirectory, FILE_CREATE_DIRECTORY) && !file_exists($this->verboseDirectory . '/.htaccess')) {
         file_put_contents($this->verboseDirectory . '/.htaccess', "<IfModule mod_expires.c>\nExpiresActive Off\n</IfModule>\n");
@@ -490,7 +498,7 @@ abstract class TestBase {
    */
   protected function verbose($message) {
     // Do nothing if verbose debugging is disabled.
-    if (!variable_get('simpletest_verbose', TRUE)) {
+    if (!$this->verbose) {
       return;
     }
 
