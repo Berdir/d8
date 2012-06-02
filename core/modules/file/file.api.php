@@ -5,6 +5,29 @@
  * Hooks for file module.
  */
 
+
+/**
+ * Load additional information into file entities.
+ *
+ * file_load_multiple() calls this hook to allow modules to load
+ * additional information into each file.
+ *
+ * @param $files
+ *   An array of file entities, indexed by fid.
+ *
+ * @see file_load_multiple()
+ * @see file_load()
+ */
+function hook_file_load($files) {
+  // Add the upload specific data into the file entity.
+  $result = db_query('SELECT * FROM {upload} u WHERE u.fid IN (:fids)', array(':fids' => array_keys($files)))->fetchAll(PDO::FETCH_ASSOC);
+  foreach ($result as $record) {
+    foreach ($record as $key => $value) {
+      $files[$record['fid']]->$key = $value;
+    }
+  }
+}
+
 /**
  * Check that files meet a given criteria.
  *
