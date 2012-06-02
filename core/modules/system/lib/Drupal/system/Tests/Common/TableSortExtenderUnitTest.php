@@ -61,7 +61,6 @@ class TableSortExtenderUnitTest extends UnitTestBase {
       'query' => array(),
     );
     $ts = tablesort_init($headers);
-    $this->verbose(strtr('$ts: <pre>!ts</pre>', array('!ts' => check_plain(var_export($ts, TRUE)))));
     $this->assertEqual($ts, $expected_ts, t('Simple table headers sorted correctly.'));
 
     // Test with simple table headers plus $_GET parameters that should _not_
@@ -73,7 +72,6 @@ class TableSortExtenderUnitTest extends UnitTestBase {
       'order' => 'bar',
     );
     $ts = tablesort_init($headers);
-    $this->verbose(strtr('$ts: <pre>!ts</pre>', array('!ts' => check_plain(var_export($ts, TRUE)))));
     $this->assertEqual($ts, $expected_ts, t('Simple table headers plus non-overriding $_GET parameters sorted correctly.'));
 
     // Test with simple table headers plus $_GET parameters that _should_
@@ -88,7 +86,6 @@ class TableSortExtenderUnitTest extends UnitTestBase {
     $expected_ts['sort'] = 'desc';
     $expected_ts['query'] = array('alpha' => 'beta');
     $ts = tablesort_init($headers);
-    $this->verbose(strtr('$ts: <pre>!ts</pre>', array('!ts' => check_plain(var_export($ts, TRUE)))));
     $this->assertEqual($ts, $expected_ts, t('Simple table headers plus $_GET parameters sorted correctly.'));
 
     // Test complex table headers.
@@ -118,7 +115,6 @@ class TableSortExtenderUnitTest extends UnitTestBase {
       'sort' => 'desc',
       'query' => array(),
     );
-    $this->verbose(strtr('$ts: <pre>!ts</pre>', array('!ts' => check_plain(var_export($ts, TRUE)))));
     $this->assertEqual($ts, $expected_ts, t('Complex table headers sorted correctly.'));
 
     // Test complex table headers plus $_GET parameters that should _not_
@@ -136,7 +132,6 @@ class TableSortExtenderUnitTest extends UnitTestBase {
       'sort' => 'asc',
       'query' => array(),
     );
-    $this->verbose(strtr('$ts: <pre>!ts</pre>', array('!ts' => check_plain(var_export($ts, TRUE)))));
     $this->assertEqual($ts, $expected_ts, t('Complex table headers plus non-overriding $_GET parameters sorted correctly.'));
     unset($_GET['sort'], $_GET['order'], $_GET['alpha']);
 
@@ -157,7 +152,6 @@ class TableSortExtenderUnitTest extends UnitTestBase {
       'query' => array('alpha' => 'beta'),
     );
     $ts = tablesort_init($headers);
-    $this->verbose(strtr('$ts: <pre>!ts</pre>', array('!ts' => check_plain(var_export($ts, TRUE)))));
     $this->assertEqual($ts, $expected_ts, t('Complex table headers plus $_GET parameters sorted correctly.'));
     unset($_GET['sort'], $_GET['order'], $_GET['alpha']);
 
