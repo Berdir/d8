@@ -95,7 +95,7 @@ abstract class TestBase {
    *
    * @var integer
    */
-  protected $verbose_id = 0;
+  protected $verboseId = 0;
 
   /**
    * Safe class name for use in verbose output filenames.
@@ -104,14 +104,14 @@ abstract class TestBase {
    *
    * @var string
    */
-  protected $verbose_class_name;
+  protected $verboseClassName;
 
   /**
    * Directory where verbose output files are put.
    *
    * @var string
    */
-  protected $verbose_directory;
+  protected $verboseDirectory;
 
   /**
    * Constructor for Test.
@@ -122,12 +122,14 @@ abstract class TestBase {
   public function __construct($test_id = NULL) {
     $this->testId = $test_id;
 
-    // Initialize verbose debugging.
-    $this->verbose_directory = variable_get('file_public_path', conf_path() . '/files') . '/simpletest/verbose';
-    if (file_prepare_directory($this->verbose_directory, FILE_CREATE_DIRECTORY) && !file_exists($this->verbose_directory . '/.htaccess')) {
-      file_put_contents($this->verbose_directory . '/.htaccess', "<IfModule mod_expires.c>\nExpiresActive Off\n</IfModule>\n");
+    if (variable_get('simpletest_verbose', TRUE)) {
+      // Initialize verbose debugging.
+      $this->verboseDirectory = variable_get('file_public_path', conf_path() . '/files') . '/simpletest/verbose';
+      if (file_prepare_directory($this->verboseDirectory, FILE_CREATE_DIRECTORY) && !file_exists($this->verboseDirectory . '/.htaccess')) {
+        file_put_contents($this->verboseDirectory . '/.htaccess', "<IfModule mod_expires.c>\nExpiresActive Off\n</IfModule>\n");
+      }
+      $this->verboseClassName = str_replace("\\", "_", get_class($this));
     }
-    $this->verbose_class_name = str_replace("\\", "_", get_class($this));
   }
 
   /**
@@ -492,17 +494,16 @@ abstract class TestBase {
       return;
     }
 
-    $message = '<hr />ID #' . $this->verbose_id . ' (<a href="' . $this->verbose_class_name . '-' . ($this->verbose_id - 1) . '.html">Previous</a> | <a href="' . $this->verbose_class_name . '-' . ($this->verbose_id + 1) . '.html">Next</a>)<hr />' . $message;
-    $verbose_filename = $this->verbose_directory . '/' . $this->verbose_class_name . '-' . $this->verbose_id . '.html';
-    debug($verbose_filename);
+    $message = '<hr />ID #' . $this->verboseId . ' (<a href="' . $this->verboseClassName . '-' . ($this->verboseId - 1) . '.html">Previous</a> | <a href="' . $this->verboseClassName . '-' . ($this->verboseId + 1) . '.html">Next</a>)<hr />' . $message;
+    $verbose_filename = $this->verboseDirectory . '/' . $this->verboseClassName . '-' . $this->verboseId . '.html';
     if (file_put_contents($verbose_filename, $message, FILE_APPEND)) {
-      $url = file_create_url($this->originalFileDirectory . '/simpletest/verbose/' . $this->verbose_class_name . '-' . $this->verbose_id . '.html');
+      $url = file_create_url($this->originalFileDirectory . '/simpletest/verbose/' . $this->verboseClassName . '-' . $this->verboseId . '.html');
       // Not using l() to avoid invoking the theme system, so that unit tests
       // can use verbose() as well.
       $url = '<a href="' . $url . '" target="_blank">' . t('Verbose message') . '</a>';
       $this->error($url, 'User notice');
     }
-    $this->verbose_id++;
+    $this->verboseId++;
   }
 
   /**
