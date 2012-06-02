@@ -7327,7 +7327,7 @@ function drupal_get_updaters() {
  * @return
  *   The Drupal FileTransfer class registry.
  *
- * @see Drupal\file\FileTransfer\FileTransfer
+ * @see Drupal\Core\FileTransfer\FileTransfer
  * @see hook_filetransfer_info()
  * @see hook_filetransfer_info_alter()
  */
