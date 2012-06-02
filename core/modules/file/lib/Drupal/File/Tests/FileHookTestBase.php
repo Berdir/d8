@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Definition of Drupal\system\Tests\File\FileHookTestBase.
+ * Definition of Drupal\file\Tests\FileHookTestBase.
  */
 
-namespace Drupal\system\Tests\File;
+namespace Drupal\file\Tests;
 
 /**
  * Base class for file tests that use the file_test module to test uploads and
@@ -18,7 +18,7 @@ abstract class FileHookTestBase extends FileTestBase {
    *
    * @var array
    */
-  public static $modules = array('file_test');
+  public static $modules = array('file_test', 'file');
 
   function setUp() {
     // Install file_test module
