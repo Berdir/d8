@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Definition of Drupal\file\File\File.
+ * Definition of Drupal\file\File.
  */
 
-namespace Drupal\file\File;
+namespace Drupal\file;
 
 use Drupal\entity\Entity;
 

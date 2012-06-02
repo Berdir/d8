@@ -11,7 +11,7 @@
  * This hook lets modules perform additional validation on files. They're able
  * to report a failure by returning one or more error messages.
  *
- * @param Drupal\file\File\File $file
+ * @param Drupal\file\File $file
  *   The file entity being validated.
  * @return
  *   An array of error messages. If there are no problems with the file return
@@ -19,7 +19,7 @@
  *
  * @see file_validate()
  */
-function hook_file_validate(Drupal\file\File\File $file) {
+function hook_file_validate(Drupal\file\File $file) {
   $errors = array();
 
   if (empty($file->filename)) {
@@ -39,10 +39,10 @@ function hook_file_validate(Drupal\file\File\File $file) {
  * doesn't distinguish between files created as a result of a copy or those
  * created by an upload.
  *
- * @param Drupal\file\File\File $file
+ * @param Drupal\file\File $file
  *   The file entity that is about to be created or updated.
  */
-function hook_file_presave(Drupal\file\File\File $file) {
+function hook_file_presave(Drupal\file\File $file) {
   // Change the file timestamp to an hour prior.
   $file->timestamp -= 3600;
 }
@@ -54,10 +54,10 @@ function hook_file_presave(Drupal\file\File\File $file) {
  * doesn't distinguish between files created as a result of a copy or those
  * created by an upload.
  *
- * @param Drupal\file\File\File $file
+ * @param Drupal\file\File $file
  *   The file that has been added.
  */
-function hook_file_insert(Drupal\file\File\File $file) {
+function hook_file_insert(Drupal\file\File $file) {
   // Add a message to the log, if the file is a jpg
   $validate = file_validate_extensions($file, 'jpg');
   if (empty($validate)) {
@@ -70,38 +70,38 @@ function hook_file_insert(Drupal\file\File\File $file) {
  *
  * This hook is called when an existing file is saved.
  *
- * @param Drupal\file\File\File $file
+ * @param Drupal\file\File $file
  *   The file that has just been updated.
  */
-function hook_file_update(Drupal\file\File\File $file) {
+function hook_file_update(Drupal\file\File $file) {
 
 }
 
 /**
  * Respond to a file that has been copied.
  *
- * @param Drupal\file\File\File $file
+ * @param Drupal\file\File $file
  *   The newly copied file entity.
- * @param Drupal\file\File\File $source
+ * @param Drupal\file\File $source
  *   The original file before the copy.
  *
  * @see file_copy()
  */
-function hook_file_copy(Drupal\file\File\File $file, Drupal\file\File\File $source) {
+function hook_file_copy(Drupal\file\File $file, Drupal\file\File $source) {
 
 }
 
 /**
  * Respond to a file that has been moved.
  *
- * @param Drupal\file\File\File $file
+ * @param Drupal\file\File $file
  *   The updated file entity after the move.
- * @param Drupal\file\File\File $source
+ * @param Drupal\file\File $source
  *   The original file entity before the move.
  *
  * @see file_move()
  */
-function hook_file_move(Drupal\file\File\File $file, Drupal\file\File\File $source) {
+function hook_file_move(Drupal\file\File $file, Drupal\file\File $source) {
 
 }
 
@@ -111,14 +111,14 @@ function hook_file_move(Drupal\file\File\File $file, Drupal\file\File\File $sour
  * This hook is invoked when deleting a file before the file is removed from the
  * filesystem and before its records are removed from the database.
  *
- * @param Drupal\file\File\File $file
+ * @param Drupal\file\File $file
  *   The file that is about to be deleted.
  *
  * @see hook_file_delete()
- * @see Drupal\file\File\FileStorageController::delete()
+ * @see Drupal\file\FileStorageController::delete()
  * @see upload_file_delete()
  */
-function hook_file_predelete(Drupal\file\File\File $file) {
+function hook_file_predelete(Drupal\file\File $file) {
   // Delete all information associated with the file.
   db_delete('upload')->condition('fid', $file->fid)->execute();
 }
@@ -129,13 +129,13 @@ function hook_file_predelete(Drupal\file\File\File $file) {
  * This hook is invoked after the file has been removed from
  * the filesystem and after its records have been removed from the database.
  *
- * @param Drupal\file\File\File $file
+ * @param Drupal\file\File $file
  *   The file that has just been deleted.
  *
  * @see hook_file_predelete()
- * @see Drupal\file\File\FileStorageController::delete()
+ * @see Drupal\file\FileStorageController::delete()
  */
-function hook_file_delete(Drupal\file\File\File $file) {
+function hook_file_delete(Drupal\file\File $file) {
   // Delete all information associated with the file.
   db_delete('upload')->condition('fid', $file->fid)->execute();
 }

@@ -8,7 +8,7 @@
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Drupal\file\File\File;
+use Drupal\file\File;
 
 /**
  * Image style constant for user presets in the database.
