@@ -91,6 +91,29 @@ abstract class TestBase {
   protected $setupEnvironment = FALSE;
 
   /**
+   * Incrementing identifier for verbose output filenames.
+   *
+   * @var integer
+   */
+  protected $verbose_id = 0;
+
+  /**
+   * Safe class name for use in verbose output filenames.
+   *
+   * Namespaces separator (\) replaced with _.
+   *
+   * @var string
+   */
+  protected $verbose_class_name;
+
+  /**
+   * Directory where verbose output files are put.
+   *
+   * @var string
+   */
+  protected $verbose_directory;
+
+  /**
    * Constructor for Test.
    *
    * @param $test_id
@@ -98,6 +121,13 @@ abstract class TestBase {
    */
   public function __construct($test_id = NULL) {
     $this->testId = $test_id;
+
+    // Initialize verbose debugging.
+    $this->verbose_directory = variable_get('file_public_path', conf_path() . '/files') . '/simpletest/verbose';
+    if (file_prepare_directory($this->verbose_directory, FILE_CREATE_DIRECTORY) && !file_exists($this->verbose_directory . '/.htaccess')) {
+      file_put_contents($this->verbose_directory . '/.htaccess', "<IfModule mod_expires.c>\nExpiresActive Off\n</IfModule>\n");
+    }
+    $this->verbose_class_name = str_replace("\\", "_", get_class($this));
   }
 
   /**
@@ -457,11 +487,22 @@ abstract class TestBase {
    * @see simpletest_verbose()
    */
   protected function verbose($message) {
-    if ($id = simpletest_verbose($message)) {
-      $class = str_replace('\\', '_', get_class($this));
-      $url = file_create_url($this->originalFileDirectory . '/simpletest/verbose/' . $class . '-' . $id . '.html');
-      $this->error(l(t('Verbose message'), $url, array('attributes' => array('target' => '_blank'))), 'User notice');
+    // Do nothing if verbose debugging is disabled.
+    if (!variable_get('simpletest_verbose', TRUE)) {
+      return;
     }
+
+    $message = '<hr />ID #' . $this->verbose_id . ' (<a href="' . $this->verbose_class_name . '-' . ($this->verbose_id - 1) . '.html">Previous</a> | <a href="' . $this->verbose_class_name . '-' . ($this->verbose_id + 1) . '.html">Next</a>)<hr />' . $message;
+    $verbose_filename = $this->verbose_directory . '/' . $this->verbose_class_name . '-' . $this->verbose_id . '.html';
+    debug($verbose_filename);
+    if (file_put_contents($verbose_filename, $message, FILE_APPEND)) {
+      $url = file_create_url($this->originalFileDirectory . '/simpletest/verbose/' . $this->verbose_class_name . '-' . $this->verbose_id . '.html');
+      // Not using l() to avoid invoking the theme system, so that unit tests
+      // can use verbose() as well.
+      $url = '<a href="' . $url . '" target="_blank">' . t('Verbose message') . '</a>';
+      $this->error($url, 'User notice');
+    }
+    $this->verbose_id++;
   }
 
   /**
@@ -477,10 +518,6 @@ abstract class TestBase {
    *   methods during debugging.
    */
   public function run(array $methods = array()) {
-    // Initialize verbose debugging.
-    $class = get_class($this);
-    simpletest_verbose(NULL, variable_get('file_public_path', conf_path() . '/files'), str_replace('\\', '_', $class));
-
     // HTTP auth settings (<username>:<password>) for the simpletest browser
     // when sending requests to the test site.
     $this->httpauth_method = variable_get('simpletest_httpauth_method', CURLAUTH_BASIC);
