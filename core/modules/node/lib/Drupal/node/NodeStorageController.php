@@ -152,7 +152,7 @@ class NodeStorageController extends EntityDatabaseStorageController {
   }
 
   /**
-   * Overrides Drupal\entity\EntityController::attachLoad().
+   * Overrides Drupal\entity\EntityDatabaseStorageController::attachLoad().
    */
   protected function attachLoad(&$nodes, $revision_id = FALSE) {
     // Create an array of nodes for each content type and pass this to the
@@ -177,7 +177,7 @@ class NodeStorageController extends EntityDatabaseStorageController {
   }
 
   /**
-   * Overrides Drupal\entity\EntityController::buildQuery().
+   * Overrides Drupal\entity\EntityDatabaseStorageController::buildQuery().
    */
   protected function buildQuery($ids, $conditions = array(), $revision_id = FALSE) {
     // Ensure that uid is taken from the {node} table,
