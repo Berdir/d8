@@ -412,36 +412,6 @@ function entity_uri($entity_type, $entity) {
 }
 
 /**
- * Returns the label of an entity.
- *
- * See the 'label callback' component of the hook_entity_info() return value
- * for more information.
- *
- * @param $entity_type
- *   The entity type; e.g., 'node' or 'user'.
- * @param $entity
- *   The entity for which to generate the label.
- *
- * @return
- *   The entity label, or FALSE if not found.
- *
- * @todo
- *   Remove once all entity types are implementing the EntityInterface.
- */
-function entity_label($entity_type, $entity) {
-  $label = FALSE;
-  $info = entity_get_info($entity_type);
-  if (isset($info['label callback'])) {
-    $label = $info['label callback']($entity_type, $entity);
-  }
-  elseif (!empty($info['entity keys']['label']) && isset($entity->{$info['entity keys']['label']})) {
-    $label = $entity->{$info['entity keys']['label']};
-  }
-
-  return $label;
-}
-
-/**
  * Attaches field API validation to entity forms.
  */
 function entity_form_field_validate($entity_type, $form, &$form_state) {
