@@ -79,7 +79,7 @@ class VocabularyStorageController extends EntityDatabaseStorageController {
   }
 
   /**
-   * Implements Drupal\entity\DrupalEntityControllerInterface::resetCache().
+   * Overrides Drupal\entity\DrupalEntityDatabaseStorageController::resetCache().
    */
   public function resetCache(array $ids = NULL) {
     drupal_static_reset('taxonomy_vocabulary_get_names');

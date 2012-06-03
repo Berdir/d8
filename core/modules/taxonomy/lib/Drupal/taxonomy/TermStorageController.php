@@ -131,7 +131,7 @@ class TermStorageController extends EntityDatabaseStorageController {
   }
 
   /**
-   * Implements Drupal\entity\EntityControllerInterface::resetCache().
+   * Overrides Drupal\entity\EntityDatabaseStorageController::resetCache().
    */
   public function resetCache(array $ids = NULL) {
     drupal_static_reset('taxonomy_term_count_nodes');
