@@ -26,10 +26,10 @@
  *   - controller class: The name of the class that is used to load the objects.
  *     The class has to implement the
  *     Drupal\entity\EntityStorageControllerInterface interface. Leave blank
- *     to use the Drupal\entity\EntityDatabaseStorageController implementation.
- *   - base table: (used by Drupal\entity\EntityDatabaseStorageController) The
+ *     to use the Drupal\entity\DatabaseStorageController implementation.
+ *   - base table: (used by Drupal\entity\DatabaseStorageController) The
  *     name of the entity type's base table.
- *   - static cache: (used by Drupal\entity\EntityDatabaseStorageController)
+ *   - static cache: (used by Drupal\entity\DatabaseStorageController)
  *     FALSE to disable static caching of entities during a page request.
  *     Defaults to TRUE.
  *   - field cache: (used by Field API loading and saving of field data) FALSE
@@ -37,7 +37,7 @@
  *     if a higher level persistent cache is available for the entity type.
  *     Defaults to TRUE.
  *   - load hook: The name of the hook which should be invoked by
- *     Drupal\entity\EntityDatabaseStorageController::attachLoad(), for example
+ *     Drupal\entity\DatabaseStorageController::attachLoad(), for example
  *     'node_load'.
  *   - uri callback: A function taking an entity as argument and returning the
  *     uri elements of the entity, e.g. 'path' and 'options'. The actual entity
@@ -216,8 +216,8 @@ function hook_entity_info() {
  */
 function hook_entity_info_alter(&$entity_info) {
   // Set the controller class for nodes to an alternate implementation of the
-  // Drupal\entity\EntityDatabaseStorageController interface.
-  $entity_info['node']['controller class'] = 'Drupal\mymodule\MyCustomNodeController';
+  // Drupal\entity\EntityStorageControllerInterface interface.
+  $entity_info['node']['controller class'] = 'Drupal\mymodule\MyCustomNodeStorageController';
 }
 
 /**

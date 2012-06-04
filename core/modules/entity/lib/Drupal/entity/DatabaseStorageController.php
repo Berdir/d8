@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\entity\EntityDatabaseStorageController.
+ * Definition of Drupal\entity\DatabaseStorageController.
  */
 
 namespace Drupal\entity;
@@ -12,13 +12,12 @@ use PDO;
 /**
  * Defines a base entity controller class.
  *
- * Default implementation of
- * Drupal\entity\EntityDatabaseStorageControllerInterface.
+ * Default implementation of Drupal\entity\DatabaseStorageControllerInterface.
  *
  * This class can be used as-is by most simple entity types. Entity types
  * requiring special handling can extend the class.
  */
-class EntityDatabaseStorageController implements EntityStorageControllerInterface {
+class DatabaseStorageController implements EntityStorageControllerInterface {
 
   /**
    * Static cache of entities.
@@ -46,7 +45,7 @@ class EntityDatabaseStorageController implements EntityStorageControllerInterfac
   /**
    * Additional arguments to pass to hook_TYPE_load().
    *
-   * Set before calling Drupal\entity\EntityDatabaseStorageController::attachLoad().
+   * Set before calling Drupal\entity\DatabaseStorageController::attachLoad().
    *
    * @var array
    */

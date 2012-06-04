@@ -69,7 +69,7 @@ function entity_get_info($entity_type = NULL) {
         $entity_info[$name] += array(
           'fieldable' => FALSE,
           'entity class' => 'Drupal\entity\Entity',
-          'controller class' => 'Drupal\entity\EntityDatabaseStorageController',
+          'controller class' => 'Drupal\entity\DatabaseStorageController',
           'static cache' => TRUE,
           'field cache' => TRUE,
           'load hook' => $name . '_load',
@@ -93,7 +93,7 @@ function entity_get_info($entity_type = NULL) {
           $entity_info[$name]['bundles'] = array($name => array('label' => $entity_info[$name]['label']));
         }
         // Prepare entity schema fields SQL info for
-        // Drupal\entity\EntityDatabaseStorageControllerInterface::buildQuery().
+        // Drupal\entity\DatabaseStorageControllerInterface::buildQuery().
         if (isset($entity_info[$name]['base table'])) {
           $entity_info[$name]['schema_fields_sql']['base table'] = drupal_schema_fields_sql($entity_info[$name]['base table']);
           if (isset($entity_info[$name]['revision table'])) {
@@ -208,7 +208,7 @@ function entity_create_stub_entity($entity_type, $ids) {
  * @see hook_entity_info()
  * @see entity_load_multiple()
  * @see Drupal\entity\EntityStorageControllerInterface
- * @see Drupal\entity\EntityDatabaseStorageController
+ * @see Drupal\entity\DatabaseStorageController
  * @see Drupal\entity\EntityFieldQuery
  */
 function entity_load($entity_type, $id, $reset = FALSE) {
@@ -225,11 +225,11 @@ function entity_load($entity_type, $id, $reset = FALSE) {
  *
  * The actual loading is done through a class that has to implement the
  * Drupal\entity\EntityStorageControllerInterface interface. By default,
- * Drupal\entity\EntityDatabaseStorageController is used. Entity types can
+ * Drupal\entity\DatabaseStorageController is used. Entity types can
  * specify that a different class should be used by setting the
  * 'controller class' key in hook_entity_info(). These classes can either
  * implement the Drupal\entity\EntityStorageControllerInterface interface, or,
- * most commonly, extend the Drupal\entity\EntityDatabaseStorageController
+ * most commonly, extend the Drupal\entity\DatabaseStorageController
  * class. See node_entity_info() and the NodeController in node.module as an
  * example.
  *
@@ -252,7 +252,7 @@ function entity_load($entity_type, $id, $reset = FALSE) {
  *
  * @see hook_entity_info()
  * @see Drupal\entity\EntityStorageControllerInterface
- * @see Drupal\entity\EntityDatabaseStorageController
+ * @see Drupal\entity\DatabaseStorageController
  * @see Drupal\entity\EntityFieldQuery
  */
 function entity_load_multiple($entity_type, $ids = FALSE, $conditions = array(), $reset = FALSE) {

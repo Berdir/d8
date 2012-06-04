@@ -15,7 +15,7 @@ namespace Drupal\entity;
  * this interface.
  *
  * Most simple, SQL-based entity controllers will do better by extending
- * Drupal\entity\EntityDatabaseStorageController instead of implementing this
+ * Drupal\entity\DatabaseStorageController instead of implementing this
  * interface directly.
  */
 interface EntityStorageControllerInterface {
