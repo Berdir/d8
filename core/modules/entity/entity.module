@@ -6,6 +6,7 @@
  */
 
 use Drupal\entity\EntityMalformedException;
+use Drupal\entity\EntityInterface;
 
 /**
  * Implements hook_help().
@@ -409,6 +410,25 @@ function entity_uri($entity_type, $entity) {
     $uri['options']['entity'] = $entity;
     return $uri;
   }
+}
+
+/**
+ * Returns the label of an entity.
+ *
+ * This is a wrapper for EntityInterface::label(), this function should only
+ * be used for menu title callbacks and similar places that do not allow to
+ * directly call the method.
+ *
+ * @param Drupal\entity\EntityInterface $entity
+ *   The entity for which to generate the label.
+ *
+ * @return
+ *   The label of the entity, or NULL if there is no label defined.
+ *
+ * @see EntityInterface::label()
+ */
+function entity_page_label(EntityInterface $entity) {
+  return $entity->label();
 }
 
 /**
