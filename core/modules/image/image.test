@@ -565,7 +565,7 @@ class ImageAdminStylesUnitTest extends ImageFieldTestCase {
 
     // Test that image is displayed using newly created style.
     $this->drupalGet('node/' . $nid);
-    $this->assertRaw(image_style_url($style_name, $node->{$field_name}[LANGUAGE_NOT_SPECIFIED][0]['uri']), t('Image displayed using style @style.', array('@style' => $style_name)));
+    $this->assertRaw(image_style_url($style_name, file_load($node->{$field_name}[LANGUAGE_NOT_SPECIFIED][0]['fid'])->uri), t('Image displayed using style @style.', array('@style' => $style_name)));
 
     // Rename the style and make sure the image field is updated.
     $new_style_name = strtolower($this->randomName(10));
@@ -575,7 +575,7 @@ class ImageAdminStylesUnitTest extends ImageFieldTestCase {
     $this->drupalPost('admin/config/media/image-styles/edit/' . $style_name, $edit, t('Update style'));
     $this->assertText(t('Changes to the style have been saved.'), t('Style %name was renamed to %new_name.', array('%name' => $style_name, '%new_name' => $new_style_name)));
     $this->drupalGet('node/' . $nid);
-    $this->assertRaw(image_style_url($new_style_name, $node->{$field_name}[LANGUAGE_NOT_SPECIFIED][0]['uri']), t('Image displayed using style replacement style.'));
+    $this->assertRaw(image_style_url($new_style_name, file_load($node->{$field_name}[LANGUAGE_NOT_SPECIFIED][0]['fid'])->uri), t('Image displayed using style replacement style.'));
 
     // Delete the style and choose a replacement style.
     $edit = array(
@@ -586,7 +586,7 @@ class ImageAdminStylesUnitTest extends ImageFieldTestCase {
     $this->assertRaw($message, $message);
 
     $this->drupalGet('node/' . $nid);
-    $this->assertRaw(image_style_url('thumbnail', $node->{$field_name}[LANGUAGE_NOT_SPECIFIED][0]['uri']), t('Image displayed using style replacement style.'));
+    $this->assertRaw(image_style_url('thumbnail', file_load($node->{$field_name}[LANGUAGE_NOT_SPECIFIED][0]['fid'])->uri), t('Image displayed using style replacement style.'));
   }
 }
 
@@ -634,7 +634,7 @@ class ImageFieldDisplayTestCase extends ImageFieldTestCase {
     $node = node_load($nid, NULL, TRUE);
 
     // Test that the default formatter is being used.
-    $image_uri = $node->{$field_name}[LANGUAGE_NOT_SPECIFIED][0]['uri'];
+    $image_uri = file_load($node->{$field_name}[LANGUAGE_NOT_SPECIFIED][0]['fid'])->uri;
     $image_info = array(
       'uri' => $image_uri,
       'width' => 40,
@@ -737,7 +737,7 @@ class ImageFieldDisplayTestCase extends ImageFieldTestCase {
     // style.
     $node = node_load($nid, NULL, TRUE);
     $image_info = array(
-      'uri' => image_style_url('medium', $node->{$field_name}[LANGUAGE_NOT_SPECIFIED][0]['uri']),
+      'uri' => image_style_url('medium', file_load($node->{$field_name}[LANGUAGE_NOT_SPECIFIED][0]['fid'])->fid),
       'width' => 220,
       'height' => 110,
     );
@@ -746,7 +746,7 @@ class ImageFieldDisplayTestCase extends ImageFieldTestCase {
 
     // Add alt/title fields to the image and verify that they are displayed.
     $image_info = array(
-      'uri' => $node->{$field_name}[LANGUAGE_NOT_SPECIFIED][0]['uri'],
+      'uri' => file_load($node->{$field_name}[LANGUAGE_NOT_SPECIFIED][0]['fod'])->uri,
       'alt' => $this->randomName(),
       'title' => $this->randomName(),
       'width' => 40,
@@ -813,7 +813,7 @@ class ImageFieldDisplayTestCase extends ImageFieldTestCase {
     $nid = $this->uploadNodeImage($images[1], $field_name, 'article');
     $node = node_load($nid, NULL, TRUE);
     $image_info = array(
-      'uri' => $node->{$field_name}[LANGUAGE_NOT_SPECIFIED][0]['uri'],
+      'uri' => file_load($node->{$field_name}[LANGUAGE_NOT_SPECIFIED][0]['fid'])->uri,
       'width' => 40,
       'height' => 20,
     );
