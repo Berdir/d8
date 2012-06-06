@@ -737,7 +737,7 @@ class ImageFieldDisplayTestCase extends ImageFieldTestCase {
     // style.
     $node = node_load($nid, NULL, TRUE);
     $image_info = array(
-      'uri' => image_style_url('medium', file_load($node->{$field_name}[LANGUAGE_NOT_SPECIFIED][0]['fid'])->fid),
+      'uri' => image_style_url('medium', file_load($node->{$field_name}[LANGUAGE_NOT_SPECIFIED][0]['fid'])->uri),
       'width' => 220,
       'height' => 110,
     );
@@ -746,7 +746,7 @@ class ImageFieldDisplayTestCase extends ImageFieldTestCase {
 
     // Add alt/title fields to the image and verify that they are displayed.
     $image_info = array(
-      'uri' => file_load($node->{$field_name}[LANGUAGE_NOT_SPECIFIED][0]['fod'])->uri,
+      'uri' => file_load($node->{$field_name}[LANGUAGE_NOT_SPECIFIED][0]['fid'])->uri,
       'alt' => $this->randomName(),
       'title' => $this->randomName(),
       'width' => 40,
