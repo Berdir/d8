@@ -193,10 +193,10 @@ interface EntityInterface {
   public function getRevisionId();
 
   /**
-   * Checks if this entity is the active revision.
+   * Checks if this entity is the current revision.
    *
    * @return bool
-   *   TRUE if the entity is the active revision, FALSE otherwise.
+   *   TRUE if the entity is the current revision, FALSE otherwise.
    */
   public function isCurrentRevision();
 

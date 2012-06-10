@@ -150,8 +150,7 @@ class NodeStorageController extends DatabaseStorageController {
     // Make sure to update the new revision key for the entity.
     $entity->{$this->revisionKey} = $record->{$this->revisionKey};
 
-    // @todo: According to the above line, a newly saved revision is always the
-    //        current one. Is that true?
+    // Mark this revision as the current one.
     $entity->isCurrentRevision = TRUE;
   }
 

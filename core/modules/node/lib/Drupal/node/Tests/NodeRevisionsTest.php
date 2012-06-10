@@ -76,7 +76,7 @@ class NodeRevisionsTest extends NodeTestBase {
     }
 
     // Confirm that this is the current revision.
-    $this->assertTrue($node->isCurrentRevision(), 'Third node revision is the active one.');
+    $this->assertTrue($node->isCurrentRevision(), 'Third node revision is the current one.');
 
     // Confirm that revisions revert properly.
     $this->drupalPost("node/$node->nid/revisions/{$nodes[1]->vid}/revert", array(), t('Revert'));
@@ -88,7 +88,7 @@ class NodeRevisionsTest extends NodeTestBase {
 
     // Confirm that this is not the current version.
     $node = node_load($node->nid, $node->vid);
-    $this->assertFalse($node->isCurrentRevision(), 'Third node revision is not the active one.');
+    $this->assertFalse($node->isCurrentRevision(), 'Third node revision is not the current one.');
 
     // Confirm revisions delete properly.
     $this->drupalPost("node/$node->nid/revisions/{$nodes[1]->vid}/delete", array(), t('Delete'));
