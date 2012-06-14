@@ -249,4 +249,37 @@ class Entity implements EntityInterface {
   public function entityInfo() {
     return entity_get_info($this->entityType);
   }
+
+  public function getIterator() {
+    // TODO: Implement getIterator() method.
+  }
+
+  public function getRawValue($property_name, $langcode = NULL) {
+    // TODO: Implement getRawValue() method.
+  }
+
+  public function access($account) {
+    // TODO: Implement access() method.
+  }
+
+  public function validate() {
+    // TODO: Implement validate() method.
+  }
+
+  public function getProperties() {
+    // TODO: Implement getProperties() method.
+  }
+
+  public function getPropertyDefinitions() {
+    // TODO: Implement getPropertyDefinitions() method.
+    // add in field api properties if entity is fieldable
+  }
+
+  public function __get($name) {
+    // TODO: Implement __get() method.
+  }
+
+  public function __set($name, $value) {
+    // TODO: Implement __set() method.
+  }
 }
