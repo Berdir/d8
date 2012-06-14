@@ -7493,6 +7493,40 @@ function drupal_get_updaters() {
 }
 
 /**
+ * @todo: Remove once we've converted to the plugin system. See
+ * drupal_get_property_type_plugin().
+ */
+function drupal_get_data_type_info() {
+  $items = &drupal_static(__FUNCTION__);
+  if (!isset($items)) {
+    $items = module_invoke_all('data_type_info');
+    drupal_alter('data_type_info', $items);
+  }
+  return $items;
+}
+
+/**
+ * Gets an instance of the data type plugin.
+ *
+ * @param string $type
+ *
+ * @todo: Make use of plugins once they are there. What's the relationship to
+ * field plugins? Maybe field type plugins are just part of that and somehow
+ * marked to be available for defining fields?
+ *
+ * @return Drupal\Core\PropertyTypeInterface
+ */
+function drupal_get_property_type_plugin($type) {
+  $plugin = &drupal_static(__FUNCTION__);
+  if (!isset($resolver[$type])) {
+    $items = drupal_get_data_type_info();
+    $class = $items[$type]['class'];
+    $plugin[$type] = new $class($type);
+  }
+  return $plugin[$type];
+}
+
+/**
  * Assembles the Drupal FileTransfer registry.
  *
  * @return
