@@ -24,7 +24,7 @@ class UnmanagedMoveTest extends FileTestBase {
    */
   function testNormal() {
     // Create a file for testing
-    $file = $this->createUri();
+    $uri = $this->createUri();
 
     // Moving to a new name.
     $desired_filepath = 'public://' . $this->randomName();

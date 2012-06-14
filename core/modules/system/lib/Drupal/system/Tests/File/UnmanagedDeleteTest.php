@@ -24,7 +24,7 @@ class UnmanagedDeleteTest extends FileTestBase {
    */
   function testNormal() {
     // Create a file for testing
-    $file = $this->createUri();
+    $uri = $this->createUri();
 
     // Delete a regular file
     $this->assertTrue(file_unmanaged_delete($uri), t('Deleted worked.'));
