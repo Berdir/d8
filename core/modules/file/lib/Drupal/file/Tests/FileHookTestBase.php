@@ -7,6 +7,8 @@
 
 namespace Drupal\file\Tests;
 
+use Drupal\system\Tests\File\FileTestBase;
+
 /**
  * Base class for file tests that use the file_test module to test uploads and
  * hooks.

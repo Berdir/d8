@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Definition of Drupal\system\Tests\File\SaveUploadTest.
+ * Definition of Drupal\file\Tests\SaveUploadTest.
  */
 
-namespace Drupal\system\Tests\File;
+namespace Drupal\file\Tests;
 
 /**
  * Test the file_save_upload() function.
