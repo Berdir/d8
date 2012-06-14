@@ -10,7 +10,7 @@ namespace Drupal\file\Tests;
 /**
  * Test the file_save_upload() function.
  */
-class SaveUploadTest extends FileHookTestBase {
+class SaveUploadTest extends FileManagedTestBase {
   /**
    * An image file path for uploading.
    */

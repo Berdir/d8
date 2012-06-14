@@ -10,7 +10,7 @@ namespace Drupal\file\Tests;
 /**
  * Tests the file_save_data() function.
  */
-class SaveDataTest extends FileHookTestBase {
+class SaveDataTest extends FileManagedTestBase {
   public static function getInfo() {
     return array(
       'name' => 'File save data',

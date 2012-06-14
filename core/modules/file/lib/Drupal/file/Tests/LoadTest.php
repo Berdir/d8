@@ -10,7 +10,7 @@ namespace Drupal\file\Tests;
 /**
  * Tests the file_load() function.
  */
-class LoadTest extends FileHookTestBase {
+class LoadTest extends FileManagedTestBase {
   public static function getInfo() {
     return array(
       'name' => 'File loading',

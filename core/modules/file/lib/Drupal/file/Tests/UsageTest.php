@@ -2,20 +2,20 @@
 
 /**
  * @file
- * Definition of Drupal\system\Tests\File\UsageTest.
+ * Definition of Drupal\file\Tests\UsageTest.
  */
 
-namespace Drupal\system\Tests\File;
+namespace Drupal\file\Tests;
 
 /**
  * Tests file usage functions.
  */
-class UsageTest extends FileTestBase {
+class UsageTest extends FileManagedTestBase {
   public static function getInfo() {
     return array(
       'name' => 'File usage',
       'description' => 'Tests the file usage functions.',
-      'group' => 'File',
+      'group' => 'File API',
     );
   }
 
