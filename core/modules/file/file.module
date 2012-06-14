@@ -6,7 +6,7 @@
  */
 
 use Drupal\entity\EntityFieldQuery;
-use Drupal\Core\File\File;
+use Drupal\file\File\File;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 // Load all Field module hooks for File.
@@ -791,7 +791,7 @@ function theme_file_icon($variables) {
 /**
  * Creates a URL to the icon for a file entity.
  *
- * @param Drupal\Core\File\File $file
+ * @param Drupal\file\File\File $file
  *   A file entity.
  * @param $icon_directory
  *   (optional) A path to a directory of icons to be used for files. Defaults to
@@ -810,7 +810,7 @@ function file_icon_url(File $file, $icon_directory = NULL) {
 /**
  * Creates a path to the icon for a file entity.
  *
- * @param Drupal\Core\File\File $file
+ * @param Drupal\file\File\File $file
  *   A file entity.
  * @param $icon_directory
  *   (optional) A path to a directory of icons to be used for files. Defaults to
@@ -863,7 +863,7 @@ function file_icon_path(File $file, $icon_directory = NULL) {
 /**
  * Determines the generic icon MIME package based on a file's MIME type.
  *
- * @param Drupal\Core\File\File $file
+ * @param Drupal\file\File\File $file
  *   A file entity.
  *
  * @return
@@ -995,7 +995,7 @@ function file_icon_map(File $file) {
 /**
  * Retrieves a list of references to a file.
  *
- * @param Drupal\Core\File\File $file
+ * @param Drupal\file\File\File $file
  *   A file entity.
  * @param $field
  *   (optional) A field array to be used for this check. If given, limits the

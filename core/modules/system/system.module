@@ -277,8 +277,8 @@ function system_entity_info() {
     'file' => array(
       'label' => t('File'),
       'base table' => 'file_managed',
-      'controller class' => 'Drupal\Core\File\FileStorageController',
-      'entity class' => 'Drupal\Core\File\File',
+      'controller class' => 'Drupal\file\File\FileStorageController',
+      'entity class' => 'Drupal\file\File\File',
       'entity keys' => array(
         'id' => 'fid',
         'label' => 'filename',
@@ -1929,7 +1929,7 @@ function _system_themes_access($theme) {
  * as a Batch API processing page, if the operation requires a batch.
  *
  * @see authorize.php
- * @see Drupal\Core\FileTransfer\FileTransfer
+ * @see Drupal\file\FileTransfer\FileTransfer
  * @see hook_filetransfer_info()
  */
 
@@ -2051,7 +2051,7 @@ function system_filetransfer_info() {
   if (function_exists('ftp_connect')) {
     $backends['ftp'] = array(
       'title' => t('FTP'),
-      'class' => 'Drupal\Core\FileTransfer\FTP',
+      'class' => 'Drupal\file\FileTransfer\FTP',
       'weight' => 0,
     );
   }
@@ -2061,7 +2061,7 @@ function system_filetransfer_info() {
   if (function_exists('ssh2_connect')) {
     $backends['ssh'] = array(
       'title' => t('SSH'),
-      'class' => 'Drupal\Core\FileTransfer\SSH',
+      'class' => 'Drupal\file\FileTransfer\SSH',
       'weight' => 20,
     );
   }

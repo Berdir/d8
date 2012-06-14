@@ -9,7 +9,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Drupal\Core\StreamWrapper\LocalStream;
-use Drupal\Core\File\File;
+use Drupal\file\File\File;
 
 /**
  * Stream wrapper bit flags that are the basis for composite types.
@@ -601,7 +601,7 @@ function file_load_multiple(array $fids = NULL) {
  * @param $fid
  *   A file ID.
  *
- * @return Drupal\Core\File\File
+ * @return Drupal\file\File\File
  *   A file entity or FALSE if the file was not found.
  *
  * @see hook_file_load()
@@ -615,7 +615,7 @@ function file_load($fid) {
 /**
  * Determines where a file is used.
  *
- * @param Drupal\Core\File\File $file
+ * @param Drupal\file\File\File $file
  *   A file entity.
  *
  * @return
@@ -649,7 +649,7 @@ function file_usage_list(File $file) {
  * - The User module associates an image with a user, so $type would be 'user'
  *   and the $id would be the user's uid.
  *
- * @param Drupal\Core\File\File $file
+ * @param Drupal\file\File\File $file
  *   A file entity.
  * @param $module
  *   The name of the module using the file.
@@ -685,7 +685,7 @@ function file_usage_add(File $file, $module, $type, $id, $count = 1) {
 /**
  * Removes a record to indicate that a module is no longer using a file.
  *
- * @param Drupal\Core\File\File $file
+ * @param Drupal\file\File\File $file
  *   A file entity.
  * @param $module
  *   The name of the module using the file.
@@ -756,7 +756,7 @@ function file_usage_delete(File $file, $module, $type = NULL, $id = NULL, $count
  *   temporary file, the resulting file will also be a temporary file. See
  *   file_save_upload() for details on temporary files.
  *
- * @param Drupal\Core\File\File $source
+ * @param Drupal\file\File\File $source
  *   A file entity.
  * @param $destination
  *   A string containing the destination that $source should be copied to.
@@ -1003,7 +1003,7 @@ function file_destination($destination, $replace) {
  *   replace the file or rename the file based on the $replace parameter.
  * - Adds the new file to the files database.
  *
- * @param Drupal\Core\File\File $source
+ * @param Drupal\file\File\File $source
  *   A file entity.
  * @param $destination
  *   A string containing the destination that $source should be moved to.
@@ -1019,7 +1019,7 @@ function file_destination($destination, $replace) {
  *       unique.
  *   - FILE_EXISTS_ERROR - Do nothing and return FALSE.
  *
- * @return Drupal\Core\File\File
+ * @return Drupal\file\File\File
  *   Resulting file entity for success, or FALSE in the event of an error.
  *
  * @see file_unmanaged_move()
@@ -1621,7 +1621,7 @@ function drupal_move_uploaded_file($filename, $uri) {
  * After executing the validator callbacks specified hook_file_validate() will
  * also be called to allow other modules to report errors about the file.
  *
- * @param Drupal\Core\File\File $file
+ * @param Drupal\file\File\File $file
  *   A file entity.
  * @param $validators
  *   An optional, associative array of callback functions used to validate the
@@ -1653,7 +1653,7 @@ function file_validate(File $file, $validators = array()) {
 /**
  * Checks for files with names longer than can be stored in the database.
  *
- * @param Drupal\Core\File\File $file
+ * @param Drupal\file\File\File $file
  *   A file entity.
  *
  * @return
@@ -1674,7 +1674,7 @@ function file_validate_name_length(File $file) {
 /**
  * Checks that the filename ends with an allowed extension.
  *
- * @param Drupal\Core\File\File $file
+ * @param Drupal\file\File\File $file
  *   A file entity.
  * @param $extensions
  *   A string with a space separated list of allowed extensions.
@@ -1700,7 +1700,7 @@ function file_validate_extensions(File $file, $extensions) {
  *
  * This check is not enforced for the user #1.
  *
- * @param Drupal\Core\File\File $file
+ * @param Drupal\file\File\File $file
  *   A file entity.
  * @param $file_limit
  *   An integer specifying the maximum file size in bytes. Zero indicates that
@@ -1737,7 +1737,7 @@ function file_validate_size(File $file, $file_limit = 0, $user_limit = 0) {
 /**
  * Checks that the file is recognized by image_get_info() as an image.
  *
- * @param Drupal\Core\File\File $file
+ * @param Drupal\file\File\File $file
  *   A file entity.
  *
  * @return
@@ -1762,7 +1762,7 @@ function file_validate_is_image(File $file) {
  * Non-image files will be ignored. If a image toolkit is available the image
  * will be scaled to fit within the desired maximum dimensions.
  *
- * @param Drupal\Core\File\File $file
+ * @param Drupal\file\File\File $file
  *   A file entity. This function may resize the file affecting its size.
  * @param $maximum_dimensions
  *   An optional string in the form WIDTHxHEIGHT e.g. '640x480' or '85x85'. If
@@ -1831,7 +1831,7 @@ function file_validate_image_resolution(File $file, $maximum_dimensions = 0, $mi
  *       unique.
  *   - FILE_EXISTS_ERROR - Do nothing and return FALSE.
  *
- * @return Drupal\Core\File\File
+ * @return Drupal\file\File\File
  *   A file entity, or FALSE on error.
  *
  * @see file_unmanaged_save_data()
@@ -2452,7 +2452,7 @@ function file_directory_temp() {
 /**
  * Examines a file entity and returns appropriate content headers for download.
  *
- * @param Drupal\Core\File\File $file
+ * @param Drupal\file\File\File $file
  *   A file entity.
  *
  * @return
