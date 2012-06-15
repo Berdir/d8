@@ -44,7 +44,7 @@ class BulkDeleteTest extends FieldTestBase {
   function _generateStubEntities($entity_type, $entities, $field_name = NULL) {
     $stubs = array();
     foreach ($entities as $id => $entity) {
-      $stub = entity_create_stub_entity($entity_type, entity_extract_ids($entity_type, $entity));
+      $stub = entity_create_entity($entity_type, entity_extract_ids($entity_type, $entity));
       if (isset($field_name)) {
         $stub->{$field_name} = $entity->{$field_name};
       }
@@ -122,7 +122,7 @@ class BulkDeleteTest extends FieldTestBase {
       }
 
       for ($i = 0; $i < 10; $i++) {
-        $entity = field_test_create_stub_entity($id, $id, $bundle);
+        $entity = field_test_create_entity($id, $id, $bundle);
         foreach ($this->fields as $field) {
           $entity->{$field['field_name']}[LANGUAGE_NOT_SPECIFIED] = $this->_generateTestFieldValues($field['cardinality']);
         }

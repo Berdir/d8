@@ -28,7 +28,7 @@ class TermStorageController extends DatabaseStorageController {
     // bundle key.
     // @todo Move to Term::bundle() once field API has been converted
     //   to make use of it.
-    if (!isset($entity->vocabulary_machine_name)) {
+    if (!isset($entity->vocabulary_machine_name) && isset($entity->vid)) {
       $vocabulary = taxonomy_vocabulary_load($entity->vid);
       $entity->vocabulary_machine_name = $vocabulary->machine_name;
     }

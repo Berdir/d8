@@ -33,7 +33,7 @@ class EntityPropertiesTest extends FieldTestBase {
       'test_entity_label_callback',
     );
 
-    $entity = field_test_create_stub_entity();
+    $entity = field_test_create_entity();
 
     foreach ($entity_types as $entity_type) {
       $label = entity_create($entity_type, (array) $entity)->label();

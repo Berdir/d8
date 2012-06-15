@@ -163,9 +163,10 @@ function entity_extract_ids($entity_type, $entity) {
 }
 
 /**
- * Assembles an object structure with initial IDs.
+ * Assembles a partial entity structure with initial IDs.
  *
- * This function can be seen as reciprocal to entity_extract_ids().
+ * This can be used to create an entity based on the returned values of an
+ * EntityFieldQuery.
  *
  * @param $entity_type
  *   The entity type; e.g. 'node' or 'user'.
@@ -177,20 +178,20 @@ function entity_extract_ids($entity_type, $entity) {
  *   - 2: Bundle name of the entity, or NULL if $entity_type has no bundles.
  *
  * @return
- *   An entity object, initialized with the IDs provided.
+ *   An entity, initialized with the IDs provided.
  */
-function entity_create_stub_entity($entity_type, $ids) {
-  $entity = new stdClass();
+function entity_create_from_ids($entity_type, $ids) {
+  $id_properties = array();
   $info = entity_get_info($entity_type);
-  $entity->{$info['entity keys']['id']} = $ids[0];
+  $id_properties[$info['entity keys']['id']] = $ids[0];
   if (!empty($info['entity keys']['revision']) && isset($ids[1])) {
-    $entity->{$info['entity keys']['revision']} = $ids[1];
+    $id_properties[$info['entity keys']['revision']] = $ids[1];
   }
   if (!empty($info['entity keys']['bundle']) && isset($ids[2])) {
-    $entity->{$info['entity keys']['bundle']} = $ids[2];
+    $id_properties[$info['entity keys']['bundle']] = $ids[2];
   }
-  return $entity;
-}
+  return entity_create($entity_type, $id_properties);
+ }
 
 /**
  * Loads an entity from the database.
