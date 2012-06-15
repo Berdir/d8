@@ -15,6 +15,10 @@ class EntityProperty implements EntityPropertyInterface {
   // Numerically indexed array of PropertyContainer objects
   protected $list;
 
+  public function __construct($list = array()) {
+    $this->list = $list;
+  }
+
 
   public function access($account) {
     // TODO: Implement access() method. Use item access.
@@ -66,7 +70,7 @@ class EntityProperty implements EntityPropertyInterface {
    * Delegate.
    */
   public function __get($name) {
-    return $this[0][$name];
+    return $this[0]->$name;
   }
 
   /**
@@ -94,6 +98,6 @@ class EntityProperty implements EntityPropertyInterface {
    * Delegate.
    */
   public function __set($name, $value) {
-    // TODO: Implement __set() method.
+    $this[0]->$name = $value;
   }
 }

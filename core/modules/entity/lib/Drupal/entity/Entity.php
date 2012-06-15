@@ -273,6 +273,7 @@ class Entity implements EntityInterface {
   public function getPropertyDefinitions() {
     // TODO: Implement getPropertyDefinitions() method.
     // add in field api properties if entity is fieldable
+    return array();
   }
 
   public function __get($name) {
