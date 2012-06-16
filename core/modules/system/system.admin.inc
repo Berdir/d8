@@ -702,32 +702,34 @@ function system_theme_settings_submit($form, &$form_state) {
 
   // If the user uploaded a new logo or favicon, save it to a permanent location
   // and use it in place of the default theme-provided file.
-  if ($file = $values['logo_upload']) {
-    unset($values['logo_upload']);
-    $filename = file_unmanaged_copy($file->uri);
-    $values['default_logo'] = 0;
-    $values['logo_path'] = $filename;
-    $values['toggle_logo'] = 1;
-  }
-  if ($file = $values['favicon_upload']) {
-    unset($values['favicon_upload']);
-    $filename = file_unmanaged_copy($file->uri);
-    $values['default_favicon'] = 0;
-    $values['favicon_path'] = $filename;
-    $values['toggle_favicon'] = 1;
-  }
+  if (module_exists('file')) {
+    if ($file = $values['logo_upload']) {
+      unset($values['logo_upload']);
+      $filename = file_unmanaged_copy($file->uri);
+      $values['default_logo'] = 0;
+      $values['logo_path'] = $filename;
+      $values['toggle_logo'] = 1;
+    }
+    if ($file = $values['favicon_upload']) {
+      unset($values['favicon_upload']);
+      $filename = file_unmanaged_copy($file->uri);
+      $values['default_favicon'] = 0;
+      $values['favicon_path'] = $filename;
+      $values['toggle_favicon'] = 1;
+    }
 
-  // If the user entered a path relative to the system files directory for
-  // a logo or favicon, store a public:// URI so the theme system can handle it.
-  if (!empty($values['logo_path'])) {
-    $values['logo_path'] = _system_theme_settings_validate_path($values['logo_path']);
-  }
-  if (!empty($values['favicon_path'])) {
-    $values['favicon_path'] = _system_theme_settings_validate_path($values['favicon_path']);
-  }
+    // If the user entered a path relative to the system files directory for
+    // a logo or favicon, store a public:// URI so the theme system can handle it.
+    if (!empty($values['logo_path'])) {
+      $values['logo_path'] = _system_theme_settings_validate_path($values['logo_path']);
+    }
+    if (!empty($values['favicon_path'])) {
+      $values['favicon_path'] = _system_theme_settings_validate_path($values['favicon_path']);
+    }
 
-  if (empty($values['default_favicon']) && !empty($values['favicon_path'])) {
-    $values['favicon_mimetype'] = file_get_mimetype($values['favicon_path']);
+    if (empty($values['default_favicon']) && !empty($values['favicon_path'])) {
+      $values['favicon_mimetype'] = file_get_mimetype($values['favicon_path']);
+    }
   }
 
   variable_set($key, $values);
