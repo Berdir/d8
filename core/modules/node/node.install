@@ -27,6 +27,13 @@ function node_schema() {
         'not null' => FALSE,
         'default' => NULL,
       ),
+      'uuid' => array(
+        'description' => 'The universally unique identifier for a node.',
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => '',
+      ),
       'type' => array(
         'description' => 'The {node_type}.type of this node.',
         'type' => 'varchar',
@@ -114,6 +121,7 @@ function node_schema() {
       'uid'                 => array('uid'),
       'tnid'                => array('tnid'),
       'translate'           => array('translate'),
+      'uuid'                => array('uuid'),
     ),
     'unique keys' => array(
       'vid' => array('vid'),
@@ -565,6 +573,27 @@ function node_update_8003() {
     }
     variable_del('node_type_language_' . $type);
   }
+}
+
+/**
+ * Create a UUID column for node table.
+ *
+ * @todo UUID upgrade path on existing records: http://drupal.org/node/1642526
+ */
+function node_update_8004() {
+  db_add_field('node', 'uuid', array(
+      'description' => 'The universally unique identifier for a node.',
+      'type' => 'varchar',
+      'length' => 128,
+      'not null' => TRUE,
+      'default' => '',
+    ),
+    array(
+      'indexes' => array(
+        'uuid' => array('uuid'),
+      )
+    )
+  );
 }
 
 /**

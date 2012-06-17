@@ -217,6 +217,54 @@ function entity_load($entity_type, $id, $reset = FALSE) {
 }
 
 /**
+ * Load entity from the database by given UUID.
+ *
+ * If an entity type supports a UUID-type entity identifier, this function can
+ * find an entity by that UUID-type entity identifier.
+ * Not all entities support that kind of UUID-type entity identifier
+ * (which can be defined in hook_entity_info).
+ *
+ * @param string $entity_type
+ *   The entity type to load, e.g. node or user.
+ * @param string $uuid
+ *   The uuid of the entity to load.
+ * @param bool $reset
+ *   Whether to reset the internal cache for the requested entity type.
+ *
+ * @return EntityInterface|FALSE
+ *   The entity object, or FALSE if there is no entity with the given UUID.
+ *
+ * @see hook_entity_info()
+ *
+ */
+function entity_load_by_uuid($entity_type, $uuid, $reset = FALSE) {
+  $entity = FALSE;
+
+  // Only consider entities that have a "uuid"-type key declared via
+  // hook_entity_info.
+  $entity_info = entity_get_info($entity_type);
+  if (is_array($entity_info) && isset($entity_info['entity keys']) && isset($entity_info['entity keys']['uuid'])) {
+    $uuid_key_name = $entity_info['entity keys']['uuid'];
+
+    // Retrieve entity record for given uuid to get its entity id.
+    $entity_query = new Drupal\entity\EntityFieldQuery();
+    $entity_query_result = $entity_query->entityCondition('entity_type', $entity_type)
+      ->propertyCondition($uuid_key_name, $uuid)
+      ->range(0, 1)
+      ->execute();
+
+    // Mine result for entity id and load the entity by its id.
+    if (is_array($entity_query_result) && isset($entity_query_result[$entity_type])) {
+      $entity_ids = array_keys($entity_query_result[$entity_type]);
+      $entity_id = array_shift($entity_ids);
+      $entity = entity_load($entity_type, $entity_id, $reset);
+    }
+  }
+
+  return $entity;
+}
+
+/**
  * Loads multiple entities from the database.
  *
  * This function should be used whenever you need to load more than one entity

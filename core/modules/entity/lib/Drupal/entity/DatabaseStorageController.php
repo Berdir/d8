@@ -8,6 +8,7 @@
 namespace Drupal\entity;
 
 use PDO;
+use Drupal\Component\Uuid\Uuid;
 
 /**
  * Defines a base entity controller class.
@@ -59,6 +60,15 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
   protected $idKey;
 
   /**
+   * Name of entity's UUID database table field, if it supports UUIDs.
+   *
+   * Has the value FALSE if this entity does not use UUIDs.
+   *
+   * @var string
+   */
+  protected $uuidKey;
+
+  /**
    * Name of entity's revision database table field, if it supports revisions.
    *
    * Has the value FALSE if this entity does not use revisions.
@@ -94,6 +104,14 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
     $this->entityCache = array();
     $this->hookLoadArguments = array();
     $this->idKey = $this->entityInfo['entity keys']['id'];
+
+    // Check if the entity type supports UUIDs.
+    if (!empty($this->entityInfo['entity keys']['uuid'])) {
+      $this->uuidKey = $this->entityInfo['entity keys']['uuid'];
+    }
+    else {
+      $this->uuidKey = FALSE;
+    }
 
     // Check if the entity type supports revisions.
     if (!empty($this->entityInfo['entity keys']['revision'])) {
@@ -366,7 +384,14 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
    */
   public function create(array $values) {
     $class = isset($this->entityInfo['entity class']) ? $this->entityInfo['entity class'] : 'Drupal\entity\Entity';
-    return new $class($values, $this->entityType);
+
+    $entity = new $class($values, $this->entityType);
+
+    // Generate and assign UUID.
+    $uuid = new Uuid();
+    $entity->uuid = $uuid->generate();
+
+    return $entity;
   }
 
   /**

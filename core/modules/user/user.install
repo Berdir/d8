@@ -132,6 +132,13 @@ function user_schema() {
         'description' => 'Primary Key: Unique user ID.',
         'default' => 0,
       ),
+      'uuid' => array(
+        'description' => 'The universally unique identifier for a user.',
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => '',
+      ),
       'name' => array(
         'type' => 'varchar',
         'length' => 60,
@@ -244,6 +251,7 @@ function user_schema() {
       'created' => array('created'),
       'mail' => array('mail'),
       'picture' => array('picture'),
+      'uuid' => array('uuid'),
     ),
     'unique keys' => array(
       'name' => array('name'),
@@ -439,6 +447,27 @@ function user_update_8002() {
     ->fields(array('rid' => DRUPAL_AUTHENTICATED_RID))
     ->condition('rid', 2)
     ->execute();
+}
+
+/**
+ * Create a UUID column for users table.
+ *
+ * @todo UUID upgrade path on existing records: http://drupal.org/node/1642526
+ */
+function user_update_8003() {
+  db_add_field('users', 'uuid', array(
+      'description' => 'The universally unique identifier for a user.',
+      'type' => 'varchar',
+      'length' => 128,
+      'not null' => TRUE,
+      'default' => '',
+    ),
+    array(
+      'indexes' => array(
+        'uuid' => array('uuid'),
+      )
+    )
+  );
 }
 
 /**

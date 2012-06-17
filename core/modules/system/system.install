@@ -866,6 +866,13 @@ function system_schema() {
         'unsigned' => TRUE,
         'not null' => TRUE,
       ),
+      'uuid' => array(
+        'description' => 'The universally unique identifier for a file.',
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => '',
+      ),
       'uid' => array(
         'description' => 'The {users}.uid of the user who is associated with the file.',
         'type' => 'int',
@@ -929,6 +936,7 @@ function system_schema() {
       'uid' => array('uid'),
       'status' => array('status'),
       'timestamp' => array('timestamp'),
+      'uuid' => array('uuid'),
     ),
     'unique keys' => array(
       'uri' => array('uri'),
@@ -1922,6 +1930,27 @@ function system_update_8010() {
     'feed_default_items' => 'feed_default_items',
     'feed_item_length' => 'feed_item_length',
   ));
+}
+
+/**
+ * Create a UUID column for file_managed table.
+ *
+ * @todo UUID upgrade path on existing records: http://drupal.org/node/1642526
+ */
+function system_update_8011() {
+  db_add_field('file_managed', 'uuid', array(
+      'description' => 'The universally unique identifier for a file.',
+      'type' => 'varchar',
+      'length' => 128,
+      'not null' => TRUE,
+      'default' => '',
+    ),
+    array(
+      'indexes' => array(
+        'uuid' => array('uuid'),
+      )
+    )
+  );
 }
 
 /**

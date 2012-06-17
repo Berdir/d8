@@ -32,6 +32,13 @@ function taxonomy_schema() {
         'not null' => TRUE,
         'description' => 'Primary Key: Unique term ID.',
       ),
+      'uuid' => array(
+        'description' => 'The universally unique identifier for a term.',
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => '',
+      ),
       'vid' => array(
         'type' => 'int',
         'unsigned' => TRUE,
@@ -85,6 +92,7 @@ function taxonomy_schema() {
       'taxonomy_tree' => array('vid', 'weight', 'name'),
       'vid_name' => array('vid', 'name'),
       'name' => array('name'),
+      'uuid' => array('uuid'),
     ),
   );
 
@@ -299,4 +307,25 @@ function taxonomy_update_8001() {
       db_add_field($table, 'langcode', $langcode_field);
     }
   }
+}
+
+/**
+ * Create a UUID column for taxonomy_term_data table.
+ *
+ * @todo UUID upgrade path on existing records: http://drupal.org/node/1642526
+ */
+function taxonomy_update_8002() {
+  db_add_field('taxonomy_term_data', 'uuid', array(
+      'description' => 'The universally unique identifier for a term.',
+      'type' => 'varchar',
+      'length' => 128,
+      'not null' => TRUE,
+      'default' => '',
+    ),
+    array(
+      'indexes' => array(
+        'uuid' => array('uuid'),
+      )
+    )
+  );
 }
