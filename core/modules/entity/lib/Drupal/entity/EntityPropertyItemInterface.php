@@ -24,5 +24,5 @@ interface EntityPropertyItemInterface extends PropertyContainerInterface {
    *
    * @return EntityInterface|mixed
    */
-  public function get($name);
+  public function get($property_name);
 }

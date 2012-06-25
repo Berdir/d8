@@ -33,7 +33,7 @@ interface PropertyContainerInterface extends IteratorAggregate  {
    */
   public function getRawValue($property_name);
 
-  public function set($name, $value);
+  public function set($property_name, $value);
 
   public function __get($name);
 

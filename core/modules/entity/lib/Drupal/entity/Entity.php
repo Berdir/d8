@@ -6,6 +6,8 @@
  */
 
 namespace Drupal\entity;
+use \Drupal\Core\Property\PropertyTypeContainerInterface;
+use \Drupal\Core\Property\PropertyContainerInterface;
 
 /**
  * Defines a base entity class.
@@ -39,13 +41,44 @@ class Entity implements EntityInterface {
   protected $enforceIsNew;
 
   /**
+   * The raw data values of the contained properties.
+   *
+   * @var array
+   */
+  protected $values = array();
+
+  /**
+   * The property's data type plugin.
+   *
+   * @var \Drupal\Core\Property\PropertyTypeContainerInterface
+   */
+  protected $dataType;
+
+
+  /**
    * Constructs a new entity object.
    */
-  public function __construct(array $values = array(), $entity_type) {
+  public function __construct(array $values, $entity_type) {
     $this->entityType = $entity_type;
     // Set initial values.
     foreach ($values as $key => $value) {
       $this->$key = $value;
+    }
+
+    // @todo: Use dependency injection.
+    $this->dataType = drupal_get_property_type_plugin('entity');
+    $this->values = $values;
+
+    // Set up initial references for primitives upon creation.
+    $data_types = drupal_get_data_type_info();
+    foreach ($this->getPropertyDefinitions() as $name => $definition) {
+      if (!($data_types[$definition['type']]['class'] instanceof PropertyTypeContainerInterface)) {
+
+        if (!isset($this->values[$name])) {
+          $this->values[$name] = NULL;
+        }
+        $this->$name = & $this->values[$name];
+      }
     }
   }
 
@@ -165,57 +198,74 @@ class Entity implements EntityInterface {
     return $languages;
   }
 
+  public function getRawValue($property_name, $langcode = NULL) {
+    $langcode = isset($langcode) ? $langcode : $this->langcode;
+    return isset($this->values[$property_name][$langcode]) ? $this->values[$property_name][$langcode] : NULL;
+  }
+
   /**
    * Implements EntityInterface::get().
    */
   public function get($property_name, $langcode = NULL) {
-    // Handle fields.
-    $entity_info = $this->entityInfo();
-    if ($entity_info['fieldable'] && field_info_instance($this->entityType, $property_name, $this->bundle())) {
-      $field = field_info_field($property_name);
-      $langcode = $this->getFieldLangcode($field, $langcode);
-      return isset($this->{$property_name}[$langcode]) ? $this->{$property_name}[$langcode] : NULL;
+    // @todo: What about possible name clashes?
+    if (!property_exists($this, $property_name) || isset($langcode)) {
+
+      $langcode = isset($langcode) ? $langcode : $this->langcode;
+      $value_ref = & $this->values[$property_name][$langcode];
+
+      // Primitive properties already exist, so this must be a property
+      // container. @see self::__construct()
+      if ($definition = $this->dataType->getPropertyDefinition($property_name)) {
+        $this->$property_name = drupal_get_property_type_plugin($definition['type'])->createItem($definition, $value_ref);
+      }
+      // Add BC for not yet converted stuff.
+      else {
+        $this->$property_name = & $this->values[$property_name];
+      }
     }
-    else {
-      // Handle properties being not fields.
-      // @todo: Add support for translatable properties being not fields.
-      return isset($this->{$property_name}) ? $this->{$property_name} : NULL;
-    }
+    return $this->$property_name;
   }
 
   /**
    * Implements EntityInterface::set().
    */
   public function set($property_name, $value, $langcode = NULL) {
-    // Handle fields.
-    $entity_info = $this->entityInfo();
-    if ($entity_info['fieldable'] && field_info_instance($this->entityType, $property_name, $this->bundle())) {
-      $field = field_info_field($property_name);
-      $langcode = $this->getFieldLangcode($field, $langcode);
-      $this->{$property_name}[$langcode] = $value;
+    $definition = $this->dataType->getPropertyDefinition($property_name);
+
+    // Add BC for not yet converted stuff.
+    if (!$definition) {
+      $this->values[$property_name] = $value;
+      $this->$property_name = & $this->values[$property_name];
+      return;
+    }
+
+    $data_type = drupal_get_property_type_plugin($definition['type']);
+    $langcode = isset($langcode) ? $langcode : $this->langcode;
+    $value_ref = & $this->values[$property_name][$langcode];
+
+    if ($data_type instanceof PropertyTypeContainerInterface) {
+      // Transform container objects back to raw values before setting if
+      // necessary. Support passing in raw values as well.
+      // @todo: Needs tests.
+      if ($value instanceof PropertyContainerInterface) {
+        $value = $data_type->getRawValue($definition, $value);
+      }
+      $value_ref = $value;
+      unset($this->$property_name);
     }
     else {
-      // Handle properties being not fields.
-      // @todo: Add support for translatable properties being not fields.
-      $this->{$property_name} = $value;
+      // Just update the internal value. $this->$name is a reference on it, so
+      // it will automatically reflect the update too.
+      $value_ref = $value;
     }
   }
 
-  /**
-   * Determines the language code to use for accessing a field value in a certain language.
-   */
-  protected function getFieldLangcode($field, $langcode = NULL) {
-    // Only apply the given langcode if the entity is language-specific.
-    // Otherwise translatable fields are handled as non-translatable fields.
-    if (field_is_translatable($this->entityType, $field) && ($default_language = $this->language())) {
-      // For translatable fields the values in default language are stored using
-      // the language code of the default language.
-      return isset($langcode) ? $langcode : $default_language->langcode;
-    }
-    else {
-      // Non-translatable fields always use LANGUAGE_NOT_SPECIFIED.
-      return LANGUAGE_NOT_SPECIFIED;
-    }
+  public function __get($name) {
+    return $this->get($name);
+  }
+
+  public function __set($name, $value) {
+    $this->set($name, $value);
   }
 
   /**
@@ -254,8 +304,21 @@ class Entity implements EntityInterface {
     // TODO: Implement getIterator() method.
   }
 
-  public function getRawValue($property_name, $langcode = NULL) {
-    // TODO: Implement getRawValue() method.
+  public function getProperties() {
+    // TODO: Implement getProperties() method.
+  }
+
+  public function getPropertyDefinition($name) {
+    $definitions = $this->getPropertyDefinitions();
+    return isset($definitions[$name]) ? $definitions[$name] : FALSE;
+  }
+
+  public function getPropertyDefinitions() {
+    return $this->dataType->getPropertyDefinitions(array(
+      'type' => 'entity',
+      'entity type' => $this->entityType,
+      'bundle' => $this->bundle(),
+    ));
   }
 
   public function access($account) {
@@ -264,23 +327,5 @@ class Entity implements EntityInterface {
 
   public function validate() {
     // TODO: Implement validate() method.
-  }
-
-  public function getProperties() {
-    // TODO: Implement getProperties() method.
-  }
-
-  public function getPropertyDefinitions() {
-    // TODO: Implement getPropertyDefinitions() method.
-    // add in field api properties if entity is fieldable
-    return array();
-  }
-
-  public function __get($name) {
-    // TODO: Implement __get() method.
-  }
-
-  public function __set($name, $value) {
-    // TODO: Implement __set() method.
   }
 }

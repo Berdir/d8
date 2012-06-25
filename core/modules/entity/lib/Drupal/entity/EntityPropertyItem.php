@@ -55,23 +55,23 @@ class EntityPropertyItem implements EntityPropertyItemInterface {
     }
   }
 
-  public function getRawValue($name) {
-    return isset($this->values[$name]) ? $this->values[$name] : NULL;
+  public function getRawValue($property_name) {
+    return isset($this->values[$property_name]) ? $this->values[$property_name] : NULL;
   }
 
-  public function get($name) {
+  public function get($property_name) {
     // @todo: What about possible name clashes?
-    if (!property_exists($this, $name)) {
+    if (!property_exists($this, $property_name)) {
       // Primitive properties already exist, so this must be a property
       // container. @see self::__construct()
-      $definition = $this->dataType->getPropertyDefinition($name);
-      $this->$name = drupal_get_property_type_plugin($definition['type'])->createItem($definition, $this->values[$name]);
+      $definition = $this->dataType->getPropertyDefinition($property_name);
+      $this->$property_name = drupal_get_property_type_plugin($definition['type'])->createItem($definition, $this->values[$property_name]);
     }
-    return $this->$name;
+    return $this->$property_name;
   }
 
-  public function set($name, $value) {
-    $definition = $this->dataType->getPropertyDefinition($name);
+  public function set($property_name, $value) {
+    $definition = $this->dataType->getPropertyDefinition($property_name);
     $data_type = drupal_get_property_type_plugin($definition['type']);
 
     if ($data_type instanceof PropertyTypeContainerInterface) {
@@ -79,18 +79,15 @@ class EntityPropertyItem implements EntityPropertyItemInterface {
       // necessary. Support passing in raw values as well.
       // @todo: Needs tests.
       if ($value instanceof PropertyContainerInterface) {
-        $this->values[$name] = $data_type->getRawValue($definition, $value);
-        $this->$name = $value;
+        $value = $data_type->getRawValue($definition, $value);
       }
-      else {
-        $this->values[$name] = $value;
-        unset($this->$name);
-      }
+      $this->values[$property_name] = $value;
+      unset($this->$property_name);
     }
     else {
       // Just update the internal value. $this->$name is a reference on it, so
       // it will automatically reflect the update too.
-      $this->values[$name] = $value;
+      $this->values[$property_name] = $value;
     }
   }
 
@@ -115,8 +112,6 @@ class EntityPropertyItem implements EntityPropertyItemInterface {
     return isset($definitions[$name]) ? $definitions[$name] : FALSE;
   }
 
-  // @todo: Add accessor to a single definition as well as the definition of the
-  // represented property.
   public function getPropertyDefinitions() {
     return $this->dataType->getPropertyDefinitions($this->definition);
   }
