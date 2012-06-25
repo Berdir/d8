@@ -510,5 +510,11 @@ function entity_data_type_info() {
       'description' => t('All kind of entities, e.g. nodes, comments or users.'),
       'class' => '\Drupal\entity\PropertyTypeEntity',
     ),
+    'text_item' => array(
+      'label' => t('Text item'),
+      'description' => t('An entity property containing a textual value.'),
+      'class' => '\Drupal\entity\PropertyTypeTextItem',
+    ),
   );
 }
+

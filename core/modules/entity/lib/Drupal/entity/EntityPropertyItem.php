@@ -10,7 +10,9 @@ use \Drupal\Core\Property\PropertyTypeContainerInterface;
 use \Drupal\Core\Property\PropertyContainerInterface;
 
 /**
- * A list of PropertyContainer items.
+ * An entity property item.
+ *
+ * @see EntityPropertyItemInterface
  */
 class EntityPropertyItem implements EntityPropertyItemInterface {
 

@@ -9,10 +9,11 @@ namespace Drupal\entity;
 use Drupal\Core\Property\PropertyContainerInterface;
 
 /**
- * Interface for property items, which is a property container that may contain
- * only primitives and entity references.
+ * Interface for entity property items, which are property container that may
+ * contain only primitives and entity references.
  *
- * This is required for properties of the item's of an entity property list.
+ * @see EntityProperty
+ * @see EntityPropertyItem
  */
 interface EntityPropertyItemInterface extends PropertyContainerInterface {
 
