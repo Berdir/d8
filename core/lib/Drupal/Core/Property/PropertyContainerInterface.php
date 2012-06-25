@@ -23,19 +23,14 @@ interface PropertyContainerInterface extends IteratorAggregate  {
 
   public function getProperties();
 
+  public function getPropertyDefinition($name);
+
   public function getPropertyDefinitions();
 
-  public function get($name);
+/*
+ * Commented out for now as it creates problems for entities.
+ *
+ *   public function __get($name);
 
-  /**
-   * Gets the raw value, i.e. the id of the entity in case of entity references,
-   * or the plain data of fields.
-   */
-  public function getRawValue($property_name);
-
-  public function set($property_name, $value);
-
-  public function __get($name);
-
-  public function __set($name, $value);
+   public function __set($name, $value);*/
 }

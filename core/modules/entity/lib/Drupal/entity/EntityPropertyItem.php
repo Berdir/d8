@@ -66,14 +66,14 @@ class EntityPropertyItem implements EntityPropertyItemInterface {
     if (!property_exists($this, $property_name)) {
       // Primitive properties already exist, so this must be a property
       // container. @see self::__construct()
-      $definition = $this->dataType->getPropertyDefinition($property_name);
+      $definition = $this->getPropertyDefinition($property_name);
       $this->$property_name = drupal_get_property_type_plugin($definition['type'])->getProperty($definition, $this->values[$property_name]);
     }
     return $this->$property_name;
   }
 
   public function set($property_name, $value) {
-    $definition = $this->dataType->getPropertyDefinition($property_name);
+    $definition = $this->getPropertyDefinition($property_name);
     $data_type = drupal_get_property_type_plugin($definition['type']);
 
     if ($data_type instanceof PropertyTypeContainerInterface) {

@@ -211,12 +211,15 @@ class Entity implements EntityInterface {
     if (!property_exists($this, $property_name) || isset($langcode)) {
 
       $langcode = isset($langcode) ? $langcode : $this->langcode;
-      $value_ref = & $this->values[$property_name][$langcode];
 
       // Primitive properties already exist, so this must be a property
       // container. @see self::__construct()
-      if ($definition = $this->dataType->getPropertyDefinition($property_name)) {
-        $this->$property_name = drupal_get_property_type_plugin($definition['type'])->getProperty($definition, $value_ref);
+      if ($definition = $this->getPropertyDefinition($property_name)) {
+
+        if (!isset($this->values[$property_name][$langcode])) {
+          $this->values[$property_name][$langcode] = NULL;
+        }
+        $this->$property_name = drupal_get_property_type_plugin($definition['type'])->getProperty($definition, $this->values[$property_name][$langcode]);
       }
       // Add BC for not yet converted stuff.
       else {
@@ -230,12 +233,13 @@ class Entity implements EntityInterface {
    * Implements EntityInterface::set().
    */
   public function set($property_name, $value, $langcode = NULL) {
-    $definition = $this->dataType->getPropertyDefinition($property_name);
+
+    $definition = $this->getPropertyDefinition($property_name);
 
     // Add BC for not yet converted stuff.
     if (!$definition) {
+
       $this->values[$property_name] = $value;
-      $this->$property_name = & $this->values[$property_name];
       return;
     }
 
@@ -260,13 +264,13 @@ class Entity implements EntityInterface {
     }
   }
 
-  public function __get($name) {
+/*  public function __get($name) {
     return $this->get($name);
   }
 
   public function __set($name, $value) {
     $this->set($name, $value);
-  }
+  }*/
 
   /**
    * Implements EntityInterface::save().
@@ -314,6 +318,12 @@ class Entity implements EntityInterface {
   }
 
   public function getPropertyDefinitions() {
+    // This is necessary as PDO writes values before calling __construct().
+    // @todo: Fix and remove this.
+    if (!isset($this->dataType)) {
+      $this->dataType = drupal_get_property_type_plugin('entity');
+    }
+
     return $this->dataType->getPropertyDefinitions(array(
       'type' => 'entity',
       'entity type' => $this->entityType,

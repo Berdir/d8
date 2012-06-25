@@ -184,11 +184,6 @@ interface EntityInterface extends PropertyContainerInterface {
    */
   public function entityInfo();
 
-
-
-
-
-
   /**
    * Returns the raw value of an entity property.
    *

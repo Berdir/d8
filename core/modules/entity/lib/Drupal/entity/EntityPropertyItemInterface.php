@@ -26,4 +26,12 @@ interface EntityPropertyItemInterface extends PropertyContainerInterface {
    * @return EntityInterface|mixed
    */
   public function get($property_name);
+
+  /**
+   * Gets the raw value, i.e. the id of the entity in case of entity references,
+   * or the plain data of fields.
+   */
+  public function getRawValue($property_name);
+
+  public function set($property_name, $value);
 }
