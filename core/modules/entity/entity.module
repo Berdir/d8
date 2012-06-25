@@ -499,3 +499,16 @@ function entity_form_submit_build_entity($entity_type, $entity, $form, &$form_st
     field_attach_submit($entity_type, $entity, $form, $form_state);
   }
 }
+
+/**
+ * Implements hook_data_type_info().
+ */
+function entity_data_type_info() {
+  return array(
+    'entity' => array(
+      'label' => t('Entity'),
+      'description' => t('All kind of entities, e.g. nodes, comments or users.'),
+      'class' => '\Drupal\entity\PropertyTypeEntity',
+    ),
+  );
+}

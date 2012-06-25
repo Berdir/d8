@@ -20,24 +20,22 @@ interface PropertyTypeContainerInterface extends PropertyTypeInterface {
    *   entity reference property.
    */
   function getPropertyDefinitions(array $definition);
-  // Implementation for entities relies upon the Entity::getPropertyDefinition
-  // implementation.
 
   /**
-   * Create an item of the data type.
+   * Gets the property object given the raw value.
    *
    * @param array $definition
    *   The definition of the container's property, e.g. the definition of an
    *   entity reference property.
-   * @param array $values
-   *   An array of property values for creating the data item, or NULL if the
-   *   property is not set. The property values have to match their respective
-   *   definitions as returned from
-   *   PropertyTypeContainerInterface::getPropertyDefinitions().
+   * @param $value
+   *   The raw value of the property, or NULL if the property is not set. For
+   *   entity references the raw value is the entity ID, whereas for other
+   *   property containers it is usually an array of (raw) values matching the
+   *   definitions of the contained properties.
    *
    *  @return PropertyContainerInterface
    */
-  function createItem(array $definition, array $values = NULL);
+  function getProperty(array $definition, $value = NULL);
 
   /**
    * Gets the raw value of a property container object.

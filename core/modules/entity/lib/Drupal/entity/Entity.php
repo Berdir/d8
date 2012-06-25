@@ -216,7 +216,7 @@ class Entity implements EntityInterface {
       // Primitive properties already exist, so this must be a property
       // container. @see self::__construct()
       if ($definition = $this->dataType->getPropertyDefinition($property_name)) {
-        $this->$property_name = drupal_get_property_type_plugin($definition['type'])->createItem($definition, $value_ref);
+        $this->$property_name = drupal_get_property_type_plugin($definition['type'])->getProperty($definition, $value_ref);
       }
       // Add BC for not yet converted stuff.
       else {

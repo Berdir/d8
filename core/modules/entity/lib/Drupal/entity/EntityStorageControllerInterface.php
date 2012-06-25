@@ -88,4 +88,11 @@ interface EntityStorageControllerInterface {
    */
   public function save(EntityInterface $entity);
 
+  /**
+   * Defines the base properties of the entity type.
+   *
+   * @return array
+   *   An array of property defintions.
+   */
+  public function basePropertyDefinitions();
 }

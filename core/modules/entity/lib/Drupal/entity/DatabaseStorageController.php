@@ -496,4 +496,11 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
     // Invoke the respective entity-level hook.
     module_invoke_all('entity_' . $hook, $entity, $this->entityType);
   }
+
+  /**
+   * Implements Drupal\entity\EntityStorageControllerInterface::basePropertyDefinitions().
+   */
+  public function basePropertyDefinitions() {
+    return array();
+  }
 }
