@@ -13,10 +13,12 @@ use Drupal\Core\Property\PropertyContainerInterface;
  * Interface for entity properties, being lists of property items implementing delegation for working with the first item.
  *
  * Contained items must implement the EntityPropertyItemInterface.
+ * This interface is required for every property of an entity.
  *
- * This will be required for every property of an entity.
- * Delegate get() and set() magic as well as their magic equivalences to the
- * first item.
+ * Methods of the PropertyContainerInterface which are not present in the
+ * PropertyListInterface need to be delegated to the first contained
+ * EntityPropertyItem, in particular that are get() and set() as well as their
+ * magic equivalences.
  */
 interface EntityPropertyInterface extends PropertyListInterface, PropertyContainerInterface {
 

@@ -8,32 +8,62 @@
 namespace Drupal\entity;
 
 /**
- * A list of PropertyContainer items.
+ * An entity property.
+ *
+ * An entity property is a list of property items, which contain only primitive
+ * properties or entity references. Note that even single-valued entity
+ * properties are represented as list of items, however for easy access to the
+ * contained item the entity property delegates get() and set() calls directly
+ * to the first item.
+ *
+ * @see EntityPropertyInterface.
  */
 class EntityProperty implements EntityPropertyInterface {
 
-  // Numerically indexed array of PropertyContainer objects
-  protected $list;
+  /**
+   * Numerically indexed array of property items, implementing the
+   * EntityPropertyItemInterface.
+   *
+   * @var array
+   */
+  protected $list = array();
 
-  public function __construct($list = array()) {
-    $this->list = $list;
-  }
+  /**
+   * The class to use for the property items.
+   *
+   * @var string
+   */
+  protected $class;
+
+  /**
+   * The definition of the represented property.
+   *
+   * @var array
+   */
+  protected $definition;
 
 
-  public function access($account) {
-    // TODO: Implement access() method. Use item access.
-  }
+  /**
+   * @param array $definition
+   *   The definition of the entity property.
+   * @param array $values
+   *   The array of raw values of the entity property.
+   * @param string $class
+   *   (optional) The class to use for the property items. Must implement
+   *   \Drupal\entity\EntityPropertyItemInterface. Defaults to
+   *   \Drupal\entity\EntityPropertyItem.
+   */
+  public function __construct(array $definition, $values = array(), $class = '\Drupal\entity\EntityPropertyItem') {
+    $this->class = $class;
+    $this->definition = $definition;
 
-  public function validate() {
-    // TODO: Implement validate() method.
+    foreach ($values as $value) {
+      $this->list[] = new $this->class($this->definition, $value);
+    }
   }
 
   public function offsetExists($offset) {
     return array_key_exists($offset, $this->list);
-  }
-
-  public function offsetSet($offset, $value) {
-    $this->list[$offset] = $value;
   }
 
   public function offsetUnset($offset) {
@@ -44,7 +74,17 @@ class EntityProperty implements EntityPropertyInterface {
     return $this->list[$offset];
   }
 
+  public function offsetSet($offset, $value) {
+    // Support setting the property using the raw value as well.
+    // @todo: Needs tests.
+    if (!($value instanceof EntityPropertyItemInterface)) {
+      $value = new $this->class($this->definition, $value);
+    }
+    $this->list[$offset] = $value;
+  }
+
   public function getIterator() {
+    // @todo: Fix to iterate over the properties, not over the raw values.
     return new ArrayIterator($this->list);
   }
 
@@ -99,5 +139,32 @@ class EntityProperty implements EntityPropertyInterface {
    */
   public function __set($property_name, $value) {
     $this->offsetGet(0)->__set($property_name, $value);
+  }
+
+  /**
+   * Gets the the raw array representation of the entity property.
+   *
+   * @return array
+   *   The raw array representation of the entity property, i.e. an array
+   *   containing the raw values of all contained items.
+   */
+  public function toArray() {
+    $values = array();
+    foreach ($this->list as $item) {
+      $value = array();
+      foreach ($item->getPropertyDefinitions() as $name => $definition) {
+        $value[$name] = $item->getRawValue($name);
+      }
+      $values[] = $value;
+    }
+    return $values;
+  }
+
+  public function access($account) {
+    // TODO: Implement access() method. Use item access.
+  }
+
+  public function validate() {
+    // TODO: Implement validate() method.
   }
 }
