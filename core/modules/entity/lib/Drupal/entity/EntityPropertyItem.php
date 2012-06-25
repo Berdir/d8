@@ -6,16 +6,92 @@
  */
 
 namespace Drupal\entity;
+use \Drupal\Core\Property\PropertyTypeContainerInterface;
+use \Drupal\Core\Property\PropertyContainerInterface;
 
 /**
  * A list of PropertyContainer items.
  */
 class EntityPropertyItem implements EntityPropertyItemInterface {
 
+  /**
+   * The raw data values of the contained properties.
+   *
+   * @var array
+   */
   protected $values = array();
 
-  public function __construct($values = array()) {
+  /**
+   * The definition of the represented property.
+   *
+   * @var array
+   */
+  protected $definition;
+
+  /**
+   * The property's data type plugin.
+   *
+   * @var \Drupal\Core\Property\PropertyTypeContainerInterface
+   */
+  protected $dataType;
+
+
+  public function __construct(array $definition, array $values = array()) {
+    $this->definition = $definition;
+    // @todo: Use dependency injection.
+    $this->dataType = drupal_get_property_type_plugin($this->definition['type']);
     $this->values = $values;
+
+    // Set up initial references for primitives upon creation.
+    $data_types = drupal_get_data_type_info();
+    foreach ($this->dataType->getPropertyDefinitions($this->definition) as $name => $definition) {
+      if (!($data_types[$definition['type']]['class'] instanceof PropertyTypeContainerInterface)) {
+
+        if (!isset($this->values[$name])) {
+          $this->values[$name] = NULL;
+        }
+        $this->$name = & $this->values[$name];
+      }
+    }
+  }
+
+  public function getRawValue($name) {
+    return isset($this->values[$name]) ? $this->values[$name] : NULL;
+  }
+
+  public function get($name) {
+    // @todo: What about possible name clashes?
+    if (!property_exists($this, $name)) {
+      // Primitive properties already exist, so this must be a property
+      // container. @see self::__construct()
+      $definition = $this->dataType->getPropertyDefinition($name);
+      $this->$name = drupal_get_property_type_plugin($definition['type'])->createItem($definition, $this->values[$name]);
+    }
+    return $this->$name;
+  }
+
+  public function set($name, $value) {
+    $definition = $this->dataType->getPropertyDefinition($name);
+    $data_type = drupal_get_property_type_plugin($definition['type']);
+
+    if ($data_type instanceof PropertyTypeContainerInterface) {
+      // Transform container objects back to raw values before setting if
+      // necessary. Support passing in raw values as well.
+      // @todo: Needs tests.
+      if ($value instanceof PropertyContainerInterface) {
+        $this->values[$name] = $data_type->getRawValue($definition, $value);
+        $this->$name = $value;
+      }
+      else {
+        $this->values[$name] = $value;
+        unset($this->$name);
+      }
+    }
+    else {
+      // Just update the internal value. $this->$name is a reference on it, so
+      // it will automatically reflect the update too.
+      $this->values[$name] = $value;
+    }
   }
 
   public function __get($name) {
@@ -26,36 +102,29 @@ class EntityPropertyItem implements EntityPropertyItemInterface {
     $this->set($name, $value);
   }
 
-  public function access($account) {
-
-  }
-
-  public function get($name) {
-    return $this->values[$name];
-  }
-
   public function getIterator() {
-
+    // @todo implement
   }
 
   public function getProperties() {
-
+    // @todo implement
   }
 
+  public function getPropertyDefinition($name) {
+    $definitions = $this->dataType->getPropertyDefinitions($this->definition);
+    return isset($definitions[$name]) ? $definitions[$name] : FALSE;
+  }
+
+  // @todo: Add accessor to a single definition as well as the definition of the
+  // represented property.
   public function getPropertyDefinitions() {
-
+    return $this->dataType->getPropertyDefinitions($this->definition);
   }
 
-  public function getRawValue($property_name) {
-
+  public function access($account) {
+    // @todo implement
   }
-
-  public function set($name, $value) {
-    $this->values[$name] = $value;
-  }
-
   public function validate() {
-
+    // @todo implement
   }
-
 }

@@ -7514,7 +7514,7 @@ function drupal_get_data_type_info() {
  * field plugins? Maybe field type plugins are just part of that and somehow
  * marked to be available for defining fields?
  *
- * @return Drupal\Core\PropertyTypeInterface
+ * @return Drupal\Core\Property\PropertyTypeInterface|Drupal\Core\Property\PropertyTypeContainerInterface
  */
 function drupal_get_property_type_plugin($type) {
   $plugin = &drupal_static(__FUNCTION__);
