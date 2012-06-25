@@ -7,7 +7,6 @@
 
 namespace Drupal\entity;
 use Drupal\Core\Property\PropertyListInterface;
-use Drupal\Core\Property\PropertyContainerInterface;
 
 /**
  * Interface for entity properties, being lists of property items implementing delegation for working with the first item.
@@ -15,15 +14,12 @@ use Drupal\Core\Property\PropertyContainerInterface;
  * Contained items must implement the EntityPropertyItemInterface.
  * This interface is required for every property of an entity.
  *
- * Methods of the EntityPropertyItemInterface which are not present in the
- * PropertyListInterface need to be delegated to the first contained
- * EntityPropertyItem, in particular that are get() and set() as well as their
- * magic equivalences.
+ * Methods of the EntityPropertyItemInterface have to be delegated to the first
+ * contained EntityPropertyItem, in particular that are get() and set() as well
+ * as their magic equivalences.
+ *
+ * @todo: This makes validate() only validate the first item what is confusing.
+ * Maybe we skip the EntityPropertyItemInterface here and manually add only
+ * get() and set() instead? That would probably make it clearer what goes where.
  */
-interface EntityPropertyInterface extends PropertyListInterface, EntityPropertyItemInterface {
-
-  /**
-   * @return EntityPropertyItemInterface
-   */
-  public function offsetGet($offset);
-}
+interface EntityPropertyInterface extends PropertyListInterface, EntityPropertyItemInterface { }

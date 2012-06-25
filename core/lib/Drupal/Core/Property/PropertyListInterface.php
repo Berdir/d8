@@ -13,10 +13,4 @@ use Countable;
 /**
  * Interface for working with lists of properties.
  */
-interface PropertyListInterface extends ArrayAccess, IteratorAggregate, Countable {
-
-  public function access($account);
-
-  public function validate();
-
-}
+interface PropertyListInterface extends ArrayAccess, IteratorAggregate, Countable { }

@@ -34,4 +34,7 @@ interface EntityPropertyItemInterface extends PropertyContainerInterface {
   public function getRawValue($property_name);
 
   public function set($property_name, $value);
+
+  // Check property item access.
+  public function access($account);
 }

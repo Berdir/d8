@@ -16,6 +16,7 @@ class TestEntityStorageController extends \Drupal\entity\DatabaseStorageControll
    */
   public function basePropertyDefinitions() {
     $properties['name'] = array(
+      'label' => t('Name'),
       'description' => ('The name of the test entity.'),
       'type' => 'text_item',
     );

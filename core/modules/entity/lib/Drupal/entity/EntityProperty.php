@@ -53,10 +53,9 @@ class EntityProperty implements EntityPropertyInterface {
    *   \Drupal\entity\EntityPropertyItemInterface. Defaults to
    *   \Drupal\entity\EntityPropertyItem.
    */
-  public function __construct(array $definition, $values = array(), $class = '\Drupal\entity\EntityPropertyItem') {
+  public function __construct(array $definition, array $values = array(), $class = '\Drupal\entity\EntityPropertyItem') {
     $this->class = $class;
     $this->definition = $definition;
-
     foreach ($values as $value) {
       $this->list[] = new $this->class($this->definition, $value);
     }
@@ -97,6 +96,13 @@ class EntityProperty implements EntityPropertyInterface {
    */
   public function getProperties() {
     return $this->offsetGet(0)->getProperties();
+  }
+
+  /**
+   * Delegate.
+   */
+  public function getPropertyDefinition($name) {
+    return $this->offsetGet(0)->getPropertyDefinition($name);
   }
 
   /**

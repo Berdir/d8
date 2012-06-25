@@ -43,18 +43,6 @@ class EntityPropertyItem implements EntityPropertyItemInterface {
     // @todo: Use dependency injection.
     $this->dataType = drupal_get_property_type_plugin($this->definition['type']);
     $this->values = $values;
-
-    // Set up initial references for primitives upon creation.
-    $data_types = drupal_get_data_type_info();
-    foreach ($this->dataType->getPropertyDefinitions($this->definition) as $name => $definition) {
-      if (!($data_types[$definition['type']]['class'] instanceof PropertyTypeContainerInterface)) {
-
-        if (!isset($this->values[$name])) {
-          $this->values[$name] = NULL;
-        }
-        $this->$name = & $this->values[$name];
-      }
-    }
   }
 
   public function getRawValue($property_name) {
@@ -64,12 +52,15 @@ class EntityPropertyItem implements EntityPropertyItemInterface {
   public function get($property_name) {
     // @todo: What about possible name clashes?
     if (!property_exists($this, $property_name)) {
-      // Primitive properties already exist, so this must be a property
-      // container. @see self::__construct()
       $definition = $this->getPropertyDefinition($property_name);
-      $this->$property_name = drupal_get_property_type_plugin($definition['type'])->getProperty($definition, $this->values[$property_name]);
+      $data_type = drupal_get_property_type_plugin($definition['type']);
+      if ($data_type instanceof PropertyTypeContainerInterface) {
+        return $data_type->getProperty($definition, $this->values[$property_name]);
+      }
+      else {
+        return $this->values[$property_name];
+      }
     }
-    return $this->$property_name;
   }
 
   public function set($property_name, $value) {

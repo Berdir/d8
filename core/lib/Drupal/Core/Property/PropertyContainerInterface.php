@@ -15,10 +15,9 @@ use IteratorAggregate;
  */
 interface PropertyContainerInterface extends IteratorAggregate  {
 
-  // Check item access.
-  public function access($account);
 
-  // Validate the item value.
+
+  // Validate the container values.
   public function validate();
 
   public function getProperties();

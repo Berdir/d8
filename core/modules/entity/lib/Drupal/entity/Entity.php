@@ -6,8 +6,8 @@
  */
 
 namespace Drupal\entity;
-use \Drupal\Core\Property\PropertyTypeContainerInterface;
-use \Drupal\Core\Property\PropertyContainerInterface;
+use Drupal\Core\Property\PropertyTypeContainerInterface;
+use Drupal\Core\Property\PropertyContainerInterface;
 
 /**
  * Defines a base entity class.
@@ -60,26 +60,14 @@ class Entity implements EntityInterface {
    */
   public function __construct(array $values, $entity_type) {
     $this->entityType = $entity_type;
-    // Set initial values.
-    foreach ($values as $key => $value) {
-      $this->$key = $value;
-    }
 
     // @todo: Use dependency injection.
     $this->dataType = drupal_get_property_type_plugin('entity');
     $this->values = $values;
 
-    // Set up initial references for primitives upon creation.
-    $data_types = drupal_get_data_type_info();
-    foreach ($this->getPropertyDefinitions() as $name => $definition) {
-      if (!($data_types[$definition['type']]['class'] instanceof PropertyTypeContainerInterface)) {
-
-        if (!isset($this->values[$name])) {
-          $this->values[$name] = NULL;
-        }
-        $this->$name = & $this->values[$name];
-      }
-    }
+    // @todo: Should we unset defined properties or initialize all entity
+    // property objects here, so we have the magic getter working with
+    // properties defined in the entity class.
   }
 
   /**
@@ -208,32 +196,37 @@ class Entity implements EntityInterface {
    */
   public function get($property_name, $langcode = NULL) {
     // @todo: What about possible name clashes?
-    if (!property_exists($this, $property_name) || isset($langcode)) {
-
+    // We cannot use property_exists() here as this won't work with unset
+    // properties that have been defined in the entity class.
+    if (!isset($this->$property_name) || isset($langcode)) {
       $langcode = isset($langcode) ? $langcode : $this->langcode;
 
-      // Primitive properties already exist, so this must be a property
-      // container. @see self::__construct()
       if ($definition = $this->getPropertyDefinition($property_name)) {
+        // @todo use getRawPropertyValue function for langcode handling.
+        $value = drupal_get_property_type_plugin($definition['type'])->getProperty($definition, $this->values[$property_name][$langcode]);
 
-        if (!isset($this->values[$property_name][$langcode])) {
-          $this->values[$property_name][$langcode] = NULL;
+        // For non-default langcodes just return the value and do not statically
+        // cache the property.
+        // @todo: fix setting.
+        if ($langcode != $this->langcode) {
+          return $value;
         }
-        $this->$property_name = drupal_get_property_type_plugin($definition['type'])->getProperty($definition, $this->values[$property_name][$langcode]);
+        // @todo: Does not work as it goes via magic as well. Implement another
+        // static storage.
+        // $this->$property_name = $value;
+        return $value;
       }
       // Add BC for not yet converted stuff.
       else {
-        $this->$property_name = & $this->values[$property_name];
+        return $this->values[$property_name];
       }
     }
-    return $this->$property_name;
   }
 
   /**
    * Implements EntityInterface::set().
    */
   public function set($property_name, $value, $langcode = NULL) {
-
     $definition = $this->getPropertyDefinition($property_name);
 
     // Add BC for not yet converted stuff.
@@ -245,7 +238,6 @@ class Entity implements EntityInterface {
 
     $data_type = drupal_get_property_type_plugin($definition['type']);
     $langcode = isset($langcode) ? $langcode : $this->langcode;
-    $value_ref = & $this->values[$property_name][$langcode];
 
     if ($data_type instanceof PropertyTypeContainerInterface) {
       // Transform container objects back to raw values before setting if
@@ -254,13 +246,13 @@ class Entity implements EntityInterface {
       if ($value instanceof PropertyContainerInterface) {
         $value = $data_type->getRawValue($definition, $value);
       }
-      $value_ref = $value;
+      $this->values[$property_name][$langcode] = $value;
       unset($this->$property_name);
     }
     else {
       // Just update the internal value. $this->$name is a reference on it, so
       // it will automatically reflect the update too.
-      $value_ref = $value;
+      $this->values[$property_name][$langcode] = $value;
     }
   }
 

@@ -21,4 +21,18 @@ class TestEntity extends Entity {
    */
   public $name;
 
+
+  public function __construct(array $values, $entity_type) {
+    parent::__construct($values, $entity_type);
+    // Let the magic work. See parent implementation @todo.
+    unset($this->name);
+  }
+
+  public function __get($name) {
+    return $this->get($name);
+  }
+
+  public function __set($name, $value) {
+    $this->set($name, $value);
+  }
 }

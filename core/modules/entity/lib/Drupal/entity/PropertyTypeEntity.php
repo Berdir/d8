@@ -36,7 +36,9 @@ class PropertyTypeEntity implements PropertyTypeContainerInterface {
   function getPropertyDefinitions(array $definition) {
     $definitions = array();
     if (!empty($definition['entity type'])) {
+      // @todo: Add static caching.
       $definitions = entity_get_controller($definition['entity type'])->basePropertyDefinitions();
+
       // Allow modules to add their own property definitions. E.g. this is
       // implemented by field.module to add definitions for its fields.
       drupal_alter('entity_property_definition', $definitions, $definition);

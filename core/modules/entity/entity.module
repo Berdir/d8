@@ -515,6 +515,13 @@ function entity_data_type_info() {
       'description' => t('An entity property containing a textual value.'),
       'class' => '\Drupal\entity\PropertyTypeTextItem',
     ),
+    // @todo: Fix and move elsewhere.
+    'string' => array(
+      'label' => t('String value'),
+      'class' => 'String',
+      'primitive' => TRUE,
+    ),
   );
 }
 
+class String { }
