@@ -29,15 +29,15 @@ class EntityProperty implements EntityPropertyInterface {
   }
 
   public function offsetExists($offset) {
-    // TODO: Implement offsetExists() method.
+    return array_key_exists($offset, $this->list);
   }
 
   public function offsetSet($offset, $value) {
-    // TODO: Implement offsetSet() method.
+    $this->list[$offset] = $value;
   }
 
   public function offsetUnset($offset) {
-    // TODO: Implement offsetUnset() method.
+    unset($this->list[$offset]);
   }
 
   public function offsetGet($offset) {
@@ -49,55 +49,55 @@ class EntityProperty implements EntityPropertyInterface {
   }
 
   public function count() {
-    // TODO: Implement count() method.
+    return count($this->list);
   }
 
   /**
    * Delegate.
    */
   public function getProperties() {
-    // TODO: Implement getProperties() method.
+    return $this->offsetGet(0)->getProperties();
   }
 
   /**
    * Delegate.
    */
   public function getPropertyDefinitions() {
-    // TODO: Implement getPropertyDefinitions() method.
+    return $this->offsetGet(0)->getPropertyDefinitions();
   }
 
   /**
    * Delegate.
    */
-  public function __get($name) {
-    return $this[0]->$name;
+  public function __get($property_name) {
+    return $this->offsetGet(0)->__get($property_name);
   }
 
   /**
    * Delegate.
    */
-  public function get($name) {
-    // TODO: Implement get() method.
+  public function get($property_name) {
+    return $this->offsetGet(0)->get($property_name);
   }
 
   /**
    * Delegate.
    */
   public function getRawValue($property_name) {
-    // TODO: Implement getRawValue() method.
+    return $this->offsetGet(0)->getRawValue($property_name);
   }
 
   /**
    * Delegate.
    */
-  public function set($name, $value) {
-    // TODO: Implement set() method.
+  public function set($property_name, $value) {
+    $this->offsetGet(0)->set($property_name, $value);
   }
 
   /**
    * Delegate.
    */
-  public function __set($name, $value) {
-    $this[0]->$name = $value;
+  public function __set($property_name, $value) {
+    $this->offsetGet(0)->__set($property_name, $value);
   }
 }
