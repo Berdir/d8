@@ -45,8 +45,8 @@ class EntityPropertyTest extends WebTestBase  {
 
     // Change the name.
     $new_name = $this->randomName();
-    $entity->name->value = $new_name = $this->randomName();
-    $this->assertEqual($new_name, $entity->name->value, 'Updated Name value can be read.');
+    $entity->name->value = $new_name;
+    $this->assertEqual($new_name, $entity->name->value, 'Updated name value can be read.');
 
     // Access the user property.
     $this->assertTrue($entity->user instanceof EntityPropertyInterface, 'Property implements interface');
