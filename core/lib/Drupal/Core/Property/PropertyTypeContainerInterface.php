@@ -24,8 +24,17 @@ interface PropertyTypeContainerInterface extends PropertyTypeInterface {
   // implementation.
 
   /**
-   * Given an associative array of property values matching the definitions,
-   * create an instance of the data type.
+   * Create an item of the data type.
+   *
+   * @param array $definition
+   *   The definition of the container's property, e.g. the definition of an
+   *   entity reference property.
+   * @param array $values
+   *   An array of property values for creating the data item. The property
+   *   values have to match their respective definitions as returned from
+   *   PropertyTypeContainerInterface::getPropertyDefinitions().
+   *
+   *  @return PropertyContainerInterface
    */
-  function createItem($values);
+  function createItem(array $definition, array $values);
 }
