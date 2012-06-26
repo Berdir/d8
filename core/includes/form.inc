@@ -1833,6 +1833,11 @@ function form_builder($form_id, &$element, &$form_state) {
       $element[$key]['#access'] = FALSE;
     }
 
+    // Deny access to this element if it belongs to a vertical that is denied.
+    if (isset($element[$key]['#group']) && isset($element[$element[$key]['#group']]['#access']) && !$element[$element[$key]['#group']]['#access']) {
+      $element[$key]['#access'] = FALSE;
+    }
+
     // Make child elements inherit their parent's #disabled and #allow_focus
     // values unless they specify their own.
     foreach (array('#disabled', '#allow_focus') as $property) {

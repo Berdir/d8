@@ -88,6 +88,14 @@ function form_test_menu() {
     'type' => MENU_CALLBACK,
   );
 
+  $items['form_test/vertical-tabs-access'] = array(
+    'title' => 'Vertical tabs tests',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('form_test_vertical_tabs_access_form'),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+
   $items['form_test/form-storage'] = array(
     'title' => 'Form storage test',
     'page callback' => 'drupal_get_form',
@@ -753,6 +761,114 @@ function _form_test_vertical_tabs_form($form, &$form_state) {
     '#type' => 'textfield',
   );
   return $form;
+}
+
+/**
+ * Tests functionality of vertical tabs with #access = FALSE.
+ */
+function form_test_vertical_tabs_access_form($form, &$form_state) {
+  $form['vertical_tabs'] = array(
+    '#type' => 'vertical_tabs',
+  );
+  $form['tab1'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Tab 1'),
+    '#collapsible' => TRUE,
+    '#group' => 'vertical_tabs',
+  );
+  $form['tab1']['field1'] = array(
+    '#title' => t('Field 1'),
+    '#type' => 'checkbox',
+    '#default_value' => TRUE,
+  );
+  $form['tab2'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Tab 2'),
+    '#collapsible' => TRUE,
+    '#group' => 'vertical_tabs',
+  );
+  $form['tab2']['field2'] = array(
+    '#title' => t('Field 2'),
+    '#type' => 'textfield',
+    '#default_value' => 'field2',
+  );
+
+  $form['fieldset'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Fieldset'),
+  );
+  $form['fieldset']['field3'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Field 3'),
+    '#default_value' => TRUE,
+  );
+
+  $form['container'] = array(
+    '#type' => 'container',
+  );
+  $form['container']['field4'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Field 4'),
+    '#default_value' => TRUE,
+  );
+  $form['container']['subcontainer'] = array(
+    '#type' => 'container',
+  );
+  $form['container']['subcontainer']['field5'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Field 5'),
+    '#default_value' => TRUE,
+  );
+
+  $form['actions'] = array(
+    '#type' => 'actions',
+  );
+  $form['actions']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Submit'),
+  );
+  return $form;
+}
+
+/**
+ * Form validation handler for form_test_vertical_tabs_access_form().
+ *
+ * @see form_test_vertical_tabs_access_form_submit()
+ */
+function form_test_vertical_tabs_access_form_validate($form, &$form_state) {
+  if (empty($form_state['values']['field1'])) {
+    form_set_error('tab1][field1', t('This checkbox inside a vertical tab does not have its default value.'));
+  }
+  if ($form_state['values']['field2'] != 'field2') {
+    form_set_error('tab2][field2', t('This textfield inside a vertical tab does not have its default value.'));
+  }
+  if (empty($form_state['values']['field3'])) {
+    form_set_error('fieldset][field3', t('This checkbox inside a fieldset does not have its default value.'));
+  }
+  if (empty($form_state['values']['field4'])) {
+    form_set_error('container][field4', t('This checkbox inside a container does not have its default value.'));
+  }
+  if (empty($form_state['values']['field5'])) {
+    form_set_error('container][subcontainer][field5', t('This checkbox inside a nested container does not have its default value.'));
+  }
+}
+
+/**
+ * Form submission handler for form_test_vertical_tabs_access_form().
+ *
+ * @see form_test_vertical_tabs_access_form_validate()
+ */
+function form_test_vertical_tabs_access_form_submit($form, &$form_state) {
+  drupal_set_message(t('The form submitted correctly.'));
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for form_test_vertical_tabs_access_form().
+ */
+function form_test_form_form_test_vertical_tabs_access_form_alter(&$form, &$form_state, $form_id) {
+  $form['vertical_tabs']['#access'] = FALSE;
+  $form['fieldset']['#access'] = FALSE;
+  $form['container']['#access'] = FALSE;
 }
 
 /**
