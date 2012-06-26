@@ -484,6 +484,20 @@ class EntityFieldQueryTest extends WebTestBase {
       array('test_entity_bundle_key', 4),
     ), t('Test sort entity bundle in descending order, field in ascending order.'), TRUE);
 
+    $query = new EntityFieldQuery();
+    $query
+      ->entityCondition('entity_type', 'test_entity_bundle_key')
+      ->propertyCondition('fttype', 'test_bundle')
+      ->fieldOrderBy($this->field_names[1], 'shape');
+    $this->assertEntityFieldQuery($query, array(
+      array('test_entity_bundle_key', 1),
+      array('test_entity_bundle_key', 2),
+      array('test_entity_bundle_key', 3),
+      array('test_entity_bundle_key', 4),
+      array('test_entity_bundle_key', 5),
+      array('test_entity_bundle_key', 6),
+    ), 'Test that fieldOrderBy() does not filter the results.');
+
     // Test entity sort by revision_id.
     $query = new EntityFieldQuery();
     $query

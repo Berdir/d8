@@ -514,7 +514,7 @@ function field_sql_storage_field_storage_query(EntityFieldQuery $query) {
     $table_alias = $tablename . $key;
     $table_aliases[$key] = $table_alias;
     if ($key) {
-      $select_query->join($tablename, $table_alias, "$table_alias.entity_type = $field_base_table.entity_type AND $table_alias.$id_key = $field_base_table.$id_key");
+      $select_query->leftJoin($tablename, $table_alias, "$table_alias.entity_type = $field_base_table.entity_type AND $table_alias.$id_key = $field_base_table.$id_key");
     }
     else {
       $select_query = db_select($tablename, $table_alias);

@@ -911,6 +911,7 @@ class EntityFieldQuery {
       return $select_query->countQuery()->execute()->fetchField();
     }
     $return = array();
+    debug((string)$select_query);
     foreach ($select_query->execute() as $partial_entity) {
       $bundle = isset($partial_entity->bundle) ? $partial_entity->bundle : NULL;
       $entity = entity_create_stub_entity($partial_entity->entity_type, array($partial_entity->entity_id, $partial_entity->revision_id, $bundle));
