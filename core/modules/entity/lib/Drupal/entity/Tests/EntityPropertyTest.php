@@ -33,8 +33,9 @@ class EntityPropertyTest extends WebTestBase  {
    */
   public function testReadWrite() {
     $name = $this->randomName();
+    $name_property[LANGUAGE_NOT_SPECIFIED][0]['value'] = $name;
     $user = $this->drupalCreateUser();
-    $entity = entity_create('entity_test', array('name' => $name, 'uid' => $user->uid));
+    $entity = entity_create('entity_test', array('name' => $name_property));
 
     // Access the name property.
     $this->assertTrue($entity->name instanceof EntityPropertyInterface, 'Property implements interface');
@@ -42,11 +43,17 @@ class EntityPropertyTest extends WebTestBase  {
 
     $this->assertEqual($name, $entity->name->value, 'Name value can be read.');
     $this->assertEqual($name, $entity->name[0]->value, 'Name value can be read through list access.');
+    $this->assertEqual($entity->getRawValue('name'), array(0 => array('value' => $name)), 'Raw property value returned.');
 
     // Change the name.
     $new_name = $this->randomName();
     $entity->name->value = $new_name;
-    $this->assertEqual($new_name, $entity->name->value, 'Updated name value can be read.');
+    $this->assertEqual($new_name, $entity->name->value, 'Name can be updated and read.');
+    $this->assertEqual($entity->getRawValue('name'), array(0 => array('value' => $new_name)), 'Raw property value reflects the update.');
+
+    $new_name = $this->randomName();
+    $entity->name[0]->value = $new_name;
+    $this->assertEqual($new_name, $entity->name->value, 'Name can be updated and read through list access.');
 
     return;
     // Access the user property.

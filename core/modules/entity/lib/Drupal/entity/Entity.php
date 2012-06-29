@@ -43,9 +43,18 @@ class Entity implements EntityInterface {
   /**
    * The raw data values of the contained properties.
    *
+   * This always holds the original, unchanged values of the entity.
+   *
    * @var array
    */
   protected $values = array();
+
+  /**
+   * The array of properties, each being an instance of EntityPropertyInterface.
+   *
+   * @var array
+   */
+  protected $properties = array();
 
   /**
    * The property's data type plugin.
@@ -58,7 +67,7 @@ class Entity implements EntityInterface {
   /**
    * Constructs a new entity object.
    */
-  public function __construct(array $values = array(), $entity_type) {
+  public function __construct(array $values, $entity_type) {
     $this->entityType = $entity_type;
     // Set initial values.
     foreach ($values as $key => $value) {
@@ -184,72 +193,53 @@ class Entity implements EntityInterface {
 
   public function getRawValue($property_name, $langcode = NULL) {
     $langcode = isset($langcode) ? $langcode : $this->langcode;
-    return isset($this->values[$property_name][$langcode]) ? $this->values[$property_name][$langcode] : NULL;
+
+    // Read $this->properties, possibly containing changes. If not set, return
+    // the unchanged value from $this->values.
+    if (isset($this->properties[$property_name][$langcode])) {
+      $definition = $this->getPropertyDefinition($property_name);
+      $data_type = drupal_get_property_type_plugin($definition['type']);
+      return $data_type->getRawValue($definition, $this->properties[$property_name][$langcode]);
+    }
+    else {
+      return isset($this->values[$property_name][$langcode]) ? $this->values[$property_name][$langcode] : NULL;
+    }
   }
 
   /**
    * Implements EntityInterface::get().
    */
   public function get($property_name, $langcode = NULL) {
-    // @todo: What about possible name clashes?
-    // We cannot use property_exists() here as this won't work with unset
-    // properties that have been defined in the entity class.
-    if (!isset($this->$property_name) || isset($langcode)) {
-      $langcode = isset($langcode) ? $langcode : $this->langcode;
+    $langcode = isset($langcode) ? $langcode : $this->langcode;
 
-      if ($definition = $this->getPropertyDefinition($property_name)) {
-        // @todo use getRawPropertyValue function for langcode handling.
-        $value = drupal_get_property_type_plugin($definition['type'])->getProperty($definition, $this->values[$property_name][$langcode]);
+    // Populate $this->properties to fasten further lookups and to keep track of
+    // property objects, possibly holding changes to properties.
+    if (!isset($this->properties[$property_name][$langcode])) {
+      $definition = $this->getPropertyDefinition($property_name);
+      $data_type = drupal_get_property_type_plugin($definition['type']);
 
-        // For non-default langcodes just return the value and do not statically
-        // cache the property.
-        // @todo: fix setting.
-        if ($langcode != $this->langcode) {
-          return $value;
-        }
-        // @todo: Does not work as it goes via magic as well. Implement another
-        // static storage.
-        // $this->$property_name = $value;
-        return $value;
-      }
-      // Add BC for not yet converted stuff.
-      else {
-        return $this->values[$property_name];
-      }
+      $value = isset($this->values[$property_name][$langcode]) ? $this->values[$property_name][$langcode] : NULL;
+      $this->properties[$property_name][$langcode] = $data_type->getProperty($definition, $value);
     }
+    return $this->properties[$property_name][$langcode];
   }
 
   /**
    * Implements EntityInterface::set().
    */
   public function set($property_name, $value, $langcode = NULL) {
-    $definition = $this->getPropertyDefinition($property_name);
-
-    // Add BC for not yet converted stuff.
-    if (!$definition) {
-
-      $this->values[$property_name] = $value;
-      return;
-    }
-
-    $data_type = drupal_get_property_type_plugin($definition['type']);
     $langcode = isset($langcode) ? $langcode : $this->langcode;
 
-    if ($data_type instanceof PropertyTypeContainerInterface) {
-      // Transform container objects back to raw values before setting if
-      // necessary. Support passing in raw values as well.
-      // @todo: Needs tests.
-      if ($value instanceof PropertyContainerInterface) {
-        $value = $data_type->getRawValue($definition, $value);
-      }
-      $this->values[$property_name][$langcode] = $value;
-      unset($this->$property_name);
+    // If a raw value is passed in, instantiate the object before setting.
+    // @todo: Needs tests.
+    if (!$value instanceof EntityPropertyInterface) {
+      $definition = $this->getPropertyDefinition($property_name);
+      $data_type = drupal_get_property_type_plugin($definition['type']);
+
+      $value = $data_type->getProperty($definition, $value);
     }
-    else {
-      // Just update the internal value. $this->$name is a reference on it, so
-      // it will automatically reflect the update too.
-      $this->values[$property_name][$langcode] = $value;
-    }
+
+    $this->properties[$property_name][$langcode] = $value;
   }
 
 /*  public function __get($name) {
