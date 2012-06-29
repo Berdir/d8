@@ -58,16 +58,12 @@ class Entity implements EntityInterface {
   /**
    * Constructs a new entity object.
    */
-  public function __construct(array $values, $entity_type) {
+  public function __construct(array $values = array(), $entity_type) {
     $this->entityType = $entity_type;
-
-    // @todo: Use dependency injection.
-    $this->dataType = drupal_get_property_type_plugin('entity');
-    $this->values = $values;
-
-    // @todo: Should we unset defined properties or initialize all entity
-    // property objects here, so we have the magic getter working with
-    // properties defined in the entity class.
+    // Set initial values.
+    foreach ($values as $key => $value) {
+      $this->$key = $value;
+    }
   }
 
   /**

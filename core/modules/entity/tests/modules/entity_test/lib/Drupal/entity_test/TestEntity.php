@@ -22,9 +22,20 @@ class TestEntity extends Entity {
   public $name;
 
 
+
   public function __construct(array $values, $entity_type) {
-    parent::__construct($values, $entity_type);
-    // Let the magic work. See parent implementation @todo.
+    // @todo: Move to the general entity class once all entity types are
+    // converted.
+    $this->entityType = $entity_type;
+
+    // @todo: Use dependency injection.
+    $this->dataType = drupal_get_property_type_plugin('entity');
+    $this->values = $values;
+
+    // @todo: Should we unset defined properties or initialize all entity
+    // property objects here, so we have the magic getter working with
+    // properties defined in the entity class.
+
     unset($this->name);
   }
 
