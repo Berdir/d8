@@ -27,7 +27,7 @@ interface PropertyTypeContainerInterface extends PropertyTypeInterface {
    * @param array $definition
    *   The definition of the container's property, e.g. the definition of an
    *   entity reference property.
-   * @param $value
+   * @param mixed $value
    *   The raw value of the property, or NULL if the property is not set. For
    *   entity references the raw value is the entity ID, whereas for other
    *   property containers it is usually an array of (raw) values matching the

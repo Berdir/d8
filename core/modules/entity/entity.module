@@ -515,9 +515,19 @@ function entity_data_type_info() {
       'description' => t('An entity property containing a textual value.'),
       'class' => '\Drupal\entity\PropertyTypeTextItem',
     ),
+    'entityreference_item' => array(
+      'label' => t('Entity reference item'),
+      'description' => t('An entity property containing an entity reference.'),
+      'class' => '\Drupal\entity\PropertyTypeEntityReferenceItem',
+    ),
     'string' => array(
       'label' => t('String'),
       'class' => 'Drupal\Core\Property\Type\String',
+      'primitive' => TRUE,
+    ),
+    'integer' => array(
+      'label' => t('String'),
+      'class' => 'Drupal\Core\Property\Type\Integer',
       'primitive' => TRUE,
     ),
   );

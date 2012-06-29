@@ -70,6 +70,11 @@ class EntityProperty implements EntityPropertyInterface {
   }
 
   public function offsetGet($offset) {
+    // Allow getting not yet existing items as well.
+    // @ŧodo: Maybe add a createItem() method instead or in addition?
+    if (!isset($this->list[$offset])) {
+      $this->list[$offset] = new $this->class($this->definition, array());
+    }
     return $this->list[$offset];
   }
 
@@ -161,7 +166,9 @@ class EntityProperty implements EntityPropertyInterface {
       foreach ($item->getPropertyDefinitions() as $name => $definition) {
         $value[$name] = $item->getRawValue($name);
       }
-      $values[] = $value;
+      if (array_filter($value)) {
+        $values[] = $value;
+      }
     }
     return $values;
   }

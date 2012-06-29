@@ -35,7 +35,11 @@ class EntityPropertyTest extends WebTestBase  {
     $name = $this->randomName();
     $name_property[LANGUAGE_NOT_SPECIFIED][0]['value'] = $name;
     $user = $this->drupalCreateUser();
+
+    // Pass in the value of the name property when creating. With the user
+    // property we test setting a property after creation.
     $entity = entity_create('entity_test', array('name' => $name_property));
+    $entity->user->id = $user->uid;
 
     // Access the name property.
     $this->assertTrue($entity->name instanceof EntityPropertyInterface, 'Property implements interface');
@@ -55,19 +59,24 @@ class EntityPropertyTest extends WebTestBase  {
     $entity->name[0]->value = $new_name;
     $this->assertEqual($new_name, $entity->name->value, 'Name can be updated and read through list access.');
 
-    return;
     // Access the user property.
     $this->assertTrue($entity->user instanceof EntityPropertyInterface, 'Property implements interface');
     $this->assertTrue($entity->user[0] instanceof EntityPropertyItemInterface, 'Property item implements interface');
 
-    $this->assertEqual($user->uid, $entity->user->value, 'User id can be read.');
+    $this->assertEqual($user->uid, $entity->user->id, 'User id can be read.');
     $this->assertEqual($user->name, $entity->user->entity->name, 'User name value can be read.');
 
-    // Change the assigned user.
+    // Change the assigned user by entity.
     $new_user = $this->drupalCreateUser();
     $entity->user->entity = $new_user;
-    $this->assertEqual($new_user->uid, $entity->user->value, 'User id can be read.');
-    $this->assertEqual($new_user->name, $entity->user->entity->name, 'User name value can be read.');
+    $this->assertEqual($new_user->uid, $entity->user->id, 'Updated user id can be read.');
+    $this->assertEqual($new_user->name, $entity->user->entity->name, 'Updated user name value can be read.');
+
+    // Change the assigned user by id.
+    $new_user = $this->drupalCreateUser();
+    $entity->user->id = $new_user->uid;
+    $this->assertEqual($new_user->uid, $entity->user->id, 'Updated user id can be read.');
+    $this->assertEqual($new_user->name, $entity->user->entity->name, 'Updated user name value can be read.');
   }
 
   /**

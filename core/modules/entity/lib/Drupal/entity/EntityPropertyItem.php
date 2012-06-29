@@ -53,50 +53,39 @@ class EntityPropertyItem implements EntityPropertyItemInterface {
   }
 
   public function getRawValue($property_name) {
-    // Read $this->properties, possibly containing changes. If not set, return
-    // the unchanged value from $this->values.
-    if (array_key_exists($property_name, $this->properties)) {
-      // If the property is an object, make sure to get its raw value.
-      if ($this->properties[$property_name] instanceof PropertyContainerInterface) {
-        $definition = $this->getPropertyDefinition($property_name);
-        $data_type = drupal_get_property_type_plugin($definition['type']);
-        return $data_type->getRawValue($definition, $this->properties[$property_name]);
-      }
-      else {
-        return $this->properties[$property_name];
-      }
-    }
     return isset($this->values[$property_name]) ? $this->values[$property_name] : NULL;
   }
 
   public function get($property_name) {
     // Populate $this->properties to fasten further lookups and to keep track of
     // property objects, possibly holding changes to properties.
+
     if (!array_key_exists($property_name, $this->properties)) {
       $definition = $this->getPropertyDefinition($property_name);
       $data_type = drupal_get_property_type_plugin($definition['type']);
+      $value = $this->getRawValue($property_name);
 
       if ($data_type instanceof PropertyTypeContainerInterface) {
-        $this->properties[$property_name] = $data_type->getProperty($definition, $this->values[$property_name]);
+        $this->properties[$property_name] = $data_type->getProperty($definition, $value);
       }
       else {
-        $this->properties[$property_name] = $this->values[$property_name];
+        $this->properties[$property_name] = $value;
       }
     }
     return $this->properties[$property_name];
   }
 
   public function set($property_name, $value) {
-    $definition = $this->getPropertyDefinition($property_name);
-    $data_type = drupal_get_property_type_plugin($definition['type']);
-
-    // If a raw value is passed in, instantiate the object before setting.
+    // If an object is passed in, get the raw value.
     // @todo: Needs tests.
-    if ($data_type instanceof PropertyTypeContainerInterface && !($value instanceof PropertyContainerInterface)) {
-      $value = $data_type->getProperty($definition, $value);
+    if ($value instanceof PropertyContainerInterface) {
+      $definition = $this->getPropertyDefinition($property_name);
+      $data_type = drupal_get_property_type_plugin($definition['type']);
+      $value = $data_type->getRawValue($definition, $value);
     }
 
-    $this->properties[$property_name] = $value;
+    $this->values[$property_name] = $value;
+    unset($this->properties[$property_name]);
   }
 
   public function __get($name) {

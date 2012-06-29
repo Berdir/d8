@@ -27,7 +27,7 @@ use Drupal\Core\Property\PropertyContainerInterface;
 class PropertyTypeEntity implements PropertyTypeContainerInterface {
 
   /**
-   * Gets an array property definitions of contained properties.
+   * Gets an array property definitions for the entity's properties.
    *
    * @param array $definition
    *   The definition of the container's property, e.g. the definition of an
@@ -46,20 +46,6 @@ class PropertyTypeEntity implements PropertyTypeContainerInterface {
     return $definitions;
   }
 
-  /**
-   * Gets the property object given the raw value.
-   *
-   * @param array $definition
-   *   The definition of the container's property, e.g. the definition of an
-   *   entity reference property.
-   * @param $value
-   *   The raw value of the property, or NULL if the property is not set. For
-   *   entity references the raw value is the entity ID, whereas for other
-   *   property containers it is usually an array of (raw) values matching the
-   *   definitions of the contained properties.
-   *
-   * @return PropertyContainerInterface
-   */
   function getProperty(array $definition, $value = NULL) {
     if (isset($value) && is_array($value)) {
       list($entity_type, $id) = $value;

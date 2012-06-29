@@ -20,11 +20,12 @@ class TestEntityStorageController extends \Drupal\entity\DatabaseStorageControll
       'description' => ('The name of the test entity.'),
       'type' => 'text_item',
     );
-//    $properties['user'] = array(
-//      'type' => 'user',
-//      'storage field' => 'uid',
-//      'description' => t('The associated user.'),
-//    );
+    $properties['user'] = array(
+      'type' => 'entityreference_item',
+      'entity type' => 'user',
+      'label' => t('User'),
+      'description' => t('The associated user.'),
+    );
     return $properties;
   }
 }
