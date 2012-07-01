@@ -30,13 +30,16 @@ class TestEntity extends Entity {
 
     // @todo: Use dependency injection.
     $this->dataType = drupal_get_property_type_plugin('entity');
-    $this->values = $values;
 
     // @todo: Should we unset defined properties or initialize all entity
     // property objects here, so we have the magic getter working with
     // properties defined in the entity class.
-
     unset($this->name);
+    unset($this->user);
+
+    foreach ($values as $name => $value) {
+      $this->set($name, $value);
+    }
   }
 
   public function __get($name) {

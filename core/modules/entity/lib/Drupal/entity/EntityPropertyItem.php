@@ -49,7 +49,10 @@ class EntityPropertyItem implements EntityPropertyItemInterface {
     $this->definition = $definition;
     // @todo: Use dependency injection.
     $this->dataType = drupal_get_property_type_plugin($this->definition['type']);
-    $this->values = $values;
+
+    foreach ($values as $name => $value) {
+      $this->set($name, $value);
+    }
   }
 
   public function getRawValue($property_name) {

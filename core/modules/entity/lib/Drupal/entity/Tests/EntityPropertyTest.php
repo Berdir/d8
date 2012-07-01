@@ -33,7 +33,7 @@ class EntityPropertyTest extends WebTestBase  {
    */
   public function testReadWrite() {
     $name = $this->randomName();
-    $name_property[LANGUAGE_NOT_SPECIFIED][0]['value'] = $name;
+    $name_property[0]['value'] = $name;
     $user = $this->drupalCreateUser();
 
     // Pass in the value of the name property when creating. With the user
