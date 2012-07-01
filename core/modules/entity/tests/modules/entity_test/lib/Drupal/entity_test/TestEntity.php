@@ -17,10 +17,16 @@ class TestEntity extends Entity {
   /**
    * The name of the test entity.
    *
-   * @var string
+   * @var EntityPropertyInterface
    */
   public $name;
 
+  /**
+   * The associated user.
+   *
+   * @var EntityPropertyInterface
+   */
+  public $user;
 
 
   public function __construct(array $values, $entity_type) {
