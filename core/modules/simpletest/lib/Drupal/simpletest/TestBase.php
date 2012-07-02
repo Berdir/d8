@@ -517,14 +517,15 @@ abstract class TestBase {
    *   methods during debugging.
    */
   public function run(array $methods = array()) {
-     if (variable_get('simpletest_verbose', TRUE)) {
+    $class = get_class($this);
+    if (variable_get('simpletest_verbose', TRUE)) {
       // Initialize verbose debugging.
       $this->verbose = TRUE;
       $this->verboseDirectory = variable_get('file_public_path', conf_path() . '/files') . '/simpletest/verbose';
       if (file_prepare_directory($this->verboseDirectory, FILE_CREATE_DIRECTORY) && !file_exists($this->verboseDirectory . '/.htaccess')) {
         file_put_contents($this->verboseDirectory . '/.htaccess', "<IfModule mod_expires.c>\nExpiresActive Off\n</IfModule>\n");
       }
-      $this->verboseClassName = str_replace("\\", "_", get_class($this));
+      $this->verboseClassName = str_replace("\\", "_", $class);
     }
     // HTTP auth settings (<username>:<password>) for the simpletest browser
     // when sending requests to the test site.
