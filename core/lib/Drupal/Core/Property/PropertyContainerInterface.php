@@ -15,15 +15,36 @@ use IteratorAggregate;
  */
 interface PropertyContainerInterface extends IteratorAggregate  {
 
-
-
-  // Validate the container values.
+  /**
+   * Validate the container values.
+   */
   public function validate();
 
+  /**
+   * Gets an array of all properties.
+   *
+   * @return array
+   *   An array of properties, keyed by property name.
+   */
   public function getProperties();
 
+  /**
+   * Gets the definition of a contained property.
+   *
+   * @param string $name
+   *   The name of property.
+   *
+   * @return array
+   *   The definition of the property.
+   */
   public function getPropertyDefinition($name);
 
+  /**
+   * Gets an array of all definitions of contained properties.
+   *
+   * @return array
+   *   An array of property definitions.
+   */
   public function getPropertyDefinitions();
 
 /*

@@ -31,7 +31,7 @@ class EntityPropertyItem implements EntityPropertyItemInterface {
   protected $properties = array();
 
   /**
-   * The definition of the represented property.
+   * The definition of the entity property.
    *
    * @var array
    */
@@ -53,6 +53,10 @@ class EntityPropertyItem implements EntityPropertyItemInterface {
     foreach ($values as $name => $value) {
       $this->set($name, $value);
     }
+  }
+
+  public function getDefinition() {
+    return $this->definition;
   }
 
   public function getRawValue($property_name) {

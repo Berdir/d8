@@ -96,6 +96,10 @@ class EntityProperty implements EntityPropertyInterface {
     return count($this->list);
   }
 
+  public function getDefinition() {
+    return $this->definition;
+  }
+
   /**
    * Delegate.
    */

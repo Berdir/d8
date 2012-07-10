@@ -18,6 +18,14 @@ use Drupal\Core\Property\PropertyContainerInterface;
 interface EntityPropertyItemInterface extends PropertyContainerInterface {
 
   /**
+   * Gets the definition of the entity property.
+   *
+   * @return array
+   *   The definition of the entity property.
+   */
+  public function getDefinition();
+
+  /**
    * May contain only primitives and entity references.
    *
    * In case of an entity reference it would return the entity object. You'll
