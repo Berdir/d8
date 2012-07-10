@@ -55,7 +55,7 @@ function taxonomy_help($path, $arg) {
       $output .= t('You can assign a sub-term to multiple parent terms. For example, <em>fusion</em> can be assigned to both <em>rock</em> and <em>jazz</em>.') . '</dd>';
       $output .= '<dd>' . t('Terms in a <em>free-tagging vocabulary</em> can be built gradually as you create or edit content. This is often done used for blogs or photo management applications.') . '</dd>';
       $output .= '<dt>' . t('Assigning vocabularies to content types') . '</dt>';
-      $output .= '<dd>' . t('Before you can use a new vocabulary to classify your content, a new Taxonomy term field must be added to a <a href="@ctedit">content type</a> on its <em>manage fields</em> page. When adding a taxonomy field, you choose a <em>widget</em> to use to enter the taxonomy information on the content editing page: a select list, checkboxes, radio buttons, or an auto-complete field (to build a free-tagging vocabulary). After choosing the field type and widget, on the subsequent <em>field settings</em> page you can choose the desired vocabulary, whether one or multiple terms can be chosen from the vocabulary, and other settings. The same vocabulary can be added to multiple content types, by using the "Add existing field" section on the manage fields page.', array('@ctedit' => url('admin/structure/types'))) . '</dd>';
+      $output .= '<dd>' . t('Before you can use a new vocabulary to classify your content, a new Taxonomy term field must be added to a <a href="@ctedit">content type</a> on its <em>manage fields</em> page. When adding a taxonomy field, you choose a <em>widget</em> to use to enter the taxonomy information on the content editing page: a select list, checkboxes, radio buttons, or an auto-complete field (to build a free-tagging vocabulary). After choosing the field type and widget, on the subsequent <em>field settings</em> page you can choose the desired vocabulary, whether one or multiple terms can be chosen from the vocabulary, and other settings. The same vocabulary can be added to multiple content types, by using the "Re-use existing field" section on the manage fields page.', array('@ctedit' => url('admin/structure/types'))) . '</dd>';
       $output .= '<dt>' . t('Classifying content') . '</dt>';
       $output .= '<dd>' . t('After the vocabulary is assigned to the content type, you can start classifying content. The field with terms will appear on the content editing screen when you edit or <a href="@addnode">add new content</a>.', array('@addnode' => url('node/add'))) . '</dd>';
       $output .= '<dt>' . t('Viewing listings and RSS feeds by term') . '</dt>';
@@ -584,7 +584,7 @@ function taxonomy_term_delete_multiple(array $tids) {
  */
 function taxonomy_term_view(Term $term, $view_mode = 'full', $langcode = NULL) {
   if (!isset($langcode)) {
-    $langcode = $GLOBALS['language_content']->langcode;
+    $langcode = drupal_container()->get(LANGUAGE_TYPE_CONTENT)->langcode;
   }
 
   field_attach_prepare_view('taxonomy_term', array($term->tid => $term), $view_mode, $langcode);
@@ -612,8 +612,7 @@ function taxonomy_term_view(Term $term, $view_mode = 'full', $langcode = NULL) {
   $build['#attached']['css'][] = drupal_get_path('module', 'taxonomy') . '/taxonomy.css';
 
   // Allow modules to modify the structured term.
-  $type = 'taxonomy_term';
-  drupal_alter(array('taxonomy_term_view', 'entity_view'), $build, $type);
+  drupal_alter(array('taxonomy_term_view', 'entity_view'), $build, $term);
 
   return $build;
 }
@@ -1128,7 +1127,7 @@ function taxonomy_field_widget_info_alter(&$info) {
  */
 function taxonomy_options_list($field, $instance, $entity_type, $entity) {
   $function = !empty($field['settings']['options_list_callback']) ? $field['settings']['options_list_callback'] : 'taxonomy_allowed_values';
-  return $function($field);
+  return $function($field, $instance, $entity_type, $entity);
 }
 
 /**
@@ -1281,10 +1280,20 @@ function taxonomy_field_formatter_view($entity_type, $entity, $field, $instance,
  *
  * @param $field
  *   The field definition.
+ * @param $instance
+ *   The instance definition. It is recommended to only use instance level
+ *   properties to filter out values from a list defined by field level
+ *   properties.
+ * @param $entity_type
+ *   The entity type the field is attached to.
+ * @param $entity
+ *   The entity object the field is attached to, or NULL if no entity
+ *   exists (e.g. in field settings page).
+ *
  * @return
  *   The array of valid terms for this field, keyed by term id.
  */
-function taxonomy_allowed_values($field) {
+function taxonomy_allowed_values($field, $instance, $entity_type, $entity) {
   $options = array();
   foreach ($field['settings']['allowed_values'] as $tree) {
     if ($vocabulary = taxonomy_vocabulary_machine_name_load($tree['vocabulary'])) {

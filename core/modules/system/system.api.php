@@ -374,7 +374,7 @@ function hook_library_info() {
     ),
     'dependencies' => array(
       // Require jQuery UI core by System module.
-      array('system', 'ui'),
+      array('system', 'jquery.ui.core'),
       // Require our other library.
       array('my_module', 'library-1'),
       // Require another library.
@@ -634,7 +634,7 @@ function hook_menu_get_item_alter(&$router_item, $path, $original_map) {
  * is invoked to retrieve a value that is used in the path in place of the
  * wildcard. A good example is user.module, which defines
  * user_uid_optional_to_arg() (corresponding to the menu entry
- * 'user/%user_uid_optional'). This function returns the user ID of the
+ * 'tracker/%user_uid_optional'). This function returns the user ID of the
  * current user.
  *
  * The _to_arg() function will get called with three arguments:
@@ -1526,7 +1526,7 @@ function hook_mail_alter(&$message) {
       $message['send'] = FALSE;
       return;
     }
-    $message['body'][] = "--\nMail sent out from " . variable_get('site_name', t('Drupal'));
+    $message['body'][] = "--\nMail sent out from " . config('system.site')->get('name');
   }
 }
 
@@ -1897,7 +1897,8 @@ function hook_custom_theme() {
  *     the message is not possible to translate.
  */
 function hook_watchdog(array $log_entry) {
-  global $base_url, $language_interface;
+  global $base_url;
+  $language_interface = drupal_container()->get(LANGUAGE_TYPE_INTERFACE);
 
   $severity_list = array(
     WATCHDOG_EMERGENCY     => t('Emergency'),
@@ -1913,7 +1914,7 @@ function hook_watchdog(array $log_entry) {
   $to = 'someone@example.com';
   $params = array();
   $params['subject'] = t('[@site_name] @severity_desc: Alert from your web site', array(
-    '@site_name' => variable_get('site_name', 'Drupal'),
+    '@site_name' => config('system.site')->get('name'),
     '@severity_desc' => $severity_list[$log_entry['severity']],
   ));
 
@@ -1979,7 +1980,7 @@ function hook_mail($key, &$message, $params) {
   $account = $params['account'];
   $context = $params['context'];
   $variables = array(
-    '%site_name' => variable_get('site_name', 'Drupal'),
+    '%site_name' => config('system.site')->get('name'),
     '%username' => user_format_name($account),
   );
   if ($context['hook'] == 'taxonomy') {
@@ -2737,7 +2738,7 @@ function hook_schema_alter(&$schema) {
  * @see AlterableInterface
  * @see SelectInterface
  */
-function hook_query_alter(Drupal\Database\Query\AlterableInterface $query) {
+function hook_query_alter(Drupal\Core\Database\Query\AlterableInterface $query) {
   if ($query->hasTag('micro_limit')) {
     $query->range(0, 2);
   }
@@ -2754,7 +2755,7 @@ function hook_query_alter(Drupal\Database\Query\AlterableInterface $query) {
  * @see AlterableInterface
  * @see SelectInterface
  */
-function hook_query_TAG_alter(Drupal\Database\Query\AlterableInterface $query) {
+function hook_query_TAG_alter(Drupal\Core\Database\Query\AlterableInterface $query) {
   // Skip the extra expensive alterations if site has no node access control modules.
   if (!node_access_view_all_nodes()) {
     // Prevent duplicates records.
@@ -2837,33 +2838,30 @@ function hook_install() {
 /**
  * Perform a single update.
  *
- * For each patch which requires a database change add a new hook_update_N()
- * which will be called by update.php. The database updates are numbered
- * sequentially according to the version of Drupal you are compatible with.
+ * For each change that requires one or more actions to be performed when
+ * updating a site, add a new hook_update_N(), which will be called by
+ * update.php. The documentation block preceding this function is stripped of
+ * newlines and used as the description for the update on the pending updates
+ * task list. Schema updates should adhere to the
+ * @link http://drupal.org/node/150215 Schema API. @endlink
  *
- * Schema updates should adhere to the Schema API:
- * @link http://drupal.org/node/150215 http://drupal.org/node/150215 @endlink
- *
- * Database updates consist of 3 parts:
- * - 1 digit for Drupal core compatibility
- * - 1 digit for your module's major release version (e.g. is this the 5.x-1.* (1) or 5.x-2.* (2) series of your module?)
- * - 2 digits for sequential counting starting with 00
- *
- * The 2nd digit should be 0 for initial porting of your module to a new Drupal
- * core API.
+ * Implementations of hook_update_N() are named (module name)_update_(number).
+ * The numbers are composed of three parts:
+ * - 1 digit for Drupal core compatibility.
+ * - 1 digit for your module's major release version (e.g., is this the 8.x-1.*
+ *   (1) or 8.x-2.* (2) series of your module?). This digit should be 0 for
+ *   initial porting of your module to a new Drupal core API.
+ * - 2 digits for sequential counting, starting with 00.
  *
  * Examples:
- * - mymodule_update_5200()
- *   - This is the first update to get the database ready to run mymodule 5.x-2.*.
- * - mymodule_update_6000()
- *   - This is the required update for mymodule to run with Drupal core API 6.x.
- * - mymodule_update_6100()
- *   - This is the first update to get the database ready to run mymodule 6.x-1.*.
- * - mymodule_update_6200()
- *   - This is the first update to get the database ready to run mymodule 6.x-2.*.
- *     Users can directly update from 5.x-2.* to 6.x-2.* and they get all 60XX
- *     and 62XX updates, but not 61XX updates, because those reside in the
- *     6.x-1.x branch only.
+ * - mymodule_update_8000(): This is the required update for mymodule to run
+ *   with Drupal core API 8.x when upgrading from Drupal core API 7.x.
+ * - mymodule_update_8100(): This is the first update to get the database ready
+ *   to run mymodule 8.x-1.*.
+ * - mymodule_update_8200(): This is the first update to get the database ready
+ *   to run mymodule 8.x-2.*. Users can directly update from 7.x-2.* to 8.x-2.*
+ *   and they get all 80xx and 82xx updates, but not 81xx updates, because
+ *   those reside in the 8.x-1.x branch only.
  *
  * A good rule of thumb is to remove updates older than two major releases of
  * Drupal. See hook_update_last_removed() to notify Drupal about the removals.
@@ -2882,8 +2880,8 @@ function hook_install() {
  * information between successive calls, and the $sandbox['#finished'] value
  * to provide feedback regarding completion level.
  *
- * See the batch operations page for more information on how to use the batch API:
- * @link http://drupal.org/node/180528 http://drupal.org/node/180528 @endlink
+ * See the batch operations page for more information on how to use the
+ * @link http://drupal.org/node/180528 Batch API. @endlink
  *
  * @param $sandbox
  *   Stores information for multipass updates. See above for more information.
@@ -2895,9 +2893,14 @@ function hook_install() {
  *   PDOException.
  *
  * @return
- *   Optionally update hooks may return a translated string that will be displayed
- *   to the user. If no message is returned, no message will be presented to the
- *   user.
+ *   Optionally, update hooks may return a translated string that will be
+ *   displayed to the user after the update has completed. If no message is
+ *   returned, no message will be presented to the user.
+ *
+ * @see batch
+ * @see schemaapi
+ * @see hook_update_last_removed()
+ * @see update_get_update_list()
  */
 function hook_update_N(&$sandbox) {
   // For non-multipass updates, the signature can simply be;
@@ -3583,7 +3586,7 @@ function hook_date_format_types_alter(&$types) {
  * used with the associated date type -- a user has to choose a format for each
  * date type in the administrative interface. There is one exception: locale
  * initialization chooses a locale-specific format for the three core-provided
- * types (see locale_get_localized_date_format() for details). If your module
+ * types (see system_get_localized_date_format() for details). If your module
  * needs to ensure that a date type it defines has a format associated with it,
  * call @code variable_set('date_format_' . $type, $format); @endcode
  * where $type is the machine-readable name defined in hook_date_format_types(),
@@ -4103,9 +4106,8 @@ function hook_countries_alter(&$countries) {
  * Control site status before menu dispatching.
  *
  * The hook is called after checking whether the site is offline but before
- * the current router item is retrieved and executed by
- * menu_execute_active_handler(). If the site is in offline mode,
- * $menu_site_status is set to MENU_SITE_OFFLINE.
+ * the current router item is retrieved and executed. If the site is in offline
+ * mode, $menu_site_status is set to MENU_SITE_OFFLINE.
  *
  * @param $menu_site_status
  *   Supported values are MENU_SITE_OFFLINE, MENU_ACCESS_DENIED,

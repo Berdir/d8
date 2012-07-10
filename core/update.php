@@ -383,10 +383,6 @@ update_prepare_d8_bootstrap();
 // Determine if the current user has access to run update.php.
 drupal_bootstrap(DRUPAL_BOOTSTRAP_SESSION);
 
-// The interface language global has been renamed in D8, we must ensure that it
-// contains a valid value while language settings are upgraded.
-// @todo Remove this globals reference entirely: http://drupal.org/node/1510686
-$GLOBALS[LANGUAGE_TYPE_INTERFACE] = language_default();
 
 // Ensure the default language is properly registered within the Dependency
 // Injection container during the upgrade process.
@@ -418,7 +414,7 @@ if (is_null($op) && update_access_allowed()) {
   // Load module basics.
   include_once DRUPAL_ROOT . '/core/includes/module.inc';
   $module_list['system']['filename'] = 'core/modules/system/system.module';
-  module_list(TRUE, FALSE, FALSE, $module_list);
+  module_list(NULL, $module_list);
   drupal_load('module', 'system');
 
   // Reset the module_implements() cache so that any new hook implementations

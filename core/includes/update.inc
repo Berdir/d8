@@ -10,6 +10,7 @@
 
 use Drupal\Component\Graph\Graph;
 use Drupal\Core\Config\FileStorage;
+use Drupal\Core\Config\ConfigException;
 
 /**
  * Minimum schema version of Drupal 7 required for upgrade to Drupal 8.
@@ -199,16 +200,55 @@ function update_prepare_d8_language() {
     update_module_add_to_system($modules);
     update_module_enable($modules);
 
-    // Rename 'language' column to 'langcode'.
-    db_drop_primary_key('language');
-    $langcode_spec = array(
-      'type' => 'varchar',
-      'length' => 12,
-      'not null' => TRUE,
-      'default' => '',
-      'description' => "Language code, e.g. 'de' or 'en-US'.",
-    );
-    db_change_field('language', 'language', 'langcode', $langcode_spec, array('primary key' => array('langcode')));
+    // Rename language column to langcode and set it again as the primary key.
+    if (db_field_exists('language', 'language')) {
+      db_drop_primary_key('language');
+      $langcode_spec = array(
+        'type' => 'varchar',
+        'length' => 12,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => "Language code, e.g. 'de' or 'en-US'.",
+      );
+      db_change_field('language', 'language', 'langcode', $langcode_spec, array('primary key' => array('langcode')));
+    }
+
+    // Update the 'language_default' system variable, if configured.
+    $language_default = variable_get('language_default');
+    if (!empty($language_default) && isset($language_default->language)) {
+      $language_default->langcode = $language_default->language;
+      unset($language_default->language);
+      // In D8, the 'language_default' is not anymore an object, but an array,
+      // so make sure that the new value that is saved into this variable is an
+      // array.
+      variable_set('language_default', (array) $language_default);
+     }
+
+    // Adds the locked column and saves the special languages.
+    if (!db_field_exists('language', 'locked')) {
+      $locked_spec = array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'A boolean indicating whether the administrator can edit or delete the language.',
+      );
+      db_add_field('language', 'locked', $locked_spec);
+
+      $max_language_weight = db_query('SELECT MAX(weight) FROM {language}')->fetchField();
+      $languages = language_default_locked_languages($max_language_weight);
+      foreach ($languages as $language) {
+        db_insert('language')
+          ->fields(array(
+            'langcode' => $language->langcode,
+            'name' => $language->name,
+            'weight' => $language->weight,
+            // These languages are locked, default to enabled.
+            'locked' => 1,
+          ))
+          ->execute();
+      }
+    }
 
     // Update the 'language_default' system variable with the langcode change.
     $language_default = variable_get('language_default');
@@ -218,7 +258,10 @@ function update_prepare_d8_language() {
         unset($language_default->language);
       }
       unset($language_default->enabled);
-      variable_set('language_default', $language_default);
+      // In D8, the 'language_default' is not anymore an object, but an array,
+      // so make sure that the new value that is saved into this variable is an
+      // array.
+      variable_set('language_default', (array) $language_default);
     }
   }
 }
@@ -900,11 +943,11 @@ function update_variables_to_config($config_name, array $variable_map) {
   $module = strtok($config_name, '.');
 
   // Load and set default configuration values.
-  // Throws a FileStorageReadException if there is no default configuration
-  // file, which is required to exist.
-  $file = new FileStorage($config_name);
-  $file->setPath(drupal_get_path('module', $module) . '/config');
-  $default_data = $file->read();
+  $file = new FileStorage(array('directory' => drupal_get_path('module', $module) . '/config'));
+  if (!$file->exists($config_name)) {
+    throw new ConfigException("Default configuration file $config_name for $module extension not found but is required to exist.");
+  }
+  $default_data = $file->read($config_name);
 
   // Merge any possibly existing original data into default values.
   // Only relevant when being called repetitively on the same config object.

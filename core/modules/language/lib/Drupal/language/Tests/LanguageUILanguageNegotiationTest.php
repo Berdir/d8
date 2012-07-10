@@ -93,7 +93,7 @@ class LanguageUILanguageNegotiationTest extends WebTestBase {
     // be some bug.
     drupal_static_reset('language_list');
     $languages = language_list();
-    variable_set('language_default', $languages['vi']);
+    variable_set('language_default', (array) $languages['vi']);
     // First visit this page to make sure our target string is searchable.
     $this->drupalGet('admin/config');
     // Now the t()'ed string is in db so switch the language back to default.
@@ -103,15 +103,29 @@ class LanguageUILanguageNegotiationTest extends WebTestBase {
     $language_browser_fallback_string = "In $langcode_browser_fallback In $langcode_browser_fallback In $langcode_browser_fallback";
     $language_string = "In $langcode In $langcode In $langcode";
     // Do a translate search of our target string.
-    $edit = array( 'string' => $default_string);
-    $this->drupalPost('admin/config/regional/translate/translate', $edit, t('Filter'));
-    // Should find the string and now click edit to post translated string.
-    $this->clickLink('edit');
-    $edit = array(
-      "translations[$langcode_browser_fallback][0]" => $language_browser_fallback_string,
-      "translations[$langcode][0]" => $language_string,
+    $search = array(
+      'string' => $default_string,
+      'langcode' => $langcode_browser_fallback,
     );
-    $this->drupalPost(NULL, $edit, t('Save translations'));
+    $this->drupalPost('admin/config/regional/translate/translate', $search, t('Filter'));
+    $textarea = current($this->xpath('//textarea'));
+    $lid = (string) $textarea[0]['name'];
+    $edit = array(
+      $lid => $language_browser_fallback_string,
+    );
+    $this->drupalPost('admin/config/regional/translate/translate', $edit, t('Save translations'));
+
+    $search = array(
+      'string' => $default_string,
+      'langcode' => $langcode,
+    );
+    $this->drupalPost('admin/config/regional/translate/translate', $search, t('Filter'));
+    $textarea = current($this->xpath('//textarea'));
+    $lid = (string) $textarea[0]['name'];
+    $edit = array(
+      $lid => $language_string,
+    );
+    $this->drupalPost('admin/config/regional/translate/translate', $edit, t('Save translations'));
 
     // Configure URL language rewrite.
     variable_set('language_negotiation_url_type', LANGUAGE_TYPE_INTERFACE);

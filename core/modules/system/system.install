@@ -116,6 +116,7 @@ function system_requirements($phase) {
     'session',
     'SimpleXML',
     'SPL',
+    'tokenizer',
     'xml',
   );
   foreach ($required_extensions as $extension) {
@@ -221,7 +222,7 @@ function system_requirements($phase) {
         $description .= ' ' . $t('Contact your system administrator or hosting provider for assistance with increasing your PHP memory limit.');
       }
 
-      $requirements['php_memory_limit']['description'] = $description . ' ' . $t('See the <a href="@url">Drupal requirements</a> for more information.', array('@url' => 'http://drupal.org/requirements'));
+      $requirements['php_memory_limit']['description'] = $description . ' ' . $t('For more information, see the online handbook entry for <a href="@memory-limit">increasing the PHP memory limit</a>.', array('@memory-limit' => 'http://drupal.org/node/207036'));
       $requirements['php_memory_limit']['severity'] = REQUIREMENT_WARNING;
     }
   }
@@ -513,7 +514,8 @@ function system_install() {
 
   // Clear out module list and hook implementation statics before calling
   // system_rebuild_theme_data().
-  module_list(TRUE);
+  drupal_static_reset('system_list');
+  module_list_reset();
   module_implements_reset();
 
   // Load system theme data appropriately.
@@ -1920,6 +1922,35 @@ function system_update_8010() {
     'feed_description' => 'feed_description',
     'feed_default_items' => 'feed_default_items',
     'feed_item_length' => 'feed_item_length',
+  ));
+}
+
+/**
+ * Update the module and base fields for the blog node type.
+ */
+function system_update_8011() {
+  db_update('node_type')
+    ->fields(array(
+      'module' => 'node',
+      'base' => 'node_content',
+    ))
+    ->condition('module', 'blog')
+    ->execute();
+}
+
+/**
+ * Moves site system settings from variable to config.
+ *
+ * @ingroup config_upgrade
+ */
+function system_update_8012() {
+  update_variables_to_config('system.site', array(
+    'site_name' => 'name',
+    'site_mail' => 'mail',
+    'site_slogan' => 'slogan',
+    'site_frontpage' => 'page.front',
+    'site_403' => 'page.403',
+    'site_404' => 'page.404',
   ));
 }
 

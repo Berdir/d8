@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Entity controller class for nodes.
+ * Definition of Drupal\node\NodeStorageController.
  */
 
 namespace Drupal\node;
@@ -149,6 +149,9 @@ class NodeStorageController extends DatabaseStorageController {
     }
     // Make sure to update the new revision key for the entity.
     $entity->{$this->revisionKey} = $record->{$this->revisionKey};
+
+    // Mark this revision as the current one.
+    $entity->isCurrentRevision = TRUE;
   }
 
   /**

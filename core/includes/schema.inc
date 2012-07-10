@@ -70,10 +70,10 @@ function drupal_get_complete_schema($rebuild = FALSE) {
       // been completed, so we force the functions we need to load just in case.
       if (function_exists('module_load_all_includes')) {
         // This function can be called very early in the bootstrap process, so
-        // we force the module_list() cache to be refreshed to ensure that it
-        // contains the complete list of modules before we go on to call
+        // we force the system_list() static cache to be refreshed to ensure
+        // that it contains the complete list of modules before we go on to call
         // module_load_all_includes().
-        module_list(TRUE);
+        drupal_static_reset('system_list');
         module_load_all_includes('install');
       }
 
@@ -349,6 +349,10 @@ function drupal_schema_fields_sql($table, $prefix = NULL) {
 
 /**
  * Saves (inserts or updates) a record to the database based upon the schema.
+ *
+ * Do not use drupal_write_record() within hook_update_N() functions, since the
+ * database schema cannot be relied upon when a user is running a series of
+ * updates. Instead, use db_insert() or db_update() to save the record.
  *
  * @param string $table
  *   The name of the table; this must be defined by a hook_schema()

@@ -81,6 +81,7 @@ function field_test_entity_info() {
       'fieldable' => TRUE,
       'field cache' => FALSE,
       'base table' => 'test_entity',
+      'revision table' => 'test_entity_revision',
       'entity keys' => array(
         'id' => 'ftid',
         'revision' => 'ftvid',
@@ -94,6 +95,7 @@ function field_test_entity_info() {
       'fieldable' => TRUE,
       'field cache' => FALSE,
       'base table' => 'test_entity',
+      'revision table' => 'test_entity_revision',
       'entity keys' => array(
         'id' => 'ftid',
         'revision' => 'ftvid',
@@ -108,6 +110,7 @@ function field_test_entity_info() {
       'fieldable' => TRUE,
       'field cache' => FALSE,
       'base table' => 'test_entity',
+      'revision table' => 'test_entity_revision',
       'label callback' => 'field_test_entity_label_callback',
       'entity keys' => array(
         'id' => 'ftid',
@@ -128,9 +131,9 @@ function field_test_entity_info_alter(&$entity_info) {
   foreach (field_test_entity_info_translatable() as $entity_type => $translatable) {
     $entity_info[$entity_type]['translation']['field_test'] = $translatable;
   }
-  // Disable locale as a translation handler.
+  // Disable the entity type translation handler.
   foreach ($entity_info as $entity_type => $info) {
-    $entity_info[$entity_type]['translation']['locale'] = FALSE;
+    $entity_info[$entity_type]['translation'][$entity_type] = FALSE;
   }
 }
 

@@ -1,5 +1,7 @@
 <?php
 
+use Drupal\entity\EntityInterface;
+
 /**
  * @file
  * Hooks provided by the Node module.
@@ -594,6 +596,8 @@ function hook_node_load($nodes, $types) {
  *   - "view"
  * @param object $account
  *   The user object to perform the access check operation on.
+ * @param object $langcode
+ *   The language code to perform the access check operation on.
  *
  * @return integer
  *   - NODE_ACCESS_ALLOW: if the operation is to be allowed.
@@ -602,7 +606,7 @@ function hook_node_load($nodes, $types) {
  *
  * @ingroup node_access
  */
-function hook_node_access($node, $op, $account) {
+function hook_node_access($node, $op, $account, $langcode) {
   $type = is_string($node) ? $node : $node->type;
 
   $configured_types = node_permissions_get_configured_types();
@@ -841,13 +845,15 @@ function hook_node_view(Drupal\node\Node $node, $view_mode, $langcode) {
  *
  * @param $build
  *   A renderable array representing the node content.
+ * @param Drupal\node\Node $node
+ *   The node being rendered.
  *
  * @see node_view()
  * @see hook_entity_view_alter()
  *
  * @ingroup node_api_hooks
  */
-function hook_node_view_alter(&$build) {
+function hook_node_view_alter(&$build, Drupal\node\Node $node) {
   if ($build['#view_mode'] == 'full' && isset($build['an_additional_field'])) {
     // Change its weight.
     $build['an_additional_field']['#weight'] = -10;

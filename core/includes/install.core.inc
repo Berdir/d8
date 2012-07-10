@@ -277,10 +277,11 @@ function install_begin_request(&$install_state) {
   drupal_language_initialize();
 
   require_once DRUPAL_ROOT . '/core/includes/ajax.inc';
+  // Override the module list with a minimal set of modules.
   $module_list['system']['filename'] = 'core/modules/system/system.module';
   $module_list['entity']['filename'] = 'core/modules/entity/entity.module';
   $module_list['user']['filename']   = 'core/modules/user/user.module';
-  module_list(TRUE, FALSE, FALSE, $module_list);
+  module_list(NULL, $module_list);
   drupal_load('module', 'system');
   drupal_load('module', 'entity');
   drupal_load('module', 'user');
@@ -1445,6 +1446,9 @@ function install_load_profile(&$install_state) {
  *   An array of information about the current installation state.
  */
 function install_bootstrap_full(&$install_state) {
+  // Clear the module list that was overriden earlier in the process.
+  // This will allow all freshly installed modules to be loaded.
+  module_list_reset();
   drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
 }
 
@@ -1916,8 +1920,11 @@ function install_configure_form_validate($form, &$form_state) {
 function install_configure_form_submit($form, &$form_state) {
   global $user;
 
-  variable_set('site_name', $form_state['values']['site_name']);
-  variable_set('site_mail', $form_state['values']['site_mail']);
+  config('system.site')
+    ->set('name', $form_state['values']['site_name'])
+    ->set('mail', $form_state['values']['site_mail'])
+    ->save();
+
   variable_set('date_default_timezone', $form_state['values']['date_default_timezone']);
   variable_set('site_default_country', $form_state['values']['site_default_country']);
 

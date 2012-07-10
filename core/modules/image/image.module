@@ -500,6 +500,50 @@ function image_path_flush($path) {
 }
 
 /**
+ * Implements MODULE_config_import_create().
+ */
+function image_config_import_create($name, $new_config, $old_config) {
+  // Only image styles require custom handling. Any other module settings can be
+  // synchronized directly.
+  if (strpos($name, 'image.style.') !== 0) {
+    return FALSE;
+  }
+  $style = $new_config->get();
+  return image_style_save($style);
+}
+
+/**
+ * Implements MODULE_config_import_change().
+ */
+function image_config_import_change($name, $new_config, $old_config) {
+  // Only image styles require custom handling. Any other module settings can be
+  // synchronized directly.
+  if (strpos($name, 'image.style.') !== 0) {
+    return FALSE;
+  }
+  $style = $new_config->get();
+  return image_style_save($style);
+}
+
+/**
+ * Implements MODULE_config_import_delete().
+ */
+function image_config_import_delete($name, $new_config, $old_config) {
+  // Only image styles require custom handling. Any other module settings can be
+  // synchronized directly.
+  if (strpos($name, 'image.style.') !== 0) {
+    return FALSE;
+  }
+  // @todo image_style_delete() supports the notion of a "replacement style"
+  //   to be used by other modules instead of the deleted style. Essential!
+  //   But that is impossible currently, since the config system only knows
+  //   about deleted and added changes. Introduce an 'old_ID' key within
+  //   config objects as a standard?
+  $style = $old_config->get();
+  return image_style_delete($style);
+}
+
+/**
  * Get an array of all styles and their settings.
  *
  * @return
@@ -548,13 +592,11 @@ function image_styles() {
  * @see image_effect_load()
  */
 function image_style_load($name) {
-  $style = config('image.style.' . $name)->get();
-
-  // @todo Requires a more reliable + generic method to check for whether the
-  //   configuration object exists.
-  if (!isset($style['name'])) {
+  $config = config('image.style.' . $name);
+  if ($config->isNew()) {
     return FALSE;
   }
+  $style = $config->get();
 
   if (!empty($style['effects'])) {
     foreach ($style['effects'] as $ieid => $effect) {
@@ -579,6 +621,8 @@ function image_style_load($name) {
  */
 function image_style_save($style) {
   $config = config('image.style.' . $style['name']);
+  $is_new = $config->isNew();
+
   $config->set('name', $style['name']);
   if (isset($style['effects'])) {
     $config->set('effects', $style['effects']);
@@ -587,11 +631,9 @@ function image_style_save($style) {
     $config->set('effects', array());
   }
   $config->save();
-  // @todo is_new must only be set when the configuration object did not exist
-  //   yet.
-  $style['is_new'] = TRUE;
 
   // Let other modules update as necessary on save.
+  $style['is_new'] = $is_new;
   module_invoke_all('image_style_save', $style);
 
   // Clear all caches and flush.
@@ -923,7 +965,7 @@ function image_style_path($style_name, $uri) {
  * @see image_effect_definition_load()
  */
 function image_effect_definitions() {
-  global $language_interface;
+  $language_interface = drupal_container()->get(LANGUAGE_TYPE_INTERFACE);
 
   // hook_image_effect_info() includes translated strings, so each language is
   // cached separately.

@@ -63,6 +63,12 @@ class Entity implements EntityInterface {
    */
   protected $dataType;
 
+  /*
+   * Indicates whether this is the current revision.
+   *
+   * @var bool
+   */
+  public $isCurrentRevision = TRUE;
 
   /**
    * Constructs a new entity object.
@@ -112,14 +118,12 @@ class Entity implements EntityInterface {
 
   /**
    * Implements EntityInterface::label().
-   *
-   * @see entity_label()
    */
-  public function label() {
+  public function label($langcode = NULL) {
     $label = FALSE;
     $entity_info = $this->entityInfo();
     if (isset($entity_info['label callback']) && function_exists($entity_info['label callback'])) {
-      $label = $entity_info['label callback']($this->entityType, $this);
+      $label = $entity_info['label callback']($this->entityType, $this, $langcode);
     }
     elseif (!empty($entity_info['entity keys']['label']) && isset($this->{$entity_info['entity keys']['label']})) {
       $label = $this->{$entity_info['entity keys']['label']};
@@ -280,6 +284,20 @@ class Entity implements EntityInterface {
    */
   public function entityInfo() {
     return entity_get_info($this->entityType);
+  }
+
+  /**
+   * Implements Drupal\entity\EntityInterface::getRevisionId().
+   */
+  public function getRevisionId() {
+    return NULL;
+  }
+
+  /**
+   * Implements Drupal\entity\EntityInterface::isCurrentRevision().
+   */
+  public function isCurrentRevision() {
+    return $this->isCurrentRevision;
   }
 
   public function getIterator() {

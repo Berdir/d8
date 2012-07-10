@@ -18,10 +18,11 @@ var states = Drupal.states = {
  */
 Drupal.behaviors.states = {
   attach: function (context, settings) {
+    var $context = $(context);
     for (var selector in settings.states) {
       for (var state in settings.states[selector]) {
         new states.Dependent({
-          element: $(selector),
+          element: $context.find(selector),
           state: states.State.sanitize(state),
           constraints: settings.states[selector][state]
         });
@@ -107,8 +108,8 @@ states.Dependent.prototype = {
         this.values[selector][state.name] = null;
 
         // Monitor state changes of the specified state for this dependee.
-        $(selector).bind('state:' + state, $.proxy(function (e) {
-          this.update(selector, state, e.value);
+        $(selector).bind('state:' + state, {selector: selector, state: state}, $.proxy(function (e) {
+          this.update(e.data.selector, e.data.state, e.value);
         }, this));
 
         // Make sure the event we just bound ourselves to is actually fired.
@@ -201,7 +202,7 @@ states.Dependent.prototype = {
       // This constraint is an array (OR or XOR).
       var hasXor = $.inArray('xor', constraints) === -1;
       for (var i = 0, len = constraints.length; i < len; i++) {
-        if (constraints[i] != 'xor') {
+        if (constraints[i] !== 'xor') {
           var constraint = this.checkConstraints(constraints[i], selector, i);
           // Return if this is OR and we have a satisfied constraint or if this
           // is XOR and we have a second satisfied constraint.
@@ -319,7 +320,7 @@ states.Trigger.prototype = {
   initialize: function () {
     var trigger = states.Trigger.states[this.state];
 
-    if (typeof trigger == 'function') {
+    if (typeof trigger === 'function') {
       // We have a custom trigger initialization function.
       trigger.call(window, this.element);
     }
@@ -368,7 +369,7 @@ states.Trigger.states = {
     'keyup': function () {
       // The function associated to that trigger returns the new value for the
       // state.
-      return this.val() == '';
+      return this.val() === '';
     }
   },
 
@@ -427,7 +428,7 @@ states.State = function(state) {
   // Normalize the state name.
   while (true) {
     // Iteratively remove exclamation marks and invert the value.
-    while (this.name.charAt(0) == '!') {
+    while (this.name.charAt(0) === '!') {
       this.name = this.name.substring(1);
       this.invert = !this.invert;
     }

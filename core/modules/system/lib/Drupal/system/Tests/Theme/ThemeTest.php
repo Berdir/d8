@@ -8,6 +8,7 @@
 namespace Drupal\system\Tests\Theme;
 
 use Drupal\simpletest\WebTestBase;
+use Drupal\test_theme\ThemeClass;
 
 /**
  * Tests low-level theme functions.
@@ -32,7 +33,7 @@ class ThemeTest extends WebTestBase {
   function testThemeSuggestions() {
     // Set the front page as something random otherwise the CLI
     // test runner fails.
-    variable_set('site_frontpage', 'nobody-home');
+    config('system.site')->set('page.front', 'nobody-home')->save();
     $args = array('node', '1', 'edit');
     $suggestions = theme_get_suggestions($args, 'page');
     $this->assertEqual($suggestions, array('page__node', 'page__node__%', 'page__node__1', 'page__node__edit'), t('Found expected node edit page suggestions'));
@@ -76,7 +77,7 @@ class ThemeTest extends WebTestBase {
     $original_path = _current_path();
     // Set the current path to node because theme_get_suggestions() will query
     // it to see if we are on the front page.
-    variable_set('site_frontpage', 'node');
+    config('system.site')->set('page.front', 'node')->save();
     _current_path('node');
     $suggestions = theme_get_suggestions(array('node'), 'page');
     // Set it back to not annoy the batch runner.
@@ -170,5 +171,12 @@ class ThemeTest extends WebTestBase {
 
     module_enable(array('theme_test'), FALSE);
     $this->assertIdentical(theme('theme_test_foo', array('foo' => 'c')), 'c', 'The theme registry contains theme_test_foo again after re-enabling the module.');
+  }
+
+  /**
+   * Tests theme can provide classes.
+   */
+  function testClassLoading() {
+    new ThemeClass();
   }
 }

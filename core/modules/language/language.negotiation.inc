@@ -321,7 +321,7 @@ function language_switcher_url($type, $path) {
  */
 function language_switcher_session($type, $path) {
   $param = variable_get('language_negotiation_session_param', 'language');
-  $language_query = isset($_SESSION[$param]) ? $_SESSION[$param] : $GLOBALS[$type]->langcode;
+  $language_query = isset($_SESSION[$param]) ? $_SESSION[$param] : drupal_container()->get($type)->langcode;
 
   $languages = language_list();
   $links = array();
@@ -368,7 +368,7 @@ function language_url_rewrite_url(&$path, &$options) {
     $options['language'] = $language_url;
   }
   // We allow only enabled languages here.
-  elseif (!isset($languages[$options['language']->langcode])) {
+  elseif (is_object($options['language']) && !isset($languages[$options['language']->langcode])) {
     unset($options['language']);
     return;
   }
@@ -377,12 +377,21 @@ function language_url_rewrite_url(&$path, &$options) {
     switch (variable_get('language_negotiation_url_part', LANGUAGE_NEGOTIATION_URL_PREFIX)) {
       case LANGUAGE_NEGOTIATION_URL_DOMAIN:
         $domains = language_negotiation_url_domains();
-        if (!empty($domains[$options['language']->langcode])) {
+        if (is_object($options['language']) && !empty($domains[$options['language']->langcode])) {
           // Ask for an absolute URL with our modified base_url.
           global $is_https;
           $url_scheme = ($is_https) ? 'https://' : 'http://';
           $options['absolute'] = TRUE;
           $options['base_url'] = $url_scheme . $domains[$options['language']->langcode];
+
+          // HTTP_HOST will optionally contain the port. Preserve that for
+          // the domain of the target language as well.
+          $http_host = $_SERVER['HTTP_HOST'];
+          if (strpos($http_host, ':') !== FALSE) {
+            $http_host_tmp = explode(':', $http_host);
+            $options['base_url'] .= ':' . end($http_host_tmp);
+          }
+
           if (isset($options['https']) && variable_get('https', FALSE)) {
             if ($options['https'] === TRUE) {
               $options['base_url'] = str_replace('http://', 'https://', $options['base_url']);
@@ -396,7 +405,7 @@ function language_url_rewrite_url(&$path, &$options) {
 
       case LANGUAGE_NEGOTIATION_URL_PREFIX:
         $prefixes = language_negotiation_url_prefixes();
-        if (!empty($prefixes[$options['language']->langcode])) {
+        if (is_object($options['language']) &&!empty($prefixes[$options['language']->langcode])) {
           $options['prefix'] = $prefixes[$options['language']->langcode] . '/';
         }
         break;

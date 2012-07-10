@@ -5,6 +5,7 @@ use Symfony\Component\ClassLoader\UniversalClassLoader;
 use Symfony\Component\ClassLoader\ApcUniversalClassLoader;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\Request;
+use Drupal\Core\Language\Language;
 
 /**
  * @file
@@ -37,11 +38,6 @@ const DRUPAL_MINIMUM_PHP_MEMORY_LIMIT = '32M';
  * The item may be removed using cache()->delete() with a cache ID.
  */
 const CACHE_PERMANENT = 0;
-
-/**
- * Indicates that the item should be removed at the next general cache wipe.
- */
-const CACHE_TEMPORARY = -1;
 
 /**
  * @defgroup logging_severity_levels Logging severity levels
@@ -208,6 +204,21 @@ const LANGUAGE_NOT_APPLICABLE = 'zxx';
 const LANGUAGE_MULTIPLE = 'mul';
 
 /**
+ * The language state when referring to configurable languages.
+ */
+const LANGUAGE_CONFIGURABLE = 1;
+
+/**
+ * The language state when referring to locked languages.
+ */
+const LANGUAGE_LOCKED = 2;
+
+/**
+ * The language state used when referring to all languages.
+ */
+const LANGUAGE_ALL = 3;
+
+/**
  * The type of language used to define the content language.
  */
 const LANGUAGE_TYPE_CONTENT = 'language_content';
@@ -286,8 +297,6 @@ const REGISTRY_WRITE_LOOKUP_CACHE = 2;
  * @see http://php.net/manual/language.functions.php
  */
 const DRUPAL_PHP_FUNCTION_PATTERN = '[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*';
-
-require_once DRUPAL_ROOT . '/core/includes/config.inc';
 
 /**
  * Starts the timer with the specified name.
@@ -476,6 +485,25 @@ function find_conf_path($http_host, $script_name, $require_settings = TRUE) {
   }
   $conf = "$confdir/default";
   return $conf;
+}
+
+/**
+ * Returns the path of the configuration directory.
+ *
+ * @return string
+ *   The configuration directory path.
+ */
+function config_get_config_directory() {
+  global $config_directory_name;
+
+  if ($test_prefix = drupal_valid_test_ua()) {
+    // @see Drupal\simpletest\WebTestBase::setUp()
+    $path = conf_path() . '/files/simpletest/' . substr($test_prefix, 10) . '/config';
+  }
+  else {
+    $path = conf_path() . '/files/' . $config_directory_name;
+  }
+  return $path;
 }
 
 /**
@@ -1057,14 +1085,7 @@ function drupal_page_is_cacheable($allow_caching = NULL) {
  * @see bootstrap_hooks()
  */
 function bootstrap_invoke_all($hook) {
-  // Bootstrap modules should have been loaded when this function is called, so
-  // we don't need to tell module_list() to reset its internal list (and we
-  // therefore leave the first parameter at its default value of FALSE). We
-  // still pass in TRUE for the second parameter, though; in case this is the
-  // first time during the bootstrap that module_list() is called, we want to
-  // make sure that its internal cache is primed with the bootstrap modules
-  // only.
-  foreach (module_list(FALSE, TRUE) as $module) {
+  foreach (module_list('bootstrap') as $module) {
     drupal_load('module', $module);
     module_invoke($module, $hook);
   }
@@ -2264,6 +2285,9 @@ function _drupal_bootstrap_configuration() {
 
   // Activate the class loader.
   drupal_classloader();
+
+  // Load the procedural configuration system helper functions.
+  require_once DRUPAL_ROOT . '/core/includes/config.inc';
 }
 
 /**
@@ -2621,15 +2645,6 @@ function drupal_language_initialize() {
         ->addMethodCall('extend', array($default));
     }
   }
-
-  // @todo Temporary backwards compatibility for code still using globals.
-  //   Remove after these issues:
-  //   - $language_interface: http://drupal.org/node/1510686
-  //   - $language_url: http://drupal.org/node/1512310
-  //   - $language_content: http://drupal.org/node/1512308
-  foreach ($types as $type) {
-    $GLOBALS[$type] = $container->get($type);
-  }
 }
 
 /**
@@ -2664,33 +2679,93 @@ function language_multilingual() {
 }
 
 /**
- * Returns a list of configured languages.
+ * Returns a list of languages set up on the site.
+ *
+ * @param $flags
+ *   (optional) Specifies the state of the languages that have to be returned.
+ *   It can be: LANGUAGE_CONFIGURABLE, LANGUAGE_LOCKED, LANGUAGE_ALL.
  *
  * @return
  *   An associative array of languages, keyed by the language code, ordered by
  *   weight ascending and name ascending.
  */
-function language_list() {
+function language_list($flags = LANGUAGE_CONFIGURABLE) {
+
   $languages = &drupal_static(__FUNCTION__);
+
   // Initialize master language list.
   if (!isset($languages)) {
+    // Initialize local language list cache.
+   $languages = array();
+
+    // Fill in master language list based on current configuration.
     $default = language_default();
     if (language_multilingual() || module_exists('language')) {
       // Use language module configuration if available.
-      $languages = db_query('SELECT * FROM {language} ORDER BY weight ASC, name ASC')->fetchAllAssoc('langcode');
+      $languages = db_query('SELECT *, 0 as `default` FROM {language} ORDER BY weight ASC, name ASC')->fetchAllAssoc('langcode', PDO::FETCH_ASSOC);
+
+      // Initialize default property so callers have an easy reference and can
+      // save the same object without data loss.
+      foreach ($languages as $langcode => $info) {
+        $info['default'] = ($langcode == $default->langcode);
+        $languages[$langcode] = new Language($info);
+      }
     }
     else {
       // No language module, so use the default language only.
       $languages = array($default->langcode => $default);
-    }
-
-    // Initialize default property so callers have an easy reference and can
-    // save the same object without data loss.
-    foreach ($languages as $langcode => $language) {
-      $languages[$langcode]->default = ($langcode == $default->langcode);
+      // Add the special languages, they will be filtered later if needed.
+      $languages += language_default_locked_languages($default->weight);
     }
   }
 
+  // Filter the full list of languages based on the value of the $all flag. By
+  // default we remove the locked languages, but the caller may request for
+  // those languages to be added as well.
+  $filtered_languages = array();
+  foreach ($languages as $langcode => $language) {
+    if (($language->locked && !($flags & LANGUAGE_LOCKED)) || (!$language->locked && !($flags & LANGUAGE_CONFIGURABLE))) {
+      continue;
+     }
+    $filtered_languages[$langcode] = $language;
+  }
+
+  return $filtered_languages;
+}
+
+/**
+ * Returns a list of the default locked languages.
+ *
+ * @param int $weight
+ *   An integer value that is used as the start value for the weights of the
+ *   locked languages.
+ *
+ * @return
+ *   An array of language objects.
+ */
+function language_default_locked_languages($weight = 0) {
+  $locked_language = array(
+    'default' => FALSE,
+    'locked' => TRUE,
+    'enabled' => TRUE,
+  );
+
+  $languages = array();
+  $languages[LANGUAGE_NOT_SPECIFIED] = new Language(array(
+    'langcode' => LANGUAGE_NOT_SPECIFIED,
+    'name' => t('Not specified'),
+    'weight' => ++$weight,
+  ) + $locked_language);
+  $languages[LANGUAGE_NOT_APPLICABLE] = new Language(array(
+    'langcode' => LANGUAGE_NOT_APPLICABLE,
+    'name' => t('Not applicable'),
+    'weight' => ++$weight,
+  ) + $locked_language);
+  $languages[LANGUAGE_MULTIPLE] = new Language(array(
+    'langcode' => LANGUAGE_MULTIPLE,
+    'name' => t('Multiple'),
+    'weight' => ++$weight,
+  ) + $locked_language);
   return $languages;
 }
 
@@ -2704,7 +2779,7 @@ function language_list() {
  *   A fully-populated language object or FALSE.
  */
 function language_load($langcode) {
-  $languages = language_list();
+  $languages = language_list(LANGUAGE_ALL);
   return isset($languages[$langcode]) ? $languages[$langcode] : FALSE;
 }
 
@@ -2732,20 +2807,32 @@ function language_name($langcode) {
 }
 
 /**
+ * Checks if a language is locked.
+ *
+ * @param $langcode
+ *   The language code.
+ */
+function language_is_locked($langcode) {
+  $language = language_load($langcode);
+  return ($language ? $language->locked : FALSE);
+}
+
+/**
  * Returns the default language used on the site.
  *
  * @return
  *   A language object.
  */
 function language_default() {
-  $default = variable_get('language_default', (object) array(
+  $info = variable_get('language_default', array(
     'langcode' => 'en',
     'name' => 'English',
     'direction' => 0,
     'weight' => 0,
+    'locked' => 0,
   ));
-  $default->default = TRUE;
-  return $default;
+  $info['default'] = TRUE;
+  return new Language($info);
 }
 
 /**
@@ -2931,13 +3018,13 @@ function drupal_classloader() {
 
   if (!isset($loader)) {
     // Include the Symfony ClassLoader for loading PSR-0-compatible classes.
-    require_once DRUPAL_ROOT . '/core/vendor/Symfony/Component/ClassLoader/UniversalClassLoader.php';
+    require_once DRUPAL_ROOT . '/core/vendor/symfony/class-loader/Symfony/Component/ClassLoader/UniversalClassLoader.php';
 
     // @todo Use a cleaner way than variable_get() to switch autoloaders.
     switch (variable_get('autoloader_mode', 'default')) {
       case 'apc':
         if (function_exists('apc_store')) {
-          require_once DRUPAL_ROOT . '/core/vendor/Symfony/Component/ClassLoader/ApcUniversalClassLoader.php';
+          require_once DRUPAL_ROOT . '/core/vendor/symfony/class-loader/Symfony/Component/ClassLoader/ApcUniversalClassLoader.php';
           $loader = new ApcUniversalClassLoader('drupal.' . $GLOBALS['drupal_hash_salt']);
           break;
         }
@@ -2950,10 +3037,21 @@ function drupal_classloader() {
         break;
     }
 
-    // Register explicit vendor namespaces.
+    // Register explicit PSR-0 vendor namespaces.
     $loader->registerNamespaces(array(
-      // All Symfony-borrowed code lives in /core/vendor/Symfony.
-      'Symfony' => DRUPAL_ROOT . '/core/vendor',
+      // All Symfony-borrowed code lives in /core/vendor/symfony.
+      'Symfony\Component\ClassLoader' => DRUPAL_ROOT . '/core/vendor/symfony/class-loader',
+      'Symfony\Component\DependencyInjection' => DRUPAL_ROOT . '/core/vendor/symfony/dependency-injection',
+      'Symfony\Component\EventDispatcher' => DRUPAL_ROOT . '/core/vendor/symfony/event-dispatcher',
+      'Symfony\Component\HttpFoundation' => DRUPAL_ROOT . '/core/vendor/symfony/http-foundation',
+      'Symfony\Component\HttpKernel' => DRUPAL_ROOT . '/core/vendor/symfony/http-kernel',
+      'Symfony\Component\Routing' => DRUPAL_ROOT . '/core/vendor/symfony/routing',
+      'Symfony\Component\Yaml' => DRUPAL_ROOT . '/core/vendor/symfony/yaml',
+    ));
+    // Register PEAR-style vendor namespaces.
+    $loader->registerPrefixes(array(
+      // All Twig-borrowed code lives in /core/vendor/twig.
+      'Twig' => DRUPAL_ROOT . '/core/vendor/twig/twig/lib',
     ));
     // Register the Drupal namespace for classes in core as a fallback.
     // This allows to register additional namespaces within the Drupal namespace
@@ -3414,6 +3512,7 @@ function drupal_check_memory_limit($required, $memory_limit = NULL) {
   // There is sufficient memory if:
   // - No memory limit is set.
   // - The memory limit is set to unlimited (-1).
-  // - The memory limit is greater than the memory required for the operation.
-  return ((!$memory_limit) || ($memory_limit == -1) || (parse_size($memory_limit) > parse_size($required)));
+  // - The memory limit is greater than or equal to the memory required for
+  //   the operation.
+  return ((!$memory_limit) || ($memory_limit == -1) || (parse_size($memory_limit) >= parse_size($required)));
 }

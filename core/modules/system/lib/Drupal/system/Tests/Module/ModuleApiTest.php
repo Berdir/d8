@@ -55,7 +55,7 @@ class ModuleApiTest extends WebTestBase {
       ->condition('type', 'module')
       ->execute();
     // Reset the module list.
-    module_list(TRUE);
+    system_list_reset();
     // Move contact to the end of the array.
     unset($module_list[array_search('contact', $module_list)]);
     $module_list[] = 'contact';
@@ -66,12 +66,12 @@ class ModuleApiTest extends WebTestBase {
       'system' => array('filename' => drupal_get_path('module', 'system')),
       'menu' => array('filename' => drupal_get_path('module', 'menu')),
     );
-    module_list(FALSE, FALSE, FALSE, $fixed_list);
+    module_list(NULL, $fixed_list);
     $new_module_list = array_combine(array_keys($fixed_list), array_keys($fixed_list));
     $this->assertModuleList($new_module_list, t('When using a fixed list'));
 
     // Reset the module list.
-    module_list(TRUE);
+    module_list_reset();
     $this->assertModuleList($module_list, t('After reset'));
   }
 
@@ -84,8 +84,6 @@ class ModuleApiTest extends WebTestBase {
   protected function assertModuleList(Array $expected_values, $condition) {
     $expected_values = array_combine($expected_values, $expected_values);
     $this->assertEqual($expected_values, module_list(), t('@condition: module_list() returns correct results', array('@condition' => $condition)));
-    ksort($expected_values);
-    $this->assertIdentical($expected_values, module_list(FALSE, FALSE, TRUE), t('@condition: module_list() returns correctly sorted results', array('@condition' => $condition)));
   }
 
   /**
@@ -135,6 +133,19 @@ class ModuleApiTest extends WebTestBase {
     $this->resetAll();
     $this->drupalGet('module-test/hook-dynamic-loading-invoke-all');
     $this->assertText('success!', t('module_invoke_all() dynamically loads a hook defined in hook_hook_info().'));
+  }
+
+  /**
+   * Test that a menu item load function can invoke hooks defined in hook_hook_info().
+   *
+   * We test this separately from testModuleInvokeAll(), because menu item load
+   * functions execute early in the request handling.
+   */
+  function testModuleInvokeAllDuringLoadFunction() {
+    module_enable(array('module_test'), FALSE);
+    $this->resetAll();
+    $this->drupalGet('module-test/hook-dynamic-loading-invoke-all-during-load/module_test');
+    $this->assertText('success!', t('Menu item load function invokes a hook defined in hook_hook_info().'));
   }
 
   /**
@@ -194,8 +205,8 @@ class ModuleApiTest extends WebTestBase {
     // Try to uninstall the PHP module by itself. This should be rejected,
     // since the modules which it depends on need to be uninstalled first, and
     // that is too destructive to perform automatically.
-    $result = drupal_uninstall_modules(array('php'));
-    $this->assertFalse($result, t('Calling drupal_uninstall_modules() on a module whose dependents are not uninstalled fails.'));
+    $result = module_uninstall(array('php'));
+    $this->assertFalse($result, t('Calling module_uninstall() on a module whose dependents are not uninstalled fails.'));
     foreach (array('forum', 'poll', 'php') as $module) {
       $this->assertNotEqual(drupal_get_installed_schema_version($module), SCHEMA_UNINSTALLED, t('The @module module was not uninstalled.', array('@module' => $module)));
     }
@@ -203,17 +214,17 @@ class ModuleApiTest extends WebTestBase {
     // Now uninstall all three modules explicitly, but in the incorrect order,
     // and make sure that drupal_uninstal_modules() uninstalled them in the
     // correct sequence.
-    $result = drupal_uninstall_modules(array('poll', 'php', 'forum'));
-    $this->assertTrue($result, t('drupal_uninstall_modules() returns the correct value.'));
+    $result = module_uninstall(array('poll', 'php', 'forum'));
+    $this->assertTrue($result, t('module_uninstall() returns the correct value.'));
     foreach (array('forum', 'poll', 'php') as $module) {
       $this->assertEqual(drupal_get_installed_schema_version($module), SCHEMA_UNINSTALLED, t('The @module module was uninstalled.', array('@module' => $module)));
     }
-    $this->assertEqual(variable_get('test_module_uninstall_order', array()), array('forum', 'poll', 'php'), t('Modules were uninstalled in the correct order by drupal_uninstall_modules().'));
+    $this->assertEqual(variable_get('test_module_uninstall_order', array()), array('forum', 'poll', 'php'), t('Modules were uninstalled in the correct order by module_uninstall().'));
 
     // Uninstall the profile module from above, and make sure that the profile
     // itself is not on the list of dependent modules to be uninstalled.
-    $result = drupal_uninstall_modules(array('comment'));
-    $this->assertTrue($result, t('drupal_uninstall_modules() returns the correct value.'));
+    $result = module_uninstall(array('comment'));
+    $this->assertTrue($result, t('module_uninstall() returns the correct value.'));
     $this->assertEqual(drupal_get_installed_schema_version('comment'), SCHEMA_UNINSTALLED, t('Comment module was uninstalled.'));
     $uninstalled_modules = variable_get('test_module_uninstall_order', array());
     $this->assertTrue(in_array('comment', $uninstalled_modules), t('Comment module is in the list of uninstalled modules.'));

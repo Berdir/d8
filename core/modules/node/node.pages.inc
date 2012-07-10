@@ -23,7 +23,9 @@ function node_page_edit($node) {
 }
 
 /**
- * Page callback: Presents the node add form.
+ * Page callback: Displays add content links for available content types.
+ *
+ * Redirects to node/add/[type] if only one content type is available.
  *
  * @see node_menu()
  */
@@ -91,7 +93,7 @@ function node_add($type) {
     'uid' => $user->uid,
     'name' => (isset($user->name) ? $user->name : ''),
     'type' => $type,
-    'langcode' => LANGUAGE_NOT_SPECIFIED,
+    'langcode' => node_type_get_default_langcode($type)
   ));
   drupal_set_title(t('Create @name', array('@name' => $types[$type]->name)), PASS_THROUGH);
   $output = drupal_get_form($type . '_node_form', $node);
@@ -186,26 +188,25 @@ function node_form($form, &$form_state, Node $node) {
   // @todo D8: Remove. Modules should access the node using $form_state['node'].
   $form['#node'] = $node;
 
-  if (variable_get('node_type_language_' . $node->type, 0) && module_exists('language')) {
-    $languages = language_list();
+  if (module_exists('language')) {
+    $languages = language_list(LANGUAGE_ALL);
     $language_options = array();
     foreach ($languages as $langcode => $language) {
-      $language_options[$langcode] = $language->name;
+      // Make locked languages appear special in the list.
+      $language_options[$langcode] = $language->locked ? t('- @name -', array('@name' => $language->name)) : $language->name;
     }
     $form['langcode'] = array(
       '#type' => 'select',
       '#title' => t('Language'),
-      '#default_value' => (isset($node->langcode) ? $node->langcode : ''),
+      '#default_value' => $node->langcode,
       '#options' => $language_options,
-      '#empty_value' => LANGUAGE_NOT_SPECIFIED,
+      '#access' => !variable_get('node_type_language_hidden_' . $node->type, TRUE),
     );
   }
   else {
     $form['langcode'] = array(
       '#type' => 'value',
-      // New nodes without multilingual support get the default language, old
-      // nodes keep their language if language.module is not available.
-      '#value' => !isset($form['#node']->nid) ? language_default()->langcode : $node->langcode,
+      '#value' => $node->langcode,
     );
   }
 
@@ -493,6 +494,9 @@ function theme_node_preview($variables) {
  * @see node_form_submit_build_node()
  */
 function node_form_submit($form, &$form_state) {
+  // Handle possible field translations first and then build the node from the
+  // submitted values.
+  node_field_language_form_submit($form, $form_state);
   $node = node_form_submit_build_node($form, $form_state);
   $insert = empty($node->nid);
   $node->save();
@@ -520,7 +524,31 @@ function node_form_submit($form, &$form_state) {
     $form_state['rebuild'] = TRUE;
   }
   // Clear the page and block caches.
-  cache_clear_all();
+  cache_invalidate(array('content' => TRUE));
+}
+
+/**
+ * Handles possible node language changes.
+ *
+ */
+function node_field_language_form_submit($form, &$form_state) {
+  if (field_has_translation_handler('node', 'node')) {
+    $bundle = $form_state['values']['type'];
+    $node_language = $form_state['values']['langcode'];
+
+    foreach (field_info_instances('node', $bundle) as $instance) {
+      $field_name = $instance['field_name'];
+      $field = field_info_field($field_name);
+      $previous_langcode = $form[$field_name]['#language'];
+
+      // Handle a possible language change: New language values are inserted,
+      // previous ones are deleted.
+      if ($field['translatable'] && $previous_langcode != $node_language) {
+        $form_state['values'][$field_name][$node_language] = $form_state['values'][$field_name][$previous_langcode];
+        $form_state['values'][$field_name][$previous_langcode] = array();
+      }
+    }
+  }
 }
 
 /**

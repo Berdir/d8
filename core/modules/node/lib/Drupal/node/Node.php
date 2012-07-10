@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Entity class for nodes.
+ * Definition of Drupal\node\Node.
  */
 
 namespace Drupal\node;
@@ -166,5 +166,12 @@ class Node extends Entity {
     $duplicate->nid = NULL;
     $duplicate->vid = NULL;
     return $duplicate;
+  }
+
+  /**
+   * Overrides Drupal\entity\Entity::getRevisionId().
+   */
+  public function getRevisionId() {
+    return $this->vid;
   }
 }

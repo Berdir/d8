@@ -1,6 +1,10 @@
 
 Drupal 8.0, xxxx-xx-xx (development version)
 ----------------------
+- Improved entity system.
+    * Added support for saving and deleting entities through the controller.
+    * Entities are now classed objects, implementing EntityInterface.
+- Replaced the core routing system with one built on the Symfony2 framework.
 - Configuration:
     * Added a centralized file-based configuration system.
     * Allows module authors to provide configuration in a standard format.
@@ -8,7 +12,13 @@ Drupal 8.0, xxxx-xx-xx (development version)
 - Included the HTML5 Shiv library to support HTML5 elements in IE 8 and below.
 - Included the following Symfony2 components:
     * ClassLoader - PSR-0-compatible autoload routines.
+    * DependencyInjection - Flexible dependency injection container.
+    * EventDispatcher - Object-oriented lightweight event handling system.
     * HttpFoundation - Abstraction objects for HTTP requests and responses.
+    * HttpKernel - Core system for managing incoming HTTP request and responses.
+    * Routing - Framework for mapping incoming requests to controller information.
+    * Yaml - Parser for YAML files.
+- Support added for making HTTP requests through a proxy server.
 - Removed modules from core.
     * The following modules have been removed from core, because contributed
       modules with similar functionality are available:
@@ -22,6 +32,7 @@ Drupal 8.0, xxxx-xx-xx (development version)
     * Support for generating and validating UUIDs.
 - JavaScript changes:
     * Updated to jQuery 1.7
+    * Updated to jQuery UI 1.9
 - Tremendously improved language support all around.
     * Great language improvements for users:
       * Improved language selection with user preference detection in the
@@ -37,6 +48,7 @@ Drupal 8.0, xxxx-xx-xx (development version)
       * Made interface translation directly accessible from language list.
       * Centralized interface translation import to one directory.
       * Drupal can now be translated to English and English can be deleted.
+      * Much improved built-in translation interface.
       * Added support for singular/plural discovery and translation.
       * Customized translations are tracked so your modifications can
         be identified and protected from translation update overwrites.
@@ -44,10 +56,12 @@ Drupal 8.0, xxxx-xx-xx (development version)
       * Freely orderable language selector in forms.
       * Made it possible to assign language to taxonomy terms, vocabularies
         and files.
+      * Node type specific default language assignment is much more versatile.
     * Better language based configuration
       * Added language options to block visibility.
     * Much improved language APIs for developers:
       * Added simple APIs and hooks to save/delete/update languages.
+      * New Language class wraps language information, used universally.
       * Unified database schemas and APIs to make it easier to spot where
         language codes are referenced.
       * Made the language negotiation system APIs more consistent for

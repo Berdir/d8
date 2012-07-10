@@ -252,6 +252,10 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
         }
       }
       $query->fields('revision', $entity_revision_fields);
+
+      // Compare revision id of the base and revision table, if equal then this
+      // is the current revision.
+      $query->addExpression('base.' . $this->revisionKey . ' = revision.' . $this->revisionKey, 'isCurrentRevision');
     }
 
     $query->fields('base', $entity_fields);
@@ -276,7 +280,7 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
    * hook_node_load() or hook_user_load(). If your hook_TYPE_load()
    * expects special parameters apart from the queried entities, you can set
    * $this->hookLoadArguments prior to calling the method.
-   * See NodeController::attachLoad() for an example.
+   * See Drupal\node\NodeStorageController::attachLoad() for an example.
    *
    * @param $queried_entities
    *   Associative array of query results, keyed on the entity ID.
@@ -304,8 +308,8 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
     // always the queried entities, followed by additional arguments set in
     // $this->hookLoadArguments.
     $args = array_merge(array($queried_entities), $this->hookLoadArguments);
-    foreach (module_implements($this->entityInfo['load hook']) as $module) {
-      call_user_func_array($module . '_' . $this->entityInfo['load hook'], $args);
+    foreach (module_implements($this->entityType . '_load') as $module) {
+      call_user_func_array($module . '_' . $this->entityType . '_load', $args);
     }
   }
 

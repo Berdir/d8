@@ -23,6 +23,12 @@ Drupal.behaviors.overlayParent = {
       // permalinks open the overlay.
       .triggerHandler('hashchange.drupal-overlay');
 
+    // Do not use the overlay on devices with low screen width.
+    // @todo Replace with conditional loading.
+    if(!Drupal.checkWidthBreakpoint()) {
+      return;
+    }
+
     $(document)
       // Instead of binding a click event handler to every link we bind one to
       // the document and only handle events that bubble up. This allows other
@@ -229,7 +235,7 @@ Drupal.overlay.redirect = function (url) {
   var link = $(url.link(url)).get(0);
 
   // If the link is already open, force the hashchange event to simulate reload.
-  if (window.location.href == link.href) {
+  if (window.location.href === link.href) {
     $(window).triggerHandler('hashchange.drupal-overlay');
   }
 
@@ -266,7 +272,7 @@ Drupal.overlay.loadChild = function (event) {
   var iframe = event.data.self;
   var iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
   var iframeWindow = iframeDocument.defaultView || iframeDocument.parentWindow;
-  if (iframeWindow.location == 'about:blank') {
+  if (iframeWindow.location.href === 'about:blank') {
     return;
   }
 
@@ -401,7 +407,7 @@ Drupal.overlay.eventhandlerOuterResize = function (event) {
   }
 
   // IE6 uses position:absolute instead of position:fixed.
-  if (typeof document.body.style.maxHeight != 'string') {
+  if (typeof document.body.style.maxHeight !== 'string') {
     this.activeFrame.height($(window).height());
   }
 
@@ -531,7 +537,7 @@ Drupal.overlay.eventhandlerRestoreDisplacedElements = function (event) {
 Drupal.overlay.eventhandlerOverrideLink = function (event) {
   // In some browsers the click event isn't fired for right-clicks. Use the
   // mouseup event for right-clicks and the click event for everything else.
-  if ((event.type == 'click' && event.button == 2) || (event.type == 'mouseup' && event.button != 2)) {
+  if ((event.type === 'click' && event.button === 2) || (event.type === 'mouseup' && event.button !== 2)) {
     return;
   }
 
@@ -563,21 +569,21 @@ Drupal.overlay.eventhandlerOverrideLink = function (event) {
   if (typeof href !== 'undefined' && href !== '' && (/^https?\:/).test(target.protocol)) {
     var anchor = href.replace(target.ownerDocument.location.href, '');
     // Skip anchor links.
-    if (anchor.length == 0 || anchor.charAt(0) == '#') {
+    if (anchor.length === 0 || anchor.charAt(0) === '#') {
       return;
     }
     // Open admin links in the overlay.
     else if (this.isAdminLink(href)) {
       // If the link contains the overlay-restore class and the overlay-context
       // state is set, also update the parent window's location.
-      var parentLocation = ($target.hasClass('overlay-restore') && typeof $.bbq.getState('overlay-context') == 'string')
+      var parentLocation = ($target.hasClass('overlay-restore') && typeof $.bbq.getState('overlay-context') === 'string')
         ? Drupal.url($.bbq.getState('overlay-context'))
         : null;
       href = this.fragmentizeLink($target.get(0), parentLocation);
       // Only override default behavior when left-clicking and user is not
       // pressing the ALT, CTRL, META (Command key on the Macintosh keyboard)
       // or SHIFT key.
-      if (event.button == 0 && !event.altKey && !event.ctrlKey && !event.metaKey && !event.shiftKey) {
+      if (event.button === 0 && !event.altKey && !event.ctrlKey && !event.metaKey && !event.shiftKey) {
         // Redirect to a fragmentized href. This will trigger a hashchange event.
         this.redirect(href);
         // Prevent default action and further propagation of the event.
@@ -598,7 +604,7 @@ Drupal.overlay.eventhandlerOverrideLink = function (event) {
     else if (this.isOpen && target.ownerDocument === this.iframeWindow.document) {
       // Open external links in the immediate parent of the frame, unless the
       // link already has a different target.
-      if (target.hostname != window.location.hostname) {
+      if (target.hostname !== window.location.hostname) {
         if (!$target.attr('target')) {
           $target.attr('target', '_parent');
         }
@@ -690,7 +696,7 @@ Drupal.overlay.eventhandlerSyncURLFragment = function (event) {
   if (this.isOpen) {
     var expected = $.bbq.getState('overlay');
     // This is just a sanity check, so we're comparing paths, not query strings.
-    if (this.getPath(Drupal.url(expected)) != this.getPath(this.iframeWindow.document.location)) {
+    if (this.getPath(Drupal.url(expected)) !== this.getPath(this.iframeWindow.document.location)) {
       // There may have been a redirect inside the child overlay window that the
       // parent wasn't aware of. Update the parent URL fragment appropriately.
       var newLocation = Drupal.overlay.fragmentizeLink(this.iframeWindow.document.location);
@@ -816,7 +822,7 @@ Drupal.overlay.resetActiveClass = function(activePath) {
 
     // A link matches if it is part of the active trail of activePath, except
     // for frontpage links.
-    if (linkDomain == windowDomain && (activePath + '/').indexOf(linkPath + '/') === 0 && (linkPath !== '' || activePath === '')) {
+    if (linkDomain === windowDomain && (activePath + '/').indexOf(linkPath + '/') === 0 && (linkPath !== '' || activePath === '')) {
       $(this).addClass('active');
     }
   });
@@ -832,14 +838,14 @@ Drupal.overlay.resetActiveClass = function(activePath) {
  *   The Drupal path.
  */
 Drupal.overlay.getPath = function (link) {
-  if (typeof link == 'string') {
+  if (typeof link === 'string') {
     // Create a native Link object, so we can use its object methods.
     link = $(link.link(link)).get(0);
   }
 
   var path = link.pathname;
   // Ensure a leading slash on the path, omitted in some browsers.
-  if (path.charAt(0) != '/') {
+  if (path.charAt(0) !== '/') {
     path = '/' + path;
   }
   path = path.replace(new RegExp(Drupal.settings.basePath + Drupal.settings.scriptPath), '');
@@ -861,17 +867,6 @@ Drupal.overlay.getDisplacement = function (region) {
   var lastDisplaced = $('.overlay-displace-' + region + ':last');
   if (lastDisplaced.length) {
     displacement = lastDisplaced.offset().top + lastDisplaced.outerHeight();
-
-    // In modern browsers (including IE9), when box-shadow is defined, use the
-    // normal height.
-    var cssBoxShadowValue = lastDisplaced.css('box-shadow');
-    var boxShadow = (typeof cssBoxShadowValue !== 'undefined' && cssBoxShadowValue !== 'none');
-    // In IE8 and below, we use the shadow filter to apply box-shadow styles to
-    // the toolbar. It adds some extra height that we need to remove.
-    if (!boxShadow && /DXImageTransform\.Microsoft\.Shadow/.test(lastDisplaced.css('filter'))) {
-      displacement -= lastDisplaced[0].filters.item('DXImageTransform.Microsoft.Shadow').strength;
-      displacement = Math.max(0, displacement);
-    }
   }
   return displacement;
 };

@@ -540,13 +540,12 @@ function _book_add_form_elements(&$form, &$form_state, Node $node) {
     '#collapsed' => TRUE,
     '#group' => 'additional_settings',
     '#attributes' => array(
-      'class' => array('book-form'),
+      'class' => array('book-outline-form'),
     ),
     '#attached' => array(
       'js' => array(drupal_get_path('module', 'book') . '/book.js'),
     ),
     '#tree' => TRUE,
-    '#attributes' => array('class' => array('book-outline-form')),
   );
   foreach (array('menu_name', 'mlid', 'nid', 'router_path', 'has_children', 'options', 'module', 'original_bid', 'parent_depth_limit') as $key) {
     $form['book'][$key] = array(
@@ -1224,7 +1223,8 @@ function book_toc($bid, $depth_limit, $exclude = array()) {
  * @see book-export-html.tpl.php
  */
 function template_preprocess_book_export_html(&$variables) {
-  global $base_url, $language_interface;
+  global $base_url;
+  $language_interface = drupal_container()->get(LANGUAGE_TYPE_INTERFACE);
 
   $variables['title'] = check_plain($variables['title']);
   $variables['base_url'] = $base_url;

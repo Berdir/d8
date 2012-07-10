@@ -5,6 +5,7 @@
  * Admin page callbacks for the system module.
  */
 
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
@@ -717,7 +718,7 @@ function system_theme_settings_submit($form, &$form_state) {
   variable_set($key, $values);
   drupal_set_message(t('The configuration options have been saved.'));
 
-  cache_clear_all();
+  cache_invalidate(array('content' => TRUE));
 }
 
 /**
@@ -1198,7 +1199,7 @@ function system_modules_submit($form, &$form_state) {
 
   // Gets module list after install process, flushes caches and displays a
   // message if there are changes.
-  $post_install_list = module_list(TRUE);
+  $post_install_list = module_list();
   if ($pre_install_list != $post_install_list) {
     drupal_flush_all_caches();
     drupal_set_message(t('The configuration options have been saved.'));
@@ -1342,7 +1343,7 @@ function system_modules_uninstall_submit($form, &$form_state) {
   if (!empty($form['#confirmed'])) {
     // Call the uninstall routine for each selected module.
     $modules = array_keys($form_state['values']['uninstall']);
-    drupal_uninstall_modules($modules);
+    module_uninstall($modules);
     drupal_set_message(t('The selected modules have been uninstalled.'));
 
     $form_state['redirect'] = 'admin/modules/uninstall';
@@ -1464,7 +1465,13 @@ function system_ip_blocking_delete_submit($form, &$form_state) {
  * @ingroup forms
  * @see system_settings_form()
  */
-function system_site_information_settings() {
+function system_site_information_settings($form, &$form_state) {
+  $site_config = config('system.site');
+  $site_mail = $site_config->get('mail');
+  if (empty($site_mail)) {
+    $site_mail = ini_get('sendmail_from');
+  }
+
   $form['site_information'] = array(
     '#type' => 'fieldset',
     '#title' => t('Site details'),
@@ -1472,19 +1479,19 @@ function system_site_information_settings() {
   $form['site_information']['site_name'] = array(
     '#type' => 'textfield',
     '#title' => t('Site name'),
-    '#default_value' => variable_get('site_name', 'Drupal'),
+    '#default_value' => $site_config->get('name'),
     '#required' => TRUE
   );
   $form['site_information']['site_slogan'] = array(
     '#type' => 'textfield',
     '#title' => t('Slogan'),
-    '#default_value' => variable_get('site_slogan', ''),
+    '#default_value' => $site_config->get('slogan'),
     '#description' => t("How this is used depends on your site's theme."),
   );
   $form['site_information']['site_mail'] = array(
     '#type' => 'email',
     '#title' => t('E-mail address'),
-    '#default_value' => variable_get('site_mail', ini_get('sendmail_from')),
+    '#default_value' => $site_mail,
     '#description' => t("The <em>From</em> address in automated e-mails sent during registration and new password requests, and other notifications. (Use an address ending in your site's domain to help prevent this e-mail being flagged as spam.)"),
     '#required' => TRUE,
   );
@@ -1495,17 +1502,10 @@ function system_site_information_settings() {
   $form['front_page']['site_frontpage'] = array(
     '#type' => 'textfield',
     '#title' => t('Default front page'),
-    '#default_value' => (variable_get('site_frontpage') != 'user' ? drupal_get_path_alias(variable_get('site_frontpage', 'user')) : ''),
+    '#default_value' => ($site_config->get('page.front') != 'user' ? drupal_get_path_alias($site_config->get('page.front')) : ''),
     '#size' => 40,
     '#description' => t('Optionally, specify a relative URL to display as the front page.  Leave blank to display the default content feed.'),
     '#field_prefix' => url(NULL, array('absolute' => TRUE)),
-  );
-  $form['front_page']['default_nodes_main'] = array(
-    '#type' => 'select', '#title' => t('Number of posts on front page'),
-    '#default_value' => variable_get('default_nodes_main', 10),
-    '#options' => drupal_map_assoc(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30)),
-    '#description' => t('The maximum number of posts displayed on overview pages such as the front page.'),
-    '#access' => (variable_get('site_frontpage') == 'node'),
   );
   $form['error_page'] = array(
     '#type' => 'fieldset',
@@ -1514,7 +1514,7 @@ function system_site_information_settings() {
   $form['error_page']['site_403'] = array(
     '#type' => 'textfield',
     '#title' => t('Default 403 (access denied) page'),
-    '#default_value' => variable_get('site_403', ''),
+    '#default_value' => $site_config->get('page.403'),
     '#size' => 40,
     '#description' => t('This page is displayed when the requested document is denied to the current user. Leave blank to display a generic "access denied" page.'),
     '#field_prefix' => url(NULL, array('absolute' => TRUE)),
@@ -1522,7 +1522,7 @@ function system_site_information_settings() {
   $form['error_page']['site_404'] = array(
     '#type' => 'textfield',
     '#title' => t('Default 404 (not found) page'),
-    '#default_value' => variable_get('site_404', ''),
+    '#default_value' => $site_config->get('page.404'),
     '#size' => 40,
     '#description' => t('This page is displayed when no other content matches the requested document. Leave blank to display a generic "page not found" page.'),
     '#field_prefix' => url(NULL, array('absolute' => TRUE)),
@@ -1530,7 +1530,7 @@ function system_site_information_settings() {
 
   $form['#validate'][] = 'system_site_information_settings_validate';
 
-  return system_settings_form($form);
+  return system_config_form($form, $form_state);
 }
 
 /**
@@ -1565,6 +1565,20 @@ function system_site_information_settings_validate($form, &$form_state) {
   if (!empty($form_state['values']['site_404']) && !drupal_valid_path($form_state['values']['site_404'])) {
     form_set_error('site_404', t("The path '%path' is either invalid or you do not have access to it.", array('%path' => $form_state['values']['site_404'])));
   }
+}
+
+/**
+ * Form submission handler for system_site_information_settings().
+ */
+function system_site_information_settings_submit($form, &$form_state) {
+  config('system.site')
+    ->set('name', $form_state['values']['site_name'])
+    ->set('mail', $form_state['values']['site_mail'])
+    ->set('slogan', $form_state['values']['site_slogan'])
+    ->set('page.front', $form_state['values']['site_frontpage'])
+    ->set('page.403', $form_state['values']['site_403'])
+    ->set('page.404', $form_state['values']['site_404'])
+    ->save();
 }
 
 /**
@@ -1689,15 +1703,9 @@ function system_performance_settings($form, &$form_state) {
     '#default_value' => $config->get('cache'),
     '#weight' => -2,
   );
+
   $period = drupal_map_assoc(array(0, 60, 180, 300, 600, 900, 1800, 2700, 3600, 10800, 21600, 32400, 43200, 86400), 'format_interval');
   $period[0] = '<' . t('none') . '>';
-  $form['caching']['cache_lifetime'] = array(
-    '#type' => 'select',
-    '#title' => t('Minimum cache lifetime'),
-    '#default_value' => $config->get('cache_lifetime'),
-    '#options' => $period,
-    '#description' => t('Cached pages will not be re-created until at least this much time has elapsed.'),
-  );
   $form['caching']['page_cache_maximum_age'] = array(
     '#type' => 'select',
     '#title' => t('Expiration of cached pages'),
@@ -1741,12 +1749,6 @@ function system_performance_settings($form, &$form_state) {
     '#disabled' => $disabled,
   );
 
-  $form['actions'] = array('#type' => 'actions');
-  $form['actions']['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Save configuration'),
-  );
-
   $form['#submit'][] = 'drupal_clear_css_cache';
   $form['#submit'][] = 'drupal_clear_js_cache';
   // This form allows page compression settings to be changed, which can
@@ -1754,7 +1756,7 @@ function system_performance_settings($form, &$form_state) {
   $form['#submit'][] = 'system_clear_page_cache_submit';
   $form['#submit'][] = 'system_performance_settings_submit';
 
-  return $form;
+  return system_config_form($form, $form_state);
 }
 
 /**
@@ -1765,7 +1767,6 @@ function system_performance_settings($form, &$form_state) {
 function system_performance_settings_submit($form, &$form_state) {
   $config = config('system.performance');
   $config->set('cache', $form_state['values']['cache']);
-  $config->set('cache_lifetime', $form_state['values']['cache_lifetime']);
   $config->set('page_cache_maximum_age', $form_state['values']['page_cache_maximum_age']);
   $config->set('page_compression', $form_state['values']['page_compression']);
   $config->set('preprocess_css', $form_state['values']['preprocess_css']);
@@ -2219,7 +2220,7 @@ function system_add_date_format_type_form_submit($form, &$form_state) {
  */
 function system_date_time_lookup() {
   $result = format_date(REQUEST_TIME, 'custom', $_GET['format']);
-  drupal_json_output($result);
+  return new JsonResponse($result);
 }
 
 /**
@@ -2238,7 +2239,7 @@ function system_site_maintenance_mode() {
   $form['maintenance_mode_message'] = array(
     '#type' => 'textarea',
     '#title' => t('Message to display when in maintenance mode'),
-    '#default_value' => variable_get('maintenance_mode_message', t('@site is currently under maintenance. We should be back shortly. Thank you for your patience.', array('@site' => variable_get('site_name', 'Drupal')))),
+    '#default_value' => variable_get('maintenance_mode_message', t('@site is currently under maintenance. We should be back shortly. Thank you for your patience.', array('@site' => config('system.site')->get('name')))),
   );
 
   return system_settings_form($form);
@@ -3169,4 +3170,186 @@ function system_action_delete_orphans_post($orphaned) {
 function system_actions_remove_orphans() {
   actions_synchronize(TRUE);
   drupal_goto('admin/config/system/actions/manage');
+}
+
+/**
+ * Display edit date format links for each language.
+ */
+function system_date_format_language_overview_page() {
+  $header = array(
+    t('Language'),
+    array('data' => t('Operations'), 'colspan' => '2'),
+  );
+
+  $languages = language_list();
+  foreach ($languages as $langcode => $language) {
+    $row = array();
+    $row[] = $language->name;
+    $row[] = l(t('edit'), 'admin/config/regional/date-time/locale/' . $langcode . '/edit');
+    $row[] = l(t('reset'), 'admin/config/regional/date-time/locale/' . $langcode . '/reset');
+    $rows[] = $row;
+  }
+
+  return theme('table', array('header' => $header, 'rows' => $rows));
+}
+
+/**
+ * Provide date localization configuration options to users.
+ */
+function system_date_format_localize_form($form, &$form_state, $langcode) {
+  // Display the current language name.
+  $form['language'] = array(
+    '#type' => 'item',
+    '#title' => t('Language'),
+    '#markup' => language_load($langcode)->name,
+    '#weight' => -10,
+  );
+  $form['langcode'] = array(
+    '#type' => 'value',
+    '#value' => $langcode,
+  );
+
+  // Get list of date format types.
+  $types = system_get_date_types();
+
+  // Get list of available formats.
+  $formats = system_get_date_formats();
+  $choices = array();
+  foreach ($formats as $type => $list) {
+    foreach ($list as $f => $format) {
+      $choices[$f] = format_date(REQUEST_TIME, 'custom', $f);
+    }
+  }
+  reset($formats);
+
+  // Get configured formats for each language.
+  $locale_formats = system_date_format_locale($langcode);
+  // Display a form field for each format type.
+  foreach ($types as $type => $type_info) {
+    if (!empty($locale_formats) && in_array($type, array_keys($locale_formats))) {
+      $default = $locale_formats[$type];
+    }
+    else {
+      $default = variable_get('date_format_' . $type, key($formats));
+    }
+
+    // Show date format select list.
+    $form['date_formats']['date_format_' . $type] = array(
+      '#type' => 'select',
+      '#title' => check_plain($type_info['title']),
+      '#attributes' => array('class' => array('date-format')),
+      '#default_value' => (isset($choices[$default]) ? $default : 'custom'),
+      '#options' => $choices,
+    );
+  }
+
+  $form['actions'] = array('#type' => 'actions');
+  $form['actions']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save configuration'),
+  );
+
+  return $form;
+}
+
+/**
+ * Submit handler for configuring localized date formats on the locale_date_format_form.
+ */
+function system_date_format_localize_form_submit($form, &$form_state) {
+  $langcode = $form_state['values']['langcode'];
+
+  // Get list of date format types.
+  $types = system_get_date_types();
+  foreach ($types as $type => $type_info) {
+    $format = $form_state['values']['date_format_' . $type];
+    if ($format == 'custom') {
+      $format = $form_state['values']['date_format_' . $type . '_custom'];
+    }
+    system_date_format_localize_form_save($langcode, $type, $format);
+  }
+  drupal_set_message(t('Configuration saved.'));
+  $form_state['redirect'] = 'admin/config/regional/date-time/locale';
+}
+
+/**
+ * Returns HTML for a locale date format form.
+ *
+ * @param $variables
+ *   An associative array containing:
+ *   - form: A render element representing the form.
+ *
+ * @ingroup themeable
+ */
+function theme_system_date_format_localize_form($variables) {
+  $form = $variables['form'];
+  $header = array(
+    t('Date type'),
+    t('Format'),
+  );
+
+  foreach (element_children($form['date_formats']) as $key) {
+    $row = array();
+    $row[] = $form['date_formats'][$key]['#title'];
+    unset($form['date_formats'][$key]['#title']);
+    $row[] = array('data' => drupal_render($form['date_formats'][$key]));
+    $rows[] = $row;
+  }
+
+  $output = drupal_render($form['language']);
+  $output .= theme('table', array('header' => $header, 'rows' => $rows));
+  $output .= drupal_render_children($form);
+
+  return $output;
+}
+
+/**
+ * Reset locale specific date formats to the global defaults.
+ *
+ * @param $langcode
+ *   Language code, e.g. 'en'.
+ */
+function system_date_format_localize_reset_form($form, &$form_state, $langcode) {
+  $form['langcode'] = array('#type' => 'value', '#value' => $langcode);
+  return confirm_form($form,
+    t('Are you sure you want to reset the date formats for %language to the global defaults?', array('%language' => language_load($langcode)->name)),
+    'admin/config/regional/date-time/locale',
+    t('Resetting will remove all localized date formats for this language. This action cannot be undone.'),
+    t('Reset'), t('Cancel'));
+}
+
+/**
+ * Reset date formats for a specific language to global defaults.
+ */
+function system_date_format_localize_reset_form_submit($form, &$form_state) {
+  db_delete('date_format_locale')
+    ->condition('language', $form_state['values']['langcode'])
+    ->execute();
+  $form_state['redirect'] = 'admin/config/regional/date-time/locale';
+}
+
+/**
+ * Save locale specific date formats to the database.
+ *
+ * @param $langcode
+ *   Language code, can be 2 characters, e.g. 'en' or 5 characters, e.g.
+ *   'en-CA'.
+ * @param $type
+ *   Date format type, e.g. 'short', 'medium'.
+ * @param $format
+ *   The date format string.
+ */
+function system_date_format_localize_form_save($langcode, $type, $format) {
+  $locale_format = array();
+  $locale_format['language'] = $langcode;
+  $locale_format['type'] = $type;
+  $locale_format['format'] = $format;
+
+  $is_existing = (bool) db_query_range('SELECT 1 FROM {date_format_locale} WHERE language = :langcode AND type = :type', 0, 1, array(':langcode' => $langcode, ':type' => $type))->fetchField();
+  if ($is_existing) {
+    $keys = array('type', 'language');
+    drupal_write_record('date_format_locale', $locale_format, $keys);
+  }
+  else {
+    drupal_write_record('date_format_locale', $locale_format);
+  }
 }

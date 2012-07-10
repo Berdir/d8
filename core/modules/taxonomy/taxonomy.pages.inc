@@ -7,6 +7,7 @@
 
 use Drupal\taxonomy\Term;
 use Drupal\taxonomy\Vocabulary;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
  * Menu callback; displays all nodes associated with a term.
@@ -68,7 +69,7 @@ function taxonomy_term_page(Term $term) {
  */
 function taxonomy_term_feed(Term $term) {
   $channel['link'] = url('taxonomy/term/' . $term->tid, array('absolute' => TRUE));
-  $channel['title'] = variable_get('site_name', 'Drupal') . ' - ' . $term->name;
+  $channel['title'] = config('system.site')->get('name') . ' - ' . $term->name;
   // Only display the description if we have a single term, to avoid clutter and confusion.
   // HTML will be removed from feed description.
   $channel['description'] = check_markup($term->description, $term->format, '', TRUE);
@@ -166,5 +167,5 @@ function taxonomy_autocomplete($field_name, $tags_typed = '') {
     }
   }
 
-  drupal_json_output($term_matches);
+  return new JsonResponse($term_matches);
 }

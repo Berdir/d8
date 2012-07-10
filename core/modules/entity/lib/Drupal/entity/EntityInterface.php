@@ -80,10 +80,15 @@ interface EntityInterface extends PropertyContainerInterface {
   /**
    * Returns the label of the entity.
    *
+   * @param $langcode
+   *   (optional) The language code of the language that should be used for
+   *   getting the label. If set to NULL, the entity's default language is
+   *   used.
+   *
    * @return
    *   The label of the entity, or NULL if there is no label defined.
    */
-  public function label();
+  public function label($langcode = NULL);
 
   /**
    * Returns the URI elements of the entity.
@@ -185,6 +190,24 @@ interface EntityInterface extends PropertyContainerInterface {
   public function entityInfo();
 
   /**
+   * Returns the revision identifier of the entity.
+   *
+   * @return
+   *   The revision identifier of the entity, or NULL if the entity does not
+   *   have a revision identifier.
+   */
+  public function getRevisionId();
+
+  /**
+   * Checks if this entity is the current revision.
+   *
+   * @return bool
+   *   TRUE if the entity is the current revision, FALSE otherwise.
+   */
+  public function isCurrentRevision();
+
+
+  /**
    * Returns the raw value of an entity property.
    *
    * Returned property values match their property information as declared in
@@ -208,5 +231,4 @@ interface EntityInterface extends PropertyContainerInterface {
    * @see EntityInterface::language()
    */
   public function getRawValue($property_name, $langcode = NULL);
-
 }

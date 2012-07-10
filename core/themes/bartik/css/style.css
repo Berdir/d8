@@ -47,6 +47,12 @@ tr.odd {
 img {
   outline: 0;
 }
+
+/**
+ * The generic monospace font family is listed before Courier new to avoid a
+ * a bug in font-size rendering:
+ * http://meyerweb.com/eric/thoughts/2010/02/12/fixed-monospace-sizing
+ */
 code,
 pre,
 kbd,
@@ -1194,6 +1200,7 @@ input.form-email,
 input.form-url,
 input.form-search,
 input.form-number,
+input.form-color,
 textarea.form-textarea,
 select.form-select {
   border: 1px solid #ccc;
@@ -1428,7 +1435,7 @@ ol.search-results {
 }
 .search-results li:last-child {
   border-bottom: none;
-  padding-bottom: none;
+  padding-bottom: 0;
   margin-bottom: 1em;
 }
 .search-results .search-snippet-info {

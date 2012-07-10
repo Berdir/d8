@@ -578,7 +578,8 @@ abstract class WebTestBase extends TestBase {
    * @see Drupal\simpletest\WebTestBase::prepareEnvironment()
    */
   protected function setUp() {
-    global $user, $language_interface, $conf;
+    global $user, $conf;
+    $language_interface = drupal_container()->get(LANGUAGE_TYPE_INTERFACE);
 
     // Create the database prefix for this test.
     $this->prepareDatabasePrefix();
@@ -663,7 +664,7 @@ abstract class WebTestBase extends TestBase {
 
     // Restore necessary variables.
     variable_set('install_task', 'done');
-    variable_set('site_mail', 'simpletest@example.com');
+    config('system.site')->set('mail', 'simpletest@example.com')->save();
     variable_set('date_default_timezone', date_default_timezone_get());
 
     // Set up English language.
@@ -776,7 +777,8 @@ abstract class WebTestBase extends TestBase {
 
     // Reload module list and implementations to ensure that test module hooks
     // aren't called after tests.
-    module_list(TRUE);
+    drupal_static_reset('system_list');
+    module_list_reset();
     module_implements_reset();
 
     // Reset the Field API.
@@ -1367,6 +1369,8 @@ abstract class WebTestBase extends TestBase {
             break;
           case 'restripe':
             break;
+          case 'add_css':
+            break;
         }
       }
       $content = $dom->saveHTML();
@@ -1461,6 +1465,7 @@ abstract class WebTestBase extends TestBase {
           case 'url':
           case 'number':
           case 'range':
+          case 'color':
           case 'hidden':
           case 'password':
           case 'email':

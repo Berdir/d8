@@ -5,7 +5,10 @@
  * User page callback file for the user module.
  */
 
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
  * Menu callback; Retrieve a JSON object containing autocomplete suggestions for existing users.
@@ -19,7 +22,7 @@ function user_autocomplete($string = '') {
     }
   }
 
-  drupal_json_output($matches);
+  return new JsonResponse($matches);
 }
 
 /**
@@ -74,7 +77,7 @@ function user_pass_validate($form, &$form_state) {
 }
 
 function user_pass_submit($form, &$form_state) {
-  global $language_interface;
+  $language_interface = drupal_container()->get(LANGUAGE_TYPE_INTERFACE);
 
   $account = $form_state['values']['account'];
   // Mail one time login URL and instructions using current language.
@@ -275,7 +278,7 @@ function user_profile_form_submit($form, &$form_state) {
     unset($_SESSION['pass_reset_'. $account->uid]);
   }
   // Clear the page cache because pages can contain usernames and/or profile information:
-  cache_clear_all();
+  cache_invalidate(array('content' => TRUE));
 
   drupal_set_message(t('The changes have been saved.'));
 }
@@ -494,8 +497,10 @@ function user_cancel_confirm($account, $timestamp = 0, $hashed_pass = '') {
 function user_page() {
   global $user;
   if ($user->uid) {
-    menu_set_active_item('user/' . $user->uid);
-    return menu_execute_active_handler(NULL, FALSE);
+    // @todo: Cleaner sub request handling.
+    $subrequest = Request::create('/user/' . $user->uid, 'GET', request()->query->all(), request()->cookies->all(), array(), request()->server->all());
+    request($subrequest);
+    return drupal_container()->get('httpkernel')->handle($subrequest, HttpKernelInterface::SUB_REQUEST);
   }
   else {
     return drupal_get_form('user_login');

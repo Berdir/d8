@@ -1,7 +1,6 @@
 <?php
 
 use Drupal\Core\Database\Database;
-use Drupal\Core\Config\FileStorage;
 
 /**
  * Indicates that a module has not been installed yet.
@@ -188,7 +187,6 @@ function drupal_get_database_types() {
  *   An array of settings that need to be updated.
  */
 function drupal_rewrite_settings($settings = array()) {
-  $default_settings = 'sites/default/default.settings.php';
   drupal_static_reset('conf_path');
   $settings_file = conf_path(FALSE) . '/settings.php';
 
@@ -200,62 +198,52 @@ function drupal_rewrite_settings($settings = array()) {
   }
 
   $buffer = NULL;
-  $first = TRUE;
-  if ($fp = fopen(DRUPAL_ROOT . '/' . $default_settings, 'r')) {
-    // Step line by line through settings.php.
-    while (!feof($fp)) {
-      $line = fgets($fp);
-      if ($first && substr($line, 0, 5) != '<?php') {
-        $buffer = "<?php\n\n";
-      }
-      $first = FALSE;
-      // Check for constants.
-      if (substr($line, 0, 7) == 'define(') {
-        preg_match('/define\(\s*[\'"]([A-Z_-]+)[\'"]\s*,(.*?)\);/', $line, $variable);
-        if (in_array($variable[1], $keys)) {
-          $setting = $settings[$variable[1]];
-          $buffer .= str_replace($variable[2], " '" . $setting['value'] . "'", $line);
-          unset($settings[$variable[1]]);
-          unset($settings[$variable[2]]);
+  $contents = file_get_contents(DRUPAL_ROOT . '/' . $settings_file);
+  if ($contents !== FALSE) {
+    // Step through each token in settings.php and replace any variables that
+    // are in the passed-in array.
+    $replacing_variable = FALSE;
+    foreach (token_get_all($contents) as $token) {
+      // Strip off the leading "$" before comparing the variable name.
+      if (is_array($token) && $token[0] == T_VARIABLE && ($variable_name = substr($token[1], 1)) && in_array($variable_name, $keys)) {
+        // Write the new value to settings.php in the following format:
+        //    $[setting] = '[value]'; // [comment]
+        $setting = $settings[$variable_name];
+        $buffer .= '$' . $variable_name . ' = ' . var_export($setting['value'], TRUE) . ';';
+        if (!empty($setting['comment'])) {
+          $buffer .= ' // ' . $setting['comment'];
         }
-        else {
-          $buffer .= $line;
-        }
-      }
-      // Check for variables.
-      elseif (substr($line, 0, 1) == '$') {
-        preg_match('/\$([^ ]*) /', $line, $variable);
-        if (in_array($variable[1], $keys)) {
-          // Write new value to settings.php in the following format:
-          //    $'setting' = 'value'; // 'comment'
-          $setting = $settings[$variable[1]];
-          $buffer .= '$' . $variable[1] . " = " . var_export($setting['value'], TRUE) . ";" . (!empty($setting['comment']) ? ' // ' . $setting['comment'] . "\n" : "\n");
-          unset($settings[$variable[1]]);
-        }
-        else {
-          $buffer .= $line;
-        }
+        unset($settings[$variable_name]);
+        $replacing_variable = TRUE;
       }
       else {
-        $buffer .= $line;
+        // Write a regular token (that is not part of a variable we're
+        // replacing) to settings.php directly.
+        if (!$replacing_variable) {
+          $buffer .= is_array($token) ? $token[1] : $token;
+        }
+        // When we hit a semicolon, we are done with the code that defines the
+        // variable that is being replaced.
+        if ($token == ';') {
+          $replacing_variable = FALSE;
+        }
       }
     }
-    fclose($fp);
 
     // Add required settings that were missing from settings.php.
     foreach ($settings as $setting => $data) {
-      if ($data['required']) {
+      if (!empty($data['required'])) {
         $buffer .= "\$$setting = " . var_export($data['value'], TRUE) . ";\n";
       }
     }
 
-    $fp = fopen(DRUPAL_ROOT . '/' . $settings_file, 'w');
-    if ($fp && fwrite($fp, $buffer) === FALSE) {
+    // Write the new settings file.
+    if (file_put_contents(DRUPAL_ROOT . '/' . $settings_file, $buffer) === FALSE) {
       throw new Exception(st('Failed to modify %settings. Verify the file permissions.', array('%settings' => $settings_file)));
     }
   }
   else {
-    throw new Exception(st('Failed to open %settings. Verify the file permissions.', array('%settings' => $default_settings)));
+    throw new Exception(st('Failed to open %settings. Verify the file permissions.', array('%settings' => $settings_file)));
   }
 }
 
@@ -337,86 +325,6 @@ function drupal_install_system() {
     ->execute();
   system_rebuild_module_data();
   config_install_default_config('system');
-}
-
-/**
- * Uninstalls a given list of modules.
- *
- * @param $module_list
- *   The modules to uninstall.
- * @param $uninstall_dependents
- *   If TRUE, the function will check that all modules which depend on the
- *   passed-in module list either are already uninstalled or contained in the
- *   list, and it will ensure that the modules are uninstalled in the correct
- *   order. This incurs a significant performance cost, so use FALSE if you
- *   know $module_list is already complete and in the correct order.
- *
- * @return
- *   FALSE if one or more dependent modules are missing from the list, TRUE
- *   otherwise.
- */
-function drupal_uninstall_modules($module_list = array(), $uninstall_dependents = TRUE) {
-  if ($uninstall_dependents) {
-    // Get all module data so we can find dependents and sort.
-    $module_data = system_rebuild_module_data();
-    // Create an associative array with weights as values.
-    $module_list = array_flip(array_values($module_list));
-
-    $profile = drupal_get_profile();
-    while (list($module) = each($module_list)) {
-      if (!isset($module_data[$module]) || drupal_get_installed_schema_version($module) == SCHEMA_UNINSTALLED) {
-        // This module doesn't exist or is already uninstalled, skip it.
-        unset($module_list[$module]);
-        continue;
-      }
-      $module_list[$module] = $module_data[$module]->sort;
-
-      // If the module has any dependents which are not already uninstalled and
-      // not included in the passed-in list, abort. It is not safe to uninstall
-      // them automatically because uninstalling a module is a destructive
-      // operation.
-      foreach (array_keys($module_data[$module]->required_by) as $dependent) {
-        if (!isset($module_list[$dependent]) && drupal_get_installed_schema_version($dependent) != SCHEMA_UNINSTALLED && $dependent != $profile) {
-          return FALSE;
-        }
-      }
-    }
-
-    // Sort the module list by pre-calculated weights.
-    asort($module_list);
-    $module_list = array_keys($module_list);
-  }
-
-  foreach ($module_list as $module) {
-    // Uninstall the module.
-    module_load_install($module);
-    module_invoke($module, 'uninstall');
-    drupal_uninstall_schema($module);
-
-    // Remove any stray configuration settings.
-    // Get the names of default configurations provided by this module
-    // by scanning its config directory.
-    $module_config_dir = drupal_get_path('module', $module) . '/config';
-    if (is_dir($module_config_dir)) {
-      $files = glob($module_config_dir . '/*.' . FileStorage::getFileExtension());
-      foreach ($files as $file) {
-        $config_name = basename($file, '.' . FileStorage::getFileExtension());
-        $file_storage = new FileStorage($config_name);
-        // Delete the configuration from storage.
-        $file_storage->delete();
-      }
-    }
-
-    watchdog('system', '%module module uninstalled.', array('%module' => $module), WATCHDOG_INFO);
-    drupal_set_installed_schema_version($module, SCHEMA_UNINSTALLED);
-  }
-
-  if (!empty($module_list)) {
-    // Call hook_module_uninstall to let other modules act
-    module_invoke_all('modules_uninstalled', $module_list);
-  }
-
-  return TRUE;
 }
 
 /**
@@ -728,6 +636,8 @@ function st($string, array $args = array(), array $options = array()) {
       // that multiple files end with the same extension, even if unlikely.
       $files = install_find_translation_files($install_state['parameters']['langcode']);
       if (!empty($files)) {
+        // Include cross-dependent code from locale module and gettext.inc.
+        require_once DRUPAL_ROOT . '/core/modules/locale/locale.module';
         require_once DRUPAL_ROOT . '/core/includes/gettext.inc';
         foreach ($files as $file) {
           _locale_import_read_po('mem-store', $file);

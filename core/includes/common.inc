@@ -110,10 +110,11 @@ const HTTP_REQUEST_TIMEOUT = -1;
  * specified. Use DRUPAL_CACHE_CUSTOM to disable standard block cache and
  * implement
  *
- * The block cache is cleared in cache_clear_all(), and uses the same clearing
- * policy than page cache (node, comment, user, taxonomy added or updated...).
- * Blocks requiring more fine-grained clearing might consider disabling the
- * built-in block cache (DRUPAL_NO_CACHE) and roll their own.
+ * The block cache is cleared when the 'content' cache tag is invalidated,
+ * following the same pattern as the page cache (node, comment, user, taxonomy
+ * added or updated...). Blocks requiring more fine-grained clearing might
+ * consider disabling the built-in block cache (DRUPAL_NO_CACHE)
+ * and roll their own.
  *
  * Note that user 1 is excluded from block caching.
  */
@@ -642,11 +643,13 @@ function drupal_encode_path($path) {
  * callback.
  *
  * @param $path
- *   A Drupal path or a full URL.
+ *   (optional) A Drupal path or a full URL, which will be passed to url() to
+ *   compute the redirect for the URL.
  * @param $options
- *   An associative array of additional URL options to pass to url().
+ *   (optional) An associative array of additional URL options to pass to url().
  * @param $http_response_code
- *   The valid values for 3xx redirection status codes are defined in
+ *   (optional) The HTTP status code to use for the redirection, defaults to
+ *   302. The valid values for 3xx redirection status codes are defined in
  *   @link http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3 RFC 2616 @endlink
  *   and the
  *   @link http://tools.ietf.org/html/draft-reschke-http-status-308-07 draft for the new HTTP status codes: @endlink
@@ -754,10 +757,51 @@ function drupal_http_request($url, array $options = array()) {
     'timeout' => 30.0,
     'context' => NULL,
   );
+
+  // Merge the default headers.
+  $options['headers'] += array(
+    'User-Agent' => 'Drupal (+http://drupal.org/)',
+  );
+
   // stream_socket_client() requires timeout to be a float.
   $options['timeout'] = (float) $options['timeout'];
 
+  // Use a proxy if one is defined and the host is not on the excluded list.
+  $proxy_server = variable_get('proxy_server', '');
+  if ($proxy_server && _drupal_http_use_proxy($uri['host'])) {
+    // Set the scheme so we open a socket to the proxy server.
+    $uri['scheme'] = 'proxy';
+    // Set the path to be the full URL.
+    $uri['path'] = $url;
+    // Since the URL is passed as the path, we won't use the parsed query.
+    unset($uri['query']);
+
+    // Add in username and password to Proxy-Authorization header if needed.
+    if ($proxy_username = variable_get('proxy_username', '')) {
+      $proxy_password = variable_get('proxy_password', '');
+      $options['headers']['Proxy-Authorization'] = 'Basic ' . base64_encode($proxy_username . (!empty($proxy_password) ? ":" . $proxy_password : ''));
+    }
+    // Some proxies reject requests with any User-Agent headers, while others
+    // require a specific one.
+    $proxy_user_agent = variable_get('proxy_user_agent', '');
+    // The default value matches neither condition.
+    if ($proxy_user_agent === NULL) {
+      unset($options['headers']['User-Agent']);
+    }
+    elseif ($proxy_user_agent) {
+      $options['headers']['User-Agent'] = $proxy_user_agent;
+    }
+  }
+
   switch ($uri['scheme']) {
+    case 'proxy':
+      // Make the socket connection to a proxy server.
+      $socket = 'tcp://' . $proxy_server . ':' . variable_get('proxy_port', 8080);
+      // The Host header still needs to match the real request.
+      $options['headers']['Host'] = $uri['host'];
+      $options['headers']['Host'] .= isset($uri['port']) && $uri['port'] != 80 ? ':' . $uri['port'] : '';
+      break;
+
     case 'http':
     case 'feed':
       $port = isset($uri['port']) ? $uri['port'] : 80;
@@ -767,12 +811,14 @@ function drupal_http_request($url, array $options = array()) {
       // checking the host that do not take into account the port number.
       $options['headers']['Host'] = $uri['host'] . ($port != 80 ? ':' . $port : '');
       break;
+
     case 'https':
       // Note: Only works when PHP is compiled with OpenSSL support.
       $port = isset($uri['port']) ? $uri['port'] : 443;
       $socket = 'ssl://' . $uri['host'] . ':' . $port;
       $options['headers']['Host'] = $uri['host'] . ($port != 443 ? ':' . $port : '');
       break;
+
     default:
       $result->error = 'invalid schema ' . $uri['scheme'];
       $result->code = -1003;
@@ -801,11 +847,6 @@ function drupal_http_request($url, array $options = array()) {
   if (isset($uri['query'])) {
     $path .= '?' . $uri['query'];
   }
-
-  // Merge the default headers.
-  $options['headers'] += array(
-    'User-Agent' => 'Drupal (+http://drupal.org/)',
-  );
 
   // Only add Content-Length if we actually have any content or if it is a POST
   // or PUT request. Some non-standard servers get confused by Content-Length in
@@ -977,6 +1018,18 @@ function drupal_http_request($url, array $options = array()) {
 
   return $result;
 }
+
+/**
+ * Helper function for determining hosts excluded from needing a proxy.
+ *
+ * @return
+ *   TRUE if a proxy should be used for this host.
+ */
+function _drupal_http_use_proxy($host) {
+  $proxy_exceptions = variable_get('proxy_exceptions', array('localhost', '127.0.0.1'));
+  return !in_array(strtolower($host), $proxy_exceptions, TRUE);
+}
+
 /**
  * @} End of "defgroup http_handling".
  */
@@ -990,7 +1043,7 @@ function drupal_http_request($url, array $options = array()) {
 /**
  * Verifies the syntax of the given e-mail address.
  *
- * Empty e-mail addresses are allowed. See RFC 2822 for details.
+ * See @link http://tools.ietf.org/html/rfc5321 RFC 5321 @endlink for details.
  *
  * @param $mail
  *   A string containing an e-mail address.
@@ -1989,8 +2042,9 @@ function _format_date_callback(array $matches = NULL, $new_langcode = NULL) {
  * alternative than url().
  *
  * @param $path
- *   The internal path or external URL being linked to, such as "node/34" or
- *   "http://example.com/foo". A few notes:
+ *   (optional) The internal path or external URL being linked to, such as
+ *   "node/34" or "http://example.com/foo". The default value is equivalent to
+ *   passing in '<front>'. A few notes:
  *   - If you provide a full URL, it will be considered an external URL.
  *   - If you provide only the path (e.g. "node/34"), it will be
  *     considered an internal link. In this case, it should be a system URL,
@@ -2006,7 +2060,8 @@ function _format_date_callback(array $matches = NULL, $new_langcode = NULL) {
  *     include them in $path, or use $options['query'] to let this function
  *     URL encode them.
  * @param $options
- *   An associative array of additional options, with the following elements:
+ *   (optional) An associative array of additional options, with the following
+ *   elements:
  *   - 'query': An array of query key/value-pairs (without any URL-encoding) to
  *     append to the URL.
  *   - 'fragment': A fragment identifier (named anchor) to append to the URL.
@@ -2427,6 +2482,7 @@ function drupal_deliver_html_page($page_callback_result) {
 
   // Menu status constants are integers; page content is a string or array.
   if (is_int($page_callback_result)) {
+    $site_config = config('system.site');
     // @todo: Break these up into separate functions?
     switch ($page_callback_result) {
       case MENU_NOT_FOUND:
@@ -2443,7 +2499,7 @@ function drupal_deliver_html_page($page_callback_result) {
           $_GET['destination'] = current_path();
         }
 
-        $path = drupal_get_normal_path(variable_get('site_404', ''));
+        $path = drupal_get_normal_path($site_config->get('page.404'));
         if ($path && $path != current_path()) {
           // Custom 404 handler. Set the active item in case there are tabs to
           // display, or other dependencies on the path.
@@ -2472,7 +2528,7 @@ function drupal_deliver_html_page($page_callback_result) {
           $_GET['destination'] = current_path();
         }
 
-        $path = drupal_get_normal_path(variable_get('site_403', ''));
+        $path = drupal_get_normal_path($site_config->get('page.403'));
         if ($path && $path != current_path()) {
           // Custom 403 handler. Set the active item in case there are tabs to
           // display or other dependencies on the path.
@@ -2495,7 +2551,7 @@ function drupal_deliver_html_page($page_callback_result) {
         drupal_add_http_header('Status', '503 Service unavailable');
         drupal_set_title(t('Site under maintenance'));
         print theme('maintenance_page', array('content' => filter_xss_admin(variable_get('maintenance_mode_message',
-          t('@site is currently under maintenance. We should be back shortly. Thank you for your patience.', array('@site' => variable_get('site_name', 'Drupal')))))));
+          t('@site is currently under maintenance. We should be back shortly. Thank you for your patience.', array('@site' => $site_config->get('name')))))));
         break;
     }
   }
@@ -3248,7 +3304,11 @@ function drupal_pre_render_styles($elements) {
             $import_batch = array_slice($import, 0, 31);
             $import = array_slice($import, 31);
             $element = $style_element_defaults;
-            $element['#value'] = implode("\n", $import_batch);
+            // This simplifies the JavaScript regex, allowing each line
+            // (separated by \n) to be treated as a completely different string.
+            // This means that we can use ^ and $ on one line at a time, and not
+            // worry about style tags since they'll never match the regex.
+            $element['#value'] = "\n" . implode("\n", $import_batch) . "\n";
             $element['#attributes']['media'] = $group['media'];
             $element['#browsers'] = $group['browsers'];
             $elements[] = $element;
@@ -4957,24 +5017,6 @@ function drupal_json_decode($var) {
 }
 
 /**
- * Returns data in JSON format.
- *
- * This function should be used for JavaScript callback functions returning
- * data in JSON format. It sets the header for JavaScript output.
- *
- * @param $var
- *   (optional) If set, the variable will be converted to JSON and output.
- */
-function drupal_json_output($var = NULL) {
-  // We are returning JSON, so tell the browser.
-  drupal_add_http_header('Content-Type', 'application/json');
-
-  if (isset($var)) {
-    echo drupal_json_encode($var);
-  }
-}
-
-/**
  * Gets a salt useful for hardening against SQL injection.
  *
  * @return
@@ -5066,9 +5108,9 @@ function _drupal_bootstrap_code() {
 }
 
 /**
- * Temporary BC function for scripts not using DrupalKernel.
+ * Temporary BC function for scripts not using HttpKernel.
  *
- * DrupalKernel skips this and replicates it via event listeners.
+ * HttpKernel skips this and replicates it via event listeners.
  *
  * @see Drupal\Core\EventSubscriber\PathSubscriber;
  * @see Drupal\Core\EventSubscriber\LegacyRequestSubscriber;
@@ -5129,7 +5171,8 @@ function drupal_page_set_cache() {
         'title' => drupal_get_title(),
         'headers' => array(),
       ),
-      'expire' => CACHE_TEMPORARY,
+      'tags' => array('content' => TRUE),
+      'expire' => CACHE_PERMANENT,
       'created' => REQUEST_TIME,
     );
 
@@ -5148,7 +5191,7 @@ function drupal_page_set_cache() {
       if (config('system.performance')->get('page_compression') && extension_loaded('zlib')) {
         $cache->data['body'] = gzencode($cache->data['body'], 9, FORCE_GZIP);
       }
-      cache('page')->set($cache->cid, $cache->data, $cache->expire);
+      cache('page')->set($cache->cid, $cache->data, $cache->expire, $cache->tags);
     }
     return $cache;
   }
@@ -5714,8 +5757,9 @@ function drupal_render_page($page) {
  * any children, it is the responsibility of the theme function to render
  * these children. For elements that are not allowed to have any children,
  * e.g. buttons or textfields, the theme function can be used to render the
- * element itself. If #theme is not present and the element has children, they
- * are rendered and concatenated into a string by drupal_render_children().
+ * element itself. If #theme is not present and the element has children, each
+ * child is itself rendered by a call to drupal_render(), and the results are
+ * concatenated.
  *
  * The #theme_wrappers property contains an array of theme functions which will
  * be called, in order, after #theme has run. These can be used to add further
@@ -6050,7 +6094,8 @@ function drupal_render_cache_set(&$markup, $elements) {
   }
   $bin = isset($elements['#cache']['bin']) ? $elements['#cache']['bin'] : 'cache';
   $expire = isset($elements['#cache']['expire']) ? $elements['#cache']['expire'] : CACHE_PERMANENT;
-  cache($bin)->set($cid, $data, $expire);
+  $tags = isset($elements['#cache']['tags']) ? $elements['#cache']['tags'] : array();
+  cache($bin)->set($cid, $data, $expire, $tags);
 }
 
 /**
@@ -6123,7 +6168,7 @@ function drupal_render_collect_attached($elements, $return = FALSE) {
  *   - #pre_render: $function with a _pre_render suffix.
  *   - #cache: An associative array prepared for drupal_render_cache_set().
  */
-function drupal_render_cache_by_query($query, $function, $expire = CACHE_TEMPORARY, $granularity = NULL) {
+function drupal_render_cache_by_query($query, $function, $expire = CACHE_PERMANENT, $granularity = NULL) {
   $cache_keys = array_merge(array($function), drupal_render_cid_parts($granularity));
   $query->preExecute();
   $cache_keys[] = hash('sha256', serialize(array((string) $query, $query->getArguments())));
@@ -6906,6 +6951,9 @@ function drupal_common_theme() {
       'render element' => 'element',
     ),
     'range' => array(
+      'render element' => 'element',
+    ),
+    'color' => array(
       'render element' => 'element',
     ),
     'form' => array(

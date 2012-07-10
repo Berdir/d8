@@ -46,7 +46,7 @@
  *   language, the translation handler is responsible for performing one of the
  *   following actions:
  *   - Ignore missing translations, i.e. do not show any field values for the
- *     requested language. For example, see locale_field_language_alter().
+ *     requested language. For example, see field_field_language_alter().
  *   - Provide a value in a different language as fallback. By default, the
  *     fallback logic is applied separately to each field to ensure that there
  *     is a value for each field to display.
@@ -68,6 +68,13 @@
  */
 function field_language_insert() {
   field_info_cache_clear();
+  // If the number of languages is bigger than 1, enable the core language
+  // fallback rules.
+  // Because the language_count is updated only after the hook is invoked, we
+  // check if the language_count is bigger or equal with 1 at the current time.
+  if (variable_get('language_count', 1) >= 1) {
+    variable_set('field_language_fallback', TRUE);
+  }
 }
 
 /**
@@ -82,6 +89,13 @@ function field_language_update() {
  */
 function field_language_delete() {
   field_info_cache_clear();
+  // If the number of languages is less than 2, disable the core language
+  // fallback rules.
+  // Because the language_count is updated after the hook is invoked, we check
+  // if the language_count is less or equal with 2 at the current time.
+  if (variable_get('language_count', 1) <= 2) {
+    variable_set('field_language_fallback', FALSE);
+  }
 }
 
 /**
@@ -165,14 +179,11 @@ function _field_language_suggestion($available_langcodes, $langcode_suggestion, 
 /**
  * Returns available content language codes.
  *
- * The language codes that may be associated to fields include
- * LANGUAGE_NOT_SPECIFIED.
- *
  * @return
  *   An array of language codes.
  */
 function field_content_languages() {
-  return array_keys(language_list() + array(LANGUAGE_NOT_SPECIFIED => NULL));
+  return array_keys(language_list(LANGUAGE_ALL));
 }
 
 /**
@@ -243,12 +254,11 @@ function field_has_translation_handler($entity_type, $handler = NULL) {
  *   A valid language code.
  */
 function field_valid_language($langcode, $default = TRUE) {
-  $enabled_languages = field_content_languages();
-  if (in_array($langcode, $enabled_languages)) {
+  $languages = field_content_languages();
+  if (in_array($langcode, $languages)) {
     return $langcode;
   }
-  global $language_content;
-  return $default ? language_default()->langcode : $language_content->langcode;
+  return $default ? language_default()->langcode : drupal_container()->get(LANGUAGE_TYPE_CONTENT)->langcode;
 }
 
 /**
@@ -264,8 +274,8 @@ function field_valid_language($langcode, $default = TRUE) {
  *
  * If translation handlers are found, we let modules provide alternative display
  * language codes for fields not having the requested language code available.
- * Core language fallback rules are provided by locale_field_language_fallback()
- * which is called by locale_field_language_alter().
+ * Core language fallback rules are provided by field_language_fallback()
+ * which is called by field_field_language_alter().
  *
  * @param $entity_type
  *   The type of $entity.
@@ -291,11 +301,25 @@ function field_language($entity_type, $entity, $field_name = NULL, $langcode = N
   if (!isset($display_langcodes[$entity_type][$id][$langcode])) {
     $display_langcode = array();
 
-    // By default display language is set to LANGUAGE_NOT_SPECIFIED if the field
-    // translation is not available. It is up to translation handlers to
-    // implement language fallback rules.
+    // By default, display language is set to one of the locked languages
+    // if the field translation is not available. It is up to translation
+    // handlers to implement language fallback rules.
     foreach (field_info_instances($entity_type, $bundle) as $instance) {
-      $display_langcode[$instance['field_name']] = isset($entity->{$instance['field_name']}[$langcode]) ? $langcode : LANGUAGE_NOT_SPECIFIED;
+      if (isset($entity->{$instance['field_name']}[$langcode])) {
+        $display_langcode[$instance['field_name']] = $langcode;
+      }
+      else {
+        // If the field has a value for one of the locked languages, then use
+        // that language for display. If not, the default one will be
+        // LANGUAGE_NOT_SPECIFIED.
+        $display_langcode[$instance['field_name']] = LANGUAGE_NOT_SPECIFIED;
+        foreach (language_list(LANGUAGE_LOCKED) as $language_locked) {
+          if (isset($entity->{$instance['field_name']}[$language_locked->langcode])) {
+            $display_langcode[$instance['field_name']] = $language_locked->langcode;
+            break;
+          }
+        }
+      }
     }
 
     if (field_has_translation_handler($entity_type)) {
@@ -304,6 +328,11 @@ function field_language($entity_type, $entity, $field_name = NULL, $langcode = N
         'entity' => $entity,
         'langcode' => $langcode,
       );
+      // Do not apply core language fallback rules if they are disabled or if
+      // the entity does not have a translation handler registered.
+      if (variable_get('field_language_fallback', FALSE) && field_has_translation_handler($context['entity_type'])) {
+        field_language_fallback($display_langcode, $context['entity'], $context['langcode']);
+      }
       drupal_alter('field_language', $display_langcode, $context);
     }
 

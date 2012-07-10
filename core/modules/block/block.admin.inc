@@ -205,7 +205,7 @@ function block_admin_display_form_submit($form, &$form_state) {
     throw $e;
   }
   drupal_set_message(t('The block settings have been updated.'));
-  cache_clear_all();
+  cache_invalidate(array('content' => TRUE));
 }
 
 /**
@@ -418,9 +418,9 @@ function block_admin_configure($form, &$form_state, $module, $delta) {
       $default_language_type = $setting->type;
     }
 
-    // Fetch the enabled languages.
-    $enabled_languages = language_list(TRUE);
-    foreach ($enabled_languages as $language) {
+    // Fetch languages.
+    $languages = language_list(LANGUAGE_ALL);
+    foreach ($languages as $language) {
       // @TODO $language->name is not wrapped with t(), it should be replaced
       // by CMI translation implementation.
       $langcodes_options[$language->langcode] = $language->name;
@@ -603,7 +603,7 @@ function block_admin_configure_submit($form, &$form_state) {
       throw $e;
     }
     drupal_set_message(t('The block configuration has been saved.'));
-    cache_clear_all();
+    cache_invalidate(array('content' => TRUE));
     $form_state['redirect'] = 'admin/structure/block';
   }
 }
@@ -712,7 +712,7 @@ function block_add_block_form_submit($form, &$form_state) {
   }
 
   drupal_set_message(t('The block has been created.'));
-  cache_clear_all();
+  cache_invalidate(array('content' => TRUE));
   $form_state['redirect'] = 'admin/structure/block';
 }
 
@@ -760,7 +760,7 @@ function block_custom_block_delete_submit($form, &$form_state) {
     ->execute();
 
   drupal_set_message(t('The block %name has been removed.', array('%name' => $form_state['values']['info'])));
-  cache_clear_all();
+  cache_invalidate(array('content' => TRUE));
   $form_state['redirect'] = 'admin/structure/block';
   return;
 }
@@ -812,4 +812,3 @@ function template_preprocess_block_admin_display_form(&$variables) {
 
   $variables['form_submit'] = drupal_render_children($variables['form']);
 }
-

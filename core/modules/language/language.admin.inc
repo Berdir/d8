@@ -12,7 +12,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 function language_admin_overview_form($form, &$form_state) {
   drupal_static_reset('language_list');
-  $languages = language_list();
+  $languages = language_list(LANGUAGE_ALL);
   $default = language_default();
 
   $form['languages'] = array(
@@ -30,8 +30,24 @@ function language_admin_overview_form($form, &$form_state) {
 
   foreach ($languages as $langcode => $language) {
     $form['languages'][$langcode]['#weight'] = $language->weight;
+    $title = check_plain($language->name);
+    $description = '';
+    switch ($langcode) {
+      case LANGUAGE_NOT_APPLICABLE:
+        $description = t('For language independent content.');
+        break;
+      case LANGUAGE_NOT_SPECIFIED:
+        $description = t('Use this when the language is not (yet) known.');
+        break;
+      case LANGUAGE_MULTIPLE:
+        $description = t('Use this when multiple languages can be assigned, such as a multilingual PDF.');
+        break;
+    }
+    if (!empty($description)) {
+      $title .= '<div class="description">' . $description . '</div>';
+    }
     $form['languages'][$langcode]['name'] = array(
-      '#markup' => check_plain($language->name),
+      '#markup' => $title,
     );
     $form['languages'][$langcode]['default'] = array(
       '#type' => 'radio',
@@ -50,22 +66,28 @@ function language_admin_overview_form($form, &$form_state) {
       '#attributes' => array(
         'class' => array('language-order-weight'),
       ),
+      '#delta' => 30,
     );
     $form['languages'][$langcode]['operations'] = array(
       '#theme_wrappers' => array('language_admin_operations'),
       '#weight' => 100,
     );
-    $form['languages'][$langcode]['operations']['edit'] = array(
-      '#type' => 'link',
-      '#title' => t('edit'),
-      '#href' => 'admin/config/regional/language/edit/' . $langcode,
-    );
-    $form['languages'][$langcode]['operations']['delete'] = array(
-      '#type' => 'link',
-      '#title' => t('delete'),
-      '#href' => 'admin/config/regional/language/delete/' . $langcode,
-      '#access' => $langcode != $default->langcode,
-    );
+    if (empty($language->locked)) {
+      $form['languages'][$langcode]['operations']['edit'] = array(
+        '#type' => 'link',
+        '#title' => t('edit'),
+        '#href' => 'admin/config/regional/language/edit/' . $langcode,
+      );
+      $form['languages'][$langcode]['operations']['delete'] = array(
+        '#type' => 'link',
+        '#title' => t('delete'),
+        '#href' => 'admin/config/regional/language/delete/' . $langcode,
+        '#access' => $langcode != $default->langcode,
+      );
+    }
+    else {
+      $form['languages'][$langcode]['default']['#attributes']['disabled'] = 'disabled';
+    }
   }
 
   $form['actions'] = array('#type' => 'actions');
@@ -142,7 +164,7 @@ function theme_language_admin_overview_form_table($variables) {
  * Process language overview form submissions, updating existing languages.
  */
 function language_admin_overview_form_submit($form, &$form_state) {
-  $languages = language_list();
+  $languages = language_list(LANGUAGE_ALL);
   $old_default = language_default();
 
   foreach ($languages as $langcode => $language) {
@@ -278,8 +300,8 @@ function language_admin_add_predefined_form_validate($form, &$form_state) {
     form_set_error('predefined_langcode', t('Fill in the language details and save the language with <em>Add custom language</em>.'));
   }
   else {
-    if (language_load($langcode)) {
-      form_set_error('predefined_langcode', t('The language %language (%langcode) already exists.', array('%language' => $languages[$langcode]->name, '%langcode' => $langcode)));
+    if ($language = language_load($langcode)) {
+      form_set_error('predefined_langcode', t('The language %language (%langcode) already exists.', array('%language' => $language->name, '%langcode' => $langcode)));
     }
   }
 }
@@ -293,9 +315,8 @@ function language_admin_add_custom_form_validate($form, &$form_state) {
     // Reuse the editing form validation routine if we add a custom language.
     language_admin_edit_form_validate($form, $form_state);
 
-    $languages = language_list();
-    if (isset($languages[$langcode])) {
-     form_set_error('langcode', t('The language %language (%langcode) already exists.', array('%language' => $languages[$langcode]->name, '%langcode' => $langcode)));
+    if ($language = language_load($langcode)) {
+      form_set_error('langcode', t('The language %language (%langcode) already exists.', array('%language' => $language->name, '%langcode' => $langcode)));
     }
   }
   else {
