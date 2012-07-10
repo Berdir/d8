@@ -15,6 +15,13 @@ use Drupal\entity\Entity;
 class TestEntity extends Entity {
 
   /**
+   * The entity ID.
+   *
+   * @var integer
+   */
+  public $id;
+
+  /**
    * The name of the test entity.
    *
    * @var EntityPropertyInterface
@@ -40,7 +47,12 @@ class TestEntity extends Entity {
     // @todo: Should we unset defined properties or initialize all entity
     // property objects here, so we have the magic getter working with
     // properties defined in the entity class.
-    unset($this->name);
+
+    // Keep a possible value during entity-loading...
+    // @ŧodo: Cleanup. See TestEntityStorageController::attachLoad().
+    if (!isset($this->name)) {
+      unset($this->name);
+    }
     unset($this->user);
 
     foreach ($values as $name => $value) {
@@ -49,10 +61,18 @@ class TestEntity extends Entity {
   }
 
   public function __get($name) {
-    return $this->get($name);
+    if ($this->getPropertyDefinition($name)) {
+      return $this->get($name);
+    }
+    return $this->$name;
   }
 
   public function __set($name, $value) {
-    $this->set($name, $value);
+    if ($this->getPropertyDefinition($name)) {
+      $this->set($name, $value);
+    }
+    else {
+      $this->$name = $value;
+    }
   }
 }

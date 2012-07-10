@@ -9,6 +9,9 @@
  * Implements hook_install().
  */
 function entity_test_install() {
+  // Do not add fields for now.
+  return;
+
   // Auto-create a field for testing.
   $field = array(
     'field_name' => 'field_test_text',

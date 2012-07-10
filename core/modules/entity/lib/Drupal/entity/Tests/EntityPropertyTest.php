@@ -64,7 +64,7 @@ class EntityPropertyTest extends WebTestBase  {
     $this->assertTrue($entity->user[0] instanceof EntityPropertyItemInterface, 'Property item implements interface');
 
     $this->assertEqual($user->uid, $entity->user->id, 'User id can be read.');
-    $this->assertEqual($user->name, $entity->user->entity->name, 'User name value can be read.');
+    $this->assertEqual($user->name, $entity->user->entity->name, 'User name can be read.');
 
     // Change the assigned user by entity.
     $new_user = $this->drupalCreateUser();
@@ -83,23 +83,24 @@ class EntityPropertyTest extends WebTestBase  {
    * Tries to save and load an entity again.
    */
   function testSave() {
-    return;
     $name = $this->randomName();
+    $name_property[0]['value'] = $name;
     $user = $this->drupalCreateUser();
-    $entity = entity_create('entity_test', array('name' => $name, 'uid' => $user->uid));
-    $entity->save();
 
-    debug($entity->id());
-    debug($entity);
+    // Pass in the value of the name property when creating. With the user
+    // property we test setting a property after creation.
+    $entity = entity_create('entity_test', array('name' => $name_property));
+    $entity->user->id = $user->uid;
+
+    $entity->save();
+    $this->assertTrue((bool) $entity->id(), 'Entity has received an id.');
+
     $entity = entity_load('entity_test', $entity->id());
-    debug($entity);
+    $this->assertTrue((bool) $entity->id(), 'Entity loaded.');
 
     // Access the name property.
-    $this->assertTrue($entity->name instanceof EntityPropertyInterface, 'Property implements interface');
-    $this->assertTrue($entity->name[0] instanceof EntityPropertyItemInterface, 'Property item implements interface');
-
     $this->assertEqual($name, $entity->name->value, 'Name value can be read.');
-    $this->assertEqual($name, $entity->name[0]->value, 'Name value can be read through list access.');
-
+    $this->assertEqual($user->uid, $entity->user->id, 'User id can be read.');
+    $this->assertEqual($user->name, $entity->user->entity->name, 'User name can be read.');
   }
 }
