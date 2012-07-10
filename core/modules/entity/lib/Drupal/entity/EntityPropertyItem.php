@@ -104,11 +104,15 @@ class EntityPropertyItem implements EntityPropertyItemInterface {
   }
 
   public function getIterator() {
-    // @todo implement
+    return new \ArrayIterator($this->getProperties());
   }
 
   public function getProperties() {
-    // @todo implement
+    $properties = array();
+    foreach ($this->getPropertyDefinitions() as $name => $definition) {
+      $properties[$name] = $this->get($name);
+    }
+    return $properties;
   }
 
   public function getPropertyDefinition($name) {

@@ -283,11 +283,15 @@ class Entity implements EntityInterface {
   }
 
   public function getIterator() {
-    // TODO: Implement getIterator() method.
+    return new \ArrayIterator($this->getProperties());
   }
 
   public function getProperties() {
-    // TODO: Implement getProperties() method.
+    $properties = array();
+    foreach ($this->getPropertyDefinitions() as $name => $definition) {
+      $properties[$name] = $this->get($name);
+    }
+    return $properties;
   }
 
   public function getPropertyDefinition($name) {
