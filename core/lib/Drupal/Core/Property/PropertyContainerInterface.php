@@ -47,6 +47,15 @@ interface PropertyContainerInterface extends IteratorAggregate  {
    */
   public function getPropertyDefinitions();
 
+  /**
+   * Gets the the raw array representation of the contained properties.
+   *
+   * @return array
+   *   The raw array representation of the contained properties, i.e. an array
+   *   keyed by property name containing the raw values.
+   */
+  public function toArray();
+
 /*
  * Commented out for now as it creates problems for entities.
  *

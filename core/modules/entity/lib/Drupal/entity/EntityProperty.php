@@ -165,10 +165,8 @@ class EntityProperty implements EntityPropertyInterface {
   public function toArray() {
     $values = array();
     foreach ($this->list as $item) {
-      $value = array();
-      foreach ($item->getPropertyDefinitions() as $name => $definition) {
-        $value[$name] = $item->getRawValue($name);
-      }
+      $value = $item->toArray();
+      // @todo: Add an isEmpty() method and make use of it.
       if (array_filter($value)) {
         $values[] = $value;
       }

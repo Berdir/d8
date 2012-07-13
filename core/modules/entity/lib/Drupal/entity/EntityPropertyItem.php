@@ -124,6 +124,14 @@ class EntityPropertyItem implements EntityPropertyItemInterface {
     return $this->dataType->getPropertyDefinitions($this->definition);
   }
 
+  public function toArray($langcode = NULL) {
+    $value = array();
+    foreach ($this->getPropertyDefinitions() as $name => $definition) {
+      $value[$name] = $this->getRawValue($name);
+    }
+    return $value;
+  }
+
   public function access($account = NULL) {
     // @todo implement
   }

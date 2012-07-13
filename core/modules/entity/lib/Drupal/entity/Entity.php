@@ -331,6 +331,14 @@ class Entity implements EntityInterface {
     ));
   }
 
+  public function toArray() {
+    $value = array();
+    foreach ($this->getPropertyDefinitions() as $name => $definition) {
+      $value[$name] = $this->getRawValue($name);
+    }
+    return $value;
+  }
+
   public function access($account) {
     // TODO: Implement access() method.
   }
