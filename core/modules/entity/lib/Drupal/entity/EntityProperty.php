@@ -88,8 +88,7 @@ class EntityProperty implements EntityPropertyInterface {
   }
 
   public function getIterator() {
-    // @todo: Fix to iterate over the properties, not over the raw values.
-    return new ArrayIterator($this->list);
+    return new \ArrayIterator($this->list);
   }
 
   public function count() {
