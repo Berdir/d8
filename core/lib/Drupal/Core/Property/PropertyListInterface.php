@@ -13,4 +13,11 @@ use Countable;
 /**
  * Interface for working with lists of properties.
  */
-interface PropertyListInterface extends ArrayAccess, IteratorAggregate, Countable { }
+interface PropertyListInterface extends ArrayAccess, IteratorAggregate, Countable {
+
+  /**
+   * Validate the list.
+   */
+  public function validate();
+
+}

@@ -124,7 +124,7 @@ class EntityPropertyItem implements EntityPropertyItemInterface {
     return $this->dataType->getPropertyDefinitions($this->definition);
   }
 
-  public function access($account) {
+  public function access($account = NULL) {
     // @todo implement
   }
   public function validate() {

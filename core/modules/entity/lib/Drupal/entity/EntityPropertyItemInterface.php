@@ -18,6 +18,18 @@ use Drupal\Core\Property\PropertyContainerInterface;
 interface EntityPropertyItemInterface extends PropertyContainerInterface {
 
   /**
+   * Check entity property access.
+   *
+   * @param \Drupal\user\User $account
+   *   (optional) The user account to check access for. Defaults to the current
+   *   user.
+   *
+   * @return bool
+   *   Whether the given user has access.
+   */
+  public function access($account = NULL);
+
+  /**
    * Gets the definition of the entity property.
    *
    * @return array
@@ -26,23 +38,49 @@ interface EntityPropertyItemInterface extends PropertyContainerInterface {
   public function getDefinition();
 
   /**
-   * May contain only primitives and entity references.
+   * Returns the value of a contained property.
    *
-   * In case of an entity reference it would return the entity object. You'll
-   * have to go with getRawValue if you want the id.
+   * Entity property items may contain only primitives and entity references.
+   *
+   * @param string $property_name
+   *   The name of the property to return; e.g., 'value'.
    *
    * @return EntityInterface|mixed
+   *   The property value, or NULL if it is not defined.
    */
   public function get($property_name);
 
   /**
-   * Gets the raw value, i.e. the id of the entity in case of entity references,
-   * or the plain data of fields.
+   * Returns the raw value of a contained property.
+   *
+   * Returns the raw value, i.e. the id of the entity in case of entity
+   * references, or the plain data of fields.
+   *
+   * @param string $property_name
+   *   The name of the property to return; e.g., 'value'.
+   *
+   * @return mixed
+   *   The raw property value, or NULL if it is not defined.
    */
   public function getRawValue($property_name);
 
+  /**
+   * Sets the value of a contained property.
+   *
+   * @param string $property_name
+   *   The name of the contained property to set; e.g., 'value'.
+   * @param mixed $value
+   *   The value to set, or NULL to unset the property.
+   */
   public function set($property_name, $value);
 
-  // Check property item access.
-  public function access($account);
+  /**
+   * Magic getter.
+   */
+  public function __get($name);
+
+  /**
+   * Magic setter.
+   */
+  public function __set($name, $value);
 }

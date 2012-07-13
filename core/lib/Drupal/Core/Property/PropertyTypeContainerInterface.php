@@ -24,6 +24,9 @@ interface PropertyTypeContainerInterface extends PropertyTypeInterface {
   /**
    * Gets the property object given the raw value.
    *
+   * @todo: Currently this handles list of properties as well. Maybe we want to
+   * separate that out, so plugins are either for lists or non-lists?
+   *
    * @param array $definition
    *   The definition of the container's property, e.g. the definition of an
    *   entity reference property.
@@ -40,12 +43,15 @@ interface PropertyTypeContainerInterface extends PropertyTypeInterface {
   /**
    * Gets the raw value of a property container object.
    *
+   * @todo: Currently this handles list of properties as well. Maybe we want to
+   * separate that out?
+   *
    * @param array $definition
    *   The definition of the container's property, e.g. the definition of an
    *   entity reference property.
-   * @param PropertyContainerInterface $value
+   * @param PropertyContainerInterface|PropertyListInterface $value
    *
    * @return mixed
    */
-  function getRawValue(array $definition, PropertyContainerInterface $value);
+  function getRawValue(array $definition, $value);
 }

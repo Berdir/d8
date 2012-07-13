@@ -176,7 +176,7 @@ class EntityProperty implements EntityPropertyInterface {
     return $values;
   }
 
-  public function access($account) {
+  public function access($account = NULL) {
     // TODO: Implement access() method. Use item access.
   }
 

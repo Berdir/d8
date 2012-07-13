@@ -66,7 +66,7 @@ class PropertyTypeEntity implements PropertyTypeContainerInterface {
    *
    * @return mixed
    */
-  function getRawValue(array $definition, PropertyContainerInterface $entity) {
+  function getRawValue(array $definition, $entity) {
     return empty($definition['entity type']) ? array($entity->entityType(), $entity->id()) : $entity->id();
   }
 

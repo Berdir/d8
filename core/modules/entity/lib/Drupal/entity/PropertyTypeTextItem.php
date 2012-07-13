@@ -43,7 +43,7 @@ class PropertyTypeTextItem implements PropertyTypeContainerInterface {
   /**
    * Implements \Drupal\Core\Property\PropertyTypeContainerInterface.
    */
-  function getRawValue(array $definition, PropertyContainerInterface $item) {
+  function getRawValue(array $definition, $item) {
     return $item->toArray();
   }
 
