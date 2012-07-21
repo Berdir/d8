@@ -103,11 +103,6 @@ abstract class UpgradePathTestBase extends WebTestBase {
       return FALSE;
     }
 
-    // Unregister the registry.
-    // This is required to make sure that the database layer works properly.
-    spl_autoload_unregister('drupal_autoload_class');
-    spl_autoload_unregister('drupal_autoload_interface');
-
     // Load the database from the portable PHP dump.
     // The files may be gzipped.
     foreach ($this->databaseDumpFiles as $file) {
@@ -250,10 +245,6 @@ abstract class UpgradePathTestBase extends WebTestBase {
     foreach (module_list() as $module) {
       drupal_load('module', $module);
     }
-
-    // Re-register autoload functions.
-    spl_autoload_register('drupal_autoload_class');
-    spl_autoload_register('drupal_autoload_interface');
 
     // Reload hook implementations
     module_implements_reset();
