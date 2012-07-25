@@ -29,22 +29,22 @@ class BulkDeleteTest extends FieldTestBase {
    * This replicates the partial entities created in field_purge_data_batch(),
    * which only have the ids and the to be deleted field defined.
    *
-   * @param $entity_type
-   *   The entity type of $entities.
    * @param $entities
-   *   An array of entities of type $entity_type.
+   *   An array of entities of type test_entity.
    * @param $field_name
    *   A field name whose data should be copied from $entities into the returned
    *   partial entities.
    * @return
    *   An array of partial entities corresponding to $entities.
    */
-  protected function convertToPartialEntities($entity_type, $entities, $field_name) {
+  protected function convertToPartialEntities($entities, $field_name) {
     $partial_entities = array();
     foreach ($entities as $id => $entity) {
-      $partial_entity = entity_create_from_ids($entity_type, entity_extract_ids($entity_type, $entity));
-      $partial_entity->$field_name = $entity->$field_name;
-      $partial_entities[$id] = $partial_entity;
+      // Re-create the entity with only the required keys, remove label as that
+      // is not present when using _field_create_entity_from_ids().
+      $partial_entities[$id] = field_test_create_entity($entity->ftid, $entity->ftvid, $entity->fttype, $entity->ftlabel);
+      unset($partial_entities[$id]->ftlabel);
+      $partial_entities[$id]->$field_name = $entity->$field_name;
     }
     return $partial_entities;
   }
@@ -180,7 +180,7 @@ class BulkDeleteTest extends FieldTestBase {
       ->execute();
     $entities = array();
     foreach ($found[$this->entity_type] as $ids) {
-      $entities[$ids[0]] = entity_create_from_ids($this->entity_type, $ids);
+      $entities[$ids->entity_id] = _field_create_entity_from_ids($ids);
     }
     field_attach_load($this->entity_type, $entities, FIELD_LOAD_CURRENT, array('field_id' => $field['id'], 'deleted' => 1));
     $this->assertEqual(count($found['test_entity']), 10, 'Correct number of entities found after deleting');
@@ -230,7 +230,7 @@ class BulkDeleteTest extends FieldTestBase {
     // bundle.
     $actual_hooks = field_test_memorize();
     $hooks = array();
-    $entities = $this->convertToPartialEntities($this->entity_type, $this->entities_by_bundles[$bundle], $field['field_name']);
+    $entities = $this->convertToPartialEntities($this->entities_by_bundles[$bundle], $field['field_name']);
     foreach (array_chunk($entities, $batch_size, TRUE) as $chunk_entity) {
       $hooks['field_test_field_load'][] = $chunk_entity;
     }
@@ -284,7 +284,7 @@ class BulkDeleteTest extends FieldTestBase {
     // bundle.
     $actual_hooks = field_test_memorize();
     $hooks = array();
-    $entities = $this->convertToPartialEntities($this->entity_type, $this->entities_by_bundles[$bundle], $field['field_name']);
+    $entities = $this->convertToPartialEntities($this->entities_by_bundles[$bundle], $field['field_name']);
     $hooks['field_test_field_load'][] = $entities;
     $hooks['field_test_field_delete'] = $entities;
     $this->checkHooksInvocations($hooks, $actual_hooks);
@@ -311,7 +311,7 @@ class BulkDeleteTest extends FieldTestBase {
     // Check hooks invocations (same as above, for the 2nd bundle).
     $actual_hooks = field_test_memorize();
     $hooks = array();
-    $entities = $this->convertToPartialEntities($this->entity_type, $this->entities_by_bundles[$bundle], $field['field_name']);
+    $entities = $this->convertToPartialEntities($this->entities_by_bundles[$bundle], $field['field_name']);
     $hooks['field_test_field_load'][] = $entities;
     $hooks['field_test_field_delete'] = $entities;
     $this->checkHooksInvocations($hooks, $actual_hooks);

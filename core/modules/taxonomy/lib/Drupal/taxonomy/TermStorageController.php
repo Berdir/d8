@@ -25,7 +25,8 @@ class TermStorageController extends DatabaseStorageController {
   public function create(array $values) {
     $entity = parent::create($values);
     // Ensure the vocabulary machine name is initialized as it is used as the
-    // bundle key.
+    // bundle key. Only attempt to do this if a vocabulary id is available,
+    // which might not be the case when creating partial/incomplete entities.
     // @todo Move to Term::bundle() once field API has been converted
     //   to make use of it.
     if (!isset($entity->vocabulary_machine_name) && isset($entity->vid)) {

@@ -870,7 +870,7 @@ function field_purge_batch($batch_size) {
       foreach ($results as $entity_type => $ids_array) {
         $entities = array();
         foreach ($ids_array as $ids) {
-          $entities[$ids[0]] = entity_create_from_ids($entity_type, $ids);
+          $entities[$ids->entity_id] = _field_create_entity_from_ids($ids);
         }
 
         field_attach_load($entity_type, $entities, FIELD_LOAD_CURRENT, array('field_id' => $field['id'], 'deleted' => 1));

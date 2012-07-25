@@ -45,7 +45,7 @@ class EfqTest extends TaxonomyTestBase {
     $this->assertEqual(array_keys($terms), array_keys($result), 'Taxonomy terms were retrieved by EntityFieldQuery.');
 
     $first_result = reset($result);
-    $term = entity_create_from_ids('taxonomy_term', $first_result);
+    $term = _field_create_entity_from_ids($first_result);
     $this->assertEqual($term->tid, $first_result[0], 'Taxonomy term can be created based on the ids');
 
     // Create a second vocabulary and five more terms.
