@@ -1232,3 +1232,4 @@ function _field_create_entity_from_ids($ids) {
   }
   return entity_create($ids->entity_type, $id_properties);
  }
+ 
