@@ -48,7 +48,7 @@ class EntityPropertiesTest extends FieldTestBase {
           break;
 
         case 'test_entity_label':
-          $this->assertEqual($label, $entity->ftlabel, 'Entity rray) $entitwith label key returned correct label.');
+          $this->assertEqual($label, $entity->ftlabel, 'Entity with label key returned correct label.');
           break;
 
         case 'test_entity_label_callback':
