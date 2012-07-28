@@ -818,12 +818,12 @@ function taxonomy_form_term_submit($form, &$form_state) {
   $status = taxonomy_term_save($term);
   switch ($status) {
     case SAVED_NEW:
-      drupal_set_message(t('Created new term %term.', array('%term' => $term->name)));
-      watchdog('taxonomy', 'Created new term %term.', array('%term' => $term->name), WATCHDOG_NOTICE, l(t('edit'), 'taxonomy/term/' . $term->tid . '/edit'));
+      drupal_set_message(t('Created new term %term.', array('%term' => $term->label())));
+      watchdog('taxonomy', 'Created new term %term.', array('%term' => $term->label()), WATCHDOG_NOTICE, l(t('edit'), 'taxonomy/term/' . $term->tid . '/edit'));
       break;
     case SAVED_UPDATED:
-      drupal_set_message(t('Updated term %term.', array('%term' => $term->name)));
-      watchdog('taxonomy', 'Updated term %term.', array('%term' => $term->name), WATCHDOG_NOTICE, l(t('edit'), 'taxonomy/term/' . $term->tid . '/edit'));
+      drupal_set_message(t('Updated term %term.', array('%term' => $term->label())));
+      watchdog('taxonomy', 'Updated term %term.', array('%term' => $term->label()), WATCHDOG_NOTICE, l(t('edit'), 'taxonomy/term/' . $term->tid . '/edit'));
       // Clear the page and block caches to avoid stale data.
       cache_invalidate(array('content' => TRUE));
       break;
@@ -892,7 +892,7 @@ function taxonomy_form_term_delete_submit($form, &$form_state) {
  * @ingroup forms
  * @see taxonomy_term_confirm_delete_submit()
  */
-function taxonomy_term_confirm_delete($form, &$form_state, $term) {
+function taxonomy_term_confirm_delete($form, &$form_state, Term $term) {
   // Always provide entity id in the same form key as in the entity edit form.
   $form['tid'] = array('#type' => 'value', '#value' => $term->tid);
 
@@ -904,7 +904,7 @@ function taxonomy_term_confirm_delete($form, &$form_state, $term) {
   $form['delete'] = array('#type' => 'value', '#value' => TRUE);
   return confirm_form($form,
     t('Are you sure you want to delete the term %title?',
-    array('%title' => $term->name)),
+    array('%title' => $term->label())),
     'admin/structure/taxonomy',
     t('Deleting a term will delete all its children if there are any. This action cannot be undone.'),
     t('Delete'),
