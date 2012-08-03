@@ -18,7 +18,7 @@
  *   The type of $entity; for example, 'node' or 'user'.
  * @param $entity
  *   The $entity to which $file is referenced.
- * @param $file
+ * @param Drupal\Core\File\File $file
  *   The file entity that is being requested.
  *
  * @return
@@ -28,7 +28,7 @@
  *
  * @see hook_field_access().
  */
-function hook_file_download_access($field, $entity_type, $entity, $file) {
+function hook_file_download_access($field, $entity_type, $entity, Drupal\Core\File\File $file) {
   if ($entity_type == 'node') {
     return node_access('view', $entity);
   }
