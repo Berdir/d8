@@ -4047,7 +4047,7 @@ function node_modules_disabled($modules) {
 /**
  * Implements hook_file_download_access().
  */
-function node_file_download_access($field, $entity_type, $entity) {
+function node_file_download_access($field, $entity_type, $entity, $file) {
   if ($entity_type == 'node') {
     return node_access('view', $entity);
   }

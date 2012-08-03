@@ -18,6 +18,8 @@
  *   The type of $entity; for example, 'node' or 'user'.
  * @param $entity
  *   The $entity to which $file is referenced.
+ * @param $file
+ *   The file entity that is being requested.
  *
  * @return
  *   TRUE is access should be allowed by this entity or FALSE if denied. Note
@@ -26,7 +28,7 @@
  *
  * @see hook_field_access().
  */
-function hook_file_download_access($field, $entity_type, $entity) {
+function hook_file_download_access($field, $entity_type, $entity, $file) {
   if ($entity_type == 'node') {
     return node_access('view', $entity);
   }
@@ -45,20 +47,22 @@ function hook_file_download_access($field, $entity_type, $entity) {
  *   An array of grants gathered by hook_file_download_access(). The array is
  *   keyed by the module that defines the entity type's access control; the
  *   values are Boolean grant responses for each module.
- * @param $field
- *   The field to which the file belongs.
- * @param $entity_type
- *   The type of $entity; for example, 'node' or 'user'.
- * @param $entity
- *   The $entity to which $file is referenced.
+ * @param array $context
+ *   An associative array containing the following key-value pairs:
+ *   - entity_type: The type of entity; for example, node or user.
+ *   - entity: The entity to which the field item is referenced.
+ *   - field: The field info of the field the field_item belongs to.
+ *   - file: The file entity that is being requested.
  *
  * @return
  *   An array of grants, keyed by module name, each with a Boolean grant value.
  *   Return an empty array to assert FALSE. You may choose to return your own
  *   module's value in addition to other grants or to overwrite the values set
  *   by other modules.
+ *
+ * @see hook_file_download_access().
  */
-function hook_file_download_access_alter(&$grants, $field, $entity_type, $entity) {
+function hook_file_download_access_alter(&$grants, $context) {
   // For our example module, we always enforce the rules set by node module.
   if (isset($grants['node'])) {
     $grants = array('node' => $grants['node']);
