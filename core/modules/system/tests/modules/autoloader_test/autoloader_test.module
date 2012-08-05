@@ -1,0 +1,53 @@
+<?php
+
+/**
+ * @file
+ * Support module for autoloader testing.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function autoloader_test_menu() {
+  $items['autoloader-test'] = array(
+    'title' => 'Autoloader test',
+    'page callback' => 'autoloader_test_page',
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+/**
+ * Page callback: Tries to autoload a list of classes and displays the results.
+ */
+function autoloader_test_page() {
+  if (!($classes = variable_get('autoloader_test_classes_to_test', array()))) {
+    $message = 'Failed to find any classes to try to load.';
+  }
+  else {
+    // To make sure the test works as intended, we have one file in the
+    // codebase that deliberately has its namespace not match its location in
+    // the filesystem. We expect to try and fail to autoload this one class.
+    $expected_failure = 'Drupal\system\Tests\System\Autoloader\AutoLoaderTestIncorrectNamespace';
+    $failures = array();
+    foreach ($classes as $class) {
+      if (!class_exists($class)) {
+        $failures[] = $class;
+      }
+    }
+    if (count($failures) == 1 && reset($failures) == $expected_failure) {
+      $message = 'Successfully loaded all classes.';
+    }
+    elseif (!empty($failures)) {
+      $failures = array_diff($failures, array($expected_failure));
+      $message = format_string('Failed to autoload the following classes: @classes', array('@classes' => implode(', ', $failures)));
+    }
+    else {
+      $message = 'The class that was expected to fail was instead able to be autoloaded.';
+    }
+  }
+
+  return '<div id="autoloader-test-result">' . $message . '</div>';
+}

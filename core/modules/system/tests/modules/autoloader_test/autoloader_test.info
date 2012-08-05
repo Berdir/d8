@@ -1,0 +1,6 @@
+name = "Autoloader test"
+description = "Support module for autoloader testing."
+package = Testing
+version = VERSION
+core = 8.x
+hidden = TRUE
