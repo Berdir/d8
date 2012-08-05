@@ -515,7 +515,7 @@ function locale_update_8007() {
     'locale-session' => 'language-session',
   );
   foreach ($variable_names as $variable_name) {
-    $value = variable_get($variable_name);
+    $value = update_variable_get($variable_name);
     // Skip processing if the variable is not stored in the db.
     if ($value === NULL) {
       continue;
