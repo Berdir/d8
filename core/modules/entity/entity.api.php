@@ -448,3 +448,18 @@ function hook_entity_prepare_view($entities, $entity_type) {
     }
   }
 }
+
+/**
+ * Change the view mode of an entity that is being displayed.
+ *
+ * @param string $view_mode
+ *   The view_mode that is to be used to display the entity.
+ * @param array $context
+ *   An array with the keys entity_type, entity and langcode.
+ */
+function hook_entity_view_mode_alter(&$view_mode, array $context) {
+  // For nodes, change the view mode when it is teaser.
+  if ($context['entity_type'] == 'node' && $view_mode == 'teaser') {
+    $view_mode = 'my_custom_view_mode';
+  }
+}
