@@ -197,11 +197,10 @@ function file_file_download($uri, $field_type = 'file') {
         // Default to FALSE and let entities overrule this ruling.
         $grants = array('system' => FALSE);
         foreach (module_implements('file_download_access') as $module) {
-          $grants = array_merge($grants, array($module => module_invoke($module, 'file_download_access', $field, $entity_type, $entity, $file)));
+          $grants = array_merge($grants, array($module => module_invoke($module, 'file_download_access', $field, $entity, $file)));
         }
         // Allow other modules to alter the returned grants/denies.
         $context = array(
-          'entity_type' => $entity_type,
           'entity' => $entity,
           'field' => $field,
           'file' => $file,

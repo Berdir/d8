@@ -15,6 +15,7 @@ use Drupal\Core\Database\Query\SelectExtender;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\node\Node;
 use Drupal\Core\File\File;
+use Drupal\entity\EntityInterface;
 
 /**
  * Denotes that the node is not published.
@@ -4048,8 +4049,8 @@ function node_modules_disabled($modules) {
 /**
  * Implements hook_file_download_access().
  */
-function node_file_download_access($field, $entity_type, $entity, File $file) {
-  if ($entity_type == 'node') {
+function node_file_download_access($field, EntityInterface $entity, File $file) {
+  if ($entity->entityType() == 'node') {
     return node_access('view', $entity);
   }
 }

@@ -14,9 +14,7 @@
  *
  * @param $field
  *   The field to which the file belongs.
- * @param $entity_type
- *   The type of $entity; for example, 'node' or 'user'.
- * @param $entity
+ * @param Drupal\entity\EntityInterface $entity
  *   The $entity to which $file is referenced.
  * @param Drupal\Core\File\File $file
  *   The file entity that is being requested.
@@ -28,8 +26,8 @@
  *
  * @see hook_field_access().
  */
-function hook_file_download_access($field, $entity_type, $entity, Drupal\Core\File\File $file) {
-  if ($entity_type == 'node') {
+function hook_file_download_access($field, Drupal\entity\EntityInterface $entity, Drupal\Core\File\File $file) {
+  if ($entity->entityType() == 'node') {
     return node_access('view', $entity);
   }
 }
@@ -49,7 +47,6 @@ function hook_file_download_access($field, $entity_type, $entity, Drupal\Core\Fi
  *   values are Boolean grant responses for each module.
  * @param array $context
  *   An associative array containing the following key-value pairs:
- *   - entity_type: The type of entity; for example, node or user.
  *   - entity: The entity to which the field item is referenced.
  *   - field: The field info of the field the field_item belongs to.
  *   - file: The file entity that is being requested.
