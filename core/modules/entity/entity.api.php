@@ -454,12 +454,14 @@ function hook_entity_prepare_view($entities, $entity_type) {
  *
  * @param string $view_mode
  *   The view_mode that is to be used to display the entity.
- * @param array $context
- *   An array with the keys entity_type, entity and langcode.
+ * @param Drupal\entity\EntityInterface $entity
+ *   The entity that is being viewed.
+ * @param string $langcode
+ *   The language code the entity is being displayed for.
  */
-function hook_entity_view_mode_alter(&$view_mode, array $context) {
+function hook_entity_view_mode_alter(&$view_mode, Drupal\entity\EntityInterface $entity, $langcode) {
   // For nodes, change the view mode when it is teaser.
-  if ($context['entity_type'] == 'node' && $view_mode == 'teaser') {
+  if ($entity->entityType() == 'node' && $view_mode == 'teaser') {
     $view_mode = 'my_custom_view_mode';
   }
 }
