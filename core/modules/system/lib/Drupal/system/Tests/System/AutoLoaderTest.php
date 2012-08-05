@@ -42,7 +42,7 @@ class AutoLoaderTest extends WebTestBase {
     // Get a list of the currently loaded classes.
     $current_classes = get_declared_classes();
 
-    // We will sea rch all core modules for new classes.
+    // We will search all core modules for new classes.
     $modules = system_rebuild_module_data();
     foreach ($modules as $name => $module) {
       if ($module->info['package'] != 'Core') {
