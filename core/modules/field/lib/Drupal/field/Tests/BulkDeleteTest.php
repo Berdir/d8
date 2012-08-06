@@ -185,7 +185,7 @@ class BulkDeleteTest extends FieldTestBase {
     field_attach_load($this->entity_type, $entities, FIELD_LOAD_CURRENT, array('field_id' => $field['id'], 'deleted' => 1));
     $this->assertEqual(count($found['test_entity']), 10, 'Correct number of entities found after deleting');
     foreach ($entities as $id => $entity) {
-       $this->assertEqual($this->entities[$id]->{$field['field_name']}, $entity->{$field['field_name']}, "Entity $id with deleted data loaded correctly");
+      $this->assertEqual($this->entities[$id]->{$field['field_name']}, $entity->{$field['field_name']}, "Entity $id with deleted data loaded correctly");
     }
   }
 

@@ -722,9 +722,9 @@ class EntityFieldQuery {
    *   ID. The only exception is when age=FIELD_LOAD_REVISION is used and field
    *   conditions or sorts are present -- in this case, the key will be the
    *   revision ID.) The entity type will only exist in the outer array if
-   *   results were found. The inner array values consist of an object
-   *   with the entity_id, revision_id and bundle properties. To traverse the
-   *   returned array:
+   *   results were found. The inner array values consist of an object with the
+   *   entity_id, revision_id and bundle properties. To traverse the returned
+   *   array:
    *   @code
    *     foreach ($query->execute() as $entity_type => $entities) {
    *       foreach ($entities as $entity_id => $entity) {
