@@ -42,9 +42,4 @@ class TestEntityController extends DatabaseStorageController {
     }
   }
 
-  public function create(array $values) {
-    $entity = parent::create($values);
-    $entity->enforceIsNew();
-    return $entity;
-  }
 }

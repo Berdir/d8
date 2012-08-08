@@ -235,7 +235,7 @@ function field_test_create_entity($id = 1, $vid = 1, $bundle = 'test_bundle', $l
 
   $label = !empty($label) ? $label : $bundle . ' label';
   $entity->ftlabel = $label;
-
+  $entity->enforceIsNew();
   return $entity;
 }
 
@@ -264,14 +264,7 @@ function field_test_entity_test_load($ftid, $ftvid = NULL) {
  *   The entity to save.
  */
 function field_test_entity_save(\Drupal\entity\EntityInterface $entity) {
-  $is_new = $entity->isNew();
-
-
   $entity->save();
-  // @todo: Move this to the proper place
-  debug($entity);
-  debug(db_query('SELECT * from {test_entity}')->fetchAll());
-  debug(db_query('SELECT * from {test_entity_revision}')->fetchAll());
 }
 
 /**
@@ -279,7 +272,7 @@ function field_test_entity_save(\Drupal\entity\EntityInterface $entity) {
  */
 function field_test_entity_add($fttype) {
   $fttype = str_replace('-', '_', $fttype);
-  $entity = (object)array('fttype' => $fttype);
+  $entity = field_test_create_entity(0, 0, $fttype);
   drupal_set_title(t('Create test_entity @bundle', array('@bundle' => $fttype)), PASS_THROUGH);
   return drupal_get_form('field_test_entity_form', $entity, TRUE);
 }
@@ -413,10 +406,10 @@ function field_test_entity_nested_form($form, &$form_state, $entity_1, $entity_2
  * Validate handler for field_test_entity_nested_form().
  */
 function field_test_entity_nested_form_validate($form, &$form_state) {
-  $entity_1 = (object) $form_state['values'];
+  $entity_1 = entity_create('test_entity', $form_state['values']);
   field_attach_form_validate('test_entity', $entity_1, $form, $form_state);
 
-  $entity_2 = (object) $form_state['values']['entity_2'];
+  $entity_2 = entity_create('test_entity', $form_state['values']['entity_2']);
   field_attach_form_validate('test_entity', $entity_2, $form['entity_2'], $form_state);
 }
 
@@ -424,11 +417,11 @@ function field_test_entity_nested_form_validate($form, &$form_state) {
  * Submit handler for field_test_entity_nested_form().
  */
 function field_test_entity_nested_form_submit($form, &$form_state) {
-  $entity_1 = (object) $form_state['values'];
+  $entity_1 = entity_create('test_entity', $form_state['values']);
   field_attach_submit('test_entity', $entity_1, $form, $form_state);
   field_test_entity_save($entity_1);
 
-  $entity_2 = (object) $form_state['values']['entity_2'];
+  $entity_2 = entity_create('test_entity', $form_state['values']['entity_2']);
   field_attach_submit('test_entity', $entity_2, $form['entity_2'], $form_state);
   field_test_entity_save($entity_2);
 

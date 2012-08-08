@@ -167,10 +167,6 @@ function _field_invoke($op, $entity_type, EntityInterface $entity, &$a = NULL, &
   $options += $default_options;
 
   // Determine the list of instances to iterate on.
-  if (!($entity instanceof EntityInterface)) {
-    debug($entity);
-    debug(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
-  }
   $instances = _field_invoke_get_instances($entity_type, $entity->bundle(), $options);
 
   // Iterate through the instances and collect results.
