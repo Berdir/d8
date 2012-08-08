@@ -247,10 +247,14 @@ class Entity implements EntityInterface {
    */
   public function createDuplicate() {
     $duplicate = clone $this;
-    $duplicate->id = NULL;
-    // Create a new UUUID.
-    $uuid = new Uuid();
-    $duplicate->uuid = $uuid->generate();
+    $entity_info = $this->entityInfo();
+    $this->{$entity_info['entity keys']['id']} = NULL;
+
+    // Check if the entity type supports UUIDs and generate a new one if so.
+    if (!empty($this->entityInfo['entity keys']['uuid'])) {
+      $uuid = new Uuid();
+      $this->{$entityInfo['entity keys']['uuid']} = $uuid->generate();
+    }
     return $duplicate;
   }
 
