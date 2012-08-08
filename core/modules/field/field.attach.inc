@@ -166,8 +166,7 @@ function _field_invoke($op, $entity_type, $entity, &$a = NULL, &$b = NULL, $opti
   $options += $default_options;
 
   // Determine the list of instances to iterate on.
-  list(, , $bundle) = entity_extract_ids($entity_type, $entity);
-  $instances = _field_invoke_get_instances($entity_type, $bundle, $options);
+  $instances = _field_invoke_get_instances($entity_type, $entity->bundle(), $options);
 
   // Iterate through the instances and collect results.
   $return = array();
@@ -279,8 +278,7 @@ function _field_invoke_multiple($op, $entity_type, $entities, &$a = NULL, &$b = 
   // $entity->$field_name property.
   foreach ($entities as $entity) {
     // Determine the list of instances to iterate on.
-    list($id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
-    $instances = _field_invoke_get_instances($entity_type, $bundle, $options);
+    $instances = _field_invoke_get_instances($entity_type, $entity->bundle(), $options);
 
     foreach ($instances as $instance) {
       $field_id = $instance['field_id'];
@@ -296,6 +294,7 @@ function _field_invoke_multiple($op, $entity_type, $entities, &$a = NULL, &$b = 
         // by hook implementations.
         // Unless a language code suggestion is provided we iterate on all the
         // available language codes.
+        $id = $entity->id();
         $available_langcodes = field_available_languages($entity_type, $field);
         $langcode = !empty($options['langcode'][$id]) ? $options['langcode'][$id] : $options['langcode'];
         $langcodes = _field_language_suggestion($available_langcodes, $langcode, $field_name);
@@ -546,10 +545,9 @@ function field_attach_form($entity_type, $entity, &$form, &$form_state, $langcod
   $form += (array) _field_invoke_default('form', $entity_type, $entity, $form, $form_state, $options);
 
   // Add custom weight handling.
-  list($id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
   $form['#pre_render'][] = '_field_extra_fields_pre_render';
   $form['#entity_type'] = $entity_type;
-  $form['#bundle'] = $bundle;
+  $form['#bundle'] = $entity->bundle();
 
   // Let other modules make changes to the form.
   // Avoid module_invoke_all() to let parameters be taken by reference.
@@ -658,9 +656,9 @@ function field_attach_load($entity_type, $entities, $age = FIELD_LOAD_CURRENT, $
     // Collect the storage backends used by the remaining fields in the entities.
     $storages = array();
     foreach ($queried_entities as $entity) {
-      list($id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
-      $instances = _field_invoke_get_instances($entity_type, $bundle, $options);
-
+      $instances = _field_invoke_get_instances($entity_type, $entity->bundle(), $options);
+      $id = $entity->id();
+      $vid = $entity->getRevisionId();
       foreach ($instances as $instance) {
         $field_name = $instance['field_name'];
         $field_id = $instance['field_id'];
@@ -694,8 +692,7 @@ function field_attach_load($entity_type, $entities, $age = FIELD_LOAD_CURRENT, $
     if ($cache_write) {
       foreach ($queried_entities as $id => $entity) {
         $data = array();
-        list($id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
-        $instances = field_info_instances($entity_type, $bundle);
+        $instances = field_info_instances($entity_type, $entity->bundle());
         foreach ($instances as $instance) {
           $data[$instance['field_name']] = $queried_entities[$id]->{$instance['field_name']};
         }
@@ -888,8 +885,6 @@ function field_attach_insert($entity_type, $entity) {
   _field_invoke_default('insert', $entity_type, $entity);
   _field_invoke('insert', $entity_type, $entity);
 
-  list($id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
-
   // Let any module insert field data before the storage engine, accumulating
   // saved fields along the way.
   $skip_fields = array();
@@ -900,7 +895,7 @@ function field_attach_insert($entity_type, $entity) {
 
   // Collect the storage backends used by the remaining fields in the entities.
   $storages = array();
-  foreach (field_info_instances($entity_type, $bundle) as $instance) {
+  foreach (field_info_instances($entity_type, $entity->bundle()) as $instance) {
     $field = field_info_field_by_id($instance['field_id']);
     $field_id = $field['id'];
     $field_name = $field['field_name'];
@@ -935,8 +930,6 @@ function field_attach_insert($entity_type, $entity) {
 function field_attach_update($entity_type, $entity) {
   _field_invoke('update', $entity_type, $entity);
 
-  list($id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
-
   // Let any module update field data before the storage engine, accumulating
   // saved fields along the way.
   $skip_fields = array();
@@ -947,7 +940,7 @@ function field_attach_update($entity_type, $entity) {
 
   // Collect the storage backends used by the remaining fields in the entities.
   $storages = array();
-  foreach (field_info_instances($entity_type, $bundle) as $instance) {
+  foreach (field_info_instances($entity_type, $entity->bundle()) as $instance) {
     $field = field_info_field_by_id($instance['field_id']);
     $field_id = $field['id'];
     $field_name = $field['field_name'];
@@ -990,11 +983,9 @@ function field_attach_update($entity_type, $entity) {
 function field_attach_delete($entity_type, $entity) {
   _field_invoke('delete', $entity_type, $entity);
 
-  list($id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
-
   // Collect the storage backends used by the fields in the entities.
   $storages = array();
-  foreach (field_info_instances($entity_type, $bundle) as $instance) {
+  foreach (field_info_instances($entity_type, $entity->bundle()) as $instance) {
     $field = field_info_field_by_id($instance['field_id']);
     $field_id = $field['id'];
     $storages[$field['storage']['type']][$field_id] = $field_id;
@@ -1027,11 +1018,9 @@ function field_attach_delete($entity_type, $entity) {
 function field_attach_delete_revision($entity_type, $entity) {
   _field_invoke('delete_revision', $entity_type, $entity);
 
-  list($id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
-
   // Collect the storage backends used by the fields in the entities.
   $storages = array();
-  foreach (field_info_instances($entity_type, $bundle) as $instance) {
+  foreach (field_info_instances($entity_type, $entity->bundle()) as $instance) {
     $field = field_info_field_by_id($instance['field_id']);
     $field_id = $field['id'];
     $storages[$field['storage']['type']][$field_id] = $field_id;
@@ -1159,10 +1148,9 @@ function field_attach_view($entity_type, $entity, $view_mode, $langcode = NULL) 
   $output = _field_invoke_default('view', $entity_type, $entity, $view_mode, $null, $options);
 
   // Add custom weight handling.
-  list($id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
   $output['#pre_render'][] = '_field_extra_fields_pre_render';
   $output['#entity_type'] = $entity_type;
-  $output['#bundle'] = $bundle;
+  $output['#bundle'] = $entity->bundle();
 
   // Let other modules alter the renderable array.
   $context = array(
@@ -1201,9 +1189,7 @@ function field_attach_view($entity_type, $entity, $view_mode, $langcode = NULL) 
  *   values.
  */
 function field_attach_preprocess($entity_type, $entity, $element, &$variables) {
-  list(, , $bundle) = entity_extract_ids($entity_type, $entity);
-
-  foreach (field_info_instances($entity_type, $bundle) as $instance) {
+  foreach (field_info_instances($entity_type, $entity->bundle()) as $instance) {
     $field_name = $instance['field_name'];
     if (isset($element[$field_name]['#language'])) {
       $langcode = $element[$field_name]['#language'];
