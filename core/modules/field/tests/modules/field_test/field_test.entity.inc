@@ -71,9 +71,9 @@ function field_test_entity_info() {
     'test_entity_bundle' => array(
       'name' => t('Test Entity with a specified bundle.'),
       'entity class' => 'Drupal\field_test\TestEntity',
+      'controller class' => 'Drupal\field_test\TestEntityController',
       'base table' => 'test_entity_bundle',
       'fieldable' => TRUE,
-      'controller class' => 'Drupal\field_test\TestEntityBundleController',
       'field cache' => FALSE,
       'entity keys' => array(
         'id' => 'ftid',
@@ -119,6 +119,7 @@ function field_test_entity_info() {
     'test_entity_label_callback' => array(
       'name' => t('Test entity label callback'),
       'entity class' => 'Drupal\field_test\TestEntity',
+      'controller class' => 'Drupal\field_test\TestEntityController',
       'fieldable' => TRUE,
       'field cache' => FALSE,
       'base table' => 'test_entity',
