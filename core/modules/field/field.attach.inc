@@ -167,6 +167,10 @@ function _field_invoke($op, $entity_type, EntityInterface $entity, &$a = NULL, &
   $options += $default_options;
 
   // Determine the list of instances to iterate on.
+  if (!($entity instanceof EntityInterface)) {
+    debug($entity);
+    debug(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
+  }
   $instances = _field_invoke_get_instances($entity_type, $entity->bundle(), $options);
 
   // Iterate through the instances and collect results.
@@ -657,6 +661,10 @@ function field_attach_load($entity_type, $entities, $age = FIELD_LOAD_CURRENT, $
     // Collect the storage backends used by the remaining fields in the entities.
     $storages = array();
     foreach ($queried_entities as $entity) {
+      if (!($entity instanceof EntityInterface)) {
+        debug(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
+        debug($entity);
+      }
       $instances = _field_invoke_get_instances($entity_type, $entity->bundle(), $options);
       $id = $entity->id();
       $vid = $entity->getRevisionId();
@@ -882,7 +890,7 @@ function field_attach_presave($entity_type, $entity) {
  *   Default values (if any) will be added to the $entity parameter for fields
  *   it leaves unspecified.
  */
-function field_attach_insert($entity_type, $entity) {
+function field_attach_insert($entity_type, EntityInterface $entity) {
   _field_invoke_default('insert', $entity_type, $entity);
   _field_invoke('insert', $entity_type, $entity);
 
@@ -928,7 +936,7 @@ function field_attach_insert($entity_type, $entity) {
  * @param Drupal\entity\EntityInterface $entity
  *   The entity with fields to save.
  */
-function field_attach_update($entity_type, $entity) {
+function field_attach_update($entity_type, EntityInterface $entity) {
   _field_invoke('update', $entity_type, $entity);
 
   // Let any module update field data before the storage engine, accumulating

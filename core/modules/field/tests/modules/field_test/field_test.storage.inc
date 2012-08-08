@@ -120,7 +120,7 @@ function field_test_field_storage_write($entity_type, $entity, $op, $fields) {
   $data = _field_test_storage_data();
 
   $id = $entity->id();
-  $vid = $entity->getVersionId();
+  $vid = $entity->getRevisionId();
   $bundle = $entity->bundle();
 
   foreach ($fields as $field_id) {
