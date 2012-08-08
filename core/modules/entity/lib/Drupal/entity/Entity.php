@@ -7,6 +7,8 @@
 
 namespace Drupal\entity;
 
+use Drupal\Component\Uuid\Uuid;
+
 /**
  * Defines a base entity class.
  *
@@ -246,6 +248,8 @@ class Entity implements EntityInterface {
   public function createDuplicate() {
     $duplicate = clone $this;
     $duplicate->id = NULL;
+    $uuid = new Uuid();
+    $duplicate->uuid = $uuid->generate();
     return $duplicate;
   }
 
