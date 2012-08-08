@@ -5,6 +5,8 @@
  * Defines an entity type.
  */
 
+use Drupal\entity\EntityInterface;
+
 /**
  * Implements hook_entity_info().
  */
@@ -236,6 +238,7 @@ function field_test_create_entity($id = 1, $vid = 1, $bundle = 'test_bundle', $l
 
   $label = !empty($label) ? $label : $bundle . ' label';
   $entity->ftlabel = $label;
+  // Make sure the entity will saved even if a primary key is provided.
   $entity->enforceIsNew();
   return $entity;
 }
@@ -264,7 +267,7 @@ function field_test_entity_test_load($ftid, $ftvid = NULL) {
  * @param $entity
  *   The entity to save.
  */
-function field_test_entity_save(\Drupal\entity\EntityInterface $entity) {
+function field_test_entity_save(EntityInterface $entity) {
   $entity->save();
 }
 
@@ -273,7 +276,7 @@ function field_test_entity_save(\Drupal\entity\EntityInterface $entity) {
  */
 function field_test_entity_add($fttype) {
   $fttype = str_replace('-', '_', $fttype);
-  $entity = field_test_create_entity(0, 0, $fttype);
+  $entity = field_test_create_entity(NULL, NULL, $fttype);
   drupal_set_title(t('Create test_entity @bundle', array('@bundle' => $fttype)), PASS_THROUGH);
   return drupal_get_form('field_test_entity_form', $entity, TRUE);
 }
