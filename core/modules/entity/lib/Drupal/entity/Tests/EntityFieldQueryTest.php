@@ -123,7 +123,6 @@ class EntityFieldQueryTest extends WebTestBase {
       $entity->enforceIsNew();
       $entity->save();
     }
-    debug(1);
 
     $entity = entity_create('test_entity_bundle', array('ftid' => 5));
     $entity->{$this->field_names[1]}[LANGUAGE_NOT_SPECIFIED][0]['shape'] = 'square';
@@ -132,7 +131,6 @@ class EntityFieldQueryTest extends WebTestBase {
     $entity->{$this->field_names[1]}[LANGUAGE_NOT_SPECIFIED][1]['color'] = 'blue';
     $entity->enforceIsNew();
     $entity->save();
-    debug(2);
 
     $instances[2] = $instance;
     $instances[2]['bundle'] = 'test_bundle';
@@ -144,13 +142,8 @@ class EntityFieldQueryTest extends WebTestBase {
     for ($i = 1; $i < 5; $i++) {
       $entity = field_test_create_entity($i, $i);
       $entity->{$this->field_names[0]}[LANGUAGE_NOT_SPECIFIED][0]['value'] = $i;
-      $entity->enforceIsNew();
-      debug(db_query('SELECT * FROM {test_entity}')->fetchAll());
-        debug($entity);
       $entity->save();
     }
-    debug(3);
-
 
     // Add two revisions to an entity.
     for ($i = 100; $i < 102; $i++) {
