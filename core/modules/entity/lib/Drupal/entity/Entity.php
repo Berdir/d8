@@ -251,9 +251,9 @@ class Entity implements EntityInterface {
     $this->{$entity_info['entity keys']['id']} = NULL;
 
     // Check if the entity type supports UUIDs and generate a new one if so.
-    if (!empty($this->entityInfo['entity keys']['uuid'])) {
+    if (!empty($entity_info['entity keys']['uuid'])) {
       $uuid = new Uuid();
-      $this->{$entityInfo['entity keys']['uuid']} = $uuid->generate();
+      $duplicate->{$entity_info['entity keys']['uuid']} = $uuid->generate();
     }
     return $duplicate;
   }
