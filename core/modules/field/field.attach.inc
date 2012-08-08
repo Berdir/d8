@@ -968,7 +968,7 @@ function field_attach_update($entity_type, $entity) {
 
   $entity_info = entity_get_info($entity_type);
   if ($entity_info['field cache']) {
-    cache('field')->delete("field:$entity_type:$id");
+    cache('field')->delete("field:$entity_type:" . $entity->id());
   }
 }
 
@@ -1003,7 +1003,7 @@ function field_attach_delete($entity_type, $entity) {
 
   $entity_info = entity_get_info($entity_type);
   if ($entity_info['field cache']) {
-    cache('field')->delete("field:$entity_type:$id");
+    cache('field')->delete("field:$entity_type:" . $entity->id());
   }
 }
 
