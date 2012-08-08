@@ -64,8 +64,9 @@ class EntityUUIDTest extends WebTestBase {
 
     // Creating a duplicate needs to result in a new UUID.
     $entity_duplicate = $entity->createDuplicate();
-    $this->assertNotEqual($entity_duplicate->uuid, $entity->uuid);
-    $this->assertNotNull($entity_duplicate->uuid);
+    $this->assertNotEqual($entity_duplicate->get('uuid'), $entity->get('uuid'));
+    $this->assertNotNull($entity_duplicate->get('uuid'));
     $entity_duplicate->save();
+    $this->assertNotEqual($entity->id(), $entity_duplicate->id());
   }
 }
