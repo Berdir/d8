@@ -1,6 +1,7 @@
 <?php
 
 use Drupal\Core\Database\Database;
+use Drupal\locale\Gettext;
 
 /**
  * Indicates that a module has not been installed yet.
@@ -248,6 +249,58 @@ function drupal_rewrite_settings($settings = array()) {
 }
 
 /**
+ * Creates the config directory and ensures it is operational.
+ *
+ * @see install_settings_form_submit()
+ * @see update_prepare_d8_bootstrap()
+ */
+function drupal_install_config_directory() {
+  global $config_directory_name;
+
+  // Add a randomized config directory name to settings.php, unless it was
+  // manually defined in the existing already.
+  if (!$config_directory_name) {
+    $settings['config_directory_name'] = array(
+      'value' => 'config_' . drupal_hash_base64(drupal_random_bytes(55)),
+      'required' => TRUE,
+    );
+    // Rewrite settings.php, which also sets the value as global variable.
+    drupal_rewrite_settings($settings);
+  }
+
+  // Ensure that the config directory exists or can be created, and is writable.
+  if (!install_ensure_config_directory()) {
+    // This should never fail, since if the config directory was specified in
+    // settings.php it will have already been created and verified earlier, and
+    // if it wasn't specified in settings.php, it is created here inside the
+    // public files directory, which has already been verified to be writable
+    // itself. But if it somehow fails anyway, the installation cannot proceed.
+    // Bail out using a similar error message as in system_requirements().
+    throw new Exception(st('The directory %directory could not be created or could not be made writable. To proceed with the installation, either create the directory and modify its permissions manually or ensure that the installer has the permissions to create it automatically. For more information, see the <a href="@handbook_url">online handbook</a>.', array(
+      '%directory' => config_get_config_directory(),
+      '@handbook_url' => 'http://drupal.org/server-permissions',
+    )));
+  }
+}
+
+/**
+ * Ensures that the config directory exists and is writable, or can be made so.
+ */
+function install_ensure_config_directory() {
+  // The config directory must be defined in settings.php.
+  global $config_directory_name;
+  if (empty($config_directory_name)) {
+    return FALSE;
+  }
+  // The logic here is similar to that used by system_requirements() for other
+  // directories that the installer creates.
+  else {
+    $config_directory = config_get_config_directory();
+    return file_prepare_directory($config_directory, FILE_CREATE_DIRECTORY | FILE_MODIFY_PERMISSIONS);
+  }
+}
+
+/**
  * Verify an install profile for installation.
  *
  * @param $install_state
@@ -305,10 +358,11 @@ function drupal_verify_profile($install_state) {
  * functions can be made available while other modules are installed.
  */
 function drupal_install_system() {
+  // Create tables.
+  drupal_install_schema('system');
+
   $system_path = drupal_get_path('module', 'system');
   require_once DRUPAL_ROOT . '/' . $system_path . '/system.install';
-  module_invoke('system', 'install');
-
   $system_versions = drupal_get_schema_versions('system');
   $system_version = $system_versions ? max($system_versions) : SCHEMA_INSTALLED;
   db_insert('system')
@@ -323,8 +377,19 @@ function drupal_install_system() {
         'bootstrap' => 0,
       ))
     ->execute();
+
+  // Clear out module list and hook implementation statics before calling
+  // system_rebuild_theme_data().
+  system_list_reset();
+  module_list_reset();
+  module_implements_reset();
+
   system_rebuild_module_data();
-  config_install_default_config('system');
+  system_rebuild_theme_data();
+
+  config_install_default_config('module', 'system');
+
+  module_invoke('system', 'install');
 }
 
 /**
@@ -636,13 +701,7 @@ function st($string, array $args = array(), array $options = array()) {
       // that multiple files end with the same extension, even if unlikely.
       $files = install_find_translation_files($install_state['parameters']['langcode']);
       if (!empty($files)) {
-        // Include cross-dependent code from locale module and gettext.inc.
-        require_once DRUPAL_ROOT . '/core/modules/locale/locale.module';
-        require_once DRUPAL_ROOT . '/core/includes/gettext.inc';
-        foreach ($files as $file) {
-          _locale_import_read_po('mem-store', $file);
-        }
-        $strings = _locale_import_one_string('mem-report');
+        $strings = Gettext::filesToArray($install_state['parameters']['langcode'], $files);
       }
     }
   }

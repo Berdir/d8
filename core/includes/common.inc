@@ -1,8 +1,10 @@
 <?php
 
+use Drupal\Component\Utility\NestedArray;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Drupal\Core\Database\Database;
+use Drupal\Core\Template\Attribute;
 
 /**
  * @file
@@ -1597,7 +1599,7 @@ function filter_xss_bad_protocol($string, $decode = TRUE) {
  * Arbitrary elements may be added using the $args associative array.
  */
 function format_rss_channel($title, $link, $description, $items, $langcode = NULL, $args = array()) {
-  $langcode = $langcode ? $langcode : drupal_container()->get(LANGUAGE_TYPE_CONTENT)->langcode;
+  $langcode = $langcode ? $langcode : language_manager(LANGUAGE_TYPE_CONTENT)->langcode;
 
   $output = "<channel>\n";
   $output .= ' <title>' . check_plain($title) . "</title>\n";
@@ -1899,7 +1901,7 @@ function format_date($timestamp, $type = 'medium', $format = '', $timezone = NUL
   }
 
   if (empty($langcode)) {
-    $langcode = drupal_container()->get(LANGUAGE_TYPE_INTERFACE)->langcode;
+    $langcode = language_manager(LANGUAGE_TYPE_INTERFACE)->langcode;
   }
 
   switch ($type) {
@@ -2075,7 +2077,7 @@ function _format_date_callback(array $matches = NULL, $new_langcode = NULL) {
  *   - 'language': An optional language object. If the path being linked to is
  *     internal to the site, $options['language'] is used to look up the alias
  *     for the URL. If $options['language'] is omitted, the language will be
- *     obtained from drupal_container()->get(LANGUAGE_TYPE_URL).
+ *     obtained from language_manager(LANGUAGE_TYPE_URL).
  *   - 'https': Whether this URL should point to a secure location. If not
  *     defined, the current scheme is used, so the user stays on http or https
  *     respectively. TRUE enforces HTTPS and FALSE enforces HTTP, but HTTPS can
@@ -2270,11 +2272,7 @@ function drupal_http_header_attributes(array $attributes = array()) {
  * @ingroup sanitization
  */
 function drupal_attributes(array $attributes = array()) {
-  foreach ($attributes as $attribute => &$data) {
-    $data = implode(' ', (array) $data);
-    $data = $attribute . '="' . check_plain($data) . '"';
-  }
-  return $attributes ? ' ' . implode(' ', $attributes) : '';
+  return new Attribute($attributes);
 }
 
 /**
@@ -2324,7 +2322,7 @@ function l($text, $path, array $options = array()) {
 
   // Append active class.
   if (($path == current_path() || ($path == '<front>' && drupal_is_front_page())) &&
-      (empty($options['language']) || $options['language']->langcode == drupal_container()->get(LANGUAGE_TYPE_URL)->langcode)) {
+      (empty($options['language']) || $options['language']->langcode == language_manager(LANGUAGE_TYPE_URL)->langcode)) {
     $options['attributes']['class'][] = 'active';
   }
 
@@ -2366,200 +2364,6 @@ function l($text, $path, array $options = array()) {
   // The result of url() is a plain-text URL. Because we are using it here
   // in an HTML argument context, we need to encode it properly.
   return '<a href="' . check_plain(url($path, $options)) . '"' . drupal_attributes($options['attributes']) . '>' . ($options['html'] ? $text : check_plain($text)) . '</a>';
-}
-
-/**
- * Delivers a page callback result to the browser in the appropriate format.
- *
- * This function is most commonly called by menu_execute_active_handler().
- *
- * When a user requests a page, index.php calls menu_execute_active_handler(),
- * which calls the 'page callback' function registered in hook_menu(). The page
- * callback function can return one of:
- * - NULL: to indicate no content.
- * - An integer menu status constant: to indicate an error condition.
- * - A string of HTML content.
- * - A renderable array of content.
- * Returning a renderable array rather than a string of HTML is preferred,
- * because that provides modules with more flexibility in customizing the final
- * result.
- *
- * When the page callback returns its constructed content to
- * menu_execute_active_handler(), this function gets called. The purpose of
- * this function is to determine the most appropriate 'delivery callback'
- * function to route the content to. The delivery callback function then
- * sends the content to the browser in the needed format. The default delivery
- * callback is drupal_deliver_html_page(), which delivers the content as an HTML
- * page, complete with blocks in addition to the content. This default can be
- * overridden on a per menu router item basis by setting 'delivery callback' in
- * hook_menu() or hook_menu_alter(), and can also be overridden on a per request
- * basis in hook_page_delivery_callback_alter().
- *
- * For example, the same page callback function can be used for an HTML
- * version of the page and an Ajax version of the page. The page callback
- * function just needs to decide what content is to be returned and the
- * delivery callback function will send it as an HTML page or an Ajax
- * response, as appropriate.
- *
- * In order for page callbacks to be reusable in different delivery formats,
- * they should not issue any "print" or "echo" statements, but instead just
- * return content.
- *
- * Also note that this function does not perform access checks. The delivery
- * callback function specified in hook_menu(), hook_menu_alter(), or
- * hook_page_delivery_callback_alter() will be called even if the router item
- * access checks fail. This is intentional (it is needed for JSON and other
- * purposes), but it has security implications. Do not call this function
- * directly unless you understand the security implications, and be careful in
- * writing delivery callbacks, so that they do not violate security. See
- * drupal_deliver_html_page() for an example of a delivery callback that
- * respects security.
- *
- * @param $page_callback_result
- *   The result of a page callback. Can be one of:
- *   - NULL: to indicate no content.
- *   - An integer menu status constant: to indicate an error condition.
- *   - A string of HTML content.
- *   - A renderable array of content.
- * @param $default_delivery_callback
- *   (Optional) If given, it is the name of a delivery function most likely
- *   to be appropriate for the page request as determined by the calling
- *   function (e.g., menu_execute_active_handler()). If not given, it is
- *   determined from the menu router information of the current page.
- *
- * @see menu_execute_active_handler()
- * @see hook_menu()
- * @see hook_menu_alter()
- * @see hook_page_delivery_callback_alter()
- */
-function drupal_deliver_page($page_callback_result, $default_delivery_callback = NULL) {
-  if (!isset($default_delivery_callback) && ($router_item = menu_get_item())) {
-    $default_delivery_callback = $router_item['delivery_callback'];
-  }
-  $delivery_callback = !empty($default_delivery_callback) ? $default_delivery_callback : 'drupal_deliver_html_page';
-  // Give modules a chance to alter the delivery callback used, based on
-  // request-time context (e.g., HTTP request headers).
-  drupal_alter('page_delivery_callback', $delivery_callback);
-  if (function_exists($delivery_callback)) {
-    $delivery_callback($page_callback_result);
-  }
-  else {
-    // If a delivery callback is specified, but doesn't exist as a function,
-    // something is wrong, but don't print anything, since it's not known
-    // what format the response needs to be in.
-    watchdog('delivery callback not found', 'callback %callback not found: %path.', array('%callback' => $delivery_callback, '%path' => current_path()), WATCHDOG_ERROR);
-  }
-}
-
-/**
- * Packages and sends the result of a page callback to the browser as HTML.
- *
- * @param $page_callback_result
- *   The result of a page callback. Can be one of:
- *   - NULL: to indicate no content.
- *   - An integer menu status constant: to indicate an error condition.
- *   - A string of HTML content.
- *   - A renderable array of content.
- *
- * @see drupal_deliver_page()
- */
-function drupal_deliver_html_page($page_callback_result) {
-  // Emit the correct charset HTTP header, but not if the page callback
-  // result is NULL, since that likely indicates that it printed something
-  // in which case, no further headers may be sent, and not if code running
-  // for this page request has already set the content type header.
-  if (isset($page_callback_result) && is_null(drupal_get_http_header('Content-Type'))) {
-    drupal_add_http_header('Content-Type', 'text/html; charset=utf-8');
-  }
-
-  // Send X-UA-Compatible HTTP header to force IE to use the most recent
-  // rendering engine or use Chrome's frame rendering engine if available.
-  if (is_null(drupal_get_http_header('X-UA-Compatible'))) {
-    drupal_add_http_header('X-UA-Compatible', 'IE=edge,chrome=1');
-  }
-
-  drupal_add_http_header('Content-Language', drupal_container()->get(LANGUAGE_TYPE_INTERFACE)->langcode);
-
-  // Menu status constants are integers; page content is a string or array.
-  if (is_int($page_callback_result)) {
-    $site_config = config('system.site');
-    // @todo: Break these up into separate functions?
-    switch ($page_callback_result) {
-      case MENU_NOT_FOUND:
-        // Print a 404 page.
-        drupal_add_http_header('Status', '404 Not Found');
-
-        watchdog('page not found', check_plain(current_path()), NULL, WATCHDOG_WARNING);
-
-        // Check for and return a fast 404 page if configured.
-        drupal_fast_404();
-
-        // Keep old path for reference, and to allow forms to redirect to it.
-        if (!isset($_GET['destination'])) {
-          $_GET['destination'] = current_path();
-        }
-
-        $path = drupal_get_normal_path($site_config->get('page.404'));
-        if ($path && $path != current_path()) {
-          // Custom 404 handler. Set the active item in case there are tabs to
-          // display, or other dependencies on the path.
-          menu_set_active_item($path);
-          $return = menu_execute_active_handler($path, FALSE);
-        }
-
-        if (empty($return) || $return == MENU_NOT_FOUND || $return == MENU_ACCESS_DENIED) {
-          // Standard 404 handler.
-          drupal_set_title(t('Page not found'));
-          $return = t('The requested page "@path" could not be found.', array('@path' => request_uri()));
-        }
-
-        drupal_set_page_content($return);
-        $page = element_info('page');
-        print drupal_render_page($page);
-        break;
-
-      case MENU_ACCESS_DENIED:
-        // Print a 403 page.
-        drupal_add_http_header('Status', '403 Forbidden');
-        watchdog('access denied', check_plain(current_path()), NULL, WATCHDOG_WARNING);
-
-        // Keep old path for reference, and to allow forms to redirect to it.
-        if (!isset($_GET['destination'])) {
-          $_GET['destination'] = current_path();
-        }
-
-        $path = drupal_get_normal_path($site_config->get('page.403'));
-        if ($path && $path != current_path()) {
-          // Custom 403 handler. Set the active item in case there are tabs to
-          // display or other dependencies on the path.
-          menu_set_active_item($path);
-          $return = menu_execute_active_handler($path, FALSE);
-        }
-
-        if (empty($return) || $return == MENU_NOT_FOUND || $return == MENU_ACCESS_DENIED) {
-          // Standard 403 handler.
-          drupal_set_title(t('Access denied'));
-          $return = t('You are not authorized to access this page.');
-        }
-
-        print drupal_render_page($return);
-        break;
-
-      case MENU_SITE_OFFLINE:
-        // Print a 503 page.
-        drupal_maintenance_theme();
-        drupal_add_http_header('Status', '503 Service unavailable');
-        drupal_set_title(t('Site under maintenance'));
-        print theme('maintenance_page', array('content' => filter_xss_admin(variable_get('maintenance_mode_message',
-          t('@site is currently under maintenance. We should be back shortly. Thank you for your patience.', array('@site' => $site_config->get('name')))))));
-        break;
-    }
-  }
-  elseif (isset($page_callback_result)) {
-    // Print anything besides a menu constant, assuming it's not NULL or
-    // undefined.
-    print drupal_render_page($page_callback_result);
-  }
 }
 
 /**
@@ -4013,6 +3817,7 @@ function drupal_add_js($data = NULL, $options = NULL) {
             array('basePath' => base_path()),
             array('scriptPath' => $scriptPath),
             array('pathPrefix' => $pathPrefix),
+            array('currentPath' => current_path()),
           ),
           'type' => 'setting',
           'scope' => 'header',
@@ -5108,9 +4913,9 @@ function _drupal_bootstrap_code() {
 }
 
 /**
- * Temporary BC function for scripts not using HttpKernel.
+ * Temporary BC function for scripts not using DrupalKernel.
  *
- * HttpKernel skips this and replicates it via event listeners.
+ * DrupalKernel skips this and replicates it via event listeners.
  *
  * @see Drupal\Core\EventSubscriber\PathSubscriber;
  * @see Drupal\Core\EventSubscriber\LegacyRequestSubscriber;
@@ -5157,9 +4962,14 @@ function _drupal_bootstrap_full($skip = FALSE) {
  * Page compression requires the PHP zlib extension
  * (http://php.net/manual/ref.zlib.php).
  *
+ * @param $body
+ *   The response body.
+ * @return
+ *   The cached object or NULL if the page cache was not set.
+ *
  * @see drupal_page_header()
  */
-function drupal_page_set_cache() {
+function drupal_page_set_cache($body) {
   global $base_root;
 
   if (drupal_page_is_cacheable()) {
@@ -5167,7 +4977,7 @@ function drupal_page_set_cache() {
       'cid' => $base_root . request_uri(),
       'data' => array(
         'path' => current_path(),
-        'body' => ob_get_clean(),
+        'body' => $body,
         'title' => drupal_get_title(),
         'headers' => array(),
       ),
@@ -5210,6 +5020,7 @@ function drupal_cron_run() {
   @ignore_user_abort(TRUE);
 
   // Prevent session information from being saved while cron is running.
+  $original_session_saving = drupal_save_session();
   drupal_save_session(FALSE);
 
   // Force the current user to anonymous to ensure consistent permissions on
@@ -5276,7 +5087,7 @@ function drupal_cron_run() {
   }
   // Restore the user.
   $GLOBALS['user'] = $original_user;
-  drupal_save_session(TRUE);
+  drupal_save_session($original_session_saving);
 
   return $return;
 }
@@ -6206,7 +6017,7 @@ function drupal_render_cid_parts($granularity = NULL) {
   // part.
   if (language_multilingual()) {
     foreach (language_types_get_configurable() as $language_type) {
-      $cid_parts[] = drupal_container()->get($language_type)->langcode;
+      $cid_parts[] = language_manager($language_type)->langcode;
     }
   }
 
@@ -6336,18 +6147,17 @@ function element_info_property($type, $property_name, $default = NULL) {
 }
 
 /**
- * Sorts a structured array by 'weight' key (no # prefix).
+ * Sorts a structured array by the 'weight' element.
  *
- * Callback for uasort() within:
- * - _field_ui_reduce_order()
- * - update_resolve_dependencies()
- * - archiver_get_info()
- * - drupal_get_updaters()
- * - drupal_get_filetransfer_info()
+ * Note that the sorting is by the 'weight' array element, not by the render
+ * element property '#weight'.
+ *
+ * Callback for uasort() used in various functions.
  *
  * @param $a
  *   First item for comparison. The compared items should be associative arrays
- *   that optionally include a 'weight' key.
+ *   that optionally include a 'weight' element. For items without a 'weight'
+ *   element, a default value of 0 will be used.
  * @param $b
  *   Second item for comparison.
  */
@@ -6567,19 +6377,7 @@ function element_set_attributes(array &$element, array $map) {
  * @see drupal_array_unset_nested_value()
  */
 function &drupal_array_get_nested_value(array &$array, array $parents, &$key_exists = NULL) {
-  $ref = &$array;
-  foreach ($parents as $parent) {
-    if (is_array($ref) && array_key_exists($parent, $ref)) {
-      $ref = &$ref[$parent];
-    }
-    else {
-      $key_exists = FALSE;
-      $null = NULL;
-      return $null;
-    }
-  }
-  $key_exists = TRUE;
-  return $ref;
+  return NestedArray::getValue($array, $parents, $key_exists);
 }
 
 /**
@@ -6644,16 +6442,7 @@ function &drupal_array_get_nested_value(array &$array, array $parents, &$key_exi
  * @see drupal_array_get_nested_value()
  */
 function drupal_array_set_nested_value(array &$array, array $parents, $value, $force = FALSE) {
-  $ref = &$array;
-  foreach ($parents as $parent) {
-    // PHP auto-creates container arrays and NULL entries without error if $ref
-    // is NULL, but throws an error if $ref is set, but not an array.
-    if ($force && isset($ref) && !is_array($ref)) {
-      $ref = array();
-    }
-    $ref = &$ref[$parent];
-  }
-  $ref = $value;
+  NestedArray::setValue($array, $parents, $value, $force);
 }
 
 /**
@@ -6715,15 +6504,7 @@ function drupal_array_set_nested_value(array &$array, array $parents, $value, $f
  * @see drupal_array_get_nested_value()
  */
 function drupal_array_unset_nested_value(array &$array, array $parents, &$key_existed = NULL) {
-  $unset_key = array_pop($parents);
-  $ref = &drupal_array_get_nested_value($array, $parents, $key_existed);
-  if ($key_existed && is_array($ref) && array_key_exists($unset_key, $ref)) {
-    $key_existed = TRUE;
-    unset($ref[$unset_key]);
-  }
-  else {
-    $key_existed = FALSE;
-  }
+  NestedArray::unsetValue($array, $parents, $key_existed);
 }
 
 /**
@@ -6755,11 +6536,7 @@ function drupal_array_unset_nested_value(array &$array, array $parents, &$key_ex
  * @see drupal_array_get_nested_value()
  */
 function drupal_array_nested_key_exists(array $array, array $parents) {
-  // Although this function is similar to PHP's array_key_exists(), its
-  // arguments should be consistent with drupal_array_get_nested_value().
-  $key_exists = NULL;
-  drupal_array_get_nested_value($array, $parents, $key_exists);
-  return $key_exists;
+  return NestedArray::keyExists($array, $parents);
 }
 
 /**

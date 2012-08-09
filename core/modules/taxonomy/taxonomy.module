@@ -120,6 +120,7 @@ function taxonomy_entity_info() {
         'id' => 'tid',
         'bundle' => 'vocabulary_machine_name',
         'label' => 'name',
+        'uuid' => 'uuid',
       ),
       'bundle keys' => array(
         'bundle' => 'machine_name',
@@ -228,6 +229,7 @@ function taxonomy_select_nodes($tid, $pager = TRUE, $limit = FALSE, $order = arr
   }
   $query = db_select('taxonomy_index', 't');
   $query->addTag('node_access');
+  $query->addMetaData('base_table', 'taxonomy_index');
   $query->condition('tid', $tid);
   if ($pager) {
     $count_query = clone $query;
@@ -354,7 +356,7 @@ function taxonomy_menu() {
   );
 
   $items['admin/structure/taxonomy/%taxonomy_vocabulary_machine_name'] = array(
-    'title callback' => 'taxonomy_admin_vocabulary_title_callback',
+    'title callback' => 'entity_page_label',
     'title arguments' => array(3),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('taxonomy_overview_terms', 3),
@@ -423,13 +425,6 @@ function taxonomy_term_access($op, $term) {
   }
 
   return user_access("$op terms in $term->vid") || user_access('administer taxonomy');
-}
-
-/**
- * Return the vocabulary name given the vocabulary object.
- */
-function taxonomy_admin_vocabulary_title_callback(Vocabulary $vocabulary) {
-  return $vocabulary->name;
 }
 
 /**
@@ -584,7 +579,7 @@ function taxonomy_term_delete_multiple(array $tids) {
  */
 function taxonomy_term_view(Term $term, $view_mode = 'full', $langcode = NULL) {
   if (!isset($langcode)) {
-    $langcode = drupal_container()->get(LANGUAGE_TYPE_CONTENT)->langcode;
+    $langcode = language_manager(LANGUAGE_TYPE_CONTENT)->langcode;
   }
 
   field_attach_prepare_view('taxonomy_term', array($term->tid => $term), $view_mode, $langcode);
@@ -647,7 +642,7 @@ function template_preprocess_taxonomy_term(&$variables) {
 
   // Gather classes, and clean up name so there are no underscores.
   $vocabulary_name_css = str_replace('_', '-', $term->vocabulary_machine_name);
-  $variables['classes_array'][] = 'vocabulary-' . $vocabulary_name_css;
+  $variables['attributes']['class'][] = 'vocabulary-' . $vocabulary_name_css;
 
   $variables['theme_hook_suggestions'][] = 'taxonomy_term__' . $term->vocabulary_machine_name;
   $variables['theme_hook_suggestions'][] = 'taxonomy_term__' . $term->tid;
@@ -1024,7 +1019,8 @@ function taxonomy_vocabulary_machine_name_load($name) {
  *   A term's ID
  *
  * @return Drupal\taxonomy\Term|false
- *   A taxonomy term entity. Results are statically cached.
+ *   A taxonomy term entity, or FALSE if the term was not found. Results are
+ *   statically cached.
  */
 function taxonomy_term_load($tid) {
   if (!is_numeric($tid)) {
@@ -1677,7 +1673,7 @@ function taxonomy_taxonomy_term_delete(Term $term) {
  * Converts EntityFieldQuery instances on taxonomy terms that have an entity
  * condition on term bundles (vocabulary machine names). Since the vocabulary
  * machine name is not present in the {taxonomy_term_data} table itself, we have
- * to convert the bundle condition into a proprety condition of vocabulary IDs
+ * to convert the bundle condition into a property condition of vocabulary IDs
  * to match against {taxonomy_term_data}.vid.
  */
 function taxonomy_entity_query_alter($query) {

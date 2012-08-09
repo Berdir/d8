@@ -44,8 +44,10 @@ class StatisticsLoggingTest extends WebTestBase {
     $config->save();
 
     // Enable access logging.
-    variable_set('statistics_enable_access_log', 1);
-    variable_set('statistics_count_content_views', 1);
+    config('statistics.settings')
+      ->set('access_log.enabled', 1)
+      ->set('count_content_views', 1)
+      ->save();
 
     // Clear the logs.
     db_truncate('accesslog');
@@ -58,7 +60,7 @@ class StatisticsLoggingTest extends WebTestBase {
   function testLogging() {
     $path = 'node/' . $this->node->nid;
     $expected = array(
-      'title' => $this->node->title,
+      'title' => $this->node->label(),
       'path' => $path,
     );
 
@@ -104,7 +106,7 @@ class StatisticsLoggingTest extends WebTestBase {
     // Visit edit page to generate a title greater than 255.
     $path = 'node/' . $this->node->nid . '/edit';
     $expected = array(
-      'title' => truncate_utf8(t('Edit Basic page') . ' ' . $this->node->title, 255),
+      'title' => truncate_utf8(t('Edit Basic page') . ' ' . $this->node->label(), 255),
       'path' => $path,
     );
     $this->drupalGet($path);

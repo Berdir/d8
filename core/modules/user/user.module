@@ -154,6 +154,7 @@ function user_entity_info() {
       'entity class' => 'Drupal\user\User',
       'entity keys' => array(
         'id' => 'uid',
+        'uuid' => 'uuid',
       ),
       'bundles' => array(
         'user' => array(
@@ -709,7 +710,7 @@ function user_user_view($account) {
  */
 function user_account_form(&$form, &$form_state) {
   global $user;
-  $language_interface = drupal_container()->get(LANGUAGE_TYPE_INTERFACE);
+  $language_interface = language_manager(LANGUAGE_TYPE_INTERFACE);
 
   $account = $form['#user'];
   $register = ($form['#user']->uid > 0 ? FALSE : TRUE);
@@ -1190,13 +1191,13 @@ function user_preprocess_block(&$variables) {
   if ($variables['block']->module == 'user') {
     switch ($variables['block']->delta) {
       case 'login':
-        $variables['attributes_array']['role'] = 'form';
+        $variables['attributes']['role'] = 'form';
         break;
       case 'new':
-        $variables['attributes_array']['role'] = 'complementary';
+        $variables['attributes']['role'] = 'complementary';
         break;
       case 'online':
-        $variables['attributes_array']['role'] = 'complementary';
+        $variables['attributes']['role'] = 'complementary';
         break;
     }
   }
@@ -1327,7 +1328,7 @@ function template_preprocess_username(&$variables) {
   // We do not want the l() function to check_plain() a second time.
   $variables['link_options']['html'] = TRUE;
   // Set a default class.
-  $variables['attributes_array'] = array('class' => array('username'));
+  $variables['attributes'] = array('class' => array('username'));
 }
 
 /**
@@ -1340,14 +1341,14 @@ function template_process_username(&$variables) {
   // This is done in the process phase so that attributes may be added by
   // modules or the theme during the preprocess phase.
   if (isset($variables['link_path'])) {
-    // $variables['attributes_array'] contains attributes that should be applied
+    // $variables['attributes'] contains attributes that should be applied
     // regardless of whether a link is being rendered or not.
     // $variables['link_attributes'] contains attributes that should only be
     // applied if a link is being rendered. Preprocess functions are encouraged
     // to use the former unless they want to add attributes on the link only.
     // If a link is being rendered, these need to be merged. Some attributes are
     // themselves arrays, so the merging needs to be recursive.
-    $variables['link_options']['attributes'] = array_merge_recursive($variables['link_attributes'], $variables['attributes_array']);
+    $variables['link_options']['attributes'] = array_merge_recursive($variables['link_attributes'], $variables['attributes']);
   }
 }
 
@@ -1363,7 +1364,7 @@ function template_process_username(&$variables) {
  *     other desired page to link to for more information about the user.
  *   - link_options: An array of options to pass to the l() function's $options
  *     parameter if linking the user's name to the user's page.
- *   - attributes_array: An array of attributes to pass to the
+ *   - attributes: An array of attributes to pass to the
  *     drupal_attributes() function if not linking to the user's page.
  *
  * @see template_preprocess_username()
@@ -1379,8 +1380,8 @@ function theme_username($variables) {
   else {
     // Modules may have added important attributes so they must be included
     // in the output. Additional classes may be added as array elements like
-    // $variables['attributes_array']['class'][] = 'myclass';
-    $output = '<span' . drupal_attributes($variables['attributes_array']) . '>' . $variables['name'] . $variables['extra'] . '</span>';
+    // $variables['attributes']['class'][] = 'myclass';
+    $output = '<span' . drupal_attributes($variables['attributes']) . '>' . $variables['name'] . $variables['extra'] . '</span>';
   }
   return $output;
 }
@@ -1623,12 +1624,6 @@ function user_menu() {
     'page arguments' => array(1),
     'access callback' => 'user_view_access',
     'access arguments' => array(1),
-    // By assigning a different menu name, this item (and all registered child
-    // paths) are no longer considered as children of 'user'. When accessing the
-    // user account pages, the preferred menu link that is used to build the
-    // active trail (breadcrumb) will be found in this menu (unless there is
-    // more specific link), so the link to 'user' will not be in the breadcrumb.
-    'menu_name' => 'navigation',
   );
 
   $items['user/%user/view'] = array(
@@ -1725,6 +1720,17 @@ function user_menu_link_alter(&$link) {
   // default (i.e., unless it has been customized).
   if ($link['link_path'] == 'user/logout' && $link['module'] == 'system' && empty($link['customized'])) {
     $link['plid'] = 0;
+  }
+}
+
+/**
+ * Implements hook_menu_breadcrumb_alter().
+ */
+function user_menu_breadcrumb_alter(&$active_trail, $item) {
+  // Remove "My account" from the breadcrumb when $item is descendant-or-self
+  // of system path user/%.
+  if (isset($active_trail[1]['module']) && $active_trail[1]['module'] == 'system' && $active_trail[1]['link_path'] == 'user' && strpos($item['path'], 'user/%') === 0) {
+    array_splice($active_trail, 1, 1);
   }
 }
 
@@ -2368,7 +2374,7 @@ function user_view_page($account) {
  */
 function user_view($account, $view_mode = 'full', $langcode = NULL) {
   if (!isset($langcode)) {
-    $langcode = drupal_container()->get(LANGUAGE_TYPE_CONTENT)->langcode;
+    $langcode = language_manager(LANGUAGE_TYPE_CONTENT)->langcode;
   }
 
   // Retrieve all profile fields and attach to $account->content.
@@ -2404,7 +2410,7 @@ function user_view($account, $view_mode = 'full', $langcode = NULL) {
  */
 function user_build_content($account, $view_mode = 'full', $langcode = NULL) {
   if (!isset($langcode)) {
-    $langcode = drupal_container()->get(LANGUAGE_TYPE_CONTENT)->langcode;
+    $langcode = language_manager(LANGUAGE_TYPE_CONTENT)->langcode;
   }
 
   // Remove previously built content, if exists.

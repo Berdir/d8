@@ -30,7 +30,7 @@ class TokenReplaceTest extends WebTestBase {
     $node = $this->drupalCreateNode(array('uid' => $account->uid));
     $node->title = '<blink>Blinking Text</blink>';
     global $user;
-    $language_interface = drupal_container()->get(LANGUAGE_TYPE_INTERFACE);
+    $language_interface = language_manager(LANGUAGE_TYPE_INTERFACE);
 
     $source  = '[node:title]';         // Title of the node we passed in
     $source .= '[node:author:name]';   // Node author's name
@@ -75,7 +75,7 @@ class TokenReplaceTest extends WebTestBase {
    * Test whether token-replacement works in various contexts.
    */
   function testSystemTokenRecognition() {
-    $language_interface = drupal_container()->get(LANGUAGE_TYPE_INTERFACE);
+    $language_interface = language_manager(LANGUAGE_TYPE_INTERFACE);
 
     // Generate prefixes and suffixes for the token context.
     $tests = array(
@@ -104,7 +104,7 @@ class TokenReplaceTest extends WebTestBase {
    * Tests the generation of all system site information tokens.
    */
   function testSystemSiteTokenReplacement() {
-    $language_interface = drupal_container()->get(LANGUAGE_TYPE_INTERFACE);
+    $language_interface = language_manager(LANGUAGE_TYPE_INTERFACE);
     $url_options = array(
       'absolute' => TRUE,
       'language' => $language_interface,
@@ -119,7 +119,7 @@ class TokenReplaceTest extends WebTestBase {
     // Generate and test sanitized tokens.
     $tests = array();
     $tests['[site:name]'] = check_plain(config('system.site')->get('name'));
-    $tests['[site:slogan]'] = check_plain(config('system.site')->get('slogan'));
+    $tests['[site:slogan]'] = filter_xss_admin(config('system.site')->get('slogan'));
     $tests['[site:mail]'] = 'simpletest@example.com';
     $tests['[site:url]'] = url('<front>', $url_options);
     $tests['[site:url-brief]'] = preg_replace(array('!^https?://!', '!/$!'), '', url('<front>', $url_options));
@@ -147,7 +147,7 @@ class TokenReplaceTest extends WebTestBase {
    * Tests the generation of all system date tokens.
    */
   function testSystemDateTokenReplacement() {
-    $language_interface = drupal_container()->get(LANGUAGE_TYPE_INTERFACE);
+    $language_interface = language_manager(LANGUAGE_TYPE_INTERFACE);
 
     // Set time to one hour before request.
     $date = REQUEST_TIME - 3600;

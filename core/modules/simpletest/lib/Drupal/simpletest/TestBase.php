@@ -86,6 +86,40 @@ abstract class TestBase {
    */
   protected $setup = FALSE;
 
+  protected $setupDatabasePrefix = FALSE;
+
+  protected $setupEnvironment = FALSE;
+
+  /**
+   * TRUE if verbose debugging is enabled.
+   *
+   * @var boolean
+   */
+  protected $verbose = FALSE;
+
+  /**
+   * Incrementing identifier for verbose output filenames.
+   *
+   * @var integer
+   */
+  protected $verboseId = 0;
+
+  /**
+   * Safe class name for use in verbose output filenames.
+   *
+   * Namespaces separator (\) replaced with _.
+   *
+   * @var string
+   */
+  protected $verboseClassName;
+
+  /**
+   * Directory where verbose output files are put.
+   *
+   * @var string
+   */
+  protected $verboseDirectory;
+
   /**
    * Constructor for Test.
    *
@@ -150,15 +184,7 @@ abstract class TestBase {
     );
 
     // Store assertion for display after the test has completed.
-    try {
-      $connection = Database::getConnection('default', 'simpletest_original_default');
-    }
-    catch (ConnectionNotDefinedException $e) {
-      // If the test was not set up, the simpletest_original_default
-      // connection does not exist.
-      $connection = Database::getConnection('default', 'default');
-    }
-    $connection
+    self::getDatabaseConnection()
       ->insert('simpletest')
       ->fields($assertion)
       ->execute();
@@ -212,7 +238,8 @@ abstract class TestBase {
       'file' => $caller['file'],
     );
 
-    return db_insert('simpletest')
+    return self::getDatabaseConnection()
+      ->insert('simpletest')
       ->fields($assertion)
       ->execute();
   }
@@ -228,9 +255,28 @@ abstract class TestBase {
    * @see Drupal\simpletest\TestBase::insertAssert()
    */
   public static function deleteAssert($message_id) {
-    return (bool) db_delete('simpletest')
+    return (bool) self::getDatabaseConnection()
+      ->delete('simpletest')
       ->condition('message_id', $message_id)
       ->execute();
+  }
+
+  /**
+   * Returns the database connection to the site running Simpletest.
+   *
+   * @return Drupal\Core\Database\Connection
+   *   The database connection to use for inserting assertions.
+   */
+  public static function getDatabaseConnection() {
+    try {
+      $connection = Database::getConnection('default', 'simpletest_original_default');
+    }
+    catch (ConnectionNotDefinedException $e) {
+      // If the test was not set up, the simpletest_original_default
+      // connection does not exist.
+      $connection = Database::getConnection('default', 'default');
+    }
+    return $connection;
   }
 
   /**
@@ -453,11 +499,21 @@ abstract class TestBase {
    * @see simpletest_verbose()
    */
   protected function verbose($message) {
-    if ($id = simpletest_verbose($message)) {
-      $class = str_replace('\\', '_', get_class($this));
-      $url = file_create_url($this->originalFileDirectory . '/simpletest/verbose/' . $class . '-' . $id . '.html');
-      $this->error(l(t('Verbose message'), $url, array('attributes' => array('target' => '_blank'))), 'User notice');
+    // Do nothing if verbose debugging is disabled.
+    if (!$this->verbose) {
+      return;
     }
+
+    $message = '<hr />ID #' . $this->verboseId . ' (<a href="' . $this->verboseClassName . '-' . ($this->verboseId - 1) . '.html">Previous</a> | <a href="' . $this->verboseClassName . '-' . ($this->verboseId + 1) . '.html">Next</a>)<hr />' . $message;
+    $verbose_filename = $this->verboseDirectory . '/' . $this->verboseClassName . '-' . $this->verboseId . '.html';
+    if (file_put_contents($verbose_filename, $message, FILE_APPEND)) {
+      $url = file_create_url($this->originalFileDirectory . '/simpletest/verbose/' . $this->verboseClassName . '-' . $this->verboseId . '.html');
+      // Not using l() to avoid invoking the theme system, so that unit tests
+      // can use verbose() as well.
+      $url = '<a href="' . $url . '" target="_blank">' . t('Verbose message') . '</a>';
+      $this->error($url, 'User notice');
+    }
+    $this->verboseId++;
   }
 
   /**
@@ -473,10 +529,16 @@ abstract class TestBase {
    *   methods during debugging.
    */
   public function run(array $methods = array()) {
-    // Initialize verbose debugging.
     $class = get_class($this);
-    simpletest_verbose(NULL, variable_get('file_public_path', conf_path() . '/files'), str_replace('\\', '_', $class));
-
+    if (variable_get('simpletest_verbose', TRUE)) {
+      // Initialize verbose debugging.
+      $this->verbose = TRUE;
+      $this->verboseDirectory = variable_get('file_public_path', conf_path() . '/files') . '/simpletest/verbose';
+      if (file_prepare_directory($this->verboseDirectory, FILE_CREATE_DIRECTORY) && !file_exists($this->verboseDirectory . '/.htaccess')) {
+        file_put_contents($this->verboseDirectory . '/.htaccess', "<IfModule mod_expires.c>\nExpiresActive Off\n</IfModule>\n");
+      }
+      $this->verboseClassName = str_replace("\\", "_", $class);
+    }
     // HTTP auth settings (<username>:<password>) for the simpletest browser
     // when sending requests to the test site.
     $this->httpauth_method = variable_get('simpletest_httpauth_method', CURLAUTH_BASIC);
@@ -582,6 +644,12 @@ abstract class TestBase {
   protected function changeDatabasePrefix() {
     if (empty($this->databasePrefix)) {
       $this->prepareDatabasePrefix();
+      // If $this->prepareDatabasePrefix() failed to work, return without
+      // setting $this->setupDatabasePrefix to TRUE, so setUp() methods will
+      // know to bail out.
+      if (empty($this->databasePrefix)) {
+        return;
+      }
     }
 
     // Clone the current connection and replace the current prefix.
@@ -593,6 +661,9 @@ abstract class TestBase {
       );
     }
     Database::addConnectionInfo('default', 'default', $connection_info['default']);
+
+    // Indicate the database prefix was set up correctly.
+    $this->setupDatabasePrefix = TRUE;
   }
 
   /**
@@ -609,7 +680,7 @@ abstract class TestBase {
    */
   protected function prepareEnvironment() {
     global $user, $conf;
-    $language_interface = drupal_container()->get(LANGUAGE_TYPE_INTERFACE);
+    $language_interface = language_manager(LANGUAGE_TYPE_INTERFACE);
 
     // Backup current in-memory configuration.
     $this->originalConf = $conf;
@@ -661,6 +732,9 @@ abstract class TestBase {
     $test_info = &$GLOBALS['drupal_test_info'];
     $test_info['test_run_id'] = $this->databasePrefix;
     $test_info['in_child_site'] = FALSE;
+
+    // Indicate the environment was set up correctly.
+    $this->setupEnvironment = TRUE;
   }
 
   /**
@@ -674,7 +748,7 @@ abstract class TestBase {
    */
   protected function tearDown() {
     global $user, $conf;
-    $language_interface = drupal_container()->get(LANGUAGE_TYPE_INTERFACE);
+    $language_interface = language_manager(LANGUAGE_TYPE_INTERFACE);
 
     // In case a fatal error occurred that was not in the test process read the
     // log to pick up any fatal errors.
@@ -829,7 +903,7 @@ abstract class TestBase {
    *   'one' => array(0, 1),
    *   'two' => array(2, 3),
    * );
-   * $permutations = $this->permute($parameters);
+   * $permutations = TestBase::generatePermutations($parameters);
    * // Result:
    * $permutations == array(
    *   array('one' => 0, 'two' => 2),

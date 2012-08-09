@@ -93,6 +93,9 @@ abstract class UpgradePathTestBase extends WebTestBase {
 
     // Prepare the environment for running tests.
     $this->prepareEnvironment();
+    if (!$this->setupEnvironment) {
+      return FALSE;
+    }
 
     // Reset all statics and variables to perform tests in a clean environment.
     $conf = array();
@@ -103,6 +106,9 @@ abstract class UpgradePathTestBase extends WebTestBase {
     // changed, since Drupal\Core\Utility\CacheArray implementations attempt to
     // write back to persistent caches when they are destructed.
     $this->changeDatabasePrefix();
+    if (!$this->setupDatabasePrefix) {
+      return FALSE;
+    }
 
     // Unregister the registry.
     // This is required to make sure that the database layer works properly.
@@ -247,7 +253,8 @@ abstract class UpgradePathTestBase extends WebTestBase {
 
     // Reload module list. For modules that are enabled in the test database,
     // but not on the test client, we need to load the code here.
-    $new_modules = array_diff(module_list(TRUE), $this->loadedModules);
+    system_list_reset();
+    $new_modules = array_diff(module_list(), $this->loadedModules);
     foreach ($new_modules as $module) {
       drupal_load('module', $module);
     }

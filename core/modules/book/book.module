@@ -570,7 +570,7 @@ function _book_add_form_elements(&$form, &$form_state, Node $node) {
 
   if (isset($node->nid) && ($nid == $node->book['original_bid']) && ($node->book['parent_depth_limit'] == 0)) {
     // This is the top level node in a maximum depth book and thus cannot be moved.
-    $options[$node->nid] = $node->title;
+    $options[$node->nid] = $node->label();
   }
   else {
     foreach (book_get_books() as $book) {
@@ -639,7 +639,7 @@ function _book_update_outline(Node $node) {
   $new = empty($node->book['mlid']);
 
   $node->book['link_path'] = 'node/' . $node->nid;
-  $node->book['link_title'] = $node->title;
+  $node->book['link_title'] = $node->label();
   $node->book['parent_mismatch'] = FALSE; // The normal case.
 
   if ($node->book['bid'] == $node->nid) {
@@ -1044,7 +1044,7 @@ function book_form_node_delete_confirm_alter(&$form, $form_state) {
 
   if (isset($node->book) && $node->book['has_children']) {
     $form['book_warning'] = array(
-      '#markup' => '<p>' . t('%title is part of a book outline, and has associated child pages. If you proceed with deletion, the child pages will be relocated automatically.', array('%title' => $node->title)) . '</p>',
+      '#markup' => '<p>' . t('%title is part of a book outline, and has associated child pages. If you proceed with deletion, the child pages will be relocated automatically.', array('%title' => $node->label())) . '</p>',
       '#weight' => -10,
     );
   }
@@ -1068,7 +1068,7 @@ function _book_link_defaults($nid) {
  */
 function book_preprocess_block(&$variables) {
   if ($variables['block']-> module == 'book') {
-    $variables['attributes_array']['role'] = 'navigation';
+    $variables['attributes']['role'] = 'navigation';
   }
 }
 
@@ -1224,7 +1224,7 @@ function book_toc($bid, $depth_limit, $exclude = array()) {
  */
 function template_preprocess_book_export_html(&$variables) {
   global $base_url;
-  $language_interface = drupal_container()->get(LANGUAGE_TYPE_INTERFACE);
+  $language_interface = language_manager(LANGUAGE_TYPE_INTERFACE);
 
   $variables['title'] = check_plain($variables['title']);
   $variables['base_url'] = $base_url;
@@ -1233,8 +1233,8 @@ function template_preprocess_book_export_html(&$variables) {
   $variables['head'] = drupal_get_html_head();
 
   // HTML element attributes.
-  $variables['html_attributes_array']['lang'] = $language_interface->langcode;
-  $variables['html_attributes_array']['dir'] = $language_interface->direction ? 'rtl' : 'ltr';
+  $variables['html_attributes']['lang'] = $language_interface->langcode;
+  $variables['html_attributes']['dir'] = $language_interface->direction ? 'rtl' : 'ltr';
 }
 
 /**
@@ -1244,7 +1244,7 @@ function template_preprocess_book_export_html(&$variables) {
  */
 function template_process_book_export_html(&$variables) {
   // Flatten out html_attributes
-  $variables['html_attributes'] = drupal_attributes($variables['html_attributes_array']);
+  $variables['html_attributes'] = drupal_attributes($variables['html_attributes']);
 }
 
 /**
@@ -1319,7 +1319,7 @@ function book_node_export(Node $node, $children = '') {
  */
 function template_preprocess_book_node_export_html(&$variables) {
   $variables['depth'] = $variables['node']->book['depth'];
-  $variables['title'] = check_plain($variables['node']->title);
+  $variables['title'] = check_plain($variables['node']->label());
   $variables['content'] = $variables['node']->rendered;
 }
 
@@ -1418,7 +1418,7 @@ function book_menu_subtree_data($link) {
       $query->join('menu_router', 'm', 'm.path = ml.router_path');
       $query->join('book', 'b', 'ml.mlid = b.mlid');
       $query->fields('b');
-      $query->fields('m', array('load_functions', 'to_arg_functions', 'access_callback', 'access_arguments', 'page_callback', 'page_arguments', 'delivery_callback', 'title', 'title_callback', 'title_arguments', 'type'));
+      $query->fields('m', array('load_functions', 'to_arg_functions', 'access_callback', 'access_arguments', 'page_callback', 'page_arguments', 'title', 'title_callback', 'title_arguments', 'type'));
       $query->fields('ml');
       $query->condition('menu_name', $link['menu_name']);
       for ($i = 1; $i <= MENU_MAX_DEPTH && $link["p$i"]; ++$i) {

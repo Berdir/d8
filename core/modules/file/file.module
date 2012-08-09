@@ -42,7 +42,6 @@ function file_menu() {
 
   $items['file/ajax'] = array(
     'page callback' => 'file_ajax_upload',
-    'delivery callback' => 'ajax_deliver',
     'access arguments' => array('access content'),
     'theme callback' => 'ajax_base_page_theme',
     'type' => MENU_CALLBACK,
@@ -175,7 +174,7 @@ function file_file_download($uri, $field_type = 'file') {
 
           // Find the field item with the matching URI.
           foreach ($field_items as $field_item) {
-            if ($field_item['uri'] == $uri) {
+            if (file_load($field_item['fid'])->uri == $uri) {
               $field = field_info_field($field_name);
               break;
             }

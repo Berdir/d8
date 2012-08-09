@@ -20,10 +20,11 @@ function contact_site_form($form, &$form_state) {
   global $user;
 
   // Check if flood control has been activated for sending e-mails.
-  $limit = variable_get('contact_threshold_limit', 5);
-  $window = variable_get('contact_threshold_window', 3600);
-  if (!flood_is_allowed('contact', $limit, $window) && !user_access('administer contact forms')) {
-    drupal_set_message(t("You cannot send more than %limit messages in @interval. Try again later.", array('%limit' => $limit, '@interval' => format_interval($window))), 'error');
+  $config = config('contact.settings');
+  $limit = $config->get('flood.limit');
+  $interval = $config->get('flood.interval');
+  if (!flood_is_allowed('contact', $limit, $interval) && !user_access('administer contact forms')) {
+    drupal_set_message(t("You cannot send more than %limit messages in @interval. Try again later.", array('%limit' => $limit, '@interval' => format_interval($interval))), 'error');
     throw new AccessDeniedHttpException();
   }
 
@@ -77,6 +78,25 @@ function contact_site_form($form, &$form_state) {
     '#default_value' => $user->uid ? $user->mail : '',
     '#required' => TRUE,
   );
+
+  // Do not allow authenticated usrs to alter the name or e-mail values to
+  // prevent the impersonation of other users.
+  if ($user->uid){
+    // Change form elements to values.
+    $form['name']['#type'] = $form['mail']['#type'] = 'value';
+
+    // Display read-only name and e-mail address to the user.
+    $form['name_display'] = array(
+      '#type' => 'item',
+      '#title' => t('Your name'),
+      '#markup' => user_format_name($user),
+    );
+    $form['mail_display'] = array(
+      '#type' => 'item',
+      '#title' => t('Your e-mail address'),
+      '#markup' => $user->mail,
+    );
+  }
   $form['subject'] = array(
     '#type' => 'textfield',
     '#title' => t('Subject'),
@@ -96,8 +116,8 @@ function contact_site_form($form, &$form_state) {
     '#title' => t('Message'),
     '#required' => TRUE,
   );
-  // We do not allow anonymous users to send themselves a copy
-  // because it can be abused to spam people.
+  // Do not allow anonymous users to send themselves a copy because it can be
+  // abused to spam people.
   $form['copy'] = array(
     '#type' => 'checkbox',
     '#title' => t('Send yourself a copy.'),
@@ -130,7 +150,7 @@ function contact_site_form_validate($form, &$form_state) {
  */
 function contact_site_form_submit($form, &$form_state) {
   global $user;
-  $language_interface = drupal_container()->get(LANGUAGE_TYPE_INTERFACE);
+  $language_interface = language_manager(LANGUAGE_TYPE_INTERFACE);
 
   $values = $form_state['values'];
   $values['sender'] = $user;
@@ -140,6 +160,7 @@ function contact_site_form_submit($form, &$form_state) {
 
   // Save the anonymous user information to a cookie for reuse.
   if (!$user->uid) {
+    $values['sender']->name .= ' (' . t('Unverified') . ')';
     user_cookie_save(array_intersect_key($values, array_flip(array('name', 'mail'))));
   }
 
@@ -160,7 +181,7 @@ function contact_site_form_submit($form, &$form_state) {
     drupal_mail('contact', 'page_autoreply', $from, $language_interface, $values, $to);
   }
 
-  flood_register_event('contact', variable_get('contact_threshold_window', 3600));
+  flood_register_event('contact', config('contact.settings')->get('flood.interval'));
   watchdog('mail', '%sender-name (@sender-from) sent an e-mail regarding %category.', array('%sender-name' => $values['name'], '@sender-from' => $from, '%category' => $values['category']['category']));
 
   // Jump to home page rather than back to contact page to avoid
@@ -181,10 +202,11 @@ function contact_personal_form($form, &$form_state, $recipient) {
   global $user;
 
   // Check if flood control has been activated for sending e-mails.
-  $limit = variable_get('contact_threshold_limit', 5);
-  $window = variable_get('contact_threshold_window', 3600);
-  if (!flood_is_allowed('contact', $limit, $window) && !user_access('administer contact forms') && !user_access('administer users')) {
-    drupal_set_message(t("You cannot send more than %limit messages in @interval. Try again later.", array('%limit' => $limit, '@interval' => format_interval($window))), 'error');
+  $config = config('contact.settings');
+  $limit = $config->get('flood.limit');
+  $interval = $config->get('flood.interval');
+  if (!flood_is_allowed('contact', $limit, $interval) && !user_access('administer contact forms') && !user_access('administer users')) {
+    drupal_set_message(t("You cannot send more than %limit messages in @interval. Try again later.", array('%limit' => $limit, '@interval' => format_interval($interval))), 'error');
     throw new AccessDeniedHttpException();
   }
 
@@ -213,6 +235,24 @@ function contact_personal_form($form, &$form_state, $recipient) {
     '#default_value' => $user->uid ? $user->mail : '',
     '#required' => TRUE,
   );
+  // Do not allow authenticated users to alter the name or e-mail values to
+  // prevent the impersonation of other users.
+  if ($user->uid){
+    // Change form elements to values.
+    $form['name']['#type'] = $form['mail']['#type'] = 'value';
+
+    // Display read-only name and e-mail address to the user.
+    $form['name_display'] = array(
+      '#type' => 'item',
+      '#title' => t('Your name'),
+      '#markup' => user_format_name($user),
+    );
+    $form['mail_display'] = array(
+      '#type' => 'item',
+      '#title' => t('Your e-mail address'),
+      '#markup' => $user->mail,
+    );
+  }
   $form['to'] = array(
     '#type' => 'item',
     '#title' => t('To'),
@@ -230,7 +270,7 @@ function contact_personal_form($form, &$form_state, $recipient) {
     '#rows' => 15,
     '#required' => TRUE,
   );
-  // We do not allow anonymous users to send themselves a copy
+  // Do not allow anonymous users to send themselves a copy
   // because it can be abused to spam people.
   $form['copy'] = array(
     '#type' => 'checkbox',
@@ -252,7 +292,7 @@ function contact_personal_form($form, &$form_state, $recipient) {
  */
 function contact_personal_form_submit($form, &$form_state) {
   global $user;
-  $language_interface = drupal_container()->get(LANGUAGE_TYPE_INTERFACE);
+  $language_interface = language_manager(LANGUAGE_TYPE_INTERFACE);
 
   $values = $form_state['values'];
   $values['sender'] = $user;
@@ -261,6 +301,7 @@ function contact_personal_form_submit($form, &$form_state) {
 
   // Save the anonymous user information to a cookie for reuse.
   if (!$user->uid) {
+    $values['sender']->name .= ' (' . t('Unverified') . ')';
     user_cookie_save(array_intersect_key($values, array_flip(array('name', 'mail'))));
   }
 
@@ -276,7 +317,7 @@ function contact_personal_form_submit($form, &$form_state) {
     drupal_mail('contact', 'user_copy', $from, $language_interface, $values, $from);
   }
 
-  flood_register_event('contact', variable_get('contact_threshold_window', 3600));
+  flood_register_event('contact', config('contact.settings')->get('flood.interval'));
   watchdog('mail', '%sender-name (@sender-from) sent %recipient-name an e-mail.', array('%sender-name' => $values['name'], '@sender-from' => $from, '%recipient-name' => $values['recipient']->name));
 
   // Jump to the contacted user's profile page.

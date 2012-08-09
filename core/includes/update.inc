@@ -88,6 +88,30 @@ function update_prepare_d8_bootstrap() {
   include_once DRUPAL_ROOT . '/core/includes/install.inc';
   drupal_bootstrap(DRUPAL_BOOTSTRAP_DATABASE);
 
+  // Check whether settings.php needs to be rewritten.
+  $settings_exist = !empty($GLOBALS['config_directory_name']);
+
+  // If any of the required settings needs to be written, then settings.php
+  // needs to be writable.
+  if (!$settings_exist) {
+    $settings_file = conf_path() . '/settings.php';
+    $writable = drupal_verify_install_file($settings_file, FILE_EXIST | FILE_READABLE | FILE_WRITABLE);
+    $requirements['settings file']['title'] = 'Settings file';
+    if ($writable) {
+      $requirements['settings file'] += array(
+        'value' => 'settings.php is writable.',
+      );
+    }
+    else {
+      $requirements['settings file'] += array(
+        'value' => 'settings.php is not writable.',
+        'severity' => REQUIREMENT_ERROR,
+        'description' => 'Drupal requires write permissions to <em>' . $settings_file . '</em> during the update process. If you are unsure how to grant file permissions, consult the <a href="http://drupal.org/server-permissions">online handbook</a>.',
+      );
+    }
+    update_extra_requirements($requirements);
+  }
+
   // If the site has not updated to Drupal 8 yet, check to make sure that it is
   // running an up-to-date version of Drupal 7 before proceeding. Note this has
   // to happen AFTER the database bootstraps because of
@@ -99,10 +123,12 @@ function update_prepare_d8_bootstrap() {
       'drupal 7 version' => array(
         'title' => 'Drupal 7 version',
         'value' => $has_required_schema ? 'You are running a current version of Drupal 7.' : 'You are not running a current version of Drupal 7',
-        'severity' => $has_required_schema ? REQUIREMENT_OK : REQUIREMENT_ERROR,
+        'severity' => $has_required_schema ? NULL : REQUIREMENT_ERROR,
         'description' => $has_required_schema ? '' : 'Please update your Drupal 7 installation to the most recent version before attempting to upgrade to Drupal 8',
       ),
     );
+    update_extra_requirements($requirements);
+
     if ($has_required_schema) {
       // Bootstrap variables so we can update theme while preparing the update
       // process.
@@ -112,6 +138,12 @@ function update_prepare_d8_bootstrap() {
       update_prepare_stored_includes();
       // Update the environment for the language bootstrap if needed.
       update_prepare_d8_language();
+
+      // Ensure the configuration directory exists and is writable or create it.
+      // If no $config_directory_name has been specified in settings.php and
+      // created manually already, and the directory cannot be created by the
+      // web server, an exception will be thrown, halting the update.
+      drupal_install_config_directory();
 
       // Change language column to langcode in url_alias.
       if (db_table_exists('url_alias') && db_field_exists('url_alias', 'language')) {
@@ -215,8 +247,10 @@ function update_prepare_d8_language() {
 
     // Update the 'language_default' system variable, if configured.
     $language_default = variable_get('language_default');
-    if (!empty($language_default) && isset($language_default->language)) {
-      $language_default->langcode = $language_default->language;
+    if (!empty($language_default) && (isset($language_default->langcode) || isset($language_default->language))) {
+      if (!isset($language_default->langcode)) {
+        $language_default->langcode = $language_default->language;
+      }
       unset($language_default->language);
       // In D8, the 'language_default' is not anymore an object, but an array,
       // so make sure that the new value that is saved into this variable is an
@@ -313,9 +347,9 @@ function update_module_add_to_system($modules = array()) {
 function update_fix_d8_requirements() {
   global $conf;
 
-  if (drupal_get_installed_schema_version('system') < 8000 && !variable_get('update_d8_requirements', FALSE)) {
+  if (drupal_get_installed_schema_version('system') < 8000 && !update_variable_get('update_d8_requirements', FALSE)) {
     // @todo: Make critical, first-run changes to the database here.
-    variable_set('update_d8_requirements', TRUE);
+    update_variable_set('update_d8_requirements', TRUE);
   }
 }
 
@@ -473,9 +507,17 @@ function update_do_one($module, $number, $dependency_map, &$context) {
 function update_batch($start, $redirect = NULL, $url = NULL, $batch = array(), $redirect_callback = 'drupal_goto') {
   // During the update, bring the site offline so that schema changes do not
   // affect visiting users.
-  $_SESSION['maintenance_mode'] = variable_get('maintenance_mode', FALSE);
-  if ($_SESSION['maintenance_mode'] == FALSE) {
-    variable_set('maintenance_mode', TRUE);
+  $maintenance_mode = config('system.maintenance')->get('enabled');
+  if (isset($maintenance_mode)) {
+    $_SESSION['maintenance_mode'] = $maintenance_mode;
+  }
+  if (empty($_SESSION['maintenance_mode'])) {
+    $GLOBALS['conf']['system.maintenance']['enabled'] = TRUE;
+    // @todo This is borderline state, not config. Or a global system
+    //   "maintenance lock".
+    if (db_table_exists('config')) {
+      config('system.maintenance')->set('enabled', TRUE)->save();
+    }
   }
 
   // Resolve any update dependencies to determine the actual updates that will
@@ -545,8 +587,10 @@ function update_finished($success, $results, $operations) {
 
   // Now that the update is done, we can put the site back online if it was
   // previously in maintenance mode.
-  if (isset($_SESSION['maintenance_mode']) && $_SESSION['maintenance_mode'] == FALSE) {
-    variable_set('maintenance_mode', FALSE);
+  if (isset($_SESSION['maintenance_mode'])) {
+    $GLOBALS['conf']['system.maintenance']['enabled'] = FALSE;
+    // At this point, the configuration system should exist.
+    config('system.maintenance')->set('enabled', FALSE)->save();
     unset($_SESSION['maintenance_mode']);
   }
 }
@@ -913,6 +957,75 @@ function update_retrieve_dependencies() {
   }
 
   return $return;
+}
+
+/**
+ * Gets the value of a variable directly from the database during the 7.x-8.x upgrade path.
+ *
+ * Use this during the 7.x-8.x upgrade path instead of variable_get().
+ *
+ * @param string $name
+ *   The name of the variable.
+ * @param mixed $default
+ *   The default value of the variable.
+ *
+ * @return mixed
+ *   The value of the variable in the database unserialized, or NULL if not set.
+ *
+ * @see update_variable_set()
+ * @see update_variable_del()
+ * @ingroup config_upgrade
+ */
+function update_variable_get($name, $default = NULL) {
+  $result = db_query('SELECT value FROM {variable} WHERE name = :name', array(':name' => $name))->fetchField();
+  if ($result !== FALSE) {
+    return unserialize($result);
+  }
+  return $default;
+}
+
+/**
+ * Sets a persistent variable during the 7.x-8.x upgrade path.
+ *
+ * Use this during the 7.x-8.x upgrade path instead of variable_set().
+ *
+ * @param string $name
+ *   The name of the variable to set.
+ * @param mixed $value
+ *   The value to set. This can be any PHP data type; these functions take care
+ *   of serialization as necessary.
+ *
+ * @see update_variable_get()
+ * @see update_variable_del()
+ * @ingroup config_upgrade
+ */
+function update_variable_set($name, $value) {
+  db_merge('variable')
+    ->key(array(
+      'name' => $name,
+    ))
+    ->fields(array(
+      'value' => serialize($value),
+    ))
+    ->execute();
+}
+
+/**
+ * Delete a variable from the database during the 7.x-8.x upgrade path.
+ *
+ * Use this during the 7.x-8.x upgrade path instead of variable_del().
+ *
+ * @param string $name
+ *   The name of the variable to delete.
+ *
+ * @see update_variable_get()
+ * @see update_variable_set()
+ * @ingroup config_upgrade
+ */
+function update_variable_del($name) {
+  db_delete('variable')
+    ->condition('name', $name)
+    ->execute();
 }
 
 /**

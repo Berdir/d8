@@ -26,7 +26,7 @@ use Drupal\simpletest\WebTestBase;
 /**
  * Defines some shared functions used by all update tests.
  */
-class UpdateTestBase extends WebTestBase {
+abstract class UpdateTestBase extends WebTestBase {
 
   /**
    * Refreshes the update status based on the desired available update scenario.
@@ -43,9 +43,9 @@ class UpdateTestBase extends WebTestBase {
   protected function refreshUpdateStatus($xml_map, $url = 'update-test') {
     // Tell the Update Manager module to fetch from the URL provided by
     // update_test module.
-    variable_set('update_fetch_url', url($url, array('absolute' => TRUE)));
+    config('update.settings')->set('fetch.url', url($url, array('absolute' => TRUE)))->save();
     // Save the map for update_test_mock_page() to use.
-    variable_set('update_test_xml_map', $xml_map);
+    config('update_test.settings')->set('xml_map', $xml_map)->save();
     // Manually check the update status.
     $this->drupalGet('admin/reports/updates/check');
   }

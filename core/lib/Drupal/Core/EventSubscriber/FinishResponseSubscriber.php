@@ -30,7 +30,10 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
     $response->headers->set('X-UA-Compatible', 'IE=edge,chrome=1', false);
 
     // Set the Content-language header.
-    $response->headers->set('Content-language', drupal_container()->get(LANGUAGE_TYPE_INTERFACE)->langcode);
+    // @todo Receive the LanguageManager object as a constructor argument when
+    //   the dependency injection container allows for it performantly:
+    //   http://drupal.org/node/1706064.
+    $response->headers->set('Content-language', language_manager(LANGUAGE_TYPE_INTERFACE)->langcode);
 
     // Because pages are highly dynamic, set the last-modified time to now
     // since the page is in fact being regenerated right now.
@@ -66,8 +69,18 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
     // @todo Revisit whether or not this is still appropriate now that the
     //   Response object does its own cache control procesisng and we intend to
     //   use partial page caching more extensively.
-    $response->headers->set('Expires', 'Sun, 19 Nov 1978 05:00:00 GMT');
-    $response->headers->set('Cache-Control', 'no-cache, must-revalidate, post-check=0, pre-check=0');
+    // Commit the user session, if needed.
+    drupal_session_commit();
+    if (config('system.performance')->get('cache') && ($cache = drupal_page_set_cache($response->getContent()))) {
+      drupal_serve_page_from_cache($cache);
+      // drupal_serve_page_from_cache() already printed the response.
+      $response->setContent('');
+      $response->headers->remove('cache-control');
+    }
+    else {
+      $response->headers->set('Expires', 'Sun, 19 Nov 1978 05:00:00 GMT');
+      $response->headers->set('Cache-Control', 'no-cache, must-revalidate, post-check=0, pre-check=0');
+    }
   }
 
   /**

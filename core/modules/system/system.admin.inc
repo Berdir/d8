@@ -156,10 +156,14 @@ function system_themes_page() {
      // content has a common place in all themes.
       $theme->incompatible_core = !isset($theme->info['core']) || ($theme->info['core'] != DRUPAL_CORE_COMPATIBILITY) || (!isset($theme->info['regions']['content']));
       $theme->incompatible_php = version_compare(phpversion(), $theme->info['php']) < 0;
+      // Confirmed that the base theme is available.
+      $theme->incompatible_base = (isset($theme->info['base theme']) && !isset($themes[$theme->info['base theme']]));
+      // Confirm that the theme engine is available.
+      $theme->incompatible_engine = (isset($theme->info['engine']) && !isset($theme->owner));
     }
     $query['token'] = drupal_get_token('system-theme-operation-link');
     $theme->operations = array();
-    if (!empty($theme->status) || !$theme->incompatible_core && !$theme->incompatible_php) {
+    if (!empty($theme->status) || !$theme->incompatible_core && !$theme->incompatible_php && !$theme->incompatible_base && !$theme->incompatible_engine) {
       // Create the operations links.
       $query['theme'] = $theme->name;
       if (drupal_theme_access($theme)) {
@@ -1584,7 +1588,6 @@ function system_site_information_settings_submit($form, &$form_state) {
 /**
  * Form builder; Cron form.
  *
- * @see system_settings_form()
  * @ingroup forms
  */
 function system_cron_settings($form, &$form_state) {
@@ -1596,40 +1599,34 @@ function system_cron_settings($form, &$form_state) {
     '#value' => t('Run cron'),
     '#submit' => array('system_run_cron_submit'),
   );
+
   $status = '<p>' . t('Last run: %cron-last ago.', array('%cron-last' => format_interval(REQUEST_TIME - variable_get('cron_last')),)) . '</p>';
   $form['status'] = array(
     '#markup' => $status,
   );
+
   $form['cron'] = array(
     '#type' => 'fieldset',
   );
   $form['cron']['cron_safe_threshold'] = array(
     '#type' => 'select',
     '#title' => t('Run cron every'),
-    '#default_value' => config('system.cron')->get('cron_safe_threshold'),
+    '#default_value' => config('system.cron')->get('threshold.autorun'),
     '#options' => array(0 => t('Never')) + drupal_map_assoc(array(3600, 10800, 21600, 43200, 86400, 604800), 'format_interval'),
   );
-  // @todo This needs to be reviewed when #1324618 gets in.
-  $form_state['config']['cron_safe_threshold'] = array(
-    'name' => 'system.cron',
-    'path' => 'cron_safe_threshold',
-  );
 
-  $form['submit'] = array('#type' => 'submit', '#value' => t('Save configuration'));
-  return $form;
+  return system_config_form($form, $form_state);
 }
 
 /**
  * Form builder submit handler; Handle submission for cron settings.
  *
  * @ingroup forms
- * @see system_settings_form()
  */
 function system_cron_settings_submit($form, &$form_state) {
   config('system.cron')
-    ->set('cron_safe_threshold', $form_state['values']['cron_safe_threshold'])
+    ->set('threshold.autorun', $form_state['values']['cron_safe_threshold'])
     ->save();
-  drupal_set_message(t('The configuration options have been saved.'));
 }
 
 /**
@@ -1653,22 +1650,34 @@ function system_run_cron_submit($form, &$form_state) {
  * Form builder; Configure error reporting settings.
  *
  * @ingroup forms
- * @see system_settings_form()
+ * @see system_logging_settings_submit()
  */
-function system_logging_settings() {
+function system_logging_settings($form, &$form_state) {
   $form['error_level'] = array(
     '#type' => 'radios',
     '#title' => t('Error messages to display'),
-    '#default_value' => variable_get('error_level', ERROR_REPORTING_DISPLAY_ALL),
+    '#default_value' => config('system.logging')->get('error_level'),
     '#options' => array(
       ERROR_REPORTING_HIDE => t('None'),
       ERROR_REPORTING_DISPLAY_SOME => t('Errors and warnings'),
       ERROR_REPORTING_DISPLAY_ALL => t('All messages'),
+      ERROR_REPORTING_DISPLAY_VERBOSE => t('All messages, with backtrace information'),
     ),
     '#description' => t('It is recommended that sites running on production environments do not display any errors.'),
   );
 
-  return system_settings_form($form);
+  return system_config_form($form, $form_state);
+}
+
+/**
+ * Form submission handler for system_logging_settings().
+ *
+ * @ingroup forms
+ */
+function system_logging_settings_submit($form, &$form_state) {
+  config('system.logging')
+    ->set('error_level', $form_state['values']['error_level'])
+    ->save();
 }
 
 /**
@@ -1888,47 +1897,48 @@ function system_image_toolkit_settings() {
  * Form builder; Configure how the site handles RSS feeds.
  *
  * @ingroup forms
- * @see system_settings_form()
  */
 function system_rss_feeds_settings($form, &$form_state) {
+  $rss_config = config('system.rss');
   $form['feed_description'] = array(
     '#type' => 'textarea',
     '#title' => t('Feed description'),
-    '#default_value' => config('system.rss-publishing')->get('feed_description'),
+    '#default_value' => $rss_config->get('channel.description'),
     '#description' => t('Description of your site, included in each feed.')
   );
   $form['feed_default_items'] = array(
     '#type' => 'select',
     '#title' => t('Number of items in each feed'),
-    '#default_value' => config('system.rss-publishing')->get('feed_default_items'),
+    '#default_value' => $rss_config->get('items.limit'),
     '#options' => drupal_map_assoc(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30)),
     '#description' => t('Default number of items to include in each feed.')
   );
   $form['feed_item_length'] = array(
     '#type' => 'select',
     '#title' => t('Feed content'),
-    '#default_value' => config('system.rss-publishing')->get('feed_item_length'),
-    '#options' => array('title' => t('Titles only'), 'teaser' => t('Titles plus teaser'), 'fulltext' => t('Full text')),
+    '#default_value' => $rss_config->get('items.view_mode'),
+    '#options' => array(
+      'title' => t('Titles only'),
+      'teaser' => t('Titles plus teaser'),
+      'fulltext' => t('Full text'),
+    ),
     '#description' => t('Global setting for the default display of content items in each feed.')
   );
-  $form['submit'] = array('#type' => 'submit', '#value' => t('Submit'));
 
-  return $form;
+  return system_config_form($form, $form_state);
 }
 
 /**
  * Form builder submit handler; Handle submission for RSS feeds settings.
  *
  * @ingroup forms
- * @see system_settings_form()
  */
 function system_rss_feeds_settings_submit($form, &$form_state) {
-  // Set the RSS publishing parameters.
-  $config = config('system.rss-publishing');
-  $config->set('feed_description', $form_state['values']['feed_description']);
-  $config->set('feed_default_items', $form_state['values']['feed_default_items']);
-  $config->set('feed_item_length', $form_state['values']['feed_item_length']);
-  $config->save();
+  config('system.rss')
+    ->set('channel.description', $form_state['values']['feed_description'])
+    ->set('items.limit', $form_state['values']['feed_default_items'])
+    ->set('items.view_mode', $form_state['values']['feed_item_length'])
+    ->save();
 }
 
 /**
@@ -2227,22 +2237,35 @@ function system_date_time_lookup() {
  * Form builder; Configure the site's maintenance status.
  *
  * @ingroup forms
- * @see system_settings_form()
+ * @see system_site_maintenance_mode_submit()
  */
-function system_site_maintenance_mode() {
+function system_site_maintenance_mode($form, &$form_state) {
+  $config = config('system.maintenance');
   $form['maintenance_mode'] = array(
     '#type' => 'checkbox',
     '#title' => t('Put site into maintenance mode'),
-    '#default_value' => variable_get('maintenance_mode', 0),
+    '#default_value' => $config->get('enabled'),
     '#description' => t('Visitors will only see the maintenance mode message. Only users with the "Access site in maintenance mode" <a href="@permissions-url">permission</a> will be able to access the site. Authorized users can log in directly via the <a href="@user-login">user login</a> page.', array('@permissions-url' => url('admin/config/people/permissions'), '@user-login' => url('user'))),
   );
   $form['maintenance_mode_message'] = array(
     '#type' => 'textarea',
     '#title' => t('Message to display when in maintenance mode'),
-    '#default_value' => variable_get('maintenance_mode_message', t('@site is currently under maintenance. We should be back shortly. Thank you for your patience.', array('@site' => config('system.site')->get('name')))),
+    '#default_value' => $config->get('message'),
   );
 
-  return system_settings_form($form);
+  return system_config_form($form, $form_state);
+}
+
+/**
+ * Form submission handler for system_site_maintenance_mode().
+ *
+ * @ingroup forms
+ */
+function system_site_maintenance_mode_submit($form, &$form_state) {
+  config('system.maintenance')
+    ->set('enabled', $form_state['values']['maintenance_mode'])
+    ->set('message', $form_state['values']['maintenance_mode_message'])
+    ->save();
 }
 
 /**
@@ -2435,7 +2458,7 @@ function theme_admin_page($variables) {
 }
 
 /**
- * Returns HTML for the output of the dashboard page.
+ * Returns HTML for the output of the admin index page.
  *
  * @param $variables
  *   An associative array containing:
@@ -2705,6 +2728,12 @@ function theme_system_themes_page($variables) {
           $theme->info['php'] .= '.*';
         }
         $output .= '<div class="incompatible">' . t('This theme requires PHP version @php_required and is incompatible with PHP version !php_version.', array('@php_required' => $theme->info['php'], '!php_version' => phpversion())) . '</div>';
+      }
+      elseif (!empty($theme->incompatible_base)) {
+        $output .= '<div class="incompatible">' . t('This theme requires the base theme @base_theme to operate correctly.', array('@base_theme' => $theme->info['base theme'])) . '</div>';
+      }
+      elseif (!empty($theme->incompatible_engine)) {
+        $output .= '<div class="incompatible">' . t('This theme requires the theme engine @theme_engine to operate correctly.', array('@theme_engine' => $theme->info['engine'])) . '</div>';
       }
       else {
         $output .= theme('links', array('links' => $theme->operations, 'attributes' => array('class' => array('operations', 'clearfix'))));

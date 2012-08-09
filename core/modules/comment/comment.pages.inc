@@ -36,7 +36,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 function comment_reply(Node $node, $pid = NULL) {
   // Set the breadcrumb trail.
-  drupal_set_breadcrumb(array(l(t('Home'), NULL), l($node->title, 'node/' . $node->nid)));
+  drupal_set_breadcrumb(array(l(t('Home'), NULL), l($node->label(), 'node/' . $node->nid)));
   $op = isset($_POST['op']) ? $_POST['op'] : '';
   $build = array();
 
@@ -116,7 +116,7 @@ function comment_approve($cid) {
   // @todo CSRF tokens are validated in page callbacks rather than access
   //   callbacks, because access callbacks are also invoked during menu link
   //   generation. Add token support to routing: http://drupal.org/node/755584.
-  $token = request()->query->get('token');
+  $token = drupal_container()->get('request')->query->get('token');
   if (!isset($token) || !drupal_valid_token($token, "comment/$cid/approve")) {
     throw new AccessDeniedHttpException();
   }

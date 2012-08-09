@@ -604,12 +604,13 @@ function _menu_check_access(&$item, $map) {
  *   $item['title'] is localized according to $item['title_callback'].
  *   If an item's callback is check_plain(), $item['options']['html'] becomes
  *   TRUE.
- *   $item['description'] is translated using t().
+ *   $item['description'] is computed using $item['description_callback'] if
+ *   specified; otherwise it is translated using t().
  *   When doing link translation and the $item['options']['attributes']['title']
  *   (link title attribute) matches the description, it is translated as well.
  */
 function _menu_item_localize(&$item, $map, $link_translate = FALSE) {
-  $callback = $item['title_callback'];
+  $title_callback = $item['title_callback'];
   $item['localized_options'] = $item['options'];
   // All 'class' attributes are assumed to be an array during rendering, but
   // links stored in the database may use an old string value.
@@ -628,7 +629,7 @@ function _menu_item_localize(&$item, $map, $link_translate = FALSE) {
   if (!$link_translate || ($item['title'] == $item['link_title'])) {
     // t() is a special case. Since it is used very close to all the time,
     // we handle it directly instead of using indirect, slower methods.
-    if ($callback == 't') {
+    if ($title_callback == 't') {
       if (empty($item['title_arguments'])) {
         $item['title'] = t($item['title']);
       }
@@ -636,15 +637,15 @@ function _menu_item_localize(&$item, $map, $link_translate = FALSE) {
         $item['title'] = t($item['title'], menu_unserialize($item['title_arguments'], $map));
       }
     }
-    elseif ($callback) {
+    elseif ($title_callback) {
       if (empty($item['title_arguments'])) {
-        $item['title'] = $callback($item['title']);
+        $item['title'] = $title_callback($item['title']);
       }
       else {
-        $item['title'] = call_user_func_array($callback, menu_unserialize($item['title_arguments'], $map));
+        $item['title'] = call_user_func_array($title_callback, menu_unserialize($item['title_arguments'], $map));
       }
       // Avoid calling check_plain again on l() function.
-      if ($callback == 'check_plain') {
+      if ($title_callback == 'check_plain') {
         $item['localized_options']['html'] = TRUE;
       }
     }
@@ -656,10 +657,33 @@ function _menu_item_localize(&$item, $map, $link_translate = FALSE) {
   // Translate description, see the motivation above.
   if (!empty($item['description'])) {
     $original_description = $item['description'];
-    $item['description'] = t($item['description']);
-    if ($link_translate && isset($item['options']['attributes']['title']) && $item['options']['attributes']['title'] == $original_description) {
-      $item['localized_options']['attributes']['title'] = $item['description'];
+  }
+  if (!empty($item['description_arguments']) || !empty($item['description'])) {
+    $description_callback = $item['description_callback'];
+    // If the description callback is t(), call it directly.
+    if ($description_callback == 't') {
+      if (empty($item['description_arguments'])) {
+        $item['description'] = t($item['description']);
+      }
+      else {
+        $item['description'] = t($item['description'], menu_unserialize($item['description_arguments'], $map));
+      }
     }
+    elseif ($description_callback) {
+      // If there are no arguments, call the description callback directly.
+      if (empty($item['description_arguments'])) {
+        $item['description'] = $description_callback($item['description']);
+      }
+      // Otherwise, use call_user_func_array() to pass the arguments.
+      else {
+        $item['description'] = call_user_func_array($description_callback, menu_unserialize($item['description_arguments'], $map));
+      }
+    }
+  }
+  // If the title and description are the same, use the translated description
+  // as a localized title.
+  if ($link_translate && isset($original_description) && isset($item['options']['attributes']['title']) && $item['options']['attributes']['title'] == $original_description) {
+    $item['localized_options']['attributes']['title'] = $item['description'];
   }
 }
 
@@ -1045,7 +1069,7 @@ function menu_tree_output($tree) {
  */
 function menu_tree_all_data($menu_name, $link = NULL, $max_depth = NULL) {
   $tree = &drupal_static(__FUNCTION__, array());
-  $language_interface = drupal_container()->get(LANGUAGE_TYPE_INTERFACE);
+  $language_interface = language_manager(LANGUAGE_TYPE_INTERFACE);
 
   // Use $mlid as a flag for whether the data being loaded is for the whole tree.
   $mlid = isset($link['mlid']) ? $link['mlid'] : 0;
@@ -1156,7 +1180,7 @@ function menu_tree_get_path($menu_name) {
 function menu_tree_page_data($menu_name, $max_depth = NULL, $only_active_trail = FALSE) {
   $tree = &drupal_static(__FUNCTION__, array());
 
-  $language_interface = drupal_container()->get(LANGUAGE_TYPE_INTERFACE);
+  $language_interface = language_manager(LANGUAGE_TYPE_INTERFACE);
 
   // Check if the active trail has been overridden for this menu tree.
   $active_path = menu_tree_get_path($menu_name);
@@ -1312,7 +1336,7 @@ function menu_build_tree($menu_name, array $parameters = array()) {
 function _menu_build_tree($menu_name, array $parameters = array()) {
   // Static cache of already built menu trees.
   $trees = &drupal_static(__FUNCTION__, array());
-  $language_interface = drupal_container()->get(LANGUAGE_TYPE_INTERFACE);
+  $language_interface = language_manager(LANGUAGE_TYPE_INTERFACE);
 
   // Build the cache id; sort parents to prevent duplicate storage and remove
   // default parameter values.
@@ -1344,7 +1368,6 @@ function _menu_build_tree($menu_name, array $parameters = array()) {
       'access_arguments',
       'page_callback',
       'page_arguments',
-      'delivery_callback',
       'tab_parent',
       'tab_root',
       'title',
@@ -1354,6 +1377,8 @@ function _menu_build_tree($menu_name, array $parameters = array()) {
       'theme_arguments',
       'type',
       'description',
+      'description_callback',
+      'description_arguments',
     ));
     for ($i = 1; $i <= MENU_MAX_DEPTH; $i++) {
       $query->orderBy('p' . $i, 'ASC');
@@ -1731,21 +1756,30 @@ function menu_list_system_menus() {
  * Return an array of links to be rendered as the Main menu.
  */
 function menu_main_menu() {
-  return menu_navigation_links(variable_get('menu_main_links_source', 'main-menu'));
+  $config = config('menu.settings');
+  $menu_enabled = module_exists('menu');
+  // When menu module is not enabled, we need a hardcoded default value.
+  $main_links_source = $menu_enabled ? $config->get('main_links') : 'main-menu';
+  return menu_navigation_links($main_links_source);
 }
 
 /**
  * Return an array of links to be rendered as the Secondary links.
  */
 function menu_secondary_menu() {
+  $config = config('menu.settings');
+  $menu_enabled = module_exists('menu');
+  // When menu module is not enabled, we need a hardcoded default value.
+  $main_links_source = $menu_enabled ? $config->get('main_links') : 'main-menu';
+  $secondary_links_source = $menu_enabled ? $config->get('secondary_links') : 'user-menu';
 
   // If the secondary menu source is set as the primary menu, we display the
   // second level of the primary menu.
-  if (variable_get('menu_secondary_links_source', 'user-menu') == variable_get('menu_main_links_source', 'main-menu')) {
-    return menu_navigation_links(variable_get('menu_main_links_source', 'main-menu'), 1);
+  if ($secondary_links_source == $main_links_source) {
+    return menu_navigation_links($main_links_source, 1);
   }
   else {
-    return menu_navigation_links(variable_get('menu_secondary_links_source', 'user-menu'), 0);
+    return menu_navigation_links($secondary_links_source, 0);
   }
 }
 
@@ -3583,10 +3617,6 @@ function _menu_router_build($callbacks) {
             }
           }
         }
-        // Same for delivery callbacks.
-        if (!isset($item['delivery callback']) && isset($parent['delivery callback'])) {
-          $item['delivery callback'] = $parent['delivery callback'];
-        }
         // Same for theme callbacks.
         if (!isset($item['theme callback']) && isset($parent['theme callback'])) {
           $item['theme callback'] = $parent['theme callback'];
@@ -3628,12 +3658,13 @@ function _menu_router_build($callbacks) {
       'access callback' => '',
       'page arguments' => array(),
       'page callback' => '',
-      'delivery callback' => '',
       'title arguments' => array(),
       'title callback' => 't',
       'theme arguments' => array(),
       'theme callback' => '',
       'description' => '',
+      'description arguments' => array(),
+      'description callback' => 't',
       'position' => '',
       'context' => 0,
       'tab_parent' => '',
@@ -3675,7 +3706,6 @@ function _menu_router_save($menu, $masks) {
       'access_arguments',
       'page_callback',
       'page_arguments',
-      'delivery_callback',
       'fit',
       'number_parts',
       'context',
@@ -3688,6 +3718,8 @@ function _menu_router_save($menu, $masks) {
       'theme_arguments',
       'type',
       'description',
+      'description_callback',
+      'description_arguments',
       'position',
       'weight',
       'include_file',
@@ -3705,7 +3737,6 @@ function _menu_router_save($menu, $masks) {
       'access_arguments' => serialize($item['access arguments']),
       'page_callback' => $item['page callback'],
       'page_arguments' => serialize($item['page arguments']),
-      'delivery_callback' => $item['delivery callback'],
       'fit' => $item['_fit'],
       'number_parts' => $item['_number_parts'],
       'context' => $item['context'],
@@ -3718,6 +3749,8 @@ function _menu_router_save($menu, $masks) {
       'theme_arguments' => serialize($item['theme arguments']),
       'type' => $item['type'],
       'description' => $item['description'],
+      'description_callback' => $item['description callback'],
+      'description_arguments' => ($item['description arguments'] ? serialize($item['description arguments']) : ''),
       'position' => $item['position'],
       'weight' => $item['weight'],
       'include_file' => $item['include file'],
@@ -3757,7 +3790,7 @@ function _menu_router_save($menu, $masks) {
  */
 function _menu_site_is_offline($check_only = FALSE) {
   // Check if site is in maintenance mode.
-  if (variable_get('maintenance_mode', 0)) {
+  if (config('system.maintenance')->get('enabled')) {
     if (user_access('access site in maintenance mode')) {
       // Ensure that the maintenance mode message is displayed only once
       // (allowing for page redirects) and specifically suppress its display on

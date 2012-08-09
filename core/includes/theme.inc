@@ -627,24 +627,40 @@ function _theme_build_registry($theme, $base_theme, $theme_engine) {
  *
  * @return
  *   An associative array of the currently available themes. The keys are the
- *   names of the themes and the values are objects having the following
+ *   themes' machine names and the values are objects having the following
  *   properties:
- *   - 'filename': The name of the .info file.
- *   - 'name': The machine name of the theme.
- *   - 'status': 1 for enabled, 0 for disabled themes.
- *   - 'info': The contents of the .info file.
- *   - 'stylesheets': A two dimensional array, using the first key for the
- *     'media' attribute (e.g. 'all'), the second for the name of the file
- *     (e.g. style.css). The value is a complete filepath
- *     (e.g. themes/bartik/style.css).
- *   - 'scripts': An associative array of JavaScripts, using the filename as key
- *     and the complete filepath as value.
- *   - 'engine': The name of the theme engine.
- *   - 'base_theme': The name of the base theme.
- *   - 'base_themes': An ordered array of all the base themes. If the first item
- *     is NULL, a base theme is missing for this theme.
- *   - 'sub_themes': An unordered array of sub-themes of this theme.
- */
+ *   - filename: The filepath and name of the .info file.
+ *   - name: The machine name of the theme.
+ *   - status: 1 for enabled, 0 for disabled themes.
+ *   - info: The contents of the .info file.
+ *   - stylesheets: A two dimensional array, using the first key for the
+ *     media attribute (e.g. 'all'), the second for the name of the file
+ *     (e.g. style.css). The value is a complete filepath (e.g.
+ *     themes/bartik/style.css). Not set if no stylesheets are defined in the
+ *     .info file.
+ *   - scripts: An associative array of JavaScripts, using the filename as key
+ *     and the complete filepath as value. Not set if no scripts are defined in
+ *     the .info file.
+ *   - prefix: The base theme engine prefix.
+ *   - engine: The machine name of the theme engine.
+ *   - base_theme: If this is a sub-theme, the machine name of the base theme
+ *     defined in the .info file. Otherwise, the element is not set.
+ *   - base_themes: If this is a sub-theme, an associative array of the
+ *     base-theme ancestors of this theme, starting with this theme's base
+ *     theme, then the base theme's own base theme, etc. Each entry has an
+ *     array key equal to the theme's machine name, and a value equal to the
+ *     human-readable theme name; if a theme with matching machine name does
+ *     not exist in the system, the value will instead be NULL (and since the
+ *     system would not know whether that theme itself has a base theme, that
+ *     will end the array of base themes). This is not set if the theme is not
+ *     a sub-theme.
+ *   - sub_themes: An associative array of themes on the system that are
+ *     either direct sub-themes (that is, they declare this theme to be
+ *     their base theme), direct sub-themes of sub-themes, etc. The keys are
+ *     the themes' machine names, and the values are the themes' human-readable
+ *     names. This element is not set if there are no themes on the system that
+ *     declare this theme as their base theme. 
+*/
 function list_themes($refresh = FALSE) {
   $list = &drupal_static(__FUNCTION__, array());
 
@@ -1401,6 +1417,9 @@ function theme_enable($theme_list) {
       ->condition('type', 'theme')
       ->condition('name', $key)
       ->execute();
+
+    // Install default configuration of the theme.
+    config_install_default_config('theme', $key);
   }
 
   list_themes(TRUE);
@@ -1608,7 +1627,7 @@ function theme_link($variables) {
  *     http://www.w3.org/TR/WCAG-TECHS/H42.html for more information.
  */
 function theme_links($variables) {
-  $language_url = drupal_container()->get(LANGUAGE_TYPE_URL);
+  $language_url = language_manager(LANGUAGE_TYPE_URL);
 
   $links = $variables['links'];
   $attributes = $variables['attributes'];
@@ -2296,7 +2315,7 @@ function _theme_table_cell($cell, $header = FALSE) {
  */
 function template_preprocess(&$variables, $hook) {
   global $user;
-  static $count = array();
+  static $count = array(), $default_attributes;
 
   // Track run count for each hook to provide zebra striping.
   // See "template_preprocess_block()" which provides the same feature specific to blocks.
@@ -2306,9 +2325,6 @@ function template_preprocess(&$variables, $hook) {
 
   // Tell all templates where they are located.
   $variables['directory'] = path_to_theme();
-
-  // Initialize html class attribute for the current hook.
-  $variables['classes_array'] = array(drupal_html_class($hook));
 
   // Merge in variables that don't depend on hook and don't change during a
   // single page request.
@@ -2324,7 +2340,17 @@ function template_preprocess(&$variables, $hook) {
   if (!isset($default_variables) || ($user !== $default_variables['user'])) {
     $default_variables = _template_preprocess_default_variables();
   }
-  $variables += $default_variables;
+  if (!isset($default_attributes)) {
+    $default_attributes = drupal_attributes(array('class' => array()));
+  }
+  $variables += $default_variables + array(
+    'attributes' => clone $default_attributes,
+    'title_attributes' => clone $default_attributes,
+    'content_attributes' => clone $default_attributes,
+  );
+
+  // Initialize html class attribute for the current hook.
+  $variables['attributes']['class'][] = drupal_html_class($hook);
 }
 
 /**
@@ -2335,9 +2361,6 @@ function _template_preprocess_default_variables() {
 
   // Variables that don't depend on a database connection.
   $variables = array(
-    'attributes_array' => array(),
-    'title_attributes_array' => array(),
-    'content_attributes_array' => array(),
     'title_prefix' => array(),
     'title_suffix' => array(),
     'user' => $user,
@@ -2369,61 +2392,35 @@ function _template_preprocess_default_variables() {
 }
 
 /**
- * Adds helper variables derived from variables defined during preprocessing.
- *
- * When preparing variables for a theme hook implementation, all 'preprocess'
- * functions run first, then all 'process' functions (see theme() for details
- * about the full sequence).
- *
- * This function serializes array variables manipulated during the preprocessing
- * phase into strings for convenient use by templates. As with
- * template_preprocess(), this function does not get called for theme hooks
- * implemented as functions.
- *
- * @see theme()
- * @see template_preprocess()
- */
-function template_process(&$variables, $hook) {
-  // Flatten out classes.
-  $variables['classes'] = implode(' ', $variables['classes_array']);
-
-  // Flatten out attributes, title_attributes, and content_attributes.
-  // Because this function can be called very often, and often with empty
-  // attributes, optimize performance by only calling drupal_attributes() if
-  // necessary.
-  $variables['attributes'] = $variables['attributes_array'] ? drupal_attributes($variables['attributes_array']) : '';
-  $variables['title_attributes'] = $variables['title_attributes_array'] ? drupal_attributes($variables['title_attributes_array']) : '';
-  $variables['content_attributes'] = $variables['content_attributes_array'] ? drupal_attributes($variables['content_attributes_array']) : '';
-}
-
-/**
  * Preprocess variables for html.tpl.php
  *
  * @see system_elements()
  * @see html.tpl.php
  */
 function template_preprocess_html(&$variables) {
-  $language_interface = drupal_container()->get(LANGUAGE_TYPE_INTERFACE);
+  $language_interface = language_manager(LANGUAGE_TYPE_INTERFACE);
 
   // Compile a list of classes that are going to be applied to the body element.
   // This allows advanced theming based on context (home page, node of certain type, etc.).
   // Add a class that tells us whether we're on the front page or not.
-  $variables['classes_array'][] = $variables['is_front'] ? 'front' : 'not-front';
+  $variables['attributes']['class'][] = $variables['is_front'] ? 'front' : 'not-front';
   // Add a class that tells us whether the page is viewed by an authenticated user or not.
-  $variables['classes_array'][] = $variables['logged_in'] ? 'logged-in' : 'not-logged-in';
+  $variables['attributes']['class'][] = $variables['logged_in'] ? 'logged-in' : 'not-logged-in';
 
   // Add information about the number of sidebars.
   if (!empty($variables['page']['sidebar_first']) && !empty($variables['page']['sidebar_second'])) {
-    $variables['classes_array'][] = 'two-sidebars';
+    $variables['attributes']['class'][] = 'two-sidebars';
   }
   elseif (!empty($variables['page']['sidebar_first'])) {
-    $variables['classes_array'][] = 'one-sidebar sidebar-first';
+    $variables['attributes']['class'][] = 'one-sidebar';
+    $variables['attributes']['class'][] = 'sidebar-first';
   }
   elseif (!empty($variables['page']['sidebar_second'])) {
-    $variables['classes_array'][] = 'one-sidebar sidebar-second';
+    $variables['attributes']['class'][] = 'one-sidebar';
+    $variables['attributes']['class'][] = 'sidebar-second';
   }
   else {
-    $variables['classes_array'][] = 'no-sidebars';
+    $variables['attributes']['class'][] = 'no-sidebars';
   }
 
   // Populate the body classes.
@@ -2433,23 +2430,22 @@ function template_preprocess_html(&$variables) {
         // Add current suggestion to page classes to make it possible to theme
         // the page depending on the current page type (e.g. node, admin, user,
         // etc.) as well as more specific data like node-12 or node-edit.
-        $variables['classes_array'][] = drupal_html_class($suggestion);
+        $variables['attributes']['class'][] = drupal_html_class($suggestion);
       }
     }
   }
 
   // If on an individual node page, add the node type to body classes.
   if ($node = menu_get_object()) {
-    $variables['classes_array'][] = drupal_html_class('node-type-' . $node->type);
+    $variables['attributes']['class'][] = drupal_html_class('node-type-' . $node->type);
   }
 
   // Initializes attributes which are specific to the html and body elements.
-  $variables['html_attributes_array'] = array();
-  $variables['body_attributes_array'] = array();
+  $variables['html_attributes'] = drupal_attributes();
 
   // HTML element attributes.
-  $variables['html_attributes_array']['lang'] = $language_interface->langcode;
-  $variables['html_attributes_array']['dir'] = $language_interface->direction ? 'rtl' : 'ltr';
+  $variables['html_attributes']['lang'] = $language_interface->langcode;
+  $variables['html_attributes']['dir'] = $language_interface->direction ? 'rtl' : 'ltr';
 
   // Add favicon.
   if (theme_get_setting('toggle_favicon')) {
@@ -2469,7 +2465,7 @@ function template_preprocess_html(&$variables) {
   else {
     $head_title = array('name' => check_plain($site_config->get('name')));
     if ($site_config->get('slogan')) {
-      $head_title['slogan'] = filter_xss_admin($site_config->get('slogan'));
+      $head_title['slogan'] = strip_tags(filter_xss_admin($site_config->get('slogan')));
     }
   }
   $variables['head_title_array'] = $head_title;
@@ -2534,7 +2530,7 @@ function template_preprocess_html(&$variables) {
  * @see page.tpl.php
  */
 function template_preprocess_page(&$variables) {
-  $language_interface = drupal_container()->get(LANGUAGE_TYPE_INTERFACE);
+  $language_interface = language_manager(LANGUAGE_TYPE_INTERFACE);
   $site_config = config('system.site');
 
   // Move some variables to the top level for themer convenience and template cleanliness.
@@ -2564,7 +2560,7 @@ function template_preprocess_page(&$variables) {
   $variables['main_menu']         = theme_get_setting('toggle_main_menu') ? menu_main_menu() : array();
   $variables['secondary_menu']    = theme_get_setting('toggle_secondary_menu') ? menu_secondary_menu() : array();
   $variables['action_links']      = menu_local_actions();
-  $variables['site_name']         = (theme_get_setting('toggle_name') ? filter_xss_admin($site_config->get('name')) : '');
+  $variables['site_name']         = (theme_get_setting('toggle_name') ? check_plain($site_config->get('name')) : '');
   $variables['site_slogan']       = (theme_get_setting('toggle_slogan') ? filter_xss_admin($site_config->get('slogan')) : '');
   $variables['tabs']              = menu_local_tabs();
 
@@ -2617,10 +2613,6 @@ function template_process_page(&$variables) {
  * @see html.tpl.php
  */
 function template_process_html(&$variables) {
-  // Flatten out html_attributes and body_attributes.
-  $variables['html_attributes'] = drupal_attributes($variables['html_attributes_array']);
-  $variables['body_attributes'] = drupal_attributes($variables['body_attributes_array']);
-
   // Render page_top and page_bottom into top level variables.
   $variables['page_top'] = drupal_render($variables['page']['page_top']);
   $variables['page_bottom'] = drupal_render($variables['page']['page_bottom']);
@@ -2638,8 +2630,8 @@ function template_process_html(&$variables) {
  * Generate an array of suggestions from path arguments.
  *
  * This is typically called for adding to the 'theme_hook_suggestions' or
- * 'classes_array' variables from within preprocess functions, when wanting to
- * base the additional suggestions on the path of the current page.
+ * 'attributes' class key variables from within preprocess functions, when
+ * wanting to base the additional suggestions on the path of the current page.
  *
  * @param $args
  *   An array of path arguments, such as from function arg().
@@ -2654,7 +2646,7 @@ function template_process_html(&$variables) {
  * @return
  *   An array of suggestions, suitable for adding to
  *   $variables['theme_hook_suggestions'] within a preprocess function or to
- *   $variables['classes_array'] if the suggestions represent extra CSS classes.
+ *   $variables['attributes']['class'] if the suggestions represent extra CSS classes.
  */
 function theme_get_suggestions($args, $base, $delimiter = '__') {
 
@@ -2719,7 +2711,7 @@ function theme_get_suggestions($args, $base, $delimiter = '__') {
  */
 function template_preprocess_maintenance_page(&$variables) {
   global $theme;
-  $language_interface = drupal_container()->get(LANGUAGE_TYPE_INTERFACE);
+  $language_interface = language_manager(LANGUAGE_TYPE_INTERFACE);
   // Retrieve the theme data to list all available regions.
   $theme_data = list_themes();
   $regions = $theme_data[$theme]->info['regions'];
@@ -2755,13 +2747,13 @@ function template_preprocess_maintenance_page(&$variables) {
   if (drupal_get_title()) {
     $head_title = array(
       'title' => strip_tags(drupal_get_title()),
-      'name' => $site_name,
+      'name' => check_plain($site_name),
     );
   }
   else {
-    $head_title = array('name' => $site_name);
+    $head_title = array('name' => check_plain($site_name));
     if ($site_slogan) {
-      $head_title['slogan'] = $site_slogan;
+      $head_title['slogan'] = strip_tags(filter_xss_admin($site_slogan));
     }
   }
 
@@ -2778,24 +2770,25 @@ function template_preprocess_maintenance_page(&$variables) {
   $variables['messages']          = $variables['show_messages'] ? theme('status_messages') : '';
   $variables['main_menu']         = array();
   $variables['secondary_menu']    = array();
-  $variables['site_name']         = (theme_get_setting('toggle_name') ? $site_name : '');
-  $variables['site_slogan']       = (theme_get_setting('toggle_slogan') ? $site_slogan : '');
+  $variables['site_name']         = (theme_get_setting('toggle_name') ? check_plain($site_name) : '');
+  $variables['site_slogan']       = (theme_get_setting('toggle_slogan') ? filter_xss_admin($site_slogan) : '');
   $variables['tabs']              = '';
   $variables['title']             = drupal_get_title();
 
   // Compile a list of classes that are going to be applied to the body element.
-  $variables['classes_array'][] = 'in-maintenance';
+  $variables['attributes']['class'][] = 'in-maintenance';
   if (isset($variables['db_is_active']) && !$variables['db_is_active']) {
-    $variables['classes_array'][] = 'db-offline';
+    $variables['attributes']['class'][] = 'db-offline';
   }
   if ($variables['layout'] == 'both') {
-    $variables['classes_array'][] = 'two-sidebars';
+    $variables['attributes']['class'][] = 'two-sidebars';
   }
   elseif ($variables['layout'] == 'none') {
-    $variables['classes_array'][] = 'no-sidebars';
+    $variables['attributes']['class'][] = 'no-sidebars';
   }
   else {
-    $variables['classes_array'][] = 'one-sidebar sidebar-' . $variables['layout'];
+    $variables['attributes']['class'][] = 'one-sidebar';
+    $variables['attributes']['class'][] = 'sidebar-' . $variables['layout'];
   }
 
   // Dead databases will show error messages so supplying this template will
@@ -2833,6 +2826,6 @@ function template_preprocess_region(&$variables) {
   $variables['content'] = $variables['elements']['#children'];
   $variables['region'] = $variables['elements']['#region'];
 
-  $variables['classes_array'][] = drupal_region_class($variables['region']);
+  $variables['attributes']['class'][] = drupal_region_class($variables['region']);
   $variables['theme_hook_suggestions'][] = 'region__' . $variables['region'];
 }

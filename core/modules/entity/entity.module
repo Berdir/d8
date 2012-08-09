@@ -5,7 +5,9 @@
  * Entity API for handling entities like nodes or users.
  */
 
+use Drupal\entity\EntityFieldQuery;
 use Drupal\entity\EntityMalformedException;
+use Drupal\entity\EntityStorageException;
 use Drupal\entity\EntityInterface;
 
 /**
@@ -46,7 +48,7 @@ function entity_modules_disabled() {
  * @see hook_entity_info_alter()
  */
 function entity_get_info($entity_type = NULL) {
-  $language_interface = drupal_container()->get(LANGUAGE_TYPE_INTERFACE);
+  $language_interface = language_manager(LANGUAGE_TYPE_INTERFACE);
 
   // Use the advanced drupal_static() pattern, since this is called very often.
   static $drupal_static_fast;
@@ -163,36 +165,6 @@ function entity_extract_ids($entity_type, $entity) {
 }
 
 /**
- * Assembles an object structure with initial IDs.
- *
- * This function can be seen as reciprocal to entity_extract_ids().
- *
- * @param $entity_type
- *   The entity type; e.g. 'node' or 'user'.
- * @param $ids
- *   A numerically indexed array, as returned by entity_extract_ids(),
- *   containing these elements:
- *   - 0: Primary ID of the entity.
- *   - 1: Revision ID of the entity, or NULL if $entity_type is not versioned.
- *   - 2: Bundle name of the entity, or NULL if $entity_type has no bundles.
- *
- * @return
- *   An entity object, initialized with the IDs provided.
- */
-function entity_create_stub_entity($entity_type, $ids) {
-  $entity = new stdClass();
-  $info = entity_get_info($entity_type);
-  $entity->{$info['entity keys']['id']} = $ids[0];
-  if (!empty($info['entity keys']['revision']) && isset($ids[1])) {
-    $entity->{$info['entity keys']['revision']} = $ids[1];
-  }
-  if (!empty($info['entity keys']['bundle']) && isset($ids[2])) {
-    $entity->{$info['entity keys']['bundle']} = $ids[2];
-  }
-  return $entity;
-}
-
-/**
  * Loads an entity from the database.
  *
  * @param string $entity_type
@@ -213,6 +185,57 @@ function entity_create_stub_entity($entity_type, $ids) {
  */
 function entity_load($entity_type, $id, $reset = FALSE) {
   $entities = entity_load_multiple($entity_type, array($id), array(), $reset);
+  return isset($entities[$id]) ? $entities[$id] : FALSE;
+}
+
+/**
+ * Loads an entity by UUID.
+ *
+ * Note that some entity types may not support UUIDs.
+ *
+ * @param string $entity_type
+ *   The entity type to load; e.g., 'node' or 'user'.
+ * @param string $uuid
+ *   The UUID of the entity to load.
+ * @param bool $reset
+ *   Whether to reset the internal cache for the requested entity type.
+ *
+ * @return EntityInterface|FALSE
+ *   The entity object, or FALSE if there is no entity with the given UUID.
+ *
+ * @throws Drupal\entity\EntityStorageException
+ *   Thrown in case the requested entity type does not support UUIDs.
+ *
+ * @see hook_entity_info()
+ *
+ * @todo D8: Make it easier to query entities by property; e.g., enhance
+ *   EntityStorageControllerInterface with a ::loadByProperty() method.
+ */
+function entity_load_by_uuid($entity_type, $uuid, $reset = FALSE) {
+  $entity_info = entity_get_info($entity_type);
+  if (empty($entity_info['entity keys']['uuid'])) {
+    throw new EntityStorageException("Entity type $entity_type does not support UUIDs.");
+  }
+  $uuid_key = $entity_info['entity keys']['uuid'];
+
+  // Look up the entity ID for the given UUID.
+  $entity_query = new EntityFieldQuery();
+  $result = $entity_query
+    ->entityCondition('entity_type', $entity_type)
+    ->propertyCondition($uuid_key, $uuid)
+    ->range(0, 1)
+    ->execute();
+
+  if (empty($result[$entity_type])) {
+    return FALSE;
+  }
+
+  $controller = entity_get_controller($entity_type);
+  if ($reset) {
+    $controller->resetCache();
+  }
+  $id = key($result[$entity_type]);
+  $entities = $controller->load(array($id));
   return isset($entities[$id]) ? $entities[$id] : FALSE;
 }
 

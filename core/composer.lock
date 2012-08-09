@@ -1,33 +1,37 @@
 {
-    "hash": "ec77094fc475b57afb7a27f63983ead1",
+    "hash": "be2e79923e2be0777a9f60ec185168a8",
     "packages": [
         {
+            "package": "doctrine/common",
+            "version": "2.3.0-RC1"
+        },
+        {
             "package": "symfony/class-loader",
-            "version": "v2.1.0-BETA1"
+            "version": "v2.1.0-RC1"
         },
         {
             "package": "symfony/dependency-injection",
-            "version": "v2.1.0-BETA1"
+            "version": "v2.1.0-RC1"
         },
         {
             "package": "symfony/event-dispatcher",
-            "version": "v2.1.0-BETA1"
+            "version": "v2.1.0-RC1"
         },
         {
             "package": "symfony/http-foundation",
-            "version": "v2.1.0-BETA1"
+            "version": "v2.1.0-RC1"
         },
         {
             "package": "symfony/http-kernel",
-            "version": "v2.1.0-BETA1"
+            "version": "v2.1.0-RC1"
         },
         {
             "package": "symfony/routing",
-            "version": "v2.1.0-BETA1"
+            "version": "v2.1.0-RC1"
         },
         {
             "package": "symfony/yaml",
-            "version": "v2.1.0-BETA1"
+            "version": "v2.1.0-RC1"
         },
         {
             "package": "twig/twig",

@@ -12,7 +12,7 @@ use Drupal\simpletest\WebTestBase;
 /**
  * Defines a base class for testing aggregator.module.
  */
-class AggregatorTestBase extends WebTestBase {
+abstract class AggregatorTestBase extends WebTestBase {
   function setUp() {
     parent::setUp(array('node', 'block', 'aggregator', 'aggregator_test'));
 
@@ -88,7 +88,7 @@ class AggregatorTestBase extends WebTestBase {
    */
   function getDefaultFeedItemCount() {
     // Our tests are based off of rss.xml, so let's find out how many elements should be related.
-    $feed_count = db_query_range('SELECT COUNT(*) FROM {node} n WHERE n.promote = 1 AND n.status = 1', 0, config('system.rss-publishing')->get('feed_default_items'))->fetchField();
+    $feed_count = db_query_range('SELECT COUNT(*) FROM {node} n WHERE n.promote = 1 AND n.status = 1', 0, config('system.rss')->get('items.limit'))->fetchField();
     return $feed_count > 10 ? 10 : $feed_count;
   }
 

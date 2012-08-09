@@ -64,7 +64,7 @@ function update_get_projects() {
       $theme_data = system_rebuild_theme_data();
       update_process_info_list($projects, $module_data, 'module', TRUE);
       update_process_info_list($projects, $theme_data, 'theme', TRUE);
-      if (variable_get('update_check_disabled', FALSE)) {
+      if (config('update.settings')->get('check.disabled_extensions')) {
         update_process_info_list($projects, $module_data, 'module', FALSE);
         update_process_info_list($projects, $theme_data, 'theme', FALSE);
       }
@@ -593,7 +593,10 @@ function update_calculate_project_update_status(&$project_data, $available) {
 
     // See if this is a higher major version than our target and yet still
     // supported. If so, record it as an "Also available" release.
-    if ($release['version_major'] > $target_major) {
+    // Note: Some projects have a HEAD release from CVS days, which could
+    // be one of those being compared. They would not have version_major
+    // set, so we must call isset first.
+    if (isset($release['version_major']) && $release['version_major'] > $target_major) {
       if (in_array($release['version_major'], $supported_majors)) {
         if (!isset($project_data['also'])) {
           $project_data['also'] = array();

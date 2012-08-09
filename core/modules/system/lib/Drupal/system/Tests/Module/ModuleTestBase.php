@@ -15,7 +15,7 @@ use Drupal\simpletest\WebTestBase;
 /**
  * Helper class for module test cases.
  */
-class ModuleTestBase extends WebTestBase {
+abstract class ModuleTestBase extends WebTestBase {
   protected $admin_user;
 
   function setUp() {
@@ -132,7 +132,7 @@ class ModuleTestBase extends WebTestBase {
    *   Expected module state.
    */
   function assertModules(array $modules, $enabled) {
-    drupal_static_reset('system_list');
+    system_list_reset();
     foreach ($modules as $module) {
       if ($enabled) {
         $message = 'Module "@module" is enabled.';

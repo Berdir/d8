@@ -6,6 +6,7 @@
  */
 
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Drupal\aggregator\Plugin\FetcherManager;
 
 /**
  * Page callback: Displays the aggregator administration page.
@@ -411,7 +412,7 @@ function aggregator_admin_refresh_feed($feed) {
   // @todo CSRF tokens are validated in page callbacks rather than access
   //   callbacks, because access callbacks are also invoked during menu link
   //   generation. Add token support to routing: http://drupal.org/node/755584.
-  $token = request()->query->get('token');
+  $token = drupal_container()->get('request')->query->get('token');
   if (!isset($token) || !drupal_valid_token($token, 'aggregator/update/' . $feed->fid)) {
     throw new AccessDeniedHttpException();
   }
@@ -434,7 +435,7 @@ function aggregator_admin_form($form, $form_state) {
     '#title' => t('Allowed HTML tags'),
     '#size' => 80,
     '#maxlength' => 255,
-    '#default_value' => variable_get('aggregator_allowed_html_tags', '<a> <b> <br> <dd> <dl> <dt> <em> <i> <li> <ol> <p> <strong> <u> <ul>'),
+    '#default_value' => config('aggregator.settings')->get('items.allowed_html'),
     '#description' => t('A space-separated list of HTML tags allowed in the content of feed items. Disallowed tags are stripped from the content.'),
   );
 
@@ -442,16 +443,11 @@ function aggregator_admin_form($form, $form_state) {
   aggregator_sanitize_configuration();
 
   // Get all available fetchers.
-  $fetchers = module_implements('aggregator_fetch');
-  foreach ($fetchers as $k => $module) {
-    if ($info = module_invoke($module, 'aggregator_fetch_info')) {
-      $label = $info['title'] . ' <span class="description">' . $info['description'] . '</span>';
-    }
-    else {
-      $label = $module;
-    }
-    unset($fetchers[$k]);
-    $fetchers[$module] = $label;
+  $fetcher_manager = new FetcherManager();
+  $fetchers = array();
+  foreach ($fetcher_manager->getDefinitions() as $id => $definition) {
+    $label = $definition['title'] . ' <span class="description">' . $definition['description'] . '</span>';
+    $fetchers[$id] = $label;
   }
 
   // Get all available parsers.
@@ -488,7 +484,7 @@ function aggregator_admin_form($form, $form_state) {
       '#title' => t('Fetcher'),
       '#description' => t('Fetchers download data from an external source. Choose a fetcher suitable for the external source you would like to download from.'),
       '#options' => $fetchers,
-      '#default_value' => variable_get('aggregator_fetcher', 'aggregator'),
+      '#default_value' => config('aggregator.settings')->get('fetcher'),
     );
   }
   if (count($parsers) > 1) {
@@ -497,7 +493,7 @@ function aggregator_admin_form($form, $form_state) {
       '#title' => t('Parser'),
       '#description' => t('Parsers transform downloaded data into standard structures. Choose a parser suitable for the type of feeds you would like to aggregate.'),
       '#options' => $parsers,
-      '#default_value' => variable_get('aggregator_parser', 'aggregator'),
+      '#default_value' => config('aggregator.settings')->get('parser'),
     );
   }
   if (count($processors) > 1) {
@@ -506,7 +502,7 @@ function aggregator_admin_form($form, $form_state) {
       '#title' => t('Processors'),
       '#description' => t('Processors act on parsed feed data, for example they store feed items. Choose the processors suitable for your task.'),
       '#options' => $processors,
-      '#default_value' => variable_get('aggregator_processors', array('aggregator')),
+      '#default_value' => config('aggregator.settings')->get('processors'),
     );
   }
   if (count($basic_conf)) {
@@ -523,23 +519,31 @@ function aggregator_admin_form($form, $form_state) {
   // Implementing modules will expect an array at $form['modules'].
   $form['modules'] = array();
 
-  $form['actions'] = array('#type' => 'actions');
-  $form['actions']['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Save configuration'),
-  );
-
-  return $form;
+  return system_config_form($form, $form_state);
 }
 
 /**
  * Form submission handler for aggregator_admin_form().
  */
 function aggregator_admin_form_submit($form, &$form_state) {
-  if (isset($form_state['values']['aggregator_processors'])) {
-    $form_state['values']['aggregator_processors'] = array_filter($form_state['values']['aggregator_processors']);
+  $config = config('aggregator.settings');
+  $config
+    ->set('items.allowed_html', $form_state['values']['aggregator_allowed_html_tags'])
+    ->set('items.expire', $form_state['values']['aggregator_clear'])
+    ->set('items.teaser_length', $form_state['values']['aggregator_teaser_length'])
+    ->set('source.list_max', $form_state['values']['aggregator_summary_items'])
+    ->set('source.category_selector', $form_state['values']['aggregator_category_selector']);
+
+  if (isset($form_state['values']['aggregator_fetcher'])) {
+    $config->set('fetcher', $form_state['values']['aggregator_fetcher']);
   }
-  system_settings_form_submit($form, $form_state);
+  if (isset($form_state['values']['aggregator_parser'])) {
+    $config->set('parser', $form_state['values']['aggregator_parser']);
+  }
+  if (isset($form_state['values']['aggregator_processors'])) {
+    $config->set('processors', array_filter($form_state['values']['aggregator_processors']));
+  }
+  $config->save();
 }
 
 /**

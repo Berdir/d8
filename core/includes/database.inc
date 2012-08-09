@@ -44,7 +44,7 @@ use Drupal\Core\Database\Query\Condition;
  * $result = db_query_range('SELECT n.nid, n.title, n.created
  *   FROM {node} n WHERE n.uid = :uid', 0, 10, array(':uid' => $uid));
  * foreach ($result as $record) {
- *   // Perform operations on $node->title, etc. here.
+ *   // Perform operations on $record->title, etc. here.
  * }
  * @endcode
  * Curly braces are used around "node" to provide table prefixing via
@@ -671,7 +671,7 @@ function _db_create_keys_sql($spec) {
  * Renames a table.
  *
  * @param $table
- *   The table to be renamed.
+ *   The current name of the table to be renamed.
  * @param $new_name
  *   The new name for the table.
  */

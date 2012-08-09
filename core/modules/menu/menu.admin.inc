@@ -52,7 +52,7 @@ function menu_overview_form($form, &$form_state, $menu) {
   global $menu_admin;
   $form['#attached']['css'] = array(drupal_get_path('module', 'menu') . '/menu.admin.css');
   $sql = "
-    SELECT m.load_functions, m.to_arg_functions, m.access_callback, m.access_arguments, m.page_callback, m.page_arguments, m.delivery_callback, m.title, m.title_callback, m.title_arguments, m.type, m.description, ml.*
+    SELECT m.load_functions, m.to_arg_functions, m.access_callback, m.access_arguments, m.page_callback, m.page_arguments, m.title, m.title_callback, m.title_arguments, m.type, m.description, m.description_callback, m.description_arguments, ml.*
     FROM {menu_links} ml LEFT JOIN {menu_router} m ON m.path = ml.router_path
     WHERE ml.menu_name = :menu
     ORDER BY p1 ASC, p2 ASC, p3 ASC, p4 ASC, p5 ASC, p6 ASC, p7 ASC, p8 ASC, p9 ASC";
@@ -61,6 +61,7 @@ function menu_overview_form($form, &$form_state, $menu) {
   foreach ($result as $item) {
     $links[] = $item;
   }
+  $delta = max(count($links), 50);
   $tree = menu_tree_data($links);
   $node_links = array();
   menu_tree_collect_node_links($tree, $node_links);
@@ -69,7 +70,7 @@ function menu_overview_form($form, &$form_state, $menu) {
   menu_tree_check_access($tree, $node_links);
   $menu_admin = FALSE;
 
-  $form = array_merge($form, _menu_overview_tree_form($tree));
+  $form = array_merge($form, _menu_overview_tree_form($tree, $delta));
   $form['#menu'] =  $menu;
 
   if (element_children($form)) {
@@ -90,8 +91,10 @@ function menu_overview_form($form, &$form_state, $menu) {
  *
  * @param $tree
  *   The menu_tree retrieved by menu_tree_data.
+ * @param $delta
+ *   The default number of menu items used in the menu weight selector is 50.
  */
-function _menu_overview_tree_form($tree) {
+function _menu_overview_tree_form($tree, $delta = 50) {
   $form = &drupal_static(__FUNCTION__, array('#tree' => TRUE));
   foreach ($tree as $data) {
     $title = '';
@@ -110,7 +113,7 @@ function _menu_overview_tree_form($tree) {
       );
       $form[$mlid]['weight'] = array(
         '#type' => 'weight',
-        '#delta' => 50,
+        '#delta' => $delta,
         '#default_value' => $item['weight'],
         '#title_display' => 'invisible',
         '#title' => t('Weight for @title', array('@title' => $item['title'])),
@@ -138,7 +141,7 @@ function _menu_overview_tree_form($tree) {
     }
 
     if ($data['below']) {
-      _menu_overview_tree_form($data['below']);
+      _menu_overview_tree_form($data['below'], $delta);
     }
   }
   return $form;
@@ -352,10 +355,23 @@ function menu_edit_item($form, &$form_state, $type, $item, $menu) {
     '#description' => t('The maximum depth for a link and all its children is fixed at !maxdepth. Some menu links may not be available as parents if selecting them would exceed this limit.', array('!maxdepth' => MENU_MAX_DEPTH)),
     '#attributes' => array('class' => array('menu-title-select')),
   );
+
+  // Get number of items in menu so the weight selector is sized appropriately.
+  $sql = "SELECT COUNT(*) FROM {menu_links} WHERE menu_name = :menu";
+  $result = db_query($sql, array(':menu' => $item['menu_name']), array('fetch' => PDO::FETCH_ASSOC));
+  foreach ($result as $row) {
+    foreach ($row as $menu_item_count) {
+      $delta = $menu_item_count;
+    }
+  }
+  if ($delta < 50) {
+    // Old hardcoded value.
+    $delta = 50;
+  }
   $form['weight'] = array(
     '#type' => 'weight',
     '#title' => t('Weight'),
-    '#delta' => 50,
+    '#delta' => $delta,
     '#default_value' => $item['weight'],
     '#description' => t('Optional. In the menu, the heavier links will sink and the lighter links will be positioned nearer the top.'),
   );
@@ -662,8 +678,12 @@ function menu_reset_item_confirm_submit($form, &$form_state) {
 
 /**
  * Menu callback; Build the form presenting menu configuration options.
+ *
+ * @ingroup forms
+ * @see menu_configure_submit()
  */
-function menu_configure() {
+function menu_configure($form, &$form_state) {
+  $config = config('menu.settings');
   $form['intro'] = array(
     '#type' => 'item',
     '#markup' => t('The menu module allows on-the-fly creation of menu links in the content authoring forms. To configure these settings for a particular content type, visit the <a href="@content-types">Content types</a> page, click the <em>edit</em> link for the content type, and go to the <em>Menu settings</em> section.', array('@content-types' => url('admin/structure/types'))),
@@ -671,11 +691,11 @@ function menu_configure() {
 
   $menu_options = menu_get_menus();
 
-  $main = variable_get('menu_main_links_source', 'main-menu');
+  $main = $config->get('main_links');
   $form['menu_main_links_source'] = array(
     '#type' => 'select',
     '#title' => t('Source for the Main links'),
-    '#default_value' => variable_get('menu_main_links_source', 'main-menu'),
+    '#default_value' => $main,
     '#empty_option' => t('No Main links'),
     '#options' => $menu_options,
     '#tree' => FALSE,
@@ -685,12 +705,22 @@ function menu_configure() {
   $form['menu_secondary_links_source'] = array(
     '#type' => 'select',
     '#title' => t('Source for the Secondary links'),
-    '#default_value' => variable_get('menu_secondary_links_source', 'user-menu'),
+    '#default_value' => $config->get('secondary_links'),
     '#empty_option' => t('No Secondary links'),
     '#options' => $menu_options,
     '#tree' => FALSE,
     '#description' => t('Select the source for the Secondary links. An advanced option allows you to use the same source for both Main links (currently %main) and Secondary links: if your source menu has two levels of hierarchy, the top level menu links will appear in the Main links, and the children of the active link will appear in the Secondary links.', array('%main' => $main ? $menu_options[$main] : t('none'))),
   );
 
-  return system_settings_form($form);
+  return system_config_form($form, $form_state);
+}
+
+/**
+ * Form submission handler for menu_configure().
+ */
+function menu_configure_submit($form, &$form_state) {
+  config('menu.settings')
+    ->set('main_links', $form_state['values']['menu_main_links_source'])
+    ->set('secondary_links', $form_state['values']['menu_secondary_links_source'])
+    ->save();
 }

@@ -67,7 +67,7 @@ function field_info_cache_clear() {
  * @see _field_info_collate_types_reset()
  */
 function _field_info_collate_types() {
-  $language_interface = drupal_container()->get(LANGUAGE_TYPE_INTERFACE);
+  $language_interface = language_manager(LANGUAGE_TYPE_INTERFACE);
 
   // Use the advanced drupal_static() pattern, since this is called very often.
   static $drupal_static_fast;
@@ -624,7 +624,8 @@ function field_info_fields() {
  * @return
  *   The field array, as returned by field_read_fields(), with an
  *   additional element 'bundles', whose value is an array of all the bundles
- *   this field belongs to keyed by entity type.
+ *   this field belongs to keyed by entity type. NULL if the field was not
+ *   found.
  *
  * @see field_info_field_by_id()
  */

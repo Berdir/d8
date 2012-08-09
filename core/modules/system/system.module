@@ -5,6 +5,7 @@
  * Configuration system that lets administrators modify the workings of the site.
  */
 
+use Drupal\Core\Utility\ModuleInfo;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -280,6 +281,7 @@ function system_entity_info() {
       'entity keys' => array(
         'id' => 'fid',
         'label' => 'filename',
+        'uuid' => 'uuid',
       ),
       'static cache' => FALSE,
     ),
@@ -611,7 +613,6 @@ function system_menu() {
   $items['system/ajax'] = array(
     'title' => 'AHAH callback',
     'page callback' => 'ajax_form_callback',
-    'delivery callback' => 'ajax_deliver',
     'access callback' => TRUE,
     'theme callback' => 'ajax_base_page_theme',
     'type' => MENU_CALLBACK,
@@ -1178,11 +1179,11 @@ function system_cron_page() {
  * @see system_cron_page().
  */
 function system_cron_access($key) {
-  if ($key != config('system.cron')->get('cron_key')) {
+  if ($key != config('system.cron')->get('key')) {
     watchdog('cron', 'Cron could not run because an invalid key was used.', array(), WATCHDOG_NOTICE);
     return FALSE;
   }
-  elseif (variable_get('maintenance_mode', 0)) {
+  elseif (config('system.maintenance')->get('enabled')) {
     watchdog('cron', 'Cron could not run because the site is in maintenance mode.', array(), WATCHDOG_NOTICE);
     return FALSE;
   }
@@ -2068,7 +2069,7 @@ function system_filetransfer_info() {
 function system_init() {
   global $conf;
 
-  $language_interface = drupal_container()->get(LANGUAGE_TYPE_INTERFACE);
+  $language_interface = language_manager(LANGUAGE_TYPE_INTERFACE);
   // For each date type (e.g. long, short), get the localized date format
   // for the user's current language and override the default setting for it
   // in $conf. This should happen on all pages except the date and time formats
@@ -2181,18 +2182,16 @@ function system_get_localized_date_format($languages) {
  * Adds CSS and JavaScript files declared in module .info files.
  */
 function system_add_module_assets() {
-  foreach (system_get_info('module') as $module => $info) {
-    if (!empty($info['stylesheets'])) {
-      foreach ($info['stylesheets'] as $media => $stylesheets) {
-        foreach ($stylesheets as $stylesheet) {
-          drupal_add_css($stylesheet, array('every_page' => TRUE, 'media' => $media));
-        }
+  foreach (system_get_module_info('stylesheets') as $module => $value) {
+    foreach ($value as $media => $stylesheets) {
+      foreach ($stylesheets as $stylesheet) {
+        drupal_add_css($stylesheet, array('every_page' => TRUE, 'media' => $media));
       }
     }
-    if (!empty($info['scripts'])) {
-      foreach ($info['scripts'] as $script) {
-        drupal_add_js($script, array('every_page' => TRUE));
-      }
+  }
+  foreach (system_get_module_info('scripts') as $module => $scripts) {
+    foreach ($scripts as $script) {
+      drupal_add_js($script, array('every_page' => TRUE));
     }
   }
 }
@@ -2201,7 +2200,8 @@ function system_add_module_assets() {
  * Implements hook_custom_theme().
  */
 function system_custom_theme() {
-  if ($request = request()) {
+  if (drupal_container()->has('request')) {
+    $request = drupal_container()->get('request');
     $path = $request->attributes->get('system_path');
     if (user_access('view the administration theme') && path_is_admin($path)) {
       return variable_get('admin_theme');
@@ -2352,17 +2352,17 @@ function system_preprocess_block(&$variables) {
 
     switch ($variables['block']->delta) {
       case 'powered-by':
-        $variables['attributes_array']['role'] = 'complementary';
+        $variables['attributes']['role'] = 'complementary';
         break;
       case 'help':
-        $variables['attributes_array']['role'] = 'complementary';
+        $variables['attributes']['role'] = 'complementary';
         break;
 
       // System menu blocks should get the same class as menu module blocks.
       default:
         if (in_array($variables['block']->delta, array_keys(menu_list_system_menus()))) {
-          $variables['attributes_array']['role'] = 'navigation';
-          $variables['classes_array'][] = 'block-menu';
+          $variables['attributes']['role'] = 'navigation';
+          $variables['attributes']['class'][] = 'block-menu';
         }
     }
   }
@@ -2598,18 +2598,44 @@ function system_update_files_database(&$files, $type) {
 function system_get_info($type, $name = NULL) {
   $info = array();
   if ($type == 'module') {
-    $type = 'module_enabled';
+    $result = db_query('SELECT name, info FROM {system} WHERE type = :type AND status = 1', array(':type' => 'module'));
+    foreach ($result as $record) {
+      $info[$record->name] = unserialize($record->info);
+    }
   }
-  $list = system_list($type);
-  foreach ($list as $shortname => $item) {
-    if (!empty($item->status)) {
-      $info[$shortname] = $item->info;
+  else {
+    $list = system_list($type);
+    foreach ($list as $shortname => $item) {
+      if (!empty($item->status)) {
+        $info[$shortname] = $item->info;
+      }
     }
   }
   if (isset($name)) {
     return isset($info[$name]) ? $info[$name] : array();
   }
   return $info;
+}
+
+/**
+ * Return .info data for modules.
+ *
+ * @param string $property
+ *   The .info property to retrieve.
+ *
+ * @return array
+ *   An array keyed by module name, with the .info file property as values.
+ *   Only modules with the property specified in their .info file will be
+ *   returned.
+ *
+ * @see Drupal\Core\Utility\ModuleInfo
+ */
+function system_get_module_info($property) {
+  static $info;
+  if (!isset($info)) {
+    $info = new ModuleInfo('system_info', 'cache');
+  }
+  return $info[$property];
 }
 
 /**
@@ -3790,7 +3816,7 @@ function system_run_automated_cron() {
   // If the site is not fully installed, suppress the automated cron run.
   // Otherwise it could be triggered prematurely by Ajax requests during
   // installation.
-  if (($threshold = config('system.cron')->get('cron_safe_threshold')) > 0 && variable_get('install_task') == 'done') {
+  if (($threshold = config('system.cron')->get('threshold.autorun')) > 0 && variable_get('install_task') == 'done') {
     $cron_last = variable_get('cron_last', NULL);
     if (!isset($cron_last) || (REQUEST_TIME - $cron_last > $threshold)) {
       drupal_cron_run();

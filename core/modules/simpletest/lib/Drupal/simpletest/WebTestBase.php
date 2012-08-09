@@ -579,13 +579,16 @@ abstract class WebTestBase extends TestBase {
    */
   protected function setUp() {
     global $user, $conf;
-    $language_interface = drupal_container()->get(LANGUAGE_TYPE_INTERFACE);
+    $language_interface = language_manager(LANGUAGE_TYPE_INTERFACE);
 
     // Create the database prefix for this test.
     $this->prepareDatabasePrefix();
 
     // Prepare the environment for running tests.
     $this->prepareEnvironment();
+    if (!$this->setupEnvironment) {
+      return FALSE;
+    }
 
     // Reset all statics and variables to perform tests in a clean environment.
     $conf = array();
@@ -596,6 +599,9 @@ abstract class WebTestBase extends TestBase {
     // changed, since Drupal\Core\Utility\CacheArray implementations attempt to
     // write back to persistent caches when they are destructed.
     $this->changeDatabasePrefix();
+    if (!$this->setupDatabasePrefix) {
+      return FALSE;
+    }
 
     // Preset the 'install_profile' system variable, so the first call into
     // system_rebuild_module_data() (in drupal_install_system()) will register
@@ -630,11 +636,18 @@ abstract class WebTestBase extends TestBase {
 
     // Install modules needed for this test. This could have been passed in as
     // either a single array argument or a variable number of string arguments.
-    // @todo Remove this compatibility layer in Drupal 8, and only accept
-    // $modules as a single array argument.
+    // @todo Remove this after fully converting to static $modules property.
     $modules = func_get_args();
     if (isset($modules[0]) && is_array($modules[0])) {
       $modules = $modules[0];
+    }
+    // Collect modules to install.
+    $class = get_class($this);
+    while ($class) {
+      if (property_exists($class, 'modules')) {
+        $modules = array_merge($modules, $class::$modules);
+      }
+      $class = get_parent_class($class);
     }
     if ($modules) {
       $success = module_enable($modules, TRUE);
@@ -753,6 +766,12 @@ abstract class WebTestBase extends TestBase {
    * and reset the database prefix.
    */
   protected function tearDown() {
+    // Ensure that TestBase::changeDatabasePrefix() has run and TestBase::$setup
+    // was not tricked into TRUE, since the following code would delete the
+    // entire parent site otherwise.
+    if (!$this->setupDatabasePrefix) {
+      return FALSE;
+    }
     // Remove all prefixed tables.
     $connection_info = Database::getConnectionInfo('default');
     $tables = db_find_tables($connection_info['default']['prefix']['default'] . '%');
@@ -777,7 +796,7 @@ abstract class WebTestBase extends TestBase {
 
     // Reload module list and implementations to ensure that test module hooks
     // aren't called after tests.
-    drupal_static_reset('system_list');
+    system_list_reset();
     module_list_reset();
     module_implements_reset();
 
@@ -804,6 +823,13 @@ abstract class WebTestBase extends TestBase {
 
     if (!isset($this->curlHandle)) {
       $this->curlHandle = curl_init();
+
+      // Some versions/configurations of cURL break on a NULL cookie jar, so
+      // supply a real file.
+      if (empty($this->cookieFile)) {
+        $this->cookieFile = $this->public_files_directory . '/cookie.jar';
+      }
+
       $curl_options = array(
         CURLOPT_COOKIEJAR => $this->cookieFile,
         CURLOPT_URL => $base_url,
@@ -818,7 +844,12 @@ abstract class WebTestBase extends TestBase {
         $curl_options[CURLOPT_HTTPAUTH] = $this->httpauth_method;
         $curl_options[CURLOPT_USERPWD] = $this->httpauth_credentials;
       }
-      curl_setopt_array($this->curlHandle, $this->additionalCurlOptions + $curl_options);
+      // curl_setopt_array() returns FALSE if any of the specified options
+      // cannot be set, and stops processing any further options.
+      $result = curl_setopt_array($this->curlHandle, $this->additionalCurlOptions + $curl_options);
+      if (!$result) {
+        throw new \UnexpectedValueException('One or more cURL options could not be set.');
+      }
 
       // By default, the child session name should be the same as the parent.
       $this->session_name = session_name();
@@ -1384,7 +1415,7 @@ abstract class WebTestBase extends TestBase {
    * Runs cron in the Drupal installed by Simpletest.
    */
   protected function cronRun() {
-    $this->drupalGet('cron/' . config('system.cron')->get('cron_key'));
+    $this->drupalGet('cron/' . config('system.cron')->get('key'));
   }
 
   /**
@@ -2257,6 +2288,32 @@ abstract class WebTestBase extends TestBase {
       ));
     }
     return $this->assertNotEqual($actual, $title, $message, $group);
+  }
+
+  /**
+   * Asserts themed output.
+   *
+   * @param $callback
+   *   The name of the theme function to invoke; e.g. 'links' for theme_links().
+   * @param $variables
+   *   An array of variables to pass to the theme function.
+   * @param $expected
+   *   The expected themed output string.
+   * @param $message
+   *   (optional) An assertion message.
+   */
+  protected function assertThemeOutput($callback, array $variables = array(), $expected, $message = '') {
+    $output = theme($callback, $variables);
+    $this->verbose('Variables:' . '<pre>' .  check_plain(var_export($variables, TRUE)) . '</pre>'
+      . '<hr />' . 'Result:' . '<pre>' .  check_plain(var_export($output, TRUE)) . '</pre>'
+      . '<hr />' . 'Expected:' . '<pre>' .  check_plain(var_export($expected, TRUE)) . '</pre>'
+      . '<hr />' . $output
+    );
+    if (!$message) {
+      $message = '%callback rendered correctly.';
+    }
+    $message = format_string($message, array('%callback' => 'theme_' . $callback . '()'));
+    $this->assertIdentical($output, $expected, $message);
   }
 
   /**

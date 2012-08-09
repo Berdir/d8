@@ -48,7 +48,7 @@ function block_help($path, $arg) {
     case 'admin/help#block':
       $output = '';
       $output .= '<h3>' . t('About') . '</h3>';
-      $output .= '<p>' . t('The Block module allows you to create boxes of content, which are rendered into an area, or region, of one or more pages of a website. The core Seven administration theme, for example, implements the regions "Content", "Help", "Dashboard main", and "Dashboard sidebar", and a block may appear in any one of these regions. The <a href="@blocks">Blocks administration page</a> provides a drag-and-drop interface for assigning a block to a region, and for controlling the order of blocks within regions. For more information, see the online handbook entry for <a href="@block">Block module</a>.', array('@block' => 'http://drupal.org/documentation/modules/block', '@blocks' => url('admin/structure/block'))) . '</p>';
+      $output .= '<p>' . t('The Block module allows you to create boxes of content, which are rendered into an area, or region, of one or more pages of a website. The core Seven administration theme, for example, implements the regions "Content" and "Help", and a block may appear in either of these regions. The <a href="@blocks">Blocks administration page</a> provides a drag-and-drop interface for assigning a block to a region, and for controlling the order of blocks within regions. For more information, see the online handbook entry for <a href="@block">Block module</a>.', array('@block' => 'http://drupal.org/documentation/modules/block', '@blocks' => url('admin/structure/block'))) . '</p>';
       $output .= '<h3>' . t('Uses') . '</h3>';
       $output .= '<dl>';
       $output .= '<dt>' . t('Positioning content') . '</dt>';
@@ -785,7 +785,7 @@ function _block_load_blocks() {
 /**
  * Implements hook_block_list_alter().
  *
- * Checks the page, user role, and user-specific visibilty settings.
+ * Checks the page, user role, and user-specific visibility settings.
  * Removes the block if the visibility conditions are not met.
  */
 function block_block_list_alter(&$blocks) {
@@ -880,7 +880,7 @@ function block_block_list_alter(&$blocks) {
       continue;
     }
     foreach ($block_langcodes[$block->module][$block->delta] as $language_type => $langcodes) {
-      if (isset($langcodes[drupal_container()->get($language_type)->langcode])) {
+      if (isset($langcodes[language_manager($language_type)->langcode])) {
         // Found a language type - langcode combination in the configuration
         // that is applicable to the current request.
         continue 2;
@@ -998,10 +998,10 @@ function template_preprocess_block(&$variables) {
   // Create the $content variable that templates expect.
   $variables['content'] = $variables['elements']['#children'];
 
-  $variables['classes_array'][] = drupal_html_class('block-' . $variables['block']->module);
+  $variables['attributes']['class'][] = drupal_html_class('block-' . $variables['block']->module);
 
   // Add default class for block content.
-  $variables['content_attributes_array']['class'][] = 'content';
+  $variables['content_attributes']['class'][] = 'content';
 
   $variables['theme_hook_suggestions'][] = 'block__' . $variables['block']->region;
   $variables['theme_hook_suggestions'][] = 'block__' . $variables['block']->module;
