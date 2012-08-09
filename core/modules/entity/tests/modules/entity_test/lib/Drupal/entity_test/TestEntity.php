@@ -47,12 +47,7 @@ class TestEntity extends Entity {
     // @todo: Should we unset defined properties or initialize all entity
     // property objects here, so we have the magic getter working with
     // properties defined in the entity class.
-
-    // Keep a possible value during entity-loading...
-    // @ŧodo: Cleanup. See TestEntityStorageController::attachLoad().
-    if (!isset($this->name)) {
-      unset($this->name);
-    }
+    unset($this->name);
     unset($this->user);
 
     foreach ($values as $name => $value) {
@@ -64,7 +59,7 @@ class TestEntity extends Entity {
     if ($this->getPropertyDefinition($name)) {
       return $this->get($name);
     }
-    return $this->$name;
+    return isset($this->$name) ? $this->$name : NULL;
   }
 
   public function __set($name, $value) {
