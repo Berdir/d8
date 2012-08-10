@@ -42,13 +42,24 @@ interface EntityStorageControllerInterface {
    *
    * @param $ids
    *   An array of entity IDs, or FALSE to load all entities.
-   * @param $conditions
-   *   An array of conditions in the form 'field' => $value.
    *
    * @return
    *   An array of entity objects indexed by their ids.
    */
-  public function load($ids = array(), $conditions = array());
+  public function load($ids = array());
+
+  /**
+   * Load entities by their properties.
+   *
+   * @param array $values
+   *   An associative array of properties of the entity, where
+   *   the keys are the property names and the values are the values those
+   *   properties must have.
+   *
+   * @return array
+   *   An array of entity objects indexed by their ids.
+   */
+  public function loadByProperties(array $values);
 
   /**
    * Constructs a new entity object, without permanently saving it.

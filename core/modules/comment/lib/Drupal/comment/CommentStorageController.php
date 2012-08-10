@@ -21,8 +21,8 @@ class CommentStorageController extends DatabaseStorageController {
   /**
    * Overrides Drupal\entity\DatabaseStorageController::buildQuery().
    */
-  protected function buildQuery($ids, $conditions = array(), $revision_id = FALSE) {
-    $query = parent::buildQuery($ids, $conditions, $revision_id);
+  protected function buildQuery($ids, $revision_id = FALSE) {
+    $query = parent::buildQuery($ids, $revision_id);
     // Specify additional fields from the user and node tables.
     $query->innerJoin('node', 'n', 'base.nid = n.nid');
     $query->addField('n', 'type', 'node_type');

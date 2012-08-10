@@ -582,25 +582,17 @@ function file_save_htaccess($directory, $private = TRUE) {
  *
  * @param array|bool $fids
  *   An array of file IDs, or FALSE to load all files.
- * @param array $conditions
- *   (deprecated) An associative array of conditions on the {file_managed}
- *   table, where the keys are the database fields and the values are the
- *   values those fields must have. Instead, it is preferable to use
- *   Drupal\entity\EntityFieldQuery to retrieve a list of entity IDs
- *   loadable by this function.
  *
  * @return array
  *   An array of file entities, indexed by fid.
- *
- * @todo Remove $conditions in Drupal 8.
  *
  * @see hook_file_load()
  * @see file_load()
  * @see entity_load()
  * @see Drupal\entity\EntityFieldQuery
  */
-function file_load_multiple($fids = array(), array $conditions = array()) {
-  return entity_load_multiple('file', $fids, $conditions);
+function file_load_multiple($fids = array()) {
+  return entity_load_multiple('file', $fids);
 }
 
 /**

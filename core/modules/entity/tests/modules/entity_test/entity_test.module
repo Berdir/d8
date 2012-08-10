@@ -47,16 +47,14 @@ function entity_test_load($id, $reset = FALSE) {
  *
  * @param array|bool $ids
  *   An array of entity IDs, or FALSE to load all entities.
- * @param array $conditions
- *   An array of conditions to match against the {entity} table.
  * @param bool $reset
  *   A boolean indicating that the internal cache should be reset.
  *
  * @return array
  *   An array of test entity objects, indexed by ID.
  */
-function entity_test_load_multiple($ids = array(), $conditions = array(), $reset = FALSE) {
-  return entity_load_multiple('entity_test', $ids, $conditions, $reset);
+function entity_test_load_multiple($ids = array(), $reset = FALSE) {
+  return entity_load_multiple('entity_test', $ids, $reset);
 }
 
 /**
