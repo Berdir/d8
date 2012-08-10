@@ -156,7 +156,7 @@ class VocabularyUnitTest extends TaxonomyTestBase {
     $this->assertEqual(array_shift($vocabularies)->vid, $vocabulary1->vid, 'Vocabulary loaded successfully by ID.');
 
     // Fetch vocabulary 1 by name.
-    $vocabulary = current(taxonomy_vocabulary_load_multiple(array(), array('name' => $vocabulary1->name)));
+    $vocabulary = current(entity_load_by_properties('taxonomy_vocabulary', array('name' => $vocabulary1->name)));
     $this->assertEqual($vocabulary->vid, $vocabulary1->vid, 'Vocabulary loaded successfully by name.');
 
     // Fetch vocabulary 1 by name and ID.

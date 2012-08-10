@@ -163,7 +163,8 @@ abstract class WebTestBase extends TestBase {
    *   A node entity matching $title.
    */
   function drupalGetNodeByTitle($title, $reset = FALSE) {
-    $nodes = node_load_multiple(array(), array('title' => $title), $reset);
+    entity_get_controller('node')->resetCache();
+    $nodes = entity_load_by_properties('node', array('title' => $title));
     // Load the first node returned from the database.
     $returned_node = reset($nodes);
     return $returned_node;

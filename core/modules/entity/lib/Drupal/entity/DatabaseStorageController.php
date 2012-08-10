@@ -209,6 +209,22 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
   }
 
   /**
+   * Implements Drupal\entity\EntityStorageControllerInterface::loadRevision().
+   */
+  public function loadRevision($revision_id) {
+    // Build and execute the query.
+    $query_result = $this->buildQuery(array(), $revision_id)->execute();
+
+    if (!empty($this->entityInfo['entity class'])) {
+      // We provide the necessary arguments for PDO to create objects of the
+      // specified entity class.
+      // @see Drupal\entity\EntityInterface::__construct()
+      $query_result->setFetchMode(PDO::FETCH_CLASS, $this->entityInfo['entity class'], array(array(), $this->entityType));
+    }
+    return $query_result->fetch();
+  }
+
+  /**
    * Implements Drupal\entity\EntityStorageControllerInterface::loadByProperties().
    */
   public function loadByProperties(array $values = array()) {

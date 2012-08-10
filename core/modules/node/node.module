@@ -1001,20 +1001,29 @@ function node_load_multiple($nids = array(), $reset = FALSE) {
  * Loads a node entity from the database.
  *
  * @param int $nid
- *   (optional) The node ID.
- * @param int $vid
- *   (optional) The revision ID.
+ *   The node ID.
  * @param bool $reset
  *   (optional) Whether to reset the node_load_multiple() cache.
  *
  * @return Drupal\node\Node|false
  *   A fully-populated node entity, or FALSE if the node is not found.
  */
-function node_load($nid = NULL, $vid = NULL, $reset = FALSE) {
-  $nids = (isset($nid) ? array($nid) : array());
-  $conditions = (isset($vid) ? array('vid' => $vid) : array());
-  $node = node_load_multiple($nids, $conditions, $reset);
+function node_load($nid = NULL, $reset = FALSE) {
+  $node = node_load_multiple(array($nid), $reset);
   return $node ? reset($node) : FALSE;
+}
+
+/**
+ * Loads a node entity from the database.
+ *
+ * @param int $nid
+ *   The node revision id.
+ *
+ * @return Drupal\node\Node|false
+ *   A fully-populated node entity, or FALSE if the node is not found.
+ */
+function node_load_revision($vid = NULL) {
+  return entity_load_revision('node', $vid);
 }
 
 /**
@@ -1164,10 +1173,9 @@ function node_delete_multiple($nids) {
  *   TRUE if the revision deletion was successful.
  */
 function node_revision_delete($revision_id) {
-  if ($revision = node_load(NULL, $revision_id)) {
+  if ($revision = node_load_revision($revision_id)) {
     // Prevent deleting the current revision.
-    $node = node_load($revision->nid);
-    if ($revision_id == $node->vid) {
+    if ($revision->isCurrentRevision()) {
       return FALSE;
     }
 
@@ -1823,15 +1831,12 @@ function _node_revision_access(Node $node, $op = 'view', $account = NULL, $langc
       return $access[$cid] = FALSE;
     }
 
-    $node_current_revision = node_load($node->nid);
-    $is_current_revision = $node_current_revision->vid == $node->vid;
-
     // There should be at least two revisions. If the vid of the given node
     // and the vid of the current revision differ, then we already have two
     // different revisions so there is no need for a separate database check.
     // Also, if you try to revert to or delete the current revision, that's
     // not good.
-    if ($is_current_revision && (db_query('SELECT COUNT(vid) FROM {node_revision} WHERE nid = :nid', array(':nid' => $node->nid))->fetchField() == 1 || $op == 'update' || $op == 'delete')) {
+    if ($node->isCurrentRevision() && (db_query('SELECT COUNT(vid) FROM {node_revision} WHERE nid = :nid', array(':nid' => $node->nid))->fetchField() == 1 || $op == 'update' || $op == 'delete')) {
       $access[$cid] = FALSE;
     }
     elseif (user_access('administer nodes', $account)) {
@@ -1840,7 +1845,7 @@ function _node_revision_access(Node $node, $op = 'view', $account = NULL, $langc
     else {
       // First check the access to the current revision and finally, if the
       // node passed in is not the current revision then access to that, too.
-      $access[$cid] = node_access($op, $node_current_revision, $account, $langcode) && ($is_current_revision || node_access($op, $node, $account, $langcode));
+      $access[$cid] = node_access($op, $node->isCurrentRevision(), $account, $langcode) && ($is_current_revision || node_access($op, $node, $account, $langcode));
     }
   }
 
@@ -3528,7 +3533,7 @@ function node_access_rebuild($batch_mode = FALSE) {
       // Rebuild newest nodes first so that recent content becomes available quickly.
       $nids = db_query("SELECT nid FROM {node} ORDER BY nid DESC")->fetchCol();
       foreach ($nids as $nid) {
-        $node = node_load($nid, NULL, TRUE);
+        $node = node_load($nid, TRUE);
         // To preserve database integrity, only acquire grants if the node
         // loads successfully.
         if (!empty($node)) {
@@ -3576,7 +3581,7 @@ function _node_access_rebuild_batch_operation(&$context) {
   // Process the next 20 nodes.
   $limit = 20;
   $nids = db_query_range("SELECT nid FROM {node} WHERE nid > :nid ORDER BY nid ASC", 0, $limit, array(':nid' => $context['sandbox']['current_node']))->fetchCol();
-  $nodes = node_load_multiple($nids, array(), TRUE);
+  $nodes = node_load_multiple($nids, TRUE);
   foreach ($nodes as $nid => $node) {
     // To preserve database integrity, only acquire grants if the node
     // loads successfully.

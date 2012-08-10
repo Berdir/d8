@@ -151,6 +151,26 @@ function entity_load($entity_type, $id, $reset = FALSE) {
 }
 
 /**
+ * Loads an entity from the database.
+ *
+ * @param string $entity_type
+ *   The entity type to load, e.g. node or user.
+ * @param int $revision_id
+ *   The id of the entity to load.
+ *
+ * @return object
+ *   The entity object, or FALSE if there is no entity with the given revision
+ *   id.
+ *
+ * @see hook_entity_info()
+ * @see Drupal\entity\EntityStorageControllerInterface
+ * @see Drupal\entity\DatabaseStorageController
+ */
+function entity_load_revision($entity_type, $revision_id) {
+  entitiy_get_controller($entity_type)->loadRevision($revision_id);
+}
+
+/**
  * Loads an entity by UUID.
  *
  * Note that some entity types may not support UUIDs.

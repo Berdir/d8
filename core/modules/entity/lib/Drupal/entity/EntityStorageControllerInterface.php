@@ -49,6 +49,17 @@ interface EntityStorageControllerInterface {
   public function load($ids = array());
 
   /**
+   * Load a specific entity revision.
+   *
+   * @param int $revision_id
+   *   The revision id.
+   *
+   * @return Drupal\entity\EntityInterface|false
+   *   The specified entity revision or FALSE if not found.
+   */
+  public function loadRevision($revision_id);
+
+  /**
    * Load entities by their properties.
    *
    * @param array $values
