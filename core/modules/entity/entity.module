@@ -167,7 +167,7 @@ function entity_load($entity_type, $id, $reset = FALSE) {
  * @see Drupal\entity\DatabaseStorageController
  */
 function entity_load_revision($entity_type, $revision_id) {
-  entitiy_get_controller($entity_type)->loadRevision($revision_id);
+  entity_get_controller($entity_type)->loadRevision($revision_id);
 }
 
 /**

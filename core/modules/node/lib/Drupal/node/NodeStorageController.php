@@ -182,10 +182,10 @@ class NodeStorageController extends DatabaseStorageController {
   /**
    * Overrides Drupal\entity\DatabaseStorageController::buildQuery().
    */
-  protected function buildQuery($ids, $conditions = array(), $revision_id = FALSE) {
+  protected function buildQuery($ids, $revision_id = FALSE) {
     // Ensure that uid is taken from the {node} table,
     // alias timestamp to revision_timestamp and add revision_uid.
-    $query = parent::buildQuery($ids, $conditions, $revision_id);
+    $query = parent::buildQuery($ids, $revision_id);
     $fields =& $query->getFields();
     unset($fields['timestamp']);
     $query->addField('revision', 'timestamp', 'revision_timestamp');
