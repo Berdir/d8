@@ -17,10 +17,27 @@ use Drupal\Core\Property\PropertyListInterface;
  * Some methods are delegated to the first contained EntityPropertyItem, in
  * particular get() and set() as well as their magic equivalences.
  *
- * @todo: Should getProperties() and getPropertyDefinitions() be delegated
- * as well.
+ * @todo: Should getProperties(), setProperties() and getPropertyDefinitions()
+ * be delegated as well.
  */
 interface EntityPropertyInterface extends PropertyListInterface {
+
+  /**
+   * Delegated to the first item.
+   *
+   * @see EntityPropertyItemInterface::get()
+   */
+  public function get($property_name);
+
+  /**
+   * Magic getter: Delegated to the first item.
+   */
+  public function __get($name);
+
+  /**
+   * Magic setter: Delegated to the first item.
+   */
+  public function __set($name, $value);
 
   /**
    * Check entity property access.
@@ -34,42 +51,4 @@ interface EntityPropertyInterface extends PropertyListInterface {
    */
   public function access($account = NULL);
 
-  /**
-   * Gets the definition of the entity property.
-   *
-   * @return array
-   *   The definition of the entity property.
-   */
-  public function getDefinition();
-
-  /**
-   * Delegated to the first item.
-   *
-   * @see EntityPropertyItemInterface::get()
-   */
-  public function get($property_name);
-
-  /**
-   * Delegated to the first item.
-   *
-   * @see EntityPropertyItemInterface::getRawValue()
-   */
-  public function getRawValue($property_name);
-
-  /**
-   * Delegated to the first item.
-   *
-   * @see EntityPropertyItemInterface::set()
-   */
-  public function set($property_name, $value);
-
-  /**
-   * Magic getter.
-   */
-  public function __get($name);
-
-  /**
-   * Magic setter.
-   */
-  public function __set($name, $value);
 }

@@ -9,24 +9,35 @@ namespace Drupal\Core\Property;
 use IteratorAggregate;
 
 /**
- * Interface for property containers.
+ * Interface for data structures that contain properties.
  *
  * This is implemented by entities as well as by PropertyItem classes.
  */
 interface PropertyContainerInterface extends IteratorAggregate  {
 
   /**
-   * Validate the container values.
-   */
-  public function validate();
-
-  /**
-   * Gets an array of all properties.
+   * Gets an array of properties.
+   *
+   * The array contains all properties which are not computed.
+   * @todo: How to get computed properties via the interface?
    *
    * @return array
-   *   An array of properties, keyed by property name.
+   *   An array of property objects implementing the PropertyInterface, keyed
+   *   by property name.
    */
   public function getProperties();
+
+  /**
+   * Sets an array of properties.
+   *
+   * @param array
+   *   The array of properties to set. The array has to consist of property
+   *   objects implementing the PropertyInterface and must be keyed by property
+   *   name.
+   *
+   * @throws InvalidArgumentException
+   */
+  public function setProperties($properties);
 
   /**
    * Gets the definition of a contained property.
@@ -40,10 +51,11 @@ interface PropertyContainerInterface extends IteratorAggregate  {
   public function getPropertyDefinition($name);
 
   /**
-   * Gets an array of all definitions of contained properties.
+   * Gets an array property definitions of contained properties.
    *
-   * @return array
-   *   An array of property definitions.
+   * @param array $definition
+   *   The definition of the container's property, e.g. the definition of an
+   *   entity reference property.
    */
   public function getPropertyDefinitions();
 
@@ -56,10 +68,4 @@ interface PropertyContainerInterface extends IteratorAggregate  {
    */
   public function toArray();
 
-/*
- * Commented out for now as it creates problems for entities.
- *
- *   public function __get($name);
-
-   public function __set($name, $value);*/
 }

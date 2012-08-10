@@ -45,6 +45,9 @@ class Entity implements EntityInterface {
    *
    * This always holds the original, unchanged values of the entity.
    *
+   * @todo: Add methods for getting original properties and to see what has
+   * changed.
+   *
    * @var array
    */
   protected $values = array();
@@ -55,13 +58,6 @@ class Entity implements EntityInterface {
    * @var array
    */
   protected $properties = array();
-
-  /**
-   * The property's data type plugin.
-   *
-   * @var \Drupal\Core\Property\PropertyTypeContainerInterface
-   */
-  protected $dataType;
 
   /*
    * Indicates whether this is the current revision.
@@ -195,21 +191,6 @@ class Entity implements EntityInterface {
     return $languages;
   }
 
-  public function getRawValue($property_name, $langcode = NULL) {
-    $langcode = isset($langcode) ? $langcode : $this->langcode;
-
-    // Read $this->properties, possibly containing changes. If not set, return
-    // the unchanged value from $this->values.
-    if (isset($this->properties[$property_name][$langcode])) {
-      $definition = $this->getPropertyDefinition($property_name);
-      $data_type = drupal_get_property_type_plugin($definition['type']);
-      return $data_type->getRawValue($definition, $this->properties[$property_name][$langcode]);
-    }
-    else {
-      return isset($this->values[$property_name][$langcode]) ? $this->values[$property_name][$langcode] : NULL;
-    }
-  }
-
   /**
    * Implements EntityInterface::get().
    */
@@ -220,10 +201,9 @@ class Entity implements EntityInterface {
     // property objects, possibly holding changes to properties.
     if (!isset($this->properties[$property_name][$langcode])) {
       $definition = $this->getPropertyDefinition($property_name);
-      $data_type = drupal_get_property_type_plugin($definition['type']);
-
       $value = isset($this->values[$property_name][$langcode]) ? $this->values[$property_name][$langcode] : NULL;
-      $this->properties[$property_name][$langcode] = $data_type->getProperty($definition, $value);
+
+      $this->properties[$property_name][$langcode] = drupal_get_property($definition, $value);
     }
     return $this->properties[$property_name][$langcode];
   }
@@ -232,27 +212,8 @@ class Entity implements EntityInterface {
    * Implements EntityInterface::set().
    */
   public function set($property_name, $value, $langcode = NULL) {
-    $langcode = isset($langcode) ? $langcode : $this->langcode;
-
-    // If a raw value is passed in, instantiate the object before setting.
-    // @todo: Needs tests.
-    if (!$value instanceof EntityPropertyInterface) {
-      $definition = $this->getPropertyDefinition($property_name);
-      $data_type = drupal_get_property_type_plugin($definition['type']);
-
-      $value = $data_type->getProperty($definition, $value);
-    }
-
-    $this->properties[$property_name][$langcode] = $value;
+    $this->get($property_name, $langcode)->setValue($value);
   }
-
-/*  public function __get($name) {
-    return $this->get($name);
-  }
-
-  public function __set($name, $value) {
-    $this->set($name, $value);
-  }*/
 
   /**
    * Implements EntityInterface::save().
@@ -300,50 +261,66 @@ class Entity implements EntityInterface {
     return $this->isCurrentRevision;
   }
 
-  public function getIterator() {
-    return new \ArrayIterator($this->getProperties());
-  }
-
+  /**
+   * Implements PropertyContainerInterface::getProperties().
+   */
   public function getProperties() {
     $properties = array();
     foreach ($this->getPropertyDefinitions() as $name => $definition) {
-      $properties[$name] = $this->get($name);
+      if (empty($definition['computed'])) {
+        $properties[$name] = $this->get($name);
+      }
     }
     return $properties;
   }
 
+  /**
+   * Implements PropertyContainerInterface::setProperties().
+   */
+  public function setProperties($properties) {
+    $definitions = $this->getPropertyDefinitions();
+    foreach ($properties as $name => $property) {
+      if (isset($definitions[$name])) {
+        $this->properties[$name] = $property;
+      }
+      // @todo: Throw exception else, invalid properties given?.
+    }
+  }
+
+  /**
+   * Implements IteratorAggregate::getIterator().
+   */
+  public function getIterator() {
+    return new \ArrayIterator($this->getProperties());
+  }
+
+  /**
+   * Implements PropertyContainerInterface::getPropertyDefinition().
+   */
   public function getPropertyDefinition($name) {
     $definitions = $this->getPropertyDefinitions();
     return isset($definitions[$name]) ? $definitions[$name] : FALSE;
   }
 
+  /**
+   * Implements PropertyContainerInterface::getPropertyDefinitions().
+   */
   public function getPropertyDefinitions() {
-    // This is necessary as PDO writes values before calling __construct().
-    // @todo: Fix and remove this.
-    if (!isset($this->dataType)) {
-      $this->dataType = drupal_get_property_type_plugin('entity');
-    }
-
-    return $this->dataType->getPropertyDefinitions(array(
-      'type' => 'entity',
-      'entity type' => $this->entityType,
-      'bundle' => $this->bundle(),
-    ));
+    return entity_get_controller($this->entityType)->getPropertyDefinitions($this->bundle());
   }
 
+  /**
+   * Implements PropertyContainerInterface::toArray().
+   */
   public function toArray() {
-    $value = array();
-    foreach ($this->getPropertyDefinitions() as $name => $definition) {
-      $value[$name] = $this->getRawValue($name);
+    $values = array();
+    foreach ($this->getProperties() as $name => $property) {
+      $values[$name] = $property->getValue();
     }
-    return $value;
+    return $values;
   }
 
   public function access($account) {
     // TODO: Implement access() method.
-  }
-
-  public function validate() {
-    // TODO: Implement validate() method.
   }
 }

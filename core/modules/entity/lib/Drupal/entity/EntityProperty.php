@@ -13,8 +13,8 @@ namespace Drupal\entity;
  * An entity property is a list of property items, which contain only primitive
  * properties or entity references. Note that even single-valued entity
  * properties are represented as list of items, however for easy access to the
- * contained item the entity property delegates get() and set() calls directly
- * to the first item.
+ * contained item the entity property delegates __get() and __set() calls
+ * directly to the first item.
  *
  * @see EntityPropertyInterface.
  */
@@ -29,74 +29,162 @@ class EntityProperty implements EntityPropertyInterface {
   protected $list = array();
 
   /**
-   * The class to use for the property items.
-   *
-   * @var string
-   */
-  protected $class;
-
-  /**
-   * The definition of the represented property.
+   * The definition of the entity property.
    *
    * @var array
    */
   protected $definition;
 
+  /**
+   * Implements PropertyInterface::__construct().
+   */
+  public function __construct(array $definition, $value = NULL) {
+    $this->definition = $definition;
+    $this->setValue($value);
+  }
 
   /**
-   * @param array $definition
-   *   The definition of the entity property.
-   * @param array $values
-   *   The array of raw values of the entity property.
-   * @param string $class
-   *   (optional) The class to use for the property items. Must implement
-   *   \Drupal\entity\EntityPropertyItemInterface. Defaults to
-   *   \Drupal\entity\EntityPropertyItem.
+   * Implements PropertyInterface::getType().
    */
-  public function __construct(array $definition, array $values = array(), $class = '\Drupal\entity\EntityPropertyItem') {
-    $this->class = $class;
-    $this->definition = $definition;
-    foreach ($values as $value) {
-      $this->list[] = new $this->class($this->definition, $value);
+  public function getType() {
+    return $this->definition['type'];
+  }
+
+  /**
+   * Implements PropertyInterface::getDefinition().
+   */
+  public function getDefinition() {
+    return $this->definition;
+  }
+
+  /**
+   * Implements PropertyInterface::getValue().
+   */
+  public function getValue() {
+    $values = array();
+    foreach ($this->list as $delta => $item) {
+      // @todo: Filter out empty items and add an isEmpty() method to them.
+      $values[$delta] = $item->getValue();
+    }
+    return $values;
+  }
+
+  /**
+   * Implements PropertyInterface::setValue().
+   *
+   * @param array $values
+   *   An array of values of the property items.
+   */
+  public function setValue($values) {
+    if (isset($values)) {
+      // Clear the values of properties for which no value has been passed.
+      foreach (array_diff_key($this->list, $values) as $delta => $item) {
+        unset($this->list[$delta]);
+      }
+
+      // Set the values.
+      foreach ($values as $delta => $value) {
+        if (!isset($this->list[$delta]) && is_numeric($delta)) {
+          $this->list[$delta] = $this->createItem($value);
+        }
+        elseif (is_numeric($delta)) {
+          $this->list[$delta]->setValue($value);
+        }
+        // @todo: Throw an exception else? Invalid value given?
+      }
+    }
+    else {
+      $this->list = array();
     }
   }
 
+  /**
+   * Returns a string representation of the property.
+   *
+   * @return string
+   */
+  public function getString() {
+    $strings = array();
+    foreach ($this->list() as $item) {
+      $strings[] = $item->getString();
+    }
+    return implode(', ', array_filter($strings));
+  }
+
+  /**
+   * Implements PropertyInterface::validate().
+   */
+  public function validate($value = NULL) {
+    // @todo implement
+  }
+
+  /**
+   * Implements ArrayAccess::offsetExists().
+   */
   public function offsetExists($offset) {
     return array_key_exists($offset, $this->list);
   }
 
+  /**
+   * Implements ArrayAccess::offsetUnset().
+   */
   public function offsetUnset($offset) {
     unset($this->list[$offset]);
   }
 
+  /**
+   * Implements ArrayAccess::offsetGet().
+   */
   public function offsetGet($offset) {
-    // Allow getting not yet existing items as well.
-    // @ŧodo: Maybe add a createItem() method instead or in addition?
-    if (!isset($this->list[$offset])) {
-      $this->list[$offset] = new $this->class($this->definition, array());
+    if (!isset($offset)) {
+      // @todo: Needs tests.
+      // The [] operator has been used so point at a new entry.
+      $offset = $this->list ? max(array_keys($this->list)) + 1 : 0;
     }
+
+    // Allow getting not yet existing items as well.
+    // @todo: Maybe add a createItem() method instead or in addition?
+    // @todo: Needs tests.
+    if (!isset($this->list[$offset]) && is_numeric($offset)) {
+      $this->list[$offset] = $this->createItem();
+    }
+    // @todo: Throw exception for not numeric offsets.
+
     return $this->list[$offset];
   }
 
-  public function offsetSet($offset, $value) {
-    // Support setting the property using the raw value as well.
-    // @todo: Needs tests.
-    if (!($value instanceof EntityPropertyItemInterface)) {
-      $value = new $this->class($this->definition, $value);
-    }
-    $this->list[$offset] = $value;
+  /**
+   * Helper for creating a list item object.
+   *
+   * @return \Drupal\Core\Property\PropertyInterface
+   */
+  protected function createItem($value = NULL) {
+    return drupal_get_property(array('list' => FALSE) + $this->definition, $value);
   }
 
+  /**
+   * Implements ArrayAccess::offsetSet().
+   */
+  public function offsetSet($offset, $value) {
+    // @todo: Throw exception if the value does not implement the interface.
+    if (is_numeric($offset)) {
+      $this->list[$offset] = $value;
+    }
+    // @todo: Throw exception if offset is invalid.
+  }
+
+  /**
+   * Implements IteratorAggregate::getIterator().
+   */
   public function getIterator() {
     return new \ArrayIterator($this->list);
   }
 
+  /**
+   * Implements Countable::count().
+   */
   public function count() {
     return count($this->list);
-  }
-
-  public function getDefinition() {
-    return $this->definition;
   }
 
   /**
@@ -137,20 +225,6 @@ class EntityProperty implements EntityPropertyInterface {
   /**
    * Delegate.
    */
-  public function getRawValue($property_name) {
-    return $this->offsetGet(0)->getRawValue($property_name);
-  }
-
-  /**
-   * Delegate.
-   */
-  public function set($property_name, $value) {
-    $this->offsetGet(0)->set($property_name, $value);
-  }
-
-  /**
-   * Delegate.
-   */
   public function __set($property_name, $value) {
     $this->offsetGet(0)->__set($property_name, $value);
   }
@@ -163,22 +237,10 @@ class EntityProperty implements EntityPropertyInterface {
    *   containing the raw values of all contained items.
    */
   public function toArray() {
-    $values = array();
-    foreach ($this->list as $item) {
-      $value = $item->toArray();
-      // @todo: Add an isEmpty() method and make use of it.
-      if (array_filter($value)) {
-        $values[] = $value;
-      }
-    }
-    return $values;
+    return $this->getValue();
   }
 
   public function access($account = NULL) {
     // TODO: Implement access() method. Use item access.
-  }
-
-  public function validate() {
-    // TODO: Implement validate() method.
   }
 }

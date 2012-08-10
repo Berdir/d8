@@ -57,13 +57,13 @@ class EntityPropertyTest extends WebTestBase  {
 
     $this->assertEqual($this->entity_name, $entity->name->value, 'Name value can be read.');
     $this->assertEqual($this->entity_name, $entity->name[0]->value, 'Name value can be read through list access.');
-    $this->assertEqual($entity->getRawValue('name'), array(0 => array('value' => $this->entity_name)), 'Raw property value returned.');
+    $this->assertEqual($entity->name->getValue(), array(0 => array('value' => $this->entity_name)), 'Plain property value returned.');
 
     // Change the name.
     $new_name = $this->randomName();
     $entity->name->value = $new_name;
     $this->assertEqual($new_name, $entity->name->value, 'Name can be updated and read.');
-    $this->assertEqual($entity->getRawValue('name'), array(0 => array('value' => $new_name)), 'Raw property value reflects the update.');
+    $this->assertEqual($entity->name->getValue(), array(0 => array('value' => $new_name)), 'Plain property value reflects the update.');
 
     $new_name = $this->randomName();
     $entity->name[0]->value = $new_name;
@@ -116,8 +116,8 @@ class EntityPropertyTest extends WebTestBase  {
       'entity type' => 'entity_test',
       'label' => t('Test entity'),
     );
-    $data_type = drupal_get_property_type_plugin($definition['type']);
-    $property_definitions = $data_type->getPropertyDefinitions($definition);
+    $property_entity = drupal_get_property($definition);
+    $property_definitions = $property_entity->getPropertyDefinitions($definition);
     $this->assertEqual($property_definitions['name']['type'], 'text_item', 'Name property found.');
     $this->assertEqual($property_definitions['user']['type'], 'entityreference_item', 'User property found.');
 
@@ -129,20 +129,16 @@ class EntityPropertyTest extends WebTestBase  {
     $this->assertEqual($definitions['name']['type'], 'text_item', 'Name property found.');
     $this->assertEqual($definitions['user']['type'], 'entityreference_item', 'User property found.');
 
-    $definition = $entity->getPropertyDefinition('name');
-    $data_type = drupal_get_property_type_plugin($definition['type']);
-    $name_properties = $data_type->getPropertyDefinitions($definition);
+    $name_properties = $entity->name->getPropertyDefinitions();
     $this->assertEqual($name_properties['value']['type'], 'string', 'String value property of the name found.');
 
-    $definition = $entity->getPropertyDefinition('user');
-    $data_type = drupal_get_property_type_plugin($definition['type']);
-    $userref_values = $data_type->getPropertyDefinitions($definition);
+    $userref_properties = $entity->user->getPropertyDefinitions();
 
-    $this->assertEqual($userref_values['id']['type'], 'integer', 'Entity id property of the user found.');
-    $this->assertEqual($userref_values['entity']['type'], 'entity', 'Entity reference property of the user found.');
+    $this->assertEqual($userref_properties['id']['type'], 'integer', 'Entity id property of the user found.');
+    $this->assertEqual($userref_properties['entity']['type'], 'entity', 'Entity reference property of the user found.');
 
     // @todo: Once the user entity has definitions, continue testing getting
-    // them from the $userref_values['entity'] definition.
+    // them from the $userref_values['entity'] property.
   }
 
   /**
@@ -157,7 +153,8 @@ class EntityPropertyTest extends WebTestBase  {
       foreach ($property as $delta => $item) {
         $this->assertTrue($property[0] instanceof EntityPropertyItemInterface, "Item $delta of property $name implements interface.");
 
-        foreach ($item as $value_name => $value) {
+        foreach ($item as $value_name => $value_property) {
+          $value = $value_property->getValue();
           $this->assertTrue(is_scalar($value) || $value instanceof \Drupal\entity\EntityInterface, "Value $value_name of item $delta of property $name is a primitive or an entity.");
         }
       }
@@ -195,7 +192,7 @@ class EntityPropertyTest extends WebTestBase  {
   function getContainedStrings($data_item, array $definition, $depth, array &$strings) {
 
     if ($definition['type'] == 'string') {
-      $strings[] = $data_item;
+      $strings[] = $data_item->getValue();
     }
 
     // Recurse until a certain depth is reached if possible.

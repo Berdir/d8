@@ -520,30 +520,32 @@ function entity_form_submit_build_entity($entity_type, $entity, $form, &$form_st
  */
 function entity_data_type_info() {
   return array(
-    'entity' => array(
-      'label' => t('Entity'),
-      'description' => t('All kind of entities, e.g. nodes, comments or users.'),
-      'class' => '\Drupal\entity\PropertyTypeEntity',
-    ),
     'text_item' => array(
       'label' => t('Text item'),
       'description' => t('An entity property containing a textual value.'),
-      'class' => '\Drupal\entity\PropertyTypeTextItem',
+      'class' => '\Drupal\entity\Property\PropertyTextItem',
+      'list class' => '\Drupal\entity\EntityProperty',
     ),
     'entityreference_item' => array(
       'label' => t('Entity reference item'),
       'description' => t('An entity property containing an entity reference.'),
-      'class' => '\Drupal\entity\PropertyTypeEntityReferenceItem',
+      'class' => '\Drupal\entity\Property\PropertyEntityReferenceItem',
+      'list class' => '\Drupal\entity\EntityProperty',
     ),
     'string' => array(
       'label' => t('String'),
-      'class' => 'Drupal\Core\Property\Type\String',
+      'class' => '\Drupal\Core\Property\Type\String',
       'primitive' => TRUE,
     ),
     'integer' => array(
-      'label' => t('String'),
-      'class' => 'Drupal\Core\Property\Type\Integer',
+      'label' => t('Integer'),
+      'class' => '\Drupal\Core\Property\Type\Integer',
       'primitive' => TRUE,
+    ),
+    'entity' => array(
+      'label' => t('Entity'),
+      'description' => t('All kind of entities, e.g. nodes, comments or users.'),
+      'class' => '\Drupal\entity\Property\PropertyEntity',
     ),
   );
 }

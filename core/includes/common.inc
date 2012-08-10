@@ -7318,11 +7318,12 @@ function drupal_get_updaters() {
 }
 
 /**
- * @todo: Remove once we've converted to the plugin system. See
- * drupal_get_property_type_plugin().
+ * Gets information about all data types.
+ *
+ * @see drupal_get_property()
  */
 function drupal_get_data_type_info() {
-  $items = &drupal_static(__FUNCTION__);
+  $items = &drupal_static('data_type_info');
   if (!isset($items)) {
     $items = module_invoke_all('data_type_info');
     drupal_alter('data_type_info', $items);
@@ -7331,24 +7332,29 @@ function drupal_get_data_type_info() {
 }
 
 /**
- * Gets an instance of the data type plugin.
+ * Gets a property object.
  *
- * @param string $type
+ * @param array $definition
+ *   The property's definition.
+ * @param $value
+ *   (optional) The property's value. If set, it has to match the property
+ *   type's format.
  *
- * @todo: Make use of plugins once they are there. What's the relationship to
- * field plugins? Maybe field type plugins are just part of that and somehow
- * marked to be available for defining fields?
+ * @return \Drupal\Core\Property\PropertyInterface
  *
- * @return Drupal\Core\Property\PropertyTypeInterface|Drupal\Core\Property\PropertyTypeContainerInterface
+ * @see drupal_get_data_type_info()
  */
-function drupal_get_property_type_plugin($type) {
-  $plugin = &drupal_static(__FUNCTION__);
-  if (!isset($resolver[$type])) {
-    $items = drupal_get_data_type_info();
-    $class = $items[$type]['class'];
-    $plugin[$type] = new $class($type);
+function drupal_get_property(array $definition, $value = NULL) {
+  $type_info = &drupal_static('data_type_info');
+
+  if (!isset($type_info)) {
+    drupal_get_data_type_info();
   }
-  return $plugin[$type];
+
+  // Allow per-property definition overrides of the used classes.
+  $class_info = $definition + $type_info[$definition['type']];
+  $class = empty($definition['list']) ? $class_info['class'] : $class_info['list class'];
+  return new $class($definition, $value);
 }
 
 /**

@@ -185,6 +185,26 @@ class TestEntityStorageController extends DatabaseStorageController {
   }
 
   /**
+   * Gets an array property definitions for the entity's properties.
+   *
+   * @param array $definition
+   *   The definition of the container's property, e.g. the definition of an
+   *   entity reference property.
+   *
+   * @todo Add to interface.
+   */
+  public function getPropertyDefinitions($bundle = NULL) {
+    // @todo: Add static caching.
+    $definitions = $this->basePropertyDefinitions();
+
+    // Allow modules to add their own property definitions. E.g. this is
+    // implemented by field.module to add definitions for its fields.
+    $context = array('bundle' => $bundle);
+    drupal_alter('entity_property_definition', $entity_type, $definitions, $context);
+    return $definitions;
+  }
+
+  /**
    * Implements \Drupal\entity\EntityStorageControllerInterface.
    */
   public function basePropertyDefinitions() {
@@ -192,12 +212,14 @@ class TestEntityStorageController extends DatabaseStorageController {
       'label' => t('Name'),
       'description' => ('The name of the test entity.'),
       'type' => 'text_item',
+      'list' => TRUE,
     );
     $properties['user'] = array(
       'label' => t('User'),
       'description' => t('The associated user.'),
       'type' => 'entityreference_item',
       'entity type' => 'user',
+      'list' => TRUE,
     );
     return $properties;
   }

@@ -41,9 +41,6 @@ class TestEntity extends Entity {
     // converted.
     $this->entityType = $entity_type;
 
-    // @todo: Use dependency injection.
-    $this->dataType = drupal_get_property_type_plugin('entity');
-
     // @todo: Should we unset defined properties or initialize all entity
     // property objects here, so we have the magic getter working with
     // properties defined in the entity class.

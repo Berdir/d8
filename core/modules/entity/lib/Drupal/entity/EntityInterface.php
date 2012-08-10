@@ -205,30 +205,4 @@ interface EntityInterface extends PropertyContainerInterface {
    *   TRUE if the entity is the current revision, FALSE otherwise.
    */
   public function isCurrentRevision();
-
-
-  /**
-   * Returns the raw value of an entity property.
-   *
-   * Returned property values match their property information as declared in
-   * hook_entity_property_info(). However for entity references just the IDs
-   * of the entities will be returned, e.g. a user ID will be returned for the
-   * node author property.
-   *
-   * @param $property_name
-   *   The name of the property to return, as described in
-   *   EntityInterface::propertyInfo(); e.g. 'title'.
-   * @param $langcode
-   *   (optional) If the property is translatable, the language code of the
-   *   language that should be used for getting the property. If set to NULL,
-   *   the entity's default language is being used.
-   *
-   * @return
-   *   The raw property value, or NULL if it is not defined.
-   *
-   * @see EntityInterface::set()
-   * @see EntityInterface::get()
-   * @see EntityInterface::language()
-   */
-  public function getRawValue($property_name, $langcode = NULL);
 }
