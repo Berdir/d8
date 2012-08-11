@@ -221,7 +221,15 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
       // @see Drupal\entity\EntityInterface::__construct()
       $query_result->setFetchMode(PDO::FETCH_CLASS, $this->entityInfo['entity class'], array(array(), $this->entityType));
     }
-    return $query_result->fetch();
+    $queried_entities = $query_result->fetchAllAssoc($this->idKey);
+
+    // Pass the loaded entities from the database through $this->attachLoad(),
+    // which attaches fields (if supported by the entity type) and calls the
+    // entity type specific load callback, for example hook_node_load().
+    if (!empty($queried_entities)) {
+      $this->attachLoad($queried_entities);
+    }
+    return reset($queried_entities);
   }
 
   /**

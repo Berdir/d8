@@ -45,9 +45,11 @@ class EntityTestStorageController extends DatabaseStorageController {
         unset($values['default_langcode']);
       }
 
+      $entity_fields = $this->entityInfo['schema_fields_sql']['base table'];
       $query->addField('data', $this->idKey);
       foreach ($values as $field => $value) {
-        $query->condition('data.' . $field, $value);
+        $table = isset($entity_fields[$field]) ? 'base' : 'data';
+        $query->condition($table . '.' . $field, $value);
       }
     }
     $ids = $query->execute()->fetchCol();

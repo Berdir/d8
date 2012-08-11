@@ -63,7 +63,7 @@ class FileFieldRevisionTest extends FileFieldTestBase {
     $this->assertFileIsPermanent($node_file_r2, t('Replacement file is permanent.'));
 
     // Check that the original file is still in place on the first revision.
-    $node = node_load_revision($node_vid_r1);
+    $node = node_revision_load($node_vid_r1);
     $this->assertEqual($node_file_r1, file_load($node->{$field_name}[LANGUAGE_NOT_SPECIFIED][0]['fid']), t('Original file still in place after replacing file in new revision.'));
     $this->assertFileExists($node_file_r1, t('Original file still in place after replacing file in new revision.'));
     $this->assertFileEntryExists($node_file_r1, t('Original file entry still in place after replacing file in new revision'));

@@ -88,8 +88,8 @@ class PageEditTest extends NodeTestBase {
     $this->assertIdentical($node->uid, $revised_node->uid, 'The node author has been preserved.');
     // Ensure that the revision authors are different since the revisions were
     // made by different users.
-    $first_node_version = node_load_revision($node->vid);
-    $second_node_version = node_load_revision($revised_node->vid);
+    $first_node_version = node_revision_load($node->vid);
+    $second_node_version = node_revision_load($revised_node->vid);
     $this->assertNotIdentical($first_node_version->revision_uid, $second_node_version->revision_uid, 'Each revision has a distinct user.');
   }
 
