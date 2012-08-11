@@ -45,11 +45,11 @@ class EntityTestStorageController extends DatabaseStorageController {
         unset($values['default_langcode']);
       }
 
-      $entity_fields = $this->entityInfo['schema_fields_sql']['base table'];
+      $data_schema = drupal_get_schema('entity_test_property_data');
       $query->addField('data', $this->idKey);
       foreach ($values as $field => $value) {
         // Check on which table the condition needs to be added.
-        $table = in_array($field, $entity_fields) ? 'base' : 'data';
+        $table = isset($data_schema['fields'][$field]) ? 'data' : 'base';
         $query->condition($table . '.' . $field, $value);
       }
     }
