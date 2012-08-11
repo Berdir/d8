@@ -657,10 +657,6 @@ function field_attach_load($entity_type, $entities, $age = FIELD_LOAD_CURRENT, $
     // Collect the storage backends used by the remaining fields in the entities.
     $storages = array();
     foreach ($queried_entities as $entity) {
-      if (!($entity instanceof EntityInterface)) {
-        debug(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
-        debug($entity);
-      }
       $instances = _field_invoke_get_instances($entity_type, $entity->bundle(), $options);
       $id = $entity->id();
       $vid = $entity->getRevisionId();
