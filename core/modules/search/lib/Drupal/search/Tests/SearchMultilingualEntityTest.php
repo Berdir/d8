@@ -19,7 +19,7 @@ class SearchMultilingualEntityTest extends SearchTestBase {
    */
   protected $searchable_nodes = array();
 
-  protected static $modules = array('language', 'locale', 'comment');
+  public static $modules = array('language', 'locale', 'comment');
 
   public static function getInfo() {
     return array(
