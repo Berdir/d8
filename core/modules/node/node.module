@@ -1022,7 +1022,7 @@ function node_load($nid = NULL, $reset = FALSE) {
  *   A fully-populated node entity, or FALSE if the node is not found.
  */
 function node_revision_load($vid = NULL) {
-  return entity_load_revision('node', $vid);
+  return entity_revision_load('node', $vid);
 }
 
 /**
