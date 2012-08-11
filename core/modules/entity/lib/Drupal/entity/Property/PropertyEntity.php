@@ -32,20 +32,32 @@ class PropertyEntity implements PropertyInterface, PropertyContainerInterface {
   protected $entityType;
 
   /**
-   * The entity ID.
+   * The property holding the entity ID.
    *
-   * @var mixed
+   * @var \Drupal\Core\Property\PropertyInterface
    */
   protected $id;
 
   /**
    * Implements PropertyInterface::__construct().
    */
-  function __construct(array $definition, $value = NULL) {
+  public function __construct(array $definition, $value = NULL) {
     $this->definition = $definition;
+    $this->entityType = isset($this->definition['entity type']) ? $this->definition['entity type'] : NULL;
+
     if (isset($value)) {
       $this->setValue($value);
     }
+  }
+
+  /**
+   * Sets the source ID property for the entity.
+   *
+   * @param \Drupal\Core\Property\PropertyInterface $property
+   *   The property holding the entity ID.
+   */
+  public function setIdProperty(PropertyInterface $property) {
+    $this->id = $property;
   }
 
   /**
@@ -72,7 +84,8 @@ class PropertyEntity implements PropertyInterface, PropertyContainerInterface {
    * Implements PropertyInterface::getValue().
    */
   public function getValue() {
-    return $this->id ? entity_load($this->entityType, $this->id) : NULL;
+    $id = $this->id->getValue();
+    return $id ? entity_load($this->entityType, $id) : NULL;
   }
 
   /**
@@ -82,14 +95,13 @@ class PropertyEntity implements PropertyInterface, PropertyContainerInterface {
    */
   public function setValue($value) {
     if (!isset($value)) {
-      $this->id = NULL;
+      $this->id->setValue(NULL);
     }
     elseif (is_scalar($value) && !empty($this->definition['entity type'])) {
-      $this->id = $value;
-      $this->entityType = $this->definition['entity type'];
+      $this->id->setValue($value);
     }
     elseif ($value instanceof \Drupal\entity\EntityInterface) {
-      $this->id = $value->id();
+      $this->id->setValue($value->id());
       $this->entityType = $value->entityType();
     }
     // @todo: Through exception if invalid value is passed.

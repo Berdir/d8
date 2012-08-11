@@ -14,6 +14,25 @@ use \Drupal\entity\EntityPropertyItemBase;
 class PropertyEntityReferenceItem extends EntityPropertyItemBase {
 
   /**
+   * Overrides EntityPropertyItemBase::__construct().
+   */
+  public function __construct(array $definition, $value = NULL) {
+    $this->definition = $definition;
+
+    // Initialize all property objects.
+    foreach ($this->getPropertyDefinitions() as $name => $definition) {
+      $this->properties[$name] = drupal_get_property($definition);
+    }
+
+    // Link the entity property with its source ID.
+    $this->properties['entity']->setIdProperty($this->properties['id']);
+
+    if (isset($value)) {
+      $this->setValue($value);
+    }
+  }
+
+  /**
    * Implements PropertyContainerInterface::getPropertyDefinitions().
    */
   public function getPropertyDefinitions() {
@@ -36,15 +55,11 @@ class PropertyEntityReferenceItem extends EntityPropertyItemBase {
   }
 
   /**
-   * Overrides EntityPropertyItemBase::get().
+   * Overrides EntityPropertyItemBase::setProperties().
    */
-  public function get($property_name) {
-    // @todo: Somehow reset the property if the ID changes.
-    if ($property_name == 'entity') {
-      // Instantiate the property with the Entity ID.
-      $id = isset($this->properties['id']) ? $this->properties['id']->getValue() : NULL;
-      $this->properties[$property_name] = drupal_get_property($this->getPropertyDefinition($property_name), $id);
-    }
-    return parent::get($property_name);
+  public function setProperties($properties) {
+    parent::setProperties($properties);
+    // Make sure the entity property is linked with the ID.
+    $this->properties['entity']->setIdProperty($this->properties['id']);
   }
 }
