@@ -1009,8 +1009,7 @@ function node_load_multiple($nids = array(), $reset = FALSE) {
  *   A fully-populated node entity, or FALSE if the node is not found.
  */
 function node_load($nid = NULL, $reset = FALSE) {
-  $node = node_load_multiple(array($nid), $reset);
-  return $node ? reset($node) : FALSE;
+  return entity_load('node', $nid, $reset);
 }
 
 /**

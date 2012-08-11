@@ -48,7 +48,8 @@ class EntityTestStorageController extends DatabaseStorageController {
       $entity_fields = $this->entityInfo['schema_fields_sql']['base table'];
       $query->addField('data', $this->idKey);
       foreach ($values as $field => $value) {
-        $table = isset($entity_fields[$field]) ? 'base' : 'data';
+        // Check on which table the condition needs to be added.
+        $table = in_array($field, $entity_fields) ? 'base' : 'data';
         $query->condition($table . '.' . $field, $value);
       }
     }

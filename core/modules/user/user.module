@@ -2290,7 +2290,7 @@ function user_delete($uid) {
  */
 function user_delete_multiple(array $uids) {
   if (!empty($uids)) {
-    $accounts = user_load_multiple($uids, array());
+    $accounts = user_load_multiple($uids);
 
     $transaction = db_transaction();
     try {

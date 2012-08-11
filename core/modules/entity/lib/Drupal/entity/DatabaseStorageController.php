@@ -227,7 +227,7 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
     // which attaches fields (if supported by the entity type) and calls the
     // entity type specific load callback, for example hook_node_load().
     if (!empty($queried_entities)) {
-      $this->attachLoad($queried_entities);
+      $this->attachLoad($queried_entities, $revision_id);
     }
     return reset($queried_entities);
   }

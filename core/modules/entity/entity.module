@@ -146,7 +146,7 @@ function entity_info_cache_clear() {
  * @see Drupal\entity\EntityFieldQuery
  */
 function entity_load($entity_type, $id, $reset = FALSE) {
-  $entities = entity_load_multiple($entity_type, array($id), array(), $reset);
+  $entities = entity_load_multiple($entity_type, array($id), $reset);
   return isset($entities[$id]) ? $entities[$id] : FALSE;
 }
 
