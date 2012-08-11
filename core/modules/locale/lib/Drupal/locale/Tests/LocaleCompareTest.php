@@ -12,7 +12,10 @@ use Drupal\simpletest\WebTestBase;
 /**
  * Tests for comparing status of existing project translations with available translations.
  */
-class LocaleCompareUnitTest extends WebTestBase {
+class LocaleCompareTest extends WebTestBase {
+
+  protected static $modules = array('update', 'locale', 'locale_test');
+
   public static function getInfo() {
     return array(
       'name' => 'Compare project states',
@@ -21,21 +24,14 @@ class LocaleCompareUnitTest extends WebTestBase {
     );
   }
 
-  function setUp() {
-    parent::setUp(array('update', 'locale', 'locale_test'));
-
-    // Create Article node type.
-    $this->drupalCreateContentType(array('type' => 'article', 'name' => 'Article'));
-
-    // Create and login user.
-    $admin_user = $this->drupalCreateUser(array('administer site configuration', 'administer languages', 'access administration pages', 'create article content'));
-    $this->drupalLogin($admin_user);
-  }
-
   /**
-   * Unit tests for translation status storage and translation status compare.
+   * Tets for translation status storage and translation status compare.
    */
   function testLocaleCompare() {
+    // Create and login user.
+    $admin_user = $this->drupalCreateUser(array('administer site configuration', 'administer languages', 'access administration pages'));
+    $this->drupalLogin($admin_user);
+
     module_load_include('compare.inc', 'locale');
 
     // Check if hidden modules are not included.

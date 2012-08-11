@@ -40,5 +40,5 @@ function locale_test_locale_translation_additional_project_info() {
     ),
   );
 
-	return $projects;
+  return $projects;
 }

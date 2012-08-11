@@ -30,8 +30,7 @@ function hook_locale_translation_projects_alter(&$projects) {
 }
 
 /**
- * Allows modules and themes to define or alter project definitions for
- * interface translation.
+ * Allows to define or alter project definitions for interface translation.
  *
  * Themes can implement this hook too in their template.php file.
  *
@@ -42,7 +41,7 @@ function hook_locale_translation_additional_project_info() {
   // If your custom module contains new strings the Locale interface translation
   // can be configured to recognize and import the translations.
   // The tanslations can be located in the local file system or remotely in a
-  // translation server (similar to localization.drupal.org).
+  // translation server (similar to localize.drupal.org).
   // Required: type. "project" is required if the "example_project" is a custom
   // module and not a contributed module.
 
@@ -83,8 +82,7 @@ function hook_locale_translation_additional_project_info() {
     ),
   );
 
-  // Themes can implement this hook too in their template.php file (but only
-  // in this file!).
+  // Themes can implement this hook too.
   $projects['zen'] = array(
     'type' => 'theme',
     'info' => array(

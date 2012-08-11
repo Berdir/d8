@@ -654,7 +654,7 @@ function locale_update_8009() {
 /**
  * Add {locale_file} table.
  */
-function locale_update_8010() {
+function locale_update_8011() {
   $table = array(
     'description' => 'File import status information for interface translation files.',
     'fields' => array(

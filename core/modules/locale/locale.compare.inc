@@ -2,7 +2,7 @@
 
 /**
  * @file
- *   The API for comparing project translation status with available translation.
+ * The API for comparing project translation status with available translation.
  */
 
 /**
@@ -64,8 +64,6 @@ function locale_translation_flush_projects() {
 
 /**
  * Build list of projects and stores the result in the database.
- *
- * Based on l10n_update_build_projects().
  */
 function locale_translation_build_projects() {
   // This function depends on Update module. We degrade gracefully.
@@ -75,6 +73,8 @@ function locale_translation_build_projects() {
 
   // Get the project list based on .info files.
   $projects = locale_translation_project_list();
+
+  $transaction = db_transaction();
 
   // Mark all previous projects as disabled and store new project data.
   db_update('locale_project')
@@ -165,7 +165,7 @@ function locale_translation_build_projects() {
 /**
  * Fetch an array of projects for translation update.
  *
- * @return
+ * @return array
  *   Array of project data including .info file data.
  */
 function locale_translation_project_list() {
@@ -211,12 +211,12 @@ function locale_translation_project_list() {
  * project = myproject" in its .info file. This function will add a project
  * "myproject" to the info data.
  *
- * @param $data
+ * @param array $data
  *   Array of .info file data.
- * @param $type
+ * @param string $type
  *   The project type. i.e. module, theme.
  *
- * @return
+ * @return array
  *   Array of .info file data.
  */
 function _locale_translation_prepare_project_list($data, $type) {
@@ -250,15 +250,15 @@ function _locale_translation_prepare_project_list($data, $type) {
 /**
  * Fetch additional project definitions and definition overrides.
  *
- * @return
- *   Array of custom project.
+ * @return array
+ *   Array of custom projects.
  *
  * @see hook_locale_translation_additional_project_info().
  */
 function locale_translation_get_additional_projects() {
   $projects = &drupal_static(__FUNCTION__, array());
 
-    if (empty($projects)) {
+  if (empty($projects)) {
     $hook = 'locale_translation_additional_project_info';
 
     // Call hook_locale_translation_additional_project_info for modules.
@@ -283,11 +283,11 @@ function locale_translation_get_additional_projects() {
 /**
  * Retrieve data for default server.
  *
- * @return
+ * @return array
  *   Array of server parameters:
  *   - "server": Localization server name
  *   - "server_url": Localization server URL where language list can be
- *                   retrieved.
+ *     retrieved.
  *   - "server_pattern": URL containing po file pattern.
  */
 // @todo: Rework the individual vars to a hook_locale_translation_server_info() with sets of server definitions?
@@ -307,14 +307,14 @@ function locale_translation_default_translation_server() {
  *   information or just the URL.
  * - From server_url in a project, we'll fetch the latest data from the server.
  *
- * @param $name
+ * @param string $name
  *   Server name e.g. localize.drupal.org
- * @param $url
+ * @param string $url
  *   Server url
- * @param $refresh
+ * @param bool $refresh
  *   TRUE = refresh the server data.
  *
- * @return
+ * @return array
  *   Array of server data.
  */
 function locale_translation_translation_servers($name = NULL, $url = NULL, $refresh = FALSE) {
@@ -329,11 +329,11 @@ function locale_translation_translation_servers($name = NULL, $url = NULL, $refr
   if (!$url && $name && isset($server_list[$name])) {
     $url = $server_list[$name]['server_url'];
   }
-  // If we still don't have an url, cannot find this server, return false.
+  // If we still don't have a URL, cannot find this server, return false.
   if (!$url) {
     return FALSE;
   }
-  // Cache server information based on the url, refresh if asked.
+  // Cache server information based on the URL, refresh if asked.
   $cid = 'interface_translation_server:' . $url;
   if ($refresh) {
     unset($info);
@@ -376,10 +376,10 @@ function locale_translation_translation_servers($name = NULL, $url = NULL, $refr
 /**
  * Build path to translation source, out of a server path replacement pattern.
  *
- * @param $project
+ * @param stdClass $project
  *   Project object containing data to be inserted in the template.
- * @param $template
- *   String containing place holders. Available place holders:
+ * @param string $template
+ *   String containing place holders. Available placeholders:
  *   - "%project": Project name.
  *   - "%version": Poject version.
  *   - "%core": Project core version.
