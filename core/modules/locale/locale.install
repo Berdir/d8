@@ -32,6 +32,7 @@ function locale_uninstall() {
   variable_del('locale_cache_length');
   variable_del('locale_translation_plurals');
   variable_del('locale_translation_javascript');
+  // @todo Delete locale_translation_ variables.
 
   // Remove all node type language variables. Node module might have been
   // enabled, but may be disabled, so use a wildcard delete.
@@ -158,6 +159,73 @@ function locale_schema() {
     ),
     'primary key' => array('uri', 'langcode'),
   );
+
+  $schema['locale_project'] = array(
+    'description' => 'Update information for project translations.',
+    'fields' => array(
+      'name' => array(
+        'description' => 'A unique short name to identify the project.',
+        'type' => 'varchar',
+        'length' => '50',
+        'not null' => TRUE,
+      ),
+      'project_type' => array(
+        'description' => 'Project type, may be core, module, theme',
+        'type' => 'varchar',
+        'length' => '50',
+        'not null' => TRUE,
+      ),
+      'core' => array(
+        'description' => 'Core compatibility string for this project.',
+        'type' => 'varchar',
+        'length' => '128',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'version' => array(
+        'description' => 'Human readable name for project used on the interface.',
+        'type' => 'varchar',
+        'length' => '128',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'server' => array(
+        'description' => 'Translation server for this project. If empty, the default is used.',
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'server_url' => array(
+        'description' => 'URL of the xml file at the translation server containing all available languages.',
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'server_pattern' => array(
+        'description' => 'Pattern of path and name of the gettext file at the translation server.',
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'status' => array(
+        'description' => 'Status flag. TBD',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 1,
+      ),
+    ),
+    'primary key' => array('name'),
+  );
+
+  $schema['cache_locale'] = drupal_get_schema_unprocessed('system', 'cache');
+  $schema['cache_locale']['description'] = 'Cache table for the locale module to store various data.';
+
+  // @todo Enable if required.
+  //$schema['cache_locale_update'] = drupal_get_schema_unprocessed('system', 'cache');
+  //$schema['cache_locale_update']['description'] = 'Cache table for the Localization Update module to store information about available releases, fetched from central server.';
 
   return $schema;
 }
@@ -620,6 +688,77 @@ function locale_update_8010() {
     'primary key' => array('uri', 'langcode'),
   );
   db_create_table('locale_file', $table);
+}
+
+/**
+ * Add a cache table and locale_project table for the locale module.
+ */
+function locale_update_8010() {
+  // Add a 'locale' cache table.
+  $table = drupal_get_schema_unprocessed('system', 'cache');
+  $table['description'] = 'Cache table for the locale module to store various data.';
+  db_create_table('cache_locale', $table);
+
+  // Add locale_project table.
+  db_create_table('locale_project', array(
+    'description' => 'Update information for project translations.',
+    'fields' => array(
+      'name' => array(
+        'description' => 'A unique short name to identify the project.',
+        'type' => 'varchar',
+        'length' => '50',
+        'not null' => TRUE,
+      ),
+      'project_type' => array(
+        'description' => 'Project type, may be core, module, theme',
+        'type' => 'varchar',
+        'length' => '50',
+        'not null' => TRUE,
+      ),
+      'core' => array(
+        'description' => 'Core compatibility string for this project.',
+        'type' => 'varchar',
+        'length' => '128',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'version' => array(
+        'description' => 'Human readable name for project used on the interface.',
+        'type' => 'varchar',
+        'length' => '128',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'server' => array(
+        'description' => 'Translation server for this project. If empty, the default is used.',
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'server_url' => array(
+        'description' => 'URL of the xml file at the translation server containing all available languages.',
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'server_pattern' => array(
+        'description' => 'Pattern of path and name of the gettext file at the translation server.',
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'status' => array(
+        'description' => 'Status flag. TBD',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 1,
+      ),
+    ),
+    'primary key' => array('name'),
+  ));
 }
 
 /**
