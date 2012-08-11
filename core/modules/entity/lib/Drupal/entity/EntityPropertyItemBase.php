@@ -39,6 +39,12 @@ abstract class EntityPropertyItemBase implements EntityPropertyItemInterface {
    */
   public function __construct(array $definition, $value = NULL) {
     $this->definition = $definition;
+
+    // Initialize all property objects.
+    foreach ($this->getPropertyDefinitions() as $name => $definition) {
+      $this->properties[$name] = drupal_get_property($definition);
+    }
+
     if (isset($value)) {
       $this->setValue($value);
     }
@@ -76,29 +82,10 @@ abstract class EntityPropertyItemBase implements EntityPropertyItemInterface {
    *   An array of property values.
    */
   public function setValue($values) {
-
-    if (isset($values)) {
-      $definitions = $this->getPropertyDefinitions();
-
-      // Clear the values of properties for which no value has been passed.
-      foreach (array_diff_key($definitions, $values) as $name => $definition) {
-        unset($this->properties[$name]);
-      }
-
-      // Set the values.
-      foreach ($values as $name => $value) {
-        if (!isset($this->properties[$name]) && isset($definitions[$name])) {
-          $this->properties[$name] = drupal_get_property($definitions[$name], $value);
-        }
-        elseif (isset($definitions[$name])) {
-          $this->properties[$name]->setValue($value);
-        }
-        // @todo: Throw an exception else? Invalid value given?
-      }
+    foreach ($this->properties as $name => $property) {
+      $property->setValue(isset($values[$name]) ? $values[$name] : NULL);
     }
-    else {
-      $this->properties = array();
-    }
+    // @todo: Throw an exception for invalid values ? Invalid value given?
   }
 
   /**
@@ -123,11 +110,7 @@ abstract class EntityPropertyItemBase implements EntityPropertyItemInterface {
    * Implements PropertyInterface::get().
    */
   public function get($property_name) {
-    // If no property object is there yet, create a new and empty object.
-    if (!isset($this->properties[$property_name])) {
-      $definition = $this->getPropertyDefinition($property_name);
-      $this->properties[$property_name] = drupal_get_property($definition);
-    }
+    // @todo: Throw an exception if an invalid property is requested.
     return $this->properties[$property_name];
   }
 
@@ -162,9 +145,8 @@ abstract class EntityPropertyItemBase implements EntityPropertyItemInterface {
    * Implements PropertyContainerInterface::setProperties().
    */
   public function setProperties($properties) {
-    $definitions = $this->getPropertyDefinitions();
     foreach ($properties as $name => $property) {
-      if (isset($definitions[$name])) {
+      if (isset($this->properties[$name])) {
         $this->properties[$name] = $property;
       }
       // @todo: Throw exception else, invalid properties given?.

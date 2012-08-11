@@ -40,7 +40,7 @@ class PropertyEntityReferenceItem extends EntityPropertyItemBase {
    */
   public function get($property_name) {
     // @todo: Somehow reset the property if the ID changes.
-    if ($property_name == 'entity' && !isset($this->properties[$property_name])) {
+    if ($property_name == 'entity') {
       // Instantiate the property with the Entity ID.
       $id = isset($this->properties['id']) ? $this->properties['id']->getValue() : NULL;
       $this->properties[$property_name] = drupal_get_property($this->getPropertyDefinition($property_name), $id);
