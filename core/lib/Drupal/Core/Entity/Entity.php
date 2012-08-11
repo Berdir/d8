@@ -42,6 +42,13 @@ class Entity implements EntityInterface {
   protected $enforceIsNew;
 
   /**
+   * Boolean indicating whether a new revision should be created on save.
+   *
+   * @var bool
+   */
+  protected $enforceNewRevision;
+
+  /**
    * Indicates whether this is the default revision.
    *
    * @var bool
@@ -81,10 +88,25 @@ class Entity implements EntityInterface {
   }
 
   /**
+   * Implements EntityInterface::isNewRevision().
+   */
+  public function isNewRevision() {
+    $info = $this->entityInfo();
+    return $this->enforceNewRevision || (!empty($info['entity keys']['revision']) && !$this->getRevisionId());
+  }
+
+  /**
    * Implements EntityInterface::enforceIsNew().
    */
   public function enforceIsNew($value = TRUE) {
     $this->enforceIsNew = $value;
+  }
+
+  /**
+   * Implements EntityInterface::enforceIsNewRevision().
+   */
+  public function enforceNewRevision($value = TRUE) {
+    $this->enforceNewRevision = $value;
   }
 
   /**

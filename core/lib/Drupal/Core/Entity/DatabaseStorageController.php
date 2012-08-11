@@ -437,6 +437,13 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
       db_delete($this->entityInfo['base table'])
         ->condition($this->idKey, $ids, 'IN')
         ->execute();
+
+      if ($this->revisionKey) {
+        db_delete($this->revisionTable)
+          ->condition($this->idKey, $ids, 'IN')
+          ->execute();
+      }
+
       // Reset the cache as soon as the changes have been applied.
       $this->resetCache($ids);
 
@@ -470,12 +477,18 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
 
       if (!$entity->isNew()) {
         $return = drupal_write_record($this->entityInfo['base table'], $entity, $this->idKey);
+        if ($this->revisionKey) {
+          $this->saveRevision($entity);
+        }
         $this->resetCache(array($entity->{$this->idKey}));
         $this->postSave($entity, TRUE);
         $this->invokeHook('update', $entity);
       }
       else {
         $return = drupal_write_record($this->entityInfo['base table'], $entity);
+        if ($this->revisionKey) {
+          $this->saveRevision($entity);
+        }
         // Reset general caches, but keep caches specific to certain entities.
         $this->resetCache(array());
 
@@ -495,6 +508,42 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
       watchdog_exception($this->entityType, $e);
       throw new EntityStorageException($e->getMessage(), $e->getCode(), $e);
     }
+  }
+
+  /**
+   * Saves a node revision.
+   *
+   * @param Drupal\entity\EntityInterface $node
+   *   The node entity.
+   */
+  protected function saveRevision(EntityInterface $entity) {
+    $revision = clone $entity;
+    // When saving a new revision, unset any existing revision ID so as to
+    // ensure that a new revision will actually be created, then store the old
+    // revision ID in a separate property for use by hook implementations.
+    if ($revision->isNewRevision() && $revision->{$this->revisionKey}) {
+      $revision->{'old_' . $this->revisionKey} = $revision->getRevisionId();
+      $revision->{$this->revisionKey} = NULL;
+    }
+
+    $this->preSaveRevision($revision);
+
+    if ($revision->isNewRevision()) {
+      drupal_write_record($this->revisionTable, $revision);
+      db_update($this->entityInfo['base table'])
+        ->fields(array($this->revisionKey => $revision->getRevisionId()))
+        ->condition($this->idKey, $revision->id())
+        ->execute();
+      $entity->enforceNewRevision(FALSE);
+    }
+    else {
+      drupal_write_record($this->revisionTable, $revision, $this->revisionKey);
+    }
+    // Make sure to update the new revision key for the entity.
+    $entity->{$this->revisionKey} = $revision->getRevisionId();
+
+    // Mark this revision as the current one.
+    $entity->isCurrentRevision = TRUE;
   }
 
   /**
@@ -529,6 +578,14 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
    * Used after the entities are deleted but before invoking the delete hook.
    */
   protected function postDelete($entities) { }
+
+  /**
+   * Act on a revision before being saved.
+   *
+   * @param Drupal\entity\EntityInterface $revision
+   *   The entity object.
+   */
+  protected function preSaveRevision(EntityInterface $revision) { }
 
   /**
    * Invokes a hook on behalf of the entity.

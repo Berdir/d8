@@ -57,6 +57,26 @@ interface EntityInterface {
   public function isNew();
 
   /**
+   * Returns whether a new revisions should be created on save.
+   *
+   * @return
+   *   TRUE if a new revision should be created.
+   *
+   * @see Drupal\entity\EntityInterface::newRevision()
+   */
+  public function isNewRevision();
+
+  /**
+   * Enforces an entity to be saved as a new revision.
+   *
+   * @param bool $value
+   *   (optional) Whether a new revision should be saved.
+   *
+   * @see Drupal\entity\EntityInterface::isNewRevision()
+   */
+  public function enforceNewRevision($value = TRUE);
+
+  /**
    * Enforces an entity to be new.
    *
    * Allows migrations to create entities with pre-defined IDs by forcing the
