@@ -14,7 +14,12 @@ use Drupal\simpletest\WebTestBase;
  */
 class LocaleCompareTest extends WebTestBase {
 
-  protected static $modules = array('update', 'locale', 'locale_test');
+  /**
+   * Modules to enable.
+   *
+   * @var array
+   */
+  public static $modules = array('update', 'locale', 'locale_test');
 
   public static function getInfo() {
     return array(
