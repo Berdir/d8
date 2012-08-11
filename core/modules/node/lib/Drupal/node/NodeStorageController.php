@@ -106,7 +106,7 @@ class NodeStorageController extends DatabaseStorageController {
   /**
    * Overrides Drupal\entity\DatabaseStorageController::preSaveRevision().
    */
-  protected function preSaveRevision(EntityInterface $revision, EntityInterface $entity) {
+  protected function preSaveRevision(EntityInterface $revision) {
     if ($revision->isNewRevision()) {
       // When inserting either a new node or a new node revision, $node->log
       // must be set because {node_revision}.log is a text column and therefore
