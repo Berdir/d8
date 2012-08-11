@@ -32,7 +32,9 @@ class String implements PropertyInterface {
    */
   function __construct(array $definition, $value = NULL) {
     $this->definition = $definition;
-    $this->setValue($value);
+    if (isset($value)) {
+      $this->setValue($value);
+    }
   }
 
   /**

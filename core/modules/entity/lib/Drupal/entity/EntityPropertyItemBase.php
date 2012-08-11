@@ -39,7 +39,9 @@ abstract class EntityPropertyItemBase implements EntityPropertyItemInterface {
    */
   public function __construct(array $definition, $value = NULL) {
     $this->definition = $definition;
-    $this->setValue($value);
+    if (isset($value)) {
+      $this->setValue($value);
+    }
   }
 
   /**
