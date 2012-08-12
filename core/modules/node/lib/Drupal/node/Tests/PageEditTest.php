@@ -81,7 +81,7 @@ class PageEditTest extends NodeTestBase {
     $this->drupalPost(NULL, $edit, t('Save'));
 
     // Ensure that the node revision has been created.
-    $revised_node = $this->drupalGetNodeByTitle($edit['title']);
+    $revised_node = $this->drupalGetNodeByTitle($edit['title'], TRUE);
     $this->assertNotIdentical($node->vid, $revised_node->vid, 'A new revision has been created.');
     // Ensure that the node author is preserved when it was not changed in the
     // edit form.
