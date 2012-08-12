@@ -35,7 +35,7 @@ class CommentStorageController extends DatabaseStorageController {
   /**
    * Overrides Drupal\entity\DatabaseStorageController::attachLoad().
    */
-  protected function attachLoad(&$comments, $revision_id = FALSE) {
+  protected function attachLoad(&$comments, $load_revision = FALSE) {
     // Set up standard comment properties.
     foreach ($comments as $key => $comment) {
       $comment->name = $comment->uid ? $comment->registered_name : $comment->name;
@@ -43,7 +43,7 @@ class CommentStorageController extends DatabaseStorageController {
       $comment->node_type = 'comment_node_' . $comment->node_type;
       $comments[$key] = $comment;
     }
-    parent::attachLoad($comments, $revision_id);
+    parent::attachLoad($comments, $load_revision);
   }
 
   /**

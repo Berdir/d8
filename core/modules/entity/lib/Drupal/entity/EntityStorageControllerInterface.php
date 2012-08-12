@@ -63,9 +63,8 @@ interface EntityStorageControllerInterface {
    * Load entities by their properties.
    *
    * @param array $values
-   *   An associative array of properties of the entity, where
-   *   the keys are the property names and the values are the values those
-   *   properties must have.
+   *   An associative array of properties of the entity, where the keys are the
+   * property names and the values are the values those properties must have.
    *
    * @return array
    *   An array of entity objects indexed by their ids.

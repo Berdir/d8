@@ -227,7 +227,7 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
     // which attaches fields (if supported by the entity type) and calls the
     // entity type specific load callback, for example hook_node_load().
     if (!empty($queried_entities)) {
-      $this->attachLoad($queried_entities, $revision_id);
+      $this->attachLoad($queried_entities, TRUE);
     }
     return reset($queried_entities);
   }
@@ -255,9 +255,8 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
    * @param Drupal\entity\EntityFieldQuery $entity_query
    *   EntityFieldQuery instance.
    * @param array $values
-   *   An associative array of properties of the entity, where
-   *   the keys are the property names and the values are the values those
-   *   properties must have.
+   *   An associative array of properties of the entity, where the keys are the
+   *   property names and the values are the values those properties must have.
    */
   protected function buildPropertyQuery(EntityFieldQuery $entity_query, array $values) {
     foreach ($values as $name => $value) {
@@ -343,14 +342,13 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
    *
    * @param $queried_entities
    *   Associative array of query results, keyed on the entity ID.
-   * @param $revision_id
-   *   ID of the revision that was loaded, or FALSE if the most current revision
-   *   was loaded.
+   * @param $load_revision
+   *   (optional) TRUE if the revision should be loaded, defaults to FALSE.
    */
-  protected function attachLoad(&$queried_entities, $revision_id = FALSE) {
+  protected function attachLoad(&$queried_entities, $load_revision = FALSE) {
     // Attach fields.
     if ($this->entityInfo['fieldable']) {
-      if ($revision_id) {
+      if ($load_revision) {
         field_attach_load_revision($this->entityType, $queried_entities);
       }
       else {

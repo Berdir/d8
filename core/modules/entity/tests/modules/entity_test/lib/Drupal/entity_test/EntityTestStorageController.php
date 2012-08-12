@@ -60,7 +60,7 @@ class EntityTestStorageController extends DatabaseStorageController {
   /**
    * Overrides Drupal\entity\DatabaseStorageController::attachLoad().
    */
-  protected function attachLoad(&$queried_entities, $revision_id = FALSE) {
+  protected function attachLoad(&$queried_entities, $load_revision = FALSE) {
     $data = db_select('entity_test_property_data', 'data', array('fetch' => PDO::FETCH_ASSOC))
       ->fields('data')
       ->condition('id', array_keys($queried_entities))
@@ -78,7 +78,7 @@ class EntityTestStorageController extends DatabaseStorageController {
       $entity->setProperties($values, $langcode);
     }
 
-    parent::attachLoad($queried_entities, $revision_id);
+    parent::attachLoad($queried_entities, $load_revision);
   }
 
   /**
