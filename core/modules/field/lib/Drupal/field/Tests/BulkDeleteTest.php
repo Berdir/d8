@@ -55,6 +55,7 @@ class BulkDeleteTest extends FieldTestBase {
       // entity classes match the actual arguments.
       unset($partial_entities[$id]->ftlabel);
       $partial_entities[$id]->enforceIsNew(NULL);
+      $partial_entities[$id]->enforceNewRevision(NULL);
       $partial_entities[$id]->$field_name = $entity->$field_name;
     }
     return $partial_entities;
