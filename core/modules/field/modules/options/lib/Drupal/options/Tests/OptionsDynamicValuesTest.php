@@ -45,14 +45,11 @@ class OptionsDynamicValuesTest extends FieldTestBase {
       ),
     );
     $this->instance = field_create_instance($this->instance);
+    $this->entity = field_test_create_entity(mt_rand(1, 10));
     $this->test = array(
-      'id' => mt_rand(1, 10),
-      // Make sure this does not equal the ID so that
-      // options_test_dynamic_values_callback() always returns 4 values.
-      'vid' => mt_rand(20, 30),
-      'bundle' => 'test_bundle',
-      'label' => $this->randomName(),
+      'id' => $this->entity->id(),
+      'bundle' => $this->entity->bundle(),
+      'label' => $this->entity->label(),
     );
-    $this->entity = call_user_func_array('field_test_create_entity', $this->test);
   }
 }

@@ -36,6 +36,13 @@ class TestEntity extends Entity {
   public $fttype;
 
   /**
+   * Label property
+   *
+   * @var string
+   */
+  public $ftlabel;
+
+  /**
    * Overrides Drupal\Core\Entity\Entity::id().
    */
   public function id() {
@@ -54,6 +61,13 @@ class TestEntity extends Entity {
    */
   public function bundle() {
     return !empty($this->fttype) ? $this->fttype : $this->entityType();
+  }
+
+  /**
+   * Overrides Drupal\entity\Entity::label().
+   */
+  public function label($langcode = NULL) {
+    return $this->ftlabel;
   }
 }
 
