@@ -131,11 +131,8 @@ class NodeStorageController extends DatabaseStorageController {
     }
 
     if ($revision->isNewRevision()) {
-      $revision->revision_timestamp = REQUEST_TIME;
-
-      if (!isset($revision->revision_uid)) {
-        $revision->revision_uid = $GLOBALS['user']->uid;
-      }
+      $revision->timestamp = REQUEST_TIME;
+      $revision->uid = isset($revision->revision_uid) ? $revision->revision_uid : $GLOBALS['user']->uid;
     }
   }
 
