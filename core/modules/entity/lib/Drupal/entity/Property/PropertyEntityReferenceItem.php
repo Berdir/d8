@@ -75,6 +75,9 @@ class PropertyEntityReferenceItem extends EntityPropertyItemBase {
     else {
       $this->properties['entity']->setValue(isset($values['entity']) ? $values['entity'] : NULL);
     }
-    // @todo: Throw an exception for invalid values ? Invalid value given?
+    unset($values['entity'], $values['id']);
+    if ($values) {
+      throw new \InvalidArgumentException('Property ' . key($values) . ' is unknown.');
+    }
   }
 }

@@ -21,7 +21,7 @@ interface PropertyInterface {
    *   (optional) The value of the property, or NULL if the property is not set.
    *    See PropertyInterface::setValue() for details.
    *
-   *  @return PropertyContainerInterface
+   * @return \Drupal\Core\Property\PropertyContainerInterface
    */
   function __construct(array $definition, $value = NULL);
 
@@ -55,7 +55,8 @@ interface PropertyInterface {
    *   The value to set in the format as documented for the property's type or
    *   NULL to unset the property.
    *
-   * @throws InvalidValueException
+   * @throws \Drupal\Core\Property\PropertyReadOnlyException
+   *   If the property is read-only.
    */
   public function setValue($value);
 

@@ -85,7 +85,8 @@ abstract class EntityPropertyItemBase implements EntityPropertyItemInterface {
     foreach ($this->properties as $name => $property) {
       $property->setValue(isset($values[$name]) ? $values[$name] : NULL);
     }
-    // @todo: Throw an exception for invalid values ? Invalid value given?
+    // @todo: Throw an exception for invalid values once conversion is
+    // totally completed.
   }
 
   /**
@@ -110,7 +111,9 @@ abstract class EntityPropertyItemBase implements EntityPropertyItemInterface {
    * Implements PropertyInterface::get().
    */
   public function get($property_name) {
-    // @todo: Throw an exception if an invalid property is requested.
+    if (!isset($this->properties[$property_name])) {
+      throw new \InvalidArgumentException('Property ' . check_plain($property_name) . ' is unknown.');
+    }
     return $this->properties[$property_name];
   }
 
@@ -149,7 +152,9 @@ abstract class EntityPropertyItemBase implements EntityPropertyItemInterface {
       if (isset($this->properties[$name])) {
         $this->properties[$name] = $property;
       }
-      // @todo: Throw exception else, invalid properties given?.
+      else {
+        throw new \InvalidArgumentException('Property ' . check_plain($name) . ' is unknown.');
+      }
     }
   }
 

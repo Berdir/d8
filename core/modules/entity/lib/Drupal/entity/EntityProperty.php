@@ -86,13 +86,15 @@ class EntityProperty implements EntityPropertyInterface {
 
       // Set the values.
       foreach ($values as $delta => $value) {
-        if (!isset($this->list[$delta]) && is_numeric($delta)) {
+        if (!is_numeric($delta)) {
+          throw new \InvalidArgumentException('Unable to set a value with a non-numeric delta in a list.');
+        }
+        elseif (!isset($this->list[$delta])) {
           $this->list[$delta] = $this->createItem($value);
         }
-        elseif (is_numeric($delta)) {
+        else {
           $this->list[$delta]->setValue($value);
         }
-        // @todo: Throw an exception else? Invalid value given?
       }
     }
     else {
@@ -144,13 +146,15 @@ class EntityProperty implements EntityPropertyInterface {
       $offset = $this->list ? max(array_keys($this->list)) + 1 : 0;
     }
 
+    if (!is_numeric($offset)) {
+      throw new \InvalidArgumentException('Unable to get a value with a non-numeric delta in a list.');
+    }
     // Allow getting not yet existing items as well.
-    // @todo: Maybe add a createItem() method instead or in addition?
+    // @todo: Maybe add a public createItem() method instead or in addition?
     // @todo: Needs tests.
-    if (!isset($this->list[$offset]) && is_numeric($offset)) {
+    elseif (!isset($this->list[$offset])) {
       $this->list[$offset] = $this->createItem();
     }
-    // @todo: Throw exception for not numeric offsets.
 
     return $this->list[$offset];
   }
@@ -172,7 +176,9 @@ class EntityProperty implements EntityPropertyInterface {
     if (is_numeric($offset)) {
       $this->list[$offset] = $value;
     }
-    // @todo: Throw exception if offset is invalid.
+    else {
+      throw new \InvalidArgumentException('Unable to set a value with a non-numeric delta in a list.');
+    }
   }
 
   /**

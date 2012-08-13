@@ -35,7 +35,10 @@ interface PropertyContainerInterface extends IteratorAggregate  {
    *   objects implementing the PropertyInterface and must be keyed by property
    *   name.
    *
-   * @throws InvalidArgumentException
+   * @throws \InvalidArgumentException
+   *   If an not existing property is passed.
+   * @throws \Drupal\Core\Property\PropertyReadOnlyException
+   *   If a read-only property is set.
    */
   public function setProperties($properties);
 

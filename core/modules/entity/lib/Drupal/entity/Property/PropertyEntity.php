@@ -110,7 +110,9 @@ class PropertyEntity implements PropertyInterface, PropertyContainerInterface {
       $this->id->setValue($value->id());
       $this->entityType = $value->entityType();
     }
-    // @todo: Through exception if invalid value is passed.
+    else {
+      throw new \InvalidArgumentException('Value is no valid entity.');
+    }
   }
 
   /**
