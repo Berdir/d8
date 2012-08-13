@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Definition of Drupal\entity\Property\PropertyTextItem.
+ * Definition of Drupal\entity\Property\PropertyStringItem.
  */
 
 namespace Drupal\entity\Property;
@@ -9,9 +9,9 @@ use \Drupal\entity\EntityPropertyItemBase;
 
 
 /**
- * Defines the 'text_item' entity property item.
+ * Defines the 'string_item' entity property item.
  */
-class PropertyTextItem extends EntityPropertyItemBase {
+class PropertyStringItem extends EntityPropertyItemBase {
 
   /**
    * Implements PropertyContainerInterface::getPropertyDefinitions().

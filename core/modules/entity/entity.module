@@ -520,10 +520,10 @@ function entity_form_submit_build_entity($entity_type, $entity, $form, &$form_st
  */
 function entity_data_type_info() {
   return array(
-    'text_item' => array(
-      'label' => t('Text item'),
-      'description' => t('An entity property containing a textual value.'),
-      'class' => '\Drupal\entity\Property\PropertyTextItem',
+    'string_item' => array(
+      'label' => t('String item'),
+      'description' => t('An entity property containing a string value.'),
+      'class' => '\Drupal\entity\Property\PropertyStringItem',
       'list class' => '\Drupal\entity\EntityProperty',
     ),
     'entityreference_item' => array(

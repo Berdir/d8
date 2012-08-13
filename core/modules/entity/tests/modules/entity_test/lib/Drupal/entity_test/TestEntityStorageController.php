@@ -211,7 +211,7 @@ class TestEntityStorageController extends DatabaseStorageController {
     $properties['name'] = array(
       'label' => t('Name'),
       'description' => ('The name of the test entity.'),
-      'type' => 'text_item',
+      'type' => 'string_item',
       'list' => TRUE,
     );
     $properties['user'] = array(

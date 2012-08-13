@@ -118,7 +118,7 @@ class EntityPropertyTest extends WebTestBase  {
     );
     $property_entity = drupal_get_property($definition);
     $property_definitions = $property_entity->getPropertyDefinitions($definition);
-    $this->assertEqual($property_definitions['name']['type'], 'text_item', 'Name property found.');
+    $this->assertEqual($property_definitions['name']['type'], 'string_item', 'Name property found.');
     $this->assertEqual($property_definitions['user']['type'], 'entityreference_item', 'User property found.');
 
     // Test introspecting an entity object.
@@ -126,7 +126,7 @@ class EntityPropertyTest extends WebTestBase  {
     $entity = entity_create('entity_test', array());
 
     $definitions = $entity->getPropertyDefinitions();
-    $this->assertEqual($definitions['name']['type'], 'text_item', 'Name property found.');
+    $this->assertEqual($definitions['name']['type'], 'string_item', 'Name property found.');
     $this->assertEqual($definitions['user']['type'], 'entityreference_item', 'User property found.');
 
     $name_properties = $entity->name->getPropertyDefinitions();
