@@ -60,8 +60,18 @@ class TestEntityStorageController extends DatabaseStorageController {
    * @todo: Remove this once this is moved in the main controller.
    */
   public function create(array $values) {
+    $entity = new $this->entityClass(array(), $this->entityType);
 
-    $entity = new $this->entityClass($values, $this->entityType);
+    // Make sure to set the bundle first.
+    if ($this->bundleKey) {
+      $entity->{$this->bundleKey} = $values[$this->bundleKey];
+      unset($values[$this->bundleKey]);
+    }
+
+    // Set all other given values.
+    foreach ($values as $name => $value) {
+      $entity->$name = $value;
+    }
 
     // Assign a new UUID if there is none yet.
     if ($this->uuidKey && !isset($entity->{$this->uuidKey})) {
@@ -127,17 +137,17 @@ class TestEntityStorageController extends DatabaseStorageController {
         $return = drupal_write_record($this->entityInfo['base table'], $record, 'id');
         $this->resetCache(array($entity->{$this->idKey}));
         $this->postSave($entity, TRUE);
-        $this->invokeHook('update', $entity);
+        $this->invokeHook('update', $entity, $record);
       }
       else {
         $return = drupal_write_record($this->entityInfo['base table'], $record);
         // Reset general caches, but keep caches specific to certain entities.
         $this->resetCache(array());
 
-        $entity->{$this->idKey} = $record['id'];
+        $entity->{$this->idKey} = $record->id;
         $entity->enforceIsNew(FALSE);
         $this->postSave($entity, FALSE);
-        $this->invokeHook('insert', $entity);
+        $this->invokeHook('insert', $entity, $record);
       }
 
       // Ignore slave server temporarily.
@@ -154,6 +164,21 @@ class TestEntityStorageController extends DatabaseStorageController {
   }
 
   /**
+   * Overrides DatabaseStorageController::invokeHook().
+   *
+   * Make sure to pass on mapped storage records to field API attachers.
+   */
+  protected function invokeHook($hook, EntityInterface $entity, \stdclass $record = NULL) {
+    if (!empty($this->entityInfo['fieldable']) && function_exists($function = 'field_attach_' . $hook)) {
+      $function($this->entityType, $record ? $record : $entity);
+    }
+    // Invoke the hook.
+    module_invoke_all($this->entityType . '_' . $hook, $entity);
+    // Invoke the respective entity-level hook.
+    module_invoke_all('entity_' . $hook, $entity, $this->entityType);
+  }
+
+  /**
    * Maps from storage records to entity objects.
    *
    * @return array
@@ -162,14 +187,37 @@ class TestEntityStorageController extends DatabaseStorageController {
   protected function mapFromStorageRecords(array $records) {
 
     foreach ($records as $id => $record) {
-      $values = $this->bundleKey ? array($this->bundleKey => $record->{$this->bundleKey}) : array();
+      // Compile values of everything that is no property yet.
+      $values[$this->idKey] = $id;
+      $values['langcode'] = $record->langcode;
+      $values['uuid'] = $record->uuid;
 
+      // Add values for all properties.
+      $property_values = array();
+      $langcode = $record->langcode;
+      $fields = field_info_fields();
+
+      foreach ($record as $name => $value) {
+        switch ($name) {
+          case 'uid':
+            $property_values['user'][$langcode][0]['id'] = $value;
+            break;
+
+          default:
+            if (isset($fields[$name]) && $value) {
+              // Handle per-language values of fields.
+              $property_values[$name] = $value;
+            }
+            elseif (!isset($values[$name])) {
+              $property_values[$name][$langcode][0]['value'] = $value;
+            }
+            break;
+        }
+      }
+
+      // Pass the plain property values in during entity construction.
+      $values['values'] = $property_values;
       $entity = new $this->entityClass($values, $this->entityType);
-      $entity->{$this->idKey} = $id;
-      $entity->{$this->uuidKey} = $record->uuid;
-      $entity->langcode = $record->langcode;
-      $entity->name->value = $record->name;
-      $entity->user->id = $record->uid;
 
       $records[$id] = $entity;
     }
@@ -179,16 +227,34 @@ class TestEntityStorageController extends DatabaseStorageController {
   /**
    * Maps from storage records to entity objects.
    */
-  protected function maptoStorageRecord(EntityInterface $entity) {
-    // Handle base properties and ids.
-    $record['id'] = $entity->id();
-    $record['uuid'] = $entity->uuid;
-    $record['langcode'] = $entity->langcode;
-    $record['name'] = $entity->name->value;
-    $record['uid'] = $entity->user->id;
+  protected function mapToStorageRecord(EntityInterface $entity) {
+    $record = new \stdClass();
+    $record->id = $entity->id();
+    $record->uuid = $entity->uuid;
+    $record->langcode = $entity->langcode;
 
-    // @todo: Handle fields here.
+    foreach ($entity as $name => $property) {
+      switch ($name) {
+        case 'name':
+          $record->name = $entity->name->value;
+          break;
+        case 'user':
+          $record->uid = $entity->user->id;
+          break;
+        default:
+          $definition = $property->getDefinition();
+          // @todo: Support all languages here, e.g. by getting all properties
+          // that have been changed for each language.
 
+          if (!empty($definition['field'])) {
+            $record->{$name}[LANGUAGE_NOT_SPECIFIED] = $property->toArray();
+          }
+          else {
+            $record->$name = $property->toArray();
+          }
+          break;
+      }
+    }
     return $record;
   }
 
@@ -203,7 +269,6 @@ class TestEntityStorageController extends DatabaseStorageController {
    */
   public function getPropertyDefinitions(array $definition) {
     // @todo: Add caching for $this->propertyInfo.
-
     if (!isset($this->propertyInfo)) {
       $this->propertyInfo = array(
         'definitions' => $this->basePropertyDefinitions(),
@@ -215,8 +280,10 @@ class TestEntityStorageController extends DatabaseStorageController {
       );
 
       // Invoke hooks.
-      module_invoke_all($this->entityType . '_property_info');
-      module_invoke_all('entity_property_info', $this->entityType);
+      $result = module_invoke_all($this->entityType . '_property_info');
+      $this->propertyInfo = array_merge_recursive($this->propertyInfo, $result);
+      $result = module_invoke_all('entity_property_info', $this->entityType);
+      $this->propertyInfo = array_merge_recursive($this->propertyInfo, $result);
 
       $hooks = array('entity_property_info', $this->entityType . '_property_info');
       drupal_alter($hooks, $this->propertyInfo, $this->entityType);

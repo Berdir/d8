@@ -94,6 +94,12 @@ class PropertyEntity implements PropertyInterface, PropertyContainerInterface {
    * Both the entity ID and the entity object may be passed as value.
    */
   public function setValue($value) {
+    // First off make sure we have an ID property. If not, create one. Then
+    // continue setting the ID depending on the value passed.
+    if (!isset($this->id)) {
+      $this->id = drupal_get_property(array('type' => 'string'));
+    }
+
     if (!isset($value)) {
       $this->id->setValue(NULL);
     }

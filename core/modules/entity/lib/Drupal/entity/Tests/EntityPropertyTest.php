@@ -7,6 +7,7 @@
 
 namespace Drupal\entity\Tests;
 
+use Drupal\core\Property\PropertyInterface;
 use Drupal\entity\EntityPropertyInterface;
 use Drupal\entity\EntityPropertyItemInterface;
 use Drupal\simpletest\WebTestBase;
@@ -35,13 +36,18 @@ class EntityPropertyTest extends WebTestBase  {
    */
   protected function createTestEntity() {
     $this->entity_name = $this->randomName();
-    $name_property[0]['value'] = $this->entity_name;
     $this->entity_user = $this->drupalCreateUser();
+    $this->entity_field_text = $this->randomName();
 
     // Pass in the value of the name property when creating. With the user
     // property we test setting a property after creation.
-    $entity = entity_create('entity_test', array('name' => $name_property));
+    $entity = entity_create('entity_test', array());
     $entity->user->id = $this->entity_user->uid;
+    $entity->name->value = $this->entity_name;
+
+    // Set a value for the test field.
+    $entity->field_test_text->value = $this->entity_field_text;
+
     return $entity;
   }
 
@@ -87,12 +93,36 @@ class EntityPropertyTest extends WebTestBase  {
     $entity->user->id = $new_user->uid;
     $this->assertEqual($new_user->uid, $entity->user->id, 'Updated user id can be read.');
     $this->assertEqual($new_user->name, $entity->user->entity->name, 'Updated user name value can be read.');
+
+    // Access the text field and test updating.
+    $this->assertEqual($entity->field_test_text->value, $this->entity_field_text, 'Text field can be read.');
+    $new_text = $this->randomName();
+    $entity->field_test_text->value = $new_text;
+    $this->assertEqual($entity->field_test_text->value, $new_text, 'Updated text field can be read.');
+
+    // Test creating the entity by passing in plain values.
+    $this->entity_name = $this->randomName();
+    $name_item[0]['value'] = $this->entity_name;
+    $this->entity_user = $this->drupalCreateUser();
+    $user_item[0]['id'] = $this->entity_user->uid;
+    $this->entity_field_text = $this->randomName();
+    $text_item[0]['value'] = $this->entity_field_text;
+
+    $entity = entity_create('entity_test', array(
+      'name' => $name_item,
+      'user' => $user_item,
+      'field_test_text' => $text_item,
+    ));
+    $this->assertEqual($this->entity_name, $entity->name->value, 'Name value can be read.');
+    $this->assertEqual($this->entity_user->uid, $entity->user->id, 'User id can be read.');
+    $this->assertEqual($this->entity_user->name, $entity->user->entity->name, 'User name can be read.');
+    $this->assertEqual($this->entity_field_text, $entity->field_test_text->value, 'Text field can be read.');
   }
 
   /**
    * Tries to save and load an entity again.
    */
-  function testSave() {
+  public function testSave() {
     $entity = $this->createTestEntity();
     $entity->save();
     $this->assertTrue((bool) $entity->id(), 'Entity has received an id.');
@@ -104,12 +134,13 @@ class EntityPropertyTest extends WebTestBase  {
     $this->assertEqual($this->entity_name, $entity->name->value, 'Name value can be read.');
     $this->assertEqual($this->entity_user->uid, $entity->user->id, 'User id can be read.');
     $this->assertEqual($this->entity_user->name, $entity->user->entity->name, 'User name can be read.');
+    $this->assertEqual($this->entity_field_text, $entity->field_test_text->value, 'Text field can be read.');
   }
 
   /**
    * Tests introspection and getting metadata upfront.
    */
-  function testIntrospection() {
+  public function testIntrospection() {
     // Test getting metadata upfront, i.e. without having an entity object.
     $definition = array(
       'type' => 'entity',
@@ -117,9 +148,10 @@ class EntityPropertyTest extends WebTestBase  {
       'label' => t('Test entity'),
     );
     $property_entity = drupal_get_property($definition);
-    $property_definitions = $property_entity->getPropertyDefinitions($definition);
-    $this->assertEqual($property_definitions['name']['type'], 'string_item', 'Name property found.');
-    $this->assertEqual($property_definitions['user']['type'], 'entityreference_item', 'User property found.');
+    $definitions = $property_entity->getPropertyDefinitions($definition);
+    $this->assertEqual($definitions['name']['type'], 'string_item', 'Name property found.');
+    $this->assertEqual($definitions['user']['type'], 'entityreference_item', 'User property found.');
+    $this->assertEqual($definitions['field_test_text']['type'], 'text_item', 'Test-text-field property found.');
 
     // Test introspecting an entity object.
     // @todo: Add bundles and test bundles as well.
@@ -128,14 +160,19 @@ class EntityPropertyTest extends WebTestBase  {
     $definitions = $entity->getPropertyDefinitions();
     $this->assertEqual($definitions['name']['type'], 'string_item', 'Name property found.');
     $this->assertEqual($definitions['user']['type'], 'entityreference_item', 'User property found.');
+    $this->assertEqual($definitions['field_test_text']['type'], 'text_item', 'Test-text-field property found.');
 
     $name_properties = $entity->name->getPropertyDefinitions();
     $this->assertEqual($name_properties['value']['type'], 'string', 'String value property of the name found.');
 
     $userref_properties = $entity->user->getPropertyDefinitions();
-
     $this->assertEqual($userref_properties['id']['type'], 'integer', 'Entity id property of the user found.');
     $this->assertEqual($userref_properties['entity']['type'], 'entity', 'Entity reference property of the user found.');
+
+    $textfield_properties = $entity->field_test_text->getPropertyDefinitions();
+    $this->assertEqual($textfield_properties['value']['type'], 'string', 'String value property of the test-text field found.');
+    $this->assertEqual($textfield_properties['format']['type'], 'string', 'String format property of the test-text field found.');
+    $this->assertEqual($textfield_properties['processed']['type'], 'string', 'String processed property of the test-text field found.');
 
     // @todo: Once the user entity has definitions, continue testing getting
     // them from the $userref_values['entity'] property.
@@ -144,7 +181,7 @@ class EntityPropertyTest extends WebTestBase  {
   /**
    * Tests iterating over properties.
    */
-  function testIterator() {
+  public function testIterator() {
     $entity = $this->createTestEntity();
 
     foreach ($entity as $name => $property) {
@@ -155,7 +192,7 @@ class EntityPropertyTest extends WebTestBase  {
 
         foreach ($item as $value_name => $value_property) {
           $value = $value_property->getValue();
-          $this->assertTrue(is_scalar($value) || $value instanceof \Drupal\entity\EntityInterface, "Value $value_name of item $delta of property $name is a primitive or an entity.");
+          $this->assertTrue(!isset($value) || is_scalar($value) || $value instanceof \Drupal\entity\EntityInterface, "Value $value_name of item $delta of property $name is a primitive or an entity.");
         }
       }
     }
@@ -168,30 +205,39 @@ class EntityPropertyTest extends WebTestBase  {
   /**
    * Tests working with entity properties based upon property container and property list interfaces.
    */
-  function testPropertyContainerInterfaces() {
+  public function testPropertyContainerInterfaces() {
     $entity = $this->createTestEntity();
+    $entity->save();
     $entity_definition = array(
       'type' => 'entity',
       'entity type' => 'entity_test',
       'label' => t('Test entity'),
     );
+    $property = drupal_get_property($entity_definition, $entity);
 
     // For the test we navigate through the tree of contained properties and get
     // all contained strings, limited by a certain depth.
     $strings = array();
-    $this->getContainedStrings($entity, $entity_definition, 0, $strings);
+    $this->getContainedStrings($property, 0, $strings);
 
     // @todo: Once the user entity has defined properties this should contain
     // the user name and other user entity strings as well.
-    $this->assertEqual($strings, array($this->entity_name), 'All contained strings found.');
+    $target_strings = array(
+      $this->entity_name,
+      $this->entity_field_text,
+      // Field format.
+      NULL,
+    );
+    $this->assertEqual($strings, $target_strings, 'All contained strings found.');
   }
 
   /**
-   * Recursive helper for getting all contained strings.
+   * Recursive helper for getting all contained strings,
+   * i.e. properties of type string.
    */
-  function getContainedStrings($data_item, array $definition, $depth, array &$strings) {
+  public function getContainedStrings(PropertyInterface $data_item, $depth, array &$strings) {
 
-    if ($definition['type'] == 'string') {
+    if ($data_item->getType() == 'string') {
       $strings[] = $data_item->getValue();
     }
 
@@ -199,13 +245,12 @@ class EntityPropertyTest extends WebTestBase  {
     if ($depth < 7) {
       if ($data_item instanceof \Drupal\Core\Property\PropertyListInterface) {
         foreach ($data_item as $item) {
-          $this->getContainedStrings($item, $definition, ++$depth, $strings);
+          $this->getContainedStrings($item, ++$depth, $strings);
         }
       }
       elseif ($data_item instanceof \Drupal\Core\Property\PropertyContainerInterface) {
         foreach ($data_item as $name => $property) {
-          $property_definition = $data_item->getPropertyDefinition($name);
-          $this->getContainedStrings($property, $property_definition, ++$depth, $strings);
+          $this->getContainedStrings($property, ++$depth, $strings);
         }
       }
     }

@@ -39,17 +39,13 @@ class TestEntity extends Entity {
   public function __construct(array $values, $entity_type) {
     // @todo: Move to the general entity class once all entity types are
     // converted.
-    $this->entityType = $entity_type;
+    parent::__construct($values, $entity_type);
 
     // @todo: Should we unset defined properties or initialize all entity
     // property objects here, so we have the magic getter working with
     // properties defined in the entity class.
     unset($this->name);
     unset($this->user);
-
-    foreach ($values as $name => $value) {
-      $this->set($name, $value);
-    }
   }
 
   public function __get($name) {

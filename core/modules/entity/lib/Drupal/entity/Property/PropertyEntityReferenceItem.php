@@ -62,4 +62,19 @@ class PropertyEntityReferenceItem extends EntityPropertyItemBase {
     // Make sure the entity property is linked with the ID.
     $this->properties['entity']->setIdProperty($this->properties['id']);
   }
+
+  /**
+   * Overrides EntityPropertyItemBase::setValue().
+   */
+  public function setValue($values) {
+    // setValue() on the entity property already updates the ID property, so
+    // only update the ID property here if no entity value is given.
+    if (!empty($values['id'])) {
+      $this->properties['id']->setValue($values['id']);
+    }
+    else {
+      $this->properties['entity']->setValue(isset($values['entity']) ? $values['entity'] : NULL);
+    }
+    // @todo: Throw an exception for invalid values ? Invalid value given?
+  }
 }
