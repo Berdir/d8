@@ -306,7 +306,10 @@ class Entity implements EntityInterface {
    * Implements PropertyContainerInterface::getPropertyDefinitions().
    */
   public function getPropertyDefinitions() {
-    return entity_get_controller($this->entityType)->getPropertyDefinitions($this->bundle());
+    return entity_get_controller($this->entityType)->getPropertyDefinitions(array(
+      'entity type' => $this->entityType,
+      'bundle' => $this->bundle(),
+    ));
   }
 
   /**

@@ -160,8 +160,7 @@ class PropertyEntity implements PropertyInterface, PropertyContainerInterface {
    */
   public function getPropertyDefinitions() {
     // @todo: Support getting definitions if multiple bundles are specified.
-    $bundle = isset($this->definition['bundle']) ? $this->definition['bundle'] : NULL;
-    $definitions = entity_get_controller($this->definition['entity type'])->getPropertyDefinitions($bundle);
+    $definitions = entity_get_controller($this->definition['entity type'])->getPropertyDefinitions($this->definition);
 
     return $definitions;
   }

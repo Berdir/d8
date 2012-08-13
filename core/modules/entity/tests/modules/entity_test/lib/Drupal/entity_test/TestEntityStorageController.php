@@ -33,6 +33,14 @@ class TestEntityStorageController extends DatabaseStorageController {
   protected $bundleKey;
 
   /**
+   * An array of property information, i.e. containing definitions.
+   *
+   * @var array
+   */
+  protected $propertyInfo;
+
+
+  /**
    * Overrides DatabaseStorageController::__construct().
    */
   public function __construct($entityType) {
@@ -193,14 +201,35 @@ class TestEntityStorageController extends DatabaseStorageController {
    *
    * @todo Add to interface.
    */
-  public function getPropertyDefinitions($bundle = NULL) {
-    // @todo: Add static caching.
-    $definitions = $this->basePropertyDefinitions();
+  public function getPropertyDefinitions(array $definition) {
+    // @todo: Add caching for $this->propertyInfo.
 
-    // Allow modules to add their own property definitions. E.g. this is
-    // implemented by field.module to add definitions for its fields.
-    $context = array('bundle' => $bundle);
-    drupal_alter('entity_property_definition', $entity_type, $definitions, $context);
+    if (!isset($this->propertyInfo)) {
+      $this->propertyInfo = array(
+        'definitions' => $this->basePropertyDefinitions(),
+        // Contains definitions of optional (per-bundle) properties.
+        'optional' => array(),
+        // An array keyed by bundle name containing the names of the per-bundle
+        // properties.
+        'bundle map' => array(),
+      );
+
+      // Invoke hooks.
+      module_invoke_all($this->entityType . '_property_info');
+      module_invoke_all('entity_property_info', $this->entityType);
+
+      $hooks = array('entity_property_info', $this->entityType . '_property_info');
+      drupal_alter($hooks, $this->propertyInfo, $this->entityType);
+    }
+
+    $definitions = $this->propertyInfo['definitions'];
+
+    // Add in per-bundle properties.
+    // @todo: Should this be statically cached as well?
+    if (!empty($definition['bundle']) && isset($this->propertyInfo['bundle map'][$definition['bundle']])) {
+      $definitions += array_intersect_key($this->propertyInfo['optional'], array_flip($this->propertyInfo['bundle map'][$definition['bundle']]));
+    }
+
     return $definitions;
   }
 
