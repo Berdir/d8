@@ -53,7 +53,11 @@ class TestEntityStorageController extends DatabaseStorageController {
    * @todo: Remove this once this is moved in the main controller.
    */
   public function create(array $values) {
-    $entity = new $this->entityClass(array(), $this->entityType);
+    // Pass in default values.
+    $defaults = array();
+    $defaults['language'][LANGUAGE_NOT_SPECIFIED][0]['langcode'] = LANGUAGE_NOT_SPECIFIED;
+
+    $entity = new $this->entityClass(array('values' => $defaults), $this->entityType);
 
     // Make sure to set the bundle first.
     if ($this->bundleKey) {
@@ -181,18 +185,19 @@ class TestEntityStorageController extends DatabaseStorageController {
   protected function mapFromStorageRecords(array $records) {
 
     foreach ($records as $id => $record) {
-      // Compile values of everything that is no property yet.
-      $values['langcode'] = $record->langcode;
-
       // Add values for all properties.
       $property_values = array();
-      $langcode = $record->langcode;
       $fields = field_info_fields();
 
       foreach ($record as $name => $value) {
         switch ($name) {
+
           case 'uid':
-            $property_values['user'][$langcode][0]['id'] = $value;
+            $property_values['user'][LANGUAGE_NOT_SPECIFIED][0]['id'] = $value;
+            break;
+
+          case 'langcode':
+            $property_values['language'][LANGUAGE_NOT_SPECIFIED][0]['langcode'] = $value;
             break;
 
           default:
@@ -201,7 +206,7 @@ class TestEntityStorageController extends DatabaseStorageController {
               $property_values[$name] = $value;
             }
             elseif (!isset($values[$name])) {
-              $property_values[$name][$langcode][0]['value'] = $value;
+              $property_values[$name][LANGUAGE_NOT_SPECIFIED][0]['value'] = $value;
             }
             break;
         }
@@ -221,13 +226,18 @@ class TestEntityStorageController extends DatabaseStorageController {
    */
   protected function mapToStorageRecord(EntityInterface $entity) {
     $record = new \stdClass();
-    $record->langcode = $entity->langcode;
 
     foreach ($entity as $name => $property) {
       switch ($name) {
+
         case 'user':
-          $record->uid = $entity->user->id;
+          $record->uid = $property->id;
           break;
+
+        case 'language':
+          $record->langcode = $property->langcode;
+          break;
+
         default:
           $definition = $property->getDefinition();
           // @todo: Support all languages here, e.g. by getting all properties
@@ -261,6 +271,12 @@ class TestEntityStorageController extends DatabaseStorageController {
       'label' => t('UUID'),
       'description' => ('The UUID of the test entity.'),
       'type' => 'string_item',
+      'list' => TRUE,
+    );
+    $properties['language'] = array(
+      'label' => t('Language'),
+      'description' => ('The language of the test entity.'),
+      'type' => 'language_item',
       'list' => TRUE,
     );
     $properties['name'] = array(

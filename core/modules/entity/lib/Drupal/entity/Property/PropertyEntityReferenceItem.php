@@ -40,8 +40,8 @@ class PropertyEntityReferenceItem extends EntityPropertyItemBase {
    * Overrides EntityPropertyItemBase::setValue().
    */
   public function setValue($values) {
-    // setValue() on the entity property already updates the ID property, so
-    // only update the ID property here if no entity value is given.
+    // Entity is computed out of the ID, so we only need to update the ID. Only
+    // set the entity property if no ID is given.
     if (!empty($values['id'])) {
       $this->properties['id']->setValue($values['id']);
     }

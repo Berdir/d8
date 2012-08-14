@@ -95,6 +95,21 @@ class EntityPropertyTest extends WebTestBase  {
     $this->assertEqual($new_user->uid, $entity->user->id, 'Updated user id can be read.');
     $this->assertEqual($new_user->name, $entity->user->entity->name, 'Updated user name value can be read.');
 
+    // Access the language property.
+    $this->assertEqual(LANGUAGE_NOT_SPECIFIED, $entity->language->langcode, 'Language code can be read.');
+    $this->assertEqual(language_load(LANGUAGE_NOT_SPECIFIED), $entity->language->object, 'Language object can be read.');
+
+    // Change the language by code.
+    $entity->language->langcode = language_default()->langcode;
+    $this->assertEqual(language_default()->langcode, $entity->language->langcode, 'Language code can be read.');
+    $this->assertEqual(language_default(), $entity->language->object, 'Language object can be read.');
+
+    // Revert language by code then try setting it by language object.
+    $entity->language->langcode = LANGUAGE_NOT_SPECIFIED;
+    $entity->language->object = language_default();
+    $this->assertEqual(language_default()->langcode, $entity->language->langcode, 'Language code can be read.');
+    $this->assertEqual(language_default(), $entity->language->object, 'Language object can be read.');
+
     // Access the text field and test updating.
     $this->assertEqual($entity->field_test_text->value, $this->entity_field_text, 'Text field can be read.');
     $new_text = $this->randomName();
@@ -132,7 +147,10 @@ class EntityPropertyTest extends WebTestBase  {
     $this->assertTrue((bool) $entity->id(), 'Entity loaded.');
 
     // Access the name property.
-    $this->assertEqual($this->entity_name, $entity->name->value, 'Name value can be read.');
+    $this->assertEqual(1, $entity->id->value, 'ID value can be read.');
+    $this->assertTrue(is_string($entity->uuid->value), 'UUID value can be read.');
+    $this->assertEqual(LANGUAGE_NOT_SPECIFIED, $entity->language->langcode, 'Language code can be read.');
+    $this->assertEqual(language_load(LANGUAGE_NOT_SPECIFIED), $entity->language->object, 'Language object can be read.');
     $this->assertEqual($this->entity_user->uid, $entity->user->id, 'User id can be read.');
     $this->assertEqual($this->entity_user->name, $entity->user->entity->name, 'User name can be read.');
     $this->assertEqual($this->entity_field_text, $entity->field_test_text->value, 'Text field can be read.');
@@ -227,6 +245,7 @@ class EntityPropertyTest extends WebTestBase  {
     // the user name and other user entity strings as well.
     $target_strings = array(
       $entity->uuid->value,
+      LANGUAGE_NOT_SPECIFIED,
       $this->entity_name,
       $this->entity_field_text,
       // Field format.
@@ -249,12 +268,12 @@ class EntityPropertyTest extends WebTestBase  {
     if ($depth < 7) {
       if ($data_item instanceof \Drupal\Core\Property\PropertyListInterface) {
         foreach ($data_item as $item) {
-          $this->getContainedStrings($item, ++$depth, $strings);
+          $this->getContainedStrings($item, $depth + 1, $strings);
         }
       }
       elseif ($data_item instanceof \Drupal\Core\Property\PropertyContainerInterface) {
         foreach ($data_item as $name => $property) {
-          $this->getContainedStrings($property, ++$depth, $strings);
+          $this->getContainedStrings($property, $depth + 1, $strings);
         }
       }
     }
@@ -274,6 +293,11 @@ class EntityPropertyTest extends WebTestBase  {
     $entity->field_test_text->format = filter_default_format();
 
     $target = "<p>The &lt;strong&gt;text&lt;/strong&gt; text to filter.</p>\n";
+    $this->assertEqual($entity->field_test_text->processed, $target, 'Text is processed with the default filter.');
+
+    // Save and load entity and make sure it still works.
+    $entity->save();
+    $entity = entity_load('entity_test', $entity->id());
     $this->assertEqual($entity->field_test_text->processed, $target, 'Text is processed with the default filter.');
   }
 }

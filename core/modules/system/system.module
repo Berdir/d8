@@ -1882,6 +1882,11 @@ function system_data_type_info() {
       'class' => '\Drupal\Core\Property\Type\Integer',
       'primitive' => TRUE,
     ),
+    'language' => array(
+      'label' => t('Language'),
+      'description' => t('A language object.'),
+      'class' => '\Drupal\Core\Property\Type\Language',
+    ),
   );
 }
 

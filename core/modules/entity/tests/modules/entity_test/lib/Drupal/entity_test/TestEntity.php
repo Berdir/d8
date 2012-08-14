@@ -43,6 +43,7 @@ class TestEntity extends EntityNG {
 
     // We unset all defined properties, so magic getters apply.
     unset($this->id);
+    unset($this->langcode);
     unset($this->uuid);
     unset($this->name);
     unset($this->user);

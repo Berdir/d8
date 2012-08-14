@@ -532,6 +532,12 @@ function entity_data_type_info() {
       'class' => '\Drupal\entity\Property\PropertyIntegerItem',
       'list class' => '\Drupal\entity\EntityProperty',
     ),
+    'language_item' => array(
+      'label' => t('Language item'),
+      'description' => t('An entity property referencing a language.'),
+      'class' => '\Drupal\entity\Property\PropertyLanguageItem',
+      'list class' => '\Drupal\entity\EntityProperty',
+    ),
     'entityreference_item' => array(
       'label' => t('Entity reference item'),
       'description' => t('An entity property containing an entity reference.'),
@@ -545,4 +551,3 @@ function entity_data_type_info() {
     ),
   );
 }
-

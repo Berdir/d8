@@ -21,7 +21,9 @@ class EntityNG extends Entity implements PropertyContainerInterface {
   /**
    * The plain data values of the contained properties.
    *
-   * This always holds the original, unchanged values of the entity.
+   * This always holds the original, unchanged values of the entity. The values
+   * are keyed by language code, whereas LANGUAGE_NOT_SPECIFIED is used for
+   * values in default language.
    *
    * @todo: Add methods for getting original properties and for determining
    * changes.
@@ -48,7 +50,12 @@ class EntityNG extends Entity implements PropertyContainerInterface {
    * Implements EntityInterface::get().
    */
   public function get($property_name, $langcode = NULL) {
-    $langcode = isset($langcode) ? $langcode : $this->langcode;
+    // Values in default language are stored using LANGUAGE_NOT_SPECIFIED.
+    if (!isset($langcode) || (isset($langcode) && $langcode == $this->get('language')->langcode)) {
+      // @todo: Find a more meaningful constant name and make field loading use
+      // it too.
+      $langcode = LANGUAGE_NOT_SPECIFIED;
+    }
 
     // Populate $this->properties to fasten further lookups and to keep track of
     // property objects, possibly holding changes to properties.
