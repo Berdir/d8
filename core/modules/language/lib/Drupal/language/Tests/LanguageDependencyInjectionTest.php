@@ -15,6 +15,14 @@ use Drupal\simpletest\WebTestBase;
  * Test for dependency injected language object.
  */
 class LanguageDependencyInjectionTest extends WebTestBase {
+
+  /**
+   * Modules to enable.
+   *
+   * @var array
+   */
+  public static $modules = array('language');
+
   public static function getInfo() {
     return array(
         'name' => 'Language dependency injection',
@@ -24,10 +32,10 @@ class LanguageDependencyInjectionTest extends WebTestBase {
   }
 
   function setUp() {
-    parent::setUp('language');
+    parent::setUp();
 
     // Ensure we are building a new Language object for each test.
-    language_manager();
+    language(NULL, TRUE);
   }
 
 
@@ -41,7 +49,7 @@ class LanguageDependencyInjectionTest extends WebTestBase {
     drupal_language_initialize();
 
     $expected = language_default();
-    $result = language_manager(LANGUAGE_TYPE_INTERFACE);
+    $result = language(LANGUAGE_TYPE_INTERFACE);
     foreach ($expected as $property => $value) {
       $this->assertEqual($expected->$property, $result->$property, t('The dependency injected language object %prop property equals the new Language object %prop property.', array('%prop' => $property)));
     }
@@ -71,7 +79,7 @@ class LanguageDependencyInjectionTest extends WebTestBase {
     // The langauge system creates a Language object which contains the
     // same properties as the new default language object.
     $expected = new Language($new_language_default);
-    $result = language_manager(LANGUAGE_TYPE_INTERFACE);
+    $result = language(LANGUAGE_TYPE_INTERFACE);
     foreach ($expected as $property => $value) {
       $this->assertEqual($expected->$property, $result->$property, t('The dependency injected language object %prop property equals the default language object %prop property.', array('%prop' => $property)));
     }

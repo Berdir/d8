@@ -13,16 +13,20 @@ use Drupal\simpletest\WebTestBase;
  * Tests for the Batch API Progress page.
  */
 class PageTest extends WebTestBase {
+
+  /**
+   * Modules to enable.
+   *
+   * @var array
+   */
+  public static $modules = array('batch_test');
+
   public static function getInfo() {
     return array(
       'name' => 'Batch progress page',
       'description' => 'Test the content of the progress page.',
       'group' => 'Batch API',
     );
-  }
-
-  function setUp() {
-    parent::setUp('batch_test');
   }
 
   /**
@@ -32,6 +36,7 @@ class PageTest extends WebTestBase {
     // Make sure that the page which starts the batch (an administrative page)
     // is using a different theme than would normally be used by the batch API.
     variable_set('theme_default', 'bartik');
+    theme_enable(array('seven'));
     variable_set('admin_theme', 'seven');
     // Log in as an administrator who can see the administrative theme.
     $admin_user = $this->drupalCreateUser(array('view the administration theme'));

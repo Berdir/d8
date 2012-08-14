@@ -258,7 +258,7 @@ function field_valid_language($langcode, $default = TRUE) {
   if (in_array($langcode, $languages)) {
     return $langcode;
   }
-  return $default ? language_default()->langcode : language_manager(LANGUAGE_TYPE_CONTENT)->langcode;
+  return $default ? language_default()->langcode : language(LANGUAGE_TYPE_CONTENT)->langcode;
 }
 
 /**
@@ -295,7 +295,8 @@ function field_valid_language($langcode, $default = TRUE) {
  */
 function field_language($entity_type, $entity, $field_name = NULL, $langcode = NULL) {
   $display_langcodes = &drupal_static(__FUNCTION__, array());
-  list($id, , $bundle) = entity_extract_ids($entity_type, $entity);
+  $id = $entity->bundle();
+  $bundle = $entity->bundle();
   $langcode = field_valid_language($langcode, FALSE);
 
   if (!isset($display_langcodes[$entity_type][$id][$langcode])) {

@@ -177,7 +177,7 @@ function block_menu() {
 }
 
 /**
- * Access callback: Only admin or enabled themes can be accessed.
+ * Access callback: Only enabled themes can be accessed.
  *
  * Path:
  * - admin/structure/block/list/% (for each theme)
@@ -880,7 +880,7 @@ function block_block_list_alter(&$blocks) {
       continue;
     }
     foreach ($block_langcodes[$block->module][$block->delta] as $language_type => $langcodes) {
-      if (isset($langcodes[language_manager($language_type)->langcode])) {
+      if (isset($langcodes[language($language_type)->langcode])) {
         // Found a language type - langcode combination in the configuration
         // that is applicable to the current request.
         continue 2;

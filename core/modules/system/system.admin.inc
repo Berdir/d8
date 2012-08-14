@@ -119,12 +119,12 @@ function system_themes_page() {
 
   $theme_default = variable_get('theme_default', 'stark');
   $theme_groups  = array();
+  $admin_theme = variable_get('admin_theme', 0);
 
   foreach ($themes as &$theme) {
     if (!empty($theme->info['hidden'])) {
       continue;
     }
-    $admin_theme_options[$theme->name] = $theme->info['name'];
     $theme->is_default = ($theme->name == $theme_default);
 
     // Identify theme screenshot.
@@ -175,12 +175,14 @@ function system_themes_page() {
       }
       if (!empty($theme->status)) {
         if (!$theme->is_default) {
-          $theme->operations[] = array(
-            'title' => t('Disable'),
-            'href' => 'admin/appearance/disable',
-            'query' => $query,
-            'attributes' => array('title' => t('Disable !theme theme', array('!theme' => $theme->info['name']))),
-          );
+          if ($theme->name != $admin_theme) {
+            $theme->operations[] = array(
+              'title' => t('Disable'),
+              'href' => 'admin/appearance/disable',
+              'query' => $query,
+              'attributes' => array('title' => t('Disable !theme theme', array('!theme' => $theme->info['name']))),
+            );
+          }
           $theme->operations[] = array(
             'title' => t('Set default'),
             'href' => 'admin/appearance/default',
@@ -188,6 +190,7 @@ function system_themes_page() {
             'attributes' => array('title' => t('Set !theme as default theme', array('!theme' => $theme->info['name']))),
           );
         }
+        $admin_theme_options[$theme->name] = $theme->info['name'];
       }
       else {
         $theme->operations[] = array(
@@ -211,6 +214,10 @@ function system_themes_page() {
     if ($theme->is_default) {
       $theme->classes[] = 'theme-default';
       $theme->notes[] = t('default theme');
+    }
+    if ($theme->name == $admin_theme || ($theme->is_default && $admin_theme == '0')) {
+      $theme->classes[] = 'theme-admin';
+      $theme->notes[] = t('admin theme');
     }
 
     // Sort enabled and disabled themes into their own groups.
@@ -300,8 +307,8 @@ function system_theme_disable() {
 
     // Check if the specified theme is one recognized by the system.
     if (!empty($themes[$theme])) {
-      if ($theme == variable_get('theme_default', 'stark')) {
-        // Don't disable the default theme.
+      // Do not disable the default or admin theme.
+      if ($theme == variable_get('theme_default', 'stark') || $theme == variable_get('admin_theme', 0)) {
         drupal_set_message(t('%theme is the default theme and cannot be disabled.', array('%theme' => $themes[$theme]->info['name'])), 'error');
       }
       else {
@@ -684,10 +691,12 @@ function _system_theme_settings_validate_path($path) {
 function system_theme_settings_submit($form, &$form_state) {
   // Exclude unnecessary elements before saving.
   form_state_values_clean($form_state);
-  $key = $form_state['values']['var'];
-  unset($form_state['values']['var']);
-
   $values = $form_state['values'];
+
+  // Extract the name of the theme from the submitted form values, then
+  // remove it from the array so that it is not saved as part of the variable.
+  $key = $values['var'];
+  unset($values['var']);
 
   // If the user uploaded a new logo or favicon, save it to a permanent location
   // and use it in place of the default theme-provided file.

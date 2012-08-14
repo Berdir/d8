@@ -15,6 +15,13 @@ use Drupal\simpletest\WebTestBase;
 class FormatDateTest extends WebTestBase {
 
   /**
+   * Modules to enable.
+   *
+   * @var array
+   */
+  public static $modules = array('language');
+
+  /**
    * Arbitrary langcode for a custom language.
    */
   const LANGCODE = 'xx';
@@ -28,7 +35,7 @@ class FormatDateTest extends WebTestBase {
   }
 
   function setUp() {
-    parent::setUp('language');
+    parent::setUp();
     variable_set('configurable_timezones', 1);
     variable_set('date_format_long', 'l, j. F Y - G:i');
     variable_set('date_format_medium', 'j. F Y - G:i');
@@ -72,7 +79,7 @@ class FormatDateTest extends WebTestBase {
   function testFormatDate() {
     global $user;
 
-    $language_interface = language_manager(LANGUAGE_TYPE_INTERFACE);
+    $language_interface = language(LANGUAGE_TYPE_INTERFACE);
 
     $timestamp = strtotime('2007-03-26T00:00:00+00:00');
     $this->assertIdentical(format_date($timestamp, 'custom', 'l, d-M-y H:i:s T', 'America/Los_Angeles', 'en'), 'Sunday, 25-Mar-07 17:00:00 PDT', t('Test all parameters.'));

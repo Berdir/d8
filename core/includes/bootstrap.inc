@@ -7,6 +7,7 @@ use Symfony\Component\ClassLoader\ApcUniversalClassLoader;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException as DependencyInjectionRuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Drupal\Core\Language\Language;
 
@@ -846,10 +847,11 @@ function drupal_get_filename($type, $name, $filename = NULL) {
   // drupal_static().
   static $files = array(), $dirs = array();
 
-  // Profiles are a special case: they have a fixed location and naming.
+  // Profiles are converted into modules in system_rebuild_module_data().
+  // @todo Remove false-exposure of profiles as modules.
+  $original_type = $type;
   if ($type == 'profile') {
-    $profile_filename = "profiles/$name/$name.profile";
-    $files[$type][$name] = file_exists($profile_filename) ? $profile_filename : FALSE;
+    $type = 'module';
   }
   if (!isset($files[$type])) {
     $files[$type] = array();
@@ -869,7 +871,7 @@ function drupal_get_filename($type, $name, $filename = NULL) {
     try {
       if (function_exists('db_query')) {
         $file = db_query("SELECT filename FROM {system} WHERE name = :name AND type = :type", array(':name' => $name, ':type' => $type))->fetchField();
-        if (file_exists(DRUPAL_ROOT . '/' . $file)) {
+        if ($file && file_exists(DRUPAL_ROOT . '/' . $file)) {
           $files[$type][$name] = $file;
         }
       }
@@ -890,6 +892,12 @@ function drupal_get_filename($type, $name, $filename = NULL) {
       }
       elseif ($type == 'theme') {
         $extension = 'info';
+      }
+      // Profiles are converted into modules in system_rebuild_module_data().
+      // @todo Remove false-exposure of profiles as modules.
+      elseif ($original_type == 'profile') {
+        $dir = 'profiles';
+        $extension = 'profile';
       }
       else {
         $extension = $type;
@@ -1457,7 +1465,7 @@ function t($string, array $args = array(), array $options = array()) {
 
   // Merge in default.
   if (empty($options['langcode'])) {
-    $options['langcode'] = language_manager(LANGUAGE_TYPE_INTERFACE)->langcode;
+    $options['langcode'] = language(LANGUAGE_TYPE_INTERFACE)->langcode;
   }
   if (empty($options['context'])) {
     $options['context'] = '';
@@ -2437,26 +2445,22 @@ function drupal_container(Container $reset = NULL) {
     // This will get merged with the full Kernel-built Container on normal page
     // requests.
     $container = new ContainerBuilder();
-    // Register configuration storage dispatcher.
-    $container->setParameter('config.storage.info', array(
-      'Drupal\Core\Config\DatabaseStorage' => array(
-        'connection' => 'default',
-        'target' => 'default',
-        'read' => TRUE,
-        'write' => TRUE,
-      ),
-      'Drupal\Core\Config\FileStorage' => array(
-        'directory' => config_get_config_directory(),
-        'read' => TRUE,
-        'write' => FALSE,
-      ),
+
+    // Register configuration storage class and options.
+    // @todo The active store and its options need to be configurable.
+    //   Use either global $conf (recursion warning) or global $config, or a
+    //   bootstrap configuration *file* to allow to set/override this very
+    //   lowest of low level configuration.
+    $container->setParameter('config.storage.options', array(
+      'connection' => 'default',
+      'target' => 'default',
     ));
-    $container->register('config.storage.dispatcher', 'Drupal\Core\Config\StorageDispatcher')
-      ->addArgument('%config.storage.info%');
+    $container->register('config.storage', 'Drupal\Core\Config\DatabaseStorage')
+      ->addArgument('%config.storage.options%');
 
     // Register configuration object factory.
     $container->register('config.factory', 'Drupal\Core\Config\ConfigFactory')
-      ->addArgument(new Reference('config.storage.dispatcher'));
+      ->addArgument(new Reference('config.storage'));
   }
   return $container;
 }
@@ -2604,13 +2608,13 @@ function get_t() {
 /**
  * Initializes all the defined language types.
  *
- * @see language_manager()
+ * @see language()
  */
 function drupal_language_initialize() {
   if (language_multilingual()) {
     $types = language_types_get_all();
     foreach ($types as $type) {
-      language_manager($type);
+      language($type);
     }
     // Allow modules to react on language system initialization in multilingual
     // environments.
@@ -2619,56 +2623,61 @@ function drupal_language_initialize() {
 }
 
 /**
- * Initializes the passed in language type.
+ * Returns the language object for a given language type.
  *
  * The 'language_manager' service is only available within the scope of a kernel
  * request. When it's not available, we return a default language object,
  * regardless of the type passed in.
  *
- * Note that this function is provided for legacy code that needs to get e.g.
- * the interface language outside the scope of a request. Code that runs within
- * the scope of a request should call
- * drupal_container()->get('language_manager')->getLanguage($type)
- * directly.
- *
  * @see Drupal\Core\Language\LanguageManager
  *
  * @param $type
- *   The type of language object needed, e.g. LANGUAGE_TYPE_INTERFACE. Passing
- *   NULL invokes a reset of the statically stored language type objects.
+ *   The type of language object needed, e.g. LANGUAGE_TYPE_INTERFACE.
+ * @param $reset
+ *   TRUE to reset the statically cached language object for the type, or for
+ *   all types if $type is NULL.
  */
-function language_manager($type = NULL) {
-  // Keep track of whether we are in a multilingual environment.
-  static $multilingual = FALSE;
-  // Keep track of whether the language_manager service is available.
-  static $language_manager_service = FALSE;
-  if ($multilingual && $language_manager_service) {
-    if (!$type) {
-      drupal_container()->get('language_manager')->reset();
-      return;
-    }
-    return drupal_container()->get('language_manager')->getLanguage($type);
-  }
-  if (language_multilingual()) {
-    $multilingual = TRUE;
-    if (drupal_container()->has('language_manager')) {
-      $language_manager_service = TRUE;
-      return drupal_container()->get('language_manager')->getLanguage($type);
-    }
-  }
-  // We can't use drupal_static() here because resetting is not a simple case of
+function language($type, $reset = FALSE) {
+  // We don't use drupal_static() here because resetting is not a simple case of
   // drupal_static_reset().
-  static $languages;
-  // If no type was passed in, reset the languages array.
-  if (!$type) {
-    $languages = array();
+  static $languages = array();
+
+  // Reset the language manager's cache and our own.
+  if ($reset) {
+    if (drupal_container()->has('language_manager')) {
+      drupal_container()->get('language_manager')->reset($type);
+    }
+    if (!isset($type)) {
+      $languages = array();
+    }
+    elseif (isset($languages[$type])) {
+      unset($languages[$type]);
+    }
   }
-  // If this is not a multilingual environment or we have not yet entered the
-  // request scope, just use the default language regardless of $type.
-  if (!isset($languages[$type])) {
-    $languages[$type] = language_default();
+
+  // If no type is passed (most likely when resetting all types), return.
+  if (!isset($type)) {
+    return;
   }
-  return $languages[$type];
+
+  // When the language_manager service exists (is both defined and the 'request'
+  // scope is active in the container), use it to get the language. Otherwise
+  // return the default language.
+  try {
+    $language_manager = drupal_container()->get('language_manager', Container::NULL_ON_INVALID_REFERENCE);
+  }
+  catch (DependencyInjectionRuntimeException $e) {
+  }
+
+  if (isset($language_manager)) {
+    return $language_manager->getLanguage($type);
+  }
+  else {
+    if (!isset($languages[$type])) {
+      $languages[$type] = language_default();
+    }
+    return $languages[$type];
+  }
 }
 
 /**

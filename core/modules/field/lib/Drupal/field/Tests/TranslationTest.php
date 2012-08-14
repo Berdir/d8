@@ -14,6 +14,14 @@ namespace Drupal\field\Tests;
  * that only the correct values are returned by field_available_languages().
  */
 class TranslationTest extends FieldTestBase {
+
+  /**
+   * Modules to enable.
+   *
+   * @var array
+   */
+  public static $modules = array('language', 'field_test');
+
   public static function getInfo() {
     return array(
       'name' => 'Field translations tests',
@@ -23,7 +31,7 @@ class TranslationTest extends FieldTestBase {
   }
 
   function setUp() {
-    parent::setUp('language', 'field_test');
+    parent::setUp();
 
     $this->field_name = drupal_strtolower($this->randomName() . '_field_name');
 
@@ -343,7 +351,7 @@ class TranslationTest extends FieldTestBase {
     $field_name = $this->field['field_name'];
 
     // Store the field translations.
-    $entity->is_new = TRUE;
+    $entity->enforceIsNew();
     foreach ($available_langcodes as $langcode => $value) {
       $entity->{$field_name}[$langcode][0]['value'] = $value + 1;
     }
