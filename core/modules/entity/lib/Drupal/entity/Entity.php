@@ -201,8 +201,11 @@ class Entity implements EntityInterface {
     // property objects, possibly holding changes to properties.
     if (!isset($this->properties[$property_name][$langcode])) {
       $definition = $this->getPropertyDefinition($property_name);
-      $value = isset($this->values[$property_name][$langcode]) ? $this->values[$property_name][$langcode] : NULL;
+      if (!$definition) {
+        throw new \InvalidArgumentException('Property ' . check_plain($property_name) . ' is unknown.');
+      }
 
+      $value = isset($this->values[$property_name][$langcode]) ? $this->values[$property_name][$langcode] : NULL;
       $this->properties[$property_name][$langcode] = drupal_get_property($definition, $value);
     }
     return $this->properties[$property_name][$langcode];
@@ -278,12 +281,10 @@ class Entity implements EntityInterface {
    * Implements PropertyContainerInterface::setProperties().
    */
   public function setProperties($properties) {
-    $definitions = $this->getPropertyDefinitions();
     foreach ($properties as $name => $property) {
-      if (isset($definitions[$name])) {
-        $this->properties[$name] = $property;
-      }
-      // @todo: Throw exception else, invalid properties given?.
+      // Copy the value to our property object.
+      $value = $property instanceof PropertyInterface ? $property->getValue() : $property;
+      $this->get($name)->setValue($value);
     }
   }
 

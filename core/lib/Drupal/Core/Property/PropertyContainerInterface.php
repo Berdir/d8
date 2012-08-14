@@ -32,8 +32,8 @@ interface PropertyContainerInterface extends IteratorAggregate  {
    *
    * @param array
    *   The array of properties to set. The array has to consist of property
-   *   objects implementing the PropertyInterface and must be keyed by property
-   *   name.
+   *   values or property objects implementing the PropertyInterface and must be
+   *   keyed by property name.
    *
    * @throws \InvalidArgumentException
    *   If an not existing property is passed.
@@ -48,8 +48,8 @@ interface PropertyContainerInterface extends IteratorAggregate  {
    * @param string $name
    *   The name of property.
    *
-   * @return array
-   *   The definition of the property.
+   * @return array|FALSE
+   *   The definition of the property or FALSE if the property does not exist.
    */
   public function getPropertyDefinition($name);
 

@@ -6,7 +6,7 @@
  */
 
 namespace Drupal\entity;
-use \Drupal\Core\Property\PropertyTypeContainerInterface;
+use \Drupal\Core\Property\PropertyInterface;
 use \Drupal\Core\Property\PropertyContainerInterface;
 
 /**
@@ -21,6 +21,10 @@ abstract class EntityPropertyItemBase implements EntityPropertyItemInterface {
 
   /**
    * The array of properties.
+   *
+   * Property objects are instantiated during object construction and cannot be
+   * replaced by others, so computed properties can safely store references on
+   * other properties.
    *
    * @var array<PropertyInterface>
    */
@@ -138,7 +142,7 @@ abstract class EntityPropertyItemBase implements EntityPropertyItemInterface {
     $properties = array();
     foreach ($this->getPropertyDefinitions() as $name => $definition) {
       if (empty($definition['computed'])) {
-        $properties[$name] = $this->get($name);
+        $properties[$name] = $this->properties[$name];
       }
     }
     return $properties;
@@ -150,7 +154,9 @@ abstract class EntityPropertyItemBase implements EntityPropertyItemInterface {
   public function setProperties($properties) {
     foreach ($properties as $name => $property) {
       if (isset($this->properties[$name])) {
-        $this->properties[$name] = $property;
+        // Copy the value to our property object.
+        $value = $property instanceof PropertyInterface ? $property->getValue() : $property;
+        $this->properties[$name]->setValue($value);
       }
       else {
         throw new \InvalidArgumentException('Property ' . check_plain($name) . ' is unknown.');

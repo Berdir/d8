@@ -134,6 +134,9 @@ interface EntityInterface extends PropertyContainerInterface {
    * @return
    *   The property value, or NULL if it is not defined.
    *
+   * @throws \InvalidArgumentException
+   *   If the value of a not existing property should be returned.
+   *
    * @see Drupal\entity\EntityInterface::language()
    */
   public function get($property_name, $langcode = NULL);
