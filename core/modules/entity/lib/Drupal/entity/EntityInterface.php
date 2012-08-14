@@ -6,12 +6,11 @@
  */
 
 namespace Drupal\entity;
-use Drupal\Core\Property\PropertyContainerInterface;
 
 /**
  * Defines a common interface for all entity objects.
  */
-interface EntityInterface extends PropertyContainerInterface {
+interface EntityInterface {
 
   /**
    * Constructs a new entity object.

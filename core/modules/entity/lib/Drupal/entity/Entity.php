@@ -6,8 +6,6 @@
  */
 
 namespace Drupal\entity;
-use Drupal\Core\Property\PropertyTypeContainerInterface;
-use Drupal\Core\Property\PropertyContainerInterface;
 
 /**
  * Defines a base entity class.
@@ -41,25 +39,6 @@ class Entity implements EntityInterface {
   protected $enforceIsNew;
 
   /**
-   * The raw data values of the contained properties.
-   *
-   * This always holds the original, unchanged values of the entity.
-   *
-   * @todo: Add methods for getting original properties and to see what has
-   * changed.
-   *
-   * @var array
-   */
-  protected $values = array();
-
-  /**
-   * The array of properties, each being an instance of EntityPropertyInterface.
-   *
-   * @var array
-   */
-  protected $properties = array();
-
-  /*
    * Indicates whether this is the current revision.
    *
    * @var bool
@@ -195,27 +174,54 @@ class Entity implements EntityInterface {
    * Implements EntityInterface::get().
    */
   public function get($property_name, $langcode = NULL) {
-    $langcode = isset($langcode) ? $langcode : $this->langcode;
-
-    // Populate $this->properties to fasten further lookups and to keep track of
-    // property objects, possibly holding changes to properties.
-    if (!isset($this->properties[$property_name][$langcode])) {
-      $definition = $this->getPropertyDefinition($property_name);
-      if (!$definition) {
-        throw new \InvalidArgumentException('Property ' . check_plain($property_name) . ' is unknown.');
-      }
-
-      $value = isset($this->values[$property_name][$langcode]) ? $this->values[$property_name][$langcode] : NULL;
-      $this->properties[$property_name][$langcode] = drupal_get_property($definition, $value);
+    // Handle fields.
+    $entity_info = $this->entityInfo();
+    if ($entity_info['fieldable'] && field_info_instance($this->entityType, $property_name, $this->bundle())) {
+      $field = field_info_field($property_name);
+      $langcode = $this->getFieldLangcode($field, $langcode);
+      return isset($this->{$property_name}[$langcode]) ? $this->{$property_name}[$langcode] : NULL;
     }
-    return $this->properties[$property_name][$langcode];
+    else {
+      // Handle properties being not fields.
+      // @todo: Add support for translatable properties being not fields.
+      return isset($this->{$property_name}) ? $this->{$property_name} : NULL;
+    }
   }
 
   /**
    * Implements EntityInterface::set().
    */
   public function set($property_name, $value, $langcode = NULL) {
-    $this->get($property_name, $langcode)->setValue($value);
+    // Handle fields.
+    $entity_info = $this->entityInfo();
+    if ($entity_info['fieldable'] && field_info_instance($this->entityType, $property_name, $this->bundle())) {
+      $field = field_info_field($property_name);
+      $langcode = $this->getFieldLangcode($field, $langcode);
+      $this->{$property_name}[$langcode] = $value;
+    }
+    else {
+      // Handle properties being not fields.
+      // @todo: Add support for translatable properties being not fields.
+      $this->{$property_name} = $value;
+    }
+  }
+
+  /**
+   * Determines the language code to use for accessing a field value in a certain language.
+   */
+  protected function getFieldLangcode($field, $langcode = NULL) {
+    // Only apply the given langcode if the entity is language-specific.
+    // Otherwise translatable fields are handled as non-translatable fields.
+    if (field_is_translatable($this->entityType, $field) && ($default_language = $this->language()) && !language_is_locked($this->langcode)) {
+      // For translatable fields the values in default language are stored using
+      // the language code of the default language.
+      return isset($langcode) ? $langcode : $default_language->langcode;
+    }
+    else {
+      // If there is a langcode defined for this field, just return it. Otherwise
+      // return LANGUAGE_NOT_SPECIFIED.
+      return (isset($this->langcode) ? $this->langcode : LANGUAGE_NOT_SPECIFIED);
+    }
   }
 
   /**
@@ -264,67 +270,4 @@ class Entity implements EntityInterface {
     return $this->isCurrentRevision;
   }
 
-  /**
-   * Implements PropertyContainerInterface::getProperties().
-   */
-  public function getProperties() {
-    $properties = array();
-    foreach ($this->getPropertyDefinitions() as $name => $definition) {
-      if (empty($definition['computed'])) {
-        $properties[$name] = $this->get($name);
-      }
-    }
-    return $properties;
-  }
-
-  /**
-   * Implements PropertyContainerInterface::setProperties().
-   */
-  public function setProperties($properties) {
-    foreach ($properties as $name => $property) {
-      // Copy the value to our property object.
-      $value = $property instanceof PropertyInterface ? $property->getValue() : $property;
-      $this->get($name)->setValue($value);
-    }
-  }
-
-  /**
-   * Implements IteratorAggregate::getIterator().
-   */
-  public function getIterator() {
-    return new \ArrayIterator($this->getProperties());
-  }
-
-  /**
-   * Implements PropertyContainerInterface::getPropertyDefinition().
-   */
-  public function getPropertyDefinition($name) {
-    $definitions = $this->getPropertyDefinitions();
-    return isset($definitions[$name]) ? $definitions[$name] : FALSE;
-  }
-
-  /**
-   * Implements PropertyContainerInterface::getPropertyDefinitions().
-   */
-  public function getPropertyDefinitions() {
-    return entity_get_controller($this->entityType)->getPropertyDefinitions(array(
-      'entity type' => $this->entityType,
-      'bundle' => $this->bundle(),
-    ));
-  }
-
-  /**
-   * Implements PropertyContainerInterface::toArray().
-   */
-  public function toArray() {
-    $values = array();
-    foreach ($this->getProperties() as $name => $property) {
-      $values[$name] = $property->getValue();
-    }
-    return $values;
-  }
-
-  public function access($account) {
-    // TODO: Implement access() method.
-  }
 }

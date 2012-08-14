@@ -59,6 +59,10 @@ interface PropertyContainerInterface extends IteratorAggregate  {
    * @param array $definition
    *   The definition of the container's property, e.g. the definition of an
    *   entity reference property.
+   *
+   * @return array
+   *   An array of property definitions of contained properties, keyed by
+   *   property name.
    */
   public function getPropertyDefinitions();
 

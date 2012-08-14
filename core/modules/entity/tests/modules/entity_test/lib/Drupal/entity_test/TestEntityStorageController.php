@@ -32,13 +32,6 @@ class TestEntityStorageController extends DatabaseStorageController {
    */
   protected $bundleKey;
 
-  /**
-   * An array of property information, i.e. containing definitions.
-   *
-   * @var array
-   */
-  protected $propertyInfo;
-
 
   /**
    * Overrides DatabaseStorageController::__construct().
@@ -255,49 +248,7 @@ class TestEntityStorageController extends DatabaseStorageController {
   }
 
   /**
-   * Gets an array property definitions for the entity's properties.
-   *
-   * @param array $definition
-   *   The definition of the container's property, e.g. the definition of an
-   *   entity reference property.
-   *
-   * @todo Add to interface.
-   */
-  public function getPropertyDefinitions(array $definition) {
-    // @todo: Add caching for $this->propertyInfo.
-    if (!isset($this->propertyInfo)) {
-      $this->propertyInfo = array(
-        'definitions' => $this->basePropertyDefinitions(),
-        // Contains definitions of optional (per-bundle) properties.
-        'optional' => array(),
-        // An array keyed by bundle name containing the names of the per-bundle
-        // properties.
-        'bundle map' => array(),
-      );
-
-      // Invoke hooks.
-      $result = module_invoke_all($this->entityType . '_property_info');
-      $this->propertyInfo = array_merge_recursive($this->propertyInfo, $result);
-      $result = module_invoke_all('entity_property_info', $this->entityType);
-      $this->propertyInfo = array_merge_recursive($this->propertyInfo, $result);
-
-      $hooks = array('entity_property_info', $this->entityType . '_property_info');
-      drupal_alter($hooks, $this->propertyInfo, $this->entityType);
-    }
-
-    $definitions = $this->propertyInfo['definitions'];
-
-    // Add in per-bundle properties.
-    // @todo: Should this be statically cached as well?
-    if (!empty($definition['bundle']) && isset($this->propertyInfo['bundle map'][$definition['bundle']])) {
-      $definitions += array_intersect_key($this->propertyInfo['optional'], array_flip($this->propertyInfo['bundle map'][$definition['bundle']]));
-    }
-
-    return $definitions;
-  }
-
-  /**
-   * Implements \Drupal\entity\EntityStorageControllerInterface.
+   * Overrides \Drupal\entity\DataBaseStorageController::basePropertyDefinitions().
    */
   public function basePropertyDefinitions() {
     $properties['id'] = array(

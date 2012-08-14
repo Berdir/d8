@@ -89,10 +89,26 @@ interface EntityStorageControllerInterface {
   public function save(EntityInterface $entity);
 
   /**
-   * Defines the base properties of the entity type.
+   * Gets an array entity property definitions.
+   *
+   * If a 'bundle' key is present in the given entity definition, properties
+   * specific to this bundle are included.
+   *
+   * @param array $definition
+   *   The definition of the entity of which to get property definitions, i.e.
+   *   an array having an 'entity type' and optionally a 'bundle' key. For
+   *   example:
+   *   @code
+   *   $definition = array(
+   *     'type' => 'entity',
+   *     'entity type' => 'node',
+   *     'bundle' => 'article',
+   *   );
+   *   @endcode
    *
    * @return array
-   *   An array of property defintions.
+   *   An array of property definitions of entity properties, keyed by property
+   *   name.
    */
-  public function basePropertyDefinitions();
+  public function getPropertyDefinitions(array $definition);
 }
