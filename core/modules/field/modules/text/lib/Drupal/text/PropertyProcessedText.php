@@ -24,7 +24,7 @@ class PropertyProcessedText extends \Drupal\Core\Property\Type\String {
   /**
    * Implements PropertyInterface::__construct().
    */
-  public function __construct(array $definition, $value = NULL) {
+  public function __construct(array $definition, $value = NULL, $context = array()) {
     $this->definition = $definition;
     if (isset($value)) {
       $this->setValue($value);

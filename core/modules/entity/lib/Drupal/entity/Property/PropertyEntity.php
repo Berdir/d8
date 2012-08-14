@@ -41,7 +41,7 @@ class PropertyEntity implements PropertyInterface, PropertyContainerInterface {
   /**
    * Implements PropertyInterface::__construct().
    */
-  public function __construct(array $definition, $value = NULL) {
+  public function __construct(array $definition, $value = NULL, $context = array()) {
     $this->definition = $definition;
     $this->entityType = isset($this->definition['entity type']) ? $this->definition['entity type'] : NULL;
 

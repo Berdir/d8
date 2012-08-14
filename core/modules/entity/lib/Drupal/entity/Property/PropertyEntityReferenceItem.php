@@ -16,7 +16,7 @@ class PropertyEntityReferenceItem extends EntityPropertyItemBase {
   /**
    * Overrides EntityPropertyItemBase::__construct().
    */
-  public function __construct(array $definition, $value = NULL) {
+  public function __construct(array $definition, $value = NULL, $context = array()) {
     $this->definition = $definition;
 
     // Initialize all property objects.

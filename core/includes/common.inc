@@ -7339,12 +7339,19 @@ function drupal_get_data_type_info() {
  * @param $value
  *   (optional) The property's value. If set, it has to match the property
  *   type's format.
+ * @param $context
+ *   (optional) An array describing the context of the property. It should be
+ *   passed if a property is created as part of a property container. The
+ *   following keys are supported:
+ *   - name: The name of the property being created.
+ *   - parent: The parent object containing the property. Must be an instance of
+ *     \Drupal\Core\Property\PropertyContainerInterface.
  *
  * @return \Drupal\Core\Property\PropertyInterface
  *
  * @see drupal_get_data_type_info()
  */
-function drupal_get_property(array $definition, $value = NULL) {
+function drupal_get_property(array $definition, $value = NULL, $context = array()) {
   $type_info = &drupal_static('data_type_info');
 
   if (!isset($type_info)) {
@@ -7354,7 +7361,7 @@ function drupal_get_property(array $definition, $value = NULL) {
   // Allow per-property definition overrides of the used classes.
   $class_info = $definition + $type_info[$definition['type']];
   $class = empty($definition['list']) ? $class_info['class'] : $class_info['list class'];
-  return new $class($definition, $value);
+  return new $class($definition, $value, $context);
 }
 
 /**

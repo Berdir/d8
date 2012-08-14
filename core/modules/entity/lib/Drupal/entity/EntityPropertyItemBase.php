@@ -41,12 +41,13 @@ abstract class EntityPropertyItemBase implements EntityPropertyItemInterface {
   /**
    * Implements PropertyInterface::__construct().
    */
-  public function __construct(array $definition, $value = NULL) {
+  public function __construct(array $definition, $value = NULL, $context = array()) {
     $this->definition = $definition;
 
     // Initialize all property objects.
     foreach ($this->getPropertyDefinitions() as $name => $definition) {
-      $this->properties[$name] = drupal_get_property($definition);
+      $context = array('name' => $name, 'parent' => $this);
+      $this->properties[$name] = drupal_get_property($definition, NULL, $context);
     }
 
     if (isset($value)) {

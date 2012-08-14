@@ -20,10 +20,17 @@ interface PropertyInterface {
    * @param mixed $value
    *   (optional) The value of the property, or NULL if the property is not set.
    *    See PropertyInterface::setValue() for details.
+   * @param $context
+   *   (optional) An array describing the context of the property. It should be
+   *   passed if a property is created as part of a property container. The
+   *   following keys are supported:
+   *   - name: The name of the property being created.
+   *   - parent: The parent object containing the property. Must be an instance of
+   *     \Drupal\Core\Property\PropertyContainerInterface.
    *
-   * @return \Drupal\Core\Property\PropertyContainerInterface
+   * @see drupal_get_property()
    */
-  function __construct(array $definition, $value = NULL);
+  public function __construct(array $definition, $value = NULL, $context = array());
 
   /**
    * Gets the data type of the property.

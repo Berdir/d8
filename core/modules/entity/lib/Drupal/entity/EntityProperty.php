@@ -38,7 +38,7 @@ class EntityProperty implements EntityPropertyInterface {
   /**
    * Implements PropertyInterface::__construct().
    */
-  public function __construct(array $definition, $value = NULL) {
+  public function __construct(array $definition, $value = NULL, $context = array()) {
     $this->definition = $definition;
     if (isset($value)) {
       $this->setValue($value);
