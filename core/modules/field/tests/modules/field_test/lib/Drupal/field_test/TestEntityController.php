@@ -18,11 +18,10 @@ class TestEntityController extends DatabaseStorageController {
   /**
    * Overrides Drupal\entity\DatabaseStorageController::preSaveRevision().
    */
-  public function preSave(EntityInterface $revision) {
+  public function preSaveRevision(EntityInterface $revision) {
     // Prepare for a new revision.
-    if (!$entity->isNew() && !empty($entity->revision)) {
-      $entity->old_ftvid = $entity->ftvid;
-      $entity->ftvid = NULL;
+    if (!empty($revision->use_provided_revision_id)) {
+      $revision->ftvid = $revision->old_ftvid;
     }
   }
 
