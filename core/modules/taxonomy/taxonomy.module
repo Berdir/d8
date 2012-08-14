@@ -946,7 +946,7 @@ function taxonomy_term_load_multiple_by_name($name, $vocabulary = NULL) {
  *   An array of taxonomy term entities, indexed by tid. When no results are
  *   found, an empty array is returned.
  */
-function taxonomy_term_load_multiple($tids = array()) {
+function taxonomy_term_load_multiple($tids = FALSE) {
   return entity_load_multiple('taxonomy_term', $tids);
 }
 
@@ -965,7 +965,7 @@ function taxonomy_term_load_multiple($tids = array()) {
  * @return array
  *  An array of vocabulary objects, indexed by vid.
  */
-function taxonomy_vocabulary_load_multiple($vids = array()) {
+function taxonomy_vocabulary_load_multiple($vids = FALSE) {
   return entity_load_multiple('taxonomy_vocabulary', $vids);
 }
 

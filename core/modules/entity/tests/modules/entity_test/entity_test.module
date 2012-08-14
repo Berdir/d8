@@ -53,7 +53,7 @@ function entity_test_load($id, $reset = FALSE) {
  * @return array
  *   An array of test entity objects, indexed by ID.
  */
-function entity_test_load_multiple($ids = array(), $reset = FALSE) {
+function entity_test_load_multiple($ids = FALSE, $reset = FALSE) {
   return entity_load_multiple('entity_test', $ids, $reset);
 }
 

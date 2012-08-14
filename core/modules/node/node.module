@@ -993,7 +993,7 @@ function node_invoke($node, $hook, $a2 = NULL, $a3 = NULL, $a4 = NULL) {
  * @see entity_load_multiple()
  * @see Drupal\entity\EntityFieldQuery
  */
-function node_load_multiple($nids = array(), $reset = FALSE) {
+function node_load_multiple($nids = FALSE, $reset = FALSE) {
   return entity_load_multiple('node', $nids, $reset);
 }
 

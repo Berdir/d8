@@ -1521,7 +1521,7 @@ function comment_delete_multiple($cids) {
  * @see entity_load()
  * @see Drupal\entity\EntityFieldQuery
  */
-function comment_load_multiple($cids = array(), $reset = FALSE) {
+function comment_load_multiple($cids = FALSE, $reset = FALSE) {
   return entity_load_multiple('comment', $cids, $reset);
 }
 
