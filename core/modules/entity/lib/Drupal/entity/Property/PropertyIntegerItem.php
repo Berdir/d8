@@ -1,0 +1,32 @@
+<?php
+/**
+ * @file
+ * Definition of Drupal\entity\Property\PropertyIntegerItem.
+ */
+
+namespace Drupal\entity\Property;
+use \Drupal\entity\EntityPropertyItemBase;
+
+
+/**
+ * Defines the 'integer_item' entity property item.
+ */
+class PropertyIntegerItem extends EntityPropertyItemBase {
+
+  /**
+   * Implements PropertyContainerInterface::getPropertyDefinitions().
+   */
+  public function getPropertyDefinitions() {
+    // Statically cache the definitions to avoid creating lots of array copies.
+    $definitions = drupal_static(__CLASS__);
+
+    if (!isset($definitions)) {
+      $definitions['value'] = array(
+        'type' => 'integer',
+        'label' => t('Integer value'),
+      );
+    }
+    return $definitions;
+  }
+}
+

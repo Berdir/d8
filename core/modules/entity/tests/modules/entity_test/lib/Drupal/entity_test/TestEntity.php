@@ -22,6 +22,13 @@ class TestEntity extends Entity {
   public $id;
 
   /**
+   * The entity UUID.
+   *
+   * @var string
+   */
+  public $uuid;
+
+  /**
    * The name of the test entity.
    *
    * @var EntityPropertyInterface
@@ -44,10 +51,24 @@ class TestEntity extends Entity {
     // @todo: Should we unset defined properties or initialize all entity
     // property objects here, so we have the magic getter working with
     // properties defined in the entity class.
+    unset($this->id);
+    unset($this->uuid);
     unset($this->name);
     unset($this->user);
   }
 
+  /**
+   * Overrides Entity::id().
+   */
+  public function id() {
+    return $this->get('id')->value;
+  }
+
+  /**
+   * Magic getter: Gets the property in default language.
+   *
+   * @todo: Move to Entity class and interface.
+   */
   public function __get($name) {
     if ($this->getPropertyDefinition($name)) {
       return $this->get($name);
@@ -55,6 +76,11 @@ class TestEntity extends Entity {
     return isset($this->$name) ? $this->$name : NULL;
   }
 
+  /**
+   * Magic getter: Sets the property in default language.
+   *
+   * @todo: Move to Entity class and interface.
+   */
   public function __set($name, $value) {
     if ($this->getPropertyDefinition($name)) {
       $this->set($name, $value);

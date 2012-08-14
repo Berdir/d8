@@ -8,6 +8,7 @@
 namespace Drupal\entity\Tests;
 
 use Drupal\core\Property\PropertyInterface;
+use Drupal\entity\EntityInterface;
 use Drupal\entity\EntityPropertyInterface;
 use Drupal\entity\EntityPropertyItemInterface;
 use Drupal\simpletest\WebTestBase;
@@ -191,8 +192,10 @@ class EntityPropertyTest extends WebTestBase  {
         $this->assertTrue($property[0] instanceof EntityPropertyItemInterface, "Item $delta of property $name implements interface.");
 
         foreach ($item as $value_name => $value_property) {
+          $this->assertTrue($value_property instanceof PropertyInterface, "Value $value_name of item $delta of property $name implements interface.");
+
           $value = $value_property->getValue();
-          $this->assertTrue(!isset($value) || is_scalar($value) || $value instanceof \Drupal\entity\EntityInterface, "Value $value_name of item $delta of property $name is a primitive or an entity.");
+          $this->assertTrue(!isset($value) || is_scalar($value) || $value instanceof EntityInterface, "Value $value_name of item $delta of property $name is a primitive or an entity.");
         }
       }
     }
@@ -223,6 +226,7 @@ class EntityPropertyTest extends WebTestBase  {
     // @todo: Once the user entity has defined properties this should contain
     // the user name and other user entity strings as well.
     $target_strings = array(
+      $entity->uuid->value,
       $this->entity_name,
       $this->entity_field_text,
       // Field format.

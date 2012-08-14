@@ -210,7 +210,7 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
       // Remove any invalid ids from the array.
       $passed_ids = array_intersect_key($passed_ids, $entities);
       foreach ($entities as $entity) {
-        $passed_ids[$entity->{$this->idKey}] = $entity;
+        $passed_ids[$entity->id()] = $entity;
       }
       $entities = $passed_ids;
     }

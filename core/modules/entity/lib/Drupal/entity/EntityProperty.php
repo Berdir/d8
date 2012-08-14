@@ -79,6 +79,11 @@ class EntityProperty implements EntityPropertyInterface {
    */
   public function setValue($values) {
     if (isset($values)) {
+
+      if (!is_array($values)) {
+        throw new \InvalidArgumentException("An entity property requires a numerically indexed array of items as value.");
+      }
+
       // Clear the values of properties for which no value has been passed.
       foreach (array_diff_key($this->list, $values) as $delta => $item) {
         unset($this->list[$delta]);

@@ -526,6 +526,12 @@ function entity_data_type_info() {
       'class' => '\Drupal\entity\Property\PropertyStringItem',
       'list class' => '\Drupal\entity\EntityProperty',
     ),
+    'integer_item' => array(
+      'label' => t('Integer item'),
+      'description' => t('An entity property containing an integer value.'),
+      'class' => '\Drupal\entity\Property\PropertyIntegerItem',
+      'list class' => '\Drupal\entity\EntityProperty',
+    ),
     'entityreference_item' => array(
       'label' => t('Entity reference item'),
       'description' => t('An entity property containing an entity reference.'),

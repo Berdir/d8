@@ -76,7 +76,7 @@ class TestEntityStorageController extends DatabaseStorageController {
     // Assign a new UUID if there is none yet.
     if ($this->uuidKey && !isset($entity->{$this->uuidKey})) {
       $uuid = new Uuid();
-      $entity->{$this->uuidKey} = $uuid->generate();
+      $entity->{$this->uuidKey}->value = $uuid->generate();
     }
     return $entity;
   }
@@ -144,7 +144,7 @@ class TestEntityStorageController extends DatabaseStorageController {
         // Reset general caches, but keep caches specific to certain entities.
         $this->resetCache(array());
 
-        $entity->{$this->idKey} = $record->id;
+        $entity->{$this->idKey}->value = $record->id;
         $entity->enforceIsNew(FALSE);
         $this->postSave($entity, FALSE);
         $this->invokeHook('insert', $entity, $record);
@@ -166,7 +166,8 @@ class TestEntityStorageController extends DatabaseStorageController {
   /**
    * Overrides DatabaseStorageController::invokeHook().
    *
-   * Make sure to pass on mapped storage records to field API attachers.
+   * Make sure to pass on mapped storage records to field API attachers for
+   * saving.
    */
   protected function invokeHook($hook, EntityInterface $entity, \stdclass $record = NULL) {
     if (!empty($this->entityInfo['fieldable']) && function_exists($function = 'field_attach_' . $hook)) {
@@ -188,9 +189,7 @@ class TestEntityStorageController extends DatabaseStorageController {
 
     foreach ($records as $id => $record) {
       // Compile values of everything that is no property yet.
-      $values[$this->idKey] = $id;
       $values['langcode'] = $record->langcode;
-      $values['uuid'] = $record->uuid;
 
       // Add values for all properties.
       $property_values = array();
@@ -229,15 +228,10 @@ class TestEntityStorageController extends DatabaseStorageController {
    */
   protected function mapToStorageRecord(EntityInterface $entity) {
     $record = new \stdClass();
-    $record->id = $entity->id();
-    $record->uuid = $entity->uuid;
     $record->langcode = $entity->langcode;
 
     foreach ($entity as $name => $property) {
       switch ($name) {
-        case 'name':
-          $record->name = $entity->name->value;
-          break;
         case 'user':
           $record->uid = $entity->user->id;
           break;
@@ -250,7 +244,9 @@ class TestEntityStorageController extends DatabaseStorageController {
             $record->{$name}[LANGUAGE_NOT_SPECIFIED] = $property->toArray();
           }
           else {
-            $record->$name = $property->toArray();
+            // Just get the first value of the first item, e.g.
+            // $entity->name[0]->value.
+            $record->$name = current($property[0]->toArray());
           }
           break;
       }
@@ -304,6 +300,18 @@ class TestEntityStorageController extends DatabaseStorageController {
    * Implements \Drupal\entity\EntityStorageControllerInterface.
    */
   public function basePropertyDefinitions() {
+    $properties['id'] = array(
+      'label' => t('ID'),
+      'description' => ('The ID of the test entity.'),
+      'type' => 'integer_item',
+      'list' => TRUE,
+    );
+    $properties['uuid'] = array(
+      'label' => t('UUID'),
+      'description' => ('The UUID of the test entity.'),
+      'type' => 'string_item',
+      'list' => TRUE,
+    );
     $properties['name'] = array(
       'label' => t('Name'),
       'description' => ('The name of the test entity.'),
