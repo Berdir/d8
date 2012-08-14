@@ -1868,6 +1868,24 @@ function system_stream_wrappers() {
 }
 
 /**
+ * Implements hook_data_type_info().
+ */
+function system_data_type_info() {
+  return array(
+    'string' => array(
+      'label' => t('String'),
+      'class' => '\Drupal\Core\Property\Type\String',
+      'primitive' => TRUE,
+    ),
+    'integer' => array(
+      'label' => t('Integer'),
+      'class' => '\Drupal\Core\Property\Type\Integer',
+      'primitive' => TRUE,
+    ),
+  );
+}
+
+/**
  * Retrieve a blocked IP address from the database.
  *
  * @param $iid integer

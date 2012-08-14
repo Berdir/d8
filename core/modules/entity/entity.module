@@ -532,16 +532,6 @@ function entity_data_type_info() {
       'class' => '\Drupal\entity\Property\PropertyEntityReferenceItem',
       'list class' => '\Drupal\entity\EntityProperty',
     ),
-    'string' => array(
-      'label' => t('String'),
-      'class' => '\Drupal\Core\Property\Type\String',
-      'primitive' => TRUE,
-    ),
-    'integer' => array(
-      'label' => t('Integer'),
-      'class' => '\Drupal\Core\Property\Type\Integer',
-      'primitive' => TRUE,
-    ),
     'entity' => array(
       'label' => t('Entity'),
       'description' => t('All kind of entities, e.g. nodes, comments or users.'),
