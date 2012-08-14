@@ -255,4 +255,21 @@ class EntityPropertyTest extends WebTestBase  {
       }
     }
   }
+
+  /**
+   * Tests getting processed property values via a computed property.
+   */
+  public function testComputedProperties() {
+    // Make the test text field processed.
+    $instance = field_info_instance('entity_test', 'field_test_text', 'entity_test');
+    $instance['settings']['text_processing'] = 1;
+    field_update_instance($instance);
+
+    $entity = $this->createTestEntity();
+    $entity->field_test_text->value = "The <strong>text</strong> text to filter.";
+    $entity->field_test_text->format = filter_default_format();
+
+    $target = "<p>The &lt;strong&gt;text&lt;/strong&gt; text to filter.</p>\n";
+    $this->assertEqual($entity->field_test_text->processed, $target, 'Text is processed with the default filter.');
+  }
 }

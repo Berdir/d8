@@ -33,6 +33,8 @@ class PropertyTextWithSummaryItem extends PropertyTextItem {
         'description' => t('The summary text value with the text format applied.'),
         'html' => TRUE,
         'computed' => TRUE,
+        'class' => '\Drupal\text\PropertyProcessedText',
+        'source' => 'summary',
       );
     }
     return $definitions;
