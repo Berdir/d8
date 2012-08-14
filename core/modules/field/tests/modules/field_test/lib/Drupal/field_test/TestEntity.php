@@ -62,12 +62,5 @@ class TestEntity extends Entity {
   public function bundle() {
     return !empty($this->fttype) ? $this->fttype : $this->entityType();
   }
-
-  /**
-   * Overrides Drupal\entity\Entity::label().
-   */
-  public function label($langcode = NULL) {
-    return $this->ftlabel;
-  }
 }
 

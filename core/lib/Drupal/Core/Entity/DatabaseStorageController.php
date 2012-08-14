@@ -519,9 +519,10 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
    */
   protected function saveRevision(EntityInterface $entity) {
     $revision = clone $entity;
-    // When saving a new revision, set the revision key to NULL if this is not
-    // a new entity or has not been changed manually already.
-    if ($revision->isNewRevision() && !empty($revision->original) && $revision->{$this->revisionKey} && $revision->{$this->revisionKey} == $revision->original->{$this->revisionKey}) {
+    // When saving a new revision, set the revision key to NULL if currently
+    // set to enforce a new vid.
+    if ($revision->isNewRevision() && $revision->{$this->revisionKey}) {
+      $revision->{'old_' . $this->revisionKey} = $revision->{$this->revisionKey};
       $revision->{$this->revisionKey} = NULL;
     }
 
