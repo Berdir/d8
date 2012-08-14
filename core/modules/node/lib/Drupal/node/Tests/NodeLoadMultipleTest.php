@@ -43,7 +43,7 @@ class NodeLoadMultipleTest extends NodeTestBase {
     $this->assertNoText($node4->label(), t('Node title does not appear in the default listing.'));
 
     // Load nodes with only a condition. Nodes 3 and 4 will be loaded.
-    $nodes = entity_load_by_properties('node', array('promote' => 0));
+    $nodes = entity_load_multiple_by_properties('node', array('promote' => 0));
     $this->assertEqual($node3->label(), $nodes[$node3->nid]->label(), t('Node was loaded.'));
     $this->assertEqual($node4->label(), $nodes[$node4->nid]->label(), t('Node was loaded.'));
     $count = count($nodes);

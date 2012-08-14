@@ -61,11 +61,11 @@ function user_pass() {
 function user_pass_validate($form, &$form_state) {
   $name = trim($form_state['values']['name']);
   // Try to load by email.
-  $users = entity_load_by_properties('user', array('mail' => $name, 'status' => '1'));
+  $users = entity_load_multiple_by_properties('user', array('mail' => $name, 'status' => '1'));
   $account = reset($users);
   if (!$account) {
     // No success, try to load by name.
-    $users = entity_load_by_properties('user', array('name' => $name, 'status' => '1'));
+    $users = entity_load_multiple_by_properties('user', array('name' => $name, 'status' => '1'));
     $account = reset($users);
   }
   if (isset($account->uid)) {

@@ -31,7 +31,7 @@ class LoadTest extends FileHookTestBase {
    * Try to load a non-existent file by URI.
    */
   function testLoadMissingFilepath() {
-    $files = entity_load_by_properties('file', array('uri' => 'foobar://misc/druplicon.png'));
+    $files = entity_load_multiple_by_properties('file', array('uri' => 'foobar://misc/druplicon.png'));
     $this->assertFalse(reset($files), t("Try to load a file that doesn't exist in the database fails."));
     $this->assertFileHooksCalled(array());
   }
@@ -40,7 +40,7 @@ class LoadTest extends FileHookTestBase {
    * Try to load a non-existent file by status.
    */
   function testLoadInvalidStatus() {
-    $files = entity_load_by_properties('file', array('status' => -99));
+    $files = entity_load_multiple_by_properties('file', array('status' => -99));
     $this->assertFalse(reset($files), t("Trying to load a file with an invalid status fails."));
     $this->assertFileHooksCalled(array());
   }
@@ -72,7 +72,7 @@ class LoadTest extends FileHookTestBase {
 
     // Load by path.
     file_test_reset();
-    $by_path_files = entity_load_by_properties('file', array('uri' => $file->uri));
+    $by_path_files = entity_load_multiple_by_properties('file', array('uri' => $file->uri));
     $this->assertFileHookCalled('load');
     $this->assertEqual(1, count($by_path_files), t('file_load_multiple() returned an array of the correct size.'));
     $by_path_file = reset($by_path_files);

@@ -256,7 +256,7 @@ function entity_load_multiple($entity_type, $ids = FALSE, $reset = FALSE) {
  * @return array
  *   An array of entity objects indexed by their ids.
  */
-function entity_load_by_properties($entity_type, array $values) {
+function entity_load_multiple_by_properties($entity_type, array $values) {
   return entity_get_controller($entity_type)->loadByProperties($values);
 }
 

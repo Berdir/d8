@@ -144,7 +144,7 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
   /**
    * Implements Drupal\entity\EntityStorageControllerInterface::load().
    */
-  public function load($ids = array()) {
+  public function load($ids = FALSE) {
     $entities = array();
 
     // Create a new variable which is either a prepared version of the $ids

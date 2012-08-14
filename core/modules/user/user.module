@@ -332,7 +332,7 @@ function user_load($uid, $reset = FALSE) {
  * @see user_load_multiple()
  */
 function user_load_by_mail($mail) {
-  $users = entity_load_by_properties('user', array('mail' => $mail));
+  $users = entity_load_multiple_by_properties('user', array('mail' => $mail));
   return reset($users);
 }
 
@@ -348,7 +348,7 @@ function user_load_by_mail($mail) {
  * @see user_load_multiple()
  */
 function user_load_by_name($name) {
-  $users = entity_load_by_properties('user', array('name' => $name));
+  $users = entity_load_multiple_by_properties('user', array('name' => $name));
   return reset($users);
 }
 

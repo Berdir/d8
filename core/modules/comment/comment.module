@@ -1424,7 +1424,7 @@ function comment_node_search_result(Node $node) {
 function comment_user_cancel($edit, $account, $method) {
   switch ($method) {
     case 'user_cancel_block_unpublish':
-      $comments = entity_load_by_properties('comment', array('uid' => $account->uid));
+      $comments = entity_load_multiple_by_properties('comment', array('uid' => $account->uid));
       foreach ($comments as $comment) {
         $comment->status = 0;
         comment_save($comment);
@@ -1432,7 +1432,7 @@ function comment_user_cancel($edit, $account, $method) {
       break;
 
     case 'user_cancel_reassign':
-      $comments = entity_load_by_properties('comment', array('uid' => $account->uid));
+      $comments = entity_load_multiple_by_properties('comment', array('uid' => $account->uid));
       foreach ($comments as $comment) {
         $comment->uid = 0;
         comment_save($comment);

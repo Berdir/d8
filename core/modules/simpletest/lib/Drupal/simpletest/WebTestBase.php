@@ -166,7 +166,7 @@ abstract class WebTestBase extends TestBase {
     if ($reset) {
       entity_get_controller('node')->resetCache();
     }
-    $nodes = entity_load_by_properties('node', array('title' => $title));
+    $nodes = entity_load_multiple_by_properties('node', array('title' => $title));
     // Load the first node returned from the database.
     $returned_node = reset($nodes);
     return $returned_node;

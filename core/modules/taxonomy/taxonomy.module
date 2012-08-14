@@ -89,7 +89,7 @@ function taxonomy_permission() {
       'title' => t('Administer vocabularies and terms'),
     ),
   );
-  foreach (taxonomy_vocabulary_load_multiple(FALSE) as $vocabulary) {
+  foreach (taxonomy_vocabulary_load_multiple() as $vocabulary) {
     $permissions += array(
       'edit terms in ' . $vocabulary->vid => array(
         'title' => t('Edit terms in %vocabulary', array('%vocabulary' => $vocabulary->name)),
@@ -926,7 +926,7 @@ function taxonomy_term_load_multiple_by_name($name, $vocabulary = NULL) {
       return array();
     }
   }
-  return entity_load_by_properties('taxonomy_term', $values);
+  return entity_load_multiple_by_properties('taxonomy_term', $values);
 }
 
 /**
@@ -998,7 +998,7 @@ function taxonomy_vocabulary_load($vid) {
  * @see taxonomy_vocabulary_load()
  */
 function taxonomy_vocabulary_machine_name_load($name) {
-  $result = entity_load_by_properties('taxonomy_vocabulary', array('machine_name' => $name));
+  $result = entity_load_multiple_by_properties('taxonomy_vocabulary', array('machine_name' => $name));
   return reset($result);
 }
 
@@ -1399,7 +1399,7 @@ function taxonomy_autocomplete_validate($element, &$form_state) {
     foreach ($typed_terms as $typed_term) {
       // See if the term exists in the chosen vocabulary and return the tid;
       // otherwise, create a new 'autocreate' term for insert/update.
-      if ($possibilities = entity_load_by_properties('taxonomy_term', array('name' => trim($typed_term), 'vid' => array_keys($vocabularies)))) {
+      if ($possibilities = entity_load_multiple_by_properties('taxonomy_term', array('name' => trim($typed_term), 'vid' => array_keys($vocabularies)))) {
         $term = array_pop($possibilities);
       }
       else {
@@ -1429,7 +1429,7 @@ function taxonomy_field_widget_error($element, $error, $form, &$form_state) {
  */
 function taxonomy_field_settings_form($field, $instance, $has_data) {
   // Get proper values for 'allowed_values_function', which is a core setting.
-  $vocabularies = taxonomy_vocabulary_load_multiple(FALSE);
+  $vocabularies = taxonomy_vocabulary_load_multiple();
   $options = array();
   foreach ($vocabularies as $vocabulary) {
     $options[$vocabulary->machine_name] = $vocabulary->name;

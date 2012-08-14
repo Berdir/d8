@@ -46,7 +46,7 @@ interface EntityStorageControllerInterface {
    * @return
    *   An array of entity objects indexed by their ids.
    */
-  public function load($ids = array());
+  public function load($ids = FALSE);
 
   /**
    * Load a specific entity revision.

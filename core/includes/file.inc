@@ -795,7 +795,7 @@ function file_copy(File $source, $destination = NULL, $replace = FILE_EXISTS_REN
     $file->filename = drupal_basename($uri);
     // If we are replacing an existing file re-use its database record.
     if ($replace == FILE_EXISTS_REPLACE) {
-      $existing_files = entity_load_by_properties('file', array('uri' => $uri));
+      $existing_files = entity_load_multiple_by_properties('file', array('uri' => $uri));
       if (count($existing_files)) {
         $existing = reset($existing_files);
         $file->fid = $existing->fid;
@@ -1044,7 +1044,7 @@ function file_move(File $source, $destination = NULL, $replace = FILE_EXISTS_REN
     $file->uri = $uri;
     // If we are replacing an existing file re-use its database record.
     if ($replace == FILE_EXISTS_REPLACE) {
-      $existing_files = entity_load_by_properties('file', array('uri' => $uri));
+      $existing_files = entity_load_multiple_by_properties('file', array('uri' => $uri));
       if (count($existing_files)) {
         $existing = reset($existing_files);
         $delete_source = TRUE;
@@ -1557,7 +1557,7 @@ function file_save_upload($source, $validators = array(), $destination = FALSE, 
 
   // If we are replacing an existing file re-use its database record.
   if ($replace == FILE_EXISTS_REPLACE) {
-    $existing_files = entity_load_by_properties('file', array('uri' => $file->uri));
+    $existing_files = entity_load_multiple_by_properties('file', array('uri' => $file->uri));
     if (count($existing_files)) {
       $existing = reset($existing_files);
       $file->fid = $existing->fid;
@@ -1850,7 +1850,7 @@ function file_save_data($data, $destination = NULL, $replace = FILE_EXISTS_RENAM
     ));
     // If we are replacing an existing file re-use its database record.
     if ($replace == FILE_EXISTS_REPLACE) {
-      $existing_files = entity_load_by_properties('file', array('uri' => $uri));
+      $existing_files = entity_load_multiple_by_properties('file', array('uri' => $uri));
       if (count($existing_files)) {
         $existing = reset($existing_files);
         $file->fid = $existing->fid;

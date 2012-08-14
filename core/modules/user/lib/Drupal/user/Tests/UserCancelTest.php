@@ -297,7 +297,7 @@ class UserCancelTest extends WebTestBase {
     $this->drupalPost('comment/reply/' . $node->nid, $edit, t('Preview'));
     $this->drupalPost(NULL, array(), t('Save'));
     $this->assertText(t('Your comment has been posted.'));
-    $comments = entity_load_by_properties('comment', array('subject' => $edit['subject']));
+    $comments = entity_load_multiple_by_properties('comment', array('subject' => $edit['subject']));
     $comment = reset($comments);
     $this->assertTrue($comment->cid, t('Comment found.'));
 
