@@ -126,7 +126,7 @@ abstract class EntityPropertyItemBase implements EntityPropertyItemInterface {
   }
 
   /**
-   * Implements PropertyInterface::get().
+   * Gets a property.
    */
   public function get($property_name) {
     if (!isset($this->properties[$property_name])) {

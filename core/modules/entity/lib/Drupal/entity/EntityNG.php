@@ -75,6 +75,7 @@ class EntityNG extends Entity implements PropertyContainerInterface {
    * Implements EntityInterface::set().
    */
   public function set($property_name, $value, $langcode = NULL) {
+    $value = $value instanceof PropertyInterface ? $value->getValue() : $value;
     $this->get($property_name, $langcode)->setValue($value);
   }
 
@@ -158,6 +159,52 @@ class EntityNG extends Entity implements PropertyContainerInterface {
       $values[$name] = $property->getValue();
     }
     return $values;
+  }
+
+  /**
+   * Gets a translation of the entity.
+   *
+   * @return \Drupal\Core\Property\PropertyContainerInterface
+   *   A container holding the translated properties.
+   */
+  public function getTranslation($langcode) {
+
+    if ($langcode == $this->get('language')->langcode) {
+      // No translation need, return the entity.
+      return $this;
+    }
+    // Check whether the language code is valid, thus is of an available
+    // language.
+    $languages = language_list(LANGUAGE_ALL);
+    if (!isset($languages[$langcode])) {
+      throw new \InvalidArgumentException("Unable to get translation for the invalid language '$langcode'.");
+    }
+
+    $definition = array(
+      'entity type' => $this->entityType,
+      'bundle' => $this->bundle(),
+      'langcode' => $langcode,
+    );
+    return new EntityTranslation($definition, NULL, array('parent' => $this));
+  }
+
+  /**
+   * Overrides EntityInterface::translations().
+   */
+  public function translations() {
+    $translations = array();
+    // Build an array with the translation langcodes set as keys.
+    foreach ($this->getProperties() as $name => $property) {
+      if (isset($this->values[$name])) {
+        $translations += $this->values[$name];
+      }
+      $translations += $this->properties[$name];
+    }
+    unset($translations[LANGUAGE_NOT_SPECIFIED]);
+
+    // Now get languages based upon translation langcodes.
+    $languages = array_intersect_key(language_list(), $translations);
+    return $languages;
   }
 
   public function access($account) {
