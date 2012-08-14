@@ -14,25 +14,6 @@ use \Drupal\entity\EntityPropertyItemBase;
 class PropertyEntityReferenceItem extends EntityPropertyItemBase {
 
   /**
-   * Overrides EntityPropertyItemBase::__construct().
-   */
-  public function __construct(array $definition, $value = NULL, $context = array()) {
-    $this->definition = $definition;
-
-    // Initialize all property objects.
-    foreach ($this->getPropertyDefinitions() as $name => $definition) {
-      $this->properties[$name] = drupal_get_property($definition);
-    }
-
-    // Link the entity property with its source ID.
-    $this->properties['entity']->setIdProperty($this->properties['id']);
-
-    if (isset($value)) {
-      $this->setValue($value);
-    }
-  }
-
-  /**
    * Implements PropertyContainerInterface::getPropertyDefinitions().
    */
   public function getPropertyDefinitions() {
@@ -50,17 +31,9 @@ class PropertyEntityReferenceItem extends EntityPropertyItemBase {
       'description' => t('The referenced entity'),
       // The entity object is computed out of the entity id.
       'computed' => TRUE,
+      'read-only' => FALSE,
     );
     return $definitions;
-  }
-
-  /**
-   * Overrides EntityPropertyItemBase::setProperties().
-   */
-  public function setProperties($properties) {
-    parent::setProperties($properties);
-    // Make sure the entity property is linked with the ID.
-    $this->properties['entity']->setIdProperty($this->properties['id']);
   }
 
   /**

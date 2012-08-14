@@ -44,8 +44,21 @@ abstract class EntityPropertyItemBase implements EntityPropertyItemInterface {
   public function __construct(array $definition, $value = NULL, $context = array()) {
     $this->definition = $definition;
 
-    // Initialize all property objects.
+    // Initialize all property objects, but postpone the creating of computed
+    // properties to a second step. That way computed properties can safely get
+    // references on non-computed properties during construction.
+    $step2 = array();
     foreach ($this->getPropertyDefinitions() as $name => $definition) {
+      if (empty($definition['computed'])) {
+        $context = array('name' => $name, 'parent' => $this);
+        $this->properties[$name] = drupal_get_property($definition, NULL, $context);
+      }
+      else {
+        $step2[$name] = $definition;
+      }
+    }
+
+    foreach ($step2 as $name => $definition) {
       $context = array('name' => $name, 'parent' => $this);
       $this->properties[$name] = drupal_get_property($definition, NULL, $context);
     }

@@ -35,7 +35,7 @@ class EntityProperty implements EntityPropertyInterface {
    */
   protected $definition;
 
-  /**
+   /**
    * Implements PropertyInterface::__construct().
    */
   public function __construct(array $definition, $value = NULL, $context = array()) {

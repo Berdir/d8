@@ -45,19 +45,18 @@ class PropertyEntity implements PropertyInterface, PropertyContainerInterface {
     $this->definition = $definition;
     $this->entityType = isset($this->definition['entity type']) ? $this->definition['entity type'] : NULL;
 
+    if (isset($context['parent'])) {
+      $this->id = $context['parent']->get('id');
+    }
+    else {
+      // No context given, so just initialize an ID property for storing the
+      // entity ID.
+      $this->id = drupal_get_property(array('type' => 'string'));
+    }
+
     if (isset($value)) {
       $this->setValue($value);
     }
-  }
-
-  /**
-   * Sets the source ID property for the entity.
-   *
-   * @param \Drupal\Core\Property\PropertyInterface $property
-   *   The property holding the entity ID.
-   */
-  public function setIdProperty(PropertyInterface $property) {
-    $this->id = $property;
   }
 
   /**
@@ -94,12 +93,6 @@ class PropertyEntity implements PropertyInterface, PropertyContainerInterface {
    * Both the entity ID and the entity object may be passed as value.
    */
   public function setValue($value) {
-    // First off make sure we have an ID property. If not, create one. Then
-    // continue setting the ID depending on the value passed.
-    if (!isset($this->id)) {
-      $this->id = drupal_get_property(array('type' => 'string'));
-    }
-
     if (!isset($value)) {
       $this->id->setValue(NULL);
     }
