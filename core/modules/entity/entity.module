@@ -245,7 +245,7 @@ function entity_load_multiple($entity_type, array $ids = NULL, $reset = FALSE) {
 }
 
 /**
- * Load entities by their properties.
+ * Load entities by their property values.
  *
  * @param string $entity_type
  *   The entity type to load, e.g. node or user.

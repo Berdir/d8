@@ -4629,7 +4629,7 @@ function _form_set_class(&$element, $class = array()) {
  *   //   1 (or no value explicitly set) means the operation is finished
  *   //   and the batch processing can continue to the next operation.
  *
- *   $nodes = entity_load_by_property('node', array('uid' => $uid, 'type' => $type));
+ *   $nodes = entity_load_multiple_by_properties('node', array('uid' => $uid, 'type' => $type));
  *   $node = reset($nodes);
  *   $context['results'][] = $node->nid . ' : ' . check_plain($node->label());
  *   $context['message'] = check_plain($node->label());
