@@ -241,7 +241,7 @@ class EntityTestStorageController extends DatabaseStorageController {
 
       if (!$entity->isNew()) {
         $return = drupal_write_record($this->entityInfo['base table'], $record, 'id');
-        $this->resetCache(array($entity->{$this->idKey}));
+        $this->resetCache(array($entity->id()));
         $this->postSave($entity, TRUE);
         $this->invokeHook('update', $entity);
       }
@@ -376,5 +376,28 @@ class EntityTestStorageController extends DatabaseStorageController {
       'translatable' => TRUE,
     );
     return $properties;
+  }
+
+  /**
+   * Overrides \Drupal\entity\DataBaseStorageController::cacheGet().
+   */
+  protected function cacheGet($ids, $conditions = array()) {
+    $entities = parent::cacheGet($ids, array());
+
+    // Exclude any entities loaded from cache if they don't match $conditions.
+    // This ensures the same behavior whether loading from memory or database.
+    if ($conditions) {
+      if (!$ids) {
+        $entities = $this->entityCache;
+      }
+
+      foreach ($entities as $entity) {
+        $entity_values = $entity->toArray();
+        if (array_diff_assoc($conditions, $entity_values)) {
+          unset($entities[$entity->id()]);
+        }
+      }
+    }
+    return $entities;
   }
 }

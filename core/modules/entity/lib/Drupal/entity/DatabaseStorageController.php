@@ -460,7 +460,7 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
 
       if (!$entity->isNew()) {
         $return = drupal_write_record($this->entityInfo['base table'], $entity, $this->idKey);
-        $this->resetCache(array($entity->{$this->idKey}));
+        $this->resetCache(array($entity->id()));
         $this->postSave($entity, TRUE);
         $this->invokeHook('update', $entity);
       }

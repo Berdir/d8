@@ -76,6 +76,8 @@ class EntityNG extends Entity implements PropertyContainerInterface {
       if (!$definition) {
         throw new \InvalidArgumentException('Property ' . check_plain($property_name) . ' is unknown.');
       }
+      // Non-translatable properties always LANGUAGE_NOT_SPECIFIED.
+      $langcode = empty($definition['translatable']) ? LANGUAGE_NOT_SPECIFIED : $langcode;
 
       $value = isset($this->values[$property_name][$langcode]) ? $this->values[$property_name][$langcode] : NULL;
       $this->properties[$property_name][$langcode] = drupal_get_property($definition, $value);
