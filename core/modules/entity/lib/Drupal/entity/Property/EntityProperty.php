@@ -257,6 +257,15 @@ class EntityProperty implements EntityPropertyInterface {
     return $this->getValue();
   }
 
+  /**
+   * Implements a deep clone.
+   */
+  public function __clone() {
+    foreach ($this->list as $delta => $property) {
+      $this->list[$delta] = clone $property;
+    }
+  }
+
   public function access($account = NULL) {
     // TODO: Implement access() method. Use item access.
   }

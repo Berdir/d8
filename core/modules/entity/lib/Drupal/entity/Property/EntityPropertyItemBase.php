@@ -211,6 +211,15 @@ abstract class EntityPropertyItemBase implements EntityPropertyItemInterface {
     return $this->getValue();
   }
 
+  /**
+   * Implements a deep clone.
+   */
+  public function __clone() {
+    foreach ($this->properties as $name => $property) {
+      $this->properties[$name] = clone $property;
+    }
+  }
+
   public function access($account = NULL) {
     // @todo implement
   }
