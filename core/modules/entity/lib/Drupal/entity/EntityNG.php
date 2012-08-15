@@ -62,11 +62,21 @@ class EntityNG extends Entity implements PropertyContainerInterface {
    * Implements EntityInterface::get().
    */
   public function get($property_name, $langcode = NULL) {
-    // Values in default language are stored using LANGUAGE_NOT_SPECIFIED.
-    if (!isset($langcode) || (isset($langcode) && $langcode == $this->get('language')->langcode)) {
+    // Values in default language are stored using LANGUAGE_NOT_SPECIFIED,
+    // so use LANGUAGE_NOT_SPECIFIED if either no language is given or it
+    // matches the default language. Then, if the default language is
+    // LANGUAGE_NOT_SPECIFIED, the entity is not translatable, so we always use
+    // LANGUAGE_NOT_SPECIFIED.
+    if (!isset($langcode) || $langcode == $this->language->langcode || LANGUAGE_NOT_SPECIFIED == $this->language->langcode) {
       // @todo: Find a more meaningful constant name and make field loading use
       // it too.
       $langcode = LANGUAGE_NOT_SPECIFIED;
+    }
+    else {
+      $languages = language_list(LANGUAGE_ALL);
+      if (!isset($languages[$langcode])) {
+        throw new \InvalidArgumentException("Unable to get translation for the invalid language '$langcode'.");
+      }
     }
 
     // Populate $this->properties to fasten further lookups and to keep track of
@@ -76,7 +86,7 @@ class EntityNG extends Entity implements PropertyContainerInterface {
       if (!$definition) {
         throw new \InvalidArgumentException('Property ' . check_plain($property_name) . ' is unknown.');
       }
-      // Non-translatable properties always LANGUAGE_NOT_SPECIFIED.
+      // Non-translatable properties always use LANGUAGE_NOT_SPECIFIED.
       $langcode = empty($definition['translatable']) ? LANGUAGE_NOT_SPECIFIED : $langcode;
 
       $value = isset($this->values[$property_name][$langcode]) ? $this->values[$property_name][$langcode] : NULL;
@@ -154,6 +164,15 @@ class EntityNG extends Entity implements PropertyContainerInterface {
   }
 
   /**
+   * Implements EntityInterface::language().
+   */
+  public function language() {
+    // @todo: Check for language.module instead, once Field API language
+    // handling depends upon it too.
+    return module_exists('locale') ? $this->language->object : FALSE;
+  }
+
+  /**
    * Gets a translation of the entity.
    *
    * @return \Drupal\Core\Property\PropertyContainerInterface
@@ -161,7 +180,7 @@ class EntityNG extends Entity implements PropertyContainerInterface {
    */
   public function getTranslation($langcode) {
 
-    if ($langcode == $this->get('language')->langcode) {
+    if ($langcode == LANGUAGE_NOT_SPECIFIED || $langcode == $this->get('language')->langcode) {
       // No translation need, return the entity.
       return $this;
     }

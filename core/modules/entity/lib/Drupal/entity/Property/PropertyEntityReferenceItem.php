@@ -40,7 +40,7 @@ class PropertyEntityReferenceItem extends EntityPropertyItemBase {
    * Overrides EntityPropertyItemBase::setValue().
    */
   public function setValue($values) {
-    // Treat the values as property value of the entity  property, if no array
+    // Treat the values as property value of the entity property, if no array
     // is given.
     if (!is_array($values)) {
       $values = array('entity' => $values);

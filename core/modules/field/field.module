@@ -411,6 +411,7 @@ function field_entity_property_info($entity_type) {
           'type' => $field['type'] . '_item',
           'field' => $field_name,
           'list' => TRUE,
+          'translatable' => !empty($field['translatable'])
         );
 
         if ($optional) {

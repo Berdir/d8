@@ -92,7 +92,7 @@ class EntityTestStorageController extends DatabaseStorageController {
 
     // Set all other given values.
     foreach ($values as $name => $value) {
-      if (is_array($value) && is_numeric(key($value))) {
+      if (is_array($value) && is_numeric(current(array_keys($value)))) {
         $entity->$name = $value;
       }
       else {

@@ -16,6 +16,13 @@ use Drupal\Core\Property\PropertyContainerInterface;
 class EntityTranslation implements PropertyContainerInterface, PropertyInterface {
 
   /**
+   * The property definition.
+   *
+   * @var array
+   */
+  protected $definition;
+
+  /**
    * The entity of which we make property translations available.
    *
    * @var EntityNG
