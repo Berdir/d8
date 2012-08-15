@@ -5,7 +5,7 @@
  */
 
 namespace Drupal\text;
-use \Drupal\entity\EntityPropertyItemBase;
+use \Drupal\entity\Property\EntityPropertyItemBase;
 
 /**
  * Defines the 'text_item' and 'text_long_item' entity property items.

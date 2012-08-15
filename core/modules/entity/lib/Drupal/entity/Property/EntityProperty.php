@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Definition of Drupal\entity\EntityProperty.
+ * Definition of Drupal\entity\Property\EntityProperty.
  */
 
-namespace Drupal\entity;
+namespace Drupal\entity\Property;
 
 /**
  * An entity property.

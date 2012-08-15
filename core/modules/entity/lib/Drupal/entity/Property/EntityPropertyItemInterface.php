@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Definition of Drupal\entity\EntityPropertyItemInterface.
+ * Definition of Drupal\entity\Property\EntityPropertyItemInterface.
  */
 
-namespace Drupal\entity;
+namespace Drupal\entity\Property;
 
 use Drupal\Core\Property\PropertyContainerInterface;
 use Drupal\Core\Property\PropertyInterface;
