@@ -40,6 +40,12 @@ class PropertyEntityReferenceItem extends EntityPropertyItemBase {
    * Overrides EntityPropertyItemBase::setValue().
    */
   public function setValue($values) {
+    // Treat the values as property value of the entity  property, if no array
+    // is given.
+    if (!is_array($values)) {
+      $values = array('entity' => $values);
+    }
+
     // Entity is computed out of the ID, so we only need to update the ID. Only
     // set the entity property if no ID is given.
     if (!empty($values['id'])) {

@@ -100,6 +100,16 @@ abstract class EntityPropertyItemBase implements EntityPropertyItemInterface {
    *   An array of property values.
    */
   public function setValue($values) {
+    // Treat the values as property value of the first property, if no array is
+    // given and we only have one property.
+    if (!is_array($values) && count($this->properties) == 1) {
+      $values = array(key($this->properties) => $values);
+    }
+    // Support passing in property objects as value.
+    elseif ($values instanceof PropertyInterface) {
+      $values = $values->getValue();
+    }
+
     foreach ($this->properties as $name => $property) {
       $property->setValue(isset($values[$name]) ? $values[$name] : NULL);
     }

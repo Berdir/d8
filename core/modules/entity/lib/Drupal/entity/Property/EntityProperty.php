@@ -80,6 +80,10 @@ class EntityProperty implements EntityPropertyInterface {
   public function setValue($values) {
     if (isset($values)) {
 
+      // Support passing in property objects as value.
+      if ($values instanceof PropertyInterface) {
+        $values = $values->getValue();
+      }
       if (!is_array($values)) {
         throw new \InvalidArgumentException("An entity property requires a numerically indexed array of items as value.");
       }
@@ -179,7 +183,7 @@ class EntityProperty implements EntityPropertyInterface {
   public function offsetSet($offset, $value) {
     // @todo: Throw exception if the value does not implement the interface.
     if (is_numeric($offset)) {
-      $this->list[$offset] = $value;
+      $this->offsetGet($offset)->setValue($value);
     }
     else {
       throw new \InvalidArgumentException('Unable to set a value with a non-numeric delta in a list.');
