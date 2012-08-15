@@ -61,7 +61,7 @@ class VocabularyUnitTest extends TaxonomyTestBase {
    */
   function testTaxonomyVocabularyDeleteWithTerms() {
     // Delete any existing vocabularies.
-    foreach (taxonomy_vocabulary_load_multiple(FALSE) as $vocabulary) {
+    foreach (taxonomy_vocabulary_load_multiple() as $vocabulary) {
       taxonomy_vocabulary_delete($vocabulary->vid);
     }
 
@@ -141,7 +141,7 @@ class VocabularyUnitTest extends TaxonomyTestBase {
     $names = taxonomy_vocabulary_get_names();
     $this->assertEqual($names[$vocabulary1->machine_name]->name, $vocabulary1->name, 'Vocabulary 1 name found.');
 
-    // Fetch all of the vocabularies using taxonomy_vocabulary_load_multiple(FALSE).
+    // Fetch all of the vocabularies using taxonomy_vocabulary_load_multiple().
     // Confirm that the vocabularies are ordered by weight.
     $vocabularies = taxonomy_vocabulary_load_multiple();
     $this->assertEqual(array_shift($vocabularies)->vid, $vocabulary1->vid, 'Vocabulary was found in the vocabularies array.');

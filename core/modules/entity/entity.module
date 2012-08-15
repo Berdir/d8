@@ -224,8 +224,8 @@ function entity_load_by_uuid($entity_type, $uuid, $reset = FALSE) {
  *
  * @param string $entity_type
  *   The entity type to load, e.g. node or user.
- * @param array|bool $ids
- *   An array of entity IDs, or FALSE to load all entities.
+ * @param array $ids
+ *   (optional) An array of entity IDs. If omitted, all entities are loaded.
  * @param bool $reset
  *   Whether to reset the internal cache for the requested entity type.
  *
@@ -237,7 +237,7 @@ function entity_load_by_uuid($entity_type, $uuid, $reset = FALSE) {
  * @see Drupal\entity\DatabaseStorageController
  * @see Drupal\entity\EntityFieldQuery
  */
-function entity_load_multiple($entity_type, $ids = FALSE, $reset = FALSE) {
+function entity_load_multiple($entity_type, array $ids = NULL, $reset = FALSE) {
   if ($reset) {
     entity_get_controller($entity_type)->resetCache();
   }

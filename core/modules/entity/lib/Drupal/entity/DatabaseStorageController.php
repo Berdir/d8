@@ -144,7 +144,7 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
   /**
    * Implements Drupal\entity\EntityStorageControllerInterface::load().
    */
-  public function load($ids = FALSE) {
+  public function load($ids = NULL) {
     $entities = array();
 
     // Create a new variable which is either a prepared version of the $ids
@@ -164,9 +164,9 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
     }
 
     // Load any remaining entities from the database. This is the case if $ids
-    // is set to FALSE (so we load all entities) or if there are any ids left to
+    // is set to NULL (so we load all entities) or if there are any ids left to
     // load.
-    if ($ids === FALSE || $ids) {
+    if ($ids === NULL || $ids) {
       // Build and execute the query.
       $query_result = $this->buildQuery($ids)->execute();
 
@@ -276,8 +276,8 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
    * See Drupal\comment\CommentStorageController::buildQuery() or
    * Drupal\taxonomy\TermStorageController::buildQuery() for examples.
    *
-   * @param $ids
-   *   An array of entity IDs, or FALSE to load all entities.
+   * @param array|null $ids
+   *   An array of entity IDs, or NULL to load all entities.
    * @param $revision_id
    *   The ID of the revision to load, or FALSE if this query is asking for the
    *   most current revision(s).

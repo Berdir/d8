@@ -580,8 +580,8 @@ function file_save_htaccess($directory, $private = TRUE) {
 /**
  * Loads file entities from the database.
  *
- * @param array|bool $fids
- *   An array of file IDs, or FALSE to load all files.
+ * @param array $fids
+ *   (optional) An array of entity IDs. If omitted, all entities are loaded.
  *
  * @return array
  *   An array of file entities, indexed by fid.
@@ -591,7 +591,7 @@ function file_save_htaccess($directory, $private = TRUE) {
  * @see entity_load()
  * @see Drupal\entity\EntityFieldQuery
  */
-function file_load_multiple($fids = array()) {
+function file_load_multiple(array $fids = NULL) {
   return entity_load_multiple('file', $fids);
 }
 
@@ -608,7 +608,7 @@ function file_load_multiple($fids = array()) {
  * @see file_load_multiple()
  */
 function file_load($fid) {
-  $files = file_load_multiple(array($fid), array());
+  $files = file_load_multiple(array($fid));
   return reset($files);
 }
 

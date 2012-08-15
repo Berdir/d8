@@ -1507,10 +1507,10 @@ function comment_delete_multiple($cids) {
 }
 
 /**
- * Loads comments from the database.
+ * Loads comment entities from the database.
  *
- * @param array|bool $cids
- *   An array of comment IDs, or FALSE to load all comments.
+ * @param array $cids
+ *   (optional) An array of entity IDs. If omitted, all entities are loaded.
  * @param bool $reset
  *   Whether to reset the internal static entity cache. Note that the static
  *   cache is disabled in comment_entity_info() by default.
@@ -1521,7 +1521,7 @@ function comment_delete_multiple($cids) {
  * @see entity_load()
  * @see Drupal\entity\EntityFieldQuery
  */
-function comment_load_multiple($cids = FALSE, $reset = FALSE) {
+function comment_load_multiple(array $cids = NULL, $reset = FALSE) {
   return entity_load_multiple('comment', $cids, $reset);
 }
 

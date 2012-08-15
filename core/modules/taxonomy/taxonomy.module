@@ -939,14 +939,14 @@ function taxonomy_term_load_multiple_by_name($name, $vocabulary = NULL) {
  * @see entity_load_multiple()
  * @see Drupal\entity\EntityFieldQuery
  *
- * @param array|bool $tids
- *   An array of taxonomy term IDs, or FALSE to load all terms.
+ * @param array $tids
+ *   (optional) An array of entity IDs. If omitted, all entities are loaded.
  *
  * @return array
  *   An array of taxonomy term entities, indexed by tid. When no results are
  *   found, an empty array is returned.
  */
-function taxonomy_term_load_multiple($tids = FALSE) {
+function taxonomy_term_load_multiple(array $tids = NULL) {
   return entity_load_multiple('taxonomy_term', $tids);
 }
 
@@ -959,13 +959,13 @@ function taxonomy_term_load_multiple($tids = FALSE) {
  *
  * @see entity_load_multiple()
  *
- * @param array|bool $vids
- *  An array of taxonomy vocabulary IDs, or FALSE to load all vocabularies.
+ * @param array $vids
+ *   (optional) An array of entity IDs. If omitted, all entities are loaded.
  *
  * @return array
  *  An array of vocabulary objects, indexed by vid.
  */
-function taxonomy_vocabulary_load_multiple($vids = FALSE) {
+function taxonomy_vocabulary_load_multiple(array $vids = NULL) {
   return entity_load_multiple('taxonomy_vocabulary', $vids);
 }
 

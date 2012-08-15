@@ -273,8 +273,8 @@ function user_external_load($authname) {
  * from the database. Users are loaded into memory and will not require
  * database access if loaded again during the same page request.
  *
- * @param array|bool $uids
- *   An array of user IDs, or FALSE to load all users.
+ * @param array $uids
+ *   (optional) An array of entity IDs. If omitted, all entities are loaded.
  * @param bool $reset
  *   A boolean indicating that the internal cache should be reset. Use this if
  *   loading a user object which has been altered during the page request.
@@ -288,7 +288,7 @@ function user_external_load($authname) {
  * @see user_load_by_name()
  * @see Drupal\entity\EntityFieldQuery
  */
-function user_load_multiple($uids = FALSE, $reset = FALSE) {
+function user_load_multiple(array $uids = NULL, $reset = FALSE) {
   return entity_load_multiple('user', $uids, $reset);
 }
 
