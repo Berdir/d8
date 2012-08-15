@@ -9,6 +9,7 @@ namespace Drupal\entity;
 
 use Drupal\Core\Property\PropertyInterface;
 use Drupal\Core\Property\PropertyContainerInterface;
+use Drupal\Component\Uuid\Uuid;
 
 /**
  * Implements Property API specific enhancements to the Entity class.
@@ -315,4 +316,32 @@ class EntityNG extends Entity implements PropertyContainerInterface {
       unset($this->properties[$name]);
     }
   }
+
+  /**
+   * Overrides Entity::createDuplicate().
+   */
+  public function createDuplicate() {
+    $duplicate = clone $this;
+    $entity_info = $this->entityInfo();
+    $this->{$entity_info['entity keys']['id']}->value = NULL;
+
+    // Check if the entity type supports UUIDs and generate a new one if so.
+    if (!empty($entity_info['entity keys']['uuid'])) {
+      $uuid = new Uuid();
+      $duplicate->{$entity_info['entity keys']['uuid']}->value = $uuid->generate();
+    }
+    return $duplicate;
+  }
+
+  /**
+   * Implements a deep clone.
+   */
+  public function __clone() {
+    foreach ($this->properties as $name => $properties) {
+      foreach ($properties as $langcode => $property) {
+        $this->properties[$name][$langcode] = clone $property;
+      }
+    }
+  }
 }
+
