@@ -9,8 +9,8 @@ namespace Drupal\entity\Tests;
 
 use Drupal\core\Property\PropertyInterface;
 use Drupal\entity\EntityInterface;
-use Drupal\entity\EntityPropertyInterface;
-use Drupal\entity\EntityPropertyItemInterface;
+use Drupal\entity\Property\EntityPropertyInterface;
+use Drupal\entity\Property\EntityPropertyItemInterface;
 use Drupal\simpletest\WebTestBase;
 
 /**
@@ -18,16 +18,19 @@ use Drupal\simpletest\WebTestBase;
  */
 class EntityPropertyTest extends WebTestBase  {
 
+  /**
+   * Modules to enable.
+   *
+   * @var array
+   */
+  public static $modules = array('entity_test');
+
   public static function getInfo() {
     return array(
       'name' => 'Entity property API',
-      'description' => 'Verifies the Entity property API',
+      'description' => 'Tests the Entity property API',
       'group' => 'Entity API',
     );
-  }
-
-  public function setUp() {
-    parent::setUp(array('entity_test'));
   }
 
   /**

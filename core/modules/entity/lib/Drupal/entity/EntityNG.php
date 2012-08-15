@@ -40,6 +40,18 @@ class EntityNG extends Entity implements PropertyContainerInterface {
   protected $properties = array();
 
   /**
+   * Whether the entity is in pre-Property API compatibility mode.
+   *
+   * If set to TRUE, property values are written directly to $this->values, thus
+   * must be plain property values keyed by language code. This must be enabled
+   * when calling field API attachers.
+   *
+   * @var bool
+   */
+  protected $compatibilityMode = FALSE;
+
+
+  /**
    * Overrides Entity::id().
    */
   public function id() {
@@ -100,28 +112,6 @@ class EntityNG extends Entity implements PropertyContainerInterface {
       // Copy the value to our property object.
       $value = $property instanceof PropertyInterface ? $property->getValue() : $property;
       $this->get($name)->setValue($value);
-    }
-  }
-
-  /**
-   * Magic getter: Gets the property in default language.
-   */
-  public function __get($name) {
-    if ($this->getPropertyDefinition($name)) {
-      return $this->get($name);
-    }
-    return isset($this->$name) ? $this->$name : NULL;
-  }
-
-  /**
-   * Magic getter: Sets the property in default language.
-   */
-  public function __set($name, $value) {
-    if ($this->getPropertyDefinition($name)) {
-      $this->set($name, $value);
-    }
-    else {
-      $this->$name = $value;
     }
   }
 
@@ -209,5 +199,99 @@ class EntityNG extends Entity implements PropertyContainerInterface {
 
   public function access($account) {
     // TODO: Implement access() method.
+  }
+
+  /**
+   * Enables or disable the compatibility mode.
+   *
+   * @param bool $enabled
+   *   Whether to enable the mode.
+   *
+   * @see EntityNG::compatibilityMode
+   */
+  public function setCompatibilityMode($enabled) {
+    $this->compatibilityMode = (bool) $enabled;
+  }
+
+  /**
+   * Returns whether the compatibility mode is active.
+   */
+  public function getCompatibilityMode() {
+    return $this->compatibilityMode;
+  }
+
+  /**
+   * Updates the original values with the interim changes.
+   *
+   * Note: This should be called by the storage controller during a save
+   * operation.
+   */
+  public function updateOriginalValues() {
+    foreach ($this->properties as $name => $properties) {
+      foreach ($properties as $langcode => $property) {
+        $this->values[$name][$langcode] = $property->getValue();
+      }
+    }
+  }
+
+  /**
+   * Magic getter: Gets the property in default language.
+   *
+   * For compatibility mode to work this must return a reference.
+   */
+  public function &__get($name) {
+    if ($this->compatibilityMode) {
+      if (!isset($this->values[$name])) {
+        $this->values[$name] = NULL;
+      }
+      return $this->values[$name];
+    }
+    if ($this->getPropertyDefinition($name)) {
+      $return = $this->get($name);
+      return $return;
+    }
+    if (!isset($this->$name)) {
+      $this->$name = NULL;
+    }
+    return $this->$name;
+  }
+
+  /**
+   * Magic getter: Sets the property in default language.
+   */
+  public function __set($name, $value) {
+    if ($this->compatibilityMode) {
+      $this->values[$name] = $value;
+    }
+    elseif ($this->getPropertyDefinition($name)) {
+      $this->set($name, $value);
+    }
+    else {
+      $this->$name = $value;
+    }
+  }
+
+  /**
+   * Magic method.
+   */
+  public function __isset($name) {
+    if ($this->compatibilityMode) {
+      return isset($this->values[$name]);
+    }
+    else {
+      return isset($this->properties[$name]);
+    }
+  }
+
+  /**
+   * Magic method.
+   */
+  public function __unset($name) {
+    if ($this->compatibilityMode) {
+      unset($this->values[$name]);
+    }
+    else {
+      unset($this->properties[$name]);
+    }
   }
 }

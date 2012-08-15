@@ -132,38 +132,43 @@ class EntityTestStorageController extends DatabaseStorageController {
    * Added mapping from storage records to entities.
    */
   protected function attachLoad(&$queried_entities, $revision_id = FALSE) {
-    // Attach fields to the stdclass record first.
-    if ($this->entityInfo['fieldable']) {
-      if ($revision_id) {
-        field_attach_load_revision($this->entityType, $queried_entities);
-      }
-      else {
-        field_attach_load($this->entityType, $queried_entities);
-      }
-    }
+    // Now map the record values to the according entity properties and
+    // activate compatibility mode.
+    $queried_entities = $this->mapFromStorageRecords($queried_entities);
 
     // Load data of translatable properties.
     $this->attachPropertyData($queried_entities);
-    // Now map the record values to the according entity properties.
-    $queried_entities = $this->mapFromStorageRecords($queried_entities);
 
-    // Call hook_entity_load().
-    foreach (module_implements('entity_load') as $module) {
-      $function = $module . '_entity_load';
-      $function($queried_entities, $this->entityType);
-    }
-    // Call hook_TYPE_load(). The first argument for hook_TYPE_load() are
-    // always the queried entities, followed by additional arguments set in
-    // $this->hookLoadArguments.
-    $args = array_merge(array($queried_entities), $this->hookLoadArguments);
-    foreach (module_implements($this->entityType . '_load') as $module) {
-      call_user_func_array($module . '_' . $this->entityType . '_load', $args);
+    parent::attachLoad($queried_entities, $revision_id);
+
+    // Loading is finished, so disable compatibility mode now.
+    foreach ($queried_entities as $entity) {
+      $entity->setCompatibilityMode(FALSE);
     }
   }
 
   /**
-   * Overrides Drupal\entity\DatabaseStorageController::attachLoad().
+   * Maps from storage records to entity objects.
    *
+   * @return array
+   *   An array of entity objects implementing the EntityInterface.
+   */
+  protected function mapFromStorageRecords(array $records) {
+
+    foreach ($records as $id => $record) {
+      $entity = new $this->entityClass(array(), $this->entityType);
+      $entity->setCompatibilityMode(TRUE);
+
+      $entity->id[LANGUAGE_NOT_SPECIFIED][0]['value'] = $id;
+      $entity->uuid[LANGUAGE_NOT_SPECIFIED][0]['value'] = $record->uuid;
+      $entity->language[LANGUAGE_NOT_SPECIFIED][0]['langcode'] = $record->langcode;
+
+      $records[$id] = $entity;
+    }
+    return $records;
+  }
+
+  /**
    * Attaches property data in all languages for translatable properties.
    */
   protected function attachPropertyData(&$queried_entities) {
@@ -185,55 +190,6 @@ class EntityTestStorageController extends DatabaseStorageController {
   }
 
   /**
-   * Maps from storage records to entity objects.
-   *
-   * @return array
-   *   An array of entity objects implementing the EntityInterface.
-   */
-  protected function mapFromStorageRecords(array $records) {
-
-    foreach ($records as $id => $record) {
-      // Add values for all properties.
-      $property_values = array();
-      $fields = field_info_fields();
-
-      foreach ($record as $name => $value) {
-        switch ($name) {
-
-          // Translatable property values are already mapped,
-          // see attachPropertyData().
-          case 'name':
-          case 'user':
-            $property_values[$name] = $value;
-            break;
-
-          case 'langcode':
-            $property_values['language'][LANGUAGE_NOT_SPECIFIED][0]['langcode'] = $value;
-            break;
-
-          default:
-            if (isset($fields[$name]) && $value) {
-              // Handle per-language values of fields.
-              $property_values[$name] = $value;
-            }
-            // Else assume a not translatable property with a single value.
-            else {
-              $property_values[$name][LANGUAGE_NOT_SPECIFIED][0]['value'] = $value;
-            }
-            break;
-        }
-      }
-
-      // Pass the plain property values in during entity construction.
-      $values['values'] = $property_values;
-      $entity = new $this->entityClass($values, $this->entityType);
-
-      $records[$id] = $entity;
-    }
-    return $records;
-  }
-
-  /**
    * Overrides DatabaseStorageController::save().
    *
    * Added mapping from entities to storage records before saving.
@@ -251,12 +207,17 @@ class EntityTestStorageController extends DatabaseStorageController {
 
       // Create the storage record to be saved.
       $record = $this->maptoStorageRecord($entity);
+      // Update the original values so that the compatibility mode works with
+      // the update values, what is required by field API attachers.
+      // @todo Once field API has been converted to use the Property API, move
+      // this after insert/update hooks.
+      $entity->updateOriginalValues();
 
       if (!$entity->isNew()) {
         $return = drupal_write_record($this->entityInfo['base table'], $record, 'id');
         $this->resetCache(array($entity->{$this->idKey}));
-        $this->postSave($entity, TRUE, $record);
-        $this->invokeHook('update', $entity, $record);
+        $this->postSave($entity, TRUE);
+        $this->invokeHook('update', $entity);
       }
       else {
         $return = drupal_write_record($this->entityInfo['base table'], $record);
@@ -265,8 +226,8 @@ class EntityTestStorageController extends DatabaseStorageController {
 
         $entity->{$this->idKey}->value = $record->id;
         $entity->enforceIsNew(FALSE);
-        $this->postSave($entity, FALSE, $record);
-        $this->invokeHook('insert', $entity, $record);
+        $this->postSave($entity, FALSE);
+        $this->invokeHook('insert', $entity);
       }
 
       // Ignore slave server temporarily.
@@ -285,13 +246,16 @@ class EntityTestStorageController extends DatabaseStorageController {
   /**
    * Overrides DatabaseStorageController::invokeHook().
    *
-   * Make sure to pass on mapped storage records to field API attachers for
-   * saving.
+   * Invokes field API attachers in compatibility mode and disables it
+   * afterwards.
    */
-  protected function invokeHook($hook, EntityInterface $entity, \stdclass $record = NULL) {
+  protected function invokeHook($hook, EntityInterface $entity) {
     if (!empty($this->entityInfo['fieldable']) && function_exists($function = 'field_attach_' . $hook)) {
-      $function($this->entityType, $record ? $record : $entity);
+      $entity->setCompatibilityMode(TRUE);
+      $function($this->entityType, $entity);
+      $entity->setCompatibilityMode(FALSE);
     }
+
     // Invoke the hook.
     module_invoke_all($this->entityType . '_' . $hook, $entity);
     // Invoke the respective entity-level hook.
@@ -299,65 +263,37 @@ class EntityTestStorageController extends DatabaseStorageController {
   }
 
   /**
-   * Maps from entity objects to storage records.
-   *
-   * @param $langcode
-   *   (optional) If set, get the values of the translation.
+   * Maps from an entity object to the storage record of the base table.
    */
   protected function mapToStorageRecord(EntityInterface $entity) {
     $record = new \stdClass();
-
-    $langcodes = array_keys($entity->translations());
-    // Values in default language are keyed by LANGUAGE_NOT_SPECIFIED.
-    $langcodes[] = LANGUAGE_NOT_SPECIFIED;
-
-    foreach ($langcodes as $langcode) {
-      foreach ($entity->getTranslation($langcode) as $name => $property) {
-        switch ($name) {
-
-          // Translatable properties.
-          case 'name':
-            $record->property_data[$langcode]['name'] = $property->value;
-            break;
-          case 'user':
-            $record->property_data[$langcode]['uid'] = $property->id;
-            break;
-
-          // Not translatable properties and fields.
-          case 'language':
-            $record->langcode = $property->langcode;
-            break;
-
-          default:
-            $definition = $property->getDefinition();
-            // @todo: Support all languages here, e.g. by getting all properties
-            // that have been changed for each language.
-
-            if (!empty($definition['field'])) {
-              $record->{$name}[$langcode] = $property->toArray();
-            }
-            else {
-              // Just get the value of the first item.
-              $record->$name = $property->value;
-            }
-            break;
-        }
-      }
-    }
+    $record->id = $entity->id();
+    $record->langcode = $entity->language->langcode;
+    $record->uuid = $entity->uuid->value;
     return $record;
   }
 
   /**
    * Overrides Drupal\entity\DatabaseStorageController::postSave().
+   *
+   * Stores values of translatable properties.
    */
-  protected function postSave(EntityInterface $entity, $update, $record = NULL) {
+  protected function postSave(EntityInterface $entity, $update) {
+    $langcodes = array_keys($entity->translations());
+    // Also add values in default language, which are keyed by
+    // LANGUAGE_NOT_SPECIFIED.
+    $langcodes[] = LANGUAGE_NOT_SPECIFIED;
 
-    foreach ($record->property_data as $langcode => $values) {
+    foreach ($langcodes as $langcode) {
+      $translation = $entity->getTranslation($langcode);
+
       $values = array(
         'id' => $entity->id(),
         'langcode' => LANGUAGE_NOT_SPECIFIED == $langcode ? $entity->language->langcode : $langcode,
         'default_langcode' => intval(LANGUAGE_NOT_SPECIFIED == $langcode),
-      ) + $values;
+        'name' => $translation->name->value,
+        'uid' => $translation->user->id,
+      );
 
       db_merge('entity_test_property_data')
         ->fields($values)
