@@ -1,0 +1,56 @@
+<?php
+
+/**
+ * @file
+ * Definition of Drupal\field_test\TestEntityFormController.
+ */
+
+namespace Drupal\field_test;
+
+use Drupal\entity\EntityInterface;
+use Drupal\entity\EntityFormController;
+
+/**
+ * Form controller for the node edit forms.
+ */
+class TestEntityFormController extends EntityFormController {
+
+  /**
+   * Overrides Drupal\entity\EntityFormController::form().
+   */
+  public function form(array $form, array &$form_state, EntityInterface $entity) {
+    $form = parent::form($form, $form_state, $entity);
+    if (!$entity->isNew()) {
+      $form['revision'] = array(
+        '#access' => user_access('administer field_test content'),
+        '#type' => 'checkbox',
+        '#title' => t('Create new revision'),
+        '#default_value' => FALSE,
+        '#weight' => 100,
+      );
+    }
+    return $form;
+  }
+
+  /**
+   * Overrides Drupal\entity\EntityFormController::save().
+   */
+  public function save(array $form, array &$form_state) {
+    $entity = $this->getEntity($form_state);
+    $insert = empty($entity->ftid);
+    $entity->save();
+
+    $message = $insert ? t('test_entity @id has been created.', array('@id' => $entity->ftid)) : t('test_entity @id has been updated.', array('@id' => $entity->ftid));
+    drupal_set_message($message);
+
+    if ($entity->ftid) {
+      $form_state['redirect'] = 'test-entity/manage/' . $entity->ftid . '/edit';
+    }
+    else {
+      // Error on save.
+      drupal_set_message(t('The entity could not be saved.'), 'error');
+      $form_state['rebuild'] = TRUE;
+    }
+  }
+
+}
