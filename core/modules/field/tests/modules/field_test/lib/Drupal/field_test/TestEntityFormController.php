@@ -11,7 +11,7 @@ use Drupal\entity\EntityInterface;
 use Drupal\entity\EntityFormController;
 
 /**
- * Form controller for the node edit forms.
+ * Form controller for the test entity edit forms.
  */
 class TestEntityFormController extends EntityFormController {
 
@@ -37,14 +37,14 @@ class TestEntityFormController extends EntityFormController {
    */
   public function save(array $form, array &$form_state) {
     $entity = $this->getEntity($form_state);
-    $insert = empty($entity->ftid);
+    $is_new = $entity->isNew();
     $entity->save();
 
-    $message = $insert ? t('test_entity @id has been created.', array('@id' => $entity->ftid)) : t('test_entity @id has been updated.', array('@id' => $entity->ftid));
+    $message = $is_new ? t('test_entity @id has been created.', array('@id' => $entity->id())) : t('test_entity @id has been updated.', array('@id' => $entity->id()));
     drupal_set_message($message);
 
-    if ($entity->ftid) {
-      $form_state['redirect'] = 'test-entity/manage/' . $entity->ftid . '/edit';
+    if ($entity->id()) {
+      $form_state['redirect'] = 'test-entity/manage/' . $entity->id() . '/edit';
     }
     else {
       // Error on save.
