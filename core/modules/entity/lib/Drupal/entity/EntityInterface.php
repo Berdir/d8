@@ -207,4 +207,5 @@ interface EntityInterface {
    *   TRUE if the entity is the current revision, FALSE otherwise.
    */
   public function isCurrentRevision();
+
 }
