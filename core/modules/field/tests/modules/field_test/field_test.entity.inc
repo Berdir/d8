@@ -238,7 +238,7 @@ function field_test_create_entity($id = 1, $vid = 1, $bundle = 'test_bundle', $l
   if (isset($vid)) {
     $entity->ftvid = $vid;
     // Flag to make sure that the provided vid is used for a new revision.
-    $entity->use_provided_revision_id = TRUE;
+    $entity->use_provided_revision_id = $vid;
   }
   $entity->fttype = $bundle;
 

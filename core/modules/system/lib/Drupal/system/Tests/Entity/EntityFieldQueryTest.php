@@ -150,7 +150,7 @@ class EntityFieldQueryTest extends WebTestBase {
     for ($i = 100; $i < 102; $i++) {
       $entity->ftvid = $i;
       // Flag to make sure that the provided vid is used for a new revision.
-      $entity->use_provided_revision_id = TRUE;
+      $entity->use_provided_revision_id = $i;
       $entity->{$this->field_names[0]}[LANGUAGE_NOT_SPECIFIED][0]['value'] = $i;
       $entity->setNewRevision();
       $entity->save();

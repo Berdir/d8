@@ -20,8 +20,8 @@ class TestEntityController extends DatabaseStorageController {
    */
   public function preSaveRevision(EntityInterface $revision) {
     // Allow for predefined revision ids.
-    if (!empty($revision->use_provided_revision_id) && !empty($revision->original->ftvid)) {
-      $revision->ftvid = $revision->original->ftvid;
+    if (!empty($revision->use_provided_revision_id)) {
+      $revision->ftvid = $revision->use_provided_revision_id;
     }
   }
 
