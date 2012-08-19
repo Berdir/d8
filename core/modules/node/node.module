@@ -2574,6 +2574,47 @@ function node_view_multiple($nodes, $view_mode = 'teaser', $weight = 0, $langcod
  * @see node_menu()
  */
 function node_page_default() {
+
+  $result = array();
+
+  $start = microtime(TRUE);
+  for ($i = 0; $i < 100; $i++) {
+    $entity = entity_create('entity_test', array('name' => 'a'));
+    $entity->save();
+  }
+  $end = microtime(TRUE);
+
+  $result['save'] = array(
+    '#type' => 'item',
+    '#markup' => $end - $start,
+    '#title' => t('Save 100 test entities'),
+  );
+
+  $start = microtime(TRUE);
+  for ($i = 0; $i < 1000; $i++) {
+    $entity = entity_load('entity_test', $i);
+  }
+  $end = microtime(TRUE);
+
+  $result['load'] = array(
+    '#type' => 'item',
+    '#markup' => $end - $start,
+    '#title' => t('Load 1000 test entities'),
+  );
+
+  $entity = entity_load('entity_test', 1);
+  $start = microtime(TRUE);
+  for ($i = 0; $i < 100000; $i++) {
+    $entity->id();
+  }
+  $end = microtime(TRUE);
+  $result['id'] = array(
+    '#type' => 'item',
+    '#markup' => $end - $start,
+    '#title' => t("Calling id() 100'000 times"),
+  );
+  return $result;
+
   $site_config = config('system.site');
   $select = db_select('node', 'n')
     ->fields('n', array('nid', 'sticky', 'created'))

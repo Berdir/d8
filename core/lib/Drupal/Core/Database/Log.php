@@ -156,8 +156,8 @@ class Log {
       }
       if (strpos($stack[$i]['class'], __NAMESPACE__) === FALSE && strpos($stack[$i + 1]['function'], 'db_') === FALSE) {
         return array(
-          'file' => $stack[$i]['file'],
-          'line' => $stack[$i]['line'],
+          'file' => isset($stack[$i]['file']) ? $stack[$i]['file'] : NULL,
+          'line' => isset($stack[$i]['line']) ? $stack[$i]['line'] : NULL,
           'function' => $stack[$i + 1]['function'],
           'class' => isset($stack[$i + 1]['class']) ? $stack[$i + 1]['class'] : NULL,
           'type' => isset($stack[$i + 1]['type']) ? $stack[$i + 1]['type'] : NULL,
