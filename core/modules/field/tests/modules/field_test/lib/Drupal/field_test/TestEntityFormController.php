@@ -52,5 +52,4 @@ class TestEntityFormController extends EntityFormController {
       $form_state['rebuild'] = TRUE;
     }
   }
-
 }
