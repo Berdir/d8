@@ -246,7 +246,7 @@ function field_test_create_entity($id = 1, $vid = 1, $bundle = 'test_bundle', $l
   $entity->ftlabel = $label;
   // Make sure the entity will saved even if a primary key is provided.
   $entity->enforceIsNew();
-  $entity->enforceNewRevision();
+  $entity->setNewRevision();
   return $entity;
 }
 
@@ -353,7 +353,7 @@ function field_test_entity_form_submit($form, &$form_state) {
   $entity = field_test_entity_form_submit_build_test_entity($form, $form_state);
   $insert = empty($entity->ftid);
   if (!empty($entity->revision)) {
-    $entity->enforceNewRevision();
+    $entity->setNewRevision();
   }
   $entity->save();
 

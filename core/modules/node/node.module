@@ -1062,7 +1062,7 @@ function node_revision_load($vid = NULL) {
 /**
  * Prepares a node for saving by populating the author and creation date.
  */
-function node_submit($node) {
+function node_submit(Node $node) {
   global $user;
 
   // A user might assign the node author by entering a user name in the node
@@ -1077,7 +1077,7 @@ function node_submit($node) {
   }
 
   // If a new revision is created, save the current user as revision author.
-  if (!empty($node->revision)) {
+  if ($node->isNewRevision()) {
     $node->revision_uid = $user->uid;
   }
 

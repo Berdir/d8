@@ -523,7 +523,6 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
     // ensure that a new revision will actually be created, then store the old
     // revision ID in a separate property for use by hook implementations.
     if ($revision->isNewRevision() && $revision->{$this->revisionKey}) {
-      $revision->{'old_' . $this->revisionKey} = $revision->getRevisionId();
       $revision->{$this->revisionKey} = NULL;
     }
 
@@ -535,7 +534,7 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
         ->fields(array($this->revisionKey => $revision->getRevisionId()))
         ->condition($this->idKey, $revision->id())
         ->execute();
-      $entity->enforceNewRevision(FALSE);
+      $entity->setNewRevision(FALSE);
     }
     else {
       drupal_write_record($this->revisionTable, $revision, $this->revisionKey);

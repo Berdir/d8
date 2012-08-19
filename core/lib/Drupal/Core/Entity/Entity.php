@@ -46,7 +46,7 @@ class Entity implements EntityInterface {
    *
    * @var bool
    */
-  protected $enforceNewRevision;
+  protected $newRevision = FALSE;
 
   /**
    * Indicates whether this is the default revision.
@@ -92,7 +92,7 @@ class Entity implements EntityInterface {
    */
   public function isNewRevision() {
     $info = $this->entityInfo();
-    return $this->enforceNewRevision || (!empty($info['entity keys']['revision']) && !$this->getRevisionId());
+    return $this->newRevision || (!empty($info['entity keys']['revision']) && !$this->getRevisionId());
   }
 
   /**
@@ -105,8 +105,8 @@ class Entity implements EntityInterface {
   /**
    * Implements EntityInterface::enforceIsNewRevision().
    */
-  public function enforceNewRevision($value = TRUE) {
-    $this->enforceNewRevision = $value;
+  public function setNewRevision($value = TRUE) {
+    $this->newRevision = $value;
   }
 
   /**

@@ -97,10 +97,6 @@ class NodeStorageController extends DatabaseStorageController {
   protected function preSave(EntityInterface $node) {
     // Before saving the node, set changed and revision times.
     $node->changed = REQUEST_TIME;
-
-    if (!empty($node->revision)) {
-      $node->enforceNewRevision(TRUE);
-    }
   }
 
   /**

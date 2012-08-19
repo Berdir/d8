@@ -74,7 +74,7 @@ interface EntityInterface {
    *
    * @see Drupal\entity\EntityInterface::isNewRevision()
    */
-  public function enforceNewRevision($value = TRUE);
+  public function setNewRevision($value = TRUE);
 
   /**
    * Enforces an entity to be new.

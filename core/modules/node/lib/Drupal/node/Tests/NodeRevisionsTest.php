@@ -48,7 +48,7 @@ class NodeRevisionsTest extends NodeTestBase {
       $this->drupalCreateNode($settings);
       $node = node_load($node->nid); // Make sure we get revision information.
       $settings = get_object_vars($node);
-      $settings['isDefaultRevision'] = TRUE;
+      $settings['revision'] = 1;
 
       $nodes[] = $node;
     }
@@ -160,7 +160,7 @@ class NodeRevisionsTest extends NodeTestBase {
     $node = clone $node;
     $node->title = $new_title;
     $node->log = '';
-    $node->revision = FALSE;
+    $node->setNewRevision(FALSE);
 
     $node->save();
     $this->drupalGet('node/' . $node->nid);
@@ -177,7 +177,7 @@ class NodeRevisionsTest extends NodeTestBase {
 
     $node = clone $node;
     $node->title = $new_title;
-    $node->revision = TRUE;
+    $node->setNewRevision();
     $node->log = NULL;
 
     $node->save();
