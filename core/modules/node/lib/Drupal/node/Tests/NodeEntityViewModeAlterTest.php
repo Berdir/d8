@@ -11,6 +11,12 @@ namespace Drupal\node\Tests;
  * Tests changing view modes for nodes.
  */
 class NodeEntityViewModeAlterTest extends NodeTestBase {
+
+  /**
+   * Enable dummy module that implements hook_node_view().
+   */
+  public static $modules = array('node_test');
+
   public static function getInfo() {
     return array(
       'name' => 'Node entity view mode',
@@ -19,18 +25,13 @@ class NodeEntityViewModeAlterTest extends NodeTestBase {
     );
   }
 
-  function setUp() {
-    // Enable dummy module that implements hook_node_view().
-    parent::setUp('node_test');
-
-    $web_user = $this->drupalCreateUser(array('create page content', 'edit own page content'));
-    $this->drupalLogin($web_user);
-  }
-
   /**
    * Create a "Basic page" node and verify its consistency in the database.
    */
   function testNodeViewModeChange() {
+    $web_user = $this->drupalCreateUser(array('create page content', 'edit own page content'));
+    $this->drupalLogin($web_user);
+
     // Create a node.
     $edit = array();
     $langcode = LANGUAGE_NOT_SPECIFIED;
