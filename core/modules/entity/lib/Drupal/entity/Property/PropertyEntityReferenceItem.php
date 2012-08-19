@@ -17,22 +17,25 @@ class PropertyEntityReferenceItem extends EntityPropertyItemBase {
    * Implements PropertyContainerInterface::getPropertyDefinitions().
    */
   public function getPropertyDefinitions() {
-    // @todo: Avoid creating multiple array copies if used multiple times.
+    // Statically cache the definitions to avoid creating lots of array copies.
+    $definitions = &drupal_static(__CLASS__);
 
-    $definitions['id'] = array(
-      // @todo: Lookup the entity type's ID data type and use it here.
-      'type' => 'integer',
-      'label' => t('Entity ID'),
-    );
-    $definitions['entity'] = array(
-      'type' => 'entity',
-      'entity type' => $this->definition['entity type'],
-      'label' => t('Entity'),
-      'description' => t('The referenced entity'),
-      // The entity object is computed out of the entity id.
-      'computed' => TRUE,
-      'read-only' => FALSE,
-    );
+    if (!isset($definitions)) {
+      $definitions['id'] = array(
+        // @todo: Lookup the entity type's ID data type and use it here.
+        'type' => 'integer',
+        'label' => t('Entity ID'),
+      );
+      $definitions['entity'] = array(
+        'type' => 'entity',
+        'entity type' => $this->definition['entity type'],
+        'label' => t('Entity'),
+        'description' => t('The referenced entity'),
+        // The entity object is computed out of the entity id.
+        'computed' => TRUE,
+        'read-only' => FALSE,
+      );
+    }
     return $definitions;
   }
 
