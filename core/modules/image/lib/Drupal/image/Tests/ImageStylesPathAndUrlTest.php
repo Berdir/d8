@@ -130,6 +130,11 @@ class ImageStylesPathAndUrlTest extends WebTestBase {
       $this->assertEqual($this->drupalGetHeader('Cache-Control'), 'no-cache, private', t('Cache-Control header was set to prevent caching.'));
       $this->assertEqual($this->drupalGetHeader('X-Image-Owned-By'), 'image_module_test', t('Expected custom header has been added.'));
 
+      // Make sure that a second request to the already existing derivate works
+      // too.
+      $this->drupalGet($generate_url);
+      $this->assertResponse(200, t('Image was generated at the URL.'));
+
       // Repeat this with a different file that we do not have access to and
       // make sure that access is denied.
       $file_noaccess = array_shift($files);
