@@ -107,6 +107,9 @@ interface EntityInterface {
    *   An array containing the 'path' and 'options' keys used to build the URI
    *   of the entity, and matching the signature of url(). NULL if the entity
    *   has no URI of its own.
+   *
+   * @see entity_url()
+   * @see entity_l()
    */
   public function uri();
 

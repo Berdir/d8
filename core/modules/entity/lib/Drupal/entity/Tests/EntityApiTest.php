@@ -94,4 +94,18 @@ class EntityApiTest extends WebTestBase {
     $value = $entity->get('uid', 'en');
     $this->assertNull($value, 'Language neutral property has been retrieved.');
   }
+
+  /**
+   * Tests Entity uri functions.
+   */
+  function testEntityLabelUrlHelpers() {
+    $user1 = $this->drupalCreateUser();
+
+    // Make sure that the entity_url() returns the expected path.
+    $uri = $user1->uri();
+    $this->assertEqual(url($uri['path'], $uri['options']), entity_url($user1), 'Expected entity URL returned.');
+
+    $label = $user1->label();
+    $this->assertEqual(l($label, $uri['path'], $uri['options']), entity_l($user1), 'Expected entity link returned.');
+  }
 }

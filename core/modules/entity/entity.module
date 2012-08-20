@@ -371,6 +371,56 @@ function entity_prepare_view($entity_type, $entities) {
 }
 
 /**
+ * Returns the URL of an entity.
+ *
+ * @param Drupal\entity\EntityInterface $entity
+ *   The entity for which to generate a path.
+ * @param array $options
+ *   An associative array of additional options to pass to the url() function.
+ *
+ * @return string|NULL
+ *   The URL of the entity, or NULL if this value is unavailable.
+ *
+ * @see Drupal\entity\EntityInterface::uri()
+ */
+function entity_url(EntityInterface $entity, array $options = array()) {
+  $uri = $entity->uri();
+
+  if (isset($uri)) {
+    $options += $uri['options'];
+    return url($uri['path'], $options);
+  }
+}
+
+/**
+ * Format the URL of an entity as a HTML anchor tag.
+ *
+ * @param Drupal\entity\EntityInterface $entity
+ *   The entity for which to generate a path.
+ * @param $text
+ *   The link text for the anchor tag. Default to entity label.
+ * @param array $options
+ *   An associative array of additional options to pass to the l() function.
+ *
+ * @return string|NULL
+ *   The HTML markup for a link to the entity, or NULL if the value is
+ *   unavailable.
+ *
+ * @see Drupal\entity\EntityInterface::uri()
+ */
+function entity_l(EntityInterface $entity, $text = NULL, array $options = array()) {
+  $uri = $entity->uri();
+
+  if (isset($uri)) {
+    $options += $uri['options'];
+    if (!isset($text)) {
+      $text = $entity->label();
+    }
+    return l($text, $uri['path'], $options);
+  }
+}
+
+/**
  * Returns the label of an entity.
  *
  * This is a wrapper for Drupal\entity\EntityInterface::label(). This function
