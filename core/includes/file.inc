@@ -1966,7 +1966,9 @@ function file_download() {
       $function = $module . '_file_download';
       $result = $function($uri);
       if ($result == -1) {
-        throw new AccessDeniedHttpException();
+        // Throw away the headers received so far.
+        $headers = array();
+        break;
       }
       if (isset($result) && is_array($result)) {
         $headers = array_merge($headers, $result);
@@ -1975,7 +1977,10 @@ function file_download() {
     if (count($headers)) {
       return file_transfer($uri, $headers);
     }
-    throw new AccessDeniedHttpException();
+    else {
+      throw new AccessDeniedHttpException();
+    }
+    drupal_exit();
   }
   throw new NotFoundHttpException();
 }

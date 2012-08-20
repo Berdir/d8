@@ -126,7 +126,20 @@ class ImageStylesPathAndUrlTest extends WebTestBase {
     $this->assertEqual($this->drupalGetHeader('Content-Type'), $generated_image_info['mime_type'], t('Expected Content-Type was reported.'));
     $this->assertEqual($this->drupalGetHeader('Content-Length'), $generated_image_info['file_size'], t('Expected Content-Length was reported.'));
     if ($scheme == 'private') {
+      $this->assertEqual($this->drupalGetHeader('Expires'), 'Sun, 19 Nov 1978 05:00:00 GMT', t('Expires header was sent.'));
+      $this->assertEqual($this->drupalGetHeader('Cache-Control'), 'no-cache, private', t('Cache-Control header was set to prevent caching.'));
       $this->assertEqual($this->drupalGetHeader('X-Image-Owned-By'), 'image_module_test', t('Expected custom header has been added.'));
+      $this->drupalGet($generate_url);
+      $this->assertResponse(403, t('Confirmed that access is denied for the private image style.') );
+      // Verify that images are not appended to the response. Currently this test only uses PNG images.
+      if (strpos($generate_url, '.png') === FALSE ) {
+        $this->fail('Confirming that private image styles are not appended require PNG file.');
+      }
+      else {
+        // Check for PNG-Signature (cf. http://www.libpng.org/pub/png/book/chapter08.html#png.ch08.div.2) in the
+        // response body.
+        $this->assertNoRaw( chr(137) . chr(80) . chr(78) . chr(71) . chr(13) . chr(10) . chr(26) . chr(10), 'No PNG signature found in the response body.');
+      }
     }
 
     $GLOBALS['script_path'] = $script_path_original;
