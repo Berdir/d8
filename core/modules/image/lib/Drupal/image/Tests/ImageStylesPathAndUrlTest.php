@@ -100,7 +100,7 @@ class ImageStylesPathAndUrlTest extends WebTestBase {
 
     // Create a working copy of the file.
     $files = $this->drupalGetTestFiles('image');
-    $file = reset($files);
+    $file = array_shift($files);
     $image_info = image_get_info($file->uri);
     $original_uri = file_unmanaged_copy($file->uri, $scheme . '://', FILE_EXISTS_RENAME);
     // Let the image_module_test module know about this file, so it can claim
@@ -129,7 +129,16 @@ class ImageStylesPathAndUrlTest extends WebTestBase {
       $this->assertEqual($this->drupalGetHeader('Expires'), 'Sun, 19 Nov 1978 05:00:00 GMT', t('Expires header was sent.'));
       $this->assertEqual($this->drupalGetHeader('Cache-Control'), 'no-cache, private', t('Cache-Control header was set to prevent caching.'));
       $this->assertEqual($this->drupalGetHeader('X-Image-Owned-By'), 'image_module_test', t('Expected custom header has been added.'));
-      $this->drupalGet($generate_url);
+
+      // Repeat this with a different file that we do not have access to and
+      // make sure that access is denied.
+      $file_noaccess = array_shift($files);
+      $original_uri_noaccess = file_unmanaged_copy($file_noaccess->uri, $scheme . '://', FILE_EXISTS_RENAME);
+      $generated_uri_noaccess = $scheme . '://styles/' . $this->style_name . '/' . $scheme . '/'. drupal_basename($original_uri_noaccess);
+      $this->assertFalse(file_exists($generated_uri_noaccess), t('Generated file does not exist.'));
+      $generate_url_noaccess = image_style_url($this->style_name, $original_uri_noaccess);
+
+      $this->drupalGet($generate_url_noaccess);
       $this->assertResponse(403, t('Confirmed that access is denied for the private image style.') );
       // Verify that images are not appended to the response. Currently this test only uses PNG images.
       if (strpos($generate_url, '.png') === FALSE ) {
