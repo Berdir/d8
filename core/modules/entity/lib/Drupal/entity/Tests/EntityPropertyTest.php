@@ -7,9 +7,9 @@
 
 namespace Drupal\entity\Tests;
 
-use Drupal\core\Property\PropertyInterface;
+use Drupal\Core\Data\DataItemInterface;
 use Drupal\entity\EntityInterface;
-use Drupal\entity\Property\EntityPropertyInterface;
+use Drupal\entity\Property\EntityPropertyListInterface;
 use Drupal\entity\Property\EntityPropertyItemInterface;
 use Drupal\simpletest\WebTestBase;
 
@@ -62,7 +62,7 @@ class EntityPropertyTest extends WebTestBase  {
     $entity = $this->createTestEntity();
 
     // Access the name property.
-    $this->assertTrue($entity->name instanceof EntityPropertyInterface, 'Property implements interface');
+    $this->assertTrue($entity->name instanceof EntityPropertyListInterface, 'Property implements interface');
     $this->assertTrue($entity->name[0] instanceof EntityPropertyItemInterface, 'Property item implements interface');
 
     $this->assertEqual($this->entity_name, $entity->name->value, 'Name value can be read.');
@@ -80,7 +80,7 @@ class EntityPropertyTest extends WebTestBase  {
     $this->assertEqual($new_name, $entity->name->value, 'Name can be updated and read through list access.');
 
     // Access the user property.
-    $this->assertTrue($entity->user instanceof EntityPropertyInterface, 'Property implements interface');
+    $this->assertTrue($entity->user instanceof EntityPropertyListInterface, 'Property implements interface');
     $this->assertTrue($entity->user[0] instanceof EntityPropertyItemInterface, 'Property item implements interface');
 
     $this->assertEqual($this->entity_user->uid, $entity->user->id, 'User id can be read.');
@@ -207,13 +207,13 @@ class EntityPropertyTest extends WebTestBase  {
     $entity = $this->createTestEntity();
 
     foreach ($entity as $name => $property) {
-      $this->assertTrue($property instanceof EntityPropertyInterface, "Property $name implements interface.");
+      $this->assertTrue($property instanceof EntityPropertyListInterface, "Property $name implements interface.");
 
       foreach ($property as $delta => $item) {
         $this->assertTrue($property[0] instanceof EntityPropertyItemInterface, "Item $delta of property $name implements interface.");
 
         foreach ($item as $value_name => $value_property) {
-          $this->assertTrue($value_property instanceof PropertyInterface, "Value $value_name of item $delta of property $name implements interface.");
+          $this->assertTrue($value_property instanceof DataItemInterface, "Value $value_name of item $delta of property $name implements interface.");
 
           $value = $value_property->getValue();
           $this->assertTrue(!isset($value) || is_scalar($value) || $value instanceof EntityInterface, "Value $value_name of item $delta of property $name is a primitive or an entity.");
@@ -227,9 +227,10 @@ class EntityPropertyTest extends WebTestBase  {
   }
 
   /**
-   * Tests working with entity properties based upon property container and property list interfaces.
+   * Tests working with entity properties based upon data structure and data
+   * list interfaces.
    */
-  public function testPropertyContainerInterfaces() {
+  public function testDataStructureInterfaces() {
     $entity = $this->createTestEntity();
     $entity->save();
     $entity_definition = array(
@@ -261,7 +262,7 @@ class EntityPropertyTest extends WebTestBase  {
    * Recursive helper for getting all contained strings,
    * i.e. properties of type string.
    */
-  public function getContainedStrings(PropertyInterface $data_item, $depth, array &$strings) {
+  public function getContainedStrings(DataItemInterface $data_item, $depth, array &$strings) {
 
     if ($data_item->getType() == 'string') {
       $strings[] = $data_item->getValue();
@@ -269,12 +270,12 @@ class EntityPropertyTest extends WebTestBase  {
 
     // Recurse until a certain depth is reached if possible.
     if ($depth < 7) {
-      if ($data_item instanceof \Drupal\Core\Property\PropertyListInterface) {
+      if ($data_item instanceof \Drupal\Core\Data\DataListInterface) {
         foreach ($data_item as $item) {
           $this->getContainedStrings($item, $depth + 1, $strings);
         }
       }
-      elseif ($data_item instanceof \Drupal\Core\Property\PropertyContainerInterface) {
+      elseif ($data_item instanceof \Drupal\Core\Data\DataStructureInterface) {
         foreach ($data_item as $name => $property) {
           $this->getContainedStrings($property, $depth + 1, $strings);
         }

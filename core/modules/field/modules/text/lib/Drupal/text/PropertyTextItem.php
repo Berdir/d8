@@ -13,7 +13,7 @@ use \Drupal\entity\Property\EntityPropertyItemBase;
 class PropertyTextItem extends EntityPropertyItemBase {
 
   /**
-   * Implements PropertyContainerInterface::getPropertyDefinitions().
+   * Implements DataStructureInterface::getPropertyDefinitions().
    */
   public function getPropertyDefinitions() {
     // Statically cache the definitions to avoid creating lots of array copies.

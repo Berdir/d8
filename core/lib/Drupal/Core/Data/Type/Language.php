@@ -1,16 +1,16 @@
 <?php
 /**
  * @file
- * Definition of Drupal\Core\Property\Type\Language.
+ * Definition of Drupal\Core\Data\Type\Language.
  */
 
-namespace Drupal\Core\Property\Type;
-use \Drupal\Core\Property\PropertyInterface;
+namespace Drupal\Core\Data\Type;
+use \Drupal\Core\Data\DataItemInterface;
 
 /**
  * Defines the 'language' property type, e.g. the computed 'language' property of language items.
  */
-class Language implements PropertyInterface {
+class Language implements DataItemInterface {
 
   /**
    * The property definition.
@@ -22,12 +22,12 @@ class Language implements PropertyInterface {
   /**
    * The property holding the langcode.
    *
-   * @var \Drupal\Core\Property\PropertyInterface
+   * @var \Drupal\Core\Data\DataItemInterface
    */
   protected $langcode;
 
   /**
-   * Implements PropertyInterface::__construct().
+   * Implements DataItemInterface::__construct().
    */
   public function __construct(array $definition, $value = NULL, $context = array()) {
     $this->definition = $definition;
@@ -47,21 +47,21 @@ class Language implements PropertyInterface {
   }
 
   /**
-   * Implements PropertyInterface::getType().
+   * Implements DataItemInterface::getType().
    */
   public function getType() {
     return $this->definition['type'];
   }
 
   /**
-   * Implements PropertyInterface::getDefinition().
+   * Implements DataItemInterface::getDefinition().
    */
   public function getDefinition() {
     return $this->definition;
   }
 
   /**
-   * Implements PropertyInterface::getValue().
+   * Implements DataItemInterface::getValue().
    */
   public function getValue() {
     $langcode = $this->langcode->getValue();
@@ -69,7 +69,7 @@ class Language implements PropertyInterface {
   }
 
   /**
-   * Implements PropertyInterface::setValue().
+   * Implements DataItemInterface::setValue().
    *
    * Both the langcode and the language object may be passed as value.
    */
@@ -89,7 +89,7 @@ class Language implements PropertyInterface {
   }
 
   /**
-   * Implements PropertyInterface::getString().
+   * Implements DataItemInterface::getString().
    */
   public function getString() {
     $language = $this->getValue();
@@ -97,7 +97,7 @@ class Language implements PropertyInterface {
   }
 
   /**
-   * Implements PropertyInterface::validate().
+   * Implements DataItemInterface::validate().
    */
   public function validate($value = NULL) {
     // TODO: Implement validate() method.

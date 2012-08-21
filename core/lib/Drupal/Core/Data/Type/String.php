@@ -2,16 +2,16 @@
 
 /**
  * @file
- * Definition of Drupal\Core\Property\Type\String.
+ * Definition of Drupal\Core\Data\Type\String.
  */
 
-namespace Drupal\Core\Property\Type;
-use Drupal\Core\Property\PropertyInterface;
+namespace Drupal\Core\Data\Type;
+use Drupal\Core\Data\DataItemInterface;
 
 /**
  * The string property type.
  */
-class String implements PropertyInterface {
+class String implements DataItemInterface {
 
   /**
    * The property definition.
@@ -28,7 +28,7 @@ class String implements PropertyInterface {
   protected $value;
 
   /**
-   * Implements PropertyInterface::__construct().
+   * Implements DataItemInterface::__construct().
    */
   public function __construct(array $definition, $value = NULL, $context = array()) {
     $this->definition = $definition;
@@ -38,42 +38,42 @@ class String implements PropertyInterface {
   }
 
   /**
-   * Implements PropertyInterface::getType().
+   * Implements DataItemInterface::getType().
    */
   public function getType() {
     return $this->definition['type'];
   }
 
   /**
-   * Implements PropertyInterface::getDefinition().
+   * Implements DataItemInterface::getDefinition().
    */
   public function getDefinition() {
     return $this->definition;
   }
 
   /**
-   * Implements PropertyInterface::getValue().
+   * Implements DataItemInterface::getValue().
    */
   public function getValue() {
     return $this->value;
   }
 
   /**
-   * Implements PropertyInterface::setValue().
+   * Implements DataItemInterface::setValue().
    */
   public function setValue($value) {
     $this->value = $value;
   }
 
   /**
-   * Implements PropertyInterface::getString().
+   * Implements DataItemInterface::getString().
    */
   public function getString() {
     return (string) $this->value;
   }
 
   /**
-   * Implements PropertyInterface::validate().
+   * Implements DataItemInterface::validate().
    */
   public function validate($value = NULL) {
     // TODO: Implement validate() method.

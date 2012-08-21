@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Definition of Drupal\Core\Property\PropertyContainerInterface.
+ * Definition of Drupal\Core\Data\DataStructureInterface.
  */
 
-namespace Drupal\Core\Property;
+namespace Drupal\Core\Data;
 use IteratorAggregate;
 
 /**
@@ -13,7 +13,7 @@ use IteratorAggregate;
  *
  * This is implemented by entities as well as by PropertyItem classes.
  */
-interface PropertyContainerInterface extends IteratorAggregate  {
+interface DataStructureInterface extends IteratorAggregate  {
 
   /**
    * Gets an array of properties.
@@ -22,7 +22,7 @@ interface PropertyContainerInterface extends IteratorAggregate  {
    * @todo: How to get computed properties via the interface?
    *
    * @return array
-   *   An array of property objects implementing the PropertyInterface, keyed
+   *   An array of property objects implementing the DataItemInterface, keyed
    *   by property name.
    */
   public function getProperties();
@@ -32,12 +32,12 @@ interface PropertyContainerInterface extends IteratorAggregate  {
    *
    * @param array
    *   The array of properties to set. The array has to consist of property
-   *   values or property objects implementing the PropertyInterface and must be
+   *   values or property objects implementing the DataItemInterface and must be
    *   keyed by property name.
    *
    * @throws \InvalidArgumentException
    *   If an not existing property is passed.
-   * @throws \Drupal\Core\Property\PropertyReadOnlyException
+   * @throws \Drupal\Core\Data\DataReadOnlyException
    *   If a read-only property is set.
    */
   public function setProperties($properties);

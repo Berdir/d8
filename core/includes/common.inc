@@ -7343,9 +7343,9 @@ function drupal_get_data_type_info() {
  *   following keys are supported:
  *   - name: The name of the property being created.
  *   - parent: The parent object containing the property. Must be an instance of
- *     \Drupal\Core\Property\PropertyContainerInterface.
+ *     \Drupal\Core\Data\DataStructureInterface.
  *
- * @return \Drupal\Core\Property\PropertyInterface
+ * @return \Drupal\Core\Data\DataItemInterface
  *
  * @see drupal_get_data_type_info()
  */

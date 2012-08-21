@@ -7,13 +7,13 @@
 
 namespace Drupal\entity;
 
-use Drupal\Core\Property\PropertyInterface;
-use Drupal\Core\Property\PropertyContainerInterface;
+use Drupal\Core\Data\DataItemInterface;
+use Drupal\Core\Data\DataStructureInterface;
 
 /**
  * Makes translated entity properties available via the Property API.
  */
-class EntityTranslation implements PropertyContainerInterface, PropertyInterface {
+class EntityTranslation implements DataStructureInterface, DataItemInterface {
 
   /**
    * The property definition.
@@ -30,7 +30,7 @@ class EntityTranslation implements PropertyContainerInterface, PropertyInterface
   protected $entity;
 
   /**
-   * Implements PropertyInterface::__construct().
+   * Implements DataItemInterface::__construct().
    */
   public function __construct(array $definition, $value = NULL, $context = array()) {
     $this->definition = $definition;
@@ -46,21 +46,21 @@ class EntityTranslation implements PropertyContainerInterface, PropertyInterface
   }
 
   /**
-   * Implements PropertyInterface::getType().
+   * Implements DataItemInterface::getType().
    */
   public function getType() {
     return $this->definition['type'];
   }
 
   /**
-   * Implements PropertyInterface::getDefinition().
+   * Implements DataItemInterface::getDefinition().
    */
   public function getDefinition() {
     return $this->definition;
   }
 
   /**
-   * Implements PropertyInterface::getValue().
+   * Implements DataItemInterface::getValue().
    */
   public function getValue() {
     $values = array();
@@ -71,7 +71,7 @@ class EntityTranslation implements PropertyContainerInterface, PropertyInterface
   }
 
   /**
-   * Implements PropertyInterface::setValue().
+   * Implements DataItemInterface::setValue().
    */
   public function setValue($values) {
     foreach ($this->getProperties() as $name => $property) {
@@ -84,7 +84,7 @@ class EntityTranslation implements PropertyContainerInterface, PropertyInterface
   }
 
   /**
-   * Implements PropertyInterface::getString().
+   * Implements DataItemInterface::getString().
    */
   public function getString() {
     $strings = array();
@@ -95,7 +95,7 @@ class EntityTranslation implements PropertyContainerInterface, PropertyInterface
   }
 
   /**
-   * Implements PropertyInterface::get().
+   * Implements DataItemInterface::get().
    */
   public function get($property_name) {
     $definitions = $this->getPropertyDefinitions();
@@ -106,7 +106,7 @@ class EntityTranslation implements PropertyContainerInterface, PropertyInterface
   }
 
   /**
-   * Implements PropertyContainerInterface::getProperties().
+   * Implements DataStructureInterface::getProperties().
    */
   public function getProperties() {
     $properties = array();
@@ -119,12 +119,12 @@ class EntityTranslation implements PropertyContainerInterface, PropertyInterface
   }
 
   /**
-   * Implements PropertyContainerInterface::setProperties().
+   * Implements DataStructureInterface::setProperties().
    */
   public function setProperties($properties) {
     foreach ($properties as $name => $property) {
       // Copy the value to our property object.
-      $value = $property instanceof PropertyInterface ? $property->getValue() : $property;
+      $value = $property instanceof DataItemInterface ? $property->getValue() : $property;
       $this->get($name)->setValue($value);
     }
   }
@@ -140,7 +140,7 @@ class EntityTranslation implements PropertyContainerInterface, PropertyInterface
    * Magic getter: Sets the property in default language.
    */
   public function __set($name, $value) {
-    $value = $value instanceof PropertyInterface ? $value->getValue() : $value;
+    $value = $value instanceof DataItemInterface ? $value->getValue() : $value;
     $this->get($name)->setValue($value);
   }
 
@@ -152,7 +152,7 @@ class EntityTranslation implements PropertyContainerInterface, PropertyInterface
   }
 
   /**
-   * Implements PropertyContainerInterface::getPropertyDefinition().
+   * Implements DataStructureInterface::getPropertyDefinition().
    */
   public function getPropertyDefinition($name) {
     $definitions = $this->getPropertyDefinitions();
@@ -160,7 +160,7 @@ class EntityTranslation implements PropertyContainerInterface, PropertyInterface
   }
 
   /**
-   * Implements PropertyContainerInterface::getPropertyDefinitions().
+   * Implements DataStructureInterface::getPropertyDefinitions().
    */
   public function getPropertyDefinitions() {
     $definitions = array();
@@ -173,7 +173,7 @@ class EntityTranslation implements PropertyContainerInterface, PropertyInterface
   }
 
   /**
-   * Implements PropertyContainerInterface::toArray().
+   * Implements DataStructureInterface::toArray().
    */
   public function toArray() {
     return $this->getValue();
@@ -184,7 +184,7 @@ class EntityTranslation implements PropertyContainerInterface, PropertyInterface
   }
 
   /**
-   * Implements PropertyInterface::validate().
+   * Implements DataItemInterface::validate().
    */
   public function validate($value = NULL) {
     // @todo implement
