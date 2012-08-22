@@ -174,7 +174,7 @@ function hook_file_delete(Drupal\file\File $file) {
  *   The field to which the file belongs.
  * @param Drupal\entity\EntityInterface $entity
  *   The entity which references the file.
- * @param Drupal\Core\File\File $file
+ * @param Drupal\file\File $file
  *   The file entity that is being requested.
  *
  * @return
@@ -184,7 +184,7 @@ function hook_file_delete(Drupal\file\File $file) {
  *
  * @see hook_field_access().
  */
-function hook_file_download_access($field, Drupal\entity\EntityInterface $entity, Drupal\Core\File\File $file) {
+function hook_file_download_access($field, Drupal\entity\EntityInterface $entity, Drupal\file\File $file) {
   if ($entity->entityType() == 'node') {
     return node_access('view', $entity);
   }
