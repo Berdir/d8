@@ -1874,18 +1874,18 @@ function system_data_type_info() {
   return array(
     'string' => array(
       'label' => t('String'),
-      'class' => '\Drupal\Core\Data\Type\String',
+      'class' => '\Drupal\Core\TypedData\Type\String',
       'primitive' => TRUE,
     ),
     'integer' => array(
       'label' => t('Integer'),
-      'class' => '\Drupal\Core\Data\Type\Integer',
+      'class' => '\Drupal\Core\TypedData\Type\Integer',
       'primitive' => TRUE,
     ),
     'language' => array(
       'label' => t('Language'),
       'description' => t('A language object.'),
-      'class' => '\Drupal\Core\Data\Type\Language',
+      'class' => '\Drupal\Core\TypedData\Type\Language',
     ),
   );
 }

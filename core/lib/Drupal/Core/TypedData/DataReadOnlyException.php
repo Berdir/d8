@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Definition of Drupal\Core\Data\DataReadOnlyException.
+ * Definition of Drupal\Core\TypedData\DataReadOnlyException.
  */
 
-namespace Drupal\Core\Data;
+namespace Drupal\Core\TypedData;
 
 /**
  * Exception thrown when trying to write or set a ready-only property.

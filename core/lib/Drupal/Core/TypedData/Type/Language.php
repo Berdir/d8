@@ -1,16 +1,16 @@
 <?php
 /**
  * @file
- * Definition of Drupal\Core\Data\Type\Language.
+ * Definition of Drupal\Core\TypedData\Type\Language.
  */
 
-namespace Drupal\Core\Data\Type;
-use \Drupal\Core\Data\DataItemInterface;
+namespace Drupal\Core\TypedData\Type;
+use \Drupal\Core\TypedData\DataWrapperInterface;
 
 /**
  * Defines the 'language' property type, e.g. the computed 'language' property of language items.
  */
-class Language implements DataItemInterface {
+class Language implements DataWrapperInterface {
 
   /**
    * The property definition.
@@ -22,12 +22,12 @@ class Language implements DataItemInterface {
   /**
    * The property holding the langcode.
    *
-   * @var \Drupal\Core\Data\DataItemInterface
+   * @var \Drupal\Core\TypedData\DataWrapperInterface
    */
   protected $langcode;
 
   /**
-   * Implements DataItemInterface::__construct().
+   * Implements DataWrapperInterface::__construct().
    */
   public function __construct(array $definition, $value = NULL, $context = array()) {
     $this->definition = $definition;
@@ -47,21 +47,21 @@ class Language implements DataItemInterface {
   }
 
   /**
-   * Implements DataItemInterface::getType().
+   * Implements DataWrapperInterface::getType().
    */
   public function getType() {
     return $this->definition['type'];
   }
 
   /**
-   * Implements DataItemInterface::getDefinition().
+   * Implements DataWrapperInterface::getDefinition().
    */
   public function getDefinition() {
     return $this->definition;
   }
 
   /**
-   * Implements DataItemInterface::getValue().
+   * Implements DataWrapperInterface::getValue().
    */
   public function getValue() {
     $langcode = $this->langcode->getValue();
@@ -69,7 +69,7 @@ class Language implements DataItemInterface {
   }
 
   /**
-   * Implements DataItemInterface::setValue().
+   * Implements DataWrapperInterface::setValue().
    *
    * Both the langcode and the language object may be passed as value.
    */
@@ -89,7 +89,7 @@ class Language implements DataItemInterface {
   }
 
   /**
-   * Implements DataItemInterface::getString().
+   * Implements DataWrapperInterface::getString().
    */
   public function getString() {
     $language = $this->getValue();
@@ -97,7 +97,7 @@ class Language implements DataItemInterface {
   }
 
   /**
-   * Implements DataItemInterface::validate().
+   * Implements DataWrapperInterface::validate().
    */
   public function validate($value = NULL) {
     // TODO: Implement validate() method.

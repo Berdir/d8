@@ -6,7 +6,7 @@
  */
 
 namespace Drupal\entity\Property;
-use Drupal\Core\Data\DataListInterface;
+use Drupal\Core\TypedData\DataListInterface;
 
 /**
  * Interface for entity properties, being lists of property items.

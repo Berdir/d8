@@ -36,7 +36,7 @@ class EntityPropertyList implements EntityPropertyListInterface {
   protected $definition;
 
    /**
-   * Implements DataItemInterface::__construct().
+   * Implements DataWrapperInterface::__construct().
    */
   public function __construct(array $definition, $value = NULL, $context = array()) {
     $this->definition = $definition;
@@ -46,21 +46,21 @@ class EntityPropertyList implements EntityPropertyListInterface {
   }
 
   /**
-   * Implements DataItemInterface::getType().
+   * Implements DataWrapperInterface::getType().
    */
   public function getType() {
     return $this->definition['type'];
   }
 
   /**
-   * Implements DataItemInterface::getDefinition().
+   * Implements DataWrapperInterface::getDefinition().
    */
   public function getDefinition() {
     return $this->definition;
   }
 
   /**
-   * Implements DataItemInterface::getValue().
+   * Implements DataWrapperInterface::getValue().
    */
   public function getValue() {
     $values = array();
@@ -72,7 +72,7 @@ class EntityPropertyList implements EntityPropertyListInterface {
   }
 
   /**
-   * Implements DataItemInterface::setValue().
+   * Implements DataWrapperInterface::setValue().
    *
    * @param array $values
    *   An array of values of the property items.
@@ -81,7 +81,7 @@ class EntityPropertyList implements EntityPropertyListInterface {
     if (isset($values)) {
 
       // Support passing in property objects as value.
-      if ($values instanceof DataItemInterface) {
+      if ($values instanceof DataWrapperInterface) {
         $values = $values->getValue();
       }
       if (!is_array($values)) {
@@ -125,7 +125,7 @@ class EntityPropertyList implements EntityPropertyListInterface {
   }
 
   /**
-   * Implements DataItemInterface::validate().
+   * Implements DataWrapperInterface::validate().
    */
   public function validate($value = NULL) {
     // @todo implement
@@ -171,7 +171,7 @@ class EntityPropertyList implements EntityPropertyListInterface {
   /**
    * Helper for creating a list item object.
    *
-   * @return \Drupal\Core\Data\DataItemInterface
+   * @return \Drupal\Core\TypedData\DataWrapperInterface
    */
   protected function createItem($value = NULL) {
     return drupal_get_property(array('list' => FALSE) + $this->definition, $value);

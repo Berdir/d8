@@ -5,8 +5,8 @@
  */
 
 namespace Drupal\entity\Property;
-use \Drupal\Core\Data\DataItemInterface;
-use \Drupal\Core\Data\DataStructureInterface;
+use \Drupal\Core\TypedData\DataWrapperInterface;
+use \Drupal\Core\TypedData\DataContainerInterface;
 
 
 /**
@@ -15,7 +15,7 @@ use \Drupal\Core\Data\DataStructureInterface;
  * This property implements the container interface, whereby most container
  * methods are just forwarded to the contained entity (if set).
  */
-class PropertyEntity implements DataItemInterface, DataStructureInterface {
+class PropertyEntity implements DataWrapperInterface, DataContainerInterface {
 
   /**
    * The property definition.
@@ -34,12 +34,12 @@ class PropertyEntity implements DataItemInterface, DataStructureInterface {
   /**
    * The property holding the entity ID.
    *
-   * @var \Drupal\Core\Data\DataItemInterface
+   * @var \Drupal\Core\TypedData\DataWrapperInterface
    */
   protected $id;
 
   /**
-   * Implements DataItemInterface::__construct().
+   * Implements DataWrapperInterface::__construct().
    */
   public function __construct(array $definition, $value = NULL, $context = array()) {
     $this->definition = $definition;
@@ -60,14 +60,14 @@ class PropertyEntity implements DataItemInterface, DataStructureInterface {
   }
 
   /**
-   * Implements DataItemInterface::getType().
+   * Implements DataWrapperInterface::getType().
    */
   public function getType() {
     return $this->definition['type'];
   }
 
   /**
-   * Implements DataItemInterface::getDefinition().
+   * Implements DataWrapperInterface::getDefinition().
    *
    * Property definitions of type 'entity' may contain keys further defining the
    * reference. Additionally supported keys are:
@@ -80,7 +80,7 @@ class PropertyEntity implements DataItemInterface, DataStructureInterface {
   }
 
   /**
-   * Implements DataItemInterface::getValue().
+   * Implements DataWrapperInterface::getValue().
    */
   public function getValue() {
     $id = $this->id->getValue();
@@ -88,7 +88,7 @@ class PropertyEntity implements DataItemInterface, DataStructureInterface {
   }
 
   /**
-   * Implements DataItemInterface::setValue().
+   * Implements DataWrapperInterface::setValue().
    *
    * Both the entity ID and the entity object may be passed as value.
    */
@@ -109,7 +109,7 @@ class PropertyEntity implements DataItemInterface, DataStructureInterface {
   }
 
   /**
-   * Implements DataItemInterface::getString().
+   * Implements DataWrapperInterface::getString().
    */
   public function getString() {
     $entity = $this->getValue();
@@ -117,7 +117,7 @@ class PropertyEntity implements DataItemInterface, DataStructureInterface {
   }
 
   /**
-   * Implements DataItemInterface::validate().
+   * Implements DataWrapperInterface::validate().
    */
   public function validate($value = NULL) {
     // TODO: Implement validate() method.
@@ -132,7 +132,7 @@ class PropertyEntity implements DataItemInterface, DataStructureInterface {
   }
 
   /**
-   * Implements DataStructureInterface::getProperties().
+   * Implements DataContainerInterface::getProperties().
    */
   public function getProperties() {
     $entity = $this->getValue();
@@ -140,7 +140,7 @@ class PropertyEntity implements DataItemInterface, DataStructureInterface {
   }
 
   /**
-   * Implements DataStructureInterface::setProperties().
+   * Implements DataContainerInterface::setProperties().
    */
   public function setProperties($properties) {
     if ($entity = $this->getValue()) {
@@ -149,7 +149,7 @@ class PropertyEntity implements DataItemInterface, DataStructureInterface {
   }
 
   /**
-   * Implements DataStructureInterface::getPropertyDefinition().
+   * Implements DataContainerInterface::getPropertyDefinition().
    */
   public function getPropertyDefinition($name) {
     $definitions = $this->getPropertyDefinitions();
@@ -157,7 +157,7 @@ class PropertyEntity implements DataItemInterface, DataStructureInterface {
   }
 
   /**
-   * Implements DataStructureInterface::getPropertyDefinitions().
+   * Implements DataContainerInterface::getPropertyDefinitions().
    */
   public function getPropertyDefinitions() {
     // @todo: Support getting definitions if multiple bundles are specified.
@@ -167,7 +167,7 @@ class PropertyEntity implements DataItemInterface, DataStructureInterface {
   }
 
   /**
-   * Implements DataStructureInterface::toArray().
+   * Implements DataContainerInterface::toArray().
    */
   public function toArray() {
     $entity = $this->getValue();

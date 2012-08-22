@@ -6,30 +6,30 @@
  */
 
 namespace Drupal\text;
-use Drupal\Core\Data\DataItemInterface;
-use Drupal\Core\Data\DataReadOnlyException;
+use Drupal\Core\TypedData\DataWrapperInterface;
+use Drupal\Core\TypedData\DataReadOnlyException;
 
 /**
  * The string property type.
  */
-class PropertyProcessedText extends \Drupal\Core\Data\Type\String {
+class PropertyProcessedText extends \Drupal\Core\TypedData\Type\String {
 
   /**
    * The text property.
    *
-   * @var \Drupal\Core\Data\DataItemInterface
+   * @var \Drupal\Core\TypedData\DataWrapperInterface
    */
   protected $text;
 
   /**
    * The text format property.
    *
-   * @var \Drupal\Core\Data\DataItemInterface
+   * @var \Drupal\Core\TypedData\DataWrapperInterface
    */
   protected $format;
 
   /**
-   * Implements DataItemInterface::__construct().
+   * Implements DataWrapperInterface::__construct().
    */
   public function __construct(array $definition, $value = NULL, $context = array()) {
     $this->definition = $definition;
@@ -47,7 +47,7 @@ class PropertyProcessedText extends \Drupal\Core\Data\Type\String {
   }
 
   /**
-   * Implements DataItemInterface::getValue().
+   * Implements DataWrapperInterface::getValue().
    */
   public function getValue($langcode = NULL) {
     // @todo: Determine a way to get the field $instance here.
@@ -64,7 +64,7 @@ class PropertyProcessedText extends \Drupal\Core\Data\Type\String {
   }
 
   /**
-   * Implements DataItemInterface::setValue().
+   * Implements DataWrapperInterface::setValue().
    */
   public function setValue($value) {
     if (isset($value)) {

@@ -7,7 +7,7 @@
 
 namespace Drupal\entity\Tests;
 
-use Drupal\Core\Data\DataItemInterface;
+use Drupal\Core\TypedData\DataWrapperInterface;
 use Drupal\entity\EntityInterface;
 use Drupal\entity\Property\EntityPropertyListInterface;
 use Drupal\entity\Property\EntityPropertyItemInterface;
@@ -213,7 +213,7 @@ class EntityPropertyTest extends WebTestBase  {
         $this->assertTrue($property[0] instanceof EntityPropertyItemInterface, "Item $delta of property $name implements interface.");
 
         foreach ($item as $value_name => $value_property) {
-          $this->assertTrue($value_property instanceof DataItemInterface, "Value $value_name of item $delta of property $name implements interface.");
+          $this->assertTrue($value_property instanceof DataWrapperInterface, "Value $value_name of item $delta of property $name implements interface.");
 
           $value = $value_property->getValue();
           $this->assertTrue(!isset($value) || is_scalar($value) || $value instanceof EntityInterface, "Value $value_name of item $delta of property $name is a primitive or an entity.");
@@ -230,7 +230,7 @@ class EntityPropertyTest extends WebTestBase  {
    * Tests working with entity properties based upon data structure and data
    * list interfaces.
    */
-  public function testDataStructureInterfaces() {
+  public function testDataContainerInterfaces() {
     $entity = $this->createTestEntity();
     $entity->save();
     $entity_definition = array(
@@ -262,7 +262,7 @@ class EntityPropertyTest extends WebTestBase  {
    * Recursive helper for getting all contained strings,
    * i.e. properties of type string.
    */
-  public function getContainedStrings(DataItemInterface $data_item, $depth, array &$strings) {
+  public function getContainedStrings(DataWrapperInterface $data_item, $depth, array &$strings) {
 
     if ($data_item->getType() == 'string') {
       $strings[] = $data_item->getValue();
@@ -270,12 +270,12 @@ class EntityPropertyTest extends WebTestBase  {
 
     // Recurse until a certain depth is reached if possible.
     if ($depth < 7) {
-      if ($data_item instanceof \Drupal\Core\Data\DataListInterface) {
+      if ($data_item instanceof \Drupal\Core\TypedData\DataListInterface) {
         foreach ($data_item as $item) {
           $this->getContainedStrings($item, $depth + 1, $strings);
         }
       }
-      elseif ($data_item instanceof \Drupal\Core\Data\DataStructureInterface) {
+      elseif ($data_item instanceof \Drupal\Core\TypedData\DataContainerInterface) {
         foreach ($data_item as $name => $property) {
           $this->getContainedStrings($property, $depth + 1, $strings);
         }

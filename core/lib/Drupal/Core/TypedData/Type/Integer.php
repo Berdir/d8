@@ -2,16 +2,16 @@
 
 /**
  * @file
- * Definition of Drupal\Core\Data\Type\String.
+ * Definition of Drupal\Core\TypedData\Type\Integer.
  */
 
-namespace Drupal\Core\Data\Type;
-use Drupal\Core\Data\DataItemInterface;
+namespace Drupal\Core\TypedData\Type;
+use Drupal\Core\TypedData\DataWrapperInterface;
 
 /**
  * The string property type.
  */
-class String implements DataItemInterface {
+class Integer implements DataWrapperInterface {
 
   /**
    * The property definition.
@@ -23,12 +23,12 @@ class String implements DataItemInterface {
   /**
    * The property value.
    *
-   * @var string
+   * @var integer
    */
   protected $value;
 
   /**
-   * Implements DataItemInterface::__construct().
+   * Implements DataWrapperInterface::__construct().
    */
   public function __construct(array $definition, $value = NULL, $context = array()) {
     $this->definition = $definition;
@@ -38,42 +38,42 @@ class String implements DataItemInterface {
   }
 
   /**
-   * Implements DataItemInterface::getType().
+   * Implements DataWrapperInterface::getType().
    */
   public function getType() {
     return $this->definition['type'];
   }
 
   /**
-   * Implements DataItemInterface::getDefinition().
+   * Implements DataWrapperInterface::getDefinition().
    */
   public function getDefinition() {
     return $this->definition;
   }
 
   /**
-   * Implements DataItemInterface::getValue().
+   * Implements DataWrapperInterface::getValue().
    */
   public function getValue() {
     return $this->value;
   }
 
   /**
-   * Implements DataItemInterface::setValue().
+   * Implements DataWrapperInterface::setValue().
    */
   public function setValue($value) {
     $this->value = $value;
   }
 
   /**
-   * Implements DataItemInterface::getString().
+   * Implements DataWrapperInterface::getString().
    */
   public function getString() {
     return (string) $this->value;
   }
 
   /**
-   * Implements DataItemInterface::validate().
+   * Implements DataWrapperInterface::validate().
    */
   public function validate($value = NULL) {
     // TODO: Implement validate() method.

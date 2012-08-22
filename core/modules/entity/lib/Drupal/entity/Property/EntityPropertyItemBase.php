@@ -6,14 +6,14 @@
  */
 
 namespace Drupal\entity\Property;
-use \Drupal\Core\Data\DataItemInterface;
-use \Drupal\Core\Data\DataStructureInterface;
+use \Drupal\Core\TypedData\DataWrapperInterface;
+use \Drupal\Core\TypedData\DataContainerInterface;
 
 /**
  * An entity property item.
  *
  * Entity property items making use of this base class have to implement the
- * DataStructureInterface::getPropertyDefinitions().
+ * DataContainerInterface::getPropertyDefinitions().
  *
  * @see EntityPropertyItemInterface
  */
@@ -26,7 +26,7 @@ abstract class EntityPropertyItemBase implements EntityPropertyItemInterface {
    * replaced by others, so computed properties can safely store references on
    * other properties.
    *
-   * @var array<DataItemInterface>
+   * @var array<DataWrapperInterface>
    */
   protected $properties = array();
 
@@ -39,7 +39,7 @@ abstract class EntityPropertyItemBase implements EntityPropertyItemInterface {
 
 
   /**
-   * Implements DataItemInterface::__construct().
+   * Implements DataWrapperInterface::__construct().
    */
   public function __construct(array $definition, $value = NULL, $context = array()) {
     $this->definition = $definition;
@@ -69,21 +69,21 @@ abstract class EntityPropertyItemBase implements EntityPropertyItemInterface {
   }
 
   /**
-   * Implements DataItemInterface::getType().
+   * Implements DataWrapperInterface::getType().
    */
   public function getType() {
     return $this->definition['type'];
   }
 
   /**
-   * Implements DataItemInterface::getDefinition().
+   * Implements DataWrapperInterface::getDefinition().
    */
   public function getDefinition() {
     return $this->definition;
   }
 
   /**
-   * Implements DataItemInterface::getValue().
+   * Implements DataWrapperInterface::getValue().
    */
   public function getValue() {
     $values = array();
@@ -94,7 +94,7 @@ abstract class EntityPropertyItemBase implements EntityPropertyItemInterface {
   }
 
   /**
-   * Implements DataItemInterface::setValue().
+   * Implements DataWrapperInterface::setValue().
    *
    * @param array $values
    *   An array of property values.
@@ -107,7 +107,7 @@ abstract class EntityPropertyItemBase implements EntityPropertyItemInterface {
       $values = array($keys[0] => $values);
     }
     // Support passing in property objects as value.
-    elseif ($values instanceof DataItemInterface) {
+    elseif ($values instanceof DataWrapperInterface) {
       $values = $values->getValue();
     }
 
@@ -119,7 +119,7 @@ abstract class EntityPropertyItemBase implements EntityPropertyItemInterface {
   }
 
   /**
-   * Implements DataItemInterface::getString().
+   * Implements DataWrapperInterface::getString().
    */
   public function getString() {
     $strings = array();
@@ -130,7 +130,7 @@ abstract class EntityPropertyItemBase implements EntityPropertyItemInterface {
   }
 
   /**
-   * Implements DataItemInterface::validate().
+   * Implements DataWrapperInterface::validate().
    */
   public function validate($value = NULL) {
     // @todo implement
@@ -161,7 +161,7 @@ abstract class EntityPropertyItemBase implements EntityPropertyItemInterface {
   }
 
   /**
-   * Implements DataStructureInterface::getProperties().
+   * Implements DataContainerInterface::getProperties().
    */
   public function getProperties() {
     $properties = array();
@@ -174,13 +174,13 @@ abstract class EntityPropertyItemBase implements EntityPropertyItemInterface {
   }
 
   /**
-   * Implements DataStructureInterface::setProperties().
+   * Implements DataContainerInterface::setProperties().
    */
   public function setProperties($properties) {
     foreach ($properties as $name => $property) {
       if (isset($this->properties[$name])) {
         // Copy the value to our property object.
-        $value = $property instanceof DataItemInterface ? $property->getValue() : $property;
+        $value = $property instanceof DataWrapperInterface ? $property->getValue() : $property;
         $this->properties[$name]->setValue($value);
       }
       else {
@@ -197,7 +197,7 @@ abstract class EntityPropertyItemBase implements EntityPropertyItemInterface {
   }
 
   /**
-   * Implements DataStructureInterface::getPropertyDefinition().
+   * Implements DataContainerInterface::getPropertyDefinition().
    */
   public function getPropertyDefinition($name) {
     $definitions = $this->getPropertyDefinitions();
@@ -205,7 +205,7 @@ abstract class EntityPropertyItemBase implements EntityPropertyItemInterface {
   }
 
   /**
-   * Implements DataStructureInterface::toArray().
+   * Implements DataContainerInterface::toArray().
    */
   public function toArray() {
     return $this->getValue();

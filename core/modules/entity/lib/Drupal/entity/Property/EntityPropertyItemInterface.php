@@ -7,8 +7,8 @@
 
 namespace Drupal\entity\Property;
 
-use Drupal\Core\Data\DataStructureInterface;
-use Drupal\Core\Data\DataItemInterface;
+use Drupal\Core\TypedData\DataContainerInterface;
+use Drupal\Core\TypedData\DataWrapperInterface;
 
 /**
  * Interface for entity property items, which are property container that may
@@ -17,7 +17,7 @@ use Drupal\Core\Data\DataItemInterface;
  * @see EntityPropertyList
  * @see EntityPropertyItem
  */
-interface EntityPropertyItemInterface extends DataStructureInterface, DataItemInterface {
+interface EntityPropertyItemInterface extends DataContainerInterface, DataWrapperInterface {
 
   /**
    * Check entity property access.
@@ -39,7 +39,7 @@ interface EntityPropertyItemInterface extends DataStructureInterface, DataItemIn
    * @param string $property_name
    *   The name of the property to return; e.g., 'value'.
    *
-   * @return Drupal\Core\Data\DataItemInterface
+   * @return Drupal\Core\TypedData\DataWrapperInterface
    *   The property object.
    */
   public function get($property_name);
