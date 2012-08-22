@@ -797,26 +797,43 @@ class EntityFieldQuery {
     if (empty($this->entityConditions['entity_type'])) {
       throw new EntityFieldQueryException(t('For this query an entity type must be specified.'));
     }
+
     $entity_type = $this->entityConditions['entity_type']['value'];
     $entity_info = entity_get_info($entity_type);
     if (empty($entity_info['base table'])) {
       throw new EntityFieldQueryException(t('Entity %entity has no base table.', array('%entity' => $entity_type)));
     }
+
     $base_table = $entity_info['base table'];
-    $base_table_schema = drupal_get_schema($base_table);
+    $data_table = 'data';
+    $data_table_schema = array();
+
     $select_query = db_select($base_table);
     $select_query->addExpression(':entity_type', 'entity_type', array(':entity_type' => $entity_type));
+    $sql_field = $entity_info['entity keys']['id'];
+
+    // If a data table is defined we need to join it and make sure that only one
+    // record per entity is returned.
+    if (!empty($entity_info['data table'])) {
+      $table = $entity_info['data table'];
+      $data_table_schema = drupal_get_schema($table);
+      $select_query->innerJoin($table, $data_table, "$data_table.$sql_field = $base_table.$sql_field");
+      $select_query->distinct(TRUE);
+    }
+
     // Process the property conditions.
     foreach ($this->propertyConditions as $property_condition) {
-      $this->addCondition($select_query, $base_table . '.' . $property_condition['column'], $property_condition);
+      $column = $property_condition['column'];
+      $table = isset($data_table_schema['fields'][$column]) ? $data_table : $base_table;
+      $this->addCondition($select_query, "$table.$column", $property_condition);
     }
-    // Process the four possible entity condition.
+
+    // Process the six possible entity condition.
     // The id field is always present in entity keys.
-    $sql_field = $entity_info['entity keys']['id'];
     $id_map['entity_id'] = $sql_field;
     $select_query->addField($base_table, $sql_field, 'entity_id');
     if (isset($this->entityConditions['entity_id'])) {
-      $this->addCondition($select_query, $base_table . '.' . $sql_field, $this->entityConditions['entity_id']);
+      $this->addCondition($select_query, "$base_table.$sql_field", $this->entityConditions['entity_id']);
     }
 
     // If there is a revision key defined, use it.
@@ -824,7 +841,7 @@ class EntityFieldQuery {
       $sql_field = $entity_info['entity keys']['revision'];
       $select_query->addField($base_table, $sql_field, 'revision_id');
       if (isset($this->entityConditions['revision_id'])) {
-        $this->addCondition($select_query, $base_table . '.' . $sql_field, $this->entityConditions['revision_id']);
+        $this->addCondition($select_query, "$base_table.$sql_field", $this->entityConditions['revision_id']);
       }
     }
     else {
@@ -835,9 +852,9 @@ class EntityFieldQuery {
 
     // Handle bundles.
     if (!empty($entity_info['entity keys']['bundle'])) {
+      $base_table_schema = drupal_get_schema($base_table);
       $sql_field = $entity_info['entity keys']['bundle'];
       $having = FALSE;
-
       if (!empty($base_table_schema['fields'][$sql_field])) {
         $select_query->addField($base_table, $sql_field, 'bundle');
       }
@@ -847,14 +864,25 @@ class EntityFieldQuery {
       $select_query->addExpression(':bundle', 'bundle', array(':bundle' => $entity_type));
       $having = TRUE;
     }
+
     $id_map['bundle'] = $sql_field;
+
     if (isset($this->entityConditions['bundle'])) {
       if (!empty($entity_info['entity keys']['bundle'])) {
-        $this->addCondition($select_query, $base_table . '.' . $sql_field, $this->entityConditions['bundle'], $having);
+        $this->addCondition($select_query, "$base_table.$sql_field", $this->entityConditions['bundle'], $having);
       }
       else {
         // This entity has no bundle, so invalidate the query.
         $select_query->where('1 = 0');
+      }
+    }
+
+    foreach (array('uuid', 'langcode') as $key) {
+      if (isset($this->entityConditions[$key])) {
+        $sql_field = !empty($entity_info['entity keys'][$key]) ? $entity_info['entity keys'][$key] : $key;
+        if (isset($base_table_schema[$sql_field])) {
+          $this->addCondition($select_query, "$base_table.$sql_field", $this->entityConditions[$key]);
+        }
       }
     }
 
@@ -868,7 +896,9 @@ class EntityFieldQuery {
         $select_query->orderBy($id_map[$key], $order['direction']);
       }
       elseif ($order['type'] == 'property') {
-        $select_query->orderBy($base_table . '.' . $order['specifier'], $order['direction']);
+        $specifier = $order['specifier'];
+        $table = isset($data_table_schema['fields'][$specifier]) ? $data_table : $base_table;
+        $select_query->orderBy("$table.$specifier", $order['direction']);
       }
     }
 
