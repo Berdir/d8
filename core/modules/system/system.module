@@ -1880,12 +1880,12 @@ function system_data_type_info() {
     'string' => array(
       'label' => t('String'),
       'class' => '\Drupal\Core\TypedData\Type\String',
-      'primitive' => TRUE,
+      'primitive type' => DataPrimitive::STRING,
     ),
     'integer' => array(
       'label' => t('Integer'),
       'class' => '\Drupal\Core\TypedData\Type\Integer',
-      'primitive' => TRUE,
+      'primitive type' => DataPrimitive::INTEGER,
     ),
     'language' => array(
       'label' => t('Language'),
