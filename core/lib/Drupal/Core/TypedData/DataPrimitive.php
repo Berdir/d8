@@ -2,8 +2,10 @@
 
 /**
  * @file
- * Definition of Drupal\Core\TypedData\DataPrimitives.
+ * Definition of Drupal\Core\TypedData\DataPrimitive.
  */
+
+namespace Drupal\Core\TypedData;
 
 /**
  * Class that holds constants for all primitive data types.

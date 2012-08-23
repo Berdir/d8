@@ -6,6 +6,7 @@
  */
 
 use Drupal\Core\Utility\ModuleInfo;
+use Drupal\Core\TypedData\DataPrimitive;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
