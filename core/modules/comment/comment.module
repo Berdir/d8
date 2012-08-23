@@ -1760,10 +1760,7 @@ function template_preprocess_comment(&$variables) {
   $variables['user_picture'] = theme_get_setting('toggle_comment_user_picture') ? theme('user_picture', array('account' => $comment)) : '';
   $variables['signature'] = $comment->signature;
 
-  $uri = $comment->uri();
-  $uri['options'] += array('attributes' => array('class' => 'permalink', 'rel' => 'bookmark'));
-
-  $variables['title'] = l($comment->subject, $uri['path'], $uri['options']);
+  $variables['title'] = entity_l($comment, NULL, array('attributes' => array('class' => 'permalink', 'rel' => 'bookmark')));
   $variables['permalink'] = l(t('Permalink'), $uri['path'], $uri['options']);
   $variables['submitted'] = t('Submitted by !username on !datetime', array('!username' => $variables['author'], '!datetime' => $variables['created']));
 

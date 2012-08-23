@@ -598,30 +598,30 @@ function rdf_preprocess_field(&$variables) {
  */
 function rdf_preprocess_user_profile(&$variables) {
   $account = $variables['elements']['#account'];
-  $uri = $account->uri();
+  $url = entity_url($account);
 
   // Adds RDFa markup to the user profile page. Fields displayed in this page
   // will automatically describe the user.
   if (!empty($account->rdf_mapping['rdftype'])) {
     $variables['attributes']['typeof'] = $account->rdf_mapping['rdftype'];
-    $variables['attributes']['about'] = url($uri['path'], $uri['options']);
+    $variables['attributes']['about'] = $url;
   }
   // Adds the relationship between the sioc:UserAccount and the foaf:Person who
   // holds the account.
   $account_holder_meta = array(
     '#tag' => 'meta',
     '#attributes' => array(
-      'about' => url($uri['path'], array_merge($uri['options'], array('fragment' => 'me'))),
+      'about' => entity_url($account, array('fragment' => 'me')),
       'typeof' => array('foaf:Person'),
       'rel' => array('foaf:account'),
-      'resource' => url($uri['path'], $uri['options']),
+      'resource' => $url,
     ),
   );
   // Adds the markup for username.
   $username_meta = array(
     '#tag' => 'meta',
     '#attributes' => array(
-      'about' => url($uri['path'], $uri['options']),
+      'about' => $url,
       'property' => $account->rdf_mapping['name']['predicates'],
       'content' => $account->name,
     )
@@ -695,8 +695,7 @@ function rdf_preprocess_comment(&$variables) {
     // the URI of the resource described within the HTML element, while the
     // typeof attribute indicates its RDF type (e.g., sioc:Post, foaf:Document,
     // and so on.)
-    $uri = $comment->uri();
-    $variables['attributes']['about'] = url($uri['path'], $uri['options']);
+    $variables['attributes']['about'] = entity_url($comment);
     $variables['attributes']['typeof'] = $comment->rdf_mapping['rdftype'];
   }
 
