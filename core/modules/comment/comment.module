@@ -1761,7 +1761,7 @@ function template_preprocess_comment(&$variables) {
   $variables['signature'] = $comment->signature;
 
   $variables['title'] = entity_l($comment, NULL, array('attributes' => array('class' => 'permalink', 'rel' => 'bookmark')));
-  $variables['permalink'] = l(t('Permalink'), $uri['path'], $uri['options']);
+  $variables['permalink'] = entity_l($comment, t('Permalink'));
   $variables['submitted'] = t('Submitted by !username on !datetime', array('!username' => $variables['author'], '!datetime' => $variables['created']));
 
   // Preprocess fields.
