@@ -8,16 +8,16 @@
 namespace Drupal\entity;
 
 use Drupal\Core\TypedData\DataWrapperInterface;
-use Drupal\Core\TypedData\DataContainerInterface;
+use Drupal\Core\TypedData\DataStructureInterface;
 use Drupal\Component\Uuid\Uuid;
 
 /**
  * Implements Property API specific enhancements to the Entity class.
  *
  * @todo: Once all entity types have been converted, merge improvements into the
- * Entity class and let EntityInterface extend the DataContainerInterface.
+ * Entity class and let EntityInterface extend the DataStructureInterface.
  */
-class EntityNG extends Entity implements DataContainerInterface {
+class EntityNG extends Entity implements DataStructureInterface {
 
   /**
    * The plain data values of the contained properties.
@@ -106,7 +106,7 @@ class EntityNG extends Entity implements DataContainerInterface {
   }
 
   /**
-   * Implements DataContainerInterface::getProperties().
+   * Implements DataStructureInterface::getProperties().
    */
   public function getProperties() {
     $properties = array();
@@ -119,7 +119,7 @@ class EntityNG extends Entity implements DataContainerInterface {
   }
 
   /**
-   * Implements DataContainerInterface::setProperties().
+   * Implements DataStructureInterface::setProperties().
    */
   public function setProperties($properties) {
     foreach ($properties as $name => $property) {
@@ -137,7 +137,7 @@ class EntityNG extends Entity implements DataContainerInterface {
   }
 
   /**
-   * Implements DataContainerInterface::getPropertyDefinition().
+   * Implements DataStructureInterface::getPropertyDefinition().
    */
   public function getPropertyDefinition($name) {
     $definitions = $this->getPropertyDefinitions();
@@ -145,7 +145,7 @@ class EntityNG extends Entity implements DataContainerInterface {
   }
 
   /**
-   * Implements DataContainerInterface::getPropertyDefinitions().
+   * Implements DataStructureInterface::getPropertyDefinitions().
    */
   public function getPropertyDefinitions() {
     return entity_get_controller($this->entityType)->getPropertyDefinitions(array(
@@ -155,7 +155,7 @@ class EntityNG extends Entity implements DataContainerInterface {
   }
 
   /**
-   * Implements DataContainerInterface::toArray().
+   * Implements DataStructureInterface::toArray().
    */
   public function toArray() {
     $values = array();
@@ -177,7 +177,7 @@ class EntityNG extends Entity implements DataContainerInterface {
   /**
    * Gets a translation of the entity.
    *
-   * @return \Drupal\Core\TypedData\DataContainerInterface
+   * @return \Drupal\Core\TypedData\DataStructureInterface
    *   A container holding the translated properties.
    */
   public function getTranslation($langcode) {

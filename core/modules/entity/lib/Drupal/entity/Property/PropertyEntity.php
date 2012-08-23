@@ -6,7 +6,7 @@
 
 namespace Drupal\entity\Property;
 use \Drupal\Core\TypedData\DataWrapperInterface;
-use \Drupal\Core\TypedData\DataContainerInterface;
+use \Drupal\Core\TypedData\DataStructureInterface;
 
 
 /**
@@ -15,7 +15,7 @@ use \Drupal\Core\TypedData\DataContainerInterface;
  * This property implements the container interface, whereby most container
  * methods are just forwarded to the contained entity (if set).
  */
-class PropertyEntity implements DataWrapperInterface, DataContainerInterface {
+class PropertyEntity implements DataWrapperInterface, DataStructureInterface {
 
   /**
    * The property definition.
@@ -132,7 +132,7 @@ class PropertyEntity implements DataWrapperInterface, DataContainerInterface {
   }
 
   /**
-   * Implements DataContainerInterface::getProperties().
+   * Implements DataStructureInterface::getProperties().
    */
   public function getProperties() {
     $entity = $this->getValue();
@@ -140,7 +140,7 @@ class PropertyEntity implements DataWrapperInterface, DataContainerInterface {
   }
 
   /**
-   * Implements DataContainerInterface::setProperties().
+   * Implements DataStructureInterface::setProperties().
    */
   public function setProperties($properties) {
     if ($entity = $this->getValue()) {
@@ -149,7 +149,7 @@ class PropertyEntity implements DataWrapperInterface, DataContainerInterface {
   }
 
   /**
-   * Implements DataContainerInterface::getPropertyDefinition().
+   * Implements DataStructureInterface::getPropertyDefinition().
    */
   public function getPropertyDefinition($name) {
     $definitions = $this->getPropertyDefinitions();
@@ -157,7 +157,7 @@ class PropertyEntity implements DataWrapperInterface, DataContainerInterface {
   }
 
   /**
-   * Implements DataContainerInterface::getPropertyDefinitions().
+   * Implements DataStructureInterface::getPropertyDefinitions().
    */
   public function getPropertyDefinitions() {
     // @todo: Support getting definitions if multiple bundles are specified.
@@ -167,7 +167,7 @@ class PropertyEntity implements DataWrapperInterface, DataContainerInterface {
   }
 
   /**
-   * Implements DataContainerInterface::toArray().
+   * Implements DataStructureInterface::toArray().
    */
   public function toArray() {
     $entity = $this->getValue();

@@ -7,7 +7,7 @@
 
 namespace Drupal\entity\Property;
 
-use Drupal\Core\TypedData\DataContainerInterface;
+use Drupal\Core\TypedData\DataStructureInterface;
 use Drupal\Core\TypedData\DataWrapperInterface;
 
 /**
@@ -17,7 +17,7 @@ use Drupal\Core\TypedData\DataWrapperInterface;
  * @see EntityPropertyList
  * @see EntityPropertyItem
  */
-interface EntityPropertyItemInterface extends DataContainerInterface, DataWrapperInterface {
+interface EntityPropertyItemInterface extends DataStructureInterface, DataWrapperInterface {
 
   /**
    * Check entity property access.

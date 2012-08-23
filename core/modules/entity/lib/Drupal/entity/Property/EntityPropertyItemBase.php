@@ -7,13 +7,13 @@
 
 namespace Drupal\entity\Property;
 use \Drupal\Core\TypedData\DataWrapperInterface;
-use \Drupal\Core\TypedData\DataContainerInterface;
+use \Drupal\Core\TypedData\DataStructureInterface;
 
 /**
  * An entity property item.
  *
  * Entity property items making use of this base class have to implement the
- * DataContainerInterface::getPropertyDefinitions().
+ * DataStructureInterface::getPropertyDefinitions().
  *
  * @see EntityPropertyItemInterface
  */
@@ -161,7 +161,7 @@ abstract class EntityPropertyItemBase implements EntityPropertyItemInterface {
   }
 
   /**
-   * Implements DataContainerInterface::getProperties().
+   * Implements DataStructureInterface::getProperties().
    */
   public function getProperties() {
     $properties = array();
@@ -174,7 +174,7 @@ abstract class EntityPropertyItemBase implements EntityPropertyItemInterface {
   }
 
   /**
-   * Implements DataContainerInterface::setProperties().
+   * Implements DataStructureInterface::setProperties().
    */
   public function setProperties($properties) {
     foreach ($properties as $name => $property) {
@@ -197,7 +197,7 @@ abstract class EntityPropertyItemBase implements EntityPropertyItemInterface {
   }
 
   /**
-   * Implements DataContainerInterface::getPropertyDefinition().
+   * Implements DataStructureInterface::getPropertyDefinition().
    */
   public function getPropertyDefinition($name) {
     $definitions = $this->getPropertyDefinitions();
@@ -205,7 +205,7 @@ abstract class EntityPropertyItemBase implements EntityPropertyItemInterface {
   }
 
   /**
-   * Implements DataContainerInterface::toArray().
+   * Implements DataStructureInterface::toArray().
    */
   public function toArray() {
     return $this->getValue();

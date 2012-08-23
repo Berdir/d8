@@ -230,7 +230,7 @@ class EntityPropertyTest extends WebTestBase  {
    * Tests working with entity properties based upon data structure and data
    * list interfaces.
    */
-  public function testDataContainerInterfaces() {
+  public function testDataStructureInterfaces() {
     $entity = $this->createTestEntity();
     $entity->save();
     $entity_definition = array(
@@ -275,7 +275,7 @@ class EntityPropertyTest extends WebTestBase  {
           $this->getContainedStrings($item, $depth + 1, $strings);
         }
       }
-      elseif ($data_item instanceof \Drupal\Core\TypedData\DataContainerInterface) {
+      elseif ($data_item instanceof \Drupal\Core\TypedData\DataStructureInterface) {
         foreach ($data_item as $name => $property) {
           $this->getContainedStrings($property, $depth + 1, $strings);
         }

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\Core\TypedData\DataContainerInterface.
+ * Definition of Drupal\Core\TypedData\DataStructureInterface.
  */
 
 namespace Drupal\Core\TypedData;
@@ -13,7 +13,7 @@ use IteratorAggregate;
  *
  * This is implemented by entities as well as by PropertyItem classes.
  */
-interface DataContainerInterface extends IteratorAggregate  {
+interface DataStructureInterface extends IteratorAggregate  {
 
   /**
    * Gets an array of properties.

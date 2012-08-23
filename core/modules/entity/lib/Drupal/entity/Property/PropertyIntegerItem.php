@@ -14,7 +14,7 @@ use \Drupal\entity\Property\EntityPropertyItemBase;
 class PropertyIntegerItem extends EntityPropertyItemBase {
 
   /**
-   * Implements DataContainerInterface::getPropertyDefinitions().
+   * Implements DataStructureInterface::getPropertyDefinitions().
    */
   public function getPropertyDefinitions() {
     // Statically cache the definitions to avoid creating lots of array copies.

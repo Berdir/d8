@@ -26,7 +26,7 @@ interface DataWrapperInterface {
    *   following keys are supported:
    *   - name: The name of the property being created.
    *   - parent: The parent object containing the property. Must be an instance of
-   *     \Drupal\Core\TypedData\DataContainerInterface.
+   *     \Drupal\Core\TypedData\DataStructureInterface.
    *
    * @see drupal_get_property()
    */

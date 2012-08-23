@@ -8,12 +8,12 @@
 namespace Drupal\entity;
 
 use Drupal\Core\TypedData\DataWrapperInterface;
-use Drupal\Core\TypedData\DataContainerInterface;
+use Drupal\Core\TypedData\DataStructureInterface;
 
 /**
  * Makes translated entity properties available via the Property API.
  */
-class EntityTranslation implements DataContainerInterface, DataWrapperInterface {
+class EntityTranslation implements DataStructureInterface, DataWrapperInterface {
 
   /**
    * The property definition.
@@ -106,7 +106,7 @@ class EntityTranslation implements DataContainerInterface, DataWrapperInterface 
   }
 
   /**
-   * Implements DataContainerInterface::getProperties().
+   * Implements DataStructureInterface::getProperties().
    */
   public function getProperties() {
     $properties = array();
@@ -119,7 +119,7 @@ class EntityTranslation implements DataContainerInterface, DataWrapperInterface 
   }
 
   /**
-   * Implements DataContainerInterface::setProperties().
+   * Implements DataStructureInterface::setProperties().
    */
   public function setProperties($properties) {
     foreach ($properties as $name => $property) {
@@ -152,7 +152,7 @@ class EntityTranslation implements DataContainerInterface, DataWrapperInterface 
   }
 
   /**
-   * Implements DataContainerInterface::getPropertyDefinition().
+   * Implements DataStructureInterface::getPropertyDefinition().
    */
   public function getPropertyDefinition($name) {
     $definitions = $this->getPropertyDefinitions();
@@ -160,7 +160,7 @@ class EntityTranslation implements DataContainerInterface, DataWrapperInterface 
   }
 
   /**
-   * Implements DataContainerInterface::getPropertyDefinitions().
+   * Implements DataStructureInterface::getPropertyDefinitions().
    */
   public function getPropertyDefinitions() {
     $definitions = array();
@@ -173,7 +173,7 @@ class EntityTranslation implements DataContainerInterface, DataWrapperInterface 
   }
 
   /**
-   * Implements DataContainerInterface::toArray().
+   * Implements DataStructureInterface::toArray().
    */
   public function toArray() {
     return $this->getValue();
