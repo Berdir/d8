@@ -130,10 +130,11 @@ class Log {
    * Determine the routine that called this query.
    *
    * We define "the routine that called this query" as the first entry in
-   * the call stack that is not inside the includes/Drupal/Database directory
+   * the call stack that is not inside the includes/Drupal/Database directory,
    * does not begin with db_ and does have a file (which excludes
    * call_user_func_array(), anonymous functions and similar). That makes the
-   * climbing logic very simple, and handles the variable stack depth caused by the query builders.
+   * climbing logic very simple, and handles the variable stack depth caused by
+   * the query builders.
    *
    * @link http://www.php.net/debug_backtrace
    * @return
