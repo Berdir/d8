@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Definition of Drupal\entity\Property\PropertyEntity.
+ * Definition of Drupal\entity\Property\EntityWrapper.
  */
 
 namespace Drupal\entity\Property;
@@ -15,7 +15,7 @@ use \Drupal\Core\TypedData\DataStructureInterface;
  * This property implements the container interface, whereby most container
  * methods are just forwarded to the contained entity (if set).
  */
-class PropertyEntity implements DataWrapperInterface, DataStructureInterface {
+class EntityWrapper implements DataWrapperInterface, DataStructureInterface {
 
   /**
    * The property definition.
