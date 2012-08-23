@@ -989,8 +989,6 @@ function node_invoke($node, $hook, $a2 = NULL, $a3 = NULL, $a4 = NULL) {
  *
  * @param array $nids
  *   (optional) An array of entity IDs. If omitted, all entities are loaded.
- * @param bool $reset
- *   (optional) Whether to reset the internal node_load() cache.
  *
  * @return array
  *   An array of node entities indexed by nid.
@@ -998,8 +996,8 @@ function node_invoke($node, $hook, $a2 = NULL, $a3 = NULL, $a4 = NULL) {
  * @see entity_load_multiple()
  * @see Drupal\entity\EntityFieldQuery
  */
-function node_load_multiple(array $nids = NULL, $reset = FALSE) {
-  return entity_load_multiple('node', $nids, $reset);
+function node_load_multiple(array $nids = NULL) {
+  return entity_load_multiple('node', $nids);
 }
 
 /**
@@ -1007,14 +1005,12 @@ function node_load_multiple(array $nids = NULL, $reset = FALSE) {
  *
  * @param int $nid
  *   The node ID.
- * @param bool $reset
- *   (optional) Whether to reset the node_load_multiple() cache.
  *
- * @return Drupal\node\Node|false
+ * @return Drupal\node\Node|boolean
  *   A fully-populated node entity, or FALSE if the node is not found.
  */
-function node_load($nid = NULL, $reset = FALSE) {
-  return entity_load('node', $nid, $reset);
+function node_load($nid) {
+  return entity_load('node', $nid);
 }
 
 /**
@@ -3480,7 +3476,9 @@ function node_access_rebuild($batch_mode = FALSE) {
       // Rebuild newest nodes first so that recent content becomes available quickly.
       $nids = db_query("SELECT nid FROM {node} ORDER BY nid DESC")->fetchCol();
       foreach ($nids as $nid) {
-        $node = node_load($nid, TRUE);
+        // Clear the static cache to limit memory usage.
+        entity_reset_cache('node');
+        $node = node_load($nid);
         // To preserve database integrity, only acquire grants if the node
         // loads successfully.
         if (!empty($node)) {
@@ -3528,7 +3526,8 @@ function _node_access_rebuild_batch_operation(&$context) {
   // Process the next 20 nodes.
   $limit = 20;
   $nids = db_query_range("SELECT nid FROM {node} WHERE nid > :nid ORDER BY nid ASC", 0, $limit, array(':nid' => $context['sandbox']['current_node']))->fetchCol();
-  $nodes = node_load_multiple($nids, TRUE);
+  entity_reset_cache('node', $nids);
+  $nodes = node_load_multiple($nids);
   foreach ($nodes as $nid => $node) {
     // To preserve database integrity, only acquire grants if the node
     // loads successfully.

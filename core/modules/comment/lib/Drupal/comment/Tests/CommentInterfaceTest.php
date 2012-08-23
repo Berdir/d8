@@ -362,8 +362,8 @@ class CommentInterfaceTest extends CommentTestBase {
     $comment_loaded = comment_load($comment->id);
 
     // Checks the new values of node comment statistics with comment #1.
-    // The node needs to be reloaded with a node_load_multiple cache reset.
-    $node = node_load($this->node->nid, TRUE);
+    entity_reset_cache('node', array($this->node->nid));
+    $node = node_load($this->node->nid);
     $this->assertEqual($node->last_comment_name, NULL, t('The value of node last_comment_name is NULL.'));
     $this->assertEqual($node->last_comment_uid, $this->web_user2->uid, t('The value of node last_comment_uid is the comment #1 uid.'));
     $this->assertEqual($node->comment_count, 1, t('The value of node comment_count is 1.'));
@@ -387,8 +387,8 @@ class CommentInterfaceTest extends CommentTestBase {
 
     // Checks the new values of node comment statistics with comment #2 and
     // ensure they haven't changed since the comment has not been moderated.
-    // The node needs to be reloaded with a node_load_multiple cache reset.
-    $node = node_load($this->node->nid, TRUE);
+    entity_reset_cache('node', array($this->node->nid));
+    $node = node_load($this->node->nid);
     $this->assertEqual($node->last_comment_name, NULL, t('The value of node last_comment_name is still NULL.'));
     $this->assertEqual($node->last_comment_uid, $this->web_user2->uid, t('The value of node last_comment_uid is still the comment #1 uid.'));
     $this->assertEqual($node->comment_count, 1, t('The value of node comment_count is still 1.'));
@@ -408,8 +408,8 @@ class CommentInterfaceTest extends CommentTestBase {
     $comment_loaded = comment_load($anonymous_comment->id);
 
     // Checks the new values of node comment statistics with comment #3.
-    // The node needs to be reloaded with a node_load_multiple cache reset.
-    $node = node_load($this->node->nid, TRUE);
+    entity_reset_cache('node', array($this->node->nid));
+    $node = node_load($this->node->nid);
     $this->assertEqual($node->last_comment_name, $comment_loaded->name, t('The value of node last_comment_name is the name of the anonymous user.'));
     $this->assertEqual($node->last_comment_uid, 0, t('The value of node last_comment_uid is zero.'));
     $this->assertEqual($node->comment_count, 2, t('The value of node comment_count is 2.'));

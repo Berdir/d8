@@ -58,7 +58,8 @@ class UserCancelTest extends WebTestBase {
     $this->assertTrue($account->status == 1, t('User account was not canceled.'));
 
     // Confirm user's content has not been altered.
-    $test_node = node_load($node->nid, TRUE);
+    entity_reset_cache('node', array($node->nid));
+    $test_node = node_load($node->nid);
     $this->assertTrue(($test_node->uid == $account->uid && $test_node->status == 1), t('Node of the user has not been altered.'));
   }
 
@@ -139,7 +140,8 @@ class UserCancelTest extends WebTestBase {
     $this->assertTrue($account->status, t('User account was not canceled.'));
 
     // Confirm user's content has not been altered.
-    $test_node = node_load($node->nid, TRUE);
+    entity_reset_cache('node', array($node->nid));
+    $test_node = node_load($node->nid);
     $this->assertTrue(($test_node->uid == $account->uid && $test_node->status == 1), t('Node of the user has not been altered.'));
   }
 
@@ -213,7 +215,8 @@ class UserCancelTest extends WebTestBase {
     $this->assertTrue($account->status == 0, t('User has been blocked.'));
 
     // Confirm user's content has been unpublished.
-    $test_node = node_load($node->nid, TRUE);
+    entity_reset_cache('node', array($node->nid));
+    $test_node = node_load($node->nid);
     $this->assertTrue($test_node->status == 0, t('Node of the user has been unpublished.'));
     $test_node = node_revision_load($node->vid);
     $this->assertTrue($test_node->status == 0, t('Node revision of the user has been unpublished.'));
@@ -262,11 +265,13 @@ class UserCancelTest extends WebTestBase {
     $this->assertFalse(user_load($account->uid, TRUE), t('User is not found in the database.'));
 
     // Confirm that user's content has been attributed to anonymous user.
-    $test_node = node_load($node->nid, TRUE);
+    entity_reset_cache('node', array($node->nid));
+    $test_node = node_load($node->nid);
     $this->assertTrue(($test_node->uid == 0 && $test_node->status == 1), t('Node of the user has been attributed to anonymous user.'));
     $test_node = node_revision_load($revision, TRUE);
     $this->assertTrue(($test_node->revision_uid == 0 && $test_node->status == 1), t('Node revision of the user has been attributed to anonymous user.'));
-    $test_node = node_load($revision_node->nid, TRUE);
+    entity_reset_cache('node', array($revision_node->nid));
+    $test_node = node_load($revision_node->nid);
     $this->assertTrue(($test_node->uid != 0 && $test_node->status == 1), t("Current revision of the user's node was not attributed to anonymous user."));
 
     // Confirm that user is logged out.
@@ -326,9 +331,11 @@ class UserCancelTest extends WebTestBase {
     $this->assertFalse(user_load($account->uid, TRUE), t('User is not found in the database.'));
 
     // Confirm that user's content has been deleted.
-    $this->assertFalse(node_load($node->nid, TRUE), t('Node of the user has been deleted.'));
+    entity_reset_cache('node', array($node->nid));
+    $this->assertFalse(node_load($node->nid), t('Node of the user has been deleted.'));
     $this->assertFalse(node_revision_load($revision), t('Node revision of the user has been deleted.'));
-    $this->assertTrue(node_load($revision_node->nid, TRUE), t("Current revision of the user's node was not deleted."));
+    entity_reset_cache('node', array($revision_node->nid));
+    $this->assertTrue(node_load($revision_node->nid), t("Current revision of the user's node was not deleted."));
     $this->assertFalse(comment_load($comment->cid), t('Comment of the user has been deleted.'));
 
     // Confirm that user is logged out.

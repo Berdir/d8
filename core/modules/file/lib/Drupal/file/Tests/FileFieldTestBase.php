@@ -143,7 +143,8 @@ abstract class FileFieldTestBase extends WebTestBase {
       $nid = $node->nid;
       // Save at least one revision to better simulate a real site.
       $this->drupalCreateNode(get_object_vars($node));
-      $node = node_load($nid, TRUE);
+      entity_reset_cache('node', array($nid));
+      $node = node_load($nid);
       $this->assertNotEqual($nid, $node->vid, t('Node revision exists.'));
     }
 

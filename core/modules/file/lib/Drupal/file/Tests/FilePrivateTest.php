@@ -51,7 +51,8 @@ class FilePrivateTest extends FileFieldTestBase {
 
     $test_file = $this->getTestFile('text');
     $nid = $this->uploadNodeFile($test_file, $field_name, $type_name, TRUE, array('private' => TRUE));
-    $node = node_load($nid, TRUE);
+    entity_reset_cache('node', array($nid));
+    $node = node_load($nid);
     $node_file = file_load($node->{$field_name}[LANGUAGE_NOT_SPECIFIED][0]['fid']);
     // Ensure the file can be downloaded.
     $this->drupalGet(file_create_url($node_file->uri));
@@ -63,7 +64,8 @@ class FilePrivateTest extends FileFieldTestBase {
     // Test with the field that should deny access through field access.
     $this->drupalLogin($this->admin_user);
     $nid = $this->uploadNodeFile($test_file, $no_access_field_name, $type_name, TRUE, array('private' => TRUE));
-    $node = node_load($nid, TRUE);
+    entity_reset_cache('node', array($nid));
+    $node = node_load($nid);
     $node_file = file_load($node->{$no_access_field_name}[LANGUAGE_NOT_SPECIFIED][0]['fid']);
     // Ensure the file cannot be downloaded.
     $this->drupalGet(file_create_url($node_file->uri));

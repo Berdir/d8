@@ -122,14 +122,16 @@ class PageEditTest extends NodeTestBase {
     // authorship to the anonymous user (uid 0).
     $edit['name'] = '';
     $this->drupalPost('node/' . $node->nid . '/edit', $edit, t('Save'));
-    $node = node_load($node->nid, TRUE);
+    entity_reset_cache('node', array($node->nid));
+    $node = node_load($node->nid);
     $this->assertIdentical($node->uid, '0', 'Node authored by anonymous user.');
 
     // Change the authored by field to another user's name (that is not
     // logged in).
     $edit['name'] = $this->web_user->name;
     $this->drupalPost('node/' . $node->nid . '/edit', $edit, t('Save'));
-    $node = node_load($node->nid, TRUE);
+    entity_reset_cache('node', array($node->nid));
+    $node = node_load($node->nid);
     $this->assertIdentical($node->uid, $this->web_user->uid, 'Node authored by normal user.');
 
     // Check that normal users cannot change the authored by information.

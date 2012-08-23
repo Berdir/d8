@@ -280,9 +280,6 @@ function user_external_load($authname) {
  *
  * @param array $uids
  *   (optional) An array of entity IDs. If omitted, all entities are loaded.
- * @param bool $reset
- *   A boolean indicating that the internal cache should be reset. Use this if
- *   loading a user object which has been altered during the page request.
  *
  * @return array
  *   An array of user objects, indexed by uid.
@@ -293,8 +290,8 @@ function user_external_load($authname) {
  * @see user_load_by_name()
  * @see Drupal\entity\EntityFieldQuery
  */
-function user_load_multiple(array $uids = NULL, $reset = FALSE) {
-  return entity_load_multiple('user', $uids, $reset);
+function user_load_multiple(array $uids = NULL) {
+  return entity_load_multiple('user', $uids);
 }
 
 /**
@@ -311,9 +308,6 @@ function user_load_multiple(array $uids = NULL, $reset = FALSE) {
  *
  * @param int $uid
  *   Integer specifying the user ID to load.
- * @param bool $reset
- *   TRUE to reset the internal cache and load from the database; FALSE
- *   (default) to load from the internal cache, if set.
  *
  * @return object
  *   A fully-loaded user object upon successful user load, or FALSE if the user
@@ -321,8 +315,8 @@ function user_load_multiple(array $uids = NULL, $reset = FALSE) {
  *
  * @see user_load_multiple()
  */
-function user_load($uid, $reset = FALSE) {
-  return entity_load('user', $uid, $reset);
+function user_load($uid) {
+  return entity_load('user', $uid);
 }
 
 /**

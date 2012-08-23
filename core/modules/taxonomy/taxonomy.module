@@ -1017,7 +1017,7 @@ function taxonomy_vocabulary_machine_name_load($name) {
  * @param $tid
  *   A term's ID
  *
- * @return Drupal\taxonomy\Term|false
+ * @return Drupal\taxonomy\Term|boolean
  *   A taxonomy term entity, or FALSE if the term was not found. Results are
  *   statically cached.
  */

@@ -313,7 +313,8 @@ function node_mass_update($nodes, $updates) {
  * @see node_mass_update()
  */
 function _node_mass_update_helper($nid, $updates) {
-  $node = node_load($nid, TRUE);
+  entity_reset_cache('node', array($nid));
+  $node = node_load($nid);
   // For efficiency manually save the original node before applying any changes.
   $node->original = clone $node;
   foreach ($updates as $name => $value) {

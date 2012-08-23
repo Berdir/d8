@@ -137,8 +137,6 @@ function entity_info_cache_clear() {
  *   The entity type to load, e.g. node or user.
  * @param int $id
  *   The id of the entity to load.
- * @param bool $reset
- *   Whether to reset the internal cache for the requested entity type.
  *
  * @return Drupal\entity\EntityInterface
  *   The entity object, or FALSE if there is no entity with the given id.
@@ -149,8 +147,8 @@ function entity_info_cache_clear() {
  * @see Drupal\entity\DatabaseStorageController
  * @see Drupal\entity\EntityFieldQuery
  */
-function entity_load($entity_type, $id, $reset = FALSE) {
-  $entities = entity_load_multiple($entity_type, array($id), $reset);
+function entity_load($entity_type, $id) {
+  $entities = entity_load_multiple($entity_type, array($id));
   return isset($entities[$id]) ? $entities[$id] : FALSE;
 }
 
@@ -183,8 +181,6 @@ function entity_revision_load($entity_type, $revision_id) {
  *   The entity type to load; e.g., 'node' or 'user'.
  * @param string $uuid
  *   The UUID of the entity to load.
- * @param bool $reset
- *   Whether to reset the internal cache for the requested entity type.
  *
  * @return EntityInterface|FALSE
  *   The entity object, or FALSE if there is no entity with the given UUID.
@@ -194,7 +190,7 @@ function entity_revision_load($entity_type, $revision_id) {
  *
  * @see hook_entity_info()
  */
-function entity_load_by_uuid($entity_type, $uuid, $reset = FALSE) {
+function entity_load_by_uuid($entity_type, $uuid) {
   $entity_info = entity_get_info($entity_type);
   if (empty($entity_info['entity keys']['uuid'])) {
     throw new EntityStorageException("Entity type $entity_type does not support UUIDs.");
@@ -202,9 +198,6 @@ function entity_load_by_uuid($entity_type, $uuid, $reset = FALSE) {
   $uuid_key = $entity_info['entity keys']['uuid'];
 
   $controller = entity_get_controller($entity_type);
-  if ($reset) {
-    $controller->resetCache();
-  }
   $entities = $controller->loadByProperties(array($uuid_key => $uuid));
   return reset($entities);
 }
@@ -230,8 +223,6 @@ function entity_load_by_uuid($entity_type, $uuid, $reset = FALSE) {
  *   The entity type to load, e.g. node or user.
  * @param array $ids
  *   (optional) An array of entity IDs. If omitted, all entities are loaded.
- * @param bool $reset
- *   Whether to reset the internal cache for the requested entity type.
  *
  * @return array
  *   An array of entity objects indexed by their ids.
@@ -241,10 +232,7 @@ function entity_load_by_uuid($entity_type, $uuid, $reset = FALSE) {
  * @see Drupal\entity\DatabaseStorageController
  * @see Drupal\entity\EntityFieldQuery
  */
-function entity_load_multiple($entity_type, array $ids = NULL, $reset = FALSE) {
-  if ($reset) {
-    entity_get_controller($entity_type)->resetCache();
-  }
+function entity_load_multiple($entity_type, array $ids = NULL) {
   return entity_get_controller($entity_type)->load($ids);
 }
 
@@ -284,6 +272,18 @@ function entity_load_unchanged($entity_type, $id) {
   entity_get_controller($entity_type)->resetCache(array($id));
   $result = entity_get_controller($entity_type)->load(array($id));
   return reset($result);
+}
+
+/**
+ * Reset the entity cache for a number of given ids.
+ *
+ * @param string $entity_type
+ *   The entity type to reset, e.g. node or user.
+ * @param array $ids
+ *   (optional) An array of entity IDs. If omitted, all entities are resetted.
+ */
+function entity_reset_cache($entity_type, array $ids = array()) {
+  entity_get_controller($entity_type)->resetCache($ids);
 }
 
 /**

@@ -4653,14 +4653,15 @@ function _form_set_class(&$element, $class = array()) {
  *     $context['sandbox']['max'] = db_query('SELECT COUNT(DISTINCT nid) FROM {node}')->fetchField();
  *   }
  *   $limit = 5;
- *   $result = db_select('node')
+ *   $nids = db_select('node')
  *     ->fields('node', array('nid'))
  *     ->condition('nid', $context['sandbox']['current_node'], '>')
  *     ->orderBy('nid')
  *     ->range(0, $limit)
- *     ->execute();
- *   foreach ($result as $row) {
- *     $node = node_load($row->nid, TRUE);
+ *     ->execute()
+ *     ->fetchCol();
+ *   entity_reset_cache('node', $nids);
+ *   foreach (node_load_multiple($nids) as $node) {
  *     $context['results'][] = $node->nid . ' : ' . check_plain($node->label());
  *     $context['sandbox']['progress']++;
  *     $context['sandbox']['current_node'] = $node->nid;

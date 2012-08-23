@@ -8,7 +8,7 @@
 namespace Drupal\search\Tests;
 
 /**
- * Test integration searching comments.
+ * Test integration searching cnodomments.
  */
 class SearchCommentTest extends SearchTestBase {
 
@@ -89,7 +89,8 @@ class SearchCommentTest extends SearchTestBase {
       'search_block_form' => "'" . $edit_comment['subject'] . "'",
     );
     $this->drupalPost('', $edit, t('Search'));
-    $node2 = node_load($node->nid, TRUE);
+    entity_reset_cache('node', array($node->nid));
+    $node2 = node_load($node->nid);
     $this->assertText($node2->label(), t('Node found in search results.'));
     $this->assertText($edit_comment['subject'], t('Comment subject found in search results.'));
 
