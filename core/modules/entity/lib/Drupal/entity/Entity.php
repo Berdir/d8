@@ -66,6 +66,13 @@ class Entity implements EntityInterface {
   }
 
   /**
+   * Implements EntityInterface::uuid().
+   */
+  public function uuid() {
+    return isset($this->uuid) ? $this->uuid : NULL;
+  }
+
+  /**
    * Implements EntityInterface::isNew().
    */
   public function isNew() {
@@ -97,7 +104,7 @@ class Entity implements EntityInterface {
    * Implements EntityInterface::label().
    */
   public function label($langcode = NULL) {
-    $label = FALSE;
+    $label = NULL;
     $entity_info = $this->entityInfo();
     if (isset($entity_info['label callback']) && function_exists($entity_info['label callback'])) {
       $label = $entity_info['label callback']($this->entityType, $this, $langcode);
@@ -110,8 +117,6 @@ class Entity implements EntityInterface {
 
   /**
    * Implements EntityInterface::uri().
-   *
-   * @see entity_uri()
    */
   public function uri() {
     $bundle = $this->bundle();
@@ -278,5 +283,4 @@ class Entity implements EntityInterface {
   public function isCurrentRevision() {
     return $this->isCurrentRevision;
   }
-
 }

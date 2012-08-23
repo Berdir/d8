@@ -273,7 +273,8 @@ function hook_element_info_alter(&$type) {
  * Perform cleanup tasks.
  *
  * This hook is run at the end of each page request. It is often used for
- * page logging and specialized cleanup. This hook MUST NOT print anything.
+ * page logging and specialized cleanup. This hook MUST NOT print anything
+ * because by the time it runs the response is already sent to the browser.
  *
  * Only use this hook if your code must run even for cached page views.
  * If you have code which must run once on all non-cached pages, use
@@ -1184,7 +1185,8 @@ function hook_page_alter(&$page) {
  * Perform alterations before a form is rendered.
  *
  * One popular use of this hook is to add form elements to the node form. When
- * altering a node form, the node entity can be accessed at $form['#node'].
+ * altering a node form, the node entity can be retrieved by invoking
+ * $form_state['controller']->getEntity($form_state).
  *
  * In addition to hook_form_alter(), which is called for all forms, there are
  * two more specific form hooks available. The first,

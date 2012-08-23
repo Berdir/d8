@@ -61,6 +61,13 @@ class EntityNG extends Entity implements DataStructureInterface {
   }
 
   /**
+   * Overrides Entity::uuid().
+   */
+  public function uuid() {
+    return $this->get('uuid')->value;
+  }
+
+  /**
    * Implements EntityInterface::get().
    */
   public function get($property_name, $langcode = NULL) {

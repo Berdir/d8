@@ -159,6 +159,8 @@ function drupal_get_form($form_id) {
  *   - build_info: Internal. An associative array of information stored by Form
  *     API that is necessary to build and rebuild the form from cache when the
  *     original context may no longer be available:
+ *     - callback: The actual callback to be used to retrieve the form array. If
+ *       none is provided $form_id is used instead. Can be any callable type.
  *     - args: A list of arguments to pass to the form constructor.
  *     - files: An optional array defining include files that need to be loaded
  *       for building the form. Each array entry may be the path to a file or
@@ -266,11 +268,11 @@ function drupal_get_form($form_id) {
  *     ones used by Form API internals) for this kind of storage. The
  *     recommended way to ensure that the chosen key doesn't conflict with ones
  *     used by the Form API or other modules is to use the module name as the
- *     key name or a prefix for the key name. For example, the Node module uses
- *     $form_state['node'] in node editing forms to store information about the
- *     node being edited, and this information stays available across successive
- *     clicks of the "Preview" button as well as when the "Save" button is
- *     finally clicked.
+ *     key name or a prefix for the key name. For example, the entity form
+ *     controller classes use $form_state['entity'] in entity forms to store
+ *     information about the entity being edited, and this information stays
+ *     available across successive clicks of the "Preview" button (if available)
+ *     as well as when the "Save" button is finally clicked.
  *   - buttons: A list containing copies of all submit and button elements in
  *     the form.
  *   - complete_form: A reference to the $form variable containing the complete
@@ -747,9 +749,13 @@ function drupal_retrieve_form($form_id, &$form_state) {
   // the constructor function itself.
   $args = $form_state['build_info']['args'];
 
-  // We first check to see if there's a function named after the $form_id.
+  // If an explicit form builder callback is defined we just use it, otherwise
+  // we look for a function named after the $form_id.
+  $callback = !empty($form_state['build_info']['callback']) ? $form_state['build_info']['callback'] : $form_id;
+
+  // We first check to see if there is a valid form builder callback defined.
   // If there is, we simply pass the arguments on to it to get the form.
-  if (!function_exists($form_id)) {
+  if (!is_callable($callback)) {
     // In cases where many form_ids need to share a central constructor function,
     // such as the node editing form, modules can implement hook_forms(). It
     // maps one or more form_ids to the correct constructor functions.
@@ -808,7 +814,7 @@ function drupal_retrieve_form($form_id, &$form_state) {
 
   // If $callback was returned by a hook_forms() implementation, call it.
   // Otherwise, call the function named after the form id.
-  $form = call_user_func_array(isset($callback) ? $callback : $form_id, $args);
+  $form = call_user_func_array($callback, $args);
   $form['#form_id'] = $form_id;
 
   return $form;
@@ -1189,18 +1195,23 @@ function drupal_validate_form($form_id, &$form, &$form_state) {
 /**
  * Redirects the user to a URL after a form has been processed.
  *
- * After a form was executed, the data in $form_state controls whether the form
- * is redirected. By default, we redirect to a new destination page. The path
- * of the destination page can be set in $form_state['redirect'], as either a
- * string containing the destination or an array of arguments compatible with
- * drupal_goto(). If that is not set, the user is redirected to the current
- * page to display a fresh, unpopulated copy of the form.
+ * After a form is submitted and processed, normally the user should be
+ * redirected to a new destination page. This function figures out what that
+ * destination should be, based on the $form_state array and the 'destination'
+ * query string in the request URL, and redirects the user there.
  *
- * For example, to redirect to 'node':
+ * Usually (for exceptions, see below) $form_state['redirect'] determines where
+ * to redirect the user. This can be set either to a string (the path to
+ * redirect to), or an array of arguments for drupal_goto(). If
+ * $form_state['redirect'] is missing, the user is usually (again, see below for
+ * exceptions) redirected back to the page they came from, where they should see
+ * a fresh, unpopulated copy of the form.
+ *
+ * Here is an example of how to set up a form to redirect to the path 'node':
  * @code
  * $form_state['redirect'] = 'node';
  * @endcode
- * Or to redirect to 'node/123?foo=bar#baz':
+ * And here is an example of how to redirect to 'node/123?foo=bar#baz':
  * @code
  * $form_state['redirect'] = array(
  *   'node/123',
@@ -1213,29 +1224,27 @@ function drupal_validate_form($form_id, &$form, &$form_state) {
  * );
  * @endcode
  *
- * There are several triggers that may prevent a redirection though:
- * - If $form_state['redirect'] is FALSE, a form builder function or form
- *   validation/submit handler does not want a user to be redirected, which
- *   means that drupal_goto() is not invoked. For most forms, the redirection
- *   logic will be the same regardless of whether $form_state['redirect'] is
- *   undefined or FALSE. However, in case it was not defined and the current
- *   request contains a 'destination' query string, drupal_goto() will redirect
- *   to that given destination instead. Only setting $form_state['redirect'] to
- *   FALSE will prevent any redirection.
- * - If $form_state['no_redirect'] is TRUE, then the callback that originally
- *   built the form explicitly disallows any redirection, regardless of the
- *   redirection value in $form_state['redirect']. For example, ajax_get_form()
- *   defines $form_state['no_redirect'] when building a form in an Ajax
- *   callback to prevent any redirection. $form_state['no_redirect'] should NOT
- *   be altered by form builder functions or form validation/submit handlers.
+ * There are several exceptions to the "usual" behavior described above:
  * - If $form_state['programmed'] is TRUE, the form submission was usually
  *   invoked via drupal_form_submit(), so any redirection would break the script
- *   that invoked drupal_form_submit().
- * - If $form_state['rebuild'] is TRUE, the form needs to be rebuilt without
- *   redirection.
+ *   that invoked drupal_form_submit() and no redirection is done.
+ * - If $form_state['rebuild'] is TRUE, the form is being rebuilt, and no
+ *   redirection is done.
+ * - If $form_state['no_redirect'] is TRUE, redirection is disabled. This is
+ *   set, for instance, by ajax_get_form() to prevent redirection in Ajax
+ *   callbacks. $form_state['no_redirect'] should never be set or altered by
+ *   form builder functions or form validation/submit handlers.
+ * - If $form_state['redirect'] is set to FALSE, redirection is disabled.
+ * - If none of the above conditions has prevented redirection, then the
+ *   redirect is accomplished by calling drupal_goto(), passing in the value of
+ *   $form_state['redirect'] if it is set, or the current path if it is
+ *   not. drupal_goto() preferentially uses the value of $_GET['destination']
+ *   (the 'destination' URL query string) if it is present, so this will
+ *   override any values set by $form_state['redirect']. Note that during
+ *   installation, install_goto() is called in place of drupal_goto().
  *
  * @param $form_state
- *   A keyed array containing the current state of the form.
+ *   An associative array containing the current state of the form.
  *
  * @see drupal_process_form()
  * @see drupal_build_form()
@@ -1469,7 +1478,7 @@ function form_execute_handlers($type, &$form, &$form_state) {
       $batch['has_form_submits'] = TRUE;
     }
     else {
-      $function($form, $form_state);
+      call_user_func_array($function, array(&$form, &$form_state));
     }
     $return = TRUE;
   }
@@ -1812,7 +1821,7 @@ function form_builder($form_id, &$element, &$form_state) {
   // checkboxes and files.
   if (isset($element['#process']) && !$element['#processed']) {
     foreach ($element['#process'] as $process) {
-      $element = $process($element, $form_state, $form_state['complete_form']);
+      $element = call_user_func_array($process, array(&$element, &$form_state, &$form_state['complete_form']));
     }
     $element['#processed'] = TRUE;
   }
@@ -4629,7 +4638,8 @@ function _form_set_class(&$element, $class = array()) {
  *   //   1 (or no value explicitly set) means the operation is finished
  *   //   and the batch processing can continue to the next operation.
  *
- *   $node = node_load(array('uid' => $uid, 'type' => $type));
+ *   $nodes = entity_load_multiple_by_properties('node', array('uid' => $uid, 'type' => $type));
+ *   $node = reset($nodes);
  *   $context['results'][] = $node->nid . ' : ' . check_plain($node->label());
  *   $context['message'] = check_plain($node->label());
  * }
@@ -4649,7 +4659,7 @@ function _form_set_class(&$element, $class = array()) {
  *     ->range(0, $limit)
  *     ->execute();
  *   foreach ($result as $row) {
- *     $node = node_load($row->nid, NULL, TRUE);
+ *     $node = node_load($row->nid, TRUE);
  *     $context['results'][] = $node->nid . ' : ' . check_plain($node->label());
  *     $context['sandbox']['progress']++;
  *     $context['sandbox']['current_node'] = $node->nid;

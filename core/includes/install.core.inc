@@ -250,6 +250,12 @@ function install_begin_request(&$install_state) {
     exit;
   }
 
+  // Initialize conf_path().
+  // This primes the site path to be used during installation. By not requiring
+  // settings.php, a bare site folder can be prepared in the /sites directory,
+  // which will be used for installing Drupal.
+  conf_path(FALSE);
+
   drupal_bootstrap(DRUPAL_BOOTSTRAP_CONFIGURATION);
 
   // A request object from the HTTPFoundation to tell us about the request.
@@ -1211,7 +1217,7 @@ function install_find_translations() {
  */
 function install_find_translation_files($langcode = NULL) {
   $directory = variable_get('locale_translate_file_directory', conf_path() . '/files/translations');
-  $files = file_scan_directory($directory, '!install\.' . (!empty($langcode) ? preg_quote($langcode, '!') : '[^\.]+') . '\.po$!', array('recurse' => FALSE));
+  $files = file_scan_directory($directory, '!drupal-\d+\.\d+\.' . (!empty($langcode) ? preg_quote($langcode, '!') : '[^\.]+') . '\.po$!', array('recurse' => FALSE));
   return $files;
 }
 
@@ -1491,7 +1497,7 @@ function install_import_translations(&$install_state) {
   }
 
   // Collect files to import for this language.
-  $batch = locale_translate_batch_import_files($langcode);
+  $batch = locale_translate_batch_import_files(array('langcode' => $langcode));
   if (!empty($batch)) {
     return $batch;
   }
@@ -1563,7 +1569,7 @@ function install_configure_form($form, &$form_state, &$install_state) {
  */
 function install_import_translations_remaining(&$install_state) {
   include_once drupal_get_path('module', 'locale') . '/locale.bulk.inc';
-  return locale_translate_batch_import_files($install_state['parameters']['langcode']);
+  return locale_translate_batch_import_files(array('langcode' => $install_state['parameters']['langcode']));
 }
 
 /**

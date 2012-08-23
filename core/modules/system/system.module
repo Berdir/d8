@@ -6,6 +6,7 @@
  */
 
 use Drupal\Core\Utility\ModuleInfo;
+
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -502,6 +503,10 @@ function system_element_info() {
     '#process' => array('form_process_select', 'ajax_process_form'),
     '#theme' => 'select',
     '#theme_wrappers' => array('form_element'),
+  );
+  $types['language_select'] = array(
+    '#input' => TRUE,
+    '#default_value' => LANGUAGE_NOT_SPECIFIED,
   );
   $types['weight'] = array(
     '#input' => TRUE,
@@ -2223,7 +2228,7 @@ function system_add_module_assets() {
  * Implements hook_custom_theme().
  */
 function system_custom_theme() {
-  if (drupal_container()->has('request')) {
+  if (drupal_container()->isScopeActive('request')) {
     $request = drupal_container()->get('request');
     $path = $request->attributes->get('system_path');
     if (user_access('view the administration theme') && path_is_admin($path)) {
@@ -2277,7 +2282,7 @@ function system_user_login(&$edit, $account) {
 function system_user_timezone(&$form, &$form_state) {
   global $user;
 
-  $account = $form['#user'];
+  $account = $form_state['controller']->getEntity($form_state);
   $form['timezone'] = array(
     '#type' => 'fieldset',
     '#title' => t('Locale settings'),

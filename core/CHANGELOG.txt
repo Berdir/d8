@@ -53,11 +53,14 @@ Drupal 8.0, xxxx-xx-xx (development version)
       * Added support for singular/plural discovery and translation.
       * Customized translations are tracked so your modifications can
         be identified and protected from translation update overwrites.
+      * All Gettext files are now imported in chunks, better for low resource
+        environments.
     * Improved content language support:
       * Freely orderable language selector in forms.
       * Made it possible to assign language to taxonomy terms, vocabularies
         and files.
       * Node type specific default language assignment is much more versatile.
+      * Added entity language variance support to search module.
     * Better language based configuration
       * Added language options to block visibility.
     * Much improved language APIs for developers:

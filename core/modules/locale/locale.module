@@ -12,6 +12,7 @@
  */
 
 use Drupal\locale\LocaleLookup;
+use Drupal\locale\LocaleConfigSubscriber;
 
 /**
  * Regular expression pattern used to localize JavaScript strings.
@@ -352,7 +353,7 @@ function locale_themes_enabled($themes) {
  */
 function locale_system_update($components) {
   include_once drupal_get_path('module', 'locale') . '/locale.bulk.inc';
-  if ($batch = locale_translate_batch_import_files(NULL, TRUE)) {
+  if ($batch = locale_translate_batch_import_files(array(), TRUE)) {
     batch_set($batch);
   }
 }
@@ -516,7 +517,7 @@ function locale_form_language_admin_add_form_alter_submit($form, $form_state) {
   }
 
   include_once drupal_get_path('module', 'locale') . '/locale.bulk.inc';
-  locale_translate_add_language_set_batch($langcode);
+  locale_translate_add_language_set_batch(array('langcode' => $langcode));
 }
 
 /**
@@ -878,4 +879,12 @@ function _locale_rebuild_js($langcode = NULL) {
       // No operation needed.
       return TRUE;
   }
+}
+
+/**
+ * Implements hook_language_init().
+ */
+function locale_language_init() {
+  // Add locale helper to configuration subscribers.
+  drupal_container()->get('dispatcher')->addSubscriber(new LocaleConfigSubscriber());
 }

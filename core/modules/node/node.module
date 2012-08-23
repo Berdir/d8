@@ -14,6 +14,8 @@ use Drupal\Core\Database\Query\AlterableInterface;
 use Drupal\Core\Database\Query\SelectExtender;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\node\Node;
+use Drupal\Core\File\File;
+use Drupal\entity\EntityInterface;
 
 /**
  * Denotes that the node is not published.
@@ -193,8 +195,11 @@ function node_entity_info() {
   $return = array(
     'node' => array(
       'label' => t('Node'),
-      'controller class' => 'Drupal\node\NodeStorageController',
       'entity class' => 'Drupal\node\Node',
+      'controller class' => 'Drupal\node\NodeStorageController',
+      'form controller class' => array(
+        'default' => 'Drupal\node\NodeFormController',
+      ),
       'base table' => 'node',
       'revision table' => 'node_revision',
       'uri callback' => 'node_uri',
@@ -982,122 +987,47 @@ function node_invoke($node, $hook, $a2 = NULL, $a3 = NULL, $a4 = NULL) {
  * from the database. Nodes are loaded into memory and will not require
  * database access if loaded again during the same page request.
  *
- * @param array|bool $nids
- *   (optional) An array of node IDs, or FALSE to load all nodes.
- * @param array $conditions
- *   (deprecated) An associative array of conditions on the {node}
- *   table, where the keys are the database fields and the values are the
- *   values those fields must have. Instead, it is preferable to use
- *   Drupal\entity\EntityFieldQuery to retrieve a list of entity IDs
- *   loadable by this function.
+ * @param array $nids
+ *   (optional) An array of entity IDs. If omitted, all entities are loaded.
  * @param bool $reset
  *   (optional) Whether to reset the internal node_load() cache.
  *
  * @return array
  *   An array of node entities indexed by nid.
  *
- * @todo Remove $conditions in Drupal 8.
- *
  * @see entity_load_multiple()
  * @see Drupal\entity\EntityFieldQuery
  */
-function node_load_multiple($nids = array(), array $conditions = array(), $reset = FALSE) {
-  return entity_load_multiple('node', $nids, $conditions, $reset);
+function node_load_multiple(array $nids = NULL, $reset = FALSE) {
+  return entity_load_multiple('node', $nids, $reset);
 }
 
 /**
  * Loads a node entity from the database.
  *
  * @param int $nid
- *   (optional) The node ID.
- * @param int $vid
- *   (optional) The revision ID.
+ *   The node ID.
  * @param bool $reset
  *   (optional) Whether to reset the node_load_multiple() cache.
  *
  * @return Drupal\node\Node|false
  *   A fully-populated node entity, or FALSE if the node is not found.
  */
-function node_load($nid = NULL, $vid = NULL, $reset = FALSE) {
-  $nids = (isset($nid) ? array($nid) : array());
-  $conditions = (isset($vid) ? array('vid' => $vid) : array());
-  $node = node_load_multiple($nids, $conditions, $reset);
-  return $node ? reset($node) : FALSE;
+function node_load($nid = NULL, $reset = FALSE) {
+  return entity_load('node', $nid, $reset);
 }
 
 /**
- * Prepares a node entity for editing.
+ * Loads a node revision from the database.
  *
- * Fills in a few default values, and then invokes hook_prepare() on the node
- * type module, and hook_node_prepare() on all modules.
+ * @param int $nid
+ *   The node revision id.
  *
- * @param Drupal\node\Node $node
- *   The node entity.
+ * @return Drupal\node\Node|false
+ *   A fully-populated node entity, or FALSE if the node is not found.
  */
-function node_object_prepare(Node $node) {
-  // Set up default values, if required.
-  $node_options = variable_get('node_options_' . $node->type, array('status', 'promote'));
-  // If this is a new node, fill in the default values.
-  if (!isset($node->nid) || isset($node->is_new)) {
-    foreach (array('status', 'promote', 'sticky') as $key) {
-      // Multistep node forms might have filled in something already.
-      if (!isset($node->$key)) {
-        $node->$key = (int) in_array($key, $node_options);
-      }
-    }
-    global $user;
-    $node->uid = $user->uid;
-    $node->created = REQUEST_TIME;
-  }
-  else {
-    $node->date = format_date($node->created, 'custom', 'Y-m-d H:i:s O');
-    // Remove the log message from the original node entity.
-    $node->log = NULL;
-  }
-  // Always use the default revision setting.
-  $node->revision = in_array('revision', $node_options);
-
-  node_invoke($node, 'prepare');
-  module_invoke_all('node_prepare', $node);
-}
-
-/**
- * Performs validation checks on the given node.
- *
- * @see node_form_validate()
- */
-function node_validate(Node $node, $form, &$form_state) {
-  $type = node_type_load($node->type);
-
-  if (isset($node->nid) && (node_last_changed($node->nid) > $node->changed)) {
-    form_set_error('changed', t('The content on this page has either been modified by another user, or you have already submitted modifications using this form. As a result, your changes cannot be saved.'));
-  }
-
-  // Validate the "authored by" field.
-  if (!empty($node->name) && !($account = user_load_by_name($node->name))) {
-    // The use of empty() is mandatory in the context of usernames
-    // as the empty string denotes the anonymous user. In case we
-    // are dealing with an anonymous user we set the user ID to 0.
-    form_set_error('name', t('The username %name does not exist.', array('%name' => $node->name)));
-  }
-
-  // Validate the "authored on" field.
-  if (!empty($node->date) && strtotime($node->date) === FALSE) {
-    form_set_error('date', t('You have to specify a valid date.'));
-  }
-
-  // Invoke hook_validate() for node type specific validation and
-  // hook_node_validate() for miscellaneous validation needed by modules. Can't
-  // use node_invoke() or module_invoke_all(), because $form_state must be
-  // receivable by reference.
-  $function = node_type_get_base($node) . '_validate';
-  if (function_exists($function)) {
-    $function($node, $form, $form_state);
-  }
-  foreach (module_implements('node_validate') as $module) {
-    $function = $module . '_node_validate';
-    $function($node, $form, $form_state);
-  }
+function node_revision_load($vid = NULL) {
+  return entity_revision_load('node', $vid);
 }
 
 /**
@@ -1172,10 +1102,9 @@ function node_delete_multiple($nids) {
  *   TRUE if the revision deletion was successful.
  */
 function node_revision_delete($revision_id) {
-  if ($revision = node_load(NULL, $revision_id)) {
+  if ($revision = node_revision_load($revision_id)) {
     // Prevent deleting the current revision.
-    $node = node_load($revision->nid);
-    if ($revision_id == $node->vid) {
+    if ($revision->isCurrentRevision()) {
       return FALSE;
     }
 
@@ -1272,6 +1201,10 @@ function node_build_content(Node $node, $view_mode = 'full', $langcode = NULL) {
 
   // Remove previously built content, if exists.
   $node->content = array();
+
+  // Allow modules to change the view mode.
+  $context = array('langcode' => $langcode);
+  drupal_alter('entity_view_mode', $view_mode, $node, $context);
 
   // The 'view' hook can be implemented to overwrite the default function
   // to display nodes.
@@ -1401,7 +1334,7 @@ function template_preprocess_node(&$variables) {
     'link_attributes' => array('rel' => 'author'),
   ));
 
-  $uri = entity_uri('node', $node);
+  $uri = $node->uri();
   $variables['node_url']  = url($uri['path'], $uri['options']);
   $variables['title']     = check_plain($node->title);
   $variables['page']      = $variables['view_mode'] == 'full' && node_is_page($node);
@@ -1620,28 +1553,32 @@ function node_search_execute($keys = NULL, $conditions = NULL) {
 
   // Load results.
   $find = $query
+    // Add the language code of the indexed item to the result of the query,
+    // since the node will be rendered using the respective language.
+    ->fields('i', array('langcode'))
     ->limit(10)
     ->execute();
   $results = array();
   foreach ($find as $item) {
     // Render the node.
     $node = node_load($item->sid);
-    $build = node_view($node, 'search_result');
+    $build = node_view($node, 'search_result', $item->langcode);
     unset($build['#theme']);
     $node->rendered = drupal_render($build);
 
     // Fetch comments for snippet.
-    $node->rendered .= ' ' . module_invoke('comment', 'node_update_index', $node);
+    $node->rendered .= ' ' . module_invoke('comment', 'node_update_index', $node, $item->langcode);
 
-    $extra = module_invoke_all('node_search_result', $node);
+    $extra = module_invoke_all('node_search_result', $node, $item->langcode);
 
-    $uri = entity_uri('node', $node);
+    $language = language_load($item->langcode);
+    $uri = $node->uri();
     $results[] = array(
-      'link' => url($uri['path'], array_merge($uri['options'], array('absolute' => TRUE))),
+      'link' => url($uri['path'], array_merge($uri['options'], array('absolute' => TRUE, 'language' => $language))),
       'type' => check_plain(node_type_get_name($node)),
-      'title' => $node->label(),
+      'title' => $node->label($item->langcode),
       'user' => theme('username', array('account' => $node)),
-      'date' => $node->changed,
+      'date' => $node->get('changed', $item->langcode),
       'node' => $node,
       'extra' => $extra,
       'score' => $item->calculated_score,
@@ -1831,15 +1768,12 @@ function _node_revision_access(Node $node, $op = 'view', $account = NULL, $langc
       return $access[$cid] = FALSE;
     }
 
-    $node_current_revision = node_load($node->nid);
-    $is_current_revision = $node_current_revision->vid == $node->vid;
-
     // There should be at least two revisions. If the vid of the given node
     // and the vid of the current revision differ, then we already have two
     // different revisions so there is no need for a separate database check.
     // Also, if you try to revert to or delete the current revision, that's
     // not good.
-    if ($is_current_revision && (db_query('SELECT COUNT(vid) FROM {node_revision} WHERE nid = :nid', array(':nid' => $node->nid))->fetchField() == 1 || $op == 'update' || $op == 'delete')) {
+    if ($node->isCurrentRevision() && (db_query('SELECT COUNT(vid) FROM {node_revision} WHERE nid = :nid', array(':nid' => $node->nid))->fetchField() == 1 || $op == 'update' || $op == 'delete')) {
       $access[$cid] = FALSE;
     }
     elseif (user_access('administer nodes', $account)) {
@@ -1848,7 +1782,7 @@ function _node_revision_access(Node $node, $op = 'view', $account = NULL, $langc
     else {
       // First check the access to the current revision and finally, if the
       // node passed in is not the current revision then access to that, too.
-      $access[$cid] = node_access($op, $node_current_revision, $account, $langcode) && ($is_current_revision || node_access($op, $node, $account, $langcode));
+      $access[$cid] = node_access($op, node_load($node->nid), $account, $langcode) && ($node->isCurrentRevision() || node_access($op, $node, $account, $langcode));
     }
   }
 
@@ -2025,30 +1959,27 @@ function node_menu() {
     'type' => MENU_LOCAL_TASK,
     'file' => 'node.pages.inc',
   );
-  $items['node/%node/revisions/%/view'] = array(
+  $items['node/%node/revisions/%node_revision/view'] = array(
     'title' => 'Revisions',
-    'load arguments' => array(3),
     'page callback' => 'node_show',
-    'page arguments' => array(1, TRUE),
+    'page arguments' => array(3, TRUE),
     'access callback' => '_node_revision_access',
-    'access arguments' => array(1),
+    'access arguments' => array(3),
   );
-  $items['node/%node/revisions/%/revert'] = array(
+  $items['node/%node/revisions/%node_revision/revert'] = array(
     'title' => 'Revert to earlier revision',
-    'load arguments' => array(3),
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('node_revision_revert_confirm', 1),
+    'page arguments' => array('node_revision_revert_confirm', 3),
     'access callback' => '_node_revision_access',
-    'access arguments' => array(1, 'update'),
+    'access arguments' => array(3, 'update'),
     'file' => 'node.pages.inc',
   );
-  $items['node/%node/revisions/%/delete'] = array(
+  $items['node/%node/revisions/%node_revision/delete'] = array(
     'title' => 'Delete earlier revision',
-    'load arguments' => array(3),
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('node_revision_delete_confirm', 1),
+    'page arguments' => array('node_revision_delete_confirm', 3),
     'access callback' => '_node_revision_access',
-    'access arguments' => array(1, 'delete'),
+    'access arguments' => array(3, 'delete'),
     'file' => 'node.pages.inc',
   );
   return $items;
@@ -2577,10 +2508,10 @@ function node_page_default() {
   $site_config = config('system.site');
   $select = db_select('node', 'n')
     ->fields('n', array('nid', 'sticky', 'created'))
-    ->condition('promote', 1)
-    ->condition('status', 1)
-    ->orderBy('sticky', 'DESC')
-    ->orderBy('created', 'DESC')
+    ->condition('n.promote', 1)
+    ->condition('n.status', 1)
+    ->orderBy('n.sticky', 'DESC')
+    ->orderBy('n.created', 'DESC')
     ->extend('Drupal\Core\Database\Query\PagerSelectExtender')
     ->limit(variable_get('default_nodes_main', 10))
     ->addTag('node_access');
@@ -2634,7 +2565,7 @@ function node_page_view(Node $node) {
   // of the active trail, and the link name becomes the page title.
   // Thus, we must explicitly set the page title to be the node title.
   drupal_set_title($node->label());
-  $uri = entity_uri('node', $node);
+  $uri = $node->uri();
   // Set the node path as the canonical URL to prevent duplicate content.
   drupal_add_html_head_link(array('rel' => 'canonical', 'href' => url($uri['path'], $uri['options'])), TRUE);
   // Set the non-aliased path as a default shortlink.
@@ -2654,7 +2585,15 @@ function node_update_index() {
     return;
   }
 
+  // The indexing throttle should be aware of the number of language variants
+  // of a node.
+  $counter = 0;
   foreach (node_load_multiple($nids) as $node) {
+    // Determine when the maximum number of indexable items is reached.
+    $counter += 1 + count($node->translations());
+    if ($counter > $limit) {
+      break;
+    }
     _node_index_node($node);
   }
 }
@@ -2671,21 +2610,26 @@ function _node_index_node(Node $node) {
   // results half-life calculation.
   variable_set('node_cron_last', $node->changed);
 
-  // Render the node.
-  $build = node_view($node, 'search_index');
-  unset($build['#theme']);
-  $node->rendered = drupal_render($build);
+  $languages = array_merge(array(language_load($node->langcode)), $node->translations());
 
-  $text = '<h1>' . check_plain($node->label()) . '</h1>' . $node->rendered;
+  foreach ($languages as $language) {
+    // Render the node.
+    $build = node_view($node, 'search_index', $language->langcode);
 
-  // Fetch extra data normally not visible
-  $extra = module_invoke_all('node_update_index', $node);
-  foreach ($extra as $t) {
-    $text .= $t;
+    unset($build['#theme']);
+    $node->rendered = drupal_render($build);
+
+    $text = '<h1>' . check_plain($node->label($language->langcode)) . '</h1>' . $node->rendered;
+
+    // Fetch extra data normally not visible.
+    $extra = module_invoke_all('node_update_index', $node, $language->langcode);
+    foreach ($extra as $t) {
+      $text .= $t;
+    }
+
+    // Update index.
+    search_index($node->nid, 'node', $text, $language->langcode);
   }
-
-  // Update index
-  search_index($node->nid, 'node', $text);
 }
 
 /**
@@ -3536,7 +3480,7 @@ function node_access_rebuild($batch_mode = FALSE) {
       // Rebuild newest nodes first so that recent content becomes available quickly.
       $nids = db_query("SELECT nid FROM {node} ORDER BY nid DESC")->fetchCol();
       foreach ($nids as $nid) {
-        $node = node_load($nid, NULL, TRUE);
+        $node = node_load($nid, TRUE);
         // To preserve database integrity, only acquire grants if the node
         // loads successfully.
         if (!empty($node)) {
@@ -3584,7 +3528,7 @@ function _node_access_rebuild_batch_operation(&$context) {
   // Process the next 20 nodes.
   $limit = 20;
   $nids = db_query_range("SELECT nid FROM {node} WHERE nid > :nid ORDER BY nid ASC", 0, $limit, array(':nid' => $context['sandbox']['current_node']))->fetchCol();
-  $nodes = node_load_multiple($nids, array(), TRUE);
+  $nodes = node_load_multiple($nids, TRUE);
   foreach ($nodes as $nid => $node) {
     // To preserve database integrity, only acquire grants if the node
     // loads successfully.
@@ -3652,21 +3596,6 @@ function node_content_form(Node $node, $form_state) {
 /**
  * @} End of "defgroup node_content".
  */
-
-/**
- * Implements hook_forms().
- *
- * All node forms share the same form handler.
- */
-function node_forms() {
-  $forms = array();
-  if ($types = node_type_get_types()) {
-    foreach (array_keys($types) as $type) {
-      $forms[$type . '_node_form']['callback'] = 'node_form';
-    }
-  }
-  return $forms;
-}
 
 /**
  * Implements hook_action_info().
@@ -4049,8 +3978,8 @@ function node_modules_disabled($modules) {
 /**
  * Implements hook_file_download_access().
  */
-function node_file_download_access($field, $entity_type, $entity) {
-  if ($entity_type == 'node') {
+function node_file_download_access($field, EntityInterface $entity, File $file) {
+  if ($entity->entityType() == 'node') {
     return node_access('view', $entity);
   }
 }

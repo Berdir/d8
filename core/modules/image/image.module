@@ -39,7 +39,7 @@ define('IMAGE_STORAGE_MODULE', IMAGE_STORAGE_OVERRIDE | IMAGE_STORAGE_DEFAULT);
 require_once DRUPAL_ROOT . '/core/modules/image/image.field.inc';
 
 /**
- * Implement of hook_help().
+ * Implements hook_help().
  */
 function image_help($path, $arg) {
   switch ($path) {
@@ -286,12 +286,9 @@ function image_file_download($uri) {
           // Send headers describing the image's size, and MIME-type...
           'Content-Type' => $info['mime_type'],
           'Content-Length' => $info['file_size'],
-          // ...and allow the file to be cached for two weeks (matching the
-          // value we/ use for the mod_expires settings in .htaccess) and
-          // ensure that caching proxies do not share the image with other
-          // users.
-          'Expires' => gmdate(DATE_RFC1123, REQUEST_TIME + 1209600),
-          'Cache-Control' => 'max-age=1209600, private, must-revalidate',
+          // By not explicitly setting them here, this uses normal Drupal
+          // Expires, Cache-Control and ETag headers to prevent proxy or
+          // browser caching of private images.
         );
       }
     }
@@ -301,7 +298,7 @@ function image_file_download($uri) {
   // Private file access for the original files. Note that we only
   // check access for non-temporary images, since file.module will
   // grant access for all temporary files.
-  $files = file_load_multiple(array(), array('uri' => $uri));
+  $files = entity_load_multiple_by_properties('file', array('uri' => $uri));
   if (count($files)) {
     $file = reset($files);
     if ($file->status) {
