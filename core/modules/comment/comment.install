@@ -5,6 +5,8 @@
  * Install, update and uninstall functions for the Comment module.
  */
 
+use Drupal\Component\Uuid\Uuid;
+
 /**
  * Implements hook_uninstall().
  */
@@ -313,6 +315,35 @@ function comment_update_8001() {
   }
   else {
     db_add_field('comment', 'uuid', $spec, $keys);
+  }
+}
+
+/**
+ * Generate an UUID for all comments.
+ */
+function comment_update_8002(&$sandbox) {
+  if (!isset($sandbox['progress'])) {
+    $sandbox['progress'] = 0;
+    $sandbox['last'] = 0;
+    $sandbox['max'] = db_query('SELECT COUNT(cid) FROM {comment}')->fetchField();
+  }
+
+  $cids = db_query_range('SELECT cid FROM {comment} WHERE cid > :cid ORDER BY cid DESC', 0, 10, array(':cid' => $sandbox['last']))->fetchCol();
+  $uuid = new Uuid();
+  foreach ($cids as $cid) {
+    db_update('comment')
+      ->fields(array(
+        'uuid' => $uuid->generate(),
+      ))
+      ->condition('cid', $cid)
+      ->isNull('uuid')
+      ->execute();
+    $sandbox['progress']++;
+  }
+
+  $sandbox['#finished'] = empty($sandbox['max']) ? 1 : ($sandbox['progress'] / $sandbox['max']);
+  if ($cids) {
+    $sandbox['last'] = max($cids);
   }
 }
 

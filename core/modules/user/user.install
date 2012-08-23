@@ -5,6 +5,8 @@
  * Install, update and uninstall functions for the user module.
  */
 
+use Drupal\Component\Uuid\Uuid;
+
 /**
  * Implements hook_schema().
  */
@@ -471,6 +473,36 @@ function user_update_8003() {
   }
   else {
     db_add_field('users', 'uuid', $spec, $keys);
+  }
+}
+
+/**
+ * Generate an UUID for all users.
+ */
+function user_update_8004(&$sandbox) {
+  if (!isset($sandbox['progress'])) {
+    $sandbox['progress'] = 0;
+    // The first user id is 0, so it needs to start with -1.
+    $sandbox['last'] = -1;
+    $sandbox['max'] = db_query('SELECT COUNT(uid) FROM {users}')->fetchField();
+  }
+
+  $uids = db_query_range('SELECT uid FROM {users} WHERE uid > :uid ORDER BY uid DESC', 0, 10, array(':uid' => $sandbox['last']))->fetchCol();
+  $uuid = new Uuid();
+  foreach ($uids as $uid) {
+    db_update('users')
+      ->fields(array(
+        'uuid' => $uuid->generate(),
+      ))
+      ->condition('uid', $uid)
+      ->isNull('uuid')
+      ->execute();
+    $sandbox['progress']++;
+  }
+
+  $sandbox['#finished'] = empty($sandbox['max']) ? 1 : ($sandbox['progress'] / $sandbox['max']);
+  if ($uids) {
+    $sandbox['last'] = max($uids);
   }
 }
 

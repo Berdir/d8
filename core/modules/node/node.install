@@ -5,6 +5,8 @@
  * Install, update and uninstall functions for the node module.
  */
 
+use Drupal\Component\Uuid\Uuid;
+
 /**
  * Implements hook_schema().
  */
@@ -576,8 +578,6 @@ function node_update_8003() {
 
 /**
  * Create a UUID column for nodes.
- *
- * @todo UUID upgrade path: http://drupal.org/node/1642526
  */
 function node_update_8004() {
   $spec = array(
@@ -597,6 +597,35 @@ function node_update_8004() {
   }
   else {
     db_add_field('node', 'uuid', $spec, $keys);
+  }
+}
+
+/**
+ * Generate an UUID for all nodes.
+ */
+function node_update_8005(&$sandbox) {
+  if (!isset($sandbox['progress'])) {
+    $sandbox['progress'] = 0;
+    $sandbox['last'] = 0;
+    $sandbox['max'] = db_query('SELECT COUNT(nid) FROM {node}')->fetchField();
+  }
+
+  $nids = db_query_range('SELECT nid FROM {node} WHERE nid > :nid ORDER BY nid DESC', 0, 10, array(':nid' => $sandbox['last']))->fetchCol();
+  $uuid = new Uuid();
+  foreach ($nids as $nid) {
+    db_update('node')
+      ->fields(array(
+        'uuid' => $uuid->generate(),
+      ))
+      ->condition('nid', $nid)
+      ->isNull('uuid')
+      ->execute();
+    $sandbox['progress']++;
+  }
+
+  $sandbox['#finished'] = empty($sandbox['max']) ? 1 : ($sandbox['progress'] / $sandbox['max']);
+  if ($nids) {
+    $sandbox['last'] = max($nids);
   }
 }
 
