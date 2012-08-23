@@ -107,5 +107,11 @@ class EntityApiTest extends WebTestBase {
 
     $label = $user1->label();
     $this->assertEqual(l($label, $uri['path'], $uri['options']), entity_l($user1), 'Expected entity link returned.');
+
+    $text = $this->randomName();
+    $this->assertEqual(l($text, $uri['path'], $uri['options']), entity_l($user1, $text), 'Expected entity link returned using custom text.');
+
+    $query_option = array('query' => array($this->randomName() => $this->randomName()));
+    $this->assertEqual(l($label, $uri['path'], $uri['options'] + $query_option), entity_l($user1, NULL, $query_option), 'Expected entity link returned using custom options.');
   }
 }
