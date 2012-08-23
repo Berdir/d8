@@ -7,18 +7,17 @@
 
 namespace Drupal\entity\Property;
 
-use Drupal\Core\Property\PropertyContainerInterface;
-use Drupal\Core\Property\PropertyInterface;
-
+use Drupal\Core\TypedData\DataContainerInterface;
+use Drupal\Core\TypedData\DataWrapperInterface;
 
 /**
  * Interface for entity property items, which are property container that may
  * contain only primitives and entity references.
  *
- * @see EntityProperty
+ * @see EntityPropertyList
  * @see EntityPropertyItem
  */
-interface EntityPropertyItemInterface extends PropertyContainerInterface, PropertyInterface {
+interface EntityPropertyItemInterface extends DataContainerInterface, DataWrapperInterface {
 
   /**
    * Check entity property access.
@@ -40,7 +39,7 @@ interface EntityPropertyItemInterface extends PropertyContainerInterface, Proper
    * @param string $property_name
    *   The name of the property to return; e.g., 'value'.
    *
-   * @return Drupal\Core\Property\PropertyInterface
+   * @return Drupal\Core\TypedData\DataWrapperInterface
    *   The property object.
    */
   public function get($property_name);

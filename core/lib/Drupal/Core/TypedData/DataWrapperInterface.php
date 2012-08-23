@@ -2,15 +2,15 @@
 
 /**
  * @file
- * Definition of Drupal\Core\Property\PropertyInterface.
+ * Definition of Drupal\Core\TypedData\DataWrapperInterface.
  */
 
-namespace Drupal\Core\Property;
+namespace Drupal\Core\TypedData;
 
 /**
  * Interface for all properties.
  */
-interface PropertyInterface {
+interface DataWrapperInterface {
 
   /**
    * Creates a property object given its definition.
@@ -19,14 +19,14 @@ interface PropertyInterface {
    *   The definition of the property.
    * @param mixed $value
    *   (optional) The value of the property, or NULL if the property is not set.
-   *    See PropertyInterface::setValue() for details.
+   *    See DataWrapperInterface::setValue() for details.
    * @param $context
    *   (optional) An array describing the context of the property. It should be
    *   passed if a property is created as part of a property container. The
    *   following keys are supported:
    *   - name: The name of the property being created.
    *   - parent: The parent object containing the property. Must be an instance of
-   *     \Drupal\Core\Property\PropertyContainerInterface.
+   *     \Drupal\Core\TypedData\DataContainerInterface.
    *
    * @see drupal_get_property()
    */
@@ -62,7 +62,7 @@ interface PropertyInterface {
    *   The value to set in the format as documented for the property's type or
    *   NULL to unset the property.
    *
-   * @throws \Drupal\Core\Property\PropertyReadOnlyException
+   * @throws \Drupal\Core\TypedData\DataReadOnlyException
    *   If the property is read-only.
    */
   public function setValue($value);

@@ -2,16 +2,16 @@
 
 /**
  * @file
- * Definition of Drupal\Core\Property\Type\Integer.
+ * Definition of Drupal\Core\TypedData\Type\String.
  */
 
-namespace Drupal\Core\Property\Type;
-use Drupal\Core\Property\PropertyInterface;
+namespace Drupal\Core\TypedData\Type;
+use Drupal\Core\TypedData\DataWrapperInterface;
 
 /**
  * The string property type.
  */
-class Integer implements PropertyInterface {
+class String implements DataWrapperInterface {
 
   /**
    * The property definition.
@@ -23,12 +23,12 @@ class Integer implements PropertyInterface {
   /**
    * The property value.
    *
-   * @var integer
+   * @var string
    */
   protected $value;
 
   /**
-   * Implements PropertyInterface::__construct().
+   * Implements DataWrapperInterface::__construct().
    */
   public function __construct(array $definition, $value = NULL, $context = array()) {
     $this->definition = $definition;
@@ -38,42 +38,42 @@ class Integer implements PropertyInterface {
   }
 
   /**
-   * Implements PropertyInterface::getType().
+   * Implements DataWrapperInterface::getType().
    */
   public function getType() {
     return $this->definition['type'];
   }
 
   /**
-   * Implements PropertyInterface::getDefinition().
+   * Implements DataWrapperInterface::getDefinition().
    */
   public function getDefinition() {
     return $this->definition;
   }
 
   /**
-   * Implements PropertyInterface::getValue().
+   * Implements DataWrapperInterface::getValue().
    */
   public function getValue() {
     return $this->value;
   }
 
   /**
-   * Implements PropertyInterface::setValue().
+   * Implements DataWrapperInterface::setValue().
    */
   public function setValue($value) {
     $this->value = $value;
   }
 
   /**
-   * Implements PropertyInterface::getString().
+   * Implements DataWrapperInterface::getString().
    */
   public function getString() {
     return (string) $this->value;
   }
 
   /**
-   * Implements PropertyInterface::validate().
+   * Implements DataWrapperInterface::validate().
    */
   public function validate($value = NULL) {
     // TODO: Implement validate() method.

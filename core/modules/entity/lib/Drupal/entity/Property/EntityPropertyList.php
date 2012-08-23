@@ -2,13 +2,13 @@
 
 /**
  * @file
- * Definition of Drupal\entity\Property\EntityProperty.
+ * Definition of Drupal\entity\Property\EntityPropertyList.
  */
 
 namespace Drupal\entity\Property;
 
 /**
- * An entity property.
+ * An entity property list.
  *
  * An entity property is a list of property items, which contain only primitive
  * properties or entity references. Note that even single-valued entity
@@ -16,9 +16,9 @@ namespace Drupal\entity\Property;
  * contained item the entity property delegates __get() and __set() calls
  * directly to the first item.
  *
- * @see EntityPropertyInterface.
+ * @see EntityPropertyListInterface.
  */
-class EntityProperty implements EntityPropertyInterface {
+class EntityPropertyList implements EntityPropertyListInterface {
 
   /**
    * Numerically indexed array of property items, implementing the
@@ -36,7 +36,7 @@ class EntityProperty implements EntityPropertyInterface {
   protected $definition;
 
    /**
-   * Implements PropertyInterface::__construct().
+   * Implements DataWrapperInterface::__construct().
    */
   public function __construct(array $definition, $value = NULL, $context = array()) {
     $this->definition = $definition;
@@ -46,21 +46,21 @@ class EntityProperty implements EntityPropertyInterface {
   }
 
   /**
-   * Implements PropertyInterface::getType().
+   * Implements DataWrapperInterface::getType().
    */
   public function getType() {
     return $this->definition['type'];
   }
 
   /**
-   * Implements PropertyInterface::getDefinition().
+   * Implements DataWrapperInterface::getDefinition().
    */
   public function getDefinition() {
     return $this->definition;
   }
 
   /**
-   * Implements PropertyInterface::getValue().
+   * Implements DataWrapperInterface::getValue().
    */
   public function getValue() {
     $values = array();
@@ -72,7 +72,7 @@ class EntityProperty implements EntityPropertyInterface {
   }
 
   /**
-   * Implements PropertyInterface::setValue().
+   * Implements DataWrapperInterface::setValue().
    *
    * @param array $values
    *   An array of values of the property items.
@@ -81,7 +81,7 @@ class EntityProperty implements EntityPropertyInterface {
     if (isset($values)) {
 
       // Support passing in property objects as value.
-      if ($values instanceof PropertyInterface) {
+      if ($values instanceof DataWrapperInterface) {
         $values = $values->getValue();
       }
       if (!is_array($values)) {
@@ -125,7 +125,7 @@ class EntityProperty implements EntityPropertyInterface {
   }
 
   /**
-   * Implements PropertyInterface::validate().
+   * Implements DataWrapperInterface::validate().
    */
   public function validate($value = NULL) {
     // @todo implement
@@ -171,7 +171,7 @@ class EntityProperty implements EntityPropertyInterface {
   /**
    * Helper for creating a list item object.
    *
-   * @return \Drupal\Core\Property\PropertyInterface
+   * @return \Drupal\Core\TypedData\DataWrapperInterface
    */
   protected function createItem($value = NULL) {
     return drupal_get_property(array('list' => FALSE) + $this->definition, $value);

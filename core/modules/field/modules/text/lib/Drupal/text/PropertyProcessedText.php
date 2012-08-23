@@ -6,30 +6,30 @@
  */
 
 namespace Drupal\text;
-use Drupal\Core\Property\PropertyInterface;
-use Drupal\Core\Property\PropertyReadOnlyException;
+use Drupal\Core\TypedData\DataWrapperInterface;
+use Drupal\Core\TypedData\DataReadOnlyException;
 
 /**
  * The string property type.
  */
-class PropertyProcessedText extends \Drupal\Core\Property\Type\String {
+class PropertyProcessedText extends \Drupal\Core\TypedData\Type\String {
 
   /**
    * The text property.
    *
-   * @var \Drupal\Core\Property\PropertyInterface
+   * @var \Drupal\Core\TypedData\DataWrapperInterface
    */
   protected $text;
 
   /**
    * The text format property.
    *
-   * @var \Drupal\Core\Property\PropertyInterface
+   * @var \Drupal\Core\TypedData\DataWrapperInterface
    */
   protected $format;
 
   /**
-   * Implements PropertyInterface::__construct().
+   * Implements DataWrapperInterface::__construct().
    */
   public function __construct(array $definition, $value = NULL, $context = array()) {
     $this->definition = $definition;
@@ -47,7 +47,7 @@ class PropertyProcessedText extends \Drupal\Core\Property\Type\String {
   }
 
   /**
-   * Implements PropertyInterface::getValue().
+   * Implements DataWrapperInterface::getValue().
    */
   public function getValue($langcode = NULL) {
     // @todo: Determine a way to get the field $instance here.
@@ -64,11 +64,11 @@ class PropertyProcessedText extends \Drupal\Core\Property\Type\String {
   }
 
   /**
-   * Implements PropertyInterface::setValue().
+   * Implements DataWrapperInterface::setValue().
    */
   public function setValue($value) {
     if (isset($value)) {
-      throw new PropertyReadOnlyException('Unable to set a computed property.');
+      throw new DataReadOnlyException('Unable to set a computed property.');
     }
   }
 }

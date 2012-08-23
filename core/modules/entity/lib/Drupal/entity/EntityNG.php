@@ -7,17 +7,17 @@
 
 namespace Drupal\entity;
 
-use Drupal\Core\Property\PropertyInterface;
-use Drupal\Core\Property\PropertyContainerInterface;
+use Drupal\Core\TypedData\DataWrapperInterface;
+use Drupal\Core\TypedData\DataContainerInterface;
 use Drupal\Component\Uuid\Uuid;
 
 /**
  * Implements Property API specific enhancements to the Entity class.
  *
  * @todo: Once all entity types have been converted, merge improvements into the
- * Entity class and let EntityInterface extend the PropertyContainerInterface.
+ * Entity class and let EntityInterface extend the DataContainerInterface.
  */
-class EntityNG extends Entity implements PropertyContainerInterface {
+class EntityNG extends Entity implements DataContainerInterface {
 
   /**
    * The plain data values of the contained properties.
@@ -34,7 +34,8 @@ class EntityNG extends Entity implements PropertyContainerInterface {
   protected $values = array();
 
   /**
-   * The array of properties, each being an instance of EntityPropertyInterface.
+   * The array of properties, each being an instance of
+   * EntityPropertyListInterface.
    *
    * @var array
    */
@@ -100,12 +101,12 @@ class EntityNG extends Entity implements PropertyContainerInterface {
    * Implements EntityInterface::set().
    */
   public function set($property_name, $value, $langcode = NULL) {
-    $value = $value instanceof PropertyInterface ? $value->getValue() : $value;
+    $value = $value instanceof DataWrapperInterface ? $value->getValue() : $value;
     $this->get($property_name, $langcode)->setValue($value);
   }
 
   /**
-   * Implements PropertyContainerInterface::getProperties().
+   * Implements DataContainerInterface::getProperties().
    */
   public function getProperties() {
     $properties = array();
@@ -118,12 +119,12 @@ class EntityNG extends Entity implements PropertyContainerInterface {
   }
 
   /**
-   * Implements PropertyContainerInterface::setProperties().
+   * Implements DataContainerInterface::setProperties().
    */
   public function setProperties($properties) {
     foreach ($properties as $name => $property) {
       // Copy the value to our property object.
-      $value = $property instanceof PropertyInterface ? $property->getValue() : $property;
+      $value = $property instanceof DataWrapperInterface ? $property->getValue() : $property;
       $this->get($name)->setValue($value);
     }
   }
@@ -136,7 +137,7 @@ class EntityNG extends Entity implements PropertyContainerInterface {
   }
 
   /**
-   * Implements PropertyContainerInterface::getPropertyDefinition().
+   * Implements DataContainerInterface::getPropertyDefinition().
    */
   public function getPropertyDefinition($name) {
     $definitions = $this->getPropertyDefinitions();
@@ -144,7 +145,7 @@ class EntityNG extends Entity implements PropertyContainerInterface {
   }
 
   /**
-   * Implements PropertyContainerInterface::getPropertyDefinitions().
+   * Implements DataContainerInterface::getPropertyDefinitions().
    */
   public function getPropertyDefinitions() {
     return entity_get_controller($this->entityType)->getPropertyDefinitions(array(
@@ -154,7 +155,7 @@ class EntityNG extends Entity implements PropertyContainerInterface {
   }
 
   /**
-   * Implements PropertyContainerInterface::toArray().
+   * Implements DataContainerInterface::toArray().
    */
   public function toArray() {
     $values = array();
@@ -176,7 +177,7 @@ class EntityNG extends Entity implements PropertyContainerInterface {
   /**
    * Gets a translation of the entity.
    *
-   * @return \Drupal\Core\Property\PropertyContainerInterface
+   * @return \Drupal\Core\TypedData\DataContainerInterface
    *   A container holding the translated properties.
    */
   public function getTranslation($langcode) {

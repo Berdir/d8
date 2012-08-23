@@ -2,11 +2,11 @@
 
 /**
  * @file
- * Definition of Drupal\entity\Property\EntityPropertyInterface.
+ * Definition of Drupal\entity\Property\EntityPropertyListInterface.
  */
 
 namespace Drupal\entity\Property;
-use Drupal\Core\Property\PropertyListInterface;
+use Drupal\Core\TypedData\DataListInterface;
 
 /**
  * Interface for entity properties, being lists of property items.
@@ -20,7 +20,7 @@ use Drupal\Core\Property\PropertyListInterface;
  * @todo: Should getProperties(), setProperties() and getPropertyDefinitions()
  * be delegated as well.
  */
-interface EntityPropertyInterface extends PropertyListInterface {
+interface EntityPropertyListInterface extends DataListInterface {
 
   /**
    * Delegated to the first item.
