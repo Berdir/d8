@@ -47,4 +47,9 @@ final class DataPrimitive {
    */
   const URI = 7;
 
+  /**
+   * The BINARY primitive data type.
+   */
+  const BINARY = 8;
+
 }
