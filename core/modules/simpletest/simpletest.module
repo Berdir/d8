@@ -288,9 +288,9 @@ function simpletest_log_read($test_id, $prefix, $test_class, $during_test = FALS
 /**
  * Get a list of all of the tests provided by the system.
  *
- * The list of test classes is loaded by searching the designated directory
- * for each module for files matching the PSR-0 standard. Once loaded the
- * test list is cached and stored in a static variable.
+ * The list of test classes is loaded by searching the designated directory for
+ * each module for files matching the PSR-0 standard. Once loaded the test list
+ * is cached and stored in a static variable.
  *
  * @return
  *   An array of tests keyed with the groups specified in each of the tests
