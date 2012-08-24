@@ -322,7 +322,7 @@ class NodeFormController extends EntityFormController {
     $node = parent::submit($form, $form_state);
 
     // Save as a new revision if requested to do so.
-    if (!empty($form_state['values'][['revision']])) {
+    if (!empty($form_state['values']['revision'])) {
       $node->setNewRevision();
     }
 
