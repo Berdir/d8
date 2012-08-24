@@ -607,10 +607,10 @@ function node_update_8005(&$sandbox) {
   if (!isset($sandbox['progress'])) {
     $sandbox['progress'] = 0;
     $sandbox['last'] = 0;
-    $sandbox['max'] = db_query('SELECT COUNT(nid) FROM {node}')->fetchField();
+    $sandbox['max'] = db_query('SELECT COUNT(nid) FROM {node} WHERE uuid IS NULL')->fetchField();
   }
 
-  $nids = db_query_range('SELECT nid FROM {node} WHERE nid > :nid ORDER BY nid DESC', 0, 10, array(':nid' => $sandbox['last']))->fetchCol();
+  $nids = db_query_range('SELECT nid FROM {node} WHERE nid > :nid AND uuid IS NULL ORDER BY nid ASC', 0, 10, array(':nid' => $sandbox['last']))->fetchCol();
   $uuid = new Uuid();
   foreach ($nids as $nid) {
     db_update('node')

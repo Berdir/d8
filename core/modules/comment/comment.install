@@ -325,10 +325,10 @@ function comment_update_8002(&$sandbox) {
   if (!isset($sandbox['progress'])) {
     $sandbox['progress'] = 0;
     $sandbox['last'] = 0;
-    $sandbox['max'] = db_query('SELECT COUNT(cid) FROM {comment}')->fetchField();
+    $sandbox['max'] = db_query('SELECT COUNT(cid) FROM {comment} WHERE uuid IS NULL')->fetchField();
   }
 
-  $cids = db_query_range('SELECT cid FROM {comment} WHERE cid > :cid ORDER BY cid DESC', 0, 10, array(':cid' => $sandbox['last']))->fetchCol();
+  $cids = db_query_range('SELECT cid FROM {comment} WHERE cid > :cid AND uuid IS NULL ORDER BY cid ASC', 0, 10, array(':cid' => $sandbox['last']))->fetchCol();
   $uuid = new Uuid();
   foreach ($cids as $cid) {
     db_update('comment')

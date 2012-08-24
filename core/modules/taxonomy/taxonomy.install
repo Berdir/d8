@@ -345,10 +345,10 @@ function taxonomy_update_8003(&$sandbox) {
   if (!isset($sandbox['progress'])) {
     $sandbox['progress'] = 0;
     $sandbox['last'] = 0;
-    $sandbox['max'] = db_query('SELECT COUNT(tid) FROM {taxonomy_term_data}')->fetchField();
+    $sandbox['max'] = db_query('SELECT COUNT(tid) FROM {taxonomy_term_data} WHERE uuid IS NULL')->fetchField();
   }
 
-  $tids = db_query_range('SELECT tid FROM {taxonomy_term_data} WHERE tid > :tid ORDER BY tid DESC', 0, 10, array(':tid' => $sandbox['last']))->fetchCol();
+  $tids = db_query_range('SELECT tid FROM {taxonomy_term_data} WHERE tid > :tid AND uuid IS NULL ORDER BY tid ASC', 0, 10, array(':tid' => $sandbox['last']))->fetchCol();
   $uuid = new Uuid();
   foreach ($tids as $tid) {
     db_update('taxonomy_term_data')
