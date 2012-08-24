@@ -1997,6 +1997,7 @@ function system_update_8017() {
     'preprocess_css' => 'preprocess.css',
     'preprocess_js' => 'preprocess.js',
   ));
+}
 
 /**
  * Remove the registry tables.
