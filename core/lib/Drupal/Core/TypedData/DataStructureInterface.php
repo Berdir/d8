@@ -11,7 +11,8 @@ use IteratorAggregate;
 /**
  * Interface for data structures that contain properties.
  *
- * This is implemented by entities as well as by PropertyItem classes.
+ * This is implemented by entities as well as by EntityPropertyItem classes of
+ * the entity.module.
  */
 interface DataStructureInterface extends IteratorAggregate  {
 

@@ -9,19 +9,19 @@ namespace Drupal\Core\TypedData\Type;
 use Drupal\Core\TypedData\DataWrapperInterface;
 
 /**
- * The string property type.
+ * The string data type.
  */
 class Integer implements DataWrapperInterface {
 
   /**
-   * The property definition.
+   * The data definition.
    *
    * @var array
    */
   protected $definition;
 
   /**
-   * The property value.
+   * The data value.
    *
    * @var integer
    */

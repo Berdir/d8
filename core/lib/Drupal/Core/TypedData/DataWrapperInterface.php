@@ -8,74 +8,74 @@
 namespace Drupal\Core\TypedData;
 
 /**
- * Interface for all properties.
+ * Interface for typed data wrappers.
  */
 interface DataWrapperInterface {
 
   /**
-   * Creates a property object given its definition.
+   * Creates a wrapper object given its definition and value.
    *
    * @param array $definition
-   *   The definition of the property.
+   *   The data definition.
    * @param mixed $value
-   *   (optional) The value of the property, or NULL if the property is not set.
-   *    See DataWrapperInterface::setValue() for details.
+   *   (optional) The data value, or NULL if the it is not set. See
+   *   DataWrapperInterface::setValue() for details.
    * @param $context
-   *   (optional) An array describing the context of the property. It should be
-   *   passed if a property is created as part of a property container. The
-   *   following keys are supported:
+   *   (optional) An array describing the data's context. Allows data structures
+   *   to pass on context to derived property wrappers. The following keys are
+   *   supported:
    *   - name: The name of the property being created.
-   *   - parent: The parent object containing the property. Must be an instance of
-   *     \Drupal\Core\TypedData\DataStructureInterface.
+   *   - parent: The parent object containing the property. Must be an instance
+   *     of \Drupal\Core\TypedData\DataStructureInterface.
    *
    * @see drupal_get_property()
    */
   public function __construct(array $definition, $value = NULL, $context = array());
 
   /**
-   * Gets the data type of the property.
+   * Gets the data type.
    *
    * @return string
-   *   The data type of the property.
+   *   The data type of the wrapped data.
    */
   public function getType();
 
   /**
-   * Gets the definition of the property.
+   * Gets the data definition.
    *
    * @return array
-   *   The definition of the property.
+   *   The data definition array.
    */
   public function getDefinition();
 
   /**
-   * Gets the value of the property.
+   * Gets the data value.
    *
    * @return mixed
    */
   public function getValue();
 
   /**
-   * Sets the value of the property.
+   * Sets the data value.
    *
    * @param mixed $value
-   *   The value to set in the format as documented for the property's type or
-   *   NULL to unset the property.
+   *   The value to set in the format as documented for the data type or NULL to
+   *   unset the data value.
    *
    * @throws \Drupal\Core\TypedData\DataReadOnlyException
-   *   If the property is read-only.
+   *   If the data is read-only.
    */
   public function setValue($value);
 
   /**
-   * Returns a string representation of the property.
+   * Returns a string representation of the data.
    *
    * @return string
    */
   public function getString();
 
   /**
-   * Validates the property value.
+   * Validates the data value.
    *
    * @param mixed $value
    *   (optional) If specified, the given value is validated. Otherwise the

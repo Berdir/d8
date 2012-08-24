@@ -8,19 +8,19 @@ namespace Drupal\Core\TypedData\Type;
 use \Drupal\Core\TypedData\DataWrapperInterface;
 
 /**
- * Defines the 'language' property type, e.g. the computed 'language' property of language items.
+ * Defines the 'language' data type, e.g. the computed 'language' property of language items.
  */
 class Language implements DataWrapperInterface {
 
   /**
-   * The property definition.
+   * The data definition.
    *
    * @var array
    */
   protected $definition;
 
   /**
-   * The property holding the langcode.
+   * The data wrapper holding the langcode.
    *
    * @var \Drupal\Core\TypedData\DataWrapperInterface
    */

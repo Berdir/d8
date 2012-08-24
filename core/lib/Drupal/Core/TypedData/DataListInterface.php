@@ -11,6 +11,6 @@ use ArrayAccess;
 use Countable;
 
 /**
- * Interface for a list of properties.
+ * Interface for a list of typed data.
  */
 interface DataListInterface extends DataWrapperInterface, ArrayAccess, IteratorAggregate, Countable { }

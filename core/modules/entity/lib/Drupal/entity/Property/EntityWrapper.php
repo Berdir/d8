@@ -10,15 +10,15 @@ use \Drupal\Core\TypedData\DataStructureInterface;
 
 
 /**
- * Defines the 'entity' property type, e.g. the computed 'entity' property of entity references.
+ * Defines the 'entity' data type, e.g. the computed 'entity' property of entity references.
  *
- * This property implements the container interface, whereby most container
- * methods are just forwarded to the contained entity (if set).
+ * This wrapper implements the DataStructureInterface, whereby most of its
+ * methods are just forwarded to the wrapped entity (if set).
  */
 class EntityWrapper implements DataWrapperInterface, DataStructureInterface {
 
   /**
-   * The property definition.
+   * The data definition.
    *
    * @var array
    */
@@ -32,7 +32,7 @@ class EntityWrapper implements DataWrapperInterface, DataStructureInterface {
   protected $entityType;
 
   /**
-   * The property holding the entity ID.
+   * The data wrapper holding the entity ID.
    *
    * @var \Drupal\Core\TypedData\DataWrapperInterface
    */
