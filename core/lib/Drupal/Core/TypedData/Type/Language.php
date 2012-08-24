@@ -38,7 +38,7 @@ class Language implements DataWrapperInterface {
     else {
       // No context given, so just initialize an langcode property for storing
       // the code.
-      $this->langcode = drupal_get_property(array('type' => 'string'));
+      $this->langcode = drupal_wrap_data(array('type' => 'string'));
     }
 
     if (isset($value)) {

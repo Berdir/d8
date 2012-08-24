@@ -169,7 +169,7 @@ class EntityPropertyTest extends WebTestBase  {
       'entity type' => 'entity_test',
       'label' => t('Test entity'),
     );
-    $property_entity = drupal_get_property($definition);
+    $property_entity = drupal_wrap_data($definition);
     $definitions = $property_entity->getPropertyDefinitions($definition);
     $this->assertEqual($definitions['name']['type'], 'string_item', 'Name property found.');
     $this->assertEqual($definitions['user']['type'], 'entityreference_item', 'User property found.');
@@ -238,7 +238,7 @@ class EntityPropertyTest extends WebTestBase  {
       'entity type' => 'entity_test',
       'label' => t('Test entity'),
     );
-    $property = drupal_get_property($entity_definition, $entity);
+    $property = drupal_wrap_data($entity_definition, $entity);
 
     // For the test we navigate through the tree of contained properties and get
     // all contained strings, limited by a certain depth.

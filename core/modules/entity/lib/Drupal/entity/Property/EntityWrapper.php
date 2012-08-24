@@ -51,7 +51,7 @@ class EntityWrapper implements DataWrapperInterface, DataStructureInterface {
     else {
       // No context given, so just initialize an ID property for storing the
       // entity ID.
-      $this->id = drupal_get_property(array('type' => 'string'));
+      $this->id = drupal_wrap_data(array('type' => 'string'));
     }
 
     if (isset($value)) {

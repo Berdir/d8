@@ -7330,33 +7330,28 @@ function drupal_get_data_type_info() {
 }
 
 /**
- * Gets a property object.
+ * Wraps a data value into a typed data wrapper.
  *
  * @param array $definition
- *   The property's definition.
+ *   The data definition.
  * @param $value
- *   (optional) The property's value. If set, it has to match the property
- *   type's format.
+ *   (optional) The data value. If set, it has to match the data type format.
  * @param $context
- *   (optional) An array describing the context of the property. It should be
- *   passed if a property is created as part of a property container. The
+ *   (optional) An array describing the context of the data. It should be
+ *   passed if a data value is wrapped as part of a data structure. The
  *   following keys are supported:
- *   - name: The name of the property being created.
- *   - parent: The parent object containing the property. Must be an instance of
+ *   - name: The name of the data being wrapped.
+ *   - parent: The parent object containing the data. Must be an instance of
  *     \Drupal\Core\TypedData\DataStructureInterface.
  *
  * @return \Drupal\Core\TypedData\DataWrapperInterface
  *
  * @see drupal_get_data_type_info()
  */
-function drupal_get_property(array $definition, $value = NULL, $context = array()) {
-  $type_info = &drupal_static('data_type_info');
+function drupal_wrap_data(array $definition, $value = NULL, $context = array()) {
+  $type_info = drupal_get_data_type_info();
 
-  if (!isset($type_info)) {
-    drupal_get_data_type_info();
-  }
-
-  // Allow per-property definition overrides of the used classes.
+  // Allow per-data definition overrides of the used classes.
   $class_info = $definition + $type_info[$definition['type']];
   $class = empty($definition['list']) ? $class_info['class'] : $class_info['list class'];
   return new $class($definition, $value, $context);

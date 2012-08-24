@@ -99,7 +99,7 @@ class EntityNG extends Entity implements DataStructureInterface {
       $langcode = empty($definition['translatable']) ? LANGUAGE_NOT_SPECIFIED : $langcode;
 
       $value = isset($this->values[$property_name][$langcode]) ? $this->values[$property_name][$langcode] : NULL;
-      $this->properties[$property_name][$langcode] = drupal_get_property($definition, $value);
+      $this->properties[$property_name][$langcode] = drupal_wrap_data($definition, $value);
     }
     return $this->properties[$property_name][$langcode];
   }
