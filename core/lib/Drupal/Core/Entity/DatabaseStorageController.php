@@ -518,29 +518,32 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
    *   The node entity.
    */
   protected function saveRevision(EntityInterface $entity) {
-    $revision = clone $entity;
+    // Convert the entity into a array as it might not have the same properties
+    // as the entity, it is just a raw structure.
+    $record = (array) $entity;
+
     // When saving a new revision, set any existing revision ID to NULL so as to
     // ensure that a new revision will actually be created, then store the old
     // revision ID in a separate property for use by hook implementations.
-    if ($revision->isNewRevision() && $revision->{$this->revisionKey}) {
-      $revision->{$this->revisionKey} = NULL;
+    if ($entity->isNewRevision() && $record[$this->revisionKey]) {
+      $record[$this->revisionKey] = NULL;
     }
 
-    $this->preSaveRevision($revision);
+    $this->preSaveRevision($record, $entity);
 
-    if ($revision->isNewRevision()) {
-      drupal_write_record($this->revisionTable, $revision);
+    if ($entity->isNewRevision()) {
+      drupal_write_record($this->revisionTable, $record);
       db_update($this->entityInfo['base table'])
-        ->fields(array($this->revisionKey => $revision->getRevisionId()))
-        ->condition($this->idKey, $revision->id())
+        ->fields(array($this->revisionKey => $record[$this->revisionKey]))
+        ->condition($this->idKey, $entity->id())
         ->execute();
       $entity->setNewRevision(FALSE);
     }
     else {
-      drupal_write_record($this->revisionTable, $revision, $this->revisionKey);
+      drupal_write_record($this->revisionTable, $record, $this->revisionKey);
     }
     // Make sure to update the new revision key for the entity.
-    $entity->{$this->revisionKey} = $revision->getRevisionId();
+    $entity->{$this->revisionKey} = $record[$this->revisionKey];
 
     // Mark this revision as the current one.
     $entity->isCurrentRevision = TRUE;
@@ -582,10 +585,12 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
   /**
    * Act on a revision before being saved.
    *
-   * @param Drupal\entity\EntityInterface $revision
+   * @param array $record
+   *   The revision array.
+   * @param Drupal\entity\EntityInterface $entity
    *   The entity object.
    */
-  protected function preSaveRevision(EntityInterface $revision) { }
+  protected function preSaveRevision(array &$record, EntityInterface $entity) { }
 
   /**
    * Invokes a hook on behalf of the entity.

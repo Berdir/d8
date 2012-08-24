@@ -9,8 +9,6 @@ namespace Drupal\node;
 
 use Drupal\Core\Entity\DatabaseStorageController;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityStorageException;
-use Exception;
 
 /**
  * Controller class for nodes.
@@ -102,8 +100,8 @@ class NodeStorageController extends DatabaseStorageController {
   /**
    * Overrides Drupal\entity\DatabaseStorageController::preSaveRevision().
    */
-  protected function preSaveRevision(EntityInterface $revision) {
-    if ($revision->isNewRevision()) {
+  protected function preSaveRevision(array &$record, EntityInterface $entity) {
+    if ($entity->isNewRevision()) {
       // When inserting either a new node or a new node revision, $node->log
       // must be set because {node_revision}.log is a text column and therefore
       // cannot have a default value. However, it might not be set at this
@@ -112,23 +110,23 @@ class NodeStorageController extends DatabaseStorageController {
       // empty string in that case.
       // @todo: Make the {node_revision}.log column nullable so that we can
       // remove this check.
-      if (!isset($revision->log)) {
-        $revision->log = '';
+      if (!isset($record['log'])) {
+        $record['log'] = '';
       }
     }
-    elseif (!isset($revision->log) || $revision->log === '') {
+    elseif (!isset($record['log']) || $record['log'] === '') {
       // If we are updating an existing node without adding a new revision, we
       // need to make sure $node->log is unset whenever it is empty. As long as
       // $node->log is unset, drupal_write_record() will not attempt to update
       // the existing database column when re-saving the revision; therefore,
       // this code allows us to avoid clobbering an existing log entry with an
       // empty one.
-      unset($revision->log);
+      unset($record['log']);
     }
 
-    if ($revision->isNewRevision()) {
-      $revision->timestamp = REQUEST_TIME;
-      $revision->uid = isset($revision->revision_uid) ? $revision->revision_uid : $GLOBALS['user']->uid;
+    if ($entity->isNewRevision()) {
+      $record['timestamp'] = REQUEST_TIME;
+      $record['uid'] = isset($record['revision_uid']) ? $record['revision_uid'] : $GLOBALS['user']->uid;
     }
   }
 
