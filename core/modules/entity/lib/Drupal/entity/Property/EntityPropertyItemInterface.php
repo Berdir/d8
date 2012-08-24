@@ -9,6 +9,7 @@ namespace Drupal\entity\Property;
 
 use Drupal\Core\TypedData\DataStructureInterface;
 use Drupal\Core\TypedData\DataWrapperInterface;
+use Drupal\Core\TypedData\DataAccessInterface;
 
 /**
  * Interface for entity property items, which are property container that may
@@ -18,18 +19,6 @@ use Drupal\Core\TypedData\DataWrapperInterface;
  * @see EntityPropertyItem
  */
 interface EntityPropertyItemInterface extends DataStructureInterface, DataWrapperInterface {
-
-  /**
-   * Check entity property access.
-   *
-   * @param \Drupal\user\User $account
-   *   (optional) The user account to check access for. Defaults to the current
-   *   user.
-   *
-   * @return bool
-   *   Whether the given user has access.
-   */
-  public function access($account = NULL);
 
   /**
    * Returns a property.

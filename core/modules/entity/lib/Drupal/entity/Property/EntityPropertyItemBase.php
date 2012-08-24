@@ -8,6 +8,7 @@
 namespace Drupal\entity\Property;
 use \Drupal\Core\TypedData\DataWrapperInterface;
 use \Drupal\Core\TypedData\DataStructureInterface;
+use Drupal\user;
 
 /**
  * An entity property item.
@@ -132,7 +133,7 @@ abstract class EntityPropertyItemBase implements EntityPropertyItemInterface {
   /**
    * Implements DataWrapperInterface::validate().
    */
-  public function validate($value = NULL) {
+  public function validate() {
     // @todo implement
   }
 
@@ -218,9 +219,5 @@ abstract class EntityPropertyItemBase implements EntityPropertyItemInterface {
     foreach ($this->properties as $name => $property) {
       $this->properties[$name] = clone $property;
     }
-  }
-
-  public function access($account = NULL) {
-    // @todo implement
   }
 }

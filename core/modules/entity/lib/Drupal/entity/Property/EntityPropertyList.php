@@ -6,6 +6,7 @@
  */
 
 namespace Drupal\entity\Property;
+use Drupal\user\User;
 
 /**
  * An entity property list.
@@ -127,7 +128,7 @@ class EntityPropertyList implements EntityPropertyListInterface {
   /**
    * Implements DataWrapperInterface::validate().
    */
-  public function validate($value = NULL) {
+  public function validate() {
     // @todo implement
   }
 
@@ -266,7 +267,10 @@ class EntityPropertyList implements EntityPropertyListInterface {
     }
   }
 
-  public function access($account = NULL) {
+  /**
+   * Implements DataAccessInterface::access().
+   */
+  public function access(User $account = NULL) {
     // TODO: Implement access() method. Use item access.
   }
 }

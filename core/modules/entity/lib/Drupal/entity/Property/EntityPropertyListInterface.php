@@ -8,6 +8,7 @@
 namespace Drupal\entity\Property;
 use Drupal\Core\TypedData\DataListInterface;
 use Drupal\Core\TypedData\DataWrapperInterface;
+use Drupal\Core\TypedData\DataAccessInterface;
 
 /**
  * Interface for entity properties, being lists of property items.
@@ -21,7 +22,7 @@ use Drupal\Core\TypedData\DataWrapperInterface;
  * @todo: Should getProperties(), setProperties() and getPropertyDefinitions()
  * be delegated as well.
  */
-interface EntityPropertyListInterface extends DataListInterface, DataWrapperInterface {
+interface EntityPropertyListInterface extends DataListInterface, DataWrapperInterface, DataAccessInterface {
 
   /**
    * Delegated to the first item.
@@ -39,17 +40,5 @@ interface EntityPropertyListInterface extends DataListInterface, DataWrapperInte
    * Magic setter: Delegated to the first item.
    */
   public function __set($name, $value);
-
-  /**
-   * Check entity property access.
-   *
-   * @param \Drupal\user\User $account
-   *   (optional) The user account to check access for. Defaults to the current
-   *   user.
-   *
-   * @return bool
-   *   Whether the given user has access.
-   */
-  public function access($account = NULL);
 
 }

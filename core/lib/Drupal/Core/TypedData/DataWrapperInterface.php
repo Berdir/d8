@@ -6,6 +6,7 @@
  */
 
 namespace Drupal\Core\TypedData;
+use Drupal\user;
 
 /**
  * Interface for typed data wrappers.
@@ -75,11 +76,8 @@ interface DataWrapperInterface {
   public function getString();
 
   /**
-   * Validates the data value.
-   *
-   * @param mixed $value
-   *   (optional) If specified, the given value is validated. Otherwise the
-   *   currently set value is validated.
+   * Validates the currently set data value.
    */
-  public function validate($value = NULL);
+  public function validate();
+
 }
