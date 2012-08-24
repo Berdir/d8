@@ -21,14 +21,14 @@ interface DataWrapperInterface {
    *   (optional) The data value, or NULL if the it is not set. See
    *   DataWrapperInterface::setValue() for details.
    * @param $context
-   *   (optional) An array describing the data's context. Allows data structures
-   *   to pass on context to derived property wrappers. The following keys are
-   *   supported:
-   *   - name: The name of the property being created.
-   *   - parent: The parent object containing the property. Must be an instance
-   *     of \Drupal\Core\TypedData\DataStructureInterface.
+   *   (optional) An array describing the context of the data. It should be
+   *   passed if a data value is wrapped as part of a data structure. The
+   *   following keys are supported:
+   *   - name: The name of the data being wrapped.
+   *   - parent: The parent object containing the data. Must be an instance of
+   *     \Drupal\Core\TypedData\DataStructureInterface.
    *
-   * @see drupal_get_property()
+   * @see drupal_wrap_data()
    */
   public function __construct(array $definition, $value = NULL, $context = array());
 
