@@ -130,13 +130,13 @@ class RegisterFormController extends AccountFormController {
     // No administrator approval required.
     elseif ($account->status || $notify) {
       if (empty($account->mail) && $notify) {
-        drupal_set_message(t('The new user <a href="@url">%name</a> was created without an email address, so no welcome message was sent.', array('@url' => url($uri['path'], $uri['options']), '%name' => $account->name)));
+        drupal_set_message(t('The new user <a href="@url">%name</a> was created without an email address, so no welcome message was sent.', array('@url' => entity_url($account), '%name' => $account->name)));
       }
       else {
         $op = $notify ? 'register_admin_created' : 'register_no_approval_required';
         _user_mail_notify($op, $account);
         if ($notify) {
-          drupal_set_message(t('A welcome message with further instructions has been e-mailed to the new user <a href="@url">%name</a>.', array('@url' => url($uri['path'], $uri['options']), '%name' => $account->name)));
+          drupal_set_message(t('A welcome message with further instructions has been e-mailed to the new user <a href="@url">%name</a>.', array('@url' => entity_url($account), '%name' => $account->name)));
         }
         else {
           drupal_set_message(t('A welcome message with further instructions has been sent to your e-mail address.'));
