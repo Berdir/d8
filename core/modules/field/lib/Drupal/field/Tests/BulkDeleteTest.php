@@ -157,8 +157,7 @@ class BulkDeleteTest extends FieldTestBase {
     $field = reset($this->fields);
 
     // There are 10 entities of this bundle.
-    $query = new EntityFieldQuery();
-    $found = $query
+    $found = entity_query()
       ->fieldCondition($field)
       ->entityCondition('bundle', $bundle)
       ->execute();
@@ -174,8 +173,7 @@ class BulkDeleteTest extends FieldTestBase {
     $this->assertEqual($instances[0]['bundle'], $bundle, 'The deleted instance is for the correct bundle');
 
     // There are 0 entities of this bundle with non-deleted data.
-    $query = new EntityFieldQuery();
-    $found = $query
+    $found = entity_query()
       ->fieldCondition($field)
       ->entityCondition('bundle', $bundle)
       ->execute();
@@ -183,8 +181,7 @@ class BulkDeleteTest extends FieldTestBase {
 
     // There are 10 entities of this bundle when deleted fields are allowed, and
     // their values are correct.
-    $query = new EntityFieldQuery();
-    $found = $query
+    $found = entity_query()
       ->fieldCondition($field)
       ->entityCondition('bundle', $bundle)
       ->deleted(TRUE)
@@ -225,8 +222,7 @@ class BulkDeleteTest extends FieldTestBase {
       field_purge_batch($batch_size);
 
       // There are $count deleted entities left.
-      $query = new EntityFieldQuery();
-      $found = $query
+      $found = entity_query()
         ->fieldCondition($field)
         ->entityCondition('bundle', $bundle)
         ->deleted(TRUE)

@@ -33,9 +33,8 @@ function entity_query_access_test_sample_query($field_name) {
   $access = &drupal_static('node_access_view_all_nodes');
   $access[$user->uid] = FALSE;
 
-  $query = new EntityFieldQuery();
-  $query
-    ->entityCondition('entity_type', 'test_entity_bundle_key')
+  debug('hi');
+  $query = entity_query('test_entity_bundle_key')
     ->fieldCondition($field_name, 'value', 0, '>')
     ->entityOrderBy('entity_id', 'ASC');
   $results = array(

@@ -152,8 +152,9 @@ function node_access_test_page() {
 function node_access_entity_test_page() {
   $output = '';
   try {
-    $query = new EntityFieldQuery;
-    $result = $query->fieldCondition('body', 'value', 'A', 'STARTS_WITH')->execute();
+    $result = entity_query()
+      ->fieldCondition('body', 'value', 'A', 'STARTS_WITH')
+      ->execute();
     if (!empty($result['node'])) {
       $output .= '<p>Yes, ' . count($result['node']) . ' nodes</p>';
       $output .= '<ul>';

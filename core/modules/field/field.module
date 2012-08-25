@@ -969,8 +969,7 @@ function field_get_items($entity_type, $entity, $field_name, $langcode = NULL) {
  *   TRUE if the field has data for any entity; FALSE otherwise.
  */
 function field_has_data($field) {
-  $query = new EntityFieldQuery();
-  return (bool) $query
+  return (bool) entity_query()
     ->fieldCondition($field)
     ->range(0, 1)
     ->count()
