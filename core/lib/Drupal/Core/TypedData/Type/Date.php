@@ -2,16 +2,16 @@
 
 /**
  * @file
- * Definition of Drupal\Core\TypedData\Type\String.
+ * Definition of Drupal\Core\TypedData\Type\Date.
  */
 
 namespace Drupal\Core\TypedData\Type;
 use Drupal\Core\TypedData\DataWrapperInterface;
 
 /**
- * The string data type.
+ * The date data type.
  */
-class String implements DataWrapperInterface {
+class Date implements DataWrapperInterface {
 
   /**
    * The data definition.
@@ -23,7 +23,7 @@ class String implements DataWrapperInterface {
   /**
    * The data value.
    *
-   * @var string
+   * @var integer
    */
   protected $value;
 
@@ -55,7 +55,7 @@ class String implements DataWrapperInterface {
    * Implements DataWrapperInterface::getValue().
    */
   public function getValue() {
-    return $this->value;
+    return new \DateTime($this->value);
   }
 
   /**
@@ -69,7 +69,7 @@ class String implements DataWrapperInterface {
    * Implements DataWrapperInterface::getString().
    */
   public function getString() {
-    return (string) $this->value;
+    return (string) $this->getValue()->format(DateTime::ISO8601);
   }
 
   /**

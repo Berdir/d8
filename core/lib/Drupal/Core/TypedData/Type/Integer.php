@@ -9,7 +9,7 @@ namespace Drupal\Core\TypedData\Type;
 use Drupal\Core\TypedData\DataWrapperInterface;
 
 /**
- * The string data type.
+ * The integer data type.
  */
 class Integer implements DataWrapperInterface {
 
@@ -75,7 +75,7 @@ class Integer implements DataWrapperInterface {
   /**
    * Implements DataWrapperInterface::validate().
    */
-  public function validate($value = NULL) {
+  public function validate() {
     // TODO: Implement validate() method.
   }
 }

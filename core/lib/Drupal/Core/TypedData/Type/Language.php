@@ -99,7 +99,7 @@ class Language implements DataWrapperInterface {
   /**
    * Implements DataWrapperInterface::validate().
    */
-  public function validate($value = NULL) {
+  public function validate() {
     // TODO: Implement validate() method.
   }
 }

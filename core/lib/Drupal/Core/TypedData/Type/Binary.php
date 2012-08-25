@@ -2,16 +2,20 @@
 
 /**
  * @file
- * Definition of Drupal\Core\TypedData\Type\String.
+ * Definition of Drupal\Core\TypedData\Type\Binary.
  */
 
 namespace Drupal\Core\TypedData\Type;
 use Drupal\Core\TypedData\DataWrapperInterface;
 
 /**
- * The string data type.
+ * The binary data type.
+ *
+ * @todo
+ *   Consider to use either the URI data wrapper or Drupal's stream wrapper API
+ *   to handle the file.
  */
-class String implements DataWrapperInterface {
+class Binary implements DataWrapperInterface {
 
   /**
    * The data definition.
@@ -21,11 +25,18 @@ class String implements DataWrapperInterface {
   protected $definition;
 
   /**
-   * The data value.
+   * The filename of the binary file.
    *
    * @var string
    */
-  protected $value;
+  protected $filename = NULL;
+
+  /**
+   * Resource pointer to the file.
+   *
+   * @var mixed
+   */
+  protected $handle = NULL;
 
   /**
    * Implements DataWrapperInterface::__construct().
@@ -34,6 +45,15 @@ class String implements DataWrapperInterface {
     $this->definition = $definition;
     if (isset($value)) {
       $this->setValue($value);
+    }
+  }
+
+  /**
+   * Close file resource handle when desctructing this wrapper.
+   */
+  public function __destruct() {
+    if ($this->handle !== NULL) {
+      fclose($this->handle);
     }
   }
 
@@ -55,21 +75,27 @@ class String implements DataWrapperInterface {
    * Implements DataWrapperInterface::getValue().
    */
   public function getValue() {
-    return $this->value;
+    if (file_exists($this->filename)) {
+      $this->handle = fopen($this->filename);
+      return fread($this->handle, filesize($this->filename));
+    }
+    else {
+      return NULL;
+    }
   }
 
   /**
    * Implements DataWrapperInterface::setValue().
    */
   public function setValue($value) {
-    $this->value = $value;
+    $this->filename = $value;
   }
 
   /**
    * Implements DataWrapperInterface::getString().
    */
   public function getString() {
-    return (string) $this->value;
+    return base64_encode($this->getValue());
   }
 
   /**

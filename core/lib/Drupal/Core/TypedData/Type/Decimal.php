@@ -2,16 +2,16 @@
 
 /**
  * @file
- * Definition of Drupal\Core\TypedData\Type\String.
+ * Definition of Drupal\Core\TypedData\Type\Decimal.
  */
 
 namespace Drupal\Core\TypedData\Type;
 use Drupal\Core\TypedData\DataWrapperInterface;
 
 /**
- * The string data type.
+ * The decimal data type.
  */
-class String implements DataWrapperInterface {
+class Decimal implements DataWrapperInterface {
 
   /**
    * The data definition.
@@ -23,7 +23,7 @@ class String implements DataWrapperInterface {
   /**
    * The data value.
    *
-   * @var string
+   * @var integer
    */
   protected $value;
 

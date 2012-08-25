@@ -1878,6 +1878,11 @@ function system_stream_wrappers() {
  */
 function system_data_type_info() {
   return array(
+    'boolean' => array(
+      'label' => t('Boolean'),
+      'class' => '\Drupal\Core\TypedData\Type\Boolean',
+      'primitive type' => DataPrimitive::BOOLEAN,
+    ),
     'string' => array(
       'label' => t('String'),
       'class' => '\Drupal\Core\TypedData\Type\String',
@@ -1887,6 +1892,31 @@ function system_data_type_info() {
       'label' => t('Integer'),
       'class' => '\Drupal\Core\TypedData\Type\Integer',
       'primitive type' => DataPrimitive::INTEGER,
+    ),
+    'decimal' => array(
+      'label' => t('Decimal'),
+      'class' => '\Drupal\Core\TypedData\Type\Decimal',
+      'primitive type' => DataPrimitive::DECIMAL,
+    ),
+    'date' => array(
+      'label' => t('Date'),
+      'class' => '\Drupal\Core\TypedData\Type\Date',
+      'primitive type' => DataPrimitive::DATE,
+    ),
+    'duration' => array(
+      'label' => t('Duration'),
+      'class' => '\Drupal\Core\TypedData\Type\Duration',
+      'primitive type' => DataPrimitive::DURATION,
+    ),
+    'uri' => array(
+      'label' => t('URI'),
+      'class' => '\Drupal\Core\TypedData\Type\Uri',
+      'primitive type' => DataPrimitive::URI,
+    ),
+    'binary' => array(
+      'label' => t('Binary'),
+      'class' => '\Drupal\Core\TypedData\Type\Binary',
+      'primitive type' => DataPrimitive::BINARY,
     ),
     'language' => array(
       'label' => t('Language'),
