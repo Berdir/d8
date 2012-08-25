@@ -169,8 +169,8 @@ class EntityPropertyTest extends WebTestBase  {
       'entity type' => 'entity_test',
       'label' => t('Test entity'),
     );
-    $property_entity = drupal_wrap_data($definition);
-    $definitions = $property_entity->getPropertyDefinitions($definition);
+    $wrapped_entity = drupal_wrap_data($definition);
+    $definitions = $wrapped_entity->getPropertyDefinitions($definition);
     $this->assertEqual($definitions['name']['type'], 'string_item', 'Name property found.');
     $this->assertEqual($definitions['user_id']['type'], 'entityreference_item', 'User property found.');
     $this->assertEqual($definitions['field_test_text']['type'], 'text_item', 'Test-text-field property found.');
@@ -238,12 +238,12 @@ class EntityPropertyTest extends WebTestBase  {
       'entity type' => 'entity_test',
       'label' => t('Test entity'),
     );
-    $property = drupal_wrap_data($entity_definition, $entity);
+    $wrapped_entity = drupal_wrap_data($entity_definition, $entity);
 
     // For the test we navigate through the tree of contained properties and get
     // all contained strings, limited by a certain depth.
     $strings = array();
-    $this->getContainedStrings($property, 0, $strings);
+    $this->getContainedStrings($wrapped_entity, 0, $strings);
 
     // @todo: Once the user entity has defined properties this should contain
     // the user name and other user entity strings as well.
@@ -262,21 +262,21 @@ class EntityPropertyTest extends WebTestBase  {
    * Recursive helper for getting all contained strings,
    * i.e. properties of type string.
    */
-  public function getContainedStrings(DataWrapperInterface $data_item, $depth, array &$strings) {
+  public function getContainedStrings(DataWrapperInterface $wrapper, $depth, array &$strings) {
 
-    if ($data_item->getType() == 'string') {
-      $strings[] = $data_item->getValue();
+    if ($wrapper->getType() == 'string') {
+      $strings[] = $wrapper->getValue();
     }
 
     // Recurse until a certain depth is reached if possible.
     if ($depth < 7) {
-      if ($data_item instanceof \Drupal\Core\TypedData\DataListInterface) {
-        foreach ($data_item as $item) {
+      if ($wrapper instanceof \Drupal\Core\TypedData\DataListInterface) {
+        foreach ($wrapper as $item) {
           $this->getContainedStrings($item, $depth + 1, $strings);
         }
       }
-      elseif ($data_item instanceof \Drupal\Core\TypedData\DataStructureInterface) {
-        foreach ($data_item as $name => $property) {
+      elseif ($wrapper instanceof \Drupal\Core\TypedData\DataStructureInterface) {
+        foreach ($wrapper as $name => $property) {
           $this->getContainedStrings($property, $depth + 1, $strings);
         }
       }
