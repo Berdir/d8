@@ -20,7 +20,7 @@ class Language implements DataWrapperInterface {
   protected $definition;
 
   /**
-   * The data wrapper holding the langcode.
+   * The data wrapper holding the langcode value.
    *
    * @var \Drupal\Core\TypedData\DataWrapperInterface
    */
@@ -33,7 +33,7 @@ class Language implements DataWrapperInterface {
     $this->definition = $definition;
 
     if (isset($context['parent'])) {
-      $this->langcode = $context['parent']->get('langcode');
+      $this->langcode = $context['parent']->get('value');
     }
     else {
       // No context given, so just initialize an langcode property for storing

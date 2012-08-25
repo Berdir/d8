@@ -75,7 +75,7 @@ class EntityTranslationTest extends WebTestBase {
   function testEntityLanguageMethods() {
     $entity = entity_create('entity_test', array(
       'name' => 'test',
-      'uid' => $GLOBALS['user']->uid,
+      'user_id' => $GLOBALS['user']->uid,
     ));
     $this->assertEqual($entity->language()->langcode, LANGUAGE_NOT_SPECIFIED, 'Entity language not specified.');
     $this->assertFalse($entity->translations(), 'No translations are available');
@@ -98,7 +98,7 @@ class EntityTranslationTest extends WebTestBase {
 
     // Now, make the entity language-specific by assigning a language and test
     // translating it.
-    $entity->language->object = $this->langcodes[0];
+    $entity->langcode->language = $this->langcodes[0];
     $entity->{$this->field_name} = array();
     $this->assertEqual($entity->language(), language_load($this->langcodes[0]), 'Entity language retrieved.');
     $this->assertFalse($entity->translations(), 'No translations are available');
@@ -149,33 +149,33 @@ class EntityTranslationTest extends WebTestBase {
 
     // Create a language neutral entity and check that properties are stored
     // as language neutral.
-    $entity = entity_create('entity_test', array('name' => $name, 'user' => $uid));
+    $entity = entity_create('entity_test', array('name' => $name, 'user_id' => $uid));
     $entity->save();
     $entity = entity_test_load($entity->id());
     $this->assertEqual($entity->language()->langcode, LANGUAGE_NOT_SPECIFIED, 'Entity created as language neutral.');
     $this->assertEqual($name, $entity->get('name', LANGUAGE_NOT_SPECIFIED)->value, 'The entity name has been correctly stored as language neutral.');
-    $this->assertEqual($uid, $entity->get('user', LANGUAGE_NOT_SPECIFIED)->id, 'The entity author has been correctly stored as language neutral.');
+    $this->assertEqual($uid, $entity->get('user_id', LANGUAGE_NOT_SPECIFIED)->value, 'The entity author has been correctly stored as language neutral.');
     // As fields, translatable properties should ignore the given langcode and
     // use neutral language if the entity is not translatable.
     $this->assertEqual($name, $entity->get('name', $langcode)->value, 'The entity name defaults to neutral language.');
-    $this->assertEqual($uid, $entity->get('user', $langcode)->id, 'The entity author defaults to neutral language.');
+    $this->assertEqual($uid, $entity->get('user_id', $langcode)->value, 'The entity author defaults to neutral language.');
     $this->assertEqual($name, $entity->get('name')->value, 'The entity name can be retrieved without specifying a language.');
-    $this->assertEqual($uid, $entity->get('user')->id, 'The entity author can be retrieved without specifying a language.');
+    $this->assertEqual($uid, $entity->get('user_id')->value, 'The entity author can be retrieved without specifying a language.');
 
     // Create a language-aware entity and check that properties are stored
     // as language-aware.
-    $entity = entity_create('entity_test', array('name' => $name, 'user' => $uid, 'language' => $langcode));
+    $entity = entity_create('entity_test', array('name' => $name, 'user_id' => $uid, 'langcode' => $langcode));
     $entity->save();
     $entity = entity_test_load($entity->id());
     $this->assertEqual($entity->language()->langcode, $langcode, 'Entity created as language specific.');
     $this->assertEqual($name, $entity->get('name', $langcode)->value, 'The entity name has been correctly stored as a language-aware property.');
-    $this->assertEqual($uid, $entity->get('user', $langcode)->id, 'The entity author has been correctly stored as a language-aware property.');
+    $this->assertEqual($uid, $entity->get('user_id', $langcode)->value, 'The entity author has been correctly stored as a language-aware property.');
     // Translatable properties on a translatable entity should use default
     // language if LANGUAGE_NOT_SPECIFIED is passed.
     $this->assertEqual($name, $entity->get('name', LANGUAGE_NOT_SPECIFIED)->value, 'The entity name defaults to the default language.');
-    $this->assertEqual($uid, $entity->get('user', LANGUAGE_NOT_SPECIFIED)->id, 'The entity author defaults to the default language.');
+    $this->assertEqual($uid, $entity->get('user_id', LANGUAGE_NOT_SPECIFIED)->value, 'The entity author defaults to the default language.');
     $this->assertEqual($name, $entity->get('name')->value, 'The entity name can be retrieved without specifying a language.');
-    $this->assertEqual($uid, $entity->get('user')->id, 'The entity author can be retrieved without specifying a language.');
+    $this->assertEqual($uid, $entity->get('user_id')->value, 'The entity author can be retrieved without specifying a language.');
 
     // Create property translations.
     $properties = array();
@@ -184,13 +184,13 @@ class EntityTranslationTest extends WebTestBase {
       if ($langcode != $default_langcode) {
         $properties[$langcode] = array(
           'name' => array(0 => $this->randomName()),
-          'user' => array(0 => mt_rand(0, 127)),
+          'user_id' => array(0 => mt_rand(0, 127)),
         );
       }
       else {
         $properties[$langcode] = array(
           'name' => array(0 => $name),
-          'user' => array(0 => $uid),
+          'user_id' => array(0 => $uid),
         );
       }
       $entity->getTranslation($langcode)->setProperties($properties[$langcode]);
@@ -202,7 +202,7 @@ class EntityTranslationTest extends WebTestBase {
     foreach ($this->langcodes as $langcode) {
       $args = array('%langcode' => $langcode);
       $this->assertEqual($properties[$langcode]['name'][0], $entity->get('name', $langcode)->value, format_string('The entity name has been correctly stored for language %langcode.', $args));
-      $this->assertEqual($properties[$langcode]['user'][0], $entity->get('user', $langcode)->id, format_string('The entity author has been correctly stored for language %langcode.', $args));
+      $this->assertEqual($properties[$langcode]['user_id'][0], $entity->get('user_id', $langcode)->value, format_string('The entity author has been correctly stored for language %langcode.', $args));
     }
 
     // Test query conditions (cache is reset at each call).
@@ -211,7 +211,7 @@ class EntityTranslationTest extends WebTestBase {
     // original language is the same of one used for a translation.
     $langcode = $this->langcodes[1];
     entity_create('entity_test', array(
-      'user' => $properties[$langcode]['user'],
+      'user_id' => $properties[$langcode]['user_id'],
       'name' => 'some name',
     ))->save();
 
@@ -232,7 +232,7 @@ class EntityTranslationTest extends WebTestBase {
     $this->assertEqual(count($entities), 0, 'No entity loaded by name translation specifying the translation language.');
     $entities = entity_load_multiple_by_properties('entity_test', array('langcode' => $langcode, 'name' => $properties[$langcode]['name'][0], 'default_langcode' => 0));
     $this->assertEqual(count($entities), 1, 'One entity loaded by name translation and language specifying to look for translations.');
-    $entities = entity_load_multiple_by_properties('entity_test', array('uid' => $properties[$langcode]['user'][0], 'default_langcode' => NULL));
+    $entities = entity_load_multiple_by_properties('entity_test', array('user_id' => $properties[$langcode]['user_id'][0], 'default_langcode' => NULL));
     $this->assertEqual(count($entities), 2, 'Two entities loaded by uid without caring about property translatability.');
   }
 }

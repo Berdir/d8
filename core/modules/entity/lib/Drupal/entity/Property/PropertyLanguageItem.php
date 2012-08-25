@@ -21,11 +21,11 @@ class PropertyLanguageItem extends EntityPropertyItemBase {
     $definitions = &drupal_static(__CLASS__);
 
     if (!isset($definitions)) {
-      $definitions['langcode'] = array(
+      $definitions['value'] = array(
         'type' => 'string',
         'label' => t('Language code'),
       );
-      $definitions['object'] = array(
+      $definitions['language'] = array(
         'type' => 'language',
         'label' => t('Language object'),
         // The language object is retrieved via the language code.
@@ -43,18 +43,18 @@ class PropertyLanguageItem extends EntityPropertyItemBase {
     // Treat the values as property value of the object property, if no array
     // is given.
     if (!is_array($values)) {
-      $values = array('object' => $values);
+      $values = array('language' => $values);
     }
 
     // Language is computed out of the langcode, so we only need to update the
     // langcode. Only set the language property if no langcode is given.
-    if (!empty($values['langcode'])) {
-      $this->properties['langcode']->setValue($values['langcode']);
+    if (!empty($values['value'])) {
+      $this->properties['value']->setValue($values['value']);
     }
     else {
-      $this->properties['object']->setValue(isset($values['object']) ? $values['object'] : NULL);
+      $this->properties['language']->setValue(isset($values['language']) ? $values['language'] : NULL);
     }
-    unset($values['object'], $values['langcode']);
+    unset($values['language'], $values['value']);
     if ($values) {
       throw new \InvalidArgumentException('Property ' . key($values) . ' is unknown.');
     }

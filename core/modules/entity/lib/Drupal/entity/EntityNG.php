@@ -76,7 +76,7 @@ class EntityNG extends Entity implements DataStructureInterface {
     // matches the default language. Then, if the default language is
     // LANGUAGE_NOT_SPECIFIED, the entity is not translatable, so we always use
     // LANGUAGE_NOT_SPECIFIED.
-    if (!isset($langcode) || $langcode == $this->language->langcode || LANGUAGE_NOT_SPECIFIED == $this->language->langcode) {
+    if (!isset($langcode) || $langcode == $this->langcode->value || LANGUAGE_NOT_SPECIFIED == $this->langcode->value) {
       // @todo: Find a more meaningful constant name and make field loading use
       // it too.
       $langcode = LANGUAGE_NOT_SPECIFIED;
@@ -178,7 +178,7 @@ class EntityNG extends Entity implements DataStructureInterface {
   public function language() {
     // @todo: Check for language.module instead, once Field API language
     // handling depends upon it too.
-    return module_exists('locale') ? $this->language->object : FALSE;
+    return module_exists('locale') ? $this->langcode->language : FALSE;
   }
 
   /**
@@ -189,7 +189,7 @@ class EntityNG extends Entity implements DataStructureInterface {
    */
   public function getTranslation($langcode) {
 
-    if ($langcode == LANGUAGE_NOT_SPECIFIED || $langcode == $this->get('language')->langcode) {
+    if ($langcode == LANGUAGE_NOT_SPECIFIED || $langcode == $this->get('langcode')->value) {
       // No translation need, return the entity.
       return $this;
     }

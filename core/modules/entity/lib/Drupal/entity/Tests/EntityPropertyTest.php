@@ -46,7 +46,7 @@ class EntityPropertyTest extends WebTestBase  {
     // Pass in the value of the name property when creating. With the user
     // property we test setting a property after creation.
     $entity = entity_create('entity_test', array());
-    $entity->user->id = $this->entity_user->uid;
+    $entity->user_id->value = $this->entity_user->uid;
     $entity->name->value = $this->entity_name;
 
     // Set a value for the test field.
@@ -80,38 +80,38 @@ class EntityPropertyTest extends WebTestBase  {
     $this->assertEqual($new_name, $entity->name->value, 'Name can be updated and read through list access.');
 
     // Access the user property.
-    $this->assertTrue($entity->user instanceof EntityPropertyListInterface, 'Property implements interface');
-    $this->assertTrue($entity->user[0] instanceof EntityPropertyItemInterface, 'Property item implements interface');
+    $this->assertTrue($entity->user_id instanceof EntityPropertyListInterface, 'Property implements interface');
+    $this->assertTrue($entity->user_id[0] instanceof EntityPropertyItemInterface, 'Property item implements interface');
 
-    $this->assertEqual($this->entity_user->uid, $entity->user->id, 'User id can be read.');
-    $this->assertEqual($this->entity_user->name, $entity->user->entity->name, 'User name can be read.');
+    $this->assertEqual($this->entity_user->uid, $entity->user_id->value, 'User id can be read.');
+    $this->assertEqual($this->entity_user->name, $entity->user_id->entity->name, 'User name can be read.');
 
     // Change the assigned user by entity.
     $new_user = $this->drupalCreateUser();
-    $entity->user->entity = $new_user;
-    $this->assertEqual($new_user->uid, $entity->user->id, 'Updated user id can be read.');
-    $this->assertEqual($new_user->name, $entity->user->entity->name, 'Updated user name value can be read.');
+    $entity->user_id->entity = $new_user;
+    $this->assertEqual($new_user->uid, $entity->user_id->value, 'Updated user id can be read.');
+    $this->assertEqual($new_user->name, $entity->user_id->entity->name, 'Updated user name value can be read.');
 
     // Change the assigned user by id.
     $new_user = $this->drupalCreateUser();
-    $entity->user->id = $new_user->uid;
-    $this->assertEqual($new_user->uid, $entity->user->id, 'Updated user id can be read.');
-    $this->assertEqual($new_user->name, $entity->user->entity->name, 'Updated user name value can be read.');
+    $entity->user_id->value = $new_user->uid;
+    $this->assertEqual($new_user->uid, $entity->user_id->value, 'Updated user id can be read.');
+    $this->assertEqual($new_user->name, $entity->user_id->entity->name, 'Updated user name value can be read.');
 
     // Access the language property.
-    $this->assertEqual(LANGUAGE_NOT_SPECIFIED, $entity->language->langcode, 'Language code can be read.');
-    $this->assertEqual(language_load(LANGUAGE_NOT_SPECIFIED), $entity->language->object, 'Language object can be read.');
+    $this->assertEqual(LANGUAGE_NOT_SPECIFIED, $entity->langcode->value, 'Language code can be read.');
+    $this->assertEqual(language_load(LANGUAGE_NOT_SPECIFIED), $entity->langcode->language, 'Language object can be read.');
 
     // Change the language by code.
-    $entity->language->langcode = language_default()->langcode;
-    $this->assertEqual(language_default()->langcode, $entity->language->langcode, 'Language code can be read.');
-    $this->assertEqual(language_default(), $entity->language->object, 'Language object can be read.');
+    $entity->langcode->value = language_default()->langcode;
+    $this->assertEqual(language_default()->langcode, $entity->langcode->value, 'Language code can be read.');
+    $this->assertEqual(language_default(), $entity->langcode->language, 'Language object can be read.');
 
     // Revert language by code then try setting it by language object.
-    $entity->language->langcode = LANGUAGE_NOT_SPECIFIED;
-    $entity->language->object = language_default();
-    $this->assertEqual(language_default()->langcode, $entity->language->langcode, 'Language code can be read.');
-    $this->assertEqual(language_default(), $entity->language->object, 'Language object can be read.');
+    $entity->langcode->value = LANGUAGE_NOT_SPECIFIED;
+    $entity->langcode->language = language_default();
+    $this->assertEqual(language_default()->langcode, $entity->langcode->value, 'Language code can be read.');
+    $this->assertEqual(language_default(), $entity->langcode->language, 'Language object can be read.');
 
     // Access the text field and test updating.
     $this->assertEqual($entity->field_test_text->value, $this->entity_field_text, 'Text field can be read.');
@@ -123,18 +123,18 @@ class EntityPropertyTest extends WebTestBase  {
     $this->entity_name = $this->randomName();
     $name_item[0]['value'] = $this->entity_name;
     $this->entity_user = $this->drupalCreateUser();
-    $user_item[0]['id'] = $this->entity_user->uid;
+    $user_item[0]['value'] = $this->entity_user->uid;
     $this->entity_field_text = $this->randomName();
     $text_item[0]['value'] = $this->entity_field_text;
 
     $entity = entity_create('entity_test', array(
       'name' => $name_item,
-      'user' => $user_item,
+      'user_id' => $user_item,
       'field_test_text' => $text_item,
     ));
     $this->assertEqual($this->entity_name, $entity->name->value, 'Name value can be read.');
-    $this->assertEqual($this->entity_user->uid, $entity->user->id, 'User id can be read.');
-    $this->assertEqual($this->entity_user->name, $entity->user->entity->name, 'User name can be read.');
+    $this->assertEqual($this->entity_user->uid, $entity->user_id->value, 'User id can be read.');
+    $this->assertEqual($this->entity_user->name, $entity->user_id->entity->name, 'User name can be read.');
     $this->assertEqual($this->entity_field_text, $entity->field_test_text->value, 'Text field can be read.');
   }
 
@@ -152,10 +152,10 @@ class EntityPropertyTest extends WebTestBase  {
     // Access the name property.
     $this->assertEqual(1, $entity->id->value, 'ID value can be read.');
     $this->assertTrue(is_string($entity->uuid->value), 'UUID value can be read.');
-    $this->assertEqual(LANGUAGE_NOT_SPECIFIED, $entity->language->langcode, 'Language code can be read.');
-    $this->assertEqual(language_load(LANGUAGE_NOT_SPECIFIED), $entity->language->object, 'Language object can be read.');
-    $this->assertEqual($this->entity_user->uid, $entity->user->id, 'User id can be read.');
-    $this->assertEqual($this->entity_user->name, $entity->user->entity->name, 'User name can be read.');
+    $this->assertEqual(LANGUAGE_NOT_SPECIFIED, $entity->langcode->value, 'Language code can be read.');
+    $this->assertEqual(language_load(LANGUAGE_NOT_SPECIFIED), $entity->langcode->language, 'Language object can be read.');
+    $this->assertEqual($this->entity_user->uid, $entity->user_id->value, 'User id can be read.');
+    $this->assertEqual($this->entity_user->name, $entity->user_id->entity->name, 'User name can be read.');
     $this->assertEqual($this->entity_field_text, $entity->field_test_text->value, 'Text field can be read.');
   }
 
@@ -172,7 +172,7 @@ class EntityPropertyTest extends WebTestBase  {
     $property_entity = drupal_wrap_data($definition);
     $definitions = $property_entity->getPropertyDefinitions($definition);
     $this->assertEqual($definitions['name']['type'], 'string_item', 'Name property found.');
-    $this->assertEqual($definitions['user']['type'], 'entityreference_item', 'User property found.');
+    $this->assertEqual($definitions['user_id']['type'], 'entityreference_item', 'User property found.');
     $this->assertEqual($definitions['field_test_text']['type'], 'text_item', 'Test-text-field property found.');
 
     // Test introspecting an entity object.
@@ -181,14 +181,14 @@ class EntityPropertyTest extends WebTestBase  {
 
     $definitions = $entity->getPropertyDefinitions();
     $this->assertEqual($definitions['name']['type'], 'string_item', 'Name property found.');
-    $this->assertEqual($definitions['user']['type'], 'entityreference_item', 'User property found.');
+    $this->assertEqual($definitions['user_id']['type'], 'entityreference_item', 'User property found.');
     $this->assertEqual($definitions['field_test_text']['type'], 'text_item', 'Test-text-field property found.');
 
     $name_properties = $entity->name->getPropertyDefinitions();
     $this->assertEqual($name_properties['value']['type'], 'string', 'String value property of the name found.');
 
-    $userref_properties = $entity->user->getPropertyDefinitions();
-    $this->assertEqual($userref_properties['id']['type'], 'integer', 'Entity id property of the user found.');
+    $userref_properties = $entity->user_id->getPropertyDefinitions();
+    $this->assertEqual($userref_properties['value']['type'], 'integer', 'Entity id property of the user found.');
     $this->assertEqual($userref_properties['entity']['type'], 'entity', 'Entity reference property of the user found.');
 
     $textfield_properties = $entity->field_test_text->getPropertyDefinitions();

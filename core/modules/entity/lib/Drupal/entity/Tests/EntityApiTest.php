@@ -36,11 +36,11 @@ class EntityApiTest extends WebTestBase {
     $user1 = $this->drupalCreateUser();
 
     // Create some test entities.
-    $entity = entity_create('entity_test', array('name' => 'test', 'user' => $user1->uid));
+    $entity = entity_create('entity_test', array('name' => 'test', 'user_id' => $user1->uid));
     $entity->save();
-    $entity = entity_create('entity_test', array('name' => 'test2', 'user' => $user1->uid));
+    $entity = entity_create('entity_test', array('name' => 'test2', 'user_id' => $user1->uid));
     $entity->save();
-    $entity = entity_create('entity_test', array('name' => 'test', 'user' => NULL));
+    $entity = entity_create('entity_test', array('name' => 'test', 'user_id' => NULL));
     $entity->save();
 
     $entities = array_values(entity_load_multiple_by_properties('entity_test', array('name' => 'test')));
@@ -76,13 +76,13 @@ class EntityApiTest extends WebTestBase {
    * Tests Entity getters/setters.
    */
   function testEntityGettersSetters() {
-    $entity = entity_create('entity_test', array('name' => 'test', 'user' => NULL));
-    $this->assertNull($entity->user->id, 'Property is not set.');
+    $entity = entity_create('entity_test', array('name' => 'test', 'user_id' => NULL));
+    $this->assertNull($entity->user_id->value, 'Property is not set.');
 
-    $entity->user->entity = $GLOBALS['user'];
-    $this->assertEqual($entity->user->id, $GLOBALS['user']->uid, 'Property has been set.');
+    $entity->user_id->entity = $GLOBALS['user'];
+    $this->assertEqual($entity->user_id->value, $GLOBALS['user']->uid, 'Property has been set.');
 
-    $value = $entity->get('user')->entity;
+    $value = $entity->get('user_id')->entity;
     $this->assertEqual($value, $GLOBALS['user'], 'Property has been retrieved.');
 
     // Make sure setting/getting translations boils down to setting/getting the

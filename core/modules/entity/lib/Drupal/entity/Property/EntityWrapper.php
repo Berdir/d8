@@ -46,7 +46,7 @@ class EntityWrapper implements DataWrapperInterface, DataStructureInterface {
     $this->entityType = isset($this->definition['entity type']) ? $this->definition['entity type'] : NULL;
 
     if (isset($context['parent'])) {
-      $this->id = $context['parent']->get('id');
+      $this->id = $context['parent']->get('value');
     }
     else {
       // No context given, so just initialize an ID property for storing the

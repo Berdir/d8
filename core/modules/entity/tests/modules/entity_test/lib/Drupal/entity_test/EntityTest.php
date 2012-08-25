@@ -40,7 +40,7 @@ class EntityTest extends EntityNG {
    *
    * @var \Drupal\entity\EntityPropertyListInterface
    */
-  public $user;
+  public $user_id;
 
   /**
    * Overrides Entity::__construct().
@@ -53,6 +53,6 @@ class EntityTest extends EntityNG {
     unset($this->langcode);
     unset($this->uuid);
     unset($this->name);
-    unset($this->user);
+    unset($this->user_id);
   }
 }

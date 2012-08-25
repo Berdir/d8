@@ -80,7 +80,7 @@ class EntityTestStorageController extends DatabaseStorageController {
   public function create(array $values) {
     // Pass in default values.
     $defaults = array();
-    $defaults['language'][LANGUAGE_NOT_SPECIFIED][0]['langcode'] = LANGUAGE_NOT_SPECIFIED;
+    $defaults['langcode'][LANGUAGE_NOT_SPECIFIED][0]['value'] = LANGUAGE_NOT_SPECIFIED;
 
     $entity = new $this->entityClass(array('values' => $defaults), $this->entityType);
 
@@ -181,7 +181,7 @@ class EntityTestStorageController extends DatabaseStorageController {
 
       $entity->id[LANGUAGE_NOT_SPECIFIED][0]['value'] = $id;
       $entity->uuid[LANGUAGE_NOT_SPECIFIED][0]['value'] = $record->uuid;
-      $entity->language[LANGUAGE_NOT_SPECIFIED][0]['langcode'] = $record->langcode;
+      $entity->langcode[LANGUAGE_NOT_SPECIFIED][0]['value'] = $record->langcode;
 
       $records[$id] = $entity;
     }
@@ -205,7 +205,7 @@ class EntityTestStorageController extends DatabaseStorageController {
       $langcode = empty($values['default_langcode']) ? $values['langcode'] : LANGUAGE_NOT_SPECIFIED;
 
       $queried_entities[$id]->name[$langcode][0]['value'] = $values['name'];
-      $queried_entities[$id]->user[$langcode][0]['id'] = $values['uid'];
+      $queried_entities[$id]->user_id[$langcode][0]['value'] = $values['user_id'];
     }
   }
 
@@ -288,7 +288,7 @@ class EntityTestStorageController extends DatabaseStorageController {
   protected function mapToStorageRecord(EntityInterface $entity) {
     $record = new \stdClass();
     $record->id = $entity->id();
-    $record->langcode = $entity->language->langcode;
+    $record->langcode = $entity->langcode->value;
     $record->uuid = $entity->uuid->value;
     return $record;
   }
@@ -309,10 +309,10 @@ class EntityTestStorageController extends DatabaseStorageController {
 
       $values = array(
         'id' => $entity->id(),
-        'langcode' => LANGUAGE_NOT_SPECIFIED == $langcode ? $entity->language->langcode : $langcode,
+        'langcode' => LANGUAGE_NOT_SPECIFIED == $langcode ? $entity->langcode->value : $langcode,
         'default_langcode' => intval(LANGUAGE_NOT_SPECIFIED == $langcode),
         'name' => $translation->name->value,
-        'uid' => $translation->user->id,
+        'user_id' => $translation->user_id->value,
       );
 
       db_merge('entity_test_property_data')
@@ -348,9 +348,9 @@ class EntityTestStorageController extends DatabaseStorageController {
       'type' => 'string_item',
       'list' => TRUE,
     );
-    $properties['language'] = array(
-      'label' => t('Language'),
-      'description' => ('The language of the test entity.'),
+    $properties['langcode'] = array(
+      'label' => t('Language code'),
+      'description' => ('The language code of the test entity.'),
       'type' => 'language_item',
       'list' => TRUE,
     );
@@ -361,9 +361,9 @@ class EntityTestStorageController extends DatabaseStorageController {
       'list' => TRUE,
       'translatable' => TRUE,
     );
-    $properties['user'] = array(
-      'label' => t('User'),
-      'description' => t('The associated user.'),
+    $properties['user_id'] = array(
+      'label' => t('User ID'),
+      'description' => t('The ID of the associated user.'),
       'type' => 'entityreference_item',
       'entity type' => 'user',
       'list' => TRUE,

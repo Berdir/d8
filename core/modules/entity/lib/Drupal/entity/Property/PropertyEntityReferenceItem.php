@@ -21,7 +21,7 @@ class PropertyEntityReferenceItem extends EntityPropertyItemBase {
     $definitions = &drupal_static(__CLASS__);
 
     if (!isset($definitions)) {
-      $definitions['id'] = array(
+      $definitions['value'] = array(
         // @todo: Lookup the entity type's ID data type and use it here.
         'type' => 'integer',
         'label' => t('Entity ID'),
@@ -51,13 +51,13 @@ class PropertyEntityReferenceItem extends EntityPropertyItemBase {
 
     // Entity is computed out of the ID, so we only need to update the ID. Only
     // set the entity property if no ID is given.
-    if (!empty($values['id'])) {
-      $this->properties['id']->setValue($values['id']);
+    if (!empty($values['value'])) {
+      $this->properties['value']->setValue($values['value']);
     }
     else {
       $this->properties['entity']->setValue(isset($values['entity']) ? $values['entity'] : NULL);
     }
-    unset($values['entity'], $values['id']);
+    unset($values['entity'], $values['value']);
     if ($values) {
       throw new \InvalidArgumentException('Property ' . key($values) . ' is unknown.');
     }
