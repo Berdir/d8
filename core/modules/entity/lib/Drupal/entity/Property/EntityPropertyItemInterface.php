@@ -9,7 +9,7 @@ namespace Drupal\entity\Property;
 
 use Drupal\Core\TypedData\DataStructureInterface;
 use Drupal\Core\TypedData\DataWrapperInterface;
-use Drupal\Core\TypedData\DataAccessInterface;
+use Drupal\Core\TypedData\DataAccessibleInterface;
 
 /**
  * Interface for entity property items, which are property container that may

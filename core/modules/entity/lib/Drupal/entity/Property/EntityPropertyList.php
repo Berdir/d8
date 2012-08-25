@@ -268,7 +268,7 @@ class EntityPropertyList implements EntityPropertyListInterface {
   }
 
   /**
-   * Implements DataAccessInterface::access().
+   * Implements DataAccessibleInterface::access().
    */
   public function access(User $account = NULL) {
     // TODO: Implement access() method. Use item access.

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\Core\TypedData\DataAccessInterface.
+ * Definition of Drupal\Core\TypedData\DataAccessibleInterface.
  */
 
 namespace Drupal\Core\TypedData;
@@ -10,7 +10,7 @@ namespace Drupal\Core\TypedData;
 /**
  * Interface for
  */
-interface DataAccessInterface {
+interface DataAccessibleInterface {
 
   /**
    * Check data value access.

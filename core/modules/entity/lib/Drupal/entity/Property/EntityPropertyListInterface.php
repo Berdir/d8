@@ -8,7 +8,7 @@
 namespace Drupal\entity\Property;
 use Drupal\Core\TypedData\DataListInterface;
 use Drupal\Core\TypedData\DataWrapperInterface;
-use Drupal\Core\TypedData\DataAccessInterface;
+use Drupal\Core\TypedData\DataAccessibleInterface;
 
 /**
  * Interface for entity properties, being lists of property items.
@@ -22,7 +22,7 @@ use Drupal\Core\TypedData\DataAccessInterface;
  * @todo: Should getProperties(), setProperties() and getPropertyDefinitions()
  * be delegated as well.
  */
-interface EntityPropertyListInterface extends DataListInterface, DataWrapperInterface, DataAccessInterface {
+interface EntityPropertyListInterface extends DataListInterface, DataWrapperInterface, DataAccessibleInterface {
 
   /**
    * Delegated to the first item.
