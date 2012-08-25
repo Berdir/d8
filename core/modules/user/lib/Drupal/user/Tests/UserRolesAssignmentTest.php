@@ -92,7 +92,8 @@ class UserRolesAssignmentTest extends WebTestBase {
    *   Defaults to TRUE.
    */
   private function userLoadAndCheckRoleAssigned($account, $rid, $is_assigned = TRUE) {
-    $account = user_load($account->uid, TRUE);
+    entity_reset_cache('user', array($account->uid));
+    $account = user_load($account->uid);
     if ($is_assigned) {
       $this->assertTrue(array_key_exists($rid, $account->roles), t('The role is present in the user object.'));
     }

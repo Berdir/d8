@@ -76,7 +76,8 @@ class UserAdminTest extends WebTestBase {
     $edit['operation'] = 'block';
     $edit['accounts[' . $account->uid . ']'] = TRUE;
     $this->drupalPost('admin/people', $edit, t('Update'));
-    $account = user_load($user_c->uid, TRUE);
+    entity_reset_cache('user', array($user_c->uid));
+    $account = user_load($user_c->uid);
     $this->assertEqual($account->status, 0, 'User C blocked');
 
     // Test unblocking of a user from /admin/people page and sending of activation mail
@@ -84,18 +85,22 @@ class UserAdminTest extends WebTestBase {
     $editunblock['operation'] = 'unblock';
     $editunblock['accounts[' . $account->uid . ']'] = TRUE;
     $this->drupalPost('admin/people', $editunblock, t('Update'));
-    $account = user_load($user_c->uid, TRUE);
+    entity_reset_cache('user', array($user_c->uid));
+    $account = user_load($user_c->uid);
     $this->assertEqual($account->status, 1, 'User C unblocked');
     $this->assertMail("to", $account->mail, "Activation mail sent to user C");
 
     // Test blocking and unblocking another user from /user/[uid]/edit form and sending of activation mail
     $user_d = $this->drupalCreateUser(array());
-    $account1 = user_load($user_d->uid, TRUE);
+    entity_reset_cache('user', array($user_d->uid));
+    $account1 = user_load($user_d->uid);
     $this->drupalPost('user/' . $account1->uid . '/edit', array('status' => 0), t('Save'));
-    $account1 = user_load($user_d->uid, TRUE);
+    entity_reset_cache('user', array($user_d->uid));
+    $account1 = user_load($user_d->uid);
     $this->assertEqual($account1->status, 0, 'User D blocked');
     $this->drupalPost('user/' . $account1->uid . '/edit', array('status' => TRUE), t('Save'));
-    $account1 = user_load($user_d->uid, TRUE);
+    entity_reset_cache('user', array($user_d->uid));
+    $account1 = user_load($user_d->uid);
     $this->assertEqual($account1->status, 1, 'User D unblocked');
     $this->assertMail("to", $account1->mail, "Activation mail sent to user D");
   }

@@ -44,7 +44,7 @@ class MoveTest extends FileManagedTestBase {
 
     // Reload the file from the database and check that the changes were
     // actually saved.
-    $loaded_file = file_load($result->fid, TRUE);
+    $loaded_file = file_load($result->fid);
     $this->assertTrue($loaded_file, t('File can be loaded from the database.'));
     $this->assertFileUnchanged($result, $loaded_file);
   }
@@ -72,14 +72,14 @@ class MoveTest extends FileManagedTestBase {
     $this->assertFileHooksCalled(array('move', 'load', 'update'));
 
     // Compare the returned value to what made it into the database.
-    $this->assertFileUnchanged($result, file_load($result->fid, TRUE));
+    $this->assertFileUnchanged($result, file_load($result->fid));
     // The target file should not have been altered.
-    $this->assertFileUnchanged($target, file_load($target->fid, TRUE));
+    $this->assertFileUnchanged($target, file_load($target->fid));
     // Make sure we end up with two distinct files afterwards.
     $this->assertDifferentFile($target, $result);
 
     // Compare the source and results.
-    $loaded_source = file_load($source->fid, TRUE);
+    $loaded_source = file_load($source->fid);
     $this->assertEqual($loaded_source->fid, $result->fid, t("Returned file's id matches the source."));
     $this->assertNotEqual($loaded_source->uri, $source->uri, t("Returned file path has changed from the original."));
   }
@@ -108,7 +108,7 @@ class MoveTest extends FileManagedTestBase {
 
     // Reload the file from the database and check that the changes were
     // actually saved.
-    $loaded_result = file_load($result->fid, TRUE);
+    $loaded_result = file_load($result->fid);
     $this->assertFileUnchanged($result, $loaded_result);
     // Check that target was re-used.
     $this->assertSameFile($target, $loaded_result);
@@ -135,7 +135,7 @@ class MoveTest extends FileManagedTestBase {
 
     // Load the file from the database and make sure it is identical to what
     // was returned.
-    $this->assertFileUnchanged($source, file_load($source->fid, TRUE));
+    $this->assertFileUnchanged($source, file_load($source->fid));
   }
 
   /**
@@ -162,7 +162,7 @@ class MoveTest extends FileManagedTestBase {
 
     // Load the file from the database and make sure it is identical to what
     // was returned.
-    $this->assertFileUnchanged($source, file_load($source->fid, TRUE));
-    $this->assertFileUnchanged($target, file_load($target->fid, TRUE));
+    $this->assertFileUnchanged($source, file_load($source->fid));
+    $this->assertFileUnchanged($target, file_load($target->fid));
   }
 }

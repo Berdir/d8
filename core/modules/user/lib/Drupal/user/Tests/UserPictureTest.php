@@ -273,7 +273,8 @@ class UserPictureTest extends WebTestBase {
     $this->drupalPost('user/' . $this->user->uid . '/edit', $edit, t('Save'));
 
     // Load actual user data from database.
-    $account = user_load($this->user->uid, TRUE);
+    entity_reset_cache('user', array($this->user->uid));
+    $account = user_load($this->user->uid);
     $pic_path = !empty($account->picture) ? $account->picture->uri : NULL;
 
     // Check if image is displayed in user's profile page.
@@ -287,7 +288,8 @@ class UserPictureTest extends WebTestBase {
     $this->drupalPost('user/' . $this->user->uid . '/edit', $edit, t('Save'));
 
     // Load actual user data from database.
-    $account1 = user_load($this->user->uid, TRUE);
+    entity_reset_cache('user', array($this->user->uid));
+    $account1 = user_load($this->user->uid);
     $this->assertFalse($account1->picture, 'User object has no picture');
 
     $file = file_load($account->picture->fid);
@@ -303,7 +305,8 @@ class UserPictureTest extends WebTestBase {
     $this->drupalPost('user/' . $this->user->uid . '/edit', $edit, t('Save'));
 
     // Load actual user data from database.
-    $account = user_load($this->user->uid, TRUE);
+    entity_reset_cache('user', array($this->user->uid));
+    $account = user_load($this->user->uid);
     return !empty($account->picture) ? $account->picture->uri : NULL;
   }
 

@@ -41,7 +41,8 @@ class UserCancelTest extends WebTestBase {
     $account = $this->drupalCreateUser(array());
     $this->drupalLogin($account);
     // Load real user object.
-    $account = user_load($account->uid, TRUE);
+    entity_reset_cache('user', array($account->uid));
+    $account = user_load($account->uid);
 
     // Create a node.
     $node = $this->drupalCreateNode(array('uid' => $account->uid));
@@ -85,7 +86,8 @@ class UserCancelTest extends WebTestBase {
       ->execute();
 
     // Reload and log in uid 1.
-    $user1 = user_load(1, TRUE);
+    entity_reset_cache('user', array(1));
+    $user1 = user_load(1);
     $user1->pass_raw = $password;
 
     // Try to cancel uid 1's account with a different user.
@@ -98,7 +100,8 @@ class UserCancelTest extends WebTestBase {
     $this->drupalPost('admin/people', $edit, t('Update'));
 
     // Verify that uid 1's account was not cancelled.
-    $user1 = user_load(1, TRUE);
+    entity_reset_cache('user', array(1));
+    $user1 = user_load(1);
     $this->assertEqual($user1->status, 1, t('User #1 still exists and is not blocked.'));
   }
 
@@ -112,7 +115,8 @@ class UserCancelTest extends WebTestBase {
     $account = $this->drupalCreateUser(array('cancel account'));
     $this->drupalLogin($account);
     // Load real user object.
-    $account = user_load($account->uid, TRUE);
+    entity_reset_cache('user', array($account->uid));
+    $account = user_load($account->uid);
 
     // Create a node.
     $node = $this->drupalCreateNode(array('uid' => $account->uid));
@@ -136,7 +140,8 @@ class UserCancelTest extends WebTestBase {
     $bogus_timestamp = $timestamp - 86400 - 60;
     $this->drupalGet("user/$account->uid/cancel/confirm/$bogus_timestamp/" . user_pass_rehash($account->pass, $bogus_timestamp, $account->login));
     $this->assertText(t('You have tried to use an account cancellation link that has expired. Please request a new one using the form below.'), t('Expired cancel account request rejected.'));
-    $account = user_load($account->uid, TRUE);
+    entity_reset_cache('user', array($account->uid));
+    $account = user_load($account->uid);
     $this->assertTrue($account->status, t('User account was not canceled.'));
 
     // Confirm user's content has not been altered.
@@ -156,7 +161,8 @@ class UserCancelTest extends WebTestBase {
     $this->drupalLogin($web_user);
 
     // Load real user object.
-    $account = user_load($web_user->uid, TRUE);
+    entity_reset_cache('user', array($web_user->uid));
+    $account = user_load($web_user->uid);
 
     // Attempt to cancel account.
     $this->drupalGet('user/' . $account->uid . '/edit');
@@ -173,7 +179,8 @@ class UserCancelTest extends WebTestBase {
 
     // Confirm account cancellation request.
     $this->drupalGet("user/$account->uid/cancel/confirm/$timestamp/" . user_pass_rehash($account->pass, $timestamp, $account->login));
-    $account = user_load($account->uid, TRUE);
+    entity_reset_cache('user', array($account->uid));
+    $account = user_load($account->uid);
     $this->assertTrue($account->status == 0, t('User has been blocked.'));
 
     // Confirm user is logged out.
@@ -190,7 +197,8 @@ class UserCancelTest extends WebTestBase {
     $account = $this->drupalCreateUser(array('cancel account'));
     $this->drupalLogin($account);
     // Load real user object.
-    $account = user_load($account->uid, TRUE);
+    entity_reset_cache('user', array($account->uid));
+    $account = user_load($account->uid);
 
     // Create a node with two revisions.
     $node = $this->drupalCreateNode(array('uid' => $account->uid));
@@ -211,7 +219,8 @@ class UserCancelTest extends WebTestBase {
 
     // Confirm account cancellation request.
     $this->drupalGet("user/$account->uid/cancel/confirm/$timestamp/" . user_pass_rehash($account->pass, $timestamp, $account->login));
-    $account = user_load($account->uid, TRUE);
+    entity_reset_cache('user', array($account->uid));
+    $account = user_load($account->uid);
     $this->assertTrue($account->status == 0, t('User has been blocked.'));
 
     // Confirm user's content has been unpublished.
@@ -235,7 +244,8 @@ class UserCancelTest extends WebTestBase {
     $account = $this->drupalCreateUser(array('cancel account'));
     $this->drupalLogin($account);
     // Load real user object.
-    $account = user_load($account->uid, TRUE);
+    entity_reset_cache('user', array($account->uid));
+    $account = user_load($account->uid);
 
     // Create a simple node.
     $node = $this->drupalCreateNode(array('uid' => $account->uid));
@@ -262,7 +272,8 @@ class UserCancelTest extends WebTestBase {
 
     // Confirm account cancellation request.
     $this->drupalGet("user/$account->uid/cancel/confirm/$timestamp/" . user_pass_rehash($account->pass, $timestamp, $account->login));
-    $this->assertFalse(user_load($account->uid, TRUE), t('User is not found in the database.'));
+    entity_reset_cache('user', array($account->uid));
+    $this->assertFalse(user_load($account->uid), t('User is not found in the database.'));
 
     // Confirm that user's content has been attributed to anonymous user.
     entity_reset_cache('node', array($node->nid));
@@ -288,7 +299,8 @@ class UserCancelTest extends WebTestBase {
     $account = $this->drupalCreateUser(array('cancel account', 'post comments', 'skip comment approval'));
     $this->drupalLogin($account);
     // Load real user object.
-    $account = user_load($account->uid, TRUE);
+    entity_reset_cache('user', array($account->uid));
+    $account = user_load($account->uid);
 
     // Create a simple node.
     $node = $this->drupalCreateNode(array('uid' => $account->uid));
@@ -328,7 +340,8 @@ class UserCancelTest extends WebTestBase {
 
     // Confirm account cancellation request.
     $this->drupalGet("user/$account->uid/cancel/confirm/$timestamp/" . user_pass_rehash($account->pass, $timestamp, $account->login));
-    $this->assertFalse(user_load($account->uid, TRUE), t('User is not found in the database.'));
+    entity_reset_cache('user', array($account->uid));
+    $this->assertFalse(user_load($account->uid), t('User is not found in the database.'));
 
     // Confirm that user's content has been deleted.
     entity_reset_cache('node', array($node->nid));
@@ -434,7 +447,8 @@ class UserCancelTest extends WebTestBase {
     $status = TRUE;
     foreach ($users as $account) {
       $status = $status && (strpos($this->content, t('%name has been deleted.', array('%name' => $account->name))) !== FALSE);
-      $status = $status && !user_load($account->uid, TRUE);
+      entity_reset_cache('user', array($account->uid));
+      $status = $status && !user_load($account->uid);
     }
     $this->assertTrue($status, t('Users deleted and not found in the database.'));
 
@@ -444,7 +458,8 @@ class UserCancelTest extends WebTestBase {
     $this->assertTrue($admin_user->status == 1, t('Administrative user is found in the database and enabled.'));
 
     // Verify that uid 1's account was not cancelled.
-    $user1 = user_load(1, TRUE);
+    entity_reset_cache('user', array(1));
+    $user1 = user_load(1);
     $this->assertEqual($user1->status, 1, t('User #1 still exists and is not blocked.'));
   }
 }

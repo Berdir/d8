@@ -114,7 +114,8 @@ class FormatDateTest extends WebTestBase {
     drupal_save_session(FALSE);
     // Save the original user and language and then replace it with the test user and language.
     $real_user = $user;
-    $user = user_load($test_user->uid, TRUE);
+    entity_reset_cache('user', array($test_user->uid));
+    $user = user_load($test_user->uid);
     $real_language = $language_interface->langcode;
     $language_interface->langcode = $user->preferred_langcode;
     // Simulate a Drupal bootstrap with the logged-in user.

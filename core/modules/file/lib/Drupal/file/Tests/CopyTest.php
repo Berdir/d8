@@ -45,7 +45,7 @@ class CopyTest extends FileManagedTestBase {
 
     // Reload the file from the database and check that the changes were
     // actually saved.
-    $this->assertFileUnchanged($result, file_load($result->fid, TRUE));
+    $this->assertFileUnchanged($result, file_load($result->fid));
   }
 
   /**
@@ -72,9 +72,9 @@ class CopyTest extends FileManagedTestBase {
 
     // Load all the affected files to check the changes that actually made it
     // to the database.
-    $loaded_source = file_load($source->fid, TRUE);
-    $loaded_target = file_load($target->fid, TRUE);
-    $loaded_result = file_load($result->fid, TRUE);
+    $loaded_source = file_load($source->fid);
+    $loaded_target = file_load($target->fid);
+    $loaded_result = file_load($result->fid);
 
     // Verify that the source file wasn't changed.
     $this->assertFileUnchanged($source, $loaded_source);
@@ -112,9 +112,9 @@ class CopyTest extends FileManagedTestBase {
 
     // Load all the affected files to check the changes that actually made it
     // to the database.
-    $loaded_source = file_load($source->fid, TRUE);
-    $loaded_target = file_load($target->fid, TRUE);
-    $loaded_result = file_load($result->fid, TRUE);
+    $loaded_source = file_load($source->fid);
+    $loaded_target = file_load($target->fid);
+    $loaded_result = file_load($result->fid);
 
     // Verify that the source file wasn't changed.
     $this->assertFileUnchanged($source, $loaded_source);
@@ -147,7 +147,7 @@ class CopyTest extends FileManagedTestBase {
     // Check that the correct hooks were called.
     $this->assertFileHooksCalled(array());
 
-    $this->assertFileUnchanged($source, file_load($source->fid, TRUE));
-    $this->assertFileUnchanged($target, file_load($target->fid, TRUE));
+    $this->assertFileUnchanged($source, file_load($source->fid));
+    $this->assertFileUnchanged($target, file_load($target->fid));
   }
 }

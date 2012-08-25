@@ -117,7 +117,8 @@ class UserLoginTest extends WebTestBase {
     $account->pass_raw = $password;
     $this->drupalLogin($account);
     // Load the stored user, which should have a different password hash now.
-    $account = user_load($account->uid, TRUE);
+    entity_reset_cache('user', array($account->uid));
+    $account = user_load($account->uid);
     $this->assertIdentical(_password_get_count_log2($account->pass), DRUPAL_HASH_COUNT + 1);
   }
 

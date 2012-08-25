@@ -50,7 +50,8 @@ class UserPasswordResetTest extends WebTestBase {
     $account = $this->drupalCreateUser();
     $this->drupalLogin($account);
     // Load real user object.
-    $account = user_load($account->uid, TRUE);
+    entity_reset_cache('user', array($account->uid));
+    $account = user_load($account->uid);
     $this->drupalLogout();
 
     // To attempt an expired password reset, create a password reset link as if

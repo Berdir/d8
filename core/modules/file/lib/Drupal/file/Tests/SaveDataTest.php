@@ -38,7 +38,7 @@ class SaveDataTest extends FileManagedTestBase {
     $this->assertFileHooksCalled(array('insert'));
 
     // Verify that what was returned is what's in the database.
-    $this->assertFileUnchanged($result, file_load($result->fid, TRUE));
+    $this->assertFileUnchanged($result, file_load($result->fid));
   }
 
   /**
@@ -63,7 +63,7 @@ class SaveDataTest extends FileManagedTestBase {
     $this->assertFileHooksCalled(array('insert'));
 
     // Verify that what was returned is what's in the database.
-    $this->assertFileUnchanged($result, file_load($result->fid, TRUE));
+    $this->assertFileUnchanged($result, file_load($result->fid));
   }
 
   /**
@@ -88,10 +88,10 @@ class SaveDataTest extends FileManagedTestBase {
 
     // Ensure that the existing file wasn't overwritten.
     $this->assertDifferentFile($existing, $result);
-    $this->assertFileUnchanged($existing, file_load($existing->fid, TRUE));
+    $this->assertFileUnchanged($existing, file_load($existing->fid));
 
     // Verify that was returned is what's in the database.
-    $this->assertFileUnchanged($result, file_load($result->fid, TRUE));
+    $this->assertFileUnchanged($result, file_load($result->fid));
   }
 
   /**
@@ -118,7 +118,7 @@ class SaveDataTest extends FileManagedTestBase {
     $this->assertSameFile($existing, $result);
 
     // Verify that what was returned is what's in the database.
-    $this->assertFileUnchanged($result, file_load($result->fid, TRUE));
+    $this->assertFileUnchanged($result, file_load($result->fid));
   }
 
   /**
@@ -137,6 +137,6 @@ class SaveDataTest extends FileManagedTestBase {
     $this->assertFileHooksCalled(array());
 
     // Ensure that the existing file wasn't overwritten.
-    $this->assertFileUnchanged($existing, file_load($existing->fid, TRUE));
+    $this->assertFileUnchanged($existing, file_load($existing->fid));
   }
 }

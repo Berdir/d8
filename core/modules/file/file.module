@@ -132,11 +132,9 @@ function file_load_multiple(array $fids = NULL) {
  *   A file entity or FALSE if the file was not found.
  *
  * @see hook_file_load()
- * @see file_load_multiple()
  */
 function file_load($fid) {
-  $files = file_load_multiple(array($fid));
-  return reset($files);
+  return entity_load('file', $fid);
 }
 
 /**

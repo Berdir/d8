@@ -144,7 +144,8 @@ class StatisticsAdminTest extends WebTestBase {
     $this->drupalLogin($account);
     $this->drupalGet('node/' . $this->test_node->nid);
 
-    $account = user_load($account->uid, TRUE);
+    entity_reset_cache('user', array($account->uid));
+    $account = user_load($account->uid);
 
     $this->drupalGet('user/' . $account->uid . '/edit');
     $this->drupalPost(NULL, NULL, t('Cancel account'));
@@ -157,7 +158,8 @@ class StatisticsAdminTest extends WebTestBase {
     preg_match('@http.+?(user/\d+/cancel/confirm/\d+/[^\s]+)@', $mail['body'], $matches);
     $path = $matches[1];
     $this->drupalGet($path);
-    $this->assertFalse(user_load($account->uid, TRUE), t('User is not found in the database.'));
+    entity_reset_cache('user', array($account->uid));
+    $this->assertFalse(user_load($account->uid), t('User is not found in the database.'));
 
     $this->drupalGet('admin/reports/visitors');
     $this->assertNoText($account->name, t('Did not find user in visitor statistics.'));
