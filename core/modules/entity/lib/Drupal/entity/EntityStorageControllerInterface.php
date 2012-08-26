@@ -110,7 +110,7 @@ interface EntityStorageControllerInterface {
   public function save(EntityInterface $entity);
 
   /**
-   * Gets an array entity property definitions.
+   * Gets an array of entity property definitions.
    *
    * If a 'bundle' key is present in the given entity definition, properties
    * specific to this bundle are included.
