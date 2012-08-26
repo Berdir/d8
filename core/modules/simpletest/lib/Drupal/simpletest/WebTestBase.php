@@ -2027,6 +2027,26 @@ abstract class WebTestBase extends TestBase {
   }
 
   /**
+   * Wraps a data value into a typed data wrapper and executes some basic
+   * assertions.
+   *
+   * @see drupal_wrap_data().
+   */
+  protected function drupalWrapData($definition, $value = NULL, $context = array()) {
+    // Save the type that was passed in so we can compare with it later.
+    $type = $definition['type'];
+    // Construct the wrapper.
+    $wrapper = drupal_wrap_data($definition, $value, $context);
+    // Assert the definition of the wrapper.
+    $this->assertTrue($wrapper instanceof \Drupal\Core\TypedData\DataWrapperInterface, 'Wrapper is an instance of the wrapper interface.');
+    $definition = $wrapper->getDefinition();
+    $this->assertTrue(!empty($definition['label']), $definition['label'] . ' wrapper definition was returned.');
+    // Assert that the correct type was constructed.
+    $this->assertEqual($wrapper->getType(), $type, $definition['label'] . ' wrapper returned type.');
+    return $wrapper;
+  }
+
+  /**
    * Pass if the internal browser's URL matches the given path.
    *
    * @param $path
