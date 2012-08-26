@@ -7352,9 +7352,9 @@ function drupal_wrap_data(array $definition, $value = NULL, $context = array()) 
   $type_info = drupal_get_data_type_info();
 
   // Allow per-data definition overrides of the used classes.
-  $class_info = $definition + $type_info[$definition['type']];
-  $class = empty($definition['list']) ? $class_info['class'] : $class_info['list class'];
-  return new $class($definition, $value, $context);
+  $full_definition = $definition + $type_info[$definition['type']];
+  $class = empty($full_definition['list']) ? $full_definition['class'] : $full_definition['list class'];
+  return new $class($full_definition, $value, $context);
 }
 
 /**
