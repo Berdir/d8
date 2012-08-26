@@ -8,7 +8,7 @@
 namespace Drupal\Core\TypedData;
 
 /**
- * Interface for
+ * Interface for checking access.
  */
 interface DataAccessibleInterface {
 

@@ -299,18 +299,15 @@ class EntityTestStorageController extends DatabaseStorageController {
    * Stores values of translatable properties.
    */
   protected function postSave(EntityInterface $entity, $update) {
-    $langcodes = array_keys($entity->translations());
-    // Also add values in default language, which are keyed by
-    // LANGUAGE_NOT_SPECIFIED.
-    $langcodes[] = LANGUAGE_NOT_SPECIFIED;
+    $default_langcode = $entity->language()->langcode;
 
-    foreach ($langcodes as $langcode) {
+    foreach ($entity->getTranslationLanguages() as $langcode => $language) {
       $translation = $entity->getTranslation($langcode);
 
       $values = array(
         'id' => $entity->id(),
-        'langcode' => LANGUAGE_NOT_SPECIFIED == $langcode ? $entity->langcode->value : $langcode,
-        'default_langcode' => intval(LANGUAGE_NOT_SPECIFIED == $langcode),
+        'langcode' => $langcode,
+        'default_langcode' => intval($default_langcode == $langcode),
         'name' => $translation->name->value,
         'user_id' => $translation->user_id->value,
       );

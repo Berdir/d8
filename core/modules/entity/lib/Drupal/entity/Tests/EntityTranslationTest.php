@@ -78,7 +78,7 @@ class EntityTranslationTest extends WebTestBase {
       'user_id' => $GLOBALS['user']->uid,
     ));
     $this->assertEqual($entity->language()->langcode, LANGUAGE_NOT_SPECIFIED, 'Entity language not specified.');
-    $this->assertFalse($entity->translations(), 'No translations are available');
+    $this->assertFalse($entity->getTranslationLanguages(FALSE), 'No translations are available');
 
     // Set the value in default language.
     $entity->set($this->field_name, array(0 => array('value' => 'default value')));
@@ -90,7 +90,7 @@ class EntityTranslationTest extends WebTestBase {
     // specified language.
     $entity->set($this->field_name, array(0 => array('value' => 'default value2')), $this->langcodes[1]);
     $this->assertEqual($entity->get($this->field_name)->value, 'default value2', 'Untranslated value updated.');
-    $this->assertFalse($entity->translations(), 'No translations are available');
+    $this->assertFalse($entity->getTranslationLanguages(FALSE), 'No translations are available');
 
     // Test getting a field value using the default language for a not
     // language-specific entity.
@@ -101,7 +101,7 @@ class EntityTranslationTest extends WebTestBase {
     $entity->langcode->language = $this->langcodes[0];
     $entity->{$this->field_name} = array();
     $this->assertEqual($entity->language(), language_load($this->langcodes[0]), 'Entity language retrieved.');
-    $this->assertFalse($entity->translations(), 'No translations are available');
+    $this->assertFalse($entity->getTranslationLanguages(FALSE), 'No translations are available');
 
     // Set the value in default language.
     $entity->set($this->field_name, array(0 => array('value' => 'default value')));
@@ -115,7 +115,7 @@ class EntityTranslationTest extends WebTestBase {
     $this->assertEqual($entity->get($this->field_name)->value, 'default value', 'Untranslated value stays.');
 
     $translations[$this->langcodes[1]] = language_load($this->langcodes[1]);
-    $this->assertEqual($entity->translations(), $translations, 'Translations retrieved.');
+    $this->assertEqual($entity->getTranslationLanguages(FALSE), $translations, 'Translations retrieved.');
 
     // Try to get a not available translation.
     $this->assertNull($entity->get($this->field_name, $this->langcodes[2])->value, 'A translation that is not available is NULL.');

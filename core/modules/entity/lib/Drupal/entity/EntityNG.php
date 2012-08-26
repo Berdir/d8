@@ -8,7 +8,7 @@
 namespace Drupal\entity;
 
 use Drupal\Core\TypedData\DataWrapperInterface;
-use Drupal\Core\TypedData\DataStructureInterface;
+use Drupal\Core\TypedData\DataStructureTranslatableInterface;
 use Drupal\Component\Uuid\Uuid;
 use InvalidArgumentException;
 
@@ -18,7 +18,7 @@ use InvalidArgumentException;
  * @todo: Once all entity types have been converted, merge improvements into the
  * Entity class and let EntityInterface extend the DataStructureInterface.
  */
-class EntityNG extends Entity implements DataStructureInterface {
+class EntityNG extends Entity implements DataStructureTranslatableInterface {
 
   /**
    * The plain data values of the contained properties.
@@ -72,15 +72,11 @@ class EntityNG extends Entity implements DataStructureInterface {
    * Implements EntityInterface::get().
    */
   public function get($property_name, $langcode = NULL) {
-    // Values in default language are stored using LANGUAGE_NOT_SPECIFIED,
-    // so use LANGUAGE_NOT_SPECIFIED if either no language is given or it
-    // matches the default language. Then, if the default language is
-    // LANGUAGE_NOT_SPECIFIED, the entity is not translatable, so we always use
-    // LANGUAGE_NOT_SPECIFIED.
+    // Values in default language are stored using the LANGUAGE_DEFAULT
+    // constant. If the default language is LANGUAGE_NOT_SPECIFIED, the entity
+    // is not translatable, so we always use LANGUAGE_DEFAULT.
     if (!isset($langcode) || $langcode == $this->langcode->value || LANGUAGE_NOT_SPECIFIED == $this->langcode->value) {
-      // @todo: Find a more meaningful constant name and make field loading use
-      // it too.
-      $langcode = LANGUAGE_NOT_SPECIFIED;
+      $langcode = LANGUAGE_DEFAULT;
     }
     else {
       $languages = language_list(LANGUAGE_ALL);
@@ -96,8 +92,8 @@ class EntityNG extends Entity implements DataStructureInterface {
       if (!$definition) {
         throw new InvalidArgumentException('Property ' . check_plain($property_name) . ' is unknown.');
       }
-      // Non-translatable properties always use LANGUAGE_NOT_SPECIFIED.
-      $langcode = empty($definition['translatable']) ? LANGUAGE_NOT_SPECIFIED : $langcode;
+      // Non-translatable properties always use default language.
+      $langcode = empty($definition['translatable']) ? LANGUAGE_DEFAULT : $langcode;
 
       $value = isset($this->values[$property_name][$langcode]) ? $this->values[$property_name][$langcode] : NULL;
       $this->properties[$property_name][$langcode] = drupal_wrap_data($definition, $value);
@@ -174,24 +170,19 @@ class EntityNG extends Entity implements DataStructureInterface {
   }
 
   /**
-   * Implements EntityInterface::language().
+   * Implements DataStructureTranslatableInterface::language().
    */
   public function language() {
-    // @todo: Check for language.module instead, once Field API language
-    // handling depends upon it too.
-    return module_exists('locale') ? $this->langcode->language : FALSE;
+    return $this->langcode->language;
   }
 
   /**
-   * Gets a translation of the entity.
-   *
-   * @return \Drupal\Core\TypedData\DataStructureInterface
-   *   A container holding the translated properties.
+   * Implements DataStructureTranslatableInterface::getTranslation().
    */
   public function getTranslation($langcode) {
 
-    if ($langcode == LANGUAGE_NOT_SPECIFIED || $langcode == $this->get('langcode')->value) {
-      // No translation need, return the entity.
+    if ($langcode == LANGUAGE_DEFAULT || $langcode == $this->get('langcode')->value) {
+      // No translation needed, return the entity.
       return $this;
     }
     // Check whether the language code is valid, thus is of an available
@@ -210,9 +201,9 @@ class EntityNG extends Entity implements DataStructureInterface {
   }
 
   /**
-   * Overrides EntityInterface::translations().
+   * Implements DataStructureTranslatableInterface::getTranslationLanguages().
    */
-  public function translations() {
+  public function getTranslationLanguages($include_default = TRUE) {
     $translations = array();
     // Build an array with the translation langcodes set as keys.
     foreach ($this->getProperties() as $name => $property) {
@@ -221,10 +212,14 @@ class EntityNG extends Entity implements DataStructureInterface {
       }
       $translations += $this->properties[$name];
     }
-    unset($translations[LANGUAGE_NOT_SPECIFIED]);
+    unset($translations[LANGUAGE_DEFAULT]);
+
+    if ($include_default) {
+      $translations[$this->language()->langcode] = TRUE;
+    }
 
     // Now get languages based upon translation langcodes.
-    $languages = array_intersect_key(language_list(), $translations);
+    $languages = array_intersect_key(language_list(LANGUAGE_ALL), $translations);
     return $languages;
   }
 

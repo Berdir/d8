@@ -208,6 +208,14 @@ const LANGUAGE_NOT_APPLICABLE = 'zxx';
 const LANGUAGE_MULTIPLE = 'mul';
 
 /**
+ * Language code referring to the default language of data, e.g. of an entity.
+ *
+ * @todo: Change value to differ from LANGUAGE_NOT_SPECIFIED once field API
+ * leverages the property API.
+ */
+const LANGUAGE_DEFAULT = 'und';
+
+/**
  * The language state when referring to configurable languages.
  */
 const LANGUAGE_CONFIGURABLE = 1;
