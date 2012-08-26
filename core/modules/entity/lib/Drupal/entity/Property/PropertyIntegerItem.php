@@ -5,7 +5,7 @@
  */
 
 namespace Drupal\entity\Property;
-use \Drupal\entity\Property\EntityPropertyItemBase;
+use Drupal\entity\Property\EntityPropertyItemBase;
 
 
 /**

@@ -6,9 +6,10 @@
  */
 
 namespace Drupal\entity\Property;
-use \Drupal\Core\TypedData\DataWrapperInterface;
-use \Drupal\Core\TypedData\DataStructureInterface;
+use Drupal\Core\TypedData\DataWrapperInterface;
+use Drupal\Core\TypedData\DataStructureInterface;
 use Drupal\user;
+use InvalidArgumentException;
 
 /**
  * An entity property item.
@@ -142,7 +143,7 @@ abstract class EntityPropertyItemBase implements EntityPropertyItemInterface {
    */
   public function get($property_name) {
     if (!isset($this->properties[$property_name])) {
-      throw new \InvalidArgumentException('Property ' . check_plain($property_name) . ' is unknown.');
+      throw new InvalidArgumentException('Property ' . check_plain($property_name) . ' is unknown.');
     }
     return $this->properties[$property_name];
   }
@@ -185,7 +186,7 @@ abstract class EntityPropertyItemBase implements EntityPropertyItemInterface {
         $this->properties[$name]->setValue($value);
       }
       else {
-        throw new \InvalidArgumentException('Property ' . check_plain($name) . ' is unknown.');
+        throw new InvalidArgumentException('Property ' . check_plain($name) . ' is unknown.');
       }
     }
   }

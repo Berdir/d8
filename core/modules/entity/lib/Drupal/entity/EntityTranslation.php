@@ -9,6 +9,7 @@ namespace Drupal\entity;
 
 use Drupal\Core\TypedData\DataWrapperInterface;
 use Drupal\Core\TypedData\DataStructureInterface;
+use InvalidArgumentException;
 
 /**
  * Makes translated entity properties available via the Property API.
@@ -36,12 +37,12 @@ class EntityTranslation implements DataStructureInterface, DataWrapperInterface 
     $this->definition = $definition;
 
     if (empty($context['parent'])) {
-      throw new \InvalidArgumentException('Missing context, i.e. the entity to work with.');
+      throw new InvalidArgumentException('Missing context, i.e. the entity to work with.');
     }
     $this->entity = $context['parent'];
 
     if (empty($this->definition['langcode'])) {
-      throw new \InvalidArgumentException('Missing language code');
+      throw new InvalidArgumentException('Missing language code');
     }
   }
 
@@ -79,7 +80,7 @@ class EntityTranslation implements DataStructureInterface, DataWrapperInterface 
       unset($values[$name]);
     }
     if ($values) {
-      throw new \InvalidArgumentException('Property ' . check_plain(key($values)) . ' is unknown or not translatable.');
+      throw new InvalidArgumentException('Property ' . check_plain(key($values)) . ' is unknown or not translatable.');
     }
   }
 
@@ -100,7 +101,7 @@ class EntityTranslation implements DataStructureInterface, DataWrapperInterface 
   public function get($property_name) {
     $definitions = $this->getPropertyDefinitions();
     if (!isset($definitions[$property_name])) {
-      throw new \InvalidArgumentException('Property ' . check_plain(key($values)) . ' is unknown or not translatable.');
+      throw new InvalidArgumentException('Property ' . check_plain(key($values)) . ' is unknown or not translatable.');
     }
     return $this->entity->get($property_name, $this->definition['langcode']);
   }

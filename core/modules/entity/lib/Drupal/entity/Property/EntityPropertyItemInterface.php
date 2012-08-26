@@ -6,7 +6,6 @@
  */
 
 namespace Drupal\entity\Property;
-
 use Drupal\Core\TypedData\DataStructureInterface;
 use Drupal\Core\TypedData\DataWrapperInterface;
 use Drupal\Core\TypedData\DataAccessibleInterface;

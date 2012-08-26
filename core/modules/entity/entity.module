@@ -5,7 +5,6 @@
  * Entity API for handling entities like nodes or users.
  */
 
-use \InvalidArgumentException;
 use Drupal\entity\EntityFieldQuery;
 use Drupal\entity\EntityMalformedException;
 use Drupal\entity\EntityStorageException;

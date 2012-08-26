@@ -5,7 +5,8 @@
  */
 
 namespace Drupal\entity\Property;
-use \Drupal\entity\Property\EntityPropertyItemBase;
+use Drupal\entity\Property\EntityPropertyItemBase;
+use InvalidArgumentException;
 
 
 /**
@@ -59,7 +60,7 @@ class PropertyEntityReferenceItem extends EntityPropertyItemBase {
     }
     unset($values['entity'], $values['value']);
     if ($values) {
-      throw new \InvalidArgumentException('Property ' . key($values) . ' is unknown.');
+      throw new InvalidArgumentException('Property ' . key($values) . ' is unknown.');
     }
   }
 }

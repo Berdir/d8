@@ -17,28 +17,28 @@ class EntityTest extends EntityNG {
   /**
    * The entity ID.
    *
-   * @var \Drupal\entity\EntityPropertyListInterface
+   * @var \Drupal\entity\Property\EntityPropertyListInterface
    */
   public $id;
 
   /**
    * The entity UUID.
    *
-   * @var \Drupal\entity\EntityPropertyListInterface
+   * @var \Drupal\entity\Property\EntityPropertyListInterface
    */
   public $uuid;
 
   /**
    * The name of the test entity.
    *
-   * @var \Drupal\entity\EntityPropertyListInterface
+   * @var \Drupal\entity\Property\EntityPropertyListInterface
    */
   public $name;
 
   /**
    * The associated user.
    *
-   * @var \Drupal\entity\EntityPropertyListInterface
+   * @var \Drupal\entity\Property\EntityPropertyListInterface
    */
   public $user_id;
 

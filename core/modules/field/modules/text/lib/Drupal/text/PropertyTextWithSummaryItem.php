@@ -5,7 +5,7 @@
  */
 
 namespace Drupal\text;
-use \Drupal\text\PropertyTextItem;
+use Drupal\text\PropertyTextItem;
 
 /**
  * Defines the 'text_with_summary' entity property item.

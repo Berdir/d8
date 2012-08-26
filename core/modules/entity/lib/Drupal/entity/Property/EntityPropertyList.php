@@ -7,6 +7,7 @@
 
 namespace Drupal\entity\Property;
 use Drupal\user\User;
+use InvalidArgumentException;
 
 /**
  * An entity property list.
@@ -86,7 +87,7 @@ class EntityPropertyList implements EntityPropertyListInterface {
         $values = $values->getValue();
       }
       if (!is_array($values)) {
-        throw new \InvalidArgumentException("An entity property requires a numerically indexed array of items as value.");
+        throw new InvalidArgumentException("An entity property requires a numerically indexed array of items as value.");
       }
 
       // Clear the values of properties for which no value has been passed.
@@ -97,7 +98,7 @@ class EntityPropertyList implements EntityPropertyListInterface {
       // Set the values.
       foreach ($values as $delta => $value) {
         if (!is_numeric($delta)) {
-          throw new \InvalidArgumentException('Unable to set a value with a non-numeric delta in a list.');
+          throw new InvalidArgumentException('Unable to set a value with a non-numeric delta in a list.');
         }
         elseif (!isset($this->list[$delta])) {
           $this->list[$delta] = $this->createItem($value);
@@ -157,7 +158,7 @@ class EntityPropertyList implements EntityPropertyListInterface {
     }
 
     if (!is_numeric($offset)) {
-      throw new \InvalidArgumentException('Unable to get a value with a non-numeric delta in a list.');
+      throw new InvalidArgumentException('Unable to get a value with a non-numeric delta in a list.');
     }
     // Allow getting not yet existing items as well.
     // @todo: Maybe add a public createItem() method instead or in addition?
@@ -187,7 +188,7 @@ class EntityPropertyList implements EntityPropertyListInterface {
       $this->offsetGet($offset)->setValue($value);
     }
     else {
-      throw new \InvalidArgumentException('Unable to set a value with a non-numeric delta in a list.');
+      throw new InvalidArgumentException('Unable to set a value with a non-numeric delta in a list.');
     }
   }
 

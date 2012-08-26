@@ -5,9 +5,9 @@
  */
 
 namespace Drupal\entity\Property;
-use \Drupal\Core\TypedData\DataWrapperInterface;
-use \Drupal\Core\TypedData\DataStructureInterface;
-
+use Drupal\Core\TypedData\DataWrapperInterface;
+use Drupal\Core\TypedData\DataStructureInterface;
+use InvalidArgumentException;
 
 /**
  * Defines the 'entity' data type, e.g. the computed 'entity' property of entity references.
@@ -104,7 +104,7 @@ class EntityWrapper implements DataWrapperInterface, DataStructureInterface {
       $this->entityType = $value->entityType();
     }
     else {
-      throw new \InvalidArgumentException('Value is no valid entity.');
+      throw new InvalidArgumentException('Value is no valid entity.');
     }
   }
 

@@ -5,8 +5,8 @@
  */
 
 namespace Drupal\entity\Property;
-use \Drupal\entity\Property\EntityPropertyItemBase;
-
+use Drupal\entity\Property\EntityPropertyItemBase;
+use InvalidArgumentException;
 
 /**
  * Defines the 'language_item' entity property item.
@@ -56,7 +56,7 @@ class PropertyLanguageItem extends EntityPropertyItemBase {
     }
     unset($values['language'], $values['value']);
     if ($values) {
-      throw new \InvalidArgumentException('Property ' . key($values) . ' is unknown.');
+      throw new InvalidArgumentException('Property ' . key($values) . ' is unknown.');
     }
   }
 }

@@ -10,6 +10,7 @@ namespace Drupal\entity;
 use Drupal\Core\TypedData\DataWrapperInterface;
 use Drupal\Core\TypedData\DataStructureInterface;
 use Drupal\Component\Uuid\Uuid;
+use InvalidArgumentException;
 
 /**
  * Implements Property API specific enhancements to the Entity class.
@@ -84,7 +85,7 @@ class EntityNG extends Entity implements DataStructureInterface {
     else {
       $languages = language_list(LANGUAGE_ALL);
       if (!isset($languages[$langcode])) {
-        throw new \InvalidArgumentException("Unable to get translation for the invalid language '$langcode'.");
+        throw new InvalidArgumentException("Unable to get translation for the invalid language '$langcode'.");
       }
     }
 
@@ -93,7 +94,7 @@ class EntityNG extends Entity implements DataStructureInterface {
     if (!isset($this->properties[$property_name][$langcode])) {
       $definition = $this->getPropertyDefinition($property_name);
       if (!$definition) {
-        throw new \InvalidArgumentException('Property ' . check_plain($property_name) . ' is unknown.');
+        throw new InvalidArgumentException('Property ' . check_plain($property_name) . ' is unknown.');
       }
       // Non-translatable properties always use LANGUAGE_NOT_SPECIFIED.
       $langcode = empty($definition['translatable']) ? LANGUAGE_NOT_SPECIFIED : $langcode;
@@ -197,7 +198,7 @@ class EntityNG extends Entity implements DataStructureInterface {
     // language.
     $languages = language_list(LANGUAGE_ALL);
     if (!isset($languages[$langcode])) {
-      throw new \InvalidArgumentException("Unable to get translation for the invalid language '$langcode'.");
+      throw new InvalidArgumentException("Unable to get translation for the invalid language '$langcode'.");
     }
 
     $definition = array(
