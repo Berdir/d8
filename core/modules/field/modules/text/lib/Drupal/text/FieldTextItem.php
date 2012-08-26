@@ -1,16 +1,16 @@
 <?php
 /**
  * @file
- * Definition of Drupal\text\PropertyTextItem.
+ * Definition of Drupal\text\FieldTextItem.
  */
 
 namespace Drupal\text;
-use Drupal\entity\Property\EntityPropertyItemBase;
+use Drupal\field\FieldItemBase;
 
 /**
  * Defines the 'text_item' and 'text_long_item' entity property items.
  */
-class PropertyTextItem extends EntityPropertyItemBase {
+class FieldTextItem extends FieldItemBase {
 
   /**
    * Property definitions of the contained properties.
@@ -41,7 +41,7 @@ class PropertyTextItem extends EntityPropertyItemBase {
         'description' => t('The text value with the text format applied.'),
         'html' => TRUE,
         'computed' => TRUE,
-        'class' => '\Drupal\text\PropertyProcessedText',
+        'class' => '\Drupal\text\FieldTextProcessed',
         'source' => 'value',
       );
     }

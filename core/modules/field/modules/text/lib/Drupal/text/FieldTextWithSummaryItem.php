@@ -1,16 +1,15 @@
 <?php
 /**
  * @file
- * Definition of Drupal\text\PropertyTextWithSummaryItem.
+ * Definition of Drupal\text\FieldTextWithSummaryItem.
  */
 
 namespace Drupal\text;
-use Drupal\text\PropertyTextItem;
 
 /**
  * Defines the 'text_with_summary' entity property item.
  */
-class PropertyTextWithSummaryItem extends PropertyTextItem {
+class FieldTextWithSummaryItem extends FieldTextItem {
 
   /**
    * Property definitions of the contained properties.
@@ -40,7 +39,7 @@ class PropertyTextWithSummaryItem extends PropertyTextItem {
         'description' => t('The summary text value with the text format applied.'),
         'html' => TRUE,
         'computed' => TRUE,
-        'class' => '\Drupal\text\PropertyProcessedText',
+        'class' => '\Drupal\text\FieldTextProcessed',
         'source' => 'summary',
       );
     }

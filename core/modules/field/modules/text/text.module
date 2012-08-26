@@ -38,7 +38,7 @@ function text_field_info() {
       'instance_settings' => array('text_processing' => 0),
       'default_widget' => 'text_textfield',
       'default_formatter' => 'text_default',
-      'property class' => '\Drupal\text\PropertyTextItem',
+      'property class' => '\Drupal\text\FieldTextItem',
     ),
     'text_long' => array(
       'label' => t('Long text'),
@@ -46,7 +46,7 @@ function text_field_info() {
       'instance_settings' => array('text_processing' => 0),
       'default_widget' => 'text_textarea',
       'default_formatter' => 'text_default',
-      'property class' => '\Drupal\text\PropertyTextItem',
+      'property class' => '\Drupal\text\FieldTextItem',
     ),
     'text_with_summary' => array(
       'label' => t('Long text and summary'),
@@ -54,7 +54,7 @@ function text_field_info() {
       'instance_settings' => array('text_processing' => 1, 'display_summary' => 0),
       'default_widget' => 'text_textarea_with_summary',
       'default_formatter' => 'text_default',
-      'property class' => '\Drupal\text\PropertyTextWithSummaryItem',
+      'property class' => '\Drupal\text\FieldTextWithSummaryItem',
     ),
   );
 }

@@ -2,18 +2,19 @@
 
 /**
  * @file
- * Definition of Drupal\text\PropertyProcessedText.
+ * Definition of Drupal\text\FieldTextProcessed.
  */
 
 namespace Drupal\text;
 use Drupal\Core\TypedData\DataWrapperInterface;
 use Drupal\Core\TypedData\DataReadOnlyException;
+use Drupal\Core\TypedData\Type\String;
 use InvalidArgumentException;
 
 /**
- * The string property type.
+ * A computed property for processing text with a format.
  */
-class PropertyProcessedText extends \Drupal\Core\TypedData\Type\String {
+class FieldTextProcessed extends String {
 
   /**
    * The text property.
@@ -55,6 +56,7 @@ class PropertyProcessedText extends \Drupal\Core\TypedData\Type\String {
     // Either implement per-bundle property definition overrides or pass on
     // entity-context (entity type, bundle, property name). For now, we assume
     // text processing is enabled if a format is given.
+
     if ($this->format->value) {
       return check_markup($this->text->value, $this->format->value, $langcode);
     }

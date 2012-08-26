@@ -14,7 +14,7 @@ use InvalidArgumentException;
 /**
  * An entity property item.
  *
- * Entity property items making use of this base class have to implement the
+ * Entity property items making use of this base class have to implement
  * DataStructureInterface::getPropertyDefinitions().
  *
  * @see EntityPropertyItemInterface

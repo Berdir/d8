@@ -383,7 +383,7 @@ function field_data_type_info() {
       $items[$type_name . '_item'] = array(
         'label' => t('Field !label item', array('!label' => $type_info['label'])),
         'class' => $type_info['property class'],
-        'list class' => !empty($type_info['property list class']) ? $type_info['property list class'] : '\Drupal\entity\Property\EntityPropertyList',
+        'list class' => !empty($type_info['property list class']) ? $type_info['property list class'] : '\Drupal\field\FieldItemList',
       );
     }
   }

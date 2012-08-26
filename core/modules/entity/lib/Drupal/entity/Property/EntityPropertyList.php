@@ -176,7 +176,8 @@ class EntityPropertyList implements EntityPropertyListInterface {
    * @return \Drupal\Core\TypedData\DataWrapperInterface
    */
   protected function createItem($value = NULL) {
-    return drupal_wrap_data(array('list' => FALSE) + $this->definition, $value);
+    $context = array('parent' => $this);
+    return drupal_wrap_data(array('list' => FALSE) + $this->definition, $value, $context);
   }
 
   /**
