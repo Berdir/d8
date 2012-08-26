@@ -13,22 +13,29 @@ use Drupal\entity\Property\EntityPropertyItemBase;
 class PropertyTextItem extends EntityPropertyItemBase {
 
   /**
+   * Property definitions of the contained properties.
+   *
+   * @see self::getPropertyDefinitions()
+   *
+   * @var array
+   */
+  static $propertyDefinitions;
+
+  /**
    * Implements DataStructureInterface::getPropertyDefinitions().
    */
   public function getPropertyDefinitions() {
-    // Statically cache the definitions to avoid creating lots of array copies.
-    $definitions = drupal_static(__CLASS__);
 
-    if (!isset($definitions)) {
-      $definitions['value'] = array(
+    if (!isset(self::$propertyDefinitions)) {
+      self::$propertyDefinitions['value'] = array(
         'type' => 'string',
         'label' => t('Text value'),
       );
-      $definitions['format'] = array(
+      self::$propertyDefinitions['format'] = array(
         'type' => 'string',
         'label' => t('Text format'),
       );
-      $definitions['processed'] = array(
+      self::$propertyDefinitions['processed'] = array(
         'type' => 'string',
         'label' => t('Processed text'),
         'description' => t('The text value with the text format applied.'),
@@ -38,7 +45,7 @@ class PropertyTextItem extends EntityPropertyItemBase {
         'source' => 'value',
       );
     }
-    return $definitions;
+    return self::$propertyDefinitions;
   }
 }
 

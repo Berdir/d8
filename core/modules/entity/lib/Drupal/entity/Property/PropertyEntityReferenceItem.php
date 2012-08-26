@@ -15,21 +15,30 @@ use InvalidArgumentException;
 class PropertyEntityReferenceItem extends EntityPropertyItemBase {
 
   /**
+   * Property definitions of the contained properties.
+   *
+   * @see self::getPropertyDefinitions()
+   *
+   * @var array
+   */
+  static $propertyDefinitions;
+
+  /**
    * Implements DataStructureInterface::getPropertyDefinitions().
    */
   public function getPropertyDefinitions() {
-    // Statically cache the definitions to avoid creating lots of array copies.
-    $definitions = &drupal_static(__CLASS__);
+    // Definitions vary by entity type, so key them by entity type.
+    $entity_type = $this->definition['entity type'];
 
-    if (!isset($definitions)) {
-      $definitions['value'] = array(
+    if (!isset(self::$propertyDefinitions[$entity_type])) {
+      self::$propertyDefinitions[$entity_type]['value'] = array(
         // @todo: Lookup the entity type's ID data type and use it here.
         'type' => 'integer',
         'label' => t('Entity ID'),
       );
-      $definitions['entity'] = array(
+      self::$propertyDefinitions[$entity_type]['entity'] = array(
         'type' => 'entity',
-        'entity type' => $this->definition['entity type'],
+        'entity type' => $entity_type,
         'label' => t('Entity'),
         'description' => t('The referenced entity'),
         // The entity object is computed out of the entity id.
@@ -37,7 +46,7 @@ class PropertyEntityReferenceItem extends EntityPropertyItemBase {
         'read-only' => FALSE,
       );
     }
-    return $definitions;
+    return self::$propertyDefinitions[$entity_type];
   }
 
   /**

@@ -14,18 +14,25 @@ use InvalidArgumentException;
 class PropertyLanguageItem extends EntityPropertyItemBase {
 
   /**
+   * Array of property definitions of contained properties.
+   *
+   * @see PropertyEntityReferenceItem::getPropertyDefinitions()
+   *
+   * @var array
+   */
+  static $propertyDefinitions;
+
+  /**
    * Implements DataStructureInterface::getPropertyDefinitions().
    */
   public function getPropertyDefinitions() {
-    // Statically cache the definitions to avoid creating lots of array copies.
-    $definitions = &drupal_static(__CLASS__);
 
-    if (!isset($definitions)) {
-      $definitions['value'] = array(
+    if (!isset(self::$propertyDefinitions)) {
+      self::$propertyDefinitions['value'] = array(
         'type' => 'string',
         'label' => t('Language code'),
       );
-      $definitions['language'] = array(
+      self::$propertyDefinitions['language'] = array(
         'type' => 'language',
         'label' => t('Language object'),
         // The language object is retrieved via the language code.
@@ -33,7 +40,7 @@ class PropertyLanguageItem extends EntityPropertyItemBase {
         'read-only' => FALSE,
       );
     }
-    return $definitions;
+    return self::$propertyDefinitions;
   }
 
   /**

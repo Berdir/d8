@@ -8,6 +8,7 @@
 namespace Drupal\text;
 use Drupal\Core\TypedData\DataWrapperInterface;
 use Drupal\Core\TypedData\DataReadOnlyException;
+use InvalidArgumentException;
 
 /**
  * The string property type.
@@ -35,10 +36,10 @@ class PropertyProcessedText extends \Drupal\Core\TypedData\Type\String {
     $this->definition = $definition;
 
     if (!isset($context['parent'])) {
-      throw new \InvalidArgumentException('Computed properties require context for computation.');
+      throw new InvalidArgumentException('Computed properties require context for computation.');
     }
     if (!isset($definition['source'])) {
-      throw new \InvalidArgumentException("The definition's 'source' key has to specify the name of the text property to be processed.");
+      throw new InvalidArgumentException("The definition's 'source' key has to specify the name of the text property to be processed.");
     }
 
     $this->text = $context['parent']->get($definition['source']);

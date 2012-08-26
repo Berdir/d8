@@ -13,21 +13,28 @@ use Drupal\text\PropertyTextItem;
 class PropertyTextWithSummaryItem extends PropertyTextItem {
 
   /**
+   * Property definitions of the contained properties.
+   *
+   * @see self::getPropertyDefinitions()
+   *
+   * @var array
+   */
+  static $propertyDefinitions;
+
+  /**
    * Implements DataStructureInterface::getPropertyDefinitions().
    */
   public function getPropertyDefinitions() {
-    // Statically cache the definitions to avoid creating lots of array copies.
-    $definitions = drupal_static(__CLASS__);
 
-    if (!isset($definitions)) {
+    if (!isset(self::$propertyDefinitions)) {
 
-      $definitions = parent::getPropertyDefinitions();
+      self::$propertyDefinitions = parent::getPropertyDefinitions();
 
-      $definitions['summary'] = array(
+      self::$propertyDefinitions['summary'] = array(
         'type' => 'string',
         'label' => t('Summary text value'),
       );
-      $definitions['summary_processed'] = array(
+      self::$propertyDefinitions['summary_processed'] = array(
         'type' => 'string',
         'label' => t('Processed summary text'),
         'description' => t('The summary text value with the text format applied.'),
@@ -37,7 +44,7 @@ class PropertyTextWithSummaryItem extends PropertyTextItem {
         'source' => 'summary',
       );
     }
-    return $definitions;
+    return self::$propertyDefinitions;
   }
 }
 
