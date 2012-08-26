@@ -10,10 +10,6 @@ use Drupal\Core\TypedData\DataWrapperInterface;
 
 /**
  * The binary data type.
- *
- * @todo
- *   Consider to use either the URI data wrapper or Drupal's stream wrapper API
- *   to handle the file.
  */
 class Binary implements DataWrapperInterface {
 
@@ -25,18 +21,23 @@ class Binary implements DataWrapperInterface {
   protected $definition;
 
   /**
-   * The filename of the binary file.
+   * The resource URI.
    *
-   * @var string
+   * @var integer
    */
-  protected $filename = NULL;
+  protected $uri;
 
   /**
-   * Resource pointer to the file.
+   * The resource stream wrapper.
    *
-   * @var mixed
+   * @var \Drupal\Core\StreamWrapper\StreamWrapperInterface
    */
-  protected $handle = NULL;
+  protected $streamWrapper;
+
+  /**
+   * The path that was opened.
+   */
+  protected $openedPath;
 
   /**
    * Implements DataWrapperInterface::__construct().
@@ -45,15 +46,6 @@ class Binary implements DataWrapperInterface {
     $this->definition = $definition;
     if (isset($value)) {
       $this->setValue($value);
-    }
-  }
-
-  /**
-   * Close file resource handle when desctructing this wrapper.
-   */
-  public function __destruct() {
-    if ($this->handle !== NULL) {
-      fclose($this->handle);
     }
   }
 
@@ -75,27 +67,25 @@ class Binary implements DataWrapperInterface {
    * Implements DataWrapperInterface::getValue().
    */
   public function getValue() {
-    if (file_exists($this->filename)) {
-      $this->handle = fopen($this->filename);
-      return fread($this->handle, filesize($this->filename));
-    }
-    else {
-      return NULL;
-    }
+    $class = file_stream_wrapper_get_class($this->definition['scheme']);
+    $this->streamWrapper = new $class;
+    $this->streamWrapper->setUri($this->uri);
+    $this->streamWrapper->stream_open($this->uri, 'r', STREAM_USE_PATH | STREAM_REPORT_ERRORS, $this->openedPath);
+    return $this->streamWrapper->handle;
   }
 
   /**
    * Implements DataWrapperInterface::setValue().
    */
   public function setValue($value) {
-    $this->filename = $value;
+    $this->uri = $value;
   }
 
   /**
    * Implements DataWrapperInterface::getString().
    */
   public function getString() {
-    return base64_encode($this->getValue());
+    return base64_encode($this->streamWrapper->stream_read(filesize($this->openedPath)));
   }
 
   /**

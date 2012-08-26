@@ -1917,6 +1917,7 @@ function system_data_type_info() {
       'label' => t('Binary'),
       'class' => '\Drupal\Core\TypedData\Type\Binary',
       'primitive type' => DataPrimitive::BINARY,
+      'scheme' => 'public',
     ),
     'language' => array(
       'label' => t('Language'),
