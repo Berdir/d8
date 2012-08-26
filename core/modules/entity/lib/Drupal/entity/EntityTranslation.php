@@ -9,6 +9,7 @@ namespace Drupal\entity;
 
 use Drupal\Core\TypedData\DataWrapperInterface;
 use Drupal\Core\TypedData\DataStructureInterface;
+use ArrayIterator;
 use InvalidArgumentException;
 
 /**
@@ -109,10 +110,10 @@ class EntityTranslation implements DataStructureInterface, DataWrapperInterface 
   /**
    * Implements DataStructureInterface::getProperties().
    */
-  public function getProperties() {
+  public function getProperties($include_computed = FALSE) {
     $properties = array();
     foreach ($this->getPropertyDefinitions() as $name => $definition) {
-      if (empty($definition['computed'])) {
+      if ($include_computed || empty($definition['computed'])) {
         $properties[$name] = $this->get($name);
       }
     }
@@ -149,7 +150,7 @@ class EntityTranslation implements DataStructureInterface, DataWrapperInterface 
    * Implements IteratorAggregate::getIterator().
    */
   public function getIterator() {
-    return new \ArrayIterator($this->getProperties());
+    return new ArrayIterator($this->getProperties());
   }
 
   /**

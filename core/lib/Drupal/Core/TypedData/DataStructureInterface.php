@@ -19,14 +19,14 @@ interface DataStructureInterface extends IteratorAggregate  {
   /**
    * Gets an array of properties.
    *
-   * The array contains all properties which are not computed.
-   * @todo: How to get computed properties via the interface?
+   * @param bool $include_computed
+   *   If set to TRUE, computed properties are included. Defaults to FALSE.
    *
    * @return array
    *   An array of property objects implementing the DataWrapperInterface, keyed
    *   by property name.
    */
-  public function getProperties();
+  public function getProperties($include_computed = FALSE);
 
   /**
    * Sets an array of properties.

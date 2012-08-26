@@ -165,10 +165,10 @@ abstract class EntityPropertyItemBase implements EntityPropertyItemInterface {
   /**
    * Implements DataStructureInterface::getProperties().
    */
-  public function getProperties() {
+  public function getProperties($include_computed = FALSE) {
     $properties = array();
     foreach ($this->getPropertyDefinitions() as $name => $definition) {
-      if (empty($definition['computed'])) {
+      if ($include_computed || empty($definition['computed'])) {
         $properties[$name] = $this->properties[$name];
       }
     }

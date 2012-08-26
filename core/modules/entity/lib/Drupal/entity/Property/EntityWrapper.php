@@ -134,9 +134,9 @@ class EntityWrapper implements DataWrapperInterface, DataStructureInterface {
   /**
    * Implements DataStructureInterface::getProperties().
    */
-  public function getProperties() {
+  public function getProperties($include_computed = FALSE) {
     $entity = $this->getValue();
-    return $entity ? $entity->getProperties() : array();
+    return $entity ? $entity->getProperties($include_computed) : array();
   }
 
   /**

@@ -10,6 +10,7 @@ namespace Drupal\entity;
 use Drupal\Core\TypedData\DataWrapperInterface;
 use Drupal\Core\TypedData\DataStructureTranslatableInterface;
 use Drupal\Component\Uuid\Uuid;
+use ArrayIterator;
 use InvalidArgumentException;
 
 /**
@@ -112,10 +113,10 @@ class EntityNG extends Entity implements DataStructureTranslatableInterface {
   /**
    * Implements DataStructureInterface::getProperties().
    */
-  public function getProperties() {
+  public function getProperties($include_computed = FALSE) {
     $properties = array();
     foreach ($this->getPropertyDefinitions() as $name => $definition) {
-      if (empty($definition['computed'])) {
+      if ($include_computed || empty($definition['computed'])) {
         $properties[$name] = $this->get($name);
       }
     }
@@ -137,7 +138,7 @@ class EntityNG extends Entity implements DataStructureTranslatableInterface {
    * Implements IteratorAggregate::getIterator().
    */
   public function getIterator() {
-    return new \ArrayIterator($this->getProperties());
+    return new ArrayIterator($this->getProperties());
   }
 
   /**
