@@ -155,6 +155,7 @@ class EntityNG extends Entity implements DataStructureTranslatableInterface, Dat
    */
   public function getPropertyDefinitions() {
     return entity_get_controller($this->entityType)->getPropertyDefinitions(array(
+      'type' => 'entity',
       'entity type' => $this->entityType,
       'bundle' => $this->bundle(),
     ));
@@ -183,7 +184,7 @@ class EntityNG extends Entity implements DataStructureTranslatableInterface, Dat
    */
   public function getTranslation($langcode) {
 
-    if ($langcode == LANGUAGE_DEFAULT || $langcode == $this->get('langcode')->value) {
+    if ($langcode == LANGUAGE_DEFAULT || $langcode == $this->language()->langcode) {
       // No translation needed, return the entity.
       return $this;
     }
@@ -193,13 +194,16 @@ class EntityNG extends Entity implements DataStructureTranslatableInterface, Dat
     if (!isset($languages[$langcode])) {
       throw new InvalidArgumentException("Unable to get translation for the invalid language '$langcode'.");
     }
-
-    $definition = array(
-      'entity type' => $this->entityType,
+    $properties = array();
+    foreach ($this->getPropertyDefinitions() as $name => $definition) {
+      $properties[$name] = $this->get($name, $langcode);
+    }
+    $translation_definition = array(
+      'type' => 'entity_translation',
+      'entity type' => $this->entityType(),
       'bundle' => $this->bundle(),
-      'langcode' => $langcode,
     );
-    return new EntityTranslation($definition, NULL, array('parent' => $this));
+    return drupal_wrap_data($translation_definition, $properties, array('parent' => $this, 'langcode' => $langcode));
   }
 
   /**

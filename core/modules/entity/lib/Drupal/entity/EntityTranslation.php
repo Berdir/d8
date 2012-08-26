@@ -28,26 +28,27 @@ class EntityTranslation implements DataStructureInterface, DataWrapperInterface,
   protected $definition;
 
   /**
-   * The entity of which we make property translations available.
+   * The array of translated properties, each being an instance of
+   * EntityPropertyListInterface.
    *
-   * @var EntityNG
+   * @var array
    */
-  protected $entity;
+  protected $properties = array();
+
+  /**
+   * The language code of the translation.
+   *
+   * @var string
+   */
+  protected $langcode;
 
   /**
    * Implements DataWrapperInterface::__construct().
    */
   public function __construct(array $definition, $value = NULL, array $context = array()) {
     $this->definition = $definition;
-
-    if (empty($context['parent'])) {
-      throw new InvalidArgumentException('Missing context, i.e. the entity to work with.');
-    }
-    $this->entity = $context['parent'];
-
-    if (empty($this->definition['langcode'])) {
-      throw new InvalidArgumentException('Missing language code');
-    }
+    $this->properties = (array) $value;
+    $this->langcode = $context['langcode'];
   }
 
   /**
@@ -107,7 +108,7 @@ class EntityTranslation implements DataStructureInterface, DataWrapperInterface,
     if (!isset($definitions[$property_name])) {
       throw new InvalidArgumentException('Property ' . check_plain(key($values)) . ' is unknown or not translatable.');
     }
-    return $this->entity->get($property_name, $this->definition['langcode']);
+    return $this->properties[$property_name];
   }
 
   /**
@@ -135,14 +136,14 @@ class EntityTranslation implements DataStructureInterface, DataWrapperInterface,
   }
 
   /**
-   * Magic getter: Gets the property in default language.
+   * Magic getter: Gets the translated property.
    */
   public function __get($name) {
     return $this->get($name);
   }
 
   /**
-   * Magic getter: Sets the property in default language.
+   * Magic getter: Sets the translated property.
    */
   public function __set($name, $value) {
     $value = $value instanceof DataWrapperInterface ? $value->getValue() : $value;
@@ -169,7 +170,12 @@ class EntityTranslation implements DataStructureInterface, DataWrapperInterface,
    */
   public function getPropertyDefinitions() {
     $definitions = array();
-    foreach ($this->entity->getPropertyDefinitions() as $name => $definition) {
+    $entity_properties = entity_get_controller($this->definition['entity type'])->getPropertyDefinitions(array(
+      'type' => 'entity',
+      'entity type' => $this->definition['entity type'],
+      'bundle' => $this->definition['bundle'],
+    ));
+    foreach ($entity_properties as $name => $definition) {
       if (!empty($definition['translatable'])) {
         $definitions[$name] = $definition;
       }

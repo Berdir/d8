@@ -590,5 +590,10 @@ function entity_data_type_info() {
       'description' => t('All kind of entities, e.g. nodes, comments or users.'),
       'class' => '\Drupal\entity\Property\EntityWrapper',
     ),
+    'entity_translation' => array(
+      'label' => t('Entity translation'),
+      'description' => t('A translation of an entity'),
+      'class' => '\Drupal\entity\EntityTranslation',
+    ),
   );
 }
