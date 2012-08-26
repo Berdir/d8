@@ -23,7 +23,7 @@ class Binary implements DataWrapperInterface {
   /**
    * The resource URI.
    *
-   * @var integer
+   * @var string
    */
   protected $uri;
 
