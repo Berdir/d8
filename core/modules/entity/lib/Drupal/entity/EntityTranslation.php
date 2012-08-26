@@ -9,13 +9,16 @@ namespace Drupal\entity;
 
 use Drupal\Core\TypedData\DataWrapperInterface;
 use Drupal\Core\TypedData\DataStructureInterface;
+use Drupal\Core\TypedData\DataAccessibleInterface;
 use ArrayIterator;
 use InvalidArgumentException;
 
 /**
  * Makes translated entity properties available via the Property API.
+ *
+ * @todo: Needs an entity specific interface.
  */
-class EntityTranslation implements DataStructureInterface, DataWrapperInterface {
+class EntityTranslation implements DataStructureInterface, DataWrapperInterface, DataAccessibleInterface {
 
   /**
    * The property definition.
@@ -181,7 +184,10 @@ class EntityTranslation implements DataStructureInterface, DataWrapperInterface 
     return $this->getValue();
   }
 
-  public function access($account = NULL) {
+  /**
+   * Implements DataAccessibleInterface::access().
+   */
+  public function access(\Drupal\user\User $account = NULL) {
     // @todo implement
   }
 

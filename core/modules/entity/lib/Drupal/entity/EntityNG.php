@@ -9,6 +9,7 @@ namespace Drupal\entity;
 
 use Drupal\Core\TypedData\DataWrapperInterface;
 use Drupal\Core\TypedData\DataStructureTranslatableInterface;
+use Drupal\Core\TypedData\DataAccessibleInterface;
 use Drupal\Component\Uuid\Uuid;
 use ArrayIterator;
 use InvalidArgumentException;
@@ -19,7 +20,7 @@ use InvalidArgumentException;
  * @todo: Once all entity types have been converted, merge improvements into the
  * Entity class and let EntityInterface extend the DataStructureInterface.
  */
-class EntityNG extends Entity implements DataStructureTranslatableInterface {
+class EntityNG extends Entity implements DataStructureTranslatableInterface, DataAccessibleInterface {
 
   /**
    * The plain data values of the contained properties.
@@ -224,7 +225,10 @@ class EntityNG extends Entity implements DataStructureTranslatableInterface {
     return $languages;
   }
 
-  public function access($account) {
+  /**
+   * Implements DataAccessibleInterface::access().
+   */
+  public function access(\Drupal\user\User $account = NULL) {
     // TODO: Implement access() method.
   }
 
