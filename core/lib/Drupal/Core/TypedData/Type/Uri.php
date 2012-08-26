@@ -34,7 +34,7 @@ class Uri implements DataWrapperInterface {
   /**
    * Implements DataWrapperInterface::__construct().
    */
-  public function __construct(array $definition, $value = NULL, $context = array()) {
+  public function __construct(array $definition, $value = NULL, array $context = array()) {
     $this->definition = $definition;
     if (isset($value)) {
       $this->setValue($value);

@@ -42,7 +42,7 @@ abstract class EntityPropertyItemBase implements EntityPropertyItemInterface {
   /**
    * Implements DataWrapperInterface::__construct().
    */
-  public function __construct(array $definition, $value = NULL, $context = array()) {
+  public function __construct(array $definition, $value = NULL, array $context = array()) {
     $this->definition = $definition;
 
     // Initialize all property objects, but postpone the creating of computed

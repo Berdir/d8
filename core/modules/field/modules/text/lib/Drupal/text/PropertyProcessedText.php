@@ -31,7 +31,7 @@ class PropertyProcessedText extends \Drupal\Core\TypedData\Type\String {
   /**
    * Implements DataWrapperInterface::__construct().
    */
-  public function __construct(array $definition, $value = NULL, $context = array()) {
+  public function __construct(array $definition, $value = NULL, array $context = array()) {
     $this->definition = $definition;
 
     if (!isset($context['parent'])) {

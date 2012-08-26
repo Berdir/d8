@@ -21,7 +21,7 @@ interface DataWrapperInterface {
    * @param mixed $value
    *   (optional) The data value, or NULL if the it is not set. See
    *   DataWrapperInterface::setValue() for details.
-   * @param $context
+   * @param array $context
    *   (optional) An array describing the context of the data. It should be
    *   passed if a data value is wrapped as part of a data structure. The
    *   following keys are supported:
@@ -31,7 +31,7 @@ interface DataWrapperInterface {
    *
    * @see drupal_wrap_data()
    */
-  public function __construct(array $definition, $value = NULL, $context = array());
+  public function __construct(array $definition, $value = NULL, array $context = array());
 
   /**
    * Gets the data type.

@@ -7334,9 +7334,9 @@ function drupal_get_data_type_info() {
  *
  * @param array $definition
  *   The data definition.
- * @param $value
+ * @param mixed $value
  *   (optional) The data value. If set, it has to match the data type format.
- * @param $context
+ * @param array $context
  *   (optional) An array describing the context of the data. It should be
  *   passed if a data value is wrapped as part of a data structure. The
  *   following keys are supported:
@@ -7348,7 +7348,7 @@ function drupal_get_data_type_info() {
  *
  * @see drupal_get_data_type_info()
  */
-function drupal_wrap_data(array $definition, $value = NULL, $context = array()) {
+function drupal_wrap_data(array $definition, $value = NULL, array $context = array()) {
   $type_info = drupal_get_data_type_info();
 
   // Allow per-data definition overrides of the used classes.
