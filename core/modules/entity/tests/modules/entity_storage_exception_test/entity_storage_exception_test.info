@@ -1,0 +1,7 @@
+name = Entity Exception test module
+description = Provides exception testing for entity module.
+package = Testing
+version = VERSION
+core = 8.x
+dependencies[] = entity
+hidden = TRUE

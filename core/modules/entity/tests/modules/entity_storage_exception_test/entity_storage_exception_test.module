@@ -1,0 +1,24 @@
+<?php
+
+/**
+ * @file
+ * Helper module for entity storage exception tests.
+ */
+
+/**
+ * Implements hook_entity_presave()
+ */
+function entity_storage_exception_test_entity_presave($entity) {
+  if (variable_get('entity_storage_exception_test_throw_exception', FALSE)) {
+    throw new Exception('Entity presave Exception', 1);
+  }
+}
+
+/**
+ * Implements hook_entity_predelete()
+ */
+function entity_storage_exception_test_entity_predelete($entity, $entityType) {
+  if (variable_get('entity_storage_exception_test_throw_exception', FALSE)) {
+    throw new Exception('Entity predelete Exception', 2);
+  }
+}
