@@ -11,14 +11,7 @@ use Drupal\Core\TypedData\DataWrapperInterface;
 /**
  * The binary data type.
  */
-class Binary implements DataWrapperInterface {
-
-  /**
-   * The data definition.
-   *
-   * @var array
-   */
-  protected $definition;
+class Binary extends DataTypeBase implements DataWrapperInterface {
 
   /**
    * The resource URI.
@@ -38,30 +31,6 @@ class Binary implements DataWrapperInterface {
    * The path that was opened.
    */
   protected $openedPath;
-
-  /**
-   * Implements DataWrapperInterface::__construct().
-   */
-  public function __construct(array $definition, $value = NULL, array $context = array()) {
-    $this->definition = $definition;
-    if (isset($value)) {
-      $this->setValue($value);
-    }
-  }
-
-  /**
-   * Implements DataWrapperInterface::getType().
-   */
-  public function getType() {
-    return $this->definition['type'];
-  }
-
-  /**
-   * Implements DataWrapperInterface::getDefinition().
-   */
-  public function getDefinition() {
-    return $this->definition;
-  }
 
   /**
    * Implements DataWrapperInterface::getValue().

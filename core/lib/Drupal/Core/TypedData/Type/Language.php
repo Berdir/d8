@@ -10,14 +10,7 @@ use \Drupal\Core\TypedData\DataWrapperInterface;
 /**
  * Defines the 'language' data type, e.g. the computed 'language' property of language items.
  */
-class Language implements DataWrapperInterface {
-
-  /**
-   * The data definition.
-   *
-   * @var array
-   */
-  protected $definition;
+class Language extends DataTypeBase implements DataWrapperInterface {
 
   /**
    * The data wrapper holding the langcode value.
@@ -44,20 +37,6 @@ class Language implements DataWrapperInterface {
     if (isset($value)) {
       $this->setValue($value);
     }
-  }
-
-  /**
-   * Implements DataWrapperInterface::getType().
-   */
-  public function getType() {
-    return $this->definition['type'];
-  }
-
-  /**
-   * Implements DataWrapperInterface::getDefinition().
-   */
-  public function getDefinition() {
-    return $this->definition;
   }
 
   /**

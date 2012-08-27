@@ -11,14 +11,7 @@ use Drupal\Core\TypedData\DataWrapperInterface;
 /**
  * The date data type.
  */
-class Date implements DataWrapperInterface {
-
-  /**
-   * The data definition.
-   *
-   * @var array
-   */
-  protected $definition;
+class Date extends DataTypeBase implements DataWrapperInterface {
 
   /**
    * The data value.
@@ -28,41 +21,10 @@ class Date implements DataWrapperInterface {
   protected $value;
 
   /**
-   * Implements DataWrapperInterface::__construct().
-   */
-  public function __construct(array $definition, $value = NULL, array $context = array()) {
-    $this->definition = $definition;
-    if (isset($value)) {
-      $this->setValue($value);
-    }
-  }
-
-  /**
-   * Implements DataWrapperInterface::getType().
-   */
-  public function getType() {
-    return $this->definition['type'];
-  }
-
-  /**
-   * Implements DataWrapperInterface::getDefinition().
-   */
-  public function getDefinition() {
-    return $this->definition;
-  }
-
-  /**
    * Implements DataWrapperInterface::getValue().
    */
   public function getValue() {
     return new \DateTime($this->value);
-  }
-
-  /**
-   * Implements DataWrapperInterface::setValue().
-   */
-  public function setValue($value) {
-    $this->value = $value;
   }
 
   /**
