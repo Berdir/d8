@@ -450,7 +450,7 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
     catch (Exception $e) {
       $transaction->rollback();
       watchdog_exception($this->entityType, $e);
-      throw new EntityStorageException($e->getMessage, $e->getCode, $e);
+      throw new EntityStorageException($e->getMessage(), $e->getCode(), $e);
     }
   }
 
