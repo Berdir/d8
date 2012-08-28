@@ -563,6 +563,9 @@ function entity_form_submit_build_entity($entity_type, $entity, $form, &$form_st
  * @param string $entity_type
  *   (optional) Limit the query to the provided entity type. Defaults to all
  *   entity types.
+ *
+ * @return Drupal\entity\EntityFieldQuery
+ *   Returns an EntityFieldQuery object.
  */
 function entity_query($entity_type = NULL) {
   $query = new EntityFieldQuery();

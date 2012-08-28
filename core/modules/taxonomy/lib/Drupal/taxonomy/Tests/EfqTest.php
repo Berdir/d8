@@ -7,8 +7,6 @@
 
 namespace Drupal\taxonomy\Tests;
 
-use Drupal\entity\EntityFieldQuery;
-
 /**
  * Tests the functionality of EntityFieldQuery for taxonomy entities.
  */

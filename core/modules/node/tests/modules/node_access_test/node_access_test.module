@@ -7,8 +7,6 @@
  * a special 'node test view' permission.
  */
 
-use Drupal\entity\EntityFieldQuery;
-
 use Drupal\node\Node;
 
 /**

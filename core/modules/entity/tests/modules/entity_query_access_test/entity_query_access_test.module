@@ -5,9 +5,6 @@
  * Helper module for testing EntityFieldQuery access on any type of entity.
  */
 
-use Drupal\entity\EntityFieldQuery;
-use Drupal\entity\EntityFieldQueryException;
-
 /**
  * Implements hook_menu().
  */
