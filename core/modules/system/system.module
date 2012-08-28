@@ -2986,7 +2986,7 @@ function system_region_list($theme_key, $show = REGIONS_ALL) {
   $list = array_keys($info['regions']);
   // If requested, suppress hidden regions. See block_admin_display_form().
   if ($show == REGIONS_VISIBLE && isset($info['regions_hidden'])) {
-    $list = array_diff($list, $info['regions_hidden']);
+    $list = array_values(array_diff($list, $info['regions_hidden']));
   }
   return $list;
 }
@@ -3037,7 +3037,7 @@ function system_system_info_alter(&$info, $file, $type) {
  *   A string that is the region name.
  */
 function system_default_region($theme) {
-  $regions = array_keys(system_region_list($theme, REGIONS_VISIBLE));
+  $regions = system_region_list($theme, REGIONS_VISIBLE);
   return isset($regions[0]) ? $regions[0] : '';
 }
 
