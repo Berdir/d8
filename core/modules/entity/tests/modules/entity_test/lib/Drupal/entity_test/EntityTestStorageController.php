@@ -9,7 +9,7 @@ namespace Drupal\entity_test;
 
 use PDO;
 
-use Drupal\entity\EntityInterface;
+use Drupal\entity\StorableInterface;
 use Drupal\entity\DatabaseStorageController;
 use Drupal\entity\EntityStorageException;
 use Drupal\Component\Uuid\Uuid;
@@ -214,7 +214,7 @@ class EntityTestStorageController extends DatabaseStorageController {
    *
    * Added mapping from entities to storage records before saving.
    */
-  public function save(EntityInterface $entity) {
+  public function save(StorableInterface $entity) {
     $transaction = db_transaction();
     try {
       // Load the stored entity, if any.
@@ -269,7 +269,7 @@ class EntityTestStorageController extends DatabaseStorageController {
    * Invokes field API attachers in compatibility mode and disables it
    * afterwards.
    */
-  protected function invokeHook($hook, EntityInterface $entity) {
+  protected function invokeHook($hook, StorableInterface $entity) {
     if (!empty($this->entityInfo['fieldable']) && function_exists($function = 'field_attach_' . $hook)) {
       $entity->setCompatibilityMode(TRUE);
       $function($this->entityType, $entity);
@@ -285,7 +285,7 @@ class EntityTestStorageController extends DatabaseStorageController {
   /**
    * Maps from an entity object to the storage record of the base table.
    */
-  protected function mapToStorageRecord(EntityInterface $entity) {
+  protected function mapToStorageRecord(StorableInterface $entity) {
     $record = new \stdClass();
     $record->id = $entity->id();
     $record->langcode = $entity->langcode->value;
@@ -298,7 +298,7 @@ class EntityTestStorageController extends DatabaseStorageController {
    *
    * Stores values of translatable properties.
    */
-  protected function postSave(EntityInterface $entity, $update) {
+  protected function postSave(StorableInterface $entity, $update) {
     $default_langcode = $entity->language()->langcode;
 
     foreach ($entity->getTranslationLanguages() as $langcode => $language) {

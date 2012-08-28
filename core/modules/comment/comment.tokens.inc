@@ -104,9 +104,9 @@ function comment_token_info() {
  */
 function comment_tokens($type, $tokens, array $data = array(), array $options = array()) {
   $url_options = array('absolute' => TRUE);
-  if (isset($options['language'])) {
-    $url_options['language'] = $options['language'];
-    $langcode = $options['language']->langcode;
+  if (isset($options['langcode'])) {
+    $url_options['language'] = language_load($options['langcode']);
+    $langcode = $options['langcode'];
   }
   else {
     $langcode = NULL;
@@ -131,7 +131,7 @@ function comment_tokens($type, $tokens, array $data = array(), array $options = 
           break;
 
         case 'name':
-          $name = ($comment->uid == 0) ? variable_get('anonymous', t('Anonymous')) : $comment->name;
+          $name = ($comment->uid == 0) ? config('user.settings')->get('anonymous') : $comment->name;
           $replacements[$original] = $sanitize ? filter_xss($name) : $name;
           break;
 

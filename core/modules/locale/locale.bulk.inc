@@ -8,6 +8,7 @@
 use Drupal\Component\Gettext\PoStreamWriter;
 use Drupal\locale\Gettext;
 use Drupal\locale\PoDatabaseReader;
+use Drupal\Core\Language\Language;
 
 
 /**
@@ -99,11 +100,9 @@ function locale_translate_import_form_submit($form, &$form_state) {
     // Add language, if not yet supported.
     $language = language_load($form_state['values']['langcode']);
     if (empty($language)) {
-      include_once DRUPAL_ROOT . '/core/includes/standard.inc';
-      $predefined = standard_language_list();
-      $language = (object) array(
-        'langcode' => $form_state['values']['langcode'],
-      );
+      $language = new Language(array(
+        'langcode' => $form_state['values']['langcode']
+      ));
       $language = language_save($language);
       drupal_set_message(t('The language %language has been created.', array('%language' => t($language->name))));
     }
@@ -227,7 +226,7 @@ function locale_translate_export_form_submit($form, &$form_state) {
   if (!empty($item)) {
     $uri = tempnam('temporary://', 'po_');
     $header = $reader->getHeader();
-    $header->setProjectName(variable_get('site_name', 'Drupal'));
+    $header->setProjectName(config('system.site')->get('name'));
     $header->setLanguageName($languageName);
 
     $writer = new PoStreamWriter;
@@ -497,13 +496,17 @@ function locale_translate_batch_finished($success, $results) {
     $additions = $updates = $deletes = $skips = 0;
     drupal_set_message(format_plural(count($results['files']), 'One translation file imported.', '@count translation files imported.'));
     $skipped_files = array();
-    foreach ($results['stats'] as $filepath => $report) {
-      $additions += $report['additions'];
-      $updates += $report['updates'];
-      $deletes += $report['deletes'];
-      $skips += $report['skips'];
-      if ($report['skips'] > 0) {
-        $skipped_files[] = $filepath;
+    // If there are no results and/or no stats (eg. coping with an empty .po
+    // file), simply do nothing.
+    if ($results && isset($results['stats'])) {
+      foreach ($results['stats'] as $filepath => $report) {
+        $additions += $report['additions'];
+        $updates += $report['updates'];
+        $deletes += $report['deletes'];
+        $skips += $report['skips'];
+        if ($report['skips'] > 0) {
+          $skipped_files[] = $filepath;
+        }
       }
     }
     drupal_set_message(t('The translation was successfully imported. There are %number newly created translated strings, %update strings were updated and %delete strings were removed.', array('%number' => $additions, '%update' => $updates, '%delete' => $deletes)));

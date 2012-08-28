@@ -5,6 +5,7 @@
  * Administration functions for language.module.
  */
 
+use Drupal\Core\Language\Language;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -199,7 +200,7 @@ function language_admin_add_form($form, &$form_state) {
       ),
     ),
     '#validate' => array('language_admin_add_predefined_form_validate'),
-    '#submit' => array('language_admin_add_predefined_form_submit'),
+    '#submit' => array('language_admin_add_form_submit'),
   );
 
   $form['custom_language'] = array(
@@ -215,7 +216,7 @@ function language_admin_add_form($form, &$form_state) {
     '#type' => 'submit',
     '#value' => t('Add custom language'),
     '#validate' => array('language_admin_add_custom_form_validate'),
-    '#submit' => array('language_admin_add_custom_form_submit'),
+    '#submit' => array('language_admin_add_form_submit'),
   );
 
   return $form;
@@ -249,7 +250,7 @@ function language_admin_edit_form($form, &$form_state, $language) {
  */
 function _language_admin_common_controls(&$form, $language = NULL) {
   if (!is_object($language)) {
-    $language = new stdClass();
+    $language = new Language(array('langcode' => NULL, 'name' => NULL,));
   }
   if (isset($language->langcode)) {
     $form['langcode_view'] = array(
@@ -268,8 +269,8 @@ function _language_admin_common_controls(&$form, $language = NULL) {
       '#title' => t('Language code'),
       '#maxlength' => 12,
       '#required' => TRUE,
-      '#default_value' => @$language->langcode,
-      '#disabled' => (isset($language->langcode)),
+      '#default_value' => '',
+      '#disabled' => FALSE,
       '#description' => t('Use language codes as <a href="@w3ctags">defined by the W3C</a> for interoperability. <em>Examples: "en", "en-gb" and "zh-hant".</em>', array('@w3ctags' => 'http://www.w3.org/International/articles/language-tags/')),
     );
   }
@@ -325,34 +326,30 @@ function language_admin_add_custom_form_validate($form, &$form_state) {
 }
 
 /**
- * Process the custom language addition form submission.
+ * Process the custom and predefined language addition form submission.
  */
-function language_admin_add_custom_form_submit($form, &$form_state) {
-  $langcode = $form_state['values']['langcode'];
-  // Custom language form.
-  $language = (object) array(
-    'langcode' => $langcode,
-    'name' => $form_state['values']['name'],
-    'direction' => $form_state['values']['direction'],
-  );
-  language_save($language);
-  drupal_set_message(t('The language %language has been created and can now be used.', array('%language' => $form_state['values']['name'])));
-  $form_state['redirect'] = 'admin/config/regional/language';
-}
-
-/**
- * Process the predefined language addition form submission.
- */
-function language_admin_add_predefined_form_submit($form, &$form_state) {
-  // Predefined language selection.
+function language_admin_add_form_submit($form, &$form_state) {
   $langcode = $form_state['values']['predefined_langcode'];
-  include_once DRUPAL_ROOT . '/core/includes/standard.inc';
-  $predefined = standard_language_list();
-  $language = (object) array(
-    'langcode' => $langcode,
-  );
-  language_save($language);
-  drupal_set_message(t('The language %language has been created and can now be used.', array('%language' => t($predefined[$langcode][0]))));
+  if ($langcode == 'custom') {
+    $langcode = $form_state['values']['langcode'];
+    // Custom language form.
+    $language = new Language(array(
+      'langcode' => $langcode,
+      'name' => $form_state['values']['name'],
+      'direction' => $form_state['values']['direction'],
+    ));
+  }
+  else {
+    $language = new Language(array('langcode' => $langcode));
+  }
+  // Save the language and inform the user that it happened.
+  $language = language_save($language);
+  drupal_set_message(t('The language %language has been created and can now be used.', array('%language' => $language->name)));
+
+  // Tell the user they have the option to add a language switcher block
+  // to their theme so they can switch between the languages.
+  drupal_set_message(t('Use one of the language switcher blocks to allow site visitors to switch between languages. You can enable these blocks on the <a href="@block-admin">block administration page</a>.', array('@block-admin' => 'admin/structure/block')));
+
   $form_state['redirect'] = 'admin/config/regional/language';
 }
 

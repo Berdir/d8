@@ -208,14 +208,6 @@ function language_process_language_select($element) {
 function language_save($language) {
   $language->is_new = !(bool) db_query_range('SELECT 1 FROM {language} WHERE langcode = :langcode', 0, 1, array(':langcode' => $language->langcode))->fetchField();
 
-  // If name was not set, we add a predefined language.
-  if (!isset($language->name)) {
-    include_once DRUPAL_ROOT . '/core/includes/standard.inc';
-    $predefined = standard_language_list();
-    $language->name = $predefined[$language->langcode][0];
-    $language->direction = isset($predefined[$language->langcode][2]) ? $predefined[$language->langcode][2] : LANGUAGE_LTR;
-  }
-
   // Let other modules modify $language before saved.
   module_invoke_all('language_presave', $language);
 
@@ -367,7 +359,7 @@ function language_language_negotiation_info() {
     'file' => $file,
     'weight' => -8,
     'name' => t('URL'),
-    'description' => t('Determine the language from the URL (Path prefix or domain).'),
+    'description' => t('Language from the URL (Path prefix or domain).'),
     'config' => 'admin/config/regional/language/detection/url',
   );
 
@@ -380,7 +372,7 @@ function language_language_negotiation_info() {
     'file' => $file,
     'weight' => -6,
     'name' => t('Session'),
-    'description' => t('Determine the language from a request/session parameter.'),
+    'description' => t('Language from a request/session parameter.'),
     'config' => 'admin/config/regional/language/detection/session',
   );
 
@@ -388,8 +380,8 @@ function language_language_negotiation_info() {
     'callbacks' => array('negotiation' => 'language_from_user'),
     'file' => $file,
     'weight' => -4,
-    'name' => t('User'),
-    'description' => t("Follow the user's language preference."),
+    'name' => t('Account'),
+    'description' => t('Account site language setting.'),
   );
 
   $negotiation_info[LANGUAGE_NEGOTIATION_BROWSER] = array(
@@ -398,7 +390,7 @@ function language_language_negotiation_info() {
     'weight' => -2,
     'cache' => 0,
     'name' => t('Browser'),
-    'description' => t("Determine the language from the browser's language settings."),
+    'description' => t("Language from the browser's language settings."),
   );
 
   $negotiation_info[LANGUAGE_NEGOTIATION_INTERFACE] = array(

@@ -7,6 +7,8 @@
 
 namespace Drupal\openid\Tests;
 
+use Drupal\Core\Language\Language;
+
 /**
  * Test account registration using Simple Registration and Attribute Exchange.
  */
@@ -31,14 +33,14 @@ class OpenIDRegistrationTest extends OpenIDTestBase {
 
   function setUp() {
     parent::setUp();
-    variable_set('user_register', USER_REGISTER_VISITORS);
+    config('user.settings')->set('register', USER_REGISTER_VISITORS)->save();
   }
 
   /**
    * Test OpenID auto-registration with e-mail verification enabled.
    */
   function testRegisterUserWithEmailVerification() {
-    variable_set('user_email_verification', TRUE);
+    config('user.settings')->set('verify_mail', TRUE)->save();
     variable_get('configurable_timezones', 1);
     variable_set('date_default_timezone', 'Europe/Brussels');
 
@@ -54,13 +56,13 @@ class OpenIDRegistrationTest extends OpenIDTestBase {
     // process should pick 'pt' based on the sreg.language being 'pt-BR'
     // (and falling back on least specific language given no pt-br available
     // locally).
-    $language = (object) array(
+    $language = new Language(array(
       'langcode' => 'pt',
-    );
+    ));
     language_save($language);
-    $language = (object) array(
+    $language = new Language(array(
       'langcode' => 'pt-pt',
-    );
+    ));
     language_save($language);
 
     // Use a User-supplied Identity that is the URL of an XRDS document.
@@ -95,7 +97,7 @@ class OpenIDRegistrationTest extends OpenIDTestBase {
    * Test OpenID auto-registration with e-mail verification disabled.
    */
   function testRegisterUserWithoutEmailVerification() {
-    variable_set('user_email_verification', FALSE);
+    config('user.settings')->set('verify_mail', FALSE)->save();
     variable_get('configurable_timezones', 1);
     variable_set('date_default_timezone', 'Europe/Brussels');
 
@@ -109,9 +111,9 @@ class OpenIDRegistrationTest extends OpenIDTestBase {
 
     // Save Portuguese, Brazil as an optional language. The process should pick
     // 'pt-br' based on the sreg.language later.
-    $language = (object) array(
+    $language = new Language(array(
       'langcode' => 'pt-br',
-    );
+    ));
     language_save($language);
 
     // Use a User-supplied Identity that is the URL of an XRDS document.
@@ -227,7 +229,7 @@ class OpenIDRegistrationTest extends OpenIDTestBase {
    * but no SREG.
    */
   function testRegisterUserWithAXButNoSREG() {
-    variable_set('user_email_verification', FALSE);
+    config('user.settings')->set('verify_mail', FALSE)->save();
     variable_set('date_default_timezone', 'Europe/Brussels');
 
     // Tell openid_test.module to respond with these AX fields.
@@ -246,13 +248,13 @@ class OpenIDRegistrationTest extends OpenIDTestBase {
 
     // Save Portuguese and Portuguese, Portugal as optional languages. The
     // process should pick 'pt-pt' as the more specific language.
-    $language = (object) array(
+    $language = new Language(array(
       'langcode' => 'pt',
-    );
+    ));
     language_save($language);
-    $language = (object) array(
+    $language = new Language(array(
       'langcode' => 'pt-pt',
-    );
+    ));
     language_save($language);
 
     // Use a User-supplied Identity that is the URL of an XRDS document.

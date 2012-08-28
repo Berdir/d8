@@ -1216,6 +1216,7 @@ function hook_page_alter(&$page) {
  *
  * @see hook_form_BASE_FORM_ID_alter()
  * @see hook_form_FORM_ID_alter()
+ * @see forms_api_reference.html
  */
 function hook_form_alter(&$form, &$form_state, $form_id) {
   if (isset($form['type']) && $form['type']['#value'] . '_node_settings' == $form_id) {
@@ -1252,6 +1253,7 @@ function hook_form_alter(&$form, &$form_state, $form_id) {
  * @see hook_form_alter()
  * @see hook_form_BASE_FORM_ID_alter()
  * @see drupal_prepare_form()
+ * @see forms_api_reference.html
  */
 function hook_form_FORM_ID_alter(&$form, &$form_state, $form_id) {
   // Modification for the form with the given form ID goes here. For example, if
@@ -3752,12 +3754,12 @@ function hook_url_outbound_alter(&$path, &$options, $original_path) {
  */
 function hook_tokens($type, $tokens, array $data = array(), array $options = array()) {
   $url_options = array('absolute' => TRUE);
-  if (isset($options['language'])) {
-    $url_options['language'] = $options['language'];
-    $language_code = $options['language']->langcode;
+  if (isset($options['langcode'])) {
+    $url_options['language'] = language_load($options['langcode']);
+    $langcode = $options['langcode'];
   }
   else {
-    $language_code = NULL;
+    $langcode = NULL;
   }
   $sanitize = !empty($options['sanitize']);
 
@@ -3783,12 +3785,12 @@ function hook_tokens($type, $tokens, array $data = array(), array $options = arr
 
         // Default values for the chained tokens handled below.
         case 'author':
-          $name = ($node->uid == 0) ? variable_get('anonymous', t('Anonymous')) : $node->name;
+          $name = ($node->uid == 0) ? config('user.settings')->get('anonymous') : $node->name;
           $replacements[$original] = $sanitize ? filter_xss($name) : $name;
           break;
 
         case 'created':
-          $replacements[$original] = format_date($node->created, 'medium', '', NULL, $language_code);
+          $replacements[$original] = format_date($node->created, 'medium', '', NULL, $langcode);
           break;
       }
     }
@@ -3825,12 +3827,12 @@ function hook_tokens($type, $tokens, array $data = array(), array $options = arr
 function hook_tokens_alter(array &$replacements, array $context) {
   $options = $context['options'];
 
-  if (isset($options['language'])) {
-    $url_options['language'] = $options['language'];
-    $language_code = $options['language']->langcode;
+  if (isset($options['langcode'])) {
+    $url_options['language'] = language_load($options['langcode']);
+    $langcode = $options['langcode'];
   }
   else {
-    $language_code = NULL;
+    $langcode = NULL;
   }
   $sanitize = !empty($options['sanitize']);
 
@@ -3840,7 +3842,7 @@ function hook_tokens_alter(array &$replacements, array $context) {
     // Alter the [node:title] token, and replace it with the rendered content
     // of a field (field_title).
     if (isset($context['tokens']['title'])) {
-      $title = field_view_field('node', $node, 'field_title', 'default', $language_code);
+      $title = field_view_field('node', $node, 'field_title', 'default', $langcode);
       $replacements[$context['tokens']['title']] = drupal_render($title);
     }
   }

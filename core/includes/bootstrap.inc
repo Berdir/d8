@@ -37,13 +37,6 @@ const DRUPAL_MINIMUM_PHP = '5.3.3';
 const DRUPAL_MINIMUM_PHP_MEMORY_LIMIT = '32M';
 
 /**
- * Indicates that the item should never be removed unless explicitly selected.
- *
- * The item may be removed using cache()->delete() with a cache ID.
- */
-const CACHE_PERMANENT = 0;
-
-/**
  * @defgroup logging_severity_levels Logging severity levels
  * @{
  * Logging severity levels as defined in RFC 3164.
@@ -1297,7 +1290,7 @@ function drupal_serve_page_from_cache(stdClass $cache) {
   $config = config('system.performance');
 
   // Negotiate whether to use compression.
-  $page_compression = $config->get('page_compression') && extension_loaded('zlib');
+  $page_compression = $config->get('response.gzip') && extension_loaded('zlib');
   $return_compressed = $page_compression && isset($_SERVER['HTTP_ACCEPT_ENCODING']) && strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') !== FALSE;
 
   // Get headers set in hook_boot(). Keys are lower-case.
@@ -1323,7 +1316,7 @@ function drupal_serve_page_from_cache(stdClass $cache) {
   // max-age > 0, allowing the page to be cached by external proxies, when a
   // session cookie is present unless the Vary header has been replaced or
   // unset in hook_boot().
-  $max_age = !isset($_COOKIE[session_name()]) || isset($hook_boot_headers['vary']) ? $config->get('page_cache_maximum_age') : 0;
+  $max_age = !isset($_COOKIE[session_name()]) || isset($hook_boot_headers['vary']) ? $config->get('cache.page.max_age') : 0;
   $default_headers['Cache-Control'] = 'public, max-age=' . $max_age;
 
   // Entity tag should change if the output changes.
@@ -1665,9 +1658,8 @@ function watchdog_exception($type, Exception $exception, $message = NULL, $varia
  *   the variables argument to declare the value of the placeholders.
  *   See t() for documentation on how $message and $variables interact.
  * @param $variables
- *   Array of variables to replace in the message on display or
- *   NULL if message is already translated or not possible to
- *   translate.
+ *   Array of variables to replace in the message on display or array() if
+ *   message is already translated or not possible to translate.
  * @param $severity
  *   The severity of the message; one of the following values as defined in
  *   @link http://www.faqs.org/rfcs/rfc3164.html RFC 3164: @endlink
@@ -1685,7 +1677,7 @@ function watchdog_exception($type, Exception $exception, $message = NULL, $varia
  * @see watchdog_severity_levels()
  * @see hook_watchdog()
  */
-function watchdog($type, $message, $variables = array(), $severity = WATCHDOG_NOTICE, $link = NULL) {
+function watchdog($type, $message, array $variables = array(), $severity = WATCHDOG_NOTICE, $link = NULL) {
   global $user, $base_root;
 
   static $in_error_state = FALSE;
@@ -2276,7 +2268,7 @@ function _drupal_bootstrap_page_cache() {
   else {
     drupal_bootstrap(DRUPAL_BOOTSTRAP_VARIABLES, FALSE);
     $config = config('system.performance');
-    $cache_enabled = $config->get('cache');
+    $cache_enabled = $config->get('cache.page.enabled');
   }
   drupal_block_denied(ip_address());
   // If there is no session cookie and cache is enabled (or forced), try
@@ -3545,4 +3537,52 @@ function drupal_check_memory_limit($required, $memory_limit = NULL) {
   // - The memory limit is greater than or equal to the memory required for
   //   the operation.
   return ((!$memory_limit) || ($memory_limit == -1) || (parse_size($memory_limit) >= parse_size($required)));
+}
+
+/**
+ * Instantiates and statically caches a storage controller for generated PHP code.
+ *
+ * By default, this returns an instance of the
+ * Drupal\Component\PhpStorage\MTimeProtectedFileStorage class.
+ *
+ * Classes implementing
+ * Drupal\Component\PhpStorage\PhpStorageInterface can be registered for a
+ * specific bin or as a default implementation.
+ *
+ * @param $name
+ *   The name for which the storage controller should be returned. Defaults to
+ *   'default'. The name is also used as the storage bin if one is not
+ *   specified in the configuration.
+ *
+ * @return Drupal\Component\PhpStorage\PhpStorageInterface
+ *   An instantiated storage controller for the specified name.
+ *
+ * @see Drupal\Component\PhpStorage\PhpStorageInterface
+ */
+function drupal_php_storage($name = 'default') {
+  global $conf;
+  $storage_controllers = &drupal_static(__FUNCTION__);
+  if (!isset($storage_controllers[$name])) {
+    if (isset($conf['php_storage'][$name])) {
+      $configuration = $conf['php_storage'][$name];
+    }
+    elseif (isset($conf['php_storage']['default'])) {
+      $configuration = $conf['php_storage']['default'];
+    }
+    else {
+      $configuration = array(
+        'class' => 'Drupal\Component\PhpStorage\MTimeProtectedFileStorage',
+        'secret' => $GLOBALS['drupal_hash_salt'],
+      );
+    }
+    $class = isset($configuration['class']) ? $configuration['class'] : 'Drupal\Component\PhpStorage\MTimeProtectedFileStorage';
+    if (!isset($configuration['bin'])) {
+      $configuration['bin'] = $name;
+    }
+    if (!isset($configuration['directory'])) {
+      $configuration['directory'] = DRUPAL_ROOT . '/' . variable_get('file_public_path', conf_path() . '/files') . '/php';
+    }
+    $storage_controllers[$name] = new $class($configuration);
+  }
+  return $storage_controllers[$name];
 }

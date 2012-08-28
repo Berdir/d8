@@ -83,11 +83,4 @@ abstract class DataTypeBase implements DataWrapperInterface {
   public function getString() {
     return (string) $this->getValue();
   }
-
-  /**
-   * Implements DataWrapperInterface::validate().
-   *
-   * @return bool
-   */
-  abstract public function validate() ;
 }

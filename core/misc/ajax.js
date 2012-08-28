@@ -1,4 +1,4 @@
-(function ($) {
+(function ($, window) {
 
 "use strict";
 
@@ -21,8 +21,8 @@ Drupal.ajax = Drupal.ajax || {};
  */
 Drupal.behaviors.AJAX = {
   attach: function (context, settings) {
-    // Load all Ajax behaviors specified in the settings.
-    for (var base in settings.ajax) {
+
+    function loadAjaxBehaviour(base) {
       var element_settings = settings.ajax[base];
       if (typeof element_settings.selector === 'undefined') {
         element_settings.selector = '#' + base;
@@ -31,6 +31,13 @@ Drupal.behaviors.AJAX = {
         element_settings.element = this;
         Drupal.ajax[element_settings.selector] = new Drupal.ajax(base, this, element_settings);
       });
+    }
+
+    // Load all Ajax behaviors specified in the settings.
+    for (var base in settings.ajax) {
+      if (settings.ajax.hasOwnProperty(base)) {
+        loadAjaxBehaviour(base);
+      }
     }
 
     // Bind Ajax behaviors to all items showing the class.
@@ -207,8 +214,8 @@ Drupal.ajax.prototype.keypressResponse = function (element, event) {
   // spacebar activation causes inappropriate activation if #ajax['keypress'] is
   // TRUE. On a text-type widget a space should always be a space.
   if (event.which === 13 || (event.which === 32 && element.type !== 'text' && element.type !== 'textarea')) {
+    event.preventDefault();
     $(ajax.element_settings.element).trigger(ajax.element_settings.event);
-    return false;
   }
 };
 
@@ -221,12 +228,14 @@ Drupal.ajax.prototype.keypressResponse = function (element, event) {
  * ajax object.
  */
 Drupal.ajax.prototype.eventResponse = function (element, event) {
+  event.preventDefault();
+
   // Create a synonym for this to reduce code confusion.
   var ajax = this;
 
   // Do not perform another ajax command if one is already in progress.
   if (ajax.ajaxing) {
-    return false;
+    return;
   }
 
   try {
@@ -252,18 +261,8 @@ Drupal.ajax.prototype.eventResponse = function (element, event) {
     // Unset the ajax.ajaxing flag here because it won't be unset during
     // the complete response.
     ajax.ajaxing = false;
-    alert("An error occurred while attempting to process " + ajax.options.url + ": " + e.message);
+    window.alert("An error occurred while attempting to process " + ajax.options.url + ": " + e.message);
   }
-
-  // For radio/checkbox, allow the default event. On IE, this means letting
-  // it actually check the box.
-  if (typeof element.type !== 'undefined' && (element.type === 'checkbox' || element.type === 'radio')) {
-    return true;
-  }
-  else {
-    return false;
-  }
-
 };
 
 /**
@@ -295,13 +294,18 @@ Drupal.ajax.prototype.beforeSerialize = function (element, options) {
   // @see ajax_base_page_theme()
   // @see drupal_get_css()
   // @see drupal_get_js()
-  options.data['ajax_page_state[theme]'] = Drupal.settings.ajaxPageState.theme;
-  options.data['ajax_page_state[theme_token]'] = Drupal.settings.ajaxPageState.theme_token;
-  for (var key in Drupal.settings.ajaxPageState.css) {
-    options.data['ajax_page_state[css][' + key + ']'] = 1;
+  var pageState = Drupal.settings.ajaxPageState;
+  options.data['ajax_page_state[theme]'] = pageState.theme;
+  options.data['ajax_page_state[theme_token]'] = pageState.theme_token;
+  for (var cssFile in pageState.css) {
+    if (pageState.css.hasOwnProperty(cssFile)) {
+      options.data['ajax_page_state[css][' + cssFile + ']'] = 1;
+    }
   }
-  for (var key in Drupal.settings.ajaxPageState.js) {
-    options.data['ajax_page_state[js][' + key + ']'] = 1;
+  for (var jsFile in pageState.js) {
+    if (pageState.js.hasOwnProperty(jsFile)) {
+      options.data['ajax_page_state[js][' + jsFile + ']'] = 1;
+    }
   }
 };
 
@@ -389,8 +393,8 @@ Drupal.ajax.prototype.success = function (response, status) {
   Drupal.freezeHeight();
 
   for (var i in response) {
-    if (response[i]['command'] && this.commands[response[i]['command']]) {
-      this.commands[response[i]['command']](this, response[i], status);
+    if (response.hasOwnProperty(i) && response[i].command && this.commands[response[i].command]) {
+      this.commands[response[i].command](this, response[i], status);
     }
   }
 
@@ -441,7 +445,7 @@ Drupal.ajax.prototype.getEffect = function (response) {
  * Handler for the form redirection error.
  */
 Drupal.ajax.prototype.error = function (response, uri) {
-  alert(Drupal.ajaxError(response, uri));
+  window.alert(Drupal.ajaxError(response, uri));
   // Remove the progress element.
   if (this.progress.element) {
     $(this.progress.element).remove();
@@ -473,6 +477,7 @@ Drupal.ajax.prototype.commands = {
     var wrapper = response.selector ? $(response.selector) : $(ajax.wrapper);
     var method = response.method || ajax.method;
     var effect = ajax.getEffect(response);
+    var settings;
 
     // We don't know what response.data contains: it might be a string of text
     // without HTML, so don't rely on jQuery correctly iterpreting
@@ -503,7 +508,7 @@ Drupal.ajax.prototype.commands = {
       case 'replaceAll':
       case 'empty':
       case 'remove':
-        var settings = response.settings || ajax.settings || Drupal.settings;
+        settings = response.settings || ajax.settings || Drupal.settings;
         Drupal.detachBehaviors(wrapper, settings);
     }
 
@@ -531,7 +536,7 @@ Drupal.ajax.prototype.commands = {
     // optional.
     if (new_content.parents('html').length > 0) {
       // Apply any settings from the returned JSON if available.
-      var settings = response.settings || ajax.settings || Drupal.settings;
+      settings = response.settings || ajax.settings || Drupal.settings;
       Drupal.attachBehaviors(new_content, settings);
     }
   },
@@ -561,7 +566,7 @@ Drupal.ajax.prototype.commands = {
    * Command to provide an alert.
    */
   alert: function (ajax, response, status) {
-    alert(response.text, response.title);
+    window.alert(response.text, response.title);
   },
 
   /**
@@ -595,7 +600,7 @@ Drupal.ajax.prototype.commands = {
    */
   invoke: function (ajax, response, status) {
     var $element = $(response.selector);
-    $element[response.method].apply($element, response.arguments);
+    $element[response.method].apply($element, response.args);
   },
 
   /**
@@ -625,11 +630,12 @@ Drupal.ajax.prototype.commands = {
     var match, importMatch = /^@import url\("(.*)"\);$/igm;
     if (document.styleSheets[0].addImport && importMatch.test(response.data)) {
       importMatch.lastIndex = 0;
-      while (match = importMatch.exec(response.data)) {
+      do {
+        match = importMatch.exec(response.data);
         document.styleSheets[0].addImport(match[1]);
-      }
+      } while (match);
     }
   }
 };
 
-})(jQuery);
+})(jQuery, this);
