@@ -2973,10 +2973,14 @@ function _system_default_theme_features() {
  * @param $show
  *   Possible values: REGIONS_ALL or REGIONS_VISIBLE. Visible excludes hidden
  *   regions.
+ * @param $translate
+ *   (optional) Region labels are translated when TRUE, defaults to FALSE. This
+ *   should be set to TRUE when the region labels are to be displayed in the
+ *   user interface.
  * @return
  *   An array of regions in the form $region['name'] = 'description'.
  */
-function system_region_list($theme_key, $show = REGIONS_ALL) {
+function system_region_list($theme_key, $show = REGIONS_ALL, $translate = FALSE) {
   $themes = list_themes();
   if (!isset($themes[$theme_key])) {
     return array();
@@ -2987,7 +2991,9 @@ function system_region_list($theme_key, $show = REGIONS_ALL) {
   // If requested, suppress hidden regions. See block_admin_display_form().
   foreach ($info['regions'] as $name => $label) {
     if ($show == REGIONS_ALL || !isset($info['regions_hidden']) || !in_array($name, $info['regions_hidden'])) {
-      $list[$name] = t($label);
+      // For performance reasons, only translate the region label when
+      // requested to do.
+      $list[$name] = $translate ? t($label) : $label;
     }
   }
 

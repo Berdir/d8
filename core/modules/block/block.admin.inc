@@ -87,7 +87,7 @@ function block_admin_display_form($form, &$form_state, $blocks, $theme, $block_r
 
   // Get a list of block regions if one was not provided.
   if (!isset($block_regions)) {
-    $block_regions = system_region_list($theme, REGIONS_VISIBLE);
+    $block_regions = system_region_list($theme, REGIONS_VISIBLE, TRUE);
   }
   // Add a last region for disabled blocks.
   $block_regions_with_disabled = $block_regions + array(BLOCK_REGION_NONE => BLOCK_REGION_NONE);
@@ -332,7 +332,7 @@ function block_admin_configure($form, &$form_state, $module, $delta) {
         '#title' => $theme_title,
         '#default_value' => !empty($region) && $region != -1 ? $region : NULL,
         '#empty_value' => BLOCK_REGION_NONE,
-        '#options' => system_region_list($key, REGIONS_VISIBLE),
+        '#options' => system_region_list($key, REGIONS_VISIBLE, TRUE),
         '#weight' => ($key == $theme_default ? 9 : 10),
       );
     }
