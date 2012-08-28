@@ -556,3 +556,18 @@ function entity_form_submit_build_entity($entity_type, $entity, $form, &$form_st
     field_attach_submit($entity_type, $entity, $form, $form_state);
   }
 }
+
+/**
+ * Returns an entity query object.
+ *
+ * @param string $entity_type
+ *   (optional) Limit the query to the provided entity type. Defaults to all
+ *   entity types.
+ */
+function entity_query($entity_type = NULL) {
+  $query = new EntityFieldQuery();
+  if ($entity_type) {
+    $query->entityCondition('entity_type', $entity_type);
+  }
+  return $query;
+}

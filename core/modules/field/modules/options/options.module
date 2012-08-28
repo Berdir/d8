@@ -384,8 +384,7 @@ function options_field_update_forbid($field, $prior_field, $has_data) {
  */
 function _options_values_in_use($field, $values) {
   if ($values) {
-    $query = new EntityFieldQuery();
-    $found = $query
+    $found = entity_query()
       ->fieldCondition($field['field_name'], 'value', $values)
       ->range(0, 1)
       ->execute();

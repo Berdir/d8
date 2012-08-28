@@ -1018,11 +1018,10 @@ function file_get_file_references(File $file, $field = NULL, $age = FIELD_LOAD_R
   foreach ($fields as $field_name => $file_field) {
     if ((empty($field_type) || $file_field['type'] == $field_type) && !isset($references[$field_name])) {
       // Get each time this file is used within a field.
-      $query = new EntityFieldQuery();
-      $query
+      $references[$field_name] = entity_query()
         ->fieldCondition($file_field, 'fid', $file->fid)
-        ->age($age);
-      $references[$field_name] = $query->execute();
+        ->age($age)
+        ->execute();
     }
   }
 

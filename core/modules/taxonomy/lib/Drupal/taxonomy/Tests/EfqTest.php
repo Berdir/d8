@@ -37,9 +37,8 @@ class EfqTest extends TaxonomyTestBase {
       $term = $this->createTerm($this->vocabulary);
       $terms[$term->tid] = $term;
     }
-    $query = new EntityFieldQuery();
-    $query->entityCondition('entity_type', 'taxonomy_term');
-    $result = $query->execute();
+    $result = entity_query('taxonomy_term')
+      ->execute();
     $result = $result['taxonomy_term'];
     asort($result);
     $this->assertEqual(array_keys($terms), array_keys($result), 'Taxonomy terms were retrieved by EntityFieldQuery.');
@@ -56,10 +55,9 @@ class EfqTest extends TaxonomyTestBase {
       $terms2[$term->tid] = $term;
     }
 
-    $query = new EntityFieldQuery();
-    $query->entityCondition('entity_type', 'taxonomy_term');
-    $query->entityCondition('bundle', $vocabulary2->machine_name);
-    $result = $query->execute();
+    $result = entity_query('taxonomy_term')
+      ->entityCondition('bundle', $vocabulary2->machine_name)
+      ->execute();
     $result = $result['taxonomy_term'];
     asort($result);
     $this->assertEqual(array_keys($terms2), array_keys($result), format_string('Taxonomy terms from the %name vocabulary were retrieved by EntityFieldQuery.', array('%name' => $vocabulary2->name)));
