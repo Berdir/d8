@@ -106,9 +106,16 @@ class EntityTranslation implements DataStructureInterface, DataWrapperInterface,
   public function get($property_name) {
     $definitions = $this->getPropertyDefinitions();
     if (!isset($definitions[$property_name])) {
-      throw new InvalidArgumentException('Property ' . check_plain(key($values)) . ' is unknown or not translatable.');
+      throw new InvalidArgumentException('Property ' . check_plain($property_name) . ' is unknown or not translatable.');
     }
     return $this->properties[$property_name];
+  }
+
+  /**
+   * Implements DataStructureInterface::set().
+   */
+  public function set($property_name, $value) {
+    $this->get($property_name)->setValue($value);
   }
 
   /**
@@ -128,10 +135,16 @@ class EntityTranslation implements DataStructureInterface, DataWrapperInterface,
    * Implements DataStructureInterface::setProperties().
    */
   public function setProperties($properties) {
-    foreach ($properties as $name => $property) {
-      // Copy the value to our property object.
-      $value = $property instanceof DataWrapperInterface ? $property->getValue() : $property;
-      $this->get($name)->setValue($value);
+    foreach ($this->getProperties() as $name => $property) {
+      if (isset($properties[$name])) {
+        // Copy the value to our property object.
+        $value = $properties[$name] instanceof DataWrapperInterface ? $properties[$name]->getValue() : $properties[$name];
+        $property->setValue($value);
+        unset($properties[$name]);
+      }
+    }
+    if ($properties) {
+      throw new InvalidArgumentException('Property ' . check_plain(key($values)) . ' is unknown or not translatable.');
     }
   }
 
@@ -146,7 +159,6 @@ class EntityTranslation implements DataStructureInterface, DataWrapperInterface,
    * Magic getter: Sets the translated property.
    */
   public function __set($name, $value) {
-    $value = $value instanceof DataWrapperInterface ? $value->getValue() : $value;
     $this->get($name)->setValue($value);
   }
 

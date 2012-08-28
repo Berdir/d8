@@ -72,6 +72,8 @@ class EntityNG extends Entity implements DataStructureTranslatableInterface, Dat
 
   /**
    * Implements EntityInterface::get().
+   *
+   * @todo: Factor language handling out into a protected method.
    */
   public function get($property_name, $langcode = NULL) {
     // Values in default language are stored using the LANGUAGE_DEFAULT
@@ -95,20 +97,22 @@ class EntityNG extends Entity implements DataStructureTranslatableInterface, Dat
         throw new InvalidArgumentException('Property ' . check_plain($property_name) . ' is unknown.');
       }
       // Non-translatable properties always use default language.
-      $langcode = empty($definition['translatable']) ? LANGUAGE_DEFAULT : $langcode;
-
-      $value = isset($this->values[$property_name][$langcode]) ? $this->values[$property_name][$langcode] : NULL;
-      $this->properties[$property_name][$langcode] = drupal_wrap_data($definition, $value);
+      if ($langcode != LANGUAGE_DEFAULT && empty($definition['translatable'])) {
+        $this->properties[$property_name][$langcode] = $this->get($property_name);
+      }
+      else {
+        $value = isset($this->values[$property_name][$langcode]) ? $this->values[$property_name][$langcode] : NULL;
+        $this->properties[$property_name][$langcode] = drupal_wrap_data($definition, $value);
+      }
     }
     return $this->properties[$property_name][$langcode];
   }
 
   /**
-   * Implements EntityInterface::set().
+   * Implements DataStructureInterface::set().
    */
-  public function set($property_name, $value, $langcode = NULL) {
-    $value = $value instanceof DataWrapperInterface ? $value->getValue() : $value;
-    $this->get($property_name, $langcode)->setValue($value);
+  public function set($property_name, $value) {
+    $this->get($property_name)->setValue($value);
   }
 
   /**

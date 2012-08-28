@@ -98,6 +98,13 @@ class EntityPropertyTest extends WebTestBase  {
     $this->assertEqual($new_user->uid, $entity->user_id->value, 'Updated user id can be read.');
     $this->assertEqual($new_user->name, $entity->user_id->entity->name, 'Updated user name value can be read.');
 
+    // Try unsetting a property.
+    $entity->name->value = NULL;
+    $entity->user_id->value = NULL;
+    $this->assertNull($entity->name->value, 'Name property is not set.');
+    $this->assertNull($entity->user_id->value, 'User ID property is not set.');
+    $this->assertNull($entity->user_id->entity, 'User entity property is not set.');
+
     // Access the language property.
     $this->assertEqual(LANGUAGE_NOT_SPECIFIED, $entity->langcode->value, 'Language code can be read.');
     $this->assertEqual(language_load(LANGUAGE_NOT_SPECIFIED), $entity->langcode->language, 'Language object can be read.');

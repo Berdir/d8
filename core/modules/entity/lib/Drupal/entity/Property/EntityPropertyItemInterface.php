@@ -20,19 +20,6 @@ use Drupal\Core\TypedData\DataAccessibleInterface;
 interface EntityPropertyItemInterface extends DataStructureInterface, DataWrapperInterface {
 
   /**
-   * Returns a property.
-   *
-   * Entity property items may contain only primitives and entity references.
-   *
-   * @param string $property_name
-   *   The name of the property to return; e.g., 'value'.
-   *
-   * @return Drupal\Core\TypedData\DataWrapperInterface
-   *   The property object.
-   */
-  public function get($property_name);
-
-  /**
    * Magic getter: Get the property value.
    */
   public function __get($name);

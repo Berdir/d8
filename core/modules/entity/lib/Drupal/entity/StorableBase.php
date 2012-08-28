@@ -145,90 +145,46 @@ abstract class StorableBase implements StorableInterface {
   }
 
   /**
-   * Implements StorableInterface::language().
+   * Implements StorableInterface::get().
+   */
+  public function get($property_name, $langcode = NULL) {
+    // @todo: Replace by EntityNG implementation once all entity types have been
+    // converted to use the entity property API.
+    return isset($this->{$property_name}) ? $this->{$property_name} : NULL;
+  }
+
+  /**
+   * Implements DataStructureInterface::set().
+   */
+  public function set($property_name, $value) {
+    // @todo: Replace by EntityNG implementation once all entity types have been
+    // converted to use the entity property API.
+    $this->{$property_name} = $value;
+  }
+
+  /**
+   * Implements DataStructureTranslatableInterface::language().
    */
   public function language() {
-    // @todo: Check for language.module instead, once Field API language
-    // handling depends upon it too.
+    // @todo: Replace by EntityNG implementation once all entity types have been
+    // converted to use the entity property API.
     return module_exists('locale') ? language_load($this->langcode) : FALSE;
   }
 
   /**
-   * Implements StorableInterface::translations().
+   * Implements DataStructureTranslatableInterface::getTranslation().
    */
-  public function translations() {
-    $languages = array();
-    $entity_info = $this->entityInfo();
-    if ($entity_info['fieldable'] && ($default_language = $this->language())) {
-      // Go through translatable properties and determine all languages for
-      // which translated values are available.
-      foreach (field_info_instances($this->entityType, $this->bundle()) as $field_name => $instance) {
-        $field = field_info_field($field_name);
-        if (field_is_translatable($this->entityType, $field) && isset($this->$field_name)) {
-          foreach ($this->$field_name as $langcode => $value)  {
-            $languages[$langcode] = TRUE;
-          }
-        }
-      }
-      // Remove the default language from the translations.
-      unset($languages[$default_language->langcode]);
-      $languages = array_intersect_key(language_list(), $languages);
-    }
-    return $languages;
+  public function getTranslation($langcode) {
+    // @todo: Replace by EntityNG implementation once all entity types have been
+    // converted to use the entity property API.
   }
 
   /**
-   * Implements StorableInterface::get().
+   * Implements DataStructureTranslatableInterface::getTranslationLanguages().
    */
-  public function get($property_name, $langcode = NULL) {
-    // Handle fields.
-    $entity_info = $this->entityInfo();
-    if ($entity_info['fieldable'] && field_info_instance($this->entityType, $property_name, $this->bundle())) {
-      $field = field_info_field($property_name);
-      $langcode = $this->getFieldLangcode($field, $langcode);
-      return isset($this->{$property_name}[$langcode]) ? $this->{$property_name}[$langcode] : NULL;
-    }
-    else {
-      // Handle properties being not fields.
-      // @todo: Add support for translatable properties being not fields.
-      return isset($this->{$property_name}) ? $this->{$property_name} : NULL;
-    }
-  }
-
-  /**
-   * Implements StorableInterface::set().
-   */
-  public function set($property_name, $value, $langcode = NULL) {
-    // Handle fields.
-    $entity_info = $this->entityInfo();
-    if ($entity_info['fieldable'] && field_info_instance($this->entityType, $property_name, $this->bundle())) {
-      $field = field_info_field($property_name);
-      $langcode = $this->getFieldLangcode($field, $langcode);
-      $this->{$property_name}[$langcode] = $value;
-    }
-    else {
-      // Handle properties being not fields.
-      // @todo: Add support for translatable properties being not fields.
-      $this->{$property_name} = $value;
-    }
-  }
-
-  /**
-   * Determines the language code to use for accessing a field value in a certain language.
-   */
-  protected function getFieldLangcode($field, $langcode = NULL) {
-    // Only apply the given langcode if the entity is language-specific.
-    // Otherwise translatable fields are handled as non-translatable fields.
-    if (field_is_translatable($this->entityType, $field) && ($default_language = $this->language()) && !language_is_locked($this->langcode)) {
-      // For translatable fields the values in default language are stored using
-      // the language code of the default language.
-      return isset($langcode) ? $langcode : $default_language->langcode;
-    }
-    else {
-      // If there is a langcode defined for this field, just return it. Otherwise
-      // return LANGUAGE_NOT_SPECIFIED.
-      return (isset($this->langcode) ? $this->langcode : LANGUAGE_NOT_SPECIFIED);
-    }
+  public function getTranslationLanguages($include_default = TRUE) {
+    // @todo: Replace by EntityNG implementation once all entity types have been
+    // converted to use the entity property API.
   }
 
   /**
@@ -282,5 +238,53 @@ abstract class StorableBase implements StorableInterface {
    */
   public function isCurrentRevision() {
     return $this->isCurrentRevision;
+  }
+
+  /**
+   * Implements DataStructureTranslatableInterface::getProperties().
+   */
+  public function getProperties($include_computed = FALSE) {
+    // @todo: Replace by EntityNG implementation once all entity types have been
+    // converted to use the entity property API.
+  }
+
+  /**
+   * Implements DataStructureTranslatableInterface::setProperties().
+   */
+  public function setProperties($properties) {
+    // @todo: Replace by EntityNG implementation once all entity types have been
+    // converted to use the entity property API.
+  }
+
+  /**
+   * Implements DataStructureTranslatableInterface::getPropertyDefinition().
+   */
+  public function getPropertyDefinition($name) {
+    // @todo: Replace by EntityNG implementation once all entity types have been
+    // converted to use the entity property API.
+  }
+
+  /**
+   * Implements DataStructureTranslatableInterface::getPropertyDefinitions().
+   */
+  public function getPropertyDefinitions() {
+    // @todo: Replace by EntityNG implementation once all entity types have been
+    // converted to use the entity property API.
+  }
+
+  /**
+   * Implements DataStructureTranslatableInterface::toArray().
+   */
+  public function toArray() {
+    // @todo: Replace by EntityNG implementation once all entity types have been
+    // converted to use the entity property API.
+  }
+
+  /**
+   * Implements DataStructureTranslatableInterface::getIterator().
+   */
+  public function getIterator() {
+    // @todo: Replace by EntityNG implementation once all entity types have been
+    // converted to use the entity property API.
   }
 }

@@ -139,13 +139,20 @@ abstract class EntityPropertyItemBase implements EntityPropertyItemInterface {
   }
 
   /**
-   * Gets a property.
+   * Implements DataStructureInterface::get().
    */
   public function get($property_name) {
     if (!isset($this->properties[$property_name])) {
       throw new InvalidArgumentException('Property ' . check_plain($property_name) . ' is unknown.');
     }
     return $this->properties[$property_name];
+  }
+
+  /**
+   * Implements DataStructureInterface::set().
+   */
+  public function set($property_name, $value) {
+    $this->get($property_name)->setValue($value);
   }
 
   /**

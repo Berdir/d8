@@ -65,28 +65,6 @@ abstract class ConfigurableBase extends StorableBase implements ConfigurableInte
   }
 
   /**
-   * Overrides Entity::get().
-   *
-   * EntityInterface::get() implements support for fieldable entities, but
-   * configurable entities are not fieldable.
-   */
-  public function get($property_name, $langcode = NULL) {
-    // @todo: Add support for translatable properties being not fields.
-    return isset($this->{$property_name}) ? $this->{$property_name} : NULL;
-  }
-
-  /**
-   * Overrides Entity::set().
-   *
-   * EntityInterface::set() implements support for fieldable entities, but
-   * configurable entities are not fieldable.
-   */
-  public function set($property_name, $value, $langcode = NULL) {
-    // @todo: Add support for translatable properties being not fields.
-    $this->{$property_name} = $value;
-  }
-
-  /**
    * Helper callback for uasort() to sort Configurable entities by weight and label.
    */
   public static function sort($a, $b) {

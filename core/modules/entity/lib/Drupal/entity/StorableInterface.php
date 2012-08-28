@@ -6,11 +6,12 @@
  */
 
 namespace Drupal\entity;
+use Drupal\Core\TypedData\DataStructureTranslatableInterface;
 
 /**
  * Defines a common interface for all entity objects.
  */
-interface StorableInterface {
+interface StorableInterface extends DataStructureTranslatableInterface {
 
   /**
    * Constructs a new entity object.
@@ -109,60 +110,6 @@ interface StorableInterface {
    *   has no URI of its own.
    */
   public function uri();
-
-  /**
-   * Returns the default language of a language-specific entity.
-   *
-   * @return
-   *   The language object of the entity's default language, or FALSE if the
-   *   entity is not language-specific.
-   *
-   * @see Drupal\entity\StorableInterface::translations()
-   */
-  public function language();
-
-  /**
-   * Returns the languages the entity is translated to.
-   *
-   * @return
-   *   An array of language objects, keyed by language codes.
-   *
-   * @see Drupal\entity\StorableInterface::language()
-   */
-  public function translations();
-
-  /**
-   * Returns the value of an entity property.
-   *
-   * @param $property_name
-   *   The name of the property to return; e.g., 'title'.
-   * @param $langcode
-   *   (optional) If the property is translatable, the language code of the
-   *   language that should be used for getting the property. If set to NULL,
-   *   the entity's default language is being used.
-   *
-   * @return
-   *   The property value, or NULL if it is not defined.
-   *
-   * @see Drupal\entity\StorableInterface::language()
-   */
-  public function get($property_name, $langcode = NULL);
-
-  /**
-   * Sets the value of an entity property.
-   *
-   * @param $property_name
-   *   The name of the property to set; e.g., 'title'.
-   * @param $value
-   *   The value to set, or NULL to unset the property.
-   * @param $langcode
-   *   (optional) If the property is translatable, the language code of the
-   *   language that should be used for getting the property. If set to
-   *   NULL, the entity's default language is being used.
-   *
-   * @see Drupal\entity\StorableInterface::language()
-   */
-  public function set($property_name, $value, $langcode = NULL);
 
   /**
    * Saves an entity permanently.

@@ -17,6 +17,30 @@ use IteratorAggregate;
 interface DataStructureInterface extends IteratorAggregate  {
 
   /**
+   * Gets a property.
+   *
+   * @param $property_name
+   *   The name of the property to get; e.g., 'title' or 'name'.
+   *
+   * @return \Drupal\Core\TypedData\DataWrapperInterface
+   *   The property object.
+   */
+  public function get($property_name);
+
+  /**
+   * Sets a property.
+   *
+   * @param $property_name
+   *   The name of the property to set; e.g., 'title' or 'name'.
+   * @param $value
+   *   The value to set, or NULL to unset the property.
+   *
+   * @return \Drupal\Core\TypedData\DataWrapperInterface
+   *   The property object.
+   */
+  public function set($property_name, $value);
+
+  /**
    * Gets an array of properties.
    *
    * @param bool $include_computed
@@ -33,8 +57,8 @@ interface DataStructureInterface extends IteratorAggregate  {
    *
    * @param array
    *   The array of properties to set. The array has to consist of property
-   *   values or property objects implementing the DataWrapperInterface and must be
-   *   keyed by property name.
+   *   values or property objects implementing the DataWrapperInterface and must
+   *   be keyed by property name.
    *
    * @throws \InvalidArgumentException
    *   If an not existing property is passed.
@@ -68,11 +92,10 @@ interface DataStructureInterface extends IteratorAggregate  {
   public function getPropertyDefinitions();
 
   /**
-   * Gets the the raw array representation of the contained properties.
+   * Gets the plain values of the contained properties.
    *
    * @return array
-   *   The raw array representation of the contained properties, i.e. an array
-   *   keyed by property name containing the raw values.
+   *   An array keyed by property name containing the plain property values.
    */
   public function toArray();
 

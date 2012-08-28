@@ -71,26 +71,4 @@ class EntityApiTest extends WebTestBase {
     $all = entity_test_load_multiple();
     $this->assertTrue(empty($all), 'Deleted all entities.');
   }
-
-  /**
-   * Tests Entity getters/setters.
-   */
-  function testEntityGettersSetters() {
-    $entity = entity_create('entity_test', array('name' => 'test', 'user_id' => NULL));
-    $this->assertNull($entity->user_id->value, 'Property is not set.');
-
-    $entity->user_id->entity = $GLOBALS['user'];
-    $this->assertEqual($entity->user_id->value, $GLOBALS['user']->uid, 'Property has been set.');
-
-    $value = $entity->get('user_id')->entity;
-    $this->assertEqual($value, $GLOBALS['user'], 'Property has been retrieved.');
-
-    // Make sure setting/getting translations boils down to setting/getting the
-    // regular value if the property is not translatable.
-    $entity->get('uuid', 'en')->value = NULL;
-    $this->assertNull($entity->uuid->value, 'Language neutral property has been set.');
-
-    $property = $entity->get('uuid', 'en');
-    $this->assertNull($property->value, 'Language neutral property has been retrieved.');
-  }
 }

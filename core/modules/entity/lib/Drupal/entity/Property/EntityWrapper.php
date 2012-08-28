@@ -132,6 +132,22 @@ class EntityWrapper implements DataWrapperInterface, DataStructureInterface {
   }
 
   /**
+   * Implements DataStructureInterface::get().
+   */
+  public function get($property_name) {
+    $entity = $this->getValue();
+    // @todo: Allow navigating through the tree without data as well.
+    return $entity ? $entity->get($property_name) : NULL;
+  }
+
+  /**
+   * Implements DataStructureInterface::set().
+   */
+  public function set($property_name, $value) {
+    $this->get($property_name)->setValue($value);
+  }
+
+  /**
    * Implements DataStructureInterface::getProperties().
    */
   public function getProperties($include_computed = FALSE) {
