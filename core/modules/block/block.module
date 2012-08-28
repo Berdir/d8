@@ -269,13 +269,10 @@ function block_page_build(&$page) {
   // The theme system might not yet be initialized. We need $theme.
   drupal_theme_initialize();
 
-  // Fetch a list of regions for the current theme.
-  $all_regions = system_region_list($theme);
-
   $item = menu_get_item();
   if ($item['path'] != 'admin/structure/block/demo/' . $theme) {
     // Load all region content assigned via blocks.
-    foreach ($all_regions as $region) {
+    foreach (system_region_list($theme) as $region) {
       // Assign blocks to region.
       if ($blocks = block_get_blocks_by_region($region)) {
         $page[$region] = $blocks;
@@ -295,10 +292,9 @@ function block_page_build(&$page) {
     // Append region description if we are rendering the regions demo page.
     $item = menu_get_item();
     if ($item['path'] == 'admin/structure/block/demo/' . $theme) {
-      $visible_regions = system_region_list($theme, REGIONS_VISIBLE);
-      foreach ($visible_regions as $region) {
-        $description = '<div class="block-region">' . $all_regions[$region] . '</div>';
-        $page[$region]['block_description'] = array(
+      foreach (system_region_labels($theme, REGIONS_VISIBLE) as $name => $label) {
+        $description = '<div class="block-region">' . $label . '</div>';
+        $page[$name]['block_description'] = array(
           '#markup' => $description,
           '#weight' => 15,
         );
