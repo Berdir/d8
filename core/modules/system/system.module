@@ -2973,31 +2973,47 @@ function _system_default_theme_features() {
  * @param $show
  *   Possible values: REGIONS_ALL or REGIONS_VISIBLE. Visible excludes hidden
  *   regions.
- * @param $translate
- *   (optional) Region labels are translated when TRUE, defaults to FALSE. This
- *   should be set to TRUE when the region labels are to be displayed in the
- *   user interface.
  * @return
- *   An array of regions in the form $region['name'] = 'description'.
+ *   An array of regions names.
  */
-function system_region_list($theme_key, $show = REGIONS_ALL, $translate = FALSE) {
+function system_region_list($theme_key, $show = REGIONS_ALL) {
   $themes = list_themes();
   if (!isset($themes[$theme_key])) {
     return array();
   }
 
-  $list = array();
   $info = $themes[$theme_key]->info;
+  $list = array_keys($info['regions']);
   // If requested, suppress hidden regions. See block_admin_display_form().
-  foreach ($info['regions'] as $name => $label) {
-    if ($show == REGIONS_ALL || !isset($info['regions_hidden']) || !in_array($name, $info['regions_hidden'])) {
-      // For performance reasons, only translate the region label when
-      // requested to do.
-      $list[$name] = $translate ? t($label) : $label;
-    }
+  if ($show == REGIONS_VISIBLE && isset($info['regions_hidden'])) {
+    $list = array_diff($list, $info['regions_hidden']);
+  }
+  return $list;
+}
+
+/**
+ * Get a list of available region labels from a specified theme.
+ *
+ * @param $theme_key
+ *   The name of a theme.
+ * @param $show
+ *   Possible values: REGIONS_ALL or REGIONS_VISIBLE. Visible excludes hidden
+ *   regions.
+ * @return
+ *   An array of regions labels keyed by the region name.
+ */
+function system_region_labels($theme_key, $show = REGIONS_ALL) {
+  $themes = list_themes();
+  if (!isset($themes[$theme_key])) {
+    return array();
   }
 
-  return $list;
+  $info = $themes[$theme_key]->info;
+  $labels = array();
+  foreach (system_region_list($theme_key, $show) as $name) {
+    $labels[$name] = t($info['regions'][$name]);
+  }
+  return $labels;
 }
 
 /**

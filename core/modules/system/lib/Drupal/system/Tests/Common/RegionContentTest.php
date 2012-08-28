@@ -27,7 +27,7 @@ class RegionContentTest extends WebTestBase {
   function testRegions() {
     global $theme_key;
 
-    $block_regions = array_keys(system_region_list($theme_key));
+    $block_regions = system_region_list($theme_key);
     $delimiter = $this->randomName(32);
     $values = array();
     // Set some random content for each region available.

@@ -87,7 +87,7 @@ function block_admin_display_form($form, &$form_state, $blocks, $theme, $block_r
 
   // Get a list of block regions if one was not provided.
   if (!isset($block_regions)) {
-    $block_regions = system_region_list($theme, REGIONS_VISIBLE, TRUE);
+    $block_regions = system_region_labels($theme, REGIONS_VISIBLE);
   }
   // Add a last region for disabled blocks.
   $block_regions_with_disabled = $block_regions + array(BLOCK_REGION_NONE => BLOCK_REGION_NONE);
@@ -226,7 +226,7 @@ function _block_compare($a, $b) {
   $regions = &drupal_static(__FUNCTION__ . ':regions');
   // We need the region list to correctly order by region.
   if (!isset($regions)) {
-    $regions = array_flip(array_keys(system_region_list($theme)));
+    $regions = array_flip(system_region_list($theme));
     $regions[BLOCK_REGION_NONE] = count($regions);
   }
 
@@ -332,7 +332,7 @@ function block_admin_configure($form, &$form_state, $module, $delta) {
         '#title' => $theme_title,
         '#default_value' => !empty($region) && $region != -1 ? $region : NULL,
         '#empty_value' => BLOCK_REGION_NONE,
-        '#options' => system_region_list($key, REGIONS_VISIBLE, TRUE),
+        '#options' => system_region_labels($key, REGIONS_VISIBLE),
         '#weight' => ($key == $theme_default ? 9 : 10),
       );
     }

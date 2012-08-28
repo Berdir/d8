@@ -275,7 +275,7 @@ function block_page_build(&$page) {
   $item = menu_get_item();
   if ($item['path'] != 'admin/structure/block/demo/' . $theme) {
     // Load all region content assigned via blocks.
-    foreach (array_keys($all_regions) as $region) {
+    foreach ($all_regions as $region) {
       // Assign blocks to region.
       if ($blocks = block_get_blocks_by_region($region)) {
         $page[$region] = $blocks;
@@ -295,7 +295,7 @@ function block_page_build(&$page) {
     // Append region description if we are rendering the regions demo page.
     $item = menu_get_item();
     if ($item['path'] == 'admin/structure/block/demo/' . $theme) {
-      $visible_regions = array_keys(system_region_list($theme, REGIONS_VISIBLE));
+      $visible_regions = system_region_list($theme, REGIONS_VISIBLE);
       foreach ($visible_regions as $region) {
         $description = '<div class="block-region">' . $all_regions[$region] . '</div>';
         $page[$region]['block_description'] = array(
@@ -468,7 +468,7 @@ function _block_rehash($theme = NULL) {
       if (!isset($block['weight'])) {
         $block['weight'] = 0;
       }
-      if (!empty($block['region']) && $block['region'] != BLOCK_REGION_NONE && !isset($regions[$block['region']]) && $block['status'] == 1) {
+      if (!empty($block['region']) && $block['region'] != BLOCK_REGION_NONE && !in_array($block['region'], $regions) && $block['status'] == 1) {
         drupal_set_message(t('The block %info was assigned to the invalid region %region and has been disabled.', array('%info' => $block['info'], '%region' => $block['region'])), 'warning');
         // Disabled modules are moved into the BLOCK_REGION_NONE later so no
         // need to move the block to another region.
@@ -680,7 +680,7 @@ function block_theme_initialize($theme) {
     $result = db_query("SELECT * FROM {block} WHERE theme = :theme", array(':theme' => $default_theme), array('fetch' => PDO::FETCH_ASSOC));
     foreach ($result as $block) {
       // If the region isn't supported by the theme, assign the block to the theme's default region.
-      if ($block['status'] && !isset($regions[$block['region']])) {
+      if ($block['status'] && in_array($block['region'], $regions)) {
         $block['region'] = system_default_region($theme);
       }
       $block['theme'] = $theme;
