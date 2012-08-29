@@ -81,18 +81,13 @@ class DataWrapperTest extends WebTestBase {
     // Binary type.
     $wrapper = $this->drupalWrapData(array('type' => 'binary'), $files[0]->uri);
     $this->assertTrue(is_resource($wrapper->getValue()), 'Binary value was fetched.');
+    // Try setting by URI.
     $wrapper->setValue($files[1]->uri);
-    // TODO: We don't really know if the binary stream actually changed. We only
-    // know that it didn't dissappear when pointing to a new URI. Fix this.
-    $this->assertTrue(is_resource($wrapper->getValue()), 'Binary value was changed.');
+    $this->assertEqual(is_resource($wrapper->getValue()), fopen($files[1]->uri, 'r'), 'Binary value was changed.');
     $this->assertTrue(is_string($wrapper->getString()), 'Binary value was converted to string');
-  }
-
-  public function testEmptyWrappers() {
-    // TODO
-  }
-
-  public function testValidation() {
-    // TODO
+    // Try setting by resource.
+    $wrapper->setValue(fopen($files[2]->uri, 'r'));
+    $this->assertEqual(is_resource($wrapper->getValue()), fopen($files[2]->uri, 'r'), 'Binary value was changed.');
+    $this->assertTrue(is_string($wrapper->getString()), 'Binary value was converted to string');
   }
 }
