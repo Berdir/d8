@@ -71,24 +71,23 @@ class EntityNG extends Entity implements DataStructureTranslatableInterface, Dat
   }
 
   /**
-   * Implements EntityInterface::get().
-   *
-   * @todo: Factor language handling out into a protected method.
+   * Implements DataStructureInterface::get().
    */
-  public function get($property_name, $langcode = NULL) {
-    // Values in default language are stored using the LANGUAGE_DEFAULT
-    // constant. If the default language is LANGUAGE_NOT_SPECIFIED, the entity
-    // is not translatable, so we always use LANGUAGE_DEFAULT.
-    if (!isset($langcode) || $langcode == $this->langcode->value || LANGUAGE_NOT_SPECIFIED == $this->langcode->value) {
-      $langcode = LANGUAGE_DEFAULT;
+  public function get($property_name) {
+    // Values in default language are always stored using the LANGUAGE_DEFAULT
+    // constant.
+    if (!isset($this->properties[$property_name][LANGUAGE_DEFAULT])) {
+      return $this->getTranslatedProperty($property_name, LANGUAGE_DEFAULT);
     }
-    else {
-      $languages = language_list(LANGUAGE_ALL);
-      if (!isset($languages[$langcode])) {
-        throw new InvalidArgumentException("Unable to get translation for the invalid language '$langcode'.");
-      }
-    }
+    return $this->properties[$property_name][LANGUAGE_DEFAULT];
+  }
 
+  /**
+   * Gets a translated property.
+   *
+   * @return \Drupal\entity\Property\EntityPropertyListInterface
+   */
+  protected function getTranslatedProperty($property_name, $langcode) {
     // Populate $this->properties to fasten further lookups and to keep track of
     // property objects, possibly holding changes to properties.
     if (!isset($this->properties[$property_name][$langcode])) {
@@ -98,11 +97,12 @@ class EntityNG extends Entity implements DataStructureTranslatableInterface, Dat
       }
       // Non-translatable properties always use default language.
       if ($langcode != LANGUAGE_DEFAULT && empty($definition['translatable'])) {
-        $this->properties[$property_name][$langcode] = $this->get($property_name);
+        $this->properties[$property_name][$langcode] = $this->getTranslatedProperty($property_name, LANGUAGE_DEFAULT);
       }
       else {
         $value = isset($this->values[$property_name][$langcode]) ? $this->values[$property_name][$langcode] : NULL;
-        $this->properties[$property_name][$langcode] = drupal_wrap_data($definition, $value);
+        $context = array('parent' => $this, 'name' => $property_name);
+        $this->properties[$property_name][$langcode] = drupal_wrap_data($definition, $value, $context);
       }
     }
     return $this->properties[$property_name][$langcode];
@@ -187,8 +187,9 @@ class EntityNG extends Entity implements DataStructureTranslatableInterface, Dat
    * Implements DataStructureTranslatableInterface::getTranslation().
    */
   public function getTranslation($langcode) {
-
-    if ($langcode == LANGUAGE_DEFAULT || $langcode == $this->language()->langcode) {
+    // If the default language is LANGUAGE_NOT_SPECIFIED, the entity is not
+    // translatable, so we use LANGUAGE_DEFAULT.
+    if ($langcode == LANGUAGE_DEFAULT || $langcode == $this->language()->langcode || LANGUAGE_NOT_SPECIFIED == $this->langcode->value) {
       // No translation needed, return the entity.
       return $this;
     }
@@ -200,7 +201,7 @@ class EntityNG extends Entity implements DataStructureTranslatableInterface, Dat
     }
     $properties = array();
     foreach ($this->getPropertyDefinitions() as $name => $definition) {
-      $properties[$name] = $this->get($name, $langcode);
+      $properties[$name] = $this->getTranslatedProperty($name, $langcode);
     }
     $translation_definition = array(
       'type' => 'entity_translation',
@@ -285,6 +286,9 @@ class EntityNG extends Entity implements DataStructureTranslatableInterface, Dat
       }
       return $this->values[$name];
     }
+    if (isset($this->properties[$name][LANGUAGE_DEFAULT])) {
+      return $this->properties[$name][LANGUAGE_DEFAULT];
+    }
     if ($this->getPropertyDefinition($name)) {
       $return = $this->get($name);
       return $return;
@@ -302,8 +306,11 @@ class EntityNG extends Entity implements DataStructureTranslatableInterface, Dat
     if ($this->compatibilityMode) {
       $this->values[$name] = $value;
     }
+    elseif (isset($this->properties[$name][LANGUAGE_DEFAULT])) {
+      $this->properties[$name][LANGUAGE_DEFAULT]->setValue($value);
+    }
     elseif ($this->getPropertyDefinition($name)) {
-      $this->set($name, $value);
+      $this->get($name)->setValue($value);
     }
     else {
       $this->$name = $value;
