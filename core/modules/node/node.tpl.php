@@ -5,7 +5,7 @@
  * Default theme implementation to display a node.
  *
  * Available variables:
- * - $title: the (sanitized) title of the node.
+ * - $label: the (sanitized) title of the node.
  * - $content: An array of node items. Use render($content) to print them all,
  *   or print a subset such as render($content['field_example']). Use
  *   hide($content['field_example']) to temporarily suppress the printing of a
@@ -74,13 +74,15 @@
  * @see template_preprocess()
  * @see template_preprocess_node()
  * @see template_process()
+ *
+ * @ingroup themeable
  */
 ?>
 <article id="node-<?php print $node->nid; ?>" class="<?php print $attributes['class']; ?> clearfix"<?php print $attributes; ?>>
 
   <?php print render($title_prefix); ?>
   <?php if (!$page): ?>
-    <h2<?php print $title_attributes; ?>><a href="<?php print $node_url; ?>" rel="bookmark"><?php print $title; ?></a></h2>
+    <h2<?php print $title_attributes; ?>><a href="<?php print $node_url; ?>" rel="bookmark"><?php print $label; ?></a></h2>
   <?php endif; ?>
   <?php print render($title_suffix); ?>
 
