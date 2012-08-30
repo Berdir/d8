@@ -180,6 +180,34 @@ abstract class StorableBase implements StorableInterface {
   }
 
   /**
+   * Returns the languages the entity is translated to.
+   *
+   * @todo: Remove once all entity types implement the entity property API. This
+   * is deprecated by
+   * DataStructureTranslatableInterface::getTranslationLanguages().
+   */
+  public function translations() {
+    $languages = array();
+    $entity_info = $this->entityInfo();
+    if ($entity_info['fieldable'] && ($default_language = $this->language())) {
+      // Go through translatable properties and determine all languages for
+      // which translated values are available.
+      foreach (field_info_instances($this->entityType, $this->bundle()) as $field_name => $instance) {
+        $field = field_info_field($field_name);
+        if (field_is_translatable($this->entityType, $field) && isset($this->$field_name)) {
+          foreach ($this->$field_name as $langcode => $value)  {
+            $languages[$langcode] = TRUE;
+          }
+        }
+      }
+      // Remove the default language from the translations.
+      unset($languages[$default_language->langcode]);
+      $languages = array_intersect_key(language_list(), $languages);
+    }
+    return $languages;
+  }
+
+  /**
    * Implements DataStructureTranslatableInterface::getTranslationLanguages().
    */
   public function getTranslationLanguages($include_default = TRUE) {
