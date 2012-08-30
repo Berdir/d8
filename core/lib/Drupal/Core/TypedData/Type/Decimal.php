@@ -11,7 +11,7 @@ use Drupal\Core\TypedData\DataWrapperInterface;
 /**
  * The decimal data type.
  */
-class Decimal extends DataTypeBase implements DataWrapperInterface {
+class Decimal extends DataWrapperBase implements DataWrapperInterface {
 
   /**
    * The data value.

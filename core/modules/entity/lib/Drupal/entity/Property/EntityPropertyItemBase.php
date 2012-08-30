@@ -6,10 +6,12 @@
  */
 
 namespace Drupal\entity\Property;
+use Drupal\Core\TypedData\Type\DataWrapperBase;
 use Drupal\Core\TypedData\DataWrapperInterface;
 use Drupal\Core\TypedData\DataStructureInterface;
 use Drupal\user;
 use InvalidArgumentException;
+use ArrayIterator;
 
 /**
  * An entity property item.
@@ -19,7 +21,7 @@ use InvalidArgumentException;
  *
  * @see EntityPropertyItemInterface
  */
-abstract class EntityPropertyItemBase implements EntityPropertyItemInterface {
+abstract class EntityPropertyItemBase extends DataWrapperBase implements EntityPropertyItemInterface {
 
   /**
    * The array of properties.
@@ -31,14 +33,6 @@ abstract class EntityPropertyItemBase implements EntityPropertyItemInterface {
    * @var array<DataWrapperInterface>
    */
   protected $properties = array();
-
-  /**
-   * The definition of the entity property.
-   *
-   * @var array
-   */
-  protected $definition;
-
 
   /**
    * Implements DataWrapperInterface::__construct().
@@ -68,20 +62,6 @@ abstract class EntityPropertyItemBase implements EntityPropertyItemInterface {
     if (isset($value)) {
       $this->setValue($value);
     }
-  }
-
-  /**
-   * Implements DataWrapperInterface::getType().
-   */
-  public function getType() {
-    return $this->definition['type'];
-  }
-
-  /**
-   * Implements DataWrapperInterface::getDefinition().
-   */
-  public function getDefinition() {
-    return $this->definition;
   }
 
   /**
@@ -202,7 +182,7 @@ abstract class EntityPropertyItemBase implements EntityPropertyItemInterface {
    * Implements IteratorAggregate::getIterator().
    */
   public function getIterator() {
-    return new \ArrayIterator($this->getProperties());
+    return new ArrayIterator($this->getProperties());
   }
 
   /**

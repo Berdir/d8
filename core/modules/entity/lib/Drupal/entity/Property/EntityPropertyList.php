@@ -6,7 +6,9 @@
  */
 
 namespace Drupal\entity\Property;
+use Drupal\Core\TypedData\Type\DataWrapperBase;
 use Drupal\user\User;
+use ArrayIterator;
 use InvalidArgumentException;
 
 /**
@@ -20,7 +22,7 @@ use InvalidArgumentException;
  *
  * @see EntityPropertyListInterface.
  */
-class EntityPropertyList implements EntityPropertyListInterface {
+class EntityPropertyList extends DataWrapperBase implements EntityPropertyListInterface {
 
   /**
    * Numerically indexed array of property items, implementing the
@@ -29,37 +31,6 @@ class EntityPropertyList implements EntityPropertyListInterface {
    * @var array
    */
   protected $list = array();
-
-  /**
-   * The definition of the entity property.
-   *
-   * @var array
-   */
-  protected $definition;
-
-   /**
-   * Implements DataWrapperInterface::__construct().
-   */
-  public function __construct(array $definition, $value = NULL, array $context = array()) {
-    $this->definition = $definition;
-    if (isset($value)) {
-      $this->setValue($value);
-    }
-  }
-
-  /**
-   * Implements DataWrapperInterface::getType().
-   */
-  public function getType() {
-    return $this->definition['type'];
-  }
-
-  /**
-   * Implements DataWrapperInterface::getDefinition().
-   */
-  public function getDefinition() {
-    return $this->definition;
-  }
 
   /**
    * Implements DataWrapperInterface::getValue().
@@ -197,7 +168,7 @@ class EntityPropertyList implements EntityPropertyListInterface {
    * Implements IteratorAggregate::getIterator().
    */
   public function getIterator() {
-    return new \ArrayIterator($this->list);
+    return new ArrayIterator($this->list);
   }
 
   /**

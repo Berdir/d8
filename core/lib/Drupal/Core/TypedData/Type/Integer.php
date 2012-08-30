@@ -11,7 +11,7 @@ use Drupal\Core\TypedData\DataWrapperInterface;
 /**
  * The integer data type.
  */
-class Integer extends DataTypeBase implements DataWrapperInterface {
+class Integer extends DataWrapperBase implements DataWrapperInterface {
 
   /**
    * The data value.

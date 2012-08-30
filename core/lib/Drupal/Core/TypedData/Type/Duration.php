@@ -13,7 +13,7 @@ use InvalidArgumentException;
 /**
  * The duration data type.
  */
-class Duration extends DataTypeBase implements DataWrapperInterface {
+class Duration extends DataWrapperBase implements DataWrapperInterface {
 
   /**
    * The data value.

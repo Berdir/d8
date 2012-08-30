@@ -13,7 +13,7 @@ use InvalidArgumentException;
 /**
  * The date data type.
  */
-class Date extends DataTypeBase implements DataWrapperInterface {
+class Date extends DataWrapperBase implements DataWrapperInterface {
 
   /**
    * The data value.

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\Core\TypedData\Type\Base.
+ * Definition of Drupal\Core\TypedData\Type\DataWrapperBase.
  */
 
 namespace Drupal\Core\TypedData\Type;
@@ -14,7 +14,7 @@ use Drupal\Core\TypedData\DataWrapperInterface;
  * Classes deriving from this base class have to declare $value
  * or override getValue() or setValue().
  */
-abstract class DataTypeBase implements DataWrapperInterface {
+abstract class DataWrapperBase implements DataWrapperInterface {
 
   /**
    * The data definition.

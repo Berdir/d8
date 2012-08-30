@@ -11,7 +11,7 @@ use Drupal\Core\TypedData\DataWrapperInterface;
 /**
  * The boolean data type.
  */
-class Boolean extends DataTypeBase implements DataWrapperInterface {
+class Boolean extends DataWrapperBase implements DataWrapperInterface {
 
   /**
    * The data value.

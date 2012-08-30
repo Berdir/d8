@@ -10,7 +10,7 @@ use \Drupal\Core\TypedData\DataWrapperInterface;
 /**
  * Defines the 'language' data type, e.g. the computed 'language' property of language items.
  */
-class Language extends DataTypeBase implements DataWrapperInterface {
+class Language extends DataWrapperBase implements DataWrapperInterface {
 
   /**
    * The data wrapper holding the langcode value.

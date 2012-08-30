@@ -6,7 +6,7 @@
  */
 
 namespace Drupal\entity;
-
+use Drupal\Core\TypedData\Type\DataWrapperBase;
 use Drupal\Core\TypedData\DataWrapperInterface;
 use Drupal\Core\TypedData\DataStructureInterface;
 use Drupal\Core\TypedData\DataAccessibleInterface;
@@ -18,14 +18,7 @@ use InvalidArgumentException;
  *
  * @todo: Needs an entity specific interface.
  */
-class EntityTranslation implements DataStructureInterface, DataWrapperInterface, DataAccessibleInterface {
-
-  /**
-   * The property definition.
-   *
-   * @var array
-   */
-  protected $definition;
+class EntityTranslation extends DataWrapperBase implements DataStructureInterface, DataAccessibleInterface {
 
   /**
    * The array of translated properties, each being an instance of
@@ -49,20 +42,6 @@ class EntityTranslation implements DataStructureInterface, DataWrapperInterface,
     $this->definition = $definition;
     $this->properties = (array) $value;
     $this->langcode = $context['langcode'];
-  }
-
-  /**
-   * Implements DataWrapperInterface::getType().
-   */
-  public function getType() {
-    return $this->definition['type'];
-  }
-
-  /**
-   * Implements DataWrapperInterface::getDefinition().
-   */
-  public function getDefinition() {
-    return $this->definition;
   }
 
   /**

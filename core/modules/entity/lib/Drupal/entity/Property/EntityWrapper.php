@@ -5,8 +5,10 @@
  */
 
 namespace Drupal\entity\Property;
+use Drupal\Core\TypedData\Type\DataWrapperBase;
 use Drupal\Core\TypedData\DataWrapperInterface;
 use Drupal\Core\TypedData\DataStructureInterface;
+use ArrayIterator;
 use InvalidArgumentException;
 
 /**
@@ -15,14 +17,7 @@ use InvalidArgumentException;
  * This wrapper implements the DataStructureInterface, whereby most of its
  * methods are just forwarded to the wrapped entity (if set).
  */
-class EntityWrapper implements DataWrapperInterface, DataStructureInterface {
-
-  /**
-   * The data definition.
-   *
-   * @var array
-   */
-  protected $definition;
+class EntityWrapper extends DataWrapperBase implements DataStructureInterface {
 
   /**
    * The referenced entity type.
@@ -57,26 +52,6 @@ class EntityWrapper implements DataWrapperInterface, DataStructureInterface {
     if (isset($value)) {
       $this->setValue($value);
     }
-  }
-
-  /**
-   * Implements DataWrapperInterface::getType().
-   */
-  public function getType() {
-    return $this->definition['type'];
-  }
-
-  /**
-   * Implements DataWrapperInterface::getDefinition().
-   *
-   * Property definitions of type 'entity' may contain keys further defining the
-   * reference. Additionally supported keys are:
-   *   - entity type: The entity type which is being referenced.
-   *   - bundle: The bundle which is being referenced, or an array of possible
-   *     bundles.
-   */
-  public function getDefinition() {
-    return $this->definition;
   }
 
   /**
@@ -128,7 +103,7 @@ class EntityWrapper implements DataWrapperInterface, DataStructureInterface {
    */
   public function getIterator() {
     $entity = $this->getValue();
-    return $entity ? $entity->getIterator() : new \ArrayIterator(array());
+    return $entity ? $entity->getIterator() : new ArrayIterator(array());
   }
 
   /**
@@ -177,9 +152,7 @@ class EntityWrapper implements DataWrapperInterface, DataStructureInterface {
    */
   public function getPropertyDefinitions() {
     // @todo: Support getting definitions if multiple bundles are specified.
-    $definitions = entity_get_controller($this->definition['entity type'])->getPropertyDefinitions($this->definition);
-
-    return $definitions;
+    return entity_get_controller($this->definition['entity type'])->getPropertyDefinitions($this->definition);
   }
 
   /**

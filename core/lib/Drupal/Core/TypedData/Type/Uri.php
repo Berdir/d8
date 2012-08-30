@@ -11,7 +11,7 @@ use Drupal\Core\TypedData\DataWrapperInterface;
 /**
  * The URI data type.
  */
-class Uri extends DataTypeBase implements DataWrapperInterface {
+class Uri extends DataWrapperBase implements DataWrapperInterface {
 
   /**
    * The data value.

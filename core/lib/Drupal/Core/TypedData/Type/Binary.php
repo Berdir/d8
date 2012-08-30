@@ -12,7 +12,7 @@ use InvalidArgumentException;
 /**
  * The binary data type.
  */
-class Binary extends DataTypeBase implements DataWrapperInterface {
+class Binary extends DataWrapperBase implements DataWrapperInterface {
 
   /**
    * The resource URI.
