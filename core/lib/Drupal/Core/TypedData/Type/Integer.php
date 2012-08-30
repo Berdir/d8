@@ -21,6 +21,13 @@ class Integer extends DataTypeBase implements DataWrapperInterface {
   protected $value;
 
   /**
+   * Implements DataWrapperInterface::setValue().
+   */
+  public function setValue($value) {
+    $this->value = isset($value) ? (int) $value : $value;
+  }
+
+  /**
    * Implements DataWrapperInterface::validate().
    */
   public function validate() {

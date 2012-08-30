@@ -16,9 +16,16 @@ class Boolean extends DataTypeBase implements DataWrapperInterface {
   /**
    * The data value.
    *
-   * @var integer
+   * @var boolean
    */
   protected $value;
+
+  /**
+   * Implements DataWrapperInterface::setValue().
+   */
+  public function setValue($value) {
+    $this->value = isset($value) ? (bool) $value : $value;
+  }
 
   /**
    * Implements DataWrapperInterface::validate().

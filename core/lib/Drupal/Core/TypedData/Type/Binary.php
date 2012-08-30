@@ -42,7 +42,11 @@ class Binary extends DataTypeBase implements DataWrapperInterface {
    * Implements DataWrapperInterface::setValue().
    */
   public function setValue($value) {
-    if (is_resource($value)) {
+    if (!isset($value)) {
+      $this->handle = NULL;
+      $this->uri = NULL;
+    }
+    elseif (is_resource($value)) {
       $this->handle = $value;
     }
     elseif (is_string($value)) {

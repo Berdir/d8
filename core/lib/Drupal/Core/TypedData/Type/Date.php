@@ -7,6 +7,8 @@
 
 namespace Drupal\Core\TypedData\Type;
 use Drupal\Core\TypedData\DataWrapperInterface;
+use DateTime;
+use InvalidArgumentException;
 
 /**
  * The date data type.
@@ -16,7 +18,7 @@ class Date extends DataTypeBase implements DataWrapperInterface {
   /**
    * The data value.
    *
-   * @var integer
+   * @var DateTime
    */
   protected $value;
 
@@ -24,7 +26,26 @@ class Date extends DataTypeBase implements DataWrapperInterface {
    * Implements DataWrapperInterface::getValue().
    */
   public function getValue() {
-    return new \DateTime($this->value);
+    return $this->value;
+  }
+
+  /**
+   * Implements DataWrapperInterface::setValue().
+   */
+  public function setValue($value) {
+    if ($value instanceof DateTime || !isset($value)) {
+      $this->value = $value;
+    }
+    elseif (is_integer($value)) {
+      // Value is a timestamp.
+      $this->value = new DateTime('@' . $value);
+    }
+    elseif (is_string($value)) {
+      $this->value = new DateTime($value);
+    }
+    else {
+      throw new InvalidArgumentException("Invalid date format given.");
+    }
   }
 
   /**

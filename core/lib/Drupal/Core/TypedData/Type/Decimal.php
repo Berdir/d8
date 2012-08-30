@@ -16,9 +16,16 @@ class Decimal extends DataTypeBase implements DataWrapperInterface {
   /**
    * The data value.
    *
-   * @var integer
+   * @var float
    */
   protected $value;
+
+  /**
+   * Implements DataWrapperInterface::setValue().
+   */
+  public function setValue($value) {
+    $this->value = isset($value) ? (float) $value : $value;
+  }
 
   /**
    * Implements DataWrapperInterface::validate().

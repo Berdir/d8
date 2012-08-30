@@ -10,10 +10,6 @@ use Drupal\Core\TypedData\DataWrapperInterface;
 
 /**
  * The URI data type.
- *
- * @todo
- *   Consider using and return stream wrappers for all URI handling. To do so in
- *   a generic fashion we would need a read-only external stream wrapper.
  */
 class Uri extends DataTypeBase implements DataWrapperInterface {
 
@@ -23,6 +19,13 @@ class Uri extends DataTypeBase implements DataWrapperInterface {
    * @var string
    */
   protected $value;
+
+  /**
+   * Implements DataWrapperInterface::setValue().
+   */
+  public function setValue($value) {
+    $this->value = isset($value) ? (string) $value : $value;
+  }
 
   /**
    * Implements DataWrapperInterface::validate().
