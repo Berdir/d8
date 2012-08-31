@@ -36,6 +36,16 @@ class DrupalKernel extends Kernel {
   }
 
   /**
+   * Overrides Kernel::boot().
+   */
+  public function boot() {
+    // We bootstrap code here rather than init() so that we don't do the heavy
+    // code-load during a cache hit.
+    drupal_bootstrap(DRUPAL_BOOTSTRAP_CODE);
+    parent::boot();
+  }
+
+  /**
    * Returns an array of available bundles.
    */
   public function registerBundles() {

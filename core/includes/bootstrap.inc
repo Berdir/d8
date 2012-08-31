@@ -2266,6 +2266,8 @@ function _drupal_bootstrap_configuration() {
  * Attempts to serve a page from the cache.
  */
 function _drupal_bootstrap_page_cache() {
+  // Not sure what to do with all this yet, but the whole phase most likely
+  // needs to be removed.
   global $user;
 
   // Allow specifying special cache handlers in settings.php, like
@@ -2274,6 +2276,7 @@ function _drupal_bootstrap_page_cache() {
   foreach (variable_get('cache_backends', array()) as $include) {
     require_once DRUPAL_ROOT . '/' . $include;
   }
+  /*
   // Check for a cache mode force from settings.php.
   if (variable_get('page_cache_without_database')) {
     $cache_enabled = TRUE;
@@ -2317,6 +2320,7 @@ function _drupal_bootstrap_page_cache() {
       header('X-Drupal-Cache: MISS');
     }
   }
+*/
 }
 
 /**

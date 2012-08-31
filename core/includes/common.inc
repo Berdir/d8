@@ -4961,62 +4961,6 @@ function _drupal_bootstrap_full($skip = FALSE) {
 }
 
 /**
- * Stores the current page in the cache.
- *
- * If page_compression is enabled, a gzipped version of the page is stored in
- * the cache to avoid compressing the output on each request. The cache entry
- * is unzipped in the relatively rare event that the page is requested by a
- * client without gzip support.
- *
- * Page compression requires the PHP zlib extension
- * (http://php.net/manual/ref.zlib.php).
- *
- * @param $body
- *   The response body.
- * @return
- *   The cached object or NULL if the page cache was not set.
- *
- * @see drupal_page_header()
- */
-function drupal_page_set_cache($body) {
-  global $base_root;
-
-  if (drupal_page_is_cacheable()) {
-    $cache = (object) array(
-      'cid' => $base_root . request_uri(),
-      'data' => array(
-        'path' => current_path(),
-        'body' => $body,
-        'title' => drupal_get_title(),
-        'headers' => array(),
-      ),
-      'tags' => array('content' => TRUE),
-      'expire' => CacheBackendInterface::CACHE_PERMANENT,
-      'created' => REQUEST_TIME,
-    );
-
-    // Restore preferred header names based on the lower-case names returned
-    // by drupal_get_http_header().
-    $header_names = _drupal_set_preferred_header_name();
-    foreach (drupal_get_http_header() as $name_lower => $value) {
-      $cache->data['headers'][$header_names[$name_lower]] = $value;
-      if ($name_lower == 'expires') {
-        // Use the actual timestamp from an Expires header if available.
-        $cache->expire = strtotime($value);
-      }
-    }
-
-    if ($cache->data['body']) {
-      if (config('system.performance')->get('response.gzip') && extension_loaded('zlib')) {
-        $cache->data['body'] = gzencode($cache->data['body'], 9, FORCE_GZIP);
-      }
-      cache('page')->set($cache->cid, $cache->data, $cache->expire, $cache->tags);
-    }
-    return $cache;
-  }
-}
-
-/**
  * Executes a cron run when called.
  *
  * Do not call this function from a test. Use $this->cronRun() instead.

@@ -13,6 +13,8 @@
 
 use Drupal\Core\DrupalKernel;
 use Symfony\Component\HttpFoundation\Request;
+use Drupal\Core\HttpCache;
+use Symfony\Component\HttpKernel\HttpCache\Store;
 
 /**
  * Root directory of Drupal installation.
@@ -25,10 +27,10 @@ define('DRUPAL_ROOT', getcwd());
 // @see Drupal\Core\EventSubscriber\PathSubscriber;
 // @see Drupal\Core\EventSubscriber\LegacyRequestSubscriber;
 require_once DRUPAL_ROOT . '/core/includes/bootstrap.inc';
-drupal_bootstrap(DRUPAL_BOOTSTRAP_CODE);
+drupal_bootstrap(DRUPAL_BOOTSTRAP_CONFIGURATION);
 
 // @todo Figure out how best to handle the Kernel constructor parameters.
-$kernel = new DrupalKernel('prod', FALSE);
+$kernel = new HttpCache(new DrupalKernel('prod', FALSE), new Store(variable_get('file_public_path', conf_path() . '/files/http_cache')));
 
 // Create a request object from the HTTPFoundation.
 $request = Request::createFromGlobals();

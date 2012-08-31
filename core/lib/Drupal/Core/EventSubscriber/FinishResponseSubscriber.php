@@ -71,16 +71,29 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
     //   use partial page caching more extensively.
     // Commit the user session, if needed.
     drupal_session_commit();
-    if (config('system.performance')->get('cache.page.enabled') && ($cache = drupal_page_set_cache($response->getContent()))) {
-      drupal_serve_page_from_cache($cache);
-      // drupal_serve_page_from_cache() already printed the response.
-      $response->setContent('');
-      $response->headers->remove('cache-control');
+    if (config('system.performance')->get('cache.page.enabled')) {
+      $this->setCacheHeaders($response, $event);
     }
     else {
       $response->headers->set('Expires', 'Sun, 19 Nov 1978 05:00:00 GMT');
       $response->headers->set('Cache-Control', 'no-cache, must-revalidate, post-check=0, pre-check=0');
     }
+  }
+
+  public function setCacheHeaders($response, $event) {
+    $response->isNotModified($event->getRequest());
+
+    $vary = array('Accept-Encoding');
+    // @todo: get this value from config('system.performance').
+    if (!variable_get('omit_vary_cookie', FALSE)) {
+      $vary[] = 'Cookie';
+    }
+    $response->setVary($vary);
+
+    $max_age = (int)config('system.performance')->get('cache.page.max_age');
+    $max_age = !isset($_COOKIE[session_name()]) ? $max_age : 0;
+    $response->setPublic();
+    $response->setMaxAge($max_age);
   }
 
   /**
