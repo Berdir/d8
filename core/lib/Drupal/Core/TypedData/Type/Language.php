@@ -5,22 +5,23 @@
  */
 
 namespace Drupal\Core\TypedData\Type;
-use \Drupal\Core\TypedData\DataWrapperInterface;
+use Drupal\Core\TypedData\WrapperInterface;
+use InvalidArgumentException;
 
 /**
  * Defines the 'language' data type, e.g. the computed 'language' property of language items.
  */
-class Language extends DataWrapperBase implements DataWrapperInterface {
+class Language extends WrapperBase implements WrapperInterface {
 
   /**
    * The data wrapper holding the langcode value.
    *
-   * @var \Drupal\Core\TypedData\DataWrapperInterface
+   * @var \Drupal\Core\TypedData\WrapperInterface
    */
   protected $langcode;
 
   /**
-   * Implements DataWrapperInterface::__construct().
+   * Implements WrapperInterface::__construct().
    */
   public function __construct(array $definition, $value = NULL, array $context = array()) {
     $this->definition = $definition;
@@ -40,7 +41,7 @@ class Language extends DataWrapperBase implements DataWrapperInterface {
   }
 
   /**
-   * Implements DataWrapperInterface::getValue().
+   * Implements WrapperInterface::getValue().
    */
   public function getValue() {
     $langcode = $this->langcode->getValue();
@@ -48,7 +49,7 @@ class Language extends DataWrapperBase implements DataWrapperInterface {
   }
 
   /**
-   * Implements DataWrapperInterface::setValue().
+   * Implements WrapperInterface::setValue().
    *
    * Both the langcode and the language object may be passed as value.
    */
@@ -63,12 +64,12 @@ class Language extends DataWrapperBase implements DataWrapperInterface {
       $this->langcode->setValue($value->langcode);
     }
     else {
-      throw new \InvalidArgumentException('Value is no valid langcode or language object.');
+      throw new InvalidArgumentException('Value is no valid langcode or language object.');
     }
   }
 
   /**
-   * Implements DataWrapperInterface::getString().
+   * Implements WrapperInterface::getString().
    */
   public function getString() {
     $language = $this->getValue();
@@ -76,7 +77,7 @@ class Language extends DataWrapperBase implements DataWrapperInterface {
   }
 
   /**
-   * Implements DataWrapperInterface::validate().
+   * Implements WrapperInterface::validate().
    */
   public function validate() {
     // TODO: Implement validate() method.

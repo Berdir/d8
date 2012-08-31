@@ -6,14 +6,14 @@
  */
 
 namespace Drupal\field;
-use Drupal\Core\TypedData\DataMissesContextException;
-use Drupal\entity\Property\EntityPropertyList;
+use Drupal\Core\TypedData\MissingContextException;
+use Drupal\entity\Property\ItemList;
 use InvalidArgumentException;
 
 /**
  * Interface for entity properties that are fields, being lists of field items.
  */
-class FieldItemList extends EntityPropertyList implements FieldItemListInterface {
+class FieldItemList extends ItemList implements FieldItemListInterface {
 
   /**
    * The field context.
@@ -23,7 +23,7 @@ class FieldItemList extends EntityPropertyList implements FieldItemListInterface
   protected $fieldContext;
 
   /**
-   * Overrides EntityPropertyList::__construct().
+   * Overrides ItemList::__construct().
    */
   public function __construct(array $definition, $value = NULL, array $context = array()) {
     parent::__construct($definition, $value, $context);
@@ -53,7 +53,7 @@ class FieldItemList extends EntityPropertyList implements FieldItemListInterface
    */
   public function getInstance() {
     if (!isset($this->fieldContext)) {
-      throw new DataMissesContextException('Unable to get the field instance without field context.');
+      throw new MissingContextException('Unable to get the field instance without field context.');
     }
     return field_info_instance($this->fieldContext['entity type'], $this->fieldContext['name'], $this->fieldContext['bundle']);
   }

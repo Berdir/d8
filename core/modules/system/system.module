@@ -6,7 +6,7 @@
  */
 
 use Drupal\Core\Utility\ModuleInfo;
-use Drupal\Core\TypedData\DataPrimitive;
+use Drupal\Core\TypedData\Primitive;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -1881,43 +1881,42 @@ function system_data_type_info() {
     'boolean' => array(
       'label' => t('Boolean'),
       'class' => '\Drupal\Core\TypedData\Type\Boolean',
-      'primitive type' => DataPrimitive::BOOLEAN,
+      'primitive type' => Primitive::BOOLEAN,
     ),
     'string' => array(
       'label' => t('String'),
       'class' => '\Drupal\Core\TypedData\Type\String',
-      'primitive type' => DataPrimitive::STRING,
+      'primitive type' => Primitive::STRING,
     ),
     'integer' => array(
       'label' => t('Integer'),
       'class' => '\Drupal\Core\TypedData\Type\Integer',
-      'primitive type' => DataPrimitive::INTEGER,
+      'primitive type' => Primitive::INTEGER,
     ),
     'decimal' => array(
       'label' => t('Decimal'),
       'class' => '\Drupal\Core\TypedData\Type\Decimal',
-      'primitive type' => DataPrimitive::DECIMAL,
+      'primitive type' => Primitive::DECIMAL,
     ),
     'date' => array(
       'label' => t('Date'),
       'class' => '\Drupal\Core\TypedData\Type\Date',
-      'primitive type' => DataPrimitive::DATE,
+      'primitive type' => Primitive::DATE,
     ),
     'duration' => array(
       'label' => t('Duration'),
       'class' => '\Drupal\Core\TypedData\Type\Duration',
-      'primitive type' => DataPrimitive::DURATION,
+      'primitive type' => Primitive::DURATION,
     ),
     'uri' => array(
       'label' => t('URI'),
       'class' => '\Drupal\Core\TypedData\Type\Uri',
-      'primitive type' => DataPrimitive::URI,
+      'primitive type' => Primitive::URI,
     ),
     'binary' => array(
       'label' => t('Binary'),
       'class' => '\Drupal\Core\TypedData\Type\Binary',
-      'primitive type' => DataPrimitive::BINARY,
-      'scheme' => 'public',
+      'primitive type' => Primitive::BINARY,
     ),
     'language' => array(
       'label' => t('Language'),

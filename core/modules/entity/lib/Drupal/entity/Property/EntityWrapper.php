@@ -5,19 +5,19 @@
  */
 
 namespace Drupal\entity\Property;
-use Drupal\Core\TypedData\Type\DataWrapperBase;
-use Drupal\Core\TypedData\DataWrapperInterface;
-use Drupal\Core\TypedData\DataStructureInterface;
+use Drupal\Core\TypedData\Type\WrapperBase;
+use Drupal\Core\TypedData\WrapperInterface;
+use Drupal\Core\TypedData\StructureInterface;
 use ArrayIterator;
 use InvalidArgumentException;
 
 /**
  * Defines the 'entity' data type, e.g. the computed 'entity' property of entity references.
  *
- * This wrapper implements the DataStructureInterface, whereby most of its
+ * This wrapper implements the StructureInterface, whereby most of its
  * methods are just forwarded to the wrapped entity (if set).
  */
-class EntityWrapper extends DataWrapperBase implements DataStructureInterface {
+class EntityWrapper extends WrapperBase implements StructureInterface {
 
   /**
    * The referenced entity type.
@@ -29,12 +29,12 @@ class EntityWrapper extends DataWrapperBase implements DataStructureInterface {
   /**
    * The data wrapper holding the entity ID.
    *
-   * @var \Drupal\Core\TypedData\DataWrapperInterface
+   * @var \Drupal\Core\TypedData\WrapperInterface
    */
   protected $id;
 
   /**
-   * Implements DataWrapperInterface::__construct().
+   * Implements WrapperInterface::__construct().
    */
   public function __construct(array $definition, $value = NULL, array $context = array()) {
     $this->definition = $definition;
@@ -55,7 +55,7 @@ class EntityWrapper extends DataWrapperBase implements DataStructureInterface {
   }
 
   /**
-   * Implements DataWrapperInterface::getValue().
+   * Implements WrapperInterface::getValue().
    */
   public function getValue() {
     $id = $this->id->getValue();
@@ -63,7 +63,7 @@ class EntityWrapper extends DataWrapperBase implements DataStructureInterface {
   }
 
   /**
-   * Implements DataWrapperInterface::setValue().
+   * Implements WrapperInterface::setValue().
    *
    * Both the entity ID and the entity object may be passed as value.
    */
@@ -84,7 +84,7 @@ class EntityWrapper extends DataWrapperBase implements DataStructureInterface {
   }
 
   /**
-   * Implements DataWrapperInterface::getString().
+   * Implements WrapperInterface::getString().
    */
   public function getString() {
     $entity = $this->getValue();
@@ -92,7 +92,7 @@ class EntityWrapper extends DataWrapperBase implements DataStructureInterface {
   }
 
   /**
-   * Implements DataWrapperInterface::validate().
+   * Implements WrapperInterface::validate().
    */
   public function validate($value = NULL) {
     // TODO: Implement validate() method.
@@ -107,7 +107,7 @@ class EntityWrapper extends DataWrapperBase implements DataStructureInterface {
   }
 
   /**
-   * Implements DataStructureInterface::get().
+   * Implements StructureInterface::get().
    */
   public function get($property_name) {
     $entity = $this->getValue();
@@ -116,14 +116,14 @@ class EntityWrapper extends DataWrapperBase implements DataStructureInterface {
   }
 
   /**
-   * Implements DataStructureInterface::set().
+   * Implements StructureInterface::set().
    */
   public function set($property_name, $value) {
     $this->get($property_name)->setValue($value);
   }
 
   /**
-   * Implements DataStructureInterface::getProperties().
+   * Implements StructureInterface::getProperties().
    */
   public function getProperties($include_computed = FALSE) {
     $entity = $this->getValue();
@@ -131,7 +131,7 @@ class EntityWrapper extends DataWrapperBase implements DataStructureInterface {
   }
 
   /**
-   * Implements DataStructureInterface::setProperties().
+   * Implements StructureInterface::setProperties().
    */
   public function setProperties($properties) {
     if ($entity = $this->getValue()) {
@@ -140,7 +140,7 @@ class EntityWrapper extends DataWrapperBase implements DataStructureInterface {
   }
 
   /**
-   * Implements DataStructureInterface::getPropertyDefinition().
+   * Implements StructureInterface::getPropertyDefinition().
    */
   public function getPropertyDefinition($name) {
     $definitions = $this->getPropertyDefinitions();
@@ -148,7 +148,7 @@ class EntityWrapper extends DataWrapperBase implements DataStructureInterface {
   }
 
   /**
-   * Implements DataStructureInterface::getPropertyDefinitions().
+   * Implements StructureInterface::getPropertyDefinitions().
    */
   public function getPropertyDefinitions() {
     // @todo: Support getting definitions if multiple bundles are specified.
@@ -156,7 +156,7 @@ class EntityWrapper extends DataWrapperBase implements DataStructureInterface {
   }
 
   /**
-   * Implements DataStructureInterface::toArray().
+   * Implements StructureInterface::toArray().
    */
   public function toArray() {
     $entity = $this->getValue();

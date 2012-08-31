@@ -6,19 +6,19 @@
  */
 
 namespace Drupal\field;
-use Drupal\Core\TypedData\DataMissesContextException;
-use Drupal\entity\Property\EntityPropertyItemBase;
+use Drupal\Core\TypedData\MissingContextException;
+use Drupal\entity\Property\ItemBase;
 use InvalidArgumentException;
 
 /**
  * A field item.
  *
  * Field items making use of this base class have to implement
- * DataStructureInterface::getPropertyDefinitions().
+ * StructureInterface::getPropertyDefinitions().
  *
- * @see \Drupal\entity\Property\EntityPropertyItemBase
+ * @see \Drupal\entity\Property\ItemBase
  */
-abstract class FieldItemBase extends EntityPropertyItemBase implements FieldItemInterface {
+abstract class FieldItemBase extends ItemBase implements FieldItemInterface {
 
   /**
    * The field context.
@@ -28,7 +28,7 @@ abstract class FieldItemBase extends EntityPropertyItemBase implements FieldItem
   protected $fieldContext;
 
   /**
-   * Overrides EntityPropertyItemBase::__construct().
+   * Overrides ItemBase::__construct().
    */
   public function __construct(array $definition, $value = NULL, array $context = array()) {
     parent::__construct($definition, $value, $context);
@@ -58,7 +58,7 @@ abstract class FieldItemBase extends EntityPropertyItemBase implements FieldItem
    */
   public function getInstance() {
     if (!isset($this->fieldContext)) {
-      throw new DataMissesContextException('Unable to get the field instance without field context.');
+      throw new MissingContextException('Unable to get the field instance without field context.');
     }
     return field_info_instance($this->fieldContext['entity type'], $this->fieldContext['name'], $this->fieldContext['bundle']);
   }

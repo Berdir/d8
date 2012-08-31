@@ -6,12 +6,12 @@
  */
 
 namespace Drupal\entity;
-use Drupal\Core\TypedData\DataStructureTranslatableInterface;
+use Drupal\Core\TypedData\StructureTranslatableInterface;
 
 /**
  * Defines a common interface for all entity objects.
  */
-interface StorableInterface extends DataStructureTranslatableInterface {
+interface StorableInterface extends StructureTranslatableInterface {
 
   /**
    * Constructs a new entity object.

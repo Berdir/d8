@@ -6,12 +6,12 @@
  */
 
 namespace Drupal\Core\TypedData\Type;
-use Drupal\Core\TypedData\DataWrapperInterface;
+use Drupal\Core\TypedData\WrapperInterface;
 
 /**
  * The string data type.
  */
-class String extends DataWrapperBase implements DataWrapperInterface {
+class String extends WrapperBase implements WrapperInterface {
 
   /**
    * The data value.
@@ -21,14 +21,14 @@ class String extends DataWrapperBase implements DataWrapperInterface {
   protected $value;
 
   /**
-   * Implements DataWrapperInterface::setValue().
+   * Implements WrapperInterface::setValue().
    */
   public function setValue($value) {
     $this->value = isset($value) ? (string) $value : $value;
   }
 
   /**
-   * Implements DataWrapperInterface::validate().
+   * Implements WrapperInterface::validate().
    */
   public function validate() {
     // TODO: Implement validate() method.

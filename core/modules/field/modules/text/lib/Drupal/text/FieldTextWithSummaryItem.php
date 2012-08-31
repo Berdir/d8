@@ -21,7 +21,7 @@ class FieldTextWithSummaryItem extends FieldTextItem {
   static $propertyDefinitions;
 
   /**
-   * Implements DataStructureInterface::getPropertyDefinitions().
+   * Implements StructureInterface::getPropertyDefinitions().
    */
   public function getPropertyDefinitions() {
 

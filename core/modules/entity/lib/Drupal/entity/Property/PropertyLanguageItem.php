@@ -5,13 +5,13 @@
  */
 
 namespace Drupal\entity\Property;
-use Drupal\entity\Property\EntityPropertyItemBase;
+use Drupal\entity\Property\ItemBase;
 use InvalidArgumentException;
 
 /**
  * Defines the 'language_item' entity property item.
  */
-class PropertyLanguageItem extends EntityPropertyItemBase {
+class PropertyLanguageItem extends ItemBase {
 
   /**
    * Array of property definitions of contained properties.
@@ -23,7 +23,7 @@ class PropertyLanguageItem extends EntityPropertyItemBase {
   static $propertyDefinitions;
 
   /**
-   * Implements DataStructureInterface::getPropertyDefinitions().
+   * Implements StructureInterface::getPropertyDefinitions().
    */
   public function getPropertyDefinitions() {
 
@@ -44,7 +44,7 @@ class PropertyLanguageItem extends EntityPropertyItemBase {
   }
 
   /**
-   * Overrides EntityPropertyItemBase::setValue().
+   * Overrides ItemBase::setValue().
    */
   public function setValue($values) {
     // Treat the values as property value of the object property, if no array
