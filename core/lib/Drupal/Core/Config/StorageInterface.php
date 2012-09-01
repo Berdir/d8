@@ -25,6 +25,17 @@ interface StorageInterface {
   public function __construct(array $options = array());
 
   /**
+   * Returns whether a configuration object exists.
+   *
+   * @param string $name
+   *   The name of a configuration object to test.
+   *
+   * @return bool
+   *   TRUE if the configuration object exists, FALSE otherwise.
+   */
+  public function exists($name);
+
+  /**
    * Reads configuration data from the storage.
    *
    * @param string $name

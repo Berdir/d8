@@ -28,7 +28,7 @@ class FileStorage implements StorageInterface {
    */
   public function __construct(array $options = array()) {
     if (!isset($options['directory'])) {
-      $options['directory'] = config_get_config_directory();
+      $options['directory'] = config_get_config_directory(CONFIG_ACTIVE_DIRECTORY);
     }
     $this->options = $options;
   }
@@ -54,10 +54,7 @@ class FileStorage implements StorageInterface {
   }
 
   /**
-   * Returns whether the configuration file exists.
-   *
-   * @return bool
-   *   TRUE if the configuration file exists, FALSE otherwise.
+   * Implements Drupal\Core\Config\StorageInterface::exists().
    */
   public function exists($name) {
     return file_exists($this->getFilePath($name));

@@ -2404,20 +2404,24 @@ function drupal_get_bootstrap_phase() {
  *
  * @see Drupal\Core\DrupalKernel
  *
- * @param $reset
- *   A new container instance to reset the Drupal container to.
+ * @param Symfony\Component\DependencyInjection\Container $new_container
+ *   A new container instance to replace the current.
+ * @param bool $reset
+ *   (optional) Internal use only. Whether to enforce a reset of the statically
+ *   cached container. Pass NULL for $new_container to create a fresh Container
+ *   in a subsequent call to this function. Used by tests.
  *
  * @return Symfony\Component\DependencyInjection\Container
  *   The instance of the Container used to set up and maintain object
  *   instances.
  */
-function drupal_container(Container $reset = NULL) {
+function drupal_container(Container $new_container = NULL, $reset = FALSE) {
   // We do not use drupal_static() here because we do not have a mechanism by
   // which to reinitialize the stored objects, so a drupal_static_reset() call
   // would leave Drupal in a nonfunctional state.
   static $container = NULL;
-  if (isset($reset)) {
-    $container = $reset;
+  if (isset($new_container) || $reset) {
+    $container = $new_container;
   }
   elseif (!isset($container)) {
     // Return a ContainerBuilder instance with the bare essentials needed for any
@@ -2426,25 +2430,38 @@ function drupal_container(Container $reset = NULL) {
     // requests.
     $container = new ContainerBuilder();
 
-    // Register configuration storage class and options.
+    // Register active configuration storage.
     // @todo The active store and its options need to be configurable.
     //   Use either global $conf (recursion warning) or global $config, or a
     //   bootstrap configuration *file* to allow to set/override this very
     //   lowest of low level configuration.
-    $container->setParameter('config.storage.options', array(
-      'connection' => 'default',
-      'target' => 'default',
+    $container->setParameter('config.storage.active.options', array(
+      'Drupal\Core\Config\FileStorage' => array(
+        'directory' => config_get_config_directory(CONFIG_ACTIVE_DIRECTORY),
+      ),
+      'Drupal\Core\Config\CacheStorage' => array(
+        'backend' => 'Drupal\Core\Cache\DatabaseBackend',
+        'bin' => 'config',
+      ),
     ));
-    $container->register('config.storage', 'Drupal\Core\Config\DatabaseStorage')
-      ->addArgument('%config.storage.options%');
+    $container->register('config.storage.active', 'Drupal\Core\Config\CachedFileStorage')
+      ->addArgument('%config.storage.active.options%');
 
     $container->register('config.subscriber.globalconf', 'Drupal\Core\EventSubscriber\ConfigGlobalOverrideSubscriber');
     $container->register('dispatcher', 'Symfony\Component\EventDispatcher\EventDispatcher')
       ->addMethodCall('addSubscriber', array(new Reference('config.subscriber.globalconf')));
+
     // Register configuration object factory.
     $container->register('config.factory', 'Drupal\Core\Config\ConfigFactory')
-      ->addArgument(new Reference('config.storage'))
+      ->addArgument(new Reference('config.storage.active'))
       ->addArgument(new Reference('dispatcher'));
+
+    // Register staging configuration storage.
+    $container->setParameter('config.storage.staging.options', array(
+      'directory' => config_get_config_directory(CONFIG_STAGING_DIRECTORY),
+    ));
+    $container->register('config.storage.staging', 'Drupal\Core\Config\FileStorage')
+      ->addArgument('%config.storage.staging.options%');
   }
   return $container;
 }

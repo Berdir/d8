@@ -23,8 +23,34 @@ class DatabaseStorageTest extends ConfigStorageTestBase {
 
   function setUp() {
     parent::setUp();
+
+    $schema['config'] = array(
+      'description' => 'Default active store for the configuration system.',
+      'fields' => array(
+        'name' => array(
+          'description' => 'The identifier for the configuration entry, such as module.example (the name of the file, minus the file extension).',
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'default' => '',
+        ),
+        'data' => array(
+          'description' => 'The raw data for this configuration entry.',
+          'type' => 'blob',
+          'not null' => TRUE,
+          'size' => 'big',
+          'translatable' => TRUE,
+        ),
+      ),
+      'primary key' => array('name'),
+    );
+    db_create_table('config', $schema['config']);
+
     $this->storage = new DatabaseStorage();
     $this->invalidStorage = new DatabaseStorage(array('connection' => 'invalid'));
+
+    // ::listAll() verifications require other configuration data to exist.
+    $this->storage->write('system.performance', array());
   }
 
   protected function read($name) {

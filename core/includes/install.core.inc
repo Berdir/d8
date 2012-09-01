@@ -5,6 +5,8 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Database\Install\TaskException;
 use Drupal\Core\Language\Language;
 
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -272,6 +274,42 @@ function install_begin_request(&$install_state) {
   include_once DRUPAL_ROOT . '/core/includes/module.inc';
   include_once DRUPAL_ROOT . '/core/includes/session.inc';
 
+  // Determine whether the configuration system is ready to operate.
+  $install_state['config_verified'] = install_verify_config_directory(CONFIG_ACTIVE_DIRECTORY) && install_verify_config_directory(CONFIG_STAGING_DIRECTORY);
+
+  // If it is not, replace the configuration storage with the InstallStorage
+  // implementation, for the following reasons:
+  // - The first call into drupal_container() will try to set up the regular
+  //   runtime configuration storage, using the CachedFileStorage. The storage
+  //   controller options require to pass in the config directory name, but that
+  //   directory does not exist yet.
+  // - The installer outputs maintenance theme pages and performs many other
+  //   operations, which try to load configuration. Since there is no active
+  //   configuration yet, and because the configuration system does not have a
+  //   notion of default values at runtime, data is missing in many places. The
+  //   lack of data does not trigger errors, but results in a broken user
+  //   interface (e.g., missing page title, etc).
+  // - The actual configuration data to read during installation is essentially
+  //   the default configuration provided by the installation profile and
+  //   modules (most notably System module). The InstallStorage therefore reads
+  //   from the default configuration directories of extensions.
+  // This override is reverted as soon as the config directory has been set up
+  // successfully.
+  // @see drupal_install_config_directory()
+  // @todo Move this into a proper Drupal\Core\DependencyInjection\InstallContainerBuilder.
+  if (!$install_state['config_verified']) {
+    $container = new ContainerBuilder();
+
+    $container->register('dispatcher', 'Symfony\Component\EventDispatcher\EventDispatcher');
+
+    $container->register('config.storage.active', 'Drupal\Core\Config\InstallStorage');
+    $container->register('config.factory', 'Drupal\Core\Config\ConfigFactory')
+      ->addArgument(new Reference('config.storage.active'))
+      ->addArgument(new Reference('dispatcher'));
+
+    drupal_container($container);
+  }
+
   // Set up $language, so t() caller functions will still work.
   drupal_language_initialize();
 
@@ -316,7 +354,6 @@ function install_begin_request(&$install_state) {
 
   // Check existing settings.php.
   $install_state['database_verified'] = install_verify_database_settings();
-  $install_state['config_verified'] = install_verify_config_directory(CONFIG_ACTIVE_DIRECTORY) && install_verify_config_directory(CONFIG_STAGING_DIRECTORY);
   $install_state['settings_verified'] = $install_state['config_verified'] && $install_state['database_verified'];
 
   if ($install_state['database_verified']) {
@@ -1053,6 +1090,11 @@ function install_settings_form_submit($form, &$form_state) {
 
   // Add the config directories to settings.php.
   drupal_install_config_directories();
+
+  // We have valid configuration directories in settings.php.
+  // Reset the service container, so the config.storage.active service will use
+  // the actual active storage for installing configuration.
+  drupal_container(NULL, TRUE);
 
   // Indicate that the settings file has been verified, and check the database
   // for the last completed task, now that we have a valid connection. This

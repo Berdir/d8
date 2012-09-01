@@ -45,7 +45,7 @@ abstract class StorableBase implements StorableInterface {
    *
    * @var bool
    */
-  public $isCurrentRevision = TRUE;
+  protected $isCurrentRevision = TRUE;
 
   /**
    * Constructs a new entity object.
@@ -280,7 +280,11 @@ abstract class StorableBase implements StorableInterface {
   /**
    * Implements Drupal\entity\StorableInterface::isCurrentRevision().
    */
-  public function isCurrentRevision() {
-    return $this->isCurrentRevision;
+  public function isCurrentRevision($new_value = NULL) {
+    $return = $this->isCurrentRevision;
+    if (isset($new_value)) {
+      $this->isCurrentRevision = (bool) $new_value;
+    }
+    return $return;
   }
 }

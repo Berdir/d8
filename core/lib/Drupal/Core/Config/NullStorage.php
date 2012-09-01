@@ -29,6 +29,13 @@ class NullStorage implements StorageInterface {
   }
 
   /**
+   * Implements Drupal\Core\Config\StorageInterface::exists().
+   */
+  public function exists($name) {
+    return FALSE;
+  }
+
+  /**
    * Implements Drupal\Core\Config\StorageInterface::read().
    */
   public function read($name) {

@@ -17,15 +17,12 @@ use Drupal\Core\Config\StorageInterface;
  *   The extension type; e.g., 'module' or 'theme'.
  * @param string $name
  *   The name of the module or theme to install default configuration for.
- *
- * @todo Make this acknowledge other storage engines rather than having
- *   SQL be hardcoded.
  */
 function config_install_default_config($type, $name) {
   $config_dir = drupal_get_path($type, $name) . '/config';
   if (is_dir($config_dir)) {
     $source_storage = new FileStorage(array('directory' => $config_dir));
-    $target_storage = drupal_container()->get('config.storage');
+    $target_storage = drupal_container()->get('config.storage.active');
     $null_storage = new NullStorage();
 
     // Upon installation, only new config objects need to be created.
@@ -43,10 +40,12 @@ function config_install_default_config($type, $name) {
 }
 
 /**
- * @todo Modules need a way to access the active store, whatever it is.
+ * Gets configuration object names starting with a given prefix.
+ *
+ * @see Drupal\Core\Config\StorageInterface::listAll()
  */
 function config_get_storage_names_with_prefix($prefix = '') {
-  return drupal_container()->get('config.storage')->listAll($prefix);
+  return drupal_container()->get('config.storage.active')->listAll($prefix);
 }
 
 /**
@@ -137,8 +136,8 @@ function config_sync_changes(array $config_changes, StorageInterface $source_sto
  */
 function config_import() {
   // Retrieve a list of differences between staging and the active store.
-  $source_storage = new FileStorage(array('directory' => config_get_config_directory(CONFIG_STAGING_DIRECTORY)));
-  $target_storage = drupal_container()->get('config.storage');
+  $source_storage = drupal_container()->get('config.storage.staging');
+  $target_storage = drupal_container()->get('config.storage.active');
 
   $config_changes = config_sync_get_changes($source_storage, $target_storage);
   if (empty($config_changes)) {
@@ -218,8 +217,8 @@ function config_import_invoke_owner(array $config_changes, StorageInterface $sou
  */
 function config_export() {
   // Retrieve a list of differences between the active store and staging.
-  $source_storage = drupal_container()->get('config.storage');
-  $target_storage = new FileStorage(array('directory' => config_get_config_directory(CONFIG_STAGING_DIRECTORY)));
+  $source_storage = drupal_container()->get('config.storage.active');
+  $target_storage = drupal_container()->get('config.storage.staging');
 
   $config_changes = config_sync_get_changes($source_storage, $target_storage);
   if (empty($config_changes)) {

@@ -155,7 +155,7 @@ class ConfigStorageController implements StorageControllerInterface {
 
     // Load all of the configurables.
     if ($ids === NULL) {
-      $names = drupal_container()->get('config.storage')->listAll($prefix);
+      $names = drupal_container()->get('config.storage.active')->listAll($prefix);
       $result = array();
       foreach ($names as $name) {
         $config = config($name);
@@ -277,7 +277,8 @@ class ConfigStorageController implements StorageControllerInterface {
     // Configuration objects do not have a schema. Extract all key names from
     // class properties.
     $class_info = new \ReflectionClass($entity);
-    foreach ($class_info->getProperties(\ReflectionProperty::IS_PUBLIC) as $property) {
+    $properties = $class_info->getProperties(\ReflectionProperty::IS_PUBLIC);
+    foreach ($properties as $property) {
       $name = $property->getName();
       $config->set($name, $entity->$name);
     }

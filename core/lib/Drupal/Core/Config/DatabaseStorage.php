@@ -44,6 +44,15 @@ class DatabaseStorage implements StorageInterface {
   }
 
   /**
+   * Implements Drupal\Core\Config\StorageInterface::exists().
+   */
+  public function exists($name) {
+    return (bool) $this->getConnection()->queryRange('SELECT 1 FROM {config} WHERE name = :name', 0, 1, array(
+      ':name' => $name,
+    ), $this->options)->fetchField();
+  }
+
+  /**
    * Implements Drupal\Core\Config\StorageInterface::read().
    *
    * @throws PDOException
@@ -56,8 +65,6 @@ class DatabaseStorage implements StorageInterface {
     // read without actually having the database available. In this case,
     // catch the exception and just return an empty array so the caller can
     // handle it if need be.
-    // @todo Remove this and use appropriate config.storage service definition
-    //   in the installer instead.
     try {
       $raw = $this->getConnection()->query('SELECT data FROM {config} WHERE name = :name', array(':name' => $name), $this->options)->fetchField();
       if ($raw !== FALSE) {
