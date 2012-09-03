@@ -38,6 +38,7 @@ class PropertyLanguageItem extends ItemBase {
         // The language object is retrieved via the language code.
         'computed' => TRUE,
         'read-only' => FALSE,
+        'settings' => array('langcode source' => 'value'),
       );
     }
     return self::$propertyDefinitions;

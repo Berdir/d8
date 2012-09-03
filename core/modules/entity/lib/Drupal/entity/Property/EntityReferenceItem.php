@@ -44,6 +44,7 @@ class EntityReferenceItem extends ItemBase {
         // The entity object is computed out of the entity id.
         'computed' => TRUE,
         'read-only' => FALSE,
+        'settings' => array('id source' => 'value'),
       );
     }
     return self::$propertyDefinitions[$entity_type];

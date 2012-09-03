@@ -40,7 +40,9 @@ class FieldTextWithSummaryItem extends FieldTextItem {
         'html' => TRUE,
         'computed' => TRUE,
         'class' => '\Drupal\text\FieldTextProcessed',
-        'source' => 'summary',
+        'settings' => array(
+          'text source' => 'summary',
+        ),
       );
     }
     return self::$propertyDefinitions;

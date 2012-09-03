@@ -39,13 +39,12 @@ class FieldTextProcessed extends String {
     if (!isset($context['parent'])) {
       throw new InvalidArgumentException('Computed properties require context for computation.');
     }
-    if (!isset($definition['source'])) {
+    if (!isset($definition['settings']['text source'])) {
       throw new InvalidArgumentException("The definition's 'source' key has to specify the name of the text property to be processed.");
     }
 
-    $this->text = $context['parent']->get($definition['source']);
+    $this->text = $context['parent']->get($definition['settings']['text source']);
     $this->format = $context['parent']->get('format');
-
   }
 
   /**

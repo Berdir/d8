@@ -26,8 +26,8 @@ class Language extends WrapperBase implements WrapperInterface {
   public function __construct(array $definition, $value = NULL, array $context = array()) {
     $this->definition = $definition;
 
-    if (isset($context['parent'])) {
-      $this->langcode = $context['parent']->get('value');
+    if (isset($context['parent']) && !empty($this->definition['settings']['langcode source'])) {
+      $this->langcode = $context['parent']->get($this->definition['settings']['langcode source']);
     }
     else {
       // No context given, so just initialize an langcode property for storing

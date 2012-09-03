@@ -40,12 +40,13 @@ class EntityWrapper extends WrapperBase implements StructureInterface {
     $this->definition = $definition;
     $this->entityType = isset($this->definition['entity type']) ? $this->definition['entity type'] : NULL;
 
-    if (isset($context['parent'])) {
-      $this->id = $context['parent']->get('value');
+    // If an ID source is specified, act as computed property.
+    if (isset($context['parent']) && !empty($this->definition['settings']['id source'])) {
+      $this->id = $context['parent']->get($this->definition['settings']['id source']);
     }
     else {
       // No context given, so just initialize an ID property for storing the
-      // entity ID.
+      // entity ID of the wrapped entity.
       $this->id = drupal_wrap_data(array('type' => 'string'));
     }
 

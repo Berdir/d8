@@ -42,7 +42,9 @@ class FieldTextItem extends FieldItemBase {
         'html' => TRUE,
         'computed' => TRUE,
         'class' => '\Drupal\text\FieldTextProcessed',
-        'source' => 'value',
+        'settings' => array(
+          'text source' => 'value',
+        ),
       );
     }
     return self::$propertyDefinitions;
