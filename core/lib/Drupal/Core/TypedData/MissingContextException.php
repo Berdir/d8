@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\Core\TypedData\DataMissesContextException.
+ * Definition of Drupal\Core\TypedData\MissingContextException.
  */
 
 namespace Drupal\Core\TypedData;
@@ -11,4 +11,4 @@ use Exception;
 /**
  * Exception thrown when data wrappers miss contextual information.
  */
-class DataMissesContextException extends Exception { }
+class MissingContextException extends Exception { }

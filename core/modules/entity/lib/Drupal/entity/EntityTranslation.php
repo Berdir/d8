@@ -6,10 +6,10 @@
  */
 
 namespace Drupal\entity;
-use Drupal\Core\TypedData\Type\DataWrapperBase;
-use Drupal\Core\TypedData\DataWrapperInterface;
-use Drupal\Core\TypedData\DataStructureInterface;
-use Drupal\Core\TypedData\DataAccessibleInterface;
+use Drupal\Core\TypedData\Type\WrapperBase;
+use Drupal\Core\TypedData\WrapperInterface;
+use Drupal\Core\TypedData\StructureInterface;
+use Drupal\Core\TypedData\AccessibleInterface;
 use ArrayIterator;
 use InvalidArgumentException;
 
@@ -18,11 +18,11 @@ use InvalidArgumentException;
  *
  * @todo: Needs an entity specific interface.
  */
-class EntityTranslation extends DataWrapperBase implements DataStructureInterface, DataAccessibleInterface {
+class EntityTranslation extends WrapperBase implements StructureInterface, AccessibleInterface {
 
   /**
    * The array of translated properties, each being an instance of
-   * EntityPropertyListInterface.
+   * ItemListInterface.
    *
    * @var array
    */
@@ -36,7 +36,7 @@ class EntityTranslation extends DataWrapperBase implements DataStructureInterfac
   protected $langcode;
 
   /**
-   * Implements DataWrapperInterface::__construct().
+   * Implements WrapperInterface::__construct().
    */
   public function __construct(array $definition, $value = NULL, array $context = array()) {
     $this->definition = $definition;
@@ -45,7 +45,7 @@ class EntityTranslation extends DataWrapperBase implements DataStructureInterfac
   }
 
   /**
-   * Implements DataWrapperInterface::getValue().
+   * Implements WrapperInterface::getValue().
    */
   public function getValue() {
     $values = array();
@@ -56,7 +56,7 @@ class EntityTranslation extends DataWrapperBase implements DataStructureInterfac
   }
 
   /**
-   * Implements DataWrapperInterface::setValue().
+   * Implements WrapperInterface::setValue().
    */
   public function setValue($values) {
     foreach ($this->getProperties() as $name => $property) {
@@ -69,7 +69,7 @@ class EntityTranslation extends DataWrapperBase implements DataStructureInterfac
   }
 
   /**
-   * Implements DataWrapperInterface::getString().
+   * Implements WrapperInterface::getString().
    */
   public function getString() {
     $strings = array();
@@ -80,7 +80,7 @@ class EntityTranslation extends DataWrapperBase implements DataStructureInterfac
   }
 
   /**
-   * Implements DataWrapperInterface::get().
+   * Implements WrapperInterface::get().
    */
   public function get($property_name) {
     $definitions = $this->getPropertyDefinitions();
@@ -91,14 +91,14 @@ class EntityTranslation extends DataWrapperBase implements DataStructureInterfac
   }
 
   /**
-   * Implements DataStructureInterface::set().
+   * Implements StructureInterface::set().
    */
   public function set($property_name, $value) {
     $this->get($property_name)->setValue($value);
   }
 
   /**
-   * Implements DataStructureInterface::getProperties().
+   * Implements StructureInterface::getProperties().
    */
   public function getProperties($include_computed = FALSE) {
     $properties = array();
@@ -111,13 +111,13 @@ class EntityTranslation extends DataWrapperBase implements DataStructureInterfac
   }
 
   /**
-   * Implements DataStructureInterface::setProperties().
+   * Implements StructureInterface::setProperties().
    */
   public function setProperties($properties) {
     foreach ($this->getProperties() as $name => $property) {
       if (isset($properties[$name])) {
         // Copy the value to our property object.
-        $value = $properties[$name] instanceof DataWrapperInterface ? $properties[$name]->getValue() : $properties[$name];
+        $value = $properties[$name] instanceof WrapperInterface ? $properties[$name]->getValue() : $properties[$name];
         $property->setValue($value);
         unset($properties[$name]);
       }
@@ -149,7 +149,7 @@ class EntityTranslation extends DataWrapperBase implements DataStructureInterfac
   }
 
   /**
-   * Implements DataStructureInterface::getPropertyDefinition().
+   * Implements StructureInterface::getPropertyDefinition().
    */
   public function getPropertyDefinition($name) {
     $definitions = $this->getPropertyDefinitions();
@@ -157,7 +157,7 @@ class EntityTranslation extends DataWrapperBase implements DataStructureInterfac
   }
 
   /**
-   * Implements DataStructureInterface::getPropertyDefinitions().
+   * Implements StructureInterface::getPropertyDefinitions().
    */
   public function getPropertyDefinitions() {
     $definitions = array();
@@ -175,21 +175,21 @@ class EntityTranslation extends DataWrapperBase implements DataStructureInterfac
   }
 
   /**
-   * Implements DataStructureInterface::toArray().
+   * Implements StructureInterface::toArray().
    */
   public function toArray() {
     return $this->getValue();
   }
 
   /**
-   * Implements DataAccessibleInterface::access().
+   * Implements AccessibleInterface::access().
    */
   public function access(\Drupal\user\User $account = NULL) {
     // @todo implement
   }
 
   /**
-   * Implements DataWrapperInterface::validate().
+   * Implements WrapperInterface::validate().
    */
   public function validate($value = NULL) {
     // @todo implement

@@ -7,9 +7,9 @@
 
 namespace Drupal\entity;
 
-use Drupal\Core\TypedData\DataWrapperInterface;
-use Drupal\Core\TypedData\DataStructureTranslatableInterface;
-use Drupal\Core\TypedData\DataAccessibleInterface;
+use Drupal\Core\TypedData\WrapperInterface;
+use Drupal\Core\TypedData\StructureTranslatableInterface;
+use Drupal\Core\TypedData\AccessibleInterface;
 use Drupal\Component\Uuid\Uuid;
 use ArrayIterator;
 use InvalidArgumentException;
@@ -18,9 +18,9 @@ use InvalidArgumentException;
  * Implements Property API specific enhancements to the Entity class.
  *
  * @todo: Once all entity types have been converted, merge improvements into the
- * Entity class and let EntityInterface extend the DataStructureInterface.
+ * Entity class and let EntityInterface extend the StructureInterface.
  */
-class EntityNG extends Entity implements DataStructureTranslatableInterface, DataAccessibleInterface {
+class EntityNG extends Entity implements StructureTranslatableInterface, AccessibleInterface {
 
   /**
    * The plain data values of the contained properties.
@@ -38,7 +38,7 @@ class EntityNG extends Entity implements DataStructureTranslatableInterface, Dat
 
   /**
    * The array of properties, each being an instance of
-   * EntityPropertyListInterface.
+   * ItemListInterface.
    *
    * @var array
    */
@@ -71,7 +71,7 @@ class EntityNG extends Entity implements DataStructureTranslatableInterface, Dat
   }
 
   /**
-   * Implements DataStructureInterface::get().
+   * Implements StructureInterface::get().
    */
   public function get($property_name) {
     // Values in default language are always stored using the LANGUAGE_DEFAULT
@@ -85,7 +85,7 @@ class EntityNG extends Entity implements DataStructureTranslatableInterface, Dat
   /**
    * Gets a translated property.
    *
-   * @return \Drupal\entity\Property\EntityPropertyListInterface
+   * @return \Drupal\entity\Property\ItemListInterface
    */
   protected function getTranslatedProperty($property_name, $langcode) {
     // Populate $this->properties to fasten further lookups and to keep track of
@@ -109,14 +109,14 @@ class EntityNG extends Entity implements DataStructureTranslatableInterface, Dat
   }
 
   /**
-   * Implements DataStructureInterface::set().
+   * Implements StructureInterface::set().
    */
   public function set($property_name, $value) {
     $this->get($property_name)->setValue($value);
   }
 
   /**
-   * Implements DataStructureInterface::getProperties().
+   * Implements StructureInterface::getProperties().
    */
   public function getProperties($include_computed = FALSE) {
     $properties = array();
@@ -129,12 +129,12 @@ class EntityNG extends Entity implements DataStructureTranslatableInterface, Dat
   }
 
   /**
-   * Implements DataStructureInterface::setProperties().
+   * Implements StructureInterface::setProperties().
    */
   public function setProperties($properties) {
     foreach ($properties as $name => $property) {
       // Copy the value to our property object.
-      $value = $property instanceof DataWrapperInterface ? $property->getValue() : $property;
+      $value = $property instanceof WrapperInterface ? $property->getValue() : $property;
       $this->get($name)->setValue($value);
     }
   }
@@ -147,7 +147,7 @@ class EntityNG extends Entity implements DataStructureTranslatableInterface, Dat
   }
 
   /**
-   * Implements DataStructureInterface::getPropertyDefinition().
+   * Implements StructureInterface::getPropertyDefinition().
    */
   public function getPropertyDefinition($name) {
     $definitions = $this->getPropertyDefinitions();
@@ -155,7 +155,7 @@ class EntityNG extends Entity implements DataStructureTranslatableInterface, Dat
   }
 
   /**
-   * Implements DataStructureInterface::getPropertyDefinitions().
+   * Implements StructureInterface::getPropertyDefinitions().
    */
   public function getPropertyDefinitions() {
     return entity_get_controller($this->entityType)->getPropertyDefinitions(array(
@@ -166,7 +166,7 @@ class EntityNG extends Entity implements DataStructureTranslatableInterface, Dat
   }
 
   /**
-   * Implements DataStructureInterface::toArray().
+   * Implements StructureInterface::toArray().
    */
   public function toArray() {
     $values = array();
@@ -177,14 +177,14 @@ class EntityNG extends Entity implements DataStructureTranslatableInterface, Dat
   }
 
   /**
-   * Implements DataStructureTranslatableInterface::language().
+   * Implements StructureTranslatableInterface::language().
    */
   public function language() {
     return $this->langcode->language;
   }
 
   /**
-   * Implements DataStructureTranslatableInterface::getTranslation().
+   * Implements StructureTranslatableInterface::getTranslation().
    */
   public function getTranslation($langcode) {
     // If the default language is LANGUAGE_NOT_SPECIFIED, the entity is not
@@ -212,7 +212,7 @@ class EntityNG extends Entity implements DataStructureTranslatableInterface, Dat
   }
 
   /**
-   * Implements DataStructureTranslatableInterface::getTranslationLanguages().
+   * Implements StructureTranslatableInterface::getTranslationLanguages().
    */
   public function getTranslationLanguages($include_default = TRUE) {
     $translations = array();
@@ -235,7 +235,7 @@ class EntityNG extends Entity implements DataStructureTranslatableInterface, Dat
   }
 
   /**
-   * Implements DataAccessibleInterface::access().
+   * Implements AccessibleInterface::access().
    */
   public function access(\Drupal\user\User $account = NULL) {
     // TODO: Implement access() method.

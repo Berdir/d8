@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\Core\TypedData\DataStructureTranslatableInterface.
+ * Definition of Drupal\Core\TypedData\StructureTranslatableInterface.
  */
 
 namespace Drupal\Core\TypedData;
@@ -10,7 +10,7 @@ namespace Drupal\Core\TypedData;
 /**
  * Interface for translatable data structures.
  */
-interface DataStructureTranslatableInterface extends DataStructureInterface {
+interface StructureTranslatableInterface extends StructureInterface {
 
   /**
    * Returns the default language.
@@ -38,7 +38,7 @@ interface DataStructureTranslatableInterface extends DataStructureInterface {
    *   The language code of the translation to get or LANGUAGE_DEFAULT to get
    *   the data in default language.
    *
-   * @return \Drupal\Core\TypedData\DataStructureInterface
+   * @return \Drupal\Core\TypedData\StructureInterface
    *   A data structure containing the translated properties.
    */
   public function getTranslation($langcode);

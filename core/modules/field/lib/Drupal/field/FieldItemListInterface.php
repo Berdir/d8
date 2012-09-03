@@ -6,12 +6,12 @@
  */
 
 namespace Drupal\field;
-use Drupal\entity\Property\EntityPropertyListInterface;
+use Drupal\entity\Property\ItemListInterface;
 
 /**
  * Interface for entity properties that are fields, being lists of field items.
  */
-interface FieldItemListInterface extends EntityPropertyListInterface {
+interface FieldItemListInterface extends ItemListInterface {
 
   /**
    * Sets contextual information of the field item list.
@@ -39,7 +39,7 @@ interface FieldItemListInterface extends EntityPropertyListInterface {
   /**
    * Get the field instance.
    *
-   * @throws \Drupal\Core\TypedData\DataMissesContextException
+   * @throws \Drupal\Core\TypedData\MissingContextException
    *   If field context is not set.
    *
    * @see Drupal\field\FieldItemListInterface::setFieldContext()

@@ -5,13 +5,13 @@
  */
 
 namespace Drupal\entity\Property;
-use Drupal\entity\Property\EntityPropertyItemBase;
+use Drupal\entity\Property\ItemBase;
 
 
 /**
  * Defines the 'integer_item' entity property item.
  */
-class PropertyIntegerItem extends EntityPropertyItemBase {
+class PropertyIntegerItem extends ItemBase {
 
   /**
    * Property definitions of the contained properties.
@@ -23,7 +23,7 @@ class PropertyIntegerItem extends EntityPropertyItemBase {
   static $propertyDefinitions;
 
   /**
-   * Implements DataStructureInterface::getPropertyDefinitions().
+   * Implements StructureInterface::getPropertyDefinitions().
    */
   public function getPropertyDefinitions() {
 

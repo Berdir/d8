@@ -6,8 +6,8 @@
  */
 
 namespace Drupal\text;
-use Drupal\Core\TypedData\DataWrapperInterface;
-use Drupal\Core\TypedData\DataReadOnlyException;
+use Drupal\Core\TypedData\WrapperInterface;
+use Drupal\Core\TypedData\ReadOnlyException;
 use Drupal\Core\TypedData\Type\String;
 use InvalidArgumentException;
 
@@ -19,19 +19,19 @@ class FieldTextProcessed extends String {
   /**
    * The text property.
    *
-   * @var \Drupal\Core\TypedData\DataWrapperInterface
+   * @var \Drupal\Core\TypedData\WrapperInterface
    */
   protected $text;
 
   /**
    * The text format property.
    *
-   * @var \Drupal\Core\TypedData\DataWrapperInterface
+   * @var \Drupal\Core\TypedData\WrapperInterface
    */
   protected $format;
 
   /**
-   * Implements DataWrapperInterface::__construct().
+   * Implements WrapperInterface::__construct().
    */
   public function __construct(array $definition, $value = NULL, array $context = array()) {
     $this->definition = $definition;
@@ -49,7 +49,7 @@ class FieldTextProcessed extends String {
   }
 
   /**
-   * Implements DataWrapperInterface::getValue().
+   * Implements WrapperInterface::getValue().
    */
   public function getValue($langcode = NULL) {
     // @todo: Determine a way to get the field $instance here.
@@ -67,11 +67,11 @@ class FieldTextProcessed extends String {
   }
 
   /**
-   * Implements DataWrapperInterface::setValue().
+   * Implements WrapperInterface::setValue().
    */
   public function setValue($value) {
     if (isset($value)) {
-      throw new DataReadOnlyException('Unable to set a computed property.');
+      throw new ReadOnlyException('Unable to set a computed property.');
     }
   }
 }

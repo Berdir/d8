@@ -6,14 +6,14 @@
  */
 
 namespace Drupal\Core\TypedData\Type;
-use Drupal\Core\TypedData\DataWrapperInterface;
+use Drupal\Core\TypedData\WrapperInterface;
 use DateInterval;
 use InvalidArgumentException;
 
 /**
  * The duration data type.
  */
-class Duration extends DataWrapperBase implements DataWrapperInterface {
+class Duration extends WrapperBase implements WrapperInterface {
 
   /**
    * The data value.
@@ -23,7 +23,7 @@ class Duration extends DataWrapperBase implements DataWrapperInterface {
   protected $value;
 
   /**
-   * Implements DataWrapperInterface::setValue().
+   * Implements WrapperInterface::setValue().
    */
   public function setValue($value) {
     if ($value instanceof DateInterval || !isset($value)) {
@@ -44,14 +44,14 @@ class Duration extends DataWrapperBase implements DataWrapperInterface {
   }
 
   /**
-   * Implements DataWrapperInterface::getString().
+   * Implements WrapperInterface::getString().
    */
   public function getString() {
     return (string) $this->getValue()->format('%rP%yY%mM%dDT%hH%mM%sS');
   }
 
   /**
-   * Implements DataWrapperInterface::validate().
+   * Implements WrapperInterface::validate().
    */
   public function validate() {
     // TODO: Implement validate() method.

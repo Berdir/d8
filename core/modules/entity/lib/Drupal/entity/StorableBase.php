@@ -154,7 +154,7 @@ abstract class StorableBase implements StorableInterface {
   }
 
   /**
-   * Implements DataStructureInterface::set().
+   * Implements StructureInterface::set().
    */
   public function set($property_name, $value) {
     // @todo: Replace by EntityNG implementation once all entity types have been
@@ -163,7 +163,7 @@ abstract class StorableBase implements StorableInterface {
   }
 
   /**
-   * Implements DataStructureTranslatableInterface::language().
+   * Implements StructureTranslatableInterface::language().
    */
   public function language() {
     // @todo: Replace by EntityNG implementation once all entity types have been
@@ -172,7 +172,7 @@ abstract class StorableBase implements StorableInterface {
   }
 
   /**
-   * Implements DataStructureTranslatableInterface::getTranslation().
+   * Implements StructureTranslatableInterface::getTranslation().
    */
   public function getTranslation($langcode) {
     // @todo: Replace by EntityNG implementation once all entity types have been
@@ -184,7 +184,7 @@ abstract class StorableBase implements StorableInterface {
    *
    * @todo: Remove once all entity types implement the entity property API. This
    * is deprecated by
-   * DataStructureTranslatableInterface::getTranslationLanguages().
+   * StructureTranslatableInterface::getTranslationLanguages().
    */
   public function translations() {
     $languages = array();
@@ -208,7 +208,7 @@ abstract class StorableBase implements StorableInterface {
   }
 
   /**
-   * Implements DataStructureTranslatableInterface::getTranslationLanguages().
+   * Implements StructureTranslatableInterface::getTranslationLanguages().
    */
   public function getTranslationLanguages($include_default = TRUE) {
     // @todo: Replace by EntityNG implementation once all entity types have been
@@ -269,7 +269,7 @@ abstract class StorableBase implements StorableInterface {
   }
 
   /**
-   * Implements DataStructureTranslatableInterface::getProperties().
+   * Implements StructureTranslatableInterface::getProperties().
    */
   public function getProperties($include_computed = FALSE) {
     // @todo: Replace by EntityNG implementation once all entity types have been
@@ -277,7 +277,7 @@ abstract class StorableBase implements StorableInterface {
   }
 
   /**
-   * Implements DataStructureTranslatableInterface::setProperties().
+   * Implements StructureTranslatableInterface::setProperties().
    */
   public function setProperties($properties) {
     // @todo: Replace by EntityNG implementation once all entity types have been
@@ -285,7 +285,7 @@ abstract class StorableBase implements StorableInterface {
   }
 
   /**
-   * Implements DataStructureTranslatableInterface::getPropertyDefinition().
+   * Implements StructureTranslatableInterface::getPropertyDefinition().
    */
   public function getPropertyDefinition($name) {
     // @todo: Replace by EntityNG implementation once all entity types have been
@@ -293,7 +293,7 @@ abstract class StorableBase implements StorableInterface {
   }
 
   /**
-   * Implements DataStructureTranslatableInterface::getPropertyDefinitions().
+   * Implements StructureTranslatableInterface::getPropertyDefinitions().
    */
   public function getPropertyDefinitions() {
     // @todo: Replace by EntityNG implementation once all entity types have been
@@ -301,7 +301,7 @@ abstract class StorableBase implements StorableInterface {
   }
 
   /**
-   * Implements DataStructureTranslatableInterface::toArray().
+   * Implements StructureTranslatableInterface::toArray().
    */
   public function toArray() {
     // @todo: Replace by EntityNG implementation once all entity types have been
@@ -309,7 +309,7 @@ abstract class StorableBase implements StorableInterface {
   }
 
   /**
-   * Implements DataStructureTranslatableInterface::getIterator().
+   * Implements StructureTranslatableInterface::getIterator().
    */
   public function getIterator() {
     // @todo: Replace by EntityNG implementation once all entity types have been

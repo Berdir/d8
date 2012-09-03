@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\Core\TypedData\DataListInterface.
+ * Definition of Drupal\Core\TypedData\ListInterface.
  */
 
 namespace Drupal\Core\TypedData;
@@ -13,4 +13,4 @@ use Countable;
 /**
  * Interface for a list of typed data.
  */
-interface DataListInterface extends ArrayAccess, IteratorAggregate , Countable { }
+interface ListInterface extends ArrayAccess, IteratorAggregate , Countable { }

@@ -7349,9 +7349,9 @@ function drupal_get_data_type_info() {
  *   following keys are supported:
  *   - name: The name of the data being wrapped.
  *   - parent: The parent object containing the data. Must be an instance of
- *     \Drupal\Core\TypedData\DataStructureInterface.
+ *     \Drupal\Core\TypedData\StructureInterface.
  *
- * @return \Drupal\Core\TypedData\DataWrapperInterface
+ * @return \Drupal\Core\TypedData\WrapperInterface
  *
  * @see drupal_get_data_type_info()
  */

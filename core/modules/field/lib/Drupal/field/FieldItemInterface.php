@@ -6,12 +6,12 @@
  */
 
 namespace Drupal\field;
-use Drupal\entity\Property\EntityPropertyItemInterface;
+use Drupal\entity\Property\ItemInterface;
 
 /**
  * Interface for field items.
  */
-interface FieldItemInterface extends EntityPropertyItemInterface {
+interface FieldItemInterface extends ItemInterface {
 
   /**
    * Sets contextual information of the field item list.

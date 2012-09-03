@@ -2,13 +2,13 @@
 
 /**
  * @file
- * Definition of Drupal\entity\Property\EntityPropertyItemBase.
+ * Definition of Drupal\entity\Property\ItemBase.
  */
 
 namespace Drupal\entity\Property;
-use Drupal\Core\TypedData\Type\DataWrapperBase;
-use Drupal\Core\TypedData\DataWrapperInterface;
-use Drupal\Core\TypedData\DataStructureInterface;
+use Drupal\Core\TypedData\Type\WrapperBase;
+use Drupal\Core\TypedData\WrapperInterface;
+use Drupal\Core\TypedData\StructureInterface;
 use Drupal\user;
 use InvalidArgumentException;
 use ArrayIterator;
@@ -17,11 +17,11 @@ use ArrayIterator;
  * An entity property item.
  *
  * Entity property items making use of this base class have to implement
- * DataStructureInterface::getPropertyDefinitions().
+ * StructureInterface::getPropertyDefinitions().
  *
  * @see EntityPropertyItemInterface
  */
-abstract class EntityPropertyItemBase extends DataWrapperBase implements EntityPropertyItemInterface {
+abstract class ItemBase extends WrapperBase implements ItemInterface {
 
   /**
    * The array of properties.
@@ -30,12 +30,12 @@ abstract class EntityPropertyItemBase extends DataWrapperBase implements EntityP
    * replaced by others, so computed properties can safely store references on
    * other properties.
    *
-   * @var array<DataWrapperInterface>
+   * @var array<WrapperInterface>
    */
   protected $properties = array();
 
   /**
-   * Implements DataWrapperInterface::__construct().
+   * Implements WrapperInterface::__construct().
    */
   public function __construct(array $definition, $value = NULL, array $context = array()) {
     $this->definition = $definition;
@@ -65,7 +65,7 @@ abstract class EntityPropertyItemBase extends DataWrapperBase implements EntityP
   }
 
   /**
-   * Implements DataWrapperInterface::getValue().
+   * Implements WrapperInterface::getValue().
    */
   public function getValue() {
     $values = array();
@@ -76,7 +76,7 @@ abstract class EntityPropertyItemBase extends DataWrapperBase implements EntityP
   }
 
   /**
-   * Implements DataWrapperInterface::setValue().
+   * Implements WrapperInterface::setValue().
    *
    * @param array $values
    *   An array of property values.
@@ -89,7 +89,7 @@ abstract class EntityPropertyItemBase extends DataWrapperBase implements EntityP
       $values = array($keys[0] => $values);
     }
     // Support passing in property objects as value.
-    elseif ($values instanceof DataWrapperInterface) {
+    elseif ($values instanceof WrapperInterface) {
       $values = $values->getValue();
     }
 
@@ -101,7 +101,7 @@ abstract class EntityPropertyItemBase extends DataWrapperBase implements EntityP
   }
 
   /**
-   * Implements DataWrapperInterface::getString().
+   * Implements WrapperInterface::getString().
    */
   public function getString() {
     $strings = array();
@@ -112,14 +112,14 @@ abstract class EntityPropertyItemBase extends DataWrapperBase implements EntityP
   }
 
   /**
-   * Implements DataWrapperInterface::validate().
+   * Implements WrapperInterface::validate().
    */
   public function validate() {
     // @todo implement
   }
 
   /**
-   * Implements DataStructureInterface::get().
+   * Implements StructureInterface::get().
    */
   public function get($property_name) {
     if (!isset($this->properties[$property_name])) {
@@ -129,28 +129,28 @@ abstract class EntityPropertyItemBase extends DataWrapperBase implements EntityP
   }
 
   /**
-   * Implements DataStructureInterface::set().
+   * Implements StructureInterface::set().
    */
   public function set($property_name, $value) {
     $this->get($property_name)->setValue($value);
   }
 
   /**
-   * Implements EntityPropertyItemInterface::__get().
+   * Implements ItemInterface::__get().
    */
   public function __get($name) {
     return $this->get($name)->getValue();
   }
 
   /**
-   * Implements EntityPropertyItemInterface::__set().
+   * Implements ItemInterface::__set().
    */
   public function __set($name, $value) {
     $this->get($name)->setValue($value);
   }
 
   /**
-   * Implements DataStructureInterface::getProperties().
+   * Implements StructureInterface::getProperties().
    */
   public function getProperties($include_computed = FALSE) {
     $properties = array();
@@ -163,13 +163,13 @@ abstract class EntityPropertyItemBase extends DataWrapperBase implements EntityP
   }
 
   /**
-   * Implements DataStructureInterface::setProperties().
+   * Implements StructureInterface::setProperties().
    */
   public function setProperties($properties) {
     foreach ($properties as $name => $property) {
       if (isset($this->properties[$name])) {
         // Copy the value to our property object.
-        $value = $property instanceof DataWrapperInterface ? $property->getValue() : $property;
+        $value = $property instanceof WrapperInterface ? $property->getValue() : $property;
         $this->properties[$name]->setValue($value);
       }
       else {
@@ -186,7 +186,7 @@ abstract class EntityPropertyItemBase extends DataWrapperBase implements EntityP
   }
 
   /**
-   * Implements DataStructureInterface::getPropertyDefinition().
+   * Implements StructureInterface::getPropertyDefinition().
    */
   public function getPropertyDefinition($name) {
     $definitions = $this->getPropertyDefinitions();
@@ -194,7 +194,7 @@ abstract class EntityPropertyItemBase extends DataWrapperBase implements EntityP
   }
 
   /**
-   * Implements DataStructureInterface::toArray().
+   * Implements StructureInterface::toArray().
    */
   public function toArray() {
     return $this->getValue();

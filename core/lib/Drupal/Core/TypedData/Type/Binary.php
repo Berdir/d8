@@ -6,13 +6,13 @@
  */
 
 namespace Drupal\Core\TypedData\Type;
-use Drupal\Core\TypedData\DataWrapperInterface;
+use Drupal\Core\TypedData\WrapperInterface;
 use InvalidArgumentException;
 
 /**
  * The binary data type.
  */
-class Binary extends DataWrapperBase implements DataWrapperInterface {
+class Binary extends WrapperBase implements WrapperInterface {
 
   /**
    * The resource URI.
@@ -29,7 +29,7 @@ class Binary extends DataWrapperBase implements DataWrapperInterface {
   public $handle = NULL;
 
   /**
-   * Implements DataWrapperInterface::getValue().
+   * Implements WrapperInterface::getValue().
    */
   public function getValue() {
     if (!isset($this->handle) && isset($this->uri)) {
@@ -39,7 +39,7 @@ class Binary extends DataWrapperBase implements DataWrapperInterface {
   }
 
   /**
-   * Implements DataWrapperInterface::setValue().
+   * Implements WrapperInterface::setValue().
    */
   public function setValue($value) {
     if (!isset($value)) {
@@ -58,7 +58,7 @@ class Binary extends DataWrapperBase implements DataWrapperInterface {
   }
 
   /**
-   * Implements DataWrapperInterface::getString().
+   * Implements WrapperInterface::getString().
    */
   public function getString() {
     $contents = '';
@@ -69,7 +69,7 @@ class Binary extends DataWrapperBase implements DataWrapperInterface {
   }
 
   /**
-   * Implements DataWrapperInterface::validate().
+   * Implements WrapperInterface::validate().
    */
   public function validate() {
     // TODO: Implement validate() method.

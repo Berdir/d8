@@ -2,11 +2,11 @@
 
 /**
  * @file
- * Definition of Drupal\Core\TypedData\Type\DataWrapperBase.
+ * Definition of Drupal\Core\TypedData\Type\WrapperBase.
  */
 
 namespace Drupal\Core\TypedData\Type;
-use Drupal\Core\TypedData\DataWrapperInterface;
+use Drupal\Core\TypedData\WrapperInterface;
 
 /**
  * The abstract base class for data types.
@@ -14,7 +14,7 @@ use Drupal\Core\TypedData\DataWrapperInterface;
  * Classes deriving from this base class have to declare $value
  * or override getValue() or setValue().
  */
-abstract class DataWrapperBase implements DataWrapperInterface {
+abstract class WrapperBase implements WrapperInterface {
 
   /**
    * The data definition.
@@ -24,7 +24,7 @@ abstract class DataWrapperBase implements DataWrapperInterface {
   protected $definition;
 
   /**
-   * Implements DataWrapperInterface::__construct().
+   * Implements WrapperInterface::__construct().
    *
    * @param array $definition
    *
@@ -40,7 +40,7 @@ abstract class DataWrapperBase implements DataWrapperInterface {
   }
 
   /**
-   * Implements DataWrapperInterface::getType().
+   * Implements WrapperInterface::getType().
    *
    * @return string
    */
@@ -49,7 +49,7 @@ abstract class DataWrapperBase implements DataWrapperInterface {
   }
 
   /**
-   * Implements DataWrapperInterface::getDefinition().
+   * Implements WrapperInterface::getDefinition().
    *
    * @return array
    */
@@ -58,7 +58,7 @@ abstract class DataWrapperBase implements DataWrapperInterface {
   }
 
   /**
-   * Implements DataWrapperInterface::getValue().
+   * Implements WrapperInterface::getValue().
    *
    * @return mixed
    */
@@ -67,7 +67,7 @@ abstract class DataWrapperBase implements DataWrapperInterface {
   }
 
   /**
-   * Implements DataWrapperInterface::setValue().
+   * Implements WrapperInterface::setValue().
    *
    * @param mixed $value
    */
@@ -76,7 +76,7 @@ abstract class DataWrapperBase implements DataWrapperInterface {
   }
 
   /**
-   * Implements DataWrapperInterface::getString().
+   * Implements WrapperInterface::getString().
    *
    * @return string
    */

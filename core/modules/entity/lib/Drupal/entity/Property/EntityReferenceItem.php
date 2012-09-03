@@ -1,18 +1,18 @@
 <?php
 /**
  * @file
- * Definition of Drupal\entity\Property\PropertyEntityReferenceItem.
+ * Definition of Drupal\entity\Property\EntityReferenceItem.
  */
 
 namespace Drupal\entity\Property;
-use Drupal\entity\Property\EntityPropertyItemBase;
+use Drupal\entity\Property\ItemBase;
 use InvalidArgumentException;
 
 
 /**
  * Defines the 'entityreference_item' entity property item.
  */
-class PropertyEntityReferenceItem extends EntityPropertyItemBase {
+class EntityReferenceItem extends ItemBase {
 
   /**
    * Property definitions of the contained properties.
@@ -24,7 +24,7 @@ class PropertyEntityReferenceItem extends EntityPropertyItemBase {
   static $propertyDefinitions;
 
   /**
-   * Implements DataStructureInterface::getPropertyDefinitions().
+   * Implements StructureInterface::getPropertyDefinitions().
    */
   public function getPropertyDefinitions() {
     // Definitions vary by entity type, so key them by entity type.
@@ -50,7 +50,7 @@ class PropertyEntityReferenceItem extends EntityPropertyItemBase {
   }
 
   /**
-   * Overrides EntityPropertyItemBase::setValue().
+   * Overrides ItemBase::setValue().
    */
   public function setValue($values) {
     // Treat the values as property value of the entity property, if no array

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\Core\TypedData\DataPrimitive.
+ * Definition of Drupal\Core\TypedData\Primitive.
  */
 
 namespace Drupal\Core\TypedData;
@@ -10,7 +10,7 @@ namespace Drupal\Core\TypedData;
 /**
  * Class that holds constants for all primitive data types.
  */
-final class DataPrimitive {
+final class Primitive {
 
   /**
    * The BOOLEAN primitive data type.

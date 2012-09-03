@@ -2,18 +2,18 @@
 
 /**
  * @file
- * Definition of Drupal\entity\Property\EntityPropertyListInterface.
+ * Definition of Drupal\entity\Property\ItemListInterface.
  */
 
 namespace Drupal\entity\Property;
-use Drupal\Core\TypedData\DataListInterface;
-use Drupal\Core\TypedData\DataWrapperInterface;
-use Drupal\Core\TypedData\DataAccessibleInterface;
+use Drupal\Core\TypedData\ListInterface;
+use Drupal\Core\TypedData\WrapperInterface;
+use Drupal\Core\TypedData\AccessibleInterface;
 
 /**
  * Interface for entity properties, being lists of property items.
  *
- * Contained items must implement the EntityPropertyItemInterface. This
+ * Contained items must implement the ItemInterface. This
  * interface is required for every property of an entity.
  *
  * Some methods are delegated to the first contained EntityPropertyItem, in
@@ -22,7 +22,7 @@ use Drupal\Core\TypedData\DataAccessibleInterface;
  * @todo: Should getProperties(), setProperties() and getPropertyDefinitions()
  * be delegated as well.
  */
-interface EntityPropertyListInterface extends DataListInterface, DataWrapperInterface, DataAccessibleInterface {
+interface ItemListInterface extends ListInterface, WrapperInterface, AccessibleInterface {
 
   /**
    * Delegated to the first item.

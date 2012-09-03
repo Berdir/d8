@@ -2,17 +2,17 @@
 
 /**
  * @file
- * Definition of Drupal\entity\Property\EntityPropertyList.
+ * Definition of Drupal\entity\Property\ItemList.
  */
 
 namespace Drupal\entity\Property;
-use Drupal\Core\TypedData\Type\DataWrapperBase;
+use Drupal\Core\TypedData\Type\WrapperBase;
 use Drupal\user\User;
 use ArrayIterator;
 use InvalidArgumentException;
 
 /**
- * An entity property list.
+ * An entity property item list.
  *
  * An entity property is a list of property items, which contain only primitive
  * properties or entity references. Note that even single-valued entity
@@ -22,18 +22,18 @@ use InvalidArgumentException;
  *
  * @see EntityPropertyListInterface.
  */
-class EntityPropertyList extends DataWrapperBase implements EntityPropertyListInterface {
+class ItemList extends WrapperBase implements ItemListInterface {
 
   /**
    * Numerically indexed array of property items, implementing the
-   * EntityPropertyItemInterface.
+   * ItemInterface.
    *
    * @var array
    */
   protected $list = array();
 
   /**
-   * Implements DataWrapperInterface::getValue().
+   * Implements WrapperInterface::getValue().
    */
   public function getValue() {
     $values = array();
@@ -45,7 +45,7 @@ class EntityPropertyList extends DataWrapperBase implements EntityPropertyListIn
   }
 
   /**
-   * Implements DataWrapperInterface::setValue().
+   * Implements WrapperInterface::setValue().
    *
    * @param array $values
    *   An array of values of the property items.
@@ -98,7 +98,7 @@ class EntityPropertyList extends DataWrapperBase implements EntityPropertyListIn
   }
 
   /**
-   * Implements DataWrapperInterface::validate().
+   * Implements WrapperInterface::validate().
    */
   public function validate() {
     // @todo implement
@@ -144,7 +144,7 @@ class EntityPropertyList extends DataWrapperBase implements EntityPropertyListIn
   /**
    * Helper for creating a list item object.
    *
-   * @return \Drupal\Core\TypedData\DataWrapperInterface
+   * @return \Drupal\Core\TypedData\WrapperInterface
    */
   protected function createItem($value = NULL) {
     $context = array('parent' => $this);
@@ -241,7 +241,7 @@ class EntityPropertyList extends DataWrapperBase implements EntityPropertyListIn
   }
 
   /**
-   * Implements DataAccessibleInterface::access().
+   * Implements AccessibleInterface::access().
    */
   public function access(User $account = NULL) {
     // TODO: Implement access() method. Use item access.

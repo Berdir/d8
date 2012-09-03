@@ -6,14 +6,14 @@
  */
 
 namespace Drupal\Core\TypedData\Type;
-use Drupal\Core\TypedData\DataWrapperInterface;
+use Drupal\Core\TypedData\WrapperInterface;
 use DateTime;
 use InvalidArgumentException;
 
 /**
  * The date data type.
  */
-class Date extends DataWrapperBase implements DataWrapperInterface {
+class Date extends WrapperBase implements WrapperInterface {
 
   /**
    * The data value.
@@ -23,14 +23,14 @@ class Date extends DataWrapperBase implements DataWrapperInterface {
   protected $value;
 
   /**
-   * Implements DataWrapperInterface::getValue().
+   * Implements WrapperInterface::getValue().
    */
   public function getValue() {
     return $this->value;
   }
 
   /**
-   * Implements DataWrapperInterface::setValue().
+   * Implements WrapperInterface::setValue().
    */
   public function setValue($value) {
     if ($value instanceof DateTime || !isset($value)) {
@@ -49,14 +49,14 @@ class Date extends DataWrapperBase implements DataWrapperInterface {
   }
 
   /**
-   * Implements DataWrapperInterface::getString().
+   * Implements WrapperInterface::getString().
    */
   public function getString() {
     return (string) $this->getValue()->format(DateTime::ISO8601);
   }
 
   /**
-   * Implements DataWrapperInterface::validate().
+   * Implements WrapperInterface::validate().
    */
   public function validate() {
     // TODO: Implement validate() method.
