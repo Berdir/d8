@@ -7326,6 +7326,7 @@ function drupal_get_updaters() {
  * Gets information about all data types.
  *
  * @see drupal_wrap_data()
+ * @see hook_data_type_info()
  */
 function drupal_get_data_type_info() {
   $items = &drupal_static('data_type_info');

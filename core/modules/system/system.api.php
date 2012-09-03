@@ -147,6 +147,63 @@ function hook_cron() {
 }
 
 /**
+ * Defines available data types for typed data wrappers.
+ *
+ * Typed data wrappers allow modules to support any kind of data based upon
+ * pre-defined primitive types and interfaces for data structures and lists.
+ *
+ * Defined data types may map to one of the pre-defined primitive types in
+ * \Drupal\Core\TypedData\Primitive or may be data structures, containing one or
+ * more data properties. Wrapper classes of data structures have to implement
+ * the \Drupal\Core\TypedData\StructureInterface. Further interfaces
+ * that may be implemented are:
+ *  - \Drupal\Core\TypedData\AccessibleInterface
+ *  - \Drupal\Core\TypedData\StructureTranslatableInterface
+ *
+ * Furthermore, lists of data items are represented with wrappers implementing
+ * the \Drupal\Core\TypedData\ListInterface, for which the class may be
+ * specified using the 'list class' key.
+ *
+ * @return array
+ *   An associative array where the key is the data type name and the value is
+ *   again an associative array. Supported keys are:
+ *   - label: The human readable label of the data type.
+ *   - class: The associated typed data wrapper class. Must implement the
+ *     \Drupal\Core\TypedData\WrapperInterface.
+ *   - list class: (optional) A typed data wrapper class used to wrap multiple
+ *     data items of the type. Must implement the
+ *     \Drupal\Core\TypedData\ListInterface.
+ *   - primitive type: (optional) Maps the data type to one of the pre-defined
+ *     primitive types in \Drupal\Core\TypedData\Primitive. If set, it must be
+ *     a constant defined by \Drupal\Core\TypedData\Primitive such as
+ *     \Drupal\Core\TypedData\Primitive::String.
+ *
+ * @see drupal_wrap_data()
+ * @see drupal_get_data_type_info()
+ */
+function hook_data_type_info() {
+  return array(
+    'email' => array(
+      'label' => t('Email'),
+      'class' => '\Drupal\email\Type\Email',
+      'primitive type' => \Drupal\Core\TypedData\Primitive::String,
+    ),
+  );
+}
+
+/**
+ * Alter available data types for typed data wrappers.
+ *
+ * @param array $data_types
+ *   An array of data type information.
+ *
+ * @see hook_data_type_info()
+ */
+function hook_data_type_info_alter(&$data_types) {
+  $data_types['email']['class'] = '\Drupal\mymodule\Type\Email';
+}
+
+/**
  * Declare queues holding items that need to be run periodically.
  *
  * While there can be only one hook_cron() process running at the same time,
