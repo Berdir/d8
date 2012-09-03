@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Definition of Drupal\entity\Property\PropertyIntegerItem.
+ * Definition of Drupal\entity\Property\IntegerItem.
  */
 
 namespace Drupal\entity\Property;
@@ -11,7 +11,7 @@ use Drupal\entity\Property\ItemBase;
 /**
  * Defines the 'integer_item' entity property item.
  */
-class PropertyIntegerItem extends ItemBase {
+class IntegerItem extends ItemBase {
 
   /**
    * Property definitions of the contained properties.

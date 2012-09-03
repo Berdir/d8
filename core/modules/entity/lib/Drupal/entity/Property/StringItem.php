@@ -11,7 +11,7 @@ use Drupal\entity\Property\ItemBase;
 /**
  * Defines the 'string_item' entity property item.
  */
-class PropertyStringItem extends ItemBase {
+class StringItem extends ItemBase {
 
   /**
    * Property definitions of the contained properties.

@@ -11,7 +11,7 @@ use InvalidArgumentException;
 /**
  * Defines the 'language_item' entity property item.
  */
-class PropertyLanguageItem extends ItemBase {
+class LanguageItem extends ItemBase {
 
   /**
    * Array of property definitions of contained properties.
