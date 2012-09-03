@@ -409,7 +409,7 @@ function field_entity_property_info($entity_type) {
         $definition = array(
           'label' => t('Field !name', array('!name' => $field_name)),
           'type' => $field['type'] . '_item',
-          'field' => $field_name,
+          'field' => TRUE,
           'list' => TRUE,
           'translatable' => !empty($field['translatable'])
         );

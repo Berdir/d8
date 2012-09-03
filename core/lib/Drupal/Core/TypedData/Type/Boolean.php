@@ -10,6 +10,9 @@ use Drupal\Core\TypedData\WrapperInterface;
 
 /**
  * The boolean data type.
+ *
+ * The plain value of a boolean is a regular PHP boolean. For setting the value
+ * any PHP variable that casts to a boolean may be passed.
  */
 class Boolean extends WrapperBase implements WrapperInterface {
 

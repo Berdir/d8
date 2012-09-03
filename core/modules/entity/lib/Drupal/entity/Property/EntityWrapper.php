@@ -8,6 +8,7 @@ namespace Drupal\entity\Property;
 use Drupal\Core\TypedData\Type\WrapperBase;
 use Drupal\Core\TypedData\WrapperInterface;
 use Drupal\Core\TypedData\StructureInterface;
+use Drupal\entity\EntityInterface;
 use ArrayIterator;
 use InvalidArgumentException;
 
@@ -16,6 +17,19 @@ use InvalidArgumentException;
  *
  * This wrapper implements the StructureInterface, whereby most of its
  * methods are just forwarded to the wrapped entity (if set).
+ *
+ * The plain value of this wrapper is the entity object, i.e. an instance of
+ * Drupal\entity\EntityInterface. For setting the value the entity object or the
+ * entity ID may be passed, whereas passing the ID is only supported if an
+ * 'entity type' constraint is specified.
+ *
+ * Supported constraints (below the definition's 'constraints' key) are:
+ *  - entity type: The entity type.
+ *  - bundle: The bundle or an array of possible bundles.
+ *
+ * Supported settings (below the definition's 'settings' key) are:
+ *  - id source: If used as computed property, the ID property used to load
+ *    the entity object.
  */
 class EntityWrapper extends WrapperBase implements StructureInterface {
 
@@ -37,8 +51,8 @@ class EntityWrapper extends WrapperBase implements StructureInterface {
    * Implements WrapperInterface::__construct().
    */
   public function __construct(array $definition, $value = NULL, array $context = array()) {
-    $this->definition = $definition;
-    $this->entityType = isset($this->definition['entity type']) ? $this->definition['entity type'] : NULL;
+    $this->definition = $definition + array('constraints' => array());
+    $this->entityType = isset($this->definition['constraints']['entity type']) ? $this->definition['constraints']['entity type'] : NULL;
 
     // If an ID source is specified, act as computed property.
     if (isset($context['parent']) && !empty($this->definition['settings']['id source'])) {
@@ -72,10 +86,10 @@ class EntityWrapper extends WrapperBase implements StructureInterface {
     if (!isset($value)) {
       $this->id->setValue(NULL);
     }
-    elseif (is_scalar($value) && !empty($this->definition['entity type'])) {
+    elseif (is_scalar($value) && !empty($this->definition['constraints']['entity type'])) {
       $this->id->setValue($value);
     }
-    elseif ($value instanceof \Drupal\entity\EntityInterface) {
+    elseif ($value instanceof EntityInterface) {
       $this->id->setValue($value->id());
       $this->entityType = $value->entityType();
     }
@@ -153,7 +167,7 @@ class EntityWrapper extends WrapperBase implements StructureInterface {
    */
   public function getPropertyDefinitions() {
     // @todo: Support getting definitions if multiple bundles are specified.
-    return entity_get_controller($this->definition['entity type'])->getPropertyDefinitions($this->definition);
+    return entity_get_controller($this->entityType)->getPropertyDefinitions($this->definition['constraints']);
   }
 
   /**

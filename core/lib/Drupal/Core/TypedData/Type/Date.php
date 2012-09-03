@@ -12,6 +12,10 @@ use InvalidArgumentException;
 
 /**
  * The date data type.
+ *
+ * The plain value of a date is an instance of the DateTime class. For setting
+ * the value an instance of the DateTime class, any string supported by
+ * DateTime::__construct(), or a timestamp as integer may be passed.
  */
 class Date extends WrapperBase implements WrapperInterface {
 

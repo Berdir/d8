@@ -161,10 +161,9 @@ class EntityTranslation extends WrapperBase implements StructureInterface, Acces
    */
   public function getPropertyDefinitions() {
     $definitions = array();
-    $entity_properties = entity_get_controller($this->definition['entity type'])->getPropertyDefinitions(array(
-      'type' => 'entity',
-      'entity type' => $this->definition['entity type'],
-      'bundle' => $this->definition['bundle'],
+    $entity_properties = entity_get_controller($this->definition['constraints']['entity type'])->getPropertyDefinitions(array(
+      'entity type' => $this->definition['constraints']['entity type'],
+      'bundle' => $this->definition['constraints']['bundle'],
     ));
     foreach ($entity_properties as $name => $definition) {
       if (!empty($definition['translatable'])) {

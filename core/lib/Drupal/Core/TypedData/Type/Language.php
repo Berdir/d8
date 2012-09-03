@@ -10,6 +10,14 @@ use InvalidArgumentException;
 
 /**
  * Defines the 'language' data type, e.g. the computed 'language' property of language items.
+ *
+ * The plain value of a language is the language object, i.e. an instance of
+ * Drupal\Core\Language\Language. For setting the value the language object or
+ * the language code as string may be passed.
+ *
+ * Supported settings (below the definition's 'settings' key) are:
+ *  - langcode source: If used as computed property, the langcode property used
+ *    to load the language object.
  */
 class Language extends WrapperBase implements WrapperInterface {
 

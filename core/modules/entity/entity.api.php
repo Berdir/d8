@@ -466,3 +466,67 @@ function hook_entity_view_mode_alter(&$view_mode, Drupal\entity\EntityInterface 
     $view_mode = 'my_custom_view_mode';
   }
 }
+
+/**
+ * Define custom entity properties.
+ *
+ * @param string $entity_type
+ *   The entity type for which to define entity properties.
+ *
+ * @return array
+ *   An array of property information having the following optional entries:
+ *   - definitions: An array of property definitions to add all entities of this
+ *     type, keyed by property name. See drupal_wrap_data() for a list of
+ *     supported keys in property definitions.
+ *   - optional: An array of property definitions for optional properties keyed
+ *     by property name. Optional properties are properties that only exist for
+ *     certain bundles of the entity type.
+ *   - bundle map: An array keyed by bundle name containing the names of
+ *     optional properties that entities of this bundle have.
+ *
+ * @see drupal_wrap_data()
+ * @see hook_entity_property_info_alter()
+ * @see Drupal\entity\StorageControllerInterface::getPropertyDefinitions()
+ */
+function hook_entity_property_info($entity_type) {
+  if (mymodule_uses_entity_type($entity_type)) {
+    $info = array();
+    $info['definitions']['mymodule_text'] = array(
+      'type' => 'string_item',
+      'list' => TRUE,
+      'label' => t('The text'),
+      'description' => t('A text property added by mymodule.'),
+      'computed' => TRUE,
+      'class' => '\Drupal\mymodule\EntityComputedText',
+    );
+    if ($entity_type == 'node') {
+      // Add a property only to entities of the 'article' bundle.
+      $info['optional']['mymodule_text_more'] = array(
+        'type' => 'string_item',
+        'list' => TRUE,
+        'label' => t('More text'),
+        'computed' => TRUE,
+        'class' => '\Drupal\mymodule\EntityComputedMoreText',
+      );
+      $info['bundle map']['article'][0] = 'mymodule_text_more';
+    }
+    return $info;
+  }
+}
+
+/**
+ * Alter defined entity properties.
+ *
+ * @param array $info
+ *   The property info array as returned by hook_entity_property_info().
+ * @param string $entity_type
+ *   The entity type for which entity properties are defined.
+ *
+ * @see hook_entity_property_info()
+ */
+function hook_entity_property_info_alter(&$info, $entity_type) {
+  if (!empty($info['definitions']['mymodule_text'])) {
+    // Alter the mymodule_text property to use a custom class.
+    $info['definitions']['mymodule_text']['class'] = '\Drupal\anothermodule\EntityComputedText';
+  }
+}

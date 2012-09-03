@@ -560,7 +560,7 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
   /**
    * Implements Drupal\entity\EntityStorageControllerInterface::getPropertyDefinitions().
    */
-  public function getPropertyDefinitions(array $definition) {
+  public function getPropertyDefinitions(array $constraints) {
     // @todo: Add caching for $this->propertyInfo.
     if (!isset($this->propertyInfo)) {
       $this->propertyInfo = array(
@@ -580,14 +580,22 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
 
       $hooks = array('entity_property_info', $this->entityType . '_property_info');
       drupal_alter($hooks, $this->propertyInfo, $this->entityType);
+
+      // Enforce properties to be multiple by default.
+      foreach ($this->propertyInfo['definitions'] as &$definition) {
+        $definition['list'] = TRUE;
+      }
+      foreach ($this->propertyInfo['optional'] as &$definition) {
+        $definition['list'] = TRUE;
+      }
     }
 
     $definitions = $this->propertyInfo['definitions'];
 
     // Add in per-bundle properties.
     // @todo: Should this be statically cached as well?
-    if (!empty($definition['bundle']) && isset($this->propertyInfo['bundle map'][$definition['bundle']])) {
-      $definitions += array_intersect_key($this->propertyInfo['optional'], array_flip($this->propertyInfo['bundle map'][$definition['bundle']]));
+    if (!empty($constraints['bundle']) && isset($this->propertyInfo['bundle map'][$constraints['bundle']])) {
+      $definitions += array_intersect_key($this->propertyInfo['optional'], array_flip($this->propertyInfo['bundle map'][$constraints['bundle']]));
     }
 
     return $definitions;

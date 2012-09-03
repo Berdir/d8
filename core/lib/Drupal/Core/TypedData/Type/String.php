@@ -10,6 +10,9 @@ use Drupal\Core\TypedData\WrapperInterface;
 
 /**
  * The string data type.
+ *
+ * The plain value of a string is a regular PHP string. For setting the value
+ * any PHP variable that casts to a string may be passed.
  */
 class String extends WrapperBase implements WrapperInterface {
 

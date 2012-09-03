@@ -173,7 +173,9 @@ class EntityPropertyTest extends WebTestBase  {
     // Test getting metadata upfront, i.e. without having an entity object.
     $definition = array(
       'type' => 'entity',
-      'entity type' => 'entity_test',
+      'constraints' => array(
+        'entity type' => 'entity_test',
+      ),
       'label' => t('Test entity'),
     );
     $wrapped_entity = drupal_wrap_data($definition);
@@ -242,7 +244,9 @@ class EntityPropertyTest extends WebTestBase  {
     $entity->save();
     $entity_definition = array(
       'type' => 'entity',
-      'entity type' => 'entity_test',
+      'constraints' => array(
+        'entity type' => 'entity_test',
+      ),
       'label' => t('Test entity'),
     );
     $wrapped_entity = drupal_wrap_data($entity_definition, $entity);

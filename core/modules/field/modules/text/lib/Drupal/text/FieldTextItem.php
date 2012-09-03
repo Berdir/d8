@@ -39,7 +39,6 @@ class FieldTextItem extends FieldItemBase {
         'type' => 'string',
         'label' => t('Processed text'),
         'description' => t('The text value with the text format applied.'),
-        'html' => TRUE,
         'computed' => TRUE,
         'class' => '\Drupal\text\FieldTextProcessed',
         'settings' => array(

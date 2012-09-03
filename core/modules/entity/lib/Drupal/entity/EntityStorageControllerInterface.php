@@ -25,22 +25,31 @@ interface EntityStorageControllerInterface extends StorageControllerInterface {
    *
    * If a 'bundle' key is present in the given entity definition, properties
    * specific to this bundle are included.
+   * Entity properties are always multi-valued, so 'list' is TRUE for each
+   * returned property definition.
    *
-   * @param array $definition
-   *   The definition of the entity of which to get property definitions, i.e.
-   *   an array having an 'entity type' and optionally a 'bundle' key. For
-   *   example:
+   * @param array $constraints
+   *   An array of entity constraints as used for entities in typed data
+   *   definitions, i.e. an array having an 'entity type' and optionally a
+   *   'bundle' key. For example:
    *   @code
-   *   $definition = array(
-   *     'type' => 'entity',
+   *   array(
    *     'entity type' => 'node',
    *     'bundle' => 'article',
-   *   );
+   *   )
    *   @endcode
    *
    * @return array
    *   An array of property definitions of entity properties, keyed by property
-   *   name.
+   *   name. In addition to the typed data definition keys as described at
+   *   drupal_wrap_data() the follow keys are supported:
+   *   - queryable: Whether the property is queryable via EntityFieldQuery.
+   *     Defaults to TRUE if 'computed' is FALSE or not set, to FALSE otherwise.
+   *   - translatable: Whether the property is translatable. Defaults to FALSE.
+   *   - field: A boolean indicating whether the property is a field. Defaults
+   *     to FALSE.
+   *
+   * @see drupal_wrap_data()
    */
-  public function getPropertyDefinitions(array $definition);
+  public function getPropertyDefinitions(array $constraints);
 }

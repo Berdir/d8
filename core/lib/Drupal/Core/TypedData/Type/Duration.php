@@ -12,6 +12,11 @@ use InvalidArgumentException;
 
 /**
  * The duration data type.
+ *
+ * The plain value of a duration is an instance of the DateInterval class. For
+ * setting the value an instance of the DateInterval class, a ISO8601 string as
+ * supported by DateInterval::__construct, or an integer in seconds may be
+ * passed.
  */
 class Duration extends WrapperBase implements WrapperInterface {
 

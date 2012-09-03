@@ -10,6 +10,8 @@ use Drupal\Core\TypedData\WrapperInterface;
 
 /**
  * The URI data type.
+ *
+ * The plain value of a URI is an absolute URI represented as PHP string.
  */
 class Uri extends WrapperBase implements WrapperInterface {
 

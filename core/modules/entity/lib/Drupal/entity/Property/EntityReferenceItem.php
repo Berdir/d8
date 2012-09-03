@@ -11,6 +11,9 @@ use InvalidArgumentException;
 
 /**
  * Defines the 'entityreference_item' entity property item.
+ *
+ * Required settings (below the definition's 'settings' key) are:
+ *  - entity type: The entity type to reference.
  */
 class EntityReferenceItem extends ItemBase {
 
@@ -28,7 +31,7 @@ class EntityReferenceItem extends ItemBase {
    */
   public function getPropertyDefinitions() {
     // Definitions vary by entity type, so key them by entity type.
-    $entity_type = $this->definition['entity type'];
+    $entity_type = $this->definition['settings']['entity type'];
 
     if (!isset(self::$propertyDefinitions[$entity_type])) {
       self::$propertyDefinitions[$entity_type]['value'] = array(
@@ -38,7 +41,9 @@ class EntityReferenceItem extends ItemBase {
       );
       self::$propertyDefinitions[$entity_type]['entity'] = array(
         'type' => 'entity',
-        'entity type' => $entity_type,
+        'constraints' => array(
+          'entity type' => $entity_type,
+        ),
         'label' => t('Entity'),
         'description' => t('The referenced entity'),
         // The entity object is computed out of the entity id.

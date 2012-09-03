@@ -13,6 +13,9 @@ use InvalidArgumentException;
 
 /**
  * A computed property for processing text with a format.
+ *
+ * Required settings (below the definition's 'settings' key) are:
+ *  - text source: The text property containing the to be processed text.
  */
 class FieldTextProcessed extends String {
 

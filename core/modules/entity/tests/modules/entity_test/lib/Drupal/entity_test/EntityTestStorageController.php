@@ -362,7 +362,7 @@ class EntityTestStorageController extends DatabaseStorageController {
       'label' => t('User ID'),
       'description' => t('The ID of the associated user.'),
       'type' => 'entityreference_item',
-      'entity type' => 'user',
+      'settings' => array('entity type' => 'user'),
       'list' => TRUE,
       'translatable' => TRUE,
     );

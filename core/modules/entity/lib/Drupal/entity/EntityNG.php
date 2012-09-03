@@ -159,7 +159,6 @@ class EntityNG extends Entity implements StructureTranslatableInterface, Accessi
    */
   public function getPropertyDefinitions() {
     return entity_get_controller($this->entityType)->getPropertyDefinitions(array(
-      'type' => 'entity',
       'entity type' => $this->entityType,
       'bundle' => $this->bundle(),
     ));
@@ -205,8 +204,10 @@ class EntityNG extends Entity implements StructureTranslatableInterface, Accessi
     }
     $translation_definition = array(
       'type' => 'entity_translation',
-      'entity type' => $this->entityType(),
-      'bundle' => $this->bundle(),
+      'constraints' => array(
+        'entity type' => $this->entityType(),
+        'bundle' => $this->bundle(),
+      ),
     );
     return drupal_wrap_data($translation_definition, $properties, array('parent' => $this, 'langcode' => $langcode));
   }

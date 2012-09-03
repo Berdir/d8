@@ -37,7 +37,6 @@ class FieldTextWithSummaryItem extends FieldTextItem {
         'type' => 'string',
         'label' => t('Processed summary text'),
         'description' => t('The summary text value with the text format applied.'),
-        'html' => TRUE,
         'computed' => TRUE,
         'class' => '\Drupal\text\FieldTextProcessed',
         'settings' => array(
