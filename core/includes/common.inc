@@ -7358,10 +7358,10 @@ function drupal_get_data_type_info() {
  *     typed data wrapper. Else the default list class as specified for the data
  *     type will be used.
  *   - settings: An array of settings, as required by the used class. See the
- *     documentation of the used class for details.
+ *     documentation of the used class for supported or required settings.
  *   - constraints: An array of type specific value constraints, e.g. for data
  *     of type 'entity' the 'entity type' and 'bundle' may be specified. See the
- *     documentation of the data type class for details.
+ *     documentation of the data type class for supported constraints.
  *   - required: A boolean specifying whether a non-NULL value is mandatory.
  *   Further keys may be supported in certain usages, e.g. for further keys
  *   supported for entity property definitions see
