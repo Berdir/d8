@@ -351,7 +351,10 @@ function shortcut_set_load($set_name) {
 function shortcut_set_save(&$shortcut_set) {
   // First save the shortcut set itself.
   if (isset($shortcut_set->set_name)) {
-    $return = drupal_write_record('shortcut_set', $shortcut_set, 'set_name');
+    $return = db_merge('shortcut_set')
+      ->key(array('set_name' => $shortcut_set->set_name))
+      ->fields(array('title' => $shortcut_set->title))
+      ->execute();
   }
   else {
     $shortcut_set->set_name = shortcut_set_get_unique_name();
@@ -617,8 +620,8 @@ function shortcut_valid_link($path) {
   if ($path != $normal_path) {
     $path = $normal_path;
   }
-  // Only accept links that correspond to valid paths on the site itself.
-  return !url_is_external($path) && menu_get_item($path);
+  // An empty path is valid too and will be converted to <front>.
+  return (!url_is_external($path) && menu_get_item($path)) || empty($path) || $path == '<front>';
 }
 
 /**
@@ -766,3 +769,21 @@ function shortcut_set_title($shortcut_set) {
   return $shortcut_set->title;
 }
 
+/**
+ * Implements hook_library_info().
+ */
+function shortcut_library_info() {
+  $libraries['drupal.shortcut.admin'] = array(
+    'title' => 'Shortcut',
+    'version' => VERSION,
+    'js' => array(
+      drupal_get_path('module', 'shortcut') . '/shortcut.admin.js' => array(),
+    ),
+    'dependencies' => array(
+      array('system', 'jquery'),
+      array('system', 'drupal'),
+    ),
+  );
+
+  return $libraries;
+}

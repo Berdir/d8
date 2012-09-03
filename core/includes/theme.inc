@@ -93,15 +93,6 @@ function drupal_theme_initialize() {
 
   // Themes can have alter functions, so reset the drupal_alter() cache.
   drupal_static_reset('drupal_alter');
-
-  // Provide the page with information about the theme that's used, so that a
-  // later Ajax request can be rendered using the same theme.
-  // @see ajax_base_page_theme()
-  $setting['ajaxPageState'] = array(
-    'theme' => $theme_key,
-    'theme_token' => drupal_get_token($theme_key),
-  );
-  drupal_add_js($setting, 'setting');
 }
 
 /**
@@ -1841,7 +1832,7 @@ function theme_table($variables) {
 
   // Add sticky headers, if applicable.
   if (count($header) && $sticky) {
-    drupal_add_js('core/misc/tableheader.js');
+    drupal_add_library('system', 'drupal.tableheader');
     // Add 'sticky-enabled' class to the table to identify it for JS.
     // This is needed to target tables constructed by this function.
     $attributes['class'][] = 'sticky-enabled';
@@ -2096,7 +2087,7 @@ function theme_item_list($variables) {
  *
  * @param $variables
  *   An associative array containing:
- *   - url: The url for the link.
+ *   - url: The URL for the link.
  */
 function theme_more_help_link($variables) {
   return '<div class="more-help-link">' . l(t('More help'), $variables['url']) . '</div>';
@@ -2161,7 +2152,7 @@ function theme_html_tag($variables) {
  *
  * @param $variables
  *   An associative array containing:
- *   - url: The url of the main page.
+ *   - url: The URL of the main page.
  *   - title: A descriptive verb for the link, like 'Read more'.
  */
 function theme_more_link($variables) {
@@ -2603,6 +2594,7 @@ function template_process_page(&$variables) {
  * @see html.tpl.php
  */
 function template_process_html(&$variables) {
+  drupal_add_library('system', 'html5shiv', TRUE);
   // Render page_top and page_bottom into top level variables.
   $variables['page_top'] = drupal_render($variables['page']['page_top']);
   $variables['page_bottom'] = drupal_render($variables['page']['page_bottom']);

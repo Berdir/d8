@@ -31,6 +31,11 @@ const LANGUAGE_NEGOTIATION_URL_FALLBACK = 'language-url-fallback';
 const LANGUAGE_NEGOTIATION_USER = 'language-user';
 
 /**
+ * The language is set based on the user admin language settings.
+ */
+const LANGUAGE_NEGOTIATION_USER_ADMIN = 'language-user-admin';
+
+/**
  * The language is set based on the request/session parameters.
  */
 const LANGUAGE_NEGOTIATION_SESSION = 'language-session';
@@ -150,14 +155,35 @@ function language_from_browser($languages) {
  *   A valid language code on success, FALSE otherwise.
  */
 function language_from_user($languages) {
-  // User preference (only for logged users).
+  // User preference (only for authenticated users).
   global $user;
 
-  if ($user->uid && !empty($user->preferred_langcode)) {
+  if ($user->uid && !empty($user->preferred_langcode) && isset($languages[$user->preferred_langcode])) {
     return $user->preferred_langcode;
   }
 
   // No language preference from the user.
+  return FALSE;
+}
+
+/**
+ * Identifies admin language from the user preferences.
+ *
+ * @param $languages
+ *   An array of valid language objects.
+ *
+ * @return
+ *   A valid language code on success, FALSE otherwise.
+ */
+function language_from_user_admin($languages) {
+  // User preference (only for authenticated users).
+  global $user;
+
+  if ($user->uid && !empty($user->preferred_admin_langcode) && isset($languages[$user->preferred_admin_langcode]) && path_is_admin(current_path())) {
+    return $user->preferred_admin_langcode;
+  }
+
+  // No language preference from the user or not on an admin path.
   return FALSE;
 }
 
@@ -239,7 +265,7 @@ function language_from_url($languages, $request) {
       foreach ($languages as $language) {
         // Skip the check if the language doesn't have a domain.
         if (!empty($domains[$language->langcode])) {
-          // Ensure that there is exactly one protocol in the url when checking
+          // Ensure that there is exactly one protocol in the URL when checking
           // the hostname.
           $host = 'http://' . str_replace(array('http://', 'https://'), '', $domains[$language->langcode]);
           $host = parse_url($host, PHP_URL_HOST);
@@ -392,18 +418,31 @@ function language_url_rewrite_url(&$path, &$options) {
       case LANGUAGE_NEGOTIATION_URL_DOMAIN:
         $domains = language_negotiation_url_domains();
         if (is_object($options['language']) && !empty($domains[$options['language']->langcode])) {
-          // Ask for an absolute URL with our modified base_url.
           global $is_https;
+
+          // Save the original base URL. If it contains a port, we need to
+          // retain it below.
+          if (!empty($options['base_url'])) {
+            // The colon in the URL scheme messes up the port checking below.
+            $normalized_base_url = str_replace(array('https://', 'http://'), '', $options['base_url']);
+
+          }
+
+          // Ask for an absolute URL with our modified base URL.
           $url_scheme = ($is_https) ? 'https://' : 'http://';
           $options['absolute'] = TRUE;
           $options['base_url'] = $url_scheme . $domains[$options['language']->langcode];
 
-          // HTTP_HOST will optionally contain the port. Preserve that for
-          // the domain of the target language as well.
+          // In case either the original base URL or the HTTP host contains a
+          // port, retain it.
           $http_host = $_SERVER['HTTP_HOST'];
-          if (strpos($http_host, ':') !== FALSE) {
-            $http_host_tmp = explode(':', $http_host);
-            $options['base_url'] .= ':' . end($http_host_tmp);
+          if (isset($normalized_base_url) && strpos($normalized_base_url, ':') !== FALSE) {
+            list($host, $port) = explode(':', $normalized_base_url);
+            $options['base_url'] .= ':' . $port;
+          }
+          elseif (strpos($http_host, ':') !== FALSE) {
+            list($host, $port) = explode(':', $http_host);
+            $options['base_url'] .= ':' . $port;
           }
 
           if (isset($options['https']) && variable_get('https', FALSE)) {
@@ -432,6 +471,24 @@ function language_url_rewrite_url(&$path, &$options) {
  */
 function language_negotiation_url_prefixes() {
   return variable_get('language_negotiation_url_prefixes', array());
+}
+
+/**
+ * Update the list of prefixes from the installed languages.
+ */
+function language_negotiation_url_prefixes_update() {
+  $prefixes = language_negotiation_url_prefixes();
+  foreach (language_list() as $language) {
+    // The prefix for this language should be updated if it's not assigned yet
+    // or the prefix is set to the empty string.
+    if (empty($prefixes[$language->langcode])) {
+      // For the default language, set the prefix to the empty string,
+      // otherwise use the langcode.
+      $prefixes[$language->langcode] = !empty($language->default) ? '' : $language->langcode;
+    }
+    // Otherwise we keep the configured prefix.
+  }
+  language_negotiation_url_prefixes_save($prefixes);
 }
 
 /**

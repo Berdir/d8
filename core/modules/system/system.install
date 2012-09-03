@@ -330,14 +330,15 @@ function system_requirements($phase) {
   // Check the config directory if it is defined in settings.php. If it isn't
   // defined, the installer will create a valid config directory later, but
   // during runtime we must always display an error.
-  if (!empty($GLOBALS['config_directory_name'])) {
-    $directories[] = config_get_config_directory();
+  if (!empty($GLOBALS['config_directories'])) {
+    $directories[] = config_get_config_directory(CONFIG_ACTIVE_DIRECTORY);
+    $directories[] = config_get_config_directory(CONFIG_STAGING_DIRECTORY);
   }
   elseif ($phase != 'install') {
-    $requirements['config directory'] = array(
-      'title' => $t('Configuration directory'),
+    $requirements['config directories'] = array(
+      'title' => $t('Configuration directories'),
       'value' => $t('Not present'),
-      'description' => $t('Your %file file must define the $config_directory_name variable as the name of a directory in which configuration files can be written.', array('%file' => conf_path() . '/settings.php')),
+      'description' => $t('Your %file file must define the $config_directories variable as an array containing the name of a directories in which configuration files can be written.', array('%file' => conf_path() . '/settings.php')),
       'severity' => REQUIREMENT_ERROR,
     );
   }
@@ -843,144 +844,6 @@ function system_schema() {
     'primary key' => array('type', 'language'),
   );
 
-  $schema['file_managed'] = array(
-    'description' => 'Stores information for uploaded files.',
-    'fields' => array(
-      'fid' => array(
-        'description' => 'File ID.',
-        'type' => 'serial',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-      ),
-      'uuid' => array(
-        'description' => 'Unique Key: Universally unique identifier for this entity.',
-        'type' => 'varchar',
-        'length' => 128,
-        'not null' => FALSE,
-      ),
-      'uid' => array(
-        'description' => 'The {users}.uid of the user who is associated with the file.',
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-      ),
-      'filename' => array(
-        'description' => 'Name of the file with no path components. This may differ from the basename of the URI if the file is renamed to avoid overwriting an existing file.',
-        'type' => 'varchar',
-        'length' => 255,
-        'not null' => TRUE,
-        'default' => '',
-        'binary' => TRUE,
-      ),
-      'uri' => array(
-        'description' => 'The URI to access the file (either local or remote).',
-        'type' => 'varchar',
-        'length' => 255,
-        'not null' => TRUE,
-        'default' => '',
-        'binary' => TRUE,
-      ),
-      'langcode' => array(
-        'description' => 'The {language}.langcode of this file.',
-        'type' => 'varchar',
-        'length' => 12,
-        'not null' => TRUE,
-        'default' => '',
-      ),
-      'filemime' => array(
-        'description' => "The file's MIME type.",
-        'type' => 'varchar',
-        'length' => 255,
-        'not null' => TRUE,
-        'default' => '',
-      ),
-      'filesize' => array(
-        'description' => 'The size of the file in bytes.',
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-      ),
-      'status' => array(
-        'description' => 'A field indicating the status of the file. Two status are defined in core: temporary (0) and permanent (1). Temporary files older than DRUPAL_MAXIMUM_TEMP_FILE_AGE will be removed during a cron run.',
-        'type' => 'int',
-        'not null' => TRUE,
-        'default' => 0,
-        'size' => 'tiny',
-      ),
-      'timestamp' => array(
-        'description' => 'UNIX timestamp for when the file was added.',
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-      ),
-    ),
-    'indexes' => array(
-      'uid' => array('uid'),
-      'status' => array('status'),
-      'timestamp' => array('timestamp'),
-    ),
-    'unique keys' => array(
-      'uuid' => array('uuid'),
-      'uri' => array('uri'),
-    ),
-    'primary key' => array('fid'),
-    'foreign keys' => array(
-      'file_owner' => array(
-        'table' => 'users',
-        'columns' => array('uid' => 'uid'),
-      ),
-    ),
-  );
-
-  $schema['file_usage'] = array(
-    'description' => 'Track where a file is used.',
-    'fields' => array(
-      'fid' => array(
-        'description' => 'File ID.',
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-      ),
-      'module' => array(
-        'description' => 'The name of the module that is using the file.',
-        'type' => 'varchar',
-        'length' => 255,
-        'not null' => TRUE,
-        'default' => '',
-      ),
-      'type' => array(
-        'description' => 'The name of the object type in which the file is used.',
-        'type' => 'varchar',
-        'length' => 64,
-        'not null' => TRUE,
-        'default' => '',
-      ),
-      'id' => array(
-        'description' => 'The primary key of the object using the file.',
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-      ),
-      'count' => array(
-        'description' => 'The number of times this file is used by this object.',
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-      ),
-    ),
-    'primary key' => array('fid', 'type', 'id', 'module'),
-    'indexes' => array(
-      'type_id' => array('type', 'id'),
-      'fid_count' => array('fid', 'count'),
-      'fid_module' => array('fid', 'module'),
-    ),
-  );
-
   $schema['flood'] = array(
     'description' => 'Flood controls the threshold of events, such as the number of contact attempts.',
     'fields' => array(
@@ -1414,68 +1277,6 @@ function system_schema() {
       'name_created' => array('name', 'created'),
       'expire' => array('expire'),
     ),
-  );
-
-  $schema['registry'] = array(
-    'description' => "Each record is a function, class, or interface name and the file it is in.",
-    'fields' => array(
-      'name'   => array(
-        'description' => 'The name of the function, class, or interface.',
-        'type' => 'varchar',
-        'length' => 255,
-        'not null' => TRUE,
-        'default' => '',
-      ),
-      'type'   => array(
-        'description' => 'Either function or class or interface.',
-        'type' => 'varchar',
-        'length' => 9,
-        'not null' => TRUE,
-        'default' => '',
-      ),
-      'filename'   => array(
-        'description' => 'Name of the file.',
-        'type' => 'varchar',
-        'length' => 255,
-        'not null' => TRUE,
-      ),
-      'module' => array(
-        'description' => 'Name of the module the file belongs to.',
-        'type' => 'varchar',
-        'length' => 255,
-        'not null' => TRUE,
-        'default' => ''
-      ),
-      'weight' => array(
-        'description' => "The order in which this module's hooks should be invoked relative to other modules. Equal-weighted modules are ordered by name.",
-        'type' => 'int',
-        'not null' => TRUE,
-        'default' => 0,
-      ),
-    ),
-    'primary key' => array('name', 'type'),
-    'indexes' => array(
-      'hook' => array('type', 'weight', 'module'),
-    ),
-  );
-
-  $schema['registry_file'] = array(
-    'description' => "Files parsed to build the registry.",
-    'fields' => array(
-      'filename'   => array(
-        'description' => 'Path to the file.',
-        'type' => 'varchar',
-        'length' => 255,
-        'not null' => TRUE,
-      ),
-      'hash'  => array(
-        'description' => "sha-256 hash of the file's contents when last parsed.",
-        'type' => 'varchar',
-        'length' => 64,
-        'not null' => TRUE,
-      ),
-    ),
-    'primary key' => array('filename'),
   );
 
   $schema['semaphore'] = array(
@@ -2059,6 +1860,27 @@ function system_update_8017() {
     'preprocess_css' => 'preprocess.css',
     'preprocess_js' => 'preprocess.js',
   ));
+}
+
+/**
+ * Revert {file_managed}.filename changed to a binary column.
+ */
+function system_update_8018() {
+  db_change_field('file_managed', 'filename', 'filename', array(
+    'description' => 'Name of the file with no path components. This may differ from the basename of the URI if the file is renamed to avoid overwriting an existing file.',
+    'type' => 'varchar',
+    'length' => 255,
+    'not null' => TRUE,
+    'default' => '',
+  ));
+}
+
+/**
+ * Remove the registry tables.
+ */
+function system_update_8019() {
+  db_drop_table('registry');
+  db_drop_table('registry_file');
 }
 
 /**

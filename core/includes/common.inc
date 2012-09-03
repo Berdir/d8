@@ -448,7 +448,7 @@ function drupal_get_query_parameters(array $query = NULL, array $exclude = array
  *   The query string to split.
  *
  * @return
- *   An array of url decoded couples $param_name => $value.
+ *   An array of URL decoded couples $param_name => $value.
  */
 function drupal_get_query_array($query) {
   $result = array();
@@ -2086,7 +2086,7 @@ function _format_date_callback(array $matches = NULL, $new_langcode = NULL) {
  *     for the URL. If $options['language'] is omitted, the language will be
  *     obtained from language(LANGUAGE_TYPE_URL).
  *   - 'https': Whether this URL should point to a secure location. If not
- *     defined, the current scheme is used, so the user stays on http or https
+ *     defined, the current scheme is used, so the user stays on HTTP or HTTPS
  *     respectively. TRUE enforces HTTPS and FALSE enforces HTTP, but HTTPS can
  *     only be enforced when the variable 'https' is set to TRUE.
  *   - 'base_url': Only used internally, to modify the base URL when a language
@@ -2726,18 +2726,6 @@ function drupal_get_css($css = NULL, $skip_alter = FALSE) {
 
   // Sort CSS items, so that they appear in the correct order.
   uasort($css, 'drupal_sort_css_js');
-
-  // Provide the page with information about the individual CSS files used,
-  // information not otherwise available when CSS aggregation is enabled. The
-  // setting is attached later in this function, but is set here, so that CSS
-  // files removed below are still considered "used" and prevented from being
-  // added in a later AJAX request.
-  // Skip if no files were added to the page or jQuery.extend() will overwrite
-  // the Drupal.settings.ajaxPageState.css object with an empty array.
-  if (!empty($css)) {
-    // Cast the array to an object to be on the safe side even if not empty.
-    $setting['ajaxPageState']['css'] = (object) array_fill_keys(array_keys($css), 1);
-  }
 
   // Remove the overridden CSS files. Later CSS files override former ones.
   $previous_item = array();
@@ -3806,55 +3794,33 @@ function drupal_add_js($data = NULL, $options = NULL) {
   // Tweak the weight so that files of the same weight are included in the
   // order of the calls to drupal_add_js().
   $options['weight'] += count($javascript) / 1000;
-
   if (isset($data)) {
-    // Add jquery.js and drupal.js, as well as the basePath setting, the
-    // first time a JavaScript file is added.
-    if (empty($javascript)) {
-      // url() generates the script and prefix using hook_url_outbound_alter().
-      // Instead of running the hook_url_outbound_alter() again here, extract
-      // them from url().
-      // @todo Make this less hacky: http://drupal.org/node/1547376.
-      $scriptPath = $GLOBALS['script_path'];
-      $pathPrefix = '';
-      url('', array('script' => &$scriptPath, 'prefix' => &$pathPrefix));
-      $javascript = array(
-        'settings' => array(
-          'data' => array(
-            array('basePath' => base_path()),
-            array('scriptPath' => $scriptPath),
-            array('pathPrefix' => $pathPrefix),
-            array('currentPath' => current_path()),
-          ),
-          'type' => 'setting',
-          'scope' => 'header',
-          'group' => JS_SETTING,
-          'every_page' => TRUE,
-          'weight' => 0,
-          'browsers' => array(),
-        ),
-        'core/misc/drupal.js' => array(
-          'data' => 'core/misc/drupal.js',
-          'type' => 'file',
-          'scope' => 'header',
-          'group' => JS_LIBRARY,
-          'every_page' => TRUE,
-          'weight' => -1,
-          'preprocess' => TRUE,
-          'cache' => TRUE,
-          'defer' => FALSE,
-          'async' => FALSE,
-          'browsers' => array(),
-        ),
-      );
-      // Register all required libraries.
-      drupal_add_library('system', 'jquery', TRUE);
-      drupal_add_library('system', 'jquery.once', TRUE);
-      drupal_add_library('system', 'html5shiv', TRUE);
-    }
-
     switch ($options['type']) {
       case 'setting':
+        // If the setting array doesn't exist, add defaults values.
+        if (!isset($javascript['settings'])) {
+          $javascript['settings'] = array(
+            'type' => 'setting',
+            'scope' => 'header',
+            'group' => JS_SETTING,
+            'every_page' => TRUE,
+            'weight' => 0,
+            'browsers' => array(),
+          );
+          // url() generates the script and prefix using hook_url_outbound_alter().
+          // Instead of running the hook_url_outbound_alter() again here, extract
+          // them from url().
+          // @todo Make this less hacky: http://drupal.org/node/1547376.
+          $scriptPath = $GLOBALS['script_path'];
+          $pathPrefix = '';
+          url('', array('script' => &$scriptPath, 'prefix' => &$pathPrefix));
+          $javascript['settings']['data'][] = array(
+            'basePath' => base_path(),
+            'scriptPath' => $scriptPath,
+            'pathPrefix' => $pathPrefix,
+            'currentPath' => current_path(),
+          );
+        }
         // All JavaScript settings are placed in the header of the page with
         // the library weight so that inline scripts appear afterwards.
         $javascript['settings']['data'][] = $data;
@@ -3953,23 +3919,59 @@ function drupal_get_js($scope = 'header', $javascript = NULL, $skip_alter = FALS
     }
   }
 
-  // Sort the JavaScript so that it appears in the correct order.
-  uasort($items, 'drupal_sort_css_js');
+  if (!empty($items)) {
+    // Sort the JavaScript files so that they appear in the correct order.
+    uasort($items, 'drupal_sort_css_js');
+    // Don't add settings if there is no other JavaScript on the page, unless
+    // this is an AJAX request.
+    // @todo Clean up container call.
+    $container = drupal_container();
+    if ($container->has('request') && $container->has('content_negotiation')) {
+      $type = $container->get('content_negotiation')->getContentType($container->get('request'));
+    }
+    if (!empty($items['settings']) || (!empty($type) && $type == 'ajax')) {
+      global $theme_key;
+      // Provide the page with information about the theme that's used, so that
+      // a later AJAX request can be rendered using the same theme.
+      // @see ajax_base_page_theme()
+      $setting['ajaxPageState']['theme'] = $theme_key;
+      // Checks that the DB is available before filling theme_token.
+      if (!defined('MAINTENANCE_MODE')) {
+        $setting['ajaxPageState']['theme_token'] = drupal_get_token($theme_key);
+      }
 
-  // Provide the page with information about the individual JavaScript files
-  // used, information not otherwise available when aggregation is enabled.
-  $setting['ajaxPageState']['js'] = array_fill_keys(array_keys($items), 1);
-  unset($setting['ajaxPageState']['js']['settings']);
-  drupal_add_js($setting, 'setting');
+      // Provide the page with information about the individual JavaScript files
+      // used, information not otherwise available when aggregation is enabled.
+      $setting['ajaxPageState']['js'] = array_fill_keys(array_keys($items), 1);
+      unset($setting['ajaxPageState']['js']['settings']);
 
-  // If we're outputting the header scope, then this might be the final time
-  // that drupal_get_js() is running, so add the setting to this output as well
-  // as to the drupal_add_js() cache. If $items['settings'] doesn't exist, it's
-  // because drupal_get_js() was intentionally passed a $javascript argument
-  // stripped of settings, potentially in order to override how settings get
-  // output, so in this case, do not add the setting to this output.
-  if ($scope == 'header' && isset($items['settings'])) {
-    $items['settings']['data'][] = $setting;
+      // Provide the page with information about the individual CSS files used,
+      // information not otherwise available when CSS aggregation is enabled.
+      // The setting is attached later in this function, but is set here, so
+      // that CSS files removed in drupal_process_attached() are still
+      // considered "used" and prevented from being added in a later AJAX
+      // request.
+      // Skip if no files were added to the page otherwise jQuery.extend() will
+      // overwrite the Drupal.settings.ajaxPageState.css object with an empty
+      // array.
+      $css = drupal_add_css();
+      if (!empty($css)) {
+        // Cast the array to an object to be on the safe side even if not empty.
+        $setting['ajaxPageState']['css'] = (object) array_fill_keys(array_keys($css), 1);
+      }
+
+      drupal_add_js($setting, 'setting');
+
+      // If we're outputting the header scope, then this might be the final time
+      // that drupal_get_js() is running, so add the settings to this output as well
+      // as to the drupal_add_js() cache. If $items['settings'] doesn't exist, it's
+      // because drupal_get_js() was intentionally passed a $javascript argument
+      // stripped of settings, potentially in order to override how settings get
+      // output, so in this case, do not add the setting to this output.
+      if ($scope == 'header' && isset($items['settings'])) {
+        $items['settings']['data'][] = $setting;
+      }
+    }
   }
 
   // Render the HTML needed to load the JavaScript.
@@ -4235,7 +4237,7 @@ function drupal_aggregate_js(&$js_groups) {
  * are the attached data. For example:
  * @code
  * $build['#attached'] = array(
- *   'js' => array(drupal_get_path('module', 'taxonomy') . '/taxonomy.js'),
+ *   'library' => array(array('taxonomy', 'taxonomy')),
  *   'css' => array(drupal_get_path('module', 'taxonomy') . '/taxonomy.css'),
  * );
  * @endcode
@@ -5128,7 +5130,7 @@ function drupal_cron_cleanup() {
  * this function will search the site-wide modules directory (i.e., /modules/),
  * your install profile's directory (i.e.,
  * /profiles/your_site_profile/modules/), the all-sites directory (i.e.,
- * /sites/all/modules/), and your site-specific directory (i.e.,
+ * /modules/), and your site-specific directory (i.e.,
  * /sites/your_site_dir/modules/), in that order, and return information about
  * all of the files ending in .module in those directories.
  *
@@ -5145,7 +5147,7 @@ function drupal_cron_cleanup() {
  * @param string $directory
  *   The subdirectory name in which the files are found. For example,
  *   'core/modules' will search in sub-directories of the /core/modules
- *   directory, sub-directories of /sites/all/modules/, etc.
+ *   directory, sub-directories of /modules/, etc.
  * @param string $key
  *   The key to be used for the associative array returned. Possible values are
  *   'uri', for the file's URI; 'filename', for the basename of the file; and
@@ -5171,10 +5173,10 @@ function drupal_system_listing($mask, $directory, $key = 'name', $min_depth = 1)
   // Search for the directory in core.
   $searchdir = array('core/' . $directory);
 
-  // The 'profiles' directory contains pristine collections of modules and
+  // The 'core/profiles' directory contains pristine collections of modules and
   // themes as provided by a distribution. It is pristine in the same way that
   // the 'core/modules' directory is pristine for core; users should avoid
-  // any modification by using the sites/all or sites/<domain> directories.
+  // any modification by using the top-level or sites/<domain> directories.
   $profile = drupal_get_profile();
   // For SimpleTest to be able to test modules packaged together with a
   // distribution we need to include the profile of the parent site (in which
@@ -5189,11 +5191,11 @@ function drupal_system_listing($mask, $directory, $key = 'name', $min_depth = 1)
   // profile always has precedence.
   $searchdir[] = drupal_get_path('profile', $profile) . '/' . $directory;
 
-  // For the case of searching for profiles, scan top-level directories.
-  // @todo Replace entire sites/all/$directory with this.
+  // Always search for contributed and custom extensions in top-level
+  // directories as well as sites/all/* directories. If the same extension is
+  // located in both directories, then the latter wins for legacy/historical
+  // reasons.
   $searchdir[] = $directory;
-
-  // Always search sites/all/* as well as the global directories.
   $searchdir[] = 'sites/all/' . $directory;
 
   if (file_exists("$config/$directory")) {
@@ -5213,7 +5215,7 @@ function drupal_system_listing($mask, $directory, $key = 'name', $min_depth = 1)
     // The exception to this is if the later file is from a module or theme not
     // compatible with Drupal core. This may occur during upgrades of Drupal
     // core when new modules exist in core while older contrib modules with the
-    // same name exist in a directory such as sites/all/modules/.
+    // same name exist in a directory such as /modules.
     foreach (array_intersect_key($files_to_add, $files) as $file_key => $file) {
       // If it has no info file, then we just behave liberally and accept the
       // new resource on the list for merging.
@@ -7059,10 +7061,8 @@ function drupal_flush_all_caches() {
   // Clear all non-drupal_static() static caches.
   // None currently; kept if any static caches need to be reset in the future.
 
-  // Update and synchronize the class registry and extension information based
-  // on current/actual code.
-  // Module data is rebuilt as part of registry_rebuild().
-  registry_rebuild();
+  // Rebuild module and theme data.
+  system_rebuild_module_data();
   system_rebuild_theme_data();
 
   // Ensure that all modules that are currently supposed to be enabled are

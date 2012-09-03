@@ -1,8 +1,8 @@
 <?php
 
 use Drupal\Core\Database\Query\SelectInterface;
-use Drupal\Core\File\File;
 use Drupal\entity\EntityInterface;
+use Drupal\file\File;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -181,7 +181,7 @@ function user_entity_info() {
 }
 
 /**
- * Entity uri callback.
+ * Entity URI callback.
  */
 function user_uri($user) {
   return array(
@@ -1820,7 +1820,7 @@ function user_external_login_register($name, $module) {
  * @param array $options
  *   (optional) A keyed array of settings. Supported options are:
  *   - langcode: A language code to be used when generating locale-sensitive
- *    urls. If langcode is NULL the users preferred language is used.
+ *    URLs. If langcode is NULL the users preferred language is used.
  *
  * @return
  *   A unique URL that provides a one-time log in for the user, from which
@@ -1850,7 +1850,7 @@ function user_pass_reset_url($account, $options = array()) {
  * @param array $options
  *   (optional) A keyed array of settings. Supported options are:
  *   - langcode: A language code to be used when generating locale-sensitive
-  *    urls. If langcode is NULL the users preferred language is used.
+  *    URLs. If langcode is NULL the users preferred language is used.
  *
  * @return
  *   A unique URL that may be used to confirm the cancellation of the user
@@ -2018,41 +2018,7 @@ function user_delete($uid) {
  * @see hook_user_delete()
  */
 function user_delete_multiple(array $uids) {
-  if (!empty($uids)) {
-    $accounts = user_load_multiple($uids);
-
-    $transaction = db_transaction();
-    try {
-      foreach ($accounts as $uid => $account) {
-        // Allow modules to act prior to user deletion.
-        module_invoke_all('user_predelete', $account);
-        module_invoke_all('entity_predelete', $account, 'user');
-
-        field_attach_delete('user', $account);
-        drupal_session_destroy_uid($account->uid);
-      }
-
-      db_delete('users')
-        ->condition('uid', $uids, 'IN')
-        ->execute();
-      db_delete('users_roles')
-        ->condition('uid', $uids, 'IN')
-        ->execute();
-      db_delete('authmap')
-        ->condition('uid', $uids, 'IN')
-        ->execute();
-
-        // Allow modules to respond to user deletion.
-        module_invoke_all('user_delete', $account);
-        module_invoke_all('entity_delete', $account, 'user');
-    }
-    catch (Exception $e) {
-      $transaction->rollback();
-      watchdog_exception('user', $e);
-      throw $e;
-    }
-    entity_get_controller('user')->resetCache();
-  }
+  entity_get_controller('user')->delete($uids);
 }
 
 /**
@@ -2984,14 +2950,24 @@ function theme_user_signature($variables) {
  *
  * @param $account
  *   User account to look up language for.
+ * @param $type
+ *   Optional string to define which preferred langcode should be used.
+ *   Default to 'preferred_langcode' property.
+ *   If set 'preferred_$type_langcode' is used.
  * @param $default
  *   Optional default language object to return if the account
  *   has no valid language.
  */
-function user_preferred_language($account, $default = NULL) {
+function user_preferred_language($account, $type = NULL, $default = NULL) {
   $language_list = language_list();
-  if (!empty($account->preferred_langcode) && isset($language_list[$account->preferred_langcode])) {
-    return $language_list[$account->preferred_langcode];
+  if (isset($type)) {
+    $preferred_langcode = $account->{'preferred_' . $type . '_langcode'};
+  }
+  else {
+    $preferred_langcode = $account->preferred_langcode;
+  }
+  if (!empty($preferred_langcode) && isset($language_list[$preferred_langcode])) {
+    return $language_list[$preferred_langcode];
   }
   else {
     return $default ? $default : language_default();
@@ -3081,7 +3057,7 @@ function user_form_process_password_confirm($element) {
     ),
   );
 
-  $element['#attached']['js'][] = drupal_get_path('module', 'user') . '/user.js';
+  $element['#attached']['library'][] = array('user', 'drupal.user');
   // Ensure settings are only added once per page.
   static $already_added = FALSE;
   if (!$already_added) {
@@ -3198,7 +3174,7 @@ function user_form_field_ui_field_edit_form_alter(&$form, &$form_state, $form_id
       // a custom behavior, since the #states system would also synchronize on
       // uncheck.
       '#attached' => array(
-        'js' => array(drupal_get_path('module', 'user') . '/user.js'),
+        'library' => array(array('user', 'drupal.user')),
       ),
     );
 
@@ -3313,4 +3289,37 @@ function user_file_download_access($field, EntityInterface $entity, File $file) 
   if ($entity->entityType() == 'user') {
     return user_view_access($entity);
   }
+}
+
+/**
+ * Implements hook_library_info().
+ */
+function user_library_info() {
+  $libraries['drupal.user'] = array(
+    'title' => 'User',
+    'version' => VERSION,
+    'js' => array(
+      drupal_get_path('module', 'user') . '/user.js' => array(),
+    ),
+    'dependencies' => array(
+      array('system', 'jquery'),
+      array('system', 'drupal'),
+      array('system', 'jquery.once'),
+    ),
+  );
+
+  $libraries['drupal.user.permissions'] = array(
+    'title' => 'User permissions',
+    'version' => VERSION,
+    'js' => array(
+      drupal_get_path('module', 'user') . '/user.permissions.js' => array(),
+    ),
+    'dependencies' => array(
+      array('system', 'jquery'),
+      array('system', 'drupal'),
+      array('system', 'drupal.settings'),
+    ),
+  );
+
+  return $libraries;
 }

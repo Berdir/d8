@@ -7,17 +7,32 @@
 
 namespace Drupal\config_test;
 
-use Drupal\config\ConfigurableBase;
+use Drupal\config\ConfigEntityBase;
 
 /**
- * Defines the ConfigTest configurable entity.
+ * Defines the ConfigTest configuration entity.
  */
-class ConfigTest extends ConfigurableBase {
+class ConfigTest extends ConfigEntityBase {
 
+  /**
+   * The machine name for the configuration entity.
+   *
+   * @var string
+   */
   public $id;
 
+  /**
+   * The UUID for the configuration entity.
+   *
+   * @var string
+   */
   public $uuid;
 
+  /**
+   * The human-readable name of the configuration entity.
+   *
+   * @var string
+   */
   public $label;
 
   /**

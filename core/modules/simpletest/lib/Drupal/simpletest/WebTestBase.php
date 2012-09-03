@@ -623,8 +623,6 @@ abstract class WebTestBase extends TestBase {
     include_once DRUPAL_ROOT . '/core/includes/install.inc';
     drupal_install_system();
 
-    $this->preloadRegistry();
-
     // Set path variables.
     variable_set('file_public_path', $this->public_files_directory);
     variable_set('file_private_path', $this->private_files_directory);
@@ -704,42 +702,6 @@ abstract class WebTestBase extends TestBase {
 
     drupal_set_time_limit($this->timeLimit);
     $this->setup = TRUE;
-  }
-
-  /**
-   * Preload the registry from the testing site.
-   *
-   * This method is called by Drupal\simpletest\WebTestBase::setUp(), and preloads
-   * the registry from the testing site to cut down on the time it takes to
-   * set up a clean environment for the current test run.
-   */
-  protected function preloadRegistry() {
-    // Use two separate queries, each with their own connections: copy the
-    // {registry} and {registry_file} tables over from the parent installation
-    // to the child installation.
-    $original_connection = Database::getConnection('default', 'simpletest_original_default');
-    $test_connection = Database::getConnection();
-
-    foreach (array('registry', 'registry_file') as $table) {
-      // Find the records from the parent database.
-      $source_query = $original_connection
-        ->select($table, array(), array('fetch' => PDO::FETCH_ASSOC))
-        ->fields($table);
-
-      $dest_query = $test_connection->insert($table);
-
-      $first = TRUE;
-      foreach ($source_query->execute() as $row) {
-        if ($first) {
-          $dest_query->fields(array_keys($row));
-          $first = FALSE;
-        }
-        // Insert the records into the child database.
-        $dest_query->values($row);
-      }
-
-      $dest_query->execute();
-    }
   }
 
   /**
@@ -854,8 +816,8 @@ abstract class WebTestBase extends TestBase {
         CURLOPT_URL => $base_url,
         CURLOPT_FOLLOWLOCATION => FALSE,
         CURLOPT_RETURNTRANSFER => TRUE,
-        CURLOPT_SSL_VERIFYPEER => FALSE, // Required to make the tests run on https.
-        CURLOPT_SSL_VERIFYHOST => FALSE, // Required to make the tests run on https.
+        CURLOPT_SSL_VERIFYPEER => FALSE, // Required to make the tests run on HTTPS.
+        CURLOPT_SSL_VERIFYHOST => FALSE, // Required to make the tests run on HTTPS.
         CURLOPT_HEADERFUNCTION => array(&$this, 'curlHeaderCallback'),
         CURLOPT_USERAGENT => $this->databasePrefix,
       );
@@ -1866,10 +1828,10 @@ abstract class WebTestBase extends TestBase {
   }
 
   /**
-   * Get the current url from the cURL handler.
+   * Get the current URL from the cURL handler.
    *
    * @return
-   *   The current url.
+   *   The current URL.
    */
   protected function getUrl() {
     return $this->url;

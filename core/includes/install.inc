@@ -1,5 +1,10 @@
 <?php
 
+ /**
+ * @file
+ * API functions for installing modules and themes.
+ */
+
 use Drupal\Core\Database\Database;
 use Drupal\locale\Gettext;
 
@@ -74,7 +79,7 @@ const FILE_NOT_WRITABLE = 64;
 const FILE_NOT_EXECUTABLE = 128;
 
 /**
- * Initialize the update system by loading all installed module's .install files.
+ * Loads .install files for installed modules to initialize the update system.
  */
 function drupal_load_updates() {
   foreach (drupal_get_installed_schema_version(NULL, FALSE, TRUE) as $module => $schema_version) {
@@ -109,11 +114,12 @@ function drupal_install_profile_distribution_name() {
 }
 
 /**
- * Auto detect the base_url with PHP predefined variables.
+ * Detects the base URL using the PHP $_SERVER variables.
  *
  * @param $file
  *   The name of the file calling this function so we can strip it out of
  *   the URI when generating the base_url.
+ *
  * @return
  *   The auto-detected $base_url that should be configured in settings.php
  */
@@ -127,7 +133,7 @@ function drupal_detect_baseurl($file = 'core/install.php') {
 }
 
 /**
- * Detect all supported databases that are compiled into PHP.
+ * Detects all supported databases that are compiled into PHP.
  *
  * @return
  *  An array of database types compiled into PHP.
@@ -143,7 +149,7 @@ function drupal_detect_database_types() {
 }
 
 /**
- * Return all supported database installer objects that are compiled into PHP.
+ * Returns all supported database installer objects that are compiled into PHP.
  *
  * @return
  *  An array of database installer objects compiled into PHP.
@@ -155,8 +161,6 @@ function drupal_get_database_types() {
   // We define a driver as a directory in /core/includes/database that in turn
   // contains a database.inc file. That allows us to drop in additional drivers
   // without modifying the installer.
-  // Because we have no registry yet, we need to also include the install.inc
-  // file for the driver explicitly.
   require_once DRUPAL_ROOT . '/core/includes/database.inc';
   foreach (file_scan_directory(DRUPAL_ROOT . '/core/lib/Drupal/Core/Database/Driver', '/^[a-z]*$/i', array('recurse' => FALSE)) as $file) {
     if (file_exists($file->uri . '/Install/Tasks.php')) {
@@ -182,7 +186,7 @@ function drupal_get_database_types() {
 }
 
 /**
- * Replace values in settings.php with values in the submitted array.
+ * Replaces values in settings.php with values in the submitted array.
  *
  * @param $settings
  *   An array of settings that need to be updated.
@@ -254,14 +258,17 @@ function drupal_rewrite_settings($settings = array()) {
  * @see install_settings_form_submit()
  * @see update_prepare_d8_bootstrap()
  */
-function drupal_install_config_directory() {
-  global $config_directory_name;
+function drupal_install_config_directories() {
+  global $config_directories;
 
   // Add a randomized config directory name to settings.php, unless it was
   // manually defined in the existing already.
-  if (!$config_directory_name) {
-    $settings['config_directory_name'] = array(
-      'value' => 'config_' . drupal_hash_base64(drupal_random_bytes(55)),
+  if (empty($config_directories)) {
+    $settings['config_directories'] = array(
+      'value' => array(
+        CONFIG_ACTIVE_DIRECTORY => 'config/active_' . drupal_hash_base64(drupal_random_bytes(55)),
+        CONFIG_STAGING_DIRECTORY => 'config/staging_' . drupal_hash_base64(drupal_random_bytes(55)),
+      ),
       'required' => TRUE,
     );
     // Rewrite settings.php, which also sets the value as global variable.
@@ -269,42 +276,80 @@ function drupal_install_config_directory() {
   }
 
   // Ensure that the config directory exists or can be created, and is writable.
-  if (!install_ensure_config_directory()) {
+  foreach (array(CONFIG_ACTIVE_DIRECTORY, CONFIG_STAGING_DIRECTORY) as $config_type) {
     // This should never fail, since if the config directory was specified in
     // settings.php it will have already been created and verified earlier, and
     // if it wasn't specified in settings.php, it is created here inside the
     // public files directory, which has already been verified to be writable
     // itself. But if it somehow fails anyway, the installation cannot proceed.
     // Bail out using a similar error message as in system_requirements().
-    throw new Exception(st('The directory %directory could not be created or could not be made writable. To proceed with the installation, either create the directory and modify its permissions manually or ensure that the installer has the permissions to create it automatically. For more information, see the <a href="@handbook_url">online handbook</a>.', array(
-      '%directory' => config_get_config_directory(),
-      '@handbook_url' => 'http://drupal.org/server-permissions',
-    )));
+    if (!install_ensure_config_directory($config_type)) {
+      throw new Exception(st('The directory %directory could not be created or could not be made writable. To proceed with the installation, either create the directory and modify its permissions manually or ensure that the installer has the permissions to create it automatically. For more information, see the <a href="@handbook_url">online handbook</a>.', array(
+        '%directory' => config_get_config_directory($config_type),
+        '@handbook_url' => 'http://drupal.org/server-permissions',
+      )));
+    }
   }
 }
 
 /**
- * Ensures that the config directory exists and is writable, or can be made so.
+ * Checks whether a config directory name is defined, and if so, whether it
+ * exists and is writable.
+ *
+ * This partically duplicates install_ensure_config_directory(), but is required
+ * since the installer would create the config directory too early in the
+ * installation process otherwise (e.g., when only visiting install.php when
+ * there is a settings.php already, but not actually executing the installation).
+ *
+ * @param string $type
+ *   Type of config directory to return. Drupal core provides 'active' and
+ *   'staging'.
+ *
+ * @return bool
+ *   TRUE if the config directory exists and is writable.
  */
-function install_ensure_config_directory() {
+function install_verify_config_directory($type) {
+  global $config_directories;
+  if (!isset($config_directories[$type])) {
+    return FALSE;
+  }
+  $config_directory = config_get_config_directory($type);
+  if (is_dir($config_directory) && is_writable($config_directory)) {
+    return TRUE;
+  }
+  return FALSE;
+}
+
+/**
+ * Ensures that the config directory exists and is writable, or can be made so.
+ *
+ * @param string $type
+ *   Type of config directory to return. Drupal core provides 'active' and
+ *   'staging'.
+ *
+ * @return bool
+ *   TRUE if the config directory exists and is writable.
+ */
+function install_ensure_config_directory($type) {
   // The config directory must be defined in settings.php.
-  global $config_directory_name;
-  if (empty($config_directory_name)) {
+  global $config_directories;
+  if (!isset($config_directories[$type])) {
     return FALSE;
   }
   // The logic here is similar to that used by system_requirements() for other
   // directories that the installer creates.
   else {
-    $config_directory = config_get_config_directory();
+    $config_directory = config_get_config_directory($type);
     return file_prepare_directory($config_directory, FILE_CREATE_DIRECTORY | FILE_MODIFY_PERMISSIONS);
   }
 }
 
 /**
- * Verify an install profile for installation.
+ * Verifies an install profile for installation.
  *
  * @param $install_state
  *   An array of information about the current installation state.
+ *
  * @return
  *   The list of modules to install.
  */
@@ -344,14 +389,14 @@ function drupal_verify_profile($install_state) {
       'title'       => st('Required modules'),
       'value'       => st('Required modules not found.'),
       'severity'    => REQUIREMENT_ERROR,
-      'description' => st('The following modules are required but were not found. Move them into the appropriate modules subdirectory, such as <em>sites/all/modules</em>. Missing modules: !modules', array('!modules' => implode(', ', $modules))),
+      'description' => st('The following modules are required but were not found. Move them into the appropriate modules subdirectory, such as <em>/modules</em>. Missing modules: !modules', array('!modules' => implode(', ', $modules))),
     );
   }
   return $requirements;
 }
 
 /**
- * Callback to install the system module.
+ * Installs the system module.
  *
  * Separated from the installation of other modules so core system
  * functions can be made available while other modules are installed.
@@ -392,7 +437,7 @@ function drupal_install_system() {
 }
 
 /**
- * Verify the state of the specified file.
+ * Verifies the state of the specified file.
  *
  * @param $file
  *   The file to check for.
@@ -400,6 +445,7 @@ function drupal_install_system() {
  *   An optional bitmask created from various FILE_* constants.
  * @param $type
  *   The type of file. Can be file (default), dir, or link.
+ *
  * @return
  *   TRUE on success or FALSE on failure. A message is set for the latter.
  */
@@ -471,7 +517,7 @@ function drupal_verify_install_file($file, $mask = NULL, $type = 'file') {
 }
 
 /**
- * Create a directory with specified permissions.
+ * Creates a directory with the specified permissions.
  *
  * @param $file
  *  The name of the directory to create;
@@ -479,6 +525,7 @@ function drupal_verify_install_file($file, $mask = NULL, $type = 'file') {
  *  The permissions of the directory to create.
  * @param $message
  *  (optional) Whether to output messages. Defaults to TRUE.
+ *
  * @return
  *  TRUE/FALSE whether or not the directory was successfully created.
  */
@@ -510,7 +557,7 @@ function drupal_install_mkdir($file, $mask, $message = TRUE) {
 }
 
 /**
- * Attempt to fix file permissions.
+ * Attempts to fix file permissions.
  *
  * The general approach here is that, because we do not know the security
  * setup of the webserver, we apply our permission changes to all three
@@ -527,6 +574,7 @@ function drupal_install_mkdir($file, $mask, $message = TRUE) {
  *  The desired permissions for the file.
  * @param $message
  *  (optional) Whether to output messages. Defaults to TRUE.
+ *
  * @return
  *  TRUE/FALSE whether or not we were able to fix the file's permissions.
  */
@@ -592,7 +640,7 @@ function drupal_install_fix_file($file, $mask, $message = TRUE) {
 }
 
 /**
- * Send the user to a different installer page.
+ * Sends the user to a different installer page.
  *
  * This issues an on-site HTTP redirect. Messages (and errors) are erased.
  *
@@ -670,7 +718,7 @@ function drupal_requirements_url($severity) {
 }
 
 /**
- * Functional equivalent of t(), used when some systems are not available.
+ * Translates a string when some systems are not available.
  *
  * Used during the install process, when database, theme, and localization
  * system is possibly not yet available.
@@ -729,7 +777,7 @@ function st($string, array $args = array(), array $options = array()) {
 }
 
 /**
- * Check an install profile's requirements.
+ * Checks an install profile's requirements.
  *
  * @param string $profile
  *   Name of install profile to check.
@@ -763,11 +811,12 @@ function drupal_check_profile($profile, array $install_state) {
 }
 
 /**
- * Extract highest severity from requirements array.
+ * Extracts the highest severity from the requirements array.
  *
  * @param $requirements
  *   An array of requirements, in the same format as is returned by
  *   hook_requirements().
+ *
  * @return
  *   The highest severity in the array.
  */
@@ -782,12 +831,13 @@ function drupal_requirements_severity(&$requirements) {
 }
 
 /**
- * Check a module's requirements.
+ * Checks a module's requirements.
  *
  * @param $module
  *   Machine name of module to check.
+ *
  * @return
- *   TRUE/FALSE depending on the requirements are in place.
+ *   TRUE or FALSE, depending on whether the requirements are met.
  */
 function drupal_check_module($module) {
   module_load_install($module);
@@ -812,13 +862,14 @@ function drupal_check_module($module) {
 }
 
 /**
- * Retrieve info about an install profile from its .info file.
+ * Retrieves information about an install profile from its .info file.
  *
  * The information stored in a profile .info file is similar to that stored in
  * a normal Drupal module .info file. For example:
  * - name: The real name of the install profile for display purposes.
  * - description: A brief description of the profile.
- * - dependencies: An array of shortnames of other modules this install profile requires.
+ * - dependencies: An array of shortnames of other modules that this install
+ *   profile requires.
  *
  * Additional, less commonly-used information that can appear in a profile.info
  * file but not in a normal Drupal module .info file includes:

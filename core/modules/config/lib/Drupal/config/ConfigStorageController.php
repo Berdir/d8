@@ -8,11 +8,11 @@
 namespace Drupal\config;
 
 use Drupal\Component\Uuid\Uuid;
-use Drupal\entity\StorableInterface;
+use Drupal\entity\EntityInterface;
 use Drupal\entity\StorageControllerInterface;
 
 /**
- * Defines the storage controller class for configurable entities.
+ * Defines the storage controller class for configuration entities.
  */
 class ConfigStorageController implements StorageControllerInterface {
 
@@ -49,6 +49,13 @@ class ConfigStorageController implements StorageControllerInterface {
   protected $idKey;
 
   /**
+   * Name of the entity's UUID property.
+   *
+   * @var string
+   */
+  protected $uuidKey = 'uuid';
+
+  /**
    * Implements Drupal\entity\StorageControllerInterface::__construct().
    *
    * Sets basic variables.
@@ -58,9 +65,6 @@ class ConfigStorageController implements StorageControllerInterface {
     $this->entityInfo = entity_get_info($entityType);
     $this->hookLoadArguments = array();
     $this->idKey = $this->entityInfo['entity keys']['id'];
-
-    // The UUID key and property is hard-coded for all configurables.
-    $this->uuidKey = 'uuid';
   }
 
   /**
@@ -137,7 +141,7 @@ class ConfigStorageController implements StorageControllerInterface {
    * Drupal\taxonomy\TermStorageController::buildQuery() for examples.
    *
    * @param $ids
-   *   An array of entity IDs, or FALSE to load all entities.
+   *   An array of entity IDs, or NULL to load all entities.
    * @param $revision_id
    *   The ID of the revision to load, or FALSE if this query is asking for the
    *   most current revision(s).
@@ -149,6 +153,7 @@ class ConfigStorageController implements StorageControllerInterface {
     $config_class = $this->entityInfo['entity class'];
     $prefix = $this->entityInfo['config prefix'] . '.';
 
+    // Load all of the configuration entities.
     if ($ids === NULL) {
       $names = drupal_container()->get('config.storage')->listAll($prefix);
       $result = array();
@@ -161,6 +166,7 @@ class ConfigStorageController implements StorageControllerInterface {
     else {
       $result = array();
       foreach ($ids as $id) {
+        // Add the prefix to the ID to serve as the configuration object name.
         $config = config($prefix . $id);
         if (!$config->isNew()) {
           $result[$id] = new $config_class($config->get(), $this->entityType);
@@ -248,7 +254,7 @@ class ConfigStorageController implements StorageControllerInterface {
   /**
    * Implements Drupal\entity\StorageControllerInterface::save().
    */
-  public function save(StorableInterface $entity) {
+  public function save(EntityInterface $entity) {
     $prefix = $this->entityInfo['config prefix'] . '.';
 
     // Load the stored entity, if any.
@@ -300,7 +306,7 @@ class ConfigStorageController implements StorageControllerInterface {
    *
    * Used before the entity is saved and before invoking the presave hook.
    */
-  protected function preSave(StorableInterface $entity) {
+  protected function preSave(EntityInterface $entity) {
   }
 
   /**
@@ -313,8 +319,8 @@ class ConfigStorageController implements StorageControllerInterface {
    *   (bool) TRUE if the entity has been updated, or FALSE if it has been
    *   inserted.
    */
-  protected function postSave(StorableInterface $entity, $update) {
-    // Delete the original configurable entity, in case the entity ID was
+  protected function postSave(EntityInterface $entity, $update) {
+    // Delete the original configuration entity, in case the entity ID was
     // renamed.
     if ($update && !empty($entity->original) && $entity->{$this->idKey} !== $entity->original->{$this->idKey}) {
       // @todo This should just delete the original config object without going
@@ -347,7 +353,7 @@ class ConfigStorageController implements StorageControllerInterface {
    * @param $entity
    *   The entity object.
    */
-  protected function invokeHook($hook, StorableInterface $entity) {
+  protected function invokeHook($hook, EntityInterface $entity) {
     // Invoke the hook.
     module_invoke_all($this->entityType . '_' . $hook, $entity);
     // Invoke the respective entity-level hook.

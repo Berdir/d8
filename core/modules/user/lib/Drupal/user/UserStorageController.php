@@ -7,7 +7,7 @@
 
 namespace Drupal\user;
 
-use Drupal\entity\StorableInterface;
+use Drupal\entity\EntityInterface;
 use Drupal\entity\EntityMalformedException;
 use Drupal\entity\DatabaseStorageController;
 
@@ -75,7 +75,7 @@ class UserStorageController extends DatabaseStorageController {
   /**
    * Overrides Drupal\entity\DatabaseStorageController::save().
    */
-  public function save(StorableInterface $entity) {
+  public function save(EntityInterface $entity) {
     if (empty($entity->uid)) {
       $entity->uid = db_next_id(db_query('SELECT MAX(uid) FROM {users}')->fetchField());
       $entity->enforceIsNew();
@@ -86,7 +86,7 @@ class UserStorageController extends DatabaseStorageController {
   /**
    * Overrides Drupal\entity\DatabaseStorageController::preSave().
    */
-  protected function preSave(StorableInterface $entity) {
+  protected function preSave(EntityInterface $entity) {
     // Update the user password if it has changed.
     if ($entity->isNew() || (!empty($entity->pass) && $entity->pass != $entity->original->pass)) {
       // Allow alternate password hashing schemes.
@@ -160,7 +160,7 @@ class UserStorageController extends DatabaseStorageController {
   /**
    * Overrides Drupal\entity\DatabaseStorageController::postSave().
    */
-  protected function postSave(StorableInterface $entity, $update) {
+  protected function postSave(EntityInterface $entity, $update) {
 
     if ($update) {
       // If the password has been changed, delete all open sessions for the
@@ -220,5 +220,17 @@ class UserStorageController extends DatabaseStorageController {
         $query->execute();
       }
     }
+  }
+
+  /**
+   * Overrides Drupal\entity\DatabaseStorageController::postDelete().
+   */
+  protected function postDelete($entities) {
+    db_delete('users_roles')
+      ->condition('uid', array_keys($entities), 'IN')
+      ->execute();
+    db_delete('authmap')
+      ->condition('uid', array_keys($entities), 'IN')
+      ->execute();
   }
 }

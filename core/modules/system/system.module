@@ -271,26 +271,6 @@ function system_hook_info() {
 }
 
 /**
- * Implements hook_entity_info().
- */
-function system_entity_info() {
-  return array(
-    'file' => array(
-      'label' => t('File'),
-      'base table' => 'file_managed',
-      'controller class' => 'Drupal\Core\File\FileStorageController',
-      'entity class' => 'Drupal\Core\File\File',
-      'entity keys' => array(
-        'id' => 'fid',
-        'label' => 'filename',
-        'uuid' => 'uuid',
-      ),
-      'static cache' => FALSE,
-    ),
-  );
-}
-
-/**
  * Implements hook_element_info().
  */
 function system_element_info() {
@@ -1217,6 +1197,31 @@ function _system_batch_theme() {
  * Implements hook_library_info().
  */
 function system_library_info() {
+  // Drupal-specific JavaScript.
+  $libraries['drupal'] = array(
+    'title' => 'Drupal',
+    'version' => VERSION,
+    'js' => array(
+      'core/misc/drupal.js' => array('group' => JS_LIBRARY, 'weight' => -18),
+    ),
+    'dependencies' => array(
+      array('system', 'jquery'),
+    ),
+  );
+
+  // Drupal settings.
+  $libraries['drupal.settings'] = array(
+    'title' => 'Drupal Settings',
+    'version' => VERSION,
+    'js' => array(
+      array('type' => 'setting', 'data' => array()),
+    ),
+    'dependencies' => array(
+      array('system', 'jquery'),
+      array('system', 'drupal'),
+    ),
+  );
+
   // Drupal's Ajax framework.
   $libraries['drupal.ajax'] = array(
     'title' => 'Drupal AJAX',
@@ -1226,6 +1231,9 @@ function system_library_info() {
       'core/misc/ajax.js' => array('group' => JS_LIBRARY, 'weight' => 2),
     ),
     'dependencies' => array(
+      array('system', 'jquery'),
+      array('system', 'drupal'),
+      array('system', 'drupal.settings'),
       array('system', 'drupal.progress'),
     ),
   );
@@ -1238,7 +1246,11 @@ function system_library_info() {
       'core/misc/batch.js' => array('group' => JS_DEFAULT, 'cache' => FALSE),
     ),
     'dependencies' => array(
+      array('system', 'jquery'),
+      array('system', 'drupal'),
+      array('system', 'drupal.settings'),
       array('system', 'drupal.progress'),
+      array('system', 'jquery.once'),
     ),
   );
 
@@ -1249,6 +1261,11 @@ function system_library_info() {
     'js' => array(
       'core/misc/progress.js' => array('group' => JS_DEFAULT),
     ),
+    'dependencies' => array(
+      array('system', 'drupal'),
+      array('system', 'jquery'),
+      array('system', 'drupal.settings'),
+    ),
   );
 
   // Drupal's form library.
@@ -1258,6 +1275,12 @@ function system_library_info() {
     'js' => array(
       'core/misc/form.js' => array('group' => JS_LIBRARY, 'weight' => 1),
     ),
+    'dependencies' => array(
+      array('system', 'jquery'),
+      array('system', 'drupal'),
+      array('system', 'jquery.cookie'),
+      array('system', 'jquery.once'),
+    ),
   );
 
   // Drupal's states library.
@@ -1266,6 +1289,12 @@ function system_library_info() {
     'version' => VERSION,
     'js' => array(
       'core/misc/states.js' => array('group' => JS_LIBRARY, 'weight' => 1),
+    ),
+    'dependencies' => array(
+      array('system', 'jquery'),
+      array('system', 'drupal'),
+      array('system', 'drupal.settings'),
+      array('system', 'jquery.once'),
     ),
   );
 
@@ -1277,6 +1306,10 @@ function system_library_info() {
       'core/misc/tabledrag.js' => array('group' => JS_LIBRARY, 'weight' => -1),
     ),
     'dependencies' => array(
+      array('system', 'jquery'),
+      array('system', 'drupal'),
+      array('system', 'drupal.settings'),
+      array('system', 'jquery.once'),
       array('system', 'jquery.cookie'),
     ),
   );
@@ -1289,6 +1322,8 @@ function system_library_info() {
       'core/misc/collapse.js' => array('group' => JS_DEFAULT),
     ),
     'dependencies' => array(
+      array('system', 'jquery'),
+      array('system', 'drupal'),
       // collapse.js relies on drupalGetSummary in form.js
       array('system', 'drupal.form'),
     ),
@@ -1300,6 +1335,11 @@ function system_library_info() {
     'version' => VERSION,
     'js' => array(
       'core/misc/autocomplete.js' => array('group' => JS_DEFAULT),
+    ),
+    'dependencies' => array(
+      array('system', 'jquery'),
+      array('system', 'drupal'),
+      array('system', 'drupal.ajax'),
     ),
   );
 
@@ -1321,6 +1361,9 @@ function system_library_info() {
     'js' => array(
       'core/misc/jquery.once.js' => array('group' => JS_LIBRARY, 'weight' => -19),
     ),
+    'dependencies' => array(
+      array('system', 'jquery'),
+    ),
   );
 
   // jQuery Form Plugin.
@@ -1332,6 +1375,7 @@ function system_library_info() {
       'core/misc/jquery.form.js' => array(),
     ),
     'dependencies' => array(
+      array('system', 'jquery'),
       array('system', 'jquery.cookie'),
     ),
   );
@@ -1343,6 +1387,9 @@ function system_library_info() {
     'version' => '1.2.1',
     'js' => array(
       'core/misc/jquery.ba-bbq.js' => array(),
+    ),
+    'dependencies' => array(
+      array('system', 'jquery'),
     ),
   );
 
@@ -1358,13 +1405,16 @@ function system_library_info() {
       'core/misc/vertical-tabs.css' => array(),
     ),
     'dependencies' => array(
+      array('system', 'jquery'),
+      array('system', 'drupal'),
+      array('system', 'drupal.settings'),
       // Vertical tabs relies on drupalGetSummary in form.js
       array('system', 'drupal.form'),
     ),
   );
 
   // Farbtastic.
-  $libraries['farbtastic'] = array(
+  $libraries['jquery.farbtastic'] = array(
     'title' => 'Farbtastic',
     'website' => 'http://code.google.com/p/farbtastic/',
     'version' => '1.2',
@@ -1401,6 +1451,9 @@ function system_library_info() {
     'css' => array(
       'core/misc/ui/themes/base/jquery.ui.core.css' => array(),
       'core/misc/ui/themes/base/jquery.ui.theme.css' => array(),
+    ),
+    'dependencies' => array(
+      array('system', 'jquery'),
     ),
   );
   $libraries['jquery.ui.accordion'] = array(
@@ -1836,6 +1889,83 @@ function system_library_info() {
     'js' => array(
       'core/misc/ui/external/jquery.cookie.js' => array(),
     ),
+    'dependencies' => array(
+      array('system', 'jquery'),
+    ),
+  );
+
+  $libraries['drupal.tableselect'] = array(
+    'title' => 'Tableselect',
+    'version' => VERSION,
+    'js' => array(
+      'core/misc/tableselect.js' => array(),
+    ),
+    'dependencies' => array(
+      array('system', 'drupal'),
+      array('system', 'jquery'),
+    ),
+  );
+  $libraries['drupal.tableheader'] = array(
+    'title' => 'Table header',
+    'version' => VERSION,
+    'js' => array(
+      'core/misc/tableheader.js' => array(),
+    ),
+    'dependencies' => array(
+      array('system', 'jquery'),
+      array('system', 'drupal'),
+      array('system', 'drupal.settings'),
+      array('system', 'jquery.once'),
+    ),
+  );
+  $libraries['drupal.timezone'] = array(
+    'title' => 'Timezone',
+    'version' => VERSION,
+    'js' => array(
+      'core/misc/timezone.js' => array(),
+    ),
+    'dependencies' => array(
+      array('system', 'jquery'),
+      array('system', 'drupal'),
+    ),
+  );
+  $libraries['drupal.machine-name'] = array(
+    'title' => 'Machine name',
+    'version' => VERSION,
+    'js' => array(
+      'core/misc/machine-name.js' => array(),
+    ),
+    'dependencies' => array(
+      array('system', 'jquery'),
+      array('system', 'drupal'),
+      array('system', 'drupal.settings'),
+    ),
+  );
+
+  $libraries['drupal.system'] = array(
+    'title' => 'System',
+    'version' => VERSION,
+    'js' => array(
+      drupal_get_path('module', 'system') . '/system.js' => array(),
+    ),
+    'dependencies' => array(
+      array('system', 'jquery'),
+      array('system', 'drupal'),
+      array('system', 'drupal.settings'),
+    ),
+  );
+  $libraries['drupal.system.cron'] = array(
+    'title' => 'System cron',
+    'version' => VERSION,
+    'js' => array(
+      drupal_get_path('module', 'system') . '/system.cron.js' => array(),
+    ),
+    'dependencies' => array(
+      array('system', 'jquery'),
+      array('system', 'drupal'),
+      array('system', 'drupal.settings'),
+      array('system', 'jquery.once'),
+    ),
   );
 
   return $libraries;
@@ -2035,11 +2165,11 @@ function system_authorized_init($callback, $file, $arguments = array(), $page_ti
  * @param array $options
  *   Optional array of options to pass to url().
  * @return
- *   The full URL to authorize.php, using https if available.
+ *   The full URL to authorize.php, using HTTPS if available.
  */
 function system_authorized_get_url(array $options = array()) {
   global $base_url;
-  // Force https if available, regardless of what the caller specifies.
+  // Force HTTPS if available, regardless of what the caller specifies.
   $options['https'] = TRUE;
   // Prefix with $base_url so url() treats it as an external link.
   return url($base_url . '/core/authorize.php', $options);
@@ -2330,7 +2460,7 @@ function system_user_timezone(&$form, &$form_state) {
   if (!isset($account->timezone) && $account->uid == $user->uid && empty($form_state['input']['timezone'])) {
     $form['timezone']['#description'] = t('Your time zone setting will be automatically detected if possible. Confirm the selection and click save.');
     $form['timezone']['timezone']['#attributes'] = array('class' => array('timezone-detect'));
-    drupal_add_js('core/misc/timezone.js');
+    drupal_add_library('system', 'drupal.timezone');
   }
 }
 
@@ -3402,30 +3532,6 @@ function system_cron() {
   db_delete('flood')
     ->condition('expiration', REQUEST_TIME, '<')
     ->execute();
-
-  // Remove temporary files that are older than DRUPAL_MAXIMUM_TEMP_FILE_AGE.
-  // Use separate placeholders for the status to avoid a bug in some versions
-  // of PHP. See http://drupal.org/node/352956.
-  $result = db_query('SELECT fid FROM {file_managed} WHERE status <> :permanent AND timestamp < :timestamp', array(
-    ':permanent' => FILE_STATUS_PERMANENT,
-    ':timestamp' => REQUEST_TIME - DRUPAL_MAXIMUM_TEMP_FILE_AGE
-  ));
-  foreach ($result as $row) {
-    if ($file = file_load($row->fid)) {
-      $references = file_usage_list($file);
-      if (empty($references)) {
-        if (file_exists($file->uri)) {
-          $file->delete();
-        }
-        else {
-          watchdog('file system', 'Could not delete temporary file "%path" during garbage collection', array('%path' => $file->uri), WATCHDOG_ERROR);
-        }
-      }
-      else {
-        watchdog('file system', 'Did not delete temporary file "%path" during garbage collection because it is in use by the following modules: %modules.', array('%path' => $file->uri, '%modules' => implode(', ', array_keys($references))), WATCHDOG_INFO);
-      }
-    }
-  }
 
   $cache_bins = array_merge(module_invoke_all('cache_flush'), array('form', 'menu'));
   foreach ($cache_bins as $bin) {
