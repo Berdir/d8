@@ -338,6 +338,7 @@ class EntityTestStorageController extends DatabaseStorageController {
       'description' => ('The ID of the test entity.'),
       'type' => 'integer_item',
       'list' => TRUE,
+      'read-only' => TRUE,
     );
     $properties['uuid'] = array(
       'label' => t('UUID'),
