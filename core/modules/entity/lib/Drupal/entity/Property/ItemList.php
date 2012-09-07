@@ -6,6 +6,7 @@
  */
 
 namespace Drupal\entity\Property;
+use Drupal\Core\TypedData\WrapperInterface;
 use Drupal\Core\TypedData\Type\WrapperBase;
 use Drupal\user\User;
 use ArrayIterator;
@@ -53,7 +54,7 @@ class ItemList extends WrapperBase implements ItemListInterface {
     if (isset($values)) {
 
       // Support passing in property objects as value.
-      if ($values instanceof DataWrapperInterface) {
+      if ($values instanceof WrapperInterface) {
         $values = $values->getValue();
       }
       if (!is_array($values)) {
@@ -121,22 +122,14 @@ class ItemList extends WrapperBase implements ItemListInterface {
    * Implements ArrayAccess::offsetGet().
    */
   public function offsetGet($offset) {
-    if (!isset($offset)) {
-      // @todo: Needs tests.
-      // The [] operator has been used so point at a new entry.
-      $offset = $this->list ? max(array_keys($this->list)) + 1 : 0;
-    }
-
     if (!is_numeric($offset)) {
       throw new InvalidArgumentException('Unable to get a value with a non-numeric delta in a list.');
     }
     // Allow getting not yet existing items as well.
-    // @todo: Maybe add a public createItem() method instead or in addition?
-    // @todo: Needs tests.
+    // @todo: Maybe add a public createItem() method in addition?
     elseif (!isset($this->list[$offset])) {
       $this->list[$offset] = $this->createItem();
     }
-
     return $this->list[$offset];
   }
 
@@ -154,6 +147,10 @@ class ItemList extends WrapperBase implements ItemListInterface {
    * Implements ArrayAccess::offsetSet().
    */
   public function offsetSet($offset, $value) {
+    if (!isset($offset)) {
+      // The [] operator has been used so point at a new entry.
+      $offset = $this->list ? max(array_keys($this->list)) + 1 : 0;
+    }
     if (is_numeric($offset)) {
       $this->offsetGet($offset)->setValue($value);
     }

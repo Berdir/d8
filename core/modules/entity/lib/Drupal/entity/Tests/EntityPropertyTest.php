@@ -143,6 +143,41 @@ class EntityPropertyTest extends WebTestBase  {
     $this->assertEqual($this->entity_user->uid, $entity->user_id->value, 'User id can be read.');
     $this->assertEqual($this->entity_user->name, $entity->user_id->entity->name, 'User name can be read.');
     $this->assertEqual($this->entity_field_text, $entity->field_test_text->value, 'Text field can be read.');
+
+    // Test copying property values.
+    $entity2 = $this->createTestEntity();
+    $entity2->name = $entity->name;
+    $entity2->user_id = $entity->user_id;
+    $entity2->field_test_text = $entity->field_test_text;
+
+    $this->assertTrue($entity->name !== $entity2->name, 'Copying properties results in a different property wrapper.');
+    $this->assertEqual($entity->name->value, $entity2->name->value, 'Name property copied.');
+    $this->assertEqual($entity->user_id->value, $entity2->user_id->value, 'User id property copied.');
+    $this->assertEqual($entity->field_test_text->value, $entity2->field_test_text->value, 'Text field copied.');
+
+    // Tests adding a value to a property list.
+    $entity->name[] = 'Another name';
+    $this->assertEqual($entity->name[1]->value == 'Another name', 'List item added via [].');
+    $entity->name[2]->value = 'Third name';
+    $this->assertEqual($entity->name[2]->value == 'Third name', 'List item added by a accessing not yet created item.');
+
+    // Test removing and empty-ing list items.
+    $this->assertEqual(count($entity->name), 3, 'List has 3 items.');
+    unset($entity->name[1]);
+    $this->assertEqual(count($entity->name), 2, 'Second list item has been removed.');
+    $entity->name[2] = NULL;
+    $this->assertEqual(count($entity->name), 2, 'Assigning NULL does not reduce array count.');
+    $this->assertTrue($entity->name[2]->isEmpty(), 'Assigning NULL empties the item.');
+
+    // Test using isEmpty().
+    unset($entity->name[2]);
+    $this->assertFalse($entity->name[0]->isEmpty(), 'Name item is not empty.');
+    $entity->name->value = NULL;
+    $this->assertTrue($entity->name[0]->isEmpty(), 'Name item is empty.');
+    $this->assertTrue($entity->name->isEmpty(), 'Name property is empty.');
+    $this->assertEqual(count($entity->name), 1, 'Empty item is considered when counting.');
+    $this->assertEqual(count(iterator_to_array($entity->name->getIterator())), count($entity->name), 'Count matches iterator count.');
+    $this->assertTrue($entity->name->getValue() === array(0 => NULL), 'Name property value contains a NULL value.');
   }
 
   /**
