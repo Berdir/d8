@@ -347,6 +347,13 @@ class ConfigStorageController implements EntityStorageControllerInterface {
   }
 
   /**
+   * Implements Drupal\entity\EntityStorageControllerInterface::getPropertyDefinitions().
+   */
+  public function getPropertyDefinitions(array $constraints) {
+    return array();
+  }
+
+  /**
    * Invokes a hook on behalf of the entity.
    *
    * @param $hook
