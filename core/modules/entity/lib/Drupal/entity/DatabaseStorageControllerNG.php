@@ -213,9 +213,9 @@ class DatabaseStorageControllerNG extends DatabaseStorageController {
    */
   protected function mapToStorageRecord(EntityInterface $entity) {
     $record = new \stdClass();
-    $record->id = $entity->id();
-    $record->langcode = $entity->langcode->value;
-    $record->uuid = $entity->uuid->value;
+    foreach ($this->entityInfo['schema_fields_sql']['base table'] as $name) {
+      $record->$name = $entity->$name->value;
+    }
     return $record;
   }
 }

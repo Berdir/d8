@@ -93,17 +93,6 @@ class EntityTestStorageController extends DatabaseStorageControllerNG {
   }
 
   /**
-   * Maps from an entity object to the storage record of the base table.
-   */
-  protected function mapToStorageRecord(EntityInterface $entity) {
-    $record = new \stdClass();
-    $record->id = $entity->id();
-    $record->langcode = $entity->langcode->value;
-    $record->uuid = $entity->uuid->value;
-    return $record;
-  }
-
-  /**
    * Overrides Drupal\entity\DatabaseStorageController::postSave().
    *
    * Stores values of translatable properties.
