@@ -57,8 +57,9 @@ class DatabaseStorageControllerNG extends DatabaseStorageController {
    * @param array $values
    *   An array of values to set, keyed by property name. The value has to be
    *   the plain value of an entity property, i.e. an array of property items.
-   *   If no array is given, the value will be set for the first property item.
-   *   Thus to set the first item of a 'name' property one can pass:
+   *   If no numerically indexed array is given, the value will be set for the
+   *   first property item. For example, to set the first item of a 'name'
+   *   property one can pass:
    *   @code
    *     $values = array('name' => array(0 => array('value' => 'the name')));
    *   @endcode
@@ -66,10 +67,8 @@ class DatabaseStorageControllerNG extends DatabaseStorageController {
    *   @code
    *     $values = array('name' => array('value' => 'the name'));
    *   @endcode
-   *
-   *   Furthermore, property items having only a single value support setting
-   *   this value without passing an array of values, making it possible to
-   *   set the 'name' property via:
+   *   If the 'name' property is a defined as 'string_item' which supports
+   *   setting by string value, it's also possible to just pass the name string:
    *   @code
    *     $values = array('name' => 'the name');
    *   @endcode
@@ -82,19 +81,12 @@ class DatabaseStorageControllerNG extends DatabaseStorageController {
 
     // Make sure to set the bundle first.
     if ($this->bundleKey) {
-      $entity->{$this->bundleKey}[0] = $values[$this->bundleKey];
+      $entity->{$this->bundleKey} = $values[$this->bundleKey];
       unset($values[$this->bundleKey]);
     }
-
     // Set all other given values.
     foreach ($values as $name => $value) {
-      if (is_array($value) && is_numeric(current(array_keys($value)))) {
-        $entity->$name = $value;
-      }
-      else {
-        // Support passing in the first value of a property item.
-        $entity->{$name}[0] = $value;
-      }
+      $entity->$name = $value;
     }
 
     // Assign a new UUID if there is none yet.

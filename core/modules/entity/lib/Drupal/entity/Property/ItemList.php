@@ -57,10 +57,14 @@ class ItemList extends WrapperBase implements ItemListInterface {
       if ($values instanceof WrapperInterface) {
         $values = $values->getValue();
       }
+      // Support passing in only the value of the first item.
+      elseif (!is_array($values) || !is_numeric(current(array_keys($values)))) {
+        $values = array(0 => $values);
+      }
+
       if (!is_array($values)) {
         throw new InvalidArgumentException("An entity property requires a numerically indexed array of items as value.");
       }
-
       // Clear the values of properties for which no value has been passed.
       foreach (array_diff_key($this->list, $values) as $delta => $item) {
         unset($this->list[$delta]);
