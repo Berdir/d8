@@ -31,10 +31,13 @@ class EntityNG extends Entity implements StructureTranslatableInterface, Accessi
    *
    * @todo: Add methods for getting original properties and for determining
    * changes.
+   * @todo: Provide a better way for defining default values.
    *
    * @var array
    */
-  protected $values = array();
+  protected $values = array(
+    'langcode' => array(LANGUAGE_DEFAULT => array(0 => array('value' => LANGUAGE_NOT_SPECIFIED))),
+  );
 
   /**
    * The array of properties, each being an instance of

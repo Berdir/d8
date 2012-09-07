@@ -78,11 +78,7 @@ class DatabaseStorageControllerNG extends DatabaseStorageController {
    *   A new entity object.
    */
   public function create(array $values) {
-    // Pass in default values.
-    $defaults = array();
-    $defaults['langcode'][LANGUAGE_NOT_SPECIFIED][0]['value'] = LANGUAGE_NOT_SPECIFIED;
-
-    $entity = new $this->entityClass(array('values' => $defaults), $this->entityType);
+    $entity = new $this->entityClass(array(), $this->entityType);
 
     // Make sure to set the bundle first.
     if ($this->bundleKey) {
