@@ -204,6 +204,14 @@ class Entity implements EntityInterface {
   }
 
   /**
+   * Implements StructureTranslatableInterface::isEmpty().
+   */
+  public function isEmpty() {
+    // @todo: Replace by EntityNG implementation once all entity types have been
+    // converted to use the entity property API.
+  }
+
+  /**
    * Implements StructureTranslatableInterface::getIterator().
    */
   public function getIterator() {

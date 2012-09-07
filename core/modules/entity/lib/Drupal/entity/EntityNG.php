@@ -176,6 +176,21 @@ class EntityNG extends Entity implements StructureTranslatableInterface, Accessi
   }
 
   /**
+   * Implements StructureInterface::isEmpty().
+   */
+  public function isEmpty() {
+    if (!$this->isNew()) {
+      return FALSE;
+    }
+    foreach ($this->getProperties() as $property) {
+      if ($property->getValue() !== NULL) {
+        return FALSE;
+      }
+    }
+    return TRUE;
+  }
+
+  /**
    * Implements StructureTranslatableInterface::language().
    */
   public function language() {

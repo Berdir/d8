@@ -38,8 +38,7 @@ class ItemList extends WrapperBase implements ItemListInterface {
   public function getValue() {
     $values = array();
     foreach ($this->list as $delta => $item) {
-      // @todo: Filter out empty items and add an isEmpty() method to them.
-      $values[$delta] = $item->getValue();
+      $values[$delta] = !$item->isEmpty() ? $item->getValue() : NULL;
     }
     return $values;
   }
@@ -155,7 +154,6 @@ class ItemList extends WrapperBase implements ItemListInterface {
    * Implements ArrayAccess::offsetSet().
    */
   public function offsetSet($offset, $value) {
-    // @todo: Throw exception if the value does not implement the interface.
     if (is_numeric($offset)) {
       $this->offsetGet($offset)->setValue($value);
     }
@@ -229,6 +227,18 @@ class ItemList extends WrapperBase implements ItemListInterface {
    */
   public function toArray() {
     return $this->getValue();
+  }
+
+  /**
+   * Implements ListInterface::isEmpty().
+   */
+  public function isEmpty() {
+    foreach ($this->list as $item) {
+      if (!$item->isEmpty()) {
+        return FALSE;
+      }
+    }
+    return TRUE;
   }
 
   /**

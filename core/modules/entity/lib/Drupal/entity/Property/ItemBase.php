@@ -201,6 +201,18 @@ abstract class ItemBase extends WrapperBase implements ItemInterface {
   }
 
   /**
+   * Implements StructureInterface::isEmpty().
+   */
+  public function isEmpty() {
+    foreach ($this->getProperties() as $property) {
+      if ($property->getValue() !== NULL) {
+        return FALSE;
+      }
+    }
+    return TRUE;
+  }
+
+  /**
    * Implements a deep clone.
    */
   public function __clone() {

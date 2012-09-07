@@ -181,6 +181,18 @@ class EntityTranslation extends WrapperBase implements StructureInterface, Acces
   }
 
   /**
+   * Implements StructureInterface::isEmpty().
+   */
+  public function isEmpty() {
+    foreach ($this->getProperties() as $property) {
+      if ($property->getValue() !== NULL) {
+        return FALSE;
+      }
+    }
+    return TRUE;
+  }
+
+  /**
    * Implements AccessibleInterface::access().
    */
   public function access(\Drupal\user\User $account = NULL) {

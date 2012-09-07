@@ -177,4 +177,11 @@ class EntityWrapper extends WrapperBase implements StructureInterface {
     $entity = $this->getValue();
     return $entity ? $entity->toArray() : array();
   }
+
+  /**
+   * Implements StructureInterface::isEmpty().
+   */
+  public function isEmpty() {
+    return (bool) $this->getValue();
+  }
 }

@@ -99,4 +99,11 @@ interface StructureInterface extends IteratorAggregate  {
    */
   public function toArray();
 
+  /**
+   * Determines whether the data structure is empty.
+   *
+   * @return boolean
+   *   TRUE if the data structure is empty, FALSE otherwise.
+   */
+  public function isEmpty();
 }
