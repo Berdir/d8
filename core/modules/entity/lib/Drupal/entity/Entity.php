@@ -225,7 +225,7 @@ class Entity implements EntityInterface {
   public function language() {
     // @todo: Replace by EntityNG implementation once all entity types have been
     // converted to use the entity property API.
-    return module_exists('locale') ? language_load($this->langcode) : new Language(array('langcode' => LANGUAGE_NOT_SPECIFIED));
+    return !empty($this->langcode) ? language_load($this->langcode) : new Language(array('langcode' => LANGUAGE_NOT_SPECIFIED));
   }
 
   /**
