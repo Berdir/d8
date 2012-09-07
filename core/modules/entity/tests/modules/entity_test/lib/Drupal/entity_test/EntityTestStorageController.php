@@ -134,26 +134,26 @@ class EntityTestStorageController extends DatabaseStorageControllerNG {
   public function basePropertyDefinitions() {
     $properties['id'] = array(
       'label' => t('ID'),
-      'description' => ('The ID of the test entity.'),
+      'description' => t('The ID of the test entity.'),
       'type' => 'integer_item',
       'list' => TRUE,
       'read-only' => TRUE,
     );
     $properties['uuid'] = array(
       'label' => t('UUID'),
-      'description' => ('The UUID of the test entity.'),
+      'description' => t('The UUID of the test entity.'),
       'type' => 'string_item',
       'list' => TRUE,
     );
     $properties['langcode'] = array(
       'label' => t('Language code'),
-      'description' => ('The language code of the test entity.'),
+      'description' => t('The language code of the test entity.'),
       'type' => 'language_item',
       'list' => TRUE,
     );
     $properties['name'] = array(
       'label' => t('Name'),
-      'description' => ('The name of the test entity.'),
+      'description' => t('The name of the test entity.'),
       'type' => 'string_item',
       'list' => TRUE,
       'translatable' => TRUE,
