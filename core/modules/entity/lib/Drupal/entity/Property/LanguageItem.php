@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Definition of Drupal\entity\Property\PropertyLanguageItem.
+ * Definition of Drupal\entity\Property\LanguageItem.
  */
 
 namespace Drupal\entity\Property;

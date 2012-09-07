@@ -574,6 +574,18 @@ function entity_data_type_info() {
       'class' => '\Drupal\entity\Property\IntegerItem',
       'list class' => '\Drupal\entity\Property\ItemList',
     ),
+    'boolean_item' => array(
+      'label' => t('Boolean item'),
+      'description' => t('An entity property containing a boolean value.'),
+      'class' => '\Drupal\entity\Property\BooleanItem',
+      'list class' => '\Drupal\entity\Property\ItemList',
+    ),
+    'date_item' => array(
+      'label' => t('Date item'),
+      'description' => t('An entity property containing a date value.'),
+      'class' => '\Drupal\entity\Property\DateItem',
+      'list class' => '\Drupal\entity\Property\ItemList',
+    ),
     'language_item' => array(
       'label' => t('Language item'),
       'description' => t('An entity property referencing a language.'),

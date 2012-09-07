@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Definition of Drupal\entity\Property\StringItem.
+ * Definition of Drupal\entity\Property\BooleanItem.
  */
 
 namespace Drupal\entity\Property;
@@ -9,9 +9,9 @@ use Drupal\entity\Property\ItemBase;
 
 
 /**
- * Defines the 'string_item' entity property item.
+ * Defines the 'boolean_item' entity property item.
  */
-class StringItem extends ItemBase {
+class BooleanItem extends ItemBase {
 
   /**
    * Property definitions of the contained properties.
@@ -29,8 +29,8 @@ class StringItem extends ItemBase {
 
     if (!isset(self::$propertyDefinitions)) {
       self::$propertyDefinitions['value'] = array(
-        'type' => 'string',
-        'label' => t('Text value'),
+        'type' => 'boolean',
+        'label' => t('Boolean value'),
       );
     }
     return self::$propertyDefinitions;
