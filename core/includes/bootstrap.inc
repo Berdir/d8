@@ -37,6 +37,26 @@ const DRUPAL_MINIMUM_PHP = '5.3.3';
 const DRUPAL_MINIMUM_PHP_MEMORY_LIMIT = '32M';
 
 /**
+ * Error reporting level: display no errors.
+ */
+const ERROR_REPORTING_HIDE = 'hide';
+
+/**
+ * Error reporting level: display errors and warnings.
+ */
+const ERROR_REPORTING_DISPLAY_SOME = 'some';
+
+/**
+ * Error reporting level: display all messages.
+ */
+const ERROR_REPORTING_DISPLAY_ALL = 'all';
+
+/**
+ * Error reporting level: display all messages, plus backtrace information.
+ */
+const ERROR_REPORTING_DISPLAY_VERBOSE = 'verbose';
+
+/**
  * @defgroup logging_severity_levels Logging severity levels
  * @{
  * Logging severity levels as defined in RFC 3164.
@@ -454,30 +474,28 @@ function conf_path($require_settings = TRUE, $reset = FALSE) {
  * @see conf_path()
  */
 function find_conf_path($http_host, $script_name, $require_settings = TRUE) {
-  $confdir = 'sites';
+  // Determine whether multi-site functionality is enabled.
+  if (!file_exists(DRUPAL_ROOT . '/sites/sites.php')) {
+    return 'sites/default';
+  }
 
   $sites = array();
-  if (file_exists(DRUPAL_ROOT . '/' . $confdir . '/sites.php')) {
-    // This will overwrite $sites with the desired mappings.
-    include(DRUPAL_ROOT . '/' . $confdir . '/sites.php');
-  }
+  include DRUPAL_ROOT . '/sites/sites.php';
 
   $uri = explode('/', $script_name);
   $server = explode('.', implode('.', array_reverse(explode(':', rtrim($http_host, '.')))));
   for ($i = count($uri) - 1; $i > 0; $i--) {
     for ($j = count($server); $j > 0; $j--) {
       $dir = implode('.', array_slice($server, -$j)) . implode('.', array_slice($uri, 0, $i));
-      if (isset($sites[$dir]) && file_exists(DRUPAL_ROOT . '/' . $confdir . '/' . $sites[$dir])) {
+      if (isset($sites[$dir]) && file_exists(DRUPAL_ROOT . '/sites/' . $sites[$dir])) {
         $dir = $sites[$dir];
       }
-      if (file_exists(DRUPAL_ROOT . '/' . $confdir . '/' . $dir . '/settings.php') || (!$require_settings && file_exists(DRUPAL_ROOT . '/' . $confdir . '/' . $dir))) {
-        $conf = "$confdir/$dir";
-        return $conf;
+      if (file_exists(DRUPAL_ROOT . '/sites/' . $dir . '/settings.php') || (!$require_settings && file_exists(DRUPAL_ROOT . '/sites/' . $dir))) {
+        return "sites/$dir";
       }
     }
   }
-  $conf = "$confdir/default";
-  return $conf;
+  return 'sites/default';
 }
 
 /**
@@ -1713,7 +1731,8 @@ function watchdog($type, $message, array $variables = array(), $severity = WATCH
       'request_uri' => $base_root . request_uri(),
       'referer'     => isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '',
       'ip'          => ip_address(),
-      'timestamp'   => REQUEST_TIME,
+      // Request time isn't accurate for long processes, use time() instead.
+      'timestamp'   => time(),
     );
 
     // Call the logging hooks to log/process the message
@@ -1779,18 +1798,29 @@ function drupal_set_message($message = NULL, $type = 'status', $repeat = TRUE) {
 }
 
 /**
- * Returns all messages that have been set.
+ * Returns all messages that have been set with drupal_set_message().
  *
- * @param $type
- *   (optional) Only return messages of this type.
- * @param $clear_queue
- *   (optional) Set to FALSE if you do not want to clear the messages queue
+ * @param string $type
+ *   (optional) Limit the messages returned by type. Defaults to NULL, meaning
+ *   all types. These values are supported:
+ *   - NULL
+ *   - 'status'
+ *   - 'warning'
+ *   - 'error'
+ * @param bool $clear_queue
+ *   (optional) If this is TRUE, the queue will be cleared of messages of the
+ *   type specified in the $type parameter. Otherwise the queue will be left
+ *   intact. Defaults to TRUE.
  *
- * @return
- *   An associative array, the key is the message type, the value an array
- *   of messages. If the $type parameter is passed, you get only that type,
- *   or an empty array if there are no such messages. If $type is not passed,
- *   all message types are returned, or an empty array if none exist.
+ * @return array
+ *   A multidimensional array with keys corresponding to the set message types.
+ *   The indexed array values of each contain the set messages for that type.
+ *   The messages returned are limited to the type specified in the $type
+ *   parameter. If there are no messages of the specified type, an empty array
+ *   is returned.
+ *
+ * @see drupal_set_message()
+ * @see theme_status_messages()
  */
 function drupal_get_messages($type = NULL, $clear_queue = TRUE) {
   if ($messages = drupal_set_message()) {
@@ -2066,7 +2096,7 @@ function drupal_anonymous_user() {
   $user->uid = 0;
   $user->hostname = ip_address();
   $user->roles = array();
-  $user->roles[DRUPAL_ANONYMOUS_RID] = 'anonymous user';
+  $user->roles[DRUPAL_ANONYMOUS_RID] = DRUPAL_ANONYMOUS_RID;
   return $user;
 }
 
@@ -2421,47 +2451,62 @@ function drupal_get_bootstrap_phase() {
  *
  * @see Drupal\Core\DrupalKernel
  *
- * @param $reset
- *   A new container instance to reset the Drupal container to.
+ * @param Symfony\Component\DependencyInjection\Container $new_container
+ *   A new container instance to replace the current.
+ * @param bool $rebuild
+ *   (optional) Internal use only. Whether to enforce a rebuild of the container.
+ *   Used by the testing framework to inject a fresh container for unit tests.
  *
  * @return Symfony\Component\DependencyInjection\Container
  *   The instance of the Container used to set up and maintain object
  *   instances.
  */
-function drupal_container(Container $reset = NULL) {
+function drupal_container(Container $new_container = NULL, $rebuild = FALSE) {
   // We do not use drupal_static() here because we do not have a mechanism by
   // which to reinitialize the stored objects, so a drupal_static_reset() call
   // would leave Drupal in a nonfunctional state.
   static $container = NULL;
-  if (isset($reset)) {
-    $container = $reset;
+  if ($rebuild) {
+    $container = NULL;
   }
-  elseif (!isset($container)) {
+  if (isset($new_container)) {
+    $container = $new_container;
+  }
+  if (!isset($container)) {
     // Return a ContainerBuilder instance with the bare essentials needed for any
     // full bootstrap regardless of whether there will be a DrupalKernel involved.
     // This will get merged with the full Kernel-built Container on normal page
     // requests.
     $container = new ContainerBuilder();
 
-    // Register configuration storage class and options.
-    // @todo The active store and its options need to be configurable.
-    //   Use either global $conf (recursion warning) or global $config, or a
-    //   bootstrap configuration *file* to allow to set/override this very
-    //   lowest of low level configuration.
-    $container->setParameter('config.storage.options', array(
-      'connection' => 'default',
-      'target' => 'default',
-    ));
-    $container->register('config.storage', 'Drupal\Core\Config\DatabaseStorage')
-      ->addArgument('%config.storage.options%');
+    // Register active configuration storage.
+    $container
+      ->register('config.cachedstorage.storage', 'Drupal\Core\Config\FileStorage')
+      ->addArgument(config_get_config_directory(CONFIG_ACTIVE_DIRECTORY));
+    // @todo Replace this with a cache.factory service plus 'config' argument.
+    $container
+      ->register('cache.config')
+      ->setFactoryClass('Drupal\Core\Cache\CacheFactory')
+      ->setFactoryMethod('get')
+      ->addArgument('config');
 
+    $container
+      ->register('config.storage', 'Drupal\Core\Config\CachedStorage')
+      ->addArgument(new Reference('config.cachedstorage.storage'))
+      ->addArgument(new Reference('cache.config'));
+
+    // Register configuration object factory.
     $container->register('config.subscriber.globalconf', 'Drupal\Core\EventSubscriber\ConfigGlobalOverrideSubscriber');
     $container->register('dispatcher', 'Symfony\Component\EventDispatcher\EventDispatcher')
       ->addMethodCall('addSubscriber', array(new Reference('config.subscriber.globalconf')));
-    // Register configuration object factory.
     $container->register('config.factory', 'Drupal\Core\Config\ConfigFactory')
       ->addArgument(new Reference('config.storage'))
       ->addArgument(new Reference('dispatcher'));
+
+    // Register staging configuration storage.
+    $container
+      ->register('config.storage.staging', 'Drupal\Core\Config\FileStorage')
+      ->addArgument(config_get_config_directory(CONFIG_STAGING_DIRECTORY));
   }
   return $container;
 }

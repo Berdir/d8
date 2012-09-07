@@ -8,6 +8,7 @@
 namespace Drupal\entity;
 
 use Drupal\Component\Uuid\Uuid;
+use Drupal\Core\Language\Language;
 
 /**
  * Defines a base entity class.
@@ -41,11 +42,11 @@ class Entity implements EntityInterface {
   protected $enforceIsNew;
 
   /**
-   * Indicates whether this is the current revision.
+   * Indicates whether this is the default revision.
    *
    * @var bool
    */
-  public $isCurrentRevision = TRUE;
+  protected $isDefaultRevision = TRUE;
 
   /**
    * Constructs a new entity object.
@@ -216,7 +217,7 @@ class Entity implements EntityInterface {
   public function language() {
     // @todo: Replace by EntityNG implementation once all entity types have been
     // converted to use the entity property API.
-    return module_exists('locale') ? language_load($this->langcode) : FALSE;
+    return module_exists('locale') ? language_load($this->langcode) : new Language(array('langcode' => LANGUAGE_NOT_SPECIFIED));
   }
 
   /**
@@ -310,9 +311,13 @@ class Entity implements EntityInterface {
   }
 
   /**
-   * Implements Drupal\entity\EntityInterface::isCurrentRevision().
+   * Implements Drupal\entity\EntityInterface::isDefaultRevision().
    */
-  public function isCurrentRevision() {
-    return $this->isCurrentRevision;
+  public function isDefaultRevision($new_value = NULL) {
+    $return = $this->isDefaultRevision;
+    if (isset($new_value)) {
+      $this->isDefaultRevision = (bool) $new_value;
+    }
+    return $return;
   }
 }

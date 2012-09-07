@@ -530,8 +530,10 @@ abstract class TestBase {
    *   methods during debugging.
    */
   public function run(array $methods = array()) {
+    $simpletest_config = config('simpletest.settings');
+
     $class = get_class($this);
-    if (variable_get('simpletest_verbose', TRUE)) {
+    if ($simpletest_config->get('verbose')) {
       // Initialize verbose debugging.
       $this->verbose = TRUE;
       $this->verboseDirectory = variable_get('file_public_path', conf_path() . '/files') . '/simpletest/verbose';
@@ -542,10 +544,10 @@ abstract class TestBase {
     }
     // HTTP auth settings (<username>:<password>) for the simpletest browser
     // when sending requests to the test site.
-    $this->httpauth_method = variable_get('simpletest_httpauth_method', CURLAUTH_BASIC);
-    $username = variable_get('simpletest_httpauth_username', NULL);
-    $password = variable_get('simpletest_httpauth_password', NULL);
-    if ($username && $password) {
+    $this->httpauth_method = (int) $simpletest_config->get('httpauth.method');
+    $username = $simpletest_config->get('httpauth.username');
+    $password = $simpletest_config->get('httpauth.password');
+    if (!empty($username) && !empty($password)) {
       $this->httpauth_credentials = $username . ':' . $password;
     }
 
@@ -690,6 +692,8 @@ abstract class TestBase {
     $this->originalContainer = clone drupal_container();
     $this->originalLanguage = $language_interface;
     $this->originalConfigDirectories = $GLOBALS['config_directories'];
+    $this->originalThemeKey = $GLOBALS['theme_key'];
+    $this->originalTheme = $GLOBALS['theme'];
 
     // Save further contextual information.
     $this->originalFileDirectory = variable_get('file_public_path', conf_path() . '/files');
@@ -726,6 +730,9 @@ abstract class TestBase {
       $GLOBALS['config_directories'][$type] = 'simpletest/' . substr($this->databasePrefix, 10) . '/config_' . $type;
     }
 
+    // Reset and create a new service container.
+    $this->container = drupal_container(NULL, TRUE);
+
     $this->configDirectories = array();
     include_once DRUPAL_ROOT . '/core/includes/install.inc';
     foreach ($GLOBALS['config_directories'] as $type => $path) {
@@ -734,6 +741,15 @@ abstract class TestBase {
       }
       $this->configDirectories[$type] = $this->originalFileDirectory . '/' . $path;
     }
+
+    // Unset globals.
+    unset($GLOBALS['theme_key']);
+    unset($GLOBALS['theme']);
+
+    // Re-initialize the theme to ensure that tests do not see an inconsistent
+    // behavior when calling functions that would initialize the theme if it has
+    // not been initialized yet.
+    drupal_theme_initialize();
 
     // Log fatal errors.
     ini_set('log_errors', 1);
@@ -777,6 +793,10 @@ abstract class TestBase {
     // Restore original database connection.
     Database::removeConnection('default');
     Database::renameConnection('simpletest_original_default', 'default');
+
+    // Restore original globals.
+    $GLOBALS['theme_key'] = $this->originalThemeKey;
+    $GLOBALS['theme'] = $this->originalTheme;
 
     // Reset all static variables.
     drupal_static_reset();

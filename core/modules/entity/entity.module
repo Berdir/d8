@@ -144,7 +144,7 @@ function entity_info_cache_clear() {
  *
  * @see hook_entity_info()
  * @see entity_load_multiple()
- * @see Drupal\entity\StorageControllerInterface
+ * @see Drupal\entity\EntityStorageControllerInterface
  * @see Drupal\entity\DatabaseStorageController
  * @see Drupal\entity\EntityFieldQuery
  */
@@ -216,11 +216,11 @@ function entity_load_by_uuid($entity_type, $uuid, $reset = FALSE) {
  * database access if loaded again during the same page request.
  *
  * The actual loading is done through a class that has to implement the
- * Drupal\entity\StorageControllerInterface interface. By default,
+ * Drupal\entity\EntityStorageControllerInterface interface. By default,
  * Drupal\entity\DatabaseStorageController is used. Entity types can
  * specify that a different class should be used by setting the
  * 'controller class' key in hook_entity_info(). These classes can either
- * implement the Drupal\entity\StorageControllerInterface interface, or,
+ * implement the Drupal\entity\EntityStorageControllerInterface interface, or,
  * most commonly, extend the Drupal\entity\DatabaseStorageController
  * class. See node_entity_info() and the NodeStorageController in node.module as
  * an example.
@@ -236,7 +236,7 @@ function entity_load_by_uuid($entity_type, $uuid, $reset = FALSE) {
  *   An array of entity objects indexed by their ids.
  *
  * @see hook_entity_info()
- * @see Drupal\entity\StorageControllerInterface
+ * @see Drupal\entity\EntityStorageControllerInterface
  * @see Drupal\entity\DatabaseStorageController
  * @see Drupal\entity\EntityFieldQuery
  */
@@ -316,7 +316,7 @@ function entity_create($entity_type, array $values) {
 /**
  * Gets the entity controller class for an entity type.
  *
- * @return Drupal\entity\StorageControllerInterface
+ * @return Drupal\entity\EntityStorageControllerInterface
  */
 function entity_get_controller($entity_type) {
   $controllers = &drupal_static(__FUNCTION__, array());
@@ -466,12 +466,13 @@ function entity_form_id(EntityInterface $entity, $operation = 'default') {
  * @return
  *   A $form_state array already filled the entity form controller.
  */
-function entity_form_state_defaults(EntityInterface $entity, $operation = 'default') {
+function entity_form_state_defaults(EntityInterface $entity, $operation = 'default', $langcode = NULL) {
   $form_state = array();
   $controller = entity_form_controller($entity->entityType(), $operation);
   $form_state['build_info']['callback'] = array($controller, 'build');
   $form_state['build_info']['base_form_id'] = $entity->entityType() . '_form';
   $form_state['build_info']['args'] = array($entity);
+  $form_state['langcode'] = $langcode;
   return $form_state;
 }
 
@@ -505,8 +506,8 @@ function entity_form_submit(EntityInterface $entity, $operation = 'default', &$f
  * @return
  *   The processed form for the given entity and operation.
  */
-function entity_get_form(EntityInterface $entity, $operation = 'default') {
-  $form_state = entity_form_state_defaults($entity, $operation);
+function entity_get_form(EntityInterface $entity, $operation = 'default', $langcode = NULL) {
+  $form_state = entity_form_state_defaults($entity, $operation, $langcode);
   $form_id = entity_form_id($entity, $operation);
   return drupal_build_form($form_id, $form_state);
 }

@@ -4,11 +4,16 @@ Drupal 8.0, xxxx-xx-xx (development version)
 - Improved entity system.
     * Added support for saving and deleting entities through the controller.
     * Entities are now classed objects, implementing EntityInterface.
+    * Drupal now understands the concept of a "default" revision, tracked
+      independently from the latest revision, allowing for the creation of
+      drafts while the current revision stays published.
 - Replaced the core routing system with one built on the Symfony2 framework.
 - Configuration:
     * Added a centralized file-based configuration system.
     * Allows module authors to provide configuration in a standard format.
     * Implements functionality to get, set, add and remove configuration.
+    * Includes ability to override configuration values with language variants 
+      and other runtime values.
 - Included the HTML5 Shiv library to support HTML5 elements in IE 8 and below.
 - Included the following Symfony2 components:
     * ClassLoader - PSR-0-compatible autoload routines.
@@ -45,6 +50,7 @@ Drupal 8.0, xxxx-xx-xx (development version)
         path prefix detection is now default.
       * Added HTML 5 language markup; language information added in markup in
         several more places.
+      * Made it possible to assign external language codes to local languages.
     * Simplified and added new features in interface translation:
       * Made interface translation directly accessible from language list.
       * Centralized interface translation import to one directory.
@@ -61,6 +67,7 @@ Drupal 8.0, xxxx-xx-xx (development version)
         and files.
       * Node type specific default language assignment is much more versatile.
       * Added entity language variance support to search module.
+      * Search indexing and query preprocessors now get language information.
     * Better language based configuration
       * Added language options to block visibility.
     * Much improved language APIs for developers:
@@ -78,6 +85,7 @@ Drupal 8.0, xxxx-xx-xx (development version)
       * Removed textgroups support from interface translation in favor of
         native configuration language support.
       * Reworked Gettext PO support to use pluggable read/write handlers.
+- Added E-mail field type to core.
 
 Drupal 7.0, 2011-01-05
 ----------------------
