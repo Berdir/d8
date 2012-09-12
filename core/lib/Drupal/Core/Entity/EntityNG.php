@@ -153,8 +153,19 @@ class EntityNG extends Entity implements StructureTranslatableInterface, Accessi
    * Implements StructureInterface::getPropertyDefinition().
    */
   public function getPropertyDefinition($name) {
-    $definitions = $this->getPropertyDefinitions();
-    return isset($definitions[$name]) ? $definitions[$name] : FALSE;
+    // First try getting property definitions which apply to all entities of
+    // this type. Then if this fails add in definitions of optional properties
+    // as well. That way we can use property definitions of base properties
+    // when determining the optional properties of an entity.
+    $definitions = entity_get_controller($this->entityType)->getPropertyDefinitions(array());
+
+    if (isset($definitions[$name])) {
+      return $definitions[$name];
+    }
+    // Add in optional properties if any.
+    if ($definitions = $this->getPropertyDefinitions()) {
+      return isset($definitions[$name]) ? $definitions[$name] : FALSE;
+    }
   }
 
   /**
