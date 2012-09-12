@@ -102,16 +102,37 @@ class DatabaseStorageControllerNG extends DatabaseStorageController {
    *
    * Added mapping from storage records to entities.
    */
-  protected function attachLoad(&$queried_entities, $revision_id = FALSE) {
+  protected function attachLoad(&$queried_entities, $load_revision = FALSE) {
     // Now map the record values to the according entity properties and
     // activate compatibility mode.
     $queried_entities = $this->mapFromStorageRecords($queried_entities);
 
-    parent::attachLoad($queried_entities, $revision_id);
+    // Attach fields.
+    if ($this->entityInfo['fieldable']) {
+      if ($load_revision) {
+        field_attach_load_revision($this->entityType, $queried_entities);
+      }
+      else {
+        field_attach_load($this->entityType, $queried_entities);
+      }
+    }
 
     // Loading is finished, so disable compatibility mode now.
     foreach ($queried_entities as $entity) {
       $entity->setCompatibilityMode(FALSE);
+    }
+
+    // Call hook_entity_load().
+    foreach (module_implements('entity_load') as $module) {
+      $function = $module . '_entity_load';
+      $function($queried_entities, $this->entityType);
+    }
+    // Call hook_TYPE_load(). The first argument for hook_TYPE_load() are
+    // always the queried entities, followed by additional arguments set in
+    // $this->hookLoadArguments.
+    $args = array_merge(array($queried_entities), $this->hookLoadArguments);
+    foreach (module_implements($this->entityType . '_load') as $module) {
+      call_user_func_array($module . '_' . $this->entityType . '_load', $args);
     }
   }
 
