@@ -6,7 +6,7 @@
  */
 
 namespace Drupal\field;
-use Drupal\entity\Property\ItemInterface;
+use Drupal\Core\Entity\Property\ItemInterface;
 
 /**
  * Interface for field items.

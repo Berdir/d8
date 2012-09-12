@@ -273,6 +273,7 @@ function install_begin_request(&$install_state) {
   // Load module basics (needed for hook invokes).
   include_once DRUPAL_ROOT . '/core/includes/module.inc';
   include_once DRUPAL_ROOT . '/core/includes/session.inc';
+  require_once DRUPAL_ROOT . '/core/includes/entity.inc';
 
   // Determine whether the configuration system is ready to operate.
   $install_state['config_verified'] = install_verify_config_directory(CONFIG_ACTIVE_DIRECTORY) && install_verify_config_directory(CONFIG_STAGING_DIRECTORY);
@@ -320,11 +321,9 @@ function install_begin_request(&$install_state) {
   require_once DRUPAL_ROOT . '/core/includes/ajax.inc';
   // Override the module list with a minimal set of modules.
   $module_list['system']['filename'] = 'core/modules/system/system.module';
-  $module_list['entity']['filename'] = 'core/modules/entity/entity.module';
   $module_list['user']['filename']   = 'core/modules/user/user.module';
   module_list(NULL, $module_list);
   drupal_load('module', 'system');
-  drupal_load('module', 'entity');
   drupal_load('module', 'user');
 
   // Load the cache infrastructure using a "fake" cache implementation that
@@ -1706,6 +1705,7 @@ function install_check_requirements($install_state) {
 
   // If Drupal is not set up already, we need to create a settings file.
   if (!$install_state['settings_verified']) {
+    $readable = FALSE;
     $writable = FALSE;
     $conf_path = './' . conf_path(FALSE, TRUE);
     $settings_file = $conf_path . '/settings.php';
@@ -1718,7 +1718,8 @@ function install_check_requirements($install_state) {
       $file = $settings_file;
       if (drupal_verify_install_file($settings_file, FILE_EXIST)) {
         // If it does, make sure it is writable.
-        $writable = drupal_verify_install_file($settings_file, FILE_READABLE|FILE_WRITABLE);
+        $readable = drupal_verify_install_file($settings_file, FILE_READABLE);
+        $writable = drupal_verify_install_file($settings_file, FILE_WRITABLE);
         $exists = TRUE;
       }
     }
@@ -1791,6 +1792,15 @@ function install_check_requirements($install_state) {
         'title'       => st('Settings file'),
         'value'       => st('The %file file exists.', array('%file' => $file)),
       );
+      // If settings.php is not readable, throw an error.
+      if (!$readable) {
+        $requirements['settings file readable'] = array(
+          'title'       => st('Settings file'),
+          'value'       => st('The settings file is not readable.'),
+          'severity'    => REQUIREMENT_ERROR,
+          'description' => st('@drupal requires read permissions to %file at all times. If you are unsure how to grant file permissions, consult the <a href="@handbook_url">online handbook</a>.', array('@drupal' => drupal_install_profile_distribution_name(), '%file' => $file, '@handbook_url' => 'http://drupal.org/server-permissions')),
+        );
+      }
       // If settings.php is not writable, throw an error.
       if (!$writable) {
         $requirements['settings file writable'] = array(
@@ -1820,7 +1830,7 @@ function install_check_requirements($install_state) {
 }
 
 /**
- * Returns a Forms API array definition for site configuration.
+ * Returns a Form API array definition for site configuration.
  *
  * @see install_configure_form()
  * @see install_configure_form_validate()

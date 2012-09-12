@@ -6,7 +6,7 @@
  */
 
 namespace Drupal\field;
-use Drupal\entity\Property\ItemListInterface;
+use Drupal\Core\Entity\Property\ItemListInterface;
 
 /**
  * Interface for entity properties that are fields, being lists of field items.

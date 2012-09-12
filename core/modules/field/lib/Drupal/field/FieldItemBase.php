@@ -7,7 +7,7 @@
 
 namespace Drupal\field;
 use Drupal\Core\TypedData\MissingContextException;
-use Drupal\entity\Property\ItemBase;
+use Drupal\Core\Entity\Property\ItemBase;
 use InvalidArgumentException;
 
 /**
@@ -16,7 +16,7 @@ use InvalidArgumentException;
  * Field items making use of this base class have to implement
  * StructureInterface::getPropertyDefinitions().
  *
- * @see \Drupal\entity\Property\ItemBase
+ * @see \Drupal\Core\Entity\Property\ItemBase
  */
 abstract class FieldItemBase extends ItemBase implements FieldItemInterface {
 

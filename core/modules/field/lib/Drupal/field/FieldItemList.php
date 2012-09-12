@@ -7,7 +7,7 @@
 
 namespace Drupal\field;
 use Drupal\Core\TypedData\MissingContextException;
-use Drupal\entity\Property\ItemList;
+use Drupal\Core\Entity\Property\ItemList;
 use InvalidArgumentException;
 
 /**

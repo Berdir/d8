@@ -719,8 +719,8 @@ function system_menu() {
 
   // Modules.
   $items['admin/modules'] = array(
-    'title' => 'Modules',
-    'description' => 'Extend site functionality.',
+    'title' => 'Extend',
+    'description' => 'Add and enable modules to extend site functionality.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('system_modules'),
     'access arguments' => array('administer modules'),
@@ -2053,6 +2053,52 @@ function system_data_type_info() {
       'label' => t('Language'),
       'description' => t('A language object.'),
       'class' => '\Drupal\Core\TypedData\Type\Language',
+    ),
+    'entity' => array(
+      'label' => t('Entity'),
+      'description' => t('All kind of entities, e.g. nodes, comments or users.'),
+      'class' => '\Drupal\Core\Entity\Property\EntityWrapper',
+    ),
+    'entity_translation' => array(
+      'label' => t('Entity translation'),
+      'description' => t('A translation of an entity'),
+      'class' => '\Drupal\Core\Entity\EntityTranslation',
+    ),
+    'boolean_item' => array(
+      'label' => t('Boolean item'),
+      'description' => t('An entity property containing a boolean value.'),
+      'class' => '\Drupal\Core\Entity\Property\BooleanItem',
+      'list class' => '\Drupal\Core\Entity\Property\ItemList',
+    ),
+    'string_item' => array(
+      'label' => t('String item'),
+      'description' => t('An entity property containing a string value.'),
+      'class' => '\Drupal\Core\Entity\Property\StringItem',
+      'list class' => '\Drupal\Core\Entity\Property\ItemList',
+    ),
+    'integer_item' => array(
+      'label' => t('Integer item'),
+      'description' => t('An entity property containing an integer value.'),
+      'class' => '\Drupal\Core\Entity\Property\IntegerItem',
+      'list class' => '\Drupal\Core\Entity\Property\ItemList',
+    ),
+    'date_item' => array(
+      'label' => t('Date item'),
+      'description' => t('An entity property containing a date value.'),
+      'class' => '\Drupal\Core\Entity\Property\DateItem',
+      'list class' => '\Drupal\Core\Entity\Property\ItemList',
+    ),
+    'language_item' => array(
+      'label' => t('Language item'),
+      'description' => t('An entity property referencing a language.'),
+      'class' => '\Drupal\Core\Entity\Property\LanguageItem',
+      'list class' => '\Drupal\Core\Entity\Property\ItemList',
+    ),
+    'entityreference_item' => array(
+      'label' => t('Entity reference item'),
+      'description' => t('An entity property containing an entity reference.'),
+      'class' => '\Drupal\Core\Entity\Property\EntityReferenceItem',
+      'list class' => '\Drupal\Core\Entity\Property\ItemList',
     ),
   );
 }
