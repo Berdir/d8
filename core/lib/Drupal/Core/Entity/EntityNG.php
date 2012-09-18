@@ -265,6 +265,15 @@ class EntityNG extends Entity implements StructureTranslatableInterface, Accessi
   }
 
   /**
+   * Overrides Entity::translations().
+   *
+   * @todo: Remove once Entity::translations() gets removed.
+   */
+  public function translations() {
+    return $this->getTranslationLanguages(FALSE);
+  }
+
+  /**
    * Implements AccessibleInterface::access().
    */
   public function access(\Drupal\user\User $account = NULL) {
