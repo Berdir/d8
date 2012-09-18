@@ -181,7 +181,7 @@ class DatabaseStorageControllerNG extends DatabaseStorageController {
       $entity->updateOriginalValues();
 
       if (!$entity->isNew()) {
-        $return = drupal_write_record($this->entityInfo['base table'], $record, 'id');
+        $return = drupal_write_record($this->entityInfo['base table'], $record, $this->idKey);
         $this->resetCache(array($entity->id()));
         $this->postSave($entity, TRUE);
         $this->invokeHook('update', $entity);
@@ -191,7 +191,7 @@ class DatabaseStorageControllerNG extends DatabaseStorageController {
         // Reset general caches, but keep caches specific to certain entities.
         $this->resetCache(array());
 
-        $entity->{$this->idKey}->value = $record->id;
+        $entity->{$this->idKey}->value = $record->{$this->idKey};
         $entity->enforceIsNew(FALSE);
         $this->postSave($entity, FALSE);
         $this->invokeHook('insert', $entity);
