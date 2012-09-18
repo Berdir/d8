@@ -208,7 +208,7 @@ class EntityNG extends Entity implements StructureTranslatableInterface, Accessi
    * Implements StructureTranslatableInterface::language().
    */
   public function language() {
-    return $this->langcode->language;
+    return $this->get('langcode')->language;
   }
 
   /**
