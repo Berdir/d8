@@ -281,6 +281,10 @@ class EntityNG extends Entity implements StructureTranslatableInterface, Accessi
    */
   public function setCompatibilityMode($enabled) {
     $this->compatibilityMode = (bool) $enabled;
+    if ($enabled) {
+      $this->updateOriginalValues();
+      $this->properties = array();
+    }
   }
 
   /**
