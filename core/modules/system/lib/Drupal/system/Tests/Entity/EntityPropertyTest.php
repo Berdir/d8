@@ -105,6 +105,37 @@ class EntityPropertyTest extends WebTestBase  {
     $this->assertNull($entity->user_id->value, 'User ID property is not set.');
     $this->assertNull($entity->user_id->entity, 'User entity property is not set.');
 
+    // Test using isset(), empty() and unset().
+    $entity->name->value = 'test unset';
+    unset($entity->name->value);
+    $this->assertFalse(isset($entity->name->value), 'Name is not set.');
+    $this->assertFalse(isset($entity->name[0]->value), 'Name is not set.');
+    $this->assertTrue(empty($entity->name->value), 'Name is empty.');
+    $this->assertTrue(empty($entity->name[0]->value), 'Name is empty.');
+
+    $entity->name->value = 'a value';
+    $this->assertTrue(isset($entity->name->value), 'Name is set.');
+    $this->assertTrue(isset($entity->name[0]->value), 'Name is set.');
+    $this->assertFalse(empty($entity->name->value), 'Name is not empty.');
+    $this->assertFalse(empty($entity->name[0]->value), 'Name is not empty.');
+    $this->assertTrue(isset($entity->name[0]), 'Name string item is set.');
+    $this->assertFalse(isset($entity->name[1]), 'Second name string item is not set as it does not exist');
+    $this->assertTrue(isset($entity->name), 'Name property is set.');
+    $this->assertFalse(isset($entity->nameInvalid), 'Not existing property is not set.');
+
+    unset($entity->name[0]);
+    $this->assertFalse(isset($entity->name[0]), 'Name property item is not set.');
+    $this->assertFalse(isset($entity->name[0]->value), 'Name is not set.');
+    $this->assertFalse(isset($entity->name->value), 'Name is not set.');
+
+    $entity->name->value = 'a value';
+    $this->assertTrue(isset($entity->name->value), 'Name is set.');
+    unset($entity->name);
+    $this->assertFalse(isset($entity->name), 'Name property is not set.');
+    $this->assertFalse(isset($entity->name[0]), 'Name property item is not set.');
+    $this->assertFalse(isset($entity->name[0]->value), 'Name is not set.');
+    $this->assertFalse(isset($entity->name->value), 'Name is not set.');
+
     // Access the language property.
     $this->assertEqual(LANGUAGE_NOT_SPECIFIED, $entity->langcode->value, 'Language code can be read.');
     $this->assertEqual(language_load(LANGUAGE_NOT_SPECIFIED), $entity->langcode->language, 'Language object can be read.');

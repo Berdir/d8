@@ -18,7 +18,7 @@ use InvalidArgumentException;
  * Implements Property API specific enhancements to the Entity class.
  *
  * @todo: Once all entity types have been converted, merge improvements into the
- * Entity class and let EntityInterface extend the StructureInterface.
+ * Entity class and overhaul the EntityInterface.
  */
 class EntityNG extends Entity implements StructureTranslatableInterface, AccessibleInterface {
 
@@ -358,8 +358,8 @@ class EntityNG extends Entity implements StructureTranslatableInterface, Accessi
     if ($this->compatibilityMode) {
       return isset($this->values[$name]);
     }
-    else {
-      return isset($this->properties[$name]);
+    elseif ($this->getPropertyDefinition($name)) {
+      return (bool) count($this->get($name));
     }
   }
 
@@ -370,8 +370,8 @@ class EntityNG extends Entity implements StructureTranslatableInterface, Accessi
     if ($this->compatibilityMode) {
       unset($this->values[$name]);
     }
-    else {
-      unset($this->properties[$name]);
+    elseif ($this->getPropertyDefinition($name)) {
+      $this->get($name)->setValue(array());
     }
   }
 

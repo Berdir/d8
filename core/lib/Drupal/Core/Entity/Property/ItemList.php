@@ -51,7 +51,7 @@ class ItemList extends WrapperBase implements ItemListInterface {
    *   An array of values of the property items.
    */
   public function setValue($values) {
-    if (isset($values)) {
+    if (!empty($values)) {
 
       // Support passing in property objects as value.
       if ($values instanceof WrapperInterface) {
@@ -217,6 +217,20 @@ class ItemList extends WrapperBase implements ItemListInterface {
    */
   public function __set($property_name, $value) {
     $this->offsetGet(0)->__set($property_name, $value);
+  }
+
+  /**
+   * Delegate.
+   */
+  public function __isset($property_name) {
+    return $this->offsetGet(0)->__isset($property_name);
+  }
+
+  /**
+   * Delegate.
+   */
+  public function __unset($property_name) {
+    return $this->offsetGet(0)->__unset($property_name);
   }
 
   /**

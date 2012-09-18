@@ -150,6 +150,22 @@ abstract class ItemBase extends WrapperBase implements ItemInterface {
   }
 
   /**
+   * Implements ItemInterface::__isset().
+   */
+  public function __isset($name) {
+    return isset($this->properties[$name]) && $this->properties[$name]->getValue() !== NULL;
+  }
+
+  /**
+   * Implements ItemInterface::__unset().
+   */
+  public function __unset($name) {
+    if (isset($this->properties[$name])) {
+      $this->properties[$name]->setValue(NULL);
+    }
+  }
+
+  /**
    * Implements StructureInterface::getProperties().
    */
   public function getProperties($include_computed = FALSE) {

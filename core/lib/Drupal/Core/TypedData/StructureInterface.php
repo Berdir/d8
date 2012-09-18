@@ -22,6 +22,9 @@ interface StructureInterface extends IteratorAggregate  {
    * @param $property_name
    *   The name of the property to get; e.g., 'title' or 'name'.
    *
+   * @throws \InvalidArgumentException
+   *   If an invalid property name is given.
+   *
    * @return \Drupal\Core\TypedData\WrapperInterface
    *   The property object.
    */
@@ -34,6 +37,9 @@ interface StructureInterface extends IteratorAggregate  {
    *   The name of the property to set; e.g., 'title' or 'name'.
    * @param $value
    *   The value to set, or NULL to unset the property.
+   *
+   * @throws \InvalidArgumentException
+   *   If an invalid property name is given.
    *
    * @return \Drupal\Core\TypedData\WrapperInterface
    *   The property object.

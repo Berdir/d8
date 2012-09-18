@@ -25,20 +25,37 @@ use Drupal\Core\TypedData\AccessibleInterface;
 interface ItemListInterface extends ListInterface, WrapperInterface, AccessibleInterface {
 
   /**
-   * Delegated to the first item.
+   * Delegates to the first item.
    *
-   * @see EntityPropertyItemInterface::get()
+   * @see \Drupal\Core\Entity\Property\ItemInterface::get()
    */
   public function get($property_name);
 
   /**
-   * Magic getter: Delegated to the first item.
+   * Magic getter: Delegates to the first item.
+   *
+   * @see \Drupal\Core\Entity\Property\ItemInterface::__get()
    */
-  public function __get($name);
+  public function __get($property_name);
 
   /**
-   * Magic setter: Delegated to the first item.
+   * Magic setter: Delegates to the first item.
+   *
+   * @see \Drupal\Core\Entity\Property\ItemInterface::__set()
    */
-  public function __set($name, $value);
+  public function __set($property_name, $value);
 
+  /**
+   * Magic method for isset(): Delegates to the first item.
+   *
+   * @see \Drupal\Core\Entity\Property\ItemInterface::__isset()
+   */
+  public function __isset($property_name);
+
+  /**
+   * Magic method for unset(): Delegates to the first item.
+   *
+   * @see \Drupal\Core\Entity\Property\ItemInterface::__unset()
+   */
+  public function __unset($property_name);
 }
