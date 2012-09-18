@@ -40,7 +40,7 @@ class Date extends WrapperBase implements WrapperInterface {
     if ($value instanceof DateTime || !isset($value)) {
       $this->value = $value;
     }
-    elseif (is_integer($value)) {
+    elseif (is_numeric($value)) {
       // Value is a timestamp.
       $this->value = new DateTime('@' . $value);
     }
