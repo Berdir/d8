@@ -34,7 +34,7 @@ class Duration extends WrapperBase implements WrapperInterface {
     if ($value instanceof DateInterval || !isset($value)) {
       $this->value = $value;
     }
-    elseif (is_integer($value)) {
+    elseif (is_numeric($value)) {
       // Value is a time span in seconds.
       $this->value = new DateInterval('PT' . $value . 'S');
     }
