@@ -7066,7 +7066,7 @@ function drupal_get_updaters() {
  * @see hook_data_type_info()
  */
 function drupal_get_data_type_info() {
-  $items = &drupal_static('data_type_info');
+  $items = &drupal_static(__FUNCTION__);
   if (!isset($items)) {
     $items = module_invoke_all('data_type_info');
     drupal_alter('data_type_info', $items);
