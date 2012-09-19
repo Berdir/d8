@@ -52,6 +52,8 @@ class Duration extends WrapperBase implements WrapperInterface {
    * Implements WrapperInterface::getString().
    */
   public function getString() {
+    // Generate an ISO 8601 formatted string as supported by
+    // DateInterval::__construct() and setValue().
     return (string) $this->getValue()->format('%rP%yY%mM%dDT%hH%mM%sS');
   }
 
