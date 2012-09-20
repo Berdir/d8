@@ -84,8 +84,8 @@ class EntityTestStorageController extends DatabaseStorageControllerNG {
     foreach ($data as $values) {
       $id = $values['id'];
       // Property values in default language are stored with
-      // LANGUAGE_NOT_SPECIFIED as key.
-      $langcode = empty($values['default_langcode']) ? $values['langcode'] : LANGUAGE_NOT_SPECIFIED;
+      // LANGUAGE_DEFAULT as key.
+      $langcode = empty($values['default_langcode']) ? $values['langcode'] : LANGUAGE_DEFAULT;
 
       $queried_entities[$id]->name[$langcode][0]['value'] = $values['name'];
       $queried_entities[$id]->user_id[$langcode][0]['value'] = $values['user_id'];
