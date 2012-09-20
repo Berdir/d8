@@ -345,7 +345,6 @@ function install_begin_request(&$install_state) {
   // requests but, except for a WSOD, there is no chance for a a lock to stall
   // (as opposed to the cache backend) so we can afford having a null
   // implementation here.
-  require_once DRUPAL_ROOT . '/core/includes/lock.inc';
   $conf['lock_backend'] = 'Drupal\Core\Lock\NullLockBackend';
 
   // Prepare for themed output. We need to run this at the beginning of the
@@ -1320,7 +1319,7 @@ function install_select_language(&$install_state) {
         if (!empty($install_state['parameters']['translate'])) {
           $output = '<p>Follow these steps to translate Drupal into your language:</p>';
           $output .= '<ol>';
-          $output .= '<li>Download a translation from the <a href="http://localize.drupal.org/download" target="_blank">translation server</a>.</li>';
+          $output .= '<li>Download a translation from the <a href="http://localize.drupal.org/download">translation server</a>.</li>';
           $output .= '<li>Place it into the following directory:<pre>' . $directory . '</pre></li>';
           $output .= '</ol>';
           $output .= '<p>For more information on installing Drupal in different languages, visit the <a href="http://drupal.org/localize" target="_blank">drupal.org handbook page</a>.</p>';

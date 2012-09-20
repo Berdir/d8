@@ -104,20 +104,24 @@ const JS_SETTING = 200;
 const HTTP_REQUEST_TIMEOUT = -1;
 
 /**
- * Constants defining cache granularity for blocks and renderable arrays.
+ * @defgroup block_caching Block Caching
+ * @{
+ * Constants that define each block's caching state.
  *
- * Modules specify the caching patterns for their blocks using binary
- * combinations of these constants in their hook_block_info():
- *   $block[delta]['cache'] = DRUPAL_CACHE_PER_ROLE | DRUPAL_CACHE_PER_PAGE;
- * DRUPAL_CACHE_PER_ROLE is used as a default when no caching pattern is
- * specified. Use DRUPAL_CACHE_CUSTOM to disable standard block cache and
- * implement
+ * Modules specify how their blocks can be cached in their hook_block_info()
+ * implementations. Caching can be turned off (DRUPAL_NO_CACHE), managed by the
+ * module declaring the block (DRUPAL_CACHE_CUSTOM), or managed by the core
+ * Block module. If the Block module is managing the cache, you can specify that
+ * the block is the same for every page and user (DRUPAL_CACHE_GLOBAL), or that
+ * it can change depending on the page (DRUPAL_CACHE_PER_PAGE) or by user
+ * (DRUPAL_CACHE_PER_ROLE or DRUPAL_CACHE_PER_USER). Page and user settings can
+ * be combined with a bitwise-binary or operator; for example,
+ * DRUPAL_CACHE_PER_ROLE | DRUPAL_CACHE_PER_PAGE means that the block can change
+ * depending on the user role or page it is on.
  *
  * The block cache is cleared when the 'content' cache tag is invalidated,
  * following the same pattern as the page cache (node, comment, user, taxonomy
- * added or updated...). Blocks requiring more fine-grained clearing might
- * consider disabling the built-in block cache (DRUPAL_NO_CACHE)
- * and roll their own.
+ * added or updated...).
  *
  * Note that user 1 is excluded from block caching.
  */
@@ -136,9 +140,8 @@ const DRUPAL_NO_CACHE = -1;
 /**
  * The block is handling its own caching in its hook_block_view().
  *
- * From the perspective of the block cache system, this is equivalent to
- * DRUPAL_NO_CACHE. Useful when time based expiration is needed or a site uses
- * a node access which invalidates standard block cache.
+ * This setting is useful when time based expiration is needed or a site uses a
+ * node access which invalidates standard block cache.
  */
 const DRUPAL_CACHE_CUSTOM = -2;
 
@@ -167,6 +170,10 @@ const DRUPAL_CACHE_PER_PAGE = 0x0004;
  * The block or element is the same for every user and page that it is visible.
  */
 const DRUPAL_CACHE_GLOBAL = 0x0008;
+
+/**
+ * @} End of "defgroup block_caching".
+ */
 
 /**
  * The delimiter used to split plural strings.
@@ -1698,7 +1705,7 @@ function format_xml_elements($array) {
  *   $output = format_plural($update_count,
  *     'Changed the content type of 1 post from %old-type to %new-type.',
  *     'Changed the content type of @count posts from %old-type to %new-type.',
- *     array('%old-type' => $info->old_type, '%new-type' => $info->new_type)));
+ *     array('%old-type' => $info->old_type, '%new-type' => $info->new_type));
  * @endcode
  *
  * @param $count
@@ -5013,7 +5020,7 @@ function drupal_cron_run() {
   drupal_alter('queue_info', $queues);
 
   // Try to acquire cron lock.
-  if (!lock_acquire('cron', 240.0)) {
+  if (!lock()->acquire('cron', 240.0)) {
     // Cron is still running normally.
     watchdog('cron', 'Attempting to re-run cron while it is already running.', array(), WATCHDOG_WARNING);
   }
@@ -5044,7 +5051,7 @@ function drupal_cron_run() {
     watchdog('cron', 'Cron run completed.', array(), WATCHDOG_NOTICE);
 
     // Release cron lock.
-    lock_release('cron');
+    lock()->release('cron');
 
     // Return TRUE so other functions can check if it did run successfully
     $return = TRUE;

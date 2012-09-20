@@ -33,6 +33,8 @@ use Drupal\field\FieldUpdateForbiddenException;
  *   - label: The human readable name of the component.
  *   - description: A short description of the component contents.
  *   - weight: The default weight of the element.
+ *   - visible: The default visibility of the element. Only for 'display'
+ *     context.
  */
 function hook_field_extra_fields() {
   $extra['node']['poll'] = array(
@@ -1082,8 +1084,8 @@ function hook_field_formatter_info() {
  * Perform alterations on Field API formatter types.
  *
  * @param $info
- *   Array of informations on formatter types exposed by
- *   hook_field_field_formatter_info() implementations.
+ *   An array of information on formatter types exposed by
+ *   hook_field_formatter_info() implementations.
  */
 function hook_field_formatter_info_alter(&$info) {
   // Add a setting to a formatter type.

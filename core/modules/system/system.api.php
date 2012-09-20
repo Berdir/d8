@@ -2002,7 +2002,7 @@ function hook_watchdog(array $log_entry) {
     '@message'       => strip_tags($log_entry['message']),
   ));
 
-  drupal_mail('emaillog', 'entry', $to, $language_interface, $params);
+  drupal_mail('emaillog', 'entry', $to, $language_interface->langcode, $params);
 }
 
 /**
@@ -2060,7 +2060,7 @@ function hook_mail($key, &$message, $params) {
     $variables += array(
       '%uid' => $node->uid,
       '%node_url' => url('node/' . $node->nid, array('absolute' => TRUE)),
-      '%node_type' => node_type_get_name($node),
+      '%node_type' => node_get_type_label($node),
       '%title' => $node->title,
       '%teaser' => $node->teaser,
       '%body' => $node->body,

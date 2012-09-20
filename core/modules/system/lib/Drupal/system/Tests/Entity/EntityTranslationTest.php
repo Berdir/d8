@@ -93,7 +93,7 @@ class EntityTranslationTest extends WebTestBase {
     $this->assertEqual($entity->get($this->field_name)->value, 'default value2', 'Untranslated value updated.');
     $this->assertFalse($entity->getTranslationLanguages(FALSE), 'No translations are available');
 
-    // Test getting a field value using the default language for a not
+    // Test getting a field value using a specific language for a not
     // language-specific entity.
     $this->assertEqual($entity->getTranslation($this->langcodes[1])->get($this->field_name)->value, 'default value2', 'Untranslated value retrieved.');
 
