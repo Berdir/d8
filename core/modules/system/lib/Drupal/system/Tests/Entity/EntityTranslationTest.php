@@ -243,7 +243,7 @@ class EntityTranslationTest extends WebTestBase {
     $query = new EntityFieldQuery();
     $query->entityCondition('entity_type', 'entity_test');
     $query->entityCondition('langcode', $default_langcode);
-    $query->propertyCondition('uid', $properties[$default_langcode]['uid'], NULL, 'original');
+    $query->propertyCondition('user_id', $properties[$default_langcode]['user_id'], NULL, 'original');
     $query->propertyCondition('name', $properties[$default_langcode]['name'], NULL, 'original');
     $query->propertyLanguageCondition($default_langcode, NULL, 'original');
     $query->propertyCondition('name', $properties[$langcode]['name'], NULL, 'translation');
@@ -255,12 +255,12 @@ class EntityTranslationTest extends WebTestBase {
     // Test mixed property and field conditions.
     $entity = entity_load('entity_test', key($result['entity_test']), TRUE);
     $field_value = $this->randomString();
-    $entity->set($this->field_name, array(array('value' => $field_value)), $langcode);
+    $entity->getTranslation($langcode)->set($this->field_name, array(array('value' => $field_value)));
     $entity->save();
     $query = new EntityFieldQuery();
     $query->entityCondition('entity_type', 'entity_test');
     $query->entityCondition('langcode', $default_langcode);
-    $query->propertyCondition('uid', $properties[$default_langcode]['uid'], NULL, 'original');
+    $query->propertyCondition('user_id', $properties[$default_langcode]['user_id'], NULL, 'original');
     $query->propertyCondition('name', $properties[$default_langcode]['name'], NULL, 'original');
     $query->propertyLanguageCondition($default_langcode, NULL, 'original');
     $query->propertyCondition('name', $properties[$langcode]['name'], NULL, 'translation');
