@@ -1998,23 +1998,22 @@ abstract class WebTestBase extends TestBase {
   }
 
   /**
-   * Wraps a data value into a typed data wrapper and executes some basic
-   * assertions.
+   * Creates a typed data object and executes some basic assertions.
    *
-   * @see drupal_wrap_data().
+   * @see Drupal\Core\TypedData\TypedDataManager::create().
    */
-  protected function drupalWrapData($definition, $value = NULL, $context = array()) {
+  protected function createTypedData($definition, $value = NULL, $context = array()) {
     // Save the type that was passed in so we can compare with it later.
     $type = $definition['type'];
-    // Construct the wrapper.
-    $wrapper = drupal_wrap_data($definition, $value, $context);
+    // Construct the object.
+    $data = typed_data()->create($definition, $value, $context);
     // Assert the definition of the wrapper.
-    $this->assertTrue($wrapper instanceof \Drupal\Core\TypedData\TypedDataInterface, 'Wrapper is an instance of the wrapper interface.');
-    $definition = $wrapper->getDefinition();
-    $this->assertTrue(!empty($definition['label']), $definition['label'] . ' wrapper definition was returned.');
+    $this->assertTrue($data instanceof \Drupal\Core\TypedData\TypedDataInterface, 'Typed data object is an instance of the typed data interface.');
+    $definition = $data->getDefinition();
+    $this->assertTrue(!empty($definition['label']), $definition['label'] . ' data definition was returned.');
     // Assert that the correct type was constructed.
-    $this->assertEqual($wrapper->getType(), $type, $definition['label'] . ' wrapper returned type.');
-    return $wrapper;
+    $this->assertEqual($data->getType(), $type, $definition['label'] . ' object returned type.');
+    return $data;
   }
 
   /**

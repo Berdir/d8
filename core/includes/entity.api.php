@@ -476,15 +476,16 @@ function hook_entity_view_mode_alter(&$view_mode, Drupal\Core\Entity\EntityInter
  * @return array
  *   An array of property information having the following optional entries:
  *   - definitions: An array of property definitions to add all entities of this
- *     type, keyed by property name. See drupal_wrap_data() for a list of
- *     supported keys in property definitions.
+ *     type, keyed by property name. See
+ *     Drupal\Core\TypedData\TypedDataManager::create() for a list of supported
+ *     keys in property definitions.
  *   - optional: An array of property definitions for optional properties keyed
  *     by property name. Optional properties are properties that only exist for
  *     certain bundles of the entity type.
  *   - bundle map: An array keyed by bundle name containing the names of
  *     optional properties that entities of this bundle have.
  *
- * @see drupal_wrap_data()
+ * @see Drupal\Core\TypedData\TypedDataManager::create()
  * @see hook_entity_property_info_alter()
  * @see Drupal\Core\Entity\StorageControllerInterface::getPropertyDefinitions()
  */

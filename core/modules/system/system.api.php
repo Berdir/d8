@@ -178,7 +178,7 @@ function hook_cron() {
  *     a constant defined by \Drupal\Core\TypedData\Primitive such as
  *     \Drupal\Core\TypedData\Primitive::String.
  *
- * @see drupal_wrap_data()
+ * @see Drupal\Core\TypedData\TypedDataManager::create()
  * @see drupal_get_data_type_info()
  */
 function hook_data_type_info() {

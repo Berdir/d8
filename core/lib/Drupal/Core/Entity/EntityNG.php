@@ -105,7 +105,7 @@ class EntityNG extends Entity implements TranslatableComplexDataInterface, Acces
       else {
         $value = isset($this->values[$property_name][$langcode]) ? $this->values[$property_name][$langcode] : NULL;
         $context = array('parent' => $this, 'name' => $property_name);
-        $this->properties[$property_name][$langcode] = drupal_wrap_data($definition, $value, $context);
+        $this->properties[$property_name][$langcode] = typed_data()->create($definition, $value, $context);
       }
     }
     return $this->properties[$property_name][$langcode];
@@ -238,7 +238,9 @@ class EntityNG extends Entity implements TranslatableComplexDataInterface, Acces
         'bundle' => $this->bundle(),
       ),
     );
-    return drupal_wrap_data($translation_definition, $properties, array('parent' => $this, 'langcode' => $langcode));
+    // Pass through the property objects to the translation as context.
+    $context = array('parent' => $this, 'langcode' => $langcode, 'properties' => $properties);
+    return typed_data()->create($translation_definition, NULL, $context);
   }
 
   /**

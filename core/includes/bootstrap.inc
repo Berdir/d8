@@ -2535,6 +2535,19 @@ function state() {
 }
 
 /**
+ * Returns the typed data manager service.
+ *
+ * Use the typed data manager service for creating typed data objects.
+ *
+ * @see Drupal\Core\TypedData\TypedDataManager::create()
+ *
+ * @return Drupal\Core\TypedData\TypedDataManager
+ */
+function typed_data() {
+  return drupal_container()->get('typed_data');
+}
+
+/**
  * Returns the test prefix if this is an internal request from SimpleTest.
  *
  * @return

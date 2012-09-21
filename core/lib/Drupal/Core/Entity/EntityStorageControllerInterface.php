@@ -131,14 +131,15 @@ interface EntityStorageControllerInterface {
    * @return array
    *   An array of property definitions of entity properties, keyed by property
    *   name. In addition to the typed data definition keys as described at
-   *   drupal_wrap_data() the follow keys are supported:
+   *   typed_data()->create() the follow keys are supported:
    *   - queryable: Whether the property is queryable via EntityFieldQuery.
    *     Defaults to TRUE if 'computed' is FALSE or not set, to FALSE otherwise.
    *   - translatable: Whether the property is translatable. Defaults to FALSE.
    *   - field: A boolean indicating whether the property is a field. Defaults
    *     to FALSE.
    *
-   * @see drupal_wrap_data()
+   * @see Drupal\Core\TypedData\TypedDataManager::create()
+   * @see typed_data()
    */
   public function getPropertyDefinitions(array $constraints);
 }

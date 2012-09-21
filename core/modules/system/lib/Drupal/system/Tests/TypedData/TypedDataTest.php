@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\system\Tests\TypedData\DataWrapperTest.
+ * Definition of Drupal\system\Tests\TypedData\TypedDataTest.
  */
 
 namespace Drupal\system\Tests\TypedData;
@@ -14,12 +14,12 @@ use DateInterval;
 /**
  * Tests primitive data types.
  */
-class DataWrapperTest extends WebTestBase {
+class TypedDataTest extends WebTestBase {
 
   public static function getInfo() {
     return array(
-      'name' => 'Test data wrappers',
-      'description' => 'Tests the functionality of all core data wrappers.',
+      'name' => 'Test typed data objects',
+      'description' => 'Tests the functionality of all core data types.',
       'group' => 'Typed Data API',
     );
   }
@@ -29,7 +29,7 @@ class DataWrapperTest extends WebTestBase {
    */
   public function testGetAndSet() {
     // Boolean type.
-    $wrapper = $this->drupalWrapData(array('type' => 'boolean'), TRUE);
+    $wrapper = $this->createTypedData(array('type' => 'boolean'), TRUE);
     $this->assertTrue($wrapper->getValue() === TRUE, 'Boolean value was fetched.');
     $wrapper->setValue(FALSE);
     $this->assertTrue($wrapper->getValue() === FALSE, 'Boolean value was changed.');
@@ -39,7 +39,7 @@ class DataWrapperTest extends WebTestBase {
 
     // String type.
     $value = $this->randomString();
-    $wrapper = $this->drupalWrapData(array('type' => 'string'), $value);
+    $wrapper = $this->createTypedData(array('type' => 'string'), $value);
     $this->assertTrue($wrapper->getValue() === $value, 'String value was fetched.');
     $new_value = $this->randomString();
     $wrapper->setValue($new_value);
@@ -51,7 +51,7 @@ class DataWrapperTest extends WebTestBase {
 
     // Integer type.
     $value = rand();
-    $wrapper = $this->drupalWrapData(array('type' => 'integer'), $value);
+    $wrapper = $this->createTypedData(array('type' => 'integer'), $value);
     $this->assertTrue($wrapper->getValue() === $value, 'Integer value was fetched.');
     $new_value = rand();
     $wrapper->setValue($new_value);
@@ -62,7 +62,7 @@ class DataWrapperTest extends WebTestBase {
 
     // Decimal type.
     $value = 123.45;
-    $wrapper = $this->drupalWrapData(array('type' => 'decimal'), $value);
+    $wrapper = $this->createTypedData(array('type' => 'decimal'), $value);
     $this->assertTrue($wrapper->getValue() === $value, 'Decimal value was fetched.');
     $new_value = 678.90;
     $wrapper->setValue($new_value);
@@ -73,7 +73,7 @@ class DataWrapperTest extends WebTestBase {
 
     // Date type.
     $value = new DateTime('@' . REQUEST_TIME);
-    $wrapper = $this->drupalWrapData(array('type' => 'date'), $value);
+    $wrapper = $this->createTypedData(array('type' => 'date'), $value);
     $this->assertTrue($wrapper->getValue() === $value, 'Date value was fetched.');
     $new_value = REQUEST_TIME + 1;
     $wrapper->setValue($new_value);
@@ -86,7 +86,7 @@ class DataWrapperTest extends WebTestBase {
 
     // Duration type.
     $value = new DateInterval('PT20S');
-    $wrapper = $this->drupalWrapData(array('type' => 'duration'), $value);
+    $wrapper = $this->createTypedData(array('type' => 'duration'), $value);
     $this->assertTrue($wrapper->getValue() === $value, 'Duration value was fetched.');
     $wrapper->setValue(10);
     $this->assertTrue($wrapper->getValue()->s == 10, 'Duration value was changed and set by time span in seconds.');
@@ -105,7 +105,7 @@ class DataWrapperTest extends WebTestBase {
     $files = $this->drupalGetTestFiles('image');
 
     // URI type.
-    $wrapper = $this->drupalWrapData(array('type' => 'uri'), $files[0]->uri);
+    $wrapper = $this->createTypedData(array('type' => 'uri'), $files[0]->uri);
     $this->assertTrue($wrapper->getValue() === $files[0]->uri, 'URI value was fetched.');
     $wrapper->setValue($files[1]->uri);
     $this->assertTrue($wrapper->getValue() === $files[1]->uri, 'URI value was changed.');
@@ -114,7 +114,7 @@ class DataWrapperTest extends WebTestBase {
     $this->assertNull($wrapper->getValue(), 'URI wrapper is null-able.');
 
     // Binary type.
-    $wrapper = $this->drupalWrapData(array('type' => 'binary'), $files[0]->uri);
+    $wrapper = $this->createTypedData(array('type' => 'binary'), $files[0]->uri);
     $this->assertTrue(is_resource($wrapper->getValue()), 'Binary value was fetched.');
     // Try setting by URI.
     $wrapper->setValue($files[1]->uri);

@@ -145,7 +145,7 @@ class ItemList extends TypedData implements IteratorAggregate, ItemListInterface
    */
   protected function createItem($value = NULL) {
     $context = array('parent' => $this);
-    return drupal_wrap_data(array('list' => FALSE) + $this->definition, $value, $context);
+    return typed_data()->create(array('list' => FALSE) + $this->definition, $value, $context);
   }
 
   /**

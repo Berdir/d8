@@ -38,7 +38,7 @@ abstract class ItemBase extends TypedData implements IteratorAggregate, ItemInte
   /**
    * Implements TypedDataInterface::__construct().
    */
-  public function __construct(array $definition, $value = NULL, array $context = array()) {
+  public function __construct(array $definition) {
     $this->definition = $definition;
 
     // Initialize all property objects, but postpone the creating of computed
@@ -48,7 +48,7 @@ abstract class ItemBase extends TypedData implements IteratorAggregate, ItemInte
     foreach ($this->getPropertyDefinitions() as $name => $definition) {
       if (empty($definition['computed'])) {
         $context = array('name' => $name, 'parent' => $this);
-        $this->properties[$name] = drupal_wrap_data($definition, NULL, $context);
+        $this->properties[$name] = typed_data()->create($definition, NULL, $context);
       }
       else {
         $step2[$name] = $definition;
@@ -57,11 +57,7 @@ abstract class ItemBase extends TypedData implements IteratorAggregate, ItemInte
 
     foreach ($step2 as $name => $definition) {
       $context = array('name' => $name, 'parent' => $this);
-      $this->properties[$name] = drupal_wrap_data($definition, NULL, $context);
-    }
-
-    if (isset($value)) {
-      $this->setValue($value);
+      $this->properties[$name] = typed_data()->create($definition, NULL, $context);
     }
   }
 

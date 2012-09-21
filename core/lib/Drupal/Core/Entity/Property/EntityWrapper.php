@@ -14,15 +14,16 @@ use IteratorAggregate;
 use InvalidArgumentException;
 
 /**
- * Defines the 'entity' data type, e.g. the computed 'entity' property of entity references.
+ * Defines an 'entity' data type, e.g. the computed 'entity' property of entity references.
  *
- * This wrapper implements the ComplexDataInterface, whereby most of its
- * methods are just forwarded to the wrapped entity (if set).
+ * This object wraps the regular entity object and implements the
+ * ComplexDataInterface by forwarding most of its methods to the wrapped entity
+ * (if set).
  *
  * The plain value of this wrapper is the entity object, i.e. an instance of
- * Drupal\Core\Entity\EntityInterface. For setting the value the entity object or the
- * entity ID may be passed, whereas passing the ID is only supported if an
- * 'entity type' constraint is specified.
+ * Drupal\Core\Entity\EntityInterface. For setting the value the entity object
+ * or the entity ID may be passed, whereas passing the ID is only supported if
+ * an 'entity type' constraint is specified.
  *
  * Supported constraints (below the definition's 'constraints' key) are:
  *  - entity type: The entity type.
@@ -51,22 +52,18 @@ class EntityWrapper extends TypedData implements IteratorAggregate, ComplexDataI
   /**
    * Implements TypedDataInterface::__construct().
    */
-  public function __construct(array $definition, $value = NULL, array $context = array()) {
+  public function __construct(array $definition) {
     $this->definition = $definition + array('constraints' => array());
     $this->entityType = isset($this->definition['constraints']['entity type']) ? $this->definition['constraints']['entity type'] : NULL;
+  }
 
+  /**
+   * Implements TypedDataInterface::setContext().
+   */
+  public function setContext(array $context) {
     // If an ID source is specified, act as computed property.
-    if (isset($context['parent']) && !empty($this->definition['settings']['id source'])) {
+    if (!empty($this->definition['settings']['id source'])) {
       $this->id = $context['parent']->get($this->definition['settings']['id source']);
-    }
-    else {
-      // No context given, so just initialize an ID property for storing the
-      // entity ID of the wrapped entity.
-      $this->id = drupal_wrap_data(array('type' => 'string'));
-    }
-
-    if (isset($value)) {
-      $this->setValue($value);
     }
   }
 
@@ -74,7 +71,7 @@ class EntityWrapper extends TypedData implements IteratorAggregate, ComplexDataI
    * Implements TypedDataInterface::getValue().
    */
   public function getValue() {
-    $id = $this->id->getValue();
+    $id = isset($this->id) ? $this->id->getValue() : FALSE;
     return $id ? entity_load($this->entityType, $id) : NULL;
   }
 
@@ -84,6 +81,11 @@ class EntityWrapper extends TypedData implements IteratorAggregate, ComplexDataI
    * Both the entity ID and the entity object may be passed as value.
    */
   public function setValue($value) {
+    // Initialize the id property if no context is given.
+    if (!isset($this->id)) {
+      $this->id = typed_data()->create(array('type' => 'string'));
+    }
+
     if (!isset($value)) {
       $this->id->setValue(NULL);
     }

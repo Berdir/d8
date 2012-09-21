@@ -29,22 +29,11 @@ class Language extends TypedData implements TypedDataInterface {
   protected $langcode;
 
   /**
-   * Implements TypedDataInterface::__construct().
+   * Implements TypedDataInterface::setContext().
    */
-  public function __construct(array $definition, $value = NULL, array $context = array()) {
-    $this->definition = $definition;
-
-    if (isset($context['parent']) && !empty($this->definition['settings']['langcode source'])) {
+  public function setContext(array $context) {
+    if (!empty($this->definition['settings']['langcode source'])) {
       $this->langcode = $context['parent']->get($this->definition['settings']['langcode source']);
-    }
-    else {
-      // No context given, so just initialize an langcode property for storing
-      // the code.
-      $this->langcode = drupal_wrap_data(array('type' => 'string'));
-    }
-
-    if (isset($value)) {
-      $this->setValue($value);
     }
   }
 
@@ -52,7 +41,7 @@ class Language extends TypedData implements TypedDataInterface {
    * Implements TypedDataInterface::getValue().
    */
   public function getValue() {
-    $langcode = $this->langcode->getValue();
+    $langcode = isset($this->langcode) ? $this->langcode->getValue(): FALSE;
     return $langcode ? language_load($langcode) : NULL;
   }
 
@@ -62,6 +51,11 @@ class Language extends TypedData implements TypedDataInterface {
    * Both the langcode and the language object may be passed as value.
    */
   public function setValue($value) {
+    // Initialize the langcode property if no context is given.
+    if (!isset($this->langcode)) {
+      $this->langcode = typed_data()->create(array('type' => 'string'));
+    }
+
     if (!isset($value)) {
       $this->langcode->setValue(NULL);
     }

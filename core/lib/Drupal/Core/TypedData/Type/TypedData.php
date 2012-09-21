@@ -25,18 +25,16 @@ abstract class TypedData implements TypedDataInterface {
 
   /**
    * Implements TypedDataInterface::__construct().
-   *
-   * @param array $definition
-   *
-   * @param mixed $value;
-   *
-   * @param array $context;
    */
-  public function __construct(array $definition, $value = NULL, array $context = array()) {
+  public function __construct(array $definition) {
     $this->definition = $definition;
-    if (isset($value)) {
-      $this->setValue($value);
-    }
+  }
+
+  /**
+   * Implements TypedDataInterface::setContext().
+   */
+  public function setContext(array $context) {
+    // No need to keep context by default.
   }
 
   /**

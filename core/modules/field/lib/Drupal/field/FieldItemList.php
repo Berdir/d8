@@ -23,10 +23,9 @@ class FieldItemList extends ItemList implements FieldItemListInterface {
   protected $fieldContext;
 
   /**
-   * Overrides ItemList::__construct().
+   * Implements TypedDataInterface::setContext().
    */
-  public function __construct(array $definition, $value = NULL, array $context = array()) {
-    parent::__construct($definition, $value, $context);
+  public function setContext(array $context) {
     if (isset($context['parent'])) {
       $this->setFieldContext($context['parent']->entityType(), $context['name'], $context['parent']->bundle());
     }

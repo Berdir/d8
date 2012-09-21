@@ -28,10 +28,9 @@ abstract class FieldItemBase extends ItemBase implements FieldItemInterface {
   protected $fieldContext;
 
   /**
-   * Overrides ItemBase::__construct().
+   * Implements TypedDataInterface::setContext().
    */
-  public function __construct(array $definition, $value = NULL, array $context = array()) {
-    parent::__construct($definition, $value, $context);
+  public function setContext(array $context) {
     if (isset($context['parent'])) {
       $this->fieldContext = $context['parent']->getFieldContext();
     }

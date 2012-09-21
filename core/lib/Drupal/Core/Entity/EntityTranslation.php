@@ -37,12 +37,13 @@ class EntityTranslation extends TypedData implements IteratorAggregate, ComplexD
   protected $langcode;
 
   /**
-   * Implements TypedDataInterface::__construct().
+   * Implements TypedDataInterface::setContext().
    */
-  public function __construct(array $definition, $value = NULL, array $context = array()) {
-    $this->definition = $definition;
-    $this->properties = (array) $value;
-    $this->langcode = $context['langcode'];
+  public function setContext(array $context) {
+    if (isset($context['langcode']) && isset($context['properties'])) {
+      $this->properties = $context['properties'];
+      $this->langcode = $context['langcode'];
+    }
   }
 
   /**

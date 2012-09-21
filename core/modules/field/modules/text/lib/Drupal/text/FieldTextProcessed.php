@@ -36,17 +36,19 @@ class FieldTextProcessed extends String {
   /**
    * Implements TypedDataInterface::__construct().
    */
-  public function __construct(array $definition, $value = NULL, array $context = array()) {
+  public function __construct(array $definition) {
     $this->definition = $definition;
 
-    if (!isset($context['parent'])) {
-      throw new InvalidArgumentException('Computed properties require context for computation.');
-    }
     if (!isset($definition['settings']['text source'])) {
       throw new InvalidArgumentException("The definition's 'source' key has to specify the name of the text property to be processed.");
     }
+  }
 
-    $this->text = $context['parent']->get($definition['settings']['text source']);
+  /**
+   * Implements TypedDataInterface::setContext().
+   */
+  public function setContext(array $context) {
+    $this->text = $context['parent']->get($this->definition['settings']['text source']);
     $this->format = $context['parent']->get('format');
   }
 
@@ -54,6 +56,11 @@ class FieldTextProcessed extends String {
    * Implements TypedDataInterface::getValue().
    */
   public function getValue($langcode = NULL) {
+
+    if (!isset($this->text)) {
+      throw new InvalidArgumentException('Computed properties require context for computation.');
+    }
+
     // @todo: Determine a way to get the field $instance here.
     // Either implement per-bundle property definition overrides or pass on
     // entity-context (entity type, bundle, property name). For now, we assume
