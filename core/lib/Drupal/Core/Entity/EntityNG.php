@@ -217,7 +217,7 @@ class EntityNG extends Entity implements StructureTranslatableInterface, Accessi
   public function getTranslation($langcode) {
     // If the default language is LANGUAGE_NOT_SPECIFIED, the entity is not
     // translatable, so we use LANGUAGE_DEFAULT.
-    if ($langcode == LANGUAGE_DEFAULT || $langcode == $this->language()->langcode || LANGUAGE_NOT_SPECIFIED == $this->langcode->value) {
+    if ($langcode == LANGUAGE_DEFAULT || in_array($this->language()->langcode, array(LANGUAGE_NOT_SPECIFIED, $langcode))) {
       // No translation needed, return the entity.
       return $this;
     }
