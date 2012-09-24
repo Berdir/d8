@@ -10,6 +10,9 @@ use Drupal\Core\TypedData\TranslatableComplexDataInterface;
 
 /**
  * Defines a common interface for all entity objects.
+ *
+ * When implementing this interface which extends Traversable, make sure to list
+ * IteratorAggregate or Iterator before this interface in the implements clause.
  */
 interface EntityInterface extends TranslatableComplexDataInterface {
 

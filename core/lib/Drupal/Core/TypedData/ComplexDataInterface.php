@@ -6,15 +6,18 @@
  */
 
 namespace Drupal\Core\TypedData;
-use IteratorAggregate;
+use Traversable;
 
 /**
  * Interface for complex data; i.e. data containing named and typed properties.
  *
  * This is implemented by entities as well as by property item classes of
- * the entity.module.
+ * entities.
+ *
+ * When implementing this interface which extends Traversable, make sure to list
+ * IteratorAggregate or Iterator before this interface in the implements clause.
  */
-interface ComplexDataInterface extends IteratorAggregate  {
+interface ComplexDataInterface extends Traversable  {
 
   /**
    * Gets a property.

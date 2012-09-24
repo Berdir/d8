@@ -10,6 +10,7 @@ use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\Core\TypedData\Type\TypedData;
 use Drupal\user\User;
 use ArrayIterator;
+use IteratorAggregate;
 use InvalidArgumentException;
 
 /**
@@ -21,9 +22,9 @@ use InvalidArgumentException;
  * contained item the entity property delegates __get() and __set() calls
  * directly to the first item.
  *
- * @see EntityPropertyListInterface.
+ * @see \Drupal\Core\Entity\Property\ItemListInterface
  */
-class ItemList extends TypedData implements ItemListInterface {
+class ItemList extends TypedData implements IteratorAggregate, ItemListInterface {
 
   /**
    * Numerically indexed array of property items, implementing the

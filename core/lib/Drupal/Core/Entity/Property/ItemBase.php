@@ -12,6 +12,7 @@ use Drupal\Core\TypedData\ComplexDataInterface;
 use Drupal\user;
 use InvalidArgumentException;
 use ArrayIterator;
+use IteratorAggregate;
 
 /**
  * An entity property item.
@@ -19,9 +20,9 @@ use ArrayIterator;
  * Entity property items making use of this base class have to implement
  * ComplexDataInterface::getPropertyDefinitions().
  *
- * @see EntityPropertyItemInterface
+ * @see \Drupal\Core\Entity\Property\ItemInterface
  */
-abstract class ItemBase extends TypedData implements ItemInterface {
+abstract class ItemBase extends TypedData implements IteratorAggregate, ItemInterface {
 
   /**
    * The array of properties.

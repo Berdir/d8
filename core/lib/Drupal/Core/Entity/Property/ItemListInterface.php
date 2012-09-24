@@ -13,11 +13,13 @@ use Drupal\Core\TypedData\AccessibleInterface;
 /**
  * Interface for entity properties, being lists of property items.
  *
- * Contained items must implement the ItemInterface. This
- * interface is required for every property of an entity.
+ * Contained items must implement the ItemInterface. This interface is required
+ * for every property of an entity. Some methods are delegated to the first
+ * contained item, in particular get() and set() as well as their magic
+ * equivalences.
  *
- * Some methods are delegated to the first contained EntityPropertyItem, in
- * particular get() and set() as well as their magic equivalences.
+ * When implementing this interface which extends Traversable, make sure to list
+ * IteratorAggregate or Iterator before this interface in the implements clause.
  *
  * @todo: Should getProperties(), setProperties() and getPropertyDefinitions()
  * be delegated as well.

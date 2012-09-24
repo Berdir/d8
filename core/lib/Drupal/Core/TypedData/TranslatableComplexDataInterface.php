@@ -9,6 +9,9 @@ namespace Drupal\Core\TypedData;
 
 /**
  * Interface for translatable complex data.
+ *
+ * When implementing this interface which extends Traversable, make sure to list
+ * IteratorAggregate or Iterator before this interface in the implements clause.
  */
 interface TranslatableComplexDataInterface extends ComplexDataInterface {
 

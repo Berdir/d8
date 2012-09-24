@@ -11,6 +11,7 @@ use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\Core\TypedData\ComplexDataInterface;
 use Drupal\Core\TypedData\AccessibleInterface;
 use ArrayIterator;
+use IteratorAggregate;
 use InvalidArgumentException;
 
 /**
@@ -18,7 +19,7 @@ use InvalidArgumentException;
  *
  * @todo: Needs an entity specific interface.
  */
-class EntityTranslation extends TypedData implements ComplexDataInterface, AccessibleInterface {
+class EntityTranslation extends TypedData implements IteratorAggregate, ComplexDataInterface, AccessibleInterface {
 
   /**
    * The array of translated properties, each being an instance of

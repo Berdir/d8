@@ -9,6 +9,7 @@ namespace Drupal\Core\Entity;
 
 use Drupal\Component\Uuid\Uuid;
 use Drupal\Core\Language\Language;
+use IteratorAggregate;
 
 /**
  * Defines a base entity class.
@@ -18,7 +19,7 @@ use Drupal\Core\Language\Language;
  * This class can be used as-is by simple entity types. Entity types requiring
  * special handling can extend the class.
  */
-class Entity implements EntityInterface {
+class Entity implements IteratorAggregate, EntityInterface {
 
   /**
    * The language code of the entity's default language.

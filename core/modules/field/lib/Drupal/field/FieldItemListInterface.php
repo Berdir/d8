@@ -10,6 +10,9 @@ use Drupal\Core\Entity\Property\ItemListInterface;
 
 /**
  * Interface for entity properties that are fields, being lists of field items.
+ *
+ * When implementing this interface which extends Traversable, make sure to list
+ * IteratorAggregate or Iterator before this interface in the implements clause.
  */
 interface FieldItemListInterface extends ItemListInterface {
 

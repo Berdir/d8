@@ -10,6 +10,7 @@ use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\Core\TypedData\ComplexDataInterface;
 use Drupal\Core\Entity\EntityInterface;
 use ArrayIterator;
+use IteratorAggregate;
 use InvalidArgumentException;
 
 /**
@@ -31,7 +32,7 @@ use InvalidArgumentException;
  *  - id source: If used as computed property, the ID property used to load
  *    the entity object.
  */
-class EntityWrapper extends TypedData implements ComplexDataInterface {
+class EntityWrapper extends TypedData implements IteratorAggregate, ComplexDataInterface {
 
   /**
    * The referenced entity type.

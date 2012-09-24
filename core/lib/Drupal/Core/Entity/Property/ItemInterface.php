@@ -10,11 +10,14 @@ use Drupal\Core\TypedData\ComplexDataInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
 
 /**
- * Interface for entity property items, which are data structures holding
- * the values.
+ * Interface for entity property items, which are complex data objects
+ * containing the values.
  *
- * @see EntityPropertyList
- * @see ItemBase
+ * When implementing this interface which extends Traversable, make sure to list
+ * IteratorAggregate or Iterator before this interface in the implements clause.
+ *
+ * @see \Drupal\Core\Entity\Property\ItemListInterface
+ * @see \Drupal\Core\Entity\Property\ItemBase
  */
 interface ItemInterface extends ComplexDataInterface, TypedDataInterface {
 

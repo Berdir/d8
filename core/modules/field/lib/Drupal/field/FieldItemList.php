@@ -11,7 +11,7 @@ use Drupal\Core\Entity\Property\ItemList;
 use InvalidArgumentException;
 
 /**
- * Interface for entity properties that are fields, being lists of field items.
+ * A list of field items.
  */
 class FieldItemList extends ItemList implements FieldItemListInterface {
 
