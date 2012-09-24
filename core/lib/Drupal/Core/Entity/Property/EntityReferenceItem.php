@@ -27,7 +27,7 @@ class EntityReferenceItem extends ItemBase {
   static $propertyDefinitions;
 
   /**
-   * Implements StructureInterface::getPropertyDefinitions().
+   * Implements ComplexDataInterface::getPropertyDefinitions().
    */
   public function getPropertyDefinitions() {
     // Definitions vary by entity type, so key them by entity type.

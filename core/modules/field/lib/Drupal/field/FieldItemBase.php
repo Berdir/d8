@@ -14,7 +14,7 @@ use InvalidArgumentException;
  * A field item.
  *
  * Field items making use of this base class have to implement
- * StructureInterface::getPropertyDefinitions().
+ * ComplexDataInterface::getPropertyDefinitions().
  *
  * @see \Drupal\Core\Entity\Property\ItemBase
  */

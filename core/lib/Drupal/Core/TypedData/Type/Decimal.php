@@ -6,7 +6,7 @@
  */
 
 namespace Drupal\Core\TypedData\Type;
-use Drupal\Core\TypedData\WrapperInterface;
+use Drupal\Core\TypedData\TypedDataInterface;
 
 /**
  * The decimal data type.
@@ -14,7 +14,7 @@ use Drupal\Core\TypedData\WrapperInterface;
  * The plain value of a decimal is a regular PHP float. For setting the value
  * any PHP variable that casts to a float may be passed.
  */
-class Decimal extends WrapperBase implements WrapperInterface {
+class Decimal extends TypedData implements TypedDataInterface {
 
   /**
    * The data value.
@@ -24,14 +24,14 @@ class Decimal extends WrapperBase implements WrapperInterface {
   protected $value;
 
   /**
-   * Implements WrapperInterface::setValue().
+   * Implements TypedDataInterface::setValue().
    */
   public function setValue($value) {
     $this->value = isset($value) ? (float) $value : $value;
   }
 
   /**
-   * Implements WrapperInterface::validate().
+   * Implements TypedDataInterface::validate().
    */
   public function validate() {
     // TODO: Implement validate() method.

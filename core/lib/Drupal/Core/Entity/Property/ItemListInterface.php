@@ -7,7 +7,7 @@
 
 namespace Drupal\Core\Entity\Property;
 use Drupal\Core\TypedData\ListInterface;
-use Drupal\Core\TypedData\WrapperInterface;
+use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\Core\TypedData\AccessibleInterface;
 
 /**
@@ -22,7 +22,7 @@ use Drupal\Core\TypedData\AccessibleInterface;
  * @todo: Should getProperties(), setProperties() and getPropertyDefinitions()
  * be delegated as well.
  */
-interface ItemListInterface extends ListInterface, WrapperInterface, AccessibleInterface {
+interface ItemListInterface extends ListInterface, TypedDataInterface, AccessibleInterface {
 
   /**
    * Delegates to the first item.

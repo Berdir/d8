@@ -7116,10 +7116,10 @@ function drupal_get_data_type_info() {
  *   following keys are supported:
  *   - name: The name of the data being wrapped.
  *   - parent: The parent object containing the data. Must be an instance of
- *     Drupal\Core\TypedData\StructureInterface or
+ *     Drupal\Core\TypedData\ComplexDataInterface or
  *     Drupal\Core\TypedData\ListInterface.
  *
- * @return Drupal\Core\TypedData\WrapperInterface
+ * @return Drupal\Core\TypedData\TypedDataInterface
  *
  * @see drupal_get_data_type_info()
  * @see Drupal\Core\TypedData\Type\Integer

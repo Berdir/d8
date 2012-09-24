@@ -2,32 +2,32 @@
 
 /**
  * @file
- * Definition of Drupal\Core\TypedData\WrapperInterface.
+ * Definition of Drupal\Core\TypedData\TypedDataInterface.
  */
 
 namespace Drupal\Core\TypedData;
 use Drupal\user;
 
 /**
- * Interface for typed data wrappers.
+ * Interface for typed data objects.
  */
-interface WrapperInterface {
+interface TypedDataInterface {
 
   /**
-   * Creates a wrapper object given its definition and value.
+   * Creates a typed data object given its definition and value.
    *
    * @param array $definition
    *   The data definition.
    * @param mixed $value
    *   (optional) The data value, or NULL if the it is not set. See
-   *   WrapperInterface::setValue() for details.
+   *   TypedDataInterface::setValue() for details.
    * @param array $context
    *   (optional) An array describing the context of the data. It should be
    *   passed if a data value is wrapped as part of a data structure. The
    *   following keys are supported:
    *   - name: The name of the data being wrapped.
    *   - parent: The parent object containing the data. Must be an instance of
-   *     \Drupal\Core\TypedData\StructureInterface.
+   *     \Drupal\Core\TypedData\ComplexDataInterface.
    *
    * @see drupal_wrap_data()
    */

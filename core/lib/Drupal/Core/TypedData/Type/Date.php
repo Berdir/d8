@@ -6,7 +6,7 @@
  */
 
 namespace Drupal\Core\TypedData\Type;
-use Drupal\Core\TypedData\WrapperInterface;
+use Drupal\Core\TypedData\TypedDataInterface;
 use DateTime;
 use InvalidArgumentException;
 
@@ -17,7 +17,7 @@ use InvalidArgumentException;
  * the value an instance of the DateTime class, any string supported by
  * DateTime::__construct(), or a timestamp as integer may be passed.
  */
-class Date extends WrapperBase implements WrapperInterface {
+class Date extends TypedData implements TypedDataInterface {
 
   /**
    * The data value.
@@ -27,14 +27,14 @@ class Date extends WrapperBase implements WrapperInterface {
   protected $value;
 
   /**
-   * Implements WrapperInterface::getValue().
+   * Implements TypedDataInterface::getValue().
    */
   public function getValue() {
     return $this->value;
   }
 
   /**
-   * Implements WrapperInterface::setValue().
+   * Implements TypedDataInterface::setValue().
    */
   public function setValue($value) {
     if ($value instanceof DateTime || !isset($value)) {
@@ -53,14 +53,14 @@ class Date extends WrapperBase implements WrapperInterface {
   }
 
   /**
-   * Implements WrapperInterface::getString().
+   * Implements TypedDataInterface::getString().
    */
   public function getString() {
     return (string) $this->getValue()->format(DateTime::ISO8601);
   }
 
   /**
-   * Implements WrapperInterface::validate().
+   * Implements TypedDataInterface::validate().
    */
   public function validate() {
     // TODO: Implement validate() method.

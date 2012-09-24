@@ -155,7 +155,7 @@ class Entity implements EntityInterface {
   }
 
   /**
-   * Implements StructureInterface::set().
+   * Implements ComplexDataInterface::set().
    */
   public function set($property_name, $value) {
     // @todo: Replace by EntityNG implementation once all entity types have been
@@ -164,7 +164,7 @@ class Entity implements EntityInterface {
   }
 
   /**
-   * Implements StructureTranslatableInterface::getProperties().
+   * Implements TranslatableComplexDataInterface::getProperties().
    */
   public function getProperties($include_computed = FALSE) {
     // @todo: Replace by EntityNG implementation once all entity types have been
@@ -172,7 +172,7 @@ class Entity implements EntityInterface {
   }
 
   /**
-   * Implements StructureTranslatableInterface::setProperties().
+   * Implements TranslatableComplexDataInterface::setProperties().
    */
   public function setProperties($properties) {
     // @todo: Replace by EntityNG implementation once all entity types have been
@@ -180,7 +180,7 @@ class Entity implements EntityInterface {
   }
 
   /**
-   * Implements StructureTranslatableInterface::getPropertyDefinition().
+   * Implements TranslatableComplexDataInterface::getPropertyDefinition().
    */
   public function getPropertyDefinition($name) {
     // @todo: Replace by EntityNG implementation once all entity types have been
@@ -188,7 +188,7 @@ class Entity implements EntityInterface {
   }
 
   /**
-   * Implements StructureTranslatableInterface::getPropertyDefinitions().
+   * Implements TranslatableComplexDataInterface::getPropertyDefinitions().
    */
   public function getPropertyDefinitions() {
     // @todo: Replace by EntityNG implementation once all entity types have been
@@ -196,7 +196,7 @@ class Entity implements EntityInterface {
   }
 
   /**
-   * Implements StructureTranslatableInterface::toArray().
+   * Implements TranslatableComplexDataInterface::toArray().
    */
   public function toArray() {
     // @todo: Replace by EntityNG implementation once all entity types have been
@@ -204,7 +204,7 @@ class Entity implements EntityInterface {
   }
 
   /**
-   * Implements StructureTranslatableInterface::isEmpty().
+   * Implements TranslatableComplexDataInterface::isEmpty().
    */
   public function isEmpty() {
     // @todo: Replace by EntityNG implementation once all entity types have been
@@ -212,7 +212,7 @@ class Entity implements EntityInterface {
   }
 
   /**
-   * Implements StructureTranslatableInterface::getIterator().
+   * Implements TranslatableComplexDataInterface::getIterator().
    */
   public function getIterator() {
     // @todo: Replace by EntityNG implementation once all entity types have been
@@ -220,7 +220,7 @@ class Entity implements EntityInterface {
   }
 
   /**
-   * Implements StructureTranslatableInterface::language().
+   * Implements TranslatableComplexDataInterface::language().
    */
   public function language() {
     // @todo: Replace by EntityNG implementation once all entity types have been
@@ -229,7 +229,7 @@ class Entity implements EntityInterface {
   }
 
   /**
-   * Implements StructureTranslatableInterface::getTranslation().
+   * Implements TranslatableComplexDataInterface::getTranslation().
    */
   public function getTranslation($langcode) {
     // @todo: Replace by EntityNG implementation once all entity types have been
@@ -241,7 +241,7 @@ class Entity implements EntityInterface {
    *
    * @todo: Remove once all entity types implement the entity property API. This
    * is deprecated by
-   * StructureTranslatableInterface::getTranslationLanguages().
+   * TranslatableComplexDataInterface::getTranslationLanguages().
    */
   public function translations() {
     $languages = array();
@@ -265,7 +265,7 @@ class Entity implements EntityInterface {
   }
 
   /**
-   * Implements StructureTranslatableInterface::getTranslationLanguages().
+   * Implements TranslatableComplexDataInterface::getTranslationLanguages().
    */
   public function getTranslationLanguages($include_default = TRUE) {
     // @todo: Replace by EntityNG implementation once all entity types have been

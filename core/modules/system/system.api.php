@@ -155,10 +155,10 @@ function hook_cron() {
  * Defined data types may map to one of the pre-defined primitive types in
  * \Drupal\Core\TypedData\Primitive or may be data structures, containing one or
  * more data properties. Wrapper classes of data structures have to implement
- * the \Drupal\Core\TypedData\StructureInterface. Further interfaces
+ * the \Drupal\Core\TypedData\ComplexDataInterface. Further interfaces
  * that may be implemented are:
  *  - \Drupal\Core\TypedData\AccessibleInterface
- *  - \Drupal\Core\TypedData\StructureTranslatableInterface
+ *  - \Drupal\Core\TypedData\TranslatableComplexDataInterface
  *
  * Furthermore, lists of data items are represented with wrappers implementing
  * the \Drupal\Core\TypedData\ListInterface, for which the class may be
@@ -169,7 +169,7 @@ function hook_cron() {
  *   again an associative array. Supported keys are:
  *   - label: The human readable label of the data type.
  *   - class: The associated typed data wrapper class. Must implement the
- *     \Drupal\Core\TypedData\WrapperInterface.
+ *     \Drupal\Core\TypedData\TypedDataInterface.
  *   - list class: (optional) A typed data wrapper class used to wrap multiple
  *     data items of the type. Must implement the
  *     \Drupal\Core\TypedData\ListInterface.

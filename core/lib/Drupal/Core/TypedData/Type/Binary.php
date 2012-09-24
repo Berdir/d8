@@ -6,7 +6,7 @@
  */
 
 namespace Drupal\Core\TypedData\Type;
-use Drupal\Core\TypedData\WrapperInterface;
+use Drupal\Core\TypedData\TypedDataInterface;
 use InvalidArgumentException;
 
 /**
@@ -16,7 +16,7 @@ use InvalidArgumentException;
  * http://php.net/manual/en/language.types.resource.php. For setting the value
  * a PHP resource or a (absolute) stream resource URI may be passed.
  */
-class Binary extends WrapperBase implements WrapperInterface {
+class Binary extends TypedData implements TypedDataInterface {
 
   /**
    * The resource URI.
@@ -33,7 +33,7 @@ class Binary extends WrapperBase implements WrapperInterface {
   public $handle = NULL;
 
   /**
-   * Implements WrapperInterface::getValue().
+   * Implements TypedDataInterface::getValue().
    */
   public function getValue() {
     if (!isset($this->handle) && isset($this->uri)) {
@@ -43,7 +43,7 @@ class Binary extends WrapperBase implements WrapperInterface {
   }
 
   /**
-   * Implements WrapperInterface::setValue().
+   * Implements TypedDataInterface::setValue().
    */
   public function setValue($value) {
     if (!isset($value)) {
@@ -62,7 +62,7 @@ class Binary extends WrapperBase implements WrapperInterface {
   }
 
   /**
-   * Implements WrapperInterface::getString().
+   * Implements TypedDataInterface::getString().
    */
   public function getString() {
     $contents = '';
@@ -73,7 +73,7 @@ class Binary extends WrapperBase implements WrapperInterface {
   }
 
   /**
-   * Implements WrapperInterface::validate().
+   * Implements TypedDataInterface::validate().
    */
   public function validate() {
     // TODO: Implement validate() method.

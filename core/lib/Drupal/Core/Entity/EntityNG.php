@@ -7,8 +7,8 @@
 
 namespace Drupal\Core\Entity;
 
-use Drupal\Core\TypedData\WrapperInterface;
-use Drupal\Core\TypedData\StructureTranslatableInterface;
+use Drupal\Core\TypedData\TypedDataInterface;
+use Drupal\Core\TypedData\TranslatableComplexDataInterface;
 use Drupal\Core\TypedData\AccessibleInterface;
 use Drupal\Component\Uuid\Uuid;
 use ArrayIterator;
@@ -20,7 +20,7 @@ use InvalidArgumentException;
  * @todo: Once all entity types have been converted, merge improvements into the
  * Entity class and overhaul the EntityInterface.
  */
-class EntityNG extends Entity implements StructureTranslatableInterface, AccessibleInterface {
+class EntityNG extends Entity implements TranslatableComplexDataInterface, AccessibleInterface {
 
   /**
    * The plain data values of the contained properties.
@@ -74,7 +74,7 @@ class EntityNG extends Entity implements StructureTranslatableInterface, Accessi
   }
 
   /**
-   * Implements StructureInterface::get().
+   * Implements ComplexDataInterface::get().
    */
   public function get($property_name) {
     // Values in default language are always stored using the LANGUAGE_DEFAULT
@@ -112,14 +112,14 @@ class EntityNG extends Entity implements StructureTranslatableInterface, Accessi
   }
 
   /**
-   * Implements StructureInterface::set().
+   * Implements ComplexDataInterface::set().
    */
   public function set($property_name, $value) {
     $this->get($property_name)->setValue($value);
   }
 
   /**
-   * Implements StructureInterface::getProperties().
+   * Implements ComplexDataInterface::getProperties().
    */
   public function getProperties($include_computed = FALSE) {
     $properties = array();
@@ -132,12 +132,12 @@ class EntityNG extends Entity implements StructureTranslatableInterface, Accessi
   }
 
   /**
-   * Implements StructureInterface::setProperties().
+   * Implements ComplexDataInterface::setProperties().
    */
   public function setProperties($properties) {
     foreach ($properties as $name => $property) {
       // Copy the value to our property object.
-      $value = $property instanceof WrapperInterface ? $property->getValue() : $property;
+      $value = $property instanceof TypedDataInterface ? $property->getValue() : $property;
       $this->get($name)->setValue($value);
     }
   }
@@ -150,7 +150,7 @@ class EntityNG extends Entity implements StructureTranslatableInterface, Accessi
   }
 
   /**
-   * Implements StructureInterface::getPropertyDefinition().
+   * Implements ComplexDataInterface::getPropertyDefinition().
    */
   public function getPropertyDefinition($name) {
     // First try getting property definitions which apply to all entities of
@@ -169,7 +169,7 @@ class EntityNG extends Entity implements StructureTranslatableInterface, Accessi
   }
 
   /**
-   * Implements StructureInterface::getPropertyDefinitions().
+   * Implements ComplexDataInterface::getPropertyDefinitions().
    */
   public function getPropertyDefinitions() {
     return entity_get_controller($this->entityType)->getPropertyDefinitions(array(
@@ -179,7 +179,7 @@ class EntityNG extends Entity implements StructureTranslatableInterface, Accessi
   }
 
   /**
-   * Implements StructureInterface::toArray().
+   * Implements ComplexDataInterface::toArray().
    */
   public function toArray() {
     $values = array();
@@ -190,7 +190,7 @@ class EntityNG extends Entity implements StructureTranslatableInterface, Accessi
   }
 
   /**
-   * Implements StructureInterface::isEmpty().
+   * Implements ComplexDataInterface::isEmpty().
    */
   public function isEmpty() {
     if (!$this->isNew()) {
@@ -205,14 +205,14 @@ class EntityNG extends Entity implements StructureTranslatableInterface, Accessi
   }
 
   /**
-   * Implements StructureTranslatableInterface::language().
+   * Implements TranslatableComplexDataInterface::language().
    */
   public function language() {
     return $this->get('langcode')->language;
   }
 
   /**
-   * Implements StructureTranslatableInterface::getTranslation().
+   * Implements TranslatableComplexDataInterface::getTranslation().
    */
   public function getTranslation($langcode) {
     // If the default language is LANGUAGE_NOT_SPECIFIED, the entity is not
@@ -242,7 +242,7 @@ class EntityNG extends Entity implements StructureTranslatableInterface, Accessi
   }
 
   /**
-   * Implements StructureTranslatableInterface::getTranslationLanguages().
+   * Implements TranslatableComplexDataInterface::getTranslationLanguages().
    */
   public function getTranslationLanguages($include_default = TRUE) {
     $translations = array();

@@ -6,7 +6,7 @@
  */
 
 namespace Drupal\Core\TypedData\Type;
-use Drupal\Core\TypedData\WrapperInterface;
+use Drupal\Core\TypedData\TypedDataInterface;
 
 /**
  * The string data type.
@@ -14,7 +14,7 @@ use Drupal\Core\TypedData\WrapperInterface;
  * The plain value of a string is a regular PHP string. For setting the value
  * any PHP variable that casts to a string may be passed.
  */
-class String extends WrapperBase implements WrapperInterface {
+class String extends TypedData implements TypedDataInterface {
 
   /**
    * The data value.
@@ -24,14 +24,14 @@ class String extends WrapperBase implements WrapperInterface {
   protected $value;
 
   /**
-   * Implements WrapperInterface::setValue().
+   * Implements TypedDataInterface::setValue().
    */
   public function setValue($value) {
     $this->value = isset($value) ? (string) $value : $value;
   }
 
   /**
-   * Implements WrapperInterface::validate().
+   * Implements TypedDataInterface::validate().
    */
   public function validate() {
     // TODO: Implement validate() method.

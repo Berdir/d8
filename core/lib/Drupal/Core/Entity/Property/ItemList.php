@@ -6,8 +6,8 @@
  */
 
 namespace Drupal\Core\Entity\Property;
-use Drupal\Core\TypedData\WrapperInterface;
-use Drupal\Core\TypedData\Type\WrapperBase;
+use Drupal\Core\TypedData\TypedDataInterface;
+use Drupal\Core\TypedData\Type\TypedData;
 use Drupal\user\User;
 use ArrayIterator;
 use InvalidArgumentException;
@@ -23,7 +23,7 @@ use InvalidArgumentException;
  *
  * @see EntityPropertyListInterface.
  */
-class ItemList extends WrapperBase implements ItemListInterface {
+class ItemList extends TypedData implements ItemListInterface {
 
   /**
    * Numerically indexed array of property items, implementing the
@@ -34,7 +34,7 @@ class ItemList extends WrapperBase implements ItemListInterface {
   protected $list = array();
 
   /**
-   * Implements WrapperInterface::getValue().
+   * Implements TypedDataInterface::getValue().
    */
   public function getValue() {
     $values = array();
@@ -45,7 +45,7 @@ class ItemList extends WrapperBase implements ItemListInterface {
   }
 
   /**
-   * Implements WrapperInterface::setValue().
+   * Implements TypedDataInterface::setValue().
    *
    * @param array $values
    *   An array of values of the property items.
@@ -54,7 +54,7 @@ class ItemList extends WrapperBase implements ItemListInterface {
     if (!empty($values)) {
 
       // Support passing in property objects as value.
-      if ($values instanceof WrapperInterface) {
+      if ($values instanceof TypedDataInterface) {
         $values = $values->getValue();
       }
       // Support passing in only the value of the first item.
@@ -102,7 +102,7 @@ class ItemList extends WrapperBase implements ItemListInterface {
   }
 
   /**
-   * Implements WrapperInterface::validate().
+   * Implements TypedDataInterface::validate().
    */
   public function validate() {
     // @todo implement
@@ -140,7 +140,7 @@ class ItemList extends WrapperBase implements ItemListInterface {
   /**
    * Helper for creating a list item object.
    *
-   * @return \Drupal\Core\TypedData\WrapperInterface
+   * @return \Drupal\Core\TypedData\TypedDataInterface
    */
   protected function createItem($value = NULL) {
     $context = array('parent' => $this);

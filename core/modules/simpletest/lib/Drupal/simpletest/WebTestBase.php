@@ -2009,7 +2009,7 @@ abstract class WebTestBase extends TestBase {
     // Construct the wrapper.
     $wrapper = drupal_wrap_data($definition, $value, $context);
     // Assert the definition of the wrapper.
-    $this->assertTrue($wrapper instanceof \Drupal\Core\TypedData\WrapperInterface, 'Wrapper is an instance of the wrapper interface.');
+    $this->assertTrue($wrapper instanceof \Drupal\Core\TypedData\TypedDataInterface, 'Wrapper is an instance of the wrapper interface.');
     $definition = $wrapper->getDefinition();
     $this->assertTrue(!empty($definition['label']), $definition['label'] . ' wrapper definition was returned.');
     // Assert that the correct type was constructed.

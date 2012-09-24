@@ -5,9 +5,9 @@
  */
 
 namespace Drupal\Core\Entity\Property;
-use Drupal\Core\TypedData\Type\WrapperBase;
-use Drupal\Core\TypedData\WrapperInterface;
-use Drupal\Core\TypedData\StructureInterface;
+use Drupal\Core\TypedData\Type\TypedData;
+use Drupal\Core\TypedData\TypedDataInterface;
+use Drupal\Core\TypedData\ComplexDataInterface;
 use Drupal\Core\Entity\EntityInterface;
 use ArrayIterator;
 use InvalidArgumentException;
@@ -15,7 +15,7 @@ use InvalidArgumentException;
 /**
  * Defines the 'entity' data type, e.g. the computed 'entity' property of entity references.
  *
- * This wrapper implements the StructureInterface, whereby most of its
+ * This wrapper implements the ComplexDataInterface, whereby most of its
  * methods are just forwarded to the wrapped entity (if set).
  *
  * The plain value of this wrapper is the entity object, i.e. an instance of
@@ -31,7 +31,7 @@ use InvalidArgumentException;
  *  - id source: If used as computed property, the ID property used to load
  *    the entity object.
  */
-class EntityWrapper extends WrapperBase implements StructureInterface {
+class EntityWrapper extends TypedData implements ComplexDataInterface {
 
   /**
    * The referenced entity type.
@@ -43,12 +43,12 @@ class EntityWrapper extends WrapperBase implements StructureInterface {
   /**
    * The data wrapper holding the entity ID.
    *
-   * @var \Drupal\Core\TypedData\WrapperInterface
+   * @var \Drupal\Core\TypedData\TypedDataInterface
    */
   protected $id;
 
   /**
-   * Implements WrapperInterface::__construct().
+   * Implements TypedDataInterface::__construct().
    */
   public function __construct(array $definition, $value = NULL, array $context = array()) {
     $this->definition = $definition + array('constraints' => array());
@@ -70,7 +70,7 @@ class EntityWrapper extends WrapperBase implements StructureInterface {
   }
 
   /**
-   * Implements WrapperInterface::getValue().
+   * Implements TypedDataInterface::getValue().
    */
   public function getValue() {
     $id = $this->id->getValue();
@@ -78,7 +78,7 @@ class EntityWrapper extends WrapperBase implements StructureInterface {
   }
 
   /**
-   * Implements WrapperInterface::setValue().
+   * Implements TypedDataInterface::setValue().
    *
    * Both the entity ID and the entity object may be passed as value.
    */
@@ -99,7 +99,7 @@ class EntityWrapper extends WrapperBase implements StructureInterface {
   }
 
   /**
-   * Implements WrapperInterface::getString().
+   * Implements TypedDataInterface::getString().
    */
   public function getString() {
     $entity = $this->getValue();
@@ -107,7 +107,7 @@ class EntityWrapper extends WrapperBase implements StructureInterface {
   }
 
   /**
-   * Implements WrapperInterface::validate().
+   * Implements TypedDataInterface::validate().
    */
   public function validate($value = NULL) {
     // TODO: Implement validate() method.
@@ -122,7 +122,7 @@ class EntityWrapper extends WrapperBase implements StructureInterface {
   }
 
   /**
-   * Implements StructureInterface::get().
+   * Implements ComplexDataInterface::get().
    */
   public function get($property_name) {
     $entity = $this->getValue();
@@ -131,14 +131,14 @@ class EntityWrapper extends WrapperBase implements StructureInterface {
   }
 
   /**
-   * Implements StructureInterface::set().
+   * Implements ComplexDataInterface::set().
    */
   public function set($property_name, $value) {
     $this->get($property_name)->setValue($value);
   }
 
   /**
-   * Implements StructureInterface::getProperties().
+   * Implements ComplexDataInterface::getProperties().
    */
   public function getProperties($include_computed = FALSE) {
     $entity = $this->getValue();
@@ -146,7 +146,7 @@ class EntityWrapper extends WrapperBase implements StructureInterface {
   }
 
   /**
-   * Implements StructureInterface::setProperties().
+   * Implements ComplexDataInterface::setProperties().
    */
   public function setProperties($properties) {
     if ($entity = $this->getValue()) {
@@ -155,7 +155,7 @@ class EntityWrapper extends WrapperBase implements StructureInterface {
   }
 
   /**
-   * Implements StructureInterface::getPropertyDefinition().
+   * Implements ComplexDataInterface::getPropertyDefinition().
    */
   public function getPropertyDefinition($name) {
     $definitions = $this->getPropertyDefinitions();
@@ -163,7 +163,7 @@ class EntityWrapper extends WrapperBase implements StructureInterface {
   }
 
   /**
-   * Implements StructureInterface::getPropertyDefinitions().
+   * Implements ComplexDataInterface::getPropertyDefinitions().
    */
   public function getPropertyDefinitions() {
     // @todo: Support getting definitions if multiple bundles are specified.
@@ -171,7 +171,7 @@ class EntityWrapper extends WrapperBase implements StructureInterface {
   }
 
   /**
-   * Implements StructureInterface::toArray().
+   * Implements ComplexDataInterface::toArray().
    */
   public function toArray() {
     $entity = $this->getValue();
@@ -179,7 +179,7 @@ class EntityWrapper extends WrapperBase implements StructureInterface {
   }
 
   /**
-   * Implements StructureInterface::isEmpty().
+   * Implements ComplexDataInterface::isEmpty().
    */
   public function isEmpty() {
     return (bool) $this->getValue();

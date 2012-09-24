@@ -6,12 +6,12 @@
  */
 
 namespace Drupal\Core\Entity;
-use Drupal\Core\TypedData\StructureTranslatableInterface;
+use Drupal\Core\TypedData\TranslatableComplexDataInterface;
 
 /**
  * Defines a common interface for all entity objects.
  */
-interface EntityInterface extends StructureTranslatableInterface {
+interface EntityInterface extends TranslatableComplexDataInterface {
 
   /**
    * Constructs a new entity object.

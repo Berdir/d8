@@ -6,9 +6,9 @@
  */
 
 namespace Drupal\Core\Entity\Property;
-use Drupal\Core\TypedData\Type\WrapperBase;
-use Drupal\Core\TypedData\WrapperInterface;
-use Drupal\Core\TypedData\StructureInterface;
+use Drupal\Core\TypedData\Type\TypedData;
+use Drupal\Core\TypedData\TypedDataInterface;
+use Drupal\Core\TypedData\ComplexDataInterface;
 use Drupal\user;
 use InvalidArgumentException;
 use ArrayIterator;
@@ -17,11 +17,11 @@ use ArrayIterator;
  * An entity property item.
  *
  * Entity property items making use of this base class have to implement
- * StructureInterface::getPropertyDefinitions().
+ * ComplexDataInterface::getPropertyDefinitions().
  *
  * @see EntityPropertyItemInterface
  */
-abstract class ItemBase extends WrapperBase implements ItemInterface {
+abstract class ItemBase extends TypedData implements ItemInterface {
 
   /**
    * The array of properties.
@@ -30,12 +30,12 @@ abstract class ItemBase extends WrapperBase implements ItemInterface {
    * replaced by others, so computed properties can safely store references on
    * other properties.
    *
-   * @var array<WrapperInterface>
+   * @var array<TypedDataInterface>
    */
   protected $properties = array();
 
   /**
-   * Implements WrapperInterface::__construct().
+   * Implements TypedDataInterface::__construct().
    */
   public function __construct(array $definition, $value = NULL, array $context = array()) {
     $this->definition = $definition;
@@ -65,7 +65,7 @@ abstract class ItemBase extends WrapperBase implements ItemInterface {
   }
 
   /**
-   * Implements WrapperInterface::getValue().
+   * Implements TypedDataInterface::getValue().
    */
   public function getValue() {
     $values = array();
@@ -76,7 +76,7 @@ abstract class ItemBase extends WrapperBase implements ItemInterface {
   }
 
   /**
-   * Implements WrapperInterface::setValue().
+   * Implements TypedDataInterface::setValue().
    *
    * @param array $values
    *   An array of property values.
@@ -89,7 +89,7 @@ abstract class ItemBase extends WrapperBase implements ItemInterface {
       $values = array($keys[0] => $values);
     }
     // Support passing in property objects as value.
-    elseif ($values instanceof WrapperInterface) {
+    elseif ($values instanceof TypedDataInterface) {
       $values = $values->getValue();
     }
 
@@ -101,7 +101,7 @@ abstract class ItemBase extends WrapperBase implements ItemInterface {
   }
 
   /**
-   * Implements WrapperInterface::getString().
+   * Implements TypedDataInterface::getString().
    */
   public function getString() {
     $strings = array();
@@ -112,14 +112,14 @@ abstract class ItemBase extends WrapperBase implements ItemInterface {
   }
 
   /**
-   * Implements WrapperInterface::validate().
+   * Implements TypedDataInterface::validate().
    */
   public function validate() {
     // @todo implement
   }
 
   /**
-   * Implements StructureInterface::get().
+   * Implements ComplexDataInterface::get().
    */
   public function get($property_name) {
     if (!isset($this->properties[$property_name])) {
@@ -129,7 +129,7 @@ abstract class ItemBase extends WrapperBase implements ItemInterface {
   }
 
   /**
-   * Implements StructureInterface::set().
+   * Implements ComplexDataInterface::set().
    */
   public function set($property_name, $value) {
     $this->get($property_name)->setValue($value);
@@ -166,7 +166,7 @@ abstract class ItemBase extends WrapperBase implements ItemInterface {
   }
 
   /**
-   * Implements StructureInterface::getProperties().
+   * Implements ComplexDataInterface::getProperties().
    */
   public function getProperties($include_computed = FALSE) {
     $properties = array();
@@ -179,13 +179,13 @@ abstract class ItemBase extends WrapperBase implements ItemInterface {
   }
 
   /**
-   * Implements StructureInterface::setProperties().
+   * Implements ComplexDataInterface::setProperties().
    */
   public function setProperties($properties) {
     foreach ($properties as $name => $property) {
       if (isset($this->properties[$name])) {
         // Copy the value to our property object.
-        $value = $property instanceof WrapperInterface ? $property->getValue() : $property;
+        $value = $property instanceof TypedDataInterface ? $property->getValue() : $property;
         $this->properties[$name]->setValue($value);
       }
       else {
@@ -202,7 +202,7 @@ abstract class ItemBase extends WrapperBase implements ItemInterface {
   }
 
   /**
-   * Implements StructureInterface::getPropertyDefinition().
+   * Implements ComplexDataInterface::getPropertyDefinition().
    */
   public function getPropertyDefinition($name) {
     $definitions = $this->getPropertyDefinitions();
@@ -210,14 +210,14 @@ abstract class ItemBase extends WrapperBase implements ItemInterface {
   }
 
   /**
-   * Implements StructureInterface::toArray().
+   * Implements ComplexDataInterface::toArray().
    */
   public function toArray() {
     return $this->getValue();
   }
 
   /**
-   * Implements StructureInterface::isEmpty().
+   * Implements ComplexDataInterface::isEmpty().
    */
   public function isEmpty() {
     foreach ($this->getProperties() as $property) {

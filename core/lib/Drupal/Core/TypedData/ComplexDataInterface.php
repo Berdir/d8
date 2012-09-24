@@ -2,19 +2,19 @@
 
 /**
  * @file
- * Definition of Drupal\Core\TypedData\StructureInterface.
+ * Definition of Drupal\Core\TypedData\ComplexDataInterface.
  */
 
 namespace Drupal\Core\TypedData;
 use IteratorAggregate;
 
 /**
- * Interface for data structures that contain properties.
+ * Interface for complex data; i.e. data containing named and typed properties.
  *
- * This is implemented by entities as well as by EntityPropertyItem classes of
+ * This is implemented by entities as well as by property item classes of
  * the entity.module.
  */
-interface StructureInterface extends IteratorAggregate  {
+interface ComplexDataInterface extends IteratorAggregate  {
 
   /**
    * Gets a property.
@@ -25,7 +25,7 @@ interface StructureInterface extends IteratorAggregate  {
    * @throws \InvalidArgumentException
    *   If an invalid property name is given.
    *
-   * @return \Drupal\Core\TypedData\WrapperInterface
+   * @return \Drupal\Core\TypedData\TypedDataInterface
    *   The property object.
    */
   public function get($property_name);
@@ -41,7 +41,7 @@ interface StructureInterface extends IteratorAggregate  {
    * @throws \InvalidArgumentException
    *   If an invalid property name is given.
    *
-   * @return \Drupal\Core\TypedData\WrapperInterface
+   * @return \Drupal\Core\TypedData\TypedDataInterface
    *   The property object.
    */
   public function set($property_name, $value);
@@ -53,7 +53,7 @@ interface StructureInterface extends IteratorAggregate  {
    *   If set to TRUE, computed properties are included. Defaults to FALSE.
    *
    * @return array
-   *   An array of property objects implementing the WrapperInterface, keyed
+   *   An array of property objects implementing the TypedDataInterface, keyed
    *   by property name.
    */
   public function getProperties($include_computed = FALSE);
@@ -63,7 +63,7 @@ interface StructureInterface extends IteratorAggregate  {
    *
    * @param array
    *   The array of properties to set. The array has to consist of property
-   *   values or property objects implementing the WrapperInterface and must
+   *   values or property objects implementing the TypedDataInterface and must
    *   be keyed by property name.
    *
    * @throws \InvalidArgumentException

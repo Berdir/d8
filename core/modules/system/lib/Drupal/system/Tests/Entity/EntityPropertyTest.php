@@ -7,7 +7,7 @@
 
 namespace Drupal\system\Tests\Entity;
 
-use Drupal\Core\TypedData\WrapperInterface;
+use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Property\ItemListInterface;
 use Drupal\Core\Entity\Property\ItemInterface;
@@ -288,7 +288,7 @@ class EntityPropertyTest extends WebTestBase  {
         $this->assertTrue($property[0] instanceof ItemInterface, "Item $delta of property $name implements interface.");
 
         foreach ($item as $value_name => $value_property) {
-          $this->assertTrue($value_property instanceof WrapperInterface, "Value $value_name of item $delta of property $name implements interface.");
+          $this->assertTrue($value_property instanceof TypedDataInterface, "Value $value_name of item $delta of property $name implements interface.");
 
           $value = $value_property->getValue();
           $this->assertTrue(!isset($value) || is_scalar($value) || $value instanceof EntityInterface, "Value $value_name of item $delta of property $name is a primitive or an entity.");
@@ -339,7 +339,7 @@ class EntityPropertyTest extends WebTestBase  {
    * Recursive helper for getting all contained strings,
    * i.e. properties of type string.
    */
-  public function getContainedStrings(WrapperInterface $wrapper, $depth, array &$strings) {
+  public function getContainedStrings(TypedDataInterface $wrapper, $depth, array &$strings) {
 
     if ($wrapper->getType() == 'string') {
       $strings[] = $wrapper->getValue();
@@ -352,7 +352,7 @@ class EntityPropertyTest extends WebTestBase  {
           $this->getContainedStrings($item, $depth + 1, $strings);
         }
       }
-      elseif ($wrapper instanceof \Drupal\Core\TypedData\StructureInterface) {
+      elseif ($wrapper instanceof \Drupal\Core\TypedData\ComplexDataInterface) {
         foreach ($wrapper as $name => $property) {
           $this->getContainedStrings($property, $depth + 1, $strings);
         }

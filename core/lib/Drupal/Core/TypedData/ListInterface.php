@@ -13,7 +13,7 @@ use Countable;
 /**
  * Interface for a list of typed data.
  */
-interface ListInterface extends ArrayAccess, IteratorAggregate , Countable {
+interface ListInterface extends ArrayAccess, IteratorAggregate, Countable {
 
   /**
    * Determines whether the list contains any non-empty items.

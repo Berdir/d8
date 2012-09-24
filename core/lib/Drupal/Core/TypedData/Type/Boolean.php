@@ -6,7 +6,7 @@
  */
 
 namespace Drupal\Core\TypedData\Type;
-use Drupal\Core\TypedData\WrapperInterface;
+use Drupal\Core\TypedData\TypedDataInterface;
 
 /**
  * The boolean data type.
@@ -14,7 +14,7 @@ use Drupal\Core\TypedData\WrapperInterface;
  * The plain value of a boolean is a regular PHP boolean. For setting the value
  * any PHP variable that casts to a boolean may be passed.
  */
-class Boolean extends WrapperBase implements WrapperInterface {
+class Boolean extends TypedData implements TypedDataInterface {
 
   /**
    * The data value.
@@ -24,14 +24,14 @@ class Boolean extends WrapperBase implements WrapperInterface {
   protected $value;
 
   /**
-   * Implements WrapperInterface::setValue().
+   * Implements TypedDataInterface::setValue().
    */
   public function setValue($value) {
     $this->value = isset($value) ? (bool) $value : $value;
   }
 
   /**
-   * Implements WrapperInterface::validate().
+   * Implements TypedDataInterface::validate().
    */
   public function validate() {
     // TODO: Implement validate() method.

@@ -6,7 +6,7 @@
  */
 
 namespace Drupal\Core\TypedData\Type;
-use Drupal\Core\TypedData\WrapperInterface;
+use Drupal\Core\TypedData\TypedDataInterface;
 use DateInterval;
 use InvalidArgumentException;
 
@@ -18,7 +18,7 @@ use InvalidArgumentException;
  * supported by DateInterval::__construct, or an integer in seconds may be
  * passed.
  */
-class Duration extends WrapperBase implements WrapperInterface {
+class Duration extends TypedData implements TypedDataInterface {
 
   /**
    * The data value.
@@ -28,7 +28,7 @@ class Duration extends WrapperBase implements WrapperInterface {
   protected $value;
 
   /**
-   * Implements WrapperInterface::setValue().
+   * Implements TypedDataInterface::setValue().
    */
   public function setValue($value) {
     if ($value instanceof DateInterval || !isset($value)) {
@@ -49,7 +49,7 @@ class Duration extends WrapperBase implements WrapperInterface {
   }
 
   /**
-   * Implements WrapperInterface::getString().
+   * Implements TypedDataInterface::getString().
    */
   public function getString() {
     // Generate an ISO 8601 formatted string as supported by
@@ -58,7 +58,7 @@ class Duration extends WrapperBase implements WrapperInterface {
   }
 
   /**
-   * Implements WrapperInterface::validate().
+   * Implements TypedDataInterface::validate().
    */
   public function validate() {
     // TODO: Implement validate() method.

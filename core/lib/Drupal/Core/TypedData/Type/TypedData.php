@@ -2,19 +2,19 @@
 
 /**
  * @file
- * Definition of Drupal\Core\TypedData\Type\WrapperBase.
+ * Definition of Drupal\Core\TypedData\Type\TypedData.
  */
 
 namespace Drupal\Core\TypedData\Type;
-use Drupal\Core\TypedData\WrapperInterface;
+use Drupal\Core\TypedData\TypedDataInterface;
 
 /**
- * The abstract base class for data types.
+ * The abstract base class for typed data.
  *
  * Classes deriving from this base class have to declare $value
  * or override getValue() or setValue().
  */
-abstract class WrapperBase implements WrapperInterface {
+abstract class TypedData implements TypedDataInterface {
 
   /**
    * The data definition.
@@ -24,7 +24,7 @@ abstract class WrapperBase implements WrapperInterface {
   protected $definition;
 
   /**
-   * Implements WrapperInterface::__construct().
+   * Implements TypedDataInterface::__construct().
    *
    * @param array $definition
    *
@@ -40,7 +40,7 @@ abstract class WrapperBase implements WrapperInterface {
   }
 
   /**
-   * Implements WrapperInterface::getType().
+   * Implements TypedDataInterface::getType().
    *
    * @return string
    */
@@ -49,7 +49,7 @@ abstract class WrapperBase implements WrapperInterface {
   }
 
   /**
-   * Implements WrapperInterface::getDefinition().
+   * Implements TypedDataInterface::getDefinition().
    *
    * @return array
    */
@@ -58,7 +58,7 @@ abstract class WrapperBase implements WrapperInterface {
   }
 
   /**
-   * Implements WrapperInterface::getValue().
+   * Implements TypedDataInterface::getValue().
    *
    * @return mixed
    */
@@ -67,7 +67,7 @@ abstract class WrapperBase implements WrapperInterface {
   }
 
   /**
-   * Implements WrapperInterface::setValue().
+   * Implements TypedDataInterface::setValue().
    *
    * @param mixed $value
    */
@@ -76,7 +76,7 @@ abstract class WrapperBase implements WrapperInterface {
   }
 
   /**
-   * Implements WrapperInterface::getString().
+   * Implements TypedDataInterface::getString().
    *
    * @return string
    */

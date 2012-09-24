@@ -22,7 +22,7 @@ class FieldTextItem extends FieldItemBase {
   static $propertyDefinitions;
 
   /**
-   * Implements StructureInterface::getPropertyDefinitions().
+   * Implements ComplexDataInterface::getPropertyDefinitions().
    */
   public function getPropertyDefinitions() {
 

@@ -6,7 +6,7 @@
  */
 
 namespace Drupal\text;
-use Drupal\Core\TypedData\WrapperInterface;
+use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\Core\TypedData\ReadOnlyException;
 use Drupal\Core\TypedData\Type\String;
 use InvalidArgumentException;
@@ -22,19 +22,19 @@ class FieldTextProcessed extends String {
   /**
    * The text property.
    *
-   * @var \Drupal\Core\TypedData\WrapperInterface
+   * @var \Drupal\Core\TypedData\TypedDataInterface
    */
   protected $text;
 
   /**
    * The text format property.
    *
-   * @var \Drupal\Core\TypedData\WrapperInterface
+   * @var \Drupal\Core\TypedData\TypedDataInterface
    */
   protected $format;
 
   /**
-   * Implements WrapperInterface::__construct().
+   * Implements TypedDataInterface::__construct().
    */
   public function __construct(array $definition, $value = NULL, array $context = array()) {
     $this->definition = $definition;
@@ -51,7 +51,7 @@ class FieldTextProcessed extends String {
   }
 
   /**
-   * Implements WrapperInterface::getValue().
+   * Implements TypedDataInterface::getValue().
    */
   public function getValue($langcode = NULL) {
     // @todo: Determine a way to get the field $instance here.
@@ -69,7 +69,7 @@ class FieldTextProcessed extends String {
   }
 
   /**
-   * Implements WrapperInterface::setValue().
+   * Implements TypedDataInterface::setValue().
    */
   public function setValue($value) {
     if (isset($value)) {

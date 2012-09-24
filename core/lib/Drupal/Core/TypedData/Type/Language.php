@@ -5,7 +5,7 @@
  */
 
 namespace Drupal\Core\TypedData\Type;
-use Drupal\Core\TypedData\WrapperInterface;
+use Drupal\Core\TypedData\TypedDataInterface;
 use InvalidArgumentException;
 
 /**
@@ -19,17 +19,17 @@ use InvalidArgumentException;
  *  - langcode source: If used as computed property, the langcode property used
  *    to load the language object.
  */
-class Language extends WrapperBase implements WrapperInterface {
+class Language extends TypedData implements TypedDataInterface {
 
   /**
    * The data wrapper holding the langcode value.
    *
-   * @var \Drupal\Core\TypedData\WrapperInterface
+   * @var \Drupal\Core\TypedData\TypedDataInterface
    */
   protected $langcode;
 
   /**
-   * Implements WrapperInterface::__construct().
+   * Implements TypedDataInterface::__construct().
    */
   public function __construct(array $definition, $value = NULL, array $context = array()) {
     $this->definition = $definition;
@@ -49,7 +49,7 @@ class Language extends WrapperBase implements WrapperInterface {
   }
 
   /**
-   * Implements WrapperInterface::getValue().
+   * Implements TypedDataInterface::getValue().
    */
   public function getValue() {
     $langcode = $this->langcode->getValue();
@@ -57,7 +57,7 @@ class Language extends WrapperBase implements WrapperInterface {
   }
 
   /**
-   * Implements WrapperInterface::setValue().
+   * Implements TypedDataInterface::setValue().
    *
    * Both the langcode and the language object may be passed as value.
    */
@@ -77,7 +77,7 @@ class Language extends WrapperBase implements WrapperInterface {
   }
 
   /**
-   * Implements WrapperInterface::getString().
+   * Implements TypedDataInterface::getString().
    */
   public function getString() {
     $language = $this->getValue();
@@ -85,7 +85,7 @@ class Language extends WrapperBase implements WrapperInterface {
   }
 
   /**
-   * Implements WrapperInterface::validate().
+   * Implements TypedDataInterface::validate().
    */
   public function validate() {
     // TODO: Implement validate() method.

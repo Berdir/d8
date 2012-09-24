@@ -6,9 +6,9 @@
  */
 
 namespace Drupal\Core\Entity;
-use Drupal\Core\TypedData\Type\WrapperBase;
-use Drupal\Core\TypedData\WrapperInterface;
-use Drupal\Core\TypedData\StructureInterface;
+use Drupal\Core\TypedData\Type\TypedData;
+use Drupal\Core\TypedData\TypedDataInterface;
+use Drupal\Core\TypedData\ComplexDataInterface;
 use Drupal\Core\TypedData\AccessibleInterface;
 use ArrayIterator;
 use InvalidArgumentException;
@@ -18,7 +18,7 @@ use InvalidArgumentException;
  *
  * @todo: Needs an entity specific interface.
  */
-class EntityTranslation extends WrapperBase implements StructureInterface, AccessibleInterface {
+class EntityTranslation extends TypedData implements ComplexDataInterface, AccessibleInterface {
 
   /**
    * The array of translated properties, each being an instance of
@@ -36,7 +36,7 @@ class EntityTranslation extends WrapperBase implements StructureInterface, Acces
   protected $langcode;
 
   /**
-   * Implements WrapperInterface::__construct().
+   * Implements TypedDataInterface::__construct().
    */
   public function __construct(array $definition, $value = NULL, array $context = array()) {
     $this->definition = $definition;
@@ -45,7 +45,7 @@ class EntityTranslation extends WrapperBase implements StructureInterface, Acces
   }
 
   /**
-   * Implements WrapperInterface::getValue().
+   * Implements TypedDataInterface::getValue().
    */
   public function getValue() {
     $values = array();
@@ -56,7 +56,7 @@ class EntityTranslation extends WrapperBase implements StructureInterface, Acces
   }
 
   /**
-   * Implements WrapperInterface::setValue().
+   * Implements TypedDataInterface::setValue().
    */
   public function setValue($values) {
     foreach ($this->getProperties() as $name => $property) {
@@ -69,7 +69,7 @@ class EntityTranslation extends WrapperBase implements StructureInterface, Acces
   }
 
   /**
-   * Implements WrapperInterface::getString().
+   * Implements TypedDataInterface::getString().
    */
   public function getString() {
     $strings = array();
@@ -80,7 +80,7 @@ class EntityTranslation extends WrapperBase implements StructureInterface, Acces
   }
 
   /**
-   * Implements WrapperInterface::get().
+   * Implements TypedDataInterface::get().
    */
   public function get($property_name) {
     $definitions = $this->getPropertyDefinitions();
@@ -91,14 +91,14 @@ class EntityTranslation extends WrapperBase implements StructureInterface, Acces
   }
 
   /**
-   * Implements StructureInterface::set().
+   * Implements ComplexDataInterface::set().
    */
   public function set($property_name, $value) {
     $this->get($property_name)->setValue($value);
   }
 
   /**
-   * Implements StructureInterface::getProperties().
+   * Implements ComplexDataInterface::getProperties().
    */
   public function getProperties($include_computed = FALSE) {
     $properties = array();
@@ -111,13 +111,13 @@ class EntityTranslation extends WrapperBase implements StructureInterface, Acces
   }
 
   /**
-   * Implements StructureInterface::setProperties().
+   * Implements ComplexDataInterface::setProperties().
    */
   public function setProperties($properties) {
     foreach ($this->getProperties() as $name => $property) {
       if (isset($properties[$name])) {
         // Copy the value to our property object.
-        $value = $properties[$name] instanceof WrapperInterface ? $properties[$name]->getValue() : $properties[$name];
+        $value = $properties[$name] instanceof TypedDataInterface ? $properties[$name]->getValue() : $properties[$name];
         $property->setValue($value);
         unset($properties[$name]);
       }
@@ -149,7 +149,7 @@ class EntityTranslation extends WrapperBase implements StructureInterface, Acces
   }
 
   /**
-   * Implements StructureInterface::getPropertyDefinition().
+   * Implements ComplexDataInterface::getPropertyDefinition().
    */
   public function getPropertyDefinition($name) {
     $definitions = $this->getPropertyDefinitions();
@@ -157,7 +157,7 @@ class EntityTranslation extends WrapperBase implements StructureInterface, Acces
   }
 
   /**
-   * Implements StructureInterface::getPropertyDefinitions().
+   * Implements ComplexDataInterface::getPropertyDefinitions().
    */
   public function getPropertyDefinitions() {
     $definitions = array();
@@ -174,14 +174,14 @@ class EntityTranslation extends WrapperBase implements StructureInterface, Acces
   }
 
   /**
-   * Implements StructureInterface::toArray().
+   * Implements ComplexDataInterface::toArray().
    */
   public function toArray() {
     return $this->getValue();
   }
 
   /**
-   * Implements StructureInterface::isEmpty().
+   * Implements ComplexDataInterface::isEmpty().
    */
   public function isEmpty() {
     foreach ($this->getProperties() as $property) {
@@ -200,7 +200,7 @@ class EntityTranslation extends WrapperBase implements StructureInterface, Acces
   }
 
   /**
-   * Implements WrapperInterface::validate().
+   * Implements TypedDataInterface::validate().
    */
   public function validate($value = NULL) {
     // @todo implement

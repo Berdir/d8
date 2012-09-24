@@ -6,8 +6,8 @@
  */
 
 namespace Drupal\Core\Entity\Property;
-use Drupal\Core\TypedData\StructureInterface;
-use Drupal\Core\TypedData\WrapperInterface;
+use Drupal\Core\TypedData\ComplexDataInterface;
+use Drupal\Core\TypedData\TypedDataInterface;
 
 /**
  * Interface for entity property items, which are data structures holding
@@ -16,7 +16,7 @@ use Drupal\Core\TypedData\WrapperInterface;
  * @see EntityPropertyList
  * @see ItemBase
  */
-interface ItemInterface extends StructureInterface, WrapperInterface {
+interface ItemInterface extends ComplexDataInterface, TypedDataInterface {
 
   /**
    * Magic getter: Get the property value.
@@ -27,7 +27,7 @@ interface ItemInterface extends StructureInterface, WrapperInterface {
    * @throws \InvalidArgumentException
    *   If a not existing property is accessed.
    *
-   * @return \Drupal\Core\TypedData\WrapperInterface
+   * @return \Drupal\Core\TypedData\TypedDataInterface
    *   The property object.
    */
   public function __get($property_name);

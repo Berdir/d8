@@ -6,14 +6,14 @@
  */
 
 namespace Drupal\Core\TypedData\Type;
-use Drupal\Core\TypedData\WrapperInterface;
+use Drupal\Core\TypedData\TypedDataInterface;
 
 /**
  * The URI data type.
  *
  * The plain value of a URI is an absolute URI represented as PHP string.
  */
-class Uri extends WrapperBase implements WrapperInterface {
+class Uri extends TypedData implements TypedDataInterface {
 
   /**
    * The data value.
@@ -23,14 +23,14 @@ class Uri extends WrapperBase implements WrapperInterface {
   protected $value;
 
   /**
-   * Implements WrapperInterface::setValue().
+   * Implements TypedDataInterface::setValue().
    */
   public function setValue($value) {
     $this->value = isset($value) ? (string) $value : $value;
   }
 
   /**
-   * Implements WrapperInterface::validate().
+   * Implements TypedDataInterface::validate().
    */
   public function validate() {
     // TODO: Implement validate() method.

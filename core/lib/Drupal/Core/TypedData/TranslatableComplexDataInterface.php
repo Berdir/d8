@@ -2,15 +2,15 @@
 
 /**
  * @file
- * Definition of Drupal\Core\TypedData\StructureTranslatableInterface.
+ * Definition of Drupal\Core\TypedData\TranslatableComplexDataInterface.
  */
 
 namespace Drupal\Core\TypedData;
 
 /**
- * Interface for translatable data structures.
+ * Interface for translatable complex data.
  */
-interface StructureTranslatableInterface extends StructureInterface {
+interface TranslatableComplexDataInterface extends ComplexDataInterface {
 
   /**
    * Returns the default language.
@@ -38,8 +38,8 @@ interface StructureTranslatableInterface extends StructureInterface {
    *   The language code of the translation to get or LANGUAGE_DEFAULT to get
    *   the data in default language.
    *
-   * @return \Drupal\Core\TypedData\StructureInterface
-   *   A data structure containing the translated properties.
+   * @return \Drupal\Core\TypedData\ComplexDataInterface
+   *   A complex data object containing the translated properties.
    */
   public function getTranslation($langcode);
 }
