@@ -40,7 +40,7 @@ class Date extends TypedData implements TypedDataInterface {
     if ($value instanceof DateTime || !isset($value)) {
       $this->value = $value;
     }
-    elseif (is_numeric($value)) {
+    elseif (is_numeric($value) && (string) (int) $value === (string) $value) {
       // Value is a timestamp.
       $this->value = new DateTime('@' . $value);
     }

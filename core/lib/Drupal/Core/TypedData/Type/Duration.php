@@ -34,7 +34,7 @@ class Duration extends TypedData implements TypedDataInterface {
     if ($value instanceof DateInterval || !isset($value)) {
       $this->value = $value;
     }
-    elseif (is_numeric($value)) {
+    elseif (is_numeric($value) && (string) (int) $value === (string) $value) {
       // Value is a time span in seconds.
       $this->value = new DateInterval('PT' . $value . 'S');
     }
