@@ -1055,9 +1055,11 @@ function comment_build_content(Comment $comment, Node $node, $view_mode = 'full'
   drupal_alter('entity_view_mode', $view_mode, $comment, $context);
 
   // Build fields content.
-  field_attach_prepare_view('comment', array($comment->cid->value => $comment), $view_mode, $langcode);
-  entity_prepare_view('comment', array($comment->cid->value => $comment), $langcode);
-  $comment->content += field_attach_view('comment', $comment, $view_mode, $langcode);
+  $comment->setCompatibilityMode(TRUE);
+  field_attach_prepare_view('comment', array($comment->id() => $comment), $view_mode, $langcode);
+  entity_prepare_view('comment', array($comment->id() => $comment), $langcode);
+  $comment->content += field_attach_view('comment', $comment, $view_mode, $langcode);;
+  $comment->setCompatibilityMode(FALSE);
 
   $comment->content['links'] = array(
     '#theme' => 'links__comment',
@@ -1166,8 +1168,8 @@ function comment_view_multiple($comments, Node $node, $view_mode = 'full', $weig
     '#sorted' => TRUE,
   );
   foreach ($comments as $comment) {
-    $build[$comment->cid->value] = comment_view($comment, $node, $view_mode, $langcode);
-    $build[$comment->cid->value]['#weight'] = $weight;
+    $build[$comment->id()] = comment_view($comment, $node, $view_mode, $langcode);
+    $build[$comment->id()]['#weight'] = $weight;
     $weight++;
   }
   return $build;
@@ -1771,7 +1773,9 @@ function template_preprocess_comment(&$variables) {
   $variables['submitted'] = t('Submitted by !username on !datetime', array('!username' => $variables['author'], '!datetime' => $variables['created']));
 
   // Preprocess fields.
+  $comment->setCompatibilityMode(TRUE);
   field_attach_preprocess('comment', $comment, $variables['elements'], $variables);
+  $comment->setCompatibilityMode(FALSE);
 
   // Helpful $content variable for templates.
   foreach (element_children($variables['elements']) as $key) {

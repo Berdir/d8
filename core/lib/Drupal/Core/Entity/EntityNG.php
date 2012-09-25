@@ -289,11 +289,11 @@ class EntityNG extends Entity implements TranslatableComplexDataInterface, Acces
    * @see EntityNG::compatibilityMode
    */
   public function setCompatibilityMode($enabled) {
-    $this->compatibilityMode = (bool) $enabled;
-    if ($enabled) {
+    if (!$this->compatibilityMode && $enabled) {
       $this->updateOriginalValues();
       $this->properties = array();
     }
+    $this->compatibilityMode = (bool) $enabled;
   }
 
   /**
