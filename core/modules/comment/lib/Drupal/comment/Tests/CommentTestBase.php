@@ -123,8 +123,8 @@ abstract class CommentTestBase extends WebTestBase {
       $regex = '/' . ($reply ? '<div class="indented">(.*?)' : '');
       $regex .= '<a id="comment-' . $comment->id . '"(.*?)'; // Comment anchor.
       $regex .= '<div(.*?)'; // Begin in comment div.
-      $regex .= $comment->subject . '(.*?)'; // Match subject.
-      $regex .= $comment->comment . '(.*?)'; // Match comment.
+      $regex .= $comment->subject->value . '(.*?)'; // Match subject.
+      $regex .= $comment->comment->value . '(.*?)'; // Match comment.
       $regex .= '/s';
 
       return (boolean)preg_match($regex, $this->drupalGetContent());

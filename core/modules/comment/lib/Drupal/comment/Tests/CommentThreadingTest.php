@@ -43,7 +43,7 @@ class CommentThreadingTest extends CommentTestBase {
     $comment = $this->postComment($this->node, $comment_text, $subject_text, TRUE);
     $comment_loaded = comment_load($comment->id);
     $this->assertTrue($this->commentExists($comment), 'Comment #1. Comment found.');
-    $this->assertEqual($comment_loaded->thread, '01/');
+    $this->assertEqual($comment_loaded->thread->value, '01/');
 
     // Reply to comment #1 creating comment #2.
     $this->drupalLogin($this->web_user);
@@ -75,7 +75,7 @@ class CommentThreadingTest extends CommentTestBase {
     $comment = $this->postComment($this->node, $comment_text, $subject_text, TRUE);
     $comment_loaded = comment_load($comment->id);
     $this->assertTrue($this->commentExists($comment), 'Comment #5. Second comment found.');
-    $this->assertEqual($comment_loaded->thread, '02/');
+    $this->assertEqual($comment_loaded->thread->value, '02/');
 
     // Reply to comment #5 creating comment #6.
     $this->drupalLogin($this->web_user);

@@ -109,8 +109,8 @@ class LocaleCommentLanguageTest extends WebTestBase {
           ->orderBy('cid', 'DESC')
           ->execute()
           ->fetchObject();
-        $args = array('%node_language' => $node_langcode, '%comment_language' => $comment->langcode, '%langcode' => $langcode);
-        $this->assertEqual($comment->langcode, $langcode, t('The comment posted with content language %langcode and belonging to the node with language %node_language has language %comment_language', $args));
+        $args = array('%node_language' => $node_langcode, '%comment_language' => $comment->langcode->value, '%langcode' => $langcode);
+        $this->assertEqual($comment->langcode->value, $langcode, t('The comment posted with content language %langcode and belonging to the node with language %node_language has language %comment_language', $args));
       }
     }
   }

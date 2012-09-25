@@ -428,10 +428,10 @@ function rdf_comment_load($comments) {
     // Pages with many comments can show poor performance. This information
     // isn't needed until rdf_preprocess_comment() is called, but set it here
     // to optimize performance for websites that implement an entity cache.
-    $comment->rdf_data['date'] = rdf_rdfa_attributes($comment->rdf_mapping['created'], $comment->created);
-    $comment->rdf_data['nid_uri'] = url('node/' . $comment->nid);
-    if ($comment->pid) {
-      $comment->rdf_data['pid_uri'] = url('comment/' . $comment->pid, array('fragment' => 'comment-' . $comment->pid));
+    $comment->rdf_data['date'] = rdf_rdfa_attributes($comment->rdf_mapping['created'], $comment->created->value->getTimestamp());
+    $comment->rdf_data['nid_uri'] = url('node/' . $comment->nid->value);
+    if ($comment->pid->value) {
+      $comment->rdf_data['pid_uri'] = url('comment/' . $comment->pid->value, array('fragment' => 'comment-' . $comment->pid->value));
     }
   }
 }
@@ -754,7 +754,7 @@ function rdf_preprocess_comment(&$variables) {
     $variables['rdf_metadata_attributes'][] = $parent_node_attributes;
 
     // Adds the relation to parent comment, if it exists.
-    if ($comment->pid != 0) {
+    if ($comment->pid->value != 0) {
       $parent_comment_attributes['rel'] = $comment->rdf_mapping['pid']['predicates'];
       // The parent comment URI is precomputed as part of the rdf_data so that
       // it can be cached as part of the entity.

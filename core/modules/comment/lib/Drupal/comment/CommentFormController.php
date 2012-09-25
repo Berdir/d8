@@ -22,7 +22,7 @@ class CommentFormController extends EntityFormController {
     global $user;
     $language_content = language(LANGUAGE_TYPE_CONTENT);
 
-    $node = node_load($comment->nid);
+    $node = $comment->nid->entity;
     $form_state['comment']['node'] = $node;
 
     // Use #comment-form as unique jump target, regardless of node type.
@@ -30,7 +30,7 @@ class CommentFormController extends EntityFormController {
     $form['#theme'] = array('comment_form__node_' . $node->type, 'comment_form');
 
     $anonymous_contact = variable_get('comment_anonymous_' . $node->type, COMMENT_ANONYMOUS_MAYNOT_CONTACT);
-    $is_admin = (!empty($comment->cid) && user_access('administer comments'));
+    $is_admin = (!empty($comment->cid->value) && user_access('administer comments'));
 
     if (!$user->uid && $anonymous_contact != COMMENT_ANONYMOUS_MAYNOT_CONTACT) {
       $form['#attached']['library'][] = array('system', 'jquery.cookie');
@@ -39,8 +39,8 @@ class CommentFormController extends EntityFormController {
 
     // If not replying to a comment, use our dedicated page callback for new
     // comments on nodes.
-    if (empty($comment->cid) && empty($comment->pid)) {
-      $form['#action'] = url('comment/reply/' . $comment->nid);
+    if (empty($comment->cid->value) && empty($comment->pid->value)) {
+      $form['#action'] = url('comment/reply/' . $comment->nid->value);
     }
 
     if (isset($form_state['comment_preview'])) {
@@ -62,16 +62,16 @@ class CommentFormController extends EntityFormController {
 
     // Prepare default values for form elements.
     if ($is_admin) {
-      $author = (!$comment->uid && $comment->name ? $comment->name : $comment->registered_name);
-      $status = (isset($comment->status) ? $comment->status : COMMENT_NOT_PUBLISHED);
-      $date = (!empty($comment->date) ? $comment->date : format_date($comment->created, 'custom', 'Y-m-d H:i O'));
+      $author = (!$comment->uid->value && $comment->name->value ? $comment->name->value : $comment->registered_name);
+      $status = (isset($comment->status->value) ? $comment->status->value : COMMENT_NOT_PUBLISHED);
+      $date = (!empty($comment->date) ? $comment->date : format_date($comment->created->value->getTimestamp(), 'custom', 'Y-m-d H:i O'));
     }
     else {
       if ($user->uid) {
         $author = $user->name;
       }
       else {
-        $author = ($comment->name ? $comment->name : '');
+        $author = ($comment->name->value ? $comment->name->value : '');
       }
       $status = (user_access('skip comment approval') ? COMMENT_PUBLISHED : COMMENT_NOT_PUBLISHED);
       $date = '';
@@ -116,7 +116,7 @@ class CommentFormController extends EntityFormController {
     $form['author']['mail'] = array(
       '#type' => 'email',
       '#title' => t('E-mail'),
-      '#default_value' => $comment->mail,
+      '#default_value' => $comment->mail->value,
       '#required' => (!$user->uid && $anonymous_contact == COMMENT_ANONYMOUS_MUST_CONTACT),
       '#maxlength' => 64,
       '#size' => 30,
@@ -127,7 +127,7 @@ class CommentFormController extends EntityFormController {
     $form['author']['homepage'] = array(
       '#type' => 'url',
       '#title' => t('Homepage'),
-      '#default_value' => $comment->homepage,
+      '#default_value' => $comment->homepage->value,
       '#maxlength' => 255,
       '#size' => 30,
       '#access' => $is_admin || (!$user->uid && $anonymous_contact != COMMENT_ANONYMOUS_MAYNOT_CONTACT),
@@ -158,24 +158,24 @@ class CommentFormController extends EntityFormController {
       '#type' => 'textfield',
       '#title' => t('Subject'),
       '#maxlength' => 64,
-      '#default_value' => $comment->subject,
+      '#default_value' => $comment->subject->value,
       '#access' => variable_get('comment_subject_field_' . $node->type, 1) == 1,
     );
 
     // Used for conditional validation of author fields.
     $form['is_anonymous'] = array(
       '#type' => 'value',
-      '#value' => ($comment->cid ? !$comment->uid : !$user->uid),
+      '#value' => ($comment->cid->value ? !$comment->uid->value : !$user->uid),
     );
 
     // Add internal comment properties.
     foreach (array('cid', 'pid', 'nid', 'uid') as $key) {
-      $form[$key] = array('#type' => 'value', '#value' => $comment->$key);
+      $form[$key] = array('#type' => 'value', '#value' => $comment->$key->value);
     }
     $form['node_type'] = array('#type' => 'value', '#value' => 'comment_node_' . $node->type);
 
     // Make the comment inherit the node language unless specifically set.
-    $comment_langcode = $comment->langcode;
+    $comment_langcode = $comment->langcode->value;
     if ($comment_langcode == LANGUAGE_NOT_SPECIFIED) {
       $comment_langcode = $language_content->langcode;
     }
@@ -187,7 +187,7 @@ class CommentFormController extends EntityFormController {
     );
 
     // Attach fields.
-    $comment->node_type = 'comment_node_' . $node->type;
+    $comment->node_type->value = 'comment_node_' . $node->type;
 
     return parent::form($form, $form_state, $comment);
   }
@@ -206,7 +206,7 @@ class CommentFormController extends EntityFormController {
 
     // Only show the save button if comment previews are optional or if we are
     // already previewing the submission.
-    $element['submit']['#access'] = ($comment->cid && user_access('administer comments')) || $preview_mode != DRUPAL_REQUIRED || isset($form_state['comment_preview']);
+    $element['submit']['#access'] = ($comment->cid->value && user_access('administer comments')) || $preview_mode != DRUPAL_REQUIRED || isset($form_state['comment_preview']);
 
     $element['preview'] = array(
       '#type' => 'submit',
@@ -272,40 +272,34 @@ class CommentFormController extends EntityFormController {
     if (empty($comment->date)) {
       $comment->date = 'now';
     }
-    $comment->created = strtotime($comment->date);
-    $comment->changed = REQUEST_TIME;
+    $comment->created->value = strtotime($comment->date);
+    $comment->changed->value = REQUEST_TIME;
 
     // If the comment was posted by a registered user, assign the author's ID.
     // @todo Too fragile. Should be prepared and stored in comment_form()
     // already.
-    if (!$comment->is_anonymous && !empty($comment->name) && ($account = user_load_by_name($comment->name))) {
-      $comment->uid = $account->uid;
+    if (!$comment->is_anonymous && !empty($comment->name->value) && ($account = user_load_by_name($comment->name->value))) {
+      $comment->uid->value = $account->uid;
     }
     // If the comment was posted by an anonymous user and no author name was
     // required, use "Anonymous" by default.
-    if ($comment->is_anonymous && (!isset($comment->name) || $comment->name === '')) {
-      $comment->name = config('user.settings')->get('anonymous');
+    if ($comment->is_anonymous && (!isset($comment->name->value) || $comment->name->value === '')) {
+      $comment->name->value = config('user.settings')->get('anonymous');
     }
 
     // Validate the comment's subject. If not specified, extract from comment
     // body.
-    if (trim($comment->subject) == '') {
+    if (trim($comment->subject->value) == '') {
       // The body may be in any format, so:
       // 1) Filter it into HTML
       // 2) Strip out all HTML tags
       // 3) Convert entities back to plain-text.
-      $comment_body = $comment->comment_body[LANGUAGE_NOT_SPECIFIED][0];
-      if (isset($comment_body['format'])) {
-        $comment_text = check_markup($comment_body['value'], $comment_body['format']);
-      }
-      else {
-        $comment_text = check_plain($comment_body['value']);
-      }
+      $comment_text = $comment->comment_body->processed;
       $comment->subject = truncate_utf8(trim(decode_entities(strip_tags($comment_text))), 29, TRUE);
       // Edge cases where the comment body is populated only by HTML tags will
       // require a default subject.
-      if ($comment->subject == '') {
-        $comment->subject = t('(No subject)');
+      if ($comment->subject->value == '') {
+        $comment->subject->value = t('(No subject)');
       }
     }
 
@@ -341,13 +335,13 @@ class CommentFormController extends EntityFormController {
       }
 
       comment_save($comment);
-      $form_state['values']['cid'] = $comment->cid;
+      $form_state['values']['cid'] = $comment->cid->value;
 
       // Add an entry to the watchdog log.
-      watchdog('content', 'Comment posted: %subject.', array('%subject' => $comment->subject), WATCHDOG_NOTICE, l(t('view'), 'comment/' . $comment->cid, array('fragment' => 'comment-' . $comment->cid)));
+      watchdog('content', 'Comment posted: %subject.', array('%subject' => $comment->subject->value), WATCHDOG_NOTICE, l(t('view'), 'comment/' . $comment->cid->value, array('fragment' => 'comment-' . $comment->cid->value)));
 
       // Explain the approval queue if necessary.
-      if ($comment->status == COMMENT_NOT_PUBLISHED) {
+      if ($comment->status->value == COMMENT_NOT_PUBLISHED) {
         if (!user_access('administer comments')) {
           drupal_set_message(t('Your comment has been queued for review by site administrators and will be published after approval.'));
         }
@@ -357,16 +351,16 @@ class CommentFormController extends EntityFormController {
       }
       $query = array();
       // Find the current display page for this comment.
-      $page = comment_get_display_page($comment->cid, $node->type);
+      $page = comment_get_display_page($comment->cid->value, $node->type);
       if ($page > 0) {
         $query['page'] = $page;
       }
       // Redirect to the newly posted comment.
-      $redirect = array('node/' . $node->nid, array('query' => $query, 'fragment' => 'comment-' . $comment->cid));
+      $redirect = array('node/' . $node->nid, array('query' => $query, 'fragment' => 'comment-' . $comment->cid->value));
     }
     else {
-      watchdog('content', 'Comment: unauthorized comment submitted or comment submitted to a closed post %subject.', array('%subject' => $comment->subject), WATCHDOG_WARNING);
-      drupal_set_message(t('Comment: unauthorized comment submitted or comment submitted to a closed post %subject.', array('%subject' => $comment->subject)), 'error');
+      watchdog('content', 'Comment: unauthorized comment submitted or comment submitted to a closed post %subject.', array('%subject' => $comment->subject->value), WATCHDOG_WARNING);
+      drupal_set_message(t('Comment: unauthorized comment submitted or comment submitted to a closed post %subject.', array('%subject' => $comment->subject->value)), 'error');
       // Redirect the user to the node they are commenting on.
       $redirect = 'node/' . $node->nid;
     }

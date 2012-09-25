@@ -290,14 +290,14 @@ class FileFieldWidgetTest extends FileFieldTestBase {
     $comment_file = file_load($comment->{'field_' . $name}[LANGUAGE_NOT_SPECIFIED][0]['fid']);
     $this->assertFileExists($comment_file, t('New file saved to disk on node creation.'));
     // Test authenticated file download.
-    $url = file_create_url($comment_file->uri);
+    $url = file_create_url($comment_file->uri->value);
     $this->assertNotEqual($url, NULL, t('Confirmed that the URL is valid'));
-    $this->drupalGet(file_create_url($comment_file->uri));
+    $this->drupalGet(file_create_url($comment_file->uri->value));
     $this->assertResponse(200, t('Confirmed that the generated URL is correct by downloading the shipped file.'));
 
     // Test anonymous file download.
     $this->drupalLogout();
-    $this->drupalGet(file_create_url($comment_file->uri));
+    $this->drupalGet(file_create_url($comment_file->uri->value));
     $this->assertResponse(403, t('Confirmed that access is denied for the file without the needed permission.'));
 
     // Unpublishes node.
@@ -309,7 +309,7 @@ class FileFieldWidgetTest extends FileFieldTestBase {
 
     // Ensures normal user can no longer download the file.
     $this->drupalLogin($user);
-    $this->drupalGet(file_create_url($comment_file->uri));
+    $this->drupalGet(file_create_url($comment_file->uri->value));
     $this->assertResponse(403, t('Confirmed that access is denied for the file without the needed permission.'));
   }
 

@@ -66,7 +66,7 @@ class CommentInterfaceTest extends CommentTestBase {
     $this->drupalGet('comment/' . $comment->id . '/edit');
     $comment = $this->postComment(NULL, $comment->comment, $comment->subject, array('name' => ''));
     $comment_loaded = comment_load($comment->id);
-    $this->assertTrue(empty($comment_loaded->name) && $comment_loaded->uid == 0, t('Comment author successfully changed to anonymous.'));
+    $this->assertTrue(empty($comment_loaded->name->value) && $comment_loaded->uid->value == 0, t('Comment author successfully changed to anonymous.'));
 
     // Test changing the comment author to an unverified user.
     $random_name = $this->randomName();
@@ -79,7 +79,7 @@ class CommentInterfaceTest extends CommentTestBase {
     $this->drupalGet('comment/' . $comment->id . '/edit');
     $comment = $this->postComment(NULL, $comment->comment, $comment->subject, array('name' => $this->web_user->name));
     $comment_loaded = comment_load($comment->id);
-    $this->assertTrue($comment_loaded->name == $this->web_user->name && $comment_loaded->uid == $this->web_user->uid, t('Comment author successfully changed to a registered user.'));
+    $this->assertTrue($comment_loaded->name->value == $this->web_user->name && $comment_loaded->uid->value == $this->web_user->uid, t('Comment author successfully changed to a registered user.'));
 
     $this->drupalLogout();
 
@@ -92,8 +92,8 @@ class CommentInterfaceTest extends CommentTestBase {
     $reply = $this->postComment(NULL, $this->randomName(), '', TRUE);
     $reply_loaded = comment_load($reply->id);
     $this->assertTrue($this->commentExists($reply, TRUE), t('Reply found.'));
-    $this->assertEqual($comment->id, $reply_loaded->pid, t('Pid of a reply to a comment is set correctly.'));
-    $this->assertEqual(rtrim($comment_loaded->thread, '/') . '.00/', $reply_loaded->thread, t('Thread of reply grows correctly.'));
+    $this->assertEqual($comment->id, $reply_loaded->pid->value, t('Pid of a reply to a comment is set correctly.'));
+    $this->assertEqual(rtrim($comment_loaded->thread->value, '/') . '.00/', $reply_loaded->thread->value, t('Thread of reply grows correctly.'));
 
     // Second reply to comment #3 creating comment #4.
     $this->drupalGet('comment/reply/' . $this->node->nid . '/' . $comment->id);
@@ -102,7 +102,7 @@ class CommentInterfaceTest extends CommentTestBase {
     $reply = $this->postComment(NULL, $this->randomName(), $this->randomName(), TRUE);
     $reply_loaded = comment_load($reply->id);
     $this->assertTrue($this->commentExists($reply, TRUE), t('Second reply found.'));
-    $this->assertEqual(rtrim($comment_loaded->thread, '/') . '.01/', $reply_loaded->thread, t('Thread of second reply grows correctly.'));
+    $this->assertEqual(rtrim($comment_loaded->thread->value, '/') . '.01/', $reply_loaded->thread, t('Thread of second reply grows correctly.'));
 
     // Edit reply.
     $this->drupalGet('comment/' . $reply->id . '/edit');
@@ -350,7 +350,7 @@ class CommentInterfaceTest extends CommentTestBase {
 
     // Checks the initial values of node comment statistics with no comment.
     $node = node_load($this->node->nid);
-    $this->assertEqual($node->last_comment_timestamp, $this->node->created, t('The initial value of node last_comment_timestamp is the node created date.'));
+    $this->assertEqual($node->last_comment_timestamp, $this->node->created->getTimestamp(), t('The initial value of node last_comment_timestamp is the node created date.'));
     $this->assertEqual($node->last_comment_name, NULL, t('The initial value of node last_comment_name is NULL.'));
     $this->assertEqual($node->last_comment_uid, $this->web_user->uid, t('The initial value of node last_comment_uid is the node uid.'));
     $this->assertEqual($node->comment_count, 0, t('The initial value of node comment_count is zero.'));
@@ -410,7 +410,7 @@ class CommentInterfaceTest extends CommentTestBase {
     // Checks the new values of node comment statistics with comment #3.
     // The node needs to be reloaded with a node_load_multiple cache reset.
     $node = node_load($this->node->nid, TRUE);
-    $this->assertEqual($node->last_comment_name, $comment_loaded->name, t('The value of node last_comment_name is the name of the anonymous user.'));
+    $this->assertEqual($node->last_comment_name, $comment_loaded->name->value, t('The value of node last_comment_name is the name of the anonymous user.'));
     $this->assertEqual($node->last_comment_uid, 0, t('The value of node last_comment_uid is zero.'));
     $this->assertEqual($node->comment_count, 2, t('The value of node comment_count is 2.'));
   }

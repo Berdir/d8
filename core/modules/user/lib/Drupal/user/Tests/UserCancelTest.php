@@ -299,7 +299,7 @@ class UserCancelTest extends WebTestBase {
     $this->assertText(t('Your comment has been posted.'));
     $comments = entity_load_multiple_by_properties('comment', array('subject' => $edit['subject']));
     $comment = reset($comments);
-    $this->assertTrue($comment->cid, t('Comment found.'));
+    $this->assertTrue($comment->cid->value, t('Comment found.'));
 
     // Create a node with two revisions, the initial one belonging to the
     // cancelling user.
@@ -329,7 +329,7 @@ class UserCancelTest extends WebTestBase {
     $this->assertFalse(node_load($node->nid, TRUE), t('Node of the user has been deleted.'));
     $this->assertFalse(node_revision_load($revision), t('Node revision of the user has been deleted.'));
     $this->assertTrue(node_load($revision_node->nid, TRUE), t("Current revision of the user's node was not deleted."));
-    $this->assertFalse(comment_load($comment->cid), t('Comment of the user has been deleted.'));
+    $this->assertFalse(comment_load($comment->cid->value), t('Comment of the user has been deleted.'));
 
     // Confirm that user is logged out.
     $this->assertNoText($account->name, t('Logged out.'));

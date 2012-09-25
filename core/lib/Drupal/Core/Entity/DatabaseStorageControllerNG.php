@@ -235,7 +235,15 @@ class DatabaseStorageControllerNG extends DatabaseStorageController {
   protected function mapToStorageRecord(EntityInterface $entity) {
     $record = new \stdClass();
     foreach ($this->entityInfo['schema_fields_sql']['base table'] as $name) {
-      $record->$name = $entity->$name->value;
+      switch ($entity->$name->get('value')->getType()) {
+        // Store dates using timestamps.
+        case 'date':
+          $record->$name = $entity->$name->value->getTimestamp();
+          break;
+        default:
+          $record->$name = $entity->$name->value;
+          break;
+      }
     }
     return $record;
   }
