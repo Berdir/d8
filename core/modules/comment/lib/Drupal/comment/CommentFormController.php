@@ -8,12 +8,12 @@
 namespace Drupal\comment;
 
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityFormController;
+use Drupal\Core\Entity\EntityFormControllerNG;
 
 /**
  * Base for controller for comment forms.
  */
-class CommentFormController extends EntityFormController {
+class CommentFormController extends EntityFormControllerNG {
 
   /**
    * Overrides Drupal\Core\Entity\EntityFormController::form().

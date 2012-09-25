@@ -1752,12 +1752,15 @@ function template_preprocess_comment(&$variables) {
   $node = $variables['elements']['#node'];
   $variables['comment'] = $comment;
   $variables['node'] = $node;
-  $variables['author'] = theme('username', array('account' => $comment));
+  // Create a fake-account object for theming the given username.
+  // @todo: Clean this up.
+  $account = (object) array('uid' => $comment->uid->value, 'name' => $comment->name->value, 'homepage' => $comment->homepage->value);
+  $variables['author'] = theme('username', array('account' => $account));
   $variables['created'] = format_date($comment->created->value->getTimestamp());
   $variables['changed'] = format_date($comment->changed->value->getTimestamp());
 
   $variables['new'] = !empty($comment->new) ? t('new') : '';
-  $variables['user_picture'] = theme_get_setting('toggle_comment_user_picture') ? theme('user_picture', array('account' => $comment)) : '';
+  $variables['user_picture'] = theme_get_setting('toggle_comment_user_picture') ? theme('user_picture', array('account' => $account)) : '';
   $variables['signature'] = $comment->signature;
 
   $uri = $comment->uri();

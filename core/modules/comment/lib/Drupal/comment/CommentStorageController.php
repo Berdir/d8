@@ -47,6 +47,7 @@ class CommentStorageController extends DatabaseStorageControllerNG {
     foreach ($records as $key => $record) {
       $record->name = $record->uid ? $record->registered_name : $record->name;
       $record->new = node_mark($record->nid, $record->changed);
+      $record->node_type = 'comment_node_' . $record->node_type;
       $records[$key] = $record;
     }
     parent::attachLoad($records, $load_revision);
