@@ -41,7 +41,9 @@ interface ItemInterface extends ComplexDataInterface, TypedDataInterface {
    * @param $property_name
    *   The name of the property to set; e.g., 'title' or 'name'.
    * @param $value
-   *   The value to set, or NULL to unset the property.
+   *   The value to set, or NULL to unset the property. Optionally, a typed
+   *   data object implementing Drupal\Core\TypedData\TypedDataInterface may be
+   *   passed instead of a plain value.
    *
    * @throws \InvalidArgumentException
    *   If a not existing property is set.

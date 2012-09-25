@@ -85,10 +85,6 @@ abstract class ItemBase extends TypedData implements IteratorAggregate, ItemInte
       $keys = array_keys($this->properties);
       $values = array($keys[0] => $values);
     }
-    // Support passing in property objects as value.
-    elseif ($values instanceof TypedDataInterface) {
-      $values = $values->getValue();
-    }
 
     foreach ($this->properties as $name => $property) {
       $property->setValue(isset($values[$name]) ? $values[$name] : NULL);
@@ -143,6 +139,10 @@ abstract class ItemBase extends TypedData implements IteratorAggregate, ItemInte
    * Implements ItemInterface::__set().
    */
   public function __set($name, $value) {
+    // Support setting values via property objects.
+    if ($value instanceof TypedDataInterface) {
+      $value = $value->getValue();
+    }
     $this->get($name)->setValue($value);
   }
 

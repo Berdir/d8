@@ -346,6 +346,11 @@ class EntityNG extends Entity implements TranslatableComplexDataInterface, Acces
    * Magic getter: Sets the property in default language.
    */
   public function __set($name, $value) {
+    // Support setting values via property objects.
+    if ($value instanceof TypedDataInterface) {
+      $value = $value->getValue();
+    }
+
     if ($this->compatibilityMode) {
       $this->values[$name] = $value;
     }

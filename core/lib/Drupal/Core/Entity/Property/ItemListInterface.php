@@ -18,6 +18,10 @@ use Drupal\Core\TypedData\AccessibleInterface;
  * contained item, in particular get() and set() as well as their magic
  * equivalences.
  *
+ * Optionally, a typed data object implementing
+ * Drupal\Core\TypedData\TypedDataInterface may be passed to
+ * ArrayAccess::offsetSet() instead of a plain value.
+ *
  * When implementing this interface which extends Traversable, make sure to list
  * IteratorAggregate or Iterator before this interface in the implements clause.
  */

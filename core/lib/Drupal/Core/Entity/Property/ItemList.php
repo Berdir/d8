@@ -54,12 +54,8 @@ class ItemList extends TypedData implements IteratorAggregate, ItemListInterface
   public function setValue($values) {
     if (!empty($values)) {
 
-      // Support passing in property objects as value.
-      if ($values instanceof TypedDataInterface) {
-        $values = $values->getValue();
-      }
       // Support passing in only the value of the first item.
-      elseif (!is_array($values) || !is_numeric(current(array_keys($values)))) {
+      if (!is_array($values) || !is_numeric(current(array_keys($values)))) {
         $values = array(0 => $values);
       }
 
@@ -157,6 +153,10 @@ class ItemList extends TypedData implements IteratorAggregate, ItemListInterface
       $offset = $this->list ? max(array_keys($this->list)) + 1 : 0;
     }
     if (is_numeric($offset)) {
+      // Support setting values via typed data objects.
+      if ($value instanceof TypedDataInterface) {
+        $value = $value->getValue();
+      }
       $this->offsetGet($offset)->setValue($value);
     }
     else {
