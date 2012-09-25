@@ -113,23 +113,6 @@ class EntityTranslation extends TypedData implements IteratorAggregate, ComplexD
   }
 
   /**
-   * Implements ComplexDataInterface::setProperties().
-   */
-  public function setProperties($properties) {
-    foreach ($this->getProperties() as $name => $property) {
-      if (isset($properties[$name])) {
-        // Copy the value to our property object.
-        $value = $properties[$name] instanceof TypedDataInterface ? $properties[$name]->getValue() : $properties[$name];
-        $property->setValue($value);
-        unset($properties[$name]);
-      }
-    }
-    if ($properties) {
-      throw new InvalidArgumentException('Property ' . check_plain(key($values)) . ' is unknown or not translatable.');
-    }
-  }
-
-  /**
    * Magic getter: Gets the translated property.
    */
   public function __get($name) {
@@ -176,10 +159,19 @@ class EntityTranslation extends TypedData implements IteratorAggregate, ComplexD
   }
 
   /**
-   * Implements ComplexDataInterface::toArray().
+   * Implements ComplexDataInterface::getPropertyValues().
    */
-  public function toArray() {
+  public function getPropertyValues() {
     return $this->getValue();
+  }
+
+  /**
+   * Implements ComplexDataInterface::setPropertyValues().
+   */
+  public function setPropertyValues($values) {
+    foreach ($values as $name => $value) {
+      $this->get($name)->setValue($value);
+    }
   }
 
   /**

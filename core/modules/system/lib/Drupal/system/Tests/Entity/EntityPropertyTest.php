@@ -209,6 +209,17 @@ class EntityPropertyTest extends WebTestBase  {
     $this->assertEqual(count($entity->name), 1, 'Empty item is considered when counting.');
     $this->assertEqual(count(iterator_to_array($entity->name->getIterator())), count($entity->name), 'Count matches iterator count.');
     $this->assertTrue($entity->name->getValue() === array(0 => NULL), 'Name property value contains a NULL value.');
+
+    // Test get and set property values.
+    $entity->name = 'foo';
+    $this->assertEqual($entity->name[0]->getPropertyValues(), array('value' => 'foo'), 'Property value has been retrieved via getPropertyValue()');
+    $entity->name[0]->setPropertyValues(array('value' => 'bar'));
+    $this->assertEqual($entity->name->value, 'bar', 'Property value has been set via setPropertyValue()');
+
+    $values = $entity->getPropertyValues();
+    $this->assertEqual($values['name'], array(0 => array('value' => 'bar')), 'Property value has been retrieved via getPropertyValue() from an entity.');
+    $entity->setPropertyValues(array('name' => 'foo'));
+    $this->assertEqual($entity->name->value, 'foo', 'Property value has been set via setPropertyValue() on an entity.');
   }
 
   /**

@@ -20,9 +20,6 @@ use Drupal\Core\TypedData\AccessibleInterface;
  *
  * When implementing this interface which extends Traversable, make sure to list
  * IteratorAggregate or Iterator before this interface in the implements clause.
- *
- * @todo: Should getProperties(), setProperties() and getPropertyDefinitions()
- * be delegated as well.
  */
 interface ItemListInterface extends ListInterface, TypedDataInterface, AccessibleInterface {
 

@@ -235,17 +235,6 @@ class ItemList extends TypedData implements IteratorAggregate, ItemListInterface
   }
 
   /**
-   * Gets the the raw array representation of the entity property.
-   *
-   * @return array
-   *   The raw array representation of the entity property, i.e. an array
-   *   containing the raw values of all contained items.
-   */
-  public function toArray() {
-    return $this->getValue();
-  }
-
-  /**
    * Implements ListInterface::isEmpty().
    */
   public function isEmpty() {

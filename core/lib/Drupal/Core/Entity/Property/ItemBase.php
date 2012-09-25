@@ -176,18 +176,18 @@ abstract class ItemBase extends TypedData implements IteratorAggregate, ItemInte
   }
 
   /**
-   * Implements ComplexDataInterface::setProperties().
+   * Implements ComplexDataInterface::getPropertyValues().
    */
-  public function setProperties($properties) {
-    foreach ($properties as $name => $property) {
-      if (isset($this->properties[$name])) {
-        // Copy the value to our property object.
-        $value = $property instanceof TypedDataInterface ? $property->getValue() : $property;
-        $this->properties[$name]->setValue($value);
-      }
-      else {
-        throw new InvalidArgumentException('Property ' . check_plain($name) . ' is unknown.');
-      }
+  public function getPropertyValues() {
+    return $this->getValue();
+  }
+
+  /**
+   * Implements ComplexDataInterface::setPropertyValues().
+   */
+  public function setPropertyValues($values) {
+    foreach ($values as $name => $value) {
+      $this->get($name)->setValue($value);
     }
   }
 
@@ -204,13 +204,6 @@ abstract class ItemBase extends TypedData implements IteratorAggregate, ItemInte
   public function getPropertyDefinition($name) {
     $definitions = $this->getPropertyDefinitions();
     return isset($definitions[$name]) ? $definitions[$name] : FALSE;
-  }
-
-  /**
-   * Implements ComplexDataInterface::toArray().
-   */
-  public function toArray() {
-    return $this->getValue();
   }
 
   /**

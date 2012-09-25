@@ -196,7 +196,7 @@ class EntityTranslationTest extends WebTestBase {
           'user_id' => array(0 => $uid),
         );
       }
-      $entity->getTranslation($langcode)->setProperties($properties[$langcode]);
+      $entity->getTranslation($langcode)->setPropertyValues($properties[$langcode]);
     }
     $entity->save();
 

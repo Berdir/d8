@@ -173,9 +173,17 @@ class Entity implements IteratorAggregate, EntityInterface {
   }
 
   /**
-   * Implements TranslatableComplexDataInterface::setProperties().
+   * Implements TranslatableComplexDataInterface::getPropertyValues().
    */
-  public function setProperties($properties) {
+  public function getPropertyValues() {
+    // @todo: Replace by EntityNG implementation once all entity types have been
+    // converted to use the entity property API.
+  }
+
+  /**
+   * Implements ComplexDataInterface::setPropertyValues().
+   */
+  public function setPropertyValues($values) {
     // @todo: Replace by EntityNG implementation once all entity types have been
     // converted to use the entity property API.
   }
@@ -192,14 +200,6 @@ class Entity implements IteratorAggregate, EntityInterface {
    * Implements TranslatableComplexDataInterface::getPropertyDefinitions().
    */
   public function getPropertyDefinitions() {
-    // @todo: Replace by EntityNG implementation once all entity types have been
-    // converted to use the entity property API.
-  }
-
-  /**
-   * Implements TranslatableComplexDataInterface::toArray().
-   */
-  public function toArray() {
     // @todo: Replace by EntityNG implementation once all entity types have been
     // converted to use the entity property API.
   }

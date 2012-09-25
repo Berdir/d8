@@ -149,15 +149,6 @@ class EntityWrapper extends TypedData implements IteratorAggregate, ComplexDataI
   }
 
   /**
-   * Implements ComplexDataInterface::setProperties().
-   */
-  public function setProperties($properties) {
-    if ($entity = $this->getValue()) {
-      $entity->setProperties($properties);
-    }
-  }
-
-  /**
    * Implements ComplexDataInterface::getPropertyDefinition().
    */
   public function getPropertyDefinition($name) {
@@ -174,11 +165,20 @@ class EntityWrapper extends TypedData implements IteratorAggregate, ComplexDataI
   }
 
   /**
-   * Implements ComplexDataInterface::toArray().
+   * Implements ComplexDataInterface::getPropertyValues().
    */
-  public function toArray() {
+  public function getPropertyValues() {
     $entity = $this->getValue();
-    return $entity ? $entity->toArray() : array();
+    return $entity ? $entity->getPropertyValues() : array();
+  }
+
+  /**
+   * Implements ComplexDataInterface::setPropertyValues().
+   */
+  public function setPropertyValues($values) {
+    if ($entity = $this->getValue()) {
+      $entity->setPropertyValues($values);
+    }
   }
 
   /**

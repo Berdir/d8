@@ -132,17 +132,6 @@ class EntityNG extends Entity implements TranslatableComplexDataInterface, Acces
   }
 
   /**
-   * Implements ComplexDataInterface::setProperties().
-   */
-  public function setProperties($properties) {
-    foreach ($properties as $name => $property) {
-      // Copy the value to our property object.
-      $value = $property instanceof TypedDataInterface ? $property->getValue() : $property;
-      $this->get($name)->setValue($value);
-    }
-  }
-
-  /**
    * Implements IteratorAggregate::getIterator().
    */
   public function getIterator() {
@@ -179,14 +168,23 @@ class EntityNG extends Entity implements TranslatableComplexDataInterface, Acces
   }
 
   /**
-   * Implements ComplexDataInterface::toArray().
+   * Implements ComplexDataInterface::getPropertyValues().
    */
-  public function toArray() {
+  public function getPropertyValues() {
     $values = array();
     foreach ($this->getProperties() as $name => $property) {
       $values[$name] = $property->getValue();
     }
     return $values;
+  }
+
+  /**
+   * Implements ComplexDataInterface::setPropertyValues().
+   */
+  public function setPropertyValues($values) {
+    foreach ($values as $name => $value) {
+      $this->get($name)->setValue($value);
+    }
   }
 
   /**

@@ -20,7 +20,7 @@ use Traversable;
 interface ComplexDataInterface extends Traversable  {
 
   /**
-   * Gets a property.
+   * Gets a property object.
    *
    * @param $property_name
    *   The name of the property to get; e.g., 'title' or 'name'.
@@ -34,7 +34,7 @@ interface ComplexDataInterface extends Traversable  {
   public function get($property_name);
 
   /**
-   * Sets a property.
+   * Sets a property value.
    *
    * @param $property_name
    *   The name of the property to set; e.g., 'title' or 'name'.
@@ -42,7 +42,7 @@ interface ComplexDataInterface extends Traversable  {
    *   The value to set, or NULL to unset the property.
    *
    * @throws \InvalidArgumentException
-   *   If an invalid property name is given.
+   *   If the specified property does not exist.
    *
    * @return \Drupal\Core\TypedData\TypedDataInterface
    *   The property object.
@@ -50,7 +50,7 @@ interface ComplexDataInterface extends Traversable  {
   public function set($property_name, $value);
 
   /**
-   * Gets an array of properties.
+   * Gets an array of property objects.
    *
    * @param bool $include_computed
    *   If set to TRUE, computed properties are included. Defaults to FALSE.
@@ -62,19 +62,28 @@ interface ComplexDataInterface extends Traversable  {
   public function getProperties($include_computed = FALSE);
 
   /**
-   * Sets an array of properties.
+   * Gets an array of property values.
+   *
+   * Gets an array of plain property values including all not-computed
+   * properties.
+   *
+   * @return array
+   *   An array keyed by property name containing the property value.
+   */
+  public function getPropertyValues();
+
+  /**
+   * Sets multiple property values.
    *
    * @param array
-   *   The array of properties to set. The array has to consist of property
-   *   values or property objects implementing the TypedDataInterface and must
-   *   be keyed by property name.
+   *   The array of property values to set, keyed by property name.
    *
    * @throws \InvalidArgumentException
-   *   If an not existing property is passed.
+   *   If the value of a not existing property is to be set.
    * @throws \Drupal\Core\TypedData\ReadOnlyException
    *   If a read-only property is set.
    */
-  public function setProperties($properties);
+  public function setPropertyValues($values);
 
   /**
    * Gets the definition of a contained property.
@@ -99,14 +108,6 @@ interface ComplexDataInterface extends Traversable  {
    *   property name.
    */
   public function getPropertyDefinitions();
-
-  /**
-   * Gets the plain values of the contained properties.
-   *
-   * @return array
-   *   An array keyed by property name containing the plain property values.
-   */
-  public function toArray();
 
   /**
    * Determines whether the data structure is empty.
