@@ -1,12 +1,11 @@
 <?php
+
 /**
  * @file
  * Definition of Drupal\Core\Entity\Property\StringItem.
  */
 
 namespace Drupal\Core\Entity\Property;
-use Drupal\Core\Entity\Property\ItemBase;
-
 
 /**
  * Defines the 'string_item' entity property item.

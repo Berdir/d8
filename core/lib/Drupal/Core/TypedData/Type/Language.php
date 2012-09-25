@@ -1,19 +1,24 @@
 <?php
+
 /**
  * @file
  * Definition of Drupal\Core\TypedData\Type\Language.
  */
 
 namespace Drupal\Core\TypedData\Type;
+
 use Drupal\Core\TypedData\TypedDataInterface;
 use InvalidArgumentException;
 
 /**
- * Defines the 'language' data type, e.g. the computed 'language' property of language items.
+ * Defines the 'language' data type.
  *
  * The plain value of a language is the language object, i.e. an instance of
  * Drupal\Core\Language\Language. For setting the value the language object or
  * the language code as string may be passed.
+ *
+ * Optionally, this class may be used as computed property, see the supported
+ * settings below. E.g., it is used as 'language' property of language items.
  *
  * Supported settings (below the definition's 'settings' key) are:
  *  - langcode source: If used as computed property, the langcode property used

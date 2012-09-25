@@ -1,12 +1,11 @@
 <?php
+
 /**
  * @file
  * Definition of Drupal\Core\Entity\Property\IntegerItem.
  */
 
 namespace Drupal\Core\Entity\Property;
-use Drupal\Core\Entity\Property\ItemBase;
-
 
 /**
  * Defines the 'integer_item' entity property item.

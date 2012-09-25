@@ -11,7 +11,6 @@ use Drupal\Component\Plugin\PluginManagerBase;
 use Drupal\Core\Plugin\Discovery\CacheDecorator;
 use Drupal\Core\Plugin\Discovery\HookDiscovery;
 
-
 /**
  * Manages data type plugins.
  */
@@ -51,16 +50,19 @@ class TypedDataManager extends PluginManagerBase {
    *   - read-only: A boolean specifying whether the data is read-only. Defaults
    *     to TRUE for computed properties, to FALSE otherwise.
    *   - class: If set and 'list' is FALSE, the class to use for creating the
-   *     typed data object. Else the default class of the data type will be
+   *     typed data object; otherwise the default class of the data type will be
    *     used.
    *   - list class: If set and 'list' is TRUE, the class to use for creating
-   *     the typed data object. Else the default list class of the data type
-   *     will be used.
-   *   - settings: An array of settings, as required by the used class. See the
-   *     documentation of the used class for supported or required settings.
+   *     the typed data object; otherwise the default list class of the data
+   *     type will be used.
+   *   - settings: An array of settings, as required by the used 'class'. See
+   *     the documentation of the class for supported or required settings.
+   *   - list settings: An array of settings as required by the used
+   *     'list class'. See the documentation of the list class for support or
+   *     required settings.
    *   - constraints: An array of type specific value constraints, e.g. for data
    *     of type 'entity' the 'entity type' and 'bundle' may be specified. See
-   *     the documentation of the data type class for supported constraints.
+   *     the documentation of the data type 'class' for supported constraints.
    *   - required: A boolean specifying whether a non-NULL value is mandatory.
    *   Further keys may be supported in certain usages, e.g. for further keys
    *   supported for entity property definitions see

@@ -6,6 +6,7 @@
  */
 
 namespace Drupal\Core\TypedData\Type;
+
 use Drupal\Core\TypedData\TypedDataInterface;
 use InvalidArgumentException;
 

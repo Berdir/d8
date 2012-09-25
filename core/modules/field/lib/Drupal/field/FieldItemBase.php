@@ -1,13 +1,14 @@
 <?php
 
-/*
+/**
  * @file
  * Definition of Drupal\field\FieldItemBase.
  */
 
 namespace Drupal\field;
-use Drupal\Core\TypedData\MissingContextException;
+
 use Drupal\Core\Entity\Property\ItemBase;
+use Drupal\Core\TypedData\MissingContextException;
 use InvalidArgumentException;
 
 /**

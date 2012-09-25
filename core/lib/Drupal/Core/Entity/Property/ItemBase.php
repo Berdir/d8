@@ -6,13 +6,14 @@
  */
 
 namespace Drupal\Core\Entity\Property;
+
 use Drupal\Core\TypedData\Type\TypedData;
-use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\Core\TypedData\ComplexDataInterface;
+use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\user;
-use InvalidArgumentException;
 use ArrayIterator;
 use IteratorAggregate;
+use InvalidArgumentException;
 
 /**
  * An entity property item.

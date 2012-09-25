@@ -6,9 +6,10 @@
  */
 
 namespace Drupal\Core\Entity\Property;
+
+use Drupal\Core\TypedData\AccessibleInterface;
 use Drupal\Core\TypedData\ListInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
-use Drupal\Core\TypedData\AccessibleInterface;
 
 /**
  * Interface for entity properties, being lists of property items.

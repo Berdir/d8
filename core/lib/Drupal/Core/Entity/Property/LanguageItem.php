@@ -1,11 +1,12 @@
 <?php
+
 /**
  * @file
  * Definition of Drupal\Core\Entity\Property\LanguageItem.
  */
 
 namespace Drupal\Core\Entity\Property;
-use Drupal\Core\Entity\Property\ItemBase;
+
 use InvalidArgumentException;
 
 /**

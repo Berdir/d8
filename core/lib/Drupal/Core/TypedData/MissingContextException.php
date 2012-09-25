@@ -6,9 +6,12 @@
  */
 
 namespace Drupal\Core\TypedData;
+
 use Exception;
 
 /**
  * Exception thrown when data wrappers miss contextual information.
  */
-class MissingContextException extends Exception { }
+class MissingContextException extends Exception {
+
+}

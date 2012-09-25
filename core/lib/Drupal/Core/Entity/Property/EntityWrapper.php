@@ -1,14 +1,16 @@
 <?php
+
 /**
  * @file
  * Definition of Drupal\Core\Entity\Property\EntityWrapper.
  */
 
 namespace Drupal\Core\Entity\Property;
-use Drupal\Core\TypedData\Type\TypedData;
-use Drupal\Core\TypedData\TypedDataInterface;
-use Drupal\Core\TypedData\ComplexDataInterface;
+
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\TypedData\Type\TypedData;
+use Drupal\Core\TypedData\ComplexDataInterface;
+use Drupal\Core\TypedData\TypedDataInterface;
 use ArrayIterator;
 use IteratorAggregate;
 use InvalidArgumentException;

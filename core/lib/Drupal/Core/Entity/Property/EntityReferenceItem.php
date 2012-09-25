@@ -1,13 +1,13 @@
 <?php
+
 /**
  * @file
  * Definition of Drupal\Core\Entity\Property\EntityReferenceItem.
  */
 
 namespace Drupal\Core\Entity\Property;
-use Drupal\Core\Entity\Property\ItemBase;
-use InvalidArgumentException;
 
+use InvalidArgumentException;
 
 /**
  * Defines the 'entityreference_item' entity property item.

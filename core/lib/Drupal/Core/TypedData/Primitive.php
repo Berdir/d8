@@ -51,5 +51,4 @@ final class Primitive {
    * The BINARY primitive data type.
    */
   const BINARY = 8;
-
 }

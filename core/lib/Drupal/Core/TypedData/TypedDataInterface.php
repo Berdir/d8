@@ -6,6 +6,7 @@
  */
 
 namespace Drupal\Core\TypedData;
+
 use Drupal\user;
 
 /**
@@ -84,5 +85,4 @@ interface TypedDataInterface {
    * Validates the currently set data value.
    */
   public function validate();
-
 }

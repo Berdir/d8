@@ -1,10 +1,12 @@
 <?php
+
 /**
  * @file
  * Definition of Drupal\text\FieldTextItem.
  */
 
 namespace Drupal\text;
+
 use Drupal\field\FieldItemBase;
 
 /**
@@ -49,4 +51,3 @@ class FieldTextItem extends FieldItemBase {
     return self::$propertyDefinitions;
   }
 }
-

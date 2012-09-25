@@ -6,6 +6,7 @@
  */
 
 namespace Drupal\Core\Entity\Property;
+
 use Drupal\Core\TypedData\ComplexDataInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
 

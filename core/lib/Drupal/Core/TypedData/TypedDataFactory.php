@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Definition of Drupal\Core\TypedData\TypedDataFactory.
@@ -7,9 +8,7 @@
 namespace Drupal\Core\TypedData;
 
 use Drupal\Component\Plugin\Factory\DefaultFactory;
-use Drupal\Component\Plugin\Discovery\DiscoveryInterface;
 use Drupal\Component\Plugin\Exception\PluginException;
-use Drupal\Component\Plugin\Derivative\DerivativeInterface;
 
 /**
  * A factory for typed data objects.

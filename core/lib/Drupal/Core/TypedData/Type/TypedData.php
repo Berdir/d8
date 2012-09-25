@@ -6,6 +6,7 @@
  */
 
 namespace Drupal\Core\TypedData\Type;
+
 use Drupal\Core\TypedData\TypedDataInterface;
 
 /**
@@ -39,8 +40,6 @@ abstract class TypedData implements TypedDataInterface {
 
   /**
    * Implements TypedDataInterface::getType().
-   *
-   * @return string
    */
   public function getType() {
     return $this->definition['type'];
@@ -48,8 +47,6 @@ abstract class TypedData implements TypedDataInterface {
 
   /**
    * Implements TypedDataInterface::getDefinition().
-   *
-   * @return array
    */
   public function getDefinition() {
     return $this->definition;
@@ -57,8 +54,6 @@ abstract class TypedData implements TypedDataInterface {
 
   /**
    * Implements TypedDataInterface::getValue().
-   *
-   * @return mixed
    */
   public function getValue() {
     return $this->value;
@@ -66,8 +61,6 @@ abstract class TypedData implements TypedDataInterface {
 
   /**
    * Implements TypedDataInterface::setValue().
-   *
-   * @param mixed $value
    */
   public function setValue($value) {
     $this->value = $value;
@@ -75,8 +68,6 @@ abstract class TypedData implements TypedDataInterface {
 
   /**
    * Implements TypedDataInterface::getString().
-   *
-   * @return string
    */
   public function getString() {
     return (string) $this->getValue();

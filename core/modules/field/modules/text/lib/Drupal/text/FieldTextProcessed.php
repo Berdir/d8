@@ -6,9 +6,10 @@
  */
 
 namespace Drupal\text;
+
 use Drupal\Core\TypedData\TypedDataInterface;
-use Drupal\Core\TypedData\ReadOnlyException;
 use Drupal\Core\TypedData\Type\String;
+use Drupal\Core\TypedData\ReadOnlyException;
 use InvalidArgumentException;
 
 /**

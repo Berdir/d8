@@ -1,11 +1,12 @@
 <?php
 
-/*
+/**
  * @file
  * Definition of Drupal\field\FieldItemInterface.
  */
 
 namespace Drupal\field;
+
 use Drupal\Core\Entity\Property\ItemInterface;
 
 /**

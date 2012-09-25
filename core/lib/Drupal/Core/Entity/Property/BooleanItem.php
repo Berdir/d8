@@ -1,12 +1,11 @@
 <?php
+
 /**
  * @file
  * Definition of Drupal\Core\Entity\Property\BooleanItem.
  */
 
 namespace Drupal\Core\Entity\Property;
-use Drupal\Core\Entity\Property\ItemBase;
-
 
 /**
  * Defines the 'boolean_item' entity property item.

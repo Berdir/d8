@@ -6,6 +6,7 @@
  */
 
 namespace Drupal\Core\Entity\Property;
+
 use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\Core\TypedData\Type\TypedData;
 use Drupal\user\User;

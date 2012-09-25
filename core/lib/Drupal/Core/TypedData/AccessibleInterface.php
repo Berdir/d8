@@ -13,15 +13,14 @@ namespace Drupal\Core\TypedData;
 interface AccessibleInterface {
 
   /**
-   * Check data value access.
+   * Checks data value access.
    *
    * @param \Drupal\user\User $account
    *   (optional) The user account to check access for. Defaults to the current
    *   user.
    *
    * @return bool
-   *   Whether the given user has access.
+   *   TRUE if the given user has access; otherwise FALSE.
    */
   public function access(\Drupal\user\User $account = NULL);
-
 }

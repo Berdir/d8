@@ -416,4 +416,3 @@ class EntityNG extends Entity implements TranslatableComplexDataInterface, Acces
     }
   }
 }
-

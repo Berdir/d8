@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Definition of Drupal\text\FieldTextWithSummaryItem.
@@ -47,4 +48,3 @@ class FieldTextWithSummaryItem extends FieldTextItem {
     return self::$propertyDefinitions;
   }
 }
-

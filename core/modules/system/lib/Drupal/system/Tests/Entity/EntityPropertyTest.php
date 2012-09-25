@@ -7,10 +7,10 @@
 
 namespace Drupal\system\Tests\Entity;
 
-use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Property\ItemListInterface;
 use Drupal\Core\Entity\Property\ItemInterface;
+use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\simpletest\WebTestBase;
 
 /**

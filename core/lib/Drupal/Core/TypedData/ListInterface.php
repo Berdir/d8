@@ -6,6 +6,7 @@
  */
 
 namespace Drupal\Core\TypedData;
+
 use ArrayAccess;
 use Countable;
 use Traversable;
