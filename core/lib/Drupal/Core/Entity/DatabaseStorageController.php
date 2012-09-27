@@ -10,7 +10,6 @@ namespace Drupal\Core\Entity;
 use PDO;
 use Exception;
 use Drupal\Component\Uuid\Uuid;
-use Exception;
 
 
 /**
@@ -476,19 +475,10 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
       $this->preSave($entity);
       $this->invokeHook('presave', $entity);
 
-      if (!$entity->isNew()) {
-        $return = drupal_write_record($this->entityInfo['base table'], $entity, $this->idKey);
-        if ($this->revisionKey) {
-          $this->saveRevision($entity);
-        }
-        $this->resetCache(array($entity->{$this->idKey}));
-        $this->postSave($entity, TRUE);
-        $this->invokeHook('update', $entity);
-      }
-      else {
+      if ($entity->isNew()) {
         $return = drupal_write_record($this->entityInfo['base table'], $entity);
         if ($this->revisionKey) {
-          $this->saveRevision($entity);
+          $this->saveRevision($entity, FALSE);
         }
         // Reset general caches, but keep caches specific to certain entities.
         $this->resetCache(array());
@@ -496,6 +486,15 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
         $entity->enforceIsNew(FALSE);
         $this->postSave($entity, FALSE);
         $this->invokeHook('insert', $entity);
+      }
+      else {
+        $return = drupal_write_record($this->entityInfo['base table'], $entity, $this->idKey);
+        if ($this->revisionKey) {
+          $this->saveRevision($entity);
+        }
+        $this->resetCache(array($entity->{$this->idKey}));
+        $this->postSave($entity, TRUE);
+        $this->invokeHook('update', $entity);
       }
 
       // Ignore slave server temporarily.
@@ -516,27 +515,33 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
    *
    * @param Drupal\entity\EntityInterface $node
    *   The node entity.
+   * @param boolean $update
+   *   (Optional) TRUE if the entity has been updated, or FALSE if it has been
+   *   inserted.
    */
-  protected function saveRevision(EntityInterface $entity) {
+  protected function saveRevision(EntityInterface $entity, $update = TRUE) {
     // Convert the entity into a array as it might not have the same properties
     // as the entity, it is just a raw structure.
     $record = (array) $entity;
 
-    // When saving a new revision, set any existing revision ID to NULL so as to
-    // ensure that a new revision will actually be created, then store the old
-    // revision ID in a separate property for use by hook implementations.
-    if ($entity->isNewRevision() && $record[$this->revisionKey]) {
+    // When saving a new revision for an existing entity, set any existing
+    // revision ID to NULL so as to ensure that a new revision will actually be
+    // created, then store the old/ revision ID in a separate property for use
+    // by hook implementations.
+    if ($update && $entity->isNewRevision() && $record[$this->revisionKey]) {
       $record[$this->revisionKey] = NULL;
     }
 
     $this->preSaveRevision($record, $entity);
 
-    if ($entity->isNewRevision()) {
+    if (!$update || $entity->isNewRevision()) {
       drupal_write_record($this->revisionTable, $record);
-      db_update($this->entityInfo['base table'])
-        ->fields(array($this->revisionKey => $record[$this->revisionKey]))
-        ->condition($this->idKey, $entity->id())
-        ->execute();
+      if ($entity->isDefaultRevision()) {
+        db_update($this->entityInfo['base table'])
+          ->fields(array($this->revisionKey => $record[$this->revisionKey]))
+          ->condition($this->idKey, $entity->id())
+          ->execute();
+      }
       $entity->setNewRevision(FALSE);
     }
     else {
@@ -544,9 +549,6 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
     }
     // Make sure to update the new revision key for the entity.
     $entity->{$this->revisionKey} = $record[$this->revisionKey];
-
-    // Mark this revision as the current one.
-    $entity->isCurrentRevision = TRUE;
   }
 
   /**

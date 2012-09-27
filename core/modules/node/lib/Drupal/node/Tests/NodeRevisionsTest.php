@@ -121,7 +121,7 @@ class NodeRevisionsTest extends NodeTestBase {
     $new_body = $this->randomName();
     $new_node_revision->body[LANGUAGE_NOT_SPECIFIED][0]['value'] = $new_body;
     // Save this as a non-default revision.
-    $new_node_revision->revision = TRUE;
+    $new_node_revision->setNewRevision();
     $new_node_revision->isDefaultRevision = FALSE;
     node_save($new_node_revision);
 
@@ -141,6 +141,11 @@ class NodeRevisionsTest extends NodeTestBase {
       ->fetchCol();
     $default_revision_vid = $default_revision[0];
     $this->assertTrue($new_node_revision->vid > $default_revision_vid, 'Revision vid is greater than default revision vid.');
+
+    $fixed_revision = $this->drupalCreateNode(array('vid' => 9999));
+
+    $loaded_revision = node_revision_load(9999);
+    $this->assertEqual($loaded_revision->nid, $fixed_revision->nid);
   }
 
   /**
