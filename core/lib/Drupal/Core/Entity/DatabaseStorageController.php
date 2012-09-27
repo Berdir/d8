@@ -526,8 +526,8 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
 
     // When saving a new revision for an existing entity, set any existing
     // revision ID to NULL so as to ensure that a new revision will actually be
-    // created, then store the old/ revision ID in a separate property for use
-    // by hook implementations.
+    // created. The old revision id is available to hook implementations through
+    // $entity->original.
     if ($update && $entity->isNewRevision() && $record[$this->revisionKey]) {
       $record[$this->revisionKey] = NULL;
     }

@@ -25,6 +25,21 @@ class EntityFieldQueryTest extends WebTestBase {
    */
   public static $modules = array('node', 'field_test', 'entity_query_access_test', 'node_access_test');
 
+  /**
+   * The first revision id.
+   *
+   * @var integer
+   */
+  protected $revision_id1;
+
+  /**
+   * The second revision id
+   *
+   * @var integer
+   */
+  protected $revision_id2;
+
+
   public static function getInfo() {
     return array(
       'name' => 'Entity query',
@@ -110,8 +125,6 @@ class EntityFieldQueryTest extends WebTestBase {
     field_create_instance($instances[1]);
 
     $this->instances = $instances;
-    // Write entity base table if there is one.
-    $entities = array();
 
     // Create entities which have a 'bundle key' defined.
     for ($i = 1; $i < 7; $i++) {
@@ -147,13 +160,11 @@ class EntityFieldQueryTest extends WebTestBase {
     }
 
     // Add two revisions to an entity.
-    for ($i = 100; $i < 102; $i++) {
-      $entity->ftvid = $i;
-      // Flag to make sure that the provided vid is used for a new revision.
-      $entity->use_provided_revision_id = $i;
-      $entity->{$this->field_names[0]}[LANGUAGE_NOT_SPECIFIED][0]['value'] = $i;
+    for ($i = 1; $i <= 2; $i++) {
+      $entity->{$this->field_names[0]}[LANGUAGE_NOT_SPECIFIED][0]['value'] = 100 + $i;
       $entity->setNewRevision();
       $entity->save();
+      $this->{'revision_id' . $i} = $entity->getRevisionId();
     }
   }
 
@@ -248,18 +259,18 @@ class EntityFieldQueryTest extends WebTestBase {
     $query = new EntityFieldQuery();
     $query
       ->entityCondition('entity_type', 'test_entity')
-      ->fieldCondition($this->fields[0], 'value', 100, '>=')
+      ->fieldCondition($this->fields[0], 'value', 101, '>=')
       ->age(FIELD_LOAD_REVISION);
     $this->assertEntityFieldQuery($query, array(
-        array('test_entity', 100),
-        array('test_entity', 101),
+        array('test_entity', $this->revision_id1),
+        array('test_entity', $this->revision_id2),
     ), t('Test revision age.'));
 
     // Test that fields attached to the non-revision supporting entity
     // 'test_entity_bundle_key' are reachable in FIELD_LOAD_REVISION.
     $query = new EntityFieldQuery();
     $query
-      ->fieldCondition($this->fields[0], 'value', 100, '<')
+      ->fieldCondition($this->fields[0], 'value', 101, '<')
       ->age(FIELD_LOAD_REVISION);
     $this->assertEntityFieldQuery($query, array(
         array('test_entity_bundle_key', 1),
@@ -828,7 +839,7 @@ class EntityFieldQueryTest extends WebTestBase {
     ), t('Test the "not in" operation on a property.'));
 
     $query = new EntityFieldQuery();
-    $query->fieldCondition($this->fields[0], 'value', array(3, 4, 100, 101), 'NOT IN');
+    $query->fieldCondition($this->fields[0], 'value', array(3, 4, 101, 102), 'NOT IN');
     $this->assertEntityFieldQuery($query, array(
       array('test_entity_bundle_key', 1),
       array('test_entity_bundle_key', 2),
