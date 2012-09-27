@@ -341,6 +341,19 @@ function hook_entity_delete(Drupal\Core\Entity\EntityInterface $entity) {
 }
 
 /**
+ * Respond to deletion of a entity revision.
+ *
+ * @param Drupal\Core\Entity\EntityInterface $entity_revision
+ *   The node revision (node object) that is being deleted.
+ */
+function hook_entity_revision_delete(Drupal\Core\Entity\EntityInterface $entity_revision) {
+  db_delete('mytable')
+    ->condition('entity_type', $entity_revision->entityType())
+    ->condition('entity_revision_id', $entity_revision->getRevisionId())
+    ->execute();
+}
+
+/**
  * Alter or execute an Drupal\Core\Entity\EntityFieldQuery.
  *
  * @param Drupal\Core\Entity\EntityFieldQuery $query
