@@ -49,7 +49,7 @@ function entity_get_info($entity_type = NULL) {
           'entity class' => 'Drupal\Core\Entity\Entity',
           'controller class' => 'Drupal\Core\Entity\DatabaseStorageController',
           'list controller class' => 'Drupal\Core\Entity\EntityListController',
-          'render class' => 'Drupal\Core\Entity\EntityRenderController',
+          'render controller class' => 'Drupal\Core\Entity\EntityRenderController',
           'form controller class' => array(
             'default' => 'Drupal\Core\Entity\EntityFormController',
           ),
