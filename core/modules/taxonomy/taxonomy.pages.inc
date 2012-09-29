@@ -48,7 +48,7 @@ function taxonomy_term_page(Term $term) {
   $build = taxonomy_term_show($term);
   if ($nids = taxonomy_select_nodes($term->tid, TRUE, variable_get('default_nodes_main', 10))) {
     $nodes = node_load_multiple($nids);
-    $build += node_view_multiple($nodes);
+    $build['nodes'] = node_view_multiple($nodes);
     $build['pager'] = array(
       '#theme' => 'pager',
       '#weight' => 5,

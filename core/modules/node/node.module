@@ -446,9 +446,6 @@ function node_type_get_types() {
  */
 function node_type_get_base($type) {
   $types = _node_types_build()->types;
-  if (is_object($type)) {
-    ddebug_backtrace();
-  }
   return isset($types[$type]) && isset($types[$type]->base) ? $types[$type]->base : FALSE;
 }
 
@@ -2523,7 +2520,7 @@ function node_feed($nids = FALSE, $channel = array()) {
  *   An array as expected by drupal_render().
  */
 function node_view(Node $node, $view_mode = 'full', $langcode = NULL) {
-  return entity_render_controller('node')->viewSingle($node, $view_mode, $langcode);
+  return entity_view($node, $view_mode, $langcode);
 }
 
 /**
@@ -2533,8 +2530,6 @@ function node_view(Node $node, $view_mode = 'full', $langcode = NULL) {
  *   An array of nodes as returned by node_load_multiple().
  * @param $view_mode
  *   (optional) View mode, e.g., 'full', 'teaser'... Defaults to 'teaser.'
- * @param $weight
- *   (optional) Integer representing the weight of the first node in the list.
  * @param $langcode
  *   (optional) A language code to use for rendering. Defaults to the global
  *   content language of the current request.
@@ -2542,8 +2537,8 @@ function node_view(Node $node, $view_mode = 'full', $langcode = NULL) {
  * @return
  *   An array in the format expected by drupal_render().
  */
-function node_view_multiple($nodes, $view_mode = 'teaser', $weight = 0, $langcode = NULL) {
-  return entity_render_controller('node')->viewMultiple($nodes, $view_mode, $weight, $langcode);
+function node_view_multiple($nodes, $view_mode = 'teaser', $langcode = NULL) {
+  return entity_view_multiple($nodes, $view_mode, $langcode);
 }
 
 /**

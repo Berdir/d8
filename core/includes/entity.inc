@@ -426,6 +426,43 @@ function entity_render_controller($entity_type) {
 }
 
 /**
+ * Return the render array for an entity.
+ *
+ * @param Drupal\Core\Entity\EntityInterface $entity
+ *   The entity to be rendered.
+ * @param string $view_mode
+ *   The view mode that should be used to display the entity.
+ * @param string $langcode
+ *   (optional) For which language the entity should be rendered, defaults to
+ *   the current language.
+ *
+ * @return array
+ *   A render array for the entity.
+ */
+function entity_view(EntityInterface $entity, $view_mode, $langcode = NULL) {
+  return entity_render_controller($entity->entityType())->viewSingle($entity, $view_mode, $langcode);
+}
+
+/**
+ * Return the render array for an entity.
+ *
+ * @param array $entity
+ *   The entities to be rendered, must be of the same type.
+ * @param string $view_mode
+ *   The view mode that should be used to display the entity.
+ * @param string $langcode
+ *   (optional) For which language the entity should be rendered, defaults to
+ *   the current language.
+ *
+ * @return array
+ *   A render array for the entities, indexed by the same keys as the
+ *   entities array passed in $entities.
+ */
+function entity_view_multiple(array $entities, $view_mode, $langcode = NULL) {
+  return entity_render_controller(reset($entities)->entityType())->viewMultiple($entities, $view_mode, $langcode);
+}
+
+/**
  * Returns the form id for the given entity and operation.
  *
  * @param EntityInterface $entity

@@ -7,8 +7,6 @@
 
 namespace Drupal\node\Tests;
 
-use Drupal\Core\Entity\EntityRenderController;
-
 /**
  * Test to ensure that a node's content is always rebuilt.
  */
@@ -33,7 +31,7 @@ class NodeBuildContentTest extends NodeTestBase {
       '#value' => $this->randomString(),
     );
     $nodes = array($node);
-    $content = EntityRenderController::create('node')->buildContent($nodes);
+    $content = entity_render_controller('node')->buildContent($nodes);
 
     // If the property doesn't exist it means the node->content was rebuilt.
     $this->assertFalse(isset($content['test_content_property']), 'Node content was emptied prior to being built.');
