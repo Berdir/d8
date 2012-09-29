@@ -2063,7 +2063,7 @@ function user_view_page($account) {
  *   An array as expected by drupal_render().
  */
 function user_view($account, $view_mode = 'full', $langcode = NULL) {
-  return entity_view($account, $view_mode, $langcode);
+  return user_view_multiple(array($account->id() => $account), $view_mode, 0, $langcode);
 }
 
 /**
@@ -2082,9 +2082,8 @@ function user_view($account, $view_mode = 'full', $langcode = NULL) {
  * @return
  *   An array in the format expected by drupal_render().
  */
-function user_view_multiple($nodes, $view_mode = 'full', $weight = 0, $langcode = NULL) {
-  return EntityRenderController::create('user')
-  ->viewMultiple($terms, $view_mode, $weight, $langcode);
+function user_view_multiple($accounts, $view_mode = 'full', $weight = 0, $langcode = NULL) {
+  return entity_render_controller('user')->viewMultiple($accounts, $view_mode, $weight, $langcode);
 }
 
 /**
