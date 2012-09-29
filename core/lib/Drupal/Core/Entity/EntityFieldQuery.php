@@ -436,7 +436,7 @@ class EntityFieldQuery {
    * @return Drupal\Core\Entity\EntityFieldQuery
    *   The called object.
    *
-   * @see Drupal\Core\Entity\EntityFieldQuery::propertyLanguageCondition()
+   * @see Drupal\entity\EntityFieldQuery::propertyLanguageCondition()
    */
   public function propertyCondition($column, $value, $operator = NULL, $langcode_group = 0) {
     $this->properties[$langcode_group][$column] = $column;
@@ -487,11 +487,11 @@ class EntityFieldQuery {
    *   condition with a related set of property conditions. By default all
    *   conditions belong to the same group.
    *
-   * @return Drupal\Core\Entity\EntityFieldQuery
+   * @return Drupal\entity\EntityFieldQuery
    *   The called object.
    *
-   * @see Drupal\Core\Entity\EntityFieldQuery::addFieldCondition()
-   * @see Drupal\Core\Entity\EntityFieldQuery::deleted()
+   * @see Drupal\entity\EntityFieldQuery::addFieldCondition()
+   * @see Drupal\entity\EntityFieldQuery::deleted()
    */
   public function propertyLanguageCondition($langcode = NULL, $operator = NULL, $langcode_group = 0) {
     // We have a separate method here to ensure there is a distinction at API
@@ -603,7 +603,7 @@ class EntityFieldQuery {
    * @return Drupal\Core\Entity\EntityFieldQuery
    *   The called object.
    *
-   * @see Drupal\Core\Entity\EntityFieldQuery::propertyLanguageCondition()
+   * @see Drupal\entity\EntityFieldQuery::propertyLanguageCondition()
    */
   public function propertyOrderBy($column, $direction = 'ASC', $langcode_group = 0) {
     $this->properties[$langcode_group][$column] = $column;
