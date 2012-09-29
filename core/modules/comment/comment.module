@@ -982,7 +982,7 @@ function comment_prepare_thread(&$comments) {
  */
 function comment_view(Comment $comment, Node $node, $view_mode = 'full', $langcode = NULL) {
   $comment->node = $node;
-  return entity_view($comment, $view_mode, $langcode);
+  return entity_render_controller('comment')->viewSingle($comment, $view_mode, $langcode);
 }
 
 /**

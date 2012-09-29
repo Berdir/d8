@@ -2063,7 +2063,7 @@ function user_view_page($account) {
  *   An array as expected by drupal_render().
  */
 function user_view($account, $view_mode = 'full', $langcode = NULL) {
-  return user_view_multiple(array($account->id() => $account), $view_mode, 0, $langcode);
+  return entity_render_controller('user')->viewSingle($account, $view_mode, $langcode);
 }
 
 /**

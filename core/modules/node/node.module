@@ -2508,6 +2508,24 @@ function node_feed($nids = FALSE, $channel = array()) {
   return new Response($output, 200, array('Content-Type' =>  'application/rss+xml; charset=utf-8'));
 }
 
+ /**
+  * Generates an array for rendering the given node.
+  *
+ * @param Drupal\node\Node $node
+ *   A node entity.
+ * @param $view_mode
+ *   (optional) View mode, e.g., 'full', 'teaser'... Defaults to 'full.'
+ * @param $langcode
+ *   (optional) A language code to use for rendering. Defaults to the global
+ *   content language of the current request.
+ *
+ * @return
+ *   An array as expected by drupal_render().
+ */
+function node_view(Node $node, $view_mode = 'full', $langcode = NULL) {
+  return entity_render_controller('node')->viewSingle($node, $view_mode, $langcode);
+}
+
 /**
  * Constructs a drupal_render() style array from an array of loaded nodes.
  *
