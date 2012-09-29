@@ -409,60 +409,6 @@ function entity_form_controller($entity_type, $operation = 'default') {
 }
 
 /**
- * Factory method to returns an entity render controller.
- *
- * @see hook_entity_info()
- *
- * @param string $entity_type
- *   The type of the entity.
- *
- * @return Drupal\Core\Entity\EntityRenderControllerInterface
- *   An entity render controller instance.
- */
-function entity_render_controller($entity_type) {
-  $info = entity_get_info($entity_type);
-  $class = $info['render controller class'];
-  return new $class($entity_type);
-}
-
-/**
- * Return the render array for an entity.
- *
- * @param Drupal\Core\Entity\EntityInterface $entity
- *   The entity to be rendered.
- * @param string $view_mode
- *   The view mode that should be used to display the entity.
- * @param string $langcode
- *   (optional) For which language the entity should be rendered, defaults to
- *   the current language.
- *
- * @return array
- *   A render array for the entity.
- */
-function entity_view(EntityInterface $entity, $view_mode, $langcode = NULL) {
-  return entity_render_controller($entity->entityType())->viewSingle($entity, $view_mode, $langcode);
-}
-
-/**
- * Return the render array for an entity.
- *
- * @param array $entity
- *   The entities to be rendered, must be of the same type.
- * @param string $view_mode
- *   The view mode that should be used to display the entity.
- * @param string $langcode
- *   (optional) For which language the entity should be rendered, defaults to
- *   the current language.
- *
- * @return array
- *   A render array for the entities, indexed by the same keys as the
- *   entities array passed in $entities.
- */
-function entity_view_multiple(array $entities, $view_mode, $langcode = NULL) {
-  return entity_render_controller(reset($entities)->entityType())->viewMultiple($entities, $view_mode, $langcode);
-}
-
-/**
  * Returns the form id for the given entity and operation.
  *
  * @param EntityInterface $entity
@@ -604,4 +550,58 @@ function entity_list_controller($entity_type) {
   $entity_info = entity_get_info($entity_type);
   $class = $entity_info['list controller class'];
   return new $class($entity_type, $storage);
+}
+
+/**
+ * Returns an entity render controller for a given entity type.
+ *
+ * @param string $entity_type
+ *   The type of the entity.
+ *
+ * @return Drupal\Core\Entity\EntityRenderControllerInterface
+ *   An entity render controller.
+ *
+ * @see hook_entity_info()
+ */
+function entity_render_controller($entity_type) {
+  $info = entity_get_info($entity_type);
+  $class = $info['render controller class'];
+  return new $class($entity_type);
+}
+
+/**
+ * Returns the render array for an entity.
+ *
+ * @param Drupal\Core\Entity\EntityInterface $entity
+ *   The entity to be rendered.
+ * @param string $view_mode
+ *   The view mode that should be used to display the entity.
+ * @param string $langcode
+ *   (optional) For which language the entity should be rendered, defaults to
+ *   the current content language.
+ *
+ * @return array
+ *   A render array for the entity.
+ */
+function entity_view(EntityInterface $entity, $view_mode, $langcode = NULL) {
+  return entity_render_controller($entity->entityType())->viewSingle($entity, $view_mode, $langcode);
+}
+
+/**
+ * Returns the render array for the provided entities.
+ *
+ * @param array $entities
+ *   The entities to be rendered, must be of the same type.
+ * @param string $view_mode
+ *   The view mode that should be used to display the entity.
+ * @param string $langcode
+ *   (optional) For which language the entity should be rendered, defaults to
+ *   the current content language.
+ *
+ * @return array
+ *   A render array for the entities, indexed by the same keys as the
+ *   entities array passed in $entities.
+ */
+function entity_view_multiple(array $entities, $view_mode, $langcode = NULL) {
+  return entity_render_controller(reset($entities)->entityType())->viewMultiple($entities, $view_mode, $langcode);
 }
