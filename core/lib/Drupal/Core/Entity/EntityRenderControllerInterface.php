@@ -47,7 +47,7 @@ interface EntityRenderControllerInterface {
    *   comment belongs to, or not passing one, and having the comment node not
    *   be available for loading.
    */
-  public function viewSingle(EntityInterface $entity, $view_mode = 'full', $langcode = NULL);
+  public function view(EntityInterface $entity, $view_mode = 'full', $langcode = NULL);
 
   /**
    * Multiple Entity view method.

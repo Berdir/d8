@@ -602,6 +602,6 @@ function entity_view(EntityInterface $entity, $view_mode, $langcode = NULL) {
  *   A render array for the entities, indexed by the same keys as the
  *   entities array passed in $entities.
  */
-function entity_view_multiple(array $entities, $view_mode, $langcode = NULL) {
-  return entity_render_controller(reset($entities)->entityType())->viewMultiple($entities, $view_mode, $langcode);
+function entity_view_multiple(array $entities, $view_mode, $weight = 0, $langcode = NULL) {
+  return entity_render_controller(reset($entities)->entityType())->viewMultiple($entities, $view_mode, $weight, $langcode);
 }

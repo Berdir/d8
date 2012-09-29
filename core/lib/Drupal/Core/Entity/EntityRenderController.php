@@ -24,7 +24,7 @@ class EntityRenderController implements EntityRenderControllerInterface {
   }
 
   /**
-   * @see \Drupal\Core\Entity\EntityRenderControllerInterface::buildContent()
+   * Overrides Drupal\Core\Entity\EntityRenderControllerInterface::buildContent().
    */
   public function buildContent(array &$entities = array(), $view_mode = 'full', $langcode = NULL) {
     // Allow modules to change the view mode.
@@ -43,15 +43,19 @@ class EntityRenderController implements EntityRenderControllerInterface {
   }
 
   /**
-   * Build fields content.
+   * Builds fields content.
    *
    * In case of a multiple view, "{$entity}_view_multiple"() already ran the
    * 'prepare_view' step. An internal flag prevents the operation from running
    * twice.
    *
-   * @param EntityInterface $entity
+   * @param Drupal\Core\Entity\EntityInterface $entity
+   *   The entity to be prepared.
    * @param string $view_mode
+   *   The view mode that should be used to prepare the entity.
    * @param string $langcode
+   *   (optional) For which language the entity should be prepared, defaults to
+   *   the current content language.
    */
   protected function prepareView(EntityInterface $entity, $view_mode, $langcode) {
     $entry = array($entity->id() => $entity);
@@ -61,11 +65,15 @@ class EntityRenderController implements EntityRenderControllerInterface {
   }
 
   /**
-   * Provide entity-specific defaults to the build process.
+   * Provides entity-specific defaults to the build process.
    *
-   * @param EntityInterface $entity
+   * @param Drupal\Core\Entity\EntityInterface $entity
+   *   The entity for which the defaults should be provided.
    * @param string $view_mode
+   *   The view mode that should be used.
    * @param string $langcode
+   *   (optional) For which language the entity should be prepared, defaults to
+   *   the current content language.
    *
    * @return array
    */
@@ -83,13 +91,15 @@ class EntityRenderController implements EntityRenderControllerInterface {
   /**
    * Specific per-entity building.
    *
-   * This method is typically not invoked by the child reimplementations, but
-   * simply replaced.
-   *
    * @param array $build
-   * @param EntityInterface $entity
+   *   The render array that is being created.
+   * @param Drupal\Core\Entity\EntityInterface $entity
+   *   The entity to be prepared.
    * @param string $view_mode
+   *   The view mode that should be used to prepare the entity.
    * @param string $langcode
+   *   (optional) For which language the entity should be prepared, defaults to
+   *   the current content language.
    *
    * @return array
    *   The build array.
@@ -99,15 +109,15 @@ class EntityRenderController implements EntityRenderControllerInterface {
   }
 
   /**
-   * @see \Drupal\Core\Entity\EntityRenderControllerInterface::viewSingle()
+   * Overrides Drupal\Core\Entity\EntityRenderControllerInterface::view().
    */
-  public function viewSingle(EntityInterface $entity, $view_mode = 'full', $langcode = NULL) {
+  public function view(EntityInterface $entity, $view_mode = 'full', $langcode = NULL) {
     $buildList = $this->viewMultiple(array($entity), $view_mode, $langcode);
     return $buildList[0];
   }
 
   /**
-   * @see \Drupal\Core\Entity\EntityRenderControllerInterface::viewMultiple()
+   * Overrides Drupal\Core\Entity\EntityRenderControllerInterface::viewMultiple().
    */
   public function viewMultiple(array $entities = array(), $view_mode = 'full', $weight = 0, $langcode = NULL) {
     if (!isset($langcode)) {
