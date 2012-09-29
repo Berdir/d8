@@ -14,13 +14,13 @@ interface EntityRenderControllerInterface {
   /**
    * Build the structured $content property on the entity.
    *
-   * @param EntityInterface $entity
+   * @param array $entities
    *   The entities, implementing EntityInterface, whose content is being built.
    * @param string $view_mode
-   *   The view mode to use when building that entity. All core entities include
-   *   at least a default "full" view mode.
+   *   (optional) The view mode that should be used to build the entity.
    * @param string $langcode
-   *   The language for which to built the content of the entity.
+   *   (optional) For which language the entity should be build, defaults to
+   *   the current content language.
    *
    * @return array
    *   The content array.
@@ -28,15 +28,15 @@ interface EntityRenderControllerInterface {
   public function buildContent(array &$entities = array(), $view_mode = 'full', $langcode = NULL);
 
   /**
-   * Main Entity view method.
+   * Returns the render array for the provided entity.
    *
-   * @param EntityInterface $entity
-   *   The entity to view.
+   * @param Drupal\Core\Entity\EntityInterface $entity
+   *   The entity to render.
    * @param string $view_mode
-   *   The view mode to use when building that entity. All core entities include
-   *   at least a default "full" view mode.
+   *   (optional) The view mode that should be used to render the entity.
    * @param string $langcode
-   *   The language for which to view the entity.
+   *   (optional) For which language the entity should be rendered, defaults to
+   *   the current content language.
    *
    * @return array
    *   A render array for the entity.
@@ -50,15 +50,15 @@ interface EntityRenderControllerInterface {
   public function view(EntityInterface $entity, $view_mode = 'full', $langcode = NULL);
 
   /**
-   * Multiple Entity view method.
+   * Returns the render array for the provided entities.
    *
    * @param array $entities
    *   An array of entities implementing EntityInterface to view.
    * @param string $view_mode
-   *   The view mode to use when building that entity. All core entities include
-   *   at least a default "full" view mode.
+   *   (optional) The view mode that should be used to render the entity.
    * @param string $langcode
-   *   The language for which to view the entity.
+   *   (optional) For which language the entity should be rendered, defaults to
+   *   the current content language.
    *
    * @return
    *   A render array for the entities, indexed by the same keys as the

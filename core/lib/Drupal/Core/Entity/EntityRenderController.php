@@ -119,7 +119,7 @@ class EntityRenderController implements EntityRenderControllerInterface {
   /**
    * Overrides Drupal\Core\Entity\EntityRenderControllerInterface::viewMultiple().
    */
-  public function viewMultiple(array $entities = array(), $view_mode = 'full', $weight = 0, $langcode = NULL) {
+  public function viewMultiple(array $entities = array(), $view_mode = 'full', $langcode = NULL) {
     if (!isset($langcode)) {
       $langcode = language(LANGUAGE_TYPE_CONTENT)->langcode;
     }
@@ -127,6 +127,7 @@ class EntityRenderController implements EntityRenderControllerInterface {
 
     $view_hook = "{$this->entityType}_view";
     $build = array('#sorted' => TRUE);
+    $weight = 0;
     foreach ($entities as $key => $entity) {
       $entity_view_mode = isset($entity->content['#view_mode'])
         ? $entity->content['#view_mode']
@@ -149,4 +150,3 @@ class EntityRenderController implements EntityRenderControllerInterface {
     return $build;
   }
 }
-
