@@ -2063,7 +2063,7 @@ function user_view_page($account) {
  *   An array as expected by drupal_render().
  */
 function user_view($account, $view_mode = 'full', $langcode = NULL) {
-  return entity_render_controller('user')->viewSingle($account, $view_mode, $langcode);
+  return entity_view($account, $view_mode, $langcode);
 }
 
 /**
@@ -2073,8 +2073,6 @@ function user_view($account, $view_mode = 'full', $langcode = NULL) {
  *   An array of user accounts as returned by user_load_multiple().
  * @param $view_mode
  *   (optional) View mode, e.g., 'full', 'teaser'... Defaults to 'teaser.'
- * @param $weight
- *   (optional) Integer representing the weight of the first account in the list.
  * @param $langcode
  *   (optional) A language code to use for rendering. Defaults to the global
  *   content language of the current request.
@@ -2082,8 +2080,8 @@ function user_view($account, $view_mode = 'full', $langcode = NULL) {
  * @return
  *   An array in the format expected by drupal_render().
  */
-function user_view_multiple($accounts, $view_mode = 'full', $weight = 0, $langcode = NULL) {
-  return entity_render_controller('user')->viewMultiple($accounts, $view_mode, $weight, $langcode);
+function user_view_multiple($accounts, $view_mode = 'full', $langcode = NULL) {
+  return entity_view($accounts, $view_mode, $langcode);
 }
 
 /**

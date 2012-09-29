@@ -45,7 +45,7 @@ function taxonomy_term_page(Term $term) {
   // Set the non-aliased path as a default shortlink.
   drupal_add_html_head_link(array('rel' => 'shortlink', 'href' => url($uri['path'], array_merge($uri['options'], array('alias' => TRUE)))), TRUE);
 
-  $build = taxonomy_term_show($term);
+  $build = taxonomy_term_view($term);
   if ($nids = taxonomy_select_nodes($term->tid, TRUE, variable_get('default_nodes_main', 10))) {
     $nodes = node_load_multiple($nids);
     $build['nodes'] = node_view_multiple($nodes);

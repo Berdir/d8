@@ -982,7 +982,7 @@ function comment_prepare_thread(&$comments) {
  */
 function comment_view(Comment $comment, Node $node, $view_mode = 'full', $langcode = NULL) {
   $comment->node = $node;
-  return entity_render_controller('comment')->viewSingle($comment, $view_mode, $langcode);
+  return entity_view($comment, $view_mode, $langcode);
 }
 
 /**
@@ -1068,7 +1068,7 @@ function comment_links(Comment $comment, Node $node) {
  */
 function comment_view_multiple($comments, Node $node, $view_mode = 'full', $weight = 0, $langcode = NULL) {
   reset($comments)->node = $node;
-  return entity_render_controller('comment')->viewMultiple($comments, $view_mode, $weight, $langcode);
+  return entity_view_multiple($comments, $view_mode, $weight, $langcode);
 }
 
 /**
