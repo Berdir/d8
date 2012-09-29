@@ -5,6 +5,7 @@
  * Enables the organization of content into categories.
  */
 
+use Drupal\Core\Entity\EntityRenderController;
 use Drupal\node\Node;
 use Drupal\taxonomy\Term;
 use Drupal\taxonomy\Vocabulary;
@@ -130,6 +131,7 @@ function taxonomy_entity_info() {
         'bundle' => 'machine_name',
       ),
       'bundles' => array(),
+      'render controller class' => 'Drupal\taxonomy\TermRenderController',
       'view modes' => array(
         // @todo View mode for display as a field (when attached to nodes etc).
         'full' => array(
@@ -163,6 +165,12 @@ function taxonomy_entity_info() {
       'label' => 'name',
     ),
     'fieldable' => FALSE,
+    'view modes' => array(
+      'full' => array(
+        'label' => t('Taxonomy vocabulary default'),
+        'custom settings' => FALSE,
+      ),
+    ),
   );
 
   return $return;
@@ -581,7 +589,7 @@ function taxonomy_term_show(Term $term) {
   return taxonomy_term_view_multiple(array($term->tid => $term), 'full');
 }
 
-/**
+ /**
  * Constructs a drupal_render() style array from an array of loaded terms.
  *
  * @param array $terms
@@ -598,16 +606,7 @@ function taxonomy_term_show(Term $term) {
  *   An array in the format expected by drupal_render().
  */
 function taxonomy_term_view_multiple(array $terms, $view_mode = 'teaser', $weight = 0, $langcode = NULL) {
-  field_attach_prepare_view('taxonomy_term', $terms, $view_mode, $langcode);
-  entity_prepare_view('taxonomy_term', $terms, $langcode);
-  $build = array();
-  foreach ($terms as $term) {
-    $build['taxonomy_terms'][$term->tid] = taxonomy_term_view($term, $view_mode, $langcode);
-    $build['taxonomy_terms'][$term->tid]['#weight'] = $weight;
-    $weight++;
-  }
-  $build['taxonomy_terms']['#sorted'] = TRUE;
-  return $build;
+  return entity_render_controller('taxonomy_term')->viewMultiple($terms, $view_mode, $weight, $langcode);
 }
 
 /**

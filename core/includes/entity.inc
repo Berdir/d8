@@ -49,6 +49,7 @@ function entity_get_info($entity_type = NULL) {
           'entity class' => 'Drupal\Core\Entity\Entity',
           'controller class' => 'Drupal\Core\Entity\DatabaseStorageController',
           'list controller class' => 'Drupal\Core\Entity\EntityListController',
+          'render class' => 'Drupal\Core\Entity\EntityRenderController',
           'form controller class' => array(
             'default' => 'Drupal\Core\Entity\EntityFormController',
           ),
@@ -406,6 +407,23 @@ function entity_form_controller($entity_type, $operation = 'default') {
 
   return new $class($operation);
 }
+
+  /**
+   * Factory method to returns an entity render controller.
+   *
+   * @see hook_entity_info()
+   *
+   * @param string $entity_type
+   *   The type of the entity.
+   *
+   * @return Drupal\Core\Entity\EntityRenderControllerInterface
+   *   An entity render controller instance.
+   */
+  function entity_render_controller($entity_type) {
+    $info = entity_get_info($entity_type);
+    $class = $info['render controller class'];
+    return new $class($entity_type);
+  }
 
 /**
  * Returns the form id for the given entity and operation.
