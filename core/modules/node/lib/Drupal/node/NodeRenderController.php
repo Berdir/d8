@@ -63,6 +63,16 @@ class NodeRenderController extends EntityRenderController {
         '#links' => $links,
         '#attributes' => array('class' => array('links', 'inline')),
       );
+
+      // Add Language field text element to node render array.
+      $entity->content['language'] = array(
+        '#type' => 'item',
+        '#title' => t('Language'),
+        '#markup' => language_name($langcode),
+        '#weight' => 0,
+        '#prefix' => '<div id="field-language-display">',
+        '#suffix' => '</div>'
+      );
     }
   }
 
@@ -79,4 +89,5 @@ class NodeRenderController extends EntityRenderController {
       $build['#contextual_links']['node'] = array('node', array($entity->nid));
     }
   }
+
 }
