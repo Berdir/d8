@@ -24,44 +24,63 @@ class EntityRenderController implements EntityRenderControllerInterface {
   }
 
   /**
-   * Overrides Drupal\Core\Entity\EntityRenderControllerInterface::buildContent().
+   * Implements Drupal\Core\Entity\EntityRenderControllerInterface::buildContent().
    */
-  public function buildContent(array &$entities = array(), $view_mode = 'full', $langcode = NULL) {
+  public function buildContent(array $entities = array(), $view_mode = 'full', $langcode = NULL) {
     // Allow modules to change the view mode.
     $context = array('langcode' => $langcode);
 
-    $return = array();
-    foreach ($entities as $key => &$entity) {
+    $prepare = array();
+    foreach ($entities as $key => $entity) {
       // Remove previously built content, if exists.
       $entity->content = array();
 
       drupal_alter('entity_view_mode', $view_mode, $entity, $context);
       $entity->content['#view_mode'] = $view_mode;
-      $return[$key] = $entity->content;
+      $prepare[$view_mode][$key] = $entity;
     }
-    return $return;
+
+    // Build field content, grouped by view mode.
+    foreach ($prepare as $view_mode => $view_mode_entities) {
+      $this->prepareView($view_mode_entities, $view_mode, $langcode);
+    }
   }
 
   /**
    * Builds fields content.
    *
-   * In case of a multiple view, "{$entity}_view_multiple"() already ran the
-   * 'prepare_view' step. An internal flag prevents the operation from running
+   * An internal flag prevents the operation from running
    * twice.
    *
-   * @param Drupal\Core\Entity\EntityInterface $entity
-   *   The entity to be prepared.
+   * @param array $entities
+   *   The entities to be prepared.
    * @param string $view_mode
    *   The view mode that should be used to prepare the entity.
    * @param string $langcode
    *   (optional) For which language the entity should be prepared, defaults to
    *   the current content language.
    */
-  protected function prepareView(EntityInterface $entity, $view_mode, $langcode) {
-    $entry = array($entity->id() => $entity);
-    field_attach_prepare_view($this->entityType, $entry, $view_mode, $langcode);
-    entity_prepare_view($this->entityType, $entry, $langcode);
-    $entity->content += field_attach_view($this->entityType, $entity, $view_mode, $langcode);
+  protected function prepareView(array $entities, $view_mode, $langcode) {
+    $prepare = array();
+    // To ensure hooks are only run once per entity, check for an
+    // entity_view_prepared flag and only process items without it.
+    foreach ($entities as $id => $entity) {
+      if (empty($entity->entity_view_prepared)) {
+        // Add this entity to the items to be prepared.
+        $prepare[$id] = $entity;
+
+        // Mark this item as prepared.
+        $entity->entity_view_prepared = TRUE;
+      }
+    }
+
+    if (!empty($prepare)) {
+      module_invoke_all('entity_prepare_view', $prepare, $this->entityType);
+      field_attach_prepare_view($this->entityType, $prepare, $view_mode, $langcode);
+    }
+    foreach ($entities as $entity) {
+      $entity->content += field_attach_view($this->entityType, $entity, $view_mode, $langcode);
+    }
   }
 
   /**
@@ -109,7 +128,7 @@ class EntityRenderController implements EntityRenderControllerInterface {
   }
 
   /**
-   * Overrides Drupal\Core\Entity\EntityRenderControllerInterface::view().
+   * Implements Drupal\Core\Entity\EntityRenderControllerInterface::view().
    */
   public function view(EntityInterface $entity, $view_mode = 'full', $langcode = NULL) {
     $buildList = $this->viewMultiple(array($entity), $view_mode, $langcode);
@@ -117,7 +136,7 @@ class EntityRenderController implements EntityRenderControllerInterface {
   }
 
   /**
-   * Overrides Drupal\Core\Entity\EntityRenderControllerInterface::viewMultiple().
+   * Implements Drupal\Core\Entity\EntityRenderControllerInterface::viewMultiple().
    */
   public function viewMultiple(array $entities = array(), $view_mode = 'full', $langcode = NULL) {
     if (!isset($langcode)) {
@@ -129,9 +148,7 @@ class EntityRenderController implements EntityRenderControllerInterface {
     $build = array('#sorted' => TRUE);
     $weight = 0;
     foreach ($entities as $key => $entity) {
-      $entity_view_mode = isset($entity->content['#view_mode'])
-        ? $entity->content['#view_mode']
-        : $view_mode;
+      $entity_view_mode = isset($entity->content['#view_mode']) ? $entity->content['#view_mode'] : $view_mode;
       module_invoke_all($view_hook, $entity, $entity_view_mode, $langcode);
       module_invoke_all('entity_view', $entity, $entity_view_mode, $langcode);
 

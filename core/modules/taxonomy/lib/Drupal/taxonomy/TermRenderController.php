@@ -1,15 +1,27 @@
 <?php
+
+/**
+ * @file
+ * Definition of Drupal\taxonomy\TermRenderController.
+ */
+
 namespace Drupal\taxonomy;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityRenderController;
 
+/**
+ * Render controller for taxonomy terms.
+ */
 class TermRenderController extends EntityRenderController {
 
-  public function buildContent(array &$entities = array(), $view_mode = 'full', $langcode = NULL) {
+  /**
+   * Overrides Drupal\Core\Entity\EntityRenderController::buildContent().
+   */
+  public function buildContent(array $entities = array(), $view_mode = 'full', $langcode = NULL) {
     parent::buildContent($entities, $view_mode, $langcode);
 
-    foreach ($entities as $key => $entity) {
+    foreach ($entities as $entity) {
       // Try to add in the core taxonomy pieces like description.
       $bundle = $entity->bundle();
       $entity_view_mode = $entity->content['#view_mode'];
@@ -23,10 +35,7 @@ class TermRenderController extends EntityRenderController {
           '#suffix' => '</div>',
         );
       }
-
-      parent::prepareView($entity, $entity_view_mode, $langcode);
     }
-    return $entity->content;
   }
 
   protected function getBuildDefaults(EntityInterface $entity, $view_mode, $langcode) {
@@ -40,6 +49,7 @@ class TermRenderController extends EntityRenderController {
   }
 
   protected function prepareBuild(array $build, EntityInterface $entity, $view_mode, $langcode = NULL) {
+    $build = parent::prepareBuild($build, $entity, $build, $langcode);
     $build['#attached']['css'][] = drupal_get_path('module', 'taxonomy') . '/taxonomy.css';
     return $build;
   }

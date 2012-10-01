@@ -1,24 +1,31 @@
 <?php
+
+/**
+ * @file
+ * Definition of Drupal\comment\CommentRenderController.
+ */
+
 namespace Drupal\comment;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityRenderController;
 
+/**
+ * Render controller for comments.
+ */
 class CommentRenderController extends EntityRenderController {
 
   /**
+   * Overrides Drupal\Core\Entity\EntityRenderController::buildContent().
+   *
    * In addition to modifying the content key on entities, this implementation
    * will also set the node key which all comments carry.
-   *
-   * @see \Drupal\Core\Entity\EntityRenderController::buildContent()
    */
-  public function buildContent(array &$entities = array(), $view_mode = 'full', $langcode = NULL) {
+  public function buildContent(array $entities = array(), $view_mode = 'full', $langcode = NULL) {
     $return = array();
     if (empty($entities)) {
       return $return;
     }
-
-    parent::buildContent($entities, $view_mode, $langcode);
 
     // Array is known not be empty, and all comments apply to the same node,
     // so we can just fetch the node from the first comment.
@@ -33,12 +40,15 @@ class CommentRenderController extends EntityRenderController {
       }
     }
 
-    foreach ($entities as $key => $entity) {
+    foreach ($entities as $entity) {
       if (!isset($entity->node)) {
         $entity->node = $node;
       }
-      $this->prepareView($entity, $entity->content['#view_mode'], $langcode);
+    }
 
+    parent::buildContent($entities, $view_mode, $langcode);
+
+    foreach ($entities as $entity) {
       $entity->content['links'] = array(
         '#theme' => 'links__comment',
         '#pre_render' => array('drupal_pre_render_links'),
@@ -52,27 +62,27 @@ class CommentRenderController extends EntityRenderController {
           '#attributes' => array('class' => array('links', 'inline')),
         );
       }
-      $return[$key] = $entity->content;
     }
+  }
 
+  /**
+   * Overrides Drupal\Core\Entity\EntityRenderController::getBuildDefaults().
+   */
+  protected function getBuildDefaults(EntityInterface $entity, $view_mode, $langcode) {
+    $return = parent::getBuildDefaults($entity, $view_mode, $langcode);
+    // @todo Accessing $node on an EntityInterface is not clean. Maybe we want
+    // to define some extended interface exposing node.
+    $node = $entity->node;
+    $return['#theme'] = 'comment__node_' . $node->bundle();
+    $return['#node'] = $node;
     return $return;
   }
 
   /**
-   * @todo Accessing $node on an EntityInterface is not clean. Maybe we want
-   *   to define some extended interface exposing node.
+   * Overrides Drupal\Core\Entity\EntityRenderController::prepareBuild().
    */
-  protected function getBuildDefaults(EntityInterface $entity, $view_mode, $langcode) {
-    $return = parent::getBuildDefaults($entity, $view_mode, $langcode);
-    $node = $entity->node;
-    $return = array_merge($return, array(
-      '#theme' => 'comment__node_' . $node->bundle(),
-      '#node' => $node,
-    ));
-    return $return;
-  }
-
   protected function prepareBuild(array $build, EntityInterface $comment, $view_mode, $langcode = NULL) {
+    $build = parent::prepareBuild($build, $comment, $view_mode, $langcode);
     if (empty($comment->in_preview)) {
       $prefix = '';
       $is_threaded = isset($comment->divs)

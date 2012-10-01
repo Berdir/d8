@@ -25,7 +25,7 @@ interface EntityRenderControllerInterface {
    * @return array
    *   The content array.
    */
-  public function buildContent(array &$entities = array(), $view_mode = 'full', $langcode = NULL);
+  public function buildContent(array $entities = array(), $view_mode = 'full', $langcode = NULL);
 
   /**
    * Returns the render array for the provided entity.

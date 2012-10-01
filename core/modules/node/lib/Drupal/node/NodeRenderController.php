@@ -1,12 +1,24 @@
 <?php
+
+/**
+ * @file
+ * Definition of Drupal\node\NodeRenderController.
+ */
+
 namespace Drupal\node;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityRenderController;
 
+/**
+ * Render controller for nodes.
+ */
 class NodeRenderController extends EntityRenderController {
 
-  public function buildContent(array &$entities = array(), $view_mode = 'full', $langcode = NULL) {
+  /**
+   * Overrides Drupal\Core\Entity\EntityRenderController::buildContent().
+   */
+  public function buildContent(array $entities = array(), $view_mode = 'full', $langcode = NULL) {
     $return = array();
     if (empty($entities)) {
       return $return;
@@ -22,7 +34,6 @@ class NodeRenderController extends EntityRenderController {
         $entity = node_invoke($entity, 'view', $entity_view_mode, $langcode);
       }
 
-      $this->prepareView($entity, $entity_view_mode, $langcode);
       $entity->content['links'] = array(
         '#theme' => 'links__node',
         '#pre_render' => array('drupal_pre_render_links'),
@@ -58,7 +69,11 @@ class NodeRenderController extends EntityRenderController {
     return $return;
   }
 
+  /**
+   * Overrides Drupal\Core\Entity\EntityRenderController::prepareBuild().
+   */
   protected function prepareBuild(array $build, EntityInterface $entity, $view_mode, $langcode = NULL) {
+    $build = parent::prepareBuild($build, $entity, $view_mode, $langcode);
     // Add contextual links for this node, except when the node is already being
     // displayed on its own page. Modules may alter this behavior (for example,
     // to restrict contextual links to certain view modes) by implementing
