@@ -30,14 +30,9 @@ class CommentRenderController extends EntityRenderController {
     // Array is known not be empty, and all comments apply to the same node,
     // so we can just fetch the node from the first comment.
     $entity = reset($entities);
-    if (isset($entity->node)) {
-      $node = $entity->node;
-    }
-    else {
-      $node = node_load($entity->nid);
-      if (empty($node)) {
-        throw new \InvalidArgumentException(t('Invalid node for comment.'));
-      }
+    $node = node_load($entity->nid);
+    if (empty($node)) {
+      throw new \InvalidArgumentException(t('Invalid node for comment.'));
     }
 
     foreach ($entities as $entity) {
@@ -49,6 +44,12 @@ class CommentRenderController extends EntityRenderController {
     parent::buildContent($entities, $view_mode, $langcode);
 
     foreach ($entities as $entity) {
+      $node = node_load($entity->nid);
+      if (!$node) {
+        throw new \InvalidArgumentException(t('Invalid node for comment.'));
+      }
+      $entity->content['#node'] = $node;
+      $entity->content['#theme'] = 'comment__node_' . $node->bundle();
       $entity->content['links'] = array(
         '#theme' => 'links__comment',
         '#pre_render' => array('drupal_pre_render_links'),
@@ -58,24 +59,11 @@ class CommentRenderController extends EntityRenderController {
         $entity->content['links'][$this->entityType] = array(
           '#theme' => 'links__comment__comment',
           // The "node" property is specified to be present, so no need to check.
-          '#links' => comment_links($entity, $entity->node),
+          '#links' => comment_links($entity, $node),
           '#attributes' => array('class' => array('links', 'inline')),
         );
       }
     }
-  }
-
-  /**
-   * Overrides Drupal\Core\Entity\EntityRenderController::getBuildDefaults().
-   */
-  protected function getBuildDefaults(EntityInterface $entity, $view_mode, $langcode) {
-    $return = parent::getBuildDefaults($entity, $view_mode, $langcode);
-    // @todo Accessing $node on an EntityInterface is not clean. Maybe we want
-    // to define some extended interface exposing node.
-    $node = $entity->node;
-    $return['#theme'] = 'comment__node_' . $node->bundle();
-    $return['#node'] = $node;
-    return $return;
   }
 
   /**

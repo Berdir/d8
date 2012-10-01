@@ -136,7 +136,7 @@ class EntityRenderController implements EntityRenderControllerInterface {
       $this->alterBuild($build[$key], $entity, $entity_view_mode, $langcode);
       $build[$key]['#weight'] = $weight++;
 
-      // Allow modules to modify the structured comment.
+      // Allow modules to modify the structured entity.
       drupal_alter(array($view_hook, 'entity_view'), $build[$key], $entity);
     }
 
