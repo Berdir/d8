@@ -40,46 +40,28 @@ class EntityRenderController implements EntityRenderControllerInterface {
       $prepare[$view_mode][$key] = $entity;
     }
 
-    // Build field content, grouped by view mode.
-    foreach ($prepare as $view_mode => $view_mode_entities) {
-      $this->buildFieldContent($view_mode_entities, $view_mode, $langcode);
-    }
-  }
+    // Prepare and build field content, grouped by view mode.
+    foreach ($prepare as $view_mode => $prepare_entities) {
+      $call = array();
+      // To ensure hooks are only run once per entity, check for an
+      // entity_view_prepared flag and only process items without it.
+      foreach ($prepare_entities as $entity) {
+        if (empty($entity->entity_view_prepared)) {
+          // Add this entity to the items to be prepared.
+          $call[$entity->id()] = $entity;
 
-  /**
-   * Builds fields content.
-   *
-   * An internal flag prevents the operation from running
-   * twice.
-   *
-   * @param array $entities
-   *   The entities to be prepared.
-   * @param string $view_mode
-   *   The view mode that should be used to prepare the entity.
-   * @param string $langcode
-   *   (optional) For which language the entity should be prepared, defaults to
-   *   the current content language.
-   */
-  protected function buildFieldContent(array $entities, $view_mode, $langcode) {
-    $prepare = array();
-    // To ensure hooks are only run once per entity, check for an
-    // entity_view_prepared flag and only process items without it.
-    foreach ($entities as $id => $entity) {
-      if (empty($entity->entity_view_prepared)) {
-        // Add this entity to the items to be prepared.
-        $prepare[$entity->id()] = $entity;
-
-        // Mark this item as prepared.
-        $entity->entity_view_prepared = TRUE;
+          // Mark this item as prepared.
+          $entity->entity_view_prepared = TRUE;
+        }
       }
-    }
 
-    if (!empty($prepare)) {
-      module_invoke_all('entity_prepare_view', $prepare, $this->entityType);
-      field_attach_prepare_view($this->entityType, $prepare, $view_mode, $langcode);
-    }
-    foreach ($entities as $entity) {
-      $entity->content += field_attach_view($this->entityType, $entity, $view_mode, $langcode);
+      if (!empty($call)) {
+        field_attach_prepare_view($this->entityType, $call, $view_mode, $langcode);
+        module_invoke_all('entity_prepare_view', $call, $this->entityType);
+      }
+      foreach ($entities as $entity) {
+        $entity->content += field_attach_view($this->entityType, $entity, $view_mode, $langcode);
+      }
     }
   }
 
