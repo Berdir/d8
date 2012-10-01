@@ -67,7 +67,7 @@ class EntityRenderController implements EntityRenderControllerInterface {
     foreach ($entities as $id => $entity) {
       if (empty($entity->entity_view_prepared)) {
         // Add this entity to the items to be prepared.
-        $prepare[$id] = $entity;
+        $prepare[$entity->id()] = $entity;
 
         // Mark this item as prepared.
         $entity->entity_view_prepared = TRUE;
@@ -103,7 +103,6 @@ class EntityRenderController implements EntityRenderControllerInterface {
       '#view_mode' => $view_mode,
       '#langcode' => $langcode,
     );
-
     return $return;
   }
 
@@ -119,13 +118,8 @@ class EntityRenderController implements EntityRenderControllerInterface {
    * @param string $langcode
    *   (optional) For which language the entity should be prepared, defaults to
    *   the current content language.
-   *
-   * @return array
-   *   The build array.
    */
-  protected function prepareBuild(array $build, EntityInterface $entity, $view_mode, $langcode = NULL) {
-    return $build;
-  }
+  protected function alterBuild(array &$build, EntityInterface $entity, $view_mode, $langcode = NULL) { }
 
   /**
    * Implements Drupal\Core\Entity\EntityRenderControllerInterface::view().
@@ -157,7 +151,7 @@ class EntityRenderController implements EntityRenderControllerInterface {
       unset($entity->content);
 
       $build[$key] += $this->getBuildDefaults($entity, $entity_view_mode, $langcode);
-      $build[$key] += $this->prepareBuild($build[$key], $entity, $entity_view_mode, $langcode);
+      $this->alterBuild($build[$key], $entity, $entity_view_mode, $langcode);
       $build[$key]['#weight'] = $weight++;
 
       // Allow modules to modify the structured comment.

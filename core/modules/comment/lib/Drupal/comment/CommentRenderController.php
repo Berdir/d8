@@ -79,10 +79,10 @@ class CommentRenderController extends EntityRenderController {
   }
 
   /**
-   * Overrides Drupal\Core\Entity\EntityRenderController::prepareBuild().
+   * Overrides Drupal\Core\Entity\EntityRenderController::alterBuild().
    */
-  protected function prepareBuild(array $build, EntityInterface $comment, $view_mode, $langcode = NULL) {
-    $build = parent::prepareBuild($build, $comment, $view_mode, $langcode);
+  protected function alterBuild(array &$build, EntityInterface $comment, $view_mode, $langcode = NULL) {
+    parent::alterBuild($build, $comment, $view_mode, $langcode);
     if (empty($comment->in_preview)) {
       $prefix = '';
       $is_threaded = isset($comment->divs)
@@ -107,7 +107,5 @@ class CommentRenderController extends EntityRenderController {
         $build['#suffix'] = str_repeat('</div>', $comment->divs_final);
       }
     }
-
-    return $build;
   }
 }

@@ -48,9 +48,8 @@ class TermRenderController extends EntityRenderController {
     return $return;
   }
 
-  protected function prepareBuild(array $build, EntityInterface $entity, $view_mode, $langcode = NULL) {
-    $build = parent::prepareBuild($build, $entity, $build, $langcode);
+  protected function alterBuild(array &$build, EntityInterface $entity, $view_mode, $langcode = NULL) {
+    parent::alterBuild($build, $entity, $view_mode, $langcode);
     $build['#attached']['css'][] = drupal_get_path('module', 'taxonomy') . '/taxonomy.css';
-    return $build;
   }
 }

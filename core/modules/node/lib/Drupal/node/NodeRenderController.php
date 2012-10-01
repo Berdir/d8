@@ -63,17 +63,14 @@ class NodeRenderController extends EntityRenderController {
         '#links' => $links,
         '#attributes' => array('class' => array('links', 'inline')),
       );
-      $return[$key] = $entity->content;
     }
-
-    return $return;
   }
 
   /**
-   * Overrides Drupal\Core\Entity\EntityRenderController::prepareBuild().
+   * Overrides Drupal\Core\Entity\EntityRenderController::alterBuild().
    */
-  protected function prepareBuild(array $build, EntityInterface $entity, $view_mode, $langcode = NULL) {
-    $build = parent::prepareBuild($build, $entity, $view_mode, $langcode);
+  protected function alterBuild(array &$build, EntityInterface $entity, $view_mode, $langcode = NULL) {
+    parent::alterBuild($build, $entity, $view_mode, $langcode);
     // Add contextual links for this node, except when the node is already being
     // displayed on its own page. Modules may alter this behavior (for example,
     // to restrict contextual links to certain view modes) by implementing
@@ -81,7 +78,5 @@ class NodeRenderController extends EntityRenderController {
     if (!empty($entity->nid) && !($view_mode == 'full' && node_is_page($entity))) {
       $build['#contextual_links']['node'] = array('node', array($entity->nid));
     }
-
-    return $build;
   }
 }
