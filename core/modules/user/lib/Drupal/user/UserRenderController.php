@@ -15,20 +15,9 @@ use Drupal\Core\Entity\EntityRenderController;
  */
 class UserRenderController extends EntityRenderController {
 
-  public function buildContent(array &$entities = array(), $view_mode = 'full', $langcode = NULL) {
-    $return = array();
-    if (empty($entities)) {
-      return $return;
-    }
-
-    parent::buildContent($entities, $view_mode, $langcode);
-    foreach ($entities as $key => $entity) {
-      $this->prepareView($entity, $entity->content['#view_mode'], $langcode);
-      $return[$key] = $entity->content;
-    }
-    return $return;
-  }
-
+  /**
+   * Overrides Drupal\Core\Entity\EntityRenderController::getBuildDefaults().
+   */
   protected function getBuildDefaults(EntityInterface $entity, $view_mode, $langcode) {
     $return = parent::getBuildDefaults($entity, $view_mode, $langcode);
 

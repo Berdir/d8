@@ -42,7 +42,7 @@ class EntityRenderController implements EntityRenderControllerInterface {
 
     // Build field content, grouped by view mode.
     foreach ($prepare as $view_mode => $view_mode_entities) {
-      $this->prepareView($view_mode_entities, $view_mode, $langcode);
+      $this->buildFieldContent($view_mode_entities, $view_mode, $langcode);
     }
   }
 
@@ -60,7 +60,7 @@ class EntityRenderController implements EntityRenderControllerInterface {
    *   (optional) For which language the entity should be prepared, defaults to
    *   the current content language.
    */
-  protected function prepareView(array $entities, $view_mode, $langcode) {
+  protected function buildFieldContent(array $entities, $view_mode, $langcode) {
     $prepare = array();
     // To ensure hooks are only run once per entity, check for an
     // entity_view_prepared flag and only process items without it.
