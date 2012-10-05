@@ -7,13 +7,26 @@
 
 namespace Drupal\Core\KeyValueStore;
 
+use Drupal\Core\Database\Query\Merge;
+
 /**
  * Defines a default key/value store implementation.
  *
  * This is Drupal's default key/value store implementation. It uses the database
  * to store key/value data.
+ *
+ * @todo This class still calls db_* functions directly because it's needed
+ *   very early, pre-Container.  Once the early bootstrap dependencies are
+ *   sorted out, switch this to use an injected database connection.
  */
 class DatabaseStorage extends StorageBase {
+
+  /**
+   * The name of the SQL table to use.
+   *
+   * @var string
+   */
+  protected $table;
 
   /**
    * Overrides Drupal\Core\KeyValueStore\StorageBase::__construct().
@@ -44,9 +57,9 @@ class DatabaseStorage extends StorageBase {
       }
     }
     catch (\Exception $e) {
-      // @todo: Perhaps if the database is never going to be available,
-      // key/value requests should return FALSE in order to allow exception
-      // handling to occur but for now, keep it an array, always.
+      // @todo Perhaps if the database is never going to be available,
+      //   key/value requests should return FALSE in order to allow exception
+      //   handling to occur but for now, keep it an array, always.
     }
     return $values;
   }
@@ -77,6 +90,23 @@ class DatabaseStorage extends StorageBase {
       ))
       ->fields(array('value' => serialize($value)))
       ->execute();
+  }
+
+  /**
+   * Implements Drupal\Core\KeyValueStore\KeyValueStoreInterface::setIfNotExists().
+   */
+  public function setIfNotExists($key, $value) {
+    $result = db_merge($this->table)
+      ->insertFields(array(
+        'collection' => $this->collection,
+        'name' => $key,
+        'value' => $value,
+      ))
+      ->condition('collection', $this->collection)
+      ->condition('name', $key)
+      ->condition('value', $value)
+      ->execute();
+    return $result == Merge::STATUS_INSERT;
   }
 
   /**
