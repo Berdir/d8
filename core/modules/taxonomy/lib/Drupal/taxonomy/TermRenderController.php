@@ -22,11 +22,10 @@ class TermRenderController extends EntityRenderController {
     parent::buildContent($entities, $view_mode, $langcode);
 
     foreach ($entities as $entity) {
-      // Try to add in the core taxonomy pieces like description.
+      // Add the description if enabled.
       $bundle = $entity->bundle();
       $entity_view_mode = $entity->content['#view_mode'];
-      $settings = field_view_mode_settings($this->entityType, $bundle);
-	    $fields = field_extra_fields_get_display($this->entityType, $bundle, $entity_view_mode);
+      $fields = field_extra_fields_get_display($this->entityType, $bundle, $entity_view_mode);
       if (!empty($entity->description) && isset($fields['description']) && $fields['description']['visible']) {
         $entity->content['description'] = array(
           '#markup' => check_markup($entity->description, $entity->format, '', TRUE),

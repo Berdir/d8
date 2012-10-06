@@ -27,20 +27,6 @@ class CommentRenderController extends EntityRenderController {
       return $return;
     }
 
-    // Array is known not be empty, and all comments apply to the same node,
-    // so we can just fetch the node from the first comment.
-    $entity = reset($entities);
-    $node = node_load($entity->nid);
-    if (empty($node)) {
-      throw new \InvalidArgumentException(t('Invalid node for comment.'));
-    }
-
-    foreach ($entities as $entity) {
-      if (!isset($entity->node)) {
-        $entity->node = $node;
-      }
-    }
-
     parent::buildContent($entities, $view_mode, $langcode);
 
     foreach ($entities as $entity) {
