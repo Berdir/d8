@@ -909,10 +909,6 @@ function image_style_flush($style) {
   field_info_cache_clear();
   drupal_theme_rebuild();
 
-  // Clear page caches when flushing.
-  if (module_exists('block')) {
-    cache('html')->flush();
-  }
   cache('html')->flush();
 }
 
