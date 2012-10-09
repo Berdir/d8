@@ -7,6 +7,7 @@
 
 namespace Drupal\Core\Cache;
 
+use Drupal\Core\Database\Database;
 use Exception;
 
 /**
@@ -32,6 +33,19 @@ use Exception;
  * administrator cleared the cache manually.
  */
 class InstallBackend extends DatabaseBackend {
+
+  /**
+   * Constructs an Drupal\Core\Cache\InstallBackend object.
+   *
+   * @param string $bin
+   *   (optional) The cache bin that should be used.
+   */
+  function __construct($bin) {
+    if (class_exists('Drupal\Core\Database\Database') && drupal_container()->hasParameter('database.info')) {
+      $this->dbConnection = Database::getConnection('default', NULL, drupal_container()->getParameter('database.info'));
+    }
+    $this->bin = $bin;
+  }
 
   /**
    * Overrides Drupal\Core\Cache\DatabaseBackend::get().

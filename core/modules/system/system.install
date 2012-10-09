@@ -184,7 +184,7 @@ function system_requirements($phase) {
   else {
     // Database information.
     $class = Database::getConnection()->getDriverClass('Install\\Tasks');
-    $tasks = new $class();
+    $tasks = new $class(drupal_container()->getParameter('database.info'));
     $requirements['database_system'] = array(
       'title' => $t('Database system'),
       'value' => $tasks->name(),

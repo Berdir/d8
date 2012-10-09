@@ -29,12 +29,6 @@ class MemoryBackend implements CacheBackendInterface {
   protected $invalidatedTags = array();
 
   /**
-   * Implements Drupal\Core\Cache\CacheBackendInterface::__construct().
-   */
-  public function __construct($bin) {
-  }
-
-  /**
    * Implements Drupal\Core\Cache\CacheBackendInterface::get().
    */
   public function get($cid) {

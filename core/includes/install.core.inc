@@ -346,7 +346,13 @@ function install_begin_request(&$install_state) {
   // because any data put in the cache during the installer is inherently
   // suspect, due to the fact that Drupal is not fully set up yet.
   require_once DRUPAL_ROOT . '/core/includes/cache.inc';
-  $conf['cache_classes'] = array('cache' => 'Drupal\Core\Cache\InstallBackend');
+  $container = drupal_container();
+  $container->register('cache', 'Drupal\Core\Cache\InstallBackend')
+    ->addArgument('cache');
+  $container->register('cache.bootstrap', 'Drupal\Core\Cache\InstallBackend')
+    ->addArgument('bootstrap');
+  $container->register('cache.form', 'Drupal\Core\Cache\InstallBackend')
+    ->addArgument('form');
 
   // The install process cannot use the database lock backend since the database
   // is not fully up, so we use a null backend implementation during the
@@ -372,6 +378,15 @@ function install_begin_request(&$install_state) {
     // Initialize the database system. Note that the connection
     // won't be initialized until it is actually requested.
     require_once DRUPAL_ROOT . '/core/includes/database.inc';
+    $container->register('cache', 'Drupal\Core\Cache\DatabaseBackend')
+      ->addArgument(new Reference('database'))
+      ->addArgument('cache');
+    $container->register('cache.bootstrap', 'Drupal\Core\Cache\DatabaseBackend')
+      ->addArgument(new Reference('database'))
+      ->addArgument('bootstrap');
+    $container->register('cache.form', 'Drupal\Core\Cache\DatabaseBackend')
+      ->addArgument(new Reference('database'))
+      ->addArgument('form');
 
     // Verify the last completed task in the database, if there is one.
     $task = install_verify_completed_task();
@@ -496,7 +511,14 @@ function install_run_task($task, &$install_state) {
         // We need to pass $install_state by reference in order for forms to
         // modify it, since the form API will use it in call_user_func_array(),
         // which requires that referenced variables be passed explicitly.
-        'build_info' => array('args' => array(&$install_state)),
+        'build_info' => array(
+          'args' => array(&$install_state),
+          // drupal_retrieve_form() tries to load the current menu item
+          // if this is not set.
+          'files' => array(
+            'menu' => FALSE,
+          )
+        ),
       );
       drupal_form_submit($function, $form_state);
       $errors = form_get_errors();
@@ -939,8 +961,9 @@ function install_verify_completed_task() {
  * Verifies that settings.php specifies a valid database connection.
  */
 function install_verify_database_settings() {
-  global $databases;
-  if (!empty($databases)) {
+  $container = drupal_container();
+  if ($container->hasParameter('database.info')) {
+    $databases = $container->getParameter('database.info');
     $database = $databases['default']['default'];
     drupal_static_reset('conf_path');
     $settings_file = './' . conf_path(FALSE) . '/settings.php';
@@ -963,13 +986,16 @@ function install_verify_database_settings() {
  * @ingroup forms
  */
 function install_settings_form($form, &$form_state, &$install_state) {
-  global $databases;
   $profile = $install_state['parameters']['profile'];
 
   drupal_static_reset('conf_path');
   $conf_path = './' . conf_path(FALSE);
   $settings_file = $conf_path . '/settings.php';
-  $database = isset($databases['default']['default']) ? $databases['default']['default'] : array();
+  $database = array();
+  if (drupal_container()->hasParameter('database.info')) {
+    $databases = drupal_container()->getParameter('database.info');
+    $database = isset($databases['default']['default']) ? $databases['default']['default'] : array();
+  }
 
   drupal_set_title(st('Database configuration'));
 
@@ -1037,6 +1063,7 @@ function install_settings_form_validate($form, &$form_state) {
   unset($database['db_prefix']);
 
   $form_state['storage']['database'] = $database;
+  drupal_container()->setParameter('database.info', array('default' => $database));
   $errors = install_database_errors($database, $form_state['values']['settings_file']);
   foreach ($errors as $name => $message) {
     form_set_error($name, $message);
@@ -1047,7 +1074,6 @@ function install_settings_form_validate($form, &$form_state) {
  * Checks a database connection and returns any errors.
  */
 function install_database_errors($database, $settings_file) {
-  global $databases;
   $errors = array();
 
   // Check database type.
@@ -1062,17 +1088,15 @@ function install_database_errors($database, $settings_file) {
 
     // Run tasks associated with the database type. Any errors are caught in the
     // calling function.
-    $databases['default']['default'] = $database;
     // Just changing the global doesn't get the new information processed.
     // We need to close any active connections and tell the Database class to
     // re-parse $databases.
     if (Database::isActiveConnection()) {
       Database::closeConnection();
     }
-    Database::parseConnectionInfo();
 
     try {
-      db_run_tasks($driver);
+      db_run_tasks($driver, $database);
     }
     catch (TaskException $e) {
       // These are generic errors, so we do not have any specific key of the

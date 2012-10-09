@@ -21,11 +21,6 @@ namespace Drupal\Core\Cache;
 class NullBackend implements CacheBackendInterface {
 
   /**
-   * Implements Drupal\Core\Cache\CacheBackendInterface::__construct().
-   */
-  function __construct($bin) {}
-
-  /**
    * Implements Drupal\Core\Cache\CacheBackendInterface::get().
    */
   function get($cid) {

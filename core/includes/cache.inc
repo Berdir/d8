@@ -5,16 +5,8 @@
  * Functions and interfaces for cache handling.
  */
 
-use Drupal\Core\Cache\CacheFactory;
-
 /**
- * Instantiates and statically caches the correct class for a cache bin.
- *
- * By default, this returns an instance of the Drupal\Core\Cache\DatabaseBackend
- * class.
- *
- * Classes implementing Drupal\Core\Cache\CacheBackendInterface can register
- * themselves both as a default implementation and for specific bins.
+ * Returns a cache service.
  *
  * @param $bin
  *   The cache bin for which the cache object should be returned, defaults to
@@ -26,21 +18,8 @@ use Drupal\Core\Cache\CacheFactory;
  * @see Drupal\Core\Cache\CacheBackendInterface
  */
 function cache($bin = 'cache') {
-  // Use the advanced drupal_static() pattern, since this is called very often.
-  static $drupal_static_fast;
-  if (!isset($drupal_static_fast)) {
-    $drupal_static_fast['cache'] = &drupal_static(__FUNCTION__, array());
-  }
-  $cache_objects = &$drupal_static_fast['cache'];
-
-  // Temporary backwards compatibiltiy layer, allow old style prefixed cache
-  // bin names to be passed as arguments.
-  $bin = str_replace('cache_', '', $bin);
-
-  if (!isset($cache_objects[$bin])) {
-    $cache_objects[$bin] = CacheFactory::get($bin);
-  }
-  return $cache_objects[$bin];
+  $service = $bin == 'cache' ? 'cache' : 'cache.' . $bin;
+  return drupal_container()->get($service);
 }
 
 /**
@@ -57,7 +36,25 @@ function cache($bin = 'cache') {
  *   The list of tags to invalidate cache items for.
  */
 function cache_invalidate(array $tags) {
-  foreach (CacheFactory::getBackends() as $bin => $class) {
-    cache($bin)->invalidateTags($tags);
+  foreach (cache_backends() as $backend) {
+    $backend->invalidateTags($tags);
   }
+}
+
+/**
+ * Returns a list of cache backends for this site.
+ *
+ * @return array
+ *   An associative array with cache bins as keys, and backend object as the
+ *   value.
+ */
+function cache_backends() {
+  $container = drupal_container();
+  $cache_services = array_filter($container->getServiceIds(), function ($value) { return substr($value, 0, 6) == 'cache.';});
+  $cache_services[] = 'cache';
+  $backends = array();
+  foreach ($cache_services as $service) {
+    $backends[$service] = $container->get($service);
+  }
+  return $backends;
 }

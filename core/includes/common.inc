@@ -4809,10 +4809,10 @@ function drupal_json_decode($var) {
  *   A salt based on information in settings.php, not in the database.
  */
 function drupal_get_hash_salt() {
-  global $drupal_hash_salt, $databases;
+  global $drupal_hash_salt;
   // If the $drupal_hash_salt variable is empty, a hash of the serialized
   // database credentials is used as a fallback salt.
-  return empty($drupal_hash_salt) ? hash('sha256', serialize($databases)) : $drupal_hash_salt;
+  return empty($drupal_hash_salt) ? hash('sha256', serialize(drupal_container()->getParameter('database.info'))) : $drupal_hash_salt;
 }
 
 /**
