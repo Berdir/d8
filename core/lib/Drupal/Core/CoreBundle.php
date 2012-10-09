@@ -48,7 +48,13 @@ class CoreBundle extends Bundle
       ->setScope('request');
 
     foreach (array('block', 'field', 'filter', 'form', 'page', 'menu', 'path', 'test') as $bin) {
-      cache_add_backend($container, $bin);
+      $id = 'cache.' . $bin;
+      // Only define the bin if it has not yet been defined.
+      if (!$container->has($id)) {
+        $definition = clone $container->getDefinition('cache');
+        // Each backend must define the bin as it's first constructor argument.
+        $container->setDefinition($id, $definition->replaceArgument(0, $bin));
+      }
     }
 
     $container->register('typed_data', 'Drupal\Core\TypedData\TypedDataManager');

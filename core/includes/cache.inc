@@ -53,25 +53,3 @@ function cache_invalidate(array $tags) {
 function cache_backends() {
   return array_keys(drupal_container()->findTaggedServiceIds('cache'));
 }
-
-/**
- * Adds a cache backend to the dependency injection container.
- *
- * The backend is added using the default definition, which is taken from the
- * default cache backend.
- *
- * @param Drupal\Core\DependencyInjection\ContainerBuilder $container
- *   The container to which the backend should be added.
- * @param $bin
- *   Name of the cache bin.
- */
-function cache_add_backend(ContainerBuilder $container, $bin) {
-  $id = 'cache.' . $bin;
-  // Only define the bin if it has not yet been defined.
-  if (!$container->has($id)) {
-    $definition = clone $container->getDefinition('cache');
-    // @todo: Relies on non-enforced constructor argument. Should be replaced
-    // with a method call instead.
-    $container->setDefinition($id, $definition->replaceArgument(0, $bin));
-  }
-}
