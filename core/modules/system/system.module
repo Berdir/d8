@@ -3476,8 +3476,7 @@ function system_cron() {
  * Implements hook_cache_flush().
  */
 function system_cache_flush() {
-  // Do NOT flush the 'form' cache bin to retain in-progress form submissions.
-  return array('bootstrap', 'config', 'cache', 'page', 'path');
+  return array('bootstrap', 'config', 'cache', 'html', 'entity', 'path');
 }
 
 /**
