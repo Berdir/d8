@@ -34,7 +34,7 @@ class DatabaseBackend implements CacheBackendInterface {
   protected static $tagCache = array();
 
   /**
-   * bo
+   * Constructs a new cache database backend.
    *
    * @param string $bin
    *   (optional) The cache bin that should be used.

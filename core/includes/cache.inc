@@ -1,7 +1,5 @@
 <?php
 
-use Drupal\Core\DependencyInjection\ContainerBuilder;
-
 /**
  * @file
  * Functions and interfaces for cache handling.

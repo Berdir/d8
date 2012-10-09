@@ -268,8 +268,13 @@ function update_info_page() {
   _drupal_flush_css_js();
   // Flush the cache of all data for the update status module.
   if (db_table_exists('cache_update')) {
-    // @todo: Change to KV once converted.
-    db_truncate('cache_update')->execute();
+    $query = db_delete('cache_update');
+    $query->condition(
+      db_or()
+      ->condition('cid', 'update_project_%', 'LIKE')
+      ->condition('cid', 'available_releases::%', 'LIKE')
+    );
+    $query->execute();
   }
 
   update_task_list('info');
