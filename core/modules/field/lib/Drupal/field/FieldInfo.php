@@ -112,7 +112,7 @@ class FieldInfo {
 
     $this->bundleExtraFields = array();
 
-    cache('field')->invalidateTags(array('field_info' => TRUE));
+    cache('entity')->invalidateTags(array('field_info' => TRUE));
   }
 
   /**
@@ -131,7 +131,7 @@ class FieldInfo {
     }
 
     // Read from persistent cache.
-    if ($cached = cache('field')->get('field_info:field_map')) {
+    if ($cached = cache('entity')->get('field_info:field_map')) {
       $map = $cached->data;
 
       // Save in "static" cache.
@@ -157,7 +157,7 @@ class FieldInfo {
 
     // Save in "static" and persistent caches.
     $this->fieldMap = $map;
-    cache('field')->set('field_info:field_map', $map, CacheBackendInterface::CACHE_PERMANENT, array('field_info' => TRUE));
+    cache('entity')->set('field_info:field_map', $map, CacheBackendInterface::CACHE_PERMANENT, array('field_info' => TRUE));
 
     return $map;
   }
@@ -175,7 +175,7 @@ class FieldInfo {
     }
 
     // Read from persistent cache.
-    if ($cached = cache('field')->get('field_info:fields')) {
+    if ($cached = cache('entity')->get('field_info:fields')) {
       $this->fieldsById = $cached->data;
     }
     else {
@@ -185,7 +185,7 @@ class FieldInfo {
       }
 
       // Store in persistent cache.
-      cache('field')->set('field_info:fields', $this->fieldsById, CacheBackendInterface::CACHE_PERMANENT, array('field_info' => TRUE));
+      cache('entity')->set('field_info:fields', $this->fieldsById, CacheBackendInterface::CACHE_PERMANENT, array('field_info' => TRUE));
     }
 
     // Fill the name/ID map.
@@ -219,7 +219,7 @@ class FieldInfo {
     if (!$this->loadedAllInstances) {
 
       // Read from persistent cache.
-      if ($cached = cache('field')->get('field_info:instances')) {
+      if ($cached = cache('entity')->get('field_info:instances')) {
         $this->bundleInstances = $cached->data;
       }
       else {
@@ -236,7 +236,7 @@ class FieldInfo {
         }
 
         // Store in persistent cache.
-        cache('field')->set('field_info:instances', $this->bundleInstances, CacheBackendInterface::CACHE_PERMANENT, array('field_info' => TRUE));
+        cache('entity')->set('field_info:instances', $this->bundleInstances, CacheBackendInterface::CACHE_PERMANENT, array('field_info' => TRUE));
       }
 
       $this->loadedAllInstances = TRUE;
@@ -353,7 +353,7 @@ class FieldInfo {
     }
 
     // Read from the persistent cache.
-    if ($cached = cache('field')->get("field_info:bundle:$entity_type:$bundle")) {
+    if ($cached = cache('entity')->get("field_info:bundle:$entity_type:$bundle")) {
       $info = $cached->data;
 
       // Extract the field definitions and save them in the "static" cache.
@@ -417,7 +417,7 @@ class FieldInfo {
     foreach ($instances as $instance) {
       $cache['fields'][] = $this->fieldsById[$instance['field_id']];
     }
-    cache('field')->set("field_info:bundle:$entity_type:$bundle", $cache, CacheBackendInterface::CACHE_PERMANENT, array('field_info' => TRUE));
+    cache('entity')->set("field_info:bundle:$entity_type:$bundle", $cache, CacheBackendInterface::CACHE_PERMANENT, array('field_info' => TRUE));
 
     return $instances;
   }
@@ -440,7 +440,7 @@ class FieldInfo {
     }
 
     // Read from the persistent cache.
-    if ($cached = cache('field')->get("field_info:bundle_extra:$entity_type:$bundle")) {
+    if ($cached = cache('entity')->get("field_info:bundle_extra:$entity_type:$bundle")) {
       $this->bundleExtraFields[$entity_type][$bundle] = $cached->data;
       return $this->bundleExtraFields[$entity_type][$bundle];
     }
@@ -458,7 +458,7 @@ class FieldInfo {
 
     // Store in the 'static' and persistent caches.
     $this->bundleExtraFields[$entity_type][$bundle] = $info;
-    cache('field')->set("field_info:bundle_extra:$entity_type:$bundle", $info, CacheBackendInterface::CACHE_PERMANENT, array('field_info' => TRUE));
+    cache('entity')->set("field_info:bundle_extra:$entity_type:$bundle", $info, CacheBackendInterface::CACHE_PERMANENT, array('field_info' => TRUE));
 
     return $this->bundleExtraFields[$entity_type][$bundle];
   }

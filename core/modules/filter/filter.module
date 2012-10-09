@@ -286,7 +286,7 @@ function filter_format_save($format) {
     $return = SAVED_UPDATED;
 
     // Clear the filter cache whenever a text format is updated.
-    cache('filter')->invalidateTags(array('filter_format' => $format->format));
+    cache('render')->invalidateTags(array('filter_format' => $format->format));
   }
 
   filter_formats_reset();
@@ -316,7 +316,7 @@ function filter_format_disable($format) {
 
   // Clear the filter cache whenever a text format is disabled.
   filter_formats_reset();
-  cache('filter')->invalidateTags(array('filter_format' => $format->format));
+  cache('render')->invalidateTags(array('filter_format' => $format->format));
 }
 
 /**
@@ -777,7 +777,7 @@ function check_markup($text, $format_id = NULL, $langcode = '', $cache = FALSE) 
   $cache_id = '';
   if ($cache) {
     $cache_id = $format->format . ':' . $langcode . ':' . hash('sha256', $text);
-    if ($cached = cache('filter')->get($cache_id)) {
+    if ($cached = cache('render')->get($cache_id)) {
       return $cached->data;
     }
   }
@@ -811,7 +811,7 @@ function check_markup($text, $format_id = NULL, $langcode = '', $cache = FALSE) 
   // automatically flushed when the text format is updated.
   // @see filter_format_save()
   if ($cache) {
-    cache('filter')->set($cache_id, $text, CacheBackendInterface::CACHE_PERMANENT, array('filter_format' => $format->format));
+    cache('render')->set($cache_id, $text, CacheBackendInterface::CACHE_PERMANENT, array('filter_format' => $format->format));
   }
 
   return $text;

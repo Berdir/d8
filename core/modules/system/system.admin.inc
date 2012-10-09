@@ -1706,7 +1706,7 @@ function system_clear_cache_submit($form, &$form_state) {
  * @ingroup forms
  */
 function system_clear_page_cache_submit($form, &$form_state) {
-  cache('page')->flush();
+  cache('html')->flush();
 }
 
 /**

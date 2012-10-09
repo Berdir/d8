@@ -765,7 +765,7 @@ function field_attach_load($entity_type, $entities, $age = FIELD_LOAD_CURRENT, $
     foreach ($entities as $id => $entity) {
       $cids[] = "field:$entity_type:$id";
     }
-    $cache = cache('field')->getMultiple($cids);
+    $cache = cache('entity')->getMultiple($cids);
     // Put the cached field values back into the entities and remove them from
     // the list of entities to query.
     foreach ($entities as $id => $entity) {
@@ -841,7 +841,7 @@ function field_attach_load($entity_type, $entities, $age = FIELD_LOAD_CURRENT, $
           $data[$instance['field_name']] = $queried_entities[$id]->{$instance['field_name']};
         }
         $cid = "field:$entity_type:$id";
-        cache('field')->set($cid, $data);
+        cache('entity')->set($cid, $data);
       }
     }
   }
@@ -1105,7 +1105,7 @@ function field_attach_update($entity_type, EntityInterface $entity) {
 
   $entity_info = entity_get_info($entity_type);
   if ($entity_info['field cache']) {
-    cache('field')->delete("field:$entity_type:" . $entity->id());
+    cache('entity')->delete("field:$entity_type:" . $entity->id());
   }
 }
 
@@ -1140,7 +1140,7 @@ function field_attach_delete($entity_type, $entity) {
 
   $entity_info = entity_get_info($entity_type);
   if ($entity_info['field cache']) {
-    cache('field')->delete("field:$entity_type:" . $entity->id());
+    cache('entity')->delete("field:$entity_type:" . $entity->id());
   }
 }
 

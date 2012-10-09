@@ -659,14 +659,12 @@ function system_schema() {
   $schema['cache_bootstrap']['description'] = 'Cache table for data required to bootstrap Drupal, may be routed to a shared memory cache.';
   $schema['cache_config'] = $schema['cache'];
   $schema['cache_config']['description'] = 'Cache table for configuration data.';
-  $schema['cache_form'] = $schema['cache'];
-  $schema['cache_form']['description'] = 'Cache table for the form system to store recently built forms and their storage data, to be used in subsequent page requests.';
-  $schema['cache_page'] = $schema['cache'];
-  $schema['cache_page']['description'] = 'Cache table used to store compressed pages for anonymous users, if page caching is enabled.';
-  $schema['cache_menu'] = $schema['cache'];
-  $schema['cache_menu']['description'] = 'Cache table for the menu system to store router information as well as generated link trees for various menu/page/user combinations.';
+  $schema['cache_render'] = $schema['cache'];
+  $schema['cache_render']['description'] = 'Cache table to store rendered HTML strings.';
+  $schema['cache_entity'] = $schema['cache'];
+  $schema['cache_entity']['description'] = 'Cache table for field and entity caches.';
   $schema['cache_path'] = $schema['cache'];
-  $schema['cache_path']['description'] = 'Cache table for path alias lookup.';
+  $schema['cache_path']['description'] = 'Cache table for path-specific (but not HTML strings) caches.';
 
   $schema['date_format_type'] = array(
     'description' => 'Stores configured date format types.',

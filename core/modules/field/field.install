@@ -161,7 +161,6 @@ function field_schema() {
       'deleted' => array('deleted'),
     ),
   );
-  $schema['cache_field'] = drupal_get_schema_unprocessed('system', 'cache');
 
   return $schema;
 }

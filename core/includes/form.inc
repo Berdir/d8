@@ -501,12 +501,12 @@ function drupal_rebuild_form($form_id, &$form_state, $old_form = NULL) {
  * Fetches a form from the cache.
  */
 function form_get_cache($form_build_id, &$form_state) {
-  if ($cached = cache('form')->get('form_' . $form_build_id)) {
+  if ($cached = cache('path')->get('form_' . $form_build_id)) {
     $form = $cached->data;
 
     global $user;
     if ((isset($form['#cache_token']) && drupal_valid_token($form['#cache_token'])) || (!isset($form['#cache_token']) && !$user->uid)) {
-      if ($cached = cache('form')->get('form_state_' . $form_build_id)) {
+      if ($cached = cache('path')->get('form_state_' . $form_build_id)) {
         // Re-populate $form_state for subsequent rebuilds.
         $form_state = $cached->data + $form_state;
 
@@ -540,12 +540,12 @@ function form_set_cache($form_build_id, $form, $form_state) {
     if ($GLOBALS['user']->uid) {
       $form['#cache_token'] = drupal_get_token();
     }
-    cache('form')->set('form_' . $form_build_id, $form, REQUEST_TIME + $expire);
+    cache('path')->set('form_' . $form_build_id, $form, REQUEST_TIME + $expire);
   }
 
   // Cache form state.
   if ($data = array_diff_key($form_state, array_flip(form_state_keys_no_cache()))) {
-    cache('form')->set('form_state_' . $form_build_id, $data, REQUEST_TIME + $expire);
+    cache('path')->set('form_state_' . $form_build_id, $data, REQUEST_TIME + $expire);
   }
 }
 
@@ -884,8 +884,8 @@ function drupal_process_form($form_id, &$form, &$form_state) {
       // here, though.
       $config = config('system.performance');
       if (!$config->get('cache.page.enabled') && !empty($form_state['values']['form_build_id'])) {
-        cache('form')->delete('form_' . $form_state['values']['form_build_id']);
-        cache('form')->delete('form_state_' . $form_state['values']['form_build_id']);
+        cache('path')->delete('form_' . $form_state['values']['form_build_id']);
+        cache('path')->delete('form_state_' . $form_state['values']['form_build_id']);
       }
 
       // If batches were set in the submit handlers, we process them now,

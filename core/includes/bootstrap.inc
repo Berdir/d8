@@ -1086,7 +1086,7 @@ function drupal_page_get_cache($check_only = FALSE) {
   }
 
   if (drupal_page_is_cacheable()) {
-    $cache = cache('page')->get($base_root . request_uri());
+    $cache = cache('html')->get($base_root . request_uri());
     if ($cache !== FALSE) {
       $cache_hit = TRUE;
     }

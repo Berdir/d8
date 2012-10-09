@@ -108,7 +108,7 @@ function _field_info_collate_types() {
   $langcode = $language_interface->langcode;
 
   if (!isset($info)) {
-    if ($cached = cache('field')->get("field_info_types:$langcode")) {
+    if ($cached = cache('entity')->get("field_info_types:$langcode")) {
       $info = $cached->data;
     }
     else {
@@ -161,7 +161,7 @@ function _field_info_collate_types() {
       }
       drupal_alter('field_storage_info', $info['storage types']);
 
-      cache('field')->set("field_info_types:$langcode", $info, CacheBackendInterface::CACHE_PERMANENT, array('field_info_types' => TRUE));
+      cache('entity')->set("field_info_types:$langcode", $info, CacheBackendInterface::CACHE_PERMANENT, array('field_info_types' => TRUE));
     }
   }
 
@@ -174,7 +174,7 @@ function _field_info_collate_types() {
 function _field_info_collate_types_reset() {
   drupal_static_reset('_field_info_collate_types');
   // Clear all languages.
-  cache('field')->invalidateTags(array('field_info_types' => TRUE));
+  cache('entity')->invalidateTags(array('field_info_types' => TRUE));
 }
 
 /**

@@ -856,7 +856,7 @@ function _field_extra_fields_pre_render($elements) {
  * Clears the field info and field data caches.
  */
 function field_cache_clear() {
-  cache('field')->flush();
+  cache('entity')->flush();
   field_info_cache_clear();
 }
 

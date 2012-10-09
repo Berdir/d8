@@ -104,10 +104,6 @@ function filter_schema() {
       'status_weight' => array('status', 'weight'),
     ),
   );
-
-  $schema['cache_filter'] = drupal_get_schema_unprocessed('system', 'cache');
-  $schema['cache_filter']['description'] = 'Cache table for the Filter module to store already filtered pieces of text, identified by text format and hash of the text.';
-
   return $schema;
 }
 
