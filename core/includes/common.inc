@@ -6808,9 +6808,8 @@ function drupal_flush_all_caches() {
   // Flush all persistent caches.
   // This is executed based on old/previously known information, which is
   // sufficient, since new extensions cannot have any primed caches yet.
-  foreach (module_invoke_all('cache_flush') as $bin) {
-    cache($bin)->flush();
-  }
+  module_invoke_all('cache_flush');
+  drupal_container()->get('cache.manager')->flush();
 
   // Flush asset file caches.
   drupal_clear_css_cache();

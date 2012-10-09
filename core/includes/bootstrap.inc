@@ -2,6 +2,7 @@
 
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Database\Database;
+use Drupal\Core\DependencyInjection\Compiler\RegisterCacheBinByTagCompilerPass;
 use Symfony\Component\ClassLoader\UniversalClassLoader;
 use Symfony\Component\ClassLoader\ApcUniversalClassLoader;
 use Symfony\Component\DependencyInjection\Container;
@@ -2472,6 +2473,9 @@ function drupal_container(Container $new_container = NULL, $rebuild = FALSE) {
         ->addArgument(new Reference('database'))
         ->addTag('cache');
     }
+
+    $container->addCompilerPass(new RegisterCacheBinByTagCompilerPass());
+    $container->register('cache.manager', 'Drupal\Core\Cache\CacheManager');
 
     $container
       ->register('config.storage', 'Drupal\Core\Config\CachedStorage')

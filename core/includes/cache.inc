@@ -36,10 +36,7 @@ function cache($bin = 'cache') {
  *   The list of tags to invalidate cache items for.
  */
 function cache_invalidate(array $tags) {
-  $container = drupal_container();
-  foreach (cache_backends() as $name) {
-    $container->get($name)->invalidateTags($tags);
-  }
+  drupal_container()->get('cache.manager')->invalidateTags($tags);
 }
 
 /**
