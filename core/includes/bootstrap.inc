@@ -2463,12 +2463,14 @@ function drupal_container(Container $new_container = NULL, $rebuild = FALSE) {
       ->addArgument(NULL)
       ->addArgument('%database.info%');
     $container->register('cache', 'Drupal\Core\Cache\DatabaseBackend')
+      ->addArgument('cache')
       ->addArgument(new Reference('database'))
-      ->addArgument('cache');
-    foreach (array('bootstrap', 'block', 'config', 'field', 'filter', 'form', 'page', 'menu', 'path', 'test') as $bin) {
+      ->addTag('cache');
+    foreach (array('bootstrap', 'config') as $bin) {
       $container->register('cache.' . $bin, 'Drupal\Core\Cache\DatabaseBackend')
+        ->addArgument($bin)
         ->addArgument(new Reference('database'))
-        ->addArgument($bin);
+        ->addTag('cache');
     }
 
     $container

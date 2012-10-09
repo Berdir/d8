@@ -47,6 +47,10 @@ class CoreBundle extends Bundle
       ->addArgument(new Reference('request'))
       ->setScope('request');
 
+    foreach (array('block', 'field', 'filter', 'form', 'page', 'menu', 'path', 'test') as $bin) {
+      cache_add_backend($container, $bin);
+    }
+
     $container->register('typed_data', 'Drupal\Core\TypedData\TypedDataManager');
     // Add the user's storage for temporary, non-cache data.
     $container->register('lock', 'Drupal\Core\Lock\DatabaseLockBackend');

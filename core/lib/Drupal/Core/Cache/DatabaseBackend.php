@@ -34,14 +34,14 @@ class DatabaseBackend implements CacheBackendInterface {
   protected static $tagCache = array();
 
   /**
-   * Constructs a new cache database backend.
+   * bo
    *
-   * @param Drupal\Core\Database\Connection $connection
-   *   The database connection that should be used.
    * @param string $bin
    *   (optional) The cache bin that should be used.
+   * @param Drupal\Core\Database\Connection $connection
+   *   The database connection that should be used.
    */
- function __construct(Connection $connection, $bin) {
+ function __construct($bin, Connection $connection) {
     $this->dbConnection = $connection;
     if ($bin != 'cache') {
       $bin = 'cache_' . $bin;

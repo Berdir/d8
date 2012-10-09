@@ -35,10 +35,7 @@ use Exception;
 class InstallBackend extends DatabaseBackend {
 
   /**
-   * Constructs an Drupal\Core\Cache\InstallBackend object.
-   *
-   * @param string $bin
-   *   (optional) The cache bin that should be used.
+   * Implements Drupal\Core\Cache\CacheBackendInterface::__construct().
    */
   function __construct($bin) {
     if (class_exists('Drupal\Core\Database\Database') && drupal_container()->hasParameter('database.info')) {
