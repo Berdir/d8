@@ -44,6 +44,9 @@ class InstallBackend extends DatabaseBackend {
     if (class_exists('Drupal\Core\Database\Database') && drupal_container()->hasParameter('database.info')) {
       $this->dbConnection = Database::getConnection('default', NULL, drupal_container()->getParameter('database.info'));
     }
+    if ($bin != 'cache') {
+      $bin = 'cache_' . $bin;
+    }
     $this->bin = $bin;
   }
 
