@@ -3447,8 +3447,7 @@ function system_cron() {
     ->condition('expiration', REQUEST_TIME, '<')
     ->execute();
 
-  $cache_bins = array_merge(module_invoke_all('cache_flush'), array('form', 'menu'));
-  foreach ($cache_bins as $bin) {
+  foreach (module_invoke_all('cache_flush') as $bin) {
     cache($bin)->expire();
   }
 
@@ -3476,7 +3475,7 @@ function system_cron() {
  * Implements hook_cache_flush().
  */
 function system_cache_flush() {
-  return array('bootstrap', 'config', 'cache', 'html', 'entity', 'path');
+  return array('bootstrap', 'config', 'cache', 'render', 'entity', 'path');
 }
 
 /**

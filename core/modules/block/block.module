@@ -373,7 +373,7 @@ function _block_get_renderable_region($list = array()) {
         '#cache' => array(
           'keys' => array($block->module, $block->delta),
           'granularity' => $block->cache,
-          'bin' => 'html',
+          'bin' => 'render',
           'tags' => array('content' => TRUE),
         ),
       );
