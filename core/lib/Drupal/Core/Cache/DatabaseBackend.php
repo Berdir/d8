@@ -25,6 +25,8 @@ class DatabaseBackend implements CacheBackendInterface {
 
   /**
    * A database connection object.
+   *
+   * @var Drupal\Core\Database\Connection
    */
   protected $connection;
 
