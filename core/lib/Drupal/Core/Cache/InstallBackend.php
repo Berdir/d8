@@ -7,6 +7,7 @@
 
 namespace Drupal\Core\Cache;
 
+use Drupal\Core\Database\Connection;
 use Exception;
 
 /**

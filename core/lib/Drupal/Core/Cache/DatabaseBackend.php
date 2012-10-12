@@ -251,7 +251,6 @@ class DatabaseBackend implements CacheBackendInterface {
    * Implements Drupal\Core\Cache\CacheBackendInterface::invalidateTags().
    */
   public function invalidateTags(array $tags) {
-    debug(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
     foreach ($this->flattenTags($tags) as $tag) {
       unset(self::$tagCache[$tag]);
       $this->connection->merge('cache_tags')
