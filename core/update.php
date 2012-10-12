@@ -268,7 +268,13 @@ function update_info_page() {
   _drupal_flush_css_js();
   // Flush the cache of all data for the update status module.
   if (db_table_exists('cache_update')) {
-    cache('update')->flush();
+    $query = db_delete('cache_update');
+    $query->condition(
+      db_or()
+      ->condition('cid', 'update_project_%', 'LIKE')
+      ->condition('cid', 'available_releases::%', 'LIKE')
+    );
+    $query->execute();
   }
 
   update_task_list('info');
@@ -448,14 +454,15 @@ drupal_maintenance_theme();
 
 // @todo Remove after converting update.php to use DrupalKernel.
 $container = drupal_container();
-$container->register('database', 'Drupal\Core\Database\Connection')
-  ->setFactoryClass('Drupal\Core\Database\Database')
-  ->setFactoryMethod('getConnection')
-  ->addArgument('default');
 $container->register('router.dumper', '\Drupal\Core\Routing\MatcherDumper')
   ->addArgument(new Reference('database'));
 $container->register('router.builder', 'Drupal\Core\Routing\RouteBuilder')
   ->addArgument(new Reference('router.dumper'));
+
+foreach (array('block', 'field', 'filter', 'path', 'form', 'menu') as $bin) {
+  $definition = clone $container->getDefinition('cache');
+  $container->setDefinition('cache.' . $bin, $definition->replaceArgument(0, $bin));
+}
 
 // Turn error reporting back on. From now on, only fatal errors (which are
 // not passed through the error handler) will cause a message to be printed.

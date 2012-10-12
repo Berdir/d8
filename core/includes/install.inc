@@ -933,8 +933,8 @@ function install_profile_info($profile, $langcode = 'en') {
  * TABLE to database specific functions like stored procedures and client
  * encoding.
  */
-function db_run_tasks($driver) {
-  db_installer_object($driver)->runTasks();
+function db_run_tasks($driver, $database) {
+  db_installer_object($driver, $database)->runTasks();
   return TRUE;
 }
 
@@ -944,9 +944,9 @@ function db_run_tasks($driver) {
  * @param $driver
  *   The name of the driver.
  */
-function db_installer_object($driver) {
+function db_installer_object($driver, $database = NULL) {
   // We cannot use Database::getConnection->getDriverClass() here, because
   // the connection object is not yet functional.
   $task_class = "Drupal\\Core\\Database\\Driver\\{$driver}\\Install\\Tasks";
-  return new $task_class();
+  return new $task_class($database);
 }

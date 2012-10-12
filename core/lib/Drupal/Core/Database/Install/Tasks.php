@@ -19,6 +19,14 @@ use Exception;
  */
 abstract class Tasks {
 
+  protected $databases = array();
+
+  function __construct($database_info = NULL) {
+    if ($database_info) {
+      $this->databases['default']['default'] = $database_info;
+    }
+  }
+
   /**
    * Structure that describes each task to run.
    *
@@ -160,10 +168,7 @@ abstract class Tasks {
    */
   protected function connect() {
     try {
-      // This doesn't actually test the connection.
-      db_set_active();
-      // Now actually do a check.
-      Database::getConnection();
+      Database::getConnection('default', NULL, $this->databases);
       $this->pass('Drupal can CONNECT to the database ok.');
     }
     catch (Exception $e) {

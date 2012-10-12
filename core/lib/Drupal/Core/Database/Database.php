@@ -144,15 +144,21 @@ abstract class Database {
   /**
    * Gets the connection object for the specified database key and target.
    *
-   * @param $target
+   * @param string $target
    *   The database target name.
    * @param $key
    *   The database connection key. Defaults to NULL which means the active key.
+   * @param array $database_info
+   *   Database connection information as defined in settings.php.
    *
    * @return Drupal\Core\Database\Connection
    *   The corresponding connection object.
    */
-  final public static function getConnection($target = 'default', $key = NULL) {
+  final public static function getConnection($target = 'default', $key = NULL, $database_info = array()) {
+    if (empty(self::$databaseInfo)) {
+      self::parseConnectionInfo($database_info);
+    }
+
     if (!isset($key)) {
       // By default, we want the active connection, set in setActiveConnection.
       $key = self::$activeKey;
@@ -195,7 +201,7 @@ abstract class Database {
    */
   final public static function setActiveConnection($key = 'default') {
     if (empty(self::$databaseInfo)) {
-      self::parseConnectionInfo();
+      throw new \LogicException('Database::setActiveConnection is called without specifying the database information first.');
     }
 
     if (!empty(self::$databaseInfo[$key])) {
@@ -208,10 +214,7 @@ abstract class Database {
   /**
    * Process the configuration file for database information.
    */
-  final public static function parseConnectionInfo() {
-    global $databases;
-
-    $database_info = is_array($databases) ? $databases : array();
+  final public static function parseConnectionInfo($database_info) {
     foreach ($database_info as $index => $info) {
       foreach ($database_info[$index] as $target => $value) {
         // If there is no "driver" property, then we assume it's an array of
@@ -287,7 +290,7 @@ abstract class Database {
    */
   final public static function getConnectionInfo($key = 'default') {
     if (empty(self::$databaseInfo)) {
-      self::parseConnectionInfo();
+      throw new \LogicException('Database::getConnectionInfo called without specifying the database information first.');
     }
 
     if (!empty(self::$databaseInfo[$key])) {
@@ -307,7 +310,7 @@ abstract class Database {
    */
   final public static function renameConnection($old_key, $new_key) {
     if (empty(self::$databaseInfo)) {
-      self::parseConnectionInfo();
+      throw new \LogicException('Database::renameConnection called without specifying the database information first.');
     }
 
     if (!empty(self::$databaseInfo[$old_key]) && empty(self::$databaseInfo[$new_key])) {
@@ -359,9 +362,9 @@ abstract class Database {
    * @throws Drupal\Core\Database\ConnectionNotDefinedException
    * @throws Drupal\Core\Database\DriverNotSpecifiedException
    */
-  final protected static function openConnection($key, $target) {
+  final protected static function openConnection($key, $target, $database_info = array()) {
     if (empty(self::$databaseInfo)) {
-      self::parseConnectionInfo();
+      self::parseConnectionInfo($database_info);
     }
 
     // If the requested database does not exist then it is an unrecoverable

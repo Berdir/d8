@@ -9,6 +9,7 @@ namespace Drupal\system\Tests\Cache;
 
 use Drupal\Core\Cache\DatabaseBackend;
 use Drupal\Core\Cache\InstallBackend;
+use Drupal\Core\Database\Database;
 use Exception;
 
 /**
@@ -49,8 +50,8 @@ class InstallTest extends CacheTestBase {
    * clearing various items in the cache.
    */
   function testCacheInstall() {
-    $database_cache = new DatabaseBackend('test');
-    $install_cache = new InstallBackend('test');
+    $database_cache = new DatabaseBackend('test', Database::getConnection());
+    $install_cache = new InstallBackend('test', Database::getConnection());
 
     // Store an item in the database cache, and confirm that the installer's
     // cache backend recognizes that the cache is not empty.

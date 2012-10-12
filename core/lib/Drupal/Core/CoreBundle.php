@@ -46,14 +46,17 @@ class CoreBundle extends Bundle
     $container->register('language_manager', 'Drupal\Core\Language\LanguageManager')
       ->addArgument(new Reference('request'))
       ->setScope('request');
-    $container->register('database', 'Drupal\Core\Database\Connection')
-      ->setFactoryClass('Drupal\Core\Database\Database')
-      ->setFactoryMethod('getConnection')
-      ->addArgument('default');
-    $container->register('database.slave', 'Drupal\Core\Database\Connection')
-      ->setFactoryClass('Drupal\Core\Database\Database')
-      ->setFactoryMethod('getConnection')
-      ->addArgument('slave');
+
+    foreach (array('block', 'field', 'filter', 'path', 'form', 'menu') as $bin) {
+      $id = 'cache.' . $bin;
+      // Only define the bin if it has not yet been defined.
+      if (!$container->has($id)) {
+        $definition = clone $container->getDefinition('cache');
+        // Each backend must define the bin as it's first constructor argument.
+        $container->setDefinition($id, $definition->replaceArgument(0, $bin));
+      }
+    }
+
     $container->register('typed_data', 'Drupal\Core\TypedData\TypedDataManager');
     // Add the user's storage for temporary, non-cache data.
     $container->register('lock', 'Drupal\Core\Lock\DatabaseLockBackend');

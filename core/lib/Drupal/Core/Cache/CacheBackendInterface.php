@@ -12,34 +12,44 @@ namespace Drupal\Core\Cache;
  *
  * All cache implementations have to implement this interface.
  * Drupal\Core\Cache\DatabaseBackend provides the default implementation, which
- * can be consulted as an example.
+ * can be consulted as an example. Additionally, a backend needs to accept the
+ * cache bin as the first constructor argument, additional arguments can be used
+ * as necessary.
  *
  * To make Drupal use your implementation for a certain cache bin, you have to
- * set a variable with the name of the cache bin as its key and the name of
- * your class as its value. For example, if your implementation of
- * Drupal\Core\Cache\CacheBackendInterface was called MyCustomCache, the
- * following line would make Drupal use it for the 'cache_page' bin:
+ * register it accordingly in the dependency injection container. For example,
+ * if your implementation of Drupal\Core\Cache\CacheBackendInterface was called
+ * Drupal\mymodule\MyCustomCache, the following line would make Drupal use it
+ * for the 'page' bin:
  * @code
- *  $conf['cache_classes']['cache_page'] = 'MyCustomCache';
+ *  drupal_classloader_register('mymodule', 'modules/mymodule');
+ *  drupal_container()->register('cache.page', 'Drupal\mymodule\MyCustomCache')
+ *    ->addArgument('page')
+ *    ->addTag('cache');
  * @endcode
  *
  * Additionally, you can register your cache implementation to be used by
- * default for all cache bins by setting the $conf['cache_classes'] variable and
- * changing the value of the 'cache' key to the name of your implementation of
- * the Drupal\Core\Cache\CacheBackendInterface, e.g.
+ * default for all cache bins. The bins bootstrap, config and page are
+ * registered too early to use the default definition and need to be overwritten
+ * explicitly.
  * @code
- *  $conf['cache_classes']['cache'] = 'MyCustomCache';
+ *  $container = drupal_container();
+ *  $container->register('cache', 'Drupal\mymodule\MyCustomCache')
+ *    ->addArgument('cache')
+ *    ->addTag('cache');
+ *  foreach (array('bootstrap', 'config', 'page') as $bin) {
+ *    $definition = clone $container->getDefinition('cache');
+ *    $container->setDefinition($id, $definition->replaceArgument(0, $bin));
+ *  }
  * @endcode
  *
- * To implement a completely custom cache bin, use the same variable format:
+ * Modules that define their own cache bin need to register it in their module
+ * bundle using the following code. They also need to define the cache_$bin
+ * table required by the default cache implementation.
+ *
  * @code
- *  $conf['cache_classes']['custom_bin'] = 'MyCustomCache';
- * @endcode
- * To access your custom cache bin, specify the name of the bin when storing
- * or retrieving cached data:
- * @code
- *  cache('custom_bin')->set($cid, $data, $expire);
- *  cache('custom_bin')->get($cid);
+ *  $definition = clone $container->getDefinition('cache');
+ *  $container->setDefinition('cache.custom', $definition->replaceArgument(0, 'custom'));
  * @endcode
  *
  * @see cache()
@@ -53,14 +63,6 @@ interface CacheBackendInterface {
    * The item may be removed using cache()->delete() with a cache ID.
    */
   const CACHE_PERMANENT = 0;
-
-  /**
-   * Constructs a new cache backend.
-   *
-   * @param $bin
-   *   The cache bin for which the object is created.
-   */
-  public function __construct($bin);
 
   /**
    * Returns data from the persistent cache.

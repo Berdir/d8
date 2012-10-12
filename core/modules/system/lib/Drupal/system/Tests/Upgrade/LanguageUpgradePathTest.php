@@ -7,6 +7,8 @@
 
 namespace Drupal\system\Tests\Upgrade;
 
+use Symfony\Component\DependencyInjection\Reference;
+
 /**
  * Tests upgrading a filled database with language data.
  *

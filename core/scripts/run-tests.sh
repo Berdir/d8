@@ -4,6 +4,8 @@
  * This script runs Drupal tests from command line.
  */
 
+use Drupal\Core\DrupalKernel;
+
 const SIMPLETEST_SCRIPT_COLOR_PASS = 32; // Green.
 const SIMPLETEST_SCRIPT_COLOR_FAIL = 31; // Red.
 const SIMPLETEST_SCRIPT_COLOR_EXCEPTION = 33; // Brown.
@@ -370,6 +372,10 @@ function simpletest_script_run_one_test($test_id, $test_class) {
   try {
     // Bootstrap Drupal.
     drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
+
+    // Initialize and boot the kernel to get a fully loaded container.
+    $kernel = new DrupalKernel('prod', FALSE);
+    $kernel->boot();
 
     simpletest_classloader_register();
 

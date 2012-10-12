@@ -7,10 +7,10 @@
 
 namespace Drupal\system\Tests\Upgrade;
 
-use Drupal\Core\Database\Database;
 use Drupal\simpletest\WebTestBase;
 use Exception;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Perform end-to-end tests of the upgrade path.
@@ -238,6 +238,12 @@ abstract class UpgradePathTestBase extends WebTestBase {
     // Upgrade succeed, rebuild the environment so that we can call the API
     // of the child site directly from this request.
     $this->upgradedSite = TRUE;
+
+    $container = drupal_container();
+    foreach (array('block', 'field', 'filter', 'path', 'form', 'menu') as $bin) {
+      $definition = clone $container->getDefinition('cache');
+      $container->setDefinition('cache.' . $bin, $definition->replaceArgument(0, $bin));
+    }
 
     // Reload module list for modules that are enabled in the test database
     // but not on the test client.

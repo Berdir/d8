@@ -710,13 +710,13 @@ abstract class TestBase {
     }
     Database::addConnectionInfo('default', 'default', $connection_info['default']);
 
-    // Additionally override global $databases, since the installer does not use
+    // Additionally set database.info, since the installer does not use
     // the Database connection info.
     // @see install_verify_database_settings()
     // @see install_database_errors()
     // @todo Fix installer to use Database connection info.
-    global $databases;
     $databases['default']['default'] = $connection_info['default'];
+    drupal_container()->setParameter('database.info', $databases);
 
     // Indicate the database prefix was set up correctly.
     $this->setupDatabasePrefix = TRUE;
@@ -896,6 +896,9 @@ abstract class TestBase {
     $GLOBALS['theme_key'] = $this->originalThemeKey;
     $GLOBALS['theme'] = $this->originalTheme;
 
+    // Restore the original container.
+    drupal_container($this->originalContainer);
+
     // Reset all static variables.
     drupal_static_reset();
 
@@ -907,7 +910,6 @@ abstract class TestBase {
     $conf = $this->originalConf;
 
     // Restore original statics and globals.
-    drupal_container($this->originalContainer);
     $language_interface = $this->originalLanguage;
     $GLOBALS['config_directories'] = $this->originalConfigDirectories;
     if (isset($this->originalPrefix)) {

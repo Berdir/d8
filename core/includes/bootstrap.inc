@@ -1,7 +1,6 @@
 <?php
 
 use Drupal\Component\Utility\NestedArray;
-use Drupal\Core\Database\Database;
 use Symfony\Component\ClassLoader\UniversalClassLoader;
 use Symfony\Component\ClassLoader\ApcUniversalClassLoader;
 use Symfony\Component\DependencyInjection\Container;
@@ -725,13 +724,16 @@ function drupal_settings_initialize() {
   global $base_url, $base_path, $base_root, $script_path;
 
   // Export these settings.php variables to the global namespace.
-  global $databases, $cookie_domain, $conf, $installed_profile, $update_free_access, $db_url, $db_prefix, $drupal_hash_salt, $is_https, $base_secure_url, $base_insecure_url, $config_directories;
+  global $cookie_domain, $conf, $installed_profile, $update_free_access, $db_url, $db_prefix, $drupal_hash_salt, $is_https, $base_secure_url, $base_insecure_url, $config_directories;
   $conf = array();
 
   // Make conf_path() available as local variable in settings.php.
   $conf_path = conf_path();
   if (is_readable(DRUPAL_ROOT . '/' . $conf_path . '/settings.php')) {
     include_once DRUPAL_ROOT . '/' . $conf_path . '/settings.php';
+    if (!empty($databases)) {
+      drupal_container()->setParameter('database.info', $databases);
+    }
   }
   $is_https = isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on';
 
@@ -2241,14 +2243,13 @@ function _drupal_bootstrap_configuration() {
   drupal_environment_initialize();
   // Start a page timer:
   timer_start('page');
+  // Activate the class loader.
+  drupal_classloader();
   // Initialize the configuration, including variables from settings.php.
   drupal_settings_initialize();
 
   // Make sure we are using the test database prefix in child Drupal sites.
   _drupal_initialize_db_test_prefix();
-
-  // Activate the class loader.
-  drupal_classloader();
 
   // Load the procedural configuration system helper functions.
   require_once DRUPAL_ROOT . '/core/includes/config.inc';
@@ -2323,7 +2324,8 @@ function _drupal_initialize_db_test_prefix() {
     $test_info['test_run_id'] = $test_prefix;
     $test_info['in_child_site'] = TRUE;
 
-    foreach ($GLOBALS['databases']['default'] as &$value) {
+    $databases = drupal_container()->getParameter('database.info');
+    foreach ($databases['default'] as &$value) {
       // Extract the current default database prefix.
       if (!isset($value['prefix'])) {
         $current_prefix = '';
@@ -2340,6 +2342,7 @@ function _drupal_initialize_db_test_prefix() {
         'default' => $current_prefix . $test_prefix,
       );
     }
+    drupal_container()->setParameter('database.info', $databases);
   }
 }
 
@@ -2350,11 +2353,10 @@ function _drupal_bootstrap_database() {
   // Redirect the user to the installation script if Drupal has not been
   // installed yet (i.e., if no $databases array has been defined in the
   // settings.php file) and we are not already installing.
-  if (empty($GLOBALS['databases']) && !drupal_installation_attempted()) {
+  if (!drupal_container()->hasParameter('database.info') && !drupal_installation_attempted()) {
     include_once DRUPAL_ROOT . '/core/includes/install.inc';
     install_goto('core/install.php');
   }
-
 
   // Initialize the database system. Note that the connection
   // won't be initialized until it is actually requested.
@@ -2440,12 +2442,29 @@ function drupal_container(Container $new_container = NULL, $rebuild = FALSE) {
     $container
       ->register('config.cachedstorage.storage', 'Drupal\Core\Config\FileStorage')
       ->addArgument(config_get_config_directory(CONFIG_ACTIVE_DIRECTORY));
-    // @todo Replace this with a cache.factory service plus 'config' argument.
-    $container
-      ->register('cache.config')
-      ->setFactoryClass('Drupal\Core\Cache\CacheFactory')
-      ->setFactoryMethod('get')
-      ->addArgument('config');
+
+    // This will be overridden by settings.php in drupal_settings_initialize().
+    $container->setParameter('database.info', array());
+    $container->register('database', 'Drupal\Core\Database\Connection')
+      ->setFactoryClass('Drupal\Core\Database\Database')
+      ->setFactoryMethod('getConnection')
+      ->addArgument('default')
+      ->addArgument(NULL)
+      ->addArgument('%database.info%');
+    $container->register('database.slave', 'Drupal\Core\Database\Connection')
+      ->setFactoryClass('Drupal\Core\Database\Database')
+      ->setFactoryMethod('getConnection')
+      ->addArgument('slave')
+      ->addArgument(NULL)
+      ->addArgument('%database.info%');
+    $container->register('cache', 'Drupal\Core\Cache\DatabaseBackend')
+      ->addArgument('cache')
+      ->addArgument(new Reference('database'))
+      ->addTag('cache');
+    foreach (array('bootstrap', 'config', 'page') as $bin) {
+      $definition = clone $container->getDefinition('cache');
+      $container->setDefinition('cache.' . $bin, $definition->replaceArgument(0, $bin));
+    }
 
     $container
       ->register('config.storage', 'Drupal\Core\Config\CachedStorage')
