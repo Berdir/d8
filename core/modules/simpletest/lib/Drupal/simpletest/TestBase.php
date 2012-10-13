@@ -884,14 +884,6 @@ abstract class TestBase {
     // Delete temporary files directory.
     file_unmanaged_delete_recursive($this->originalFileDirectory . '/simpletest/' . substr($this->databasePrefix, 10), array($this, 'filePreDeleteCallback'));
 
-    // Restore original database connection.
-    Database::removeConnection('default');
-    Database::renameConnection('simpletest_original_default', 'default');
-    // @see TestBase::changeDatabasePrefix()
-    global $databases;
-    $connection_info = Database::getConnectionInfo('default');
-    $databases['default']['default'] = $connection_info['default'];
-
     // Restore original globals.
     $GLOBALS['theme_key'] = $this->originalThemeKey;
     $GLOBALS['theme'] = $this->originalTheme;
@@ -902,6 +894,8 @@ abstract class TestBase {
     // Reset module list and module load status.
     module_list_reset();
     module_load_all(FALSE, TRUE);
+
+    $this->removeTestDatabase();
 
     // Restore original in-memory configuration.
     $conf = $this->originalConf;
@@ -921,6 +915,36 @@ abstract class TestBase {
     // Restore original user session.
     $user = $this->originalUser;
     drupal_save_session(TRUE);
+  }
+
+  /**
+   * Removes the test database connection.
+   */
+  protected function removeTestDatabase() {
+    // Remove all prefixed tables.
+    /*$connection_info = Database::getConnectionInfo('default');
+    $tables = db_find_tables($connection_info['default']['prefix']['default'] . '%');
+    if (empty($tables)) {
+      $this->fail('Failed to find test tables to drop.');
+    }
+    $prefix_length = strlen($connection_info['default']['prefix']['default']);
+    foreach ($tables as $table) {
+      if (db_drop_table(substr($table, $prefix_length))) {
+        unset($tables[$table]);
+      }
+    }
+    if (!empty($tables)) {
+      $this->fail('Failed to drop all prefixed tables.');
+    }*/
+
+    // Restore original database connection.
+    Database::removeConnection('default');
+    Database::renameConnection('simpletest_original_default', 'default');
+
+    // @see TestBase::changeDatabasePrefix()
+    global $databases;
+    $connection_info = Database::getConnectionInfo('default');
+    $databases['default']['default'] = $connection_info['default'];
   }
 
   /**

@@ -71,4 +71,64 @@ abstract class UnitTestBase extends TestBase {
 
     $this->setup = TRUE;
   }
+
+    /**
+   * Deletes created files, database tables, and reverts all environment changes.
+   *
+   * This method needs to be invoked for both unit and integration tests.
+   *
+   * @see TestBase::prepareDatabasePrefix()
+   * @see TestBase::changeDatabasePrefix()
+   * @see TestBase::prepareEnvironment()
+   */
+  protected function tearDown() {
+    global $user, $conf;
+    $language_interface = language(LANGUAGE_TYPE_INTERFACE);
+
+    // In case a fatal error occurred that was not in the test process read the
+    // log to pick up any fatal errors.
+    simpletest_log_read($this->testId, $this->databasePrefix, get_class($this), TRUE);
+
+    $emailCount = count(variable_get('drupal_test_email_collector', array()));
+    if ($emailCount) {
+      $message = format_plural($emailCount, '1 e-mail was sent during this test.', '@count e-mails were sent during this test.');
+      $this->pass($message, t('E-mail'));
+    }
+
+    // Delete temporary files directory.
+    file_unmanaged_delete_recursive($this->originalFileDirectory . '/simpletest/' . substr($this->databasePrefix, 10), array($this, 'filePreDeleteCallback'));
+
+    $this->removeTestDatabase();
+
+    // Restore original globals.
+    $GLOBALS['theme_key'] = $this->originalThemeKey;
+    $GLOBALS['theme'] = $this->originalTheme;
+
+    // Reset all static variables.
+    drupal_static_reset();
+
+    // Reset module list and module load status.
+    module_list_reset();
+    module_load_all(FALSE, TRUE);
+
+
+    // Restore original in-memory configuration.
+    $conf = $this->originalConf;
+
+    // Restore original statics and globals.
+    drupal_container($this->originalContainer);
+    $language_interface = $this->originalLanguage;
+    $GLOBALS['config_directories'] = $this->originalConfigDirectories;
+    if (isset($this->originalPrefix)) {
+      drupal_valid_test_ua($this->originalPrefix);
+    }
+
+    // Restore original shutdown callbacks.
+    $callbacks = &drupal_register_shutdown_function();
+    $callbacks = $this->originalShutdownCallbacks;
+
+    // Restore original user session.
+    $user = $this->originalUser;
+    drupal_save_session(TRUE);
+  }
 }
