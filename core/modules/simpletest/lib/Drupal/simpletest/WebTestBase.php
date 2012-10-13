@@ -613,8 +613,6 @@ abstract class WebTestBase extends TestBase {
     // Reset all statics and variables to perform tests in a clean environment.
     $conf = array();
     drupal_static_reset();
-    // drupal_container() does not use drupal_static().
-    drupal_container(NULL, TRUE);
 
     // Change the database prefix.
     // All static variables need to be reset before the database prefix is

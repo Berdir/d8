@@ -887,10 +887,6 @@ abstract class TestBase {
     // Restore original database connection.
     Database::removeConnection('default');
     Database::renameConnection('simpletest_original_default', 'default');
-    // @see TestBase::changeDatabasePrefix()
-    global $databases;
-    $connection_info = Database::getConnectionInfo('default');
-    $databases['default']['default'] = $connection_info['default'];
 
     // Restore original globals.
     $GLOBALS['theme_key'] = $this->originalThemeKey;

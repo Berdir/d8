@@ -155,6 +155,8 @@ abstract class Database {
    *   The corresponding connection object.
    */
   final public static function getConnection($target = 'default', $key = NULL, $database_info = array()) {
+    // @todo: Refactor this class to instantiate it and pass in the database
+    // info through the controller: http://drupal.org/node/1811730.
     if (empty(self::$databaseInfo)) {
       self::parseConnectionInfo($database_info);
     }

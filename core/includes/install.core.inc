@@ -522,11 +522,6 @@ function install_run_task($task, &$install_state) {
         // which requires that referenced variables be passed explicitly.
         'build_info' => array(
           'args' => array(&$install_state),
-          // drupal_retrieve_form() tries to load the current menu item
-          // if this is not set.
-          'files' => array(
-            'menu' => FALSE,
-          )
         ),
       );
       drupal_form_submit($function, $form_state);
