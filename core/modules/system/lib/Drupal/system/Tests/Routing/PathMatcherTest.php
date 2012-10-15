@@ -46,7 +46,7 @@ class PathMatcherTest extends UnitTestBase {
   }
 
   public function tearDown() {
-    $this->fixtures->dropTables(Database::getConnection());
+    $this->fixtures->dropTables(drupal_container()->get('database')->getConnection());
 
     parent::tearDown();
   }
@@ -56,7 +56,7 @@ class PathMatcherTest extends UnitTestBase {
    */
   public function testCandidateOutlines() {
 
-    $connection = Database::getConnection();
+    $connection = drupal_container()->get('database')->getConnection();
     $matcher = new PathMatcher($connection);
 
     $parts = array('node', '5', 'edit');
@@ -76,7 +76,7 @@ class PathMatcherTest extends UnitTestBase {
    * Confirms that we can find routes with the exact incoming path.
    */
   function testExactPathMatch() {
-    $connection = Database::getConnection();
+    $connection = drupal_container()->get('database')->getConnection();
     $matcher = new PathMatcher($connection, 'test_routes');
 
     $this->fixtures->createTables($connection);
@@ -100,7 +100,7 @@ class PathMatcherTest extends UnitTestBase {
    * Confirms that we can find routes whose pattern would match the request.
    */
   function testOutlinePathMatch() {
-    $connection = Database::getConnection();
+    $connection = drupal_container()->get('database')->getConnection();
     $matcher = new PathMatcher($connection, 'test_routes');
 
     $this->fixtures->createTables($connection);
@@ -129,7 +129,7 @@ class PathMatcherTest extends UnitTestBase {
    * Confirms that a trailing slash on the request doesn't result in a 404.
    */
   function testOutlinePathMatchTrailingSlash() {
-    $connection = Database::getConnection();
+    $connection = drupal_container()->get('database')->getConnection();
     $matcher = new PathMatcher($connection, 'test_routes');
 
     $this->fixtures->createTables($connection);
@@ -158,7 +158,7 @@ class PathMatcherTest extends UnitTestBase {
    * Confirms that we can find routes whose pattern would match the request.
    */
   function testOutlinePathMatchDefaults() {
-    $connection = Database::getConnection();
+    $connection = drupal_container()->get('database')->getConnection();
     $matcher = new PathMatcher($connection, 'test_routes');
 
     $this->fixtures->createTables($connection);
@@ -197,7 +197,7 @@ class PathMatcherTest extends UnitTestBase {
    * Confirms that we can find routes whose pattern would match the request.
    */
   function testOutlinePathMatchDefaultsCollision() {
-    $connection = Database::getConnection();
+    $connection = drupal_container()->get('database')->getConnection();
     $matcher = new PathMatcher($connection, 'test_routes');
 
     $this->fixtures->createTables($connection);
@@ -237,7 +237,7 @@ class PathMatcherTest extends UnitTestBase {
    * Confirms that we can find routes whose pattern would match the request.
    */
   function testOutlinePathMatchDefaultsCollision2() {
-    $connection = Database::getConnection();
+    $connection = drupal_container()->get('database')->getConnection();
     $matcher = new PathMatcher($connection, 'test_routes');
 
     $this->fixtures->createTables($connection);
@@ -276,7 +276,7 @@ class PathMatcherTest extends UnitTestBase {
    * Confirms that an exception is thrown when no matching path is found.
    */
   function testOutlinePathNoMatch() {
-    $connection = Database::getConnection();
+    $connection = drupal_container()->get('database')->getConnection();
     $matcher = new PathMatcher($connection, 'test_routes');
 
     $this->fixtures->createTables($connection);

@@ -73,7 +73,7 @@ class CoreBundle extends Bundle
     $matcher->add(new \Drupal\Core\LegacyUrlMatcher());
 
     $nested = new \Drupal\Core\Routing\NestedMatcher();
-    $nested->setInitialMatcher(new \Drupal\Core\Routing\PathMatcher(Database::getConnection()));
+    $nested->setInitialMatcher(new \Drupal\Core\Routing\PathMatcher(drupal_container()->get('database')->getConnection()));
     $nested->addPartialMatcher(new \Drupal\Core\Routing\HttpMethodMatcher());
     $nested->setFinalMatcher(new \Drupal\Core\Routing\FirstEntryFinalMatcher());
     $matcher->add($nested, 5);

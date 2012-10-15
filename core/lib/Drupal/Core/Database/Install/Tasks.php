@@ -19,6 +19,14 @@ use Exception;
  */
 abstract class Tasks {
 
+  protected $databases = array();
+
+  function __construct($database_info = NULL) {
+    if ($database_info) {
+      $this->databases['default']['default'] = $database_info;
+    }
+  }
+
   /**
    * Structure that describes each task to run.
    *
@@ -160,10 +168,7 @@ abstract class Tasks {
    */
   protected function connect() {
     try {
-      // This doesn't actually test the connection.
-      db_set_active();
-      // Now actually do a check.
-      Database::getConnection();
+      Database::getConnection('default', NULL, $this->databases);
       $this->pass('Drupal can CONNECT to the database ok.');
     }
     catch (Exception $e) {
@@ -191,8 +196,8 @@ abstract class Tasks {
    * Check the engine version.
    */
   protected function checkEngineVersion() {
-    if ($this->minimumVersion() && version_compare(Database::getConnection()->version(), $this->minimumVersion(), '<')) {
-      $this->fail(st("The database version %version is less than the minimum required version %minimum_version.", array('%version' => Database::getConnection()->version(), '%minimum_version' => $this->minimumVersion())));
+    if ($this->minimumVersion() && version_compare(drupal_container()->get('database')->getConnection()->version(), $this->minimumVersion(), '<')) {
+      $this->fail(st("The database version %version is less than the minimum required version %minimum_version.", array('%version' => drupal_container()->get('database')->getConnection()->version(), '%minimum_version' => $this->minimumVersion())));
     }
   }
 

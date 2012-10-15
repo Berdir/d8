@@ -73,7 +73,7 @@ class Tasks extends InstallTasks {
   function checkBinaryOutput() {
     // PostgreSQL < 9 doesn't support bytea_output, so verify we are running
     // at least PostgreSQL 9.
-    $database_connection = Database::getConnection();
+    $database_connection = drupal_container()->get('database')->getConnection();
     if (version_compare($database_connection->version(), '9') >= 0) {
       if (!$this->checkBinaryOutputSuccess()) {
         // First try to alter the database. If it fails, raise an error telling

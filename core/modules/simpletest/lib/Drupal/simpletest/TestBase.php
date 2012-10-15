@@ -775,13 +775,13 @@ abstract class TestBase {
     }
     Database::addConnectionInfo('default', 'default', $connection_info['default']);
 
-    // Additionally override global $databases, since the installer does not use
+    // Additionally set database.info, since the installer does not use
     // the Database connection info.
     // @see install_verify_database_settings()
     // @see install_database_errors()
     // @todo Fix installer to use Database connection info.
-    global $databases;
     $databases['default']['default'] = $connection_info['default'];
+    drupal_container()->setParameter('database.info', $databases);
 
     // Indicate the database prefix was set up correctly.
     $this->setupDatabasePrefix = TRUE;
@@ -869,7 +869,7 @@ abstract class TestBase {
       if (!install_ensure_config_directory($type)) {
         return FALSE;
       }
-      $this->configDirectories[$type] = $this->originalFileDirectory . '/' . $directory['path'];
+      $this->configDirectories[$tyDape] = $this->originalFileDirectory . '/' . $directory['path'];
     }
 
     // Unset globals.
@@ -973,17 +973,13 @@ abstract class TestBase {
     // Delete temporary files directory.
     file_unmanaged_delete_recursive($this->originalFileDirectory . '/simpletest/' . substr($this->databasePrefix, 10), array($this, 'filePreDeleteCallback'));
 
-    // Restore original database connection.
-    Database::removeConnection('default');
-    Database::renameConnection('simpletest_original_default', 'default');
-    // @see TestBase::changeDatabasePrefix()
-    global $databases;
-    $connection_info = Database::getConnectionInfo('default');
-    $databases['default']['default'] = $connection_info['default'];
+    // Restore the original container.
+    drupal_container($this->originalContainer);
 
     // Restore original globals.
     $GLOBALS['theme_key'] = $this->originalThemeKey;
     $GLOBALS['theme'] = $this->originalTheme;
+
 
     // Reset all static variables.
     // All destructors of statically cached objects have been invoked above;
@@ -1001,7 +997,6 @@ abstract class TestBase {
     $conf = $this->originalConf;
 
     // Restore original statics and globals.
-    drupal_container($this->originalContainer);
     $GLOBALS['config_directories'] = $this->originalConfigDirectories;
     if (isset($this->originalPrefix)) {
       drupal_valid_test_ua($this->originalPrefix);

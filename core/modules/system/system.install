@@ -183,7 +183,7 @@ function system_requirements($phase) {
   }
   else {
     // Database information.
-    $class = Database::getConnection()->getDriverClass('Install\\Tasks');
+    $class = drupal_container()->get('database')->getConnection()->getDriverClass('Install\\Tasks');
     $tasks = new $class();
     $requirements['database_system'] = array(
       'title' => $t('Database system'),
@@ -191,7 +191,7 @@ function system_requirements($phase) {
     );
     $requirements['database_system_version'] = array(
       'title' => $t('Database system version'),
-      'value' => Database::getConnection()->version(),
+      'value' => drupal_container()->get('database')->getConnection()->version(),
     );
   }
 
@@ -1720,7 +1720,7 @@ function system_update_8006() {
  */
 function system_update_8007() {
   // Find all potential cache tables.
-  $tables = db_find_tables(Database::getConnection()->prefixTables('{cache}') . '%');
+  $tables = db_find_tables(drupal_container()->get('database')->getConnection()->prefixTables('{cache}') . '%');
 
   foreach ($tables as $table) {
     // Assume we have a valid cache table if there is both 'cid' and 'data'
@@ -2056,7 +2056,7 @@ function system_update_8022() {
     'primary key' => array('name'),
   );
 
-  $schema = Database::getConnection()->schema();
+  $schema = drupal_container()->get('database')->getConnection()->schema();
 
   $schema->dropTable('router');
 

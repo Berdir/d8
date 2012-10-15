@@ -66,7 +66,7 @@ class TransactionTest extends DatabaseTestBase {
    *   Whether to execute a DDL statement during the inner transaction.
    */
   protected function transactionOuterLayer($suffix, $rollback = FALSE, $ddl_statement = FALSE) {
-    $connection = Database::getConnection();
+    $connection = drupal_container()->get('database')->getConnection();
     $depth = $connection->transactionDepth();
     $txn = db_transaction();
 
@@ -108,7 +108,7 @@ class TransactionTest extends DatabaseTestBase {
    *   Whether to execute a DDL statement during the transaction.
    */
   protected function transactionInnerLayer($suffix, $rollback = FALSE, $ddl_statement = FALSE) {
-    $connection = Database::getConnection();
+    $connection = drupal_container()->get('database')->getConnection();
 
     $depth = $connection->transactionDepth();
     // Start a transaction. If we're being called from ->transactionOuterLayer,
@@ -162,7 +162,7 @@ class TransactionTest extends DatabaseTestBase {
    */
   function testTransactionRollBackSupported() {
     // This test won't work right if transactions are not supported.
-    if (!Database::getConnection()->supportsTransactions()) {
+    if (!drupal_container()->get('database')->getConnection()->supportsTransactions()) {
       return;
     }
     try {
@@ -188,7 +188,7 @@ class TransactionTest extends DatabaseTestBase {
    */
   function testTransactionRollBackNotSupported() {
     // This test won't work right if transactions are supported.
-    if (Database::getConnection()->supportsTransactions()) {
+    if (drupal_container()->get('database')->getConnection()->supportsTransactions()) {
       return;
     }
     try {
@@ -274,7 +274,7 @@ class TransactionTest extends DatabaseTestBase {
     $this->assertRowAbsent('row');
 
     // The behavior of a rollback depends on the type of database server.
-    if (Database::getConnection()->supportsTransactionalDDL()) {
+    if (drupal_container()->get('database')->getConnection()->supportsTransactionalDDL()) {
       // For database servers that support transactional DDL, a rollback
       // of a transaction including DDL statements should be possible.
       $this->cleanUp();
@@ -394,11 +394,11 @@ class TransactionTest extends DatabaseTestBase {
    */
   function testTransactionStacking() {
     // This test won't work right if transactions are not supported.
-    if (!Database::getConnection()->supportsTransactions()) {
+    if (!drupal_container()->get('database')->getConnection()->supportsTransactions()) {
       return;
     }
 
-    $database = Database::getConnection();
+    $database = drupal_container()->get('database')->getConnection();
 
     // Standard case: pop the inner transaction before the outer transaction.
     $transaction = db_transaction();

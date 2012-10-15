@@ -931,8 +931,9 @@ function install_verify_completed_task() {
  * Verifies that settings.php specifies a valid database connection.
  */
 function install_verify_database_settings() {
-  global $databases;
-  if (!empty($databases)) {
+  $container = drupal_container();
+  if ($container->hasParameter('database.info')) {
+    $databases = $container->getParameter('database.info');
     $database = $databases['default']['default'];
     drupal_static_reset('conf_path');
     $settings_file = './' . conf_path(FALSE) . '/settings.php';
@@ -955,13 +956,16 @@ function install_verify_database_settings() {
  * @ingroup forms
  */
 function install_settings_form($form, &$form_state, &$install_state) {
-  global $databases;
   $profile = $install_state['parameters']['profile'];
 
   drupal_static_reset('conf_path');
   $conf_path = './' . conf_path(FALSE);
   $settings_file = $conf_path . '/settings.php';
-  $database = isset($databases['default']['default']) ? $databases['default']['default'] : array();
+  $database = array();
+  if (drupal_container()->hasParameter('database.info')) {
+    $databases = drupal_container()->getParameter('database.info');
+    $database = isset($databases['default']['default']) ? $databases['default']['default'] : array();
+  }
 
   drupal_set_title(st('Database configuration'));
 
@@ -1029,6 +1033,7 @@ function install_settings_form_validate($form, &$form_state) {
   unset($database['db_prefix']);
 
   $form_state['storage']['database'] = $database;
+  drupal_container()->setParameter('database.info', array('default' => $database));
   $errors = install_database_errors($database, $form_state['values']['settings_file']);
   foreach ($errors as $name => $message) {
     form_set_error($name, $message);
@@ -1039,7 +1044,6 @@ function install_settings_form_validate($form, &$form_state) {
  * Checks a database connection and returns any errors.
  */
 function install_database_errors($database, $settings_file) {
-  global $databases;
   $errors = array();
 
   // Check database type.
@@ -1054,17 +1058,15 @@ function install_database_errors($database, $settings_file) {
 
     // Run tasks associated with the database type. Any errors are caught in the
     // calling function.
-    $databases['default']['default'] = $database;
     // Just changing the global doesn't get the new information processed.
     // We need to close any active connections and tell the Database class to
     // re-parse $databases.
     if (Database::isActiveConnection()) {
       Database::closeConnection();
     }
-    Database::parseConnectionInfo();
 
     try {
-      db_run_tasks($driver);
+      db_run_tasks($driver, $database);
     }
     catch (TaskException $e) {
       // These are generic errors, so we do not have any specific key of the

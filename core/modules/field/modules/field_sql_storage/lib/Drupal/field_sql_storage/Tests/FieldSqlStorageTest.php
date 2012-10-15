@@ -362,8 +362,8 @@ class FieldSqlStorageTest extends WebTestBase {
 
     // Verify the indexes we will create do not exist yet.
     foreach ($tables as $table) {
-      $this->assertFalse(Database::getConnection()->schema()->indexExists($table, 'value'), t("No index named value exists in $table"));
-      $this->assertFalse(Database::getConnection()->schema()->indexExists($table, 'value_format'), t("No index named value_format exists in $table"));
+      $this->assertFalse(drupal_container()->get('database')->getConnection()->schema()->indexExists($table, 'value'), t("No index named value exists in $table"));
+      $this->assertFalse(drupal_container()->get('database')->getConnection()->schema()->indexExists($table, 'value_format'), t("No index named value_format exists in $table"));
     }
 
     // Add data so the table cannot be dropped.
@@ -375,15 +375,15 @@ class FieldSqlStorageTest extends WebTestBase {
     $field = array('field_name' => $field_name, 'indexes' => array('value' => array(array('value', 255))));
     field_update_field($field);
     foreach ($tables as $table) {
-      $this->assertTrue(Database::getConnection()->schema()->indexExists($table, "{$field_name}_value"), t("Index on value created in $table"));
+      $this->assertTrue(drupal_container()->get('database')->getConnection()->schema()->indexExists($table, "{$field_name}_value"), t("Index on value created in $table"));
     }
 
     // Add a different index, removing the existing custom one.
     $field = array('field_name' => $field_name, 'indexes' => array('value_format' => array(array('value', 127), array('format', 127))));
     field_update_field($field);
     foreach ($tables as $table) {
-      $this->assertTrue(Database::getConnection()->schema()->indexExists($table, "{$field_name}_value_format"), t("Index on value_format created in $table"));
-      $this->assertFalse(Database::getConnection()->schema()->indexExists($table, "{$field_name}_value"), t("Index on value removed in $table"));
+      $this->assertTrue(drupal_container()->get('database')->getConnection()->schema()->indexExists($table, "{$field_name}_value_format"), t("Index on value_format created in $table"));
+      $this->assertFalse(drupal_container()->get('database')->getConnection()->schema()->indexExists($table, "{$field_name}_value"), t("Index on value removed in $table"));
     }
 
     // Verify that the tables were not dropped.

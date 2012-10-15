@@ -9,12 +9,8 @@ namespace Drupal\Core\Database;
 
 /**
  * Primary front-controller for the database system.
- *
- * This class is uninstantiatable and un-extendable. It acts to encapsulate
- * all control and shepherding of database connections into a single location
- * without the use of globals.
  */
-abstract class Database {
+class Database {
 
   /**
    * Flag to indicate a query call should simply return NULL.
@@ -45,28 +41,28 @@ abstract class Database {
    *
    * @var array
    */
-  static protected $connections = array();
+  protected $connections = array();
 
   /**
    * A processed copy of the database connection information from settings.php.
    *
    * @var array
    */
-  static protected $databaseInfo = NULL;
+  protected $databaseInfo = NULL;
 
   /**
    * A list of key/target credentials to simply ignore.
    *
    * @var array
    */
-  static protected $ignoreTargets = array();
+  protected $ignoreTargets = array();
 
   /**
    * The key of the currently active database connection.
    *
    * @var string
    */
-  static protected $activeKey = 'default';
+  protected $activeKey = 'default';
 
   /**
    * An array of active query log objects.
@@ -80,7 +76,11 @@ abstract class Database {
    *
    * @var array
    */
-  static protected $logs = array();
+  protected $logs = array();
+
+  public function __construct(array $database_info) {
+    $this->parseConnectionInfo($database_info);
+  }
 
   /**
    * Starts logging a given logging key on the specified connection.
@@ -97,21 +97,21 @@ abstract class Database {
    *
    * @see Drupal\Core\Database\Log
    */
-  final public static function startLog($logging_key, $key = 'default') {
-    if (empty(self::$logs[$key])) {
-      self::$logs[$key] = new Log($key);
+  final public function startLog($logging_key, $key = 'default') {
+    if (empty($this->logs[$key])) {
+      $this->logs[$key] = new Log($key);
 
       // Every target already active for this connection key needs to have the
       // logging object associated with it.
-      if (!empty(self::$connections[$key])) {
-        foreach (self::$connections[$key] as $connection) {
-          $connection->setLogger(self::$logs[$key]);
+      if (!empty($this->connections[$key])) {
+        foreach ($this->connections[$key] as $connection) {
+          $connection->setLogger($this->logs[$key]);
         }
       }
     }
 
-    self::$logs[$key]->start($logging_key);
-    return self::$logs[$key];
+    $this->logs[$key]->start($logging_key);
+    return $this->logs[$key];
   }
 
   /**
@@ -132,19 +132,19 @@ abstract class Database {
    *
    * @see Drupal\Core\Database\Log
    */
-  final public static function getLog($logging_key, $key = 'default') {
-    if (empty(self::$logs[$key])) {
+  final public function getLog($logging_key, $key = 'default') {
+    if (empty($this->logs[$key])) {
       return NULL;
     }
-    $queries = self::$logs[$key]->get($logging_key);
-    self::$logs[$key]->end($logging_key);
+    $queries = $this->logs[$key]->get($logging_key);
+    $this->logs[$key]->end($logging_key);
     return $queries;
   }
 
   /**
    * Gets the connection object for the specified database key and target.
    *
-   * @param $target
+   * @param string $target
    *   The database target name.
    * @param $key
    *   The database connection key. Defaults to NULL which means the active key.
@@ -152,25 +152,26 @@ abstract class Database {
    * @return Drupal\Core\Database\Connection
    *   The corresponding connection object.
    */
-  final public static function getConnection($target = 'default', $key = NULL) {
+  final public function getConnection($target = 'default', $key = NULL) {
+
     if (!isset($key)) {
       // By default, we want the active connection, set in setActiveConnection.
-      $key = self::$activeKey;
+      $key = $this->activeKey;
     }
     // If the requested target does not exist, or if it is ignored, we fall back
     // to the default target. The target is typically either "default" or
     // "slave", indicating to use a slave SQL server if one is available. If
     // it's not available, then the default/master server is the correct server
     // to use.
-    if (!empty(self::$ignoreTargets[$key][$target]) || !isset(self::$databaseInfo[$key][$target])) {
+    if (!empty($this->ignoreTargets[$key][$target]) || !isset($this->databaseInfo[$key][$target])) {
       $target = 'default';
     }
 
-    if (!isset(self::$connections[$key][$target])) {
+    if (!isset($this->connections[$key][$target])) {
       // If necessary, a new connection is opened.
-      self::$connections[$key][$target] = self::openConnection($key, $target);
+      $this->connections[$key][$target] = self::openConnection($key, $target);
     }
-    return self::$connections[$key][$target];
+    return $this->connections[$key][$target];
   }
 
   /**
@@ -183,8 +184,8 @@ abstract class Database {
    *   TRUE if there is at least one database connection established, FALSE
    *   otherwise.
    */
-  final public static function isActiveConnection() {
-    return !empty(self::$activeKey) && !empty(self::$connections) && !empty(self::$connections[self::$activeKey]);
+  final public function isActiveConnection() {
+    return !empty($this->activeKey) && !empty($this->connections) && !empty($this->connections[$this->activeKey]);
   }
 
   /**
@@ -193,14 +194,14 @@ abstract class Database {
    * @return
    *   The previous database connection key.
    */
-  final public static function setActiveConnection($key = 'default') {
-    if (empty(self::$databaseInfo)) {
-      self::parseConnectionInfo();
+  final public function setActiveConnection($key = 'default') {
+    if (empty($this->databaseInfo)) {
+      throw new \LogicException('Database::setActiveConnection is called without specifying the database information first.');
     }
 
-    if (!empty(self::$databaseInfo[$key])) {
-      $old_key = self::$activeKey;
-      self::$activeKey = $key;
+    if (!empty($this->databaseInfo[$key])) {
+      $old_key = $this->activeKey;
+      $this->activeKey = $key;
       return $old_key;
     }
   }
@@ -208,10 +209,7 @@ abstract class Database {
   /**
    * Process the configuration file for database information.
    */
-  final public static function parseConnectionInfo() {
-    global $databases;
-
-    $database_info = is_array($databases) ? $databases : array();
+  final public function parseConnectionInfo($database_info) {
     foreach ($database_info as $index => $info) {
       foreach ($database_info[$index] as $target => $value) {
         // If there is no "driver" property, then we assume it's an array of
@@ -237,8 +235,8 @@ abstract class Database {
       }
     }
 
-    if (!is_array(self::$databaseInfo)) {
-      self::$databaseInfo = $database_info;
+    if (!is_array($this->databaseInfo)) {
+      $this->databaseInfo = $database_info;
     }
 
     // Merge the new $database_info into the existing.
@@ -247,7 +245,7 @@ abstract class Database {
     else {
       foreach ($database_info as $database_key => $database_values) {
         foreach ($database_values as $target => $target_values) {
-          self::$databaseInfo[$database_key][$target] = $target_values;
+          $this->databaseInfo[$database_key][$target] = $target_values;
         }
       }
     }
@@ -273,9 +271,9 @@ abstract class Database {
    *   settings.php. Note that the structure of this array will depend on the
    *   database driver it is connecting to.
    */
-  public static function addConnectionInfo($key, $target, $info) {
-    if (empty(self::$databaseInfo[$key][$target])) {
-      self::$databaseInfo[$key][$target] = $info;
+  public function addConnectionInfo($key, $target, $info) {
+    if (empty($this->databaseInfo[$key][$target])) {
+      $this->databaseInfo[$key][$target] = $info;
     }
   }
 
@@ -285,13 +283,13 @@ abstract class Database {
    * @param $connection
    *   The connection key for which we want information.
    */
-  final public static function getConnectionInfo($key = 'default') {
-    if (empty(self::$databaseInfo)) {
-      self::parseConnectionInfo();
+  final public function getConnectionInfo($key = 'default') {
+    if (empty($this->databaseInfo)) {
+      throw new \LogicException('Database::getConnectionInfo called without specifying the database information first.');
     }
 
-    if (!empty(self::$databaseInfo[$key])) {
-      return self::$databaseInfo[$key];
+    if (!empty($this->databaseInfo[$key])) {
+      return $this->databaseInfo[$key];
     }
   }
 
@@ -305,20 +303,20 @@ abstract class Database {
    * @return
    *   TRUE in case of success, FALSE otherwise.
    */
-  final public static function renameConnection($old_key, $new_key) {
-    if (empty(self::$databaseInfo)) {
-      self::parseConnectionInfo();
+  final public function renameConnection($old_key, $new_key) {
+    if (empty($this->databaseInfo)) {
+      throw new \LogicException('Database::renameConnection called without specifying the database information first.');
     }
 
-    if (!empty(self::$databaseInfo[$old_key]) && empty(self::$databaseInfo[$new_key])) {
+    if (!empty($this->databaseInfo[$old_key]) && empty($this->databaseInfo[$new_key])) {
       // Migrate the database connection information.
-      self::$databaseInfo[$new_key] = self::$databaseInfo[$old_key];
-      unset(self::$databaseInfo[$old_key]);
+      $this->databaseInfo[$new_key] = $this->databaseInfo[$old_key];
+      unset($this->databaseInfo[$old_key]);
 
       // Migrate over the DatabaseConnection object if it exists.
-      if (isset(self::$connections[$old_key])) {
-        self::$connections[$new_key] = self::$connections[$old_key];
-        unset(self::$connections[$old_key]);
+      if (isset($this->connections[$old_key])) {
+        $this->connections[$new_key] = $this->connections[$old_key];
+        unset($this->connections[$old_key]);
       }
 
       return TRUE;
@@ -336,10 +334,10 @@ abstract class Database {
    * @return
    *   TRUE in case of success, FALSE otherwise.
    */
-  final public static function removeConnection($key) {
-    if (isset(self::$databaseInfo[$key])) {
+  final public function removeConnection($key) {
+    if (isset($this->databaseInfo[$key])) {
       self::closeConnection(NULL, $key);
-      unset(self::$databaseInfo[$key]);
+      unset($this->databaseInfo[$key]);
       return TRUE;
     }
     else {
@@ -359,30 +357,30 @@ abstract class Database {
    * @throws Drupal\Core\Database\ConnectionNotDefinedException
    * @throws Drupal\Core\Database\DriverNotSpecifiedException
    */
-  final protected static function openConnection($key, $target) {
-    if (empty(self::$databaseInfo)) {
-      self::parseConnectionInfo();
+  final protected function openConnection($key, $target, $database_info = array()) {
+    if (empty($this->databaseInfo)) {
+      self::parseConnectionInfo($database_info);
     }
 
     // If the requested database does not exist then it is an unrecoverable
     // error.
-    if (!isset(self::$databaseInfo[$key])) {
+    if (!isset($this->databaseInfo[$key])) {
       throw new ConnectionNotDefinedException('The specified database connection is not defined: ' . $key);
     }
 
-    if (!$driver = self::$databaseInfo[$key][$target]['driver']) {
+    if (!$driver = $this->databaseInfo[$key][$target]['driver']) {
       throw new DriverNotSpecifiedException('Driver not specified for this database connection: ' . $key);
     }
 
     $driver_class = "Drupal\\Core\\Database\\Driver\\{$driver}\\Connection";
-    $new_connection = new $driver_class(self::$databaseInfo[$key][$target]);
+    $new_connection = new $driver_class($this->databaseInfo[$key][$target]);
     $new_connection->setTarget($target);
     $new_connection->setKey($key);
 
     // If we have any active logging objects for this connection key, we need
     // to associate them with the connection we just opened.
-    if (!empty(self::$logs[$key])) {
-      $new_connection->setLogger(self::$logs[$key]);
+    if (!empty($this->logs[$key])) {
+      $new_connection->setLogger($this->logs[$key]);
     }
 
     return $new_connection;
@@ -397,30 +395,30 @@ abstract class Database {
    * @param $key
    *   The database connection key. Defaults to NULL which means the active key.
    */
-  public static function closeConnection($target = NULL, $key = NULL) {
+  public function closeConnection($target = NULL, $key = NULL) {
     // Gets the active connection by default.
     if (!isset($key)) {
-      $key = self::$activeKey;
+      $key = $this->activeKey;
     }
     // To close a connection, it needs to be set to NULL and removed from the
-    // static variable. In all cases, closeConnection() might be called for a
+    // variable. In all cases, closeConnection() might be called for a
     // connection that was not opened yet, in which case the key is not defined
     // yet and we just ensure that the connection key is undefined.
     if (isset($target)) {
-      if (isset(self::$connections[$key][$target])) {
-        self::$connections[$key][$target]->destroy();
-        self::$connections[$key][$target] = NULL;
+      if (isset($this->connections[$key][$target])) {
+        $this->connections[$key][$target]->destroy();
+        $this->connections[$key][$target] = NULL;
       }
-      unset(self::$connections[$key][$target]);
+      unset($this->connections[$key][$target]);
     }
     else {
-      if (isset(self::$connections[$key])) {
-        foreach (self::$connections[$key] as $target => $connection) {
-          self::$connections[$key][$target]->destroy();
-          self::$connections[$key][$target] = NULL;
+      if (isset($this->connections[$key])) {
+        foreach ($this->connections[$key] as $target => $connection) {
+          $this->connections[$key][$target]->destroy();
+          $this->connections[$key][$target] = NULL;
         }
       }
-      unset(self::$connections[$key]);
+      unset($this->connections[$key]);
     }
   }
 
@@ -436,7 +434,7 @@ abstract class Database {
    * @param $target
    *   The target of the specified key to ignore.
    */
-  public static function ignoreTarget($key, $target) {
-    self::$ignoreTargets[$key][$target] = TRUE;
+  public function ignoreTarget($key, $target) {
+    $this->ignoreTargets[$key][$target] = TRUE;
   }
 }
