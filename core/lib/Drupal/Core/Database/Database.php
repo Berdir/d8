@@ -195,10 +195,6 @@ class Database {
    *   The previous database connection key.
    */
   final public function setActiveConnection($key = 'default') {
-    if (empty($this->databaseInfo)) {
-      throw new \LogicException('Database::setActiveConnection is called without specifying the database information first.');
-    }
-
     if (!empty($this->databaseInfo[$key])) {
       $old_key = $this->activeKey;
       $this->activeKey = $key;
@@ -284,10 +280,6 @@ class Database {
    *   The connection key for which we want information.
    */
   final public function getConnectionInfo($key = 'default') {
-    if (empty($this->databaseInfo)) {
-      throw new \LogicException('Database::getConnectionInfo called without specifying the database information first.');
-    }
-
     if (!empty($this->databaseInfo[$key])) {
       return $this->databaseInfo[$key];
     }
@@ -304,10 +296,6 @@ class Database {
    *   TRUE in case of success, FALSE otherwise.
    */
   final public function renameConnection($old_key, $new_key) {
-    if (empty($this->databaseInfo)) {
-      throw new \LogicException('Database::renameConnection called without specifying the database information first.');
-    }
-
     if (!empty($this->databaseInfo[$old_key]) && empty($this->databaseInfo[$new_key])) {
       // Migrate the database connection information.
       $this->databaseInfo[$new_key] = $this->databaseInfo[$old_key];

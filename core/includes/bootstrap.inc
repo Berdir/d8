@@ -2201,7 +2201,6 @@ function drupal_get_user_timezone() {
  */
 function _drupal_error_handler($error_level, $message, $filename, $line, $context) {
   require_once DRUPAL_ROOT . '/core/includes/errors.inc';
-  var_dump($message);
   _drupal_error_handler_real($error_level, $message, $filename, $line, $context);
 }
 

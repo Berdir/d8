@@ -46,6 +46,16 @@ abstract class UnitTestBase extends TestBase {
     if (!$this->setupEnvironment) {
       return FALSE;
     }
+
+    // Change the database prefix.
+    // All static variables need to be reset before the database prefix is
+    // changed, since Drupal\Core\Utility\CacheArray implementations attempt to
+    // write back to persistent caches when they are destructed.
+    $this->changeDatabasePrefix();
+    if (!$this->setupDatabasePrefix) {
+      return FALSE;
+    }
+
     $this->originalThemeRegistry = theme_get_registry(FALSE);
 
     // Reset all statics and variables to perform tests in a clean environment.
@@ -56,15 +66,6 @@ abstract class UnitTestBase extends TestBase {
     module_list(NULL, array());
 
     $conf['file_public_path'] = $this->public_files_directory;
-
-    // Change the database prefix.
-    // All static variables need to be reset before the database prefix is
-    // changed, since Drupal\Core\Utility\CacheArray implementations attempt to
-    // write back to persistent caches when they are destructed.
-    $this->changeDatabasePrefix();
-    if (!$this->setupDatabasePrefix) {
-      return FALSE;
-    }
 
     // Set user agent to be consistent with WebTestBase.
     $_SERVER['HTTP_USER_AGENT'] = $this->databasePrefix;

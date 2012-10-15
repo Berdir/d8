@@ -2322,7 +2322,7 @@ function system_init() {
   // the timestamp after which the slave can be re-enabled.
   if (isset($_SESSION['ignore_slave_server'])) {
     if ($_SESSION['ignore_slave_server'] >= REQUEST_TIME) {
-      Database::ignoreTarget('default', 'slave');
+      drupal_container()->get('database')->ignoreTarget('default', 'slave');
     }
     else {
       unset($_SESSION['ignore_slave_server']);

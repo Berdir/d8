@@ -146,7 +146,7 @@ function _dblog_get_message_types() {
  * Note: Some values may be truncated to meet database column size restrictions.
  */
 function dblog_watchdog(array $log_entry) {
-  Database::getConnection('default', 'default')->insert('watchdog')
+  drupal_container()->get('database')->getConnection('default', 'default')->insert('watchdog')
     ->fields(array(
       'uid' => $log_entry['uid'],
       'type' => substr($log_entry['type'], 0, 64),

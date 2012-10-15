@@ -168,7 +168,7 @@ abstract class Tasks {
    */
   protected function connect() {
     try {
-      Database::getConnection('default', NULL, $this->databases);
+      drupal_container()->get('database')->getConnection('default', NULL, $this->databases);
       $this->pass('Drupal can CONNECT to the database ok.');
     }
     catch (Exception $e) {

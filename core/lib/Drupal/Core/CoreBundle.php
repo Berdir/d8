@@ -46,14 +46,6 @@ class CoreBundle extends Bundle
     $container->register('language_manager', 'Drupal\Core\Language\LanguageManager')
       ->addArgument(new Reference('request'))
       ->setScope('request');
-    $container->register('database', 'Drupal\Core\Database\Connection')
-      ->setFactoryClass('Drupal\Core\Database\Database')
-      ->setFactoryMethod('getConnection')
-      ->addArgument('default');
-    $container->register('database.slave', 'Drupal\Core\Database\Connection')
-      ->setFactoryClass('Drupal\Core\Database\Database')
-      ->setFactoryMethod('getConnection')
-      ->addArgument('slave');
     $container->register('typed_data', 'Drupal\Core\TypedData\TypedDataManager');
     // Add the user's storage for temporary, non-cache data.
     $container->register('lock', 'Drupal\Core\Lock\DatabaseLockBackend');

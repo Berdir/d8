@@ -48,7 +48,7 @@ class Schema extends DatabaseSchema {
       $info['table'] = substr($table, ++$pos);
     }
     else {
-      $db_info = Database::getConnectionInfo();
+      $db_info = drupal_container()->get('database')->getConnectionInfo();
       $info['database'] = $db_info['default']['database'];
       $info['table'] = $table;
     }

@@ -94,7 +94,7 @@ abstract class Query implements PlaceholderInterface {
    * Implements the magic __wakeup function to reconnect to the database.
    */
   public function __wakeup() {
-    $this->connection = Database::getConnection($this->connectionTarget, $this->connectionKey);
+    $this->connection = drupal_container()->get('database')->getConnection($this->connectionTarget, $this->connectionKey);
   }
 
   /**

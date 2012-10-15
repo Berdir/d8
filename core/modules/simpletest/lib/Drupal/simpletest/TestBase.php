@@ -136,6 +136,8 @@ abstract class TestBase {
    */
   protected $verboseDirectoryUrl;
 
+  protected static $originalContainer;
+
   /**
    * Constructor for Test.
    *
@@ -289,15 +291,12 @@ abstract class TestBase {
    *   The database connection to use for inserting assertions.
    */
   public static function getDatabaseConnection() {
-    try {
-      $connection = Database::getConnection('default', 'simpletest_original_default');
+    if (!empty(self::$originalContainer)) {
+      return self::$originalContainer->get('database')->getConnection();
     }
-    catch (ConnectionNotDefinedException $e) {
-      // If the test was not set up, the simpletest_original_default
-      // connection does not exist.
-      $connection = Database::getConnection('default', 'default');
+    else {
+      return drupal_container()->get('database')->getConnection();
     }
-    return $connection;
   }
 
   /**
@@ -766,22 +765,15 @@ abstract class TestBase {
     }
 
     // Clone the current connection and replace the current prefix.
-    $connection_info = Database::getConnectionInfo('default');
-    Database::renameConnection('default', 'simpletest_original_default');
-    foreach ($connection_info as $target => $value) {
-      $connection_info[$target]['prefix'] = array(
-        'default' => $value['prefix']['default'] . $this->databasePrefix,
+    $database_info = self::$originalContainer->getParameter('database.info');
+    foreach ($database_info['default'] as $target => $value) {
+      $prefix = is_string($value['prefix']) ? $value['prefix'] : $value['prefix']['default'];
+      $database_info['default'][$target]['prefix'] = array(
+        'default' => $prefix . $this->databasePrefix,
       );
     }
-    Database::addConnectionInfo('default', 'default', $connection_info['default']);
 
-    // Additionally set database.info, since the installer does not use
-    // the Database connection info.
-    // @see install_verify_database_settings()
-    // @see install_database_errors()
-    // @todo Fix installer to use Database connection info.
-    $databases['default']['default'] = $connection_info['default'];
-    drupal_container()->setParameter('database.info', $databases);
+    $this->container->setParameter('database.info', $database_info);
 
     // Indicate the database prefix was set up correctly.
     $this->setupDatabasePrefix = TRUE;
@@ -814,7 +806,7 @@ abstract class TestBase {
     $this->originalConf = $conf;
 
     // Backup statics and globals.
-    $this->originalContainer = clone drupal_container();
+    self::$originalContainer = clone drupal_container();
     $this->originalLanguage = $language_interface;
     $this->originalConfigDirectories = $GLOBALS['config_directories'];
     $this->originalThemeKey = $GLOBALS['theme_key'];
@@ -869,7 +861,7 @@ abstract class TestBase {
       if (!install_ensure_config_directory($type)) {
         return FALSE;
       }
-      $this->configDirectories[$tyDape] = $this->originalFileDirectory . '/' . $directory['path'];
+      $this->configDirectories[$type] = $this->originalFileDirectory . '/' . $directory['path'];
     }
 
     // Unset globals.
@@ -912,15 +904,22 @@ abstract class TestBase {
     // restores the original container.
     // @see Drupal\Core\DrupalKernel::initializeContainer()
     $this->kernel = new DrupalKernel('testing', FALSE);
+
+    // The DrupalKernel does not update the container in drupal_container(), but
+    // replaces it with a new object. We therefore need to replace the minimal
+    // boostrap container that has been set up by TestBase::prepareEnvironment().
+    $this->container = drupal_container();
+
+    // The database prefix is stored as a container parameter, rebuilding the
+    // container means those params are gone, so this step needs to be repeated
+    // every time the container is rebuilt.
+    $this->changeDatabasePrefix();
+
     // Booting the kernel is necessary to initialize the new DIC. While
     // normally the kernel gets booted on demand in
     // Symfony\Component\HttpKernel\handle(), this kernel needs manual booting
     // as it is not used to handle a request.
     $this->kernel->boot();
-    // The DrupalKernel does not update the container in drupal_container(), but
-    // replaces it with a new object. We therefore need to replace the minimal
-    // boostrap container that has been set up by TestBase::prepareEnvironment().
-    $this->container = drupal_container();
   }
 
   /**
@@ -947,9 +946,9 @@ abstract class TestBase {
     // entire parent site otherwise.
     if ($this->setupDatabasePrefix) {
       // Remove all prefixed tables.
-      $connection_info = Database::getConnectionInfo('default');
-      $tables = db_find_tables($connection_info['default']['prefix']['default'] . '%');
-      $prefix_length = strlen($connection_info['default']['prefix']['default']);
+      $database_info = $this->container->getParameter('database.info');
+      $tables = db_find_tables($database_info['default']['default']['prefix']['default'] . '%');
+      $prefix_length = strlen($database_info['default']['default']['prefix']['default']);
       foreach ($tables as $table) {
         if (db_drop_table(substr($table, $prefix_length))) {
           unset($tables[$table]);
@@ -974,7 +973,7 @@ abstract class TestBase {
     file_unmanaged_delete_recursive($this->originalFileDirectory . '/simpletest/' . substr($this->databasePrefix, 10), array($this, 'filePreDeleteCallback'));
 
     // Restore the original container.
-    drupal_container($this->originalContainer);
+    drupal_container(self::$originalContainer);
 
     // Restore original globals.
     $GLOBALS['theme_key'] = $this->originalThemeKey;
@@ -997,6 +996,7 @@ abstract class TestBase {
     $conf = $this->originalConf;
 
     // Restore original statics and globals.
+    $language_interface = $this->originalLanguage;
     $GLOBALS['config_directories'] = $this->originalConfigDirectories;
     if (isset($this->originalPrefix)) {
       drupal_valid_test_ua($this->originalPrefix);

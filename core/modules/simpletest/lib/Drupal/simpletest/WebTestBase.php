@@ -632,7 +632,8 @@ abstract class WebTestBase extends TestBase {
 
     // Set installer parameters.
     // @see install.php, install.core.inc
-    $connection_info = Database::getConnectionInfo();
+    $database_info = $this->container->getParameter('database.info');
+    $connection_info = $database_info['default'];
     $this->root_user = (object) array(
       'name' => 'admin',
       'mail' => 'admin@example.com',

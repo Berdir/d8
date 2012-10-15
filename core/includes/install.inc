@@ -951,7 +951,7 @@ function db_run_tasks($driver, $database) {
  *   The name of the driver.
  */
 function db_installer_object($driver, $database = NULL) {
-  // We cannot use Database::getConnection->getDriverClass() here, because
+  // We cannot use Database::getConnection()->getDriverClass() here, because
   // the connection object is not yet functional.
   $task_class = "Drupal\\Core\\Database\\Driver\\{$driver}\\Install\\Tasks";
   return new $task_class($database);

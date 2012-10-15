@@ -358,7 +358,7 @@ function locale_storage() {
   $storage = &drupal_static(__FUNCTION__);
   if (!isset($storage)) {
     $options = array('target' => 'default');
-    $storage = new StringDatabaseStorage(Database::getConnection($options['target']), $options);
+    $storage = new StringDatabaseStorage(drupal_container()->get('database')->getConnection($options['target']), $options);
   }
   return $storage;
 }

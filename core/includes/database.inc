@@ -417,7 +417,7 @@ function db_transaction($name = NULL, array $options = array()) {
  *   The key of the formerly active database.
  */
 function db_set_active($key = 'default') {
-  return Database::setActiveConnection($key);
+  return drupal_container()->get('database')->setActiveConnection($key);
 }
 
 /**
@@ -505,7 +505,7 @@ function db_close(array $options = array()) {
   if (empty($options['target'])) {
     $options['target'] = NULL;
   }
-  Database::closeConnection($options['target']);
+  drupal_container()->get('database')->closeConnection($options['target']);
 }
 
 /**
@@ -898,7 +898,7 @@ function db_change_field($table, $field, $field_new, $spec, $keys_new = array())
  * Sets a session variable specifying the lag time for ignoring a slave server.
  */
 function db_ignore_slave() {
-  $connection_info = Database::getConnectionInfo();
+  $connection_info = drupal_container()->get('database')->getConnectionInfo();
   // Only set ignore_slave_server if there are slave servers being used, which
   // is assumed if there are more than one.
   if (count($connection_info) > 1) {
