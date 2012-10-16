@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Matcher\Dumper\MatcherDumperInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
-use Drupal\Core\Database\Database;
+use Drupal\Core\Database\Connection;
 
 /**
  * Dumps Route information to a database table.
@@ -47,14 +47,14 @@ class MatcherDumper implements MatcherDumperInterface {
   /**
    * Construct the MatcherDumper.
    *
-   * @param Drupal\Core\Database\Database $database
+   * @param Drupal\Core\Database\Connection $database
    *   The database connection which will be used to store the route
    *   information.
    * @param string $table
    *   (optional) The table to store the route info in. Defaults to 'router'.
    */
-  public function __construct(Database $database, $table = 'router') {
-    $this->connection = $database->getConnection();
+  public function __construct(Connection $connection, $table = 'router') {
+    $this->connection = $connection;
 
     $this->tableName = $table;
   }

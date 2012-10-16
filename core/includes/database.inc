@@ -500,7 +500,7 @@ function db_close(array $options = array()) {
  *   An integer number larger than any number returned before for this sequence.
  */
 function db_next_id($existing_id = 0) {
-  return drupal_container()->get('database_manager')->nextId($existing_id);
+  return drupal_container()->get('database')->nextId($existing_id);
 }
 
 /**

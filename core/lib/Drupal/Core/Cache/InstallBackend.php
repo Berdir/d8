@@ -40,6 +40,9 @@ class InstallBackend extends DatabaseBackend {
       $bin = 'cache_' . $bin;
     }
     $this->bin = $bin;
+    if (drupal_container()->has('database')) {
+      $this->connection = drupal_container()->get('database');
+    }
   }
 
   /**
@@ -66,7 +69,7 @@ class InstallBackend extends DatabaseBackend {
    */
   public function delete($cid) {
     try {
-      if (class_exists('Drupal\Core\Database\Database')) {
+      if ($this->connection) {
         parent::delete($cid);
       }
     }
@@ -78,7 +81,7 @@ class InstallBackend extends DatabaseBackend {
    */
   public function deleteMultiple(array $cids) {
     try {
-      if (class_exists('Drupal\Core\Database\Database')) {
+      if ($this->connection) {
         parent::deleteMultiple($cids);
       }
     }
@@ -90,7 +93,7 @@ class InstallBackend extends DatabaseBackend {
    */
   public function invalidateTags(array $tags) {
     try {
-      if (class_exists('Drupal\Core\Database\Database')) {
+      if ($this->connection) {
         parent::invalidateTags($tags);
       }
     }
@@ -102,7 +105,7 @@ class InstallBackend extends DatabaseBackend {
    */
   public function flush() {
     try {
-      if (class_exists('Drupal\Core\Database\Database')) {
+      if ($this->connection) {
         parent::flush();
       }
     }
@@ -114,7 +117,7 @@ class InstallBackend extends DatabaseBackend {
    */
   public function expire() {
     try {
-      if (class_exists('Drupal\Core\Database\Database')) {
+      if ($this->connection) {
         parent::expire();
       }
     }
@@ -126,7 +129,7 @@ class InstallBackend extends DatabaseBackend {
    */
   public function garbageCollection() {
     try {
-      if (class_exists('Drupal\Core\Database\Database')) {
+      if ($this->connection) {
         parent::garbageCollection();
       }
     }
@@ -138,7 +141,7 @@ class InstallBackend extends DatabaseBackend {
    */
   public function isEmpty() {
     try {
-      if (class_exists('Drupal\Core\Database\Database')) {
+      if ($this->connection) {
         return parent::isEmpty();
       }
     }
