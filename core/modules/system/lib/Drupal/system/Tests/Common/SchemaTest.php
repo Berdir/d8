@@ -74,19 +74,19 @@ class SchemaTest extends WebTestBase {
     $this->assertFalse($this->tryInsert(), 'Insert without a default failed.');
 
     // Test for fake index and test for the boolean result of indexExists().
-    $index_exists = drupal_container()->get('database')->schema()->indexExists('test_table', 'test_field');
+    $index_exists = drupal_container()->get('database_manager')->schema()->indexExists('test_table', 'test_field');
     $this->assertIdentical($index_exists, FALSE, 'Fake index does not exists');
     // Add index.
     db_add_index('test_table', 'test_field', array('test_field'));
     // Test for created index and test for the boolean result of indexExists().
-    $index_exists = drupal_container()->get('database')->schema()->indexExists('test_table', 'test_field');
+    $index_exists = drupal_container()->get('database_manager')->schema()->indexExists('test_table', 'test_field');
     $this->assertIdentical($index_exists, TRUE, 'Index created.');
 
     // Rename the table.
     db_rename_table('test_table', 'test_table2');
 
     // Index should be renamed.
-    $index_exists = drupal_container()->get('database')->schema()->indexExists('test_table2', 'test_field');
+    $index_exists = drupal_container()->get('database_manager')->schema()->indexExists('test_table2', 'test_field');
     $this->assertTrue($index_exists, 'Index was renamed.');
 
     // We need the default so that we can insert after the rename.
@@ -177,8 +177,8 @@ class SchemaTest extends WebTestBase {
    *   Optional column to test.
    */
   function checkSchemaComment($description, $table, $column = NULL) {
-    if (method_exists(drupal_container()->get('database')->schema(), 'getComment')) {
-      $comment = drupal_container()->get('database')->schema()->getComment($table, $column);
+    if (method_exists(drupal_container()->get('database_manager')->schema(), 'getComment')) {
+      $comment = drupal_container()->get('database_manager')->schema()->getComment($table, $column);
       $this->assertEqual($comment, $description, 'The comment matches the schema description.');
     }
   }

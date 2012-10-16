@@ -874,7 +874,7 @@ function db_change_field($table, $field, $field_new, $spec, $keys_new = array())
  * Sets a session variable specifying the lag time for ignoring a slave server.
  */
 function db_ignore_slave() {
-  $connection_info = drupal_container()->get('database')->getConnectionInfo();
+  $connection_info = drupal_container()->get('database_manager')->getConnectionInfo();
   // Only set ignore_slave_server if there are slave servers being used, which
   // is assumed if there are more than one.
   if (count($connection_info) > 1) {
