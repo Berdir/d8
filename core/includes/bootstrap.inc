@@ -2225,7 +2225,6 @@ function _drupal_exception_handler($exception) {
     // Another uncaught exception was thrown while handling the first one.
     // If we are displaying errors, then do so with no possibility of a further uncaught exception being thrown.
     if (error_displayable()) {
-      print $exception->getTraceAsString();
       print '<h1>Additional uncaught exception thrown while handling exception.</h1>';
       print '<h2>Original</h2><p>' . _drupal_render_exception_safe($exception) . '</p>';
       print '<h2>Additional</h2><p>' . _drupal_render_exception_safe($exception2) . '</p><hr />';

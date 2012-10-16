@@ -457,7 +457,7 @@ function db_escape_field($field) {
  *   The escaped string.
  */
 function db_like($string) {
-  return drupal_container()->get('database_manager')->escapeLike($string);
+  return drupal_container()->get('database')->escapeLike($string);
 }
 
 /**
@@ -467,7 +467,7 @@ function db_like($string) {
  *   The name of the currently active database driver.
  */
 function db_driver() {
-  return drupal_container()->get('database_manager')->driver();
+  return drupal_container()->get('database')->driver();
 }
 
 /**
