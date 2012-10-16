@@ -939,8 +939,8 @@ function install_profile_info($profile, $langcode = 'en') {
  * TABLE to database specific functions like stored procedures and client
  * encoding.
  */
-function db_run_tasks($driver, $database) {
-  db_installer_object($driver, $database)->runTasks();
+function db_run_tasks($driver) {
+  db_installer_object($driver)->runTasks();
   return TRUE;
 }
 

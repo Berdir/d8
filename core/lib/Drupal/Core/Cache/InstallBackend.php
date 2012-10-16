@@ -33,6 +33,15 @@ use Exception;
  */
 class InstallBackend extends DatabaseBackend {
 
+  public function __construct($bin) {
+    // All cache tables should be prefixed with 'cache_', except for the
+    // default 'cache' bin.
+    if ($bin != 'cache') {
+      $bin = 'cache_' . $bin;
+    }
+    $this->bin = $bin;
+  }
+
   /**
    * Overrides Drupal\Core\Cache\DatabaseBackend::get().
    */

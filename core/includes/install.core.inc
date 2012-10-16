@@ -88,6 +88,8 @@ function install_drupal($settings = array()) {
     // When an installation error occurs, either send the error to the web
     // browser or pass on the exception so the calling script can use it.
     if ($install_state['interactive']) {
+      var_dump($e->getMessage());
+      var_dump($e->getTraceAsString());
       install_display_output($e->getMessage(), $install_state);
     }
     else {
@@ -1061,18 +1063,21 @@ function install_database_errors($database, $settings_file) {
     // Just changing the global doesn't get the new information processed.
     // We need to close any active connections and tell the Database class to
     // re-parse $databases.
-    if (drupal_container()->get('database')->isActiveConnection()) {
-      drupal_container()->get('database')->closeConnection();
+    if (!drupal_container()->has('database')) {
+      drupal_container()->setParameter('database.info', array('default' => array('default' => $database)));
+      drupal_container()->register('database', 'Drupal\Core\Database\Database')
+        ->addArgument('%database.info%');
     }
 
     try {
-      db_run_tasks($driver, $database);
+      db_run_tasks($driver);
     }
     catch (TaskException $e) {
       // These are generic errors, so we do not have any specific key of the
       // database connection array to attach them to; therefore, we just put
       // them in the error array with standard numeric keys.
-      $errors[$driver . '][0'] = $e->getMessage();
+
+      $errors[$driver . '][0'] = $e->getTraceAsString();
     }
   }
   return $errors;

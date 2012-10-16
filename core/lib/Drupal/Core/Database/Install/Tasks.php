@@ -7,8 +7,6 @@
 
 namespace Drupal\Core\Database\Install;
 
-use Drupal\Core\Database\Database;
-
 use PDO;
 use Exception;
 
@@ -18,14 +16,6 @@ use Exception;
  * Defines basic Drupal requirements for databases.
  */
 abstract class Tasks {
-
-  protected $databases = array();
-
-  function __construct($database_info = NULL) {
-    if ($database_info) {
-      $this->databases['default']['default'] = $database_info;
-    }
-  }
 
   /**
    * Structure that describes each task to run.
@@ -168,7 +158,7 @@ abstract class Tasks {
    */
   protected function connect() {
     try {
-      drupal_container()->get('database')->getConnection('default', NULL, $this->databases);
+      drupal_container()->get('database')->getConnection('default', NULL);
       $this->pass('Drupal can CONNECT to the database ok.');
     }
     catch (Exception $e) {
