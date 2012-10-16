@@ -292,10 +292,10 @@ abstract class TestBase {
    */
   public static function getDatabaseConnection() {
     if (!empty(self::$originalContainer)) {
-      return self::$originalContainer->get('database')->getConnection();
+      return self::$originalContainer->get('database');
     }
     else {
-      return drupal_container()->get('database')->getConnection();
+      return drupal_container()->get('database');
     }
   }
 

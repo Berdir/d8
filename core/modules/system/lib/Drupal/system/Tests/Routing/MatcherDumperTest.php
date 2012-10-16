@@ -48,7 +48,7 @@ class MatcherDumperTest extends UnitTestBase {
    * Confirms that the dumper can be instantiated successfuly.
    */
   function testCreate() {
-    $connection = drupal_container()->get('database')->getConnection();
+    $connection = drupal_container()->get('database');
     $dumper= new MatcherDumper($connection);
 
     $class_name = 'Drupal\Core\Routing\MatcherDumper';
@@ -59,7 +59,7 @@ class MatcherDumperTest extends UnitTestBase {
    * Confirms that we can add routes to the dumper.
    */
   function testAddRoutes() {
-    $connection = drupal_container()->get('database')->getConnection();
+    $connection = drupal_container()->get('database');
     $dumper= new MatcherDumper($connection);
 
     $route = new Route('test');
@@ -80,7 +80,7 @@ class MatcherDumperTest extends UnitTestBase {
    * Confirms that we can add routes to the dumper when it already has some.
    */
   function testAddAdditionalRoutes() {
-    $connection = drupal_container()->get('database')->getConnection();
+    $connection = drupal_container()->get('database');
     $dumper= new MatcherDumper($connection);
 
     $route = new Route('test');
@@ -116,7 +116,7 @@ class MatcherDumperTest extends UnitTestBase {
    * Confirm that we can dump a route collection to the database.
    */
   public function testDump() {
-    $connection = drupal_container()->get('database')->getConnection();
+    $connection = drupal_container()->get('database');
     $dumper= new MatcherDumper($connection, 'test_routes');
 
     $route = new Route('/test/{my}/path');

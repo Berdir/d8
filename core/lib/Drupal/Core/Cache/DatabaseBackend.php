@@ -39,7 +39,7 @@ class DatabaseBackend implements CacheBackendInterface {
       $bin = 'cache_' . $bin;
     }
     $this->bin = $bin;
-    $this->connection = drupal_container()->get('database')->getConnection();
+    $this->connection = drupal_container()->get('database');
   }
 
   /**

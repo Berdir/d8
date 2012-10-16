@@ -158,7 +158,7 @@ abstract class Tasks {
    */
   protected function connect() {
     try {
-      drupal_container()->get('database')->getConnection('default', NULL);
+      drupal_container()->get('database');
       $this->pass('Drupal can CONNECT to the database ok.');
     }
     catch (Exception $e) {
@@ -186,8 +186,8 @@ abstract class Tasks {
    * Check the engine version.
    */
   protected function checkEngineVersion() {
-    if ($this->minimumVersion() && version_compare(drupal_container()->get('database')->getConnection()->version(), $this->minimumVersion(), '<')) {
-      $this->fail(st("The database version %version is less than the minimum required version %minimum_version.", array('%version' => drupal_container()->get('database')->getConnection()->version(), '%minimum_version' => $this->minimumVersion())));
+    if ($this->minimumVersion() && version_compare(drupal_container()->get('database')->version(), $this->minimumVersion(), '<')) {
+      $this->fail(st("The database version %version is less than the minimum required version %minimum_version.", array('%version' => drupal_container()->get('database')->version(), '%minimum_version' => $this->minimumVersion())));
     }
   }
 

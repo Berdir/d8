@@ -2454,8 +2454,18 @@ function drupal_container(Container $new_container = NULL, $rebuild = FALSE) {
 
     // This will be overridden by settings.php in drupal_settings_initialize().
     $container->setParameter('database.info', array());
-    $container->register('database', 'Drupal\Core\Database\Database')
+    $container->register('database_manager', 'Drupal\Core\Database\Database')
       ->addArgument('%database.info%');
+
+    $container->register('database', 'Drupal\Core\Database\Connection')
+      ->setFactoryService('database_manager')
+      ->setFactoryMethod('getConnection')
+      ->addArgument('default');
+    $container->register('database.slave', 'Drupal\Core\Database\Connection')
+      ->setFactoryService('database_manager')
+      ->setFactoryMethod('getConnection')
+      ->addArgument('slave');
+
 
     $container
       ->register('config.storage', 'Drupal\Core\Config\CachedStorage')

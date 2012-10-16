@@ -76,7 +76,7 @@ class NodeCreationTest extends NodeTestBase {
       $this->pass(t('Expected exception has been thrown.'));
     }
 
-    if (drupal_container()->get('database')->getConnection()->supportsTransactions()) {
+    if (drupal_container()->get('database')->supportsTransactions()) {
       // Check that the node does not exist in the database.
       $node = $this->drupalGetNodeByTitle($edit['title']);
       $this->assertFalse($node, 'Transactions supported, and node not found in database.');

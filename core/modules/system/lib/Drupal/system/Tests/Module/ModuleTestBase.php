@@ -42,7 +42,7 @@ abstract class ModuleTestBase extends WebTestBase {
    *   specified base table. Defaults to TRUE.
    */
   function assertTableCount($base_table, $count = TRUE) {
-    $tables = db_find_tables(drupal_container()->get('database')->getConnection()->prefixTables('{' . $base_table . '}') . '%');
+    $tables = db_find_tables(drupal_container()->get('database')->prefixTables('{' . $base_table . '}') . '%');
 
     if ($count) {
       return $this->assertTrue($tables, format_string('Tables matching "@base_table" found.', array('@base_table' => $base_table)));

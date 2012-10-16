@@ -53,7 +53,7 @@ class DatabaseStorageExpirable extends DatabaseStorage implements KeyValueStoreE
    */
   public function __construct($collection, array $options = array()) {
     parent::__construct($collection, $options);
-    $this->connection = isset($options['connection']) ? $options['connection'] : drupal_container()->get('database')->getConnection();
+    $this->connection = isset($options['connection']) ? $options['connection'] : drupal_container()->get('database');
     $this->table = isset($options['table']) ? $options['table'] : 'key_value_expire';
   }
 

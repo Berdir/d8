@@ -1,6 +1,5 @@
 <?php
 
-use Drupal\Core\Database\Database;
 use Drupal\Core\Database\Query\Condition;
 
 /**
@@ -208,11 +207,8 @@ use Drupal\Core\Database\Query\Condition;
  * @see DatabaseConnection::defaultOptions()
  */
 function db_query($query, array $args = array(), array $options = array()) {
-  if (empty($options['target'])) {
-    $options['target'] = 'default';
-  }
-
-  return drupal_container()->get('database')->getConnection($options['target'])->query($query, $args, $options);
+  $service = empty($options['target']) || $options['target'] == 'default' ? 'database' : 'database.slave';
+  return drupal_container()->get($service)->query($query, $args, $options);
 }
 
 /**
@@ -240,11 +236,8 @@ function db_query($query, array $args = array(), array $options = array()) {
  * @see DatabaseConnection::defaultOptions()
  */
 function db_query_range($query, $from, $count, array $args = array(), array $options = array()) {
-  if (empty($options['target'])) {
-    $options['target'] = 'default';
-  }
-
-  return drupal_container()->get('database')->getConnection($options['target'])->queryRange($query, $from, $count, $args, $options);
+  $service = empty($options['target']) || $options['target'] == 'default' ? 'database' : 'database.slave';
+  return drupal_container()->get($service)->queryRange($query, $from, $count, $args, $options);
 }
 
 /**
@@ -270,11 +263,8 @@ function db_query_range($query, $from, $count, array $args = array(), array $opt
  * @see DatabaseConnection::defaultOptions()
  */
 function db_query_temporary($query, array $args = array(), array $options = array()) {
-  if (empty($options['target'])) {
-    $options['target'] = 'default';
-  }
-
-  return drupal_container()->get('database')->getConnection($options['target'])->queryTemporary($query, $args, $options);
+  $service = empty($options['target']) || $options['target'] == 'default' ? 'database' : 'database.slave';
+  return drupal_container()->get($service)->queryTemporary($query, $args, $options);
 }
 
 /**
@@ -289,10 +279,8 @@ function db_query_temporary($query, array $args = array(), array $options = arra
  *   A new InsertQuery object for this connection.
  */
 function db_insert($table, array $options = array()) {
-  if (empty($options['target']) || $options['target'] == 'slave') {
-    $options['target'] = 'default';
-  }
-  return drupal_container()->get('database')->getConnection($options['target'])->insert($table, $options);
+  $service = empty($options['target']) || $options['target'] == 'default' ? 'database' : 'database.slave';
+  return drupal_container()->get($service)->insert($table, $options);
 }
 
 /**
@@ -307,10 +295,8 @@ function db_insert($table, array $options = array()) {
  *   A new MergeQuery object for this connection.
  */
 function db_merge($table, array $options = array()) {
-  if (empty($options['target']) || $options['target'] == 'slave') {
-    $options['target'] = 'default';
-  }
-  return drupal_container()->get('database')->getConnection($options['target'])->merge($table, $options);
+  $service = empty($options['target']) || $options['target'] == 'default' ? 'database' : 'database.slave';
+  return drupal_container()->get($service)->merge($table, $options);
 }
 
 /**
@@ -325,10 +311,8 @@ function db_merge($table, array $options = array()) {
  *   A new UpdateQuery object for this connection.
  */
 function db_update($table, array $options = array()) {
-  if (empty($options['target']) || $options['target'] == 'slave') {
-    $options['target'] = 'default';
-  }
-  return drupal_container()->get('database')->getConnection($options['target'])->update($table, $options);
+  $service = empty($options['target']) || $options['target'] == 'default' ? 'database' : 'database.slave';
+  return drupal_container()->get($service)->update($table, $options);
 }
 
 /**
@@ -343,10 +327,8 @@ function db_update($table, array $options = array()) {
  *   A new DeleteQuery object for this connection.
  */
 function db_delete($table, array $options = array()) {
-  if (empty($options['target']) || $options['target'] == 'slave') {
-    $options['target'] = 'default';
-  }
-  return drupal_container()->get('database')->getConnection($options['target'])->delete($table, $options);
+  $service = empty($options['target']) || $options['target'] == 'default' ? 'database' : 'database.slave';
+  return drupal_container()->get($service)->delete($table, $options);
 }
 
 /**
@@ -361,10 +343,8 @@ function db_delete($table, array $options = array()) {
  *   A new TruncateQuery object for this connection.
  */
 function db_truncate($table, array $options = array()) {
-  if (empty($options['target']) || $options['target'] == 'slave') {
-    $options['target'] = 'default';
-  }
-  return drupal_container()->get('database')->getConnection($options['target'])->truncate($table, $options);
+  $service = empty($options['target']) || $options['target'] == 'default' ? 'database' : 'database.slave';
+  return drupal_container()->get($service)->truncate($table, $options);
 }
 
 /**
@@ -382,10 +362,8 @@ function db_truncate($table, array $options = array()) {
  *   A new SelectQuery object for this connection.
  */
 function db_select($table, $alias = NULL, array $options = array()) {
-  if (empty($options['target'])) {
-    $options['target'] = 'default';
-  }
-  return drupal_container()->get('database')->getConnection($options['target'])->select($table, $alias, $options);
+  $service = empty($options['target']) || $options['target'] == 'default' ? 'database' : 'database.slave';
+  return drupal_container()->get($service)->select($table, $alias, $options);
 }
 
 /**
@@ -401,10 +379,8 @@ function db_select($table, $alias = NULL, array $options = array()) {
  *   A new DatabaseTransaction object for this connection.
  */
 function db_transaction($name = NULL, array $options = array()) {
-  if (empty($options['target'])) {
-    $options['target'] = 'default';
-  }
-  return drupal_container()->get('database')->getConnection($options['target'])->startTransaction($name);
+  $service = empty($options['target']) || $options['target'] == 'default' ? 'database' : 'database.slave';
+  return drupal_container()->get($service)->startTransaction($name);
 }
 
 /**
@@ -417,7 +393,7 @@ function db_transaction($name = NULL, array $options = array()) {
  *   The key of the formerly active database.
  */
 function db_set_active($key = 'default') {
-  return drupal_container()->get('database')->setActiveConnection($key);
+  return drupal_container()->get('database_manager')->setActiveConnection($key);
 }
 
 /**
@@ -432,7 +408,7 @@ function db_set_active($key = 'default') {
  *   The escaped table name as a string.
  */
 function db_escape_table($table) {
-  return drupal_container()->get('database')->getConnection()->escapeTable($table);
+  return drupal_container()->get('database')->escapeTable($table);
 }
 
 /**
@@ -447,7 +423,7 @@ function db_escape_table($table) {
  *   The escaped field name as a string.
  */
 function db_escape_field($field) {
-  return drupal_container()->get('database')->getConnection()->escapeField($field);
+  return drupal_container()->get('database_manager')->escapeField($field);
 }
 
 /**
@@ -481,7 +457,7 @@ function db_escape_field($field) {
  *   The escaped string.
  */
 function db_like($string) {
-  return drupal_container()->get('database')->getConnection()->escapeLike($string);
+  return drupal_container()->get('database_manager')->escapeLike($string);
 }
 
 /**
@@ -491,7 +467,7 @@ function db_like($string) {
  *   The name of the currently active database driver.
  */
 function db_driver() {
-  return drupal_container()->get('database')->getConnection()->driver();
+  return drupal_container()->get('database_manager')->driver();
 }
 
 /**
@@ -505,7 +481,7 @@ function db_close(array $options = array()) {
   if (empty($options['target'])) {
     $options['target'] = NULL;
   }
-  drupal_container()->get('database')->closeConnection($options['target']);
+  drupal_container()->get('database_manager')->closeConnection($options['target']);
 }
 
 /**
@@ -524,7 +500,7 @@ function db_close(array $options = array()) {
  *   An integer number larger than any number returned before for this sequence.
  */
 function db_next_id($existing_id = 0) {
-  return drupal_container()->get('database')->getConnection()->nextId($existing_id);
+  return drupal_container()->get('database_manager')->nextId($existing_id);
 }
 
 /**
@@ -587,7 +563,7 @@ function db_condition($conjunction) {
  *   A Schema API table definition array.
  */
 function db_create_table($name, $table) {
-  return drupal_container()->get('database')->getConnection()->schema()->createTable($name, $table);
+  return drupal_container()->get('database_manager')->schema()->createTable($name, $table);
 }
 
 /**
@@ -603,7 +579,7 @@ function db_create_table($name, $table) {
  *   An array of field names.
  */
 function db_field_names($fields) {
-  return drupal_container()->get('database')->getConnection()->schema()->fieldNames($fields);
+  return drupal_container()->get('database_manager')->schema()->fieldNames($fields);
 }
 
 /**
@@ -618,7 +594,7 @@ function db_field_names($fields) {
  *   TRUE if the given index exists, otherwise FALSE.
  */
 function db_index_exists($table, $name) {
-  return drupal_container()->get('database')->getConnection()->schema()->indexExists($table, $name);
+  return drupal_container()->get('database_manager')->schema()->indexExists($table, $name);
 }
 
 /**
@@ -631,7 +607,7 @@ function db_index_exists($table, $name) {
  *   TRUE if the given table exists, otherwise FALSE.
  */
 function db_table_exists($table) {
-  return drupal_container()->get('database')->getConnection()->schema()->tableExists($table);
+  return drupal_container()->get('database_manager')->schema()->tableExists($table);
 }
 
 /**
@@ -646,7 +622,7 @@ function db_table_exists($table) {
  *   TRUE if the given column exists, otherwise FALSE.
  */
 function db_field_exists($table, $field) {
-  return drupal_container()->get('database')->getConnection()->schema()->fieldExists($table, $field);
+  return drupal_container()->get('database_manager')->schema()->fieldExists($table, $field);
 }
 
 /**
@@ -660,11 +636,11 @@ function db_field_exists($table, $field) {
  *   Array, both the keys and the values are the matching tables.
  */
 function db_find_tables($table_expression) {
-  return drupal_container()->get('database')->getConnection()->schema()->findTables($table_expression);
+  return drupal_container()->get('database_manager')->schema()->findTables($table_expression);
 }
 
 function _db_create_keys_sql($spec) {
-  return drupal_container()->get('database')->getConnection()->schema()->createKeysSql($spec);
+  return drupal_container()->get('database_manager')->schema()->createKeysSql($spec);
 }
 
 /**
@@ -676,7 +652,7 @@ function _db_create_keys_sql($spec) {
  *   The new name for the table.
  */
 function db_rename_table($table, $new_name) {
-  return drupal_container()->get('database')->getConnection()->schema()->renameTable($table, $new_name);
+  return drupal_container()->get('database_manager')->schema()->renameTable($table, $new_name);
 }
 
 /**
@@ -686,7 +662,7 @@ function db_rename_table($table, $new_name) {
  *   The table to be dropped.
  */
 function db_drop_table($table) {
-  return drupal_container()->get('database')->getConnection()->schema()->dropTable($table);
+  return drupal_container()->get('database_manager')->schema()->dropTable($table);
 }
 
 /**
@@ -711,7 +687,7 @@ function db_drop_table($table) {
  * @see db_change_field()
  */
 function db_add_field($table, $field, $spec, $keys_new = array()) {
-  return drupal_container()->get('database')->getConnection()->schema()->addField($table, $field, $spec, $keys_new);
+  return drupal_container()->get('database_manager')->schema()->addField($table, $field, $spec, $keys_new);
 }
 
 /**
@@ -723,7 +699,7 @@ function db_add_field($table, $field, $spec, $keys_new = array()) {
  *   The field to be dropped.
  */
 function db_drop_field($table, $field) {
-  return drupal_container()->get('database')->getConnection()->schema()->dropField($table, $field);
+  return drupal_container()->get('database_manager')->schema()->dropField($table, $field);
 }
 
 /**
@@ -737,7 +713,7 @@ function db_drop_field($table, $field) {
  *   Default value to be set. NULL for 'default NULL'.
  */
 function db_field_set_default($table, $field, $default) {
-  return drupal_container()->get('database')->getConnection()->schema()->fieldSetDefault($table, $field, $default);
+  return drupal_container()->get('database_manager')->schema()->fieldSetDefault($table, $field, $default);
 }
 
 /**
@@ -749,7 +725,7 @@ function db_field_set_default($table, $field, $default) {
  *   The field to be altered.
  */
 function db_field_set_no_default($table, $field) {
-  return drupal_container()->get('database')->getConnection()->schema()->fieldSetNoDefault($table, $field);
+  return drupal_container()->get('database_manager')->schema()->fieldSetNoDefault($table, $field);
 }
 
 /**
@@ -761,7 +737,7 @@ function db_field_set_no_default($table, $field) {
  *   Array of fields for the primary key.
  */
 function db_add_primary_key($table, $fields) {
-  return drupal_container()->get('database')->getConnection()->schema()->addPrimaryKey($table, $fields);
+  return drupal_container()->get('database_manager')->schema()->addPrimaryKey($table, $fields);
 }
 
 /**
@@ -771,7 +747,7 @@ function db_add_primary_key($table, $fields) {
  *   Name of the table to be altered.
  */
 function db_drop_primary_key($table) {
-  return drupal_container()->get('database')->getConnection()->schema()->dropPrimaryKey($table);
+  return drupal_container()->get('database_manager')->schema()->dropPrimaryKey($table);
 }
 
 /**
@@ -785,7 +761,7 @@ function db_drop_primary_key($table) {
  *   An array of field names.
  */
 function db_add_unique_key($table, $name, $fields) {
-  return drupal_container()->get('database')->getConnection()->schema()->addUniqueKey($table, $name, $fields);
+  return drupal_container()->get('database_manager')->schema()->addUniqueKey($table, $name, $fields);
 }
 
 /**
@@ -797,7 +773,7 @@ function db_add_unique_key($table, $name, $fields) {
  *   The name of the key.
  */
 function db_drop_unique_key($table, $name) {
-  return drupal_container()->get('database')->getConnection()->schema()->dropUniqueKey($table, $name);
+  return drupal_container()->get('database_manager')->schema()->dropUniqueKey($table, $name);
 }
 
 /**
@@ -811,7 +787,7 @@ function db_drop_unique_key($table, $name) {
  *   An array of field names.
  */
 function db_add_index($table, $name, $fields) {
-  return drupal_container()->get('database')->getConnection()->schema()->addIndex($table, $name, $fields);
+  return drupal_container()->get('database_manager')->schema()->addIndex($table, $name, $fields);
 }
 
 /**
@@ -823,7 +799,7 @@ function db_add_index($table, $name, $fields) {
  *   The name of the index.
  */
 function db_drop_index($table, $name) {
-  return drupal_container()->get('database')->getConnection()->schema()->dropIndex($table, $name);
+  return drupal_container()->get('database_manager')->schema()->dropIndex($table, $name);
 }
 
 /**
@@ -887,7 +863,7 @@ function db_drop_index($table, $name) {
  *   but without the 'fields' element.
  */
 function db_change_field($table, $field, $field_new, $spec, $keys_new = array()) {
-  return drupal_container()->get('database')->getConnection()->schema()->changeField($table, $field, $field_new, $spec, $keys_new);
+  return drupal_container()->get('database_manager')->schema()->changeField($table, $field, $field_new, $spec, $keys_new);
 }
 
 /**

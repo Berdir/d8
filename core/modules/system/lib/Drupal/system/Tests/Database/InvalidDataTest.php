@@ -51,7 +51,7 @@ class InvalidDataTest extends DatabaseTestBase {
       $name = db_query('SELECT name FROM {test} WHERE age = :age', array(':age' => 63))->fetchField();
 
       if ($name == 'Elvis') {
-        if (!drupal_container()->get('database')->getConnection()->supportsTransactions()) {
+        if (!drupal_container()->get('database')->supportsTransactions()) {
           // This is an expected fail.
           // Database engines that don't support transactions can leave partial
           // inserts in place when an error occurs. This is the case for MySQL
