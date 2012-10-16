@@ -2056,7 +2056,7 @@ function system_update_8022() {
     'primary key' => array('name'),
   );
 
-  $schema = drupal_container()->get('database_manager')->schema();
+  $schema = drupal_container()->get('database')->schema();
 
   $schema->dropTable('router');
 

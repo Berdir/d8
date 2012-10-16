@@ -1064,9 +1064,19 @@ function install_database_errors($database, $settings_file) {
     // We need to close any active connections and tell the Database class to
     // re-parse $databases.
     if (!drupal_container()->has('database')) {
-      drupal_container()->setParameter('database.info', array('default' => array('default' => $database)));
-      drupal_container()->register('database', 'Drupal\Core\Database\Database')
+      $container = drupal_container();
+      $container->setParameter('database.info', array('default' => array('default' => $database)));
+      $container->register('database_manager', 'Drupal\Core\Database\Database')
         ->addArgument('%database.info%');
+
+      $container->register('database', 'Drupal\Core\Database\Connection')
+        ->setFactoryService('database_manager')
+        ->setFactoryMethod('getConnection')
+        ->addArgument('default');
+      $container->register('database.slave', 'Drupal\Core\Database\Connection')
+        ->setFactoryService('database_manager')
+        ->setFactoryMethod('getConnection')
+        ->addArgument('slave');
     }
 
     try {

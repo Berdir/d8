@@ -563,7 +563,7 @@ function db_condition($conjunction) {
  *   A Schema API table definition array.
  */
 function db_create_table($name, $table) {
-  return drupal_container()->get('database_manager')->schema()->createTable($name, $table);
+  return drupal_container()->get('database')->schema()->createTable($name, $table);
 }
 
 /**
@@ -579,7 +579,7 @@ function db_create_table($name, $table) {
  *   An array of field names.
  */
 function db_field_names($fields) {
-  return drupal_container()->get('database_manager')->schema()->fieldNames($fields);
+  return drupal_container()->get('database')->schema()->fieldNames($fields);
 }
 
 /**
@@ -594,7 +594,7 @@ function db_field_names($fields) {
  *   TRUE if the given index exists, otherwise FALSE.
  */
 function db_index_exists($table, $name) {
-  return drupal_container()->get('database_manager')->schema()->indexExists($table, $name);
+  return drupal_container()->get('database')->schema()->indexExists($table, $name);
 }
 
 /**
@@ -607,7 +607,7 @@ function db_index_exists($table, $name) {
  *   TRUE if the given table exists, otherwise FALSE.
  */
 function db_table_exists($table) {
-  return drupal_container()->get('database_manager')->schema()->tableExists($table);
+  return drupal_container()->get('database')->schema()->tableExists($table);
 }
 
 /**
@@ -622,7 +622,7 @@ function db_table_exists($table) {
  *   TRUE if the given column exists, otherwise FALSE.
  */
 function db_field_exists($table, $field) {
-  return drupal_container()->get('database_manager')->schema()->fieldExists($table, $field);
+  return drupal_container()->get('database')->schema()->fieldExists($table, $field);
 }
 
 /**
@@ -636,11 +636,11 @@ function db_field_exists($table, $field) {
  *   Array, both the keys and the values are the matching tables.
  */
 function db_find_tables($table_expression) {
-  return drupal_container()->get('database_manager')->schema()->findTables($table_expression);
+  return drupal_container()->get('database')->schema()->findTables($table_expression);
 }
 
 function _db_create_keys_sql($spec) {
-  return drupal_container()->get('database_manager')->schema()->createKeysSql($spec);
+  return drupal_container()->get('database')->schema()->createKeysSql($spec);
 }
 
 /**
@@ -652,7 +652,7 @@ function _db_create_keys_sql($spec) {
  *   The new name for the table.
  */
 function db_rename_table($table, $new_name) {
-  return drupal_container()->get('database_manager')->schema()->renameTable($table, $new_name);
+  return drupal_container()->get('database')->schema()->renameTable($table, $new_name);
 }
 
 /**
@@ -662,7 +662,7 @@ function db_rename_table($table, $new_name) {
  *   The table to be dropped.
  */
 function db_drop_table($table) {
-  return drupal_container()->get('database_manager')->schema()->dropTable($table);
+  return drupal_container()->get('database')->schema()->dropTable($table);
 }
 
 /**
@@ -687,7 +687,7 @@ function db_drop_table($table) {
  * @see db_change_field()
  */
 function db_add_field($table, $field, $spec, $keys_new = array()) {
-  return drupal_container()->get('database_manager')->schema()->addField($table, $field, $spec, $keys_new);
+  return drupal_container()->get('database')->schema()->addField($table, $field, $spec, $keys_new);
 }
 
 /**
@@ -699,7 +699,7 @@ function db_add_field($table, $field, $spec, $keys_new = array()) {
  *   The field to be dropped.
  */
 function db_drop_field($table, $field) {
-  return drupal_container()->get('database_manager')->schema()->dropField($table, $field);
+  return drupal_container()->get('database')->schema()->dropField($table, $field);
 }
 
 /**
@@ -713,7 +713,7 @@ function db_drop_field($table, $field) {
  *   Default value to be set. NULL for 'default NULL'.
  */
 function db_field_set_default($table, $field, $default) {
-  return drupal_container()->get('database_manager')->schema()->fieldSetDefault($table, $field, $default);
+  return drupal_container()->get('database')->schema()->fieldSetDefault($table, $field, $default);
 }
 
 /**
@@ -725,7 +725,7 @@ function db_field_set_default($table, $field, $default) {
  *   The field to be altered.
  */
 function db_field_set_no_default($table, $field) {
-  return drupal_container()->get('database_manager')->schema()->fieldSetNoDefault($table, $field);
+  return drupal_container()->get('database')->schema()->fieldSetNoDefault($table, $field);
 }
 
 /**
@@ -737,7 +737,7 @@ function db_field_set_no_default($table, $field) {
  *   Array of fields for the primary key.
  */
 function db_add_primary_key($table, $fields) {
-  return drupal_container()->get('database_manager')->schema()->addPrimaryKey($table, $fields);
+  return drupal_container()->get('database')->schema()->addPrimaryKey($table, $fields);
 }
 
 /**
@@ -747,7 +747,7 @@ function db_add_primary_key($table, $fields) {
  *   Name of the table to be altered.
  */
 function db_drop_primary_key($table) {
-  return drupal_container()->get('database_manager')->schema()->dropPrimaryKey($table);
+  return drupal_container()->get('database')->schema()->dropPrimaryKey($table);
 }
 
 /**
@@ -761,7 +761,7 @@ function db_drop_primary_key($table) {
  *   An array of field names.
  */
 function db_add_unique_key($table, $name, $fields) {
-  return drupal_container()->get('database_manager')->schema()->addUniqueKey($table, $name, $fields);
+  return drupal_container()->get('database')->schema()->addUniqueKey($table, $name, $fields);
 }
 
 /**
@@ -773,7 +773,7 @@ function db_add_unique_key($table, $name, $fields) {
  *   The name of the key.
  */
 function db_drop_unique_key($table, $name) {
-  return drupal_container()->get('database_manager')->schema()->dropUniqueKey($table, $name);
+  return drupal_container()->get('database')->schema()->dropUniqueKey($table, $name);
 }
 
 /**
@@ -787,7 +787,7 @@ function db_drop_unique_key($table, $name) {
  *   An array of field names.
  */
 function db_add_index($table, $name, $fields) {
-  return drupal_container()->get('database_manager')->schema()->addIndex($table, $name, $fields);
+  return drupal_container()->get('database')->schema()->addIndex($table, $name, $fields);
 }
 
 /**
@@ -799,7 +799,7 @@ function db_add_index($table, $name, $fields) {
  *   The name of the index.
  */
 function db_drop_index($table, $name) {
-  return drupal_container()->get('database_manager')->schema()->dropIndex($table, $name);
+  return drupal_container()->get('database')->schema()->dropIndex($table, $name);
 }
 
 /**
@@ -863,7 +863,7 @@ function db_drop_index($table, $name) {
  *   but without the 'fields' element.
  */
 function db_change_field($table, $field, $field_new, $spec, $keys_new = array()) {
-  return drupal_container()->get('database_manager')->schema()->changeField($table, $field, $field_new, $spec, $keys_new);
+  return drupal_container()->get('database')->schema()->changeField($table, $field, $field_new, $spec, $keys_new);
 }
 
 /**
