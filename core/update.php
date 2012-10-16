@@ -448,10 +448,6 @@ drupal_maintenance_theme();
 
 // @todo Remove after converting update.php to use DrupalKernel.
 $container = drupal_container();
-/*$container->register('database', 'Drupal\Core\Database\Connection')
-  ->setFactoryClass('Drupal\Core\Database\Database')
-  ->setFactoryMethod('getConnection')
-  ->addArgument('default');*/
 $container->register('router.dumper', '\Drupal\Core\Routing\MatcherDumper')
   ->addArgument(new Reference('database'));
 $container->register('router.builder', 'Drupal\Core\Routing\RouteBuilder')

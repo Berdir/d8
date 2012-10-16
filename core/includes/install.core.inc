@@ -88,8 +88,6 @@ function install_drupal($settings = array()) {
     // When an installation error occurs, either send the error to the web
     // browser or pass on the exception so the calling script can use it.
     if ($install_state['interactive']) {
-      var_dump($e->getMessage());
-      var_dump($e->getTraceAsString());
       install_display_output($e->getMessage(), $install_state);
     }
     else {
