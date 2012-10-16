@@ -69,4 +69,11 @@ class FileReadOnlyStorage implements PhpStorageInterface {
   protected function getFullPath($name) {
     return $this->directory . '/' . $name;
   }
+
+  /**
+   * Implements Drupal\Component\PhpStorage\PhpStorageInterface::writeable().
+   */
+  function writeable() {
+    return FALSE;
+  }
 }

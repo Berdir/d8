@@ -119,7 +119,7 @@ function module_list_reset() {
  * Builds a list of bootstrap modules and enabled modules and themes.
  *
  * @param $type
- *   The type of list to return:
+ *   (optional) The type of list to return:
  *   - module_enabled: All enabled modules.
  *   - bootstrap: All enabled modules required for bootstrap.
  *   - theme: All themes.
@@ -138,13 +138,13 @@ function module_list_reset() {
  *   callers like system_list() to force-disable a possible configuration
  *   storage controller cache or some other way to circumvent it/take it over.
  */
-function system_list($type) {
+function system_list($type = NULL) {
   $lists = &drupal_static(__FUNCTION__);
 
   // For bootstrap modules, attempt to fetch the list from cache if possible.
   // if not fetch only the required information to fire bootstrap hooks
   // in case we are going to serve the page from cache.
-  if ($type == 'bootstrap') {
+  if ($type === 'bootstrap') {
     if (isset($lists['bootstrap'])) {
       return $lists['bootstrap'];
     }
@@ -188,7 +188,7 @@ function system_list($type) {
         // Build a list of all enabled modules.
         $lists['module_enabled'][$name] = $name;
         // Build a list of filenames so drupal_get_filename can use it.
-        $lists['filepaths'][] = array(
+        $lists['filepaths'][$name] = array(
           'type' => 'module',
           'name' => $name,
           'filepath' => $module_files[$name],
@@ -215,7 +215,7 @@ function system_list($type) {
         $lists['theme'][$name] = $theme;
         // Build a list of filenames so drupal_get_filename can use it.
         if (isset($enabled_themes[$name])) {
-          $lists['filepaths'][] = array(
+          $lists['filepaths'][$name] = array(
             'type' => 'theme',
             'name' => $name,
             'filepath' => $theme->filename,
@@ -249,6 +249,11 @@ function system_list($type) {
         // Set the theme engine prefix.
         $lists['theme'][$key]->prefix = ($lists['theme'][$key]->info['engine'] == 'theme') ? $base_key : $lists['theme'][$key]->info['engine'];
       }
+      // Store a hash of the enabled modules and themes for use when compiling
+      // the DIC.
+      $lists['system_list_hash'] = hash('sha256', implode(',', array_keys($lists['filepaths'])));
+      // Save a little space by stripping out the keys from the file paths.
+      $lists['filepaths'] = array_values($lists['filepaths']);
       cache('bootstrap')->set('system_list', $lists);
     }
     // To avoid a separate database lookup for the filepath, prime the
@@ -259,7 +264,7 @@ function system_list($type) {
     }
   }
 
-  return $lists[$type];
+  return $type ? $lists[$type] : $lists;
 }
 
 /**

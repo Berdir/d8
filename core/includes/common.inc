@@ -3901,7 +3901,7 @@ function drupal_get_js($scope = 'header', $javascript = NULL, $skip_alter = FALS
     // this is an AJAX request.
     // @todo Clean up container call.
     $container = drupal_container();
-    if ($container->has('request') && $container->has('content_negotiation')) {
+    if ($container->has('content_negotiation') && $container->isScopeActive('request')) {
       $type = $container->get('content_negotiation')->getContentType($container->get('request'));
     }
     if (!empty($items['settings']) || (!empty($type) && $type == 'ajax')) {
