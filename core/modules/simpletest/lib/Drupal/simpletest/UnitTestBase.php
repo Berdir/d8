@@ -7,9 +7,6 @@
 
 namespace Drupal\simpletest;
 
-use Drupal\Core\Database\Database;
-use Drupal\Core\Database\ConnectionNotDefinedException;
-
 /**
  * Test case for Drupal unit tests.
  *
@@ -41,6 +38,8 @@ abstract class UnitTestBase extends TestBase {
     // Create the database prefix for this test.
     $this->prepareDatabasePrefix();
 
+    $this->originalThemeRegistry = theme_get_registry(FALSE);
+
     // Prepare the environment for running tests.
     $this->prepareEnvironment();
     if (!$this->setupEnvironment) {
@@ -55,8 +54,6 @@ abstract class UnitTestBase extends TestBase {
     if (!$this->setupDatabasePrefix) {
       return FALSE;
     }
-
-    $this->originalThemeRegistry = theme_get_registry(FALSE);
 
     // Reset all statics and variables to perform tests in a clean environment.
     $conf = array();
