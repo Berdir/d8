@@ -641,7 +641,6 @@ abstract class WebTestBase extends TestBase {
     );
     $settings = array(
       'interactive' => FALSE,
-      'config_verified' => TRUE,
       'parameters' => array(
         'profile' => $this->profile,
         'langcode' => 'en',
