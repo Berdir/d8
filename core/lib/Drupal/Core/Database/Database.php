@@ -424,8 +424,10 @@ class Database {
 
   public function __destruct() {
     if ($this->isActiveConnection()) {
+      // Register this as a shutdown function in __destruct() to make sure this
+      // happens after all other shotdown functions have been executed.
+      register_shutdown_function(array($this, 'closeConnection'));
       $this->closeConnection();
-      //print "DESTRUCT\n";
     }
   }
 }

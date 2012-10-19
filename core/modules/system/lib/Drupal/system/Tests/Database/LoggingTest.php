@@ -26,7 +26,8 @@ class LoggingTest extends DatabaseTestBase {
    * Tests that we can log the existence of a query.
    */
   function testEnableLogging() {
-    $log = Database::startLog('testing');
+    $database = drupal_container()->get('database_manager');
+    $log = $database->startLog('testing');
 
     db_query('SELECT name FROM {test} WHERE age > :age', array(':age' => 25))->fetchCol();
     db_query('SELECT age FROM {test} WHERE name = :name', array(':name' => 'Ringo'))->fetchCol();
@@ -34,7 +35,7 @@ class LoggingTest extends DatabaseTestBase {
     // Trigger a call that does not have file in the backtrace.
     call_user_func_array('db_query', array('SELECT age FROM {test} WHERE name = :name', array(':name' => 'Ringo')))->fetchCol();
 
-    $queries = Database::getLog('testing', 'default');
+    $queries = $database->getLog('testing', 'default');
 
     $this->assertEqual(count($queries), 3, 'Correct number of queries recorded.');
 
@@ -47,16 +48,17 @@ class LoggingTest extends DatabaseTestBase {
    * Tests that we can run two logs in parallel.
    */
   function testEnableMultiLogging() {
-    Database::startLog('testing1');
+    $database = drupal_container()->get('database_manager');
+    $database->startLog('testing1');
 
     db_query('SELECT name FROM {test} WHERE age > :age', array(':age' => 25))->fetchCol();
 
-    Database::startLog('testing2');
+    $database->startLog('testing2');
 
     db_query('SELECT age FROM {test} WHERE name = :name', array(':name' => 'Ringo'))->fetchCol();
 
-    $queries1 = Database::getLog('testing1');
-    $queries2 = Database::getLog('testing2');
+    $queries1 = $database->getLog('testing1');
+    $queries2 = $database->getLog('testing2');
 
     $this->assertEqual(count($queries1), 2, 'Correct number of queries recorded for log 1.');
     $this->assertEqual(count($queries2), 1, 'Correct number of queries recorded for log 2.');
@@ -68,16 +70,17 @@ class LoggingTest extends DatabaseTestBase {
   function testEnableTargetLogging() {
     // Clone the master credentials to a slave connection and to another fake
     // connection.
-    $connection_info = Database::getConnectionInfo('default');
-    Database::addConnectionInfo('default', 'slave', $connection_info['default']);
+    $database = drupal_container()->get('database_manager');
+    $connection_info = $database->getConnectionInfo('default');
+    $database->addConnectionInfo('default', 'slave', $connection_info['default']);
 
-    Database::startLog('testing1');
+    $database->startLog('testing1');
 
     db_query('SELECT name FROM {test} WHERE age > :age', array(':age' => 25))->fetchCol();
 
     db_query('SELECT age FROM {test} WHERE name = :name', array(':name' => 'Ringo'), array('target' => 'slave'));//->fetchCol();
 
-    $queries1 = Database::getLog('testing1');
+    $queries1 = $database->getLog('testing1');
 
     $this->assertEqual(count($queries1), 2, 'Recorded queries from all targets.');
     $this->assertEqual($queries1[0]['target'], 'default', 'First query used default target.');
@@ -92,7 +95,8 @@ class LoggingTest extends DatabaseTestBase {
    * target.
    */
   function testEnableTargetLoggingNoTarget() {
-    Database::startLog('testing1');
+    $database = drupal_container()->get('database_manager');
+    $database->startLog('testing1');
 
     db_query('SELECT name FROM {test} WHERE age > :age', array(':age' => 25))->fetchCol();
 
@@ -103,7 +107,7 @@ class LoggingTest extends DatabaseTestBase {
     // does not exist.
     db_query('SELECT age FROM {test} WHERE name = :name', array(':name' => 'Ringo'), array('target' => 'fake'))->fetchCol();
 
-    $queries1 = Database::getLog('testing1');
+    $queries1 = $database->getLog('testing1');
 
     $this->assertEqual(count($queries1), 2, 'Recorded queries from all targets.');
     $this->assertEqual($queries1[0]['target'], 'default', 'First query used default target.');
@@ -114,13 +118,14 @@ class LoggingTest extends DatabaseTestBase {
    * Tests that we can log queries separately on different connections.
    */
   function testEnableMultiConnectionLogging() {
+    $database = drupal_container()->get('database_manager');
     // Clone the master credentials to a fake connection.
     // That both connections point to the same physical database is irrelevant.
-    $connection_info = Database::getConnectionInfo('default');
-    Database::addConnectionInfo('test2', 'default', $connection_info['default']);
+    $connection_info = $database->getConnectionInfo('default');
+    $database->addConnectionInfo('test2', 'default', $connection_info['default']);
 
-    Database::startLog('testing1');
-    Database::startLog('testing1', 'test2');
+    $database->startLog('testing1');
+    $database->startLog('testing1', 'test2');
 
     db_query('SELECT name FROM {test} WHERE age > :age', array(':age' => 25))->fetchCol();
 
@@ -130,8 +135,8 @@ class LoggingTest extends DatabaseTestBase {
 
     db_set_active($old_key);
 
-    $queries1 = Database::getLog('testing1');
-    $queries2 = Database::getLog('testing1', 'test2');
+    $queries1 = $database->getLog('testing1');
+    $queries2 = $database->getLog('testing1', 'test2');
 
     $this->assertEqual(count($queries1), 1, 'Correct number of queries recorded for first connection.');
     $this->assertEqual(count($queries2), 1, 'Correct number of queries recorded for second connection.');

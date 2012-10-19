@@ -2427,9 +2427,17 @@ function drupal_container(Container $new_container = NULL, $rebuild = FALSE) {
   // would leave Drupal in a nonfunctional state.
   static $container = NULL;
   if ($rebuild) {
+    // If there is an existing container, close open connnections.
+    if ($container) {
+      $container->get('database_manager')->closeConnection();
+    }
     $container = NULL;
   }
   if (isset($new_container)) {
+    // If there is an existing container, close open connnections.
+    if ($container) {
+      $container->get('database_manager')->closeConnection();
+    }
     $container = $new_container;
   }
   if (!isset($container)) {

@@ -905,13 +905,6 @@ abstract class TestBase {
     // @see Drupal\Core\DrupalKernel::initializeContainer()
     $this->kernel = new DrupalKernel('testing', FALSE);
 
-    // Close any remaining connections in the previous container.
-    if (!empty($this->container)) {
-      // Close the connection.
-      $this->container->get('database_manager')->closeConnection();
-      unset($this->container);
-    }
-
     // The DrupalKernel does not update the container in drupal_container(), but
     // replaces it with a new object. We therefore need to replace the minimal
     // boostrap container that has been set up by TestBase::prepareEnvironment().
@@ -982,10 +975,6 @@ abstract class TestBase {
     // Restore the original container.
     drupal_container(self::$originalContainer);
 
-    // Close the connection.
-    $this->container->get('database_manager')->closeConnection();
-    unset($this->container);
-
     // Restore original globals.
     $GLOBALS['theme_key'] = $this->originalThemeKey;
     $GLOBALS['theme'] = $this->originalTheme;
@@ -1007,7 +996,6 @@ abstract class TestBase {
     $conf = $this->originalConf;
 
     // Restore original statics and globals.
-    $language_interface = $this->originalLanguage;
     $GLOBALS['config_directories'] = $this->originalConfigDirectories;
     if (isset($this->originalPrefix)) {
       drupal_valid_test_ua($this->originalPrefix);

@@ -50,9 +50,11 @@ class Statement extends PDOStatement implements StatementInterface {
       }
     }
 
-    $logger = $this->dbh->getLogger();
-    if (!empty($logger)) {
-      $query_start = microtime(TRUE);
+    if ($this->dbh) {
+      $logger = $this->dbh->getLogger();
+      if (!empty($logger)) {
+        $query_start = microtime(TRUE);
+      }
     }
 
     $return = parent::execute($args);

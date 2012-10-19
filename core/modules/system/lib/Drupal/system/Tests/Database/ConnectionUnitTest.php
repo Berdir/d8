@@ -21,6 +21,8 @@ class ConnectionUnitTest extends UnitTestBase {
   protected $monitor;
   protected $originalCount;
 
+  protected $database;
+
   public static function getInfo() {
     return array(
       'name' => 'Connection unit tests',
@@ -35,15 +37,14 @@ class ConnectionUnitTest extends UnitTestBase {
     $this->key = 'default';
     $this->originalTarget = 'default';
     $this->target = 'DatabaseConnectionUnitTest';
+    $this->database = drupal_container()->get('database_manager');
 
     // Create an additional connection to monitor the connections being opened
     // and closed in this test.
     // @see TestBase::changeDatabasePrefix()
-    $connection_info = Database::getConnectionInfo('default');
-    Database::addConnectionInfo('default', 'monitor', $connection_info['default']);
-    global $databases;
-    $databases['default']['monitor'] = $connection_info['default'];
-    $this->monitor = Database::getConnection('monitor');
+    $connection_info = $this->database->getConnectionInfo('default');
+    $this->database->addConnectionInfo('default', 'monitor', $connection_info['default']);
+    $this->monitor = $this->database->getConnection('monitor');
   }
 
   /**
@@ -51,11 +52,11 @@ class ConnectionUnitTest extends UnitTestBase {
    */
   protected function addConnection() {
     // Add a new target to the connection, by cloning the current connection.
-    $connection_info = Database::getConnectionInfo($this->key);
-    Database::addConnectionInfo($this->key, $this->target, $connection_info[$this->originalTarget]);
+    $connection_info = $this->database->getConnectionInfo($this->key);
+    $this->database->addConnectionInfo($this->key, $this->target, $connection_info[$this->originalTarget]);
 
     // Verify that the new target exists.
-    $info = Database::getConnectionInfo($this->key);
+    $info = $this->database->getConnectionInfo($this->key);
     // Note: Custom assertion message to not expose database credentials.
     $this->assertIdentical($info[$this->target], $connection_info[$this->key], 'New connection info found.');
   }
@@ -66,7 +67,7 @@ class ConnectionUnitTest extends UnitTestBase {
    * @return integer
    */
   protected function getConnectionID() {
-    return (int) Database::getConnection($this->target, $this->key)->query('SELECT CONNECTION_ID()')->fetchField();
+    return (int) $this->database->getConnection($this->target, $this->key)->query('SELECT CONNECTION_ID()')->fetchField();
   }
 
   /**
@@ -100,13 +101,13 @@ class ConnectionUnitTest extends UnitTestBase {
     // Add and open a new connection.
     $this->addConnection();
     $id = $this->getConnectionID();
-    Database::getConnection($this->target, $this->key);
+    $this->database->getConnection($this->target, $this->key);
 
     // Verify that there is a new connection.
     $this->assertConnection($id);
 
     // Close the connection.
-    Database::closeConnection($this->target, $this->key);
+    $this->database->closeConnection($this->target, $this->key);
     // Wait 20ms to give the database engine sufficient time to react.
     usleep(20000);
 
@@ -121,16 +122,16 @@ class ConnectionUnitTest extends UnitTestBase {
     // Add and open a new connection.
     $this->addConnection();
     $id = $this->getConnectionID();
-    Database::getConnection($this->target, $this->key);
+    $this->database->getConnection($this->target, $this->key);
 
     // Verify that there is a new connection.
     $this->assertConnection($id);
 
     // Execute a query.
-    Database::getConnection($this->target, $this->key)->query('SHOW TABLES');
+    $this->database->getConnection($this->target, $this->key)->query('SHOW TABLES');
 
     // Close the connection.
-    Database::closeConnection($this->target, $this->key);
+    $this->database->closeConnection($this->target, $this->key);
     // Wait 20ms to give the database engine sufficient time to react.
     usleep(20000);
 
@@ -145,16 +146,16 @@ class ConnectionUnitTest extends UnitTestBase {
     // Add and open a new connection.
     $this->addConnection();
     $id = $this->getConnectionID();
-    Database::getConnection($this->target, $this->key);
+    $this->database->getConnection($this->target, $this->key);
 
     // Verify that there is a new connection.
     $this->assertConnection($id);
 
     // Execute a query.
-    Database::getConnection($this->target, $this->key)->query('SHOW TABLES')->fetchCol();
+    $this->database->getConnection($this->target, $this->key)->query('SHOW TABLES')->fetchCol();
 
     // Close the connection.
-    Database::closeConnection($this->target, $this->key);
+    $this->database->closeConnection($this->target, $this->key);
     // Wait 20ms to give the database engine sufficient time to react.
     usleep(20000);
 
@@ -169,14 +170,14 @@ class ConnectionUnitTest extends UnitTestBase {
     // Add and open a new connection.
     $this->addConnection();
     $id = $this->getConnectionID();
-    Database::getConnection($this->target, $this->key);
+    $this->database->getConnection($this->target, $this->key);
 
     // Verify that there is a new connection.
     $this->assertConnection($id);
 
     // Create a table.
     $name = 'foo';
-    Database::getConnection($this->target, $this->key)->schema()->createTable($name, array(
+    $this->database->getConnection($this->target, $this->key)->schema()->createTable($name, array(
       'fields' => array(
         'name' => array(
           'type' => 'varchar',
@@ -186,16 +187,16 @@ class ConnectionUnitTest extends UnitTestBase {
     ));
 
     // Execute a query.
-    Database::getConnection($this->target, $this->key)->select('foo', 'f')
+    $this->database->getConnection($this->target, $this->key)->select('foo', 'f')
       ->fields('f', array('name'))
       ->execute()
       ->fetchAll();
 
     // Drop the table.
-    Database::getConnection($this->target, $this->key)->schema()->dropTable($name);
+    $this->database->getConnection($this->target, $this->key)->schema()->dropTable($name);
 
     // Close the connection.
-    Database::closeConnection($this->target, $this->key);
+    $this->database->closeConnection($this->target, $this->key);
     // Wait 20ms to give the database engine sufficient time to react.
     usleep(20000);
 

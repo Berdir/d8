@@ -154,10 +154,6 @@ abstract class Connection extends PDO {
     }
 
     $this->id = ++self::$counter;
-    //print "Opened connection " . $this->id . "\n";
-    if (self::$counter == 2) {
-      //debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-    }
   }
 
   /**
@@ -174,7 +170,6 @@ abstract class Connection extends PDO {
     // proper callable, so we reset it to PDOStatement.
     $this->setAttribute(PDO::ATTR_STATEMENT_CLASS, array($this->statementClass, array(NULL)));
     $this->schema = NULL;
-    //print "Closing connection " . $this->id . "\n";
   }
 
   /**
