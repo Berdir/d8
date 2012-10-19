@@ -135,9 +135,6 @@ abstract class Connection extends PDO {
    */
   protected $prefixReplace = array();
 
-  static protected $counter = 0;
-  protected $id = 0;
-
   function __construct($dsn, $username, $password, $driver_options = array()) {
     // Initialize and prepare the connection prefix.
     $this->setPrefix(isset($this->connectionOptions['prefix']) ? $this->connectionOptions['prefix'] : '');
@@ -152,8 +149,6 @@ abstract class Connection extends PDO {
     if (!empty($this->statementClass)) {
       $this->setAttribute(PDO::ATTR_STATEMENT_CLASS, array($this->statementClass, array($this)));
     }
-
-    $this->id = ++self::$counter;
   }
 
   /**
@@ -168,7 +163,7 @@ abstract class Connection extends PDO {
     // Destroy all references to this connection by setting them to NULL.
     // The Statement class attribute only accepts a new value that presents a
     // proper callable, so we reset it to PDOStatement.
-    $this->setAttribute(PDO::ATTR_STATEMENT_CLASS, array($this->statementClass, array(NULL)));
+    $this->setAttribute(PDO::ATTR_STATEMENT_CLASS, array('PDOStatement', array()));
     $this->schema = NULL;
   }
 
