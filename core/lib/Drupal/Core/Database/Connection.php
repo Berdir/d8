@@ -163,7 +163,7 @@ abstract class Connection extends PDO {
     // Destroy all references to this connection by setting them to NULL.
     // The Statement class attribute only accepts a new value that presents a
     // proper callable, so we reset it to PDOStatement.
-    $this->setAttribute(PDO::ATTR_STATEMENT_CLASS, array('PDOStatement', array()));
+    $this->setAttribute(PDO::ATTR_STATEMENT_CLASS, array($this->statementClass, array(NULL)));
     $this->schema = NULL;
   }
 
