@@ -97,7 +97,7 @@ class Database {
    *
    * @see Drupal\Core\Database\Log
    */
-  final public function startLog($logging_key, $key = 'default') {
+  public function startLog($logging_key, $key = 'default') {
     if (empty($this->logs[$key])) {
       $this->logs[$key] = new Log($key);
 
@@ -132,7 +132,7 @@ class Database {
    *
    * @see Drupal\Core\Database\Log
    */
-  final public function getLog($logging_key, $key = 'default') {
+  public function getLog($logging_key, $key = 'default') {
     if (empty($this->logs[$key])) {
       return NULL;
     }
@@ -152,7 +152,7 @@ class Database {
    * @return Drupal\Core\Database\Connection
    *   The corresponding connection object.
    */
-  final public function getConnection($target = 'default', $key = NULL) {
+  public function getConnection($target = 'default', $key = NULL) {
 
     if (!isset($key)) {
       // By default, we want the active connection, set in setActiveConnection.
@@ -184,7 +184,7 @@ class Database {
    *   TRUE if there is at least one database connection established, FALSE
    *   otherwise.
    */
-  final public function isActiveConnection() {
+  public function isActiveConnection() {
     return !empty($this->activeKey) && !empty($this->connections) && !empty($this->connections[$this->activeKey]);
   }
 
@@ -194,7 +194,7 @@ class Database {
    * @return
    *   The previous database connection key.
    */
-  final public function setActiveConnection($key = 'default') {
+  public function setActiveConnection($key = 'default') {
     if (!empty($this->databaseInfo[$key])) {
       $old_key = $this->activeKey;
       $this->activeKey = $key;
@@ -205,7 +205,7 @@ class Database {
   /**
    * Process the configuration file for database information.
    */
-  final public function parseConnectionInfo($database_info) {
+  public function parseConnectionInfo($database_info) {
     foreach ($database_info as $index => $info) {
       foreach ($database_info[$index] as $target => $value) {
         // If there is no "driver" property, then we assume it's an array of
@@ -279,7 +279,7 @@ class Database {
    * @param $connection
    *   The connection key for which we want information.
    */
-  final public function getConnectionInfo($key = 'default') {
+  public function getConnectionInfo($key = 'default') {
     if (!empty($this->databaseInfo[$key])) {
       return $this->databaseInfo[$key];
     }
@@ -295,7 +295,7 @@ class Database {
    * @return
    *   TRUE in case of success, FALSE otherwise.
    */
-  final public function renameConnection($old_key, $new_key) {
+  public function renameConnection($old_key, $new_key) {
     if (!empty($this->databaseInfo[$old_key]) && empty($this->databaseInfo[$new_key])) {
       // Migrate the database connection information.
       $this->databaseInfo[$new_key] = $this->databaseInfo[$old_key];
@@ -322,7 +322,7 @@ class Database {
    * @return
    *   TRUE in case of success, FALSE otherwise.
    */
-  final public function removeConnection($key) {
+  public function removeConnection($key) {
     if (isset($this->databaseInfo[$key])) {
       self::closeConnection(NULL, $key);
       unset($this->databaseInfo[$key]);
@@ -345,11 +345,7 @@ class Database {
    * @throws Drupal\Core\Database\ConnectionNotDefinedException
    * @throws Drupal\Core\Database\DriverNotSpecifiedException
    */
-  final protected function openConnection($key, $target, $database_info = array()) {
-    if (empty($this->databaseInfo)) {
-      self::parseConnectionInfo($database_info);
-    }
-
+  protected function openConnection($key, $target) {
     // If the requested database does not exist then it is an unrecoverable
     // error.
     if (!isset($this->databaseInfo[$key])) {
@@ -424,5 +420,12 @@ class Database {
    */
   public function ignoreTarget($key, $target) {
     $this->ignoreTargets[$key][$target] = TRUE;
+  }
+
+  public function __destruct() {
+    if ($this->isActiveConnection()) {
+      $this->closeConnection();
+      //print "DESTRUCT\n";
+    }
   }
 }

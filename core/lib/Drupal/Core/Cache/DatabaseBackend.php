@@ -39,6 +39,8 @@ class DatabaseBackend implements CacheBackendInterface {
       $bin = 'cache_' . $bin;
     }
     $this->bin = $bin;
+    // @todo: Replace this with a injected connection in
+    //   http://drupal.org/node/1764474.
     $this->connection = drupal_container()->get('database');
   }
 

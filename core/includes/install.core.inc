@@ -1076,6 +1076,10 @@ function install_database_errors($database, $settings_file) {
         ->setFactoryMethod('getConnection')
         ->addArgument('slave');
     }
+    else {
+      // If there already is a service defined, close the connection first.
+      drupal_container()->get('database_manager')->closeConnection();
+    }
 
     try {
       db_run_tasks($driver);

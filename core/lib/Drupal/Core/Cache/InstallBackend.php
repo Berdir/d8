@@ -43,6 +43,8 @@ class InstallBackend extends DatabaseBackend {
       $bin = 'cache_' . $bin;
     }
     $this->bin = $bin;
+    // @todo: Replace this with an injected connection in
+    //   http://drupal.org/node/1764474.
     if (drupal_container()->has('database')) {
       $this->connection = drupal_container()->get('database');
     }

@@ -423,7 +423,7 @@ function db_escape_table($table) {
  *   The escaped field name as a string.
  */
 function db_escape_field($field) {
-  return drupal_container()->get('database_manager')->escapeField($field);
+  return drupal_container()->get('database')->escapeField($field);
 }
 
 /**

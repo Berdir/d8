@@ -2451,11 +2451,11 @@ function drupal_container(Container $new_container = NULL, $rebuild = FALSE) {
       ->setFactoryMethod('get')
       ->addArgument('config');
 
-    // This will be overridden by settings.php in drupal_settings_initialize().
+    // This will be overridden in drupal_settings_initialize().
     $container->setParameter('database.info', array());
+
     $container->register('database_manager', 'Drupal\Core\Database\Database')
       ->addArgument('%database.info%');
-
     $container->register('database', 'Drupal\Core\Database\Connection')
       ->setFactoryService('database_manager')
       ->setFactoryMethod('getConnection')
