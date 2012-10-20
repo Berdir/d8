@@ -201,14 +201,14 @@ function theme_pager($variables) {
   if ($pager_total[$element] > 1) {
     if ($li_first) {
       $items[] = array(
-        'class' => array('pager-first'),
-        'data' => $li_first,
+        '#li_attributes' => array('class' => array('pager-first')),
+        '#markup' => $li_first,
       );
     }
     if ($li_previous) {
       $items[] = array(
-        'class' => array('pager-previous'),
-        'data' => $li_previous,
+        '#li_attributes' => array('class' => array('pager-previous')),
+        '#markup' => $li_previous,
       );
     }
 
@@ -216,49 +216,49 @@ function theme_pager($variables) {
     if ($i != $pager_max) {
       if ($i > 1) {
         $items[] = array(
-          'class' => array('pager-ellipsis'),
-          'data' => '…',
+          '#li_attributes' => array('class' => array('pager-ellipsis')),
+          '#markup' => '…',
         );
       }
       // Now generate the actual pager piece.
       for (; $i <= $pager_last && $i <= $pager_max; $i++) {
         if ($i < $pager_current) {
           $items[] = array(
-            'class' => array('pager-item'),
-            'data' => theme('pager_previous', array('text' => $i, 'element' => $element, 'interval' => ($pager_current - $i), 'parameters' => $parameters)),
+            '#li_attributes' => array('class' => array('pager-item')),
+            '#markup' => theme('pager_previous', array('text' => $i, 'element' => $element, 'interval' => ($pager_current - $i), 'parameters' => $parameters)),
           );
         }
         if ($i == $pager_current) {
           $items[] = array(
-            'class' => array('pager-current'),
-            'data' => $i,
+            '#li_attributes' => array('class' => array('pager-current')),
+            '#markup' => $i,
           );
         }
         if ($i > $pager_current) {
           $items[] = array(
-            'class' => array('pager-item'),
-            'data' => theme('pager_next', array('text' => $i, 'element' => $element, 'interval' => ($i - $pager_current), 'parameters' => $parameters)),
+            '#li_attributes' => array('class' => array('pager-item')),
+            '#markup' => theme('pager_next', array('text' => $i, 'element' => $element, 'interval' => ($i - $pager_current), 'parameters' => $parameters)),
           );
         }
       }
       if ($i < $pager_max) {
         $items[] = array(
-          'class' => array('pager-ellipsis'),
-          'data' => '…',
+          '#li_attributes' => array('class' => array('pager-ellipsis')),
+          '#markup' => '…',
         );
       }
     }
     // End generation.
     if ($li_next) {
       $items[] = array(
-        'class' => array('pager-next'),
-        'data' => $li_next,
+        '#li_attributes' => array('class' => array('pager-next')),
+        '#markup' => $li_next,
       );
     }
     if ($li_last) {
       $items[] = array(
-        'class' => array('pager-last'),
-        'data' => $li_last,
+        '#li_attributes' => array('class' => array('pager-last')),
+        '#markup' => $li_last,
       );
     }
     return '<h2 class="element-invisible">' . t('Pages') . '</h2>' . theme('item_list', array(

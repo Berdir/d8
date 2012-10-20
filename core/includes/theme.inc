@@ -2078,15 +2078,9 @@ function theme_mark($variables) {
  *
  * @param $variables
  *   An associative array containing:
- *   - items: A list of items to render. String values are rendered as is. Each
- *     item can also be an associative array containing:
- *     - data: The string content of the list item.
- *     - children: A list of nested child items to render that behave
- *       identically to 'items', but any non-numeric string keys are treated as
- *       HTML attributes for the child list that wraps 'children'.
- *     - type: The type of list to return (e.g. "ul", "ol").
- *     Any other key/value pairs are used as HTML attributes for the list item
- *     in 'data'.
+ *   - items: A list of items to render. Allowed values are strings or
+ *     renderable arrays. Additionally, the key #li_attributes can be used to
+ *     specify attributes for the li tag.
  *   - title: The title of the list.
  *   - type: The type of list to return (e.g. "ul", "ol").
  *   - attributes: The attributes applied to the list element.
@@ -2103,38 +2097,13 @@ function theme_item_list($variables) {
 
     $num_items = count($items);
     $i = 0;
-    foreach ($items as $key => $item) {
+    foreach ($items as $item) {
       $i++;
-      $attributes = array();
-
+      // @todo Support attributes on the li tag? How?
       if (is_array($item)) {
-        $value = '';
-        if (isset($item['data'])) {
-          $value .= $item['data'];
-        }
-        $attributes = array_diff_key($item, array('data' => 0, 'children' => 0, 'type' => 0));
-
-        // Append nested child list, if any.
-        if (isset($item['children'])) {
-          // HTML attributes for the outer list are defined in the 'attributes'
-          // theme variable, but not inherited by children. For nested lists,
-          // all non-numeric keys in 'children' are used as list attributes.
-          $child_list_attributes = array();
-          foreach ($item['children'] as $child_key => $child_item) {
-            if (is_string($child_key)) {
-              $child_list_attributes[$child_key] = $child_item;
-              unset($item['children'][$child_key]);
-            }
-          }
-          $value .= theme('item_list', array(
-            'items' => $item['children'],
-            'type' => (isset($item['type']) ? $item['type'] : $type),
-            'attributes' => $child_list_attributes,
-          ));
-        }
-      }
-      else {
-        $value = $item;
+        $attributes = isset($item['#li_attributes']) ? $item['#li_attributes'] : array();
+        unset($item['#li_attributes']);
+        $value = drupal_render($item);
       }
 
       $attributes['class'][] = ($i % 2 ? 'odd' : 'even');

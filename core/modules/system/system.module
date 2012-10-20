@@ -4168,7 +4168,7 @@ function theme_exposed_filters($variables) {
   if (isset($form['current'])) {
     $items = array();
     foreach (element_children($form['current']) as $key) {
-      $items[] = drupal_render($form['current'][$key]);
+      $items[] = $form['current'][$key];
     }
     $output .= theme('item_list', array('items' => $items, 'attributes' => array('class' => array('clearfix', 'current-filters'))));
   }
