@@ -2103,7 +2103,7 @@ function theme_item_list($variables) {
       if (is_array($item)) {
         $attributes = isset($item['#li_attributes']) ? $item['#li_attributes'] : array();
         unset($item['#li_attributes']);
-        $value = drupal_render($item);
+        $item = drupal_render($item);
       }
 
       $attributes['class'][] = ($i % 2 ? 'odd' : 'even');
@@ -2114,7 +2114,7 @@ function theme_item_list($variables) {
         $attributes['class'][] = 'last';
       }
 
-      $output .= '<li' . new Attribute($attributes) . '>' . $value . '</li>';
+      $output .= '<li' . new Attribute($attributes) . '>' . $item . '</li>';
     }
     $output .= "</$type>";
   }
