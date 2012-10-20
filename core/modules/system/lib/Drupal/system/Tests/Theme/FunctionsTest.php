@@ -44,25 +44,28 @@ class FunctionsTest extends WebTestBase {
     );
     $variables['items'] = array(
       'a',
+      // Items can be render arrays with their own attributes.
       array(
-        'data' => 'b',
-        'children' => array(
-          'c',
-          // Nested children may use additional attributes.
-          array(
-            'data' => 'd',
-            'class' => array('dee'),
-          ),
-          // Any string key is treated as child list attribute.
-          'id' => 'childlist',
+        '#li_attributes' => array(
+          'id' => 'bee',
         ),
-        // Any other keys are treated as item attributes.
-        'id' => 'bee',
-        'type' => 'ol',
+        'item' => array('#markup' => 'b'),
+        'childlist' =>  array(
+          '#theme' => 'item_list',
+          '#attributes' => array('id' => 'childlist'),
+          '#type' => 'ol',
+          '#items' => array(
+            'c',
+            array(
+              '#markup' => 'd',
+              '#li_attributes' => array('class' => array('dee')),
+            ),
+          ),
+        ),
       ),
       array(
-        'data' => 'e',
-        'id' => 'E',
+        '#markup' => 'e',
+        '#li_attributes' => array('id' => 'E'),
       ),
     );
     $inner = '<div class="item-list"><ol id="childlist">';
