@@ -53,7 +53,7 @@ class LanguageUpgradePathTest extends UpgradePathTestBase {
 
     // Directly check the comment language property on the first comment.
     $comment = db_query('SELECT * FROM {comment} WHERE cid = :cid', array(':cid' => 1))->fetchObject();
-    $this->assertTrue($comment->langcode == 'und', t('Comment 1 language code found.'));
+    $this->assertTrue($comment->langcode->value == 'und', t('Comment 1 language code found.'));
 
     // Ensure that the language switcher has been correctly upgraded. We need to
     // assert the expected HTML id because the block might appear even if the

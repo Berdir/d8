@@ -70,7 +70,7 @@ class CommentInterfaceTest extends CommentTestBase {
     $this->drupalGet('comment/' . $comment->id . '/edit');
     $comment = $this->postComment(NULL, $comment->comment, $comment->subject, array('name' => ''));
     $comment_loaded = comment_load($comment->id);
-    $this->assertTrue(empty($comment_loaded->name) && $comment_loaded->uid == 0, 'Comment author successfully changed to anonymous.');
+    $this->assertTrue(empty($comment_loaded->name->value) && $comment_loaded->uid == 0, 'Comment author successfully changed to anonymous.');
 
     // Test changing the comment author to an unverified user.
     $random_name = $this->randomName();
@@ -83,7 +83,7 @@ class CommentInterfaceTest extends CommentTestBase {
     $this->drupalGet('comment/' . $comment->id . '/edit');
     $comment = $this->postComment(NULL, $comment->comment, $comment->subject, array('name' => $this->web_user->name));
     $comment_loaded = comment_load($comment->id);
-    $this->assertTrue($comment_loaded->name == $this->web_user->name && $comment_loaded->uid == $this->web_user->uid, 'Comment author successfully changed to a registered user.');
+    $this->assertTrue($comment_loaded->name->value == $this->web_user->name && $comment_loaded->uid == $this->web_user->uid, 'Comment author successfully changed to a registered user.');
 
     $this->drupalLogout();
 
@@ -96,8 +96,8 @@ class CommentInterfaceTest extends CommentTestBase {
     $reply = $this->postComment(NULL, $this->randomName(), '', TRUE);
     $reply_loaded = comment_load($reply->id);
     $this->assertTrue($this->commentExists($reply, TRUE), 'Reply found.');
-    $this->assertEqual($comment->id, $reply_loaded->pid, 'Pid of a reply to a comment is set correctly.');
-    $this->assertEqual(rtrim($comment_loaded->thread, '/') . '.00/', $reply_loaded->thread, 'Thread of reply grows correctly.');
+    $this->assertEqual($comment->id, $reply_loaded->pid->value, 'Pid of a reply to a comment is set correctly.');
+    $this->assertEqual(rtrim($comment_loaded->thread->value, '/') . '.00/', $reply_loaded->thread->value, 'Thread of reply grows correctly.');
 
     // Second reply to comment #3 creating comment #4.
     $this->drupalGet('comment/reply/' . $this->node->nid . '/' . $comment->id);
@@ -106,7 +106,7 @@ class CommentInterfaceTest extends CommentTestBase {
     $reply = $this->postComment(NULL, $this->randomName(), $this->randomName(), TRUE);
     $reply_loaded = comment_load($reply->id);
     $this->assertTrue($this->commentExists($reply, TRUE), 'Second reply found.');
-    $this->assertEqual(rtrim($comment_loaded->thread, '/') . '.01/', $reply_loaded->thread, 'Thread of second reply grows correctly.');
+    $this->assertEqual(rtrim($comment_loaded->thread->value, '/') . '.01/', $reply_loaded->thread->value, 'Thread of second reply grows correctly.');
 
     // Edit reply.
     $this->drupalGet('comment/' . $reply->id . '/edit');

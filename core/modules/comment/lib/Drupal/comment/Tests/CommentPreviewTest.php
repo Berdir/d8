@@ -131,10 +131,10 @@ class CommentPreviewTest extends CommentTestBase {
 
     // Check that the saved comment is still correct.
     $comment_loaded = comment_load($comment->id);
-    $this->assertEqual($comment_loaded->subject, $edit['subject'], 'Subject loaded.');
-    $this->assertEqual($comment_loaded->comment_body[$langcode][0]['value'], $edit['comment_body[' . $langcode . '][0][value]'], 'Comment body loaded.');
-    $this->assertEqual($comment_loaded->name, $edit['name'], 'Name loaded.');
-    $this->assertEqual($comment_loaded->created, $raw_date, 'Date loaded.');
+    $this->assertEqual($comment_loaded->subject->value, $edit['subject'], 'Subject loaded.');
+    $this->assertEqual($comment_loaded->comment_body->value, $edit['comment_body[' . $langcode . '][0][value]'], 'Comment body loaded.');
+    $this->assertEqual($comment_loaded->name->value, $edit['name'], 'Name loaded.');
+    $this->assertEqual($comment_loaded->created->value, $raw_date, 'Date loaded.');
 
   }
 

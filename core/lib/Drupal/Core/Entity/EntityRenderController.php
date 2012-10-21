@@ -38,6 +38,10 @@ class EntityRenderController implements EntityRenderControllerInterface {
       drupal_alter('entity_view_mode', $view_mode, $entity, $context);
       $entity->content['#view_mode'] = $view_mode;
       $prepare[$view_mode][$key] = $entity;
+
+      if ($entity instanceof EntityNG) {
+        $entity->setCompatibilityMode(TRUE);
+      }
     }
 
     // Prepare and build field content, grouped by view mode.
@@ -61,6 +65,9 @@ class EntityRenderController implements EntityRenderControllerInterface {
       }
       foreach ($entities as $entity) {
         $entity->content += field_attach_view($this->entityType, $entity, $view_mode, $langcode);
+        if ($entity instanceof EntityNG) {
+          $entity->setCompatibilityMode(FALSE);
+        }
       }
     }
   }

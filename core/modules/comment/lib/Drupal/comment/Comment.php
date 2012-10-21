@@ -8,31 +8,35 @@
 namespace Drupal\comment;
 
 use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\Core\Entity\Entity;
+use Drupal\Core\Entity\EntityNG;
 
 /**
  * Defines the comment entity class.
  */
-class Comment extends Entity implements ContentEntityInterface {
+class Comment extends EntityNG implements ContentEntityInterface {
 
   /**
    * The comment ID.
    *
-   * @var integer
+   * @todo: Rename to 'id'.
+   *
+   * @var \Drupal\Core\Entity\Property\ItemListInterface
    */
   public $cid;
 
   /**
    * The comment UUID.
    *
-   * @var string
+   * @var \Drupal\Core\Entity\Property\ItemListInterface
    */
   public $uuid;
 
   /**
    * The parent comment ID if this is a reply to a comment.
    *
-   * @var integer
+   * @todo: Rename to 'parent_id'.
+   *
+   * @var \Drupal\Core\Entity\Property\ItemListInterface
    */
   public $pid;
 
@@ -44,14 +48,14 @@ class Comment extends Entity implements ContentEntityInterface {
   /**
    * The comment language code.
    *
-   * @var string
+   * @var \Drupal\Core\Entity\Property\ItemListInterface
    */
-  public $langcode = LANGUAGE_NOT_SPECIFIED;
+  public $langcode;
 
   /**
    * The comment title.
    *
-   * @var string
+   * @var \Drupal\Core\Entity\Property\ItemListInterface
    */
   public $subject;
 
@@ -59,7 +63,9 @@ class Comment extends Entity implements ContentEntityInterface {
   /**
    * The comment author ID.
    *
-   * @var integer
+   * @todo: Rename to 'user_id'.
+   *
+   * @var \Drupal\Core\Entity\Property\ItemListInterface
    */
   public $uid = 0;
 
@@ -68,16 +74,16 @@ class Comment extends Entity implements ContentEntityInterface {
    *
    * For anonymous authors, this is the value as typed in the comment form.
    *
-   * @var string
+   * @var \Drupal\Core\Entity\Property\ItemListInterface
    */
-  public $name = '';
+  public $name;
 
   /**
    * The comment author's e-mail address.
    *
    * For anonymous authors, this is the value as typed in the comment form.
    *
-   * @var string
+   * @var \Drupal\Core\Entity\Property\ItemListInterface
    */
   public $mail;
 
@@ -86,21 +92,52 @@ class Comment extends Entity implements ContentEntityInterface {
    *
    * For anonymous authors, this is the value as typed in the comment form.
    *
-   * @var string
+   * @var \Drupal\Core\Entity\Property\ItemListInterface
    */
   public $homepage;
+
+  /**
+   * The plain data values of the contained properties.
+   *
+   * Define some default values used.
+   *
+   * @var array
+   */
+  protected $values = array(
+    'langcode' => array(LANGUAGE_DEFAULT => array(0 => array('value' => LANGUAGE_NOT_SPECIFIED))),
+    'name' => array(LANGUAGE_DEFAULT => array(0 => array('value' => ''))),
+    'uid' => array(LANGUAGE_DEFAULT => array(0 => array('value' => 0))),
+  );
+
+  /**
+   * Overrides Entity::__construct().
+   */
+  public function __construct(array $values, $entity_type) {
+    parent::__construct($values, $entity_type);
+
+    // We unset all defined properties, so magic getters apply.
+    unset($this->cid);
+    unset($this->langcode);
+    unset($this->uuid);
+    unset($this->pid);
+    unset($this->subject);
+    unset($this->uid);
+    unset($this->name);
+    unset($this->mail);
+    unset($this->homepage);
+  }
 
   /**
    * Implements Drupal\Core\Entity\EntityInterface::id().
    */
   public function id() {
-    return $this->cid;
+    return $this->get('cid')->value;
   }
 
   /**
    * Implements Drupal\Core\Entity\EntityInterface::bundle().
    */
   public function bundle() {
-    return $this->node_type;
+    return $this->get('node_type')->value;
   }
 }

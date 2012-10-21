@@ -1364,6 +1364,13 @@ function field_attach_prepare_view($entity_type, $entities, $view_mode, $langcod
       // Add this entity to the items to be prepared.
       $prepare[$id] = $entity;
 
+      // Enable compatibility mode if necessary.
+      // @todo: Remove this once all entity types have been converted to the
+      // new property API.
+      if ($entity instanceof \Drupal\Core\Entity\EntityNG) {
+        $entity->setCompatibilityMode(TRUE);
+      }
+
       // Determine the actual language code to display for each field, given the
       // language codes available in the field data.
       $options['langcode'][$id] = field_language($entity_type, $entity, NULL, $langcode);
@@ -1378,6 +1385,15 @@ function field_attach_prepare_view($entity_type, $entities, $view_mode, $langcod
   _field_invoke_multiple('prepare_view', $entity_type, $prepare, $null, $null, $options);
   // Then let the formatters do their own specific massaging.
   field_invoke_method_multiple('prepareView', _field_invoke_formatter_target($view_mode), $prepare, $view_mode, $null, $options);
+
+  // Disable compatibility mode if enabled previously.
+  // @todo: Remove this once all entity types have been converted to the
+  // new property API.
+  foreach ($prepare as $entity) {
+    if ($entity instanceof \Drupal\Core\Entity\EntityNG) {
+      $entity->setCompatibilityMode(FALSE);
+    }
+  }
 }
 
 /**

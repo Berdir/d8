@@ -292,11 +292,11 @@ class EntityNG extends Entity {
    * @see EntityNG::compatibilityMode
    */
   public function setCompatibilityMode($enabled) {
-    $this->compatibilityMode = (bool) $enabled;
-    if ($enabled) {
+    if (!$this->compatibilityMode && $enabled) {
       $this->updateOriginalValues();
       $this->fields = array();
     }
+    $this->compatibilityMode = (bool) $enabled;
   }
 
   /**
