@@ -342,6 +342,18 @@ function user_install() {
  */
 
 /**
+ * Implements hook_update_dependencies().
+ */
+function user_update_dependencies() {
+  // Make sure that file.module is enabled before converting the user picture
+  // to a field.
+  $dependencies['user'][8010] = array(
+    'system' => 8031,
+  );
+  return $dependencies;
+}
+
+/**
  * The 'Member for' extra field has moved one level up in the array.
  */
 function user_update_8000() {
@@ -624,16 +636,10 @@ function user_update_8010() {
  * Create user picture field.
  */
 function user_update_8010() {
-// User pictures can only be migrated to the new user picture image field
-// if Image module is installed.
+  // User pictures can only be migrated to the new user picture image field
+  // if Image module is installed.
   if (!module_exists('image')) {
-    $modules = array(
-      'image',
-    );
-    if (!module_exists('file')) {
-      $modules[] = 'file';
-    }
-    update_module_enable($modules);
+    module_enable(array('image'));
   }
 
   if ($default_image = variable_get('user_picture_default', '')) {
