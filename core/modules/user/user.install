@@ -642,8 +642,8 @@ function user_update_8010() {
     module_enable(array('image'));
   }
 
-  if ($default_image = variable_get('user_picture_default', '')) {
-    $picture_directory =  variable_get('file_default_scheme', 'public') . '://' . variable_get('user_picture_path', 'pictures');
+  if ($default_image = update_variable_get('user_picture_default', '')) {
+    $picture_directory =  update_variable_get('file_default_scheme', 'public') . '://' . update_variable_get('user_picture_path', 'pictures');
     file_prepare_directory($picture_directory, FILE_CREATE_DIRECTORY);
     $destination = file_stream_wrapper_uri_normalize($picture_directory . '/' . drupal_basename($default_image));
     $default_image = file_save_data($default_image, $destination, FILE_EXISTS_REPLACE);
@@ -657,25 +657,33 @@ function user_update_8010() {
     // the field appears on the user account form after migration, even if
     // user pictures were disabled previously. The picture is only hidden in
     // the output.
-    'formatter' => variable_get('user_pictures', 0) ? 'image' : 'hidden',
-    'file_directory' => variable_get('user_picture_path', 'pictures'),
+    'formatter' => update_variable_get('user_pictures', 0) ? 'image' : 'hidden',
+    'file_directory' => update_variable_get('user_picture_path', 'pictures'),
     'default_image' => $default_image ? $default_image->id() : 0,
-    'image_style' => variable_get('user_picture_style', ''),
-    'max_resolution' => variable_get('user_picture_dimensions', '85x85'),
-    'max_filesize' => variable_get('user_picture_file_size', '30') . ' KB',
-    'description' => variable_get('user_picture_guidelines', ''),
+    'image_style' => update_variable_get('user_picture_style', ''),
+    'max_resolution' => update_variable_get('user_picture_dimensions', '85x85'),
+    'max_filesize' => update_variable_get('user_picture_file_size', '30') . ' KB',
+    'description' => update_variable_get('user_picture_guidelines', ''),
   );
 
   _user_install_picture_field($settings);
 
-// Delete old variables.
-  variable_del('user_pictures');
-  variable_del('user_picture_path');
-  variable_del('user_picture_default');
-  variable_del('user_picture_style');
-  variable_del('user_picture_dimensions');
-  variable_del('user_picture_file_size');
-  variable_del('user_picture_guidelines');
+  // Update the user bundle settings and hide the member_for extra field.
+  $settings = update_variable_get('field_bundle_settings_user__user');
+  $settings['extra_fields']['display']['member_for']['compact'] = array(
+    'weight' => 0,
+    'visible' => FALSE,
+  );
+  update_variable_set('field_bundle_settings_user__user', $settings);
+
+  // Delete old variables.
+  update_variable_del('user_pictures');
+  update_variable_del('user_picture_path');
+  update_variable_del('user_picture_default');
+  update_variable_del('user_picture_style');
+  update_variable_del('user_picture_dimensions');
+  update_variable_del('user_picture_file_size');
+  update_variable_del('user_picture_guidelines');
 }
 
 /**
@@ -686,28 +694,40 @@ function user_update_8011(&$sandbox) {
   if (!isset($sandbox['total'])) {
     $sandbox['total'] = (int) db_query('SELECT COUNT(picture) FROM {users} WHERE picture > 0')->fetchField();
     $sandbox['processed'] = 0;
-
-    $fields = _update_7000_field_read_fields(array('field_name' => 'user_picture'), 'field_name');
-    $field = $fields['user_picture'];
-    $sandbox['user_picture_table'] = _field_sql_storage_tablename($field);
   }
 
   if ($sandbox['total']) {
     // Retrieve next 20 rows to migrate.
-    $results = db_query_range('SELECT uid, picture FROM {users} WHERE picture > 0', 0, 20)->fetchAllKeyed();
-    foreach ($results as $uid => $fid) {
-      // Inject the field value and save the user account, so the picture
-      // file usage is claimed.
-      db_insert($sandbox['user_picture_table'])
+    $rows = db_query_range('SELECT uid, picture FROM {users} WHERE picture > 0', 0, 20)->fetchAllKeyed();
+    foreach ($rows as $uid => $fid) {
+
+      // Table and column found in the field's storage details. During upgrades,
+      // it's always SQL.
+      $table_name = "field_data_user_picture";
+      $revision_name = "field_revision_picture";
+
+      // Add a row to the field data and revision tables.
+      db_insert($table_name)
         ->fields(array(
-        'entity_type' => 'user',
-        'bundle' => 'user',
-        'entity_id' => $uid,
-        'revision_id' => $uid,
-        'langcode' => LANGUAGE_NOT_SPECIFIED,
-        'delta' => 0,
-        'user_picture_fid' => $fid,
-      ))
+          'entity_type' => 'user',
+          'bundle' => 'user',
+          'entity_id' => $uid,
+          'revision_id' => $uid,
+          'langcode' => LANGUAGE_NOT_SPECIFIED,
+          'delta' => 0,
+          'user_picture_fid' => $fid,
+        ))
+        ->execute();
+      db_insert($revision_name)
+        ->fields(array(
+          'entity_type' => 'user',
+          'bundle' => 'user',
+          'entity_id' => $uid,
+          'revision_id' => $uid,
+          'langcode' => LANGUAGE_NOT_SPECIFIED,
+          'delta' => 0,
+          'user_picture_fid' => $fid,
+        ))
         ->execute();
 
       // Update file usage from user to file module.
@@ -720,13 +740,21 @@ function user_update_8011(&$sandbox) {
         ->condition('type', 'user')
         ->condition('id', $uid)
         ->fields(array(
-        'module' => 'file',
-      ))
+          'module' => 'file',
+        ))
         ->execute();
     }
 
+    // Set picture column of the migrated users to 0.
+    db_update('users')
+      ->fields(array(
+        'picture' => 0,
+      ))
+      ->condition('uid', array_keys($rows))
+      ->execute();
+
     // Report status.
-    $sandbox['processed'] += count($results);
+    $sandbox['processed'] += count($rows);
   }
   $sandbox['#finished'] = $sandbox['total'] ? $sandbox['processed'] / $sandbox['total'] : 1;
 
