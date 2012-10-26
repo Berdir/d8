@@ -103,7 +103,7 @@ function openid_test_yadis_xrds() {
     }
     $output = '<?xml version="1.0" encoding="UTF-8"?>';
     if (!empty($_GET['doctype'])) {
-      $output = "\n<!DOCTYPE dct [ <!ELEMENT blue (#PCDATA)> ]>\n";
+      $output .= "\n<!DOCTYPE dct [ <!ELEMENT blue (#PCDATA)> ]>\n";
     }
     $output .= '
       <xrds:XRDS xmlns:xrds="xri://$xrds" xmlns="xri://$xrd*($v*2.0)" xmlns:openid="http://openid.net/xmlns/1.0">

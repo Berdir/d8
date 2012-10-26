@@ -189,7 +189,7 @@ class OpenIDFunctionalTest extends OpenIDTestBase {
     $identity = url('openid-test/yadis/xrds', array('absolute' => TRUE, 'query' => array('doctype' => 1)));
     // Test logging in via the login block on the front page.
     $edit = array('openid_identifier' => $identity);
-    $this->drupalPost('', $edit, t('Log in'));
+    $this->drupalPost('', $edit, t('Log in'), array(), array(), 'openid-login-form');
     $this->assertRaw(t('Sorry, that is not a valid OpenID. Ensure you have spelled your ID correctly.'), 'XML with DOCTYPE was rejected.');
   }
 
