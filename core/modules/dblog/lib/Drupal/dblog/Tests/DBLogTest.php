@@ -523,6 +523,9 @@ class DBLogTest extends WebTestBase {
     $this->assertText(t('Database log cleared.'), 'Confirmation message found');
   }
 
+  /**
+   * Verifies that exceptions are catched in dblog_watchdog().
+   */
   protected function testDBLogException() {
     $log = array(
       'type'        => 'custom',
