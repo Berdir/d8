@@ -175,6 +175,14 @@ class OpenIDFunctionalTest extends OpenIDTestBase {
 
     $this->drupalLogout();
 
+    // Use a User-supplied Identity that is the URL of an XRDS document.
+    // Tell the test module to add a doctype. This should fail.
+    $identity = url('openid-test/yadis/xrds', array('absolute' => TRUE, 'query' => array('doctype' => 1)));
+    // Test logging in via the login block on the front page.
+    $edit = array('openid_identifier' => $identity);
+    $this->drupalPost('', $edit, t('Log in'), array(), array(), 'openid-login-form');
+    $this->assertRaw(t('Sorry, that is not a valid OpenID. Ensure you have spelled your ID correctly.'), 'XML with DOCTYPE was rejected.');
+
     // Tell openid_test.module to alter the checkid_setup request.
     $new_identity = 'http://example.com/' . $this->randomName();
     variable_set('openid_test_identity', $new_identity);
@@ -183,14 +191,6 @@ class OpenIDFunctionalTest extends OpenIDTestBase {
     $this->assertLink(t('Log out'), 0, 'User was logged in.');
     $response = variable_get('openid_test_hook_openid_response_response');
     $this->assertEqual($response['openid.identity'], $new_identity, 'hook_openid_request_alter() were invoked.');
-
-    // Use a User-supplied Identity that is the URL of an XRDS document.
-    // Tell the test module to add a doctype. This should fail.
-    $identity = url('openid-test/yadis/xrds', array('absolute' => TRUE, 'query' => array('doctype' => 1)));
-    // Test logging in via the login block on the front page.
-    $edit = array('openid_identifier' => $identity);
-    $this->drupalPost('', $edit, t('Log in'), array(), array(), 'openid-login-form');
-    $this->assertRaw(t('Sorry, that is not a valid OpenID. Ensure you have spelled your ID correctly.'), 'XML with DOCTYPE was rejected.');
   }
 
   /**
