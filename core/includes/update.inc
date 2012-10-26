@@ -220,6 +220,10 @@ function update_prepare_d8_bootstrap() {
       // requirements check.
       require_once DRUPAL_ROOT . '/core/modules/system/system.module';
 
+      // Make sure that the bootstrap cache is cleared as that might contain
+      // incompatible data structures.
+      cache('bootstrap')->flush();
+
       // Retrieve all installed extensions from the {system} table.
       // Uninstalled extensions are ignored and not converted.
       $result = db_query('SELECT name, status, weight, schema_version, type FROM {system} WHERE type = :theme OR (type = :module AND schema_version <> :schema_uninstalled)', array(
