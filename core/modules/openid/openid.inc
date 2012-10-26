@@ -134,13 +134,9 @@ function openid_redirect_form($form, &$form_state, $url, $message) {
 function _openid_xrds_parse($raw_xml) {
   $services = array();
 
-  // For PHP version >= 5.2.11, we can use this function to protect against
-  // malicious doctype declarations and other unexpected entity loading.
-  // However, we will not rely on it, and reject any XML with a DOCTYPE.
-  $disable_entity_loader = function_exists('libxml_disable_entity_loader');
-  if ($disable_entity_loader) {
-    $load_entities = libxml_disable_entity_loader(TRUE);
-  }
+  // protect against malicious doctype declarations and other unexpected entity
+  // loading.
+  $load_entities = libxml_disable_entity_loader(TRUE);
 
   // Load the XML into a DOM document.
   $dom = new DOMDocument();
@@ -182,9 +178,7 @@ function _openid_xrds_parse($raw_xml) {
   }
 
   // Return the LIBXML options to the previous state before returning.
-  if ($disable_entity_loader) {
-    libxml_disable_entity_loader($load_entities);
-  }
+  libxml_disable_entity_loader($load_entities);
 
   return $services;
 }
