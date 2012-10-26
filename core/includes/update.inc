@@ -87,8 +87,21 @@ function update_check_incompatibility($name, $type = 'module') {
  * irreversible changes to the database are made here.
  */
 function update_prepare_d8_bootstrap() {
-  // Allow the database system to work even if the registry has not been
-  // created yet.
+  // @todo Race-condition: drupal_install_config_directories() calls into
+  //   install_ensure_config_directory(), which calls into
+  //   file_prepare_directory(), whichs calls into file_get_stream_wrappers(),
+  //   which attempts to invoke hooks with a non-existing module/hook system.
+  include_once DRUPAL_ROOT . '/core/includes/module.inc';
+  $module_list['system']['filename'] = 'core/modules/system/system.module';
+  module_list(NULL, $module_list);
+  require_once DRUPAL_ROOT . '/' . $module_list['system']['filename'];
+  // Ensure the configuration directories exist and are writable, or create
+  // them. If the directories have not been specified in settings.php and
+  // created manually already, and either directory cannot be created by the
+  // web server, an exception will be thrown, halting the update.
+  drupal_install_config_directories();
+
+  // Bootstrap the database.
   include_once DRUPAL_ROOT . '/core/includes/install.inc';
   drupal_bootstrap(DRUPAL_BOOTSTRAP_DATABASE);
 
@@ -192,20 +205,6 @@ function update_prepare_d8_bootstrap() {
         // array.
         variable_set('language_default', (array) $language_default);
       }
-
-      // @todo Race-condition: drupal_install_config_directories() calls into
-      //   install_ensure_config_directory(), which calls into
-      //   file_prepare_directory(), whichs calls into file_get_stream_wrappers(),
-      //   which attempts to invoke hooks with a non-existing module/hook system.
-      include_once DRUPAL_ROOT . '/core/includes/module.inc';
-      $module_list['system']['filename'] = 'core/modules/system/system.module';
-      module_list(NULL, $module_list);
-      require_once DRUPAL_ROOT . '/' . $module_list['system']['filename'];
-      // Ensure the configuration directories exist and are writable, or create
-      // them. If the directories have not been specified in settings.php and
-      // created manually already, and either directory cannot be created by the
-      // web server, an exception will be thrown, halting the update.
-      drupal_install_config_directories();
 
       $module_config = config('system.module');
       $disabled_modules = config('system.module.disabled');
