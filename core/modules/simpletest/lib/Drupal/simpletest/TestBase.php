@@ -123,6 +123,13 @@ abstract class TestBase {
   protected $verboseDirectory;
 
   /**
+   * TRUE if die on fail enabled.
+   *
+   * @var boolean
+   */
+  protected $dieOnFail = FALSE;
+
+  /*
    * The original database prefix when running inside Simpletest.
    *
    * @var string
@@ -216,6 +223,9 @@ abstract class TestBase {
       return TRUE;
     }
     else {
+      if ($this->dieOnFail) {
+        exit(1);
+      }
       return FALSE;
     }
   }
@@ -652,6 +662,7 @@ abstract class TestBase {
       }
       $this->verboseClassName = str_replace("\\", "_", $class);
     }
+    $this->dieOnFail = $simpletest_config->get('die_on_fail');
     // HTTP auth settings (<username>:<password>) for the simpletest browser
     // when sending requests to the test site.
     $this->httpauth_method = (int) $simpletest_config->get('httpauth.method');
