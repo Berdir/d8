@@ -1169,9 +1169,6 @@ function template_preprocess_node(&$variables) {
   $variables['label']     = check_plain($node->label());
   $variables['page']      = $variables['view_mode'] == 'full' && node_is_page($node);
 
-  // Flatten the node entity's member fields.
-  $variables = array_merge((array) $node, $variables);
-
   // Helpful $content variable for templates.
   $variables += array('content' => array());
   foreach (element_children($variables['elements']) as $key) {
@@ -1198,13 +1195,13 @@ function template_preprocess_node(&$variables) {
 
   // Gather node classes.
   $variables['attributes']['class'][] = drupal_html_class('node-' . $node->type);
-  if ($variables['promote']) {
+  if ($node->promote) {
     $variables['attributes']['class'][] = 'promoted';
   }
-  if ($variables['sticky']) {
+  if ($node->sticky) {
     $variables['attributes']['class'][] = 'sticky';
   }
-  if (!$variables['status']) {
+  if (!$node->status) {
     $variables['attributes']['class'][] = 'unpublished';
   }
   if ($variables['view_mode']) {
