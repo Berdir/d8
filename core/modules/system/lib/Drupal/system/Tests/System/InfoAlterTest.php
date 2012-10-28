@@ -39,7 +39,7 @@ class InfoAlterTest extends WebTestBase {
     $this->assertTrue(isset($info['regions']['test_region']), 'Altered theme info was returned by system_get_info().');
     $seven_regions = system_region_list('seven');
     $this->assertTrue(isset($seven_regions['test_region']), 'Altered theme info was returned by system_region_list().');
-    $system_list_themes = system_list('theme');
+    $system_list_themes = drupal_extension_handler()->systemList('theme');
     $info = $system_list_themes['seven']->info;
     $this->assertTrue(isset($info['regions']['test_region']), 'Altered theme info was returned by system_list().');
     $list_themes = list_themes();
@@ -53,7 +53,7 @@ class InfoAlterTest extends WebTestBase {
     $this->assertFalse(isset($info['regions']['test_region']), 'Altered theme info was not returned by system_get_info().');
     $seven_regions = system_region_list('seven');
     $this->assertFalse(isset($seven_regions['test_region']), 'Altered theme info was not returned by system_region_list().');
-    $system_list_themes = system_list('theme');
+    $system_list_themes = drupal_extension_handler()->systemList('theme');
     $info = $system_list_themes['seven']->info;
     $this->assertFalse(isset($info['regions']['test_region']), 'Altered theme info was not returned by system_list().');
     $list_themes = list_themes();

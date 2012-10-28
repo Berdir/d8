@@ -38,8 +38,50 @@ class CoreBundle extends Bundle
     $container->register('request', 'Symfony\Component\HttpFoundation\Request')
       ->setSynthetic(TRUE);
 
+    // The extension_handler and keyvalue services are synthetic because they
+    // get created by the kernel and injected into the container.
+    $container->register('extension_handler', 'Drupal\Core\ExtensionHandler')
+      ->setSynthetic(TRUE);
+    $container->register('keyvalue', 'Drupal\Core\KeyValueStore\KeyValueFactory')
+      ->setSynthetic(TRUE);
+
+    // Register the config services
+    // Register active configuration storage.
+    $container
+      ->register('config.cachedstorage.storage', 'Drupal\Core\Config\FileStorage')
+      ->addArgument(config_get_config_directory(CONFIG_ACTIVE_DIRECTORY));
+    // @todo Replace this with a cache.factory service plus 'config' argument.
+    $container
+      ->register('cache.config', 'Drupal\Core\Cache\CacheBackendInterface')
+      ->setFactoryClass('Drupal\Core\Cache\CacheFactory')
+      ->setFactoryMethod('get')
+      ->addArgument('config');
+
+    $container
+      ->register('config.storage', 'Drupal\Core\Config\CachedStorage')
+      ->addArgument(new Reference('config.cachedstorage.storage'))
+      ->addArgument(new Reference('cache.config'));
+
+    // Register configuration object factory.
+    $container->register('config.subscriber.globalconf', 'Drupal\Core\EventSubscriber\ConfigGlobalOverrideSubscriber')
+      ->addTag('event_subscriber');
+
+    $container->register('config.factory', 'Drupal\Core\Config\ConfigFactory')
+      ->addArgument(new Reference('config.storage'))
+      ->addArgument(new Reference('dispatcher'));
+
+    // Register staging configuration storage.
+    $container
+      ->register('config.storage.staging', 'Drupal\Core\Config\FileStorage')
+      ->addArgument(config_get_config_directory(CONFIG_STAGING_DIRECTORY));
+
+    $container
+      ->register('state.storage', 'Drupal\Core\KeyValueStore\DatabaseStorage')
+      ->addArgument('state');
+
     $container->register('dispatcher', 'Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher')
       ->addArgument(new Reference('service_container'));
+
     $container->register('resolver', 'Drupal\Core\ControllerResolver')
       ->addArgument(new Reference('service_container'));
     $container->register('http_kernel', 'Drupal\Core\HttpKernel')
@@ -114,6 +156,7 @@ class CoreBundle extends Bundle
       ->setScope('request')
       ->addTag('event_subscriber');
     $container->register('request_close_subscriber', 'Drupal\Core\EventSubscriber\RequestCloseSubscriber')
+      ->addArgument(new Reference('extension_handler'))
       ->addTag('event_subscriber');
     $container->register('config_global_override_subscriber', 'Drupal\Core\EventSubscriber\ConfigGlobalOverrideSubscriber')
       ->addTag('event_subscriber');

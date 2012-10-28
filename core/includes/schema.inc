@@ -79,14 +79,13 @@ function drupal_get_complete_schema($rebuild = FALSE) {
       // Load the .install files to get hook_schema.
       // On some databases this function may be called before bootstrap has
       // been completed, so we force the functions we need to load just in case.
-      if (function_exists('module_load_all_includes')) {
-        // This function can be called very early in the bootstrap process, so
-        // we force the system_list() static cache to be refreshed to ensure
-        // that it contains the complete list of modules before we go on to call
-        // module_load_all_includes().
-        system_list_reset();
-        module_load_all_includes('install');
-      }
+      $extension_handler = drupal_extension_handler();
+      // This function can be called very early in the bootstrap process, so
+      // we force the ExtensionHandler's system list to be refreshed to ensure
+      // that it contains the complete list of modules before we go on to call
+      // module_load_all_includes().
+      $extension_handler->systemListReset();
+      $extension_handler->loadAllIncludes('install');
 
       require_once DRUPAL_ROOT . '/core/includes/common.inc';
       // Invoke hook_schema for all modules.

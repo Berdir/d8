@@ -2721,7 +2721,7 @@ function system_get_info($type, $name = NULL) {
     }
   }
   else {
-    $list = system_list($type);
+    $list = drupal_extension_handler()->systemList($type);
     foreach ($list as $shortname => $item) {
       if (!empty($item->status)) {
         $info[$shortname] = $item->info;
@@ -2868,7 +2868,8 @@ function system_rebuild_module_data() {
       $record->schema_version = SCHEMA_UNINSTALLED;
       $files[$module] = $record->filename;
     }
-    $modules = _module_build_dependencies($modules);
+
+    $modules = drupal_extension_handler()->buildModuleDependencies($modules);
     $modules_cache = $modules;
 
     // Store filenames to allow system_list() and drupal_get_filename() to

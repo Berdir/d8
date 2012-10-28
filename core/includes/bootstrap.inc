@@ -1,7 +1,11 @@
 <?php
 
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Cache\CacheFactory;
 use Drupal\Core\Database\Database;
+use Drupal\Core\ExtensionHandler;
+use Drupal\Core\InstallerExtensionHandler;
+use Drupal\Core\KeyValueStore\KeyValueFactory;
 use Symfony\Component\ClassLoader\UniversalClassLoader;
 use Symfony\Component\ClassLoader\ApcUniversalClassLoader;
 use Symfony\Component\DependencyInjection\Container;
@@ -841,117 +845,6 @@ function drupal_settings_initialize() {
 }
 
 /**
- * Returns and optionally sets the filename for a system resource.
- *
- * The filename, whether provided, cached, or retrieved from the database, is
- * only returned if the file exists.
- *
- * This function plays a key role in allowing Drupal's resources (modules
- * and themes) to be located in different places depending on a site's
- * configuration. For example, a module 'foo' may legally be be located
- * in any of these three places:
- *
- * core/modules/foo/foo.module
- * modules/foo/foo.module
- * sites/example.com/modules/foo/foo.module
- *
- * Calling drupal_get_filename('module', 'foo') will give you one of
- * the above, depending on where the module is located.
- *
- * @param $type
- *   The type of the item (i.e. theme, theme_engine, module, profile).
- * @param $name
- *   The name of the item for which the filename is requested.
- * @param $filename
- *   The filename of the item if it is to be set explicitly rather
- *   than by consulting the database.
- *
- * @return
- *   The filename of the requested item.
- */
-function drupal_get_filename($type, $name, $filename = NULL) {
-  // The location of files will not change during the request, so do not use
-  // drupal_static().
-  static $files = array(), $dirs = array();
-
-  // Profiles are converted into modules in system_rebuild_module_data().
-  // @todo Remove false-exposure of profiles as modules.
-  $original_type = $type;
-  if ($type == 'profile') {
-    $type = 'module';
-  }
-  if (!isset($files[$type])) {
-    $files[$type] = array();
-  }
-
-  if (!empty($filename) && file_exists($filename)) {
-    $files[$type][$name] = $filename;
-  }
-  elseif (isset($files[$type][$name])) {
-    // nothing
-  }
-  else {
-    // Verify that we have an keyvalue service before using it. This is required
-    // because this function is called during installation.
-    // @todo Inject database connection into KeyValueStore\DatabaseStorage.
-    if (drupal_container()->has('keyvalue') && function_exists('db_query')) {
-      try {
-        $file_list = state()->get('system.' . $type . '.files');
-        if ($file_list && isset($file_list[$name]) && file_exists(DRUPAL_ROOT . '/' . $file_list[$name])) {
-          $files[$type][$name] = $file_list[$name];
-        }
-      }
-      catch (Exception $e) {
-        // The keyvalue service raised an exception because the backend might
-        // be down. We have a fallback for this case so we hide the error
-        // completely.
-      }
-    }
-    // Fallback to searching the filesystem if the database could not find the
-    // file or the file returned by the database is not found.
-    if (!isset($files[$type][$name])) {
-      // We have consistent directory naming: modules, themes...
-      $dir = $type . 's';
-      if ($type == 'theme_engine') {
-        $dir = 'themes/engines';
-        $extension = 'engine';
-      }
-      elseif ($type == 'theme') {
-        $extension = 'info';
-      }
-      // Profiles are converted into modules in system_rebuild_module_data().
-      // @todo Remove false-exposure of profiles as modules.
-      elseif ($original_type == 'profile') {
-        $dir = 'profiles';
-        $extension = 'profile';
-      }
-      else {
-        $extension = $type;
-      }
-
-      if (!isset($dirs[$dir][$extension])) {
-        $dirs[$dir][$extension] = TRUE;
-        if (!function_exists('drupal_system_listing')) {
-          require_once DRUPAL_ROOT . '/core/includes/common.inc';
-        }
-        // Scan the appropriate directories for all files with the requested
-        // extension, not just the file we are currently looking for. This
-        // prevents unnecessary scans from being repeated when this function is
-        // called more than once in the same page request.
-        $matches = drupal_system_listing("/^" . DRUPAL_PHP_FUNCTION_PATTERN . "\.$extension$/", $dir, 'name', 0);
-        foreach ($matches as $matched_name => $file) {
-          $files[$type][$matched_name] = $file->uri;
-        }
-      }
-    }
-  }
-
-  if (isset($files[$type][$name])) {
-    return $files[$type][$name];
-  }
-}
-
-/**
  * Loads the persistent variable table.
  *
  * The variable table is composed of values that have been saved in the table
@@ -1126,40 +1019,6 @@ function bootstrap_invoke_all($hook) {
     drupal_load('module', $module);
     module_invoke($module, $hook);
   }
-}
-
-/**
- * Includes a file with the provided type and name.
- *
- * This prevents including a theme, engine, module, etc., more than once.
- *
- * @param $type
- *   The type of item to load (i.e. theme, theme_engine, module).
- * @param $name
- *   The name of the item to load.
- *
- * @return
- *   TRUE if the item is loaded or has already been loaded.
- */
-function drupal_load($type, $name) {
-  // Once a file is included this can't be reversed during a request so do not
-  // use drupal_static() here.
-  static $files = array();
-
-  if (isset($files[$type][$name])) {
-    return TRUE;
-  }
-
-  $filename = drupal_get_filename($type, $name);
-
-  if ($filename) {
-    include_once DRUPAL_ROOT . '/' . $filename;
-    $files[$type][$name] = TRUE;
-
-    return TRUE;
-  }
-
-  return FALSE;
 }
 
 /**
@@ -2430,10 +2289,11 @@ function drupal_container(Container $new_container = NULL, $rebuild = FALSE) {
     $container = $new_container;
   }
   if (!isset($container)) {
-    // Return a ContainerBuilder instance with the bare essentials needed for any
-    // full bootstrap regardless of whether there will be a DrupalKernel involved.
-    // This will get merged with the full Kernel-built Container on normal page
-    // requests.
+   // This will never happen on a normal page request. It is currently used only
+   // by the installer and in situations where a full bootstrap is done outside
+   // the context of a DrupalKernel, e.g. run-tests.sh, or when an exception is
+   // thrown while the Kernel is booting.
+   // @todo Use a precompiled container for this.
     $container = new ContainerBuilder();
 
     // Register active configuration storage.
@@ -2470,6 +2330,117 @@ function drupal_container(Container $new_container = NULL, $rebuild = FALSE) {
       ->register('keyvalue', 'Drupal\Core\KeyValueStore\KeyValueFactory');
   }
   return $container;
+}
+
+/**
+ * Retrieves the ExtensionHandler that manages the list of enabled modules.
+ *
+ * This is a temporary function that will instantiate a new ExtensionHandler if
+ * there isn't one present in the container. This will only happen if the
+ * boostrap container is being used, e.g. during installation.
+ * @todo Remove this and convert all calls to it to
+ *  drupal_container()->get('extension_handler') once the installer and the
+ *  run-tests.sh script are using a Kernel.
+ *
+ * @return Drupal\Core\ExtensionHandlerInterface
+ */
+function drupal_extension_handler($installer = FALSE) {
+  $extension_handler = &drupal_static(__FUNCTION__, NULL);
+  if (isset($extension_handler)) {
+    return $extension_handler;
+  }
+  if ($installer) {
+    $extension_handler = new InstallerExtensionHandler(drupal_classloader());
+  }
+  else {
+    if (drupal_container()->has('extension_handler')) {
+      $extension_handler = drupal_container()->get('extension_handler');
+    }
+    else {
+      // This is only ever used by run-tests.sh
+      $key_value = new KeyValueFactory();
+      $cache = CacheFactory::get('cache');
+      $bootstrap_cache = CacheFactory::get('bootstrap');
+      $extension_handler = new ExtensionHandler($key_value, $cache, $bootstrap_cache, drupal_classloader());
+    }
+  }
+
+  return $extension_handler;
+}
+
+/**
+ * Returns and optionally sets the filename for a system resource.
+ *
+ * @see ExtensionHandler::getFilename().
+ */
+function drupal_get_filename($type, $name, $filename = NULL) {
+  return drupal_extension_handler()->getFilename($type, $name, $filename);
+}
+
+/**
+ * Includes a file with the provided type and name.
+ *
+ * @see ExtensionHandler::load().
+ */
+function drupal_load($type, $name) {
+  return drupal_extension_handler()->load($type, $name);
+}
+
+/**
+ * Returns a list of currently active modules.
+ *
+ * @see ExtensionHandler::moduleList().
+ */
+function module_list($type = 'module_enabled', array $fixed_list = NULL, $reset = FALSE) {
+  return drupal_extension_handler()->getEnabledModules($type, $fixed_list, $reset);
+}
+
+/**
+ * Loads all the modules that have been enabled in the system table.
+ *
+ * @see ExtensionHandler::loadAll().
+ */
+function module_load_all($bootstrap = FALSE, $reset = FALSE, $loaded = FALSE) {
+  return drupal_extension_handler()->loadAll($bootstrap, $reset, $loaded);
+}
+
+/**
+ * Determines which modules are implementing a hook.
+ *
+ * @see ExtensionHandler::moduleImplements().
+ */
+function module_implements($hook) {
+  return drupal_extension_handler()->moduleImplements($hook);
+}
+
+/**
+ * Invokes a hook in all enabled modules that implement it.
+ *
+ * @see ExtensionHandler::moduleInvokeAll().
+ */
+function module_invoke_all($hook) {
+  $args = func_get_args();
+  // Remove $hook from the arguments.
+  unset($args[0]);
+  return drupal_extension_handler()->moduleInvokeAll($hook, $args);
+}
+
+/**
+ * Passes alterable variables to specific hook_TYPE_alter() implementations.
+ *
+ * @see ExtensionHandler::alter().
+ */
+function drupal_alter($type, &$data, &$context1 = NULL, &$context2 = NULL) {
+  return drupal_extension_handler()->alter($type, $data, $context1, $context2);
+}
+
+/**
+ * Determines whether a given module exists.
+ *
+ * @see ExtensionHandler::moduleExists().
+ */
+function module_exists($module) {
+  return drupal_extension_handler()->moduleExists($module);
 }
 
 /**
@@ -2709,14 +2680,8 @@ function language($type, $reset = FALSE) {
   // When the language_manager service exists (is both defined and the 'request'
   // scope is active in the container), use it to get the language. Otherwise
   // return the default language.
-  try {
-    $language_manager = drupal_container()->get('language_manager', Container::NULL_ON_INVALID_REFERENCE);
-  }
-  catch (DependencyInjectionRuntimeException $e) {
-  }
-
-  if (isset($language_manager)) {
-    return $language_manager->getLanguage($type);
+  if (drupal_container()->isScopeActive('request')) {
+    return drupal_container()->get('language_manager')->getLanguage($type);
   }
   else {
     if (!isset($languages[$type])) {

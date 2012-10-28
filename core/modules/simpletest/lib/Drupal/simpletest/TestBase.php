@@ -1008,8 +1008,8 @@ abstract class TestBase {
     }
 
     // Reset module list and module load status.
-    module_list_reset();
-    module_load_all(FALSE, TRUE);
+    drupal_extension_handler()->moduleListReset();
+    module_load_all(FALSE, TRUE, TRUE);
 
     // Restore original shutdown callbacks.
     $callbacks = &drupal_register_shutdown_function();

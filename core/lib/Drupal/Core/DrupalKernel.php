@@ -7,14 +7,16 @@
 
 namespace Drupal\Core;
 
-use Drupal\Core\Cache\CacheBackendInterface;
-use Drupal\Core\CoreBundle;
 use Drupal\Component\PhpStorage\PhpStorageInterface;
-use Symfony\Component\HttpKernel\Kernel;
+use Drupal\Core\Cache\CacheFactory;
+use Drupal\Core\CoreBundle;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\ExtensionHandler;
+use Drupal\Core\KeyValueStore\KeyValueFactory;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
+use Symfony\Component\HttpKernel\Kernel;
 
 /**
  * The DrupalKernel class is the core of Drupal itself.
@@ -50,6 +52,23 @@ class DrupalKernel extends Kernel implements DrupalKernelInterface {
   protected $storage;
 
   /**
+   * @var \Drupal\Core\KeyValueStore\KeyValueFactory
+   */
+  protected $keyValue;
+
+  /**
+   * ExtensionHandler instance holding the list of enabled modules.
+   */
+  protected $extensionHandler;
+
+  /**
+   * Whether the container needs to be dumped to PHP.
+   *
+   * @var boolean
+   */
+  protected $containerNeedsDumping = FALSE;
+
+  /**
    * Constructs a DrupalKernel object.
    *
    * @param string $environment
@@ -62,24 +81,16 @@ class DrupalKernel extends Kernel implements DrupalKernelInterface {
    *   this value currently. Pass TRUE.
    * @param array $module_list
    *   (optional) The array of enabled modules as returned by module_list().
-   * @param Drupal\Core\Cache\CacheBackendInterface $compilation_index_cache
+   * @param String $compilation_index_cache_bin
    *   (optional) If wanting to dump a compiled container to disk or use a
-   *   previously compiled container, the cache object for the bin that stores
-   *   the class name of the compiled container.
+   *   previously compiled container, the cache bin that stores the class name
+   *   of the compiled container.
    */
-  public function __construct($environment, $debug, array $module_list = NULL, CacheBackendInterface $compilation_index_cache = NULL) {
+  public function __construct($environment, $debug, array $module_list = NULL, $compilation_index_cache_bin = NULL) {
     parent::__construct($environment, $debug);
-    $this->compilationIndexCache = $compilation_index_cache;
+    $this->moduleList = $module_list;
+    $this->compilationIndexCache = isset($compilation_index_cache_bin) ? CacheFactory::get($compilation_index_cache_bin) : NULL;
     $this->storage = drupal_php_storage('service_container');
-    if (isset($module_list)) {
-      $this->moduleList = $module_list;
-    }
-    else {
-      // @todo This is a temporary measure which will no longer be necessary
-      //   once we have an ExtensionHandler for managing this list. See
-      //   http://drupal.org/node/1331486.
-      $this->moduleList = module_list();
-    }
   }
 
   /**
@@ -93,14 +104,33 @@ class DrupalKernel extends Kernel implements DrupalKernelInterface {
   }
 
   /**
+   * Overrides Kernel::boot().
+   */
+  public function boot() {
+    // Instantiate an ExtensionHandler which the Kernel itself needs in order to
+    // find out which modules are enabled. In the buildContainer() method we
+    // register this and the database connection we pass to it as synthetic
+    // services to the container so that they do not need to be instantiated
+    // over again.
+    $this->keyValue = new KeyValueFactory();
+    $class_loader = drupal_classloader();
+    $this->extensionHandler = new ExtensionHandler($this->keyValue, CacheFactory::get('cache'), CacheFactory::get('bootstrap'), $class_loader);
+    parent::boot();
+    drupal_bootstrap(DRUPAL_BOOTSTRAP_CODE);
+    if ($this->containerNeedsDumping && !$this->dumpDrupalContainer($this->container, $this->getContainerBaseClass())) {
+      watchdog('DrupalKernel', 'Container cannot be written to disk');
+    }
+  }
+
+  /**
    * Returns an array of available bundles.
    */
   public function registerBundles() {
     $bundles = array(
       new CoreBundle(),
     );
-
-    foreach ($this->moduleList as $module) {
+    $modules = $this->moduleList ?: array_keys($this->extensionHandler->systemList('module_enabled'));
+    foreach ($modules as $module) {
       $camelized = ContainerBuilder::camelize($module);
       $class = "Drupal\\{$module}\\{$camelized}Bundle";
       if (class_exists($class)) {
@@ -152,20 +182,16 @@ class DrupalKernel extends Kernel implements DrupalKernelInterface {
     }
     if (!isset($this->container)) {
       $this->container = $this->buildContainer();
-      if ($this->compilationIndexCache && !$this->dumpDrupalContainer($this->container, $this->getContainerBaseClass())) {
-        // We want to log this as an error but we cannot call watchdog() until
-        // the container has been fully built and set in drupal_container().
-        $error = 'Container cannot be written to disk';
+      if ($this->compilationIndexCache) {
+        $this->containerNeedsDumping = TRUE;
       }
     }
 
     $this->container->set('kernel', $this);
-
+    // Add our ExtensionHandler and KeyValueFactory as synthetic services.
+    $this->container->set('extension_handler', $this->extensionHandler);
+    $this->container->set('keyvalue', $this->keyValue);
     drupal_container($this->container);
-
-    if (isset($error)) {
-      watchdog('DrupalKernel', $error);
-    }
   }
 
   /**
@@ -175,11 +201,6 @@ class DrupalKernel extends Kernel implements DrupalKernelInterface {
    */
   protected function buildContainer() {
     $container = $this->getContainerBuilder();
-
-    // Merge in the minimal bootstrap container.
-    if ($bootstrap_container = drupal_container()) {
-      $container->merge($bootstrap_container);
-    }
     foreach ($this->bundles as $bundle) {
       $bundle->build($container);
     }

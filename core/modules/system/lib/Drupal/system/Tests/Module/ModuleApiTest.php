@@ -51,7 +51,7 @@ class ModuleApiTest extends WebTestBase {
     // Try to mess with the module weights.
     module_set_weight('contact', 20);
     // Reset the module list.
-    system_list_reset();
+    drupal_extension_handler()->systemListReset();
     // Move contact to the end of the array.
     unset($module_list[array_search('contact', $module_list)]);
     $module_list[] = 'contact';
@@ -67,7 +67,7 @@ class ModuleApiTest extends WebTestBase {
     $this->assertModuleList($new_module_list, t('When using a fixed list'));
 
     // Reset the module list.
-    module_list_reset();
+    drupal_extension_handler()->moduleListReset();
     $this->assertModuleList($module_list, t('After reset'));
   }
 
@@ -106,9 +106,9 @@ class ModuleApiTest extends WebTestBase {
 
     module_load_include('inc', 'module_test', 'module_test.file');
     $modules = module_implements('test_hook');
-    $static = drupal_static('module_implements');
     $this->assertTrue(in_array('module_test', $modules), 'Hook found.');
-    $this->assertEqual($static['test_hook']['module_test'], 'file', 'Include file detected.');
+    $module_implementations = drupal_extension_handler()->cachedHookImplementations();
+    $this->assertEqual($module_implementations['test_hook']['module_test'], 'file', 'Include file detected.');
   }
 
   /**

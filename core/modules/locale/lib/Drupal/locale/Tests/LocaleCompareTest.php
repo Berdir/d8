@@ -124,7 +124,7 @@ EOF;
 
     // Reset static system list caches to reflect info changes.
     drupal_static_reset('locale_translation_project_list');
-    system_list_reset();
+    drupal_extension_handler()->systemListReset();
 
     // Check if interface translation data is collected from hook_info.
     $projects = locale_translation_project_list();

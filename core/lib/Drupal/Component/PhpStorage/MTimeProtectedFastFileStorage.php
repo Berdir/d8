@@ -144,6 +144,7 @@ class MTimeProtectedFastFileStorage extends FileStorage {
       mkdir($this->directory, 0700, TRUE);
     }
     chmod($this->directory, 0700);
+    require_once DRUPAL_ROOT . '/core/includes/file.inc';
     file_save_htaccess($this->directory);
   }
 

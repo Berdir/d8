@@ -7,6 +7,7 @@
 
 namespace Drupal\system\Tests\DrupalKernel;
 
+use Drupal\Core\Cache\CacheFactory;
 use Drupal\Core\Cache\MemoryBackend;
 use Drupal\Core\DrupalKernel;
 use Drupal\simpletest\UnitTestBase;
@@ -39,16 +40,16 @@ class DrupalKernelTest extends UnitTestBase {
       'class' => 'Drupal\Component\PhpStorage\MTimeProtectedFileStorage',
       'secret' => $GLOBALS['drupal_hash_salt'],
     );
-    $cache = new MemoryBackend('test');
+    $conf['cache_classes'] = array('test' => 'Drupal\Core\Cache\MemoryBackend');
     $module_enabled = array(
       'system' => 'system',
       'user' => 'user',
     );
-    $kernel = new DrupalKernel('testing', FALSE, $module_enabled, $cache);
+    $kernel = new DrupalKernel('testing', FALSE, $module_enabled, 'test');
     $kernel->boot();
     // Instantiate it a second time and we should get the compiled Container
     // class.
-    $kernel = new DrupalKernel('testing', FALSE, $module_enabled, $cache);
+    $kernel = new DrupalKernel('testing', FALSE, $module_enabled, 'test');
     $kernel->boot();
     $container = $kernel->getContainer();
     $refClass = new ReflectionClass($container);
@@ -66,7 +67,7 @@ class DrupalKernelTest extends UnitTestBase {
     $conf['php_storage']['service_container'] = array(
       'class' => 'Drupal\Component\PhpStorage\FileReadOnlyStorage',
     );
-    $kernel = new DrupalKernel('testing', FALSE, $module_enabled, $cache);
+    $kernel = new DrupalKernel('testing', FALSE, $module_enabled, 'test');
     $kernel->boot();
     $container = $kernel->getContainer();
     $refClass = new ReflectionClass($container);
@@ -91,12 +92,12 @@ class DrupalKernelTest extends UnitTestBase {
       'user' => 'user',
       'bundle_test' => 'bundle_test',
     );
-    $cache->flush();
-    $kernel = new DrupalKernel('testing', FALSE, $module_enabled, $cache);
+    CacheFactory::get('test')->flush();
+    $kernel = new DrupalKernel('testing', FALSE, $module_enabled, 'test');
     $kernel->boot();
     // Instantiate it a second time and we should still get a ContainerBuilder
     // class because we are using the read-only PHP storage.
-    $kernel = new DrupalKernel('testing', FALSE, $module_enabled, $cache);
+    $kernel = new DrupalKernel('testing', FALSE, $module_enabled, 'test');
     $kernel->boot();
     $container = $kernel->getContainer();
     $refClass = new ReflectionClass($container);

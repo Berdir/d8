@@ -425,9 +425,10 @@ function drupal_install_system() {
     ->save();
 
   // Clear out module list and hook implementation statics.
-  system_list_reset();
-  module_list_reset();
-  module_implements_reset();
+  $extension_handler = drupal_extension_handler();
+  $extension_handler->systemListReset();
+  $extension_handler->moduleListReset();
+  $extension_handler->moduleImplementsReset();
 
   config_install_default_config('module', 'system');
 

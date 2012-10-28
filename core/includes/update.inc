@@ -9,6 +9,7 @@
  */
 
 use Drupal\Component\Graph\Graph;
+use Drupal\Core\ExtensionHandler;
 use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Config\ConfigException;
 use Drupal\Component\Uuid\Uuid;
@@ -226,12 +227,15 @@ function update_prepare_d8_bootstrap() {
         ':schema_uninstalled' => SCHEMA_UNINSTALLED,
       ));
       $module_data = _system_rebuild_module_data();
+      $theme_data = _system_rebuild_theme_data();
+      $list = array();
 
       // Migrate each extension into configuration, varying by the extension's
       // status, and record its schema version.
       foreach ($result as $record) {
         if ($record->type == 'module') {
           if ($record->status && isset($module_data[$record->name])) {
+            $list[$record->name] = $module_data[$record->name]->filename;
             $module_config->set('enabled.' . $record->name, $record->weight);
           }
           else {
@@ -240,6 +244,7 @@ function update_prepare_d8_bootstrap() {
         }
         elseif ($record->type == 'theme') {
           if ($record->status) {
+            $list[$record->name] = $theme_data[$record->name]->filename;
             $theme_config->set('enabled.' . $record->name, 0);
           }
           else {
@@ -259,7 +264,7 @@ function update_prepare_d8_bootstrap() {
       // Update the environment for the language bootstrap if needed.
       update_prepare_d8_language();
       // Prime the classloader.
-      system_list('module_enabled');
+      drupal_extension_handler()->systemListWarm($list);
 
       // Change language column to langcode in url_alias.
       if (db_table_exists('url_alias') && db_field_exists('url_alias', 'language')) {
@@ -518,10 +523,7 @@ function update_module_enable(array $modules) {
     // updates since the module's inception are executed in a core upgrade.
     $schema_store->set($module, 0);
 
-    // system_list_reset() is in module.inc but that would only be available
-    // once the variable bootstrap is done.
-    require_once DRUPAL_ROOT . '/core/includes/module.inc';
-    system_list_reset();
+    drupal_extension_handler()->systemListReset();
     //  @todo: figure out what to do about hook_install() and hook_enable().
   }
 }

@@ -29,7 +29,7 @@ class ClassLoaderTest extends WebTestBase {
 
     module_enable(array('module_test', 'module_autoload_test'), FALSE);
     $this->resetAll();
-    // Check twice to test an unprimed and primed system_list() cache.
+    // Check twice to test an unprimed and primed drupal_extension_handler()->systemList() cache.
     for ($i=0; $i<2; $i++) {
       $this->drupalGet('module-test/class-loading');
       $this->assertText($expected, 'Autoloader loads classes from an enabled module.');
@@ -37,7 +37,7 @@ class ClassLoaderTest extends WebTestBase {
 
     module_disable(array('module_autoload_test'), FALSE);
     $this->resetAll();
-    // Check twice to test an unprimed and primed system_list() cache.
+    // Check twice to test an unprimed and primed drupal_extension_handler()->systemList() cache.
     for ($i=0; $i<2; $i++) {
       $this->drupalGet('module-test/class-loading');
       $this->assertNoText($expected, 'Autoloader does not load classes from a disabled module.');

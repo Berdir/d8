@@ -155,6 +155,11 @@ abstract class WebTestBase extends TestBase {
   protected $kernel;
 
   /**
+   * The original extension handler for the parent site.
+   */
+  protected $originalExtensionHandler;
+
+  /**
    * Constructor for Drupal\simpletest\WebTestBase.
    */
   function __construct($test_id = NULL) {
@@ -636,6 +641,10 @@ abstract class WebTestBase extends TestBase {
     // Backup the currently running Simpletest batch.
     $this->originalBatch = batch_get();
 
+    // Store the original ExtensionHandler object so that it can be restored at
+    // tearDown.
+    $this->originalExtensionHandler = drupal_extension_handler();
+
     // Create the database prefix for this test.
     $this->prepareDatabasePrefix();
 
@@ -796,21 +805,31 @@ abstract class WebTestBase extends TestBase {
    * and reset the database prefix.
    */
   protected function tearDown() {
+
     // Destroy the testing kernel.
     if (isset($this->kernel)) {
       $this->kernel->shutdown();
     }
     parent::tearDown();
 
-    // Ensure that internal logged in variable and cURL options are reset.
-    $this->loggedInUser = FALSE;
-    $this->additionalCurlOptions = array();
+    // Restore the original ExtensionHandler if there is one.
+    if (isset($this->originalExtensionHandler)) {
+      $extension_handler = $this->originalExtensionHandler;
+      drupal_container()->set('extension_handler', $extension_handler);
+    }
+    else {
+      $extension_handler = drupal_extension_handler();
+    }
 
     // Reload module list and implementations to ensure that test module hooks
     // aren't called after tests.
-    system_list_reset();
-    module_list_reset();
-    module_implements_reset();
+    $extension_handler->systemListReset();
+    $extension_handler->moduleListReset();
+    $extension_handler->moduleImplementsReset();
+
+    // Ensure that internal logged in variable and cURL options are reset.
+    $this->loggedInUser = FALSE;
+    $this->additionalCurlOptions = array();
 
     // Reset the Field API.
     field_cache_clear();

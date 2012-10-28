@@ -665,7 +665,7 @@ function list_themes($refresh = FALSE) {
 
   if ($refresh) {
     $list = array();
-    system_list_reset();
+    drupal_extension_handler()->systemListReset();
   }
 
   if (empty($list)) {
@@ -675,7 +675,7 @@ function list_themes($refresh = FALSE) {
     // Also check that the site is not in the middle of an install or update.
     if (!defined('MAINTENANCE_MODE')) {
       try {
-        $themes = system_list('theme');
+        $themes = drupal_extension_handler()->systemList('theme');
       }
       catch (Exception $e) {
         // If the database is not available, rebuild the theme data.

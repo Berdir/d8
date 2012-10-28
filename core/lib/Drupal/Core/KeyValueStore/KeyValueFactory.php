@@ -6,6 +6,7 @@
  */
 
 namespace Drupal\Core\KeyValueStore;
+use Drupal\Core\Database\Connection;
 
 /**
  * Defines the key/value store factory.
