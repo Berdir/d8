@@ -888,14 +888,14 @@ class EntityFieldQuery {
 
     $entity_type = $this->entityConditions['entity_type']['value'];
     $entity_info = entity_get_info($entity_type);
-    if (empty($entity_info['base table'])) {
+    if (empty($entity_info['base_table'])) {
       throw new EntityFieldQueryException(t('Entity %entity has no base table.', array('%entity' => $entity_type)));
     }
 
-    $base_table = $entity_info['base table'];
+    $base_table = $entity_info['base_table'];
     $select_query = db_select($base_table);
     $select_query->addExpression(':entity_type', 'entity_type', array(':entity_type' => $entity_type));
-    $sql_field = $entity_info['entity keys']['id'];
+    $sql_field = $entity_info['entity_keys']['id'];
 
     // If a data table is defined we need to join it and make sure that only one
     // record per entity is returned.
@@ -913,8 +913,8 @@ class EntityFieldQuery {
     }
 
     // If there is a revision key defined, use it.
-    if (!empty($entity_info['entity keys']['revision'])) {
-      $sql_field = $entity_info['entity keys']['revision'];
+    if (!empty($entity_info['entity_keys']['revision'])) {
+      $sql_field = $entity_info['entity_keys']['revision'];
       $select_query->addField($base_table, $sql_field, 'revision_id');
       if (isset($this->entityConditions['revision_id'])) {
         $this->addCondition($select_query, "$base_table.$sql_field", $this->entityConditions['revision_id']);
@@ -927,9 +927,9 @@ class EntityFieldQuery {
     $id_map['revision_id'] = $sql_field;
 
     // Handle bundles.
-    if (!empty($entity_info['entity keys']['bundle'])) {
+    if (!empty($entity_info['entity_keys']['bundle'])) {
       $base_table_schema = drupal_get_schema($base_table);
-      $sql_field = $entity_info['entity keys']['bundle'];
+      $sql_field = $entity_info['entity_keys']['bundle'];
       $having = FALSE;
       if (!empty($base_table_schema['fields'][$sql_field])) {
         $select_query->addField($base_table, $sql_field, 'bundle');
@@ -944,7 +944,7 @@ class EntityFieldQuery {
     $id_map['bundle'] = $sql_field;
 
     if (isset($this->entityConditions['bundle'])) {
-      if (!empty($entity_info['entity keys']['bundle'])) {
+      if (!empty($entity_info['entity_keys']['bundle'])) {
         $this->addCondition($select_query, "$base_table.$sql_field", $this->entityConditions['bundle'], $having);
       }
       else {
@@ -955,7 +955,7 @@ class EntityFieldQuery {
 
     foreach (array('uuid', 'langcode') as $key) {
       if (isset($this->entityConditions[$key])) {
-        $sql_field = !empty($entity_info['entity keys'][$key]) ? $entity_info['entity keys'][$key] : $key;
+        $sql_field = !empty($entity_info['entity_keys'][$key]) ? $entity_info['entity_keys'][$key] : $key;
         if (isset($base_table_schema[$sql_field])) {
           $this->addCondition($select_query, "$base_table.$sql_field", $this->entityConditions[$key]);
         }
@@ -1075,7 +1075,7 @@ class EntityFieldQuery {
    */
   public function addPropertyConditions(Select $select_query, $entity_type) {
     $entity_info = entity_get_info($entity_type);
-    $entity_base_table = $entity_info['base table'];
+    $entity_base_table = $entity_info['base_table'];
     list($data_table, $data_table_schema) = $this->getPropertyDataSchema($entity_type);
 
     foreach ($this->propertyConditions as $property_condition) {
@@ -1104,7 +1104,7 @@ class EntityFieldQuery {
     $entity_info = entity_get_info($entity_type);
     list($data_table, $data_table_schema) = $this->getPropertyDataSchema($entity_type);
     $specifier = $order['specifier'];
-    $table = !empty($data_table_schema['fields'][$specifier]) ? $data_table  . '_' . $order['langcode_group'] : $entity_info['base table'];
+    $table = !empty($data_table_schema['fields'][$specifier]) ? $data_table  . '_' . $order['langcode_group'] : $entity_info['base_table'];
     $select_query->orderBy("$table.$specifier", $order['direction']);
   }
 
@@ -1126,7 +1126,7 @@ class EntityFieldQuery {
     // If we have no data table there are no property meta conditions to handle.
     if (!empty($data_table)) {
       $entity_info = entity_get_info($entity_type);
-      $id_key = $entity_info['entity keys']['id'];
+      $id_key = $entity_info['entity_keys']['id'];
       $base_id_key = !empty($base_id_key) ? $base_id_key : $id_key;
 
       foreach ($this->properties as $key => $property) {
@@ -1154,8 +1154,8 @@ class EntityFieldQuery {
   protected function getPropertyDataSchema($entity_type) {
     $entity_info = entity_get_info($entity_type);
 
-    if (!empty($entity_info['data table'])) {
-      $data_table = $entity_info['data table'];
+    if (!empty($entity_info['data_table'])) {
+      $data_table = $entity_info['data_table'];
       $data_table_schema = drupal_get_schema($data_table);
     }
     else {

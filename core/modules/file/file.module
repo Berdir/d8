@@ -6,7 +6,7 @@
  */
 
 use Drupal\Core\Entity\EntityFieldQuery;
-use Drupal\file\File;
+use Drupal\file\Plugin\Core\Entity\File;
 use Drupal\Core\Template\Attribute;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Drupal\file\FileUsage\DatabaseFileUsageBackend;
@@ -88,30 +88,15 @@ function file_element_info() {
 }
 
 /**
- * Implements hook_entity_info().
+ * Implements hook_entity_info_alter().
  */
-function file_entity_info() {
-  return array(
-    'file' => array(
-      'label' => t('File'),
-      'base table' => 'file_managed',
-      'controller class' => 'Drupal\file\FileStorageController',
-      'entity class' => 'Drupal\file\File',
-      'entity keys' => array(
-        'id' => 'fid',
-        'label' => 'filename',
-        'uuid' => 'uuid',
-      ),
-      'view modes' => array(
-        'full' => array(
-          'label' => t('File default'),
-          'custom settings' => FALSE,
-        ),
-      ),
-      'static cache' => FALSE,
-    ),
+function file_entity_info_alter(&$info) {
+  $info['file']['view_modes']['full'] = array(
+    'label' => t('File default'),
+    'custom settings' => FALSE,
   );
 }
+
 /**
  * Loads file entities from the database.
  *

@@ -5,7 +5,7 @@
  * Provides Config module hook implementations for testing purposes.
  */
 
-use Drupal\config_test\ConfigTest;
+use Drupal\config_test\Plugin\Core\Entity\ConfigTest;
 
 require_once dirname(__FILE__) . '/config_test.hooks.inc';
 
@@ -37,7 +37,7 @@ function config_test_config_import_change($name, $new_config, $old_config) {
   // @todo Make this less ugly.
   list($entity_type) = explode('.', $name);
   $entity_info = entity_get_info($entity_type);
-  $id = substr($name, strlen($entity_info['config prefix']) + 1);
+  $id = substr($name, strlen($entity_info['config_prefix']) + 1);
   $config_test = entity_load('config_test', $id);
 
   // Store the original config, and iterate through each property to store it.
@@ -69,35 +69,15 @@ function config_test_config_import_delete($name, $new_config, $old_config) {
   // @todo Make this less ugly.
   list($entity_type) = explode('.', $name);
   $entity_info = entity_get_info($entity_type);
-  $id = substr($name, strlen($entity_info['config prefix']) + 1);
+  $id = substr($name, strlen($entity_info['config_prefix']) + 1);
   config_test_delete($id);
   return TRUE;
 }
 
 /**
- * Implements hook_entity_info().
- */
-function config_test_entity_info() {
-  $types['config_test'] = array(
-    'label' => 'Test configuration',
-    'controller class' => 'Drupal\Core\Config\Entity\ConfigStorageController',
-    'entity class' => 'Drupal\config_test\ConfigTest',
-    'list controller class' => 'Drupal\Core\Config\Entity\ConfigEntityListController',
-    'uri callback' => 'config_test_uri',
-    'config prefix' => 'config_test.dynamic',
-    'entity keys' => array(
-      'id' => 'id',
-      'label' => 'label',
-      'uuid' => 'uuid',
-    ),
-  );
-  return $types;
-}
-
-/**
  * Entity URI callback.
  *
- * @param Drupal\config_test\ConfigTest $config_test
+ * @param Drupal\config_test\Plugin\Core\Entity\ConfigTest $config_test
  *   A ConfigTest entity.
  */
 function config_test_uri(ConfigTest $config_test) {
@@ -156,7 +136,7 @@ function config_test_load($id) {
 /**
  * Saves a ConfigTest object.
  *
- * @param Drupal\config_test\ConfigTest $config_test
+ * @param Drupal\config_test\Plugin\Core\Entity\ConfigTest $config_test
  *   The ConfigTest object to save.
  */
 function config_test_save(ConfigTest $config_test) {
@@ -184,7 +164,7 @@ function config_test_list_page() {
 /**
  * Form constructor to add or edit a ConfigTest object.
  *
- * @param Drupal\config_test\ConfigTest $config_test
+ * @param Drupal\config_test\Plugin\Core\Entity\ConfigTest $config_test
  *   (optional) An existing ConfigTest object to edit. If omitted, the form
  *   creates a new ConfigTest.
  */
@@ -258,7 +238,7 @@ function config_test_form_submit($form, &$form_state) {
 /**
  * Form constructor to delete a ConfigTest object.
  *
- * @param Drupal\config_test\ConfigTest $config_test
+ * @param Drupal\config_test\Plugin\Core\Entity\ConfigTest $config_test
  *   The ConfigTest object to delete.
  */
 function config_test_delete_form($form, &$form_state, ConfigTest $config_test) {

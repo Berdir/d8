@@ -2,16 +2,40 @@
 
 /**
  * @file
- * Definition of Drupal\node\Node.
+ * Definition of Drupal\node\Plugin\Core\Entity\Node.
  */
 
-namespace Drupal\node;
+namespace Drupal\node\Plugin\Core\Entity;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\Entity;
+use Drupal\Core\Annotation\Plugin;
+use Drupal\Core\Annotation\Translation;
 
 /**
  * Defines the node entity class.
+ *
+ * @Plugin(
+ *   id = "node",
+ *   label = @Translation("Node"),
+ *   module = "node",
+ *   controller_class = "Drupal\node\NodeStorageController",
+ *   render_controller_class = "Drupal\node\NodeRenderController",
+ *   form_controller_class = {
+ *     "default" = "Drupal\node\NodeFormController"
+ *   },
+ *   base_table = "node",
+ *   revision_table = "node_revision",
+ *   uri_callback = "node_uri",
+ *   fieldable = TRUE,
+ *   entity_keys = {
+ *     "id" = "nid",
+ *     "revision" = "vid",
+ *     "bundle" = "type",
+ *     "label" = "title",
+ *     "uuid" = "uuid"
+ *   }
+ * )
  */
 class Node extends Entity implements ContentEntityInterface {
 

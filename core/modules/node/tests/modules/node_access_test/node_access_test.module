@@ -9,7 +9,7 @@
 
 use Drupal\Core\Entity\EntityFieldQuery;
 
-use Drupal\node\Node;
+use Drupal\node\Plugin\Core\Entity\Node;
 
 /**
  * Implements hook_node_grants().

@@ -2,16 +2,32 @@
 
 /**
  * @file
- * Definition of Drupal\file\File.
+ * Definition of Drupal\file\Plugin\Core\Entity\File.
  */
 
-namespace Drupal\file;
+namespace Drupal\file\Plugin\Core\Entity;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\Entity;
+use Drupal\Core\Annotation\Plugin;
+use Drupal\Core\Annotation\Translation;
 
 /**
  * Defines the file entity class.
+ *
+ * @Plugin(
+ *   id = "file",
+ *   label = @Translation("File"),
+ *   module = "file",
+ *   controller_class = "Drupal\file\FileStorageController",
+ *   base_table = "file_managed",
+ *   static_cache = FALSE,
+ *   entity_keys = {
+ *     "id" = "fid",
+ *     "label" = "filename",
+ *     "uuid" = "uuid"
+ *   }
+ * )
  */
 class File extends Entity implements ContentEntityInterface {
 

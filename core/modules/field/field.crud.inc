@@ -91,7 +91,7 @@ function field_create_field($field) {
   // collisions with existing entity properties, but some is better
   // than none.
   foreach (entity_get_info() as $type => $info) {
-    if (in_array($field['field_name'], $info['entity keys'])) {
+    if (in_array($field['field_name'], $info['entity_keys'])) {
       throw new FieldException(t('Attempt to create field name %name which is reserved by entity type %type.', array('%name' => $field['field_name'], '%type' => $type)));
     }
   }

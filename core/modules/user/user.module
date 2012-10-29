@@ -2,7 +2,7 @@
 
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\file\File;
+use Drupal\file\Plugin\Core\Entity\File;
 use Drupal\Core\Template\Attribute;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -139,43 +139,19 @@ function user_theme() {
 }
 
 /**
- * Implements hook_entity_info().
+ * Implements hook_entity_info_alter().
  */
-function user_entity_info() {
-  return array(
-    'user' => array(
-      'label' => t('User'),
-      'controller class' => 'Drupal\user\UserStorageController',
-      'form controller class' => array(
-        'profile' => 'Drupal\user\ProfileFormController',
-        'register' => 'Drupal\user\RegisterFormController',
-      ),
-      'base table' => 'users',
-      'uri callback' => 'user_uri',
-      'label callback' => 'user_label',
-      'fieldable' => TRUE,
-      'entity class' => 'Drupal\user\User',
-      'entity keys' => array(
-        'id' => 'uid',
-        'uuid' => 'uuid',
-      ),
-      'bundles' => array(
-        'user' => array(
-          'label' => t('User'),
-          'admin' => array(
-            'path' => 'admin/config/people/accounts',
-            'access arguments' => array('administer users'),
-          ),
-        ),
-      ),
-      'render controller class' => 'Drupal\user\UserRenderController',
-      'view modes' => array(
-        'full' => array(
-          'label' => t('User account'),
-          'custom settings' => FALSE,
-        ),
-      ),
+function user_entity_info_alter(&$info) {
+  $info['user']['bundles']['user'] = array(
+    'label' => t('User'),
+    'admin' => array(
+      'path' => 'admin/config/people/accounts',
+      'access arguments' => array('administer users'),
     ),
+  );
+  $info['user']['view_modes']['full'] = array(
+    'label' => t('User account'),
+    'custom settings' => FALSE,
   );
 }
 
