@@ -1169,17 +1169,17 @@ function template_preprocess_node(&$variables) {
   $variables['label']     = check_plain($node->label());
   $variables['page']      = $variables['view_mode'] == 'full' && node_is_page($node);
 
-  // Helpful $content variable for templates.
-  $variables += array('content' => array());
-  foreach (element_children($variables['elements']) as $key) {
-    $variables['content'][$key] = $variables['elements'][$key];
-  }
-
   // Make useful flags and node data available.
   // @todo: Check if all are required.
   $properties = array('type', 'comment_count', 'uid', 'created', 'promote', 'sticky', 'status', 'comment', 'readmore');
   foreach ($properties as $property) {
     $variables[$property] = $node->$property;
+  }
+
+  // Helpful $content variable for templates.
+  $variables += array('content' => array());
+  foreach (element_children($variables['elements']) as $key) {
+    $variables['content'][$key] = $variables['elements'][$key];
   }
 
   // Make the field variables available with the appropriate language.
