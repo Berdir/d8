@@ -42,10 +42,10 @@
  *
  * Other variables:
  * - $node: Full node entity. Contains data that may not be safe.
- * - $node->type: Node type; for example, page, article, etc.
- * - $node->comment_count: Number of comments attached to the node.
- * - $node->uid: User ID of the node author.
- * - $node->created: Time the node was published formatted in Unix timestamp.
+ * - $type: Node type; for example, page, article, etc.
+ * - $comment_count: Number of comments attached to the node.
+ * - $uid: User ID of the node author.
+ * - $created: Time the node was published formatted in Unix timestamp.
  * - $zebra: Outputs either "even" or "odd". Useful for zebra striping in
  *   teaser listings.
  * - $id: Position of the node. Increments each time it's output.
@@ -54,22 +54,22 @@
  * - $view_mode: View mode; for example, "teaser" or "full".
  * - $teaser: Flag for the teaser state (shortcut for $view_mode == 'teaser').
  * - $page: Flag for the full page state.
- * - $node->promote: Flag for front page promotion state.
- * - $node->sticky: Flags for sticky post setting.
- * - $node->status: Flag for published status.
- * - $node->comment: State of comment settings for the node.
- * - $node->readmore: Flags true if the teaser content of the node cannot hold the
+ * - $promote: Flag for front page promotion state.
+ * - $sticky: Flags for sticky post setting.
+ * - $status: Flag for published status.
+ * - $comment: State of comment settings for the node.
+ * - $readmore: Flags true if the teaser content of the node cannot hold the
  *   main body content.
  * - $is_front: Flags true when presented in the front page.
  * - $logged_in: Flags true when the current user is a logged-in member.
  * - $is_admin: Flags true when the current user is an administrator.
  *
- * Field variables: for each field instance attached to the node a corresponding
- * variable is defined; for example, $node->body becomes $body. When needing to
- * access a field's raw values, developers/themers are strongly encouraged to
- * use these variables. Otherwise they will have to explicitly specify the
- * desired field language; for example, $node->body['en'], thus overriding any
- * language negotiation rule that was previously applied.
+ * Field variables: For each field instance attached to the node a
+ * corresponding variable is defined; for example, $node->body becomes $body.
+ * When needing to access a field's raw values, developers/themers are strongly
+ * encouraged to use these variables. Otherwise they will have to explicitly
+ * specify the desired field language; for example, $node->body['en'], thus
+ * overriding any language negotiation rule that was previously applied.
  *
  * @see template_preprocess()
  * @see template_preprocess_node()
