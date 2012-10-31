@@ -2234,7 +2234,7 @@ function system_update_8036() {
 /**
  * Enables file.module.
  */
-function system_update_8031() {
+function system_update_8033() {
   // The {file_managed} table has been moved to file.module, so it needs to be
   // enabled as manually trying to enable it would fail with a "{file_managed}
   // exists already" error.

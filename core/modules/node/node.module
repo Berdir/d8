@@ -1034,17 +1034,6 @@ function node_revision_delete($revision_id) {
 }
 
 /**
- * Implements hook_entity_prepare_view().
- *
- * Load user account objects into node entities.
- */
-function node_entity_prepare_view($entities, $type) {
-  if ($type == 'node') {
-    user_attach_accounts($entities);
-  }
-}
-
-/**
  * Page callback: Generates an array which displays a node detail page.
  *
  * @param Drupal\node\Node $node
