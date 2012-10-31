@@ -166,9 +166,9 @@ class UserStorageController extends DatabaseStorageController {
       // If the password has been changed, delete all open sessions for the
       // user and recreate the current one.
       if ($entity->pass != $entity->original->pass) {
-        drupal_session_destroy_uid($entity->uid);
+        // FIXME: Destroy session by uid here
         if ($entity->uid == $GLOBALS['user']->uid) {
-          drupal_session_regenerate();
+          drupal_container()->get('session')->migrate();
         }
       }
 
@@ -195,7 +195,7 @@ class UserStorageController extends DatabaseStorageController {
 
       // If the user was blocked, delete the user's sessions to force a logout.
       if ($entity->original->status != $entity->status && $entity->status == 0) {
-        drupal_session_destroy_uid($entity->uid);
+        // FIXME: Session destroy by uid here.
       }
 
       // Send emails after we have the new user object.

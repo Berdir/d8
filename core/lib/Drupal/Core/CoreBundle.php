@@ -68,6 +68,22 @@ class CoreBundle extends Bundle
     $container->register('entity.query', 'Drupal\Core\Entity\Query\QueryFactory')
       ->addArgument(new Reference('service_container'));
 
+    /*
+     * @todo This needs to be uncommened as soon as the bootstrap container is
+     * tackled out and real container inits before the session.
+     *
+    // Register the session service.
+    $container->register('session.storage.backend', 'Drupal\Core\Session\Handler\DatabaseSessionHandler');
+    $container->register('session.storage.proxy', 'Drupal\Core\Session\Proxy\CookieOverrideProxy')
+      ->addArgument(new Reference('session.storage.backend'));
+    $container->setParameter('session.storage.options', array());
+    $container->register('session.storage', 'Drupal\Core\Session\Storage\DrupalSessionStorage')
+      ->addArgument('%session.storage.options%')
+      ->addArgument(new Reference('session.storage.proxy'));
+    $container->register('session', 'Drupal\Core\Session\Session')
+      ->addArgument(new Reference('session.storage'));
+     */
+
     $container->register('router.dumper', 'Drupal\Core\Routing\MatcherDumper')
       ->addArgument(new Reference('database'));
     $container->register('router.builder', 'Drupal\Core\Routing\RouteBuilder')

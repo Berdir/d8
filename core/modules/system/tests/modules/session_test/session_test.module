@@ -68,7 +68,7 @@ function session_test_menu() {
  * Implements hook_boot().
  */
 function session_test_boot() {
-  header('X-Session-Empty: ' . intval(empty($_SESSION)));
+  header('X-Session-Empty: ' . intval(drupal_container()->get('session')->isEmpty()));
 }
 
 /**
@@ -96,7 +96,7 @@ function _session_test_set($value) {
  * anyway.
  */
 function _session_test_no_set($value) {
-  drupal_save_session(FALSE);
+  drupal_container()->get('session')->disableSave();
   _session_test_set($value);
   return t('session saving was disabled, and then %val was set', array('%val' => $value));
 }
@@ -133,10 +133,10 @@ function _session_test_set_message() {
 }
 
 /**
- * Menu callback, sets a message but call drupal_save_session(FALSE).
+ * Menu callback, sets a message but disable the session save.
  */
 function _session_test_set_message_but_dont_save() {
-  drupal_save_session(FALSE);
+  drupal_container()->get('session')->disableSave();
   _session_test_set_message();
 }
 

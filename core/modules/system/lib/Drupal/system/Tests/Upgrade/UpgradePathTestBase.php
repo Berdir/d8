@@ -49,9 +49,10 @@ abstract class UpgradePathTestBase extends WebTestBase {
     curl_setopt($this->curlHandle, CURLOPT_COOKIE, rawurlencode(session_name()) . '=' . rawurlencode($sid));
 
     // Force our way into the session of the child site.
-    drupal_save_session(TRUE);
-    _drupal_session_write($sid, '');
-    drupal_save_session(FALSE);
+    //
+    $session = drupal_container()->get('session');
+    $session->start();
+    $session->disableSave();
   }
 
   /**
@@ -84,7 +85,7 @@ abstract class UpgradePathTestBase extends WebTestBase {
     $this->upgradeErrors = array();
 
     // Create the database prefix for this test.
-    $this->prepareDatabasePrefix();
+    //$this->prepareDatabasePrefix();
 
     // Prepare the environment for running tests.
     $this->prepareEnvironment();
@@ -123,7 +124,19 @@ abstract class UpgradePathTestBase extends WebTestBase {
 
     // Ensure that the session is not written to the new environment and replace
     // the global $user session with uid 1 from the new test site.
-    drupal_save_session(FALSE);
+
+
+
+
+
+
+
+
+
+    $session = drupal_container()->get('session');
+    //$this->verbose(var_dump($session));
+    $session->disableSave();
+
     // Login as uid 1.
     $user = db_query('SELECT * FROM {users} WHERE uid = :uid', array(':uid' => 1))->fetchObject();
 

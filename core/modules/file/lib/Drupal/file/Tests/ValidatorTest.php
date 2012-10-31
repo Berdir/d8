@@ -131,7 +131,7 @@ class ValidatorTest extends FileManagedTestBase {
   function testFileValidateSize() {
     global $user;
     $original_user = $user;
-    drupal_save_session(FALSE);
+    drupal_container()->get('session')->disableSave();
 
     // Run these tests as a regular user.
     $user = $this->drupalCreateUser();
@@ -148,6 +148,6 @@ class ValidatorTest extends FileManagedTestBase {
     $this->assertEqual(count($errors), 2, t('Errors for both the file and their limit.'), 'File');
 
     $user = $original_user;
-    drupal_save_session(TRUE);
+    drupal_container()->get('session')->enableSave();
   }
 }

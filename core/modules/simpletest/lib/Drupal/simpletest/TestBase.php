@@ -825,9 +825,6 @@ abstract class TestBase {
     $this->originalProfile = drupal_get_profile();
     $this->originalUser = clone $user;
 
-    // Ensure that the current session is not changed by the new environment.
-    drupal_save_session(FALSE);
-
     // Save and clean the shutdown callbacks array because it is static cached
     // and will be changed by the test run. Otherwise it will contain callbacks
     // from both environments and the testing environment will try to call the
@@ -872,6 +869,9 @@ abstract class TestBase {
 
     // Reset and create a new service container.
     $this->container = drupal_container(NULL, TRUE);
+
+    // Ensure that the current session is not changed by the new environment.
+    $this->container->get('session')->disableSave();
 
     // Unset globals.
     unset($GLOBALS['theme_key']);
@@ -1018,7 +1018,7 @@ abstract class TestBase {
 
     // Restore original user session.
     $user = $this->originalUser;
-    drupal_save_session(TRUE);
+    $this->container->get('session')->enableSave();
   }
 
   /**
