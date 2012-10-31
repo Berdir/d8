@@ -952,17 +952,6 @@ function comment_view(Comment $comment, $view_mode = 'full', $langcode = NULL) {
 }
 
 /**
- * Implements hook_entity_prepare_view().
- *
- * Load user account objects into comment entities.
- */
-function comment_entity_prepare_view($entities, $type) {
-  if ($type == 'comment') {
-    user_attach_accounts($entities);
-  }
-}
-
-/**
  * Adds reply, edit, delete, etc. links, depending on user permissions.
  *
  * @param Drupal\comment\Comment $comment
