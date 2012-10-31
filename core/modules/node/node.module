@@ -1175,6 +1175,13 @@ function template_preprocess_node(&$variables) {
     $variables['content'][$key] = $variables['elements'][$key];
   }
 
+  // Make useful flags and node data available.
+  // @todo: Check if all are required.
+  $properties = array('type', 'comment_count', 'uid', 'created', 'promote', 'sticky', 'status', 'comment', 'readmore');
+  foreach ($properties as $property) {
+    $variables[$property] = $node->$property;
+  }
+
   // Make the field variables available with the appropriate language.
   field_attach_preprocess('node', $node, $variables['content'], $variables);
 
