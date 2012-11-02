@@ -38,7 +38,6 @@ class JoinTest extends PluginTestBase {
     drupal_classloader_register('views', dirname(drupal_get_filename('module', 'views')));
     drupal_classloader_register('views_test_data', dirname(drupal_get_filename('module', 'views_test_data')));
 
-
     // Add a join plugin manager which can be used in all of the tests.
     $this->manager = drupal_container()->get('plugin.manager.views.join');
   }
