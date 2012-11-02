@@ -26,6 +26,9 @@ abstract class PluginTestBase extends UnitTestBase {
   public function setUp() {
     parent::setUp();
 
+    // Make sure that the plugin_test.module namespace is registered.
+    drupal_classloader_register('plugin_test', dirname(drupal_get_filename('module', 'plugin_test')));
+
     // Real modules implementing plugin types may expose a module-specific API
     // for retrieving each type's plugin manager, or make them available in
     // Drupal's dependency injection container, but for unit testing, we get

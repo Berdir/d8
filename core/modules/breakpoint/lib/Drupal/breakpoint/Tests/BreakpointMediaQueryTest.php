@@ -23,6 +23,13 @@ class BreakpointMediaQueryTest extends UnitTestBase {
     );
   }
 
+  public function setUp() {
+    parent::setUp();
+
+    // Make sure that the plugin_test.module namespace is registered.
+    drupal_classloader_register('breakpoint', dirname(drupal_get_filename('module', 'breakpoint')));
+  }
+
   /**
    * Test valid media queries.
    */

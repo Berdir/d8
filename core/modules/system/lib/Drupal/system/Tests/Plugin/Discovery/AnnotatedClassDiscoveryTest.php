@@ -24,6 +24,10 @@ class AnnotatedClassDiscoveryTest extends DiscoveryTestBase {
 
   public function setUp() {
     parent::setUp();
+
+    // Make sure that the plugin_test.module namespace is registered.
+    drupal_classloader_register('plugin_test', dirname(drupal_get_filename('module', 'plugin_test')));
+
     $this->expectedDefinitions = array(
       'apple' => array(
         'id' => 'apple',

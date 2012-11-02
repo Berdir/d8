@@ -14,13 +14,6 @@ use Drupal\simpletest\DrupalUnitTestBase;
  */
 class ConfigOverrideTest extends DrupalUnitTestBase {
 
-  /**
-   * Modules to enable.
-   *
-   * @var array
-   */
-  public static $modules = array('config_test');
-
   public static function getInfo() {
     return array(
       'name' => 'Configuration overrides',
@@ -31,6 +24,8 @@ class ConfigOverrideTest extends DrupalUnitTestBase {
 
   function setUp() {
     parent::setUp();
+
+    $this->enableModules(array('config_test'));
 
     config_install_default_config('module', 'config_test');
   }

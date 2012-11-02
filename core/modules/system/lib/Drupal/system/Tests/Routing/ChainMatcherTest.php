@@ -22,13 +22,19 @@ use Exception;
  * Basic tests for the ChainMatcher.
  */
 class ChainMatcherTest extends UnitTestBase {
-  
+
   public static function getInfo() {
     return array(
       'name' => 'Chain matcher tests',
       'description' => 'Confirm that the chain matcher is working correctly.',
       'group' => 'Routing',
     );
+  }
+
+  public function setUp() {
+    parent::setUp();
+    // Make sure the system.module classes can be found.
+    drupal_classloader_register('system', dirname(drupal_get_filename('module', 'system')));
   }
 
   /**

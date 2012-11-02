@@ -29,6 +29,10 @@ class DrupalKernelTest extends UnitTestBase {
    * Tests DIC compilation.
    */
   function testCompileDIC() {
+
+    // Make sure that the bundle_test.module namespace is registered.
+    drupal_classloader_register('bundle_test', dirname(drupal_get_filename('module', 'bundle_test')));
+
     // Because we'll be instantiating a new kernel during this test, the
     // container stored in drupal_container() will be updated as a side effect.
     // We need to be able to restore it to the correct one at the end of this

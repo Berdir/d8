@@ -64,6 +64,8 @@ class TempStoreDatabaseTest extends UnitTestBase {
     $schema = system_schema();
     db_create_table('semaphore', $schema['semaphore']);
     db_create_table('key_value_expire', $schema['key_value_expire']);
+    // Register the namespace of user.module.
+    drupal_classloader_register('user', dirname(drupal_get_filename('module', 'user')));
 
     // Create several objects for testing.
     for ($i = 0; $i <= 3; $i++) {

@@ -249,9 +249,7 @@ class EntityManager extends PluginManagerBase {
       return $cache->data;
     }
     else {
-      // @todo Remove array_filter() once http://drupal.org/node/1780396 is
-      //   resolved.
-      $definitions = array_filter(parent::getDefinitions());
+      $definitions = parent::getDefinitions();
       cache($this->cacheBin)->set($this->cacheKey, $definitions, $this->cacheExpire, $this->cacheTags);
       return $definitions;
     }
@@ -262,12 +260,6 @@ class EntityManager extends PluginManagerBase {
    */
   protected function processDefinition(&$definition, $plugin_id) {
     parent::processDefinition($definition, $plugin_id);
-
-    // @todo Remove this check once http://drupal.org/node/1780396 is resolved.
-    if (!module_exists($definition['module'])) {
-      $definition = NULL;
-      return;
-    }
 
     foreach ($definition['view_modes'] as $view_mode => $view_mode_info) {
       $definition['view_modes'][$view_mode] += array(

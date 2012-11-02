@@ -814,6 +814,7 @@ abstract class TestBase {
     $this->originalConf = $conf;
 
     // Backup statics and globals.
+    $this->originalClassLoader = clone drupal_classloader();
     $this->originalContainer = clone drupal_container();
     $this->originalLanguage = $language_interface;
     $this->originalConfigDirectories = $GLOBALS['config_directories'];
@@ -850,6 +851,13 @@ abstract class TestBase {
     file_prepare_directory($this->temp_files_directory, FILE_CREATE_DIRECTORY);
     file_prepare_directory($this->translation_files_directory, FILE_CREATE_DIRECTORY);
     $this->generatedTestFiles = FALSE;
+
+    // Unregister the classloader and register a freshly built one to ensure
+    // that registered namespaces of the test runner do not leak into the test.
+    // @todo Replace with ::unregister() when using ClassLoader.
+    // @see http://drupal.org/node/1658720
+    spl_autoload_unregister(array(drupal_classloader(), 'loadClass'));
+    drupal_classloader(NULL, TRUE);
 
     // Create and set new configuration directories. The child site
     // uses drupal_valid_test_ua() to adjust the config directory paths to
@@ -1002,6 +1010,8 @@ abstract class TestBase {
     $conf = $this->originalConf;
 
     // Restore original statics and globals.
+    drupal_classloader($this->originalClassLoader);
+    $this->originalClassLoader->register();
     drupal_container($this->originalContainer);
     $GLOBALS['config_directories'] = $this->originalConfigDirectories;
     if (isset($this->originalPrefix)) {

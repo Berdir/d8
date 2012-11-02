@@ -72,6 +72,9 @@ class CommentFieldsTest extends CommentTestBase {
     $edit = array();
     $edit['modules[Core][comment][enable]'] = FALSE;
     $this->drupalPost('admin/modules', $edit, t('Save configuration'));
+    // @todo: A new classloader needs to be built because comment is still in
+    //   there. Should this be moved to resetAll()?
+    drupal_classloader(NULL, TRUE);
     $this->resetAll();
     $this->assertFalse(module_exists('comment'), 'Comment module disabled.');
 

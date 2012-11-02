@@ -48,6 +48,9 @@ class PluginTypeListTest extends UnitTestBase {
       'wizard',
     );
 
+    // Make sure the views.module classes can be found.
+    drupal_classloader_register('views', dirname(drupal_get_filename('module', 'views')));
+
     $diff = array_diff($plugin_list, ViewExecutable::getPluginTypes());
     $this->assertTrue(empty($diff), 'The plugin list is correct');
   }

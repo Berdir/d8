@@ -33,6 +33,9 @@ class ControllerResolverTest extends UnitTestBase {
     $container = new Container();
     $resolver = new ControllerResolver($container);
 
+    // Make sure the system.module classes can be found.
+    drupal_classloader_register('system', dirname(drupal_get_filename('module', 'system')));
+
     $request = Request::create('/some/path');
     $request->attributes->set('_controller', '\Drupal\system\Tests\Routing\MockController::run');
 

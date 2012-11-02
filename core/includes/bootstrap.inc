@@ -3112,15 +3112,29 @@ function ip_address() {
  * are DRUPAL_ROOT and variable_get(). Otherwise it may be called as early as
  * possible.
  *
+ * @param $new_loader
+ *   (optional) Internal use only. A new class loader instance to replace the
+ *   current.
+ * @param bool $rebuild
+ *   (optional) Internal use only. Whether to reset the statically cached class
+ *   loader. Used by the testing framework to prevent the class loader from the
+ *   parent site (test runner) leaking into tests.
+ *
  * @return Symfony\Component\ClassLoader\UniversalClassLoader
  *   A UniversalClassLoader class instance (or extension thereof).
  */
-function drupal_classloader() {
+function drupal_classloader($new_loader = NULL, $rebuild = FALSE) {
   // By default, use the UniversalClassLoader which is best for development,
   // as it does not break when code is moved on the file system. However, as it
   // is slow, allow to use the APC class loader in production.
   static $loader;
 
+  if ($rebuild) {
+    $loader = NULL;
+  }
+  if (isset($new_loader)) {
+    $loader = $new_loader;
+  }
   if (!isset($loader)) {
     // Include the Symfony ClassLoader for loading PSR-0-compatible classes.
     require_once DRUPAL_ROOT . '/core/vendor/symfony/class-loader/Symfony/Component/ClassLoader/UniversalClassLoader.php';

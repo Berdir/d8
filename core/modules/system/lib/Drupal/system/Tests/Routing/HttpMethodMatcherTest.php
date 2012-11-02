@@ -39,12 +39,15 @@ class HttpMethodMatcherTest extends UnitTestBase {
     );
   }
 
-  function __construct($test_id = NULL) {
-    parent::__construct($test_id);
+  function setUp() {
+    parent::setUp();
+
+    // Make sure the system.module classes can be found.
+    drupal_classloader_register('system', dirname(drupal_get_filename('module', 'system')));
 
     $this->fixtures = new RoutingFixtures();
   }
-  
+
   /**
    * Confirms that the HttpMethod matcher matches properly.
    */

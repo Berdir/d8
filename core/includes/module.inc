@@ -519,6 +519,8 @@ function module_enable($module_list, $enable_dependencies = TRUE) {
 
       // Clear the entity info cache before importing new configuration.
       entity_info_cache_clear();
+      // Register the PSR-0 namespace of the enabled module.
+      drupal_classloader_register($module, dirname(drupal_get_filename('module', $module)));
 
       // Now install the module if necessary.
       if (drupal_get_installed_schema_version($module, TRUE) == SCHEMA_UNINSTALLED) {
@@ -640,6 +642,9 @@ function module_disable($module_list, $disable_dependents = TRUE) {
     // so we can still call module hooks to get information.
     module_invoke_all('modules_disabled', $invoke_modules);
     _system_update_bootstrap_status();
+    // Reset the classloader, the call to module_list() will re-initialize it
+    // with all still enabled modules.
+    drupal_classloader(NULL, TRUE);
     // Update the kernel to exclude the disabled modules.
     drupal_container()->get('kernel')->updateModules(module_list());
     // Update the theme registry to remove the newly-disabled module.
