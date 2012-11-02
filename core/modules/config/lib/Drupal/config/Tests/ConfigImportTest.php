@@ -14,6 +14,13 @@ use Drupal\simpletest\DrupalUnitTestBase;
  */
 class ConfigImportTest extends DrupalUnitTestBase {
 
+  /**
+   * Modules to enable.
+   *
+   * @var array
+   */
+  public static $modules = array('config_test');
+
   public static function getInfo() {
     return array(
       'name' => 'Import configuration',
@@ -24,8 +31,6 @@ class ConfigImportTest extends DrupalUnitTestBase {
 
   function setUp() {
     parent::setUp();
-
-    $this->enableModules(array('config_test'));
 
     config_install_default_config('module', 'config_test');
     // Installing config_test's default configuration pollutes the global

@@ -145,6 +145,8 @@ abstract class DrupalUnitTestBase extends UnitTestBase {
     // Set the modules in the fixed module_list().
     foreach ($modules as $module) {
       $this->moduleList[$module]['filename'] = drupal_get_filename('module', $module);
+      // Register the PSR-0 namespace of the enabled module.
+      drupal_classloader_register($module, dirname($this->moduleList[$module]['filename'] ));
     }
     module_list(NULL, $this->moduleList);
 

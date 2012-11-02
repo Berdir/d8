@@ -519,8 +519,6 @@ function module_enable($module_list, $enable_dependencies = TRUE) {
 
       // Clear the entity info cache before importing new configuration.
       entity_info_cache_clear();
-      // Register the PSR-0 namespace of the enabled module.
-      drupal_classloader_register($module, dirname(drupal_get_filename('module', $module)));
 
       // Now install the module if necessary.
       if (drupal_get_installed_schema_version($module, TRUE) == SCHEMA_UNINSTALLED) {
