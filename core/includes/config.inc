@@ -290,6 +290,7 @@ function config_get_module_config_entities($module) {
   // While this is a lot of work to generate, it's not worth static caching
   // since this function is only called at install/uninstall, and only
   // once per module.
+  debug(array_keys(drupal_classloader()->getNamespaces()));
   $info = entity_get_info();
   return array_filter($info, function($entity_info) use ($module) {
     return ($entity_info['module'] == $module) && is_subclass_of($entity_info['class'], 'Drupal\Core\Config\Entity\ConfigEntityInterface');
