@@ -111,7 +111,7 @@ class FormatDateTest extends WebTestBase {
     $this->drupalPost('user/' . $test_user->uid . '/edit', $edit, t('Save'));
 
     // Disable session saving as we are about to modify the global $user.
-    drupal_save_session(FALSE);
+    drupal_container()->get('session')->disableSave();
     // Save the original user and language and then replace it with the test user and language.
     $real_user = $user;
     $user = user_load($test_user->uid, TRUE);
@@ -141,6 +141,6 @@ class FormatDateTest extends WebTestBase {
     $language_interface->langcode = $real_language;
     // Restore default time zone.
     date_default_timezone_set(drupal_get_user_timezone());
-    drupal_save_session(TRUE);
+    drupal_container()->get('session')->enableSave();
   }
 }

@@ -2379,8 +2379,8 @@ function drupal_exit($destination = NULL) {
     if (!defined('MAINTENANCE_MODE') || MAINTENANCE_MODE != 'update') {
       module_invoke_all('exit', $destination);
     }
-    drupal_session_commit();
   }
+  drupal_session_commit();
   exit;
 }
 
@@ -5011,8 +5011,8 @@ function drupal_cron_run() {
   @ignore_user_abort(TRUE);
 
   // Prevent session information from being saved while cron is running.
-  $original_session_saving = drupal_save_session();
-  drupal_save_session(FALSE);
+  $session = drupal_container()->get('session');
+  $session->disableSave();
 
   // Force the current user to anonymous to ensure consistent permissions on
   // cron runs.
@@ -5078,7 +5078,7 @@ function drupal_cron_run() {
   }
   // Restore the user.
   $GLOBALS['user'] = $original_user;
-  drupal_save_session($original_session_saving);
+  $session->enableSave();
 
   return $return;
 }

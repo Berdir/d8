@@ -525,7 +525,7 @@ else {
 }
 if (isset($output) && $output) {
   // Explicitly start a session so that the update.php token will be accepted.
-  drupal_session_start();
+  drupal_container()->get('session')->start();
   // We defer the display of messages until all updates are done.
   $progress_page = ($batch = batch_get()) && isset($batch['running']);
   if ($output instanceof Response) {

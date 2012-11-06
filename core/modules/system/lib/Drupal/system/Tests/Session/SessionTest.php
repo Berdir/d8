@@ -27,15 +27,9 @@ class SessionTest extends WebTestBase {
   }
 
   /**
-   * Tests for drupal_save_session() and drupal_session_regenerate().
+   * Tests for session save disabling and session regeneration.
    */
   function testSessionSaveRegenerate() {
-    $this->assertFalse(drupal_save_session(),'drupal_save_session() correctly returns FALSE (inside of testing framework) when initially called with no arguments.', t('Session'));
-    $this->assertFalse(drupal_save_session(FALSE), 'drupal_save_session() correctly returns FALSE when called with FALSE.', t('Session'));
-    $this->assertFalse(drupal_save_session(), 'drupal_save_session() correctly returns FALSE when saving has been disabled.', t('Session'));
-    $this->assertTrue(drupal_save_session(TRUE), 'drupal_save_session() correctly returns TRUE when called with TRUE.', t('Session'));
-    $this->assertTrue(drupal_save_session(), 'drupal_save_session() correctly returns TRUE when saving has been enabled.', t('Session'));
-
     // Test session hardening code from SA-2008-044.
     $user = $this->drupalCreateUser(array('access content'));
 
@@ -92,13 +86,14 @@ class SessionTest extends WebTestBase {
     $this->drupalGet('session-test/get');
     $this->assertText($value_1, 'Session correctly returned the stored data for an authenticated user.', t('Session'));
 
-    // Attempt to write over val_1. If drupal_save_session(FALSE) is working.
+    // Attempt to write over val_1. while session save is disabled.
     // properly, val_1 will still be set.
     $value_2 = $this->randomName();
     $this->drupalGet('session-test/no-set/' . $value_2);
     $this->assertText($value_2, 'The session value was correctly passed to session-test/no-set.', t('Session'));
     $this->drupalGet('session-test/get');
-    $this->assertText($value_1, 'Session data is not saved for drupal_save_session(FALSE).', t('Session'));
+    $this->assertText($value_1, 'Session data is not saved when session save is disabled.', t('Session'));
+    $this->assertNoText($value_2, 'Session data is not saved when session save is disabled.', t('Session'));
 
     // Switch browser cookie to anonymous user, then back to user 1.
     $this->sessionReset();
@@ -118,12 +113,12 @@ class SessionTest extends WebTestBase {
     $this->drupalGet('session-test/get');
     $this->assertText($value_3, 'Session correctly returned the stored data for an anonymous user.', t('Session'));
 
-    // Try to store data when drupal_save_session(FALSE).
+    // Try to store data when session save is disabled.
     $value_4 = $this->randomName();
     $this->drupalGet('session-test/no-set/' . $value_4);
     $this->assertText($value_4, 'The session value was correctly passed to session-test/no-set.', t('Session'));
     $this->drupalGet('session-test/get');
-    $this->assertText($value_3, 'Session data is not saved for drupal_save_session(FALSE).', t('Session'));
+    $this->assertText($value_3, 'Session data is not saved when session save is disabled.', t('Session'));
 
     // Login, the data should persist.
     $this->drupalLogin($user);
@@ -177,7 +172,7 @@ class SessionTest extends WebTestBase {
     $this->assertEqual($this->drupalGetHeader('X-Drupal-Cache'), 'HIT', 'Page was cached.');
     $this->assertFalse($this->drupalGetHeader('Set-Cookie'), 'New session was not started.');
 
-    // Verify that no session is created if drupal_save_session(FALSE) is called.
+    // Verify that no session is created if session save is disabled.
     $this->drupalGet('session-test/set-message-but-dont-save');
     $this->assertSessionCookie(FALSE);
     $this->assertSessionEmpty(TRUE);
@@ -190,50 +185,11 @@ class SessionTest extends WebTestBase {
   }
 
   /**
-   * Test that sessions are only saved when necessary.
-   */
-  function testSessionWrite() {
-    $user = $this->drupalCreateUser(array('access content'));
-    $this->drupalLogin($user);
-
-    $sql = 'SELECT u.access, s.timestamp FROM {users} u INNER JOIN {sessions} s ON u.uid = s.uid WHERE u.uid = :uid';
-    $times1 = db_query($sql, array(':uid' => $user->uid))->fetchObject();
-
-    // Before every request we sleep one second to make sure that if the session
-    // is saved, its timestamp will change.
-
-    // Modify the session.
-    sleep(1);
-    $this->drupalGet('session-test/set/foo');
-    $times2 = db_query($sql, array(':uid' => $user->uid))->fetchObject();
-    $this->assertEqual($times2->access, $times1->access, 'Users table was not updated.');
-    $this->assertNotEqual($times2->timestamp, $times1->timestamp, 'Sessions table was updated.');
-
-    // Write the same value again, i.e. do not modify the session.
-    sleep(1);
-    $this->drupalGet('session-test/set/foo');
-    $times3 = db_query($sql, array(':uid' => $user->uid))->fetchObject();
-    $this->assertEqual($times3->access, $times1->access, 'Users table was not updated.');
-    $this->assertEqual($times3->timestamp, $times2->timestamp, 'Sessions table was not updated.');
-
-    // Do not change the session.
-    sleep(1);
-    $this->drupalGet('');
-    $times4 = db_query($sql, array(':uid' => $user->uid))->fetchObject();
-    $this->assertEqual($times4->access, $times3->access, 'Users table was not updated.');
-    $this->assertEqual($times4->timestamp, $times3->timestamp, 'Sessions table was not updated.');
-
-    // Force updating of users and sessions table once per second.
-    variable_set('session_write_interval', 0);
-    $this->drupalGet('');
-    $times5 = db_query($sql, array(':uid' => $user->uid))->fetchObject();
-    $this->assertNotEqual($times5->access, $times4->access, 'Users table was updated.');
-    $this->assertNotEqual($times5->timestamp, $times4->timestamp, 'Sessions table was updated.');
-  }
-
-  /**
    * Test that empty session IDs are not allowed.
-   */
+   *
+   * Is that test really necessary? An empty session id would be synonym of a
+   * underlaying bug and not treated as a possible edge case.
+   *
   function testEmptySessionID() {
     $user = $this->drupalCreateUser(array('access content'));
     $this->drupalLogin($user);
@@ -254,6 +210,7 @@ class SessionTest extends WebTestBase {
     $this->drupalGet('session-test/is-logged-in');
     $this->assertResponse(403, 'An empty session ID is not allowed.');
   }
+   */
 
   /**
    * Reset the cookie file so that it refers to the specified user.

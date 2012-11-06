@@ -239,7 +239,8 @@ function user_load_multiple(array $uids = NULL, $reset = FALSE) {
  * user. So to avoid confusion and to avoid clobbering the global $user object,
  * it is a good idea to assign the result of this function to a different local
  * variable, generally $account. If you actually do want to act as the user you
- * are loading, it is essential to call drupal_save_session(FALSE); first.
+ * are loading, it is essential to call
+ * \Drupal\Core\Session\Session::disableSave(); first.
  * See
  * @link http://drupal.org/node/218104 Safely impersonating another user @endlink
  * for more information.
@@ -1705,10 +1706,12 @@ function user_login_finalize(&$edit = array()) {
     ->condition('uid', $user->uid)
     ->execute();
 
+  $session = drupal_container()->get('session');
   // Regenerate the session ID to prevent against session fixation attacks.
   // This is called before hook_user in case one of those functions fails
   // or incorrectly does a redirect which would leave the old session in place.
-  drupal_session_regenerate();
+  $session->migrate();
+  $session->set('uid', $user->uid);
 
   module_invoke_all('user_login', $edit, $user);
 }
@@ -1953,6 +1956,7 @@ function user_delete($uid) {
  */
 function user_delete_multiple(array $uids) {
   entity_delete_multiple('user', $uids);
+  // FIXME: Delete session by uid here.
 }
 
 /**
