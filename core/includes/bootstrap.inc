@@ -2487,7 +2487,6 @@ function drupal_container(Container $new_container = NULL, $rebuild = FALSE) {
       ->setFactoryClass('Drupal\Core\Session\StaticSessionFactory')
       ->setFactoryMethod('getSession');
   }
-
   return $container;
 }
 
