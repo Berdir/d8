@@ -1507,6 +1507,10 @@ function install_bootstrap_full(&$install_state) {
   $kernel = new DrupalKernel('prod', FALSE, NULL);
   $kernel->boot();
   drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
+
+  // During install session needs to be manually pulled and initialized: this
+  // will force it to be fully initialized so batches will work flawlessly.
+  drupal_container()->get('session')->get('uid');
 }
 
 /**

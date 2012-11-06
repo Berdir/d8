@@ -815,6 +815,7 @@ abstract class TestBase {
 
     // Backup statics and globals.
     $this->originalContainer = clone drupal_container();
+    $this->originalSessionID = $this->originalContainer->get('session')->getId();
     $this->originalLanguage = $language_interface;
     $this->originalConfigDirectories = $GLOBALS['config_directories'];
     $this->originalThemeKey = $GLOBALS['theme_key'];
@@ -824,9 +825,6 @@ abstract class TestBase {
     $this->originalFileDirectory = variable_get('file_public_path', conf_path() . '/files');
     $this->originalProfile = drupal_get_profile();
     $this->originalUser = clone $user;
-
-    // Ensure that the current session is not changed by the new environment.
-    drupal_save_session(FALSE);
 
     // Save and clean the shutdown callbacks array because it is static cached
     // and will be changed by the test run. Otherwise it will contain callbacks
@@ -856,6 +854,9 @@ abstract class TestBase {
     // a test-prefix-specific directory within the public files directory.
     // @see config_get_config_directory()
     $GLOBALS['config_directories'] = array();
+    // Ensure that the current session is not changed by the new environment.
+    $this->originalContainer->get('session')->disableSave();
+
     $this->configDirectories = array();
     include_once DRUPAL_ROOT . '/core/includes/install.inc';
     foreach (array(CONFIG_ACTIVE_DIRECTORY, CONFIG_STAGING_DIRECTORY) as $type) {
@@ -1003,6 +1004,7 @@ abstract class TestBase {
 
     // Restore original statics and globals.
     drupal_container($this->originalContainer);
+    session_id($this->originalSessionID);
     $GLOBALS['config_directories'] = $this->originalConfigDirectories;
     if (isset($this->originalPrefix)) {
       drupal_valid_test_ua($this->originalPrefix);
@@ -1018,7 +1020,7 @@ abstract class TestBase {
 
     // Restore original user session.
     $user = $this->originalUser;
-    drupal_save_session(TRUE);
+    $this->originalContainer->get('session')->enableSave();
   }
 
   /**
