@@ -2178,7 +2178,6 @@ function system_update_8034() {
 }
 
 /**
-
  * Make changes on the {sessions} table accordingly to new Symfony session
  * handling usage.
  *
@@ -2189,7 +2188,7 @@ function system_update_8034() {
  *
  * @see http://drupal.org/node/335411
  */
-function system_update_8034() {
+function system_update_8035() {
   db_drop_field('sessions', 'uid');
   db_drop_field('sessions', 'hostname');
   db_drop_field('sessions', 'ssid');
