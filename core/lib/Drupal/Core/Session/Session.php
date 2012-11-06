@@ -93,4 +93,17 @@ class Session extends BaseSession {
 
     parent::save();
   }
+
+  /**
+   * Overrides Symfony\Component\HttpFoundation\Session\Session::migrate().
+   *
+   * Prevent regenerate if saving is disabled.
+   */
+  public function migrate($destroy = false, $lifetime = null) {
+    if (!$this->isSaveEnabled()) {
+      return;
+    }
+    return $this->storage->regenerate($destroy, $lifetime);
+  }
+
 }

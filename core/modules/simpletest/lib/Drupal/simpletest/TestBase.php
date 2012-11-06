@@ -815,7 +815,6 @@ abstract class TestBase {
 
     // Backup statics and globals.
     $this->originalContainer = clone drupal_container();
-    $this->originalSessionID = $this->originalContainer->get('session')->getId();
     $this->originalLanguage = $language_interface;
     $this->originalConfigDirectories = $GLOBALS['config_directories'];
     $this->originalThemeKey = $GLOBALS['theme_key'];
@@ -854,9 +853,6 @@ abstract class TestBase {
     // a test-prefix-specific directory within the public files directory.
     // @see config_get_config_directory()
     $GLOBALS['config_directories'] = array();
-    // Ensure that the current session is not changed by the new environment.
-    $this->originalContainer->get('session')->disableSave();
-
     $this->configDirectories = array();
     include_once DRUPAL_ROOT . '/core/includes/install.inc';
     foreach (array(CONFIG_ACTIVE_DIRECTORY, CONFIG_STAGING_DIRECTORY) as $type) {
@@ -873,6 +869,8 @@ abstract class TestBase {
 
     // Reset and create a new service container.
     $this->container = drupal_container(NULL, TRUE);
+    // Ensure that the current session is not changed by the new environment.
+    $this->container->get('session')->disableSave();
 
     // Unset globals.
     unset($GLOBALS['theme_key']);
@@ -1003,8 +1001,8 @@ abstract class TestBase {
     $conf = $this->originalConf;
 
     // Restore original statics and globals.
+    $this->container->get('session')->enableSave();
     drupal_container($this->originalContainer);
-    session_id($this->originalSessionID);
     $GLOBALS['config_directories'] = $this->originalConfigDirectories;
     if (isset($this->originalPrefix)) {
       drupal_valid_test_ua($this->originalPrefix);
@@ -1020,7 +1018,6 @@ abstract class TestBase {
 
     // Restore original user session.
     $user = $this->originalUser;
-    $this->originalContainer->get('session')->enableSave();
   }
 
   /**
