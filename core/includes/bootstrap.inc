@@ -2477,20 +2477,17 @@ function drupal_container(Container $new_container = NULL, $rebuild = FALSE) {
     $container
       ->register('keyvalue.database', 'Drupal\Core\KeyValueStore\KeyValueDatabaseFactory')
       ->addArgument(new Reference('database'));
-<<<<<<< HEAD
 
     // Register the EntityManager.
     $container->register('plugin.manager.entity', 'Drupal\Core\Entity\EntityManager');
-=======
-      
+
     // Register the session service.
     $container
       ->register('session', 'Drupal\Core\Session\Session')
       ->setFactoryClass('Drupal\Core\Session\StaticSessionFactory')
       ->setFactoryMethod('getSession');
->>>>>>> applied session patch.
   }
-  
+
   return $container;
 }
 
