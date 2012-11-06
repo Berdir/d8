@@ -68,10 +68,10 @@ class NodeTranslationUITest extends EntityTranslationUITest {
   }
 
   /**
-   * Test that no metadata is stored for a disabled
+   * Test that no metadata is stored for a disabled bundle.
    */
   public function testDisabledBundle() {
-    // Create a bundle does not have translation enabled.
+    // Create a bundle that does not have translation enabled.
     $disabledBundle = $this->randomName();
     $this->drupalCreateContentType(array('type' => $disabledBundle, 'name' => $disabledBundle));
 
