@@ -192,6 +192,28 @@ function update_prepare_d8_bootstrap() {
           'primary key' => array('collection', 'name'),
         );
         db_create_table('key_value', $specs);
+
+        // Make the uid column optional to support sessions writes.
+        db_change_field('sessions', 'uid', 'uid', array(
+          'description' => 'The {users}.uid of the user who is associated with the file.',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => FALSE,
+          'default' => 0,
+        ));
+
+        // Convert sessions, store uid in session data.
+        // @todo: This could possibly time out with many authenticated sessions.
+        $rows = db_query('SELECT sid, session, uid FROM {sessions} WHERE uid > 0');
+        foreach ($rows as $row) {
+          $session['_sf2_attributes'] = array('uid' => $row->uid);
+          db_update('sessions')
+            ->condition('sid', $row->sid)
+            ->fields(array(
+              'session' => session_raw_encode($session),
+            ))
+            ->execute();
+        }
       }
       // Bootstrap variables so we can update theme while preparing the update
       // process.
@@ -1305,4 +1327,36 @@ function update_add_uuids(&$sandbox, $table, $primary_key, $values) {
     $sandbox['progress']++;
     $sandbox['last'] = $value;
   }
+}
+
+/**
+ * Serialize session values.
+ *
+ * http://www.php.net/manual/en/function.session-encode.php#76425
+ */
+function session_raw_encode($array, $safe = TRUE) {
+  // The session is passed as refernece, even if you dont want it to.
+  if ($safe) {
+    $array = unserialize(serialize($array));
+  }
+
+  $raw = '';
+  $line = 0;
+  $keys = array_keys($array);
+  foreach ($keys as $key) {
+    $value = $array[$key];
+    $line++;
+
+    $raw .= $key . '|';
+
+    if (is_array($value) && isset($value['huge_recursion_blocker_we_hope'])) {
+      $raw .= 'R:' . $value['huge_recursion_blocker_we_hope'] . ';';
+    }
+    else {
+      $raw .= serialize($value);
+    }
+    $array[$key] = Array('huge_recursion_blocker_we_hope' => $line);
+  }
+
+  return $raw;
 }
