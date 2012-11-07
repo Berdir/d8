@@ -831,7 +831,7 @@ function user_block_view($delta = '') {
         // Display a list of currently online users.
         $max_users = $block_config->get('max_list_count');
         if ($authenticated_count && $max_users) {
-          $items = db_query_range('SELECT uid, name, access FROM {users} WHERE access >= :interval AND s.uid > 0 ORDER BY access DESC', 0, $max_users, array(':interval' => $interval))->fetchAll();
+          $items = db_query_range('SELECT uid, name, access FROM {users} WHERE access >= :interval AND uid > 0 ORDER BY access DESC', 0, $max_users, array(':interval' => $interval))->fetchAll();
 
           foreach ($items as $account) {
             $block['content']['#items'][] = theme('username', array('account' => $account));
