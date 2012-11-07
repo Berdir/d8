@@ -66,7 +66,6 @@ function _drupal_session_load_user() {
       $user->roles = array();
       $user->roles[DRUPAL_AUTHENTICATED_RID] = 'authenticated user';
       $user->roles += db_query("SELECT r.rid, r.name FROM {role} r INNER JOIN {users_roles} ur ON ur.rid = r.rid WHERE ur.uid = :uid", array(':uid' => $user->uid))->fetchAllKeyed(0, 1);
-      return $user;
     }
     elseif ($user) {
       // The user is anonymous or blocked.
