@@ -1001,7 +1001,6 @@ abstract class TestBase {
     $conf = $this->originalConf;
 
     // Restore original statics and globals.
-    $this->container->get('session')->enableSave();
     drupal_container($this->originalContainer);
     $GLOBALS['config_directories'] = $this->originalConfigDirectories;
     if (isset($this->originalPrefix)) {
