@@ -61,7 +61,7 @@ class EntityTestStorageController extends DatabaseStorageControllerNG {
   protected function attachPropertyData(&$queried_entities, $load_revision = FALSE) {
     $query = db_select('entity_test_property_data', 'data', array('fetch' => PDO::FETCH_ASSOC))
       ->fields('data')
-      ->condition('id', array_keys($queried_entities))
+      ->condition('id', array_keys($records))
       ->orderBy('data.id');
     if ($load_revision) {
       // Get revision id's.
@@ -73,15 +73,18 @@ class EntityTestStorageController extends DatabaseStorageControllerNG {
     }
     $data = $query->execute();
 
+    $property_values = array();
+
     foreach ($data as $values) {
       $id = $values['id'];
       // Field values in default language are stored with
       // LANGUAGE_DEFAULT as key.
       $langcode = empty($values['default_langcode']) ? $values['langcode'] : LANGUAGE_DEFAULT;
 
-      $queried_entities[$id]->name[$langcode][0]['value'] = $values['name'];
-      $queried_entities[$id]->user_id[$langcode][0]['value'] = $values['user_id'];
+      $property_values[$id]['name'][$langcode][0]['value'] = $values['name'];
+      $property_values[$id]['user_id'][$langcode][0]['value'] = $values['user_id'];
     }
+    return $property_values;
   }
 
   /**

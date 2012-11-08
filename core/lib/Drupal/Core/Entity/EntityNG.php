@@ -50,16 +50,42 @@ class EntityNG extends Entity {
   protected $fields = array();
 
   /**
-   * Whether the entity is in pre-Entity Field API compatibility mode.
+   * An instance of the backward compatibility decorator.
    *
-   * If set to TRUE, field values are written directly to $this->values, thus
-   * must be plain property values keyed by language code. This must be enabled
-   * when calling legacy field API attachers.
-   *
-   * @var bool
+   * @var EntityBCDecorator
    */
-  protected $compatibilityMode = FALSE;
+  protected $bcEntity;
 
+  /**
+   * Static cache for property definitions.
+   *
+   * @var array
+   */
+  protected $fieldDefinitions;
+
+  /**
+   * Overrides Entity::__construct().
+   */
+  public function __construct(array $values, $entity_type) {
+    parent::__construct(array(), $entity_type);
+    $this->values = $values + $this->values;
+    $this->init();
+  }
+
+  /**
+   * Initialize the object. Invoked upon construction and wake up.
+   */
+  protected function init() {
+    // We unset all defined properties, so magic getters apply.
+    unset($this->langcode);
+  }
+
+  /**
+   * Magic __wakeup() implemenation.
+   */
+  public function __wakeup() {
+    $this->init();
+  }
 
   /**
    * Overrides Entity::id().
@@ -144,6 +170,11 @@ class EntityNG extends Entity {
    * Implements ComplexDataInterface::getPropertyDefinition().
    */
   public function getPropertyDefinition($name) {
+    // Try to read from static cache.
+    if (isset($this->fieldDefinitions)) {
+      return isset($this->fieldDefinitions[$name]) ? $this->fieldDefinitions[$name] : FALSE;
+    }
+
     // First try getting property definitions which apply to all entities of
     // this type. Then if this fails add in definitions of optional properties
     // as well. That way we can use property definitions of base properties
@@ -163,10 +194,13 @@ class EntityNG extends Entity {
    * Implements ComplexDataInterface::getPropertyDefinitions().
    */
   public function getPropertyDefinitions() {
-    return entity_get_controller($this->entityType)->getFieldDefinitions(array(
-      'entity type' => $this->entityType,
-      'bundle' => $this->bundle(),
-    ));
+    if (!isset($this->fieldDefinitions)) {
+      $this->fieldDefinitions = entity_get_controller($this->entityType)->getFieldDefinitions(array(
+        'entity type' => $this->entityType,
+        'bundle' => $this->bundle(),
+      ));
+    }
+    return $this->fieldDefinitions;
   }
 
   /**
@@ -208,7 +242,13 @@ class EntityNG extends Entity {
    * Implements TranslatableInterface::language().
    */
   public function language() {
-    return $this->get('langcode')->language;
+    $language = $this->get('langcode')->language;
+    if (!$language) {
+      // Make sure we return a proper language object.
+      // @todo Refactor this, see: http://drupal.org/node/1834542.
+      $language = language_default();
+    }
+    return $language;
   }
 
   /**
@@ -276,38 +316,36 @@ class EntityNG extends Entity {
   }
 
   /**
-   * Enables or disable the compatibility mode.
+   * Overrides Entity::translations().
    *
-   * @param bool $enabled
-   *   Whether to enable the mode.
-   *
-   * @see EntityNG::compatibilityMode
+   * @todo: Remove once Entity::translations() gets removed.
    */
-  public function setCompatibilityMode($enabled) {
-    $this->compatibilityMode = (bool) $enabled;
-    if ($enabled) {
-      $this->updateOriginalValues();
-      $this->fields = array();
-    }
+  public function translations() {
+    return $this->getTranslationLanguages(FALSE);
   }
 
   /**
-   * Returns whether the compatibility mode is active.
+   * Overrides Entity::getBCEntity().
    */
-  public function getCompatibilityMode() {
-    return $this->compatibilityMode;
+  public function getBCEntity() {
+    if (!isset($this->bcEntity)) {
+      $this->bcEntity = new EntityBCDecorator($this);
+    }
+    return $this->bcEntity;
   }
 
   /**
    * Updates the original values with the interim changes.
-   *
-   * Note: This should be called by the storage controller during a save
-   * operation.
    */
   public function updateOriginalValues() {
-    foreach ($this->fields as $name => $properties) {
-      foreach ($properties as $langcode => $property) {
-        $this->values[$name][$langcode] = $property->getValue();
+    if (!$this->fields) {
+      return;
+    }
+    foreach ($this->getPropertyDefinitions() as $name => $definition) {
+      if (empty($definition['computed']) && !empty($this->fields[$name])) {
+        foreach ($this->fields[$name] as $langcode => $field) {
+          $this->values[$name][$langcode] = $field->getValue();
+        }
       }
     }
   }
@@ -318,12 +356,6 @@ class EntityNG extends Entity {
    * For compatibility mode to work this must return a reference.
    */
   public function &__get($name) {
-    if ($this->compatibilityMode) {
-      if (!isset($this->values[$name])) {
-        $this->values[$name] = NULL;
-      }
-      return $this->values[$name];
-    }
     if (isset($this->fields[$name][LANGUAGE_DEFAULT])) {
       return $this->fields[$name][LANGUAGE_DEFAULT];
     }
@@ -331,10 +363,12 @@ class EntityNG extends Entity {
       $return = $this->get($name);
       return $return;
     }
-    if (!isset($this->$name)) {
-      $this->$name = NULL;
+    // Else directly read/write plain values. That way, fields not yet converted
+    // to the entity field API can always be accessed as in compatibility mode.
+   if (!isset($this->values[$name])) {
+      $this->values[$name] = NULL;
     }
-    return $this->$name;
+    return $this->values[$name];
   }
 
   /**
@@ -346,17 +380,16 @@ class EntityNG extends Entity {
       $value = $value->getValue();
     }
 
-    if ($this->compatibilityMode) {
-      $this->values[$name] = $value;
-    }
-    elseif (isset($this->fields[$name][LANGUAGE_DEFAULT])) {
+    if (isset($this->fields[$name][LANGUAGE_DEFAULT])) {
       $this->fields[$name][LANGUAGE_DEFAULT]->setValue($value);
     }
     elseif ($this->getPropertyDefinition($name)) {
       $this->get($name)->setValue($value);
     }
+    // Else directly read/write plain values. That way, fields not yet converted
+    // to the entity field API can always be accessed as in compatibility mode.
     else {
-      $this->$name = $value;
+      $this->values[$name] = $value;
     }
   }
 
@@ -364,11 +397,11 @@ class EntityNG extends Entity {
    * Magic method.
    */
   public function __isset($name) {
-    if ($this->compatibilityMode) {
-      return isset($this->values[$name]);
-    }
-    elseif ($this->getPropertyDefinition($name)) {
+    if ($this->getPropertyDefinition($name)) {
       return (bool) count($this->get($name));
+    }
+    else {
+      return isset($this->values[$name]);
     }
   }
 
@@ -376,11 +409,11 @@ class EntityNG extends Entity {
    * Magic method.
    */
   public function __unset($name) {
-    if ($this->compatibilityMode) {
-      unset($this->values[$name]);
-    }
-    elseif ($this->getPropertyDefinition($name)) {
+    if ($this->getPropertyDefinition($name)) {
       $this->get($name)->setValue(array());
+    }
+    else {
+      unset($this->values[$name]);
     }
   }
 
@@ -404,6 +437,8 @@ class EntityNG extends Entity {
    * Implements a deep clone.
    */
   public function __clone() {
+    $this->bcEntity = NULL;
+
     foreach ($this->fields as $name => $properties) {
       foreach ($properties as $langcode => $property) {
         $this->fields[$name][$langcode] = clone $property;
@@ -412,5 +447,20 @@ class EntityNG extends Entity {
         }
       }
     }
+  }
+
+  /**
+   * Overrides Entity::label() to access the label field with the new API.
+   */
+  public function label($langcode = NULL) {
+    $label = NULL;
+    $entity_info = $this->entityInfo();
+    if (isset($entity_info['label_callback']) && function_exists($entity_info['label_callback'])) {
+      $label = $entity_info['label_callback']($this->entityType, $this, $langcode);
+    }
+    elseif (!empty($entity_info['entity_keys']['label']) && isset($this->{$entity_info['entity_keys']['label']})) {
+      $label = $this->{$entity_info['entity_keys']['label']}->value;
+    }
+    return $label;
   }
 }

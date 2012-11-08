@@ -13,8 +13,12 @@ use InvalidArgumentException;
 /**
  * Defines the 'entityreference_field' entity field item.
  *
- * Required settings (below the definition's 'settings' key) are:
- *  - entity type: The entity type to reference.
+ * Available settings (below the definition's 'settings' key) are:
+ *   - entity type: (required) The entity type to reference.
+ *   - property {NAME}: An array containing definition overrides for the
+ *     property with the name {NAME}. For example, this can be used by a
+ *     computed field to easily override the 'class' key of single field value
+ *     only.
  */
 class EntityReferenceItem extends FieldItemBase {
 

@@ -181,4 +181,22 @@ interface EntityInterface extends ComplexDataInterface, AccessibleInterface, Tra
    *   $new_value was passed, the previous value is returned.
    */
   public function isDefaultRevision($new_value = NULL);
+
+  /**
+   * Gets a backward compatibility decorator entity.
+   *
+   * @see \Drupal\Core\Entity\EntityInterface::getOriginalEntity()
+   *
+   * @return \Drupal\Core\Entity\EntityInterface
+   */
+  public function getBCEntity();
+
+  /**
+   * Removes any possibly (backward compatibility) decorator in use.
+   *
+   * @see \Drupal\Core\Entity\EntityInterface::getBCEntity()
+   *
+   * @return \Drupal\Core\Entity\EntityInterface
+   */
+  public function getOriginalEntity();
 }

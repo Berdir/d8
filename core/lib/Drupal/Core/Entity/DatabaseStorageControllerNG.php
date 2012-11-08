@@ -80,7 +80,7 @@ class DatabaseStorageControllerNG extends DatabaseStorageController {
     $entity = new $this->entityClass(array(), $this->entityType);
 
     // Make sure to set the bundle first.
-    if ($this->bundleKey) {
+    if ($this->bundleKey && !empty($values[$this->bundleKey])) {
       $entity->{$this->bundleKey} = $values[$this->bundleKey];
       unset($values[$this->bundleKey]);
     }
@@ -109,17 +109,18 @@ class DatabaseStorageControllerNG extends DatabaseStorageController {
 
     // Attach fields.
     if ($this->entityInfo['fieldable']) {
+      // Prepare BC compatible entities for field API.
+      $bc_entities = array();
+      foreach ($queried_entities as $key => $entity) {
+        $bc_entities[$key] = $entity->getBCEntity();
+      }
+
       if ($load_revision) {
-        field_attach_load_revision($this->entityType, $queried_entities);
+        field_attach_load_revision($this->entityType, $bc_entities);
       }
       else {
-        field_attach_load($this->entityType, $queried_entities);
+        field_attach_load($this->entityType, $bc_entities);
       }
-    }
-
-    // Loading is finished, so disable compatibility mode now.
-    foreach ($queried_entities as $entity) {
-      $entity->setCompatibilityMode(FALSE);
     }
 
     // Call hook_entity_load().
@@ -150,12 +151,10 @@ class DatabaseStorageControllerNG extends DatabaseStorageController {
   protected function mapFromStorageRecords(array $records, $load_revision = FALSE) {
 
     foreach ($records as $id => $record) {
-      $entity = new $this->entityClass(array(), $this->entityType);
-      $entity->setCompatibilityMode(TRUE);
-
       foreach ($record as $name => $value) {
-        $entity->{$name}[LANGUAGE_DEFAULT][0]['value'] = $value;
+        $values[$name][LANGUAGE_DEFAULT][0]['value'] = $value;
       }
+      $entity = new $this->entityClass($values, $this->entityType);
       $records[$id] = $entity;
     }
     return $records;
@@ -179,11 +178,6 @@ class DatabaseStorageControllerNG extends DatabaseStorageController {
 
       // Create the storage record to be saved.
       $record = $this->maptoStorageRecord($entity);
-      // Update the original values so that the compatibility mode works with
-      // the update values, what is required by field API attachers.
-      // @todo Once field API has been converted to use the Field API, move
-      // this after insert/update hooks.
-      $entity->updateOriginalValues();
 
       if (!$entity->isNew()) {
         if ($entity->isDefaultRevision()) {
@@ -215,6 +209,7 @@ class DatabaseStorageControllerNG extends DatabaseStorageController {
         $this->postSave($entity, FALSE);
         $this->invokeHook('insert', $entity);
       }
+      $entity->updateOriginalValues();
 
       // Ignore slave server temporarily.
       db_ignore_slave();
@@ -281,9 +276,7 @@ class DatabaseStorageControllerNG extends DatabaseStorageController {
       $function = 'field_attach_delete_revision';
     }
     if (!empty($this->entityInfo['fieldable']) && function_exists($function)) {
-      $entity->setCompatibilityMode(TRUE);
-      $function($this->entityType, $entity);
-      $entity->setCompatibilityMode(FALSE);
+      $function($this->entityType, $entity->getBCEntity());
     }
 
     // Invoke the hook.
@@ -298,7 +291,15 @@ class DatabaseStorageControllerNG extends DatabaseStorageController {
   protected function mapToStorageRecord(EntityInterface $entity) {
     $record = new \stdClass();
     foreach ($this->entityInfo['schema_fields_sql']['base_table'] as $name) {
-      $record->$name = $entity->$name->value;
+      switch ($entity->$name->get('value')->getType()) {
+        // Store dates using timestamps.
+        case 'date':
+          $record->$name = $entity->$name->value->getTimestamp();
+          break;
+        default:
+          $record->$name = $entity->$name->value;
+          break;
+      }
     }
     return $record;
   }

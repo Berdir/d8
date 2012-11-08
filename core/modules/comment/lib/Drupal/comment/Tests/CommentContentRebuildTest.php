@@ -34,7 +34,7 @@ class CommentContentRebuildTest extends CommentTestBase {
     $subject_text = $this->randomName();
     $comment_text = $this->randomName();
     $comment = $this->postComment($this->node, $comment_text, $subject_text, TRUE);
-    $comment_loaded = comment_load($comment->id);
+    $comment_loaded = comment_load($comment->id());
     $this->assertTrue($this->commentExists($comment), 'Comment found.');
 
     // Add the property to the content array and then see if it still exists on build.

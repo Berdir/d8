@@ -33,7 +33,7 @@ class CommentRenderController extends EntityRenderController {
     parent::buildContent($entities, $view_mode, $langcode);
 
     foreach ($entities as $entity) {
-      $node = node_load($entity->nid);
+      $node = $entity->nid->entity;
       if (!$node) {
         throw new \InvalidArgumentException(t('Invalid node for comment.'));
       }
@@ -76,7 +76,7 @@ class CommentRenderController extends EntityRenderController {
       }
 
       // Add anchor for each comment.
-      $prefix .= "<a id=\"comment-$comment->cid\"></a>\n";
+      $prefix .= "<a id=\"comment-{$comment->cid->value}\"></a>\n";
       $build['#prefix'] = $prefix;
 
       // Close all open divs.

@@ -8,7 +8,13 @@
 namespace Drupal\text\Type;
 
 /**
- * Defines the 'text_with_summary' entity field item.
+ * Defines the 'text_with_summary_field' entity field item.
+ *
+ * Available settings (below the definition's 'settings' key) are:
+ *   - property {NAME}: An array containing definition overrides for the
+ *     property with the name {NAME}. For example, this can be used by a
+ *     computed field to easily override the 'class' key of single field value
+ *     only.
  */
 class TextSummaryItem extends TextItem {
 

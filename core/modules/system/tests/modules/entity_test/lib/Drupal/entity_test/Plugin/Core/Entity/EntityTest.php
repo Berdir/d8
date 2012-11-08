@@ -74,14 +74,12 @@ class EntityTest extends EntityNG {
   public $user_id;
 
   /**
-   * Overrides Entity::__construct().
+   * Initialize the object. Invoked upon construction and wake up.
    */
-  public function __construct(array $values, $entity_type) {
-    parent::__construct($values, $entity_type);
-
+  protected function init() {
+    parent::init();
     // We unset all defined properties, so magic getters apply.
     unset($this->id);
-    unset($this->langcode);
     unset($this->uuid);
     unset($this->revision_id);
     unset($this->name);

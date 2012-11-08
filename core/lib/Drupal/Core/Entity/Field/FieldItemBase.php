@@ -22,6 +22,12 @@ use InvalidArgumentException;
  * Entity field items making use of this base class have to implement
  * ComplexDataInterface::getPropertyDefinitions().
  *
+ * Available settings (below the definition's 'settings' key) are:
+ *   - property {NAME}: An array containing definition overrides for the
+ *     property with the name {NAME}. For example, this can be used by a
+ *     computed field to easily override the 'class' key of single field value
+ *     only.
+ *
  * @see \Drupal\Core\Entity\Field\FieldItemInterface
  */
 abstract class FieldItemBase extends TypedData implements IteratorAggregate, FieldItemInterface {
@@ -62,6 +68,12 @@ abstract class FieldItemBase extends TypedData implements IteratorAggregate, Fie
     // references on non-computed properties during construction.
     $step2 = array();
     foreach ($this->getPropertyDefinitions() as $name => $definition) {
+
+      // Apply any per-property definition overrides.
+      if (isset($this->definition['settings']['property ' . $name])) {
+        $definition = $this->definition['settings']['property ' . $name] + $definition;
+      }
+
       if (empty($definition['computed'])) {
         $context = array('name' => $name, 'parent' => $this);
         $this->properties[$name] = typed_data()->create($definition, NULL, $context);
@@ -96,8 +108,8 @@ abstract class FieldItemBase extends TypedData implements IteratorAggregate, Fie
    */
   public function setValue($values) {
     // Treat the values as property value of the first property, if no array is
-    // given and we only have one property.
-    if (!is_array($values) && count($this->properties) == 1) {
+    // given.
+    if (!is_array($values)) {
       $keys = array_keys($this->properties);
       $values = array($keys[0] => $values);
     }

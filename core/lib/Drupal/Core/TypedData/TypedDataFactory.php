@@ -33,20 +33,19 @@ class TypedDataFactory extends DefaultFactory {
 
     // Allow per-data definition overrides of the used classes and generally
     // default to the data type definition.
-    $definition = $configuration + $type_definition;
+    $key = empty($configuration['list']) ? 'class' : 'list class';
 
-    if (empty($definition['list'])) {
-      if (empty($definition['class'])) {
-        throw new PluginException(sprintf('The plugin (%s) did not specify an instance class.', $plugin_id));
-      }
-      $plugin_class = $definition['class'];
+    if (isset($configuration[$key])) {
+      $class = $configuration[$key];
     }
-    else {
-      if (empty($definition['list class'])) {
-        throw new PluginException(sprintf('The plugin (%s) did not specify a list instance class.', $plugin_id));
-      }
-      $plugin_class = $definition['list class'];
+    elseif (isset($type_definition[$key])) {
+      $class = $type_definition[$key];
     }
-    return new $plugin_class($definition, $plugin_id, $this->discovery);
+
+    if (!isset($class)) {
+      throw new PluginException(sprintf('The plugin (%s) did not specify an instance class.', $plugin_id));
+    }
+
+    return new $class($configuration, $plugin_id, $this->discovery);
   }
 }

@@ -107,7 +107,7 @@ class EntityCrudHookTest extends WebTestBase {
     ));
 
     $_SESSION['entity_crud_hook_test'] = array();
-    $comment = comment_load($comment->cid);
+    $comment = comment_load($comment->cid->value);
 
     $this->assertHookMessageOrder(array(
       'entity_crud_hook_test_entity_load called for type comment',
@@ -115,7 +115,7 @@ class EntityCrudHookTest extends WebTestBase {
     ));
 
     $_SESSION['entity_crud_hook_test'] = array();
-    $comment->subject = 'New subject';
+    $comment->subject->value = 'New subject';
     comment_save($comment);
 
     $this->assertHookMessageOrder(array(
@@ -126,7 +126,7 @@ class EntityCrudHookTest extends WebTestBase {
     ));
 
     $_SESSION['entity_crud_hook_test'] = array();
-    comment_delete($comment->cid);
+    comment_delete($comment->cid->value);
 
     $this->assertHookMessageOrder(array(
       'entity_crud_hook_test_comment_predelete called',

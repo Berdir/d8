@@ -371,4 +371,18 @@ class Entity implements IteratorAggregate, EntityInterface {
     }
     return $return;
   }
+
+  /**
+   * Implements Drupal\Core\Entity\EntityInterface::getBCEntity().
+   */
+  public function getBCEntity() {
+    return $this;
+  }
+
+  /**
+   * Implements Drupal\Core\Entity\EntityInterface::getOriginalEntity().
+   */
+  public function getOriginalEntity() {
+    return $this;
+  }
 }

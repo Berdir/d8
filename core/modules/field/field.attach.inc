@@ -7,6 +7,8 @@
 
 use Drupal\field\FieldValidationException;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityNG;
+use Drupal\Core\Entity\EntityBCDecorator;
 
 /**
  * @defgroup field_storage Field Storage API
@@ -1384,6 +1386,9 @@ function field_attach_prepare_view($entity_type, $entities, $view_mode, $langcod
       // Add this entity to the items to be prepared.
       $prepare[$id] = $entity;
 
+      // Enable BC if necessary.
+      $entity = $entity->getBCEntity();
+
       // Determine the actual language code to display for each field, given the
       // language codes available in the field data.
       $options['langcode'][$id] = field_language($entity_type, $entity, NULL, $langcode);
@@ -1449,6 +1454,8 @@ function field_attach_prepare_view($entity_type, $entities, $view_mode, $langcod
  *   A renderable array for the field values.
  */
 function field_attach_view($entity_type, EntityInterface $entity, $view_mode, $langcode = NULL, array $options = array()) {
+  // Enable BC if necessary.
+  $entity = $entity->getBCEntity();
   // Determine the actual language code to display for each field, given the
   // language codes available in the field data.
   $options['langcode'] = field_language($entity_type, $entity, NULL, $langcode);
@@ -1456,6 +1463,9 @@ function field_attach_view($entity_type, EntityInterface $entity, $view_mode, $l
   // Invoke field_default_view().
   $null = NULL;
   $output = field_invoke_method('view', _field_invoke_formatter_target($view_mode), $entity, $view_mode, $null, $options);
+
+  // Remove the BC layer now.
+  $entity = $entity->getOriginalEntity();
 
   // Add custom weight handling.
   $output['#pre_render'][] = '_field_extra_fields_pre_render';
