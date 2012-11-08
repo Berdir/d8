@@ -8,7 +8,6 @@
 namespace Drupal\Core\Session;
 
 use Symfony\Component\HttpFoundation\Session\Session as BaseSession;
-use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 
 /**
  * Overrides Symfony's Session object in order to implement Drupal specific
@@ -18,18 +17,11 @@ use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 class Session extends BaseSession {
 
   /**
-   * Is session save enabled.
-   *
-   * @var bool
-   */
-  protected $saveEnabled = true;
-
-  /**
    * Enable session save, at commit time session will be saved by the session
    * handler and session token will be sent.
    */
   public function enableSave() {
-    $this->saveEnabled = true;
+    $this->storage->getSaveHandler()->setActive(TRUE);
   }
 
   /**
@@ -42,7 +34,7 @@ class Session extends BaseSession {
    * See http://drupal.org/node/218104 for usage.
    */
   public function disableSave() {
-    $this->saveEnabled = false;
+    $this->storage->getSaveHandler()->setActive(FALSE);
   }
 
   /**
@@ -51,7 +43,7 @@ class Session extends BaseSession {
    * @return bool
    */
   public function isSaveEnabled() {
-    return $this->saveEnabled;
+    $this->storage->getSaveHandler()->isActive();
   }
 
   /**
@@ -83,21 +75,10 @@ class Session extends BaseSession {
     return $empty && !count($this->getFlashBag()->all()) && !count($this->all());
   }
 
-  public function save() {
-    // Session saving is checked upper, but avoid accidental save() trigger in
-    // case save is disabled.
-    // @todo May be should throw a \LogicException here?
-    if (!$this->isSaveEnabled()) {
-      return;
-    }
-
-    parent::save();
-  }
-
   /**
    * Overrides Symfony\Component\HttpFoundation\Session\Session::migrate().
    *
-   * Prevent regenerate if saving is disabled.
+   * Prevents session regenerate if saving is disabled.
    */
   public function migrate($destroy = false, $lifetime = null) {
     if (!$this->isSaveEnabled()) {
