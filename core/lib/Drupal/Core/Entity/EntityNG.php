@@ -363,9 +363,14 @@ class EntityNG extends Entity {
       $return = $this->get($name);
       return $return;
     }
+    // Allow the EntityBCDecorator to directly access the values and fields.
+    // @todo: Remove once the EntityBCDecorator gets removed.
+    if ($name == 'values' || $name == 'fields') {
+      return $this->$name;
+    }
     // Else directly read/write plain values. That way, fields not yet converted
     // to the entity field API can always be accessed as in compatibility mode.
-   if (!isset($this->values[$name])) {
+    if (!isset($this->values[$name])) {
       $this->values[$name] = NULL;
     }
     return $this->values[$name];

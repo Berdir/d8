@@ -7,6 +7,7 @@
 
 namespace Drupal\Core\Entity;
 
+use IteratorAggregate;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
@@ -22,7 +23,7 @@ use Drupal\Core\Entity\EntityInterface;
  * be easy to fix as an unset() on the variable is problematic with the magic
  * getter/setter then).
  */
-class EntityBCDecorator extends EntityNG {
+class EntityBCDecorator implements IteratorAggregate, EntityInterface {
 
   /**
    * The EntityInterface object being decorated.
