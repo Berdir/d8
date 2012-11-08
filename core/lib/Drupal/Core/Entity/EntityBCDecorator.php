@@ -101,14 +101,16 @@ class EntityBCDecorator extends EntityNG {
    * Magic method.
    */
   public function __isset($name) {
-    return $this->decorated->__isset($name);
+    $value = $this->__get($name);
+    return isset($value);
   }
 
   /**
    * Magic method.
    */
   public function __unset($name) {
-    return $this->decorated->__unset($name);
+    $value = &$this->__get($name);
+    $value = array();
   }
 
   /**
