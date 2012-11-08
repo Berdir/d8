@@ -16,12 +16,12 @@ use Drupal\Core\Entity\EntityInterface;
  * Allows using entities converted to the new Entity Field API with the Drupal 7
  * way of accessing ways fields or properties.
  *
- * Note: We are extending EntityNG in order to be able to directly access the
- * protected values and fields properties. We do so, as providing references to
- * this arrays makes $entity->values and $entity->fields to references itself as
- * well, which is problematic during __clone() (this is something that would not
- * be easy to fix as an unset() on the variable is problematic with the magic
- * getter/setter then).
+ * Note: We access the protected 'values' and 'fields' properties of the entity
+ * via the magic getter - which returns them by reference for us. We do so, as
+ * providing references to this arrays makes $entity->values and $entity->fields
+ * to references itself as well, which is problematic during __clone() (this is
+ * something that would not be easy to fix as an unset() on the variable is
+ * problematic with the magic getter/setter then).
  */
 class EntityBCDecorator implements IteratorAggregate, EntityInterface {
 
