@@ -296,23 +296,29 @@ class EntityNG extends Entity {
    */
   public function getTranslationLanguages($include_default = TRUE) {
     $translations = array();
-    // Build an array with the translation langcodes set as keys.
+    // Build an array with the translation langcodes set as keys. Empty
+    // translations must be filtered out.
     foreach ($this->getProperties() as $name => $property) {
-      if (isset($this->values[$name])) {
-        $translations += $this->values[$name];
+      foreach ($this->fields[$name] as $langcode => $field) {
+        if (!$field->isEmpty()) {
+          $translations[$langcode] = TRUE;
+        }
+        if (isset($this->values[$name])) {
+          foreach ($this->values[$name] as $langcode => $values) {
+            if ($values && !(isset($this->fields[$name][$langcode]) && $this->fields[$name][$langcode]->isEmpty())) {
+              $translations[$langcode] = TRUE;
+            }
+          }
+        }
       }
-      $translations += $this->fields[$name];
     }
     unset($translations[LANGUAGE_DEFAULT]);
 
     if ($include_default) {
       $translations[$this->language()->langcode] = TRUE;
     }
-
-    // Now get languages based upon translation langcodes. Empty languages must
-    // be filtered out as they concern empty/unset properties.
-    $languages = array_intersect_key(language_list(LANGUAGE_ALL), array_filter($translations));
-    return $languages;
+    // Now get languages based upon translation langcodes.
+    return array_intersect_key(language_list(LANGUAGE_ALL), $translations);
   }
 
   /**
