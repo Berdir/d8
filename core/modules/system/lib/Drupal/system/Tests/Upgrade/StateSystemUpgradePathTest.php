@@ -51,6 +51,14 @@ class StateSystemUpgradePathTest extends UpgradePathTestBase {
       'value' => 'kdm95qppDDlyZrcUOx453YwQqDA4DNmxi4VQcxzFU9M',
       'variable_name' => 'cron_key',
     );
+    $expected_state['statistics.day_timestamp'] = array(
+      'value' => 1352070595,
+      'variable_name' => 'statistics_day_timestamp',
+    );
+    $expected_state['statistics.node_counter_scale'] = array(
+      'value' => 1.0 / 2000,
+      'variable_name' => 'node_cron_views_scale',
+    );
     $expected_state['update.last_check'] = array(
       'value' => 1304208000,
       'variable_name' => 'update_last_check',
