@@ -813,6 +813,8 @@ function user_block_view($delta = '') {
       }
       return $block;
 
+    // @todo: Move this block to statistics.module and remove dependency on
+    //   user.access.
     case 'online':
       if (user_access('access content')) {
         // Count users active within the defined period.
@@ -831,9 +833,8 @@ function user_block_view($delta = '') {
         // Display a list of currently online users.
         $max_users = $block_config->get('max_list_count');
         if ($authenticated_count && $max_users) {
-          $items = db_query_range('SELECT uid, name, access FROM {users} WHERE access >= :interval AND uid > 0 ORDER BY access DESC', 0, $max_users, array(':interval' => $interval))->fetchAll();
-
-          foreach ($items as $account) {
+          $uids = db_query_range('SELECT uid FROM {users} WHERE access >= :interval AND uid > 0 ORDER BY access DESC', 0, $max_users, array(':interval' => $interval))->fetchCol();
+          foreach (user_load_multiple($uids) as $account) {
             $block['content']['#items'][] = theme('username', array('account' => $account));
           }
         }
