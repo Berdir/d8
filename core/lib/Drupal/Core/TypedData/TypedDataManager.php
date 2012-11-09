@@ -94,7 +94,7 @@ class TypedDataManager extends PluginManagerBase {
    * @see Drupal\Core\Entity\Field\EntityWrapper
    */
   function create(array $definition, $value = NULL, array $context = array()) {
-    $wrapper = $this->createInstance($definition['type'], $definition);
+    $wrapper = $this->factory->createInstance($definition['type'], $definition);
     if (isset($value)) {
       $wrapper->setValue($value);
     }

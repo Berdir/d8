@@ -7,6 +7,7 @@
 
 namespace Drupal\Core\TypedData;
 
+use InvalidArgumentException;
 use Drupal\Component\Plugin\Factory\DefaultFactory;
 use Drupal\Component\Plugin\Exception\PluginException;
 
@@ -19,6 +20,13 @@ use Drupal\Component\Plugin\Exception\PluginException;
 class TypedDataFactory extends DefaultFactory {
 
   /**
+   * Static cache for definitions to speed things up.
+   *
+   * @var array
+   */
+  protected $definitions;
+
+  /**
    * Implements Drupal\Component\Plugin\Factory\FactoryInterface::createInstance().
    *
    * @param string $plugin_id
@@ -29,12 +37,18 @@ class TypedDataFactory extends DefaultFactory {
    * @return Drupal\Core\TypedData\TypedDataInterface
    */
   public function createInstance($plugin_id, array $configuration) {
-    $type_definition = $this->discovery->getDefinition($plugin_id);
 
-    // Allow per-data definition overrides of the used classes and generally
-    // default to the data type definition.
+    if (!isset($this->definitions)) {
+      $this->definitions = $this->discovery->getDefinitions();
+    }
+    if (!isset($this->definitions[$plugin_id])) {
+      throw new InvalidArgumentException(format_string('Invalid data type %plugin_id has been given.', array('%plugin_id' => $plugin_id)));
+    }
+
+    $type_definition = $this->definitions[$plugin_id];
+
+    // Allow per-data definition overrides of the used classes.
     $key = empty($configuration['list']) ? 'class' : 'list class';
-
     if (isset($configuration[$key])) {
       $class = $configuration[$key];
     }
@@ -45,7 +59,6 @@ class TypedDataFactory extends DefaultFactory {
     if (!isset($class)) {
       throw new PluginException(sprintf('The plugin (%s) did not specify an instance class.', $plugin_id));
     }
-
-    return new $class($configuration, $plugin_id, $this->discovery);
+    return new $class($configuration, $plugin_id);
   }
 }
