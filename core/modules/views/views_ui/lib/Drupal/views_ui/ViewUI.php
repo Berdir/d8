@@ -1073,4 +1073,17 @@ class ViewUI implements ViewStorageInterface {
     return $this->__call(__FUNCTION__, func_get_args());
   }
 
+  /**
+   * Implements Drupal\Core\Entity\EntityInterface::getBCEntity().
+   */
+  public function getBCEntity() {
+    return $this->__call(__FUNCTION__, func_get_args());
+  }
+
+  /**
+   * Implements Drupal\Core\Entity\EntityInterface::getOriginalEntity().
+   */
+  public function getOriginalEntity() {
+    return $this->__call(__FUNCTION__, func_get_args());
+  }
 }

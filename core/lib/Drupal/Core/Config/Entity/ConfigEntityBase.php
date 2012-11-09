@@ -110,4 +110,18 @@ abstract class ConfigEntityBase extends Entity implements ConfigEntityInterface 
     }
     return ($a_weight < $b_weight) ? -1 : 1;
   }
+
+  /**
+   * Implements Drupal\Core\Entity\EntityInterface::getBCEntity().
+   */
+  public function getBCEntity() {
+    return $this;
+  }
+
+  /**
+   * Implements Drupal\Core\Entity\EntityInterface::getOriginalEntity().
+   */
+  public function getOriginalEntity() {
+    return $this;
+  }
 }
