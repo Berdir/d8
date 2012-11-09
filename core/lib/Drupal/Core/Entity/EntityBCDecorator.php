@@ -69,6 +69,13 @@ class EntityBCDecorator implements IteratorAggregate, EntityInterface {
       // avoid them becoming out of sync.
       unset($this->decorated->fields[$name]);
     }
+    // Allow accessing field values in entity default languages other than
+    // LANGUAGE_DEFAULT by mapping the values to LANGUAGE_DEFAULT.
+    $langcode = $this->decorated->language()->langcode;
+    if ($langcode != LANGUAGE_DEFAULT && isset($this->decorated->values[$name][LANGUAGE_DEFAULT]) && !isset($this->decorated->values[$name][$langcode])) {
+      $this->decorated->values[$name][$langcode] = &$this->decorated->values[$name][LANGUAGE_DEFAULT];
+    }
+
     if (!isset($this->decorated->values[$name])) {
       $this->decorated->values[$name] = NULL;
     }
