@@ -1666,7 +1666,7 @@ function template_preprocess_comment(&$variables) {
   $variables['author'] = theme('username', array('account' => $account));
   $variables['created'] = format_date($comment->created->value->getTimestamp());
   $variables['changed'] = format_date($comment->changed->value->getTimestamp());
-  $variables['new'] = !empty($comment->new->value) ? t('new') : '';
+  $variables['new'] = $comment->new->value ? t('new') : '';
   if (theme_get_setting('toggle_comment_user_picture')) {
     // To change user picture settings (e.g., image style), edit the 'compact'
     // view mode on the User entity.

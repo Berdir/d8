@@ -68,13 +68,15 @@ class FieldNewValue extends Integer implements ContextAwareInterface {
    * Implements TypedDataInterface::getValue().
    */
   public function getValue($langcode = NULL) {
-
-    if (!isset($this->parent)) {
-      throw new InvalidArgumentException('Computed properties require context for computation.');
+    if (!isset($this->value)) {
+      if (!isset($this->parent)) {
+        throw new InvalidArgumentException('Computed properties require context for computation.');
+      }
+      $field = $this->parent->getParent();
+      $entity = $field->getParent();
+      $this->value = node_mark($entity->nid->value, $entity->changed->value->getTimestamp());
     }
-    $field = $this->parent->getParent();
-    $entity = $field->getParent();
-    return node_mark($entity->nid->value, $entity->changed->value->getTimestamp());
+    return $this->value;
   }
 
   /**
