@@ -196,7 +196,7 @@ abstract class CacheArray implements ArrayAccess {
    * @param $lock
    *   Whether to acquire a lock before writing to cache.
    */
-  protected function set($data, $lock = TRUE) {
+  protected function setData($data, $lock = TRUE) {
     // Lock cache writes to help avoid stampedes.
     // To implement locking for cache misses, override __construct().
     $lock_name = $this->cid . ':' . $this->bin;
@@ -222,7 +222,7 @@ abstract class CacheArray implements ArrayAccess {
       }
     }
     if (!empty($data)) {
-      $this->set($data);
+      $this->setData($data);
     }
   }
 }

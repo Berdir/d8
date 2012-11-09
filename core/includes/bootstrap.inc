@@ -2477,6 +2477,9 @@ function drupal_container(Container $new_container = NULL, $rebuild = FALSE) {
     $container
       ->register('keyvalue.database', 'Drupal\Core\KeyValueStore\KeyValueDatabaseFactory')
       ->addArgument(new Reference('database'));
+    $container->register('state', 'Drupal\Core\KeyValueStore\KeyValueCacheDecorator')
+      ->addArgument(new Reference('keyvalue'))
+      ->addArgument('state');
 
     // Register the EntityManager.
     $container->register('plugin.manager.entity', 'Drupal\Core\Entity\EntityManager');
@@ -2496,7 +2499,7 @@ function drupal_container(Container $new_container = NULL, $rebuild = FALSE) {
  * @return Drupal\Core\KeyValueStore\KeyValueStoreInterface
  */
 function state() {
-  return drupal_container()->get('keyvalue')->get('state');
+  return drupal_container()->get('state');
 }
 
 /**
