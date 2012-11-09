@@ -67,8 +67,10 @@ class EntityNG extends Entity {
    * Overrides Entity::__construct().
    */
   public function __construct(array $values, $entity_type) {
-    parent::__construct(array(), $entity_type);
-    $this->values = $values + $this->values;
+    $this->entityType = $entity_type;
+    foreach ($values as $key => $value) {
+      $this->values[$key] = $value;
+    }
     $this->init();
   }
 
