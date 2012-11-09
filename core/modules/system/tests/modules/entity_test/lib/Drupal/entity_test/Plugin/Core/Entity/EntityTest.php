@@ -23,7 +23,7 @@ use Drupal\Core\Annotation\Translation;
  *   form_controller_class = {
  *     "default" = "Drupal\entity_test\EntityTestFormController"
  *   },
- *   translation_controller_class = "Drupal\entity_test\EntityTestTranslationController",
+ *   translation_controller_class = "Drupal\translation_entity\EntityTranslationControllerNG",
  *   base_table = "entity_test",
  *   data_table = "entity_test_property_data",
  *   revision_table = "entity_test_property_revision",
