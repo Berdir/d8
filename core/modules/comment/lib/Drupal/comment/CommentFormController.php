@@ -260,10 +260,8 @@ class CommentFormController extends EntityFormControllerNG {
   public function submit(array $form, array &$form_state) {
     $comment = parent::submit($form, $form_state);
 
-    if (empty($comment->date)) {
-      $comment->date = 'now';
-    }
-    $date = new DrupalDateTime($comment->date);
+    // @todo: Move populating the entity over to self::buildEntity().
+    $date = !empty($form_state['values']['date']) ? $form_state['values']['date'] : 'now';
     $comment->created->value = $date;
     $comment->changed->value = REQUEST_TIME;
 
