@@ -6,6 +6,13 @@
  */
 
 /**
+ * Implements hook_uninstall().
+ */
+function tracker_uninstall() {
+  state()->delete('tracker.index_nid');
+}
+
+/**
  * Implements hook_enable().
  */
 function tracker_enable() {
