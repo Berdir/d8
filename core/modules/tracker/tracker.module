@@ -79,9 +79,10 @@ function tracker_menu() {
  * process, 'tracker_index_nid' will be 0.
  */
 function tracker_cron() {
-  $max_nid = variable_get('tracker_index_nid', 0);
-  $batch_size = config('tracker.settings')->get('cron_index_limit');
+  $state = state();
+  $max_nid = $state->get('tracker.index_nid') ?: 0;
   if ($max_nid > 0) {
+    $batch_size = config('tracker.settings')->get('cron_index_limit');
     $last_nid = FALSE;
     $result = db_query_range('SELECT nid, uid, status FROM {node} WHERE nid <= :max_nid ORDER BY nid DESC', 0, $batch_size, array(':max_nid' => $max_nid), array('target' => 'slave'));
 
@@ -143,13 +144,13 @@ function tracker_cron() {
 
     if ($last_nid !== FALSE) {
       // Prepare a starting point for the next run.
-      variable_set('tracker_index_nid', $last_nid - 1);
+      $state->set('tracker.index_nid', $last_nid - 1);
 
       watchdog('tracker', 'Indexed %count content items for tracking.', array('%count' => $count));
     }
     else {
       // If all nodes have been indexed, set to zero to skip future cron runs.
-      variable_set('tracker_index_nid', 0);
+      $state->set('tracker.index_nid', 0);
     }
   }
 }
