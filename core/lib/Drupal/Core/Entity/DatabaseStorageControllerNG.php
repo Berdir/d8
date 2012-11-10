@@ -151,11 +151,13 @@ class DatabaseStorageControllerNG extends DatabaseStorageController {
   protected function mapFromStorageRecords(array $records, $load_revision = FALSE) {
 
     foreach ($records as $id => $record) {
+      $values = array();
       foreach ($record as $name => $value) {
-        $values[$name][LANGUAGE_DEFAULT][0]['value'] = $value;
+        // Avoid unnecessary array hierarchies to save memory.
+        $values[$name][LANGUAGE_DEFAULT] = $value;
       }
-      $entity = new $this->entityClass($values, $this->entityType);
-      $records[$id] = $entity;
+      // Turn the record into an entity class.
+      $records[$id] = new $this->entityClass($values, $this->entityType);
     }
     return $records;
   }
