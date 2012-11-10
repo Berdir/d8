@@ -370,7 +370,7 @@ class EntityNG extends Entity {
       return $this->fields[$name][LANGUAGE_DEFAULT];
     }
     if ($this->getPropertyDefinition($name)) {
-      $return = $this->get($name);
+      $return = $this->getTranslatedField($name, LANGUAGE_DEFAULT);
       return $return;
     }
     // Allow the EntityBCDecorator to directly access the values and fields.
@@ -379,7 +379,7 @@ class EntityNG extends Entity {
       return $this->$name;
     }
     // Else directly read/write plain values. That way, fields not yet converted
-    // to the entity field API can always be accessed as in compatibility mode.
+    // to the entity field API can always be directly accessed.
     if (!isset($this->values[$name])) {
       $this->values[$name] = NULL;
     }
@@ -399,10 +399,10 @@ class EntityNG extends Entity {
       $this->fields[$name][LANGUAGE_DEFAULT]->setValue($value);
     }
     elseif ($this->getPropertyDefinition($name)) {
-      $this->get($name)->setValue($value);
+      $this->getTranslatedField($name, LANGUAGE_DEFAULT)->setValue($value);
     }
     // Else directly read/write plain values. That way, fields not yet converted
-    // to the entity field API can always be accessed as in compatibility mode.
+    // to the entity field API can always be directly accessed.
     else {
       $this->values[$name] = $value;
     }
