@@ -22,9 +22,9 @@ use InvalidArgumentException;
 class LanguageItem extends FieldItemBase {
 
   /**
-   * Array of property definitions of contained properties.
+   * Definitions of the contained properties.
    *
-   * @see PropertyEntityReferenceItem::getPropertyDefinitions()
+   * @see self::getPropertyDefinitions()
    *
    * @var array
    */

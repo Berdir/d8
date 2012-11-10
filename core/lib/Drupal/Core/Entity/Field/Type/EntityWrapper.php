@@ -70,7 +70,7 @@ class EntityWrapper extends TypedData implements IteratorAggregate, ComplexDataI
    * Implements TypedDataInterface::__construct().
    */
   public function __construct(array $definition) {
-    $this->definition = $definition + array('constraints' => array());
+    $this->definition = $definition;
     $this->entityType = isset($this->definition['constraints']['entity type']) ? $this->definition['constraints']['entity type'] : NULL;
   }
 

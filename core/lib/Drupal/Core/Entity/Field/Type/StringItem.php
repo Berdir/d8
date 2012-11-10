@@ -21,7 +21,7 @@ use Drupal\Core\Entity\Field\FieldItemBase;
 class StringItem extends FieldItemBase {
 
   /**
-   * Field definitions of the contained properties.
+   * Definitions of the contained properties.
    *
    * @see self::getPropertyDefinitions()
    *

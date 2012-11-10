@@ -23,7 +23,7 @@ use InvalidArgumentException;
 class EntityReferenceItem extends FieldItemBase {
 
   /**
-   * Field definitions of the contained properties.
+   * Definitions of the contained properties.
    *
    * @see self::getPropertyDefinitions()
    *

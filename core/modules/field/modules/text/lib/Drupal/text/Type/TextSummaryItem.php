@@ -19,7 +19,7 @@ namespace Drupal\text\Type;
 class TextSummaryItem extends TextItem {
 
   /**
-   * Field definitions of the contained properties.
+   * Definitions of the contained properties.
    *
    * @see self::getPropertyDefinitions()
    *
