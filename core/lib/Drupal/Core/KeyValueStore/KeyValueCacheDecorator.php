@@ -22,11 +22,14 @@ class KeyValueCacheDecorator extends CacheArray implements KeyValueStoreInterfac
 
   public function __construct(KeyValueFactory $keyValueFactory, $collection) {
     parent::__construct('state', 'cache');
+    //debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
     $this->keyValueStore = $keyValueFactory->get($collection);
   }
 
   protected function resolveCacheMiss($offset) {
     $this->storage[$offset] = $this->keyValueStore->get($offset);
+    $this->persist($offset);
+    return $this->storage[$offset];
   }
 
   public function get($key) {
@@ -57,7 +60,7 @@ class KeyValueCacheDecorator extends CacheArray implements KeyValueStoreInterfac
   public function getMultiple(array $keys) {
     $values = array();
     foreach ($keys as $key) {
-      $values[$key] = $this->offsetGet($offset);
+      $values[$key] = $this->offsetGet($key);
     }
     return $values;
   }
@@ -72,11 +75,14 @@ class KeyValueCacheDecorator extends CacheArray implements KeyValueStoreInterfac
     $this->keyValueStore->setMultiple($data);
     foreach ($data as $key => $value) {
       $this->offsetSet($key, $value);
+      $this->persist($key);
     }
   }
 
   public function set($key, $value) {
+    $this->keyValueStore->set($key, $value);
     $this->offsetSet($key, $value);
+    $this->persist($key);
   }
 
 }
