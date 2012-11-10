@@ -218,11 +218,4 @@ class Comment extends EntityNG implements ContentEntityInterface {
   public function id() {
     return $this->get('cid')->value;
   }
-
-  /**
-   * Implements Drupal\Core\Entity\EntityInterface::bundle().
-   */
-  public function bundle() {
-    return $this->get('node_type')->value;
-  }
 }

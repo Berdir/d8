@@ -77,13 +77,10 @@ class DatabaseStorageControllerNG extends DatabaseStorageController {
    *   A new entity object.
    */
   public function create(array $values) {
-    $entity = new $this->entityClass(array(), $this->entityType);
+    // We have to determine the bundle first.
+    $bundle = $this->bundleKey ? $values[$this->bundleKey] : FALSE;
+    $entity = new $this->entityClass(array(), $this->entityType, $bundle);
 
-    // Make sure to set the bundle first.
-    if ($this->bundleKey && !empty($values[$this->bundleKey])) {
-      $entity->{$this->bundleKey} = $values[$this->bundleKey];
-      unset($values[$this->bundleKey]);
-    }
     // Set all other given values.
     foreach ($values as $name => $value) {
       $entity->$name = $value;
@@ -156,8 +153,9 @@ class DatabaseStorageControllerNG extends DatabaseStorageController {
         // Avoid unnecessary array hierarchies to save memory.
         $values[$name][LANGUAGE_DEFAULT] = $value;
       }
+      $bundle = $this->bundleKey ? $record->{$this->bundleKey} : FALSE;
       // Turn the record into an entity class.
-      $records[$id] = new $this->entityClass($values, $this->entityType);
+      $records[$id] = new $this->entityClass($values, $this->entityType, $bundle);
     }
     return $records;
   }

@@ -26,6 +26,13 @@ use InvalidArgumentException;
 class EntityNG extends Entity {
 
   /**
+   * Local cache holding the value of the bundle field.
+   *
+   * @var string
+   */
+  protected $bundle = FALSE;
+
+  /**
    * The plain data values of the contained fields.
    *
    * This always holds the original, unchanged values of the entity. The values
@@ -57,17 +64,20 @@ class EntityNG extends Entity {
   protected $bcEntity;
 
   /**
-   * Static cache for property definitions.
+   * Static cache for field definitions, keyed by entity type and bundle.
+   *
+   * @see self::getPropertyDefinitions()
    *
    * @var array
    */
-  protected $fieldDefinitions;
+  static $fieldDefinitions;
 
   /**
    * Overrides Entity::__construct().
    */
-  public function __construct(array $values, $entity_type) {
+  public function __construct(array $values, $entity_type, $bundle = FALSE) {
     $this->entityType = $entity_type;
+    $this->bundle = $bundle ? $bundle : $this->entityType;
     foreach ($values as $key => $value) {
       $this->values[$key] = $value;
     }
@@ -78,6 +88,13 @@ class EntityNG extends Entity {
    * Initialize the object. Invoked upon construction and wake up.
    */
   protected function init() {
+    if (!isset(static::$fieldDefinitions[$this->entityType][$this->bundle])) {
+      $definitions = entity_get_controller($this->entityType)->getFieldDefinitions(array(
+        'entity type' => $this->entityType,
+        'bundle' => $this->bundle,
+      ));
+      static::$fieldDefinitions[$this->entityType][$this->bundle] = $definitions;
+    }
     // We unset all defined properties, so magic getters apply.
     unset($this->langcode);
   }
@@ -90,10 +107,17 @@ class EntityNG extends Entity {
   }
 
   /**
-   * Overrides Entity::id().
+   * Implements Drupal\Core\Entity\EntityInterface::id().
    */
   public function id() {
-    return $this->get('id')->value;
+    return $this->id->value;
+  }
+
+  /**
+   * Implements Drupal\Core\Entity\EntityInterface::bundle().
+   */
+  public function bundle() {
+    return $this->bundle;
   }
 
   /**
@@ -172,37 +196,15 @@ class EntityNG extends Entity {
    * Implements ComplexDataInterface::getPropertyDefinition().
    */
   public function getPropertyDefinition($name) {
-    // Try to read from static cache.
-    if (isset($this->fieldDefinitions)) {
-      return isset($this->fieldDefinitions[$name]) ? $this->fieldDefinitions[$name] : FALSE;
-    }
-
-    // First try getting property definitions which apply to all entities of
-    // this type. Then if this fails add in definitions of optional properties
-    // as well. That way we can use property definitions of base properties
-    // when determining the optional properties of an entity.
-    $definitions = entity_get_controller($this->entityType)->getFieldDefinitions(array());
-
-    if (isset($definitions[$name])) {
-      return $definitions[$name];
-    }
-    // Add in optional properties if any.
-    if ($definitions = $this->getPropertyDefinitions()) {
-      return isset($definitions[$name]) ? $definitions[$name] : FALSE;
-    }
+    $definitions = &static::$fieldDefinitions[$this->entityType][$this->bundle];
+    return isset($definitions[$name]) ? $definitions[$name] : FALSE;
   }
 
   /**
    * Implements ComplexDataInterface::getPropertyDefinitions().
    */
   public function getPropertyDefinitions() {
-    if (!isset($this->fieldDefinitions)) {
-      $this->fieldDefinitions = entity_get_controller($this->entityType)->getFieldDefinitions(array(
-        'entity type' => $this->entityType,
-        'bundle' => $this->bundle(),
-      ));
-    }
-    return $this->fieldDefinitions;
+    return static::$fieldDefinitions[$this->entityType][$this->bundle];
   }
 
   /**
