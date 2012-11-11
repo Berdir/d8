@@ -20,13 +20,6 @@ use Drupal\Component\Plugin\Exception\PluginException;
 class TypedDataFactory extends DefaultFactory {
 
   /**
-   * Static cache for definitions to speed things up.
-   *
-   * @var array
-   */
-  protected $definitions;
-
-  /**
    * Implements Drupal\Component\Plugin\Factory\FactoryInterface::createInstance().
    *
    * @param string $plugin_id
@@ -38,14 +31,11 @@ class TypedDataFactory extends DefaultFactory {
    */
   public function createInstance($plugin_id, array $configuration) {
 
-    if (!isset($this->definitions)) {
-      $this->definitions = $this->discovery->getDefinitions();
-    }
-    if (!isset($this->definitions[$plugin_id])) {
+    $type_definition = $this->discovery->getDefinition($plugin_id);
+
+    if (!isset($type_definition)) {
       throw new InvalidArgumentException(format_string('Invalid data type %plugin_id has been given.', array('%plugin_id' => $plugin_id)));
     }
-
-    $type_definition = $this->definitions[$plugin_id];
 
     // Allow per-data definition overrides of the used classes.
     $key = empty($configuration['list']) ? 'class' : 'list class';

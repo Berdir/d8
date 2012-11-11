@@ -65,8 +65,11 @@ class CacheDecorator implements CachedDiscoveryInterface {
    * Implements Drupal\Component\Plugin\Discovery\DicoveryInterface::getDefinition().
    */
   public function getDefinition($plugin_id) {
-    $definitions = $this->getDefinitions();
-    return isset($definitions[$plugin_id]) ? $definitions[$plugin_id] : NULL;
+    if (!isset($this->definitions)) {
+      // Initialize definitions.
+      $this->getDefinitions();
+    }
+    return isset($this->definitions[$plugin_id]) ? $this->definitions[$plugin_id] : NULL;
   }
 
   /**
