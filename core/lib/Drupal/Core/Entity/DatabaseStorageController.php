@@ -30,6 +30,8 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
    */
   protected $entityCache;
 
+  protected $fieldDefinitions;
+
   /**
    * Entity type for this controller instance.
    *
@@ -680,15 +682,17 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
       }
     }
 
-    $definitions = $this->entityFieldInfo['definitions'];
+    $bundle = !empty($constraints['bundle']) ? $constraints['bundle'] : FALSE;
 
     // Add in per-bundle properties.
-    // @todo: Should this be statically cached as well?
-    if (!empty($constraints['bundle']) && isset($this->entityFieldInfo['bundle map'][$constraints['bundle']])) {
-      $definitions += array_intersect_key($this->entityFieldInfo['optional'], array_flip($this->entityFieldInfo['bundle map'][$constraints['bundle']]));
-    }
+    if (!isset($this->fieldDefinitions[$bundle])) {
+      $this->fieldDefinitions[$bundle] = $this->entityFieldInfo['definitions'];
 
-    return $definitions;
+      if (isset($this->entityFieldInfo['bundle map'][$constraints['bundle']])) {
+        $this->fieldDefinitions[$bundle] += array_intersect_key($this->entityFieldInfo['optional'], array_flip($this->entityFieldInfo['bundle map'][$constraints['bundle']]));
+      }
+    }
+    return $this->fieldDefinitions[$bundle];
   }
 
   /**

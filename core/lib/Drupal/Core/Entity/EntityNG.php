@@ -88,16 +88,6 @@ class EntityNG extends Entity {
    * Initialize the object. Invoked upon construction and wake up.
    */
   protected function init() {
-    if (!isset(static::$fieldDefinitions)) {
-      static::$fieldDefinitions = &drupal_static(__CLASS__ . __FUNCTION__);
-    }
-    if (!isset(static::$fieldDefinitions[$this->entityType][$this->bundle])) {
-      $definitions = entity_get_controller($this->entityType)->getFieldDefinitions(array(
-        'entity type' => $this->entityType,
-        'bundle' => $this->bundle,
-      ));
-      static::$fieldDefinitions[$this->entityType][$this->bundle] = $definitions;
-    }
     // We unset all defined properties, so magic getters apply.
     unset($this->langcode);
   }
@@ -199,7 +189,7 @@ class EntityNG extends Entity {
    * Implements ComplexDataInterface::getPropertyDefinition().
    */
   public function getPropertyDefinition($name) {
-    $definitions = &static::$fieldDefinitions[$this->entityType][$this->bundle];
+    $definitions = $this->getPropertyDefinitions();
     return isset($definitions[$name]) ? $definitions[$name] : FALSE;
   }
 
@@ -207,7 +197,10 @@ class EntityNG extends Entity {
    * Implements ComplexDataInterface::getPropertyDefinitions().
    */
   public function getPropertyDefinitions() {
-    return static::$fieldDefinitions[$this->entityType][$this->bundle];
+    return entity_get_controller($this->entityType)->getFieldDefinitions(array(
+      'entity type' => $this->entityType,
+      'bundle' => $this->bundle,
+    ));
   }
 
   /**
