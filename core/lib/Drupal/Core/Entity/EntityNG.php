@@ -88,6 +88,9 @@ class EntityNG extends Entity {
    * Initialize the object. Invoked upon construction and wake up.
    */
   protected function init() {
+    if (!isset(static::$fieldDefinitions)) {
+      static::$fieldDefinitions = &drupal_static(__CLASS__ . __FUNCTION__);
+    }
     if (!isset(static::$fieldDefinitions[$this->entityType][$this->bundle])) {
       $definitions = entity_get_controller($this->entityType)->getFieldDefinitions(array(
         'entity type' => $this->entityType,

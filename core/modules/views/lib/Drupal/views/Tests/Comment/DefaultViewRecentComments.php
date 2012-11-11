@@ -77,11 +77,10 @@ class DefaultViewRecentComments extends ViewTestBase {
 
     // Create some comments and attach them to the created node.
     for ($i = 0; $i < $this->masterDisplayResults; $i++) {
-      $comment = entity_create('comment', array());
+      $comment = entity_create('comment', array('node_type' => 'comment_node_' . $this->node->type));
       $comment->uid->value = 0;
       $comment->nid->value = $this->node->nid;
       $comment->subject->value = 'Test comment ' . $i;
-      $comment->node_type->value = 'comment_node_' . $this->node->type;
       $comment->comment_body->value = 'Test body ' . $i;
       $comment->comment_body->format = 'full_html';
 
