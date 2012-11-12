@@ -64,13 +64,13 @@ class EntityNG extends Entity {
   protected $bcEntity;
 
   /**
-   * Static cache for field definitions, keyed by entity type and bundle.
+   * Local cache for field definitions.
    *
    * @see self::getPropertyDefinitions()
    *
    * @var array
    */
-  static $fieldDefinitions;
+  protected $fieldDefinitions;
 
   /**
    * Overrides Entity::__construct().
@@ -192,9 +192,11 @@ class EntityNG extends Entity {
    * Implements ComplexDataInterface::getPropertyDefinition().
    */
   public function getPropertyDefinition($name) {
-    $definitions = $this->getPropertyDefinitions();
-    if (isset($definitions[$name])) {
-      return $definitions[$name];
+    if (!isset($this->fieldDefinitions)) {
+      $this->getPropertyDefinitions();
+    }
+    if (isset($this->fieldDefinitions[$name])) {
+      return $this->fieldDefinitions[$name];
     }
     else {
       return FALSE;
@@ -205,10 +207,13 @@ class EntityNG extends Entity {
    * Implements ComplexDataInterface::getPropertyDefinitions().
    */
   public function getPropertyDefinitions() {
-    return entity_get_controller($this->entityType)->getFieldDefinitions(array(
-      'entity type' => $this->entityType,
-      'bundle' => $this->bundle,
-    ));
+    if (!isset($this->fieldDefinitions)) {
+      $this->fieldDefinitions = entity_get_controller($this->entityType)->getFieldDefinitions(array(
+        'entity type' => $this->entityType,
+        'bundle' => $this->bundle,
+      ));
+    }
+    return $this->fieldDefinitions;
   }
 
   /**

@@ -30,7 +30,6 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
    */
   protected $entityCache;
 
-  protected $fieldDefinitions;
 
   /**
    * Entity type for this controller instance.
@@ -56,6 +55,13 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
    * @see hook_entity_field_info()
    */
   protected $entityFieldInfo;
+
+  /**
+   * Static cache of field definitions per bundle.
+   *
+   * @var array
+   */
+  protected $fieldDefinitions;
 
   /**
    * Additional arguments to pass to hook_TYPE_load().
@@ -688,7 +694,7 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
     if (!isset($this->fieldDefinitions[$bundle])) {
       $this->fieldDefinitions[$bundle] = $this->entityFieldInfo['definitions'];
 
-      if (isset($this->entityFieldInfo['bundle map'][$constraints['bundle']])) {
+      if ($bundle && isset($this->entityFieldInfo['bundle map'][$constraints['bundle']])) {
         $this->fieldDefinitions[$bundle] += array_intersect_key($this->entityFieldInfo['optional'], array_flip($this->entityFieldInfo['bundle map'][$constraints['bundle']]));
       }
     }
