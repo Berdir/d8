@@ -138,12 +138,12 @@ class UpdateComplexTest extends DatabaseTestBase {
    */
   function testSubSelectUpdate() {
     $subselect = db_select('test', 't');
-    $subselect->addExpression('MAX(age)', 'max_age');
+    $subselect->addExpression('MAX(age) + :increment', 'max_age', array(':increment' => 1));
     db_update('test_task')
       ->expression('priority', $subselect)
       ->execute();
     $results = array_map('intval', db_query('SELECT priority FROM {test_task}')->fetchCol());
-    $this->assertIdentical(array(28), array_unique($results));
+    $this->assertIdentical(array(29), array_unique($results));
   }
 
 }

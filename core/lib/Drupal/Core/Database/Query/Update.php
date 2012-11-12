@@ -212,6 +212,10 @@ class Update extends Query implements ConditionInterface {
       if (!empty($data['arguments'])) {
         $update_values += $data['arguments'];
       }
+      if ($data['expression'] instanceof SelectInterface) {
+        $data['expression']->compile($this->connection, $this);
+        $update_values += $data['expression']->arguments();
+      }
       unset($fields[$field]);
     }
 
