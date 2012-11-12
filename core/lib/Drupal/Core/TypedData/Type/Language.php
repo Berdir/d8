@@ -82,7 +82,9 @@ class Language extends TypedData implements TypedDataInterface, ContextAwareInte
   public function getValue() {
     $source = $this->getLanguageCodeSource();
     $langcode = $source ? $source->getValue() : $this->langcode;
-    return $langcode ? language_load($langcode) : NULL;
+    if ($langcode) {
+      return language_load($langcode);
+    }
   }
 
   /**

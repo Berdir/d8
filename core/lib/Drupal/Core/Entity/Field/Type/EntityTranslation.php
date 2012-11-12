@@ -186,7 +186,12 @@ class EntityTranslation extends TypedData implements IteratorAggregate, Accessib
    */
   public function getPropertyDefinition($name) {
     $definitions = $this->getPropertyDefinitions();
-    return isset($definitions[$name]) ? $definitions[$name] : FALSE;
+    if (isset($definitions[$name])) {
+      return $definitions[$name];
+    }
+    else {
+      return FALSE;
+    }
   }
 
   /**

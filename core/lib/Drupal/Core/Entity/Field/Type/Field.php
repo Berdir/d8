@@ -56,7 +56,12 @@ class Field extends TypedData implements IteratorAggregate, FieldInterface {
   public function getValue() {
     $values = array();
     foreach ($this->list as $delta => $item) {
-      $values[$delta] = !$item->isEmpty() ? $item->getValue() : NULL;
+      if (!$item->isEmpty()) {
+        $values[$delta] = $item->getValue();
+      }
+      else {
+        $values[$delta] = NULL;
+      }
     }
     return $values;
   }

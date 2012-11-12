@@ -115,7 +115,12 @@ abstract class FieldItemBase extends TypedData implements IteratorAggregate, Fie
     }
 
     foreach ($this->properties as $name => $property) {
-      $property->setValue(isset($values[$name]) ? $values[$name] : NULL);
+      if (isset($values[$name])) {
+        $property->setValue($values[$name]);
+      }
+      else {
+        $property->setValue(NULL);
+      }
     }
     // @todo: Throw an exception for invalid values once conversion is
     // totally completed.
@@ -261,7 +266,12 @@ abstract class FieldItemBase extends TypedData implements IteratorAggregate, Fie
    */
   public function getPropertyDefinition($name) {
     $definitions = $this->getPropertyDefinitions();
-    return isset($definitions[$name]) ? $definitions[$name] : FALSE;
+    if (isset($definitions[$name])) {
+      return $definitions[$name];
+    }
+    else {
+      return FALSE;
+    }
   }
 
   /**

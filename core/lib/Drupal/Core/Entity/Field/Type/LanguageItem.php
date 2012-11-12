@@ -67,8 +67,11 @@ class LanguageItem extends FieldItemBase {
     if (!empty($values['value'])) {
       $this->properties['value']->setValue($values['value']);
     }
+    elseif (isset($values['language'])) {
+      $this->properties['language']->setValue($values['language']);
+    }
     else {
-      $this->properties['language']->setValue(isset($values['language']) ? $values['language'] : NULL);
+      $this->properties['language']->setValue(NULL);
     }
     unset($values['language'], $values['value']);
     if ($values) {

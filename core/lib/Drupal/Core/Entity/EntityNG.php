@@ -150,7 +150,10 @@ class EntityNG extends Entity {
         $this->fields[$property_name][$langcode] = $this->getTranslatedField($property_name, LANGUAGE_DEFAULT);
       }
       else {
-        $value = isset($this->values[$property_name][$langcode]) ? $this->values[$property_name][$langcode] : NULL;
+        $value = NULL;
+        if (isset($this->values[$property_name][$langcode])) {
+          $value = $this->values[$property_name][$langcode];
+        }
         $context = array('parent' => $this, 'name' => $property_name);
         $this->fields[$property_name][$langcode] = typed_data()->create($definition, $value, $context);
       }
@@ -190,7 +193,12 @@ class EntityNG extends Entity {
    */
   public function getPropertyDefinition($name) {
     $definitions = $this->getPropertyDefinitions();
-    return isset($definitions[$name]) ? $definitions[$name] : FALSE;
+    if (isset($definitions[$name])) {
+      return $definitions[$name];
+    }
+    else {
+      return FALSE;
+    }
   }
 
   /**

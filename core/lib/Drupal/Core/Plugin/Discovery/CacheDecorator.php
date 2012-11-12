@@ -69,7 +69,9 @@ class CacheDecorator implements CachedDiscoveryInterface {
       // Initialize definitions.
       $this->getDefinitions();
     }
-    return isset($this->definitions[$plugin_id]) ? $this->definitions[$plugin_id] : NULL;
+    if (isset($this->definitions[$plugin_id])) {
+      return $this->definitions[$plugin_id];
+    }
   }
 
   /**
