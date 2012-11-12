@@ -7,7 +7,7 @@
 
 namespace Drupal\system\Tests\Database;
 
-use Drupal\simpletest\WebTestBase;
+use Drupal\simpletest\DrupalUnitTestBase;
 
 /**
  * Tests for databases.
@@ -15,7 +15,7 @@ use Drupal\simpletest\WebTestBase;
  * Because all database tests share the same test data, we can centralize that
  * here.
  */
-abstract class DatabaseTestBase extends WebTestBase {
+abstract class DatabaseTestBase extends DrupalUnitTestBase {
 
   /**
    * Modules to enable.
