@@ -245,6 +245,9 @@ class Update extends Query implements ConditionInterface {
     $fields = $this->fields;
     $update_fields = array();
     foreach ($this->expressionFields as $field => $data) {
+      if ($data['expression'] instanceof SelectInterface) {
+        $data['expression'] = ' (' . $data['expression'] . ')';
+      }
       $update_fields[] = $field . '=' . $data['expression'];
       unset($fields[$field]);
     }

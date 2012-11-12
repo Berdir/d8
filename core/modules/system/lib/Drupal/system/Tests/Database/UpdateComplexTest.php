@@ -132,4 +132,18 @@ class UpdateComplexTest extends DatabaseTestBase {
     $after_age = db_query('SELECT age FROM {test} WHERE name = :name', array(':name' => 'Ringo'))->fetchField();
     $this->assertEqual($before_age + 4, $after_age, 'Age updated correctly');
   }
+
+  /**
+   * Test UPDATE with a subselect value.
+   */
+  function testSubSelectUpdate() {
+    $subselect = db_select('test', 't');
+    $subselect->addExpression('MAX(age)', 'max_age');
+    db_update('test_task')
+      ->expression('priority', $subselect)
+      ->execute();
+    $results = array_map('intval', db_query('SELECT priority FROM {test_task}')->fetchCol());
+    $this->assertIdentical(array(28), array_unique($results));
+  }
+
 }
