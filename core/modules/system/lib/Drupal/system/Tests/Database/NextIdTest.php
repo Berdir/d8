@@ -7,18 +7,25 @@
 
 namespace Drupal\system\Tests\Database;
 
-use Drupal\simpletest\WebTestBase;
+use Drupal\simpletest\UnitTestBase;
 
 /**
  * Checks the sequences API.
  */
-class NextIdTest extends WebTestBase {
+class NextIdTest extends UnitTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Sequences API',
       'description' => 'Test the secondary sequences API.',
       'group' => 'Database',
     );
+  }
+
+  public function setUp() {
+    parent::setUp();
+    module_load_install('system');
+    $schema = system_schema();
+    db_create_table('sequences', $schema['sequences']);
   }
 
   /**
