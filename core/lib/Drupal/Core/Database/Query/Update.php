@@ -250,6 +250,8 @@ class Update extends Query implements ConditionInterface {
     $update_fields = array();
     foreach ($this->expressionFields as $field => $data) {
       if ($data['expression'] instanceof SelectInterface) {
+        // Compile and cast expression subquery to a string.
+        $data['expression']->compile($this->connection, $this);
         $data['expression'] = ' (' . $data['expression'] . ')';
       }
       $update_fields[] = $field . '=' . $data['expression'];
