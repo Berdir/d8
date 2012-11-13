@@ -394,25 +394,25 @@ function standard_install() {
     ->execute();
 
   // Create a Home link in the main menu.
-  $item = array(
+  $item = entity_create('menu_link', array(
     'link_title' => st('Home'),
     'link_path' => '<front>',
     'menu_name' => 'main',
-  );
+  ));
   menu_link_save($item);
 
   // Populate the default shortcut set.
   $shortcut_set = shortcut_set_load(SHORTCUT_DEFAULT_SET_NAME);
-  $shortcut_set->links[] = array(
+  $shortcut_set->links[] = entity_create('menu_link', array(
     'link_path' => 'node/add',
     'link_title' => st('Add content'),
     'weight' => -20,
-  );
-  $shortcut_set->links[] = array(
+  ));
+  $shortcut_set->links[] = entity_create('menu_link', array(
     'link_path' => 'admin/content',
     'link_title' => st('Find content'),
     'weight' => -19,
-  );
+  ));
   shortcut_set_save($shortcut_set);
 
   // Update the menu router information.

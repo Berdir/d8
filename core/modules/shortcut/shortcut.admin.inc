@@ -120,7 +120,7 @@ function shortcut_set_switch_submit($form, &$form_state) {
     $default_set = shortcut_default_set($account);
     $set = (object) array(
       'title' => $form_state['values']['new'],
-      'links' => menu_links_clone($default_set->links),
+      'links' => menu_link_clone($default_set->links),
     );
     shortcut_set_save($set);
     $replacements = array(
@@ -241,7 +241,7 @@ function shortcut_set_add_form_submit($form, &$form_state) {
   $default_set = shortcut_default_set();
   $set = (object) array(
     'title' => $form_state['values']['new'],
-    'links' => menu_links_clone($default_set->links),
+    'links' => menu_link_clone($default_set->links),
   );
   shortcut_set_save($set);
   drupal_set_message(t('The %set_name shortcut set has been created. You can edit it from this page.', array('%set_name' => $set->title)));
@@ -424,10 +424,10 @@ function shortcut_link_edit($form, &$form_state, $shortcut_link) {
  */
 function _shortcut_link_form_elements($shortcut_link = NULL) {
   if (!isset($shortcut_link)) {
-    $shortcut_link = array(
+    $shortcut_link = entity_create('menu_link', array(
       'link_title' => '',
       'link_path' => ''
-    );
+    ));
   }
   else {
     $shortcut_link['link_path'] = ($shortcut_link['link_path'] == '<front>') ? '' : drupal_get_path_alias($shortcut_link['link_path']);
@@ -483,7 +483,10 @@ function shortcut_link_edit_submit($form, &$form_state) {
   }
   $form_state['values']['shortcut_link']['link_path'] = $shortcut_path;
 
-  $shortcut_link = array_merge($form_state['values']['original_shortcut_link'], $form_state['values']['shortcut_link']);
+  $shortcut_link = $form_state['values']['original_shortcut_link'];
+  foreach ($form_state['values']['shortcut_link'] as $key => $value) {
+   $shortcut_link[$key] = $value;
+  }
 
   menu_link_save($shortcut_link);
   $form_state['redirect'] = 'admin/config/user-interface/shortcut/' . $shortcut_link['menu_name'];
@@ -496,7 +499,7 @@ function shortcut_link_edit_submit($form, &$form_state) {
 function shortcut_link_add_submit($form, &$form_state) {
   // Add the shortcut link to the set.
   $shortcut_set = $form_state['values']['shortcut_set'];
-  $shortcut_link = $form_state['values']['shortcut_link'];
+  $shortcut_link = entity_create('menu_link', $form_state['values']['shortcut_link']);
   $shortcut_link['menu_name'] = $shortcut_set->set_name;
   shortcut_admin_add_link($shortcut_link, $shortcut_set);
   shortcut_set_save($shortcut_set);

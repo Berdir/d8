@@ -5,8 +5,9 @@
  * Allows users to create and organize related content in an outline.
  */
 
-use Drupal\node\Plugin\Core\Entity\Node;
 use Drupal\Core\Template\Attribute;
+use Drupal\menu_link\MenuLinkStorageController;
+use Drupal\node\Plugin\Core\Entity\Node;
 
 /**
  * Implements hook_help().
@@ -641,7 +642,9 @@ function _book_update_outline(Node $node) {
     }
   }
 
-  if (menu_link_save($node->book)) {
+  $node->book = entity_create('menu_link', $node->book);
+  try {
+    menu_link_save($node->book);
     if ($new) {
       // Insert new.
       db_insert('book')
@@ -667,9 +670,10 @@ function _book_update_outline(Node $node) {
 
     return TRUE;
   }
-
-  // Failed to save the menu link.
-  return FALSE;
+  catch (Exception $e) {
+    // Failed to save the menu link.
+    return FALSE;
+  }
 }
 
 /**
@@ -1009,7 +1013,7 @@ function book_node_prepare(Node $node) {
  *   The depth limit for items in the parent select.
  */
 function _book_parent_depth_limit($book_link) {
-  return MENU_MAX_DEPTH - 1 - (($book_link['mlid'] && $book_link['has_children']) ? menu_link_children_relative_depth($book_link) : 0);
+  return MENU_MAX_DEPTH - 1 - (($book_link['mlid'] && $book_link['has_children']) ? entity_get_controller('menu_link')->findChildrenRelativeDepth($book_link) : 0);
 }
 
 /**

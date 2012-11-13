@@ -18,13 +18,19 @@ function system_admin_config_page() {
     drupal_set_message(t('One or more problems were detected with your Drupal installation. Check the <a href="@status">status report</a> for more information.', array('@status' => url('admin/reports/status'))), 'error');
   }
   $blocks = array();
-  if ($admin = db_query("SELECT menu_name, mlid FROM {menu_links} WHERE link_path = 'admin/config' AND module = 'system'")->fetchAssoc()) {
-    $result = db_query("
-      SELECT m.*, ml.*
-      FROM {menu_links} ml
-      INNER JOIN {menu_router} m ON ml.router_path = m.path
-      WHERE ml.link_path <> 'admin/help' AND menu_name = :menu_name AND ml.plid = :mlid AND hidden = 0", $admin, array('fetch' => PDO::FETCH_ASSOC));
-    foreach ($result as $item) {
+  if ($system_link = entity_load_multiple_by_properties('menu_link', array('link_path' => 'admin/config', 'module' => 'system'))) {
+    $system_link = reset($system_link);
+    $query = entity_query('menu_link')
+      ->condition('link_path', 'admin/help', '<>')
+      ->condition('menu_name', $system_link->menu_name)
+      ->condition('plid', $system_link->id())
+      ->condition('hidden', 0);
+    $result = $query->execute();
+    if (!empty($result)) {
+      $menu_links = menu_link_load_multiple($result);
+    }
+
+    foreach ($menu_links as $item) {
       _menu_link_translate($item);
       if (!$item['access']) {
         continue;

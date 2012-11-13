@@ -52,16 +52,16 @@ abstract class ShortcutTestBase extends WebTestBase {
 
       // Populate the default shortcut set.
       $shortcut_set = shortcut_set_load(SHORTCUT_DEFAULT_SET_NAME);
-      $shortcut_set->links[] = array(
+      $shortcut_set->links[] = entity_create('menu_link', array(
         'link_path' => 'node/add',
         'link_title' => st('Add content'),
         'weight' => -20,
-      );
-      $shortcut_set->links[] = array(
+      ));
+      $shortcut_set->links[] = entity_create('menu_link', array(
         'link_path' => 'admin/content',
         'link_title' => st('Find content'),
         'weight' => -19,
-      );
+      ));
       shortcut_set_save($shortcut_set);
     }
 
@@ -75,6 +75,8 @@ abstract class ShortcutTestBase extends WebTestBase {
     // Log in as admin and grab the default shortcut set.
     $this->drupalLogin($this->admin_user);
     $this->set = shortcut_set_load(SHORTCUT_DEFAULT_SET_NAME);
+    // Reset the keys of the links array.
+    $this->set->links = array_values($this->set->links);
     shortcut_set_assign_user($this->set, $this->admin_user);
   }
 
@@ -104,10 +106,10 @@ abstract class ShortcutTestBase extends WebTestBase {
    * Creates a generic shortcut link.
    */
   function generateShortcutLink($path, $title = '') {
-    $link = array(
+    $link = entity_create('menu_link', array(
       'link_path' => $path,
       'link_title' => !empty($title) ? $title : $this->randomName(10),
-    );
+    ));
 
     return $link;
   }

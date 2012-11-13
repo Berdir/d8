@@ -460,6 +460,10 @@ $container->register('router.dumper', '\Drupal\Core\Routing\MatcherDumper')
 $container->register('router.builder', 'Drupal\Core\Routing\RouteBuilder')
   ->addArgument(new Reference('router.dumper'))
   ->addArgument(new Reference('lock'));
+$container->register('entity.query', 'Drupal\Core\Entity\Query\QueryFactory')
+  ->addArgument(new Reference('service_container'));
+$container->register('entity.query.field_sql_storage', 'Drupal\field_sql_storage\Entity\QueryFactory')
+  ->addArgument(new Reference('database'));
 
 // Turn error reporting back on. From now on, only fatal errors (which are
 // not passed through the error handler) will cause a message to be printed.

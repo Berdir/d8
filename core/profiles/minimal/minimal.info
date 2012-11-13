@@ -2,6 +2,7 @@ name = Minimal
 description = Build a custom site without pre-configured functionality. Suitable for advanced users.
 version = VERSION
 core = 8.x
+dependencies[] = menu_link
 dependencies[] = node
 dependencies[] = block
 dependencies[] = dblog
