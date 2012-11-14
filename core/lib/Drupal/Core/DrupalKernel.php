@@ -203,11 +203,32 @@ class DrupalKernel extends Kernel implements DrupalKernelInterface {
     // If we haven't yet booted, we don't need to do anything: the new module
     // list will take effect when boot() is called. If we have already booted,
     // then reboot in order to refresh the bundle list and container.
-    if ($this->booted) {
+    if ($this->booted && $this->getBundleClasses($old_module_list) != $this->getBundleClasses($this->moduleList)) {
       drupal_container(NULL, TRUE);
       $this->booted = FALSE;
       $this->boot();
     }
+  }
+
+  /**
+   * Retrieves the name of bundle classes for a given list of modules.
+   *
+   * @param array $module_list
+   *   An associative array whose keys and values are the names of modules.
+   *
+   * @return array
+   *   An array whose values are bundle class names.
+   */
+  protected function getBundleClasses($module_list) {
+    $bundle_classes = array();
+    foreach ($module_list as $module) {
+      $camelized = ContainerBuilder::camelize($module);
+      $class = "Drupal\\{$module}\\{$camelized}Bundle";
+      if (class_exists($class)) {
+        $bundle_classes[] = $class;
+      }
+    }
+    return $bundle_classes;
   }
 
   /**

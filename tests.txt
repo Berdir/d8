@@ -1,0 +1,738 @@
+Actions executing in a potentially infinite loop 21 passes, 0 fails, and 0 exceptions
+Aggregator configuration 20 passes, 0 fails, and 0 exceptions
+Actions configuration 39 passes, 0 fails, and 0 exceptions
+Categorize feed functionality 21 passes, 0 fails, and 0 exceptions
+Categorize feed item functionality 61 passes, 0 fails, and 0 exceptions
+Update on cron functionality 55 passes, 0 fails, and 0 exceptions
+Remove feed functionality 25 passes, 0 fails, and 0 exceptions
+Import feeds from OPML functionality 55 passes, 0 fails, and 0 exceptions
+Add feed functionality 71 passes, 0 fails, and 0 exceptions
+Miscellaneous AJAX tests 7 passes, 0 fails, and 0 exceptions
+Update feed functionality 76 passes, 0 fails, and 0 exceptions
+AJAX command form values 29 passes, 0 fails, and 0 exceptions
+AJAX commands 73 passes, 0 fails, and 0 exceptions
+Update feed item functionality 65 passes, 0 fails, and 0 exceptions
+Batch percentages 18 passes, 0 fails, and 0 exceptions
+Feed parser functionality 72 passes, 0 fails, and 0 exceptions
+IP address banning 43 passes, 0 fails, and 0 exceptions
+Batch progress page 16 passes, 0 fails, and 0 exceptions
+Remove feed item functionality 270 passes, 0 fails, and 0 exceptions
+Administration theme 19 passes, 0 fails, and 0 exceptions
+Blocks not in hidden region 18 passes, 0 fails, and 0 exceptions
+Checks display of aggregator items 228 passes, 0 fails, and 0 exceptions
+Block template suggestions 3 passes, 0 fails, and 0 exceptions
+Block HTML id 16 passes, 0 fails, and 0 exceptions
+AJAX framework 34 passes, 0 fails, and 0 exceptions
+Blocks in invalid regions 24 passes, 0 fails, and 0 exceptions
+AJAX multi form 36 passes, 0 fails, and 0 exceptions
+Personalized block settings 12 passes, 0 fails, and 0 exceptions
+Get filename test 5 passes, 0 fails, and 0 exceptions
+New default theme blocks 22 passes, 0 fails, and 0 exceptions
+Non default theme admin 11 passes, 0 fails, and 0 exceptions
+Miscellaneous bootstrap unit tests 5 passes, 0 fails, and 0 exceptions
+Overriding server variables 6 passes, 0 fails, and 0 exceptions
+Boot and exit hook invocation 19 passes, 0 fails, and 0 exceptions
+Resettable static variables test 5 passes, 0 fails, and 0 exceptions
+IP address and HTTP_HOST test 11 passes, 0 fails, and 0 exceptions
+Timer test 5 passes, 0 fails, and 0 exceptions
+Breakpoint general API functions 6 passes, 0 fails, and 0 exceptions
+Variable test 9 passes, 0 fails, and 0 exceptions
+Breakpoint CRUD operations 21 passes, 0 fails, and 0 exceptions
+Language block visibility 91 passes, 0 fails, and 0 exceptions
+Breakpoint media query tests 63 passes, 0 fails, and 0 exceptions
+Breakpoint group general API functions 4 passes, 0 fails, and 0 exceptions
+Page cache test 77 passes, 2 fails, and 0 exceptions
+Backend chain implementation 48 passes, 0 fails, and 0 exceptions
+Breakpoint group CRUD operations 12 passes, 0 fails, and 0 exceptions
+Backend chain 86 passes, 0 fails, and 0 exceptions
+Database backend 86 passes, 0 fails, and 0 exceptions
+Cache clear test 9 passes, 0 fails, and 0 exceptions
+Memory cache backend 86 passes, 0 fails, and 0 exceptions
+Cache NullBackend test 2 passes, 0 fails, and 0 exceptions
+Cache install test 15 passes, 0 fails, and 0 exceptions
+Block caching 205 passes, 0 fails, and 0 exceptions
+Bundle Registration 9 passes, 0 fails, and 0 exceptions
+Comment actions 30 passes, 0 fails, and 0 exceptions
+Breakpoint theme functionality 23 passes, 0 fails, and 0 exceptions
+Comment Rebuild 33 passes, 0 fails, and 0 exceptions
+Color functionality 87 passes, 0 fails, and 0 exceptions
+Batch processing 161 passes, 0 fails, and 0 exceptions
+Anonymous comments 163 passes, 0 fails, and 0 exceptions
+Comment blocks 118 passes, 0 fails, and 0 exceptions
+Comment approval 152 passes, 0 fails, and 0 exceptions
+Comment 'new' indicator 42 passes, 0 fails, and 0 exceptions
+Block functionality 358 passes, 0 fails, and 0 exceptions
+Comment interface 251 passes, 0 fails, and 0 exceptions
+Comment deletion on node changes 24 passes, 0 fails, and 0 exceptions
+Comment node access 57 passes, 0 fails, and 0 exceptions
+Book functionality 517 passes, 0 fails, and 0 exceptions
+Comment language 72 passes, 0 fails, and 0 exceptions
+Comment RSS 26 passes, 0 fails, and 0 exceptions
+Comment fields 107 passes, 0 fails, and 0 exceptions
+Comment CSS 501 passes, 0 fails, and 0 exceptions
+Comment statistics 98 passes, 0 fails, and 0 exceptions
+Comment token replacement 66 passes, 0 fails, and 0 exceptions
+HTML Attributes 7 passes, 0 fails, and 0 exceptions
+Autocomplete tags 8 passes, 0 fails, and 0 exceptions
+Alter hook functionality 7 passes, 0 fails, and 0 exceptions
+drupal_add_feed() tests 7 passes, 0 fails, and 0 exceptions
+CSS Unit Tests 12 passes, 0 fails, and 0 exceptions
+Color conversion 85 passes, 0 fails, and 0 exceptions
+Comment Threading 159 passes, 0 fails, and 0 exceptions
+HTML identifiers 10 passes, 0 fails, and 0 exceptions
+Comment translation UI 68 passes, 0 fails, and 0 exceptions
+Comment paging settings 213 passes, 0 fails, and 0 exceptions
+JSON 21 passes, 0 fails, and 0 exceptions
+Parsing .info files 3 passes, 0 fails, and 0 exceptions
+Format date 71 passes, 0 fails, and 0 exceptions
+Redirect functionality 27 passes, 0 fails, and 0 exceptions
+Region content 18 passes, 0 fails, and 0 exceptions
+Size parsing test 35 passes, 0 fails, and 0 exceptions
+Comment links 1093 passes, 0 fails, 0 exceptions, and 64 debug messages
+SimpleTest error collector 16 passes, 0 fails, and 0 exceptions
+Drupal system listing 6 passes, 0 fails, and 0 exceptions
+Number step validation 24 passes, 0 fails, and 0 exceptions
+URL validation 79 passes, 0 fails, and 0 exceptions
+String filtering tests 17 passes, 0 fails, and 0 exceptions
+CRUD operations 18 passes, 0 fails, and 0 exceptions
+Comment preview 98 passes, 0 fails, and 0 exceptions
+Data record write functionality 34 passes, 0 fails, and 0 exceptions
+File content 31 passes, 0 fails, and 0 exceptions
+Import configuration 38 passes, 0 fails, and 0 exceptions
+Drupal HTTP request 35 passes, 0 fails, and 0 exceptions
+Installation functionality 11 passes, 0 fails, and 0 exceptions
+Configuration overrides 12 passes, 0 fails, and 0 exceptions
+Variable migration 11 passes, 0 fails, and 0 exceptions
+Configuration entity list 68 passes, 0 fails, and 0 exceptions
+Configuration entities 124 passes, 0 fails, and 0 exceptions
+DatabaseStorage controller operations 19 passes, 0 fails, and 0 exceptions
+FileStorage controller operations 21 passes, 0 fails, and 0 exceptions
+Locale override 3 passes, 0 fails, and 0 exceptions
+Import UI 46 passes, 0 fails, and 0 exceptions
+Contact form textfields 13 passes, 0 fails, and 0 exceptions
+drupal_render() 54 passes, 0 fails, and 0 exceptions
+Contextual links on node lists 16 passes, 0 fails, and 0 exceptions
+URL generation tests 70 passes, 0 fails, and 0 exceptions
+Schema API 588 passes, 0 fails, and 0 exceptions
+Personal contact form 162 passes, 0 fails, and 0 exceptions
+Connection unit tests 12 passes, 0 fails, and 0 exceptions
+Case sensitivity 8 passes, 0 fails, and 0 exceptions
+Basic SQL syntax tests 30 passes, 0 fails, and 0 exceptions
+Site-wide contact form 244 passes, 0 fails, and 0 exceptions
+Cascading stylesheets 41 passes, 0 fails, and 0 exceptions
+Delete/Truncate tests 23 passes, 0 fails, and 0 exceptions
+Empty statement 4 passes, 0 fails, and 0 exceptions
+Connection tests 38 passes, 0 fails, and 0 exceptions
+Query altering tests 62 passes, 0 fails, and 0 exceptions
+Invalid data 8 passes, 0 fails, and 0 exceptions
+Insert tests, LOB fields 15 passes, 0 fails, and 0 exceptions
+Sequences API 2 passes, 0 fails, and 0 exceptions
+Insert tests, default fields 22 passes, 0 fails, and 0 exceptions
+Custom query syntax tests 7 passes, 0 fails, and 0 exceptions
+Range query test 8 passes, 0 fails, and 0 exceptions
+Fetch tests 66 passes, 0 fails, and 0 exceptions
+Select tests, ordered 29 passes, 0 fails, and 0 exceptions
+Insert tests 51 passes, 0 fails, and 0 exceptions
+Query logging 44 passes, 0 fails, and 0 exceptions
+Regression tests 31 passes, 0 fails, and 0 exceptions
+Serialize query 7 passes, 0 fails, and 0 exceptions
+Merge tests 83 passes, 0 fails, and 0 exceptions
+Tablesort query tests 45 passes, 0 fails, and 0 exceptions
+Temporary query test 11 passes, 0 fails, and 0 exceptions
+Pager query tests 47 passes, 0 fails, and 0 exceptions
+Query tagging tests 32 passes, 0 fails, and 0 exceptions
+Select tests, subqueries 43 passes, 0 fails, and 0 exceptions
+DateTimePlus 54 passes, 0 fails, and 0 exceptions
+Update tests, LOB 15 passes, 0 fails, and 0 exceptions
+
+Fatal error: Call to undefined function Drupal\system\Tests\Datetime\drupal_save_session() in /var/lib/drupaltestbot/sites/default/files/checkout/core/modules/system/lib/Drupal/system/Tests/Datetime/DrupalDateTimeTest.php on line 87
+FATAL Drupal\system\Tests\Datetime\DrupalDateTimeTest: test runner returned a non-zero error code (255).
+Transaction tests 74 passes, 0 fails, and 0 exceptions
+DrupalKernel tests 5 passes, 0 fails, and 0 exceptions
+Content negotiation 40 passes, 0 fails, and 0 exceptions
+Entity properties 4 passes, 0 fails, and 0 exceptions
+Entity info 6 passes, 0 fails, and 0 exceptions
+Entity CRUD 8 passes, 0 fails, and 0 exceptions
+Update tests, Complex 59 passes, 0 fails, and 0 exceptions
+Select tests, complex 156 passes, 0 fails, and 0 exceptions
+Update tests 56 passes, 0 fails, and 0 exceptions
+JavaScript 86 passes, 0 fails, and 0 exceptions
+Entity form 26 passes, 0 fails, and 0 exceptions
+Entity UUIDs 19 passes, 0 fails, and 0 exceptions
+Entity translation form 36 passes, 0 fails, and 0 exceptions
+Entity Translation 51 passes, 0 fails, and 0 exceptions
+Config Test Translation UI 13 passes, 0 fails, and 0 exceptions
+DBLog functionality 373 passes, 0 fails, and 0 exceptions
+Select tests 153 passes, 0 fails, and 0 exceptions
+Entity Query 60 passes, 0 fails, and 0 exceptions
+Entity Test Translation UI 68 passes, 0 fails, and 0 exceptions
+Entity CRUD hooks 114 passes, 0 fails, and 0 exceptions
+Entity Field API 143 passes, 0 fails, and 0 exceptions
+Field access tests 21 passes, 0 fails, and 0 exceptions
+Field Display API tests 46 passes, 0 fails, and 0 exceptions
+Field bulk delete tests 75 passes, 0 fails, and 0 exceptions
+Field instance CRUD tests 38 passes, 0 fails, and 0 exceptions
+Field attach tests (other) 103 passes, 0 fails, and 0 exceptions
+Field info tests 71 passes, 0 fails, and 0 exceptions
+E-mail field 18 passes, 0 fails, and 0 exceptions
+Multilingual fields 64 passes, 0 fails, and 0 exceptions
+Field CRUD tests 69 passes, 0 fails, and 0 exceptions
+Field translations tests 102 passes, 0 fails, and 0 exceptions
+Options field dynamic values 9 passes, 0 fails, and 0 exceptions
+Link field UI 21 passes, 0 fails, and 0 exceptions
+Options field 16 passes, 0 fails, and 0 exceptions
+Field SQL Storage tests 92 passes, 0 fails, and 0 exceptions
+Field attach tests (storage-related) 92 passes, 0 fails, and 0 exceptions
+Options select dynamic values 16 passes, 0 fails, and 0 exceptions
+Number field 87 passes, 0 fails, and 0 exceptions
+Field form tests 265 passes, 0 fails, and 0 exceptions
+Link field 133 passes, 0 fails, and 0 exceptions
+Widget customization 21 passes, 0 fails, and 0 exceptions
+Text field 184 passes, 0 fails, and 0 exceptions
+File field display tests 50 passes, 0 fails, and 0 exceptions
+Options widgets 261 passes, 0 fails, and 0 exceptions
+Options field UI 207 passes, 0 fails, and 0 exceptions
+File field file path tests 27 passes, 0 fails, and 0 exceptions
+Text translation 104 passes, 0 fails, and 0 exceptions
+Manage display 123 passes, 0 fails, and 0 exceptions
+Text summary 138 passes, 0 fails, and 0 exceptions
+File field revision test 67 passes, 0 fails, and 0 exceptions
+File field RSS content 23 passes, 0 fails, and 0 exceptions
+File URL rewriting 14 passes, 0 fails, and 0 exceptions
+Private file test 37 passes, 0 fails, and 0 exceptions
+Manage fields 201 passes, 0 fails, and 0 exceptions
+File token replacement 35 passes, 0 fails, and 0 exceptions
+File delete 24 passes, 0 fails, and 0 exceptions
+File copying 110 passes, 0 fails, and 0 exceptions
+File saving 16 passes, 0 fails, and 0 exceptions
+File download 45 passes, 0 fails, and 0 exceptions
+File space used tests 12 passes, 0 fails, and 0 exceptions
+Managed file element test 268 passes, 0 fails, and 0 exceptions
+File validate 12 passes, 0 fails, and 0 exceptions
+File loading 34 passes, 0 fails, and 0 exceptions
+File moving 110 passes, 0 fails, and 0 exceptions
+File save data 93 passes, 0 fails, and 0 exceptions
+File mimetypes 42 passes, 0 fails, and 0 exceptions
+File usage 34 passes, 0 fails, and 0 exceptions
+File field validation tests 118 passes, 0 fails, and 0 exceptions
+File paths and directories 20 passes, 0 fails, and 0 exceptions
+File naming 5 passes, 0 fails, and 0 exceptions
+File validator tests 29 passes, 0 fails, and 0 exceptions
+Unmanaged file copying 29 passes, 0 fails, and 0 exceptions
+Stream wrappers 19 passes, 0 fails, and 0 exceptions
+Unmanaged file delete 7 passes, 0 fails, and 0 exceptions
+File scan directory 29 passes, 0 fails, and 0 exceptions
+Unmanaged file moving 20 passes, 0 fails, and 0 exceptions
+Unmanaged file save data 7 passes, 0 fails, and 0 exceptions
+Unmanaged recursive file delete 17 passes, 0 fails, and 0 exceptions
+Unmanaged file copying 32 passes, 0 fails, and 0 exceptions
+Unmanaged file delete 10 passes, 0 fails, and 0 exceptions
+File paths and directories 24 passes, 0 fails, and 0 exceptions
+File field widget test 299 passes, 0 fails, and 0 exceptions
+File uploading 270 passes, 0 fails, and 0 exceptions
+Unmanaged recursive file delete 21 passes, 0 fails, and 0 exceptions
+Unmanaged file save data 8 passes, 0 fails, and 0 exceptions
+Filter CRUD operations 239 passes, 0 fails, and 0 exceptions
+API 5 passes, 0 fails, and 0 exceptions
+Default text format functionality 33 passes, 0 fails, and 0 exceptions
+File scan directory 29 passes, 0 fails, and 0 exceptions
+Unmanaged file moving 23 passes, 0 fails, and 0 exceptions
+Unassigned text format functionality 1 pass, 0 fails, and 0 exceptions
+Filter format hooks 33 passes, 0 fails, and 0 exceptions
+Filter settings 12 passes, 0 fails, and 0 exceptions
+Filter module filters 215 passes, 0 fails, and 0 exceptions
+Local image input filter 46 passes, 0 fails, and 0 exceptions
+Form alter hooks 4 passes, 0 fails, and 0 exceptions
+Form API checkbox 97 passes, 0 fails, and 0 exceptions
+Form element and label output test 20 passes, 0 fails, and 0 exceptions
+Security 40 passes, 0 fails, and 0 exceptions
+Rebuild arbitrary forms 16 passes, 0 fails, and 0 exceptions
+Form API email 17 passes, 0 fails, and 0 exceptions
+Element processing 37 passes, 0 fails, and 0 exceptions
+Vertical tabs form element type test 39 passes, 0 fails, and 0 exceptions
+Form API file inclusion 11 passes, 0 fails, and 0 exceptions
+Unique HTML IDs 7 passes, 0 fails, and 0 exceptions
+Filter format access 272 passes, 0 fails, and 0 exceptions
+Programmatic form submissions 24 passes, 0 fails, and 0 exceptions
+Language select form element 47 passes, 0 fails, and 0 exceptions
+Form redirecting 31 passes, 0 fails, and 0 exceptions
+Form state values clearance (advanced) 7 passes, 0 fails, and 0 exceptions
+File uploading 270 passes, 0 fails, and 0 exceptions
+Form state values clearance 14 passes, 0 fails, and 0 exceptions
+Form rebuilding 53 passes, 0 fails, and 0 exceptions
+Form API URL 17 passes, 0 fails, and 0 exceptions
+Form wrapper callback 5 passes, 0 fails, and 0 exceptions
+Form triggering element determination 50 passes, 0 fails, and 0 exceptions
+Tableselect form element type test 69 passes, 0 fails, and 0 exceptions
+Forum index 27 passes, 0 fails, and 0 exceptions
+Directed acyclic graph manipulation 28 passes, 0 fails, and 0 exceptions
+Filter administration functionality 178 passes, 0 fails, and 0 exceptions
+Forum private node access test 63 passes, 0 fails, and 0 exceptions
+Form validation handlers 112 passes, 0 fails, and 0 exceptions
+image_dimensions_scale() 15 passes, 0 fails, and 0 exceptions
+No help 12 passes, 0 fails, and 0 exceptions
+Multistep form using form storage 120 passes, 0 fails, and 0 exceptions
+Image dimensions 56 passes, 0 fails, and 0 exceptions
+Forum blocks 148 passes, 0 fails, and 0 exceptions
+Image field default images tests 36 passes, 0 fails, and 0 exceptions
+Image field validation tests 21 passes, 0 fails, and 0 exceptions
+Form element validation 638 passes, 0 fails, and 0 exceptions
+Image theme functions 5 passes, 0 fails, and 0 exceptions
+Help functionality 287 passes, 0 fails, and 0 exceptions
+Image GD manipulation tests 204 passes, 0 fails, and 0 exceptions
+Installer language tests 8 passes, 0 fails, and 0 exceptions
+Image effects 43 passes, 0 fails, and 0 exceptions
+Image moving 4 passes, 0 fails, and 0 exceptions
+exception 'Symfony\Component\DependencyInjection\Exception\InvalidArgumentException' with message 'The service definition "session" does not exist.' in /var/lib/drupaltestbot/sites/default/files/checkout/core/vendor/symfony/dependency-injection/Symfony/Component/DependencyInjection/ContainerBuilder.php:690
+Stack trace:
+#0 /var/lib/drupaltestbot/sites/default/files/checkout/core/vendor/symfony/dependency-injection/Symfony/Component/DependencyInjection/ContainerBuilder.php(338): Symfony\Component\DependencyInjection\ContainerBuilder->getDefinition('session')
+#1 /var/lib/drupaltestbot/sites/default/files/checkout/core/modules/simpletest/lib/Drupal/simpletest/TestBase.php(1004): Symfony\Component\DependencyInjection\ContainerBuilder->get('session')
+#2 /var/lib/drupaltestbot/sites/default/files/checkout/core/modules/system/lib/Drupal/system/Tests/KeyValueStore/DatabaseStorageExpirableTest.php(49): Drupal\simpletest\TestBase->tearDown()
+#3 /var/lib/drupaltestbot/sites/default/files/checkout/core/modules/simpletest/lib/Drupal/simpletest/TestBase.php(703): Drupal\system\Tests\KeyValueStore\DatabaseStorageExpirableTest->tearDown()
+#4 /var/lib/drupaltestbot/sites/default/files/checkout/core/scripts/run-tests.sh(381): Drupal\simpletest\TestBase->run()
+#5 /var/lib/drupaltestbot/sites/default/files/checkout/core/scripts/run-tests.sh(22): simpletest_script_run_one_test('291', 'Drupal\system\T...')
+#6 {main}FATAL Drupal\system\Tests\KeyValueStore\DatabaseStorageExpirableTest: test runner returned a non-zero error code (1).
+exception 'Symfony\Component\DependencyInjection\Exception\InvalidArgumentException' with message 'The service definition "session" does not exist.' in /var/lib/drupaltestbot/sites/default/files/checkout/core/vendor/symfony/dependency-injection/Symfony/Component/DependencyInjection/ContainerBuilder.php:690
+Stack trace:
+#0 /var/lib/drupaltestbot/sites/default/files/checkout/core/vendor/symfony/dependency-injection/Symfony/Component/DependencyInjection/ContainerBuilder.php(338): Symfony\Component\DependencyInjection\ContainerBuilder->getDefinition('session')
+#1 /var/lib/drupaltestbot/sites/default/files/checkout/core/modules/simpletest/lib/Drupal/simpletest/TestBase.php(1004): Symfony\Component\DependencyInjection\ContainerBuilder->get('session')
+#2 /var/lib/drupaltestbot/sites/default/files/checkout/core/modules/system/lib/Drupal/system/Tests/KeyValueStore/DatabaseStorageTest.php(44): Drupal\simpletest\TestBase->tearDown()
+#3 /var/lib/drupaltestbot/sites/default/files/checkout/core/modules/simpletest/lib/Drupal/simpletest/TestBase.php(703): Drupal\system\Tests\KeyValueStore\DatabaseStorageTest->tearDown()
+#4 /var/lib/drupaltestbot/sites/default/files/checkout/core/scripts/run-tests.sh(381): Drupal\simpletest\TestBase->run()
+#5 /var/lib/drupaltestbot/sites/default/files/checkout/core/scripts/run-tests.sh(22): simpletest_script_run_one_test('292', 'Drupal\system\T...')
+#6 {main}FATAL Drupal\system\Tests\KeyValueStore\DatabaseStorageTest: test runner returned a non-zero error code (1).
+Garbage collection 2 passes, 0 fails, and 0 exceptions
+exception 'Symfony\Component\DependencyInjection\Exception\InvalidArgumentException' with message 'The service definition "session" does not exist.' in /var/lib/drupaltestbot/sites/default/files/checkout/core/vendor/symfony/dependency-injection/Symfony/Component/DependencyInjection/ContainerBuilder.php:690
+Stack trace:
+#0 /var/lib/drupaltestbot/sites/default/files/checkout/core/vendor/symfony/dependency-injection/Symfony/Component/DependencyInjection/ContainerBuilder.php(338): Symfony\Component\DependencyInjection\ContainerBuilder->getDefinition('session')
+#1 /var/lib/drupaltestbot/sites/default/files/checkout/core/modules/simpletest/lib/Drupal/simpletest/TestBase.php(1004): Symfony\Component\DependencyInjection\ContainerBuilder->get('session')
+#2 /var/lib/drupaltestbot/sites/default/files/checkout/core/modules/system/lib/Drupal/system/Tests/KeyValueStore/MemoryStorageTest.php(49): Drupal\simpletest\TestBase->tearDown()
+#3 /var/lib/drupaltestbot/sites/default/files/checkout/core/modules/simpletest/lib/Drupal/simpletest/TestBase.php(703): Drupal\system\Tests\KeyValueStore\MemoryStorageTest->tearDown()
+#4 /var/lib/drupaltestbot/sites/default/files/checkout/core/scripts/run-tests.sh(381): Drupal\simpletest\TestBase->run()
+#5 /var/lib/drupaltestbot/sites/default/files/checkout/core/scripts/run-tests.sh(22): simpletest_script_run_one_test('294', 'Drupal\system\T...')
+#6 {main}FATAL Drupal\system\Tests\KeyValueStore\MemoryStorageTest: test runner returned a non-zero error code (1).
+JSON-LD Normalizer 4 passes, 0 fails, and 0 exceptions
+Image styles path and URL functions 65 passes, 0 fails, and 0 exceptions
+Drupal JSON-LD Normalizer 11 passes, 0 fails, and 0 exceptions
+PHP Fatal error:  Call to a member function get() on a non-object in /var/lib/drupaltestbot/sites/default/files/checkout/core/modules/simpletest/lib/Drupal/simpletest/TestBase.php on line 1004
+
+Fatal error: Call to a member function get() on a non-object in /var/lib/drupaltestbot/sites/default/files/checkout/core/modules/simpletest/lib/Drupal/simpletest/TestBase.php on line 1004
+Uncaught exception thrown in shutdown function.
+Drupal\Core\Database\DatabaseExceptionWrapper: SQLSTATE[HY000]: General error: failed to instantiate user-supplied statement class: SELECT 1 AS expression
+FROM
+{key_value} key_value
+WHERE ( (name = :db_condition_placeholder_0) AND (collection = :db_condition_placeholder_1) ) FOR UPDATE; Array
+(
+    [:db_condition_placeholder_0] =&gt; menu_expanded
+    [:db_condition_placeholder_1] =&gt; state
+)
+ in Drupal\Core\Database\Connection->query() (line 548 of /var/lib/drupaltestbot/sites/default/files/checkout/core/lib/Drupal/Core/Database/Connection.php).
+
+Uncaught exception thrown in shutdown function.
+Drupal\Core\Database\DatabaseExceptionWrapper: SQLSTATE[HY000]: General error: failed to instantiate user-supplied statement class: SELECT 1 AS expression
+FROM
+{key_value} key_value
+WHERE ( (name = :db_condition_placeholder_0) AND (collection = :db_condition_placeholder_1) ) FOR UPDATE; Array
+(
+    [:db_condition_placeholder_0] =&gt; menu_expanded
+    [:db_condition_placeholder_1] =&gt; state
+)
+ in Drupal\Core\Database\Connection->query() (line 548 of /var/lib/drupaltestbot/sites/default/files/checkout/core/lib/Drupal/Core/Database/Connection.php).
+
+Uncaught exception thrown in shutdown function.
+Drupal\Core\Database\DatabaseExceptionWrapper: SQLSTATE[HY000]: General error: failed to instantiate user-supplied statement class: SELECT 1 AS expression
+FROM
+{key_value} key_value
+WHERE ( (name = :db_condition_placeholder_0) AND (collection = :db_condition_placeholder_1) ) FOR UPDATE; Array
+(
+    [:db_condition_placeholder_0] =&gt; menu_expanded
+    [:db_condition_placeholder_1] =&gt; state
+)
+ in Drupal\Core\Database\Connection->query() (line 548 of /var/lib/drupaltestbot/sites/default/files/checkout/core/lib/Drupal/Core/Database/Connection.php).
+
+Image styles and effects UI configuration 204 passes, 0 fails, and 0 exceptions
+FATAL Drupal\forum\Tests\ForumTest: test runner returned a non-zero error code (255).
+Language negotiation autoconfiguration 46 passes, 0 fails, and 0 exceptions
+Custom Language configuration 36 passes, 0 fails, and 0 exceptions
+Image field display tests 160 passes, 0 fails, and 0 exceptions
+Browser language detection 107 passes, 0 fails, and 0 exceptions
+Language dependency injection 17 passes, 0 fails, and 0 exceptions
+Language negotiation info 49 passes, 0 fails, and 0 exceptions
+Paths on non-English monolingual sites 35 passes, 0 fails, and 0 exceptions
+Language switching 26 passes, 0 fails, and 0 exceptions
+Language configuration form element tests 54 passes, 0 fails, and 0 exceptions
+Language list configuration 100 passes, 0 fails, and 0 exceptions
+URL rewriting 44 passes, 0 fails, and 0 exceptions
+Layout derivatives 24 passes, 0 fails, and 0 exceptions
+String translation using st() 2 passes, 0 fails, and 0 exceptions
+Image toolkit tests 53 passes, 0 fails, and 0 exceptions
+Translation export 57 passes, 0 fails, and 0 exceptions
+Compare project states 68 passes, 0 fails, and 0 exceptions
+Javascript translation 66 passes, 0 fails, and 0 exceptions
+Javascript library localization 2 passes, 0 fails, and 0 exceptions
+UI language negotiation 133 passes, 0 fails, and 0 exceptions
+Path language settings 47 passes, 0 fails, and 0 exceptions
+String storage and objects 26 passes, 0 fails, and 0 exceptions
+Translation file import status 91 passes, 0 fails, and 0 exceptions
+Locale uninstall (FR) 36 passes, 0 fails, and 0 exceptions
+Locale uninstall (EN) 36 passes, 0 fails, and 0 exceptions
+Content language settings 149 passes, 0 fails, and 0 exceptions
+Plural handling 160 passes, 0 fails, and 0 exceptions
+Locking framework tests 29 passes, 0 fails, and 0 exceptions
+Mail system 4 passes, 0 fails, and 0 exceptions
+Menu rebuild test 5 passes, 0 fails, and 0 exceptions
+Translation import 201 passes, 0 fails, and 0 exceptions
+Menu links 50 passes, 0 fails, and 0 exceptions
+Menu tree generation 4 passes, 0 fails, and 0 exceptions
+Menu tree output 7 passes, 0 fails, and 0 exceptions
+Menu settings for nodes 61 passes, 0 fails, and 0 exceptions
+Module class loader 10 passes, 0 fails, and 0 exceptions
+HTML to text conversion 83 passes, 0 fails, and 0 exceptions
+Active trail 68 passes, 0 fails, and 0 exceptions
+Module installation 3 passes, 0 fails, and 0 exceptions
+Requirements hook failure 16 passes, 0 fails, and 0 exceptions
+String translate, search and validate 292 passes, 0 fails, and 0 exceptions
+Module enable 3 passes, 0 fails, and 0 exceptions
+Required modules 18 passes, 0 fails, and 0 exceptions
+Module uninstallation 2 passes, 0 fails, and 0 exceptions
+Multistep node form basic options 16 passes, 0 fails, and 0 exceptions
+Module versions 51 passes, 0 fails, and 0 exceptions
+Breadcrumbs 409 passes, 0 fails, and 0 exceptions
+Node access language 25 passes, 0 fails, and 0 exceptions
+Node access and fields 50 passes, 0 fails, and 0 exceptions
+Node access rebuild 19 passes, 0 fails, and 0 exceptions
+Node access records 26 passes, 0 fails, and 0 exceptions
+Node access pagination 30 passes, 0 fails, and 0 exceptions
+Node access 34 passes, 0 fails, and 0 exceptions
+Node access on any table 159 passes, 0 fails, and 0 exceptions
+Module dependencies 160 passes, 0 fails, and 0 exceptions
+Block availability 21 passes, 0 fails, and 0 exceptions
+Rebuild content 4 passes, 0 fails, and 0 exceptions
+Node blocks 84 passes, 0 fails, and 0 exceptions
+Node administration 145 passes, 0 fails, and 0 exceptions
+Node entity query alter 32 passes, 0 fails, and 0 exceptions
+Node feed 1 pass, 0 fails, and 0 exceptions
+Node entity view mode 20 passes, 0 fails, and 0 exceptions
+Node load hooks 7 passes, 0 fails, and 0 exceptions
+Load multiple nodes 27 passes, 0 fails, and 0 exceptions
+Node creation 49 passes, 0 fails, and 0 exceptions
+Node revision permissions 33 passes, 0 fails, and 0 exceptions
+Node post information display 40 passes, 0 fails, and 0 exceptions
+Node RSS Content 21 passes, 0 fails, and 0 exceptions
+Node revisions 64 passes, 0 fails, and 0 exceptions
+Node title 23 passes, 0 fails, and 0 exceptions
+Node title XSS filtering 23 passes, 0 fails, and 0 exceptions
+Node token replacement 37 passes, 0 fails, and 0 exceptions
+Node query alter 99 passes, 0 fails, and 0 exceptions
+Node save 60 passes, 0 fails, and 0 exceptions
+Node translation UI 65 passes, 0 fails, and 0 exceptions
+Node type persist 65 passes, 0 fails, and 0 exceptions
+Node type initial language 80 passes, 0 fails, and 0 exceptions
+Node edit permissions 34 passes, 0 fails, and 0 exceptions
+Node edit 97 passes, 0 fails, and 0 exceptions
+Node preview 41 passes, 0 fails, and 0 exceptions
+Summary length 18 passes, 0 fails, and 0 exceptions
+Module API 68 passes, 0 fails, and 0 exceptions
+Menu router 224 passes, 0 fails, and 0 exceptions
+Node types 136 passes, 0 fails, and 0 exceptions
+Pager functionality 123 passes, 0 fails, and 0 exceptions
+Path aliases with translated nodes 71 passes, 0 fails, and 0 exceptions
+OpenID helper functions 45 passes, 0 fails, and 0 exceptions
+Path lookup 13 passes, 0 fails, and 0 exceptions
+Taxonomy term URL aliases 37 passes, 0 fails, and 0 exceptions
+Drupal match path 41 passes, 0 fails, and 0 exceptions
+Path aliases with languages 78 passes, 0 fails, and 0 exceptions
+Path save 4 passes, 0 fails, and 0 exceptions
+Path alias functionality 138 passes, 0 fails, and 0 exceptions
+Simple file storage 12 passes, 0 fails, and 0 exceptions
+MTime protected fast file storage 19 passes, 0 fails, and 0 exceptions
+MTime protected file storage 19 passes, 0 fails, and 0 exceptions
+PHP filter access check 38 passes, 0 fails, and 0 exceptions
+PHP filter functionality 42 passes, 0 fails, and 0 exceptions
+Picture administration functionality 54 passes, 0 fails, and 0 exceptions
+Derivative Discovery 9 passes, 0 fails, and 0 exceptions
+Annotated class discovery 6 passes, 0 fails, and 0 exceptions
+Static discovery 6 passes, 0 fails, and 0 exceptions
+AlterDecorator 3 passes, 0 fails, and 0 exceptions
+Factory 9 passes, 0 fails, and 0 exceptions
+Inspection 10 passes, 0 fails, and 0 exceptions
+URL altering 34 passes, 0 fails, and 0 exceptions
+Poll choice deletion 54 passes, 0 fails, and 0 exceptions
+OpenID account registration 148 passes, 0 fails, and 0 exceptions
+Block availability 172 passes, 0 fails, and 0 exceptions
+Poll add choice 16 passes, 0 fails, and 0 exceptions
+Picture field display tests 116 passes, 0 fails, and 0 exceptions
+Poll expiration 52 passes, 0 fails, and 0 exceptions
+Poll create 269 passes, 0 fails, and 0 exceptions
+Poll token replacement 125 passes, 0 fails, and 0 exceptions
+Poll translation 73 passes, 0 fails, and 0 exceptions
+Queue functionality 14 passes, 0 fails, and 0 exceptions
+User poll vote capability. 127 passes, 15 fails, and 0 exceptions
+Poll vote 146 passes, 0 fails, and 0 exceptions
+RDF mapping CRUD functions 10 passes, 0 fails, and 0 exceptions
+RDF namespaces serialization test 7 passes, 0 fails, and 0 exceptions
+RDF namespaces 5 passes, 0 fails, and 0 exceptions
+OpenID discovery and login 318 passes, 0 fails, and 0 exceptions
+Chain matcher tests 3 passes, 0 fails, and 0 exceptions
+Controller Resolver tests 1 pass, 0 fails, and 0 exceptions
+FirstEntryFinalMatcher tests 8 passes, 0 fails, and 0 exceptions
+Partial matcher HTTP Method tests 8 passes, 0 fails, and 0 exceptions
+RDF mapping hook 6 passes, 0 fails, and 0 exceptions
+NestedMatcher tests 1 pass, 0 fails, and 0 exceptions
+Dumper tests 8 passes, 0 fails, and 0 exceptions
+Path matcher tests 27 passes, 0 fails, and 0 exceptions
+Routes 6 passes, 0 fails, and 0 exceptions
+Advanced search form 34 passes, 0 fails, and 0 exceptions
+RDF tracker page mapping 33 passes, 0 fails, and 0 exceptions
+Integrated Router tests 21 passes, 0 fails, and 0 exceptions
+Block availability 64 passes, 0 fails, and 0 exceptions
+RDFa markup 29 passes, 0 fails, and 0 exceptions
+Comment count toggle 31 passes, 0 fails, and 0 exceptions
+Menu link creation/deletion 3100 passes, 0 fails, and 0 exceptions
+Embedded forms 32 passes, 0 fails, and 0 exceptions
+Search expression insert/extract 24 passes, 0 fails, and 0 exceptions
+Search engine phrase queries 25 passes, 0 fails, and 0 exceptions
+Search excerpt extraction 18 passes, 0 fails, and 0 exceptions
+Keywords and conditions 28 passes, 0 fails, and 0 exceptions
+Config settings form 132 passes, 0 fails, and 0 exceptions
+Search engine queries 147 passes, 0 fails, and 0 exceptions
+RDF comment mapping 203 passes, 0 fails, and 0 exceptions
+Search language selection 41 passes, 0 fails, and 0 exceptions
+Search and node access 16 passes, 0 fails, and 0 exceptions
+Search page override 15 passes, 0 fails, and 0 exceptions
+Enable/disable modules 1893 passes, 0 fails, and 0 exceptions
+Multilingual entities 10 passes, 0 fails, and 0 exceptions
+Search page text 37 passes, 0 fails, and 0 exceptions
+Search numbers 175 passes, 0 fails, and 0 exceptions
+Search preprocess langcode 39 passes, 0 fails, and 0 exceptions
+Search simplify 657 passes, 0 fails, and 0 exceptions
+Serialization tests 2 passes, 0 fails, and 0 exceptions
+CJK tokenizer 8 passes, 0 fails, and 0 exceptions
+Session HTTPS handling 12 passes, 0 fails, and 1 exception
+RDF mapping definition functionality 59 passes, 0 fails, and 0 exceptions
+Search number matching 295 passes, 0 fails, and 0 exceptions
+Broken SimpleTest method 21 passes, 0 fails, and 0 exceptions
+Search engine ranking 59 passes, 0 fails, and 0 exceptions
+Comment Search tests 193 passes, 0 fails, and 0 exceptions
+SimpleTest browser 16 passes, 0 fails, and 0 exceptions
+Testing SimpleTest setUp 2 passes, 0 fails, and 0 exceptions
+SimpleTest e-mail capturing 12 passes, 0 fails, and 0 exceptions
+Session tests 133 passes, 8 fails, and 0 exceptions
+Broken requirements test 19 passes, 0 fails, and 0 exceptions
+Other Installation profiles 12 passes, 0 fails, and 0 exceptions
+Installation profile module tests 19 passes, 0 fails, and 0 exceptions
+Statistics logging tests 35 passes, 0 fails, and 0 exceptions
+Top visitor banning 46 passes, 0 fails, and 0 exceptions
+drupal_array_*() tests 13 passes, 0 fails, and 0 exceptions
+Tablesort 6 passes, 0 fails, and 0 exceptions
+Statistics token replacement 30 passes, 0 fails, and 0 exceptions
+FileTransfer unit tests 2 passes, 0 fails, and 0 exceptions
+Syslog functionality 17 passes, 0 fails, and 0 exceptions
+Fingerprinting meta tag 3 passes, 0 fails, and 0 exceptions
+403 functionality 68 passes, 0 fails, and 0 exceptions
+Shortcut link functionality 148 passes, 0 fails, and 0 exceptions
+Test statistics admin. 110 passes, 0 fails, and 0 exceptions
+Localize date formats 37 passes, 0 fails, and 0 exceptions
+Cron run 40 passes, 0 fails, and 0 exceptions
+Exception controller 2 passes, 0 fails, and 0 exceptions
+Administrative pages 181 passes, 0 fails, and 0 exceptions
+Default mobile meta tags 12 passes, 0 fails, and 0 exceptions
+Flood control mechanism 6 passes, 0 fails, and 0 exceptions
+Index.php handling 6 passes, 0 fails, and 0 exceptions
+Error handlers 40 passes, 0 fails, and 0 exceptions
+Info file format parser 9 passes, 0 fails, and 0 exceptions
+Front page 37 passes, 0 fails, and 0 exceptions
+Statistics reports tests 92 passes, 0 fails, and 0 exceptions
+System info alter 10 passes, 0 fails, and 0 exceptions
+SimpleTest functionality 114 passes, 0 fails, and 0 exceptions
+Password hashing 10 passes, 0 fails, and 0 exceptions
+404 functionality 18 passes, 0 fails, and 0 exceptions
+HTTP file retrieval 7 passes, 0 fails, and 0 exceptions
+Shutdown functions 5 passes, 0 fails, and 0 exceptions
+Authorize API 16 passes, 0 fails, and 0 exceptions
+Date and time 109 passes, 4 fails, and 0 exceptions
+Unicode handling 182 passes, 0 fails, and 0 exceptions
+Main content rendering fallback 60 passes, 0 fails, and 0 exceptions
+HTML in page titles 44 passes, 0 fails, and 0 exceptions
+Site maintenance mode functionality 77 passes, 0 fails, and 0 exceptions
+Taxonomy entity query 14 passes, 0 fails, and 0 exceptions
+Taxonomy term hooks 23 passes, 0 fails, and 0 exceptions
+Taxonomy term multiple loading 18 passes, 0 fails, and 0 exceptions
+Shortcut set functionality 216 passes, 0 fails, and 0 exceptions
+Token replacement 36 passes, 0 fails, and 0 exceptions
+Taxonomy RSS Content. 26 passes, 0 fails, and 0 exceptions
+Multiple vocabulary term reference field 26 passes, 0 fails, and 0 exceptions
+Test for legacy node bug. 14 passes, 0 fails, and 0 exceptions
+Taxonomy term unit tests 11 passes, 0 fails, and 0 exceptions
+Taxonomy term index 46 passes, 0 fails, and 0 exceptions
+Taxonomy theme switching 19 passes, 0 fails, and 0 exceptions
+Taxonomy term translation UI 64 passes, 0 fails, and 0 exceptions
+Taxonomy term language 64 passes, 0 fails, and 0 exceptions
+TempStore 19 passes, 0 fails, and 0 exceptions
+Taxonomy term reference field 45 passes, 0 fails, and 0 exceptions
+Taxonomy token replacement 55 passes, 0 fails, and 0 exceptions
+Theme interface functionality 205 passes, 0 fails, and 0 exceptions
+Theme fast initialization 12 passes, 0 fails, and 0 exceptions
+Theme HTML Tag 2 passes, 0 fails, and 0 exceptions
+Theme initialization in hook_init() 5 passes, 0 fails, and 0 exceptions
+html.tpl.php html and body attributes 5 passes, 0 fails, and 0 exceptions
+Vocabulary language 61 passes, 0 fails, and 0 exceptions
+ThemeRegistry 6 passes, 0 fails, and 0 exceptions
+Theme functions 25 passes, 0 fails, and 0 exceptions
+Theme Twig References 15 passes, 0 fails, and 0 exceptions
+Entity filtering theme test 56 passes, 0 fails, and 0 exceptions
+Theme Table 6 passes, 0 fails, and 0 exceptions
+Tracker Node Access Tests 28 passes, 0 fails, and 0 exceptions
+Twig Engine 10 passes, 0 fails, and 0 exceptions
+Taxonomy vocabulary interface 110 passes, 0 fails, and 0 exceptions
+Test typed data objects 61 passes, 0 fails, and 0 exceptions
+Taxonomy vocabularies 83 passes, 0 fails, and 0 exceptions
+Unit tests 4 passes, 0 fails, and 0 exceptions
+Taxonomy term functions and forms 263 passes, 0 fails, and 0 exceptions
+Upload and extract module functionality 64 passes, 0 fails, and 0 exceptions
+Update dependency hook invocation 4 passes, 0 fails, and 0 exceptions
+Missing update dependencies 4 passes, 0 fails, and 0 exceptions
+Basic minimal profile upgrade path, bare database 3 passes, 1 fail, and 1 exception
+Theme API 48 passes, 0 fails, and 0 exceptions
+Block upgrade test 3 passes, 1 fail, and 1 exception
+Basic standard + all profile upgrade path, bare database 3 passes, 1 fail, and 1 exception
+Basic minimal profile upgrade path, populated database 3 passes, 1 fail, and 1 exception
+Basic standard + all profile upgrade path, populated database 3 passes, 1 fail, and 1 exception
+Image upgrade test 3 passes, 1 fail, and 1 exception
+Update dependency ordering 5 passes, 0 fails, and 0 exceptions
+Modules disabled upgrade test 3 passes, 1 fail, and 1 exception
+State system upgrade test 3 passes, 1 fail, and 1 exception
+System config upgrade test 3 passes, 1 fail, and 1 exception
+Update functionality 201 passes, 0 fails, and 0 exceptions
+Role upgrade test 3 passes, 1 fail, and 1 exception
+Uuid upgrade test 3 passes, 1 fail, and 1 exception
+Language upgrade test 12 passes, 4 fails, and 4 exceptions
+Tracker 228 passes, 0 fails, and 0 exceptions
+User admin settings 4 passes, 0 fails, and 0 exceptions
+Authmap assignment 6 passes, 0 fails, and 0 exceptions
+User autocompletion 25 passes, 0 fails, and 0 exceptions
+User administration 61 passes, 0 fails, and 0 exceptions
+Update contrib functionality 187 passes, 0 fails, and 0 exceptions
+User delete test 15 passes, 0 fails, and 0 exceptions
+User blocks 36 passes, 0 fails, and 1 exception
+User create 33 passes, 0 fails, and 0 exceptions
+User edited own account 22 passes, 0 fails, and 0 exceptions
+User account links 61 passes, 0 fails, and 0 exceptions
+User entity callback tests 7 passes, 0 fails, and 0 exceptions
+User language settings 39 passes, 0 fails, and 0 exceptions
+User language creation 68 passes, 0 fails, and 0 exceptions
+User edit 78 passes, 0 fails, and 0 exceptions
+Update core functionality 214 passes, 0 fails, and 0 exceptions
+Reset password 30 passes, 0 fails, and 0 exceptions
+User login 159 passes, 0 fails, and 0 exceptions
+User role administration 54 passes, 0 fails, and 0 exceptions
+Role permissions 50 passes, 0 fails, and 0 exceptions
+User save test 2 passes, 0 fails, and 0 exceptions
+Role assignment 51 passes, 0 fails, and 0 exceptions
+User search 37 passes, 0 fails, and 0 exceptions
+User time zones 23 passes, 6 fails, and 0 exceptions
+User signatures 46 passes, 0 fails, and 0 exceptions
+User token replacement 47 passes, 0 fails, and 0 exceptions
+UUID handling 7 passes, 0 fails, and 0 exceptions
+Username/e-mail validation 16 passes, 0 fails, and 0 exceptions
+User validate current pass custom form 17 passes, 0 fails, and 0 exceptions
+User translation UI 63 passes, 0 fails, and 0 exceptions
+User registration 130 passes, 0 fails, and 0 exceptions
+Views Analyze 18 passes, 0 fails, 0 exceptions, and 3 debug messages
+Default views 72 passes, 0 fails, 0 exceptions, and 4 debug messages
+Glossary tests 8 passes, 0 fails, 0 exceptions, and 3 debug messages
+Plugin list 1 pass, 0 fails, and 0 exceptions
+Handler alias tests 10 passes, 0 fails, and 0 exceptions
+View core token replacement 12 passes, 0 fails, and 0 exceptions
+Plugin instantiation 256 passes, 0 fails, and 0 exceptions
+Translation functionality 590 passes, 0 fails, and 0 exceptions
+Basic query tests 11 passes, 0 fails, and 0 exceptions
+Upload user picture 126 passes, 0 fails, and 0 exceptions
+View element 15 passes, 0 fails, and 0 exceptions
+Views Module tests 52 passes, 0 fails, 0 exceptions, and 3 debug messages
+Configuration entity CRUD tests 109 passes, 0 fails, 0 exceptions, and 2 debug messages
+Table Data 14 passes, 0 fails, 0 exceptions, and 6 debug messages
+Default View - Recent Comments 8 passes, 0 fails, 0 exceptions, and 6 debug messages
+Argument: String 4 passes, 0 fails, and 0 exceptions
+Area: Text 5 passes, 0 fails, and 0 exceptions
+Argument: Null 5 passes, 0 fails, and 0 exceptions
+Field: Boolean 11 passes, 0 fails, and 0 exceptions
+Field: Date 15 passes, 0 fails, and 0 exceptions
+Field: Custom 2 passes, 0 fails, and 0 exceptions
+Field: File size 9 passes, 0 fails, and 0 exceptions
+Field: Counter 8 passes, 0 fails, and 0 exceptions
+Area: Base 58 passes, 0 fails, and 0 exceptions
+Field: URL 3 passes, 0 fails, and 0 exceptions
+View executable tests 110 passes, 0 fails, and 0 exceptions
+Field: XSS 4 passes, 0 fails, and 0 exceptions
+Groupby 40 passes, 0 fails, 0 exceptions, and 39 debug messages
+Filter: Combine 2 passes, 0 fails, and 0 exceptions
+Handlers: All 244 passes, 0 fails, 0 exceptions, and 22 debug messages
+Filter: Date 24 passes, 0 fails, 0 exceptions, and 6 debug messages
+Filter: In-operator 11 passes, 0 fails, and 0 exceptions
+Relationship: Standard 5 passes, 0 fails, and 0 exceptions
+Filter: Equality 8 passes, 0 fails, and 0 exceptions
+Sort: Date 25 passes, 0 fails, and 0 exceptions
+Sort: Random 7 passes, 0 fails, and 0 exceptions
+Comment: User UID Argument 9 passes, 0 fails, 0 exceptions, and 3 debug messages
+Comment: User UID Filter 9 passes, 0 fails, 0 exceptions, and 3 debug messages
+Field: Entity Api Integration 4 passes, 0 fails, and 0 exceptions
+Sort: Generic 10 passes, 0 fails, and 0 exceptions
+Field: Views Data 15 passes, 0 fails, and 0 exceptions
+Cancel account 254 passes, 0 fails, and 0 exceptions
+Node: Node Type field 2 passes, 0 fails, and 0 exceptions
+Field: Field handler 24 passes, 0 fails, and 0 exceptions
+Node: User has revision Filter 4 passes, 0 fails, and 0 exceptions
+Node: Revision integration 3 passes, 0 fails, and 0 exceptions
+Taxonomy: Node term data Relationship 2 passes, 0 fails, 0 exceptions, and 1 debug message
+Taxonomy: Representative Node Relationship 2 passes, 0 fails, and 0 exceptions
+User: Access permission 14 passes, 0 fails, and 0 exceptions
+User: Access role 14 passes, 0 fails, and 0 exceptions
+User: Argument default 9 passes, 0 fails, 0 exceptions, and 3 debug messages
+User: Uid Argument 5 passes, 0 fails, and 0 exceptions
+User: Name Field 7 passes, 0 fails, and 0 exceptions
+User: Representative Node Relationship 3 passes, 0 fails, and 0 exceptions
+Filter: Numeric 23 passes, 0 fails, and 0 exceptions
+User: Argument validator 19 passes, 0 fails, and 0 exceptions
+Field: Base 206 passes, 0 fails, and 0 exceptions
+Handler: Base 116 passes, 0 fails, 0 exceptions, and 2 debug messages
+Argument validator 6 passes, 0 fails, and 0 exceptions
+Display extender 6 passes, 0 fails, and 0 exceptions
+Display: Page plugin 7 passes, 0 fails, and 0 exceptions
+Access 39 passes, 0 fails, and 0 exceptions
+Display: Feed plugin 28 passes, 0 fails, and 0 exceptions
+Argument default 24 passes, 0 fails, and 0 exceptions
+Cache 12 passes, 0 fails, and 0 exceptions
+Filter: General 13 passes, 0 fails, and 0 exceptions
+User: Name Filter 57 passes, 0 fails, and 0 exceptions
+Join 16 passes, 0 fails, 0 exceptions, and 1 debug message
+Query 3 passes, 0 fails, and 0 exceptions
+Display 39 passes, 0 fails, and 0 exceptions
+Style: Mapping 43 passes, 0 fails, and 0 exceptions
+Style: Unformatted 18 passes, 0 fails, and 0 exceptions
+Exposed forms 85 passes, 0 fails, and 0 exceptions
+Display extender: UI 23 passes, 0 fails, and 0 exceptions
+Group By functionality 26 passes, 0 fails, and 0 exceptions
+Default views functionality 69 passes, 0 fails, and 0 exceptions
+Style: General 24 passes, 0 fails, and 0 exceptions
+Query: UI 19 passes, 0 fails, and 0 exceptions
+Handler test 110 passes, 0 fails, and 0 exceptions
+Redirect 26 passes, 0 fails, and 0 exceptions
+Pager 92 passes, 0 fails, 0 exceptions, and 6 debug messages
+Row: UI 30 passes, 0 fails, and 0 exceptions
+Storage properties 21 passes, 0 fails, and 0 exceptions
+Style: UI 30 passes, 0 fails, and 0 exceptions
+Settings functionality 90 passes, 0 fails, and 0 exceptions
+Tag 23 passes, 0 fails, and 0 exceptions
+Comment: Wizard 35 passes, 0 fails, 0 exceptions, and 6 debug messages
+Menu functionality 20 passes, 0 fails, 0 exceptions, and 6 debug messages
+Items per page functionality 40 passes, 0 fails, 0 exceptions, and 9 debug messages
+Sorting functionality 31 passes, 0 fails, 0 exceptions, and 9 debug messages
+Basic functionality 78 passes, 0 fails, 0 exceptions, and 18 debug messages
+XML-RPC validator 10 passes, 0 fails, and 0 exceptions
+Overridden displays functionality 167 passes, 0 fails, and 0 exceptions
+XML-RPC message and alteration 7 passes, 0 fails, and 0 exceptions
+XML-RPC basic 9 passes, 0 fails, and 0 exceptions
+Taxonomy functionality 78 passes, 0 fails, 0 exceptions, and 24 debug messages
+Display tests 201 passes, 0 fails, and 0 exceptions
+Filter: String 50 passes, 0 fails, and 0 exceptions
