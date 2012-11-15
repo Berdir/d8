@@ -40,15 +40,6 @@ class DrupalKernel extends Kernel implements DrupalKernelInterface {
   protected $moduleList;
 
   /**
-   * Holds an updated list of enabled modules.
-   *
-   * @var array
-   *   An associative array whose keys are module names and whose values are
-   *   ignored.
-   */
-  protected $newModuleList;
-
-  /**
    * An array of module data objects.
    *
    * The data objects have the same data structure as returned by
@@ -196,7 +187,8 @@ class DrupalKernel extends Kernel implements DrupalKernelInterface {
    * Implements Drupal\Core\DrupalKernelInterface::updateModules().
    */
   public function updateModules(array $module_list, array $module_paths = array()) {
-    $this->newModuleList = $module_list;
+    $old_module_list = $this->moduleList;
+    $this->moduleList = $module_list;
     foreach ($module_paths as $module => $path) {
       $this->moduleData[$module] = (object) array('uri' => $path);
     }
@@ -268,17 +260,8 @@ class DrupalKernel extends Kernel implements DrupalKernelInterface {
         $this->container = new $fully_qualified_class_name;
       }
     }
-    // First check whether the list of modules changed in this request.
-    if (isset($this->newModuleList)) {
-      if (isset($this->container) && isset($this->moduleList) && array_keys($this->moduleList) !== array_keys($this->newModuleList)) {
-        unset($this->container);
-      }
-      $this->moduleList = $this->newModuleList;
-      unset($this->newModuleList);
-    }
-    // Second, verify that some other request -- for example on another
-    // web frontend or during the installer -- changed the list of enabled
-    // modules.
+    // Verify if some other request -- for example on another web frontend or
+    // during the installer -- changed the list of enabled modules.
     if (isset($this->container)) {
       $module_list = $this->moduleList ?: $this->container->get('config.factory')->get('system.module')->load()->get('enabled');
       if (array_keys((array)$module_list) !== $this->container->getParameter('container.modules')) {
