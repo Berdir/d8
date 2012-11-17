@@ -353,7 +353,7 @@ function install_begin_request(&$install_state) {
     else {
       drupal_bootstrap(DRUPAL_BOOTSTRAP_CODE);
     }
-    $kernel = new DrupalKernel('prod', TRUE, NULL);
+    $kernel = new DrupalKernel('prod', TRUE, drupal_classloader());
     $kernel->boot();
 
     // We are anonymous until we reach install_configure_form_submit().
@@ -923,7 +923,7 @@ function install_system_rebuild(&$install_state) {
   // @see install_begin_request()
   drupal_bootstrap(DRUPAL_BOOTSTRAP_VARIABLES);
   _drupal_bootstrap_code();
-  $kernel = new DrupalKernel('prod', TRUE, NULL);
+  $kernel = new DrupalKernel('prod', TRUE, drupal_classloader());
   $kernel->boot();
 
   $install_state['base_system_verified'] = TRUE;
