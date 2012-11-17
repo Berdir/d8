@@ -39,14 +39,14 @@ abstract class ConfigStorageTestBase extends DrupalUnitTestBase {
     $data = $this->storage->read($name);
     $this->assertIdentical($data, FALSE);
 
-    // Reading a name containing non-decodeable data returns FALSE.
+    // Reading a name containing non-decodeable data returns an array.
     $this->insert($name, '');
     $data = $this->storage->read($name);
-    $this->assertIdentical($data, FALSE);
+    $this->assertIdentical($data, array());
 
     $this->update($name, 'foo');
     $data = $this->storage->read($name);
-    $this->assertIdentical($data, FALSE);
+    $this->assertIdentical($data, array());
 
     $this->delete($name);
 

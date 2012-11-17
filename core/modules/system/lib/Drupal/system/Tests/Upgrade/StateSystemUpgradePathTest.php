@@ -35,6 +35,19 @@ class StateSystemUpgradePathTest extends UpgradePathTestBase {
 
     $expected_state = array();
 
+    $expected_state['system.install_time'] = array(
+      'value' => 1304208000,
+      'variable_name' => 'install_time',
+    );
+    $expected_state['system.install_task'] = array(
+      'value' => 'done',
+      'variable_name' => 'install_task',
+    );
+    $expected_state['system.path_alias_whitelist'] = array(
+      'value' => array(
+      ),
+      'variable_name' => 'path_alias_whitelist',
+    );
     $expected_state['node.node_access_needs_rebuild'] = array(
       'value' => TRUE,
       'variable_name' => 'node_access_needs_rebuild',

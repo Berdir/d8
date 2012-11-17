@@ -12,6 +12,9 @@
 
 // Update system settings to known values.
 db_merge('variable')
+  ->key(array('name' => 'install_time'))->fields(array('value' => serialize(1304208000)))
+  ->execute();
+db_merge('variable')
   ->key(array('name' => 'node_cron_views_scale'))
   ->fields(array('value' => serialize(1.0 / 2000)))
   ->execute();

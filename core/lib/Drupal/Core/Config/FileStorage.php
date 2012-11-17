@@ -173,9 +173,10 @@ class FileStorage implements StorageInterface {
    */
   public function decode($raw) {
     $data = $this->getParser()->parse($raw);
-    // A simple string is valid YAML for any reason.
+    // A simple string is valid YAML for any reason. Also, a config file may
+    // exist but can be empty, in which case $data is NULL.
     if (!is_array($data)) {
-      return FALSE;
+      return array();
     }
     return $data;
   }

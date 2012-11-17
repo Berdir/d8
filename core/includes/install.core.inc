@@ -146,14 +146,15 @@ function install_state_defaults() {
     // The last task that was completed during the previous installation
     // request.
     'completed_task' => NULL,
-    // This becomes TRUE only when a valid config directory is created or
-    // detected.
+    // TRUE when there are valid config directories.
     'config_verified' => FALSE,
-    // This becomes TRUE only when Drupal's system module is installed.
-    'database_tables_exist' => FALSE,
-    // This becomes TRUE only when a valid database connection can be
-    // established.
+    // TRUE when there is a valid database connection.
     'database_verified' => FALSE,
+    // TRUE when a valid settings.php exists (containing both database
+    // connection information and config directory names).
+    'settings_verified' => FALSE,
+    // TRUE when the base system is ready to operate.
+    'base_system_verified' => FALSE,
     // An array of forms to be programmatically submitted during the
     // installation. The keys of each element indicate the name of the
     // installation task that the form submission is for, and the values are
@@ -192,10 +193,6 @@ function install_state_defaults() {
     // $_SERVER array via drupal_override_server_variables(). Used by
     // non-interactive installations only.
     'server' => array(),
-    // This becomes TRUE only when a valid settings.php file is written
-    // (containing both valid database connection information and a valid
-    // config directory).
-    'settings_verified' => FALSE,
     // Installation tasks can set this to TRUE to force the page request to
     // end (even if there is no themable output), in the case of an interactive
     // installation. This is needed only rarely; for example, it would be used
@@ -274,86 +271,97 @@ function install_begin_request(&$install_state) {
   // This must go after drupal_bootstrap(), which unsets globals!
   global $conf;
 
-  require_once DRUPAL_ROOT . '/core/modules/system/system.install';
-  require_once DRUPAL_ROOT . '/core/includes/common.inc';
+  // Load include files containing procedural service helpers.
+  require_once DRUPAL_ROOT . '/core/includes/cache.inc';
+  require_once DRUPAL_ROOT . '/core/includes/database.inc';
+
+  // Required for module_list() override in early installer environment.
   require_once DRUPAL_ROOT . '/core/includes/file.inc';
+  require_once DRUPAL_ROOT . '/core/includes/module.inc';
+
+  // Required for various installer operations.
   require_once DRUPAL_ROOT . '/core/includes/install.inc';
-  require_once DRUPAL_ROOT . '/core/includes/schema.inc';
-  require_once DRUPAL_ROOT . '/' . variable_get('path_inc', 'core/includes/path.inc');
 
-  // Load module basics (needed for hook invokes).
-  include_once DRUPAL_ROOT . '/core/includes/module.inc';
-  include_once DRUPAL_ROOT . '/core/includes/session.inc';
-  require_once DRUPAL_ROOT . '/core/includes/entity.inc';
+  // Required for running install tasks.
+  require_once DRUPAL_ROOT . '/core/includes/form.inc';
+  require_once DRUPAL_ROOT . '/core/includes/ajax.inc';
+  require_once DRUPAL_ROOT . '/core/includes/batch.inc';
 
-  // Determine whether the configuration system is ready to operate.
+  // Determine bootstrap status.
+  if (!empty($install_state['parameters']['bootstrap'])) {
+    $install_state['parameters']['bootstrap'] = (int) $install_state['parameters']['bootstrap'];
+    $install_state['base_system_verified'] = TRUE;
+  }
+
+  // Determine whether base system services are ready to operate.
   $install_state['config_verified'] = install_verify_config_directory(CONFIG_ACTIVE_DIRECTORY) && install_verify_config_directory(CONFIG_STAGING_DIRECTORY);
+  $install_state['database_verified'] = install_verify_database_settings();
+  $install_state['settings_verified'] = $install_state['config_verified'] && $install_state['database_verified'];
 
-  // If it is not, replace the configuration storage with the InstallStorage
-  // implementation, for the following reasons:
-  // - The first call into drupal_container() will try to set up the regular
-  //   runtime configuration storage, using the CachedStorage by default. It
-  //   calls config_get_config_directory() to retrieve the config directory to
-  //   use, but that throws an exception, since $config_directories is not
-  //   defined since there is no settings.php yet. If there is a prepared
-  //   settings.php already, then the returned directory still cannot be used,
-  //   because it does not necessarily exist. The installer ensures that it
-  //   exists and is writeable in a later step.
-  // - The installer outputs maintenance theme pages and performs many other
-  //   operations, which try to load configuration. Since there is no active
-  //   configuration yet, and because the configuration system does not have a
-  //   notion of default values at runtime, data is missing in many places. The
-  //   lack of data does not trigger errors, but results in a broken user
-  //   interface (e.g., missing page title, etc).
-  // - The actual configuration data to read during installation is essentially
-  //   the default configuration provided by the installation profile and
-  //   modules (most notably System module). The InstallStorage therefore reads
-  //   from the default configuration directories of extensions.
-  // This override is reverted as soon as the config directory has been set up
-  // successfully.
-  // @see drupal_install_config_directories()
-  if (!$install_state['config_verified']) {
+  // If they are not, replace services with in-memory implementations and
+  // specialized installer implementations. This override is reverted as soon as
+  // the install_system_rebuild() phase is reached.
+  if (!$install_state['base_system_verified']) {
     // @todo Move into a proper Drupal\Core\DependencyInjection\InstallContainerBuilder.
     $container = new ContainerBuilder();
 
+    // The actual configuration data to read during installation is essentially
+    // the default configuration provided by the installation profile and
+    // modules (most notably System module). The InstallStorage therefore reads
+    // from the default configuration directories of extensions.
     $container->register('dispatcher', 'Symfony\Component\EventDispatcher\EventDispatcher');
-
     $container->register('config.storage', 'Drupal\Core\Config\InstallStorage');
     $container->register('config.factory', 'Drupal\Core\Config\ConfigFactory')
       ->addArgument(new Reference('config.storage'))
       ->addArgument(new Reference('dispatcher'));
+
+    $conf['keyvalue_default'] = 'keyvalue.memory';
+    $container
+      ->register('keyvalue', 'Drupal\Core\KeyValueStore\KeyValueFactory')
+      ->addArgument(new Reference('service_container'));
+    $container
+      ->register('keyvalue.memory', 'Drupal\Core\KeyValueStore\KeyValueMemoryFactory');
+
+    $conf['cache_classes'] = array('cache' => 'Drupal\Core\Cache\InstallBackend');
+    $conf['lock_backend'] = 'Drupal\Core\Lock\NullLockBackend';
+
     drupal_container($container);
+
+    // Override the module list with a minimal set of modules.
+    $module_list['system']['filename'] = 'core/modules/system/system.module';
+    module_list(NULL, $module_list);
+    drupal_load('module', 'system');
+
+    // Set up $language, so t() caller functions will still work.
+    drupal_language_initialize();
   }
+  // We have reached the install_system_rebuild() install task and need to
+  // install System module as well as all the rest of the system in a full
+  // environment.
+  else {
+    require_once DRUPAL_ROOT . '/core/includes/common.inc';
+    // DRUPAL_BOOTSTRAP_SESSION is incompatible with the installer, as it tries
+    // to read and write sessions before the {users} table has been installed.
+    // Therefore, the install_base_system() task needs a custom bootstrap that
+    // avoids session initialization but is otherwise still a full environment.
+    // @todo Convert session handling into a swappable service.
+    // @see http://drupal.org/node/335411
+    if ($install_state['parameters']['bootstrap'] == DRUPAL_BOOTSTRAP_VARIABLES) {
+      drupal_bootstrap(DRUPAL_BOOTSTRAP_VARIABLES);
+      _drupal_bootstrap_code();
+    }
+    else {
+      drupal_bootstrap(DRUPAL_BOOTSTRAP_CODE);
+    }
+    $kernel = new DrupalKernel('prod', TRUE, NULL);
+    $kernel->boot();
 
-  // Set up $language, so t() caller functions will still work.
-  drupal_language_initialize();
-
-  require_once DRUPAL_ROOT . '/core/includes/ajax.inc';
-  // Override the module list with a minimal set of modules.
-  $module_list['system']['filename'] = 'core/modules/system/system.module';
-  module_list(NULL, $module_list);
-  drupal_load('module', 'system');
-
-  // Load the cache infrastructure using a "fake" cache implementation that
-  // does not attempt to write to the database. We need this during the initial
-  // part of the installer because the database is not available yet. We
-  // continue to use it even when the database does become available, in order
-  // to preserve consistency between interactive and command-line installations
-  // (the latter complete in one page request and therefore are forced to
-  // continue using the cache implementation they started with) and also
-  // because any data put in the cache during the installer is inherently
-  // suspect, due to the fact that Drupal is not fully set up yet.
-  require_once DRUPAL_ROOT . '/core/includes/cache.inc';
-  $conf['cache_classes'] = array('cache' => 'Drupal\Core\Cache\InstallBackend');
-
-  // The install process cannot use the database lock backend since the database
-  // is not fully up, so we use a null backend implementation during the
-  // installation process. This will also speed up the installation process.
-  // The site being installed will use the real lock backend when doing AJAX
-  // requests but, except for a WSOD, there is no chance for a a lock to stall
-  // (as opposed to the cache backend) so we can afford having a null
-  // implementation here.
-  $conf['lock_backend'] = 'Drupal\Core\Lock\NullLockBackend';
+    // We are anonymous until we reach install_configure_form_submit().
+    global $user;
+    if (empty($user)) {
+      $user = drupal_anonymous_user();
+    }
+  }
 
   // Prepare for themed output. We need to run this at the beginning of the
   // page request to avoid a different theme accidentally getting set. (We also
@@ -362,21 +370,7 @@ function install_begin_request(&$install_state) {
   // accessing the database before it is set up yet.)
   drupal_maintenance_theme();
 
-  // Check existing settings.php.
-  $install_state['database_verified'] = install_verify_database_settings();
-  $install_state['settings_verified'] = $install_state['config_verified'] && $install_state['database_verified'];
-
-  if ($install_state['database_verified']) {
-    // Initialize the database system. Note that the connection
-    // won't be initialized until it is actually requested.
-    require_once DRUPAL_ROOT . '/core/includes/database.inc';
-
-    // Verify the last completed task in the database, if there is one.
-    $task = install_verify_completed_task();
-  }
-  else {
-    $task = NULL;
-
+  if (!$install_state['database_verified']) {
     // Do not install over a configured settings.php. Check the 'db_url'
     // variable in addition to 'databases', since previous versions of Drupal
     // used that (and we do not want to allow installations on an existing site
@@ -387,8 +381,7 @@ function install_begin_request(&$install_state) {
   }
 
   // Modify the installation state as appropriate.
-  $install_state['completed_task'] = $task;
-  $install_state['database_tables_exist'] = !empty($task);
+  $install_state['completed_task'] = install_verify_completed_task();
 
   // Add the list of available profiles to the installation state.
   $install_state['profiles'] += drupal_system_listing('/^' . DRUPAL_PHP_FUNCTION_PATTERN . '\.profile$/', 'profiles');
@@ -432,8 +425,8 @@ function install_run_tasks(&$install_state) {
     if (!$install_state['task_not_complete']) {
       $install_state['tasks_performed'][] = $task_name;
       $install_state['installation_finished'] = empty($tasks_to_perform);
-      if ($install_state['database_tables_exist'] && ($task['run'] == INSTALL_TASK_RUN_IF_NOT_COMPLETED || $install_state['installation_finished'])) {
-        variable_set('install_task', $install_state['installation_finished'] ? 'done' : $task_name);
+      if ($task['run'] == INSTALL_TASK_RUN_IF_NOT_COMPLETED || $install_state['installation_finished']) {
+        state()->set('system.install_task', $install_state['installation_finished'] ? 'done' : $task_name);
       }
     }
     // Stop when there are no tasks left. In the case of an interactive
@@ -461,7 +454,6 @@ function install_run_task($task, &$install_state) {
   $function = $task['function'];
 
   if ($task['type'] == 'form') {
-    require_once DRUPAL_ROOT . '/core/includes/form.inc';
     if ($install_state['interactive']) {
       // For interactive forms, build the form and ensure that it will not
       // redirect, since the installer handles its own redirection only after
@@ -506,7 +498,7 @@ function install_run_task($task, &$install_state) {
   elseif ($task['type'] == 'batch') {
     // Start a new batch based on the task function, if one is not running
     // already.
-    $current_batch = variable_get('install_current_batch');
+    $current_batch = state()->get('system.install_current_batch');
     if (!$install_state['interactive'] || !$current_batch) {
       $batch = $function($install_state);
       if (empty($batch)) {
@@ -519,7 +511,7 @@ function install_run_task($task, &$install_state) {
       // task is currently running. Otherwise, we need to make sure the batch
       // will complete in one page request.
       if ($install_state['interactive']) {
-        variable_set('install_current_batch', $function);
+        state()->set('system.install_current_batch', $function);
       }
       else {
         $batch =& batch_get();
@@ -532,7 +524,6 @@ function install_run_task($task, &$install_state) {
     // If we are in the middle of processing this batch, keep sending back
     // any output from the batch process, until the task is complete.
     elseif ($current_batch == $function) {
-      include_once DRUPAL_ROOT . '/core/includes/batch.inc';
       $output = _batch_page();
       // Because Batch API now returns a JSON response for intermediary steps,
       // but the installer doesn't handle Response objects yet, just send the
@@ -548,7 +539,7 @@ function install_run_task($task, &$install_state) {
       // longer requesting a batch ID.
       if ($output === FALSE) {
         // Return nothing so the next task will run in the same request.
-        variable_del('install_current_batch');
+        state()->delete('system.install_current_batch');
         return;
       }
       else {
@@ -622,12 +613,10 @@ function install_tasks($install_state) {
   $tasks = array(
     'install_select_language' => array(
       'display_name' => st('Choose language'),
-      'run' => INSTALL_TASK_RUN_IF_REACHED,
     ),
     'install_select_profile' => array(
       'display_name' => st('Choose profile'),
       'display' => count($install_state['profiles']) != 1,
-      'run' => INSTALL_TASK_RUN_IF_REACHED,
     ),
     'install_load_profile' => array(
       'run' => INSTALL_TASK_RUN_IF_REACHED,
@@ -643,10 +632,14 @@ function install_tasks($install_state) {
       // since the form submit handler is where settings.php is rewritten.
       'run' => $install_state['settings_verified'] ? INSTALL_TASK_SKIP : INSTALL_TASK_RUN_IF_NOT_COMPLETED,
     ),
-    'install_base_system' => array(
+    'install_system_schema' => array(
+      'run' => $install_state['base_system_verified'] ? INSTALL_TASK_SKIP : INSTALL_TASK_RUN_IF_NOT_COMPLETED,
     ),
-    'install_bootstrap_full' => array(
-      'run' => INSTALL_TASK_RUN_IF_REACHED,
+    'install_system_rebuild' => array(
+      'run' => $install_state['base_system_verified'] ? INSTALL_TASK_SKIP : INSTALL_TASK_RUN_IF_NOT_COMPLETED,
+    ),
+    // All tasks below are executed in a regular, full Drupal environment.
+    'install_base_system' => array(
     ),
     'install_profile_modules' => array(
       'display_name' => count($install_state['profiles']) == 1 ? st('Install site') : st('Installation profile'),
@@ -873,14 +866,85 @@ function install_verify_requirements(&$install_state) {
 }
 
 /**
+ * Install task: Installs the System module schema.
+ */
+function install_system_schema(&$install_state) {
+  require_once DRUPAL_ROOT . '/core/includes/schema.inc';
+  require_once DRUPAL_ROOT . '/core/modules/system/system.install';
+  // This task is the one that sets up persistent storage tables. Since this
+  // task is executed in the early installer environment, install_run_tasks()
+  // is not able to record that this task has been completed. Thus, the
+  // interactive installer invokes this task a second time and the fact that it
+  // completed can only be recorded after the second invocation.
+  $schema = drupal_get_schema_unprocessed('system');
+  $table = key($schema);
+  if (!db_table_exists($table)) {
+    drupal_install_schema('system');
+  }
+
+  // If we are in the interactive installer, all we need to do is to set the
+  // 'bootstrap' parameter. Doing so will trigger a redirect and the next page
+  // request will perform a full boostrap into the new environment, skipping
+  // install_system_rebuild().
+  $install_state['parameters']['bootstrap'] = DRUPAL_BOOTSTRAP_VARIABLES;
+}
+
+/**
+ * Install task: Performs a full bootstrap into the new environment.
+ */
+function install_system_rebuild(&$install_state) {
+  global $conf;
+
+  // This phase is reached in the non-interactive installer only.
+  // We need to unset all overrides and rebuild all necessary facilities to get
+  // into a regular bootstrap state.
+  unset($conf['cache_classes']);
+  unset($conf['keyvalue_default']);
+  unset($conf['lock_backend']);
+
+  // Ensure that custom service definitions in a prepared settings.php are
+  // applied. This effectively allows to install Drupal with custom Cache,
+  // KeyValue, and Lock backends in the non-interactive installer.
+  $conf_path = conf_path();
+  if (is_readable(DRUPAL_ROOT . '/' . $conf_path . '/settings.php')) {
+    include DRUPAL_ROOT . '/' . $conf_path . '/settings.php';
+  }
+
+  // Rebuild and replace the container with working service implementations.
+  drupal_container(NULL, TRUE);
+
+  // Clear out module list and hook implementation statics.
+  module_list_reset();
+  module_load_all(FALSE, TRUE);
+  system_list_reset();
+  module_implements_reset();
+
+  // Bootstrap, but avoid session initialization.
+  // @see install_begin_request()
+  drupal_bootstrap(DRUPAL_BOOTSTRAP_VARIABLES);
+  _drupal_bootstrap_code();
+  $kernel = new DrupalKernel('prod', TRUE, NULL);
+  $kernel->boot();
+
+  $install_state['base_system_verified'] = TRUE;
+}
+
+/**
  * Installation task; install the base functionality Drupal needs to bootstrap.
  *
  * @param $install_state
  *   An array of information about the current installation state.
  */
 function install_base_system(&$install_state) {
-  // Install system.module.
+  // Install System module.
+  // This cannot use module_enable(), since System module's database tables have
+  // to be created separately in install_system_schema(), so we are able to
+  // switch to a full Drupal environment in install_system_rebuild().
   drupal_install_system();
+
+  // Something in the installer bootstrap primes file_get_stream_wrappers() too
+  // early. Resetting that static alone doesn't resolve it.
+  drupal_static_reset();
 
   // Call file_ensure_htaccess() to ensure that all of Drupal's standard
   // directories (e.g., the public files directory and config directory) have
@@ -905,6 +969,13 @@ function install_base_system(&$install_state) {
 
   state()->set('install_profile_modules', array_diff($modules, array('system')));
   $install_state['database_tables_exist'] = TRUE;
+
+  // Now that the {users} table exists, the session can be initialized.
+  $install_state['parameters']['bootstrap'] = DRUPAL_BOOTSTRAP_CODE;
+  if ($install_state['interactive']) {
+    return;
+  }
+  drupal_bootstrap(DRUPAL_BOOTSTRAP_CODE);
 }
 
 /**
@@ -915,16 +986,8 @@ function install_base_system(&$install_state) {
  *   is already installed.
  */
 function install_verify_completed_task() {
-  try {
-    if ($result = db_query("SELECT value FROM {variable} WHERE name = :name", array('name' => 'install_task'))) {
-      $task = unserialize($result->fetchField());
-    }
-  }
-  // Do not trigger an error if the database query fails, since the database
-  // might not be set up yet.
-  catch (Exception $e) {
-  }
-  if (isset($task)) {
+  $task = state()->get('system.install_task');
+  if ($task) {
     if ($task == 'done') {
       throw new Exception(install_already_done_error());
     }
@@ -1100,23 +1163,12 @@ function install_settings_form_submit($form, &$form_state) {
   );
 
   drupal_rewrite_settings($settings);
+  $install_state['database_verified'] = TRUE;
+  $install_state['settings_verified'] = TRUE;
 
   // Add the config directories to settings.php.
   drupal_install_config_directories();
-
-  // We have valid configuration directories in settings.php.
-  // Reset the service container, so the config.storage service will use the
-  // actual active storage for installing configuration.
-  drupal_container(NULL, TRUE);
-
-  // Indicate that the settings file has been verified, and check the database
-  // for the last completed task, now that we have a valid connection. This
-  // last step is important since we want to trigger an error if the new
-  // database already has Drupal installed.
-  $install_state['settings_verified'] = TRUE;
   $install_state['config_verified'] = TRUE;
-  $install_state['database_verified'] = TRUE;
-  $install_state['completed_task'] = install_verify_completed_task();
 }
 
 /**
@@ -1491,23 +1543,6 @@ function install_load_profile(&$install_state) {
 }
 
 /**
- * Performs a full bootstrap of Drupal during installation.
- *
- * @param $install_state
- *   An array of information about the current installation state.
- */
-function install_bootstrap_full(&$install_state) {
-  // Clear the module list that was overriden earlier in the process.
-  // This will allow all freshly installed modules to be loaded.
-  module_list_reset();
-
-  // Instantiate the kernel.
-  $kernel = new DrupalKernel('prod', FALSE, drupal_classloader());
-  $kernel->boot();
-  drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
-}
-
-/**
  * Installs required modules via a batch process.
  *
  * @param $install_state
@@ -1517,6 +1552,12 @@ function install_bootstrap_full(&$install_state) {
  *   The batch definition.
  */
 function install_profile_modules(&$install_state) {
+  // Batch API relies on drupal_get_token() and thus an initialized session.
+  // Up until now, the entire installation process happened without a user.
+  // Now that we are in a full environment, we need to enforce the session to be
+  // regenerated, so we have a new session ID and it is stored for the user.
+  drupal_session_regenerate();
+
   $modules = state()->get('install_profile_modules') ?: array();
   $files = system_rebuild_module_data();
   state()->delete('install_profile_modules');
@@ -1640,15 +1681,6 @@ function install_configure_form($form, &$form_state, &$install_state) {
   // work during installation.
   drupal_add_js(array('copyFieldValue' => array('edit-site-mail' => array('edit-account-mail'))), 'setting');
 
-  // Cache a fully-built schema. This is necessary for any invocation of
-  // index.php because: (1) setting cache table entries requires schema
-  // information, (2) that occurs during bootstrap before any module are
-  // loaded, so (3) if there is no cached schema, drupal_get_schema() will
-  // try to generate one but with no loaded modules will return nothing.
-  //
-  // @todo Move this to the 'install_finished' task?
-  drupal_get_schema(NULL, TRUE);
-
   // Return the form.
   return _install_configure_form($form, $form_state, $install_state);
 }
@@ -1692,6 +1724,7 @@ function install_finished(&$install_state) {
   // Flush all caches to ensure that any full bootstraps during the installer
   // do not leave stale cached data, and that any content types or other items
   // registered by the installation profile are registered correctly.
+  // @todo This appears to be unnecessary.
   drupal_flush_all_caches();
 
   drupal_set_title(st('@drupal installation complete', array('@drupal' => drupal_install_profile_distribution_name())), PASS_THROUGH);
@@ -1727,6 +1760,7 @@ function _install_module_batch($module, $module_name, &$context) {
 function _install_profile_modules_finished($success, $results, $operations) {
   // Flush all caches to complete the module installation process. Subsequent
   // installation tasks will now have full access to the profile's modules.
+  // @todo This appears to be unnecessary.
   drupal_flush_all_caches();
 }
 
@@ -1784,7 +1818,7 @@ function install_check_requirements($install_state) {
         // having settings.php also owned by the webserver does not introduce
         // any additional security risk, so we keep the file in place.
         if (fileowner($default_settings_file) === fileowner($settings_file)) {
-          $writable = drupal_verify_install_file($settings_file, FILE_READABLE|FILE_WRITABLE);
+          $readable = $writable = drupal_verify_install_file($settings_file, FILE_READABLE|FILE_WRITABLE);
           $exists = TRUE;
         }
         // If settings.php and default.settings.php have different owners, this
@@ -1808,7 +1842,7 @@ function install_check_requirements($install_state) {
           $exists = !$deleted;
           if ($exists) {
             $settings_file_ownership_error = TRUE;
-            $writable = drupal_verify_install_file($settings_file, FILE_READABLE|FILE_WRITABLE);
+            $readable = $writable = drupal_verify_install_file($settings_file, FILE_READABLE|FILE_WRITABLE);
           }
         }
       }
@@ -2037,5 +2071,5 @@ function install_configure_form_submit($form, &$form_state) {
   user_login_finalize();
 
   // Record when this install ran.
-  variable_set('install_time', $_SERVER['REQUEST_TIME']);
+  state()->set('system.install_time', $_SERVER['REQUEST_TIME']);
 }

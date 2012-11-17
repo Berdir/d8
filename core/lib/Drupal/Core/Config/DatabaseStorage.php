@@ -145,7 +145,7 @@ class DatabaseStorage implements StorageInterface {
    */
   public function decode($raw) {
     $data = @unserialize($raw);
-    return is_array($data) ? $data : FALSE;
+    return is_array($data) ? $data : array();
   }
 
   /**

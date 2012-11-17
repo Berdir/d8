@@ -2246,6 +2246,8 @@ function _drupal_exception_handler($exception) {
  * Sets up the script environment and loads settings.php.
  */
 function _drupal_bootstrap_configuration() {
+  // Load the procedural configuration system helper functions.
+  require_once DRUPAL_ROOT . '/core/includes/config.inc';
   // Set the Drupal custom error handler.
   set_error_handler('_drupal_error_handler');
   set_exception_handler('_drupal_exception_handler');
@@ -2261,9 +2263,6 @@ function _drupal_bootstrap_configuration() {
 
   // Activate the class loader.
   drupal_classloader();
-
-  // Load the procedural configuration system helper functions.
-  require_once DRUPAL_ROOT . '/core/includes/config.inc';
 }
 
 /**

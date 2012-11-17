@@ -7,6 +7,7 @@
 
 use Drupal\Core\Database\Database;
 use Drupal\locale\Gettext;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Requirement severity -- Informational message only.
@@ -413,40 +414,68 @@ function drupal_verify_profile($install_state) {
 }
 
 /**
- * Installs the system module.
+ * Installs the System module.
  *
- * Separated from the installation of other modules so core system
- * functions can be made available while other modules are installed.
+ * This is the exact same procedure as in module_enable(). The only difference
+ * is that System module's database schema has been installed in
+ * install_system_schema() already. Due to that, module_enable() can no longer
+ * be used.
+ *
+ * @see install_base_system()
+ * @see install_system_schema()
  */
 function drupal_install_system() {
-  // Create tables.
-  drupal_install_schema('system');
+  $module = 'system';
 
-  $system_path = drupal_get_path('module', 'system');
-  require_once DRUPAL_ROOT . '/' . $system_path . '/system.install';
-  $system_versions = drupal_get_schema_versions('system');
-  $system_version = $system_versions ? max($system_versions) : SCHEMA_INSTALLED;
-  drupal_container()
-    ->get('keyvalue')
-    ->get('system.schema')
-    ->set('system', $system_version);
+  $schema_store = drupal_container()->get('keyvalue')->get('system.schema');
+  $module_config = config('system.module');
+  $disabled_config = config('system.module.disabled');
 
-  // System module needs to be enabled and the system/module lists need to be
-  // reset first in order to allow config_install_default_config() to invoke
-  // config import callbacks.
-  // @todo Installation profiles may override the system.module config object.
-  config('system.module')
-    ->set('enabled.system', 0)
+  $module_config
+    ->set("enabled.$module", 0)
     ->save();
+  $disabled_config
+    ->clear($module)
+    ->save();
+  // Load the module's code.
+  drupal_load('module', $module);
 
-  // Clear out module list and hook implementation statics.
+  // Refresh the module list to include it.
   system_list_reset();
-  module_list_reset();
   module_implements_reset();
+  _system_update_bootstrap_status();
+  // Update the kernel to include it.
+  // @todo The if statement is here because install_begin_request() creates
+  //   a container without a kernel. It probably shouldn't.
+  if ($kernel = drupal_container()->get('kernel', ContainerInterface::NULL_ON_INVALID_REFERENCE)) {
+    $kernel->updateModules(module_list());
+  }
 
-  config_install_default_config('module', 'system');
+  // Refresh the schema to include it.
+  drupal_get_schema(NULL, TRUE);
+  // Update the theme registry to include it.
+  drupal_theme_rebuild();
 
-  module_invoke('system', 'install');
+  // Clear the entity info cache before importing new configuration.
+  entity_info_cache_clear();
+
+  // Install default configuration of the module.
+  config_install_default_config('module', $module);
+
+  // Set the schema version to the number of the last update provided.
+  $versions = drupal_get_schema_versions($module);
+  $version = $versions ? max($versions) : SCHEMA_INSTALLED;
+  $schema_store->set($module, $version);
+
+  // Allow the module to perform install tasks.
+  module_invoke($module, 'install');
+
+  watchdog('system', '%module module installed.', array('%module' => $module), WATCHDOG_INFO);
+
+  entity_info_cache_clear();
+
+  // Enable the module.
+  module_invoke($module, 'enable');
 }
 
 /**

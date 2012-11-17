@@ -1,2 +1,6 @@
 enabled:
+  # @todo config_install_default_config() overwrites existing config.
+  #   In case of System module, the installer needs to write this config file,
+  #   before it can install default config. Therefore, system module MUST be
+  #   contained in here already.
   system: '0'
