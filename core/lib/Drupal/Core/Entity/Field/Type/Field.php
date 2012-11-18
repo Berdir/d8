@@ -29,11 +29,18 @@ use InvalidArgumentException;
 class Field extends TypedData implements IteratorAggregate, FieldInterface {
 
   /**
-   * The entity field name.
+   * The typed data namespace.
    *
    * @var string
    */
-  protected $name;
+  protected $namespace;
+
+  /**
+   * The property path.
+   *
+   * @var string
+   */
+  protected $propertyPath;
 
   /**
    * The parent entity.
@@ -160,8 +167,14 @@ class Field extends TypedData implements IteratorAggregate, FieldInterface {
    * @return \Drupal\Core\TypedData\TypedDataInterface
    */
   protected function createItem($value = NULL) {
-    $context = array('parent' => $this);
-    return typed_data()->create(array('list' => FALSE) + $this->definition, $value, $context);
+    return typed_data()->getPropertyInstance($this, 0, $value);
+  }
+
+  /**
+   * Implements ListInterface::getItemDefinition().
+   */
+  public function getItemDefinition() {
+    return array('list' => FALSE) + $this->definition;
   }
 
   /**
@@ -202,14 +215,35 @@ class Field extends TypedData implements IteratorAggregate, FieldInterface {
    * Implements ContextAwareInterface::getName().
    */
   public function getName() {
-    return $this->name;
+    return substr($this->propertyPath, strrpos('.', $this->propertyPath));
   }
 
   /**
-   * Implements ContextAwareInterface::setName().
+   * Implements ContextAwareInterface::getName().
    */
-  public function setName($name) {
-    $this->name = $name;
+  public function getNamespace() {
+    return $this->namespace;
+  }
+
+  /**
+   * Implements ContextAwareInterface::getName().
+   */
+  public function setNamespace($namespace) {
+    $this->namespace = $namespace;
+  }
+
+  /**
+   * Implements ContextAwareInterface::getName().
+   */
+  public function getPropertyPath() {
+    return $this->propertyPath;
+  }
+
+  /**
+   * Implements ContextAwareInterface::getName().
+   */
+  public function setPropertyPath($property_path) {
+    $this->propertyPath = $property_path;
   }
 
   /**

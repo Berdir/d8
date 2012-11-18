@@ -2,11 +2,12 @@
 
 /**
  * @file
- * Definition of Drupal\Core\TypedData\TypedDataManager.
+ * Contains \Drupal\Core\TypedData\TypedDataManager.
  */
 
 namespace Drupal\Core\TypedData;
 
+use InvalidArgumentException;
 use Drupal\Component\Plugin\PluginManagerBase;
 use Drupal\Core\Plugin\Discovery\CacheDecorator;
 use Drupal\Core\Plugin\Discovery\HookDiscovery;
@@ -15,6 +16,13 @@ use Drupal\Core\Plugin\Discovery\HookDiscovery;
  * Manages data type plugins.
  */
 class TypedDataManager extends PluginManagerBase {
+
+  /**
+   * An array of typed data property prototypes.
+   *
+   * @var array
+   */
+  protected $prototypes = array();
 
   public function __construct() {
     $this->discovery = new CacheDecorator(new HookDiscovery('data_type_info'), 'typed_data:types');
@@ -29,7 +37,7 @@ class TypedDataManager extends PluginManagerBase {
    * @param array $configuration
    *   The plugin configuration, i.e. the data definition.
    *
-   * @return Drupal\Core\TypedData\TypedDataInterface
+   * @return \Drupal\Core\TypedData\TypedDataInterface
    */
   public function createInstance($plugin_id, array $configuration) {
     return $this->factory->createInstance($plugin_id, $configuration);
@@ -70,17 +78,8 @@ class TypedDataManager extends PluginManagerBase {
    * @param mixed $value
    *   (optional) The data value. If set, it has to match one of the supported
    *   data type format as documented for the data type classes.
-   * @param array $context
-   *   (optional) An array describing the context of the data object, e.g. its
-   *   name or parent data structure. The context should be passed if a typed
-   *   data object is created as part of a data structure. The following keys
-   *   are supported:
-   *   - name: The name associated with the data.
-   *   - parent: The parent object containing the data. Must be an instance of
-   *     Drupal\Core\TypedData\ComplexDataInterface or
-   *     Drupal\Core\TypedData\ListInterface.
    *
-   * @return Drupal\Core\TypedData\TypedDataInterface
+   * @return \Drupal\Core\TypedData\TypedDataInterface
    *
    * @see typed_data()
    * @see Drupal\Core\TypedData\Type\Integer
@@ -93,19 +92,75 @@ class TypedDataManager extends PluginManagerBase {
    * @see Drupal\Core\TypedData\Type\Binary
    * @see Drupal\Core\Entity\Field\EntityWrapper
    */
-  function create(array $definition, $value = NULL, array $context = array()) {
+  public function create(array $definition, $value = NULL) {
     $wrapper = $this->factory->createInstance($definition['type'], $definition);
     if (isset($value)) {
       $wrapper->setValue($value);
     }
-    if ($wrapper instanceof ContextAwareInterface) {
-      if (isset($context['name'])) {
-        $wrapper->setName($context['name']);
-      }
-      if (isset($context['parent'])) {
-        $wrapper->setParent($context['parent']);
-      }
-    }
     return $wrapper;
+  }
+
+  /**
+   * Implements \Drupal\Component\Plugin\PluginManagerInterface::getInstance().
+   */
+  public function getInstance(array $options) {
+    return $this->getPropertyInstance($options['object'], $options['property'], $options['value'], $options['context']);
+  }
+
+  /**
+   * Get a typed data instance for a property of a given typed data object.
+   *
+   * If the object has a namespace and property path specified, this method
+   * will use prototyping for fast and efficient instantiation of many property
+   * objects with the same namespace and property path; e.g., if
+   * comment.comment_body.0.value is instantiated very often when multiple
+   * comments are used.
+   *
+   * @param ContextAware $object
+   *   The parent typed data object, implementing the ContextAwareInterface and
+   *   either the ListInterface or the ComplexDataInterface.
+   * @param string $property_name
+   *   The name of the property to instantiate, or '0' to get an item of a list.
+   * @param mixed $value
+   *   (optional) The data value. If set, it has to match one of the supported
+   *   data type format as documented for the data type classes.
+   *
+   * @throws \InvalidArgumentException
+   *   If the passed object does not implement either the ListInterface or the
+   *   ComplexDataInterface.
+   *
+   * @return \Drupal\Core\TypedData\TypedDataInterface
+   *   The new property instance.
+   *
+   * @see \Drupal\Core\TypedData\Type\create()
+   */
+  public function getPropertyInstance(ContextAwareInterface $object, $property_name, $value = NULL) {
+    $namespace = $object->getNamespace();
+    $property_path = $object->getPropertyPath() . '.' . $property_name;
+    $key = $namespace . ':' . $property_path;
+
+    if (!$namespace || !isset($this->prototypes[$key])) {
+      if ($object instanceof ComplexDataInterface) {
+        $definition = $object->getPropertyDefinition($property_name);
+      }
+      elseif ($object instanceof ListInterface) {
+        $definition = $object->getItemDefinition();
+      }
+      else {
+        throw new \InvalidArgumentException("The passed object has to either implement the ComplexDatainterface or the Listinterface.");
+      }
+      $this->prototypes[$key] = $this->create($definition);
+    }
+    $property = clone $this->prototypes[$key];
+
+    if (isset($value)) {
+      $property->setValue($value);
+    }
+    if ($property instanceof ContextAwareInterface) {
+      $property->setNamespace($namespace);
+      $property->setPropertyPath($property_path);
+      $property->setParent($object);
+    }
+    return $property;
   }
 }

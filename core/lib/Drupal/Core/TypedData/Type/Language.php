@@ -28,11 +28,18 @@ use InvalidArgumentException;
 class Language extends TypedData implements TypedDataInterface, ContextAwareInterface {
 
   /**
-   * The name.
+   * The typed data namespace.
    *
    * @var string
    */
-  protected $name;
+  protected $namespace;
+
+  /**
+   * The property path.
+   *
+   * @var string
+   */
+  protected $propertyPath;
 
   /**
    * The parent data structure.
@@ -52,14 +59,35 @@ class Language extends TypedData implements TypedDataInterface, ContextAwareInte
    * Implements ContextAwareInterface::getName().
    */
   public function getName() {
-    return $this->name;
+    return substr($this->propertyPath, strrpos('.', $this->propertyPath));
   }
 
   /**
-   * Implements ContextAwareInterface::setName().
+   * Implements ContextAwareInterface::getName().
    */
-  public function setName($name) {
-    $this->name = $name;
+  public function getNamespace() {
+    return $this->namespace;
+  }
+
+  /**
+   * Implements ContextAwareInterface::getName().
+   */
+  public function setNamespace($namespace) {
+    $this->namespace = $namespace;
+  }
+
+  /**
+   * Implements ContextAwareInterface::getName().
+   */
+  public function getPropertyPath() {
+    return $this->propertyPath;
+  }
+
+  /**
+   * Implements ContextAwareInterface::getName().
+   */
+  public function setPropertyPath($property_path) {
+    $this->propertyPath = $property_path;
   }
 
   /**
