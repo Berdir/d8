@@ -318,4 +318,39 @@ class EntityBCDecorator implements IteratorAggregate, EntityInterface {
   public function getTranslation($langcode, $strict = TRUE) {
     return $this->decorated->getTranslation($langcode, $strict);
   }
+
+  /**
+   * Forwards the call to the decorated entity.
+   */
+  public function getName() {
+    return $this->decorated->getName();
+  }
+
+  /**
+   * Forwards the call to the decorated entity.
+   */
+  public function getNamespace() {
+    return $this->decorated->getNamespace();
+  }
+
+  /**
+   * Forwards the call to the decorated entity.
+   */
+  public function getPropertyPath() {
+    return $this->decorated->getPropertyPath();
+  }
+
+  /**
+   * Forwards the call to the decorated entity.
+   */
+  public function getParent() {
+    return $this->decorated->getParent();
+  }
+
+  /**
+   * Forwards the call to the decorated entity.
+   */
+  public function setParent($parent) {
+    $this->decorated->setParent($parent);
+  }
 }

@@ -27,9 +27,9 @@ class TypedDataFactory extends DefaultFactory {
    * @param array $configuration
    *   The plugin configuration, i.e. the data definition.
    *
-   * @return Drupal\Core\TypedData\TypedDataInterface
+   * @return \Drupal\Core\TypedData\TypedDataInterface
    */
-  public function createInstance($plugin_id, array $configuration) {
+  public function createInstance($plugin_id, array $configuration, $property_name = NULL, $object = NULL) {
 
     $type_definition = $this->discovery->getDefinition($plugin_id);
 
@@ -49,6 +49,6 @@ class TypedDataFactory extends DefaultFactory {
     if (!isset($class)) {
       throw new PluginException(sprintf('The plugin (%s) did not specify an instance class.', $plugin_id));
     }
-    return new $class($configuration, $plugin_id);
+    return new $class($configuration, $property_name, $object);
   }
 }

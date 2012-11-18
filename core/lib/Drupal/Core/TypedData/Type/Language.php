@@ -7,9 +7,8 @@
 
 namespace Drupal\Core\TypedData\Type;
 
-use Drupal\Core\TypedData\ContextAwareInterface;
-use Drupal\Core\TypedData\TypedDataInterface;
 use InvalidArgumentException;
+use Drupal\Core\TypedData\ContextAwareTypedData;
 
 /**
  * Defines the 'language' data type.
@@ -25,28 +24,7 @@ use InvalidArgumentException;
  *  - langcode source: If used as computed property, the langcode property used
  *    to load the language object.
  */
-class Language extends TypedData implements TypedDataInterface, ContextAwareInterface {
-
-  /**
-   * The typed data namespace.
-   *
-   * @var string
-   */
-  protected $namespace;
-
-  /**
-   * The property path.
-   *
-   * @var string
-   */
-  protected $propertyPath;
-
-  /**
-   * The parent data structure.
-   *
-   * @var mixed
-   */
-  protected $parent;
+class Language extends ContextAwareTypedData {
 
   /**
    * The language code of the language if no 'langcode source' is used.
@@ -54,55 +32,6 @@ class Language extends TypedData implements TypedDataInterface, ContextAwareInte
    * @var string
    */
   protected $langcode;
-
-  /**
-   * Implements ContextAwareInterface::getName().
-   */
-  public function getName() {
-    return substr($this->propertyPath, strrpos('.', $this->propertyPath));
-  }
-
-  /**
-   * Implements ContextAwareInterface::getName().
-   */
-  public function getNamespace() {
-    return $this->namespace;
-  }
-
-  /**
-   * Implements ContextAwareInterface::getName().
-   */
-  public function setNamespace($namespace) {
-    $this->namespace = $namespace;
-  }
-
-  /**
-   * Implements ContextAwareInterface::getName().
-   */
-  public function getPropertyPath() {
-    return $this->propertyPath;
-  }
-
-  /**
-   * Implements ContextAwareInterface::getName().
-   */
-  public function setPropertyPath($property_path) {
-    $this->propertyPath = $property_path;
-  }
-
-  /**
-   * Implements ContextAwareInterface::getParent().
-   */
-  public function getParent() {
-    return $this->parent;
-  }
-
-  /**
-   * Implements ContextAwareInterface::setParent().
-   */
-  public function setParent($parent) {
-    $this->parent = $parent;
-  }
 
   /**
    * Implements TypedDataInterface::getValue().

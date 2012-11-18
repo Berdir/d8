@@ -8,6 +8,7 @@
 namespace Drupal\Core\Entity;
 
 use Drupal\Core\TypedData\AccessibleInterface;
+use Drupal\Core\TypedData\ContextAwareInterface;
 use Drupal\Core\TypedData\ComplexDataInterface;
 use Drupal\Core\TypedData\TranslatableInterface;
 
@@ -17,7 +18,7 @@ use Drupal\Core\TypedData\TranslatableInterface;
  * When implementing this interface which extends Traversable, make sure to list
  * IteratorAggregate or Iterator before this interface in the implements clause.
  */
-interface EntityInterface extends ComplexDataInterface, AccessibleInterface, TranslatableInterface {
+interface EntityInterface extends ContextAwareInterface, ComplexDataInterface, AccessibleInterface, TranslatableInterface {
 
   /**
    * Returns the entity identifier (the entity's machine name or numeric ID).

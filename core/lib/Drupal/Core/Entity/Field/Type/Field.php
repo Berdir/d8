@@ -8,8 +8,8 @@
 namespace Drupal\Core\Entity\Field\Type;
 
 use Drupal\Core\Entity\Field\FieldInterface;
+use Drupal\Core\TypedData\ContextAwareTypedData;
 use Drupal\Core\TypedData\TypedDataInterface;
-use Drupal\Core\TypedData\Type\TypedData;
 use Drupal\user\Plugin\Core\Entity\User;
 use ArrayIterator;
 use IteratorAggregate;
@@ -26,28 +26,7 @@ use InvalidArgumentException;
  *
  * @see \Drupal\Core\Entity\Field\FieldInterface
  */
-class Field extends TypedData implements IteratorAggregate, FieldInterface {
-
-  /**
-   * The typed data namespace.
-   *
-   * @var string
-   */
-  protected $namespace;
-
-  /**
-   * The property path.
-   *
-   * @var string
-   */
-  protected $propertyPath;
-
-  /**
-   * The parent entity.
-   *
-   * @var \Drupal\Core\Entity\EntityInterface
-   */
-  protected $parent;
+class Field extends ContextAwareTypedData implements IteratorAggregate, FieldInterface {
 
   /**
    * Numerically indexed array of field items, implementing the
@@ -209,57 +188,6 @@ class Field extends TypedData implements IteratorAggregate, FieldInterface {
    */
   public function count() {
     return count($this->list);
-  }
-
-  /**
-   * Implements ContextAwareInterface::getName().
-   */
-  public function getName() {
-    return substr($this->propertyPath, strrpos('.', $this->propertyPath));
-  }
-
-  /**
-   * Implements ContextAwareInterface::getName().
-   */
-  public function getNamespace() {
-    return $this->namespace;
-  }
-
-  /**
-   * Implements ContextAwareInterface::getName().
-   */
-  public function setNamespace($namespace) {
-    $this->namespace = $namespace;
-  }
-
-  /**
-   * Implements ContextAwareInterface::getName().
-   */
-  public function getPropertyPath() {
-    return $this->propertyPath;
-  }
-
-  /**
-   * Implements ContextAwareInterface::getName().
-   */
-  public function setPropertyPath($property_path) {
-    $this->propertyPath = $property_path;
-  }
-
-  /**
-   * Implements ContextAwareInterface::getParent().
-   *
-   * @return \Drupal\Core\Entity\EntityInterface
-   */
-  public function getParent() {
-    return $this->parent;
-  }
-
-  /**
-   * Implements ContextAwareInterface::setParent().
-   */
-  public function setParent($parent) {
-    $this->parent = $parent;
   }
 
   /**

@@ -154,8 +154,7 @@ class EntityNG extends Entity {
         if (isset($this->values[$property_name][$langcode])) {
           $value = $this->values[$property_name][$langcode];
         }
-        $context = array('parent' => $this, 'name' => $property_name);
-        $this->fields[$property_name][$langcode] = typed_data()->create($definition, $value, $context);
+        $this->fields[$property_name][$langcode] = typed_data()->getPropertyInstance($this, $property_name, $value);
       }
     }
     return $this->fields[$property_name][$langcode];
@@ -289,6 +288,9 @@ class EntityNG extends Entity {
         $fields[$name] = $this->getTranslatedField($name, $langcode);
       }
     }
+    // @todo: Add a way to get the definition of a translation to the
+    // TranslatableInterface and leverage TypeDataManager::getPropertyInstance
+    // also.
     $translation_definition = array(
       'type' => 'entity_translation',
       'constraints' => array(
@@ -296,11 +298,13 @@ class EntityNG extends Entity {
         'bundle' => $this->bundle(),
       ),
     );
-    $translation = typed_data()->create($translation_definition, $fields, array(
-      'parent' => $this,
-      'name' => $langcode,
-    ));
+    $translation = typed_data()->create($translation_definition, $fields);
     $translation->setStrictMode($strict);
+    if ($translation instanceof ContextAwareInterface) {
+      $translation->setNamespace($this->namespace);
+      $translation->setPropertyPath('@' . $langcode);
+      $translation->setParent($this);
+    }
     return $translation;
   }
 
@@ -486,5 +490,26 @@ class EntityNG extends Entity {
       $label = $this->{$entity_info['entity_keys']['label']}->value;
     }
     return $label;
+  }
+
+  /**
+   * Implements ContextAwareInterface::getName().
+   */
+  public function getName() {
+    return '';
+  }
+
+  /**
+   * Implements ContextAwareInterface::getNamespace().
+   */
+  public function getNamespace() {
+    return 'Drupal.core.entity.' . $this->entityType;
+  }
+
+  /**
+   * Implements ContextAwareInterface::getPropertyPath().
+   */
+  public function getPropertyPath() {
+    return '';
   }
 }

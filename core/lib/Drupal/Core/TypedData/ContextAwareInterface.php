@@ -35,16 +35,6 @@ interface ContextAwareInterface {
   public function getNamespace();
 
   /**
-   * Sets the typed data namespace of the typed data tree.
-   *
-   * @param string $namespace
-   *   The namespace to set. E.g. Drupal.core.entity.entity_type or NULL.
-   *
-   * @see ContextAwareInterface::getNamespace()
-   */
-  public function setNamespace($namespace);
-
-  /**
    * Returns the property path of the data.
    *
    * The trail of property names relative to the root of the typed data tree,
@@ -58,16 +48,6 @@ interface ContextAwareInterface {
   public function getPropertyPath();
 
   /**
-   * Sets the property path of the data.
-   *
-   * @param string $property_path
-   *   The property path to set.
-   *
-   * @see ContextAwareInterface::getPropertyPath()
-   */
-  public function setPropertyPath($property_path);
-
-  /**
    * Returns the parent data structure; i.e. either complex data or a list.
    *
    * @return \Drupal\Core\TypedData\ComplexDataInterface|\Drupal\Core\TypedData\ListInterface
@@ -78,8 +58,7 @@ interface ContextAwareInterface {
   /**
    * Sets the parent of a property or item.
    *
-   * This method is supposed to be used by the parental data structure in order
-   * to provide appropriate context only.
+   * This method is supposed to be called by the factory only.
    *
    * @param mixed $parent
    *   The parent data structure; either complex data or a list.

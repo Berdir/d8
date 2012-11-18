@@ -7,7 +7,7 @@
 
 namespace Drupal\Core\Entity\Field;
 
-use Drupal\Core\TypedData\Type\TypedData;
+use Drupal\Core\TypedData\ContextAwareTypedData;
 use Drupal\Core\TypedData\ComplexDataInterface;
 use Drupal\Core\TypedData\ContextAwareInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
@@ -22,36 +22,9 @@ use InvalidArgumentException;
  * Entity field items making use of this base class have to implement
  * ComplexDataInterface::getPropertyDefinitions().
  *
- * Available settings (below the definition's 'settings' key) are:
- *   - property {NAME}: An array containing definition overrides for the
- *     property with the name {NAME}. For example, this can be used by a
- *     computed field to easily override the 'class' key of single field value
- *     only.
- *
  * @see \Drupal\Core\Entity\Field\FieldItemInterface
  */
-abstract class FieldItemBase extends TypedData implements IteratorAggregate, FieldItemInterface {
-
-  /**
-   * The typed data namespace.
-   *
-   * @var string
-   */
-  protected $namespace;
-
-  /**
-   * The property path.
-   *
-   * @var string
-   */
-  protected $propertyPath;
-
-  /**
-   * The parent entity field.
-   *
-   * @var \Drupal\Core\Entity\Field\FieldInterface
-   */
-  protected $parent;
+abstract class FieldItemBase extends ContextAwareTypedData implements IteratorAggregate, FieldItemInterface {
 
   /**
    * The array of properties.
@@ -65,34 +38,26 @@ abstract class FieldItemBase extends TypedData implements IteratorAggregate, Fie
   protected $properties = array();
 
   /**
-   * Implements TypedDataInterface::__construct().
+   * Overrides ContextAwareTypedData::__construct().
    */
-  public function __construct(array $definition) {
-    $this->definition = $definition;
+  public function __construct(array $definition, $name = NULL, ContextAwareInterface $parent = NULL) {
+    parent::__construct($definition, $name, $parent);
 
     // Initialize all property objects, but postpone the creating of computed
     // properties to a second step. That way computed properties can safely get
     // references on non-computed properties during construction.
     $step2 = array();
     foreach ($this->getPropertyDefinitions() as $name => $definition) {
-
-      // Apply any per-property definition overrides.
-      if (isset($this->definition['settings']['property ' . $name])) {
-        $definition = $this->definition['settings']['property ' . $name] + $definition;
-      }
-
       if (empty($definition['computed'])) {
-        $context = array('name' => $name, 'parent' => $this);
-        $this->properties[$name] = typed_data()->create($definition, NULL, $context);
+        $this->properties[$name] = typed_data()->getPropertyInstance($this, $name);
       }
       else {
-        $step2[$name] = $definition;
+        $step2[] = $name;
       }
     }
 
-    foreach ($step2 as $name => $definition) {
-      $context = array('name' => $name, 'parent' => $this);
-      $this->properties[$name] = typed_data()->create($definition, NULL, $context);
+    foreach ($step2 as $name) {
+      $this->properties[$name] = typed_data()->getPropertyInstance($this, $name);
     }
   }
 
@@ -202,56 +167,6 @@ abstract class FieldItemBase extends TypedData implements IteratorAggregate, Fie
     }
   }
 
-  /**
-   * Implements ContextAwareInterface::getName().
-   */
-  public function getName() {
-    return substr($this->propertyPath, strrpos('.', $this->propertyPath));
-  }
-
-  /**
-   * Implements ContextAwareInterface::getName().
-   */
-  public function getNamespace() {
-    return $this->namespace;
-  }
-
-  /**
-   * Implements ContextAwareInterface::getName().
-   */
-  public function setNamespace($namespace) {
-    $this->namespace = $namespace;
-  }
-
-  /**
-   * Implements ContextAwareInterface::getName().
-   */
-  public function getPropertyPath() {
-    return $this->propertyPath;
-  }
-
-  /**
-   * Implements ContextAwareInterface::getName().
-   */
-  public function setPropertyPath($property_path) {
-    $this->propertyPath = $property_path;
-  }
-
-  /**
-   * Implements ContextAwareInterface::getParent().
-   *
-   * @return \Drupal\Core\Entity\Field\FieldInterface
-   */
-  public function getParent() {
-    return $this->parent;
-  }
-
-  /**
-   * Implements ContextAwareInterface::setParent().
-   */
-  public function setParent($parent) {
-    $this->parent = $parent;
-  }
 
   /**
    * Implements ComplexDataInterface::getProperties().

@@ -313,6 +313,30 @@ class EntityFieldTest extends WebTestBase  {
 
     // @todo: Once the user entity has definitions, continue testing getting
     // them from the $userref_values['entity'] property.
+
+    // Make sure provided contextual information is right.
+    $this->assertEqual($entity->getNamespace(), 'Drupal.core.entity.entity_test');
+    $this->assertEqual($entity->getPropertyPath(), '');
+    $this->assertEqual($entity->getName(), '');
+    $this->assertEqual($entity->getParent(), NULL);
+
+    $field = $entity->user_id;
+    $this->assertEqual($field->getNamespace(), 'Drupal.core.entity.entity_test');
+    $this->assertEqual($field->getPropertyPath(), 'user_id');
+    $this->assertEqual($field->getName(), 'user_id');
+    $this->assertEqual($field->getParent(), $entity, 'Parent object matches.');
+
+    $field_item = $field[0];
+    $this->assertEqual($field_item->getNamespace(), 'Drupal.core.entity.entity_test');
+    $this->assertEqual($field_item->getPropertyPath(), 'user_id.0');
+    $this->assertEqual($field_item->getName(), '0');
+    $this->assertEqual($field_item->getParent(), $field, 'Parent object matches.');
+
+    $item_value = $field_item->get('entity');
+    $this->assertEqual($item_value->getNamespace(), 'Drupal.core.entity.entity_test');
+    $this->assertEqual($item_value->getPropertyPath(), 'user_id.0.entity');
+    $this->assertEqual($item_value->getName(), 'entity');
+    $this->assertEqual($item_value->getParent(), $field_item, 'Parent object matches.');
   }
 
   /**

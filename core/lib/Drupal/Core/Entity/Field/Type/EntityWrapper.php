@@ -8,9 +8,9 @@
 namespace Drupal\Core\Entity\Field\Type;
 
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\TypedData\Type\TypedData;
 use Drupal\Core\TypedData\ComplexDataInterface;
 use Drupal\Core\TypedData\ContextAwareInterface;
+use Drupal\Core\TypedData\ContextAwareTypedData;
 use Drupal\Core\TypedData\TypedDataInterface;
 use ArrayIterator;
 use IteratorAggregate;
@@ -36,21 +36,7 @@ use InvalidArgumentException;
  *  - id source: If used as computed property, the ID property used to load
  *    the entity object.
  */
-class EntityWrapper extends TypedData implements IteratorAggregate, ComplexDataInterface, ContextAwareInterface {
-
-  /**
-   * The name.
-   *
-   * @var string
-   */
-  protected $name;
-
-  /**
-   * The parent data structure.
-   *
-   * @var mixed
-   */
-  protected $parent;
+class EntityWrapper extends ContextAwareTypedData implements IteratorAggregate, ComplexDataInterface {
 
   /**
    * The referenced entity type.
@@ -67,10 +53,10 @@ class EntityWrapper extends TypedData implements IteratorAggregate, ComplexDataI
   protected $id;
 
   /**
-   * Implements TypedDataInterface::__construct().
+   * Overrides ContextAwareTypedData::__construct().
    */
-  public function __construct(array $definition) {
-    $this->definition = $definition;
+  public function __construct(array $definition, $name = NULL, ContextAwareInterface $parent = NULL) {
+    parent::__construct($definition, $name, $parent);
     $this->entityType = isset($this->definition['constraints']['entity type']) ? $this->definition['constraints']['entity type'] : NULL;
   }
 
@@ -158,34 +144,6 @@ class EntityWrapper extends TypedData implements IteratorAggregate, ComplexDataI
    */
   public function set($property_name, $value) {
     $this->get($property_name)->setValue($value);
-  }
-
-  /**
-   * Implements ContextAwareInterface::getName().
-   */
-  public function getName() {
-    return $this->name;
-  }
-
-  /**
-   * Implements ContextAwareInterface::setName().
-   */
-  public function setName($name) {
-    $this->name = $name;
-  }
-
-  /**
-   * Implements ContextAwareInterface::getParent().
-   */
-  public function getParent() {
-    return $this->parent;
-  }
-
-  /**
-   * Implements ContextAwareInterface::setParent().
-   */
-  public function setParent($parent) {
-    $this->parent = $parent;
   }
 
   /**

@@ -7,10 +7,9 @@
 
 namespace Drupal\Core\Entity\Field\Type;
 
-use Drupal\Core\TypedData\Type\TypedData;
 use Drupal\Core\TypedData\AccessibleInterface;
 use Drupal\Core\TypedData\ComplexDataInterface;
-use Drupal\Core\TypedData\ContextAwareInterface;
+use Drupal\Core\TypedData\ContextAwareTypedData;
 use Drupal\Core\TypedData\TypedDataInterface;
 use ArrayIterator;
 use IteratorAggregate;
@@ -19,7 +18,7 @@ use InvalidArgumentException;
 /**
  * Makes translated entity properties available via the Field API.
  */
-class EntityTranslation extends TypedData implements IteratorAggregate, AccessibleInterface, ComplexDataInterface, ContextAwareInterface {
+class EntityTranslation extends ContextAwareTypedData implements IteratorAggregate, AccessibleInterface, ComplexDataInterface {
 
   /**
    * The array of translated properties, each being an instance of
@@ -28,20 +27,6 @@ class EntityTranslation extends TypedData implements IteratorAggregate, Accessib
    * @var array
    */
   protected $properties = array();
-
-  /**
-   * The language code of the translation.
-   *
-   * @var string
-   */
-  protected $langcode;
-
-  /**
-   * The parent entity.
-   *
-   * @var \Drupal\Core\Entity\EntityInterface
-   */
-  protected $parent;
 
   /**
    * Whether the entity translation acts in strict mode.
@@ -72,37 +57,6 @@ class EntityTranslation extends TypedData implements IteratorAggregate, Accessib
     $this->strict = $strict;
   }
 
-  /**
-   * Implements ContextAwareInterface::getName().
-   */
-  public function getName() {
-    // The name of the translation is the language code.
-    return $this->langcode;
-  }
-
-  /**
-   * Implements ContextAwareInterface::setName().
-   */
-  public function setName($name) {
-    // The name of the translation is the language code.
-    $this->langcode = $name;
-  }
-
-  /**
-   * Implements ContextAwareInterface::getParent().
-   *
-   * @return \Drupal\Core\Entity\EntityInterface
-   */
-  public function getParent() {
-    return $this->parent;
-  }
-
-  /**
-   * Implements ContextAwareInterface::setParent().
-   */
-  public function setParent($parent) {
-    $this->parent = $parent;
-  }
   /**
    * Implements TypedDataInterface::getValue().
    */

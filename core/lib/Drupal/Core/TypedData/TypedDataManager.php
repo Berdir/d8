@@ -82,18 +82,19 @@ class TypedDataManager extends PluginManagerBase {
    * @return \Drupal\Core\TypedData\TypedDataInterface
    *
    * @see typed_data()
-   * @see Drupal\Core\TypedData\Type\Integer
-   * @see Drupal\Core\TypedData\Type\Float
-   * @see Drupal\Core\TypedData\Type\String
-   * @see Drupal\Core\TypedData\Type\Boolean
-   * @see Drupal\Core\TypedData\Type\Duration
-   * @see Drupal\Core\TypedData\Type\Date
-   * @see Drupal\Core\TypedData\Type\Uri
-   * @see Drupal\Core\TypedData\Type\Binary
-   * @see Drupal\Core\Entity\Field\EntityWrapper
+   * @see \Drupal\Core\TypedData\TypedDataManager::getPropertyInstance()
+   * @see \Drupal\Core\TypedData\Type\Integer
+   * @see \Drupal\Core\TypedData\Type\Float
+   * @see \Drupal\Core\TypedData\Type\String
+   * @see \Drupal\Core\TypedData\Type\Boolean
+   * @see \Drupal\Core\TypedData\Type\Duration
+   * @see \Drupal\Core\TypedData\Type\Date
+   * @see \Drupal\Core\TypedData\Type\Uri
+   * @see \Drupal\Core\TypedData\Type\Binary
+   * @see \Drupal\Core\Entity\Field\EntityWrapper
    */
-  public function create(array $definition, $value = NULL) {
-    $wrapper = $this->factory->createInstance($definition['type'], $definition);
+  public function create(array $definition, $value = NULL, $property_name = NULL, $object = NULL) {
+    $wrapper = $this->factory->createInstance($definition['type'], $definition, $property_name, $object);
     if (isset($value)) {
       $wrapper->setValue($value);
     }
@@ -126,19 +127,22 @@ class TypedDataManager extends PluginManagerBase {
    *   data type format as documented for the data type classes.
    *
    * @throws \InvalidArgumentException
-   *   If the passed object does not implement either the ListInterface or the
-   *   ComplexDataInterface.
+   *   If the given property is not known, or the passed object does not
+   *   implement the ListInterface or the ComplexDataInterface.
    *
    * @return \Drupal\Core\TypedData\TypedDataInterface
    *   The new property instance.
    *
-   * @see \Drupal\Core\TypedData\Type\create()
+   * @see \Drupal\Core\TypedData\TypedDataManager::create()
    */
   public function getPropertyInstance(ContextAwareInterface $object, $property_name, $value = NULL) {
     $namespace = $object->getNamespace();
-    $property_path = $object->getPropertyPath() . '.' . $property_name;
+    $property_path = $object->getPropertyPath();
+    $property_path .= $property_path ? '.' . $property_name : $property_name;
     $key = $namespace . ':' . $property_path;
 
+    // If a namespace is given, make sure we have a prototype. Then, clone the
+    // prototype and set object specific values, i.e. the value and the context.
     if (!$namespace || !isset($this->prototypes[$key])) {
       if ($object instanceof ComplexDataInterface) {
         $definition = $object->getPropertyDefinition($property_name);
@@ -147,19 +151,24 @@ class TypedDataManager extends PluginManagerBase {
         $definition = $object->getItemDefinition();
       }
       else {
-        throw new \InvalidArgumentException("The passed object has to either implement the ComplexDatainterface or the Listinterface.");
+        throw new InvalidArgumentException("The passed object has to either implement the ComplexDataInterface or the ListInterface.");
       }
-      $this->prototypes[$key] = $this->create($definition);
-    }
-    $property = clone $this->prototypes[$key];
+      // Make sure we have got a valid definition.
+      if (!$definition) {
+        throw new InvalidArgumentException('Property ' . check_plain($property_name) . ' is unknown.');
+      }
 
+      $this->prototypes[$key] = $this->create($definition, NULL, $property_name, $object);
+    }
+
+    $property = clone $this->prototypes[$key];
+    // Update the parent relationship if necessary.
+    if ($property instanceof ContextAwareInterface) {
+      $property->setParent($object);
+    }
+    // Set the passed data value.
     if (isset($value)) {
       $property->setValue($value);
-    }
-    if ($property instanceof ContextAwareInterface) {
-      $property->setNamespace($namespace);
-      $property->setPropertyPath($property_path);
-      $property->setParent($object);
     }
     return $property;
   }

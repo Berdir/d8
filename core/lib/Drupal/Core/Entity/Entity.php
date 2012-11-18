@@ -385,4 +385,44 @@ class Entity implements IteratorAggregate, EntityInterface {
   public function getOriginalEntity() {
     return $this;
   }
+
+  /**
+   * Implements \Drupal\Core\TypedData\ContextAwareInterface::getName().
+   */
+  public function getName() {
+    // @todo: Replace by EntityNG implementation once all entity types have been
+    // converted to use the entity field API.
+  }
+
+  /**
+   * Implements \Drupal\Core\TypedData\ContextAwareInterface::getNamespace().
+   */
+  public function getNamespace() {
+    // @todo: Replace by EntityNG implementation once all entity types have been
+    // converted to use the entity field API.
+  }
+
+  /**
+   * Implements \Drupal\Core\TypedData\ContextAwareInterface::getPropertyPath().
+   */
+  public function getPropertyPath() {
+    // @todo: Replace by EntityNG implementation once all entity types have been
+    // converted to use the entity field API.
+  }
+
+  /**
+   * Implements \Drupal\Core\TypedData\ContextAwareInterface::getParent().
+   */
+  public function getParent() {
+    // @todo: Replace by EntityNG implementation once all entity types have been
+    // converted to use the entity field API.
+  }
+
+  /**
+   * Implements \Drupal\Core\TypedData\ContextAwareInterface::setParent().
+   */
+  public function setParent($parent) {
+    // @todo: Replace by EntityNG implementation once all entity types have been
+    // converted to use the entity field API.
+  }
 }
