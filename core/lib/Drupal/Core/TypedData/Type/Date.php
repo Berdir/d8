@@ -7,15 +7,15 @@
 
 namespace Drupal\Core\TypedData\Type;
 
-use Drupal\Core\Datetime\DrupalDateTime;
+use DateTime;
 use Drupal\Core\TypedData\TypedDataInterface;
 use InvalidArgumentException;
 
 /**
  * The date data type.
  *
- * The plain value of a date is an instance of the DrupalDateTime class. For setting
- * the value any value supported by the __construct() of the DrupalDateTime
+ * The plain value of a date is an instance of the DateTime class. For setting
+ * the value any value supported by the __construct() of the DateTime
  * class will work, including a DateTime object, a timestamp, a string
  * date, or an array of date parts.
  */
@@ -33,16 +33,18 @@ class Date extends TypedData implements TypedDataInterface {
    */
   public function setValue($value) {
 
-    // Don't try to create a date from an empty value.
-    // It would default to the current time.
-    if (!isset($value)) {
+    if ($value instanceof DateTime || !isset($value)) {
       $this->value = $value;
     }
+    // Treat integer values as timestamps, even if supplied as PHP string.
+    elseif ((string) (int) $value === (string) $value) {
+      $this->value = new DateTime('@' . $value);
+    }
+    elseif (is_string($value)) {
+      $this->value = new DateTime($value);
+    }
     else {
-      $this->value = $value instanceOf DrupalDateTime ? $value : new DrupalDateTime($value);
-      if ($this->value->hasErrors()) {
-        throw new InvalidArgumentException("Invalid date format given.");
-      }
+      throw new InvalidArgumentException("Invalid date format given.");
     }
   }
 
@@ -50,7 +52,7 @@ class Date extends TypedData implements TypedDataInterface {
    * Implements TypedDataInterface::getString().
    */
   public function getString() {
-    return (string) $this->getValue();
+    return (string) $this->getValue()->format(DateTime::ISO8601);
   }
 
   /**
