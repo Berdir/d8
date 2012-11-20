@@ -9,6 +9,7 @@ namespace Drupal\views_ui;
 
 use Drupal\views\ViewExecutable;
 use Drupal\Core\Database\Database;
+use Drupal\Core\TypedData\ContextAwareInterface;
 use Drupal\views\Plugin\views\query\Sql;
 use Drupal\views\Plugin\Core\Entity\View;
 use Drupal\views\ViewStorageInterface;
@@ -1084,6 +1085,41 @@ class ViewUI implements ViewStorageInterface {
    * Implements Drupal\Core\Entity\EntityInterface::getOriginalEntity().
    */
   public function getOriginalEntity() {
+    return $this->__call(__FUNCTION__, func_get_args());
+  }
+
+  /**
+   * Implements \Drupal\Core\TypedData\ContextAwareInterface::getName().
+   */
+  public function getName() {
+    return $this->__call(__FUNCTION__, func_get_args());
+  }
+
+  /**
+   * Implements \Drupal\Core\TypedData\ContextAwareInterface::getNamespace().
+   */
+  public function getNamespace() {
+    return $this->__call(__FUNCTION__, func_get_args());
+  }
+
+  /**
+   * Implements \Drupal\Core\TypedData\ContextAwareInterface::getPropertyPath().
+   */
+  public function getPropertyPath() {
+    return $this->__call(__FUNCTION__, func_get_args());
+  }
+
+  /**
+   * Implements \Drupal\Core\TypedData\ContextAwareInterface::getParent().
+   */
+  public function getParent() {
+    return $this->__call(__FUNCTION__, func_get_args());
+  }
+
+  /**
+   * Implements \Drupal\Core\TypedData\ContextAwareInterface::setContext().
+   */
+  public function setContext($name = NULL, ContextAwareInterface $parent = NULL) {
     return $this->__call(__FUNCTION__, func_get_args());
   }
 }

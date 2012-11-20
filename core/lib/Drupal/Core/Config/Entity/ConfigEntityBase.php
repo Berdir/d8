@@ -8,6 +8,7 @@
 namespace Drupal\Core\Config\Entity;
 
 use Drupal\Core\Entity\Entity;
+use Drupal\Core\TypedData\ContextAwareInterface;
 
 /**
  * Defines a base configuration entity class.
@@ -123,5 +124,45 @@ abstract class ConfigEntityBase extends Entity implements ConfigEntityInterface 
    */
   public function getOriginalEntity() {
     return $this;
+  }
+
+ /**
+   * Implements \Drupal\Core\TypedData\ContextAwareInterface::getName().
+   */
+  public function getName() {
+    // @todo: Replace by EntityNG implementation once all entity types have been
+    // converted to use the entity field API.
+  }
+
+  /**
+   * Implements \Drupal\Core\TypedData\ContextAwareInterface::getNamespace().
+   */
+  public function getNamespace() {
+    // @todo: Replace by EntityNG implementation once all entity types have been
+    // converted to use the entity field API.
+  }
+
+  /**
+   * Implements \Drupal\Core\TypedData\ContextAwareInterface::getPropertyPath().
+   */
+  public function getPropertyPath() {
+    // @todo: Replace by EntityNG implementation once all entity types have been
+    // converted to use the entity field API.
+  }
+
+  /**
+   * Implements \Drupal\Core\TypedData\ContextAwareInterface::getParent().
+   */
+  public function getParent() {
+    // @todo: Replace by EntityNG implementation once all entity types have been
+    // converted to use the entity field API.
+  }
+
+  /**
+   * Implements \Drupal\Core\TypedData\ContextAwareInterface::setContext().
+   */
+  public function setContext($name = NULL, ContextAwareInterface $parent = NULL) {
+    // @todo: Replace by EntityNG implementation once all entity types have been
+    // converted to use the entity field API.
   }
 }
