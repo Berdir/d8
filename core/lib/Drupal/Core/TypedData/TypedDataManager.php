@@ -137,9 +137,7 @@ class TypedDataManager extends PluginManagerBase {
    */
   public function getPropertyInstance(ContextAwareInterface $object, $property_name, $value = NULL) {
     $namespace = $object->getNamespace();
-    $property_path = $object->getPropertyPath();
-    $property_path .= $property_path ? '.' . $property_name : $property_name;
-    $key = $namespace . ':' . $property_path;
+    $key = $namespace . ':' . $object->getPropertyPath() . '.' . $property_name;
 
     // If a namespace is given, make sure we have a prototype. Then, clone the
     // prototype and set object specific values, i.e. the value and the context.

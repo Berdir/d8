@@ -8,6 +8,7 @@
 namespace Drupal\Core\Entity\Field\Type;
 
 use Drupal\Core\Entity\Field\FieldInterface;
+use Drupal\Core\TypedData\ContextAwareInterface;
 use Drupal\Core\TypedData\ContextAwareTypedData;
 use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\user\Plugin\Core\Entity\User;
@@ -35,6 +36,18 @@ class Field extends ContextAwareTypedData implements IteratorAggregate, FieldInt
    * @var array
    */
   protected $list = array();
+
+  /**
+   * Overrides ContextAwareTypedData::__construct().
+   */
+  public function __construct(array $definition, $name = NULL, ContextAwareInterface $parent = NULL) {
+    parent::__construct($definition, $name, $parent);
+    // Always initialize one empty item as usually that will be needed. That
+    // way prototypes created by
+    // \Drupal\Core\TypedData\TypedDataManager::getPropertyInstance() will
+    // already have one field item ready for use after cloning.
+    $this->list[0] = $this->createItem();
+  }
 
   /**
    * Implements TypedDataInterface::getValue().
