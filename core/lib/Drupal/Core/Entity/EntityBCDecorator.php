@@ -9,6 +9,7 @@ namespace Drupal\Core\Entity;
 
 use IteratorAggregate;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\TypedData\ContextAwareInterface;
 
 /**
  * Implements a decorator providing backwards compatible entity field access.
@@ -350,7 +351,7 @@ class EntityBCDecorator implements IteratorAggregate, EntityInterface {
   /**
    * Forwards the call to the decorated entity.
    */
-  public function setParent($parent) {
-    $this->decorated->setParent($parent);
+  public function setContext($name = NULL, ContextAwareInterface $parent = NULL) {
+    $this->decorated->setContext($name, $parent);
   }
 }

@@ -236,7 +236,7 @@ abstract class FieldItemBase extends ContextAwareTypedData implements IteratorAg
     foreach ($this->properties as $name => $property) {
       $this->properties[$name] = clone $property;
       if ($property instanceof ContextAwareInterface) {
-        $this->properties[$name]->setParent($this);
+        $this->properties[$name]->setContext($name, $this);
       }
     }
   }

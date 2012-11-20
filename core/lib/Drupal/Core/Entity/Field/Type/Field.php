@@ -46,7 +46,7 @@ class Field extends ContextAwareTypedData implements IteratorAggregate, FieldInt
     // way prototypes created by
     // \Drupal\Core\TypedData\TypedDataManager::getPropertyInstance() will
     // already have one field item ready for use after cloning.
-    $this->list[0] = $this->createItem();
+    $this->list[0] = $this->createItem(0);
   }
 
   /**
@@ -148,7 +148,7 @@ class Field extends ContextAwareTypedData implements IteratorAggregate, FieldInt
     // Allow getting not yet existing items as well.
     // @todo: Maybe add a public createItem() method in addition?
     elseif (!isset($this->list[$offset])) {
-      $this->list[$offset] = $this->createItem();
+      $this->list[$offset] = $this->createItem($offset);
     }
     return $this->list[$offset];
   }
@@ -158,8 +158,8 @@ class Field extends ContextAwareTypedData implements IteratorAggregate, FieldInt
    *
    * @return \Drupal\Core\TypedData\TypedDataInterface
    */
-  protected function createItem($value = NULL) {
-    return typed_data()->getPropertyInstance($this, 0, $value);
+  protected function createItem($offset = 0, $value = NULL) {
+    return typed_data()->getPropertyInstance($this, $offset, $value);
   }
 
   /**
@@ -270,6 +270,9 @@ class Field extends ContextAwareTypedData implements IteratorAggregate, FieldInt
   public function __clone() {
     foreach ($this->list as $delta => $property) {
       $this->list[$delta] = clone $property;
+      if ($property instanceof ContextAwareInterface) {
+        $property->setContext($delta, $this);
+      }
     }
   }
 

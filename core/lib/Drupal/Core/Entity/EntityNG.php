@@ -301,9 +301,7 @@ class EntityNG extends Entity {
     $translation = typed_data()->create($translation_definition, $fields);
     $translation->setStrictMode($strict);
     if ($translation instanceof ContextAwareInterface) {
-      $translation->setNamespace($this->namespace);
-      $translation->setPropertyPath('@' . $langcode);
-      $translation->setParent($this);
+      $translation->setContext('@' . $langcode, $this);
     }
     return $translation;
   }
@@ -471,7 +469,7 @@ class EntityNG extends Entity {
       foreach ($properties as $langcode => $property) {
         $this->fields[$name][$langcode] = clone $property;
         if ($property instanceof ContextAwareInterface) {
-          $this->fields[$name][$langcode]->setParent($this);
+          $this->fields[$name][$langcode]->setContext($name, $this);
         }
       }
     }

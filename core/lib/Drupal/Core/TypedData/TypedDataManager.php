@@ -152,7 +152,7 @@ class TypedDataManager extends PluginManagerBase {
    *   The parent typed data object, implementing the ContextAwareInterface and
    *   either the ListInterface or the ComplexDataInterface.
    * @param string $property_name
-   *   The name of the property to instantiate, or '0' to get an item of a list.
+   *   The name of the property to instantiate, or the delta of an list item.
    * @param mixed $value
    *   (optional) The data value. If set, it has to match one of the supported
    *   data type formats as documented by the data type classes.
@@ -168,7 +168,10 @@ class TypedDataManager extends PluginManagerBase {
    */
   public function getPropertyInstance(ContextAwareInterface $object, $property_name, $value = NULL) {
     $namespace = $object->getNamespace();
-    $key = $namespace . ':' . $object->getPropertyPath() . '.' . $property_name;
+    $key = $namespace . ':' . $object->getPropertyPath() . '.';
+    // If we are creating list items, we always use 0 in the key as all list
+    // items look the same.
+    $key .= is_numeric($property_name) ? 0 : $property_name;
 
     // If a namespace is given, make sure we have a prototype. Then, clone the
     // prototype and set object specific values, i.e. the value and the context.
@@ -193,7 +196,7 @@ class TypedDataManager extends PluginManagerBase {
     $property = clone $this->prototypes[$key];
     // Update the parent relationship if necessary.
     if ($property instanceof ContextAwareInterface) {
-      $property->setParent($object);
+      $property->setContext($property_name, $object);
     }
     // Set the passed data value.
     if (isset($value)) {

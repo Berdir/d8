@@ -17,7 +17,7 @@ namespace Drupal\Core\TypedData;
  * Classes deriving from this base class have to declare $value
  * or override getValue() or setValue().
  */
-abstract class ContextAwareTypedData extends \Drupal\Core\TypedData\Type\TypedData implements ContextAwareInterface {
+abstract class ContextAwareTypedData extends TypedData implements ContextAwareInterface {
 
   /**
    * The typed data namespace.
@@ -31,7 +31,7 @@ abstract class ContextAwareTypedData extends \Drupal\Core\TypedData\Type\TypedDa
    *
    * @var string
    */
-  protected $propertyPath;
+  protected $propertyPath = '';
 
   /**
    * The parent typed data object.
@@ -56,11 +56,23 @@ abstract class ContextAwareTypedData extends \Drupal\Core\TypedData\Type\TypedDa
    */
   public function __construct(array $definition, $name = NULL, ContextAwareInterface $parent = NULL) {
     $this->definition = $definition;
+    $this->setContext($name, $parent);
+  }
+
+  /**
+   * Implements ContextAwareInterface::setContext().
+   */
+  public function setContext($name = NULL, ContextAwareInterface $parent = NULL) {
+    $this->parent = $parent;
     if (isset($name) && isset($parent)) {
+      $this->propertyPath = $this->parent->getPropertyPath();
+      $this->propertyPath = $this->propertyPath ? $this->propertyPath . '.' . $name : $name;
+    }
+    else {
+      $this->propertyPath = '';
+    }
+    if (!isset($this->namespace) && isset($parent)) {
       $this->namespace = $parent->getNamespace();
-      $this->propertyPath = $parent->getPropertyPath();
-      $this->propertyPath .= $this->propertyPath ? '.' . $name : $name;
-      $this->setParent($parent);
     }
   }
 
@@ -93,13 +105,6 @@ abstract class ContextAwareTypedData extends \Drupal\Core\TypedData\Type\TypedDa
    */
   public function getParent() {
     return $this->parent;
-  }
-
-  /**
-   * Implements ContextAwareInterface::setParent().
-   */
-  public function setParent($parent) {
-    $this->parent = $parent;
   }
 
   /**

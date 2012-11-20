@@ -9,6 +9,7 @@ namespace Drupal\Core\Entity;
 
 use Drupal\Component\Uuid\Uuid;
 use Drupal\Core\Language\Language;
+use Drupal\Core\TypedData\ContextAwareInterface;
 use IteratorAggregate;
 
 /**
@@ -419,9 +420,9 @@ class Entity implements IteratorAggregate, EntityInterface {
   }
 
   /**
-   * Implements \Drupal\Core\TypedData\ContextAwareInterface::setParent().
+   * Implements \Drupal\Core\TypedData\ContextAwareInterface::setContext().
    */
-  public function setParent($parent) {
+  public function setContext($name = NULL, ContextAwareInterface $parent = NULL) {
     // @todo: Replace by EntityNG implementation once all entity types have been
     // converted to use the entity field API.
   }

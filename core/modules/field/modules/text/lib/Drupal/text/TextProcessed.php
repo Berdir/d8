@@ -46,12 +46,14 @@ class TextProcessed extends ContextAwareTypedData {
   }
 
   /**
-   * Overrides ContextAwareTypedData::setParent().
+   * Overrides ContextAwareTypedData::setContext().
    */
-  public function setParent($parent) {
-    $this->parent = $parent;
-    $this->text = $parent->get($this->definition['settings']['text source']);
-    $this->format = $parent->get('format');
+  public function setContext($name = NULL, ContextAwareInterface $parent = NULL) {
+    parent::setContext($name, $parent);
+    if (isset($parent)) {
+      $this->text = $parent->get($this->definition['settings']['text source']);
+      $this->format = $parent->get('format');
+    }
   }
 
   /**
