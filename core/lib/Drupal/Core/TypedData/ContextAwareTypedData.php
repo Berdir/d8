@@ -97,4 +97,11 @@ abstract class ContextAwareTypedData extends \Drupal\Core\TypedData\Type\TypedDa
   public function setParent($parent) {
     $this->parent = $parent;
   }
+
+  /**
+   * Implements TypedDataInterface::validate().
+   */
+  public function validate() {
+    // @todo: Implement validate() method.
+  }
 }

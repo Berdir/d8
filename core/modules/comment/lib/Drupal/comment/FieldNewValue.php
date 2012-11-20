@@ -2,14 +2,12 @@
 
 /**
  * @file
- * Definition of Drupal\comment\FieldNewValue.
+ * Contains \Drupal\comment\FieldNewValue.
  */
 
 namespace Drupal\comment;
 
-use Drupal\Core\TypedData\ContextAwareInterface;
-use Drupal\Core\TypedData\TypedDataInterface;
-use Drupal\Core\TypedData\Type\Integer;
+use Drupal\Core\TypedData\ContextAwareTypedData;
 use Drupal\Core\TypedData\ReadOnlyException;
 use InvalidArgumentException;
 
@@ -18,54 +16,10 @@ use InvalidArgumentException;
  *
  * @todo: Declare the list of allowed values once supported.
  */
-class FieldNewValue extends Integer implements ContextAwareInterface {
+class FieldNewValue extends ContextAwareTypedData {
 
   /**
-   * The name.
-   *
-   * @var string
-   */
-  protected $name;
-
-  /**
-   * The parent data structure.
-   *
-   * @var \Drupal\Core\Entity\Field\FieldItemInterface
-   */
-  protected $parent;
-
-  /**
-   * Implements ContextAwareInterface::getName().
-   */
-  public function getName() {
-    return $this->name;
-  }
-
-  /**
-   * Implements ContextAwareInterface::setName().
-   */
-  public function setName($name) {
-    $this->name = $name;
-  }
-
-  /**
-   * Implements ContextAwareInterface::getParent().
-   *
-   * @return \Drupal\Core\Entity\Field\FieldItemInterface
-   */
-  public function getParent() {
-    return $this->parent;
-  }
-
-  /**
-   * Implements ContextAwareInterface::setParent().
-   */
-  public function setParent($parent) {
-    $this->parent = $parent;
-  }
-
-  /**
-   * Implements TypedDataInterface::getValue().
+   * Implements \Drupal\Core\TypedData\TypedDataInterface::getValue().
    */
   public function getValue($langcode = NULL) {
     if (!isset($this->value)) {
@@ -80,7 +34,7 @@ class FieldNewValue extends Integer implements ContextAwareInterface {
   }
 
   /**
-   * Implements TypedDataInterface::setValue().
+   * Implements \Drupal\Core\TypedData\TypedDataInterface::setValue().
    */
   public function setValue($value) {
     if (isset($value)) {
