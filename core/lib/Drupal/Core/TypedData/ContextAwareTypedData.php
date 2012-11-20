@@ -10,6 +10,10 @@ namespace Drupal\Core\TypedData;
 /**
  * An abstract base class for context aware typed data.
  *
+ * This implementation requires parent typed data objects to implement the
+ * ContextAwareInterface also, such that the context can be derived from the
+ * parents.
+ *
  * Classes deriving from this base class have to declare $value
  * or override getValue() or setValue().
  */

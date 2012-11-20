@@ -26,10 +26,17 @@ class TypedDataFactory extends DefaultFactory {
    *   The id of a plugin, i.e. the data type.
    * @param array $configuration
    *   The plugin configuration, i.e. the data definition.
+   * @param string $name
+   *   (optional) If a property or list item is to be created, the name of the
+   *   property or the delta of the the list item. Otherwise, leave it empty.
+   * @param mixed $parent
+   *   (optional) If a property or list item is to be created, the parent typed
+   *   data object implementing either theListInterface or the
+   *   ComplexDataInterface. Otherwise, leave it empty.
    *
    * @return \Drupal\Core\TypedData\TypedDataInterface
    */
-  public function createInstance($plugin_id, array $configuration, $property_name = NULL, $object = NULL) {
+  public function createInstance($plugin_id, array $configuration, $name = NULL, $parent = NULL) {
 
     $type_definition = $this->discovery->getDefinition($plugin_id);
 
@@ -49,6 +56,6 @@ class TypedDataFactory extends DefaultFactory {
     if (!isset($class)) {
       throw new PluginException(sprintf('The plugin (%s) did not specify an instance class.', $plugin_id));
     }
-    return new $class($configuration, $property_name, $object);
+    return new $class($configuration, $name, $parent);
   }
 }

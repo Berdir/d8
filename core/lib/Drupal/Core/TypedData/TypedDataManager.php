@@ -36,11 +36,18 @@ class TypedDataManager extends PluginManagerBase {
    *   The id of a plugin, i.e. the data type.
    * @param array $configuration
    *   The plugin configuration, i.e. the data definition.
+   * @param string $name
+   *   (optional) If a property or list item is to be created, the name of the
+   *   property or the delta of the the list item. Otherwise, leave it empty.
+   * @param mixed $parent
+   *   (optional) If a property or list item is to be created, the parent typed
+   *   data object implementing either theListInterface or the
+   *   ComplexDataInterface. Otherwise, leave it empty.
    *
    * @return \Drupal\Core\TypedData\TypedDataInterface
    */
-  public function createInstance($plugin_id, array $configuration) {
-    return $this->factory->createInstance($plugin_id, $configuration);
+  public function createInstance($plugin_id, array $configuration, $name = NULL, $parent = NULL) {
+    return $this->factory->createInstance($plugin_id, $configuration, $name, $parent);
   }
 
   /**
@@ -78,8 +85,13 @@ class TypedDataManager extends PluginManagerBase {
    * @param mixed $value
    *   (optional) The data value. If set, it has to match one of the supported
    *   data type format as documented for the data type classes.
-   *
-   * @return \Drupal\Core\TypedData\TypedDataInterface
+   * @param string $name
+   *   (optional) If a property or list item is to be created, the name of the
+   *   property or the delta of the the list item. Otherwise, leave it empty.
+   * @param mixed $parent
+   *   (optional) If a property or list item is to be created, the parent typed
+   *   data object implementing either theListInterface or the
+   *   ComplexDataInterface. Otherwise, leave it empty.
    *
    * @see typed_data()
    * @see \Drupal\Core\TypedData\TypedDataManager::getPropertyInstance()
@@ -93,8 +105,8 @@ class TypedDataManager extends PluginManagerBase {
    * @see \Drupal\Core\TypedData\Type\Binary
    * @see \Drupal\Core\Entity\Field\EntityWrapper
    */
-  public function create(array $definition, $value = NULL, $property_name = NULL, $object = NULL) {
-    $wrapper = $this->factory->createInstance($definition['type'], $definition, $property_name, $object);
+  public function create(array $definition, $value = NULL, $name = NULL, $parent = NULL) {
+    $wrapper = $this->factory->createInstance($definition['type'], $definition, $name, $parent);
     if (isset($value)) {
       $wrapper->setValue($value);
     }
