@@ -1664,9 +1664,8 @@ function template_preprocess_comment(&$variables) {
   $variables['node'] = $node;
   $account = comment_prepare_author($comment);
   $variables['author'] = theme('username', array('account' => $account));
-  // @todo: Refactor date formatting. See http://drupal.org/node/1844956.
-  $variables['created'] = $comment->created->value->format(variable_get('date_format_medium', 'D, m/d/Y - H:i'));
-  $variables['changed'] = $comment->changed->value->format(variable_get('date_format_medium', 'D, m/d/Y - H:i'));
+  $variables['created'] = format_date($comment->created->value->getTimestamp());
+  $variables['changed'] = format_date($comment->changed->value->getTimestamp());
   $variables['new'] = $comment->new->value ? t('new') : '';
   if (theme_get_setting('toggle_comment_user_picture')) {
     // To change user picture settings (e.g., image style), edit the 'compact'
@@ -1696,8 +1695,8 @@ function template_preprocess_comment(&$variables) {
     $account_parent = comment_prepare_author($comment);
     $variables['parent_comment'] = $comment_parent;
     $variables['parent_author'] = theme('username', array('account' => $account_parent));
-    $variables['parent_created'] = $comment_parent->created->value->format(variable_get('date_format_medium', 'D, m/d/Y - H:i'));
-    $variables['parent_changed'] = $comment_parent->changed->value->format(variable_get('date_format_medium', 'D, m/d/Y - H:i'));
+    $variables['parent_created'] = format_date($comment_parent->created->value->getTimestamp());
+    $variables['parent_changed'] = format_date($comment_parent->changed->value->getTimestamp());
     $uri_parent = $comment_parent->uri();
     $uri_parent['options'] += array('attributes' => array('class' => 'permalink', 'rel' => 'bookmark'));
     $variables['parent_title'] = l($comment_parent->subject->value, $uri_parent['path'], $uri_parent['options']);
