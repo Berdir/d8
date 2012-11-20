@@ -103,9 +103,28 @@ class TypedDataManager extends PluginManagerBase {
 
   /**
    * Implements \Drupal\Component\Plugin\PluginManagerInterface::getInstance().
+   *
+   * @param array $options
+   *   An array of options with the following keys:
+   *   - object: The parent typed data object, implementing the
+   *     ContextAwareInterface and either the ListInterface or the
+   *     ComplexDataInterface.
+   *   - property: The name of the property to instantiate, or the delta of the
+   *     the list item to instantiate.
+   *   - value: The value to set. If set, it has to match one of the supported
+   *     data type formats as documented by the data type classes.
+   *
+   * @throws \InvalidArgumentException
+   *   If the given property is not known, or the passed object does not
+   *   implement the ListInterface or the ComplexDataInterface.
+   *
+   * @return \Drupal\Core\TypedData\TypedDataInterface
+   *   The new property instance.
+   *
+   * @see \Drupal\Core\TypedData\TypedDataManager::getPropertyInstance()
    */
   public function getInstance(array $options) {
-    return $this->getPropertyInstance($options['object'], $options['property'], $options['value'], $options['context']);
+    return $this->getPropertyInstance($options['object'], $options['property'], $options['value']);
   }
 
   /**
@@ -117,14 +136,14 @@ class TypedDataManager extends PluginManagerBase {
    * comment.comment_body.0.value is instantiated very often when multiple
    * comments are used.
    *
-   * @param ContextAware $object
+   * @param ContextAwareInterface $object
    *   The parent typed data object, implementing the ContextAwareInterface and
    *   either the ListInterface or the ComplexDataInterface.
    * @param string $property_name
    *   The name of the property to instantiate, or '0' to get an item of a list.
    * @param mixed $value
    *   (optional) The data value. If set, it has to match one of the supported
-   *   data type format as documented for the data type classes.
+   *   data type formats as documented by the data type classes.
    *
    * @throws \InvalidArgumentException
    *   If the given property is not known, or the passed object does not
