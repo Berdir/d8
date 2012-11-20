@@ -49,7 +49,7 @@ use Drupal\Core\Annotation\Translation;
  *       "custom_settings" = FALSE
  *     },
  *     "compact" = {
-         "label" = 'Compact',
+         "label" = "Compact",
          "custom_settings" = TRUE
        }
  *   }
