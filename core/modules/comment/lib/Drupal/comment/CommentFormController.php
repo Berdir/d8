@@ -255,15 +255,21 @@ class CommentFormController extends EntityFormControllerNG {
   }
 
   /**
+   * Overrides EntityFormController::buildEntity().
+   */
+  public function buildEntity(array $form, array &$form_state) {
+    $comment = parent::buildEntity($form, $form_state);
+    $date = !empty($form_state['values']['date']) ? $form_state['values']['date'] : 'now';
+    $comment->created->value = $date;
+    $comment->changed->value = REQUEST_TIME;
+    return $comment;
+  }
+
+  /**
    * Overrides Drupal\Core\Entity\EntityFormController::submit().
    */
   public function submit(array $form, array &$form_state) {
     $comment = parent::submit($form, $form_state);
-
-    // @todo: Move populating the entity over to self::buildEntity().
-    $date = !empty($form_state['values']['date']) ? $form_state['values']['date'] : 'now';
-    $comment->created->value = $date;
-    $comment->changed->value = REQUEST_TIME;
 
     // If the comment was posted by a registered user, assign the author's ID.
     // @todo Too fragile. Should be prepared and stored in comment_form()
