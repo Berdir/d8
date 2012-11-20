@@ -92,7 +92,7 @@ class Field extends ContextAwareTypedData implements IteratorAggregate, FieldInt
           throw new InvalidArgumentException('Unable to set a value with a non-numeric delta in a list.');
         }
         elseif (!isset($this->list[$delta])) {
-          $this->list[$delta] = $this->createItem($value);
+          $this->list[$delta] = $this->createItem($delta, $value);
         }
         else {
           $this->list[$delta]->setValue($value);
@@ -271,7 +271,7 @@ class Field extends ContextAwareTypedData implements IteratorAggregate, FieldInt
     foreach ($this->list as $delta => $property) {
       $this->list[$delta] = clone $property;
       if ($property instanceof ContextAwareInterface) {
-        $property->setContext($delta, $this);
+        $this->list[$delta]->setContext($delta, $this);
       }
     }
   }

@@ -215,6 +215,8 @@ class EntityFieldTest extends WebTestBase  {
     $this->assertIdentical(count($entity->name), 0, 'Name field contains no items.');
     $this->assertIdentical($entity->name->getValue(), array(), 'Name field value is an empty array.');
 
+    $entity->name->value = 'foo';
+    $this->assertTrue($entity->name->value, 'foo', 'Name field set.');
     // Test removing all list items by setting it to NULL.
     $entity->name = NULL;
     $this->assertIdentical(count($entity->name), 0, 'Name field contains no items.');
@@ -324,19 +326,19 @@ class EntityFieldTest extends WebTestBase  {
     $this->assertEqual($field->getNamespace(), 'Drupal.core.entity.entity_test');
     $this->assertEqual($field->getPropertyPath(), 'user_id');
     $this->assertEqual($field->getName(), 'user_id');
-    $this->assertEqual($field->getParent(), $entity, 'Parent object matches.');
+    $this->assertIdentical($field->getParent(), $entity, 'Parent object matches.');
 
     $field_item = $field[0];
     $this->assertEqual($field_item->getNamespace(), 'Drupal.core.entity.entity_test');
     $this->assertEqual($field_item->getPropertyPath(), 'user_id.0');
     $this->assertEqual($field_item->getName(), '0');
-    $this->assertEqual($field_item->getParent(), $field, 'Parent object matches.');
+    $this->assertIdentical($field_item->getParent(), $field, 'Parent object matches.');
 
     $item_value = $field_item->get('entity');
     $this->assertEqual($item_value->getNamespace(), 'Drupal.core.entity.entity_test');
     $this->assertEqual($item_value->getPropertyPath(), 'user_id.0.entity');
     $this->assertEqual($item_value->getName(), 'entity');
-    $this->assertEqual($item_value->getParent(), $field_item, 'Parent object matches.');
+    $this->assertIdentical($item_value->getParent(), $field_item, 'Parent object matches.');
   }
 
   /**

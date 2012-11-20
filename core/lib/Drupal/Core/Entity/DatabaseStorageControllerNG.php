@@ -87,7 +87,7 @@ class DatabaseStorageControllerNG extends DatabaseStorageController {
     }
 
     // Assign a new UUID if there is none yet.
-    if ($this->uuidKey && !isset($entity->{$this->uuidKey})) {
+    if ($this->uuidKey && !isset($entity->{$this->uuidKey}->value)) {
       $uuid = new Uuid();
       $entity->{$this->uuidKey}->value = $uuid->generate();
     }
