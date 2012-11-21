@@ -348,7 +348,7 @@ function user_update_dependencies() {
   // Make sure that file.module is enabled before converting the user picture
   // to a field.
   $dependencies['user'][8011] = array(
-    'system' => 8036,
+    'system' => 8037,
   );
   return $dependencies;
 }
