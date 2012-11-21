@@ -1,5 +1,7 @@
 <?php
 
+use Drupal\Component\Uuid\Uuid;
+
 /**
  * @file
  * Install, update and uninstall functions for the user module.
@@ -636,6 +638,8 @@ function user_update_8010() {
  * Create user picture field.
  */
 function user_update_8011() {
+  global $user;
+
   // User pictures can only be migrated to the new user picture image field
   // if Image module is installed.
   if (!module_exists('image')) {
@@ -646,7 +650,28 @@ function user_update_8011() {
     $picture_directory =  update_variable_get('file_default_scheme', 'public') . '://' . update_variable_get('user_picture_path', 'pictures');
     file_prepare_directory($picture_directory, FILE_CREATE_DIRECTORY);
     $destination = file_stream_wrapper_uri_normalize($picture_directory . '/' . drupal_basename($default_image));
-    $default_image = file_save_data($default_image, $destination, FILE_EXISTS_REPLACE);
+    // The file entity needs to be created manually as entities can not be
+    // created/saved during the upgrade path. Attempt to replicate the behavior
+    // of file_save_data() by updating an eventually existing record for that
+    // file.
+    file_unmanaged_save_data($default_image, $destination, FILE_EXISTS_REPLACE);
+    $uuid = new Uuid();
+    db_merge('file_managed')
+      ->key(array(
+        'uri' => $destination,
+      ))
+      ->fields(array(
+        'uid' => $user->uid,
+        'status' => FILE_STATUS_PERMANENT,
+        'filename' => drupal_basename($destination),
+        'uuid' => $uuid->generate(),
+        'langcode' => LANGUAGE_NOT_SPECIFIED,
+        'filesize' => filesize($destination),
+        'filemime' => file_get_mimetype($destination),
+        'timestamp' => REQUEST_TIME,
+      ))
+      ->execute();
+    $default_image_fid = db_query('SELECT fid FROM {file_managed} WHERE uri = :uri', array(':uri' => $destination))->fetchField();
   }
   $settings = array(
     // In D7, user pictures did not require Image module to work. Image module
@@ -659,7 +684,7 @@ function user_update_8011() {
     // the output.
     'formatter' => update_variable_get('user_pictures', 0) ? 'image' : 'hidden',
     'file_directory' => update_variable_get('user_picture_path', 'pictures'),
-    'default_image' => $default_image ? $default_image->id() : 0,
+    'default_image' => !empty($default_image_fid) ? $default_image_fid : 0,
     'image_style' => update_variable_get('user_picture_style', ''),
     'max_resolution' => update_variable_get('user_picture_dimensions', '85x85'),
     'max_filesize' => update_variable_get('user_picture_file_size', '30') . ' KB',

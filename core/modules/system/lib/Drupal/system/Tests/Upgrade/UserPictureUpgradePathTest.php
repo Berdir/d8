@@ -43,6 +43,11 @@ class UserPictureUpgradePathTest extends UpgradePathTestBase {
     $file = entity_load('file', $instance['settings']['default_image']);
     $this->assertIdentical($instance['settings']['default_image'], $file->id(), 'Default user picture has been migrated.');
     $this->assertEqual($file->uri, 'public://user_pictures_dir/druplicon.png', 'File id matches the uri expected.');
+    $this->assertEqual($file->filename, 'druplicon.png');
+    $this->assertEqual($file->langcode, LANGUAGE_NOT_SPECIFIED);
+    $this->assertEqual($file->filemime, 'image/png');
+    $this->assertFalse(empty($file->uuid));
+
     $this->assertEqual($instance['settings']['max_resolution'], '800x800', 'User picture maximum resolution has been migrated.');
     $this->assertEqual($instance['settings']['max_filesize'], '700 KB', 'User picture maximum filesize has been migrated.');
     $this->assertEqual($instance['description'], 'These are user picture guidelines.', 'User picture guidelines are now the user picture field description.');
