@@ -725,14 +725,8 @@ function user_update_8012(&$sandbox) {
     // Retrieve next 20 rows to migrate.
     $rows = db_query_range('SELECT uid, picture FROM {users} WHERE picture > 0', 0, 20)->fetchAllKeyed();
     foreach ($rows as $uid => $fid) {
-
-      // Table and column found in the field's storage details. During upgrades,
-      // it's always SQL.
-      $table_name = "field_data_user_picture";
-      $revision_name = "field_revision_picture";
-
       // Add a row to the field data and revision tables.
-      db_insert($table_name)
+      db_insert('field_data_user_picture')
         ->fields(array(
           'entity_type' => 'user',
           'bundle' => 'user',
@@ -743,7 +737,7 @@ function user_update_8012(&$sandbox) {
           'user_picture_fid' => $fid,
         ))
         ->execute();
-      db_insert($revision_name)
+      db_insert('field_revision_user_picture')
         ->fields(array(
           'entity_type' => 'user',
           'bundle' => 'user',
