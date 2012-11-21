@@ -1,11 +1,11 @@
 <?php
 
-use Drupal\Component\Uuid\Uuid;
-
 /**
  * @file
  * Install, update and uninstall functions for the user module.
  */
+
+use Drupal\Component\Uuid\Uuid;
 
 /**
  * Implements hook_schema().
