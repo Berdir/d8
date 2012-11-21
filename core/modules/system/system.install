@@ -2232,18 +2232,6 @@ function system_update_8036() {
 }
 
 /**
- * Enables file.module.
- */
-function system_update_8037() {
-  // The {file_managed} table has been moved to file.module, so it needs to be
-  // enabled as manually trying to enable it would fail with a "{file_managed}
-  // exists already" error.
-  if (!module_exists('file')) {
-    update_module_enable(array('file'));
-  }
-}
-
-/**
  * @} End of "defgroup updates-7.x-to-8.x".
  * The next series of updates should start at 9000.
  */
