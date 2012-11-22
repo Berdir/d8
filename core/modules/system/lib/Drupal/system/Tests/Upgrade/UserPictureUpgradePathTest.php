@@ -57,6 +57,13 @@ class UserPictureUpgradePathTest extends UpgradePathTestBase {
     // Verify compact view mode default settings.
     $this->drupalGet('admin/config/people/accounts/display/compact');
     $this->assertFieldByName('fields[member_for][type]', 'hidden');
+
+    // Check the user picture and file usage record.
+    $user = user_load(1);
+    $file = file_load($user->user_picture[LANGUAGE_NOT_SPECIFIED][0]['fid']);
+    $this->assertEqual('public://user_pictures_dir/faked_image.png', $file->uri);
+    $usage = file_usage()->listUsage($file);
+    $this->assertEqual(1, $usage['file']['user'][1]);
   }
 
 }

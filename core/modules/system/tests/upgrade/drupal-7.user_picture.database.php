@@ -4,11 +4,41 @@
  * @file
  * Database additions for user picture tests. Used in UserPictureUpgradePathTest.
  *
- * This dump only contains data and schema components relevant for role
+ * This dump only contains data and schema components relevant for user picture
  * functionality. The drupal-7.bare.database.php file is imported before
  * this dump, so the two form the database structure expected in tests
  * altogether.
  */
+
+// Add an image and assign it to uid 1.
+$fid = db_insert('file_managed')
+  ->fields(array(
+    'uri' => 'public://user_pictures_dir/faked_image.png',
+    'uid' => 1,
+    'status' => 1,
+    'filename' => 'faked_image.png',
+    'filesize' => 1000,
+    'filemime' => 'image/png',
+    'timestamp' => 1353542634,
+  ))
+  ->execute();
+
+db_insert('file_usage')
+  ->fields(array(
+    'fid' => $fid,
+    'module' => 'user',
+    'type' => 'user',
+    'id' => 1,
+    'count' => 1,
+  ))
+  ->execute();
+
+db_update('users')
+  ->condition('uid', 1)
+  ->fields(array(
+    'picture' => $fid,
+  ))
+  ->execute();
 
 // Set up variables needed for user picture support.
 $deleted_variables = array(
