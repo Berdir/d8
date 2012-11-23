@@ -29,7 +29,6 @@ class UserStorageController extends DatabaseStorageController {
       if ($record->picture) {
         $picture_fids[] = $record->picture;
       }
-      $queried_users[$key]->data = unserialize($record->data);
       $queried_users[$key]->roles = array();
       if ($record->uid) {
         $queried_users[$record->uid]->roles[DRUPAL_AUTHENTICATED_RID] = DRUPAL_AUTHENTICATED_RID;
@@ -149,10 +148,10 @@ class UserStorageController extends DatabaseStorageController {
       $entity->roles = array_filter($entity->roles);
     }
 
-    // Move account cancellation information into $entity->data.
+    // Store account cancellation information.
     foreach (array('user_cancel_method', 'user_cancel_notify') as $key) {
       if (isset($entity->{$key})) {
-        $entity->data[$key] = $entity->{$key};
+        drupal_container()->get('user.data')->set('user', $entity->id(), substr($key, 5), $entity->{$key});
       }
     }
   }
@@ -232,5 +231,6 @@ class UserStorageController extends DatabaseStorageController {
     db_delete('authmap')
       ->condition('uid', array_keys($entities), 'IN')
       ->execute();
+    drupal_container()->get('user.data')->delete(NULL, array_keys($entities));
   }
 }
