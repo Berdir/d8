@@ -29,6 +29,7 @@ class FilledStandardUpgradePathTest extends UpgradePathTestBase {
     // Path to the database dump files.
     $this->databaseDumpFiles = array(
       drupal_get_path('module', 'system') . '/tests/upgrade/drupal-7.filled.standard_all.database.php.gz',
+      drupal_get_path('module', 'system') . '/tests/upgrade/drupal-7.user_data.database.php',
     );
     parent::setUp();
   }
@@ -96,5 +97,10 @@ class FilledStandardUpgradePathTest extends UpgradePathTestBase {
     $blog_type = node_type_load('blog');
     $this->assertEqual($blog_type->module, 'node', "Content type 'blog' has been reassigned from the blog module to the node module.");
     $this->assertEqual($blog_type->base, 'node_content', "The base string used to construct callbacks corresponding to content type 'Blog' has been reassigned to 'node_content'.");
+
+    debug(db_query('SELECT * FROM {users}')->fetchAll());
+    debug(db_query('SELECT * FROM {_d7_users_data}')->fetchAll());
+    debug(db_query('SELECT * FROM {users_data}')->fetchAll());
+
   }
 }
