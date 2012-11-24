@@ -194,7 +194,10 @@ class EntityTranslation extends ContextAwareTypedData implements IteratorAggrega
    */
   public function access($operation = 'view', \Drupal\user\Plugin\Core\Entity\User $account = NULL) {
     $method = $operation . 'Access';
-    return entity_access_controller($this->parent->entityType())->$method($this->parent, $this->langcode, $account);
+    // @todo Add a way to set and get the langcode so that's more obvious what
+    // we're doing here.
+    $langocde = substr($this->getName(), 1);
+    return entity_access_controller($this->parent->entityType())->$method($this->parent, $langocde, $account);
   }
 
   /**

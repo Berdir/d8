@@ -48,17 +48,35 @@ class EntityTestStorageController extends DatabaseStorageControllerNG {
    *   An array of entity objects implementing the EntityInterface.
    */
   protected function mapFromStorageRecords(array $records, $load_revision = FALSE) {
-    $records = parent::mapFromStorageRecords($records, $load_revision);
-
+    $property_values = array();
     // Load data of translatable properties.
-    $this->attachPropertyData($records, $load_revision);
+    $property_values = $this->getPropertyValues($records, $load_revision);
+
+    foreach ($records as $id => $record) {
+      $values = array();
+      if (isset($property_values[$id])) {
+        $values = $property_values[$id];
+      }
+      foreach ($record as $name => $value) {
+        if (!isset($values[$name][LANGUAGE_DEFAULT])) {
+          // Avoid unnecessary array hierarchies to save memory.
+          $values[$name][LANGUAGE_DEFAULT] = $value;
+        }
+      }
+      $bundle = FALSE;
+      if ($this->bundleKey) {
+        $bundle = $record->{$this->bundleKey};
+      }
+      // Turn the record into an entity class.
+      $records[$id] = new $this->entityClass($values, $this->entityType, $bundle);
+    }
     return $records;
   }
 
   /**
    * Attaches property data in all languages for translatable properties.
    */
-  protected function attachPropertyData(&$queried_entities, $load_revision = FALSE) {
+  protected function getPropertyValues(&$records, $load_revision = FALSE) {
     $query = db_select('entity_test_property_data', 'data', array('fetch' => PDO::FETCH_ASSOC))
       ->fields('data')
       ->condition('id', array_keys($records))
@@ -66,7 +84,7 @@ class EntityTestStorageController extends DatabaseStorageControllerNG {
     if ($load_revision) {
       // Get revision id's.
       $revision_ids = array();
-      foreach ($queried_entities as $id => $entity) {
+      foreach ($records as $id => $entity) {
         $revision_ids[] = $entity->get('revision_id')->value;
       }
       $query->condition('revision_id', $revision_ids);
