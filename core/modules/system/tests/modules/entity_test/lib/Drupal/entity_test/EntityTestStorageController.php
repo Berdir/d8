@@ -85,7 +85,7 @@ class EntityTestStorageController extends DatabaseStorageControllerNG {
       // Get revision id's.
       $revision_ids = array();
       foreach ($records as $id => $entity) {
-        $revision_ids[] = $entity->get('revision_id')->value;
+        $revision_ids[] = $entity->revision_id;
       }
       $query->condition('revision_id', $revision_ids);
     }
