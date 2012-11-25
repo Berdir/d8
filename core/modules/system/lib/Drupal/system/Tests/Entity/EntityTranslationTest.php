@@ -131,7 +131,7 @@ class EntityTranslationTest extends WebTestBase {
       $this->pass('A translation for an invalid language is NULL.');
     }
 
-    // Try to get an untranslatable value from a translation in strict mode.
+    // Try to get an unstranslatable value from a translation in strict mode.
     try {
       $field_name = 'field_test_text';
       $value = $entity->getTranslation($this->langcodes[1])->get($field_name);
@@ -141,7 +141,7 @@ class EntityTranslationTest extends WebTestBase {
       $this->pass('Getting an untranslatable value from a translation in strict mode throws an exception.');
     }
 
-    // Try to get an untranslatable value from a translation in non-strict
+    // Try to get an unstranslatable value from a translation in non-strict
     // mode.
     $entity->set($field_name, array(0 => array('value' => 'default value')));
     $value = $entity->getTranslation($this->langcodes[1], FALSE)->get($field_name)->value;
@@ -156,7 +156,7 @@ class EntityTranslationTest extends WebTestBase {
       $this->pass("Setting a translation for an invalid language throws an exception.");
     }
 
-    // Try to set an untranslatable value into a translation in strict mode.
+    // Try to set an unstranslatable value into a translation in strict mode.
     try {
       $entity->getTranslation($this->langcodes[1])->set($field_name, NULL);
       $this->fail("Setting an untranslatable value into a translation in strict mode throws an exception.");
