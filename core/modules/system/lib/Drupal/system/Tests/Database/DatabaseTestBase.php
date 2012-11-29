@@ -10,7 +10,7 @@ namespace Drupal\system\Tests\Database;
 use Drupal\simpletest\DrupalUnitTestBase;
 
 /**
- * Tests for databases.
+ * Base class for databases database tests.
  *
  * Because all database tests share the same test data, we can centralize that
  * here.
@@ -20,7 +20,7 @@ abstract class DatabaseTestBase extends DrupalUnitTestBase {
   function setUp() {
     parent::setUp();
     $this->enableModules(array('database_test'));
-    $this->addSampleData();
+    self::addSampleData();
   }
 
   /**
@@ -46,11 +46,8 @@ abstract class DatabaseTestBase extends DrupalUnitTestBase {
 
   /**
    * Sets up our sample data.
-   *
-   * These are added using db_query(), since we're not trying to test the
-   * INSERT operations here, just populate.
    */
-  function addSampleData() {
+  static function addSampleData() {
     // We need the IDs, so we can't use a multi-insert here.
     $john = db_insert('test')
       ->fields(array(
