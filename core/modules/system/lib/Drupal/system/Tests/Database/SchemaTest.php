@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Definition of Drupal\system\Tests\Common\SchemaTest.
+ * Contains Drupal\system\Tests\Database\SchemaTest.
  */
 
-namespace Drupal\system\Tests\Common;
+namespace Drupal\system\Tests\Database;
 
 use Drupal\Core\Database\Database;
 use Drupal\simpletest\UnitTestBase;

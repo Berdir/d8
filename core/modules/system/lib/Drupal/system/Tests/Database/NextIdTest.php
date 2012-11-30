@@ -7,12 +7,19 @@
 
 namespace Drupal\system\Tests\Database;
 
-use Drupal\simpletest\UnitTestBase;
+use Drupal\simpletest\DrupalUnitTestBase;
 
 /**
  * Checks the sequences API.
  */
-class NextIdTest extends UnitTestBase {
+class NextIdTest extends DrupalUnitTestBase {
+
+  /**
+   * The modules to enable.
+   * @var array
+   */
+  public static $modules = array('system');
+
   public static function getInfo() {
     return array(
       'name' => 'Sequences API',
@@ -23,9 +30,7 @@ class NextIdTest extends UnitTestBase {
 
   public function setUp() {
     parent::setUp();
-    module_load_install('system');
-    $schema = system_schema();
-    db_create_table('sequences', $schema['sequences']);
+    $this->installSchema('system', 'sequences');
   }
 
   /**
