@@ -27,9 +27,6 @@ class CommentRenderController extends EntityRenderController {
       return $return;
     }
 
-    // Attach user account.
-    user_attach_accounts($entities);
-
     parent::buildContent($entities, $view_mode, $langcode);
 
     foreach ($entities as $entity) {
