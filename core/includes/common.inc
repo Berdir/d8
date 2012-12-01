@@ -6593,6 +6593,9 @@ function drupal_flush_all_caches() {
   drupal_clear_js_cache();
   _drupal_flush_css_js();
 
+  // Flush all loaded configuration.
+  drupal_container('cache')->clear();
+
   // Reset all static caches.
   drupal_static_reset();
 

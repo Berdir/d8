@@ -77,4 +77,8 @@ class ConfigFactory {
     return $this->configs[$name]->init();
   }
 
+  public function clear() {
+    $this->configs = array();
+  }
+
 }
