@@ -102,7 +102,7 @@ function config_get_storage_names_with_prefix($prefix = '') {
  *   A configuration object.
  */
 function config($name) {
-  return drupal_container()->get('config.factory')->get($name)->load();
+  return drupal_container()->get('config.factory')->get($name);
 }
 
 /**

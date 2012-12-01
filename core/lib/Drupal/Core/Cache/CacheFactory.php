@@ -32,13 +32,7 @@ class CacheFactory {
     // use the default 'cache' definition otherwise.
     $cache_backends = self::getBackends();
     $class = isset($cache_backends[$bin]) ? $cache_backends[$bin] : $cache_backends['cache'];
-
-    $backend = new $class($bin);
-    if ($backend instanceof BackendChain) {
-      $backend->appendBackend(new MemoryBackend($bin));
-      $backend->appendBackend(new DatabaseBackend($bin));
-    }
-    return $backend;
+    return new $class($bin);
   }
 
   /**
@@ -56,8 +50,6 @@ class CacheFactory {
     $cache_backends = isset($conf['cache_classes']) ? $conf['cache_classes'] : array();
     // Ensure there is a default 'cache' bin definition.
     $cache_backends += array('cache' => 'Drupal\Core\Cache\DatabaseBackend');
-    // Add cache chain config for the config bin.
-    $cache_backends += array('config' => 'Drupal\Core\Cache\BackendChain');
     return $cache_backends;
   }
 

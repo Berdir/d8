@@ -65,6 +65,13 @@ class Config {
   protected $eventDispatcher;
 
   /**
+   * Whether the config object has already been loaded.
+   *
+   * @var bool
+   */
+  protected $isLoaded = FALSE;
+
+  /**
    * Constructs a configuration object.
    *
    * @param string $name
@@ -151,6 +158,9 @@ class Config {
    *   The data that was requested.
    */
   public function get($key = '') {
+    if (!$this->isLoaded) {
+      $this->load();
+    }
     if (!isset($this->overriddenData)) {
       $this->setOverriddenData();
     }
@@ -243,6 +253,9 @@ class Config {
    *   The configuration object.
    */
   public function set($key, $value) {
+    if (!$this->isLoaded) {
+      $this->load();
+    }
     // Type-cast value into a string.
     $value = $this->castValue($value);
 
@@ -309,6 +322,9 @@ class Config {
    *   The configuration object.
    */
   public function clear($key) {
+    if (!$this->isLoaded) {
+      $this->load();
+    }
     $parts = explode('.', $key);
     if (count($parts) == 1) {
       unset($this->data[$key]);
@@ -337,6 +353,7 @@ class Config {
       $this->setData($data);
     }
     $this->notify('load');
+    $this->isLoaded = TRUE;
     return $this;
   }
 
@@ -347,6 +364,9 @@ class Config {
    *   The configuration object.
    */
   public function save() {
+    if (!$this->isLoaded) {
+      $this->load();
+    }
     $this->storage->write($this->name, $this->data);
     $this->isNew = FALSE;
     $this->notify('save');
@@ -412,6 +432,9 @@ class Config {
    *   The configuration object.
    */
   public function merge(array $data_to_merge) {
+    if (!$this->isLoaded) {
+      $this->load();
+    }
     // Preserve integer keys so that config keys are not changed.
     $this->data = NestedArray::mergeDeepArray(array($this->data, $data_to_merge), TRUE);
     return $this;
