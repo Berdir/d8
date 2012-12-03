@@ -194,9 +194,9 @@ function user_logout() {
 function template_preprocess_user(&$variables) {
   $account = $variables['elements']['#user'];
 
-  // Helpful $user_profile variable for templates.
+  // Helpful $content variable for templates.
   foreach (element_children($variables['elements']) as $key) {
-    $variables['user_profile'][$key] = $variables['elements'][$key];
+    $variables['content'][$key] = $variables['elements'][$key];
   }
 
   // Preprocess fields.
