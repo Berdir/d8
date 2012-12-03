@@ -358,7 +358,6 @@ class Config {
   public function load() {
     $this->isLoaded = NULL;
     $data = $this->storage->read($this->name);
-    // This stops setData from setting isLoaded to TRUE.
     if ($data === FALSE) {
       $this->isNew = TRUE;
       $this->setData(array());
