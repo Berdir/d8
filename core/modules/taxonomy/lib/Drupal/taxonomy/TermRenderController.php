@@ -37,16 +37,6 @@ class TermRenderController extends EntityRenderController {
     }
   }
 
-  protected function getBuildDefaults(EntityInterface $entity, $view_mode, $langcode) {
-    $return = parent::getBuildDefaults($entity, $view_mode, $langcode);
-
-    // TODO: rename "term" to "taxonomy_term" in theme_taxonomy_term().
-    $return['#term'] = $return["#{$this->entityType}"];
-    unset($return["#{$this->entityType}"]);
-
-    return $return;
-  }
-
   protected function alterBuild(array &$build, EntityInterface $entity, $view_mode, $langcode = NULL) {
     parent::alterBuild($build, $entity, $view_mode, $langcode);
     $build['#attached']['css'][] = drupal_get_path('module', 'taxonomy') . '/taxonomy.css';
