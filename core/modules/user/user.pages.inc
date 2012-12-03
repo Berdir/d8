@@ -184,15 +184,15 @@ function user_logout() {
 }
 
 /**
- * Process variables for user-profile.tpl.php.
+ * Process variables for user.tpl.php.
  *
  * The $variables array contains the following arguments:
  * - $account
  *
- * @see user-profile.tpl.php
+ * @see user.tpl.php
  */
-function template_preprocess_user_profile(&$variables) {
-  $account = $variables['elements']['#account'];
+function template_preprocess_user(&$variables) {
+  $account = $variables['elements']['#user'];
 
   // Helpful $user_profile variable for templates.
   foreach (element_children($variables['elements']) as $key) {

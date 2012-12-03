@@ -15,16 +15,4 @@ use Drupal\Core\Entity\EntityRenderController;
  */
 class UserRenderController extends EntityRenderController {
 
-  /**
-   * Overrides Drupal\Core\Entity\EntityRenderController::getBuildDefaults().
-   */
-  protected function getBuildDefaults(EntityInterface $entity, $view_mode, $langcode) {
-    $return = parent::getBuildDefaults($entity, $view_mode, $langcode);
-
-    // @todo rename "theme_user_profile" to "theme_user", 'account' to 'user'.
-    $return['#theme'] = 'user_profile';
-    $return['#account'] = $return['#user'];
-
-    return $return;
-  }
 }
