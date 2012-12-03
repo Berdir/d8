@@ -102,7 +102,7 @@ function config_get_storage_names_with_prefix($prefix = '') {
  *   A configuration object.
  */
 function config($name) {
-  return drupal_container()->get('config.factory')->get($name)->load();
+  return drupal_container()->get('config.factory')->get($name);
 }
 
 /**
@@ -141,11 +141,11 @@ function config_sync_get_changes(StorageInterface $source_storage, StorageInterf
     'delete' => array(),
   );
 
-  foreach (array_diff_assoc($target_config_data, $source_config_data) as $name => $value) {
+  foreach (array_diff_key($target_config_data, $source_config_data) as $name => $value) {
     $config_changes['delete'][] = $value['name'];
   }
 
-  foreach (array_diff_assoc($source_config_data, $target_config_data) as $name => $value) {
+  foreach (array_diff_key($source_config_data, $target_config_data) as $name => $value) {
     $config_changes['create'][] = $value['name'];
   }
 
@@ -200,6 +200,8 @@ function config_sync_changes(array $config_changes, StorageInterface $source_sto
  *   synchronization error, or NULL if there are no changes to synchronize.
  */
 function config_import() {
+  // Invalidate config objects.
+  drupal_container()->get('config.factory')->resetConfigs();
   // Retrieve a list of differences between staging and the active configuration.
   $source_storage = drupal_container()->get('config.storage.staging');
   $target_storage = drupal_container()->get('config.storage');

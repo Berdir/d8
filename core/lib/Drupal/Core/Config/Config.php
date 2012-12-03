@@ -65,6 +65,16 @@ class Config {
   protected $eventDispatcher;
 
   /**
+   * Whether the config object has already been loaded.
+   *
+   * Aside from TRUE or FALSE it can be NULL when inside load() to signal the
+   * "being loaded" phase.
+   *
+   * @var bool
+   */
+  protected $isLoaded = FALSE;
+
+  /**
    * Constructs a configuration object.
    *
    * @param string $name
@@ -88,6 +98,8 @@ class Config {
    *   The configuration object.
    */
   public function init() {
+    $this->isLoaded = FALSE;
+    $this->overrides = array();
     $this->notify('init');
     return $this;
   }
@@ -120,6 +132,9 @@ class Config {
    *   TRUE if this config object does not exist in storage.
    */
   public function isNew() {
+    if (!$this->isLoaded) {
+      $this->load();
+    }
     return $this->isNew;
   }
 
@@ -151,6 +166,9 @@ class Config {
    *   The data that was requested.
    */
   public function get($key = '') {
+    if (!$this->isLoaded) {
+      $this->load();
+    }
     if (!isset($this->overriddenData)) {
       $this->setOverriddenData();
     }
@@ -179,6 +197,11 @@ class Config {
    *   The configuration object.
    */
   public function setData(array $data) {
+    // A load would destroy the data just set (for example on import). Do not
+    // set when inside load().
+    if (isset($this->isLoaded)) {
+      $this->isLoaded = TRUE;
+    }
     $this->data = $data;
     $this->resetOverriddenData();
     return $this;
@@ -243,6 +266,9 @@ class Config {
    *   The configuration object.
    */
   public function set($key, $value) {
+    if (!$this->isLoaded) {
+      $this->load();
+    }
     // Type-cast value into a string.
     $value = $this->castValue($value);
 
@@ -309,6 +335,9 @@ class Config {
    *   The configuration object.
    */
   public function clear($key) {
+    if (!$this->isLoaded) {
+      $this->load();
+    }
     $parts = explode('.', $key);
     if (count($parts) == 1) {
       unset($this->data[$key]);
@@ -327,7 +356,9 @@ class Config {
    *   The configuration object.
    */
   public function load() {
+    $this->isLoaded = NULL;
     $data = $this->storage->read($this->name);
+    // This stops setData from setting isLoaded to TRUE.
     if ($data === FALSE) {
       $this->isNew = TRUE;
       $this->setData(array());
@@ -337,6 +368,7 @@ class Config {
       $this->setData($data);
     }
     $this->notify('load');
+    $this->isLoaded = TRUE;
     return $this;
   }
 
@@ -347,6 +379,9 @@ class Config {
    *   The configuration object.
    */
   public function save() {
+    if (!$this->isLoaded) {
+      $this->load();
+    }
     $this->storage->write($this->name, $this->data);
     $this->isNew = FALSE;
     $this->notify('save');
@@ -412,8 +447,12 @@ class Config {
    *   The configuration object.
    */
   public function merge(array $data_to_merge) {
+    if (!$this->isLoaded) {
+      $this->load();
+    }
     // Preserve integer keys so that config keys are not changed.
     $this->data = NestedArray::mergeDeepArray(array($this->data, $data_to_merge), TRUE);
+    $this->resetOverriddenData();
     return $this;
   }
 }
