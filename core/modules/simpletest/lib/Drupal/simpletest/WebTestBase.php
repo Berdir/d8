@@ -1227,6 +1227,7 @@ abstract class WebTestBase extends TestBase {
           $out = $this->curlExec(array(CURLOPT_URL => $action, CURLOPT_POST => TRUE, CURLOPT_POSTFIELDS => $post, CURLOPT_HTTPHEADER => $headers));
           // Ensure that any changes to variables in the other thread are picked up.
           $this->refreshVariables();
+          $this->container->get('config.factory')->resetConfigs();
 
           // Replace original page output with new output from redirected page(s).
           if ($new = $this->checkForMetaRefresh()) {
