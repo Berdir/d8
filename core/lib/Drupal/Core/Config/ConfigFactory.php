@@ -67,7 +67,7 @@ class ConfigFactory {
     global $conf;
 
     if (isset($this->configs[$name])) {
-      return $this->configs[$name];
+      #return $this->configs[$name];
     }
 
     // @todo The decrease of CPU time is interesting, since that means that

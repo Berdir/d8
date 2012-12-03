@@ -287,9 +287,10 @@ class ConfigStorageController implements EntityStorageControllerInterface {
       $id = $entity->getOriginalID();
     }
     $config = config($prefix . $id);
+    $is_new = $config->isNew();
     $config->setName($prefix . $entity->id());
 
-    if (!$config->isNew() && !isset($entity->original)) {
+    if (!$is_new && !isset($entity->original)) {
       $this->resetCache(array($id));
       $result = $this->load(array($id));
       $entity->original = reset($result);
@@ -303,7 +304,7 @@ class ConfigStorageController implements EntityStorageControllerInterface {
       $config->set($key, $value);
     }
 
-    if (!$config->isNew()) {
+    if (!$is_new) {
       $return = SAVED_UPDATED;
       $config->save();
       $this->postSave($entity, TRUE);
