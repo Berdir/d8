@@ -29,6 +29,10 @@ class NodeRenderController extends EntityRenderController {
 
     parent::buildContent($entities, $view_mode, $langcode);
 
+    if (theme_get_setting('toggle_node_user_picture') && user_picture_enabled()) {
+      parent::buildUserPictures($entities, 'compact', $langcode);
+    }
+
     foreach ($entities as $key => $entity) {
       $entity_view_mode = $entity->content['#view_mode'];
 

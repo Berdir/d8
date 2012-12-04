@@ -171,8 +171,7 @@ function user_attach_accounts(array $entities) {
  *
  * This approach preserves compatibility with node/comment templates. Alternate
  * user picture implementations (e.g., Gravatar) should provide their own
- * add/edit/delete forms and populate the 'picture' variable during the
- * preprocess stage.
+ * formatter on the user_picture field instance.
  */
 function user_picture_enabled() {
   return (bool) field_info_instance('user', 'user_picture', 'user');
@@ -1980,7 +1979,7 @@ function user_view($account, $view_mode = 'full', $langcode = NULL) {
  *   An array in the format expected by drupal_render().
  */
 function user_view_multiple($accounts, $view_mode = 'full', $langcode = NULL) {
-  return entity_view($accounts, $view_mode, $langcode);
+  return entity_view_multiple($accounts, $view_mode, $langcode);
 }
 
 /**

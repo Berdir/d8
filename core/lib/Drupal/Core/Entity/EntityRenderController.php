@@ -66,6 +66,24 @@ class EntityRenderController implements EntityRenderControllerInterface {
   }
 
   /**
+   * Implements Drupal\Core\Entity\EntityRenderControllerInterface::buildUserPictures().
+   */
+  function buildUserPictures(array $entities = array(), $view_mode = 'compact', $langcode = NULL) {
+    $accounts = array();
+    foreach ($entities as $entity) {
+      $accounts[$entity->account->id()] = $entity->account;
+    }
+    if (!empty($accounts)) {
+      $rendered_accounts = user_view_multiple($accounts, 'compact');
+      foreach ($entities as $entity) {
+        $id = $entity->account->id();
+        // @todo Should we need to declare user_picture property in Entity?
+        $entities[$id]->content['user_picture'] = $rendered_accounts[$id];
+      }
+    }
+  }
+
+  /**
    * Provides entity-specific defaults to the build process.
    *
    * @param Drupal\Core\Entity\EntityInterface $entity

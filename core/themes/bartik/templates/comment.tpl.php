@@ -72,7 +72,7 @@
 
   <div class="attribution">
 
-    <?php print render($user_picture); ?>
+    <?php print render($content['user_picture']); ?>
 
     <div class="submitted">
       <p class="commenter-name">
