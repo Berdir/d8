@@ -190,6 +190,8 @@ function config_sync_changes(array $config_changes, StorageInterface $source_sto
       }
     }
   }
+  // Config might have changed, reset the stored config objects.
+  drupal_container()->get('config.factory')->resetConfigs();
 }
 
 /**
@@ -200,8 +202,6 @@ function config_sync_changes(array $config_changes, StorageInterface $source_sto
  *   synchronization error, or NULL if there are no changes to synchronize.
  */
 function config_import() {
-  // Invalidate config objects.
-  drupal_container()->get('config.factory')->resetConfigs();
   // Retrieve a list of differences between staging and the active configuration.
   $source_storage = drupal_container()->get('config.storage.staging');
   $target_storage = drupal_container()->get('config.storage');

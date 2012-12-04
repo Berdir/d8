@@ -70,9 +70,6 @@ class ConfigFactory {
       return $this->configs[$name];
     }
 
-    // @todo The decrease of CPU time is interesting, since that means that
-    //   ContainerBuilder involves plenty of function calls (which are known to
-    //   be slow in PHP).
     $this->configs[$name] = new Config($name, $this->storage, $this->eventDispatcher);
     return $this->configs[$name]->init();
   }
