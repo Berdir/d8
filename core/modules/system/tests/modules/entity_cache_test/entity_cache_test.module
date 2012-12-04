@@ -18,6 +18,7 @@
  * @see entity_cache_test_dependency_entity_info()
  */
 function entity_cache_test_watchdog($log_entry) {
+  debug($log_entry);
   if ($log_entry['type'] == 'system' && $log_entry['message'] == '%module module installed.') {
     $info = entity_get_info('entity_cache_test');
     // Store the information in a system variable to analyze it later in the
