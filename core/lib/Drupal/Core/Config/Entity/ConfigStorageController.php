@@ -383,6 +383,11 @@ class ConfigStorageController implements EntityStorageControllerInterface {
     if ($update && !empty($entity->original) && $entity->{$this->idKey} !== $entity->original->{$this->idKey}) {
       // @todo This should just delete the original config object without going
       //   through the API, no?
+      // @todo: We try to delete the original here, but because ConfigFactory
+      //   still things the new one that has been renamed is the original, we
+      //   end up deleting the new config file instead of the old one. Clearing
+      //   the cache fixes this, but isn't the correct approach.
+      drupal_container()->get('config.factory')->resetConfigs();
       $entity->original->delete();
     }
   }
