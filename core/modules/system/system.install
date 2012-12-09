@@ -2249,14 +2249,13 @@ function system_update_8042() {
 }
 
 /**
- * Convert existing date formats to the new config system.
+ * Converts existing date formats to the new config system.
  */
-function system_update_8042() {
-
+function system_update_8043() {
   // Get the date config object.
   $config = config('system.date');
 
-  // Fetch all date types from date_format_type
+  // Fetch all date types from {date_format_type}.
   $date_formats = db_query('SELECT * FROM {date_format_type}')->fetchAllAssoc('type', PDO::FETCH_ASSOC);
   if (!empty($date_formats)) {
     foreach ($date_formats as $type => $format) {
@@ -2272,7 +2271,7 @@ function system_update_8042() {
         $config->set("formats.{$type}.pattern.php", $default_format);
 
         // Delete the migrated variables.
-        db_delete('variable')->condition('name', $variable_name, '=')->execute();
+        update_variable_del($variable_name);
       }
     }
 
