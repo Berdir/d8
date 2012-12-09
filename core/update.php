@@ -39,7 +39,7 @@ if (version_compare(PHP_VERSION, '5.3.3') < 0) {
  * Global flag indicating that update.php is being run.
  *
  * When this flag is set, various operations do not take place, such as invoking
- * hook_init() and hook_exit(), css/js preprocessing, and translation.
+ * hook_init(), event close subscribers, css/js preprocessing, and translation.
  *
  * This constant is defined using define() instead of const so that PHP
  * versions older than 5.3 can display the proper PHP requirements instead of

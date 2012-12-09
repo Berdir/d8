@@ -32,8 +32,8 @@ define('DRUPAL_ROOT', getcwd());
  * Global flag to identify update.php and authorize.php runs.
  *
  * Identifies update.php and authorize.php runs, avoiding unwanted operations
- * such as hook_init() and hook_exit() invokes, css/js preprocessing and
- * translation, and solves some theming issues. The flag is checked in other
+ * such as hook_init() and event close subscriber invokes, css/js preprocessing
+ * and translation, and solves some theming issues. The flag is checked in other
  * places in Drupal code (not just authorize.php).
  */
 const MAINTENANCE_MODE = 'update';

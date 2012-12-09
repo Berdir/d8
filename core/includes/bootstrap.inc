@@ -2342,10 +2342,9 @@ function _drupal_bootstrap_page_cache() {
         bootstrap_invoke_all('boot');
       }
       drupal_serve_page_from_cache($cache);
-      // If the skipping of the bootstrap hooks is not enforced, call
-      // hook_exit.
-      if (variable_get('page_cache_invoke_hooks', TRUE)) {
-        bootstrap_invoke_all('exit');
+      // Terminate kernel
+      if ($kernel = drupal_container()->get('kernel', ContainerInterface::NULL_ON_INVALID_REFERENCE)) {
+        $kernel->terminate;
       }
       // We are done.
       exit;

@@ -2265,18 +2265,14 @@ function l($text, $path, array $options = array()) {
  * Performs end-of-request tasks.
  *
  * There should rarely be a reason to call exit instead of drupal_exit();
- *
- * @param $destination
- *   If this function is called from drupal_goto(), then this argument
- *   will be a fully-qualified URL that is the destination of the redirect.
- *   This should be passed along to hook_exit() implementations.
  */
-function drupal_exit($destination = NULL) {
+function drupal_exit() {
   if (drupal_get_bootstrap_phase() == DRUPAL_BOOTSTRAP_FULL) {
-    if (!defined('MAINTENANCE_MODE') || MAINTENANCE_MODE != 'update') {
-      module_invoke_all('exit', $destination);
-    }
     drupal_session_commit();
+  }
+  // Terminate kernel
+  if ($kernel = drupal_container()->get('kernel', ContainerInterface::NULL_ON_INVALID_REFERENCE)) {
+    $kernel->terminate;
   }
   exit;
 }
