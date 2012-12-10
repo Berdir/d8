@@ -567,7 +567,7 @@ function _xmlrpc($url, $args, $headers = array()) {
   }
   catch (BadResponseException $e) {
     $response = $e->getResponse();
-    xmlrpc_error($response->getStatusCode(), $response->getReasonPhrase());
+    xmlrpc_error($response ? $response->getStatusCode() : NULL, $response ? $response->getReasonPhrase() : $e->getMessage());
     return FALSE;
   }
   if ($response->getStatusCode() != 200) {
