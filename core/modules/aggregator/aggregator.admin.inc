@@ -5,8 +5,9 @@
  * Admin page callbacks for the aggregator module.
  */
 
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Drupal\aggregator\Plugin\FetcherManager;
+use Guzzle\Http\Exception\BadResponseException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
  * Page callback: Displays the aggregator administration page.
@@ -353,16 +354,18 @@ function aggregator_form_opml_submit($form, &$form_state) {
     $data = file_get_contents($file->uri);
   }
   else {
-    $response = drupal_http_request($form_state['values']['remote']);
-    if (!isset($response->error)) {
-      $data = $response->data;
-    }
-    else {
-      watchdog('aggregator', 'HTTP request to @url failed with error: @error', array('@url' => $form_state['values']['remote'], '@error' => $response->error));
+    try {
+      $response = drupal_container()
+        ->get('http_default_client')
+        ->get($form_state['values']['remote'])
+        ->send();
+      $feeds = _aggregator_parse_opml($response->getBody(TRUE));
+    } catch (BadResponseException $e) {
+      $error = $e->getResponse() ? $e->getResponse()->getReasonPhrase() : $e->getMessage();
+      watchdog('aggregator', 'HTTP request to @url failed with error: @error', array('@url' => $form_state['values']['remote'], '@error' => $error));
     }
   }
 
-  $feeds = _aggregator_parse_opml($data);
   if (empty($feeds)) {
     drupal_set_message(t('No new feed has been added.'));
     return;

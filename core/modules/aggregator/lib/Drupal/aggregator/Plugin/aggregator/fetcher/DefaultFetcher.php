@@ -15,8 +15,6 @@ use Guzzle\Http\Exception\BadResponseException;
 /**
  * Defines a default fetcher implementation.
  *
- * Uses drupal_http_request() to download the feed.
- *
  * @Plugin(
  *   id = "aggregator",
  *   title = @Translation("Default fetcher"),
