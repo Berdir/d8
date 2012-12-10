@@ -5,6 +5,8 @@
  * Code required only when fetching information about available updates.
  */
 
+use Guzzle\Http\Exception\BadResponseException;
+
 /**
  * Page callback: Checks for updates and displays the update status report.
  *
@@ -151,30 +153,29 @@ function _update_process_fetch_task($project) {
   $project_name = $project['name'];
 
   if (empty($fail[$fetch_url_base]) || $fail[$fetch_url_base] < $max_fetch_attempts) {
-    $result = drupal_http_request($url, array('headers' => array('accept' => 'text/xml')));
-    if (isset($result->error)) {
-      watchdog('update', 'HTTP request to @url failed with error: @error.', array('@url' => $url, '@error' => $result->error));
-    }
-    elseif (!isset($result->error) && isset($result->data)) {
-      $data = $result->data;
-    }
-  }
+    try {
+      $response = drupal_container()
+        ->get('http_default_client')
+        ->get($url, array('Accept' => 'text/xml'))
+        ->send();
 
-  if (!empty($data)) {
-    $available = update_parse_xml($data);
-    // @todo: Purge release data we don't need (http://drupal.org/node/238950).
-    if (!empty($available)) {
-      // Only if we fetched and parsed something sane do we return success.
-      $success = TRUE;
-    }
-  }
-  else {
-    $available['project_status'] = 'not-fetched';
-    if (empty($fail[$fetch_url_base])) {
-      $fail[$fetch_url_base] = 1;
-    }
-    else {
-      $fail[$fetch_url_base]++;
+      $available = update_parse_xml($response->getBody(TRUE));
+      // @todo: Purge release data we don't need (http://drupal.org/node/238950).
+      if (!empty($available)) {
+        // Only if we fetched and parsed something sane do we return success.
+        $success = TRUE;
+      }
+    } catch (BadResponseException $e) {
+      $error = $e->getResponse() ? $e->getResponse()->getReasonPhrase() : $e->getMessage();
+      watchdog('update', 'HTTP request to @url failed with error: @error.', array('@url' => $url, '@error' => $error));
+
+      $available['project_status'] = 'not-fetched';
+      if (empty($fail[$fetch_url_base])) {
+        $fail[$fetch_url_base] = 1;
+      }
+      else {
+        $fail[$fetch_url_base]++;
+      }
     }
   }
 
