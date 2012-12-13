@@ -359,13 +359,14 @@ function aggregator_form_opml_submit($form, &$form_state) {
         ->get('http_default_client')
         ->get($form_state['values']['remote'])
         ->send();
-      $feeds = _aggregator_parse_opml($response->getBody(TRUE));
+      $data = $response->getBody(TRUE);
     } catch (BadResponseException $e) {
       $error = $e->getResponse() ? $e->getResponse()->getReasonPhrase() : $e->getMessage();
       watchdog('aggregator', 'HTTP request to @url failed with error: @error', array('@url' => $form_state['values']['remote'], '@error' => $error));
     }
   }
 
+  $feeds = _aggregator_parse_opml($data);
   if (empty($feeds)) {
     drupal_set_message(t('No new feed has been added.'));
     return;
