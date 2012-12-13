@@ -154,28 +154,32 @@ function _update_process_fetch_task($project) {
 
   if (empty($fail[$fetch_url_base]) || $fail[$fetch_url_base] < $max_fetch_attempts) {
     try {
-      $response = drupal_container()
+      $data = drupal_container()
         ->get('http_default_client')
         ->get($url, array('Accept' => 'text/xml'))
-        ->send();
-
-      $available = update_parse_xml($response->getBody(TRUE));
-      // @todo: Purge release data we don't need (http://drupal.org/node/238950).
-      if (!empty($available)) {
-        // Only if we fetched and parsed something sane do we return success.
-        $success = TRUE;
-      }
+        ->send()
+        ->getBody(TRUE);
     } catch (BadResponseException $e) {
       $error = $e->getResponse() ? $e->getResponse()->getReasonPhrase() : $e->getMessage();
       watchdog('update', 'HTTP request to @url failed with error: @error.', array('@url' => $url, '@error' => $error));
+    }
+  }
 
-      $available['project_status'] = 'not-fetched';
-      if (empty($fail[$fetch_url_base])) {
-        $fail[$fetch_url_base] = 1;
-      }
-      else {
-        $fail[$fetch_url_base]++;
-      }
+  if (!empty($data)) {
+    $available = update_parse_xml($data);
+    // @todo: Purge release data we don't need (http://drupal.org/node/238950).
+    if (!empty($available)) {
+      // Only if we fetched and parsed something sane do we return success.
+      $success = TRUE;
+    }
+  }
+  else {
+    $available['project_status'] = 'not-fetched';
+    if (empty($fail[$fetch_url_base])) {
+      $fail[$fetch_url_base] = 1;
+    }
+    else {
+      $fail[$fetch_url_base]++;
     }
   }
 
