@@ -21,6 +21,7 @@ return array(
     'Symfony\\Cmf\\Component\\Routing' => $vendorDir . '/symfony-cmf/routing/',
     'Psr\\Log\\' => $vendorDir . '/psr/log/',
     'Guzzle\\Stream' => $vendorDir . '/guzzle/stream/',
+    'Guzzle\\Plugin\\Async' => $vendorDir . '/guzzle/plugin-async/',
     'Guzzle\\Parser' => $vendorDir . '/guzzle/parser/',
     'Guzzle\\Http' => $vendorDir . '/guzzle/http/',
     'Guzzle\\Common' => $vendorDir . '/guzzle/common/',

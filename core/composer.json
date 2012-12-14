@@ -20,6 +20,7 @@
     "twig/twig": "1.12.1",
     "doctrine/common": "2.3.0",
     "guzzle/http": "3.1.0",
+    "guzzle/plugin-async": "3.1.0",
     "kriswallsmith/assetic": "1.1.0-alpha1",
     "symfony-cmf/routing": "dev-master#ea4a10",
     "easyrdf/easyrdf": "0.8.0-beta.1",
