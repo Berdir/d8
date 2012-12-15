@@ -25,6 +25,13 @@ class StatisticsLoggingTest extends WebTestBase {
    */
   public static $modules = array('statistics', 'block');
 
+  /**
+   * The Guzzle HTTP client.
+   *
+   * @var \Guzzle\Http\ClientInterface;
+   */
+  protected $client;
+
   public static function getInfo() {
     return array(
       'name' => 'Statistics logging tests',
@@ -60,6 +67,9 @@ class StatisticsLoggingTest extends WebTestBase {
     // Clear the logs.
     db_truncate('accesslog');
     db_truncate('node_counter');
+
+    $this->client = drupal_container()->get('http_default_client');
+    $this->client->setConfig(array('curl.options' => array(CURLOPT_TIMEOUT => 10)));
   }
 
   /**
@@ -80,7 +90,7 @@ class StatisticsLoggingTest extends WebTestBase {
     $headers = array('Content-Type' => 'application/x-www-form-urlencoded');
     global $base_url;
     $stats_path = $base_url . '/' . drupal_get_path('module', 'statistics'). '/statistics.php';
-    drupal_http_request($stats_path, array('method' => 'POST', 'data' => $post, 'headers' => $headers, 'timeout' => 10000));
+    $this->client->post($stats_path, $headers, $post)->send();
     $this->assertIdentical($this->drupalGetHeader('X-Drupal-Cache'), 'MISS', 'Testing an uncached page.');
     $log = db_query('SELECT * FROM {accesslog}')->fetchAll(PDO::FETCH_ASSOC);
     $this->assertTrue(is_array($log) && count($log) == 1, 'Page request was logged.');
@@ -91,7 +101,7 @@ class StatisticsLoggingTest extends WebTestBase {
     // Verify logging of a cached page.
     $this->drupalGet($path);
     // Manually calling statistics.php, simulating ajax behavior.
-    drupal_http_request($stats_path, array('method' => 'POST', 'data' => $post, 'headers' => $headers, 'timeout' => 10000));
+    $this->client->post($stats_path, $headers, $post)->send();
     $this->assertIdentical($this->drupalGetHeader('X-Drupal-Cache'), 'HIT', 'Testing a cached page.');
     $log = db_query('SELECT * FROM {accesslog}')->fetchAll(PDO::FETCH_ASSOC);
     $this->assertTrue(is_array($log) && count($log) == 2, 'Page request was logged.');
@@ -103,7 +113,7 @@ class StatisticsLoggingTest extends WebTestBase {
     $this->drupalLogin($this->auth_user);
     $this->drupalGet($path);
     // Manually calling statistics.php, simulating ajax behavior.
-    drupal_http_request($stats_path, array('method' => 'POST', 'data' => $post, 'headers' => $headers, 'timeout' => 10000));
+    $this->client->post($stats_path, $headers, $post)->send();
     $log = db_query('SELECT * FROM {accesslog}')->fetchAll(PDO::FETCH_ASSOC);
     // Check the 6th item since login and account pages are also logged
     $this->assertTrue(is_array($log) && count($log) == 6, 'Page request was logged.');
