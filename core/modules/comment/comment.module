@@ -1459,7 +1459,7 @@ function comment_load_multiple(array $cids = NULL, $reset = FALSE) {
  *   The comment object.
  */
 function comment_load($cid, $reset = FALSE) {
-  return entity_load('comment', $cid);
+  return entity_load('comment', $cid, $reset);
 }
 
 /**
