@@ -69,7 +69,7 @@ class CommentInterfaceTest extends CommentTestBase {
     // Test changing the comment author to "Anonymous".
     $this->drupalGet('comment/' . $comment->id . '/edit');
     $comment = $this->postComment(NULL, $comment->comment, $comment->subject, array('name' => ''));
-    $comment_loaded = comment_load($comment->id);
+    $comment_loaded = comment_load($comment->id, TRUE);
     $this->assertTrue(empty($comment_loaded->name) && $comment_loaded->uid == 0, 'Comment author successfully changed to anonymous.');
 
     // Test changing the comment author to an unverified user.

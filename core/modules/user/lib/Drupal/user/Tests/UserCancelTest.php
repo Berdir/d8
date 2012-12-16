@@ -327,7 +327,7 @@ class UserCancelTest extends WebTestBase {
     $this->assertFalse(node_load($node->nid, TRUE), 'Node of the user has been deleted.');
     $this->assertFalse(node_revision_load($revision), 'Node revision of the user has been deleted.');
     $this->assertTrue(node_load($revision_node->nid, TRUE), "Current revision of the user's node was not deleted.");
-    $this->assertFalse(comment_load($comment->cid), 'Comment of the user has been deleted.');
+    $this->assertFalse(comment_load($comment->cid, TRUE), 'Comment of the user has been deleted.');
 
     // Confirm that user is logged out.
     $this->assertNoText($account->name, 'Logged out.');
