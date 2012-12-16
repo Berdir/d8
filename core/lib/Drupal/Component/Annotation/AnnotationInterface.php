@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\Component\Annotation\AnnotationInterface.
+ * Contains Drupal\Component\Annotation\AnnotationInterface.
  */
 
 namespace Drupal\Component\Annotation;

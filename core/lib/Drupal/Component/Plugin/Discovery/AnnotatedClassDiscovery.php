@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\Component\Plugin\Discovery\AnnotatedClassDiscovery.
+ * Contains Drupal\Component\Plugin\Discovery\AnnotatedClassDiscovery.
  */
 
 namespace Drupal\Component\Plugin\Discovery;
@@ -37,7 +37,7 @@ class AnnotatedClassDiscovery implements DiscoveryInterface {
    * The name of the annotation that contains the plugin definition.
    *
    * The class corresponding to this name must implement
-   * Drupal\Component\Annotation\AnnotationInterface.
+   * \Drupal\Component\Annotation\AnnotationInterface.
    *
    * @var string
    */
