@@ -82,7 +82,7 @@ class CommentInterfaceTest extends CommentTestBase {
     // Test changing the comment author to a verified user.
     $this->drupalGet('comment/' . $comment->id . '/edit');
     $comment = $this->postComment(NULL, $comment->comment, $comment->subject, array('name' => $this->web_user->name));
-    $comment_loaded = comment_load($comment->id);
+    $comment_loaded = comment_load($comment->id, TRUE);
     $this->assertTrue($comment_loaded->name == $this->web_user->name && $comment_loaded->uid == $this->web_user->uid, 'Comment author successfully changed to a registered user.');
 
     $this->drupalLogout();
