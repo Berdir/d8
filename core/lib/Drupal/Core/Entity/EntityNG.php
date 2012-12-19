@@ -280,16 +280,10 @@ class EntityNG extends Entity {
     $translations = array();
     // Build an array with the translation langcodes set as keys.
     foreach ($this->getProperties() as $name => $property) {
-      // @todo Figure out why we get localized non-translatable properties here
-      // and thus have to filter them!
-      $definition = $property->getDefinition();
-      if (!empty($definition['translatable'])) {
-        if (isset($this->values[$name])) {
-          $translations += $this->values[$name];
-        }
-        $translations += $this->fields[$name];
+      if (isset($this->values[$name])) {
+        $translations += $this->values[$name];
       }
-
+      $translations += $this->fields[$name];
     }
     unset($translations[LANGUAGE_DEFAULT]);
 
