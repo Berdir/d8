@@ -1744,7 +1744,10 @@ function system_update_8006() {
 }
 
 /**
- * Add tags, checksum_invalidations, checksum_deletions to a cache table.
+ * Adds tags, checksum_invalidations, checksum_deletions to a cache table.
+ *
+ * @param string $table
+ *   Name of the cache table.
  */
 function system_update_8007_add_tag_column($table) {
   if (db_table_exists($table)) {
