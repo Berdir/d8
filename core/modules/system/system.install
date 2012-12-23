@@ -684,12 +684,12 @@ function system_schema() {
   $schema['cache_bootstrap']['description'] = 'Cache table for data required to bootstrap Drupal, may be routed to a shared memory cache.';
   $schema['cache_config'] = $schema['cache'];
   $schema['cache_config']['description'] = 'Cache table for configuration data.';
-  $schema['cache_page'] = $schema['cache'];
-  $schema['cache_page']['description'] = 'Cache table used to store compressed pages for anonymous users, if page caching is enabled.';
-  $schema['cache_menu'] = $schema['cache'];
-  $schema['cache_menu']['description'] = 'Cache table for the menu system to store router information as well as generated link trees for various menu/page/user combinations.';
+  $schema['cache_render'] = $schema['cache'];
+  $schema['cache_render']['description'] = 'Cache table to store rendered HTML strings.';
+  $schema['cache_entity'] = $schema['cache'];
+  $schema['cache_entity']['description'] = 'Cache table for field and entity caches.';
   $schema['cache_path'] = $schema['cache'];
-  $schema['cache_path']['description'] = 'Cache table for path alias lookup.';
+  $schema['cache_path']['description'] = 'Cache table for path-specific (but not HTML strings) caches.';
 
   $schema['flood'] = array(
     'description' => 'Flood controls the threshold of events, such as the number of contact attempts.',
@@ -2174,6 +2174,19 @@ function system_update_8052() {
  */
 function system_update_8053() {
   db_drop_table('cache_form');
+}
+
+/**
+ * Add new generic cache bins.
+ */
+function system_update_8054() {
+  $schema['cache_render'] = drupal_get_schema_unprocessed('system', 'cache');
+  $schema['cache_render']['description'] = 'Cache table to store rendered HTML strings.';
+  $schema['cache_entity'] = drupal_get_schema_unprocessed('system', 'cache');
+  $schema['cache_entity']['description'] = 'Cache table for field and entity caches.';
+  foreach ($schema as $name => $definition) {
+    db_create_table($name, $definition);
+  }
 }
 
 /**

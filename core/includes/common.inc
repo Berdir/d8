@@ -4979,7 +4979,7 @@ function drupal_page_set_cache($body) {
       if (config('system.performance')->get('response.gzip') && extension_loaded('zlib')) {
         $cache->data['body'] = gzencode($cache->data['body'], 9, FORCE_GZIP);
       }
-      cache('page')->set($cache->cid, $cache->data, $cache->expire, $cache->tags);
+      cache('render')->set($cache->cid, $cache->data, $cache->expire, $cache->tags);
     }
     return $cache;
   }

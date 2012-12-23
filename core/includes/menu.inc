@@ -1100,7 +1100,7 @@ function menu_tree_all_data($menu_name, $link = NULL, $max_depth = NULL) {
 
   if (!isset($tree[$cid])) {
     // If the static variable doesn't have the data, check {cache_menu}.
-    $cache = cache('menu')->get($cid);
+    $cache = cache('path')->get($cid);
     if ($cache && isset($cache->data)) {
       // If the cache entry exists, it contains the parameters for
       // menu_build_tree().
@@ -1127,7 +1127,7 @@ function menu_tree_all_data($menu_name, $link = NULL, $max_depth = NULL) {
       }
 
       // Cache the tree building parameters using the page-specific cid.
-      cache('menu')->set($cid, $tree_parameters, CacheBackendInterface::CACHE_PERMANENT, array('menu' => $menu_name));
+      cache('path')->set($cid, $tree_parameters, CacheBackendInterface::CACHE_PERMANENT, array('menu' => $menu_name));
     }
 
     // Build the tree using the parameters; the resulting tree will be cached
@@ -1227,7 +1227,7 @@ function menu_tree_page_data($menu_name, $max_depth = NULL, $only_active_trail =
 
     if (!isset($tree[$cid])) {
       // If the static variable doesn't have the data, check {cache_menu}.
-      $cache = cache('menu')->get($cid);
+      $cache = cache('path')->get($cid);
       if ($cache && isset($cache->data)) {
         // If the cache entry exists, it contains the parameters for
         // menu_build_tree().
@@ -1295,7 +1295,7 @@ function menu_tree_page_data($menu_name, $max_depth = NULL, $only_active_trail =
           $tree_parameters['active_trail'] = $active_trail;
         }
         // Cache the tree building parameters using the page-specific cid.
-        cache('menu')->set($cid, $tree_parameters, CacheBackendInterface::CACHE_PERMANENT, array('menu' => $menu_name));
+        cache('path')->set($cid, $tree_parameters, CacheBackendInterface::CACHE_PERMANENT, array('menu' => $menu_name));
       }
 
       // Build the tree using the parameters; the resulting tree will be cached
@@ -1364,7 +1364,7 @@ function _menu_build_tree($menu_name, array $parameters = array()) {
 
   // If we do not have this tree in the static cache, check {cache_menu}.
   if (!isset($trees[$tree_cid])) {
-    $cache = cache('menu')->get($tree_cid);
+    $cache = cache('path')->get($tree_cid);
     if ($cache && isset($cache->data)) {
       $trees[$tree_cid] = $cache->data;
     }
@@ -1407,7 +1407,7 @@ function _menu_build_tree($menu_name, array $parameters = array()) {
     menu_tree_collect_node_links($data['tree'], $data['node_links']);
 
     // Cache the data, if it is not already in the cache.
-    cache('menu')->set($tree_cid, $data, CacheBackendInterface::CACHE_PERMANENT, array('menu' => $menu_name));
+    cache('path')->set($tree_cid, $data, CacheBackendInterface::CACHE_PERMANENT, array('menu' => $menu_name));
     $trees[$tree_cid] = $data;
   }
 
@@ -2571,7 +2571,7 @@ function menu_get_active_title() {
  * Clears the cached cached data for a single named menu.
  */
 function menu_cache_clear($menu_name = 'tools') {
-  cache('menu')->deleteTags(array('menu' => $menu_name));
+  cache('path')->deleteTags(array('menu' => $menu_name));
   // Also clear the menu system static caches.
   menu_reset_static_cache();
 }
@@ -2583,7 +2583,7 @@ function menu_cache_clear($menu_name = 'tools') {
  * might have been made to the router items or menu links.
  */
 function menu_cache_clear_all() {
-  cache('menu')->deleteAll();
+  cache('path')->deleteAll();
   menu_reset_static_cache();
 }
 

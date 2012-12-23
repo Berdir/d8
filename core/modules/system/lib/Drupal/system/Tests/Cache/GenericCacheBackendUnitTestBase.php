@@ -56,7 +56,7 @@ abstract class GenericCacheBackendUnitTestBase extends DrupalUnitTestBase {
    */
   protected function getTestBin() {
     if (!isset($this->testBin)) {
-      $this->testBin = 'page';
+      $this->testBin = 'render';
     }
     return $this->testBin;
   }
@@ -501,7 +501,7 @@ abstract class GenericCacheBackendUnitTestBase extends DrupalUnitTestBase {
     // (test_cid_invalidate1 and test_cid_invalidate2) still exist from previous
     // tests.
     $tags = array('test_tag' => array(1, 2, 3));
-    $bins = array('path', 'bootstrap', 'page');
+    $bins = array('path', 'bootstrap', 'render');
     foreach ($bins as $bin) {
       $this->getCacheBackend($bin)->set('test', $this->defaultValue, CacheBackendInterface::CACHE_PERMANENT, $tags);
       $this->assertTrue($this->getCacheBackend($bin)->get('test'), 'Cache item was set in bin.');

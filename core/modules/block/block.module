@@ -339,7 +339,7 @@ function _block_get_renderable_region($list = array()) {
         '#cache' => array(
           'keys' => array($id, $block->get('module')),
           'granularity' => $settings['cache'],
-          'bin' => 'block',
+          'bin' => 'render',
           'tags' => array('content' => TRUE),
         ),
       );

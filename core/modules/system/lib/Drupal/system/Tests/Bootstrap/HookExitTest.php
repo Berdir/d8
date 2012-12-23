@@ -56,12 +56,12 @@ class HookExitTest extends WebTestBase {
 
     // Test with aggressive cache. Exit should not fire since page is cached.
     variable_set('page_cache_invoke_hooks', FALSE);
-    $this->assertTrue(cache('page')->get(url('', array('absolute' => TRUE))), 'Page has been cached.');
+    $this->assertTrue(cache('render')->get(url('', array('absolute' => TRUE))), 'Page has been cached.');
     $this->drupalGet('');
     $this->assertEqual(db_query('SELECT COUNT(*) FROM {watchdog} WHERE type = :type AND message = :message', array(':type' => 'system_test', ':message' => 'hook_exit'))->fetchField(), $calls, 'hook_exit not called with aggressive cache and a cached page.');
 
     // Test with page cache cleared, exit should be called.
-    $this->assertTrue(db_delete('cache_page')->execute(), 'Page cache cleared.');
+    $this->assertTrue(db_delete('cache_render')->execute(), 'Page cache cleared.');
     $this->drupalGet('');
     $calls++;
     $this->assertEqual(db_query('SELECT COUNT(*) FROM {watchdog} WHERE type = :type AND message = :message', array(':type' => 'system_test', ':message' => 'hook_exit'))->fetchField(), $calls, 'hook_exit called with aggressive cache and no cached page.');

@@ -18,9 +18,9 @@ namespace Drupal\Core\Cache;
  * set a variable with the name of the cache bin as its key and the name of
  * your class as its value. For example, if your implementation of
  * Drupal\Core\Cache\CacheBackendInterface was called MyCustomCache, the
- * following line would make Drupal use it for the 'cache_page' bin:
+ * following line would make Drupal use it for the 'cache_render' bin:
  * @code
- *  $conf['cache_classes']['cache_page'] = 'MyCustomCache';
+ *  $conf['cache_classes']['cache_render'] = 'MyCustomCache';
  * @endcode
  *
  * Additionally, you can register your cache implementation to be used by

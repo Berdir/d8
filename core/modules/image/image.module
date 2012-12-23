@@ -778,10 +778,7 @@ function image_style_flush($style) {
   drupal_theme_rebuild();
 
   // Clear page caches when flushing.
-  if (module_exists('block')) {
-    cache('block')->deleteAll();
-  }
-  cache('page')->deleteAll();
+  cache('render')->deleteAll();
 }
 
 /**

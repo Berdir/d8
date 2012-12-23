@@ -205,9 +205,9 @@ function hook_filter_FILTER_settings($form, &$form_state, $filter, $format, $def
  *   The language code of the text to be filtered.
  * @param $cache
  *   A Boolean indicating whether the filtered text is going to be cached in
- *   {cache_filter}.
+ *   {cache_render}.
  * @param $cache_id
- *   The ID of the filtered text in {cache_filter}, if $cache is TRUE.
+ *   The ID of the filtered text in {cache_render}, if $cache is TRUE.
  *
  * @return
  *   The prepared, escaped text.
@@ -238,9 +238,9 @@ function hook_filter_FILTER_prepare($text, $filter, $format, $langcode, $cache, 
  *   The language code of the text to be filtered.
  * @param $cache
  *   A Boolean indicating whether the filtered text is going to be cached in
- *   {cache_filter}.
+ *   {cache_render}.
  * @param $cache_id
- *   The ID of the filtered text in {cache_filter}, if $cache is TRUE.
+ *   The ID of the filtered text in {cache_render}, if $cache is TRUE.
  *
  * @return
  *   The filtered text.
