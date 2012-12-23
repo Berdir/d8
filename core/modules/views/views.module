@@ -655,7 +655,10 @@ function views_language_list($field = 'name', $flags = LANGUAGE_ALL) {
  */
 function views_field_create_instance($instance) {
   cache('views_info')->deleteAll();
-  cache('views_results')->deleteAll();
+  // @todo: Is this necessary?
+  cache('path')->deleteAll();
+  cache('render')->deleteAll();
+
 }
 
 /**
@@ -663,7 +666,9 @@ function views_field_create_instance($instance) {
  */
 function views_field_update_instance($instance, $prior_instance) {
   cache('views_info')->deleteAll();
-  cache('views_results')->deleteAll();
+  // @todo: Is this necessary?
+  cache('path')->deleteAll();
+  cache('render')->deleteAll();
 }
 
 /**
@@ -671,7 +676,9 @@ function views_field_update_instance($instance, $prior_instance) {
  */
 function views_field_delete_instance($instance) {
   cache('views_info')->deleteAll();
-  cache('views_results')->deleteAll();
+  // @todo: Is this necessary?
+  cache('path')->deleteAll();
+  cache('render')->deleteAll();
 }
 
 /**

@@ -32,9 +32,14 @@ abstract class CachePluginBase extends PluginBase {
   var $storage = array();
 
   /**
-   * What table to store data in.
+   * Which cache bin to store the rendered output in.
    */
-  var $table = 'views_results';
+  var $output_bin = 'render';
+
+  /**
+   * Which cache bin to store query results in.
+   */
+  var $results_bin = 'path';
 
   /**
    * Stores the cache ID used for the results cache.
@@ -125,12 +130,12 @@ abstract class CachePluginBase extends PluginBase {
           'total_rows' => isset($this->view->total_rows) ? $this->view->total_rows : 0,
           'current_page' => $this->view->getCurrentPage(),
         );
-        cache($this->table)->set($this->generateResultsKey(), $data, $this->cache_set_expire($type));
+        cache($this->results_bin)->set($this->generateResultsKey(), $data, $this->cache_set_expire($type));
         break;
       case 'output':
         $this->storage['output'] = $this->view->display_handler->output;
         $this->gather_headers();
-        cache($this->table)->set($this->generateOutputKey(), $this->storage, $this->cache_set_expire($type));
+        cache($this->output_bin)->set($this->generateOutputKey(), $this->storage, $this->cache_set_expire($type));
         break;
     }
   }
@@ -150,7 +155,7 @@ abstract class CachePluginBase extends PluginBase {
       case 'results':
         // Values to set: $view->result, $view->total_rows, $view->execute_time,
         // $view->current_page.
-        if ($cache = cache($this->table)->get($this->generateResultsKey())) {
+        if ($cache = cache($this->results_bin)->get($this->generateResultsKey())) {
           if (!$cutoff || $cache->created > $cutoff) {
             $this->view->result = $cache->data['result'];
             $this->view->total_rows = $cache->data['total_rows'];
@@ -161,7 +166,7 @@ abstract class CachePluginBase extends PluginBase {
         }
         return FALSE;
       case 'output':
-        if ($cache = cache($this->table)->get($this->generateOutputKey())) {
+        if ($cache = cache($this->output_bin)->get($this->generateOutputKey())) {
           if (!$cutoff || $cache->created > $cutoff) {
             $this->storage = $cache->data;
             $this->view->display_handler->output = $cache->data['output'];
@@ -180,7 +185,8 @@ abstract class CachePluginBase extends PluginBase {
    * to be sure that we catch everything. Maybe that's a bad idea.
    */
   function cache_flush() {
-    cache($this->table)->deleteTags(array($this->view->storage->id() => TRUE));
+    cache($this->output_bin)->deleteTags(array($this->view->storage->get('name') => TRUE));
+    cache($this->results_bin)->deleteTags(array($this->view->storage->get('name') => TRUE));
   }
 
   /**
