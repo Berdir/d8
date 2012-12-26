@@ -43,7 +43,7 @@ class EditEntityFieldAccessCheck implements AccessCheckInterface, EditEntityFiel
   public function accessEditEntityField(EntityInterface $entity, $field_name) {
     $entity_type = $entity->entityType();
     // @todo Generalize to all entity types: http://drupal.org/node/1839516.
-    return ($entity_type == 'node' && node_access('update', $entity) && field_access('edit', $field_name, $entity_type, $entity));
+    return ($entity_type == 'node' && node_access('update', $entity) && field_access('edit', $field_name, $entity));
   }
 
   /**

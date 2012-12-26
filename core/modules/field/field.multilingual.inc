@@ -1,5 +1,7 @@
 <?php
 
+use Drupal\Core\Entity\EntityInterface;
+
 /**
  * @file
  * Functions implementing Field API multilingual support.
@@ -283,9 +285,7 @@ function field_valid_language($langcode, $default = TRUE) {
  * Core language fallback rules are provided by field_language_fallback()
  * which is called by field_field_language_alter().
  *
- * @param $entity_type
- *   The type of $entity.
- * @param $entity
+ * @param \Drupal\Core\Entity\EntityInterface $entity
  *   The entity to be displayed.
  * @param $field_name
  *   (optional) The name of the field to be displayed. Defaults to NULL. If
@@ -299,18 +299,18 @@ function field_valid_language($langcode, $default = TRUE) {
  *   A language code if a field name is specified, an array of language codes
  *   keyed by field name otherwise.
  */
-function field_language($entity_type, $entity, $field_name = NULL, $langcode = NULL) {
+function field_language(EntityInterface $entity, $field_name = NULL, $langcode = NULL) {
   $display_langcodes = &drupal_static(__FUNCTION__, array());
   $id = $entity->id();
   $bundle = $entity->bundle();
   $langcode = field_valid_language($langcode, FALSE);
-  if (!isset($display_langcodes[$entity_type][$id][$langcode])) {
+  if (!isset($display_langcodes[$entity->entityType()][$id][$langcode])) {
     $display_langcode = array();
 
     // By default, display language is set to one of the locked languages
     // if the field translation is not available. It is up to translation
     // handlers to implement language fallback rules.
-    foreach (field_info_instances($entity_type, $bundle) as $instance) {
+    foreach (field_info_instances($entity->entityType(), $bundle) as $instance) {
       if (isset($entity->{$instance['field_name']}[$langcode])) {
         $display_langcode[$instance['field_name']] = $langcode;
       }
@@ -328,24 +328,23 @@ function field_language($entity_type, $entity, $field_name = NULL, $langcode = N
       }
     }
 
-    if (field_has_translation_handler($entity_type)) {
+    if (field_has_translation_handler($entity->entityType())) {
       $context = array(
-        'entity_type' => $entity_type,
         'entity' => $entity,
         'langcode' => $langcode,
       );
       // Do not apply core language fallback rules if they are disabled or if
       // the entity does not have a translation handler registered.
-      if (variable_get('field_language_fallback', FALSE) && field_has_translation_handler($context['entity_type'])) {
+      if (variable_get('field_language_fallback', FALSE) && field_has_translation_handler($entity->entityType())) {
         field_language_fallback($display_langcode, $context['entity'], $context['langcode']);
       }
       drupal_alter('field_language', $display_langcode, $context);
     }
 
-    $display_langcodes[$entity_type][$id][$langcode] = $display_langcode;
+    $display_langcodes[$entity->entityType()][$id][$langcode] = $display_langcode;
   }
 
-  $display_langcode = $display_langcodes[$entity_type][$id][$langcode];
+  $display_langcode = $display_langcodes[$entity->entityType()][$id][$langcode];
 
   // Single-field mode.
   if (isset($field_name)) {
