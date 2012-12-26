@@ -998,7 +998,6 @@ function hook_field_attach_update(\Drupal\Core\Entity\EntityInterface $entity) {
  *   values.
  * @param $context
  *   An associative array containing:
- *   - entity_type: The type of $entity; for example, 'node' or 'user'.
  *   - entity: The entity with fields to render.
  *   - element: The structured array containing the values ready for rendering.
  */

@@ -49,12 +49,12 @@ class FieldAttachStorageTest extends FieldAttachTestBase {
       // If this is the first revision do an insert.
       if (!$revision_id) {
         $revision[$revision_id]->{$this->field_name}[$langcode] = $values[$revision_id];
-        field_attach_insert($entity_type, $revision[$revision_id]);
+        field_attach_insert($revision[$revision_id]);
       }
       else {
         // Otherwise do an update.
         $revision[$revision_id]->{$this->field_name}[$langcode] = $values[$revision_id];
-        field_attach_update($entity_type, $revision[$revision_id]);
+        field_attach_update($revision[$revision_id]);
       }
     }
 
@@ -494,7 +494,7 @@ class FieldAttachStorageTest extends FieldAttachTestBase {
     $values = $this->_generateTestFieldValues($this->field['cardinality']);
     $entity->{$this->field_name}[$langcode] = $values;
     $entity->{$field_name}[$langcode] = $this->_generateTestFieldValues(1);
-    field_attach_insert('test_entity', $entity);
+    field_attach_insert($entity);
 
     // Verify the fields are present on load
     $entity = field_test_create_entity(0, 0, $this->instance['bundle']);

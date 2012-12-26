@@ -77,7 +77,7 @@ class TextFieldTest extends WebTestBase {
     for ($i = 0; $i <= $max_length + 2; $i++) {
       $entity->{$this->field['field_name']}[$langcode][0]['value'] = str_repeat('x', $i);
       try {
-        field_attach_validate('test_entity', $entity);
+        field_attach_validate($entity);
         $this->assertTrue($i <= $max_length, "Length $i does not cause validation error when max_length is $max_length");
       }
       catch (FieldValidationException $e) {

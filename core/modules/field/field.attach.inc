@@ -1450,9 +1450,7 @@ function field_attach_view(EntityInterface $entity, EntityDisplay $display, $lan
  * translatable fields the language currently chosen for display will be
  * selected.
  *
- * @param $entity_type
- *   The type of $entity; e.g. 'node' or 'user'.
- * @param Drupal\Core\Entity\EntityInterface $entity
+ * @param \Drupal\Core\Entity\EntityInterface $entity
  *   The entity with fields to render.
  * @param $element
  *   The structured array containing the values ready for rendering.
@@ -1460,8 +1458,8 @@ function field_attach_view(EntityInterface $entity, EntityDisplay $display, $lan
  *   The variables array is passed by reference and will be populated with field
  *   values.
  */
-function field_attach_preprocess($entity_type, EntityInterface $entity, $element, &$variables) {
-  foreach (field_info_instances($entity_type, $entity->bundle()) as $instance) {
+function field_attach_preprocess(EntityInterface $entity, $element, &$variables) {
+  foreach (field_info_instances($entity->entityType(), $entity->bundle()) as $instance) {
     $field_name = $instance['field_name'];
     if (isset($element[$field_name]['#language'])) {
       $langcode = $element[$field_name]['#language'];
@@ -1471,7 +1469,6 @@ function field_attach_preprocess($entity_type, EntityInterface $entity, $element
 
   // Let other modules make changes to the $variables array.
   $context = array(
-    'entity_type' => $entity_type,
     'entity' => $entity,
     'element' => $element,
   );
