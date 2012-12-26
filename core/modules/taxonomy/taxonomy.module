@@ -1026,7 +1026,7 @@ function taxonomy_options_list($field, $instance, $entity) {
  * Possible error codes:
  * - 'taxonomy_term_illegal_value': The value is not part of the list of allowed values.
  */
-function taxonomy_field_validate(EntityInterface $entity, $field, $instance, $langcode, $items, &$errors) {
+function taxonomy_field_validate(EntityInterface $entity = NULL, $field, $instance, $langcode, $items, &$errors) {
   // Build an array of existing term IDs so they can be loaded with
   // taxonomy_term_load_multiple();
   foreach ($items as $delta => $item) {

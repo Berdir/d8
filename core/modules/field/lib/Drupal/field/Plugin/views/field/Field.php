@@ -8,6 +8,7 @@
 namespace Drupal\field\Plugin\views\field;
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\views\ViewExecutable;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\views\Plugin\views\field\FieldPluginBase;
 use Drupal\Core\Annotation\Plugin;

@@ -407,7 +407,7 @@ function _options_values_in_use($field, $values) {
  * Possible error codes:
  * - 'list_illegal_value': The value is not part of the list of allowed values.
  */
-function options_field_validate(EntityInterface $entity, $field, $instance, $langcode, $items, &$errors) {
+function options_field_validate(EntityInterface $entity = NULL, $field, $instance, $langcode, $items, &$errors) {
   $allowed_values = options_allowed_values($field, $instance, $entity);
   foreach ($items as $delta => $item) {
     if (!empty($item['value'])) {

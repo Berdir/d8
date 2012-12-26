@@ -383,7 +383,7 @@ function hook_field_prepare_view($entity_type, $entities, $field, $instances, $l
  *   - error: An error code (should be a string prefixed with the module name).
  *   - message: The human-readable message to be displayed.
  */
-function hook_field_validate(\Drupal\Core\Entity\EntityInterface $entity, $field, $instance, $langcode, $items, &$errors) {
+function hook_field_validate(\Drupal\Core\Entity\EntityInterface $entity = NULL, $field, $instance, $langcode, $items, &$errors) {
   foreach ($items as $delta => $item) {
     if (!empty($item['value'])) {
       if (!empty($field['settings']['max_length']) && drupal_strlen($item['value']) > $field['settings']['max_length']) {

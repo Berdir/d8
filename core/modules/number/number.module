@@ -124,7 +124,7 @@ function number_field_instance_settings_form($field, $instance) {
  * - number_min: The value is less than the allowed minimum value.
  * - number_max: The value is greater than the allowed maximum value.
  */
-function number_field_validate(EntityInterface $entity, $field, $instance, $langcode, $items, &$errors) {
+function number_field_validate(EntityInterface $entity = NULL, $field, $instance, $langcode, $items, &$errors) {
   foreach ($items as $delta => $item) {
     if ($item['value'] != '') {
       if (is_numeric($instance['settings']['min']) && $item['value'] < $instance['settings']['min']) {

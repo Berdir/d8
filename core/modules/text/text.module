@@ -120,7 +120,7 @@ function text_field_instance_settings_form($field, $instance) {
  * - text_value_max_length: The value exceeds the maximum length.
  * - text_summary_max_length: The summary exceeds the maximum length.
  */
-function text_field_validate(EntityInterface $entity, $field, $instance, $langcode, $items, &$errors) {
+function text_field_validate(EntityInterface $entity = NULL, $field, $instance, $langcode, $items, &$errors) {
   foreach ($items as $delta => $item) {
     // @todo Length is counted separately for summary and value, so the maximum
     //   length can be exceeded very easily.

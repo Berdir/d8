@@ -129,7 +129,7 @@ function field_test_field_storage_write(EntityInterface $entity, $op, $fields) {
     $field_name = $field['field_name'];
     $field_data = &$data[$field_id];
 
-    $all_langcodes = field_available_languages($entity_type, $field);
+    $all_langcodes = field_available_languages($entity->entityType(), $field);
     $field_langcodes = array_intersect($all_langcodes, array_keys((array) $entity->$field_name));
 
     // Delete and insert, rather than update, in case a value was added.

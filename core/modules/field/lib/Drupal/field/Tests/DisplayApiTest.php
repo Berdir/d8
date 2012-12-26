@@ -83,7 +83,7 @@ class DisplayApiTest extends FieldTestBase {
    */
   function testFieldViewField() {
     // No display settings: check that default display settings are used.
-    $output = field_view_field('test_entity', $this->entity, $this->field_name);
+    $output = field_view_field($this->entity, $this->field_name);
     $this->drupalSetContent(drupal_render($output));
     $settings = field_info_formatter_settings('field_test_default');
     $setting = $settings['test_formatter_setting'];
@@ -101,7 +101,7 @@ class DisplayApiTest extends FieldTestBase {
         'alter' => TRUE,
       ),
     );
-    $output = field_view_field('test_entity', $this->entity, $this->field_name, $display);
+    $output = field_view_field($this->entity, $this->field_name, $display);
     $this->drupalSetContent(drupal_render($output));
     $setting = $display['settings']['test_formatter_setting_multiple'];
     $this->assertNoText($this->label, 'Label was not displayed.');
@@ -120,7 +120,7 @@ class DisplayApiTest extends FieldTestBase {
         'test_formatter_setting_additional' => $this->randomName(),
       ),
     );
-    $output = field_view_field('test_entity', $this->entity, $this->field_name, $display);
+    $output = field_view_field($this->entity, $this->field_name, $display);
     $view = drupal_render($output);
     $this->drupalSetContent($view);
     $setting = $display['settings']['test_formatter_setting_additional'];
@@ -132,7 +132,7 @@ class DisplayApiTest extends FieldTestBase {
 
     // View mode: check that display settings specified in the display object
     // are used.
-    $output = field_view_field('test_entity', $this->entity, $this->field_name, 'teaser');
+    $output = field_view_field($this->entity, $this->field_name, 'teaser');
     $this->drupalSetContent(drupal_render($output));
     $setting = $this->display_options['teaser']['settings']['test_formatter_setting'];
     $this->assertText($this->label, 'Label was displayed.');
@@ -142,7 +142,7 @@ class DisplayApiTest extends FieldTestBase {
 
     // Unknown view mode: check that display settings for 'default' view mode
     // are used.
-    $output = field_view_field('test_entity', $this->entity, $this->field_name, 'unknown_view_mode');
+    $output = field_view_field($this->entity, $this->field_name, 'unknown_view_mode');
     $this->drupalSetContent(drupal_render($output));
     $setting = $this->display_options['default']['settings']['test_formatter_setting'];
     $this->assertText($this->label, 'Label was displayed.');

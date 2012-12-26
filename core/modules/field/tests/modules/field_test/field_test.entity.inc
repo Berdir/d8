@@ -243,11 +243,11 @@ function field_test_entity_nested_form_validate($form, &$form_state) {
  */
 function field_test_entity_nested_form_submit($form, &$form_state) {
   $entity_1 = entity_create('test_entity', $form_state['values']);
-  field_attach_submit('test_entity', $entity_1, $form, $form_state);
+  field_attach_submit($entity_1, $form, $form_state);
   field_test_entity_save($entity_1);
 
   $entity_2 = entity_create('test_entity', $form_state['values']['entity_2']);
-  field_attach_submit('test_entity', $entity_2, $form['entity_2'], $form_state);
+  field_attach_submit($entity_2, $form['entity_2'], $form_state);
   field_test_entity_save($entity_2);
 
   drupal_set_message(t('test_entities @id_1 and @id_2 have been updated.', array('@id_1' => $entity_1->ftid, '@id_2' => $entity_2->ftid)));

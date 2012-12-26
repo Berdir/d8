@@ -115,7 +115,7 @@ function field_test_field_delete(EntityInterface $entity, $field, $instance, $it
  * Possible error codes:
  * - 'field_test_invalid': The value is invalid.
  */
-function field_test_field_validate(EntityInterface $entity, $field, $instance, $langcode, $items, &$errors) {
+function field_test_field_validate(EntityInterface $entity = NULL, $field, $instance, $langcode, $items, &$errors) {
   $args = func_get_args();
   field_test_memorize(__FUNCTION__, $args);
 
