@@ -1554,20 +1554,18 @@ function hook_field_storage_write($entity_type, $entity, $op, $fields) {
  *
  * This hook is invoked from field_attach_delete() to ask the field storage
  * module to delete field data.
- *
- * @param $entity_type
- *   The entity type of entity, such as 'node' or 'user'.
- * @param $entity
+
+ * @param \Drupal\Core\Entity\EntityInterface $entity
  *   The entity on which to operate.
  * @param $fields
  *   An array listing the fields to delete. The keys and values of the
  *   array are field IDs.
  */
-function hook_field_storage_delete($entity_type, $entity, $fields) {
-  foreach (field_info_instances($entity_type, $entity->bundle()) as $instance) {
+function hook_field_storage_delete(\Drupal\Core\Entity\EntityInterface $entity, $fields) {
+  foreach (field_info_instances($entity->entityType(), $entity->bundle()) as $instance) {
     if (isset($fields[$instance['field_id']])) {
       $field = field_info_field_by_id($instance['field_id']);
-      field_sql_storage_field_storage_purge($entity_type, $entity, $field, $instance);
+      field_sql_storage_field_storage_purge($entity, $field, $instance);
     }
   }
 }
@@ -1581,17 +1579,13 @@ function hook_field_storage_delete($entity_type, $entity, $fields) {
  * Deleting the current (most recently written) revision is not
  * allowed as has undefined results.
  *
- * @param $entity_type
- *   The entity type of entity, such as 'node' or 'user'.
- * @param $entity
- *   The entity on which to operate. The revision to delete is
- *   indicated by the entity's revision ID property, as identified by
- *   hook_fieldable_info() for $entity_type.
+ * @param \Drupal\Core\Entity\EntityInterface $entity
+ *   The entity on which to operate.
  * @param $fields
  *   An array listing the fields to delete. The keys and values of the
  *   array are field IDs.
  */
-function hook_field_storage_delete_revision($entity_type, $entity, $fields) {
+function hook_field_storage_delete_revision(\Drupal\Core\Entity\EntityInterface $entity, $fields) {
   $vid = $entity->getRevisionId();
   if (isset($vid)) {
     foreach ($fields as $field_id) {
@@ -2204,24 +2198,22 @@ function hook_field_storage_purge_field_instance($instance) {
  * Called from field_purge_data() to allow the field storage module to delete
  * field data information.
  *
- * @param $entity_type
- *   The type of $entity; for example, 'node' or 'user'.
- * @param $entity
+ * @param \Drupal\Core\Entity\EntityInterface $entity
  *   The pseudo-entity whose field data to delete.
  * @param $field
  *   The (possibly deleted) field whose data is being purged.
  * @param $instance
  *   The deleted field instance whose data is being purged.
  */
-function hook_field_storage_purge($entity_type, $entity, $field, $instance) {
+function hook_field_storage_purge(\Drupal\Core\Entity\EntityInterface $entity, $field, $instance) {
   $table_name = _field_sql_storage_tablename($field);
   $revision_name = _field_sql_storage_revision_tablename($field);
   db_delete($table_name)
-    ->condition('entity_type', $entity_type)
+    ->condition('entity_type', $entity->entityType())
     ->condition('entity_id', $entity->id())
     ->execute();
   db_delete($revision_name)
-    ->condition('entity_type', $entity_type)
+    ->condition('entity_type', $entity->entityType())
     ->condition('entity_id', $entity->id())
     ->execute();
 }
