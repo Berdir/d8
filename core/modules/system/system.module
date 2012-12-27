@@ -8,8 +8,8 @@
 use Drupal\Core\Utility\ModuleInfo;
 use Drupal\Core\TypedData\Primitive;
 use Drupal\system\Plugin\block\block\SystemMenuBlock;
+use Guzzle\Plugin\Async\AsyncPlugin;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Maximum age of temporary files in seconds.
@@ -3726,19 +3726,18 @@ function system_run_automated_cron() {
   if (($threshold = config('system.cron')->get('threshold.autorun')) > 0 && variable_get('install_task') == 'done') {
     $cron_last = state()->get('system.cron_last') ?: NULL;
     if (!isset($cron_last) || (REQUEST_TIME - $cron_last > $threshold)) {
-      $client = drupal_container()->get('http_default_client');
-      // Create and add the async plugin as a subscriber.
-      $async_plugin = new \Guzzle\Plugin\Async\AsyncPlugin();
-      $client->addSubscriber($async_plugin);
-
-      // Execute the asynchronous request. This will return immediately with a
-      // HTTP/1.1 200 OK and X-Guzzle-Async as the singe header.
-      $url = url('cron/' . state()->get('system.cron_key'), array('absolute' => TRUE));
-      $client->get($url)->send();
-
-      // Remove th subscriber again so that other requests will be executed
-      // normally again.
-      $client->getEventDispatcher()->removeSubscriber($async_plugin);
+      // Only execute the request if we can aquire the lock. If this fails then
+      // another request is already taking care of it and we don't have to
+      // retry.
+      if (lock()->acquire('cron_request')) {
+        // Execute the asynchronous request. This will return immediately with a
+        // HTTP/1.1 200 OK and X-Guzzle-Async as the singe header.
+        $url = url('cron/' . state()->get('system.cron_key'), array('absolute' => TRUE));
+        $request = drupal_container()->get('http_default_client')->get($url);
+        $request->addSubscriber(new AsyncPlugin());
+        $request->send();
+        lock()->release('cron_request');
+      }
     }
   }
 }
