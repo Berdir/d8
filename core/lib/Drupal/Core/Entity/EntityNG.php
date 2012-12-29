@@ -60,6 +60,28 @@ class EntityNG extends Entity {
    */
   protected $compatibilityMode = FALSE;
 
+  /**
+   * Overrides Entity::__construct().
+   */
+  public function __construct(array $values, $entity_type, $bundle = FALSE) {
+    parent::__construct($values, $entity_type, $bundle);
+    $this->init();
+  }
+
+  /**
+   * Initialize the object. Invoked upon construction and wake up.
+   */
+  protected function init() {
+    // We unset all defined properties, so magic getters apply.
+    unset($this->langcode);
+  }
+
+  /**
+   * Magic __wakeup() implementation.
+   */
+  public function __wakeup() {
+    $this->init();
+  }
 
   /**
    * Overrides Entity::id().
