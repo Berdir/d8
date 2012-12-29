@@ -236,7 +236,7 @@ function file_field_update(EntityInterface $entity, $field, $instance, $langcode
   // deletion of previous file usages are necessary.
   if (!empty($entity->original) && $entity->getRevisionId() != $entity->original->getRevisionId()) {
     foreach ($items as $item) {
-      file_usage()->add(file_load($item['fid']), 'file', $entity->entityInfo(), $entity->id());
+      file_usage()->add(file_load($item['fid']), 'file', $entity->entityType(), $entity->id());
     }
     return;
   }

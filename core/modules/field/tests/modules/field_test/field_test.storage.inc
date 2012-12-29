@@ -139,13 +139,13 @@ function field_test_field_storage_write(EntityInterface $entity, $op, $fields) {
       $langcodes = !empty($entity->$field_name) ? $field_langcodes : $all_langcodes;
       if ($langcodes) {
         foreach ($field_data['current'] as $key => $row) {
-          if ($row->type == $entity_type && $row->entity_id == $id && in_array($row->langcode, $langcodes)) {
+          if ($row->type == $entity->entityType() && $row->entity_id == $id && in_array($row->langcode, $langcodes)) {
             unset($field_data['current'][$key]);
           }
         }
         if (isset($vid)) {
           foreach ($field_data['revisions'] as $key => $row) {
-            if ($row->type == $entity_type && $row->revision_id == $vid) {
+            if ($row->type == $entity->entityType() && $row->revision_id == $vid) {
               unset($field_data['revisions'][$key]);
             }
           }
@@ -159,7 +159,7 @@ function field_test_field_storage_write(EntityInterface $entity, $op, $fields) {
       foreach ($items as $delta => $item) {
         $row = (object) array(
           'field_id' => $field_id,
-          'type' => $entity_type,
+          'type' => $entity->entityType(),
           'entity_id' => $id,
           'revision_id' => $vid,
           'bundle' => $bundle,

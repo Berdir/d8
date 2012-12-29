@@ -108,7 +108,7 @@ class Field extends FieldPluginBase {
    */
   public function access() {
     $base_table = $this->get_base_table();
-    return field_access('view', $this->field_info, $this->definition['entity_tables'][$base_table]);
+    return field_access('view', $this->field_info);
   }
 
   /**
