@@ -375,17 +375,17 @@ class FieldAttachStorageTest extends FieldAttachTestBase {
     // Create revision 0
     $values = $this->_generateTestFieldValues($this->field['cardinality']);
     $rev[0]->{$this->field_name}[$langcode] = $values;
-    field_attach_insert($entity_type, $rev[0]);
+    field_attach_insert($rev[0]);
 
     // Create revision 1
     $rev[1] = field_test_create_entity(0, 1, $this->instance['bundle']);
     $rev[1]->{$this->field_name}[$langcode] = $values;
-    field_attach_update($entity_type, $rev[1]);
+    field_attach_update($rev[1]);
 
     // Create revision 2
     $rev[2] = field_test_create_entity(0, 2, $this->instance['bundle']);
     $rev[2]->{$this->field_name}[$langcode] = $values;
-    field_attach_update($entity_type, $rev[2]);
+    field_attach_update($rev[2]);
 
     // Confirm each revision loads
     foreach (array_keys($rev) as $vid) {
@@ -395,7 +395,7 @@ class FieldAttachStorageTest extends FieldAttachTestBase {
     }
 
     // Delete revision 1, confirm the other two still load.
-    field_attach_delete_revision($entity_type, $rev[1]);
+    field_attach_delete_revision($rev[1]);
     foreach (array(0, 2) as $vid) {
       $read = field_test_create_entity(0, $vid, $this->instance['bundle']);
       field_attach_load_revision($entity_type, array(0 => $read));
@@ -408,7 +408,7 @@ class FieldAttachStorageTest extends FieldAttachTestBase {
     $this->assertEqual(count($read->{$this->field_name}[$langcode]), $this->field['cardinality'], "The test entity current revision has {$this->field['cardinality']} values.");
 
     // Delete all field data, confirm nothing loads
-    field_attach_delete($entity_type, $rev[2]);
+    field_attach_delete($rev[2]);
     foreach (array(0, 1, 2) as $vid) {
       $read = field_test_create_entity(0, $vid, $this->instance['bundle']);
       field_attach_load_revision($entity_type, array(0 => $read));

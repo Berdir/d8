@@ -256,6 +256,11 @@ class FieldAttachOtherTest extends FieldAttachTestBase {
 
     // Cacheable entity type.
     $entity_type = 'test_cacheable_entity';
+    $entity_init = entity_create($entity_type, array(
+      'ftid' => 1,
+      'ftvid' => 1,
+      'fttype' => $this->instance['bundle'],
+    ));
     $cid = "field:$entity_type:{$entity_init->ftid}";
     $instance = $this->instance;
     $instance['entity_type'] = $entity_type;
@@ -296,7 +301,11 @@ class FieldAttachOtherTest extends FieldAttachTestBase {
     $this->assertEqual($cache->data[$this->field_name][$langcode], $values, 'Cached: correct cache entry on load');
 
     // Create a new revision, and check that the cache entry is wiped.
-    $entity_init = field_test_create_entity(1, 2, $this->instance['bundle']);
+    $entity_init = entity_create($entity_type, array(
+      'ftid' => 1,
+      'ftvid' => 2,
+      'fttype' => $this->instance['bundle'],
+    ));
     $values = $this->_generateTestFieldValues($this->field['cardinality']);
     $entity = clone($entity_init);
     $entity->{$this->field_name}[$langcode] = $values;
