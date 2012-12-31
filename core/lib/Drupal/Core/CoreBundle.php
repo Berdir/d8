@@ -73,6 +73,14 @@ class CoreBundle extends Bundle {
       ->register('keyvalue.database', 'Drupal\Core\KeyValueStore\KeyValueDatabaseFactory')
       ->addArgument(new Reference('database'));
 
+    // Register the Queue factory.
+    $container
+      ->register('queue', 'Drupal\Core\Queue\QueueFactory')
+      ->addArgument(new Reference('service_container'));
+    $container
+      ->register('queue.database', 'Drupal\Core\Queue\QueueDatabaseFactory')
+      ->addArgument(new Reference('database'));
+
     $container->register('path.alias_manager', 'Drupal\Core\Path\AliasManager')
       ->addArgument(new Reference('database'))
       ->addArgument(new Reference('keyvalue'));
