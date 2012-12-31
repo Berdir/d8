@@ -42,7 +42,7 @@ class KeyValueFactory {
    * @return \Drupal\Core\KeyValueStore\KeyValueStoreInterface
    *   A key/value store implementation for the given $collection.
    */
-  public function get($collection, $reliable = TRUE) {
+  public function get($collection) {
     global $conf;
     if (!isset($this->stores[$collection])) {
       if (isset($conf['keyvalue_service_' . $collection])) {
