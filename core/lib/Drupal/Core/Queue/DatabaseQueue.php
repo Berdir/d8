@@ -7,6 +7,8 @@
 
 namespace Drupal\Core\Queue;
 
+use Drupal\Core\Database\Connection;
+
 /**
  * Default queue implementation.
  */

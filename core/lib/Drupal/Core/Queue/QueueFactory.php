@@ -5,7 +5,7 @@
  * Contains Drupal\Core\Queue\QueueFactory.
  */
 
-namespace Drupal\Core\QueueStore;
+namespace Drupal\Core\Queue;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
