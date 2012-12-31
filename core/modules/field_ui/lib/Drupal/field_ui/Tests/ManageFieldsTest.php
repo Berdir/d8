@@ -463,7 +463,7 @@ class ManageFieldsTest extends FieldUiTestBase {
     $this->fieldUIAddNewField($bundle_path, $edit1);
 
     // Delete the field.
-    $this->fieldUIDeleteField($bundle_path, $this->field_name, $this->field_label, t('Tags'));
+    $this->fieldUIDeleteField($bundle_path, $this->field_name, $this->field_label, 'Tags');
 
     // Reset the fields info.
     field_info_cache_clear();
