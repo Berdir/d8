@@ -258,7 +258,7 @@ $drupal_hash_salt = '';
  *  $class_loader = 'apc'
  *  $class_loader = 'default'
  */
-# $class_loader = 'apc';
+# $settings['class_loader'] = 'apc';
 
 /**
  * Location of the site configuration files.

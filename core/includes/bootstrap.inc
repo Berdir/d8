@@ -719,7 +719,7 @@ function drupal_settings_initialize() {
   global $base_url, $base_path, $base_root, $script_path;
 
   // Export these settings.php variables to the global namespace.
-  global $databases, $cookie_domain, $conf, $installed_profile, $update_free_access, $class_loader, $db_url, $db_prefix, $drupal_hash_salt, $is_https, $base_secure_url, $base_insecure_url, $config_directories;
+  global $databases, $cookie_domain, $conf, $settings, $installed_profile, $update_free_access, $db_url, $db_prefix, $drupal_hash_salt, $is_https, $base_secure_url, $base_insecure_url, $config_directories;
   $conf = array();
 
   // Make conf_path() available as local variable in settings.php.
@@ -3012,12 +3012,11 @@ function drupal_classloader() {
   static $loader;
 
   if (!isset($loader)) {
-    global $class_loader;
 
     // Include the Symfony ClassLoader for loading PSR-0-compatible classes.
     require_once DRUPAL_ROOT . '/core/vendor/symfony/class-loader/Symfony/Component/ClassLoader/UniversalClassLoader.php';
 
-    switch ($class_loader) {
+    switch ($GLOBALS['settings']['class_loader']) {
       case 'apc':
         if (function_exists('apc_store')) {
           require_once DRUPAL_ROOT . '/core/vendor/symfony/class-loader/Symfony/Component/ClassLoader/ApcUniversalClassLoader.php';
