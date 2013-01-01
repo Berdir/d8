@@ -838,7 +838,7 @@ function drupal_http_request($url, array $options = array()) {
   switch ($uri['scheme']) {
     case 'proxy':
       // Make the socket connection to a proxy server.
-      $socket = 'tcp://' . $proxy_server . ':' . variable_get('proxy_port', 8080);
+      $socket = 'tcp://' . $proxy_server . ':' . settings_get('proxy_port', 8080);
       // The Host header still needs to match the real request.
       $options['headers']['Host'] = $uri['host'];
       $options['headers']['Host'] .= isset($uri['port']) && $uri['port'] != 80 ? ':' . $uri['port'] : '';
@@ -4757,10 +4757,10 @@ function drupal_valid_token($token, $value = '', $skip_anonymous = FALSE) {
  * Loads code for subsystems and modules, and registers stream wrappers.
  */
 function _drupal_bootstrap_code() {
-  require_once DRUPAL_ROOT . '/' . variable_get('path_inc', 'core/includes/path.inc');
+  require_once DRUPAL_ROOT . '/' . settings_get('path_inc', 'core/includes/path.inc');
   require_once DRUPAL_ROOT . '/core/includes/theme.inc';
   require_once DRUPAL_ROOT . '/core/includes/pager.inc';
-  require_once DRUPAL_ROOT . '/' . variable_get('menu_inc', 'core/includes/menu.inc');
+  require_once DRUPAL_ROOT . '/' . settings_get('menu_inc', 'core/includes/menu.inc');
   require_once DRUPAL_ROOT . '/core/includes/tablesort.inc';
   require_once DRUPAL_ROOT . '/core/includes/file.inc';
   require_once DRUPAL_ROOT . '/core/includes/unicode.inc';

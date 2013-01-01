@@ -2139,7 +2139,7 @@ function drupal_bootstrap($phase = NULL, $new_phase = TRUE) {
           break;
 
         case DRUPAL_BOOTSTRAP_SESSION:
-          require_once DRUPAL_ROOT . '/' . variable_get('session_inc', 'core/includes/session.inc');
+          require_once DRUPAL_ROOT . '/' . settings_get('session_inc', 'core/includes/session.inc');
           drupal_session_initialize();
           break;
 
@@ -2279,11 +2279,11 @@ function _drupal_bootstrap_page_cache() {
   // Allow specifying special cache handlers in settings.php, like
   // using memcached or files for storing cache information.
   require_once DRUPAL_ROOT . '/core/includes/cache.inc';
-  foreach (variable_get('cache_backends', array()) as $include) {
+  foreach (settings_get('cache_backends', array()) as $include) {
     require_once DRUPAL_ROOT . '/' . $include;
   }
   // Check for a cache mode force from settings.php.
-  if (variable_get('page_cache_without_database')) {
+  if (settings_get('page_cache_without_database')) {
     $cache_enabled = TRUE;
   }
   else {
@@ -2308,13 +2308,13 @@ function _drupal_bootstrap_page_cache() {
       date_default_timezone_set(drupal_get_user_timezone());
       // If the skipping of the bootstrap hooks is not enforced, call
       // hook_boot.
-      if (variable_get('page_cache_invoke_hooks', TRUE)) {
+      if (settings_get('page_cache_invoke_hooks', TRUE)) {
         bootstrap_invoke_all('boot');
       }
       drupal_serve_page_from_cache($cache);
       // If the skipping of the bootstrap hooks is not enforced, call
       // hook_exit.
-      if (variable_get('page_cache_invoke_hooks', TRUE)) {
+      if (settings_get('page_cache_invoke_hooks', TRUE)) {
         bootstrap_invoke_all('exit');
       }
       // We are done.
