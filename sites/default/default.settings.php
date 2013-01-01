@@ -412,35 +412,35 @@ ini_set('session.cookie_lifetime', 2000000);
  * malicious client could bypass restrictions by setting the
  * X-Forwarded-For header directly. Therefore, Drupal's proxy
  * configuration requires the IP addresses of all remote proxies to be
- * specified in $conf['reverse_proxy_addresses'] to work correctly.
+ * specified in $settings['reverse_proxy_addresses'] to work correctly.
  *
  * Enable this setting to get Drupal to determine the client IP from
- * the X-Forwarded-For header (or $conf['reverse_proxy_header'] if set).
+ * the X-Forwarded-For header (or $settings['reverse_proxy_header'] if set).
  * If you are unsure about this setting, do not have a reverse proxy,
  * or Drupal operates in a shared hosting environment, this setting
  * should remain commented out.
  *
  * In order for this setting to be used you must specify every possible
- * reverse proxy IP address in $conf['reverse_proxy_addresses'].
+ * reverse proxy IP address in $settings['reverse_proxy_addresses'].
  * If a complete list of reverse proxies is not available in your
  * environment (for example, if you use a CDN) you may set the
  * $_SERVER['REMOTE_ADDR'] variable directly in settings.php.
  * Be aware, however, that it is likely that this would allow IP
  * address spoofing unless more advanced precautions are taken.
  */
-# $conf['reverse_proxy'] = TRUE;
+# $settings['reverse_proxy'] = TRUE;
 
 /**
  * Specify every reverse proxy IP address in your environment.
- * This setting is required if $conf['reverse_proxy'] is TRUE.
+ * This setting is required if $settings['reverse_proxy'] is TRUE.
  */
-# $conf['reverse_proxy_addresses'] = array('a.b.c.d', ...);
+# $settings['reverse_proxy_addresses'] = array('a.b.c.d', ...);
 
 /**
  * Set this value if your proxy server sends the client IP in a header
  * other than X-Forwarded-For.
  */
-# $conf['reverse_proxy_header'] = 'HTTP_X_CLUSTER_CLIENT_IP';
+# $settings['reverse_proxy_header'] = 'HTTP_X_CLUSTER_CLIENT_IP';
 
 /**
  * Page caching:
@@ -458,7 +458,7 @@ ini_set('session.cookie_lifetime', 2000000);
  * HTTP proxy, and bypass the reverse proxy if one is used) in order to avoid
  * getting cached pages from the proxy.
  */
-# $conf['system.performance']['cache']['page']['omit_vary_cookie'] = TRUE;
+# $settings['omit_vary_cookie'] = TRUE;
 
 /**
  * CSS/JS aggregated file gzip compression:
@@ -484,7 +484,7 @@ ini_set('session.cookie_lifetime', 2000000);
  *
  * Remove the leading hash signs to enable.
  */
-# $conf['locale_custom_strings_en'][''] = array(
+# $settings['locale_custom_strings_en'][''] = array(
 #   'forum'      => 'Discussion board',
 #   '@count min' => '@count minutes',
 # );
@@ -508,9 +508,9 @@ ini_set('session.cookie_lifetime', 2000000);
  *
  * Remove the leading hash signs if you would like to alter this functionality.
  */
-#$conf['system.fast_404']['exclude_paths'] = '/\/(?:styles)\//';
-#$conf['system.fast_404']['paths'] = '/\.(?:txt|png|gif|jpe?g|css|js|ico|swf|flv|cgi|bat|pl|dll|exe|asp)$/i';
-#$conf['system.fast_404']['html'] = '<!DOCTYPE html><html><head><title>404 Not Found</title></head><body><h1>Not Found</h1><p>The requested URL "@path" was not found on this server.</p></body></html>';
+# $conf['system.fast_404']['exclude_paths'] = '/\/(?:styles)\//';
+# $conf['system.fast_404']['paths'] = '/\.(?:txt|png|gif|jpe?g|css|js|ico|swf|flv|cgi|bat|pl|dll|exe|asp)$/i';
+# $conf['system.fast_404']['html'] = '<!DOCTYPE html><html><head><title>404 Not Found</title></head><body><h1>Not Found</h1><p>The requested URL "@path" was not found on this server.</p></body></html>';
 
 /**
  * External access proxy settings:
@@ -523,12 +523,12 @@ ini_set('session.cookie_lifetime', 2000000);
  * proxy_exceptions variable is an array of host names to be accessed directly,
  * not via proxy.
  */
-# $conf['proxy_server'] = '';
-# $conf['proxy_port'] = 8080;
-# $conf['proxy_username'] = '';
-# $conf['proxy_password'] = '';
-# $conf['proxy_user_agent'] = '';
-# $conf['proxy_exceptions'] = array('127.0.0.1', 'localhost');
+# $settings['proxy_server'] = '';
+# $settings['proxy_port'] = 8080;
+# $settings['proxy_username'] = '';
+# $settings['proxy_password'] = '';
+# $settings['proxy_user_agent'] = '';
+# $settings['proxy_exceptions'] = array('127.0.0.1', 'localhost');
 
 /**
  * Authorized file system operations:

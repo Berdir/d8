@@ -501,9 +501,9 @@ class RouterTest extends WebTestBase {
 
     foreach ($test_data as $case_no => $override) {
       $this->menuItemTitlesCasesHelper($case_no);
-      variable_set('locale_custom_strings_en', array('' => $override));
+      $GLOBALS['settings']['locale_custom_strings_en'] = array('' => $override);
       $this->menuItemTitlesCasesHelper($case_no, TRUE);
-      variable_set('locale_custom_strings_en', array());
+      $GLOBALS['settings']['locale_custom_strings_en'] = array();
     }
   }
 

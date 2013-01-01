@@ -945,6 +945,27 @@ function drupal_get_filename($type, $name, $filename = NULL) {
 }
 
 /**
+ * Returns a setting.
+ *
+ * Settings can be set in settings.php in the $settings.php array and requested
+ * by this function. Settings should be used over configuration for read-only,
+ * possibly low bootstrap configuration that is environment specific.
+ *
+ * @param $name
+ *   The name of the setting to return.
+ * @param $default
+ *   (optional) The default value to use if this setting is not set.
+ *
+ * @return
+ *   The value of the settings.
+ */
+function settings_get($name, $default = NULL) {
+  global $settings;
+
+  return isset($settings[$name]) ? $settings[$name] : $default;
+}
+
+/**
  * Loads the persistent variable table.
  *
  * The variable table is composed of values that have been saved in the table
@@ -1391,7 +1412,7 @@ function drupal_serve_page_from_cache(stdClass $cache) {
   // response to reply to a subsequent request for a given URL without
   // revalidation. If a Vary header has been set in hook_boot(), it is assumed
   // that the module knows how to cache the page.
-  if (!isset($hook_boot_headers['vary']) && !config('system.performance')->get('cache.page.omit_vary_cookie')) {
+  if (!isset($hook_boot_headers['vary']) && !settings_get('omit_vary_cookie')) {
     header('Vary: Cookie');
   }
 
@@ -1496,7 +1517,7 @@ function t($string, array $args = array(), array $options = array()) {
   // handful of string replacements. See settings.php for examples.
   // Cache the $custom_strings variable to improve performance.
   if (!isset($custom_strings[$options['langcode']])) {
-    $custom_strings[$options['langcode']] = variable_get('locale_custom_strings_' . $options['langcode'], array());
+    $custom_strings[$options['langcode']] = settings_get('locale_custom_strings_' . $options['langcode'], array());
   }
   // Custom strings work for English too, even if locale module is disabled.
   if (isset($custom_strings[$options['langcode']][$options['context']][$string])) {
@@ -2967,12 +2988,12 @@ function ip_address() {
   if (!isset($ip_address)) {
     $ip_address = $_SERVER['REMOTE_ADDR'];
 
-    if (variable_get('reverse_proxy', 0)) {
-      $reverse_proxy_header = variable_get('reverse_proxy_header', 'HTTP_X_FORWARDED_FOR');
+    if (settings_get('reverse_proxy', 0)) {
+      $reverse_proxy_header = settings_get('reverse_proxy_header', 'HTTP_X_FORWARDED_FOR');
       if (!empty($_SERVER[$reverse_proxy_header])) {
         // If an array of known reverse proxy IPs is provided, then trust
         // the XFF header if request really comes from one of them.
-        $reverse_proxy_addresses = variable_get('reverse_proxy_addresses', array());
+        $reverse_proxy_addresses = settings_get('reverse_proxy_addresses', array());
 
         // Turn XFF header into an array.
         $forwarded = explode(',', $_SERVER[$reverse_proxy_header]);
@@ -3016,7 +3037,7 @@ function drupal_classloader() {
     // Include the Symfony ClassLoader for loading PSR-0-compatible classes.
     require_once DRUPAL_ROOT . '/core/vendor/symfony/class-loader/Symfony/Component/ClassLoader/UniversalClassLoader.php';
 
-    switch ($GLOBALS['settings']['class_loader']) {
+    switch (settings_get('class_loader')) {
       case 'apc':
         if (function_exists('apc_store')) {
           require_once DRUPAL_ROOT . '/core/vendor/symfony/class-loader/Symfony/Component/ClassLoader/ApcUniversalClassLoader.php';

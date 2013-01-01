@@ -45,12 +45,12 @@ class FormatDateTest extends WebTestBase {
       ->set('formats.short.pattern.php', 'Y M j - g:ia')
       ->save();
 
-    variable_set('locale_custom_strings_' . self::LANGCODE, array(
+    $GLOBALS['settings']['locale_custom_strings_' . self::LANGCODE] = array(
       '' => array('Sunday' => 'domingo'),
       'Long month name' => array('March' => 'marzo'),
-    ));
-
-    $this->refreshVariables();
+    );
+    // @todo: Overide/restore global settings in setUp/tearDown()?
+    $GLOBALS['settings']['locale_custom_strings_' . self::LANGCODE] = array();
   }
 
   /**

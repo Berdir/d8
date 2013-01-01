@@ -809,7 +809,7 @@ function drupal_http_request($url, array $options = array()) {
   $options['timeout'] = (float) $options['timeout'];
 
   // Use a proxy if one is defined and the host is not on the excluded list.
-  $proxy_server = variable_get('proxy_server', '');
+  $proxy_server = settings_get('proxy_server', '');
   if ($proxy_server && _drupal_http_use_proxy($uri['host'])) {
     // Set the scheme so we open a socket to the proxy server.
     $uri['scheme'] = 'proxy';
@@ -819,13 +819,13 @@ function drupal_http_request($url, array $options = array()) {
     unset($uri['query']);
 
     // Add in username and password to Proxy-Authorization header if needed.
-    if ($proxy_username = variable_get('proxy_username', '')) {
-      $proxy_password = variable_get('proxy_password', '');
+    if ($proxy_username = settings_get('proxy_username', '')) {
+      $proxy_password = settings_get('proxy_password', '');
       $options['headers']['Proxy-Authorization'] = 'Basic ' . base64_encode($proxy_username . (!empty($proxy_password) ? ":" . $proxy_password : ''));
     }
     // Some proxies reject requests with any User-Agent headers, while others
     // require a specific one.
-    $proxy_user_agent = variable_get('proxy_user_agent', '');
+    $proxy_user_agent = settings_get('proxy_user_agent', '');
     // The default value matches neither condition.
     if ($proxy_user_agent === NULL) {
       unset($options['headers']['User-Agent']);
@@ -1068,7 +1068,7 @@ function drupal_http_request($url, array $options = array()) {
  *   TRUE if a proxy should be used for this host.
  */
 function _drupal_http_use_proxy($host) {
-  $proxy_exceptions = variable_get('proxy_exceptions', array('localhost', '127.0.0.1'));
+  $proxy_exceptions = settings_get('proxy_exceptions', array('localhost', '127.0.0.1'));
   return !in_array(strtolower($host), $proxy_exceptions, TRUE);
 }
 
