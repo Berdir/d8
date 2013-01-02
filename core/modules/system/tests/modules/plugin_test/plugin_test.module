@@ -14,3 +14,32 @@ function plugin_test_plugin_test_alter(&$definitions) {
   }
   $definitions['user_login']['altered_single'] = TRUE;
 }
+
+function plugin_test_menu() {
+  $items = array();
+  $items['plugin_definition_test'] = array(
+    'access callback' => TRUE,
+    'page callback' => 'plugin_test_definitions',
+  );
+  return $items;
+}
+
+function plugin_test_definitions() {
+  $manager = new Drupal\plugin_test\Plugin\CachedMockBlockManager();
+  $output = array();
+  foreach($manager->getDefinitions() as $plugin_id => $definition) {
+    $results = db_select('locales_source', 'ls')
+      ->fields('ls')
+      ->condition('source', $definition['label'])
+      ->execute();
+    foreach ($results as $result) {
+      drupal_set_message('<pre>' . var_export($result->lid, TRUE) . '</pre>');
+    }
+    $output[$plugin_id] = array(
+      '#type' => 'markup',
+      '#markup' => $definition['label'],
+    );
+  }
+  debug(language(LANGUAGE_TYPE_INTERFACE));
+  return $output;
+}
