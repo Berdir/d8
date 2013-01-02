@@ -947,7 +947,7 @@ function drupal_get_filename($type, $name, $filename = NULL) {
 /**
  * Returns a setting.
  *
- * Settings can be set in settings.php in the $settings.php array and requested
+ * Settings can be set in settings.php in the $settings array and requested
  * by this function. Settings should be used over configuration for read-only,
  * possibly low bootstrap configuration that is environment specific.
  *
