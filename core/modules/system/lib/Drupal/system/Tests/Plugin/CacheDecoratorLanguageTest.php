@@ -79,12 +79,9 @@ class CacheDecoratorLanguageTest extends WebTestBase {
    */
   public function testCacheDecoratorLanguage() {
     $languages = $this->languages;
-    // Visit our destination first to prime any relevant strings.
-    $this->drupalGet('plugin_definition_test');
-    // Check for the expected block labels on the page.
+    // Define custom strings to provide a translation.
     $custom_strings = array();
     foreach ($this->mockBlockExpectedDefinitions as $plugin_id => $definition) {
-      $this->assertText($definition['label']);
       $custom_strings[$definition['label']] = 'de ' . $definition['label'];
     }
     variable_set('locale_custom_strings_de', array('' => $custom_strings));

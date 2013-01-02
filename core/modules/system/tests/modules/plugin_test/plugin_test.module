@@ -40,6 +40,5 @@ function plugin_test_definitions() {
       '#markup' => $definition['label'],
     );
   }
-  debug(language(LANGUAGE_TYPE_INTERFACE));
   return $output;
 }
