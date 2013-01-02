@@ -403,6 +403,7 @@ function field_sql_storage_field_storage_write(EntityInterface $entity, $op, $fi
   $vid = $entity->getRevisionId();
   $id = $entity->id();
   $bundle = $entity->bundle();
+  $entity_type = $entity->entityType();
   if (!isset($vid)) {
     $vid = $id;
   }
@@ -413,7 +414,7 @@ function field_sql_storage_field_storage_write(EntityInterface $entity, $op, $fi
     $table_name = _field_sql_storage_tablename($field);
     $revision_name = _field_sql_storage_revision_tablename($field);
 
-    $all_langcodes = field_available_languages($entity->entityType(), $field);
+    $all_langcodes = field_available_languages($entity_type, $field);
     $field_langcodes = array_intersect($all_langcodes, array_keys((array) $entity->$field_name));
 
     // Delete and insert, rather than update, in case a value was added.
@@ -426,13 +427,13 @@ function field_sql_storage_field_storage_write(EntityInterface $entity, $op, $fi
         // of an entity.
         if ($entity->isDefaultRevision()) {
           db_delete($table_name)
-            ->condition('entity_type', $entity->entityType())
+            ->condition('entity_type', $entity_type)
             ->condition('entity_id', $id)
             ->condition('langcode', $langcodes, 'IN')
             ->execute();
         }
         db_delete($revision_name)
-          ->condition('entity_type', $entity->entityType())
+          ->condition('entity_type', $entity_type)
           ->condition('entity_id', $id)
           ->condition('revision_id', $vid)
           ->condition('langcode', $langcodes, 'IN')
@@ -456,7 +457,7 @@ function field_sql_storage_field_storage_write(EntityInterface $entity, $op, $fi
         // We now know we have someting to insert.
         $do_insert = TRUE;
         $record = array(
-          'entity_type' => $entity->entityType(),
+          'entity_type' => $entity_type,
           'entity_id' => $id,
           'revision_id' => $vid,
           'bundle' => $bundle,
