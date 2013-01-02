@@ -1510,7 +1510,7 @@ function hook_field_storage_write(\Drupal\Core\Entity\EntityInterface $entity, $
  *
  * This hook is invoked from field_attach_delete() to ask the field storage
  * module to delete field data.
-
+ *
  * @param \Drupal\Core\Entity\EntityInterface $entity
  *   The entity on which to operate.
  * @param $fields
@@ -2184,7 +2184,7 @@ function hook_field_storage_purge(\Drupal\Core\Entity\EntityInterface $entity, $
  *   The operation to be performed. Possible values: 'edit', 'view'.
  * @param $field
  *   The field on which the operation is to be performed.
- * @param $entity
+ * @param \Drupal\Core\Entity\EntityInterface $entity
  *   (optional) The entity for the operation.
  * @param $account
  *   (optional) The account to check; if not given use currently logged in user.

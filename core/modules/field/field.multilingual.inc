@@ -303,14 +303,15 @@ function field_language(EntityInterface $entity, $field_name = NULL, $langcode =
   $display_langcodes = &drupal_static(__FUNCTION__, array());
   $id = $entity->id();
   $bundle = $entity->bundle();
+  $entity_type = $entity->entityType();
   $langcode = field_valid_language($langcode, FALSE);
-  if (!isset($display_langcodes[$entity->entityType()][$id][$langcode])) {
+  if (!isset($display_langcodes[$entity_type][$id][$langcode])) {
     $display_langcode = array();
 
     // By default, display language is set to one of the locked languages
     // if the field translation is not available. It is up to translation
     // handlers to implement language fallback rules.
-    foreach (field_info_instances($entity->entityType(), $bundle) as $instance) {
+    foreach (field_info_instances($entity_type, $bundle) as $instance) {
       if (isset($entity->{$instance['field_name']}[$langcode])) {
         $display_langcode[$instance['field_name']] = $langcode;
       }
@@ -328,23 +329,23 @@ function field_language(EntityInterface $entity, $field_name = NULL, $langcode =
       }
     }
 
-    if (field_has_translation_handler($entity->entityType())) {
+    if (field_has_translation_handler($entity_type)) {
       $context = array(
         'entity' => $entity,
         'langcode' => $langcode,
       );
       // Do not apply core language fallback rules if they are disabled or if
       // the entity does not have a translation handler registered.
-      if (variable_get('field_language_fallback', FALSE) && field_has_translation_handler($entity->entityType())) {
+      if (variable_get('field_language_fallback', FALSE) && field_has_translation_handler($entity_type)) {
         field_language_fallback($display_langcode, $context['entity'], $context['langcode']);
       }
       drupal_alter('field_language', $display_langcode, $context);
     }
 
-    $display_langcodes[$entity->entityType()][$id][$langcode] = $display_langcode;
+    $display_langcodes[$entity_type][$id][$langcode] = $display_langcode;
   }
 
-  $display_langcode = $display_langcodes[$entity->entityType()][$id][$langcode];
+  $display_langcode = $display_langcodes[$entity_type][$id][$langcode];
 
   // Single-field mode.
   if (isset($field_name)) {
