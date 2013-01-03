@@ -1039,11 +1039,11 @@ function block_user_role_delete($role) {
 function block_menu_delete($menu) {
   db_delete('block')
     ->condition('module', 'menu')
-    ->condition('delta', $menu['menu_name'])
+    ->condition('delta', $menu->id())
     ->execute();
   db_delete('block_role')
     ->condition('module', 'menu')
-    ->condition('delta', $menu['menu_name'])
+    ->condition('delta', $menu->id())
     ->execute();
 }
 

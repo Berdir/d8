@@ -102,8 +102,8 @@ class MenuTest extends WebTestBase {
    */
   function doCustomMenuTests() {
     $this->menu = $this->addCustomMenu();
-    $this->doMenuTests($this->menu['menu_name']);
-    $this->addInvalidMenuLink($this->menu['menu_name']);
+    $this->doMenuTests($this->menu->id());
+    $this->addInvalidMenuLink($this->menu->id());
     $this->addCustomMenuCRUD();
   }
 
@@ -113,25 +113,25 @@ class MenuTest extends WebTestBase {
   function addCustomMenuCRUD() {
     // Add a new custom menu.
     $menu_name = substr(hash('sha256', $this->randomName(16)), 0, MENU_MAX_MENU_NAME_LENGTH_UI);
-    $title = $this->randomName(16);
+    $label = $this->randomName(16);
 
     $menu = array(
-      'menu_name' => $menu_name,
-      'title' => $title,
+      'id' => $menu_name,
+      'label' => $label,
       'description' => 'Description text',
     );
     menu_save($menu);
 
     // Assert the new menu.
     $this->drupalGet('admin/structure/menu/manage/' . $menu_name . '/edit');
-    $this->assertRaw($title, 'Custom menu was added.');
+    $this->assertRaw($label, 'Custom menu was added.');
 
     // Edit the menu.
-    $new_title = $this->randomName(16);
-    $menu['title'] = $new_title;
+    $new_label = $this->randomName(16);
+    $menu['label'] = $new_label;
     menu_save($menu);
     $this->drupalGet('admin/structure/menu/manage/' . $menu_name . '/edit');
-    $this->assertRaw($new_title, 'Custom menu was edited.');
+    $this->assertRaw($new_label, 'Custom menu was edited.');
   }
 
   /**
@@ -143,11 +143,11 @@ class MenuTest extends WebTestBase {
     // Try adding a menu using a menu_name that is too long.
     $this->drupalGet('admin/structure/menu/add');
     $menu_name = substr(hash('sha256', $this->randomName(16)), 0, MENU_MAX_MENU_NAME_LENGTH_UI + 1);
-    $title = $this->randomName(16);
+    $label = $this->randomName(16);
     $edit = array(
-      'menu_name' => $menu_name,
+      'id' => $menu_name,
       'description' => '',
-      'title' =>  $title,
+      'label' =>  $label,
     );
     $this->drupalPost('admin/structure/menu/add', $edit, t('Save'));
 
@@ -160,7 +160,7 @@ class MenuTest extends WebTestBase {
 
     // Change the menu_name so it no longer exceeds the maximum length.
     $menu_name = substr(hash('sha256', $this->randomName(16)), 0, MENU_MAX_MENU_NAME_LENGTH_UI);
-    $edit['menu_name'] = $menu_name;
+    $edit['id'] = $menu_name;
     $this->drupalPost('admin/structure/menu/add', $edit, t('Save'));
 
     // Verify that no validation error is given for menu_name length.
@@ -172,7 +172,7 @@ class MenuTest extends WebTestBase {
     // Unlike most other modules, there is no confirmation message displayed.
 
     $this->drupalGet('admin/structure/menu');
-    $this->assertText($title, 'Menu created');
+    $this->assertText($label, 'Menu created');
 
     // Enable the custom menu block.
     $menu_name = 'menu-' . $menu_name; // Drupal prepends the name with 'menu-'.
@@ -191,13 +191,13 @@ class MenuTest extends WebTestBase {
    * @param string $menu_name Custom menu name.
    */
   function deleteCustomMenu($menu) {
-    $menu_name = $this->menu['menu_name'];
-    $title = $this->menu['title'];
+    $menu_name = $this->menu->id();
+    $label = $this->menu->label();
 
     // Delete custom menu.
     $this->drupalPost("admin/structure/menu/manage/$menu_name/delete", array(), t('Delete'));
     $this->assertResponse(200);
-    $this->assertRaw(t('The custom menu %title has been deleted.', array('%title' => $title)), 'Custom menu was deleted');
+    $this->assertRaw(t('The custom menu %title has been deleted.', array('%title' => $label)), 'Custom menu was deleted');
     $this->assertFalse(menu_load($menu_name), 'Custom menu was deleted');
     // Test if all menu links associated to the menu were removed from database.
     $result = db_query("SELECT menu_name FROM {menu_links} WHERE menu_name = :menu_name", array(':menu_name' => $menu_name))->fetchField();

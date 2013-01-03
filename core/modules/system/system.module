@@ -2144,6 +2144,57 @@ function system_data_type_info() {
 }
 
 /**
+ * Implements hook_config_import_create().
+ */
+function system_config_import_create($name, $new_config, $old_config) {
+  if (strpos($name, 'system.menu.') !== 0) {
+    return FALSE;
+  }
+
+  $menu = entity_create('menu', $new_config->get());
+  $menu->save();
+  return TRUE;
+}
+
+/**
+ * Implements hook_config_import_change().
+ */
+function system_config_import_change($name, $new_config, $old_config) {
+  if (strpos($name, 'system.menu.') !== 0) {
+    return FALSE;
+  }
+
+  list(, , $id) = explode('.', $name);
+  $entity = entity_load('menu', $id);
+  $entity->original = clone $entity;
+  foreach ($old_config->get() as $property => $value) {
+    $entity->original->$property = $value;
+  }
+
+  // Iterate through each property of the new config, copying it to the menu
+  // object.
+  foreach ($new_config->get() as $property => $value) {
+    $entity->$property = $value;
+  }
+
+  $entity->save();
+  return TRUE;
+}
+
+/**
+ * Implements hook_config_import_delete().
+ */
+function system_config_import_delete($name, $new_config, $old_config) {
+  if (strpos($name, 'system.menu.') !== 0) {
+    return FALSE;
+  }
+
+  list(, , $id) = explode('.', $name);
+  entity_delete_multiple('menu', array($id));
+  return TRUE;
+}
+
+/**
  * Menu item access callback - only enabled themes can be accessed.
  */
 function _system_themes_access($theme) {

@@ -11,9 +11,10 @@
  * URLs to be added to the main site navigation menu.
  */
 
-use Drupal\node\Plugin\Core\Entity\Node;
-
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Drupal\node\Plugin\Core\Entity\Node;
+use Drupal\system\Plugin\Core\Entity\Menu;
+use Drupal\Core\Config\Entity\ConfigEntityBase;
 
 /**
  * Maximum length of menu name as entered by the user. Database length is 32
@@ -101,7 +102,7 @@ function menu_menu() {
     'title' => 'Customize menu',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('menu_overview_form', 4),
-    'title callback' => 'menu_overview_title',
+    'title callback' => 'entity_page_label',
     'title arguments' => array(4),
     'access arguments' => array('administer menu'),
     'file' => 'menu.admin.inc',
@@ -161,6 +162,26 @@ function menu_menu() {
 }
 
 /**
+ * Implements hook_entity_info_alter().
+ */
+function menu_entity_info_alter(&$entity_info) {
+  $entity_info['menu']['list_controller_class'] = 'Drupal\menu\MenuListController';
+  $entity_info['menu']['uri_callback'] = 'menu_uri';
+}
+
+/**
+ * Entity URI callback.
+ *
+ * @param Drupal\system\Plugin\Core\Entity\Menu $menu
+ *   A Menu entity.
+ */
+function menu_uri(Menu $menu) {
+  return array(
+    'path' => 'admin/structure/menu/manage/' . $menu->id(),
+  );
+}
+
+/**
  * Implements hook_theme().
  */
 function menu_theme() {
@@ -171,7 +192,7 @@ function menu_theme() {
     ),
     'menu_admin_overview' => array(
       'file' => 'menu.admin.inc',
-      'variables' => array('title' => NULL, 'name' => NULL, 'description' => NULL),
+      'variables' => array('label' => NULL, 'id' => NULL, 'description' => NULL),
     ),
   );
 }
@@ -186,13 +207,13 @@ function menu_enable() {
   $base_link = db_query("SELECT mlid AS plid, menu_name FROM {menu_links} WHERE link_path = 'admin/structure/menu' AND module = 'system'")->fetchAssoc();
   $base_link['router_path'] = 'admin/structure/menu/manage/%';
   $base_link['module'] = 'menu';
-  $result = db_query("SELECT * FROM {menu_custom}", array(), array('fetch' => PDO::FETCH_ASSOC));
-  foreach ($result as $menu) {
+  $menus = entity_load_multiple('menu');
+  foreach ($menus as $menu) {
     // $link is passed by reference to menu_link_save(), so we make a copy of $base_link.
     $link = $base_link;
     $link['mlid'] = 0;
-    $link['link_title'] = $menu['title'];
-    $link['link_path'] = 'admin/structure/menu/manage/' . $menu['menu_name'];
+    $link['link_title'] = $menu->label();
+    $link['link_path'] = 'admin/structure/menu/manage/' . $menu->id();
     $menu_link = db_query("SELECT mlid FROM {menu_links} WHERE link_path = :path AND plid = :plid", array(
       ':path' => $link['link_path'],
       ':plid' => $link['plid']
@@ -206,13 +227,6 @@ function menu_enable() {
 }
 
 /**
- * Title callback for the menu overview page and links.
- */
-function menu_overview_title($menu) {
-  return $menu['title'];
-}
-
-/**
  * Load the data for a single custom menu.
  *
  * @param $menu_name
@@ -221,34 +235,13 @@ function menu_overview_title($menu) {
  *   Array defining the custom menu, or FALSE if the menu doesn't exist.
  */
 function menu_load($menu_name) {
-  $all_menus = menu_load_all();
-  return isset($all_menus[$menu_name]) ? $all_menus[$menu_name] : FALSE;
-}
-
-/**
- * Load all custom menu data.
- *
- * @return
- *   Array of custom menu data.
- */
-function menu_load_all() {
-  $custom_menus = &drupal_static(__FUNCTION__);
-  if (!isset($custom_menus)) {
-    if ($cached = cache('menu')->get('menu_custom')) {
-      $custom_menus = $cached->data;
-    }
-    else {
-      $custom_menus = db_query('SELECT * FROM {menu_custom}')->fetchAllAssoc('menu_name', PDO::FETCH_ASSOC);
-      cache('menu')->set('menu_custom', $custom_menus);
-    }
-  }
-  return $custom_menus;
+  return entity_load('menu', $menu_name);
 }
 
 /**
  * Save a custom menu.
  *
- * @param $menu
+ * @param Drupal\system\Plugin\Core\Entity\Menu $menu
  *   An array representing a custom menu:
  *   - menu_name: The unique name of the custom menu (composed of lowercase
  *     letters, numbers, and hyphens).
@@ -260,14 +253,9 @@ function menu_load_all() {
  *
  * @see menu_load()
  */
-function menu_save($menu) {
-  $status = db_merge('menu_custom')
-    ->key(array('menu_name' => $menu['menu_name']))
-    ->fields(array(
-      'title' => $menu['title'],
-      'description' => $menu['description'],
-    ))
-    ->execute();
+function menu_save($menu_array) {
+  $menu = entity_create('menu', $menu_array);
+  $status = $menu->save();
   menu_cache_clear_all();
 
   switch ($status) {
@@ -278,8 +266,8 @@ function menu_save($menu) {
       $config = config('system.menu');
 
       $active_menus = $config->get('active_menus_default') ?: array_keys(menu_get_menus());
-      if (!in_array($menu['menu_name'], $active_menus)) {
-        $active_menus[] = $menu['menu_name'];
+      if (!in_array($menu->id(), $active_menus)) {
+        $active_menus[] = $menu->id();
         $config->set('active_menus_default', $active_menus);
       }
 
@@ -301,7 +289,7 @@ function menu_save($menu) {
  * function should usually be called from a user interface (form submit) handler
  * only, which allows the user to confirm the action.
  *
- * @param $menu
+ * @param Drupal\system\Plugin\Core\Entity\Menu $menu
  *   An array representing a custom menu:
  *   - menu_name: The unique name of the custom menu.
  *   - title: The human readable menu title.
@@ -318,21 +306,19 @@ function menu_save($menu) {
  */
 function menu_delete($menu) {
   // Delete all links from the menu.
-  menu_delete_links($menu['menu_name']);
+  menu_delete_links($menu->id());
 
   // Remove menu from active menus variable.
   $active_menus = variable_get('menu_default_active_menus', array_keys(menu_get_menus()));
   foreach ($active_menus as $i => $menu_name) {
-    if ($menu['menu_name'] == $menu_name) {
+    if ($menu->id() == $menu_name) {
       unset($active_menus[$i]);
       variable_set('menu_default_active_menus', $active_menus);
     }
   }
 
   // Delete the custom menu.
-  db_delete('menu_custom')
-    ->condition('menu_name', $menu['menu_name'])
-    ->execute();
+  $menu->delete();
 
   menu_cache_clear_all();
   module_invoke_all('menu_delete', $menu);
@@ -801,12 +787,12 @@ function menu_form_node_type_form_alter(&$form, $form_state) {
  *   titles as the values.
  */
 function menu_get_menus($all = TRUE) {
-  if ($custom_menus = menu_load_all()) {
+  if ($custom_menus = entity_load_multiple('menu')) {
     if (!$all) {
       $custom_menus = array_diff_key($custom_menus, menu_list_system_menus());
     }
     foreach ($custom_menus as $menu_name => $menu) {
-      $custom_menus[$menu_name] = t($menu['title']);
+      $custom_menus[$menu_name] = $menu->label();
     }
     asort($custom_menus);
   }
