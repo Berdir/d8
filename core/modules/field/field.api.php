@@ -1203,7 +1203,7 @@ function hook_field_available_languages_alter(&$langcodes, $context) {
  *
  * @param $entity_type
  *   The type of $entity; e.g. 'node' or 'user'.
- * @param $entity
+ * @param $bundle
  *   the entity with fields to process.
  */
 function hook_field_attach_create_bundle($entity_type, $bundle) {
