@@ -343,7 +343,7 @@ function install_begin_request(&$install_state) {
   drupal_load('module', 'system');
 
   require_once DRUPAL_ROOT . '/core/includes/cache.inc';
-  $conf['cache_classes'] = array('cache' => 'Drupal\Core\Cache\NullBackend');
+  $conf['cache_classes'] = array('cache' => 'Drupal\Core\Cache\MemoryBackend');
 
   // The install process cannot use the database lock backend since the database
   // is not fully up, so we use a null backend implementation during the

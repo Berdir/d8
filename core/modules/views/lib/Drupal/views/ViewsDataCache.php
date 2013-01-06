@@ -215,9 +215,11 @@ class ViewsDataCache {
           $this->set($cid, $data);
         }
       }
-    } catch (\Exception $e) {
-      // During testing the table is gone before this fires. Nasty.
-      // @todo remove after http://drupal.org/node/512026.
+    }
+    catch (\Exception $e) {
+      // During testing the table is gone before this fires.
+      // @todo Use terminate() instead of __destruct(), see
+      //   http://drupal.org/node/512026.
     }
   }
 

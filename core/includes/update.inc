@@ -140,9 +140,6 @@ function update_prepare_d8_bootstrap() {
   // compatible yet. Use the null backend by default to avoid exceptions.
   $GLOBALS['conf']['cache_classes'] = array('cache' => 'Drupal\Core\Cache\NullBackend');
   drupal_bootstrap(DRUPAL_BOOTSTRAP_DATABASE);
-  // Now remove the cache override.
-  unset($GLOBALS['conf']['cache_classes']['cache']);
-  drupal_static_reset('cache');
 
   // If the site has not updated to Drupal 8 yet, check to make sure that it is
   // running an up-to-date version of Drupal 7 before proceeding. Note this has
@@ -414,6 +411,9 @@ function update_prepare_d8_bootstrap() {
         db_change_field('url_alias', 'language', 'langcode', $langcode_spec, $langcode_indexes);
       }
     }
+  // Now remove the cache override.
+  unset($GLOBALS['conf']['cache_classes']['cache']);
+  drupal_static_reset('cache');
   }
 }
 

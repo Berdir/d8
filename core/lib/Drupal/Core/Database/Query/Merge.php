@@ -124,11 +124,15 @@ class Merge extends Query implements ConditionInterface {
   protected $needsUpdate = FALSE;
 
   /**
-   * TRUE when execute() runs for the second time.
+   * TRUE when Merge::execute() runs for the second time.
    *
-   * @var boolean
+   * There could have been a deadlock problem with another transaction. This
+   * flag is used to retry exactly once and if that still fails, assume a
+   * permament failure and abort.
+   *
+   * @var bool
    */
-  protected $retry = FALSE;
+  protected $secondTry = FALSE;
 
   /**
   * Constructs a Merge object.
@@ -423,16 +427,17 @@ class Merge extends Query implements ConditionInterface {
           $insert->useDefaults($this->defaultFields);
         }
         $insert->execute();
-        $this->retry = FALSE;
+        $this->secondTry = FALSE;
         return self::STATUS_INSERT;
       }
       catch (IntegrityConstraintViolationException $e) {
-        // Retry only once.
-        if ($this->retry) {
-          throw $e;
+        // Could be a temporary problem (lock), retry once.
+        if (!$this->secondTry) {
+          $this->secondTry = TRUE;
+          return $this->execute();
         }
-        $this->retry = TRUE;
-        return $this->execute();
+        // In case we already tried a second time, throw the exception.
+        throw $e;
       }
     }
     if ($this->needsUpdate) {
