@@ -205,14 +205,19 @@ class ViewsDataCache {
    * Destructs the ViewDataCache object.
    */
   public function __destruct() {
-    if ($this->rebuildCache && !empty($this->storage)) {
-      // Keep a record with all data.
-      $this->set($this->baseCid, $this->storage);
-      // Save data in seperate cache entries.
-      foreach ($this->storage as $table => $data) {
-        $cid = $this->baseCid . ':' . $table;
-        $this->set($cid, $data);
+    try {
+      if ($this->rebuildCache && !empty($this->storage)) {
+        // Keep a record with all data.
+        $this->set($this->baseCid, $this->storage);
+        // Save data in seperate cache entries.
+        foreach ($this->storage as $table => $data) {
+          $cid = $this->baseCid . ':' . $table;
+          $this->set($cid, $data);
+        }
       }
+    } catch (\Exception $e) {
+      // During testing the table is gone before this fires. Nasty.
+      // @todo remove after http://drupal.org/node/512026.
     }
   }
 

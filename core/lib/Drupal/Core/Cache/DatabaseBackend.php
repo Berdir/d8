@@ -8,6 +8,7 @@
 namespace Drupal\Core\Cache;
 
 use Drupal\Core\Database\Database;
+use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Exception;
 use PDO;
 
@@ -52,30 +53,23 @@ class DatabaseBackend implements CacheBackendInterface {
    * Implements Drupal\Core\Cache\CacheBackendInterface::getMultiple().
    */
   public function getMultiple(&$cids, $allow_invalid = FALSE) {
-    try {
-      // When serving cached pages, the overhead of using ::select() was found
-      // to add around 30% overhead to the request. Since $this->bin is a
-      // variable, this means the call to ::query() here uses a concatenated
-      // string. This is highly discouraged under any other circumstances, and
-      // is used here only due to the performance overhead we would incur
-      // otherwise. When serving an uncached page, the overhead of using
-      // ::select() is a much smaller proportion of the request.
-      $result = Database::getConnection()->query('SELECT cid, data, created, expire, serialized, tags, checksum_invalidations, checksum_deletions FROM {' . Database::getConnection()->escapeTable($this->bin) . '} WHERE cid IN (:cids)', array(':cids' => $cids));
-      $cache = array();
-      foreach ($result as $item) {
-        $item = $this->prepareItem($item, $allow_invalid);
-        if ($item) {
-          $cache[$item->cid] = $item;
-        }
+    // When serving cached pages, the overhead of using ::select() was found
+    // to add around 30% overhead to the request. Since $this->bin is a
+    // variable, this means the call to ::query() here uses a concatenated
+    // string. This is highly discouraged under any other circumstances, and
+    // is used here only due to the performance overhead we would incur
+    // otherwise. When serving an uncached page, the overhead of using
+    // ::select() is a much smaller proportion of the request.
+    $result = Database::getConnection()->query('SELECT cid, data, created, expire, serialized, tags, checksum_invalidations, checksum_deletions FROM {' . Database::getConnection()->escapeTable($this->bin) . '} WHERE cid IN (:cids)', array(':cids' => $cids));
+    $cache = array();
+    foreach ($result as $item) {
+      $item = $this->prepareItem($item, $allow_invalid);
+      if ($item) {
+        $cache[$item->cid] = $item;
       }
-      $cids = array_diff($cids, array_keys($cache));
-      return $cache;
     }
-    catch (Exception $e) {
-      // If the database is never going to be available, cache requests should
-      // return FALSE in order to allow exception handling to occur.
-      return array();
-    }
+    $cids = array_diff($cids, array_keys($cache));
+    return $cache;
   }
 
   /**
@@ -131,33 +125,36 @@ class DatabaseBackend implements CacheBackendInterface {
    * Implements Drupal\Core\Cache\CacheBackendInterface::set().
    */
   public function set($cid, $data, $expire = CacheBackendInterface::CACHE_PERMANENT, array $tags = array()) {
-    try {
-      $flat_tags = $this->flattenTags($tags);
-      $checksum = $this->checksumTags($flat_tags);
-      $fields = array(
-        'serialized' => 0,
-        'created' => REQUEST_TIME,
-        'expire' => $expire,
-        'tags' => implode(' ', $flat_tags),
-        'checksum_invalidations' => $checksum['invalidations'],
-        'checksum_deletions' => $checksum['deletions'],
-      );
-      if (!is_string($data)) {
-        $fields['data'] = serialize($data);
-        $fields['serialized'] = 1;
-      }
-      else {
-        $fields['data'] = $data;
-        $fields['serialized'] = 0;
-      }
+    $flat_tags = $this->flattenTags($tags);
+    $checksum = $this->checksumTags($flat_tags);
+    $fields = array(
+      'serialized' => 0,
+      'created' => REQUEST_TIME,
+      'expire' => $expire,
+      'tags' => implode(' ', $flat_tags),
+      'checksum_invalidations' => $checksum['invalidations'],
+      'checksum_deletions' => $checksum['deletions'],
+    );
+    if (!is_string($data)) {
+      $fields['data'] = serialize($data);
+      $fields['serialized'] = 1;
+    }
+    else {
+      $fields['data'] = $data;
+      $fields['serialized'] = 0;
+    }
 
+    try {
       Database::getConnection()->merge($this->bin)
         ->key(array('cid' => $cid))
         ->fields($fields)
         ->execute();
     }
-    catch (Exception $e) {
-      // The database may not be available, so we'll ignore cache_set requests.
+    catch (DatabaseExceptionWrapper $e) {
+      // If set() failed for whatever reason, then try to delete() to avoid a
+      // stale cache. Removing this causes sporadic testbot failures due to
+      // what seems a bug in the InnoDB deadlock detection heuristics.
+      $this->delete($cid);
     }
   }
 

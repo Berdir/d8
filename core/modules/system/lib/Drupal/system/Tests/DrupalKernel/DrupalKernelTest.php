@@ -38,6 +38,7 @@ class DrupalKernelTest extends UnitTestBase {
       'directory' => DRUPAL_ROOT . '/' . variable_get('file_public_path', conf_path() . '/files') . '/php',
       'secret' => $GLOBALS['drupal_hash_salt'],
     );
+    $conf['cache_classes'] = array('cache' => 'Drupal\Core\Cache\NullBackend');
     // @todo: write a memory based storage backend for testing.
     $module_enabled = array(
       'system' => 'system',
@@ -105,5 +106,6 @@ class DrupalKernelTest extends UnitTestBase {
     // Check that the location of the new module is registered.
     $modules = $container->getParameter('container.modules');
     $this->assertEqual($modules['bundle_test'], drupal_get_filename('module', 'bundle_test'));
+    unset($conf['cache_classes']);
   }
 }

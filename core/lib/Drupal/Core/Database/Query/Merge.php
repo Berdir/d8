@@ -124,6 +124,13 @@ class Merge extends Query implements ConditionInterface {
   protected $needsUpdate = FALSE;
 
   /**
+   * TRUE when execute() runs for the second time.
+   *
+   * @var boolean
+   */
+  protected $retry = FALSE;
+
+  /**
   * Constructs a Merge object.
   *
   * @param Drupal\Core\Database\Connection $connection
@@ -416,16 +423,16 @@ class Merge extends Query implements ConditionInterface {
           $insert->useDefaults($this->defaultFields);
         }
         $insert->execute();
+        $this->retry = FALSE;
         return self::STATUS_INSERT;
       }
       catch (IntegrityConstraintViolationException $e) {
-        // The insert query failed, maybe it's because a racing insert query
-        // beat us in inserting the same row. Retry the select query, if it
-        // returns a row, ignore the error and continue with the update
-        // query below.
-        if (!$select->execute()->fetchField()) {
+        // Retry only once.
+        if ($this->retry) {
           throw $e;
         }
+        $this->retry = TRUE;
+        return $this->execute();
       }
     }
     if ($this->needsUpdate) {
@@ -438,6 +445,7 @@ class Merge extends Query implements ConditionInterface {
         }
       }
       $update->execute();
+      $this->retry = FALSE;
       return self::STATUS_UPDATE;
     }
   }
