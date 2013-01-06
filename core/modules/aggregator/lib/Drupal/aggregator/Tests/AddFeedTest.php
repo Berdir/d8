@@ -35,6 +35,7 @@ class AddFeedTest extends AggregatorTestBase {
     $this->assertText($feed->title, 'Page title');
     $this->drupalGet('aggregator/sources/' . $feed->fid . '/categorize');
     $this->assertResponse(200, 'Feed categorization page exists.');
+    $this->assertText($feed->title);
 
     // Delete feed.
     $this->deleteFeed($feed);
@@ -63,6 +64,7 @@ class AddFeedTest extends AggregatorTestBase {
     $this->assertText($feed->title, 'Page title');
     $this->drupalGet('aggregator/sources/' . $feed->fid . '/categorize');
     $this->assertResponse(200, 'Long URL feed categorization page exists.');
+    $this->assertText($feed->title);
 
     // Delete feeds.
     $this->deleteFeed($feed);

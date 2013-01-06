@@ -51,11 +51,6 @@ function aggregator_help($path, $arg) {
  */
 function aggregator_theme() {
   return array(
-    'aggregator_wrapper' => array(
-      'variables' => array('content' => NULL),
-      'file' => 'aggregator.pages.inc',
-      'template' => 'aggregator-wrapper',
-    ),
     'aggregator_categorize_items' => array(
       'render element' => 'form',
       'file' => 'aggregator.pages.inc',
@@ -74,11 +69,11 @@ function aggregator_theme() {
       'template' => 'aggregator-summary-items',
     ),
     'aggregator_summary_item' => array(
-      'variables' => array('item' => NULL),
+      'variables' => array('aggregator_item' => NULL, 'view_mode' => NULL),
       'file' => 'aggregator.pages.inc',
     ),
     'aggregator_item' => array(
-      'variables' => array('item' => NULL),
+      'variables' => array('aggregator_item' => NULL, 'view_mode' => NULL),
       'file' => 'aggregator.pages.inc',
       'template' => 'aggregator-item',
     ),
@@ -276,7 +271,7 @@ function aggregator_menu() {
  *   A string with the aggregator category title.
  */
 function _aggregator_category_title($category) {
-  return $category['title'];
+  return $category->title;
 }
 
 /**
@@ -428,15 +423,10 @@ function aggregator_save_feed($edit) {
   elseif (!empty($edit['fid'])) {
     $iids = db_query('SELECT iid FROM {aggregator_item} WHERE fid = :fid', array(':fid' => $edit['fid']))->fetchCol();
     if ($iids) {
-      db_delete('aggregator_category_item')
-        ->condition('iid', $iids, 'IN')
-        ->execute();
+      entity_delete_multiple('aggregator_item', $iids);
     }
     db_delete('aggregator_feed')->
       condition('fid', $edit['fid'])
-      ->execute();
-    db_delete('aggregator_item')
-      ->condition('fid', $edit['fid'])
       ->execute();
     // Make sure there is no active block for this feed.
     $block_configs = config_get_storage_names_with_prefix('plugin.core.block');
@@ -630,7 +620,7 @@ function aggregator_feed_load($fid) {
 function aggregator_category_load($cid) {
   $categories = &drupal_static(__FUNCTION__);
   if (!isset($categories[$cid])) {
-    $categories[$cid] = db_query('SELECT * FROM {aggregator_category} WHERE cid = :cid', array(':cid' => $cid))->fetchAssoc();
+    $categories[$cid] = db_query('SELECT * FROM {aggregator_category} WHERE cid = :cid', array(':cid' => $cid))->fetchObject();
   }
 
   return $categories[$cid];

@@ -22,26 +22,46 @@ function aggregator_aggregator_process($feed) {
   if (is_object($feed)) {
     if (is_array($feed->items)) {
       foreach ($feed->items as $item) {
+        // @todo: The default entity render controller always returns an empty
+        //   array, which is ignored in aggregator_save_item() currently. Should
+        //   probably be fixed.
+        if (empty($item['title'])) {
+          continue;
+        }
+
         // Save this item. Try to avoid duplicate entries as much as possible. If
         // we find a duplicate entry, we resolve it and pass along its ID is such
         // that we can update it if needed.
         if (!empty($item['guid'])) {
-          $entry = db_query("SELECT iid, timestamp FROM {aggregator_item} WHERE fid = :fid AND guid = :guid", array(':fid' => $feed->fid, ':guid' => $item['guid']))->fetchObject();
+          $values = array('fid' => $feed->fid, 'guid' => $item['guid']);
         }
         elseif ($item['link'] && $item['link'] != $feed->link && $item['link'] != $feed->url) {
-          $entry = db_query("SELECT iid, timestamp FROM {aggregator_item} WHERE fid = :fid AND link = :link", array(':fid' => $feed->fid, ':link' => $item['link']))->fetchObject();
+          $values = array('fid' => $feed->fid, 'link' => $item['link']);
         }
         else {
-          $entry = db_query("SELECT iid, timestamp FROM {aggregator_item} WHERE fid = :fid AND title = :title", array(':fid' => $feed->fid, ':title' => $item['title']))->fetchObject();
+          $values = array('fid' => $feed->fid, 'title' => $item['title']);
         }
-        if (!$item['timestamp']) {
-          $item['timestamp'] = isset($entry->timestamp) ? $entry->timestamp : REQUEST_TIME;
+
+        // Try to load an existing entry.
+        if ($entry = entity_load_multiple_by_properties('aggregator_item', $values)) {
+          $entry = reset($entry);
+        }
+        else {
+          $entry = entity_create('aggregator_item', array());
+        }
+        if ($item['timestamp']) {
+          $entry->timestamp->value = $item['timestamp'];
         }
 
         // Make sure the item title and author fit in the 255 varchar column.
-        $item['title'] = truncate_utf8($item['title'], 255, TRUE, TRUE);
-        $item['author'] = truncate_utf8($item['author'], 255, TRUE, TRUE);
-        aggregator_save_item(array('iid' => (isset($entry->iid) ? $entry->iid : ''), 'fid' => $feed->fid, 'timestamp' => $item['timestamp'], 'title' => $item['title'], 'link' => $item['link'], 'author' => $item['author'], 'description' => $item['description'], 'guid' => $item['guid']));
+        $entry->title->value = truncate_utf8($item['title'], 255, TRUE, TRUE);
+        $entry->author->value = truncate_utf8($item['author'], 255, TRUE, TRUE);
+
+        $entry->fid->value = $feed->fid;
+        $entry->link->value = $item['link'];
+        $entry->description->value = $item['description'];
+        $entry->guid->value = $item['guid'];
+        $entry->save();
       }
     }
   }
@@ -52,14 +72,7 @@ function aggregator_aggregator_process($feed) {
  */
 function aggregator_aggregator_remove($feed) {
   $iids = db_query('SELECT iid FROM {aggregator_item} WHERE fid = :fid', array(':fid' => $feed->fid))->fetchCol();
-  if ($iids) {
-    db_delete('aggregator_category_item')
-      ->condition('iid', $iids, 'IN')
-      ->execute();
-  }
-  db_delete('aggregator_item')
-    ->condition('fid', $feed->fid)
-    ->execute();
+  entity_delete_multiple('aggregator_item', $iids);
 
   drupal_set_message(t('The news items from %site have been removed.', array('%site' => $feed->title)));
 }
@@ -145,48 +158,6 @@ function _aggregator_characters($length) {
 }
 
 /**
- * Adds/edits/deletes an aggregator item.
- *
- * @param $edit
- *   An associative array describing the item to be added/edited/deleted.
- */
-function aggregator_save_item($edit) {
-  if ($edit['title'] && empty($edit['iid'])) {
-    $edit['iid'] = db_insert('aggregator_item')
-      ->fields(array(
-        'title' => $edit['title'],
-        'link' => $edit['link'],
-        'author' => $edit['author'],
-        'description' => $edit['description'],
-        'guid' => $edit['guid'],
-        'timestamp' => $edit['timestamp'],
-        'fid' => $edit['fid'],
-      ))
-      ->execute();
-  }
-  if ($edit['iid'] && !$edit['title']) {
-    db_delete('aggregator_item')
-      ->condition('iid', $edit['iid'])
-      ->execute();
-    db_delete('aggregator_category_item')
-      ->condition('iid', $edit['iid'])
-      ->execute();
-  }
-  elseif ($edit['title'] && $edit['link']) {
-    // file the items in the categories indicated by the feed
-    $result = db_query('SELECT cid FROM {aggregator_category_feed} WHERE fid = :fid', array(':fid' => $edit['fid']));
-    foreach ($result as $category) {
-      db_merge('aggregator_category_item')
-        ->key(array(
-          'iid' => $edit['iid'],
-          'cid' => $category->cid,
-        ))
-        ->execute();
-    }
-  }
-}
-
-/**
  * Expires items from a feed depending on expiration settings.
  *
  * @param $feed
@@ -204,12 +175,7 @@ function aggregator_expire($feed) {
     ))
     ->fetchCol();
     if ($iids) {
-      db_delete('aggregator_category_item')
-        ->condition('iid', $iids, 'IN')
-        ->execute();
-      db_delete('aggregator_item')
-        ->condition('iid', $iids, 'IN')
-        ->execute();
+      entity_delete_multiple('aggregator_item', $iids);
     }
   }
 }
