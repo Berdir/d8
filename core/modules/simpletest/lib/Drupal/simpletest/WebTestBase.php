@@ -902,15 +902,10 @@ abstract class WebTestBase extends TestBase {
 
     // Reload module list and implementations to ensure that test module hooks
     // aren't called after tests.
-    system_list_reset();
     module_list_reset();
-    module_implements_reset();
 
     // Reset the Field API.
-    field_cache_clear();
-
-    // Rebuild caches.
-    $this->refreshVariables();
+    field_info_cache_clear();
 
     // Close the CURL handler.
     $this->curlClose();
