@@ -900,10 +900,6 @@ abstract class WebTestBase extends TestBase {
     $this->loggedInUser = FALSE;
     $this->additionalCurlOptions = array();
 
-    // Reload module list and implementations to ensure that test module hooks
-    // aren't called after tests.
-    module_list_reset();
-
     // Close the CURL handler.
     $this->curlClose();
   }
