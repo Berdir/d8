@@ -19,7 +19,7 @@ class BundleTestBundle extends Bundle
 {
   public function build(ContainerBuilder $container) {
     $container->register('bundle_test_class', 'Drupal\bundle_test\TestClass')
-      ->addArgument(new Reference('keyvalue'))
+      ->addArgument(new Reference('state'))
       ->addTag('event_subscriber')
       ->addTag('needs_termination');
 

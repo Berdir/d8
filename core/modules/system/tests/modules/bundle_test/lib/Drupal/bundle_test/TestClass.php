@@ -7,7 +7,7 @@
 
 namespace Drupal\bundle_test;
 
-use Drupal\Core\KeyValueStore\KeyValueFactory;
+use Drupal\Core\KeyValueStore\KeyValueStoreInterface;
 use Drupal\Core\TerminationInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -22,8 +22,14 @@ class TestClass implements EventSubscriberInterface, TerminationInterface {
    */
   protected $state;
 
-  public function __construct(KeyValueFactory $keyvalueFactory) {
-    $this->state = $keyvalueFactory->get('state');
+  /**
+   * Constructor.
+   *
+   * @param \Drupal\Core\KeyValueStore\KeyValueStoreInterface $state
+   *   The state key value store.
+   */
+  public function __construct(KeyValueStoreInterface $state) {
+    $this->state = $state;
   }
 
   /**

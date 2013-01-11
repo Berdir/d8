@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\system\Tests\ServiceTerminator\ServiceTerminatorTest.
+ * Contains \Drupal\system\Tests\DrupalKernel\ServiceTerminatorTest.
  */
 
-namespace Drupal\system\Tests\ServiceTerminator;
+namespace Drupal\system\Tests\DrupalKernel;
 
 use Drupal\simpletest\DrupalUnitTestBase;
 use Symfony\Component\HttpFoundation\Response;

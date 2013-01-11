@@ -87,9 +87,15 @@ class CoreBundle extends Bundle {
       ->register('queue.database', 'Drupal\Core\Queue\QueueDatabaseFactory')
       ->addArgument(new Reference('database'));
 
+    $container
+      ->register('state', 'Drupal\Core\KeyValueStore\KeyValueStoreInterface')
+      ->setFactoryService('keyvalue')
+      ->setFactoryMethod('get')
+      ->addArgument('state');
+
     $container->register('path.alias_manager', 'Drupal\Core\Path\AliasManager')
       ->addArgument(new Reference('database'))
-      ->addArgument(new Reference('keyvalue'));
+      ->addArgument(new Reference('state'));
 
     $container->register('http_client_simpletest_subscriber', 'Drupal\Core\Http\Plugin\SimpletestHttpRequestSubscriber');
     $container->register('http_default_client', 'Guzzle\Http\Client')
