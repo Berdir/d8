@@ -506,9 +506,10 @@ function form_get_cache($form_build_id, &$form_state) {
 
     global $user;
     if ((isset($form['#cache_token']) && drupal_valid_token($form['#cache_token'])) || (!isset($form['#cache_token']) && !$user->uid)) {
-      if ($cached = cache('form')->get('form_state_' . $form_build_id)) {
+      $stored_form_state = drupal_container()->get('keyvalue.expirable')->get('form_state')->get($form_build_id);
+      if ($stored_form_state) {
         // Re-populate $form_state for subsequent rebuilds.
-        $form_state = $cached->data + $form_state;
+        $form_state = $stored_form_state + $form_state;
 
         // If the original form is contained in include files, load the files.
         // @see form_load_include()
@@ -545,7 +546,7 @@ function form_set_cache($form_build_id, $form, $form_state) {
 
   // Cache form state.
   if ($data = array_diff_key($form_state, array_flip(form_state_keys_no_cache()))) {
-    cache('form')->set('form_state_' . $form_build_id, $data, REQUEST_TIME + $expire);
+    drupal_container()->get('keyvalue.expirable')->get('form_state')->setWithExpire($form_build_id, $data, $expire);
   }
 }
 
@@ -884,7 +885,7 @@ function drupal_process_form($form_id, &$form, &$form_state) {
       $config = config('system.performance');
       if (!$config->get('cache.page.enabled') && !empty($form_state['values']['form_build_id'])) {
         cache('form')->delete('form_' . $form_state['values']['form_build_id']);
-        cache('form')->delete('form_state_' . $form_state['values']['form_build_id']);
+        drupal_container()->get('keyvalue.expirable')->get('form_state')->delete($form_state['values']['form_build_id']);
       }
 
       // If batches were set in the submit handlers, we process them now,

@@ -12,6 +12,7 @@ use Drupal\Core\DependencyInjection\Compiler\RegisterAccessChecksPass;
 use Drupal\Core\DependencyInjection\Compiler\RegisterMatchersPass;
 use Drupal\Core\DependencyInjection\Compiler\RegisterNestedMatchersPass;
 use Drupal\Core\DependencyInjection\Compiler\RegisterSerializationClassesPass;
+use Drupal\Core\DependencyInjection\Compiler\RegisterServicesForTerminationPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
@@ -102,6 +103,15 @@ class CoreBundle extends Bundle {
 
     // Register the EntityManager.
     $container->register('plugin.manager.entity', 'Drupal\Core\Entity\EntityManager');
+
+    // Register the expirable KeyValueStore factory.
+    $container
+      ->register('keyvalue.expirable', 'Drupal\Core\KeyValueStore\KeyValueExpirableFactory')
+      ->addArgument(new Reference('service_container'));
+    $container
+      ->register('keyvalue.expirable.database', 'Drupal\Core\KeyValueStore\KeyValueDatabaseExpirableFactory')
+      ->addArgument(new Reference('database'))
+      ->addTag('needs_termination');
 
     // The 'request' scope and service enable services to depend on the Request
     // object and get reconstructed when the request object changes (e.g.,
@@ -253,6 +263,10 @@ class CoreBundle extends Bundle {
     $container->register('flood', 'Drupal\Core\Flood\DatabaseBackend')
       ->addArgument(new Reference('database'));
 
+    $container->register('kernel_terminate_subscriber', 'Drupal\Core\EventSubscriber\KernelTerminateSubscriber')
+      ->addMethodCall('setContainer', array(new Reference('service_container')))
+      ->addTag('event_subscriber');
+
     $container->addCompilerPass(new RegisterMatchersPass());
     $container->addCompilerPass(new RegisterNestedMatchersPass());
     // Add a compiler pass for adding Normalizers and Encoders to Serializer.
@@ -260,6 +274,8 @@ class CoreBundle extends Bundle {
     // Add a compiler pass for registering event subscribers.
     $container->addCompilerPass(new RegisterKernelListenersPass(), PassConfig::TYPE_AFTER_REMOVING);
     $container->addCompilerPass(new RegisterAccessChecksPass());
+    // Add a compiler pass for registering services needing termination.
+    $container->addCompilerPass(new RegisterServicesForTerminationPass());
   }
 
   /**

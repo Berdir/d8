@@ -7,6 +7,7 @@
 
 namespace Drupal\Core\KeyValueStore;
 
+use Drupal\Core\TerminationInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
 use Drupal\Core\KeyValueStore\KeyValueDatabaseFactory;
@@ -14,7 +15,14 @@ use Drupal\Core\KeyValueStore\KeyValueDatabaseFactory;
 /**
  * Defines the key/value store factory for the database backend.
  */
-class KeyValueDatabaseExpirableFactory extends KeyValueDatabaseFactory {
+class KeyValueDatabaseExpirableFactory extends KeyValueDatabaseFactory implements TerminationInterface {
+
+  /**
+   * Holds references to each instantiation so they can be terminated.
+   *
+   * @var array
+   */
+  protected $storages;
 
   /**
    * Constructs a new key/value expirable database storage object for a given
@@ -28,6 +36,17 @@ class KeyValueDatabaseExpirableFactory extends KeyValueDatabaseFactory {
    *   A key/value store implementation for the given $collection.
    */
   public function get($collection) {
-    return new DatabaseStorageExpirable($collection, $this->connection);
+    $storage = new DatabaseStorageExpirable($collection, $this->connection);
+    $this->storages[] = $storage;
+    return $storage;
+  }
+
+  /**
+   * Implements Drupal\Core\TerminationInterface::terminate().
+   */
+  public function terminate() {
+    foreach ($this->storages as $storage) {
+      $storage->terminate();
+    }
   }
 }

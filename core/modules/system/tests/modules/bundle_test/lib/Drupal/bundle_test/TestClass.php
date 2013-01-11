@@ -7,11 +7,24 @@
 
 namespace Drupal\bundle_test;
 
-use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Drupal\Core\KeyValueStore\KeyValueFactory;
+use Drupal\Core\TerminationInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
 
-class TestClass implements EventSubscriberInterface {
+class TestClass implements EventSubscriberInterface, TerminationInterface {
+
+  /**
+   * The state keyvalue collection.
+   *
+   * @var \Drupal\Core\KeyValueStore\KeyValueStoreInterface
+   */
+  protected $state;
+
+  public function __construct(KeyValueFactory $keyvalueFactory) {
+    $this->state = $keyvalueFactory->get('state');
+  }
 
   /**
    * A simple kernel listener method.
@@ -29,5 +42,12 @@ class TestClass implements EventSubscriberInterface {
   static function getSubscribedEvents() {
     $events[KernelEvents::REQUEST][] = array('onKernelRequestTest', 100);
     return $events;
+  }
+
+  /**
+   * Implements \Drupal\Core\TerminationInterface::terminate().
+   */
+  public function terminate() {
+    $this->state->set('bundle_test.terminated', TRUE);
   }
 }

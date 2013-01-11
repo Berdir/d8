@@ -7,13 +7,14 @@
 
 namespace Drupal\views;
 
-use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Config\ConfigFactory;
+use Drupal\Core\TerminationInterface;
 
 /**
  * Class to manage and lazy load cached views data.
  */
-class ViewsDataCache {
+class ViewsDataCache implements TerminationInterface {
 
   /**
    * The base cache ID to use.
@@ -206,22 +207,15 @@ class ViewsDataCache {
   /**
    * Destructs the ViewDataCache object.
    */
-  public function __destruct() {
-    try {
-      if ($this->rebuildCache && !empty($this->storage)) {
-        // Keep a record with all data.
-        $this->set($this->baseCid, $this->storage);
-        // Save data in seperate cache entries.
-        foreach ($this->storage as $table => $data) {
-          $cid = $this->baseCid . ':' . $table;
-          $this->set($cid, $data);
-        }
+  public function terminate() {
+    if ($this->rebuildCache && !empty($this->storage)) {
+      // Keep a record with all data.
+      $this->set($this->baseCid, $this->storage);
+      // Save data in seperate cache entries.
+      foreach ($this->storage as $table => $data) {
+        $cid = $this->baseCid . ':' . $table;
+        $this->set($cid, $data);
       }
-    }
-    catch (\Exception $e) {
-      // During testing the table is gone before this fires.
-      // @todo Use terminate() instead of __destruct(), see
-      //   http://drupal.org/node/512026.
     }
   }
 
