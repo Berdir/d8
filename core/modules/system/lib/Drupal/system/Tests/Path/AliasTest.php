@@ -43,7 +43,7 @@ class AliasTest extends DrupalUnitTestBase {
     $this->fixtures->createTables($connection);
 
     //Create AliasManager and Path object.
-    $aliasManager = new AliasManager($connection, $this->container->get('keyvalue'));
+    $aliasManager = new AliasManager($connection, $this->container->get('keyvalue')->get('state'));
     $path = new Path($connection, $aliasManager);
 
     $aliases = $this->fixtures->sampleUrlAliases();
@@ -96,7 +96,7 @@ class AliasTest extends DrupalUnitTestBase {
     $this->fixtures->createTables($connection);
 
     //Create AliasManager and Path object.
-    $aliasManager = new AliasManager($connection, $this->container->get('keyvalue'));
+    $aliasManager = new AliasManager($connection, $this->container->get('keyvalue')->get('state'));
     $pathObject = new Path($connection, $aliasManager);
 
     // Test the situation where the source is the same for multiple aliases.
