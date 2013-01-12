@@ -2,10 +2,11 @@
 
 /**
  * @file
- * Contains Drupal\Core\Queue\QueueDatabaseFactory.
+ * Contains \Drupal\Core\Queue\QueueDatabaseFactory.
  */
 
 namespace Drupal\Core\Queue;
+
 use Drupal\Core\Database\Connection;
 
 /**
@@ -23,7 +24,6 @@ class QueueDatabaseFactory {
   /**
    * Constructs this factory object.
    *
-   *
    * @param \Drupal\Core\Database\Connection $connection
    *   The Connection object containing the key-value tables.
    */
@@ -38,6 +38,7 @@ class QueueDatabaseFactory {
    *   The name of the collection holding key and value pairs.
    * @param \Drupal\Core\Database\Connection $connection
    *   The connection to run against.
+   *
    * @return \Drupal\Core\QueueStore\DatabaseStorage
    *   A key/value store implementation for the given $collection.
    */

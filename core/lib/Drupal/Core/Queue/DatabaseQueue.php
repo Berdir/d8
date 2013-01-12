@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains Drupal\Core\Queue\DatabaseQueue.
+ * Contains \Drupal\Core\Queue\DatabaseQueue.
  */
 
 namespace Drupal\Core\Queue;

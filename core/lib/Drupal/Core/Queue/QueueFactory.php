@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains Drupal\Core\Queue\QueueFactory.
+ * Contains \Drupal\Core\Queue\QueueFactory.
  */
 
 namespace Drupal\Core\Queue;
