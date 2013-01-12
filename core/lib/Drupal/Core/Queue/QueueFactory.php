@@ -7,12 +7,13 @@
 
 namespace Drupal\Core\Queue;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Component\Utility\Settings;
+use Symfony\Component\DependencyInjection\ContainerAware;
 
 /**
- * Defines the key/value store factory.
+ * Defines the queue factory.
  */
-class QueueFactory {
+class QueueFactory extends ContainerAware {
 
   /**
    * Instantiated queues, keyed by name.
@@ -22,20 +23,22 @@ class QueueFactory {
   protected $queues = array();
 
   /**
-   * var \Symfony\Component\DependencyInjection\ContainerInterface
+   * The settings object.
+   *
+   * @var \Drupal\Component\Utility\Settings
    */
-  protected $container;
+  protected $settings;
 
 
   /**
-   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   * Constructs a queue factory.
    */
-  function __construct(ContainerInterface $container) {
-    $this->container = $container;
+  function __construct(Settings $settings) {
+    $this->settings = $settings;
   }
 
   /**
-   * Constructs a new key/value store for a given collection name.
+   * Constructs a new queue.
    *
    * @param string $name
    *   The name of the queue to work with.
@@ -45,22 +48,18 @@ class QueueFactory {
    *   to FALSE.
    *
    * @return \Drupal\Core\QueueStore\QueueInterface
-   *   A key/value store implementation for the given $collection.
+   *   A queue implementation for the given name.
    */
   public function get($name, $reliable = FALSE) {
-    global $conf;
     if (!isset($this->queues[$name])) {
-      if ($reliable && isset($conf['queue_reliable_service_' . $name])) {
-        $service_name = $conf['queue_reliable_service_' . $name];
+      // If it is a reliable queue, check the specific settings first.
+      if ($reliable) {
+        $service_name = $this->settings->get('queue_reliable_service_' . $name);
       }
-      elseif (isset($conf['queue_service_' . $name])) {
-        $service_name = $conf['queue_service_' . $name];
-      }
-      elseif (isset($conf['queue_default'])) {
-        $service_name = $conf['queue_default'];
-      }
-      else {
-        $service_name = 'queue.database';
+      // If no reliable queue was defined, check the service and global
+      // settings, fall back to queue.database.
+      if (empty($service_name)) {
+        $service_name = $this->settings->get('queue_service_' . $name, $this->settings->get('queue_default', 'queue.database'));
       }
       $this->queues[$name] = $this->container->get($service_name)->get($name);
     }

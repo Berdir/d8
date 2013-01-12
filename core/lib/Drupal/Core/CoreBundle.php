@@ -73,10 +73,15 @@ class CoreBundle extends Bundle {
       ->register('keyvalue.database', 'Drupal\Core\KeyValueStore\KeyValueDatabaseFactory')
       ->addArgument(new Reference('database'));
 
+    $container->register('settings', 'Drupal\Component\Utility\Settings')
+      ->setFactoryClass('Drupal\Component\Utility\Settings')
+      ->setFactoryMethod('getSingleton');
+
     // Register the Queue factory.
     $container
       ->register('queue', 'Drupal\Core\Queue\QueueFactory')
-      ->addArgument(new Reference('service_container'));
+      ->addArgument(new Reference('settings'))
+      ->addMethodCall('setContainer', array(new Reference('service_container')));
     $container
       ->register('queue.database', 'Drupal\Core\Queue\QueueDatabaseFactory')
       ->addArgument(new Reference('database'));

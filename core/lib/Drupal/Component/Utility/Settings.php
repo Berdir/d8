@@ -2,25 +2,47 @@
 
 /**
  * @file
- * Contains Drupal\Component\Utility\Settings.
+ * Contains \Drupal\Component\Utility\Settings.
  */
 
 namespace Drupal\Component\Utility;
 
+/**
+ * Read only settings that are initialized with the class.
+ */
 class Settings {
 
   /**
+   * Array with the settings.
+   *
    * @var array
    */
-  protected $storage;
+  protected $storage = array();
 
   /**
-   * @var Settings
+   * Singleton instance.
+   *
+   * @var \Drupal\Component\Utility\Settings
    */
-  static $singleton;
+  protected static $singleton;
 
   /**
+   * Returns the settings instance.
+   *
+   * A singleton is used because this class is used before the container is
+   * available.
+   *
+   * @return \Drupal\Component\Utility\Settings
+   */
+  static function getSingleton() {
+    return self::$singleton;
+  }
+
+  /**
+   * Constructor.
+   *
    * @param array $settings
+   *   Array with the settings.
    */
   function __construct(array $settings) {
     $this->storage = $settings;
