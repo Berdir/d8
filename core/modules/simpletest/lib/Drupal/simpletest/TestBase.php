@@ -919,7 +919,7 @@ abstract class TestBase {
     foreach (array(CONFIG_ACTIVE_DIRECTORY, CONFIG_STAGING_DIRECTORY) as $type) {
       // Assign the relative path to the global variable.
       $path = 'simpletest/' . substr($this->databasePrefix, 10) . '/config_' . $type;
-      $GLOBALS['config_directories'][$type]['path'] = $path;
+      $GLOBALS['config_directories'][$type] = $path;
       // Ensure the directory can be created and is writeable.
       if (!install_ensure_config_directory($type)) {
         return FALSE;

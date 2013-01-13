@@ -239,12 +239,8 @@ function drupal_install_config_directories() {
     $config_directories_hash = drupal_hash_base64(drupal_random_bytes(55));
     $settings['config_directories'] = array(
       'value' => array(
-        CONFIG_ACTIVE_DIRECTORY => array(
-          'path' => 'config_' . $config_directories_hash . '/active',
-        ),
-        CONFIG_STAGING_DIRECTORY => array(
-          'path' => 'config_' . $config_directories_hash . '/staging',
-        ),
+        CONFIG_ACTIVE_DIRECTORY => conf_path() . '/files/config_' . $config_directories_hash . '/active',
+        CONFIG_STAGING_DIRECTORY => conf_path() . '/files/config_' . $config_directories_hash . '/staging',
       ),
       'required' => TRUE,
     );
