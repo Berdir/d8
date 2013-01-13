@@ -45,7 +45,8 @@ class CacheDecoratorTest extends DiscoveryTestBase {
 
     // Use a non-db cache backend, so that we can use DiscoveryTestBase (which
     // extends UnitTestBase).
-    $conf['cache_classes'][$this->cacheBin] = 'Drupal\Core\Cache\MemoryBackend';
+    $this->container->register('cache.memory', 'Drupal\Core\Cache\MemoryBackendFactory');
+    $conf['cache_bin_' . $this->cacheBin] = 'cache.memory';
 
     // Create discovery objects to test.
     $this->emptyDiscovery = new StaticDiscovery();

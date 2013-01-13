@@ -133,7 +133,8 @@ abstract class DrupalUnitTestBase extends UnitTestBase {
     // Keep the container object around for tests.
     $this->container = $container;
     $container->register('lock', 'Drupal\Core\Lock\NullLockBackend');
-    $conf['cache_classes'] = array('cache' => 'Drupal\Core\Cache\MemoryBackend');
+    $this->container->register('cache.memory', 'Drupal\Core\Cache\MemoryBackendFactory');
+    $conf['cache_bin'] = 'cache.memory';
     $container
       ->register('config.storage', 'Drupal\Core\Config\FileStorage')
       ->addArgument($this->configDirectories[CONFIG_ACTIVE_DIRECTORY]);
@@ -147,7 +148,7 @@ abstract class DrupalUnitTestBase extends UnitTestBase {
       // away with a simple container holding the absolute bare minimum. When
       // a kernel is overridden then there's no need to re-register the keyvalue
       // service but when a test is happy with the superminimal container put
-      // together here, it still might a keyvalue storage for anything (for 
+      // together here, it still might a keyvalue storage for anything (for
       // eg. module_enable) using state() -- that's why a memory service was
       // added in the first place.
       $container

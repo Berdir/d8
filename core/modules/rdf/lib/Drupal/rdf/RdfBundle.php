@@ -22,7 +22,7 @@ class RdfBundle extends Bundle {
   public function build(ContainerBuilder $container) {
     // Site schema type cache.
     $container->register('cache.rdf.site_schema.types', 'Drupal\Core\Cache\CacheBackendInterface')
-      ->setFactoryClass('Drupal\Core\Cache\CacheFactory')
+      ->setFactoryService('cache')
       ->setFactoryMethod('get')
       ->addArgument('cache');
 

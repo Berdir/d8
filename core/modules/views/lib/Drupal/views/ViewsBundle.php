@@ -28,7 +28,7 @@ class ViewsBundle extends Bundle {
 
     $container
       ->register('cache.views_info', 'Drupal\Core\Cache\CacheBackendInterface')
-      ->setFactoryClass('Drupal\Core\Cache\CacheFactory')
+      ->setFactoryService('cache')
       ->setFactoryMethod('get')
       ->addArgument('views_info');
 

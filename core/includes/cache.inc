@@ -26,21 +26,7 @@ use Drupal\Core\Cache\CacheFactory;
  * @see Drupal\Core\Cache\CacheBackendInterface
  */
 function cache($bin = 'cache') {
-  // Use the advanced drupal_static() pattern, since this is called very often.
-  static $drupal_static_fast;
-  if (!isset($drupal_static_fast)) {
-    $drupal_static_fast['cache'] = &drupal_static(__FUNCTION__, array());
-  }
-  $cache_objects = &$drupal_static_fast['cache'];
-
-  // Temporary backwards compatibiltiy layer, allow old style prefixed cache
-  // bin names to be passed as arguments.
-  $bin = str_replace('cache_', '', $bin);
-
-  if (!isset($cache_objects[$bin])) {
-    $cache_objects[$bin] = CacheFactory::get($bin);
-  }
-  return $cache_objects[$bin];
+  return drupal_container()->get('cache')->get($bin);
 }
 
 /**
@@ -57,7 +43,7 @@ function cache($bin = 'cache') {
  *   The list of tags to delete cache items for.
  */
 function cache_delete_tags(array $tags) {
-  foreach (CacheFactory::getBackends() as $bin => $class) {
+  foreach (drupal_container()->get('cache')->getBackends() as $bin => $class) {
     cache($bin)->deleteTags($tags);
   }
 }
@@ -76,7 +62,7 @@ function cache_delete_tags(array $tags) {
  *   The list of tags to invalidate cache items for.
  */
 function cache_invalidate_tags(array $tags) {
-  foreach (CacheFactory::getBackends() as $bin => $class) {
+  foreach (drupal_container()->get('cache')->getBackends() as $bin => $class) {
     cache($bin)->invalidateTags($tags);
   }
 }

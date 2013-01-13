@@ -7,14 +7,14 @@
 
 namespace Drupal\Core\Cache;
 
-use Drupal\Core\Database\Database;
-use Drupal\Core\Database\DatabaseException;
+use Drupal\Core\Database\Connection;
 
 /**
  * Defines a default cache implementation.
  *
  * This is Drupal's default cache implementation. It uses the database to store
- * cached data. Each cache bin corresponds to a database table by the same name.
+ * cached data. Each cache bin corresponds to a database table prefixed by
+ * cache_.
  */
 class DatabaseBackend implements CacheBackendInterface {
 
@@ -24,12 +24,22 @@ class DatabaseBackend implements CacheBackendInterface {
   protected $bin;
 
   /**
-   * Constructs a DatabaseBackend object.
+   * A database connection object.
+   *
+   * @var \Drupal\Core\Database\Connection
+   */
+  protected $connection;
+
+  /**
+   * Constructs a new cache database backend.
    *
    * @param string $bin
-   *   The cache bin for which the object is created.
+   *   (optional) The cache bin that should be used.
+   * @param \Drupal\Core\Database\Connection $connection
+   *   The database connection that should be used.
    */
-  public function __construct($bin) {
+  function __construct($bin, Connection $connection) {
+    $this->connection = $connection;
     // All cache tables should be prefixed with 'cache_', except for the
     // default 'cache' bin.
     if ($bin != 'cache') {
@@ -58,7 +68,7 @@ class DatabaseBackend implements CacheBackendInterface {
     // is used here only due to the performance overhead we would incur
     // otherwise. When serving an uncached page, the overhead of using
     // ::select() is a much smaller proportion of the request.
-    $result = Database::getConnection()->query('SELECT cid, data, created, expire, serialized, tags, checksum_invalidations, checksum_deletions FROM {' . Database::getConnection()->escapeTable($this->bin) . '} WHERE cid IN (:cids)', array(':cids' => $cids));
+    $result = $this->connection->query('SELECT cid, data, created, expire, serialized, tags, checksum_invalidations, checksum_deletions FROM {' . $this->connection->escapeTable($this->bin) . '} WHERE cid IN (:cids)', array(':cids' => $cids));
     $cache = array();
     foreach ($result as $item) {
       $item = $this->prepareItem($item, $allow_invalid);
@@ -142,7 +152,7 @@ class DatabaseBackend implements CacheBackendInterface {
       $fields['serialized'] = 0;
     }
 
-    Database::getConnection()->merge($this->bin)
+    $this->connection->merge($this->bin)
       ->key(array('cid' => $cid))
       ->fields($fields)
       ->execute();
@@ -152,7 +162,7 @@ class DatabaseBackend implements CacheBackendInterface {
    * Implements Drupal\Core\Cache\CacheBackendInterface::delete().
    */
   public function delete($cid) {
-    Database::getConnection()->delete($this->bin)
+    $this->connection->delete($this->bin)
       ->condition('cid', $cid)
       ->execute();
   }
@@ -163,7 +173,7 @@ class DatabaseBackend implements CacheBackendInterface {
   public function deleteMultiple(array $cids) {
     // Delete in chunks when a large array is passed.
     do {
-      Database::getConnection()->delete($this->bin)
+      $this->connection->delete($this->bin)
         ->condition('cid', array_splice($cids, 0, 1000), 'IN')
         ->execute();
     }
@@ -177,7 +187,7 @@ class DatabaseBackend implements CacheBackendInterface {
     $tag_cache = &drupal_static('Drupal\Core\Cache\CacheBackendInterface::tagCache');
     foreach ($this->flattenTags($tags) as $tag) {
       unset($tag_cache[$tag]);
-      Database::getConnection()->merge('cache_tags')
+      $this->connection->merge('cache_tags')
         ->insertFields(array('deletions' => 1))
         ->expression('deletions', 'deletions + 1')
         ->key(array('tag' => $tag))
@@ -189,14 +199,14 @@ class DatabaseBackend implements CacheBackendInterface {
    * Implements Drupal\Core\Cache\CacheBackendInterface::deleteAll().
    */
   public function deleteAll() {
-    Database::getConnection()->truncate($this->bin)->execute();
+    $this->connection->truncate($this->bin)->execute();
   }
 
   /**
    * Implements Drupal\Core\Cache\CacheBackendInterface::deleteExpired().
    */
   public function deleteExpired() {
-    Database::getConnection()->delete($this->bin)
+    $this->connection->delete($this->bin)
       ->condition('expire', CacheBackendInterface::CACHE_PERMANENT, '<>')
       ->condition('expire', REQUEST_TIME, '<')
       ->execute();
@@ -215,7 +225,7 @@ class DatabaseBackend implements CacheBackendInterface {
   public function invalidateMultiple(array $cids) {
     // Update in chunks when a large array is passed.
     do {
-      Database::getConnection()->update($this->bin)
+      $this->connection->update($this->bin)
         ->fields(array('expire' => REQUEST_TIME - 1))
         ->condition('cid', array_splice($cids, 0, 1000), 'IN')
         ->execute();
@@ -230,7 +240,7 @@ class DatabaseBackend implements CacheBackendInterface {
     $tag_cache = &drupal_static('Drupal\Core\Cache\CacheBackendInterface::tagCache');
     foreach ($this->flattenTags($tags) as $tag) {
       unset($tag_cache[$tag]);
-      Database::getConnection()->merge('cache_tags')
+      $this->connection->merge('cache_tags')
         ->insertFields(array('invalidations' => 1))
         ->expression('invalidations', 'invalidations + 1')
         ->key(array('tag' => $tag))
@@ -242,7 +252,7 @@ class DatabaseBackend implements CacheBackendInterface {
    * Implements Drupal\Core\Cache\CacheBackendInterface::invalidateAll().
    */
   public function invalidateAll() {
-    Database::getConnection()->update($this->bin)
+    $this->connection->update($this->bin)
       ->fields(array('expire' => REQUEST_TIME - 1))
       ->execute();
   }
@@ -303,7 +313,7 @@ class DatabaseBackend implements CacheBackendInterface {
 
     $query_tags = array_diff($flat_tags, array_keys($tag_cache));
     if ($query_tags) {
-      $db_tags = Database::getConnection()->query('SELECT tag, invalidations, deletions FROM {cache_tags} WHERE tag IN (:tags)', array(':tags' => $query_tags))->fetchAllAssoc('tag', \PDO::FETCH_ASSOC);
+      $db_tags = $this->connection->query('SELECT tag, invalidations, deletions FROM {cache_tags} WHERE tag IN (:tags)', array(':tags' => $query_tags))->fetchAllAssoc('tag', \PDO::FETCH_ASSOC);
       $tag_cache += $db_tags;
 
       // Fill static cache with empty objects for tags not found in the database.
@@ -323,7 +333,7 @@ class DatabaseBackend implements CacheBackendInterface {
    */
   public function isEmpty() {
     $this->garbageCollection();
-    $query = Database::getConnection()->select($this->bin);
+    $query = $this->connection->select($this->bin);
     $query->addExpression('1');
     $result = $query->range(0, 1)
       ->execute()

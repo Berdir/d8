@@ -346,6 +346,8 @@ function install_begin_request(&$install_state) {
     // (as opposed to the cache backend) so we can afford having a null
     // implementation here.
     $container->register('lock', 'Drupal\Core\Lock\NullLockBackend');
+    $container->register('cache', 'Drupal\Core\Cache\CacheFactory')
+      ->addMethodCall('setContainer', array(new Reference('service_container')));
     drupal_container($container);
   }
 
@@ -359,7 +361,8 @@ function install_begin_request(&$install_state) {
   drupal_load('module', 'system');
 
   require_once DRUPAL_ROOT . '/core/includes/cache.inc';
-  $conf['cache_classes'] = array('cache' => 'Drupal\Core\Cache\MemoryBackend');
+  drupal_container()->set('cache.memory', new \Drupal\Core\Cache\MemoryBackendFactory());
+  $conf['cache_bin'] = 'cache.memory';
 
   // Prepare for themed output. We need to run this at the beginning of the
   // page request to avoid a different theme accidentally getting set. (We also

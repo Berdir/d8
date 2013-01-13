@@ -808,8 +808,9 @@ abstract class WebTestBase extends TestBase {
     $batch = &batch_get();
     $batch = $this->originalBatch;
 
-    // Revert install_begin_request() cache service overrides.
-    unset($conf['cache_classes']);
+    // Revert install_begin_request() cache and lock service overrides.
+    unset($conf['cache_bin']);
+    unset($conf['lock_backend']);
 
     // Set path variables.
 

@@ -41,7 +41,7 @@ class CoreBundle extends Bundle {
     // @todo Replace this with a cache.factory service plus 'config' argument.
     $container
       ->register('cache.config', 'Drupal\Core\Cache\CacheBackendInterface')
-      ->setFactoryClass('Drupal\Core\Cache\CacheFactory')
+      ->setFactoryService('cache')
       ->setFactoryMethod('get')
       ->addArgument('config');
 
@@ -50,6 +50,17 @@ class CoreBundle extends Bundle {
       ->addArgument(new Reference('config.cachedstorage.storage'))
       ->addArgument(new Reference('cache.config'));
 
+    // Register the cache factory.
+    $container->register('cache', 'Drupal\Core\Cache\CacheFactory')
+      ->addMethodCall('setContainer', array(new Reference('service_container')));
+    $container
+      ->register('cache.database', 'Drupal\Core\Cache\DatabaseBackendFactory')
+      ->addArgument(new Reference('database'));
+
+    // Register configuration object factory.
+    $container->register('config.subscriber.globalconf', 'Drupal\Core\EventSubscriber\ConfigGlobalOverrideSubscriber');
+    $container->register('dispatcher', 'Symfony\Component\EventDispatcher\EventDispatcher')
+      ->addMethodCall('addSubscriber', array(new Reference('config.subscriber.globalconf')));
     $container->register('config.factory', 'Drupal\Core\Config\ConfigFactory')
       ->addArgument(new Reference('config.storage'))
       ->addArgument(new Reference('event_dispatcher'))
@@ -141,7 +152,7 @@ class CoreBundle extends Bundle {
 
     $container
       ->register('cache.path', 'Drupal\Core\Cache\CacheBackendInterface')
-      ->setFactoryClass('Drupal\Core\Cache\CacheFactory')
+      ->setFactoryService('cache')
       ->setFactoryMethod('get')
       ->addArgument('path');
 

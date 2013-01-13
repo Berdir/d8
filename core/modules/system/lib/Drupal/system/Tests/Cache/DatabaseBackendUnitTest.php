@@ -8,6 +8,7 @@
 namespace Drupal\system\Tests\Cache;
 
 use Drupal\Core\Cache\DatabaseBackend;
+use Drupal\Core\Database\Database;
 
 /**
  * Tests DatabaseBackend using GenericCacheBackendUnitTestBase.
@@ -29,7 +30,7 @@ class DatabaseBackendUnitTest extends GenericCacheBackendUnitTestBase {
    *   A new DatabaseBackend object.
    */
   protected function createCacheBackend($bin) {
-    return new DatabaseBackend($bin);
+    return new DatabaseBackend($bin, Database::getConnection());
   }
 
   /**
