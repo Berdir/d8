@@ -2195,6 +2195,17 @@ function system_update_8045() {
 }
 
 /**
+ * Moves drupal_private_key variable to state.
+ *
+ * @ingroup config_upgrade
+ */
+function system_update_8046() {
+  update_variables_to_state(array(
+    'drupal_private_key' => 'system.private_key',
+  ));
+}
+
+/**
  * @} End of "defgroup updates-7.x-to-8.x".
  * The next series of updates should start at 9000.
  */
