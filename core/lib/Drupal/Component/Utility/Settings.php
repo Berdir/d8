@@ -10,21 +10,21 @@ namespace Drupal\Component\Utility;
 /**
  * Read only settings that are initialized with the class.
  */
-class Settings {
+final class Settings {
 
   /**
    * Array with the settings.
    *
    * @var array
    */
-  protected $storage = array();
+  private $storage = array();
 
   /**
    * Singleton instance.
    *
    * @var \Drupal\Component\Utility\Settings
    */
-  protected static $singleton;
+  private static $instance;
 
   /**
    * Returns the settings instance.
@@ -34,8 +34,8 @@ class Settings {
    *
    * @return \Drupal\Component\Utility\Settings
    */
-  static function getSingleton() {
-    return self::$singleton;
+  public static function getSingleton() {
+    return self::$instance;
   }
 
   /**
@@ -46,7 +46,7 @@ class Settings {
    */
   function __construct(array $settings) {
     $this->storage = $settings;
-    self::$singleton = $this;
+    self::$instance = $this;
   }
 
   /**
