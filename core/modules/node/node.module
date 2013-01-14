@@ -2095,7 +2095,7 @@ function node_feed($nids = FALSE, $channel = array()) {
   $rss_config = config('system.rss');
 
   if ($nids === FALSE) {
-    $nids = db_select('node', 'n')
+    $nids = db_select('nod', 'n')
       ->fields('n', array('nid', 'created'))
       ->condition('n.promote', 1)
       ->condition('n.status', 1)

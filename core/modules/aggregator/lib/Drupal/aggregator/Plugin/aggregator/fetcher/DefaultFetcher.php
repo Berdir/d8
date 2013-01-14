@@ -11,6 +11,7 @@ use Drupal\aggregator\Plugin\FetcherInterface;
 use Drupal\Core\Annotation\Plugin;
 use Drupal\Core\Annotation\Translation;
 use Guzzle\Http\Exception\BadResponseException;
+use Guzzle\Http\Exception\RequestException;
 
 /**
  * Defines a default fetcher implementation.
@@ -47,12 +48,23 @@ class DefaultFetcher implements FetcherInterface {
       $feed->modified = strtotime($response->getLastModified());
       $feed->http_headers = $response->getHeaders();
 
+      // Update the feed URL in case of 301 redirect.
+      if ($response->getStatusCode() == 301 && $response->getPreviousResponse()) {
+        if ($location = $response->getPreviousResponse()->getLocation()) {
+          $feed->url = $location;
+        }
+      }
       return TRUE;
     }
     catch (BadResponseException $e) {
       $response = $e->getResponse();
       watchdog('aggregator', 'The feed from %site seems to be broken due to "%error".', array('%site' => $feed->title, '%error' => $response->getStatusCode() . ' ' . $response->getReasonPhrase()), WATCHDOG_WARNING);
       drupal_set_message(t('The feed from %site seems to be broken because of error "%error".', array('%site' => $feed->title, '%error' => $response->getStatusCode() . ' ' . $response->getReasonPhrase())));
+      return FALSE;
+    }
+    catch (RequestException $e) {
+      watchdog('aggregator', 'The feed from %site seems to be broken due to "%error".', array('%site' => $feed->title, '%error' => $e->getMessage()), WATCHDOG_WARNING);
+      drupal_set_message(t('The feed from %site seems to be broken because of error "%error".', array('%site' => $feed->title, '%error' => $e->getMessage())));
       return FALSE;
     }
   }
