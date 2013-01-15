@@ -25,7 +25,11 @@ class RegisterServicesForTerminationPass implements CompilerPassInterface {
 
     $definition = $container->getDefinition('kernel_terminate_subscriber');
 
-    foreach ($container->findTaggedServiceIds('needs_termination') as $id => $attributes) {
+    // Reverse the order of tagged services to terminate them in the opposite
+    // order of which they are defined.
+    // @todo: Does this need a better system to detect references?
+    $services = array_reverse($container->findTaggedServiceIds('needs_termination'));
+    foreach ($services as $id => $attributes) {
 
       // We must assume that the class value has been correcly filled, even if
       // the service is created by a factory.

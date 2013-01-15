@@ -151,10 +151,10 @@ class DatabaseStorageExpirable extends DatabaseStorage implements KeyValueStoreE
   }
 
   /**
-   * Implements Drupal\Core\TerminationInterface::terminate().
+   * Implements \Drupal\Core\TerminationInterface::terminate().
    */
   public function terminate() {
-    if ($this->needsGarbageCollection && $this->connection->schema()->tableExists($this->table)) {
+    if ($this->needsGarbageCollection) {
       $this->garbageCollection();
     }
   }

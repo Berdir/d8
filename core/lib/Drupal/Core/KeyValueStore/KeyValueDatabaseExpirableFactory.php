@@ -42,7 +42,7 @@ class KeyValueDatabaseExpirableFactory extends KeyValueDatabaseFactory implement
   }
 
   /**
-   * Implements Drupal\Core\TerminationInterface::terminate().
+   * Implements \Drupal\Core\TerminationInterface::terminate().
    */
   public function terminate() {
     foreach ($this->storages as $storage) {

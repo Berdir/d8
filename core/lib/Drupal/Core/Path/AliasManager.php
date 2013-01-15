@@ -22,7 +22,7 @@ class AliasManager implements AliasManagerInterface {
   /**
    * The Key/Value Store to use for state
    *
-   * @var \Drupal\Core\KeyValueStore\DatabaseStorage
+   * @var \Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface
    */
   protected $state;
 
