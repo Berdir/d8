@@ -8,7 +8,7 @@
 namespace Drupal\Core\Path;
 
 use Drupal\Core\Database\Connection;
-use \Drupal\Core\KeyValueStore\KeyValueStoreInterface;
+use Drupal\Core\KeyValueStore\KeyValueFactory;
 
 class AliasManager implements AliasManagerInterface {
 
@@ -22,7 +22,7 @@ class AliasManager implements AliasManagerInterface {
   /**
    * The Key/Value Store to use for state
    *
-   * @var \Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface
+   * @var \Drupal\Core\KeyValueStore\DatabaseStorage
    */
   protected $state;
 

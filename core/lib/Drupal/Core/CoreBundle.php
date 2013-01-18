@@ -110,15 +110,6 @@ class CoreBundle extends Bundle {
     // Register the EntityManager.
     $container->register('plugin.manager.entity', 'Drupal\Core\Entity\EntityManager');
 
-    // Register the expirable KeyValueStore factory.
-    $container
-      ->register('keyvalue.expirable', 'Drupal\Core\KeyValueStore\KeyValueExpirableFactory')
-      ->addArgument(new Reference('service_container'));
-    $container
-      ->register('keyvalue.expirable.database', 'Drupal\Core\KeyValueStore\KeyValueDatabaseExpirableFactory')
-      ->addArgument(new Reference('database'))
-      ->addTag('needs_termination');
-
     // The 'request' scope and service enable services to depend on the Request
     // object and get reconstructed when the request object changes (e.g.,
     // during a subrequest).
