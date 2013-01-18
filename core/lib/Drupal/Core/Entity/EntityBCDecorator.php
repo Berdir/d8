@@ -72,19 +72,29 @@ class EntityBCDecorator implements IteratorAggregate, EntityInterface {
       // avoid them becoming out of sync.
       unset($this->decorated->fields[$name]);
     }
-    // Allow accessing field values in entity default languages other than
-    // LANGUAGE_DEFAULT by mapping the values to LANGUAGE_DEFAULT.
-    $langcode = $this->decorated->language()->langcode;
-    if ($langcode != LANGUAGE_DEFAULT && isset($this->decorated->values[$name]) && is_array($this->decorated->values[$name])) {
-      if (isset($this->decorated->values[$name][LANGUAGE_DEFAULT]) && !isset($this->decorated->values[$name][$langcode])) {
-        $this->decorated->values[$name][$langcode] = &$this->decorated->values[$name][LANGUAGE_DEFAULT];
+    // When accessing values for entity properties that have been converted to
+    // an entity field, provide direct access to the plain value. This makes it
+    // possible to use the BC-decorator with properties; e.g., $node->title.
+    if (!field_info_field($name) && $this->decorated->getPropertyDefinition($name)) {
+      if (!isset($this->decorated->values[$name][LANGUAGE_DEFAULT][0]['value'])) {
+        $this->decorated->values[$name][LANGUAGE_DEFAULT][0]['value'] = NULL;
       }
+      return $this->decorated->values[$name][LANGUAGE_DEFAULT][0]['value'];
     }
-
-    if (!isset($this->decorated->values[$name])) {
-      $this->decorated->values[$name] = NULL;
+    else {
+      // Allow accessing field values in entity default languages other than
+      // LANGUAGE_DEFAULT by mapping the values to LANGUAGE_DEFAULT.
+      $langcode = $this->decorated->language()->langcode;
+      if ($langcode != LANGUAGE_DEFAULT && isset($this->decorated->values[$name]) && is_array($this->decorated->values[$name])) {
+        if (isset($this->decorated->values[$name][LANGUAGE_DEFAULT]) && !isset($this->decorated->values[$name][$langcode])) {
+          $this->decorated->values[$name][$langcode] = &$this->decorated->values[$name][LANGUAGE_DEFAULT];
+        }
+      }
+      if (!isset($this->decorated->values[$name])) {
+        $this->decorated->values[$name] = NULL;
+      }
+      return $this->decorated->values[$name];
     }
-    return $this->decorated->values[$name];
   }
 
   /**
@@ -93,17 +103,25 @@ class EntityBCDecorator implements IteratorAggregate, EntityInterface {
    * Directly writes to the plain field values, as done by Drupal 7.
    */
   public function __set($name, $value) {
-    if (is_array($value) && $definition = $this->decorated->getPropertyDefinition($name)) {
-      // If field API sets a value with a langcode in entity language, move it
-      // to LANGUAGE_DEFAULT.
-      foreach ($value as $langcode => $data) {
-        if ($langcode != LANGUAGE_DEFAULT && $langcode == $this->decorated->language()->langcode) {
-          $value[LANGUAGE_DEFAULT] = $data;
-          unset($value[$langcode]);
+    // When updating values for entity properties that have been converted to
+    // an entity field, directly write to the plain value. This makes it
+    // possible to use the BC-decorator with properties; e.g., $node->title.
+    if (!field_info_field($name) && $this->decorated->getPropertyDefinition($name)) {
+      $this->decorated->values[$name][LANGUAGE_DEFAULT][0]['value'] = $value;
+    }
+    else {
+      if (is_array($value) && $definition = $this->decorated->getPropertyDefinition($name)) {
+        // If field API sets a value with a langcode in entity language, move it
+        // to LANGUAGE_DEFAULT.
+        foreach ($value as $langcode => $data) {
+          if ($langcode != LANGUAGE_DEFAULT && $langcode == $this->decorated->language()->langcode) {
+            $value[LANGUAGE_DEFAULT] = $data;
+            unset($value[$langcode]);
+          }
         }
       }
+      $this->decorated->values[$name] = $value;
     }
-    $this->decorated->values[$name] = $value;
     unset($this->decorated->fields[$name]);
   }
 
