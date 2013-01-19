@@ -22,25 +22,27 @@ class NodeStorageController extends DatabaseStorageControllerNG {
    * Overrides Drupal\Core\Entity\DatabaseStorageController::create().
    */
   public function create(array $values) {
-    $node = parent::create($values);
-
-    // Set the created time to now.
-    if (empty($node->created)) {
-      $node->created = REQUEST_TIME;
+    // @todo Handle this through property defaults.
+    if (empty($values['created'])) {
+      $values['created'] = REQUEST_TIME;
     }
-
-    return $node;
+    return parent::create($values);
   }
 
   /**
-   * Overrides Drupal\Core\Entity\DatabaseStorageController::attachLoad().
+   * Overrides Drupal\Core\Entity\DatabaseStorageControllerNG::attachLoad().
    */
   protected function attachLoad(&$nodes, $load_revision = FALSE) {
+    $nodes = $this->mapFromStorageRecords($nodes, $load_revision);
+
     // Create an array of nodes for each content type and pass this to the
     // object type specific callback.
+    // To preserve backward-compatibility we replace the mapped nodes with their
+    // BC decorators.
     $typed_nodes = array();
     foreach ($nodes as $id => $entity) {
-      $typed_nodes[$entity->type][$id] = $entity;
+      $nodes[$id] = $entity->getBCEntity();
+      $typed_nodes[$entity->bundle()][$id] = $nodes[$id];
     }
 
     // Call object type specific callbacks on each typed array of nodes.
@@ -163,4 +165,105 @@ class NodeStorageController extends DatabaseStorageControllerNG {
       ->condition('nid', $ids, 'IN')
       ->execute();
   }
+
+  /**
+   * Overrides \Drupal\Core\Entity\DataBaseStorageControllerNG::basePropertyDefinitions().
+   */
+  public function baseFieldDefinitions() {
+    $properties['nid'] = array(
+      'label' => t('Node ID'),
+      'description' => t('The node ID.'),
+      'type' => 'integer_field',
+      'read-only' => TRUE,
+    );
+    $properties['uuid'] = array(
+      'label' => t('UUID'),
+      'description' => t('The node UUID.'),
+      'type' => 'string_field',
+      'read-only' => TRUE,
+    );
+    $properties['vid'] = array(
+      'label' => t('Revision ID'),
+      'description' => t('The node revision ID.'),
+      'type' => 'integer_field',
+      'read-only' => TRUE,
+    );
+    $properties['type'] = array(
+      'label' => t('Type'),
+      'description' => t('The node type.'),
+      'type' => 'string_field',
+      'read-only' => TRUE,
+    );
+    $properties['langcode'] = array(
+      'label' => t('Language code'),
+      'description' => t('The node language code.'),
+      'type' => 'language_field',
+    );
+    $properties['title'] = array(
+      'label' => t('Title'),
+      'description' => t('The title of this node, always treated as non-markup plain text.'),
+      'type' => 'string_field',
+    );
+    $properties['uid'] = array(
+      'label' => t('User ID'),
+      'description' => t('The user ID of the node author.'),
+      'type' => 'entityreference_field',
+      'settings' => array('entity type' => 'user'),
+    );
+    $properties['status'] = array(
+      'label' => t('Publishing status'),
+      'description' => t('A boolean indicating whether the node is published.'),
+      'type' => 'boolean_field',
+    );
+    $properties['created'] = array(
+      'label' => t('Created'),
+      'description' => t('The time that the node was created.'),
+      'type' => 'integer_field',
+    );
+    $properties['changed'] = array(
+      'label' => t('Changed'),
+      'description' => t('The time that the node was last edited.'),
+      'type' => 'integer_field',
+    );
+    $properties['comment'] = array(
+      'label' => t('Comment'),
+      'description' => t('Whether comments are allowed on this node: 0 = no, 1 = closed (read only), 2 = open (read/write).'),
+      'type' => 'integer_field',
+    );
+    $properties['promote'] = array(
+      'label' => t('Promote'),
+      'description' => t('A boolean indicating whether the node should be displayed on the front page.'),
+      'type' => 'boolean_field',
+    );
+    $properties['sticky'] = array(
+      'label' => t('Sticky'),
+      'description' => t('A boolean indicating whether the node should be displayed at the top of lists in which it appears.'),
+      'type' => 'boolean_field',
+    );
+    $properties['tnid'] = array(
+      'label' => t('Translation set ID'),
+      'description' => t('The translation set id for this node, which equals the node id of the source post in each set.'),
+      'type' => 'integer_field',
+    );
+    $properties['translate'] = array(
+      'label' => t('Translate'),
+      'description' => t('A boolean indicating whether this translation page needs to be updated.'),
+      'type' => 'boolean_field',
+    );
+    $properties['revision_timestamp'] = array(
+      'label' => t('Revision timestamp'),
+      'description' => t('The time that the current revision was created.'),
+      'type' => 'integer_field',
+      'queryable' => FALSE,
+    );
+    $properties['revision_uid'] = array(
+      'label' => t('Revision user ID'),
+      'description' => t('The user ID of the author of the current revision.'),
+      'type' => 'entityreference_field',
+      'settings' => array('entity type' => 'user'),
+      'queryable' => FALSE,
+    );
+    return $properties;
+  }
+
 }

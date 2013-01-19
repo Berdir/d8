@@ -141,11 +141,14 @@ class DatabaseStorageControllerNG extends DatabaseStorageController {
    * Added mapping from storage records to entities.
    */
   protected function attachLoad(&$queried_entities, $load_revision = FALSE) {
-    // Now map the record values to the according entity properties and
-    // activate compatibility mode.
-    $queried_entities = $this->mapFromStorageRecords($queried_entities, $load_revision);
+    // Now map the record values to the according entity properties, but only if
+    // this did not already happen in an overridden method invoking this.
+    $record = reset($queried_entities);
+    if (is_array($record)) {
+      $queried_entities = $this->mapFromStorageRecords($queried_entities, $load_revision);
+    }
 
-    // Attach fields.
+    // Activate backward-compatibility mode to attach fields.
     if ($this->entityInfo['fieldable']) {
       // Prepare BC compatible entities for field API.
       $bc_entities = array();
