@@ -7,7 +7,7 @@
 
 namespace Drupal\node;
 
-use Drupal\Core\Entity\DatabaseStorageController;
+use Drupal\Core\Entity\DatabaseStorageControllerNG;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
@@ -16,7 +16,7 @@ use Drupal\Core\Entity\EntityInterface;
  * This extends the Drupal\Core\Entity\DatabaseStorageController class, adding
  * required special handling for node entities.
  */
-class NodeStorageController extends DatabaseStorageController {
+class NodeStorageController extends DatabaseStorageControllerNG {
 
   /**
    * Overrides Drupal\Core\Entity\DatabaseStorageController::create().
