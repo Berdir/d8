@@ -112,14 +112,7 @@ class EntityNG extends Entity {
    * Implements Drupal\Core\Entity\EntityInterface::id().
    */
   public function id() {
-    return $this->{$this->entityInfo['entity_keys']['id']}->value;
-  }
-
-  /**
-   * Overrides Drupal\Core\Entity\Entity::getRevisionId().
-   */
-  public function getRevisionId() {
-    return !empty($this->entity_info['entity_keys']['revision']) ? $this->{$this->entity_info['entity_keys']['revision']}->value : NULL;
+    return $this->id->value;
   }
 
   /**

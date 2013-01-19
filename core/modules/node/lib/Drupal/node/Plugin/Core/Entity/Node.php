@@ -242,4 +242,18 @@ class Node extends EntityNG implements ContentEntityInterface {
     unset($this->revision_uid);
   }
 
+  /**
+   * Implements Drupal\Core\Entity\EntityInterface::id().
+   */
+  public function id() {
+    return $this->get('nid')->value;
+  }
+
+  /**
+   * Overrides Drupal\Core\Entity\Entity::getRevisionId().
+   */
+  public function getRevisionId() {
+    return $this->get('vid')->value;
+  }
+
 }
