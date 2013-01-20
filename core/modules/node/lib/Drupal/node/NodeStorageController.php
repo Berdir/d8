@@ -32,17 +32,24 @@ class NodeStorageController extends DatabaseStorageControllerNG {
   /**
    * Overrides Drupal\Core\Entity\DatabaseStorageControllerNG::attachLoad().
    */
-  protected function attachLoad(&$nodes, $load_revision = FALSE) {
-    $nodes = $this->mapFromStorageRecords($nodes, $load_revision);
+  protected function attachLoad(&$queried_entities, $load_revision = FALSE) {
+    $queried_entities = $this->mapFromStorageRecords($queried_entities, $load_revision);
 
     // Create an array of nodes for each content type and pass this to the
-    // object type specific callback.
-    // To preserve backward-compatibility we replace the mapped nodes with their
-    // BC decorators.
+    // object type specific callback. To preserve backward-compatibility we
+    // pass on BC decorators to node-specific hooks, while we pass on the
+    // regular entity objects else.
     $typed_nodes = array();
-    foreach ($nodes as $id => $entity) {
+    foreach ($queried_entities as $id => $entity) {
       $nodes[$id] = $entity->getBCEntity();
       $typed_nodes[$entity->bundle()][$id] = $nodes[$id];
+    }
+
+    if ($load_revision) {
+      field_attach_load_revision($this->entityType, $nodes);
+    }
+    else {
+      field_attach_load($this->entityType, $nodes);
     }
 
     // Call object type specific callbacks on each typed array of nodes.
@@ -57,7 +64,19 @@ class NodeStorageController extends DatabaseStorageControllerNG {
     // hook_node_load(), containing a list of node types that were loaded.
     $argument = array_keys($typed_nodes);
     $this->hookLoadArguments = array($argument);
-    parent::attachLoad($nodes, $load_revision);
+
+    // Call hook_entity_load().
+    foreach (module_implements('entity_load') as $module) {
+      $function = $module . '_entity_load';
+      $function($queried_entities, $this->entityType);
+    }
+    // Call hook_TYPE_load(). The first argument for hook_TYPE_load() are
+    // always the queried entities, followed by additional arguments set in
+    // $this->hookLoadArguments.
+    $args = array_merge(array($nodes), $this->hookLoadArguments);
+    foreach (module_implements($this->entityType . '_load') as $module) {
+      call_user_func_array($module . '_' . $this->entityType . '_load', $args);
+    }
   }
 
   /**
@@ -88,7 +107,23 @@ class NodeStorageController extends DatabaseStorageControllerNG {
       node_invoke($node->getBCEntity(), 'delete');
     }
 
-    parent::invokeHook($hook, $node->getBCEntity());
+    // Inline parent::invokeHook() to pass on BC-entities to node-specific
+    // hooks.
+
+    $function = 'field_attach_' . $hook;
+    // @todo: field_attach_delete_revision() is named the wrong way round,
+    // consider renaming it.
+    if ($function == 'field_attach_revision_delete') {
+      $function = 'field_attach_delete_revision';
+    }
+    if (!empty($this->entityInfo['fieldable']) && function_exists($function)) {
+      $function($node->getBCEntity());
+    }
+
+    // Invoke the hook.
+    module_invoke_all($this->entityType . '_' . $hook, $node->getBCEntity());
+    // Invoke the respective entity-level hook.
+    module_invoke_all('entity_' . $hook, $node, $this->entityType);
   }
 
   /**
@@ -113,10 +148,10 @@ class NodeStorageController extends DatabaseStorageControllerNG {
       // @todo: Make the {node_revision}.log column nullable so that we can
       // remove this check.
       if (!isset($record->log)) {
-        $record->log = '';
+        $record->log->value = '';
       }
     }
-    elseif (!isset($record->log) || $record->log === '') {
+    elseif (!isset($record->log) || $record->log->value === '') {
       // If we are updating an existing node without adding a new revision, we
       // need to make sure $node->log is unset whenever it is empty. As long as
       // $node->log is unset, drupal_write_record() will not attempt to update
@@ -127,15 +162,15 @@ class NodeStorageController extends DatabaseStorageControllerNG {
     }
 
     if ($entity->isNewRevision()) {
-      $record->timestamp = REQUEST_TIME;
-      $record->uid = isset($record->revision_uid) ? $record->revision_uid : $GLOBALS['user']->uid;
+      $record->timestamp->value = REQUEST_TIME;
+      $record->uid->value = isset($record->revision_uid) ? $record->revision_uid->value : $GLOBALS['user']->uid;
     }
   }
 
   /**
    * Overrides Drupal\Core\Entity\DatabaseStorageController::postSave().
    */
-  function postSave(EntityInterface $node, $update) {
+  public function postSave(EntityInterface $node, $update) {
     // Update the node access table for this node, but only if it is the
     // default revision. There's no need to delete existing records if the node
     // is new.
@@ -143,10 +178,11 @@ class NodeStorageController extends DatabaseStorageControllerNG {
       node_access_acquire_grants($node->getBCEntity(), $update);
     }
   }
+
   /**
    * Overrides Drupal\Core\Entity\DatabaseStorageController::preDelete().
    */
-  function preDelete($entities) {
+  public function preDelete($entities) {
     if (module_exists('search')) {
       foreach ($entities as $id => $entity) {
         search_reindex($entity->nid->value, 'node');
