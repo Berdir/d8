@@ -923,7 +923,12 @@ function node_invoke($node, $hook, $a2 = NULL, $a3 = NULL, $a4 = NULL) {
  * @see Drupal\Core\Entity\Query\EntityQueryInterface
  */
 function node_load_multiple(array $nids = NULL, $reset = FALSE) {
-  return entity_load_multiple('node', $nids, $reset);
+  $entities = entity_load_multiple('node', $nids, $reset);
+  // Return BC-entities.
+  foreach ($entities as $id => $entity) {
+    $entities[$id] = $entity->getBCEntity();
+  }
+  return $entities;
 }
 
 /**
@@ -939,7 +944,7 @@ function node_load_multiple(array $nids = NULL, $reset = FALSE) {
  *   A fully-populated node entity, or FALSE if the node is not found.
  */
 function node_load($nid = NULL, $reset = FALSE) {
-  return entity_load('node', $nid, $reset);
+  return entity_load('node', $nid, $reset)->getBCEntity();
 }
 
 /**
