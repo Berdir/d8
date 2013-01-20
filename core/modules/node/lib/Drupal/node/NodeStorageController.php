@@ -26,7 +26,7 @@ class NodeStorageController extends DatabaseStorageControllerNG {
     if (empty($values['created'])) {
       $values['created'] = REQUEST_TIME;
     }
-    return parent::create($values)->getBCEntity();
+    return parent::create($values);
   }
 
   /**
