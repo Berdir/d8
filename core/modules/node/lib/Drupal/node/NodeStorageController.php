@@ -26,7 +26,7 @@ class NodeStorageController extends DatabaseStorageControllerNG {
     if (empty($values['created'])) {
       $values['created'] = REQUEST_TIME;
     }
-    return parent::create($values);
+    return parent::create($values)->getBCEntity();
   }
 
   /**
@@ -80,15 +80,15 @@ class NodeStorageController extends DatabaseStorageControllerNG {
    */
   protected function invokeHook($hook, EntityInterface $node) {
     if ($hook == 'insert' || $hook == 'update') {
-      node_invoke($node, $hook);
+      node_invoke($node->getBCEntity(), $hook);
     }
     else if ($hook == 'predelete') {
       // 'delete' is triggered in 'predelete' is here to preserve hook ordering
       // from Drupal 7.
-      node_invoke($node, 'delete');
+      node_invoke($node->getBCEntity(), 'delete');
     }
 
-    parent::invokeHook($hook, $node);
+    parent::invokeHook($hook, $node->getBCEntity());
   }
 
   /**
@@ -140,7 +140,7 @@ class NodeStorageController extends DatabaseStorageControllerNG {
     // default revision. There's no need to delete existing records if the node
     // is new.
     if ($node->isDefaultRevision()) {
-      node_access_acquire_grants($node, $update);
+      node_access_acquire_grants($node->getBCEntity(), $update);
     }
   }
   /**
@@ -149,7 +149,7 @@ class NodeStorageController extends DatabaseStorageControllerNG {
   function preDelete($entities) {
     if (module_exists('search')) {
       foreach ($entities as $id => $entity) {
-        search_reindex($entity->nid, 'node');
+        search_reindex($entity->nid->value, 'node');
       }
     }
   }

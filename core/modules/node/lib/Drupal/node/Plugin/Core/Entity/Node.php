@@ -256,4 +256,14 @@ class Node extends EntityNG implements ContentEntityInterface {
     return $this->get('vid')->value;
   }
 
+ /**
+   * Overrides EntityNG::getBCEntity().
+   */
+  public function getBCEntity() {
+    if (!isset($this->bcEntity)) {
+      $this->bcEntity = new NodeBCDecorator($this);
+    }
+    return $this->bcEntity;
+  }
+
 }

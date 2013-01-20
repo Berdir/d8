@@ -176,7 +176,7 @@ abstract class WebTestBase extends TestBase {
    */
   function drupalGetNodeByTitle($title, $reset = FALSE) {
     if ($reset) {
-      entity_get_controller('node')->resetCache();
+      drupal_container()->get('plugin.manager.entity')->getStorageController('node')->resetCache();
     }
     $nodes = entity_load_multiple_by_properties('node', array('title' => $title));
     // Load the first node returned from the database.
@@ -281,8 +281,8 @@ abstract class WebTestBase extends TestBase {
 
     // Small hack to link revisions to our test user.
     db_update('node_revision')
-      ->fields(array('uid' => $node->uid))
-      ->condition('vid', $node->vid)
+      ->fields(array('uid' => $node->uid->value))
+      ->condition('vid', $node->vid->value)
       ->execute();
     return $node;
   }

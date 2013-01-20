@@ -119,7 +119,7 @@ class DefaultViewsTest extends WebTestBase {
    */
   public function testDefaultViews() {
     // Get all default views.
-    $controller = entity_get_controller('view');
+    $controller = $this->container->get('plugin.manager.entity')->getStorageController('view');
     $views = $controller->load();
 
     foreach ($views as $name => $view_storage) {
@@ -133,7 +133,7 @@ class DefaultViewsTest extends WebTestBase {
           $view->preExecute($this->viewArgMap[$name]);
         }
 
-        $this->assert(TRUE, format_string('View @view will be executed.', array('@view' => $view->storage->get('name'))));
+        $this->assert(TRUE, format_string('View @view will be executed.', array('@view' => $view->storage->id())));
         $view->execute();
 
         $tokens = array('@name' => $name, '@display_id' => $display_id);

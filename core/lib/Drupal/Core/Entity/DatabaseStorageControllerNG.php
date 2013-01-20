@@ -439,7 +439,9 @@ class DatabaseStorageControllerNG extends DatabaseStorageController {
   protected function mapToRevisionStorageRecord(EntityInterface $entity) {
     $record = new \stdClass();
     foreach ($this->entityInfo['schema_fields_sql']['revision_table'] as $name) {
-      $record->$name = $entity->$name->value;
+      if (isset($entity->$name->value)) {
+        $record->$name = $entity->$name->value;
+      }
     }
     return $record;
   }
