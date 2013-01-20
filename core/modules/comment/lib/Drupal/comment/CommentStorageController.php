@@ -57,7 +57,7 @@ class CommentStorageController extends DatabaseStorageControllerNG {
   public function create(array $values) {
     // We have to determine the bundle first.
     if (empty($values['node_type']) && !empty($values['nid'])) {
-      $node = node_load($values['nid']);
+      $node = node_load(is_object($values['nid']) ? $values['nid']->value : $values['nid']);
       $values['node_type'] = 'comment_node_' . $node->type;
     }
     $comment = new $this->entityClass(array(), $this->entityType, $values['node_type']);

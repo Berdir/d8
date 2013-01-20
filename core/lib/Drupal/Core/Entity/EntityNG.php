@@ -471,6 +471,12 @@ class EntityNG extends Entity {
       $uuid = new Uuid();
       $duplicate->{$entity_info['entity_keys']['uuid']}->value = $uuid->generate();
     }
+
+    // Check whether the entity type supports revisions and initialize it if so.
+    if (!empty($entity_info['entity_keys']['revision'])) {
+      $duplicate->{$entity_info['entity_keys']['revision']}->value = NULL;
+    }
+
     return $duplicate;
   }
 
@@ -504,4 +510,5 @@ class EntityNG extends Entity {
     }
     return $label;
   }
+
 }

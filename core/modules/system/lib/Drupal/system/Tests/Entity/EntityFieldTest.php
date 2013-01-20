@@ -537,4 +537,28 @@ class EntityFieldTest extends WebTestBase  {
     $entity = entity_load($entity_type, $entity->id());
     $this->assertEqual($entity->field_test_text->processed, $target, format_string('%entity_type: Text is processed with the default filter.', array('%entity_type' => $entity_type)));
   }
+
+  /**
+   * Tests using the entity BC decorator with entity properties.
+   *
+   * @todo: Remove once the entit BC decorator is removed.
+   * @see \Drupal\Core\Entity\EntityBCDecorator
+   */
+  public function testBCDecorator() {
+    // Test using comment subject via the BC decorator.
+    module_enable(array('node', 'comment'));
+    $node = $this->drupalCreateNode();
+    $comment = entity_create('comment', array(
+      'nid' => $node->nid,
+      'subject' => 'old-value',
+    ));
+    $comment->save();
+
+    // Test reading.
+    $bc_entity = $comment->getBCEntity();
+    $this->assertEqual($bc_entity->subject, 'old-value', 'Accessing entity property via BC decorator.');
+    // Test writing.
+    $bc_entity->subject = 'new';
+    $this->assertEqual($comment->subject->value, 'new', 'Updated entity property via BC decorator.');
+  }
 }
