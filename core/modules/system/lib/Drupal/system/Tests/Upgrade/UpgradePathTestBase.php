@@ -203,13 +203,15 @@ abstract class UpgradePathTestBase extends WebTestBase {
   protected function performUpgrade($register_errors = TRUE) {
 
     // Load the first update screen.
-    $this->getUpdatePhp();
+    $out = $this->getUpdatePhp();
     if (!$this->assertResponse(200)) {
+      debug($out, 'response');
       throw new Exception('Initial GET to update.php did not return HTTP 200 status.');
     }
 
     // Ensure that the first update screen appeared correctly.
     if (!$this->assertFieldByXPath('//input[@type="submit"]')) {
+      debug($out, 'response');
       throw new Exception('An error was encountered during the first access to update.php.');
     }
 
@@ -219,21 +221,23 @@ abstract class UpgradePathTestBase extends WebTestBase {
     $this->rebuildContainer();
 
     // Continue.
-    $this->drupalPost(NULL, array(), t('Continue'));
+    $out = $this->drupalPost(NULL, array(), t('Continue'));
     if (!$this->assertResponse(200)) {
+      debug($out, 'response');
       throw new Exception('POST to continue update.php did not return HTTP 200 status.');
     }
 
     // The test should pass if there are no pending updates.
     $content = $this->drupalGetContent();
     if (strpos($content, t('No pending updates.')) !== FALSE) {
+      debug(strip_tags($out), 'response');
       $this->pass('No pending updates and therefore no upgrade process to test.');
       $this->pendingUpdates = FALSE;
       return TRUE;
     }
 
     // Go!
-    $this->drupalPost(NULL, array(), t('Apply pending updates'));
+    $out = $this->drupalPost(NULL, array(), t('Apply pending updates'));
     if (!$this->assertResponse(200)) {
       throw new Exception('POST to update.php to apply pending updates did not return HTTP 200 status.');
     }
@@ -247,15 +251,18 @@ abstract class UpgradePathTestBase extends WebTestBase {
       }
     }
     if (!empty($this->upgradeErrors)) {
+      debug(strip_tags($out), 'response');
       // Upgrade failed, the installation might be in an inconsistent state,
       // don't process.
       throw new Exception('Errors during update process.');
     }
 
     // Check if there still are pending updates.
-    $this->getUpdatePhp();
+    $out_pending = $this->getUpdatePhp();
     $this->drupalPost(NULL, array(), t('Continue'));
     if (!$this->assertText(t('No pending updates.'), 'No pending updates at the end of the update process.')) {
+      debug(strip_tags($out), 'response before');
+      debug(strip_tags($out_pending), 'response pending');
       throw new Exception('update.php still shows pending updates after execution.');
     }
 
