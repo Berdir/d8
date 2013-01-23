@@ -10,14 +10,14 @@ namespace Drupal\Core\Entity\Field\Type;
 use Drupal\Core\Entity\Field\FieldItemBase;
 
 /**
- * Defines the 'integer_field' entity field item.
+ * Defines the 'number_integer_field' entity field item.
  */
 class IntegerItem extends FieldItemBase {
 
   /**
    * Definitions of the contained properties.
    *
-   * @see self::getPropertyDefinitions()
+   * @see IntegerItem::getPropertyDefinitions()
    *
    * @var array
    */
@@ -28,12 +28,12 @@ class IntegerItem extends FieldItemBase {
    */
   public function getPropertyDefinitions() {
 
-    if (!isset(self::$propertyDefinitions)) {
-      self::$propertyDefinitions['value'] = array(
+    if (!isset(static::$propertyDefinitions)) {
+      static::$propertyDefinitions['value'] = array(
         'type' => 'integer',
         'label' => t('Integer value'),
       );
     }
-    return self::$propertyDefinitions;
+    return static::$propertyDefinitions;
   }
 }

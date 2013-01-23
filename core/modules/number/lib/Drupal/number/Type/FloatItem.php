@@ -17,7 +17,7 @@ class FloatItem extends FieldItemBase {
   /**
    * Definitions of the contained properties.
    *
-   * @see self::getPropertyDefinitions()
+   * @see FloatItem::getPropertyDefinitions()
    *
    * @var array
    */
@@ -28,12 +28,12 @@ class FloatItem extends FieldItemBase {
    */
   public function getPropertyDefinitions() {
 
-    if (!isset(self::$propertyDefinitions)) {
-      self::$propertyDefinitions['value'] = array(
+    if (!isset(static::$propertyDefinitions)) {
+      static::$propertyDefinitions['value'] = array(
         'type' => 'float',
         'label' => t('Float value'),
       );
     }
-    return self::$propertyDefinitions;
+    return static::$propertyDefinitions;
   }
 }
