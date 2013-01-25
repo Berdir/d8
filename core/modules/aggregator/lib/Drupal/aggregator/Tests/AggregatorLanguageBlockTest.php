@@ -55,7 +55,7 @@ class AggregatorLanguageBlockTest extends AggregatorTestBase {
    * Creates a block in a language, check blocks page in all languages.
    */
   public function testBlockLinks() {
-    // Need admin user to be able to access block admin.
+    // Create admin user to be able to access block admin.
     $admin_user = $this->drupalCreateUser(array(
       'administer blocks',
       'access administration pages',
@@ -65,9 +65,6 @@ class AggregatorLanguageBlockTest extends AggregatorTestBase {
       'administer languages',
     ));
     $this->drupalLogin($admin_user);
-
-    // Save language prefixes.
-    //$this->drupalPost('admin/config/regional/language/detection/url', array('prefix[en]' => 'en'), t('Save configuration'));
 
     // Create the block cache for all languages.
     foreach ($this->langcodes as $langcode) {
