@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\aggregator\Tests\AggregatorLanguageBlockTest.
+ * Contains \Drupal\aggregator\Tests\AggregatorLanguageBlockTest.
  */
 
 namespace Drupal\aggregator\Tests;
@@ -10,7 +10,7 @@ namespace Drupal\aggregator\Tests;
 use Drupal\Core\Language\Language;
 
 /**
- * Tests rendering functionality in the Aggregator module.
+ * Tests multilingual block definition caching.
  */
 class AggregatorLanguageBlockTest extends AggregatorTestBase {
 
@@ -32,7 +32,7 @@ class AggregatorLanguageBlockTest extends AggregatorTestBase {
     return array(
       'name' => 'Multilingual blocks',
       'description' => 'Checks display of aggregator blocks with multiple languages.',
-      'group' => 'Aggregator'
+      'group' => 'Aggregator',
     );
   }
 
@@ -52,7 +52,7 @@ class AggregatorLanguageBlockTest extends AggregatorTestBase {
   }
 
   /**
-   * Create a block in a language, check blocks page in all languages.
+   * Creates a block in a language, check blocks page in all languages.
    */
   public function testBlockLinks() {
     // Need admin user to be able to access block admin.
