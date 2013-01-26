@@ -114,7 +114,7 @@ class NodeRevisionsAllTestCase extends NodeTestBase {
     $this->assertTrue(($nodes[1]->body[LANGUAGE_NOT_SPECIFIED][0]['value'] == $reverted_node->body[LANGUAGE_NOT_SPECIFIED][0]['value']), t('Node reverted correctly.'));
 
     // Confirm that this is not the current version.
-    $node = node_load($node->nid, $node->vid);
+    $node = node_revision_load($node->vid);
     $this->assertFalse($node->isDefaultRevision(), 'Third node revision is not the current one.');
 
     // Confirm revisions delete properly.
