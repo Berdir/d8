@@ -11,7 +11,7 @@ use Drupal\Core\Entity\Field\FieldItemInterface;
 use Drupal\Core\Entity\Field\FieldInterface;
 
 /**
- * Tests the new entity API for the field field type.
+ * Tests the new entity API for the shape field type.
  */
 class ShapeItemTest extends FieldItemUnitTestBase {
 
