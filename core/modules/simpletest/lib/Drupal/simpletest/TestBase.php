@@ -925,7 +925,7 @@ abstract class TestBase {
         return FALSE;
       }
       // Provide the already resolved path for tests.
-      $this->configDirectories[$type] = $this->originalFileDirectory . '/' . $path;
+      $this->configDirectories[$type] = $path;
     }
   }
 
