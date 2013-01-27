@@ -1860,8 +1860,9 @@ function install_check_translations($install_state) {
 
   $readable = FALSE;
   $writable = FALSE;
-  $files_directory = variable_get('file_public_path', conf_path() . '/files');
-  $translations_directory = variable_get('locale_translate_file_directory', conf_path() . '/files/translations');
+  // @todo: Make this configurable.
+  $files_directory = conf_path() . '/files';
+  $translations_directory = conf_path() . '/files/translations';
   $translations_directory_exists = FALSE;
   $online = FALSE;
   $server_available = FALSE;
