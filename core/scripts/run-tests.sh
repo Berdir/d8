@@ -487,7 +487,7 @@ function simpletest_script_cleanup($test_id, $test_class, $exitcode) {
 
   // Check whether a test file directory was setup already.
   // @see prepareEnvironment()
-  $public_files = variable_get('file_public_path', conf_path() . '/files');
+  $public_files = config('system.file')->get('path.public');
   $test_directory = $public_files . '/simpletest/' . substr($db_prefix, 10);
   if (is_dir($test_directory)) {
     // Output the error_log.

@@ -45,7 +45,7 @@ class ThemeTest extends WebTestBase {
   function testThemeSettings() {
     // Specify a filesystem path to be used for the logo.
     $file = current($this->drupalGetTestFiles('image'));
-    $file_relative = strtr($file->uri, array('public:/' => variable_get('file_public_path', conf_path() . '/files')));
+    $file_relative = strtr($file->uri, array('public:/' => config('system.file')->get('path.public')));
     $default_theme_path = 'core/themes/stark';
 
     $supported_paths = array(
@@ -97,7 +97,7 @@ class ThemeTest extends WebTestBase {
       if (file_uri_scheme($input) == 'public') {
         $implicit_public_file = file_uri_target($input);
         $explicit_file = $input;
-        $local_file = strtr($input, array('public:/' => variable_get('file_public_path', conf_path() . '/files')));
+        $local_file = strtr($input, array('public:/' => config('system.file')->get('path.public')));
       }
       // Adjust for fully qualified stream wrapper URI elsewhere.
       elseif (file_uri_scheme($input) !== FALSE) {
@@ -107,7 +107,7 @@ class ThemeTest extends WebTestBase {
       elseif ($input == file_uri_target($file->uri)) {
         $implicit_public_file = $input;
         $explicit_file = 'public://' . $input;
-        $local_file = variable_get('file_public_path', conf_path() . '/files') . '/' . $input;
+        $local_file = config('system.file')->get('path.public') . '/' . $input;
       }
       $this->assertEqual((string) $elements[0], $implicit_public_file);
       $this->assertEqual((string) $elements[1], $explicit_file);
@@ -118,7 +118,7 @@ class ThemeTest extends WebTestBase {
       $elements = $this->xpath('//*[@id=:id]/img', array(':id' => 'logo'));
       $this->assertEqual((string) $elements[0]['src'], $expected['src']);
     }
-
+    $public_path = config('system.file')->get('path.public');
     $unsupported_paths = array(
       // Stream wrapper URI to non-existing file.
       'public://whatever.png',
@@ -132,9 +132,9 @@ class ThemeTest extends WebTestBase {
       // Relative path within the public filesystem to non-existing file.
       'whatever.png',
       // Relative path to non-existing file in public filesystem.
-      variable_get('file_public_path', conf_path() . '/files') . '/whatever.png',
+      $public_path . '/whatever.png',
       // Semi-absolute path to non-existing file in public filesystem.
-      '/' . variable_get('file_public_path', conf_path() . '/files') . '/whatever.png',
+      '/' . $public_path . '/whatever.png',
       // Relative path to arbitrary non-existing file.
       'core/misc/whatever.png',
       // Semi-absolute path to arbitrary non-existing file.

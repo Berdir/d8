@@ -91,7 +91,7 @@ class FileTransferTest extends WebTestBase {
 
     $gotit = TRUE;
     try {
-      $this->testConnection->copyDirectory($source, DRUPAL_ROOT . '/'. variable_get('file_public_path', conf_path() . '/files'));
+      $this->testConnection->copyDirectory($source, DRUPAL_ROOT . '/'. config('system.file')->get('path.public'));
     }
     catch (FileTransferException $e) {
       $gotit = FALSE;

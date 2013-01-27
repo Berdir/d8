@@ -416,7 +416,7 @@ abstract class WebTestBase extends TestBase {
       $original = drupal_get_path('module', 'simpletest') . '/files';
       $files = file_scan_directory($original, '/(html|image|javascript|php|sql)-.*/');
       foreach ($files as $file) {
-        file_unmanaged_copy($file->uri, variable_get('file_public_path', conf_path() . '/files'));
+        file_unmanaged_copy($file->uri, config('system.file')->get('path.public'));
       }
 
       $this->generatedTestFiles = TRUE;
@@ -785,21 +785,32 @@ abstract class WebTestBase extends TestBase {
     // Reset the static batch to remove Simpletest's batch operations.
     $batch = &batch_get();
     $batch = array();
-    $variables = array(
-      'file_public_path' =>  $this->public_files_directory,
-      'file_private_path' =>  $this->private_files_directory,
-      'file_temporary_path' =>  $this->temp_files_directory,
-      'locale_translate_file_directory' =>  $this->translation_files_directory,
+    $variable_groups = array(
+      'system.file' => array(
+        'path.public' =>  $this->public_files_directory,
+        'path.private' =>  $this->private_files_directory,
+        'path.temporary' =>  $this->temp_files_directory,
+      ),
+      'locale.settings' =>  array(
+        'translation.path' => $this->translation_files_directory,
+      ),
     );
-    foreach ($variables as $name => $value) {
-      $GLOBALS['conf'][$name] = $value;
+    foreach ($variable_groups as $config_base => $variables) {
+      foreach ($variables as $name => $value) {
+      $GLOBALS['conf'][$config_base][$name] = $value;
+      }
     }
     // Execute the non-interactive installer.
     require_once DRUPAL_ROOT . '/core/includes/install.core.inc';
     install_drupal($settings);
     $this->rebuildContainer();
-    foreach ($variables as $name => $value) {
-      variable_set($name, $value);
+
+    foreach ($variable_groups as $config_base => $variables) {
+      $config = config($config_base);
+      foreach ($variables as $name => $value) {
+        $config->set($name, $value);
+      }
+      $config->save();
     }
 
     // Restore the original Simpletest batch.

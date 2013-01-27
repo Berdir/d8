@@ -49,7 +49,7 @@ class PhpStorageFactory {
       $configuration['bin'] = $name;
     }
     if (!isset($configuration['directory'])) {
-      $path = isset($conf['file_public_path']) ? $conf['file_public_path'] : conf_path() . '/files';
+      $path = isset($conf['system.file.path.public']) ? $conf['system.file.path.public'] : conf_path() . '/files';
       $configuration['directory'] = DRUPAL_ROOT . "/$path/php";
     }
     return new $class($configuration);
