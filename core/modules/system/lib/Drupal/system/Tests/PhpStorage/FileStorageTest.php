@@ -23,7 +23,7 @@ class FileStorageTest extends PhpStorageTestBase {
   function setUp() {
     global $conf;
     parent::setUp();
-    $dir_path = DRUPAL_ROOT . '/' . config('system.file')->get('path.public') . '/php';
+    $dir_path = DRUPAL_ROOT . '/' . $this->public_files_directory . '/php';
     $conf['php_storage']['simpletest'] = array(
       'class' => 'Drupal\Component\PhpStorage\FileStorage',
       'directory' => $dir_path,
