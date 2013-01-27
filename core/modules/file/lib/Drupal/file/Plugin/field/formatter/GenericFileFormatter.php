@@ -36,6 +36,7 @@ class GenericFileFormatter extends FormatterBase {
       $elements[$delta] = array(
         '#theme' => 'file_link',
         '#file' => file_load($item['fid']),
+        '#description' => $item['description'],
       );
     }
 
