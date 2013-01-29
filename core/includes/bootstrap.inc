@@ -2037,55 +2037,14 @@ function drupal_hash_base64($data) {
 }
 
 /**
- * Merges multiple arrays, recursively, and returns the merged array.
+ * Gets a salt useful for hardening against SQL injection.
  *
- * This function is similar to PHP's array_merge_recursive() function, but it
- * handles non-array values differently. When merging values that are not both
- * arrays, the latter value replaces the former rather than merging with it.
- *
- * Example:
- * @code
- * $link_options_1 = array('fragment' => 'x', 'attributes' => array('title' => t('X'), 'class' => array('a', 'b')));
- * $link_options_2 = array('fragment' => 'y', 'attributes' => array('title' => t('Y'), 'class' => array('c', 'd')));
- *
- * // This results in array('fragment' => array('x', 'y'), 'attributes' => array('title' => array(t('X'), t('Y')), 'class' => array('a', 'b', 'c', 'd'))).
- * $incorrect = array_merge_recursive($link_options_1, $link_options_2);
- *
- * // This results in array('fragment' => 'y', 'attributes' => array('title' => t('Y'), 'class' => array('a', 'b', 'c', 'd'))).
- * $correct = drupal_array_merge_deep($link_options_1, $link_options_2);
- * @endcode
- *
- * @param ...
- *   Arrays to merge.
- *
- * @return
- *   The merged array.
- *
- * @see drupal_array_merge_deep_array()
+ * @return string
+ *   A salt based on information in settings.php, not in the database.
  */
-function drupal_array_merge_deep() {
-  return drupal_array_merge_deep_array(func_get_args());
-}
-
-/**
- * Merges multiple arrays, recursively, and returns the merged array.
- *
- * This function is equivalent to drupal_array_merge_deep(), except the
- * input arrays are passed as a single array parameter rather than a variable
- * parameter list.
- *
- * The following are equivalent:
- * - drupal_array_merge_deep($a, $b);
- * - drupal_array_merge_deep_array(array($a, $b));
- *
- * The following are also equivalent:
- * - call_user_func_array('drupal_array_merge_deep', $arrays_to_merge);
- * - drupal_array_merge_deep_array($arrays_to_merge);
- *
- * @see drupal_array_merge_deep()
- */
-function drupal_array_merge_deep_array($arrays) {
-  return NestedArray::mergeDeepArray($arrays);
+function drupal_get_hash_salt() {
+  global $drupal_hash_salt;
+  return !empty($drupal_hash_salt) ? $drupal_hash_salt : '';
 }
 
 /**
@@ -3593,54 +3552,6 @@ function drupal_check_memory_limit($required, $memory_limit = NULL) {
   // - The memory limit is greater than or equal to the memory required for
   //   the operation.
   return ((!$memory_limit) || ($memory_limit == -1) || (parse_size($memory_limit) >= parse_size($required)));
-}
-
-/**
- * Instantiates and statically caches a storage controller for generated PHP code.
- *
- * By default, this returns an instance of the
- * Drupal\Component\PhpStorage\MTimeProtectedFileStorage class.
- *
- * Classes implementing
- * Drupal\Component\PhpStorage\PhpStorageInterface can be registered for a
- * specific bin or as a default implementation.
- *
- * @param $name
- *   The name for which the storage controller should be returned. Defaults to
- *   'default'. The name is also used as the storage bin if one is not
- *   specified in the configuration.
- *
- * @return Drupal\Component\PhpStorage\PhpStorageInterface
- *   An instantiated storage controller for the specified name.
- *
- * @see Drupal\Component\PhpStorage\PhpStorageInterface
- */
-function drupal_php_storage($name = 'default') {
-  global $conf;
-  $storage_controllers = &drupal_static(__FUNCTION__);
-  if (!isset($storage_controllers[$name])) {
-    if (isset($conf['php_storage'][$name])) {
-      $configuration = $conf['php_storage'][$name];
-    }
-    elseif (isset($conf['php_storage']['default'])) {
-      $configuration = $conf['php_storage']['default'];
-    }
-    else {
-      $configuration = array(
-        'class' => 'Drupal\Component\PhpStorage\MTimeProtectedFileStorage',
-        'secret' => $GLOBALS['drupal_hash_salt'],
-      );
-    }
-    $class = isset($configuration['class']) ? $configuration['class'] : 'Drupal\Component\PhpStorage\MTimeProtectedFileStorage';
-    if (!isset($configuration['bin'])) {
-      $configuration['bin'] = $name;
-    }
-    if (!isset($configuration['directory'])) {
-      $configuration['directory'] = DRUPAL_ROOT . '/' . variable_get('file_public_path', conf_path() . '/files') . '/php';
-    }
-    $storage_controllers[$name] = new $class($configuration);
-  }
-  return $storage_controllers[$name];
 }
 
 /**
