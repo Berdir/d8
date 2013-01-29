@@ -2037,17 +2037,6 @@ function drupal_hash_base64($data) {
 }
 
 /**
- * Gets a salt useful for hardening against SQL injection.
- *
- * @return string
- *   A salt based on information in settings.php, not in the database.
- */
-function drupal_get_hash_salt() {
-  global $drupal_hash_salt;
-  return !empty($drupal_hash_salt) ? $drupal_hash_salt : '';
-}
-
-/**
  * Generates a default anonymous $user object.
  *
  * @return Object - the user object.
