@@ -121,7 +121,10 @@ class Condition extends ConditionBase {
           return TRUE;
         }
       }
-      elseif ($this->match($condition, $data[$key])) {
+      // Only try to match a scalar if there are no remaining keys in
+      // $needs_matching as this indicates that we are looking for a specific
+      // subkey and a scalar can never match that.
+      elseif (empty($needs_matching) && $this->match($condition, $data[$key])) {
         return TRUE;
       }
     }
