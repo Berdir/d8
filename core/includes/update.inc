@@ -647,6 +647,12 @@ function update_fix_d8_requirements() {
  * @param bool $update_schema_version
  *   (optional) The schema version the module should be set to. Defaults to 0
  *   which works well for completely new modules.
+ *
+ * @return array
+ *   List of the old schema versions keyed by the module names,
+ *   SCHEMA_UNINSTALLED if it was not installed before. Additional manual
+ *   installation steps like installing default configuration might be necessary
+ *   if the module was not installed before.
  */
 function update_module_enable(array $modules, $schema_version = 0) {
   $schema_store = drupal_container()->get('keyvalue')->get('system.schema');
@@ -675,8 +681,9 @@ function update_module_enable(array $modules, $schema_version = 0) {
       ->clear($module)
       ->save();
 
+    $current_schema = $schema_store->get($module);
     // Set the schema version if the module was not just disabled before.
-    if ($schema_store->get($module) === NULL || $schema_store->get($module) === SCHEMA_UNINSTALLED) {
+    if ($current_schema === NULL || $current_schema === SCHEMA_UNINSTALLED) {
       // Change the schema version to the given value (defaults to 0), so any
       // module updates since the module's inception are executed in a core
       // upgrade.
@@ -684,7 +691,7 @@ function update_module_enable(array $modules, $schema_version = 0) {
       $old_schema[$module] = SCHEMA_UNINSTALLED;
     }
     else {
-      $old_schema[$module] = $schema_store->get($module);
+      $old_schema[$module] = $current_schema;
     }
 
     // system_list_reset() is in module.inc but that would only be available
