@@ -930,22 +930,18 @@ abstract class TestBase {
   }
 
   /**
-   * Rebuild drupal_container().
+   * Prepares the DrupalKernel to use for the test.
    *
-   * Use this to build a new kernel and service container. For example, when the
-   * list of enabled modules is changed via the internal browser, in which case
-   * the test process still contains an old kernel and service container with an
-   * old module list.
-   *
-   * @todo Fix http://drupal.org/node/1708692 so that module enable/disable
-   *   changes are immediately reflected in drupal_container(). Until then,
-   *   tests can invoke this workaround when requiring services from newly
-   *   enabled modules to be immediately available in the same request.
+   * The kernel's primary responsibility is to initialize the dependency
+   * injection container, which it stores in drupal_container(). Tests can
+   * access the container via $this->container, so we copy it to there as well.
+   * TestBase::tearDown() restores drupal_container() to the original container
+   * that existed prior to TestBase::prepareEnvironment().
    *
    * @see TestBase::prepareEnvironment()
    * @see TestBase::tearDown()
    */
-  protected function rebuildContainer() {
+  protected function prepareKernel() {
     $this->kernel = new DrupalKernel('testing', FALSE, drupal_classloader(), FALSE);
     $this->kernel->boot();
     // DrupalKernel replaces the container in drupal_container() with a

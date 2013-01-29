@@ -794,10 +794,16 @@ abstract class WebTestBase extends TestBase {
     foreach ($variables as $name => $value) {
       $GLOBALS['conf'][$name] = $value;
     }
+
     // Execute the non-interactive installer.
     require_once DRUPAL_ROOT . '/core/includes/install.core.inc';
     install_drupal($settings);
-    $this->rebuildContainer();
+
+    // The installer uses a 'install' kernel. Now that the installation is
+    // finished, prepare a 'testing' kernel.
+    $this->prepareKernel();
+
+    // Save overridden $conf variables to the database.
     foreach ($variables as $name => $value) {
       variable_set($name, $value);
     }
@@ -828,7 +834,6 @@ abstract class WebTestBase extends TestBase {
     if ($modules) {
       $success = module_enable($modules, TRUE);
       $this->assertTrue($success, t('Enabled modules: %modules', array('%modules' => implode(', ', $modules))));
-      $this->rebuildContainer();
     }
 
     // Reset/rebuild all data structures after enabling the modules.
@@ -850,13 +855,18 @@ abstract class WebTestBase extends TestBase {
   /**
    * Reset all data structures after having enabled new modules.
    *
-   * This method is called by Drupal\simpletest\WebTestBase::setUp() after enabling
-   * the requested modules. It must be called again when additional modules
-   * are enabled later.
+   * This method is called by Drupal\simpletest\WebTestBase::setUp() after
+   * enabling the requested modules. It must be called again when additional
+   * modules are enabled later.
    */
   protected function resetAll() {
     // Clear all database and static caches and rebuild data structures.
     drupal_flush_all_caches();
+
+    // When modules are enabled or caches flushed, the container in
+    // drupal_container() is replaced with a rebuilt object. Update the
+    // container used by tests to match.
+    $this->container = drupal_container();
 
     // Reload global $conf array and permissions.
     $this->refreshVariables();
@@ -3157,4 +3167,5 @@ abstract class WebTestBase extends TestBase {
       $this->verbose(t('Email:') . '<pre>' . print_r($mail, TRUE) . '</pre>');
     }
   }
+
 }

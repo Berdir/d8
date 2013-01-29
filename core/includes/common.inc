@@ -8,6 +8,7 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Database\Database;
+use Drupal\Core\DrupalKernel;
 use Drupal\Core\SystemListingInfo;
 use Drupal\Core\Template\Attribute;
 
@@ -6430,16 +6431,30 @@ function drupal_flush_all_caches() {
   drupal_static_reset();
 
   // Clear all non-drupal_static() static caches.
-  // @todo Rebuild the kernel/container.
   drupal_container()->get('plugin.manager.entity')->clearCachedDefinitions();
 
+  // Wipe the PHP Storage caches.
+  PhpStorageFactory::get('service_container')->deleteAll();
+  PhpStorageFactory::get('twig')->deleteAll();
+
   // Rebuild module and theme data.
-  system_rebuild_module_data();
+  $module_data = system_rebuild_module_data();
   system_rebuild_theme_data();
 
   // Ensure that all modules that are currently supposed to be enabled are
   // actually loaded.
   drupal_container()->get('module_handler')->loadAll();
+
+  // Rebuild and reboot a new kernel.
+  // A simple DrupalKernel::reboot() is not sufficient, since the list of
+  // enabled modules might have been adjusted above due to changed code.
+  $files = array();
+  foreach ($module_data as $module => $data) {
+    if (isset($data->uri)) {
+      $files[$module] = $data->uri;
+    }
+  }
+  drupal_container()->get('kernel')->updateModules(module_list(), $files);
 
   // Update the list of bootstrap modules.
   // Allows developers to get new hook_boot() implementations registered without
@@ -6462,10 +6477,6 @@ function drupal_flush_all_caches() {
   // to be based on up to date information.
   drupal_container()->get('router.builder')->rebuild();
   menu_router_rebuild();
-
-  // Wipe the PHP Storage caches.
-  PhpStorageFactory::get('service_container')->deleteAll();
-  PhpStorageFactory::get('twig')->deleteAll();
 
   // Re-initialize the maintenance theme, if the current request attempted to
   // use it. Unlike regular usages of this function, the installer and update

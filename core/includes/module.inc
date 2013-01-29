@@ -284,11 +284,13 @@ function module_enable($module_list, $enable_dependencies = TRUE) {
 
   $modules_installed = array();
   $modules_enabled = array();
-  $schema_store = drupal_container()->get('keyvalue')->get('system.schema');
-  $module_config = config('system.module');
-  $disabled_config = config('system.module.disabled');
-  $module_handler = drupal_container()->get('module_handler');
   foreach ($module_list as $module) {
+    // Each iteration through this loop, there's potentially a new
+    // drupal_container() so refetch these objects.
+    $module_config = config('system.module');
+    $disabled_config = config('system.module.disabled');
+    $module_handler = drupal_container()->get('module_handler');
+
     // Only process modules that are not already enabled.
     // A module is only enabled if it is configured as enabled. Custom or
     // overridden module handlers might contain the module already, which means

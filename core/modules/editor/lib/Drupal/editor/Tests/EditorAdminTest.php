@@ -67,7 +67,6 @@ class EditorAdminTest extends WebTestBase {
 
     // Make a text editor available.
     module_enable(array('editor_test'));
-    $this->rebuildContainer();
     $this->resetAll();
     $this->drupalGet('admin/config/content/formats/filtered_html');
 

@@ -52,8 +52,7 @@ class CoreBundle extends Bundle {
 
     $container->register('config.factory', 'Drupal\Core\Config\ConfigFactory')
       ->addArgument(new Reference('config.storage'))
-      ->addArgument(new Reference('event_dispatcher'))
-      ->addTag('persist');
+      ->addArgument(new Reference('event_dispatcher'));
 
     // Register staging configuration storage.
     $container

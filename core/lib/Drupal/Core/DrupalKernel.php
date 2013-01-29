@@ -150,6 +150,14 @@ class DrupalKernel extends Kernel implements DrupalKernelInterface {
   }
 
   /**
+   * Implements DrupalKernelInterface::reboot().
+   */
+  public function reboot() {
+    $this->booted = FALSE;
+    $this->boot();
+  }
+
+  /**
    * Returns an array of available bundles.
    *
    * @return array
@@ -236,8 +244,7 @@ class DrupalKernel extends Kernel implements DrupalKernelInterface {
     // list will take effect when boot() is called. If we have already booted,
     // then reboot in order to refresh the bundle list and container.
     if ($this->booted) {
-      $this->booted = FALSE;
-      $this->boot();
+      $this->reboot();
     }
   }
 
@@ -375,7 +382,19 @@ class DrupalKernel extends Kernel implements DrupalKernelInterface {
     foreach ($this->bundles as $bundle) {
       $bundle->build($container);
     }
-    $container->setParameter('persistIds', array_keys($container->findTaggedServiceIds('persist')));
+
+    // Identify all services whose instances should be persisted when rebuilding
+    // the container during the lifetime of the kernel (e.g., during a kernel
+    // reboot). Include synthetic services, because by definition, they cannot
+    // be automatically reinstantiated. Also include services tagged to persist.
+    $persist_ids = array();
+    foreach ($container->getDefinitions() as $id => $definition) {
+      if ($definition->isSynthetic() || $definition->getTag('persist')) {
+        $persist_ids[] = $id;
+      }
+    }
+    $container->setParameter('persistIds', $persist_ids);
+
     $container->compile();
     return $container;
   }

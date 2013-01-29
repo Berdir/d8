@@ -18,6 +18,16 @@ use Symfony\Component\HttpKernel\KernelInterface;
 interface DrupalKernelInterface extends KernelInterface {
 
   /**
+   * Reboots an already booted kernel.
+   *
+   * Rebooting ensures that all instances of services being tagged with
+   * 'persist' are moved over to the new kernel instance.
+   *
+   * @see DrupalKernelInterface::updateModules()
+   */
+  public function reboot();
+
+  /**
    * Updates the kernel's list of modules to the new list.
    *
    * The kernel needs to update its bundle list and container to match the new

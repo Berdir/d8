@@ -213,10 +213,11 @@ abstract class UpgradePathTestBase extends WebTestBase {
       throw new Exception('An error was encountered during the first access to update.php.');
     }
 
-    // Initialize config directories and rebuild the service container after
-    // creating them in the first step.
+    // Initialize config directories.
     parent::prepareConfigDirectories();
-    $this->rebuildContainer();
+
+    // Prepare the kernel.
+    $this->prepareKernel();
 
     // Continue.
     $this->drupalPost(NULL, array(), t('Continue'));
@@ -270,9 +271,10 @@ abstract class UpgradePathTestBase extends WebTestBase {
     // but not on the test client.
     drupal_container()->get('module_handler')->resetImplementations();
     drupal_container()->get('module_handler')->reload();
+    $module_list = $this->container->get('module_handler')->getModuleList();
+    $this->kernel->updateModules($module_list);
 
-    // Rebuild the container and all caches.
-    $this->rebuildContainer();
+    // Reset all caches.
     $this->resetAll();
 
     return TRUE;

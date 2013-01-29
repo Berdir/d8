@@ -1,5 +1,6 @@
 <?php
 
+use Drupal\Component\PhpStorage\PhpStorageFactory;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\Settings;
 use Drupal\Core\DrupalKernel;
@@ -3615,3 +3616,105 @@ function lock() {
 /**
  * @} End of "defgroup lock".
  */
+
+/**
+ * Unfreezes Drupal from a corrupted/deadlock situation.
+ *
+ * Under various conditions, the registered and the available services may
+ * mismatch, preventing the system to boot a kernel and any subsystems,
+ * eventually leaving the system in a non-functional state, of which it cannot
+ * recover on its own due to circular dependencies.
+ *
+ * In such cases, put the following code into a new @code unfreeze.php @endcode
+ * file in your site's root folder:
+ * @code
+ * define('DRUPAL_ROOT', getcwd());
+ * require_once DRUPAL_ROOT . '/core/includes/bootstrap.inc';
+ * drupal_bootstrap(DRUPAL_BOOTSTRAP_CONFIGURATION);
+ * drupal_rebuild();
+ * @endcode
+ * Invoke the script either by accessing it through the browser or via the
+ * command line. Make sure to disable or delete the script file afterwards.
+ *
+ * This function is essentially a wrapper around drupal_flush_all_caches(),
+ * which performs all required tasks already, but which requires a functional
+ * kernel, base system, and module system to operate. Use the drupal_rebuild()
+ * function if these base systems are corrupted.
+ *
+ * Do not use this function to flush all caches and rebuild the system at
+ * regular runtime. Use drupal_flush_all_caches() directly instead.
+ */
+function drupal_rebuild() {
+  // First, there has to be a functional DrupalKernel, since all following
+  // operations depend on services being available, and the services itself
+  // partially require the module system to be available (which in turn requires
+  // the kernel).
+
+  // Ensure the base system has been booted. Booting to
+  // DRUPAL_BOOTSTRAP_CONFIGURATION is always possible and should never fail,
+  // since it does not involve any complex operations.
+  drupal_bootstrap(DRUPAL_BOOTSTRAP_CONFIGURATION);
+
+  // Load the code that would normally be loaded between
+  // DRUPAL_BOOTSTRAP_CONFIGURATION and DRUPAL_BOOTSTRAP_VARIABLES.
+  // @see _drupal_bootstrap_page_cache()
+  require_once DRUPAL_ROOT . '/core/includes/cache.inc';
+  if (!empty($conf['cache_backends'])) {
+    foreach ($conf['cache_backends'] as $include) {
+      require_once DRUPAL_ROOT . '/' . $include;
+    }
+  }
+  // @see _drupal_bootstrap_database()
+  require_once DRUPAL_ROOT . '/core/includes/database.inc';
+  // @see _drupal_bootstrap_variables()
+  require_once DRUPAL_ROOT . '/core/includes/module.inc';
+
+  // In a disaster recovery situation, it is not possible to boot to
+  // DRUPAL_BOOTSTRAP_VARIABLES, since the second bootstrap phase tries to boot
+  // a kernel already. The PhpStorageFactory calls below require the public
+  // files path though, so ensure it is known.
+  // @todo Once file system settings are converted to configuration, this means
+  //   a massive circular dependency, since the configuration system requires a
+  //   working kernel.
+  // We cannot use variable_initialize(), since it requires the cache and lock
+  // services already.
+  // @see _drupal_bootstrap_variables()
+  // @see variable_initialize()
+  global $conf;
+  $variables = array_map('unserialize', Database::getConnection()->query('SELECT name, value FROM {variable}')->fetchAllKeyed());
+  $conf += $variables;
+
+  // The current kernel may contain outdated/bogus definitions, so ensure that
+  // all dumped containers no longer exist.
+  // Dependencies:
+  // - global $conf « drupal_settings_initialize(), DRUPAL_BOOTSTRAP_CONFIGURATION
+  // - $conf['file_public_path'] « variable_initialize(), DRUPAL_BOOTSTRAP_VARIABLES
+  PhpStorageFactory::get('service_container')->deleteAll();
+  PhpStorageFactory::get('twig')->deleteAll();
+
+  // Build and boot a new kernel.
+  // Do not write it to disk, since drupal_flush_all_caches() will do that.
+  // Dependencies:
+  // - $conf['drupal_bootstrap_config_storage'] « drupal_settings_initialize()
+  // - conf_path()
+  // - global $config_directories « drupal_settings_initialize()
+  $kernel = new DrupalKernel('prod', FALSE, drupal_classloader(), FALSE);
+  $kernel->boot();
+
+  // Second, now that the kernel has been rebuilt and rebooted from scratch and
+  // services should be available, ensure that base system services do not
+  // operate on stale/outdated data. This should allow us to boot the module
+  // system and eventually to DRUPAL_BOOTSTRAP_CODE.
+
+  // Flush the primary bootstrap cache bins to ensure that data is not loaded
+  // from outdated caches.
+  cache('bootstrap')->deleteAll();
+  cache('config')->deleteAll();
+
+  // Boot all remaining subsystems.
+  drupal_bootstrap(DRUPAL_BOOTSTRAP_CODE);
+
+  // Third, flush all caches and rebuild data structures.
+  drupal_flush_all_caches();
+}
+
