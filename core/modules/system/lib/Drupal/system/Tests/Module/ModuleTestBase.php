@@ -57,7 +57,7 @@ abstract class ModuleTestBase extends WebTestBase {
    *   The name of the module.
    */
   function assertModuleTablesExist($module) {
-    $this->rebuildContainer();
+    $this->prepareKernel();
     $tables = array_keys(drupal_get_schema_unprocessed($module));
     $tables_exist = TRUE;
     foreach ($tables as $table) {
@@ -145,7 +145,7 @@ abstract class ModuleTestBase extends WebTestBase {
    *   Expected module state.
    */
   function assertModules(array $modules, $enabled) {
-    $this->rebuildContainer();
+    $this->prepareKernel();
     foreach ($modules as $module) {
       if ($enabled) {
         $message = 'Module "@module" is enabled.';
