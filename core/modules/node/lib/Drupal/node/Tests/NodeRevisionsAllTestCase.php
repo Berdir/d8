@@ -57,7 +57,7 @@ class NodeRevisionsAllTestCase extends NodeTestBase {
 
       // Create revision with a random title and body and update variables.
       $this->drupalCreateNode($settings);
-      $node = node_load($node->nid); // Make sure we get revision information.
+      $node = node_load($node->id()); // Make sure we get revision information.
       $settings = get_object_vars($node);
       $nodes[] = $node;
     }
@@ -89,11 +89,11 @@ class NodeRevisionsAllTestCase extends NodeTestBase {
     $this->drupalLogin($content_admin);
 
     // Confirm the correct revision text appears on "view revisions" page.
-    $this->drupalGet("node/$node->nid/revisions/$node->vid/view");
-    $this->assertText($node->body[LANGUAGE_NOT_SPECIFIED][0]['value'], t('Correct text displays for version.'));
+    $this->drupalGet('node/' . $node->id(). '/revisions/' . $node->getRevisionId() . '/view');
+    $this->assertText($node->body->value, t('Correct text displays for version.'));
 
     // Confirm the correct log message appears on "revisions overview" page.
-    $this->drupalGet("node/$node->nid/revisions");
+    $this->drupalGet('node/' . $node->id(). '/revisions');
     foreach ($logs as $log) {
       $this->assertText($log, t('Log message found.'));
     }
@@ -102,47 +102,47 @@ class NodeRevisionsAllTestCase extends NodeTestBase {
     $this->assertTrue($node->isDefaultRevision(), 'Third node revision is the current one.');
 
     // Confirm that revisions revert properly.
-    $this->drupalPost("node/$node->nid/revisions/{$nodes[1]->vid}/revert", array(), t('Revert'));
+    $this->drupalPost('node/' . $node->id(). '/revisions/' . $nodes[1]->getRevisionId() .'/revert', array(), t('Revert'));
     $this->assertRaw(t('@type %title has been reverted back to the revision from %revision-date.',
       array(
         '@type' => 'Basic page',
-        '%title' => $nodes[1]->title,
-        '%revision-date' => format_date($nodes[1]->revision_timestamp)
+        '%title' => $nodes[1]->title->value,
+        '%revision-date' => format_date($nodes[1]->revision_timestamp->value)
       )),
       'Revision reverted.');
-    $reverted_node = node_load($node->nid);
-    $this->assertTrue(($nodes[1]->body[LANGUAGE_NOT_SPECIFIED][0]['value'] == $reverted_node->body[LANGUAGE_NOT_SPECIFIED][0]['value']), t('Node reverted correctly.'));
+    $reverted_node = node_load($node->id());
+    $this->assertTrue(($nodes[1]->body->value == $reverted_node->value), t('Node reverted correctly.'));
 
     // Confirm that this is not the current version.
-    $node = node_revision_load($node->vid);
+    $node = node_revision_load($node->getRevisionId());
     $this->assertFalse($node->isDefaultRevision(), 'Third node revision is not the current one.');
 
     // Confirm revisions delete properly.
-    $this->drupalPost("node/$node->nid/revisions/{$nodes[1]->vid}/delete", array(), t('Delete'));
+    $this->drupalPost('node/' . $node->id(). '/revisions/' . $nodes[1]->getRevisionId() . '/delete', array(), t('Delete'));
     $this->assertRaw(t('Revision from %revision-date of @type %title has been deleted.',
       array(
-        '%revision-date' => format_date($nodes[1]->revision_timestamp),
+        '%revision-date' => format_date($nodes[1]->revision_timestamp->value),
         '@type' => 'Basic page',
-        '%title' => $nodes[1]->title,
+        '%title' => $nodes[1]->title->value,
       )),
       'Revision deleted.');
     $this->assertTrue(db_query('SELECT COUNT(vid) FROM {node_revision} WHERE nid = :nid and vid = :vid',
-      array(':nid' => $node->nid, ':vid' => $nodes[1]->vid))->fetchField() == 0,
+      array(':nid' => $node->id(), ':vid' => $nodes[1]->getRevisionId()))->fetchField() == 0,
       'Revision not found.');
 
     // Set the revision timestamp to an older date to make sure that the
     // confirmation message correctly displays the stored revision date.
     $old_revision_date = REQUEST_TIME - 86400;
     db_update('node_revision')
-      ->condition('vid', $nodes[2]->vid)
+      ->condition('vid', $nodes[2]->getRevisionId())
       ->fields(array(
         'timestamp' => $old_revision_date,
       ))
       ->execute();
-    $this->drupalPost("node/$node->nid/revisions/{$nodes[2]->vid}/revert", array(), t('Revert'));
+    $this->drupalPost('node/' . $node->id(). '/revisions/' . $nodes[2]->getRevisionId() . '/revert', array(), t('Revert'));
     $this->assertRaw(t('@type %title has been reverted back to the revision from %revision-date.', array(
       '@type' => 'Basic page',
-      '%title' => $nodes[2]->title,
+      '%title' => $nodes[2]->title->value,
       '%revision-date' => format_date($old_revision_date),
     )));
   }

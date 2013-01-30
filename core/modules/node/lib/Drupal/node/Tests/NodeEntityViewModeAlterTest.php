@@ -44,7 +44,7 @@ class NodeEntityViewModeAlterTest extends NodeTestBase {
 
     // Set the flag to alter the view mode and view the node.
     variable_set('node_test_change_view_mode', 'teaser');
-    $this->drupalGet('node/' . $node->nid);
+    $this->drupalGet('node/' . $node->id());
 
     // Check that teaser mode is viewed.
     $this->assertText('Extra data that should appear only in the teaser for the node.', 'Teaser text present');

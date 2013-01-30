@@ -89,7 +89,7 @@ class NodeFieldMultilingualTestCase extends WebTestBase {
     $this->assertTrue($assert, 'Field language correctly set.');
 
     // Change node language.
-    $this->drupalGet("node/$node->nid/edit");
+    $this->drupalGet('node/' . $node->id(). '/edit');
     $edit = array(
       $title_key => $this->randomName(8),
       'langcode' => 'it'
@@ -105,10 +105,10 @@ class NodeFieldMultilingualTestCase extends WebTestBase {
     language_negotiation_set(LANGUAGE_TYPE_CONTENT, array(LANGUAGE_NEGOTIATION_URL => 0));
 
     // Test multilingual field language fallback logic.
-    $this->drupalGet("it/node/$node->nid");
+    $this->drupalGet("it/node/$node->id()");
     $this->assertRaw($body_value, 'Body correctly displayed using Italian as requested language');
 
-    $this->drupalGet("node/$node->nid");
+    $this->drupalGet("node/$node->id()");
     $this->assertRaw($body_value, 'Body correctly displayed using English as requested language');
   }
 
@@ -134,9 +134,9 @@ class NodeFieldMultilingualTestCase extends WebTestBase {
     $this->assertTrue($node, 'Node found in database.');
 
     // Check if node body is showed.
-    $this->drupalGet("node/$node->nid");
+    $this->drupalGet("node/$node->id()");
     $body = $this->xpath('//article[@id=:id]//div[@class=:class]/descendant::p', array(
-      ':id' => 'node-' . $node->nid,
+      ':id' => 'node-' . $node->id(),
       ':class' => 'content',
     ));
     $this->assertEqual(current($body), $node->body['en'][0]['value'], 'Node body found.');

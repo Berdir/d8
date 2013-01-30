@@ -148,10 +148,10 @@ class NodeStorageController extends DatabaseStorageControllerNG {
       // @todo: Make the {node_revision}.log column nullable so that we can
       // remove this check.
       if (!isset($record->log)) {
-        $record->log->value = '';
+        $entity->log = $record->log = '';
       }
     }
-    elseif (!isset($record->log) || $record->log->value === '') {
+    elseif (!isset($record->log) || $record->log === '') {
       // If we are updating an existing node without adding a new revision, we
       // need to make sure $node->log is unset whenever it is empty. As long as
       // $node->log is unset, drupal_write_record() will not attempt to update
@@ -162,8 +162,8 @@ class NodeStorageController extends DatabaseStorageControllerNG {
     }
 
     if ($entity->isNewRevision()) {
-      $record->timestamp->value = REQUEST_TIME;
-      $record->uid->value = isset($record->revision_uid) ? $record->revision_uid->value : $GLOBALS['user']->uid;
+      $record->timestamp = $entity->timestamp = REQUEST_TIME;
+      $record->uid = $entity->uid = isset($record->revision_uid) ? $record->revision_uid->value : $GLOBALS['user']->uid;
     }
   }
 

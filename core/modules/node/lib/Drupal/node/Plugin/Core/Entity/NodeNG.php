@@ -42,6 +42,7 @@ use Drupal\Core\Annotation\Translation;
  *   bundle_keys = {
  *     "bundle" = "type"
  *   },
+ *   permission_granularity = "bundle",
  *   view_modes = {
  *     "full" = {
  *       "label" = "Full content",

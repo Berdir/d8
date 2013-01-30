@@ -250,13 +250,13 @@ function node_entity_display_alter(EntityDisplay $display, $context) {
 /**
  * Entity URI callback.
  *
- * @param Drupal\node\Node $node
+ * @param \Drupal\Core\Entity\EntityInterface $node
  *   A node entity.
  *
  * @return array
  *   An array with 'path' as the key and the path to the node as its value.
  */
-function node_uri(Node $node) {
+function node_uri(\Drupal\Core\Entity\EntityInterface $node) {
   return array(
     'path' => 'node/' . $node->nid,
   );

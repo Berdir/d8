@@ -92,11 +92,11 @@ class NodeAdminTest extends NodeTestBase {
     $this->drupalGet('admin/content');
     $this->assertResponse(200);
     foreach ($nodes as $node) {
-      $this->assertLinkByHref('node/' . $node->nid);
-      $this->assertLinkByHref('node/' . $node->nid . '/edit');
-      $this->assertLinkByHref('node/' . $node->nid . '/delete');
+      $this->assertLinkByHref('node/' . $node->id());
+      $this->assertLinkByHref('node/' . $node->id() . '/edit');
+      $this->assertLinkByHref('node/' . $node->id() . '/delete');
       // Verify tableselect.
-      $this->assertFieldByName('nodes[' . $node->nid . ']', '', 'Tableselect found.');
+      $this->assertFieldByName('nodes[' . $node->id() . ']', '', 'Tableselect found.');
     }
 
     // Verify filtering by publishing status.
@@ -167,9 +167,9 @@ class NodeAdminTest extends NodeTestBase {
     $this->drupalGet('admin/content');
     $this->assertResponse(200);
     foreach ($nodes as $node) {
-      $this->assertLinkByHref('node/' . $node->nid);
-      $this->assertLinkByHref('node/' . $node->nid . '/edit');
-      $this->assertLinkByHref('node/' . $node->nid . '/delete');
+      $this->assertLinkByHref('node/' . $node->id());
+      $this->assertLinkByHref('node/' . $node->id() . '/edit');
+      $this->assertLinkByHref('node/' . $node->id() . '/delete');
     }
   }
 }
