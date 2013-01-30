@@ -155,9 +155,12 @@ class CoreBundle extends Bundle {
     $this->registerTwig($container);
     $this->registerRouting($container);
 
-    // Add the entity query factory.
+    // Add the entity query factories.
     $container->register('entity.query', 'Drupal\Core\Entity\Query\QueryFactory')
-      ->addArgument(new Reference('service_container'));
+      ->addArgument(new Reference('plugin.manager.entity'))
+      ->addMethodCall('setContainer', array(new Reference('service_container')));
+    $container->register('entity.query.config', 'Drupal\Core\Config\Entity\Query\QueryFactory')
+      ->addArgument(new Reference('config.storage'));
 
     $container->register('router.dumper', 'Drupal\Core\Routing\MatcherDumper')
       ->addArgument(new Reference('database'));
@@ -196,6 +199,7 @@ class CoreBundle extends Bundle {
       ->addTag('route_filter');
 
     $container->register('router_processor_subscriber', 'Drupal\Core\EventSubscriber\RouteProcessorSubscriber')
+      ->addArgument(new Reference('content_negotiation'))
       ->addTag('event_subscriber');
     $container->register('router_listener', 'Symfony\Component\HttpKernel\EventListener\RouterListener')
       ->addArgument(new Reference('router'))
@@ -253,7 +257,11 @@ class CoreBundle extends Bundle {
     $container->register('serializer.normalizer.complex_data', 'Drupal\Core\Serialization\ComplexDataNormalizer')->addTag('normalizer');
     $container->register('serializer.normalizer.list', 'Drupal\Core\Serialization\ListNormalizer')->addTag('normalizer');
     $container->register('serializer.normalizer.typed_data', 'Drupal\Core\Serialization\TypedDataNormalizer')->addTag('normalizer');
-    $container->register('serializer.encoder.json', 'Drupal\Core\Serialization\JsonEncoder')->addTag('encoder');
+
+    $container->register('serializer.encoder.json', 'Drupal\Core\Serialization\JsonEncoder')
+      ->addTag('encoder', array('format' => array('json' => 'JSON')));
+    $container->register('serializer.encoder.xml', 'Drupal\Core\Serialization\XmlEncoder')
+      ->addTag('encoder', array('format' => array('xml' => 'XML')));
 
     $container->register('flood', 'Drupal\Core\Flood\DatabaseBackend')
       ->addArgument(new Reference('database'));

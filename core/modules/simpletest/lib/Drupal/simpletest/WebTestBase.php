@@ -462,12 +462,14 @@ abstract class WebTestBase extends TestBase {
    * @param array $permissions
    *   Array of permission names to assign to user. Note that the user always
    *   has the default permissions derived from the "authenticated users" role.
+   * @param $name
+   *   The user name.
    *
    * @return object|false
    *   A fully loaded user object with pass_raw property, or FALSE if account
    *   creation fails.
    */
-  protected function drupalCreateUser(array $permissions = array()) {
+  protected function drupalCreateUser(array $permissions = array(), $name = NULL) {
     // Create a role with the given permission set, if any.
     $rid = FALSE;
     if ($permissions) {
@@ -479,7 +481,7 @@ abstract class WebTestBase extends TestBase {
 
     // Create a user assigned to that role.
     $edit = array();
-    $edit['name']   = $this->randomName();
+    $edit['name']   = !empty($name) ? $name : $this->randomName();
     $edit['mail']   = $edit['name'] . '@example.com';
     $edit['pass']   = user_password();
     $edit['status'] = 1;
@@ -616,29 +618,44 @@ abstract class WebTestBase extends TestBase {
    *   $account->pass_raw = $pass_raw;
    * @endcode
    *
-   * @param $user
+   * @param $account
    *   User object representing the user to log in.
    *
    * @see drupalCreateUser()
    */
-  protected function drupalLogin($user) {
+  protected function drupalLogin($account) {
     if ($this->loggedInUser) {
       $this->drupalLogout();
     }
 
     $edit = array(
-      'name' => $user->name,
-      'pass' => $user->pass_raw
+      'name' => $account->name,
+      'pass' => $account->pass_raw
     );
     $this->drupalPost('user', $edit, t('Log in'));
 
-    // If a "log out" link appears on the page, it is almost certainly because
-    // the login was successful.
-    $pass = $this->assertLink(t('Log out'), 0, t('User %name successfully logged in.', array('%name' => $user->name)), t('User login'));
-
-    if ($pass) {
-      $this->loggedInUser = $user;
+    // @see WebTestBase::drupalUserIsLoggedIn()
+    if (isset($this->session_id)) {
+      $account->session_id = $this->session_id;
     }
+    $pass = $this->assert($this->drupalUserIsLoggedIn($account), format_string('User %name successfully logged in.', array('%name' => $account->name)), 'User login');
+    if ($pass) {
+      $this->loggedInUser = $account;
+    }
+  }
+
+  /**
+   * Returns whether a given user account is logged in.
+   *
+   * @param \Drupal\user\User $account
+   *   The user account object to check.
+   */
+  protected function drupalUserIsLoggedIn($account) {
+    if (!isset($account->session_id)) {
+      return FALSE;
+    }
+    // @see _drupal_session_read()
+    return (bool) db_query("SELECT sid FROM {users} u INNER JOIN {sessions} s ON u.uid = s.uid WHERE s.sid = :sid", array(':sid' => $account->session_id))->fetchField();
   }
 
   /**
@@ -662,6 +679,8 @@ abstract class WebTestBase extends TestBase {
     $pass = $pass && $this->assertField('pass', t('Password field found.'), t('Logout'));
 
     if ($pass) {
+      // @see WebTestBase::drupalUserIsLoggedIn()
+      unset($this->loggedInUser->session_id);
       $this->loggedInUser = FALSE;
     }
   }

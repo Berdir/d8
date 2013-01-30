@@ -23,24 +23,15 @@ use Drupal\Core\Entity\EntityInterface;
  *
  * @see \Drupal\Core\Entity\EntityManager
  * @see hook_entity_info_alter()
+ *
+ * @deprecated Use \Drupal\Core\Entity\EntityManager::getDefinitions() directly.
  */
 function entity_get_info($entity_type = NULL) {
-  // Use the advanced drupal_static() pattern, since this is called very often.
-  static $drupal_static_fast;
-  if (!isset($drupal_static_fast)) {
-    $drupal_static_fast['entity_info'] = &drupal_static(__FUNCTION__);
-  }
-  $entity_info = &$drupal_static_fast['entity_info'];
-
-  if (empty($entity_info)) {
-    $entity_info = drupal_container()->get('plugin.manager.entity')->getDefinitions();
-  }
-
   if (empty($entity_type)) {
-    return $entity_info;
+    return drupal_container()->get('plugin.manager.entity')->getDefinitions();
   }
-  elseif (isset($entity_info[$entity_type])) {
-    return $entity_info[$entity_type];
+  else {
+    return drupal_container()->get('plugin.manager.entity')->getDefinition($entity_type);
   }
 }
 
@@ -48,24 +39,91 @@ function entity_get_info($entity_type = NULL) {
  * Resets the cached information about entity types.
  */
 function entity_info_cache_clear() {
-  drupal_static_reset('entity_get_info');
+  drupal_static_reset('entity_get_view_modes');
+  drupal_static_reset('entity_get_bundles');
   // Clear all languages.
-  cache()->deleteTags(array('entity_info' => TRUE));
+  drupal_container()->get('plugin.manager.entity')->clearCachedDefinitions();
 }
 
 /**
- * Returns the defined bundles for the given entity type.
+ * Returns the entity bundle info.
  *
- * @param string $entity_type
- *   The entity type whose bundles should be returned.
+ * @param string|null $entity_type
+ *   The entity type whose bundle info should be returned, or NULL for all
+ *   bundles info. Defaults to NULL.
  *
  * @return array
- *   An array containing the bundle names or the entity type name itself if no
- *   bundle is defined.
+ *   The bundle info for a specific entity type, or all entity types.
  */
-function entity_get_bundles($entity_type) {
-  $entity_info = entity_get_info($entity_type);
-  return isset($entity_info['bundles']) ? array_keys($entity_info['bundles']) : array($entity_type);
+function entity_get_bundles($entity_type = NULL) {
+  $bundles = &drupal_static(__FUNCTION__);
+  if (!$bundles) {
+    $langcode = language(LANGUAGE_TYPE_INTERFACE)->langcode;
+    if ($cache = cache()->get("entity_bundle_info:$langcode")) {
+      $bundles = $cache->data;
+    }
+    else {
+      $bundles = module_invoke_all('entity_bundle_info');
+      // If no bundles are provided, use the entity type name and label.
+      foreach (entity_get_info() as $type => $entity_info) {
+        if (!isset($bundles[$type])) {
+          $bundles[$type][$type]['label'] = $entity_info['label'];
+        }
+      }
+      drupal_alter('entity_bundle_info', $bundles);
+      cache()->set("entity_bundle_info:$langcode", $bundles, CacheBackendInterface::CACHE_PERMANENT, array('entity_info' => TRUE));
+    }
+  }
+
+  if (empty($entity_type)) {
+    return $bundles;
+  }
+  elseif (isset($bundles[$entity_type])) {
+    return $bundles[$entity_type];
+  }
+
+  return array();
+}
+
+/**
+ * Returns the entity view mode info.
+ *
+ * @param string|null $entity_type
+ *   The entity type whose view mode info should be returned, or NULL for all
+ *   view mode info. Defaults to NULL.
+ *
+ * @return array
+ *   The view mode info for a specific entity type, or all entity types.
+ */
+function entity_get_view_modes($entity_type = NULL) {
+  $view_modes = &drupal_static(__FUNCTION__);
+  if (!$view_modes) {
+    $langcode = language(LANGUAGE_TYPE_INTERFACE)->langcode;
+    if ($cache = cache()->get("entity_view_mode_info:$langcode")) {
+      $view_modes = $cache->data;
+    }
+    else {
+      $view_modes = module_invoke_all('entity_view_mode_info');
+      foreach ($view_modes as $type => $entity_info) {
+        foreach ($entity_info as $view_mode => $view_mode_info) {
+          $view_modes[$type][$view_mode] += array(
+            'custom_settings' => FALSE,
+          );
+        }
+      }
+      drupal_alter('entity_view_mode_info', $view_modes);
+      cache()->set("entity_view_mode_info:$langcode", $view_modes, CacheBackendInterface::CACHE_PERMANENT, array('entity_info' => TRUE));
+    }
+  }
+
+  if (empty($entity_type)) {
+    return $view_modes;
+  }
+  elseif (isset($view_modes[$entity_type])) {
+    return $view_modes[$entity_type];
+  }
+
+  return array();
 }
 
 /**
@@ -662,7 +720,25 @@ function entity_get_render_display(EntityInterface $entity, $view_mode) {
  * @param $conjunction
  *   AND if all conditions in the query need to apply, OR if any of them is
  *   enough. Optional, defaults to AND.
+ *
+ * @return \Drupal\Core\Entity\Query\QueryInterface
+ *   The query object that can query the given entity type.
  */
 function entity_query($entity_type, $conjunction = 'AND') {
   return drupal_container()->get('entity.query')->get($entity_type, $conjunction);
+}
+
+/**
+ * Generic access callback for entity pages.
+ *
+ * @param \Drupal\Core\Entity\EntityInterface $entity
+ *   The entity for which access is being checked.
+ * @param string $operation
+ *   (optional) The operation being performed on the entity. Defaults to 'view'.
+ *
+ * @return bool
+ *   TRUE if the access is granted. FALSE if access is denied.
+ */
+function entity_page_access(EntityInterface $entity, $operation = 'view') {
+  return $entity->access($operation);
 }

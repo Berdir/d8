@@ -576,7 +576,7 @@ function system_element_info() {
     '#theme_wrappers' => array('container'),
   );
   $types['actions'] = array(
-    '#process' => array('form_process_actions', 'form_process_container'),
+    '#process' => array('form_pre_render_actions_dropbutton', 'form_process_actions', 'form_process_container'),
     '#weight' => 100,
     '#theme_wrappers' => array('container'),
   );
@@ -2560,7 +2560,6 @@ function system_form_user_profile_form_alter(&$form, &$form_state) {
   if (config('system.timezone')->get('user.configurable')) {
     system_user_timezone($form, $form_state);
   }
-  return $form;
 }
 
 /**
@@ -2570,7 +2569,6 @@ function system_form_user_register_form_alter(&$form, &$form_state) {
   $config = config('system.timezone');
   if ($config->get('user.configurable') && $config->get('user.default') == DRUPAL_USER_TIMEZONE_SELECT) {
     system_user_timezone($form, $form_state);
-    return $form;
   }
 }
 

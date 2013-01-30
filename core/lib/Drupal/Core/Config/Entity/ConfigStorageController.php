@@ -428,7 +428,7 @@ class ConfigStorageController implements EntityStorageControllerInterface {
    * Implements Drupal\Core\Entity\EntityStorageControllerInterface::getQueryServicename().
    */
   public function getQueryServicename() {
-    throw new \LogicException('Querying configuration entities is not supported.');
+    return 'entity.query.config';
   }
 
   /**
@@ -470,11 +470,11 @@ class ConfigStorageController implements EntityStorageControllerInterface {
     $entity->original = clone $entity;
 
     foreach ($old_config->get() as $property => $value) {
-      $entity->original->$property = $value;
+      $entity->original->set($property, $value);
     }
 
     foreach ($new_config->get() as $property => $value) {
-      $entity->$property = $value;
+      $entity->set($property, $value);
     }
 
     $entity->save();

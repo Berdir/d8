@@ -19,6 +19,7 @@ use Drupal\Core\Annotation\Translation;
  *   label = @Translation("User"),
  *   module = "user",
  *   controller_class = "Drupal\user\UserStorageController",
+ *   access_controller_class = "Drupal\user\UserAccessController",
  *   form_controller_class = {
  *     "profile" = "Drupal\user\ProfileFormController",
  *     "register" = "Drupal\user\RegisterFormController"
@@ -32,24 +33,6 @@ use Drupal\Core\Annotation\Translation;
  *   entity_keys = {
  *     "id" = "uid",
  *     "uuid" = "uuid"
- *   },
- *   bundles = {
- *     "user" = {
- *       "label" = "User",
- *       "admin" = {
- *         "path" = "admin/config/people/accounts",
- *       }
- *     }
- *   },
- *   view_modes = {
- *     "full" = {
- *       "label" = "User account",
- *       "custom_settings" = FALSE
- *     },
- *     "compact" = {
- *       "label" = "Compact",
- *       "custom_settings" = TRUE
- *     }
  *   }
  * )
  */

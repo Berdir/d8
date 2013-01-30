@@ -19,6 +19,13 @@ class DisplayTest extends UITestBase {
    */
   public static $testViews = array('test_display');
 
+  /**
+   * Modules to enable
+   *
+   * @var array
+   */
+  public static $modules = array('contextual');
+
   public static function getInfo() {
     return array(
       'name' => 'Display tests',
@@ -149,7 +156,35 @@ class DisplayTest extends UITestBase {
 
     $this->drupalGet($path_prefix);
     $this->drupalPost(NULL, array(), 'clone Page');
-    $this->assertLinkByHref($path_prefix . '/page_1', 0, 'Make sure after cloning the new display appears in the UI');
+    $this->assertLinkByHref($path_prefix . '/page_2', 0, 'Make sure after cloning the new display appears in the UI');
+    $this->assertUrl($path_prefix . '/page_2', array(), 'The user got redirected to the new display.');
+
+    // Set the title and override the css classes.
+    $random_title = $this->randomName();
+    $random_css = $this->randomName();
+    $this->drupalPost("admin/structure/views/nojs/display/{$view['id']}/page_2/title", array('title' => $random_title), t('Apply'));
+    $this->drupalPost("admin/structure/views/nojs/display/{$view['id']}/page_2/css_class", array('override[dropdown]' => 'page_2', 'css_class' => $random_css), t('Apply'));
+
+    // Clone as a different display type.
+    $this->drupalPost(NULL, array(), 'clone as Block');
+    $this->assertLinkByHref($path_prefix . '/block_1', 0, 'Make sure after cloning the new display appears in the UI');
+    $this->assertUrl($path_prefix . '/block_1', array(), 'The user got redirected to the new display.');
+    $this->assertText(t('Block settings'));
+    $this->assertNoText(t('Page settings'));
+
+    $this->drupalPost(NULL, array(), t('Save'));
+    $view = views_get_view($view['id']);
+    $view->initDisplay();
+
+    $page_2 = $view->displayHandlers->get('page_2');
+    $this->assertTrue($page_2, 'The new page display got saved.');
+    $this->assertEqual($page_2->display['display_title'], 'Page');
+    $block_1 = $view->displayHandlers->get('block_1');
+    $this->assertTrue($block_1, 'The new block display got saved.');
+    $this->assertEqual($block_1->display['display_plugin'], 'block');
+    $this->assertEqual($block_1->display['display_title'], 'Block', 'The new display title got generated as expected.');
+    $this->assertEqual($block_1->getOption('title'), $random_title, 'The overridden title option from the display got copied into the clone');
+    $this->assertEqual($block_1->getOption('css_class'), $random_css, 'The overridden css_class option from the display got copied into the clone');
   }
 
   /**
@@ -181,7 +216,7 @@ class DisplayTest extends UITestBase {
 
     $expected = array(
       'parent path' => 'admin/structure/views/view',
-      'argument properties' => array('name'),
+      'argument properties' => array('id'),
     );
 
     // Test the expected views_ui array exists on each definition.
@@ -238,6 +273,17 @@ class DisplayTest extends UITestBase {
     $this->drupalGet($path);
 
     $this->assertLink(t('Custom URL'), 0, 'The link option has custom url as summary.');
+  }
+
+  /**
+   * Tests contextual links on Views page displays.
+   */
+  public function testPageContextualLinks() {
+    $this->drupalLogin($this->drupalCreateUser(array('administer views', 'access contextual links')));
+    $view = entity_load('view', 'test_display');
+    $view->enable();
+    $this->drupalGet('test-display');
+    $this->assertLinkByHref("admin/structure/views/view/{$view->id()}/edit/page_1");
   }
 
 }

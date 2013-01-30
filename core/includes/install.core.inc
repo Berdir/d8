@@ -1229,18 +1229,18 @@ function install_select_profile_form($form, &$form_state, $install_state) {
     $names = array('standard' => $names['standard']) + $names;
   }
 
-  foreach ($names as $profile => $name) {
-    // The profile name and description are extracted for translation from the
-    // .info file, so we can use st() on them even though they are dynamic data
-    // at this point.
-    $form['profile'][$name] = array(
-      '#type' => 'radio',
-      '#value' => 'standard',
-      '#return_value' => $profile,
-      '#title' => st($name),
-      '#description' => isset($profiles[$profile]['description']) ? st($profiles[$profile]['description']) : '',
-      '#parents' => array('profile'),
-    );
+  // The profile name and description are extracted for translation from the
+  // .info file, so we can use st() on them even though they are dynamic data
+  // at this point.
+  $form['profile'] = array(
+    '#type' => 'radios',
+    '#title' => st('Select an installation profile'),
+    '#title_display' => 'invisible',
+    '#options' => array_map('st', $names),
+    '#default_value' => 'standard',
+  );
+  foreach (array_keys($names) as $profile) {
+    $form['profile'][$profile]['#description'] = isset($profiles[$profile]['description']) ? st($profiles[$profile]['description']) : '';
   }
   $form['actions'] = array('#type' => 'actions');
   $form['actions']['submit'] =  array(
@@ -1349,7 +1349,7 @@ function install_select_language(&$install_state) {
     // thow an error.
     else {
       if (count($files) == 1) {
-        $install_state['parameters']['langcode'] = array_shift(array_keys($files));
+        $install_state['parameters']['langcode'] = current(array_keys($files));
         return;
       }
       else {
@@ -1403,6 +1403,8 @@ function install_select_language_form($form, &$form_state, $files = array()) {
   $browser_langcode = language_from_browser($browser_options);
   $form['langcode'] = array(
     '#type' => 'select',
+    '#title' => st('Choose language'),
+    '#title_display' => 'invisible',
     '#options' => $select_options,
     // Use the browser detected language as default or English if nothing found.
     '#default_value' => !empty($browser_langcode) ? $browser_langcode : 'en',
@@ -1846,7 +1848,6 @@ function install_check_translations($install_state) {
 
   $readable = FALSE;
   $writable = FALSE;
-  $executable = FALSE;
   $files_directory = variable_get('file_public_path', conf_path() . '/files');
   $translations_directory = variable_get('locale_translate_file_directory', conf_path() . '/files/translations');
   $translations_directory_exists = FALSE;
@@ -1863,7 +1864,6 @@ function install_check_translations($install_state) {
   if (drupal_verify_install_file($translations_directory, FILE_EXIST|FILE_WRITABLE, 'dir')) {
     $readable = is_readable($translations_directory);
     $writable = is_writable($translations_directory);
-    $executable = is_executable($translations_directory);
     $translations_directory_exists = TRUE;
   }
 
@@ -1934,15 +1934,6 @@ function install_check_translations($install_state) {
         'value'       => st('The translations directory is writable.'),
       );
     }
-    // If translations directory is not executable, throw an error.
-    if (!$executable) {
-      $requirements['translations directory executable'] = array(
-      'title'       => st('Translations directory'),
-        'value'       => st('The translations directory is not executable.'),
-        'severity'    => REQUIREMENT_ERROR,
-        'description' => st('The installer requires execute permissions to %translations_directory during the installation process. If you are unsure how to grant file permissions, consult the <a href="@handbook_url">online handbook</a>.', array('%translations_directory' => $translations_directory, '@handbook_url' => 'http://drupal.org/server-permissions')),
-      );
-    }
   }
 
   // If the translations server can not be contacted, throw an error.
@@ -1977,7 +1968,7 @@ function install_check_translations($install_state) {
     }
   }
 
-  if ($translations_directory_exists && $readable && $writable && $executable && $translation_available) {
+  if ($translations_directory_exists && $readable && $writable && $translation_available) {
     $translation_downloaded = install_retrieve_file($translation_url, $translations_directory);
 
     if (!$translation_downloaded) {

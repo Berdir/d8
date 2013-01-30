@@ -12,17 +12,29 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\TypedData\ContextAwareInterface;
 
 /**
- * Implements a decorator providing backwards compatible entity field access.
+ * Provides backwards compatible (BC) access to entity fields.
  *
- * Allows using entities converted to the new Entity Field API with the Drupal 7
- * way of accessing fields or properties.
+ * Allows using entities converted to the new Entity Field API with the previous
+ * way of accessing fields or properties. For example, via the backwards
+ * compatible (BC) decorator you can do:
+ * @code
+ *   $node->title = $value;
+ *   $node->body[LANGUAGE_NONE][0]['value'] = $value;
+ * @endcode
+ * Without the BC decorator the same assignment would have to look like this:
+ * @code
+ *   $node->title->value = $value;
+ *   $node->body->value = $value;
+ * @endcode
+ * Without the BC decorator the language always default to the entity language,
+ * whereas a specific translation can be access via the getTranslation() method.
  *
- * Note: We access the protected 'values' and 'fields' properties of the entity
- * via the magic getter - which returns them by reference for us. We do so, as
- * providing references to this arrays makes $entity->values and $entity->fields
- * to references itself as well, which is problematic during __clone() (this is
- * something that would not be easy to fix as an unset() on the variable is
- * problematic with the magic getter/setter then).
+ * The BC decorator should be only used during conversion to the new entity
+ * field API, such that existing code can be converted iteratively. Any new code
+ * should directly use the new entity field API and avoid using the
+ * EntityBCDecorator, if possible.
+ *
+ * @todo: Remove once everything is converted to use the new entity field API.
  */
 class EntityBCDecorator implements IteratorAggregate, EntityInterface {
 
@@ -63,13 +75,25 @@ class EntityBCDecorator implements IteratorAggregate, EntityInterface {
    * Directly accesses the plain field values, as done in Drupal 7.
    */
   public function &__get($name) {
-    // Make sure $this->decorated->values reflects the latest values.
+    // We access the protected 'values' and 'fields' properties of the decorated
+    // entity via the magic getter - which returns them by reference for us. We
+    // do so, as providing references to these arrays would make $entity->values
+    // and $entity->fields reference themselves, which is problematic during
+    // __clone() (this is something we cannot work-a-round easily as an unset()
+    // on the variable is problematic in conjunction with the magic
+    // getter/setter).
+
     if (!empty($this->decorated->fields[$name])) {
+      // Any field value set via the new Entity Field API will be stored inside
+      // the field objects managed by the entity, thus we need to ensure
+      // $this->decorated->values reflects the latest values first.
       foreach ($this->decorated->fields[$name] as $langcode => $field) {
         $this->decorated->values[$name][$langcode] = $field->getValue();
       }
-      // Values might be changed by reference, so remove the field object to
-      // avoid them becoming out of sync.
+      // The returned values might be changed by reference, so we need to remove
+      // the field object to avoid the field object and the value getting out of
+      // sync. That way, the next field object instantiated by EntityNG will
+      // receive the possibly updated value.
       unset($this->decorated->fields[$name]);
     }
     // When accessing values for entity properties that have been converted to
@@ -129,6 +153,9 @@ class EntityBCDecorator implements IteratorAggregate, EntityInterface {
       }
       $this->decorated->values[$name] = $value;
     }
+    // Remove the field object to avoid the field object and the value getting
+    // out of sync. That way, the next field object instantiated by EntityNG
+    // will hold the updated value.
     unset($this->decorated->fields[$name]);
   }
 

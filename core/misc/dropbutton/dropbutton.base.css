@@ -22,6 +22,21 @@
 .js .dropbutton-widget {
   max-width: 100%;
 }
+@media screen and (max-width:600px) {
+  .js .dropbutton-wrapper {
+    width: 100%;
+  }
+}
+
+/* Splitbuttons */
+.form-actions .dropbutton-wrapper {
+  float: left;
+}
+.js .form-actions .dropbutton-widget {
+  position: static;
+}
+
+
 .js .dropbutton-widget {
   position: absolute;
 }

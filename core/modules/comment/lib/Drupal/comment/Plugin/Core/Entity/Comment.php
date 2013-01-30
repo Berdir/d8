@@ -25,7 +25,7 @@ use Drupal\Core\Annotation\Translation;
  *   form_controller_class = {
  *     "default" = "Drupal\comment\CommentFormController"
  *   },
- *   translation_controller_class = "Drupal\translation_entity\EntityTranslationControllerNG",
+ *   translation_controller_class = "Drupal\comment\CommentTranslationController",
  *   base_table = "comment",
  *   uri_callback = "comment_uri",
  *   fieldable = TRUE,
@@ -35,12 +35,6 @@ use Drupal\Core\Annotation\Translation;
  *     "bundle" = "node_type",
  *     "label" = "subject",
  *     "uuid" = "uuid"
- *   },
- *   view_modes = {
- *     "full" = {
- *       "label" = "Full comment",
- *       "custom_settings" = FALSE
- *     }
  *   }
  * )
  */
