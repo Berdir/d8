@@ -239,6 +239,7 @@ abstract class UpgradePathTestBase extends WebTestBase {
     // Go!
     $out = $this->drupalPost(NULL, array(), t('Apply pending updates'));
     if (!$this->assertResponse(200)) {
+      debug($out);
       throw new Exception('POST to update.php to apply pending updates did not return HTTP 200 status.');
     }
 
@@ -258,8 +259,8 @@ abstract class UpgradePathTestBase extends WebTestBase {
     }
 
     // Check if there still are pending updates.
-    $out_pending = $this->getUpdatePhp();
-    $this->drupalPost(NULL, array(), t('Continue'));
+    $this->getUpdatePhp();
+    $out_pending = $this->drupalPost(NULL, array(), t('Continue'));
     if (!$this->assertText(t('No pending updates.'), 'No pending updates at the end of the update process.')) {
       debug(strip_tags($out), 'response before');
       debug(strip_tags($out_pending), 'response pending');
