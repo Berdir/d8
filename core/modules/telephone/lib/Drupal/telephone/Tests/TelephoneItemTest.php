@@ -34,7 +34,7 @@ class TelephoneItemTest extends FieldItemUnitTestBase {
   public function setUp() {
     parent::setUp();
 
-    // Create an telephone field and instance for validation.
+    // Create a telephone field and instance for validation.
     $this->field = array(
       'field_name' => 'field_test',
       'type' => 'telephone',
