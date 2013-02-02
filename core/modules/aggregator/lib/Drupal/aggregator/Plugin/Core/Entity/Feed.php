@@ -129,13 +129,6 @@ class Feed extends EntityNG implements ContentEntityInterface {
   public $modified;
 
   /**
-   * Number of items to display in the feed’s block.
-   *
-   * @var \Drupal\Core\Entity\Field\FieldInterface
-   */
-  public $block;
-
-  /**
    * Overrides Drupal\Core\Entity\EntityNG::init().
    */
   public function init() {
@@ -154,7 +147,6 @@ class Feed extends EntityNG implements ContentEntityInterface {
     unset($this->hash);
     unset($this->etag);
     unset($this->modified);
-    unset($this->block);
 
   }
 

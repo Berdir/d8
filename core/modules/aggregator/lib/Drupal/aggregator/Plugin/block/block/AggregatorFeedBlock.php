@@ -18,7 +18,6 @@ use Drupal\Core\Annotation\Translation;
  *   id = "aggregator_feed_block",
  *   admin_label = @Translation("Aggregator feed"),
  *   module = "aggregator",
- *   derivative = "Drupal\aggregator\Plugin\Derivative\AggregatorFeedBlock"
  * )
  */
 class AggregatorFeedBlock extends BlockBase {
@@ -30,6 +29,7 @@ class AggregatorFeedBlock extends BlockBase {
     // By default, the block will contain 10 feed items.
     return array(
       'block_count' => 10,
+      'feed' => NULL,
     );
   }
 
@@ -45,6 +45,17 @@ class AggregatorFeedBlock extends BlockBase {
    * Overrides \Drupal\block\BlockBase::blockForm().
    */
   public function blockForm($form, &$form_state) {
+    $feeds = entity_load_multiple('aggregator_feed');
+    $options = array();
+    foreach ($feeds as $feed) {
+      $options[$feed->id()] = $feed->label();
+    }
+    $form['feed'] = array(
+      '#type' => 'select',
+      '#title' => t('Select the feed that should be displayed'),
+      '#default_value' => $this->configuration['feed'],
+      '#options' => $options,
+    );
     $form['block_count'] = array(
       '#type' => 'select',
       '#title' => t('Number of news items in block'),
@@ -59,27 +70,26 @@ class AggregatorFeedBlock extends BlockBase {
    */
   public function blockSubmit($form, &$form_state) {
     $this->configuration['block_count'] = $form_state['values']['block_count'];
+    $this->configuration['feed'] = $form_state['values']['feed'];
+
   }
 
   /**
    * Implements \Drupal\block\BlockBase::build().
    */
   public function build() {
-    // Plugin IDs look something like this: aggregator_feed_block:1.
-    list(, $id) = explode(':', $this->getPluginId());
-    if ($feed = db_query('SELECT fid, title, block FROM {aggregator_feed} WHERE block <> 0 AND fid = :fid', array(':fid' => $id))->fetchObject()) {
-      $result = db_query_range("SELECT * FROM {aggregator_item} WHERE fid = :fid ORDER BY timestamp DESC, iid DESC", 0, $this->configuration['block_count'], array(':fid' => $id));
-      $read_more = theme('more_link', array('url' => 'aggregator/sources/' . $feed->fid, 'title' => t("View this feed's recent news.")));
-
-      $items = array();
-      foreach ($result as $item) {
-        $items[] = theme('aggregator_block_item', array('item' => $item));
-      }
-      // Only display the block if there are items to show.
-      if (count($items) > 0) {
-        return array(
-          '#children' => theme('item_list', array('items' => $items)) . $read_more,
+    $feed = aggregator_feed_load($this->configuration['feed']);
+    if ($feed) {
+      module_load_include('inc', 'aggregator', 'aggregator.pages');
+      $items = aggregator_load_feed_items('source', $feed, $this->configuration['block_count']);
+      if ($items) {
+        $build['items'] = entity_view_multiple($items, 'default');
+        $build['read_more'] = array(
+          '#theme' => 'more_link',
+          '#url' => 'aggregator/sources/' . $feed->id(),
+          '#title' => t("View this feed's recent news."),
         );
+        return $build;
       }
     }
   }

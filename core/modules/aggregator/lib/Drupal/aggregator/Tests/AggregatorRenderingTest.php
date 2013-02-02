@@ -68,6 +68,7 @@ class AggregatorRenderingTest extends AggregatorTestBase {
 
     // Set the number of news items to 0 to test that the block does not show
     // up.
+    // @todo: Fix.
     $feed->block = 0;
     $feed->save();
     // Check that the block is no longer displayed.
