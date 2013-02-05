@@ -40,7 +40,7 @@ class CommentAccessController extends EntityAccessController {
     if (!isset($account)) {
       $account = $GLOBALS['user'];
     }
-    return ($account->uid && $account->id() == $entity->uid && $entity->status == COMMENT_PUBLISHED && user_access('edit own comments', $account)) || user_access('administer comments', $account);
+    return ($account->uid && $account->uid == $entity->uid && $entity->status == COMMENT_PUBLISHED && user_access('edit own comments', $account)) || user_access('administer comments', $account);
   }
 
   /**
