@@ -242,14 +242,14 @@ function comment_menu() {
     'access arguments' => array('administer comments'),
     'type' => MENU_LOCAL_TASK,
   );
-  $items['comment/%'] = array(
+  $items['comment/%comment'] = array(
     'title' => 'Comment permalink',
     'page callback' => 'comment_permalink',
     'page arguments' => array(1),
     'access callback' => 'entity_page_access',
     'access arguments' => array(1, 'view'),
   );
-  $items['comment/%/view'] = array(
+  $items['comment/%comment/view'] = array(
     'title' => 'View comment',
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => -10,
@@ -265,7 +265,7 @@ function comment_menu() {
     'type' => MENU_LOCAL_TASK,
     'weight' => 0,
   );
-  $items['comment/%/approve'] = array(
+  $items['comment/%comment/approve'] = array(
     'title' => 'Approve',
     'page callback' => 'comment_approve',
     'page arguments' => array(1),
@@ -274,7 +274,7 @@ function comment_menu() {
     'file' => 'comment.pages.inc',
     'weight' => 1,
   );
-  $items['comment/%/delete'] = array(
+  $items['comment/%comment/delete'] = array(
     'title' => 'Delete',
     'page callback' => 'comment_confirm_delete_page',
     'page arguments' => array(1),
@@ -437,15 +437,14 @@ function comment_permission() {
  * calculates the page number based on current comment settings and returns
  * the full comment view with the pager set dynamically.
  *
- * @param $cid
- *   A comment identifier.
+ * @param \Drupal\comment\Plugin\Core\Entity\Comment $comment
+ *   A comment entity.
  *
  * @return
  *   The comment listing set to the page on which the comment appears.
  */
-function comment_permalink($cid) {
-  if (($comment = comment_load($cid)) && ($node = $comment->nid->entity)) {
-
+function comment_permalink(Comment $comment) {
+  if ($node = $comment->nid->entity) {
     // Find the current display page for this comment.
     $page = comment_get_display_page($comment->id(), $node->type);
 

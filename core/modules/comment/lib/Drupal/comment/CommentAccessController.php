@@ -40,7 +40,7 @@ class CommentAccessController extends EntityAccessController {
     if (!isset($account)) {
       $account = $GLOBALS['user'];
     }
-    return ($account->uid && $account->uid == $entity->uid && $entity->status == COMMENT_PUBLISHED && user_access('edit own comments', $account)) || user_access('administer comments', $account);
+    return ($account->uid && $account->uid == $entity->uid->value && $entity->status->value == COMMENT_PUBLISHED && user_access('edit own comments', $account)) || user_access('administer comments', $account);
   }
 
   /**
@@ -53,7 +53,7 @@ class CommentAccessController extends EntityAccessController {
   /**
    * Implements \Drupal\Core\Entity\EntityAccessController::approveAccess().
    */
-  public function improveAccess(EntityInterface $entity, $langcode = LANGUAGE_DEFAULT, User $account = NULL) {
+  public function approveAccess(EntityInterface $entity, $langcode = LANGUAGE_DEFAULT, User $account = NULL) {
     return user_access('administer comments', $account);
   }
 
