@@ -246,7 +246,8 @@ function comment_menu() {
     'title' => 'Comment permalink',
     'page callback' => 'comment_permalink',
     'page arguments' => array(1),
-    'access arguments' => array('access comments'),
+    'access callback' => 'entity_page_access',
+    'access arguments' => array(1, 'view'),
   );
   $items['comment/%/view'] = array(
     'title' => 'View comment',
@@ -259,8 +260,8 @@ function comment_menu() {
     'title' => 'Edit',
     'page callback' => 'comment_edit_page',
     'page arguments' => array(1),
-    'access callback' => 'comment_access',
-    'access arguments' => array('edit', 1),
+    'access callback' => 'entity_page_access',
+    'access arguments' => array(1, 'update'),
     'type' => MENU_LOCAL_TASK,
     'weight' => 0,
   );
@@ -268,7 +269,8 @@ function comment_menu() {
     'title' => 'Approve',
     'page callback' => 'comment_approve',
     'page arguments' => array(1),
-    'access arguments' => array('administer comments'),
+    'access callback' => 'entity_page_access',
+    'access arguments' => array(1, 'approve'),
     'file' => 'comment.pages.inc',
     'weight' => 1,
   );
@@ -276,7 +278,8 @@ function comment_menu() {
     'title' => 'Delete',
     'page callback' => 'comment_confirm_delete_page',
     'page arguments' => array(1),
-    'access arguments' => array('administer comments'),
+    'access callback' => 'entity_page_access',
+    'access arguments' => array(1, 'delete'),
     'type' => MENU_LOCAL_TASK,
     'file' => 'comment.admin.inc',
     'weight' => 2,
@@ -958,7 +961,7 @@ function comment_links(Comment $comment, Node $node) {
       }
     }
     elseif (user_access('post comments')) {
-      if (comment_access('edit', $comment)) {
+      if ($comment->access('update')) {
         $links['comment-edit'] = array(
           'title' => t('edit'),
           'href' => "comment/{$comment->id()}/edit",
@@ -1333,30 +1336,6 @@ function comment_user_cancel($edit, $account, $method) {
 function comment_user_predelete($account) {
   $cids = db_query('SELECT c.cid FROM {comment} c WHERE uid = :uid', array(':uid' => $account->uid))->fetchCol();
   comment_delete_multiple($cids);
-}
-
-/**
- * Determines whether the current user has access to a particular comment.
- *
- * Authenticated users can edit their comments as long they have not been
- * replied to. This prevents people from changing or revising their statements
- * based on the replies to their posts.
- *
- * @param $op
- *   The operation that is to be performed on the comment. Only 'edit' is
- *   recognized now.
- * @param Drupal\comment\Comment $comment
- *   The comment object.
- *
- * @return
- *   TRUE if the current user has acces to the comment, FALSE otherwise.
- */
-function comment_access($op, Comment $comment) {
-  global $user;
-
-  if ($op == 'edit') {
-    return ($user->uid && $user->uid == $comment->uid->target_id && $comment->status->value == COMMENT_PUBLISHED && user_access('edit own comments')) || user_access('administer comments');
-  }
 }
 
 /**
