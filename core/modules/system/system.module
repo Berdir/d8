@@ -548,7 +548,6 @@ function system_element_info() {
     '#theme_wrappers' => array('fieldset'),
   );
   $types['details'] = array(
-    '#collapsible' => FALSE,
     '#collapsed' => FALSE,
     '#value' => NULL,
     '#process' => array('form_process_group', 'ajax_process_form'),
@@ -576,7 +575,7 @@ function system_element_info() {
     '#theme_wrappers' => array('container'),
   );
   $types['actions'] = array(
-    '#process' => array('form_process_actions', 'form_process_container'),
+    '#process' => array('form_pre_render_actions_dropbutton', 'form_process_actions', 'form_process_container'),
     '#weight' => 100,
     '#theme_wrappers' => array('container'),
   );
@@ -1353,9 +1352,9 @@ function system_library_info() {
     ),
   );
 
-  // Drupal's collapsible details.
+  // Collapsible details.
   $libraries['drupal.collapse'] = array(
-    'title' => 'Drupal collapsible details',
+    'title' => 'Collapsible details',
     'version' => VERSION,
     'js' => array(
       'core/misc/collapse.js' => array('group' => JS_DEFAULT),
@@ -2224,6 +2223,7 @@ function system_data_type_info() {
       'label' => t('Email'),
       'class' => '\Drupal\Core\TypedData\Type\Email',
       'primitive type' => Primitive::STRING,
+      'constraints' => array('Email' => array()),
     ),
     'binary' => array(
       'label' => t('Binary'),
@@ -2275,10 +2275,16 @@ function system_data_type_info() {
       'class' => '\Drupal\Core\Entity\Field\Type\LanguageItem',
       'list class' => '\Drupal\Core\Entity\Field\Type\Field',
     ),
-    'entityreference_field' => array(
+    'entity_reference_field' => array(
       'label' => t('Entity reference field item'),
       'description' => t('An entity field containing an entity reference.'),
       'class' => '\Drupal\Core\Entity\Field\Type\EntityReferenceItem',
+      'list class' => '\Drupal\Core\Entity\Field\Type\Field',
+    ),
+    'uri_field' => array(
+      'label' => t('URI field item'),
+      'description' => t('An entity field containing a URI'),
+      'class' => '\Drupal\Core\Entity\Field\Type\UriItem',
       'list class' => '\Drupal\Core\Entity\Field\Type\Field',
     ),
   );
@@ -2560,7 +2566,6 @@ function system_form_user_profile_form_alter(&$form, &$form_state) {
   if (config('system.timezone')->get('user.configurable')) {
     system_user_timezone($form, $form_state);
   }
-  return $form;
 }
 
 /**
@@ -2570,7 +2575,6 @@ function system_form_user_register_form_alter(&$form, &$form_state) {
   $config = config('system.timezone');
   if ($config->get('user.configurable') && $config->get('user.default') == DRUPAL_USER_TIMEZONE_SELECT) {
     system_user_timezone($form, $form_state);
-    return $form;
   }
 }
 
@@ -2606,7 +2610,6 @@ function system_user_timezone(&$form, &$form_state) {
     '#type' => 'details',
     '#title' => t('Locale settings'),
     '#weight' => 6,
-    '#collapsible' => TRUE,
   );
   $form['timezone']['timezone'] = array(
     '#type' => 'select',

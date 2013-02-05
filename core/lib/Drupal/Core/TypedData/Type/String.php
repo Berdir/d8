@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\Core\TypedData\Type\String.
+ * Contains \Drupal\Core\TypedData\Type\String.
  */
 
 namespace Drupal\Core\TypedData\Type;
@@ -23,18 +23,4 @@ class String extends TypedData {
    * @var string
    */
   protected $value;
-
-  /**
-   * Implements TypedDataInterface::setValue().
-   */
-  public function setValue($value) {
-    $this->value = isset($value) ? (string) $value : $value;
-  }
-
-  /**
-   * Implements TypedDataInterface::validate().
-   */
-  public function validate() {
-    // TODO: Implement validate() method.
-  }
 }

@@ -176,10 +176,22 @@ class Block extends DisplayPluginBase {
    * Block views use exposed widgets only if AJAX is set.
    */
   public function usesExposed() {
-      if ($this->isAJAXEnabled()) {
+      if ($this->ajaxEnabled()) {
         return parent::usesExposed();
       }
       return FALSE;
     }
+
+  /**
+   * Overrides \Drupal\views\Plugin\views\display\DisplayPluginBase::remove().
+   */
+  public function remove() {
+    parent::remove();
+
+    $plugin_id = 'views_block:' . $this->view->storage->id() . '-' . $this->display['id'];
+    foreach (entity_load_multiple_by_properties('block', array('plugin' => $plugin_id)) as $block) {
+      $block->delete();
+    }
+  }
 
 }

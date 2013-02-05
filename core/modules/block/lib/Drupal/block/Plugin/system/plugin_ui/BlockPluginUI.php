@@ -93,12 +93,14 @@ class BlockPluginUI extends PluginUIBase {
           '#links' => $values,
         );
       }
-      $form['left']['plugin_library'] = array(
-        '#theme' => 'table',
-        '#header' => $this->tableHeader(),
-        '#rows' => $rows,
-      );
     }
+    // Sort rows alphabetically.
+    sort($rows);
+    $form['left']['plugin_library'] = array(
+      '#theme' => 'table',
+      '#header' => $this->tableHeader(),
+      '#rows' => $rows,
+    );
     return $form;
   }
 
@@ -141,7 +143,7 @@ class BlockPluginUI extends PluginUIBase {
     $plugin_definition = $this->getDefinition();
     list($plugin, $theme) = explode(':', $this->getPluginId());
     $row = array();
-    $row[] = $display_plugin_definition['subject'];
+    $row[] = check_plain($display_plugin_definition['subject']);
     $row[] = array('data' => array(
       '#type' => 'operations',
       '#links' => array(

@@ -11,6 +11,7 @@ use Drupal\Component\Plugin\PluginManagerBase;
 use Drupal\Component\Plugin\Factory\DefaultFactory;
 use Drupal\Component\Plugin\Discovery\ProcessDecorator;
 use Drupal\Core\Plugin\Discovery\AlterDecorator;
+use Drupal\Core\Plugin\Discovery\CacheDecorator;
 use Drupal\Core\Plugin\Discovery\AnnotatedClassDiscovery;
 use Drupal\Core\Plugin\Discovery\InfoHookDecorator;
 use Drupal\Core\Cache\CacheBackendInterface;
@@ -109,49 +110,6 @@ use Drupal\Core\Cache\CacheBackendInterface;
  *   Elements:
  *   - bundle: The name of the property that contains the name of the bundle
  *     object.
- * - bundles: An array describing all bundles for this object type. Keys are
- *   bundle machine names, as found in the objects' 'bundle' property
- *   (defined in the 'entity_keys' entry for the entity type in the
- *   EntityManager). Elements:
- *   - label: The human-readable name of the bundle.
- *   - uri_callback: The same as the 'uri_callback' key defined for the entity
- *     type in the EntityManager, but for the bundle only. When determining
- *     the URI of an entity, if a 'uri_callback' is defined for both the
- *     entity type and the bundle, the one for the bundle is used.
- *   - admin: An array of information that allows Field UI pages to attach
- *     themselves to the existing administration pages for the bundle.
- *     Elements:
- *     - path: the path of the bundle's main administration page, as defined
- *       in hook_menu(). If the path includes a placeholder for the bundle,
- *       the 'bundle argument', 'bundle helper' and 'real path' keys below
- *       are required.
- *     - bundle argument: The position of the placeholder in 'path', if any.
- *     - real path: The actual path (no placeholder) of the bundle's main
- *       administration page. This will be used to generate links.
- *     - access callback: As in hook_menu(). 'user_access' will be assumed if
- *       no value is provided.
- *     - access arguments: As in hook_menu().
- * - view_modes: An array describing the view modes for the entity type. View
- *   modes let entities be displayed differently depending on the context.
- *   For instance, a node can be displayed differently on its own page
- *   ('full' mode), on the home page or taxonomy listings ('teaser' mode), or
- *   in an RSS feed ('rss' mode). Modules taking part in the display of the
- *   entity (notably the Field API) can adjust their behavior depending on
- *   the requested view mode. An additional 'default' view mode is available
- *   for all entity types. This view mode is not intended for actual entity
- *   display, but holds default display settings. For each available view
- *   mode, administrators can configure whether it should use its own set of
- *   field display settings, or just replicate the settings of the 'default'
- *   view mode, thus reducing the amount of display configurations to keep
- *   track of. Keys of the array are view mode names. Each view mode is
- *   described by an array with the following key/value pairs:
- *   - label: The human-readable name of the view mode.
- *   - custom_settings: A boolean specifying whether the view mode should by
- *     default use its own custom field display settings. If FALSE, entities
- *     displayed in this view mode will reuse the 'default' display settings
- *     by default (e.g. right after the module exposing the view mode is
- *     enabled), but administrators can later use the Field UI to apply custom
- *     display settings specific to the view mode.
  * - menu_base_path: (optional) The base menu router path to which the entity
  *   administration user interface responds. It can be used to generate UI
  *   links and to attach additional router items to the entity UI in a generic
@@ -162,6 +120,11 @@ use Drupal\Core\Cache\CacheBackendInterface;
  *   entity.
  * - menu_path_wildcard: (optional) A string identifying the menu loader in the
  *   router path.
+ * - permission_granularity: (optional) Specifies whether a module exposing
+ *   permissions for the current entity type should use entity-type level
+ *   granularity, bundle level granularity or just skip this entity. The allowed
+ *   values are respectively "entity_type", "bundle" or FALSE. Defaults to
+ *   "entity_type".
  *
  * The defaults for the plugin definition are provided in
  * \Drupal\Core\Entity\EntityManager::defaults.
@@ -171,34 +134,6 @@ use Drupal\Core\Cache\CacheBackendInterface;
  * @see hook_entity_info_alter()
  */
 class EntityManager extends PluginManagerBase {
-
-  /**
-   * The cache bin used for entity plugin definitions.
-   *
-   * @var string
-   */
-  protected $cacheBin = 'cache';
-
-  /**
-   * The cache key used for entity plugin definitions.
-   *
-   * @var string
-   */
-  protected $cacheKey = 'entity_info';
-
-  /**
-   * The cache expiration for entity plugin definitions.
-   *
-   * @var int
-   */
-  protected $cacheExpire = CacheBackendInterface::CACHE_PERMANENT;
-
-  /**
-   * The cache tags used for entity plugin definitions.
-   *
-   * @var array
-   */
-  protected $cacheTags = array('entity_info' => TRUE);
 
   /**
    * Contains instantiated controllers keyed by controller type and entity type.
@@ -229,8 +164,7 @@ class EntityManager extends PluginManagerBase {
     'access_controller_class' => 'Drupal\Core\Entity\EntityAccessController',
     'static_cache' => TRUE,
     'translation' => array(),
-    'bundles' => array(),
-    'view_modes' => array(),
+    'permission_granularity' => 'entity_type',
   );
 
   /**
@@ -242,36 +176,9 @@ class EntityManager extends PluginManagerBase {
     $this->discovery = new InfoHookDecorator($this->discovery, 'entity_info');
     $this->discovery = new ProcessDecorator($this->discovery, array($this, 'processDefinition'));
     $this->discovery = new AlterDecorator($this->discovery, 'entity_info');
-    $this->factory = new DefaultFactory($this);
+    $this->discovery = new CacheDecorator($this->discovery, 'entity_info:' . language(LANGUAGE_TYPE_INTERFACE)->langcode, 'cache', CacheBackendInterface::CACHE_PERMANENT, array('entity_info' => TRUE));
 
-    // Entity type plugins includes translated strings, so each language is
-    // cached separately.
-    $this->cacheKey .= ':' . language(LANGUAGE_TYPE_INTERFACE)->langcode;
-  }
-
-  /**
-   * Overrides Drupal\Component\Plugin\PluginManagerBase::getDefinition().
-   */
-  public function getDefinition($plugin_id) {
-    $definitions = $this->getDefinitions();
-    return isset($definitions[$plugin_id]) ? $definitions[$plugin_id] : NULL;
-  }
-
-  /**
-   * Overrides Drupal\Component\Plugin\PluginManagerBase::getDefinitions().
-   */
-  public function getDefinitions() {
-    // Because \Drupal\Core\Plugin\Discovery\CacheDecorator runs before
-    // definitions are processed and does not support cache tags, we perform our
-    // own caching.
-    if ($cache = cache($this->cacheBin)->get($this->cacheKey)) {
-      return $cache->data;
-    }
-    else {
-      $definitions = parent::getDefinitions();
-      cache($this->cacheBin)->set($this->cacheKey, $definitions, $this->cacheExpire, $this->cacheTags);
-      return $definitions;
-    }
+    $this->factory = new DefaultFactory($this->discovery);
   }
 
   /**
@@ -286,17 +193,6 @@ class EntityManager extends PluginManagerBase {
       return;
     }
 
-    foreach ($definition['view_modes'] as $view_mode => $view_mode_info) {
-      $definition['view_modes'][$view_mode] += array(
-        'custom_settings' => FALSE,
-      );
-    }
-
-    // If no bundle key is provided, assume a single bundle, named after
-    // the entity type.
-    if (empty($definition['entity_keys']['bundle']) && empty($definition['bundles'])) {
-      $definition['bundles'] = array($plugin_id => array('label' => $definition['label']));
-    }
     // Prepare entity schema fields SQL info for
     // Drupal\Core\Entity\DatabaseStorageControllerInterface::buildQuery().
     if (isset($definition['base_table'])) {

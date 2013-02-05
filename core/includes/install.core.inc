@@ -10,6 +10,8 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+use Guzzle\Http\Exception\RequestException;
+
 /**
  * @file
  * API functions for installing Drupal.
@@ -338,6 +340,9 @@ function install_begin_request(&$install_state) {
     $container->register('config.factory', 'Drupal\Core\Config\ConfigFactory')
       ->addArgument(new Reference('config.storage'))
       ->addArgument(new Reference('event_dispatcher'));
+
+    // Register the 'language_manager' service.
+    $container->register('language_manager', 'Drupal\Core\Language\LanguageManager');
 
     // The install process cannot use the database lock backend since the database
     // is not fully up, so we use a null backend implementation during the
@@ -1229,18 +1234,18 @@ function install_select_profile_form($form, &$form_state, $install_state) {
     $names = array('standard' => $names['standard']) + $names;
   }
 
-  foreach ($names as $profile => $name) {
-    // The profile name and description are extracted for translation from the
-    // .info file, so we can use st() on them even though they are dynamic data
-    // at this point.
-    $form['profile'][$name] = array(
-      '#type' => 'radio',
-      '#value' => 'standard',
-      '#return_value' => $profile,
-      '#title' => st($name),
-      '#description' => isset($profiles[$profile]['description']) ? st($profiles[$profile]['description']) : '',
-      '#parents' => array('profile'),
-    );
+  // The profile name and description are extracted for translation from the
+  // .info file, so we can use st() on them even though they are dynamic data
+  // at this point.
+  $form['profile'] = array(
+    '#type' => 'radios',
+    '#title' => st('Select an installation profile'),
+    '#title_display' => 'invisible',
+    '#options' => array_map('st', $names),
+    '#default_value' => 'standard',
+  );
+  foreach (array_keys($names) as $profile) {
+    $form['profile'][$profile]['#description'] = isset($profiles[$profile]['description']) ? st($profiles[$profile]['description']) : '';
   }
   $form['actions'] = array('#type' => 'actions');
   $form['actions']['submit'] =  array(
@@ -1349,7 +1354,7 @@ function install_select_language(&$install_state) {
     // thow an error.
     else {
       if (count($files) == 1) {
-        $install_state['parameters']['langcode'] = array_shift(array_keys($files));
+        $install_state['parameters']['langcode'] = current(array_keys($files));
         return;
       }
       else {
@@ -1403,6 +1408,8 @@ function install_select_language_form($form, &$form_state, $files = array()) {
   $browser_langcode = language_from_browser($browser_options);
   $form['langcode'] = array(
     '#type' => 'select',
+    '#title' => st('Choose language'),
+    '#title_display' => 'invisible',
     '#options' => $select_options,
     // Use the browser detected language as default or English if nothing found.
     '#default_value' => !empty($browser_langcode) ? $browser_langcode : 'en',
@@ -1445,7 +1452,7 @@ function install_download_translation(&$install_state) {
 }
 
 /**
- * Attempts to get a file using drupal_http_request and to store it locally.
+ * Attempts to get a file using a HTTP request and to store it locally.
  *
  * @param string $uri
  *   The URI of the file to grab.
@@ -1467,14 +1474,18 @@ function install_retrieve_file($uri, $destination) {
   else {
     $path = $destination;
   }
-  $result = drupal_http_request($uri);
-  if ($result->code != 200) {
+
+  try {
+    $request = drupal_container()->get('http_default_client')->get($uri, array('Accept' => 'text/plain'));
+    $data = $request->send()->getBody(TRUE);
+    if (empty($data)) {
+      return FALSE;
+    }
+  }
+  catch (RequestException $e) {
     return FALSE;
   }
-  if (file_put_contents($path, $result->data) === FALSE) {
-    return FALSE;
-  }
-  return TRUE;
+  return file_put_contents($path, $data) !== FALSE;
 }
 
 /**
@@ -1484,12 +1495,17 @@ function install_retrieve_file($uri, $destination) {
  *  The URI to contact.
  *
  * @return string
- *   URI of the server if the localization server was contacted successfully.
- *   FALSE if not.
+ *   TRUE if the URI was contacted successfully, FALSE if not.
  */
 function install_check_localization_server($uri) {
-  $result = drupal_http_request($uri, array('method' => 'HEAD'));
-  return (!isset($result->error) && $result->code == 200);
+  try {
+    $request = drupal_container()->get('http_default_client')->head($uri);
+    $response = $request->send();
+    return TRUE;
+  }
+  catch (RequestException $e) {
+    return FALSE;
+  }
 }
 
 /**
@@ -1846,7 +1862,6 @@ function install_check_translations($install_state) {
 
   $readable = FALSE;
   $writable = FALSE;
-  $executable = FALSE;
   $files_directory = variable_get('file_public_path', conf_path() . '/files');
   $translations_directory = variable_get('locale_translate_file_directory', conf_path() . '/files/translations');
   $translations_directory_exists = FALSE;
@@ -1863,7 +1878,6 @@ function install_check_translations($install_state) {
   if (drupal_verify_install_file($translations_directory, FILE_EXIST|FILE_WRITABLE, 'dir')) {
     $readable = is_readable($translations_directory);
     $writable = is_writable($translations_directory);
-    $executable = is_executable($translations_directory);
     $translations_directory_exists = TRUE;
   }
 
@@ -1934,15 +1948,6 @@ function install_check_translations($install_state) {
         'value'       => st('The translations directory is writable.'),
       );
     }
-    // If translations directory is not executable, throw an error.
-    if (!$executable) {
-      $requirements['translations directory executable'] = array(
-      'title'       => st('Translations directory'),
-        'value'       => st('The translations directory is not executable.'),
-        'severity'    => REQUIREMENT_ERROR,
-        'description' => st('The installer requires execute permissions to %translations_directory during the installation process. If you are unsure how to grant file permissions, consult the <a href="@handbook_url">online handbook</a>.', array('%translations_directory' => $translations_directory, '@handbook_url' => 'http://drupal.org/server-permissions')),
-      );
-    }
   }
 
   // If the translations server can not be contacted, throw an error.
@@ -1977,7 +1982,7 @@ function install_check_translations($install_state) {
     }
   }
 
-  if ($translations_directory_exists && $readable && $writable && $executable && $translation_available) {
+  if ($translations_directory_exists && $readable && $writable && $translation_available) {
     $translation_downloaded = install_retrieve_file($translation_url, $translations_directory);
 
     if (!$translation_downloaded) {
@@ -2195,7 +2200,6 @@ function _install_configure_form($form, &$form_state, &$install_state) {
   $form['site_information'] = array(
     '#type' => 'details',
     '#title' => st('Site information'),
-    '#collapsible' => FALSE,
   );
   $form['site_information']['site_name'] = array(
     '#type' => 'textfield',
@@ -2214,7 +2218,6 @@ function _install_configure_form($form, &$form_state, &$install_state) {
   $form['admin_account'] = array(
     '#type' => 'details',
     '#title' => st('Site maintenance account'),
-    '#collapsible' => FALSE,
   );
 
   $form['admin_account']['account']['#tree'] = TRUE;
@@ -2243,7 +2246,6 @@ function _install_configure_form($form, &$form_state, &$install_state) {
   $form['server_settings'] = array(
     '#type' => 'details',
     '#title' => st('Server settings'),
-    '#collapsible' => FALSE,
   );
 
   $countries = country_get_list();
@@ -2270,7 +2272,6 @@ function _install_configure_form($form, &$form_state, &$install_state) {
   $form['update_notifications'] = array(
     '#type' => 'details',
     '#title' => st('Update notifications'),
-    '#collapsible' => FALSE,
   );
   $form['update_notifications']['update_status_module'] = array(
     '#type' => 'checkboxes',

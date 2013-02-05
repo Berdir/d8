@@ -1710,10 +1710,9 @@ function form_error(&$element, $message = '') {
  *   can also be used to set additional properties or implement special logic
  *   other than adding child elements: for example, for the 'details' element
  *   type, one of the functions in this array is form_process_details(), which
- *   adds the attributes and JavaScript needed to make the details collapsible
- *   if the #collapsible property is set. The #process functions are called in
- *   preorder traversal, meaning they are called for the parent element first,
- *   then for the child elements.
+ *   adds the attributes and JavaScript needed to make the details work in older
+ *   browsers. The #process functions are called in preorder traversal, meaning
+ *   they are called for the parent element first, then for the child elements.
  * - $element['#after_build']: An array of functions called after form_builder()
  *   is done with its processing of the element. These are called in postorder
  *   traversal, meaning they are called for the child elements first, then for
@@ -2817,8 +2816,8 @@ function form_get_options($element, $key) {
  * @param $variables
  *   An associative array containing:
  *   - element: An associative array containing the properties of the element.
- *     Properties used: #attributes, #children, #collapsed, #collapsible,
- *     #description, #id, #title, #value.
+ *     Properties used: #attributes, #children, #collapsed, #description, #id,
+ *     #title, #value.
  *
  * @ingroup themeable
  */
@@ -2863,8 +2862,8 @@ function theme_fieldset($variables) {
  * @param $variables
  *   An associative array containing:
  *   - element: An associative array containing the properties of the element.
- *     Properties used: #attributes, #children, #collapsed, #collapsible,
- *     #description, #id, #title, #value.
+ *     Properties used: #attributes, #children, #collapsed, #description, #id,
+ *     #title, #value.
  *
  * @ingroup themeable
  */
@@ -3334,6 +3333,52 @@ function form_process_checkboxes($element) {
 function form_process_actions($element, &$form_state) {
   $element['#attributes']['class'][] = 'form-actions';
   return $element;
+}
+
+/**
+ * #pre_render callback for #type 'actions'.
+ *
+ * This callback iterates over all child elements of the #type 'actions'
+ * container to look for elements with a #dropbutton property, so as to group
+ * those elements into dropbuttons. As such, it works similar to #group, but is
+ * specialized for dropbuttons.
+ *
+ * The value of #dropbutton denotes the dropbutton to group the child element
+ * into. For example, two different values of 'foo' and 'bar' on child elements
+ * would generate two separate dropbuttons, which each contain the corresponding
+ * buttons.
+ *
+ * @param array $element
+ *   The #type 'actions' element to process.
+ *
+ * @return array
+ *   The processed #type 'actions' element, including individual buttons grouped
+ *   into new #type 'dropbutton' elements.
+ */
+function form_pre_render_actions_dropbutton(array $element) {
+  $dropbuttons = array();
+  foreach (element_children($element, TRUE) as $key) {
+    if (isset($element[$key]['#dropbutton'])) {
+      $dropbutton = $element[$key]['#dropbutton'];
+      // If there is no dropbutton for this button group yet, create one.
+      if (!isset($dropbuttons[$dropbutton])) {
+        $dropbuttons[$dropbutton] = array(
+          '#type' => 'dropbutton',
+        );
+      }
+      // Add this button to the corresponding dropbutton.
+      // @todo Change #type 'dropbutton' to be based on theme_item_list()
+      //   instead of theme_links() to avoid this preemptive rendering.
+      $button = drupal_render($element[$key]);
+      $dropbuttons[$dropbutton]['#links'][$key] = array(
+        'title' => $button,
+        'html' => TRUE,
+      );
+    }
+  }
+  // @todo For now, all dropbuttons appear first. Consider to invent a more
+  //   fancy sorting/injection algorithm here.
+  return $dropbuttons + $element;
 }
 
 /**
@@ -3926,10 +3971,7 @@ function form_pre_render_details($element) {
   }
 
   // Collapsible details.
-  if (!empty($element['#collapsible'])) {
-    $element['#attached']['library'][] = array('system', 'drupal.collapse');
-    $element['#attributes']['class'][] = 'collapsible';
-  }
+  $element['#attached']['library'][] = array('system', 'drupal.collapse');
   if (empty($element['#collapsed'])) {
     $element['#attributes']['open'] = 'open';
   }

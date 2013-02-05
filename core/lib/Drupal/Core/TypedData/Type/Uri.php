@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\Core\TypedData\Type\Uri.
+ * Contains \Drupal\Core\TypedData\Type\Uri.
  */
 
 namespace Drupal\Core\TypedData\Type;
@@ -22,18 +22,4 @@ class Uri extends TypedData {
    * @var string
    */
   protected $value;
-
-  /**
-   * Implements TypedDataInterface::setValue().
-   */
-  public function setValue($value) {
-    $this->value = isset($value) ? (string) $value : $value;
-  }
-
-  /**
-   * Implements TypedDataInterface::validate().
-   */
-  public function validate() {
-    // TODO: Implement validate() method.
-  }
 }

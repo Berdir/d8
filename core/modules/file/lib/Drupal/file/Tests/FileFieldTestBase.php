@@ -21,14 +21,13 @@ abstract class FileFieldTestBase extends WebTestBase {
   */
   public static $modules = array('file', 'file_module_test', 'field_ui');
 
-  protected $profile = 'standard';
-
   protected $admin_user;
 
   function setUp() {
     parent::setUp();
-    $this->admin_user = $this->drupalCreateUser(array('access content', 'access administration pages', 'administer site configuration', 'administer users', 'administer permissions', 'administer content types', 'administer node fields', 'administer node display', 'administer comment fields', 'administer nodes', 'bypass node access'));
+    $this->admin_user = $this->drupalCreateUser(array('access content', 'access administration pages', 'administer site configuration', 'administer users', 'administer permissions', 'administer content types', 'administer node fields', 'administer node display', 'administer nodes', 'bypass node access'));
     $this->drupalLogin($this->admin_user);
+    $this->drupalCreateContentType(array('type' => 'article', 'name' => 'Article'));
   }
 
   /**
@@ -149,7 +148,7 @@ abstract class FileFieldTestBase extends WebTestBase {
 
     // Attach a file to the node.
     $edit['files[' . $field_name . '_' . $langcode . '_0]'] = drupal_realpath($file->uri);
-    $this->drupalPost("node/$nid/edit", $edit, t('Save'));
+    $this->drupalPost("node/$nid/edit", $edit, t('Save and keep published'));
 
     return $nid;
   }
@@ -165,7 +164,7 @@ abstract class FileFieldTestBase extends WebTestBase {
     );
 
     $this->drupalPost('node/' . $nid . '/edit', array(), t('Remove'));
-    $this->drupalPost(NULL, $edit, t('Save'));
+    $this->drupalPost(NULL, $edit, t('Save and keep published'));
   }
 
   /**
@@ -178,7 +177,7 @@ abstract class FileFieldTestBase extends WebTestBase {
     );
 
     $this->drupalPost('node/' . $nid . '/edit', array(), t('Remove'));
-    $this->drupalPost(NULL, $edit, t('Save'));
+    $this->drupalPost(NULL, $edit, t('Save and keep published'));
   }
 
   /**

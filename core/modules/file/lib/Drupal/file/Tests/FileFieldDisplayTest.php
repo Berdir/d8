@@ -11,6 +11,7 @@ namespace Drupal\file\Tests;
  * Tests that formatters are working properly.
  */
 class FileFieldDisplayTest extends FileFieldTestBase {
+
   public static function getInfo() {
     return array(
       'name' => 'File field display tests',
@@ -64,7 +65,7 @@ class FileFieldDisplayTest extends FileFieldTestBase {
 
     // Turn the "display" option off and check that the file is no longer displayed.
     $edit = array($field_name . '[' . LANGUAGE_NOT_SPECIFIED . '][0][display]' => FALSE);
-    $this->drupalPost('node/' . $nid . '/edit', $edit, t('Save'));
+    $this->drupalPost('node/' . $nid . '/edit', $edit, t('Save and keep published'));
 
     $this->assertNoRaw($default_output, t('Field is hidden when "display" option is unchecked.'));
 

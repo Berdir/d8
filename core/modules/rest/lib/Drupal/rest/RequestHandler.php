@@ -7,6 +7,7 @@
 
 namespace Drupal\rest;
 
+use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -29,8 +30,9 @@ class RequestHandler extends ContainerAware {
    *   The response object.
    */
   public function handle(Request $request, $id = NULL) {
-    $plugin = $request->attributes->get('_route')->getDefault('_plugin');
+    $plugin = $request->attributes->get(RouteObjectInterface::ROUTE_OBJECT)->getDefault('_plugin');
     $method = strtolower($request->getMethod());
+
     $resource = $this->container
       ->get('plugin.manager.rest')
       ->getInstance(array('id' => $plugin));
@@ -65,5 +67,15 @@ class RequestHandler extends ContainerAware {
       $response->headers->set('Content-Type', 'application/vnd.drupal.ld+json');
     }
     return $response;
+  }
+
+  /**
+   * Generates a CSRF protecting session token.
+   *
+   * @return \Symfony\Component\HttpFoundation\Response
+   *   The response object.
+   */
+  public function csrfToken() {
+    return new Response(drupal_get_token('rest'), 200, array('Content-Type' => 'text/plain'));
   }
 }

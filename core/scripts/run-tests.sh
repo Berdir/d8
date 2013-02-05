@@ -69,7 +69,9 @@ drupal_set_time_limit(0);
 simpletest_script_reporter_init();
 
 // Execute tests.
-simpletest_script_execute_batch(simpletest_script_get_test_list());
+for ($i = 0; $i < $args['repeat']; $i++) {
+  simpletest_script_execute_batch($test_list);
+}
 
 // Stop the timer.
 simpletest_script_reporter_timer_stop();
@@ -146,6 +148,15 @@ All arguments are long options.
               Keeps detailed assertion results (in the database) after tests
               have completed. By default, assertion results are cleared.
 
+  --repeat    Number of times to repeat the test.
+
+  --die-on-fail
+
+              Exit test execution immediately upon any failed assertion. This
+              allows to access the test site by changing settings.php to use the
+              test database and configuration directories. Use in combination
+              with --repeat for debugging random test failures.
+
   <test1>[,<test2>[,<test3> ...]]
 
               One or more tests to be run. By default, these are interpreted
@@ -191,6 +202,8 @@ function simpletest_script_parse_args() {
     'verbose' => FALSE,
     'keep-results' => FALSE,
     'test_names' => array(),
+    'repeat' => 1,
+    'die-on-fail' => FALSE,
     // Used internally.
     'test-id' => 0,
     'execute-test' => '',
@@ -348,6 +361,15 @@ function simpletest_script_execute_batch($test_classes) {
         proc_close($child['process']);
         if ($status['exitcode']) {
           echo 'FATAL ' . $child['class'] . ': test runner returned a non-zero error code (' . $status['exitcode'] . ').' . "\n";
+          if ($args['die-on-fail']) {
+            list($db_prefix, ) = simpletest_last_test_get($child['test_id']);
+            $public_files = variable_get('file_public_path', conf_path() . '/files');
+            $test_directory = $public_files . '/simpletest/' . substr($db_prefix, 10);
+            echo 'Simpletest database and files kept and test exited immediately on fail so should be reproducible if you change settings.php to use the database prefix '. $db_prefix . ' and config directories in '. $test_directory . "\n";
+            $args['keep-results'] = TRUE;
+            // Exit repeat loop immediately.
+            $args['repeat'] = -1;
+          }
         }
         // Free-up space by removing any potentially created resources.
         if (!$args['keep-results']) {
@@ -378,6 +400,7 @@ function simpletest_script_run_one_test($test_id, $test_class) {
     $conf['simpletest.settings']['clear_results'] = !$args['keep-results'];
 
     $test = new $test_class($test_id);
+    $test->dieOnFail = (bool) $args['die-on-fail'];
     $test->run();
     $info = $test->getInfo();
 
@@ -412,7 +435,7 @@ function simpletest_script_command($test_id, $test_class) {
   $command .= ' --url ' . escapeshellarg($args['url']);
   $command .= ' --php ' . escapeshellarg($php);
   $command .= " --test-id $test_id";
-  foreach (array('verbose', 'keep-results', 'color') as $arg) {
+  foreach (array('verbose', 'keep-results', 'color', 'die-on-fail') as $arg) {
     if ($args[$arg]) {
       $command .= ' --' . $arg;
     }
@@ -534,7 +557,9 @@ function simpletest_script_get_test_list() {
           'key' => 'name',
           'recurse' => TRUE,
         ));
-        $test_list = array_merge($test_list, array_keys($files));
+        foreach ($files as $test => $file) {
+          $test_list[] = "Drupal\\$module\\Tests\\$test";
+        }
       }
     }
     elseif ($args['file']) {

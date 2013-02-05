@@ -1454,6 +1454,7 @@ function system_update_last_removed() {
   return 7069;
 }
 
+//Do not copy @defgroup to other files. Use @addtogroup instead.
 /**
  * @defgroup config_upgrade Configuration system upgrade functions
  * @{
@@ -1540,8 +1541,8 @@ function system_update_8004() {
   // internationalization, keep it, but standardize the specification.
   // Otherwise, add the field.
   if (db_field_exists('file_managed', 'langcode')) {
-    // According to the documentation of db_change_field(), indeces using the
-    // field should be dropped first; if the contrib module created any indeces,
+    // According to the documentation of db_change_field(), indices using the
+    // field should be dropped first; if the contrib module created any indices,
     // it is its responsibility to drop them in an update function that runs
     // before this one, which it can enforce via hook_update_dependencies().
     db_change_field('file_managed', 'langcode', 'langcode', $langcode_field);

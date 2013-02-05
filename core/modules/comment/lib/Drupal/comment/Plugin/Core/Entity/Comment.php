@@ -25,7 +25,7 @@ use Drupal\Core\Annotation\Translation;
  *   form_controller_class = {
  *     "default" = "Drupal\comment\CommentFormController"
  *   },
- *   translation_controller_class = "Drupal\translation_entity\EntityTranslationControllerNG",
+ *   translation_controller_class = "Drupal\comment\CommentTranslationController",
  *   base_table = "comment",
  *   uri_callback = "comment_uri",
  *   fieldable = TRUE,
@@ -35,12 +35,6 @@ use Drupal\Core\Annotation\Translation;
  *     "bundle" = "node_type",
  *     "label" = "subject",
  *     "uuid" = "uuid"
- *   },
- *   view_modes = {
- *     "full" = {
- *       "label" = "Full comment",
- *       "custom_settings" = FALSE
- *     }
  *   }
  * )
  */
@@ -186,7 +180,7 @@ class Comment extends EntityNG implements ContentEntityInterface {
   protected $values = array(
     'langcode' => array(LANGUAGE_DEFAULT => array(0 => array('value' => LANGUAGE_NOT_SPECIFIED))),
     'name' => array(LANGUAGE_DEFAULT => array(0 => array('value' => ''))),
-    'uid' => array(LANGUAGE_DEFAULT => array(0 => array('value' => 0))),
+    'uid' => array(LANGUAGE_DEFAULT => array(0 => array('target_id' => 0))),
   );
 
   /**

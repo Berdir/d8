@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\Core\TypedData\Type\Float.
+ * Contains \Drupal\Core\TypedData\Type\Float.
  */
 
 namespace Drupal\Core\TypedData\Type;
@@ -23,18 +23,4 @@ class Float extends TypedData {
    * @var float
    */
   protected $value;
-
-  /**
-   * Implements TypedDataInterface::setValue().
-   */
-  public function setValue($value) {
-    $this->value = isset($value) ? (float) $value : $value;
-  }
-
-  /**
-   * Implements TypedDataInterface::validate().
-   */
-  public function validate() {
-    // TODO: Implement validate() method.
-  }
 }

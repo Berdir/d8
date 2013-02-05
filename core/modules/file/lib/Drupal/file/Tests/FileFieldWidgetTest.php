@@ -11,6 +11,14 @@ namespace Drupal\file\Tests;
  * Tests file field widget.
  */
 class FileFieldWidgetTest extends FileFieldTestBase {
+
+  /**
+   * Modules to enable.
+   *
+   * @var array
+   */
+  public static $modules = array('comment');
+
   public static function getInfo() {
     return array(
       'name' => 'File field widget test',
@@ -23,11 +31,7 @@ class FileFieldWidgetTest extends FileFieldTestBase {
    * Tests upload and remove buttons for a single-valued File field.
    */
   function testSingleValuedWidget() {
-    // Use 'page' instead of 'article', so that the 'article' image field does
-    // not conflict with this test. If in the future the 'page' type gets its
-    // own default file or image field, this test can be made more robust by
-    // using a custom node type.
-    $type_name = 'page';
+    $type_name = 'article';
     $field_name = strtolower($this->randomName());
     $this->createFileField($field_name, $type_name);
     $field = field_info_field($field_name);
@@ -73,7 +77,7 @@ class FileFieldWidgetTest extends FileFieldTestBase {
       $this->assertTrue(isset($label[0]), 'Label for upload found.');
 
       // Save the node and ensure it does not have the file.
-      $this->drupalPost(NULL, array(), t('Save'));
+      $this->drupalPost(NULL, array(), t('Save and keep published'));
       $node = node_load($nid, TRUE);
       $this->assertTrue(empty($node->{$field_name}[LANGUAGE_NOT_SPECIFIED][0]['fid']), t('File was successfully removed from the node.'));
     }
@@ -83,11 +87,7 @@ class FileFieldWidgetTest extends FileFieldTestBase {
    * Tests upload and remove buttons for multiple multi-valued File fields.
    */
   function testMultiValuedWidget() {
-    // Use 'page' instead of 'article', so that the 'article' image field does
-    // not conflict with this test. If in the future the 'page' type gets its
-    // own default file or image field, this test can be made more robust by
-    // using a custom node type.
-    $type_name = 'page';
+    $type_name = 'article';
     $field_name = strtolower($this->randomName());
     $field_name2 = strtolower($this->randomName());
     $this->createFileField($field_name, $type_name, array('cardinality' => 3));
@@ -191,7 +191,7 @@ class FileFieldWidgetTest extends FileFieldTestBase {
       $this->assertNoFieldByXPath('//input[@type="submit"]', t('Remove'), t('After removing all files, there is no "Remove" button displayed (JSMode=%type).', array('%type' => $type)));
 
       // Save the node and ensure it does not have any files.
-      $this->drupalPost(NULL, array('title' => $this->randomName()), t('Save'));
+      $this->drupalPost(NULL, array('title' => $this->randomName()), t('Save and publish'));
       $matches = array();
       preg_match('/node\/([0-9]+)/', $this->getUrl(), $matches);
       $nid = $matches[1];
@@ -204,11 +204,7 @@ class FileFieldWidgetTest extends FileFieldTestBase {
    * Tests a file field with a "Private files" upload destination setting.
    */
   function testPrivateFileSetting() {
-    // Use 'page' instead of 'article', so that the 'article' image field does
-    // not conflict with this test. If in the future the 'page' type gets its
-    // own default file or image field, this test can be made more robust by
-    // using a custom node type.
-    $type_name = 'page';
+    $type_name = 'article';
     $field_name = strtolower($this->randomName());
     $this->createFileField($field_name, $type_name);
     $field = field_info_field($field_name);
@@ -245,11 +241,13 @@ class FileFieldWidgetTest extends FileFieldTestBase {
   function testPrivateFileComment() {
     $user = $this->drupalCreateUser(array('access comments'));
 
-    // Remove access comments permission from anon user.
-    $edit = array(
-      DRUPAL_ANONYMOUS_RID . '[access comments]' => FALSE,
-    );
-    $this->drupalPost('admin/people/permissions', $edit, t('Save permissions'));
+    // Grant the admin user required comment permissions.
+    user_role_grant_permissions(key($this->admin_user->roles), array('administer comment fields'));
+
+    // Revoke access comments permission from anon user, grant post to
+    // authenticated.
+    user_role_revoke_permissions(DRUPAL_ANONYMOUS_RID, array('access comments'));
+    user_role_grant_permissions(DRUPAL_AUTHENTICATED_RID, array('post comments', 'skip comment approval'));
 
     // Create a new field.
     $edit = array(
@@ -268,7 +266,7 @@ class FileFieldWidgetTest extends FileFieldTestBase {
     $edit = array(
       'title' => $this->randomName(),
     );
-    $this->drupalPost('node/add/article', $edit, t('Save'));
+    $this->drupalPost('node/add/article', $edit, t('Save and publish'));
     $node = $this->drupalGetNodeByTitle($edit['title']);
 
     // Add a comment with a file.
@@ -302,10 +300,7 @@ class FileFieldWidgetTest extends FileFieldTestBase {
 
     // Unpublishes node.
     $this->drupalLogin($this->admin_user);
-    $edit = array(
-      'status' => FALSE,
-    );
-    $this->drupalPost('node/' . $node->nid . '/edit', $edit, t('Save'));
+    $this->drupalPost('node/' . $node->nid . '/edit', array(), t('Save and unpublish'));
 
     // Ensures normal user can no longer download the file.
     $this->drupalLogin($user);

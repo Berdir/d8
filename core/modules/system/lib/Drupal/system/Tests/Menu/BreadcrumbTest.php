@@ -112,6 +112,7 @@ class BreadcrumbTest extends MenuTestBase {
       'admin/structure/menu' => t('Menus'),
     );
     $this->assertBreadcrumb('admin/structure/menu/manage/tools', $trail);
+    $this->assertBreadcrumb('admin/structure/menu/manage/tools/edit', $trail);
 
     $mlid_node_add = db_query('SELECT mlid FROM {menu_links} WHERE link_path = :href AND module = :module', array(
       ':href' => 'node/add',
@@ -121,7 +122,6 @@ class BreadcrumbTest extends MenuTestBase {
       'admin/structure/menu/manage/tools' => t('Tools'),
     );
     $this->assertBreadcrumb("admin/structure/menu/item/$mlid_node_add/edit", $trail);
-    $this->assertBreadcrumb('admin/structure/menu/manage/tools/edit', $trail);
     $this->assertBreadcrumb('admin/structure/menu/manage/tools/add', $trail);
 
     // Verify Node administration breadcrumbs.
@@ -282,7 +282,7 @@ class BreadcrumbTest extends MenuTestBase {
     $edit = array(
       'menu[parent]' => $link['menu_name'] . ':' . $link['mlid'],
     );
-    $this->drupalPost("node/{$parent->nid}/edit", $edit, t('Save'));
+    $this->drupalPost("node/{$parent->nid}/edit", $edit, t('Save and keep published'));
     $expected = array(
       "node" => $link['link_title'],
     );
@@ -308,7 +308,7 @@ class BreadcrumbTest extends MenuTestBase {
     $edit = array(
       "field_tags[$langcode]" => implode(',', array_keys($tags)),
     );
-    $this->drupalPost("node/{$parent->nid}/edit", $edit, t('Save'));
+    $this->drupalPost("node/{$parent->nid}/edit", $edit, t('Save and keep published'));
 
     // Put both terms into a hierarchy Drupal » Breadcrumbs. Required for both
     // the menu links and the terms itself, since taxonomy_term_page() resets

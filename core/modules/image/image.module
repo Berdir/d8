@@ -301,7 +301,8 @@ function image_file_download($uri) {
     if ($info = image_get_info($uri)) {
       // Check the permissions of the original to grant access to this image.
       $headers = module_invoke_all('file_download', $original_uri);
-      if (!in_array(-1, $headers)) {
+      // Confirm there's at least one module granting access and none denying access.
+      if (!empty($headers) && !in_array(-1, $headers)) {
         return array(
           // Send headers describing the image's size, and MIME-type...
           'Content-Type' => $info['mime_type'],
@@ -352,8 +353,8 @@ function image_image_style_update(ImageStyle $style) {
     // Loop through all fields searching for image fields.
     foreach ($instances as $instance) {
       if ($instance['widget']['module'] == 'image') {
-        $entity_info = entity_get_info($instance['entity_type']);
-        $view_modes = array('default') + array_keys($entity_info['view_modes']);
+        $view_modes = entity_get_view_modes($instance['entity_type']);
+        $view_modes = array('default') + array_keys($view_modes);
         foreach ($view_modes as $view_mode) {
           $display = entity_get_display($instance['entity_type'], $instance['bundle'], $view_mode);
           $display_options = $display->getComponent($instance['field_name']);
@@ -558,7 +559,7 @@ function image_image_style_load($styles) {
  * Gets an array of image styles suitable for using as select list options.
  *
  * @param $include_empty
- *   If TRUE a <none> option will be inserted in the options array.
+ *   If TRUE a '- None -' option will be inserted in the options array.
  * @return
  *   Array of image styles both key and value are set to style name.
  */
@@ -566,7 +567,7 @@ function image_style_options($include_empty = TRUE) {
   $styles = entity_load_multiple('image_style');
   $options = array();
   if ($include_empty && !empty($styles)) {
-    $options[''] = t('<none>');
+    $options[''] = t('- None -');
   }
   foreach ($styles as $name => $style) {
     $options[$name] = $style->label();

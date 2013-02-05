@@ -21,12 +21,12 @@ use Drupal\Core\Entity\EntityInterface;
  * base node operation:
  * - Node-type-specific hooks: These hooks are only invoked on the primary
  *   module, using the "base" return component of hook_node_info() as the
- *   function prefix.  For example, poll.module defines the base for the Poll
- *   content type as "poll", so during creation of a poll node, hook_insert() is
- *   only invoked by calling poll_insert().
+ *   function prefix.  For example, forum.module defines the base for the Forum
+ *   content type as "forum", so during creation of a forum node, hook_insert() is
+ *   only invoked by calling forum_insert().
  * - All-module hooks: This set of hooks is invoked on all implementing modules,
  *   to allow other modules to modify what the primary node module is doing. For
- *   example, hook_node_insert() is invoked on all modules when creating a poll
+ *   example, hook_node_insert() is invoked on all modules when creating a forum
  *   node.
  * - Field hooks: Hooks related to the fields attached to the node. These are
  *   invoked from the field operations functions described below, and can be
@@ -563,12 +563,13 @@ function hook_node_create(\Drupal\node\Plugin\Core\Entity\Node $node) {
  * for all available nodes should be loaded in a single query where possible.
  *
  * This hook is invoked during node loading, which is handled by entity_load(),
- * via classes NodeController and Drupal\Core\Entity\DatabaseStorageController.
- * After the node information is read from the database or the entity cache,
- * hook_load() is invoked on the node's content type module, then
- * field_attach_load_revision() or field_attach_load() is called, then
- * hook_entity_load() is invoked on all implementing modules, and finally
- * hook_node_load() is invoked on all implementing modules.
+ * via classes Drupal\node\NodeStorageController and
+ * Drupal\Core\Entity\DatabaseStorageController. After the node information is
+ * read from the database or the entity cache, hook_load() is invoked on the
+ * node's content type module, then field_attach_load_revision() or
+ * field_attach_load() is called, then hook_entity_load() is invoked on all
+ * implementing modules, and finally hook_node_load() is invoked on all
+ * implementing modules.
  *
  * @param $nodes
  *   An array of the nodes being loaded, keyed by nid.
@@ -819,8 +820,8 @@ function hook_node_validate(Drupal\node\Node $node, $form, &$form_state) {
  * object, but before the node is saved or previewed. It is a chance for modules
  * to adjust the node's properties from what they are simply after a copy from
  * $form_state['values']. This hook is intended for adjusting non-field-related
- * properties. See hook_field_attach_submit() for customizing field-related
- * properties.
+ * properties. See hook_field_attach_extract_form_values() for customizing
+ * field-related properties.
  *
  * @param Drupal\node\Node $node
  *   The node entity being updated in response to a form submission.
@@ -1216,12 +1217,13 @@ function hook_insert(Drupal\node\Node $node) {
  * (use hook_node_load() to respond to all node loads).
  *
  * This hook is invoked during node loading, which is handled by entity_load(),
- * via classes NodeController and Drupal\Core\Entity\DatabaseStorageController.
- * After the node information is read from the database or the entity cache,
- * hook_load() is invoked on the node's content type module, then
- * field_attach_node_revision() or field_attach_load() is called, then
- * hook_entity_load() is invoked on all implementing modules, and finally
- * hook_node_load() is invoked on all implementing modules.
+ * via classes Drupal\node\NodeStorageController and
+ * Drupal\Core\Entity\DatabaseStorageController. After the node information is
+ * read from the database or the entity cache, hook_load() is invoked on the
+ * node's content type module, then field_attach_node_revision() or
+ * field_attach_load() is called, then hook_entity_load() is invoked on all
+ * implementing modules, and finally hook_node_load() is invoked on all
+ * implementing modules.
  *
  * This hook should only be used to add information that is not in the node or
  * node revisions table, not to replace information that is in these tables

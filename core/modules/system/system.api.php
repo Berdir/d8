@@ -47,21 +47,6 @@ function hook_hook_info() {
 }
 
 /**
- * Alter information from hook_hook_info().
- *
- * @param $hooks
- *   Information gathered by module_hook_info() from other modules'
- *   implementations of hook_hook_info(). Alter this array directly.
- *   See hook_hook_info() for information on what this may contain.
- */
-function hook_hook_info_alter(&$hooks) {
-  // Our module wants to completely override the core tokens, so make
-  // sure the core token hooks are not found.
-  $hooks['token_info']['group'] = 'mytokens';
-  $hooks['tokens']['group'] = 'mytokens';
-}
-
-/**
  * Define administrative paths.
  *
  * Modules may specify whether or not the paths they define in hook_menu() are
@@ -178,6 +163,8 @@ function hook_cron() {
  *     primitive types in \Drupal\Core\TypedData\Primitive. If set, it must be
  *     a constant defined by \Drupal\Core\TypedData\Primitive such as
  *     \Drupal\Core\TypedData\Primitive::String.
+ *   - constraints: An array of validation constraints for this type. See
+ *     \Drupal\Core\TypedData\TypedDataManager::getConstraints() for details.
  *
  * @see typed_data()
  * @see Drupal\Core\TypedData\TypedDataManager::create()
@@ -189,6 +176,7 @@ function hook_data_type_info() {
       'label' => t('Email'),
       'class' => '\Drupal\email\Type\Email',
       'primitive type' => \Drupal\Core\TypedData\Primitive::String,
+      'constraints' => array('Email' => array()),
     ),
   );
 }
@@ -1952,7 +1940,8 @@ function hook_template_preprocess_default_variables_alter(&$variables) {
  * @return
  *   The machine-readable name of the theme that should be used for the current
  *   page request. The value returned from this function will only have an
- *   effect if it corresponds to a currently-active theme on the site.
+ *   effect if it corresponds to a currently-active theme on the site. Do not 
+ *   return a value if you do not wish to set a custom theme.
  */
 function hook_custom_theme() {
   // Allow the user to request a particular theme via a query parameter.

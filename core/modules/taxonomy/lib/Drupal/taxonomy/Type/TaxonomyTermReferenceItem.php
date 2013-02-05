@@ -17,7 +17,7 @@ class TaxonomyTermReferenceItem extends FieldItemBase {
   /**
    * Property definitions of the contained properties.
    *
-   * @see self::getPropertyDefinitions()
+   * @see TaxonomyTermReferenceItem::getPropertyDefinitions()
    *
    * @var array
    */
@@ -27,15 +27,15 @@ class TaxonomyTermReferenceItem extends FieldItemBase {
    * Implements \Drupal\Core\TypedData\ComplexDataInterface::getPropertyDefinitions().
    */
   public function getPropertyDefinitions() {
-    if (!isset(self::$propertyDefinitions)) {
-      self::$propertyDefinitions['tid'] = array(
+    if (!isset(static::$propertyDefinitions)) {
+      static::$propertyDefinitions['tid'] = array(
         'type' => 'integer',
         'label' => t('Referenced taxonomy term id.'),
       );
-      self::$propertyDefinitions['entity'] = array(
+      static::$propertyDefinitions['entity'] = array(
         'type' => 'entity',
         'constraints' => array(
-          'entity type' => 'taxonomy_term',
+          'EntityType' => 'taxonomy_term',
         ),
         'label' => t('Term'),
         'description' => t('The referenced taxonomy term'),
@@ -45,7 +45,7 @@ class TaxonomyTermReferenceItem extends FieldItemBase {
         'settings' => array('id source' => 'tid'),
       );
     }
-    return self::$propertyDefinitions;
+    return static::$propertyDefinitions;
   }
 
   /**

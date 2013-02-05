@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\Core\TypedData\TypedDataInterface.
+ * Contains \Drupal\Core\TypedData\TypedDataInterface.
  */
 
 namespace Drupal\Core\TypedData;
@@ -40,7 +40,7 @@ interface TypedDataInterface {
   /**
    * Sets the data value.
    *
-   * @param mixed $value
+   * @param mixed|null $value
    *   The value to set in the format as documented for the data type or NULL to
    *   unset the data value.
    *
@@ -57,7 +57,20 @@ interface TypedDataInterface {
   public function getString();
 
   /**
+   * Gets a list of validation constraints.
+   *
+   * @return array
+   *   Array of constraints, each being an instance of
+   *   \Symfony\Component\Validator\Constraint.
+   */
+  public function getConstraints();
+
+  /**
    * Validates the currently set data value.
+   *
+   * @return \Symfony\Component\Validator\ConstraintViolationListInterface
+   *   A list of constraint violations. If the list is empty, validation
+   *   succeeded.
    */
   public function validate();
 }

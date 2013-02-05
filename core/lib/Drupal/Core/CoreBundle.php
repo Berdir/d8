@@ -60,6 +60,10 @@ class CoreBundle extends Bundle {
       ->register('config.storage.staging', 'Drupal\Core\Config\FileStorage')
       ->addArgument(config_get_config_directory(CONFIG_STAGING_DIRECTORY));
 
+    // Register the typed configuration data manager.
+    $container->register('config.typed', 'Drupal\Core\Config\TypedConfigManager')
+      ->addArgument(new Reference('config.storage'));
+
     // Register the service for the default database connection.
     $container->register('database', 'Drupal\Core\Database\Connection')
       ->setFactoryClass('Drupal\Core\Database\Database')
@@ -94,7 +98,8 @@ class CoreBundle extends Bundle {
 
     $container->register('path.alias_manager', 'Drupal\Core\Path\AliasManager')
       ->addArgument(new Reference('database'))
-      ->addArgument(new Reference('keyvalue'));
+      ->addArgument(new Reference('state'))
+      ->addArgument(new Reference('language_manager'));
 
     $container->register('http_client_simpletest_subscriber', 'Drupal\Core\Http\Plugin\SimpletestHttpRequestSubscriber');
     $container->register('http_default_client', 'Guzzle\Http\Client')
@@ -138,14 +143,18 @@ class CoreBundle extends Bundle {
       ->addArgument(new Reference('event_dispatcher'))
       ->addArgument(new Reference('service_container'))
       ->addArgument(new Reference('controller_resolver'));
-    $container->register('language_manager', 'Drupal\Core\Language\LanguageManager')
-      ->addArgument(new Reference('request'))
-      ->setScope('request');
+
+    // Register the 'language_manager' service.
+    $container->register('language_manager', 'Drupal\Core\Language\LanguageManager');
+
     $container->register('database.slave', 'Drupal\Core\Database\Connection')
       ->setFactoryClass('Drupal\Core\Database\Database')
       ->setFactoryMethod('getConnection')
       ->addArgument('slave');
-    $container->register('typed_data', 'Drupal\Core\TypedData\TypedDataManager');
+    $container->register('typed_data', 'Drupal\Core\TypedData\TypedDataManager')
+      ->addMethodCall('setValidationConstraintManager', array(new Reference('validation.constraint')));
+    $container->register('validation.constraint', 'Drupal\Core\Validation\ConstraintManager');
+
     // Add the user's storage for temporary, non-cache data.
     $container->register('lock', 'Drupal\Core\Lock\DatabaseLockBackend');
     $container->register('user.tempstore', 'Drupal\user\TempStoreFactory')
@@ -155,9 +164,12 @@ class CoreBundle extends Bundle {
     $this->registerTwig($container);
     $this->registerRouting($container);
 
-    // Add the entity query factory.
+    // Add the entity query factories.
     $container->register('entity.query', 'Drupal\Core\Entity\Query\QueryFactory')
-      ->addArgument(new Reference('service_container'));
+      ->addArgument(new Reference('plugin.manager.entity'))
+      ->addMethodCall('setContainer', array(new Reference('service_container')));
+    $container->register('entity.query.config', 'Drupal\Core\Config\Entity\Query\QueryFactory')
+      ->addArgument(new Reference('config.storage'));
 
     $container->register('router.dumper', 'Drupal\Core\Routing\MatcherDumper')
       ->addArgument(new Reference('database'));
@@ -196,6 +208,7 @@ class CoreBundle extends Bundle {
       ->addTag('route_filter');
 
     $container->register('router_processor_subscriber', 'Drupal\Core\EventSubscriber\RouteProcessorSubscriber')
+      ->addArgument(new Reference('content_negotiation'))
       ->addTag('event_subscriber');
     $container->register('router_listener', 'Symfony\Component\HttpKernel\EventListener\RouterListener')
       ->addArgument(new Reference('router'))
@@ -234,6 +247,9 @@ class CoreBundle extends Bundle {
       ->addTag('event_subscriber');
     $container->register('config_global_override_subscriber', 'Drupal\Core\EventSubscriber\ConfigGlobalOverrideSubscriber')
       ->addTag('event_subscriber');
+    $container->register('language_request_subscriber', 'Drupal\Core\EventSubscriber\LanguageRequestSubscriber')
+      ->addArgument(new Reference('language_manager'))
+      ->addTag('event_subscriber');
 
     $container->register('exception_controller', 'Drupal\Core\ExceptionController')
       ->addArgument(new Reference('content_negotiation'))
@@ -253,7 +269,11 @@ class CoreBundle extends Bundle {
     $container->register('serializer.normalizer.complex_data', 'Drupal\Core\Serialization\ComplexDataNormalizer')->addTag('normalizer');
     $container->register('serializer.normalizer.list', 'Drupal\Core\Serialization\ListNormalizer')->addTag('normalizer');
     $container->register('serializer.normalizer.typed_data', 'Drupal\Core\Serialization\TypedDataNormalizer')->addTag('normalizer');
-    $container->register('serializer.encoder.json', 'Drupal\Core\Serialization\JsonEncoder')->addTag('encoder');
+
+    $container->register('serializer.encoder.json', 'Drupal\Core\Serialization\JsonEncoder')
+      ->addTag('encoder', array('format' => array('json' => 'JSON')));
+    $container->register('serializer.encoder.xml', 'Drupal\Core\Serialization\XmlEncoder')
+      ->addTag('encoder', array('format' => array('xml' => 'XML')));
 
     $container->register('flood', 'Drupal\Core\Flood\DatabaseBackend')
       ->addArgument(new Reference('database'));

@@ -19,8 +19,17 @@ function field_test_entity_info_alter(&$entity_info) {
   // Disable the entity type translation handler.
   foreach ($entity_info as $entity_type => $info) {
     $entity_info[$entity_type]['translation'][$entity_type] = FALSE;
-    if ($info['module'] == 'field_test') {
-      $entity_info[$entity_type]['view_modes'] = array(
+  }
+}
+
+/**
+ * Implements hook_entity_view_mode_info_alter().
+ */
+function field_test_entity_view_mode_info_alter(&$view_modes) {
+  $entity_info = entity_get_info();
+  foreach ($entity_info as $entity_type => $info) {
+    if ($entity_info[$entity_type]['module'] == 'field_test') {
+      $view_modes[$entity_type] = array(
         'full' => array(
           'label' => t('Full object'),
           'custom_settings' => TRUE,
@@ -30,12 +39,23 @@ function field_test_entity_info_alter(&$entity_info) {
           'custom_settings' => TRUE,
         ),
       );
-      $entity_info[$entity_type]['bundles'] = state()->get('field_test_bundles') ?: array('test_bundle' => array('label' => 'Test Bundle'));
+    }
+  }
+}
+
+/**
+ * Implements hook_entity_bundle_info_alter().
+ */
+function field_test_entity_bundle_info_alter(&$bundles) {
+  $entity_info = entity_get_info();
+  foreach ($bundles as $entity_type => $info) {
+    if ($entity_info[$entity_type]['module'] == 'field_test') {
+      $bundles[$entity_type] = state()->get('field_test_bundles') ?: array('test_bundle' => array('label' => 'Test Bundle'));
       if ($entity_type == 'test_entity_bundle') {
-        $entity_info[$entity_type]['bundles'] += array('test_entity_2' => array('label' => 'Test entity 2'));
+        $bundles[$entity_type] += array('test_entity_2' => array('label' => 'Test entity 2'));
       }
       if ($entity_type == 'test_entity_bundle_key') {
-        $entity_info[$entity_type]['bundles'] += array('bundle1' => array('label' => 'Bundle1'), 'bundle2' => array('label' => 'Bundle2'));
+        $bundles[$entity_type] += array('bundle1' => array('label' => 'Bundle1'), 'bundle2' => array('label' => 'Bundle2'));
       }
     }
   }
@@ -152,6 +172,10 @@ function field_test_create_entity($id = 1, $vid = 1, $bundle = 'test_bundle', $l
  *   The loaded entity.
  */
 function field_test_entity_test_load($ftid, $ftvid = NULL) {
+  // Prevent this from being called as hook_entity_test_load().
+  if (is_array($ftid)) {
+    return;
+  }
   $ids = (isset($ftid) ? array($ftid) : array());
   $conditions = (isset($ftvid) ? array('ftvid' => $ftvid) : array());
   $test_entity = entity_load_multiple('test_entity', $ids, $conditions);
@@ -229,11 +253,11 @@ function field_test_entity_nested_form($form, &$form_state, $entity_1, $entity_2
  */
 function field_test_entity_nested_form_validate($form, &$form_state) {
   $entity_1 = entity_create('test_entity', $form_state['values']);
-  field_attach_submit($entity_1, $form, $form_state);
+  field_attach_extract_form_values($entity_1, $form, $form_state);
   field_attach_form_validate($entity_1, $form, $form_state);
 
   $entity_2 = entity_create('test_entity', $form_state['values']['entity_2']);
-  field_attach_submit($entity_2, $form['entity_2'], $form_state);
+  field_attach_extract_form_values($entity_2, $form['entity_2'], $form_state);
   field_attach_form_validate($entity_2, $form['entity_2'], $form_state);
 }
 
@@ -242,11 +266,11 @@ function field_test_entity_nested_form_validate($form, &$form_state) {
  */
 function field_test_entity_nested_form_submit($form, &$form_state) {
   $entity_1 = entity_create('test_entity', $form_state['values']);
-  field_attach_submit($entity_1, $form, $form_state);
+  field_attach_extract_form_values($entity_1, $form, $form_state);
   field_test_entity_save($entity_1);
 
   $entity_2 = entity_create('test_entity', $form_state['values']['entity_2']);
-  field_attach_submit($entity_2, $form['entity_2'], $form_state);
+  field_attach_extract_form_values($entity_2, $form['entity_2'], $form_state);
   field_test_entity_save($entity_2);
 
   drupal_set_message(t('test_entities @id_1 and @id_2 have been updated.', array('@id_1' => $entity_1->ftid, '@id_2' => $entity_2->ftid)));

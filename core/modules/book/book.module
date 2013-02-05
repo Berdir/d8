@@ -166,10 +166,11 @@ function book_menu() {
     'type' => MENU_SUGGESTED_ITEM,
     'file' => 'book.pages.inc',
   );
-  $items['book/export/%/%'] = array(
+  $items['book/export/%/%node'] = array(
     'page callback' => 'book_export',
     'page arguments' => array(2, 3),
-    'access arguments' => array('access printer-friendly version'),
+    'access callback' => 'book_export_access',
+    'access arguments' => array(3),
     'type' => MENU_CALLBACK,
     'file' => 'book.pages.inc',
   );
@@ -193,6 +194,16 @@ function book_menu() {
   );
 
   return $items;
+}
+
+/**
+ * Access callback: Determines if the book export page is accessible.
+ *
+ * @param \Drupal\node\Plugin\Core\Entity\Node $node
+ *   The node whose export page is to be viewed.
+ */
+function book_export_access(Node $node) {
+  return user_access('access printer-friendly version') && node_access('view', $node);
 }
 
 /**
@@ -250,14 +261,14 @@ function book_admin_paths() {
 }
 
 /**
- * Implements hook_entity_info().
+ * Implements hook_entity_view_mode_info().
  */
-function book_entity_info(&$info) {
+function book_entity_view_mode_info() {
   // Add the 'Print' view mode for nodes.
-  $info['node']['view_modes']['print'] = array(
+  $view_modes['node']['print'] = array(
     'label' => t('Print'),
-    'custom_settings' => FALSE,
   );
+  return $view_modes;
 }
 
 /**
@@ -423,7 +434,6 @@ function _book_add_form_elements(&$form, &$form_state, Node $node) {
     '#type' => 'details',
     '#title' => t('Book outline'),
     '#weight' => 10,
-    '#collapsible' => TRUE,
     '#collapsed' => TRUE,
     '#group' => 'advanced',
     '#attributes' => array(

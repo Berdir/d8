@@ -37,8 +37,8 @@ class CommentFormController extends EntityFormControllerNG {
 
     // If not replying to a comment, use our dedicated page callback for new
     // comments on nodes.
-    if (!$comment->id() && !$comment->pid->value) {
-      $form['#action'] = url('comment/reply/' . $comment->nid->value);
+    if (!$comment->id() && !$comment->pid->target_id) {
+      $form['#action'] = url('comment/reply/' . $comment->nid->target_id);
     }
 
     if (isset($form_state['comment_preview'])) {
@@ -53,7 +53,6 @@ class CommentFormController extends EntityFormControllerNG {
       $form['author'] += array(
         '#type' => 'details',
         '#title' => t('Administration'),
-        '#collapsible' => TRUE,
         '#collapsed' => TRUE,
       );
     }
@@ -76,38 +75,23 @@ class CommentFormController extends EntityFormControllerNG {
     }
 
     // Add the author name field depending on the current user.
+    $form['author']['name'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Your name'),
+      '#default_value' => $author,
+      '#required' => (!$user->uid && $anonymous_contact == COMMENT_ANONYMOUS_MUST_CONTACT),
+      '#maxlength' => 60,
+      '#size' => 30,
+    );
     if ($is_admin) {
-      $form['author']['name'] = array(
-        '#type' => 'textfield',
-        '#title' => t('Authored by'),
-        '#default_value' => $author,
-        '#maxlength' => 60,
-        '#size' => 30,
-        '#description' => t('Leave blank for %anonymous.', array('%anonymous' => config('user.settings')->get('anonymous'))),
-        '#autocomplete_path' => 'user/autocomplete',
-      );
+      $form['author']['name']['#title'] = t('Authored by');
+      $form['author']['name']['#description'] = t('Leave blank for %anonymous.', array('%anonymous' => config('user.settings')->get('anonymous')));
+      $form['author']['name']['#autocomplete_path'] = 'user/autocomplete';
     }
     elseif ($user->uid) {
-      $form['author']['_author'] = array(
-        '#type' => 'item',
-        '#title' => t('Your name'),
-        '#markup' => theme('username', array('account' => $user)),
-      );
-
-      $form['author']['name'] = array(
-        '#type' => 'value',
-        '#value' => $author,
-      );
-    }
-    else {
-      $form['author']['name'] = array(
-        '#type' => 'textfield',
-        '#title' => t('Your name'),
-        '#default_value' => $author,
-        '#required' => (!$user->uid && $anonymous_contact == COMMENT_ANONYMOUS_MUST_CONTACT),
-        '#maxlength' => 60,
-        '#size' => 30,
-      );
+      $form['author']['name']['#type'] = 'item';
+      $form['author']['name']['#value'] = $form['author']['name']['#default_value'];
+      $form['author']['name']['#markup'] = theme('username', array('account' => $user));
     }
 
     // Add author e-mail and homepage fields depending on the current user.
@@ -163,7 +147,7 @@ class CommentFormController extends EntityFormControllerNG {
     // Used for conditional validation of author fields.
     $form['is_anonymous'] = array(
       '#type' => 'value',
-      '#value' => ($comment->id() ? !$comment->uid->value : !$user->uid),
+      '#value' => ($comment->id() ? !$comment->uid->target_id : !$user->uid),
     );
 
     // Make the comment inherit the current content language unless specifically
@@ -175,7 +159,8 @@ class CommentFormController extends EntityFormControllerNG {
 
     // Add internal comment properties.
     foreach (array('cid', 'pid', 'nid', 'uid', 'node_type', 'langcode') as $key) {
-      $form[$key] = array('#type' => 'value', '#value' => $comment->$key->value);
+      $key_name = key($comment->$key->offsetGet(0)->getProperties());
+      $form[$key] = array('#type' => 'value', '#value' => $comment->$key->{$key_name});
     }
 
     return parent::form($form, $form_state, $comment);
@@ -275,7 +260,7 @@ class CommentFormController extends EntityFormControllerNG {
     // @todo Too fragile. Should be prepared and stored in comment_form()
     // already.
     if (!$comment->is_anonymous && !empty($comment->name->value) && ($account = user_load_by_name($comment->name->value))) {
-      $comment->uid->value = $account->uid;
+      $comment->uid->target_id = $account->uid;
     }
     // If the comment was posted by an anonymous user and no author name was
     // required, use "Anonymous" by default.

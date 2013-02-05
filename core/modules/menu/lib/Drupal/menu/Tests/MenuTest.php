@@ -18,8 +18,6 @@ class MenuTest extends WebTestBase {
    */
   public static $modules = array('menu', 'block');
 
-  protected $profile = 'standard';
-
   protected $big_user;
   protected $std_user;
   protected $menu;
@@ -36,6 +34,8 @@ class MenuTest extends WebTestBase {
   function setUp() {
     parent::setUp();
 
+    $this->drupalCreateContentType(array('type' => 'article', 'name' => 'Article'));
+
     // Create users.
     $this->big_user = $this->drupalCreateUser(array('access administration pages', 'administer blocks', 'administer menu', 'create article content'));
     $this->std_user = $this->drupalCreateUser(array());
@@ -49,16 +49,15 @@ class MenuTest extends WebTestBase {
     $this->drupalLogin($this->big_user);
     $this->items = array();
 
-    // Do standard menu tests.
-    $this->doStandardMenuTests();
-
-    // Do custom menu tests.
-    $this->doCustomMenuTests();
+    $this->menu = $this->addCustomMenu();
+    $this->doMenuTests($this->menu->id());
+    $this->addInvalidMenuLink($this->menu->id());
+    $this->addCustomMenuCRUD();
 
     // Do standard user tests.
     // Login the user.
     $this->drupalLogin($this->std_user);
-    $this->verifyAccess(403);
+    $this->verifyAccess(403, $this->menu->id());
     foreach ($this->items as $item) {
       $node = node_load(substr($item['link_path'], 5)); // Paths were set as 'node/$nid'.
       $this->verifyMenuLink($item, $node);
@@ -90,24 +89,6 @@ class MenuTest extends WebTestBase {
   }
 
   /**
-   * Tests standard menu functionality using the Tools menu.
-   */
-  function doStandardMenuTests() {
-    $this->doMenuTests();
-    $this->addInvalidMenuLink();
-  }
-
-  /**
-   * Tests custom menu functionality using the Tools menu.
-   */
-  function doCustomMenuTests() {
-    $this->menu = $this->addCustomMenu();
-    $this->doMenuTests($this->menu->id());
-    $this->addInvalidMenuLink($this->menu->id());
-    $this->addCustomMenuCRUD();
-  }
-
-  /**
    * Add custom menu using CRUD functions.
    */
   function addCustomMenuCRUD() {
@@ -123,14 +104,14 @@ class MenuTest extends WebTestBase {
     $menu->save();
 
     // Assert the new menu.
-    $this->drupalGet('admin/structure/menu/manage/' . $menu_name . '/edit');
+    $this->drupalGet('admin/structure/menu/manage/' . $menu_name);
     $this->assertRaw($label, 'Custom menu was added.');
 
     // Edit the menu.
     $new_label = $this->randomName(16);
     $menu->set('label', $new_label);
     $menu->save();
-    $this->drupalGet('admin/structure/menu/manage/' . $menu_name . '/edit');
+    $this->drupalGet('admin/structure/menu/manage/' . $menu_name);
     $this->assertRaw($new_label, 'Custom menu was edited.');
   }
 
@@ -204,9 +185,9 @@ class MenuTest extends WebTestBase {
   }
 
   /**
-   * Tests menu functionality using the Tools menu.
+   * Tests menu functionality.
    */
-  function doMenuTests($menu_name = 'tools') {
+  function doMenuTests($menu_name) {
     // Add nodes to use as links for menu links.
     $node1 = $this->drupalCreateNode(array('type' => 'article'));
     $node2 = $this->drupalCreateNode(array('type' => 'article'));
@@ -261,10 +242,10 @@ class MenuTest extends WebTestBase {
     $this->disableMenuLink($item1);
     $edit = array();
 
-    // Note in the UI the 'mlid:x[hidden]' form element maps to enabled, or
-    // NOT hidden.
-    $edit['mlid:' . $item1['mlid'] . '[hidden]'] = TRUE;
-    $this->drupalPost('admin/structure/menu/manage/' . $item1['menu_name'], $edit, t('Save configuration'));
+    // Note in the UI the 'links[mlid:x][hidden]' form element maps to enabled,
+    // or NOT hidden.
+    $edit['links[mlid:' . $item1['mlid'] . '][hidden]'] = TRUE;
+    $this->drupalPost('admin/structure/menu/manage/' . $item1['menu_name'], $edit, t('Save'));
 
     // Verify in the database.
     $this->assertMenuLink($item1['mlid'], array('hidden' => 0));
@@ -552,7 +533,7 @@ class MenuTest extends WebTestBase {
    *
    * @param integer $response HTTP response code.
    */
-  private function verifyAccess($response = 200) {
+  private function verifyAccess($response = 200, $menu_name = 'tools') {
     // View menu help node.
     $this->drupalGet('admin/help/menu');
     $this->assertResponse($response);
@@ -568,7 +549,7 @@ class MenuTest extends WebTestBase {
     }
 
     // View tools menu customization node.
-    $this->drupalGet('admin/structure/menu/manage/tools');
+    $this->drupalGet('admin/structure/menu/manage/' . $menu_name);
         $this->assertResponse($response);
     if ($response == 200) {
       $this->assertText(t('Tools'), 'Tools menu node was displayed');

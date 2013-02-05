@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\Core\TypedData\Type\Integer.
+ * Contains \Drupal\Core\TypedData\Type\Integer.
  */
 
 namespace Drupal\Core\TypedData\Type;
@@ -23,18 +23,4 @@ class Integer extends TypedData {
    * @var integer
    */
   protected $value;
-
-  /**
-   * Implements TypedDataInterface::setValue().
-   */
-  public function setValue($value) {
-    $this->value = isset($value) ? (int) $value : $value;
-  }
-
-  /**
-   * Implements TypedDataInterface::validate().
-   */
-  public function validate() {
-    // TODO: Implement validate() method.
-  }
 }

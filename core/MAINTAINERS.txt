@@ -206,6 +206,10 @@ Database Logging module
 Edit module
 - Wim Leers 'Wim Leers' http://drupal.org/user/99777
 
+Entity Reference module
+- Amitai Burstein 'Amitaibu' http://drupal.org/user/57511
+- Andrei Mateescu 'amateescu' http://drupal.org/user/729614
+
 Field module
 - Yves Chedemois 'yched' http://drupal.org/user/39567
 - Barry Jaspan 'bjaspan' http://drupal.org/user/46413
@@ -259,9 +263,6 @@ PHP module
 
 Picture module
 - Peter Droogmans 'attiks' http://drupal.org/user/105002
-
-Poll module
-- Andrei Mateescu 'amateescu' http://drupal.org/user/729614
 
 RDF module
 - Stéphane Corlosquet 'scor' http://drupal.org/user/52142

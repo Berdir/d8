@@ -99,11 +99,22 @@ function comment_help($path, $arg) {
 }
 
 /**
- * Implements hook_entity_info().
+ * Implements hook_entity_view_mode_info().
  */
-function comment_entity_info(&$info) {
+function comment_entity_view_mode_info() {
+  $view_modes['comment']['full'] = array(
+    'label' => t('Full comment'),
+  );
+  return $view_modes;
+}
+
+/**
+ * Implements hook_entity_bundle_info().
+ */
+function comment_entity_bundle_info() {
+  $bundles = array();
   foreach (node_type_get_names() as $type => $name) {
-    $info['comment']['bundles']['comment_node_' . $type] = array(
+    $bundles['comment']['comment_node_' . $type] = array(
       'label' => t('@node_type comment', array('@node_type' => $name)),
       // Provide the node type/bundle name for other modules, so it does not
       // have to be extracted manually from the bundle name.
@@ -121,6 +132,7 @@ function comment_entity_info(&$info) {
       ),
     );
   }
+  return $bundles;
 }
 
 /**
@@ -289,7 +301,7 @@ function comment_menu_alter(&$items) {
   $items['admin/content']['description'] = 'Administer content and comments.';
 
   // Adjust the Field UI tabs on admin/structure/types/manage/[node-type].
-  // See comment_entity_info().
+  // See comment_entity_bundle_info().
   $items['admin/structure/types/manage/%comment_node_type/comment/fields']['title'] = 'Comment fields';
   $items['admin/structure/types/manage/%comment_node_type/comment/fields']['weight'] = 3;
   $items['admin/structure/types/manage/%comment_node_type/comment/display']['title'] = 'Comment display';
@@ -933,7 +945,7 @@ function comment_links(Comment $comment, Node $node) {
       );
       $links['comment-reply'] = array(
         'title' => t('reply'),
-        'href' => "comment/reply/{$comment->nid->value}/{$comment->id()}",
+        'href' => "comment/reply/{$comment->nid->target_id}/{$comment->id()}",
         'html' => TRUE,
       );
       if ($comment->status->value == COMMENT_NOT_PUBLISHED) {
@@ -955,7 +967,7 @@ function comment_links(Comment $comment, Node $node) {
       }
       $links['comment-reply'] = array(
         'title' => t('reply'),
-        'href' => "comment/reply/{$comment->nid->value}/{$comment->id()}",
+        'href' => "comment/reply/{$comment->nid->target_id}/{$comment->id()}",
         'html' => TRUE,
       );
     }
@@ -1005,7 +1017,6 @@ function comment_form_node_type_form_alter(&$form, $form_state) {
     $form['comment'] = array(
       '#type' => 'details',
       '#title' => t('Comment settings'),
-      '#collapsible' => TRUE,
       '#collapsed' => TRUE,
       '#group' => 'additional_settings',
       '#attributes' => array(
@@ -1112,7 +1123,6 @@ function comment_form_node_form_alter(&$form, $form_state) {
     '#type' => 'details',
     '#access' => user_access('administer comments'),
     '#title' => t('Comment settings'),
-    '#collapsible' => TRUE,
     '#collapsed' => TRUE,
     '#group' => 'advanced',
     '#attributes' => array(
@@ -1310,7 +1320,7 @@ function comment_user_cancel($edit, $account, $method) {
     case 'user_cancel_reassign':
       $comments = entity_load_multiple_by_properties('comment', array('uid' => $account->uid));
       foreach ($comments as $comment) {
-        $comment->uid->value = 0;
+        $comment->uid->target_id = 0;
         comment_save($comment);
       }
       break;
@@ -1345,7 +1355,7 @@ function comment_access($op, Comment $comment) {
   global $user;
 
   if ($op == 'edit') {
-    return ($user->uid && $user->uid == $comment->uid->value && $comment->status->value == COMMENT_PUBLISHED && user_access('edit own comments')) || user_access('administer comments');
+    return ($user->uid && $user->uid == $comment->uid->target_id && $comment->status->value == COMMENT_PUBLISHED && user_access('edit own comments')) || user_access('administer comments');
   }
 }
 
@@ -1389,7 +1399,7 @@ function comment_delete_multiple($cids) {
  *   (optional) An array of entity IDs. If omitted, all entities are loaded.
  * @param bool $reset
  *   Whether to reset the internal static entity cache. Note that the static
- *   cache is disabled in comment_entity_info() by default.
+ *   cache is disabled by default.
  *
  * @return array
  *   An array of comment objects, indexed by comment ID.
@@ -1408,7 +1418,7 @@ function comment_load_multiple(array $cids = NULL, $reset = FALSE) {
  *   The ID of the comment to be loaded.
  * @param bool $reset
  *   Whether to reset the internal static entity cache. Note that the static
- *   cache is disabled in comment_entity_info() by default.
+ *   cache is disabled by default.
  *
  * @return
  *   The comment object.
@@ -1548,7 +1558,7 @@ function comment_preview(Comment $comment) {
     }
 
     if (!empty($account->uid)) {
-      $comment->uid->value = $account->uid;
+      $comment->uid->target_id = $account->uid;
       $comment->name->value = check_plain($account->name);
     }
     elseif (empty($comment->name->value)) {
@@ -1564,7 +1574,7 @@ function comment_preview(Comment $comment) {
     $preview_build['comment_preview'] = $comment_build;
   }
 
-  if ($comment->pid->value) {
+  if ($comment->pid->target_id) {
     $build = array();
     $comment = $comment->pid->entity;
     if ($comment && $comment->status->value == COMMENT_PUBLISHED) {
@@ -1653,7 +1663,7 @@ function template_preprocess_comment(&$variables) {
   $variables['permalink'] = l(t('Permalink'), $uri['path'], $uri['options']);
   $variables['submitted'] = t('Submitted by !username on !datetime', array('!username' => $variables['author'], '!datetime' => $variables['created']));
 
-  if ($comment->pid->value) {
+  if ($comment->pid->target_id) {
     // Fetch and store the parent comment information for use in templates.
     $comment_parent = $comment->pid->entity;
     $account_parent = comment_prepare_author($comment);
@@ -1708,14 +1718,14 @@ function template_preprocess_comment(&$variables) {
   if ($variables['new']) {
     $variables['attributes']['class'][] = 'new';
   }
-  if (!$comment->uid->value) {
+  if (!$comment->uid->target_id) {
     $variables['attributes']['class'][] = 'by-anonymous';
   }
   else {
-    if ($comment->uid->value == $variables['node']->uid) {
+    if ($comment->uid->target_id == $variables['node']->uid) {
       $variables['attributes']['class'][] = 'by-node-author';
     }
-    if ($comment->uid->value == $variables['user']->uid) {
+    if ($comment->uid->target_id == $variables['user']->uid) {
       $variables['attributes']['class'][] = 'by-viewer';
     }
   }

@@ -828,7 +828,6 @@ function language_negotiation_configure_browser_form($form, &$form_state) {
   $form['new_mapping'] = array(
     '#type' => 'details',
     '#title' => t('Add a new mapping'),
-    '#collapsible' => TRUE,
     '#collapsed' => TRUE,
     '#tree' => TRUE,
   );
@@ -1002,7 +1001,7 @@ function language_content_settings_form(array $form, array $form_state, array $s
     $default[$entity_type] = FALSE;
 
     // Check whether we have any custom setting.
-    foreach (entity_get_bundles($entity_type) as $bundle) {
+    foreach (entity_get_bundles($entity_type) as $bundle => $bundle_info) {
       $conf = language_get_default_configuration($entity_type, $bundle);
       if (!empty($conf['language_show']) || $conf['langcode'] != 'site_default') {
         $default[$entity_type] = $entity_type;
@@ -1043,10 +1042,10 @@ function language_content_settings_form(array $form, array $form_state, array $s
       ),
     );
 
-    foreach (entity_get_bundles($entity_type) as $bundle) {
+    foreach (entity_get_bundles($entity_type) as $bundle => $bundle_info) {
       $form['settings'][$entity_type][$bundle]['settings'] = array(
         '#type' => 'item',
-        '#label' => isset($info['bundles'][$bundle]) ? $info['bundles'][$bundle]['label'] : $labels[$entity_type],
+        '#label' => $bundle_info['label'],
         'language' => array(
           '#type' => 'language_configuration',
           '#entity_information' => array(

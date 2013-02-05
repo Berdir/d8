@@ -35,37 +35,53 @@ abstract class TypedData implements TypedDataInterface {
   }
 
   /**
-   * Implements TypedDataInterface::getType().
+   * Implements \Drupal\Core\TypedData\TypedDataInterface::getType().
    */
   public function getType() {
     return $this->definition['type'];
   }
 
   /**
-   * Implements TypedDataInterface::getDefinition().
+   * Implements \Drupal\Core\TypedData\TypedDataInterface::getDefinition().
    */
   public function getDefinition() {
     return $this->definition;
   }
 
   /**
-   * Implements TypedDataInterface::getValue().
+   * Implements \Drupal\Core\TypedData\TypedDataInterface::getValue().
    */
   public function getValue() {
     return $this->value;
   }
 
   /**
-   * Implements TypedDataInterface::setValue().
+   * Implements \Drupal\Core\TypedData\TypedDataInterface::setValue().
    */
   public function setValue($value) {
     $this->value = $value;
   }
 
   /**
-   * Implements TypedDataInterface::getString().
+   * Implements \Drupal\Core\TypedData\TypedDataInterface::getString().
    */
   public function getString() {
     return (string) $this->getValue();
+  }
+
+  /**
+   * Implements \Drupal\Core\TypedData\TypedDataInterface::getConstraints().
+   */
+  public function getConstraints() {
+    // @todo: Add the typed data manager as proper dependency.
+    return typed_data()->getConstraints($this->definition);
+  }
+
+  /**
+   * Implements \Drupal\Core\TypedData\TypedDataInterface::validate().
+   */
+  public function validate() {
+    // @todo: Add the typed data manager as proper dependency.
+    return typed_data()->getValidator()->validate($this);
   }
 }
