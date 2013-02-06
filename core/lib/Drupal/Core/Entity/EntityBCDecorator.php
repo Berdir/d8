@@ -100,10 +100,16 @@ class EntityBCDecorator implements IteratorAggregate, EntityInterface {
     // an entity field, provide direct access to the plain value. This makes it
     // possible to use the BC-decorator with properties; e.g., $node->title.
     if (!field_info_field($name) && $this->decorated->getPropertyDefinition($name)) {
-      if (!isset($this->decorated->values[$name][LANGUAGE_DEFAULT][0]['value'])) {
+      if (!isset($this->decorated->values[$name][LANGUAGE_DEFAULT])) {
         $this->decorated->values[$name][LANGUAGE_DEFAULT][0]['value'] = NULL;
       }
-      return $this->decorated->values[$name][LANGUAGE_DEFAULT][0]['value'];
+      $value = $this->decorated->values[$name][LANGUAGE_DEFAULT];
+      if (is_array($value)) {
+        return $value[0]['value'];
+      }
+      else {
+        return $value;
+      }
     }
     else {
       // Allow accessing field values in entity default language other than
