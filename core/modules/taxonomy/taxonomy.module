@@ -5,10 +5,9 @@
  * Enables the organization of content into categories.
  */
 
-use Drupal\node\Plugin\Core\Entity\Node;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\taxonomy\Plugin\Core\Entity\Term;
 use Drupal\taxonomy\Plugin\Core\Entity\Vocabulary;
-use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Denotes that no term in the vocabulary has a parent.
@@ -1395,7 +1394,7 @@ function taxonomy_field_presave(EntityInterface $entity, $field, $instance, $lan
 /**
  * Implements hook_node_insert().
  */
-function taxonomy_node_insert(Node $node) {
+function taxonomy_node_insert(EntityInterface $node) {
   // Add taxonomy index entries for the node.
   taxonomy_build_node_index($node);
 }
@@ -1406,7 +1405,7 @@ function taxonomy_node_insert(Node $node) {
  * The index lists all terms that are related to a given node entity, and is
  * therefore maintained at the entity level.
  *
- * @param \Drupal\node\Plugin\Core\Entity\Node $node
+ * @param \Drupal\node\Plugin\Core\Entity\EntityInterface $node
  *   The node entity.
  */
 function taxonomy_build_node_index($node) {
@@ -1472,7 +1471,7 @@ function taxonomy_build_node_index($node) {
 /**
  * Implements hook_node_update().
  */
-function taxonomy_node_update(Node $node) {
+function taxonomy_node_update(EntityInterface $node) {
   // Always rebuild the node's taxonomy index entries on node save.
   taxonomy_delete_node_index($node);
   taxonomy_build_node_index($node);
@@ -1481,7 +1480,7 @@ function taxonomy_node_update(Node $node) {
 /**
  * Implements hook_node_predelete().
  */
-function taxonomy_node_predelete(Node $node) {
+function taxonomy_node_predelete(EntityInterface $node) {
   // Clean up the {taxonomy_index} table when nodes are deleted.
   taxonomy_delete_node_index($node);
 }
@@ -1489,10 +1488,10 @@ function taxonomy_node_predelete(Node $node) {
 /**
  * Deletes taxonomy index entries for a given node.
  *
- * @param Drupal\node\Plugin\Core\Entity\Node $node
+ * @param Drupal\node\Plugin\Core\Entity\EntityInterface $node
  *   The node entity.
  */
-function taxonomy_delete_node_index(Node $node) {
+function taxonomy_delete_node_index(EntityInterface $node) {
   if (config('taxonomy.settings')->get('maintain_index_table')) {
     db_delete('taxonomy_index')->condition('nid', $node->nid)->execute();
   }

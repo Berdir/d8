@@ -8,7 +8,7 @@
 namespace Drupal\node\Plugin\Core\Entity;
 
 use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\Core\Entity\Entity;
+use Drupal\Core\Entity\EntityNG;
 use Drupal\Core\Annotation\Plugin;
 use Drupal\Core\Annotation\Translation;
 
@@ -43,7 +43,7 @@ use Drupal\Core\Annotation\Translation;
  *   permission_granularity = "bundle"
  * )
  */
-class Node extends Entity implements ContentEntityInterface {
+class Node extends EntityNG implements ContentEntityInterface {
 
   /**
    * The node ID.
@@ -67,7 +67,7 @@ class Node extends Entity implements ContentEntityInterface {
    *
    * @var boolean
    */
-  public $isDefaultRevision = TRUE;
+  public $isDefaultRevision;
 
   /**
    * The node UUID.
@@ -88,7 +88,7 @@ class Node extends Entity implements ContentEntityInterface {
    *
    * @var string
    */
-  public $langcode = LANGUAGE_NOT_SPECIFIED;
+  public $langcode;
 
   /**
    * The node title.
@@ -193,33 +193,54 @@ class Node extends Entity implements ContentEntityInterface {
   public $revision_uid;
 
   /**
+   * The plain data values of the contained properties.
+   *
+   * Define default values.
+   *
+   * @var array
+   */
+  protected $values = array(
+    'langcode' => array(LANGUAGE_DEFAULT => array(0 => array('value' => LANGUAGE_NOT_SPECIFIED))),
+    'isDefaultRevision' => array(LANGUAGE_DEFAULT => array(0 => array('value' => TRUE))),
+  );
+
+  /**
+   * Overrides \Drupal\Core\Entity\EntityNG::init().
+   */
+  protected function init() {
+    parent::init();
+    // We unset all defined properties, so magic getters apply.
+    unset($this->nid);
+    unset($this->vid);
+    unset($this->isDefaultRevision);
+    unset($this->uuid);
+    unset($this->type);
+    unset($this->title);
+    unset($this->uid);
+    unset($this->status);
+    unset($this->created);
+    unset($this->changed);
+    unset($this->comment);
+    unset($this->promote);
+    unset($this->sticky);
+    unset($this->tnid);
+    unset($this->translate);
+    unset($this->revision_timestamp);
+    unset($this->revision_uid);
+  }
+
+  /**
    * Implements Drupal\Core\Entity\EntityInterface::id().
    */
   public function id() {
-    return $this->nid;
-  }
-
-  /**
-   * Implements Drupal\Core\Entity\EntityInterface::bundle().
-   */
-  public function bundle() {
-    return $this->type;
-  }
-
-  /**
-   * Overrides Drupal\Core\Entity\Entity::createDuplicate().
-   */
-  public function createDuplicate() {
-    $duplicate = parent::createDuplicate();
-    $duplicate->vid = NULL;
-    return $duplicate;
+    return $this->get('nid')->value;
   }
 
   /**
    * Overrides Drupal\Core\Entity\Entity::getRevisionId().
    */
   public function getRevisionId() {
-    return $this->vid;
+    return $this->get('vid')->value;
   }
 
 }
