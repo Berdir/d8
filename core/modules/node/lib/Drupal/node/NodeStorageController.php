@@ -33,23 +33,23 @@ class NodeStorageController extends DatabaseStorageControllerNG {
    * Overrides Drupal\Core\Entity\DatabaseStorageControllerNG::attachLoad().
    */
   protected function attachLoad(&$queried_entities, $load_revision = FALSE) {
-    $queried_entities = $this->mapFromStorageRecords($queried_entities, $load_revision);
+    $nodes = $this->mapFromStorageRecords($queried_entities, $load_revision);
 
     // Create an array of nodes for each content type and pass this to the
     // object type specific callback. To preserve backward-compatibility we
     // pass on BC decorators to node-specific hooks, while we pass on the
     // regular entity objects else.
     $typed_nodes = array();
-    foreach ($queried_entities as $id => $entity) {
-      $nodes[$id] = $entity->getBCEntity();
-      $typed_nodes[$entity->bundle()][$id] = $nodes[$id];
+    foreach ($nodes as $id => $node) {
+      $queried_entities[$id] = $node->getBCEntity();
+      $typed_nodes[$node->bundle()][$id] = $queried_entities[$id];
     }
 
     if ($load_revision) {
-      field_attach_load_revision($this->entityType, $nodes);
+      field_attach_load_revision($this->entityType, $queried_entities);
     }
     else {
-      field_attach_load($this->entityType, $nodes);
+      field_attach_load($this->entityType, $queried_entities);
     }
 
     // Call object type specific callbacks on each typed array of nodes.
@@ -73,7 +73,7 @@ class NodeStorageController extends DatabaseStorageControllerNG {
     // Call hook_TYPE_load(). The first argument for hook_TYPE_load() are
     // always the queried entities, followed by additional arguments set in
     // $this->hookLoadArguments.
-    $args = array_merge(array($nodes), $this->hookLoadArguments);
+    $args = array_merge(array($queried_entities), $this->hookLoadArguments);
     foreach (module_implements($this->entityType . '_load') as $module) {
       call_user_func_array($module . '_' . $this->entityType . '_load', $args);
     }

@@ -257,7 +257,7 @@ function node_entity_display_alter(EntityDisplay $display, $context) {
  */
 function node_uri(EntityInterface $node) {
   return array(
-    'path' => 'node/' . $node->nid,
+    'path' => 'node/' . $node->nid->value,
   );
 }
 
