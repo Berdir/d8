@@ -243,8 +243,8 @@ class NodeStorageController extends DatabaseStorageControllerNG {
     $properties['uid'] = array(
       'label' => t('User ID'),
       'description' => t('The user ID of the node author.'),
-      'type' => 'entityreference_field',
-      'settings' => array('entity type' => 'user'),
+      'type' => 'entity_reference_field',
+      'settings' => array('target_type' => 'user'),
     );
     $properties['status'] = array(
       'label' => t('Publishing status'),
@@ -295,8 +295,8 @@ class NodeStorageController extends DatabaseStorageControllerNG {
     $properties['revision_uid'] = array(
       'label' => t('Revision user ID'),
       'description' => t('The user ID of the author of the current revision.'),
-      'type' => 'entityreference_field',
-      'settings' => array('entity type' => 'user'),
+      'type' => 'entity_reference_field',
+      'settings' => array('target_type' => 'user'),
       'queryable' => FALSE,
     );
     return $properties;
