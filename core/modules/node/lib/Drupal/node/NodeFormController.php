@@ -10,12 +10,12 @@ namespace Drupal\node;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityFormController;
+use Drupal\Core\Entity\EntityFormControllerNG;
 
 /**
  * Form controller for the node edit forms.
  */
-class NodeFormController extends EntityFormController {
+class NodeFormController extends EntityFormControllerNG {
 
   /**
    * Prepares the node object.
