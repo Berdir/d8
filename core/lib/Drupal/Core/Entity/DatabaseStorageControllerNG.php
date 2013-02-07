@@ -491,6 +491,11 @@ class DatabaseStorageControllerNG extends DatabaseStorageController {
 
     $transaction = db_transaction();
     try {
+      // Ensure we are dealing with the actual entities.
+      foreach ($entities as $id => $entity) {
+        $entities[$id] = $entity->getOriginalEntity();
+      }
+
       $this->preDelete($entities);
       foreach ($entities as $id => $entity) {
         $this->invokeHook('predelete', $entity);
