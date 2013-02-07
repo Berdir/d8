@@ -105,11 +105,9 @@ class EntityBCDecorator implements IteratorAggregate, EntityInterface {
       }
       $value = $this->decorated->values[$name][LANGUAGE_DEFAULT];
       if (is_array($value)) {
-        return $value[0]['value'];
+        $value = reset($value[0]);
       }
-      else {
-        return $value;
-      }
+      return $value;
     }
     else {
       // Allow accessing field values in entity default language other than
