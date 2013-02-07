@@ -105,7 +105,7 @@ class EntityBCDecorator implements IteratorAggregate, EntityInterface {
       }
       $value = $this->decorated->values[$name][LANGUAGE_DEFAULT];
       if (is_array($value)) {
-        $value = reset($value[0]);
+        $value = !empty($value[0]) ? reset($value[0]) : NULL;
       }
       return $value;
     }
