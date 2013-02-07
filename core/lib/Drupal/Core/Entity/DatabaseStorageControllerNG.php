@@ -279,7 +279,7 @@ class DatabaseStorageControllerNG extends DatabaseStorageController {
       $this->invokeHook('presave', $entity);
 
       // Create the storage record to be saved.
-      $record = $this->maptoStorageRecord($entity);
+      $record = $this->mapToStorageRecord($entity);
 
       if (!$entity->isNew()) {
         if ($entity->isDefaultRevision()) {
