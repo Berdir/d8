@@ -98,13 +98,15 @@ class NodeStorageController extends DatabaseStorageControllerNG {
    * Overrides Drupal\Core\Entity\DatabaseStorageController::invokeHook().
    */
   protected function invokeHook($hook, EntityInterface $node) {
+    $node = $node->getBCEntity();
+
     if ($hook == 'insert' || $hook == 'update') {
-      node_invoke($node->getBCEntity(), $hook);
+      node_invoke($node, $hook);
     }
     else if ($hook == 'predelete') {
       // 'delete' is triggered in 'predelete' is here to preserve hook ordering
       // from Drupal 7.
-      node_invoke($node->getBCEntity(), 'delete');
+      node_invoke($node, 'delete');
     }
 
     // Inline parent::invokeHook() to pass on BC-entities to node-specific
@@ -117,11 +119,11 @@ class NodeStorageController extends DatabaseStorageControllerNG {
       $function = 'field_attach_delete_revision';
     }
     if (!empty($this->entityInfo['fieldable']) && function_exists($function)) {
-      $function($node->getBCEntity());
+      $function($node);
     }
 
     // Invoke the hook.
-    module_invoke_all($this->entityType . '_' . $hook, $node->getBCEntity());
+    module_invoke_all($this->entityType . '_' . $hook, $node);
     // Invoke the respective entity-level hook.
     module_invoke_all('entity_' . $hook, $node, $this->entityType);
   }

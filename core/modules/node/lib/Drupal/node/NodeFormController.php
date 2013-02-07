@@ -512,4 +512,19 @@ class NodeFormController extends EntityFormControllerNG {
     $form_state['redirect'] = array('node/' . $node->nid . '/delete', array('query' => $destination));
   }
 
+  /**
+   * Implements \Drupal\Core\Entity\EntityFormControllerInterface::buildEntity().
+   */
+  public function buildEntity(array $form, array &$form_state) {
+    return parent::buildEntity($form, $form_state)->getBCEntity();
+  }
+
+  /**
+   * Implements \Drupal\Core\Entity\EntityFormControllerInterface::getEntity().
+   */
+  public function getEntity(array $form_state) {
+    $entity = parent::getEntity($form_state);
+    return isset($entity) ? $entity->getBCEntity() : $entity;
+  }
+
 }
