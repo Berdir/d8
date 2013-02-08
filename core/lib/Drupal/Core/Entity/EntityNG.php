@@ -367,7 +367,7 @@ class EntityNG extends Entity {
    */
   public function getBCEntity() {
     if (!isset($this->bcEntity)) {
-      $this->bcEntity = new EntityBCDecorator($this);
+      $this->bcEntity = new EntityBCDecorator($this, $this->values, $this->fields);
     }
     return $this->bcEntity;
   }
@@ -407,11 +407,6 @@ class EntityNG extends Entity {
     if (isset($this->fieldDefinitions[$name])) {
       $return = $this->getTranslatedField($name, LANGUAGE_DEFAULT);
       return $return;
-    }
-    // Allow the EntityBCDecorator to directly access the values and fields.
-    // @todo: Remove once the EntityBCDecorator gets removed.
-    if ($name == 'values' || $name == 'fields') {
-      return $this->$name;
     }
     // Else directly read/write plain values. That way, non-field entity
     // properties can always be accessed directly.
