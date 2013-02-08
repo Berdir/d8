@@ -270,6 +270,9 @@ class DatabaseStorageControllerNG extends DatabaseStorageController {
   public function save(EntityInterface $entity) {
     $transaction = db_transaction();
     try {
+      // Ensure we are dealing with the actual entity.
+      $entity = $entity->getOriginalEntity();
+
       // Load the stored entity, if any.
       if (!$entity->isNew() && !isset($entity->original)) {
         $entity->original = entity_load_unchanged($this->entityType, $entity->id());

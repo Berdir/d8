@@ -133,7 +133,7 @@ class NodeStorageController extends DatabaseStorageControllerNG {
    */
   protected function preSave(EntityInterface $node) {
     // Before saving the node, set changed and revision times.
-    $node->changed = REQUEST_TIME;
+    $node->changed->value = REQUEST_TIME;
   }
 
   /**
