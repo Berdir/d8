@@ -1415,7 +1415,7 @@ function node_search_execute($keys = NULL, $conditions = NULL) {
       'type' => check_plain(node_get_type_label($node)),
       'title' => $node->label($item->langcode),
       'user' => theme('username', array('account' => $node)),
-      'date' => $node->get('changed', $item->langcode),
+      'date' => $node->getTranslation($item->langcode)->changed->value,
       'node' => $node,
       'extra' => $extra,
       'score' => $item->calculated_score,
