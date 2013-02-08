@@ -46,6 +46,13 @@ class EntityBCDecorator implements IteratorAggregate, EntityInterface {
   protected $decorated;
 
   /**
+   * Local cache for field definitions.
+   *
+   * @var array
+   */
+  protected $definitions;
+
+  /**
    * The plain data values of the decorated entity fields.
    *
    * @var array
@@ -65,12 +72,15 @@ class EntityBCDecorator implements IteratorAggregate, EntityInterface {
    * @param \Drupal\Core\Entity\EntityInterface $decorated
    *   The decorated entity.
    * @param array
+   *   An array of field definitions.
+   * @param array
    *   The plain data values of the decorated entity fields.
    * @param array
    *   The array of fields, each being an instance of FieldInterface.
    */
-  function __construct(EntityNG $decorated, array &$values, array &$fields) {
+  function __construct(EntityNG $decorated, array &$definitions, array &$values, array &$fields) {
     $this->decorated = $decorated;
+    $this->definitions = &$definitions;
     $this->values = &$values;
     $this->fields = &$fields;
   }
@@ -129,7 +139,7 @@ class EntityBCDecorator implements IteratorAggregate, EntityInterface {
     // When accessing values for entity properties that have been converted to
     // an entity field, provide direct access to the plain value. This makes it
     // possible to use the BC-decorator with properties; e.g., $node->title.
-    if (!field_info_field($name) && $this->decorated->getPropertyDefinition($name)) {
+    if (isset($this->definitions[$name]) && empty($this->definitions[$name]['configurable'])) {
       if (!isset($this->values[$name][LANGUAGE_DEFAULT])) {
         $this->values[$name][LANGUAGE_DEFAULT][0]['value'] = NULL;
       }
@@ -163,14 +173,15 @@ class EntityBCDecorator implements IteratorAggregate, EntityInterface {
    * Directly writes to the plain field values, as done by Drupal 7.
    */
   public function __set($name, $value) {
+    $defined = isset($this->definitions[$name]);
     // When updating values for entity properties that have been converted to
     // an entity field, directly write to the plain value. This makes it
     // possible to use the BC-decorator with properties; e.g., $node->title.
-    if (!field_info_field($name) && $this->decorated->getPropertyDefinition($name)) {
+    if ($defined && empty($this->definitions[$name]['configurable'])) {
       $this->values[$name][LANGUAGE_DEFAULT] = $value;
     }
     else {
-      if (is_array($value) && $definition = $this->decorated->getPropertyDefinition($name)) {
+      if ($defined && is_array($value)) {
         // If field API sets a value with a langcode in entity language, move it
         // to LANGUAGE_DEFAULT.
         // This is necessary as EntityNG does key values in default language always

@@ -367,7 +367,8 @@ class EntityNG extends Entity {
    */
   public function getBCEntity() {
     if (!isset($this->bcEntity)) {
-      $this->bcEntity = new EntityBCDecorator($this, $this->values, $this->fields);
+      $this->getPropertyDefinitions();
+      $this->bcEntity = new EntityBCDecorator($this, $this->fieldDefinitions, $this->values, $this->fields);
     }
     return $this->bcEntity;
   }
