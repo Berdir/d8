@@ -39,7 +39,7 @@ class NodeAccessPagerTest extends WebTestBase {
   /**
    * Tests the comment pager for nodes with multiple grants per realm.
    */
-  public function testCommentPager() {
+  public function atestCommentPager() {
     // Create a node.
     $node = $this->drupalCreateNode();
 
@@ -85,11 +85,7 @@ class NodeAccessPagerTest extends WebTestBase {
       $this->drupalCreateNode(array(
         'nid' => NULL,
         'type' => 'forum',
-        'taxonomy_forums' => array(
-          LANGUAGE_NOT_SPECIFIED => array(
-            array('tid' => $tid, 'vid' => $vid),
-          ),
-        ),
+        'taxonomy_forums' => array(array('tid' => $tid)),
       ));
     }
 
