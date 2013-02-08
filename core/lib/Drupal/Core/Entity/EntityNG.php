@@ -269,7 +269,7 @@ class EntityNG extends Entity {
     if ($this->getPropertyDefinition('langcode')) {
       $language = $this->get('langcode')->language;
     }
-    if (!isset($language)) {
+    if (empty($language)) {
       // Make sure we return a proper language object.
       $language = new Language(array('langcode' => LANGUAGE_NOT_SPECIFIED));
     }
