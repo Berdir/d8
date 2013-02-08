@@ -92,4 +92,13 @@ class EntityReferenceItem extends FieldItemBase {
     $property_name = ($property_name == 'value') ? 'target_id' : $property_name;
     return parent::get($property_name);
   }
+
+  /**
+   * Implements \Drupal\Core\Entity\Field\FieldItemInterface::__isset().
+   */
+  public function __isset($property_name) {
+    $property_name = ($property_name == 'value') ? 'target_id' : $property_name;
+    return parent::__isset($property_name);
+  }
+
 }
