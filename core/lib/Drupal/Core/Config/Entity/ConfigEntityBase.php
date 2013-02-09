@@ -31,7 +31,7 @@ abstract class ConfigEntityBase extends Entity implements ConfigEntityInterface 
    *
    * @var bool
    */
-  public $status;
+  public $status = TRUE;
 
   /**
    * Overrides Entity::__construct().
@@ -112,8 +112,8 @@ abstract class ConfigEntityBase extends Entity implements ConfigEntityInterface 
   /**
    * Implements \Drupal\Core\Config\Entity\ConfigEntityInterface::setStatus().
    */
-  public function setStatus(bool $status) {
-    $this->status = $status;
+  public function setStatus($status) {
+    $this->status = (bool) $status;
     return $this;
   }
 
