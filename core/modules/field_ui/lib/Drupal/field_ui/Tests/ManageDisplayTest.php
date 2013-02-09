@@ -111,7 +111,7 @@ class ManageDisplayTest extends FieldUiTestBase {
     $value = 12345;
     $settings = array(
       'type' => $this->type,
-      'field_test' => array(LANGUAGE_NOT_SPECIFIED => array(array('value' => $value))),
+      'field_test' => array(array('value' => $value)),
     );
     $node = $this->drupalCreateNode($settings);
 
