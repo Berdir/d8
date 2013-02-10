@@ -17,7 +17,7 @@ class FileItem extends FieldItemBase {
   /**
    * Property definitions of the contained properties.
    *
-   * @see self::getPropertyDefinitions()
+   * @see FileItem::getPropertyDefinitions()
    *
    * @var array
    */
