@@ -43,7 +43,7 @@ class FileItem extends FieldItemBase {
       static::$propertyDefinitions['entity'] = array(
         'type' => 'entity',
         'constraints' => array(
-          'entity type' => 'file',
+          'EntityType' => 'file',
         ),
         'label' => t('File'),
         'description' => t('The referenced file'),

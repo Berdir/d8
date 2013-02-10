@@ -7,21 +7,28 @@
 
 namespace Drupal\file\Tests;
 
-use Drupal\simpletest\WebTestBase;
 use Drupal\Core\Entity\Field\FieldItemInterface;
 use Drupal\Core\Entity\Field\FieldInterface;
+use Drupal\field\Tests\FieldItemUnitTestBase;
 
 /**
  * Tests the new entity API for the file field type.
  */
-class FileItemTest extends WebTestBase {
+class FileItemTest extends FieldItemUnitTestBase {
 
   /**
    * Modules to enable.
    *
    * @var array
    */
-  public static $modules = array('field', 'field_sql_storage', 'file', 'entity_test');
+  public static $modules = array('file');
+
+  /**
+   * Created file entity.
+   *
+   * @var \Drupal\file\Plugin\Core\Entity\File
+   */
+  protected $file;
 
   public static function getInfo() {
     return array(
@@ -33,6 +40,10 @@ class FileItemTest extends WebTestBase {
 
   public function setUp() {
     parent::setUp();
+
+    $this->installSchema('file', 'file_managed');
+    $this->installSchema('file', 'file_usage');
+
     $field = array(
       'field_name' => 'file_test',
       'type' => 'file',
@@ -48,9 +59,9 @@ class FileItemTest extends WebTestBase {
       ),
     );
     field_create_instance($instance);
-    $files = $this->drupalGetTestFiles('text');
+    file_put_contents('public://example.txt', $this->randomName());
     $this->file = entity_create('file', array(
-      'uri' => reset($files)->uri,
+      'uri' => 'public://example.txt',
     ));
     $this->file->save();
   }
@@ -78,9 +89,9 @@ class FileItemTest extends WebTestBase {
     $this->assertEqual($entity->file_test->entity->uuid(), $this->file->uuid());
 
     // Make sure the computed files reflects updates to the file.
-    $files = $this->drupalGetTestFiles('image');
+    file_put_contents('public://example-2.txt', $this->randomName());
     $file2 = entity_create('file', array(
-      'uri' => reset($files)->uri,
+      'uri' => 'public://example-2.txt',
     ));
     $file2->save();
 
