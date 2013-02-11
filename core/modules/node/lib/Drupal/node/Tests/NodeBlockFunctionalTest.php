@@ -76,15 +76,15 @@ class NodeBlockFunctionalTest extends NodeTestBase {
     // Change the changed time for node so that we can test ordering.
     db_update('node')
       ->fields(array(
-        'changed' => $node1->changed->value + 100,
+        'changed' => $node1->changed + 100,
       ))
-      ->condition('nid', $node2->id())
+      ->condition('nid', $node2->nid)
       ->execute();
     db_update('node')
       ->fields(array(
-        'changed' => $node1->changed->value + 200,
+        'changed' => $node1->changed + 200,
       ))
-      ->condition('nid', $node3->id())
+      ->condition('nid', $node3->nid)
       ->execute();
 
     // Test that a user without the 'access content' permission cannot
@@ -144,9 +144,9 @@ class NodeBlockFunctionalTest extends NodeTestBase {
     $this->assertNoText($label, 'Block was not displayed on the front page.');
     $this->drupalGet('node/add/article');
     $this->assertText($label, 'Block was displayed on the node/add/article page.');
-    $this->drupalGet('node/' . $node1->id());
+    $this->drupalGet('node/' . $node1->nid);
     $this->assertText($label, 'Block was displayed on the node/N when node is of type article.');
-    $this->drupalGet('node/' . $node5->id());
+    $this->drupalGet('node/' . $node5->nid);
     $this->assertNoText($label, 'Block was not displayed on nodes of type page.');
   }
 

@@ -29,7 +29,7 @@ class SummaryLengthTest extends NodeTestBase {
       'promote' => 1,
     );
     $node = $this->drupalCreateNode($settings);
-    $this->assertTrue(node_load($node->id()), 'Node created.');
+    $this->assertTrue(node_load($node->nid), 'Node created.');
 
     // Create user with permission to view the node.
     $web_user = $this->drupalCreateUser(array('access content', 'administer content types'));
@@ -47,7 +47,7 @@ class SummaryLengthTest extends NodeTestBase {
     $this->assertRaw($expected);
 
     // Change the teaser length for "Basic page" content type.
-    $display = entity_get_display('node', $node->bundle(), 'teaser');
+    $display = entity_get_display('node', $node->type, 'teaser');
     $display_options = $display->getComponent('body');
     $display_options['settings']['trim_length'] = 200;
     $display->setComponent('body', $display_options)
