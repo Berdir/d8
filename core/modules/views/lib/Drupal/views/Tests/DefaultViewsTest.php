@@ -93,13 +93,13 @@ class DefaultViewsTest extends WebTestBase {
       $term = $this->createTerm($this->vocabulary);
 
       $values = array('created' => $time, 'type' => 'page');
-      $values[$this->field_name][LANGUAGE_NOT_SPECIFIED][]['tid'] = $term->tid;
+      $values[$this->field_name][]['tid'] = $term->tid;
 
       // Make every other node promoted.
       if ($i % 2) {
         $values['promote'] = TRUE;
       }
-      $values['body'][LANGUAGE_NOT_SPECIFIED][]['value'] = l('Node ' . 1, 'node/' . 1);
+      $values['body'][]['value'] = l('Node ' . 1, 'node/' . 1);
 
       $node = $this->drupalCreateNode($values);
 
@@ -123,7 +123,7 @@ class DefaultViewsTest extends WebTestBase {
     $views = $controller->load();
 
     foreach ($views as $name => $view_storage) {
-      $view = new ViewExecutable($view_storage);
+      $view = $view_storage->get('executable');
       $view->initDisplay();
       foreach ($view->storage->get('display') as $display_id => $display) {
         $view->setDisplay($display_id);

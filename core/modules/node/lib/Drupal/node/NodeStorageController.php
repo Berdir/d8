@@ -26,30 +26,30 @@ class NodeStorageController extends DatabaseStorageControllerNG {
     if (empty($values['created'])) {
       $values['created'] = REQUEST_TIME;
     }
-    return parent::create($values);
+    return parent::create($values)->getBCEntity();
   }
 
   /**
    * Overrides Drupal\Core\Entity\DatabaseStorageControllerNG::attachLoad().
    */
   protected function attachLoad(&$queried_entities, $load_revision = FALSE) {
-    $queried_entities = $this->mapFromStorageRecords($queried_entities, $load_revision);
+    $nodes = $this->mapFromStorageRecords($queried_entities, $load_revision);
 
     // Create an array of nodes for each content type and pass this to the
     // object type specific callback. To preserve backward-compatibility we
     // pass on BC decorators to node-specific hooks, while we pass on the
     // regular entity objects else.
     $typed_nodes = array();
-    foreach ($queried_entities as $id => $entity) {
-      $nodes[$id] = $entity->getBCEntity();
-      $typed_nodes[$entity->bundle()][$id] = $nodes[$id];
+    foreach ($nodes as $id => $node) {
+      $queried_entities[$id] = $node->getBCEntity();
+      $typed_nodes[$node->bundle()][$id] = $queried_entities[$id];
     }
 
     if ($load_revision) {
-      field_attach_load_revision($this->entityType, $nodes);
+      field_attach_load_revision($this->entityType, $queried_entities);
     }
     else {
-      field_attach_load($this->entityType, $nodes);
+      field_attach_load($this->entityType, $queried_entities);
     }
 
     // Call object type specific callbacks on each typed array of nodes.
@@ -73,7 +73,7 @@ class NodeStorageController extends DatabaseStorageControllerNG {
     // Call hook_TYPE_load(). The first argument for hook_TYPE_load() are
     // always the queried entities, followed by additional arguments set in
     // $this->hookLoadArguments.
-    $args = array_merge(array($nodes), $this->hookLoadArguments);
+    $args = array_merge(array($queried_entities), $this->hookLoadArguments);
     foreach (module_implements($this->entityType . '_load') as $module) {
       call_user_func_array($module . '_' . $this->entityType . '_load', $args);
     }
@@ -98,13 +98,15 @@ class NodeStorageController extends DatabaseStorageControllerNG {
    * Overrides Drupal\Core\Entity\DatabaseStorageController::invokeHook().
    */
   protected function invokeHook($hook, EntityInterface $node) {
+    $node = $node->getBCEntity();
+
     if ($hook == 'insert' || $hook == 'update') {
-      node_invoke($node->getBCEntity(), $hook);
+      node_invoke($node, $hook);
     }
     else if ($hook == 'predelete') {
       // 'delete' is triggered in 'predelete' is here to preserve hook ordering
       // from Drupal 7.
-      node_invoke($node->getBCEntity(), 'delete');
+      node_invoke($node, 'delete');
     }
 
     // Inline parent::invokeHook() to pass on BC-entities to node-specific
@@ -117,11 +119,11 @@ class NodeStorageController extends DatabaseStorageControllerNG {
       $function = 'field_attach_delete_revision';
     }
     if (!empty($this->entityInfo['fieldable']) && function_exists($function)) {
-      $function($node->getBCEntity());
+      $function($node);
     }
 
     // Invoke the hook.
-    module_invoke_all($this->entityType . '_' . $hook, $node->getBCEntity());
+    module_invoke_all($this->entityType . '_' . $hook, $node);
     // Invoke the respective entity-level hook.
     module_invoke_all('entity_' . $hook, $node, $this->entityType);
   }
@@ -131,7 +133,7 @@ class NodeStorageController extends DatabaseStorageControllerNG {
    */
   protected function preSave(EntityInterface $node) {
     // Before saving the node, set changed and revision times.
-    $node->changed = REQUEST_TIME;
+    $node->changed->value = REQUEST_TIME;
   }
 
   /**
@@ -148,7 +150,7 @@ class NodeStorageController extends DatabaseStorageControllerNG {
       // @todo: Make the {node_revision}.log column nullable so that we can
       // remove this check.
       if (!isset($record->log)) {
-        $entity->log = $record->log = '';
+        $record->log = '';
       }
     }
     elseif (!isset($record->log) || $record->log === '') {
@@ -162,8 +164,8 @@ class NodeStorageController extends DatabaseStorageControllerNG {
     }
 
     if ($entity->isNewRevision()) {
-      $record->timestamp = $entity->timestamp = REQUEST_TIME;
-      $record->uid = $entity->uid = isset($record->revision_uid) ? $record->revision_uid->value : $GLOBALS['user']->uid;
+      $record->timestamp = REQUEST_TIME;
+      $record->uid = isset($record->revision_uid) ? $record->revision_uid : $GLOBALS['user']->uid;
     }
   }
 
@@ -243,8 +245,8 @@ class NodeStorageController extends DatabaseStorageControllerNG {
     $properties['uid'] = array(
       'label' => t('User ID'),
       'description' => t('The user ID of the node author.'),
-      'type' => 'entityreference_field',
-      'settings' => array('entity type' => 'user'),
+      'type' => 'entity_reference_field',
+      'settings' => array('target_type' => 'user'),
     );
     $properties['status'] = array(
       'label' => t('Publishing status'),
@@ -295,8 +297,8 @@ class NodeStorageController extends DatabaseStorageControllerNG {
     $properties['revision_uid'] = array(
       'label' => t('Revision user ID'),
       'description' => t('The user ID of the author of the current revision.'),
-      'type' => 'entityreference_field',
-      'settings' => array('entity type' => 'user'),
+      'type' => 'entity_reference_field',
+      'settings' => array('target_type' => 'user'),
       'queryable' => FALSE,
     );
     return $properties;

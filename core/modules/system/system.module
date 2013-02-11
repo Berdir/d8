@@ -475,6 +475,7 @@ function system_element_info() {
     '#process' => array('form_process_select', 'ajax_process_form'),
     '#theme' => 'select',
     '#theme_wrappers' => array('form_element'),
+    '#options' => array(),
   );
   $types['language_select'] = array(
     '#input' => TRUE,
@@ -548,7 +549,6 @@ function system_element_info() {
     '#theme_wrappers' => array('fieldset'),
   );
   $types['details'] = array(
-    '#collapsible' => FALSE,
     '#collapsed' => FALSE,
     '#value' => NULL,
     '#process' => array('form_process_group', 'ajax_process_form'),
@@ -1353,9 +1353,9 @@ function system_library_info() {
     ),
   );
 
-  // Drupal's collapsible details.
+  // Collapsible details.
   $libraries['drupal.collapse'] = array(
-    'title' => 'Drupal collapsible details',
+    'title' => 'Collapsible details',
     'version' => VERSION,
     'js' => array(
       'core/misc/collapse.js' => array('group' => JS_DEFAULT),
@@ -2133,7 +2133,7 @@ function system_library_info() {
     ),
   );
   $libraries['drupal.system.modules'] = array(
-    'title' => 'System cron',
+    'title' => 'System modules',
     'version' => VERSION,
     'js' => array(
       drupal_get_path('module', 'system') . '/system.modules.js' => array(),
@@ -2168,7 +2168,7 @@ function system_stream_wrappers() {
   );
 
   // Only register the private file stream wrapper if a file path has been set.
-  if (variable_get('file_private_path', FALSE)) {
+  if (config('system.file')->get('path.private')) {
     $wrappers['private'] = array(
       'name' => t('Private files'),
       'class' => 'Drupal\Core\StreamWrapper\PrivateStream',
@@ -2224,6 +2224,7 @@ function system_data_type_info() {
       'label' => t('Email'),
       'class' => '\Drupal\Core\TypedData\Type\Email',
       'primitive type' => Primitive::STRING,
+      'constraints' => array('Email' => array()),
     ),
     'binary' => array(
       'label' => t('Binary'),
@@ -2275,10 +2276,16 @@ function system_data_type_info() {
       'class' => '\Drupal\Core\Entity\Field\Type\LanguageItem',
       'list class' => '\Drupal\Core\Entity\Field\Type\Field',
     ),
-    'entityreference_field' => array(
+    'entity_reference_field' => array(
       'label' => t('Entity reference field item'),
       'description' => t('An entity field containing an entity reference.'),
       'class' => '\Drupal\Core\Entity\Field\Type\EntityReferenceItem',
+      'list class' => '\Drupal\Core\Entity\Field\Type\Field',
+    ),
+    'uri_field' => array(
+      'label' => t('URI field item'),
+      'description' => t('An entity field containing a URI'),
+      'class' => '\Drupal\Core\Entity\Field\Type\UriItem',
       'list class' => '\Drupal\Core\Entity\Field\Type\Field',
     ),
   );
@@ -2604,7 +2611,6 @@ function system_user_timezone(&$form, &$form_state) {
     '#type' => 'details',
     '#title' => t('Locale settings'),
     '#weight' => 6,
-    '#collapsible' => TRUE,
   );
   $form['timezone']['timezone'] = array(
     '#type' => 'select',
@@ -2671,7 +2677,10 @@ function system_admin_menu_block($item) {
   }
 
   if (!isset($item['mlid'])) {
-    $item += db_query("SELECT mlid, menu_name FROM {menu_links} ml WHERE ml.router_path = :path AND module = 'system'", array(':path' => $item['path']))->fetchAssoc();
+    $menu_links = entity_load_multiple_by_properties('menu_link', array('router_path' => $item['path'], 'module' => 'system'));
+    $menu_link = reset($menu_links);
+    $item['mlid'] = $menu_link->id();
+    $item['menu_name'] = $menu_link->menu_name;
   }
 
   if (isset($cache[$item['mlid']])) {
@@ -2679,17 +2688,8 @@ function system_admin_menu_block($item) {
   }
 
   $content = array();
-  $query = db_select('menu_links', 'ml', array('fetch' => PDO::FETCH_ASSOC));
-  $query->join('menu_router', 'm', 'm.path = ml.router_path');
-  $query
-    ->fields('ml')
-    // Weight should be taken from {menu_links}, not {menu_router}.
-    ->fields('m', array_diff(drupal_schema_fields_sql('menu_router'), array('weight')))
-    ->condition('ml.plid', $item['mlid'])
-    ->condition('ml.menu_name', $item['menu_name'])
-    ->condition('ml.hidden', 0);
-
-  foreach ($query->execute() as $link) {
+  $menu_links = entity_load_multiple_by_properties('menu_link', array('plid' => $item['mlid'], 'menu_name' => $item['menu_name'], 'hidden' => 0));
+  foreach ($menu_links as $link) {
     _menu_link_translate($link);
     if ($link['access']) {
       // The link description, either derived from 'description' in
@@ -2932,7 +2932,7 @@ function system_rebuild_module_data() {
  * Refreshes the list of bootstrap modules.
  *
  * This is called internally by module_enable/disable() to flag modules that
- * implement hooks used during bootstrap, such as hook_boot(). These modules
+ * implement hooks used during bootstrap, such as hook_watchdog(). These modules
  * are loaded earlier to invoke the hooks.
  */
 function _system_update_bootstrap_status() {
@@ -3454,18 +3454,8 @@ function system_get_module_admin_tasks($module, $info) {
 
   if (!isset($links)) {
     $links = array();
-    $query = db_select('menu_links', 'ml', array('fetch' => PDO::FETCH_ASSOC));
-    $query->join('menu_router', 'm', 'm.path = ml.router_path');
-    $query
-      ->fields('ml')
-      // Weight should be taken from {menu_links}, not {menu_router}.
-      ->fields('m', array_diff(drupal_schema_fields_sql('menu_router'), array('weight')))
-      ->condition('ml.link_path', 'admin/%', 'LIKE')
-      ->condition('ml.hidden', 0, '>=')
-      ->condition('ml.module', 'system')
-      ->condition('m.number_parts', 1, '>')
-      ->condition('m.page_callback', 'system_admin_menu_block_page', '<>');
-    foreach ($query->execute() as $link) {
+    $menu_links = entity_get_controller('menu_link')->loadModuleAdminTasks();
+    foreach ($menu_links as $link) {
       _menu_link_translate($link);
       if ($link['access']) {
         $links[$link['router_path']] = $link;
@@ -3517,6 +3507,7 @@ function system_get_module_admin_tasks($module, $info) {
       $item['title'] = t('Configure @module permissions', array('@module' => $info['name']));
       unset($item['description']);
       $item['localized_options']['fragment'] = 'module-' . $module;
+      $item = entity_create('menu_link', $item);
       $admin_tasks["admin/people/permissions#module-$module"] = $item;
     }
   }

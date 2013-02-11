@@ -1,7 +1,7 @@
 base_table: node
 core: '8'
 description: ''
-disabled: '0'
+status: '1'
 display:
   default:
     display_options:
@@ -23,6 +23,7 @@ display:
           field: type
           id: type
           table: node
+          plugin_id: string
       pager:
         type: full
       style:

@@ -11,33 +11,6 @@
  */
 
 /**
- * Allows modules to act after language initialization has been performed.
- *
- * This is primarily needed to provide translation for configuration variables
- * in the proper bootstrap phase. Variables are user-defined strings and
- * therefore should not be translated via t(), since the source string can
- * change without notice and any previous translation would be lost. Moreover,
- * since variables can be used in the bootstrap phase, we need a bootstrap hook
- * to provide a translation early enough to avoid misalignments between code
- * using the original values and code using the translated values. However
- * modules implementing hook_boot() should be aware that language initialization
- * did not happen yet and thus they cannot rely on translated variables.
- */
-function hook_language_init() {
-  global $conf;
-
-  switch (language(LANGUAGE_TYPE_INTERFACE)->langcode) {
-    case 'it':
-      $conf['system.site']['name'] = 'Il mio sito Drupal';
-      break;
-
-    case 'fr':
-      $conf['system.site']['name'] = 'Mon site Drupal';
-      break;
-  }
-}
-
-/**
  * Perform alterations on language switcher links.
  *
  * A language switcher link may need to point to a different path or use a
@@ -204,11 +177,14 @@ function hook_language_fallback_candidates_alter(array &$fallback_candidates) {
  * vs. initial capital letter only) is not taken into account, and in
  * transliterations of capital letters that result in two or more letters, by
  * convention only the first is capitalized in the Drupal transliteration
- * result. So, the process has limitations; however, since the reason for
- * transliteration is typically to create machine names or file names, this
- * should not really be a problem. After transliteration, other transformation
- * or validation may be necessary, such as converting spaces to another
- * character, removing non-printable characters, lower-casing, etc.
+ * result. Also, only Unicode characters of 4 bytes or less can be
+ * transliterated in the base system; language-specific overrides can be made
+ * for longer Unicode characters. So, the process has limitations; however,
+ * since the reason for transliteration is typically to create machine names or
+ * file names, this should not really be a problem. After transliteration,
+ * other transformation or validation may be necessary, such as converting
+ * spaces to another character, removing non-printable characters,
+ * lower-casing, etc.
  *
  * Here is a code snippet to transliterate some text:
  * @code
@@ -223,12 +199,19 @@ function hook_language_fallback_candidates_alter(array &$fallback_candidates) {
  * Drupal Core provides the generic transliteration character tables and
  * overrides for a few common languages; modules can implement
  * hook_transliteration_overrides_alter() to provide further language-specific
- * overrides. Modules can also completely override the transliteration classes
- * in \Drupal\Core\CoreBundle.
+ * overrides (including providing transliteration for Unicode characters that
+ * are longer than 4 bytes). Modules can also completely override the
+ * transliteration classes in \Drupal\Core\CoreBundle.
  */
 
 /**
  * Provide language-specific overrides for transliteration.
+ *
+ * If the overrides you want to provide are standard for your language, consider
+ * providing a patch for the Drupal Core transliteration system instead of using
+ * this hook. This hook can be used temporarily until Drupal Core's
+ * transliteration tables are fixed, or for sites that want to use a
+ * non-standard transliteration system.
  *
  * @param array $overrides
  *   Associative array of language-specific overrides whose keys are integer

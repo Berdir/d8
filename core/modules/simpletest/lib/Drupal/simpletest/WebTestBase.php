@@ -200,7 +200,7 @@ abstract class WebTestBase extends TestBase {
    *   The following defaults are provided:
    *   - body: Random string using the default filter format:
    *     @code
-   *       $settings['body'][LANGUAGE_NOT_SPECIFIED][0] = array(
+   *       $settings['body'][0] = array(
    *         'value' => $this->randomName(32),
    *         'format' => filter_default_format(),
    *       );
@@ -213,10 +213,7 @@ abstract class WebTestBase extends TestBase {
    *   - status: NODE_PUBLISHED.
    *   - sticky: NODE_NOT_STICKY.
    *   - type: 'page'.
-   *   - langcode: LANGUAGE_NOT_SPECIFIED. (If a 'langcode' key is provided in
-   *     the array, this language code will also be used for a randomly
-   *     generated body field for that language, and the body for
-   *     LANGUAGE_NOT_SPECIFIED will remain empty.)
+   *   - langcode: LANGUAGE_NOT_SPECIFIED.
    *   - uid: The currently logged in user, or the user running test.
    *   - revision: 1. (Backwards-compatible binary flag indicating whether a
    *     new revision should be created; use 1 to specify a new revision.)
@@ -227,7 +224,7 @@ abstract class WebTestBase extends TestBase {
   protected function drupalCreateNode(array $settings = array()) {
     // Populate defaults array.
     $settings += array(
-      'body'      => array(LANGUAGE_NOT_SPECIFIED => array(array())),
+      'body'      => array(array()),
       'title'     => $this->randomName(8),
       'changed'   => REQUEST_TIME,
       'promote'   => NODE_NOT_PROMOTED,
@@ -264,14 +261,10 @@ abstract class WebTestBase extends TestBase {
     }
 
     // Merge body field value and format separately.
-    $body = array(
+    $settings['body'][0] += array(
       'value' => $this->randomName(32),
       'format' => filter_default_format(),
     );
-    if (empty($settings['body'][$settings['langcode']])) {
-      $settings['body'][$settings['langcode']][0] = array();
-    }
-    $settings['body'][$settings['langcode']][0] += $body;
 
     $node = entity_create('node', $settings);
     if (!empty($settings['revision'])) {
@@ -281,8 +274,8 @@ abstract class WebTestBase extends TestBase {
 
     // Small hack to link revisions to our test user.
     db_update('node_revision')
-      ->fields(array('uid' => $node->uid->value))
-      ->condition('vid', $node->vid->value)
+      ->fields(array('uid' => $node->uid))
+      ->condition('vid', $node->vid)
       ->execute();
     return $node;
   }
@@ -462,7 +455,7 @@ abstract class WebTestBase extends TestBase {
    * @param array $permissions
    *   Array of permission names to assign to user. Note that the user always
    *   has the default permissions derived from the "authenticated users" role.
-   * @param $name
+   * @param string $name
    *   The user name.
    *
    * @return object|false
@@ -747,6 +740,7 @@ abstract class WebTestBase extends TestBase {
     // @see install.php, install.core.inc
     $connection_info = Database::getConnectionInfo();
     $this->root_user = (object) array(
+      'uid' => 1,
       'name' => 'admin',
       'mail' => 'admin@example.com',
       'pass_raw' => $this->randomName(),
@@ -787,22 +781,25 @@ abstract class WebTestBase extends TestBase {
     // Reset the static batch to remove Simpletest's batch operations.
     $batch = &batch_get();
     $batch = array();
-    $variables = array(
-      'file_public_path' =>  $this->public_files_directory,
-      'file_private_path' =>  $this->private_files_directory,
-      'file_temporary_path' =>  $this->temp_files_directory,
-      'locale_translate_file_directory' =>  $this->translation_files_directory,
+    $variable_groups = array(
+      'system.file' => array(
+        'path.private' =>  $this->private_files_directory,
+        'path.temporary' =>  $this->temp_files_directory,
+      ),
+      'locale.settings' =>  array(
+        'translation.path' => $this->translation_files_directory,
+      ),
     );
-    foreach ($variables as $name => $value) {
-      $GLOBALS['conf'][$name] = $value;
+    foreach ($variable_groups as $config_base => $variables) {
+      foreach ($variables as $name => $value) {
+        NestedArray::setValue($GLOBALS['conf'], array_merge(array($config_base), explode('.', $name)), $value);
+      }
     }
+    $GLOBALS['conf']['file_public_path'] = $this->public_files_directory;
     // Execute the non-interactive installer.
     require_once DRUPAL_ROOT . '/core/includes/install.core.inc';
     install_drupal($settings);
     $this->rebuildContainer();
-    foreach ($variables as $name => $value) {
-      variable_set($name, $value);
-    }
 
     // Restore the original Simpletest batch.
     $batch = &batch_get();
@@ -828,6 +825,7 @@ abstract class WebTestBase extends TestBase {
       $class = get_parent_class($class);
     }
     if ($modules) {
+      $modules = array_unique($modules);
       $success = module_enable($modules, TRUE);
       $this->assertTrue($success, t('Enabled modules: %modules', array('%modules' => implode(', ', $modules))));
       $this->rebuildContainer();
@@ -835,6 +833,17 @@ abstract class WebTestBase extends TestBase {
 
     // Reset/rebuild all data structures after enabling the modules.
     $this->resetAll();
+
+    // Now make sure that the file path configurations are saved. This is done
+    // after we install the modules to override default values.
+    foreach ($variable_groups as $config_base => $variables) {
+      $config = config($config_base);
+      foreach ($variables as $name => $value) {
+        $config->set($name, $value);
+      }
+      $config->save();
+    }
+    variable_set('file_public_path', $this->public_files_directory);
 
     // Use the test mail class instead of the default mail handler class.
     variable_set('mail_system', array('default-system' => 'Drupal\Core\Mail\VariableLog'));

@@ -505,10 +505,10 @@ function entity_get_form(EntityInterface $entity, $operation = 'default', $langc
  * for copying the form values of added form elements to entity properties.
  * Many of the main entity builder functions can call this helper function to
  * re-use its logic of copying $form_state['values'][PROPERTY] values to
- * $entity->PROPERTY for all entries in $form_state['values'] that are not field
- * data, and calling field_attach_submit() to copy field data. Apart from that
- * this helper invokes any additional builder functions that have been specified
- * in $form['#entity_builders'].
+ * $entity->PROPERTY for all entries in $form_state['values'] that are not
+ * field data, and calling field_attach_extract_form_values() to copy field
+ * data. Apart from that this helper invokes any additional builder functions
+ * that have been specified in $form['#entity_builders'].
  *
  * For some entity forms (e.g., forms with complex non-field data and forms that
  * simultaneously edit multiple entities), this behavior may be inappropriate,
@@ -520,7 +520,8 @@ function entity_form_submit_build_entity($entity_type, $entity, $form, &$form_st
 
   // Copy top-level form values that are not for fields to entity properties,
   // without changing existing entity properties that are not being edited by
-  // this form. Copying field values must be done using field_attach_submit().
+  // this form. Copying field values must be done using
+  // field_attach_extract_form_values().
   $values_excluding_fields = $info['fieldable'] ? array_diff_key($form_state['values'], field_info_instances($entity_type, $entity->bundle())) : $form_state['values'];
   foreach ($values_excluding_fields as $key => $value) {
     $entity->set($key, $value);
@@ -535,7 +536,7 @@ function entity_form_submit_build_entity($entity_type, $entity, $form, &$form_st
 
   // Copy field values to the entity.
   if ($info['fieldable']) {
-    field_attach_submit($entity, $form, $form_state);
+    field_attach_extract_form_values($entity, $form, $form_state);
   }
 }
 
@@ -741,4 +742,23 @@ function entity_query($entity_type, $conjunction = 'AND') {
  */
 function entity_page_access(EntityInterface $entity, $operation = 'view') {
   return $entity->access($operation);
+}
+
+/**
+ * Generic access callback for create entity pages.
+ *
+ * Some entity types might have create access per bundle or something else.
+ * In that case you have to create a custom access callback.
+ *
+ * @param string $entity_type
+ *   The entity type.
+ *
+ * @return bool
+ *   TRUE if the access is granted. FALSE if access is denied.
+ */
+function entity_page_create_access($entity_type) {
+  $entity = drupal_container()->get('plugin.manager.entity')
+    ->getStorageController($entity_type)
+    ->create(array());
+  return $entity->access('create');
 }

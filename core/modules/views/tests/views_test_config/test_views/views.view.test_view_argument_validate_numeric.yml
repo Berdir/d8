@@ -1,7 +1,7 @@
 base_table: node
 core: '8'
 description: ''
-disabled: '0'
+status: '1'
 display:
   default:
     display_options:
@@ -17,6 +17,7 @@ display:
           table: views
           validate:
             type: numeric
+          plugin_id: 'null'
       cache:
         type: none
       exposed_form:

@@ -27,6 +27,13 @@ abstract class ConfigEntityBase extends Entity implements ConfigEntityInterface 
   protected $originalID;
 
   /**
+   * The enabled/disabled status of the configuration entity.
+   *
+   * @var bool
+   */
+  public $status = TRUE;
+
+  /**
    * Overrides Entity::__construct().
    */
   public function __construct(array $values, $entity_type) {
@@ -86,6 +93,35 @@ abstract class ConfigEntityBase extends Entity implements ConfigEntityInterface 
   public function set($property_name, $value, $langcode = NULL) {
     // @todo: Add support for translatable properties being not fields.
     $this->{$property_name} = $value;
+  }
+
+  /**
+   * Implements \Drupal\Core\Config\Entity\ConfigEntityInterface::enable().
+   */
+  public function enable() {
+    return $this->setStatus(TRUE);
+  }
+
+  /**
+   * Implements \Drupal\Core\Config\Entity\ConfigEntityInterface::disable().
+   */
+  public function disable() {
+    return $this->setStatus(FALSE);
+  }
+
+  /**
+   * Implements \Drupal\Core\Config\Entity\ConfigEntityInterface::setStatus().
+   */
+  public function setStatus($status) {
+    $this->status = (bool) $status;
+    return $this;
+  }
+
+  /**
+   * Implements \Drupal\Core\Config\Entity\ConfigEntityInterface::status().
+   */
+  public function status() {
+    return !empty($this->status);
   }
 
   /**

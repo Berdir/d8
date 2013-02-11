@@ -59,6 +59,7 @@ class LanguageUILanguageNegotiationTest extends WebTestBase {
 
   function setUp() {
     parent::setUp();
+
     require_once DRUPAL_ROOT . '/core/includes/language.inc';
     $admin_user = $this->drupalCreateUser(array('administer languages', 'translate interface', 'access administration pages', 'administer blocks'));
     $this->drupalLogin($admin_user);
@@ -369,6 +370,7 @@ class LanguageUILanguageNegotiationTest extends WebTestBase {
     if (!empty($test['language_test_domain'])) {
       state()->set('language_test.domain', $test['language_test_domain']);
     }
+    $this->container->get('language_manager')->reset();
     $this->drupalGet($test['path'], array(), $test['http_header']);
     $this->assertText($test['expect'], $test['message']);
     $this->assertText(t('Language negotiation method: @name', array('@name' => $test['expected_method_id'])));

@@ -270,6 +270,9 @@ class DatabaseStorageControllerNG extends DatabaseStorageController {
   public function save(EntityInterface $entity) {
     $transaction = db_transaction();
     try {
+      // Ensure we are dealing with the actual entity.
+      $entity = $entity->getOriginalEntity();
+
       // Load the stored entity, if any.
       if (!$entity->isNew() && !isset($entity->original)) {
         $entity->original = entity_load_unchanged($this->entityType, $entity->id());
@@ -279,7 +282,7 @@ class DatabaseStorageControllerNG extends DatabaseStorageController {
       $this->invokeHook('presave', $entity);
 
       // Create the storage record to be saved.
-      $record = $this->maptoStorageRecord($entity);
+      $record = $this->mapToStorageRecord($entity);
 
       if (!$entity->isNew()) {
         if ($entity->isDefaultRevision()) {
@@ -491,6 +494,11 @@ class DatabaseStorageControllerNG extends DatabaseStorageController {
 
     $transaction = db_transaction();
     try {
+      // Ensure we are dealing with the actual entities.
+      foreach ($entities as $id => $entity) {
+        $entities[$id] = $entity->getOriginalEntity();
+      }
+
       $this->preDelete($entities);
       foreach ($entities as $id => $entity) {
         $this->invokeHook('predelete', $entity);

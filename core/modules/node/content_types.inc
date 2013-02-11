@@ -158,7 +158,6 @@ function node_type_form($form, &$form_state, $type = NULL) {
   $form['submission'] = array(
     '#type' => 'details',
     '#title' => t('Submission form settings'),
-    '#collapsible' => TRUE,
     '#group' => 'additional_settings',
   );
   $form['submission']['title_label'] = array(
@@ -193,7 +192,6 @@ function node_type_form($form, &$form_state, $type = NULL) {
   $form['workflow'] = array(
     '#type' => 'details',
     '#title' => t('Publishing options'),
-    '#collapsible' => TRUE,
     '#collapsed' => TRUE,
     '#group' => 'additional_settings',
   );
@@ -212,7 +210,6 @@ function node_type_form($form, &$form_state, $type = NULL) {
     $form['language'] = array(
       '#type' => 'details',
       '#title' => t('Language settings'),
-      '#collapsible' => TRUE,
       '#collapsed' => TRUE,
       '#group' => 'additional_settings',
     );
@@ -232,7 +229,6 @@ function node_type_form($form, &$form_state, $type = NULL) {
   $form['display'] = array(
     '#type' => 'details',
     '#title' => t('Display settings'),
-    '#collapsible' => TRUE,
     '#collapsed' => TRUE,
     '#group' => 'additional_settings',
   );
@@ -308,11 +304,11 @@ function _node_characters($length) {
  */
 function node_type_form_validate($form, &$form_state) {
   $type = new stdClass();
-  $type->type = trim($form_state['values']['type']);
+  $type->type = $form_state['values']['type'];
   $type->name = trim($form_state['values']['name']);
 
   // Work out what the type was before the user submitted this form
-  $old_type = trim($form_state['values']['old_type']);
+  $old_type = $form_state['values']['old_type'];
 
   $types = node_type_get_names();
 
@@ -341,7 +337,7 @@ function node_type_form_submit($form, &$form_state) {
 
   $type = node_type_set_defaults();
 
-  $type->type = trim($form_state['values']['type']);
+  $type->type = $form_state['values']['type'];
   $type->name = trim($form_state['values']['name']);
   $type->orig_type = trim($form_state['values']['orig_type']);
   $type->old_type = isset($form_state['values']['old_type']) ? $form_state['values']['old_type'] : $type->type;

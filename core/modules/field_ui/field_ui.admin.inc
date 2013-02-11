@@ -315,11 +315,7 @@ function field_ui_field_overview($entity_type, $bundle) {
 
   $field_overview = new FieldOverview($entity_type, $bundle);
 
-  $form_state = array();
-  $form_state['build_info']['callback'] = array($field_overview, 'form');
-  $form_state['build_info']['args'] = array($entity_type, $bundle);
-
-  return drupal_build_form('field_ui_field_overview_form', $form_state);
+  return drupal_get_callback_form('field_ui_field_overview_form', array($field_overview, 'form'), array($entity_type, $bundle));
 }
 
 /**
@@ -366,11 +362,7 @@ function field_ui_display_overview($entity_type, $bundle, $view_mode) {
 
   $display_overview = new DisplayOverview($entity_type, $bundle, $view_mode);
 
-  $form_state = array();
-  $form_state['build_info']['callback'] = array($display_overview, 'form');
-  $form_state['build_info']['args'] = array($entity_type, $bundle, $view_mode);
-
-  return drupal_build_form('field_ui_display_overview_form', $form_state);
+  return drupal_get_callback_form('field_ui_display_overview_form', array($display_overview, 'form'), array($entity_type, $bundle, $view_mode));
 }
 
 /**
@@ -503,7 +495,7 @@ function field_ui_existing_field_options($entity_type, $bundle) {
  * Form constructor for the field settings edit page.
  *
  * @see field_ui_menu()
- * @see field_ui_settings_form_submit()
+ * @see field_ui_field_settings_form_submit()
  * @ingroups forms
  */
 function field_ui_field_settings_form($form, &$form_state, $instance) {
@@ -881,7 +873,7 @@ function field_ui_field_edit_form($form, &$form_state, $instance) {
   );
 
   // Add additional field instance settings from the field module.
-  $additions = module_invoke($field['module'], 'field_instance_settings_form', $field, $instance);
+  $additions = module_invoke($field['module'], 'field_instance_settings_form', $field, $instance, $form_state);
   if (is_array($additions)) {
     $form['instance']['settings'] = $additions;
     $form['instance']['settings']['#weight'] = 10;
@@ -933,7 +925,6 @@ function field_ui_default_value_widget($field, $instance, &$form, &$form_state) 
   $element = array(
     '#type' => 'details',
     '#title' => t('Default value'),
-    '#collapsible' => FALSE,
     '#tree' => TRUE,
     '#description' => t('The default value for this field, used when creating new content.'),
     // Stick to an empty 'parents' on this form in order not to breaks widgets
@@ -972,7 +963,7 @@ function field_ui_field_edit_form_validate($form, &$form_state) {
 
     // Extract the 'default value'.
     $items = array();
-    $instance->getWidget()->submit($entity, LANGUAGE_NOT_SPECIFIED, $items, $element, $form_state);
+    $instance->getWidget()->extractFormValues($entity, LANGUAGE_NOT_SPECIFIED, $items, $element, $form_state);
 
     // Grab the field definition from $form_state.
     $field_state = field_form_get_state($element['#parents'], $field_name, LANGUAGE_NOT_SPECIFIED, $form_state);
@@ -1013,7 +1004,7 @@ function field_ui_field_edit_form_submit($form, &$form_state) {
 
     // Extract field values.
     $items = array();
-    $instance->getWidget()->submit($entity, LANGUAGE_NOT_SPECIFIED, $items, $element, $form_state);
+    $instance->getWidget()->extractFormValues($entity, LANGUAGE_NOT_SPECIFIED, $items, $element, $form_state);
 
     $instance['default_value'] = $items ? $items : NULL;
   }

@@ -37,16 +37,17 @@ class CategorizeFeedItemTest extends AggregatorTestBase {
     $this->assertTrue(!empty($category), 'The category found in database.');
 
     $link_path = 'aggregator/categories/' . $category->cid;
-    $menu_link = db_query("SELECT * FROM {menu_links} WHERE link_path = :link_path", array(':link_path' => $link_path))->fetch();
-    $this->assertTrue(!empty($menu_link), 'The menu link associated with the category found in database.');
+    $menu_links = entity_load_multiple_by_properties('menu_link', array('link_path' => $link_path));
+    $this->assertTrue(!empty($menu_links), 'The menu link associated with the category found in database.');
 
     $feed = $this->createFeed();
     db_insert('aggregator_category_feed')
       ->fields(array(
         'cid' => $category->cid,
-        'fid' => $feed->fid,
+        'fid' => $feed->id(),
       ))
       ->execute();
+
     $this->updateFeedItems($feed, $this->getDefaultFeedItemCount());
     $this->getFeedCategories($feed);
     $this->assertTrue(!empty($feed->categories), 'The category found in the feed.');

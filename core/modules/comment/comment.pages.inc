@@ -5,7 +5,7 @@
  * User page callbacks for the Comment module.
  */
 
-use Drupal\node\Plugin\Core\Entity\Node;
+use Drupal\Core\Entity\EntityInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  * The node or comment that is being replied to must appear above the comment
  * form to provide the user context while authoring the comment.
  *
- * @param Drupal\node\Node $node
+ * @param \Drupal\Core\Entity\EntityInterface $node
  *   Every comment belongs to a node. This is that node.
  * @param $pid
  *   (optional) Some comments are replies to other comments. In those cases,
@@ -34,7 +34,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     - comment_parent: If the comment is a reply to another comment.
  *   - comment_form: The comment form as a renderable array.
  */
-function comment_reply(Node $node, $pid = NULL) {
+function comment_reply(EntityInterface $node, $pid = NULL) {
   // Set the breadcrumb trail.
   drupal_set_breadcrumb(array(l(t('Home'), NULL), l($node->label(), 'node/' . $node->nid)));
   $op = isset($_POST['op']) ? $_POST['op'] : '';
@@ -59,7 +59,7 @@ function comment_reply(Node $node, $pid = NULL) {
         if ($comment->status->value == COMMENT_PUBLISHED) {
           // If that comment exists, make sure that the current comment and the
           // parent comment both belong to the same parent node.
-          if ($comment->nid->value != $node->nid) {
+          if ($comment->nid->target_id != $node->nid) {
             // Attempting to reply to a comment not belonging to the current nid.
             drupal_set_message(t('The comment you are replying to does not exist.'), 'error');
             drupal_goto("node/$node->nid");
@@ -121,7 +121,7 @@ function comment_approve($cid) {
     comment_save($comment);
 
     drupal_set_message(t('Comment approved.'));
-    drupal_goto('node/' . $comment->nid->value);
+    drupal_goto('node/' . $comment->nid->target_id);
   }
   throw new NotFoundHttpException();
 }

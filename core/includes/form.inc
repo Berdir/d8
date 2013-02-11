@@ -138,6 +138,28 @@ function drupal_get_form($form_id) {
 }
 
 /**
+ * Returns a renderable form array using a specific callback.
+ *
+ * When using drupal_get_form(), the $form_id or information from hook_forms()
+ * is used to determine the callback used to build the form. If the callback
+ * needs to be explicitly specified, or if it is a method, use this function.
+ *
+ * @param string $form_id
+ *   The unique string identifying the desired form.
+ * @param callable $callback
+ *   A callback to be used for building the form.
+ * @param array $args
+ *   (optional) An array of arguments to pass to the form callback. Defaults to
+ *   an empty array.
+ */
+function drupal_get_callback_form($form_id, $callback, array $args = array()) {
+  $form_state = array();
+  $form_state['build_info']['args'] = $args;
+  $form_state['build_info']['callback'] = $callback;
+  return drupal_build_form($form_id, $form_state);
+}
+
+/**
  * Builds and processes a form for a given form ID.
  *
  * The form may also be retrieved from the cache if the form was built in a
@@ -1710,10 +1732,9 @@ function form_error(&$element, $message = '') {
  *   can also be used to set additional properties or implement special logic
  *   other than adding child elements: for example, for the 'details' element
  *   type, one of the functions in this array is form_process_details(), which
- *   adds the attributes and JavaScript needed to make the details collapsible
- *   if the #collapsible property is set. The #process functions are called in
- *   preorder traversal, meaning they are called for the parent element first,
- *   then for the child elements.
+ *   adds the attributes and JavaScript needed to make the details work in older
+ *   browsers. The #process functions are called in preorder traversal, meaning
+ *   they are called for the parent element first, then for the child elements.
  * - $element['#after_build']: An array of functions called after form_builder()
  *   is done with its processing of the element. These are called in postorder
  *   traversal, meaning they are called for the child elements first, then for
@@ -2731,6 +2752,9 @@ function theme_select($variables) {
  */
 function form_select_options($element, $choices = NULL) {
   if (!isset($choices)) {
+    if (empty($element['#options'])) {
+      return '';
+    }
     $choices = $element['#options'];
   }
   // array_key_exists() accommodates the rare event where $element['#value'] is NULL.
@@ -2817,8 +2841,8 @@ function form_get_options($element, $key) {
  * @param $variables
  *   An associative array containing:
  *   - element: An associative array containing the properties of the element.
- *     Properties used: #attributes, #children, #collapsed, #collapsible,
- *     #description, #id, #title, #value.
+ *     Properties used: #attributes, #children, #collapsed, #description, #id,
+ *     #title, #value.
  *
  * @ingroup themeable
  */
@@ -2863,8 +2887,8 @@ function theme_fieldset($variables) {
  * @param $variables
  *   An associative array containing:
  *   - element: An associative array containing the properties of the element.
- *     Properties used: #attributes, #children, #collapsed, #collapsible,
- *     #description, #id, #title, #value.
+ *     Properties used: #attributes, #children, #collapsed, #description, #id,
+ *     #title, #value.
  *
  * @ingroup themeable
  */
@@ -3972,10 +3996,7 @@ function form_pre_render_details($element) {
   }
 
   // Collapsible details.
-  if (!empty($element['#collapsible'])) {
-    $element['#attached']['library'][] = array('system', 'drupal.collapse');
-    $element['#attributes']['class'][] = 'collapsible';
-  }
+  $element['#attached']['library'][] = array('system', 'drupal.collapse');
   if (empty($element['#collapsed'])) {
     $element['#attributes']['open'] = 'open';
   }

@@ -144,11 +144,22 @@ abstract class TestBase {
   protected $originalSettings;
 
   /**
-   * TRUE if die on fail enabled.
+   * The public file directory for the test environment.
+   *
+   * This is set in TestBase::prepareEnvironment().
+   *
+   * @var string
+   */
+  protected $public_files_directory;
+
+  /**
+   * Whether to die in case any test assertion fails.
+   *
+   * @see run-tests.sh
    *
    * @var boolean
    */
-  protected $dieOnFail = FALSE;
+  public $dieOnFail = FALSE;
 
   /**
    * Constructor for Test.
@@ -174,7 +185,7 @@ abstract class TestBase {
    * Internal helper: stores the assert.
    *
    * @param $status
-   *   Can be 'pass', 'fail', 'exception'.
+   *   Can be 'pass', 'fail', 'exception', 'debug'.
    *   TRUE is a synonym for 'pass', FALSE for 'fail'.
    * @param $message
    *   (optional) A message to display with the assertion. Do not translate
@@ -230,7 +241,7 @@ abstract class TestBase {
       return TRUE;
     }
     else {
-      if ($this->dieOnFail) {
+      if ($this->dieOnFail && ($status == 'fail' || $status == 'exception')) {
         exit(1);
       }
       return FALSE;
@@ -670,7 +681,6 @@ abstract class TestBase {
       }
       $this->verboseClassName = str_replace("\\", "_", $class);
     }
-    $this->dieOnFail = $simpletest_config->get('die_on_fail');
     // HTTP auth settings (<username>:<password>) for the simpletest browser
     // when sending requests to the test site.
     $this->httpauth_method = (int) $simpletest_config->get('httpauth.method');
@@ -1023,13 +1033,6 @@ abstract class TestBase {
     // All destructors of statically cached objects have been invoked above;
     // this second reset is guranteed to reset everything to nothing.
     drupal_static_reset();
-
-    // Reset static in language().
-    // Restoring drupal_container() makes language() return the proper languages
-    // already, but it contains an additional static that needs to be reset. The
-    // reset can happen before the container is restored, as it is unnecessary
-    // to reset the language_manager service.
-    language(NULL, TRUE);
 
     // Restore original in-memory configuration.
     $conf = $this->originalConf;

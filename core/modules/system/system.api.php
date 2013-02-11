@@ -163,6 +163,8 @@ function hook_cron() {
  *     primitive types in \Drupal\Core\TypedData\Primitive. If set, it must be
  *     a constant defined by \Drupal\Core\TypedData\Primitive such as
  *     \Drupal\Core\TypedData\Primitive::String.
+ *   - constraints: An array of validation constraints for this type. See
+ *     \Drupal\Core\TypedData\TypedDataManager::getConstraints() for details.
  *
  * @see typed_data()
  * @see Drupal\Core\TypedData\TypedDataManager::create()
@@ -174,6 +176,7 @@ function hook_data_type_info() {
       'label' => t('Email'),
       'class' => '\Drupal\email\Type\Email',
       'primitive type' => \Drupal\Core\TypedData\Primitive::String,
+      'constraints' => array('Email' => array()),
     ),
   );
 }
@@ -315,26 +318,19 @@ function hook_element_info_alter(&$type) {
 /**
  * Perform cleanup tasks.
  *
- * This hook is run at the end of each page request. It is often used for
- * page logging and specialized cleanup. This hook MUST NOT print anything
- * because by the time it runs the response is already sent to the browser.
+ * This hook is run at the end of each non-cached page request. It is often
+ * used for page logging and specialized cleanup. This hook MUST NOT print
+ * anything because by the time it runs the response is already sent to the
+ * browser.
  *
- * Only use this hook if your code must run even for cached page views.
- * If you have code which must run once on all non-cached pages, use
- * hook_init() instead. That is the usual case. If you implement this hook
- * and see an error like 'Call to undefined function', it is likely that
- * you are depending on the presence of a module which has not been loaded yet.
- * It is not loaded because Drupal is still in bootstrap mode.
+ * This hook is not run on cached pages.
  *
  * @param $destination
  *   If this hook is invoked as part of a drupal_goto() call, then this argument
  *   will be a fully-qualified URL that is the destination of the redirect.
  */
 function hook_exit($destination = NULL) {
-  db_update('counter')
-    ->expression('hits', 'hits + 1')
-    ->condition('type', 1)
-    ->execute();
+  watchdog('mymodule', 'Page was built for user %name.', array('%name' => user_format_name($GLOBALS['user'])), WATCHDOG_INFO);
 }
 
 /**
@@ -902,127 +898,6 @@ function hook_menu_alter(&$items) {
 }
 
 /**
- * Alter the data being saved to the {menu_links} table by menu_link_save().
- *
- * @param $item
- *   Associative array defining a menu link as passed into menu_link_save().
- *
- * @see hook_translated_menu_link_alter()
- */
-function hook_menu_link_alter(&$item) {
-  // Make all new admin links hidden (a.k.a disabled).
-  if (strpos($item['link_path'], 'admin') === 0 && empty($item['mlid'])) {
-    $item['hidden'] = 1;
-  }
-  // Flag a link to be altered by hook_translated_menu_link_alter().
-  if ($item['link_path'] == 'devel/cache/clear') {
-    $item['options']['alter'] = TRUE;
-  }
-  // Flag a link to be altered by hook_translated_menu_link_alter(), but only
-  // if it is derived from a menu router item; i.e., do not alter a custom
-  // menu link pointing to the same path that has been created by a user.
-  if ($item['link_path'] == 'user' && $item['module'] == 'system') {
-    $item['options']['alter'] = TRUE;
-  }
-}
-
-/**
- * Alter a menu link after it has been translated and before it is rendered.
- *
- * This hook is invoked from _menu_link_translate() after a menu link has been
- * translated; i.e., after dynamic path argument placeholders (%) have been
- * replaced with actual values, the user access to the link's target page has
- * been checked, and the link has been localized. It is only invoked if
- * $item['options']['alter'] has been set to a non-empty value (e.g., TRUE).
- * This flag should be set using hook_menu_link_alter().
- *
- * Implementations of this hook are able to alter any property of the menu link.
- * For example, this hook may be used to add a page-specific query string to all
- * menu links, or hide a certain link by setting:
- * @code
- *   'hidden' => 1,
- * @endcode
- *
- * @param $item
- *   Associative array defining a menu link after _menu_link_translate()
- * @param $map
- *   Associative array containing the menu $map (path parts and/or objects).
- *
- * @see hook_menu_link_alter()
- */
-function hook_translated_menu_link_alter(&$item, $map) {
-  if ($item['href'] == 'devel/cache/clear') {
-    $item['localized_options']['query'] = drupal_get_destination();
-  }
-}
-
-/**
- * Inform modules that a menu link has been created.
- *
- * This hook is used to notify modules that menu items have been
- * created. Contributed modules may use the information to perform
- * actions based on the information entered into the menu system.
- *
- * @param $link
- *   Associative array defining a menu link as passed into menu_link_save().
- *
- * @see hook_menu_link_update()
- * @see hook_menu_link_delete()
- */
-function hook_menu_link_insert($link) {
-  // In our sample case, we track menu items as editing sections
-  // of the site. These are stored in our table as 'disabled' items.
-  $record['mlid'] = $link['mlid'];
-  $record['menu_name'] = $link['menu_name'];
-  $record['status'] = 0;
-  drupal_write_record('menu_example', $record);
-}
-
-/**
- * Inform modules that a menu link has been updated.
- *
- * This hook is used to notify modules that menu items have been
- * updated. Contributed modules may use the information to perform
- * actions based on the information entered into the menu system.
- *
- * @param $link
- *   Associative array defining a menu link as passed into menu_link_save().
- *
- * @see hook_menu_link_insert()
- * @see hook_menu_link_delete()
- */
-function hook_menu_link_update($link) {
-  // If the parent menu has changed, update our record.
-  $menu_name = db_query("SELECT menu_name FROM {menu_example} WHERE mlid = :mlid", array(':mlid' => $link['mlid']))->fetchField();
-  if ($menu_name != $link['menu_name']) {
-    db_update('menu_example')
-      ->fields(array('menu_name' => $link['menu_name']))
-      ->condition('mlid', $link['mlid'])
-      ->execute();
-  }
-}
-
-/**
- * Inform modules that a menu link has been deleted.
- *
- * This hook is used to notify modules that menu items have been
- * deleted. Contributed modules may use the information to perform
- * actions based on the information entered into the menu system.
- *
- * @param $link
- *   Associative array defining a menu link as passed into menu_link_save().
- *
- * @see hook_menu_link_insert()
- * @see hook_menu_link_update()
- */
-function hook_menu_link_delete($link) {
-  // Delete the record from our table.
-  db_delete('menu_example')
-    ->condition('mlid', $link['mlid'])
-    ->execute();
-}
-
-/**
  * Alter tabs and actions displayed on the page before they are rendered.
  *
  * This hook is invoked by menu_local_tasks(). The system-determined tabs and
@@ -1455,24 +1330,6 @@ function hook_forms($form_id, $args) {
 }
 
 /**
- * Perform setup tasks for all page requests.
- *
- * This hook is run at the beginning of the page request. It is typically
- * used to set up global parameters that are needed later in the request.
- *
- * Only use this hook if your code must run even for cached page views. This
- * hook is called before the theme, modules, or most include files are loaded
- * into memory. It happens while Drupal is still in bootstrap mode.
- *
- * @see hook_init()
- */
-function hook_boot() {
-  // We need user_access() in the shutdown function. Make sure it gets loaded.
-  drupal_load('module', 'user');
-  drupal_register_shutdown_function('devel_shutdown');
-}
-
-/**
  * Perform setup tasks for non-cached page requests.
  *
  * This hook is run at the beginning of the page request. It is typically
@@ -1482,7 +1339,6 @@ function hook_boot() {
  *
  * This hook is not run on cached pages.
  *
- * @see hook_boot()
  * @see hook_exit()
  *
  * Do not use this hook to add CSS/JS to pages, use hook_page_build() instead.

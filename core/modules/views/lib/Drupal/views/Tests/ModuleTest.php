@@ -27,57 +27,6 @@ class ModuleTest extends ViewUnitTestBase {
     );
   }
 
-  public function test_views_trim_text() {
-    // Test unicode, @see http://drupal.org/node/513396#comment-2839416
-    $text = array(
-      'Tuy nhiên, những hi vọng',
-      'Giả sử chúng tôi có 3 Apple',
-      'siêu nhỏ này là bộ xử lý',
-      'Di động của nhà sản xuất Phần Lan',
-      'khoảng cách từ đại lí đến',
-      'của hãng bao gồm ba dòng',
-      'сд асд асд ас',
-      'асд асд асд ас'
-    );
-    // Just test maxlength without word boundry.
-    $alter = array(
-      'max_length' => 10,
-    );
-    $expect = array(
-      'Tuy nhiên,',
-      'Giả sử chú',
-      'siêu nhỏ n',
-      'Di động củ',
-      'khoảng các',
-      'của hãng b',
-      'сд асд асд',
-      'асд асд ас',
-    );
-
-    foreach ($text as $key => $line) {
-      $result_text = views_trim_text($alter, $line);
-      $this->assertEqual($result_text, $expect[$key]);
-    }
-
-    // Test also word_boundary
-    $alter['word_boundary'] = TRUE;
-    $expect = array(
-      'Tuy nhiên',
-      'Giả sử',
-      'siêu nhỏ',
-      'Di động',
-      'khoảng',
-      'của hãng',
-      'сд асд',
-      'асд асд',
-    );
-
-    foreach ($text as $key => $line) {
-      $result_text = views_trim_text($alter, $line);
-      $this->assertEqual($result_text, $expect[$key]);
-    }
-  }
-
   /**
    * Tests the views_get_handler method.
    */
@@ -182,15 +131,15 @@ class ModuleTest extends ViewUnitTestBase {
   function testStatusFunctions() {
     $view = views_get_view('test_view_status')->storage;
 
-    $this->assertFalse($view->isEnabled(), 'The view status is disabled.');
+    $this->assertFalse($view->status(), 'The view status is disabled.');
 
     views_enable_view($view);
-    $this->assertTrue($view->isEnabled(), 'A view has been enabled.');
-    $this->assertEqual($view->isEnabled(), views_view_is_enabled($view), 'views_view_is_enabled is correct.');
+    $this->assertTrue($view->status(), 'A view has been enabled.');
+    $this->assertEqual($view->status(), views_view_is_enabled($view), 'views_view_is_enabled is correct.');
 
     views_disable_view($view);
-    $this->assertFalse($view->isEnabled(), 'A view has been disabled.');
-    $this->assertEqual(!$view->isEnabled(), views_view_is_disabled($view), 'views_view_is_disabled is correct.');
+    $this->assertFalse($view->status(), 'A view has been disabled.');
+    $this->assertEqual(!$view->status(), views_view_is_disabled($view), 'views_view_is_disabled is correct.');
   }
 
   /**

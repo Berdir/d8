@@ -10,6 +10,8 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+use Guzzle\Http\Exception\RequestException;
+
 /**
  * @file
  * API functions for installing Drupal.
@@ -339,6 +341,9 @@ function install_begin_request(&$install_state) {
       ->addArgument(new Reference('config.storage'))
       ->addArgument(new Reference('event_dispatcher'));
 
+    // Register the 'language_manager' service.
+    $container->register('language_manager', 'Drupal\Core\Language\LanguageManager');
+
     // The install process cannot use the database lock backend since the database
     // is not fully up, so we use a null backend implementation during the
     // installation process. This will also speed up the installation process.
@@ -387,11 +392,8 @@ function install_begin_request(&$install_state) {
   else {
     $task = NULL;
 
-    // Do not install over a configured settings.php. Check the 'db_url'
-    // variable in addition to 'databases', since previous versions of Drupal
-    // used that (and we do not want to allow installations on an existing site
-    // whose settings file has not yet been updated).
-    if (!empty($GLOBALS['databases']) || !empty($GLOBALS['db_url'])) {
+    // Do not install over a configured settings.php.
+    if (!empty($GLOBALS['databases'])) {
       throw new Exception(install_already_done_error());
     }
   }
@@ -1291,9 +1293,23 @@ function install_find_translations() {
  * @see file_scan_directory()
  */
 function install_find_translation_files($langcode = NULL) {
-  $directory = variable_get('locale_translate_file_directory', conf_path() . '/files/translations');
-  $files = file_scan_directory($directory, '!drupal-\d+\.\d+\.' . (!empty($langcode) ? preg_quote($langcode, '!') : '[^\.]+') . '\.po$!', array('recurse' => FALSE));
-  return $files;
+  return file_scan_directory(install_translation_directory(), '!drupal-\d+\.\d+\.' . (!empty($langcode) ? preg_quote($langcode, '!') : '[^\.]+') . '\.po$!', array('recurse' => FALSE));
+}
+
+/**
+ * Get installation translations directory path.
+ *
+ * @return string
+ *   A string containing the installation translations directory path.
+ */
+function install_translation_directory() {
+  if (isset($GLOBALS['conf']['locale.settings']['translation.path'])) {
+    $directory = $GLOBALS['conf']['locale.settings']['translation.path'];
+  }
+  else {
+    $directory = conf_path() . '/files/translations';
+  }
+  return $directory;
 }
 
 /**
@@ -1447,7 +1463,7 @@ function install_download_translation(&$install_state) {
 }
 
 /**
- * Attempts to get a file using drupal_http_request and to store it locally.
+ * Attempts to get a file using a HTTP request and to store it locally.
  *
  * @param string $uri
  *   The URI of the file to grab.
@@ -1469,14 +1485,18 @@ function install_retrieve_file($uri, $destination) {
   else {
     $path = $destination;
   }
-  $result = drupal_http_request($uri);
-  if ($result->code != 200) {
+
+  try {
+    $request = drupal_container()->get('http_default_client')->get($uri, array('Accept' => 'text/plain'));
+    $data = $request->send()->getBody(TRUE);
+    if (empty($data)) {
+      return FALSE;
+    }
+  }
+  catch (RequestException $e) {
     return FALSE;
   }
-  if (file_put_contents($path, $result->data) === FALSE) {
-    return FALSE;
-  }
-  return TRUE;
+  return file_put_contents($path, $data) !== FALSE;
 }
 
 /**
@@ -1486,12 +1506,17 @@ function install_retrieve_file($uri, $destination) {
  *  The URI to contact.
  *
  * @return string
- *   URI of the server if the localization server was contacted successfully.
- *   FALSE if not.
+ *   TRUE if the URI was contacted successfully, FALSE if not.
  */
 function install_check_localization_server($uri) {
-  $result = drupal_http_request($uri, array('method' => 'HEAD'));
-  return (!isset($result->error) && $result->code == 200);
+  try {
+    $request = drupal_container()->get('http_default_client')->head($uri);
+    $response = $request->send();
+    return TRUE;
+  }
+  catch (RequestException $e) {
+    return FALSE;
+  }
 }
 
 /**
@@ -1848,8 +1873,9 @@ function install_check_translations($install_state) {
 
   $readable = FALSE;
   $writable = FALSE;
-  $files_directory = variable_get('file_public_path', conf_path() . '/files');
-  $translations_directory = variable_get('locale_translate_file_directory', conf_path() . '/files/translations');
+  // @todo: Make this configurable.
+  $files_directory = conf_path() . '/files';
+  $translations_directory = conf_path() . '/files/translations';
   $translations_directory_exists = FALSE;
   $online = FALSE;
   $server_available = FALSE;
@@ -2186,7 +2212,6 @@ function _install_configure_form($form, &$form_state, &$install_state) {
   $form['site_information'] = array(
     '#type' => 'details',
     '#title' => st('Site information'),
-    '#collapsible' => FALSE,
   );
   $form['site_information']['site_name'] = array(
     '#type' => 'textfield',
@@ -2205,7 +2230,6 @@ function _install_configure_form($form, &$form_state, &$install_state) {
   $form['admin_account'] = array(
     '#type' => 'details',
     '#title' => st('Site maintenance account'),
-    '#collapsible' => FALSE,
   );
 
   $form['admin_account']['account']['#tree'] = TRUE;
@@ -2234,7 +2258,6 @@ function _install_configure_form($form, &$form_state, &$install_state) {
   $form['server_settings'] = array(
     '#type' => 'details',
     '#title' => st('Server settings'),
-    '#collapsible' => FALSE,
   );
 
   $countries = country_get_list();
@@ -2261,7 +2284,6 @@ function _install_configure_form($form, &$form_state, &$install_state) {
   $form['update_notifications'] = array(
     '#type' => 'details',
     '#title' => st('Update notifications'),
-    '#collapsible' => FALSE,
   );
   $form['update_notifications']['update_status_module'] = array(
     '#type' => 'checkboxes',

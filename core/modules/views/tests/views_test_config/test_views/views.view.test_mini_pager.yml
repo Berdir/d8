@@ -64,6 +64,7 @@ display:
           hide_empty: '0'
           empty_zero: '0'
           link_to_node: '1'
+          plugin_id: node
       filters: {  }
       sorts: {  }
       title: test_mini_pager
@@ -78,6 +79,6 @@ display:
     display_options:
       path: test_mini_pager
 base_field: nid
-disabled: '0'
+status: '1'
 module: views
 langcode: und

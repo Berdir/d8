@@ -559,9 +559,9 @@ function translation_entity_permission() {
         case 'bundle':
           foreach (entity_get_bundles($entity_type) as $bundle => $bundle_info) {
             if (translation_entity_enabled($entity_type, $bundle)) {
-              $t_args['%bundle_label'] = isset($info['bundles'][$bundle]['label']) ? $info['bundles'][$bundle]['label'] : $bundle;
+              $t_args['%bundle_label'] = isset($bundle_info['label']) ? $bundle_info['label'] : $bundle;
               $permission["translate $bundle $entity_type"] = array(
-                  'title' => t('Translate %bundle_label @entity_label', $t_args),
+                'title' => t('Translate %bundle_label @entity_label', $t_args),
               );
             }
           }
@@ -847,7 +847,7 @@ function translation_entity_language_configuration_element_validate($element, ar
     // @todo Set the correct form element name as soon as the element parents
     //   are correctly set. We should be using NestedArray::getValue() but for
     //   now we cannot.
-    form_set_error('', t('Translation is not supported if language is always one of: @locked_languages', array('@locked_languages' => implode(', ', $locked_languages))));
+    form_set_error('', t('"Show language selector" is not compatible with translating content that has default language: %choice. Either do not hide the language selector or pick a specific language.', array('%choice' => $locked_languages[$values['langcode']])));
   }
 }
 

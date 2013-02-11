@@ -15,6 +15,7 @@ Drupal 8.0, xxxx-xx-xx (development version)
     * Implements functionality to get, set, add and remove configuration.
     * Includes ability to override configuration values with language variants
       and other runtime values.
+- Added the CKEditor WYSIWYG editor. Provides a drag-and-drop configuration UI.
 - Included the HTML5 Shiv library to support HTML5 elements in IE 8 and below.
 - Included the following Symfony2 components:
     * ClassLoader - PSR-0-compatible autoload routines.
@@ -101,6 +102,7 @@ Drupal 8.0, xxxx-xx-xx (development version)
 - Added Phone number field type to core.
 - Added local image input filter, to enable secure image posting.
 - Added Views and Views UI module to core.
+- Added Entity Reference field type to core.
 
 Drupal 7.0, 2011-01-05
 ----------------------

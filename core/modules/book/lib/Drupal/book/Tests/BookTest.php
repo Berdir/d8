@@ -7,7 +7,7 @@
 
 namespace Drupal\book\Tests;
 
-use Drupal\node\Plugin\Core\Entity\Node;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\simpletest\WebTestBase;
 
 /**
@@ -145,7 +145,7 @@ class BookTest extends WebTestBase {
    *
    * Also checks the printer friendly version of the outline.
    *
-   * @param Drupal\node\Node $node
+   * @param \Drupal\Core\Entity\EntityInterface $node
    *   Node to check.
    * @param $nodes
    *   Nodes that should be in outline.
@@ -158,7 +158,7 @@ class BookTest extends WebTestBase {
    * @param array $breadcrumb
    *   The nodes that should be displayed in the breadcrumb.
    */
-  function checkBookNode(Node $node, $nodes, $previous = FALSE, $up = FALSE, $next = FALSE, array $breadcrumb) {
+  function checkBookNode(EntityInterface $node, $nodes, $previous = FALSE, $up = FALSE, $next = FALSE, array $breadcrumb) {
     // $number does not use drupal_static as it should not be reset
     // since it uniquely identifies each call to checkBookNode().
     static $number = 0;
@@ -301,6 +301,13 @@ class BookTest extends WebTestBase {
     // Try getting the URL directly, and verify it fails.
     $this->drupalGet('book/export/html/' . $this->book->nid);
     $this->assertResponse('403', 'Anonymous user properly forbidden.');
+
+    // Now grant anonymous users permission to view the printer-friendly
+    // version and verify that node access restrictions still prevent them from
+    // seeing it.
+    user_role_grant_permissions(DRUPAL_ANONYMOUS_RID, array('access printer-friendly version'));
+    $this->drupalGet('book/export/html/' . $this->book->nid);
+    $this->assertResponse('403', 'Anonymous user properly forbidden from seeing the printer-friendly version when denied by node access.');
   }
 
   /**

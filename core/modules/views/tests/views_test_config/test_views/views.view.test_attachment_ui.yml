@@ -1,7 +1,7 @@
 base_table: views_test_data
 core: '8'
 description: ''
-disabled: '0'
+status: '1'
 display:
   default:
     display_options:
@@ -24,6 +24,7 @@ display:
           id: id
           table: views_test_data
           field: id
+          plugin_id: numeric
     display_plugin: default
     display_title: Master
     id: default

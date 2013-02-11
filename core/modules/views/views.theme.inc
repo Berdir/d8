@@ -130,7 +130,7 @@ function template_preprocess_views_view(&$vars) {
   }
 
   // If using AJAX, send identifying data about this view.
-  if ($view->use_ajax && empty($view->is_attachment) && empty($view->live_preview)) {
+  if ($view->ajaxEnabled() && empty($view->is_attachment) && empty($view->live_preview)) {
     $settings = array(
       'views' => array(
         'ajax_path' => url('views/ajax'),
@@ -877,7 +877,7 @@ function template_preprocess_views_view_rss(&$vars) {
   $vars['description'] = check_plain(decode_entities(strip_tags($style->get_description())));
 
   if ($view->display_handler->getOption('sitename_title')) {
-    $title = $config->id();
+    $title = $config->get('name');
     if ($slogan = $config->get('slogan')) {
       $title .= ' - ' . $slogan;
     }

@@ -51,7 +51,7 @@ class NodeSaveTest extends NodeTestBase {
     $title = $this->randomName(8);
     $node = array(
       'title' => $title,
-      'body' => array(LANGUAGE_NOT_SPECIFIED => array(array('value' => $this->randomName(32)))),
+      'body' => array(array('value' => $this->randomName(32))),
       'uid' => $this->web_user->uid,
       'type' => 'article',
       'nid' => $test_nid,

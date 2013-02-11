@@ -11,7 +11,8 @@ use Drupal\Core\DependencyInjection\Compiler\RegisterKernelListenersPass;
 use Drupal\Core\DependencyInjection\Compiler\RegisterAccessChecksPass;
 use Drupal\Core\DependencyInjection\Compiler\RegisterMatchersPass;
 use Drupal\Core\DependencyInjection\Compiler\RegisterRouteFiltersPass;
-use Drupal\Core\DependencyInjection\Compiler\RegisterSerializationClassesPass;
+use Drupal\Core\DependencyInjection\Compiler\RegisterRouteEnhancersPass;
+use Drupal\Core\DependencyInjection\Compiler\RegisterParamConvertersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
@@ -60,6 +61,10 @@ class CoreBundle extends Bundle {
       ->register('config.storage.staging', 'Drupal\Core\Config\FileStorage')
       ->addArgument(config_get_config_directory(CONFIG_STAGING_DIRECTORY));
 
+    // Register the typed configuration data manager.
+    $container->register('config.typed', 'Drupal\Core\Config\TypedConfigManager')
+      ->addArgument(new Reference('config.storage'));
+
     // Register the service for the default database connection.
     $container->register('database', 'Drupal\Core\Database\Connection')
       ->setFactoryClass('Drupal\Core\Database\Database')
@@ -94,7 +99,8 @@ class CoreBundle extends Bundle {
 
     $container->register('path.alias_manager', 'Drupal\Core\Path\AliasManager')
       ->addArgument(new Reference('database'))
-      ->addArgument(new Reference('keyvalue'));
+      ->addArgument(new Reference('state'))
+      ->addArgument(new Reference('language_manager'));
 
     $container->register('http_client_simpletest_subscriber', 'Drupal\Core\Http\Plugin\SimpletestHttpRequestSubscriber');
     $container->register('http_default_client', 'Guzzle\Http\Client')
@@ -113,8 +119,7 @@ class CoreBundle extends Bundle {
     // object and get reconstructed when the request object changes (e.g.,
     // during a subrequest).
     $container->addScope(new Scope('request'));
-    $container->register('request', 'Symfony\Component\HttpFoundation\Request')
-      ->setSynthetic(TRUE);
+    $container->register('request', 'Symfony\Component\HttpFoundation\Request');
 
     $container->register('event_dispatcher', 'Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher')
       ->addArgument(new Reference('service_container'));
@@ -138,14 +143,18 @@ class CoreBundle extends Bundle {
       ->addArgument(new Reference('event_dispatcher'))
       ->addArgument(new Reference('service_container'))
       ->addArgument(new Reference('controller_resolver'));
-    $container->register('language_manager', 'Drupal\Core\Language\LanguageManager')
-      ->addArgument(new Reference('request'))
-      ->setScope('request');
+
+    // Register the 'language_manager' service.
+    $container->register('language_manager', 'Drupal\Core\Language\LanguageManager');
+
     $container->register('database.slave', 'Drupal\Core\Database\Connection')
       ->setFactoryClass('Drupal\Core\Database\Database')
       ->setFactoryMethod('getConnection')
       ->addArgument('slave');
-    $container->register('typed_data', 'Drupal\Core\TypedData\TypedDataManager');
+    $container->register('typed_data', 'Drupal\Core\TypedData\TypedDataManager')
+      ->addMethodCall('setValidationConstraintManager', array(new Reference('validation.constraint')));
+    $container->register('validation.constraint', 'Drupal\Core\Validation\ConstraintManager');
+
     // Add the user's storage for temporary, non-cache data.
     $container->register('lock', 'Drupal\Core\Lock\DatabaseLockBackend');
     $container->register('user.tempstore', 'Drupal\user\TempStoreFactory')
@@ -198,6 +207,12 @@ class CoreBundle extends Bundle {
     $container->register('mime_type_matcher', 'Drupal\Core\Routing\MimeTypeMatcher')
       ->addTag('route_filter');
 
+    $container->register('paramconverter_manager', 'Drupal\Core\ParamConverter\ParamConverterManager')
+      ->addTag('route_enhancer');
+    $container->register('paramconverter.entity', 'Drupal\Core\ParamConverter\EntityConverter')
+      ->addArgument(new Reference('plugin.manager.entity'))
+      ->addTag('paramconverter');
+
     $container->register('router_processor_subscriber', 'Drupal\Core\EventSubscriber\RouteProcessorSubscriber')
       ->addArgument(new Reference('content_negotiation'))
       ->addTag('event_subscriber');
@@ -238,6 +253,9 @@ class CoreBundle extends Bundle {
       ->addTag('event_subscriber');
     $container->register('config_global_override_subscriber', 'Drupal\Core\EventSubscriber\ConfigGlobalOverrideSubscriber')
       ->addTag('event_subscriber');
+    $container->register('language_request_subscriber', 'Drupal\Core\EventSubscriber\LanguageRequestSubscriber')
+      ->addArgument(new Reference('language_manager'))
+      ->addTag('event_subscriber');
 
     $container->register('exception_controller', 'Drupal\Core\ExceptionController')
       ->addArgument(new Reference('content_negotiation'))
@@ -249,20 +267,6 @@ class CoreBundle extends Bundle {
     $container
       ->register('transliteration', 'Drupal\Core\Transliteration\PHPTransliteration');
 
-    // Add Serializer with arguments to be replaced in the compiler pass.
-    $container->register('serializer', 'Symfony\Component\Serializer\Serializer')
-      ->addArgument(array())
-      ->addArgument(array());
-
-    $container->register('serializer.normalizer.complex_data', 'Drupal\Core\Serialization\ComplexDataNormalizer')->addTag('normalizer');
-    $container->register('serializer.normalizer.list', 'Drupal\Core\Serialization\ListNormalizer')->addTag('normalizer');
-    $container->register('serializer.normalizer.typed_data', 'Drupal\Core\Serialization\TypedDataNormalizer')->addTag('normalizer');
-
-    $container->register('serializer.encoder.json', 'Drupal\Core\Serialization\JsonEncoder')
-      ->addTag('encoder', array('format' => array('json' => 'JSON')));
-    $container->register('serializer.encoder.xml', 'Drupal\Core\Serialization\XmlEncoder')
-      ->addTag('encoder', array('format' => array('xml' => 'XML')));
-
     $container->register('flood', 'Drupal\Core\Flood\DatabaseBackend')
       ->addArgument(new Reference('database'));
 
@@ -270,11 +274,12 @@ class CoreBundle extends Bundle {
     $container->addCompilerPass(new RegisterRouteFiltersPass());
     // Add a compiler pass for registering event subscribers.
     $container->addCompilerPass(new RegisterKernelListenersPass(), PassConfig::TYPE_AFTER_REMOVING);
-    // Add a compiler pass for adding Normalizers and Encoders to Serializer.
-    $container->addCompilerPass(new RegisterSerializationClassesPass());
     // Add a compiler pass for registering event subscribers.
     $container->addCompilerPass(new RegisterKernelListenersPass(), PassConfig::TYPE_AFTER_REMOVING);
     $container->addCompilerPass(new RegisterAccessChecksPass());
+    // Add a compiler pass for upcasting of entity route parameters.
+    $container->addCompilerPass(new RegisterParamConvertersPass());
+    $container->addCompilerPass(new RegisterRouteEnhancersPass());
   }
 
   /**
@@ -346,7 +351,7 @@ class CoreBundle extends Bundle {
         // This is saved / loaded via drupal_php_storage().
         // All files can be refreshed by clearing caches.
         // @todo ensure garbage collection of expired files.
-        'cache' => TRUE,
+        'cache' => settings()->get('twig_cache', TRUE),
         'base_template_class' => 'Drupal\Core\Template\TwigTemplate',
         // @todo Remove in followup issue
         // @see http://drupal.org/node/1712444.
@@ -354,10 +359,8 @@ class CoreBundle extends Bundle {
         // @todo Remove in followup issue
         // @see http://drupal.org/node/1806538.
         'strict_variables' => FALSE,
-        // @todo Maybe make debug mode dependent on "production mode" setting.
-        'debug' => TRUE,
-        // @todo Make auto reload mode dependent on "production mode" setting.
-        'auto_reload' => FALSE,
+        'debug' => settings()->get('twig_debug', FALSE),
+        'auto_reload' => settings()->get('twig_auto_reload', NULL),
       ))
       ->addMethodCall('addExtension', array(new Definition('Drupal\Core\Template\TwigExtension')))
       // @todo Figure out what to do about debugging functions.
