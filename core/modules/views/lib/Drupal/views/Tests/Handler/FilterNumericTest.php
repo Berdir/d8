@@ -14,6 +14,8 @@ use Drupal\views\Tests\ViewUnitTestBase;
  */
 class FilterNumericTest extends ViewUnitTestBase {
 
+  public static $modules = array('system');
+
   /**
    * Views used by this test.
    *
@@ -37,7 +39,8 @@ class FilterNumericTest extends ViewUnitTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->enableModules(array('system'));
+    $this->installSchema('system', array('menu_router', 'variable'));
+    // @todo: Convert to installSchema.
     $this->enableModules(array('menu_link'));
   }
 

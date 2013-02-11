@@ -14,6 +14,8 @@ use Drupal\views\Tests\ViewUnitTestBase;
  */
 class FilterEqualityTest extends ViewUnitTestBase {
 
+  public static $modules = array('system');
+
   /**
    * Views used by this test.
    *
@@ -36,7 +38,8 @@ class FilterEqualityTest extends ViewUnitTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->enableModules(array('system'));
+    $this->installSchema('system', array('menu_router', 'variable'));
+    // @todo: Convert to installSchema.
     $this->enableModules(array('menu_link'));
   }
 
