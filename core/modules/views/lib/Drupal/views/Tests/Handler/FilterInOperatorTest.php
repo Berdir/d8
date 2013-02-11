@@ -40,8 +40,6 @@ class FilterInOperatorTest extends ViewUnitTestBase {
     parent::setUp();
 
     $this->installSchema('system', array('menu_router', 'variable'));
-    // @todo: Convert to installSchema.
-    $this->enableModules(array('menu_link'));
   }
 
   function viewsData() {

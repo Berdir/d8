@@ -97,7 +97,7 @@ abstract class DrupalUnitTestBase extends UnitTestBase {
 
     // Bootstrap the kernel.
     // No need to dump it; this test runs in-memory.
-    $this->kernel = new DrupalKernel('testing', TRUE, drupal_classloader(), FALSE);
+    $this->kernel = new DrupalKernel('unit_testing', TRUE, drupal_classloader(), FALSE);
     $this->kernel->boot();
 
     // Collect and set a fixed module list.
@@ -118,7 +118,7 @@ abstract class DrupalUnitTestBase extends UnitTestBase {
     // together.
     $modules = array_reverse($modules);
     $modules = call_user_func_array('array_merge_recursive', $modules);
-    $this->enableModules(array_unique($modules), FALSE);
+    $this->enableModules($modules, FALSE);
   }
 
   protected function tearDown() {
