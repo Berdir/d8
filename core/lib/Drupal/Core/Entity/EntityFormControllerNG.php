@@ -78,7 +78,7 @@ class EntityFormControllerNG extends EntityFormController {
     $translation = $entity->getTranslation($this->getFormLangcode($form_state), FALSE);
     $definitions = $translation->getPropertyDefinitions();
     foreach ($values_excluding_fields as $key => $value) {
-      if (isset($definitions[$key])) {
+      if (isset($definitions[$key]) || $entity instanceof EntityBCDecorator) {
         $translation->$key = $value;
       }
     }
