@@ -1464,7 +1464,7 @@ function taxonomy_node_predelete(EntityInterface $node) {
 /**
  * Deletes taxonomy index entries for a given node.
  *
- * @param Drupal\node\Plugin\Core\Entity\Node $node
+ * @param \Drupal\Core\Entity\EntityInterface $node
  *   The node entity.
  */
 function taxonomy_delete_node_index(EntityInterface $node) {
