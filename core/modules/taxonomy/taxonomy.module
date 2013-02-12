@@ -5,9 +5,10 @@
  * Enables the organization of content into categories.
  */
 
-use Drupal\Core\Entity\EntityInterface;
+use Drupal\node\Plugin\Core\Entity\Node;
 use Drupal\taxonomy\Plugin\Core\Entity\Term;
 use Drupal\taxonomy\Plugin\Core\Entity\Vocabulary;
+use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Denotes that no term in the vocabulary has a parent.
@@ -1070,10 +1071,7 @@ function taxonomy_field_validate(EntityInterface $entity = NULL, $field, $instan
  * Implements hook_field_is_empty().
  */
 function taxonomy_field_is_empty($item, $field) {
-  if (!is_array($item) || (empty($item['tid']) && (string) $item['tid'] !== '0')) {
-    return TRUE;
-  }
-  return FALSE;
+  return empty($item['tid']) && empty($item['entity']);
 }
 
 /**
@@ -1361,12 +1359,10 @@ function taxonomy_rdf_mapping() {
  */
 function taxonomy_field_presave(EntityInterface $entity, $field, $instance, $langcode, &$items) {
   foreach ($items as $delta => $item) {
-    if ($item['tid'] == 'autocreate') {
+    if (!$item['tid'] && isset($item['entity'])) {
       unset($item['tid']);
-      $term = entity_create('taxonomy_term', $item);
-      $term->langcode = $langcode;
-      taxonomy_term_save($term);
-      $items[$delta]['tid'] = $term->tid;
+      taxonomy_term_save($item['entity']);
+      $items[$delta]['tid'] = $item['entity']->tid;
     }
   }
 }
@@ -1385,7 +1381,7 @@ function taxonomy_node_insert(EntityInterface $node) {
  * The index lists all terms that are related to a given node entity, and is
  * therefore maintained at the entity level.
  *
- * @param \Drupal\node\Plugin\Core\Entity\EntityInterface $node
+ * @param \Drupal\node\Plugin\Core\Entity\Node $node
  *   The node entity.
  */
 function taxonomy_build_node_index($node) {
@@ -1426,9 +1422,7 @@ function taxonomy_build_node_index($node) {
         foreach (field_available_languages('node', $field) as $langcode) {
           if (!empty($items[$langcode])) {
             foreach ($items[$langcode] as $item) {
-              if (!empty($item['tid'])) {
-                $tid_all[$item['tid']] = $item['tid'];
-              }
+              $tid_all[$item['tid']] = $item['tid'];
             }
           }
         }
@@ -1470,7 +1464,7 @@ function taxonomy_node_predelete(EntityInterface $node) {
 /**
  * Deletes taxonomy index entries for a given node.
  *
- * @param Drupal\node\Plugin\Core\Entity\EntityInterface $node
+ * @param Drupal\node\Plugin\Core\Entity\Node $node
  *   The node entity.
  */
 function taxonomy_delete_node_index(EntityInterface $node) {
