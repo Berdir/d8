@@ -874,7 +874,11 @@ abstract class WebTestBase extends TestBase {
    */
   protected function resetAll() {
     // Clear all database and static caches and rebuild data structures.
-    drupal_flush_all_caches();
+    foreach (module_invoke_all('cache_flush') as $bin) {
+      cache($bin)->deleteAll();
+    }
+    state()->set('menu_rebuild_needed', TRUE);
+    drupal_static_reset();
 
     // Reload global $conf array and permissions.
     $this->refreshVariables();

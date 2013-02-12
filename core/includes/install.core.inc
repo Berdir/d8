@@ -1861,7 +1861,7 @@ function _install_module_batch($module, $module_name, &$context) {
 function _install_profile_modules_finished($success, $results, $operations) {
   // Flush all caches to complete the module installation process. Subsequent
   // installation tasks will now have full access to the profile's modules.
-  drupal_flush_all_caches();
+  //drupal_flush_all_caches();
 }
 
 /**
