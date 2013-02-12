@@ -2643,7 +2643,7 @@ function node_access($op, $node, $account = NULL, $langcode = NULL) {
   }
 
   // Check if authors can view their own unpublished nodes.
-  if ($op == 'view' && !$node->get('status', $langcode) && user_access('view own unpublished content', $account) && $account->uid == $node->get('uid', $langcode) && $account->uid != 0) {
+  if ($op == 'view' && empty($node->get('status', $langcode)->value) && user_access('view own unpublished content', $account) && $account->uid == $node->get('uid', $langcode)->value && $account->uid != 0) {
     $rights[$account->uid][$cid][$langcode][$op] = TRUE;
     return TRUE;
   }
@@ -2680,7 +2680,7 @@ function node_access($op, $node, $account = NULL, $langcode = NULL) {
       $rights[$account->uid][$cid][$langcode][$op] = $result;
       return $result;
     }
-    elseif (is_object($node) && $op == 'view' && $node->get('status', $langcode)) {
+    elseif (is_object($node) && $op == 'view' && !empty($node->get('status', $langcode)->value)) {
       // If no modules implement hook_node_grants(), the default behavior is to
       // allow all users to view published nodes, so reflect that here.
       $rights[$account->uid][$cid][$langcode][$op] = TRUE;
