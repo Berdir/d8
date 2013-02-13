@@ -530,4 +530,23 @@ class EntityNG extends Entity {
     return $label;
   }
 
+  /**
+   * Overrides Entity::isNewRevision().
+   */
+  public function isNewRevision() {
+    $info = $this->entityInfo();
+    return $this->newRevision->value || (!empty($info['entity_keys']['revision']) && !$this->getRevisionId());
+  }
+
+  /**
+   * Overrides Entity::isDefaultRevision().
+   */
+  public function isDefaultRevision($new_value = NULL) {
+    $return = $this->isDefaultRevision->value;
+    if (isset($new_value)) {
+      $this->isDefaultRevision = (bool) $new_value;
+    }
+    return $return;
+  }
+
 }

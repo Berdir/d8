@@ -313,6 +313,11 @@ class NodeStorageController extends DatabaseStorageControllerNG {
       'settings' => array('target_type' => 'user'),
       'queryable' => FALSE,
     );
+    $properties['log'] = array(
+      'label' => t('Log'),
+      'description' => t('The log entry explaining the changes in this version.'),
+      'type' => 'text_field',
+    );
     return $properties;
   }
 

@@ -214,6 +214,7 @@ class Node extends EntityNG implements ContentEntityInterface {
     unset($this->translate);
     unset($this->revision_timestamp);
     unset($this->revision_uid);
+    unset($this->log);
   }
 
   /**
