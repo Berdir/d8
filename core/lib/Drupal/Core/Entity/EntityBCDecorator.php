@@ -187,11 +187,16 @@ class EntityBCDecorator implements IteratorAggregate, EntityInterface {
     if (($isset = isset($value)) && is_array($value)) {
       $isset = FALSE;
       foreach ($value as $langcode => $data) {
-        foreach ($data as $delta => $value) {
-          if (!is_null($value)) {
-            $isset = TRUE;
-            break(2);
+        if (is_array($data)) {
+          foreach ($data as $delta => $value) {
+            if (!is_null($value)) {
+              $isset = TRUE;
+              break(2);
+            }
           }
+        }
+        else {
+          $isset = !empty($data);
         }
       }
     }
