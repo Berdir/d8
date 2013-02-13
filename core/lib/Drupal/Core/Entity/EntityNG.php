@@ -49,6 +49,8 @@ class EntityNG extends Entity {
    */
   protected $values = array(
     'langcode' => array(LANGUAGE_DEFAULT => array(0 => array('value' => LANGUAGE_NOT_SPECIFIED))),
+    'newRevision' => array(LANGUAGE_DEFAULT => array(0 => array('value' => FALSE))),
+    'isDefaultRevision' => array(LANGUAGE_DEFAULT => array(0 => array('value' => TRUE))),
   );
 
   /**
@@ -101,6 +103,9 @@ class EntityNG extends Entity {
   protected function init() {
     // We unset all defined properties, so magic getters apply.
     unset($this->langcode);
+    unset($this->enforceIsNew);
+    unset($this->newRevision);
+    unset($this->isDefaultRevision);
   }
 
   /**

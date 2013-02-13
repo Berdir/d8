@@ -87,7 +87,7 @@ class EntityBCDecorator implements IteratorAggregate, EntityInterface {
   public function &__get($name) {
     // Directly return the original property.
     if ($name == 'original') {
-      return $this->values[$name];
+      return $this->decorated->values[$name];
     }
 
     // We access the protected 'values' and 'fields' properties of the decorated

@@ -193,18 +193,6 @@ class Node extends EntityNG implements ContentEntityInterface {
   public $revision_uid;
 
   /**
-   * The plain data values of the contained properties.
-   *
-   * Define default values.
-   *
-   * @var array
-   */
-  protected $values = array(
-    'langcode' => array(LANGUAGE_DEFAULT => array(0 => array('value' => LANGUAGE_NOT_SPECIFIED))),
-    'isDefaultRevision' => array(LANGUAGE_DEFAULT => array(0 => array('value' => TRUE))),
-  );
-
-  /**
    * Overrides \Drupal\Core\Entity\EntityNG::init().
    */
   protected function init() {
@@ -212,7 +200,6 @@ class Node extends EntityNG implements ContentEntityInterface {
     // We unset all defined properties, so magic getters apply.
     unset($this->nid);
     unset($this->vid);
-    unset($this->isDefaultRevision);
     unset($this->uuid);
     unset($this->type);
     unset($this->title);

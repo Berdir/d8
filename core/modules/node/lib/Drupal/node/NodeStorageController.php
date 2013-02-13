@@ -237,6 +237,18 @@ class NodeStorageController extends DatabaseStorageControllerNG {
       'description' => t('The node language code.'),
       'type' => 'language_field',
     );
+    $properties['newRevision'] = array(
+      'label' => t('New revision'),
+      'description' => t('A boolean indicating whether this is a new revision.'),
+      'type' => 'boolean_field',
+      'queryable' => FALSE,
+    );
+    $properties['isDefaultRevision'] = array(
+      'label' => t('Default revision'),
+      'description' => t('A boolean indicating whether this version is the default revision.'),
+      'type' => 'boolean_field',
+      'queryable' => FALSE,
+    );
     $properties['title'] = array(
       'label' => t('Title'),
       'description' => t('The title of this node, always treated as non-markup plain text.'),
