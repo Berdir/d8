@@ -182,7 +182,20 @@ class EntityBCDecorator implements IteratorAggregate, EntityInterface {
    */
   public function __isset($name) {
     $value = $this->__get($name);
-    return isset($value);
+    // Horrible code but necessary because non existing properties are
+    // initialized with the value NULL.
+    if (($isset = isset($value)) && is_array($value)) {
+      $isset = FALSE;
+      foreach ($value as $langcode => $data) {
+        foreach ($data as $delta => $value) {
+          if (!is_null($value)) {
+            $isset = TRUE;
+            break(2);
+          }
+        }
+      }
+    }
+    return $isset;
   }
 
   /**
