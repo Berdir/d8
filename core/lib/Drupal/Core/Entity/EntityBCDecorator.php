@@ -148,6 +148,13 @@ class EntityBCDecorator implements IteratorAggregate, EntityInterface {
    * Directly writes to the plain field values, as done by Drupal 7.
    */
   public function __set($name, $value) {
+
+    // The property revision was used to create a new revision - do so as well.
+    // @TODO Did this apply only to node or for other entity types too?
+    if ($name == 'revision') {
+      $this->setNewRevision($value);
+    }
+
     $defined = isset($this->definitions[$name]);
     // When updating values for entity properties that have been converted to
     // an entity field, directly write to the plain value. This makes it
