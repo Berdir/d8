@@ -49,8 +49,6 @@ class EntityNG extends Entity {
    */
   protected $values = array(
     'langcode' => array(LANGUAGE_DEFAULT => array(0 => array('value' => LANGUAGE_NOT_SPECIFIED))),
-    'newRevision' => array(LANGUAGE_DEFAULT => array(0 => array('value' => FALSE))),
-    'isDefaultRevision' => array(LANGUAGE_DEFAULT => array(0 => array('value' => TRUE))),
   );
 
   /**
@@ -83,6 +81,11 @@ class EntityNG extends Entity {
     $this->entityType = $entity_type;
     $this->bundle = $bundle ? $bundle : $this->entityType;
     foreach ($values as $key => $value) {
+      // If the key matches an existing property set the value to the property
+      // to ensure non converted properties have the correct value.
+      if (property_exists($this, $key) && isset($value[LANGUAGE_DEFAULT])) {
+        $this->$key = $value[LANGUAGE_DEFAULT];
+      }
       $this->values[$key] = $value;
     }
     $this->init();
@@ -103,9 +106,6 @@ class EntityNG extends Entity {
   protected function init() {
     // We unset all defined properties, so magic getters apply.
     unset($this->langcode);
-    unset($this->enforceIsNew);
-    unset($this->newRevision);
-    unset($this->isDefaultRevision);
   }
 
   /**
@@ -529,24 +529,4 @@ class EntityNG extends Entity {
     }
     return $label;
   }
-
-  /**
-   * Overrides Entity::isNewRevision().
-   */
-  public function isNewRevision() {
-    $info = $this->entityInfo();
-    return $this->newRevision->value || (!empty($info['entity_keys']['revision']) && !$this->getRevisionId());
-  }
-
-  /**
-   * Overrides Entity::isDefaultRevision().
-   */
-  public function isDefaultRevision($new_value = NULL) {
-    $return = $this->isDefaultRevision->value;
-    if (isset($new_value)) {
-      $this->isDefaultRevision = (bool) $new_value;
-    }
-    return $return;
-  }
-
 }

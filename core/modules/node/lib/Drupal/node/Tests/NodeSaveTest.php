@@ -55,9 +55,9 @@ class NodeSaveTest extends NodeTestBase {
       'uid' => $this->web_user->uid,
       'type' => 'article',
       'nid' => $test_nid,
-      'enforceIsNew' => TRUE,
     );
     $node = node_submit(entity_create('node', $node));
+    $node->enforceIsNew();
 
     // Verify that node_submit did not overwrite the user ID.
     $this->assertEqual($node->uid, $this->web_user->uid, 'Function node_submit() preserves user ID');

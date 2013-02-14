@@ -64,7 +64,7 @@ class NodeRevisionsAllTestCase extends NodeTestBase {
       $node->setNewRevision();
       $node->save();
 
-      $node = node_load($node->nid); // Make sure we get revision information.
+      $node = node_load($node->nid, TRUE); // Make sure we get revision information.
       $nodes[] = clone $node;
     }
 
