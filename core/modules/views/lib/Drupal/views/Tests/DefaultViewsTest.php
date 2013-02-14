@@ -44,6 +44,9 @@ class DefaultViewsTest extends WebTestBase {
   protected function setUp() {
     parent::setUp();
 
+    // Create Basic page node type.
+    $this->drupalCreateContentType(array('type' => 'page', 'name' => 'Basic page'));
+
     $this->vocabulary = entity_create('taxonomy_vocabulary', array(
       'name' => $this->randomName(),
       'description' => $this->randomName(),
