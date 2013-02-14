@@ -103,7 +103,10 @@ class EntityBCDecorator implements IteratorAggregate, EntityInterface {
       // the field objects managed by the entity, thus we need to ensure
       // $this->decorated->values reflects the latest values first.
       foreach ($this->decorated->fields[$name] as $langcode => $field) {
-        $this->decorated->values[$name][$langcode] = $field->getValue();
+        // Only set if it's not empty, otherwise there can be ghost values.
+        if (!$field->isEmpty()) {
+          $this->decorated->values[$name][$langcode] = $field->getValue();
+        }
       }
       // The returned values might be changed by reference, so we need to remove
       // the field object to avoid the field object and the value getting out of
@@ -204,6 +207,7 @@ class EntityBCDecorator implements IteratorAggregate, EntityInterface {
         }
         else {
           $isset = !empty($data);
+          break;
         }
       }
     }
