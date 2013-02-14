@@ -304,7 +304,7 @@ class NodeStorageController extends DatabaseStorageControllerNG {
     $properties['log'] = array(
       'label' => t('Log'),
       'description' => t('The log entry explaining the changes in this version.'),
-      'type' => 'text_field',
+      'type' => 'string_field',
     );
     return $properties;
   }
