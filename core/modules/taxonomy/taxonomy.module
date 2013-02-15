@@ -1113,7 +1113,7 @@ function taxonomy_field_formatter_view(EntityInterface $entity, $field, $instanc
           );
         }
         else {
-          $term = $item['taxonomy_term'];
+          $term = $item['entity'];
           $uri = $term->uri();
           $element[$delta] = array(
             '#type' => 'link',
@@ -1127,7 +1127,7 @@ function taxonomy_field_formatter_view(EntityInterface $entity, $field, $instanc
 
     case 'taxonomy_term_reference_plain':
       foreach ($items as $delta => $item) {
-        $name = ($item['tid'] != 'autocreate' ? $item['taxonomy_term']->label() : $item['name']);
+        $name = ($item['tid'] != 'autocreate' ? $item['entity']->label() : $item['name']);
         $element[$delta] = array(
           '#markup' => check_plain($name),
         );
@@ -1138,7 +1138,7 @@ function taxonomy_field_formatter_view(EntityInterface $entity, $field, $instanc
       foreach ($items as $delta => $item) {
         $entity->rss_elements[] = array(
           'key' => 'category',
-          'value' => $item['tid'] != 'autocreate' ? $item['taxonomy_term']->label() : $item['name'],
+          'value' => $item['tid'] != 'autocreate' ? $item['entity']->label() : $item['name'],
           'attributes' => array(
             'domain' => $item['tid'] != 'autocreate' ? url('taxonomy/term/' . $item['tid'], array('absolute' => TRUE)) : '',
           ),
@@ -1193,7 +1193,7 @@ function taxonomy_field_formatter_prepare_view($entity_type, $entities, $field, 
   foreach ($entities as $id => $entity) {
     foreach ($items[$id] as $delta => $item) {
       // Force the array key to prevent duplicates.
-      if ($item['tid'] != 'autocreate') {
+      if ($item['tid'] != 'autocreate' && $item['tid'] !== FALSE) {
         $tids[$item['tid']] = $item['tid'];
       }
     }
@@ -1209,7 +1209,7 @@ function taxonomy_field_formatter_prepare_view($entity_type, $entities, $field, 
         // Check whether the taxonomy term field instance value could be loaded.
         if (isset($terms[$item['tid']])) {
           // Replace the instance value with the term data.
-          $items[$id][$delta]['taxonomy_term'] = $terms[$item['tid']];
+          $items[$id][$delta]['entity'] = $terms[$item['tid']];
         }
         // Terms to be created are not in $terms, but are still legitimate.
         elseif ($item['tid'] == 'autocreate') {
