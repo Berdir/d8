@@ -1101,7 +1101,7 @@ function taxonomy_field_formatter_view(EntityInterface $entity, $field, $instanc
   $element = array();
 
   // Terms whose tid is 'autocreate' do not exist
-  // yet and $item['taxonomy_term'] is not set. Theme such terms as
+  // yet and $item['entity'] is not set. Theme such terms as
   // just their name.
 
   switch ($display['type']) {
