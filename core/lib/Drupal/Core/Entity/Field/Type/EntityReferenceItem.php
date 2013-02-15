@@ -98,7 +98,7 @@ class EntityReferenceItem extends FieldItemBase {
    */
   public function __get($name) {
     $name = ($name == 'value') ? 'target_id' : $name;
-    parent::__get($name);
+    return parent::__get($name);
   }
 
   /**
