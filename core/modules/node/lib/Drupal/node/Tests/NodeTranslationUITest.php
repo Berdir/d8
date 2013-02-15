@@ -7,6 +7,7 @@
 
 namespace Drupal\node\Tests;
 
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\translation_entity\Tests\EntityTranslationUITest;
 
 /**
