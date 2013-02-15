@@ -32,7 +32,7 @@ interface ConditionInterface {
   /**
    * Adds a condition.
    *
-   * @param string $field
+   * @param string|\Drupal\Core\Entity\Query\ConditionInterface $field
    * @param mixed $value
    * @param string $operator
    * @param string $langcode
