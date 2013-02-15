@@ -219,7 +219,9 @@ class EntityBCDecorator implements IteratorAggregate, EntityInterface {
    */
   public function __unset($name) {
     $value = &$this->__get($name);
-    $value = array();
+    // Unset should act like the property isn't set and thus ignored. Following
+    // structure will provide that behaviour with EntityBCDecorator::__isset().
+    $value = array(LANGUAGE_NOT_SPECIFIED => NULL);
   }
 
   /**
