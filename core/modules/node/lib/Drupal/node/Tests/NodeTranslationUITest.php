@@ -67,7 +67,10 @@ class NodeTranslationUITest extends EntityTranslationUITest {
   /**
    * Overrides \Drupal\translation_entity\Tests\EntityTranslationUITest::getFormSubmitAction().
    */
-  protected function getFormSubmitAction() {
+  protected function getFormSubmitAction(EntityInterface $entity) {
+    if ($entity->status) {
+      return t('Save and unpublish');
+    }
     return t('Save and keep unpublished');
   }
 
@@ -123,7 +126,7 @@ class NodeTranslationUITest extends EntityTranslationUITest {
         'name' => $user->name,
         'date' => format_date($values[$langcode]['created'], 'custom', 'Y-m-d H:i:s O'),
       );
-      $this->drupalPost($path, $edit, $this->getFormSubmitAction(), array('language' => $languages[$langcode]));
+      $this->drupalPost($path, $edit, $this->getFormSubmitAction($entity), array('language' => $languages[$langcode]));
     }
 
     $entity = entity_load($this->entityType, $this->entityId, TRUE);

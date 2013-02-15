@@ -240,6 +240,8 @@ function translation_entity_edit_page(EntityInterface $entity, Language $languag
 function translation_entity_prepare_translation(EntityInterface $entity, Language $source, Language $target) {
   // @todo Unify field and property handling.
   $instances = field_info_instances($entity->entityType(), $entity->bundle());
+  // @todo remove once EntityBCDecorator is gone.
+  $entity = $entity->getOriginalEntity();
   if ($entity instanceof EntityNG) {
     $source_translation = $entity->getTranslation($source->langcode);
     $target_translation = $entity->getTranslation($target->langcode);
