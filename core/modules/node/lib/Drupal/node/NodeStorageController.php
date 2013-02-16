@@ -165,7 +165,7 @@ class NodeStorageController extends DatabaseStorageControllerNG {
 
     if ($entity->isNewRevision()) {
       $record->timestamp = REQUEST_TIME;
-      $record->uid = isset($record->revision_uid) ? $record->revision_uid : $GLOBALS['user']->uid;
+      $record->uid = isset($entity->revision_uid->value) ? $entity->revision_uid->value : $GLOBALS['user']->uid;
     }
   }
 
