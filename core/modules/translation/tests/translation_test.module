@@ -11,5 +11,5 @@ use Drupal\Core\Entity\EntityInterface;
  * Implements hook_node_insert().
  */
 function translation_test_node_insert(EntityInterface $node) {
-  drupal_write_record('node', $node, 'nid');
+  $node->save();
 }
