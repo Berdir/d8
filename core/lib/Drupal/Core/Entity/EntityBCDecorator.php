@@ -53,6 +53,14 @@ class EntityBCDecorator implements IteratorAggregate, EntityInterface {
   protected $definitions;
 
   /**
+   * Track empty initialized properties to return an appropriate value in
+   * EntityBCDecorator::__isset().
+   *
+   * @var array
+   */
+  protected $intializedEmpty = array();
+
+  /**
    * Constructs a Drupal\Core\Entity\EntityCompatibilityDecorator object.
    *
    * @param \Drupal\Core\Entity\EntityInterface $decorated
@@ -119,6 +127,7 @@ class EntityBCDecorator implements IteratorAggregate, EntityInterface {
     // possible to use the BC-decorator with properties; e.g., $node->title.
     if (isset($this->definitions[$name]) && empty($this->definitions[$name]['configurable'])) {
       if (!isset($this->decorated->values[$name][LANGUAGE_DEFAULT])) {
+        $this->intializedEmpty[$name] = TRUE;
         $this->decorated->values[$name][LANGUAGE_DEFAULT][0]['value'] = NULL;
       }
       $value = $this->decorated->values[$name][LANGUAGE_DEFAULT];
@@ -185,6 +194,8 @@ class EntityBCDecorator implements IteratorAggregate, EntityInterface {
     // out of sync. That way, the next field object instantiated by EntityNG
     // will hold the updated value.
     unset($this->decorated->fields[$name]);
+    // Clear the empty tracking.
+    unset($this->intializedEmpty[$name]);
   }
 
   /**
@@ -192,39 +203,23 @@ class EntityBCDecorator implements IteratorAggregate, EntityInterface {
    */
   public function __isset($name) {
     $value = $this->__get($name);
-    // Horrible code but necessary because non existing properties are
-    // initialized with the value NULL in a proper data-structure.
-    if (($isset = isset($value)) && is_array($value) && !empty($value)) {
-      foreach ($value as $langcode => $data) {
-        if (is_array($data)) {
-          foreach ($data as $delta => $value) {
-            if (!is_null($value)) {
-              return TRUE;
-            }
-          }
-          // An empty array is considered as set since that's unlikely an
-          // artificially initialized one.
-          return empty($data);
-        }
-        else {
-          // Temporarly commented out als this results in an incorrect FALSE for
-          // an array where the first key is empty ($node->path when alias is
-          // being deleted). Is this really necessary?
-          //return !empty($data);
-        }
-      }
-    }
-    return $isset;
+    return isset($value) && empty($this->intializedEmpty[$name]);
   }
 
   /**
    * Implements the magic method for unset().
    */
   public function __unset($name) {
+    // Set the value to NULL.
     $value = &$this->__get($name);
-    // Unset should act like the property isn't set and thus ignored. Following
-    // structure will provide that behaviour with EntityBCDecorator::__isset().
-    $value = array(LANGUAGE_NOT_SPECIFIED => NULL);
+    $value = NULL;
+    // When accessing values for entity properties that have been converted to
+    // an entity field, provide direct access to the plain value. This makes it
+    // possible to use the BC-decorator with properties; e.g., $node->title.
+    if (isset($this->definitions[$name]) && empty($this->definitions[$name]['configurable'])) {
+      // Ensure it's really recognized as unset in EntityBCDecorator::__isset().
+      $this->intializedEmpty[$name] = TRUE;
+    }
   }
 
   /**
@@ -252,6 +247,8 @@ class EntityBCDecorator implements IteratorAggregate, EntityInterface {
    * Forwards the call to the decorated entity.
    */
   public function set($property_name, $value) {
+    // Clear the empty tracking.
+    unset($this->intializedEmpty[$property_name]);
     return $this->decorated->set($property_name, $value);
   }
 
