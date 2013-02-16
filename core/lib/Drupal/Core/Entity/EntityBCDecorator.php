@@ -207,7 +207,10 @@ class EntityBCDecorator implements IteratorAggregate, EntityInterface {
           return empty($data);
         }
         else {
-          return !empty($data);
+          // Temporarly commented out als this results in an incorrect FALSE for
+          // an array where the first key is empty ($node->path when alias is
+          // being deleted). Is this really necessary?
+          //return !empty($data);
         }
       }
     }
