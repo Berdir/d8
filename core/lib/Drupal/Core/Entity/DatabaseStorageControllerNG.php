@@ -273,6 +273,9 @@ class DatabaseStorageControllerNG extends DatabaseStorageController {
       // Ensure we are dealing with the actual entity.
       $entity = $entity->getOriginalEntity();
 
+      // Sync the changes made in the fields array to the internal values array.
+      $entity->updateOriginalValues();
+
       // Load the stored entity, if any.
       if (!$entity->isNew() && !isset($entity->original)) {
         $entity->original = entity_load_unchanged($this->entityType, $entity->id());

@@ -29,8 +29,6 @@ class EntityTranslationControllerNG extends EntityTranslationController {
     foreach ($translation->getPropertyDefinitions() as $property_name => $langcode) {
       $translation->$property_name = array();
     }
-    // Sync changes into the internal values array.
-    $entity->updateOriginalValues();
   }
 
 }
