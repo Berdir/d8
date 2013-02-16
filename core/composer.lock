@@ -1,5 +1,5 @@
 {
-    "hash": "a8c56a3549ec70f775e4bf795e65a993",
+    "hash": "ea4e5e5da86989b55eb693856d0a7088",
     "packages": [
         {
             "name": "doctrine/common",
@@ -265,6 +265,55 @@
                 "http",
                 "message",
                 "url"
+            ]
+        },
+        {
+            "name": "guzzle/plugin-async",
+            "version": "v3.1.0",
+            "target-dir": "Guzzle/Plugin/Async",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/guzzle/plugin-async",
+                "reference": "v3.0.7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/guzzle/plugin-async/archive/v3.0.7.zip",
+                "reference": "v3.0.7",
+                "shasum": ""
+            },
+            "require": {
+                "guzzle/http": "self.version",
+                "php": ">=5.3.2"
+            },
+            "time": "2012-12-07 16:45:11",
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Guzzle\\Plugin\\Async": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Michael Dowling",
+                    "email": "mtdowling@gmail.com",
+                    "homepage": "https://github.com/mtdowling"
+                }
+            ],
+            "description": "Guzzle async request plugin",
+            "homepage": "http://guzzlephp.org/",
+            "keywords": [
+                "Guzzle",
+                "plugin"
             ]
         },
         {
@@ -791,7 +840,7 @@
                 "symfony/http-kernel": ">=2.1,<2.3-dev",
                 "symfony/routing": ">=2.1,<2.3-dev"
             },
-            "time": "2013-01-21 20:33:16",
+            "time": "2013-01-24 16:09:01",
             "type": "library",
             "extra": {
                 "branch-alias": {
