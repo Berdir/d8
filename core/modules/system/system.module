@@ -3726,17 +3726,17 @@ function system_run_automated_cron() {
   if (($threshold = config('system.cron')->get('threshold.autorun')) > 0 && variable_get('install_task') == 'done') {
     $cron_last = state()->get('system.cron_last') ?: NULL;
     if (!isset($cron_last) || (REQUEST_TIME - $cron_last > $threshold)) {
-      // Only execute the request if we can aquire the lock. If this fails then
-      // another request is already taking care of it and we don't have to
-      // retry.
-      if (lock()->acquire('cron_request')) {
+      // Attempt to aquire the cron lock to make sure we don't attempt to
+      // re-start cron while it is already running.
+      if (lock()->acquire('cron')) {
+        // Immediately release the lock again so that cron can start.
+        lock()->release('cron');
         // Execute the asynchronous request. This will return immediately with a
         // HTTP/1.1 200 OK and X-Guzzle-Async as the singe header.
         $url = url('cron/' . state()->get('system.cron_key'), array('absolute' => TRUE));
         $request = drupal_container()->get('http_default_client')->get($url);
         $request->addSubscriber(new AsyncPlugin());
         $request->send();
-        lock()->release('cron_request');
       }
     }
   }
