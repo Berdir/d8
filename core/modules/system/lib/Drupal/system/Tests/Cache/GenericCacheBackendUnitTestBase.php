@@ -298,6 +298,25 @@ abstract class GenericCacheBackendUnitTestBase extends DrupalUnitTestBase {
     $this->assertFalse(in_array('test19', $cids), "Added cache id test19 is not in cids array.");
   }
 
+   /**
+   * Test Drupal\Core\Cache\CacheBackendInterface::setMultiple().
+   */
+  public function testSetMultiple() {
+    $backend = $this->getCacheBackend();
+
+    // Set numerous testing keys.
+    $backend->set('cid_1', 'Some other value');
+    $items = array(
+      'cid_1' => array('data' => 1),
+      'cid_2' => array('data' => 2),
+    );
+    $backend->setMultiple($items);
+    $cids = array_keys($items);
+    $cached = $backend->getMultiple($cids);
+    $this->assertEqual($cached['cid_1']->data, $items['cid_1']['data'], 'Over-written cache item set correctly.');
+    $this->assertEqual($cached['cid_2']->data, $items['cid_2']['data'], 'New cache item set correctly.');
+  }
+
   /**
    * Tests Drupal\Core\Cache\CacheBackendInterface::isEmpty().
    */

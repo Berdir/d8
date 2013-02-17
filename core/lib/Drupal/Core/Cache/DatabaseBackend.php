@@ -160,6 +160,32 @@ class DatabaseBackend implements CacheBackendInterface {
   }
 
   /**
+   * Implements Drupal\Core\Cache\CacheBackendInterface::setMultiple().
+   */
+  function setMultiple(array $items) {
+    try {
+      $this->deleteMultiple(array_keys($items));
+      $query = Database::getConnection()->insert($this->bin)->fields(array('cid', 'data', 'expire', 'created', 'serialized', 'tags', 'checksum'));
+      foreach ($items as $cid => $item) {
+        $fields = array(
+          'cid' => $cid,
+          'data' => is_string($item['data']) ? $item['data'] : serialize($item['data']),
+          'expire' => isset($item['expire']) ? $item['expire'] : CacheBackendInterface::CACHE_PERMANENT,
+          'created' => REQUEST_TIME,
+          'serialized' => is_string($item['data']) ? 0 : 1,
+          'tags' => isset($item['tags']) ? implode(' ', $this->flattenTags($item['tags'])) : '',
+          'checksum' => $this->checksumTags(isset($item['tags']) ? $item['tags'] : array()),
+        );
+        $query->values($fields);
+      }
+      $query->execute();
+    }
+    catch (Exception $e) {
+      // The database may not be available, so we'll ignore errors.
+     }
+  }
+
+  /**
    * Implements Drupal\Core\Cache\CacheBackendInterface::delete().
    */
   public function delete($cid) {

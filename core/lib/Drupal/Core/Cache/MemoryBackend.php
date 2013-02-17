@@ -106,6 +106,15 @@ class MemoryBackend implements CacheBackendInterface {
   }
 
   /**
+   * Implements Drupal\Core\Cache\CacheBackendInterface::setMultiple().
+   */
+  public function setMultiple(array $items = array()) {
+    foreach ($items as $cid => $item) {
+      $this->set($cid, $item['data'], isset($item['expire']) ? $item['expire'] : CacheBackendInterface::CACHE_PERMANENT, isset($item['tags']) ? $item['tags'] : array());
+    }
+  }
+
+  /**
    * Implements Drupal\Core\Cache\CacheBackendInterface::delete().
    */
   public function delete($cid) {

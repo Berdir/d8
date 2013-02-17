@@ -149,6 +149,26 @@ interface CacheBackendInterface {
   public function set($cid, $data, $expire = CacheBackendInterface::CACHE_PERMANENT, array $tags = array());
 
   /**
+   * Store multiple items in the persistent cache.
+   *
+   * @param $items
+   *   An array of cache items in the form:
+   *   @code
+   *   $items = array(
+   *     $cid => array(
+   *       // Required, will be automatically serialized if not a string.
+   *       'data' => $data,
+   *       // Optional, defaults to CacheBackendInterface::CACHE_PERMANENT.
+   *       'expire' => CacheBackendInterface::CACHE_PERMANENT,
+   *       // (optional) The cache tags for this item, see CacheBackendInterface::set().
+   *       'tags' => array(),
+   *     ),
+   *   );
+   *   @endcode
+   */
+  function setMultiple(array $items);
+
+  /**
    * Deletes an item from the cache.
    *
    * If the cache item is being deleted because it is no longer "fresh", you may
