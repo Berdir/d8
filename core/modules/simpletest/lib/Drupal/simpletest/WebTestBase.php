@@ -16,6 +16,7 @@ use stdClass;
 use DOMDocument;
 use DOMXPath;
 use SimpleXMLElement;
+use Drupal\Core\Datetime\DrupalDateTime;
 
 /**
  * Test case for typical Drupal tests.
@@ -1270,7 +1271,6 @@ abstract class WebTestBase extends TestBase {
           // handleForm() function, it's not currently a requirement.
           $submit_matches = TRUE;
         }
-
         // We post only if we managed to handle every field in edit and the
         // submit button matches.
         if (!$edit && ($submit_matches || !isset($submit))) {
@@ -1606,6 +1606,10 @@ abstract class WebTestBase extends TestBase {
           case 'password':
           case 'email':
           case 'search':
+          case 'date':
+          case 'time':
+          case 'datetime':
+          case 'datetime-local';
             $post[$name] = $edit[$name];
             unset($edit[$name]);
             break;
@@ -1913,10 +1917,9 @@ abstract class WebTestBase extends TestBase {
   /**
    * Follows a link by name.
    *
-   * Will click the first link found with this link text by default, or a
-   * later one if an index is given. Match is case insensitive with
-   * normalized space. The label is translated label. There is an assert
-   * for successful click.
+   * Will click the first link found with this link text by default, or a later
+   * one if an index is given. Match is case sensitive with normalized space.
+   * The label is translated label. There is an assert for successful click.
    *
    * @param $label
    *   Text between the anchor tags.
