@@ -165,16 +165,19 @@ class DatabaseBackend implements CacheBackendInterface {
   function setMultiple(array $items) {
     try {
       $this->deleteMultiple(array_keys($items));
-      $query = Database::getConnection()->insert($this->bin)->fields(array('cid', 'data', 'expire', 'created', 'serialized', 'tags', 'checksum'));
+      $query = Database::getConnection()->insert($this->bin)->fields(array('cid', 'data', 'expire', 'created', 'serialized', 'tags', 'checksum_invalidations', 'checksum_deletions'));
       foreach ($items as $cid => $item) {
+        $flat_tags = $this->flattenTags(isset($item['tags']) ? $item['tags'] : array());
+        $checksum = $this->checksumTags($flat_tags);
         $fields = array(
           'cid' => $cid,
           'data' => is_string($item['data']) ? $item['data'] : serialize($item['data']),
           'expire' => isset($item['expire']) ? $item['expire'] : CacheBackendInterface::CACHE_PERMANENT,
           'created' => REQUEST_TIME,
           'serialized' => is_string($item['data']) ? 0 : 1,
-          'tags' => isset($item['tags']) ? implode(' ', $this->flattenTags($item['tags'])) : '',
-          'checksum' => $this->checksumTags(isset($item['tags']) ? $item['tags'] : array()),
+          'tags' => implode(' ', $flat_tags),
+          'checksum_invalidations' => $checksum['invalidations'],
+          'checksum_deletions' => $checksum['deletions'],
         );
         $query->values($fields);
       }
