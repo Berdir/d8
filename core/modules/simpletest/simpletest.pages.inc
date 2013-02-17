@@ -9,6 +9,28 @@
  * List tests arranged in groups that can be selected and run.
  */
 function simpletest_test_form($form) {
+
+
+  // JS-only table filters.
+  $form['filters'] = array(
+    '#type' => 'container',
+    '#attributes' => array(
+      'class' => array('table-filter', 'js-show'),
+    ),
+  );
+  $form['filters']['text'] = array(
+    '#type' => 'search',
+    '#title' => t('Search'),
+    '#size' => 30,
+    '#placeholder' => t('Enter test name…'),
+    '#attributes' => array(
+      'class' => array('table-filter-text'),
+      'data-table' => '#simpletest-test-form',
+      'autocomplete' => 'off',
+      'title' => t('Enter a part of the test name or description to filter by.'),
+    ),
+  );
+
   $form['tests'] = array(
     '#type' => 'details',
     '#title' => t('Tests'),
@@ -149,11 +171,11 @@ function theme_simpletest_test_table($variables) {
       );
       $row[] = array(
         'data' => '<label for="' . $test['#id'] . '">' . $title . '</label>',
-        'class' => array('simpletest-test-label'),
+        'class' => array('simpletest-test-label', 'table-filter-text-source'),
       );
       $row[] = array(
-        'data' => '<div class="description">' . $description . '</div>',
-        'class' => array('simpletest-test-description'),
+        'data' => '<div class="description">' . t('@description (@class)', array('@description' => $description, '@class' => $test_name)) . '</div>',
+        'class' => array('simpletest-test-description', 'table-filter-text-source'),
       );
 
       $rows[] = array('data' => $row, 'class' => array($test_class . '-test', ($collapsed ? 'js-hide' : '')));
