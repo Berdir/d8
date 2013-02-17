@@ -299,7 +299,7 @@ abstract class GenericCacheBackendUnitTestBase extends DrupalUnitTestBase {
   }
 
    /**
-   * Test Drupal\Core\Cache\CacheBackendInterface::setMultiple().
+   * Tests \Drupal\Core\Cache\CacheBackendInterface::setMultiple().
    */
   public function testSetMultiple() {
     $backend = $this->getCacheBackend();

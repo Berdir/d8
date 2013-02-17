@@ -106,7 +106,7 @@ class MemoryBackend implements CacheBackendInterface {
   }
 
   /**
-   * Implements Drupal\Core\Cache\CacheBackendInterface::setMultiple().
+   * Implements \Drupal\Core\Cache\CacheBackendInterface::setMultiple().
    */
   public function setMultiple(array $items = array()) {
     foreach ($items as $cid => $item) {

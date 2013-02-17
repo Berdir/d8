@@ -166,7 +166,7 @@ interface CacheBackendInterface {
    *   );
    *   @endcode
    */
-  function setMultiple(array $items);
+  public function setMultiple(array $items);
 
   /**
    * Deletes an item from the cache.
