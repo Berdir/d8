@@ -49,7 +49,7 @@ function entity_reference_entity_field_info($entity_type) {
       if ($field['type'] != 'entity_reference') {
         continue;
       }
-      $property_info['definitions'][$field_name]['settings']['target_type'] = $field['settings']['target_type'];
+      $property_info['optional'][$field_name]['settings']['target_type'] = $field['settings']['target_type'];
     }
   }
   return $property_info;
