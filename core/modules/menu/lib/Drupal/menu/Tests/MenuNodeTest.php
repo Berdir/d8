@@ -21,8 +21,6 @@ class MenuNodeTest extends WebTestBase {
    */
   public static $modules = array('menu', 'test_page_test');
 
-  protected $profile = 'standard';
-
   public static function getInfo() {
     return array(
       'name' => 'Menu settings for nodes',
@@ -33,6 +31,8 @@ class MenuNodeTest extends WebTestBase {
 
   function setUp() {
     parent::setUp();
+
+    $this->drupalCreateContentType(array('type' => 'page', 'title' => 'Page'));
 
     $this->admin_user = $this->drupalCreateUser(array(
       'access administration pages',

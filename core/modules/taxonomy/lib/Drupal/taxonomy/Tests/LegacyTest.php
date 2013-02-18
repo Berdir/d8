@@ -14,8 +14,6 @@ use Drupal\Core\Datetime\DrupalDateTime;
  */
 class LegacyTest extends TaxonomyTestBase {
 
-  protected $profile = 'standard';
-
   public static function getInfo() {
     return array(
       'name' => 'Test for legacy node bug.',
@@ -26,6 +24,43 @@ class LegacyTest extends TaxonomyTestBase {
 
   function setUp() {
     parent::setUp();
+    $this->drupalCreateContentType(array('type' => 'article', 'name' => 'Article'));
+
+    // Create a default vocabulary named "Tags", enabled for the 'article' content type.
+    $vocabulary = entity_create('taxonomy_vocabulary', array(
+      'name' => 'Tags',
+      'vid' => 'tags',
+    ));
+    taxonomy_vocabulary_save($vocabulary);
+
+    $field = array(
+      'field_name' => 'field_' . $vocabulary->id(),
+      'type' => 'taxonomy_term_reference',
+      // Set cardinality to unlimited for tagging.
+      'cardinality' => FIELD_CARDINALITY_UNLIMITED,
+      'settings' => array(
+        'allowed_values' => array(
+          array(
+            'vocabulary' => $vocabulary->id(),
+            'parent' => 0,
+          ),
+        ),
+      ),
+    );
+    field_create_field($field);
+
+    $instance = array(
+      'field_name' => 'field_' . $vocabulary->id(),
+      'entity_type' => 'node',
+      'label' => 'Tags',
+      'bundle' => 'article',
+      'widget' => array(
+        'type' => 'taxonomy_autocomplete',
+        'weight' => -4,
+      ),
+    );
+    field_create_instance($instance);
+
     $this->admin_user = $this->drupalCreateUser(array('administer taxonomy', 'administer nodes', 'bypass node access'));
     $this->drupalLogin($this->admin_user);
   }

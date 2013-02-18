@@ -19,9 +19,7 @@ class TextTranslationTest extends WebTestBase {
    *
    * @var array
    */
-  public static $modules = array('translation');
-
-  protected $profile = 'standard';
+  public static $modules = array('translation', 'field_ui');
 
   public static function getInfo() {
     return array(
@@ -34,8 +32,13 @@ class TextTranslationTest extends WebTestBase {
   function setUp() {
     parent::setUp();
 
-    $full_html_format = filter_format_load('full_html');
-    $this->format = $full_html_format->format;
+    // Create Full HTML text format.
+    $full_html_format = entity_create('filter_format', array(
+      'format' => 'full_html',
+      'name' => 'Full HTML',
+    ));
+    $full_html_format->save();
+    $this->checkPermissions(array(), TRUE);
     $this->admin = $this->drupalCreateUser(array(
       'administer languages',
       'administer content types',
@@ -44,6 +47,7 @@ class TextTranslationTest extends WebTestBase {
       'bypass node access',
       filter_permission_name($full_html_format),
     ));
+    $this->drupalCreateContentType(array('type' => 'article', 'name' => 'Article'));
     $this->translator = $this->drupalCreateUser(array('create article content', 'edit own article content', 'translate all content'));
 
     // Enable an additional language.
@@ -110,8 +114,8 @@ class TextTranslationTest extends WebTestBase {
     $this->drupalPost('node/add/article', $edit, t('Save'));
 
     // Populate the body field: the first item gets the "Full HTML" input
-    // format, the second one "Filtered HTML".
-    $formats = array('full_html', 'filtered_html');
+    // format, the second one "Plain Text".
+    $formats = array('full_html', 'plain_text');
     $langcode = LANGUAGE_NOT_SPECIFIED;
     foreach ($body as $delta => $value) {
       $edit = array(

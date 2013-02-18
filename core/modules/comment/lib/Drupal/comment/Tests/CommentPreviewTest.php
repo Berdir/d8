@@ -14,13 +14,6 @@ use Drupal\Core\Datetime\DrupalDateTime;
  */
 class CommentPreviewTest extends CommentTestBase {
 
-  /**
-   * Use the standard profile.
-   *
-   * @var string
-   */
-  protected $profile = 'standard';
-
   public static function getInfo() {
     return array(
       'name' => 'Comment preview',

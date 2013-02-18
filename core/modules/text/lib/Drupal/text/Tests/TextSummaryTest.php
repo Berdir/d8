@@ -13,7 +13,6 @@ use Drupal\simpletest\WebTestBase;
  * Tests the text field summary.
  */
 class TextSummaryTest extends WebTestBase {
-  protected $profile = 'standard';
 
   public static function getInfo() {
     return array(
