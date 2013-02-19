@@ -699,6 +699,17 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
     }
 
     $bundle = !empty($constraints['Bundle']) ? $constraints['Bundle'] : FALSE;
+    if (!$bundle) {
+      $bundles = entity_get_bundles($this->entityType);
+      if (count($bundles) == 1) {
+        // If there is only a single bundle, default to it.
+        $bundle = key($bundles);
+      }
+      elseif (count($bundles) == 0) {
+        // If there are no bundles, the bundle equals the entity type.
+        $bundle = $this->entityType;
+      }
+    }
 
     // Add in per-bundle fields.
     if (!isset($this->fieldDefinitions[$bundle])) {
