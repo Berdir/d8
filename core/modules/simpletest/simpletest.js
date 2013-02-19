@@ -114,44 +114,45 @@ Drupal.behaviors.simpletestTableFilterByText = {
   attach: function (context, settings) {
     var $input = $('input.table-filter-text').once('table-filter-text');
     var $table = $($input.attr('data-table'));
-    var $rowsAndDetails, $rows, $details;
+    var $rows;
+    var searching = false;
 
-    function hidePackageDetails(index, element) {
-      var $details = $(element);
-      var $visibleRows = $details.find('table:not(.sticky-header)').find('tbody tr:visible');
-      $details.toggle($visibleRows.length > 0);
-    }
-
-    function filterModuleList (e) {
+    function filterTestList (e) {
       var query = $(e.target).val().toLowerCase();
 
-      function showModuleRow (index, row) {
+      function showTestRow (index, row) {
         var $row = $(row);
         var $sources = $row.find('.table-filter-text-source');
         var textMatch = $sources.text().toLowerCase().indexOf(query) !== -1;
         $row.closest('tr').toggle(textMatch);
       }
 
-      // Filter if the length of the query is at least 2 characters.
-      if (query.length >= 2) {
-        $rows.each(showModuleRow);
-
-        // Hide the package <details> if they don't have any visible rows.
-        // Note that we first show() all <details> to be able to use ':visible'.
-        $details.show().each(hidePackageDetails);
+      function hideTestRow (index, row) {
+        var $row = $(row);
+        var $sources = $row.find('.table-filter-text-source');
+        var textMatch = $sources.text().toLowerCase().indexOf(query) !== -1;
+        $row.closest('tr').toggle(textMatch);
       }
-      else {
-        $rowsAndDetails.show();
+
+      // Filter if the length of the query is at least 4 characters.
+      if (query.length >= 4) {
+        searching = true;
+        $rows.each(showTestRow);
+      }
+      else if (searching) {
+        // Hide all rows and then show groups.
+        // @todo: This does not respect the current state of the group toggle.
+        searching = false;
+        $rows.hide();
+        $rows.filter('.simpletest-group').show();
       }
     }
 
     if ($table.length) {
-      $rowsAndDetails = $table.find('tr, details');
       $rows = $table.find('tbody tr');
-      $details = $table.find('details');
 
       // @todo Use autofocus attribute when possible.
-      $input.focus().on('keyup', filterModuleList);
+      $input.focus().on('keyup', filterTestList);
     }
   }
 };
