@@ -854,7 +854,9 @@ abstract class TestBase {
     $this->originalTheme = isset($GLOBALS['theme']) ? $GLOBALS['theme'] : NULL;
 
     // Save further contextual information.
-    $this->originalFileDirectory = file_public_path();
+    // Use the original files directory to avoid nesting it within an existing
+    // simpletest directory if a test is executed within a test.
+    $this->originalFileDirectory = settings()->get('file_public_directory', conf_path() . '/files');
     $this->originalProfile = drupal_get_profile();
     $this->originalUser = isset($user) ? clone $user : NULL;
 

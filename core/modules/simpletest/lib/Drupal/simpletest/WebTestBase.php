@@ -803,7 +803,6 @@ abstract class WebTestBase extends TestBase {
         NestedArray::setValue($GLOBALS['conf'], array_merge(array($config_base), explode('.', $name)), $value);
       }
     }
-    $this->settingsSet('file_public_path', $this->public_files_directory);
     // Execute the non-interactive installer.
     require_once DRUPAL_ROOT . '/core/includes/install.core.inc';
     install_drupal($settings);
