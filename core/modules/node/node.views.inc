@@ -420,6 +420,14 @@ function node_views_data() {
     ),
   );
 
+  $data['node']['node_listing_empty'] = array(
+    'title' => t('Empty Node Frontpage behavior'),
+    'help' => t('Provides a link to the node add overview page.'),
+    'area' => array(
+      'id' => 'node_listing_empty',
+    ),
+  );
+
   // Content revision table
 
   // Define the base group of this table. Fields that don't
