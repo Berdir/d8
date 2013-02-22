@@ -417,7 +417,7 @@ abstract class WebTestBase extends TestBase {
       $original = drupal_get_path('module', 'simpletest') . '/files';
       $files = file_scan_directory($original, '/(html|image|javascript|php|sql)-.*/');
       foreach ($files as $file) {
-        file_unmanaged_copy($file->uri, variable_get('file_public_path', conf_path() . '/files'));
+        file_unmanaged_copy($file->uri, file_public_path());
       }
 
       $this->generatedTestFiles = TRUE;
@@ -803,7 +803,7 @@ abstract class WebTestBase extends TestBase {
         NestedArray::setValue($GLOBALS['conf'], array_merge(array($config_base), explode('.', $name)), $value);
       }
     }
-    $GLOBALS['conf']['file_public_path'] = $this->public_files_directory;
+    $this->settingsSet('file_public_path', $this->public_files_directory);
     // Execute the non-interactive installer.
     require_once DRUPAL_ROOT . '/core/includes/install.core.inc';
     install_drupal($settings);
@@ -851,7 +851,6 @@ abstract class WebTestBase extends TestBase {
       }
       $config->save();
     }
-    variable_set('file_public_path', $this->public_files_directory);
 
     // Use the test mail class instead of the default mail handler class.
     variable_set('mail_system', array('default-system' => 'Drupal\Core\Mail\VariableLog'));

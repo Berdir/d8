@@ -188,7 +188,7 @@ EOF;
     state()->set('locale.test_projects_alter', TRUE);
 
     // Setup the environment.
-    $public_path = variable_get('file_public_path', conf_path() . '/files');
+    $public_path = file_public_path();
     $this->setTranslationsDirectory($public_path . '/local');
     $config->set('translation.default_filename', '%project-%version.%language._po')->save();
 

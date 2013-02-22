@@ -444,6 +444,15 @@ $settings['update_free_access'] = FALSE;
 # $settings['allow_authorize_operations'] = FALSE;
 
 /**
+ * Public file path:
+ *
+ * A local file system path where public files will be stored. This directory
+ * must exist and be writable by Drupal. This directory must be relative to
+ * the Drupal installation directory and be accessible over the web.
+ */
+$settings['file_public_path'] = conf_path() . '/files';
+
+/**
  * Base URL (optional).
  *
  * If Drupal is generating incorrect URLs on your site, which could

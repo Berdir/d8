@@ -75,7 +75,7 @@ class FilterHtmlImageSecureTest extends WebTestBase {
   function testImageSource() {
     global $base_url;
 
-    $public_files_path = variable_get('file_public_path', conf_path() . '/files');
+    $public_files_path = file_public_path();
 
     $http_base_url = preg_replace('/^https?/', 'http', $base_url);
     $https_base_url = preg_replace('/^https?/', 'https', $base_url);

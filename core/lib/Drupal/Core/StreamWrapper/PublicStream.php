@@ -19,7 +19,7 @@ class PublicStream extends LocalStream {
    * Implements Drupal\Core\StreamWrapper\LocalStream::getDirectoryPath()
    */
   public function getDirectoryPath() {
-    return variable_get('file_public_path', conf_path() . '/files');
+    return file_public_path();
   }
 
   /**

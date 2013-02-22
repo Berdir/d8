@@ -530,7 +530,7 @@ function system_theme_settings($form, &$form_state, $key = '') {
 
       // Prepare local file path for description.
       if ($original_path && isset($friendly_path)) {
-        $local_file = strtr($original_path, array('public:/' => variable_get('file_public_path', conf_path() . '/files')));
+        $local_file = strtr($original_path, array('public:/' => file_public_path()));
       }
       elseif ($key) {
         $local_file = drupal_get_path('theme', $key) . '/' . $default;
@@ -1752,12 +1752,11 @@ function system_clear_page_cache_submit($form, &$form_state) {
 function system_file_system_settings($form, $form_state) {
   $config = config('system.file');
   $form['file_public_path'] = array(
-    '#type' => 'textfield',
+    '#type' => 'item',
     '#title' => t('Public file system path'),
-    '#default_value' => variable_get('file_public_path', conf_path() . '/files'),
-    '#maxlength' => 255,
-    '#description' => t('A local file system path where public files will be stored. This directory must exist and be writable by Drupal. This directory must be relative to the Drupal installation directory and be accessible over the web.'),
-    '#after_build' => array('system_check_directory'),
+    '#default_value' => file_public_path(),
+    '#markup' => file_public_path(),
+    '#description' => t('A local file system path where public files will be stored. This directory must exist and be writable by Drupal. This directory must be relative to the Drupal installation directory and be accessible over the web. This must be changed in settings.php'),
   );
 
   $form['file_private_path'] = array(
@@ -1806,8 +1805,6 @@ function system_file_system_settings_submit($form, &$form_state) {
   $config = config('system.file')
     ->set('path.private', $form_state['values']['file_private_path'])
     ->set('path.temporary', $form_state['values']['file_temporary_path']);
-  variable_set('file_public_path', $form_state['values']['file_public_path']);
-
 
   if(isset($form_state['values']['file_default_scheme'])) {
     $config->set('default_scheme', $form_state['values']['file_default_scheme']);

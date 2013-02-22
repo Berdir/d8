@@ -674,7 +674,7 @@ abstract class TestBase {
     if ($simpletest_config->get('verbose')) {
       // Initialize verbose debugging.
       $this->verbose = TRUE;
-      $this->verboseDirectory = variable_get('file_public_path', conf_path() . '/files') . '/simpletest/verbose';
+      $this->verboseDirectory = file_public_path() . '/simpletest/verbose';
       $this->verboseDirectoryUrl = file_create_url($this->verboseDirectory);
       if (file_prepare_directory($this->verboseDirectory, FILE_CREATE_DIRECTORY) && !file_exists($this->verboseDirectory . '/.htaccess')) {
         file_put_contents($this->verboseDirectory . '/.htaccess', "<IfModule mod_expires.c>\nExpiresActive Off\n</IfModule>\n");
@@ -854,7 +854,7 @@ abstract class TestBase {
     $this->originalTheme = isset($GLOBALS['theme']) ? $GLOBALS['theme'] : NULL;
 
     // Save further contextual information.
-    $this->originalFileDirectory = variable_get('file_public_path', conf_path() . '/files');
+    $this->originalFileDirectory = file_public_path();
     $this->originalProfile = drupal_get_profile();
     $this->originalUser = isset($user) ? clone $user : NULL;
 

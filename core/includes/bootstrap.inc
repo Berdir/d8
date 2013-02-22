@@ -3494,6 +3494,20 @@ function drupal_check_memory_limit($required, $memory_limit = NULL) {
 }
 
 /**
+ * Returns the public path directory
+ */
+function file_public_path() {
+  $base_path = settings()->get('file_public_path', conf_path() . '/files');
+  if ($test_prefix = drupal_valid_test_ua()) {
+    // @see Drupal\simpletest\WebTestBase::setUp()
+    return $base_path . '/simpletest/' . substr($test_prefix, 10);
+  }
+  else {
+    return $base_path;
+  }
+}
+
+/**
  * @defgroup lock Locking mechanisms
  * @{
  * Functions to coordinate long-running operations across requests.

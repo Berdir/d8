@@ -306,7 +306,7 @@ function system_requirements($phase) {
   if ($phase != 'install') {
     $filesystem_config = config('system.file');
     $directories = array(
-      variable_get('file_public_path', conf_path() . '/files'),
+      file_public_path(),
       // By default no private files directory is configured. For private files
       // to be secure the admin needs to provide a path outside the webroot.
       $filesystem_config->get('path.private'),
@@ -319,8 +319,8 @@ function system_requirements($phase) {
   if ($phase == 'install') {
     global $conf;
     $directories = array();
-    if (!empty($conf['file_public_path'])) {
-      $directories[] = $conf['file_public_path'];
+    if ($file_public_path = settings()->get('file_public_path')) {
+      $directories[] = $file_public_path;
     }
     else {
       // If we are installing Drupal, the settings.php file might not exist yet
