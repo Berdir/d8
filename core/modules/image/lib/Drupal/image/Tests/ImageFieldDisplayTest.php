@@ -111,7 +111,9 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     // Ensure the derivative image is generated so we do not have to deal with
     // image style callback paths.
     $this->drupalGet(image_style_url('thumbnail', $image_uri));
-    $image_info['uri'] = $image_uri;
+    // Need to create the URL again since it will change if clean URLs
+    // are disabled.
+    $image_info['uri'] = image_style_url('thumbnail', $image_uri);
     $image_info['width'] = 100;
     $image_info['height'] = 50;
     $image_info['style_name'] = 'thumbnail';

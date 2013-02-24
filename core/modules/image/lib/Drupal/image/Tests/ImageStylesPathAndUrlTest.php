@@ -110,13 +110,19 @@ class ImageStylesPathAndUrlTest extends WebTestBase {
     $this->assertNotIdentical(FALSE, $original_uri, 'Created the generated image file.');
 
     // Get the URL of a file that has not been generated and try to create it.
-    $generated_uri = $scheme . '://styles/' . $this->style_name . '/' . $scheme . '/'. drupal_basename($original_uri);
+    $generated_uri = image_style_path($this->style_name, $original_uri);
     $this->assertFalse(file_exists($generated_uri), 'Generated file does not exist.');
     $generate_url = image_style_url($this->style_name, $original_uri);
 
     if ($GLOBALS['script_path']) {
       $this->assertTrue(strpos($generate_url, $GLOBALS['script_path']) !== FALSE, 'When using non-clean URLS, the system path contains the script name.');
     }
+    // Add some extra chars to the token.
+    $this->drupalGet(str_replace(IMAGE_DERIVATIVE_TOKEN . '=', IMAGE_DERIVATIVE_TOKEN . '=Zo', $generate_url));
+    $this->assertResponse(403, 'Image was inaccessible at the URL wih an invalid token.');
+    // Change the parameter name so the token is missing.
+    $this->drupalGet(str_replace(IMAGE_DERIVATIVE_TOKEN . '=', 'wrongparam=', $generate_url));
+    $this->assertResponse(403, 'Image was inaccessible at the URL wih a missing token.');
 
     // Fetch the URL that generates the file.
     $this->drupalGet($generate_url);
@@ -161,6 +167,11 @@ class ImageStylesPathAndUrlTest extends WebTestBase {
         // response body.
         $this->assertNoRaw( chr(137) . chr(80) . chr(78) . chr(71) . chr(13) . chr(10) . chr(26) . chr(10), 'No PNG signature found in the response body.');
       }
+    }
+    elseif (!$GLOBALS['script_path']) {
+      // Add some extra chars to the token.
+      $this->drupalGet(str_replace(IMAGE_DERIVATIVE_TOKEN . '=', IMAGE_DERIVATIVE_TOKEN . '=Zo', $generate_url));
+      $this->assertResponse(200, 'Existing image was accessible at the URL wih an invalid token.');
     }
 
     $GLOBALS['script_path'] = $script_path_original;
