@@ -10,7 +10,7 @@ namespace Drupal\node\Tests;
 /**
  * Test to ensure that a node's content is always rebuilt.
  */
-class NodeBuildContentTest extends NodeTestBase {
+class NodeBuildContentTest extends NodeUnitTestBase {
 
   public static function getInfo() {
     return array(
@@ -24,7 +24,7 @@ class NodeBuildContentTest extends NodeTestBase {
   * Ensures that content array is rebuilt on every call to node_build_content().
   */
   function testNodeRebuildContent() {
-    $node = $this->drupalCreateNode();
+    $node = $this->createNode();
 
     // Set a property in the content array so we can test for its existence later on.
     $node->content['test_content_property'] = array(

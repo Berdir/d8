@@ -10,7 +10,7 @@ namespace Drupal\node\Tests;
 /**
  * Tests for the hooks invoked during node_load().
  */
-class NodeLoadHooksTest extends NodeTestBase {
+class NodeLoadHooksTest extends NodeUnitTestBase {
 
   /**
    * Modules to enable.
@@ -32,10 +32,14 @@ class NodeLoadHooksTest extends NodeTestBase {
    */
   function testHookNodeLoad() {
     // Create some sample articles and pages.
-    $node1 = $this->drupalCreateNode(array('type' => 'article', 'status' => NODE_PUBLISHED));
-    $node2 = $this->drupalCreateNode(array('type' => 'article', 'status' => NODE_PUBLISHED));
-    $node3 = $this->drupalCreateNode(array('type' => 'article', 'status' => NODE_NOT_PUBLISHED));
-    $node4 = $this->drupalCreateNode(array('type' => 'page', 'status' => NODE_NOT_PUBLISHED));
+    $node1 = $this->CreateNode(array('type' => 'article', 'status' => NODE_PUBLISHED));
+    $node1->save();
+    $node2 = $this->CreateNode(array('type' => 'article', 'status' => NODE_PUBLISHED));
+    $node2->save();
+    $node3 = $this->CreateNode(array('type' => 'article', 'status' => NODE_NOT_PUBLISHED));
+    $node3->save();
+    $node4 = $this->CreateNode(array('type' => 'page', 'status' => NODE_NOT_PUBLISHED));
+    $node4->save();
 
     // Check that when a set of nodes that only contains articles is loaded,
     // the properties added to the node by node_test_load_node() correctly
