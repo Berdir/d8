@@ -56,7 +56,7 @@ const NODE_STICKY = 1;
  * Modules should return this value from hook_node_access() to allow access to a
  * node.
  */
-const NODE_ACCESS_ALLOW = 'allow';
+const NODE_ACCESS_ALLOW = TRUE;
 
 /**
  * Denotes that access is denied for a node.
@@ -64,7 +64,7 @@ const NODE_ACCESS_ALLOW = 'allow';
  * Modules should return this value from hook_node_access() to deny access to a
  * node.
  */
-const NODE_ACCESS_DENY = 'deny';
+const NODE_ACCESS_DENY = FALSE;
 
 /**
  * Denotes that access is unaffected for a node.
