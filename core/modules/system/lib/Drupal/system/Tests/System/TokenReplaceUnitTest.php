@@ -32,7 +32,7 @@ class TokenReplaceUnitTest extends DrupalUnitTestBase {
   public function setUp() {
     parent::setUp();
     // Install default system configuration.
-    config_install_default_config('module', 'system');
+    $this->installConfig(array('system'));
   }
 
   /**
