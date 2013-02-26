@@ -2166,18 +2166,18 @@ function system_update_8050() {
     }
     if (count($old_mail_system_settings)) {
       // Warn about non-core classes which may need to be updated.
-      drupal_set_message(t('The following mail backends need to be re-configured: @list', array('@list' => implode(', ', $old_mail_system_settings))), 'warning');
+      drupal_set_message(format_string('The following mail backends need to be re-configured: @list.', array('@list' => implode(', ', $old_mail_system_settings))), 'warning');
     }
 
     $new_mail_system_settings += $old_mail_system_settings;
     // Save the updated variable, and let update_variables_to_config convert it.
     if ($new_mail_system_settings) {
       update_variable_set('mail_system', $new_mail_system_settings);
-      update_variables_to_config('system.mail', array(
-        'mail_system' => 'interface',
-      ));
     }
   }
+  update_variables_to_config('system.mail', array(
+    'mail_system' => 'interface',
+  ));
 }
 
 /**

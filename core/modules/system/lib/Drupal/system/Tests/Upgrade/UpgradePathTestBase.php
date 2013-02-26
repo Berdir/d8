@@ -40,11 +40,6 @@ abstract class UpgradePathTestBase extends WebTestBase {
   var $pendingUpdates = TRUE;
 
   /**
-   * Flag to indicate whether to check for pending update or not.
-   */
-  var $checkPendingUpdates = TRUE;
-
-  /**
    * Prepares the appropriate session for the release of Drupal being upgraded.
    */
   protected function prepareD8Session() {
@@ -207,13 +202,10 @@ abstract class UpgradePathTestBase extends WebTestBase {
   /**
    * Perform the upgrade.
    *
-   * @param bool $register_errors
+   * @param $register_errors
    *   Register the errors during the upgrade process as failures.
-   *
-   * @return bool
+   * @return
    *   TRUE if the upgrade succeeded, FALSE otherwise.
-   *
-   * @throws \Exception
    */
   protected function performUpgrade($register_errors = TRUE) {
 
@@ -266,22 +258,10 @@ abstract class UpgradePathTestBase extends WebTestBase {
       // don't process.
       throw new Exception('Errors during update process.');
     }
-    if ($this->hasPendingUpdate()) {
-      return $this->checkPendingUpdates();
-    }
 
-    return TRUE;
-  }
+    // Allow tests to check the completion page.
+    $this->checkCompletionPage();
 
-  /**
-   * Checks that no updates are pending at the end of an upgrade.
-   *
-   * @return bool
-   *   TRUE if there are no pending updates, FALSE if not.
-   *
-   * @throws \Exception
-   */
-  protected function checkPendingUpdates() {
     // Check if there still are pending updates.
     $this->getUpdatePhp();
     $this->drupalPost(NULL, array(), t('Continue'));
@@ -335,20 +315,10 @@ abstract class UpgradePathTestBase extends WebTestBase {
   }
 
   /**
-   * Check for available pending updates.
+   * Checks the update.php completion page.
    *
-   * @return bool
+   * Invoked by UpgradePathTestBase::performUpgrade() to allow upgrade tests to
+   * check messages and other output on the final confirmation page.
    */
-  protected function hasPendingUpdate() {
-    return $this->checkPendingUpdates;
-  }
-
-  /**
-   * Provides option to set pending update check.
-   *
-   * @param bool $flag
-   */
-  protected function setPendingUpdateCheck($flag = TRUE) {
-    $this->checkPendingUpdates = $flag;
-  }
+  protected function checkCompletionPage() { }
 }
