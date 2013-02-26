@@ -23,9 +23,12 @@ class CKEditorPluginManager extends PluginManagerBase {
 
   /**
    * Overrides \Drupal\Component\Plugin\PluginManagerBase::__construct().
+   *
+   * @param array $namespaces
+   *   An array of paths keyed by it's corresponding namespaces.
    */
-  public function __construct() {
-    $this->discovery = new AnnotatedClassDiscovery('ckeditor', 'plugin');
+  public function __construct($namespaces) {
+    $this->discovery = new AnnotatedClassDiscovery('ckeditor', 'plugin', $namespaces);
     $this->discovery = new ProcessDecorator($this->discovery, array($this, 'processDefinition'));
     $this->discovery = new AlterDecorator($this->discovery, 'ckeditor_plugin_info');
     $this->discovery = new CacheDecorator($this->discovery, 'ckeditor_plugin');
