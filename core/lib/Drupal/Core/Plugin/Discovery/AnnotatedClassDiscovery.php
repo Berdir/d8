@@ -20,7 +20,7 @@ class AnnotatedClassDiscovery extends ComponentAnnotatedClassDiscovery {
    * @param array $plugin_namespaces
    *   An array of paths keyed by it's corresponding namespaces.
    */
-  function __construct($owner, $type, $root_namespaces = NULL, $plugin_namespaces = array()) {
+  function __construct($owner, $type, $root_namespaces = NULL, array $plugin_namespaces = array()) {
     $this->owner = $owner;
     $this->type = $type;
     $this->rootNamespaces = $root_namespaces;

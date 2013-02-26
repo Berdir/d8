@@ -27,7 +27,7 @@ class EditorManager extends PluginManagerBase {
    * @param array $namespaces
    *   An array of paths keyed by it's corresponding namespaces.
    */
-  public function __construct($namespaces) {
+  public function __construct(array $namespaces) {
     $this->discovery = new AnnotatedClassDiscovery('edit', 'editor', $namespaces);
     $this->discovery = new ProcessDecorator($this->discovery, array($this, 'processDefinition'));
     $this->discovery = new AlterDecorator($this->discovery, 'edit_editor');
