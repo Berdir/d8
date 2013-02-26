@@ -16,11 +16,15 @@ class AnnotatedClassDiscovery extends ComponentAnnotatedClassDiscovery {
 
   /**
    * Constructs an AnnotatedClassDiscovery object.
+   *
+   * @param array $plugin_namespaces
+   *   An array of paths keyed by it's corresponding namespaces.
    */
-  function __construct($owner, $type, $root_namespaces = NULL) {
+  function __construct($owner, $type, $root_namespaces = NULL, $plugin_namespaces = array()) {
     $this->owner = $owner;
     $this->type = $type;
     $this->rootNamespaces = $root_namespaces;
+    $this->pluginNamespaces = $plugin_namespaces;
     $annotation_namespaces = array(
       'Drupal\Component\Annotation' => DRUPAL_ROOT . '/core/lib',
       'Drupal\Core\Annotation' => DRUPAL_ROOT . '/core/lib',
@@ -31,15 +35,18 @@ class AnnotatedClassDiscovery extends ComponentAnnotatedClassDiscovery {
   /**
    * Overrides Drupal\Component\Plugin\Discovery\AnnotatedClassDiscovery::getPluginNamespaces().
    *
+   * @todo Figure out how to let this comment still be TRUE.
    * This is overridden rather than set in the constructor, because Drupal
    * modules can be enabled (and therefore, namespaces registered) during the
    * lifetime of a plugin manager.
    */
   protected function getPluginNamespaces() {
+    if (!empty($this->plugin_namespaces)) {
+      return parent::getPluginNamespaces();
+    }
     $plugin_namespaces = array();
-    $root_namespaces = isset($this->rootNamespaces) ? $this->rootNamespaces : drupal_classloader()->getNamespaces();
-    foreach ($root_namespaces as $namespace => $dirs) {
-      $plugin_namespaces["$namespace\\Plugin\\{$this->owner}\\{$this->type}"] = $dirs;
+    foreach ($this->rootNamespaces as $namespace => $dir) {
+      $plugin_namespaces["$namespace\\Plugin\\{$this->owner}\\{$this->type}"] = array($dir);
     }
     return $plugin_namespaces;
   }

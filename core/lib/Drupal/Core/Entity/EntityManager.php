@@ -168,10 +168,13 @@ class EntityManager extends PluginManagerBase {
 
   /**
    * Constructs a new Entity plugin manager.
+   *
+   * @param array $namespaces
+   *   An array of paths keyed by it's corresponding namespaces.
    */
-  public function __construct() {
+  public function __construct($namespaces) {
     // Allow the plugin definition to be altered by hook_entity_info_alter().
-    $this->discovery = new AnnotatedClassDiscovery('Core', 'Entity');
+    $this->discovery = new AnnotatedClassDiscovery('Core', 'Entity', $namespaces);
     $this->discovery = new InfoHookDecorator($this->discovery, 'entity_info');
     $this->discovery = new ProcessDecorator($this->discovery, array($this, 'processDefinition'));
     $this->discovery = new AlterDecorator($this->discovery, 'entity_info');
