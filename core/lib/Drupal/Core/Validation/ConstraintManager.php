@@ -42,7 +42,7 @@ class ConstraintManager extends PluginManagerBase {
    * @param array $namespaces
    *   An array of paths keyed by it's corresponding namespaces.
    */
-  public function __construct($namespaces) {
+  public function __construct(array $namespaces) {
     $this->discovery = new AnnotatedClassDiscovery('Validation', 'Constraint', $namespaces);
     $this->discovery = new StaticDiscoveryDecorator($this->discovery, array($this, 'registerDefinitions'));
     $this->discovery = new DerivativeDiscoveryDecorator($this->discovery);
