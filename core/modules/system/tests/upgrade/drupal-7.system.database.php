@@ -119,6 +119,10 @@ db_insert('variable')->fields(array(
     'name' => 'actions_max_stack',
     'value' => 'i:42;',
   ))
+  ->values(array(
+  'name' => 'mail_system',
+  'value' => 'a:2:{s:14:"default-system";s:17:"DefaultMailSystem";s:7:"maillog";s:17:"MaillogMailSystem";}',
+))
 ->execute();
 
 db_update('variable')
