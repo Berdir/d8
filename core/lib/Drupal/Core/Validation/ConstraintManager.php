@@ -43,6 +43,8 @@ class ConstraintManager extends PluginManagerBase {
    *   An array of paths keyed by it's corresponding namespaces.
    */
   public function __construct(array $namespaces) {
+    // Allow the component to provide plugins.
+    $namespaces['Drupal\Core\Validation'] = DRUPAL_ROOT . '/core/lib';
     $this->discovery = new AnnotatedClassDiscovery('Validation', 'Constraint', $namespaces);
     $this->discovery = new StaticDiscoveryDecorator($this->discovery, array($this, 'registerDefinitions'));
     $this->discovery = new DerivativeDiscoveryDecorator($this->discovery);

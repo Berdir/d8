@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\Core\Plugin\Validation\Constraint\RangeConstraint.
+ * Contains \Drupal\Core\Validation\Plugin\Validation\Constraint\RangeConstraint.
  */
 
-namespace Drupal\Core\Plugin\Validation\Constraint;
+namespace Drupal\Core\Validation\Plugin\Validation\Constraint;
 
 use Drupal\Core\Annotation\Plugin;
 use Drupal\Core\Annotation\Translation;
