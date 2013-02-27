@@ -22,7 +22,9 @@ class AnnotatedClassDiscovery extends ComponentAnnotatedClassDiscovery {
    * @param string $type
    *   The plugin type, for example filter.
    * @param array $root_namespaces
-   *
+   *   Array of root paths keyed by the corresponding namespace to look for
+   *   plugin implementations, \Plugin\$owner\$type will be appended to each
+   *   namespace.
    * @param array $plugin_namespaces
    *   An array of paths keyed by it's corresponding namespaces.
    */
