@@ -17,19 +17,24 @@ class AnnotatedClassDiscovery extends ComponentAnnotatedClassDiscovery {
   /**
    * Constructs an AnnotatedClassDiscovery object.
    *
+   * @param string $owner
+   *   The module name that defines the plugin type.
+   * @param string $type
+   *   The plugin type, for example filter.
+   * @param array $root_namespaces
+   *
    * @param array $plugin_namespaces
    *   An array of paths keyed by it's corresponding namespaces.
    */
-  function __construct($owner, $type, $root_namespaces = NULL, array $plugin_namespaces = array()) {
+  function __construct($owner, $type, array $root_namespaces = array(), array $plugin_namespaces = array()) {
     $this->owner = $owner;
     $this->type = $type;
     $this->rootNamespaces = $root_namespaces;
-    $this->pluginNamespaces = $plugin_namespaces;
     $annotation_namespaces = array(
       'Drupal\Component\Annotation' => DRUPAL_ROOT . '/core/lib',
       'Drupal\Core\Annotation' => DRUPAL_ROOT . '/core/lib',
     );
-    parent::__construct(array(), $annotation_namespaces, 'Drupal\Core\Annotation\Plugin');
+    parent::__construct($plugin_namespaces, $annotation_namespaces, 'Drupal\Core\Annotation\Plugin');
   }
 
   /**
@@ -41,7 +46,7 @@ class AnnotatedClassDiscovery extends ComponentAnnotatedClassDiscovery {
    * lifetime of a plugin manager.
    */
   protected function getPluginNamespaces() {
-    if (!empty($this->plugin_namespaces)) {
+    if (!empty($this->pluginNamespaces)) {
       return parent::getPluginNamespaces();
     }
     $plugin_namespaces = array();
