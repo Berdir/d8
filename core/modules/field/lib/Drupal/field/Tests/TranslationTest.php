@@ -34,7 +34,7 @@ class TranslationTest extends FieldUnitTestBase {
 
   function setUp() {
     parent::setUp();
-    $this->installSchema('language', array('langauge'));
+    $this->installSchema('language', array('language'));
 
     $this->field_name = drupal_strtolower($this->randomName() . '_field_name');
 
