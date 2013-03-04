@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\aggregator\Plugin\aggregator\fetcher\DefaultFetcher.
+ * Contains \Drupal\aggregator\Plugin\aggregator\fetcher\DefaultFetcher.
  */
 
 namespace Drupal\aggregator\Plugin\aggregator\fetcher;
@@ -16,7 +16,7 @@ use Guzzle\Http\Exception\BadResponseException;
 /**
  * Defines a default fetcher implementation.
  *
- * Uses drupal_http_request() to download the feed.
+ * Uses http_default_client class to download the feed.
  *
  * @Plugin(
  *   id = "aggregator",
@@ -27,9 +27,9 @@ use Guzzle\Http\Exception\BadResponseException;
 class DefaultFetcher implements FetcherInterface {
 
   /**
-   * Implements Drupal\aggregator\Plugin\FetcherInterface::fetch().
+   * Implements \Drupal\aggregator\Plugin\FetcherInterface::fetch().
    */
-  function fetch(Feed $feed) {
+  public function fetch(Feed $feed) {
     $request = drupal_container()->get('http_default_client')->get($feed->url->value);
     $feed->source_string = FALSE;
 
