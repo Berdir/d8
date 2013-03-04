@@ -15,7 +15,7 @@ use Drupal\Core\Entity\EntityAccessController;
 /**
  * Tests the entity access controller.
  */
-class EntityAccessTest extends EntityUnitBaseTest  {
+class EntityAccessTest extends EntityUnitTestBase  {
 
   public static $modules = array('language', 'locale');
 
@@ -62,7 +62,10 @@ class EntityAccessTest extends EntityUnitBaseTest  {
   function testEntityAccess() {
     // Set up a non-admin user that is allowed to view test entities.
     global $user;
-    $user = $this->createUser(array('uid' => 2), array('view test entity'));
+    $role = $this->createUserRole(array('view test entity'));
+    $user = $this->createUser(array('uid' => 2));
+    $user->roles[$role->id()] = $role->id();
+    $user->save();
     $entity = entity_create('entity_test', array(
       'name' => 'test',
     ));
@@ -110,7 +113,10 @@ class EntityAccessTest extends EntityUnitBaseTest  {
 
     // Set up a non-admin user that is allowed to view test entity translations.
     global $user;
-    $user = $this->createUser(array('uid' => 2), array('view test entity translations'));
+    $role = $this->createUserRole(array('view test entity translations'));
+    $user = $this->createUser(array('uid' => 2));
+    $user->roles[$role->id()] = $role->id();
+    $user->save();
 
     // Create two test languages.
     foreach (array('foo', 'bar') as $langcode) {
