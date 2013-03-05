@@ -8,13 +8,14 @@
 namespace Drupal\Core\Path;
 
 use Drupal\Core\Database\Connection;
+use Drupal\Core\DestructableInterface;
 use Drupal\Core\KeyValueStore\KeyValueFactory;
 use Drupal\Core\Utility\CacheArray;
 
 /**
  * Extends CacheArray to build the path alias whitelist over time.
  */
-class AliasWhitelist extends CacheArray {
+class AliasWhitelist extends CacheArray implements DestructableInterface {
 
   /**
    * The Key/Value Store to use for state.
@@ -133,5 +134,20 @@ class AliasWhitelist extends CacheArray {
   public function clear() {
     parent::clear();
     $this->loadMenuPathRoots();
+  }
+
+  /**
+   * Implements Drupal\Core\DestructableInterface::destruct().
+   */
+  public function destruct() {
+    parent::__destruct();
+  }
+
+  /**
+   * Overrides \Drupal\Core\Utility\CacheArray::clear().
+   */
+  public function __destruct() {
+    // Do nothing to avoid segmentation faults. This can go away after the
+    // cache collector from http://drupal.org/node/1786490 is used.
   }
 }

@@ -129,7 +129,8 @@ class CoreBundle extends Bundle {
       ->addArgument('path_alias_whitelist')
       ->addArgument('cache')
       ->addArgument(new Reference('keyvalue'))
-      ->addArgument(new Reference('database'));
+      ->addArgument(new Reference('database'))
+      ->addTag('needs_destruction');
 
      $container->register('path.alias_manager', 'Drupal\Core\Path\AliasManager')
       ->addArgument(new Reference('database'))
