@@ -46,7 +46,8 @@ class PathProcessorTest extends PathUnitTestBase {
     $this->fixtures->createTables($connection);
 
     // Create dependecies needed by various path processors.
-    $alias_manager = new AliasManager($connection, $this->container->get('state'), $this->container->get('language_manager'));
+    $whitelist = new AliasWhitelist('path_alias_whitelist', 'cache', $this->container->get('keyvalue'), $connection);
+    $aliasManager = new AliasManager($connection, $whitelist, $this->container->get('language_manager'));
     $module_handler = $this->container->get('module_handler');
 
     // Create the processors.
