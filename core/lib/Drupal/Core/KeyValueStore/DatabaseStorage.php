@@ -129,7 +129,7 @@ class DatabaseStorage extends StorageBase {
    * Implements Drupal\Core\KeyValueStore\KeyValueStoreInterface::deleteAll().
    */
   public function deleteAll() {
-    db_delete($this->table)
+    $this->connection->delete($this->table)
       ->condition('collection', $this->collection)
       ->execute();
   }
