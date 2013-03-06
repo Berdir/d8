@@ -19,13 +19,6 @@ use Drupal\Core\Database\Query\Merge;
 class DatabaseStorageExpirable extends DatabaseStorage implements KeyValueStoreExpirableInterface {
 
   /**
-   * The connection object for this storage.
-   *
-   * @var Drupal\Core\Database\Connection
-   */
-  protected $connection;
-
-  /**
    * Flag indicating whether garbage collection should be performed.
    *
    * When this flag is TRUE, garbage collection happens at the end of the
