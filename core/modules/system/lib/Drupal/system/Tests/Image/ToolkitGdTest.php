@@ -8,6 +8,7 @@
 namespace Drupal\system\Tests\Image;
 
 use Drupal\simpletest\WebTestBase;
+use Drupal\system\Plugin\ImageToolkitManager;
 
 /**
  * Test the core GD image manipulation functions.
@@ -35,8 +36,9 @@ class ToolkitGdTest extends WebTestBase {
   }
 
   protected function checkRequirements() {
-    image_get_available_toolkits();
-    if (!function_exists('image_gd_check_settings') || !image_gd_check_settings()) {
+    $manager = new ImageToolkitManager();
+    $definition = $manager->getDefinition('gd');
+    if (!call_user_func($definition['class'] . '::isAvailable')) {
       return array(
         'Image manipulations for the GD toolkit cannot run because the GD toolkit is not available.',
       );
@@ -201,10 +203,11 @@ class ToolkitGdTest extends WebTestBase {
       );
     }
 
+    $manager = new ImageToolkitManager();
     foreach ($files as $file) {
       foreach ($operations as $op => $values) {
         // Load up a fresh image.
-        $image = image_load(drupal_get_path('module', 'simpletest') . '/files/' . $file, 'gd');
+        $image = image_load(drupal_get_path('module', 'simpletest') . '/files/' . $file, $manager->createInstance('gd'));
         if (!$image) {
           $this->fail(t('Could not load image %file.', array('%file' => $file)));
           continue 2;

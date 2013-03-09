@@ -302,6 +302,16 @@ class CoreBundle extends Bundle {
 
     $container->register('plugin.manager.condition', 'Drupal\Core\Condition\ConditionManager');
 
+    // Register image toolkit manager.
+    $container
+      ->register('image.toolkit.manager', 'Drupal\system\Plugin\ImageToolkitManager')
+      ->addArgument('%container.namespaces%');
+    // Register image toolkit.
+    $container
+      ->register('image.toolkit', 'Drupal\system\Plugin\ImageToolkitInterface')
+      ->setFactoryService('image.toolkit.manager')
+      ->setFactoryMethod('getDefaultToolkit');
+
     $container->register('kernel_destruct_subscriber', 'Drupal\Core\EventSubscriber\KernelDestructionSubscriber')
       ->addMethodCall('setContainer', array(new Reference('service_container')))
       ->addTag('event_subscriber');
