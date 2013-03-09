@@ -8,7 +8,7 @@
 namespace Drupal\image_test\Plugin\system\imagetoolkit;
 
 use Drupal\Component\Plugin\PluginBase;
-use Drupal\Core\Annotation\Plugin;
+use Drupal\Component\Annotation\Plugin;
 use Drupal\Core\Annotation\Translation;
 use Drupal\system\Plugin\ImageToolkitInterface;
 use stdClass;

@@ -36,7 +36,7 @@ class ToolkitGdTest extends WebTestBase {
   }
 
   protected function checkRequirements() {
-    $manager = new ImageToolkitManager();
+    $manager = new ImageToolkitManager($this->container->getParameter('container.namespaces'));
     $definition = $manager->getDefinition('gd');
     if (!call_user_func($definition['class'] . '::isAvailable')) {
       return array(
@@ -203,7 +203,7 @@ class ToolkitGdTest extends WebTestBase {
       );
     }
 
-    $manager = new ImageToolkitManager();
+    $manager = new ImageToolkitManager($this->container->getParameter('container.namespaces'));
     foreach ($files as $file) {
       foreach ($operations as $op => $values) {
         // Load up a fresh image.

@@ -7,7 +7,7 @@
 
 namespace Drupal\image_test\Plugin\system\imagetoolkit;
 
-use Drupal\Core\Annotation\Plugin;
+use Drupal\Component\Annotation\Plugin;
 use Drupal\Core\Annotation\Translation;
 
 /**
