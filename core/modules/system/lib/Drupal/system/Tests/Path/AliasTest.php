@@ -167,26 +167,27 @@ class AliasTest extends PathUnitTestBase {
     $this->assertNull($whitelist['user']);
     $this->assertNull($whitelist['admin']);
 
-    // Non-existing path roots should be NULL too.
-    $this->assertNull($whitelist['invalid']);
+    // Non-existing path roots should be NULL too. Use a length of 7 to avoid
+    // possible conflict with random aliases below.
+    $this->assertNull($whitelist[$this->randomName()]);
 
     // Add an alias for user/1, user should get whitelisted now.
-    $path->save('user/1', 'admin');
+    $path->save('user/1', $this->randomName());
     $this->assertTrue($whitelist['user']);
     $this->assertNull($whitelist['admin']);
-    $this->assertNull($whitelist['invalid']);
+    $this->assertNull($whitelist[$this->randomName()]);
 
     // Add an alias for admin, both should get whitelisted now.
-    $path->save('admin/something', 'admin');
+    $path->save('admin/something', $this->randomName());
     $this->assertTrue($whitelist['user']);
     $this->assertTrue($whitelist['admin']);
-    $this->assertNull($whitelist['invalid']);
+    $this->assertNull($whitelist[$this->randomName()]);
 
     // Remove the user alias again, whitelist entry should be removed.
     $path->delete(array('source' => 'user/1'));
     $this->assertNull($whitelist['user']);
     $this->assertTrue($whitelist['admin']);
-    $this->assertNull($whitelist['invalid']);
+    $this->assertNull($whitelist[$this->randomName()]);
 
   }
 }
