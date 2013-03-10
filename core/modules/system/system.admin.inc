@@ -7,6 +7,7 @@
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Drupal\Core\Datetime\DrupalDateTime;
 
@@ -298,7 +299,7 @@ function system_theme_enable() {
     else {
       drupal_set_message(t('The %theme theme was not found.', array('%theme' => $theme)), 'error');
     }
-    drupal_goto('admin/appearance');
+    return new RedirectResponse('admin/appearance');
   }
   throw new AccessDeniedHttpException();
 }
@@ -326,7 +327,7 @@ function system_theme_disable() {
     else {
       drupal_set_message(t('The %theme theme was not found.', array('%theme' => $theme)), 'error');
     }
-    drupal_goto('admin/appearance');
+    return new RedirectResponse('admin/appearance');
   }
   throw new AccessDeniedHttpException();
 }
@@ -375,7 +376,7 @@ function system_theme_default() {
     else {
       drupal_set_message(t('The %theme theme was not found.', array('%theme' => $theme)), 'error');
     }
-    drupal_goto('admin/appearance');
+    return new RedirectResponse('admin/appearance');
   }
   throw new AccessDeniedHttpException();
 }
@@ -1374,7 +1375,7 @@ function system_modules_uninstall_validate($form, &$form_state) {
   // Form submitted, but no modules selected.
   if (!count(array_filter($form_state['values']['uninstall']))) {
     drupal_set_message(t('No modules selected.'), 'error');
-    drupal_goto('admin/modules/uninstall');
+    return new RedirectResponse('admin/modules/uninstall');
   }
 }
 
@@ -1588,7 +1589,7 @@ function system_run_cron_submit($form, &$form_state) {
     drupal_set_message(t('Cron run failed.'), 'error');
   }
 
-  drupal_goto('admin/config/system/cron');
+  return new RedirectResponse('admin/config/system/cron');
 }
 
 /**
@@ -2099,7 +2100,7 @@ function system_run_cron() {
     drupal_set_message(t('Cron run failed.'), 'error');
   }
 
-  drupal_goto('admin/reports/status');
+  return new RedirectResponse('admin/reports/status');
 }
 
 /**

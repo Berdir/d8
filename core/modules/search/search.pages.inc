@@ -5,6 +5,8 @@
  * User page callbacks for the Search module.
  */
 
+use Symfony\Component\HttpFoundation\RedirectResponse;
+
 /**
  * Page callback: Presents the search form and/or search results.
  *
@@ -39,7 +41,7 @@ function search_view($module = NULL, $keys = '') {
     if ($keys) {
       $path .= '/' . $keys;
     }
-    drupal_goto($path);
+    return new RedirectResponse($path);
   }
 
   // Default results output is an empty string.

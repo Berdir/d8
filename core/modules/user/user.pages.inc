@@ -101,7 +101,7 @@ function user_pass_reset($form, &$form_state, $uid, $timestamp, $hashed_pass, $a
         drupal_set_message(t('The one-time login link you clicked is invalid.'));
       }
     }
-    drupal_goto();
+    return new RedirectResponse('<front>');
   }
   else {
     // Time out, in seconds, until login URL expires.
@@ -113,7 +113,7 @@ function user_pass_reset($form, &$form_state, $uid, $timestamp, $hashed_pass, $a
       // No time out for first time login.
       if ($account->login && $current - $timestamp > $timeout) {
         drupal_set_message(t('You have tried to use a one-time login link that has expired. Please request a new one using the form below.'));
-        drupal_goto('user/password');
+        return new RedirectResponse('user/password');
       }
       elseif ($account->uid && $timestamp >= $account->login && $timestamp <= $current && $hashed_pass == user_pass_rehash($account->pass, $timestamp, $account->login)) {
         // First stage is a confirmation form, then login
@@ -128,7 +128,7 @@ function user_pass_reset($form, &$form_state, $uid, $timestamp, $hashed_pass, $a
           // Let the user's password be changed without the current password check.
           $token = drupal_hash_base64(drupal_random_bytes(55));
           $_SESSION['pass_reset_' . $user->uid] = $token;
-          drupal_goto('user/' . $user->uid . '/edit', array('query' => array('pass-reset-token' => $token)));
+          return new RedirectResponse('user/' . $user->uid . '/edit', array('query' => array('pass-reset-token' => $token)));
         }
         else {
           $form['message'] = array('#markup' => t('<p>This is a one-time login for %user_name and will expire on %expiration_date.</p><p>Click on this button to log in to the site and change your password.</p>', array('%user_name' => $account->name, '%expiration_date' => format_date($timestamp + $timeout))));
@@ -141,7 +141,7 @@ function user_pass_reset($form, &$form_state, $uid, $timestamp, $hashed_pass, $a
       }
       else {
         drupal_set_message(t('You have tried to use a one-time login link that has either been used or is no longer valid. Please request a new one using the form below.'));
-        drupal_goto('user/password');
+        return new RedirectResponse('user/password');
       }
     }
     else {
@@ -165,7 +165,7 @@ function user_logout() {
   // Destroy the current session, and reset $user to the anonymous user.
   session_destroy();
 
-  drupal_goto();
+  return new RedirectResponse('<front>');
 }
 
 /**
@@ -388,7 +388,7 @@ function user_cancel_confirm($account, $timestamp = 0, $hashed_pass = '') {
     }
     else {
       drupal_set_message(t('You have tried to use an account cancellation link that has expired. Please request a new one using the form below.'));
-      drupal_goto("user/$account->uid/cancel");
+      return new RedirectResponse("user/$account->uid/cancel");
     }
   }
   throw new AccessDeniedHttpException();
@@ -403,7 +403,7 @@ function user_cancel_confirm($account, $timestamp = 0, $hashed_pass = '') {
 function user_page() {
   global $user;
   if ($user->uid) {
-    return new RedirectResponse(url('user/' . $user->uid, array('absolute' => TRUE)));
+    return new RedirectResponse('user/' . $user->uid);
   }
   else {
     return drupal_get_form('user_login_form');

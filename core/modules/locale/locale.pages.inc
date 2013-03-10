@@ -8,6 +8,7 @@
 use Drupal\locale\SourceString;
 use Drupal\locale\TranslationString;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
  * Page callback: Shows the string search screen.
@@ -479,7 +480,7 @@ function locale_translation_manual_status() {
   if (batch_get()) {
     batch_process('admin/reports/translations');
   }
-  drupal_goto('admin/reports/translations');
+  return new RedirectResponse('admin/reports/translations');
 }
 
 /**

@@ -142,8 +142,19 @@ class ViewSubscriber implements EventSubscriberInterface {
    */
   public function onHtml(GetResponseForControllerResultEvent $event) {
     $page_callback_result = $event->getControllerResult();
-    return new Response(drupal_render_page($page_callback_result));
-  }
+    // Handle early global redirects.
+    if ($redirect = drupal_set_redirect()) {
+      return $redirect;
+    }
+    $page = drupal_render_page($page_callback_result);
+    // Check for redirects that happened late, e.g. during forms built in
+    // preprocess functions.
+    // Handle global redirects.
+    if ($redirect = drupal_set_redirect()) {
+      return $redirect;
+    }
+    return new Response($page);
+    }
 
   /**
    * Registers the methods in this class that should be listeners.

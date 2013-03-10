@@ -5,6 +5,8 @@
  * Admin page callbacks for the Action module.
  */
 
+use Symfony\Component\HttpFoundation\RedirectResponse;
+
 /**
  * Menu callback; Displays an overview of available and configured actions.
  */
@@ -143,7 +145,7 @@ function action_admin_manage_form_submit($form, &$form_state) {
  */
 function action_admin_configure($form, &$form_state, $action = NULL) {
   if ($action === NULL) {
-    drupal_goto('admin/config/system/actions');
+    return new RedirectResponse('admin/config/system/actions');
   }
 
   $actions_map = action_actions_map(action_list());
@@ -292,5 +294,5 @@ function action_admin_delete_orphans_post($orphaned) {
  */
 function action_admin_remove_orphans() {
   action_synchronize(TRUE);
-  drupal_goto('admin/config/system/actions/manage');
+  return new RedirectResponse('admin/config/system/actions/manage');
 }

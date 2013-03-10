@@ -5,6 +5,8 @@
  * Page callbacks for simpletest module.
  */
 
+use Symfony\Component\HttpFoundation\RedirectResponse;
+
 /**
  * List tests arranged in groups that can be selected and run.
  */
@@ -204,16 +206,25 @@ function simpletest_test_form_submit($form, &$form_state) {
 }
 
 /**
+ * Page callback for the rest results.
+ *
+ * @param string $test_id
+ *   The ID of the executed test.
+ */
+function simpletest_test_result($test_id) {
+  // Make sure there are test results to display and a re-run is not being performed.
+  if (is_numeric($test_id) && !$results = simpletest_result_get($test_id)) {
+    drupal_set_message(t('No test results to display.'), 'error');
+    return new RedirectResponse('admin/config/development/testing');
+  }
+  return drupal_get_form('simpletest_result_form', $test_id);
+}
+
+/**
  * Test results form for $test_id.
  */
 function simpletest_result_form($form, &$form_state, $test_id) {
-  // Make sure there are test results to display and a re-run is not being performed.
-  $results = array();
-  if (is_numeric($test_id) && !$results = simpletest_result_get($test_id)) {
-    drupal_set_message(t('No test results to display.'), 'error');
-    drupal_goto('admin/config/development/testing');
-    return $form;
-  }
+  $results = simpletest_result_get($test_id);
 
   // Load all classes and include CSS.
   drupal_add_css(drupal_get_path('module', 'simpletest') . '/simpletest.css');

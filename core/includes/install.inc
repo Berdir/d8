@@ -858,7 +858,17 @@ function drupal_install_fix_file($file, $mask, $message = TRUE) {
 function install_goto($path) {
   global $base_url;
   include_once DRUPAL_ROOT . '/core/includes/common.inc';
-  header('Location: ' . $base_url . '/' . $path);
+
+  // TODO this is hacking around symfony's redirection giving us a fully
+  // qualified url. It's a quick hack to get things working but warrants a
+  // security review or a better implementation.
+  if (url_is_external($path)) {
+    $real_path = $path;
+  }
+  else {
+    $real_path = $base_url . '/' . $path;
+  }
+  header('Location: ' . $real_path);
   header('Cache-Control: no-cache'); // Not a permanent redirect.
   drupal_exit();
 }

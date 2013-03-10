@@ -8,6 +8,7 @@
 use Drupal\node\Plugin\Core\Entity\Node;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
  * Form constructor for the comment reply form.
@@ -47,7 +48,7 @@ function comment_reply(Node $node, $pid = NULL) {
     }
     else {
       drupal_set_message(t('You are not authorized to post comments.'), 'error');
-      drupal_goto("node/$node->nid");
+      return new RedirectResponse("node/$node->nid");
     }
   }
   else {
@@ -62,19 +63,19 @@ function comment_reply(Node $node, $pid = NULL) {
           if ($comment->nid->target_id != $node->nid) {
             // Attempting to reply to a comment not belonging to the current nid.
             drupal_set_message(t('The comment you are replying to does not exist.'), 'error');
-            drupal_goto("node/$node->nid");
+            return new RedirectResponse("node/$node->nid");
           }
           // Display the parent comment
           $build['comment_parent'] = comment_view($comment);
         }
         else {
           drupal_set_message(t('The comment you are replying to does not exist.'), 'error');
-          drupal_goto("node/$node->nid");
+          return new RedirectResponse("node/$node->nid");
         }
       }
       else {
         drupal_set_message(t('You are not authorized to view comments.'), 'error');
-        drupal_goto("node/$node->nid");
+        return new RedirectResponse("node/$node->nid");
       }
     }
     // This is the case where the comment is in response to a node. Display the node.
@@ -85,14 +86,14 @@ function comment_reply(Node $node, $pid = NULL) {
     // Should we show the reply box?
     if ($node->comment != COMMENT_NODE_OPEN) {
       drupal_set_message(t("This discussion is closed: you can't post new comments."), 'error');
-      drupal_goto("node/$node->nid");
+      return new RedirectResponse("node/$node->nid");
     }
     elseif (user_access('post comments')) {
       $build['comment_form'] = comment_add($node, $pid);
     }
     else {
       drupal_set_message(t('You are not authorized to post comments.'), 'error');
-      drupal_goto("node/$node->nid");
+      return new RedirectResponse("node/$node->nid");
     }
   }
 
@@ -121,7 +122,7 @@ function comment_approve($cid) {
     comment_save($comment);
 
     drupal_set_message(t('Comment approved.'));
-    drupal_goto('node/' . $comment->nid->target_id);
+    return new RedirectResponse('node/' . $comment->nid->value);
   }
   throw new NotFoundHttpException();
 }

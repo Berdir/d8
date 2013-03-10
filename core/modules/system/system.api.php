@@ -3056,17 +3056,17 @@ function hook_install_tasks(&$install_state) {
 }
 
 /**
- * Change the page the user is sent to by drupal_goto().
+ * Change the page the user is sent to within a RedirectResponse.
  *
  * @param $path
  *   A Drupal path or a full URL.
  * @param $options
  *   An associative array of additional URL options to pass to url().
  * @param $http_response_code
- *   The HTTP status code to use for the redirection. See drupal_goto() for more
- *   information.
+ *   The HTTP status code to use for the redirection. See RedirectResponse for
+ *   more information.
  */
-function hook_drupal_goto_alter(&$path, &$options, &$http_response_code) {
+function hook_redirect_response_alter(&$path, &$options, &$http_response_code) {
   // A good addition to misery module.
   $http_response_code = 500;
 }

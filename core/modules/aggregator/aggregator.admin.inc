@@ -6,6 +6,7 @@
  */
 
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Drupal\aggregator\Plugin\Core\Entity\Feed;
 
 /**
@@ -320,7 +321,7 @@ function aggregator_admin_refresh_feed(Feed $feed) {
   }
 
   aggregator_refresh($feed);
-  drupal_goto('admin/config/services/aggregator');
+  return new RedirectResponse('admin/config/services/aggregator');
 }
 
 /**

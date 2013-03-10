@@ -279,6 +279,8 @@ class CoreBundle extends Bundle {
     $container->register('request_close_subscriber', 'Drupal\Core\EventSubscriber\RequestCloseSubscriber')
       ->addArgument(new Reference('module_handler'))
       ->addTag('event_subscriber');
+    $container->register('response_subscriber', 'Drupal\Core\EventSubscriber\ResponseSubscriber')
+    ->addTag('event_subscriber');
     $container->register('config_global_override_subscriber', 'Drupal\Core\EventSubscriber\ConfigGlobalOverrideSubscriber')
       ->addTag('event_subscriber');
     $container->register('language_request_subscriber', 'Drupal\Core\EventSubscriber\LanguageRequestSubscriber')

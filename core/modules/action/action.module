@@ -23,6 +23,8 @@
  * @} End of "defgroup actions".
  */
 
+use Symfony\Component\HttpFoundation\RedirectResponse;
+
 /**
  * Implements hook_help().
  */
@@ -708,5 +710,5 @@ function action_goto_action_submit($form, $form_state) {
  * @ingroup actions.
  */
 function action_goto_action($entity, $context) {
-  drupal_goto(token_replace($context['url'], $context));
+  return new RedirectResponse(token_replace($context['url'], 302, $context));
 }

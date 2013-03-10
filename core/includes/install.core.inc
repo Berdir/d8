@@ -557,7 +557,10 @@ function install_run_task($task, &$install_state) {
       }
       // Process the batch. For progressive batches, this will redirect.
       // Otherwise, the batch will complete.
-      batch_process(install_redirect_url($install_state), install_full_redirect_url($install_state));
+      $return = batch_process(install_redirect_url($install_state), install_full_redirect_url($install_state));
+      if (is_a($return, 'Symfony\Component\HttpFoundation\RedirectResponse')) {
+        install_goto($return->getTargetUrl());
+      }
     }
     // If we are in the middle of processing this batch, keep sending back
     // any output from the batch process, until the task is complete.

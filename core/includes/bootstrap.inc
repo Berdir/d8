@@ -12,6 +12,7 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException as DependencyInjectionRuntimeException;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Lock\DatabaseLockBackend;
 use Drupal\Core\Lock\LockBackendInterface;
@@ -3476,6 +3477,22 @@ function drupal_check_memory_limit($required, $memory_limit = NULL) {
   // - The memory limit is greater than or equal to the memory required for
   //   the operation.
   return ((!$memory_limit) || ($memory_limit == -1) || (parse_size($memory_limit) >= parse_size($required)));
+}
+
+/**
+ * Set a redirect response.
+ *
+ * This should only be used if there is no other way to return the response
+ * as the page callback.
+ *
+ * @param \Symfony\Component\HttpFoundation\RedirectResponse $response
+ */
+function drupal_set_redirect(RedirectResponse $response = NULL) {
+  $stored_response = &drupal_static(__FUNCTION__);
+  if ($response) {
+    $stored_response = $response;
+  }
+  return $stored_response;
 }
 
 /**

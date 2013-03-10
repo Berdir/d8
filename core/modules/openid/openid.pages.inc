@@ -5,6 +5,8 @@
  * User page callbacks for the openid module.
  */
 
+use Symfony\Component\HttpFoundation\RedirectResponse;
+
 /**
  * Menu callback; Process an OpenID authentication.
  */
@@ -20,7 +22,7 @@ function openid_authentication_page() {
       drupal_set_message(t('OpenID login cancelled.'));
       break;
   }
-  drupal_goto();
+  return new RedirectResponse('<front>');
 }
 
 /**

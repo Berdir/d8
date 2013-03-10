@@ -11,6 +11,7 @@ use Drupal\Core\TypedData\Primitive;
 use Drupal\system\Plugin\block\block\SystemMenuBlock;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
  * Maximum age of temporary files in seconds.
@@ -2328,8 +2329,8 @@ function _system_themes_access($theme) {
  * or to call system_authorized_init() and then redirect to authorize.php,
  * using the URL from system_authorized_get_url(). Redirecting yourself is
  * necessary when your authorized operation is being triggered by a form
- * submit handler, since calling drupal_goto() in a submit handler is a bad
- * idea, and you should instead set $form_state['redirect'].
+ * submit handler, since calling new RedirectResponse in a submit handler is a
+ * bad idea, and you should instead set $form_state['redirect'].
  *
  * Once the SESSION is setup for the operation and the user is redirected to
  * authorize.php, they will be prompted for their connection credentials (core
@@ -2356,7 +2357,7 @@ function _system_themes_access($theme) {
  * not to assume any code exists. Example (system_authorized_run()):
  * @code
  *   system_authorized_init($callback, $file, $arguments, $page_title);
- *   drupal_goto(system_authorized_get_url());
+ *   return new RedirectResponse(system_authorized_get_url());
  * @endcode
  * Example (update_manager_install_form_submit()):
  * @code
@@ -2429,7 +2430,7 @@ function system_authorized_batch_processing_url() {
  */
 function system_authorized_run($callback, $file, $arguments = array(), $page_title = NULL) {
   system_authorized_init($callback, $file, $arguments, $page_title);
-  drupal_goto(system_authorized_get_url());
+  return new RedirectResponse(system_authorized_get_url());
 }
 
 /**
@@ -3440,7 +3441,7 @@ function system_admin_compact_mode() {
  */
 function system_admin_compact_page($mode = 'off') {
   user_cookie_save(array('admin_compact_mode' => ($mode == 'on')));
-  drupal_goto();
+  return new RedirectResponse('<front>');
 }
 
 /**

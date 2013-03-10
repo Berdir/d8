@@ -1057,7 +1057,7 @@ function user_menu() {
 /**
  * Implements hook_menu_site_status_alter().
  */
-function user_menu_site_status_alter(&$menu_site_status, $path) {
+function user_menu_site_status_alter(&$menu_site_status, $path, &$redirect_path) {
   if ($menu_site_status == MENU_SITE_OFFLINE) {
     // If the site is offline, log out unprivileged users.
     if (user_is_logged_in() && !user_access('access site in maintenance mode')) {
@@ -1069,7 +1069,8 @@ function user_menu_site_status_alter(&$menu_site_status, $path) {
       switch ($path) {
         case 'user':
           // Forward anonymous user to login page.
-          drupal_goto('user/login');
+          $redirect_path = 'user/login';
+          break;
         case 'user/login':
         case 'user/password':
           // Disable offline mode.
@@ -1087,11 +1088,11 @@ function user_menu_site_status_alter(&$menu_site_status, $path) {
   if (user_is_logged_in()) {
     if ($path == 'user/login') {
       // If user is logged in, redirect to 'user' instead of giving 403.
-      drupal_goto('user');
+      $redirect_path = 'user';
     }
     if ($path == 'user/register') {
       // Authenticated user should be redirected to user edit page.
-      drupal_goto('user/' . $GLOBALS['user']->uid . '/edit');
+      $redirect_path = 'user/' . $GLOBALS['user']->uid . '/edit';
     }
   }
 }
@@ -2143,7 +2144,7 @@ function user_multiple_cancel_confirm($form, &$form_state) {
     drupal_set_message($message, $redirect ? 'error' : 'warning');
     // If only user 1 was selected, redirect to the overview.
     if ($redirect) {
-      drupal_goto('admin/people');
+      return new RedirectResponse('admin/people');
     }
   }
 

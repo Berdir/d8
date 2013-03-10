@@ -5,6 +5,8 @@
  * Implement OpenID Relying Party support for Drupal
  */
 
+use Symfony\Component\HttpFoundation\RedirectResponse;
+
 /**
  * Implements hook_menu().
  */
@@ -785,7 +787,7 @@ function openid_authentication($response) {
     }
     else {
       module_invoke_all('openid_response', $response, $form_state['user']);
-      drupal_goto();
+      return new RedirectResponse();
     }
 
     $messages = drupal_get_messages('error');
@@ -807,13 +809,13 @@ function openid_authentication($response) {
     // registration page and prefill with the values we received.
     $destination = drupal_get_destination();
     unset($_GET['destination']);
-    drupal_goto('user/register', array('query' => $destination));
+    return new RedirectResponse(array('user/register', array('query' => $destination)));
   }
   else {
     drupal_set_message(t('Only site administrators can create new user accounts.'), 'error');
     module_invoke_all('openid_response', $response, NULL);
   }
-  drupal_goto();
+  return new RedirectResponse('<front>');
 }
 
 function openid_association_request($public) {

@@ -14,7 +14,8 @@
  * @see batch_get()
  */
 
-use \Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
  * Loads a batch from the database.
@@ -54,7 +55,7 @@ function _batch_page() {
     $batch = batch_load($_REQUEST['id']);
     if (!$batch) {
       drupal_set_message(t('No active batch.'), 'error');
-      drupal_goto();
+      return new RedirectResponse('<front>');
     }
   }
 
@@ -469,6 +470,9 @@ function _batch_finished() {
 
     // Use drupal_redirect_form() to handle the redirection logic.
     drupal_redirect_form($_batch['form_state']);
+    if ($redirect = drupal_set_redirect()) {
+      return $redirect;
+    }
 
     // If no redirection happened, redirect to the originating page. In case the
     // form needs to be rebuilt, save the final $form_state for

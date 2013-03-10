@@ -8,6 +8,7 @@
 namespace Drupal\user;
 
 use Drupal\Core\Entity\EntityInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
  * Form controller for the user register forms.
@@ -32,7 +33,7 @@ class RegisterFormController extends AccountFormController {
 
     // If we aren't admin but already logged on, go to the user page instead.
     if (!$admin && $user->uid) {
-      drupal_goto('user/' . $user->uid);
+      return new RedirectResponse('user/' . $user->uid);
     }
 
     $form['#attached']['library'][] = array('system', 'jquery.cookie');

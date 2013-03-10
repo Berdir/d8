@@ -7,6 +7,7 @@
 
 use Drupal\Core\Language\Language;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
  * User interface for the language overview screen.
@@ -297,7 +298,7 @@ function language_admin_delete_form($form, &$form_state, $language) {
 
   if (language_default()->langcode == $langcode) {
     drupal_set_message(t('The default language cannot be deleted.'));
-    drupal_goto('admin/config/regional/language');
+    return new RedirectResponse('admin/config/regional/language');
   }
 
   // For other languages, warn the user that data loss is ahead.

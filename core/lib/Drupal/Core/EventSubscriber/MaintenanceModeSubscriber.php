@@ -8,6 +8,7 @@
 namespace Drupal\Core\EventSubscriber;
 
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -30,10 +31,14 @@ class MaintenanceModeSubscriber implements EventSubscriberInterface {
     // Allow other modules to change the site status but not the path. The path
     // can be changed using a request listener.
     $read_only_path = $event->getRequest()->attributes->get('system_path');
-    drupal_alter('menu_site_status', $status, $read_only_path);
+    $redirect_path = $read_only_path;
+    drupal_alter('menu_site_status', $status, $read_only_path, $redirect_path);
+    if ($redirect_path != $read_only_path) {
+      $event->setResponse(new RedirectResponse($redirect_path));
+    }
 
     // Only continue if the site is online.
-    if ($status != MENU_SITE_ONLINE) {
+    elseif ($status != MENU_SITE_ONLINE) {
       // Deliver the 503 page.
       drupal_maintenance_theme();
       drupal_set_title(t('Site under maintenance'));

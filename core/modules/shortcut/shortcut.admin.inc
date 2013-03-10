@@ -6,6 +6,7 @@
  */
 
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
  * Form callback: builds the form for switching shortcut sets.
@@ -601,7 +602,7 @@ function shortcut_link_add_inline($shortcut_set) {
     else {
       drupal_set_message(t('Unable to add a shortcut for %title.', array('%title' => $link['link_title'])));
     }
-    drupal_goto();
+    return new RedirectResponse('<front>');
   }
 
   throw new AccessDeniedHttpException();

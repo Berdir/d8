@@ -7,6 +7,7 @@
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
  * Implements hook_help().
@@ -146,7 +147,7 @@ function overlay_init() {
     // <front>#overlay=admin/modules to actually enable the overlay.
     if (isset($_SESSION['overlay_enable_redirect']) && $_SESSION['overlay_enable_redirect']) {
       unset($_SESSION['overlay_enable_redirect']);
-      drupal_goto('<front>', array('fragment' => 'overlay=' . $current_path));
+      return new RedirectResponse(array('<front>', array('fragment' => 'overlay=' . $current_path)));
     }
 
     if (isset($_GET['render']) && $_GET['render'] == 'overlay') {
@@ -252,9 +253,11 @@ function overlay_library_info() {
 }
 
 /**
- * Implements hook_drupal_goto_alter().
+ * Implements hook_redirect_response_alter().
+ *
+ * @todo convert this to an event subscriber?
  */
-function overlay_drupal_goto_alter(&$path, &$options, &$http_response_code) {
+function overlay_redirect_response_alter(&$path, &$options, &$http_response_code) {
   if (overlay_get_mode() == 'child') {
     // The authorize.php script bootstraps Drupal to a very low level, where
     // the PHP code that is necessary to close the overlay properly will not be
@@ -368,7 +371,7 @@ function overlay_user_dismiss_message() {
   drupal_container()->get('user.data')->set('overlay', $user->uid, 'message_dismissed', 1);
   drupal_set_message(t('The message has been dismissed. You can change your overlay settings at any time by visiting your profile page.'));
   // Destination is normally given. Go to the user profile as a fallback.
-  drupal_goto('user/' . $user->uid . '/edit');
+  return new RedirectResponse('user/' . $user->uid . '/edit');
 }
 
 /**

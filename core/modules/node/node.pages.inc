@@ -10,6 +10,7 @@
  */
 
 use Drupal\node\Plugin\Core\Entity\Node;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
  * Page callback: Presents the node editing form.
@@ -50,7 +51,7 @@ function node_add_page() {
   // Bypass the node/add listing if only one content type is available.
   if (count($content) == 1) {
     $type = array_shift($content);
-    drupal_goto('node/add/' . $type->type);
+    return new RedirectResponse('node/add/' . $type->type);
   }
   return array('#theme' => 'node_add_list', '#content' => $content);
 }

@@ -311,7 +311,7 @@ function _openid_test_endpoint_authenticate() {
       'openid.mode' => 'error',
       'openid.error' => 'Unexpted identity',
     );
-    return new RedirectResponse(url($_REQUEST['openid_return_to'], array('query' => $response, 'external' => TRUE)));
+    return new RedirectResponse(array($_REQUEST['openid_return_to'], array('query' => $response, 'external' => TRUE)));
   }
 
   // Generate unique identifier for this authentication.
