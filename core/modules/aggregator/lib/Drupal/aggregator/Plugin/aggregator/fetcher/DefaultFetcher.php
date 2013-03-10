@@ -30,7 +30,7 @@ class DefaultFetcher implements FetcherInterface {
    * Implements Drupal\aggregator\Plugin\FetcherInterface::fetch().
    */
   function fetch(Feed $feed) {
-    $request = drupal_container()->get('http_default_client')->get($feed->url->value);
+    $request = \Drupal::httpClient()->get($feed->url->value);
     $feed->source_string = FALSE;
 
     // Generate conditional GET headers.
