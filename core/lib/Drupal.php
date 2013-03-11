@@ -144,8 +144,8 @@ class Drupal {
    * Retrieves a configuration object.
    *
    * This is the main entry point to the configuration API. Calling
-   * @code config('book.admin') @endcode will return a configuration object in
-   * which the book module can store its administrative settings.
+   * @code Drupal::config('book.admin') @endcode will return a configuration
+   * object in which the book module can store its administrative settings.
    *
    * @param string $name
    *   The name of the configuration object to retrieve. The name corresponds to
@@ -160,7 +160,7 @@ class Drupal {
   }
 
   /**
-   * Instantiates and statically caches the correct class for a queue.
+   * Returns a queue for the given queue name.
    *
    * The following variables can be set by variable_set or $conf overrides:
    * - queue_class_$name: The class to be used for the queue $name.
@@ -255,6 +255,20 @@ class Drupal {
    */
   public static function moduleHandler() {
     return static::$container->get('module_handler');
+  }
+
+  /**
+   * Returns the typed data manager service.
+   *
+   * Use the typed data manager service for creating typed data objects.
+   *
+   * @return \Drupal\Core\TypedData\TypedDataManager
+   *   The typed data manager.
+   *
+   * @see \Drupal\Core\TypedData\TypedDataManager::create()
+   */
+  function typedData() {
+    return static::$container->get('typed_data');
   }
 
 }

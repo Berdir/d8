@@ -30,6 +30,7 @@ class DefaultFetcher implements FetcherInterface {
    * Implements Drupal\aggregator\Plugin\FetcherInterface::fetch().
    */
   function fetch(Feed $feed) {
+    // @todo: Inject the http client.
     $request = \Drupal::httpClient()->get($feed->url->value);
     $feed->source_string = FALSE;
 

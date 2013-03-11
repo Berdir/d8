@@ -1302,7 +1302,7 @@ function user_login_name_validate($form, &$form_state) {
 function user_login_authenticate_validate($form, &$form_state) {
   $password = trim($form_state['values']['pass']);
   $flood_config = config('user.flood');
-  $flood = Drupal::flood();
+  $flood = Drupal::service('flood');
   if (!empty($form_state['values']['name']) && !empty($password)) {
     // Do not allow any login from the current user's IP if the limit has been
     // reached. Default is 50 failed attempts allowed in one hour. This is
@@ -1350,7 +1350,7 @@ function user_login_authenticate_validate($form, &$form_state) {
  */
 function user_login_final_validate($form, &$form_state) {
   $flood_config = config('user.flood');
-  $flood = Drupal::flood();
+  $flood = Drupal::service('flood');
   if (empty($form_state['uid'])) {
     // Always register an IP-based failed login event.
     $flood->register('user.failed_login_ip', $flood_config->get('ip_window'));
