@@ -45,11 +45,6 @@ class FeedStorageController extends DatabaseStorageControllerNG {
    */
   protected function preDelete($entities) {
     parent::preDelete($entities);
-
-    // Invalidate the block cache to update aggregator feed-based derivatives.
-    if (module_exists('block')) {
-      drupal_container()->get('plugin.manager.block')->clearCachedDefinitions();
-    }
     foreach ($entities as $entity) {
       $iids = db_query('SELECT iid FROM {aggregator_item} WHERE fid = :fid', array(':fid' => $entity->id()))->fetchCol();
       if ($iids) {
@@ -66,6 +61,7 @@ class FeedStorageController extends DatabaseStorageControllerNG {
 
     foreach ($entities as $entity) {
       // Make sure there is no active block for this feed.
+      // @todo: How can we check the settings here?
       $block_configs = config_get_storage_names_with_prefix('plugin.core.block');
       foreach ($block_configs as $config_id) {
         $config = config($config_id);
@@ -81,11 +77,6 @@ class FeedStorageController extends DatabaseStorageControllerNG {
    */
   protected function preSave(EntityInterface $entity) {
     parent::preSave($entity);
-
-    // Invalidate the block cache to update aggregator feed-based derivatives.
-    if (module_exists('block')) {
-      drupal_container()->get('plugin.manager.block')->clearCachedDefinitions();
-    }
     // An existing feed is being modified, delete the category listings.
     db_delete('aggregator_category_feed')
       ->condition('fid', $entity->id())
@@ -180,11 +171,6 @@ class FeedStorageController extends DatabaseStorageControllerNG {
     $fields['modified'] = array(
       'label' => t('Modified'),
       'description' => t('When the feed was last modified, as a Unix timestamp.'),
-      'type' => 'integer_field',
-    );
-    $fields['block'] = array(
-      'label' => t('Block'),
-      'description' => t('Number of items to display in the feed’s block.'),
       'type' => 'integer_field',
     );
     return $fields;

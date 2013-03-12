@@ -27,7 +27,7 @@ function aggregator_admin_overview() {
  *   The page HTML.
  */
 function aggregator_view() {
-  $result = db_query('SELECT f.fid, f.title, f.url, f.refresh, f.checked, f.link, f.description, f.hash, f.etag, f.modified, f.image, f.block, COUNT(i.iid) AS items FROM {aggregator_feed} f LEFT JOIN {aggregator_item} i ON f.fid = i.fid GROUP BY f.fid, f.title, f.url, f.refresh, f.checked, f.link, f.description, f.hash, f.etag, f.modified, f.image, f.block ORDER BY f.title');
+  $result = db_query('SELECT f.fid, f.title, f.url, f.refresh, f.checked, f.link, f.description, f.hash, f.etag, f.modified, f.image, COUNT(i.iid) AS items FROM {aggregator_feed} f LEFT JOIN {aggregator_item} i ON f.fid = i.fid GROUP BY f.fid, f.title, f.url, f.refresh, f.checked, f.link, f.description, f.hash, f.etag, f.modified, f.image ORDER BY f.title');
 
   $output = '<h3>' . t('Feed overview') . '</h3>';
 
@@ -102,7 +102,6 @@ function aggregator_view() {
 function aggregator_feed_add() {
   $feed = entity_create('aggregator_feed', array(
     'refresh' => 3600,
-    'block' => 5,
   ));
   return entity_get_form($feed);
 }
@@ -170,12 +169,6 @@ function aggregator_form_opml($form, &$form_state) {
     '#default_value' => 3600,
     '#options' => $period,
     '#description' => t('The length of time between feed updates. Requires a correctly configured <a href="@cron">cron maintenance task</a>.', array('@cron' => url('admin/reports/status'))),
-  );
-  $form['block'] = array('#type' => 'select',
-    '#title' => t('News items in block'),
-    '#default_value' => 5,
-    '#options' => drupal_map_assoc(array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20)),
-    '#description' => t("Drupal can make a block with the most recent news items of a feed. You can <a href=\"@block-admin\">configure blocks</a> to be displayed in the sidebar of your page. This setting lets you configure the number of news items to show in a feed's block. If you choose '0' these feeds' blocks will be disabled.", array('@block-admin' => url('admin/structure/block'))),
   );
 
   // Handling of categories.
@@ -260,7 +253,6 @@ function aggregator_form_opml_submit($form, &$form_state) {
       'title' => $feed['title'],
       'url' => $feed['url'],
       'refresh' => $form_state['values']['refresh'],
-      'block' => $form_state['values']['block'],
     ));
     $new_feed->categories = $form_state['values']['category'];
     $new_feed->save();

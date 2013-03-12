@@ -17,7 +17,7 @@ use Drupal\Core\Annotation\Translation;
  * @Plugin(
  *   id = "aggregator_feed_block",
  *   admin_label = @Translation("Aggregator feed"),
- *   module = "aggregator",
+ *   module = "aggregator"
  * )
  */
 class AggregatorFeedBlock extends BlockBase {
