@@ -407,6 +407,7 @@ class EntityCrudHookTest extends EntityUnitTestBase {
    */
   public function testTaxonomyVocabularyHooks() {
     $this->installSchema('taxonomy', array('taxonomy_term_data', 'taxonomy_term_hierarchy'));
+    $this->installSchema('system', 'variable');
 
     $vocabulary = entity_create('taxonomy_vocabulary', array(
       'name' => 'Test vocabulary',

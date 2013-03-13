@@ -7,8 +7,6 @@
 
 namespace Drupal\entity_reference\Plugin\field\widget;
 
-use Drupal\Component\Annotation\Plugin;
-use Drupal\Core\Annotation\Translation;
 use Drupal\field\Plugin\Type\Widget\WidgetBase;
 
 /**
@@ -44,7 +42,6 @@ abstract class AutocompleteWidgetBase extends WidgetBase {
       '#default_value' => $this->getSetting('placeholder'),
       '#description' => t('Text that will be shown inside the field until a value is entered. This hint is usually a sample value or a brief description of the expected format.'),
     );
-
 
     return $element;
   }

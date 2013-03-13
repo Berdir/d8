@@ -73,13 +73,16 @@ class EntityReferenceItem extends FieldItemBase {
     if (isset($values['target_id'])) {
       $this->properties['target_id']->setValue($values['target_id']);
     }
+    elseif (isset($values['revision_id'])) {
+      $this->properties['revision_id']->setValue($values['revision_id']);
+    }
     elseif (isset($values['entity'])) {
       $this->properties['entity']->setValue($values['entity']);
     }
     else {
       $this->properties['entity']->setValue(NULL);
     }
-    unset($values['entity'], $values['target_id']);
+    unset($values['entity'], $values['target_id'], $values['revision_id']);
     if ($values) {
       throw new \InvalidArgumentException('Property ' . key($values) . ' is unknown.');
     }

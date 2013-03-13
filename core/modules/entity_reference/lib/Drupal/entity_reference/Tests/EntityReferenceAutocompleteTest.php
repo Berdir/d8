@@ -116,5 +116,13 @@ class EntityReferenceAutocompleteTest extends TaxonomyTestBase {
     }
     $target = array($n => '<div class="reference-autocomplete">' . check_plain($third_term->name) . '</div>');
     $this->assertRaw(drupal_json_encode($target), 'Autocomplete returns a term containing a comma and a slash.');
+
+    // Try to autocomplete using a nonexistent field.
+    $field_name = $this->randomName();
+    $tag = $this->randomName();
+    $message = t("Taxonomy field @field_name not found.", array('@field_name' => $field_name));
+    $this->assertFalse(field_info_field($field_name), format_string('Field %field_name does not exist.', array('%field_name' => $field_name)));
+    $this->drupalGet('entity_reference/autocomplete/single/' . $field_name . '/node/article/NULL', array('query' => array('q' => $tag)));
+    $this->assertResponse('403', 'Autocomplete returns correct HTTP response code when the taxonomy field does not exist.');
   }
 }

@@ -41,7 +41,10 @@ class ManageFieldsTest extends FieldUiTestBase {
 
     $field = array(
       'field_name' => 'field_' . $vocabulary->id(),
-      'type' => 'taxonomy_term_reference',
+      'type' => 'entity_reference',
+      'settings' => array(
+        'target_type' => 'taxonomy_term',
+      ),
     );
     field_create_field($field);
 
@@ -397,7 +400,7 @@ class ManageFieldsTest extends FieldUiTestBase {
     $edit = array(
       'fields[_add_new_field][field_name]' => 'tags',
       'fields[_add_new_field][label]' => $this->randomName(),
-      'fields[_add_new_field][type]' => 'taxonomy_term_reference',
+      'fields[_add_new_field][type]' => 'entity_reference',
       'fields[_add_new_field][widget_type]' => 'options_select',
     );
     $url = 'admin/structure/types/manage/' . $this->type . '/fields';
@@ -414,15 +417,15 @@ class ManageFieldsTest extends FieldUiTestBase {
     $url_fields = 'admin/structure/types/manage/article/fields';
     $url_tags_widget = $url_fields . '/field_tags/widget-type';
 
-    // Check that the field_tags field currently uses the 'options_select'
+    // Check that the field_tags field currently uses the 'entity_reference_autocomplete'
     // widget.
     $instance = field_info_instance('node', 'field_tags', 'article');
-    $this->assertEqual($instance['widget']['type'], 'options_select');
+    $this->assertEqual($instance['widget']['type'], 'entity_reference_autocomplete');
 
     // Check that the "Manage fields" page shows the correct widget type.
     $this->drupalGet($url_fields);
     $link = current($this->xpath('//a[contains(@href, :href)]', array(':href' => $url_tags_widget)));
-    $this->assertEqual((string) $link, 'Select list');
+    $this->assertEqual((string) $link, 'Autocomplete');
 
     // Go to the 'Widget type' form and check that the correct widget is
     // selected.

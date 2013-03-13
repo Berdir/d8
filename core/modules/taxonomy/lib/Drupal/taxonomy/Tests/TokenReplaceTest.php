@@ -29,15 +29,10 @@ class TokenReplaceTest extends TaxonomyTestBase {
 
     $field = array(
       'field_name' => 'taxonomy_' . $this->vocabulary->id(),
-      'type' => 'taxonomy_term_reference',
+      'type' => 'entity_reference',
       'cardinality' => FIELD_CARDINALITY_UNLIMITED,
       'settings' => array(
-        'allowed_values' => array(
-          array(
-            'vocabulary' => $this->vocabulary->id(),
-            'parent' => 0,
-          ),
-        ),
+        'target_type' => 'taxonomy_term',
       ),
     );
     field_create_field($field);
@@ -49,11 +44,20 @@ class TokenReplaceTest extends TaxonomyTestBase {
       'widget' => array(
         'type' => 'options_select',
       ),
+      'settings' => array(
+        'handler' => 'default',
+        'handler_settings' => array(
+          'target_bundles' => array(
+            $this->vocabulary->id(),
+          ),
+          'auto_create' => TRUE,
+        ),
+      ),
     );
     field_create_instance($this->instance);
     entity_get_display('node', 'article', 'default')
       ->setComponent('taxonomy_' . $this->vocabulary->id(), array(
-        'type' => 'taxonomy_term_reference_link',
+        'type' => 'entity_reference_label',
       ))
       ->save();
   }

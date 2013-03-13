@@ -19,7 +19,7 @@ abstract class TaxonomyTestBase extends WebTestBase {
    *
    * @var array
    */
-  public static $modules = array('taxonomy');
+  public static $modules = array('entity_reference', 'taxonomy');
 
   function setUp() {
     parent::setUp();

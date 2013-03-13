@@ -107,16 +107,11 @@ function standard_install() {
 
   $field = array(
     'field_name' => 'field_' . $vocabulary->id(),
-    'type' => 'taxonomy_term_reference',
+    'type' => 'entity_reference',
     // Set cardinality to unlimited for tagging.
     'cardinality' => FIELD_CARDINALITY_UNLIMITED,
     'settings' => array(
-      'allowed_values' => array(
-        array(
-          'vocabulary' => $vocabulary->id(),
-          'parent' => 0,
-        ),
-      ),
+      'target_type' => 'taxonomy_term',
     ),
   );
   field_create_field($field);
@@ -128,8 +123,17 @@ function standard_install() {
     'bundle' => 'article',
     'description' => $vocabulary->help,
     'widget' => array(
-      'type' => 'taxonomy_autocomplete',
+      'type' => 'entity_reference_autocomplete_tags',
       'weight' => -4,
+    ),
+    'settings' => array(
+      'handler' => 'default',
+      'handler_settings' => array(
+        'target_bundles' => array(
+          $vocabulary->id(),
+        ),
+        'auto_create' => TRUE,
+      ),
     ),
   );
   field_create_instance($instance);
@@ -137,13 +141,15 @@ function standard_install() {
   // Assign display settings for the 'default' and 'teaser' view modes.
   entity_get_display('node', 'article', 'default')
     ->setComponent($instance['field_name'], array(
-      'type' => 'taxonomy_term_reference_link',
+      'type' => 'entity_reference_label',
+      'settings' => array('link' => TRUE),
       'weight' => 10,
     ))
     ->save();
   entity_get_display('node', 'article', 'teaser')
     ->setComponent($instance['field_name'], array(
-      'type' => 'taxonomy_term_reference_link',
+      'type' => 'entity_reference_label',
+      'settings' => array('link' => TRUE),
       'weight' => 10,
     ))
     ->save();

@@ -58,7 +58,7 @@ class SupportsSerializationTest extends WebTestBase {
     $supportedEntity = entity_create('entity_test', array());
     $unsupportedEntity = new ConfigEntityTest();
     $field = $supportedEntity->get('uuid');
-    $entityreferenceField = $supportedEntity->get('user_id');
+    $entityReferenceField = $supportedEntity->get('user_id');
 
     // Supported entity.
     $this->assertTrue($this->normalizers['entity']->supportsNormalization($supportedEntity, static::$format), "Entity normalization is supported for $format on content entities.");
@@ -68,7 +68,7 @@ class SupportsSerializationTest extends WebTestBase {
     // Field item.
     $this->assertTrue($this->normalizers['field_item']->supportsNormalization($field->offsetGet(0), static::$format), "Field item normalization is supported for $format.");
     // Entity reference field item.
-    $this->assertTrue($this->normalizers['entityreference']->supportsNormalization($entityreferenceField->offsetGet(0), static::$format), "Entity reference field item normalization is supported for $format.");
+    $this->assertTrue($this->normalizers['entity_reference']->supportsNormalization($entityReferenceField->offsetGet(0), static::$format), "Entity reference field item normalization is supported for $format.");
   }
 
   /**
@@ -80,7 +80,7 @@ class SupportsSerializationTest extends WebTestBase {
     $supportedEntityClass = 'Drupal\Core\Entity\EntityNG';
     $unsupportedEntityClass = 'Drupal\config\Tests\ConfigEntityTest';
     $fieldClass = 'Drupal\Core\Entity\Field\Type\StringItem';
-    $entityreferenceFieldClass = 'Drupal\Core\Entity\Field\Type\EntityReferenceItem';
+    $entityReferenceFieldClass = 'Drupal\Core\Entity\Field\Type\EntityReferenceItem';
 
     // Supported entity.
     $this->assertTrue($this->normalizers['entity']->supportsDenormalization($data, $supportedEntityClass, static::$format), "Entity denormalization is supported for $format on content entities.");
@@ -90,7 +90,7 @@ class SupportsSerializationTest extends WebTestBase {
     // Field item.
     $this->assertTrue($this->normalizers['field_item']->supportsDenormalization($data, $fieldClass, static::$format), "Field item denormalization is supported for $format.");
     // Entity reference field item.
-    $this->assertTrue($this->normalizers['entityreference']->supportsDenormalization($data, $entityreferenceFieldClass, static::$format), "Entity reference field item denormalization is supported for $format.");
+    $this->assertTrue($this->normalizers['entity_reference']->supportsDenormalization($data, $entityReferenceFieldClass, static::$format), "Entity reference field item denormalization is supported for $format.");
   }
 
 }

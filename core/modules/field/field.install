@@ -170,9 +170,14 @@ function field_schema() {
 /**
  * Creates a field by writing directly to the database.
  *
+ * @param $field
+ *   The field definition array, passed by reference.
+ * @param $update
+ *   Optional; Indicate if we need to create a new field or update an existing one. Defaults to FALSE.
+ *
  * @ingroup update_api
  */
-function _update_7000_field_create_field(&$field) {
+function _update_7000_field_create_field(&$field, $update = FALSE) {
   // Merge in default values.`
   $field += array(
     'entity_types' => array(),
@@ -228,13 +233,34 @@ function _update_7000_field_create_field(&$field) {
     'translatable' => (int) $field['translatable'],
     'deleted' => (int) $field['deleted'],
   );
-  // We don't use drupal_write_record() here because it depends on the schema.
-  $field['id'] = db_insert('field_config')
-    ->fields($record)
-    ->execute();
 
-  // Create storage for the field.
-  field_sql_storage_field_storage_create_field($field);
+  // We don't use drupal_write_record() here because it depends on the schema.
+  if ($update) {
+    db_update('field_config')
+      ->condition('id', $field['id'])
+      ->fields($record)
+      ->execute();
+  }
+  else {
+    $field['id'] = db_insert('field_config')
+      ->fields($record)
+      ->execute();
+
+    // Create storage for the field.
+    field_sql_storage_field_storage_create_field($field);
+  }
+}
+
+/**
+ * Updates a field by writing directly to the database.
+ *
+ * @param $field
+ *   The field definition array.
+ *
+ * @ingroup update_api
+ */
+function _update_7000_field_update_field($field) {
+  _update_7000_field_create_field($field, TRUE);
 }
 
 /**
@@ -347,9 +373,16 @@ function _update_7000_field_read_fields(array $conditions = array(), $key = 'id'
 /**
  * Writes a field instance directly to the database.
  *
+ * @param $field
+ *   The field definition array.
+ * @param $instance
+ *   The instance definition array, passed by reference.
+ * @param $update
+ *   Optional; Indicate if we need to create a new instance or update an existing one. Defaults to FALSE.
+ *
  * @ingroup update_api
  */
-function _update_7000_field_create_instance($field, &$instance) {
+function _update_7000_field_create_instance($field, &$instance, $update = FALSE) {
   // Merge in defaults.
   $instance += array(
     'field_id' => $field['id'],
@@ -371,9 +404,33 @@ function _update_7000_field_create_instance($field, &$instance) {
     'data' => serialize($data),
     'deleted' => (int) $instance['deleted'],
   );
-  $instance['id'] = db_insert('field_config_instance')
-    ->fields($record)
-    ->execute();
+
+  if ($update) {
+    db_update('field_config_instance')
+      ->condition('id', $instance['id'])
+      ->fields($record)
+      ->execute();
+  }
+  else {
+    $instance['id'] = db_insert('field_config_instance')
+      ->fields($record)
+      ->execute();
+
+  }
+}
+
+/**
+ * Updates a field instance directly to the database.
+ *
+ * @param $field
+ *   The field definition array.
+ * @param $instance
+ *   The instance definition array, passed by reference.
+ *
+ * @ingroup update_api
+ */
+function _update_7000_field_update_instance($field, &$instance) {
+  _update_7000_field_create_instance($field, $instance, TRUE);
 }
 
 /**
@@ -487,4 +544,3 @@ function field_update_8002() {
  * @} End of "addtogroup updates-7.x-to-8.x".
  * The next series of updates should start at 9000.
  */
-

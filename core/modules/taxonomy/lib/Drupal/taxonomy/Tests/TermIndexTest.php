@@ -33,15 +33,10 @@ class TermIndexTest extends TaxonomyTestBase {
     $this->field_name_1 = drupal_strtolower($this->randomName());
     $this->field_1 = array(
       'field_name' => $this->field_name_1,
-      'type' => 'taxonomy_term_reference',
+      'type' => 'entity_reference',
       'cardinality' => FIELD_CARDINALITY_UNLIMITED,
       'settings' => array(
-        'allowed_values' => array(
-          array(
-            'vocabulary' => $this->vocabulary->id(),
-            'parent' => 0,
-          ),
-        ),
+        'target_type' => 'taxonomy_term',
       ),
     );
     field_create_field($this->field_1);
@@ -52,26 +47,30 @@ class TermIndexTest extends TaxonomyTestBase {
       'widget' => array(
         'type' => 'options_select',
       ),
+      'settings' => array(
+        'handler' => 'default',
+        'handler_settings' => array(
+          'target_bundles' => array(
+            $this->vocabulary->id(),
+          ),
+          'auto_create' => TRUE,
+        ),
+      ),
     );
     field_create_instance($this->instance_1);
     entity_get_display('node', 'article', 'default')
       ->setComponent($this->field_name_1, array(
-        'type' => 'taxonomy_term_reference_link',
+        'type' => 'entity_reference_label',
       ))
       ->save();
 
     $this->field_name_2 = drupal_strtolower($this->randomName());
     $this->field_2 = array(
       'field_name' => $this->field_name_2,
-      'type' => 'taxonomy_term_reference',
+      'type' => 'entity_reference',
       'cardinality' => FIELD_CARDINALITY_UNLIMITED,
       'settings' => array(
-        'allowed_values' => array(
-          array(
-            'vocabulary' => $this->vocabulary->id(),
-            'parent' => 0,
-          ),
-        ),
+        'target_type' => 'taxonomy_term',
       ),
     );
     field_create_field($this->field_2);
@@ -82,11 +81,20 @@ class TermIndexTest extends TaxonomyTestBase {
       'widget' => array(
         'type' => 'options_select',
       ),
+      'settings' => array(
+        'handler' => 'default',
+        'handler_settings' => array(
+          'target_bundles' => array(
+            $this->vocabulary->id(),
+          ),
+          'auto_create' => TRUE,
+        ),
+      ),
     );
     field_create_instance($this->instance_2);
     entity_get_display('node', 'article', 'default')
       ->setComponent($this->field_name_2, array(
-        'type' => 'taxonomy_term_reference_link',
+        'type' => 'entity_reference_label',
       ))
       ->save();
   }
@@ -169,7 +177,7 @@ class TermIndexTest extends TaxonomyTestBase {
     $this->assertEqual(1, $index_count, 'Term 2 is indexed once.');
 
     // Update the article to change one term.
-    $node->{$this->field_name_1}[$langcode] = array(array('tid' => $term_1->tid));
+    $node->{$this->field_name_1}[$langcode] = array(array('target_id' => $term_1->tid));
     $node->save();
 
     // Check that both terms are indexed.
@@ -185,7 +193,7 @@ class TermIndexTest extends TaxonomyTestBase {
     $this->assertEqual(1, $index_count, 'Term 2 is indexed.');
 
     // Update the article to change another term.
-    $node->{$this->field_name_2}[$langcode] = array(array('tid' => $term_1->tid));
+    $node->{$this->field_name_2}[$langcode] = array(array('target_id' => $term_1->tid));
     $node->save();
 
     // Check that only one term is indexed.

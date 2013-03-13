@@ -88,11 +88,11 @@ ul.tips {
   margin-left: 20px;
   margin-right: 0;
 }
-.field-type-taxonomy-term-reference .field-label {
+.field-type-entity-reference .field-label {
   padding-left: 5px;
   padding-right: 0;
 }
-.field-type-taxonomy-term-reference ul.links li {
+.field-type-entity-reference ul.links li {
   padding: 0 0 0 1em;
   float: right;
 }

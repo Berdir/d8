@@ -56,7 +56,7 @@ class JsonldTestSetupHelper {
     $this->rdfMappingManager = new RdfMappingManager($dispatcher, $this->siteSchemaManager);
     // Construct normalizers.
     $this->normalizers = array(
-      'entityreference' => new JsonldEntityReferenceNormalizer($this->siteSchemaManager, $this->rdfMappingManager),
+      'entity_reference' => new JsonldEntityReferenceNormalizer($this->siteSchemaManager, $this->rdfMappingManager),
       'field_item' => new JsonldFieldItemNormalizer($this->siteSchemaManager, $this->rdfMappingManager),
       'entity' => new JsonldEntityNormalizer($this->siteSchemaManager, $this->rdfMappingManager),
     );

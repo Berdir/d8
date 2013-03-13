@@ -17,7 +17,7 @@ class RssTest extends TaxonomyTestBase {
    *
    * @var array
    */
-  public static $modules = array('node', 'field_ui');
+  public static $modules = array('node', 'field_ui', 'entity_reference');
 
   public static function getInfo() {
     return array(
@@ -36,15 +36,10 @@ class RssTest extends TaxonomyTestBase {
 
     $field = array(
       'field_name' => 'taxonomy_' . $this->vocabulary->id(),
-      'type' => 'taxonomy_term_reference',
+      'type' => 'entity_reference',
       'cardinality' => FIELD_CARDINALITY_UNLIMITED,
       'settings' => array(
-        'allowed_values' => array(
-          array(
-            'vocabulary' => $this->vocabulary->id(),
-            'parent' => 0,
-          ),
-        ),
+        'target_type' => 'taxonomy_term',
       ),
     );
     field_create_field($field);
@@ -56,11 +51,20 @@ class RssTest extends TaxonomyTestBase {
       'widget' => array(
         'type' => 'options_select',
       ),
+      'settings' => array(
+        'handler' => 'default',
+        'handler_settings' => array(
+          'target_bundles' => array(
+            $this->vocabulary->id(),
+          ),
+          'auto_create' => TRUE,
+        ),
+      ),
     );
     field_create_instance($this->instance);
     entity_get_display('node', 'article', 'default')
       ->setComponent('taxonomy_' . $this->vocabulary->id(), array(
-        'type' => 'taxonomy_term_reference_link',
+        'type' => 'entity_reference_label',
       ))
       ->save();
   }
@@ -84,7 +88,7 @@ class RssTest extends TaxonomyTestBase {
     // Change the format to 'RSS category'.
     $this->drupalGet("admin/structure/types/manage/article/display/rss");
     $edit = array(
-      "fields[taxonomy_" . $this->vocabulary->id() . "][type]" => 'taxonomy_term_reference_rss_category',
+      "fields[taxonomy_" . $this->vocabulary->id() . "][type]" => 'entity_reference_rss_category',
     );
     $this->drupalPost(NULL, $edit, t('Save'));
 

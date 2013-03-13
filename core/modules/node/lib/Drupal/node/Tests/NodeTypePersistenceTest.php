@@ -12,7 +12,7 @@ namespace Drupal\node\Tests;
  */
 class NodeTypePersistenceTest extends NodeTestBase {
   // Enable the prerequisite modules for forum
-  public static $modules = array('history', 'taxonomy', 'options', 'comment');
+  public static $modules = array('history', 'entity_reference', 'taxonomy', 'options', 'comment');
   public static function getInfo() {
     return array(
       'name' => 'Node type persist',

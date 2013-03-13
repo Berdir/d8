@@ -280,12 +280,11 @@ class Node extends WizardPluginBase {
       foreach (field_info_instances($this->entity_type, $bundle) as $instance) {
         // We define "tag-like" taxonomy fields as ones that use the
         // "Autocomplete term widget (tagging)" widget.
-        if ($instance['widget']['type'] == 'taxonomy_autocomplete') {
-          $tag_fields[] = $instance['field_name'];
+        if ($instance['widget']['type'] == 'entity_reference_autocomplete_tags') {
+          $tag_fields[$instance['field_name']] = $instance;
         }
       }
     }
-    $tag_fields = array_unique($tag_fields);
     if (!empty($tag_fields)) {
       // If there is more than one "tag-like" taxonomy field available to
       // the view, we can only make our filter apply to one of them (as
@@ -293,20 +292,22 @@ class Node extends WizardPluginBase {
       // that is created by the Standard install profile in core and also
       // commonly used by contrib modules; thus, it is most likely to be
       // associated with the "main" free-tagging vocabulary on the site.
-      if (in_array('field_tags', $tag_fields)) {
+      if (array_key_exists('field_tags', $tag_fields)) {
         $tag_field_name = 'field_tags';
       }
       else {
-        $tag_field_name = reset($tag_fields);
+        $tag_field_name = key($tag_fields);
       }
+      $tag_field_instance = $tag_fields[$tag_field_name];
       // Add the autocomplete textfield to the wizard.
       $form['displays']['show']['tagged_with'] = array(
         '#type' => 'textfield',
         '#title' => t('tagged with'),
-        '#autocomplete_path' => 'taxonomy/autocomplete/' . $tag_field_name,
+        '#autocomplete_path' => 'entity_reference/autocomplete/tags/' . $tag_field_name . '/' . $tag_field_instance['entity_type'] . '/' . $tag_field_instance['bundle'] . '/NULL',
         '#size' => 30,
         '#maxlength' => 1024,
         '#field_name' => $tag_field_name,
+        '#field_instance' => $tag_field_instance,
         '#element_validate' => array('views_ui_taxonomy_autocomplete_validate'),
       );
     }

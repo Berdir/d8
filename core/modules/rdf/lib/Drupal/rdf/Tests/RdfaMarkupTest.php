@@ -157,7 +157,7 @@ class RdfaMarkupTest extends WebTestBase {
     $tag1 = $this->randomName(8);
     $tag2 = $this->randomName(8);
     $edit = array();
-    $edit['field_tags[' . LANGUAGE_NOT_SPECIFIED . ']'] = "$tag1, $tag2";
+    $edit['field_tags[' . LANGUAGE_NOT_SPECIFIED . '][target_id]'] = "$tag1, $tag2";
     $this->drupalPost('node/' . $node->nid . '/edit', $edit, t('Save'));
     $term_1_id = key(taxonomy_term_load_multiple_by_name($tag1));
     $taxonomy_term_1_uri = url('taxonomy/term/' . $term_1_id, array('absolute' => TRUE));

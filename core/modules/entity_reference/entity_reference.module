@@ -487,6 +487,76 @@ function entity_reference_create_instance($entity_type, $bundle, $field_name, $f
 }
 
 /**
+ * Implements hook_field_attach_rename_bundle().
+ */
+function entity_reference_field_attach_rename_bundle($entity_type, $bundle_old, $bundle_new) {
+  // Reflect bundle name changes in the definitions of existing entity reference
+  // field instance.
+  $fields = field_read_fields();
+  foreach (field_read_instances() as $instance) {
+    $field_name = $instance['field_name'];
+    if ($fields[$field_name]['type'] != 'entity_reference' || $fields[$field_name]['settings']['target_type'] != $entity_type) {
+      // Not an entity reference field, referencing the given entity type.
+      continue;
+    }
+    if (empty($instance['settings']['handler_settings']['target_bundles'])) {
+      // Instance is referencing all bundles.
+      continue;
+    }
+
+    $update_instance = FALSE;
+    foreach ($instance['settings']['handler_settings']['target_bundles'] as $delta => $bundle) {
+      if ($bundle == $bundle_old) {
+        $instance['settings']['handler_settings']['target_bundles'][$delta] = $bundle_new;
+        $update_instance = TRUE;
+      }
+    }
+    if ($update_instance) {
+      field_update_instance($instance);
+    }
+  }
+}
+
+/**
+ * Implements hook_field_attach_delete_bundle().
+ */
+function entity_reference_field_attach_delete_bundle($entity_type, $bundle, $instances) {
+  // Iterate over all entity reference fields referencing the given entity type
+  // and delete those which target only the bundle that was deleted.
+  $fields = field_read_fields();
+  foreach (field_read_instances() as $instance) {
+    $field_name = $instance['field_name'];
+    if ($fields[$field_name]['type'] != 'entity_reference' || $fields[$field_name]['settings']['target_type'] != $entity_type) {
+      // Not an entity reference field, referencing the given entity type.
+      continue;
+    }
+    if (empty($instance['settings']['handler_settings']['target_bundles'])) {
+      // Instance is referencing all bundles.
+      continue;
+    }
+
+    $modified_instance = FALSE;
+    foreach ($instance['settings']['handler_settings']['target_bundles'] as $delta => $target_bundle) {
+      if ($target_bundle == $bundle) {
+        unset($instance['settings']['handler_settings']['target_bundles'][$delta]);
+        $modified_instance = TRUE;
+      }
+    }
+    if ($modified_instance) {
+      if (empty($instance['settings']['handler_settings']['target_bundles'])) {
+        field_delete_instance($instance);
+      }
+      else {
+        // Re-key the 'target_bundles' array.
+        $instance['settings']['handler_settings']['target_bundles'] = array_values($instance['settings']['handler_settings']['target_bundles']);
+        // Update the instance definition with the new target bundles.
+        field_update_instance($instance);
+      }
+    }
+  }
+}
+
+/**
  * Menu Access callback for the autocomplete widget.
  *
  * @param string $type

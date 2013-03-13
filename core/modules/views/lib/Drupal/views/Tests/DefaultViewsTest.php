@@ -20,7 +20,7 @@ class DefaultViewsTest extends WebTestBase {
    *
    * @var array
    */
-  public static $modules = array('views', 'node', 'search', 'comment', 'taxonomy', 'block');
+  public static $modules = array('views', 'node', 'search', 'comment', 'entity_reference', 'taxonomy', 'block');
 
   /**
    * An array of argument arrays to use for default views.
@@ -62,15 +62,10 @@ class DefaultViewsTest extends WebTestBase {
     $this->field_name = drupal_strtolower($this->randomName());
     $this->field = array(
       'field_name' => $this->field_name,
-      'type' => 'taxonomy_term_reference',
+      'type' => 'entity_reference',
       'settings' => array(
-        'allowed_values' => array(
-          array(
-            'vocabulary' => $this->vocabulary->id(),
-            'parent' => '0',
-          ),
-        ),
-      )
+        'target_type' => 'taxonomy_term',
+      ),
     );
     field_create_field($this->field);
     $this->instance = array(
@@ -80,11 +75,20 @@ class DefaultViewsTest extends WebTestBase {
       'widget' => array(
         'type' => 'options_select',
       ),
+      'settings' => array(
+        'handler' => 'default',
+        'handler_settings' => array(
+          'target_bundles' => array(
+            $this->vocabulary->id(),
+          ),
+          'auto_create' => TRUE,
+        ),
+      ),
     );
     field_create_instance($this->instance);
     entity_get_display('node', 'page', 'full')
       ->setComponent($this->field_name, array(
-        'type' => 'taxonomy_term_reference_link',
+        'type' => 'entity_reference_label',
       ))
       ->save();
 
@@ -96,7 +100,7 @@ class DefaultViewsTest extends WebTestBase {
       $term = $this->createTerm($this->vocabulary);
 
       $values = array('created' => $time, 'type' => 'page');
-      $values[$this->field_name][]['tid'] = $term->tid;
+      $values[$this->field_name][]['target_id'] = $term->tid;
 
       // Make every other node promoted.
       if ($i % 2) {

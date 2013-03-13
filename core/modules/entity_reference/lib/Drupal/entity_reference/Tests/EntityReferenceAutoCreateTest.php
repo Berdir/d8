@@ -17,7 +17,7 @@ class EntityReferenceAutoCreateTest extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Entity Reference auto-create',
-      'description' => 'Tests creating new entity (e.g. taxonomy-term) from an autocomplete widget.',
+      'description' => 'Tests creating new entity (e.g. node) from an autocomplete widget.',
       'group' => 'Entity Reference',
     );
   }
@@ -55,7 +55,7 @@ class EntityReferenceAutoCreateTest extends WebTestBase {
       'settings' => array(
         'handler' => 'default',
         'handler_settings' => array(
-          // Reference a single vocabulary.
+          // Reference a single bundle.
           'target_bundles' => array(
             $referenced->type,
           ),
@@ -89,7 +89,7 @@ class EntityReferenceAutoCreateTest extends WebTestBase {
 
     $edit = array(
       'title' => $this->randomName(),
-      'test_field[und][0][target_id]' => $new_title,
+      'test_field[' . LANGUAGE_NOT_SPECIFIED . '][0][target_id]' => $new_title,
     );
     $this->drupalPost("node/add/$this->referencing_type", $edit, 'Save');
 

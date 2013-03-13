@@ -148,7 +148,7 @@ function views_ajax_form_wrapper($form_id, &$form_state) {
  * @param $vid
  *   The vocabulary id of the tags which should be returned.
  *
- * @see taxonomy_autocomplete()
+ * @see entity_reference_autocomplete_tags()
  */
 function views_ajax_autocomplete_taxonomy($vid) {
   // The user enters a comma-separated list of tags. We only autocomplete the last tag.

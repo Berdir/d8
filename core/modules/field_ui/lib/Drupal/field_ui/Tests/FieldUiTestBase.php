@@ -19,7 +19,7 @@ abstract class FieldUiTestBase extends WebTestBase {
    *
    * @var array
    */
-  public static $modules = array('node', 'field_ui', 'field_test', 'taxonomy');
+  public static $modules = array('node', 'field_ui', 'field_test', 'taxonomy', 'entity_reference');
 
   function setUp() {
     parent::setUp();

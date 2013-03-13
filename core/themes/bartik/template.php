@@ -130,7 +130,7 @@ function bartik_menu_tree($variables) {
 /**
  * Implements theme_field__field_type().
  */
-function bartik_field__taxonomy_term_reference($variables) {
+function bartik_field__entity_reference($variables) {
   $output = '';
 
   // Render the label, if it's not hidden.

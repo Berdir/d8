@@ -43,20 +43,11 @@ class TermFieldMultipleVocabularyTest extends TaxonomyTestBase {
     $this->field_name = drupal_strtolower($this->randomName());
     $this->field = array(
       'field_name' => $this->field_name,
-      'type' => 'taxonomy_term_reference',
+      'type' => 'entity_reference',
       'cardinality' => FIELD_CARDINALITY_UNLIMITED,
       'settings' => array(
-        'allowed_values' => array(
-          array(
-            'vocabulary' => $this->vocabulary1->id(),
-            'parent' => '0',
-          ),
-          array(
-            'vocabulary' => $this->vocabulary2->id(),
-            'parent' => '0',
-          ),
-        ),
-      )
+        'target_type' => 'taxonomy_term',
+      ),
     );
     field_create_field($this->field);
     $this->instance = array(
@@ -66,11 +57,21 @@ class TermFieldMultipleVocabularyTest extends TaxonomyTestBase {
       'widget' => array(
         'type' => 'options_select',
       ),
+      'settings' => array(
+        'handler' => 'default',
+        'handler_settings' => array(
+          'target_bundles' => array(
+            $this->vocabulary1->id(),
+            $this->vocabulary2->id(),
+          ),
+          'auto_create' => TRUE,
+        ),
+      ),
     );
     field_create_instance($this->instance);
     entity_get_display('test_entity', 'test_bundle', 'full')
       ->setComponent($this->field_name, array(
-        'type' => 'taxonomy_term_reference_link',
+        'type' => 'entity_reference_label',
       ))
       ->save();
   }
@@ -120,10 +121,6 @@ class TermFieldMultipleVocabularyTest extends TaxonomyTestBase {
     // Term 1 should still be displayed; term 2 should not be.
     $this->assertText($term1->name, 'Term 1 name is displayed.');
     $this->assertNoText($term2->name, 'Term 2 name is not displayed.');
-
-    // Verify that field and instance settings are correct.
-    $field_info = field_info_field($this->field_name);
-    $this->assertEqual(count($field_info['settings']['allowed_values']), 1, 'Only one vocabulary is allowed for the field.');
 
     // The widget should still be displayed.
     $this->drupalGet('test-entity/add/test_bundle');

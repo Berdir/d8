@@ -307,7 +307,7 @@ class BreadcrumbTest extends MenuTestBase {
       'Breadcrumbs' => array(),
     );
     $edit = array(
-      "field_tags[$langcode]" => implode(',', array_keys($tags)),
+      "field_tags[$langcode][target_id]" => implode(',', array_keys($tags)),
     );
     $this->drupalPost("node/{$parent->nid}/edit", $edit, t('Save and keep published'));
 

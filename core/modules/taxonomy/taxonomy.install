@@ -5,6 +5,7 @@
  * Install, update and uninstall functions for the taxonomy module.
  */
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Uuid\Uuid;
 
 /**
@@ -333,5 +334,118 @@ function taxonomy_update_8006() {
       ->condition('vid', $vid)
       ->fields(array('vid' => $machine_name))
       ->execute();
+  }
+}
+
+/**
+ * Convert taxonomy term fields to entity reference.
+ */
+function taxonomy_update_8007() {
+  if (!$fields = field_read_fields(array('type' => 'taxonomy_term_reference'), array('include_inactive' => 1))) {
+    return;
+  }
+  update_module_enable(array('entity_reference'));
+  module_load_install('entity_reference');
+
+  foreach ($fields as $field_name => $field) {
+    if ($field['storage']['type'] != 'field_sql_storage') {
+      // Field doesn't use SQL storage, we cannot modify the schema.
+      continue;
+    }
+
+    $instances = field_read_instances(array('field_id' => $field['id']), array('include_inactive' => 1));
+
+    $tables = array(
+      _field_sql_storage_tablename($field),
+      _field_sql_storage_revision_tablename($field),
+    );
+
+    foreach ($tables as $table_name) {
+      db_change_field($table_name, $field_name . '_tid', $field_name . '_target_id', array(
+        'description' => 'The ID of the target entity.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ));
+
+      // Add the revision ID column.
+      $column = array(
+        'description' => 'The revision ID of the target entity.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+      );
+      db_add_field($table_name, $field_name . '_revision_id', $column);
+
+      // Change the index.
+      db_drop_index($table_name, $field_name . '_tid');
+      db_add_index($table_name, $field_name . '_target_id', array($field_name . '_target_id'));
+    }
+
+    // Update the field settings.
+    $field['settings']['target_type'] = 'taxonomy_term';
+    $schema = entity_reference_field_schema($field);
+    unset($field['columns'], $field['indexes'], $field['foreign keys']);
+    $field = NestedArray::mergeDeep($field, $schema);
+
+    // @todo: Bring back $field['settings']['allowed_values'][0]['parent'] in
+    // http://drupal.org/node/1915056.
+    $vocabulary_name = $field['settings']['allowed_values'][0]['vocabulary'];
+    unset($field['settings']['allowed_values']);
+
+    $field['module'] = $field['type'] = 'entity_reference';
+
+    _update_7000_field_update_field($field);
+
+    // Update the instance settings.
+    if (!$instances) {
+      continue;
+    }
+
+    $field = field_info_field($field_name);
+
+    foreach ($instances as $instance) {
+      if ($instance['widget']['type'] == 'taxonomy_autocomplete') {
+        // Update the widget.
+        $instance['widget']['type'] = 'entity_reference_autocomplete_tags';
+        $instance['widget']['module'] = 'entity_reference';
+        $instance['widget']['settings']['match_operator'] = "CONTAINS";
+        $instance['widget']['settings']['autocomplete_path'] = "entity_reference/autocomplete/tags";
+      }
+
+      $instance['settings']['handler'] = 'default';
+      $instance['settings']['handler_settings'] = array(
+        'target_bundles' => array($vocabulary_name),
+        // Enable auto-create.
+        'auto_create' => TRUE,
+      );
+
+      _update_7000_field_update_instance($field, $instance);
+
+      if (empty($field['bundles'])) {
+        continue;
+      }
+
+      // Update the formatter.
+      foreach ($field['bundles'] as $entity_type => $bundles) {
+        $entity_info = drupal_container()->get('plugin.manager.entity')->getDefinition($entity_type);
+        foreach ($bundles as $bundle) {
+          // Add the 'default' view mode.
+          $entity_info['view_modes'][] = 'default';
+          foreach (array_keys($entity_info['view_modes']) as $view_mode) {
+            $display = _update_8000_entity_get_display($entity_type, $bundle, $view_mode);
+            $original_display = $display->get('content.' . $field_name);
+            $display->set('content.' . $field_name, array(
+                'label' => $original_display['label'],
+                'weight' => $original_display['weight'],
+                'type' => 'entity_reference_label',
+                'settings' => array('link' => TRUE),
+              ))
+              ->save();
+            update_config_manifest_add('entity.display', array($display->get('id')));
+          }
+        }
+      }
+    }
   }
 }

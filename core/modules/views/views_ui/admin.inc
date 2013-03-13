@@ -221,23 +221,15 @@ function views_ui_nojs_submit($form, &$form_state) {
 function views_ui_taxonomy_autocomplete_validate($element, &$form_state) {
   $value = array();
   if ($tags = $element['#value']) {
-    // Get the machine names of the vocabularies we will search, keyed by the
-    // vocabulary IDs.
     $field = field_info_field($element['#field_name']);
-    $vocabularies = array();
-    if (!empty($field['settings']['allowed_values'])) {
-      foreach ($field['settings']['allowed_values'] as $tree) {
-        if ($vocabulary = entity_load('taxonomy_vocabulary', $tree['vocabulary'])) {
-          $vocabularies[$vocabulary->id()] = $tree['vocabulary'];
-        }
-      }
-    }
+    $instance = $element['#field_instance'];
+    $handler = entity_reference_get_selection_handler($field, $instance);
+
     // Store the term ID of each (valid) tag that the user typed.
     $typed_terms = drupal_explode_tags($tags);
     foreach ($typed_terms as $typed_term) {
-      if ($terms = entity_load_multiple_by_properties('taxonomy_term', array('name' => trim($typed_term), 'vid' => array_keys($vocabularies)))) {
-        $term = array_pop($terms);
-        $value['tids'][] = $term->tid;
+      if ($entity_id = $handler->validateAutocompleteInput($typed_term, $element, $form_state, NULL, FALSE)) {
+        $value['tids'][] = $entity_id;
       }
     }
     // Store the term IDs along with the name of the vocabulary. Currently
@@ -246,7 +238,7 @@ function views_ui_taxonomy_autocomplete_validate($element, &$form_state) {
     // one.
     if (!empty($value['tids'])) {
       $value['tids'] = array_unique($value['tids']);
-      $value['vocabulary'] = array_pop($vocabularies);
+      $value['vocabulary'] = array_pop($instance['settings']['handler_settings']['target_bundles']);
     }
   }
   form_set_value($element, $value, $form_state);

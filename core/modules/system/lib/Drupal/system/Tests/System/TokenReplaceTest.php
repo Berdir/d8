@@ -13,6 +13,14 @@ use Drupal\simpletest\WebTestBase;
  * Test token replacement in strings.
  */
 class TokenReplaceTest extends WebTestBase {
+
+  /**
+   * Modules to enable.
+   *
+   * @var array
+   */
+  public static $modules = array('entity_reference');
+
   public static function getInfo() {
     return array(
       'name' => 'Token replacement',

@@ -23,8 +23,9 @@ interface SelectionInterface {
    * Returns a list of referencable entities.
    *
    * @return array
-   *   An array of referencable entities. Keys are entity IDs and
-   *   values are (safe HTML) labels to be displayed to the user.
+   *   A multidimensional array of referencable entities. The first level of
+   *   keys are entity bundles. The second level are entity IDs and values are
+   *   (safe HTML) labels to be displayed to the user.
    */
   public function getReferencableEntities($match = NULL, $match_operator = 'CONTAINS', $limit = 0);
 

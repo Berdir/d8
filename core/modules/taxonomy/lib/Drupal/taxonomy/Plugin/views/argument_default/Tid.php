@@ -138,7 +138,7 @@ class Tid extends ArgumentDefaultPluginBase {
         $fields = field_info_instances('node', $node->type);
         foreach ($fields as $name => $info) {
           $field_info = field_info_field($name);
-          if ($field_info['type'] == 'taxonomy_term_reference') {
+          if ($field_info['type'] == 'entity_reference') {
             $items = field_get_items($node, $name);
             if (is_array($items)) {
               foreach ($items as $item) {

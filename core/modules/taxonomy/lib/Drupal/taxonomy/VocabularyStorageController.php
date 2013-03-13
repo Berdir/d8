@@ -23,24 +23,6 @@ class VocabularyStorageController extends ConfigStorageController {
       field_attach_create_bundle('taxonomy_term', $entity->id());
     }
     elseif ($entity->getOriginalID() != $entity->id()) {
-      // Reflect machine name changes in the definitions of existing 'taxonomy'
-      // fields.
-      $fields = field_read_fields();
-      foreach ($fields as $field_name => $field) {
-        $update_field = FALSE;
-        if ($field['type'] == 'taxonomy_term_reference') {
-          foreach ($field['settings']['allowed_values'] as $key => &$value) {
-            if ($value['vocabulary'] == $entity->getOriginalID()) {
-              $value['vocabulary'] = $entity->id();
-              $update_field = TRUE;
-            }
-          }
-          if ($update_field) {
-            field_update_field($field);
-          }
-        }
-      }
-      // Update bundles.
       field_attach_rename_bundle('taxonomy_term', $entity->getOriginalID(), $entity->id());
     }
     parent::postSave($entity, $update);
@@ -61,37 +43,12 @@ class VocabularyStorageController extends ConfigStorageController {
    * Overrides Drupal\Core\Config\Entity\ConfigStorageController::postDelete().
    */
   protected function postDelete($entities) {
-    parent::postDelete($entities);
+    foreach ($entities as $entity) {
+      field_attach_delete_bundle('taxonomy_term', $entity->id());
+    }
 
-    $vocabularies = array();
-    foreach ($entities as $vocabulary) {
-      $vocabularies[$vocabulary->id()] = $vocabulary->id();
-    }
-    // Load all Taxonomy module fields and delete those which use only this
-    // vocabulary.
-    $taxonomy_fields = field_read_fields(array('module' => 'taxonomy'));
-    foreach ($taxonomy_fields as $field_name => $taxonomy_field) {
-      $modified_field = FALSE;
-      // Term reference fields may reference terms from more than one
-      // vocabulary.
-      foreach ($taxonomy_field['settings']['allowed_values'] as $key => $allowed_value) {
-        if (isset($vocabularies[$allowed_value['vocabulary']])) {
-          unset($taxonomy_field['settings']['allowed_values'][$key]);
-          $modified_field = TRUE;
-        }
-      }
-      if ($modified_field) {
-        if (empty($taxonomy_field['settings']['allowed_values'])) {
-          field_delete_field($field_name);
-        }
-        else {
-          // Update the field definition with the new allowed values.
-          field_update_field($taxonomy_field);
-        }
-      }
-    }
-    // Reset caches.
-    $this->resetCache(array_keys($vocabularies));
+    parent::postDelete($entities);
+    $this->resetCache(array_keys($entities));
   }
 
   /**

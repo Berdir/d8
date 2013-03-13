@@ -42,7 +42,7 @@ class LegacyTest extends TaxonomyTestBase {
     $edit['date[date]'] = $date->format('Y-m-d');
     $edit['date[time]'] = $date->format('H:i:s');
     $edit["body[$langcode][0][value]"] = $this->randomName();
-    $edit["field_tags[$langcode]"] = $this->randomName();
+    $edit["field_tags[$langcode][target_id]"] = $this->randomName();
     $this->drupalPost('node/add/article', $edit, t('Save and publish'));
     // Checks that the node has been saved.
     $node = $this->drupalGetNodeByTitle($edit['title']);

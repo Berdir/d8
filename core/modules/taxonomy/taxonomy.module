@@ -26,14 +26,6 @@ const TAXONOMY_HIERARCHY_SINGLE = 1;
 const TAXONOMY_HIERARCHY_MULTIPLE = 2;
 
 /**
- * Users can create new terms in a free-tagging vocabulary when
- * submitting a taxonomy_autocomplete_widget. We store a term object
- * whose tid is 'autocreate' as a field data item during widget
- * validation and then actually create the term if/when that field
- * data item makes it to taxonomy_field_insert/update().
- */
-
-/**
  * Implements hook_help().
  */
 function taxonomy_help($path, $arg) {
@@ -320,14 +312,6 @@ function taxonomy_menu() {
     'page arguments' => array(2),
     'access callback' => 'entity_page_access',
     'access arguments' => array(2, 'view'),
-    'type' => MENU_CALLBACK,
-    'file' => 'taxonomy.pages.inc',
-  );
-  $items['taxonomy/autocomplete/%'] = array(
-    'title' => 'Autocomplete taxonomy',
-    'page callback' => 'taxonomy_autocomplete',
-    'page arguments' => array(2),
-    'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
     'file' => 'taxonomy.pages.inc',
   );
@@ -958,274 +942,6 @@ function taxonomy_implode_tags($tags, $vid = NULL) {
 }
 
 /**
- * Implements hook_field_info().
- *
- * Field settings:
- * - allowed_values: a list array of one or more vocabulary trees:
- *   - vocabulary: a vocabulary machine name.
- *   - parent: a term ID of a term whose children are allowed. This should be
- *     '0' if all terms in a vocabulary are allowed. The allowed values do not
- *     include the parent term.
- *
- */
-function taxonomy_field_info() {
-  return array(
-    'taxonomy_term_reference' => array(
-      'label' => t('Term reference'),
-      'description' => t('This field stores a reference to a taxonomy term.'),
-      'default_widget' => 'options_select',
-      'default_formatter' => 'taxonomy_term_reference_link',
-      'field item class' => 'Drupal\taxonomy\Type\TaxonomyTermReferenceItem',
-      'settings' => array(
-        'allowed_values' => array(
-          array(
-            'vocabulary' => '',
-            'parent' => '0',
-          ),
-        ),
-      ),
-    ),
-  );
-}
-
-/**
- * Implements hook_field_widget_info_alter().
- */
-function taxonomy_field_widget_info_alter(&$info) {
-  $info['options_select']['field_types'][] = 'taxonomy_term_reference';
-  $info['options_buttons']['field_types'][] = 'taxonomy_term_reference';
-}
-
-/**
- * Implements hook_options_list().
- */
-function taxonomy_options_list($field, $instance, $entity) {
-  $function = !empty($field['settings']['options_list_callback']) ? $field['settings']['options_list_callback'] : 'taxonomy_allowed_values';
-  return $function($field, $instance, $entity);
-}
-
-/**
- * Implements hook_field_validate().
- *
- * Taxonomy field settings allow for either a single vocabulary ID, multiple
- * vocabulary IDs, or sub-trees of a vocabulary to be specified as allowed
- * values, although only the first of these is supported via the field UI.
- * Confirm that terms entered as values meet at least one of these conditions.
- *
- * Possible error codes:
- * - 'taxonomy_term_illegal_value': The value is not part of the list of allowed values.
- */
-function taxonomy_field_validate(EntityInterface $entity = NULL, $field, $instance, $langcode, $items, &$errors) {
-  // Build an array of existing term IDs so they can be loaded with
-  // taxonomy_term_load_multiple();
-  foreach ($items as $delta => $item) {
-    if (!empty($item['tid']) && $item['tid'] != 'autocreate') {
-      $tids[] = $item['tid'];
-    }
-  }
-  if (!empty($tids)) {
-    $terms = taxonomy_term_load_multiple($tids);
-
-    // Check each existing item to ensure it can be found in the
-    // allowed values for this field.
-    foreach ($items as $delta => $item) {
-      $validate = TRUE;
-      if (!empty($item['tid']) && $item['tid'] != 'autocreate') {
-        $validate = FALSE;
-        foreach ($field['settings']['allowed_values'] as $settings) {
-          // If no parent is specified, check if the term is in the vocabulary.
-          if (isset($settings['vocabulary']) && empty($settings['parent'])) {
-            if ($settings['vocabulary'] == $terms[$item['tid']]->bundle()) {
-              $validate = TRUE;
-              break;
-            }
-          }
-          // If a parent is specified, then to validate it must appear in the
-          // array returned by taxonomy_term_load_parents_all().
-          elseif (!empty($settings['parent'])) {
-            $ancestors = taxonomy_term_load_parents_all($item['tid']);
-            foreach ($ancestors as $ancestor) {
-              if ($ancestor->tid == $settings['parent']) {
-                $validate = TRUE;
-                break 2;
-              }
-            }
-          }
-        }
-      }
-      if (!$validate) {
-        $errors[$field['field_name']][$langcode][$delta][] = array(
-          'error' => 'taxonomy_term_reference_illegal_value',
-          'message' => t('%name: illegal value.', array('%name' => $instance['label'])),
-        );
-      }
-    }
-  }
-}
-
-/**
- * Implements hook_field_is_empty().
- */
-function taxonomy_field_is_empty($item, $field) {
-  return !is_array($item) || (empty($item['tid']) && empty($item['entity']));
-}
-
-/**
- * Implements hook_field_formatter_info().
- */
-function taxonomy_field_formatter_info() {
-  return array(
-    'taxonomy_term_reference_link' => array(
-      'label' => t('Link'),
-      'field types' => array('taxonomy_term_reference'),
-    ),
-    'taxonomy_term_reference_plain' => array(
-      'label' => t('Plain text'),
-      'field types' => array('taxonomy_term_reference'),
-    ),
-    'taxonomy_term_reference_rss_category' => array(
-      'label' => t('RSS category'),
-      'field types' => array('taxonomy_term_reference'),
-    ),
-  );
-}
-
-/**
- * Implements hook_field_formatter_view().
- */
-function taxonomy_field_formatter_view(EntityInterface $entity, $field, $instance, $langcode, $items, $display) {
-  $element = array();
-
-  // Terms whose tid is 'autocreate' do not exist yet and $item['entity'] is not
-  // set. Theme such terms as just their name.
-
-  switch ($display['type']) {
-    case 'taxonomy_term_reference_link':
-      foreach ($items as $delta => $item) {
-        if ($item['tid'] == 'autocreate') {
-          $element[$delta] = array(
-            '#markup' => check_plain($item['name']),
-          );
-        }
-        else {
-          $term = $item['entity'];
-          $uri = $term->uri();
-          $element[$delta] = array(
-            '#type' => 'link',
-            '#title' => $term->label(),
-            '#href' => $uri['path'],
-            '#options' => $uri['options'],
-          );
-        }
-      }
-      break;
-
-    case 'taxonomy_term_reference_plain':
-      foreach ($items as $delta => $item) {
-        $name = ($item['tid'] != 'autocreate' ? $item['entity']->label() : $item['name']);
-        $element[$delta] = array(
-          '#markup' => check_plain($name),
-        );
-      }
-      break;
-
-    case 'taxonomy_term_reference_rss_category':
-      foreach ($items as $delta => $item) {
-        $entity->rss_elements[] = array(
-          'key' => 'category',
-          'value' => $item['tid'] != 'autocreate' ? $item['entity']->label() : $item['name'],
-          'attributes' => array(
-            'domain' => $item['tid'] != 'autocreate' ? url('taxonomy/term/' . $item['tid'], array('absolute' => TRUE)) : '',
-          ),
-        );
-      }
-      break;
-  }
-
-  return $element;
-}
-
-/**
- * Returns the set of valid terms for a taxonomy field.
- *
- * @param $field
- *   The field definition.
- * @param $instance
- *   The instance definition. It is recommended to only use instance level
- *   properties to filter out values from a list defined by field level
- *   properties.
- * @param \Drupal\Core\Entity\EntityInterface $entity
- *   The entity object the field is attached to, or NULL if no entity
- *   exists (e.g. in field settings page).
- *
- * @return
- *   The array of valid terms for this field, keyed by term id.
- */
-function taxonomy_allowed_values($field, $instance, EntityInterface $entity) {
-  $options = array();
-  foreach ($field['settings']['allowed_values'] as $tree) {
-    if ($vocabulary = taxonomy_vocabulary_load($tree['vocabulary'])) {
-      if ($terms = taxonomy_get_tree($vocabulary->id(), $tree['parent'], NULL, TRUE)) {
-        foreach ($terms as $term) {
-          $options[$term->tid] = str_repeat('-', $term->depth) . $term->label();
-        }
-      }
-    }
-  }
-  return $options;
-}
-
-/**
- * Implements hook_field_formatter_prepare_view().
- *
- * This preloads all taxonomy terms for multiple loaded objects at once and
- * unsets values for invalid terms that do not exist.
- */
-function taxonomy_field_formatter_prepare_view($entity_type, $entities, $field, $instances, $langcode, &$items, $displays) {
-  $tids = array();
-
-  // Collect every possible term attached to any of the fieldable entities.
-  foreach ($entities as $id => $entity) {
-    foreach ($items[$id] as $delta => $item) {
-      // Force the array key to prevent duplicates.
-      if ($item['tid'] != 'autocreate' && $item['tid'] !== FALSE) {
-        $tids[$item['tid']] = $item['tid'];
-      }
-    }
-  }
-  if ($tids) {
-    $terms = taxonomy_term_load_multiple($tids);
-
-    // Iterate through the fieldable entities again to attach the loaded term data.
-    foreach ($entities as $id => $entity) {
-      $rekey = FALSE;
-
-      foreach ($items[$id] as $delta => $item) {
-        // Check whether the taxonomy term field instance value could be loaded.
-        if (isset($terms[$item['tid']])) {
-          // Replace the instance value with the term data.
-          $items[$id][$delta]['entity'] = $terms[$item['tid']];
-        }
-        // Terms to be created are not in $terms, but are still legitimate.
-        elseif ($item['tid'] == 'autocreate') {
-          // Leave the item in place.
-        }
-        // Otherwise, unset the instance value, since the term does not exist.
-        else {
-          unset($items[$id][$delta]);
-          $rekey = TRUE;
-        }
-      }
-
-      if ($rekey) {
-        // Rekey the items array.
-        $items[$id] = array_values($items[$id]);
-      }
-    }
-  }
-}
-
-/**
  * Title callback for term pages.
  *
  * @param Drupal\taxonomy\Plugin\Core\Entity\Term $term
@@ -1236,52 +952,6 @@ function taxonomy_field_formatter_prepare_view($entity_type, $entities, $field, 
  */
 function taxonomy_term_title(Term $term) {
   return $term->label();
-}
-
-/**
- * Form element validate handler for taxonomy term autocomplete element.
- */
-function taxonomy_autocomplete_validate($element, &$form_state) {
-  // Split the values into an array.
-  // @see Drupal\taxonomy\Plugin\field\widget\TaxonomyAutocompleteWidget:massageFormValues()
-  $typed_terms = array();
-  if ($tags = $element['#value']) {
-    $typed_terms = drupal_explode_tags($tags);
-  }
-  form_set_value($element, $typed_terms, $form_state);
-}
-
-/**
- * Implements hook_field_settings_form().
- */
-function taxonomy_field_settings_form($field, $instance, $has_data) {
-  // Get proper values for 'allowed_values_function', which is a core setting.
-  $vocabularies = taxonomy_vocabulary_load_multiple();
-  $options = array();
-  foreach ($vocabularies as $vocabulary) {
-    $options[$vocabulary->id()] = $vocabulary->name;
-  }
-  $form['allowed_values'] = array(
-    '#tree' => TRUE,
-  );
-
-  foreach ($field['settings']['allowed_values'] as $delta => $tree) {
-    $form['allowed_values'][$delta]['vocabulary'] = array(
-      '#type' => 'select',
-      '#title' => t('Vocabulary'),
-      '#default_value' => $tree['vocabulary'],
-      '#options' => $options,
-      '#required' => TRUE,
-      '#description' => t('The vocabulary which supplies the options for this field.'),
-      '#disabled' => $has_data,
-    );
-    $form['allowed_values'][$delta]['parent'] = array(
-      '#type' => 'value',
-      '#value' => $tree['parent'],
-    );
-  }
-
-  return $form;
 }
 
 /**
@@ -1348,6 +1018,7 @@ function taxonomy_rdf_mapping() {
  */
 
 /**
+<<<<<<< HEAD
  * Implements hook_field_presave().
  *
  * Create any new terms defined in a freetagging vocabulary.
@@ -1363,6 +1034,8 @@ function taxonomy_field_presave(EntityInterface $entity, $field, $instance, $lan
 }
 
 /**
+=======
+>>>>>>> applied patch
  * Implements hook_node_insert().
  */
 function taxonomy_node_insert(EntityInterface $node) {
@@ -1402,7 +1075,7 @@ function taxonomy_build_node_index($node) {
     foreach (field_info_instances('node', $node->type) as $instance) {
       $field_name = $instance['field_name'];
       $field = field_info_field($field_name);
-      if ($field['module'] == 'taxonomy' && $field['storage']['type'] == 'field_sql_storage') {
+      if ($field['module'] == 'entity_reference' && $field['settings']['target_type'] == 'taxonomy_term' && $field['storage']['type'] == 'field_sql_storage') {
         // If a field value is not set in the node object when node_save() is
         // called, the old value from $node->original is used.
         if (isset($node->{$field_name})) {
@@ -1417,7 +1090,7 @@ function taxonomy_build_node_index($node) {
         foreach (field_available_languages('node', $field) as $langcode) {
           if (!empty($items[$langcode])) {
             foreach ($items[$langcode] as $item) {
-              $tid_all[$item['tid']] = $item['tid'];
+              $tid_all[$item['target_id']] = $item['target_id'];
             }
           }
         }

@@ -2,6 +2,7 @@ name: Forum
 description: 'Provides discussion forums.'
 dependencies:
   - node
+  - entity_reference
   - history
   - taxonomy
   - comment

@@ -58,14 +58,9 @@ function forum_enable() {
   if (!field_info_field('taxonomy_forums')) {
     $field = array(
       'field_name' => 'taxonomy_forums',
-      'type' => 'taxonomy_term_reference',
+      'type' => 'entity_reference',
       'settings' => array(
-        'allowed_values' => array(
-          array(
-            'vocabulary' => $vocabulary->id(),
-            'parent' => 0,
-          ),
-        ),
+        'target_type' => 'taxonomy_term',
       ),
     );
     field_create_field($field);
@@ -90,19 +85,28 @@ function forum_enable() {
       'widget' => array(
         'type' => 'options_select',
       ),
+      'settings' => array(
+        'handler' => 'default',
+        'handler_settings' => array(
+          'target_bundles' => array(
+            $vocabulary->id(),
+          ),
+          'auto_create' => TRUE,
+        ),
+      ),
     );
     field_create_instance($instance);
 
     // Assign display settings for the 'default' and 'teaser' view modes.
     entity_get_display('node', 'forum', 'default')
       ->setComponent('taxonomy_forums', array(
-        'type' => 'taxonomy_term_reference_link',
+        'type' => 'entity_reference_label',
         'weight' => 10,
       ))
       ->save();
     entity_get_display('node', 'forum', 'teaser')
       ->setComponent('taxonomy_forums', array(
-        'type' => 'taxonomy_term_reference_link',
+        'type' => 'entity_reference_label',
         'weight' => 10,
       ))
       ->save();
