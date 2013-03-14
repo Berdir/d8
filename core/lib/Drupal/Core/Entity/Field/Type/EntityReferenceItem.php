@@ -82,7 +82,9 @@ class EntityReferenceItem extends FieldItemBase {
     else {
       $this->properties['entity']->setValue(NULL);
     }
-    unset($values['entity'], $values['target_id'], $values['revision_id']);
+    // @todo: access is set in EntityReferenceFormatter::prepareView(), should
+    //   that be stored somewhere else?
+    unset($values['entity'], $values['target_id'], $values['revision_id'], $values['access']);
     if ($values) {
       throw new \InvalidArgumentException('Property ' . key($values) . ' is unknown.');
     }
