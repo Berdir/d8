@@ -87,4 +87,16 @@ class FieldUpgradePathTest extends UpgradePathTestBase {
     $this->assertEqual($displays['teaser']['content']['language'], $expected['teaser']);
   }
 
+  /**
+   * Tests upgrade of fields and instances to config.
+   */
+  function testFieldUpgradeToConfig() {
+    $this->assertTrue($this->performUpgrade(), t('The upgrade was completed successfully.'));
+
+    // Assert the body field and instance on the article are converted.
+    $body_field = field_info_field('body');
+    $this->assertNotNull($body_field, 'The body field has been found.');
+    $body_field_instance = field_info_instance('node', 'body', 'article');
+    $this->assertNotNull($body_field_instance, 'The body field instance on the article content type has been found.');
+  }
 }

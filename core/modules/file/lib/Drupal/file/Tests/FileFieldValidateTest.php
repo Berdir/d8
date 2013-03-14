@@ -27,7 +27,7 @@ class FileFieldValidateTest extends FileFieldTestBase {
    */
   function testRequired() {
     $type_name = 'article';
-    $field_name = strtolower($this->randomName());
+    $field_name = 'test_file_field';
     $this->createFileField($field_name, $type_name, array(), array('required' => '1'));
     $field = field_info_field($field_name);
     $instance = field_info_instance('node', $field_name, $type_name);
@@ -75,7 +75,7 @@ class FileFieldValidateTest extends FileFieldTestBase {
    */
   function testFileMaxSize() {
     $type_name = 'article';
-    $field_name = strtolower($this->randomName());
+    $field_name = 'test_file_field';
     $this->createFileField($field_name, $type_name, array(), array('required' => '1'));
     $field = field_info_field($field_name);
     $instance = field_info_instance('node', $field_name, $type_name);
@@ -127,7 +127,7 @@ class FileFieldValidateTest extends FileFieldTestBase {
    */
   function testFileExtension() {
     $type_name = 'article';
-    $field_name = strtolower($this->randomName());
+    $field_name = 'test_file_field';
     $this->createFileField($field_name, $type_name);
     $field = field_info_field($field_name);
     $instance = field_info_instance('node', $field_name, $type_name);

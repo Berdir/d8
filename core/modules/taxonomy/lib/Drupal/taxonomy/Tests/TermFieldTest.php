@@ -53,7 +53,7 @@ class TermFieldTest extends TaxonomyTestBase {
         ),
       )
     );
-    field_create_field($this->field);
+    $this->field = field_create_field($this->field);
     $this->instance = array(
       'field_name' => $this->field_name,
       'entity_type' => 'test_entity',

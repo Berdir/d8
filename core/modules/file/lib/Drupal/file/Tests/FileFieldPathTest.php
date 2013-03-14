@@ -23,7 +23,7 @@ class FileFieldPathTest extends FileFieldTestBase {
    * Tests the normal formatter display on node display.
    */
   function testUploadPath() {
-    $field_name = strtolower($this->randomName());
+    $field_name = 'test_file_field';
     $type_name = 'article';
     $field = $this->createFileField($field_name, $type_name);
     $test_file = $this->getTestFile('text');

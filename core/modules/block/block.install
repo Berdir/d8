@@ -263,7 +263,7 @@ function block_update_8008() {
       'module' => 'text',
       'cardinality' => 1,
     );
-    _update_7000_field_create_field($body_field);
+    $body_field = _update_7000_field_create_field($body_field);
 
     $instance = array(
       'field_name' => 'block_body',

@@ -32,7 +32,7 @@ class FileFieldWidgetTest extends FileFieldTestBase {
    */
   function testSingleValuedWidget() {
     $type_name = 'article';
-    $field_name = strtolower($this->randomName());
+    $field_name = 'test_file_field';
     $this->createFileField($field_name, $type_name);
     $field = field_info_field($field_name);
     $instance = field_info_instance('node', $field_name, $type_name);
@@ -88,8 +88,8 @@ class FileFieldWidgetTest extends FileFieldTestBase {
    */
   function testMultiValuedWidget() {
     $type_name = 'article';
-    $field_name = strtolower($this->randomName());
-    $field_name2 = strtolower($this->randomName());
+    $field_name = 'test_file_field';
+    $field_name2 = 'test_file_field_2';
     $this->createFileField($field_name, $type_name, array('cardinality' => 3));
     $this->createFileField($field_name2, $type_name, array('cardinality' => 3));
 
@@ -205,7 +205,7 @@ class FileFieldWidgetTest extends FileFieldTestBase {
    */
   function testPrivateFileSetting() {
     $type_name = 'article';
-    $field_name = strtolower($this->randomName());
+    $field_name = 'test_file_field';
     $this->createFileField($field_name, $type_name);
     $field = field_info_field($field_name);
     $instance = field_info_instance('node', $field_name, $type_name);
@@ -260,6 +260,9 @@ class FileFieldWidgetTest extends FileFieldTestBase {
     $edit = array('field[settings][uri_scheme]' => 'private');
     $this->drupalPost(NULL, $edit, t('Save field settings'));
     $this->drupalPost(NULL, array(), t('Save settings'));
+
+    // Manually clear cache on the tester side.
+    field_info_cache_clear();
 
     // Create node.
     $text_file = $this->getTestFile('text');

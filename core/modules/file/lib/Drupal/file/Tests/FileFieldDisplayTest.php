@@ -24,7 +24,7 @@ class FileFieldDisplayTest extends FileFieldTestBase {
    * Tests normal formatter display on node display.
    */
   function testNodeDisplay() {
-    $field_name = strtolower($this->randomName());
+    $field_name = 'test_file_field';
     $type_name = 'article';
     $field_settings = array(
       'display_field' => '1',

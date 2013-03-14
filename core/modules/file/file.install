@@ -125,8 +125,8 @@ function file_schema() {
       ),
       'id' => array(
         'description' => 'The primary key of the object using the file.',
-        'type' => 'int',
-        'unsigned' => TRUE,
+        'type' => 'varchar',
+        'length' => 64,
         'not null' => TRUE,
         'default' => 0,
       ),
@@ -234,6 +234,21 @@ function file_requirements($phase) {
 }
 
 /**
+ * Implements hook_update_dependencies().
+ */
+function file_update_dependencies() {
+  // The update hook to convert the id column in the column table needs to be
+  // the first one because user update hooks will be called during system
+  // update hooks due to other dependencies and the user picture conversion
+  // might need to save a default image and the field it's stored in, does
+  // not have an integer id anymore.
+  $dependencies['system'][8001] = array(
+    'file' => 8001,
+  );
+  return $dependencies;
+}
+
+/**
 * Converts default_file_main variable to config.
 *
 * @ingroup config_upgrade
@@ -244,4 +259,18 @@ function file_update_8000() {
     'file_description_length'=>'description.length',
     'file_icon_directory'=>'icon.directory',
   ));
+}
+
+/**
+ * Convert the id column in file_usage to store UUID's.
+ */
+function file_update_8001() {
+  $spec = array(
+    'description' => 'The primary key of the object using the file.',
+    'type' => 'varchar',
+    'length' => 64,
+    'not null' => TRUE,
+    'default' => '',
+  );
+  db_change_field('file_usage', 'id', 'id', $spec);
 }

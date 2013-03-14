@@ -31,7 +31,7 @@ class FileTokenReplaceTest extends FileFieldTestBase {
 
     // Create file field.
     $type_name = 'article';
-    $field_name = 'field_' . strtolower($this->randomName());
+    $field_name = 'test_file_field';
     $this->createFileField($field_name, $type_name);
     $field = field_info_field($field_name);
     $instance = field_info_instance('node', $field_name, $type_name);

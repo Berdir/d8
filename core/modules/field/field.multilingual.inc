@@ -208,7 +208,10 @@ function field_content_languages() {
  *   TRUE if the field can be translated.
  */
 function field_is_translatable($entity_type, $field) {
-  return $field['translatable'] && field_has_translation_handler($entity_type);
+  // See http://drupal.org/node/1862758#comment-7035586
+  if (!empty($field)) {
+    return $field['translatable'] && field_has_translation_handler($entity_type);
+  }
 }
 
 /**

@@ -315,10 +315,6 @@ function user_install_picture_field() {
       'uri_scheme' => 'public',
       'default_image' => FALSE,
     ),
-    'storage' => array(
-      'type' => 'field_sql_storage',
-      'settings' => array(),
-    ),
   );
   $field = field_create_field($field);
 
@@ -716,7 +712,7 @@ function user_update_8011() {
       'settings' => array(),
     ),
   );
-  _update_7000_field_create_field($field);
+  $field = _update_7000_field_create_field($field);
 
   $instance = array(
     'field_name' => 'user_picture',

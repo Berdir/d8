@@ -136,22 +136,17 @@ class FieldInfoTest extends FieldUnitTestBase {
     // Simulate a stored field definition missing a field setting (e.g. a
     // third-party module adding a new field setting has been enabled, and
     // existing fields do not know the setting yet).
-    $data = db_query('SELECT data FROM {field_config} WHERE field_name = :field_name', array(':field_name' => $field_definition['field_name']))->fetchField();
-    $data = unserialize($data);
-    $data['settings'] = array();
-    db_update('field_config')
-      ->fields(array('data' => serialize($data)))
-      ->condition('field_name', $field_definition['field_name'])
-      ->execute();
-
-    field_cache_clear();
+    config('field.field.' . $field_definition['field_name'])
+      ->set('settings', array())
+      ->save();
+    field_info_cache_clear();
 
     // Read the field back.
     $field = field_info_field($field_definition['field_name']);
 
     // Check that all expected settings are in place.
     $field_type = field_info_field_types($field_definition['type']);
-    $this->assertIdentical($field['settings'], $field_type['settings'], 'All expected default field settings are present.');
+    $this->assertEqual($field['settings'], $field_type['settings'], 'All expected default field settings are present.');
   }
 
   /**
@@ -173,25 +168,18 @@ class FieldInfoTest extends FieldUnitTestBase {
     // Simulate a stored instance definition missing various settings (e.g. a
     // third-party module adding instance or widget settings has been enabled,
     // but existing instances do not know the new settings).
-    $data = db_query('SELECT data FROM {field_config_instance} WHERE field_name = :field_name AND bundle = :bundle', array(':field_name' => $instance_definition['field_name'], ':bundle' => $instance_definition['bundle']))->fetchField();
-    $data = unserialize($data);
-    $data['settings'] = array();
-    $data['widget']['settings'] = 'unavailable_widget';
-    $data['widget']['settings'] = array();
-    db_update('field_config_instance')
-      ->fields(array('data' => serialize($data)))
-      ->condition('field_name', $instance_definition['field_name'])
-      ->condition('bundle', $instance_definition['bundle'])
-      ->execute();
-
-    field_cache_clear();
+    $instance = entity_load('field_instance', $instance_definition['entity_type'] . '.' . $instance_definition['bundle'] . '.' . $instance_definition['field_name']);
+    $instance['settings'] = array();
+    $instance['widget']['settings'] = 'unavailable_widget';
+    $instance['widget']['settings'] = array();
+    field_update_instance($instance);
 
     // Read the instance back.
     $instance = field_info_instance($instance_definition['entity_type'], $instance_definition['field_name'], $instance_definition['bundle']);
 
     // Check that all expected instance settings are in place.
     $field_type = field_info_field_types($field_definition['type']);
-    $this->assertIdentical($instance['settings'], $field_type['instance_settings'] , 'All expected instance settings are present.');
+    $this->assertEqual($instance['settings'], $field_type['instance_settings'] , 'All expected instance settings are present.');
 
     // Check that the default widget is used and expected settings are in place.
     $widget = $instance->getWidget();

@@ -5,22 +5,29 @@
  * Install, update, and uninstall functions for the Field SQL Storage module.
  */
 
+use Drupal\field\Plugin\Core\Entity\Field;
+
 /**
  * Implements hook_schema().
  */
 function field_sql_storage_schema() {
   $schema = array();
 
-  // Dynamic (data) tables.
-  if (db_table_exists('field_config')) {
-    $fields = field_read_fields(array(), array('include_deleted' => TRUE, 'include_inactive' => TRUE));
-    drupal_load('module', 'field_sql_storage');
-    foreach ($fields as $field) {
+  // It's not safe to call field_read_fields() during maintenance mode.
+  // It's also not safe to call entity_load_multiple() during
+  // hook_schema() invocations.
+  if (!defined('MAINTENANCE_MODE')) {
+    // @todo we also need deleted fields, they have a schema.
+    $field_names = config_get_storage_names_with_prefix('field.field');
+    foreach ($field_names as $name) {
+      $field = config($name)->get();
       if ($field['storage']['type'] == 'field_sql_storage') {
+        $field = new Field($field, 'field_entity');
         $schema += _field_sql_storage_schema($field);
       }
     }
   }
+
   return $schema;
 }
 
@@ -104,7 +111,7 @@ function field_sql_storage_update_8000(&$sandbox) {
   $field_langcode = array(
     'type' => 'varchar',
     'length' => 32,
-    'not null' => true,
+    'not null' => TRUE,
     'default' => '',
   );
 

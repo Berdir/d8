@@ -1170,7 +1170,7 @@ function field_attach_insert(EntityInterface $entity) {
   $storages = array();
   foreach (field_info_instances($entity->entityType(), $entity->bundle()) as $instance) {
     $field = field_info_field_by_id($instance['field_id']);
-    $field_id = $field['id'];
+    $field_id = $field['uuid'];
     $field_name = $field['field_name'];
     if (!empty($entity->$field_name)) {
       // Collect the storage backend if the field has not been written yet.
@@ -1211,7 +1211,7 @@ function field_attach_update(EntityInterface $entity) {
   $storages = array();
   foreach (field_info_instances($entity->entityType(), $entity->bundle()) as $instance) {
     $field = field_info_field_by_id($instance['field_id']);
-    $field_id = $field['id'];
+    $field_id = $field['uuid'];
     $field_name = $field['field_name'];
     // Leave the field untouched if $entity comes with no $field_name property,
     // but empty the field if it comes as a NULL value or an empty array.
@@ -1254,7 +1254,7 @@ function field_attach_delete(EntityInterface $entity) {
   $storages = array();
   foreach (field_info_instances($entity->entityType(), $entity->bundle()) as $instance) {
     $field = field_info_field_by_id($instance['field_id']);
-    $field_id = $field['id'];
+    $field_id = $field['uuid'];
     $storages[$field['storage']['type']][$field_id] = $field_id;
   }
 
@@ -1287,7 +1287,7 @@ function field_attach_delete_revision(EntityInterface $entity) {
   $storages = array();
   foreach (field_info_instances($entity->entityType(), $entity->bundle()) as $instance) {
     $field = field_info_field_by_id($instance['field_id']);
-    $field_id = $field['id'];
+    $field_id = $field['uuid'];
     $storages[$field['storage']['type']][$field_id] = $field_id;
   }
 
@@ -1549,11 +1549,17 @@ function field_attach_create_bundle($entity_type, $bundle) {
  *   The new name of the bundle.
  */
 function field_attach_rename_bundle($entity_type, $bundle_old, $bundle_new) {
-  db_update('field_config_instance')
-    ->fields(array('bundle' => $bundle_new))
-    ->condition('entity_type', $entity_type)
-    ->condition('bundle', $bundle_old)
-    ->execute();
+  $instances = field_read_instances();
+  foreach ($instances as $id => $instance) {
+    if ($instance['entity_type'] == $entity_type && $instance['bundle'] == $bundle_old) {
+      $new_instance_id = $instance['entity_type'] . '.' . $bundle_new . '.' . $instance['field_name'];
+      config('field.instance.' . $instance['entity_type'] . '.' . $bundle_old . '.' . $instance['field_name'])->rename('field.instance.' . $new_instance_id);
+      config('field.instance.' . $instance['entity_type'] . '.' . $bundle_new . '.' . $instance['field_name'])
+        ->set('bundle', $bundle_new)
+        ->set('id', $new_instance_id)
+        ->save();
+    }
+  }
 
   // Clear the cache.
   field_cache_clear();
@@ -1569,7 +1575,7 @@ function field_attach_rename_bundle($entity_type, $bundle_old, $bundle_new) {
 }
 
 /**
- * Notifies field.module the a bundle was deleted.
+ * Notifies field.module that a bundle was deleted.
  *
  * This deletes the data for the field instances as well as the field instances
  * themselves. This function actually just marks the data and field instances as
@@ -1582,14 +1588,18 @@ function field_attach_rename_bundle($entity_type, $bundle_old, $bundle_new) {
  *   The entity type to which the bundle is bound.
  * @param $bundle
  *   The bundle to delete.
+ * @param $field_cleanup
+ *   If TRUE, the field will be deleted as well if its last instance is being
+ *   deleted. If FALSE, it is the caller's responsibility to handle the case of
+ *   fields left without instances. Defaults to TRUE.
  */
-function field_attach_delete_bundle($entity_type, $bundle) {
+function field_attach_delete_bundle($entity_type, $bundle, $field_cleanup = TRUE) {
   // First, delete the instances themselves. field_read_instances() must be
   // used here since field_info_instances() does not return instances for
   // disabled entity types or bundles.
   $instances = field_read_instances(array('entity_type' => $entity_type, 'bundle' => $bundle), array('include_inactive' => 1));
   foreach ($instances as $instance) {
-    field_delete_instance($instance);
+    field_delete_instance($instance, $field_cleanup);
   }
 
   // Clear the cache.

@@ -48,13 +48,13 @@ class DatetimeFieldTest extends WebTestBase {
     $this->drupalLogin($web_user);
 
     // Create a field with settings to validate.
-    $this->field = array(
+    $this->field_definition = array(
       'field_name' => drupal_strtolower($this->randomName()),
       'type' => 'datetime',
       'settings' => array('datetime_type' => 'date'),
     );
-    field_create_field($this->field);
-    $this->instance = array(
+    $this->field = field_create_field($this->field_definition);
+    $this->instance_definition = array(
       'field_name' => $this->field['field_name'],
       'entity_type' => 'test_entity',
       'bundle' => 'test_bundle',
@@ -65,7 +65,7 @@ class DatetimeFieldTest extends WebTestBase {
         'default_value' => 'blank',
       ),
     );
-    field_create_instance($this->instance);
+    $this->instance = field_create_instance($this->instance_definition);
 
     $this->display_options = array(
       'type' => 'datetime_default',
@@ -281,13 +281,15 @@ class DatetimeFieldTest extends WebTestBase {
   function testDefaultValue() {
 
     // Change the field to a datetime field.
+    $this->field = $this->field_definition;
     $this->field['settings']['datetime_type'] = 'datetime';
     field_update_field($this->field);
 
     // Set the default value to 'now'.
+    $this->instance = $this->instance_definition;
     $this->instance['settings']['default_value'] = 'now';
     $this->instance['default_value_function'] = 'datetime_default_value';
-    field_update_instance($this->instance);
+    $this->instance = field_update_instance($this->instance);
 
     // Display creation form.
     $date = new DrupalDateTime();
@@ -303,7 +305,9 @@ class DatetimeFieldTest extends WebTestBase {
     $this->assertNoFieldByName("{$this->field['field_name']}[$langcode][0][value][time]", '', 'Time element found.');
 
     // Set the default value to 'blank'.
+    $this->instance = $this->instance_definition;
     $this->instance['settings']['default_value'] = 'blank';
+    $this->instance['default_value_function'] = 'datetime_default_value';
     field_update_instance($this->instance);
 
     // Display creation form.

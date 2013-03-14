@@ -11,7 +11,7 @@ use Drupal\Component\Plugin\Discovery\DiscoveryInterface;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\field\Plugin\PluginSettingsBase;
-use Drupal\field\FieldInstance;
+use Drupal\field\Plugin\Core\Entity\FieldInstance;
 
 /**
  * Base class for 'Field widget' plugin implementations.
@@ -54,7 +54,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface 
    * @param Drupal\Component\Plugin\Discovery\DiscoveryInterface $discovery
    *   The Discovery class that holds access to the widget implementation
    *   definition.
-   * @param Drupal\field\FieldInstance $instance
+   * @param Drupal\field\Plugin\Core\Entity\FieldInstance $instance
    *   The field instance to which the widget is associated.
    * @param array $settings
    *   The widget settings.

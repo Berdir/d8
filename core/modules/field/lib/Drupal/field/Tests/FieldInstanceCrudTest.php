@@ -8,6 +8,7 @@
 namespace Drupal\field\Tests;
 
 use Drupal\field\FieldException;
+use Drupal\field\Plugin\Core\Entity\FieldInstance;
 
 class FieldInstanceCrudTest extends FieldUnitTestBase {
 
@@ -48,26 +49,24 @@ class FieldInstanceCrudTest extends FieldUnitTestBase {
   function testCreateFieldInstance() {
     field_create_instance($this->instance_definition);
 
-    // Read the raw record from the {field_config_instance} table.
-    $result = db_query('SELECT * FROM {field_config_instance} WHERE field_name = :field_name AND bundle = :bundle', array(':field_name' => $this->instance_definition['field_name'], ':bundle' => $this->instance_definition['bundle']));
-    $record = $result->fetchAssoc();
-    $record['data'] = unserialize($record['data']);
+    // Read the configuration.
+    $instance = entity_load('field_instance', $this->instance_definition['entity_type'] . '.' . $this->instance_definition['bundle'] . '.' . $this->instance_definition['field_name']);
 
     $field_type = field_info_field_types($this->field['type']);
     $widget_type = field_info_widget_types($field_type['default_widget']);
 
     // Check that the ID key is filled in.
-    $this->assertIdentical($record['id'], $this->instance_definition['id'], 'The instance id is filled in');
+    //$this->assertIdentical($record['id'], $this->instance_definition['id'], 'The instance id is filled in');
 
     // Check that default values are set.
-    $this->assertIdentical($record['data']['required'], FALSE, 'Required defaults to false.');
-    $this->assertIdentical($record['data']['label'], $this->instance_definition['field_name'], 'Label defaults to field name.');
-    $this->assertIdentical($record['data']['description'], '', 'Description defaults to empty string.');
-    $this->assertIdentical($record['data']['widget']['type'], $field_type['default_widget'], 'Default widget has been written.');
+    $this->assertEqual($instance['required'], FALSE, 'Required defaults to false.');
+    $this->assertIdentical($instance['label'], $this->instance_definition['field_name'], 'Label defaults to field name.');
+    $this->assertIdentical($instance['description'], '', 'Description defaults to empty string.');
+    $this->assertIdentical($instance['widget']['type'], $field_type['default_widget'], 'Default widget has been written.');
 
     // Check that default settings are set.
-    $this->assertIdentical($record['data']['settings'], $field_type['instance_settings'] , 'Default instance settings have been written.');
-    $this->assertIdentical($record['data']['widget']['settings'], $widget_type['settings'] , 'Default widget settings have been written.');
+    $this->assertEqual($instance['settings'], $field_type['instance_settings'] , 'Default instance settings have been written.');
+    $this->assertIdentical($instance['widget']['settings'], $widget_type['settings'] , 'Default widget settings have been written.');
 
     // Guarantee that the field/bundle combination is unique.
     try {
@@ -132,7 +131,9 @@ class FieldInstanceCrudTest extends FieldUnitTestBase {
 
     // Read the instance back.
     $instance = field_read_instance('test_entity', $this->instance_definition['field_name'], $this->instance_definition['bundle']);
-    $this->assertTrue($this->instance_definition == $instance, 'The field was properly read.');
+    $this->assertTrue($this->instance_definition['field_name'] == $instance['field_name'], 'The field was properly read.');
+    $this->assertTrue($this->instance_definition['entity_type'] == $instance['entity_type'], 'The field was properly read.');
+    $this->assertTrue($this->instance_definition['bundle'] == $instance['bundle'], 'The field was properly read.');
   }
 
   /**
@@ -206,7 +207,9 @@ class FieldInstanceCrudTest extends FieldUnitTestBase {
 
     // Make sure the field is deleted when its last instance is deleted.
     field_delete_instance($another_instance);
-    $field = field_read_field($another_instance['field_name'], array('include_deleted' => TRUE));
-    $this->assertTrue(!empty($field['deleted']), 'A deleted field is marked for deletion after all its instances have been marked for deletion.');
+    $deleted_fields = state()->get('field.field.deleted');
+    $this->assertTrue(isset($deleted_fields[$another_instance['field_id']]), 'A deleted field is marked for deletion.');
+    $field = field_read_field(array('field_name' => $another_instance['field_name']));
+    $this->assertFalse($field, 'The field marked to be deleted is not found anymore in the configuration.');
   }
 }
