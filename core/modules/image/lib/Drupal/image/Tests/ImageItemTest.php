@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @image
+ * @file
  * Contains \Drupal\image\Tests\ImageItemTest.
  */
 
@@ -107,6 +107,10 @@ class ImageItemTest extends FieldUnitTestBase {
     $this->assertEqual($entity->image_test->width, $info['width']);
     $this->assertEqual($entity->image_test->height, $info['height']);
     $this->assertEqual($entity->image_test->alt, $new_alt);
+
+    // Check that the image item can be set to the referenced file directly.
+    $entity->image_test = $this->image;
+    $this->assertEqual($entity->image_test->fid, $this->image->id());
   }
 
 }
