@@ -86,7 +86,7 @@ class NodeAccessPagerTest extends WebTestBase {
         'nid' => NULL,
         'type' => 'forum',
         'taxonomy_forums' => array(
-          array('target_id' => $tid, 'vid' => $vid),
+          array('target_id' => $tid),
         ),
       ));
     }
