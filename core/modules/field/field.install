@@ -173,7 +173,8 @@ function field_schema() {
  * @param $field
  *   The field definition array, passed by reference.
  * @param $update
- *   Optional; Indicate if we need to create a new field or update an existing one. Defaults to FALSE.
+ *   (optional) Indicate if we need to create a new field or update an existing
+ *   one. Defaults to FALSE.
  *
  * @ingroup update_api
  */
@@ -378,7 +379,8 @@ function _update_7000_field_read_fields(array $conditions = array(), $key = 'id'
  * @param $instance
  *   The instance definition array, passed by reference.
  * @param $update
- *   Optional; Indicate if we need to create a new instance or update an existing one. Defaults to FALSE.
+ *   (optional) Indicate if we need to create a new instance or update an
+ *   existing one. Defaults to FALSE.
  *
  * @ingroup update_api
  */

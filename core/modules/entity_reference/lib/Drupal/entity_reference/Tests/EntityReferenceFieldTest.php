@@ -35,13 +35,12 @@ class EntityReferenceFieldTest extends DrupalUnitTestBase {
     );
   }
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
 
     $this->installSchema('system', 'variable');
     $this->installSchema('field', array('field_config', 'field_config_instance'));
-    $this->installSchema('field_test', 'test_entity');
-    $this->installSchema('field_test', 'test_entity_revision');
+    $this->installSchema('field_test', array('test_entity', 'test_entity_revision'));
 
     // Setup a field and instance.
     $this->field_name = drupal_strtolower($this->randomName());
@@ -75,7 +74,7 @@ class EntityReferenceFieldTest extends DrupalUnitTestBase {
   }
 
   /**
-   * Test reference field validation.
+   * Tests reference field validation.
    */
   function testEntityReferenceFieldValidation() {
     // Test valid and invalid values with field_attach_validate().
@@ -109,8 +108,7 @@ class EntityReferenceFieldTest extends DrupalUnitTestBase {
   }
 
   /**
-   * Tests that vocabulary machine name changes are mirrored in field
-   * definitions.
+   * Tests that bundle changes are mirrored in field definitions.
    */
   function testEntityReferenceFieldChangeMachineName() {
     // Add several entries in the 'target_bundles' setting, to make sure that
