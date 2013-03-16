@@ -30,7 +30,7 @@ class ConfigurableEntityReferenceItem extends EntityReferenceItem {
   static $propertyDefinitions;
 
   /**
-   * Implements \Drupal\Core\TypedData\ComplexDataInterface::getPropertyDefinitions().
+   * Overrides \Drupal\Core\Entity\Field\Type\EntityReferenceItem::getPropertyDefinitions().
    */
   public function getPropertyDefinitions() {
     // Definitions vary by entity type, so key them by entity type.
@@ -63,7 +63,7 @@ class ConfigurableEntityReferenceItem extends EntityReferenceItem {
   }
 
   /**
-   * Overrides \Drupal\Core\Entity\Field\FieldItemBase::setValue().
+   * Overrides \Drupal\Core\Entity\Field\Type\EntityReferenceItem::setValue().
    */
   public function setValue($values) {
     // Treat the values as property value of the entity field, if no array
