@@ -441,7 +441,7 @@ function field_entity_field_info($entity_type) {
         // @todo: Allow for adding field type settings.
         $definition = array(
           'label' => t('Field !name', array('!name' => $field_name)),
-          'type' => $field['type'] . '_field',
+          'type' => isset($field_types[$field['type']]['data_type']) ? $field_types[$field['type']]['data_type'] :  $field['type'] . '_field',
           'configurable' => TRUE,
           'translatable' => !empty($field['translatable'])
         );

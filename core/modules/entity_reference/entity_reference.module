@@ -29,9 +29,24 @@ function entity_reference_field_info() {
     ),
     'default_widget' => 'entity_reference_autocomplete',
     'default_formatter' => 'entity_reference_label',
-    'field item class' => '\Drupal\Core\Entity\Field\Type\EntityReferenceItem',
+    'data_type' => 'entity_reference_configurable_field',
+    'field item class' => '\Drupal\entity_reference\Type\ConfigurableEntityReferenceItem',
   );
   return $field_info;
+}
+
+/**
+ * Implements hook_data_type_info().
+ */
+function entity_reference_data_type_info() {
+  return array(
+    'entity_reference_configurable_field' => array(
+      'label' => t('Configurable entity reference field item'),
+      'description' => t('An entity field containing a configurable entity reference.'),
+      'class' => '\Drupal\entity_reference\Type\ConfigurableEntityReferenceItem',
+      'list class' => '\Drupal\Core\Entity\Field\Type\Field',
+    ),
+  );
 }
 
 /**
