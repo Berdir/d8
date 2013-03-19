@@ -709,27 +709,6 @@ function update_storage_clear() {
 }
 
 /**
- * Implements hook_cache_flush().
- *
- * Called from update.php (among others) to flush the caches. Since we're
- * running update.php, we are likely to install a new version of something, in
- * which case, we want to check for available update data again. However,
- * because we use the key value storage system, we need to clear directly at
- * this point and return nothing.
- *
- * However, we only want to do this from update.php, since otherwise, we'd lose
- * all the available update data on every cron run. So, we specifically check if
- * the site is in MAINTENANCE_MODE == 'update' (which indicates update.php is
- * running, not update module... alas for overloaded names).
- */
-function update_cache_flush() {
-  if (defined('MAINTENANCE_MODE') && MAINTENANCE_MODE == 'update') {
-    update_storage_clear();
-  }
-  return array();
-}
-
-/**
  * Returns a short unique identifier for this Drupal installation.
  *
  * @return
