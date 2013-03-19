@@ -329,6 +329,6 @@ function _update_batch_create_message(&$project_results, $message, $success = TR
  * @see update_storage_clear()
  */
 function _update_authorize_clear_update_status() {
-  drupal_container()->get('keyvalue.expirable')->get('update')->deleteAll();
-  drupal_container()->get('keyvalue.expirable')->get('update_available_release')->deleteAll();
+  Drupal::keyValueExpirable('update')->deleteAll();
+  Drupal::keyValueExpirable('update_available_release')->deleteAll();
 }

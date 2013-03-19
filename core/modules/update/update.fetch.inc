@@ -136,7 +136,7 @@ function _update_process_fetch_task($project) {
   if (empty($fail)) {
     // If we have valid data about release history XML servers that we have
     // failed to fetch from on previous attempts, load that.
-    $fail = drupal_container()->get('keyvalue.expirable')->get('update')->get('fetch_failures');
+    $fail = Drupal::keyValueExpirable('update')->get('fetch_failures');
   }
 
   $max_fetch_attempts = $update_config->get('fetch.max_attempts');
@@ -178,10 +178,10 @@ function _update_process_fetch_task($project) {
 
   $frequency = $update_config->get('check.interval_days');
   $available['last_fetch'] = REQUEST_TIME + $request_time_difference;
-  drupal_container()->get('keyvalue.expirable')->get('update_available_releases')->setWithExpire($project_name, $available, $request_time_difference + (60 * 60 * 24 * $frequency));
+  Drupal::keyValueExpirable('update_available_releases')->setWithExpire($project_name, $available, $request_time_difference + (60 * 60 * 24 * $frequency));
 
   // Stash the $fail data back in the DB for the next 5 minutes.
-  drupal_container()->get('keyvalue.expirable')->get('update')->setWithExpire('fetch_failures', $fail, $request_time_difference + (60 * 5));
+  Drupal::keyValueExpirable('update')->setWithExpire('fetch_failures', $fail, $request_time_difference + (60 * 5));
 
   // Whether this worked or not, we did just (try to) check for updates.
   state()->set('update.last_check', REQUEST_TIME + $request_time_difference);
@@ -205,15 +205,15 @@ function _update_refresh() {
   // since that data (even if it's stale) can be useful during
   // update_get_projects(); for example, to modules that implement
   // hook_system_info_alter() such as cvs_deploy.
-  drupal_container()->get('keyvalue.expirable')->get('update')->delete('update_project_projects');
-  drupal_container()->get('keyvalue.expirable')->get('update')->delete('update_project_data');
+  Drupal::keyValueExpirable('update')->delete('update_project_projects');
+  Drupal::keyValueExpirable('update')->delete('update_project_data');
 
   $projects = update_get_projects();
 
   // Now that we have the list of projects, we should also clear the available
   // release data, since even if we fail to fetch new data, we need to clear
   // out the stale data at this point.
-  drupal_container()->get('keyvalue.expirable')->get('update_available_releases')->deleteAll();
+  Drupal::keyValueExpirable('update_available_releases')->deleteAll();
 
   foreach ($projects as $key => $project) {
     update_create_fetch_task($project);

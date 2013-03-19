@@ -387,7 +387,7 @@ function update_get_available($refresh = FALSE) {
   $needs_refresh = FALSE;
 
   // Grab whatever data we currently have.
-  $available = drupal_container()->get('keyvalue.expirable')->get('update_available_releases')->getAll();
+  $available = Drupal::keyValueExpirable('update_available_releases')->getAll();
 
   $projects = update_get_projects();
   foreach ($projects as $key => $project) {
@@ -426,7 +426,7 @@ function update_get_available($refresh = FALSE) {
     update_fetch_data();
     // After processing the queue, we've (hopefully) got better data, so pull
     // the latest data again and use that directly.
-    $available = drupal_container()->get('keyvalue.expirable')->get('update_available_releases')->getAll();
+    $available = Drupal::keyValueExpirable('update_available_releases')->getAll();
   }
 
   return $available;
@@ -704,8 +704,8 @@ function update_verify_update_archive($project, $archive_file, $directory) {
  * Invalidates stored data relating to update status.
  */
 function update_storage_clear() {
-  drupal_container()->get('keyvalue.expirable')->get('update')->deleteAll();
-  drupal_container()->get('keyvalue.expirable')->get('update_available_release')->deleteAll();
+  Drupal::keyValueExpirable('update')->deleteAll();
+  Drupal::keyValueExpirable('update_available_release')->deleteAll();
 }
 
 /**

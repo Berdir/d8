@@ -70,7 +70,7 @@ function update_get_projects() {
       // Allow other modules to alter projects before fetching and comparing.
       drupal_alter('update_projects', $projects);
       // Store the site's project data for at most 1 hour.
-      drupal_container()->get('keyvalue.expirable')->get('update')->setWithExpire('update_project_projects', $projects, 3600);
+      Drupal::keyValueExpirable('update')->setWithExpire('update_project_projects', $projects, 3600);
     }
   }
   return $projects;
@@ -360,7 +360,7 @@ function update_calculate_project_data($available) {
   drupal_alter('update_status', $projects);
 
   // Store the site's update status for at most 1 hour.
-  drupal_container()->get('keyvalue.expirable')->get('update')->setWithExpire('update_project_data', $projects, 3600);
+  Drupal::keyValueExpirable('update')->setWithExpire('update_project_data', $projects, 3600);
   return $projects;
 }
 
@@ -793,10 +793,10 @@ function update_project_storage($key) {
     'admin/reports/updates/check',
   );
   if (in_array(current_path(), $paths)) {
-    drupal_container()->get('keyvalue.expirable')->get('update')->delete($key);
+    Drupal::keyValueExpirable('update')->delete($key);
   }
   else {
-    $projects = drupal_container()->get('keyvalue.expirable')->get('update')->get($key);
+    $projects = Drupal::keyValueExpirable('update')->get($key);
   }
   return $projects;
 }
