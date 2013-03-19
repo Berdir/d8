@@ -10,7 +10,6 @@
  * the Update Manager module.
  */
 
-use Drupal\Core\FileTransfer\FileTransfer;
 use Drupal\Core\Updater\UpdaterException;
 
 /**

@@ -1735,7 +1735,7 @@ function system_update_8022() {
  * Create the 'key_value_expire' table.
  */
 function system_update_8023() {
-  // Moved to update_fix_d8_requirements().
+  // Moved to update_fix_d8_requirements() as it is required early.
 }
 
 /**
