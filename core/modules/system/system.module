@@ -3549,7 +3549,7 @@ function system_cron() {
   // Cleanup the flood.
   Drupal::service('flood')->garbageCollection();
 
-  $cache_bins = array_merge(module_invoke_all('cache_flush'), array('form', 'menu'));
+  $cache_bins = array_merge(module_invoke_all('cache_flush'), array('menu'));
   foreach ($cache_bins as $bin) {
     cache($bin)->garbageCollection();
   }
