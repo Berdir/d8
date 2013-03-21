@@ -8,7 +8,7 @@
 namespace Drupal\Core\KeyValueStore;
 
 /**
- * Defines the key/value store factory for the database backend.
+ * Defines the key/value store factory for the null backend.
  */
 class KeyValueNullExpirableFactory {
 
@@ -18,6 +18,7 @@ class KeyValueNullExpirableFactory {
    *
    * @param string $collection
    *   The name of the collection holding key and value pairs.
+   *
    * @return \Drupal\Core\KeyValueStore\DatabaseStorageExpirable
    *   A key/value store implementation for the given $collection.
    */
