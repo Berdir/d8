@@ -70,7 +70,7 @@ class CacheTest extends DrupalUnitTestBase {
     // Test that loading the cache with a different form_id fails.
     $wrong_form_build_id = $this->randomName(9);
     $cached_form_state = form_state_defaults();
-    $this->assertFalse(form_get_cache($wrong_form_build_id, $cached_form));
+    $this->assertFalse(form_get_cache($wrong_form_build_id, $cached_form_state), 'No form returned from cache');
     $this->assertTrue(empty($cached_form_state['example']), 'Cached form state was not loaded');
   }
 
