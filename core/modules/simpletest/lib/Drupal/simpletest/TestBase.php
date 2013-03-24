@@ -867,6 +867,8 @@ abstract class TestBase {
 
     // Ensure that the current session is not changed by the new environment.
     drupal_save_session(FALSE);
+    // Make sure the parent user is unset to enforce a common environment.
+    $user = NULL;
 
     // Save and clean the shutdown callbacks array because it is static cached
     // and will be changed by the test run. Otherwise it will contain callbacks
