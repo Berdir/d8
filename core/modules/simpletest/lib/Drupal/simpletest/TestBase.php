@@ -867,8 +867,9 @@ abstract class TestBase {
 
     // Ensure that the current session is not changed by the new environment.
     drupal_save_session(FALSE);
-    // Make sure the parent user is unset to enforce a common environment.
-    $user = NULL;
+    // Run all tests as a anonymous user by default, web tests will replace that
+    // during the test set up.
+    $user = drupal_anonymous_user();
 
     // Save and clean the shutdown callbacks array because it is static cached
     // and will be changed by the test run. Otherwise it will contain callbacks
