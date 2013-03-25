@@ -12,62 +12,62 @@ function common_test_menu() {
   $items['common-test/drupal_goto'] = array(
     'title' => 'Drupal Goto',
     'page callback' => 'common_test_drupal_goto_land',
-    'access arguments' => array('access content'),
+    'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
   $items['common-test/drupal_goto/alternative'] = array(
     'title' => 'Drupal Goto',
     'page callback' => 'common_test_drupal_goto_land_alternative',
-    'access arguments' => array('access content'),
+    'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
   $items['common-test/drupal_goto/fail'] = array(
     'title' => 'Drupal Goto',
     'page callback' => 'common_test_drupal_goto_land_fail',
-    'access arguments' => array('access content'),
+    'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
   $items['common-test/drupal_goto/redirect'] = array(
     'title' => 'Drupal Goto',
     'page callback' => 'common_test_drupal_goto_redirect',
-    'access arguments' => array('access content'),
+    'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
   $items['common-test/drupal_goto/redirect_advanced'] = array(
     'title' => 'Drupal Goto',
     'page callback' => 'common_test_drupal_goto_redirect_advanced',
-    'access arguments' => array('access content'),
+    'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
   $items['common-test/drupal_goto/redirect_fail'] = array(
     'title' => 'Drupal Goto Failure',
     'page callback' => 'drupal_goto',
     'page arguments' => array('common-test/drupal_goto/fail'),
-    'access arguments' => array('access content'),
+    'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
   $items['common-test/destination'] = array(
     'title' => 'Drupal Get Destination',
     'page callback' => 'common_test_destination',
-    'access arguments' => array('access content'),
+    'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
   $items['common-test/query-string'] = array(
     'title' => 'Test querystring',
     'page callback' => 'common_test_js_and_css_querystring',
-    'access arguments' => array('access content'),
+    'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
   $items['common-test/drupal-render-invalid-keys'] = array(
     'title' => 'Drupal Render',
     'page callback' => 'common_test_drupal_render_invalid_keys',
-    'access arguments' => array('access content'),
+    'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
   $items['common-test/l-active-class'] = array(
     'title' => 'Test l() adding of active class',
     'page callback' => 'common_test_l_active_class',
-    'access arguments' => array('access content'),
+    'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
   return $items;

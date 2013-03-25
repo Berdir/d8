@@ -25,34 +25,34 @@ function system_test_menu() {
     'title' => 'Redirect',
     'page callback' => 'system_test_redirect',
     'page arguments' => array(2),
-    'access arguments' => array('access content'),
+    'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
   $items['system-test/multiple-redirects/%'] = array(
     'title' => 'Redirect',
     'page callback' => 'system_test_multiple_redirects',
     'page arguments' => array(2),
-    'access arguments' => array('access content'),
+    'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
   $items['system-test/set-header'] = array(
     'page callback' => 'system_test_set_header',
-    'access arguments' => array('access content'),
+    'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
   $items['system-test/redirect-noscheme'] = array(
     'page callback' => 'system_test_redirect_noscheme',
-    'access arguments' => array('access content'),
+    'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
   $items['system-test/redirect-noparse'] = array(
     'page callback' => 'system_test_redirect_noparse',
-    'access arguments' => array('access content'),
+    'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
   $items['system-test/redirect-invalid-scheme'] = array(
     'page callback' => 'system_test_redirect_invalid_scheme',
-    'access arguments' => array('access content'),
+    'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
 
@@ -60,7 +60,7 @@ function system_test_menu() {
     'title' => 'Variable Get',
     'page callback' => 'variable_get',
     'page arguments' => array('simpletest_bootstrap_variable_test', NULL),
-    'access arguments' => array('access content'),
+    'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
 

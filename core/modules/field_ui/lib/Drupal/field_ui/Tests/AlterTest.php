@@ -19,7 +19,7 @@ class AlterTest extends WebTestBase {
    *
    * @var array
    */
-  public static $modules = array('field_ui', 'field_test', 'text', 'options');
+  public static $modules = array('node', 'field_ui', 'field_test', 'text', 'options');
 
   public static function getInfo() {
     return array(

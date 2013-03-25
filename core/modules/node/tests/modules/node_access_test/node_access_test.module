@@ -82,17 +82,16 @@ function node_access_test_permission() {
  * Sets up a test page that lists nodes.
  */
 function node_access_test_menu() {
-  $items = array();
   $items['node_access_test_page'] = array(
     'title' => 'Node access test',
     'page callback' => 'node_access_test_page',
-    'access arguments' => array('access content'),
+    'access callback' => TRUE,
     'type' => MENU_SUGGESTED_ITEM,
   );
   $items['node_access_entity_test_page'] = array(
-    'title' => 'Node access test',
+    'title' => 'Node access entity test',
     'page callback' => 'node_access_entity_test_page',
-    'access arguments' => array('access content'),
+    'access callback' => TRUE,
     'type' => MENU_SUGGESTED_ITEM,
   );
   return $items;

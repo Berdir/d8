@@ -12,13 +12,6 @@ namespace Drupal\file\Tests;
  */
 class RemoteFileSaveUploadTest extends SaveUploadTest {
 
-  /**
-   * Modules to enable.
-   *
-   * @var array
-   */
-  public static $modules = array('file_test');
-
   public static function getInfo() {
     $info = parent::getInfo();
     $info['group'] = 'File API (remote)';

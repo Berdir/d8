@@ -19,7 +19,7 @@ abstract class PhpTestBase extends WebTestBase {
    *
    * @var array
    */
-  public static $modules = array('php');
+  public static $modules = array('filter', 'node', 'php');
 
   protected $php_code_format;
 

@@ -12,7 +12,7 @@ function url_alter_test_menu() {
   $items['url-alter-test/foo'] = array(
     'title' => 'Foo',
     'page callback' => 'url_alter_test_foo',
-    'access arguments' => array('access content'),
+    'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
   return $items;

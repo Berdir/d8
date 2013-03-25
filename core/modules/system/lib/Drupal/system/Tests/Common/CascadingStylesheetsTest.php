@@ -19,7 +19,7 @@ class CascadingStylesheetsTest extends WebTestBase {
    *
    * @var array
    */
-  public static $modules = array('language', 'common_test');
+  public static $modules = array('node', 'language', 'common_test');
 
   public static function getInfo() {
     return array(

@@ -23,7 +23,7 @@ class StatisticsLoggingTest extends WebTestBase {
    *
    * @var array
    */
-  public static $modules = array('statistics', 'block');
+  public static $modules = array('node', 'statistics', 'block');
 
   public static function getInfo() {
     return array(

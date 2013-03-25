@@ -71,18 +71,18 @@ function module_test_menu() {
   $items['module-test/hook-dynamic-loading-invoke'] = array(
     'title' => 'Test hook dynamic loading (invoke)',
     'page callback' => 'module_test_hook_dynamic_loading_invoke',
-    'access arguments' => array('access content'),
+    'access callback' => TRUE,
   );
   $items['module-test/hook-dynamic-loading-invoke-all'] = array(
     'title' => 'Test hook dynamic loading (invoke_all)',
     'page callback' => 'module_test_hook_dynamic_loading_invoke_all',
-    'access arguments' => array('access content'),
+    'access callback' => TRUE,
   );
   $items['module-test/hook-dynamic-loading-invoke-all-during-load/%module_test'] = array(
     'title' => 'Test hook dynamic loading (menu item load)',
     'page callback' => 'module_test_hook_dynamic_loading_invoke_all_during_load',
     'page arguments' => array(2),
-    'access arguments' => array('access content'),
+    'access callback' => TRUE,
   );
   $items['module-test/class-loading'] = array(
     'title' => 'Test loading a class from another module',

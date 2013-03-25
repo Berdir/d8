@@ -19,7 +19,7 @@ class OptionsFieldUITest extends FieldTestBase {
    *
    * @var array
    */
-  public static $modules = array('options', 'field_test', 'taxonomy', 'field_ui');
+  public static $modules = array('node', 'options', 'field_test', 'taxonomy', 'field_ui');
 
   public static function getInfo() {
     return array(

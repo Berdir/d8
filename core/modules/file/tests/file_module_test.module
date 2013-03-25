@@ -12,15 +12,12 @@ use Drupal\file\Plugin\Core\Entity\File;
  * Implements hook_menu().
  */
 function file_module_test_menu() {
-  $items = array();
-
   $items['file/test'] = array(
     'title' => 'Managed file test',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('file_module_test_form'),
-    'access arguments' => array('access content'),
+    'access callback' => TRUE,
   );
-
   return $items;
 }
 

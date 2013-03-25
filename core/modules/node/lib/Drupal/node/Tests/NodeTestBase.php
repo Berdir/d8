@@ -24,8 +24,12 @@ abstract class NodeTestBase extends WebTestBase {
   function setUp() {
     parent::setUp();
 
-    // Create Basic page and Article node types.
     if ($this->profile != 'standard') {
+      // Enable default permissions for system roles.
+      user_role_grant_permissions(DRUPAL_ANONYMOUS_RID, array('access content'));
+      user_role_grant_permissions(DRUPAL_AUTHENTICATED_RID, array('access content'));
+
+      // Create Basic page and Article node types.
       $this->drupalCreateContentType(array('type' => 'page', 'name' => 'Basic page'));
       $this->drupalCreateContentType(array('type' => 'article', 'name' => 'Article'));
     }
