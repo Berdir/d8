@@ -44,7 +44,7 @@ class DatabaseBackendUnitTest extends GenericCacheBackendUnitTestBase {
    * Installs system schema.
    */
   public function setUpCacheBackend() {
-    $this->installSchema('system', array('cache', 'cache_page', 'cache_tags', 'cache_path', 'cache_bootstrap'));
+    $this->installSchema('system', array('cache', 'cache_render', 'cache_tags', 'cache_path', 'cache_bootstrap'));
   }
 
   /**

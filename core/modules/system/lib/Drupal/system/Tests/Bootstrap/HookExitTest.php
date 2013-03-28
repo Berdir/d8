@@ -50,7 +50,7 @@ class HookExitTest extends WebTestBase {
     $this->drupalGet('');
     $calls++;
     $this->assertEqual(db_query('SELECT COUNT(*) FROM {watchdog} WHERE type = :type AND message = :message', array(':type' => 'system_test', ':message' => 'hook_exit'))->fetchField(), $calls, 'hook_exit called with normal cache and no cached page.');
-    $this->assertTrue(cache('page')->get(url('', array('absolute' => TRUE))), 'Page has been cached.');
+    $this->assertTrue(cache('render')->get(url('', array('absolute' => TRUE))), 'Page has been cached.');
     $this->drupalGet('');
     $this->assertEqual(db_query('SELECT COUNT(*) FROM {watchdog} WHERE type = :type AND message = :message', array(':type' => 'system_test', ':message' => 'hook_exit'))->fetchField(), $calls, 'hook_exit not called with normal cache and a cached page.');
 

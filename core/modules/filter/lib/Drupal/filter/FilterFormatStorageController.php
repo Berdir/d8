@@ -75,7 +75,7 @@ class FilterFormatStorageController extends ConfigStorageController {
 
     if ($update) {
       // Clear the filter cache whenever a text format is updated.
-      cache('filter')->deleteTags(array('filter_format' => $entity->id()));
+      cache('render')->deleteTags(array('filter_format' => $entity->id()));
     }
     else {
       // Default configuration of modules and installation profiles is allowed

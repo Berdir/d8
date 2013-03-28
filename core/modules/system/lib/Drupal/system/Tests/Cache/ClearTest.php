@@ -36,7 +36,6 @@ class ClearTest extends CacheTestBase {
     // Create cache entries for each flushed cache bin.
     $bins = Cache::getBins();
     $this->assertTrue($bins, 'cache_get_bins() returned bins to flush.');
-    $bins['menu'] = $this->container->get('cache.menu');
     foreach ($bins as $bin => $cache_backend) {
       $cid = 'test_cid_clear' . $bin;
       $cache_backend->set($cid, $this->default_value);
