@@ -39,7 +39,7 @@ class FormatterPluginManager extends PluginManagerBase {
     $this->discovery = new FormatterLegacyDiscoveryDecorator($this->discovery);
     $this->discovery = new ProcessDecorator($this->discovery, array($this, 'processDefinition'));
     $this->discovery = new AlterDecorator($this->discovery, 'field_formatter_info');
-    $this->discovery = new CacheDecorator($this->discovery, 'field_formatter_types', 'field');
+    $this->discovery = new CacheDecorator($this->discovery, 'field_formatter_types');
 
     $this->factory = new FormatterFactory($this->discovery);
   }
