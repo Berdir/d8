@@ -25,7 +25,6 @@ class FieldBundle extends Bundle {
       ->addArgument('%container.namespaces%');
     $container->register('plugin.manager.field.formatter', 'Drupal\field\Plugin\Type\Formatter\FormatterPluginManager')
       ->addArgument('%container.namespaces%');
-    CacheFactory::registerBin($container, 'field');
   }
 
 }

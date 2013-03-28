@@ -351,7 +351,7 @@ function install_begin_request(&$install_state) {
 
     // Register the 'language_manager' service.
     $container->register('language_manager', 'Drupal\Core\Language\LanguageManager');
-    foreach (array('bootstrap', 'config', 'cache', 'menu', 'page', 'path') as $bin) {
+    foreach (array('bootstrap', 'config', 'cache', 'entity', 'render', 'path') as $bin) {
       $container
         ->register("cache.$bin", 'Drupal\Core\Cache\MemoryBackend')
         ->addArgument($bin);

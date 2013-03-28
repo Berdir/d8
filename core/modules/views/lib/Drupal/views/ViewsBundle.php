@@ -38,7 +38,6 @@ class ViewsBundle extends Bundle {
     $container->register('views.analyzer', 'Drupal\views\Analyzer')
       ->addArgument(new Reference('module_handler'));
     CacheFactory::registerBin($container, 'views_info');
-    CacheFactory::registerBin($container, 'views_results');
   }
 
 }

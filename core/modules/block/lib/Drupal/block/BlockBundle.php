@@ -23,7 +23,6 @@ class BlockBundle extends Bundle {
     // Register the BlockManager class with the dependency injection container.
     $container->register('plugin.manager.block', 'Drupal\block\Plugin\Type\BlockManager')
       ->addArgument('%container.namespaces%');
-    CacheFactory::registerBin($container, 'block');
   }
 
 }
