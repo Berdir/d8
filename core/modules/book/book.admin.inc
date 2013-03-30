@@ -127,7 +127,7 @@ function book_admin_edit_submit($form, &$form_state) {
     // Flush static and cache.
     drupal_static_reset('book_menu_subtree_data');
     $cid = 'links:' . $form['#node']->book['menu_name'] . ':subtree-cid:' . $form['#node']->book['mlid'];
-    cache('menu')->delete($cid);
+    cache('path')->delete($cid);
   }
 
   drupal_set_message(t('Updated book %title.', array('%title' => $form['#node']->label())));
