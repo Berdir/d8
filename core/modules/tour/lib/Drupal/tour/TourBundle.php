@@ -8,6 +8,7 @@
 namespace Drupal\tour;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
@@ -22,7 +23,7 @@ class TourBundle extends Bundle {
     // Register the plugin manager for our plugin type with the dependency
     // injection container.
     $container->register('plugin.manager.tour.tip', 'Drupal\tour\TipPluginManager')
-      ->addArgument('%container.namespaces%');
+      ->addArgument(new Reference('container.namespaces'));
   }
 
 }

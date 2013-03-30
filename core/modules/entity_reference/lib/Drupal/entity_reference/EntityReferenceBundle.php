@@ -27,4 +27,5 @@ class EntityReferenceBundle extends Bundle {
     $container->register('entity_reference.autocomplete', 'Drupal\entity_reference\EntityReferenceAutocomplete')
       ->addArgument(new Reference('plugin.manager.entity'));
   }
+
 }

@@ -23,7 +23,7 @@ class RestBundle extends Bundle {
     // Register the resource manager class with the dependency injection
     // container.
     $container->register('plugin.manager.rest', 'Drupal\rest\Plugin\Type\ResourcePluginManager')
-      ->addArgument('%container.namespaces%');
+      ->addArgument(new Reference('container.namespaces'));
 
     $container->register('rest.route_subscriber', 'Drupal\rest\EventSubscriber\RouteSubscriber')
       ->addArgument(new Reference('plugin.manager.rest'))

@@ -8,6 +8,7 @@
 namespace Drupal\editor;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
@@ -22,7 +23,7 @@ class EditorBundle extends Bundle {
     // Register the plugin manager for our plugin type with the dependency
     // injection container.
     $container->register('plugin.manager.editor', 'Drupal\editor\Plugin\EditorManager')
-      ->addArgument('%container.namespaces%');
+      ->addArgument(new Reference('container.namespaces'));
   }
 
 }

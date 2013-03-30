@@ -150,9 +150,16 @@ class CoreBundle extends Bundle {
       ->addMethodCall('addSubscriber', array(new Reference('http_client_simpletest_subscriber')))
       ->addMethodCall('setUserAgent', array('Drupal (+http://drupal.org/)'));
 
+
+    // Register a namespaces object.
+    $container->register('container.namespaces', 'ArrayObject')
+      ->addArgument('%container.namespaces%')
+      ->addTag('persist');
+
     // Register the EntityManager.
     $container->register('plugin.manager.entity', 'Drupal\Core\Entity\EntityManager')
-      ->addArgument('%container.namespaces%');
+      ->addArgument(new Reference('container.namespaces'));
+
 
     // The 'request' scope and service enable services to depend on the Request
     // object and get reconstructed when the request object changes (e.g.,
@@ -182,7 +189,7 @@ class CoreBundle extends Bundle {
     $container->register('typed_data', 'Drupal\Core\TypedData\TypedDataManager')
       ->addMethodCall('setValidationConstraintManager', array(new Reference('validation.constraint')));
     $container->register('validation.constraint', 'Drupal\Core\Validation\ConstraintManager')
-      ->addArgument('%container.namespaces%');
+      ->addArgument(new Reference('container.namespaces'));
 
     // Add the user's storage for temporary, non-cache data.
     $container->register('lock', 'Drupal\Core\Lock\DatabaseLockBackend');
@@ -293,7 +300,8 @@ class CoreBundle extends Bundle {
     $container->register('flood', 'Drupal\Core\Flood\DatabaseBackend')
       ->addArgument(new Reference('database'));
 
-    $container->register('plugin.manager.condition', 'Drupal\Core\Condition\ConditionManager');
+    $container->register('plugin.manager.condition', 'Drupal\Core\Condition\ConditionManager')
+      ->addArgument(new Reference('container.namespaces'));
 
     $container->register('kernel_destruct_subscriber', 'Drupal\Core\EventSubscriber\KernelDestructionSubscriber')
       ->addMethodCall('setContainer', array(new Reference('service_container')))
@@ -306,7 +314,7 @@ class CoreBundle extends Bundle {
     // Register image toolkit manager.
     $container
       ->register('image.toolkit.manager', 'Drupal\system\Plugin\ImageToolkitManager')
-      ->addArgument('%container.namespaces%');
+      ->addArgument(new Reference('container.namespaces'));
     // Register image toolkit.
     $container
       ->register('image.toolkit', 'Drupal\system\Plugin\ImageToolkitInterface')

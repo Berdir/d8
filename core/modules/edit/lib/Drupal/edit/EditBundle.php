@@ -21,7 +21,7 @@ class EditBundle extends Bundle {
    */
   public function build(ContainerBuilder $container) {
     $container->register('plugin.manager.edit.editor', 'Drupal\edit\Plugin\EditorManager')
-      ->addArgument('%container.namespaces%');
+      ->addArgument(new Reference('container.namespaces'));
 
     $container->register('access_check.edit.entity_field', 'Drupal\edit\Access\EditEntityFieldAccessCheck')
       ->addTag('access_check');

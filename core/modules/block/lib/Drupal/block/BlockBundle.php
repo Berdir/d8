@@ -9,6 +9,7 @@ namespace Drupal\Block;
 
 use Drupal\Core\Cache\CacheFactory;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
@@ -22,7 +23,7 @@ class BlockBundle extends Bundle {
   public function build(ContainerBuilder $container) {
     // Register the BlockManager class with the dependency injection container.
     $container->register('plugin.manager.block', 'Drupal\block\Plugin\Type\BlockManager')
-      ->addArgument('%container.namespaces%');
+      ->addArgument(new Reference('container.namespaces'));
     CacheFactory::registerBin($container, 'block');
   }
 

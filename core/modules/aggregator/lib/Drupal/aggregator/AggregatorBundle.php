@@ -8,6 +8,7 @@
 namespace Drupal\aggregator;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
@@ -20,7 +21,7 @@ class AggregatorBundle extends Bundle {
    */
   public function build(ContainerBuilder $container) {
     $container->register('plugin.manager.aggregator.fetcher', 'Drupal\aggregator\Plugin\FetcherManager')
-      ->addArgument('%container.namespaces%');
+      ->addArgument(new Reference('container.namespaces'));
   }
 
 }

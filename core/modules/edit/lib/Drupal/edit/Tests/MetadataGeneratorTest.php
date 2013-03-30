@@ -56,7 +56,7 @@ class MetadataGeneratorTest extends EditTestBase {
   function setUp() {
     parent::setUp();
 
-    $this->editorManager = new EditorManager($this->container->getParameter('container.namespaces'));
+    $this->editorManager = new EditorManager($this->container->get('container.namespaces'));
     $this->accessChecker = new MockEditEntityFieldAccessCheck();
     $this->editorSelector = new EditorSelector($this->editorManager);
     $this->metadataGenerator = new MetadataGenerator($this->accessChecker, $this->editorSelector, $this->editorManager);
@@ -131,7 +131,7 @@ class MetadataGeneratorTest extends EditTestBase {
     // Enable edit_test module so that the WYSIWYG Create.js PropertyEditor
     // widget becomes available.
     $this->enableModules(array('edit_test'));
-    $this->editorManager = new EditorManager($this->container->getParameter('container.namespaces'));
+    $this->editorManager = new EditorManager($this->container->get('container.namespaces'));
     $this->editorSelector = new EditorSelector($this->editorManager);
     $this->metadataGenerator = new MetadataGenerator($this->accessChecker, $this->editorSelector, $this->editorManager);
 

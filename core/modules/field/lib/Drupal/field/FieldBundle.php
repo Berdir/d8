@@ -9,6 +9,7 @@ namespace Drupal\field;
 
 use Drupal\Core\Cache\CacheFactory;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
@@ -22,9 +23,9 @@ class FieldBundle extends Bundle {
   public function build(ContainerBuilder $container) {
     // Register the plugin managers for our plugin types with the dependency injection container.
     $container->register('plugin.manager.field.widget', 'Drupal\field\Plugin\Type\Widget\WidgetPluginManager')
-      ->addArgument('%container.namespaces%');
+      ->addArgument(new Reference('container.namespaces'));
     $container->register('plugin.manager.field.formatter', 'Drupal\field\Plugin\Type\Formatter\FormatterPluginManager')
-      ->addArgument('%container.namespaces%');
+      ->addArgument(new Reference('container.namespaces'));
     CacheFactory::registerBin($container, 'field');
   }
 

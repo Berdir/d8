@@ -25,7 +25,7 @@ class ViewsBundle extends Bundle {
     foreach (ViewExecutable::getPluginTypes() as $type) {
       $container->register("plugin.manager.views.$type", 'Drupal\views\Plugin\ViewsPluginManager')
         ->addArgument($type)
-        ->addArgument('%container.namespaces%');
+        ->addArgument(new Reference('container.namespaces'));
     }
 
     $container->register('views.views_data', 'Drupal\views\ViewsDataCache')

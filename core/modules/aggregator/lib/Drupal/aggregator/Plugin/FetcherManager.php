@@ -20,10 +20,10 @@ class FetcherManager extends PluginManagerBase {
   /**
    * Constructs a FetcherManager object.
    *
-   * @param array $namespaces
+   * @param \Traversable $namespaces
    *   An array of paths keyed by it's corresponding namespaces.
    */
-  public function __construct(array $namespaces) {
+  public function __construct(\Traversable $namespaces) {
     $this->discovery = new AnnotatedClassDiscovery('aggregator', 'fetcher', $namespaces);
     $this->discovery = new CacheDecorator($this->discovery, 'aggregator_fetcher:' . language(LANGUAGE_TYPE_INTERFACE)->langcode);
     $this->factory = new DefaultFactory($this->discovery);

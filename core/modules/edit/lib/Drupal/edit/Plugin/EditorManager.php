@@ -24,10 +24,10 @@ class EditorManager extends PluginManagerBase {
   /**
    * Overrides \Drupal\Component\Plugin\PluginManagerBase::__construct().
    *
-   * @param array $namespaces
+   * @param \Traversable $namespaces
    *   An array of paths keyed by it's corresponding namespaces.
    */
-  public function __construct(array $namespaces) {
+  public function __construct(\Traversable $namespaces) {
     $this->discovery = new AnnotatedClassDiscovery('edit', 'editor', $namespaces);
     $this->discovery = new ProcessDecorator($this->discovery, array($this, 'processDefinition'));
     $this->discovery = new AlterDecorator($this->discovery, 'edit_editor');

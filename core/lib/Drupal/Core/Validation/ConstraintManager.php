@@ -39,10 +39,10 @@ class ConstraintManager extends PluginManagerBase {
   /**
    * Overrides \Drupal\Component\Plugin\PluginManagerBase::__construct().
    *
-   * @param array $namespaces
+   * @param \Traversable $namespaces
    *   An array of paths keyed by it's corresponding namespaces.
    */
-  public function __construct(array $namespaces) {
+  public function __construct(\Traversable $namespaces) {
     $this->discovery = new AnnotatedClassDiscovery('Validation', 'Constraint', $namespaces);
     $this->discovery = new StaticDiscoveryDecorator($this->discovery, array($this, 'registerDefinitions'));
     $this->discovery = new DerivativeDiscoveryDecorator($this->discovery);

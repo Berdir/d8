@@ -21,7 +21,7 @@ class CKEditorBundle extends Bundle {
    */
   public function build(ContainerBuilder $container) {
     $container->register('plugin.manager.ckeditor.plugin', 'Drupal\ckeditor\CKEditorPluginManager')
-      ->addArgument('%container.namespaces%');
+      ->addArgument(new Reference('container.namespaces'));
   }
 
 }
