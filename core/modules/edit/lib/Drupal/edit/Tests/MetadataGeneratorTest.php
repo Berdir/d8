@@ -131,9 +131,6 @@ class MetadataGeneratorTest extends EditTestBase {
     // Enable edit_test module so that the WYSIWYG Create.js PropertyEditor
     // widget becomes available.
     $this->enableModules(array('edit_test'));
-    $this->editorManager = new EditorManager($this->container->get('container.namespaces'));
-    $this->editorSelector = new EditorSelector($this->editorManager);
-    $this->metadataGenerator = new MetadataGenerator($this->accessChecker, $this->editorSelector, $this->editorManager);
 
     // Create a rich text field.
     $field_name = 'field_rich';

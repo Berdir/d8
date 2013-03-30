@@ -109,8 +109,6 @@ class EditorSelectionTest extends EditTestBase {
     // Enable edit_test module so that the 'wysiwyg' Create.js PropertyEditor
     // widget becomes available.
     $this->enableModules(array('edit_test'));
-    $this->editorManager = new EditorManager($this->container->get('container.namespaces'));
-    $this->editorSelector = new EditorSelector($this->editorManager);
 
     $field_name = 'field_textarea';
     $this->createFieldWithInstance(
