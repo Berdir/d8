@@ -23,7 +23,7 @@ class EntityReferenceBundle extends Bundle {
     // Register the SelectionPluginManager class and the autocomplete helper
     // with the dependency injection container.
     $container->register('plugin.manager.entity_reference.selection', 'Drupal\entity_reference\Plugin\Type\SelectionPluginManager')
-      ->addArgument('%container.namespaces%');
+      ->addArgument(new Reference('container.namespaces'));
     $container->register('entity_reference.autocomplete', 'Drupal\entity_reference\EntityReferenceAutocomplete')
       ->addArgument(new Reference('plugin.manager.entity'));
   }
