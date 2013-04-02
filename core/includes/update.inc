@@ -673,6 +673,13 @@ function update_fix_d8_requirements() {
     );
     db_create_table('key_value_expire', $schema);
 
+    // Views module is required to convert all previously existing listings into
+    // views configurations.
+    // Like any other module APIs and services, Views' services are not available
+    // in update.php. Existing listings are migrated into configuration, using
+    // the limited standard tools of raw database queries and config().
+    update_module_enable(array('views'));
+
     update_variable_set('update_d8_requirements', TRUE);
   }
 }
@@ -731,6 +738,27 @@ function update_module_enable(array $modules, $schema_version = 0) {
     }
     else {
       $old_schema[$module] = $current_schema;
+    }
+
+    // Copy the default configuration of the module into the active storage.
+    // The default configuration is not altered in any way, and since the module
+    // is just being installed, none of its configuration can exist already, so
+    // this is a plain copy operation from one storage to another.
+    $module_config_path = drupal_get_path('module', $module) . '/config';
+    if (is_dir($module_config_path)) {
+      $module_filestorage = new FileStorage($module_config_path);
+      $config_storage = drupal_container()->get('config.storage');
+      foreach ($module_filestorage->listAll() as $config_name) {
+        // If this file already exists, something in the upgrade path went
+        // completely wrong and we want to know.
+        if ($config_storage->exists($config_name)) {
+          throw new ConfigException(format_string('Default configuration file @name of @module module unexpectedly exists already before the module was installed.', array(
+            '@module' => $module,
+            '@name' => $config_name,
+          )));
+        }
+        $config_storage->write($config_name, $module_filestorage->read($config_name));
+      }
     }
 
     // system_list_reset() is in module.inc but that would only be available
