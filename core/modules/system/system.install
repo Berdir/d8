@@ -1,11 +1,13 @@
 <?php
 
-use Drupal\Core\Database\Database;
-
 /**
  * @file
  * Install, update and uninstall functions for the system module.
  */
+
+use Drupal\Core\Config\ConfigException;
+use Drupal\Core\Config\FileStorage;
+use Drupal\Core\Database\Database;
 
 /**
  * Test and report Drupal installation requirements.

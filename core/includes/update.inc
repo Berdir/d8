@@ -452,6 +452,13 @@ function update_prepare_stored_includes() {
  */
 function update_prepare_d8_language() {
   if (db_table_exists('languages')) {
+
+    // Install/enable the language module. We need to use the update specific
+    // version of this function to ensure schema conflicts don't happen due to
+    // our updated data.
+    $modules = array('language');
+    update_module_enable($modules);
+
     $languages = db_select('languages', 'l')
       ->fields('l')
       ->execute();
@@ -489,12 +496,6 @@ function update_prepare_d8_language() {
 
     // Rename the languages table to language.
     db_rename_table('languages', 'language');
-
-    // Install/enable the language module. We need to use the update specific
-    // version of this function to ensure schema conflicts don't happen due to
-    // our updated data.
-    $modules = array('language');
-    update_module_enable($modules);
 
     // Rename language column to langcode and set it again as the primary key.
     if (db_field_exists('language', 'language')) {
