@@ -416,13 +416,6 @@ function field_test_field_storage_delete_instance($instance) {
 }
 
 /**
- * Implements hook_entity_bundle_create().
- */
-function field_test_entity_bundle_create($entity_type, $bundle) {
-  // We don't need to do anything here.
-}
-
-/**
  * Implements hook_entity_bundle_rename().
  */
 function field_test_entity_bundle_rename($entity_type, $bundle_old, $bundle_new) {
