@@ -3719,11 +3719,11 @@ function system_retrieve_file($url, $destination = NULL, $managed = FALSE, $repl
   }
   catch (BadResponseException $exception) {
     $response = $exception->getResponse();
-    drupal_set_message(t('HTTP error "@error" occurred when trying to fetch @remote.', array('@errorcode' => $response->getStatusCode() . ' ' . $response->getReasonPhrase(), '@remote' => $url)), 'error');
+    drupal_set_message(t('Failed to fetch file due to HTTP error "%error"', array('%error' => $response->getStatusCode() . ' ' . $response->getReasonPhrase())), 'error');
     return FALSE;
   }
   catch (RequestException $exception) {
-    drupal_set_message(t('HTTP error "@error" occurred when trying to fetch @remote.', array('@errorcode' => $exception->getMessage(), '@remote' => $url)), 'error');
+    drupal_set_message(t('Failed to fetch file due to error "%error"', array('%error' => $exception->getMessage())), 'error');
     return FALSE;
   }
   if (!$local) {
