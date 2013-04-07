@@ -129,7 +129,7 @@ class ViewsDataTest extends ViewUnitTestBase {
   }
 
   /**
-   * Make sure that cache entries are only set and get when necessary.
+   * Ensures that cache entries are only set and get when necessary.
    */
   public function testCache() {
     // Request the same table 5 times.
@@ -138,14 +138,14 @@ class ViewsDataTest extends ViewUnitTestBase {
       $this->viewsDataCache->get($table_name);
     }
 
-    // This did a full rebuild internally, so we have one get for the table,
-    // one for the whole storage and we also write both.
+    // Requesting the table did a full rebuild internally, so we have one cache
+    // get for the table, one for the whole storage and we also write both.
     $this->assertEqual($this->memoryCounterBackend->getCounter('get', 'views_data:views_test_data:en'), 1);
     $this->assertEqual($this->memoryCounterBackend->getCounter('get', 'views_data:en'), 1);
     $this->assertEqual($this->memoryCounterBackend->getCounter('set', 'views_data:en'), 1);
     $this->assertEqual($this->memoryCounterBackend->getCounter('set', 'views_data:views_test_data:en'), 1);
 
-    // Re-initialize the views data cache and repeat.
+    // Re-initialize the views data cache to simulate a new request and repeat.
     $this->memoryCounterBackend->resetCounter();
     $this->viewsDataCache = new ViewsDataCache($this->memoryCounterBackend, $this->container->get('config.factory'), $this->container->get('module_handler'));
     for ($i = 0; $i < 5; $i++) {
@@ -167,7 +167,7 @@ class ViewsDataTest extends ViewUnitTestBase {
     }
 
     // This only requested the full information. No other cache requests should
-    // have been made
+    // have been made.
     $this->assertEqual($this->memoryCounterBackend->getCounter('get', 'views_data:views_test_data:en'), 0);
     $this->assertEqual($this->memoryCounterBackend->getCounter('get', 'views_data:en'), 1);
     $this->assertEqual($this->memoryCounterBackend->getCounter('set', 'views_data:en'), 0);

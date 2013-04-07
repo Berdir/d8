@@ -183,7 +183,7 @@ class ViewsDataCache {
       $this->processEntityTypes($data);
 
       // Keep a record with all data.
-      $this->cacheBackend->set($this->prepareCid($this->baseCid), $this->storage);
+      $this->cacheBackend->set($this->prepareCid($this->baseCid), $data);
 
       return $data;
     }
