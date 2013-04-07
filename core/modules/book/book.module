@@ -203,7 +203,7 @@ function book_menu() {
  *   The node whose export page is to be viewed.
  */
 function book_export_access(EntityInterface $node) {
-  return user_access('access printer-friendly version') && node_access('view', $node);
+  return user_access('access printer-friendly version') && $node->access('view');
 }
 
 /**
@@ -219,7 +219,7 @@ function book_export_access(EntityInterface $node) {
  * @see book_menu()
  */
 function _book_outline_access(EntityInterface $node) {
-  return user_access('administer book outlines') && node_access('view', $node);
+  return user_access('administer book outlines') && $node->access('view');
 }
 
 /**

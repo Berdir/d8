@@ -85,7 +85,7 @@ function translation_menu() {
  * @see translation_menu()
  */
 function _translation_tab_access($node) {
-  if ($node->langcode != LANGUAGE_NOT_SPECIFIED && translation_supported_type($node->type) && node_access('view', $node)) {
+  if ($node->langcode != LANGUAGE_NOT_SPECIFIED && translation_supported_type($node->type) && $node->access('view')) {
     return translation_user_can_translate_node($node);
   }
   return FALSE;

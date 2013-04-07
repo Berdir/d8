@@ -27,7 +27,7 @@ class LinkEdit extends Link {
    */
   function render_link($node, $values) {
     // Ensure user has access to edit this node.
-    if (!node_access('update', $node)) {
+    if (!$node->access('update')) {
       return;
     }
 

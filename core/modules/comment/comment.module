@@ -2060,7 +2060,7 @@ function comment_file_download_access($field, EntityInterface $entity, File $fil
   if ($entity->entityType() == 'comment') {
     if (user_access('access comments') && $entity->status->value == COMMENT_PUBLISHED || user_access('administer comments')) {
       $node = $entity->nid->entity;
-      return node_access('view', $node);
+      return $node->access('view');
     }
     return FALSE;
   }

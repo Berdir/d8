@@ -554,14 +554,14 @@ function node_admin_nodes() {
 
     // Build a list of all the accessible operations for the current node.
     $operations = array();
-    if (node_access('update', $node)) {
+    if ($node->access('update')) {
       $operations['edit'] = array(
         'title' => t('Edit'),
         'href' => 'node/' . $node->nid . '/edit',
         'query' => $destination,
       );
     }
-    if (node_access('delete', $node)) {
+    if ($node->access('delete')) {
       $operations['delete'] = array(
         'title' => t('Delete'),
         'href' => 'node/' . $node->nid . '/delete',

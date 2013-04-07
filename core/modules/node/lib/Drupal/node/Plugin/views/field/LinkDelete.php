@@ -27,7 +27,7 @@ class LinkDelete extends Link {
    */
   function render_link($node, $values) {
     // Ensure user has access to delete this node.
-    if (!node_access('delete', $node)) {
+    if (!$node->access('delete')) {
       return;
     }
 

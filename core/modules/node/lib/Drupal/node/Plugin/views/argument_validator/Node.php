@@ -94,7 +94,7 @@ class Node extends ArgumentValidatorPluginBase {
         }
 
         if (!empty($this->options['access'])) {
-          if (!node_access($this->options['access_op'], $node)) {
+          if (!$node->access($this->options['access_op'])) {
             return FALSE;
           }
         }
@@ -126,7 +126,7 @@ class Node extends ArgumentValidatorPluginBase {
           }
 
           if (!empty($this->options['access'])) {
-            if (!node_access($this->options['access_op'], $node)) {
+            if (!$node->access($this->options['access_op'])) {
               return FALSE;
             }
           }

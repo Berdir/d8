@@ -223,6 +223,7 @@ function hook_file_delete(Drupal\file\File $file) {
  */
 function hook_file_download_access($field, Drupal\Core\Entity\EntityInterface $entity, Drupal\file\File $file) {
   if ($entity->entityType() == 'node') {
+    // @todo revisit later
     return node_access('view', $entity);
   }
 }

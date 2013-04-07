@@ -1942,13 +1942,13 @@ function theme_node_recent_block($variables) {
       'data' => theme('node_recent_content', array('node' => $node)),
       'class' => 'title-author',
     );
-    if (node_access('update', $node)) {
+    if ($node->access('update')) {
       $row[] = array(
         'data' => l(t('edit'), 'node/' . $node->nid . '/edit', $l_options),
         'class' => 'edit',
       );
     }
-    if (node_access('delete', $node)) {
+    if ($node->access('delete')) {
       $row[] = array(
         'data' => l(t('delete'), 'node/' . $node->nid . '/delete', $l_options),
         'class' => 'delete',
@@ -3542,6 +3542,7 @@ function node_modules_disabled($modules) {
  */
 function node_file_download_access($field, EntityInterface $entity, File $file) {
   if ($entity->entityType() == 'node') {
+    // @todo revisit later
     return node_access('view', $entity);
   }
 }
