@@ -7,6 +7,9 @@
 
 namespace Drupal\views\Tests;
 
+use Drupal\Core\Cache\MemoryCounterBackend;
+use Drupal\views\ViewsDataCache;
+
 /**
  * Tests the fetching of views data.
  *
@@ -28,6 +31,13 @@ class ViewsDataTest extends ViewUnitTestBase {
    */
   protected $count = 0;
 
+  /**
+   * The memory backend to use for the test.
+   *
+   * @var \Drupal\Core\Cache\MemoryCounterBackend
+   */
+  protected $memoryCounterBackend;
+
   public static function getInfo() {
     return array(
       'name' => 'Table Data',
@@ -39,7 +49,8 @@ class ViewsDataTest extends ViewUnitTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->viewsDataCache = $this->container->get('views.views_data');
+    $this->memoryCounterBackend = new MemoryCounterBackend('views_info');
+    $this->viewsDataCache = new ViewsDataCache($this->memoryCounterBackend, $this->container->get('config.factory'), $this->container->get('module_handler'));
     $this->state = $this->container->get('state');
   }
 
@@ -115,6 +126,53 @@ class ViewsDataTest extends ViewUnitTestBase {
     $data = $this->viewsDataCache->get($random_table_name);
     $this->assertEqual($data, array(), 'Make sure fetching views data for an invalid table returns an empty array.');
     $this->assertCountIncrement(FALSE);
+  }
+
+  /**
+   * Make sure that cache entries are only set and get when necessary.
+   */
+  public function testCache() {
+    // Request the same table 5 times.
+    $table_name = 'views_test_data';
+    for ($i = 0; $i < 5; $i++) {
+      $this->viewsDataCache->get($table_name);
+    }
+
+    // This did a full rebuild internally, so we have one get for the table,
+    // one for the whole storage and we also write both.
+    $this->assertEqual($this->memoryCounterBackend->getCounter('get', 'views_data:views_test_data:en'), 1);
+    $this->assertEqual($this->memoryCounterBackend->getCounter('get', 'views_data:en'), 1);
+    $this->assertEqual($this->memoryCounterBackend->getCounter('set', 'views_data:en'), 1);
+    $this->assertEqual($this->memoryCounterBackend->getCounter('set', 'views_data:views_test_data:en'), 1);
+
+    // Re-initialize the views data cache and repeat.
+    $this->memoryCounterBackend->resetCounter();
+    $this->viewsDataCache = new ViewsDataCache($this->memoryCounterBackend, $this->container->get('config.factory'), $this->container->get('module_handler'));
+    for ($i = 0; $i < 5; $i++) {
+      $this->viewsDataCache->get($table_name);
+    }
+
+    // This only requested the table for which a specific cache entry already
+    // exists. No other cache requests should have been made.
+    $this->assertEqual($this->memoryCounterBackend->getCounter('get', 'views_data:views_test_data:en'), 1);
+    $this->assertEqual($this->memoryCounterBackend->getCounter('get', 'views_data:en'), 0);
+    $this->assertEqual($this->memoryCounterBackend->getCounter('set', 'views_data:en'), 0);
+    $this->assertEqual($this->memoryCounterBackend->getCounter('set', 'views_data:views_test_data:en'), 0);
+
+    // Re-initialize the views data cache and repeat with no specified table.
+    $this->memoryCounterBackend->resetCounter();
+    $this->viewsDataCache = new ViewsDataCache($this->memoryCounterBackend, $this->container->get('config.factory'), $this->container->get('module_handler'));
+    for ($i = 0; $i < 5; $i++) {
+      $this->viewsDataCache->get();
+    }
+
+    // This only requested the full information. No other cache requests should
+    // have been made
+    $this->assertEqual($this->memoryCounterBackend->getCounter('get', 'views_data:views_test_data:en'), 0);
+    $this->assertEqual($this->memoryCounterBackend->getCounter('get', 'views_data:en'), 1);
+    $this->assertEqual($this->memoryCounterBackend->getCounter('set', 'views_data:en'), 0);
+    $this->assertEqual($this->memoryCounterBackend->getCounter('set', 'views_data:views_test_data:en'), 0);
+
   }
 
   /**
