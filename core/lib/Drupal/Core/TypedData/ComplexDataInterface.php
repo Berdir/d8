@@ -21,7 +21,7 @@ use Traversable;
  * When implementing this interface which extends Traversable, make sure to list
  * IteratorAggregate or Iterator before this interface in the implements clause.
  */
-interface ComplexDataInterface extends Traversable  {
+interface ComplexDataInterface extends Traversable, TypedDataInterface  {
 
   /**
    * Gets a property object.
@@ -120,4 +120,14 @@ interface ComplexDataInterface extends Traversable  {
    *   TRUE if the data structure is empty, FALSE otherwise.
    */
   public function isEmpty();
+
+  /**
+   * React to changes to a child property.
+   *
+   * Note that this is invoked before any changes are applied.
+   *
+   * @param $property_name
+   *   The name of the property which is changed.
+   */
+  public function onChange($property_name);
 }

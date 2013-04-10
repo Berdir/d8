@@ -8,7 +8,7 @@
 namespace Drupal\Core\Config\Entity;
 
 use Drupal\Core\Entity\Entity;
-use Drupal\Core\TypedData\ContextAwareInterface;
+use Drupal\Core\TypedData\TypedDataInterface;
 
 /**
  * Defines a base configuration entity class.
@@ -178,37 +178,37 @@ abstract class ConfigEntityBase extends Entity implements ConfigEntityInterface 
   }
 
   /**
-   * Implements \Drupal\Core\TypedData\ContextAwareInterface::getName().
+   * Implements \Drupal\Core\TypedData\TypedDataInterface::getName().
    */
   public function getName() {
     return NULL;
   }
 
   /**
-   * Implements \Drupal\Core\TypedData\ContextAwareInterface::getRoot().
+   * Implements \Drupal\Core\TypedData\TypedDataInterface::getRoot().
    */
   public function getRoot() {
     return $this;
   }
 
   /**
-   * Implements \Drupal\Core\TypedData\ContextAwareInterface::getPropertyPath().
+   * Implements \Drupal\Core\TypedData\TypedDataInterface::getPropertyPath().
    */
   public function getPropertyPath() {
     return '';
   }
 
   /**
-   * Implements \Drupal\Core\TypedData\ContextAwareInterface::getParent().
+   * Implements \Drupal\Core\TypedData\TypedDataInterface::getParent().
    */
   public function getParent() {
     return NULL;
   }
 
   /**
-   * Implements \Drupal\Core\TypedData\ContextAwareInterface::setContext().
+   * Implements \Drupal\Core\TypedData\TypedDataInterface::setContext().
    */
-  public function setContext($name = NULL, ContextAwareInterface $parent = NULL) {
+  public function setContext($name = NULL, TypedDataInterface $parent = NULL) {
     // As entities are always the root of the tree, we do not need to set any
     // context.
   }

@@ -9,7 +9,7 @@ namespace Drupal\views_ui;
 
 use Drupal\views\ViewExecutable;
 use Drupal\Core\Database\Database;
-use Drupal\Core\TypedData\ContextAwareInterface;
+use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\views\Plugin\views\query\Sql;
 use Drupal\views\Plugin\Core\Entity\View;
 use Drupal\views\ViewStorageInterface;
@@ -994,37 +994,93 @@ class ViewUI implements ViewStorageInterface {
   }
 
   /**
-   * Implements \Drupal\Core\TypedData\ContextAwareInterface::getName().
+   * Implements \Drupal\Core\TypedData\TypedDataInterface::getType().
+   */
+  public function getType() {
+    return $this->__call(__FUNCTION__, func_get_args());
+  }
+
+  /**
+   * Implements \Drupal\Core\TypedData\TypedDataInterface::getDefinition().
+   */
+  public function getDefinition() {
+    return $this->__call(__FUNCTION__, func_get_args());
+  }
+
+  /**
+   * Implements \Drupal\Core\TypedData\TypedDataInterface::getValue().
+   */
+  public function getValue() {
+    return $this->__call(__FUNCTION__, func_get_args());
+  }
+
+  /**
+   * Implements \Drupal\Core\TypedData\TypedDataInterface::setValue().
+   */
+  public function setValue($value, $notify = TRUE) {
+    return $this->__call(__FUNCTION__, func_get_args());
+  }
+
+  /**
+   * Implements \Drupal\Core\TypedData\TypedDataInterface::getString().
+   */
+  public function getString() {
+    return $this->__call(__FUNCTION__, func_get_args());
+  }
+
+  /**
+   * Implements \Drupal\Core\TypedData\TypedDataInterface::getConstraints().
+   */
+  public function getConstraints() {
+    return $this->__call(__FUNCTION__, func_get_args());
+  }
+
+  /**
+   * Implements \Drupal\Core\TypedData\TypedDataInterface::validate().
+   */
+  public function validate() {
+    return $this->__call(__FUNCTION__, func_get_args());
+  }
+
+  /**
+   * Implements \Drupal\Core\TypedData\TypedDataInterface::getName().
    */
   public function getName() {
     return $this->storage->getName();
   }
 
   /**
-   * Implements \Drupal\Core\TypedData\ContextAwareInterface::getRoot().
+   * Implements \Drupal\Core\TypedData\TypedDataInterface::getRoot().
    */
   public function getRoot() {
     return $this->storage->getRoot();
   }
 
   /**
-   * Implements \Drupal\Core\TypedData\ContextAwareInterface::getPropertyPath().
+   * Implements \Drupal\Core\TypedData\TypedDataInterface::getPropertyPath().
    */
   public function getPropertyPath() {
     return $this->storage->getPropertyPath();
   }
 
   /**
-   * Implements \Drupal\Core\TypedData\ContextAwareInterface::getParent().
+   * Implements \Drupal\Core\TypedData\TypedDataInterface::getParent().
    */
   public function getParent() {
     return $this->storage->getParent();
   }
 
   /**
-   * Implements \Drupal\Core\TypedData\ContextAwareInterface::setContext().
+   * Implements \Drupal\Core\TypedData\TypedDataInterface::setContext().
    */
-  public function setContext($name = NULL, ContextAwareInterface $parent = NULL) {
+  public function setContext($name = NULL, TypedDataInterface $parent = NULL) {
     return $this->storage->setContext($name, $parent);
+  }
+
+  /**
+   * Implements \Drupal\Core\TypedData\TypedDataInterface::onChange().
+   */
+  public function onChange($property_name) {
+    $this->storage->onChange($property_name);
   }
 }

@@ -9,6 +9,7 @@ namespace Drupal\Core\Config\Schema;
 
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\TypedData\ComplexDataInterface;
+use Drupal\Core\TypedData\TypedDataInterface;
 use \InvalidArgumentException;
 
 /**
@@ -120,6 +121,16 @@ class Mapping extends ArrayElement implements ComplexDataInterface {
    */
   public function isEmpty() {
     return empty($this->value);
+  }
+
+  /**
+   * Implements \Drupal\Core\TypedData\ComplexDataInterface::onChange().
+   */
+  public function onChange($property_name) {
+    // Notify the parent of changes.
+    if (isset($this->parent)) {
+      $this->parent->onChange($this->name);
+    }
   }
 
 }
