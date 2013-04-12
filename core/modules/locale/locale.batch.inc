@@ -444,7 +444,6 @@ function locale_translation_http_check($uri) {
 
   try {
     $response = Drupal::httpClient()
-      ->get('http_default_client')
       ->head($uri)
       ->send();
     $result = array();
@@ -471,7 +470,7 @@ function locale_translation_http_check($uri) {
       watchdog('locale', 'Translation file not found: @uri.', array('@uri' => $uri));
       return TRUE;
     }
-    watchdog('locale', 'HTTP request to @url failed with error: @error.', array('@url' => $uri, '@error' => $response->getReasonPhrase()));
+    watchdog('locale', 'HTTP request to @url failed with error: @error.', array('@url' => $uri, '@error' => $response->getStatusCode() . ' ' . $response->getReasonPhrase()));
   }
   catch (RequestException $e) {
     // Handle connection problems and cURL specific errors (CurlException) and
