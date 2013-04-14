@@ -32,7 +32,12 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   storage controller cache or some other way to circumvent it/take it over.
  */
 function system_list($type) {
-  $lists = &drupal_static(__FUNCTION__);
+  $lists = &drupal_static(__FUNCTION__, array());
+
+  if (isset($lists[$type])) {
+    return $lists[$type];
+  }
+
   if ($cached = cache('bootstrap')->get('system_list')) {
     $lists = $cached->data;
   }
