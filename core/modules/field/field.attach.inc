@@ -510,7 +510,8 @@ function _field_invoke_multiple($op, $entity_type, $entities, &$a = NULL, &$b = 
       $field_id = $instance['field_id'];
       $field_name = $instance['field_name'];
       $field = field_info_field_by_id($field_id);
-      if (function_exists($options['default'] ? 'field_default_' . $op : $field['module'] . '_field_' . $op)) {
+      $function = $options['default'] ? 'field_default_' . $op : $field['module'] . '_field_' . $op;
+      if (function_exists($function)) {
         // Add the field to the list of fields to invoke the hook on.
         if (!isset($fields[$field_id])) {
           $fields[$field_id] = $field;
@@ -523,11 +524,7 @@ function _field_invoke_multiple($op, $entity_type, $entities, &$a = NULL, &$b = 
         $langcode = !empty($options['langcode'][$id]) ? $options['langcode'][$id] : $options['langcode'];
         $langcodes = _field_language_suggestion($available_langcodes, $langcode, $field_name);
         foreach ($langcodes as $langcode) {
-          // Enable BC if necessary.
-          $entity = $entity->getBCEntity();
           $grouped_items[$field_id][$langcode][$id] = isset($entity->{$field_name}[$langcode]) ? $entity->{$field_name}[$langcode] : array();
-          // Reset back to original.
-          $entity = $entity->getNGEntity();
           // Group the instances and entities corresponding to the current
           // field.
           $grouped_instances[$field_id][$langcode][$id] = $instance;
@@ -568,11 +565,7 @@ function _field_invoke_multiple($op, $entity_type, $entities, &$a = NULL, &$b = 
     foreach ($grouped_entities[$field_id] as $langcode => $entities) {
       foreach ($entities as $id => $entity) {
         if ($grouped_items[$field_id][$langcode][$id] !== array() || isset($entity->{$field_name}[$langcode])) {
-          // Enable BC Entity if necessary.
-          $entity = $entity->getBCEntity();
           $entity->{$field_name}[$langcode] = $grouped_items[$field_id][$langcode][$id];
-          // Reset back to original.
-          $entity = $entity->getNGEntity();
         }
       }
     }

@@ -28,7 +28,11 @@ class EntityRenderController implements EntityRenderControllerInterface {
    * Implements \Drupal\Core\Entity\EntityRenderControllerInterface::buildContent().
    */
   public function buildContent(array $entities, array $displays, $view_mode, $langcode = NULL) {
-    field_attach_prepare_view($this->entityType, $entities, $displays, $langcode);
+    $bc_entities = array();
+    foreach ($entities as $entity) {
+      $bc_entities[$entity->id()] = $entity->getBCEntity();
+    }
+    field_attach_prepare_view($this->entityType, $bc_entities, $displays, $langcode);
     module_invoke_all('entity_prepare_view', $this->entityType, $entities, $displays, $view_mode);
 
     foreach ($entities as $entity) {
@@ -36,7 +40,7 @@ class EntityRenderController implements EntityRenderControllerInterface {
       $entity->content = array(
         '#view_mode' => $view_mode,
       );
-      $entity->content += field_attach_view($entity, $displays[$entity->bundle()], $langcode);
+      $entity->content += field_attach_view($entity->getBCEntity(), $displays[$entity->bundle()], $langcode);
     }
   }
 
