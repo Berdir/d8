@@ -527,7 +527,7 @@ function _field_invoke_multiple($op, $entity_type, $entities, &$a = NULL, &$b = 
           $entity = $entity->getBCEntity();
           $grouped_items[$field_id][$langcode][$id] = isset($entity->{$field_name}[$langcode]) ? $entity->{$field_name}[$langcode] : array();
           // Reset back to original.
-          $entity = $entity->getOriginalEntity();
+          $entity = $entity->getNGEntity();
           // Group the instances and entities corresponding to the current
           // field.
           $grouped_instances[$field_id][$langcode][$id] = $instance;
@@ -572,7 +572,7 @@ function _field_invoke_multiple($op, $entity_type, $entities, &$a = NULL, &$b = 
           $entity = $entity->getBCEntity();
           $entity->{$field_name}[$langcode] = $grouped_items[$field_id][$langcode][$id];
           // Reset back to original.
-          $entity = $entity->getOriginalEntity();
+          $entity = $entity->getNGEntity();
         }
       }
     }
