@@ -163,8 +163,13 @@ class DatabaseBackend implements CacheBackendInterface {
    * Implements \Drupal\Core\Cache\CacheBackendInterface::setMultiple().
    */
   function setMultiple(array $items) {
+    // Use a transaction so that the database can write the changes in a single
+    // commit.
+    $transaction = $this->connection->startTransaction();
     $this->deleteMultiple(array_keys($items));
-    $query = Database::getConnection()->insert($this->bin)->fields(array('cid', 'data', 'expire', 'created', 'serialized', 'tags', 'checksum_invalidations', 'checksum_deletions'));
+    $query = $this->connection
+      ->insert($this->bin)
+      ->fields(array('cid', 'data', 'expire', 'created', 'serialized', 'tags', 'checksum_invalidations', 'checksum_deletions'));
     foreach ($items as $cid => $item) {
       $item += array(
         'expire' => CacheBackendInterface::CACHE_PERMANENT,
