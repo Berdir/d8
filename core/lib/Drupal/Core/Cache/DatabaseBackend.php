@@ -164,7 +164,7 @@ class DatabaseBackend implements CacheBackendInterface {
    */
   function setMultiple(array $items) {
     $this->deleteMultiple(array_keys($items));
-    $query = Database::getConnection()->insert($this->bin)->fields(array('cid', 'data', 'expire', 'created', 'serialized', 'tags', 'checksCum_invalidations', 'checksum_deletions'));
+    $query = Database::getConnection()->insert($this->bin)->fields(array('cid', 'data', 'expire', 'created', 'serialized', 'tags', 'checksum_invalidations', 'checksum_deletions'));
     foreach ($items as $cid => $item) {
       $item += array(
         'expire' => CacheBackendInterface::CACHE_PERMANENT,
