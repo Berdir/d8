@@ -1,0 +1,5 @@
+id: user.full
+label: User account
+custom_settings: '0'
+targetEntityType: user
+locked: '1'

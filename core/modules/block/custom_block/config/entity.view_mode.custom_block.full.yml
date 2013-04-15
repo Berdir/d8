@@ -1,0 +1,5 @@
+id: custom_block.full
+label: Full
+custom_settings: '0'
+targetEntityType: custom_block
+locked: '1'

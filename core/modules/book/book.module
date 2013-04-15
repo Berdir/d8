@@ -261,17 +261,6 @@ function book_admin_paths() {
 }
 
 /**
- * Implements hook_entity_view_mode_info().
- */
-function book_entity_view_mode_info() {
-  // Add the 'Print' view mode for nodes.
-  $view_modes['node']['print'] = array(
-    'label' => t('Print'),
-  );
-  return $view_modes;
-}
-
-/**
  * Returns an array of all books.
  *
  * This list may be used for generating a list of all the books, or for building

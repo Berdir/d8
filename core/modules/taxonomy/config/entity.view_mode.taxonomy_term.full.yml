@@ -1,0 +1,5 @@
+id: taxonomy_term.full
+label: Taxonomy term page
+custom_settings: '0'
+targetEntityType: taxonomy_term
+locked: '1'

@@ -1,0 +1,5 @@
+id: vocabulary.full
+label: Taxonomy vocabulary
+custom_settings: '0'
+targetEntityType: taxonomy_vocabulary
+locked: '1'

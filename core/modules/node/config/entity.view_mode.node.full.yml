@@ -1,0 +1,5 @@
+id: node.full
+label: Full content
+custom_settings: '0'
+targetEntityType: node
+locked: '1'

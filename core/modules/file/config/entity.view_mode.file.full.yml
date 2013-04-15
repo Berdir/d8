@@ -1,0 +1,5 @@
+id: file.full
+label: File default
+custom_settings: '0'
+targetEntityType: file
+locked: '1'

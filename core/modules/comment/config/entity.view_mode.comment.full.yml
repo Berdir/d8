@@ -1,0 +1,5 @@
+id: comment.full
+label: Full comment
+custom_settings: '0'
+targetEntityType: comment
+locked: '1'

@@ -121,13 +121,10 @@ function entity_get_view_modes($entity_type = NULL) {
       $view_modes = $cache->data;
     }
     else {
-      $view_modes = module_invoke_all('entity_view_mode_info');
-      foreach ($view_modes as $type => $entity_info) {
-        foreach ($entity_info as $view_mode => $view_mode_info) {
-          $view_modes[$type][$view_mode] += array(
-            'custom_settings' => FALSE,
-          );
-        }
+      $view_modes = array();
+      foreach (entity_load_multiple('view_mode') as $view_mode) {
+        list($view_mode_entity_type, $view_mode_name) = explode('.', $view_mode->id());
+        $view_modes[$view_mode_entity_type][$view_mode_name] = (array) $view_mode;
       }
       drupal_alter('entity_view_mode_info', $view_modes);
       cache()->set("entity_view_mode_info:$langcode", $view_modes, CacheBackendInterface::CACHE_PERMANENT, array('entity_info' => TRUE));

@@ -1,0 +1,5 @@
+id: node.rss
+label: RSS
+custom_settings: '0'
+targetEntityType: node
+locked: '1'

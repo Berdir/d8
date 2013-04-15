@@ -1,0 +1,5 @@
+id: node.search_result
+label: Search result
+custom_settings: '0'
+targetEntityType: node
+locked: '1'

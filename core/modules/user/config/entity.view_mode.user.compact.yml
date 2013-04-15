@@ -1,0 +1,5 @@
+id: user.compact
+label: Compact
+custom_settings: '1'
+targetEntityType: user
+locked: '1'
