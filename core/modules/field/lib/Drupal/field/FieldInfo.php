@@ -462,8 +462,11 @@ class FieldInfo {
       return $this->bundleExtraFields[$entity_type][$bundle];
     }
 
-    // Read from the persistent cache.
-    if ($cached = cache('field')->get("field_info:bundle_extra:$entity_type:$bundle")) {
+    // Read from the persistent cache. Since hook_field_extra_fields() and
+    // hook_field_extra_fields_alter() might contain t() calls, we cache per
+    // language.
+    $langcode = language(LANGUAGE_TYPE_INTERFACE)->langcode;
+    if ($cached = cache('field')->get("field_info:bundle_extra:$langcode:$entity_type:$bundle")) {
       $this->bundleExtraFields[$entity_type][$bundle] = $cached->data;
       return $this->bundleExtraFields[$entity_type][$bundle];
     }
@@ -481,7 +484,7 @@ class FieldInfo {
 
     // Store in the 'static' and persistent caches.
     $this->bundleExtraFields[$entity_type][$bundle] = $info;
-    cache('field')->set("field_info:bundle_extra:$entity_type:$bundle", $info, CacheBackendInterface::CACHE_PERMANENT, array('field_info' => TRUE));
+    cache('field')->set("field_info:bundle_extra:$langcode:$entity_type:$bundle", $info, CacheBackendInterface::CACHE_PERMANENT, array('field_info' => TRUE));
 
     return $this->bundleExtraFields[$entity_type][$bundle];
   }

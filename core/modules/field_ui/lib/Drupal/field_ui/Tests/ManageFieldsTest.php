@@ -7,10 +7,19 @@
 
 namespace Drupal\field_ui\Tests;
 
+use Drupal\Core\Language\Language;
+
 /**
  * Tests the functionality of the 'Manage fields' screen.
  */
 class ManageFieldsTest extends FieldUiTestBase {
+  /**
+   * Modules to enable.
+   *
+   * @var array
+   */
+  public static $modules = array('language', 'locale');
+
   public static function getInfo() {
     return array(
       'name' => 'Manage fields',
@@ -60,7 +69,7 @@ class ManageFieldsTest extends FieldUiTestBase {
    * In order to act on the same fields, and not create the fields over and over
    * again the following tests create, update and delete the same fields.
    */
-  function testCRUDFields() {
+  function dtestCRUDFields() {
     $this->manageFieldsPage();
     $this->createField();
     $this->updateField();
@@ -240,7 +249,7 @@ class ManageFieldsTest extends FieldUiTestBase {
   /**
    * Tests that default value is correctly validated and saved.
    */
-  function testDefaultValue() {
+  function dtestDefaultValue() {
     // Create a test field and instance.
     $field_name = 'test';
     $field = array(
@@ -297,7 +306,7 @@ class ManageFieldsTest extends FieldUiTestBase {
   /**
    * Tests that deletion removes fields and instances as expected.
    */
-  function testDeleteField() {
+  function dtestDeleteField() {
     // Create a new field.
     $bundle_path1 = 'admin/structure/types/manage/' . $this->type;
     $edit1 = array(
@@ -343,7 +352,7 @@ class ManageFieldsTest extends FieldUiTestBase {
   /**
    * Tests that Field UI respects the 'no_ui' option in hook_field_info().
    */
-  function testHiddenFields() {
+  function dtestHiddenFields() {
     $bundle_path = 'admin/structure/types/manage/' . $this->type . '/fields/';
 
     // Check that the field type is not available in the 'add new field' row.
@@ -378,7 +387,7 @@ class ManageFieldsTest extends FieldUiTestBase {
   /**
    * Tests renaming a bundle.
    */
-  function testRenameBundle() {
+  function dtestRenameBundle() {
     $type2 = strtolower($this->randomName(8)) . '_test';
 
     $options = array(
@@ -391,7 +400,7 @@ class ManageFieldsTest extends FieldUiTestBase {
   /**
    * Tests that a duplicate field name is caught by validation.
    */
-  function testDuplicateFieldName() {
+  function dtestDuplicateFieldName() {
     // field_tags already exists, so we're expecting an error when trying to
     // create a new field with the same name.
     $edit = array(
@@ -410,7 +419,7 @@ class ManageFieldsTest extends FieldUiTestBase {
   /**
    * Tests changing the widget used by a field.
    */
-  function testWidgetChange() {
+  function dtestWidgetChange() {
     $url_fields = 'admin/structure/types/manage/article/fields';
     $url_tags_widget = $url_fields . '/field_tags/widget-type';
 
@@ -453,7 +462,7 @@ class ManageFieldsTest extends FieldUiTestBase {
   /**
    * Tests that deletion removes fields and instances as expected for a term.
    */
-  function testDeleteTaxonomyField() {
+  function dtestDeleteTaxonomyField() {
     // Create a new field.
     $bundle_path = 'admin/structure/taxonomy/tags';
     $edit1 = array(
@@ -471,6 +480,32 @@ class ManageFieldsTest extends FieldUiTestBase {
     $this->assertNull(field_info_instance('taxonomy_term', $this->field_name, 'tags'), 'Field instance was deleted.');
     // Check that the field was deleted too.
     $this->assertNull(field_info_field($this->field_name), 'Field was deleted.');
+  }
+
+  /**
+   * Test that _field_info_collate_fields() is not localized
+   */
+  function testFieldTranslation() {
+    $admin_user = $this->drupalCreateUser(array('administer user fields', 'access administration pages'));
+    $this->drupalLogin($admin_user);
+    $language = new Language(array('langcode' => 'xx'));
+    language_save($language);
+    // Create test source string
+    $en_string = locale_storage()->createString(array(
+      'source' => 'User name and password',
+      'context' => '',
+    ))->save();
+    // Create translation for new string and save it.
+    $translation = locale_storage()->createTranslation(array(
+      'lid' => $en_string->lid,
+      'language' => 'xx',
+      'translation' => $this->randomName(),
+    ))->save();
+    //check translated strings are avialable in pages.
+    $this->drupalGet('xx/admin/config/people/accounts/fields');
+    $this->assertText($translation->getString(), 'Translated string found.');
+    $this->drupalGet('admin/config/people/accounts/fields');
+    $this->assertText($en_string->getString(), 'English string found.');
   }
 
 }
