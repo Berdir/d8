@@ -900,7 +900,7 @@ function field_attach_load($entity_type, $entities, $age = FIELD_LOAD_CURRENT, $
   $queried_entities = array();
   foreach ($entities as $entity) {
     // Enable BC if necessary.
-    $queried_entities[$entity->id()] = $entity->getBEntity();
+    $queried_entities[$entity->id()] = $entity->getBCEntity();
   }
 
   // Fetch available entities from cache, if applicable.
