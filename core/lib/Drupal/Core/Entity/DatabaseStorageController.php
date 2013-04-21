@@ -8,6 +8,7 @@
 namespace Drupal\Core\Entity;
 
 use PDO;
+use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Component\Uuid\Uuid;
 use Drupal\Component\Utility\NestedArray;
@@ -164,7 +165,6 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
       }
     }
     else {
-      cache()->delete('entity_field_definitions:' . $this->entityType);
       $this->entityCache = array();
     }
   }
@@ -680,7 +680,8 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
   public function getFieldDefinitions(array $constraints) {
     if (!isset($this->entityFieldInfo)) {
       // First, try to load from cache.
-      if ($cache = cache()->get('entity_field_definitions:' . $this->entityType)) {
+      $cid = 'entity_field_definitions:' . $this->entityType . ':' . language(LANGUAGE_TYPE_INTERFACE)->langcode;
+      if ($cache = cache()->get($cid)) {
         $this->entityFieldInfo = $cache->data;
       }
       else {
@@ -688,8 +689,8 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
           'definitions' => $this->baseFieldDefinitions(),
           // Contains definitions of optional (per-bundle) fields.
           'optional' => array(),
-          // An array keyed by bundle name containing the optional fields added by
-          // the bundle.
+          // An array keyed by bundle name containing the optional fields added
+          // by the bundle.
           'bundle map' => array(),
         );
 
@@ -709,7 +710,7 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
         foreach ($this->entityFieldInfo['optional'] as &$definition) {
           $definition['list'] = TRUE;
         }
-        cache()->set('entity_field_definitions:' . $this->entityType, $this->entityFieldInfo);
+        cache()->set($cid, $this->entityFieldInfo, CacheBackendInterface::CACHE_PERMANENT, array('entity_info' => TRUE));
       }
     }
 
