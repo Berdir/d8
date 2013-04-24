@@ -196,7 +196,6 @@ class EntityTranslation extends ContextAwareTypedData implements IteratorAggrega
    * Implements \Drupal\Core\TypedData\AccessibleInterface::access().
    */
   public function access($operation = 'view', \Drupal\user\Plugin\Core\Entity\User $account = NULL) {
-    $method = $operation . 'Access';
     // Determine the language code of this translation by cutting of the
     // leading "@" from the property name to get the langcode.
     // @todo Add a way to set and get the langcode so that's more obvious what
@@ -204,6 +203,6 @@ class EntityTranslation extends ContextAwareTypedData implements IteratorAggrega
     $langcode = substr($this->getName(), 1);
     return drupal_container()->get('plugin.manager.entity')
       ->getAccessController($this->parent->entityType())
-      ->$method($this->parent, $langcode, $account);
+      ->access($this->parent, $operation, $langcode, $account);
   }
 }
