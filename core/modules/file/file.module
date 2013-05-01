@@ -649,39 +649,17 @@ function file_file_download($uri, $field_type = 'file') {
     foreach ($field_references as $entity_type => $entities) {
       foreach ($entities as $entity) {
         $field = field_info_field($field_name);
-        // Check if access to this field is not disallowed.
-        if (!field_access('view', $field, $entity_type, $entity)) {
+        // Check view access for the field and entity the field belongs to. Deny
+        // access if either of those returns FALSE.
+        if (!$entity->access('view') || !field_access('view', $field, $entity_type, $entity)) {
           $denied = TRUE;
           continue;
         }
 
-        // Invoke hook and collect grants/denies for download access.
-        // Default to FALSE and let entities overrule this ruling.
-        $grants = array('system' => FALSE);
-        foreach (Drupal::moduleHandler()->getImplementations('file_download_access') as $module) {
-          $grants = array_merge($grants, array($module => module_invoke($module, 'file_download_access', $field, $entity, $file)));
-        }
-        // Allow other modules to alter the returned grants/denies.
-        $context = array(
-          'entity' => $entity,
-          'field' => $field,
-          'file' => $file,
-        );
-        drupal_alter('file_download_access', $grants, $context);
-
-        if (in_array(TRUE, $grants)) {
-          // If TRUE is returned, access is granted and no further checks are
-          // necessary.
-          $denied = FALSE;
-          break 3;
-        }
-
-        if (in_array(FALSE, $grants)) {
-          // If an implementation returns FALSE, access to this entity is denied
-          // but the file could belong to another entity to which the user might
-          // have access. Continue with these.
-          $denied = TRUE;
-        }
+        // Otherwise, we have access to the field and the file can be
+        // downloaded. We do not need further checks, break out of the loop.
+        $denied = FALSE;
+        break 3;
       }
     }
   }

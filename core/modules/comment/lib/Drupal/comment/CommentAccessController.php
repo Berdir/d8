@@ -24,7 +24,10 @@ class CommentAccessController extends EntityAccessController {
   protected function checkAccess(EntityInterface $entity, $operation, $langcode, AccountInterface $account) {
     switch ($operation) {
       case 'view':
-        return user_access('access comments', $account);
+        if (user_access('access comments') && $entity->status->value == COMMENT_PUBLISHED || user_access('administer comments')) {
+          return $entity->nid->entity->access('view');
+        }
+        return FALSE;
         break;
 
       case 'update':
