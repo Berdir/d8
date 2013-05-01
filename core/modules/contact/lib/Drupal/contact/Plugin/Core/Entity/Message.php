@@ -10,6 +10,7 @@ namespace Drupal\contact\Plugin\Core\Entity;
 use Drupal\Core\Entity\Annotation\EntityType;
 use Drupal\Core\Annotation\Translation;
 use Drupal\Core\Entity\Entity;
+use Drupal\Core\Entity\EntityNG;
 use Drupal\contact\MessageInterface;
 
 /**
@@ -20,7 +21,7 @@ use Drupal\contact\MessageInterface;
  *   label = @Translation("Contact message"),
  *   module = "contact",
  *   controllers = {
- *     "storage" = "Drupal\Core\Entity\DatabaseStorageController",
+ *     "storage" = "Drupal\contact\MessageStorageController",
  *     "render" = "Drupal\contact\MessageRenderController",
  *     "form" = {
  *       "default" = "Drupal\contact\MessageFormController"
@@ -35,7 +36,7 @@ use Drupal\contact\MessageInterface;
  *   }
  * )
  */
-class Message extends Entity implements MessageInterface {
+class Message extends EntityNG implements MessageInterface {
 
   /**
    * The contact category ID of this message.
@@ -104,11 +105,15 @@ class Message extends Entity implements MessageInterface {
     return NULL;
   }
 
-  /**
-   * Overrides Drupal\Core\Entity\Entity::bundle().
-   */
-  public function bundle() {
-    return $this->category;
+  protected function init() {
+    parent::init();
+    unset($this->name);
+    unset($this->message);
+    unset($this->mail);
+    unset($this->category);
+    unset($this->copy);
+    unset($this->recipient);
+    unset($this->subject);
   }
 
   /**

@@ -29,6 +29,9 @@ class String {
    * @ingroup sanitization
    */
   public static function checkPlain($text) {
+    if (!is_scalar($text)) {
+      debug(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
+    }
     return htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
   }
 

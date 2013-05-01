@@ -263,8 +263,8 @@ function contact_mail($key, &$message, $params) {
 
   $variables = array(
     '!site-name' => config('system.site')->get('name'),
-    '!subject' => $contact_message->subject,
-    '!category' => isset($params['contact_category']) ? $params['contact_category']->label() : NULL,
+    '!subject' => $contact_message->subject->value,
+    '!category' => !empty($params['contact_category']) ? $params['contact_category']->label() : NULL,
     '!form-url' => url(current_path(), array('absolute' => TRUE, 'language' => $language)),
     '!sender-name' => user_format_name($sender),
   );
@@ -303,7 +303,7 @@ function contact_mail($key, &$message, $params) {
       $message['body'][] = t("!sender-name (!sender-url) has sent you a message via your contact form at !site-name.", $variables, $options);
       $message['body'][] = t("If you don't want to receive such e-mails, you can change your settings at !recipient-edit-url.", $variables, $options);
       $message['body'][] = t('Message:', array(), $options);
-      $message['body'][] = $contact_message->message;
+      $message['body'][] = $contact_message->message->value;
       break;
   }
 }
