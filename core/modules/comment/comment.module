@@ -1780,19 +1780,6 @@ function comment_ranking() {
 }
 
 /**
- * Implements hook_file_download_access().
- */
-function comment_file_download_access($field, EntityInterface $entity, File $file) {
-  if ($entity->entityType() == 'comment') {
-    if (user_access('access comments') && $entity->status->value == COMMENT_PUBLISHED || user_access('administer comments')) {
-      $node = $entity->nid->entity;
-      return node_access('view', $node);
-    }
-    return FALSE;
-  }
-}
-
-/**
  * Implements hook_library_info().
  */
 function comment_library_info() {

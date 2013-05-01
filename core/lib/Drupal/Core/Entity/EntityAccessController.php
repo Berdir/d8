@@ -53,7 +53,7 @@ class EntityAccessController implements EntityAccessControllerInterface {
     }
     else {
       // No result from hook, so entity checks are done.
-      $return = (bool) $this->checkAccess($entity, $operation, $langcode, $account);
+      $return = $this->checkAccess($entity, $operation, $langcode, $account);
     }
     return $this->setCache($return, $entity, $operation, $langcode, $account);
   }
@@ -133,7 +133,7 @@ class EntityAccessController implements EntityAccessControllerInterface {
     $uuid = $entity->uuid();
 
     // Save the given value in the static cache and directly return it.
-    return $this->accessCache[$uid][$uuid][$langcode][$operation] = (bool) $access;
+    return $this->accessCache[$uid][$uuid][$langcode][$operation] = $access;
   }
 
   /**
