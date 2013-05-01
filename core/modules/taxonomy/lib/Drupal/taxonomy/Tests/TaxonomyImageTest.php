@@ -22,7 +22,7 @@ class TaxonomyImageTest extends TaxonomyTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Taxonomy Image Test',
-      'description' => 'Test the functionality of image fields.',
+      'description' => 'Tests access checks of private image fields',
       'group' => 'Taxonomy',
     );
   }
@@ -63,19 +63,19 @@ class TaxonomyImageTest extends TaxonomyTestBase {
     $this->drupalLogin($user);
 
     // Create a term and upload the image.
-    $term = $this->createTerm($this->vocabulary);
-    $uri = $term->uri();
     $files = $this->drupalGetTestFiles('image');
     $image = array_pop($files);
+    $edit['name'] = $this->randomName();
     $edit['files[field_test_' . LANGUAGE_NOT_SPECIFIED . '_0]'] = drupal_realpath($image->uri);
-    $this->drupalPost($uri['path'] . '/edit', $edit, t('Save'));
-    $term = taxonomy_term_load($term->id());
-    $this->assertText(t('Updated term @name.', array('@name' => $term->label())));
+    $this->drupalPost('admin/structure/taxonomy/' . $this->vocabulary->vid  . '/add', $edit, t('Save'));
+    $terms = entity_load_multiple_by_properties('taxonomy_term', array('name' => $edit ['name']));
+    $term = reset($terms);
+    $this->assertText(t('Created new term @name.', array('@name' => $term->label())));
 
     // Create a user that should have access to the file and one that doesn't.
     $access_user = $this->drupalCreateUser(array('access content'));
     $no_access_user = $this->drupalCreateUser();
-    $image = file_load($term->field_test[LANGUAGE_NOT_SPECIFIED][0]['fid']);
+    $image = file_load($term->field_test->fid);
     $this->drupalLogin($access_user);
     $this->drupalGet(file_create_url($image->uri));
     $this->assertResponse(200, 'Private image on term is accessible with right permission');
