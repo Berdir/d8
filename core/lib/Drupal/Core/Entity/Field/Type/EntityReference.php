@@ -85,7 +85,7 @@ class EntityReference extends DataReferenceBase {
    *
    * Both the entity ID and the entity object may be passed as value.
    */
-  public function setValue($value) {
+  public function setValue($value, $notify = TRUE) {
     // If we have already a typed data object for the target, clear it.
     unset($this->target);
 
@@ -98,7 +98,7 @@ class EntityReference extends DataReferenceBase {
       throw new InvalidArgumentException('Value is not a valid entity.');
     }
     // Now update the value in the source property.
-    $this->getSource()->setValue($value);
+    $this->getSource()->setValue($value, $notify);
   }
 
   /**

@@ -13,6 +13,7 @@ use Drupal\Core\TypedData\ComplexDataInterface;
 use Drupal\Core\TypedData\ContextAwareInterface;
 use Drupal\Core\TypedData\ContextAwareTypedData;
 use Drupal\Core\TypedData\TypedDataInterface;
+use Drupal\Core\TypedData\TypedData;
 use ArrayIterator;
 use IteratorAggregate;
 use InvalidArgumentException;
@@ -38,7 +39,7 @@ use InvalidArgumentException;
  *  - EntityType: The entity type.
  *  - Bundle: The bundle or an array of possible bundles.
  */
-class Entity extends ContextAwareTypedData implements IteratorAggregate, ComplexDataInterface {
+class Entity extends TypedData implements IteratorAggregate, ComplexDataInterface {
 
   /**
    * Overrides \Drupal\Core\TypedData\TypedData::getValue().
@@ -52,7 +53,7 @@ class Entity extends ContextAwareTypedData implements IteratorAggregate, Complex
    *
    * Both the entity ID and the entity object may be passed as value.
    */
-  public function setValue($value) {
+  public function setValue($value, $notify = TRUE) {
     if (isset($value)) {
       throw new InvalidArgumentException("Cannot set a value for an abstract type.");
     }
@@ -82,7 +83,7 @@ class Entity extends ContextAwareTypedData implements IteratorAggregate, Complex
   /**
    * Implements \Drupal\Core\TypedData\ComplexDataInterface::set().
    */
-  public function set($property_name, $value) {
+  public function set($property_name, $value, $notify = TRUE) {
     throw new InvalidArgumentException("Cannot set a property of an abstract type.");
   }
 
@@ -146,5 +147,12 @@ class Entity extends ContextAwareTypedData implements IteratorAggregate, Complex
    */
   public function isEmpty() {
     return TRUE;
+  }
+
+  /**
+   * Implements \Drupal\Core\TypedData\ComplexDataInterface::onChange().
+   */
+  public function onChange($property_name) {
+    // Nothing to do.
   }
 }

@@ -17,7 +17,7 @@ namespace Drupal\Core\TypedData;
  * Required settings (below the definition's 'settings' key) are:
  *  - source: The langcode property used to load the language object.
  */
-abstract class DataReferenceBase extends ContextAwareTypedData implements DataReferenceInterface  {
+abstract class DataReferenceBase extends TypedData implements DataReferenceInterface  {
 
   /**
    * The referenced data.
@@ -60,15 +60,15 @@ abstract class DataReferenceBase extends ContextAwareTypedData implements DataRe
    *
    * Both the langcode and the language object may be passed as value.
    */
-  public function setValue($value) {
+  public function setValue($value, $notify = TRUE) {
     // If we have already a typed data object for the target, clear it and start
     // with a new object. That way we do not change the value of a object which
     // might be referenced elsewhere also.
     unset($this->target);
     $target = $this->getTarget();
     // Set the value on the target so we can retrieve its identifier.
-    $target->setValue($value);
-    $this->getSource()->setValue($this->getTargetIdentifier());
+    $target->setValue($value, $notify);
+    $this->getSource()->setValue($this->getTargetIdentifier(), $notify);
   }
 
   /**
