@@ -96,7 +96,17 @@ class EntityNG extends Entity {
    * @return string
    */
   public function getType() {
-    return $this->entityType;
+    if ($this->bundle != $this->entityType) {
+      return 'entity:' . $this->entityType . ':' . $this->bundle;
+    }
+    return 'entity:' . $this->entityType;
+  }
+
+  public function getDefinition() {
+    // @todo: add $this->definition.
+    return array(
+      'type' => $this->getType(),
+    );
   }
 
   /**

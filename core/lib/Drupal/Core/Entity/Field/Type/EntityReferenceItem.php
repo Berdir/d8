@@ -11,10 +11,13 @@ use Drupal\Core\Entity\Field\FieldItemBase;
 use Drupal\Core\TypedData\TypedDataInterface;
 
 /**
- * Defines the 'entity_reference' entity field item.
+ * Defines the 'entity_reference_field' entity field item.
  *
- * Required settings (below the definition's 'settings' key) are:
- *  - target_type: The entity type to reference.
+ * Supported settings (below the definition's 'settings' key) are:
+ * - target_type: The entity type to reference. Required.
+ * - target_bundle: (optional): If set, restricts the entity bundles which may
+ *   may be referenced. May be set to an single bundle, or to an array of
+ *   allowed bundles.
  */
 class EntityReferenceItem extends FieldItemBase {
 
@@ -31,11 +34,11 @@ class EntityReferenceItem extends FieldItemBase {
    * Implements \Drupal\Core\TypedData\ComplexDataInterface::getPropertyDefinitions().
    */
   public function getPropertyDefinitions() {
-    // Definitions vary by entity type, so key them by entity type.
-    $target_type = $this->definition['settings']['target_type'];
+    // Definitions vary by settings, so key them accordingly.
+    $key = implode(',', $this->definition['settings']);
 
-    if (!isset(self::$propertyDefinitions[$target_type])) {
-      static::$propertyDefinitions[$target_type]['target_id'] = array(
+    if (!isset(self::$propertyDefinitions[$key])) {
+      static::$propertyDefinitions[$key]['target_id'] = array(
         // @todo: Lookup the entity type's ID data type and use it here.
         'type' => 'integer',
         'label' => t('Entity ID'),
@@ -43,20 +46,23 @@ class EntityReferenceItem extends FieldItemBase {
           'Range' => array('min' => 0),
         ),
       );
-      static::$propertyDefinitions[$target_type]['entity'] = array(
-        'type' => 'entity',
+      static::$propertyDefinitions[$key]['entity'] = array(
+        'type' => 'entity_reference',
         'constraints' => array(
-          'EntityType' => $target_type,
+          'EntityType' => $this->definition['settings']['target_type'],
         ),
         'label' => t('Entity'),
         'description' => t('The referenced entity'),
         // The entity object is computed out of the entity ID.
         'computed' => TRUE,
         'read-only' => FALSE,
-        'settings' => array('id source' => 'target_id'),
+        'settings' => array('source' => 'target_id'),
       );
+      if (isset($this->definition['settings']['target_bundle'])) {
+        static::$propertyDefinitions[$key]['entity']['constraints']['Bundle'] = $this->definition['settings']['target_bundle'];
+      }
     }
-    return static::$propertyDefinitions[$target_type];
+    return static::$propertyDefinitions[$key];
   }
 
   /**

@@ -35,12 +35,13 @@ class LanguageItem extends FieldItemBase {
         'label' => t('Language code'),
       );
       static::$propertyDefinitions['language'] = array(
-        'type' => 'language',
+        'type' => 'language_reference',
         'label' => t('Language object'),
+        'description' => t('The referenced language'),
         // The language object is retrieved via the language code.
         'computed' => TRUE,
         'read-only' => FALSE,
-        'settings' => array('langcode source' => 'value'),
+        'settings' => array('source' => 'value'),
       );
     }
     return static::$propertyDefinitions;

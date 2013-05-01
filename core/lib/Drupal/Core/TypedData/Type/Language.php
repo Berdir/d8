@@ -17,13 +17,6 @@ use Drupal\Core\TypedData\TypedData;
  * The plain value of a language is the language object, i.e. an instance of
  * \Drupal\Core\Language\Language. For setting the value the language object or
  * the language code as string may be passed.
- *
- * Optionally, this class may be used as computed property, see the supported
- * settings below. E.g., it is used as 'language' property of language items.
- *
- * Supported settings (below the definition's 'settings' key) are:
- *  - langcode source: If used as computed property, the langcode property used
- *    to load the language object.
  */
 class Language extends TypedData {
 
@@ -41,9 +34,8 @@ class Language extends TypedData {
     if (!empty($this->definition['settings']['langcode source'])) {
       $this->langcode = $this->parent->__get($this->definition['settings']['langcode source']);
     }
-   if ($this->langcode) {
-      $language = language_load($this->langcode);
-      return $language ?: new LanguageObject(array('langcode' => $this->langcode));
+    if ($this->langcode) {
+      return language_load($this->langcode);
     }
   }
 
@@ -58,6 +50,7 @@ class Language extends TypedData {
       $value = $value->langcode;
     }
     elseif (isset($value) && !is_scalar($value)) {
+      // @todo: Move this to a validation constraint.
       throw new InvalidArgumentException('Value is no valid langcode or language object.');
     }
     // Update the 'langcode source' property, if given.

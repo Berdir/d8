@@ -2323,15 +2323,24 @@ function system_data_type_info() {
       'description' => t('A language object.'),
       'class' => '\Drupal\Core\TypedData\Type\Language',
     ),
+    'language_reference' => array(
+      'label' => t('Language reference'),
+      'class' => '\Drupal\Core\TypedData\Type\LanguageReference',
+    ),
     'entity' => array(
       'label' => t('Entity'),
       'description' => t('All kind of entities, e.g. nodes, comments or users.'),
-      'class' => '\Drupal\Core\Entity\Field\Type\EntityWrapper',
+      'class' => '\Drupal\Core\Entity\Field\Type\Entity',
+      'derivative' => '\Drupal\Core\Entity\Field\Type\EntityDeriver'
     ),
     'entity_translation' => array(
       'label' => t('Entity translation'),
       'description' => t('A translation of an entity'),
       'class' => '\Drupal\Core\Entity\Field\Type\EntityTranslation',
+    ),
+    'entity_reference' => array(
+      'label' => t('Entity reference'),
+      'class' => '\Drupal\Core\Entity\Field\Type\EntityReference',
     ),
     'boolean_field' => array(
       'label' => t('Boolean field item'),
