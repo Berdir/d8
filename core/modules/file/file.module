@@ -652,9 +652,12 @@ function file_file_download($uri, $field_type = 'file') {
     foreach ($field_references as $entity_type => $entities) {
       foreach ($entities as $entity) {
         $field = field_info_field($field_name);
-        // Check if access to this field is not disallowed.
-        debug($entity->access('download'), 'download');
-        if (!$entity->access('view') || !field_access('view', $field, $entity_type, $entity)) {
+        // First check the download operation of the entity, which allows to
+        // implement specific checks. If that returns NULL, fall back to view
+        // operation. Also check if access to this field is allowed.
+        $download_access = $entity->access('download');
+        $entity_access = $download_access !== NULL ? $download_access : $entity->access('view');
+        if (!$entity_access || !field_access('view', $field, $entity_type, $entity)) {
           $denied = TRUE;
           continue;
         }

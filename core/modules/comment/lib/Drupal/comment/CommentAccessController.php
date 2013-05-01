@@ -24,7 +24,7 @@ class CommentAccessController extends EntityAccessController {
   protected function checkAccess(EntityInterface $entity, $operation, $langcode, AccountInterface $account) {
     switch ($operation) {
       case 'view':
-        return user_access('access comments', $account);
+        return user_access('access comments') && $entity->status->value == COMMENT_PUBLISHED || user_access('administer comments');
         break;
 
       case 'create':
@@ -41,6 +41,16 @@ class CommentAccessController extends EntityAccessController {
 
       case 'approve':
         return user_access('administer comments', $account);
+        break;
+
+      case 'download':
+        // Only check access to the parent node for the download operation as
+        // we assume that viewing a comment happens on the node page and access
+        // for that was checked separately.
+        if (user_access('access comments') && $entity->status->value == COMMENT_PUBLISHED || user_access('administer comments')) {
+          return node_access('view', $entity->nid->entity);
+        }
+        return FALSE;
         break;
     }
   }
