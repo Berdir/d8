@@ -260,7 +260,7 @@ class Entity implements IteratorAggregate, EntityInterface {
   public function access($operation = 'view', \Drupal\user\Plugin\Core\Entity\User $account = NULL) {
     return drupal_container()->get('plugin.manager.entity')
       ->getAccessController($this->entityType)
-      ->access($this, $operation, LANGUAGE_DEFAULT, $account);
+      ->access($this, $operation, NULL, $account);
   }
 
   /**

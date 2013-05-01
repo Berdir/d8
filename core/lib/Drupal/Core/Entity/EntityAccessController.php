@@ -24,7 +24,24 @@ class EntityAccessController implements EntityAccessControllerInterface {
   /**
    * {@inheritdoc}
    */
-  public function access(EntityInterface $entity, $operation, $langcode = LANGUAGE_DEFAULT, User $account = NULL) {
+  public function access(EntityInterface $entity, $operation, $langcode = NULL, User $account = NULL) {
+    // If no language code was provided, default to the entity's langcode.
+    if (empty($langcode)) {
+      $langcode = $entity->language()->langcode;
+      // If the Language module is enabled, try to use the language from content
+      // negotiation.
+      // @todo: Relying on a module in core/lib is not cool.
+      if (module_exists('language')) {
+        // Load languages the node exists in.
+        $node_translations = $entity->getTranslationLanguages();
+        // Load the language from content negotiation.
+        $content_negotiation_langcode = language(LANGUAGE_TYPE_CONTENT)->langcode;
+        // If there is a translation available, use it.
+        if (isset($node_translations[$content_negotiation_langcode])) {
+          $langcode = $content_negotiation_langcode;
+        }
+      }
+    }
 
     // @todo Remove this once we can rely on $account.
     if (!$account) {

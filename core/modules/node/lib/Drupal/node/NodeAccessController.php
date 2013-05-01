@@ -20,7 +20,7 @@ class NodeAccessController extends EntityAccessController {
   /**
    * {@inheritdoc}
    */
-  public function access(EntityInterface $entity, $operation, $langcode = LANGUAGE_DEFAULT, User $account = NULL) {
+  public function access(EntityInterface $entity, $operation, $langcode = NULL, User $account = NULL) {
     if (user_access('bypass node access', $account)) {
       return TRUE;
     }
