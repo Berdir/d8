@@ -16,8 +16,6 @@ locked: '0'
 cardinality: '-1'
 translatable: '0'
 entity_types: {  }
-indexes:
-  tid:
-    - tid
+indexes: { }
 status: 1
 langcode: und
