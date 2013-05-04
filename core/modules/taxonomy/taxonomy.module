@@ -1027,8 +1027,8 @@ function taxonomy_field_validate(EntityInterface $entity = NULL, $field, $instan
   // Build an array of existing term IDs so they can be loaded with
   // taxonomy_term_load_multiple();
   foreach ($items as $delta => $item) {
-    if (!empty($item['tid']) && $item['tid'] != 'autocreate') {
-      $tids[] = $item['tid'];
+    if (!empty($item['target_id']) && $item['target_id'] != 'autocreate') {
+      $tids[] = $item['target_id'];
     }
   }
   if (!empty($tids)) {
@@ -1038,12 +1038,12 @@ function taxonomy_field_validate(EntityInterface $entity = NULL, $field, $instan
     // allowed values for this field.
     foreach ($items as $delta => $item) {
       $validate = TRUE;
-      if (!empty($item['tid']) && $item['tid'] != 'autocreate') {
+      if (!empty($item['target_id']) && $item['target_id'] != 'autocreate') {
         $validate = FALSE;
         foreach ($field['settings']['allowed_values'] as $settings) {
           // If no parent is specified, check if the term is in the vocabulary.
           if (isset($settings['vocabulary']) && empty($settings['parent'])) {
-            if ($settings['vocabulary'] == $terms[$item['tid']]->bundle()) {
+            if ($settings['vocabulary'] == $terms[$item['target_id']]->bundle()) {
               $validate = TRUE;
               break;
             }
@@ -1051,7 +1051,7 @@ function taxonomy_field_validate(EntityInterface $entity = NULL, $field, $instan
           // If a parent is specified, then to validate it must appear in the
           // array returned by taxonomy_term_load_parents_all().
           elseif (!empty($settings['parent'])) {
-            $ancestors = taxonomy_term_load_parents_all($item['tid']);
+            $ancestors = taxonomy_term_load_parents_all($item['target_id']);
             foreach ($ancestors as $ancestor) {
               if ($ancestor->id() == $settings['parent']) {
                 $validate = TRUE;
@@ -1075,7 +1075,7 @@ function taxonomy_field_validate(EntityInterface $entity = NULL, $field, $instan
  * Implements hook_field_is_empty().
  */
 function taxonomy_field_is_empty($item, $field) {
-  return !is_array($item) || (empty($item['tid']) && empty($item['entity']));
+  return !is_array($item) || (empty($item['target_id']) && empty($item['entity']));
 }
 
 /**
@@ -1236,10 +1236,10 @@ function taxonomy_rdf_mapping() {
  */
 function taxonomy_field_presave(EntityInterface $entity, $field, $instance, $langcode, &$items) {
   foreach ($items as $delta => $item) {
-    if (!$item['tid'] && isset($item['entity'])) {
-      unset($item['tid']);
+    if (!$item['target_id'] && isset($item['entity'])) {
+      unset($item['target_id']);
       taxonomy_term_save($item['entity']);
-      $items[$delta]['tid'] = $item['entity']->id();
+      $items[$delta]['target_id'] = $item['entity']->id();
     }
   }
 }
@@ -1299,7 +1299,7 @@ function taxonomy_build_node_index($node) {
         foreach (field_available_languages('node', $field) as $langcode) {
           if (!empty($items[$langcode])) {
             foreach ($items[$langcode] as $item) {
-              $tid_all[$item['tid']] = $item['tid'];
+              $tid_all[$item['target_id']] = $item['target_id'];
             }
           }
         }

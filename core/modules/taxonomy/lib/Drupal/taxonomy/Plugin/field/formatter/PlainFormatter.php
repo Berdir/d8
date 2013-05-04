@@ -33,10 +33,10 @@ class PlainFormatter extends TaxonomyFormatterBase {
   public function viewElements(EntityInterface $entity, $langcode, array $items) {
     $elements = array();
 
-    // Terms whose tid is 'autocreate' do not exist yet and $item['entity'] is
-    // not set. Theme such terms as just their name.
+    // Terms whose target_id is 'autocreate' do not exist yet and
+    // $item['entity'] is not set. Theme such terms as just their name.
     foreach ($items as $delta => $item) {
-      $name = ($item['tid'] != 'autocreate' ? $item['entity']->label() : $item['name']);
+      $name = ($item['target_id'] != 'autocreate' ? $item['entity']->label() : $item['name']);
       $elements[$delta] = array(
         '#markup' => check_plain($name),
       );
