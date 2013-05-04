@@ -106,6 +106,14 @@ abstract class FormatterBase extends PluginSettingsBase implements FormatterInte
         '#formatter' => $this->getPluginId(),
       );
 
+      // Gather cache tags from reference fields.
+      foreach ($items as $item) {
+        if (isset($item['entity'])) {
+          $info['#cache']['tags'][$item['entity']->entityType()][] = $item['entity']->id();
+          $info['#cache']['tags'][$item['entity']->entityType() . '_view'] = TRUE;
+        }
+      }
+
       $addition[$field['field_name']] = array_merge($info, $elements);
     }
 

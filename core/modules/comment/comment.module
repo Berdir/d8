@@ -1929,6 +1929,7 @@ function comment_unpublish_by_keyword_action_submit($form, $form_state) {
  */
 function comment_save_action(Comment $comment) {
   comment_save($comment);
+  Drupal::service('plugin.manager.entity')->getRenderController('comment')->resetCache(array($comment));
   cache_invalidate_tags(array('content' => TRUE));
   watchdog('action', 'Saved comment %title', array('%title' => $comment->subject->value));
 }

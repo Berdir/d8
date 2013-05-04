@@ -267,6 +267,7 @@ abstract class CommentTestBase extends WebTestBase {
    */
   function setCommentSettings($name, $value, $message) {
     variable_set($name . '_article', $value);
+    \Drupal::service('plugin.manager.entity')->getRenderController('comment')->resetCache();
     // Display status message.
     $this->pass($message);
   }

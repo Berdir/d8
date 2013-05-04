@@ -513,13 +513,15 @@ function taxonomy_term_confirm_delete($form, &$form_state, Term $term) {
  * @see taxonomy_term_confirm_delete()
  */
 function taxonomy_term_confirm_delete_submit($form, &$form_state) {
-  taxonomy_term_delete($form_state['values']['tid']);
+  $entity = taxonomy_term_load($form_state['values']['tid']);
+  $entity->delete();
   taxonomy_check_vocabulary_hierarchy($form_state['taxonomy']['vocabulary'], $form_state['values']);
   drupal_set_message(t('Deleted term %name.', array('%name' => $form_state['values']['name'])));
   watchdog('taxonomy', 'Deleted term %name.', array('%name' => $form_state['values']['name']), WATCHDOG_NOTICE);
   if (!isset($_GET['destination'])) {
     $form_state['redirect'] = 'admin/structure/taxonomy';
   }
+  Drupal::service('plugin.manager.entity')->getRenderController('taxonomy_term')->resetCache(array($entity));
   cache_invalidate_tags(array('content' => TRUE));
   return;
 }

@@ -144,6 +144,8 @@ class VocabularyFormController extends EntityFormController {
    * Overrides Drupal\Core\Entity\EntityFormController::save().
    */
   public function save(array $form, array &$form_state) {
+    parent::save($form, $form_state);
+
     $vocabulary = $this->entity;
 
     // Prevent leading and trailing spaces in vocabulary names.

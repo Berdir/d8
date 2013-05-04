@@ -285,6 +285,7 @@ class CommentAttributesTest extends CommentTestBase {
 
     $comment = entity_create('comment', $values);
     $comment->save();
+    \Drupal::service('plugin.manager.entity')->getRenderController('comment')->resetCache(array($comment));
     return $comment;
    }
 }

@@ -93,6 +93,8 @@ class RegisterFormController extends AccountFormController {
    * Overrides Drupal\Core\Entity\EntityFormController::submit().
    */
   public function save(array $form, array &$form_state) {
+    parent::save($form, $form_state);
+
     $account = $this->entity;
     $pass = $account->pass;
     $admin = $form_state['values']['administer_users'];

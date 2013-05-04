@@ -538,6 +538,7 @@ class DatabaseStorageController implements EntityStorageControllerInterface {
           $this->saveRevision($entity);
         }
         $this->resetCache(array($entity->id()));
+
         $this->postSave($entity, TRUE);
         $this->invokeHook('update', $entity);
       }

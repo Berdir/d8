@@ -1071,16 +1071,18 @@ function node_revision_delete($revision_id) {
  * @see node_menu()
  */
 function node_show(EntityInterface $node, $message = FALSE) {
+  // For markup consistency with other pages, use node_view_multiple() rather than node_view().
+  $nodes = array('nodes' => node_view_multiple(array($node->id() => $node), 'full'));
+
   if ($message) {
     drupal_set_title(t('Revision of %title from %date', array('%title' => $node->label(), '%date' => format_date($node->revision_timestamp))), PASS_THROUGH);
+    // Don't use the render cache when a revision is displayed.
+    unset($nodes['nodes'][$node->id()]['#cache']);
   }
-
-  // For markup consistency with other pages, use node_view_multiple() rather than node_view().
-  $nodes = array('nodes' => node_view_multiple(array($node->nid => $node), 'full'));
 
   // Update the history table, stating that this user viewed this node.
   if (module_exists('history')) {
-    history_write($node->nid);
+    history_write($node->id());
   }
 
   return $nodes;
@@ -2236,7 +2238,7 @@ function _node_index_node(EntityInterface $node) {
 
   foreach ($languages as $language) {
     // Render the node.
-    $build = node_view($node, 'search_index', $language->langcode);
+    $build = entity_view($node, 'search_index', $language->langcode, TRUE);
 
     unset($build['#theme']);
     $node->rendered = drupal_render($build);

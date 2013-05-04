@@ -94,6 +94,8 @@ class CategoryFormController extends EntityFormController {
    * Overrides Drupal\Core\Entity\EntityFormController::save().
    */
   public function save(array $form, array &$form_state) {
+    parent::save($form, $form_state);
+
     $category = $this->entity;
     $status = $category->save();
 

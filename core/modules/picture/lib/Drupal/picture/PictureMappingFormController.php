@@ -126,6 +126,8 @@ class PictureMappingFormController extends EntityFormController {
    * Overrides Drupal\Core\Entity\EntityFormController::save().
    */
   public function save(array $form, array &$form_state) {
+    parent::save($form, $form_state);
+
     $picture_mapping = $this->entity;
     $picture_mapping->save();
 

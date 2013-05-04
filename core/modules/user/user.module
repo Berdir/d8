@@ -1987,6 +1987,8 @@ function user_role_grant_permissions($rid, array $permissions = array()) {
   // Clear the user access cache.
   drupal_static_reset('user_access');
   drupal_static_reset('user_role_permissions');
+  // Entity render cache is based on user roles, so we need to clear it as well.
+  entity_render_cache_clear();
 }
 
 /**
@@ -2010,6 +2012,8 @@ function user_role_revoke_permissions($rid, array $permissions = array()) {
   // Clear the user access cache.
   drupal_static_reset('user_access');
   drupal_static_reset('user_role_permissions');
+  // Entity render cache is based on user roles, so we need to clear it as well.
+  entity_render_cache_clear();
 }
 
 /**

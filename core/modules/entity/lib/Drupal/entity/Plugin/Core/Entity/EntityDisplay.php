@@ -120,7 +120,17 @@ class EntityDisplay extends ConfigEntityBase implements EntityDisplayInterface {
     if (empty($this->id)) {
       $this->id = $this->id();
     }
-    return parent::save();
+    $return = parent::save();
+
+    // Reset the render cache for the target entity type.
+    try {
+      \Drupal::service('plugin.manager.entity')->getRenderController($this->targetEntityType)->resetCache();
+    }
+    catch (\Exception $e) {
+      // Nothing to do if the entity type doesn't have a render controller.
+    }
+
+    return $return;
   }
 
   /**

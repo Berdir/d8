@@ -65,6 +65,7 @@ class DateTimeTest extends WebTestBase {
 
     // Set time zone to Los Angeles time.
     $config->set('default', 'America/Los_Angeles')->save();
+    \Drupal::service('plugin.manager.entity')->getRenderController('node')->resetCache(array($node1, $node2));
 
     // Confirm date format and time zone.
     $this->drupalGet("node/$node1->nid");

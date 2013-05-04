@@ -80,6 +80,7 @@ function comment_reply(EntityInterface $node, $pid = NULL) {
     // This is the case where the comment is in response to a node. Display the node.
     elseif (user_access('access content')) {
       $build['comment_node'] = node_view($node);
+      unset($build['comment_node']['#cache']);
     }
 
     // Should we show the reply box?
@@ -118,6 +119,7 @@ function comment_approve(Comment $comment) {
 
   $comment->status->value = COMMENT_PUBLISHED;
   $comment->save();
+  Drupal::service('plugin.manager.entity')->getRenderController('comment')->resetCache(array($comment));
 
   drupal_set_message(t('Comment approved.'));
   drupal_goto('node/' . $comment->nid->target_id);

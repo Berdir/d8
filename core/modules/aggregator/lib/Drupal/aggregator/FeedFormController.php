@@ -111,6 +111,8 @@ class FeedFormController extends EntityFormControllerNG {
    * Overrides Drupal\Core\Entity\EntityFormController::save().
    */
   public function save(array $form, array &$form_state) {
+    parent::save($form, $form_state);
+
     $feed = $this->entity;
     $insert = (bool) $feed->id();
     if (!empty($form_state['values']['category'])) {

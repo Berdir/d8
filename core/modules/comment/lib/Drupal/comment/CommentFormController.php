@@ -309,6 +309,8 @@ class CommentFormController extends EntityFormControllerNG {
    * Overrides Drupal\Core\Entity\EntityFormController::save().
    */
   public function save(array $form, array &$form_state) {
+    parent::save($form, $form_state);
+
     $node = node_load($form_state['values']['nid']);
     $comment = $this->entity;
 

@@ -496,6 +496,9 @@ class DisplayOverview extends OverviewBase {
       field_bundle_settings($this->entity_type, $this->bundle, $bundle_settings);
     }
 
+    // Clear the render cache for this entity type.
+    \Drupal::service('plugin.manager.entity')->getRenderController($this->entity_type)->resetCache();
+
     drupal_set_message(t('Your settings have been saved.'));
   }
 

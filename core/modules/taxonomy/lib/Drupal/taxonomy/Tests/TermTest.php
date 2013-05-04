@@ -333,6 +333,7 @@ class TermTest extends TaxonomyTestBase {
     // Check that it does NOT show a description when description is blank.
     $term->description = '';
     taxonomy_term_save($term);
+    \Drupal::service('plugin.manager.entity')->getRenderController('taxonomy_term')->resetCache(array($term));
     $this->drupalGet('taxonomy/term/' . $term->id());
     $this->assertNoPattern('|class="taxonomy-term-description"|', 'Term page did not display the term description when description was blank.');
 

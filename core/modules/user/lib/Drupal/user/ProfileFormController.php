@@ -41,6 +41,8 @@ class ProfileFormController extends AccountFormController {
    * Overrides Drupal\Core\Entity\EntityFormController::save().
    */
   public function save(array $form, array &$form_state) {
+    parent::save($form, $form_state);
+
     $account = $this->entity;
     $account->save();
     $form_state['values']['uid'] = $account->id();

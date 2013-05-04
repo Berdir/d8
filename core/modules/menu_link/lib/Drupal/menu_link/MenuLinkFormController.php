@@ -202,8 +202,9 @@ class MenuLinkFormController extends EntityFormController {
    * Overrides EntityFormController::save().
    */
   public function save(array $form, array &$form_state) {
-    $menu_link = $this->entity;
+    parent::save($form, $form_state);
 
+    $menu_link = $this->entity;
     $saved = $menu_link->save();
 
     if ($saved) {

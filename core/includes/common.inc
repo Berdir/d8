@@ -5479,7 +5479,7 @@ function drupal_render_cache_set(&$markup, $elements) {
   }
   $bin = isset($elements['#cache']['bin']) ? $elements['#cache']['bin'] : 'cache';
   $expire = isset($elements['#cache']['expire']) ? $elements['#cache']['expire'] : CacheBackendInterface::CACHE_PERMANENT;
-  $tags = isset($elements['#cache']['tags']) ? $elements['#cache']['tags'] : array();
+  $tags = drupal_render_collect_cache_tags($elements, TRUE);
   cache($bin)->set($cid, $data, $expire, $tags);
 }
 
@@ -5522,6 +5522,57 @@ function drupal_render_collect_attached($elements, $return = FALSE) {
   if ($return) {
     $return = $attached;
     $attached = array();
+    return $return;
+  }
+}
+
+/**
+ * Collects cache tags for an element and its children into a single array.
+ *
+ * When caching elements, it is necessary to collect all cache tags into a
+ * single array, from both the element itself and all child elements. This
+ * allows items to be invalidated based on all tags attached to the content
+ * they're constituted from.
+ *
+ * @param array $elements
+ *   The element to collect cache tags from.
+ * @param bool $return
+ *   Whether to return the attached elements and reset the internal static.
+ *
+ * @return array
+ *   The cache tags array for this element and its descendants.
+ */
+function drupal_render_collect_cache_tags($elements, $return = FALSE) {
+  $tags = &drupal_static(__FUNCTION__, array());
+
+  // Collect all cache tags for this element.
+  if (isset($elements['#cache']['tags'])) {
+    foreach ($elements['#cache']['tags'] as $namespace => $values) {
+      if (is_array($values)) {
+        foreach ($values as $value) {
+          if (!isset($tags[$namespace][$value])) {
+            $tags[$namespace][$value] = $value;
+          }
+        }
+      }
+      else {
+        if (!isset($tags[$namespace])) {
+          $tags[$namespace] = $values;
+        }
+      }
+    }
+  }
+  if ($children = element_children($elements)) {
+    foreach ($children as $child) {
+      drupal_render_collect_cache_tags($elements[$child]);
+    }
+  }
+
+  // If this was the first call to the function, return all attached elements
+  // and reset the static cache.
+  if ($return) {
+    $return = $tags;
+    $tags = array();
     return $return;
   }
 }

@@ -83,6 +83,8 @@ class MenuFormController extends EntityFormController {
    * Overrides Drupal\Core\Entity\EntityFormController::save().
    */
   public function save(array $form, array &$form_state) {
+    parent::save($form, $form_state);
+
     $menu = $this->entity;
     $system_menus = menu_list_system_menus();
 

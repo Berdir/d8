@@ -87,4 +87,10 @@ class BlockRenderController implements EntityRenderControllerInterface {
     return $build;
   }
 
+  /**
+   * Implements \Drupal\Core\Entity\EntityRenderControllerInterface::resetCache().
+   */
+  public function resetCache(array $entities = NULL) {
+    // @todo Move block render caching logic to this controller?
+  }
 }

@@ -427,6 +427,8 @@ class NodeFormController extends EntityFormController {
    * Overrides Drupal\Core\Entity\EntityFormController::save().
    */
   public function save(array $form, array &$form_state) {
+    parent::save($form, $form_state);
+
     $node = $this->entity;
     $insert = empty($node->nid);
     $node->save();

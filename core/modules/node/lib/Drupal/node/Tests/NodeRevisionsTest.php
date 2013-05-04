@@ -139,6 +139,7 @@ class NodeRevisionsTest extends NodeTestBase {
     $new_node_revision->setNewRevision();
     $new_node_revision->isDefaultRevision = FALSE;
     node_save($new_node_revision);
+    \Drupal::service('plugin.manager.entity')->getRenderController('node')->resetCache(array($node));
 
     $this->drupalGet("node/$node->nid");
     $this->assertNoText($new_body, 'Revision body text is not present on default version of node.');

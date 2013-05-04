@@ -3008,6 +3008,7 @@ function system_date_format_localize_reset_form($form, &$form_state, $langcode) 
 function system_date_format_localize_reset_form_submit($form, &$form_state) {
   config('locale.config.' . $form['langcode']['#value'] . '.system.date')
     ->delete();
+  entity_render_cache_clear();
   $form_state['redirect'] = 'admin/config/regional/date-time/locale';
 }
 

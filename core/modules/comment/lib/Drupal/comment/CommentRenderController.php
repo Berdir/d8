@@ -79,9 +79,10 @@ class CommentRenderController extends EntityRenderController {
       $is_threaded = isset($comment->divs)
         && variable_get('comment_default_mode_' . $comment->bundle(), COMMENT_MODE_THREADED) == COMMENT_MODE_THREADED;
 
-      // Add 'new' anchor if needed.
+      // Add 'new' anchor and disable render cache if needed.
       if (!empty($comment->first_new)) {
         $prefix .= "<a id=\"new\"></a>\n";
+        unset($build['#cache']);
       }
 
       // Add indentation div or close open divs as needed.

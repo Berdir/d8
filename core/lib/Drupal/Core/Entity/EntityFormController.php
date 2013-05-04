@@ -263,7 +263,13 @@ class EntityFormController implements EntityFormControllerInterface {
    *   A reference to a keyed array containing the current state of the form.
    */
   public function save(array $form, array &$form_state) {
-    // @todo Perform common save operations.
+    // Clear the render cache.
+    try {
+      \Drupal::service('plugin.manager.entity')->getRenderController($this->entity->entityType())->resetCache(array($this->entity));
+    }
+    catch (\Exception $e) {
+      // Nothing to do if the entity type doesn't have a render controller.
+    }
   }
 
   /**
