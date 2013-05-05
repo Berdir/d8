@@ -232,7 +232,7 @@ function menu_menu_insert(Menu $menu) {
   menu_cache_clear_all();
   // Invalidate the block cache to update menu-based derivatives.
   if (module_exists('block')) {
-    drupal_container()->get('plugin.manager.block')->clearCachedDefinitions();
+    Drupal::pluginManager('block', 'block')->clearCachedDefinitions();
   }
   // Make sure the menu is present in the active menus variable so that its
   // items may appear in the menu active trail.
@@ -255,7 +255,7 @@ function menu_menu_update(Menu $menu) {
   menu_cache_clear_all();
   // Invalidate the block cache to update menu-based derivatives.
   if (module_exists('block')) {
-    drupal_container()->get('plugin.manager.block')->clearCachedDefinitions();
+    Drupal::pluginManager('block', 'block')->clearCachedDefinitions();
   }
 }
 
@@ -284,7 +284,7 @@ function menu_menu_delete(Menu $menu) {
 
   // Invalidate the block cache to update menu-based derivatives.
   if (module_exists('block')) {
-    drupal_container()->get('plugin.manager.block')->clearCachedDefinitions();
+    Drupal::pluginManager('block', 'block')->clearCachedDefinitions();
   }
 }
 

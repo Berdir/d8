@@ -85,7 +85,7 @@ class FeedStorageController extends DatabaseStorageControllerNG {
 
     // Invalidate the block cache to update aggregator feed-based derivatives.
     if (module_exists('block')) {
-      drupal_container()->get('plugin.manager.block')->clearCachedDefinitions();
+      \Drupal::pluginManager('block', 'block')->clearCachedDefinitions();
     }
     // An existing feed is being modified, delete the category listings.
     db_delete('aggregator_category_feed')

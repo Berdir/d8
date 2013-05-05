@@ -134,7 +134,7 @@ class Block extends ConfigEntityBase implements BlockInterface {
 
       // Create a plugin instance and store its configuration as settings.
       try {
-        $this->instance = drupal_container()->get('plugin.manager.block')->createInstance($this->plugin, $this->settings, $this);
+        $this->instance = \Drupal::pluginManager('block', 'block')->createInstance($this->plugin, $this->settings, $this);
         $this->settings += $this->instance->getConfig();
       }
       catch (PluginException $e) {

@@ -49,7 +49,7 @@ class CKEditor extends EditorBase {
    */
   public function settingsForm(array $form, array &$form_state, Editor $editor) {
     $module_path = drupal_get_path('module', 'ckeditor');
-    $manager = drupal_container()->get('plugin.manager.ckeditor.plugin');
+    $manager = \Drupal::pluginManager('ckeditor', 'plugin');
 
     $form['toolbar'] = array(
       '#type' => 'container',
@@ -110,7 +110,7 @@ class CKEditor extends EditorBase {
     $language_interface = language(LANGUAGE_TYPE_INTERFACE);
 
     $settings = array();
-    $manager = drupal_container()->get('plugin.manager.ckeditor.plugin');
+    $manager = \Drupal::pluginManager('ckeditor', 'plugin');
 
     // Get the settings for all enabled plugins, even the internal ones.
     $enabled_plugins = array_keys($manager->getEnabledPlugins($editor, TRUE));

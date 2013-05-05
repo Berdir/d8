@@ -209,10 +209,10 @@ function field_info_field_types($field_type = NULL) {
  */
 function field_info_widget_types($widget_type = NULL) {
   if ($widget_type) {
-    return drupal_container()->get('plugin.manager.field.widget')->getDefinition($widget_type);
+    return Drupal::pluginManager('field', 'widget')->getDefinition($widget_type);
   }
   else {
-    return drupal_container()->get('plugin.manager.field.widget')->getDefinitions();
+    return Drupal::pluginManager('field', 'widget')->getDefinitions();
   }
 }
 
@@ -230,10 +230,10 @@ function field_info_widget_types($widget_type = NULL) {
  */
 function field_info_formatter_types($formatter_type = NULL) {
   if ($formatter_type) {
-    return drupal_container()->get('plugin.manager.field.formatter')->getDefinition($formatter_type);
+    return Drupal::pluginManager('field', 'formatter')->getDefinition($formatter_type);
   }
   else {
-    return drupal_container()->get('plugin.manager.field.formatter')->getDefinitions();
+    return Drupal::pluginManager('field', 'formatter')->getDefinitions();
   }
 }
 

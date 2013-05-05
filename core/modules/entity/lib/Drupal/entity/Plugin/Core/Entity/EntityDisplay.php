@@ -215,7 +215,7 @@ class EntityDisplay extends ConfigEntityBase implements EntityDisplayInterface {
 
     if ($instance = field_info_instance($this->targetEntityType, $name, $this->bundle)) {
       $field = field_info_field($instance['field_name']);
-      $options = drupal_container()->get('plugin.manager.field.formatter')->prepareConfiguration($field['type'], $options);
+      $options = \Drupal::pluginManager('field', 'formatter')->prepareConfiguration($field['type'], $options);
 
       // Clear the persisted formatter, if any.
       unset($this->formatters[$name]);
@@ -284,7 +284,7 @@ class EntityDisplay extends ConfigEntityBase implements EntityDisplayInterface {
     // Instantiate the formatter object from the stored display properties.
     if ($configuration = $this->getComponent($field_name)) {
       $instance = field_info_instance($this->targetEntityType, $field_name, $this->bundle);
-      $formatter = drupal_container()->get('plugin.manager.field.formatter')->getInstance(array(
+      $formatter = \Drupal::pluginManager('field', 'formatter')->getInstance(array(
         'instance' => $instance,
         'view_mode' => $this->originalViewMode,
         // No need to prepare, defaults have been merged in setComponent().

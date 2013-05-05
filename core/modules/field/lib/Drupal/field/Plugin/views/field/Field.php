@@ -401,7 +401,7 @@ class Field extends FieldPluginBase {
 
     // Get the settings form.
     $settings_form = array('#value' => array());
-    if ($formatter = drupal_container()->get('plugin.manager.field.formatter')->getInstance($options)) {
+    if ($formatter = \Drupal::pluginManager('field', 'formatter')->getInstance($options)) {
       $settings_form = $formatter->settingsForm($form, $form_state);
     }
     $form['settings'] = $settings_form;

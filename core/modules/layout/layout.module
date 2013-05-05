@@ -58,7 +58,7 @@ function layout_permission() {
  *   The layout plugin manager instance.
  */
 function layout_manager() {
-  return drupal_container()->get('plugin.manager.layout');
+  return \Drupal::pluginManager('layout', 'layout');
 }
 
 /**

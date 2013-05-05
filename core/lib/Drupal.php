@@ -158,6 +158,24 @@ class Drupal {
   }
 
   /**
+   * Retrieves a plugin manager for the given plugin owner and type.
+   *
+   * Plugin managers must be registered as plugin.manager.$owner.$type or
+   * plugin.manager.$owner if type is the same as owner.
+   *
+   * @param string $owner
+   *   The plugin owner.
+   * @param string $type
+   *   The plugin type.
+   *
+   * @return \Drupal\Component\Plugin\PluginManagerInterface
+   *   The plugin manager service.
+   */
+  public static function pluginManager($owner, $type) {
+    return static::$container->get("plugin.manager.$owner.$type");
+  }
+
+  /**
    * Returns the current primary database.
    *
    * @return \Drupal\Core\Database\Connection

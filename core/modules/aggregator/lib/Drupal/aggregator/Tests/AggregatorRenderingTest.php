@@ -39,7 +39,7 @@ class AggregatorRenderingTest extends AggregatorTestBase {
     $this->updateFeedItems($feed, $this->getDefaultFeedItemCount());
 
     // Clear the block cache to load the new block definitions.
-    $this->container->get('plugin.manager.block')->clearCachedDefinitions();
+    \Drupal::pluginManager('block', 'block')->clearCachedDefinitions();
 
     // Need admin user to be able to access block admin.
     $admin_user = $this->drupalCreateUser(array(

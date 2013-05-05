@@ -158,7 +158,7 @@ function block_menu() {
   //   hook_menu_local_tasks() to check for the untranslated tab_parent path.
   // @see http://drupal.org/node/1067408
   $themes = list_themes();
-  foreach (drupal_container()->get('plugin.manager.system.plugin_ui')->getDefinitions() as $plugin_id => $plugin) {
+  foreach (Drupal::pluginManager('system', 'plugin_ui')->getDefinitions() as $plugin_id => $plugin) {
     list($plugin_base, $key) = explode(':', $plugin_id);
     if ($plugin_base == 'block_plugin_ui') {
       $theme = $themes[$key];

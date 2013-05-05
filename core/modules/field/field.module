@@ -822,7 +822,7 @@ function field_view_field(EntityInterface $entity, $field_name, $display_options
     // hook_field_attach_display_alter() needs to receive the 'prepared'
     // $display_options, so we cannot let preparation happen internally.
     $field = field_info_field($field_name);
-    $formatter_manager = drupal_container()->get('plugin.manager.field.formatter');
+    $formatter_manager = Drupal::pluginManager('field', 'formatter');
     $display_options = $formatter_manager->prepareConfiguration($field['type'], $display_options);
     $formatter = $formatter_manager->getInstance(array(
       'instance' => $instance,

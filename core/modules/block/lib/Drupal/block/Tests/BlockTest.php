@@ -210,7 +210,7 @@ class BlockTest extends BlockTestBase {
     $this->assertTrue(module_exists('block_test'), 'Test block module enabled.');
 
     // Clear the block cache to load the block_test module's block definitions.
-    $this->container->get('plugin.manager.block')->clearCachedDefinitions();
+    \Drupal::pluginManager('block', 'block')->clearCachedDefinitions();
 
     // Add a test block.
     $block = array();
@@ -244,8 +244,7 @@ class BlockTest extends BlockTestBase {
     $this->assertTrue(module_exists('block_test'), 'Test block module enabled.');
 
     // Clear the block cache to load the block_test module's block definitions.
-    $manager = $this->container->get('plugin.manager.block');
-    $manager->clearCachedDefinitions();
+    \Drupal::pluginManager('block', 'block')->clearCachedDefinitions();
 
     // Add test blocks in different regions and confirm they are displayed.
     $blocks = array();
@@ -261,7 +260,7 @@ class BlockTest extends BlockTestBase {
     // Disable the block test module and refresh the definitions cache.
     module_disable(array('block_test'), FALSE);
     $this->assertFalse(module_exists('block_test'), 'Test block module disabled.');
-    $manager->clearCachedDefinitions();
+    \Drupal::pluginManager('block', 'block')->clearCachedDefinitions();
 
     // Ensure that the block administration page still functions as expected.
     $this->drupalGet('admin/structure/block');
@@ -306,7 +305,7 @@ class BlockTest extends BlockTestBase {
     // Re-enable the module and refresh the definitions cache.
     module_enable(array('block_test'), FALSE);
     $this->assertTrue(module_exists('block_test'), 'Test block module re-enabled.');
-    $manager->clearCachedDefinitions();
+    \Drupal::pluginManager('block', 'block')->clearCachedDefinitions();
 
     // Reload the admin page and confirm the block can again be configured.
     $this->drupalGet('admin/structure/block');

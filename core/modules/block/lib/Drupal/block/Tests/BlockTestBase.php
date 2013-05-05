@@ -68,7 +68,6 @@ abstract class BlockTestBase extends WebTestBase {
     );
 
     $default_theme = variable_get('theme_default', 'stark');
-    $manager = $this->container->get('plugin.manager.block');
     $instances = config_get_storage_names_with_prefix('plugin.core.block.' . $default_theme);
     foreach ($instances as $plugin_id) {
       config($plugin_id)->delete();

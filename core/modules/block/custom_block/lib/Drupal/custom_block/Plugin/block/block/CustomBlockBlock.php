@@ -68,7 +68,7 @@ class CustomBlockBlock extends BlockBase {
   public function blockSubmit($form, &$form_state) {
     // Invalidate the block cache to update custom block-based derivatives.
     if (module_exists('block')) {
-      drupal_container()->get('plugin.manager.block')->clearCachedDefinitions();
+      \Drupal::pluginManager('block', 'block')->clearCachedDefinitions();
     }
   }
 

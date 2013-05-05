@@ -69,7 +69,7 @@ class CustomBlockStorageController extends DatabaseStorageControllerNG {
    */
   protected function postSave(EntityInterface $block, $update) {
     // Invalidate the block cache to update custom block-based derivatives.
-    drupal_container()->get('plugin.manager.block')->clearCachedDefinitions();
+    \Drupal::pluginManager('block', 'block')->clearCachedDefinitions();
   }
 
   /**

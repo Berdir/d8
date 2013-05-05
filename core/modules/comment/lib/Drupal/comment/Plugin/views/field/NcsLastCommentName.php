@@ -37,7 +37,7 @@ class NcsLastCommentName extends FieldPluginBase {
         )
       )
     );
-    $join = drupal_container()->get('plugin.manager.views.join')->createInstance('standard', $definition);
+    $join = \Drupal::pluginManager('views', 'join')->createInstance('standard', $definition);
 
     // ncs_user alias so this can work with the sort handler, below.
 //    $this->user_table = $this->query->add_relationship(NULL, $join, 'users', $this->relationship);

@@ -174,7 +174,7 @@ class DisplayOverview extends OverviewBase {
 
       // Get the corresponding formatter object.
       if ($display_options && $display_options['type'] != 'hidden') {
-        $formatter = drupal_container()->get('plugin.manager.field.formatter')->getInstance(array(
+        $formatter = \Drupal::pluginManager('field', 'formatter')->getInstance(array(
           'instance' => $instance,
           'view_mode' => $this->view_mode,
           'configuration' => $display_options

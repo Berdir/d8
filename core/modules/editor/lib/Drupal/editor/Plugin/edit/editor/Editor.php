@@ -41,7 +41,7 @@ class Editor extends PluginBase implements EditPluginInterface {
     elseif (!empty($instance['settings']['text_processing'])) {
       $format_id = $items[0]['format'];
       if (isset($format_id) && $editor = editor_load($format_id)) {
-        $definition = drupal_container()->get('plugin.manager.editor')->getDefinition($editor->editor);
+        $definition = \Drupal::pluginManager('editor', 'editor')->getDefinition($editor->editor);
         if ($definition['supports_inline_editing'] === TRUE) {
           return TRUE;
         }
@@ -75,7 +75,7 @@ class Editor extends PluginBase implements EditPluginInterface {
     global $user;
 
     $user_format_ids = array_keys(filter_formats($user));
-    $manager = drupal_container()->get('plugin.manager.editor');
+    $manager = \Drupal::pluginManager('editor', 'editor');
     $definitions = $manager->getDefinitions();
 
     // Filter the current user's formats to those that support inline editing.

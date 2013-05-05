@@ -62,7 +62,7 @@ class EntityReverse extends RelationshipPluginBase  {
     else {
       $id = 'standard';
     }
-    $first_join = drupal_container()->get('plugin.manager.views.join')->createInstance($id, $first);
+    $first_join = \Drupal::pluginManager('views', 'join')->createInstance($id, $first);
 
 
     $this->first_alias = $this->query->add_table($this->definition['field table'], $this->relationship, $first_join);
@@ -87,7 +87,7 @@ class EntityReverse extends RelationshipPluginBase  {
     else {
       $id = 'standard';
     }
-    $second_join = drupal_container()->get('plugin.manager.views.join')->createInstance($id, $second);
+    $second_join = \Drupal::pluginManager('views', 'join')->createInstance($id, $second);
     $second_join->adjusted = TRUE;
 
     // use a short alias for this:
