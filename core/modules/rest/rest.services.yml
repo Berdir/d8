@@ -1,5 +1,5 @@
 services:
-  plugin.manager.rest:
+  plugin.manager.rest.resource:
     class: Drupal\rest\Plugin\Type\ResourcePluginManager
     arguments: ['@container.namespaces']
   rest.route_subscriber:

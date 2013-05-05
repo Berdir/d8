@@ -36,7 +36,7 @@ class RequestHandler extends ContainerAware {
     $method = strtolower($request->getMethod());
 
     $resource = $this->container
-      ->get('plugin.manager.rest')
+      ->get('plugin.manager.rest.resource')
       ->getInstance(array('id' => $plugin));
 
     // Deserialze incoming data if available.

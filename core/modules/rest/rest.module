@@ -28,8 +28,8 @@ function rest_menu() {
  */
 function rest_permission() {
   $permissions = array();
-  if (Drupal::getContainer()->has('plugin.manager.rest')) {
-    $manager = Drupal::pluginManager('rest', 'rest');
+  if (Drupal::getContainer()->has('plugin.manager.rest.resource')) {
+    $manager = Drupal::pluginManager('rest', 'resource');
     $resources = config('rest.settings')->get('resources');
     if ($resources && $enabled = array_intersect_key($manager->getDefinitions(), $resources)) {
       foreach ($enabled as $key => $resource) {
