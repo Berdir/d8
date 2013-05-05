@@ -1079,7 +1079,7 @@ function system_menu() {
     );
   }
 
-  foreach (drupal_container()->get('plugin.manager.system.plugin_ui')->getDefinitions() as $plugin_id => $plugin) {
+  foreach (Drupal::pluginManager('system', 'plugin_ui')->getDefinitions() as $plugin_id => $plugin) {
     if ($plugin['menu'] === TRUE) {
       $items[$plugin['path'] . '/' . $plugin_id . '/' . $plugin['suffix']] = array(
         'title' => $plugin['title'],
@@ -1132,7 +1132,7 @@ function system_menu() {
  *   documentation. Also "proxies" is a weird word to use.
  */
 function system_plugin_ui_form($form, &$form_state, $plugin, $facet = NULL) {
-  $plugin_ui = drupal_container()->get('plugin.manager.system.plugin_ui')->createInstance($plugin);
+  $plugin_ui = Drupal::pluginManager('system', 'plugin_ui')->createInstance($plugin);
   $form = $plugin_ui->form($form, $form_state, $facet);
   $form['#validate'][] = array($plugin_ui, 'formValidate');
   $form['#submit'][] = array($plugin_ui, 'formSubmit');
@@ -1158,7 +1158,7 @@ function system_plugin_autocomplete($plugin_id) {
   $string = drupal_strtolower(array_pop($string_typed));
   $matches = array();
   if ($string) {
-    $plugin_ui = drupal_container()->get('plugin.manager.system.plugin_ui')->getDefinition($plugin_id);
+    $plugin_ui = Drupal::pluginManager('system', 'plugin_ui')->getDefinition($plugin_id);
     $manager = new $plugin_ui['manager']();
     $titles = array();
     foreach($manager->getDefinitions() as $plugin_id => $plugin) {
@@ -1177,7 +1177,7 @@ function system_plugin_autocomplete($plugin_id) {
  * @todo What the heck kind of parameter name is "facet"?
  */
 function system_plugin_ui_access($plugin, $facet = NULL) {
-  $plugin_ui = drupal_container()->get('plugin.manager.system.plugin_ui')->createInstance($plugin);
+  $plugin_ui = Drupal::pluginManager('system', 'plugin_ui')->createInstance($plugin);
   return $plugin_ui->access($facet);
 }
 
@@ -1186,7 +1186,7 @@ function system_plugin_ui_access($plugin, $facet = NULL) {
  */
 function system_forms() {
   $forms = array();
-  foreach (drupal_container()->get('plugin.manager.system.plugin_ui')->getDefinitions() as $plugin_id => $plugin) {
+  foreach (Drupal::pluginManager('system', 'plugin_ui')->getDefinitions() as $plugin_id => $plugin) {
     if (empty($forms[$plugin['id']])) {
       $forms[$plugin['id']]['callback'] = 'system_plugin_ui_form';
     }

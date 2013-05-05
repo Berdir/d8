@@ -172,6 +172,10 @@ class Drupal {
    *   The plugin manager service.
    */
   public static function pluginManager($owner, $type) {
+    // @todo: Remove this and only support the longer form?
+    if ($owner == $type && static::$container->has("plugin.manager.$owner")) {
+      return static::$container->get("plugin.manager.$owner");
+    }
     return static::$container->get("plugin.manager.$owner.$type");
   }
 
