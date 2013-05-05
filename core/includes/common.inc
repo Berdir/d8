@@ -6234,7 +6234,7 @@ function archiver_get_archiver($file) {
   if (!is_file($filepath)) {
     throw new Exception(t('Archivers can only operate on local files: %file not supported', array('%file' => $file)));
   }
-  return Drupal::pluginManager('archiver')->getInstance(array('filepath' => $filepath));
+  return Drupal::pluginManager('archiver', 'archiver')->getInstance(array('filepath' => $filepath));
 }
 
 /**
