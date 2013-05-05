@@ -13,8 +13,6 @@ use Drupal\Core\Annotation\Translation;
 use Drupal\tour\TipsBag;
 use Drupal\tour\TourInterface;
 
-
-
 /**
  * Defines the configured tour entity.
  *
