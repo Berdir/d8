@@ -6204,7 +6204,7 @@ function drupal_check_incompatibility($v, $current_version) {
  */
 function archiver_get_extensions() {
   $valid_extensions = array();
-  foreach (Drupal::service('plugin.manager.archiver')->getDefinitions() as $archive) {
+  foreach (Drupal::pluginManager('archiver', 'archiver')->getDefinitions() as $archive) {
     foreach ($archive['extensions'] as $extension) {
       foreach (explode('.', $extension) as $part) {
         if (!in_array($part, $valid_extensions)) {
@@ -6234,7 +6234,7 @@ function archiver_get_archiver($file) {
   if (!is_file($filepath)) {
     throw new Exception(t('Archivers can only operate on local files: %file not supported', array('%file' => $file)));
   }
-  return Drupal::service('plugin.manager.archiver')->getInstance(array('filepath' => $filepath));
+  return Drupal::pluginManager('archiver')->getInstance(array('filepath' => $filepath));
 }
 
 /**

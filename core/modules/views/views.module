@@ -692,7 +692,7 @@ function views_invalidate_cache() {
 
   // Invalidate the block cache to update views block derivatives.
   if ($module_handler->moduleExists('block')) {
-    Drupal::service('plugin.manager.block')->clearCachedDefinitions();
+    Drupal::pluginManager('block', 'block')->clearCachedDefinitions();
   }
 
   // Allow modules to respond to the Views cache being cleared.

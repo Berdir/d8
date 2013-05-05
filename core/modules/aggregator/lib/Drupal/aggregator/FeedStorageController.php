@@ -48,11 +48,11 @@ class FeedStorageController extends DatabaseStorageControllerNG {
 
     // Invalidate the block cache to update aggregator feed-based derivatives.
     if (module_exists('block')) {
-      \Drupal::service('plugin.manager.block')->clearCachedDefinitions();
+      \Drupal::pluginManager('block', 'block')->clearCachedDefinitions();
     }
     foreach ($entities as $entity) {
       // Notify processors to remove stored items.
-      $manager = \Drupal::service('plugin.manager.aggregator.processor');
+      $manager = \Drupal::pluginmanager('aggregator', 'processor');
       foreach ($manager->getDefinitions() as $id => $definition) {
         $manager->createInstance($id)->remove($entity);
       }

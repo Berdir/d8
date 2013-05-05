@@ -386,7 +386,7 @@ function aggregator_save_category($edit) {
 function aggregator_remove(Feed $feed) {
   // Call \Drupal\aggregator\Plugin\ProcessorInterface::remove() on all
   // processors.
-  $manager = Drupal::service('plugin.manager.aggregator.processor');
+  $manager = Drupal::pluginManager('aggregator', 'processor');
   foreach ($manager->getDefinitions() as $id => $definition) {
     $manager->createInstance($id)->remove($feed);
   }
@@ -410,7 +410,7 @@ function aggregator_refresh(Feed $feed) {
 
   $config = config('aggregator.settings');
   // Fetch the feed.
-  $fetcher_manager = Drupal::service('plugin.manager.aggregator.fetcher');
+  $fetcher_manager = Drupal::pluginManager('aggregator', 'fetcher');
   try {
     $success = $fetcher_manager->createInstance($config->get('fetcher'))->fetch($feed);
   }
@@ -420,7 +420,7 @@ function aggregator_refresh(Feed $feed) {
   }
 
   // Retrieve processor manager now.
-  $processor_manager = Drupal::service('plugin.manager.aggregator.processor');
+  $processor_manager = Drupal::pluginManager('aggregator', 'processor');
   // Store instances in an array so we dont have to instantiate new objects.
   $processor_instances = array();
   foreach ($config->get('processors') as $processor) {
@@ -439,7 +439,7 @@ function aggregator_refresh(Feed $feed) {
 
   if ($success && ($feed->hash->value != $hash)) {
     // Parse the feed.
-    $parser_manager = Drupal::service('plugin.manager.aggregator.parser');
+    $parser_manager = Drupal::pluginManager('aggregator', 'parser');
     try {
       if ($parser_manager->createInstance($config->get('parser'))->parse($feed)) {
         if (empty($feed->link->value)) {

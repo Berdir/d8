@@ -11,9 +11,7 @@
  * @ingroup forms
  */
 function rest_admin_form($form, &$form_state) {
-  $resources = drupal_container()
-    ->get('plugin.manager.rest')
-    ->getDefinitions();
+  $resources = Drupal::pluginManager('rest', 'rest')->getDefinitions();
   $entity_resources = array();
   $other_resources = array();
   foreach ($resources as $plugin_name => $definition) {
@@ -87,7 +85,7 @@ function rest_admin_form_submit($form, &$form_state) {
     $enabled_resources += array_filter($form_state['values']['other_resources']);
   }
   $resources = array();
-  $plugin_manager = drupal_container()->get('plugin.manager.rest');
+  $plugin_manager = Drupal::pluginManager('rest', 'rest');
 
   // Enable all methods and all formats for each selected resource.
   foreach ($enabled_resources as $resource) {

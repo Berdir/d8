@@ -47,6 +47,8 @@ class Views {
   /**
    * Returns the plugin manager for a certain views plugin type.
    *
+   * @todo: Remove in favor of Drupal:pluginManager('views', $type)?
+   *
    * @param string $type
    *   The plugin type, for example filter.
    *

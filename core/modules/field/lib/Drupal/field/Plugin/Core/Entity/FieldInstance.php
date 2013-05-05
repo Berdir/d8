@@ -373,7 +373,7 @@ class FieldInstance extends ConfigEntityBase implements FieldInstanceInterface {
       'settings' => array(),
     );
     // Get the widget module and settings from the widget type.
-    if ($widget_type_info = \Drupal::service('plugin.manager.field.widget')->getDefinition($this->widget['type'])) {
+    if ($widget_type_info = \Drupal::pluginManager('field', 'widget')->getDefinition($this->widget['type'])) {
       $this->widget['module'] = $widget_type_info['module'];
       $this->widget['settings'] += $widget_type_info['settings'];
     }
@@ -478,7 +478,7 @@ class FieldInstance extends ConfigEntityBase implements FieldInstanceInterface {
         'settings' => $widget_properties['settings'],
         'weight' => $widget_properties['weight'],
       );
-      $this->widgetPlugin = \Drupal::service('plugin.manager.field.widget')->getInstance($options);
+      $this->widgetPlugin = \Drupal::pluginManager('field', 'widget')->getInstance($options);
     }
 
     return $this->widgetPlugin;
