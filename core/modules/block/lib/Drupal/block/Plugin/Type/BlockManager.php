@@ -28,10 +28,4 @@ class BlockManager extends DefaultPluginManager {
   public function __construct(\Traversable $namespaces) {
     parent::__construct('Block', $namespaces);
   }
-
-  public function createInstance($plugin_id, array $configuration = array(), Block $entity = NULL) {
-    $plugin_class = DefaultFactory::getPluginClass($plugin_id, $this);
-    return new $plugin_class($configuration, $plugin_id, $this, $entity);
-  }
-
 }
