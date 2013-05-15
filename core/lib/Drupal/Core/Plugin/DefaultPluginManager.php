@@ -110,10 +110,11 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
    *
    * @param string $subdir
    *   The plugin's subdirectory, for example views/filter.
-   * @param array $namespaces
-   *   An array of paths keyed by it's corresponding namespaces.
+   * @param \Traversable $namespaces
+   *   An object that implements \Traversable which contains the root paths
+   *   keyed by the corresponding namespace to look for plugin implementations
    */
-  public function __construct($subdir, array $namespaces) {
+  public function __construct($subdir, \Traversable $namespaces) {
     $this->subdir = $subdir;
     $this->discovery = new AnnotatedClassDiscovery($subdir, $namespaces);
     $this->discovery = new DerivativeDiscoveryDecorator($this->discovery);
