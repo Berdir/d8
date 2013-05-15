@@ -257,7 +257,7 @@ class Entity implements IteratorAggregate, EntityInterface {
   /**
    * Implements \Drupal\Core\TypedData\AccessibleInterface::access().
    */
-  public function access($operation = 'view', \Drupal\user\Plugin\Core\Entity\User $account = NULL) {
+  public function access($operation = 'view', \Drupal\user\UserInterface $account = NULL) {
     return \Drupal::entityManager()
       ->getAccessController($this->entityType)
       ->access($this, $operation, Language::LANGCODE_DEFAULT, $account);

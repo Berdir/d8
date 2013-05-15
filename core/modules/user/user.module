@@ -134,7 +134,7 @@ function user_entity_bundle_info() {
  */
 function user_uri($user) {
   return array(
-    'path' => 'user/' . $user->uid,
+    'path' => 'user/' . $user->id(),
   );
 }
 
@@ -155,7 +155,7 @@ function user_uri($user) {
  * @see user_format_name()
  */
 function user_label($entity_type, $entity) {
-  return user_format_name($entity);
+  return user_format_name($entity->getBCEntity());
 }
 
 /**
@@ -271,7 +271,12 @@ function user_field_extra_fields() {
  * @see \Drupal\Core\Entity\Query\QueryInterface
  */
 function user_load_multiple(array $uids = NULL, $reset = FALSE) {
-  return entity_load_multiple('user', $uids, $reset);
+  $entities = entity_load_multiple('user', $uids, $reset);
+  // Return BC-entities.
+  foreach ($entities as $id => $entity) {
+    $entities[$id] = $entity->getBCEntity();
+  }
+  return $entities;
 }
 
 /**
@@ -299,7 +304,8 @@ function user_load_multiple(array $uids = NULL, $reset = FALSE) {
  * @see user_load_multiple()
  */
 function user_load($uid, $reset = FALSE) {
-  return entity_load('user', $uid, $reset);
+  $user = entity_load('user', $uid, $reset);
+  return $user ? $user->getBCEntity() : FALSE;
 }
 
 /**
@@ -315,7 +321,7 @@ function user_load($uid, $reset = FALSE) {
  */
 function user_load_by_mail($mail) {
   $users = entity_load_multiple_by_properties('user', array('mail' => $mail));
-  return reset($users);
+  return $users ? reset($users)->getBCEntity() : FALSE;
 }
 
 /**
@@ -331,7 +337,7 @@ function user_load_by_mail($mail) {
  */
 function user_load_by_name($name) {
   $users = entity_load_multiple_by_properties('user', array('name' => $name));
-  return reset($users);
+  return $users ? reset($users)->getBCEntity() : FALSE;
 }
 
 /**
@@ -412,7 +418,7 @@ function user_role_permissions($roles) {
 
   $role_permissions = $fetch = array();
 
-  foreach ($roles as $rid => $name) {
+  foreach ($roles as $rid) {
     if (isset($cache[$rid])) {
       $role_permissions[$rid] = $cache[$rid];
     }
@@ -462,6 +468,9 @@ function user_access($string, $account = NULL) {
   if (!isset($account)) {
     $account = $user;
   }
+
+  // Make sure we are working with the BC decorator.
+  $account = $account instanceof User ? $account->getBCEntity() : $account;
 
   // User #1 has all privileges:
   if ($account->uid == 1) {
@@ -601,7 +610,7 @@ function user_search_execute($keys = NULL, $conditions = NULL) {
 /**
  * Implements hook_user_view().
  */
-function user_user_view(User $account, EntityDisplay $display) {
+function user_user_view(EntityInterface $account, EntityDisplay $display) {
   if ($display->getComponent('member_for')) {
     $account->content['member_for'] = array(
       '#type' => 'item',
@@ -722,6 +731,9 @@ function user_template_preprocess_default_variables_alter(&$variables) {
  */
 function template_preprocess_username(&$variables) {
   $account = $variables['account'];
+  if ($account instanceof User) {
+    $account = $account->getBCEntity();
+  }
 
   $variables['extra'] = '';
   if (empty($account->uid)) {
@@ -2103,12 +2115,11 @@ function user_multiple_role_edit($accounts, $operation, $rid) {
       $accounts = user_load_multiple($accounts);
       foreach ($accounts as $account) {
         // Skip adding the role to the user if they already have it.
-        if ($account !== FALSE && !isset($account->roles[$rid])) {
-          $roles = $account->roles + array($rid => $role_name);
+        if ($account !== FALSE && !array_search($rid, $account->roles)) {
           // For efficiency manually save the original account before applying
           // any changes.
           $account->original = clone $account;
-          $account->roles = $roles;
+          $account->roles[count($account->roles)] = $rid;
           $account->save();
         }
       }
@@ -2117,8 +2128,8 @@ function user_multiple_role_edit($accounts, $operation, $rid) {
       $accounts = user_load_multiple($accounts);
       foreach ($accounts as $account) {
         // Skip removing the role from the user if they already don't have it.
-        if ($account !== FALSE && isset($account->roles[$rid])) {
-          $roles = array_diff($account->roles, array($rid => $role_name));
+        if ($account !== FALSE && $index = array_search($rid, $account->roles)) {
+          $roles = array_diff($account->roles, array($rid));
           // For efficiency manually save the original account before applying
           // any changes.
           $account->original = clone $account;
@@ -2347,6 +2358,7 @@ function theme_user_signature($variables) {
  */
 function user_preferred_langcode($account, $type = NULL, $default = NULL) {
   $language_list = language_list();
+  $account = $account->getBCEntity();
   if (isset($type)) {
     $preferred_langcode = $account->{'preferred_' . $type . '_langcode'};
   }

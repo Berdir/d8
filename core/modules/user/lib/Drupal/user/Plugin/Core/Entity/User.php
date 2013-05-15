@@ -7,10 +7,10 @@
 
 namespace Drupal\user\Plugin\Core\Entity;
 
-use Drupal\Core\Entity\Entity;
+use Drupal\Core\Entity\EntityNG;
 use Drupal\Core\Entity\Annotation\EntityType;
 use Drupal\Core\Annotation\Translation;
-use Drupal\Core\Language\Language;
+use Drupal\user\UserBCDecorator;
 use Drupal\user\UserInterface;
 
 /**
@@ -43,7 +43,7 @@ use Drupal\user\UserInterface;
  *   }
  * )
  */
-class User extends Entity implements UserInterface {
+class User extends EntityNG implements UserInterface {
 
   /**
    * The user ID.
@@ -64,7 +64,7 @@ class User extends Entity implements UserInterface {
    *
    * @var string
    */
-  public $name = '';
+  public $name;
 
   /**
    * The user's password (hashed).
@@ -78,7 +78,7 @@ class User extends Entity implements UserInterface {
    *
    * @var string
    */
-  public $mail = '';
+  public $mail;
 
   /**
    * The user's default theme.
@@ -114,7 +114,7 @@ class User extends Entity implements UserInterface {
    *
    * @var integer
    */
-  public $access = 0;
+  public $access;
 
   /**
    * The timestamp when the user last logged in. A value of 0 means the user has
@@ -122,14 +122,14 @@ class User extends Entity implements UserInterface {
    *
    * @var integer
    */
-  public $login = 0;
+  public $login;
 
   /**
    * Whether the user is active (1) or blocked (0).
    *
    * @var integer
    */
-  public $status = 1;
+  public $status;
 
   /**
    * The user's timezone.
@@ -143,40 +143,91 @@ class User extends Entity implements UserInterface {
    *
    * @var string
    */
-  public $langcode = Language::LANGCODE_NOT_SPECIFIED;
+  public $langcode;
 
   /**
    * The user's preferred langcode for receiving emails and viewing the site.
    *
    * @var string
    */
-  public $preferred_langcode = Language::LANGCODE_NOT_SPECIFIED;
+  public $preferred_langcode;
 
   /**
    * The user's preferred langcode for viewing administration pages.
    *
    * @var string
    */
-  public $preferred_admin_langcode = Language::LANGCODE_NOT_SPECIFIED;
+  public $preferred_admin_langcode;
 
   /**
    * The email address used for initial account creation.
    *
    * @var string
    */
-  public $init = '';
+  public $init;
 
   /**
    * The user's roles.
    *
    * @var array
    */
-  public $roles = array();
+  public $roles;
+
+    /**
+   * The plain data values of the contained properties.
+   *
+   * Define default values.
+   *
+   * @var array
+   */
+  protected $values = array(
+    'langcode' => array(LANGUAGE_DEFAULT => array(0 => array('value' => LANGUAGE_NOT_SPECIFIED))),
+    'preferred_langcode' => array(LANGUAGE_DEFAULT => array(0 => array('value' => LANGUAGE_NOT_SPECIFIED))),
+    'admin_preffered_langcode' => array(LANGUAGE_DEFAULT => array(0 => array('value' => LANGUAGE_NOT_SPECIFIED))),
+    'name' => array(LANGUAGE_DEFAULT => array(0 => array('value' => ''))),
+    'mail' => array(LANGUAGE_DEFAULT => array(0 => array('value' => ''))),
+    'init' => array(LANGUAGE_DEFAULT => array(0 => array('value' => ''))),
+    'access' => array(LANGUAGE_DEFAULT => array(0 => array('value' => 0))),
+    'login' => array(LANGUAGE_DEFAULT => array(0 => array('value' => 0))),
+    'status' => array(LANGUAGE_DEFAULT => array(0 => array('value' => 1))),
+  );
 
   /**
    * Implements Drupal\Core\Entity\EntityInterface::id().
    */
   public function id() {
-    return $this->uid;
+    return $this->get('uid')->value;
   }
+
+  protected function init() {
+    parent::init();
+    unset($this->access);
+    unset($this->created);
+    unset($this->init);
+    unset($this->login);
+    unset($this->mail);
+    unset($this->name);
+    unset($this->pass);
+    unset($this->preferred_admin_langcode);
+    unset($this->preferred_langcode);
+    unset($this->roles);
+    unset($this->signature);
+    unset($this->signature_format);
+    unset($this->status);
+    unset($this->theme);
+    unset($this->timezone);
+    unset($this->uid);
+    unset($this->uuid);
+  }
+
+  public function getBCEntity() {
+    if (!isset($this->bcEntity)) {
+      // Initialize field definitions so that we can pass them by reference.
+      $this->getPropertyDefinitions();
+      $this->bcEntity = new UserBCDecorator($this, $this->fieldDefinitions);
+    }
+    return $this->bcEntity;
+  }
+
+
 }

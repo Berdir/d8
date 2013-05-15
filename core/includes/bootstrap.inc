@@ -21,6 +21,7 @@ use Drupal\Core\Language\Language;
 use Drupal\Core\Lock\DatabaseLockBackend;
 use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\user\Plugin\Core\Entity\User;
+use Drupal\Core\Entity\EntityBCDecorator;
 
 /**
  * @file
@@ -1756,14 +1757,13 @@ function drupal_set_title($title = NULL, $output = CHECK_PLAIN) {
  *   The user object.
  */
 function drupal_anonymous_user() {
-  $values = array(
+  return (object) array(
     'uid' => 0,
     'hostname' => Drupal::request()->getClientIP(),
     'roles' => array(
       DRUPAL_ANONYMOUS_RID => DRUPAL_ANONYMOUS_RID,
     ),
   );
-  return new User($values, 'user');
 }
 
 /**

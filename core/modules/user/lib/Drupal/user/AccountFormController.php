@@ -148,7 +148,7 @@ abstract class AccountFormController extends EntityFormController {
     $form['account']['roles'] = array(
       '#type' => 'checkboxes',
       '#title' => t('Roles'),
-      '#default_value' => (!$register && isset($account->roles) ? array_keys($account->roles) : array()),
+      '#default_value' => (!$register ? $account->roles : array()),
       '#options' => $roles,
       '#access' => $roles && user_access('administer permissions'),
       DRUPAL_AUTHENTICATED_RID => $checkbox_authenticated,
@@ -224,6 +224,19 @@ abstract class AccountFormController extends EntityFormController {
     );
 
     return parent::form($form, $form_state, $account);
+  }
+
+  /**
+   * Overrides Drupal\Core\Entity\EntityFormController::buildEntity().
+   */
+  public function buildEntity(array $form, array &$form_state) {
+    // Change the roles array to a list of enabled roles.
+    // @todo: Move this to an value callback on the form element.
+    if (empty($this->roles_filtered)) {
+      $form_state['values']['roles'] = array_keys(array_filter($form_state['values']['roles']));
+      $this->roles_filtered = TRUE;
+    }
+    return parent::buildEntity($form, $form_state);
   }
 
   /**
