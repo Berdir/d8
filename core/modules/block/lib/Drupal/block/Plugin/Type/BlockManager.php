@@ -6,15 +6,9 @@
 
 namespace Drupal\block\Plugin\Type;
 
-use Drupal\Component\Plugin\PluginManagerBase;
-use Drupal\Component\Plugin\Discovery\DerivativeDiscoveryDecorator;
-use Drupal\Core\Cache\CacheBackendInterface;
-use Drupal\Core\Language\Language;
-use Drupal\Core\Plugin\Discovery\AnnotatedClassDiscovery;
-use Drupal\Core\Plugin\Discovery\AlterDecorator;
-use Drupal\Core\Plugin\Discovery\CacheDecorator;
+use Drupal\block\Plugin\Core\Entity\Block;
 use Drupal\Component\Plugin\Factory\DefaultFactory;
-
+use Drupal\Core\Plugin\DefaultPluginManager;
 /**
  * Manages discovery and instantiation of block plugins.
  *
@@ -22,7 +16,7 @@ use Drupal\Component\Plugin\Factory\DefaultFactory;
  *
  * @see \Drupal\block\BlockPluginInterface
  */
-class BlockManager extends PluginManagerBase {
+class BlockManager extends DefaultPluginManager {
 
   /**
    * Constructs a new \Drupal\block\Plugin\Type\BlockManager object.
@@ -32,12 +26,12 @@ class BlockManager extends PluginManagerBase {
    *   keyed by the corresponding namespace to look for plugin implementations,
    */
   public function __construct(\Traversable $namespaces) {
-    $this->discovery = new AnnotatedClassDiscovery('Block', $namespaces);
-    $this->discovery = new DerivativeDiscoveryDecorator($this->discovery);
-    $this->discovery = new AlterDecorator($this->discovery, 'block');
-    $this->discovery = new CacheDecorator($this->discovery, 'block_plugins:' . language(Language::TYPE_INTERFACE)->langcode, 'block', CacheBackendInterface::CACHE_PERMANENT, array('block'));
+    parent::__construct('Block', $namespaces);
+  }
 
-    $this->factory = new DefaultFactory($this->discovery);
+  public function createInstance($plugin_id, array $configuration = array(), Block $entity = NULL) {
+    $plugin_class = DefaultFactory::getPluginClass($plugin_id, $this);
+    return new $plugin_class($configuration, $plugin_id, $this, $entity);
   }
 
 }

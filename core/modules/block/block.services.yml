@@ -2,6 +2,9 @@ services:
   plugin.manager.block:
     class: Drupal\block\Plugin\Type\BlockManager
     arguments: ['@container.namespaces']
+    calls:
+      - [setAlterHook, ['@module_handler', 'block']]
+      - [setCache, ['@cache.block', 'block_plugins']]
   cache.block:
     class: Drupal\Core\Cache\CacheBackendInterface
     tags:
