@@ -37,8 +37,7 @@ class CategoryFormController extends EntityFormController {
       '#machine_name' => array(
         'exists' => 'contact_category_load',
       ),
-      // Do not allow change 'user' category used for personal contact form.
-      '#disabled' => !$category->isNew() || $category->id() == 'personal',
+      '#disabled' => !$category->isNew(),
     );
     $form['recipients'] = array(
       '#type' => 'textarea',
@@ -71,18 +70,6 @@ class CategoryFormController extends EntityFormController {
     );
 
     return $form;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function actions(array $form, array &$form_state) {
-    $actions = parent::actions($form, $form_state);
-
-    $actions['delete']['#access'] = $this->entity->access('delete');
-
-    return $actions;
-
   }
 
   /**

@@ -38,6 +38,9 @@ class CategoryListController extends ConfigEntityListController {
     if (!$entity->access('delete')) {
       unset($operations['delete']);
     }
+    if (!$entity->access('update')) {
+      unset($operations['edit']);
+    }
     return $operations;
   }
 
