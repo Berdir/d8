@@ -91,6 +91,7 @@ abstract class FieldItemBase extends Map implements FieldItemInterface {
     // value that needs to be updated.
     if (isset($this->properties[$property_name])) {
       $this->properties[$property_name]->setValue($value, FALSE);
+      unset($this->values[$property_name]);
     }
     // Allow setting plain values for not-defined properties also.
     else {

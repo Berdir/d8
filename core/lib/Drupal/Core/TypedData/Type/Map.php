@@ -230,4 +230,14 @@ class Map extends TypedData implements \IteratorAggregate, ComplexDataInterface 
       $this->parent->onChange($this->name);
     }
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function applyDefaultValue($notify = TRUE) {
+    // Apply the default value of all properties.
+    foreach ($this->getProperties() as $property) {
+      $property->applyDefaultValue(FALSE);
+    }
+  }
 }

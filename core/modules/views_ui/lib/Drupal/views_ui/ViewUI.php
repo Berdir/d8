@@ -1134,4 +1134,11 @@ class ViewUI implements ViewStorageInterface {
   public function onChange($property_name) {
     $this->storage->onChange($property_name);
   }
+
+  /**
+   * Implements \Drupal\Core\TypedData\TypedDataInterface::applyDefaultValue().
+   */
+  public function applyDefaultValue($notify = TRUE) {
+    $this->storage->applyDefaultValue($notify);
+  }
 }

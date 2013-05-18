@@ -21,6 +21,9 @@ use Drupal\Core\TypedData\ItemList;
  * contained item the entity field delegates __get() and __set() calls
  * directly to the first item.
  *
+ * Supported settings (below the definition's 'settings' key) are:
+ * - default_value: (optional) If set, the default value to apply to the field.
+ *
  * @see \Drupal\Core\Entity\Field\FieldInterface
  */
 class Field extends ItemList implements FieldInterface {
@@ -46,20 +49,13 @@ class Field extends ItemList implements FieldInterface {
   }
 
   /**
-   * Overrides \Drupal\Core\TypedData\ItemList::getValue().
+   * {@inheritdoc}
    */
-  public function getValue() {
+  public function filterEmptyValues() {
     if (isset($this->list)) {
-      $values = array();
-      foreach ($this->list as $delta => $item) {
-        if (!$item->isEmpty()) {
-          $values[$delta] = $item->getValue();
-        }
-        else {
-          $values[$delta] = NULL;
-        }
-      }
-      return $values;
+      $this->list = array_values(array_filter($this->list, function($item) {
+        return !$item->isEmpty();
+      }));
     }
   }
 
@@ -200,5 +196,19 @@ class Field extends ItemList implements FieldInterface {
   public function defaultAccess($operation = 'view', User $account = NULL) {
     // Grant access per default.
     return TRUE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function applyDefaultValue($notify = TRUE) {
+    if (isset($this->definition['settings']['default_value'])) {
+      $this->setValue($this->definition['settings']['default_value'], $notify);
+    }
+    else {
+      // Create one field item and apply defaults.
+      $this->offsetGet(0)->applyDefaultValue(FALSE);
+    }
+    return $this;
   }
 }

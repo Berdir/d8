@@ -176,19 +176,6 @@ class Comment extends EntityNG implements CommentInterface {
   public $new;
 
   /**
-   * The plain data values of the contained properties.
-   *
-   * Define default values.
-   *
-   * @var array
-   */
-  protected $values = array(
-    'langcode' => array(LANGUAGE_DEFAULT => array(0 => array('value' => LANGUAGE_NOT_SPECIFIED))),
-    'name' => array(LANGUAGE_DEFAULT => array(0 => array('value' => ''))),
-    'uid' => array(LANGUAGE_DEFAULT => array(0 => array('target_id' => 0))),
-  );
-
-  /**
    * Initialize the object. Invoked upon construction and wake up.
    */
   protected function init() {

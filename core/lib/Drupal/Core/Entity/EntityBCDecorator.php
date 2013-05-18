@@ -523,4 +523,11 @@ class EntityBCDecorator implements IteratorAggregate, EntityInterface {
   public function isTranslatable() {
     return $this->decorated->isTranslatable();
   }
+
+  /**
+   * Forwards the call to the decorated entity.
+   */
+  public function applyDefaultValue($notify = TRUE) {
+    return $this->decorated->applyDefaultValue($notify);
+  }
 }

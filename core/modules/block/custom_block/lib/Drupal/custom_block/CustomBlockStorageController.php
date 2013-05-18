@@ -85,7 +85,7 @@ class CustomBlockStorageController extends DatabaseStorageControllerNG {
     $properties['uuid'] = array(
       'label' => t('UUID'),
       'description' => t('The custom block UUID.'),
-      'type' => 'string_field',
+      'type' => 'uuid_field',
     );
     $properties['revision_id'] = array(
       'label' => t('Revision ID'),

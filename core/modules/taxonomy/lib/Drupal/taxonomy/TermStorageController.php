@@ -158,11 +158,14 @@ class TermStorageController extends DatabaseStorageControllerNG {
       'label' => t('Weight'),
       'description' => t('The weight of this term in relation to other terms.'),
       'type' => 'integer_field',
+      'settings' => array('default_value' => 0),
     );
     $properties['parent'] = array(
       'label' => t('Term Parents'),
       'description' => t('The parents of this term.'),
       'type' => 'integer_field',
+      // Save new terms with no parents by default.
+      'settings' => array('default_value' => 0),
       'computed' => TRUE,
     );
     return $properties;

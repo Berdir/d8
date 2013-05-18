@@ -9,7 +9,6 @@ namespace Drupal\Core\Entity;
 
 use Drupal\Core\Language\Language;
 use Drupal\Core\TypedData\TypedDataInterface;
-use Drupal\Component\Uuid\Uuid;
 use ArrayIterator;
 use InvalidArgumentException;
 
@@ -42,13 +41,10 @@ class EntityNG extends Entity {
    *
    * @todo: Add methods for getting original fields and for determining
    * changes.
-   * @todo: Provide a better way for defining default values.
    *
    * @var array
    */
-  protected $values = array(
-    'langcode' => array(LANGUAGE_DEFAULT => array(0 => array('value' => LANGUAGE_NOT_SPECIFIED))),
-  );
+  protected $values = array();
 
   /**
    * The array of fields, each being an instance of FieldInterface.
@@ -387,6 +383,7 @@ class EntityNG extends Entity {
     foreach ($this->getPropertyDefinitions() as $name => $definition) {
       if (empty($definition['computed']) && !empty($this->fields[$name])) {
         foreach ($this->fields[$name] as $langcode => $field) {
+          $field->filterEmptyValues();
           $this->values[$name][$langcode] = $field->getValue();
         }
       }
@@ -485,8 +482,7 @@ class EntityNG extends Entity {
 
     // Check if the entity type supports UUIDs and generate a new one if so.
     if (!empty($entity_info['entity_keys']['uuid'])) {
-      $uuid = new Uuid();
-      $duplicate->{$entity_info['entity_keys']['uuid']}->value = $uuid->generate();
+      $duplicate->{$entity_info['entity_keys']['uuid']}->applyDefaultValue();
     }
 
     // Check whether the entity type supports revisions and initialize it if so.

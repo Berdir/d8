@@ -2330,6 +2330,12 @@ function system_data_type_info() {
       'class' => '\Drupal\Core\Entity\Field\Type\UriItem',
       'list class' => '\Drupal\Core\Entity\Field\Type\Field',
     ),
+    'uuid_field' => array(
+      'label' => t('UUID field item'),
+      'description' => t('An entity field containing a UUID.'),
+      'class' => '\Drupal\Core\Entity\Field\Type\UuidItem',
+      'list class' => '\Drupal\Core\Entity\Field\Type\Field',
+    ),
   );
 }
 

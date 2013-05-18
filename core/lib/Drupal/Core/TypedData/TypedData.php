@@ -112,6 +112,15 @@ abstract class TypedData implements TypedDataInterface {
   }
 
   /**
+   * Implements \Drupal\Core\TypedData\TypedDataInterface::applyDefaultValue().
+   */
+  public function applyDefaultValue($notify = TRUE) {
+    // Default to no default value.
+    $this->setValue(NULL, $notify);
+    return $this;
+  }
+
+  /**
    * Implements \Drupal\Core\TypedData\TypedDataInterface::setContext().
    */
   public function setContext($name = NULL, TypedDataInterface $parent = NULL) {
