@@ -154,6 +154,9 @@ services:
   plugin.manager.archiver:
     class: Drupal\Core\Archiver\ArchiverManager
     arguments: ['@container.namespaces']
+    calls:
+      - [setAlterHook, ['@module_handler', 'archiver_info']]
+      - [setCache, ['@cache.cache', 'archiver_info']]
   request:
     class: Symfony\Component\HttpFoundation\Request
   event_dispatcher:
@@ -179,6 +182,9 @@ services:
   validation.constraint:
     class: Drupal\Core\Validation\ConstraintManager
     arguments: ['@container.namespaces']
+    calls:
+      - [setAlterHook, ['@module_handler', 'validation_constraint']]
+      - [setCache, ['@cache.cache', 'validation_constraint']]
   lock:
     class: Drupal\Core\Lock\DatabaseLockBackend
   user.tempstore:
@@ -404,6 +410,9 @@ services:
   plugin.manager.condition:
     class: Drupal\Core\Condition\ConditionManager
     arguments: ['@container.namespaces']
+    calls:
+      - [setAlterHook, ['@module_handler', 'condition_info']]
+      - [setCache, ['@cache.cache', 'condition']]
   kernel_destruct_subscriber:
     class: Drupal\Core\EventSubscriber\KernelDestructionSubscriber
     tags:
@@ -417,6 +426,8 @@ services:
   image.toolkit.manager:
     class: Drupal\system\Plugin\ImageToolkitManager
     arguments: ['@container.namespaces']
+    calls:
+      - [setCache, ['@cache.cache', 'image_toolkit']]
   image.toolkit:
     class: Drupal\system\Plugin\ImageToolkitInterface
     factory_method: getDefaultToolkit

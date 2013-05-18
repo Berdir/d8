@@ -7,50 +7,20 @@
 
 namespace Drupal\Core\Plugin;
 
+use Drupal\Component\Plugin\Discovery\CachedDiscoveryInterface;
 use Drupal\Component\Plugin\Discovery\DerivativeDiscoveryDecorator;
 use Drupal\Component\Plugin\PluginManagerBase;
 use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Component\Plugin\Factory\DefaultFactory;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\CacheBackendInterface;
-use Drupal\Core\Extension\ModuleHandler;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\Discovery\AnnotatedClassDiscovery;
 
 /**
  * Base class for plugin managers.
  */
-class DefaultPluginManager extends PluginManagerBase implements PluginManagerInterface {
-
-  /**
-   * The object that discovers plugins managed by this manager.
-   *
-   * @var \Drupal\Component\Plugin\Discovery\DiscoveryInterface
-   */
-  protected $discovery;
-
-  /**
-   * The object that instantiates plugins managed by this manager.
-   *
-   * @var \Drupal\Component\Plugin\Factory\FactoryInterface
-   */
-  protected $factory;
-
-  /**
-   * The object that returns the preconfigured plugin instance appropriate for
-   * a particular runtime condition.
-   *
-   * @var \Drupal\Component\Plugin\Mapper\MapperInterface
-   */
-  protected $mapper;
-
-  /**
-   * A set of defaults to be referenced by $this->processDefinition() if
-   * additional processing of plugins is necessary or helpful for development
-   * purposes.
-   *
-   * @var array
-   */
-  protected $defaults = array();
+class DefaultPluginManager extends PluginManagerBase implements PluginManagerInterface, CachedDiscoveryInterface {
 
   /**
    * Cached definitions array.
@@ -113,10 +83,16 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
    * @param \Traversable $namespaces
    *   An object that implements \Traversable which contains the root paths
    *   keyed by the corresponding namespace to look for plugin implementations
+   * @param array $annotation_namespaces
+   *   (optional) The namespaces of classes that can be used as annotations.
+   *   Defaults to an empty array.
+   * @param string $plugin_definition_annotation_name
+   *   (optional) The name of the annotation that contains the plugin definition.
+   *   Defaults to 'Drupal\Component\Annotation\Plugin'.
    */
-  public function __construct($subdir, \Traversable $namespaces) {
+  function __construct($subdir, \Traversable $namespaces, $annotation_namespaces = array(), $plugin_definition_annotation_name = 'Drupal\Component\Annotation\Plugin') {
     $this->subdir = $subdir;
-    $this->discovery = new AnnotatedClassDiscovery($subdir, $namespaces);
+    $this->discovery = new AnnotatedClassDiscovery($subdir, $namespaces, $annotation_namespaces, $plugin_definition_annotation_name);
     $this->discovery = new DerivativeDiscoveryDecorator($this->discovery);
 
     $this->factory = new DefaultFactory($this);
@@ -146,64 +122,27 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
    * @param string $alter_hook
    *   (optional) Name of the alter hook. Defaults to $owner_$type if not given.
    */
-  public function setAlterHook(ModuleHandler $module_handler, $alter_hook = NULL) {
+  public function setAlterHook(ModuleHandlerInterface $module_handler, $alter_hook = NULL) {
     $this->moduleHandler = $module_handler;
     $this->alterHook = $alter_hook ? $alter_hook : strtolower($this->subdir);
   }
 
   /**
-   * Implements Drupal\Component\Plugin\PluginManagerInterface::createInstance().
-   */
-  public function createInstance($plugin_id, array $configuration = array()) {
-    return $this->factory->createInstance($plugin_id, $configuration);
-  }
-
-  /**
-   * Implements Drupal\Component\Plugin\PluginManagerInterface::getInstance().
-   */
-  public function getInstance(array $options) {
-    if (!empty($this->mapper)) {
-      return $this->mapper->getInstance($options);
-    }
-  }
-
-  /**
-   * Performs extra processing on plugin definitions.
-   *
-   * By default we add defaults for the type to the definition. If a type has
-   * additional processing logic they can do that by replacing or extending the
-   * method.
-   */
-  public function processDefinition(&$definition, $plugin_id) {
-    if ($this->defaults) {
-      $definition = NestedArray::mergeDeep($this->defaults, $definition);
-    }
-  }
-
-  /**
-   * Implements Drupal\Component\Plugin\Discovery\DicoveryInterface::getDefinition().
+   * {@inheritdoc}
    */
   public function getDefinition($plugin_id) {
-    // Optimize for fast access to definitions if they are already in memory.
-    if (isset($this->definitions)) {
-      // Avoid using a ternary that would create a copy of the array.
-      if (isset($this->definitions[$plugin_id])) {
-        return $this->definitions[$plugin_id];
-      }
-      else {
-        return;
-      }
+    // Fetch definitions if they're not loaded yet.
+    if (!isset($this->definitions)) {
+      $this->getDefinitions();
     }
-
-    $definitions = $this->getDefinitions();
     // Avoid using a ternary that would create a copy of the array.
-    if (isset($definitions[$plugin_id])) {
-      return $definitions[$plugin_id];
+    if (isset($this->definitions[$plugin_id])) {
+      return $this->definitions[$plugin_id];
     }
   }
 
   /**
-   * Implements \Drupal\Component\Plugin\Discovery\CachedDiscoveryInterface::getDefinitions().
+   * {@inheritdoc}
    */
   public function getDefinitions() {
     $definitions = $this->getCachedDefinitions();
@@ -221,7 +160,7 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
   }
 
   /**
-   * Implements \Drupal\Component\Plugin\Discovery\CachedDiscoveryInterface::clearCachedDefinitions().
+   * {@inheritdoc}
    */
   public function clearCachedDefinitions() {
     if ($this->cache) {
@@ -237,7 +176,7 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
   /**
    * Returns the cached plugin definitions of the decorated discovery class.
    *
-   * @return mixed
+   * @return array|NULL
    *   On success this will return an array of plugin definitions. On failure
    *   this should return NULL, indicating to other methods that this has not
    *   yet been defined. Success with no values should return as an empty array

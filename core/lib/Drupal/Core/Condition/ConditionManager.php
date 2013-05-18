@@ -12,7 +12,7 @@ use Drupal\Core\Executable\ExecutableManagerInterface;
 use Drupal\Core\Executable\ExecutableInterface;
 use Drupal\Component\Plugin\Factory\DefaultFactory;
 use Drupal\Component\Plugin\Discovery\DerivativeDiscoveryDecorator;
-use Drupal\Core\Language\Language;
+use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Plugin\Discovery\AlterDecorator;
 use Drupal\Core\Plugin\Discovery\AnnotatedClassDiscovery;
 use Drupal\Core\Plugin\Discovery\CacheDecorator;
@@ -20,7 +20,7 @@ use Drupal\Core\Plugin\Discovery\CacheDecorator;
 /**
  * A plugin manager for condition plugins.
  */
-class ConditionManager extends PluginManagerBase implements ExecutableManagerInterface {
+class ConditionManager extends DefaultPluginManager implements ExecutableManagerInterface {
 
   /**
    * Constructs aa ConditionManager object.
@@ -30,12 +30,7 @@ class ConditionManager extends PluginManagerBase implements ExecutableManagerInt
    *   keyed by the corresponding namespace to look for plugin implementations,
    */
   public function __construct(\Traversable $namespaces) {
-    $this->discovery = new AnnotatedClassDiscovery('Condition', $namespaces);
-    $this->discovery = new DerivativeDiscoveryDecorator($this->discovery);
-    $this->discovery = new AlterDecorator($this->discovery, 'condition_info');
-    $this->discovery = new CacheDecorator($this->discovery, 'condition:' . language(Language::TYPE_INTERFACE)->langcode);
-
-    $this->factory = new DefaultFactory($this);
+    parent::__construct('Condition', $namespaces);
   }
 
   /**

@@ -7,14 +7,12 @@
 
 namespace Drupal\system\Plugin;
 
-use Drupal\Component\Plugin\Factory\DefaultFactory;
-use Drupal\Component\Plugin\PluginManagerBase;
-use Drupal\Core\Plugin\Discovery\AnnotatedClassDiscovery;
+use Drupal\Core\Plugin\DefaultPluginManager;
 
 /**
  * Manages toolkit plugins.
  */
-class ImageToolkitManager extends PluginManagerBase {
+class ImageToolkitManager extends DefaultPluginManager {
 
   /**
    * Constructs the ImageToolkitManager object.
@@ -24,8 +22,7 @@ class ImageToolkitManager extends PluginManagerBase {
    *   keyed by the corresponding namespace to look for plugin implementations,
    */
   public function __construct(\Traversable $namespaces) {
-    $this->discovery = new AnnotatedClassDiscovery('ImageToolkit', $namespaces);
-    $this->factory = new DefaultFactory($this->discovery);
+    parent::__construct('ImageToolkit', $namespaces);
   }
 
   /**

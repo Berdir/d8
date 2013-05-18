@@ -7,15 +7,11 @@
 namespace Drupal\Core\Archiver;
 
 use Drupal\Component\Plugin\Factory\DefaultFactory;
-use Drupal\Component\Plugin\PluginManagerBase;
-use Drupal\Core\Plugin\Discovery\AlterDecorator;
-use Drupal\Core\Plugin\Discovery\AnnotatedClassDiscovery;
-use Drupal\Core\Plugin\Discovery\CacheDecorator;
-
+use Drupal\Core\Plugin\DefaultPluginManager;
 /**
  * Archiver plugin manager.
  */
-class ArchiverManager extends PluginManagerBase {
+class ArchiverManager extends DefaultPluginManager {
 
   /**
    * Constructs a ArchiverManager object.
@@ -25,9 +21,7 @@ class ArchiverManager extends PluginManagerBase {
    *   keyed by the corresponding namespace to look for plugin implementations,
    */
   public function __construct(\Traversable $namespaces) {
-    $this->discovery = new AnnotatedClassDiscovery('Archiver', $namespaces);
-    $this->discovery = new AlterDecorator($this->discovery, 'archiver_info');
-    $this->discovery = new CacheDecorator($this->discovery, 'archiver_info');
+    parent::__construct('Archiver', $namespaces);
   }
 
   /**
