@@ -237,9 +237,9 @@ class UserStorageController extends DatabaseStorageControllerNG {
     }
 
     // Invoke the hook.
-    \Drupal::moduleHandler()->invokeAll($this->entityType . '_' . $hook, $entity->getBCEntity());
+    \Drupal::moduleHandler()->invokeAll($this->entityType . '_' . $hook, array($entity->getBCEntity()));
     // Invoke the respective entity-level hook.
-    \Drupal::moduleHandler()->invokeAll('entity_' . $hook, $entity->getBCEntity(), $this->entityType);
+    \Drupal::moduleHandler()->invokeAll('entity_' . $hook, array($entity->getBCEntity(), $this->entityType));
   }
 
   /**
