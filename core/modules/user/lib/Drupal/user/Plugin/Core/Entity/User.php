@@ -193,12 +193,15 @@ class User extends EntityNG implements UserInterface {
   );
 
   /**
-   * Implements Drupal\Core\Entity\EntityInterface::id().
+   * {@inheritdoc}
    */
   public function id() {
     return $this->get('uid')->value;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function init() {
     parent::init();
     unset($this->access);
@@ -220,6 +223,9 @@ class User extends EntityNG implements UserInterface {
     unset($this->uuid);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getBCEntity() {
     if (!isset($this->bcEntity)) {
       // Initialize field definitions so that we can pass them by reference.
@@ -228,6 +234,5 @@ class User extends EntityNG implements UserInterface {
     }
     return $this->bcEntity;
   }
-
 
 }

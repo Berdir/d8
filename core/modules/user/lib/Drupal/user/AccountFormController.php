@@ -227,7 +227,7 @@ abstract class AccountFormController extends EntityFormController {
   }
 
   /**
-   * Overrides Drupal\Core\Entity\EntityFormController::buildEntity().
+   * {@inheritdoc}
    */
   public function buildEntity(array $form, array &$form_state) {
     // Change the roles array to a list of enabled roles.

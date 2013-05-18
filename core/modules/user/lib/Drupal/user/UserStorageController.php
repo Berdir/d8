@@ -116,12 +116,6 @@ class UserStorageController extends DatabaseStorageControllerNG {
       $entity->uid->value = $this->database->nextId(db_query('SELECT MAX(uid) FROM {users}')->fetchField());
       $entity->enforceIsNew();
     }
-
-    // There are some cases that pre-set ->original for performance. Make sure
-    // original is not a BC decorator.
-    if ($entity->original instanceof \Drupal\Core\Entity\EntityBCDecorator) {
-      $entity->original = $entity->original->getNGEntity();
-    }
     parent::save($entity);
   }
 
@@ -165,15 +159,12 @@ class UserStorageController extends DatabaseStorageControllerNG {
       // user and recreate the current one.
       if ($entity->pass->value != $entity->original->pass->value) {
         drupal_session_destroy_uid($entity->id());
-        if ($entity->uid->value == $GLOBALS['user']->uid) {
+        if ($entity->id() == $GLOBALS['user']->uid) {
           drupal_session_regenerate();
         }
       }
 
-      // Remove roles that are no longer enabled for the user.
-      //$entity->roles = array_filter($entity->roles);
-
-      // Reload user roles if provided.
+      // Update user roles if changed.
       if ($entity->roles->getValue() != $entity->original->roles->getValue()) {
         db_delete('users_roles')
           ->condition('uid', $entity->id())
@@ -232,7 +223,7 @@ class UserStorageController extends DatabaseStorageControllerNG {
   }
 
   /**
-   * Overrides \Drupal\Core\Entity\DataBaseStorageControllerNG::invokeHook().
+   * {@inheritdoc}
    */
   protected function invokeHook($hook, EntityInterface $entity) {
     $function = 'field_attach_' . $hook;
@@ -246,13 +237,13 @@ class UserStorageController extends DatabaseStorageControllerNG {
     }
 
     // Invoke the hook.
-    module_invoke_all($this->entityType . '_' . $hook, $entity->getBCEntity());
+    \Drupal::moduleHandler()->invokeAll($this->entityType . '_' . $hook, $entity->getBCEntity());
     // Invoke the respective entity-level hook.
-    module_invoke_all('entity_' . $hook, $entity->getBCEntity(), $this->entityType);
+    \Drupal::moduleHandler()->invokeAll('entity_' . $hook, $entity->getBCEntity(), $this->entityType);
   }
 
   /**
-   * Overrides \Drupal\Core\Entity\DataBaseStorageControllerNG::baseFieldDefinitions().
+   * {@inheritdoc}
    */
   public function baseFieldDefinitions() {
     $properties['uid'] = array(

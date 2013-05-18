@@ -346,6 +346,12 @@ class DatabaseStorageControllerNG extends DatabaseStorageController {
       // Ensure we are dealing with the actual entity.
       $entity = $entity->getNGEntity();
 
+      // There are some cases that pre-set ->original for performance. Make sure
+      // original is not a BC decorator.
+      if ($entity->original instanceof \Drupal\Core\Entity\EntityBCDecorator) {
+        $entity->original = $entity->original->getNGEntity();
+      }
+
       // Sync the changes made in the fields array to the internal values array.
       $entity->updateOriginalValues();
 

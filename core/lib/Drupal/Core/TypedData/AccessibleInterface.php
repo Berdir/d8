@@ -7,6 +7,8 @@
 
 namespace Drupal\Core\TypedData;
 
+use Drupal\user\UserInterface;
+
 /**
  * Interface for checking access.
  */
@@ -32,6 +34,6 @@ interface AccessibleInterface {
    *
    * @todo Don't depend on module level code.
    */
-  public function access($operation = 'view', \Drupal\user\UserInterface $account = NULL);
+  public function access($operation = 'view', UserInterface $account = NULL);
 
 }
