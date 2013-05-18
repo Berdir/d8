@@ -49,8 +49,16 @@ class ContactSitewideTest extends WebTestBase {
     $this->drupalPost('admin/config/people/accounts', $edit, t('Save configuration'));
     $this->assertText(t('The configuration options have been saved.'));
 
+    $this->drupalGet('admin/structure/contact');
+    // Default category exists.
+    $this->assertLinkByHref('admin/structure/contact/manage/feedback/delete');
+    // User category could not be deleted.
+    $this->assertNoLinkByHref('admin/structure/contact/manage/personal/delete');
     // Delete old categories to ensure that new categories are used.
     $this->deleteCategories();
+    $this->drupalGet('admin/structure/contact');
+    $this->assertLinkByHref('admin/structure/contact/manage/personal');
+    $this->assertNoLinkByHref('admin/structure/contact/manage/feedback');
 
     // Ensure that the contact form won't be shown without categories.
     user_role_grant_permissions(DRUPAL_ANONYMOUS_RID, array('access site-wide contact form'));
@@ -179,10 +187,6 @@ class ContactSitewideTest extends WebTestBase {
     $this->drupalGet('contact');
     $this->assertResponse(403);
     $this->assertRaw(t('You cannot send more than %number messages in @interval. Try again later.', array('%number' => config('contact.settings')->get('flood.limit'), '@interval' => format_interval(600))));
-
-    // Delete created categories.
-    $this->drupalLogin($admin_user);
-    $this->deleteCategories();
   }
 
   /**
@@ -313,9 +317,16 @@ class ContactSitewideTest extends WebTestBase {
   function deleteCategories() {
     $categories = entity_load_multiple('contact_category');
     foreach ($categories as $id => $category) {
-      $this->drupalPost("admin/structure/contact/manage/$id/delete", array(), t('Delete'));
-      $this->assertRaw(t('Category %label has been deleted.', array('%label' => $category->label())));
-      $this->assertFalse(entity_load('contact_category', $id), format_string('Category %category not found', array('%category' => $category->label())));
+      if ($id == 'personal') {
+        // Personal category could not be deleted.
+        $this->drupalGet("admin/structure/contact/manage/$id/delete");
+        $this->assertResponse(403);
+      }
+      else {
+        $this->drupalPost("admin/structure/contact/manage/$id/delete", array(), t('Delete'));
+        $this->assertRaw(t('Category %label has been deleted.', array('%label' => $category->label())));
+        $this->assertFalse(entity_load('contact_category', $id), format_string('Category %category not found', array('%category' => $category->label())));
+      }
     }
   }
 

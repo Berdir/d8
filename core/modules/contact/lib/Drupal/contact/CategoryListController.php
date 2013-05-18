@@ -34,6 +34,10 @@ class CategoryListController extends ConfigEntityListController {
         'weight' => 12,
       );
     }
+
+    if (!$entity->access('delete')) {
+      unset($operations['delete']);
+    }
     return $operations;
   }
 

@@ -37,7 +37,8 @@ class CategoryFormController extends EntityFormController {
       '#machine_name' => array(
         'exists' => 'contact_category_load',
       ),
-      '#disabled' => !$category->isNew(),
+      // Do not allow change 'user' category used for personal contact form.
+      '#disabled' => !$category->isNew() || $category->id() == 'personal',
     );
     $form['recipients'] = array(
       '#type' => 'textarea',
@@ -70,6 +71,18 @@ class CategoryFormController extends EntityFormController {
     );
 
     return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function actions(array $form, array &$form_state) {
+    $actions = parent::actions($form, $form_state);
+
+    $actions['delete']['#access'] = $this->entity->access('delete');
+
+    return $actions;
+
   }
 
   /**
@@ -128,8 +141,7 @@ class CategoryFormController extends EntityFormController {
    * Overrides Drupal\Core\Entity\EntityFormController::delete().
    */
   public function delete(array $form, array &$form_state) {
-    $category = $this->entity;
-    $form_state['redirect'] = 'admin/structure/contact/manage/' . $category->id() . '/delete';
+    $form_state['redirect'] = 'admin/structure/contact/manage/' . $this->entity->id() . '/delete';
   }
 
 }
