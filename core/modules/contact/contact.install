@@ -30,7 +30,7 @@ function contact_install() {
 function contact_update_dependencies() {
   // Migrate users.data after User module prepared the tables.
   $dependencies['contact'][8003] = array(
-    'user' => 8015,
+    'user' => 8016,
   );
   return $dependencies;
 }
