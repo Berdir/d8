@@ -29,10 +29,6 @@ function taxonomy_token_info() {
     'name' => t("Name"),
     'description' => t("The name of the taxonomy term."),
   );
-  $term['description'] = array(
-    'name' => t("Description"),
-    'description' => t("The optional description of the taxonomy term."),
-  );
   $term['node-count'] = array(
     'name' => t("Node count"),
     'description' => t("The number of nodes tagged with the taxonomy term."),
@@ -105,10 +101,6 @@ function taxonomy_tokens($type, $tokens, array $data = array(), array $options =
 
         case 'name':
           $replacements[$original] = $sanitize ? check_plain($term->name->value) : $term->name->value;
-          break;
-
-        case 'description':
-          $replacements[$original] = $sanitize ? check_markup($term->description->value, $term->format->value, '', TRUE) : $term->description->value;
           break;
 
         case 'url':

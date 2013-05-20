@@ -126,20 +126,6 @@ function taxonomy_views_data() {
     ),
   );
 
-  // Term description
-  $data['taxonomy_term_data']['description'] = array(
-    'title' => t('Term description'),
-    'help' => t('The description associated with a taxonomy term.'),
-    'field' => array(
-      'id' => 'markup',
-      'format' => array('field' => 'format'),
-      'click sortable' => FALSE,
-    ),
-    'filter' => array(
-      'id' => 'string',
-    ),
-  );
-
   // Term vocabulary
   $data['taxonomy_term_data']['vid'] = array(
     'title' => t('Vocabulary'),

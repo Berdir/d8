@@ -35,13 +35,6 @@ class TermFormController extends EntityFormControllerNG {
       '#weight' => -5,
     );
 
-    $form['description'] = array(
-      '#type' => 'text_format',
-      '#title' => t('Description'),
-      '#default_value' => $term->description->value,
-      '#format' => $term->format->value,
-      '#weight' => 0,
-    );
     $language_configuration = module_invoke('language', 'get_default_configuration', 'taxonomy_term', $vocabulary->id());
     $form['langcode'] = array(
       '#type' => 'language_select',
@@ -138,12 +131,6 @@ class TermFormController extends EntityFormControllerNG {
 
     // Prevent leading and trailing spaces in term names.
     $term->name->value = trim($term->name->value);
-
-    // Convert text_format field into values expected by
-    // \Drupal\Core\Entity\Entity::save() method.
-    $description = $form_state['values']['description'];
-    $term->description->value = $description['value'];
-    $term->format->value = $description['format'];
 
     // Assign parents with proper delta values starting from 0.
     $term->parent = array_keys($form_state['values']['parent']);

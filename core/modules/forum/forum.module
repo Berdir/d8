@@ -1081,7 +1081,6 @@ function template_preprocess_forum_list(&$variables) {
   $row = 0;
   // Sanitize each forum so that the template can safely print the data.
   foreach ($variables['forums'] as $id => $forum) {
-    $variables['forums'][$id]->description = filter_xss_admin($forum->description->value);
     $variables['forums'][$id]->link = url("forum/" . $forum->id());
     $variables['forums'][$id]->name = check_plain($forum->label());
     $variables['forums'][$id]->is_container = !empty($forum->container);

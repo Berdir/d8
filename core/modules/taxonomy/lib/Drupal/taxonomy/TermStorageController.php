@@ -143,17 +143,6 @@ class TermStorageController extends DatabaseStorageControllerNG {
       'description' => t('The term name.'),
       'type' => 'string_field',
     );
-    $properties['description'] = array(
-      'label' => t('Description'),
-      'description' => t('A description of the term'),
-      'type' => 'string_field',
-    );
-    // @todo Combine with description.
-    $properties['format'] = array(
-      'label' => t('Description format'),
-      'description' => t('The filter format ID of the description.'),
-      'type' => 'string_field',
-    );
     $properties['weight'] = array(
       'label' => t('Weight'),
       'description' => t('The weight of this term in relation to other terms.'),

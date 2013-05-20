@@ -139,18 +139,6 @@ function taxonomy_field_extra_fields() {
           'description' => t('Term name textfield'),
           'weight' => -5,
         ),
-        'description' => array(
-          'label' => t('Description'),
-          'description' => t('Term description textarea'),
-          'weight' => 0,
-        ),
-      ),
-      'display' => array(
-        'description' => array(
-          'label' => t('Description'),
-          'description' => t('Term description'),
-          'weight' => 0,
-        ),
       ),
     );
   }

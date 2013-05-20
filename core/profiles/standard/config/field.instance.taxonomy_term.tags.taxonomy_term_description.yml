@@ -1,0 +1,22 @@
+id: taxonomy_term.tags.taxonomy_term_description
+field_name: taxonomy_term_description
+entity_type: taxonomy_term
+bundle: tags
+label: Description
+description: ''
+required: false
+default_value: ''
+default_value_function: ''
+settings:
+  text_processing: '1'
+  user_register_form: '0'
+widget:
+  weight: '-4'
+  type: text_textarea
+  settings:
+    rows: '5'
+    placeholder: ''
+  module: text
+field_type: text_long
+status: 1
+langcode: und

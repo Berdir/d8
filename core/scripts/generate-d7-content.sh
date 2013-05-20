@@ -141,6 +141,7 @@ for ($i = 0; $i < 24; $i++) {
   for ($j = 0; $j < $vocabulary->hierarchy + 1; $j++) {
     ++$term_id;
     $term = entity_create('taxonomy_term', array(
+      'vid' => $voc_id,
       'vocabulary_machine_name' => $vocabulary->machine_name,
       // For multiple parent vocabularies, omit the t0-t1 relation, otherwise
       // every parent in the vocabulary is a parent.

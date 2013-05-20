@@ -83,20 +83,6 @@ class Term extends EntityNG implements TermInterface {
   public $name;
 
   /**
-   * Description of the term.
-   *
-   * @var \Drupal\Core\Entity\Field\FieldInterface
-   */
-  public $description;
-
-  /**
-   * The text format name for the term's description.
-   *
-   * @var \Drupal\Core\Entity\Field\FieldInterface
-   */
-  public $format;
-
-  /**
    * The weight of this term.
    *
    * This property stores the weight of this term in relation to other terms of
@@ -148,7 +134,6 @@ class Term extends EntityNG implements TermInterface {
     unset($this->name);
     unset($this->weight);
     unset($this->format);
-    unset($this->description);
     unset($this->parent);
   }
 }

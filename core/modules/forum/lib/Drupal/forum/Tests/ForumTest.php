@@ -382,13 +382,11 @@ class ForumTest extends WebTestBase {
    *   The created taxonomy term data.
    */
   function createForum($type, $parent = 0) {
-    // Generate a random name/description.
+    // Generate a random name.
     $name = $this->randomName(10);
-    $description = $this->randomName(100);
 
     $edit = array(
       'name' => $name,
-      'description' => $description,
       'parent[0]' => $parent,
       'weight' => '0',
     );
@@ -406,7 +404,7 @@ class ForumTest extends WebTestBase {
     );
 
     // Verify forum.
-    $term = db_query("SELECT * FROM {taxonomy_term_data} t WHERE t.vid = :vid AND t.name = :name AND t.description = :desc", array(':vid' => config('forum.settings')->get('vocabulary'), ':name' => $name, ':desc' => $description))->fetchAssoc();
+    $term = db_query("SELECT * FROM {taxonomy_term_data} t WHERE t.vid = :vid AND t.name = :name", array(':vid' => config('forum.settings')->get('vocabulary'), ':name' => $name))->fetchAssoc();
     $this->assertTrue(!empty($term), 'The ' . $type . ' exists in the database');
 
     // Verify forum hierarchy.

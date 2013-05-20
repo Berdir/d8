@@ -52,11 +52,7 @@ function forum_form_forum($form, &$form_state, Term $term) {
     '#description' => t('Short but meaningful name for this collection of threaded discussions.'),
     '#required' => TRUE,
   );
-  $form['description'] = array('#type' => 'textarea',
-    '#title' => t('Description'),
-    '#default_value' => $term->description->value,
-    '#description' => t('Description and guidelines for discussions within this forum.'),
-  );
+
   $form['parent']['#tree'] = TRUE;
   $form['parent'][0] = _forum_parent_select($term->id(), t('Parent'), 'forum');
   $form['weight'] = array('#type' => 'weight',
@@ -158,13 +154,6 @@ function forum_form_container($form, &$form_state, Term $term) {
     '#maxlength' => 255,
     '#description' => t('Short but meaningful name for this collection of related forums.'),
     '#required' => TRUE
-  );
-
-  $form['description'] = array(
-    '#type' => 'textarea',
-    '#title' => t('Description'),
-    '#default_value' => $term->description->value,
-    '#description' => t('Description and guidelines for forums within this container.')
   );
   $form['parent']['#tree'] = TRUE;
   $form['parent'][0] = _forum_parent_select($term->id(), t('Parent'), 'container');

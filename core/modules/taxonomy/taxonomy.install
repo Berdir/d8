@@ -59,18 +59,6 @@ function taxonomy_schema() {
         'default' => '',
         'description' => 'The term name.',
       ),
-      'description' => array(
-        'type' => 'text',
-        'not null' => FALSE,
-        'size' => 'big',
-        'description' => 'A description of the term.',
-      ),
-      'format' => array(
-        'type' => 'varchar',
-        'length' => 255,
-        'not null' => FALSE,
-        'description' => 'The filter format ID of the description.',
-      ),
       'weight' => array(
         'type' => 'int',
         'not null' => TRUE,
@@ -191,6 +179,17 @@ function taxonomy_field_schema($field) {
       ),
     ),
   );
+}
+
+/**
+ * Implements hook_update_dependencies().
+ */
+function taxonomy_update_dependencies() {
+  // Convert term description to a field before fields are convert to config.
+  $dependencies['field'][8003] = array(
+    'taxonomy' => 8009,
+  );
+  return $dependencies;
 }
 
 /**
@@ -334,4 +333,110 @@ function taxonomy_update_8006() {
       ->fields(array('vid' => $machine_name))
       ->execute();
   }
+}
+
+/**
+ * Create new field for term descriptions.
+ */
+function taxonomy_update_8007() {
+  $vocabularies = config_get_storage_names_with_prefix('taxonomy.vocabulary.');
+  if (count($vocabularies)) {
+    // Create a new term description field.
+    $field = array(
+      'field_name' => 'taxonomy_term_description',
+      'module' => 'text',
+      'type' => 'text_long',
+      'cardinality' => 1,
+      'locked' => FALSE,
+      'storage' => array(
+        'type' => 'field_sql_storage',
+        'settings' => array(),
+      ),
+    );
+    _update_7000_field_create_field($field);
+
+    // Create instances for existing vocabularies.
+    foreach ($vocabularies as $vocabulary) {
+      $vocabulary = substr($vocabulary, strlen('taxonomy.vocabulary.'));
+      // Attaches the description field to each bundle.
+      $instance = array(
+        'field_name' => 'taxonomy_term_description',
+        'label' => 'Description',
+        'description' => '',
+        'entity_type' => 'taxonomy_term',
+        'bundle' => $vocabulary,
+        'required' => FALSE,
+        'settings' => array('text_processing' => 1),
+        'widget' => array(
+          'type' => 'text_textarea',
+          'module' => 'text',
+          'settings' => array(
+            'rows' => 5,
+          ),
+        ),
+        'display' => array(
+          'default' => array(
+            'label' => 'hidden',
+            'type' => 'text_default',
+          ),
+        ),
+      );
+      _update_7000_field_create_instance($field, $instance);
+    }
+  }
+}
+
+/**
+ * Move term descriptions in {term_data}.description into new field.
+ */
+function taxonomy_update_8008(&$sandbox) {
+  if (!isset($sandbox['progress'])) {
+    $sandbox['progress'] = 0;
+    $sandbox['current_tid'] = 0;
+    $sandbox['max'] = db_query('SELECT COUNT(DISTINCT tid) FROM {taxonomy_term_data} WHERE vid > 0')->fetchField();
+  }
+
+  $terms = db_query_range('SELECT t.tid, t.description, t.format, t.vid FROM {taxonomy_term_data} t WHERE tid > :tid ORDER BY tid ASC', 0, 100, array(':tid' => $sandbox['current_tid']));
+
+  $data = db_insert('field_data_taxonomy_term_description')
+    ->fields(array('entity_type', 'bundle', 'entity_id', 'revision_id', 'langcode', 'delta', 'taxonomy_term_description_value', 'taxonomy_term_description_format'));
+  $revision = db_insert('field_revision_taxonomy_term_description')
+    ->fields(array('entity_type', 'bundle', 'entity_id', 'revision_id', 'langcode', 'delta', 'taxonomy_term_description_value', 'taxonomy_term_description_format'));
+  foreach ($terms as $term) {
+    $data->values(array(
+        'entity_type' => 'taxonomy_term',
+        'bundle' => $term->vid,
+        'entity_id' => $term->tid,
+        'revision_id' => $term->tid,
+        'langcode' => LANGUAGE_NOT_SPECIFIED,
+        'delta' => 0,
+        'taxonomy_term_description_value' => $term->description,
+        'taxonomy_term_description_format' => $term->format,
+      ));
+    $revision->fields(array(
+        'entity_type' => 'taxonomy_term',
+        'bundle' => $term->vid,
+        'entity_id' => $term->tid,
+        'revision_id' => $term->tid,
+        'langcode' => LANGUAGE_NOT_SPECIFIED,
+        'delta' => 0,
+        'taxonomy_term_description_value' => $term->description,
+        'taxonomy_term_description_format' => $term->format,
+      ));
+    $sandbox['progress']++;
+    $sandbox['current_tid'] = $term->tid;
+  }
+
+  $data->execute();
+  $revision->execute();
+
+  $sandbox['#finished'] = empty($sandbox['max']) ? 1 : ($sandbox['progress'] / $sandbox['max']);
+}
+
+/**
+ * Remove {term_data}.description and {term_data}.format.
+ */
+function taxonomy_update_8009() {
+  db_drop_field('taxonomy_term_data', 'description');
+  db_drop_field('taxonomy_term_data', 'format');
 }

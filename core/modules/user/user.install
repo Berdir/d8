@@ -380,10 +380,10 @@ function user_install_picture_field() {
  * Implements hook_update_dependencies().
  */
 function user_update_dependencies() {
-  // Convert user picture to field after the fields and instances are converted
-  // to ConfigEntities.
+  // Make sure that the uuid column is added to {file_managed} before the
+  // user picture default image is added.
   $dependencies['user'][8011] = array(
-    'field' => 8003,
+    'system' => 8015,
   );
   return $dependencies;
 }

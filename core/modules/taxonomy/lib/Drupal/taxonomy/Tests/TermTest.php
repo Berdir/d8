@@ -291,7 +291,6 @@ class TermTest extends TaxonomyTestBase {
   function testTermInterface() {
     $edit = array(
       'name' => $this->randomName(12),
-      'description[value]' => $this->randomName(100),
     );
     // Explicitly set the parents field to 'root', to ensure that
     // TermFormController::save() handles the invalid term ID correctly.
@@ -313,11 +312,9 @@ class TermTest extends TaxonomyTestBase {
     $this->clickLink(t('edit'));
 
     $this->assertRaw($edit['name'], 'The randomly generated term name is present.');
-    $this->assertText($edit['description[value]'], 'The randomly generated term description is present.');
 
     $edit = array(
       'name' => $this->randomName(14),
-      'description[value]' => $this->randomName(102),
     );
 
     // Edit the term.
@@ -335,15 +332,6 @@ class TermTest extends TaxonomyTestBase {
     // View the term and check that it is correct.
     $this->drupalGet('taxonomy/term/' . $term->id());
     $this->assertText($edit['name'], 'The randomly generated term name is present.');
-    $this->assertText($edit['description[value]'], 'The randomly generated term description is present.');
-
-    // Did this page request display a 'term-listing-heading'?
-    $this->assertPattern('|class="taxonomy-term-description"|', 'Term page displayed the term description element.');
-    // Check that it does NOT show a description when description is blank.
-    $term->description = '';
-    $term->save();
-    $this->drupalGet('taxonomy/term/' . $term->id());
-    $this->assertNoPattern('|class="taxonomy-term-description"|', 'Term page did not display the term description when description was blank.');
 
     // Check that the term feed page is working.
     $this->drupalGet('taxonomy/term/' . $term->id() . '/feed');
@@ -430,7 +418,6 @@ class TermTest extends TaxonomyTestBase {
     // Add a new term with multiple parents.
     $edit = array(
       'name' => $this->randomName(12),
-      'description[value]' => $this->randomName(100),
       'parent[]' => array(0, $parent->id()),
     );
     // Save the new term.
@@ -441,7 +428,6 @@ class TermTest extends TaxonomyTestBase {
     $term = reset($terms);
     $this->assertNotNull($term, 'Term found in database.');
     $this->assertEqual($edit['name'], $term->label(), 'Term name was successfully saved.');
-    $this->assertEqual($edit['description[value]'], $term->description->value, 'Term description was successfully saved.');
     // Check that the parent tid is still there. The other parent (<root>) is
     // not added by taxonomy_term_load_parents().
     $parents = taxonomy_term_load_parents($term->id());

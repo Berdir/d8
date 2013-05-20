@@ -48,17 +48,15 @@ class PathTaxonomyTermTest extends PathTestBase {
   function testTermAlias() {
     // Create a term in the default 'Tags' vocabulary with URL alias.
     $vocabulary = taxonomy_vocabulary_load('tags');
-    $description = $this->randomName();;
     $edit = array(
       'name' => $this->randomName(),
-      'description[value]' => $description,
       'path[alias]' => $this->randomName(),
     );
     $this->drupalPost('admin/structure/taxonomy/manage/' . $vocabulary->id() . '/add', $edit, t('Save'));
 
     // Confirm that the alias works.
     $this->drupalGet($edit['path[alias]']);
-    $this->assertText($description, 'Term can be accessed on URL alias.');
+    $this->assertText($edit['name'], 'Term can be accessed on URL alias.');
 
     // Change the term's URL alias.
     $tid = db_query("SELECT tid FROM {taxonomy_term_data} WHERE name = :name", array(':name' => $edit['name']))->fetchField();
@@ -68,11 +66,11 @@ class PathTaxonomyTermTest extends PathTestBase {
 
     // Confirm that the changed alias works.
     $this->drupalGet($edit2['path[alias]']);
-    $this->assertText($description, 'Term can be accessed on changed URL alias.');
+    $this->assertText($edit['name'], 'Term can be accessed on changed URL alias.');
 
     // Confirm that the old alias no longer works.
     $this->drupalGet($edit['path[alias]']);
-    $this->assertNoText($description, 'Old URL alias has been removed after altering.');
+    $this->assertNoText($edit['name'], 'Old URL alias has been removed after altering.');
     $this->assertResponse(404, 'Old URL alias returns 404.');
 
     // Remove the term's URL alias.
@@ -82,7 +80,7 @@ class PathTaxonomyTermTest extends PathTestBase {
 
     // Confirm that the alias no longer works.
     $this->drupalGet($edit2['path[alias]']);
-    $this->assertNoText($description, 'Old URL alias has been removed after altering.');
+    $this->assertNoText($edit['name'], 'Old URL alias has been removed after altering.');
     $this->assertResponse(404, 'Old URL alias returns 404.');
   }
 }
