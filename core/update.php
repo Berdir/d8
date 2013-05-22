@@ -15,6 +15,7 @@
  */
 
 use Symfony\Component\HttpFoundation\Request;
+use Drupal\Core\DrupalKernel;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -134,7 +135,7 @@ function update_script_selection_form($form, &$form_state) {
     );
 
     // No updates to run, so caches won't get flushed later.  Clear them now.
-    drupal_flush_all_caches();
+    update_flush_all_caches();
   }
   else {
     $form['help'] = array(
@@ -176,6 +177,21 @@ function update_helpful_links() {
     );
   }
   return $links;
+}
+
+/**
+ * Remove update overrides and flush all caches.
+ *
+ * This needs to be ran once all (if any) updates are ran. Do not call this
+ * while updates are running.
+ */
+function update_flush_all_caches() {
+  unset($GLOBALS['conf']['container_bundles']['UpdateBundle']);
+  $kernel = new DrupalKernel('update', FALSE, drupal_classloader(), FALSE);
+  $kernel->boot();
+
+  // No updates to run, so caches won't get flushed later.  Clear them now.
+  drupal_flush_all_caches();
 }
 
 /**

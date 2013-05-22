@@ -179,7 +179,7 @@ function block_update_8005() {
  * Enable the Custom Block module.
  */
 function block_update_8006() {
-  update_module_enable(array('custom_block'));
+  module_enable(array('custom_block'));
 }
 
 /**

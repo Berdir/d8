@@ -658,7 +658,8 @@ function user_update_8011() {
   if (!module_exists('image')) {
     // Install image.module with schema version 8002 as a previous version
     // would have to create tables that would be removed again.
-    $old_schema = update_module_enable(array('image'), 8002);
+    $old_schema = module_enable(array('image'));
+    update_set_schema('image', 8002);
     if ($old_schema['image'] == SCHEMA_UNINSTALLED) {
       // If image.module was not installed before, install default
       // configuration and run the install hook.
