@@ -43,7 +43,7 @@ class BlockAccessController extends EntityAccessController {
     // For blocks with roles associated, if none of the user's roles matches
     // the settings from this block, access is denied.
     $visibility = $entity->get('visibility');
-    if (!empty($visibility['role']['roles']) && !array_intersect(array_filter($visibility['role']['roles']), array_keys($user->roles))) {
+    if (!empty($visibility['role']['roles']) && !array_intersect(array_filter($visibility['role']['roles']), $user->roles)) {
       // No match.
       return FALSE;
     }
