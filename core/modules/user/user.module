@@ -2119,7 +2119,7 @@ function user_multiple_role_edit($accounts, $operation, $rid) {
           // For efficiency manually save the original account before applying
           // any changes.
           $account->original = clone $account;
-          $account->roles[count($account->roles)] = $rid;
+          $account->roles[] = $rid;
           $account->save();
         }
       }

@@ -63,8 +63,8 @@ class LocaleUninstallTest extends WebTestBase {
     // Check the UI language.
 
     // @todo: If the global user is an EntityBCDecorator, getting the roles
-    // roles from it within LocaleLookup results in a loop that invokes
-    // LocaleLookup again.
+    // from it within LocaleLookup results in a loop that invokes LocaleLookup
+    // again.
     global $user;
     $user = drupal_anonymous_user();
 
