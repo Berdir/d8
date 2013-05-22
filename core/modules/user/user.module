@@ -407,7 +407,7 @@ function user_password($length = 10) {
  * Determine the permissions for one or more roles.
  *
  * @param $roles
- *   An array whose keys are the role IDs of interest, such as $user->roles.
+ *   An array whose values are the role IDs of interest, such as $user->roles.
  *
  * @return
  *   An array indexed by role ID. Each value is an array whose keys are the
@@ -2298,7 +2298,7 @@ function user_build_filter_query(SelectInterface $query) {
     if ($key == 'permission') {
       $account = entity_create('user', array());
       $account->uid = 'user_filter';
-      $account->roles = array(DRUPAL_AUTHENTICATED_RID => 1);
+      $account->roles[] = DRUPAL_AUTHENTICATED_RID;
       if (user_access($value, $account)) {
         continue;
       }
