@@ -82,6 +82,7 @@ function edit_library_info() {
       // Views.
       $path . '/js/views/AppView.js' => $options,
       $path . '/js/views/EditorDecorationView.js' => $options,
+      $path . '/js/views/EntityToolbarView.js' => $options,
       $path . '/js/views/ContextualLinkView.js' => $options,
       $path . '/js/views/ModalView.js' => $options,
       $path . '/js/views/FieldToolbarView.js' => $options,
@@ -98,8 +99,10 @@ function edit_library_info() {
       array('system', 'underscore'),
       array('system', 'backbone'),
       array('system', 'jquery.form'),
+      array('system', 'jquery.ui.position'),
       array('system', 'drupal.form'),
       array('system', 'drupal.ajax'),
+      array('system', 'drupal.debounce'),
       array('system', 'drupalSettings'),
     ),
   );

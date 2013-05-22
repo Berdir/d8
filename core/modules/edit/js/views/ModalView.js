@@ -72,8 +72,8 @@ Drupal.edit.ModalView = Backbone.View.extend({
         that.remove();
       });
 
-    var action = $(event.target).attr('data-edit-modal-action');
-    return this.callback(action);
+    var action = $(event.target).parent().attr('data-edit-modal-action');
+    return this.callback(event, action);
   }
 });
 

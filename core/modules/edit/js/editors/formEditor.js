@@ -14,11 +14,12 @@ Drupal.edit.editors.form = Drupal.edit.EditorView.extend({
   /**
    * {@inheritdoc}
    */
-  stateChange: function (fieldModel, state) {
+  stateChange: function (fieldModel, state, options) {
     var from = fieldModel.previous('state');
     var to = state;
     switch (to) {
       case 'inactive':
+        this.removeForm();
         break;
       case 'candidate':
         if (from !== 'inactive') {
@@ -38,7 +39,7 @@ Drupal.edit.editors.form = Drupal.edit.EditorView.extend({
       case 'changed':
         break;
       case 'saving':
-        this.save();
+        this.save(options);
         break;
       case 'saved':
         break;
@@ -82,7 +83,8 @@ Drupal.edit.editors.form = Drupal.edit.EditorView.extend({
     var formOptions = {
       fieldID: fieldModel.id,
       $el: this.$el,
-      nocssjs: false
+      nocssjs: false,
+      reset: Drupal.edit.app.changedFieldsInTempstore.length === 0
     };
     Drupal.edit.util.form.load(formOptions, function (form, ajax) {
       Drupal.ajax.prototype.commands.insert(ajax, {
@@ -128,12 +130,13 @@ Drupal.edit.editors.form = Drupal.edit.EditorView.extend({
   /**
    * {@inheritdoc}
    */
-  save: function () {
+  save: function (options) {
     var $formContainer = this.$formContainer;
     var $submit = $formContainer.find('.edit-form-submit');
     var base = $submit.attr('id');
     var editorModel = this.model;
     var fieldModel = this.fieldModel;
+    var callback = (options || {}).callback || function () {};
 
     // Successfully saved.
     Drupal.ajax[base].commands.editFieldFormSaved = function (ajax, response, status) {
@@ -144,7 +147,10 @@ Drupal.edit.editors.form = Drupal.edit.EditorView.extend({
       // Then, set the 'html' attribute on the field model. This will cause the
       // field to be rerendered.
       fieldModel.set('html', response.data);
-     };
+
+      // Invoke the optional callback.
+      callback.call();
+    };
 
     // Unsuccessfully saved; validation errors.
     Drupal.ajax[base].commands.editFieldFormValidationErrors = function (ajax, response, status) {

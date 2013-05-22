@@ -22,8 +22,7 @@
 
 var options = $.extend({
   strings: {
-    quickEdit: Drupal.t('Quick edit'),
-    stopQuickEdit: Drupal.t('Stop quick edit')
+    quickEdit: Drupal.t('Quick edit')
   }
 }, drupalSettings.edit);
 
@@ -57,6 +56,9 @@ Drupal.behaviors.edit = {
     $('body').once('edit-init', initEdit);
 
     // Process each field element: queue to be used or to fetch metadata.
+    // When a field is being rerender after editing, it will process
+    // immediately. New fields will fail to process. They are queued to have
+    // their metadata fetched, which occurs below in fetchMissingMetaData().
     $(context).find('[data-edit-id]').once('edit').each(function (index, fieldElement) {
       processField(fieldElement);
     });
@@ -167,10 +169,15 @@ function initEdit (bodyElement) {
 function processField (fieldElement) {
   var metadata = Drupal.edit.metadata;
   var fieldID = fieldElement.getAttribute('data-edit-id');
+  var entityID = extractEntityID(fieldID);
 
-  // Early-return if metadata for this field is mising.
+  // Early-return if metadata for this field is missing.
   if (!metadata.has(fieldID)) {
-    fieldsMetadataQueue.push({ el: fieldElement, fieldID: fieldID });
+    fieldsMetadataQueue.push({
+      el: fieldElement,
+      fieldID: fieldID,
+      entityID: entityID
+    });
     return;
   }
   // Early-return if the user is not allowed to in-place edit this field.
@@ -232,6 +239,7 @@ function fetchMissingMetadata (callback) {
   if (fieldsMetadataQueue.length) {
     var fieldIDs = _.pluck(fieldsMetadataQueue, 'fieldID');
     var fieldElementsWithoutMetadata = _.pluck(fieldsMetadataQueue, 'el');
+    var entityIDs = _.uniq(_.pluck(fieldsMetadataQueue, 'entityID'), true);
     fieldsMetadataQueue = [];
 
     $(window).ready(function () {
@@ -242,7 +250,10 @@ function fetchMissingMetadata (callback) {
       Drupal.ajax[id] = new Drupal.ajax(id, $el, {
         url: drupalSettings.edit.metadataURL,
         event: 'edit-internal.edit',
-        submit: { 'fields[]': fieldIDs },
+        submit: {
+          'fields[]': fieldIDs,
+          'entities[]': entityIDs
+        },
         // No progress indicator.
         progress: { type: null }
       });
@@ -313,7 +324,8 @@ function initializeEntityContextualLink (contextualLink) {
   else if (hasFieldWithPermission(fieldIDs)) {
     var entityModel = new Drupal.edit.EntityModel({
       el: contextualLink.region,
-      id: contextualLink.entityID
+      id: contextualLink.entityID,
+      label: Drupal.edit.metadata.get(contextualLink.entityID, 'label')
     });
     Drupal.edit.collections.entities.add(entityModel);
 

@@ -40,6 +40,8 @@ class EditController extends ContainerAware {
     if (!isset($fields)) {
       throw new NotFoundHttpException();
     }
+    $entities = $request->request->get('entities');
+
     $metadataGenerator = $this->container->get('edit.metadata.generator');
 
     $metadata = array();
@@ -62,8 +64,12 @@ class EditController extends ContainerAware {
       if (!$langcode || (field_valid_language($langcode) !== $langcode)) {
         throw new NotFoundHttpException();
       }
-
-      $metadata[$field] = $metadataGenerator->generate($entity, $instance, $langcode, $view_mode);
+      // If the entity information for this field is requested, include it.
+      $entity_id = $entity->entityType() . '/' . $entity_id;
+      if (in_array($entity_id, $entities) && !isset($metadata[$entity_id])) {
+        $metadata[$entity_id] = $metadataGenerator->generateEntity($entity, $langcode);
+      }
+      $metadata[$field] = $metadataGenerator->generateField($entity, $instance, $langcode, $view_mode);
     }
 
     $response->addCommand(new MetaDataCommand($metadata));

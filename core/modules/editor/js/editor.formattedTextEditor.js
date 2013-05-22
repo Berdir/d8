@@ -55,7 +55,7 @@ Drupal.edit.editors.editor = Drupal.edit.EditorView.extend({
   /**
    * {@inheritdoc}
    */
-  stateChange: function (fieldModel, state) {
+  stateChange: function (fieldModel, state, options) {
     var editorModel = this.model;
     var from = fieldModel.previous('state');
     var to = state;
@@ -122,7 +122,7 @@ Drupal.edit.editors.editor = Drupal.edit.EditorView.extend({
         if (from === 'invalid') {
           this.removeValidationErrors();
         }
-        this.save();
+        this.save(options);
         break;
 
       case 'saved':

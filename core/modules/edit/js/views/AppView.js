@@ -1,4 +1,4 @@
-(function ($, _, Backbone, Drupal) {
+(function ($, _, Backbone, Drupal, drupalSettings) {
 
 "use strict";
 
@@ -10,6 +10,10 @@ Drupal.edit.AppView = Backbone.View.extend({
   // Configuration for state handling.
   activeEditorStates: [],
   singleEditorStates: [],
+
+  // Ephemeral storage for changed fields that persists through field
+  // rerendering.
+  changedFieldsInTempstore: [],
 
   /**
    * {@inheritdoc}
@@ -25,11 +29,12 @@ Drupal.edit.AppView = Backbone.View.extend({
     // @see Drupal.edit.FieldModel.states
     this.activeEditorStates = ['activating', 'active'];
     this.singleEditorStates = ['highlighted', 'activating', 'active'];
+    this.changedEditorStates = ['saving', 'changed', 'invalid'];
 
     options.entitiesCollection
       // Track app state.
-      .on('change:isActive', this.appStateChange, this)
-      .on('change:isActive', this.enforceSingleActiveEntity, this);
+      .on('change:state', this.appStateChange, this);
+      //.on('change:isActive', this.enforceSingleActiveEntity, this);
 
     options.fieldsCollection
       // Track app state.
@@ -50,27 +55,39 @@ Drupal.edit.AppView = Backbone.View.extend({
    * @param Boolean isActive
    *   A boolean that represents the changed active state of the entityModel.
    */
-  appStateChange: function (entityModel, isActive) {
+  appStateChange: function (entityModel, state, options) {
     var app = this;
-    if (isActive) {
-      // Move all fields of this entity from the 'inactive' state to the
-      // 'candidate' state.
-      entityModel.get('fields').each(function (fieldModel) {
-        // First, set up editors; they must be notified of state changes.
-        app.setupEditor(fieldModel);
-        // Second, change the field's state.
-        fieldModel.set('state', 'candidate');
-      });
-    }
-    else {
-      // Move all fields of this entity from whatever state they are in to
-      // the 'inactive' state.
-      entityModel.get('fields').each(function (fieldModel) {
-        // First, change the field's state.
-        fieldModel.set('state', 'inactive', { reason: 'stop' });
-        // Second, tear down editors.
-        app.teardownEditor(fieldModel);
-      });
+    switch (state) {
+      case 'launching':
+          // Create an entity toolbar.
+        var entityToolbar = new Drupal.edit.EntityToolbarView({
+          el: entityModel.get('el'),
+          model: entityModel,
+          appModel: this.model
+        });
+        entityModel.set('entityToolbar', entityToolbar);
+        // Move all fields of this entity from the 'inactive' state to the
+        // 'candidate' state.
+        entityModel.get('fields').each(function (fieldModel) {
+          // Set up editors; they must be notified of state changes.
+          app.setupEditor(fieldModel);
+        });
+        _.defer(function () {
+          entityModel.set('state', 'opening');;
+        });
+        break;
+      case 'closed':
+        var entityToolbar = entityModel.get('entityToolbar');
+        if (entityToolbar) {
+          entityModel.get('entityToolbar').remove();
+          entityModel.set('entityToolbar', null);
+        }
+        // Teardown the editors.
+        entityModel.get('fields').each(function (fieldModel) {
+          // Second, tear down editors.
+          app.teardownEditor(fieldModel);
+        });
+        break;
     }
   },
 
@@ -88,7 +105,7 @@ Drupal.edit.AppView = Backbone.View.extend({
    * @param Function callback
    *   The callback function that should receive the state acceptance result.
    */
-  acceptEditorStateChange: function (from, to, context, callback) {
+  acceptEditorStateChange: function (from, to, context) {
     var accept = true;
 
     // If the app is in view mode, then reject all state changes except for
@@ -135,15 +152,9 @@ Drupal.edit.AppView = Backbone.View.extend({
       // If it's not against the general principle, then here are more
       // disallowed cases to check.
       if (accept) {
-        // Ensure only one editor (field) at a time may be higlighted or active.
-        if (from === 'candidate' && _.indexOf(this.singleEditorStates, to) !== -1) {
-          if (this.model.get('highlightedEditor') || this.model.get('activeEditor')) {
-            accept = false;
-          }
-        }
         // Reject going from activating/active to candidate because of a
         // mouseleave.
-        else if (_.indexOf(this.activeEditorStates, from) !== -1 && to === 'candidate') {
+        if (_.indexOf(this.activeEditorStates, from) !== -1 && to === 'candidate') {
           if (context && context.reason === 'mouseleave') {
             accept = false;
           }
@@ -165,7 +176,9 @@ Drupal.edit.AppView = Backbone.View.extend({
               // that will ask the user to confirm his choice.
               accept = false;
               // The callback will be called from the helper function.
-              this._confirmStopEditing(callback);
+              this._confirmStopEditing({
+                callback: (context || {}).callback || function () {}
+              });
             }
           }
         }
@@ -184,6 +197,11 @@ Drupal.edit.AppView = Backbone.View.extend({
    *   The field for which an in-place editor must be set up.
    */
   setupEditor: function (fieldModel) {
+    // Get the corresponding entity toolbar.
+    var entityModel = fieldModel.get('entity');
+    var entityToolbar = entityModel.get('entityToolbar');
+    // Get the field toolbar DOM root from the entity toolbar.
+    var fieldToolbarRoot = entityToolbar.getToolbarRoot();
     // Create in-place editor.
     var editorName = fieldModel.get('metadata').editor;
     var editorModel = new Drupal.edit.EditorModel();
@@ -196,9 +214,14 @@ Drupal.edit.AppView = Backbone.View.extend({
     // Create in-place editor's toolbar — positions appropriately above the
     // edited element.
     var toolbarView = new Drupal.edit.FieldToolbarView({
+      el: fieldToolbarRoot,
       model: fieldModel,
       $editedElement: $(editorView.getEditedElement()),
-      editorView: editorView
+      // @todo editorView is needed for the getEditUISetting method. Maybe we
+      // can factor out this dependency and put it in the metadata of the
+      // Drupal.edit.Metadata object for this field.
+      editorView: editorView,
+      entityModel: entityModel
     });
 
     // Create decoration for edited element: padding if necessary, sets classes
@@ -206,8 +229,7 @@ Drupal.edit.AppView = Backbone.View.extend({
     var decorationView = new Drupal.edit.EditorDecorationView({
       el: $(editorView.getEditedElement()),
       model: fieldModel,
-      editorView: editorView,
-      toolbarId: toolbarView.getId()
+      editorView: editorView
     });
 
     // Track these three views in FieldModel so that we can tear them down
@@ -251,7 +273,10 @@ Drupal.edit.AppView = Backbone.View.extend({
    *
    * @see acceptEditorStateChange()
    */
-  _confirmStopEditing: function () {
+  _confirmStopEditing: function (options) {
+    var activeEntity = Drupal.edit.collections.entities.where({ isActive: true })[0];
+    // Set the active entity to opened while we confirm the field changes.
+    activeEntity.set('state', 'opened');
     // Only instantiate if there isn't a modal instance visible yet.
     if (!this.model.get('activeModal')) {
       var that = this;
@@ -259,15 +284,22 @@ Drupal.edit.AppView = Backbone.View.extend({
         model: this.model,
         message: Drupal.t('You have unsaved changes'),
         buttons: [
-          { action: 'discard', classes: 'gray-button', label: Drupal.t('Discard changes') },
-          { action: 'save', type: 'submit', classes: 'blue-button', label: Drupal.t('Save') }
+          { action: 'save', type: 'submit', classes: 'action-save edit-button', label: Drupal.t('Save') },
+          { action: 'discard', classes: 'action-cancel edit-button', label: Drupal.t('Discard changes') }
         ],
-        callback: function (action) {
+        callback: function (event, action) {
           // The active modal has been removed.
           that.model.set('activeModal', null);
-          // Set the state that matches the user's action.
-          var targetState = (action === 'discard') ? 'candidate' : 'saving';
-          that.model.get('activeEditor').set('state', 'candidate', { confirmed: true });
+          // If the targetState is saving, the field must be saved, then the
+          // entity must be saved.
+          if (action === 'save') {
+            activeEntity.set('state', 'quitcommitting');
+          }
+          else {
+            activeEntity.set('state', 'deactivating', {
+              confirmed: true
+            });
+          }
         }
       });
       this.model.set('activeModal', modal);
@@ -292,7 +324,7 @@ Drupal.edit.AppView = Backbone.View.extend({
     if (_.indexOf(this.singleEditorStates, to) !== -1 && this.model.get('highlightedEditor') !== fieldModel) {
       this.model.set('highlightedEditor', fieldModel);
     }
-    else if (this.model.get('highlightedEditor') === fieldModel && to === 'candidate') {
+    else if (this.model.get('highlightedEditor') === fieldModel && to === 'candidate' || to === 'inactive') {
       this.model.set('highlightedEditor', null);
     }
 
@@ -301,13 +333,53 @@ Drupal.edit.AppView = Backbone.View.extend({
       this.model.set('activeEditor', fieldModel);
     }
     else if (this.model.get('activeEditor') === fieldModel && to === 'candidate') {
-      // Discarded if it transitions from a changed state to 'candidate'.
       if (from === 'changed' || from === 'invalid') {
         fieldModel.editorView.revert();
       }
       this.model.set('activeEditor', null);
     }
   },
+
+  /**
+   *
+   */
+  enableEditor: function (fieldModel) {
+    // check if there's an active editor.
+    var activeEditor = this.model.get('activeEditor');
+
+    // Do nothing if the fieldModel is already the active editor.
+    if (fieldModel === activeEditor) {
+      return;
+    }
+    if (activeEditor) {
+      // If there is, check if the model is changed.
+      if (activeEditor.get('state') === 'changed') {
+        // Save a reference to the changed field so it can be marked as
+        // as changed until the tempStore is pushed to permanent storage.
+        this.changedFieldsInTempstore.push(activeEditor.id);
+        // Attempt to save the field.
+        activeEditor.set({'state': 'saving'}, {
+          // This callback will be invoked if the activeEditor field is
+          // successfully saved.
+          callback: function () {
+            // Set the new fieldModel to activating.
+            fieldModel.set('state', 'activating');
+          }
+        });
+      }
+      // else, set it to a candidate.
+      else {
+        activeEditor.set('state', 'candidate');
+        // Set the new fieldModel to activating.
+        fieldModel.set('state', 'activating');
+      }
+    }
+    else {
+      // Set the new fieldModel to activating.
+      fieldModel.set('state', 'activating');
+    }
+  },
+
 
   /**
    * Render an updated field (a field whose 'html' attribute changed).
@@ -363,6 +435,22 @@ Drupal.edit.AppView = Backbone.View.extend({
       this.setupEditor(fieldModel);
       fieldModel.set('state', 'candidate');
     }
+
+    // If the field change was only saved to tempstore, mark the field as
+    // changed. The changed marker will be cleared when the
+    // Drupal.edit.app.AppView.prototype.save() method is called.
+    for (var i = 0, fields = this.changedFieldsInTempstore; i < fields.length; i++) {
+      var changedFieldModel = fields[i];
+      if (changedFieldModel === fieldModel.id) {
+        var $field = $(fieldModel.get('el'));
+        if ($field.is('.edit-editable')) {
+          $field.addClass('edit-changed');
+        }
+        else {
+          $field.find('.edit-editable').addClass('edit-changed');
+        }
+      }
+    }
   },
 
   /**
@@ -389,4 +477,4 @@ Drupal.edit.AppView = Backbone.View.extend({
   }
 });
 
-}(jQuery, _, Backbone, Drupal));
+}(jQuery, _, Backbone, Drupal, drupalSettings));

@@ -43,6 +43,7 @@ Drupal.edit.EditorView = Backbone.View.extend({
     // The el property is the field, which should not be removed. Remove the
     // pointer to it, then call Backbone.View.prototype.remove().
     this.setElement();
+    this.fieldModel.off(null, null, this);
     Backbone.View.prototype.remove.call(this);
   },
 
@@ -86,7 +87,7 @@ Drupal.edit.EditorView = Backbone.View.extend({
    * @param String state
    *   The state of the associated field. One of Drupal.edit.FieldModel.states.
    */
-  stateChange: function (fieldModel, state) {
+  stateChange: function (fieldModel, state, options) {
     var from = fieldModel.previous('state');
     var to = state;
     switch (to) {
@@ -101,6 +102,14 @@ Drupal.edit.EditorView = Backbone.View.extend({
         // Except when we come from the 'invalid' state, then we clean up.
         if (from === 'invalid') {
           this.removeValidationErrors();
+        }
+
+        // Attempt to save if the field was previously in the changed state.
+        // WIM: this code makes zero sense to me, and looks utterly evil!
+        if (from === 'changed') {
+          _.defer(function () {
+            fieldModel.set('state', 'saving');
+          });
         }
         break;
       case 'highlighted':
@@ -138,7 +147,7 @@ Drupal.edit.EditorView = Backbone.View.extend({
         if (from === 'invalid') {
           this.removeValidationErrors();
         }
-        this.save();
+        this.save(options);
         break;
       case 'saved':
         // Nothing to do for the typical in-place editor. Immediately after
@@ -168,9 +177,10 @@ Drupal.edit.EditorView = Backbone.View.extend({
   /**
    * Saves the modified value in the in-place editor for this field.
    */
-  save: function () {
+  save: function (options) {
     var fieldModel = this.fieldModel;
     var editorModel = this.model;
+    var callback = (options || {}).callback || function () {};
 
     function fillAndSubmitForm (value) {
       var $form = $('#edit_backstage form');
@@ -186,7 +196,8 @@ Drupal.edit.EditorView = Backbone.View.extend({
     var formOptions = {
       fieldID: this.fieldModel.id,
       $el: this.$el,
-      nocssjs: true
+      nocssjs: true,
+      reset: Drupal.edit.app.changedFieldsInTempstore.length === 0
     };
     Drupal.edit.util.form.load(formOptions, function (form, ajax) {
       // Create a backstage area for storing forms that are hidden from view

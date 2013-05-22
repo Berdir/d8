@@ -7,7 +7,6 @@
 "use strict";
 
 Drupal.edit.EditorDecorationView = Backbone.View.extend({
-  toolbarId: null,
 
   _widthAttributeIsEmpty: null,
 
@@ -25,13 +24,9 @@ Drupal.edit.EditorDecorationView = Backbone.View.extend({
    * @param Object options
    *   An object with the following keys:
    *   - Drupal.edit.EditorView editorView: the editor object view.
-   *   - String toolbarId: the ID attribute of the toolbar as rendered in the
-   *     DOM.
    */
   initialize: function (options) {
     this.editorView = options.editorView;
-
-    this.toolbarId = options.toolbarId;
 
     this.model.on('change:state', this.stateChange, this);
   },
@@ -61,6 +56,7 @@ Drupal.edit.EditorDecorationView = Backbone.View.extend({
         this.undecorate();
         break;
       case 'candidate':
+        this.markChanged(false);
         this.decorate();
         if (from !== 'inactive') {
           this.stopHighlight();
@@ -84,6 +80,7 @@ Drupal.edit.EditorDecorationView = Backbone.View.extend({
         this.startEdit();
         break;
       case 'changed':
+        this.markChanged(true);
         break;
       case 'saving':
         break;
@@ -101,10 +98,8 @@ Drupal.edit.EditorDecorationView = Backbone.View.extend({
    */
   onMouseEnter: function (event) {
     var that = this;
-    this._ignoreHoveringVia(event, '#' + this.toolbarId, function () {
-      that.model.set('state', 'highlighted');
-      event.stopPropagation();
-    });
+    that.model.set('state', 'highlighted');
+    event.stopPropagation();
   },
 
   /**
@@ -114,10 +109,8 @@ Drupal.edit.EditorDecorationView = Backbone.View.extend({
    */
   onMouseLeave: function (event) {
     var that = this;
-    this._ignoreHoveringVia(event, '#' + this.toolbarId, function () {
-      that.model.set('state', 'candidate', { reason: 'mouseleave' });
-      event.stopPropagation();
-    });
+    that.model.set('state', 'candidate', { reason: 'mouseleave' });
+    event.stopPropagation();
   },
 
   /**
@@ -126,7 +119,8 @@ Drupal.edit.EditorDecorationView = Backbone.View.extend({
    * @param jQuery event
    */
   onClick: function (event) {
-    this.model.set('state', 'activating');
+    var that = this;
+    Drupal.edit.app.enableEditor(this.model);
     event.preventDefault();
     event.stopPropagation();
   },
@@ -169,9 +163,6 @@ Drupal.edit.EditorDecorationView = Backbone.View.extend({
    */
   prepareEdit: function () {
     this.$el.addClass('edit-editing');
-
-    // While editing, do not show any other editors.
-    $('.edit-candidate').not('.edit-editing').removeClass('edit-editable');
   },
 
   /**
@@ -181,6 +172,13 @@ Drupal.edit.EditorDecorationView = Backbone.View.extend({
     if (this.editorView.getEditUISettings().padding) {
       this._pad();
     }
+  },
+
+  /**
+   *
+   */
+  markChanged: function (toggle) {
+    this.$el.toggleClass('edit-changed', toggle);
   },
 
   /**
@@ -214,7 +212,6 @@ Drupal.edit.EditorDecorationView = Backbone.View.extend({
       this._widthAttributeIsEmpty = true;
       this.$el
         .addClass('edit-animate-disable-width')
-        .css('width', this.$el.width())
         .css('background-color', this._getBgColor(this.$el));
     }
 
@@ -332,26 +329,6 @@ Drupal.edit.EditorDecorationView = Backbone.View.extend({
       pos = '0px';
     }
     return pos;
-  },
-
-  /**
-   * Ignores hovering to/from the given closest element.
-   *
-   * When a hover occurs to/from another element, invoke the callback.
-   *
-   * @param jQuery event
-   * @param jQuery closest
-   *   A jQuery-wrapped DOM element or compatibale jQuery input. The element
-   *   whose mouseenter and mouseleave events should be ignored.
-   * @param Function callback
-   */
-  _ignoreHoveringVia: function (event, closest, callback) {
-    if ($(event.relatedTarget).closest(closest).length > 0) {
-      event.stopPropagation();
-    }
-    else {
-      callback();
-    }
   }
 });
 

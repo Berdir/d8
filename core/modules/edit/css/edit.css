@@ -6,71 +6,39 @@
 }
 
 .edit-animate-fast {
--webkit-transition: all .2s ease;
-   -moz-transition: all .2s ease;
-    -ms-transition: all .2s ease;
-     -o-transition: all .2s ease;
-        transition: all .2s ease;
+  -webkit-transition: all .2s ease;
+  transition: all .2s ease;
 }
 
 .edit-animate-default {
   -webkit-transition: all .4s ease;
-     -moz-transition: all .4s ease;
-      -ms-transition: all .4s ease;
-       -o-transition: all .4s ease;
-          transition: all .4s ease;
+  transition: all .4s ease;
 }
 
 .edit-animate-slow {
--webkit-transition: all .6s ease;
-   -moz-transition: all .6s ease;
-    -ms-transition: all .6s ease;
-     -o-transition: all .6s ease;
-        transition: all .6s ease;
+  -webkit-transition: all .6s ease;
+  transition: all .6s ease;
 }
 
 .edit-animate-delay-veryfast {
   -webkit-transition-delay: .05s;
-     -moz-transition-delay: .05s;
-      -ms-transition-delay: .05s;
-       -o-transition-delay: .05s;
-          transition-delay: .05s;
+  transition-delay: .05s;
 }
 
 .edit-animate-delay-fast {
   -webkit-transition-delay: .2s;
-     -moz-transition-delay: .2s;
-      -ms-transition-delay: .2s;
-       -o-transition-delay: .2s;
-          transition-delay: .2s;
+  transition-delay: .2s;
 }
 
 .edit-animate-disable-width {
   -webkit-transition: width 0s;
-     -moz-transition: width 0s;
-      -ms-transition: width 0s;
-       -o-transition: width 0s;
-          transition: width 0s;
+  transition: width 0s;
 }
 
 .edit-animate-only-visibility {
   -webkit-transition: opacity .2s ease;
-     -moz-transition: opacity .2s ease;
-      -ms-transition: opacity .2s ease;
-       -o-transition: opacity .2s ease;
-          transition: opacity .2s ease;
+  transition: opacity .2s ease;
 }
-
-.edit-animate-only-background-and-padding {
-  -webkit-transition: background, padding .2s ease;
-     -moz-transition: background, padding .2s ease;
-      -ms-transition: background, padding .2s ease;
-       -o-transition: background, padding .2s ease;
-          transition: background, padding .2s ease;
-}
-
-
-
 
 /**
  * Candidate editables + editables being edited.
@@ -89,25 +57,29 @@
 }
 .edit-field.edit-editable,
 .edit-field .edit-editable {
-  box-shadow: 0 0 1px 1px #4d9de9;
+  box-shadow: 0 0 1px 2px #4d9de9;
 }
 
 /* Highlighted (hovered) editable. */
 .edit-editable.edit-highlighted {
   z-index: 305;
-  min-width: 200px;
 }
-.edit-field.edit-editable.edit-highlighted,
-.edit-form.edit-editable.edit-highlighted,
-.edit-field .edit-editable.edit-highlighted {
-  box-shadow: 0 0 1px 1px #0199ff, 0 0 3px 3px rgba(153, 153, 153, .5);
+.edit-field.edit-highlighted,
+.edit-form.edit-highlighted,
+.edit-field .edit-highlighted {
+  box-shadow: 0 0 1px 2px #0199ff, 0 0 3px 5px rgba(153, 153, 153, .5);
 }
-.edit-field.edit-editable.edit-highlighted.edit-validation-error,
-.edit-form.edit-editable.edit-highlighted.edit-validation-error,
-.edit-field .edit-editable.edit-highlighted.edit-validation-error {
-  box-shadow: 0 0 1px 1px red, 0 0 3px 3px rgba(153, 153, 153, .5);
+.edit-field.edit-changed,
+.edit-form.edit-changed,
+.edit-field .edit-changed {
+  box-shadow: 0 0 1px 2px orange, 0 0 3px 5px rgba(153, 153, 153, .5);
 }
-.edit-form.edit-editable .form-item .error {
+.edit-field.edit-validation-error,
+.edit-form.edit-validation-error,
+.edit-field .edit-validation-error {
+  box-shadow: 0 0 1px 2px red, 0 0 3px 5px rgba(153, 153, 153, .5);
+}
+.edit-form .form-item .error {
   border: 1px solid #eea0a0;
 }
 
@@ -210,11 +182,25 @@
  * Edit mode: toolbars
  */
 
-/* Trick: wrap statically positioned elements in relatively positioned element
-   without changing its location. This allows us to absolutely position the
-   toolbar.
-*/
-.edit-toolbar-container,
+/**
+ * Entity toolbar.
+ */
+.edit-toolbar-container {
+  border: 1px solid #a8a8a8;
+  background-color: white;
+  border: 1px solid #ababab;
+  box-shadow: 2px 2px 4px -2px black, 2px 2px 12px 0px hsla(40, 10%, 70%, 1);
+  max-width: 100%;
+  position: absolute;
+  -webkit-transition: all 0.5s;
+  transition: all 0.5s;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  width: 40em;
+  z-index: 350;
+}
 .edit-form-container {
   position: relative;
   padding: 0;
@@ -223,51 +209,21 @@
   vertical-align: baseline;
   z-index: 310;
 }
-.edit-toolbar-container {
-  -webkit-user-select: none;
-   -khtml-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-       -o-user-select: none;
-          user-select: none;
+.edit-toolgroup.ops {
+  float: right; /* LTR */
 }
-
-.edit-toolbar-heightfaker {
-  height: auto;
-  position: absolute;
-  bottom: 1px;
-  box-shadow: 0 0 1px 1px #0199ff, 0 0 3px 3px rgba(153, 153, 153, .5);
-  background: #fff;
-  display: none;
-}
-.edit-highlighted .edit-toolbar-heightfaker {
-  display: block;
+.edit-toolbar-label {
+  overflow: hidden;
+  padding: 0.333em 0.5em;
 }
 
 /* The toolbar; these are not necessarily visible. */
 .edit-toolbar {
-  position: relative;
-  height: 100%;
   font-family: 'Droid sans', 'Lucida Grande', sans-serif;
-}
-.edit-toolbar-heightfaker {
-  clip: rect(-1000px, 1000px, auto, -1000px); /* Remove bottom box-shadow. */
-}
-/* Exception: when the toolbar is instructed to be "full width". */
-.edit-toolbar-fullwidth .edit-toolbar-heightfaker {
-  width: 100%;
-  clip: auto;
-}
-
-
-/* The toolbar contains toolgroups; these are visible. */
-.edit-toolgroup {
-  float: left; /* LTR */
 }
 
 /* Info toolgroup. */
 .edit-toolgroup.info {
-  float: left; /* LTR */
   font-weight: bolder;
   padding: 0 5px;
   background: #fff url('../images/throbber.gif') no-repeat -60px 60px;
@@ -276,97 +232,75 @@
   padding-right: 35px;
   background-position: 90% 50%;
 }
-
-/* Operations toolgroup. */
-.edit-toolgroup.ops {
-  float: right; /* LTR */
-  margin-left: 5px;
+.edit-toolbar-fullwidth {
+  width: 100%;
 }
-
 .edit-toolgroup.wysiwyg-floated {
   float: right;
 }
 .edit-toolgroup.wysiwyg-main {
-  clear: left;
+  clear: both;
   width: 100%;
   padding-left: 0;
 }
 
-
-
 /**
  * Edit mode: buttons (in both modal and toolbar).
  */
-#edit_modal button,
-.edit-toolbar button {
-  float: left; /* LTR */
-  display: block;
-  height: 29px;
-  min-width: 29px;
-  padding: 3px 6px 6px 6px;
-  margin: 4px 5px 1px 0;
+.edit-button {
+  background-image: -webkit-linear-gradient(top, #f5f5f5 0%, #ccc 100%);
+  background-image: -moz-linear-gradient(top, #f5f5f5 0%, #ccc 100%);
+  background-image: linear-gradient(top, #f5f5f5 0%, #ccc 100%);
   border: 1px solid #fff;
-  border-radius: 3px;
-  color: white;
-  text-decoration: none;
-  font-size: 13px;
+  color: #666;
   cursor: pointer;
-}
-#edit_modal button {
-  float: none;
   display: inline-block;
+  font-size: 1em;
+  min-height: 29px;
+  min-width: 29px;
+  opacity: 1;
+  padding: 3px 6px 6px 6px;
+  text-decoration: none;
+  -webkit-transition: all .1s ease;
+  transition: all .1s ease;
 }
-
+.edit-button[aria-hidden="true"] {
+  visibility: hidden;
+  opacity: 0;
+}
 /* Button with icons. */
-#edit_modal button span,
-.edit-toolbar button span {
-  width: 22px;
-  height: 19px;
-  display: block;
-  float: left;
-}
-.edit-toolbar span.close {
+#edit_modal .action-cancel span,
+.edit-toolbar .action-cancel span {
   background: url('../images/close.png') no-repeat 3px 2px;
-  text-indent: -999em;
   direction: ltr;
+  display: inline-block;
+  width: 18px;
+  text-indent: -999em;
 }
-
-.edit-toolbar button.blank-button {
-  color: black;
-  background-color: #fff;
-  font-weight: bolder;
-}
-
-#edit_modal button.blue-button,
-.edit-toolbar button.blue-button {
+.edit-button.action-save {
   color: white;
   background-image: -webkit-linear-gradient(top, #6fc2f2 0%, #4e97c0 100%);
   background-image: -moz-linear-gradient(top, #6fc2f2 0%, #4e97c0 100%);
   background-image: linear-gradient(top, #6fc2f2 0%, #4e97c0 100%);
-  border-radius: 5px;
 }
-
-#edit_modal button.gray-button,
-.edit-toolbar button.gray-button {
-  color: #666;
-  background-image: -webkit-linear-gradient(top, #f5f5f5 0%, #ccc 100%);
-  background-image: -moz-linear-gradient(top, #f5f5f5 0%, #ccc 100%);
-  background-image: linear-gradient(top, #f5f5f5 0%, #ccc 100%);
-  border-radius: 5px;
+.edit-button.action-saving {
+  background-image: -webkit-linear-gradient(top, #dddddd 0%, #c0c0c0 100%);
+  background-image: -moz-linear-gradient(top, #dddddd 0%, #c0c0c0 100%);
+  background-image: linear-gradient(top, #dddddd 0%, #c0c0c0 100%);
 }
-
-#edit_modal button.blue-button:hover,
-.edit-toolbar button.blue-button:hover,
-#edit_modal button.blue-button:active,
-.edit-toolbar button.blue-button:active {
-  border: 1px solid #55a5d3;
-  box-shadow: 0 2px 1px rgba(0,0,0,0.2);
+.edit-button.action-saving .ajax-progress {
+  padding: 0px 4px 0px 6px;
 }
-
-#edit_modal button.gray-button:hover,
-.edit-toolbar button.gray-button:hover,
-#edit_modal button.gray-button:active,
-.edit-toolbar button.gray-button:active {
+.edit-button.action-saving .ajax-progress .throbber {
+  padding: 0 6px;
+}
+.edit-button:hover,
+.edit-button:active {
   border: 1px solid #cdcdcd;
   box-shadow: 0 2px 1px rgba(0,0,0,0.1);
+}
+.edit-button.action-save:hover,
+.edit-button.action-save:active {
+  border: 1px solid #55a5d3;
+  box-shadow: 0 2px 1px rgba(0,0,0,0.2);
 }
