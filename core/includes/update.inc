@@ -360,6 +360,16 @@ function update_prepare_d8_bootstrap() {
       // Migrate each extension into configuration, varying by the extension's
       // status, and record its schema version.
       foreach ($result as $record) {
+        if (drupal_strlen($record->name) > 50) {
+          $requirements['module name too long ' . $record->name] = array(
+            'title' => 'Module name too long',
+            'value' => format_string('@name is @count characters long.', array('@name' => $record->name, '@count' => drupal_strlen($record->name))),
+            'description' => 'Module names longer than 50 characters are no longer supported.',
+            'severity' => REQUIREMENT_ERROR,
+          );
+          update_extra_requirements($requirements);
+        }
+
         if ($record->type == 'module') {
           if ($record->status && isset($module_data[$record->name])) {
             $module_config->set('enabled.' . $record->name, $record->weight);
