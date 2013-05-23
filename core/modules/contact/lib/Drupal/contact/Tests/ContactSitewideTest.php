@@ -57,7 +57,7 @@ class ContactSitewideTest extends WebTestBase {
     // Delete old categories to ensure that new categories are used.
     $this->deleteCategories();
     $this->drupalGet('admin/structure/contact');
-    $this->assertLinkByHref('admin/structure/contact/manage/personal');
+    $this->assertText('Personal', 'Personal category was not deleted');
     $this->assertNoLinkByHref('admin/structure/contact/manage/feedback');
 
     // Ensure that the contact form won't be shown without categories.

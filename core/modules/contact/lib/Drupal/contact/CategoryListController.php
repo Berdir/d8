@@ -60,9 +60,16 @@ class CategoryListController extends ConfigEntityListController {
    */
   public function buildRow(EntityInterface $entity) {
     $row['category'] = check_plain($entity->label());
-    $row['recipients'] = check_plain(implode(', ', $entity->recipients));
-    $default_category = config('contact.settings')->get('default_category');
-    $row['selected'] = ($default_category == $entity->id() ? t('Yes') : t('No'));
+    // Special case the personal category.
+    if ($entity->id() == 'personal') {
+      $row['recipients'] = t('Selected user');
+      $row['selected'] = t('No');
+    }
+    else {
+      $row['recipients'] = check_plain(implode(', ', $entity->recipients));
+      $default_category = config('contact.settings')->get('default_category');
+      $row['selected'] = ($default_category == $entity->id() ? t('Yes') : t('No'));
+    }
     $row['operations']['data'] = $this->buildOperations($entity);
     return $row;
   }
