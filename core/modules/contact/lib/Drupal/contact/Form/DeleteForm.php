@@ -9,6 +9,7 @@ namespace Drupal\contact\Form;
 
 use Drupal\Core\Form\ConfirmFormBase;
 use Drupal\contact\Plugin\Core\Entity\Category;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Builds the form to delete a contact category.
@@ -54,6 +55,10 @@ class DeleteForm extends ConfirmFormBase {
    * Overrides \Drupal\Core\Form\ConfirmFormBase::buildForm().
    */
   public function buildForm(array $form, array &$form_state, Category $contact_category = NULL) {
+    // The personal category can not be deleted.
+    if ($contact_category->id() == 'personal') {
+      throw new NotFoundHttpException();
+    }
     $this->contactCategory = $contact_category;
 
     return parent::buildForm($form, $form_state);

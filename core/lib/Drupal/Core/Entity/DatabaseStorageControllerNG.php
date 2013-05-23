@@ -102,9 +102,9 @@ class DatabaseStorageControllerNG extends DatabaseStorageController {
     $bundle = FALSE;
     if ($this->bundleKey) {
       if (!isset($values[$this->bundleKey])) {
-        //throw new EntityStorageException(t('Missing bundle for entity type @type', array('@type' => $this->entityType)));
+        throw new EntityStorageException(t('Missing bundle for entity type @type', array('@type' => $this->entityType)));
       }
-      $bundle = isset($values[$this->bundleKey]) ? $values[$this->bundleKey] : NULL;
+      $bundle = $values[$this->bundleKey];
     }
     $entity = new $this->entityClass(array(), $this->entityType, $bundle);
 

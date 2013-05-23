@@ -8,6 +8,7 @@
 namespace Drupal\contact;
 
 use Drupal\Core\Entity\EntityFormController;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Base form controller for category edit forms.
@@ -21,6 +22,12 @@ class CategoryFormController extends EntityFormController {
     $form = parent::form($form, $form_state);
 
     $category = $this->entity;
+
+    // The personal category can not be edited.
+    if ($category->id() == 'personal') {
+      throw new NotFoundHttpException();
+    }
+
     $default_category = config('contact.settings')->get('default_category');
 
     $form['label'] = array(

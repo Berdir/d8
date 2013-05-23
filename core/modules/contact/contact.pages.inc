@@ -45,6 +45,9 @@ function contact_site_page(Category $category = NULL) {
       }
     }
   }
+  else if ($category->id() == 'personal') {
+    throw new NotFoundHttpException();
+  }
   $message = entity_create('contact_message', array(
     'category' => $category->id(),
   ));
@@ -75,6 +78,7 @@ function contact_personal_page($recipient) {
   drupal_set_title(t('Contact @username', array('@username' => user_format_name($recipient))), PASS_THROUGH);
 
   $message = entity_create('contact_message', array(
+    'category' => 'personal',
     'recipient' => $recipient,
     'category' => 'personal',
   ));
