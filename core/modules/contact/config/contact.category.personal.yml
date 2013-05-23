@@ -3,8 +3,3 @@ label: 'Personal contact form'
 recipients: []
 reply: ''
 weight: '0'
-<<<<<<< HEAD
-=======
-langcode: en
-locked: '1'
->>>>>>> applied patch
