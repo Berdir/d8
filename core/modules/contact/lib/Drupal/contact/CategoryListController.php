@@ -18,13 +18,7 @@ class CategoryListController extends ConfigEntityListController {
    * Overrides Drupal\Core\Entity\EntityListController::getOperations().
    */
   public function getOperations(EntityInterface $entity) {
-    $operations = array();
-
-    // The personal category can not be edited or deleted.
-    if ($entity->id() != 'personal') {
-      $operations = parent::getOperations($entity);
-    }
-
+    $operations = parent::getOperations($entity);
     if (module_exists('field_ui')) {
       $uri = $entity->uri();
       $operations['manage-fields'] = array(

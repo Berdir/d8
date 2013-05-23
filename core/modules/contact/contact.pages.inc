@@ -78,7 +78,6 @@ function contact_personal_page($recipient) {
   drupal_set_title(t('Contact @username', array('@username' => user_format_name($recipient))), PASS_THROUGH);
 
   $message = entity_create('contact_message', array(
-    'category' => 'personal',
     'recipient' => $recipient,
     'category' => 'personal',
   ));
