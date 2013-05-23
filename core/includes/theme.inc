@@ -10,9 +10,10 @@
 
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\Config;
+use Drupal\Core\Extension\ExtensionNameLengthException;
 use Drupal\Core\Template\Attribute;
-use Drupal\Core\Utility\ThemeRegistry;
 use Drupal\Core\Theme\ThemeSettings;
+use Drupal\Core\Utility\ThemeRegistry;
 
 /**
  * @defgroup content_flags Content markers
@@ -1562,6 +1563,14 @@ function theme_enable($theme_list) {
   $theme_config = config('system.theme');
   $disabled_themes = config('system.theme.disabled');
   foreach ($theme_list as $key) {
+    // Throw an exception if the theme name is too long.
+    if (strlen($key) > DRUPAL_EXTENSION_NAME_MAX_LENGTH) {
+      throw new ExtensionNameLengthException(format_string('Theme name %name is over the maximum allowed length of @max characters.', array(
+        '%name' => $key,
+        '@max' => DRUPAL_EXTENSION_NAME_MAX_LENGTH,
+      )));
+    }
+
     // The value is not used; the weight is ignored for themes currently.
     $theme_config->set("enabled.$key", 0);
     $disabled_themes->clear($key);

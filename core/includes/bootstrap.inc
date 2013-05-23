@@ -188,6 +188,11 @@ const DRUPAL_AUTHENTICATED_RID = 'authenticated';
 const DRUPAL_KILOBYTE = 1024;
 
 /**
+ * The maximum number of characters in a module or theme name.
+ */
+const DRUPAL_EXTENSION_NAME_MAX_LENGTH = 50;
+
+/**
  * Special system language code (only applicable to UI language).
  *
  * Refers to the language used in Drupal and module/theme source code. Drupal

@@ -8,6 +8,7 @@
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Extension\ExtensionNameLengthException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Yaml\Parser;
 
@@ -259,6 +260,13 @@ function module_enable($module_list, $enable_dependencies = TRUE) {
         // Skip already enabled modules.
         unset($module_list[$module]);
         continue;
+      }
+      // Throw an exception if the module name is too long.
+      if (strlen($module) > DRUPAL_EXTENSION_NAME_MAX_LENGTH) {
+        throw new ExtensionNameLengthException(format_string('Module name %name is over the maximum allowed length of @max characters.', array(
+          '%name' => $module,
+          '@max' => DRUPAL_EXTENSION_NAME_MAX_LENGTH,
+        )));
       }
       $module_list[$module] = $module_data[$module]->sort;
 
