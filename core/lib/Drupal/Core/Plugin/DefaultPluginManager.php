@@ -15,12 +15,13 @@ use Drupal\Component\Plugin\Factory\DefaultFactory;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Language\LanguageManager;
 use Drupal\Core\Plugin\Discovery\AnnotatedClassDiscovery;
 
 /**
  * Base class for plugin managers.
  */
-class DefaultPluginManager extends PluginManagerBase implements PluginManagerInterface, CachedDiscoveryInterface {
+abstract class DefaultPluginManager extends PluginManagerBase implements PluginManagerInterface, CachedDiscoveryInterface {
 
   /**
    * Cached definitions array.
@@ -67,16 +68,19 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
   /**
    * The module handler to invoke the alter hook.
    *
-   * @var \Drupal\Core\Extension\ModuleHandler
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
-   * Constructs a \Drupal\Core\Plugin\DrupalPluginManagerBase object.
+   * The language manager.
    *
-   * Provides a Drupal ready plugin manager base class that implements caching
-   * appropriately and simplifies developer experience for creating new plugin
-   * managers.
+   * @var \Drupal\Core\Language\LanguageManager
+   */
+  protected $languageManager;
+
+  /**
+   * Creates the discovery object.
    *
    * @param string $subdir
    *   The plugin's subdirectory, for example views/filter.
@@ -90,11 +94,10 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
    *   (optional) The name of the annotation that contains the plugin definition.
    *   Defaults to 'Drupal\Component\Annotation\Plugin'.
    */
-  function __construct($subdir, \Traversable $namespaces, $annotation_namespaces = array(), $plugin_definition_annotation_name = 'Drupal\Component\Annotation\Plugin') {
+  public function __construct($subdir, \Traversable $namespaces, $annotation_namespaces = array(), $plugin_definition_annotation_name = 'Drupal\Component\Annotation\Plugin') {
     $this->subdir = $subdir;
     $this->discovery = new AnnotatedClassDiscovery($subdir, $namespaces, $annotation_namespaces, $plugin_definition_annotation_name);
     $this->discovery = new DerivativeDiscoveryDecorator($this->discovery);
-
     $this->factory = new DefaultFactory($this);
   }
 
@@ -105,26 +108,16 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
    *
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache
    *   Cache backend instance to use.
+   * @param \Drupal\Core\Language\LanguageManager
+   *   The language manager.
    * @param type $cache_key_prefix
    *   Cache key prefix to use, the language code will be appended automatically.
    */
-  public function setCache(CacheBackendInterface $cache, $cache_key_prefix) {
+  public function setCache(CacheBackendInterface $cache, LanguageManager $language_manager, $cache_key_prefix) {
+    $this->languageManager = $language_manager;
     $this->cache = $cache;
     $this->cacheKeyPrefix = $cache_key_prefix;
-    $this->cacheKey = $cache_key_prefix . ':' . language(LANGUAGE_TYPE_INTERFACE)->langcode;
-  }
-
-  /**
-   * Set the alter hook name that should be used if needed.
-   *
-   * @param \Drupal\Core\Extension\ModuleHandler $module_handler
-   *   The module handler to invoke the alter hook with.
-   * @param string $alter_hook
-   *   (optional) Name of the alter hook. Defaults to $owner_$type if not given.
-   */
-  public function setAlterHook(ModuleHandlerInterface $module_handler, $alter_hook = NULL) {
-    $this->moduleHandler = $module_handler;
-    $this->alterHook = $alter_hook ? $alter_hook : strtolower($this->subdir);
+    $this->cacheKey = $cache_key_prefix . ':' . $language_manager->getLanguage(LANGUAGE_TYPE_INTERFACE)->langcode;
   }
 
   /**
@@ -147,13 +140,7 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
   public function getDefinitions() {
     $definitions = $this->getCachedDefinitions();
     if (!isset($definitions)) {
-      $definitions = $this->discovery->getDefinitions();
-      foreach ($definitions as $plugin_id => &$definition) {
-        $this->processDefinition($definition, $plugin_id);
-      }
-      if ($this->alterHook) {
-        $this->moduleHandler->alter($this->alterHook, $definitions);
-      }
+      $definitions = $this->findDefinitions();
       $this->setCachedDefinitions($definitions);
     }
     return $definitions;
@@ -165,6 +152,7 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
   public function clearCachedDefinitions() {
     if ($this->cache) {
       $cache_keys = array();
+      // @todo: Use $this->languageManager->languageList() after http://drupal.org/node/1862202 is in.
       foreach (language_list() as $langcode => $language) {
         $cache_keys[] = $this->cacheKeyPrefix . ':' .$langcode;
       }
@@ -200,6 +188,22 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
       $this->cache->set($this->cacheKey, $definitions);
     }
     $this->definitions = $definitions;
+  }
+
+  /**
+   * Finds plugin definitions.
+   *
+   * @return array
+   */
+  protected function findDefinitions() {
+    $definitions = $this->discovery->getDefinitions();
+    foreach ($definitions as $plugin_id => &$definition) {
+      $this->processDefinition($definition, $plugin_id);
+    }
+    if ($this->alterHook) {
+      $this->moduleHandler->alter($this->alterHook, $definitions);
+    }
+    return $definitions;
   }
 
 }

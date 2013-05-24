@@ -1,5 +1,7 @@
 <?php
 
+use Drupal\Component\Utility\String;
+
 // Register the namespaces we'll need to autoload from.
 $loader = require __DIR__ . "/../vendor/autoload.php";
 $loader->add('Drupal\\', __DIR__);
@@ -25,3 +27,17 @@ define('REQUEST_TIME', (int) $_SERVER['REQUEST_TIME']);
 // numbers handling.
 // @see drupal_environment_initialize()
 setlocale(LC_ALL, 'C');
+
+/**
+ * Test replacement for the t() function.
+ *
+ * @param $string
+ *   The string to translate.
+ * @param array $arguments
+ *   Array of replacements.
+ * @param array $context
+ *   Translation context, unused.
+ */
+function t($string, array $args = array(), array $context = array()) {
+  return String::format($string, $args);
+}
