@@ -52,8 +52,6 @@ class DefaultPluginManagerTest extends UnitTestCase {
   }
 
   function setUp() {
-    parent::setUp();
-
     $this->expectedDefinitions = array(
       'apple' => array(
         'id' => 'apple',
@@ -72,7 +70,7 @@ class DefaultPluginManagerTest extends UnitTestCase {
       ),
     );
 
-    $this->namespaces = $namespaces = new \ArrayObject(array('Drupal\plugin_test' => DRUPAL_ROOT . '/core/modules/system/tests/modules/plugin_test/lib'));
+    $this->namespaces = new \ArrayObject(array('Drupal\plugin_test' => DRUPAL_ROOT . '/core/modules/system/tests/modules/plugin_test/lib'));
   }
 
   /**
