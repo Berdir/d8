@@ -7,6 +7,9 @@
 namespace Drupal\Core\Archiver;
 
 use Drupal\Component\Plugin\Factory\DefaultFactory;
+use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Language\LanguageManager;
 use Drupal\Core\Plugin\DefaultPluginManager;
 
 /**
@@ -27,7 +30,7 @@ class ArchiverManager extends DefaultPluginManager {
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler to invoke the alter hook with.
    */
-  public function __construct(\Traversable $namespaces, CacheBackendInterfac $cache, LanguageManager $language_manager, ModuleHandler $module_handler) {
+  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache, LanguageManager $language_manager, ModuleHandlerInterface $module_handler) {
     parent::__construct('Archiver', $namespaces);
     $this->discovery = new StaticDiscoveryDecorator($this->discovery, array($this, 'registerDefinitions'));
     $this->alterHook = 'archiver_info';
