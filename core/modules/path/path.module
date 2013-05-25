@@ -253,7 +253,7 @@ function path_entity_field_info($entity_type) {
 function path_entity_insert(EntityInterface $entity) {
   if ($entity->getPropertyDefinition('path')) {
     $ng_entity = $entity->getNGEntity();
-    $ng_entity->path->alias = trim($entity->path->alias);
+    $ng_entity->path->alias = trim($ng_entity->path->alias);
     // Only save a non-empty alias.
     if (!empty($ng_entity->path->alias)) {
       // Ensure fields for programmatic executions.
@@ -272,16 +272,16 @@ function path_entity_update(EntityInterface $entity) {
     $ng_entity = $entity->getNGEntity();
     $ng_entity->path->alias = trim($ng_entity->path->alias);
     // Delete old alias if user erased it.
-    if (!empty($ng_entity->path->pid) && empty($ng_entity->path->alias)) {
+    if ($ng_entity->path->pid && !$ng_entity->path->alias) {
       Drupal::service('path.crud')->delete(array('pid' => $ng_entity->path->pid));
     }
     // Only save a non-empty alias.
     if ($ng_entity->path->alias) {
-      $pid = (!empty($ng_entity->path->pid) ? $ng_entity->path->pid  : NULL);
+      $pid = $ng_entity->path->pid;
       // Ensure fields for programmatic executions.
       $uri = $ng_entity->uri();
       $langcode = $ng_entity->language()->langcode;
-      Drupal::service('path.crud')->save($uri['path'], $ng_entity->path->alias, $langcode);
+      Drupal::service('path.crud')->save($uri['path'], $ng_entity->path->alias, $langcode, $pid);
     }
   }
 }
