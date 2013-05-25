@@ -182,51 +182,6 @@ function path_form_element_validate($element, &$form_state, $complete_form) {
 }
 
 /**
- * Implements hook_node_insert().
- */
-function path_node_insert(EntityInterface $node) {
-  if (isset($node->path)) {
-    $alias = trim($node->path['alias']);
-    // Only save a non-empty alias.
-    if (!empty($alias)) {
-      // Ensure fields for programmatic executions.
-      $source = 'node/' . $node->nid;
-      $langcode = isset($node->langcode) ? $node->langcode : Language::LANGCODE_NOT_SPECIFIED;
-      Drupal::service('path.crud')->save($source, $alias, $langcode);
-    }
-  }
-}
-
-/**
- * Implements hook_node_update().
- */
-function path_node_update(EntityInterface $node) {
-  if (isset($node->path)) {
-    $path = $node->path;
-    $alias = trim($path['alias']);
-    // Delete old alias if user erased it.
-    if (!empty($path['pid']) && empty($path['alias'])) {
-      Drupal::service('path.crud')->delete(array('pid' => $path['pid']));
-    }
-    // Only save a non-empty alias.
-    if (!empty($path['alias'])) {
-      // Ensure fields for programmatic executions.
-      $source = 'node/' . $node->nid;
-      $langcode = isset($node->langcode) ? $node->langcode : Language::LANGCODE_NOT_SPECIFIED;
-      Drupal::service('path.crud')->save($source, $alias, $langcode, $path['pid']);
-    }
-  }
-}
-
-/**
- * Implements hook_node_predelete().
- */
-function path_node_predelete(EntityInterface $node) {
-  // Delete all aliases associated with this node.
-  Drupal::service('path.crud')->delete(array('source' => 'node/' . $node->nid));
-}
-
-/**
  * Implements hook_form_FORM_ID_alter() for taxonomy_term_form().
  */
 function path_form_taxonomy_term_form_alter(&$form, $form_state) {
@@ -279,7 +234,7 @@ function path_data_type_info() {
  * Implements hook_entity_field_info().
  */
 function path_entity_field_info($entity_type) {
-  if ($entity_type === 'taxonomy_term') {
+  if ($entity_type === 'taxonomy_term' || $entity_type === 'node') {
     $info['definitions']['path'] = array(
       'type' => 'path_field',
       'label' => t('The path alias'),
@@ -291,48 +246,53 @@ function path_entity_field_info($entity_type) {
 }
 
 /**
- * Implements hook_taxonomy_term_insert().
+ * Implements hook_entity_insert().
+ *
+ * @todo: Move this to methods on the FieldItem class.
  */
-function path_taxonomy_term_insert(Term $term) {
-  if (isset($term->path)) {
-    $term->path->alias = trim($term->path->alias);
+function path_entity_insert(EntityInterface $entity) {
+  if (isset($entity->path)) {
+    $ng_entity = $entity->getNGEntity();
+    $ng_entity->path->alias = trim($entity->path->alias);
     // Only save a non-empty alias.
-    if (!empty($term->path->alias)) {
+    if (!empty($ng_entity->path->alias)) {
       // Ensure fields for programmatic executions.
-      $source = 'taxonomy/term/' . $term->id();
-      $langcode = Language::LANGCODE_NOT_SPECIFIED;
-      Drupal::service('path.crud')->save($source, $term->path->alias, $langcode);
+      $uri = $ng_entity->uri();
+      $langcode = $ng_entity->language()->langcode;
+      Drupal::service('path.crud')->save($uri['path'], $ng_entity->path->alias, $langcode);
     }
   }
 }
 
 /**
- * Implements hook_taxonomy_term_update().
+ * Implements hook_entity_update().
  */
-function path_taxonomy_term_update(Term $term) {
-  if (isset($term->path)) {
-    $term->path->alias = trim($term->path->alias);
+function path_entity_update(EntityInterface $entity) {
+  if (isset($entity->path)) {
+    $ng_entity = $entity->getNGEntity();
+    $ng_entity->path->alias = trim($ng_entity->path->alias);
     // Delete old alias if user erased it.
-    if (!empty($term->path->pid) && empty($term->path->alias)) {
-      Drupal::service('path.crud')->delete(array('pid' => $term->path->pid));
+    if (!empty($ng_entity->path->pid) && empty($ng_entity->path->alias)) {
+      Drupal::service('path.crud')->delete(array('pid' => $ng_entity->path->pid));
     }
     // Only save a non-empty alias.
-    if ($term->path->alias) {
-      $pid = (!empty($term->path->pid) ? $term->path->pid  : NULL);
+    if ($ng_entity->path->alias) {
+      $pid = (!empty($ng_entity->path->pid) ? $ng_entity->path->pid  : NULL);
       // Ensure fields for programmatic executions.
-      $source = 'taxonomy/term/' . $term->id();
-      $langcode = Language::LANGCODE_NOT_SPECIFIED;
-      Drupal::service('path.crud')->save($source, $term->path->alias, $langcode, $pid);
+      $uri = $ng_entity->uri();
+      $langcode = $ng_entity->language()->langcode;
+      Drupal::service('path.crud')->save($uri['path'], $ng_entity->path->alias, $langcode);
     }
   }
 }
 
 /**
- * Implements hook_taxonomy_term_delete().
+ * Implements hook_entity_predelete().
  */
-function path_taxonomy_term_delete(Term $term) {
+function path_entity_predelete(EntityInterface $entity) {
   // Delete all aliases associated with this term.
-  Drupal::service('path.crud')->delete(array('source' => 'taxonomy/term/' . $term->id()));
+  $uri = $entity->uri();
+  Drupal::service('path.crud')->delete(array('source' => $uri['path']));
 }
 
 /**
