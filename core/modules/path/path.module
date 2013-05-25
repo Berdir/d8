@@ -251,7 +251,7 @@ function path_entity_field_info($entity_type) {
  * @todo: Move this to methods on the FieldItem class.
  */
 function path_entity_insert(EntityInterface $entity) {
-  if (isset($entity->path)) {
+  if ($entity->getPropertyDefinition('path')) {
     $ng_entity = $entity->getNGEntity();
     $ng_entity->path->alias = trim($entity->path->alias);
     // Only save a non-empty alias.
@@ -268,7 +268,7 @@ function path_entity_insert(EntityInterface $entity) {
  * Implements hook_entity_update().
  */
 function path_entity_update(EntityInterface $entity) {
-  if (isset($entity->path)) {
+  if ($entity->getPropertyDefinition('path')) {
     $ng_entity = $entity->getNGEntity();
     $ng_entity->path->alias = trim($ng_entity->path->alias);
     // Delete old alias if user erased it.
@@ -290,9 +290,11 @@ function path_entity_update(EntityInterface $entity) {
  * Implements hook_entity_predelete().
  */
 function path_entity_predelete(EntityInterface $entity) {
-  // Delete all aliases associated with this term.
-  $uri = $entity->uri();
-  Drupal::service('path.crud')->delete(array('source' => $uri['path']));
+  if ($entity->getPropertyDefinition('path')) {
+    // Delete all aliases associated with this term.
+    $uri = $entity->uri();
+    Drupal::service('path.crud')->delete(array('source' => $uri['path']));
+  }
 }
 
 /**
