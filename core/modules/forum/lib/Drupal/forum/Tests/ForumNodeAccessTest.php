@@ -36,7 +36,7 @@ class ForumNodeAccessTest extends WebTestBase {
   function setUp() {
     parent::setUp();
     node_access_rebuild();
-    state()->set('node_access_test.private', TRUE);
+    \Drupal::state()->set('node_access_test.private', TRUE);
   }
 
   /**

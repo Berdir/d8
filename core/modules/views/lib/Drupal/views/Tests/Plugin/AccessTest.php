@@ -101,8 +101,8 @@ class AccessTest extends PluginTestBase {
     $view->setDisplay();
     $argument1 = $this->randomName();
     $argument2 = $this->randomName();
-    state()->set('test_dynamic_access_argument1', $argument1);
-    state()->set('test_dynamic_access_argument2', $argument2);
+    \Drupal::state()->set('test_dynamic_access_argument1', $argument1);
+    \Drupal::state()->set('test_dynamic_access_argument2', $argument2);
 
     $access_plugin = $view->display_handler->getPlugin('access');
 

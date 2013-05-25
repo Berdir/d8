@@ -43,7 +43,7 @@ class OpenIDRegistrationTest extends OpenIDTestBase {
       ->save();
 
     // Tell openid_test.module to respond with these SREG fields.
-    state()->set('openid_test.response', array(
+    \Drupal::state()->set('openid_test.response', array(
       'openid.sreg.nickname' => 'john',
       'openid.sreg.email' => 'john@example.com',
       'openid.sreg.language' => 'pt-BR',
@@ -102,7 +102,7 @@ class OpenIDRegistrationTest extends OpenIDTestBase {
       ->save();
 
     // Tell openid_test.module to respond with these SREG fields.
-    state()->set('openid_test.response', array(
+    \Drupal::state()->set('openid_test.response', array(
       'openid.sreg.nickname' => 'john',
       'openid.sreg.email' => 'john@example.com',
       'openid.sreg.language' => 'pt-BR',
@@ -145,7 +145,7 @@ class OpenIDRegistrationTest extends OpenIDTestBase {
 
     // Tell openid_test.module to respond with these SREG fields.
     $web_user = $this->drupalCreateUser(array());
-    state()->set('openid_test.response', array(
+    \Drupal::state()->set('openid_test.response', array(
       'openid.sreg.nickname' => $web_user->name,
       'openid.sreg.email' => 'mail@invalid#',
       'openid.sreg.timezone' => 'Foo/Bar',
@@ -159,11 +159,11 @@ class OpenIDRegistrationTest extends OpenIDTestBase {
     $this->assertRaw(t('Account registration using the information provided by your OpenID provider failed due to the reasons listed below. Complete the registration by filling out the form below. If you already have an account, you can <a href="@login">log in</a> now and add your OpenID under "My account".', array('@login' => url('user/login'))), 'User was asked to complete the registration process manually.');
     $this->assertRaw(t('The name %name is already taken.', array('%name' => $web_user->name)), 'Form validation error for username was displayed.');
     $this->assertRaw(t('The e-mail address %mail is not valid.', array('%mail' => 'mail@invalid#')), 'Form validation error for e-mail address was displayed.');
-    $this->assertTrue(state()->get('openid_test.hook_openid_response_response'), 'hook_openid_response() was invoked.');
-    $this->assertFalse(state()->get('openid_test.hook_openid_response_account'), 'No user object passed to hook_openid_response().');
+    $this->assertTrue(\Drupal::state()->get('openid_test.hook_openid_response_response'), 'hook_openid_response() was invoked.');
+    $this->assertFalse(\Drupal::state()->get('openid_test.hook_openid_response_account'), 'No user object passed to hook_openid_response().');
 
     // Enter username and e-mail address manually.
-    state()->delete('openid_test.hook_openid_response_response');
+    \Drupal::state()->delete('openid_test.hook_openid_response_response');
     $edit = array('name' => 'john', 'mail' => 'john@example.com');
     $this->drupalPost(NULL, $edit, t('Create new account'));
     $this->assertRaw(t('Once you have verified your e-mail address, you may log in via OpenID.'), 'User was asked to verify e-mail address.');
@@ -176,7 +176,7 @@ class OpenIDRegistrationTest extends OpenIDTestBase {
     // Follow the one-time login that was sent in the welcome e-mail.
     $this->drupalGet($reset_url);
     $this->drupalPost(NULL, array(), t('Log in'));
-    $this->assertFalse(state()->get('openid_test.hook_openid_response_response'), 'hook_openid_response() was not invoked.');
+    $this->assertFalse(\Drupal::state()->get('openid_test.hook_openid_response_response'), 'hook_openid_response() was not invoked.');
 
     // The user is taken to user/%uid/edit.
     $this->assertFieldByName('mail', 'john@example.com', 'User was registered with right e-mail address.');
@@ -233,7 +233,7 @@ class OpenIDRegistrationTest extends OpenIDTestBase {
       ->save();
 
     // Tell openid_test.module to respond with these AX fields.
-    state()->set('openid_test.response', array(
+    \Drupal::state()->set('openid_test.response', array(
       'openid.ns.ext123' => 'http://openid.net/srv/ax/1.0',
       'openid.ext123.type.mail456' => 'http://axschema.org/contact/email',
       'openid.ext123.value.mail456' => 'john@example.com',

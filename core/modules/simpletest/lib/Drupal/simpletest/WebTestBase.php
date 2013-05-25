@@ -1595,7 +1595,7 @@ abstract class WebTestBase extends TestBase {
    * Runs cron in the Drupal installed by Simpletest.
    */
   protected function cronRun() {
-    $this->drupalGet('cron/' . state()->get('system.cron_key'));
+    $this->drupalGet('cron/' . \Drupal::state()->get('system.cron_key'));
   }
 
   /**
@@ -2168,7 +2168,7 @@ abstract class WebTestBase extends TestBase {
    *   An array containing e-mail messages captured during the current test.
    */
   protected function drupalGetMails($filter = array()) {
-    $captured_emails = state()->get('system.test_email_collector') ?: array();
+    $captured_emails = \Drupal::state()->get('system.test_email_collector') ?: array();
     $filtered_emails = array();
 
     foreach ($captured_emails as $message) {
@@ -3137,7 +3137,7 @@ abstract class WebTestBase extends TestBase {
    *   TRUE on pass, FALSE on fail.
    */
   protected function assertMail($name, $value = '', $message = '', $group = 'E-mail') {
-    $captured_emails = state()->get('system.test_email_collector') ?: array();
+    $captured_emails = \Drupal::state()->get('system.test_email_collector') ?: array();
     $email = end($captured_emails);
     return $this->assertTrue($email && isset($email[$name]) && $email[$name] == $value, $message, $group);
   }
