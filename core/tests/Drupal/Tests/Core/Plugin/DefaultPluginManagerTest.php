@@ -51,7 +51,7 @@ class DefaultPluginManagerTest extends UnitTestCase {
     );
   }
 
-  function setUp() {
+  public function setUp() {
     $this->expectedDefinitions = array(
       'apple' => array(
         'id' => 'apple',
@@ -76,15 +76,16 @@ class DefaultPluginManagerTest extends UnitTestCase {
   /**
    * Tests the plugin manager with no cache and altering.
    */
-  function testDefaultPluginManager() {
+  public function testDefaultPluginManager() {
     $plugin_manager = new TestPluginManager($this->namespaces, $this->expectedDefinitions);
     $this->assertEquals($this->expectedDefinitions, $plugin_manager->getDefinitions());
+    $this->assertEquals($this->expectedDefinitions['banana'], $plugin_manager->getDefinition('banana'));
   }
 
   /**
    * Tests the plugin manager with no cache and altering.
    */
-  function testDefaultPluginManagerWithAlter() {
+  public function testDefaultPluginManagerWithAlter() {
     $module_handler = $this->getMock('Drupal\Core\Extension\ModuleHandler');
 
     // Configure the stub.
@@ -97,12 +98,13 @@ class DefaultPluginManagerTest extends UnitTestCase {
     $plugin_manager->setAlterHook($module_handler, $alter_hook_name);
 
     $this->assertEquals($this->expectedDefinitions, $plugin_manager->getDefinitions());
+    $this->assertEquals($this->expectedDefinitions['banana'], $plugin_manager->getDefinition('banana'));
   }
 
   /**
    * Tests the plugin manager with caching and altering.
    */
-  function testDefaultPluginManagerWithEmptyCache() {
+  public function testDefaultPluginManagerWithEmptyCache() {
     $cid = $this->randomName();
     $cache_backend = $this->getMockBuilder('Drupal\Core\Cache\MemoryBackend')
       ->disableOriginalConstructor()
@@ -128,12 +130,13 @@ class DefaultPluginManagerTest extends UnitTestCase {
     $plugin_manager->setCache($cache_backend, $language_manager, $cid);
 
     $this->assertEquals($this->expectedDefinitions, $plugin_manager->getDefinitions());
+    $this->assertEquals($this->expectedDefinitions['banana'], $plugin_manager->getDefinition('banana'));
   }
 
   /**
    * Tests the plugin manager with caching and altering.
    */
-  function testDefaultPluginManagerWithFilledCache() {
+  public function testDefaultPluginManagerWithFilledCache() {
     $cid = $this->randomName();
     $cache_backend = $this->getMockBuilder('Drupal\Core\Cache\MemoryBackend')
       ->disableOriginalConstructor()

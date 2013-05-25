@@ -1,7 +1,5 @@
 <?php
 
-use Drupal\Component\Utility\String;
-
 // Register the namespaces we'll need to autoload from.
 $loader = require __DIR__ . "/../vendor/autoload.php";
 $loader->add('Drupal\\', __DIR__);

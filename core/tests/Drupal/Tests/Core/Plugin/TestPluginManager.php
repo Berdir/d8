@@ -42,11 +42,11 @@ class TestPluginManager extends DefaultPluginManager {
    * @param \Drupal\Core\Extension\ModuleHandler $module_handler
    *   The module handler to invoke the alter hook with.
    * @param string $alter_hook
-   *   (optional) Name of the alter hook. Defaults to $owner_$type if not given.
+   *   Name of the alter hook. Defaults to $owner_$type if not given.
    */
-  public function setAlterHook(ModuleHandlerInterface $module_handler, $alter_hook = NULL) {
+  public function setAlterHook(ModuleHandlerInterface $module_handler, $alter_hook) {
     $this->moduleHandler = $module_handler;
-    $this->alterHook = $alter_hook ? $alter_hook : strtolower($this->subdir);
+    $this->alterHook = $alter_hook;
   }
 
 }
