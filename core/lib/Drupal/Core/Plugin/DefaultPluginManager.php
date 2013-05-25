@@ -16,6 +16,7 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageManager;
+use Drupal\Core\Language\Language;
 use Drupal\Core\Plugin\Discovery\AnnotatedClassDiscovery;
 
 /**
@@ -117,7 +118,7 @@ abstract class DefaultPluginManager extends PluginManagerBase implements PluginM
     $this->languageManager = $language_manager;
     $this->cache = $cache;
     $this->cacheKeyPrefix = $cache_key_prefix;
-    $this->cacheKey = $cache_key_prefix . ':' . $language_manager->getLanguage(LANGUAGE_TYPE_INTERFACE)->langcode;
+    $this->cacheKey = $cache_key_prefix . ':' . $language_manager->getLanguage(Language::TYPE_INTERFACE)->langcode;
   }
 
   /**

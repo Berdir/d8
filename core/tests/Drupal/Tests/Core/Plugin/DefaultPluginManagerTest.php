@@ -8,19 +8,7 @@
 namespace Drupal\Tests\Core\Plugin;
 
 use Drupal\Core\Language\Language;
-use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Tests\UnitTestCase;
-
-// @todo Remove once http://drupal.org/node/1620010 is committed.
-if (!defined('LANGUAGE_TYPE_INTERFACE')) {
-  define('LANGUAGE_TYPE_INTERFACE', 'language_interface');
-}
-if (!defined('LANGUAGE_LTR')) {
-  define('LANGUAGE_LTR', 0);
-}
-if (!defined('LANGUAGE_RTL')) {
-  define('LANGUAGE_RTL', 1);
-}
 
 /**
  * Tests the DefaultPluginManager.
@@ -123,7 +111,7 @@ class DefaultPluginManagerTest extends UnitTestCase {
     $language_manager = $this->getMock('Drupal\Core\Language\LanguageManager');
     $language_manager->expects($this->once())
       ->method('getLanguage')
-      ->with(LANGUAGE_TYPE_INTERFACE)
+      ->with(Language::TYPE_INTERFACE)
       ->will($this->returnValue($language));
 
     $plugin_manager = new TestPluginManager($this->namespaces, $this->expectedDefinitions);
@@ -154,7 +142,7 @@ class DefaultPluginManagerTest extends UnitTestCase {
     $language_manager = $this->getMock('Drupal\Core\Language\LanguageManager');
     $language_manager->expects($this->once())
       ->method('getLanguage')
-      ->with(LANGUAGE_TYPE_INTERFACE)
+      ->with(Language::TYPE_INTERFACE)
       ->will($this->returnValue($language));
 
     $plugin_manager = new TestPluginManager($this->namespaces, $this->expectedDefinitions);
