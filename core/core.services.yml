@@ -153,10 +153,7 @@ services:
     arguments: ['@container.namespaces', '@service_container']
   plugin.manager.archiver:
     class: Drupal\Core\Archiver\ArchiverManager
-    arguments: ['@container.namespaces']
-    calls:
-      - [setAlterHook, ['@module_handler', 'archiver_info']]
-      - [setCache, ['@cache.cache', 'archiver_info']]
+    arguments: ['@container.namespaces', '@cache.cache', '@language_manager', '@module_handler']
   request:
     class: Symfony\Component\HttpFoundation\Request
   event_dispatcher:
@@ -181,10 +178,7 @@ services:
       - [setValidationConstraintManager, ['@validation.constraint']]
   validation.constraint:
     class: Drupal\Core\Validation\ConstraintManager
-    arguments: ['@container.namespaces']
-    calls:
-      - [setAlterHook, ['@module_handler', 'validation_constraint']]
-      - [setCache, ['@cache.cache', 'validation_constraint']]
+    arguments: ['@container.namespaces', '@cache.cache', '@language_manager', '@module_handler']
   lock:
     class: Drupal\Core\Lock\DatabaseLockBackend
   user.tempstore:
@@ -409,10 +403,7 @@ services:
     arguments: ['@database', '@request']
   plugin.manager.condition:
     class: Drupal\Core\Condition\ConditionManager
-    arguments: ['@container.namespaces']
-    calls:
-      - [setAlterHook, ['@module_handler', 'condition_info']]
-      - [setCache, ['@cache.cache', 'condition']]
+    arguments: ['@container.namespaces', '@cache.cache', '@language_manager', '@module_handler']
   kernel_destruct_subscriber:
     class: Drupal\Core\EventSubscriber\KernelDestructionSubscriber
     tags:
@@ -425,9 +416,7 @@ services:
       - { name: event_subscriber }
   image.toolkit.manager:
     class: Drupal\system\Plugin\ImageToolkitManager
-    arguments: ['@container.namespaces']
-    calls:
-      - [setCache, ['@cache.cache', 'image_toolkit']]
+    arguments: ['@container.namespaces', '@cache.cache', '@language_manager']
   image.toolkit:
     class: Drupal\system\Plugin\ImageToolkitInterface
     factory_method: getDefaultToolkit

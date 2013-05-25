@@ -8,7 +8,9 @@
 namespace Drupal\Core\Validation;
 
 use Drupal\Component\Plugin\Discovery\StaticDiscoveryDecorator;
-use Drupal\Component\Plugin\Discovery\DerivativeDiscoveryDecorator;
+use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Extension\ModuleHandler;
+use Drupal\Core\Language\LanguageManager;
 use Drupal\Core\Plugin\DefaultPluginManager;
 
 /**
@@ -37,11 +39,19 @@ class ConstraintManager extends DefaultPluginManager {
    * @param \Traversable $namespaces
    *   An object that implements \Traversable which contains the root paths
    *   keyed by the corresponding namespace to look for plugin implementations,
+   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
+   *   Cache backend instance to use.
+   * @param \Drupal\Core\Language\LanguageManager
+   *   The language manager.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   *   The module handler to invoke the alter hook with.
    */
-  public function __construct(\Traversable $namespaces) {
+  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache, LanguageManager $language_manager, ModuleHandler $module_handler) {
     parent::__construct('Validation/Constraint', $namespaces);
     $this->discovery = new StaticDiscoveryDecorator($this->discovery, array($this, 'registerDefinitions'));
-    $this->discovery = new DerivativeDiscoveryDecorator($this->discovery);
+    $this->alterHook = 'validation_constraint';
+    $this->moduleHandler = $module_handler;
+    $this->setCache($cache, $language_manager, 'validation_constraint');
   }
 
   /**

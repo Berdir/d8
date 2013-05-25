@@ -194,6 +194,7 @@ abstract class DefaultPluginManager extends PluginManagerBase implements PluginM
    * Finds plugin definitions.
    *
    * @return array
+   *   List of definitions to store in cache.
    */
   protected function findDefinitions() {
     $definitions = $this->discovery->getDefinitions();

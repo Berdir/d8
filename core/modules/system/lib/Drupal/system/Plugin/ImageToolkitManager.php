@@ -7,6 +7,8 @@
 
 namespace Drupal\system\Plugin;
 
+use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Language\LanguageManager;
 use Drupal\Core\Plugin\DefaultPluginManager;
 
 /**
@@ -20,9 +22,12 @@ class ImageToolkitManager extends DefaultPluginManager {
    * @param \Traversable $namespaces
    *   An object that implements \Traversable which contains the root paths
    *   keyed by the corresponding namespace to look for plugin implementations,
+   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
+   *   Cache backend instance to use.
    */
-  public function __construct(\Traversable $namespaces) {
+  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache, LanguageManager $language_manager) {
     parent::__construct('ImageToolkit', $namespaces);
+    $this->setCache($cache, $language_manager, 'image_toolkit');
   }
 
   /**

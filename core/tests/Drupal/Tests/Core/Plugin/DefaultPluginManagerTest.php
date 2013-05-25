@@ -70,18 +70,6 @@ class DefaultPluginManagerTest extends UnitTestCase {
         ),
         'class' => 'Drupal\plugin_test\Plugin\plugin_test\fruit\Banana',
       ),
-      'cherry' => array(
-        'id' => 'cherry',
-        'label' => 'Cherry',
-        'color' => 'red',
-        'class' => 'Drupal\plugin_test\Plugin\plugin_test\fruit\Cherry',
-      ),
-      'orange' => array(
-        'id' => 'orange',
-        'label' => 'Orange',
-        'color' => 'orange',
-        'class' => 'Drupal\plugin_test\Plugin\plugin_test\fruit\Orange',
-      ),
     );
 
     $this->namespaces = $namespaces = new \ArrayObject(array('Drupal\plugin_test' => DRUPAL_ROOT . '/core/modules/system/tests/modules/plugin_test/lib'));
@@ -91,7 +79,7 @@ class DefaultPluginManagerTest extends UnitTestCase {
    * Tests the plugin manager with no cache and altering.
    */
   function testDefaultPluginManager() {
-    $plugin_manager = new TestDefaultPluginManager($this->namespaces);
+    $plugin_manager = new TestPluginManager($this->namespaces, $this->expectedDefinitions);
     $this->assertEquals($this->expectedDefinitions, $plugin_manager->getDefinitions());
   }
 
@@ -107,7 +95,7 @@ class DefaultPluginManagerTest extends UnitTestCase {
       ->method('alter')
       ->with($this->equalTo($alter_hook_name), $this->equalTo($this->expectedDefinitions));
 
-    $plugin_manager = new TestDefaultPluginManager($this->namespaces);
+    $plugin_manager = new TestPluginManager($this->namespaces, $this->expectedDefinitions);
     $plugin_manager->setAlterHook($module_handler, $alter_hook_name);
 
     $this->assertEquals($this->expectedDefinitions, $plugin_manager->getDefinitions());
@@ -138,7 +126,7 @@ class DefaultPluginManagerTest extends UnitTestCase {
       ->with(LANGUAGE_TYPE_INTERFACE)
       ->will($this->returnValue($language));
 
-    $plugin_manager = new TestDefaultPluginManager($this->namespaces);
+    $plugin_manager = new TestPluginManager($this->namespaces, $this->expectedDefinitions);
     $plugin_manager->setCache($cache_backend, $language_manager, $cid);
 
     $this->assertEquals($this->expectedDefinitions, $plugin_manager->getDefinitions());
@@ -168,7 +156,7 @@ class DefaultPluginManagerTest extends UnitTestCase {
       ->with(LANGUAGE_TYPE_INTERFACE)
       ->will($this->returnValue($language));
 
-    $plugin_manager = new TestDefaultPluginManager($this->namespaces);
+    $plugin_manager = new TestPluginManager($this->namespaces, $this->expectedDefinitions);
     $plugin_manager->setCache($cache_backend, $language_manager, $cid);
 
     $this->assertEquals($this->expectedDefinitions, $plugin_manager->getDefinitions());

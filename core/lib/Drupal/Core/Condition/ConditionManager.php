@@ -7,18 +7,12 @@
 
 namespace Drupal\Core\Condition;
 
-use Drupal\Component\Plugin\PluginManagerBase;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Executable\ExecutableManagerInterface;
 use Drupal\Core\Executable\ExecutableInterface;
-use Drupal\Component\Plugin\Factory\DefaultFactory;
-use Drupal\Component\Plugin\Discovery\DerivativeDiscoveryDecorator;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageManager;
 use Drupal\Core\Plugin\DefaultPluginManager;
-use Drupal\Core\Plugin\Discovery\AlterDecorator;
-use Drupal\Core\Plugin\Discovery\AnnotatedClassDiscovery;
-use Drupal\Core\Plugin\Discovery\CacheDecorator;
 
 /**
  * A plugin manager for condition plugins.
