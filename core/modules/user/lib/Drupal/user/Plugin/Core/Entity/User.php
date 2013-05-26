@@ -12,6 +12,7 @@ use Drupal\Core\Entity\Annotation\EntityType;
 use Drupal\Core\Annotation\Translation;
 use Drupal\user\UserBCDecorator;
 use Drupal\user\UserInterface;
+use Drupal\Core\Language\Language;
 
 /**
  * Defines the user entity class.
@@ -48,63 +49,63 @@ class User extends EntityNG implements UserInterface {
   /**
    * The user ID.
    *
-   * @var integer
+   * @var \Drupal\Core\Entity\Field\FieldInterface
    */
   public $uid;
 
   /**
    * The user UUID.
    *
-   * @var string
+   * @var \Drupal\Core\Entity\Field\FieldInterface
    */
   public $uuid;
 
   /**
    * The unique user name.
    *
-   * @var string
+   * @var \Drupal\Core\Entity\Field\FieldInterface
    */
   public $name;
 
   /**
    * The user's password (hashed).
    *
-   * @var string
+   * @var \Drupal\Core\Entity\Field\FieldInterface
    */
   public $pass;
 
   /**
    * The user's email address.
    *
-   * @var string
+   * @var \Drupal\Core\Entity\Field\FieldInterface
    */
   public $mail;
 
   /**
    * The user's default theme.
    *
-   * @var string
+   * @var \Drupal\Core\Entity\Field\FieldInterface
    */
   public $theme;
 
   /**
    * The user's signature.
    *
-   * @var string
+   * @var \Drupal\Core\Entity\Field\FieldInterface
    */
   public $signature;
 
   /**
    * The user's signature format.
    *
-   * @var string
+   * @var \Drupal\Core\Entity\Field\FieldInterface
    */
   public $signature_format;
 
   /**
    * The timestamp when the user was created.
    *
-   * @var integer
+   * @var \Drupal\Core\Entity\Field\FieldInterface
    */
   public $created;
 
@@ -112,7 +113,7 @@ class User extends EntityNG implements UserInterface {
    * The timestamp when the user last accessed the site. A value of 0 means the
    * user has never accessed the site.
    *
-   * @var integer
+   * @var \Drupal\Core\Entity\Field\FieldInterface
    */
   public $access;
 
@@ -120,56 +121,56 @@ class User extends EntityNG implements UserInterface {
    * The timestamp when the user last logged in. A value of 0 means the user has
    * never logged in.
    *
-   * @var integer
+   * @var \Drupal\Core\Entity\Field\FieldInterface
    */
   public $login;
 
   /**
    * Whether the user is active (1) or blocked (0).
    *
-   * @var integer
+   * @var \Drupal\Core\Entity\Field\FieldInterface
    */
   public $status;
 
   /**
    * The user's timezone.
    *
-   * @var string
+   * @var \Drupal\Core\Entity\Field\FieldInterface
    */
   public $timezone;
 
   /**
    * The user's langcode.
    *
-   * @var string
+   * @var \Drupal\Core\Entity\Field\FieldInterface
    */
   public $langcode;
 
   /**
    * The user's preferred langcode for receiving emails and viewing the site.
    *
-   * @var string
+   * @var \Drupal\Core\Entity\Field\FieldInterface
    */
   public $preferred_langcode;
 
   /**
    * The user's preferred langcode for viewing administration pages.
    *
-   * @var string
+   * @var \Drupal\Core\Entity\Field\FieldInterface
    */
   public $preferred_admin_langcode;
 
   /**
    * The email address used for initial account creation.
    *
-   * @var string
+   * @var \Drupal\Core\Entity\Field\FieldInterface
    */
   public $init;
 
   /**
    * The user's roles.
    *
-   * @var array
+   * @var \Drupal\Core\Entity\Field\FieldInterface
    */
   public $roles;
 
@@ -181,15 +182,15 @@ class User extends EntityNG implements UserInterface {
    * @var array
    */
   protected $values = array(
-    'langcode' => array(LANGUAGE_DEFAULT => array(0 => array('value' => LANGUAGE_NOT_SPECIFIED))),
-    'preferred_langcode' => array(LANGUAGE_DEFAULT => array(0 => array('value' => LANGUAGE_NOT_SPECIFIED))),
-    'admin_preffered_langcode' => array(LANGUAGE_DEFAULT => array(0 => array('value' => LANGUAGE_NOT_SPECIFIED))),
-    'name' => array(LANGUAGE_DEFAULT => array(0 => array('value' => ''))),
-    'mail' => array(LANGUAGE_DEFAULT => array(0 => array('value' => ''))),
-    'init' => array(LANGUAGE_DEFAULT => array(0 => array('value' => ''))),
-    'access' => array(LANGUAGE_DEFAULT => array(0 => array('value' => 0))),
-    'login' => array(LANGUAGE_DEFAULT => array(0 => array('value' => 0))),
-    'status' => array(LANGUAGE_DEFAULT => array(0 => array('value' => 1))),
+    'langcode' => array(Language::LANGCODE_DEFAULT => array(0 => array('value' => Language::LANGCODE_NOT_SPECIFIED))),
+    'preferred_langcode' => array(Language::LANGCODE_DEFAULT => array(0 => array('value' => Language::LANGCODE_NOT_SPECIFIED))),
+    'admin_preffered_langcode' => array(Language::LANGCODE_DEFAULT => array(0 => array('value' => Language::LANGCODE_NOT_SPECIFIED))),
+    'name' => array(Language::LANGCODE_DEFAULT => array(0 => array('value' => ''))),
+    'mail' => array(Language::LANGCODE_DEFAULT => array(0 => array('value' => ''))),
+    'init' => array(Language::LANGCODE_DEFAULT => array(0 => array('value' => ''))),
+    'access' => array(Language::LANGCODE_DEFAULT => array(0 => array('value' => 0))),
+    'login' => array(Language::LANGCODE_DEFAULT => array(0 => array('value' => 0))),
+    'status' => array(Language::LANGCODE_DEFAULT => array(0 => array('value' => 1))),
   );
 
   /**
