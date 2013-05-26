@@ -32,7 +32,6 @@ class ArchiverManager extends DefaultPluginManager {
    */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache, LanguageManager $language_manager, ModuleHandlerInterface $module_handler) {
     parent::__construct('Archiver', $namespaces);
-    $this->discovery = new StaticDiscoveryDecorator($this->discovery, array($this, 'registerDefinitions'));
     $this->alterHook = 'archiver_info';
     $this->moduleHandler = $module_handler;
     $this->setCache($cache, $language_manager, 'archiver_info');
