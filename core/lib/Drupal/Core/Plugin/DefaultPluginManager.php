@@ -103,16 +103,18 @@ abstract class DefaultPluginManager extends PluginManagerBase implements PluginM
   }
 
   /**
-   * Sets the cache backend that should be used.
+   * Initialize the cache backend.
    *
-   * Plugin definitions are cached used the cache backend if one is provided.
+   * Plugin definitions are cached using the provided cache backend. The
+   * interface languge is added as a suffix to the cache key.
    *
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache
    *   Cache backend instance to use.
    * @param \Drupal\Core\Language\LanguageManager
    *   The language manager.
    * @param type $cache_key_prefix
-   *   Cache key prefix to use, the language code will be appended automatically.
+   *   Cache key prefix to use, the language code will be appended
+   *   automatically.
    */
   public function setCache(CacheBackendInterface $cache, LanguageManager $language_manager, $cache_key_prefix) {
     $this->languageManager = $language_manager;

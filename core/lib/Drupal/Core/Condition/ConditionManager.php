@@ -23,8 +23,8 @@ class ConditionManager extends DefaultPluginManager implements ExecutableManager
    * Constructs a ConditionManager object.
    *
    * @param \Traversable $namespaces
-   *   An object that implements \Traversable which contains the root paths keyed by the corresponding namespace to look
-   *   for plugin implementations,
+   *   An object that implements \Traversable which contains the root paths
+   *   keyed by the corresponding namespace to look for plugin implementations,
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache
    *   Cache backend instance to use.
    * @param \Drupal\Core\Language\LanguageManager
