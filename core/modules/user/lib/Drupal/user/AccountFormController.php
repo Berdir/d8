@@ -230,13 +230,16 @@ abstract class AccountFormController extends EntityFormController {
    * {@inheritdoc}
    */
   public function buildEntity(array $form, array &$form_state) {
-    $changed_form_state = $form_state;
     // Change the roles array to a list of enabled roles.
     // @todo: Alter the form state as the form values are directly extracted and
     //   set on the field, which throws an exception as the list requires
-    //   numeric keys. Allow to override this per field.
-    $changed_form_state['values']['roles'] = array_keys(array_filter($changed_form_state['values']['roles']));
-    return parent::buildEntity($form, $changed_form_state);
+    //   numeric keys. Allow to override this per field. As this function is
+    //   called twice, we have to prevent it from getting the array keys twice.
+    if (empty($this->roles_filtered)) {
+      $form_state['values']['roles'] = array_keys(array_filter($form_state['values']['roles']));
+      $this->roles_filtered = TRUE;
+    }
+    return parent::buildEntity($form, $form_state);
   }
 
   /**

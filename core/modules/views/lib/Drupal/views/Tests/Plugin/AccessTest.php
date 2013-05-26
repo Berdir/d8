@@ -47,7 +47,7 @@ class AccessTest extends PluginTestBase {
     $this->normal_user = $this->drupalCreateUser(array('views_test_data test permission'));
 
     // @todo: How to add a new item to the roles field list.
-    $this->normal_user->getNGEntity()->roles[]->value = $this->normal_role;
+    $this->normal_user->getNGEntity()->roles[2]->value = $this->normal_role;
     // @todo when all the plugin information is cached make a reset function and
     // call it here.
   }
