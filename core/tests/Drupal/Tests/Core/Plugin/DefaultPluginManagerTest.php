@@ -39,7 +39,7 @@ class DefaultPluginManagerTest extends UnitTestCase {
     );
   }
 
-  public function setUp() {
+  protected function setUp() {
     $this->expectedDefinitions = array(
       'apple' => array(
         'id' => 'apple',
