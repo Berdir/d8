@@ -112,8 +112,8 @@ class UserStorageController extends DatabaseStorageControllerNG {
    * Overrides Drupal\Core\Entity\DatabaseStorageController::save().
    */
   public function save(EntityInterface $entity) {
-    if (!$entity->uid->value) {
-      $entity->uid->value = $this->database->nextId(db_query('SELECT MAX(uid) FROM {users}')->fetchField());
+    if (!$entity->id()) {
+      $entity->uid->value = $this->database->nextId($this->database->query('SELECT MAX(uid) FROM {users}')->fetchField());
       $entity->enforceIsNew();
     }
     parent::save($entity);

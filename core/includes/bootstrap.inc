@@ -1760,9 +1760,7 @@ function drupal_anonymous_user() {
   return (object) array(
     'uid' => 0,
     'hostname' => Drupal::request()->getClientIP(),
-    'roles' => array(
-      DRUPAL_ANONYMOUS_RID => DRUPAL_ANONYMOUS_RID,
-    ),
+    'roles' => array(DRUPAL_ANONYMOUS_RID),
   );
 }
 

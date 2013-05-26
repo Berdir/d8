@@ -2115,7 +2115,7 @@ function user_multiple_role_edit($accounts, $operation, $rid) {
       $accounts = user_load_multiple($accounts);
       foreach ($accounts as $account) {
         // Skip adding the role to the user if they already have it.
-        if ($account !== FALSE && !array_search($rid, $account->roles)) {
+        if ($account !== FALSE && !in_array($rid, $account->roles)) {
           // For efficiency manually save the original account before applying
           // any changes.
           $account->original = clone $account;
@@ -2128,7 +2128,7 @@ function user_multiple_role_edit($accounts, $operation, $rid) {
       $accounts = user_load_multiple($accounts);
       foreach ($accounts as $account) {
         // Skip removing the role from the user if they already don't have it.
-        if ($account !== FALSE && $index = array_search($rid, $account->roles)) {
+        if ($account !== FALSE && in_array($rid, $account->roles)) {
           $roles = array_diff($account->roles, array($rid));
           // For efficiency manually save the original account before applying
           // any changes.

@@ -32,14 +32,14 @@ class UserAccessController extends EntityAccessController {
       case 'update':
         // Users can always edit their own account. Users with the 'administer
         // users' permission can edit any account except the anonymous account.
-        return (($account->uid == $entity->uid->value) || user_access('administer users', $account)) && $entity->uid->value > 0;
+        return (($account->uid == $entity->id()) || user_access('administer users', $account)) && $entity->id() > 0;
         break;
 
       case 'delete':
         // Users with 'cancel account' permission can cancel their own account,
         // users with 'administer users' permission can cancel any account
         // except the anonymous account.
-        return ((($account->uid == $entity->uid->value) && user_access('cancel account', $account)) || user_access('administer users', $account)) && $entity->uid->value > 0;
+        return ((($account->uid == $entity->id()) && user_access('cancel account', $account)) || user_access('administer users', $account)) && $entity->id() > 0;
         break;
     }
   }
@@ -51,9 +51,9 @@ class UserAccessController extends EntityAccessController {
    */
   protected function viewAccess(EntityInterface $entity, $langcode, UserInterface $account) {
     // Never allow access to view the anonymous user account.
-    if ($entity->uid->value) {
+    if ($entity->id()) {
       // Admins can view all, users can view own profiles at all times.
-      if ($account->uid == $entity->uid->value || user_access('administer users', $account)) {
+      if ($account->uid == $entity->id() || user_access('administer users', $account)) {
         return TRUE;
       }
       elseif (user_access('access user profiles', $account)) {
