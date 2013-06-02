@@ -52,8 +52,13 @@ class ContactSitewideTest extends WebTestBase {
     $this->drupalGet('admin/structure/contact');
     // Default category exists.
     $this->assertLinkByHref('admin/structure/contact/manage/feedback/delete');
-    // User category could not be deleted.
+    // User category could not be changed or deleted.
+    $this->assertNoLinkByHref('admin/structure/contact/manage/personal');
     $this->assertNoLinkByHref('admin/structure/contact/manage/personal/delete');
+
+    $this->drupalGet('admin/structure/contact/manage/personal');
+    $this->assertResponse(403);
+
     // Delete old categories to ensure that new categories are used.
     $this->deleteCategories();
     $this->drupalGet('admin/structure/contact');
@@ -147,9 +152,6 @@ class ContactSitewideTest extends WebTestBase {
     $this->assertResponse(200);
 
     // Submit contact form with invalid values.
-    $categories = entity_load_multiple('contact_category');
-    $id = key($categories);
-
     $this->submitContact('', $recipients[0], $this->randomName(16), $id, $this->randomName(64));
     $this->assertText(t('Your name field is required.'));
 
