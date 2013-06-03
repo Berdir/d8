@@ -68,9 +68,8 @@ class FileSystemForm extends SystemConfigFormBase {
       );
     }
 
-    $period = drupal_map_assoc(array(0, 3600, 10800, 21600, 32400, 43200, 86400, 604800, -1), 'format_interval');
-    $period[0] = t('None (immediately delete)');
-    $period[-1] = t('Do not delete temporary files ever');
+    $period = drupal_map_assoc(array(0, 3600, 10800, 21600, 32400, 43200, 86400, 604800), 'format_interval');
+    $period[0] = t('Do not delete temporary files');
     $form['temporary_maximum_age'] = array(
       '#type' => 'select',
       '#title' => t('Temporary file maximum age'),
