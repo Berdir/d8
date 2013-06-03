@@ -87,17 +87,27 @@ class FileStorageController extends DatabaseStorageController {
   }
 
   /**
-   * Retrieve temporary files that are older than DRUPAL_MAXIMUM_TEMP_FILE_AGE.
+   * Retrieve temporary files that are older than a certain amount of time.
    *
-   *  @return
-   *    A list of files to be deleted.
+   * @param int $age
+   *   Optional. The number of seconds that a temporary file must be in order
+   *   to be selected. If less than zero, no results will be returned. The
+   *   default is DRUPAL_MAXIMUM_TEMP_FILE_AGE.
+   *
+   * @return array
+   *   An array of file IDs.
    */
-  public function retrieveTemporaryFiles() {
+  public function retrieveTemporaryFiles($age = DRUPAL_MAXIMUM_TEMP_FILE_AGE) {
     // Use separate placeholders for the status to avoid a bug in some versions
     // of PHP. See http://drupal.org/node/352956.
-    return db_query('SELECT fid FROM {' . $this->entityInfo['base_table'] . '} WHERE status <> :permanent AND timestamp < :timestamp', array(
-      ':permanent' => FILE_STATUS_PERMANENT,
-      ':timestamp' => REQUEST_TIME - DRUPAL_MAXIMUM_TEMP_FILE_AGE
-    ));
+    if ($age < 0) {
+      return array();
+    }
+    else {
+      return db_query('SELECT fid FROM {' . $this->entityInfo['base_table'] . '} WHERE status <> :permanent AND timestamp < :timestamp', array(
+        ':permanent' => FILE_STATUS_PERMANENT,
+        ':timestamp' => REQUEST_TIME - $age,
+      ));
+    }
   }
 }

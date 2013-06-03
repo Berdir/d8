@@ -704,21 +704,21 @@ function file_file_download($uri, $field_type = 'file') {
  * Implements file_cron()
  */
 function file_cron() {
-  $result = Drupal::entityManager()->getStorageController('file')->retrieveTemporaryFiles();
-  foreach ($result as $row) {
-    if ($file = file_load($row->fid)) {
-      $references = file_usage()->listUsage($file);
-      if (empty($references)) {
-        if (file_exists($file->uri)) {
-          $file->delete();
-        }
-        else {
-          watchdog('file system', 'Could not delete temporary file "%path" during garbage collection', array('%path' => $file->uri), WATCHDOG_ERROR);
-        }
+  $age = config('system.file')->get('temporary_maximum_age');
+  $fids = Drupal::entityManager()->getStorageController('file')->retrieveTemporaryFiles($age);
+  $files = file_load_multiple($fids);
+  foreach ($files as $file) {
+    $references = file_usage()->listUsage($file);
+    if (empty($references)) {
+      if (file_exists($file->uri)) {
+        $file->delete();
       }
       else {
-        watchdog('file system', 'Did not delete temporary file "%path" during garbage collection because it is in use by the following modules: %modules.', array('%path' => $file->uri, '%modules' => implode(', ', array_keys($references))), WATCHDOG_INFO);
+        watchdog('file system', 'Could not delete temporary file "%path" during garbage collection', array('%path' => $file->uri), WATCHDOG_ERROR);
       }
+    }
+    else {
+      watchdog('file system', 'Did not delete temporary file "%path" during garbage collection because it is in use by the following modules: %modules.', array('%path' => $file->uri, '%modules' => implode(', ', array_keys($references))), WATCHDOG_INFO);
     }
   }
 }

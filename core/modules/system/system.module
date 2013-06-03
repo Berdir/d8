@@ -18,7 +18,9 @@ use Guzzle\Http\Exception\BadResponseException;
 use Guzzle\Http\Exception\RequestException;
 
 /**
- * Maximum age of temporary files in seconds.
+ * Default maximum age of temporary files in seconds.
+ *
+ * @todo This should be renamed to DRUPAL_DEFAULT_MAXIMUM_TEMP_FILE_AGE? OR just removed in favor of the config?
  */
 const DRUPAL_MAXIMUM_TEMP_FILE_AGE = 21600;
 

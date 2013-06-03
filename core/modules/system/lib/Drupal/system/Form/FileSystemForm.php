@@ -68,6 +68,17 @@ class FileSystemForm extends SystemConfigFormBase {
       );
     }
 
+    $period = drupal_map_assoc(array(0, 3600, 10800, 21600, 32400, 43200, 86400, 604800, -1), 'format_interval');
+    $period[0] = t('None (immediately delete)');
+    $period[-1] = t('Do not delete temporary files ever');
+    $form['temporary_maximum_age'] = array(
+      '#type' => 'select',
+      '#title' => t('Temporary file maximum age'),
+      '#default_value' => $config->get('temporary_maximum_age'),
+      '#options' => $options,
+      '#description' => t('The maximum age a temporary, unused file must be before it will be deleted. Files that are no longer used or referred to anywhere are marked as temporary.'),
+    );
+
     return parent::buildForm($form, $form_state);
   }
 
@@ -77,7 +88,8 @@ class FileSystemForm extends SystemConfigFormBase {
   public function submitForm(array &$form, array &$form_state) {
     $config = $this->configFactory->get('system.file')
       ->set('path.private', $form_state['values']['file_private_path'])
-      ->set('path.temporary', $form_state['values']['file_temporary_path']);
+      ->set('path.temporary', $form_state['values']['file_temporary_path'])
+      ->set('temporary_maximum_age', $form_state['values']['temporary_maximum_age']);
     variable_set('file_public_path', $form_state['values']['file_public_path']);
 
     if (isset($form_state['values']['file_default_scheme'])) {
