@@ -662,9 +662,6 @@ function user_update_8011() {
       // Install image.module with schema version 8002 as a previous version
       // would have to create tables that would be removed again.
       update_set_schema('image', 8002);
-      // If image.module was not installed before, install default
-      // configuration and run the install hook.
-      config_install_default_config('module', 'image');
       // Inlined version of image_install(), make sure that the styles
       // directory exists.
       $directory = update_variable_get('file_default_scheme', 'public') . '://styles';
