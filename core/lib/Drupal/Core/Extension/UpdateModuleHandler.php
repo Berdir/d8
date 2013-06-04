@@ -41,6 +41,7 @@ class UpdateModuleHandler extends ModuleHandler {
         return array('system');
       // This is called during rebuild to find testing themes.
       case 'system_theme_info':
+        return array();
       // t() in system_stream_wrappers() needs this. Other schema calls aren't
       // supported.
       case 'schema':
