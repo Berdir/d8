@@ -39,81 +39,10 @@ use Drupal\contact\MessageInterface;
 class Message extends EntityNG implements MessageInterface {
 
   /**
-   * The contact category ID of this message.
-   *
-   * @var string
-   */
-  public $category;
-
-  /**
-   * The sender's name.
-   *
-   * @var string
-   */
-  public $name;
-
-  /**
-   * The sender's e-mail address.
-   *
-   * @var string
-   */
-  public $mail;
-
-  /**
-   * The user account object of the message recipient.
-   *
-   * Only applies to the user contact form. For a site contact form category,
-   * multiple recipients can be configured. The existence of a $recipient
-   * triggers user contact form specific processing in the contact message form
-   * controller.
-   *
-   * @see Drupal\contact\MessageFormController::form()
-   * @see Drupal\contact\MessageFormController::save()
-   *
-   * @todo Replace Category::$recipients with the user account's e-mail address
-   *   upon Entity::create().
-   *
-   * @var Drupal\user\Plugin\Core\Entity\User
-   */
-  public $recipient;
-
-  /**
-   * The message subject.
-   *
-   * @var string
-   */
-  public $subject;
-
-  /**
-   * The message text.
-   *
-   * @var string
-   */
-  public $message;
-
-  /**
-   * Whether to send a copy of the message to the sender.
-   *
-   * @var bool
-   */
-  public $copy;
-
-  /**
    * Overrides Drupal\Core\Entity\Entity::id().
    */
   public function id() {
     return NULL;
-  }
-
-  protected function init() {
-    parent::init();
-    unset($this->name);
-    unset($this->message);
-    unset($this->mail);
-    unset($this->category);
-    unset($this->copy);
-    unset($this->recipient);
-    unset($this->subject);
   }
 
   /**
@@ -121,6 +50,57 @@ class Message extends EntityNG implements MessageInterface {
    */
   public function isPersonal() {
     return $this->bundle() == 'personal';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCategory() {
+    return $this->get('category')->entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSenderName() {
+    $this->get('name')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSenderMail() {
+    $this->get('mail')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSubject() {
+    $this->get('subject')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getMessage() {
+    return $this->get('message')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function copy() {
+    return (bool)$this->get('copy')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPersonalRecipient() {
+    if ($this->isPersonal()) {
+      return $this->get('recipient')->entity;
+    }
   }
 
 }

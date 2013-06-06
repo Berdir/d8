@@ -67,17 +67,10 @@ class MessageFormController extends EntityFormControllerNG {
       $form['recipient'] = array(
         '#type' => 'item',
         '#title' => t('To'),
-        '#value' => $message->recipient->entity,
         'name' => array(
           '#theme' => 'username',
-          '#account' => $message->recipient->entity,
+          '#account' => $message->getPersonalRecipient(),
         ),
-      );
-    }
-    else {
-      $form['category'] = array(
-        '#type' => 'value',
-        '#value' => $message->category->target_id,
       );
     }
 
@@ -146,13 +139,13 @@ class MessageFormController extends EntityFormControllerNG {
     if (!$user->uid) {
       // At this point, $sender contains drupal_anonymous_user(), so we need to
       // take over the submitted form values.
-      $sender->name = $message->name->value;
-      $sender->mail = $message->mail->value;
+      $sender->name = $message->getSenderName();
+      $sender->mail = $message->getSenderMail();
       // Save the anonymous user information to a cookie for reuse.
-      user_cookie_save(array('name' => $message->name->value, 'mail' => $message->mail->value));
+      user_cookie_save(array('name' => $message->getSenderName(), 'mail' => $message->getSenderMail()));
       // For the e-mail message, clarify that the sender name is not verified; it
       // could potentially clash with a username on this site.
-      $sender->name = t('!name (not verified)', array('!name' => $message->name->value));
+      $sender->name = t('!name (not verified)', array('!name' => $message->getSenderName()));
     }
 
     // Build e-mail parameters.
@@ -161,16 +154,16 @@ class MessageFormController extends EntityFormControllerNG {
 
     if (!$message->isPersonal()) {
       // Send to the category recipient(s), using the site's default language.
-      $category = $message->category->entity;
+      $category = $message->getCategory();
       $params['contact_category'] = $category;
 
       $to = implode(', ', $category->recipients);
       $recipient_langcode = language_default()->langcode;
     }
-    elseif ($message->recipient->target_id) {
+    elseif ($recipient = $message->getPersonalRecipient()) {
       // Send to the user in the user's preferred language.
-      $to = $message->recipient->entity->mail;
-      $recipient_langcode = user_preferred_langcode($message->recipient->entity);
+      $to = $recipient->mail;
+      $recipient_langcode = user_preferred_langcode($recipient);
     }
     else {
       throw new \RuntimeException(t('Unable to determine message recipient.'));
@@ -211,8 +204,8 @@ class MessageFormController extends EntityFormControllerNG {
 
     // To avoid false error messages caused by flood control, redirect away from
     // the contact form; either to the contacted user account or the front page.
-    if ($message->recipient->target_id && user_access('access user profiles')) {
-      $uri = $message->recipient->entity->uri();
+    if ($message->isPersonal() && user_access('access user profiles')) {
+      $uri = $message->getPersonalRecipient()->uri();
       $form_state['redirect'] = array($uri['path'], $uri['options']);
     }
     else {
