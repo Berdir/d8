@@ -112,7 +112,8 @@ function _drupal_session_read($sid) {
 
   // We found the client's session record and they are an authenticated,
   // active user.
-  if ($user && $user->id() > 0 && $user->status == 1) {
+  if ($values && $values['uid'] > 0 && $values['status'] == 1) {
+    $user = new UserSession($values);
     // Add roles element to $user.
     $rids = db_query("SELECT ur.rid FROM {users_roles} ur WHERE ur.uid = :uid", array(':uid' => $user->uid))->fetchCol();
     $user->roles = array_merge(array(DRUPAL_AUTHENTICATED_RID), $rids);
