@@ -10,7 +10,6 @@ namespace Drupal\user\Plugin\views\access;
 use Drupal\Component\Annotation\Plugin;
 use Drupal\views\Plugin\views\access\AccessPluginBase;
 use Drupal\Core\Annotation\Translation;
-use Symfony\Component\Routing\Route;
 
 /**
  * Access plugin that provides permission-based access control.
