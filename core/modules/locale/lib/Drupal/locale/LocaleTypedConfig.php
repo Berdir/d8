@@ -50,8 +50,13 @@ class LocaleTypedConfig extends Element {
    * @param \Drupal\locale\LocaleConfigManager $localeConfig;
    *   The locale configuration manager object.
    */
+  // @todo Figure out signature.
   public function __construct(array $definition, $name, $langcode, \Drupal\locale\LocaleConfigManager $localeConfig) {
-    parent::__construct($definition, $name);
+    // @todo parent::__construct() needs a $plugin_id and $plugin_definition,
+    // but not sure how to get those.
+    $plugin_id = '';
+    $plugin_definition = array();
+    parent::__construct($definition, $plugin_id, $plugin_definition, $name);
     $this->langcode = $langcode;
     $this->localeConfig = $localeConfig;
   }

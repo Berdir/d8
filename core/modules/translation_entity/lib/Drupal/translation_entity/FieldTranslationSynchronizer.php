@@ -54,6 +54,7 @@ class FieldTranslationSynchronizer implements FieldTranslationSynchronizerInterf
 
     // Enable compatibility mode for NG entities.
     $entity_unchanged = $entity_unchanged->getBCEntity();
+    $entity = $entity->getBCEntity();
 
     // @todo Use Entity Field API to retrieve field definitions.
     $instances = field_info_instances($entity_type, $entity->bundle());

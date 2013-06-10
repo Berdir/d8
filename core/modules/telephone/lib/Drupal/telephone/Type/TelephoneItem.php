@@ -7,12 +7,12 @@
 
 namespace Drupal\telephone\Type;
 
-use Drupal\Core\Entity\Field\FieldItemBase;
+use Drupal\field\Plugin\field\field_type\LegacyCFieldItem;
 
 /**
  * Defines the 'telephone_field' entity field items.
  */
-class TelephoneItem extends FieldItemBase {
+class TelephoneItem extends LegacyCFieldItem {
 
   /**
    * Definitions of the contained properties.

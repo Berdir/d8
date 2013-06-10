@@ -37,8 +37,8 @@ class TextProcessed extends TypedData {
   /**
    * Overrides TypedData::__construct().
    */
-  public function __construct(array $definition, $name = NULL, TypedDataInterface $parent = NULL) {
-    parent::__construct($definition, $name, $parent);
+  public function __construct(array $definition, $plugin_id, array $plugin_definition, $name = NULL, TypedDataInterface $parent = NULL) {
+    parent::__construct($definition, $plugin_id, $plugin_definition, $name, $parent);
 
     if (!isset($definition['settings']['text source'])) {
       throw new InvalidArgumentException("The definition's 'source' key has to specify the name of the text property to be processed.");
@@ -83,7 +83,8 @@ class TextProcessed extends TypedData {
    */
   public function setValue($value, $notify = TRUE) {
     if (isset($value)) {
-      throw new ReadOnlyException('Unable to set a computed property.');
+      // @todo This is triggered from DatabaseStorageController::invokeFieldMethod() (case of non-NG entity types).
+//      throw new ReadOnlyException('Unable to set a computed property.');
     }
   }
 

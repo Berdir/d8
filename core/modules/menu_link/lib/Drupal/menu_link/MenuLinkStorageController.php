@@ -152,6 +152,7 @@ class MenuLinkStorageController extends DatabaseStorageController {
       // Unlike the save() method from DatabaseStorageController, we invoke the
       // 'presave' hook first because we want to allow modules to alter the
       // entity before all the logic from our preSave() method.
+      $this->invokeFieldMethod('preSave', $entity);
       $this->invokeHook('presave', $entity);
       $this->preSave($entity);
 
@@ -167,6 +168,7 @@ class MenuLinkStorageController extends DatabaseStorageController {
           if (!$entity->isNew()) {
             $this->resetCache(array($entity->{$this->idKey}));
             $this->postSave($entity, TRUE);
+            $this->invokeFieldMethod('update', $entity);
             $this->invokeHook('update', $entity);
           }
           else {
@@ -175,6 +177,7 @@ class MenuLinkStorageController extends DatabaseStorageController {
 
             $entity->enforceIsNew(FALSE);
             $this->postSave($entity, FALSE);
+            $this->invokeFieldMethod('insert', $entity);
             $this->invokeHook('insert', $entity);
           }
         }

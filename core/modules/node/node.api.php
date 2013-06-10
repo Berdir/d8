@@ -113,7 +113,6 @@ use Drupal\Core\Entity\EntityInterface;
  *   node_form_validate()):
  *   - hook_validate() (node-type-specific)
  *   - hook_node_validate() (all)
- *   - field_attach_form_validate()
  * - Searching (calling node_search_execute()):
  *   - hook_ranking() (all)
  *   - Query is executed to find matching nodes

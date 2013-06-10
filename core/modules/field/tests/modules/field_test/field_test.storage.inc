@@ -93,7 +93,7 @@ function field_test_field_storage_load($entity_type, $entities, $age, $fields, $
     $sub_table = $load_current ? 'current' : 'revisions';
     $delta_count = array();
     foreach ($field_data[$sub_table] as $row) {
-      if ($row->type == $entity_type && (!$row->deleted || $options['deleted'])) {
+      if ($row->type == $entity_type && (!$row->deleted || !empty($options['instance']->deleted))) {
         if (($load_current && in_array($row->entity_id, $ids)) || (!$load_current && in_array($row->revision_id, $ids))) {
           if (in_array($row->langcode, field_available_languages($entity_type, $field))) {
             if (!isset($delta_count[$row->entity_id][$row->langcode])) {

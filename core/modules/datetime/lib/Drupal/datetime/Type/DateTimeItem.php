@@ -7,12 +7,12 @@
 
 namespace Drupal\datetime\Type;
 
-use Drupal\Core\Entity\Field\FieldItemBase;
+use Drupal\field\Plugin\field\field_type\LegacyCFieldItem;
 
 /**
  * Defines the 'datetime' entity field item.
  */
-class DateTimeItem extends FieldItemBase {
+class DateTimeItem extends LegacyCFieldItem {
 
   /**
    * Field definitions of the contained properties.

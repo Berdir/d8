@@ -207,468 +207,6 @@ function hook_field_info_alter(&$info) {
 }
 
 /**
- * Define the Field API schema for a field structure.
- *
- * This hook MUST be defined in .install for it to be detected during
- * installation and upgrade.
- *
- * @param $field
- *   A field structure.
- *
- * @return
- *   An associative array with the following keys:
- *   - columns: An array of Schema API column specifications, keyed by column
- *     name. This specifies what comprises a value for a given field. For
- *     example, a value for a number field is simply 'value', while a value for
- *     a formatted text field is the combination of 'value' and 'format'. It is
- *     recommended to avoid having the column definitions depend on field
- *     settings when possible. No assumptions should be made on how storage
- *     engines internally use the original column name to structure their
- *     storage.
- *   - indexes: (optional) An array of Schema API index definitions. Only
- *     columns that appear in the 'columns' array are allowed. Those indexes
- *     will be used as default indexes. Individual field definitions can
- *     specify additional indexes or modify, at their own risk, the indexes
- *     specified by the field type. Some storage engines might not support
- *     indexes.
- *   - foreign keys: (optional) An array of Schema API foreign key definitions.
- *     Note, however, that the field data is not necessarily stored in SQL.
- *     Also, the possible usage is limited, as you cannot specify another field
- *     as related, only existing SQL tables, such as {taxonomy_term_data}.
- */
-function hook_field_schema($field) {
-  if ($field['type'] == 'text_long') {
-    $columns = array(
-      'value' => array(
-        'type' => 'text',
-        'size' => 'big',
-        'not null' => FALSE,
-      ),
-    );
-  }
-  else {
-    $columns = array(
-      'value' => array(
-        'type' => 'varchar',
-        'length' => $field['settings']['max_length'],
-        'not null' => FALSE,
-      ),
-    );
-  }
-  $columns += array(
-    'format' => array(
-      'type' => 'varchar',
-      'length' => 255,
-      'not null' => FALSE,
-    ),
-  );
-  return array(
-    'columns' => $columns,
-    'indexes' => array(
-      'format' => array('format'),
-    ),
-    'foreign keys' => array(
-      'format' => array(
-        'table' => 'filter_format',
-        'columns' => array('format' => 'format'),
-      ),
-    ),
-  );
-}
-
-/**
- * Define custom load behavior for this module's field types.
- *
- * Unlike most other field hooks, this hook operates on multiple entities. The
- * $entities, $instances and $items parameters are arrays keyed by entity ID.
- * For performance reasons, information for all available entity should be
- * loaded in a single query where possible.
- *
- * Note that the changes made to the field values get cached by the field cache
- * for subsequent loads. You should never use this hook to load fieldable
- * entities, since this is likely to cause infinite recursions when
- * hook_field_load() is run on those as well. Use
- * hook_field_formatter_prepare_view() instead.
- *
- * Make changes or additions to field values by altering the $items parameter by
- * reference. There is no return value.
- *
- * @param $entity_type
- *   The type of $entity.
- * @param $entities
- *   Array of entities being loaded, keyed by entity ID.
- * @param $field
- *   The field structure for the operation.
- * @param $instances
- *   Array of instance structures for $field for each entity, keyed by entity
- *   ID.
- * @param $langcode
- *   The language code associated with $items.
- * @param $items
- *   Array of field values already loaded for the entities, keyed by entity ID.
- *   Store your changes in this parameter (passed by reference).
- * @param $age
- *   FIELD_LOAD_CURRENT to load the most recent revision for all fields, or
- *   FIELD_LOAD_REVISION to load the version indicated by each entity.
- */
-function hook_field_load($entity_type, $entities, $field, $instances, $langcode, &$items, $age) {
-  // Sample code from text.module: precompute sanitized strings so they are
-  // stored in the field cache.
-  foreach ($entities as $id => $entity) {
-    foreach ($items[$id] as $delta => $item) {
-      // Only process items with a cacheable format, the rest will be handled
-      // by formatters if needed.
-      if (empty($instances[$id]['settings']['text_processing']) || filter_format_allowcache($item['format'])) {
-        $items[$id][$delta]['safe_value'] = isset($item['value']) ? text_sanitize($instances[$id]['settings']['text_processing'], $langcode, $item, 'value') : '';
-        if ($field['type'] == 'text_with_summary') {
-          $items[$id][$delta]['safe_summary'] = isset($item['summary']) ? text_sanitize($instances[$id]['settings']['text_processing'], $langcode, $item, 'summary') : '';
-        }
-      }
-    }
-  }
-}
-
-/**
- * Prepare field values prior to display.
- *
- * This hook is invoked before the field values are handed to formatters for
- * display, and runs before the formatters' own
- * hook_field_formatter_prepare_view().
- *
- * Unlike most other field hooks, this hook operates on multiple entities. The
- * $entities, $instances and $items parameters are arrays keyed by entity ID.
- * For performance reasons, information for all available entities should be
- * loaded in a single query where possible.
- *
- * Make changes or additions to field values by altering the $items parameter by
- * reference. There is no return value.
- *
- * @param $entity_type
- *   The type of $entity.
- * @param $entities
- *   Array of entities being displayed, keyed by entity ID.
- * @param $field
- *   The field structure for the operation.
- * @param $instances
- *   Array of instance structures for $field for each entity, keyed by entity
- *   ID.
- * @param $langcode
- *   The language associated with $items.
- * @param $items
- *   $entity->{$field['field_name']}, or an empty array if unset.
- */
-function hook_field_prepare_view($entity_type, $entities, $field, $instances, $langcode, &$items) {
-  // Sample code from image.module: if there are no images specified at all,
-  // use the default image.
-  foreach ($entities as $id => $entity) {
-    if (empty($items[$id]) && $field['settings']['default_image']) {
-      if ($file = file_load($field['settings']['default_image'])) {
-        $items[$id][0] = (array) $file + array(
-          'is_default' => TRUE,
-          'alt' => '',
-          'title' => '',
-        );
-      }
-    }
-  }
-}
-
-/**
- * Validate this module's field data.
- *
- * If there are validation problems, add to the $errors array (passed by
- * reference). There is no return value.
- *
- * @param \Drupal\Core\Entity\EntityInterface $entity
- *   The entity for the operation.
- * @param $field
- *   The field structure for the operation.
- * @param $instance
- *   The instance structure for $field on $entity's bundle.
- * @param $langcode
- *   The language associated with $items.
- * @param $items
- *   $entity->{$field['field_name']}[$langcode], or an empty array if unset.
- * @param $errors
- *   The array of errors (keyed by field name, language code, and delta) that
- *   have already been reported for the entity. The function should add its
- *   errors to this array. Each error is an associative array with the following
- *   keys and values:
- *   - error: An error code (should be a string prefixed with the module name).
- *   - message: The human-readable message to be displayed.
- */
-function hook_field_validate(\Drupal\Core\Entity\EntityInterface $entity = NULL, $field, $instance, $langcode, $items, &$errors) {
-  foreach ($items as $delta => $item) {
-    if (!empty($item['value'])) {
-      if (!empty($field['settings']['max_length']) && drupal_strlen($item['value']) > $field['settings']['max_length']) {
-        $errors[$field['field_name']][$langcode][$delta][] = array(
-          'error' => 'text_max_length',
-          'message' => t('%name: the value may not be longer than %max characters.', array('%name' => $instance['label'], '%max' => $field['settings']['max_length'])),
-        );
-      }
-    }
-  }
-}
-
-/**
- * Define custom presave behavior for this module's field types.
- *
- * Make changes or additions to field values by altering the $items parameter by
- * reference. There is no return value.
- *
- * @param \Drupal\Core\Entity\EntityInterface $entity
- *   The entity for the operation.
- * @param $field
- *   The field structure for the operation.
- * @param $instance
- *   The instance structure for $field on $entity's bundle.
- * @param $langcode
- *   The language associated with $items.
- * @param $items
- *   $entity->{$field['field_name']}[$langcode], or an empty array if unset.
- */
-function hook_field_presave(\Drupal\Core\Entity\EntityInterface $entity, $field, $instance, $langcode, &$items) {
-  if ($field['type'] == 'number_decimal') {
-    // Let PHP round the value to ensure consistent behavior across storage
-    // backends.
-    foreach ($items as $delta => $item) {
-      if (isset($item['value'])) {
-        $items[$delta]['value'] = round($item['value'], $field['settings']['scale']);
-      }
-    }
-  }
-}
-
-/**
- * Define custom insert behavior for this module's field data.
- *
- * This hook is invoked from field_attach_insert() on the module that defines a
- * field, during the process of inserting an entity object (node, taxonomy term,
- * etc.). It is invoked just before the data for this field on the particular
- * entity object is inserted into field storage. Only field modules that are
- * storing or tracking information outside the standard field storage mechanism
- * need to implement this hook.
- *
- * @param \Drupal\Core\Entity\EntityInterface $entity
- *   The entity for the operation.
- * @param $field
- *   The field structure for the operation.
- * @param $instance
- *   The instance structure for $field on $entity's bundle.
- * @param $langcode
- *   The language associated with $items.
- * @param $items
- *   $entity->{$field['field_name']}[$langcode], or an empty array if unset.
- *
- * @see hook_field_update()
- * @see hook_field_delete()
- */
-function hook_field_insert(\Drupal\Core\Entity\EntityInterface $entity, $field, $instance, $langcode, &$items) {
-  if (config('taxonomy.settings')->get('maintain_index_table') && $field['storage']['type'] == 'field_sql_storage' && $entity->entityType() == 'node' && $entity->status) {
-    $query = db_insert('taxonomy_index')->fields(array('nid', 'tid', 'sticky', 'created', ));
-    foreach ($items as $item) {
-      $query->values(array(
-        'nid' => $entity->nid,
-        'tid' => $item['tid'],
-        'sticky' => $entity->sticky,
-        'created' => $entity->created,
-      ));
-    }
-    $query->execute();
-  }
-}
-
-/**
- * Define custom update behavior for this module's field data.
- *
- * This hook is invoked from field_attach_update() on the module that defines a
- * field, during the process of updating an entity object (node, taxonomy term,
- * etc.). It is invoked just before the data for this field on the particular
- * entity object is updated into field storage. Only field modules that are
- * storing or tracking information outside the standard field storage mechanism
- * need to implement this hook.
- *
- * @param \Drupal\Core\Entity\EntityInterface $entity
- *   The entity for the operation.
- * @param $field
- *   The field structure for the operation.
- * @param $instance
- *   The instance structure for $field on $entity's bundle.
- * @param $langcode
- *   The language associated with $items.
- * @param $items
- *   $entity->{$field['field_name']}[$langcode], or an empty array if unset.
- *
- * @see hook_field_insert()
- * @see hook_field_delete()
- */
-function hook_field_update(\Drupal\Core\Entity\EntityInterface $entity, $field, $instance, $langcode, &$items) {
-  if (config('taxonomy.settings')->get('maintain_index_table') && $field['storage']['type'] == 'field_sql_storage' && $entity->entityType() == 'node') {
-    $first_call = &drupal_static(__FUNCTION__, array());
-
-    // We don't maintain data for old revisions, so clear all previous values
-    // from the table. Since this hook runs once per field, per object, make
-    // sure we only wipe values once.
-    if (!isset($first_call[$entity->nid])) {
-      $first_call[$entity->nid] = FALSE;
-      db_delete('taxonomy_index')->condition('nid', $entity->nid)->execute();
-    }
-    // Only save data to the table if the node is published.
-    if ($entity->status) {
-      $query = db_insert('taxonomy_index')->fields(array('nid', 'tid', 'sticky', 'created'));
-      foreach ($items as $item) {
-        $query->values(array(
-          'nid' => $entity->nid,
-          'tid' => $item['tid'],
-          'sticky' => $entity->sticky,
-          'created' => $entity->created,
-        ));
-      }
-      $query->execute();
-    }
-  }
-}
-
-/**
- * Update the storage information for a field.
- *
- * This is invoked on the field's storage module when updating the field,
- * before the new definition is saved to the database. The field storage module
- * should update its storage tables according to the new field definition. If
- * there is a problem, the field storage module should throw an exception.
- *
- * @param $field
- *   The updated field structure to be saved.
- * @param $prior_field
- *   The previously-saved field structure.
- * @param $has_data
- *   TRUE if the field has data in storage currently.
- */
-function hook_field_storage_update_field($field, $prior_field, $has_data) {
-  if (!$has_data) {
-    // There is no data. Re-create the tables completely.
-    $prior_schema = _field_sql_storage_schema($prior_field);
-    foreach ($prior_schema as $name => $table) {
-      db_drop_table($name, $table);
-    }
-    $schema = _field_sql_storage_schema($field);
-    foreach ($schema as $name => $table) {
-      db_create_table($name, $table);
-    }
-  }
-  else {
-    // There is data. See field_sql_storage_field_storage_update_field() for
-    // an example of what to do to modify the schema in place, preserving the
-    // old data as much as possible.
-  }
-  drupal_get_schema(NULL, TRUE);
-}
-
-/**
- * Define custom delete behavior for this module's field data.
- *
- * This hook is invoked from field_attach_delete() on the module that defines a
- * field, during the process of deleting an entity object (node, taxonomy term,
- * etc.). It is invoked just before the data for this field on the particular
- * entity object is deleted from field storage. Only field modules that are
- * storing or tracking information outside the standard field storage mechanism
- * need to implement this hook.
- *
- * @param \Drupal\Core\Entity\EntityInterface $entity
- *   The entity for the operation.
- * @param $field
- *   The field structure for the operation.
- * @param $instance
- *   The instance structure for $field on $entity's bundle.
- * @param $langcode
- *   The language associated with $items.
- * @param $items
- *   $entity->{$field['field_name']}[$langcode], or an empty array if unset.
- *
- * @see hook_field_insert()
- * @see hook_field_update()
- */
-function hook_field_delete(\Drupal\Core\Entity\EntityInterface $entity, $field, $instance, $langcode, &$items) {
-  // Delete all file usages within this entity.
-  foreach ($items as $delta => $item) {
-    file_usage()->delete(file_load($item['fid']), 'file', $entity->entityType(), $entity->id(), 0);
-  }
-}
-
-/**
- * Define custom revision delete behavior for this module's field types.
- *
- * This hook is invoked just before the data is deleted from field storage in
- * field_attach_delete_revision(), and will only be called for fieldable types
- * that are versioned.
- *
- * @param \Drupal\Core\Entity\EntityInterface $entity
- *   The entity for the operation.
- * @param $field
- *   The field structure for the operation.
- * @param $instance
- *   The instance structure for $field on $entity's bundle.
- * @param $langcode
- *   The language associated with $items.
- * @param $items
- *   $entity->{$field['field_name']}[$langcode], or an empty array if unset.
- */
-function hook_field_delete_revision(\Drupal\Core\Entity\EntityInterface $entity, $field, $instance, $langcode, &$items) {
-  foreach ($items as $delta => $item) {
-    // Decrement the file usage count by 1.
-    file_usage()->delete(file_load($item['fid']), 'file', $entity->entityType(), $entity->id());
-  }
-}
-
-/**
- * Define custom prepare_translation behavior for this module's field types.
- *
- * @param \Drupal\Core\Entity\EntityInterface $entity
- *   The entity for the operation.
- * @param $field
- *   The field structure for the operation.
- * @param $instance
- *   The instance structure for $field on $entity's bundle.
- * @param $langcode
- *   The language associated with $items.
- * @param $items
- *   $entity->{$field['field_name']}[$langcode], or an empty array if unset.
- * @param $source_entity
- *   The source entity from which field values are being copied.
- * @param $source_langcode
- *   The source language from which field values are being copied.
- */
-function hook_field_prepare_translation(\Drupal\Core\Entity\EntityInterface $entity, $field, $instance, $langcode, &$items, $source_entity, $source_langcode) {
-  // If the translating user is not permitted to use the assigned text format,
-  // we must not expose the source values.
-  $field_name = $field['field_name'];
-  $formats = filter_formats();
-  $format_id = $source_entity->{$field_name}[$source_langcode][0]['format'];
-  if (!filter_access($formats[$format_id])) {
-    $items = array();
-  }
-}
-
-/**
- * Define what constitutes an empty item for a field type.
- *
- * @param $item
- *   An item that may or may not be empty.
- * @param $field
- *   The field to which $item belongs.
- *
- * @return
- *   TRUE if $field's type considers $item not to contain any data; FALSE
- *   otherwise.
- */
-function hook_field_is_empty($item, $field) {
-  if (empty($item['value']) && (string) $item['value'] !== '0') {
-    return TRUE;
-  }
-  return FALSE;
-}
-
-/**
  * @} End of "defgroup field_types".
  */
 
@@ -888,25 +426,6 @@ function hook_field_attach_load($entity_type, $entities, $age, $options) {
 }
 
 /**
- * Act on field_attach_validate().
- *
- * This hook is invoked after the field module has performed the operation.
- *
- * @param \Drupal\Core\Entity\EntityInterface $entity
- *   The entity with fields to validate.
- * @param $errors
- *   The array of errors (keyed by field name, language code, and delta) that
- *   have already been reported for the entity. The function should add its
- *   errors to this array. Each error is an associative array with the following
- *   keys and values:
- *   - error: An error code (should be a string prefixed with the module name).
- *   - message: The human-readable message to be displayed.
- */
-function hook_field_attach_validate(\Drupal\Core\Entity\EntityInterface $entity, &$errors) {
-  // @todo Needs function body.
-}
-
-/**
  * Act on field_attach_extract_form_values().
  *
  * This hook is invoked after the field module has performed the operation.
@@ -932,42 +451,6 @@ function hook_field_attach_extract_form_values(\Drupal\Core\Entity\EntityInterfa
 }
 
 /**
- * Act on field_attach_presave().
- *
- * This hook is invoked after the field module has performed the operation.
- *
- * @param \Drupal\Core\Entity\EntityInterface $entity
- *   the entity with fields to process.
- */
-function hook_field_attach_presave(\Drupal\Core\Entity\EntityInterface $entity) {
-  // @todo Needs function body.
-}
-
-/**
- * Act on field_attach_insert().
- *
- * This hook is invoked after the field module has performed the operation.
- *
- * @param \Drupal\Core\Entity\EntityInterface $entity
- *   the entity with fields to process.
- */
-function hook_field_attach_insert(\Drupal\Core\Entity\EntityInterface $entity) {
-  // @todo Needs function body.
-}
-
-/**
- * Act on field_attach_update().
- *
- * This hook is invoked after the field module has performed the operation.
- *
- * @param \Drupal\Core\Entity\EntityInterface $entity
- *   the entity with fields to process.
- */
-function hook_field_attach_update(\Drupal\Core\Entity\EntityInterface $entity) {
-  // @todo Needs function body.
-}
-
-/**
  * Alter field_attach_preprocess() variables.
  *
  * This hook is invoked while preprocessing field templates in
@@ -982,30 +465,6 @@ function hook_field_attach_update(\Drupal\Core\Entity\EntityInterface $entity) {
  *   - element: The structured array containing the values ready for rendering.
  */
 function hook_field_attach_preprocess_alter(&$variables, $context) {
-  // @todo Needs function body.
-}
-
-/**
- * Act on field_attach_delete().
- *
- * This hook is invoked after the field module has performed the operation.
- *
- * @param \Drupal\Core\Entity\EntityInterface $entity
- *   the entity with fields to process.
- */
-function hook_field_attach_delete(\Drupal\Core\Entity\EntityInterface $entity) {
-  // @todo Needs function body.
-}
-
-/**
- * Act on field_attach_delete_revision().
- *
- * This hook is invoked after the field module has performed the operation.
- *
- * @param \Drupal\Core\Entity\EntityInterface $entity
- *   the entity with fields to process.
- */
-function hook_field_attach_delete_revision(\Drupal\Core\Entity\EntityInterface $entity) {
   // @todo Needs function body.
 }
 
@@ -1602,6 +1061,41 @@ function hook_field_storage_create_field($field) {
   $schema = _field_sql_storage_schema($field);
   foreach ($schema as $name => $table) {
     db_create_table($name, $table);
+  }
+  drupal_get_schema(NULL, TRUE);
+}
+
+/**
+ * Update the storage information for a field.
+ *
+ * This is invoked on the field's storage module when updating the field,
+ * before the new definition is saved to the database. The field storage module
+ * should update its storage tables according to the new field definition. If
+ * there is a problem, the field storage module should throw an exception.
+ *
+ * @param $field
+ *   The updated field structure to be saved.
+ * @param $prior_field
+ *   The previously-saved field structure.
+ * @param $has_data
+ *   TRUE if the field has data in storage currently.
+ */
+function hook_field_storage_update_field($field, $prior_field, $has_data) {
+  if (!$has_data) {
+    // There is no data. Re-create the tables completely.
+    $prior_schema = _field_sql_storage_schema($prior_field);
+    foreach ($prior_schema as $name => $table) {
+      db_drop_table($name, $table);
+    }
+    $schema = _field_sql_storage_schema($field);
+    foreach ($schema as $name => $table) {
+      db_create_table($name, $table);
+    }
+  }
+  else {
+    // There is data. See field_sql_storage_field_storage_update_field() for
+    // an example of what to do to modify the schema in place, preserving the
+    // old data as much as possible.
   }
   drupal_get_schema(NULL, TRUE);
 }

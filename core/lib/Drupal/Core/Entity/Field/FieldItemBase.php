@@ -25,8 +25,8 @@ abstract class FieldItemBase extends Map implements FieldItemInterface {
   /**
    * Overrides \Drupal\Core\TypedData\TypedData::__construct().
    */
-  public function __construct(array $definition, $name = NULL, TypedDataInterface $parent = NULL) {
-    parent::__construct($definition, $name, $parent);
+  public function __construct(array $definition, $plugin_id, array $plugin_definition, $name = NULL, TypedDataInterface $parent = NULL) {
+    parent::__construct($definition, $plugin_id, $plugin_definition, $name, $parent);
     // Initialize computed properties by default, such that they get cloned
     // with the whole item.
     foreach ($this->getPropertyDefinitions() as $name => $definition) {
@@ -151,5 +151,44 @@ abstract class FieldItemBase extends Map implements FieldItemInterface {
     }
     return $constraints;
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function preSave() { }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function insert() { }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function update() { }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function delete() { }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function deleteRevision() { }
+
+
+
+  // @todo
+
+  /**
+   * {@inheritdoc}
+   */
+  public function prepareView(array $entities, array $instances, $langcode, array &$items) { }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function prepareTranslation(EntityInterface $source_entity, $source_langcode) { }
 
 }

@@ -7,13 +7,12 @@
 
 namespace Drupal\taxonomy\Type;
 
-use Drupal\Core\Entity\Field\FieldItemBase;
-use Drupal\Core\TypedData\TypedDataInterface;
+use Drupal\field\Plugin\field\field_type\LegacyCFieldItem;
 
 /**
  * Defines the 'taxonomy_term_reference' entity field item.
  */
-class TaxonomyTermReferenceItem extends FieldItemBase {
+class TaxonomyTermReferenceItem extends LegacyCFieldItem {
 
   /**
    * Property definitions of the contained properties.

@@ -61,8 +61,8 @@ class EntityWrapper extends TypedData implements IteratorAggregate, ComplexDataI
   /**
    * Overrides TypedData::__construct().
    */
-  public function __construct(array $definition, $name = NULL, TypedDataInterface $parent = NULL) {
-    parent::__construct($definition, $name, $parent);
+  public function __construct(array $definition, $plugin_id, array $plugin_definition, $name = NULL, TypedDataInterface $parent = NULL) {
+    parent::__construct($definition, $plugin_id, $plugin_definition, $name, $parent);
     $this->entityType = isset($this->definition['constraints']['EntityType']) ? $this->definition['constraints']['EntityType'] : NULL;
   }
 
@@ -90,7 +90,8 @@ class EntityWrapper extends TypedData implements IteratorAggregate, ComplexDataI
     if ($value instanceof EntityInterface && $value->isNew()) {
       $this->newEntity = $value;
       $this->entityType = $value->entityType();
-      $value = FALSE;
+      // @todo Fix from https://drupal.org/node/2012662.
+      $value = 0;
     }
     elseif ($value instanceof EntityInterface) {
       $this->entityType = $value->entityType();

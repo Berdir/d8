@@ -196,6 +196,13 @@ class Field extends ConfigEntityBase implements FieldInterface {
   public $deleted = FALSE;
 
   /**
+   * The field type handler.
+   *
+   * @var \Drupal\field\Plugin\Type\FieldType\CFieldItemInterface
+   */
+  protected $handler;
+
+  /**
    * The field schema.
    *
    * @var array
@@ -452,15 +459,12 @@ class Field extends ConfigEntityBase implements FieldInterface {
    */
   public function getSchema() {
     if (!isset($this->schema)) {
-      $module_handler = \Drupal::moduleHandler();
-
-      // Collect the schema from the field type.
-      // @todo Use $module_handler->loadInclude() once
-      // http://drupal.org/node/1941000 is fixed.
-      module_load_install($this->module);
-      // Invoke hook_field_schema() for the field.
-      $schema = (array) $module_handler->invoke($this->module, 'field_schema', array($this));
-      $schema += array('columns' => array(), 'indexes' => array(), 'foreign keys' => array());
+      // Get the schema from the field item class.
+      $definition = \Drupal::service('plugin.manager.field.field_type')->getDefinition($this->type);
+      $class = $definition['class'];
+      $schema = $class::schema($this);
+      // Fill in default values for optional entries.
+      $schema += array('indexes' => array(), 'foreign keys' => array());
 
       // Check that the schema does not include forbidden column names.
       if (array_intersect(array_keys($schema['columns']), static::getReservedColumns())) {
@@ -475,6 +479,20 @@ class Field extends ConfigEntityBase implements FieldInterface {
     }
 
     return $this->schema;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getColumns() {
+    $schema = $this->getSchema();
+    // A typical use case for the method is to iterate on the columns, while
+    // some other use cases rely on identifying the first column with the/ key()
+    // function. Since the schema is persisted in the Field object, we take care
+    // of resetting the array pointer so that the former does not interfere with
+    // the latter.
+    reset($schema['columns']);
+    return $schema['columns'];
   }
 
   /**
@@ -588,5 +606,5 @@ class Field extends ConfigEntityBase implements FieldInterface {
   public static function getReservedColumns() {
     return array('deleted');
   }
-
+  
 }

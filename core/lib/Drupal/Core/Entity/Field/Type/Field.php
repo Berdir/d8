@@ -36,8 +36,8 @@ class Field extends ItemList implements FieldInterface {
   /**
    * Overrides TypedData::__construct().
    */
-  public function __construct(array $definition, $name = NULL, TypedDataInterface $parent = NULL) {
-    parent::__construct($definition, $name, $parent);
+  public function __construct(array $definition, $plugin_id, array $plugin_definition, $name = NULL, TypedDataInterface $parent = NULL) {
+    parent::__construct($definition, $plugin_id, $plugin_definition, $name, $parent);
     // Always initialize one empty item as most times a value for at least one
     // item will be present. That way prototypes created by
     // \Drupal\Core\TypedData\TypedDataManager::getPropertyInstance() will
@@ -53,6 +53,20 @@ class Field extends ItemList implements FieldInterface {
       $this->list = array_values(array_filter($this->list, function($item) {
         return !$item->isEmpty();
       }));
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   * @todo Revisit the need when all entity types are converted to NG entities.
+   */
+  public function getValue($include_computed = FALSE) {
+    if (isset($this->list)) {
+      $values = array();
+      foreach ($this->list as $delta => $item) {
+        $values[$delta] = $item->getValue($include_computed);
+      }
+      return $values;
     }
   }
 
@@ -209,4 +223,57 @@ class Field extends ItemList implements FieldInterface {
     }
     return $constraints;
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function preSave() {
+    // Filter out empty items.
+    $this->filterEmptyValues();
+
+    $this->delegateMethod('presave');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function insert() {
+    $this->delegateMethod('insert');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function update() {
+    $this->delegateMethod('update');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function delete() {
+    $this->delegateMethod('delete');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function deleteRevision() {
+    $this->delegateMethod('deleteRevision');
+  }
+
+  /**
+   * Calls a method on each FieldItem.
+   *
+   * @param string $method
+   *   The name of the method.
+   */
+  protected function delegateMethod($method) {
+    if (isset($this->list)) {
+      foreach ($this->list as $item) {
+        $item->{$method}();
+      }
+    }
+  }
+
 }

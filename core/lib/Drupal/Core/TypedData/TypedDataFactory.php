@@ -57,6 +57,8 @@ class TypedDataFactory extends DefaultFactory {
     if (!isset($class)) {
       throw new PluginException(sprintf('The plugin (%s) did not specify an instance class.', $plugin_id));
     }
-    return new $class($configuration, $name, $parent);
+
+    return new $class($configuration, $plugin_id, $type_definition, $name, $parent);
   }
+
 }

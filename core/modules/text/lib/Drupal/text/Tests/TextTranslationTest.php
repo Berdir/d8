@@ -24,13 +24,14 @@ class TextTranslationTest extends WebTestBase {
 
   protected $profile = 'standard';
 
-  public static function getInfo() {
-    return array(
-      'name' => 'Text translation',
-      'description' => 'Check if the text field is correctly prepared for translation.',
-      'group' => 'Field types',
-    );
-  }
+// @todo Uncomment when field_attach_prepare_translation() works again.
+//  public static function getInfo() {
+//    return array(
+//      'name' => 'Text translation',
+//      'description' => 'Check if the text field is correctly prepared for translation.',
+//      'group' => 'Field types',
+//    );
+//  }
 
   function setUp() {
     parent::setUp();

@@ -309,6 +309,7 @@ class DatabaseStorageController implements EntityStorageControllerInterface, Ent
       $this->database->delete($this->revisionTable)
         ->condition($this->revisionKey, $revision->getRevisionId())
         ->execute();
+      $this->invokeFieldMethod('deleteRevision', $revision);
       $this->invokeHook('revision_delete', $revision);
     }
   }
@@ -526,6 +527,7 @@ class DatabaseStorageController implements EntityStorageControllerInterface, Ent
 
       $this->postDelete($entities);
       foreach ($entities as $id => $entity) {
+        $this->invokeFieldMethod('delete', $entity);
         $this->invokeHook('delete', $entity);
       }
       // Ignore slave server temporarily.
@@ -550,6 +552,7 @@ class DatabaseStorageController implements EntityStorageControllerInterface, Ent
       }
 
       $this->preSave($entity);
+      $this->invokeFieldMethod('preSave', $entity);
       $this->invokeHook('presave', $entity);
 
       if (!$entity->isNew()) {
@@ -566,6 +569,7 @@ class DatabaseStorageController implements EntityStorageControllerInterface, Ent
         }
         $this->resetCache(array($entity->id()));
         $this->postSave($entity, TRUE);
+        $this->invokeFieldMethod('update', $entity);
         $this->invokeHook('update', $entity);
       }
       else {
@@ -578,6 +582,7 @@ class DatabaseStorageController implements EntityStorageControllerInterface, Ent
 
         $entity->enforceIsNew(FALSE);
         $this->postSave($entity, FALSE);
+        $this->invokeFieldMethod('insert', $entity);
         $this->invokeHook('insert', $entity);
       }
 
@@ -681,7 +686,8 @@ class DatabaseStorageController implements EntityStorageControllerInterface, Ent
    * Invokes a hook on behalf of the entity.
    *
    * @param $hook
-   *   One of 'presave', 'insert', 'update', 'predelete', or 'delete'.
+   *   One of 'presave', 'insert', 'update', 'predelete', 'delete', or
+   *  'revision_delete'.
    * @param $entity
    *   The entity object.
    */
@@ -699,6 +705,141 @@ class DatabaseStorageController implements EntityStorageControllerInterface, Ent
     module_invoke_all($this->entityType . '_' . $hook, $entity);
     // Invoke the respective entity-level hook.
     module_invoke_all('entity_' . $hook, $entity, $this->entityType);
+  }
+
+  /**
+   * Invokes a method on all the Field objetcs within an entity.
+   *
+   * @param string $method
+   *   The method name.
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity object.
+   * @todo $options
+   */
+  public function invokeFieldMethod($method, EntityInterface $entity, $options = array()) {
+    // @todo getTranslationLanguages() seems like a potential perf drag ?
+    foreach (array_keys($entity->getTranslationLanguages()) as $langcode) {
+      // @todo getTranslation() only works on NG entities. Remove the condition
+      // and the second code branch when all core entity types are converted.
+      if ($translation = $entity->getTranslation($langcode)) {
+        foreach ($translation as $field_name => $field) {
+          // @todo How to work with an injected 'instance' here ?
+          if (empty($options['instance']) || $options['instance']->getField()->id() == $field_name) {
+            $field->$method();
+          }
+        }
+      }
+      else {
+        // For BC entities, iterate through fields and instanciate NG items
+        // objects manually.
+        if (isset($options['instance'])) {
+          $field = $options['instance']->getField();
+          $definitions = array($field->id() => _field_generate_entity_field_definition($field, $options['instance']));
+        }
+        else {
+          $definitions = $this->getFieldDefinitions(array(
+            'EntityType' => $entity->entityType(),
+            'Bundle' => $entity->bundle(),
+          ));
+        }
+        foreach ($definitions as $field_name => $definition) {
+          if (!empty($definition['configurable'])) {
+            // Create the items object.
+            $items = isset($entity->{$field_name}[$langcode]) ? $entity->{$field_name}[$langcode] : array();
+            // @todo Exception : this calls setValue(), tries to set the 'formatted' property.
+            // For now, this is worked around by commenting out the Exception in TextProcessed::setValue().
+            $itemsNG = \Drupal::typedData()->create($definition, $items, $field_name, $entity);
+            $itemsNG->$method();
+
+            // Put back the items values in the entity.
+            $items = $itemsNG->getValue(TRUE);
+            if ($items !== array() || isset($entity->{$field_name}[$langcode])) {
+              $entity->{$field_name}[$langcode] = $items;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Invokes the prepareCache() method on all the relevant FieldItem objetcs.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity object.
+   * @todo $options
+   */
+  public function invokeFieldItemPrepareCache(EntityInterface $entity, $options) {
+    foreach (array_keys($entity->getTranslationLanguages()) as $langcode) {
+      // @todo getTranslation() only works on NG entities. Remove the condition
+      // and the second code branch when all core entity types are converted.
+      if ($translation = $entity->getTranslation($langcode)) {
+        if (!empty($options['instance'])) {
+          $field = $options['instance']->getField();
+          $definitions = array($field->id() => _field_generate_entity_field_definition($field, $options['instance']));
+        }
+        else {
+          $definitions = $translation->getPropertyDefinitions();
+        }
+        foreach ($definitions as $property => $definition) {
+          $type_definition = \Drupal::typedData()->getDefinition($definition['type']);
+          // Only create the item objects if needed.
+          if (is_subclass_of($type_definition['class'], '\Drupal\field\Plugin\Type\FieldType\PrepareCacheInterface')
+            // Prevent legacy field types from skewing performance too much by
+            // checking the existence of the legacy function directly, instead
+            // of making LegacyCFieldItem implement PrepareCacheInterface.
+            // @todo Remove once all core field types have been converted (see
+            // http://drupal.org/node/2014671).
+            || (is_subclass_of($type_definition['class'], '\Drupal\field\Plugin\field\field_type\LegacyCFieldItem') && function_exists($type_definition['module'] . '_field_load'))) {
+
+            // Call the prepareCache() method directly on each item
+            // individually.
+            foreach ($translation->get($property) as $item) {
+              $item->prepareCache();
+            }
+          }
+        }
+      }
+      else {
+        // For BC entities, iterate through the fields and instanciate NG items
+        // objects manually.
+        if (isset($options['instance'])) {
+          $field = $options['instance']->getField();
+          $definitions = array($field->id() => _field_generate_entity_field_definition($field, $options['instance']));
+        }
+        else {
+          $definitions = $this->getFieldDefinitions(array(
+            'EntityType' => $entity->entityType(),
+            'Bundle' => $entity->bundle(),
+          ));
+        }
+        foreach ($definitions as $field_name => $definition) {
+          if (!empty($definition['configurable'])) {
+            $type_definition = \Drupal::typedData()->getDefinition($definition['type']);
+            // Only create the item objects if needed.
+            if (is_subclass_of($type_definition['class'], '\Drupal\field\Plugin\Type\FieldType\PrepareCacheInterface')
+              // @todo Remove once all core field types have been converted (see
+              // http://drupal.org/node/2014671).
+              || (is_subclass_of($type_definition['class'], '\Drupal\field\Plugin\field\field_type\LegacyCFieldItem') && function_exists($type_definition['module'] . '_field_load'))) {
+
+              // Create the items object.
+              $items = isset($entity->{$field_name}[$langcode]) ? $entity->{$field_name}[$langcode] : array();
+              $itemsNG = \Drupal::typedData()->create($definition, $items, $field_name, $entity);
+
+              foreach ($itemsNG as $item) {
+                $item->prepareCache();
+              }
+
+              // Put back the items values in the entity.
+              $items = $itemsNG->getValue(TRUE);
+              if ($items !== array() || isset($entity->{$field_name}[$langcode])) {
+                $entity->{$field_name}[$langcode] = $items;
+              }
+            }
+          }
+        }
+      }
+    }
   }
 
   /**

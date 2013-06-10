@@ -108,6 +108,12 @@ class ConstraintManager extends PluginManagerBase {
       'class' => '\Symfony\Component\Validator\Constraints\Email',
       'type' => array('string'),
     ));
+    // @todo Should this be turned into a plugin of ours ?
+    $this->discovery->setDefinition('Count', array(
+      'label' => t('Count'),
+      'class' => '\Symfony\Component\Validator\Constraints\Count',
+      'type' => array(),
+    ));
   }
 
   /**

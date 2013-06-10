@@ -29,7 +29,7 @@ function file_field_info() {
       ),
       'default_widget' => 'file_generic',
       'default_formatter' => 'file_default',
-      'field item class' => '\Drupal\file\Type\FileItem',
+      'class' => '\Drupal\file\Type\FileItem',
     ),
   );
 }
@@ -181,6 +181,14 @@ function _file_generic_settings_file_directory_validate($element, &$form_state) 
   // Strip slashes from the beginning and end of $widget['file_directory'].
   $value = trim($element['#value'], '\\/');
   form_set_value($element, $value, $form_state);
+}
+
+function file_field_load($entity_type, $entities, $field, $instances, $langcode, &$items) {
+  foreach ($entities as $id => $entity) {
+    foreach ($items[$id] as $delta => $item) {
+      $items[$id][$delta]['display'] = 2;
+    }
+  }
 }
 
 /**

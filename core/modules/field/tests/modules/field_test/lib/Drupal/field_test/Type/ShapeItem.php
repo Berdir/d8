@@ -7,12 +7,12 @@
 
 namespace Drupal\field_test\Type;
 
-use Drupal\Core\Entity\Field\FieldItemBase;
+use Drupal\field\Plugin\field\field_type\LegacyCFieldItem;
 
 /**
  * Defines the 'shape_field' entity field item.
  */
-class ShapeItem extends FieldItemBase {
+class ShapeItem extends LegacyCFieldItem {
 
   /**
    * Property definitions of the contained properties.

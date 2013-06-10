@@ -7,12 +7,12 @@
 
 namespace Drupal\link\Type;
 
-use Drupal\Core\Entity\Field\FieldItemBase;
+use Drupal\field\Plugin\field\field_type\LegacyCFieldItem;
 
 /**
  * Defines the 'link_field' entity field item.
  */
-class LinkItem extends FieldItemBase {
+class LinkItem extends LegacyCFieldItem {
 
   /**
    * Property definitions of the contained properties.

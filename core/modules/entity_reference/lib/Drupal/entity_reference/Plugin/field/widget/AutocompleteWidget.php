@@ -76,8 +76,7 @@ class AutocompleteWidget extends AutocompleteWidgetBase {
       if (!$value && $auto_create && (count($this->instance['settings']['handler_settings']['target_bundles']) == 1)) {
         // Auto-create item. see entity_reference_field_presave().
         $value = array(
-          'target_id' => 'auto_create',
-          'label' => $element['#value'],
+          'entity' => $this->createNewEntity($element['#value'], $element['#autocreate_uid']),
           // Keep the weight property.
           '_weight' => $element['#weight'],
         );

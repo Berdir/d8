@@ -265,4 +265,10 @@ class EntityManager extends PluginManagerBase {
     return $admin_path;
   }
 
+  // @todo temporary - Revisit after http://drupal.org/node/1893820
+  public function clearCachedFieldDefinitions() {
+    unset($this->controllers['storage']);
+    cache()->deleteTags(array('entity_info'));
+  }
+
 }

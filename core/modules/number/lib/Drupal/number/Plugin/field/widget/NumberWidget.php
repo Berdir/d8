@@ -10,6 +10,7 @@ namespace Drupal\number\Plugin\field\widget;
 use Drupal\Component\Annotation\Plugin;
 use Drupal\Core\Annotation\Translation;
 use Drupal\field\Plugin\Type\Widget\WidgetBase;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 
 /**
  * Plugin implementation of the 'number' widget.
@@ -93,7 +94,7 @@ class NumberWidget extends WidgetBase {
   /**
    * Implements Drupal\field\Plugin\Type\Widget\WidgetInterface::errorElement().
    */
-  public function errorElement(array $element, array $error, array $form, array &$form_state) {
+  public function errorElement(array $element, ConstraintViolationInterface $error, array $form, array &$form_state) {
     return $element['value'];
   }
 

@@ -15,6 +15,11 @@ namespace Drupal\Core\TypedData;
  */
 abstract class TypedData implements TypedDataInterface {
 
+  // @todo Should extend PluginBase, but PluginInspectionInterface::getDefinition()
+  // should be renamed getPluginDefinition() first.
+  protected $pluginId;
+  protected $pluginDefinition;
+
   /**
    * The data definition.
    *
@@ -41,6 +46,10 @@ abstract class TypedData implements TypedDataInterface {
    *
    * @param array $definition
    *   The data definition.
+   * @param string $plugin_id
+   *   The plugin_id for the plugin instance.
+   * @param array $plugin_definition
+   *   The plugin implementation definition.
    * @param string $name
    *   (optional) The name of the created property, or NULL if it is the root
    *   of a typed data tree. Defaults to NULL.
@@ -50,10 +59,19 @@ abstract class TypedData implements TypedDataInterface {
    *
    * @see Drupal\Core\TypedData\TypedDataManager::create()
    */
-  public function __construct(array $definition, $name = NULL, TypedDataInterface $parent = NULL) {
+  public function __construct(array $definition, $plugin_id, array $plugin_definition, $name = NULL, TypedDataInterface $parent = NULL) {
     $this->definition = $definition;
+    $this->pluginId = $plugin_id;
+    $this->pluginDefinition = $plugin_definition;
     $this->parent = $parent;
     $this->name = $name;
+  }
+
+  public function getPluginId() {
+    return $this->pluginId;
+  }
+  public function getPluginDefinition() {
+    return $this->pluginDefinition;
   }
 
   /**

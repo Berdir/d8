@@ -1,4 +1,7 @@
 services:
+  plugin.manager.field.field_type:
+    class: Drupal\field\Plugin\Type\FieldType\FieldTypePluginManager
+    arguments: ['@container.namespaces', '@module_handler']
   plugin.manager.field.widget:
     class: Drupal\field\Plugin\Type\Widget\WidgetPluginManager
     arguments: ['@container.namespaces']

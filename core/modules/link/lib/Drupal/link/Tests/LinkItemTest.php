@@ -61,6 +61,9 @@ class LinkItemTest extends FieldUnitTestBase {
     $entity->field_test->title = $title;
     $entity->field_test->get('attributes')->set('class', $class);
     $entity->name->value = $this->randomName();
+    // @todo This fails because link_field_presave() sets 'attibutes' to a
+    // serialized string, but this is rejected by Map::setValue() because the
+    // 'attributes' property is supposed to be a TypeData 'Map'.
     $entity->save();
 
     // Verify that the field value is changed.

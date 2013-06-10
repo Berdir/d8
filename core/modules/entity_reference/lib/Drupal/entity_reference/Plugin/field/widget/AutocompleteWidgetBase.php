@@ -10,6 +10,7 @@ namespace Drupal\entity_reference\Plugin\field\widget;
 use Drupal\Component\Annotation\Plugin;
 use Drupal\Core\Annotation\Translation;
 use Drupal\field\Plugin\Type\Widget\WidgetBase;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 
 /**
  * Parent plugin for entity reference autocomplete widgets.
@@ -53,6 +54,8 @@ abstract class AutocompleteWidgetBase extends WidgetBase {
    * Implements \Drupal\field\Plugin\Type\Widget\WidgetInterface::formElement().
    */
   public function formElement(array $items, $delta, array $element, $langcode, array &$form, array &$form_state) {
+    global $user;
+
     $instance = $this->instance;
     $field = $this->field;
     $entity = isset($element['#entity']) ? $element['#entity'] : NULL;
@@ -77,6 +80,8 @@ abstract class AutocompleteWidgetBase extends WidgetBase {
       '#size' => $this->getSetting('size'),
       '#placeholder' => $this->getSetting('placeholder'),
       '#element_validate' => array(array($this, 'elementValidate')),
+      // @todo: Use wrapper to get the user if exists or needed.
+      '#autocreate_uid' => isset($entity->uid) ? $entity->uid : $user->uid,
     );
 
     return array('target_id' => $element);
@@ -85,7 +90,7 @@ abstract class AutocompleteWidgetBase extends WidgetBase {
   /**
    * Overrides \Drupal\field\Plugin\Type\Widget\WidgetBase::errorElement().
    */
-  public function errorElement(array $element, array $error, array $form, array &$form_state) {
+  public function errorElement(array $element, ConstraintViolationInterface $error, array $form, array &$form_state) {
     return $element['target_id'];
   }
 
@@ -120,4 +125,39 @@ abstract class AutocompleteWidgetBase extends WidgetBase {
     }
     return $entity_labels;
   }
+
+  /**
+   * Creates a new entity from a label entered in the autocomplete input.
+   *
+   * @param string $label
+   *   The entity label.
+   * @param int $uid
+   *   The entity uid.
+   *
+   * @return \Drupal\Core\Entity\EntityInterface
+   */
+  protected function createNewEntity($label, $uid) {
+    $entity_manager = \Drupal::entityManager();
+    $target_type = $this->field['settings']['target_type'];
+
+    // Get the bundle.
+    if (!empty($this->instance['settings']['handler_settings']['target_bundles']) && count($this->instance['settings']['handler_settings']['target_bundles']) == 1) {
+      $bundle = reset($this->instance['settings']['handler_settings']['target_bundles']);
+    }
+    else {
+      $bundles = entity_get_bundles($target_type);
+      $bundle = reset($bundles);
+    }
+
+    $entity_info = $entity_manager->getDefinition($target_type);
+    $bundle_key = $entity_info['entity_keys']['bundle'];
+    $label_key = $entity_info['entity_keys']['label'];
+
+    return $entity_manager->getStorageController($target_type)->create(array(
+      $label_key => $label,
+      $bundle_key => $bundle,
+      'uid' => $uid,
+    ));
+  }
+
 }

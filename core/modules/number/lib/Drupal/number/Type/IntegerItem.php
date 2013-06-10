@@ -7,12 +7,12 @@
 
 namespace Drupal\number\Type;
 
-use Drupal\Core\Entity\Field\FieldItemBase;
+use Drupal\field\Plugin\field\field_type\LegacyCFieldItem;
 
 /**
  * Defines the 'number_integer_field' entity field item.
  */
-class IntegerItem extends FieldItemBase {
+class IntegerItem extends LegacyCFieldItem {
 
   /**
    * Definitions of the contained properties.

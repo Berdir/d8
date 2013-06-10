@@ -581,10 +581,15 @@ function field_purge_batch($batch_size) {
         $ids->entity_id = $entity_id;
         $entities[$entity_id] = _field_create_entity_from_ids($ids);
       }
-      field_attach_load($entity_type, $entities, FIELD_LOAD_CURRENT, array('field_id' => $field['uuid'], 'deleted' => 1));
+
+      $storage_info = field_info_storage_types($field->storage['type']);
+      // @todo $options['instance'] - it's actually 'deleted' that makes sense there.
+      module_invoke($storage_info['module'], 'field_storage_load', $entity_type, $entities, FIELD_LOAD_CURRENT, array($field->uuid => array_keys($entities)), array('instance' => $instance));
+
       foreach ($entities as $entity) {
         // Purge the data for the entity.
-        field_purge_data($entity, $field, $instance);
+        $items = $entity->{$field->id()};
+//        field_purge_data($entity, $items, $field, $instance);
       }
     }
     else {
@@ -621,8 +626,9 @@ function field_purge_batch($batch_size) {
 function field_purge_data(EntityInterface $entity, $field, $instance) {
   // Each field type's hook_field_delete() only expects to operate on a single
   // field at a time, so we can use it as-is for purging.
-  $options = array('field_id' => $instance['field_id'], 'deleted' => TRUE);
-  _field_invoke('delete', $entity, $dummy, $dummy, $options);
+  Drupal::entityManager()
+    ->getStorageController($entity->entityType())
+    ->invokeFieldMethod('delete', $entity, array('field' => $field, 'instance' => $instance));
 
   // Tell the field storage system to purge the data.
   module_invoke($field['storage']['module'], 'field_storage_purge', $entity, $field, $instance);

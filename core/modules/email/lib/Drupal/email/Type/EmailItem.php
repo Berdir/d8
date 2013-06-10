@@ -7,12 +7,12 @@
 
 namespace Drupal\email\Type;
 
-use Drupal\Core\Entity\Field\FieldItemBase;
+use Drupal\field\Plugin\field\field_type\LegacyCFieldItem;
 
 /**
  * Defines the 'email_field' entity field item.
  */
-class EmailItem extends FieldItemBase {
+class EmailItem extends LegacyCFieldItem {
 
   /**
    * Definitions of the contained properties.

@@ -7,6 +7,8 @@
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Template\Attribute;
+use Drupal\field\FieldInterface;
+use Drupal\field\FieldInstanceInterface;
 
 /*
  * Load all public Field API functions. Drupal currently has no
@@ -14,7 +16,6 @@ use Drupal\Core\Template\Attribute;
  * every page request.
  */
 require_once __DIR__ . '/field.crud.inc';
-require_once __DIR__ . '/field.default.inc';
 require_once __DIR__ . '/field.info.inc';
 require_once __DIR__ . '/field.multilingual.inc';
 require_once __DIR__ . '/field.attach.inc';
@@ -229,21 +230,14 @@ function field_system_info_alter(&$info, $file, $type) {
 }
 
 /**
- * Implements hook_data_type_info() to register data types for all field types.
+ * Implements hook_data_type_info().
  */
 function field_data_type_info() {
-  $field_types = field_info_field_types();
-  $items = array();
-
-  // Expose data types for all the field type items.
-  foreach ($field_types as $type_name => $type_info) {
-    $data_type = isset($type_info['data_type']) ? $type_info['data_type'] : $type_name . '_field';
-    $items[$data_type] = array(
-      'label' => t('Field !label item', array('!label' => $type_info['label'])),
-      'class' => $type_info['field item class'],
-      'list class' => !empty($type_info['field class']) ? $type_info['field class'] : '\Drupal\Core\Entity\Field\Type\Field',
-    );
-  }
+  // Expose each "configurable field" type as a data type. We add one single
+  // entry, which will be expanded through plugin derivatives.
+  $items['field_type'] = array(
+    'derivative' => '\Drupal\field\Plugin\DataType\CFieldDataTypeDerivative',
+  );
   return $items;
 }
 
@@ -292,21 +286,12 @@ function field_populate_default_values(EntityInterface $entity, $langcode = NULL
  */
 function field_entity_field_info($entity_type) {
   $property_info = array();
-  $field_types = field_info_field_types();
 
   foreach (field_info_instances($entity_type) as $bundle_name => $instances) {
     $optional = $bundle_name != $entity_type;
 
     foreach ($instances as $field_name => $instance) {
-      $field = field_info_field($field_name);
-
-      // @todo: Allow for adding field type settings.
-      $definition = array(
-        'label' => t('Field !name', array('!name' => $field_name)),
-        'type' => isset($field_types[$field['type']]['data_type']) ? $field_types[$field['type']]['data_type'] :  $field['type'] . '_field',
-        'configurable' => TRUE,
-        'translatable' => !empty($field['translatable'])
-      );
+      $definition = _field_generate_entity_field_definition($instance->getField());
 
       if ($optional) {
         $property_info['optional'][$field_name] = $definition;
@@ -319,6 +304,34 @@ function field_entity_field_info($entity_type) {
   }
 
   return $property_info;
+}
+
+/**
+ * Generates an entity field definition for a configurable field.
+ *
+ * @param \Drupal\field\FieldInterface $field
+ *   The field definition.
+ * @param \Drupal\field\FieldInstanceInterface $instance
+ *   (Optionnal) The field instance definition.
+ *
+ * @return array
+ *   The entity field definition.
+ */
+function _field_generate_entity_field_definition(FieldInterface $field, FieldInstanceInterface $instance = NULL) {
+  // @todo: Allow for adding field type settings.
+  $definition = array(
+    'label' => t('Field !name', array('!name' => $field->id())),
+    // @todo change the prefix to 'configurable something'.
+    'type' => 'field_type:' . $field->type,
+    'list' => TRUE,
+    'configurable' => TRUE,
+    'translatable' => !empty($field->translatable),
+  );
+  if ($instance) {
+    $definition['instance'] = $instance;
+  }
+
+  return $definition;
 }
 
 /**
@@ -496,63 +509,6 @@ function field_get_default_value(EntityInterface $entity, $field, $instance, $la
     $items = $instance['default_value'];
   }
   return $items;
-}
-
-/**
- * Filters out empty field values.
- *
- * @param $field
- *   The field definition.
- * @param $items
- *   The field values to filter.
- *
- * @return
- *   The array of items without empty field values. The function also renumbers
- *   the array keys to ensure sequential deltas.
- */
-function _field_filter_items($field, $items) {
-  $function = $field['module'] . '_field_is_empty';
-  foreach ((array) $items as $delta => $item) {
-    // Explicitly break if the function is undefined.
-    if ($function($item, $field)) {
-      unset($items[$delta]);
-    }
-  }
-  return array_values($items);
-}
-
-/**
- * Sorts items in a field according to user drag-and-drop reordering.
- *
- * @param $field
- *   The field definition.
- * @param $items
- *   The field values to sort.
- *
- * @return
- *   The sorted array of field items.
- */
-function _field_sort_items($field, $items) {
-  if (($field['cardinality'] > 1 || $field['cardinality'] == FIELD_CARDINALITY_UNLIMITED) && isset($items[0]['_weight'])) {
-    usort($items, '_field_sort_items_helper');
-    foreach ($items as $delta => $item) {
-      if (is_array($items[$delta])) {
-        unset($items[$delta]['_weight']);
-      }
-    }
-  }
-  return $items;
-}
-
-/**
- * Callback for usort() within _field_sort_items().
- *
- * Copied form element_sort(), which acts on #weight keys.
- */
-function _field_sort_items_helper($a, $b) {
-  $a_weight = (is_array($a) ? $a['_weight'] : 0);
-  $b_weight = (is_array($b) ? $b['_weight'] : 0);
-  return $a_weight - $b_weight;
 }
 
 /**

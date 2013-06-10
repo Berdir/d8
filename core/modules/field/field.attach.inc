@@ -5,10 +5,11 @@
  * Field attach API, allowing entities (nodes, users, ...) to be 'fieldable'.
  */
 
-use Drupal\field\FieldValidationException;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityNG;
 use Drupal\entity\Plugin\Core\Entity\EntityDisplay;
 use Drupal\entity\Plugin\Core\Entity\EntityFormDisplay;
+use Drupal\Core\Language\Language;
 
 /**
  * @defgroup field_storage Field Storage API
@@ -732,8 +733,7 @@ function _field_invoke_widget_target($form_display) {
  * appear within the same $form element, or within the same '#parents' space.
  *
  * For each call to field_attach_form(), field values are processed by calling
- * field_attach_form_validate() and field_attach_extract_form_values() on the
- * same $form element.
+ * field_attach_extract_form_values() on the same $form element.
  *
  * Sample resulting structure in $form:
  * @code
@@ -874,28 +874,17 @@ function field_attach_form(EntityInterface $entity, &$form, &$form_state, $langc
  *   FIELD_LOAD_REVISION.
  * @param $options
  *   An associative array of additional options, with the following keys:
- *   - field_id: The field ID that should be loaded, instead of loading all
- *     fields, for each entity. Note that returned entities may contain data for
- *     other fields, for example if they are read from a cache.
- *   - deleted: If TRUE, the function will operate on deleted fields as well as
- *     non-deleted fields. If unset or FALSE, only non-deleted fields are
- *     operated on.
+ *   - instance: A field instance entity, If provided, only values for the
+ *     corresponding field will be loaded, and the cache is bypassed. This
+ *     option is only supported when all $entities are within the same bundle.
  */
 function field_attach_load($entity_type, $entities, $age = FIELD_LOAD_CURRENT, $options = array()) {
   $load_current = $age == FIELD_LOAD_CURRENT;
 
-  // Merge default options.
-  $default_options = array(
-    'deleted' => FALSE,
-  );
-  $options += $default_options;
-
   $info = entity_get_info($entity_type);
   // Only the most current revision of non-deleted fields for cacheable entity
   // types can be cached.
-  $cache_read = $load_current && $info['field_cache'] && empty($options['deleted']);
-  // In addition, do not write to the cache when loading a single field.
-  $cache_write = $cache_read && !isset($options['field_id']);
+  $use_cache = $load_current && $info['field_cache'] && empty($options['instance']);
 
   if (empty($entities)) {
     return;
@@ -911,7 +900,7 @@ function field_attach_load($entity_type, $entities, $age = FIELD_LOAD_CURRENT, $
   $queried_entities = $entities;
 
   // Fetch available entities from cache, if applicable.
-  if ($cache_read) {
+  if ($use_cache) {
     // Build the list of cache entries to retrieve.
     $cids = array();
     foreach ($entities as $id => $entity) {
@@ -936,7 +925,7 @@ function field_attach_load($entity_type, $entities, $age = FIELD_LOAD_CURRENT, $
     // The invoke order is:
     // - hook_field_storage_pre_load()
     // - storage backend's hook_field_storage_load()
-    // - field-type module's hook_field_load()
+    // - Field class's prepareCache() method.
     // - hook_field_attach_load()
 
     // Invoke hook_field_storage_pre_load(): let any module load field
@@ -944,28 +933,32 @@ function field_attach_load($entity_type, $entities, $age = FIELD_LOAD_CURRENT, $
     $skip_fields = array();
     foreach (module_implements('field_storage_pre_load') as $module) {
       $function = $module . '_field_storage_pre_load';
+      // @todo $options['instance']
       $function($entity_type, $queried_entities, $age, $skip_fields, $options);
     }
 
-    $instances = array();
-
-    // Collect the storage backends used by the remaining fields in the entities.
+    // Collect the storage backends used by the remaining fields in the
+    // entities.
     $storages = array();
     foreach ($queried_entities as $entity) {
-      $instances = _field_invoke_get_instances($entity_type, $entity->bundle(), $options);
       $id = $entity->id();
       $vid = $entity->getRevisionId();
+
+      if (isset($options['instance'])) {
+        $instances = array($options['instance']);
+      }
+      else {
+        $instances = field_info_instances($entity_type, $entity->bundle());
+      }
+
       foreach ($instances as $instance) {
-        $field_name = $instance['field_name'];
-        $field_id = $instance['field_id'];
-        // Make sure all fields are present at least as empty arrays.
+        $field = $instance->getField();
+        $field_name = $field->id();
         if (!isset($queried_entities[$id]->{$field_name})) {
           $queried_entities[$id]->{$field_name} = array();
         }
-        // Collect the storage backend if the field has not been loaded yet.
-        if (!isset($skip_fields[$field_id])) {
-          $field = field_info_field_by_id($field_id);
-          $storages[$field['storage']['type']][$field_id][] = $load_current ? $id : $vid;
+        if (!isset($skip_fields[$field->uuid])) {
+          $storages[$field->storage['type']][$field->uuid][] = $load_current ? $id : $vid;
         }
       }
     }
@@ -973,19 +966,24 @@ function field_attach_load($entity_type, $entities, $age = FIELD_LOAD_CURRENT, $
     // Invoke hook_field_storage_load() on the relevant storage backends.
     foreach ($storages as $storage => $fields) {
       $storage_info = field_info_storage_types($storage);
+      // @todo $options['instance'] - it's actually 'deleted' that makes sense there.
       module_invoke($storage_info['module'], 'field_storage_load', $entity_type, $queried_entities, $age, $fields, $options);
     }
 
-    // Invoke field-type module's hook_field_load().
-    $null = NULL;
-    _field_invoke_multiple('load', $entity_type, $queried_entities, $age, $null, $options);
+    // Invoke the field type's prepareCache() method.
+    foreach ($queried_entities as $entity) {
+      \Drupal::entityManager()
+        ->getStorageController($entity_type)
+        ->invokeFieldItemPrepareCache($entity, $options);
+    }
 
     // Invoke hook_field_attach_load(): let other modules act on loading the
     // entity.
+    // @todo $options['instance']
     module_invoke_all('field_attach_load', $entity_type, $queried_entities, $age, $options);
 
     // Build cache data.
-    if ($cache_write) {
+    if ($use_cache) {
       foreach ($queried_entities as $id => $entity) {
         $data = array();
         $instances = field_info_instances($entity_type, $entity->bundle());
@@ -1025,46 +1023,6 @@ function field_attach_load_revision($entity_type, $entities, $options = array())
 }
 
 /**
- * Performs field validation against the field data in an entity.
- *
- * This function does not perform field widget validation on form submissions.
- * It is intended to be called during API save operations. Use
- * field_attach_form_validate() to validate form submissions.
- *
- * @param \Drupal\Core\Entity\EntityInterface $entity
- *   The entity with fields to validate.
- * @throws Drupal\field\FieldValidationException
- *   If validation errors are found, a FieldValidationException is thrown. The
- *   'errors' property contains the array of errors, keyed by field name,
- *   language and delta.
- * @param array $options
- *   An associative array of additional options. See field_invoke_method() for
- *   details.
- */
-function field_attach_validate(EntityInterface $entity, array $options = array()) {
-  // Ensure we are working with a BC mode entity.
-  $entity = $entity->getBCEntity();
-
-  $errors = array();
-  // Check generic, field-type-agnostic errors first.
-  $null = NULL;
-  _field_invoke_default('validate', $entity, $errors, $null, $options);
-  // Check field-type specific errors.
-  _field_invoke('validate', $entity, $errors, $null, $options);
-
-  // Let other modules validate the entity.
-  // Avoid module_invoke_all() to let $errors be taken by reference.
-  foreach (module_implements('field_attach_validate') as $module) {
-    $function = $module . '_field_attach_validate';
-    $function($entity, $errors);
-  }
-
-  if ($errors) {
-    throw new FieldValidationException($errors);
-  }
-}
-
-/**
  * Performs field validation against form-submitted field values.
  *
  * There are two levels of validation for fields in forms: widget validation and
@@ -1094,25 +1052,31 @@ function field_attach_validate(EntityInterface $entity, array $options = array()
  *   details.
  */
 function field_attach_form_validate(EntityInterface $entity, $form, &$form_state, array $options = array()) {
-  // Ensure we are working with a BC mode entity.
-  $entity = $entity->getBCEntity();
-
-  // Perform field_level validation.
-  try {
-    field_attach_validate($entity, $options);
+  // Only support NG entities.
+  if (!($entity->getNGEntity() instanceof EntityNG)) {
+    return;
   }
-  catch (FieldValidationException $e) {
-    // Pass field-level validation errors back to widgets for accurate error
-    // flagging.
-    foreach ($e->errors as $field_name => $field_errors) {
-      foreach ($field_errors as $langcode => $errors) {
+
+  $has_violations = FALSE;
+  foreach ($entity as $field_name => $field) {
+    $definition = $field->getDefinition();
+    if (!empty($definition['configurable']) && (empty($options['field_name']) || $options['field_name'] == $field_name)) {
+      $field_violations = $field->validate();
+      if (count($field_violations)) {
+        $has_violations = TRUE;
+
+        // Place violations in $form_state.
+        $langcode = field_is_translatable($entity->entityType(), field_info_field($field_name)) ? $entity->language()->langcode : Language::LANGCODE_NOT_SPECIFIED;
         $field_state = field_form_get_state($form['#parents'], $field_name, $langcode, $form_state);
-        $field_state['errors'] = $errors;
+        $field_state['constraint_violations'] = $field_violations;
         field_form_set_state($form['#parents'], $field_name, $langcode, $form_state, $field_state);
       }
     }
-    $form_display = $form_state['form_display'];
-    field_invoke_method('flagErrors', _field_invoke_widget_target($form_display), $entity, $form, $form_state, $options);
+  }
+
+  if ($has_violations) {
+    // Map errors back to form elements.
+    field_invoke_method('flagErrors', _field_invoke_widget_target($form_state['form_display']), $entity, $form, $form_state, $options);
   }
 }
 
@@ -1151,25 +1115,6 @@ function field_attach_extract_form_values(EntityInterface $entity, $form, &$form
 }
 
 /**
- * Performs necessary operations just before fields data get saved.
- *
- * We take no specific action here, we just give other modules the opportunity
- * to act.
- *
- * @param \Drupal\Core\Entity\EntityInterface $entity
- *   The entity with fields to process.
- */
-function field_attach_presave($entity) {
-  // Ensure we are working with a BC mode entity.
-  $entity = $entity->getBCEntity();
-
-  _field_invoke('presave', $entity);
-
-  // Let other modules act on presaving the entity.
-  module_invoke_all('field_attach_presave', $entity);
-}
-
-/**
  * Save field data for a new entity.
  *
  * The passed-in entity must already contain its id and (if applicable)
@@ -1186,8 +1131,6 @@ function field_attach_presave($entity) {
 function field_attach_insert(EntityInterface $entity) {
   // Ensure we are working with a BC mode entity.
   $entity = $entity->getBCEntity();
-
-  _field_invoke('insert', $entity);
 
   // Let any module insert field data before the storage engine, accumulating
   // saved fields along the way.
@@ -1216,9 +1159,6 @@ function field_attach_insert(EntityInterface $entity) {
     $storage_info = field_info_storage_types($storage);
     module_invoke($storage_info['module'], 'field_storage_write', $entity, FIELD_STORAGE_INSERT, $fields);
   }
-
-  // Let other modules act on inserting the entity.
-  module_invoke_all('field_attach_insert', $entity);
 }
 
 /**
@@ -1230,8 +1170,6 @@ function field_attach_insert(EntityInterface $entity) {
 function field_attach_update(EntityInterface $entity) {
   // Ensure we are working with a BC mode entity.
   $entity = $entity->getBCEntity();
-
-  _field_invoke('update', $entity);
 
   // Let any module update field data before the storage engine, accumulating
   // saved fields along the way.
@@ -1265,9 +1203,6 @@ function field_attach_update(EntityInterface $entity) {
     module_invoke($storage_info['module'], 'field_storage_write', $entity, FIELD_STORAGE_UPDATE, $fields);
   }
 
-  // Let other modules act on updating the entity.
-  module_invoke_all('field_attach_update', $entity);
-
   $entity_info = $entity->entityInfo();
   if ($entity_info['field_cache']) {
     cache('field')->delete('field:' . $entity->entityType() . ':' . $entity->id());
@@ -1285,8 +1220,6 @@ function field_attach_delete(EntityInterface $entity) {
   // Ensure we are working with a BC mode entity.
   $entity = $entity->getBCEntity();
 
-  _field_invoke('delete', $entity);
-
   // Collect the storage backends used by the fields in the entities.
   $storages = array();
   foreach (field_info_instances($entity->entityType(), $entity->bundle()) as $instance) {
@@ -1300,9 +1233,6 @@ function field_attach_delete(EntityInterface $entity) {
     $storage_info = field_info_storage_types($storage);
     module_invoke($storage_info['module'], 'field_storage_delete', $entity, $fields);
   }
-
-  // Let other modules act on deleting the entity.
-  module_invoke_all('field_attach_delete', $entity);
 
   $entity_info = $entity->entityInfo();
   if ($entity_info['field_cache']) {
@@ -1321,8 +1251,6 @@ function field_attach_delete_revision(EntityInterface $entity) {
   // Ensure we are working with a BC mode entity.
   $entity = $entity->getBCEntity();
 
-  _field_invoke('delete_revision', $entity);
-
   // Collect the storage backends used by the fields in the entities.
   $storages = array();
   foreach (field_info_instances($entity->entityType(), $entity->bundle()) as $instance) {
@@ -1336,9 +1264,6 @@ function field_attach_delete_revision(EntityInterface $entity) {
     $storage_info = field_info_storage_types($storage);
     module_invoke($storage_info['module'], 'field_storage_delete_revision', $entity, $fields);
   }
-
-  // Let other modules act on deleting the revision.
-  module_invoke_all('field_attach_delete_revision', $entity);
 }
 
 /**
