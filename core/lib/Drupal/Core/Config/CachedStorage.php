@@ -37,7 +37,7 @@ class CachedStorage implements StorageInterface, StorageCacheInterface {
    *
    * @var array
    */
-  protected static $listAllCache = array();
+  protected $findByPrefixCache = array();
 
   /**
    * Constructs a new CachedStorage controller.
@@ -120,8 +120,8 @@ class CachedStorage implements StorageInterface, StorageCacheInterface {
       // While not all written data is read back, setting the cache instead of
       // just deleting it avoids cache rebuild stampedes.
       $this->cache->set($name, $data, CacheBackendInterface::CACHE_PERMANENT);
-      $this->cache->deleteTags(array('listAll' => TRUE));
-      static::$listAllCache = array();
+      $this->cache->deleteTags(array('findByPrefix' => TRUE));
+      $this->findByPrefixCache = array();
       return TRUE;
     }
     return FALSE;
@@ -135,8 +135,8 @@ class CachedStorage implements StorageInterface, StorageCacheInterface {
     // rebuilding the cache before the storage is gone.
     if ($this->storage->delete($name)) {
       $this->cache->delete($name);
-      $this->cache->deleteTags(array('listAll' => TRUE));
-      static::$listAllCache = array();
+      $this->cache->deleteTags(array('findByPrefix' => TRUE));
+      $this->findByPrefixCache = array();
       return TRUE;
     }
     return FALSE;
@@ -151,8 +151,8 @@ class CachedStorage implements StorageInterface, StorageCacheInterface {
     if ($this->storage->rename($name, $new_name)) {
       $this->cache->delete($name);
       $this->cache->delete($new_name);
-      $this->cache->deleteTags(array('listAll' => TRUE));
-      static::$listAllCache = array();
+      $this->cache->deleteTags(array('findByPrefix' => TRUE));
+      $this->findByPrefixCache = array();
       return TRUE;
     }
     return FALSE;
@@ -200,18 +200,18 @@ class CachedStorage implements StorageInterface, StorageCacheInterface {
    *   An array containing matching configuration object names.
    */
   protected function findByPrefix($prefix) {
-    if (!isset(static::$listAllCache[$prefix])) {
+    if (!isset($this->findByPrefixCache[$prefix])) {
       // The : character is not allowed in config file names, so this can not
       // conflict.
-      if ($cache = $this->cache->get('list:' . $prefix)) {
-        static::$listAllCache[$prefix] = $cache->data;
+      if ($cache = $this->cache->get('find:' . $prefix)) {
+        $this->findByPrefixCache[$prefix] = $cache->data;
       }
       else {
-        static::$listAllCache[$prefix] = $this->storage->listAll($prefix);
-        $this->cache->set('list:' . $prefix, static::$listAllCache[$prefix], CacheBackendInterface::CACHE_PERMANENT, array('listAll' => TRUE));
+        $this->findByPrefixCache[$prefix] = $this->storage->listAll($prefix);
+        $this->cache->set('find:' . $prefix, $this->findByPrefixCache[$prefix], CacheBackendInterface::CACHE_PERMANENT, array('findByPrefix' => TRUE));
       }
     }
-    return static::$listAllCache[$prefix];
+    return $this->findByPrefixCache[$prefix];
   }
 
   /**
@@ -232,6 +232,6 @@ class CachedStorage implements StorageInterface, StorageCacheInterface {
    * Clears the static list cache.
    */
   public function resetListCache() {
-    static::$listAllCache = array();
+    $this->findByPrefixCache = array();
   }
 }
