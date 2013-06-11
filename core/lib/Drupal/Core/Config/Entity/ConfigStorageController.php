@@ -488,9 +488,10 @@ class ConfigStorageController implements EntityStorageControllerInterface, Entit
   }
 
   /**
-   * Implements Drupal\Core\Entity\EntityStorageControllerInterface::getFieldDefinitions().
+   * {@inheritdoc}
    */
-  public function getFieldDefinitions(array $constraints) {
+  public function baseFieldDefinitions() {
+    // @todo: Define abstract once all entity types have been converted.
     return array();
   }
 
