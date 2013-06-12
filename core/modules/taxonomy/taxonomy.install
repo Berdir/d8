@@ -357,7 +357,7 @@ function taxonomy_update_8007() {
 
     // Create instances for existing vocabularies.
     foreach ($vocabularies as $vocabulary) {
-      $vocabulary = substr($vocabulary, strlen('taxonomy.vocabulary.'));
+      $vocabulary = substr($vocabulary, drupal_strlen('taxonomy.vocabulary.'));
       // Attaches the description field to each bundle.
       $instance = array(
         'field_name' => 'taxonomy_term_description',
