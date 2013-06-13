@@ -13,7 +13,7 @@ use Drupal\Core\DestructableInterface;
 use Drupal\Core\Lock\LockBackendInterface;
 
 /**
- * Extends CacheArray to allow for dynamic building of the locale cache.
+ * A cache collector to allow for dynamic building of the locale cache.
  */
 class LocaleLookup extends CacheCollector {
 
@@ -53,7 +53,7 @@ class LocaleLookup extends CacheCollector {
   protected $lock;
 
   /**
-   * Constructs a LocaleCache object.
+   * Constructs a LocaleLookup object.
    *
    * @param string $langcode
    *   The language code.

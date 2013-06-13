@@ -93,7 +93,7 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
   protected $cacheInvalidated = FALSE;
 
   /**
-   * Constructs a CacheArray object.
+   * Constructs a CacheCollector object.
    *
    * @param string $cid
    *   The cid for the array being cached.
@@ -136,7 +136,7 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
   }
 
   /**
-   * Implements CacheCollectorInterface::set().
+   * Implements \Drupal\Core\Cache\CacheCollectorInterface::set().
    *
    * This is not persisted by default. In practice this means that setting a
    * value will only apply while the object is in scope and will not be written
@@ -148,10 +148,8 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
     $this->storage[$key] = $value;
     // The key might have been marked for deletion.
     unset($this->keysToRemove[$key]);
-    // Invalidate the cache to make sure that other requests immediately see the
-    // deletion before this request is terminated.
-    $this->cache->invalidate($this->cid);
-    $this->cacheInvalidated = TRUE;
+    $this->invalidateCache();
+
   }
 
   /**
@@ -162,10 +160,7 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
     $this->keysToRemove[$key] = $key;
     // The key might have been marked for persisting.
     unset($this->keysToPersist[$key]);
-    // Invalidate the cache to make sure that other requests immediately see the
-    // deletion before this request is terminated.
-    $this->cache->invalidate($this->cid);
-    $this->cacheInvalidated = TRUE;
+    $this->invalidateCache();
   }
 
   /**
@@ -226,7 +221,7 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
       if ($cache = $this->cache->get($this->cid, $this->cacheInvalidated)) {
         if ($this->cacheInvalidated && $cache->created != $this->cacheCreated) {
           // We have invalidated the cache in this request and got a different
-          // cache entry, do not attempt to overwrite data that might have been
+          // cache entry. Do not attempt to overwrite data that might have been
           // changed in a different request. We'll let the cache rebuild in
           // later requests.
           $this->cache->delete($this->cid);
@@ -271,6 +266,16 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
    */
   public function destruct() {
     $this->updateCache();
+  }
+
+  /**
+   * Invalidate the cache.
+   */
+  protected function invalidateCache() {
+    // Invalidate the cache to make sure that other requests immediately see the
+    // deletion before this request is terminated.
+    $this->cache->invalidate($this->cid);
+    $this->cacheInvalidated = TRUE;
   }
 
 }

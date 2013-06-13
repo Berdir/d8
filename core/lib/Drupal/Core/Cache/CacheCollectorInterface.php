@@ -17,9 +17,9 @@ namespace Drupal\Core\Cache;
  * the amount of data that needs to be loaded from cache backends on each
  * request, and memory usage from static caches of that same data.
  *
- * The default implementation is CacheCollector.
+ * The default implementation is \Drupal\Core\Cache\CacheCollector.
  */
-Interface CacheCollectorInterface {
+interface CacheCollectorInterface {
 
   /**
    * Gets value from the cache.
