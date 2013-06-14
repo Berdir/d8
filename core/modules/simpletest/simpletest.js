@@ -99,4 +99,53 @@ Drupal.behaviors.simpleTestSelectAll = {
   }
 };
 
+/**
+ * Filters the module list table by a text input search string.
+ *
+ * Additionally accounts for multiple tables being wrapped in "package" details
+ * elements.
+ *
+ * Text search input: input.table-filter-text
+ * Target table:      input.table-filter-text[data-table]
+ * Source text:       .table-filter-text-source
+ */
+Drupal.behaviors.simpletestTableFilterByText = {
+  attach: function (context, settings) {
+    var $input = $('input.table-filter-text').once('table-filter-text');
+    var $table = $($input.attr('data-table'));
+    var $rows;
+    var searching = false;
+
+    function filterTestList (e) {
+      var query = $(e.target).val().toLowerCase();
+
+      function showTestRow (index, row) {
+        var $row = $(row);
+        var textMatch = $row.find('.table-filter-text-source').text().toLowerCase().indexOf(query) !== -1;
+        $row.closest('tr').toggle(textMatch);
+      }
+
+      // Filter if the length of the query is at least 3 characters.
+      if (query.length >= 3) {
+        searching = true;
+        $rows.each(showTestRow);
+      }
+      else if (searching) {
+        // Hide all rows and then show groups.
+        // @todo Make this respect the current state of the group toggle.
+        searching = false;
+        $rows.hide();
+        $rows.filter('.simpletest-group').show();
+      }
+    }
+
+    if ($table.length) {
+      $rows = $table.find('tbody tr');
+
+      // @todo Use autofocus attribute when possible.
+      $input.focus().on('keyup', filterTestList);
+    }
+  }
+};
+
 })(jQuery);
