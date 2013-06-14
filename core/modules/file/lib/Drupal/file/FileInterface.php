@@ -11,7 +11,7 @@ use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\user\UserInterface;
 
 /**
- * Provides an interface defining a file entity.
+ * Defines getter and setter methods for file entity base fields.
  */
 interface FileInterface extends ContentEntityInterface {
 
