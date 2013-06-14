@@ -175,7 +175,8 @@ function forum_menu_local_tasks(&$data, $router_item, $root_path) {
       // Loop through all bundles for forum taxonomy vocabulary field.
       $field = field_info_field('taxonomy_forums');
       foreach ($field['bundles']['node'] as $type) {
-        if (node_access('create', $type)) {
+        $node = entity_create('node', array('type' => $type));
+        if ($node->access('create')) {
           $links[$type] = array(
             '#theme' => 'menu_local_action',
             '#link' => array(

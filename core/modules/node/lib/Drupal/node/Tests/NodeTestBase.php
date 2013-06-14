@@ -51,14 +51,15 @@ abstract class NodeTestBase extends WebTestBase {
   function assertNodeAccess(array $ops, $node, AccountInterface $account, $langcode = NULL) {
     foreach ($ops as $op => $result) {
       $msg = format_string(
-        'node_access() returns @result with operation %op, language code %langcode.',
+        '$node->access() returns @result with operation %op, language code %langcode.',
         array(
           '@result' => $result ? 'true' : 'false',
           '%op' => $op,
           '%langcode' => !empty($langcode) ? $langcode : 'empty'
         )
       );
-      $this->assertEqual($result, node_access($op, $node, $account, $langcode), $msg);
+      // @todo: What to do with $language used previously in node_access?
+      $this->assertEqual($result, $node->access($op, $account), $msg);
     }
   }
 

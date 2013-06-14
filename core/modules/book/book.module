@@ -124,7 +124,8 @@ function book_node_view_link(EntityInterface $node, $view_mode) {
   if (isset($node->book['depth'])) {
     if ($view_mode == 'full' && node_is_page($node)) {
       $child_type = config('book.settings')->get('child_type');
-      if ((user_access('add content to books') || user_access('administer book outlines')) && node_access('create', $child_type) && $node->status == 1 && $node->book['depth'] < MENU_MAX_DEPTH) {
+      $node = entity_create('node', array('type' => $child_type));
+      if ((user_access('add content to books') || user_access('administer book outlines')) && $node->access('create', $child_type) && $node->status == 1 && $node->book['depth'] < MENU_MAX_DEPTH) {
         $links['book_add_child'] = array(
           'title' => t('Add child page'),
           'href' => 'node/add/' . $child_type,
@@ -222,7 +223,7 @@ function book_menu() {
  *   The node whose export page is to be viewed.
  */
 function book_export_access(EntityInterface $node) {
-  return user_access('access printer-friendly version') && node_access('view', $node);
+  return user_access('access printer-friendly version') && $node->access('view');
 }
 
 /**
@@ -238,7 +239,7 @@ function book_export_access(EntityInterface $node) {
  * @see book_menu()
  */
 function _book_outline_access(EntityInterface $node) {
-  return user_access('administer book outlines') && node_access('view', $node);
+  return user_access('administer book outlines') && $node->access('view');
 }
 
 /**

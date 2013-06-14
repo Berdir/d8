@@ -1557,7 +1557,9 @@ function _node_revision_access(EntityInterface $node, $op = 'view', $account = N
     else {
       // First check the access to the default revision and finally, if the
       // node passed in is not the default revision then access to that, too.
-      $access[$cid] = node_access($op, node_load($node->nid), $account, $langcode) && ($node->isDefaultRevision() || node_access($op, $node, $account, $langcode));
+      $default_revision_node = node_load($node->id());
+      // @todo: What to do with $language?
+      $access[$cid] = $default_revision_node->access($op, $account) && ($node->isDefaultRevision() || $node->access($op, $account));
     }
   }
 
@@ -1575,7 +1577,8 @@ function _node_revision_access(EntityInterface $node, $op = 'view', $account = N
 function _node_add_access() {
   $types = node_type_get_types();
   foreach ($types as $type) {
-    if (node_hook($type->type, 'form') && node_access('create', $type->type)) {
+    $node = entity_create('node', array('type' => $type->type));
+    if (node_hook($type->type, 'form') && $node->access('create')) {
       return TRUE;
     }
   }
@@ -1887,13 +1890,13 @@ function theme_node_recent_block($variables) {
       'data' => drupal_render($node_recent_content),
       'class' => 'title-author',
     );
-    if (node_access('update', $node)) {
+    if ($node->access('update')) {
       $row[] = array(
         'data' => l(t('edit'), 'node/' . $node->nid . '/edit', $l_options),
         'class' => 'edit',
       );
     }
-    if (node_access('delete', $node)) {
+    if ($node->access('delete')) {
       $row[] = array(
         'data' => l(t('delete'), 'node/' . $node->nid . '/delete', $l_options),
         'class' => 'delete',
@@ -2880,7 +2883,7 @@ function node_access_acquire_grants(EntityInterface $node, $delete = TRUE) {
  *
  * If a realm is provided, it will only delete grants from that realm, but it
  * will always delete a grant from the 'all' realm. Modules that utilize
- * node_access() can use this function when doing mass updates due to widespread
+ * node access can use this function when doing mass updates due to widespread
  * permission changes.
  *
  * Note: Don't call this function directly from a contributed module. Call
@@ -3212,7 +3215,7 @@ function node_modules_disabled($modules) {
  */
 function node_file_download_access($field, EntityInterface $entity, File $file) {
   if ($entity->entityType() == 'node') {
-    return node_access('view', $entity);
+    return $entity->access('view');
   }
 }
 

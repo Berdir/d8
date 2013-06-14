@@ -46,7 +46,7 @@ function translation_node_overview(EntityInterface $node) {
       $path = 'node/' . $translation_node->nid;
       $links = language_negotiation_get_switch_links($type, $path);
       $title = empty($links->links[$langcode]['href']) ? l($translation_node->label(), $path) : l($translation_node->label(), $links->links[$langcode]['href'], $links->links[$langcode]);
-      if (node_access('update', $translation_node)) {
+      if ($translation_node->access('update')) {
         $path = 'node/' . $translation_node->nid . '/edit';
         $links = language_negotiation_get_switch_links($type, $path);
         if (!empty($links->links[$langcode]['href'])) {
@@ -64,7 +64,7 @@ function translation_node_overview(EntityInterface $node) {
     else {
       // No such translation in the set yet: help user to create it.
       $title = t('n/a');
-      if (node_access('create', $node)) {
+      if ($node->access('create')) {
         $path = 'node/add/' . $node->type;
         $links = language_negotiation_get_switch_links($type, $path);
         $query = array('query' => array('translation' => $node->nid, 'target' => $langcode));

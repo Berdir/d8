@@ -19,7 +19,7 @@ class NodeTranslationController extends EntityTranslationController {
    * Overrides EntityTranslationController::getAccess().
    */
   public function getAccess(EntityInterface $entity, $op) {
-    return node_access($op, $entity);
+    return $entity->access($op);
   }
 
   /**

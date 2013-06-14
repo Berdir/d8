@@ -299,7 +299,7 @@ class NodeFormController extends EntityFormController {
     }
 
     $element['preview'] = array(
-      '#access' => $preview_mode != DRUPAL_DISABLED && (node_access('create', $node) || node_access('update', $node)),
+      '#access' => $preview_mode != DRUPAL_DISABLED && ($node->access('create') || $node->access('update')),
       '#value' => t('Preview'),
       '#weight' => 20,
       '#validate' => array(
@@ -311,7 +311,7 @@ class NodeFormController extends EntityFormController {
       ),
     );
 
-    $element['delete']['#access'] = node_access('delete', $node);
+    $element['delete']['#access'] = $node->access('delete');
     $element['delete']['#weight'] = 100;
 
     return $element;
@@ -452,7 +452,7 @@ class NodeFormController extends EntityFormController {
     if ($node->nid) {
       $form_state['values']['nid'] = $node->nid;
       $form_state['nid'] = $node->nid;
-      $form_state['redirect'] = node_access('view', $node) ? 'node/' . $node->nid : '<front>';
+      $form_state['redirect'] = $node->access('view') ? 'node/' . $node->nid : '<front>';
     }
     else {
       // In the unlikely case something went wrong on save, the node will be

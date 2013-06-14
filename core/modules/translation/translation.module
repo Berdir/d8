@@ -86,7 +86,7 @@ function translation_menu() {
  * @see translation_menu()
  */
 function _translation_tab_access($node) {
-  if ($node->langcode != Language::LANGCODE_NOT_SPECIFIED && translation_supported_type($node->type) && node_access('view', $node)) {
+  if ($node->langcode != Language::LANGCODE_NOT_SPECIFIED && translation_supported_type($node->type) && $node->access('view')) {
     return translation_user_can_translate_node($node);
   }
   return FALSE;
@@ -149,7 +149,7 @@ function translation_user_can_translate_node($node, $account = NULL) {
   if (empty($account)) {
     $account = $GLOBALS['user'];
   }
-  return node_access('view', $node, $account) && (user_access('translate all content', $account) || ($node->uid == $account->uid && user_access('translate own content', $account)));
+  return $node->access('view', $account) && (user_access('translate all content', $account) || ($node->uid == $account->uid && user_access('translate own content', $account)));
 }
 
 /**
