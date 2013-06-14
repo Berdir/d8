@@ -104,7 +104,7 @@ function theme_simpletest_test_table($variables) {
       );
       $row[] = array(
         'data' => '<div class="description">' . t('@description (@class)', array('@description' => $description, '@class' => $test_name)) . '</div>',
-        'class' => array('simpletest-test-description', 'table-filter-text-source'),
+        'class' => array('simpletest-test-description', 'table-filter-text-source'),git s
       );
 
       $rows[] = array('data' => $row, 'class' => array($test_class . '-test', ($collapsed ? 'js-hide' : '')));
