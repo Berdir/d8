@@ -60,6 +60,7 @@ class CacheCollectorTest extends UnitTestCase {
     $this->cache = $this->getMock('Drupal\Core\Cache\CacheBackendInterface');
     $this->lock = $this->getMock('Drupal\Core\Lock\LockBackendInterface');
     $this->cid = $this->randomName();
+    $this->collector = new CacheCollectorHelper($this->cid, $this->cache, $this->lock);
   }
 
 
@@ -67,7 +68,6 @@ class CacheCollectorTest extends UnitTestCase {
    * Tests the resolve cache miss function.
    */
   public function testResolveCacheMiss() {
-    $this->constructCollector();
     $key = $this->randomName();
     $value = $this->randomName();
     $this->collector->setCacheMissData($key, $value);
@@ -79,7 +79,6 @@ class CacheCollectorTest extends UnitTestCase {
    * Tests setting and getting values when the cache is empty.
    */
   public function testSetAndGet() {
-    $this->constructCollector();
     $key = $this->randomName();
     $value = $this->randomName();
 
@@ -95,11 +94,8 @@ class CacheCollectorTest extends UnitTestCase {
    * Makes sure that NULL is a valid value and is collected.
    */
   public function testSetAndGetNull() {
-    $this->constructCollector();
     $key = $this->randomName();
     $value = NULL;
-
-    $this->constructCollector();
 
     $this->cache->expects($this->once())
       ->method('invalidate')
@@ -124,7 +120,6 @@ class CacheCollectorTest extends UnitTestCase {
       ->method('get')
       ->with($this->cid)
       ->will($this->returnValue($cache));
-    $this->constructCollector();
     $this->assertTrue($this->collector->has($key));
     $this->assertEquals($value, $this->collector->get($key));
     $this->assertEquals(0, $this->collector->getCacheMisses());
@@ -134,7 +129,6 @@ class CacheCollectorTest extends UnitTestCase {
    * Tests setting and deleting values.
    */
   public function testDelete() {
-    $this->constructCollector();
     $key = $this->randomName();
     $value = $this->randomName();
 
@@ -156,7 +150,6 @@ class CacheCollectorTest extends UnitTestCase {
    * Tests updating the cache when no changes were made.
    */
   public function testUpdateCacheNoChanges() {
-    $this->constructCollector();
 
     $this->lock->expects($this->never())
       ->method('acquire');
@@ -170,7 +163,6 @@ class CacheCollectorTest extends UnitTestCase {
    * Tests updating the cache after a set.
    */
   public function testUpdateCache() {
-    $this->constructCollector();
     $key = $this->randomName();
     $value = $this->randomName();
 
@@ -202,7 +194,6 @@ class CacheCollectorTest extends UnitTestCase {
    * Tests updating the cache when the lock acquire fails.
    */
   public function testUpdateCacheLockFail() {
-    $this->constructCollector();
     $key = $this->randomName();
     $value = $this->randomName();
 
@@ -235,9 +226,8 @@ class CacheCollectorTest extends UnitTestCase {
       ->method('get')
       ->with($this->cid)
       ->will($this->returnValue($cache));
-    $this->constructCollector();
 
-    $this->cache->expects($this->at(0))
+    $this->cache->expects($this->at(1))
       ->method('invalidate')
       ->with($this->cid);
     $this->collector->set($key, 'new value');
@@ -271,7 +261,6 @@ class CacheCollectorTest extends UnitTestCase {
    * Tests updating the cache when a different request
    */
   public function testUpdateCacheMerge() {
-    $this->constructCollector();
     $key = $this->randomName();
     $value = $this->randomName();
 
@@ -318,7 +307,6 @@ class CacheCollectorTest extends UnitTestCase {
       ->method('get')
       ->with($this->cid)
       ->will($this->returnValue($cache));
-    $this->constructCollector();
 
     $this->collector->delete($key);
 
@@ -348,7 +336,6 @@ class CacheCollectorTest extends UnitTestCase {
    * Tests a reset of the cache collector.
    */
   public function testUpdateCacheReset() {
-    $this->constructCollector();
     $key = $this->randomName();
     $value = $this->randomName();
 
@@ -370,7 +357,6 @@ class CacheCollectorTest extends UnitTestCase {
    * Tests a clear of the cache collector.
    */
   public function testUpdateCacheClear() {
-    $this->constructCollector();
     $key = $this->randomName();
     $value = $this->randomName();
 
@@ -391,13 +377,4 @@ class CacheCollectorTest extends UnitTestCase {
     $this->assertEquals(2, $this->collector->getCacheMisses());
   }
 
-  /**
-   * Constructs the collector.
-   *
-   * Separate methods so that the cache mock can be set up before calling the
-   * constructor.
-   */
-  protected function constructCollector() {
-    $this->collector = new CacheCollectorHelper($this->cid, $this->cache, $this->lock);
-  }
 }

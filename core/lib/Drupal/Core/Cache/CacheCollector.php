@@ -93,6 +93,15 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
   protected $cacheInvalidated = FALSE;
 
   /**
+   * Indicates if the collected cache was already loaded.
+   *
+   * The collected cache is lazy loaded when an entry is set, get or deleted.
+   *
+   * @var bool
+   */
+  protected $cacheLoaded = FALSE;
+
+  /**
    * Constructs a CacheCollector object.
    *
    * @param string $cid
@@ -109,11 +118,6 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
     $this->cache = $cache;
     $this->tags = $tags;
     $this->lock = $lock;
-
-    if ($cache = $this->cache->get($this->cid)) {
-      $this->cacheCreated = $cache->created;
-      $this->storage = $cache->data;
-    }
   }
 
   /**
@@ -129,6 +133,7 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
    * {@inheritdoc}
    */
   public function get($key) {
+    $this->lazyLoadCache();
     if (isset($this->storage[$key]) || array_key_exists($key, $this->storage)) {
       return $this->storage[$key];
     }
@@ -147,6 +152,7 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
    * this behavior, for example by adding a call to persist().
    */
   public function set($key, $value) {
+    $this->lazyLoadCache();
     $this->storage[$key] = $value;
     // The key might have been marked for deletion.
     unset($this->keysToRemove[$key]);
@@ -158,6 +164,7 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
    * {@inheritdoc}
    */
   public function delete($key) {
+    $this->lazyLoadCache();
     unset($this->storage[$key]);
     $this->keysToRemove[$key] = $key;
     // The key might have been marked for persisting.
@@ -253,6 +260,7 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
     $this->storage = array();
     $this->keysToPersist = array();
     $this->keysToRemove = array();
+    $this->cacheLoaded = FALSE;
   }
 
   /**
@@ -268,6 +276,22 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
    */
   public function destruct() {
     $this->updateCache();
+  }
+
+  /**
+   * Loads the cache if not already done.
+   */
+  protected function lazyLoadCache() {
+    if ($this->cacheLoaded) {
+      return;
+    }
+    // The cache was not yet loaded, set flag to TRUE.
+    $this->cacheLoaded = TRUE;
+
+    if ($cache = $this->cache->get($this->cid)) {
+      $this->cacheCreated = $cache->created;
+      $this->storage = $cache->data;
+    }
   }
 
   /**
