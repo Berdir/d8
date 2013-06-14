@@ -120,7 +120,9 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
    * {@inheritdoc}
    */
   public function has($key) {
-    return $this->get($key) !== NULL;
+    // Make sure the value is loaded.
+    $this->get($key);
+    return isset($this->storage[$key]) || array_key_exists($key, $this->storage);
   }
 
   /**

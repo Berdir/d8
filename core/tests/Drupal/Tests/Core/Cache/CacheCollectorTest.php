@@ -66,7 +66,7 @@ class CacheCollectorTest extends UnitTestCase {
   /**
    * Tests the resolve cache miss function.
    */
-  function testResolveCacheMiss() {
+  public function testResolveCacheMiss() {
     $this->constructCollector();
     $key = $this->randomName();
     $value = $this->randomName();
@@ -78,7 +78,7 @@ class CacheCollectorTest extends UnitTestCase {
   /**
    * Tests setting and getting values when the cache is empty.
    */
-  function testSetAndGet() {
+  public function testSetAndGet() {
     $this->constructCollector();
     $key = $this->randomName();
     $value = $this->randomName();
@@ -94,14 +94,12 @@ class CacheCollectorTest extends UnitTestCase {
   /**
    * Makes sure that NULL is a valid value and is collected.
    */
-  function testSetAndGetFalse() {
+  public function testSetAndGetNull() {
     $this->constructCollector();
     $key = $this->randomName();
     $value = NULL;
 
     $this->constructCollector();
-    $key = $this->randomName();
-    $value = $this->randomName();
 
     $this->cache->expects($this->once())
       ->method('invalidate')
@@ -114,7 +112,7 @@ class CacheCollectorTest extends UnitTestCase {
   /**
    * Tests returning value from the collected cache.
    */
-  function testGetFromCache() {
+  public function testGetFromCache() {
     $key = $this->randomName();
     $value = $this->randomName();
 
@@ -135,7 +133,7 @@ class CacheCollectorTest extends UnitTestCase {
   /**
    * Tests setting and deleting values.
    */
-  function testDelete() {
+  public function testDelete() {
     $this->constructCollector();
     $key = $this->randomName();
     $value = $this->randomName();
@@ -157,7 +155,7 @@ class CacheCollectorTest extends UnitTestCase {
   /**
    * Tests updating the cache when no changes were made.
    */
-  function testUpdateCacheNoChanges() {
+  public function testUpdateCacheNoChanges() {
     $this->constructCollector();
 
     $this->lock->expects($this->never())
@@ -171,7 +169,7 @@ class CacheCollectorTest extends UnitTestCase {
   /**
    * Tests updating the cache after a set.
    */
-  function testUpdateCache() {
+  public function testUpdateCache() {
     $this->constructCollector();
     $key = $this->randomName();
     $value = $this->randomName();
@@ -203,7 +201,7 @@ class CacheCollectorTest extends UnitTestCase {
   /**
    * Tests updating the cache when the lock acquire fails.
    */
-  function testUpdateCacheLockFail() {
+  public function testUpdateCacheLockFail() {
     $this->constructCollector();
     $key = $this->randomName();
     $value = $this->randomName();
@@ -225,7 +223,7 @@ class CacheCollectorTest extends UnitTestCase {
   /**
    * Tests updating the cache when there is a
    */
-  function testUpdateCacheInvalidatedConflict() {
+  public function testUpdateCacheInvalidatedConflict() {
     $key = $this->randomName();
     $value = $this->randomName();
 
@@ -272,7 +270,7 @@ class CacheCollectorTest extends UnitTestCase {
   /**
    * Tests updating the cache when a different request
    */
-  function testUpdateCacheMerge() {
+  public function testUpdateCacheMerge() {
     $this->constructCollector();
     $key = $this->randomName();
     $value = $this->randomName();
@@ -308,7 +306,7 @@ class CacheCollectorTest extends UnitTestCase {
   /**
    * Tests updating the cache after a delete.
    */
-  function testUpdateCacheDelete() {
+  public function testUpdateCacheDelete() {
     $key = $this->randomName();
     $value = $this->randomName();
 
@@ -349,7 +347,7 @@ class CacheCollectorTest extends UnitTestCase {
   /**
    * Tests a reset of the cache collector.
    */
-  function testUpdateCacheReset() {
+  public function testUpdateCacheReset() {
     $this->constructCollector();
     $key = $this->randomName();
     $value = $this->randomName();
@@ -371,7 +369,7 @@ class CacheCollectorTest extends UnitTestCase {
   /**
    * Tests a clear of the cache collector.
    */
-  function testUpdateCacheClear() {
+  public function testUpdateCacheClear() {
     $this->constructCollector();
     $key = $this->randomName();
     $value = $this->randomName();
