@@ -44,8 +44,8 @@ class AliasWhitelist extends CacheCollector {
    *   The cache backend.
    * @param \Drupal\Core\Lock\LockBackendInterface $lock
    *   The lock backend.
-   * @param \Drupal\Core\KeyValueStore\KeyValueFactory $keyvalue
-   *   The keyvalue factory to get the state cache from.
+   * @param \Drupal\Core\KeyValueStore\KeyValueStoreInterface $state
+   *   The state keyvalue store.
    * @param \Drupal\Core\Database\Connection $connection
    *   The database connection.
    */

@@ -27,14 +27,14 @@ use Drupal\Core\Lock\LockBackendInterface;
 abstract class CacheCollector implements CacheCollectorInterface, DestructableInterface {
 
   /**
-   * A cid to pass to cache()->set() and cache()->get().
+   * The cache id that is used for the cache entry.
    *
    * @var string
    */
   protected $cid;
 
   /**
-   * A tags array to pass to cache()->set().
+   * A list of tags that are used for the cache entry.
    *
    * @var array
    */
@@ -206,7 +206,7 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
         $data[$offset] = $this->storage[$offset];
       }
     }
-    if (empty($data)) {
+    if (empty($data) && empty($this->keysToRemove)) {
       return;
     }
 
