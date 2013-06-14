@@ -135,14 +135,13 @@ Drupal.behaviors.simpletestTableFilterByText = {
         // @todo Make this respect the current state of the group toggle.
         searching = false;
         $rows.hide();
-        $rows.filter('.simpletest-group').show();
+        $rows.filter('.simpletest-group').show().find('div.simpletest-image')
+          .html(settings.simpleTest.images[0]);
       }
     }
 
     if ($table.length) {
       $rows = $table.find('tbody tr');
-
-      // @todo Use autofocus attribute when possible.
       $input.focus().on('keyup', filterTestList);
     }
   }

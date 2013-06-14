@@ -103,8 +103,8 @@ function theme_simpletest_test_table($variables) {
         'class' => array('simpletest-test-label', 'table-filter-text-source'),
       );
       $row[] = array(
-        'data' => '<div class="description">' . t('@description (@class)', array('@description' => $description, '@class' => $test_name)) . '</div>',
-        'class' => array('simpletest-test-description', 'table-filter-text-source'),git s
+        'data' => '<div class="description">' . format_string('@description (@class)', array('@description' => $description, '@class' => $test_name)) . '</div>',
+        'class' => array('simpletest-test-description', 'table-filter-text-source'),
       );
 
       $rows[] = array('data' => $row, 'class' => array($test_class . '-test', ($collapsed ? 'js-hide' : '')));
