@@ -150,7 +150,8 @@ abstract class DrupalUnitTestBase extends UnitTestBase {
 
     $container
       ->register('config.storage', 'Drupal\Core\Config\MemoryStorage')
-      ->addArgument(array());
+      ->addArgument(array())
+      ->addTag('persist');
 
     $conf['keyvalue_default'] = 'keyvalue.memory';
     $container->set('keyvalue.memory', $this->keyValueFactory);
