@@ -6,6 +6,7 @@
  */
 
 use Drupal\Component\Uuid\Uuid;
+use Drupal\Core\Language\Language;
 
 /**
  * Implements hook_uninstall().
@@ -343,7 +344,7 @@ function taxonomy_update_8007() {
   if (count($vocabularies)) {
     // Create a new term description field.
     $field = array(
-      'field_name' => 'taxonomy_term_description',
+      'id' => 'taxonomy_term_description',
       'module' => 'text',
       'type' => 'text_long',
       'cardinality' => 1,
@@ -353,14 +354,14 @@ function taxonomy_update_8007() {
         'settings' => array(),
       ),
     );
-    _update_7000_field_create_field($field);
+    _update_8003_field_create_field($field);
 
     // Create instances for existing vocabularies.
     foreach ($vocabularies as $vocabulary) {
       $vocabulary = substr($vocabulary, drupal_strlen('taxonomy.vocabulary.'));
       // Attaches the description field to each bundle.
       $instance = array(
-        'field_name' => 'taxonomy_term_description',
+        'id' => 'taxonomy_term_description',
         'label' => 'Description',
         'description' => '',
         'entity_type' => 'taxonomy_term',
@@ -381,7 +382,7 @@ function taxonomy_update_8007() {
           ),
         ),
       );
-      _update_7000_field_create_instance($field, $instance);
+      _update_8003_field_create_instance($field, $instance);
     }
   }
 }
@@ -408,7 +409,7 @@ function taxonomy_update_8008(&$sandbox) {
         'bundle' => $term->vid,
         'entity_id' => $term->tid,
         'revision_id' => $term->tid,
-        'langcode' => LANGUAGE_NOT_SPECIFIED,
+        'langcode' => Language::LANGCODE_NOT_SPECIFIED,
         'delta' => 0,
         'taxonomy_term_description_value' => $term->description,
         'taxonomy_term_description_format' => $term->format,
@@ -418,7 +419,7 @@ function taxonomy_update_8008(&$sandbox) {
         'bundle' => $term->vid,
         'entity_id' => $term->tid,
         'revision_id' => $term->tid,
-        'langcode' => LANGUAGE_NOT_SPECIFIED,
+        'langcode' => Language::LANGCODE_NOT_SPECIFIED,
         'delta' => 0,
         'taxonomy_term_description_value' => $term->description,
         'taxonomy_term_description_format' => $term->format,
