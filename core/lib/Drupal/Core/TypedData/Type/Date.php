@@ -42,7 +42,7 @@ class Date extends TypedData {
       $this->value = $value;
     }
     else {
-      $this->value = $value instanceOf DrupalDateTime ? $value : new DrupalDateTime($value);
+      $this->value = $value;
     }
   }
 }
