@@ -149,8 +149,8 @@ abstract class DrupalUnitTestBase extends UnitTestBase {
     $this->settingsSet('cache', array('default' => 'cache.backend.memory'));
 
     $container
-      ->register('config.storage', 'Drupal\Core\Config\FileStorage')
-      ->addArgument($this->configDirectories[CONFIG_ACTIVE_DIRECTORY]);
+      ->register('config.storage', 'Drupal\Core\Config\MemoryStorage')
+      ->addArgument(array());
 
     $conf['keyvalue_default'] = 'keyvalue.memory';
     $container->set('keyvalue.memory', $this->keyValueFactory);
