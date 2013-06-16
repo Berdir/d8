@@ -95,18 +95,25 @@ class EntityListController implements EntityListControllerInterface, EntityContr
    */
   public function getOperations(EntityInterface $entity) {
     $uri = $entity->uri();
-    $operations['edit'] = array(
-      'title' => t('Edit'),
-      'href' => $uri['path'] . '/edit',
-      'options' => $uri['options'],
-      'weight' => 10,
-    );
-    $operations['delete'] = array(
-      'title' => t('Delete'),
-      'href' => $uri['path'] . '/delete',
-      'options' => $uri['options'],
-      'weight' => 100,
-    );
+
+    $operations = array();
+    if ($entity->access('edit')) {
+      $operations['edit'] = array(
+        'title' => t('Edit'),
+        'href' => $uri['path'] . '/edit',
+        'options' => $uri['options'],
+        'weight' => 10,
+      );
+    }
+    if ($entity->access('delete')) {
+      $operations['delete'] = array(
+        'title' => t('Delete'),
+        'href' => $uri['path'] . '/delete',
+        'options' => $uri['options'],
+        'weight' => 100,
+      );
+    }
+
     return $operations;
   }
 

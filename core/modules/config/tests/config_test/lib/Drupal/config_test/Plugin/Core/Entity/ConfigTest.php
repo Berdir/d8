@@ -24,7 +24,8 @@ use Drupal\config_test\ConfigTestInterface;
  *     "list" = "Drupal\Core\Config\Entity\ConfigEntityListController",
  *     "form" = {
  *       "default" = "Drupal\config_test\ConfigTestFormController"
- *     }
+ *     },
+ *     "access" = "Drupal\config_test\ConfigTestAccessController"
  *   },
  *   uri_callback = "config_test_uri",
  *   config_prefix = "config_test.dynamic",

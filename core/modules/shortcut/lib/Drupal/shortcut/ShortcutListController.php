@@ -31,15 +31,11 @@ class ShortcutListController extends ConfigEntityListController {
     $uri = $entity->uri();
 
     $operations['edit']['title'] = t('Edit menu');
-    $operations['edit']['href'] = $uri['path'] . '/edit';
 
     $operations['list'] = array(
       'title' => t('List links'),
       'href' => $uri['path'],
     );
-    if (!$entity->access('delete')) {
-      unset($operations['delete']);
-    }
     return $operations;
   }
 
