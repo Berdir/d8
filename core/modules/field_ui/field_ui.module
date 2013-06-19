@@ -6,6 +6,7 @@
  */
 
 use Drupal\entity\EntityViewModeInterface;
+use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Implements hook_help().
@@ -285,6 +286,30 @@ function field_ui_form_node_type_form_alter(&$form, $form_state) {
       '#weight' => 45,
     );
     $form['#submit'][] = 'field_ui_form_node_type_form_submit';
+  }
+}
+
+/**
+ * Implements hook_entity_operation_alter().
+ */
+function field_ui_entity_operation_alter(array &$operations, EntityInterface $entity) {
+  $info = $entity->entityInfo();
+  // Add manage fields and display links if this entity type is the bundle
+  // of another.
+  if (!empty($info['bundle_of'])) {
+    $uri = $entity->uri();
+    $operations['manage-fields'] = array(
+      'title' => t('Manage fields'),
+      'href' => $uri['path'] . '/fields',
+      'options' => $uri['options'],
+      'weight' => 11,
+    );
+    $operations['manage-display'] = array(
+      'title' => t('Manage display'),
+      'href' => $uri['path'] . '/display',
+      'options' => $uri['options'],
+      'weight' => 12,
+    );
   }
 }
 
