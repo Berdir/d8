@@ -167,6 +167,18 @@ use Drupal\Core\Database\Query\PlaceholderInterface;
 
 abstract class Schema implements PlaceholderInterface {
 
+  /**
+   * The maximum allowed length of a database index.
+   *
+   * The MySQL MyISAM storage engine enforces a limit of 1000 bytes, which
+   * corresponds to 333 UTF-8 characters. We enforce this limitation for all
+   * schemata, so that it is not possible to inadvertently declare a schema
+   * that is not compatible with MySQL.
+   *
+   * @see http://dev.mysql.com/doc/refman/5.6/en/myisam-storage-engine.html
+   */
+  const MAX_INDEX_SIZE = 1000;
+
   protected $connection;
 
   /**
@@ -661,10 +673,127 @@ abstract class Schema implements PlaceholderInterface {
     if ($this->tableExists($name)) {
       throw new SchemaObjectExistsException(t('Table @name already exists.', array('@name' => $name)));
     }
+    $this->validateTable($name, $table);
     $statements = $this->createTableSql($name, $table);
     foreach ($statements as $statement) {
       $this->connection->query($statement);
     }
+  }
+
+  /**
+   * Validates a table definition.
+   *
+   * @param string $name
+   *   The name of the table.
+   * @param array $table
+   *   A Schema API table definition array.
+   *
+   * @throws Drupal\Core\Database\SchemaIndexSizeException
+   *   If a specified index is too long.
+   *
+   * @see \Drupal\Core\Database\Schema::addIndex()
+   */
+  public function validateTable($name, array $table) {
+    $spec = array_intersect_key($table, array('unique keys' => 1, 'indexes' => 1));
+    if (isset($table['primary key'])) {
+      $spec['primary key'] = array('primary key' => $table['primary key']);
+    }
+    foreach ($spec as $type => $keys) {
+      foreach ($keys as $key_name => $fields) {
+        $size = 0;
+        foreach ($fields as $field) {
+          $size += $this->indexSize($table, $field);
+        }
+        if ($size > static::MAX_INDEX_SIZE) {
+          throw new SchemaIndexSizeException(format_string('Table index @key_name for @table_name exceeds the maximum allowed size.', array('@key_name' => $key_name, '@table_name' => $name)));
+        }
+      }
+    }
+  }
+
+  /**
+   * Returns the index length to reserve when validating a given field.
+   *
+   * @param array $table
+   *   The database table definition array from hook_schema().
+   * @param array|string $field
+   *   The database index field item from hook_schema().
+   *
+   * @return int.
+   *   The size to allot for the field in the index, in bytes. For fields that
+   *   are too large to include in an index, Schema::MAX_INDEX_SIZE + 1 is
+   *   returned instead.
+   */
+  protected function indexSize($table, $field) {
+    // Default to 0, so that custom field types are not counted.
+    $size = 0;
+
+    // If just the field name is provided, the whole field is used for
+    // the index, so add its total length.
+    if (is_string($field)) {
+      // For fields with a specified length, use that.
+      if (isset($table['fields'][$field]['length'])) {
+        // Each unicode character uses 3 bytes.
+        $size = 3 * $table['fields'][$field]['length'];
+      }
+      // For fields without a specified length, allot space based on the
+      // field type's size in MySQL.
+      // @see http://drupal.org/node/159605
+      else {
+        switch ($table['fields'][$field]['type']) {
+          case 'serial':
+          case 'int':
+          case 'float':
+            // If the field type is serial, int, or float, allot 8 bytes for
+            // 'big' field sizes and 4 for others..
+            if (!empty($field['size']) && $field['size'] == 'big') {
+              $size = 8;
+            }
+            else {
+              $size = 4;
+            }
+            break;
+
+          case 'numeric':
+            // If the field type is numeric, allot 29 bytes.
+            $size = 29;
+            break;
+
+          case 'char':
+            // If the field type is char, allot 255 bytes.
+            $size = 255;
+            break;
+
+          case 'char':
+            // If the field type is text, allot 256 bytes for tiny or small
+            // fields, and fail otherwise.
+            if (!empty($field['size']) && ($field['size'] == 'tiny' || $field['size'] == 'small')) {
+              $size = 256;
+            }
+            else {
+              // Larger sizes are too big for an index.
+              $size = static::MAX_INDEX_SIZE + 1;
+            }
+            break;
+
+          case 'blob':
+          case 'varchar':
+            // BLOBs and unlimited varchars are always too big.
+            $size = static::MAX_INDEX_SIZE + 1;
+            break;
+        }
+      }
+    }
+
+    // Otherwise, if the field is an array, then the first key of the
+    // array is the field name, and the second is the length used in the
+    // index, e.g. array('my_field', 64)
+    // See \Drupal\Core\Database\Driver\mysql\Schema::createKeySql().
+    else {
+      $size = $field[1];
+    }
+
+    return $size;
   }
 
   /**

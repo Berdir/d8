@@ -8,6 +8,7 @@
 namespace Drupal\system\Tests\Database;
 
 use Drupal\Core\Database\Database;
+use Drupal\Core\Database\SchemaIndexSizeException;
 use Drupal\simpletest\UnitTestBase;
 
 /**
@@ -141,6 +142,60 @@ class SchemaTest extends UnitTestBase {
     }
     catch (\Exception $e) {}
     $this->assertTrue(db_table_exists('test_timestamp'), 'Table with database specific datatype was created.');
+  }
+
+  /**
+   * Tests schema definitions that exceed the maximum allowed size.
+   */
+  function testSchemaMaxIndexSize() {
+    // Define a table structure with an index that is too large.
+    $table_specification = array(
+      'description' => 'Test schema table.',
+      'fields' => array(
+        // Allotted 765 bytes.
+        'text_field_1'  => array(
+          'type' => 'text',
+          'default' => NULL,
+          'length' => 255,
+        ),
+        // Allotted 765 bytes.
+        'text_field_2'  => array(
+          'type' => 'text',
+          'default' => NULL,
+          'length' => 128,
+        ),
+        // Allotted 29 bytes.
+        'numeric_field'  => array(
+          'type' => 'numeric',
+          'default' => NULL,
+        ),
+        // Allotted 8 bytes.
+        'int_field' => array(
+          'type' => 'int',
+          'default' => NULL,
+        ),
+      ),
+      'primary key' => array('text_field_1', 'text_field_2', 'numeric_field', 'int_field'),
+    );
+    try {
+      db_create_table('test_table', $table_specification);
+      $this->fail('Exception thrown when attempting to create a table with an index that is too large.');
+    }
+    catch (SchemaIndexSizeException $e) {
+      $this->pass('Exception thrown when attempting to create a table with an index that is too large.');
+    }
+
+    // Reduce the size of the index to exactly the maximum.
+    // (255 + 66) * 3 + 29 + 8 = 1000
+    $table_definition['fields']['text_field_2']['length'] = 66;
+    try {
+      db_create_table('test_table', $table_specification);
+      $this->pass('Exception not thrown when attempting to create a table with an index that is the maximum size.');
+    }
+    catch (SchemaIndexSizeException $e) {
+      $this->fail('Exception not thrown when attempting to create a table with an index that is the maximum size.');
+    }
+
   }
 
   /**
