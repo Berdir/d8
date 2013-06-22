@@ -81,10 +81,10 @@ class LocaleLookup extends CacheCollector {
   /**
    * {@inheritdoc}
    */
-  protected function resolveCacheMiss($offset) {
+  protected function resolveCacheMiss($key) {
     $translation = $this->stringStorage->findTranslation(array(
       'language' => $this->langcode,
-      'source' => $offset,
+      'source' => $key,
       'context' => $this->context,
     ));
 
@@ -95,19 +95,19 @@ class LocaleLookup extends CacheCollector {
       // We don't have the source string, update the {locales_source} table to
       // indicate the string is not translated.
       $this->stringStorage->createString(array(
-        'source' => $offset,
+        'source' => $key,
         'context' => $this->context,
         'version' => VERSION
       ))->addLocation('path', request_uri())->save();
       $value = TRUE;
     }
-    $this->storage[$offset] = $value;
+    $this->storage[$key] = $value;
     // Disabling the usage of string caching allows a module to watch for
     // the exact list of strings used on a page. From a performance
     // perspective that is a really bad idea, so we have no user
     // interface for this. Be careful when turning this option off!
     if (config('locale.settings')->get('cache_strings')) {
-      $this->persist($offset);
+      $this->persist($key);
     }
     return $value;
   }

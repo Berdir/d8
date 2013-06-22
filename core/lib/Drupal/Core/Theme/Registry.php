@@ -11,6 +11,7 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\DestructableInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Core\Utility\ThemeRegistry;
 
 /**
@@ -40,6 +41,13 @@ class Registry implements DestructableInterface {
    * @var string
    */
   protected $engine;
+
+  /**
+   * The lock backend that should be used.
+   *
+   * @var \Drupal\Core\Lock\LockBackendInterface
+   */
+  protected $lock;
 
   /**
    * The complete theme registry.
@@ -107,19 +115,21 @@ class Registry implements DestructableInterface {
    */
   protected $runtimeRegistry;
 
-
   /**
    * Constructs a \Drupal\Core\\Theme\Registry object.
    *
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache
    *   The cache backend interface to use for the complete theme registry data.
+   * @param \Drupal\Core\Lock\LockBackendInterface $lock
+   *   The lock backend.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler to use to load modules.
    * @param string $theme_name
    *   (optional) The name of the theme for which to construct the registry.
    */
-  public function __construct(CacheBackendInterface $cache, ModuleHandlerInterface $module_handler, $theme_name = NULL) {
+  public function __construct(CacheBackendInterface $cache, LockBackendInterface $lock, ModuleHandlerInterface $module_handler, $theme_name = NULL) {
     $this->cache = $cache;
+    $this->lock = $lock;
     $this->moduleHandler = $module_handler;
     $this->init($theme_name);
   }
@@ -250,7 +260,7 @@ class Registry implements DestructableInterface {
    */
   public function getRuntime() {
     if (!isset($this->runtimeRegistry)) {
-      $this->runtimeRegistry = new ThemeRegistry('theme_registry:runtime:' . $this->theme->name, 'cache', array('theme_registry' => TRUE), $this->moduleHandler->isLoaded());
+      $this->runtimeRegistry = new ThemeRegistry('theme_registry:runtime:' . $this->theme->name, $this->cache, $this->lock, array('theme_registry' => TRUE), $this->moduleHandler->isLoaded());
     }
     return $this->runtimeRegistry;
   }

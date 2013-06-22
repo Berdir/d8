@@ -97,7 +97,8 @@ class TwigSettingsTest extends WebTestBase {
 
     // Get the template filename and the cache filename for
     // theme_test.template_test.html.twig.
-    $template_filename = $templates['theme_test_template_test']['path'] . '/' . $templates['theme_test_template_test']['template'] . $extension;
+    $template = $templates->get('theme_test_template_test');
+    $template_filename = $template['path'] . '/' . $template['template'] . $extension;
     $cache_filename = drupal_container()->get('twig')->getCacheFilename($template_filename);
 
     // Navigate to the page and make sure the template gets cached.
