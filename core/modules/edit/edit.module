@@ -35,6 +35,20 @@ function edit_menu() {
 }
 
 /**
+ * Implements hook_theme().
+ */
+function edit_theme() {
+  return array(
+    'node' => array(
+      'preprocess' => array('edit_preprocess_node'),
+    ),
+    'field' => array(
+      'preprocess' => array('edit_preprocess_field'),
+    ),
+  );
+}
+
+/**
  * Implements hook_permission().
  */
 function edit_permission() {

@@ -60,23 +60,31 @@ function forum_help($path, $arg) {
  */
 function forum_theme() {
   return array(
+    'block__forum' => array(
+      'preprocess' => array('forum_preprocess_block'),
+    ),
     'forums' => array(
+      'preprocess' => array('template_preprocess_forums'),
       'template' => 'forums',
       'variables' => array('forums' => NULL, 'topics' => NULL, 'parents' => NULL, 'tid' => NULL, 'sortby' => NULL, 'forum_per_page' => NULL),
     ),
     'forum_list' => array(
+      'preprocess' => array('template_preprocess_forum_list'),
       'template' => 'forum-list',
       'variables' => array('forums' => NULL, 'parents' => NULL, 'tid' => NULL),
     ),
     'forum_topic_list' => array(
+      'preprocess' => array('template_preprocess_forum_topic_list'),
       'template' => 'forum-topic-list',
       'variables' => array('tid' => NULL, 'topics' => NULL, 'sortby' => NULL, 'forum_per_page' => NULL),
     ),
     'forum_icon' => array(
+      'preprocess' => array('template_preprocess_forum_icon'),
       'template' => 'forum-icon',
       'variables' => array('new_posts' => NULL, 'num_posts' => 0, 'comment_mode' => 0, 'sticky' => 0, 'first_new' => FALSE),
     ),
     'forum_submitted' => array(
+      'preprocess' => array('template_preprocess_forum_submitted'),
       'template' => 'forum-submitted',
       'variables' => array('topic' => NULL),
     ),

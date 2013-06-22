@@ -8,6 +8,7 @@
 namespace Drupal\Core\Utility;
 
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\DestructableInterface;
 
 /**
  * Builds the run-time theme registry.
@@ -17,7 +18,7 @@ use Drupal\Core\Cache\CacheBackendInterface;
  * that are actually in use on the site. On cache misses the complete
  * theme registry is loaded and used to update the run-time cache.
  */
-class ThemeRegistry extends CacheArray {
+class ThemeRegistry extends CacheArray implements DestructableInterface {
 
   /**
    * Whether the partial registry can be persisted to the cache.
@@ -76,7 +77,8 @@ class ThemeRegistry extends CacheArray {
    *   initialized to NULL.
    */
   function initializeRegistry() {
-    $this->completeRegistry = theme_get_registry();
+    // @todo DIC this.
+    $this->completeRegistry = \Drupal::service('theme.registry')->get();
 
     return array_fill_keys(array_keys($this->completeRegistry), NULL);
   }
@@ -111,8 +113,9 @@ class ThemeRegistry extends CacheArray {
    * Implements CacheArray::resolveCacheMiss().
    */
   public function resolveCacheMiss($offset) {
+    // @todo DIC this.
     if (!isset($this->completeRegistry)) {
-      $this->completeRegistry = theme_get_registry();
+      $this->completeRegistry = \Drupal::service('theme.registry')->get();
     }
     $this->storage[$offset] = $this->completeRegistry[$offset];
     if ($this->persistable) {
@@ -142,4 +145,19 @@ class ThemeRegistry extends CacheArray {
       }
     }
   }
+
+
+  /**
+   * Implements Drupal\Core\DestructableInterface::destruct().
+   */
+  public function destruct() {
+    parent::__destruct();
+  }
+
+  /**
+   * Destructs the ThemeRegistry object.
+   */
+  public function __destruct() {
+  }
+
 }

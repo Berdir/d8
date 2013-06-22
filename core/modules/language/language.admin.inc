@@ -925,7 +925,7 @@ function template_preprocess_language_content_settings_table(&$variables) {
  * @ingroup themable
  */
 function theme_language_content_settings_table($variables) {
-  return '<h4>' . $variables['build']['#title'] . '</h4>' . drupal_render($variables['build']);
+  return '<h4>' . $variables['build']['#title'] . '</h4>' . drupal_render_children($variables['build']);
 }
 
 /**

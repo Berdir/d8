@@ -38,6 +38,7 @@ class FastTest extends WebTestBase {
    * Tests access to user autocompletion and verify the correct results.
    */
   function testUserAutocomplete() {
+    // @todo Replace with injected mock registry in DUTB test.
     $this->drupalLogin($this->account);
     $this->drupalGet('user/autocomplete', array('query' => array('q' => $this->account->name)));
     $this->assertRaw($this->account->name);

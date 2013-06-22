@@ -41,7 +41,11 @@ class ThemeTestTwig extends WebTestBase {
     config('system.theme')
       ->set('default', 'test_theme')
       ->save();
-    $this->drupalGet('twig-theme-test/php-variables');
+    $this->rebuildContainer();
+    $this->resetAll();
+    $this->container->get('theme.registry')->reset();
+
+    $this->drupalSetContent(theme('twig_theme_test_php_variables'));
     foreach (_test_theme_twig_php_values() as $type => $value) {
       $this->assertRaw('<li>' . $type . ': ' . $value['expected'] . '</li>');
     }

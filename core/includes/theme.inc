@@ -13,6 +13,7 @@ use Drupal\Core\Config\Config;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Extension\ExtensionNameLengthException;
 use Drupal\Core\Template\Attribute;
+use Drupal\Core\Theme\Registry;
 use Drupal\Core\Utility\ThemeRegistry;
 use Drupal\Core\Theme\ThemeSettings;
 use Drupal\Component\Utility\NestedArray;
@@ -141,10 +142,8 @@ function drupal_theme_initialize() {
  *    the same information as the $theme object. It should be in
  *    'oldest first' order, meaning the top level of the chain will
  *    be first.
- * @param $registry_callback
- *   The callback to invoke to set the theme registry.
  */
-function _drupal_theme_initialize($theme, $base_theme = array(), $registry_callback = '_theme_load_registry') {
+function _drupal_theme_initialize($theme, $base_theme = array()) {
   global $theme_info, $base_theme_info, $theme_engine, $theme_path;
   $theme_info = $theme;
   $base_theme_info = $base_theme;
@@ -273,393 +272,6 @@ function _drupal_theme_initialize($theme, $base_theme = array(), $registry_callb
 
   // Always include Twig as the default theme engine.
   include_once DRUPAL_ROOT . '/core/themes/engines/twig/twig.engine';
-
-  if (isset($registry_callback)) {
-    _theme_registry_callback($registry_callback, array($theme, $base_theme, $theme_engine));
-  }
-}
-
-/**
- * Gets the theme registry.
- *
- * @param bool $complete
- *   Optional boolean to indicate whether to return the complete theme registry
- *   array or an instance of the Drupal\Core\Utility\ThemeRegistry class.
- *   If TRUE, the complete theme registry array will be returned. This is useful
- *   if you want to foreach over the whole registry, use array_* functions or
- *   inspect it in a debugger. If FALSE, an instance of the
- *   Drupal\Core\Utility\ThemeRegistry class will be returned, this provides an
- *   ArrayObject which allows it to be accessed with array syntax and isset(),
- *   and should be more lightweight than the full registry. Defaults to TRUE.
- *
- * @return
- *   The complete theme registry array, or an instance of the
- *   Drupal\Core\Utility\ThemeRegistry class.
- */
-function theme_get_registry($complete = TRUE) {
-  // Use the advanced drupal_static() pattern, since this is called very often.
-  static $drupal_static_fast;
-  if (!isset($drupal_static_fast)) {
-    $drupal_static_fast['registry'] = &drupal_static('theme_get_registry');
-  }
-  $theme_registry = &$drupal_static_fast['registry'];
-
-  // Initialize the theme, if this is called early in the bootstrap, or after
-  // static variables have been reset.
-  if (!is_array($theme_registry)) {
-    drupal_theme_initialize();
-    $theme_registry = array();
-  }
-
-  $key = (int) $complete;
-
-  if (!isset($theme_registry[$key])) {
-    list($callback, $arguments) = _theme_registry_callback();
-    if (!$complete) {
-      $arguments[] = FALSE;
-    }
-    $theme_registry[$key] = call_user_func_array($callback, $arguments);
-  }
-
-  return $theme_registry[$key];
-}
-
-/**
- * Sets the callback that will be used by theme_get_registry().
- *
- * @param $callback
- *   The name of the callback function.
- * @param $arguments
- *   The arguments to pass to the function.
- */
-function _theme_registry_callback($callback = NULL, array $arguments = array()) {
-  static $stored;
-  if (isset($callback)) {
-    $stored = array($callback, $arguments);
-  }
-  return $stored;
-}
-
-/**
- * Gets the theme_registry cache; if it doesn't exist, builds it.
- *
- * @param $theme
- *   The loaded $theme object as returned by list_themes().
- * @param $base_theme
- *   An array of loaded $theme objects representing the ancestor themes in
- *   oldest first order.
- * @param $theme_engine
- *   The name of the theme engine.
- * @param $complete
- *   Whether to load the complete theme registry or an instance of the
- *   Drupal\Core\Utility\ThemeRegistry class.
- *
- * @return
- *   The theme registry array, or an instance of the
- *   Drupal\Core\Utility\ThemeRegistry class.
- */
-function _theme_load_registry($theme, $base_theme = NULL, $theme_engine = NULL, $complete = TRUE) {
-  if ($complete) {
-    // Check the theme registry cache; if it exists, use it.
-    $cached = cache()->get("theme_registry:$theme->name");
-    if (isset($cached->data)) {
-      $registry = $cached->data;
-    }
-    else {
-      // If not, build one and cache it.
-      $registry = _theme_build_registry($theme, $base_theme, $theme_engine);
-      // Only persist this registry if all modules are loaded. This assures a
-      // complete set of theme hooks.
-      if (Drupal::moduleHandler()->isLoaded()) {
-        _theme_save_registry($theme, $registry);
-      }
-    }
-    return $registry;
-  }
-  else {
-    return new ThemeRegistry('theme_registry:runtime:' . $theme->name, 'cache', array('theme_registry' => TRUE), Drupal::moduleHandler()->isLoaded());
-  }
-}
-
-/**
- * Writes the theme_registry cache into the database.
- */
-function _theme_save_registry($theme, $registry) {
-  cache()->set("theme_registry:$theme->name", $registry, CacheBackendInterface::CACHE_PERMANENT, array('theme_registry' => TRUE));
-}
-
-/**
- * Forces the system to rebuild the theme registry.
- *
- * This function should be called when modules are added to the system, or when
- * a dynamic system needs to add more theme hooks.
- */
-function drupal_theme_rebuild() {
-  drupal_static_reset('theme_get_registry');
-  cache()->invalidateTags(array('theme_registry' => TRUE));
-}
-
-/**
- * Process a single implementation of hook_theme().
- *
- * @param $cache
- *   The theme registry that will eventually be cached; It is an associative
- *   array keyed by theme hooks, whose values are associative arrays describing
- *   the hook:
- *   - 'type': The passed-in $type.
- *   - 'theme path': The passed-in $path.
- *   - 'function': The name of the function generating output for this theme
- *     hook. Either defined explicitly in hook_theme() or, if neither
- *     'function' nor 'template' is defined, then the default theme function
- *     name is used. The default theme function name is the theme hook prefixed
- *     by either 'theme_' for modules or '$name_' for everything else. If
- *     'function' is defined, 'template' is not used.
- *   - 'template': The filename of the template generating output for this
- *     theme hook. The template is in the directory defined by the 'path' key of
- *     hook_theme() or defaults to "$path/templates".
- *   - 'variables': The variables for this theme hook as defined in
- *     hook_theme(). If there is more than one implementation and 'variables'
- *     is not specified in a later one, then the previous definition is kept.
- *   - 'render element': The renderable element for this theme hook as defined
- *     in hook_theme(). If there is more than one implementation and
- *     'render element' is not specified in a later one, then the previous
- *     definition is kept.
- *   - 'preprocess functions': See theme() for detailed documentation.
- *   - 'process functions': See theme() for detailed documentation.
- * @param $name
- *   The name of the module, theme engine, base theme engine, theme or base
- *   theme implementing hook_theme().
- * @param $type
- *   One of 'module', 'theme_engine', 'base_theme_engine', 'theme', or
- *   'base_theme'. Unlike regular hooks that can only be implemented by modules,
- *   each of these can implement hook_theme(). _theme_process_registry() is
- *   called in aforementioned order and new entries override older ones. For
- *   example, if a theme hook is both defined by a module and a theme, then the
- *   definition in the theme will be used.
- * @param $theme
- *   The loaded $theme object as returned from list_themes().
- * @param $path
- *   The directory where $name is. For example, modules/system or
- *   themes/bartik.
- *
- * @see theme()
- * @see hook_theme()
- * @see list_themes()
- */
-function _theme_process_registry(&$cache, $name, $type, $theme, $path) {
-  $result = array();
-
-  // Processor functions work in two distinct phases with the process
-  // functions always being executed after the preprocess functions.
-  $variable_process_phases = array(
-    'preprocess functions' => 'preprocess',
-    'process functions'    => 'process',
-  );
-
-  $hook_defaults = array(
-    'variables' => TRUE,
-    'render element' => TRUE,
-    'pattern' => TRUE,
-    'base hook' => TRUE,
-  );
-
-  $module_list = array_keys(Drupal::moduleHandler()->getModuleList());
-
-  // Invoke the hook_theme() implementation, process what is returned, and
-  // merge it into $cache.
-  $function = $name . '_theme';
-  if (function_exists($function)) {
-    $result = $function($cache, $type, $theme, $path);
-    foreach ($result as $hook => $info) {
-      // When a theme or engine overrides a module's theme function
-      // $result[$hook] will only contain key/value pairs for information being
-      // overridden.  Pull the rest of the information from what was defined by
-      // an earlier hook.
-
-      // Fill in the type and path of the module, theme, or engine that
-      // implements this theme function.
-      $result[$hook]['type'] = $type;
-      $result[$hook]['theme path'] = $path;
-
-      // If function and file are omitted, default to standard naming
-      // conventions.
-      if (!isset($info['template']) && !isset($info['function'])) {
-        $result[$hook]['function'] = ($type == 'module' ? 'theme_' : $name . '_') . $hook;
-      }
-
-      if (isset($cache[$hook]['includes'])) {
-        $result[$hook]['includes'] = $cache[$hook]['includes'];
-      }
-
-      // If the theme implementation defines a file, then also use the path
-      // that it defined. Otherwise use the default path. This allows
-      // system.module to declare theme functions on behalf of core .include
-      // files.
-      if (isset($info['file'])) {
-        $include_file = isset($info['path']) ? $info['path'] : $path;
-        $include_file .= '/' . $info['file'];
-        include_once DRUPAL_ROOT . '/' . $include_file;
-        $result[$hook]['includes'][] = $include_file;
-      }
-
-      // If the default keys are not set, use the default values registered
-      // by the module.
-      if (isset($cache[$hook])) {
-        $result[$hook] += array_intersect_key($cache[$hook], $hook_defaults);
-      }
-
-      // The following apply only to theming hooks implemented as templates.
-      if (isset($info['template'])) {
-        // Prepend the current theming path when none is set.
-        if (!isset($info['path'])) {
-          $result[$hook]['template'] = $path . '/templates/' . $info['template'];
-        }
-      }
-
-      // Allow variable processors for all theming hooks, whether the hook is
-      // implemented as a template or as a function.
-      foreach ($variable_process_phases as $phase_key => $phase) {
-        // Check for existing variable processors. Ensure arrayness.
-        if (!isset($info[$phase_key]) || !is_array($info[$phase_key])) {
-          $info[$phase_key] = array();
-          $prefixes = array();
-          if ($type == 'module') {
-            // Default variable processor prefix.
-            $prefixes[] = 'template';
-            // Add all modules so they can intervene with their own variable
-            // processors. This allows them to provide variable processors even
-            // if they are not the owner of the current hook.
-            $prefixes = array_merge($prefixes, $module_list);
-          }
-          elseif ($type == 'theme_engine' || $type == 'base_theme_engine') {
-            // Theme engines get an extra set that come before the normally
-            // named variable processors.
-            $prefixes[] = $name . '_engine';
-            // The theme engine registers on behalf of the theme using the
-            // theme's name.
-            $prefixes[] = $theme;
-          }
-          else {
-            // This applies when the theme manually registers their own variable
-            // processors.
-            $prefixes[] = $name;
-          }
-          foreach ($prefixes as $prefix) {
-            // Only use non-hook-specific variable processors for theming hooks
-            // implemented as templates. See theme().
-            if (isset($info['template']) && function_exists($prefix . '_' . $phase)) {
-              $info[$phase_key][] = $prefix . '_' . $phase;
-            }
-            if (function_exists($prefix . '_' . $phase . '_' . $hook)) {
-              $info[$phase_key][] = $prefix . '_' . $phase . '_' . $hook;
-            }
-          }
-        }
-        // Check for the override flag and prevent the cached variable
-        // processors from being used. This allows themes or theme engines to
-        // remove variable processors set earlier in the registry build.
-        if (!empty($info['override ' . $phase_key])) {
-          // Flag not needed inside the registry.
-          unset($result[$hook]['override ' . $phase_key]);
-        }
-        elseif (isset($cache[$hook][$phase_key]) && is_array($cache[$hook][$phase_key])) {
-          $info[$phase_key] = array_merge($cache[$hook][$phase_key], $info[$phase_key]);
-        }
-        $result[$hook][$phase_key] = $info[$phase_key];
-      }
-    }
-
-    // Merge the newly created theme hooks into the existing cache.
-    $cache = $result + $cache;
-  }
-
-  // Let themes have variable processors even if they didn't register a
-  // template.
-  if ($type == 'theme' || $type == 'base_theme') {
-    foreach ($cache as $hook => $info) {
-      // Check only if not registered by the theme or engine.
-      if (empty($result[$hook])) {
-        foreach ($variable_process_phases as $phase_key => $phase) {
-          if (!isset($info[$phase_key])) {
-            $cache[$hook][$phase_key] = array();
-          }
-          // Only use non-hook-specific variable processors for theming hooks
-          // implemented as templates. See theme().
-          if (isset($info['template']) && function_exists($name . '_' . $phase)) {
-            $cache[$hook][$phase_key][] = $name . '_' . $phase;
-          }
-          if (function_exists($name . '_' . $phase . '_' . $hook)) {
-            $cache[$hook][$phase_key][] = $name . '_' . $phase . '_' . $hook;
-            $cache[$hook]['theme path'] = $path;
-          }
-          // Ensure uniqueness.
-          $cache[$hook][$phase_key] = array_unique($cache[$hook][$phase_key]);
-        }
-      }
-    }
-  }
-}
-
-/**
- * Builds the theme registry cache.
- *
- * @param $theme
- *   The loaded $theme object as returned by list_themes().
- * @param $base_theme
- *   An array of loaded $theme objects representing the ancestor themes in
- *   oldest first order.
- * @param $theme_engine
- *   The name of the theme engine.
- */
-function _theme_build_registry($theme, $base_theme, $theme_engine) {
-  $cache = array();
-  // First, process the theme hooks advertised by modules. This will
-  // serve as the basic registry. Since the list of enabled modules is the same
-  // regardless of the theme used, this is cached in its own entry to save
-  // building it for every theme.
-  if ($cached = cache()->get('theme_registry:build:modules')) {
-    $cache = $cached->data;
-  }
-  else {
-    foreach (module_implements('theme') as $module) {
-      _theme_process_registry($cache, $module, 'module', $module, drupal_get_path('module', $module));
-    }
-    // Only cache this registry if all modules are loaded.
-    if (Drupal::moduleHandler()->isLoaded()) {
-      cache()->set("theme_registry:build:modules", $cache, CacheBackendInterface::CACHE_PERMANENT, array('theme_registry' => TRUE));
-    }
-  }
-
-  // Process each base theme.
-  foreach ($base_theme as $base) {
-    // If the base theme uses a theme engine, process its hooks.
-    $base_path = dirname($base->filename);
-    if ($theme_engine) {
-      _theme_process_registry($cache, $theme_engine, 'base_theme_engine', $base->name, $base_path);
-    }
-    _theme_process_registry($cache, $base->name, 'base_theme', $base->name, $base_path);
-  }
-
-  // And then the same thing, but for the theme.
-  if ($theme_engine) {
-    _theme_process_registry($cache, $theme_engine, 'theme_engine', $theme->name, dirname($theme->filename));
-  }
-
-  // Finally, hooks provided by the theme itself.
-  _theme_process_registry($cache, $theme->name, 'theme', $theme->name, dirname($theme->filename));
-
-  // Let modules alter the registry.
-  drupal_alter('theme_registry', $cache);
-
-  // Optimize the registry to not have empty arrays for functions.
-  foreach ($cache as $hook => $info) {
-    foreach (array('preprocess functions', 'process functions') as $phase) {
-      if (empty($info[$phase])) {
-        unset($cache[$hook][$phase]);
-      }
-    }
-  }
-  return $cache;
 }
 
 /**
@@ -844,6 +456,7 @@ function drupal_find_base_themes($themes, $key, $used_keys = array()) {
  * executed (if they exist), in the following order (note that in the following
  * list, HOOK indicates the theme hook name, MODULE indicates a module name,
  * THEME indicates a theme name, and ENGINE indicates a theme engine name):
+ * @todo Needs update for declarative *_preprocess_HOOK().
  * - template_preprocess(&$variables, $hook): Creates a default set of
  *   variables for all theme hooks with template implementations.
  * - template_preprocess_HOOK(&$variables): Should be implemented by the module
@@ -944,12 +557,12 @@ function theme($hook, $variables = array()) {
   static $default_attributes;
   // If called before all modules are loaded, we do not necessarily have a full
   // theme registry to work with, and therefore cannot process the theme
-  // request properly. See also _theme_load_registry().
+  // request properly.
   if (!Drupal::moduleHandler()->isLoaded() && !defined('MAINTENANCE_MODE')) {
     throw new Exception(t('theme() may not be called until all modules are loaded.'));
   }
 
-  $hooks = theme_get_registry(FALSE);
+  $hooks = \Drupal::service('theme.registry')->getRuntime();
 
   // If an array of hook candidates were passed, use the first one that has an
   // implementation.
@@ -1046,15 +659,15 @@ function theme($hook, $variables = array()) {
         include_once DRUPAL_ROOT . '/' . $include_file;
       }
     }
-    if (isset($base_hook_info['preprocess functions']) || isset($base_hook_info['process functions'])) {
+    if (isset($base_hook_info['preprocess']) || isset($base_hook_info['process'])) {
       $variables['theme_hook_suggestion'] = $hook;
       $hook = $base_hook;
       $info = $base_hook_info;
     }
   }
-  if (isset($info['preprocess functions']) || isset($info['process functions'])) {
+  if (isset($info['preprocess']) || isset($info['process'])) {
     $variables['theme_hook_suggestions'] = array();
-    foreach (array('preprocess functions', 'process functions') as $phase) {
+    foreach (array('preprocess', 'process') as $phase) {
       if (!empty($info[$phase])) {
         foreach ($info[$phase] as $processor_function) {
           if (function_exists($processor_function)) {
@@ -1084,6 +697,11 @@ function theme($hook, $variables = array()) {
     }
     foreach (array_reverse($suggestions) as $suggestion) {
       if (isset($hooks[$suggestion])) {
+        // A theme hook suggestion is essentially the reverse of a base hook
+        // definition; instead of finding the generic parent, we find a more
+        // specific child. The registry ensures to merge the base hook info into
+        // the suggestion's info.
+        // @see \Drupal\Core\Theme\Registry::build()
         $info = $hooks[$suggestion];
         break;
       }
@@ -1092,10 +710,8 @@ function theme($hook, $variables = array()) {
 
   // Generate the output using either a function or a template.
   $output = '';
-  if (isset($info['function'])) {
-    if (function_exists($info['function'])) {
-      $output = $info['function']($variables);
-    }
+  if (!isset($info['template']) && isset($info['function'])) {
+    $output = $info['function']($variables);
   }
   else {
     $render_function = 'twig_render_template';
@@ -1115,21 +731,6 @@ function theme($hook, $variables = array()) {
       }
     }
 
-    // In some cases, a template implementation may not have had
-    // template_preprocess() run (for example, if the default implementation is
-    // a function, but a template overrides that default implementation). In
-    // these cases, a template should still be able to expect to have access to
-    // the variables provided by template_preprocess(), so we add them here if
-    // they don't already exist. We don't want the overhead of running
-    // template_preprocess() twice, so we use the 'directory' variable to
-    // determine if it has already run, which while not completely intuitive,
-    // is reasonably safe, and allows us to save on the overhead of adding some
-    // new variable to track that.
-    if (!isset($variables['directory'])) {
-      $default_template_variables = array();
-      template_preprocess($default_template_variables, $hook);
-      $variables += $default_template_variables;
-    }
     if (!isset($default_attributes)) {
       $default_attributes = new Attribute();
     }
@@ -1212,10 +813,8 @@ function drupal_find_theme_functions($cache, $prefixes) {
         if ($matches) {
           foreach ($matches as $match) {
             $new_hook = substr($match, strlen($prefix) + 1);
-            $arg_name = isset($info['variables']) ? 'variables' : 'render element';
             $implementations[$new_hook] = array(
               'function' => $match,
-              $arg_name => $info[$arg_name],
               'base hook' => $hook,
             );
           }
@@ -1326,11 +925,9 @@ function drupal_find_theme_templates($cache, $extension, $path) {
           $file = str_replace($extension, '', $file);
           // Put the underscores back in for the hook name and register this
           // pattern.
-          $arg_name = isset($info['variables']) ? 'variables' : 'render element';
           $implementations[strtr($file, '-', '_')] = array(
             'template' => $file,
             'path' => dirname($files[$match]->uri),
-            $arg_name => $info[$arg_name],
             'base hook' => $hook,
           );
         }
@@ -1519,7 +1116,7 @@ function theme_enable($theme_list) {
   list_themes(TRUE);
   Drupal::service('router.builder')->rebuild();
   menu_router_rebuild();
-  drupal_theme_rebuild();
+  Drupal::service('theme.registry')->reset();
 
   // Invoke hook_themes_enabled() after the themes have been enabled.
   module_invoke_all('themes_enabled', $theme_list);
@@ -1555,7 +1152,7 @@ function theme_disable($theme_list) {
   list_themes(TRUE);
   Drupal::service('router.builder')->rebuild();
   menu_router_rebuild();
-  drupal_theme_rebuild();
+  Drupal::service('theme.registry')->reset();
 
   // Invoke hook_themes_disabled after the themes have been disabled.
   module_invoke_all('themes_disabled', $theme_list);
@@ -3073,18 +2670,24 @@ function drupal_common_theme() {
     // From theme.inc.
     'html' => array(
       'render element' => 'page',
+      'preprocess' => array('template_preprocess_html'),
+      'process' => array('template_process_html'),
       'template' => 'html',
     ),
     'page' => array(
       'render element' => 'page',
+      'preprocess' => array('template_preprocess_page'),
+      'process' => array('template_process_page'),
       'template' => 'page',
     ),
     'region' => array(
       'render element' => 'elements',
+      'preprocess' => array('template_preprocess_region'),
       'template' => 'region',
     ),
     'datetime' => array(
       'variables' => array('timestamp' => NULL, 'text' => NULL, 'attributes' => array(), 'html' => FALSE),
+      'preprocess' => array('template_preprocess_datetime'),
       'template' => 'datetime',
     ),
     'status_messages' => array(
@@ -3130,6 +2733,7 @@ function drupal_common_theme() {
     ),
     'item_list' => array(
       'variables' => array('items' => array(), 'title' => '', 'list_type' => 'ul', 'attributes' => array()),
+      'preprocess' => array('template_preprocess_item_list'),
     ),
     'more_help_link' => array(
       'variables' => array('url' => NULL),
@@ -3149,103 +2753,123 @@ function drupal_common_theme() {
     // From theme.maintenance.inc.
     'maintenance_page' => array(
       'variables' => array('content' => NULL, 'show_messages' => TRUE),
+      'includes' => array('core/includes/theme.maintenance.inc'),
+      'preprocess' => array('template_preprocess_maintenance_page'),
+      'process' => array('template_process_maintenance_page'),
       'template' => 'maintenance-page',
     ),
     'install_page' => array(
       'variables' => array('content' => NULL),
+      'includes' => array('core/includes/theme.maintenance.inc'),
     ),
     'task_list' => array(
       'variables' => array('items' => NULL, 'active' => NULL),
+      'includes' => array('core/includes/theme.maintenance.inc'),
     ),
     'authorize_message' => array(
       'variables' => array('message' => NULL, 'success' => TRUE),
+      'includes' => array('core/includes/theme.maintenance.inc'),
     ),
     'authorize_report' => array(
       'variables' => array('messages' => array()),
+      'includes' => array('core/includes/theme.maintenance.inc'),
     ),
     // From pager.inc.
     'pager' => array(
       'variables' => array('tags' => array(), 'element' => 0, 'parameters' => array(), 'quantity' => 9),
-    ),
-    'pager_first' => array(
-      'variables' => array('text' => NULL, 'element' => 0, 'parameters' => array()),
-    ),
-    'pager_previous' => array(
-      'variables' => array('text' => NULL, 'element' => 0, 'interval' => 1, 'parameters' => array()),
-    ),
-    'pager_next' => array(
-      'variables' => array('text' => NULL, 'element' => 0, 'interval' => 1, 'parameters' => array()),
-    ),
-    'pager_last' => array(
-      'variables' => array('text' => NULL, 'element' => 0, 'parameters' => array()),
+      'includes' => array('core/includes/pager.inc'),
     ),
     'pager_link' => array(
       'variables' => array('text' => NULL, 'page_new' => NULL, 'element' => NULL, 'parameters' => array(), 'attributes' => array()),
+      'includes' => array('core/includes/pager.inc'),
     ),
     // From menu.inc.
     'menu_link' => array(
       'render element' => 'element',
+      'includes' => array('core/includes/menu.inc'),
     ),
     'menu_tree' => array(
       'render element' => 'tree',
+      'preprocess' => array('template_preprocess_menu_tree'),
+      'includes' => array('core/includes/menu.inc'),
     ),
     'menu_local_task' => array(
       'render element' => 'element',
+      'includes' => array('core/includes/menu.inc'),
     ),
     'menu_local_action' => array(
       'render element' => 'element',
+      'includes' => array('core/includes/menu.inc'),
     ),
     'menu_local_tasks' => array(
       'variables' => array('primary' => array(), 'secondary' => array()),
+      'includes' => array('core/includes/menu.inc'),
     ),
     // From form.inc.
     'input' => array(
       'render element' => 'element',
+      'preprocess' => array('template_preprocess_input'),
+      'includes' => array('core/includes/form.inc'),
     ),
     'select' => array(
       'render element' => 'element',
+      'includes' => array('core/includes/form.inc'),
     ),
     'fieldset' => array(
       'render element' => 'element',
+      'includes' => array('core/includes/form.inc'),
     ),
     'details' => array(
       'render element' => 'element',
+      'includes' => array('core/includes/form.inc'),
     ),
     'radios' => array(
       'render element' => 'element',
+      'includes' => array('core/includes/form.inc'),
     ),
     'date' => array(
       'render element' => 'element',
+      'includes' => array('core/includes/form.inc'),
     ),
     'exposed_filters' => array(
       'render element' => 'form',
+      'includes' => array('core/includes/form.inc'),
     ),
     'checkboxes' => array(
       'render element' => 'element',
+      'includes' => array('core/includes/form.inc'),
     ),
     'form' => array(
       'render element' => 'element',
+      'includes' => array('core/includes/form.inc'),
     ),
     'textarea' => array(
       'render element' => 'element',
+      'includes' => array('core/includes/form.inc'),
     ),
     'tableselect' => array(
       'render element' => 'element',
+      'includes' => array('core/includes/form.inc'),
     ),
     'form_element' => array(
       'render element' => 'element',
+      'includes' => array('core/includes/form.inc'),
     ),
     'form_required_marker' => array(
       'render element' => 'element',
+      'includes' => array('core/includes/form.inc'),
     ),
     'form_element_label' => array(
       'render element' => 'element',
+      'includes' => array('core/includes/form.inc'),
     ),
     'vertical_tabs' => array(
       'render element' => 'element',
+      'includes' => array('core/includes/form.inc'),
     ),
     'container' => array(
       'render element' => 'element',
+      'includes' => array('core/includes/form.inc'),
     ),
   );
 }

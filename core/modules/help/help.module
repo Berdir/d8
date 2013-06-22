@@ -30,6 +30,16 @@ function help_menu() {
 }
 
 /**
+ * Implements hook_theme().
+ */
+function help_theme() {
+  $theme['block__system_help_block'] = array(
+    'preprocess' => array('help_preprocess_block'),
+  );
+  return $theme;
+}
+
+/**
  * Implements hook_help().
  */
 function help_help($path, $arg) {

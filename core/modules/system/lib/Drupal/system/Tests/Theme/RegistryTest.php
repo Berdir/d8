@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\system\Tests\Theme\RegistryTest.
+ * Contains \Drupal\system\Tests\Theme\RuntimeRegistryTest.
  */
 
 namespace Drupal\system\Tests\Theme;
@@ -13,7 +13,7 @@ use Drupal\Core\Utility\ThemeRegistry;
 /**
  * Tests the ThemeRegistry class.
  */
-class RegistryTest extends WebTestBase {
+class RuntimeRegistryTest extends WebTestBase {
 
   /**
    * Modules to enable.
@@ -22,11 +22,10 @@ class RegistryTest extends WebTestBase {
    */
   public static $modules = array('theme_test');
 
-  protected $profile = 'testing';
   public static function getInfo() {
     return array(
       'name' => 'ThemeRegistry',
-      'description' => 'Tests the behavior of the ThemeRegistry class',
+      'description' => 'Tests the runtime ThemeRegistry class.',
       'group' => 'Theme',
     );
   }

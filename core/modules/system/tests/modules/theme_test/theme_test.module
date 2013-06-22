@@ -4,15 +4,37 @@
  * Implements hook_theme().
  */
 function theme_test_theme($existing, $type, $theme, $path) {
+  // Theme registry tests.
+  // @see test_theme_theme()
+  $items['theme_test_function_replace_template'] = array(
+    'variables' => array(),
+    'preprocess' => array(
+      'template_preprocess_theme_test_function_replace_template',
+      'theme_test_preprocess_theme_test_function_replace_template',
+    ),
+  );
+  $items['html'] = array(
+    'preprocess' => array('theme_test_preprocess_html'),
+  );
+
+
   $items['theme_test'] = array(
     'file' => 'theme_test.inc',
     'variables' => array('foo' => ''),
+    'preprocess' => array('template_preprocess_theme_test'),
+  );
+  $items['theme_test_preprocess'] = array(
+    'file' => 'theme_test.inc',
+    'variables' => array('foo' => ''),
+    'preprocess' => array('template_preprocess_theme_test_preprocess'),
   );
   $items['theme_test_template_test'] = array(
     'template' => 'theme_test.template_test',
+    'variables' => array(),
   );
   $items['theme_test_template_test_2'] = array(
     'template' => 'theme_test.template_test',
+    'variables' => array(),
   );
   $items['theme_test_foo'] = array(
     'variables' => array('foo' => NULL),
@@ -45,6 +67,13 @@ function theme_test_menu() {
   $items['theme-test/suggestion'] = array(
     'title' => 'Suggestion',
     'page callback' => '_theme_test_suggestion',
+    'access callback' => TRUE,
+    'theme callback' => '_theme_custom_theme',
+    'type' => MENU_CALLBACK,
+  );
+  $items['theme-test/preprocess-suggestion'] = array(
+    'title' => 'Preprocess suggestion',
+    'page callback' => '_theme_test_preprocess_suggestion',
     'access callback' => TRUE,
     'theme callback' => '_theme_custom_theme',
     'type' => MENU_CALLBACK,
@@ -140,6 +169,29 @@ function _theme_test_alter() {
  */
 function _theme_test_suggestion() {
   return theme(array('theme_test__suggestion', 'theme_test'), array());
+}
+
+/**
+ * Page callback, calls a theme hook suggestion.
+ */
+function _theme_test_preprocess_suggestion() {
+  return theme(array('theme_test_preprocess__suggestion', 'theme_test_preprocess'), array());
+}
+
+/**
+ * Implements hook_preprocess().
+ *
+ * @see \Drupal\system\Tests\Theme\RegistryUnitTest
+ */
+function theme_test_preprocess(&$variables) {
+}
+
+/**
+ * Implements hook_process().
+ *
+ * @see \Drupal\system\Tests\Theme\RegistryUnitTest
+ */
+function theme_test_process(&$variables) {
 }
 
 /**

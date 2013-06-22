@@ -6,6 +6,24 @@
  */
 
 /**
+ * Implements hook_theme().
+ */
+function bartik_theme() {
+  $theme['html'] = array(
+    'preprocess' => array('bartik_preprocess_html'),
+    'process' => array('bartik_process_html'),
+  );
+  $theme['maintenance_page'] = array(
+    'preprocess' => array('bartik_preprocess_maintenance_page'),
+    'process' => array('bartik_process_maintenance_page'),
+  );
+  $theme['page'] = array(
+    'process' => array('bartik_process_page'),
+  );
+  return $theme;
+}
+
+/**
  * Implements hook_preprocess_HOOK() for html.tpl.php.
  *
  * Adds body classes if certain regions have content.

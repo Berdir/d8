@@ -95,8 +95,12 @@ function user_help($path, $arg) {
  */
 function user_theme() {
   return array(
+    'block__user' => array(
+      'preprocess' => array('user_preprocess_block'),
+    ),
     'user' => array(
       'render element' => 'elements',
+      'preprocess' => array('template_preprocess_user'),
       'file' => 'user.pages.inc',
       'template' => 'user',
     ),
@@ -113,6 +117,8 @@ function user_theme() {
     ),
     'username' => array(
       'variables' => array('account' => NULL, 'attributes' => array()),
+      'preprocess' => array('template_preprocess_username'),
+      'variables' => array('account' => NULL),
     ),
   );
 }

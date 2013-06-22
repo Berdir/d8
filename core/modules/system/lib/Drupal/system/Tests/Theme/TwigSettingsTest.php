@@ -81,15 +81,19 @@ class TwigSettingsTest extends WebTestBase {
     config('system.theme')
       ->set('default', 'test_theme')
       ->save();
-
-    $cache = array();
-    // Prime the theme cache.
-    foreach (module_implements('theme') as $module) {
-      _theme_process_registry($cache, $module, 'module', $module, drupal_get_path('module', $module));
-    }
+    // Unset the global variables, so \Drupal\Core\Theme::init() fires
+    // drupal_theme_initialize, which fills up the global variables properly and
+    // choosed the current active theme.
+    unset($GLOBALS['theme_info']);
+    unset($GLOBALS['theme']);
+    // Reset the theme registry, so that the new theme is used.
+    $this->container->set('theme.registry', NULL);
 
     // Load array of Twig templates.
-    $templates = drupal_find_theme_templates($cache, $extension, drupal_get_path('theme', 'test_theme'));
+    $registry = $this->container->get('theme.registry');
+    $registry->reset();
+
+    $templates = $registry->getRuntime();
 
     // Get the template filename and the cache filename for
     // theme_test.template_test.html.twig.

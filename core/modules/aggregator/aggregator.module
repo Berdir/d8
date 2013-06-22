@@ -55,6 +55,7 @@ function aggregator_theme() {
     'aggregator_feed_source' => array(
       'variables' => array('aggregator_feed' => NULL, 'view_mode' => NULL),
       'file' => 'aggregator.pages.inc',
+      'preprocess' => array('template_preprocess_aggregator_feed_source'),
       'template' => 'aggregator-feed-source',
     ),
     'aggregator_block_item' => array(
@@ -63,15 +64,18 @@ function aggregator_theme() {
     'aggregator_summary_items' => array(
       'variables' => array('summary_items' => NULL, 'source' => NULL),
       'file' => 'aggregator.pages.inc',
+      'preprocess' => array('template_preprocess_aggregator_summary_items'),
       'template' => 'aggregator-summary-items',
     ),
     'aggregator_summary_item' => array(
       'variables' => array('aggregator_item' => NULL, 'view_mode' => NULL),
       'file' => 'aggregator.pages.inc',
+      'preprocess' => array('template_preprocess_aggregator_summary_item'),
     ),
     'aggregator_item' => array(
       'variables' => array('aggregator_item' => NULL, 'view_mode' => NULL),
       'file' => 'aggregator.pages.inc',
+      'preprocess' => array('template_preprocess_aggregator_item'),
       'template' => 'aggregator-item',
     ),
     'aggregator_page_opml' => array(
@@ -81,6 +85,9 @@ function aggregator_theme() {
     'aggregator_page_rss' => array(
       'variables' => array('feeds' => NULL, 'category' => NULL),
       'file' => 'aggregator.pages.inc',
+    ),
+    'block' => array(
+      'preprocess' => array('aggregator_preprocess_block'),
     ),
   );
 }

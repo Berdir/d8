@@ -762,9 +762,10 @@ function template_preprocess_locale_translation_update_info(&$variables) {
   $details = array();
 
   // Build output for available updates.
-  if (isset($variables['updates'])) {
+  if (!empty($variables['updates'])) {
+    $modules = array();
+    $releases = array();
     if ($variables['updates']) {
-      $releases = array();
       foreach ($variables['updates'] as $update) {
         $modules[] = $update['name'];
         $releases[] = t('@module (@date)', array('@module' => $update['name'], '@date' => format_date($update['timestamp'], 'html_date')));

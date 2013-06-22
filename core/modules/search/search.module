@@ -105,14 +105,19 @@ function search_help($path, $arg) {
  */
 function search_theme() {
   return array(
+    'block__search_form_block' => array(
+      'preprocess' => array('search_preprocess_block'),
+    ),
     'search_result' => array(
       'variables' => array('result' => NULL, 'module' => NULL),
       'file' => 'search.pages.inc',
+      'preprocess' => array('template_preprocess_search_result'),
       'template' => 'search-result',
     ),
     'search_results' => array(
       'variables' => array('results' => NULL, 'module' => NULL),
       'file' => 'search.pages.inc',
+      'preprocess' => array('template_preprocess_search_results'),
       'template' => 'search-results',
     ),
   );

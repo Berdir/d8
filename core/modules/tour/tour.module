@@ -103,6 +103,17 @@ function tour_toolbar() {
 }
 
 /**
+ * Implements hook_theme().
+ */
+function tour_theme() {
+  return array(
+    'page' => array(
+      'preprocess' => array('tour_preprocess_page'),
+    ),
+  );
+}
+
+/**
  * Implements hook_preprocess_HOOK() for page.tpl.php.
  */
 function tour_preprocess_page(&$variables) {

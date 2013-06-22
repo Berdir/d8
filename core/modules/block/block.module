@@ -91,6 +91,7 @@ function block_theme() {
   return array(
     'block' => array(
       'render element' => 'elements',
+      'preprocess' => array('template_preprocess_block'),
       'template' => 'block',
     ),
   );

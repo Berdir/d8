@@ -180,6 +180,9 @@ function language_permission() {
  */
 function language_theme() {
   return array(
+    'block__language' => array(
+      'preprocess' => array('language_preprocess_block'),
+    ),
     'language_negotiation_configure_form' => array(
       'render element' => 'form',
     ),
@@ -188,7 +191,7 @@ function language_theme() {
       'file' => 'language.admin.inc',
     ),
     'language_content_settings_table' => array(
-      'render element' => 'element',
+      'render element' => 'build',
       'file' => 'language.admin.inc',
     ),
   );

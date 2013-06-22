@@ -5,6 +5,8 @@
  * @{
  * Functions and templates for the user interface to be implemented by themes.
  *
+ * @todo Review these docs for new declarative preprocess functions.
+ *
  * Drupal's presentation layer is a pluggable system known as the theme
  * layer. Each theme can take control over most of Drupal's output, and
  * has complete control over the CSS.
@@ -115,7 +117,7 @@ function hook_preprocess(&$variables, $hook) {
   }
 
   if (!isset($hooks)) {
-    $hooks = theme_get_registry();
+    $hooks = \Drupal::service('theme.registry')->getRuntime();
   }
 
   // Determine the primary theme function argument.
@@ -140,13 +142,15 @@ function hook_preprocess(&$variables, $hook) {
 }
 
 /**
- * Preprocess theme variables for a specific theme hook.
+ * Preprocess callback for theme variables of a specific theme hook.
  *
- * This hook allows modules to preprocess theme variables for a specific theme
- * hook. It should only be used if a module needs to override or add to the
- * theme preprocessing for a theme hook it didn't define.
+ * This is not a hook. Preprocess callbacks for specific theme hooks need to be
+ * manually registered via hook_theme().
  *
  * For more detailed information, see theme().
+ *
+ * The function name MAY not follow this example, but it is RECOMMENDED to
+ * follow the function name pattern of hook_preprocess_HOOK().
  *
  * @param $variables
  *   The variables array (modify in place).
@@ -188,13 +192,15 @@ function hook_process(&$variables, $hook) {
 }
 
 /**
- * Process theme variables for a specific theme hook.
+ * Process callback for theme variables of a specific theme hook.
  *
- * This hook allows modules to process theme variables for a specific theme
- * hook. It should only be used if a module needs to override or add to the
- * theme processing for a theme hook it didn't define.
+ * This is not a hook. Process callbacks for specific theme hooks need to be
+ * manually registered via hook_theme().
  *
  * For more detailed information, see theme().
+ *
+ * The function name MAY not follow this example, but it is RECOMMENDED to
+ * follow the function name pattern of hook_process_HOOK().
  *
  * @param $variables
  *   The variables array (modify in place).

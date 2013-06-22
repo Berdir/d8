@@ -656,7 +656,7 @@ class ModuleHandler implements ModuleHandlerInterface {
         // Refresh the schema to include it.
         drupal_get_schema(NULL, TRUE);
         // Update the theme registry to include it.
-        drupal_theme_rebuild();
+        \Drupal::service('theme.registry')->reset();
 
         // Allow modules to react prior to the installation of a module.
         $this->invokeAll('modules_preinstall', array(array($module)));
@@ -803,7 +803,7 @@ class ModuleHandler implements ModuleHandlerInterface {
       drupal_container()->get('kernel')->updateModules($enabled, $enabled);
 
       // Update the theme registry to remove the newly-disabled module.
-      drupal_theme_rebuild();
+      \Drupal::service('theme.registry')->reset();
     }
   }
 

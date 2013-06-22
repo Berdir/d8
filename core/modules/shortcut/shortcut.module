@@ -178,6 +178,12 @@ function shortcut_admin_paths() {
  */
 function shortcut_theme() {
   return array(
+    'block__shortcut' => array(
+      'preprocess' => array('shortcut_preprocess_block'),
+    ),
+    'page' => array(
+      'preprocess' => array('shortcut_preprocess_page'),
+    ),
     'shortcut_set_customize' => array(
       'render element' => 'form',
       'file' => 'shortcut.admin.inc',
