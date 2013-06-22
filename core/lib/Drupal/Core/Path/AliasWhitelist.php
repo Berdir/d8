@@ -82,20 +82,20 @@ class AliasWhitelist extends CacheCollector {
   /**
    * {@inheritdoc}
    */
-  public function get($offset) {
+  public function get($key) {
     $this->lazyLoadCache();
     // url() may be called with paths that are not represented by menu router
     // items such as paths that will be rewritten by hook_url_outbound_alter().
     // Therefore internally TRUE is used to indicate whitelisted paths. FALSE is
     // used to indicate paths that have already been checked but are not
     // whitelisted, and NULL indicates paths that have not been checked yet.
-    if (isset($this->storage[$offset])) {
-      if ($this->storage[$offset]) {
+    if (isset($this->storage[$key])) {
+      if ($this->storage[$key]) {
         return TRUE;
       }
     }
-    elseif (array_key_exists($offset, $this->storage)) {
-      return $this->resolveCacheMiss($offset);
+    elseif (array_key_exists($key, $this->storage)) {
+      return $this->resolveCacheMiss($key);
     }
   }
 

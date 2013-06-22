@@ -568,7 +568,7 @@ function theme($hook, $variables = array()) {
   // implementation.
   if (is_array($hook)) {
     foreach ($hook as $candidate) {
-      if (isset($hooks[$candidate])) {
+      if ($hooks->has($candidate)) {
         break;
       }
     }
@@ -580,16 +580,16 @@ function theme($hook, $variables = array()) {
 
   // If there's no implementation, check for more generic fallbacks. If there's
   // still no implementation, log an error and return an empty string.
-  if (!isset($hooks[$hook])) {
+  if (!$hooks->has($hook)) {
     // Iteratively strip everything after the last '__' delimiter, until an
     // implementation is found.
     while ($pos = strrpos($hook, '__')) {
       $hook = substr($hook, 0, $pos);
-      if (isset($hooks[$hook])) {
+      if ($hooks->has($hook)) {
         break;
       }
     }
-    if (!isset($hooks[$hook])) {
+    if (!$hooks->has($hook)) {
       // Only log a message when not trying theme suggestions ($hook being an
       // array).
       if (!isset($candidate)) {
@@ -599,7 +599,7 @@ function theme($hook, $variables = array()) {
     }
   }
 
-  $info = $hooks[$hook];
+  $info = $hooks->get($hook);
   global $theme_path;
   $temp = $theme_path;
   // point path_to_theme() to the currently used theme path:
@@ -651,7 +651,7 @@ function theme($hook, $variables = array()) {
   // be used unless overridden by a variable processor function.
   if (isset($info['base hook'])) {
     $base_hook = $info['base hook'];
-    $base_hook_info = $hooks[$base_hook];
+    $base_hook_info = $hooks->get($base_hook);
     // Include files required by the base hook, since its variable processors
     // might reside there.
     if (!empty($base_hook_info['includes'])) {
@@ -696,13 +696,13 @@ function theme($hook, $variables = array()) {
       $suggestions[] = $variables['theme_hook_suggestion'];
     }
     foreach (array_reverse($suggestions) as $suggestion) {
-      if (isset($hooks[$suggestion])) {
+      if ($hooks->has($suggestion)) {
         // A theme hook suggestion is essentially the reverse of a base hook
         // definition; instead of finding the generic parent, we find a more
         // specific child. The registry ensures to merge the base hook info into
         // the suggestion's info.
         // @see \Drupal\Core\Theme\Registry::build()
-        $info = $hooks[$suggestion];
+        $info = $hooks->get($suggestion);
         break;
       }
     }
