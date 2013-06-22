@@ -366,6 +366,14 @@ class TypedDataManager extends PluginManagerBase {
     if (!empty($definition['required']) && empty($definition['constraints']['NotNull'])) {
       $constraints[] = $validation_manager->create('NotNull', array());
     }
+
+    // If the definition provides a class check for further validation criteria.
+    $class = isset($definition['class']) ? $definition['class'] : $type_definition['class'];
+    // Check if the class provides allowed values.
+    if (array_key_exists('Drupal\Core\TypedData\AllowedValuesInterface', class_implements($class))) {
+      $constraints[] = $validation_manager->create('AllowedValues', array());
+    }
+
     return $constraints;
   }
 }

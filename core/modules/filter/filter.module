@@ -9,6 +9,7 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Template\Attribute;
 use Drupal\filter\Plugin\Core\Entity\FilterFormat;
+use Drupal\Core\TypedData\Primitive;
 
 /**
  * Non-HTML markup language filters that generate HTML.
@@ -105,6 +106,19 @@ function filter_element_info() {
     '#theme_wrappers' => array('text_format_wrapper'),
   );
   return $type;
+}
+
+/**
+ * Implements hook_data_type_info().
+ */
+function filter_data_type_info() {
+  return array(
+    'filter_format' => array(
+      'label' => t('Filter format'),
+      'class' => 'Drupal\filter\Type\FilterFormat',
+      'primitive type' => Primitive::STRING,
+    ),
+  );
 }
 
 /**
