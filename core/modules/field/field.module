@@ -172,6 +172,8 @@ function field_theme() {
   return array(
     'field' => array(
       'render element' => 'element',
+      'preprocess' => array('template_preprocess_field'),
+      'process' => array('template_process_field'),
     ),
     'field_multiple_value_form' => array(
       'render element' => 'element',

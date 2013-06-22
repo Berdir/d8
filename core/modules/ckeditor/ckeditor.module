@@ -92,6 +92,7 @@ function ckeditor_theme() {
     'ckeditor_settings_toolbar' => array(
       'file' => 'ckeditor.admin.inc',
       'variables' => array('editor' => NULL, 'plugins' => NULL),
+      'preprocess' => array('template_preprocess_ckeditor_settings_toolbar'),
     ),
   );
 }

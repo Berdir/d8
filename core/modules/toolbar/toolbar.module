@@ -51,6 +51,7 @@ function toolbar_theme($existing, $type, $theme, $path) {
   );
   $items['toolbar_tab_wrapper'] = array(
     'render element' => 'element',
+    'preprocess' => array('template_preprocess_toolbar_tab_wrapper'),
   );
   $items['toolbar_tray_wrapper'] = array(
     'render element' => 'element',

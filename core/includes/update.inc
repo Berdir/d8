@@ -442,6 +442,9 @@ function update_prepare_d8_bootstrap() {
   new Settings($settings);
   $kernel = new DrupalKernel('update', drupal_classloader(), FALSE);
   $kernel->boot();
+
+  // Remove the theme_registry cache entry from D7.
+  Drupal::cache('cache')->deleteAll();
 }
 
 /**

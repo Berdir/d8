@@ -8,6 +8,20 @@
 use Drupal\views\ViewExecutable;
 
 /**
+ * Implements hook_theme().
+ */
+function views_test_data_theme() {
+  $theme['views_view_mapping_test'] = array(
+    'render element' => 'element',
+    'preprocess' => array('template_preprocess_views_view_mapping_test'),
+  );
+  $theme['views_view_table'] = array(
+    'preprocess' => array('views_test_data_preprocess_views_view_table'),
+  );
+  return $theme;
+}
+
+/**
  * Implements hook_permission().
  */
 function views_test_data_permission() {

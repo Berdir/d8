@@ -217,6 +217,30 @@ function rdf_theme() {
     'rdf_metadata' => array(
       'variables' => array('metadata' => array()),
     ),
+    'comment' => array(
+      'preprocess' => array('rdf_preprocess_comment'),
+    ),
+    'field' => array(
+      'preprocess' => array('rdf_preprocess_field'),
+    ),
+    'html' => array(
+      'preprocess' => array('rdf_preprocess_html'),
+    ),
+    'image' => array(
+      'preprocess' => array('rdf_preprocess_image'),
+    ),
+    'node' => array(
+      'preprocess' => array('rdf_preprocess_node'),
+    ),
+    'taxonomy_term' => array(
+      'preprocess' => array('rdf_preprocess_taxonomy_term'),
+    ),
+    'user' => array(
+      'preprocess' => array('rdf_preprocess_user'),
+    ),
+    'username' => array(
+      'preprocess' => array('rdf_preprocess_username'),
+    ),
   );
 }
 

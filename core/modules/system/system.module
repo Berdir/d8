@@ -138,6 +138,9 @@ function system_help($path, $arg) {
  */
 function system_theme() {
   return array_merge(drupal_common_theme(), array(
+    'block' => array(
+      'preprocess' => array('system_preprocess_block'),
+    ),
     'system_themes_page' => array(
       'variables' => array('theme_groups' => NULL),
       'file' => 'system.admin.inc',
@@ -190,6 +193,7 @@ function system_theme() {
       'render element' => 'form',
     ),
     'system_plugin_ui_form' => array(
+      'preprocess' => array('template_preprocess_system_plugin_ui_form'),
       'template' => 'system-plugin-ui-form',
       'render element' => 'form',
     ),

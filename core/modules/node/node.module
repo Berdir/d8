@@ -148,8 +148,12 @@ function node_help($path, $arg) {
  */
 function node_theme() {
   return array(
+    'block__node' => array(
+      'preprocess' => array('node_preprocess_block'),
+    ),
     'node' => array(
       'render element' => 'elements',
+      'preprocess' => array('template_preprocess_node'),
       'template' => 'node',
     ),
     'node_search_admin' => array(

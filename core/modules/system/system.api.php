@@ -1564,21 +1564,13 @@ function hook_permission() {
  *   - base hook: A string declaring the base theme hook if this theme
  *     implementation is actually implementing a suggestion for another theme
  *     hook.
- *   - pattern: A regular expression pattern to be used to allow this theme
- *     implementation to have a dynamic name. The convention is to use __ to
- *     differentiate the dynamic portion of the theme. For example, to allow
- *     forums to be themed individually, the pattern might be: 'forum__'. Then,
- *     when the forum is themed, call:
- *     @code
- *     theme(array('forum__' . $tid, 'forum'), $forum)
- *     @endcode
  *   - preprocess functions: A list of functions used to preprocess this data.
  *     Ordinarily this won't be used; it's automatically filled in. By default,
  *     for a module this will be filled in as template_preprocess_HOOK. For
  *     a theme this will be filled in as twig_preprocess and
  *     twig_preprocess_HOOK as well as themename_preprocess and
  *     themename_preprocess_HOOK.
- *   - override preprocess functions: Set to TRUE when a theme does NOT want
+ *   - no preprocess: Set to TRUE when a theme does NOT want
  *     the standard preprocess functions to run. This can be used to give a
  *     theme FULL control over how variables are set. For example, if a theme
  *     wants total control over how certain variables in the page.tpl.php are
@@ -1624,8 +1616,9 @@ function hook_theme($existing, $type, $theme, $path) {
  * Changes here will not be visible until the next cache clear.
  *
  * The $theme_registry array is keyed by theme hook name, and contains the
- * information returned from hook_theme(), as well as additional properties
- * added by _theme_process_registry().
+ * processed information returned from hook_theme().
+ *
+ * @see \Drupal\Core\Theme\Registry::$registry
  *
  * For example:
  * @code
@@ -1648,7 +1641,6 @@ function hook_theme($existing, $type, $theme, $path) {
  *   The entire cache of theme registry information, post-processing.
  *
  * @see hook_theme()
- * @see _theme_process_registry()
  */
 function hook_theme_registry_alter(&$theme_registry) {
   // Kill the next/previous forum topic navigation links.

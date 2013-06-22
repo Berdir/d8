@@ -74,13 +74,24 @@ function overlay_permission() {
  */
 function overlay_theme() {
   return array(
+    'html' => array(
+      'preprocess' => array('overlay_preprocess_html'),
+    ),
+    'maintenance_page' => array(
+      'preprocess' => array('overlay_preprocess_maintenance_page'),
+    ),
     'overlay' => array(
       'render element' => 'page',
+      'preprocess' => array('template_preprocess_overlay'),
+      'process' => array('template_process_overlay'),
       'template' => 'overlay',
     ),
     'overlay_disable_message' => array(
       'render element' => 'element',
       'template' => 'overlay-disable-message',
+    ),
+    'page' => array(
+      'preprocess' => array('overlay_preprocess_page'),
     ),
   );
 }

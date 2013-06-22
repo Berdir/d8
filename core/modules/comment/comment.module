@@ -158,6 +158,9 @@ function comment_field_extra_fields() {
  */
 function comment_theme() {
   return array(
+    'block__comment' => array(
+      'preprocess' => array('comment_preprocess_block'),
+    ),
     'comment_block' => array(
       'variables' => array('number' => NULL),
     ),
@@ -165,6 +168,7 @@ function comment_theme() {
       'variables' => array('comment' => NULL),
     ),
     'comment' => array(
+      'preprocess' => array('template_preprocess_comment'),
       'template' => 'comment',
       'render element' => 'elements',
     ),
@@ -172,6 +176,7 @@ function comment_theme() {
       'variables' => array('node' => NULL),
     ),
     'comment_wrapper' => array(
+      'preprocess' => array('template_preprocess_comment_wrapper'),
       'template' => 'comment-wrapper',
       'render element' => 'content',
     ),

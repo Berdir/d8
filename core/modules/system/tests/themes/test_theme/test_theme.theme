@@ -6,6 +6,139 @@
  */
 
 /**
+ * Implements hook_theme().
+ */
+function test_theme_theme() {
+  $theme = _test_theme_theme_registry();
+  return $theme;
+}
+
+/**
+ * Implements hook_theme() for Theme Registry tests.
+ *
+ * Separated from test_theme_theme() for long-term self-documentation.
+ *
+ * For the limited scope of Theme Registry tests, only the declaration matters.
+ * The registered theme hooks do not actually exist as functions and templates.
+ * Other tests may choose to re-use these theme hooks and even provide actual
+ * implementations, but should not change their declarations.
+ *
+ * @see \Drupal\system\Tests\Theme\RegistryUnitTest
+ */
+function _test_theme_theme_registry() {
+  $new = array('variables' => array());
+  $include = array('file' => 'test_theme.inc');
+
+  // Functions.
+
+  // New function.
+  $theme['test_theme_new_function'] = $new;
+  // New function in an include file.
+  $theme['test_theme_new_function_include'] = $new + $include;
+  // New function with template preprocess function.
+  $theme['test_theme_new_function_preprocess'] = $new + array(
+      'preprocess' => array(
+        'template_preprocess_test_theme_new_function_preprocess',
+      ),
+    );
+  // New function with template preprocess in an include file.
+  $theme['test_theme_new_function_preprocess_include'] = $new + $include + array(
+      'preprocess' => array(
+        'template_preprocess_test_theme_new_function_preprocess_include',
+        'test_theme_preprocess_test_theme_new_function_preprocess_include',
+      ),
+    );
+  $theme['test_theme_new_function_custom'] = $new + array(
+      'function' => 'test_theme_new_function_customized',
+    );
+
+  // Templates.
+
+  // New template.
+  $theme['test_theme_new_template'] = $new + array(
+      'template' => 'test_theme_new_template',
+    );
+  // New template with template preprocess in an include file.
+  $theme['test_theme_new_template_preprocess_include'] = $new + $include + array(
+      'template' => 'test_theme_new_template_preprocess_include',
+      'preprocess' => array(
+        'template_preprocess_test_theme_new_template_preprocess_include',
+        'test_theme_preprocess_test_theme_new_template_preprocess_include',
+      ),
+    );
+  // Module function replaced with a template.
+  $theme['theme_test_function_replace_template'] = array(
+    'template' => 'theme_test_function_replace_template',
+    // And while being there, add another preproces, too :)
+    'preprocess' => array('test_theme_preprocess_theme_test_function_replace_template'),
+  );
+
+  // Preprocess functions.
+
+  // Preprocess function for a non-existing theme hook.
+  $theme['non_existing_theme_hook'] = array(
+    'preprocess' => array('test_theme_preprocess_non_existing_theme_hook'),
+  );
+  // Preprocess function for an existing function.
+  // This implementation actually exists, so as to not break testing sites in
+  // case test_theme is enabled.
+  $theme['link'] = array(
+    'preprocess' => array('test_theme_preprocess_link'),
+  );
+  // Preprocess function for an existing template.
+  // This implementation actually exists, so as to not break testing sites in
+  // case test_theme is enabled.
+  $theme['html'] = array(
+    'preprocess' => array('test_theme_preprocess_html'),
+  );
+  // @todo preprocess + file/include
+  // @todo no preprocess
+
+  // (Preprocess functions for) Theme hook suggestions.
+
+  // @todo base hook
+  // @todo base hook of base hook
+  // @todo include file
+  // @todo replace function with template for suggestion only
+
+  return $theme;
+}
+
+/**
+ * Implements THEME_preprocess().
+ *
+ * @see _test_theme_theme_registry()
+ * @see theme()
+ */
+function test_theme_preprocess(&$variables, $hook) {
+}
+
+/**
+ * Implements THEME_process().
+ *
+ * @see _test_theme_theme_registry()
+ * @see theme()
+ */
+function test_theme_process(&$variables, $hook) {
+}
+
+/**
+ * Preprocess function for theme('link').
+ *
+ * @see _test_theme_theme_registry()
+ */
+function test_theme_preprocess_link(&$variables) {
+}
+
+/**
+ * Preprocess function for theme('html').
+ *
+ * @see _test_theme_theme_registry()
+ */
+function test_theme_preprocess_html(&$variables) {
+}
+
+/**
  * Implements THEME_preprocess_twig_theme_test_php_variables().
  */
 function test_theme_preprocess_twig_theme_test_php_variables(&$variables) {
@@ -17,6 +150,13 @@ function test_theme_preprocess_twig_theme_test_php_variables(&$variables) {
  */
 function test_theme_theme_test__suggestion($variables) {
   return 'Theme hook implementor=test_theme_theme_test__suggestion(). Foo=' . $variables['foo'];
+}
+
+/**
+ * Tests a theme overriding a default hook with a suggestion.
+ */
+function test_theme_theme_test_preprocess__suggestion($variables) {
+  return 'Theme hook implementor=test_theme_theme_test_preprocess__suggestion(). Foo=' . $variables['foo'];
 }
 
 /**

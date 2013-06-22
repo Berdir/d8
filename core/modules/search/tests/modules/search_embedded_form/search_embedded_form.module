@@ -10,6 +10,16 @@
  */
 
 /**
+ * Implements hook_theme().
+ */
+function search_embedded_form_theme() {
+  $theme['search_result'] = array(
+    'preprocess' => array('search_embedded_form_preprocess_search_result'),
+  );
+  return $theme;
+}
+
+/**
   * Implements hook_menu().
   */
 function search_embedded_form_menu() {

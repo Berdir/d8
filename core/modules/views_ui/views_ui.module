@@ -139,11 +139,13 @@ function views_ui_theme() {
       'variables' => array('description' => '', 'link' => '', 'settings_links' => array(), 'overridden' => FALSE, 'defaulted' => FALSE, 'description_separator' => TRUE, 'class' => array()),
       'template' => 'views-ui-display-tab-setting',
       'file' => 'views_ui.theme.inc',
+      'preprocess' => array('template_preprocess_views_ui_display_tab_setting'),
     ),
     'views_ui_display_tab_bucket' => array(
       'render element' => 'element',
       'template' => 'views-ui-display-tab-bucket',
       'file' => 'views_ui.theme.inc',
+      'preprocess' => array('template_preprocess_views_ui_display_tab_bucket'),
     ),
     'views_ui_rearrange_filter_form' => array(
       'render element' => 'form',
@@ -158,6 +160,7 @@ function views_ui_theme() {
     'views_ui_view_info' => array(
       'variables' => array('view' => NULL, 'displays' => NULL),
       'file' => 'views_ui.theme.inc',
+      'preprocess' => array('template_preprocess_views_ui_view_info'),
     ),
 
     // Group of filters.
@@ -184,6 +187,10 @@ function views_ui_theme() {
     'views_ui_container' => array(
       'render element' => 'element',
       'file' => 'views_ui.theme.inc',
+    ),
+
+    'views_view' => array(
+      'preprocess' => array('views_ui_preprocess_views_view'),
     ),
   );
 }

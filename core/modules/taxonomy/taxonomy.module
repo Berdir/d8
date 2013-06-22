@@ -221,6 +221,7 @@ function taxonomy_theme() {
   return array(
     'taxonomy_term' => array(
       'render element' => 'elements',
+      'preprocess' => array('template_preprocess_taxonomy_term'),
       'template' => 'taxonomy-term',
     ),
   );

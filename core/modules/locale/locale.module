@@ -243,6 +243,9 @@ function locale_permission() {
  */
 function locale_theme() {
   return array(
+    'node' => array(
+      'preprocess' => array('locale_preprocess_node'),
+    ),
     'locale_translate_edit_form_strings' => array(
       'render element' => 'form',
       'file' => 'locale.pages.inc',
@@ -253,7 +256,7 @@ function locale_theme() {
       'template' => 'locale-translation-last-check',
     ),
     'locale_translation_update_info' => array(
-      'arguments' => array('updates' => array(), 'not_found' => array()),
+      'variables' => array('updates' => array(), 'not_found' => array()),
       'file' => 'locale.pages.inc',
       'template' => 'locale-translation-update-info',
     ),

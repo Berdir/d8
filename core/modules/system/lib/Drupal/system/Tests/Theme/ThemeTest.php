@@ -93,10 +93,26 @@ class ThemeTest extends WebTestBase {
    */
   function testPreprocessForSuggestions() {
     // Test with both an unprimed and primed theme registry.
-    drupal_theme_rebuild();
+    $this->container->get('theme.registry')->reset();
     for ($i = 0; $i < 2; $i++) {
       $this->drupalGet('theme-test/suggestion');
       $this->assertText('Theme hook implementor=test_theme_theme_test__suggestion(). Foo=template_preprocess_theme_test', 'Theme hook suggestion ran with data available from a preprocess function for the base hook.');
+    }
+  }
+
+  /**
+   * Ensures suggestion preprocess functions run even for default implementations.
+   *
+   * The theme hook used by this test has its base preprocess function in a
+   * separate file, so this test also ensures that that file is correctly loaded
+   * when needed.
+   */
+  function testSuggestionPreprocessForDefaults() {
+    // Test with both an unprimed and primed theme registry.
+    $this->container->get('theme.registry')->reset();
+    for ($i = 0; $i < 2; $i++) {
+      $this->drupalGet('theme-test/preprocess-suggestion');
+      $this->assertText('Theme hook implementor=test_theme_theme_test_preprocess__suggestion(). Foo=template_preprocess_theme_test_preprocess', 'Theme hook ran with data available from a preprocess function for the suggested hook.');
     }
   }
 
@@ -247,14 +263,8 @@ class ThemeTest extends WebTestBase {
    * Tests drupal_find_theme_templates().
    */
   public function testFindThemeTemplates() {
-    $cache = array();
-
-    // Prime the theme cache.
-    foreach (module_implements('theme') as $module) {
-      _theme_process_registry($cache, $module, 'module', $module, drupal_get_path('module', $module));
-    }
-
-    $templates = drupal_find_theme_templates($cache, '.html.twig', drupal_get_path('theme', 'test_theme'));
-    $this->assertEqual($templates['node__1']['template'], 'node--1', 'Template node--1.html.twig was found in test_theme.');
+    $registry = $this->container->get('theme.registry')->get();
+    $templates = drupal_find_theme_templates($registry, '.tpl.twig', drupal_get_path('theme', 'test_theme'));
+    $this->assertEqual($templates['node__1']['template'], 'node--1', 'Template node--1.tpl.twig was found in test_theme.');
   }
 }

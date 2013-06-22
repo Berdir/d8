@@ -589,7 +589,7 @@ function image_style_flush($style) {
 
   // Clear field caches so that formatters may be added for this style.
   field_info_cache_clear();
-  drupal_theme_rebuild();
+  Drupal::service('theme.registry')->reset();
 
   // Clear page caches when flushing.
   if (module_exists('block')) {

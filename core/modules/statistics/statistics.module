@@ -31,6 +31,16 @@ function statistics_help($path, $arg) {
 }
 
 /**
+ * Implements hook_theme().
+ */
+function statistics_theme() {
+  $theme['block__statistics'] = array(
+    'preprocess' => array('statistics_preprocess_block'),
+  );
+  return $theme;
+}
+
+/**
  * Implements hook_permission().
  */
 function statistics_permission() {
