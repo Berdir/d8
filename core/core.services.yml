@@ -124,10 +124,10 @@ services:
     factory_class: Drupal\Component\Utility\Settings
     factory_method: getSingleton
   state:
-    class: Drupal\Core\KeyValueStore\KeyValueStoreInterface
-    factory_method: get
-    factory_service: keyvalue
-    arguments: [state]
+    class: Drupal\Core\KeyValueStore\KeyValueCacheDecorator
+    arguments: ['@cache.cache', '@lock', '@keyvalue', state]
+    tags:
+      - { name: needs_destruction }
   queue:
     class: Drupal\Core\Queue\QueueFactory
     arguments: ['@settings']
