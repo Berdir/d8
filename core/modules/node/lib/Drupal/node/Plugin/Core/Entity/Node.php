@@ -187,7 +187,7 @@ class Node extends EntityNG implements NodeInterface {
    * {@inheritdoc}
    */
   public function getAuthor() {
-    return $this->get('uid')->entity;
+    return $this->get('uid')->entity->getBCEntity();
   }
 
   /**
