@@ -588,4 +588,12 @@ class Entity implements IteratorAggregate, EntityInterface {
   public function preSaveRevision(EntityStorageControllerInterface $storage_controller, \stdClass $record) {
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public static function baseFieldDefinitions($entity_type) {
+    return \Drupal::entityManager()->getStorageController($entity_type)->baseFieldDefinitions();
+  }
+
+
 }

@@ -1209,4 +1209,11 @@ class ViewUI implements ViewStorageInterface {
   public function uriRelationships() {
     return $this->storage->uriRelationships();
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function baseFieldDefinitions($entity_type) {
+    return array();
+  }
 }

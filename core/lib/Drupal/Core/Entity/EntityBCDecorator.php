@@ -589,4 +589,12 @@ class EntityBCDecorator implements IteratorAggregate, EntityInterface {
    */
   public static function postLoad(EntityStorageControllerInterface $storage_controller, array $entities) {
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function baseFieldDefinitions($entity_type) {
+    return array();
+  }
+
 }
