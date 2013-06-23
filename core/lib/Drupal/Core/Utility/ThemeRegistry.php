@@ -149,7 +149,7 @@ class ThemeRegistry extends CacheCollector implements DestructableInterface {
     }
 
     $lock_name = $this->cid . ':' . __CLASS__;
-    if (!$lock || $this->locks->acquire($lock_name)) {
+    if (!$lock || $this->lock->acquire($lock_name)) {
       if ($cached = $this->cache->get($this->cid)) {
         // Use array merge instead of union so that filled in values in $data
         // overwrite empty values in the current cache.

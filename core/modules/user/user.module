@@ -118,7 +118,6 @@ function user_theme() {
     'username' => array(
       'variables' => array('account' => NULL, 'attributes' => array()),
       'preprocess' => array('template_preprocess_username'),
-      'variables' => array('account' => NULL),
     ),
   );
 }

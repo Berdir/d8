@@ -2727,6 +2727,7 @@ function drupal_common_theme() {
     'tablesort_indicator' => array(
       'variables' => array('style' => NULL),
       'template' => 'tablesort-indicator',
+      'preprocess' => array('template_preprocess_tablesort_indicator'),
     ),
     'mark' => array(
       'variables' => array('mark_type' => MARK_NEW),
