@@ -406,6 +406,7 @@ function install_begin_request(&$install_state) {
     $container
       ->register('theme.registry', 'Drupal\Core\Theme\Registry')
       ->addArgument(new Reference('cache.cache'))
+      ->addArgument(new Reference('lock'))
       ->addArgument(new Reference('module_handler'))
       ->addTag('needs_destruction');
 
