@@ -2512,13 +2512,13 @@ function node_query_node_access_alter(AlterableInterface $query) {
  * via hook_node_access_records_alter() implementations, and saves the collected
  * and altered grants to the database.
  *
- * @param \Drupal\Core\Entity\EntityInterface $node
+ * @param \Drupal\node\NodeInterface $node
  *   The $node to acquire grants for.
  * @param $delete
  *   (optional) Whether to delete existing node access records before inserting
  *   new ones. Defaults to TRUE.
  */
-function node_access_acquire_grants(\Drupal\node\NodeInterface $node, $delete = TRUE) {
+function node_access_acquire_grants(NodeInterface $node, $delete = TRUE) {
   $grants = module_invoke_all('node_access_records', $node);
   // Let modules alter the grants.
   drupal_alter('node_access_records', $grants, $node);
