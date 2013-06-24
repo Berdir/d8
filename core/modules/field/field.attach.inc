@@ -905,7 +905,7 @@ function field_attach_update(EntityInterface $entity) {
     // but empty the field if it comes as a NULL value or an empty array.
     // Function property_exists() is slower, so we catch the more frequent
     // cases where it's an empty array with the faster isset().
-    if (isset($entity->$field_name) || property_exists($entity, $field_name)) {
+    if ($entity->getPropertyDefinition($field_name)) {
       // Collect the storage backend if the field has not been written yet.
       if (!isset($skip_fields[$field_id])) {
         $storages[$field['storage']['type']][$field_id] = $field_id;
