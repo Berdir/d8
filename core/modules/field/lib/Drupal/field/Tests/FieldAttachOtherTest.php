@@ -261,22 +261,26 @@ class FieldAttachOtherTest extends FieldUnitTestBase {
 
     // Cacheable entity type.
     $entity_type = 'entity_test_cache';
-    $entity_init = entity_create($entity_type, array(
-      'id' => 1,
-      'revision_id' => 1,
-      'type' => $this->instance['bundle'],
-    ));
     $cid = "field:$entity_type:" . $entity_init->id();
     $instance_definition = $this->instance_definition;
     $instance_definition['entity_type'] = $entity_type;
+    $instance_definition['bundle'] = $entity_type;
     entity_create('field_instance', $instance_definition)->save();
+
+    entity_info_cache_clear();
+
+    $entity_init = entity_create($entity_type, array(
+      'id' => 1,
+      'revision_id' => 1,
+      'type' => $entity_type,
+    ));
 
     // Check that no initial cache entry is present.
     $this->assertFalse(cache('field')->get($cid), 'Cached: no initial cache entry');
 
     // Save, and check that no cache entry is present.
     $entity = clone($entity_init);
-    $entity->{$this->field_name}[$langcode] = $values;
+    $entity->{$this->field_name} = $values;
     field_attach_insert($entity);
     $this->assertFalse(cache('field')->get($cid), 'Cached: no cache entry on insert');
 
@@ -296,7 +300,7 @@ class FieldAttachOtherTest extends FieldUnitTestBase {
     // Update with different values, and check that the cache entry is wiped.
     $values = $this->_generateTestFieldValues($this->field['cardinality']);
     $entity = clone($entity_init);
-    $entity->{$this->field_name}[$langcode] = $values;
+    $entity->{$this->field_name} = $values;
     field_attach_update($entity);
     $this->assertFalse(cache('field')->get($cid), 'Cached: no cache entry on update');
 
@@ -310,7 +314,7 @@ class FieldAttachOtherTest extends FieldUnitTestBase {
     $entity_init = entity_create($entity_type, array(
       'id' => 1,
       'revision_id' => 2,
-      'type' => $this->instance['bundle'],
+      'type' => $entity_type,
     ));
     $values = $this->_generateTestFieldValues($this->field['cardinality']);
     $entity = clone($entity_init);

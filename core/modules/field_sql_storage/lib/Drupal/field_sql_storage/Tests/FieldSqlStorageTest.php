@@ -254,7 +254,7 @@ class FieldSqlStorageTest extends EntityUnitTestBase {
   }
 
   /**
-   * Tests insert and update with missing or NULL fields.
+   * Tests insert and update with empty and NULL fields.
    */
   function testFieldAttachSaveMissingData() {
     $entity_type = 'entity_test_rev';
@@ -262,7 +262,6 @@ class FieldSqlStorageTest extends EntityUnitTestBase {
       'id' => 0,
       'revision_id' => 0,
     ));
-    $langcode = Language::LANGCODE_NOT_SPECIFIED;
 
     // Insert: Field is missing
     field_attach_insert($entity);
@@ -289,16 +288,6 @@ class FieldSqlStorageTest extends EntityUnitTestBase {
       ->execute()
       ->fetchField();
     $this->assertEqual($count, 1, 'Field data saved');
-
-    // Update: Field is missing. Data should survive.
-    // @todo: Remove this?
-    unset($entity->getBCEntity()->{$this->field_name});
-    field_attach_update($entity);
-    $count = db_select($this->table)
-      ->countQuery()
-      ->execute()
-      ->fetchField();
-    $this->assertEqual($count, 1, 'Missing field leaves data in table');
 
     // Update: Field is NULL. Data should be wiped.
     $entity->getBCEntity()->{$this->field_name} = NULL;

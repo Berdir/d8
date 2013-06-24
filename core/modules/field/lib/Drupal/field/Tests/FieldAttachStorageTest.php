@@ -272,21 +272,13 @@ class FieldAttachStorageTest extends FieldUnitTestBase {
   }
 
   /**
-   * Tests insert and update with missing or NULL fields.
+   * Tests insert and update with empty or NULL fields.
    */
   function testFieldAttachSaveMissingData() {
     $entity_type = 'entity_test_rev';
     $this->createFieldWithInstance($entity_type);
 
     $entity_init = entity_create($entity_type, array('id' => 1, 'revision_id' => 1));
-
-    // Insert: Field is missing.
-    $entity = clone($entity_init);
-    field_attach_insert($entity);
-
-    $entity = clone($entity_init);
-    field_attach_load($entity_type, array($entity->id() => $entity));
-    $this->assertTrue($entity->{$this->field_name}->isEmpty(), 'Insert: missing field results in no value saved');
 
     // Insert: Field is NULL.
     field_cache_clear();
@@ -308,15 +300,6 @@ class FieldAttachStorageTest extends FieldUnitTestBase {
     $entity = clone($entity_init);
     field_attach_load($entity_type, array($entity->id() => $entity));
     $this->assertEqual($entity->{$this->field_name}->getValue(), $values, 'Field data saved');
-
-    // Update: Field is missing. Data should survive.
-    field_cache_clear();
-    $entity = clone($entity_init);
-    field_attach_update($entity);
-
-    $entity = clone($entity_init);
-    field_attach_load($entity_type, array($entity->id() => $entity));
-    $this->assertEqual($entity->{$this->field_name}->getValue(), $values, 'Update: missing field leaves existing values in place');
 
     // Update: Field is NULL. Data should be wiped.
     field_cache_clear();
@@ -351,7 +334,7 @@ class FieldAttachStorageTest extends FieldUnitTestBase {
   }
 
   /**
-   * Test insert with missing or NULL fields, with default value.
+   * Test insert with empty or NULL fields, with default value.
    */
   function testFieldAttachSaveMissingDataDefaultValue() {
     $entity_type = 'entity_test_rev';
@@ -375,17 +358,6 @@ class FieldAttachStorageTest extends FieldUnitTestBase {
     $entity->getBCEntity()->{$this->field_name} = array();
     field_attach_load($entity_type, array($entity->id() => $entity));
     $this->assertTrue($entity->{$this->field_name}->isEmpty(), 'Insert: NULL field results in no value saved');
-
-    // Insert: Field is missing.
-    field_cache_clear();
-    $entity = clone($entity_init);
-    unset($entity->getBCEntity()->{$this->field_name});
-    field_attach_insert($entity);
-
-    $entity = clone($entity_init);
-    $entity->getBCEntity()->{$this->field_name} = array();
-    field_attach_load($entity_type, array($entity->id() => $entity));
-    $this->assertEqual($entity->{$this->field_name}->getValue(), $default, 'Insert: missing field results in default value saved');
 
     // Verify that prepopulated field values are not overwritten by defaults.
     $value = array(array('value' => $default[0]['value'] - mt_rand(1, 127)));
