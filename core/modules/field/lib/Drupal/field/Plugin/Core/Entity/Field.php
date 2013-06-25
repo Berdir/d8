@@ -142,25 +142,6 @@ class Field extends ConfigEntityBase implements FieldInterface {
   public $locked = FALSE;
 
   /**
-   * The field storage definition.
-   *
-   * An array of key/value pairs identifying the storage backend to use for the
-   * field:
-   * - type: (string) The storage backend used by the field. Storage backends
-   *   are defined by modules that implement hook_field_storage_info().
-   * - settings: (array) A sub-array of key/value pairs of settings. The keys
-   *   and default values are defined by the storage backend in the 'settings'
-   *   entry of hook_field_storage_info().
-   * - module: (string, read-only) The name of the module that implements the
-   *   storage backend.
-   * - active: (integer, read-only) TRUE if the module that implements the
-   *   storage backend is currently enabled, FALSE otherwise.
-   *
-   * @var array
-   */
-  public $storage = array();
-
-  /**
    * The custom storage indexes for the field data storage.
    *
    * This set of indexes is merged with the "default" indexes specified by the
@@ -194,18 +175,19 @@ class Field extends ConfigEntityBase implements FieldInterface {
   public $deleted = FALSE;
 
   /**
+   * The storage type this field is in. Typically 'sql'.
+   *
+   * @var string
+   */
+  protected $storageType;
+
+
+  /**
    * The field schema.
    *
    * @var array
    */
   protected $schema;
-
-  /**
-   * The storage information for the field.
-   *
-   * @var array
-   */
-  protected $storageDetails;
 
   /**
    * Constructs a Field object.
@@ -263,7 +245,6 @@ class Field extends ConfigEntityBase implements FieldInterface {
       'module',
       'active',
       'entity_types',
-      'storage',
       'locked',
       'cardinality',
       'translatable',
@@ -289,7 +270,7 @@ class Field extends ConfigEntityBase implements FieldInterface {
    */
   public function save() {
     // Clear the derived data about the field.
-    unset($this->schema, $this->storageDetails);
+    unset($this->schema);
 
     if ($this->isNew()) {
       return $this->saveNew();
@@ -356,24 +337,6 @@ class Field extends ConfigEntityBase implements FieldInterface {
     // definition is passed to the various hooks and written to config.
     $this->settings += $field_type['settings'];
 
-    // Provide default storage.
-    $this->storage += array(
-      'type' => variable_get('field_storage_default', 'field_sql_storage'),
-      'settings' => array(),
-    );
-    // Check that the storage type is known.
-    $storage_type = field_info_storage_types($this->storage['type']);
-    if (!$storage_type) {
-      throw new FieldException(format_string('Attempt to create a field with unknown storage type %type.', array('%type' => $this->storage['type'])));
-    }
-    $this->storage['module'] = $storage_type['module'];
-    $this->storage['active'] = TRUE;
-    // Provide default storage settings.
-    $this->storage['settings'] += $storage_type['settings'];
-
-    // Invoke the storage backend's hook_field_storage_create_field().
-    $module_handler->invoke($this->storage['module'], 'field_storage_create_field', array($this));
-
     // Save the configuration.
     $result = parent::save();
     field_cache_clear();
@@ -408,9 +371,6 @@ class Field extends ConfigEntityBase implements FieldInterface {
     }
     if ($this->entity_types != $original->entity_types) {
       throw new FieldException("Cannot change an existing field's entity_types property.");
-    }
-    if ($this->storage['type'] != $original->storage['type']) {
-      throw new FieldException("Cannot change an existing field's storage type.");
     }
 
     // Make sure all settings are present, so that a complete field definition
@@ -526,25 +486,6 @@ class Field extends ConfigEntityBase implements FieldInterface {
     // the latter.
     reset($schema['columns']);
     return $schema['columns'];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getStorageDetails() {
-    if (!isset($this->storageDetails)) {
-      $module_handler = \Drupal::moduleHandler();
-
-      // Collect the storage details from the storage backend, and let other
-      // modules alter it. This invokes hook_field_storage_details() and
-      // hook_field_storage_details_alter().
-      $details = (array) $module_handler->invoke($this->storage['module'], 'field_storage_details', array($this));
-      $module_handler->alter('field_storage_details', $details, $this);
-
-      $this->storageDetails = $details;
-    }
-
-    return $this->storageDetails;
   }
 
   /**
@@ -680,10 +621,6 @@ class Field extends ConfigEntityBase implements FieldInterface {
       case 'bundles':
         $bundles = $this->getBundles();
         return $bundles;
-
-      case 'storage_details':
-        $this->getStorageDetails();
-        return $this->storageDetails;
     }
 
     return $this->{$offset};
@@ -764,5 +701,18 @@ class Field extends ConfigEntityBase implements FieldInterface {
     }
 
     return FALSE;
+  }
+
+  public function getStorageType() {
+    return $this->storageType;
+  }
+
+  public function setStorageType($storage_type) {
+    if (!$this->storageType) {
+      $this->storageType = $storage_type;
+    }
+    elseif ($storage_type != $this->storageType) {
+      throw new FieldException('Field storage type can not be changed.');
+    }
   }
 }

@@ -352,6 +352,12 @@ class FieldInstance extends ConfigEntityBase implements FieldInstanceInterface {
     if (!empty($this->field->entity_types) && !in_array($this->entity_type, $this->field->entity_types)) {
       throw new FieldException(format_string('Attempt to create an instance of field @field_id on forbidden entity type @entity_type.', array('@field_id' => $this->field->id, '@entity_type' => $this->entity_type)));
     }
+    $storage_type = $this->field->getStorageType();
+    $this->field->setStorageType($instance_controller->storageType());
+    if (!$storage_type) {
+      $this->field->save();
+      $instance_controller->insertField($this->field);
+    }
 
     // Assign the ID.
     $this->id = $this->id();
@@ -371,6 +377,7 @@ class FieldInstance extends ConfigEntityBase implements FieldInstanceInterface {
     $result = parent::save();
     field_cache_clear();
 
+    $instance_controller->insertFieldInstance($this);
     // Invoke hook_field_create_instance() after the cache is cleared for API
     // consistency.
     $module_handler->invokeAll('field_create_instance', array($this));

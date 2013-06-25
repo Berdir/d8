@@ -501,4 +501,10 @@ class ConfigStorageController extends EntityStorageControllerBase {
     return TRUE;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function storageType() {
+    return 'config';
+  }
 }

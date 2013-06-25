@@ -9,6 +9,7 @@ namespace Drupal\Core\Entity;
 
 use Drupal\Core\Language\Language;
 use Drupal\field\FieldInfo;
+use Drupal\field\Plugin\Core\Entity\Field;
 use PDO;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Entity\Query\QueryInterface;
@@ -771,4 +772,134 @@ class DatabaseStorageController extends EntityStorageControllerBase {
 
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function storageType() {
+    return 'sql';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function insertField(Field $field) {
+    $schema = $this->fieldSchema($field);
+    foreach ($schema as $name => $table) {
+      db_create_table($name, $table);
+    }
+  }
+
+  protected function fieldSchema(Field $field) {
+    $deleted = $field['deleted'] ? 'deleted ' : '';
+    $current = array(
+      'description' => "Data storage for {$deleted}field {$field['id']} ({$field['field_name']})",
+      'fields' => array(
+        'entity_type' => array(
+          'type' => 'varchar',
+          'length' => 128,
+          'not null' => TRUE,
+          'default' => '',
+          'description' => 'The entity type this data is attached to',
+        ),
+        'bundle' => array(
+          'type' => 'varchar',
+          'length' => 128,
+          'not null' => TRUE,
+          'default' => '',
+          'description' => 'The field instance bundle to which this row belongs, used when deleting a field instance',
+        ),
+        'deleted' => array(
+          'type' => 'int',
+          'size' => 'tiny',
+          'not null' => TRUE,
+          'default' => 0,
+          'description' => 'A boolean indicating whether this data item has been deleted'
+        ),
+        'entity_id' => array(
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'description' => 'The entity id this data is attached to',
+        ),
+        'revision_id' => array(
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => FALSE,
+          'description' => 'The entity revision id this data is attached to, or NULL if the entity type is not versioned',
+        ),
+        // @todo Consider storing langcode as integer.
+        'langcode' => array(
+          'type' => 'varchar',
+          'length' => 32,
+          'not null' => TRUE,
+          'default' => '',
+          'description' => 'The language code for this data item.',
+        ),
+        'delta' => array(
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'description' => 'The sequence number for this data item, used for multi-value fields',
+        ),
+      ),
+      'primary key' => array('entity_type', 'entity_id', 'deleted', 'delta', 'langcode'),
+      'indexes' => array(
+        'entity_type' => array('entity_type'),
+        'bundle' => array('bundle'),
+        'deleted' => array('deleted'),
+        'entity_id' => array('entity_id'),
+        'revision_id' => array('revision_id'),
+        'langcode' => array('langcode'),
+      ),
+    );
+
+    $schema = $field->getSchema();
+
+    // Add field columns.
+    foreach ($schema['columns'] as $column_name => $attributes) {
+      $real_name = _field_sql_storage_columnname($field['field_name'], $column_name);
+      $current['fields'][$real_name] = $attributes;
+    }
+
+    // Add indexes.
+    foreach ($schema['indexes'] as $index_name => $columns) {
+      $real_name = _field_sql_storage_indexname($field['field_name'], $index_name);
+      foreach ($columns as $column_name) {
+        // Indexes can be specified as either a column name or an array with
+        // column name and length. Allow for either case.
+        if (is_array($column_name)) {
+          $current['indexes'][$real_name][] = array(
+            _field_sql_storage_columnname($field['field_name'], $column_name[0]),
+            $column_name[1],
+          );
+        }
+        else {
+          $current['indexes'][$real_name][] = _field_sql_storage_columnname($field['field_name'], $column_name);
+        }
+      }
+    }
+
+    // Add foreign keys.
+    foreach ($schema['foreign keys'] as $specifier => $specification) {
+      $real_name = _field_sql_storage_indexname($field['field_name'], $specifier);
+      $current['foreign keys'][$real_name]['table'] = $specification['table'];
+      foreach ($specification['columns'] as $column_name => $referenced) {
+        $sql_storage_column = _field_sql_storage_columnname($field['field_name'], $column_name);
+        $current['foreign keys'][$real_name]['columns'][$sql_storage_column] = $referenced;
+      }
+    }
+
+    // Construct the revision table.
+    $revision = $current;
+    $revision['description'] = "Revision archive storage for {$deleted}field {$field['id']} ({$field['field_name']})";
+    $revision['primary key'] = array('entity_type', 'entity_id', 'revision_id', 'deleted', 'delta', 'langcode');
+    $revision['fields']['revision_id']['not null'] = TRUE;
+    $revision['fields']['revision_id']['description'] = 'The entity revision id this data is attached to';
+
+    return array(
+      _field_sql_storage_tablename($field) => $current,
+      _field_sql_storage_revision_tablename($field) => $revision,
+    );
+
+  }
 }

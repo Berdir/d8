@@ -6,6 +6,8 @@
  */
 
 namespace Drupal\Core\Entity;
+use Drupal\field\Plugin\Core\Entity\Field;
+use Drupal\field\Plugin\Core\Entity\FieldInstance;
 use Symfony\Component\DependencyInjection\Container;
 
 /**
@@ -482,16 +484,39 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
 
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function bundleCreate($bundle) {
 
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function bundleRename($bundle, $bundle_new) {
 
   }
 
 
+  /**
+   * {@inheritdoc}
+   */
   public function bundleDelete($bundle) {
+
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function insertField(Field $field) {
+
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function insertFieldInstance(FieldInstance $field) {
 
   }
 }

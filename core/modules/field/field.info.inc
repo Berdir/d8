@@ -221,31 +221,6 @@ function field_info_formatter_types($formatter_type = NULL) {
 }
 
 /**
- * Returns information about field storage from hook_field_storage_info().
- *
- * @param $storage_type
- *   (optional) A storage type name. If omitted, all storage types will be
- *   returned.
- *
- * @return
- *   Either a storage type description, as provided by
- *   hook_field_storage_info(), or an array of all existing storage types, keyed
- *   by storage type name.
- */
-function field_info_storage_types($storage_type = NULL) {
-  $info = _field_info_collate_types();
-  $storage_types = $info['storage types'];
-  if ($storage_type) {
-    if (isset($storage_types[$storage_type])) {
-      return $storage_types[$storage_type];
-    }
-  }
-  else {
-    return $storage_types;
-  }
-}
-
-/**
  * Returns all field definitions.
  *
  * Use of this function should be avoided when possible, since it loads and
@@ -519,22 +494,6 @@ function field_info_widget_settings($type) {
  */
 function field_info_formatter_settings($type) {
   $info = field_info_formatter_types($type);
-  return isset($info['settings']) ? $info['settings'] : array();
-}
-
-/**
- * Returns a field storage type's default settings.
- *
- * @param $type
- *   A field storage type name.
- *
- * @return
- *   The storage type's default settings, as provided by
- *   hook_field_storage_info(), or an empty array if type or settings are
- *   undefined.
- */
-function field_info_storage_settings($type) {
-  $info = field_info_storage_types($type);
   return isset($info['settings']) ? $info['settings'] : array();
 }
 

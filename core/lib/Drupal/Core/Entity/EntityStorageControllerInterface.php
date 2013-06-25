@@ -6,6 +6,8 @@
  */
 
 namespace Drupal\Core\Entity;
+use Drupal\field\Plugin\Core\Entity\Field;
+use Drupal\field\Plugin\Core\Entity\FieldInstance;
 
 /**
  * Defines a common interface for entity controller classes.
@@ -187,4 +189,22 @@ interface EntityStorageControllerInterface {
    *   The name of the bundle being deleted.
    */
   public function bundleDelete($bundle);
+
+  /**
+   * The type of storage, for example 'sql'.
+   *
+   * @return string
+   */
+  public function storageType();
+
+  /**
+   * Allows reaction to the creation of a configurable field.
+   */
+  public function insertField(Field $field);
+
+  /**
+   * Allows reaction to the creation of a configurable field instance.
+   */
+  public function insertFieldInstance(FieldInstance $instance);
+
 }
