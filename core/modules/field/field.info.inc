@@ -41,74 +41,7 @@ function field_info_cache_clear() {
   Drupal::typedData()->clearCachedDefinitions();
   Drupal::service('plugin.manager.entity.field.field_type')->clearCachedDefinitions();
 
-  _field_info_collate_types_reset();
   Field::fieldInfo()->flush();
-}
-
-/**
- * Collates all information on field types, widget types and related structures.
- *
- * @return
- *   An associative array containing:
- *   - 'storage types': Array of hook_field_storage_info() results, keyed by
- *     storage type names. Each element has the following components: label,
- *     description, and settings from hook_field_storage_info(), as well as
- *     module, giving the module that exposes the storage type.
- *
- * @see _field_info_collate_types_reset()
- */
-function _field_info_collate_types() {
-  $language_interface = language(Language::TYPE_INTERFACE);
-
-  // Use the advanced drupal_static() pattern, since this is called very often.
-  static $drupal_static_fast;
-
-  if (!isset($drupal_static_fast)) {
-    $drupal_static_fast['field_info_collate_types'] = &drupal_static(__FUNCTION__);
-  }
-  $info = &$drupal_static_fast['field_info_collate_types'];
-
-  // The _info() hooks invoked below include translated strings, so each
-  // language is cached separately.
-  $langcode = $language_interface->langcode;
-
-  if (!isset($info)) {
-    if ($cached = cache('field')->get("field_info_types:$langcode")) {
-      $info = $cached->data;
-    }
-    else {
-      $info = array(
-        'storage types' => array(),
-      );
-
-      // Populate storage types.
-      foreach (module_implements('field_storage_info') as $module) {
-        $storage_types = (array) module_invoke($module, 'field_storage_info');
-        foreach ($storage_types as $name => $storage_info) {
-          // Provide defaults.
-          $storage_info += array(
-            'settings' => array(),
-          );
-          $info['storage types'][$name] = $storage_info;
-          $info['storage types'][$name]['module'] = $module;
-        }
-      }
-      drupal_alter('field_storage_info', $info['storage types']);
-
-      cache('field')->set("field_info_types:$langcode", $info, CacheBackendInterface::CACHE_PERMANENT, array('field_info_types' => TRUE));
-    }
-  }
-
-  return $info;
-}
-
-/**
- * Clears collated information on field and widget types and related structures.
- */
-function _field_info_collate_types_reset() {
-  drupal_static_reset('_field_info_collate_types');
-  // Clear all languages.
-  cache('field')->deleteTags(array('field_info_types' => TRUE));
 }
 
 /**

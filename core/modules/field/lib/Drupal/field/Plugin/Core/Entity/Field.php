@@ -521,10 +521,6 @@ class Field extends ConfigEntityBase implements FieldInterface {
    * {@inheritdoc}
    */
   public function getFieldSettings() {
-    // @todo field_info_field_types() calls _field_info_collate_types() which
-    //   maintains its own static cache. However, do some CPU and memory
-    //   profiling to see if it's worth statically caching $field_type_info, or
-    //   the default field and instance settings, within $this.
     $field_type_info = field_info_field_types($this->type);
 
     $settings = $field_type_info['instance_settings'] + $this->settings + $field_type_info['settings'];
