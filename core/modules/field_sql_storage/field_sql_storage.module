@@ -61,28 +61,6 @@ function field_sql_storage_field_storage_purge(EntityInterface $entity, $field, 
     ->condition('entity_id', $entity->id())
     ->execute();
 }
-
-/**
- * Implements hook_field_storage_delete_instance().
- *
- * This function simply marks for deletion all data associated with the field.
- */
-function field_sql_storage_field_storage_delete_instance($instance) {
-  $field = field_info_field($instance['field_name']);
-  $table_name = _field_sql_storage_tablename($field);
-  $revision_name = _field_sql_storage_revision_tablename($field);
-  db_update($table_name)
-    ->fields(array('deleted' => 1))
-    ->condition('entity_type', $instance['entity_type'])
-    ->condition('bundle', $instance['bundle'])
-    ->execute();
-  db_update($revision_name)
-    ->fields(array('deleted' => 1))
-    ->condition('entity_type', $instance['entity_type'])
-    ->condition('bundle', $instance['bundle'])
-    ->execute();
-}
-
 /**
  * Implements hook_field_storage_purge_field().
  *

@@ -210,4 +210,8 @@ interface EntityStorageControllerInterface {
    */
   public function handleUpdateField(Field $field, Field $original);
 
+  /**
+   * Allows reaction to the deletion of a configurable field instance.
+   */
+  public function handleInstanceDelete(FieldInstance $instance);
 }

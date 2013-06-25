@@ -10,6 +10,7 @@ namespace Drupal\Core\Entity;
 use Drupal\Core\Language\Language;
 use Drupal\field\FieldInfo;
 use Drupal\field\Plugin\Core\Entity\Field;
+use Drupal\field\Plugin\Core\Entity\FieldInstance;
 use PDO;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Entity\Query\QueryInterface;
@@ -1055,7 +1056,26 @@ class DatabaseStorageController extends EntityStorageControllerBase {
    *   A string containing a generated column name for a field data table that is
    *   unique among all other fields.
    */
-  function fieldColumnName($name, $column) {
+  protected function fieldColumnName($name, $column) {
     return in_array($column, Field::getReservedColumns()) ? $column : $name . '_' . $column;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function handleInstanceDelete(FieldInstance $instance) {
+    $field = $instance->getField()->getFieldName();
+    $table_name = $this->fieldTableName($field);
+    $revision_name = $this->fieldRevisionTableName($field);
+    $this->database->update($table_name)
+      ->fields(array('deleted' => 1))
+      ->condition('entity_type', $instance['entity_type'])
+      ->condition('bundle', $instance['bundle'])
+      ->execute();
+    $this->database->update($revision_name)
+      ->fields(array('deleted' => 1))
+      ->condition('entity_type', $instance['entity_type'])
+      ->condition('bundle', $instance['bundle'])
+      ->execute();
   }
 }

@@ -428,7 +428,8 @@ class Field extends ConfigEntityBase implements FieldInterface {
         $instance->delete(FALSE);
       }
 
-      // Mark field data for deletion by invoking
+      // Mark field data for deletion.
+
       // hook_field_storage_delete_field().
       $module_handler->invoke($this->storage['module'], 'field_storage_delete_field', array($this));
 
@@ -705,12 +706,23 @@ class Field extends ConfigEntityBase implements FieldInterface {
     return $this->storageType;
   }
 
+  /**
+   * Set the storage type.
+   *
+   * @param $storage_type
+   *   The storage type.
+   * @return bool
+   *   TRUE when there was no storage type before.
+   * @throws \Drupal\field\FieldException
+   */
   public function setStorageType($storage_type) {
-    if (!$this->storageType) {
+    if (!$this->storageType && $storage_type) {
       $this->storageType = $storage_type;
+      return TRUE;
     }
     elseif ($storage_type != $this->storageType) {
       throw new FieldException('Field storage type can not be changed.');
     }
+    return FALSE;
   }
 }

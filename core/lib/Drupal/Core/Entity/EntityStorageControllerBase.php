@@ -520,4 +520,10 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
 
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function handleInstanceDelete(FieldInstance $instance) {
+
+  }
 }
