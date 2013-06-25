@@ -11,8 +11,8 @@ use InvalidArgumentException;
 use Drupal\Component\Plugin\Discovery\ProcessDecorator;
 use Drupal\Component\Plugin\Discovery\DerivativeDiscoveryDecorator;
 use Drupal\Component\Plugin\PluginManagerBase;
+use Drupal\Core\Plugin\Discovery\AnnotatedClassDiscovery;
 use Drupal\Core\Plugin\Discovery\CacheDecorator;
-use Drupal\Core\Plugin\Discovery\HookDiscovery;
 use Drupal\Core\TypedData\Validation\MetadataFactory;
 use Drupal\Core\Validation\ConstraintManager;
 use Drupal\Core\Validation\DrupalTranslator;
@@ -46,7 +46,7 @@ class TypedDataManager extends PluginManagerBase {
    * @var array
    */
   protected $defaults = array(
-    'list class' => '\Drupal\Core\TypedData\ItemList',
+    'list_class' => '\Drupal\Core\TypedData\ItemList',
   );
 
   /**
@@ -56,8 +56,12 @@ class TypedDataManager extends PluginManagerBase {
    */
   protected $prototypes = array();
 
-  public function __construct() {
-    $this->discovery = new HookDiscovery('data_type_info');
+  public function __construct(\Traversable $namespaces) {
+    $annotation_namespaces = array(
+      'Drupal\Core\TypedData\Annotation' => DRUPAL_ROOT . '/core/lib',
+    );
+
+    $this->discovery = new AnnotatedClassDiscovery('DataType', $namespaces, $annotation_namespaces, 'Drupal\Core\TypedData\Annotation\DataType');
     $this->discovery = new DerivativeDiscoveryDecorator($this->discovery);
     $this->discovery = new ProcessDecorator($this->discovery, array($this, 'processDefinition'));
     $this->discovery = new CacheDecorator($this->discovery, 'typed_data:types');
@@ -104,13 +108,13 @@ class TypedDataManager extends PluginManagerBase {
    *   - class: If set and 'list' is FALSE, the class to use for creating the
    *     typed data object; otherwise the default class of the data type will be
    *     used.
-   *   - list class: If set and 'list' is TRUE, the class to use for creating
+   *   - list_class: If set and 'list' is TRUE, the class to use for creating
    *     the typed data object; otherwise the default list class of the data
    *     type will be used.
    *   - settings: An array of settings, as required by the used 'class'. See
    *     the documentation of the class for supported or required settings.
-   *   - list settings: An array of settings as required by the used
-   *     'list class'. See the documentation of the list class for support or
+   *   - list_settings: An array of settings as required by the used
+   *     'list_class'. See the documentation of the list class for support or
    *     required settings.
    *   - constraints: An array of validation constraints. See
    *     \Drupal\Core\TypedData\TypedDataManager::getConstraints() for details.
@@ -134,14 +138,14 @@ class TypedDataManager extends PluginManagerBase {
    *
    * @see \Drupal::typedData()
    * @see \Drupal\Core\TypedData\TypedDataManager::getPropertyInstance()
-   * @see \Drupal\Core\TypedData\Type\Integer
-   * @see \Drupal\Core\TypedData\Type\Float
-   * @see \Drupal\Core\TypedData\Type\String
-   * @see \Drupal\Core\TypedData\Type\Boolean
-   * @see \Drupal\Core\TypedData\Type\Duration
-   * @see \Drupal\Core\TypedData\Type\Date
-   * @see \Drupal\Core\TypedData\Type\Uri
-   * @see \Drupal\Core\TypedData\Type\Binary
+   * @see \Drupal\Core\TypedData\Plugin\DataType\Integer
+   * @see \Drupal\Core\TypedData\Plugin\DataType\Float
+   * @see \Drupal\Core\TypedData\Plugin\DataType\String
+   * @see \Drupal\Core\TypedData\Plugin\DataType\Boolean
+   * @see \Drupal\Core\TypedData\Plugin\DataType\Duration
+   * @see \Drupal\Core\TypedData\Plugin\DataType\Date
+   * @see \Drupal\Core\TypedData\Plugin\DataType\Uri
+   * @see \Drupal\Core\TypedData\Plugin\DataType\Binary
    * @see \Drupal\Core\Entity\Field\EntityWrapper
    */
   public function create(array $definition, $value = NULL, $name = NULL, $parent = NULL) {
@@ -349,12 +353,16 @@ class TypedDataManager extends PluginManagerBase {
 
     $type_definition = $this->getDefinition($definition['type']);
     // Auto-generate a constraint for the primitive type if we have a mapping.
-    if (isset($type_definition['primitive type'])) {
-      $constraints[] = $validation_manager->create('PrimitiveType', array('type' => $type_definition['primitive type']));
+    if (isset($type_definition['primitive_type'])) {
+      $constraints[] = $validation_manager->create('PrimitiveType', array('type' => $type_definition['primitive_type']));
     }
     // Add in constraints specified by the data type.
     if (isset($type_definition['constraints'])) {
       foreach ($type_definition['constraints'] as $name => $options) {
+        // Annotations do not support empty arrays.
+        if ($options === TRUE) {
+          $options = array();
+        }
         $constraints[] = $validation_manager->create($name, $options);
       }
     }

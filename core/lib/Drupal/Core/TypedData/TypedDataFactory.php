@@ -46,7 +46,7 @@ class TypedDataFactory extends DefaultFactory {
 
     // Allow per-data definition overrides of the used classes, i.e. take over
     // classes specified in the data definition.
-    $key = empty($configuration['list']) ? 'class' : 'list class';
+    $key = empty($configuration['list']) ? 'class' : 'list_class';
     if (isset($configuration[$key])) {
       $class = $configuration[$key];
     }

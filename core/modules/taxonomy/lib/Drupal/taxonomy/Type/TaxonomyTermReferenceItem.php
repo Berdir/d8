@@ -7,7 +7,7 @@
 
 namespace Drupal\taxonomy\Type;
 
-use Drupal\Core\Entity\Field\Type\EntityReferenceItem;
+use Drupal\Core\Entity\Plugin\DataType\EntityReferenceItem;
 use Drupal\field\Plugin\Type\FieldType\ConfigEntityReferenceItemBase;
 
 /**
