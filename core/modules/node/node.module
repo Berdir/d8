@@ -626,8 +626,8 @@ function node_submit(EntityInterface $node) {
 
   // If a new revision is created, save the current user as revision author.
   if ($node->isNewRevision()) {
-    $node->revision_uid = $user->uid;
-    $node->revision_timestamp = REQUEST_TIME;
+    $node->setRevisionAuthorId($user->id());
+    $node->setRevisionCreationTime(REQUEST_TIME);
   }
 
   $node->setCreatedTime(!empty($node->date) && $node->date instanceOf DrupalDateTime ? $node->date->getTimestamp() : REQUEST_TIME);
@@ -665,7 +665,7 @@ function node_revision_delete($revision_id) {
  */
 function node_show(EntityInterface $node, $message = FALSE) {
   if ($message) {
-    drupal_set_title(t('Revision of %title from %date', array('%title' => $node->label(), '%date' => format_date($node->revision_timestamp))), PASS_THROUGH);
+    drupal_set_title(t('Revision of %title from %date', array('%title' => $node->label(), '%date' => format_date($node->getRevisionCreationTime()))), PASS_THROUGH);
   }
 
   // For markup consistency with other pages, use node_view_multiple() rather than node_view().

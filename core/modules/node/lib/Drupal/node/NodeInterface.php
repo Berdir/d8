@@ -8,6 +8,7 @@
 namespace Drupal\node;
 
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\user\UserInterface;
 
 /**
  * Provides an interface defining a node entity.
@@ -19,6 +20,9 @@ interface NodeInterface extends ContentEntityInterface {
    *
    * @param string $title
    *   The node title.
+   *
+   * @return \Drupal\node\NodeInterface
+   *   The called node entity.
    */
   public function setTitle($title);
 
@@ -35,6 +39,9 @@ interface NodeInterface extends ContentEntityInterface {
    *
    * @param int $timestamp
    *   The node creation timestamp.
+   *
+   * @return \Drupal\node\NodeInterface
+   *   The called node entity.
    */
   public function setCreatedTime($timestamp);
 
@@ -59,6 +66,9 @@ interface NodeInterface extends ContentEntityInterface {
    *
    * @param bool $promoted
    *   TRUE to set this node to promoted, FALSE to set it to not promoted.
+   *
+   * @return \Drupal\node\NodeInterface
+   *   The called node entity.
    */
   public function setPromoted($promoted);
 
@@ -75,6 +85,9 @@ interface NodeInterface extends ContentEntityInterface {
    *
    * @param bool $sticky
    *   TRUE to set this node to sticky, FALSE to set it to not sticky.
+   *
+   * @return \Drupal\node\NodeInterface
+   *   The called node entity.
    */
   public function setSticky($sticky);
 
@@ -99,6 +112,9 @@ interface NodeInterface extends ContentEntityInterface {
    *
    * @param int $uid
    *   The author user id.
+   *
+   * @return \Drupal\node\NodeInterface
+   *   The called node entity.
    */
   public function setAuthorId($uid);
 
@@ -117,7 +133,48 @@ interface NodeInterface extends ContentEntityInterface {
    *
    * @param bool $published
    *   TRUE to set this node to published, FALSE to set it to unpublished.
+   *
+   * @return \Drupal\node\NodeInterface
+   *   The called node entity.
    */
   public function setPublished($published);
+
+  /**
+   * Returns the node revision creation timestamp.
+   *
+   * @return int
+   *   The UNIX timestamp of when this revision was created.
+   */
+  public function getRevisionCreationTime();
+
+  /**
+   * Sets the node revision creation timestamp.
+   *
+   * @param int $imestamp
+   *   The UNIX timestamp of when this revision was created.
+   *
+   * @return \Drupal\node\NodeInterface
+   *   The called node entity.
+   */
+  public function setRevisionCreationTime($timestamp);
+
+  /**
+   * Returns the node revision author.
+   *
+   * @return \Drupal\user\UserInterface
+   *   The user entity for the revision author.
+   */
+  public function getRevisionAuthor();
+
+  /**
+   * Sets the node revision author.
+   *
+   * @param int $uid
+   *   The user ID of the revision author.
+   *
+   * @return \Drupal\node\NodeInterface
+   *   The called node entity.
+   */
+  public function setRevisionAuthorId($uid);
 
 }

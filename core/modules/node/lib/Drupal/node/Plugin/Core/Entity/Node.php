@@ -146,6 +146,7 @@ class Node extends EntityNG implements NodeInterface {
    */
   public function setTitle($title) {
     $this->set('title', $title);
+    return $this;
   }
 
   /**
@@ -153,6 +154,15 @@ class Node extends EntityNG implements NodeInterface {
    */
   public function getCreatedTime() {
     return $this->get('created')->value;
+  }
+
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setCreatedTime($timestamp) {
+    $this->set('created', $timestamp);
+    return $this;
   }
 
   /**
@@ -172,6 +182,14 @@ class Node extends EntityNG implements NodeInterface {
   /**
    * {@inheritdoc}
    */
+  public function setPromoted($promoted) {
+    $this->set('promoted', $promoted ? NODE_PROMOTED : NODE_NOT_PROMOTED);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function isSticky() {
     return (bool) $this->get('sticky')->value;
   }
@@ -179,8 +197,23 @@ class Node extends EntityNG implements NodeInterface {
   /**
    * {@inheritdoc}
    */
+  public function setSticky($sticky) {
+    $this->set('sticky', $sticky ? NODE_STICKY : NODE_NOT_STICKY);
+    return $this;
+  }
+  /**
+   * {@inheritdoc}
+   */
   public function isPublished() {
     return (bool) $this->get('status')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setPublished($published) {
+    $this->set('status', $published ? NODE_PUBLISHED : NODE_NOT_PUBLISHED);
+    return $this;
   }
 
   /**
@@ -205,36 +238,39 @@ class Node extends EntityNG implements NodeInterface {
   /**
    * {@inheritdoc}
    */
-  public function setCreatedTime($timestamp) {
-    $this->set('created', $timestamp);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setPromoted($promoted) {
-    $this->set('promoted', $promoted ? NODE_PROMOTED : NODE_NOT_PROMOTED);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setSticky($sticky) {
-    $this->set('sticky', $sticky ? NODE_STICKY : NODE_NOT_STICKY);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function setAuthorId($uid) {
     $this->set('uid', $uid);
+    return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setPublished($published) {
-    $this->set('status', $published ? NODE_PUBLISHED : NODE_NOT_PUBLISHED);
+  public function getRevisionCreationTime() {
+    return $this->get('revision_timestamp')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setRevisionCreationTime($timestamp) {
+    $this->set('revision_timestamp', $timestamp);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getRevisionAuthor() {
+    return $this->get('revision_uid')->entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setRevisionAuthorId($uid) {
+    $this->set('revision_uid', $uid);
+    return $this;
   }
 
 }
