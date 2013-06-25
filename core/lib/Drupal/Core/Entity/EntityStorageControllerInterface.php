@@ -162,4 +162,29 @@ interface EntityStorageControllerInterface {
    */
   public function invokeFieldItemPrepareCache(EntityInterface $entity);
 
+  /**
+   * Allows reaction to a bundle being created.
+   *
+   * @param string $bundle
+   *   The name of the bundle created.
+   */
+  public function bundleCreate($bundle);
+
+  /**
+   * Allows reaction to a bundle being renamed.
+   *
+   * @param string $bundle
+   *   The name of the bundle being renamed.
+   * @param string $bundle_new
+   *   The new name of the bundle.
+   */
+  public function bundleRename($bundle, $bundle_new);
+
+  /**
+   * Allows reaction to a bundle being deleted.
+   *
+   * @param string $bundle
+   *   The name of the bundle being deleted.
+   */
+  public function bundleDelete($bundle);
 }

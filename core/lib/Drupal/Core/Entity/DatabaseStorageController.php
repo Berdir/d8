@@ -8,6 +8,7 @@
 namespace Drupal\Core\Entity;
 
 use Drupal\Core\Language\Language;
+use Drupal\field\FieldInfo;
 use PDO;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Entity\Query\QueryInterface;
@@ -59,13 +60,21 @@ class DatabaseStorageController extends EntityStorageControllerBase {
   protected $database;
 
   /**
+   * The field info object.
+   *
+   * @var \Drupal\field\FieldInfo
+   */
+  protected $fieldInfo;
+
+  /**
    * {@inheritdoc}
    */
   public static function createInstance(ContainerInterface $container, $entity_type, array $entity_info) {
     return new static(
       $entity_type,
       $entity_info,
-      $container->get('database')
+      $container->get('database'),
+      $container->get('field.info')
     );
   }
 
@@ -79,10 +88,11 @@ class DatabaseStorageController extends EntityStorageControllerBase {
    * @param \Drupal\Core\Database\Connection $database
    *   The database connection to be used.
    */
-  public function __construct($entity_type, array $entity_info, Connection $database) {
+  public function __construct($entity_type, array $entity_info, Connection $database, FieldInfo $field_info) {
     parent::__construct($entity_type, $entity_info);
 
     $this->database = $database;
+    $this->fieldInfo = $field_info;
 
     // Check if the entity type supports IDs.
     if (isset($this->entityInfo['entity_keys']['id'])) {
@@ -330,10 +340,10 @@ class DatabaseStorageController extends EntityStorageControllerBase {
     // Attach fields.
     if ($this->entityInfo['fieldable']) {
       if ($load_revision) {
-        field_attach_load_revision($this->entityType, $queried_entities);
+        $this->fieldLoad($this->entityType, $queried_entities, FIELD_LOAD_REVISION);
       }
       else {
-        field_attach_load($this->entityType, $queried_entities);
+        $this->fieldLoad($this->entityType, $queried_entities, FIELD_LOAD_CURRENT);
       }
     }
 
@@ -482,7 +492,7 @@ class DatabaseStorageController extends EntityStorageControllerBase {
   /**
    * Saves an entity revision.
    *
-   * @param Drupal\Core\Entity\EntityInterface $entity
+   * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity object.
    */
   protected function saveRevision(EntityInterface $entity) {
@@ -520,31 +530,6 @@ class DatabaseStorageController extends EntityStorageControllerBase {
   }
 
   /**
-   * Invokes a hook on behalf of the entity.
-   *
-   * @param $hook
-   *   One of 'presave', 'insert', 'update', 'predelete', 'delete', or
-   *  'revision_delete'.
-   * @param $entity
-   *   The entity object.
-   */
-  protected function invokeHook($hook, EntityInterface $entity) {
-    $function = 'field_attach_' . $hook;
-    // @todo: field_attach_delete_revision() is named the wrong way round,
-    // consider renaming it.
-    if ($function == 'field_attach_revision_delete') {
-      $function = 'field_attach_delete_revision';
-    }
-    if (!empty($this->entityInfo['fieldable']) && function_exists($function)) {
-      $function($entity);
-    }
-    // Invoke the hook.
-    module_invoke_all($this->entityType . '_' . $hook, $entity);
-    // Invoke the respective entity-level hook.
-    module_invoke_all('entity_' . $hook, $entity, $this->entityType);
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function baseFieldDefinitions() {
@@ -558,4 +543,232 @@ class DatabaseStorageController extends EntityStorageControllerBase {
   public function getQueryServiceName() {
     return 'entity.query.field_sql_storage';
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  function doFieldLoad($entity_type, $entities, $age) {
+    $load_current = $age == FIELD_LOAD_CURRENT;
+    $bundles = array();
+    foreach ($entities as $entity) {
+      $bundles[$entity->bundle()] = TRUE;
+    }
+    $fields = array();
+    foreach ($bundles as $bundle => $v) {
+      foreach ($this->fieldInfo->getBundleInstances($entity_type, $bundle) as $field_name => $instance) {
+        $fields[$field_name] = $instance->getField();
+      }
+    }
+    foreach ($fields as $field_name => $field) {
+      $table = $load_current ? _field_sql_storage_tablename($field) : _field_sql_storage_revision_tablename($field);
+
+      $query = $this->database->select($table, 't')
+        ->fields('t')
+        ->condition('entity_type', $entity_type)
+        ->condition($load_current ? 'entity_id' : 'revision_id', $ids, 'IN')
+        ->condition('langcode', field_available_languages($entity_type, $field), 'IN')
+        ->orderBy('delta');
+
+      if (empty($options['deleted'])) {
+        $query->condition('deleted', 0);
+      }
+
+      $results = $query->execute();
+
+      $delta_count = array();
+      foreach ($results as $row) {
+        if (!isset($delta_count[$row->entity_id][$row->langcode])) {
+          $delta_count[$row->entity_id][$row->langcode] = 0;
+        }
+
+        if ($field['cardinality'] == FIELD_CARDINALITY_UNLIMITED || $delta_count[$row->entity_id][$row->langcode] < $field['cardinality']) {
+          $item = array();
+          // For each column declared by the field, populate the item
+          // from the prefixed database column.
+          foreach ($field['columns'] as $column => $attributes) {
+            $column_name = _field_sql_storage_columnname($field_name, $column);
+            // Unserialize the value if specified in the column schema.
+            $item[$column] = (!empty($attributes['serialize'])) ? unserialize($row->$column_name) : $row->$column_name;
+          }
+
+          // Add the item to the field values for the entity.
+          $entities[$row->entity_id]->{$field_name}[$row->langcode][] = $item;
+          $delta_count[$row->entity_id][$row->langcode]++;
+        }
+      }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function doFieldInsert(EntityInterface $entity) {
+    $this->doFieldWrite($entity, FIELD_STORAGE_INSERT);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function doFieldUpdate(EntityInterface $entity) {
+    $this->doFieldWrite($entity, FIELD_STORAGE_UPDATE);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function doFieldWrite(EntityInterface $entity, $op) {
+    $vid = $entity->getRevisionId();
+    $id = $entity->id();
+    $bundle = $entity->bundle();
+    $entity_type = $entity->entityType();
+    if (!isset($vid)) {
+      $vid = $id;
+    }
+
+    foreach ($this->fieldInfo->getBundleInstances($entity_type, $bundle) as $field_name => $instance) {
+      $field = $instance->getField();
+      $table_name = _field_sql_storage_tablename($field);
+      $revision_name = _field_sql_storage_revision_tablename($field);
+
+      $all_langcodes = field_available_languages($entity_type, $field);
+      $field_langcodes = array_intersect($all_langcodes, array_keys((array) $entity->$field_name));
+
+      // Delete and insert, rather than update, in case a value was added.
+      if ($op == FIELD_STORAGE_UPDATE) {
+        // Delete language codes present in the incoming $entity->$field_name.
+        // Delete all language codes if $entity->$field_name is empty.
+        $langcodes = !empty($entity->$field_name) ? $field_langcodes : $all_langcodes;
+        if ($langcodes) {
+          // Only overwrite the field's base table if saving the default revision
+          // of an entity.
+          if ($entity->isDefaultRevision()) {
+            $this->database->delete($table_name)
+              ->condition('entity_type', $entity_type)
+              ->condition('entity_id', $id)
+              ->condition('langcode', $langcodes, 'IN')
+              ->execute();
+          }
+          $this->database->delete($revision_name)
+            ->condition('entity_type', $entity_type)
+            ->condition('entity_id', $id)
+            ->condition('revision_id', $vid)
+            ->condition('langcode', $langcodes, 'IN')
+            ->execute();
+        }
+      }
+
+      // Prepare the multi-insert query.
+      $do_insert = FALSE;
+      $columns = array('entity_type', 'entity_id', 'revision_id', 'bundle', 'delta', 'langcode');
+      foreach ($field['columns'] as $column => $attributes) {
+        $columns[] = _field_sql_storage_columnname($field_name, $column);
+      }
+      $query = $this->database->insert($table_name)->fields($columns);
+      $revision_query = $this->database->insert($revision_name)->fields($columns);
+
+      foreach ($field_langcodes as $langcode) {
+        $items = (array) $entity->{$field_name}[$langcode];
+        $delta_count = 0;
+        foreach ($items as $delta => $item) {
+          // We now know we have someting to insert.
+          $do_insert = TRUE;
+          $record = array(
+            'entity_type' => $entity_type,
+            'entity_id' => $id,
+            'revision_id' => $vid,
+            'bundle' => $bundle,
+            'delta' => $delta,
+            'langcode' => $langcode,
+          );
+          foreach ($field['columns'] as $column => $attributes) {
+            $column_name = _field_sql_storage_columnname($field_name, $column);
+            $value = isset($item[$column]) ? $item[$column] : NULL;
+            // Serialize the value if specified in the column schema.
+            $record[$column_name] = (!empty($attributes['serialize'])) ? serialize($value) : $value;
+          }
+          $query->values($record);
+          if (isset($vid)) {
+            $revision_query->values($record);
+          }
+
+          if ($field['cardinality'] != FIELD_CARDINALITY_UNLIMITED && ++$delta_count == $field['cardinality']) {
+            break;
+          }
+        }
+      }
+
+      // Execute the query if we have values to insert.
+      if ($do_insert) {
+        // Only overwrite the field's base table if saving the default revision
+        // of an entity.
+        if ($entity->isDefaultRevision()) {
+          $query->execute();
+        }
+        $revision_query->execute();
+      }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function dofieldDelete(EntityInterface $entity) {
+    foreach ($this->fieldInfo->getBundleInstances($entity->getType(), $entity->bundle()) as $instance) {
+      $field = $instance->getField();
+      $table_name = _field_sql_storage_tablename($field);
+      $revision_name = _field_sql_storage_revision_tablename($field);
+      $this->database->delete($table_name)
+        ->condition('entity_type', $entity->entityType())
+        ->condition('entity_id', $entity->id())
+        ->execute();
+      $this->database->delete($revision_name)
+        ->condition('entity_type', $entity->entityType())
+        ->condition('entity_id', $entity->id())
+        ->execute();
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function doFieldRevisionDelete(EntityInterface $entity) {
+    $vid = $entity->getRevisionId();
+    if (isset($vid)) {
+      foreach ($this->fieldInfo->getBundleInstances($entity->getType(), $entity->bundle()) as $instance) {
+        $revision_name = _field_sql_storage_revision_tablename($instance->getField());
+        db_delete($revision_name)
+          ->condition('entity_type', $entity->entityType())
+          ->condition('entity_id', $entity->id())
+          ->condition('revision_id', $vid)
+          ->execute();
+      }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function bundleRename($bundle, $bundle_new) {
+    // We need to account for deleted or inactive fields and instances.
+    $instances = field_read_instances(array('entity_type' => $this->entityType, 'bundle' => $bundle_new), array('include_deleted' => TRUE, 'include_inactive' => TRUE));
+    foreach ($instances as $instance) {
+      $field = field_info_field_by_id($instance['field_id']);
+      if ($field['storage']['type'] == 'field_sql_storage') {
+        $table_name = _field_sql_storage_tablename($field);
+        $revision_name = _field_sql_storage_revision_tablename($field);
+        db_update($table_name)
+          ->fields(array('bundle' => $bundle_new))
+          ->condition('entity_type', $this->entityType)
+          ->condition('bundle', $bundle)
+          ->execute();
+        db_update($revision_name)
+          ->fields(array('bundle' => $bundle_new))
+          ->condition('entity_type', $this->entityType)
+          ->condition('bundle', $bundle)
+          ->execute();
+      }
+    }
+
+  }
+
 }
