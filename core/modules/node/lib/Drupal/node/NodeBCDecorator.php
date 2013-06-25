@@ -115,7 +115,7 @@ class NodeBCDecorator extends EntityBCDecorator implements NodeInterface {
    * {@inheritdoc}
    */
   public function setRevisionCreationTime($timestamp) {
-    return $this->decorated->gsetRevisionCreationTime($timestamp);
+    return $this->decorated->setRevisionCreationTime($timestamp);
   }
 
   /**
