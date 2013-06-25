@@ -21,21 +21,21 @@ class ViewsTaxonomyAutocompleteTest extends ViewTestBase {
   /**
    * The taxonomy vocabulary created for this test.
    *
-   * @var \Drupal\taxonomy\Plugin\Core\Entity\Vocabulary
+   * @var \Drupal\taxonomy\VocabularyInterface
    */
   protected $vocabulary;
 
   /**
    * Stores the first term used in the different tests.
    *
-   * @var \Drupal\taxonomy\Plugin\Core\Entity\Term
+   * @var \Drupal\taxonomy\TermInterface
    */
   protected $term1;
 
   /**
    * Stores the second term used in the different tests.
    *
-   * @var \Drupal\taxonomy\Plugin\Core\Entity\Term
+   * @var \Drupal\taxonomy\TermInterface
    */
   protected $term2;
 
@@ -65,7 +65,7 @@ class ViewsTaxonomyAutocompleteTest extends ViewTestBase {
     $this->vocabulary->save();
 
     $this->term1 = $this->createTerm('term1');
-    $this->term2 = $this->createTerm('term2');
+    $this->term2 = $this->createTerm('another_term');
   }
 
   /**
@@ -84,7 +84,6 @@ class ViewsTaxonomyAutocompleteTest extends ViewTestBase {
     $expected = MapArray::copyValuesToKeys((array) $label);
     $this->assertIdentical($expected, $this->drupalGetJSON($base_autocomplete_path, array('query' => array('q' => $label))));
     // Test a term by partial name.
-    $expected = MapArray::copyValuesToKeys(array($this->term1->label(), $this->term2->label()));
     $partial = substr($label, 0, 2);
     $this->assertIdentical($expected, $this->drupalGetJSON($base_autocomplete_path, array('query' => array('q' => $partial))));
   }
