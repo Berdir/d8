@@ -66,7 +66,7 @@ class CacheDecoratorTest extends StorageTestBase {
       $this->assertEqual($stores[$i]->get('key'), $this->objects[$i]);
 
       // Reset the cache and make sure the value was updated.
-      $stores[$i]->reset();
+      $stores[$i]->clear();
       $this->assertNull($stores[$i]->get('key'));
     }
   }

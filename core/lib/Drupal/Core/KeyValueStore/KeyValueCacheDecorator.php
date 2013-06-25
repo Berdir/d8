@@ -118,7 +118,7 @@ class KeyValueCacheDecorator extends CacheCollector implements KeyValueStoreInte
     $this->keyValueStore->setMultiple($data);
     foreach ($data as $key => $value) {
       parent::set($key, $value);
-      $this->keysToPersist[$key] = $value;
+      $this->persist($key);
     }
   }
 
@@ -136,7 +136,7 @@ class KeyValueCacheDecorator extends CacheCollector implements KeyValueStoreInte
    */
   public function deleteAll() {
     $this->keyValueStore->deleteAll();
-    $this->cache->delete($this->cid);
+    $this->clear();
   }
 
 }
