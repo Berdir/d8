@@ -114,21 +114,6 @@ function _field_sql_storage_indexname($name, $index) {
 }
 
 /**
- * Returns the database schema for a field.
- *
- * This may contain one or more tables. Each table will contain the columns
- * relevant for the specified field. Leave the $field's 'columns' and 'indexes'
- * keys empty to get only the base schema.
- *
- * @param $field
- *   The field structure for which to generate a database schema.
- * @return
- *   One or more tables representing the schema for the field.
- */
-function _field_sql_storage_schema($field) {
-}
-
-/**
  * Implements hook_field_update_forbid().
  *
  * Forbids any field update that changes column definitions if there is any
