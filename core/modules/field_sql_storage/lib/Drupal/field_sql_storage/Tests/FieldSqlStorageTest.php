@@ -332,7 +332,7 @@ class FieldSqlStorageTest extends EntityUnitTestBase {
 
     // Update: Field translation is NULL but field is not empty. Translation
     // data should be wiped.
-    $entity->{$this->field_name} = NULL;
+    $entity->getBCEntity()->{$this->field_name}[Language::LANGCODE_NOT_SPECIFIED] = NULL;
     field_attach_update($entity);
     $count = db_select($this->table)
       ->countQuery()
