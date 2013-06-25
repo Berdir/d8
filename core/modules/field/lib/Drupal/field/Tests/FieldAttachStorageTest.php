@@ -52,7 +52,7 @@ class FieldAttachStorageTest extends FieldUnitTestBase {
    */
   function testFieldAttachSaveLoad() {
     $entity_type = 'entity_test_rev';
-    $this->createFieldWithInstance($entity_type);
+    $this->createFieldWithInstance('', $entity_type);
 
     // Configure the instance so that we test hook_field_load() (see
     // field_test_field_load() in field_test.module).
@@ -111,7 +111,6 @@ class FieldAttachStorageTest extends FieldUnitTestBase {
    */
   function testFieldAttachLoadMultiple() {
     $entity_type = 'entity_test';
-    $this->createFieldWithInstance($entity_type);
 
     // Define 2 bundles.
     $bundles = array(
@@ -276,7 +275,7 @@ class FieldAttachStorageTest extends FieldUnitTestBase {
    */
   function testFieldAttachSaveMissingData() {
     $entity_type = 'entity_test_rev';
-    $this->createFieldWithInstance($entity_type);
+    $this->createFieldWithInstance('', $entity_type);
 
     $entity_init = entity_create($entity_type, array('id' => 1, 'revision_id' => 1));
 
@@ -338,7 +337,7 @@ class FieldAttachStorageTest extends FieldUnitTestBase {
    */
   function testFieldAttachSaveMissingDataDefaultValue() {
     $entity_type = 'entity_test_rev';
-    $this->createFieldWithInstance($entity_type);
+    $this->createFieldWithInstance('', $entity_type);
 
     // Add a default value function.
     $this->instance['default_value_function'] = 'field_test_default_value';
@@ -370,7 +369,7 @@ class FieldAttachStorageTest extends FieldUnitTestBase {
    */
   function testFieldAttachDelete() {
     $entity_type = 'entity_test_rev';
-    $this->createFieldWithInstance($entity_type);
+    $this->createFieldWithInstance('', $entity_type);
     $rev[0] = entity_create($entity_type, array('id' => 0, 'revision_id' => 0, 'type' => $this->instance['bundle']));
 
     // Create revision 0
@@ -425,7 +424,7 @@ class FieldAttachStorageTest extends FieldUnitTestBase {
    */
   function testEntityCreateRenameBundle() {
     $entity_type = 'entity_test_rev';
-    $this->createFieldWithInstance($entity_type);
+    $this->createFieldWithInstance('', $entity_type);
 
     // Create a new bundle.
     $new_bundle = 'test_bundle_' . drupal_strtolower($this->randomName());
@@ -465,7 +464,7 @@ class FieldAttachStorageTest extends FieldUnitTestBase {
    */
   function testEntityDeleteBundle() {
     $entity_type = 'entity_test_rev';
-    $this->createFieldWithInstance($entity_type);
+    $this->createFieldWithInstance('', $entity_type);
 
     // Create a new bundle.
     $new_bundle = 'test_bundle_' . drupal_strtolower($this->randomName());

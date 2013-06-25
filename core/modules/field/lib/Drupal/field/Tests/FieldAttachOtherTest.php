@@ -45,7 +45,7 @@ class FieldAttachOtherTest extends FieldUnitTestBase {
    * Test field_attach_view() and field_attach_prepare_view().
    */
   function testFieldAttachView() {
-    $this->createFieldWithInstance('entity_test', '_2');
+    $this->createFieldWithInstance('_2');
 
     $entity_type = 'entity_test';
     $entity_init = entity_create($entity_type, array());
@@ -341,7 +341,7 @@ class FieldAttachOtherTest extends FieldUnitTestBase {
    * widgets show up.
    */
   function testFieldAttachForm() {
-    $this->createFieldWithInstance('entity_test', '_2');
+    $this->createFieldWithInstance('_2');
 
     $entity_type = 'entity_test';
     $entity = entity_create($entity_type, array('id' => 1, 'revision_id' => 1, 'type' => $this->instance['bundle']));
@@ -383,7 +383,7 @@ class FieldAttachOtherTest extends FieldUnitTestBase {
    * Test field_attach_extract_form_values().
    */
   function testFieldAttachExtractFormValues() {
-    $this->createFieldWithInstance('entity_test', '_2');
+    $this->createFieldWithInstance('_2');
 
     $entity_type = 'entity_test';
     $entity_init = entity_create($entity_type, array('id' => 1, 'revision_id' => 1, 'type' => $this->instance['bundle']));
