@@ -102,7 +102,7 @@ function entity_get_bundles($entity_type = NULL) {
  */
 function entity_invoke_bundle_hook($hook, $entity_type, $bundle, $bundle_new = NULL) {
   entity_info_cache_clear();
-  $method = 'bundle' . ucfirst($hook);
+  $method = 'handleBundle' . ucfirst($hook);
   Drupal::entityManager()->getStorageController($entity_type)->$method($bundle, $bundle_new);
   module_invoke_all('entity_bundle_' . $hook, $entity_type, $bundle, $bundle_new);
 }

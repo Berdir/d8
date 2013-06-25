@@ -737,7 +737,7 @@ class DatabaseStorageController extends EntityStorageControllerBase {
     if (isset($vid)) {
       foreach ($this->fieldInfo->getBundleInstances($entity->getType(), $entity->bundle()) as $instance) {
         $revision_name = _field_sql_storage_revision_tablename($instance->getField());
-        db_delete($revision_name)
+        $this->database->delete($revision_name)
           ->condition('entity_type', $entity->entityType())
           ->condition('entity_id', $entity->id())
           ->condition('revision_id', $vid)
@@ -749,7 +749,7 @@ class DatabaseStorageController extends EntityStorageControllerBase {
   /**
    * {@inheritdoc}
    */
-  public function bundleRename($bundle, $bundle_new) {
+  public function handleBundleRename($bundle, $bundle_new) {
     // We need to account for deleted or inactive fields and instances.
     $instances = field_read_instances(array('entity_type' => $this->entityType, 'bundle' => $bundle_new), array('include_deleted' => TRUE, 'include_inactive' => TRUE));
     foreach ($instances as $instance) {
@@ -757,12 +757,12 @@ class DatabaseStorageController extends EntityStorageControllerBase {
       if ($field['storage']['type'] == 'field_sql_storage') {
         $table_name = _field_sql_storage_tablename($field);
         $revision_name = _field_sql_storage_revision_tablename($field);
-        db_update($table_name)
+        $this->database->update($table_name)
           ->fields(array('bundle' => $bundle_new))
           ->condition('entity_type', $this->entityType)
           ->condition('bundle', $bundle)
           ->execute();
-        db_update($revision_name)
+        $this->database->update($revision_name)
           ->fields(array('bundle' => $bundle_new))
           ->condition('entity_type', $this->entityType)
           ->condition('bundle', $bundle)
@@ -782,10 +782,89 @@ class DatabaseStorageController extends EntityStorageControllerBase {
   /**
    * {@inheritdoc}
    */
-  public function insertField(Field $field) {
+  public function handleInsertField(Field $field) {
     $schema = $this->fieldSchema($field);
     foreach ($schema as $name => $table) {
-      db_create_table($name, $table);
+      $this->database->schema()->createTable($name, $table);
+    }
+  }
+
+  public function handleUpdateField(Field $field, Field $original) {
+    if (!$field->hasData()) {
+      // There is no data. Re-create the tables completely.
+
+      if ($this->database->supportsTransactionalDDL()) {
+        // If the database supports transactional DDL, we can go ahead and rely
+        // on it. If not, we will have to rollback manually if something fails.
+        $transaction = $this->database->startTransaction();
+      }
+
+      try {
+        $original_schema = $this->fieldSchema($original);
+        foreach ($original_schema as $name => $table) {
+          $this->database->schema()->dropTable($name, $table);
+        }
+        $schema = $this->fieldSchema($field);
+        foreach ($schema as $name => $table) {
+          $this->database->schema()->createTable($name, $table);
+        }
+      }
+      catch (\Exception $e) {
+        if ($this->database->supportsTransactionalDDL()) {
+          $transaction->rollback();
+        }
+        else {
+          // Recreate tables.
+          $original_schema = $this->fieldSchema($original);
+          foreach ($original_schema as $name => $table) {
+            if (!$this->database->schema()->tableExists($name)) {
+              $this->database->schema()->createTable($name, $table);
+            }
+          }
+        }
+        throw $e;
+      }
+    }
+    else {
+      // There is data, so there are no column changes. Drop all the
+      // prior indexes and create all the new ones, except for all the
+      // priors that exist unchanged.
+      $table = _field_sql_storage_tablename($original);
+      $revision_table = _field_sql_storage_revision_tablename($original);
+
+      $schema = $field->getSchema();
+      $original_schema = $original->getSchema();
+
+      foreach ($original_schema['indexes'] as $name => $columns) {
+        if (!isset($schema['indexes'][$name]) || $columns != $schema['indexes'][$name]) {
+          $real_name = _field_sql_storage_indexname($field['field_name'], $name);
+          $this->database->schema()->dropIndex($table, $real_name);
+          $this->database->schema()->dropIndex($revision_table, $real_name);
+        }
+      }
+      $table = _field_sql_storage_tablename($field);
+      $revision_table = _field_sql_storage_revision_tablename($field);
+      foreach ($schema['indexes'] as $name => $columns) {
+        if (!isset($original_schema['indexes'][$name]) || $columns != $original_schema['indexes'][$name]) {
+          $real_name = _field_sql_storage_indexname($field['field_name'], $name);
+          $real_columns = array();
+          foreach ($columns as $column_name) {
+            // Indexes can be specified as either a column name or an array with
+            // column name and length. Allow for either case.
+            if (is_array($column_name)) {
+              $real_columns[] = array(
+                _field_sql_storage_columnname($field['field_name'], $column_name[0]),
+                $column_name[1],
+              );
+            }
+            else {
+              $real_columns[] = _field_sql_storage_columnname($field['field_name'], $column_name);
+            }
+          }
+          $this->database->schema()->addIndex($table, $real_name, $real_columns);
+          $this->database->schema()->addIndex($revision_table, $real_name, $real_columns);
+        }
+      }
     }
   }
 

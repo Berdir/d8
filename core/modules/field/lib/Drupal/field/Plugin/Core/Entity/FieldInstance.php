@@ -363,7 +363,6 @@ class FieldInstance extends ConfigEntityBase implements FieldInstanceInterface {
     $this->field->setStorageType($instance_controller->storageType());
     if (!$storage_type) {
       $this->field->save();
-      $instance_controller->insertField($this->field);
     }
 
     // Assign the ID.
@@ -384,7 +383,6 @@ class FieldInstance extends ConfigEntityBase implements FieldInstanceInterface {
     $result = parent::save();
     field_cache_clear();
 
-    $instance_controller->insertFieldInstance($this);
     return $result;
   }
 

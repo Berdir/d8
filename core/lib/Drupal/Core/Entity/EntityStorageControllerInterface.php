@@ -170,7 +170,7 @@ interface EntityStorageControllerInterface {
    * @param string $bundle
    *   The name of the bundle created.
    */
-  public function bundleCreate($bundle);
+  public function handleBundleCreate($bundle);
 
   /**
    * Allows reaction to a bundle being renamed.
@@ -180,7 +180,7 @@ interface EntityStorageControllerInterface {
    * @param string $bundle_new
    *   The new name of the bundle.
    */
-  public function bundleRename($bundle, $bundle_new);
+  public function handleBundleRename($bundle, $bundle_new);
 
   /**
    * Allows reaction to a bundle being deleted.
@@ -188,7 +188,7 @@ interface EntityStorageControllerInterface {
    * @param string $bundle
    *   The name of the bundle being deleted.
    */
-  public function bundleDelete($bundle);
+  public function handleBundleDelete($bundle);
 
   /**
    * The type of storage, for example 'sql'.
@@ -199,12 +199,15 @@ interface EntityStorageControllerInterface {
 
   /**
    * Allows reaction to the creation of a configurable field.
+   *
+   * This function is actually called when the first instance is created
+   * as the field does not have a storage before.
    */
-  public function insertField(Field $field);
+  public function handleInsertField(Field $field);
 
   /**
-   * Allows reaction to the creation of a configurable field instance.
+   * Allows reaction to the update of a configurable field.
    */
-  public function insertFieldInstance(FieldInstance $instance);
+  public function handleUpdateField(Field $field, Field $original);
 
 }

@@ -390,7 +390,12 @@ class Field extends ConfigEntityBase implements FieldInterface {
     // hook_field_storage_update_field(). The storage engine can reject the
     // definition update as invalid by raising an exception, which stops
     // execution before the definition is written to config.
-    $module_handler->invoke($this->storage['module'], 'field_storage_update_field', array($this, $original));
+    if ($this->storageType == $original->storageType) {
+      $storage_controller->handleUpdateField($this, $original);
+    }
+    else {
+      $storage_controller->handleInsertField($this);
+    }
 
     // Save the configuration.
     $result = parent::save();

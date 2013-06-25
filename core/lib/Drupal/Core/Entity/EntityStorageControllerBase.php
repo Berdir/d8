@@ -487,14 +487,14 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
   /**
    * {@inheritdoc}
    */
-  public function bundleCreate($bundle) {
+  public function handleBundleCreate($bundle) {
 
   }
 
   /**
    * {@inheritdoc}
    */
-  public function bundleRename($bundle, $bundle_new) {
+  public function handleBundleRename($bundle, $bundle_new) {
 
   }
 
@@ -502,21 +502,22 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
   /**
    * {@inheritdoc}
    */
-  public function bundleDelete($bundle) {
+  public function handleBundleDelete($bundle) {
 
   }
 
   /**
    * {@inheritdoc}
    */
-  public function insertField(Field $field) {
+  public function handleInsertField(Field $field) {
 
   }
 
   /**
    * {@inheritdoc}
    */
-  public function insertFieldInstance(FieldInstance $field) {
+  public function handleUpdateField(Field $field, Field $original) {
 
   }
+
 }

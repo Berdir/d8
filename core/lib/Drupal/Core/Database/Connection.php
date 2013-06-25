@@ -759,7 +759,7 @@ abstract class Connection implements \Serializable {
    *
    * This method will lazy-load the appropriate schema library file.
    *
-   * @return Drupal\Core\Database\Schema
+   * @return \Drupal\Core\Database\Schema
    *   The database Schema object for this connection.
    */
   public function schema() {
