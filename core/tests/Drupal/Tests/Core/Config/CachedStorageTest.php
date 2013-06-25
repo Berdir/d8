@@ -52,7 +52,7 @@ class CachedStorageTest extends UnitTestCase {
 
     $response = array("$prefix." . $this->randomName(), "$prefix." . $this->randomName());
     $cache = new MemoryBackend(__FUNCTION__);
-    $cache->set('list:' . $prefix, $response);
+    $cache->set('find:' . $prefix, $response);
     $cachedStorage = new CachedStorage($storage, $cache);
     $this->assertEquals($response, $cachedStorage->listAll($prefix));
   }
