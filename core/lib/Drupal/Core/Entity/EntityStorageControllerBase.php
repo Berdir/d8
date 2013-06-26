@@ -526,4 +526,40 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
   public function handleInstanceDelete(FieldInstance $instance) {
 
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function handleDeleteField(Field $field) {
+
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function fieldPurgeData($entity_id, Field $field, FieldInstance $instance) {
+    $values = $this->fieldValues($entity_id, $field, $instance);
+    foreach ($values as $value) {
+      $definition = _field_generate_entity_field_definition($field, $instance);
+      $items = \Drupal::typedData()->create($definition, $value, $field->id());
+      $items->delete();
+    }
+  }
+
+  abstract protected function fieldValues($entity_id, Field $field, FieldInstance $instance);
+
+  /**
+   * {@inheritdoc}
+   */
+  public function fieldPurge(Field $field) {
+    // TODO: Implement fieldPurge() method.
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function fieldUpdateForbid(Field $field, Field $prior_field) {
+
+  }
+
 }

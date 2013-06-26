@@ -363,7 +363,6 @@ class Field extends ConfigEntityBase implements FieldInterface {
    *   In case of failures at the configuration storage level.
    */
   protected function saveUpdated() {
-    $module_handler = \Drupal::moduleHandler();
     $storage_controller = \Drupal::entityManager()->getStorageController($this->entityType);
 
     $original = $storage_controller->loadUnchanged($this->id());
@@ -384,24 +383,31 @@ class Field extends ConfigEntityBase implements FieldInterface {
 
     // See if any module forbids the update by throwing an exception. This
     // invokes hook_field_update_forbid().
-    $module_handler->invokeAll('field_update_forbid', array($this, $original));
+    if ($this->storageType) {
+      $data_storage_controller = $this->dataStorageController();
+      if ($this->storageType == $original->storageType) {
+        // Tell the storage engine to update the field by invoking the
+        // hook_field_storage_update_field(). The storage engine can reject
+        // the definition update as invalid by raising an exception, which
+        // stops execution before the definition is written to config.
+        $data_storage_controller->handleUpdateField($this, $original);
+      }
+      else {
+        $data_storage_controller->handleInsertField($this);
+      }
+    }
 
-    // Tell the storage engine to update the field by invoking the
-    // hook_field_storage_update_field(). The storage engine can reject the
-    // definition update as invalid by raising an exception, which stops
-    // execution before the definition is written to config.
-    if ($this->storageType == $original->storageType) {
-      $storage_controller->handleUpdateField($this, $original);
-    }
-    else {
-      $storage_controller->handleInsertField($this);
-    }
 
     // Save the configuration.
     $result = parent::save();
     field_cache_clear();
 
     return $result;
+  }
+
+  protected function dataStorageController() {
+    $entity_types = array_keys($this->getBundles());
+    return \Drupal::entityManager()->getStorageController($entity_types[0]);
   }
 
   /**
@@ -412,6 +418,7 @@ class Field extends ConfigEntityBase implements FieldInterface {
       $module_handler = \Drupal::moduleHandler();
       $instance_controller = \Drupal::entityManager()->getStorageController('field_instance');
       $state = \Drupal::state();
+      $entity_type = '';
 
       // Delete all non-deleted instances.
       $instance_ids = array();
@@ -428,10 +435,9 @@ class Field extends ConfigEntityBase implements FieldInterface {
         $instance->delete(FALSE);
       }
 
-      // Mark field data for deletion.
-
-      // hook_field_storage_delete_field().
-      $module_handler->invoke($this->storage['module'], 'field_storage_delete_field', array($this));
+      if ($entity_type) {
+        \Drupal::entityManager()->getStorageController($entity_type)->handleDeleteField($this);
+      }
 
       // Delete the configuration of this field and save the field configuration
       // in the key_value table so we can use it later during

@@ -254,19 +254,8 @@ function field_purge_batch($batch_size) {
     $results = $query->execute();
 
     if ($results) {
-      $entities = array();
-      foreach ($results as $revision_id => $entity_id) {
-        // This might not be the revision id if the entity type does not support
-        // revisions but _field_create_entity_from_ids() checks that and
-        // disregards this value so there is no harm setting it.
-        $ids->revision_id = $revision_id;
-        $ids->entity_id = $entity_id;
-        $entities[$entity_id] = _field_create_entity_from_ids($ids);
-      }
-      field_attach_load($entity_type, $entities, FIELD_LOAD_CURRENT, array('instance' => $instance));
-      foreach ($entities as $entity) {
-        // Purge the data for the entity.
-        field_purge_data($entity, $field, $instance);
+      foreach ($results as $entity_id) {
+        field_purge_data($entity_id, $field, $instance);
       }
     }
     else {
@@ -287,33 +276,25 @@ function field_purge_batch($batch_size) {
 }
 
 /**
- * Purges the field data for a single field on a single pseudo-entity.
+ * Purges the field data for a single field on a single entity.
  *
  * This is basically the same as field_attach_delete() except it only applies to
  * a single field. The entity itself is not being deleted, and it is quite
  * possible that other field data will remain attached to it.
  *
- * @param \Drupal\Core\Entity\EntityInterface $entity
- *   The pseudo-entity whose field data is being purged.
+ * @param int $entity_id
+ *   The entity id for the entity whose field data is being purged.
  * @param $field
  *   The (possibly deleted) field whose data is being purged.
  * @param $instance
  *   The deleted field instance whose data is being purged.
  */
-function field_purge_data(EntityInterface $entity, $field, $instance) {
-  foreach ($entity->{$field->id()} as $value) {
-    $definition = _field_generate_entity_field_definition($field, $instance);
-    $items = \Drupal::typedData()->create($definition, $value, $field->id(), $entity);
-    $items->delete();
-  }
-
-  // Tell the field storage system to purge the data.
-  module_invoke($field['storage']['module'], 'field_storage_purge', $entity, $field, $instance);
-
+function field_purge_data($entity_id, Field $field, FieldInstance $instance) {
+  Drupal::entityManager()->getStorageController($instance->entity_type)->fieldPurgeData($entity_id, $field, $instance);
   // Let other modules act on purging the data.
   foreach (module_implements('field_attach_purge') as $module) {
     $function = $module . '_field_attach_purge';
-    $function($entity, $field, $instance);
+    $function($entity_id, $field, $instance);
   }
 }
 

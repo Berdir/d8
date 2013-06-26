@@ -211,7 +211,33 @@ interface EntityStorageControllerInterface {
   public function handleUpdateField(Field $field, Field $original);
 
   /**
+   * Allows reaction to the deletion of a configurable field.
+   */
+  public function handleDeleteField(Field $field);
+
+  /**
    * Allows reaction to the deletion of a configurable field instance.
    */
   public function handleInstanceDelete(FieldInstance $instance);
+
+  /**
+   * Purges the field data for a single field on a single entity.
+   *
+   * The entity itself is not being deleted, and it is quite possible that
+   * other field data will remain attached to it.
+   *
+   * @param int $entity_id
+   *   The entity id for the entity whose field data is being purged.
+   * @param $field
+   *   The (possibly deleted) field whose data is being purged.
+   * @param $instance
+   *   The deleted field instance whose data is being purged.
+   */
+  public function fieldPurgeData($entity_id, Field $field, FieldInstance $instance);
+
+  /**
+   * All the field data is gone, final cleanup.
+   */
+  public function fieldPurge(Field $field);
+
 }

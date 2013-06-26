@@ -9,6 +9,7 @@ namespace Drupal\Core\Entity;
 
 use Drupal\Core\Language\Language;
 use Drupal\field\FieldInfo;
+use Drupal\field\FieldUpdateForbiddenException;
 use Drupal\field\Plugin\Core\Entity\Field;
 use Drupal\field\Plugin\Core\Entity\FieldInstance;
 use PDO;
@@ -827,6 +828,9 @@ class DatabaseStorageController extends EntityStorageControllerBase {
       }
     }
     else {
+      if ($field['columns'] != $original['columns']) {
+        throw new FieldUpdateForbiddenException("field_sql_storage cannot change the schema for an existing field with data.");
+      }
       // There is data, so there are no column changes. Drop all the
       // prior indexes and create all the new ones, except for all the
       // priors that exist unchanged.
@@ -1040,7 +1044,7 @@ class DatabaseStorageController extends EntityStorageControllerBase {
    *   A string containing a generated index name for a field data table that is
    *   unique among all other fields.
    */
-  protected function fieldindexName($name, $index) {
+  protected function fieldIndexName($name, $index) {
     return $name . '_' . $index;
   }
 
@@ -1078,4 +1082,66 @@ class DatabaseStorageController extends EntityStorageControllerBase {
       ->condition('bundle', $instance['bundle'])
       ->execute();
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function handleDeleteField(Field $field) {
+    // Mark all data associated with the field for deletion.
+    $field['deleted'] = FALSE;
+    $table = $this->fieldTableName($field);
+    $revision_table = $this->fieldRevisionTableName($field);
+    $this->database->update($table)
+      ->fields(array('deleted' => 1))
+      ->execute();
+
+    // Move the table to a unique name while the table contents are being deleted.
+    $field['deleted'] = TRUE;
+    $new_table = $this->fieldTableName($field);
+    $revision_new_table = $this->fieldRevisionTableName($field);
+    $this->database->schema()->renameTable($table, $new_table);
+    $this->database->schema()->renameTable($revision_table, $revision_new_table);
+  }
+
+
+
+  /**
+   * {@inheritdoc}
+   */
+  public function fieldPurgeData($entity_id, Field $field, FieldInstance $instance) {
+    $table_name = $this->fieldTableName($field);
+    $revision_name = $this->fieldRevisionTableName($field);
+    $this->database->delete($table_name)
+      ->condition('entity_type', $instance->entity_type)
+      ->condition('entity_id', $entity_id)
+      ->execute();
+    $this->database->delete($revision_name)
+      ->condition('entity_type', $instance->entity_type)
+      ->condition('entity_id', $entity_id)
+      ->execute();
+  }
+
+  protected function fieldValues($entity_id, Field $field, FieldInstance $instance) {
+    $field_name = $field->id();
+    $columns = array();
+    foreach ($field->getColumns() as $column_name => $data) {
+      $columns[] = $this->fieldColumnName($field_name, $column_name);
+    }
+    return $this->database->select($this->fieldTableName($field), 't')
+      ->fields('t', $columns)
+      ->condition('entity_id', $entity_id)
+      ->execute()
+      ->fetchAllAssoc();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function fieldPurge(Field $field) {
+    $table_name = $this->fieldTableName($field);
+    $revision_name = $this->fieldRevisionTableName($field);
+    $this->database->schema()->dropTable($table_name);
+    $this->database->schema()->dropTable($revision_name);
+  }
+
 }
