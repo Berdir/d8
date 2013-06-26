@@ -8,6 +8,7 @@
  */
 
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Entity\DatabaseStorageController;
 
 /**
  * Implements hook_views_data().
@@ -99,8 +100,8 @@ function field_views_field_default_views_data($field) {
 
   $data = array();
 
-  $current_table = _field_sql_storage_tablename($field);
-  $revision_table = _field_sql_storage_revision_tablename($field);
+  $current_table = DatabaseStorageController::fieldTableName($field);
+  $revision_table = DatabaseStorageController::fieldRevisionTableName($field);
 
   // The list of entity:bundle that this field is used in.
   $bundles_names = array();
@@ -172,7 +173,7 @@ function field_views_field_default_views_data($field) {
 
   $add_fields = array('delta', 'langcode', 'bundle');
   foreach ($field['columns'] as $column_name => $attributes) {
-    $add_fields[] = _field_sql_storage_columnname($field['field_name'], $column_name);
+    $add_fields[] = DatabaseStorageController::fieldColumnName($field['field_name'], $column_name);
   }
 
   // Note: we don't have a label available here, because we are at the field

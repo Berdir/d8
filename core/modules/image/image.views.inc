@@ -6,6 +6,7 @@
  *
  * @ingroup views_module_handlers
  */
+use Drupal\Core\Entity\DatabaseStorageController;
 
 /**
  * Implements hook_field_views_data().
@@ -51,7 +52,7 @@ function image_field_views_data_views_data_alter(&$data, $field) {
       'help' => t('Relate each @entity with a @field set to the image.', array('@entity' => $entity, '@field' => $label)),
       'id' => 'entity_reverse',
       'field_name' => $field['field_name'],
-      'field table' => _field_sql_storage_tablename($field),
+      'field table' => DatabaseStorageController::fieldTableName($field),
       'field field' => $field['field_name'] . '_fid',
       'base' => $entity_info['base_table'],
       'base field' => $entity_info['entity_keys']['id'],

@@ -7,6 +7,7 @@
 
 namespace Drupal\contact\Tests\Views;
 
+use Drupal\Core\Entity\DatabaseStorageController;
 use Drupal\views\Tests\ViewTestBase;
 
 /**
@@ -58,7 +59,7 @@ class ContactFieldsTest extends ViewTestBase {
    * Tests the views data generation.
    */
   public function testViewsData() {
-    $table_name = _field_sql_storage_tablename($this->field);
+    $table_name = DatabaseStorageController::fieldTableName($this->field);
     $data = $this->container->get('views.views_data')->get($table_name);
 
     // Test that the expected data array is returned.

@@ -563,7 +563,7 @@ class DatabaseStorageController extends EntityStorageControllerBase {
       }
     }
     foreach ($fields as $field_name => $field) {
-      $table = $load_current ? $this->fieldTableName($field) : $this->fieldRevisionTableName($field);
+      $table = $load_current ? static::fieldTableName($field) : static::fieldRevisionTableName($field);
 
       $query = $this->database->select($table, 't')
         ->fields('t')
@@ -589,7 +589,7 @@ class DatabaseStorageController extends EntityStorageControllerBase {
           // For each column declared by the field, populate the item
           // from the prefixed database column.
           foreach ($field['columns'] as $column => $attributes) {
-            $column_name = $this->fieldColumnName($field_name, $column);
+            $column_name = static::fieldColumnName($field_name, $column);
             // Unserialize the value if specified in the column schema.
             $item[$column] = (!empty($attributes['serialize'])) ? unserialize($row->$column_name) : $row->$column_name;
           }
@@ -630,8 +630,8 @@ class DatabaseStorageController extends EntityStorageControllerBase {
 
     foreach ($this->fieldInfo->getBundleInstances($entity_type, $bundle) as $field_name => $instance) {
       $field = $instance->getField();
-      $table_name = $this->fieldTableName($field);
-      $revision_name = $this->fieldRevisionTableName($field);
+      $table_name = static::fieldTableName($field);
+      $revision_name = static::fieldRevisionTableName($field);
 
       $all_langcodes = field_available_languages($entity_type, $field);
       $field_langcodes = array_intersect($all_langcodes, array_keys((array) $entity->$field_name));
@@ -664,7 +664,7 @@ class DatabaseStorageController extends EntityStorageControllerBase {
       $do_insert = FALSE;
       $columns = array('entity_type', 'entity_id', 'revision_id', 'bundle', 'delta', 'langcode');
       foreach ($field['columns'] as $column => $attributes) {
-        $columns[] = $this->fieldColumnName($field_name, $column);
+        $columns[] = static::fieldColumnName($field_name, $column);
       }
       $query = $this->database->insert($table_name)->fields($columns);
       $revision_query = $this->database->insert($revision_name)->fields($columns);
@@ -684,7 +684,7 @@ class DatabaseStorageController extends EntityStorageControllerBase {
             'langcode' => $langcode,
           );
           foreach ($field['columns'] as $column => $attributes) {
-            $column_name = $this->fieldColumnName($field_name, $column);
+            $column_name = static::fieldColumnName($field_name, $column);
             $value = isset($item[$column]) ? $item[$column] : NULL;
             // Serialize the value if specified in the column schema.
             $record[$column_name] = (!empty($attributes['serialize'])) ? serialize($value) : $value;
@@ -718,8 +718,8 @@ class DatabaseStorageController extends EntityStorageControllerBase {
   protected function dofieldDelete(EntityInterface $entity) {
     foreach ($this->fieldInfo->getBundleInstances($entity->getType(), $entity->bundle()) as $instance) {
       $field = $instance->getField();
-      $table_name = $this->fieldTableName($field);
-      $revision_name = $this->fieldRevisionTableName($field);
+      $table_name = static::fieldTableName($field);
+      $revision_name = static::fieldRevisionTableName($field);
       $this->database->delete($table_name)
         ->condition('entity_type', $entity->entityType())
         ->condition('entity_id', $entity->id())
@@ -738,7 +738,7 @@ class DatabaseStorageController extends EntityStorageControllerBase {
     $vid = $entity->getRevisionId();
     if (isset($vid)) {
       foreach ($this->fieldInfo->getBundleInstances($entity->getType(), $entity->bundle()) as $instance) {
-        $revision_name = $this->fieldRevisionTableName($instance->getField());
+        $revision_name = static::fieldRevisionTableName($instance->getField());
         $this->database->delete($revision_name)
           ->condition('entity_type', $entity->entityType())
           ->condition('entity_id', $entity->id())
@@ -757,8 +757,8 @@ class DatabaseStorageController extends EntityStorageControllerBase {
     foreach ($instances as $instance) {
       $field = field_info_field_by_id($instance['field_id']);
       if ($field['storage']['type'] == 'field_sql_storage') {
-        $table_name = $this->fieldTableName($field);
-        $revision_name = $this->fieldRevisionTableName($field);
+        $table_name = static::fieldTableName($field);
+        $revision_name = static::fieldRevisionTableName($field);
         $this->database->update($table_name)
           ->fields(array('bundle' => $bundle_new))
           ->condition('entity_type', $this->entityType)
@@ -785,7 +785,7 @@ class DatabaseStorageController extends EntityStorageControllerBase {
    * {@inheritdoc}
    */
   public function handleInsertField(Field $field) {
-    $schema = $this->fieldSchema($field);
+    $schema = $this->fieldSqlSchema($field);
     foreach ($schema as $name => $table) {
       $this->database->schema()->createTable($name, $table);
     }
@@ -802,11 +802,11 @@ class DatabaseStorageController extends EntityStorageControllerBase {
       }
 
       try {
-        $original_schema = $this->fieldSchema($original);
+        $original_schema = $this->fieldSqlSchema($original);
         foreach ($original_schema as $name => $table) {
           $this->database->schema()->dropTable($name, $table);
         }
-        $schema = $this->fieldSchema($field);
+        $schema = $this->fieldSqlSchema($field);
         foreach ($schema as $name => $table) {
           $this->database->schema()->createTable($name, $table);
         }
@@ -817,7 +817,7 @@ class DatabaseStorageController extends EntityStorageControllerBase {
         }
         else {
           // Recreate tables.
-          $original_schema = $this->fieldSchema($original);
+          $original_schema = $this->fieldSqlSchema($original);
           foreach ($original_schema as $name => $table) {
             if (!$this->database->schema()->tableExists($name)) {
               $this->database->schema()->createTable($name, $table);
@@ -834,36 +834,36 @@ class DatabaseStorageController extends EntityStorageControllerBase {
       // There is data, so there are no column changes. Drop all the
       // prior indexes and create all the new ones, except for all the
       // priors that exist unchanged.
-      $table = $this->fieldTableName($original);
-      $revision_table = $this->fieldRevisionTableName($original);
+      $table = static::fieldTableName($original);
+      $revision_table = static::fieldRevisionTableName($original);
 
       $schema = $field->getSchema();
       $original_schema = $original->getSchema();
 
       foreach ($original_schema['indexes'] as $name => $columns) {
         if (!isset($schema['indexes'][$name]) || $columns != $schema['indexes'][$name]) {
-          $real_name = $this->fieldindexName($field['field_name'], $name);
+          $real_name = static::fieldindexName($field['field_name'], $name);
           $this->database->schema()->dropIndex($table, $real_name);
           $this->database->schema()->dropIndex($revision_table, $real_name);
         }
       }
-      $table = $this->fieldTableName($field);
-      $revision_table = $this->fieldRevisionTableName($field);
+      $table = static::fieldTableName($field);
+      $revision_table = static::fieldRevisionTableName($field);
       foreach ($schema['indexes'] as $name => $columns) {
         if (!isset($original_schema['indexes'][$name]) || $columns != $original_schema['indexes'][$name]) {
-          $real_name = $this->fieldindexName($field['field_name'], $name);
+          $real_name = static::fieldindexName($field['field_name'], $name);
           $real_columns = array();
           foreach ($columns as $column_name) {
             // Indexes can be specified as either a column name or an array with
             // column name and length. Allow for either case.
             if (is_array($column_name)) {
               $real_columns[] = array(
-                $this->fieldColumnName($field['field_name'], $column_name[0]),
+                static::fieldColumnName($field['field_name'], $column_name[0]),
                 $column_name[1],
               );
             }
             else {
-              $real_columns[] = $this->fieldColumnName($field['field_name'], $column_name);
+              $real_columns[] = static::fieldColumnName($field['field_name'], $column_name);
             }
           }
           $this->database->schema()->addIndex($table, $real_name, $real_columns);
@@ -873,7 +873,18 @@ class DatabaseStorageController extends EntityStorageControllerBase {
     }
   }
 
-  protected function fieldSchema(Field $field) {
+  /**
+   * Gets the SQL table schema.
+   *
+   * @private Calling this function circumvents the entity system and is
+   * strongly discouraged. This function is not considered part of the public
+   * API and modules relying on it might break even in minor releases.
+   *
+   * @param Field $field
+   *
+   * @return array
+   */
+  public static function fieldSqlSchema(Field $field) {
     $deleted = $field['deleted'] ? 'deleted ' : '';
     $current = array(
       'description' => "Data storage for {$deleted}field {$field['id']} ({$field['field_name']})",
@@ -941,34 +952,34 @@ class DatabaseStorageController extends EntityStorageControllerBase {
 
     // Add field columns.
     foreach ($schema['columns'] as $column_name => $attributes) {
-      $real_name = $this->fieldColumnName($field['field_name'], $column_name);
+      $real_name = static::fieldColumnName($field['field_name'], $column_name);
       $current['fields'][$real_name] = $attributes;
     }
 
     // Add indexes.
     foreach ($schema['indexes'] as $index_name => $columns) {
-      $real_name = $this->fieldindexName($field['field_name'], $index_name);
+      $real_name = static::fieldindexName($field['field_name'], $index_name);
       foreach ($columns as $column_name) {
         // Indexes can be specified as either a column name or an array with
         // column name and length. Allow for either case.
         if (is_array($column_name)) {
           $current['indexes'][$real_name][] = array(
-            $this->fieldColumnName($field['field_name'], $column_name[0]),
+            static::fieldColumnName($field['field_name'], $column_name[0]),
             $column_name[1],
           );
         }
         else {
-          $current['indexes'][$real_name][] = $this->fieldColumnName($field['field_name'], $column_name);
+          $current['indexes'][$real_name][] = static::fieldColumnName($field['field_name'], $column_name);
         }
       }
     }
 
     // Add foreign keys.
     foreach ($schema['foreign keys'] as $specifier => $specification) {
-      $real_name = $this->fieldindexName($field['field_name'], $specifier);
+      $real_name = static::fieldindexName($field['field_name'], $specifier);
       $current['foreign keys'][$real_name]['table'] = $specification['table'];
       foreach ($specification['columns'] as $column_name => $referenced) {
-        $sql_storage_column = $this->fieldColumnName($field['field_name'], $column_name);
+        $sql_storage_column = static::fieldColumnName($field['field_name'], $column_name);
         $current['foreign keys'][$real_name]['columns'][$sql_storage_column] = $referenced;
       }
     }
@@ -981,27 +992,34 @@ class DatabaseStorageController extends EntityStorageControllerBase {
     $revision['fields']['revision_id']['description'] = 'The entity revision id this data is attached to';
 
     return array(
-      $this->fieldTableName($field) => $current,
-      $this->fieldRevisionTableName($field) => $revision,
+      static::fieldTableName($field) => $current,
+      static::fieldRevisionTableName($field) => $revision,
     );
   }
 
   /**
    * Generates a table name for a field data table.
    *
-   * When a field is a deleted, the table is renamed to
-   * {field_deleted_data_FIELD_UUID}. To make sure we don't end up with table
-   * names longer than 64 characters, we hash the uuid and return the first 10
-   * characters so we end up with a short unique ID.
+   * @private Calling this function circumvents the entity system and is
+   * strongly discouraged. This function is not considered part of the public
+   * API and modules relying on it might break even in minor releases. Only
+   * call this function to write a query that \Drupal::entityQuery() does not
+   * support. Always call entity_load() before using the data found in the
+   * table.
    *
    * @param $field
    *   The field structure.
    *
    * @return
    *   A string containing the generated name for the database table.
+   *
    */
-  protected function fieldTableName($field) {
+  static public function fieldTableName($field) {
     if ($field['deleted']) {
+      // When a field is a deleted, the table is renamed to
+      // {field_deleted_data_FIELD_UUID}. To make sure we don't end up with
+      // table names longer than 64 characters, we hash the uuid and return
+      // the first 10 characters so we end up with a short unique ID.
       return "field_deleted_data_" . substr(hash('sha256', $field['uuid']), 0, 10);
     }
     else {
@@ -1012,10 +1030,12 @@ class DatabaseStorageController extends EntityStorageControllerBase {
   /**
    * Generates a table name for a field revision archive table.
    *
-   * When a field is a deleted, the table is renamed to
-   * {field_deleted_revision_FIELD_UUID}. To make sure we don't end up with table
-   * names longer than 64 characters, we hash the uuid and return the first
-   * 10 characters so we end up with a short unique ID.
+   * @private Calling this function circumvents the entity system and is
+   * strongly discouraged. This function is not considered part of the public
+   * API and modules relying on it might break even in minor releases. Only
+   * call this function to write a query that Drupal::entityQuery() does not
+   * support. Always call entity_load() before using the data found in the
+   * table.
    *
    * @param $name
    *   The field structure.
@@ -1023,8 +1043,12 @@ class DatabaseStorageController extends EntityStorageControllerBase {
    * @return
    *   A string containing the generated name for the database table.
    */
-  protected function fieldRevisionTableName($field) {
+  static public function fieldRevisionTableName($field) {
     if ($field['deleted']) {
+      // When a field is a deleted, the table is renamed to
+      // {field_deleted_revision_FIELD_UUID}. To make sure we don't end up
+      // with table names longer than 64 characters, we hash the uuid and
+      // return the first 10 characters so we end up with a short unique ID.
       return "field_deleted_revision_" . substr(hash('sha256', $field['uuid']), 0, 10);
     }
     else {
@@ -1035,6 +1059,10 @@ class DatabaseStorageController extends EntityStorageControllerBase {
   /**
    * Generates an index name for a field data table.
    *
+   * @private Calling this function circumvents the entity system and is
+   * strongly discouraged. This function is not considered part of the public
+   * API and modules relying on it might break even in minor releases.
+   *
    * @param $name
    *   The name of the field.
    * @param $column
@@ -1044,12 +1072,19 @@ class DatabaseStorageController extends EntityStorageControllerBase {
    *   A string containing a generated index name for a field data table that is
    *   unique among all other fields.
    */
-  protected function fieldIndexName($name, $index) {
+  static public function fieldIndexName($name, $index) {
     return $name . '_' . $index;
   }
 
   /**
    * Generates a column name for a field data table.
+   *
+   * @private Calling this function circumvents the entity system and is
+   * strongly discouraged. This function is not considered part of the public
+   * API and modules relying on it might break even in minor releases. Only
+   * call this function to write a query that \Drupal::entityQuery() does not
+   * support. Always call entity_load() before using the data found in the
+   * table.
    *
    * @param $name
    *   The name of the field.
@@ -1060,7 +1095,7 @@ class DatabaseStorageController extends EntityStorageControllerBase {
    *   A string containing a generated column name for a field data table that is
    *   unique among all other fields.
    */
-  protected function fieldColumnName($name, $column) {
+  static public function fieldColumnName($name, $column) {
     return in_array($column, Field::getReservedColumns()) ? $column : $name . '_' . $column;
   }
 
@@ -1069,8 +1104,8 @@ class DatabaseStorageController extends EntityStorageControllerBase {
    */
   public function handleInstanceDelete(FieldInstance $instance) {
     $field = $instance->getField()->getFieldName();
-    $table_name = $this->fieldTableName($field);
-    $revision_name = $this->fieldRevisionTableName($field);
+    $table_name = static::fieldTableName($field);
+    $revision_name = static::fieldRevisionTableName($field);
     $this->database->update($table_name)
       ->fields(array('deleted' => 1))
       ->condition('entity_type', $instance['entity_type'])
@@ -1089,16 +1124,16 @@ class DatabaseStorageController extends EntityStorageControllerBase {
   public function handleDeleteField(Field $field) {
     // Mark all data associated with the field for deletion.
     $field['deleted'] = FALSE;
-    $table = $this->fieldTableName($field);
-    $revision_table = $this->fieldRevisionTableName($field);
+    $table = static::fieldTableName($field);
+    $revision_table = static::fieldRevisionTableName($field);
     $this->database->update($table)
       ->fields(array('deleted' => 1))
       ->execute();
 
     // Move the table to a unique name while the table contents are being deleted.
     $field['deleted'] = TRUE;
-    $new_table = $this->fieldTableName($field);
-    $revision_new_table = $this->fieldRevisionTableName($field);
+    $new_table = static::fieldTableName($field);
+    $revision_new_table = static::fieldRevisionTableName($field);
     $this->database->schema()->renameTable($table, $new_table);
     $this->database->schema()->renameTable($revision_table, $revision_new_table);
   }
@@ -1108,8 +1143,8 @@ class DatabaseStorageController extends EntityStorageControllerBase {
    */
   public function fieldPurgeData($entity_id, Field $field, FieldInstance $instance) {
     parent::fieldPurgeData($entity_id, $field, $instance);
-    $table_name = $this->fieldTableName($field);
-    $revision_name = $this->fieldRevisionTableName($field);
+    $table_name = static::fieldTableName($field);
+    $revision_name = static::fieldRevisionTableName($field);
     $this->database->delete($table_name)
       ->condition('entity_type', $instance->entity_type)
       ->condition('entity_id', $entity_id)
@@ -1124,9 +1159,9 @@ class DatabaseStorageController extends EntityStorageControllerBase {
     $field_name = $field->id();
     $columns = array();
     foreach ($field->getColumns() as $column_name => $data) {
-      $columns[] = $this->fieldColumnName($field_name, $column_name);
+      $columns[] = static::fieldColumnName($field_name, $column_name);
     }
-    return $this->database->select($this->fieldTableName($field), 't')
+    return $this->database->select(static::fieldTableName($field), 't')
       ->fields('t', $columns)
       ->condition('entity_id', $entity_id)
       ->execute()
@@ -1137,8 +1172,8 @@ class DatabaseStorageController extends EntityStorageControllerBase {
    * {@inheritdoc}
    */
   public function fieldPurge(Field $field) {
-    $table_name = $this->fieldTableName($field);
-    $revision_name = $this->fieldRevisionTableName($field);
+    $table_name = static::fieldTableName($field);
+    $revision_name = static::fieldRevisionTableName($field);
     $this->database->schema()->dropTable($table_name);
     $this->database->schema()->dropTable($revision_name);
   }

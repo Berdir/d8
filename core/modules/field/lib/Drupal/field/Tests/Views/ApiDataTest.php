@@ -6,6 +6,7 @@
  */
 
 namespace Drupal\field\Tests\Views;
+use Drupal\Core\Entity\DatabaseStorageController;
 
 /**
  * Test the produced views_data.
@@ -84,8 +85,8 @@ class ApiDataTest extends FieldTestBase {
     // Check the table and the joins of the first field.
     // Attached to node only.
     $field = $this->fields[0];
-    $current_table = _field_sql_storage_tablename($field);
-    $revision_table = _field_sql_storage_revision_tablename($field);
+    $current_table = DatabaseStorageController::fieldTableName($field);
+    $revision_table = DatabaseStorageController::fieldRevisionTableName($field);
     $data[$current_table] = $views_data->get($current_table);
     $data[$revision_table] = $views_data->get($revision_table);
 
@@ -117,8 +118,8 @@ class ApiDataTest extends FieldTestBase {
     // Check the table and the joins of the second field.
     // Attached to both node and user.
     $field_2 = $this->fields[2];
-    $current_table_2 = _field_sql_storage_tablename($field_2);
-    $revision_table_2 = _field_sql_storage_revision_tablename($field_2);
+    $current_table_2 = DatabaseStorageController::fieldTableName($field_2);
+    $revision_table_2 = DatabaseStorageController::fieldRevisionTableName($field_2);
     $data[$current_table_2] = $views_data->get($current_table_2);
     $data[$revision_table_2] = $views_data->get($revision_table_2);
 
