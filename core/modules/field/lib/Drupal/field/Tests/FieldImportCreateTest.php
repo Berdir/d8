@@ -81,8 +81,8 @@ class FieldImportCreateTest extends FieldUnitTestBase {
 
     // One field with two field instances.
     $field_id_2 = 'field_test_import_staging_2';
-    $instance_id_2a = "test_entity.test_bundle.$field_id_2";
-    $instance_id_2b = "test_entity.test_bundle_2.$field_id_2";
+    $instance_id_2a = "entity_test.test_bundle.$field_id_2";
+    $instance_id_2b = "entity_test.test_bundle_2.$field_id_2";
     $field_config_name_2 = "field.field.$field_id_2";
     $instance_config_name_2a = "field.instance.$instance_id_2a";
     $instance_config_name_2b = "field.instance.$instance_id_2b";
