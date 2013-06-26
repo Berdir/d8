@@ -221,7 +221,7 @@ class TranslationTest extends FieldUnitTestBase {
     foreach (array(NULL, array()) as $empty_items) {
       $id++;
       $revision_id++;
-      $values = array('eid' => $id, 'evid' => $revision_id, 'fttype' => $instance['bundle'], 'langcode' => $translation_langcodes[0]);
+      $values = array('id' => $id, 'revision_id' => $revision_id, 'type' => $instance['bundle'], 'langcode' => $translation_langcodes[0]);
       $entity = entity_create($entity_type, $values);
       foreach ($translation_langcodes as $langcode) {
         $values[$this->field_name][$langcode] = $this->_generateTestFieldValues($this->field['cardinality']);

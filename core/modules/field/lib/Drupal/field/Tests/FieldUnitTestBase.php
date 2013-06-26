@@ -49,12 +49,15 @@ abstract class FieldUnitTestBase extends DrupalUnitTestBase {
    *   PHP variable names as well.
    * @param string $entity_type
    *   (optional) The entity type on which the instance should be created.
-   *   Defaults to 'test_entity'.
+   *   Defaults to "entity_test".
    * @param string $bundle
    *   (optional) The entity type on which the instance should be created.
-   *   Defaults to 'test_bundle'.
+   *   Defaults to the default bundle of the entity type.
    */
-  function createFieldWithInstance($suffix = '', $entity_type = 'entity_test', $bundle = 'entity_test') {
+  function createFieldWithInstance($suffix = '', $entity_type = 'entity_test', $bundle = NULL) {
+    if (empty($bundle)) {
+      $bundle = $entity_type;
+    }
     $field_name = 'field_name' . $suffix;
     $field = 'field' . $suffix;
     $field_id = 'field_id' . $suffix;
@@ -68,7 +71,7 @@ abstract class FieldUnitTestBase extends DrupalUnitTestBase {
     $this->$instance_definition = array(
       'field_name' => $this->$field_name,
       'entity_type' => $entity_type,
-      'bundle' => $entity_type,
+      'bundle' => $bundle,
       'label' => $this->randomName() . '_label',
       'description' => $this->randomName() . '_description',
       'settings' => array(
@@ -78,7 +81,7 @@ abstract class FieldUnitTestBase extends DrupalUnitTestBase {
     $this->$instance = entity_create('field_instance', $this->$instance_definition);
     $this->$instance->save();
 
-    entity_get_form_display('entity_test', 'entity_test', 'default')
+    entity_get_form_display($entity_type, $bundle, 'default')
       ->setComponent($this->$field_name, array(
         'type' => 'test_field_widget',
         'settings' => array(

@@ -273,7 +273,7 @@ class FieldAttachStorageTest extends FieldUnitTestBase {
   /**
    * Tests insert and update with empty or NULL fields.
    */
-  function testFieldAttachSaveMissingData() {
+  function testFieldAttachSaveEmptyData() {
     $entity_type = 'entity_test_rev';
     $this->createFieldWithInstance('', $entity_type);
 
@@ -335,7 +335,7 @@ class FieldAttachStorageTest extends FieldUnitTestBase {
   /**
    * Test insert with empty or NULL fields, with default value.
    */
-  function testFieldAttachSaveMissingDataDefaultValue() {
+  function testFieldAttachSaveEmptyDataDefaultValue() {
     $entity_type = 'entity_test_rev';
     $this->createFieldWithInstance('', $entity_type);
 
