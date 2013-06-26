@@ -544,7 +544,7 @@ class DatabaseStorageController extends EntityStorageControllerBase {
    * Implements \Drupal\Core\Entity\EntityStorageControllerInterface::getQueryServiceName().
    */
   public function getQueryServiceName() {
-    return 'entity.query.field_sql_storage';
+    return 'entity.query.sql';
   }
 
   /**
@@ -1102,8 +1102,6 @@ class DatabaseStorageController extends EntityStorageControllerBase {
     $this->database->schema()->renameTable($table, $new_table);
     $this->database->schema()->renameTable($revision_table, $revision_new_table);
   }
-
-
 
   /**
    * {@inheritdoc}
