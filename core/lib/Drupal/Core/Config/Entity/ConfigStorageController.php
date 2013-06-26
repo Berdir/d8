@@ -260,7 +260,7 @@ class ConfigStorageController extends EntityStorageControllerBase {
 
     // Load all of the configuration entities.
     $result = array();
-    foreach ($this->configStorage->loadMultiple($names) as $config) {
+    foreach ($this->configFactory->loadMultiple($names) as $config) {
       $result[$config->get($this->idKey)] = new $config_class($config->get(), $this->entityType);
     }
     return $result;
