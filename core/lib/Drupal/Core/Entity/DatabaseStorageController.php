@@ -1109,6 +1109,7 @@ class DatabaseStorageController extends EntityStorageControllerBase {
    * {@inheritdoc}
    */
   public function fieldPurgeData($entity_id, Field $field, FieldInstance $instance) {
+    parent::fieldPurgeData($entity_id, $field, $instance);
     $table_name = $this->fieldTableName($field);
     $revision_name = $this->fieldRevisionTableName($field);
     $this->database->delete($table_name)

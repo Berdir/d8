@@ -255,7 +255,7 @@ function field_purge_batch($batch_size) {
 
     if ($results) {
       foreach ($results as $entity_id) {
-        field_purge_data($entity_id, $field, $instance);
+        Drupal::entityManager()->getStorageController($instance->entity_type)->fieldPurgeData($entity_id, $field, $instance);
       }
     }
     else {
@@ -272,29 +272,6 @@ function field_purge_batch($batch_size) {
     if (empty($instances)) {
       field_purge_field($field);
     }
-  }
-}
-
-/**
- * Purges the field data for a single field on a single entity.
- *
- * This is basically the same as field_attach_delete() except it only applies to
- * a single field. The entity itself is not being deleted, and it is quite
- * possible that other field data will remain attached to it.
- *
- * @param int $entity_id
- *   The entity id for the entity whose field data is being purged.
- * @param $field
- *   The (possibly deleted) field whose data is being purged.
- * @param $instance
- *   The deleted field instance whose data is being purged.
- */
-function field_purge_data($entity_id, Field $field, FieldInstance $instance) {
-  Drupal::entityManager()->getStorageController($instance->entity_type)->fieldPurgeData($entity_id, $field, $instance);
-  // Let other modules act on purging the data.
-  foreach (module_implements('field_attach_purge') as $module) {
-    $function = $module . '_field_attach_purge';
-    $function($entity_id, $field, $instance);
   }
 }
 
