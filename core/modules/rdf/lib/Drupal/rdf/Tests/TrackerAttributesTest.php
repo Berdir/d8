@@ -134,7 +134,7 @@ class TrackerAttributesTest extends WebTestBase {
       'type' => 'literal',
       // The theme layer adds a space after the title a element, and the RDFa
       // attribute is on the wrapping td. Adds a space to match this.
-      'value' => $node->title . ' ',
+      'value' => $node->label() . ' ',
       'lang' => 'en',
     );
     $this->assertTrue($graph->hasProperty($node_uri, 'http://purl.org/dc/terms/title', $expected_value), 'Title found in RDF output (dc:title).');

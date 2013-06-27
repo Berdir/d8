@@ -72,6 +72,6 @@ class UpcastingTest extends WebTestBase {
     // converters:
     //   parent: 'node'
     $this->drupalGet("paramconverter_test/node/" . $node->id() . "/set/parent/" . $parent->id());
-    $this->assertRaw("Setting '" . $parent->title . "' as parent of '" . $node->title . "'.");
+    $this->assertRaw("Setting '" . $parent->label() . "' as parent of '" . $node->label() . "'.");
   }
 }

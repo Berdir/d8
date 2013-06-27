@@ -43,7 +43,7 @@ class TokenReplaceTest extends WebTestBase {
     $source .= '[user:name]';          // No user passed in, should be untouched
     $source .= '[bogus:token]';        // Non-existent token
 
-    $target  = check_plain($node->title);
+    $target  = check_plain($node->label());
     $target .= check_plain($account->name);
     $target .= format_interval(REQUEST_TIME - $node->getCreatedTime(), 2, $language_interface->id);
     $target .= check_plain($user->name);
@@ -65,10 +65,10 @@ class TokenReplaceTest extends WebTestBase {
     // correctly by a 'known' token, [node:title].
     $raw_tokens = array('title' => '[node:title]');
     $generated = $token_service->generate('node', $raw_tokens, array('node' => $node));
-    $this->assertEqual($generated['[node:title]'], check_plain($node->title), 'Token sanitized.');
+    $this->assertEqual($generated['[node:title]'], check_plain($node->label()), 'Token sanitized.');
 
     $generated = $token_service->generate('node', $raw_tokens, array('node' => $node), array('sanitize' => FALSE));
-    $this->assertEqual($generated['[node:title]'], $node->title, 'Unsanitized token generated properly.');
+    $this->assertEqual($generated['[node:title]'], $node->label(), 'Unsanitized token generated properly.');
 
     // Test token replacement when the string contains no tokens.
     $this->assertEqual($token_service->replace('No tokens here.'), 'No tokens here.');

@@ -172,6 +172,6 @@ class NodeSaveTest extends NodeTestBase {
     // node_test_node_insert() tiggers a save on insert if the title equals
     // 'new'.
     $node = $this->drupalCreateNode(array('title' => 'new'));
-    $this->assertEqual($node->title, 'Node ' . $node->id(), 'Node saved on node insert.');
+    $this->assertEqual($node->label(), 'Node ' . $node->id(), 'Node saved on node insert.');
   }
 }

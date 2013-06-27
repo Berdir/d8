@@ -22,6 +22,6 @@ class TestControllers {
   }
 
   public function testNodeSetParent(EntityInterface $node, EntityInterface $parent) {
-    return "Setting '{$parent->title}' as parent of '{$node->title}'.";
+    return "Setting '" . $parent->label() . "' as parent of '" . $node->label() . "'.";
   }
 }

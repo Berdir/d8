@@ -53,7 +53,7 @@ class NodeTokenReplaceTest extends NodeTestBase {
     $tests['[node:tnid]'] = $node->tnid;
     $tests['[node:type]'] = 'article';
     $tests['[node:type-name]'] = 'Article';
-    $tests['[node:title]'] = check_plain($node->title);
+    $tests['[node:title]'] = check_plain($node->label());
     $tests['[node:body]'] = text_sanitize($instance['settings']['text_processing'], $node->langcode, $node->body[$node->langcode][0], 'value');
     $tests['[node:summary]'] = text_sanitize($instance['settings']['text_processing'], $node->langcode, $node->body[$node->langcode][0], 'summary');
     $tests['[node:langcode]'] = check_plain($node->langcode);
@@ -74,7 +74,7 @@ class NodeTokenReplaceTest extends NodeTestBase {
     }
 
     // Generate and test unsanitized tokens.
-    $tests['[node:title]'] = $node->title;
+    $tests['[node:title]'] = $node->label();
     $tests['[node:body]'] = $node->body[$node->langcode][0]['value'];
     $tests['[node:summary]'] = $node->body[$node->langcode][0]['summary'];
     $tests['[node:langcode]'] = $node->langcode;
