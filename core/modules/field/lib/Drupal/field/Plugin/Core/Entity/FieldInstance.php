@@ -352,15 +352,16 @@ class FieldInstance extends ConfigEntityBase implements FieldInstanceInterface {
    *   In case of failures at the configuration storage level.
    */
   protected function saveNew() {
-    $module_handler = \Drupal::moduleHandler();
     $instance_controller = \Drupal::entityManager()->getStorageController($this->entityType);
 
     // Check that the field can be attached to this entity type.
     if (!empty($this->field->entity_types) && !in_array($this->entity_type, $this->field->entity_types)) {
       throw new FieldException(format_string('Attempt to create an instance of field @field_id on forbidden entity type @entity_type.', array('@field_id' => $this->field->id, '@entity_type' => $this->entity_type)));
     }
-    if ($this->field->setStorageType(\Drupal::entityManager()->getStorageController($this->entity_type)->storageType())) {
+    $data_storage_controller = \Drupal::entityManager()->getStorageController($this->entity_type);
+    if ($this->field->setStorageType($data_storage_controller->storageType())) {
       $this->field->save();
+      $data_storage_controller->handleFirstInstance($this);
     }
 
     // Assign the ID.

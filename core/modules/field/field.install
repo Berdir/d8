@@ -261,12 +261,6 @@ function field_update_8003() {
       'module' => $record['module'],
       'active' => $record['active'],
       'settings' => $record['data']['settings'],
-      'storage' => array(
-        'type' => $record['storage_type'],
-        'module' => $record['storage_module'],
-        'active' => $record['storage_active'],
-        'settings' => $record['data']['storage']['settings'],
-      ),
       'locked' => $record['locked'],
       'cardinality' => $record['cardinality'],
       'translatable' => $record['translatable'],

@@ -535,4 +535,5 @@ class ConfigStorageController extends EntityStorageControllerBase {
   public function storageType() {
     return 'config';
   }
+
 }

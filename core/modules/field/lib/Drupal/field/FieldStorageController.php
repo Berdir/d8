@@ -118,7 +118,6 @@ class FieldStorageController extends ConfigStorageController {
     // Translate "do not include inactive instances" into actual conditions.
     if (!$include_inactive) {
       $conditions['active'] = TRUE;
-      $conditions['storage.active'] = TRUE;
     }
 
     // Collect matching fields.
@@ -127,10 +126,6 @@ class FieldStorageController extends ConfigStorageController {
       foreach ($conditions as $key => $value) {
         // Extract the actual value against which the condition is checked.
         switch ($key) {
-          case 'storage.active':
-            $checked_value = $field->storage['active'];
-            break;
-
           case 'field_name';
             $checked_value = $field->id;
             break;

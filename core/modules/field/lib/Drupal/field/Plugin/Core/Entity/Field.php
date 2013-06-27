@@ -256,6 +256,7 @@ class Field extends ConfigEntityBase implements FieldInterface {
       'cardinality',
       'translatable',
       'indexes',
+      'storageType',
     );
     $properties = array();
     foreach ($names as $name) {
@@ -299,7 +300,6 @@ class Field extends ConfigEntityBase implements FieldInterface {
    *   In case of failures at the configuration storage level.
    */
   protected function saveNew() {
-    $module_handler = \Drupal::moduleHandler();
     $entity_manager = \Drupal::entityManager();
     $storage_controller = $entity_manager->getStorageController($this->entityType);
 
@@ -383,18 +383,12 @@ class Field extends ConfigEntityBase implements FieldInterface {
 
     // See if any module forbids the update by throwing an exception. This
     // invokes hook_field_update_forbid().
-    if ($this->storageType) {
-      $data_storage_controller = $this->dataStorageController();
-      if ($this->storageType == $original->storageType) {
-        // Tell the storage engine to update the field by invoking the
-        // hook_field_storage_update_field(). The storage engine can reject
-        // the definition update as invalid by raising an exception, which
-        // stops execution before the definition is written to config.
-        $data_storage_controller->handleUpdateField($this, $original);
-      }
-      else {
-        $data_storage_controller->handleInsertField($this);
-      }
+    if ($entity_types = array_keys($this->getBundles())) {
+      $data_storage_controller = \Drupal::entityManager()->getStorageController($entity_types[0]);
+      // Tell the storage engine to update the field. The storage engine can
+      // reject the definition update as invalid by raising an exception,
+      // which stops execution before the definition is written to config.
+      $data_storage_controller->handleUpdateField($this, $original);
     }
 
 
@@ -403,11 +397,6 @@ class Field extends ConfigEntityBase implements FieldInterface {
     field_cache_clear();
 
     return $result;
-  }
-
-  protected function dataStorageController() {
-    $entity_types = array_keys($this->getBundles());
-    return \Drupal::entityManager()->getStorageController($entity_types[0]);
   }
 
   /**

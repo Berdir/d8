@@ -533,7 +533,6 @@ class FieldInfo {
   public function prepareField($field) {
     // Make sure all expected field settings are present.
     $field['settings'] += field_info_field_settings($field['type']);
-    $field['storage']['settings'] += field_info_storage_settings($field['storage']['type']);
 
     return $field;
   }

@@ -198,12 +198,12 @@ interface EntityStorageControllerInterface {
   public function storageType();
 
   /**
-   * Allows reaction to the creation of a configurable field.
+   * Allows reaction to first instance created.
    *
-   * This function is actually called when the first instance is created
-   * as the field does not have a storage before.
+   * As there is no storage controller yet for the field when it is created,
+   * this is the first chance for the storage controller to react.
    */
-  public function handleInsertField(Field $field);
+  public function handleFirstInstance(FieldInstance $instance);
 
   /**
    * Allows reaction to the update of a configurable field.

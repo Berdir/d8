@@ -453,8 +453,6 @@ function field_sync_field_status() {
       Drupal::config('field.field.' . $field['id'])
         ->set('module', $field['module'])
         ->set('active', $field['active'])
-        ->set('storage.module', $field['storage']['module'])
-        ->set('storage.active', $field['storage']['active'])
         ->save();
     }
   }

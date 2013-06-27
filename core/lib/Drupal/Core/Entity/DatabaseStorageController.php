@@ -553,8 +553,10 @@ class DatabaseStorageController extends EntityStorageControllerBase {
   function doFieldLoad($entity_type, $entities, $age) {
     $load_current = $age == FIELD_LOAD_CURRENT;
     $bundles = array();
+    $ids = $load_current ? array_keys($entities) : array();
     foreach ($entities as $entity) {
       $bundles[$entity->bundle()] = TRUE;
+      $ids[] = $entity->getRevisionId();
     }
     $fields = array();
     foreach ($bundles as $bundle => $v) {
@@ -779,16 +781,6 @@ class DatabaseStorageController extends EntityStorageControllerBase {
    */
   public function storageType() {
     return 'sql';
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function handleInsertField(Field $field) {
-    $schema = $this->fieldSqlSchema($field);
-    foreach ($schema as $name => $table) {
-      $this->database->schema()->createTable($name, $table);
-    }
   }
 
   public function handleUpdateField(Field $field, Field $original) {
@@ -1102,6 +1094,16 @@ class DatabaseStorageController extends EntityStorageControllerBase {
   /**
    * {@inheritdoc}
    */
+  public function handleFirstInstance(FieldInstance $instance) {
+    $schema = $this->fieldSqlSchema($instance->getField());
+    foreach ($schema as $name => $table) {
+      $this->database->schema()->createTable($name, $table);
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function handleInstanceDelete(FieldInstance $instance) {
     $field = $instance->getField()->getFieldName();
     $table_name = static::fieldTableName($field);
@@ -1155,6 +1157,9 @@ class DatabaseStorageController extends EntityStorageControllerBase {
       ->execute();
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function fieldValues($entity_id, Field $field, FieldInstance $instance) {
     $field_name = $field->id();
     $columns = array();

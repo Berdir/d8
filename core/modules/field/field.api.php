@@ -394,31 +394,6 @@ function hook_field_attach_preprocess_alter(&$variables, $context) {
 }
 
 /**
- * Act on field_purge_data().
- *
- * This hook is invoked in field_purge_data() and allows modules to act on
- * purging data from a single field pseudo-entity. For example, if a module
- * relates data in the field with its own data, it may purge its own data during
- * this process as well.
- *
- * @param \Drupal\Core\Entity\EntityInterface $entity
- *   The pseudo-entity whose field data is being purged.
- * @param $field
- *   The (possibly deleted) field whose data is being purged.
- * @param $instance
- *   The deleted field instance whose data is being purged.
- *
- * @see @link field_purge Field API bulk data deletion @endlink
- * @see field_purge_data()
- */
-function hook_field_attach_purge(\Drupal\Core\Entity\EntityInterface $entity, $field, $instance) {
-  // find the corresponding data in mymodule and purge it
-  if ($entity->entityType() == 'node' && $field->field_name == 'my_field_name') {
-    mymodule_remove_mydata($entity->nid);
-  }
-}
-
-/**
  * Perform alterations on field_attach_view() or field_view_field().
  *
  * This hook is invoked after the field module has performed the operation.

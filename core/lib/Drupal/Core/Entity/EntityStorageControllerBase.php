@@ -509,7 +509,7 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
   /**
    * {@inheritdoc}
    */
-  public function handleInsertField(Field $field) {
+  public function handleFirstInstance(FieldInstance $instance) {
 
   }
 
@@ -546,19 +546,22 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
     }
   }
 
-  abstract protected function fieldValues($entity_id, Field $field, FieldInstance $instance);
-
   /**
-   * {@inheritdoc}
+   * Get the field values for a single field of a single entity.
+   *
+   * @param $entity_id
+   * @param Field $field
+   * @param FieldInstance $instance
+   * @return array
    */
-  public function fieldPurge(Field $field) {
-    // TODO: Implement fieldPurge() method.
+  protected function fieldValues($entity_id, Field $field, FieldInstance $instance) {
+    return array();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function fieldUpdateForbid(Field $field, Field $prior_field) {
+  public function fieldPurge(Field $field) {
 
   }
 
