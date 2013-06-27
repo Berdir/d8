@@ -279,7 +279,7 @@ class LanguageUILanguageNegotiationTest extends WebTestBase {
       'expect' => $language_string,
       'expected_method_id' => LANGUAGE_NEGOTIATION_USER,
       'http_header' => array(),
-      'message' => 'USER > DEFAULT: defined prefereed user language setting, the UI language is based on user setting',
+      'message' => 'USER > DEFAULT: defined preferred user language setting, the UI language is based on user setting',
     );
     $this->runTest($test);
 
@@ -321,7 +321,7 @@ class LanguageUILanguageNegotiationTest extends WebTestBase {
       'expect' => $language_string,
       'expected_method_id' => LANGUAGE_NEGOTIATION_USER_ADMIN,
       'http_header' => array(),
-      'message' => 'USER ADMIN > DEFAULT: defined prefereed user admin language setting, the UI language is based on user setting',
+      'message' => 'USER ADMIN > DEFAULT: defined preferred user admin language setting, the UI language is based on user setting',
     );
     $this->runTest($test);
 

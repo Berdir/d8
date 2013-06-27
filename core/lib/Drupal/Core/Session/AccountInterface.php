@@ -55,4 +55,54 @@ interface AccountInterface {
    */
   public function getSessionData();
 
+  /**
+   * Returns TRUE if the account is authenticated.
+   *
+   * @return bool
+   *   TRUE if the account is authenticated.
+   */
+  public function isAuthenticated();
+
+  /**
+   * Returns TRUE if the account is anonymous.
+   *
+   * @return bool
+   *   TRUE if the account is anonymous.
+   */
+  public function isAnonymous();
+
+  /**
+   * Returns the preferred language code of the account.
+   *
+   * @param string $default
+   *   (optional) Default language code to return if the account
+   *   has no valid language, defaults to the site default language.
+   *
+   * @return string
+   *   The language code that is preferred by the account.
+   */
+  public function getPreferredLangcode($default = NULL);
+
+  /**
+   * Returns the preferred administrative language code of the account.
+   *
+   * Defines which language is used on administrative pages.
+   *
+   * @param string $default
+   *   (optional) Default language code to return if the account
+   *   has no valid language, defaults to the site default language.
+   *
+   * @return string
+   *   The language code that is preferred by the account.
+   */
+  public function getPreferredAdminLangcode($default = NULL);
+
+  /**
+   * Returns the user name.
+   *
+   * @return string
+   *   Unchanged name of the user.
+   */
+  public function getUsername();
+
 }
