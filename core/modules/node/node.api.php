@@ -611,7 +611,7 @@ function hook_node_access(\Drupal\node\NodeInterface $node, $op, $account, $lang
  * @ingroup node_api_hooks
  */
 function hook_node_prepare_form(\Drupal\node\NodeInterface $node, $form_display, $operation, array &$form_state) {
-  if (!isset($node->comment)) {
+  if (!isset($node->comment->value)) {
     $node->comment = variable_get('comment_' . $node->bundle(), COMMENT_NODE_OPEN);
   }
 }
