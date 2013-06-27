@@ -1162,5 +1162,5 @@ function datetime_form_node_form_alter(&$form, &$form_state, $form_id) {
  */
 function datetime_node_prepare_form(NodeInterface $node, $form_display, $operation, array &$form_state) {
   // Prepare the 'Authored on' date to use datetime.
-  $node->date = new DrupalDateTime($node->created);
+  $node->date = new DrupalDateTime($node->getCreatedTime());
 }

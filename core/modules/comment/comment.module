@@ -1118,7 +1118,7 @@ function comment_node_load($nodes, $types) {
     }
     else {
       $node->cid = 0;
-      $node->last_comment_timestamp = $node->created;
+      $node->last_comment_timestamp = $node->getCreatedTime();
       $node->last_comment_name = '';
       $node->last_comment_uid = $node->uid;
       $node->comment_count = 0;

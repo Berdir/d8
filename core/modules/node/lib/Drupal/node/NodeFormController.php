@@ -48,10 +48,10 @@ class NodeFormController extends EntityFormController {
       }
       global $user;
       $node->uid = $user->id();
-      $node->created = REQUEST_TIME;
+      $node->setCreatedTime(REQUEST_TIME);
     }
     else {
-      $node->date = format_date($node->created, 'custom', 'Y-m-d H:i:s O');
+      $node->date = format_date($node->getCreatedTime(), 'custom', 'Y-m-d H:i:s O');
       // Remove the log message from the original node entity.
       $node->log = NULL;
     }
@@ -199,7 +199,7 @@ class NodeFormController extends EntityFormController {
       '#type' => 'textfield',
       '#title' => t('Authored on'),
       '#maxlength' => 25,
-      '#description' => t('Format: %time. The date format is YYYY-MM-DD and %timezone is the time zone offset from UTC. Leave blank to use the time of form submission.', array('%time' => !empty($node->date) ? date_format(date_create($node->date), 'Y-m-d H:i:s O') : format_date($node->created, 'custom', 'Y-m-d H:i:s O'), '%timezone' => !empty($node->date) ? date_format(date_create($node->date), 'O') : format_date($node->created, 'custom', 'O'))),
+      '#description' => t('Format: %time. The date format is YYYY-MM-DD and %timezone is the time zone offset from UTC. Leave blank to use the time of form submission.', array('%time' => !empty($node->date) ? date_format(date_create($node->date), 'Y-m-d H:i:s O') : format_date($node->getCreatedTime(), 'custom', 'Y-m-d H:i:s O'), '%timezone' => !empty($node->date) ? date_format(date_create($node->date), 'O') : format_date($node->getCreatedTime(), 'custom', 'O'))),
       '#default_value' => !empty($node->date) ? $node->date : '',
     );
 

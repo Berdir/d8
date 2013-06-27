@@ -62,7 +62,7 @@ class NodeTokenReplaceTest extends NodeTestBase {
     $tests['[node:author]'] = check_plain(user_format_name($account));
     $tests['[node:author:uid]'] = $node->uid;
     $tests['[node:author:name]'] = check_plain(user_format_name($account));
-    $tests['[node:created:since]'] = format_interval(REQUEST_TIME - $node->created, 2, $language_interface->id);
+    $tests['[node:created:since]'] = format_interval(REQUEST_TIME - $node->getCreatedTime(), 2, $language_interface->id);
     $tests['[node:changed:since]'] = format_interval(REQUEST_TIME - $node->changed, 2, $language_interface->id);
 
     // Test to make sure that we generated something for each token.

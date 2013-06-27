@@ -45,7 +45,7 @@ class TokenReplaceTest extends WebTestBase {
 
     $target  = check_plain($node->title);
     $target .= check_plain($account->name);
-    $target .= format_interval(REQUEST_TIME - $node->created, 2, $language_interface->id);
+    $target .= format_interval(REQUEST_TIME - $node->getCreatedTime(), 2, $language_interface->id);
     $target .= check_plain($user->name);
     $target .= format_date(REQUEST_TIME, 'short', '', NULL, $language_interface->id);
 

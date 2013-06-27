@@ -3155,7 +3155,7 @@ function hook_tokens($type, $tokens, array $data = array(), array $options = arr
           break;
 
         case 'created':
-          $replacements[$original] = format_date($node->created, 'medium', '', NULL, $langcode);
+          $replacements[$original] = format_date($node->getCreatedTime(), 'medium', '', NULL, $langcode);
           break;
       }
     }
@@ -3166,7 +3166,7 @@ function hook_tokens($type, $tokens, array $data = array(), array $options = arr
     }
 
     if ($created_tokens = $token_service->findWithPrefix($tokens, 'created')) {
-      $replacements += $token_service->generate('date', $created_tokens, array('date' => $node->created), $options);
+      $replacements += $token_service->generate('date', $created_tokens, array('date' => $node->getCreatedTime()), $options);
     }
   }
 
