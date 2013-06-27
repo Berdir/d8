@@ -438,7 +438,7 @@ function hook_node_delete(\Drupal\Core\Entity\EntityInterface $node) {
  */
 function hook_node_revision_delete(\Drupal\Core\Entity\EntityInterface $node) {
   db_delete('mytable')
-    ->condition('vid', $node->vid)
+    ->condition('vid', $node->getRevisionId())
     ->execute();
 }
 

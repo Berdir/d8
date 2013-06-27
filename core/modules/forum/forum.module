@@ -346,7 +346,7 @@ function forum_node_update(EntityInterface $node) {
       if (!empty($node->forum_tid)) {
         db_update('forum')
           ->fields(array('tid' => $node->forum_tid))
-          ->condition('vid', $node->vid)
+          ->condition('vid', $node->getRevisionId())
           ->execute();
       }
       // The node is removed from the forum.
@@ -361,7 +361,7 @@ function forum_node_update(EntityInterface $node) {
         db_insert('forum')
           ->fields(array(
             'tid' => $node->forum_tid,
-            'vid' => $node->vid,
+            'vid' => $node->getRevisionId(),
             'nid' => $node->id(),
           ))
           ->execute();
@@ -372,12 +372,12 @@ function forum_node_update(EntityInterface $node) {
     if (!empty($node->shadow)) {
       db_delete('forum')
         ->condition('nid', $node->id())
-        ->condition('vid', $node->vid)
+        ->condition('vid', $node->getRevisionId())
         ->execute();
       db_insert('forum')
         ->fields(array(
           'nid' => $node->id(),
-          'vid' => $node->vid,
+          'vid' => $node->getRevisionId(),
           'tid' => $node->forum_tid,
         ))
         ->execute();
@@ -394,7 +394,7 @@ function forum_node_insert(EntityInterface $node) {
       $nid = db_insert('forum')
         ->fields(array(
           'tid' => $node->forum_tid,
-          'vid' => $node->vid,
+          'vid' => $node->getRevisionId(),
           'nid' => $node->id(),
         ))
         ->execute();
@@ -423,7 +423,7 @@ function forum_node_load($nodes) {
   $node_vids = array();
   foreach ($nodes as $node) {
     if (_forum_node_check_node_type($node)) {
-      $node_vids[] = $node->vid;
+      $node_vids[] = $node->getRevisionId();
     }
   }
   if (!empty($node_vids)) {

@@ -213,7 +213,7 @@ class UserCancelTest extends WebTestBase {
     // Confirm user's content has been unpublished.
     $test_node = node_load($node->id(), TRUE);
     $this->assertTrue($test_node->status == 0, 'Node of the user has been unpublished.');
-    $test_node = node_revision_load($node->vid);
+    $test_node = node_revision_load($node->getRevisionId());
     $this->assertTrue($test_node->status == 0, 'Node revision of the user has been unpublished.');
 
     // Confirm that the confirmation message made it through to the end user.
@@ -238,7 +238,7 @@ class UserCancelTest extends WebTestBase {
     // Create a node with two revisions, the initial one belonging to the
     // cancelling user.
     $revision_node = $this->drupalCreateNode(array('uid' => $account->id()));
-    $revision = $revision_node->vid;
+    $revision = $revision_node->getRevisionId();
     $settings = get_object_vars($revision_node);
     $settings['revision'] = 1;
     $settings['uid'] = 1; // Set new/current revision to someone else.
@@ -304,7 +304,7 @@ class UserCancelTest extends WebTestBase {
     // Create a node with two revisions, the initial one belonging to the
     // cancelling user.
     $revision_node = $this->drupalCreateNode(array('uid' => $account->id()));
-    $revision = $revision_node->vid;
+    $revision = $revision_node->getRevisionId();
     $settings = get_object_vars($revision_node);
     $settings['revision'] = 1;
     $settings['uid'] = 1; // Set new/current revision to someone else.

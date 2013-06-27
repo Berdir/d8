@@ -115,7 +115,7 @@ function node_tokens($type, $tokens, array $data = array(), array $options = arr
           break;
 
         case 'vid':
-          $replacements[$original] = $node->vid;
+          $replacements[$original] = $node->getRevisionId();
           break;
 
         case 'tnid':

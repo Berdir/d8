@@ -52,7 +52,7 @@ class PageEditTest extends NodeTestBase {
 
     // Check that "edit" link points to correct page.
     $this->clickLink(t('Edit'));
-    $edit_url = url("node/$node->nid/edit", array('absolute' => TRUE));
+    $edit_url = url("node/" . $node->id() . "/edit", array('absolute' => TRUE));
     $actual_url = $this->getURL();
     $this->assertEqual($edit_url, $actual_url, 'On edit page.');
 
@@ -78,7 +78,7 @@ class PageEditTest extends NodeTestBase {
     $second_web_user = $this->drupalCreateUser(array('administer nodes', 'edit any page content'));
     $this->drupalLogin($second_web_user);
     // Edit the same node, creating a new revision.
-    $this->drupalGet("node/$node->nid/edit");
+    $this->drupalGet("node/" . $node->id() . "/edit");
     $edit = array();
     $edit['title'] = $this->randomName(8);
     $edit[$body_key] = $this->randomName(16);
@@ -87,14 +87,14 @@ class PageEditTest extends NodeTestBase {
 
     // Ensure that the node revision has been created.
     $revised_node = $this->drupalGetNodeByTitle($edit['title'], TRUE);
-    $this->assertNotIdentical($node->vid, $revised_node->vid, 'A new revision has been created.');
+    $this->assertNotIdentical($node->getRevisionId(), $revised_node->getRevisionId(), 'A new revision has been created.');
     // Ensure that the node author is preserved when it was not changed in the
     // edit form.
     $this->assertIdentical($node->uid, $revised_node->uid, 'The node author has been preserved.');
     // Ensure that the revision authors are different since the revisions were
     // made by different users.
-    $first_node_version = node_revision_load($node->vid);
-    $second_node_version = node_revision_load($revised_node->vid);
+    $first_node_version = node_revision_load($node->getRevisionId());
+    $second_node_version = node_revision_load($revised_node->getRevisionId());
     $this->assertNotIdentical($first_node_version->revision_uid, $second_node_version->revision_uid, 'Each revision has a distinct user.');
   }
 

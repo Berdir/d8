@@ -268,18 +268,18 @@ function node_revision_overview($node) {
         '#theme' => 'username',
         '#account' => user_load($revision->uid),
       );
-      $row[] = t('!date by !username', array('!date' => l(format_date($revision->revision_timestamp, 'short'), "node/$node->nid/revisions/$revision->vid/view"), '!username' => drupal_render($username)))
+      $row[] = t('!date by !username', array('!date' => l(format_date($revision->revision_timestamp, 'short'), "node/" . $node->id() . "/revisions/" . $revision->vid . "/view"), '!username' => drupal_render($username)))
                . (($revision->log != '') ? '<p class="revision-log">' . filter_xss($revision->log) . '</p>' : '');
       if ($revert_permission) {
         $links['revert'] = array(
           'title' => t('Revert'),
-          'href' => "node/$node->nid/revisions/$revision->vid/revert",
+          'href' => "node/" . $node->id() . "/revisions/" . $revision->vid . "/revert",
         );
       }
       if ($delete_permission) {
         $links['delete'] = array(
           'title' => t('Delete'),
-          'href' => "node/$node->nid/revisions/$revision->vid/delete",
+          'href' => "node/" . $node->id() . "/revisions/" . $revision->vid . "/delete",
         );
       }
       $row[] = array(

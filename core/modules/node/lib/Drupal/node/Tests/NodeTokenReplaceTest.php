@@ -49,7 +49,7 @@ class NodeTokenReplaceTest extends NodeTestBase {
     // Generate and test sanitized tokens.
     $tests = array();
     $tests['[node:nid]'] = $node->id();
-    $tests['[node:vid]'] = $node->vid;
+    $tests['[node:vid]'] = $node->getRevisionId();
     $tests['[node:tnid]'] = $node->tnid;
     $tests['[node:type]'] = 'article';
     $tests['[node:type-name]'] = 'Article';
