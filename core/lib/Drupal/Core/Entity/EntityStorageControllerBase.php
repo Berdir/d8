@@ -337,36 +337,15 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
       $this->doFieldLoad($entity_type, $queried_entities, $age);
 
       // Invoke the field type's prepareCache() method.
-      if (empty($options['instance'])) {
-        foreach ($queried_entities as $entity) {
-          \Drupal::entityManager()
-            ->getStorageController($entity_type)
-            ->invokeFieldItemPrepareCache($entity);
-        }
-      }
-      else {
-        // Do not rely on invokeFieldItemPrepareCache(), which only works on
-        // fields listed in getFieldDefinitions(), and will fail if we are loading
-        // values for a deleted field. Instead, generate FieldItem objects
-        // directly, and call their prepareCache() method.
-        foreach ($queried_entities as $entity) {
-          $field = $options['instance']->getField();
-          $field_name = $field->id();
-          // Call the prepareCache() method on each item.
-          foreach ($entity->{$field_name} as $langcode => $values) {
-            $definition = _field_generate_entity_field_definition($field, $options['instance']);
-            $items = \Drupal::typedData()->create($definition, $values, $field_name, $entity);
-            foreach ($items as $item) {
-              $item->prepareCache();
-            }
-            $entity->{$field_name}[$langcode] = $items->getValue();
-          }
-        }
+      foreach ($queried_entities as $entity) {
+        \Drupal::entityManager()
+          ->getStorageController($entity_type)
+          ->invokeFieldItemPrepareCache($entity);
       }
 
       // Invoke hook_field_attach_load(): let other modules act on loading the
       // entity.
-      module_invoke_all('field_attach_load', $entity_type, $queried_entities, $age, $options);
+      module_invoke_all('field_attach_load', $entity_type, $queried_entities, $age);
 
       // Build cache data.
       if ($use_cache) {

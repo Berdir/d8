@@ -13,6 +13,7 @@ use Drupal\Core\Password\PasswordInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\field\FieldInfo;
 use Drupal\user\UserDataInterface;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Entity\DatabaseStorageControllerNG;
 
@@ -157,14 +158,9 @@ class UserStorageController extends DatabaseStorageControllerNG implements UserS
    * {@inheritdoc}
    */
   protected function invokeHook($hook, EntityInterface $entity) {
-    $function = 'field_attach_' . $hook;
-    // @todo: field_attach_delete_revision() is named the wrong way round,
-    // consider renaming it.
-    if ($function == 'field_attach_revision_delete') {
-      $function = 'field_attach_delete_revision';
-    }
-    if (!empty($this->entityInfo['fieldable']) && function_exists($function)) {
-      $function($entity->getBCEntity());
+    $method = Container::camelize('field_' . $hook);
+    if (!empty($this->entityInfo['fieldable']) && method_exists($this, $method)) {
+      $this->$method($entity->getBCEntity());
     }
 
     // Invoke the hook.

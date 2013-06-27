@@ -567,18 +567,14 @@ class DatabaseStorageController extends EntityStorageControllerBase {
     foreach ($fields as $field_name => $field) {
       $table = $load_current ? static::fieldTableName($field) : static::fieldRevisionTableName($field);
 
-      $query = $this->database->select($table, 't')
+      $results = $this->database->select($table, 't')
         ->fields('t')
         ->condition('entity_type', $entity_type)
         ->condition($load_current ? 'entity_id' : 'revision_id', $ids, 'IN')
         ->condition('langcode', field_available_languages($entity_type, $field), 'IN')
-        ->orderBy('delta');
-
-      if (empty($options['deleted'])) {
-        $query->condition('deleted', 0);
-      }
-
-      $results = $query->execute();
+        ->orderBy('delta')
+        ->condition('deleted', 0)
+        ->execute();
 
       $delta_count = array();
       foreach ($results as $row) {

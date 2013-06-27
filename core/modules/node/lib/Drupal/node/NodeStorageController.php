@@ -9,6 +9,7 @@ namespace Drupal\node;
 
 use Drupal\Core\Entity\DatabaseStorageControllerNG;
 use Drupal\Core\Entity\EntityInterface;
+use Symfony\Component\DependencyInjection\Container;
 
 /**
  * Controller class for nodes.
@@ -80,14 +81,9 @@ class NodeStorageController extends DatabaseStorageControllerNG {
     // Inline parent::invokeHook() to pass on BC-entities to node-specific
     // hooks.
 
-    $function = 'field_attach_' . $hook;
-    // @todo: field_attach_delete_revision() is named the wrong way round,
-    // consider renaming it.
-    if ($function == 'field_attach_revision_delete') {
-      $function = 'field_attach_delete_revision';
-    }
-    if (!empty($this->entityInfo['fieldable']) && function_exists($function)) {
-      $function($node);
+    $method = Container::camelize('field_' . $hook);
+    if (!empty($this->entityInfo['fieldable']) && method_exists($this, $method)) {
+      $this->$method($node);
     }
 
     // Invoke the hook.
