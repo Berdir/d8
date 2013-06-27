@@ -1158,7 +1158,7 @@ function comment_node_insert(EntityInterface $node) {
       ->fields(array(
         'nid' => $node->id(),
         'cid' => 0,
-        'last_comment_timestamp' => $node->changed,
+        'last_comment_timestamp' => $node->getChangedTime(),
         'last_comment_name' => NULL,
         'last_comment_uid' => $node->uid,
         'comment_count' => 0,

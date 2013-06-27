@@ -159,7 +159,7 @@ class TrackerAttributesTest extends WebTestBase {
     // Last updated.
     $expected_value = array(
       'type' => 'literal',
-      'value' => date('c', $node->changed),
+      'value' => date('c', $node->getChangedTime()),
       'datatype' => 'http://www.w3.org/2001/XMLSchema#dateTime',
     );
     $this->assertTrue($graph->hasProperty($node_uri, 'http://rdfs.org/sioc/ns#last_activity_date', $expected_value), 'Last activity date found in RDF output (sioc:last_activity_date).');

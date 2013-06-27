@@ -76,7 +76,7 @@ function tracker_page($account = NULL, $set_title = FALSE) {
 
       $mark_build = array(
         '#theme' => 'mark',
-        '#status' => node_mark($node->id(), $node->changed),
+        '#status' => node_mark($node->id(), $node->getChangedTime()),
       );
 
       $row = array(

@@ -80,7 +80,7 @@ class Date extends Formula {
         return date($this->argFormat, $node->getCreatedTime());
       }
       elseif ($this->options['default_argument_type'] == 'node_changed') {
-        return date($this->argFormat, $node->changed);
+        return date($this->argFormat, $node->getChangedTime());
       }
     }
 

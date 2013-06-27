@@ -194,7 +194,7 @@ function node_tokens($type, $tokens, array $data = array(), array $options = arr
           break;
 
         case 'changed':
-          $replacements[$original] = format_date($node->changed, 'medium', '', NULL, $langcode);
+          $replacements[$original] = format_date($node->getChangedTime(), 'medium', '', NULL, $langcode);
           break;
       }
     }
@@ -209,7 +209,7 @@ function node_tokens($type, $tokens, array $data = array(), array $options = arr
     }
 
     if ($changed_tokens = $token_service->findWithPrefix($tokens, 'changed')) {
-      $replacements += $token_service->generate('date', $changed_tokens, array('date' => $node->changed), $options);
+      $replacements += $token_service->generate('date', $changed_tokens, array('date' => $node->getChangedTime()), $options);
     }
   }
 

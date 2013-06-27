@@ -239,7 +239,7 @@ function node_admin_nodes() {
     $l_options = $node->langcode != Language::LANGCODE_NOT_SPECIFIED && isset($languages[$node->langcode]) ? array('language' => $languages[$node->langcode]) : array();
     $mark = array(
       '#theme' => 'mark',
-      '#status' => node_mark($node->id(), $node->changed),
+      '#status' => node_mark($node->id(), $node->getChangedTime()),
     );
     $form['nodes'][$node->id()]['title'] = array(
       '#type' => 'link',
@@ -259,7 +259,7 @@ function node_admin_nodes() {
       '#markup' => $node->status ? t('published') : t('not published'),
     );
     $form['nodes'][$node->id()]['changed'] = array(
-      '#markup' => format_date($node->changed, 'short'),
+      '#markup' => format_date($node->getChangedTime(), 'short'),
     );
     if ($multilingual) {
       $form['nodes'][$node->id()]['language_name'] = array(

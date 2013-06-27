@@ -176,7 +176,7 @@ function seven_form_node_form_alter(&$form, &$form_state) {
       '#type' => 'item',
       '#wrapper_attributes' => array('class' => array('changed', 'container-inline')),
       '#title' => t('Last saved'),
-      '#markup' => !$node->isNew() ? format_date($node->changed, 'short') : t('Not saved yet'),
+      '#markup' => !$node->isNew() ? format_date($node->getChangedTime(), 'short') : t('Not saved yet'),
     ),
     'author' => array(
       '#type' => 'item',

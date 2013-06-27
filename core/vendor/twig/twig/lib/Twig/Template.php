@@ -263,6 +263,7 @@ abstract class Twig_Template implements Twig_TemplateInterface
         try {
             $this->doDisplay($context, $blocks);
         } catch (Twig_Error $e) {
+            debug($e->getTraceAsString());
             if (!$e->getTemplateFile()) {
                 $e->setTemplateFile($this->getTemplateName());
             }

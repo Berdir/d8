@@ -96,7 +96,7 @@ class NodeFormController extends EntityFormController {
     // Changed must be sent to the client, for later overwrite error checking.
     $form['changed'] = array(
       '#type' => 'hidden',
-      '#default_value' => isset($node->changed) ? $node->changed : NULL,
+      '#default_value' => $node->getChangedTime(),
     );
 
     $node_type = node_type_load($node->type);
@@ -327,7 +327,7 @@ class NodeFormController extends EntityFormController {
   public function validate(array $form, array &$form_state) {
     $node = $this->buildEntity($form, $form_state);
 
-    if ($node->id() && (node_last_changed($node->id(), $this->getFormLangcode($form_state)) > $node->changed)) {
+    if ($node->id() && (node_last_changed($node->id(), $this->getFormLangcode($form_state)) > $node->getChangedTime())) {
       form_set_error('changed', t('The content on this page has either been modified by another user, or you have already submitted modifications using this form. As a result, your changes cannot be saved.'));
     }
 
