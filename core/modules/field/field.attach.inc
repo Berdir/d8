@@ -506,6 +506,8 @@ function _field_invoke_widget_target($form_display) {
  *   An associative array of additional options. See field_invoke_method() for
  *   details.
  *
+ * @deprecated as of Drupal 8.0. Use the entity system instead.
+ *
  * @see field_form_get_state()
  * @see field_form_set_state()
  */
@@ -562,6 +564,8 @@ function field_attach_form(EntityInterface $entity, &$form, &$form_state, $langc
  * @param array $options
  *   An associative array of additional options. See field_invoke_method() for
  *   details.
+ *
+ * @deprecated as of Drupal 8.0. Use the entity system instead.
  */
 function field_attach_form_validate(EntityInterface $entity, $form, &$form_state, array $options = array()) {
   // Only support NG entities.
@@ -609,6 +613,8 @@ function field_attach_form_validate(EntityInterface $entity, $form, &$form_state
  * @param array $options
  *   An associative array of additional options. See field_invoke_method() for
  *   details.
+ *
+ * @deprecated as of Drupal 8.0. Use the entity system instead.
  */
 function field_attach_extract_form_values(EntityInterface $entity, $form, &$form_state, array $options = array()) {
   // Ensure we are working with a BC mode entity.
@@ -627,6 +633,162 @@ function field_attach_extract_form_values(EntityInterface $entity, $form, &$form
 }
 
 /**
+<<<<<<< HEAD
+=======
+ * Save field data for a new entity.
+ *
+ * The passed-in entity must already contain its id and (if applicable)
+ * revision id attributes.
+ * Default values (if any) will be saved for fields not present in the
+ * $entity.
+ *
+ * @param \Drupal\Core\Entity\EntityInterface $entity
+ *   The entity with fields to save.
+ * @return
+ *   Default values (if any) will be added to the $entity parameter for fields
+ *   it leaves unspecified.
+ *
+ * @deprecated as of Drupal 8.0. Use the entity system instead.
+ */
+function field_attach_insert(EntityInterface $entity) {
+  // Ensure we are working with a BC mode entity.
+  $entity = $entity->getBCEntity();
+
+  // Let any module insert field data before the storage engine, accumulating
+  // saved fields along the way.
+  $skip_fields = array();
+  foreach (module_implements('field_storage_pre_insert') as $module) {
+    $function = $module . '_field_storage_pre_insert';
+    $function($entity, $skip_fields);
+  }
+
+  // Collect the storage backends used by the remaining fields in the entities.
+  $storages = array();
+  foreach (field_info_instances($entity->entityType(), $entity->bundle()) as $instance) {
+    $field = field_info_field_by_id($instance['field_id']);
+    $field_id = $field['uuid'];
+    $field_name = $field['field_name'];
+    if (!empty($entity->$field_name)) {
+      // Collect the storage backend if the field has not been written yet.
+      if (!isset($skip_fields[$field_id])) {
+        $storages[$field['storage']['type']][$field_id] = $field_id;
+      }
+    }
+  }
+
+  // Field storage backends save any remaining unsaved fields.
+  foreach ($storages as $storage => $fields) {
+    $storage_info = field_info_storage_types($storage);
+    module_invoke($storage_info['module'], 'field_storage_write', $entity, FIELD_STORAGE_INSERT, $fields);
+  }
+}
+
+/**
+ * Saves field data for an existing entity.
+ *
+ * @param \Drupal\Core\Entity\EntityInterface $entity
+ *   The entity with fields to save.
+ *
+ * @deprecated as of Drupal 8.0. Use the entity system instead.
+ */
+function field_attach_update(EntityInterface $entity) {
+  // Ensure we are working with a BC mode entity.
+  $entity = $entity->getBCEntity();
+
+  // Let any module update field data before the storage engine, accumulating
+  // saved fields along the way.
+  $skip_fields = array();
+  foreach (module_implements('field_storage_pre_update') as $module) {
+    $function = $module . '_field_storage_pre_update';
+    $function($entity, $skip_fields);
+  }
+
+  // Collect the storage backends used by the remaining fields in the entities.
+  $storages = array();
+  foreach (field_info_instances($entity->entityType(), $entity->bundle()) as $instance) {
+    $field = field_info_field_by_id($instance['field_id']);
+    $field_id = $field['uuid'];
+    // Collect the storage backend if the field has not been written yet.
+    if (!isset($skip_fields[$field_id])) {
+      $storages[$field['storage']['type']][$field_id] = $field_id;
+    }
+  }
+
+  // Field storage backends save any remaining unsaved fields.
+  foreach ($storages as $storage => $fields) {
+    $storage_info = field_info_storage_types($storage);
+    module_invoke($storage_info['module'], 'field_storage_write', $entity, FIELD_STORAGE_UPDATE, $fields);
+  }
+
+  $entity_info = $entity->entityInfo();
+  if ($entity_info['field_cache']) {
+    cache('field')->delete('field:' . $entity->entityType() . ':' . $entity->id());
+  }
+}
+
+/**
+ * Deletes field data for an existing entity. This deletes all revisions of
+ * field data for the entity.
+ *
+ * @param \Drupal\Core\Entity\EntityInterface $entity
+ *   The entity whose field data to delete.
+ *
+ * @deprecated as of Drupal 8.0. Use the entity system instead.
+ */
+function field_attach_delete(EntityInterface $entity) {
+  // Ensure we are working with a BC mode entity.
+  $entity = $entity->getBCEntity();
+
+  // Collect the storage backends used by the fields in the entities.
+  $storages = array();
+  foreach (field_info_instances($entity->entityType(), $entity->bundle()) as $instance) {
+    $field = field_info_field_by_id($instance['field_id']);
+    $field_id = $field['uuid'];
+    $storages[$field['storage']['type']][$field_id] = $field_id;
+  }
+
+  // Field storage backends delete their data.
+  foreach ($storages as $storage => $fields) {
+    $storage_info = field_info_storage_types($storage);
+    module_invoke($storage_info['module'], 'field_storage_delete', $entity, $fields);
+  }
+
+  $entity_info = $entity->entityInfo();
+  if ($entity_info['field_cache']) {
+    cache('field')->delete('field:' . $entity->entityType() . ':' . $entity->id());
+  }
+}
+
+/**
+ * Delete field data for a single revision of an existing entity. The passed
+ * entity must have a revision ID attribute.
+ *
+ * @param \Drupal\Core\Entity\EntityInterface $entity
+ *   The entity with fields to save.
+ *
+ * @deprecated as of Drupal 8.0. Use the entity system instead.
+ */
+function field_attach_delete_revision(EntityInterface $entity) {
+  // Ensure we are working with a BC mode entity.
+  $entity = $entity->getBCEntity();
+
+  // Collect the storage backends used by the fields in the entities.
+  $storages = array();
+  foreach (field_info_instances($entity->entityType(), $entity->bundle()) as $instance) {
+    $field = field_info_field_by_id($instance['field_id']);
+    $field_id = $field['uuid'];
+    $storages[$field['storage']['type']][$field_id] = $field_id;
+  }
+
+  // Field storage backends delete their data.
+  foreach ($storages as $storage => $fields) {
+    $storage_info = field_info_storage_types($storage);
+    module_invoke($storage_info['module'], 'field_storage_delete_revision', $entity, $fields);
+  }
+}
+
+/**
+>>>>>>> origin/8.x
  * Prepares field data prior to display.
  *
  * This function lets field types and formatters load additional data needed for
@@ -649,6 +811,8 @@ function field_attach_extract_form_values(EntityInterface $entity, $form, &$form
  * @param $langcode
  *   (Optional) The language the field values are to be shown in. If no language
  *   is provided the current language is used.
+ *
+ * @deprecated as of Drupal 8.0. Use the entity system instead.
  */
 function field_attach_prepare_view($entity_type, array $entities, array $displays, $langcode = NULL) {
   $options['langcode'] = array();
@@ -711,6 +875,8 @@ function field_attach_prepare_view($entity_type, array $entities, array $display
  *
  * @return array
  *   A renderable array for the field values.
+ *
+ * @deprecated as of Drupal 8.0. Use the entity system instead.
  */
 function field_attach_view(EntityInterface $entity, EntityDisplay $display, $langcode = NULL, array $options = array()) {
   // Ensure we are working with a BC mode entity.
@@ -805,7 +971,7 @@ function field_entity_bundle_rename($entity_type, $bundle_old, $bundle_new) {
     }
   }
 
-  // Clear the cache.
+  // Clear the field cache.
   field_cache_clear();
 
   // Update bundle settings.
