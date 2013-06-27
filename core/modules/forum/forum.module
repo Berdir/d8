@@ -515,7 +515,7 @@ function forum_field_storage_pre_insert(EntityInterface $entity) {
 /**
  * Implements hook_field_storage_pre_update().
  */
-function forum_field_storage_pre_update(EntityInterface $entity, &$skip_fields) {
+function forum_field_storage_pre_update(EntityInterface $entity) {
   $first_call = &drupal_static(__FUNCTION__, array());
 
   if ($entity->entityType() == 'node' && _forum_node_check_node_type($entity)) {

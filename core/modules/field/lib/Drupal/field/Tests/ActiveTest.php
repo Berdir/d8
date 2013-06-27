@@ -43,23 +43,7 @@ class ActiveTest extends FieldTestBase {
     // - the field type module,
     // - the storage module,
     // - both.
-    $this->_testActiveHelper($field_definition, array('field_test'));
-    $this->_testActiveHelper($field_definition, array('field_sql_storage'));
-    $this->_testActiveHelper($field_definition, array('field_test', 'field_sql_storage'));
-  }
-
-  /**
-   * Helper function for testActive().
-   *
-   * Test dependency between a field and a set of modules.
-   *
-   * @param $field_definition
-   *   A field definition.
-   * @param $modules
-   *   An aray of module names. The field will be tested to be inactive as long
-   *   as any of those modules is disabled.
-   */
-  function _testActiveHelper($field_definition, $modules) {
+    $modules = array('field_test');
     $field_name = $field_definition['field_name'];
 
     // Read the field.

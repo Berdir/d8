@@ -446,6 +446,7 @@ class FieldInstance extends ConfigEntityBase implements FieldInstanceInterface {
   public function delete($field_cleanup = TRUE) {
     if (!$this->deleted) {
       $module_handler = \Drupal::moduleHandler();
+      \Drupal::entityManager()->getStorageController($this->entity_type)->handleInstanceDelete($this);
       $state = \Drupal::state();
 
       // Delete the configuration of this instance and save the configuration
@@ -461,11 +462,6 @@ class FieldInstance extends ConfigEntityBase implements FieldInstanceInterface {
 
       // Clear the cache.
       field_cache_clear();
-
-      // Mark instance data for deletion by invoking
-      \Drupal::entityManager()->getStorageController($this->entity_type)->handleInstanceDelete($this);
-      // hook_field_storage_delete_instance().
-      $module_handler->invoke($this->field->storage['module'], 'field_storage_delete_instance', array($this));
 
       // Remove the instance from the entity form displays.
       if ($form_display = entity_load('entity_form_display', $this->entity_type . '.' . $this->bundle . '.default')) {
