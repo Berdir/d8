@@ -26,7 +26,7 @@ class TextPlainUnitTest extends DrupalUnitTestBase {
    *
    * @var array
    */
-  public static $modules = array('entity', 'field', 'field_sql_storage', 'text', 'entity_test', 'system');
+  public static $modules = array('entity', 'field', 'text', 'entity_test', 'system');
 
   /**
    * Contains rendered content.

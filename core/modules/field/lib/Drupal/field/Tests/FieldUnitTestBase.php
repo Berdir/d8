@@ -20,7 +20,7 @@ abstract class FieldUnitTestBase extends DrupalUnitTestBase {
    *
    * @var array
    */
-  public static $modules = array('user', 'entity', 'system', 'field', 'text', 'field_sql_storage', 'entity_test', 'field_test');
+  public static $modules = array('user', 'entity', 'system', 'field', 'text', 'entity_test', 'field_test');
 
   /**
    * A string for assert raw and text helper methods.

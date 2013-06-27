@@ -180,7 +180,7 @@ class FieldInfo {
     // Get active fields.
     foreach (config_get_storage_names_with_prefix('field.field') as $config_id) {
       $field_config = $this->config->get($config_id)->get();
-      if ($field_config['active'] && $field_config['storage']['active']) {
+      if ($field_config['active']) {
         $fields[$field_config['uuid']] = $field_config;
       }
     }

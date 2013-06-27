@@ -53,7 +53,7 @@ class EntityFormDisplayTest extends DrupalUnitTestBase {
    * Tests the behavior of a field component within an EntityFormDisplay object.
    */
   public function testFieldComponent() {
-    $this->enableModules(array('field_sql_storage', 'field_test'));
+    $this->enableModules(array('field_test'));
 
     $form_display = entity_create('entity_form_display', array(
       'targetEntityType' => 'entity_test',
