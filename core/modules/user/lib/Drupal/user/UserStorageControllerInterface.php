@@ -16,13 +16,6 @@ use Drupal\Core\Entity\EntityStorageControllerInterface;
 interface UserStorageControllerInterface extends EntityStorageControllerInterface {
 
   /**
-   * Add any roles from the storage to the user.
-   *
-   * @param array $users
-   */
-  public function addRoles(array $users);
-
-  /**
    * Save the user's roles.
    *
    * @param \Drupal\Core\Entity\EntityInterface $user

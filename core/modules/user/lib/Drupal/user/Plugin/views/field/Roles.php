@@ -29,7 +29,7 @@ class Roles extends PrerenderList {
    *
    * @var \Drupal\user\UserStorageControllerInterface
    */
-  protected $storage_controller;
+  protected $storageController;
 
   /**
    * Constructs a Drupal\Component\Plugin\PluginBase object.
@@ -80,11 +80,14 @@ class Roles extends PrerenderList {
 
     if ($uids) {
       $roles = user_roles();
-      $users_rids = $this->storage_controller->getUserRoles($uids);
+      $users_rids = $this->storageController->getUserRoles($uids);
       foreach ($users_rids as $uid => $rids) {
         foreach ($rids as $rid) {
-          $this->items[$uid][$rid]['role'] = check_plain($roles[$rid]->label());
-          $this->items[$uid][$rid]['rid'] = $rid;
+          // Don't list anonymous/authenticated user roles.
+          if (!in_array($rid, array(DRUPAL_AUTHENTICATED_RID, DRUPAL_ANONYMOUS_RID))) {
+            $this->items[$uid][$rid]['role'] = check_plain($roles[$rid]->label());
+            $this->items[$uid][$rid]['rid'] = $rid;
+          }
         }
       }
       // Sort the roles for each user by role weight.

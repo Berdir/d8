@@ -42,7 +42,10 @@ function user_admin_account() {
   foreach (user_load_multiple($uids) as $account) {
     $users_roles = array();
     foreach ($account->getRoles() as $rid) {
-      $users_roles[] = $roles[$rid];
+      // Skip the authenticated user role.
+      if ($rid != DRUPAL_AUTHENTICATED_RID) {
+        $users_roles[] = $roles[$rid];
+      }
     }
     asort($users_roles);
     $username = array(
