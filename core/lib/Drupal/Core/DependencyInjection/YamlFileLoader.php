@@ -7,12 +7,12 @@
 
 namespace Drupal\Core\DependencyInjection;
 
+use Drupal\Component\Yaml\Yaml;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\Yaml\Parser;
 
 /**
  * YamlFileLoader loads YAML files service definitions.
@@ -33,12 +33,20 @@ class YamlFileLoader {
   static protected $yaml = array();
 
   /**
+   * The YAML parser.
+   *
+   * @var \Drupal\Component\Yaml\Yaml
+   */
+  protected $parser;
+
+  /**
    * @param \Drupal\Core\DependencyInjection\ContainerBuilder $container
    */
   protected $container;
 
   public function __construct(ContainerBuilder $container) {
     $this->container = $container;
+    $this->parser = new Yaml();
   }
 
   /**
@@ -190,8 +198,7 @@ class YamlFileLoader {
    *   The file content.
    */
   protected function loadFile($filename) {
-    $parser = new Parser();
-    return $this->validate($parser->parse(file_get_contents($filename)), $filename);
+    return $this->validate($this->parser->parse(file_get_contents($filename)), $filename);
   }
 
   /**

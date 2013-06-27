@@ -17,7 +17,7 @@ display:
           table: users
           field: uid
           title_enable: true
-          title: %1
+          title: '%1'
           plugin_id: user_uid
     display_plugin: default
     display_title: Master

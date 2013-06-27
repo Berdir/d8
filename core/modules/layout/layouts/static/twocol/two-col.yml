@@ -1,12 +1,12 @@
-title: Two column
-category: Columns: 2
+title: 'Two column'
+category: 'Columns: 2'
 template: two-col
 stylesheets:
   - two-col.css
 regions:
   first:
-    label: Left side
+    label: 'Left side'
     type: content
   second:
-    label: Right side
+    label: 'Right side'
     type: aside

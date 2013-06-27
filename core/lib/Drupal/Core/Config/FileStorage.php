@@ -7,8 +7,7 @@
 
 namespace Drupal\Core\Config;
 
-use Symfony\Component\Yaml\Dumper;
-use Symfony\Component\Yaml\Parser;
+use Drupal\Component\Yaml\Yaml;
 
 /**
  * Defines the file storage controller.
@@ -23,18 +22,11 @@ class FileStorage implements StorageInterface {
   protected $directory = '';
 
   /**
-   * A shared YAML dumper instance.
+   * A YAML instance.
    *
-   * @var Symfony\Component\Yaml\Dumper
+   * @var \Drupal\Component\Yaml\YamlInterface
    */
-  protected $dumper;
-
-  /**
-   * A shared YAML parser instance.
-   *
-   * @var Symfony\Component\Yaml\Parser
-   */
-  protected $parser;
+  protected $yaml;
 
   /**
    * Constructs a new FileStorage controller.
@@ -129,30 +121,15 @@ class FileStorage implements StorageInterface {
   }
 
   /**
-   * Gets the YAML dumper instance.
+   * Gets the YAML instance.
    *
-   * @return Symfony\Component\Yaml\Dumper
+   * @return \Drupal\Component\Yaml\YamlInterface
    */
-  protected function getDumper() {
-    if (!isset($this->dumper)) {
-      $this->dumper = new Dumper();
-      // Set Yaml\Dumper's default indentation for nested nodes/collections to
-      // 2 spaces for consistency with Drupal coding standards.
-      $this->dumper->setIndentation(2);
+  protected function getYaml() {
+    if (!isset($this->yaml)) {
+      $this->yaml = new Yaml();
     }
-    return $this->dumper;
-  }
-
-  /**
-   * Gets the YAML parser instance.
-   *
-   * @return Symfony\Component\Yaml\Parser
-   */
-  protected function getParser() {
-    if (!isset($this->parser)) {
-      $this->parser = new Parser();
-    }
-    return $this->parser;
+    return $this->yaml;
   }
 
   /**
@@ -161,9 +138,7 @@ class FileStorage implements StorageInterface {
    * @throws Symfony\Component\Yaml\Exception\DumpException
    */
   public function encode($data) {
-    // The level where you switch to inline YAML is set to PHP_INT_MAX to ensure
-    // this does not occur.
-    return $this->getDumper()->dump($data, PHP_INT_MAX);
+    return $this->getYaml()->dump($data);
   }
 
   /**
@@ -172,7 +147,7 @@ class FileStorage implements StorageInterface {
    * @throws Symfony\Component\Yaml\Exception\ParseException
    */
   public function decode($raw) {
-    $data = $this->getParser()->parse($raw);
+    $data = $this->getYaml()->parse($raw);
     // A simple string is valid YAML for any reason.
     if (!is_array($data)) {
       return FALSE;

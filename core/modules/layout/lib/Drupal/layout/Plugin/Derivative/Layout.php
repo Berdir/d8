@@ -9,7 +9,7 @@ namespace Drupal\layout\Plugin\Derivative;
 
 use DirectoryIterator;
 use Drupal\Component\Plugin\Derivative\DerivativeBase;
-use Drupal\Core\Config\FileStorage;
+use Drupal\Component\Yaml\Yaml;
 
 /**
  * Layout plugin derivative definition.
@@ -74,6 +74,7 @@ class Layout extends DerivativeBase {
    */
   protected function iterateDirectories($dir, $provider) {
     $directories = new DirectoryIterator($dir);
+    $yaml = new Yaml();
     foreach ($directories as $fileinfo) {
       if ($fileinfo->isDir() && !$fileinfo->isDot()) {
         // Keep discovering in subdirectories to arbitrary depth.
@@ -83,9 +84,8 @@ class Layout extends DerivativeBase {
         // Declarative layout definitions are defined with a .yml file in a
         // layout subdirectory. This provides all information about the layout
         // such as layout markup template and CSS and JavaScript files to use.
-        $directory = new FileStorage($fileinfo->getPath());
         $key = $provider['provider'] . '__' .  $fileinfo->getBasename('.yml');
-        $this->derivatives[$key] = $directory->read($fileinfo->getBasename('.yml'));
+        $this->derivatives[$key] = $yaml->parse(file_get_contents($fileinfo->getRealPath()));
         $this->derivatives[$key]['theme'] = $key;
         $this->derivatives[$key]['path'] = $fileinfo->getPath();
         $this->derivatives[$key]['provider'] = $provider;

@@ -1,7 +1,7 @@
-title: Single column
-category: Columns: 1
+title: 'Single column'
+category: 'Columns: 1'
 template: one-col
 regions:
   middle:
-    label: Middle column
+    label: 'Middle column'
     type: content

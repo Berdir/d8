@@ -8,7 +8,7 @@
 namespace Drupal\Core\Extension;
 
 use Drupal\Component\Graph\Graph;
-use Symfony\Component\Yaml\Parser;
+use Drupal\Component\Yaml\Yaml;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\KeyValueStore\KeyValueStoreInterface;
@@ -844,6 +844,7 @@ class ModuleHandler implements ModuleHandlerInterface {
 
     $schema_store = \Drupal::keyValue('system.schema');
     $disabled_config = config('system.module.disabled');
+    $yaml = new Yaml();
     foreach ($module_list as $module) {
       // Uninstall the module.
       module_load_install($module);
@@ -856,8 +857,7 @@ class ModuleHandler implements ModuleHandlerInterface {
       // Remove any cache bins defined by the module.
       $service_yaml_file = drupal_get_path('module', $module) . "/$module.services.yml";
       if (file_exists($service_yaml_file)) {
-        $parser = new Parser;
-        $definitions = $parser->parse(file_get_contents($service_yaml_file));
+        $definitions = $yaml->parse(file_get_contents($service_yaml_file));
         if (isset($definitions['services'])) {
           foreach ($definitions['services'] as $id => $definition) {
             if (isset($definition['tags'])) {

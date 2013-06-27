@@ -8,12 +8,20 @@
 namespace Drupal\config\Tests\Storage;
 
 use Drupal\Core\Config\FileStorage;
-use Symfony\Component\Yaml\Yaml;
+use Drupal\Component\Yaml\Yaml;
 
 /**
  * Tests FileStorage controller operations.
  */
 class FileStorageTest extends ConfigStorageTestBase {
+
+  /**
+   * A YAML instance.
+   *
+   * @var \Drupal\Component\Yaml\YamlInterface
+   */
+  protected $yaml;
+
   public static function getInfo() {
     return array(
       'name' => 'FileStorage controller operations',
@@ -24,6 +32,7 @@ class FileStorageTest extends ConfigStorageTestBase {
 
   function setUp() {
     parent::setUp();
+    $this->yaml = new Yaml();
     $this->storage = new FileStorage($this->configDirectories[CONFIG_ACTIVE_DIRECTORY]);
     $this->invalidStorage = new FileStorage($this->configDirectories[CONFIG_ACTIVE_DIRECTORY] . '/nonexisting');
 
@@ -33,7 +42,7 @@ class FileStorageTest extends ConfigStorageTestBase {
 
   protected function read($name) {
     $data = file_get_contents($this->storage->getFilePath($name));
-    return Yaml::parse($data);
+    return $this->yaml->parse($data);
   }
 
   protected function insert($name, $data) {

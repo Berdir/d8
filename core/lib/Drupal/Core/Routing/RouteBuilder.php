@@ -9,12 +9,12 @@ namespace Drupal\Core\Routing;
 
 use Symfony\Component\Routing\Matcher\Dumper\MatcherDumperInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Route;
 
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Lock\LockBackendInterface;
+use Drupal\Component\Yaml\Yaml;
 
 /**
  * Managing class for rebuilding the router table.
@@ -81,7 +81,7 @@ class RouteBuilder {
       return;
     }
 
-    $parser = new Parser();
+    $yaml = new Yaml();
 
     // We need to manually call each module so that we can know which module
     // a given item came from.
@@ -89,7 +89,7 @@ class RouteBuilder {
       $collection = new RouteCollection();
       $routing_file = DRUPAL_ROOT . '/' . dirname($filename) . '/' . $module . '.routing.yml';
       if (file_exists($routing_file)) {
-        $routes = $parser->parse(file_get_contents($routing_file));
+        $routes = $yaml->parse(file_get_contents($routing_file));
         if (!empty($routes)) {
           foreach ($routes as $name => $route_info) {
             $defaults = isset($route_info['defaults']) ? $route_info['defaults'] : array();

@@ -10,9 +10,9 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Language\Language;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\Yaml\Parser;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
+use Drupal\Component\Yaml\Yaml;
 use Drupal\Component\PhpStorage\PhpStorageFactory;
 use Drupal\Component\Utility\MapArray;
 use Drupal\Component\Utility\NestedArray;
@@ -5387,8 +5387,8 @@ function drupal_parse_info_file($filename) {
       $info[$filename] = array();
     }
     else {
-      $parser = new Parser();
-      $info[$filename] = $parser->parse(file_get_contents($filename));
+      $yaml = new Yaml();
+      $info[$filename] = $yaml->parse(file_get_contents($filename));
       if (isset($info[$filename]['version']) && $info[$filename]['version'] === 'VERSION') {
         $info[$filename]['version'] = VERSION;
       }
