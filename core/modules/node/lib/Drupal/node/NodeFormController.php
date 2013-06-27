@@ -9,13 +9,13 @@ namespace Drupal\node;
 
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Datetime\DrupalDateTime;
-use Drupal\Core\Entity\EntityFormController;
+use Drupal\Core\Entity\EntityFormControllerNG;
 use Drupal\Core\Language\Language;
 
 /**
  * Form controller for the node edit forms.
  */
-class NodeFormController extends EntityFormController {
+class NodeFormController extends EntityFormControllerNG {
 
   /**
    * Default settings for this content/node type.
@@ -42,7 +42,7 @@ class NodeFormController extends EntityFormController {
     if ($node->isNew()) {
       foreach (array('status', 'promote', 'sticky') as $key) {
         // Multistep node forms might have filled in something already.
-        if (!isset($node->$key)) {
+        if ($node->$key->isEmpty()) {
           $node->$key = (int) in_array($key, $this->settings['options']);
         }
       }
@@ -373,9 +373,13 @@ class NodeFormController extends EntityFormController {
     // Save as a new revision if requested to do so.
     if (!empty($form_state['values']['revision'])) {
       $node->setNewRevision();
+      // If a new revision is created, save the current user as revision author.
+      $node->setRevisionCreationTime(REQUEST_TIME);
+      global $user;
+      $node->setRevisionAuthorId($user->id());
     }
 
-    node_submit($node);
+    $node->validated = TRUE;
     foreach (\Drupal::moduleHandler()->getImplementations('node_submit') as $module) {
       $function = $module . '_node_submit';
       $function($node, $form, $form_state);
@@ -428,6 +432,32 @@ class NodeFormController extends EntityFormController {
     $node->setPublished(FALSE);
     return $node;
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buildEntity(array $form, array &$form_state) {
+    $entity = parent::buildEntity($form, $form_state);
+    // A user might assign the node author by entering a user name in the node
+    // form, which we then need to translate to a user ID.
+    if (!empty($form_state['values']['name'])) {
+      if ($account = user_load_by_name($form_state['values']['name'])) {
+        $entity->setAuthorId($account->id());
+      }
+      else {
+        $entity->setAuthorId(0);
+      }
+    }
+
+    if (!empty($form_state['values']['date']) && $form_state['values']['date'] instanceOf DrupalDateTime) {
+      $entity->setCreatedTime($form_state['values']['date']->getTimestamp());
+    }
+    else {
+      $entity->setCreatedTime(REQUEST_TIME);
+    }
+    return $entity;
+  }
+
 
   /**
    * Overrides Drupal\Core\Entity\EntityFormController::save().

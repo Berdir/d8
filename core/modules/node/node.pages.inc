@@ -91,7 +91,7 @@ function node_add($node_type) {
     'name' => $user->getUsername(),
     'type' => $type,
     'langcode' => $langcode ? $langcode : language_default()->id,
-  ))->getBCEntity();
+  ));
   drupal_set_title(t('Create @name', array('@name' => $node_type->name)), PASS_THROUGH);
   return Drupal::entityManager()->getForm($node);
 }
