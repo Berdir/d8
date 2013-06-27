@@ -28,22 +28,21 @@ function user_admin_account() {
     ->extend('Drupal\Core\Database\Query\PagerSelectExtender')
     ->extend('Drupal\Core\Database\Query\TableSortExtender');
   $query
-    ->fields('u', array('uid', 'name', 'status', 'created', 'access'))
+    ->fields('u', array('uid'))
     ->limit(50)
     ->orderByHeader($header)
     ->setCountQuery($count_query);
-  $result = $query->execute();
+  $uids = $query
+    ->execute()
+    ->fetchCol();
 
   $destination = drupal_get_destination();
   $status = array(t('blocked'), t('active'));
   $roles = array_map('check_plain', user_role_names(TRUE));
-  $accounts = array();
-  foreach ($result as $account) {
-    $account = user_load($account->uid);
+  foreach (user_load_multiple($uids) as $account) {
     $users_roles = array();
-    $roles_result = db_query('SELECT rid FROM {users_roles} WHERE uid = :uid', array(':uid' => $account->uid));
-    foreach ($roles_result as $user_role) {
-      $users_roles[] = $roles[$user_role->rid];
+    foreach ($account->getRoles() as $rid) {
+      $users_roles[] = $roles[$rid];
     }
     asort($users_roles);
     $username = array(

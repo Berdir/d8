@@ -9,6 +9,7 @@ namespace Drupal\user\Plugin\views\field;
 
 use Drupal\Component\Annotation\PluginID;
 use Drupal\Core\Database\Connection;
+use Drupal\user\UserStorageControllerInterface;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Plugin\views\field\PrerenderList;
@@ -26,9 +27,9 @@ class Roles extends PrerenderList {
   /**
    * Database Service Object.
    *
-   * @var \Drupal\Core\Database\Connection
+   * @var \Drupal\user\UserStorageControllerInterface
    */
-  protected $database;
+  protected $storage_controller;
 
   /**
    * Constructs a Drupal\Component\Plugin\PluginBase object.
@@ -42,17 +43,17 @@ class Roles extends PrerenderList {
    * @param \Drupal\Core\Database\Connection $database
    *   Database Service Object.
    */
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition, Connection $database) {
+  public function __construct(array $configuration, $plugin_id, array $plugin_definition, UserStorageControllerInterface $storage_controller) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
-    $this->database = $database;
+    $this->storageController = $storage_controller;
   }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, array $plugin_definition) {
-    return new static($configuration, $plugin_id, $plugin_definition, $container->get('database'));
+    return new static($configuration, $plugin_id, $plugin_definition, $container->get('plugin.manager.entity')->getStorageController('user'));
   }
 
   /**
@@ -79,10 +80,12 @@ class Roles extends PrerenderList {
 
     if ($uids) {
       $roles = user_roles();
-      $result = $this->database->query('SELECT u.uid, u.rid FROM {users_roles} u WHERE u.uid IN (:uids) AND u.rid IN (:rids)', array(':uids' => $uids, ':rids' => array_keys($roles)));
-      foreach ($result as $role) {
-        $this->items[$role->uid][$role->rid]['role'] = check_plain($roles[$role->rid]->label());
-        $this->items[$role->uid][$role->rid]['rid'] = $role->rid;
+      $users_rids = $this->storage_controller->getUserRoles($uids);
+      foreach ($users_rids as $uid => $rids) {
+        foreach ($rids as $rid) {
+          $this->items[$uid][$rid]['role'] = check_plain($roles[$rid]->label());
+          $this->items[$uid][$rid]['rid'] = $rid;
+        }
       }
       // Sort the roles for each user by role weight.
       $ordered_roles = array_flip(array_keys($roles));

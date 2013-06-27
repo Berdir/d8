@@ -36,4 +36,15 @@ interface UserStorageControllerInterface extends EntityStorageControllerInterfac
    */
   public function deleteUserRoles(array $uids);
 
+  /**
+   * Returns role IDs of the provided users.
+   *
+   * @param array $uids
+   *   User ID's for which roles should be returned.
+   *
+   * @return array
+   *   An array of role ids per user, keyed by the user id.
+   */
+  public function getUserRoles(array $uids);
+
 }

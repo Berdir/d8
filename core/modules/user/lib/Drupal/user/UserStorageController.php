@@ -75,18 +75,10 @@ class UserStorageController extends DatabaseStorageControllerNG implements UserS
    * Overrides Drupal\Core\Entity\DatabaseStorageController::attachLoad().
    */
   function attachLoad(&$queried_users, $load_revision = FALSE) {
-    foreach ($queried_users as $key => $record) {
-      $queried_users[$key]->roles = array();
-      if ($record->uid) {
-        $queried_users[$record->uid]->roles[] = DRUPAL_AUTHENTICATED_RID;
-      }
-      else {
-        $queried_users[$record->uid]->roles[] = DRUPAL_ANONYMOUS_RID;
-      }
-    }
-
     // Add any additional roles from the database.
-    $this->addRoles($queried_users);
+    foreach ($this->getUserRoles(array_keys($queried_users)) as $uid => $rids) {
+      $queried_users[$uid]->roles = $rids;
+    }
 
     // Call the default attachLoad() method. This will add fields and call
     // hook_user_load().
@@ -135,16 +127,6 @@ class UserStorageController extends DatabaseStorageControllerNG implements UserS
   /**
    * {@inheritdoc}
    */
-  public function addRoles(array $users) {
-    $result = db_query('SELECT rid, uid FROM {users_roles} WHERE uid IN (:uids)', array(':uids' => array_keys($users)));
-    foreach ($result as $record) {
-      $users[$record->uid]->roles[] = $record->rid;
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function deleteUserRoles(array $uids) {
     $this->database->delete('users_roles')
       ->condition('uid', $uids)
@@ -169,6 +151,27 @@ class UserStorageController extends DatabaseStorageControllerNG implements UserS
     \Drupal::moduleHandler()->invokeAll($this->entityType . '_' . $hook, array($entity->getBCEntity()));
     // Invoke the respective entity-level hook.
     \Drupal::moduleHandler()->invokeAll('entity_' . $hook, array($entity->getBCEntity(), $this->entityType));
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getUserRoles(array $uids) {
+    $users = array();
+    foreach ($uids as $uid) {
+      $users[$uid] = array();
+      if ($uid) {
+        $users[$uid] = array(DRUPAL_AUTHENTICATED_RID);
+      }
+      else {
+        $users[$uid] = array(DRUPAL_ANONYMOUS_RID);
+      }
+    }
+    $result = $this->database->query('SELECT rid, uid FROM {users_roles} WHERE uid IN (:uids)', array(':uids' => array_keys($users)));
+    foreach ($result as $record) {
+      $users[$record->uid][] = $record->rid;
+    }
+    return $users;
   }
 
   /**
