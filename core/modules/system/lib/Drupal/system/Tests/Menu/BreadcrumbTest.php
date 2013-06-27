@@ -171,7 +171,7 @@ class BreadcrumbTest extends MenuTestBase {
 
     // Verify node breadcrumbs (without menu link).
     $node1 = $this->drupalCreateNode();
-    $nid1 = $node1->nid;
+    $nid1 = $node1->id();
     $trail = $home;
     $this->assertBreadcrumb("node/$nid1", $trail);
     // Also verify that the node does not appear elsewhere (e.g., menu trees).
@@ -215,7 +215,7 @@ class BreadcrumbTest extends MenuTestBase {
           'plid' => 0,
         )),
       ));
-      $nid2 = $node2->nid;
+      $nid2 = $node2->id();
 
       $trail = $home;
       $tree = array(
@@ -243,7 +243,7 @@ class BreadcrumbTest extends MenuTestBase {
           'plid' => $node2->menu['mlid'],
         )),
       ));
-      $nid3 = $node3->nid;
+      $nid3 = $node3->id();
 
       $this->assertBreadcrumb("node/$nid3", $trail, $node3->title, $tree, FALSE);
       // The node itself should not be contained in the breadcrumb on the

@@ -73,7 +73,7 @@ class SearchRankingTest extends SearchTestBase {
     $edit = array();
     $edit['subject'] = 'my comment title';
     $edit['comment_body[' . Language::LANGCODE_NOT_SPECIFIED . '][0][value]'] = 'some random comment';
-    $this->drupalGet('comment/reply/' . $nodes['comments'][1]->nid);
+    $this->drupalGet('comment/reply/' . $nodes['comments'][1]->id());
     $this->drupalPost(NULL, $edit, t('Preview'));
     $this->drupalPost(NULL, $edit, t('Save'));
 
@@ -185,7 +185,7 @@ class SearchRankingTest extends SearchTestBase {
       $set = array_slice($set, -2, 1);
 
       // Assert the results.
-      $this->assertEqual($set[0]['node']->nid, $node->nid, 'Search tag ranking for "&lt;' . $tag . '&gt;" order.');
+      $this->assertEqual($set[0]['node']->nid, $node->id(), 'Search tag ranking for "&lt;' . $tag . '&gt;" order.');
 
       // Delete node so it doesn't show up in subsequent search results.
       $node->delete();
@@ -228,6 +228,6 @@ class SearchRankingTest extends SearchTestBase {
 
     // Do the search and assert the results.
     $set = node_search_execute('rocks');
-    $this->assertEqual($set[0]['node']->nid, $node->nid, 'Search double ranking order.');
+    $this->assertEqual($set[0]['node']->nid, $node->id(), 'Search double ranking order.');
   }
 }

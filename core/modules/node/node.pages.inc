@@ -181,6 +181,47 @@ function theme_node_preview($variables) {
 }
 
 /**
+<<<<<<< HEAD
+=======
+ * Page callback: Form constructor for node deletion confirmation form.
+ *
+ * @param object $node
+ *   A node object.
+ *
+ * @return array
+ *   A form array.
+ *
+ * @see node_delete_confirm_submit()
+ * @see node_menu()
+ */
+function node_delete_confirm($form, &$form_state, $node) {
+  // Always provide entity id in the same form key as in the entity edit form.
+  $form['nid'] = array('#type' => 'value', '#value' => $node->id());
+  return confirm_form($form,
+    t('Are you sure you want to delete %title?', array('%title' => $node->label())),
+    'node/' . $node->id(),
+    t('This action cannot be undone.'),
+    t('Delete'),
+    t('Cancel')
+  );
+}
+
+/**
+ * Form submission handler for node_delete_confirm().
+ */
+function node_delete_confirm_submit($form, &$form_state) {
+  if ($form_state['values']['confirm']) {
+    $node = node_load($form_state['values']['nid']);
+    $node->delete();
+    watchdog('content', '@type: deleted %title.', array('@type' => $node->type, '%title' => $node->label()));
+    drupal_set_message(t('@type %title has been deleted.', array('@type' => node_get_type_label($node), '%title' => $node->label())));
+  }
+
+  $form_state['redirect'] = '<front>';
+}
+
+/**
+>>>>>>> Rename ->nid to ->id()
  * Page callback: Generates an overview table of older revisions of a node.
  *
  * @param object $node
@@ -217,7 +258,7 @@ function node_revision_overview($node) {
         '#theme' => 'username',
         '#account' => user_load($revision->uid),
       );
-      $row[] = array('data' => t('!date by !username', array('!date' => l(format_date($revision->revision_timestamp, 'short'), "node/$node->nid"), '!username' => drupal_render($username)))
+      $row[] = array('data' => t('!date by !username', array('!date' => l(format_date($revision->revision_timestamp, 'short'), 'node/' . $node->id()), '!username' => drupal_render($username)))
                                . (($revision->log != '') ? '<p class="revision-log">' . filter_xss($revision->log) . '</p>' : ''),
                      'class' => array('revision-current'));
       $row[] = array('data' => drupal_placeholder(t('current revision')), 'class' => array('revision-current'));
