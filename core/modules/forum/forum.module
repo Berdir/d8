@@ -269,7 +269,7 @@ function forum_uri($forum) {
  */
 function _forum_node_check_node_type(EntityInterface $node) {
   // Fetch information about the forum field.
-  $instance = field_info_instance('node', 'taxonomy_forums', $node->type);
+  $instance = field_info_instance('node', 'taxonomy_forums', $node->bundle());
   return !empty($instance);
 }
 

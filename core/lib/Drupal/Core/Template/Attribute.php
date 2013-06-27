@@ -6,7 +6,6 @@
  */
 
 namespace Drupal\Core\Template;
-use Drupal\Core\Entity\Field\Type\Field;
 
 
 /**

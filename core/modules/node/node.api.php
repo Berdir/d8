@@ -568,7 +568,7 @@ function hook_node_load($nodes, $types) {
  * @ingroup node_access
  */
 function hook_node_access($node, $op, $account, $langcode) {
-  $type = is_string($node) ? $node : $node->type;
+  $type = is_string($node) ? $node : $node->bundle();
 
   $configured_types = node_permissions_get_configured_types();
   if (isset($configured_types[$type])) {
@@ -612,7 +612,7 @@ function hook_node_access($node, $op, $account, $langcode) {
  */
 function hook_node_prepare_form(\Drupal\node\NodeInterface $node, $form_display, $operation, array &$form_state) {
   if (!isset($node->comment)) {
-    $node->comment = variable_get("comment_$node->type", COMMENT_NODE_OPEN);
+    $node->comment = variable_get('comment_' . $node->bundle(), COMMENT_NODE_OPEN);
   }
 }
 

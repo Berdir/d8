@@ -44,7 +44,7 @@ class NodeTokenReplaceTest extends NodeTestBase {
 
     // Load node so that the body and summary fields are structured properly.
     $node = node_load($node->id());
-    $instance = field_info_instance('node', 'body', $node->type);
+    $instance = field_info_instance('node', 'body', $node->bundle());
 
     // Generate and test sanitized tokens.
     $tests = array();
@@ -92,7 +92,7 @@ class NodeTokenReplaceTest extends NodeTestBase {
     // Load node (without summary) so that the body and summary fields are
     // structured properly.
     $node = node_load($node->id());
-    $instance = field_info_instance('node', 'body', $node->type);
+    $instance = field_info_instance('node', 'body', $node->bundle());
 
     // Generate and test sanitized token - use full body as expected value.
     $tests = array();

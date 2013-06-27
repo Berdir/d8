@@ -65,7 +65,7 @@ function translation_node_overview(EntityInterface $node) {
       // No such translation in the set yet: help user to create it.
       $title = t('n/a');
       if (node_access('create', $node)) {
-        $path = 'node/add/' . $node->type;
+        $path = 'node/add/' . $node->bundle();
         $links = language_negotiation_get_switch_links($type, $path);
         $query = array('query' => array('translation' => $node->id(), 'target' => $langcode));
         if (!empty($links->links[$langcode]['href'])) {

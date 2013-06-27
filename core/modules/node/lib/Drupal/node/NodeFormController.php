@@ -82,7 +82,7 @@ class NodeFormController extends EntityFormController {
     // Override the default CSS class name, since the user-defined node type
     // name in 'TYPE-node-form' potentially clashes with third-party class
     // names.
-    $form['#attributes']['class'][0] = drupal_html_class('node-' . $node->type . '-form');
+    $form['#attributes']['class'][0] = drupal_html_class('node-' . $node->bundle() . '-form');
 
     // Basic node information.
     // These elements are just values so they are not even sent to the client.
@@ -99,7 +99,7 @@ class NodeFormController extends EntityFormController {
       '#default_value' => $node->getChangedTime(),
     );
 
-    $node_type = node_type_load($node->type);
+    $node_type = node_type_load($node->bundle());
     if ($node_type->has_title) {
       $form['title'] = array(
         '#type' => 'textfield',
@@ -111,7 +111,7 @@ class NodeFormController extends EntityFormController {
       );
     }
 
-    $language_configuration = module_invoke('language', 'get_default_configuration', 'node', $node->type);
+    $language_configuration = module_invoke('language', 'get_default_configuration', 'node', $node->bundle());
     $form['langcode'] = array(
       '#title' => t('Language'),
       '#type' => 'language_select',
@@ -437,7 +437,7 @@ class NodeFormController extends EntityFormController {
     $insert = $node->isNew();
     $node->save();
     $node_link = l(t('view'), 'node/' . $node->id());
-    $watchdog_args = array('@type' => $node->type, '%title' => $node->label());
+    $watchdog_args = array('@type' => $node->bundle(), '%title' => $node->label());
     $t_args = array('@type' => node_get_type_label($node), '%title' => $node->label());
 
     if ($insert) {

@@ -90,7 +90,7 @@ function tracker_page($account = NULL, $set_title = FALSE) {
 
       // Adds extra RDFa markup to the $row array if the RDF module is enabled.
       if (module_exists('rdf')) {
-        $mapping = rdf_get_mapping('node', $node->type);
+        $mapping = rdf_get_mapping('node', $node->bundle());
         // Adds RDFa markup to the title of the node. Because the RDFa markup is
         // added to the td tag which might contain HTML code, we specify an
         // empty datatype to ensure the value of the title read by the RDFa

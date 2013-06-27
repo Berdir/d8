@@ -1133,7 +1133,7 @@ function taxonomy_build_node_index($node) {
   if ($status && $node->isDefaultRevision()) {
     // Collect a unique list of all the term IDs from all node fields.
     $tid_all = array();
-    foreach (field_info_instances('node', $node->type) as $instance) {
+    foreach (field_info_instances('node', $node->bundle()) as $instance) {
       $field_name = $instance['field_name'];
       $field = field_info_field($field_name);
       if ($field['module'] == 'taxonomy' && $field['storage']['type'] == 'field_sql_storage') {

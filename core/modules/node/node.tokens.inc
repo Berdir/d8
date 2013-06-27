@@ -123,7 +123,7 @@ function node_tokens($type, $tokens, array $data = array(), array $options = arr
           break;
 
         case 'type':
-          $replacements[$original] = $sanitize ? check_plain($node->type) : $node->type;
+          $replacements[$original] = $sanitize ? check_plain($node->bundle()) : $node->bundle();
           break;
 
         case 'type-name':
@@ -138,7 +138,7 @@ function node_tokens($type, $tokens, array $data = array(), array $options = arr
         case 'body':
         case 'summary':
           if ($items = field_get_items($node, 'body', $langcode)) {
-            $instance = field_info_instance('node', 'body', $node->type);
+            $instance = field_info_instance('node', 'body', $node->bundle());
             $field_langcode = field_language($node, 'body', $langcode);
 
             // If the summary was requested and is not empty, use it.
@@ -154,7 +154,7 @@ function node_tokens($type, $tokens, array $data = array(), array $options = arr
 
                 // Get the 'trim_length' size used for the 'teaser' mode, if
                 // present, or use the default trim_length size.
-                $display_options = entity_get_display('node', $node->type, 'teaser')->getComponent('body');
+                $display_options = entity_get_display('node', $node->bundle(), 'teaser')->getComponent('body');
                 if (isset($display_options['settings']['trim_length'])) {
                   $length = $display_options['settings']['trim_length'];
                 }

@@ -213,7 +213,7 @@ function node_delete_confirm_submit($form, &$form_state) {
   if ($form_state['values']['confirm']) {
     $node = node_load($form_state['values']['nid']);
     $node->delete();
-    watchdog('content', '@type: deleted %title.', array('@type' => $node->type, '%title' => $node->label()));
+    watchdog('content', '@type: deleted %title.', array('@type' => $node->bundle(), '%title' => $node->label()));
     drupal_set_message(t('@type %title has been deleted.', array('@type' => node_get_type_label($node), '%title' => $node->label())));
   }
 
@@ -240,7 +240,7 @@ function node_revision_overview($node) {
   $revisions = node_revision_list($node);
 
   $rows = array();
-  $type = $node->type;
+  $type = $node->bundle();
 
   $revert_permission = FALSE;
   if ((user_access("revert $type revisions") || user_access('revert all revisions') || user_access('administer nodes')) && node_access('update', $node)) {
@@ -252,7 +252,6 @@ function node_revision_overview($node) {
   }
   foreach ($revisions as $revision) {
     $row = array();
-    $type = $node->type;
     if ($revision->current_vid > 0) {
       $username = array(
         '#theme' => 'username',

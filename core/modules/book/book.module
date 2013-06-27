@@ -307,7 +307,7 @@ function book_form_node_form_alter(&$form, &$form_state, $form_id) {
   $node = $form_state['controller']->getEntity();
   $access = user_access('administer book outlines');
   if (!$access) {
-    if (user_access('add content to books') && ((!empty($node->book['mlid']) && !$node->isNew()) || book_type_is_allowed($node->type))) {
+    if (user_access('add content to books') && ((!empty($node->book['mlid']) && !$node->isNew()) || book_type_is_allowed($node->bundle()))) {
       // Already in the book hierarchy, or this node type is allowed.
       $access = TRUE;
     }

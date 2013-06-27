@@ -77,7 +77,7 @@ function node_test_node_access_records(EntityInterface $node) {
     return;
   }
   $grants = array();
-  if ($node->type == 'article') {
+  if ($node->bundle() == 'article') {
     // Create grant in arbitrary article_realm for article nodes.
     $grants[] = array(
       'realm' => 'test_article_realm',
@@ -88,7 +88,7 @@ function node_test_node_access_records(EntityInterface $node) {
       'priority' => 0,
     );
   }
-  elseif ($node->type == 'page') {
+  elseif ($node->bundle() == 'page') {
     // Create grant in arbitrary page_realm for page nodes.
     $grants[] = array(
       'realm' => 'test_page_realm',
