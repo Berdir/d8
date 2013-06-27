@@ -385,14 +385,12 @@ class User extends EntityNG implements UserInterface {
   }
 
   /**
-   * Returns the user name.
-   *
-   * @return string
-   *   Unchanged name of the user.
+   * {@inheritdoc}
    */
   public function getUsername() {
-    return $this->get('name')->value;
+    $name = $this->get('name')->value ?: \Drupal::config('user.settings')->get('anonymous');
+    \Drupal::moduleHandler()->alter('user_format_name', $name, $this);
+    return $name;
   }
-
 
 }

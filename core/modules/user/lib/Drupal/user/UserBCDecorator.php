@@ -15,6 +15,7 @@ use Drupal\Core\Entity\EntityBCDecorator;
 class UserBCDecorator extends EntityBCDecorator implements UserInterface {
 
   /**
+   * The decorated user entity.
    *
    * @var \Drupal\user\UserInterface
    */

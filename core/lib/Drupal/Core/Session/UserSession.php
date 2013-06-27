@@ -177,8 +177,9 @@ class UserSession implements AccountInterface {
    * {@inheritdoc}
    */
   public function getUsername() {
-    return $this->name;
+    $name = $this->name ?: \Drupal::config('user.settings')->get('anonymous');
+    \Drupal::moduleHandler()->alter('user_format_name', $name, $this);
+    return $name;
   }
-
 
 }

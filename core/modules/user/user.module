@@ -159,7 +159,7 @@ function user_uri($user) {
  * @see user_format_name()
  */
 function user_label($entity_type, $entity) {
-  return user_format_name($entity->getBCEntity());
+  return $entity->getUsername();
 }
 
 /**
@@ -663,13 +663,6 @@ function user_preprocess_block(&$variables) {
 /**
  * Format a username.
  *
- * By default, the passed-in object's 'name' property is used if it exists, or
- * else, the site-defined value for the 'anonymous' variable. However, a module
- * may override this by implementing
- * hook_user_format_name_alter(&$name, $account).
- *
- * @see hook_user_format_name_alter()
- *
  * @param \Drupal\Core\Session\Interface $account
  *   The account object for the user whose name is to be formatted.
  *
@@ -677,11 +670,11 @@ function user_preprocess_block(&$variables) {
  *   An unsanitized string with the username to display. The code receiving
  *   this result must ensure that check_plain() is called on it before it is
  *   printed to the page.
+ *
+ * @deprecated Use \Drupal\Core\Session\Interface::getUsername() instead.
  */
 function user_format_name(AccountInterface $account) {
-  $name = $account->getUsername() ?: Drupal::config('user.settings')->get('anonymous');
-  drupal_alter('user_format_name', $name, $account);
-  return $name;
+  return $account->getUsername();
 }
 
 /**
@@ -732,7 +725,7 @@ function template_preprocess_username(&$variables) {
   // unsanitized version, in case other preprocess functions want to implement
   // their own shortening logic or add markup. If they do so, they must ensure
   // that $variables['name'] is safe for printing.
-  $name = $variables['name_raw'] = user_format_name($account);
+  $name = $variables['name_raw'] = $account->getUsername();
   if (drupal_strlen($name) > 20) {
     $name = drupal_substr($name, 0, 15) . '...';
   }
@@ -1127,8 +1120,8 @@ function user_menu_title() {
 /**
  * Menu item title callback - use the user name.
  */
-function user_page_title($account) {
-  return is_object($account) ? user_format_name($account) : '';
+function user_page_title(UserInterface $account = NULL) {
+  return $account ? $account->getUsername() : '';
 }
 
 /**
@@ -2153,7 +2146,7 @@ function user_toolbar() {
     '#type' => 'toolbar_item',
     'tab' => array(
       '#type' => 'link',
-      '#title' => user_format_name($user),
+      '#title' => $user->getUsername(),
       '#href' => 'user',
       '#options' => array(
         'attributes' => array(

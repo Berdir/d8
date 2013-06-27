@@ -98,10 +98,19 @@ interface AccountInterface {
   public function getPreferredAdminLangcode($default = NULL);
 
   /**
-   * Returns the user name.
+   * Returns the username of this account.
    *
-   * @return string
-   *   Unchanged name of the user.
+   * By default, the passed-in object's 'name' property is used if it exists, or
+   * else, the site-defined value for the 'anonymous' variable. However, a module
+   * may override this by implementing
+   * hook_user_format_name_alter(&$name, $account).
+   *
+   * @see hook_user_format_name_alter()
+   *
+   * @return
+   *   An unsanitized string with the username to display. The code receiving
+   *   this result must ensure that check_plain() is called on it before it is
+   *   printed to the page.
    */
   public function getUsername();
 
