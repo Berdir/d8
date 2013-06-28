@@ -222,7 +222,7 @@ class NodeFormController extends EntityFormController {
     $form['options']['promote'] = array(
       '#type' => 'checkbox',
       '#title' => t('Promoted to front page'),
-      '#default_value' => $node->promote,
+      '#default_value' => $node->isPromoted(),
     );
 
     $form['options']['sticky'] = array(

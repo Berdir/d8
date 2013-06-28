@@ -10,6 +10,7 @@
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\entity\Plugin\Core\Entity\EntityDisplay;
+use Drupal\node\NodeInterface;
 
 /**
  * Implements hook_node_load().
@@ -105,11 +106,11 @@ function node_test_node_access_records(EntityInterface $node) {
 /**
  * Implements hook_node_access_records_alter().
  */
-function node_test_node_access_records_alter(&$grants, EntityInterface $node) {
+function node_test_node_access_records_alter(&$grants, NodeInterface $node) {
   if (!empty($grants)) {
     foreach ($grants as $key => $grant) {
       // Alter grant from test_page_realm to test_alter_realm and modify the gid.
-      if ($grant['realm'] == 'test_page_realm' && $node->promote) {
+      if ($grant['realm'] == 'test_page_realm' && $node->isPromoted()) {
         $grants[$key]['realm'] = 'test_alter_realm';
         $grants[$key]['gid'] = 2;
       }
