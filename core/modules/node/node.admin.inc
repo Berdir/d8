@@ -236,7 +236,7 @@ function node_admin_nodes() {
     '#empty' => t('No content available.'),
   );
   foreach ($nodes as $node) {
-    $l_options = $node->langcode != Language::LANGCODE_NOT_SPECIFIED && isset($languages[$node->langcode]) ? array('language' => $languages[$node->langcode]) : array();
+    $l_options = $node->language()->id != Language::LANGCODE_NOT_SPECIFIED && isset($languages[$node->language()->id]) ? array('language' => $languages[$node->language()->id]) : array();
     $mark = array(
       '#theme' => 'mark',
       '#status' => node_mark($node->id(), $node->getChangedTime()),
@@ -263,7 +263,7 @@ function node_admin_nodes() {
     );
     if ($multilingual) {
       $form['nodes'][$node->id()]['language_name'] = array(
-        '#markup' => language_name($node->langcode),
+        '#markup' => $node->language()->name,
       );
     }
 

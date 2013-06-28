@@ -527,7 +527,6 @@ class EntityBCDecorator implements IteratorAggregate, EntityInterface {
     $this->decorated->onChange($property_name);
   }
 
-
   /**
    * Forwards the call to the decorated entity.
    */

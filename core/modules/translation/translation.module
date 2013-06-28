@@ -88,7 +88,7 @@ function translation_menu() {
  * @see translation_menu()
  */
 function _translation_tab_access($node) {
-  if ($node->langcode != Language::LANGCODE_NOT_SPECIFIED && translation_supported_type($node->bundle()) && node_access('view', $node)) {
+  if ($node->language()->id != Language::LANGCODE_NOT_SPECIFIED && translation_supported_type($node->bundle()) && node_access('view', $node)) {
     return translation_user_can_translate_node($node);
   }
   return FALSE;
@@ -272,7 +272,7 @@ function translation_node_view(EntityInterface $node, EntityDisplay $display, $v
 
     foreach ($translations as $langcode => $translation) {
       // Do not show links to the same node or to unpublished translations.
-      if ($translation->status && isset($languages[$langcode]) && $langcode != $node->langcode) {
+      if ($translation->status && isset($languages[$langcode]) && $langcode != $node->language()->id) {
         $key = "translation_$langcode";
 
         if (isset($custom_links->links[$langcode])) {
@@ -325,7 +325,7 @@ function translation_node_prepare_form(NodeInterface $node, $form_display, $oper
 
     $language_list = language_list();
     $langcode = $target;
-    if (!isset($language_list[$langcode]) || ($source_node->langcode == $langcode)) {
+    if (!isset($language_list[$langcode]) || ($source_node->language()->id == $langcode)) {
       // If not supported language, or same language as source node, break.
       return;
     }
@@ -387,7 +387,7 @@ function translation_node_insert(EntityInterface $node) {
 function translation_node_update(EntityInterface $node) {
   // Only act if we are dealing with a content type supporting translations.
   if (translation_supported_type($node->bundle())) {
-    if (isset($node->translation) && $node->translation && !empty($node->langcode) && $node->tnid) {
+    if (isset($node->translation) && $node->translation && $node->tnid) {
       // Update translation information.
       db_update('node')
         ->fields(array(
@@ -554,10 +554,10 @@ function translation_language_switch_links_alter(array &$links, $type, $path) {
       // have translations it might be a language neutral node, in which case we
       // must leave the language switch links unaltered. This is true also for
       // nodes not having translation support enabled.
-      if (empty($node) || $node->langcode == Language::LANGCODE_NOT_SPECIFIED || !translation_supported_type($node->bundle())) {
+      if (empty($node) || $node->language()->id == Language::LANGCODE_NOT_SPECIFIED || !translation_supported_type($node->bundle())) {
         return;
       }
-      $translations = array($node->langcode => $node);
+      $translations = array($node->language()->id => $node);
     }
     else {
       $translations = translation_node_get_translations($node->tnid);

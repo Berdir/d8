@@ -247,7 +247,7 @@ class TranslationTest extends WebTestBase {
     $node_es = clone $node;
     $node_es->langcode = 'es';
     $node_it = clone $node;
-    $node2_it->langcode = 'it';
+    $node_it->langcode = 'it';
     $this->assertLanguageSwitchLinks($node, $node, TRUE, $type);
     $this->assertLanguageSwitchLinks($node, $node_es, TRUE, $type);
     $this->assertLanguageSwitchLinks($node, $node_it, TRUE, $type);
@@ -450,7 +450,7 @@ class TranslationTest extends WebTestBase {
 
     $result = TRUE;
     $languages = language_list();
-    $page_language = $languages[$node->langcode];
+    $page_language = $languages[$node->language()->id];
     $translation_language = $languages[$translation->langcode];
     $url = url("node/$translation->nid", array('language' => $translation_language));
 

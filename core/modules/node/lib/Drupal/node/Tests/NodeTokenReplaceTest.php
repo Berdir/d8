@@ -54,9 +54,9 @@ class NodeTokenReplaceTest extends NodeTestBase {
     $tests['[node:type]'] = 'article';
     $tests['[node:type-name]'] = 'Article';
     $tests['[node:title]'] = check_plain($node->label());
-    $tests['[node:body]'] = text_sanitize($instance['settings']['text_processing'], $node->langcode, $node->body[$node->langcode][0], 'value');
-    $tests['[node:summary]'] = text_sanitize($instance['settings']['text_processing'], $node->langcode, $node->body[$node->langcode][0], 'summary');
-    $tests['[node:langcode]'] = check_plain($node->langcode);
+    $tests['[node:body]'] = text_sanitize($instance['settings']['text_processing'], $node->language()->id, $node->body[$node->language()->id][0], 'value');
+    $tests['[node:summary]'] = text_sanitize($instance['settings']['text_processing'], $node->language()->id, $node->body[$node->language()->id][0], 'summary');
+    $tests['[node:langcode]'] = check_plain($node->language()->id);
     $tests['[node:url]'] = url('node/' . $node->id(), $url_options);
     $tests['[node:edit-url]'] = url('node/' . $node->id() . '/edit', $url_options);
     $tests['[node:author]'] = check_plain(user_format_name($account));
@@ -75,9 +75,9 @@ class NodeTokenReplaceTest extends NodeTestBase {
 
     // Generate and test unsanitized tokens.
     $tests['[node:title]'] = $node->label();
-    $tests['[node:body]'] = $node->body[$node->langcode][0]['value'];
-    $tests['[node:summary]'] = $node->body[$node->langcode][0]['summary'];
-    $tests['[node:langcode]'] = $node->langcode;
+    $tests['[node:body]'] = $node->body[$node->language()->id][0]['value'];
+    $tests['[node:summary]'] = $node->body[$node->language()->id][0]['summary'];
+    $tests['[node:langcode]'] = $node->language()->id;
     $tests['[node:author:name]'] = user_format_name($account);
 
     foreach ($tests as $input => $expected) {
@@ -96,7 +96,7 @@ class NodeTokenReplaceTest extends NodeTestBase {
 
     // Generate and test sanitized token - use full body as expected value.
     $tests = array();
-    $tests['[node:summary]'] = text_sanitize($instance['settings']['text_processing'], $node->langcode, $node->body[$node->langcode][0], 'value');
+    $tests['[node:summary]'] = text_sanitize($instance['settings']['text_processing'], $node->language()->id, $node->body[$node->language()->id][0], 'value');
 
     // Test to make sure that we generated something for each token.
     $this->assertFalse(in_array(0, array_map('strlen', $tests)), 'No empty tokens generated for node without a summary.');
@@ -107,7 +107,7 @@ class NodeTokenReplaceTest extends NodeTestBase {
     }
 
     // Generate and test unsanitized tokens.
-    $tests['[node:summary]'] = $node->body[$node->langcode][0]['value'];
+    $tests['[node:summary]'] = $node->body[$node->language()->id][0]['value'];
 
     foreach ($tests as $input => $expected) {
       $output = $token_service->replace($input, array('node' => $node), array('language' => $language_interface, 'sanitize' => FALSE));

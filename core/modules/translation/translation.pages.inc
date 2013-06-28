@@ -30,7 +30,7 @@ function translation_node_overview(EntityInterface $node) {
   else {
     // We have no translation source nid, this could be a new set, emulate that.
     $tnid = $node->nid;
-    $translations = array($node->langcode => $node);
+    $translations = array($node->language()->id => $node);
   }
 
   $type = config('translation.settings')->get('language_type');
