@@ -7,13 +7,10 @@
 
 namespace Drupal\Core\Entity;
 
-use Drupal\Core\Language\Language;
 use Drupal\field\FieldInfo;
 use Drupal\field\FieldUpdateForbiddenException;
 use Drupal\field\Plugin\Core\Entity\Field;
 use Drupal\field\Plugin\Core\Entity\FieldInstance;
-use PDO;
-use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Component\Uuid\Uuid;
 use Drupal\Component\Utility\NestedArray;
@@ -156,7 +153,7 @@ class DatabaseStorageController extends EntityStorageControllerBase {
         // We provide the necessary arguments for PDO to create objects of the
         // specified entity class.
         // @see Drupal\Core\Entity\EntityInterface::__construct()
-        $query_result->setFetchMode(PDO::FETCH_CLASS, $this->entityInfo['class'], array(array(), $this->entityType));
+        $query_result->setFetchMode(\PDO::FETCH_CLASS, $this->entityInfo['class'], array(array(), $this->entityType));
       }
       $queried_entities = $query_result->fetchAllAssoc($this->idKey);
     }
@@ -201,7 +198,7 @@ class DatabaseStorageController extends EntityStorageControllerBase {
       // We provide the necessary arguments for PDO to create objects of the
       // specified entity class.
       // @see Drupal\Core\Entity\EntityInterface::__construct()
-      $query_result->setFetchMode(PDO::FETCH_CLASS, $this->entityInfo['class'], array(array(), $this->entityType));
+      $query_result->setFetchMode(\PDO::FETCH_CLASS, $this->entityInfo['class'], array(array(), $this->entityType));
     }
     $queried_entities = $query_result->fetchAllAssoc($this->idKey);
 
