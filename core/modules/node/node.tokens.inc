@@ -184,9 +184,8 @@ function node_tokens($type, $tokens, array $data = array(), array $options = arr
 
         // Default values for the chained tokens handled below.
         case 'author':
-          $account = user_load($node->uid);
-          $name = user_format_name($account);
-          $replacements[$original] = $sanitize ? check_plain($name) : $name;
+          $account = $node->getAuthor() ? $node->getAuthor() : user_load(0);
+          $replacements[$original] = $sanitize ? check_plain($account->label()) : $account->label();
           break;
 
         case 'created':
@@ -200,8 +199,7 @@ function node_tokens($type, $tokens, array $data = array(), array $options = arr
     }
 
     if ($author_tokens = $token_service->findWithPrefix($tokens, 'author')) {
-      $author = user_load($node->uid);
-      $replacements += $token_service->generate('user', $author_tokens, array('user' => $author), $options);
+      $replacements += $token_service->generate('user', $author_tokens, array('user' => $node->getAuthor()), $options);
     }
 
     if ($created_tokens = $token_service->findWithPrefix($tokens, 'created')) {

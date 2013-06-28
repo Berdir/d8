@@ -253,7 +253,7 @@ function node_admin_nodes() {
     );
     $form['nodes'][$node->id()]['author'] = array(
       '#theme' => 'username',
-      '#account' => user_load($node->uid),
+      '#account' => $node->getAuthor(),
     );
     $form['nodes'][$node->id()]['status'] = array(
       '#markup' => $node->status ? t('published') : t('not published'),

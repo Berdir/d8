@@ -257,7 +257,7 @@ function hook_node_grants($account, $op) {
  * @see hook_node_access_records_alter()
  * @ingroup node_access
  */
-function hook_node_access_records(\Drupal\Core\Entity\EntityInterface $node) {
+function hook_node_access_records(\Drupal\node\NodeInterface $node) {
   // We only care about the node if it has been marked private. If not, it is
   // treated just like any other node and we completely ignore it.
   if ($node->private) {
@@ -281,7 +281,7 @@ function hook_node_access_records(\Drupal\Core\Entity\EntityInterface $node) {
     // have status unpublished.
     $grants[] = array(
       'realm' => 'example_author',
-      'gid' => $node->uid,
+      'gid' => $node->getAuthorId(),
       'grant_view' => 1,
       'grant_update' => 1,
       'grant_delete' => 1,
@@ -567,7 +567,7 @@ function hook_node_load($nodes, $types) {
  *
  * @ingroup node_access
  */
-function hook_node_access($node, $op, $account, $langcode) {
+function hook_node_access(\Drupal\node\NodeInterface $node, $op, $account, $langcode) {
   $type = is_string($node) ? $node : $node->bundle();
 
   $configured_types = node_permissions_get_configured_types();
@@ -577,13 +577,13 @@ function hook_node_access($node, $op, $account, $langcode) {
     }
 
     if ($op == 'update') {
-      if (user_access('edit any ' . $type . ' content', $account) || (user_access('edit own ' . $type . ' content', $account) && ($account->id() == $node->uid))) {
+      if (user_access('edit any ' . $type . ' content', $account) || (user_access('edit own ' . $type . ' content', $account) && ($account->id() == $node->getAuthorId()))) {
         return NODE_ACCESS_ALLOW;
       }
     }
 
     if ($op == 'delete') {
-      if (user_access('delete any ' . $type . ' content', $account) || (user_access('delete own ' . $type . ' content', $account) && ($account->id() == $node->uid))) {
+      if (user_access('delete any ' . $type . ' content', $account) || (user_access('delete own ' . $type . ' content', $account) && ($account->id() == $node->getAuthorId()))) {
         return NODE_ACCESS_ALLOW;
       }
     }

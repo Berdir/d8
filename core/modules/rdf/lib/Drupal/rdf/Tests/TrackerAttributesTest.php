@@ -119,9 +119,9 @@ class TrackerAttributesTest extends WebTestBase {
    */
   function _testBasicTrackerRdfaMarkup(EntityInterface $node) {
     $node_uri = url('node/' . $node->id(), array('absolute' => TRUE));
-    $user_uri = url('user/' . $node->uid, array('absolute' => TRUE));
+    $user_uri = url('user/' . $node->getAuthorId(), array('absolute' => TRUE));
 
-    $user = ($node->uid == 0) ? 'Anonymous user' : 'Registered user';
+    $user = ($node->getAuthorId() == 0) ? 'Anonymous user' : 'Registered user';
 
     // Parses tracker page where the nodes are displayed in a table.
     $parser = new \EasyRdf_Parser_Rdfa();
@@ -150,10 +150,10 @@ class TrackerAttributesTest extends WebTestBase {
       'type' => 'uri',
       'value' => $user_uri,
     );
-    if ($node->uid == 0) {
+    if ($node->getAuthorId() == 0) {
       $this->assertFalse($graph->hasProperty($node_uri, 'http://rdfs.org/sioc/ns#has_creator', $expected_value), 'No relation to author found in RDF output (sioc:has_creator).');
     }
-    elseif ($node->uid > 0) {
+    elseif ($node->getAuthorId() > 0) {
       $this->assertTrue($graph->hasProperty($node_uri, 'http://rdfs.org/sioc/ns#has_creator', $expected_value), 'Relation to author found in RDF output (sioc:has_creator).');
     }
     // Last updated.

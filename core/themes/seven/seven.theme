@@ -182,7 +182,7 @@ function seven_form_node_form_alter(&$form, &$form_state) {
       '#type' => 'item',
       '#wrapper_attributes' => array('class' => array('author', 'container-inline')),
       '#title' => t('Author'),
-      '#markup' => user_format_name(user_load($node->uid)),
+      '#markup' => $node->getAuthor()->label(),
     ),
   );
   $form['revision_information']['#type'] = 'container';

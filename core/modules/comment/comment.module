@@ -1120,7 +1120,7 @@ function comment_node_load($nodes, $types) {
       $node->cid = 0;
       $node->last_comment_timestamp = $node->getCreatedTime();
       $node->last_comment_name = '';
-      $node->last_comment_uid = $node->uid;
+      $node->last_comment_uid = $node->getAuthorId();
       $node->comment_count = 0;
     }
   }
@@ -1160,7 +1160,7 @@ function comment_node_insert(EntityInterface $node) {
         'cid' => 0,
         'last_comment_timestamp' => $node->getChangedTime(),
         'last_comment_name' => NULL,
-        'last_comment_uid' => $node->uid,
+        'last_comment_uid' => $node->getAuthorId(),
         'comment_count' => 0,
       ))
       ->execute();
@@ -1610,7 +1610,7 @@ function template_preprocess_comment(&$variables) {
     $variables['attributes']['class'][] = 'by-anonymous';
   }
   else {
-    if ($comment->uid->target_id == $variables['node']->uid) {
+    if ($comment->uid->target_id == $variables['node']->getAuthorId()) {
       $variables['attributes']['class'][] = 'by-node-author';
     }
     if ($comment->uid->target_id == $variables['user']->id()) {

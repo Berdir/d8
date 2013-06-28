@@ -60,7 +60,7 @@ class NodeSaveTest extends NodeTestBase {
     $node->enforceIsNew();
 
     // Verify that node_submit did not overwrite the user ID.
-    $this->assertEqual($node->uid, $this->web_user->id(), 'Function node_submit() preserves user ID');
+    $this->assertEqual($node->getAuthorId(), $this->web_user->id(), 'Function node_submit() preserves user ID');
 
     $node->save();
     // Test the import.

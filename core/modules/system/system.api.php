@@ -1860,7 +1860,7 @@ function hook_mail($key, &$message, $params) {
   if (isset($params['node'])) {
     $node = $params['node'];
     $variables += array(
-      '%uid' => $node->uid,
+      '%uid' => $node->getAuthorId(),
       '%node_url' => url('node/' . $node->id(), array('absolute' => TRUE)),
       '%node_type' => node_get_type_label($node),
       '%title' => $node->label(),
@@ -3150,8 +3150,8 @@ function hook_tokens($type, $tokens, array $data = array(), array $options = arr
 
         // Default values for the chained tokens handled below.
         case 'author':
-          $name = ($node->uid == 0) ? config('user.settings')->get('anonymous') : $node->name;
-          $replacements[$original] = $sanitize ? filter_xss($name) : $name;
+          $account = $node->getAuthor() ? $node->getAuthor() : user_load(0);
+          $replacements[$original] = $sanitize ? check_plain($account->label()) : $account->label();
           break;
 
         case 'created':
@@ -3161,8 +3161,7 @@ function hook_tokens($type, $tokens, array $data = array(), array $options = arr
     }
 
     if ($author_tokens = $token_service->findWithPrefix($tokens, 'author')) {
-      $author = user_load($node->uid);
-      $replacements += $token_service->generate('user', $author_tokens, array('user' => $author), $options);
+      $replacements += $token_service->generate('user', $author_tokens, array('user' => $node->getAuthor()), $options);
     }
 
     if ($created_tokens = $token_service->findWithPrefix($tokens, 'created')) {

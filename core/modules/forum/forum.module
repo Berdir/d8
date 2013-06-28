@@ -1211,7 +1211,7 @@ function template_preprocess_forum_icon(&$variables) {
  *   - topic: The topic object.
  */
 function template_preprocess_forum_submitted(&$variables) {
-  $variables['author'] = isset($variables['topic']->uid) ? theme('username', array('account' => user_load($variables['topic']->uid))) : '';
+  $variables['author'] = $variables['topic'] && $variables['topic']->getAuthor() ? theme('username', array('account' => $variables['topic']->getAuthor())) : '';
   $variables['time'] = $variables['topic'] && $variables['topic']->getCreatedTime() ? format_interval(REQUEST_TIME - $variables['topic']->getCreatedTime()) : '';
 }
 

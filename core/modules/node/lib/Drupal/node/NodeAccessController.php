@@ -79,11 +79,11 @@ class NodeAccessController extends EntityAccessController implements NodeAccessC
   protected function checkAccess(EntityInterface $node, $operation, $langcode, AccountInterface $account) {
     // Fetch information from the node object if possible.
     $status = isset($node->status) ? $node->status : NULL;
-    $uid = isset($node->uid) ? $node->uid : NULL;
+    $uid = $node->getAuthorId();
     // If it is a proper EntityNG object, use the proper methods.
     if ($node instanceof EntityNG) {
       $status = $node->getTranslation($langcode)->status->value;
-      $uid = $node->getTranslation($langcode)->uid->value;
+      $uid = $node->getTranslation($langcode)->getAuthorId();
     }
 
     // Check if authors can view their own unpublished nodes.

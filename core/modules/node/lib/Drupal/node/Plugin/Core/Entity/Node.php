@@ -263,7 +263,12 @@ class Node extends EntityNG implements NodeInterface {
    * {@inheritdoc}
    */
   public function getRevisionAuthor() {
-    return $this->get('revision_uid')->entity;
+    $entity = $this->get('revision_uid')->entity;
+    // If no user is given, default to the anonymous user.
+    if (!$entity) {
+      return user_load(0)->getBCentity();
+    }
+    return $entity->getBCEntity();
   }
 
   /**

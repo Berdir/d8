@@ -57,7 +57,7 @@ class UserCancelTest extends WebTestBase {
 
     // Confirm user's content has not been altered.
     $test_node = node_load($node->id(), TRUE);
-    $this->assertTrue(($test_node->uid == $account->id() && $test_node->status == 1), 'Node of the user has not been altered.');
+    $this->assertTrue(($test_node->getAuthorId() == $account->id() && $test_node->status == 1), 'Node of the user has not been altered.');
   }
 
   /**
@@ -138,7 +138,7 @@ class UserCancelTest extends WebTestBase {
 
     // Confirm user's content has not been altered.
     $test_node = node_load($node->id(), TRUE);
-    $this->assertTrue(($test_node->uid == $account->id() && $test_node->status == 1), 'Node of the user has not been altered.');
+    $this->assertTrue(($test_node->getAuthorId() == $account->id() && $test_node->status == 1), 'Node of the user has not been altered.');
   }
 
   /**
@@ -261,11 +261,11 @@ class UserCancelTest extends WebTestBase {
 
     // Confirm that user's content has been attributed to anonymous user.
     $test_node = node_load($node->id(), TRUE);
-    $this->assertTrue(($test_node->uid == 0 && $test_node->status == 1), 'Node of the user has been attributed to anonymous user.');
+    $this->assertTrue(($test_node->getAuthorId() == 0 && $test_node->status == 1), 'Node of the user has been attributed to anonymous user.');
     $test_node = node_revision_load($revision, TRUE);
-    $this->assertTrue(($test_node->revision_uid == 0 && $test_node->status == 1), 'Node revision of the user has been attributed to anonymous user.');
+    $this->assertTrue(($test_node->getRevisionAuthor()->id() == 0 && $test_node->status == 1), 'Node revision of the user has been attributed to anonymous user.');
     $test_node = node_load($revision_node->id(), TRUE);
-    $this->assertTrue(($test_node->uid != 0 && $test_node->status == 1), "Current revision of the user's node was not attributed to anonymous user.");
+    $this->assertTrue(($test_node->getAuthorId() != 0 && $test_node->status == 1), "Current revision of the user's node was not attributed to anonymous user.");
 
     // Confirm that the confirmation message made it through to the end user.
     $this->assertRaw(t('%name has been deleted.', array('%name' => $account->name)), "Confirmation message displayed to user.");

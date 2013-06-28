@@ -11,6 +11,7 @@
 
 use Drupal\Core\Entity\EntityInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Drupal\node\NodeInterface;
 
 /**
  * Page callback: Displays add content links for available content types.
@@ -107,21 +108,21 @@ function node_add($node_type) {
  *
  * @see node_form_build_preview()
  */
-function node_preview(EntityInterface $node) {
+function node_preview(NodeInterface $node) {
   if (node_access('create', $node) || node_access('update', $node)) {
     // Load the user's name when needed.
     if (isset($node->name)) {
       // The use of isset() is mandatory in the context of user IDs, because
       // user ID 0 denotes the anonymous user.
       if ($user = user_load_by_name($node->name)) {
-        $node->uid = $user->id();
+        $node->setAuthorId($user->id());
       }
       else {
-        $node->uid = 0; // anonymous user
+        $node->setAuthorId(0); // anonymous user
       }
     }
-    elseif ($node->uid) {
-      $user = user_load($node->uid);
+    elseif ($node->getAuthorId()) {
+      $user = $node->getAuthor();
       $node->name = $user->name;
     }
 
