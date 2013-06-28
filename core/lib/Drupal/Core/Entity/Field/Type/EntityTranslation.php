@@ -141,6 +141,7 @@ class EntityTranslation extends TypedData implements IteratorAggregate, Accessib
    * Implements \IteratorAggregate::getIterator().
    */
   public function getIterator() {
+    dpm(array_keys($this->getProperties()));
     return new ArrayIterator($this->getProperties());
   }
 
@@ -163,6 +164,7 @@ class EntityTranslation extends TypedData implements IteratorAggregate, Accessib
   public function getPropertyDefinitions() {
     $definitions = array();
     foreach ($this->parent->getPropertyDefinitions() as $name => $definition) {
+      dpm(!empty($definition['translatable']), $name);
       if (!empty($definition['translatable']) || !$this->strict) {
         $definitions[$name] = $definition;
       }
