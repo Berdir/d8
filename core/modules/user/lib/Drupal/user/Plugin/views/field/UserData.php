@@ -58,12 +58,18 @@ class UserData extends FieldPluginBase {
   public function buildOptionsForm(&$form, &$form_state) {
     parent::buildOptionsForm($form, $form_state);
 
+    $modules = system_get_info('module');
+    $names = array();
+    foreach ($modules as $name => $module) {
+      $names[$name] = $module['name'];
+    }
+
     $form['module'] = array(
       '#title' => t('Module name'),
       '#type' => 'select',
       '#description' => t('The module which sets this user data.'),
       '#default_value' => $this->options['module'],
-      '#options' => system_get_module_info('name'),
+      '#options' => $names,
     );
 
     $form['name'] = array(

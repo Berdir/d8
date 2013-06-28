@@ -79,8 +79,11 @@ class SearchSettingsForm extends SystemConfigFormBase {
    */
   protected function getModuleOptions() {
     $search_info = search_get_info(TRUE);
-    $names = system_get_module_info('name');
-    $names = array_intersect_key($names, $search_info);
+    $modules = system_get_info('module');
+    $names = array();
+    foreach ($search_info as $module_name => $info) {
+      $names[$module_name] = $modules[$module_name]['name'];
+    }
     asort($names, SORT_STRING);
     return $names;
   }
