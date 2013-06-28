@@ -479,7 +479,7 @@ class FieldInstance extends ConfigEntityBase implements FieldInstanceInterface {
 
       // Delete the field itself if we just deleted its last instance.
       if ($field_cleanup && count($this->field->getBundles()) == 0) {
-        $this->field->delete();
+        $this->field->delete($this->entity_type);
       }
     }
   }

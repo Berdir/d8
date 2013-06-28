@@ -88,6 +88,15 @@ class EntityManager extends PluginManagerBase {
   protected $fieldDefinitions;
 
   /**
+   * The root paths.
+   *
+   * @see \Drupal\Core\Entity\EntityManager::__construct().
+   *
+   * @var \Traversable
+   */
+  protected $namespaces;
+
+  /**
    * Constructs a new Entity plugin manager.
    *
    * @param \Traversable $namespaces
@@ -104,21 +113,38 @@ class EntityManager extends PluginManagerBase {
    */
   public function __construct(\Traversable $namespaces, ContainerInterface $container, ModuleHandlerInterface $module_handler, CacheBackendInterface $cache, LanguageManager $language_manager) {
     // Allow the plugin definition to be altered by hook_entity_info_alter().
-    $annotation_namespaces = array(
-      'Drupal\Core\Entity\Annotation' => DRUPAL_ROOT . '/core/lib',
-    );
 
     $this->moduleHandler = $module_handler;
     $this->cache = $cache;
     $this->languageManager = $language_manager;
+    $this->namespaces = $namespaces;
 
+    $this->doDiscovery($namespaces);
+    $this->factory = new DefaultFactory($this->discovery);
+    $this->container = $container;
+  }
+
+  protected function doDiscovery($namespaces) {
+    $annotation_namespaces = array(
+      'Drupal\Core\Entity\Annotation' => DRUPAL_ROOT . '/core/lib',
+    );
     $this->discovery = new AnnotatedClassDiscovery('Core/Entity', $namespaces, $annotation_namespaces, 'Drupal\Core\Entity\Annotation\EntityType');
     $this->discovery = new InfoHookDecorator($this->discovery, 'entity_info');
     $this->discovery = new AlterDecorator($this->discovery, 'entity_info');
     $this->discovery = new CacheDecorator($this->discovery, 'entity_info:' . $this->languageManager->getLanguage(Language::TYPE_INTERFACE)->langcode, 'cache', CacheBackendInterface::CACHE_PERMANENT, array('entity_info' => TRUE));
+  }
 
-    $this->factory = new DefaultFactory($this->discovery);
-    $this->container = $container;
+  /**
+   * Add more namespaces to the entity manager.
+   *
+   * @param \Traversable $namespaces
+   */
+  public function addNamespaces(\Traversable $namespaces) {
+    reset($this->namespaces);
+    $iterator = new \AppendIterator;
+    $iterator->append(new \IteratorIterator($this->namespaces));
+    $iterator->append($namespaces);
+    $this->doDiscovery($iterator);
   }
 
   /**
