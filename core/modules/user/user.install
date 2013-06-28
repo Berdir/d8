@@ -686,7 +686,7 @@ function user_update_8011() {
       'default_image' => !empty($default_image_fid) ? array($default_image_fid) : array(),
     ),
   );
-  _update_8003_field_create_instance($field, $instance);
+  _update_8003_field_create_instance($field, $instance, TRUE);
 
   module_load_install('entity');
   if (update_variable_get('user_pictures', 0)) {

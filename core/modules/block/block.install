@@ -262,7 +262,7 @@ function block_update_8008() {
       'label' => 'Block body',
       'settings' => array('display_summary' => FALSE),
     );
-    _update_8003_field_create_instance($body_field, $instance);
+    _update_8003_field_create_instance($body_field, $instance, TRUE);
 
     module_load_install('entity');
     // Assign form settings for the 'default' form mode.

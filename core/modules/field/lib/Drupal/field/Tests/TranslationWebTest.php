@@ -33,7 +33,7 @@ class TranslationWebTest extends FieldTestBase {
    *
    * @var string
    */
-  protected $entity_type = 'test_entity';
+  protected $entity_type = 'entity_test_rev';
 
   /**
    * The field to use in this test.
@@ -61,8 +61,6 @@ class TranslationWebTest extends FieldTestBase {
     parent::setUp();
 
     $this->field_name = drupal_strtolower($this->randomName() . '_field_name');
-
-    $this->entity_type = 'entity_test_rev';
 
     $field = array(
       'field_name' => $this->field_name,

@@ -865,7 +865,7 @@ class DatabaseStorageController extends EntityStorageControllerBase {
    * strongly discouraged. This function is not considered part of the public
    * API and modules relying on it might break even in minor releases.
    *
-   * @param Field $field
+   * @param \Drupal\field\Plugin\Core\Entity\Field $field
    *
    * @return array
    */

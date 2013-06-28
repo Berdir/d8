@@ -24,7 +24,7 @@ class EntityReferenceSelectionAccessTest extends WebTestBase {
     );
   }
 
-  public static $modules = array('node', 'comment', 'entity_reference');
+  public static $modules = array('node', 'comment', 'entity_reference', 'entity_test');
 
   function setUp() {
     parent::setUp();
@@ -73,7 +73,7 @@ class EntityReferenceSelectionAccessTest extends WebTestBase {
     $field->save();
     $instance = entity_create('field_instance', array(
       'field_name' => 'test_field',
-      'entity_type' => 'test_entity',
+      'entity_type' => 'entity_test',
       'bundle' => 'test_bundle',
       'settings' => array(
         'handler' => 'default',
@@ -216,7 +216,7 @@ class EntityReferenceSelectionAccessTest extends WebTestBase {
     $field->save();
     $instance = entity_create('field_instance', array(
       'field_name' => 'test_field',
-      'entity_type' => 'test_entity',
+      'entity_type' => 'entity_test',
       'bundle' => 'test_bundle',
       'settings' => array(
         'handler' => 'default',
@@ -361,7 +361,7 @@ class EntityReferenceSelectionAccessTest extends WebTestBase {
     $field->save();
     $instance = entity_create('field_instance', array(
       'field_name' => 'test_field',
-      'entity_type' => 'test_entity',
+      'entity_type' => 'entity_test',
       'bundle' => 'test_bundle',
       'settings' => array(
         'handler' => 'default',

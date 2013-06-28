@@ -6,12 +6,16 @@
  */
 
 use Drupal\Component\Uuid\Uuid;
+use Drupal\Core\Entity\DatabaseStorageController;
 use Drupal\field\Plugin\Core\Entity\Field;
 
 /**
  * Implements hook_uninstall().
  */
 function taxonomy_uninstall() {
+  Drupal::entityManager()->addNamespaces(new ArrayIterator(array(
+    'Drupal\taxonomy' => DRUPAL_ROOT . '/core/modules/taxonomy/lib',
+  )));
   // Remove taxonomy_term bundles.
   $config_names = config_get_storage_names_with_prefix('taxonomy.vocabulary.');
   foreach ($config_names as $config_name) {
@@ -360,8 +364,8 @@ function taxonomy_update_8007() {
       $field = new Field($field_config->get());
 
       $tables = array(
-        _field_sql_storage_tablename($field),
-        _field_sql_storage_revision_tablename($field),
+        DatabaseStorageController::fieldTableName($field),
+        DatabaseStorageController::fieldRevisionTableName($field),
       );
 
       foreach ($tables as $table_name) {

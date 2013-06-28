@@ -5,6 +5,7 @@
  * Install, update and uninstall functions for File module.
  */
 
+use Drupal\Core\Entity\DatabaseStorageController;
 use Drupal\field\Plugin\Core\Entity\Field;
 
 /**
@@ -308,8 +309,8 @@ function file_update_8003() {
       $field = new Field($field_config->get());
 
       $tables = array(
-        _field_sql_storage_tablename($field),
-        _field_sql_storage_revision_tablename($field),
+        DatabaseStorageController::fieldTableName($field),
+        DatabaseStorageController::fieldRevisionTableName($field),
       );
 
       foreach ($tables as $table_name) {

@@ -14,7 +14,7 @@ use Drupal\simpletest\WebTestBase;
  */
 class SelectionTest extends WebTestBase {
 
-  public static $modules = array('views', 'entity_reference', 'entity_reference_test');
+  public static $modules = array('views', 'entity_reference', 'entity_reference_test', 'entity_test');
 
   public static function getInfo() {
     return array(
@@ -53,7 +53,7 @@ class SelectionTest extends WebTestBase {
     $field->save();
     $instance = entity_create('field_instance', array(
       'field_name' => 'test_field',
-      'entity_type' => 'test_entity',
+      'entity_type' => 'entity_test',
       'bundle' => 'test_bundle',
       'settings' => array(
         'handler' => 'views',

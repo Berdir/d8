@@ -50,7 +50,7 @@ class BulkDeleteTest extends FieldUnitTestBase {
    *
    * @var array
    */
-  protected $entity_type = 'test_entity';
+  protected $entity_type = 'entity_test';
 
   public static function getInfo() {
     return array(
@@ -130,7 +130,6 @@ class BulkDeleteTest extends FieldUnitTestBase {
 
     // For each bundle, create an instance of each field, and 10
     // entities with values for each field.
-    $this->entity_type = 'entity_test';
     foreach ($this->bundles as $bundle) {
       foreach ($this->fields as $field) {
         entity_create('field_instance', array(
