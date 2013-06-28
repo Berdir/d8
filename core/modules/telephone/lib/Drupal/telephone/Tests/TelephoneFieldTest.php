@@ -21,7 +21,6 @@ class TelephoneFieldTest extends WebTestBase {
    */
   public static $modules = array(
     'field',
-    'field_sql_storage',
     'node',
     'telephone'
   );

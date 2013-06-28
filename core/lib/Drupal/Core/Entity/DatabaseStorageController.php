@@ -1101,7 +1101,7 @@ class DatabaseStorageController extends EntityStorageControllerBase {
    * {@inheritdoc}
    */
   public function handleInstanceDelete(FieldInstance $instance) {
-    $field = $instance->getField()->getFieldName();
+    $field = $instance->getField();
     $table_name = static::fieldTableName($field);
     $revision_name = static::fieldRevisionTableName($field);
     $this->database->update($table_name)

@@ -9,6 +9,7 @@
 
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\DatabaseStorageController;
+use Drupal\field\Plugin\Core\Entity\Field;
 
 /**
  * Implements hook_views_data().
@@ -19,7 +20,7 @@ use Drupal\Core\Entity\DatabaseStorageController;
 function field_views_data() {
   $data = array();
   foreach (field_info_fields() as $field) {
-    if ($field['storage']['type'] != 'field_sql_storage') {
+    if ($field->getStorageType() != 'sql') {
       continue;
     }
 
@@ -49,7 +50,7 @@ function field_views_data() {
  */
 function field_views_data_alter(&$data) {
   foreach (field_info_fields() as $field) {
-    if ($field['storage']['type'] != 'field_sql_storage') {
+    if ($field->getStorageType() != 'sql') {
       continue;
     }
 
@@ -90,7 +91,7 @@ function field_views_field_label($field_name) {
 /**
  * Default views data implementation for a field.
  */
-function field_views_field_default_views_data($field) {
+function field_views_field_default_views_data(Field $field) {
   $field_types = field_info_field_types();
 
   // Check the field module is available.
@@ -173,7 +174,7 @@ function field_views_field_default_views_data($field) {
 
   $add_fields = array('delta', 'langcode', 'bundle');
   foreach ($field['columns'] as $column_name => $attributes) {
-    $add_fields[] = DatabaseStorageController::fieldColumnName($field['field_name'], $column_name);
+    $add_fields[] = DatabaseStorageController::fieldColumnName($field->id(), $column_name);
   }
 
   // Note: we don't have a label available here, because we are at the field
@@ -297,10 +298,11 @@ function field_views_field_default_views_data($field) {
       else {
         $group = t('@group (historical data)', array('@group' => $group_name));
       }
-      $column_real_name = $field['storage_details']['sql'][$type][$table][$column];
+      $column_real_name = DatabaseStorageController::fieldColumnName($field->id(), $column);
 
       // Load all the fields from the table by default.
-      $additional_fields = array_values($field['storage_details']['sql'][$type][$table]);
+      $field_sql_schema = DatabaseStorageController::fieldSqlSchema($field);
+      $additional_fields = array_keys($field_sql_schema[$current_table]['fields']);
 
       $data[$table][$column_real_name] = array(
         'group' => $group,
