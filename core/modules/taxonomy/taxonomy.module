@@ -1121,11 +1121,11 @@ function taxonomy_build_node_index($node) {
     // If a node property is not set in the node object when $node->save() is
     // called, the old value from $node->original is used.
     if (!empty($node->original)) {
-      $status = (int)(!empty($node->status) || (!isset($node->status) && !empty($node->original->status)));
+      $status = $node->isPublished();
       $sticky = (int)(!empty($node->sticky) || (!isset($node->sticky) && !empty($node->original->sticky)));
     }
     else {
-      $status = (int)(!empty($node->status));
+      $status = $node->isPublished();
       $sticky = (int)(!empty($node->sticky));
     }
   }

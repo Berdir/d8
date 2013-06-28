@@ -71,7 +71,7 @@ class BulkFormTest extends WebTestBase {
 
     // Unpublish just one node.
     $node = node_load($nodes[0]->id());
-    $this->assertTrue($node->status, 'The node is published.');
+    $this->assertTrue($node->isPublished(), 'The node is published.');
 
     $edit = array('action_bulk_form[0]' => TRUE, 'action' => 'node_unpublish_action');
     $this->drupalPost(NULL, $edit, t('Apply'));
@@ -80,11 +80,11 @@ class BulkFormTest extends WebTestBase {
 
     // Load the node again.
     $node = node_load($node->id(), TRUE);
-    $this->assertFalse($node->status, 'A single node has been unpublished.');
+    $this->assertFalse($node->isPublished(), 'A single node has been unpublished.');
 
     // The second node should still be published.
     $node = node_load($nodes[1]->id(), TRUE);
-    $this->assertTrue($node->status, 'An unchecked node is still published.');
+    $this->assertTrue($node->isPublished(), 'An unchecked node is still published.');
 
     // Set up to include just the sticky actions.
     $view = views_get_view('test_bulk_form');

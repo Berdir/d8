@@ -41,7 +41,7 @@ class BulkFormTest extends NodeTestBase {
     $this->assertIdentical(count($elements), 8, 'All node operations are found.');
 
     // Block a node using the bulk form.
-    $this->assertTrue($node->status);
+    $this->assertTrue($node->isPublished());
     $edit = array(
       'node_bulk_form[0]' => TRUE,
       'action' => 'node_unpublish_action',
@@ -49,7 +49,7 @@ class BulkFormTest extends NodeTestBase {
     $this->drupalPost(NULL, $edit, t('Apply'));
     // Re-load the node and check their status.
     $node = entity_load('node', $node->id());
-    $this->assertFalse($node->status);
+    $this->assertFalse($node->isPublished());
   }
 
 }

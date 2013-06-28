@@ -256,7 +256,7 @@ function node_admin_nodes() {
       '#account' => $node->getAuthor(),
     );
     $form['nodes'][$node->id()]['status'] = array(
-      '#markup' => $node->status ? t('published') : t('not published'),
+      '#markup' => $node->isPublished() ? t('published') : t('not published'),
     );
     $form['nodes'][$node->id()]['changed'] = array(
       '#markup' => format_date($node->getChangedTime(), 'short'),

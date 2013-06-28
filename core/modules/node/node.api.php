@@ -214,7 +214,7 @@ function hook_node_grants($account, $op) {
  * - 'gid': A 'grant ID' from hook_node_grants().
  * - 'grant_view': If set to 1 a user that has been identified as a member
  *   of this gid within this realm can view this node. This should usually be
- *   set to $node->status. Failure to do so may expose unpublished content
+ *   set to $node->isPublished(). Failure to do so may expose unpublished content
  *   to some users.
  * - 'grant_update': If set to 1 a user that has been identified as a member
  *   of this gid within this realm can edit this node.
@@ -263,9 +263,9 @@ function hook_node_access_records(\Drupal\node\NodeInterface $node) {
   if ($node->private) {
     $grants = array();
     // Only published Catalan translations of private nodes should be viewable
-    // to all users. If we fail to check $node->status, all users would be able
+    // to all users. If we fail to check $node->isPublished(), all users would be able
     // to view an unpublished node.
-    if ($node->status) {
+    if ($node->isPublished()) {
       $grants[] = array(
         'realm' => 'example',
         'gid' => 1,

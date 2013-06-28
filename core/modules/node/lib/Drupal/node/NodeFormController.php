@@ -271,7 +271,7 @@ class NodeFormController extends EntityFormController {
         $element['publish']['#value'] = t('Save and publish');
       }
       else {
-        $element['publish']['#value'] = $node->status ? t('Save and keep published') : t('Save and publish');
+        $element['publish']['#value'] = $node->isPublished() ? t('Save and keep published') : t('Save and publish');
       }
       $element['publish']['#weight'] = 0;
       array_unshift($element['publish']['#submit'], array($this, 'publish'));
@@ -283,13 +283,13 @@ class NodeFormController extends EntityFormController {
         $element['unpublish']['#value'] = t('Save as unpublished');
       }
       else {
-        $element['unpublish']['#value'] = !$node->status ? t('Save and keep unpublished') : t('Save and unpublish');
+        $element['unpublish']['#value'] = !$node->isPublished() ? t('Save and keep unpublished') : t('Save and unpublish');
       }
       $element['unpublish']['#weight'] = 10;
       array_unshift($element['unpublish']['#submit'], array($this, 'unpublish'));
 
       // If already published, the 'publish' button is primary.
-      if ($node->status) {
+      if ($node->isPublished()) {
         unset($element['unpublish']['#button_type']);
       }
       // Otherwise, the 'unpublish' button is primary and should come first.
@@ -411,7 +411,7 @@ class NodeFormController extends EntityFormController {
    */
   public function publish(array $form, array &$form_state) {
     $node = $this->entity;
-    $node->status = 1;
+    $node->setPublished(TRUE);
     return $node;
   }
 
@@ -425,7 +425,7 @@ class NodeFormController extends EntityFormController {
    */
   public function unpublish(array $form, array &$form_state) {
     $node = $this->entity;
-    $node->status = 0;
+    $node->setPublished(FALSE);
     return $node;
   }
 
