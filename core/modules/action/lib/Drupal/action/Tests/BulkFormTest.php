@@ -64,7 +64,7 @@ class BulkFormTest extends WebTestBase {
 
     foreach ($nodes as $node) {
       $changed_node = node_load($node->id());
-      $this->assertTrue($changed_node->sticky, format_string('Node @nid got marked as sticky.', array('@nid' => $node->id())));
+      $this->assertTrue($changed_node->isSticky(), format_string('Node @nid got marked as sticky.', array('@nid' => $node->id())));
     }
 
     $this->assertText('Make content sticky was applied to 10 items.');

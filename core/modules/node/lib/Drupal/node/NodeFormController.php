@@ -228,7 +228,7 @@ class NodeFormController extends EntityFormController {
     $form['options']['sticky'] = array(
       '#type' => 'checkbox',
       '#title' => t('Sticky at top of lists'),
-      '#default_value' => $node->sticky,
+      '#default_value' => $node->isSticky(),
     );
 
     // This form uses a button-level #submit handler for the form's main submit
