@@ -155,7 +155,7 @@ class NodeFormController extends EntityFormController {
       '#type' => 'textarea',
       '#title' => t('Revision log message'),
       '#rows' => 4,
-      '#default_value' => !empty($node->log) ? $node->log : '',
+      '#default_value' => !empty($node->log->value) ? $node->log->value : '',
       '#description' => t('Briefly describe the changes you have made.'),
       '#states' => array(
         'visible' => array(

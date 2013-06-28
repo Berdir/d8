@@ -104,7 +104,7 @@ class Node extends EntityNG implements NodeInterface {
       // need to make sure $entity->log is reset whenever it is empty.
       // Therefore, this code allows us to avoid clobbering an existing log
       // entry with an empty one.
-      $record->log = $this->original->log;
+      $record->log = $this->original->log->value;
     }
   }
 
