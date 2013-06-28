@@ -9,13 +9,13 @@ namespace Drupal\node;
 
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Datetime\DrupalDateTime;
-use Drupal\Core\Entity\EntityFormController;
+use Drupal\Core\Entity\EntityFormControllerNG;
 use Drupal\Core\Language\Language;
 
 /**
  * Form controller for the node edit forms.
  */
-class NodeFormController extends EntityFormController {
+class NodeFormController extends EntityFormControllerNG {
 
   /**
    * Default settings for this content/node type.
@@ -42,7 +42,7 @@ class NodeFormController extends EntityFormController {
     if ($node->isNew()) {
       foreach (array('status', 'promote', 'sticky') as $key) {
         // Multistep node forms might have filled in something already.
-        if (!isset($node->$key)) {
+        if ($node->$key->isEmpty()) {
           $node->$key = (int) in_array($key, $this->settings['options']);
         }
       }
