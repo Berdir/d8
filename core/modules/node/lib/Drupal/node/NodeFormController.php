@@ -105,7 +105,7 @@ class NodeFormController extends EntityFormController {
         '#type' => 'textfield',
         '#title' => check_plain($node_type->title_label),
         '#required' => TRUE,
-        '#default_value' => $node->title,
+        '#default_value' => $node->title->value,
         '#maxlength' => 255,
         '#weight' => -5,
       );
