@@ -7,6 +7,7 @@
 
 namespace Drupal\Core\TypedData;
 
+use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageManager;
@@ -356,7 +357,7 @@ class TypedDataManager extends DefaultPluginManager {
     $validation_manager = $this->getValidationConstraintManager();
 
     $type_definition = $this->getDefinition($definition['type']);
-    // Auto-generate a constraint data types implementing a primitive interface.
+    // Auto-generate a constraint for data types implementing a primitive interface.
     if (is_subclass_of($type_definition['class'], '\Drupal\Core\TypedData\PrimitiveInterface')) {
       $constraints[] = $validation_manager->create('PrimitiveType', array());
     }

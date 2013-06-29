@@ -5,7 +5,7 @@
  * Contains \Drupal\Core\TypedData\Type\Timestamp.
  */
 
-namespace Drupal\Core\TypedData\Type;
+namespace Drupal\Core\TypedData\Plugin\DataType;
 
 use Drupal\Core\TypedData\Annotation\DataType;
 use Drupal\Core\Annotation\Translation;
