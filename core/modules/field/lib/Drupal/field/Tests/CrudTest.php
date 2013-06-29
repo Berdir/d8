@@ -327,15 +327,13 @@ class CrudTest extends FieldUnitTestBase {
     $this->assertTrue(!empty($instance) && empty($instance['deleted']), 'A new instance for a previously used field name is created.');
 
     // Save an entity with data for the field
-    $entity = entity_create('entity_test', array('id' => 0, 'revision_id' => 0));
-    $langcode = Language::LANGCODE_NOT_SPECIFIED;
+    $entity = entity_create('entity_test', array());
     $values[0]['value'] = mt_rand(1, 127);
     $entity->{$field['field_name']}->value = $values[0]['value'];
-    field_attach_insert($entity);
+    $entity->save();
 
     // Verify the field is present on load
-    $entity = entity_create('entity_test', array('id' => 0, 'revision_id' => 0));
-    field_attach_load('entity_test', array(0 => $entity));
+    $entity = entity_load($entity->entityType(), $entity->id());
     $this->assertIdentical(count($entity->{$field['field_name']}), count($values), "Data in previously deleted field saves and loads correctly");
     foreach ($values as $delta => $value) {
       $this->assertEqual($entity->{$field['field_name']}[$delta]->value, $values[$delta]['value'], "Data in previously deleted field saves and loads correctly");
@@ -379,18 +377,14 @@ class CrudTest extends FieldUnitTestBase {
     $instance->save();
 
     do {
-      // We need a unique ID for our entity. $cardinality will do.
-      $id = $cardinality;
-      $entity = entity_create('entity_test', array('id' => $id, 'revision_id' => $id));
+      $entity = entity_create('entity_test', array());
       // Fill in the entity with more values than $cardinality.
       for ($i = 0; $i < 20; $i++) {
         $entity->field_update[$i]->value = $i;
       }
-      // Save the entity.
-      field_attach_insert($entity);
+      $entity->save();
       // Load back and assert there are $cardinality number of values.
-      $entity = entity_create('entity_test', array('id' => $id, 'revision_id' => $id));
-      field_attach_load('entity_test', array($id => $entity));
+      $entity = entity_load($entity->entityType(), $entity->id());
       $this->assertEqual(count($entity->field_update), $field->cardinality, 'Cardinality is kept');
       // Now check the values themselves.
       for ($delta = 0; $delta < $cardinality; $delta++) {
