@@ -9,7 +9,8 @@ namespace Drupal\Core\TypedData\Plugin\DataType;
 
 use Drupal\Core\TypedData\Annotation\DataType;
 use Drupal\Core\Annotation\Translation;
-use Drupal\Core\TypedData\TypedData;
+use Drupal\Core\TypedData\PrimitiveBase;
+use Drupal\Core\TypedData\Type\BooleanInterface;
 
 /**
  * The boolean data type.
@@ -20,15 +21,8 @@ use Drupal\Core\TypedData\TypedData;
  * @DataType(
  *   id = "boolean",
  *   label = @Translation("Boolean"),
- *   primitive_type = 1
  * )
  */
-class Boolean extends TypedData {
+class Boolean extends PrimitiveBase implements BooleanInterface {
 
-  /**
-   * The data value.
-   *
-   * @var boolean
-   */
-  protected $value;
 }

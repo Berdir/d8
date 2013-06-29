@@ -9,7 +9,8 @@ namespace Drupal\Core\TypedData\Plugin\DataType;
 
 use Drupal\Core\TypedData\Annotation\DataType;
 use Drupal\Core\Annotation\Translation;
-use Drupal\Core\TypedData\TypedData;
+use Drupal\Core\TypedData\PrimitiveBase;
+use Drupal\Core\TypedData\Type\StringInterface;
 
 /**
  * The string data type.
@@ -20,15 +21,8 @@ use Drupal\Core\TypedData\TypedData;
  * @DataType(
  *   id = "string",
  *   label = @Translation("String"),
- *   primitive_type = 2
  * )
  */
-class String extends TypedData {
+class String extends PrimitiveBase implements StringInterface {
 
-  /**
-   * The data value.
-   *
-   * @var string
-   */
-  protected $value;
 }

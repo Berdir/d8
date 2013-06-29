@@ -9,6 +9,8 @@ namespace Drupal\Core\TypedData\Plugin\DataType;
 
 use Drupal\Core\TypedData\Annotation\DataType;
 use Drupal\Core\Annotation\Translation;
+use Drupal\Core\TypedData\PrimitiveBase;
+use Drupal\Core\TypedData\Type\UriInterface;
 use Drupal\Core\TypedData\TypedData;
 
 /**
@@ -19,15 +21,8 @@ use Drupal\Core\TypedData\TypedData;
  * @DataType(
  *   id = "uri",
  *   label = @Translation("URI"),
- *   primitive_type = 7
  * )
  */
-class Uri extends TypedData {
+class Uri extends PrimitiveBase implements UriInterface {
 
-  /**
-   * The data value.
-   *
-   * @var string
-   */
-  protected $value;
 }

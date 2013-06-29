@@ -9,7 +9,8 @@ namespace Drupal\Core\TypedData\Plugin\DataType;
 
 use Drupal\Core\TypedData\Annotation\DataType;
 use Drupal\Core\Annotation\Translation;
-use Drupal\Core\TypedData\TypedData;
+use Drupal\Core\TypedData\PrimitiveBase;
+use Drupal\Core\TypedData\Type\FloatInterface;
 
 /**
  * The float data type.
@@ -20,15 +21,8 @@ use Drupal\Core\TypedData\TypedData;
  * @DataType(
  *   id = "float",
  *   label = @Translation("Float"),
- *   primitive_type = 4
  * )
  */
-class Float extends TypedData {
+class Float extends PrimitiveBase implements FloatInterface {
 
-  /**
-   * The data value.
-   *
-   * @var float
-   */
-  protected $value;
 }
