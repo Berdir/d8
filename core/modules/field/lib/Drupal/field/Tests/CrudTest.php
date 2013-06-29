@@ -151,28 +151,32 @@ class CrudTest extends FieldUnitTestBase {
   }
 
   /**
-   * Test failure to create a field.
+   * Test failure to change the storage type of a field.
    */
   function testCreateFieldFail() {
-    $field_name = 'duplicate';
-    $field_definition = array('field_name' => $field_name, 'type' => 'test_field', 'storage' => array('type' => 'field_test_storage_failure'));
-    $field = entity_load('field_entity', $field_name);
-
-    // The field does not exist.
-    $this->assertFalse($field, 'The field does not exist.');
-
-    // Try to create the field.
+    $this->assertFalse(field_info_field('field_1'), 'field_1 does not exist');
+    $field_definition = array(
+      'field_name' => 'field_1',
+      'type' => 'test_field',
+    );
+    entity_create('field_entity', $field_definition)->save();
+    $instance_definition = array(
+      'field_name' => $field_definition['field_name'],
+      'entity_type' => 'entity_test',
+      'bundle' => 'entity_test',
+    );
+    entity_create('field_instance', $instance_definition)->save();
+    $field = field_info_field('field_1');
+    // Check that not-changing does not throw an exception.
+    $storage_type = $field->getStorageType();
+    $field->setStorageType($storage_type);
     try {
-      entity_create('field_entity', $field_definition)->save();
-      $this->assertTrue(FALSE, 'Field creation (correctly) fails.');
+      $field->setStorageType($storage_type . 'x');
+      $this->fail('Field storage type can not be changed.');
     }
-    catch (\Exception $e) {
-      $this->assertTrue(TRUE, 'Field creation (correctly) fails.');
+    catch (FieldException $e) {
+      $this->assertEqual($e->getMessage(), 'Field storage type can not be changed.');
     }
-
-    // The field does not exist.
-    $field = entity_load('field_entity', $field_name);
-    $this->assertFalse($field, 'The field does not exist.');
   }
 
   /**
@@ -380,15 +384,16 @@ class CrudTest extends FieldUnitTestBase {
       $entity = entity_create('entity_test', array());
       // Fill in the entity with more values than $cardinality.
       for ($i = 0; $i < 20; $i++) {
-        $entity->field_update[$i]->value = $i;
+        // We can not use $i here because 0 values are filtered out.
+        $entity->field_update[$i]->value = $i + 1;
       }
       $entity->save();
       // Load back and assert there are $cardinality number of values.
       $entity = entity_load($entity->entityType(), $entity->id());
-      $this->assertEqual(count($entity->field_update), $field->cardinality, 'Cardinality is kept');
+      $this->assertEqual(count($entity->field_update), $field->cardinality);
       // Now check the values themselves.
       for ($delta = 0; $delta < $cardinality; $delta++) {
-        $this->assertEqual($entity->field_update[$delta]->value, $delta, 'Value is kept');
+        $this->assertEqual($entity->field_update[$delta]->value, $delta + 1);
       }
       // Increase $cardinality and set the field cardinality to the new value.
       $field->cardinality = ++$cardinality;
