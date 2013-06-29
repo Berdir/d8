@@ -402,17 +402,17 @@ class Field extends ConfigEntityBase implements FieldInterface {
   /**
    * Overrides \Drupal\Core\Entity\Entity::delete().
    *
-   * @param string $last_entity_type
+   * @param string $attached_entity_type
    *   (internal) The field data storage is handled by an entity storage
    *   controller. In order to get this controller, an entity type is
    *   necessary. If the field being deleted has no instances, the field
    *   object itself can not find the entity type it was previously attached
-   *   to and so for example the SQL storage table would not be able to drop
-   *   the field table. To avoid this problem, when the last instance is
+   *   to and so for example the SQL storage controller would not be able to
+   *   drop the field table. To avoid this problem, when the last instance is
    *   deleted \Drupal\Core\Entity\FieldInstance::delete() passes in the
    *   entity type in this argument.
    */
-  public function delete($last_entity_type = '') {
+  public function delete($attached_entity_type = '') {
     if (!$this->deleted) {
       $instance_controller = \Drupal::entityManager()->getStorageController('field_instance');
       $state = \Drupal::state();
@@ -424,6 +424,9 @@ class Field extends ConfigEntityBase implements FieldInterface {
         foreach ($bundles as $bundle) {
           $instance_ids[] = "$entity_type.$bundle.$this->id";
         }
+        // A field only can be instantiated on one storage type, it does not
+        // matter which $entity_type is used as long as there is one.
+        $attached_entity_type = $entity_type;
       }
       foreach ($instance_controller->load($instance_ids) as $instance) {
         // By default, FieldInstance::delete() will automatically try to delete
@@ -433,13 +436,9 @@ class Field extends ConfigEntityBase implements FieldInterface {
         $instance->delete(FALSE);
       }
 
-      if ($this->storageType) {
-        // Either the loop iterating $this->getBundles() above have found
-        // instances and then $entity_type is set or there are no more
-        // instances. In the latter case when deleting the last one,
-        // \Drupal\Core\Entity\FieldInstance::delete() passes in the entity
-        // type of the last instance.
-        \Drupal::entityManager()->getStorageController($entity_type ?: $last_entity_type)->handleDeleteField($this);
+      // The only case $entity_type is empty when there never were instances.
+      if ($attached_entity_type) {
+        \Drupal::entityManager()->getStorageController($attached_entity_type)->handleDeleteField($this);
       }
 
       // Delete the configuration of this field and save the field configuration

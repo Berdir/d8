@@ -62,11 +62,11 @@ function _update_8003_field_create_field(array &$field_config) {
  * @param array $instance_config
  *   An array of field instance properties.
  * @param bool $first
- *   If this is the first instance of the field.
+ *   TRUE ff this is the first instance of the field. Defaults to TRUE.
  *
  * @ingroup update_api
  */
-function _update_8003_field_create_instance(array $field_config, array &$instance_config, $first = FALSE) {
+function _update_8003_field_create_instance(array $field_config, array &$instance_config, $first = TRUE) {
   $uuid = new Uuid();
 
   // Merge in defaults.
