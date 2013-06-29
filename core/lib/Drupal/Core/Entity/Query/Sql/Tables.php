@@ -10,6 +10,7 @@ namespace Drupal\Core\Entity\Query\Sql;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Entity\Query\QueryException;
 use Drupal\field\Plugin\Core\Entity\Field;
+use Drupal\Core\Entity\Field\Type\EntityReference;
 
 /**
  * Adds tables and fields to the SQL entity query.
@@ -193,7 +194,7 @@ class Tables {
           $next_index_prefix = $relationship_specifier;
         }
         // Check for a valid relationship.
-        if (isset($propertyDefinitions[$relationship_specifier]['constraints']['EntityType']) && isset($propertyDefinitions[$relationship_specifier]['settings']['id source'])) {
+        if (isset($propertyDefinitions[$relationship_specifier]['constraints']['EntityType']) && $entity->{$specifier}->get('entity') instanceof EntityReference) {
           // If it is, use the entity type.
           $entity_type = $propertyDefinitions[$relationship_specifier]['constraints']['EntityType'];
           $entity_info = entity_get_info($entity_type);

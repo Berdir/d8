@@ -39,10 +39,6 @@ class Date extends TypedData {
    * Overrides TypedData::setValue().
    */
   public function setValue($value, $notify = TRUE) {
-    // Notify the parent of any changes to be made.
-    if ($notify && isset($this->parent)) {
-      $this->parent->onChange($this->name);
-    }
     // Don't try to create a date from an empty value.
     // It would default to the current time.
     if (!isset($value)) {
@@ -50,6 +46,10 @@ class Date extends TypedData {
     }
     else {
       $this->value = $value instanceOf DrupalDateTime ? $value : new DrupalDateTime($value);
+    }
+    // Notify the parent of any changes.
+    if ($notify && isset($this->parent)) {
+      $this->parent->onChange($this->name);
     }
   }
 }

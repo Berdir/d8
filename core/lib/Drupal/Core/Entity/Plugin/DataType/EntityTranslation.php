@@ -81,11 +81,11 @@ class EntityTranslation extends TypedData implements IteratorAggregate, Accessib
    * Overrides \Drupal\Core\TypedData\TypedData::setValue().
    */
   public function setValue($values, $notify = TRUE) {
-    // Notify the parent of any changes to be made.
+    $this->fields = $values;
+    // Notify the parent of any changes.
     if ($notify && isset($this->parent)) {
       $this->parent->onChange($this->name);
     }
-    $this->fields = $values;
   }
 
   /**

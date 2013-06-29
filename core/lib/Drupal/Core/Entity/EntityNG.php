@@ -101,15 +101,6 @@ class EntityNG extends Entity {
   }
 
   /**
-   * Gets the typed data type of the entity.
-   *
-   * @return string
-   */
-  public function getType() {
-    return $this->entityType;
-  }
-
-  /**
    * Initialize the object. Invoked upon construction and wake up.
    */
   protected function init() {

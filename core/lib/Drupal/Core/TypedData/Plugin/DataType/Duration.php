@@ -39,10 +39,6 @@ class Duration extends TypedData {
    * Overrides TypedData::setValue().
    */
   public function setValue($value, $notify = TRUE) {
-    // Notify the parent of any changes to be made.
-    if ($notify && isset($this->parent)) {
-      $this->parent->onChange($this->name);
-    }
     // Catch any exceptions thrown due to invalid values being passed.
     try {
       if ($value instanceof DateInterval || !isset($value)) {
@@ -67,6 +63,10 @@ class Duration extends TypedData {
       // An invalid value has been given. Setting any invalid value will let
       // validation fail.
       $this->value = $e;
+    }
+    // Notify the parent of any changes.
+    if ($notify && isset($this->parent)) {
+      $this->parent->onChange($this->name);
     }
   }
 

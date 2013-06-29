@@ -10,7 +10,8 @@ namespace Drupal\Core\Entity;
 use Drupal\Component\Uuid\Uuid;
 use Drupal\Core\Language\Language;
 use Drupal\Core\TypedData\TypedDataInterface;
-use Drupal\user\UserInterface;
+use Drupal\Core\TypedData\Annotation\DataType;
+use Drupal\Core\Annotation\Translation;
 use IteratorAggregate;
 use Drupal\Core\Session\AccountInterface;
 
@@ -21,6 +22,13 @@ use Drupal\Core\Session\AccountInterface;
  *
  * This class can be used as-is by simple entity types. Entity types requiring
  * special handling can extend the class.
+ *
+ * @DataType(
+ *   id = "entity",
+ *   label = @Translation("Entity"),
+ *   description = @Translation("All kind of entities, e.g. nodes, comments or users."),
+ *   derivative = "\Drupal\Core\Entity\Plugin\TypedData\Deriver\EntityDeriver"
+ * )
  */
 class Entity implements IteratorAggregate, EntityInterface {
 
@@ -424,9 +432,10 @@ class Entity implements IteratorAggregate, EntityInterface {
    * Implements \Drupal\Core\TypedData\TypedDataInterface::getType().
    */
   public function getType() {
-    // @todo: Incorporate the entity type here by making entities proper
-    // typed data. See http://drupal.org/node/1868004.
-    return 'entity';
+    if ($this->bundle() != $this->entityType()) {
+      return 'entity:' . $this->entityType() . ':' . $this->bundle();
+    }
+    return 'entity:' . $this->entityType();
   }
 
   /**
