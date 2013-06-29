@@ -368,6 +368,9 @@ class Field extends ConfigEntityBase implements FieldInterface {
 
     $original = $storage_controller->loadUnchanged($this->id());
     $this->original = $original;
+    if ($this->original->getStorageType() && !$this->storageType) {
+      $this->storageType = $this->original->getStorageType();
+    }
 
     // Some updates are always disallowed.
     if ($this->type != $original->type) {
