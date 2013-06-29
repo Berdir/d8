@@ -1136,24 +1136,24 @@ class DatabaseStorageController extends EntityStorageControllerBase {
   /**
    * {@inheritdoc}
    */
-  public function fieldPurgeData($entity_id, Field $field, FieldInstance $instance) {
-    parent::fieldPurgeData($entity_id, $field, $instance);
+  public function fieldPurgeData(EntityInterface $entity, Field $field, FieldInstance $instance) {
+    parent::fieldPurgeData($entity, $field, $instance);
     $table_name = static::fieldTableName($field);
     $revision_name = static::fieldRevisionTableName($field);
     $this->database->delete($table_name)
       ->condition('entity_type', $instance->entity_type)
-      ->condition('entity_id', $entity_id)
+      ->condition('entity_id', $entity->id())
       ->execute();
     $this->database->delete($revision_name)
       ->condition('entity_type', $instance->entity_type)
-      ->condition('entity_id', $entity_id)
+      ->condition('entity_id', $entity->id())
       ->execute();
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function fieldValues($entity_id, Field $field, FieldInstance $instance) {
+  protected function fieldValues(EntityInterface $entity, Field $field, FieldInstance $instance) {
     $field_name = $field->id();
     $columns = array();
     foreach ($field->getColumns() as $column_name => $data) {
@@ -1161,9 +1161,9 @@ class DatabaseStorageController extends EntityStorageControllerBase {
     }
     return $this->database->select(static::fieldTableName($field), 't')
       ->fields('t', $columns)
-      ->condition('entity_id', $entity_id)
+      ->condition('entity_id', $entity->id())
       ->execute()
-      ->fetchAllAssoc();
+      ->fetchAll();
   }
 
   /**

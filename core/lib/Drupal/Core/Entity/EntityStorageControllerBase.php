@@ -516,11 +516,11 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
   /**
    * {@inheritdoc}
    */
-  public function fieldPurgeData($entity_id, Field $field, FieldInstance $instance) {
-    $values = $this->fieldValues($entity_id, $field, $instance);
+  public function fieldPurgeData(EntityInterface  $entity, Field $field, FieldInstance $instance) {
+    $values = $this->fieldValues($entity, $field, $instance);
     foreach ($values as $value) {
       $definition = _field_generate_entity_field_definition($field, $instance);
-      $items = \Drupal::typedData()->create($definition, $value, $field->id());
+      $items = \Drupal::typedData()->create($definition, $value, $field->id(), $entity);
       $items->delete();
     }
   }
@@ -528,12 +528,12 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
   /**
    * Get the field values for a single field of a single entity.
    *
-   * @param $entity_id
+   * @param \Drupal\Core\Entity\EntityInterface $entity_id
    * @param Field $field
    * @param FieldInstance $instance
    * @return array
    */
-  protected function fieldValues($entity_id, Field $field, FieldInstance $instance) {
+  protected function fieldValues(EntityInterface $entity, Field $field, FieldInstance $instance) {
     return array();
   }
 

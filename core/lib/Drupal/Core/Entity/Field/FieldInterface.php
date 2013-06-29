@@ -109,8 +109,7 @@ interface FieldInterface extends ListInterface, AccessibleInterface {
    * Defines custom delete behavior for field values.
    *
    * This method is called during the process of deleting an entity, just before
-   * values are deleted from storage. There is no parent available during
-   * delete.
+   * values are deleted from storage.
    */
   public function delete();
 

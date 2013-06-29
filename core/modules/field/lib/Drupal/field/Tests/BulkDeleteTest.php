@@ -7,10 +7,10 @@
 
 namespace Drupal\field\Tests;
 
-use Drupal\field\Plugin\Core\Entity\FieldInstance;
+use Drupal\Core\Entity\DatabaseStorageController;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\field\Plugin\Core\Entity\Field;
 
-use Drupal\Core\Language\Language;
 
 /**
  * Unit test class for field bulk delete and batch purge functionality.
@@ -197,19 +197,25 @@ class BulkDeleteTest extends FieldUnitTestBase {
       ->condition("$field_name.deleted", 1)
       ->sort('id')
       ->execute();
-    $ids = (object) array(
-      'entity_type' => 'entity_test',
-      'bundle' => $bundle,
-    );
-    $entities = array();
-    foreach ($found as $entity_id) {
-      $ids->entity_id = $entity_id;
-      $entities[$entity_id] = _field_create_entity_from_ids($ids);
-    }
-    field_attach_load($this->entity_type, $entities, FIELD_LOAD_CURRENT, array('instance' => $instance));
     $this->assertEqual(count($found), 10, 'Correct number of entities found after deleting');
-    foreach ($entities as $id => $entity) {
-      $this->assertEqual($this->entities[$id]->{$field->id()}->value, $entity->{$field->id()}[Language::LANGCODE_NOT_SPECIFIED][0]['value'], "Entity $id with deleted data loaded correctly");
+    $this->assertFalse(array_diff($found, array_keys($this->entities)));
+    $this->checkFieldTableContents($field);
+  }
+
+  /**
+   * Test that the actual stored content didn't change during delete.
+   *
+   * @param Field $field
+   */
+  protected function checkFieldTableContents(Field $field) {
+    $schema = DatabaseStorageController::fieldSqlSchema($field);
+    $table = DatabaseStorageController::fieldTableName($field);
+    $column = DatabaseStorageController::fieldColumnName($field->id(), 'value');
+    $result = db_select($table, 't')
+      ->fields('t', array_keys($schema[$table]['fields']))
+      ->execute();
+    foreach ($result as $row) {
+      $this->assertEqual($this->entities[$row->entity_id]->{$field->id()}->value, $row->$column);
     }
   }
 
@@ -246,13 +252,12 @@ class BulkDeleteTest extends FieldUnitTestBase {
     }
 
     // Check hooks invocations.
-    // hook_field_load() and hook_field_delete() should have been called once
-    // for each entity in the bundle.
+    // hook_field_delete() should have been called once for each entity in the
+    // bundle.
     $actual_hooks = field_test_memorize();
     $hooks = array();
     $entities = $this->entities_by_bundles[$bundle];
     foreach ($entities as $id => $entity) {
-      $hooks['field_test_field_load'][] = array($id => $entity);
       $hooks['field_test_field_delete'][] = $entity;
     }
     $this->checkHooksInvocations($hooks, $actual_hooks);
@@ -296,13 +301,12 @@ class BulkDeleteTest extends FieldUnitTestBase {
     field_purge_batch(10);
 
     // Check hooks invocations.
-    // hook_field_load() and hook_field_delete() should have been called once
-    // for each entity in the bundle.
+    // hook_field_delete() should have been called once for each entity in the
+    // bundle.
     $actual_hooks = field_test_memorize();
     $hooks = array();
     $entities = $this->entities_by_bundles[$bundle];
     foreach ($entities as $id => $entity) {
-      $hooks['field_test_field_load'][] = array($id => $entity);
       $hooks['field_test_field_delete'][] = $entity;
     }
     $this->checkHooksInvocations($hooks, $actual_hooks);
@@ -331,7 +335,6 @@ class BulkDeleteTest extends FieldUnitTestBase {
     $hooks = array();
     $entities = $this->entities_by_bundles[$bundle];
     foreach ($entities as $id => $entity) {
-      $hooks['field_test_field_load'][] = array($id => $entity);
       $hooks['field_test_field_delete'][] = $entity;
     }
     $this->checkHooksInvocations($hooks, $actual_hooks);

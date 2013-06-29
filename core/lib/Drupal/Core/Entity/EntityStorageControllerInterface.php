@@ -233,7 +233,7 @@ interface EntityStorageControllerInterface {
    * @param $instance
    *   The deleted field instance whose data is being purged.
    */
-  public function fieldPurgeData($entity_id, Field $field, FieldInstance $instance);
+  public function fieldPurgeData(EntityInterface $entity, Field $field, FieldInstance $instance);
 
   /**
    * All the field data is gone, final cleanup.
