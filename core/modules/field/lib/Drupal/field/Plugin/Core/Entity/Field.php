@@ -368,7 +368,13 @@ class Field extends ConfigEntityBase implements FieldInterface {
 
     $original = $storage_controller->loadUnchanged($this->id());
     $this->original = $original;
-    if ($this->original->getStorageType() && !$this->storageType) {
+    $original_storage_type = $this->original->getStorageType();
+    // Disallow changing storage types. Explicit changes of storage types are
+    // disallowed by setStorageType() so this can only happen if an existing
+    // field object gets out of sync with the stored field config, for example
+    // by creating a field, an instance and then re-saving the original field
+    // object.
+    if ($original_storage_type && $this->storageType != $this->original->getStorageType()) {
       $this->storageType = $this->original->getStorageType();
     }
 
