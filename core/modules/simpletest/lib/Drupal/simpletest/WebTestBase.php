@@ -2003,7 +2003,7 @@ abstract class WebTestBase extends TestBase {
    *   TRUE if the assertion succeeded, FALSE otherwise.
    */
   protected function assertLinkByHref($href, $index = 0, $message = '', $group = 'Other') {
-    $links = $this->xpath('//a[contains(@href, :href)]', array(':href' => $href));
+    $links = $this->xpath('//a[ends-with(@href, :href)]', array(':href' => $href));
     $message = ($message ?  $message : t('Link containing href %href found.', array('%href' => $href)));
     return $this->assert(isset($links[$index]), $message, $group);
   }
@@ -2027,7 +2027,7 @@ abstract class WebTestBase extends TestBase {
    *   TRUE if the assertion succeeded, FALSE otherwise.
    */
   protected function assertNoLinkByHref($href, $message = '', $group = 'Other') {
-    $links = $this->xpath('//a[contains(@href, :href)]', array(':href' => $href));
+    $links = $this->xpath('//a[ends-with(@href, :href)]', array(':href' => $href));
     $message = ($message ?  $message : t('No link containing href %href found.', array('%href' => $href)));
     return $this->assert(empty($links), $message, $group);
   }
