@@ -2,12 +2,14 @@
 
 /**
  * @file
- * Contains \Drupal\Core\Entity\Field\Type\EntityReference.
+ * Contains \Drupal\Core\Entity\Plugin\DataType\EntityReference.
  */
 
-namespace Drupal\Core\Entity\Field\Type;
+namespace Drupal\Core\Entity\Plugin\DataType;
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\TypedData\Annotation\DataType;
+use Drupal\Core\Annotation\Translation;
 use Drupal\Core\TypedData\DataReferenceBase;
 
 /**
@@ -27,7 +29,7 @@ use Drupal\Core\TypedData\DataReferenceBase;
  *
  * @DataType(
  *   id = "entity_reference",
- *   label = @Translation("Entity reference"),
+ *   label = @Translation("Entity reference")
  * )
  */
 class EntityReference extends DataReferenceBase {

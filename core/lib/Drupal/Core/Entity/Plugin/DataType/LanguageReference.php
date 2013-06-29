@@ -2,12 +2,14 @@
 
 /**
  * @file
- * Contains \Drupal\Core\Entity\Field\Type\LanguageReference.
+ * Contains \Drupal\Core\Entity\Plugin\DataType\LanguageReference.
  */
 
-namespace Drupal\Core\Entity\Field\Type;
+namespace Drupal\Core\Entity\Plugin\DataType;
 
 use Drupal\Core\TypedData\DataReferenceBase;
+use Drupal\Core\TypedData\Annotation\DataType;
+use Drupal\Core\Annotation\Translation;
 
 /**
  * Defines the 'language_reference' data type.
@@ -21,7 +23,7 @@ use Drupal\Core\TypedData\DataReferenceBase;
  *
  * @DataType(
  *   id = "language_reference",
- *   label = @Translation("Language reference"),
+ *   label = @Translation("Language reference")
  * )
  */
 class LanguageReference extends DataReferenceBase {
