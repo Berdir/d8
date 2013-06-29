@@ -363,6 +363,7 @@ class Field extends ConfigEntityBase implements FieldInterface {
    *   In case of failures at the configuration storage level.
    */
   protected function saveUpdated() {
+    $module_handler = \Drupal::moduleHandler();
     $storage_controller = \Drupal::entityManager()->getStorageController($this->entityType);
 
     $original = $storage_controller->loadUnchanged($this->id());
@@ -383,6 +384,8 @@ class Field extends ConfigEntityBase implements FieldInterface {
 
     // See if any module forbids the update by throwing an exception. This
     // invokes hook_field_update_forbid().
+    $module_handler->invokeAll('field_update_forbid', array($this, $original));
+
     if ($entity_types = array_keys($this->getBundles())) {
       $data_storage_controller = \Drupal::entityManager()->getStorageController($entity_types[0]);
       // Tell the storage engine to update the field. The storage engine can

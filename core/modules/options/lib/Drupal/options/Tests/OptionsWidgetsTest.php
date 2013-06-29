@@ -533,12 +533,15 @@ class OptionsWidgetsTest extends FieldTestBase {
     $admin_user = $this->drupalCreateUser(array('access content', 'administer content types', 'administer node fields', 'administer node form display', 'administer taxonomy'));
     $this->drupalLogin($admin_user);
 
-    // Create a test field instance.
-    $fieldUpdate = $this->bool;
+    // Before update, the field needs to be reloaded because the instance
+    // saved the field and this object is now outdated. Normally a field
+    // gets created then instances get created and the field is not updated
+    // immediately so this is normally not a problem.
+    $fieldUpdate = field_info_field($this->bool->id());
     $fieldUpdate['settings']['allowed_values'] = array(0 => 0, 1 => 'MyOnValue');
     $fieldUpdate->save();
     entity_create('field_instance', array(
-      'field_name' => $this->bool['field_name'],
+      'field_name' => $this->bool->id(),
       'entity_type' => 'node',
       'bundle' => 'page',
     ))->save();
