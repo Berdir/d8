@@ -30,11 +30,11 @@ use Drupal\Core\TypedData\TypedData;
 class Language extends TypedData implements IdentifiableInterface {
 
   /**
-   * The language code of the language if no 'langcode source' is used.
+   * The id of the language.
    *
    * @var string
    */
-  protected $langcode;
+  protected $id;
 
   /**
    * @var \Drupal\Core\Language
@@ -47,8 +47,8 @@ class Language extends TypedData implements IdentifiableInterface {
    * @return \Drupal\Core\Language\Language|null
    */
   public function getValue() {
-    if (!isset($this->language) && $this->langcode) {
-      $this->language = language_load($this->langcode);
+    if (!isset($this->language) && $this->id) {
+      $this->language = language_load($this->id);
     }
     return $this->language;
   }
@@ -61,14 +61,14 @@ class Language extends TypedData implements IdentifiableInterface {
   public function setValue($value, $notify = TRUE) {
     // Support passing language objects.
     if (is_object($value)) {
-      $this->langcode = $value->langcode;
+      $this->id = $value->id;
       $this->language = $value;
     }
     elseif (isset($value) && !is_scalar($value)) {
       throw new InvalidArgumentException('Value is no valid langcode or language object.');
     }
     else {
-      $this->langcode = $value;
+      $this->id = $value;
       $this->language = NULL;
     }
     // Notify the parent of any changes.
@@ -89,11 +89,11 @@ class Language extends TypedData implements IdentifiableInterface {
    * {@inheritdoc}
    */
   public function id() {
-    if (isset($this->langcode)) {
-      return $this->langcode;
+    if (isset($this->id)) {
+      return $this->id;
     }
     elseif (isset($this->language)) {
-      return $this->language->langcode;
+      return $this->language->id;
     }
   }
 
