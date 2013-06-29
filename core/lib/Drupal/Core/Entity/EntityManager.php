@@ -179,6 +179,9 @@ class EntityManager extends PluginManagerBase {
    */
   public function getControllerClass($entity_type, $controller_type, $nested = NULL) {
     $definition = $this->getDefinition($entity_type);
+    if (!$definition) {
+      throw new \InvalidArgumentException(sprintf('The %s entity type does not exist.', $entity_type));
+    }
     $definition = $definition['controllers'];
     if (empty($definition[$controller_type])) {
       throw new \InvalidArgumentException(sprintf('The entity (%s) did not specify a %s.', $entity_type, $controller_type));

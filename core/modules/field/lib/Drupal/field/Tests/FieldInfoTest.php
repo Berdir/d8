@@ -32,15 +32,6 @@ class FieldInfoTest extends FieldUnitTestBase {
       $this->assertEqual($info[$t_key]['module'], 'field_test',  'Field type field_test module appears.');
     }
 
-    $storage_info = field_test_field_storage_info();
-    $info = field_info_storage_types();
-    foreach ($storage_info as $s_key => $storage) {
-      foreach ($storage as $key => $val) {
-        $this->assertEqual($info[$s_key][$key], $val, format_string('Storage type %s_key key %key is %value', array('%s_key' => $s_key, '%key' => $key, '%value' => print_r($val, TRUE))));
-      }
-      $this->assertEqual($info[$s_key]['module'], 'field_test',  'Storage type field_test module appears.');
-    }
-
     // Verify that no unexpected instances exist.
     $instances = field_info_instances('entity_test');
     $expected = array();
@@ -192,7 +183,14 @@ class FieldInfoTest extends FieldUnitTestBase {
       'entity_type' => 'comment',
       'bundle' => 'comment_node_article',
     );
-    entity_create('field_instance', $instance_definition)->save();
+    $instance = entity_create('field_instance', $instance_definition);
+    try {
+      $instance->save();
+      $this->fail('No exception was thrown');
+    }
+    catch (\InvalidArgumentException $e) {
+      $this->assertEqual($e->getMessage(), 'The comment entity type does not exist.');
+    }
 
     // Disable coment module. This clears field_info cache.
     module_disable(array('comment'));
