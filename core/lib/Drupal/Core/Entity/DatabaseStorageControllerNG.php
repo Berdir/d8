@@ -413,7 +413,7 @@ class DatabaseStorageControllerNG extends DatabaseStorageController {
    */
   protected function saveRevision(EntityInterface $entity) {
     $return = $entity->id();
-    $default_langcode = $entity->language()->langcode;
+    $default_langcode = $entity->language()->id;
 
     if (!$entity->isNewRevision()) {
       // Delete to handle removed values.
@@ -535,7 +535,7 @@ class DatabaseStorageControllerNG extends DatabaseStorageController {
    *   The record to store.
    */
   protected function mapToDataStorageRecord(EntityInterface $entity, $langcode) {
-    $default_langcode = $entity->language()->langcode;
+    $default_langcode = $entity->language()->id;
     // Don't use strict mode, this way there's no need to do checks here, as
     // non-translatable properties are replicated for each language.
     $translation = $entity->getTranslation($langcode, FALSE);

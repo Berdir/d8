@@ -6,7 +6,9 @@
  */
 
 namespace Drupal\system\Tests\Upgrade;
+use Drupal\Core\Entity\DatabaseStorageController;
 use Drupal\Core\Language\Language;
+use Drupal\field\Plugin\Core\Entity\Field;
 
 /**
  * Tests upgrade of system variables.
@@ -132,12 +134,6 @@ class FieldUpgradePathTest extends UpgradePathTestBase {
       'module' => 'text',
       'active' => '1',
       'settings' => array(),
-      'storage' => array(
-        'type' => 'field_sql_storage',
-        'module' => 'field_sql_storage',
-        'active' => '1',
-        'settings' => array(),
-      ),
       'locked' => 0,
       'cardinality' => 1,
       'translatable' => 0,
@@ -209,16 +205,18 @@ class FieldUpgradePathTest extends UpgradePathTestBase {
     // The deleted field uuid and deleted instance field_uuid must match.
     $this->assertEqual($deleted_field['uuid'], $deleted_instance['field_uuid']);
 
-    // Check that pre-existing deleted field values are read correctly.
-    $entity = _field_create_entity_from_ids((object) array(
-      'entity_type' => 'node',
-      'bundle' => 'article',
-      'entity_id' => 2,
-      'revision_id' => 2,
-    ));
-    field_attach_load('node', array(2 => $entity), FIELD_LOAD_CURRENT, array('instance' => entity_create('field_instance', $deleted_instance)));
-    $deleted_value = $entity->get('test_deleted_field');
-    $this->assertEqual($deleted_value[Language::LANGCODE_NOT_SPECIFIED][0]['value'], 'Some deleted value');
+    // Check that pre-existing deleted field table is renamed correctly.
+    $field_entity = new Field($deleted_field);
+    $table_name = DatabaseStorageController::fieldTableName($field_entity);
+    $this->assertEqual("field_deleted_data_" . substr(hash('sha256', $deleted_field['uuid']), 0, 10), $table_name);
+    $deleted_value = db_select($table_name, 't')
+      ->fields('t', array(DatabaseStorageController::fieldColumnName($deleted_field['id'], 'value')))
+      ->condition('entity_type', 'node')
+      ->condition('entity_id', 2)
+      ->condition('langcode', Language::LANGCODE_NOT_SPECIFIED)
+      ->execute()
+      ->fetchField();
+    $this->assertEqual($deleted_value, 'Some deleted value');
 
     // Check that creation of a new node works as expected.
     $value = $this->randomName();
