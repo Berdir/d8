@@ -2003,7 +2003,8 @@ abstract class WebTestBase extends TestBase {
    *   TRUE if the assertion succeeded, FALSE otherwise.
    */
   protected function assertLinkByHref($href, $index = 0, $message = '', $group = 'Other') {
-    $links = $this->xpath('//a[ends-with(@href, :href)]', array(':href' => $href));
+    // This is an XPath 1.0 implementation of the ends-with() function.
+    $links = $this->xpath('//a[:href = substring(@href, string-length(@href) - ' . (strlen($href) + 1) . ')]', array(':href' => $href));
     $message = ($message ?  $message : t('Link containing href %href found.', array('%href' => $href)));
     return $this->assert(isset($links[$index]), $message, $group);
   }
@@ -2027,7 +2028,8 @@ abstract class WebTestBase extends TestBase {
    *   TRUE if the assertion succeeded, FALSE otherwise.
    */
   protected function assertNoLinkByHref($href, $message = '', $group = 'Other') {
-    $links = $this->xpath('//a[ends-with(@href, :href)]', array(':href' => $href));
+    // This is an XPath 1.0 implementation of the ends-with() function.
+    $links = $this->xpath('//a[:href = substring(@href, string-length(@href) - ' . (strlen($href) + 1) . ')]', array(':href' => $href));
     $message = ($message ?  $message : t('No link containing href %href found.', array('%href' => $href)));
     return $this->assert(empty($links), $message, $group);
   }
