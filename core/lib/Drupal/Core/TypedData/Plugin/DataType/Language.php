@@ -61,6 +61,7 @@ class Language extends TypedData implements IdentifiableInterface {
   public function setValue($value, $notify = TRUE) {
     // Support passing language objects.
     if (is_object($value)) {
+      $this->langcode = $value->langcode;
       $this->language = $value;
     }
     elseif (isset($value) && !is_scalar($value)) {
@@ -68,6 +69,7 @@ class Language extends TypedData implements IdentifiableInterface {
     }
     else {
       $this->langcode = $value;
+      $this->language = NULL;
     }
     // Notify the parent of any changes.
     if ($notify && isset($this->parent)) {
