@@ -20,7 +20,7 @@ use Drupal\Core\TypedData\Type\BooleanInterface;
  *
  * @DataType(
  *   id = "boolean",
- *   label = @Translation("Boolean"),
+ *   label = @Translation("Boolean")
  * )
  */
 class Boolean extends PrimitiveBase implements BooleanInterface {

@@ -20,7 +20,7 @@ use Drupal\Core\TypedData\Type\FloatInterface;
  *
  * @DataType(
  *   id = "float",
- *   label = @Translation("Float"),
+ *   label = @Translation("Float")
  * )
  */
 class Float extends PrimitiveBase implements FloatInterface {

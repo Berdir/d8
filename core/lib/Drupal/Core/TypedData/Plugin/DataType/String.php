@@ -20,7 +20,7 @@ use Drupal\Core\TypedData\Type\StringInterface;
  *
  * @DataType(
  *   id = "string",
- *   label = @Translation("String"),
+ *   label = @Translation("String")
  * )
  */
 class String extends PrimitiveBase implements StringInterface {

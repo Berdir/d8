@@ -18,7 +18,7 @@ use Drupal\Core\TypedData\Type\DurationInterface;
  *
  * @DataType(
  *   id = "duration",
- *   label = @Translation("Duration"),
+ *   label = @Translation("Duration")
  * )
  */
 class DurationIso8601 extends String implements DurationInterface {

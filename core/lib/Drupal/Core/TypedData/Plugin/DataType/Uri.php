@@ -20,7 +20,7 @@ use Drupal\Core\TypedData\TypedData;
  *
  * @DataType(
  *   id = "uri",
- *   label = @Translation("URI"),
+ *   label = @Translation("URI")
  * )
  */
 class Uri extends PrimitiveBase implements UriInterface {

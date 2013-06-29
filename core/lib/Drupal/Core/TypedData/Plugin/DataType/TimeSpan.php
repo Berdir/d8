@@ -7,6 +7,10 @@
 
 namespace Drupal\Core\TypedData\Plugin\DataType;
 
+use Drupal\Core\TypedData\Annotation\DataType;
+use Drupal\Core\Annotation\Translation;
+use Drupal\Core\TypedData\Type\DurationInterface;
+
 /**
  * The time span data type represents durations as number of seconds.
  *
@@ -18,7 +22,7 @@ namespace Drupal\Core\TypedData\Plugin\DataType;
  *
  * @DataType(
  *   id = "timespan",
- *   label = @Translation("Time span in seconds"),
+ *   label = @Translation("Time span in seconds")
  * )
  *
  * @see \Drupal\Core\TypedData\Type\DurationIso8601

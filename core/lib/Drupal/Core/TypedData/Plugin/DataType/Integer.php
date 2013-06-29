@@ -20,7 +20,7 @@ use Drupal\Core\TypedData\Type\IntegerInterface;
  *
  * @DataType(
  *   id = "integer",
- *   label = @Translation("Integer"),
+ *   label = @Translation("Integer")
  * )
  */
 class Integer extends PrimitiveBase implements IntegerInterface {

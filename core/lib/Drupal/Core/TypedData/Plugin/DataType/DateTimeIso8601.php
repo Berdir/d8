@@ -19,7 +19,7 @@ use Drupal\Core\TypedData\Type\DateTimeInterface;
  *
  * @DataType(
  *   id = "datetime_iso8601",
- *   label = @Translation("Date"),
+ *   label = @Translation("Date")
  * )
  */
 class DateTimeIso8601 extends String implements DateTimeInterface {

@@ -22,7 +22,7 @@ use Drupal\Core\TypedData\TypedData;
  *
  * @DataType(
  *   id = "binary",
- *   label = @Translation("Binary"),
+ *   label = @Translation("Binary")
  * )
  */
 class Binary extends PrimitiveBase implements BinaryInterface {

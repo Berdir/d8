@@ -7,6 +7,8 @@
 
 namespace Drupal\Core\TypedData\Type;
 
+use Drupal\Core\TypedData\Annotation\DataType;
+use Drupal\Core\Annotation\Translation;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\TypedData\Type\DateTimeInterface;
 
@@ -15,7 +17,7 @@ use Drupal\Core\TypedData\Type\DateTimeInterface;
  *
  * @DataType(
  *   id = "timestamp",
- *   label = @Translation("String"),
+ *   label = @Translation("String")
  * )
  */
 class Timestamp extends Integer implements DateTimeInterface {
