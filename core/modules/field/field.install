@@ -291,16 +291,14 @@ function field_update_8003() {
       // Additionally, rename the data tables for deleted fields. Technically
       // this would belong in an update in field_sql_storage.module, but it is
       // easier to do it now, when the old numeric ID is available.
-      if ($config['storage']['type'] == 'field_sql_storage') {
-        $field = new Field($config);
-        $tables = array(
-          "field_deleted_data_{$record['id']}" => DatabaseStorageController::fieldTableName($field),
-          "field_deleted_revision_{$record['id']}" => DatabaseStorageController::fieldRevisionTableName($field),
-        );
-        foreach ($tables as $table_old => $table_new) {
-          if (db_table_exists($table_old)) {
-            db_rename_table($table_old, $table_new);
-          }
+      $field = new Field($config);
+      $tables = array(
+        "field_deleted_data_{$record['id']}" => DatabaseStorageController::fieldTableName($field),
+        "field_deleted_revision_{$record['id']}" => DatabaseStorageController::fieldRevisionTableName($field),
+      );
+      foreach ($tables as $table_old => $table_new) {
+        if (db_table_exists($table_old)) {
+          db_rename_table($table_old, $table_new);
         }
       }
     }

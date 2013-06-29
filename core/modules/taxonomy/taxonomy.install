@@ -16,6 +16,7 @@ function taxonomy_uninstall() {
   Drupal::entityManager()->addNamespaces(new ArrayIterator(array(
     'Drupal\taxonomy' => DRUPAL_ROOT . '/core/modules/taxonomy/lib',
   )));
+  drupal_classloader_register('taxonomy', 'core/modules/taxonomy');
   // Remove taxonomy_term bundles.
   $config_names = config_get_storage_names_with_prefix('taxonomy.vocabulary.');
   foreach ($config_names as $config_name) {
