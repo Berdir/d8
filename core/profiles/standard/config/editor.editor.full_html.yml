@@ -9,7 +9,7 @@ settings:
         - Strike
         - Superscript
         - Subscript
-        - -
+        - '-'
         - RemoveFormat
         - '|'
         - DrupalLink
