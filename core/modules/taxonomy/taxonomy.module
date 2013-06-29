@@ -1155,7 +1155,7 @@ function taxonomy_build_node_index($node) {
     foreach (field_info_instances('node', $node->type) as $instance) {
       $field_name = $instance['field_name'];
       $field = field_info_field($field_name);
-      if ($field['module'] == 'taxonomy' && $field['storage']['type'] == 'field_sql_storage') {
+      if ($field['module'] == 'taxonomy' && $field->getStorageType() == 'sql') {
         // If a field value is not set in the node object when $node->save() is
         // called, the old value from $node->original is used.
         if (isset($node->{$field_name})) {
