@@ -175,61 +175,42 @@ class FieldAttachStorageTest extends FieldUnitTestBase {
    * Tests insert and update with empty or NULL fields.
    */
   function testFieldAttachSaveEmptyData() {
-    $entity_type = 'entity_test_rev';
+    $entity_type = 'entity_test';
     $this->createFieldWithInstance('', $entity_type);
 
-    $entity_init = entity_create($entity_type, array('id' => 1, 'revision_id' => 1));
+    $entity_init = entity_create($entity_type, array('id' => 1));
 
     // Insert: Field is NULL.
-    field_cache_clear();
-    $entity = clone($entity_init);
+    $entity = clone $entity_init;
     $entity->{$this->field_name} = NULL;
-    field_attach_insert($entity);
-
-    $entity = clone($entity_init);
-    field_attach_load($entity_type, array($entity->id() => $entity));
+    $entity->enforceIsNew();
+    $entity = $this->entitySaveReload($entity);
     $this->assertTrue($entity->{$this->field_name}->isEmpty(), 'Insert: NULL field results in no value saved');
 
     // Add some real data.
-    field_cache_clear();
     $entity = clone($entity_init);
     $values = $this->_generateTestFieldValues(1);
     $entity->{$this->field_name} = $values;
-    field_attach_insert($entity);
-
-    $entity = clone($entity_init);
-    field_attach_load($entity_type, array($entity->id() => $entity));
+    $entity = $this->entitySaveReload($entity);
     $this->assertEqual($entity->{$this->field_name}->getValue(), $values, 'Field data saved');
 
     // Update: Field is NULL. Data should be wiped.
-    field_cache_clear();
     $entity = clone($entity_init);
     $entity->{$this->field_name} = NULL;
-    field_attach_update($entity);
-
-    $entity = clone($entity_init);
-    field_attach_load($entity_type, array($entity->id() => $entity));
+    $entity = $this->entitySaveReload($entity);
     $this->assertTrue($entity->{$this->field_name}->isEmpty(), 'Update: NULL field removes existing values');
 
     // Re-add some data.
-    field_cache_clear();
     $entity = clone($entity_init);
     $values = $this->_generateTestFieldValues(1);
     $entity->{$this->field_name} = $values;
-    field_attach_update($entity);
-
-    $entity = clone($entity_init);
-    field_attach_load($entity_type, array($entity->id() => $entity));
+    $entity = $this->entitySaveReload($entity);
     $this->assertEqual($entity->{$this->field_name}->getValue(), $values, 'Field data saved');
 
     // Update: Field is empty array. Data should be wiped.
-    field_cache_clear();
     $entity = clone($entity_init);
     $entity->{$this->field_name} = array();
-    field_attach_update($entity);
-
-    $entity = clone($entity_init);
-    field_attach_load($entity_type, array($entity->id() => $entity));
+    $entity = $this->entitySaveReload($entity);
     $this->assertTrue($entity->{$this->field_name}->isEmpty(), 'Update: empty array removes existing values');
   }
 
