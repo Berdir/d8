@@ -164,11 +164,7 @@ class TranslationTest extends FieldUnitTestBase {
     }
 
     // Save and reload the field translations.
-    $entity->save();
-    $controller = $this->container->get('plugin.manager.entity')->getStorageController($entity_type);
-    $controller->resetCache();
-    $entity = $controller->load(array($entity->id()));
-    $entity = reset($entity);
+    $entity = $this->entitySaveReload($entity);
 
     // Check if the correct values were saved/loaded.
     foreach ($field_translations as $langcode => $items) {

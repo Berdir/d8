@@ -334,10 +334,9 @@ class CrudTest extends FieldUnitTestBase {
     $entity = entity_create('entity_test', array());
     $values[0]['value'] = mt_rand(1, 127);
     $entity->{$field['field_name']}->value = $values[0]['value'];
-    $entity->save();
+    $entity = $this->entitySaveReload($entity);
 
     // Verify the field is present on load
-    $entity = entity_load($entity->entityType(), $entity->id());
     $this->assertIdentical(count($entity->{$field['field_name']}), count($values), "Data in previously deleted field saves and loads correctly");
     foreach ($values as $delta => $value) {
       $this->assertEqual($entity->{$field['field_name']}[$delta]->value, $values[$delta]['value'], "Data in previously deleted field saves and loads correctly");
@@ -387,9 +386,8 @@ class CrudTest extends FieldUnitTestBase {
         // We can not use $i here because 0 values are filtered out.
         $entity->field_update[$i]->value = $i + 1;
       }
-      $entity->save();
       // Load back and assert there are $cardinality number of values.
-      $entity = entity_load($entity->entityType(), $entity->id());
+      $entity = $this->entitySaveReload($entity);
       $this->assertEqual(count($entity->field_update), $field->cardinality);
       // Now check the values themselves.
       for ($delta = 0; $delta < $cardinality; $delta++) {

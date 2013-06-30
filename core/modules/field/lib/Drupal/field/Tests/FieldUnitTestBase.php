@@ -92,6 +92,17 @@ abstract class FieldUnitTestBase extends DrupalUnitTestBase {
   }
 
   /**
+   * Save and reload an entity.
+   */
+  protected function entitySaveReload(EntityInterface $entity) {
+    $entity->save();
+    $controller = $this->container->get('plugin.manager.entity')->getStorageController($entity->getType());
+    $controller->resetCache();
+    $entities = $controller->load(array($entity->id()));
+    return reset($entities);
+  }
+
+  /**
    * Generate random values for a field_test field.
    *
    * @param $cardinality
