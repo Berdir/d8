@@ -153,8 +153,7 @@ class TranslationTest extends FieldUnitTestBase {
     // Prepare the field translations.
     $entity_type = 'entity_test';
     field_test_entity_info_translatable($entity_type, TRUE);
-    $id = $revision_id = 1;
-    $entity = entity_create($entity_type, array('id' => $id, 'revision_id' => $revision_id, 'type' => $this->instance['bundle']));
+    $entity = entity_create($entity_type, array('type' => $this->instance['bundle']));
     $field_translations = array();
     $available_langcodes = field_available_languages($entity_type, $this->field);
     $this->assertTrue(count($available_langcodes) > 1, 'Field is translatable.');
@@ -165,10 +164,11 @@ class TranslationTest extends FieldUnitTestBase {
     }
 
     // Save and reload the field translations.
-    field_attach_insert($entity);
-    $entity = entity_create($entity_type, array('id' => $id, 'revision_id' => $revision_id, 'type' => $this->instance['bundle']));
-    $entity->langcode->value = reset($available_langcodes);
-    field_attach_load($entity_type, array($id => $entity));
+    $entity->save();
+    $controller = $this->container->get('plugin.manager.entity')->getStorageController($entity_type);
+    $controller->resetCache();
+    $entity = $controller->load(array($entity->id()));
+    $entity = reset($entity);
 
     // Check if the correct values were saved/loaded.
     foreach ($field_translations as $langcode => $items) {
@@ -197,9 +197,7 @@ class TranslationTest extends FieldUnitTestBase {
     asort($translation_langcodes);
     $translation_langcodes = array_values($translation_langcodes);
 
-    $id++;
-    $revision_id++;
-    $values = array('id' => $id, 'revision_id' => $revision_id, 'type' => $instance['bundle'], 'langcode' => $translation_langcodes[0]);
+    $values = array('type' => $instance['bundle'], 'langcode' => $translation_langcodes[0]);
     $entity = entity_create($entity_type, $values);
     foreach ($translation_langcodes as $langcode) {
       $values[$this->field_name][$langcode] = $this->_generateTestFieldValues($this->field['cardinality']);
@@ -217,9 +215,7 @@ class TranslationTest extends FieldUnitTestBase {
 
     // Check that explicit empty values are not overridden with default values.
     foreach (array(NULL, array()) as $empty_items) {
-      $id++;
-      $revision_id++;
-      $values = array('id' => $id, 'revision_id' => $revision_id, 'type' => $instance['bundle'], 'langcode' => $translation_langcodes[0]);
+      $values = array('type' => $instance['bundle'], 'langcode' => $translation_langcodes[0]);
       $entity = entity_create($entity_type, $values);
       foreach ($translation_langcodes as $langcode) {
         $values[$this->field_name][$langcode] = $this->_generateTestFieldValues($this->field['cardinality']);
