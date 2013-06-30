@@ -567,7 +567,7 @@ function update_prepare_d8_language() {
 
     // Convert languages to config entities.
     $result = db_query('SELECT * FROM {language}');
-    $uuid = new Uuid();
+    $uuid = Drupal::service('uuid');
     foreach ($result as $language) {
       config('language.entity.' . $language->langcode)
         ->set('id', $language->langcode)

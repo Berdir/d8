@@ -1077,7 +1077,7 @@ function user_update_8019() {
  * Create the 'register' form mode.
  */
 function user_update_8020() {
-  $uuid = new Uuid();
+  $uuid = Drupal::service('uuid');
 
   config("entity.form_mode.user.register")
     ->set('id', "user.register")

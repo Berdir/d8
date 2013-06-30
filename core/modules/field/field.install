@@ -381,7 +381,7 @@ function field_update_8004() {
  * the user.user.register form display.
  */
 function field_update_8005() {
-  $uuid = new Uuid();
+  $uuid = Drupal::service('uuid');
 
   $user_default_form_display = Drupal::config('entity.form_display.user.user.default');
   $user_register_config_data = array(
