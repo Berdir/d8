@@ -62,26 +62,23 @@ class FieldAttachStorageTest extends FieldUnitTestBase {
     // TODO : test empty values filtering and "compression" (store consecutive deltas).
     // Preparation: create three revisions and store them in $revision array.
     $values = array();
+    $entity = entity_create($entity_type, array());
     for ($revision_id = 0; $revision_id < 3; $revision_id++) {
-      $revision[$revision_id] = entity_create($entity_type, array('id' => 0, 'revision_id' => $revision_id));
       // Note: we try to insert one extra value.
-      $values[$revision_id] = $this->_generateTestFieldValues($this->field['cardinality'] + 1);
-      $current_revision = $revision_id;
-      // If this is the first revision do an insert.
-      if (!$revision_id) {
-        $revision[$revision_id]->{$this->field_name}->setValue($values[$revision_id]);
-        field_attach_insert($revision[$revision_id]);
-      }
-      else {
-        // Otherwise do an update.
-        $revision[$revision_id]->{$this->field_name}->setValue($values[$revision_id]);
-        field_attach_update($revision[$revision_id]);
-      }
+      $current_values = $this->_generateTestFieldValues($this->field['cardinality'] + 1);
+      $entity->{$this->field_name}->setValue($current_values);
+      $entity->setNewRevision();
+      $entity->save();
+      $entity_id = $entity->id();
+      $current_revision = $entity->getRevisionId();
+      $values[$current_revision] = $current_values;
     }
 
+    $storage_controller =  $this->container->get('plugin.manager.entity')->getStorageController($entity_type);
+    $storage_controller->resetCache();
+    $entities = $storage_controller->load(array($entity_id));
+    $entity = reset($entities);
     // Confirm current revision loads the correct data.
-    $entity = entity_create($entity_type, array('id' => 0, 'revision_id' => 0));
-    field_attach_load($entity_type, array(0 => $entity));
     // Number of values per field loaded equals the field cardinality.
     $this->assertEqual(count($entity->{$this->field_name}), $this->field['cardinality'], 'Current revision: expected number of values');
     for ($delta = 0; $delta < $this->field['cardinality']; $delta++) {
@@ -92,9 +89,8 @@ class FieldAttachStorageTest extends FieldUnitTestBase {
     }
 
     // Confirm each revision loads the correct data.
-    foreach (array_keys($revision) as $revision_id) {
-      $entity = entity_create($entity_type, array('id' => 0, 'revision_id' => $revision_id));
-      field_attach_load_revision($entity_type, array(0 => $entity));
+    foreach (array_keys($values) as $revision_id) {
+      $entity = $storage_controller->loadRevision($revision_id);
       // Number of values per field loaded equals the field cardinality.
       $this->assertEqual(count($entity->{$this->field_name}), $this->field['cardinality'], format_string('Revision %revision_id: expected number of values.', array('%revision_id' => $revision_id)));
       for ($delta = 0; $delta < $this->field['cardinality']; $delta++) {
