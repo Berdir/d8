@@ -233,11 +233,8 @@ class FieldAttachStorageTest extends FieldUnitTestBase {
     // Insert: Field is NULL.
     $entity = clone($entity_init);
     $entity->getBCEntity()->{$this->field_name} = NULL;
-    field_attach_insert($entity);
-
-    $entity = clone($entity_init);
-    $entity->getBCEntity()->{$this->field_name} = array();
-    field_attach_load($entity_type, array($entity->id() => $entity));
+    $entity->enforceIsNew();
+    $entity = $this->entitySaveReload($entity);
     $this->assertTrue($entity->{$this->field_name}->isEmpty(), 'Insert: NULL field results in no value saved');
 
     // Verify that prepopulated field values are not overwritten by defaults.
@@ -249,56 +246,60 @@ class FieldAttachStorageTest extends FieldUnitTestBase {
   /**
    * Test field_attach_delete().
    */
-  function testFieldAttachDelete() {
+  function xtestFieldAttachDelete() {
     $entity_type = 'entity_test_rev';
     $this->createFieldWithInstance('', $entity_type);
-    $rev[0] = entity_create($entity_type, array('id' => 0, 'revision_id' => 0, 'type' => $this->instance['bundle']));
+    $entity = entity_create($entity_type, array('type' => $this->instance['bundle']));
+    $vids = array();
 
     // Create revision 0
     $values = $this->_generateTestFieldValues($this->field['cardinality']);
-    $rev[0]->{$this->field_name} = $values;
-    field_attach_insert($rev[0]);
+    $entity->{$this->field_name} = $values;
+    $entity->save();
+    $vids[] = $entity->getRevisionId();
 
     // Create revision 1
-    $rev[1] = entity_create($entity_type, array('id' => 0, 'revision_id' => 1, 'type' => $this->instance['bundle']));
-    $rev[1]->{$this->field_name} = $values;
-    field_attach_update($rev[1]);
+    $entity->setNewRevision();
+    $entity->save();
+    $vids[] = $entity->getRevisionId();
 
     // Create revision 2
-    $rev[2] = entity_create($entity_type, array('id' => 0, 'revision_id' => 2, 'type' => $this->instance['bundle']));
-    $rev[2]->{$this->field_name} = $values;
-    field_attach_update($rev[2]);
+    $entity->setNewRevision();
+    $entity->save();
+    $vids[] = $entity->getRevisionId();
+    $controller = $this->container->get('plugin.manager.entity')->getStorageController($entity->getType());
+    $controller->resetCache();
 
     // Confirm each revision loads
-    foreach (array_keys($rev) as $vid) {
-      $read = entity_create($entity_type, array('id' => 0, 'revision_id' => $vid, 'type' => $this->instance['bundle']));
-      field_attach_load_revision($entity_type, array(0 => $read));
-      $this->assertEqual(count($read->{$this->field_name}), $this->field['cardinality'], "The test entity revision $vid has {$this->field['cardinality']} values.");
+    foreach ($vids as $vid) {
+      $revision = $controller->loadRevision($vid);
+      $this->assertEqual(count($revision->{$this->field_name}), $this->field['cardinality'], "The test entity revision $vid has {$this->field['cardinality']} values.");
     }
 
     // Delete revision 1, confirm the other two still load.
-    field_attach_delete_revision($rev[1]);
+    $controller->deleteRevision($vids[1]);
+    $controller->resetCache();
     foreach (array(0, 2) as $vid) {
-      $read = entity_create($entity_type, array('id' => 0, 'revision_id' => $vid, 'type' => $this->instance['bundle']));
-      field_attach_load_revision($entity_type, array(0 => $read));
-      $this->assertEqual(count($read->{$this->field_name}), $this->field['cardinality'], "The test entity revision $vid has {$this->field['cardinality']} values.");
+      $revision = $controller->loadRevision($vid);
+      $this->assertEqual(count($revision->{$this->field_name}), $this->field['cardinality'], "The test entity revision $vid has {$this->field['cardinality']} values.");
     }
 
     // Confirm the current revision still loads
-    $read = entity_create($entity_type, array('id' => 0, 'revision_id' => 2, 'type' => $this->instance['bundle']));
-    field_attach_load($entity_type, array(0 => $read));
-    $this->assertEqual(count($read->{$this->field_name}), $this->field['cardinality'], "The test entity current revision has {$this->field['cardinality']} values.");
+    $controller->resetCache();
+    $entities = $controller->load(array($entity->id()));
+    $current = reset($entities);
+    $this->assertEqual(count($current->{$this->field_name}), $this->field['cardinality'], "The test entity current revision has {$this->field['cardinality']} values.");
 
     // Delete all field data, confirm nothing loads
-    field_attach_delete($rev[2]);
+    $entity->delete();
+    $controller->resetCache();
     foreach (array(0, 1, 2) as $vid) {
-      $read = entity_create($entity_type, array('id' => 0, 'revision_id' => $vid, 'type' => $this->instance['bundle']));
-      field_attach_load_revision($entity_type, array(0 => $read));
-      $this->assertIdentical($read->{$this->field_name}[0]->getValue(), array(), "The test entity revision $vid is deleted.");
+      $revision = $controller->loadRevision($vid);
+      $this->assertIdentical($revision->{$this->field_name}[0]->getValue(), array(), "The test entity revision $vid is deleted.");
     }
-    $read = entity_create($entity_type, array('id' => 0, 'revision_id' => 2, 'type' => $this->instance['bundle']));
-    field_attach_load($entity_type, array(0 => $read));
-    $this->assertIdentical($read->{$this->field_name}[0]->getValue(), array(), 'The test entity current revision is deleted.');
+    $entities = $controller->load(array($entity->id()));
+    $current = reset($entities);
+    $this->assertIdentical($current->{$this->field_name}[0]->getValue(), array(), 'The test entity current revision is deleted.');
   }
 
   /**
