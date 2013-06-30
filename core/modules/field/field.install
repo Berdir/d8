@@ -5,7 +5,6 @@
  * Install, update, and uninstall functions for the Field module.
  */
 
-use Drupal\Component\Uuid\Uuid;
 use Drupal\field\Plugin\Core\Entity\Field;
 
 /**
@@ -20,7 +19,7 @@ use Drupal\field\Plugin\Core\Entity\Field;
  * @ingroup update_api
  */
 function _update_8003_field_create_field(array &$field_config) {
-  $uuid = new Uuid();
+  $uuid = Drupal::service('uuid');
 
   // Merge in default values.
   $field_config += array(
@@ -69,7 +68,7 @@ function _update_8003_field_create_field(array &$field_config) {
  * @ingroup update_api
  */
 function _update_8003_field_create_instance(array $field_config, array &$instance_config) {
-  $uuid = new Uuid();
+  $uuid = Drupal::service('uuid');
 
   // Merge in defaults.
   $instance_config += array(
@@ -241,8 +240,7 @@ function field_update_8002() {
  * Convert fields and instances to config.
  */
 function field_update_8003() {
-  $uuid = new Uuid();
-
+  $uuid = Drupal::service('uuid');
   $state = Drupal::state();
   $deleted_fields = $state->get('field.field.deleted') ?: array();
   $deleted_instances = $state->get('field.instance.deleted') ?: array();

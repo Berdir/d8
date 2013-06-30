@@ -67,7 +67,7 @@ services:
     arguments: ['@config.cachedstorage.storage', '@cache.config']
   config.context.factory:
     class: Drupal\Core\Config\Context\ConfigContextFactory
-    arguments: ['@event_dispatcher']
+    arguments: ['@event_dispatcher', '@uuid']
   config.context:
     class: Drupal\Core\Config\Context\ContextInterface
     tags:

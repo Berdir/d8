@@ -41,6 +41,7 @@ class EntityNG extends Entity {
    *
    * @todo: Add methods for getting original fields and for determining
    * changes.
+   * @todo: Provide a better way for defining default values.
    *
    * @var array
    */
@@ -574,7 +575,9 @@ class EntityNG extends Entity {
 
     // Check if the entity type supports UUIDs and generate a new one if so.
     if (!empty($entity_info['entity_keys']['uuid'])) {
-      $duplicate->{$entity_info['entity_keys']['uuid']}->applyDefaultValue();
+      // @todo Inject the uuid service into the storage controller once
+      //    possible.
+      $duplicate->{$entity_info['entity_keys']['uuid']}->value = \Drupal::service('uuid')->generate();
     }
 
     // Check whether the entity type supports revisions and initialize it if so.

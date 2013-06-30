@@ -11,6 +11,7 @@ use Drupal\Core\Entity\DatabaseStorageController;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Database\Connection;
+use Drupal\Component\Uuid\UuidInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Cmf\Component\Routing\RouteProviderInterface;
 
@@ -55,8 +56,8 @@ class MenuLinkStorageController extends DatabaseStorageController implements Men
    * @param \Symfony\Cmf\Component\Routing\RouteProviderInterface $route_provider
    *   The route provider service.
    */
-  public function __construct($entity_type, array $entity_info, Connection $database, RouteProviderInterface $route_provider) {
-    parent::__construct($entity_type, $entity_info, $database);
+  public function __construct($entity_type, array $entity_info, Connection $database, UuidInterface $uuid_service, RouteProviderInterface $route_provider) {
+    parent::__construct($entity_type, $entity_info, $database, $uuid_service);
 
     $this->routeProvider = $route_provider;
 
@@ -85,6 +86,7 @@ class MenuLinkStorageController extends DatabaseStorageController implements Men
       $entity_type,
       $entity_info,
       $container->get('database'),
+      $container->get('uuid'),
       $container->get('router.route_provider')
     );
   }

@@ -14,7 +14,6 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 use Drupal\Component\Utility\Crypt;
-use Drupal\Component\Uuid\Uuid;
 use Drupal\file\Plugin\Core\Entity\File;
 use Drupal\image\Plugin\Core\Entity\ImageStyle;
 use Drupal\field\FieldInterface;
@@ -830,7 +829,7 @@ function image_effect_save($style, &$effect) {
 
   // Generate a unique image effect ID for a new effect.
   if (empty($effect['ieid'])) {
-    $uuid = new Uuid();
+    $uuid = Drupal::service('uuid');
     $effect['ieid'] = $uuid->generate();
   }
   $style->effects[$effect['ieid']] = $effect;

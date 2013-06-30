@@ -1283,7 +1283,8 @@ abstract class TestBase {
         $this->container->get('event_dispatcher'),
         $this->container->get('config.factory'),
         $this->container->get('plugin.manager.entity'),
-        $this->container->get('lock')
+        $this->container->get('lock'),
+        $this->container->get('uuid')
       );
     }
     // Always recalculate the changelist when called.

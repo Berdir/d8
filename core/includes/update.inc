@@ -14,7 +14,6 @@ use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Config\ConfigException;
 use Drupal\Core\DrupalKernel;
 use Drupal\Component\Gettext\PoHeader;
-use Drupal\Component\Uuid\Uuid;
 use Drupal\Component\Utility\NestedArray;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -1521,7 +1520,7 @@ function update_variables_to_state(array $variable_map) {
  *   A $primary_key values of rows to be updated.
  */
 function update_add_uuids(&$sandbox, $table, $primary_key, $values) {
-  $uuid = new Uuid();
+  $uuid = Drupal::service('uuid');
   foreach ($values as $value) {
     db_update($table)
       ->fields(array(

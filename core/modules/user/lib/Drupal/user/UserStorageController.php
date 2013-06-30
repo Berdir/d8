@@ -11,6 +11,7 @@ use Drupal\Core\Entity\EntityBCDecorator;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Password\PasswordInterface;
 use Drupal\Core\Database\Connection;
+use Drupal\Component\Uuid\UuidInterface;
 use Drupal\user\UserDataInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Entity\DatabaseStorageControllerNG;
@@ -51,8 +52,8 @@ class UserStorageController extends DatabaseStorageControllerNG implements UserS
    * @param \Drupal\user\UserDataInterface $user_data
    *   The user data service.
    */
-  public function __construct($entity_type, $entity_info, Connection $database, PasswordInterface $password, UserDataInterface $user_data) {
-    parent::__construct($entity_type, $entity_info, $database);
+  public function __construct($entity_type, $entity_info, Connection $database, UuidInterface $uuid_service, PasswordInterface $password, UserDataInterface $user_data) {
+    parent::__construct($entity_type, $entity_info, $database, $uuid_service);
 
     $this->password = $password;
     $this->userData = $user_data;
@@ -66,6 +67,7 @@ class UserStorageController extends DatabaseStorageControllerNG implements UserS
       $entity_type,
       $entity_info,
       $container->get('database'),
+      $container->get('uuid'),
       $container->get('password'),
       $container->get('user.data')
     );

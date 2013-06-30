@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\Component\Uuid\Php.
+ * Contains \Drupal\Component\Uuid\Php.
  */
 
 namespace Drupal\Component\Uuid;
@@ -19,7 +19,7 @@ use Drupal\Component\Utility\Crypt;
 class Php implements UuidInterface {
 
   /**
-   * Implements Drupal\Component\Uuid\UuidInterface::generate().
+   * {@inheritdoc}
    */
   public function generate() {
     $hex = substr(hash('sha256', Crypt::randomBytes(16)), 0, 32);
@@ -46,4 +46,5 @@ class Php implements UuidInterface {
 
     return $uuid;
   }
+
 }

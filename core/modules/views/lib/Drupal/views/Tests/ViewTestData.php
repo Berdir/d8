@@ -66,7 +66,8 @@ class ViewTestData {
           \Drupal::service('event_dispatcher'),
           \Drupal::service('config.factory'),
           \Drupal::entityManager(),
-          \Drupal::lock()
+          \Drupal::lock(),
+          \Drupal::service('uuid')
         );
         $installer->import();
       }

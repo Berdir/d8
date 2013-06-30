@@ -19,4 +19,5 @@ interface UuidInterface {
    *   A 32 byte integer represented as a hex string formatted with 4 hypens.
    */
   public function generate();
+
 }

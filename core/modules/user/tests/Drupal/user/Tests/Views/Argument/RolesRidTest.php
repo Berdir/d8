@@ -8,6 +8,7 @@
 namespace Drupal\user\Tests\Views\Argument;
 
 use Drupal\Component\Utility\String;
+use Drupal\Component\Uuid\Php;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Tests\UnitTestCase;
 use Drupal\user\Plugin\views\argument\RolesRid;
@@ -63,11 +64,12 @@ class RolesRidTest extends UnitTestCase {
     $entity_query_factory = $this->getMockBuilder('Drupal\Core\Entity\Query\QueryFactory')
       ->disableOriginalConstructor()
       ->getMock();
+    $uuid = new Php();
 
     // Creates a stub role storage controller and replace the attachLoad()
     // method with an empty version, because attachLoad() calls
     // module_implements().
-    $role_storage_controller = $this->getMock('Drupal\user\RoleStorageController', array('attachLoad'), array('user_role', static::$entityInfo, $config_factory, $config_storage, $entity_query_factory));
+    $role_storage_controller = $this->getMock('Drupal\user\RoleStorageController', array('attachLoad'), array('user_role', static::$entityInfo, $config_factory, $config_storage, $uuid, $entity_query_factory));
 
 
     $entity_manager = $this->getMockBuilder('Drupal\Core\Entity\EntityManager')

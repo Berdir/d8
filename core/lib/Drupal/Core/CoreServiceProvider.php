@@ -50,6 +50,7 @@ class CoreServiceProvider implements ServiceProviderInterface  {
     $container->addScope(new Scope('request'));
     $this->registerTwig($container);
     $this->registerModuleHandler($container);
+    $this->registerUuid($container);
 
     $container->addCompilerPass(new RegisterMatchersPass());
     $container->addCompilerPass(new RegisterRouteFiltersPass());
@@ -130,6 +131,33 @@ class CoreServiceProvider implements ServiceProviderInterface  {
       // @todo Figure out what to do about debugging functions.
       // @see http://drupal.org/node/1804998
       ->addMethodCall('addExtension', array(new Definition('Twig_Extension_Debug')));
+  }
+
+  /**
+   * Determines and registers the Uuid service.
+   *
+   * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+   *   The container.
+   *
+   * @return string
+   *   Class name for the Uuid service.
+   */
+  public static function registerUuid(ContainerBuilder $container) {
+    $uuid_class = 'Drupal\Component\Uuid\Php';
+
+    // Debian/Ubuntu uses the (broken) OSSP extension as their UUID
+    // implementation. The OSSP implementation is not compatible with the
+    // PECL functions.
+    if (function_exists('uuid_create') && !function_exists('uuid_make')) {
+      $uuid_class = 'Drupal\Component\Uuid\Pecl';
+    }
+    // Try to use the COM implementation for Windows users.
+    elseif (function_exists('com_create_guid')) {
+      $uuid_class = 'Drupal\Component\Uuid\Com';
+    }
+
+    $container->register('uuid', $uuid_class);
+    return $uuid_class;
   }
 
 }

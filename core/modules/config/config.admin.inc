@@ -128,7 +128,8 @@ function config_admin_import_form_submit($form, &$form_state) {
     Drupal::service('event_dispatcher'),
     Drupal::service('config.factory'),
     Drupal::entityManager(),
-    Drupal::lock()
+    Drupal::lock(),
+    Drupal::service('uuid')
   );
   if ($config_importer->alreadyImporting()) {
     drupal_set_message(t('Another request may be synchronizing configuration already.'));
