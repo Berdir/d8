@@ -153,10 +153,10 @@ class UserSession implements AccountInterface {
   function getPreferredLangcode($default = NULL) {
     $language_list = language_list();
     if (!empty($this->preferred_langcode) && isset($language_list[$this->preferred_langcode])) {
-      return $language_list[$this->preferred_langcode]->langcode;
+      return $language_list[$this->preferred_langcode]->id;
     }
     else {
-      return $default ? $default : language_default()->langcode;
+      return $default ? $default : language_default()->id;
     }
   }
 
@@ -166,10 +166,10 @@ class UserSession implements AccountInterface {
   function getPreferredAdminLangcode($default = NULL) {
     $language_list = language_list();
     if (!empty($this->preferred_admin_langcode) && isset($language_list[$this->preferred_admin_langcode])) {
-      return $language_list[$this->preferred_admin_langcode]->langcode;
+      return $language_list[$this->preferred_admin_langcode]->id;
     }
     else {
-      return $default ? $default : language_default()->langcode;
+      return $default ? $default : language_default()->id;
     }
   }
 

@@ -343,10 +343,10 @@ class User extends EntityNG implements UserInterface {
     $language_list = language_list();
     $preferred_langcode = $this->get('preferred_langcode')->value;
     if (!empty($preferred_langcode) && isset($language_list[$preferred_langcode])) {
-      return $language_list[$preferred_langcode]->langcode;
+      return $language_list[$preferred_langcode]->id;
     }
     else {
-      return $default ? $default : language_default()->langcode;
+      return $default ? $default : language_default()->id;
     }
   }
 
@@ -357,7 +357,7 @@ class User extends EntityNG implements UserInterface {
     $language_list = language_list();
     $preferred_langcode = $this->get('preferred_admin_langcode')->value;
     if (!empty($preferred_langcode) && isset($language_list[$preferred_langcode])) {
-      return $language_list[$preferred_langcode]->langcode;
+      return $language_list[$preferred_langcode]->id;
     }
     else {
       return $default ? $default : language_default()->langcode;
