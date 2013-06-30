@@ -246,7 +246,7 @@ class FieldAttachStorageTest extends FieldUnitTestBase {
   /**
    * Test field_attach_delete().
    */
-  function xtestFieldAttachDelete() {
+  function testFieldAttachDelete() {
     $entity_type = 'entity_test_rev';
     $this->createFieldWithInstance('', $entity_type);
     $entity = entity_create($entity_type, array('type' => $this->instance['bundle']));
@@ -279,7 +279,8 @@ class FieldAttachStorageTest extends FieldUnitTestBase {
     // Delete revision 1, confirm the other two still load.
     $controller->deleteRevision($vids[1]);
     $controller->resetCache();
-    foreach (array(0, 2) as $vid) {
+    foreach (array(0, 2) as $key) {
+      $vid = $vids[$key];
       $revision = $controller->loadRevision($vid);
       $this->assertEqual(count($revision->{$this->field_name}), $this->field['cardinality'], "The test entity revision $vid has {$this->field['cardinality']} values.");
     }
@@ -295,11 +296,10 @@ class FieldAttachStorageTest extends FieldUnitTestBase {
     $controller->resetCache();
     foreach (array(0, 1, 2) as $vid) {
       $revision = $controller->loadRevision($vid);
-      $this->assertIdentical($revision->{$this->field_name}[0]->getValue(), array(), "The test entity revision $vid is deleted.");
+      $this->assertFalse($revision);
     }
     $entities = $controller->load(array($entity->id()));
-    $current = reset($entities);
-    $this->assertIdentical($current->{$this->field_name}[0]->getValue(), array(), 'The test entity current revision is deleted.');
+    $this->assertFalse($entities);
   }
 
   /**
@@ -318,14 +318,11 @@ class FieldAttachStorageTest extends FieldUnitTestBase {
     entity_create('field_instance', $this->instance_definition)->save();
 
     // Save an entity with data in the field.
-    $entity = entity_create($entity_type, array('id' => 0, 'revision_id' => 0, 'type' => $this->instance['bundle']));
+    $entity = entity_create($entity_type, array('type' => $this->instance['bundle']));
     $values = $this->_generateTestFieldValues($this->field['cardinality']);
     $entity->{$this->field_name} = $values;
-    field_attach_insert($entity);
-
     // Verify the field data is present on load.
-    $entity = entity_create($entity_type, array('id' => 0, 'revision_id' => 0, 'type' => $this->instance['bundle']));
-    field_attach_load($entity_type, array(0 => $entity));
+    $entity = $this->entitySaveReload($entity);
     $this->assertEqual(count($entity->{$this->field_name}), $this->field['cardinality'], "Data is retrieved for the new bundle");
 
     // Rename the bundle.
@@ -337,8 +334,10 @@ class FieldAttachStorageTest extends FieldUnitTestBase {
     $this->assertIdentical($this->instance['bundle'], $new_bundle, "Bundle name has been updated in the instance.");
 
     // Verify the field data is present on load.
-    $entity = entity_create($entity_type, array('id' => 0, 'revision_id' => 0, 'type' => $this->instance['bundle']));
-    field_attach_load($entity_type, array(0 => $entity));
+    $controller = $this->container->get('plugin.manager.entity')->getStorageController($entity->getType());
+    $controller->resetCache();
+    $entities = $controller->load(array($entity->id()));
+    $entity = reset($entities);
     $this->assertEqual(count($entity->{$this->field_name}), $this->field['cardinality'], "Bundle name has been updated in the field storage");
   }
 
@@ -372,15 +371,13 @@ class FieldAttachStorageTest extends FieldUnitTestBase {
     entity_create('field_instance', $instance)->save();
 
     // Save an entity with data for both fields
-    $entity = entity_create($entity_type, array('id' => 0, 'revision_id' => 0, 'type' => $this->instance['bundle']));
+    $entity = entity_create($entity_type, array('type' => $this->instance['bundle']));
     $values = $this->_generateTestFieldValues($this->field['cardinality']);
     $entity->{$this->field_name} = $values;
     $entity->{$field_name} = $this->_generateTestFieldValues(1);
-    field_attach_insert($entity);
+    $entity = $this->entitySaveReload($entity);
 
     // Verify the fields are present on load
-    $entity = entity_create($entity_type, array('id' => 0, 'revision_id' => 0, 'type' => $this->instance['bundle']));
-    field_attach_load($entity_type, array(0 => $entity));
     $this->assertEqual(count($entity->{$this->field_name}), 4, 'First field got loaded');
     $this->assertEqual(count($entity->{$field_name}), 1, 'Second field got loaded');
 
@@ -388,8 +385,11 @@ class FieldAttachStorageTest extends FieldUnitTestBase {
     entity_test_delete_bundle($this->instance['bundle'], $entity_type);
 
     // Verify no data gets loaded
-    $entity = entity_create($entity_type, array('id' => 0, 'revision_id' => 0, 'type' => $this->instance['bundle']));
-    field_attach_load($entity_type, array(0 => $entity));
+    $controller = $this->container->get('plugin.manager.entity')->getStorageController($entity->getType());
+    $controller->resetCache();
+    $entities = $controller->load(array($entity->id()));
+    $entity = reset($entities);
+
     $this->assertTrue(empty($entity->{$this->field_name}), 'No data for first field');
     $this->assertTrue(empty($entity->{$field_name}), 'No data for second field');
 
