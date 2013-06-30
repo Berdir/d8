@@ -193,7 +193,7 @@ function language_from_user($languages) {
 
   if ($user->id()) {
     $langcode = $user->getPreferredLangcode();
-    $default_langcode = language_default()->langcode;
+    $default_langcode = language_default()->id;
     if (!empty($langcode) && $langcode != $default_langcode && isset($languages[$langcode])) {
       return $langcode;
     }
@@ -223,7 +223,7 @@ function language_from_user_admin(array $languages, Request $request = NULL) {
   if ($user->id()) {
     $request_path = $request ? urldecode(trim($request->getPathInfo(), '/')) : _current_path();
     $langcode = $user->getPreferredAdminLangcode();
-    $default_langcode = language_default()->langcode;
+    $default_langcode = language_default()->id;
     if (!empty($langcode) && $langcode != $default_langcode && isset($languages[$langcode]) && path_is_admin($request_path)) {
       return $langcode;
     }

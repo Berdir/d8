@@ -360,7 +360,7 @@ class User extends EntityNG implements UserInterface {
       return $language_list[$preferred_langcode]->id;
     }
     else {
-      return $default ? $default : language_default()->langcode;
+      return $default ? $default : language_default()->id;
     }
   }
 
