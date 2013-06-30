@@ -236,7 +236,7 @@ class FieldAttachOtherTest extends FieldUnitTestBase {
    */
   function testFieldAttachCache() {
     // Initialize random values and a test entity.
-    $entity_init = entity_create('entity_test', array('id' => 1, 'revision_id' => 1, 'type' => $this->instance['bundle']));
+    $entity_init = entity_create('entity_test', array('type' => $this->instance['bundle']));
     $langcode = Language::LANGCODE_NOT_SPECIFIED;
     $values = $this->_generateTestFieldValues($this->field['cardinality']);
 
@@ -250,18 +250,12 @@ class FieldAttachOtherTest extends FieldUnitTestBase {
     // Save, and check that no cache entry is present.
     $entity = clone($entity_init);
     $entity->{$this->field_name}->setValue($values);
-    field_attach_insert($entity);
-    $this->assertFalse(cache('field')->get($cid), 'Non-cached: no cache entry on insert');
-
-    // Load, and check that no cache entry is present.
-    $entity = clone($entity_init);
-    field_attach_load($entity_type, array($entity->id() => $entity));
-    $this->assertFalse(cache('field')->get($cid), 'Non-cached: no cache entry on load');
-
+    $entity = $this->entitySaveReload($entity);
+    $cid = "field:$entity_type:" . $entity->id();
+    $this->assertFalse(cache('field')->get($cid), 'Non-cached: no cache entry on insert and load');
 
     // Cacheable entity type.
     $entity_type = 'entity_test_cache';
-    $cid = "field:$entity_type:" . $entity_init->id();
     $instance_definition = $this->instance_definition;
     $instance_definition['entity_type'] = $entity_type;
     $instance_definition['bundle'] = $entity_type;
@@ -270,8 +264,6 @@ class FieldAttachOtherTest extends FieldUnitTestBase {
     entity_info_cache_clear();
 
     $entity_init = entity_create($entity_type, array(
-      'id' => 1,
-      'revision_id' => 1,
       'type' => $entity_type,
     ));
 
@@ -281,56 +273,52 @@ class FieldAttachOtherTest extends FieldUnitTestBase {
     // Save, and check that no cache entry is present.
     $entity = clone($entity_init);
     $entity->{$this->field_name} = $values;
-    field_attach_insert($entity);
+    $entity->save();
+    $cid = "field:$entity_type:" . $entity->id();
     $this->assertFalse(cache('field')->get($cid), 'Cached: no cache entry on insert');
 
-    // Load a single field, and check that no cache entry is present.
-    $entity = clone($entity_init);
-    $instance = field_info_instance($entity->entityType(), $this->field_name, $entity->bundle());
-    field_attach_load($entity_type, array($entity->id() => $entity), FIELD_LOAD_CURRENT, array('instance' => $instance));
-    $cache = cache('field')->get($cid);
-    $this->assertFalse($cache, 'Cached: no cache entry on loading a single field');
-
     // Load, and check that a cache entry is present with the expected values.
-    $entity = clone($entity_init);
-    field_attach_load($entity_type, array($entity->id() => $entity));
+    $controller = $this->container->get('plugin.manager.entity')->getStorageController($entity->getType());
+    $controller->resetCache();
+    $controller->load(array($entity->id()));
     $cache = cache('field')->get($cid);
     $this->assertEqual($cache->data[$this->field_name][$langcode], $values, 'Cached: correct cache entry on load');
 
     // Update with different values, and check that the cache entry is wiped.
     $values = $this->_generateTestFieldValues($this->field['cardinality']);
-    $entity = clone($entity_init);
+    $entity = entity_create($entity_type, array(
+      'type' => $entity_type,
+      'id' => $entity->id(),
+    ));
     $entity->{$this->field_name} = $values;
-    field_attach_update($entity);
+    $entity->save();
     $this->assertFalse(cache('field')->get($cid), 'Cached: no cache entry on update');
 
     // Load, and check that a cache entry is present with the expected values.
-    $entity = clone($entity_init);
-    field_attach_load($entity_type, array($entity->id() => $entity));
+    $controller->resetCache();
+    $controller->load(array($entity->id()));
     $cache = cache('field')->get($cid);
     $this->assertEqual($cache->data[$this->field_name][$langcode], $values, 'Cached: correct cache entry on load');
 
     // Create a new revision, and check that the cache entry is wiped.
-    $entity_init = entity_create($entity_type, array(
-      'id' => 1,
-      'revision_id' => 2,
+    $entity = entity_create($entity_type, array(
       'type' => $entity_type,
+      'id' => $entity->id(),
     ));
     $values = $this->_generateTestFieldValues($this->field['cardinality']);
-    $entity = clone($entity_init);
     $entity->{$this->field_name} = $values;
-    field_attach_update($entity);
-    $cache = cache('field')->get($cid);
+    $entity->setNewRevision();
+    $entity->save();
     $this->assertFalse(cache('field')->get($cid), 'Cached: no cache entry on new revision creation');
 
     // Load, and check that a cache entry is present with the expected values.
-    $entity = clone($entity_init);
-    field_attach_load($entity_type, array($entity->id() => $entity));
+    $controller->resetCache();
+    $controller->load(array($entity->id()));
     $cache = cache('field')->get($cid);
     $this->assertEqual($cache->data[$this->field_name][$langcode], $values, 'Cached: correct cache entry on load');
 
     // Delete, and check that the cache entry is wiped.
-    field_attach_delete($entity);
+    $entity->delete();
     $this->assertFalse(cache('field')->get($cid), 'Cached: no cache entry after delete');
   }
 
