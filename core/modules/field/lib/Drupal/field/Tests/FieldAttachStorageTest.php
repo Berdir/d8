@@ -152,11 +152,14 @@ class FieldAttachStorageTest extends FieldUnitTestBase {
         $values[$index][$field_name] = mt_rand(1, 127);
         $entity->$field_name->setValue(array('value' => $values[$index][$field_name]));
       }
-      field_attach_insert($entity);
+      $entity->enforceIsnew();
+      $entity->save();
     }
 
     // Check that a single load correctly loads field values for both entities.
-    field_attach_load($entity_type, $entities);
+    $controller = $this->container->get('plugin.manager.entity')->getStorageController($entity->getType());
+    $controller->resetCache();
+    $entities = $controller->load();
     foreach ($entities as $index => $entity) {
       $instances = field_info_instances($entity_type, $bundles[$index]);
       foreach ($instances as $field_name => $instance) {
