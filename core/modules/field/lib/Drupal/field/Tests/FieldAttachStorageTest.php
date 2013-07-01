@@ -76,8 +76,7 @@ class FieldAttachStorageTest extends FieldUnitTestBase {
 
     $storage_controller =  $this->container->get('plugin.manager.entity')->getStorageController($entity_type);
     $storage_controller->resetCache();
-    $entities = $storage_controller->load(array($entity_id));
-    $entity = reset($entities);
+    $entity = $storage_controller->load($entity_id);
     // Confirm current revision loads the correct data.
     // Number of values per field loaded equals the field cardinality.
     $this->assertEqual(count($entity->{$this->field_name}), $this->field['cardinality'], 'Current revision: expected number of values');
@@ -159,7 +158,7 @@ class FieldAttachStorageTest extends FieldUnitTestBase {
     // Check that a single load correctly loads field values for both entities.
     $controller = $this->container->get('plugin.manager.entity')->getStorageController($entity->getType());
     $controller->resetCache();
-    $entities = $controller->load();
+    $entities = $controller->loadMultiple();
     foreach ($entities as $index => $entity) {
       $instances = field_info_instances($entity_type, $bundles[$index]);
       foreach ($instances as $field_name => $instance) {
@@ -287,8 +286,7 @@ class FieldAttachStorageTest extends FieldUnitTestBase {
 
     // Confirm the current revision still loads
     $controller->resetCache();
-    $entities = $controller->load(array($entity->id()));
-    $current = reset($entities);
+    $current = $controller->load($entity->id());
     $this->assertEqual(count($current->{$this->field_name}), $this->field['cardinality'], "The test entity current revision has {$this->field['cardinality']} values.");
 
     // Delete all field data, confirm nothing loads
@@ -298,8 +296,7 @@ class FieldAttachStorageTest extends FieldUnitTestBase {
       $revision = $controller->loadRevision($vid);
       $this->assertFalse($revision);
     }
-    $entities = $controller->load(array($entity->id()));
-    $this->assertFalse($entities);
+    $this->assertFalse($controller->load($entity->id()));
   }
 
   /**
@@ -336,8 +333,7 @@ class FieldAttachStorageTest extends FieldUnitTestBase {
     // Verify the field data is present on load.
     $controller = $this->container->get('plugin.manager.entity')->getStorageController($entity->getType());
     $controller->resetCache();
-    $entities = $controller->load(array($entity->id()));
-    $entity = reset($entities);
+    $entitt = $controller->load($entity->id());
     $this->assertEqual(count($entity->{$this->field_name}), $this->field['cardinality'], "Bundle name has been updated in the field storage");
   }
 
@@ -387,8 +383,7 @@ class FieldAttachStorageTest extends FieldUnitTestBase {
     // Verify no data gets loaded
     $controller = $this->container->get('plugin.manager.entity')->getStorageController($entity->getType());
     $controller->resetCache();
-    $entities = $controller->load(array($entity->id()));
-    $entity = reset($entities);
+    $entity= $controller->load($entity->id());
 
     $this->assertTrue(empty($entity->{$this->field_name}), 'No data for first field');
     $this->assertTrue(empty($entity->{$field_name}), 'No data for second field');

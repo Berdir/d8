@@ -280,7 +280,7 @@ class FieldAttachOtherTest extends FieldUnitTestBase {
     // Load, and check that a cache entry is present with the expected values.
     $controller = $this->container->get('plugin.manager.entity')->getStorageController($entity->getType());
     $controller->resetCache();
-    $controller->load(array($entity->id()));
+    $controller->load($entity->id());
     $cache = cache('field')->get($cid);
     $this->assertEqual($cache->data[$this->field_name][$langcode], $values, 'Cached: correct cache entry on load');
 
@@ -296,7 +296,7 @@ class FieldAttachOtherTest extends FieldUnitTestBase {
 
     // Load, and check that a cache entry is present with the expected values.
     $controller->resetCache();
-    $controller->load(array($entity->id()));
+    $controller->load($entity->id());
     $cache = cache('field')->get($cid);
     $this->assertEqual($cache->data[$this->field_name][$langcode], $values, 'Cached: correct cache entry on load');
 
@@ -313,7 +313,7 @@ class FieldAttachOtherTest extends FieldUnitTestBase {
 
     // Load, and check that a cache entry is present with the expected values.
     $controller->resetCache();
-    $controller->load(array($entity->id()));
+    $controller->load($entity->id());
     $cache = cache('field')->get($cid);
     $this->assertEqual($cache->data[$this->field_name][$langcode], $values, 'Cached: correct cache entry on load');
 

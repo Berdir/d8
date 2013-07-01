@@ -98,8 +98,7 @@ abstract class FieldUnitTestBase extends DrupalUnitTestBase {
     $entity->save();
     $controller = $this->container->get('plugin.manager.entity')->getStorageController($entity->getType());
     $controller->resetCache();
-    $entities = $controller->load(array($entity->id()));
-    return reset($entities);
+    return $controller->load($entity->id());
   }
 
   /**

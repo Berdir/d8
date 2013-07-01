@@ -143,6 +143,7 @@ class FieldUpgradePathTest extends UpgradePathTestBase {
       ),
       'status' => 1,
       'langcode' => 'und',
+      'storageType' => 'sql',
     ));
 
     // Check that the configuration for the instance on article and page nodes
