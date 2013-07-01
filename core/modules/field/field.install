@@ -37,14 +37,6 @@ function _update_8003_field_create_field(array &$field_config) {
     'langcode' => 'und',
   );
 
-  // Set the storage.
-  $field_config['storage'] = array(
-    'type' => 'field_sql_storage',
-    'module' => 'field_sql_storage',
-    'active' => TRUE,
-    'settings' => array(),
-  );
-
   // Save in config.
   Drupal::config('field.field.' . $field_config['id'])
     ->setData($field_config)
@@ -326,6 +318,7 @@ function field_update_8003() {
       'indexes' => $record['data']['indexes'] ?: array(),
       'status' => 1,
       'langcode' => 'und',
+      'storageType' => 'sql',
     );
 
     // Reassign all list.module fields to be controlled by options.module.
