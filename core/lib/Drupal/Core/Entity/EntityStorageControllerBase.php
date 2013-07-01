@@ -258,6 +258,28 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
   }
 
   /**
+   * Checks translation statuses and invoke the related hooks if needed.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity being saved.
+   */
+  protected function invokeTranslationHooks(EntityInterface $entity) {
+    $translations = $entity->getTranslationLanguages(FALSE);
+    $original_translations = $entity->original->getTranslationLanguages(FALSE);
+    $all_translations = array_keys($translations + $original_translations);
+
+    // Notify modules of translation insertion/deletion.
+    foreach ($all_translations as $langcode) {
+      if (isset($translations[$langcode]) && !isset($original_translations[$langcode])) {
+        $this->invokeHook('translation_insert', $entity->getTranslation($langcode));
+      }
+      elseif (!isset($translations[$langcode]) && isset($original_translations[$langcode])) {
+        $this->invokeHook('translation_delete', $entity->getTranslation($langcode));
+      }
+    }
+  }
+
+  /**
    * Loads fields for the current revisions of a group of entities.
    *
    * Loads all fields for each entity object in a group of a single entity type.
