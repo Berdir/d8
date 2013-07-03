@@ -119,12 +119,13 @@ function hook_preprocess(&$variables, $hook) {
   }
 
   // Determine the primary theme function argument.
-  if (isset($hooks[$hook]['variables'])) {
-    $keys = array_keys($hooks[$hook]['variables']);
+  $hook_info = $hooks->get($hook);
+  if (isset($hook_info['variables'])) {
+    $keys = array_keys($hook_info['variables']);
     $key = $keys[0];
   }
   else {
-    $key = $hooks[$hook]['render element'];
+    $key = $hook_info['render element'];
   }
 
   if (isset($variables[$key])) {
