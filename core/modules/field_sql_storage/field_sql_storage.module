@@ -436,6 +436,8 @@ function field_sql_storage_field_storage_write(EntityInterface $entity, $op, $fi
     $table_name = _field_sql_storage_tablename($field);
     $revision_name = _field_sql_storage_revision_tablename($field);
 
+    $all_langcodes = field_available_languages($entity_type, $field);
+    $field_langcodes = array_intersect($all_langcodes, array_keys((array) $entity->$field_name));
 
     // Delete and insert, rather than update, in case a value was added.
     if ($op == FIELD_STORAGE_UPDATE) {
@@ -445,14 +447,12 @@ function field_sql_storage_field_storage_write(EntityInterface $entity, $op, $fi
         db_delete($table_name)
           ->condition('entity_type', $entity_type)
           ->condition('entity_id', $id)
-          ->condition('langcode', $langcodes, 'IN')
           ->execute();
       }
       db_delete($revision_name)
         ->condition('entity_type', $entity_type)
         ->condition('entity_id', $id)
         ->condition('revision_id', $vid)
-        ->condition('langcode', $langcodes, 'IN')
         ->execute();
     }
 
