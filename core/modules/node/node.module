@@ -553,41 +553,6 @@ function node_revision_load($vid = NULL) {
 }
 
 /**
- * Prepares a node for saving by populating the author and creation date.
- *
- * @param \Drupal\Core\Entity\EntityInterface $node
- *   A node object.
- *
- * @return Drupal\node\Node
- *   An updated node object.
- */
-function node_submit(EntityInterface $node) {
-  global $user;
-
-  // A user might assign the node author by entering a user name in the node
-  // form, which we then need to translate to a user ID.
-  if (isset($node->name)) {
-    if ($account = user_load_by_name($node->name)) {
-      $node->setAuthorId($account->id());
-    }
-    else {
-      $node->setAuthorId(0);
-    }
-  }
-
-  // If a new revision is created, save the current user as revision author.
-  if ($node->isNewRevision()) {
-    $node->setRevisionAuthorId($user->id());
-    $node->setRevisionCreationTime(REQUEST_TIME);
-  }
-
-  $node->setCreatedTime(!empty($node->date) && $node->date instanceOf DrupalDateTime ? $node->date->getTimestamp() : REQUEST_TIME);
-  $node->validated = TRUE;
-
-  return $node;
-}
-
-/**
  * Deletes a node revision.
  *
  * @param $revision_id
