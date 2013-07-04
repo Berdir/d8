@@ -22,6 +22,7 @@ class EditEntityFieldAccessCheck implements AccessCheckInterface, EditEntityFiel
    * Implements AccessCheckInterface::applies().
    */
   public function applies(Route $route) {
+    // @see edit.routing.yml
     return array_key_exists('_access_edit_entity_field', $route->getRequirements());
   }
 
