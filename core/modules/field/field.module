@@ -399,6 +399,7 @@ function field_modules_disabled($modules) {
  */
 function field_sync_field_status() {
   $state = Drupal::state();
+  $module_handler = Drupal::moduleHandler();
 
   // Get both deleted and non-deleted field definitions.
   $fields = array();
@@ -416,7 +417,7 @@ function field_sync_field_status() {
   // Set the 'module' and 'active' values for the current set of enabled
   // modules.
   $changed = array();
-
+  $modules = $module_handler->getModuleList();
   $field_types = Drupal::service('plugin.manager.entity.field.field_type')->getDefinitions();
   // Set fields with missing field type modules to inactive.
   foreach ($fields as $uuid => &$field) {

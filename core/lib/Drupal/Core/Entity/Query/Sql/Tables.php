@@ -158,7 +158,7 @@ class Tables {
           $column = 'value';
         }
         $table = $this->ensureFieldTable($index_prefix, $field, $type, $langcode, $base_table, $entity_id_field, $field_id_field);
-        $sql_column = DatabaseStorageController::fieldColumnName($field['field_name'], $column);
+        $sql_column = DatabaseStorageController::fieldColumnName($field, $column);
       }
       // This is an entity property (non-configurable field).
       else {

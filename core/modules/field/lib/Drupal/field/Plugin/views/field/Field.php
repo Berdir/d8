@@ -287,7 +287,8 @@ class Field extends FieldPluginBase {
     }
 
     $this->ensureMyTable();
-    $column = DatabaseStorageController::fieldColumnName($this->definition['field_name'], $this->options['click_sort_column']);
+    $field = field_info_field($this->definition['field_name']);
+    $column = DatabaseStorageController::fieldColumnName($field, $this->options['click_sort_column']);
     if (!isset($this->aliases[$column])) {
       // Column is not in query; add a sort on it (without adding the column).
       $this->aliases[$column] = $this->tableAlias . '.' . $column;

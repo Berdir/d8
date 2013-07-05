@@ -174,7 +174,7 @@ function field_views_field_default_views_data(Field $field) {
 
   $add_fields = array('delta', 'langcode', 'bundle');
   foreach ($field['columns'] as $column_name => $attributes) {
-    $add_fields[] = DatabaseStorageController::fieldColumnName($field->id(), $column_name);
+    $add_fields[] = DatabaseStorageController::fieldColumnName($field, $column_name);
   }
 
   // Note: we don't have a label available here, because we are at the field
@@ -298,7 +298,7 @@ function field_views_field_default_views_data(Field $field) {
       else {
         $group = t('@group (historical data)', array('@group' => $group_name));
       }
-      $column_real_name = DatabaseStorageController::fieldColumnName($field->id(), $column);
+      $column_real_name = DatabaseStorageController::fieldColumnName($field, $column);
 
       // Load all the fields from the table by default.
       $field_sql_schema = DatabaseStorageController::fieldSqlSchema($field);

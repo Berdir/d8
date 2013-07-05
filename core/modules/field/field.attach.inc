@@ -12,45 +12,6 @@ use Drupal\entity\Plugin\Core\Entity\EntityFormDisplay;
 use Drupal\Core\Language\Language;
 
 /**
- * @defgroup field_storage Field Storage API
- * @{
- * Implements a storage engine for Field API data.
- *
- * The Field Attach API uses the Field Storage API to perform all "database
- * access". Each Field Storage API hook function defines a primitive database
- * operation such as read, write, or delete. The default field storage module,
- * field_sql_storage.module, uses the local SQL database to implement these
- * operations, but alternative field storage backends can choose to represent
- * the data in SQL differently or use a completely different storage mechanism
- * such as a cloud-based database.
- *
- * Each field defines which storage backend it uses. The Drupal configuration
- * 'field.settings.default_storage' identifies the storage backend used by
- * default.
- *
- * See @link field Field API @endlink for information about the other parts of
- * the Field API.
- */
-
-/**
- * Argument for an update operation.
- *
- * This is used in hook_field_storage_write when updating an existing entity.
- */
-const FIELD_STORAGE_UPDATE = 'update';
-
-/**
- * Argument for an insert operation.
- *
- * This is used in hook_field_storage_write when inserting a new entity.
- */
-const FIELD_STORAGE_INSERT = 'insert';
-
-/**
- * @} End of "defgroup field_storage".
- */
-
-/**
  * @defgroup field_attach Field Attach API
  * @{
  * Operates on Field API data attached to Drupal entities.

@@ -210,7 +210,7 @@ class BulkDeleteTest extends FieldUnitTestBase {
   protected function checkFieldTableContents(Field $field) {
     $schema = DatabaseStorageController::fieldSqlSchema($field);
     $table = DatabaseStorageController::fieldTableName($field);
-    $column = DatabaseStorageController::fieldColumnName($field->id(), 'value');
+    $column = DatabaseStorageController::fieldColumnName($field, 'value');
     $result = db_select($table, 't')
       ->fields('t', array_keys($schema[$table]['fields']))
       ->execute();

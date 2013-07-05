@@ -120,7 +120,7 @@ class EntityReferenceItemTest extends FieldUnitTestBase {
     $this->assertEqual(count($schema['foreign keys']), 1, 'There is 1 foreign key in the schema.');
 
     $foreign_key = reset($schema['foreign keys']);
-    $foreign_key_column = DatabaseStorageController::fieldColumnName($field['field_name'], $foreign_key_column_name);
+    $foreign_key_column = DatabaseStorageController::fieldColumnName($field, $foreign_key_column_name);
     $this->assertEqual($foreign_key['table'], 'taxonomy_term_data', 'Foreign key table name preserved in the schema.');
     $this->assertEqual($foreign_key['columns'][$foreign_key_column], 'tid', 'Foreign key column name preserved in the schema.');
 

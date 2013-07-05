@@ -137,7 +137,11 @@ class EntityManager extends PluginManagerBase {
   /**
    * Add more namespaces to the entity manager.
    *
+   * This is usually only necessary for uninstall purposes.
+   *
    * @param \Traversable $namespaces
+   *
+   * @see comment_uninstall()
    */
   public function addNamespaces(\Traversable $namespaces) {
     reset($this->namespaces);
