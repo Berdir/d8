@@ -211,7 +211,7 @@ class FieldUpgradePathTest extends UpgradePathTestBase {
     $table_name = DatabaseStorageController::fieldTableName($field_entity);
     $this->assertEqual("field_deleted_data_" . substr(hash('sha256', $deleted_field['uuid']), 0, 10), $table_name);
     $deleted_value = db_select($table_name, 't')
-      ->fields('t', array(DatabaseStorageController::fieldColumnName($deleted_field, 'value')))
+      ->fields('t', array(DatabaseStorageController::fieldColumnName($field_entity, 'value')))
       ->condition('entity_type', 'node')
       ->condition('entity_id', 2)
       ->condition('langcode', Language::LANGCODE_NOT_SPECIFIED)

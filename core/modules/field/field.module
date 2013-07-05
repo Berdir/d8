@@ -398,8 +398,8 @@ function field_modules_disabled($modules) {
  * Refreshes the 'active' and 'storage[active]' values for fields.
  */
 function field_sync_field_status() {
-  $state = Drupal::state();
   $module_handler = Drupal::moduleHandler();
+  $state = Drupal::state();
 
   // Get both deleted and non-deleted field definitions.
   $fields = array();
