@@ -9,8 +9,8 @@ namespace Drupal\Core\Entity;
 
 use Drupal\field\FieldInfo;
 use Drupal\field\FieldUpdateForbiddenException;
-use Drupal\field\Plugin\Core\Entity\FieldInterface;
-use Drupal\field\Plugin\Core\Entity\FieldInstance;
+use Drupal\field\FieldInterface;
+use Drupal\field\FieldInstanceInterface;
 use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Component\Uuid\Uuid;
 use Drupal\Component\Utility\NestedArray;
@@ -1106,7 +1106,7 @@ class DatabaseStorageController extends EntityStorageControllerBase {
   /**
    * {@inheritdoc}
    */
-  public function handleFirstInstance(FieldInstance $instance) {
+  public function handleFirstInstance(FieldInstanceInterface $instance) {
     $schema = $this->fieldSqlSchema($instance->getField());
     foreach ($schema as $name => $table) {
       $this->database->schema()->createTable($name, $table);
@@ -1116,7 +1116,7 @@ class DatabaseStorageController extends EntityStorageControllerBase {
   /**
    * {@inheritdoc}
    */
-  public function handleInstanceDelete(FieldInstance $instance) {
+  public function handleInstanceDelete(FieldInstanceInterface $instance) {
     $field = $instance->getField();
     $table_name = static::fieldTableName($field);
     $revision_name = static::fieldRevisionTableName($field);
@@ -1155,7 +1155,7 @@ class DatabaseStorageController extends EntityStorageControllerBase {
   /**
    * {@inheritdoc}
    */
-  public function fieldPurgeData(EntityInterface $entity, FieldInterface $field, FieldInstance $instance) {
+  public function fieldPurgeData(EntityInterface $entity, FieldInterface $field, FieldInstanceInterface $instance) {
     parent::fieldPurgeData($entity, $field, $instance);
     $table_name = static::fieldTableName($field);
     $revision_name = static::fieldRevisionTableName($field);
@@ -1172,7 +1172,7 @@ class DatabaseStorageController extends EntityStorageControllerBase {
   /**
    * {@inheritdoc}
    */
-  protected function fieldValues(EntityInterface $entity, FieldInterface $field, FieldInstance $instance) {
+  protected function fieldValues(EntityInterface $entity, FieldInterface $field, FieldInstanceInterface $instance) {
     $field_name = $field->id();
     $columns = array();
     foreach ($field->getColumns() as $column_name => $data) {

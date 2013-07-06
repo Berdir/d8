@@ -9,7 +9,7 @@ namespace Drupal\field\Tests;
 
 use Drupal\Core\Entity\DatabaseStorageController;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\field\Plugin\Core\Entity\FieldInterface;
+use Drupal\field\FieldInterface;
 
 
 /**

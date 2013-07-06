@@ -9,7 +9,7 @@
 
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\DatabaseStorageController;
-use Drupal\field\Plugin\Core\Entity\FieldInterface;
+use Drupal\field\FieldInterface;
 
 /**
  * Implements hook_views_data().

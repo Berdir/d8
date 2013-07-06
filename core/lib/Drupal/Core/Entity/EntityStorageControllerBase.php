@@ -6,8 +6,8 @@
  */
 
 namespace Drupal\Core\Entity;
-use Drupal\field\Plugin\Core\Entity\FieldInterface;
-use Drupal\field\Plugin\Core\Entity\FieldInstance;
+use Drupal\field\FieldInterface;
+use Drupal\field\FieldInstanceInterface;
 use Symfony\Component\DependencyInjection\Container;
 
 /**
@@ -509,7 +509,7 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
   /**
    * {@inheritdoc}
    */
-  public function handleFirstInstance(FieldInstance $instance) {
+  public function handleFirstInstance(FieldInstanceInterface $instance) {
 
   }
 
@@ -523,7 +523,7 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
   /**
    * {@inheritdoc}
    */
-  public function handleInstanceDelete(FieldInstance $instance) {
+  public function handleInstanceDelete(FieldInstanceInterface $instance) {
 
   }
 
@@ -537,7 +537,7 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
   /**
    * {@inheritdoc}
    */
-  public function fieldPurgeData(EntityInterface  $entity, FieldInterface $field, FieldInstance $instance) {
+  public function fieldPurgeData(EntityInterface  $entity, FieldInterface $field, FieldInstanceInterface $instance) {
     $values = $this->fieldValues($entity, $field, $instance);
     foreach ($values as $value) {
       $definition = _field_generate_entity_field_definition($field, $instance);
@@ -554,7 +554,7 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
    * @param FieldInstance $instance
    * @return array
    */
-  protected function fieldValues(EntityInterface $entity, FieldInterface $field, FieldInstance $instance) {
+  protected function fieldValues(EntityInterface $entity, FieldInterface $field, FieldInstanceInterface $instance) {
     return array();
   }
 

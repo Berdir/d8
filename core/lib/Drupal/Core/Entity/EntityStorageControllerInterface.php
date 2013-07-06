@@ -6,8 +6,8 @@
  */
 
 namespace Drupal\Core\Entity;
-use Drupal\field\Plugin\Core\Entity\FieldInterface;
-use Drupal\field\Plugin\Core\Entity\FieldInstance;
+use Drupal\field\FieldInterface;
+use Drupal\field\FieldInstanceInterface;
 
 /**
  * Defines a common interface for entity controller classes.
@@ -220,7 +220,7 @@ interface EntityStorageControllerInterface {
    * instance creations and updates have no handling methods as instance
    * changes do not affect the storage.
    */
-  public function handleFirstInstance(FieldInstance $instance);
+  public function handleFirstInstance(FieldInstanceInterface $instance);
 
   /**
    * Allows reaction to the update of a configurable field.
@@ -235,7 +235,7 @@ interface EntityStorageControllerInterface {
   /**
    * Allows reaction to the deletion of a configurable field instance.
    */
-  public function handleInstanceDelete(FieldInstance $instance);
+  public function handleInstanceDelete(FieldInstanceInterface $instance);
 
   /**
    * Purges the field data for a single field on a single entity.
@@ -250,7 +250,7 @@ interface EntityStorageControllerInterface {
    * @param $instance
    *   The deleted field instance whose data is being purged.
    */
-  public function fieldPurgeData(EntityInterface $entity, FieldInterface $field, FieldInstance $instance);
+  public function fieldPurgeData(EntityInterface $entity, FieldInterface $field, FieldInstanceInterface $instance);
 
   /**
    * All the field data is gone, final cleanup.
