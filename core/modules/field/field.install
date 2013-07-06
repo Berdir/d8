@@ -335,10 +335,12 @@ function field_update_8003() {
     else {
       $config['deleted'] = TRUE;
       $deleted_fields[$config['uuid']] = $config;
+      // This will not be saved but the DatabaseStorageController helpers need
+      // the field object.
+      $field = new Field($config);
       // Additionally, rename the data tables for deleted fields. Technically
       // this would belong in an update in field_sql_storage.module, but it is
       // easier to do it now, when the old numeric ID is available.
-      $field = new Field($config);
       $tables = array(
         "field_deleted_data_{$record['id']}" => DatabaseStorageController::fieldTableName($field),
         "field_deleted_revision_{$record['id']}" => DatabaseStorageController::fieldRevisionTableName($field),

@@ -285,7 +285,8 @@ function field_invoke_method_multiple($method, $target_function, array $entities
     // fields with an empty array (those are not equivalent on update).
     foreach ($grouped_entities[$instance_id] as $langcode => $entities) {
       foreach ($entities as $id => $entity) {
-        if ($grouped_items[$instance_id][$langcode][$id] !== array() || isset($entity->{$field_name}[$langcode])) {     $entity->{$field_name}[$langcode] = $grouped_items[$instance_id][$langcode][$id];
+        if ($grouped_items[$instance_id][$langcode][$id] !== array() || isset($entity->{$field_name}[$langcode])) {
+          $entity->{$field_name}[$langcode] = $grouped_items[$instance_id][$langcode][$id];
         }
       }
     }
