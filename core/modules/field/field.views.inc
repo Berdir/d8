@@ -9,7 +9,7 @@
 
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\DatabaseStorageController;
-use Drupal\field\Plugin\Core\Entity\Field;
+use Drupal\field\Plugin\Core\Entity\FieldInterface;
 
 /**
  * Implements hook_views_data().
@@ -91,7 +91,7 @@ function field_views_field_label($field_name) {
 /**
  * Default views data implementation for a field.
  */
-function field_views_field_default_views_data(Field $field) {
+function field_views_field_default_views_data(FieldInterface $field) {
   $field_types = field_info_field_types();
 
   // Check the field module is available.

@@ -9,7 +9,7 @@ namespace Drupal\Core\Entity;
 
 use Drupal\field\FieldInfo;
 use Drupal\field\FieldUpdateForbiddenException;
-use Drupal\field\Plugin\Core\Entity\Field;
+use Drupal\field\Plugin\Core\Entity\FieldInterface;
 use Drupal\field\Plugin\Core\Entity\FieldInstance;
 use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Component\Uuid\Uuid;
@@ -792,7 +792,7 @@ class DatabaseStorageController extends EntityStorageControllerBase {
   /**
    * {@inheritdoc}
    */
-  public function handleUpdateField(Field $field, Field $original) {
+  public function handleUpdateField(FieldInterface $field, FieldInterface $original) {
     if (!$field->hasData()) {
       // There is no data. Re-create the tables completely.
 
@@ -881,14 +881,14 @@ class DatabaseStorageController extends EntityStorageControllerBase {
    * strongly discouraged. This function is not considered part of the public
    * API and modules relying on it might break even in minor releases.
    *
-   * @param \Drupal\field\Plugin\Core\Entity\Field $field
+   * @param \Drupal\field\Plugin\Core\Entity\FieldInterface $field
    *   The field object.
    *
    * @return array
    *   The same as a hook_schema() implementation for the data and the
    *   revision tables.
    */
-  public static function fieldSqlSchema(Field $field) {
+  public static function fieldSqlSchema(FieldInterface $field) {
     $deleted = $field['deleted'] ? 'deleted ' : '';
     $current = array(
       'description' => "Data storage for {$deleted}field {$field['id']} ({$field['field_name']})",
@@ -1018,7 +1018,7 @@ class DatabaseStorageController extends EntityStorageControllerBase {
    *   A string containing the generated name for the database table.
    *
    */
-  static public function fieldTableName(Field $field) {
+  static public function fieldTableName(FieldInterface $field) {
     if ($field['deleted']) {
       // When a field is a deleted, the table is renamed to
       // {field_deleted_data_FIELD_UUID}. To make sure we don't end up with
@@ -1041,13 +1041,13 @@ class DatabaseStorageController extends EntityStorageControllerBase {
    * support. Always call entity_load() before using the data found in the
    * table.
    *
-   * @param \Drupal\field\Plugin\Core\Entity\Field $field
+   * @param \Drupal\field\Plugin\Core\Entity\FieldInterface $field
    *   The field object.
    *
    * @return string
    *   A string containing the generated name for the database table.
    */
-  static public function fieldRevisionTableName(Field $field) {
+  static public function fieldRevisionTableName(FieldInterface $field) {
     if ($field['deleted']) {
       // When a field is a deleted, the table is renamed to
       // {field_deleted_revision_FIELD_UUID}. To make sure we don't end up
@@ -1067,7 +1067,7 @@ class DatabaseStorageController extends EntityStorageControllerBase {
    * strongly discouraged. This function is not considered part of the public
    * API and modules relying on it might break even in minor releases.
    *
-   * @param \Drupal\field\Plugin\Core\Entity\Field $field
+   * @param \Drupal\field\Plugin\Core\Entity\FieldInterface $field
    *   The field structure
    * @param string $index
    *   The name of the index.
@@ -1076,7 +1076,7 @@ class DatabaseStorageController extends EntityStorageControllerBase {
    *   A string containing a generated index name for a field data table that is
    *   unique among all other fields.
    */
-  static public function fieldIndexName(Field $field, $index) {
+  static public function fieldIndexName(FieldInterface $field, $index) {
     return $field->id() . '_' . $index;
   }
 
@@ -1090,7 +1090,7 @@ class DatabaseStorageController extends EntityStorageControllerBase {
    * support. Always call entity_load() before using the data found in the
    * table.
    *
-   * @param \Drupal\field\Plugin\Core\Entity\Field $field
+   * @param \Drupal\field\Plugin\Core\Entity\FieldInterface $field
    *   The field object.
    * @param string $column
    *   The name of the column.
@@ -1099,7 +1099,7 @@ class DatabaseStorageController extends EntityStorageControllerBase {
    *   A string containing a generated column name for a field data table that is
    *   unique among all other fields.
    */
-  static public function fieldColumnName(Field $field, $column) {
+  static public function fieldColumnName(FieldInterface $field, $column) {
     return in_array($column, Field::getReservedColumns()) ? $column : $field->id() . '_' . $column;
   }
 
@@ -1135,7 +1135,7 @@ class DatabaseStorageController extends EntityStorageControllerBase {
   /**
    * {@inheritdoc}
    */
-  public function handleDeleteField(Field $field) {
+  public function handleDeleteField(FieldInterface $field) {
     // Mark all data associated with the field for deletion.
     $field['deleted'] = FALSE;
     $table = static::fieldTableName($field);
@@ -1155,7 +1155,7 @@ class DatabaseStorageController extends EntityStorageControllerBase {
   /**
    * {@inheritdoc}
    */
-  public function fieldPurgeData(EntityInterface $entity, Field $field, FieldInstance $instance) {
+  public function fieldPurgeData(EntityInterface $entity, FieldInterface $field, FieldInstance $instance) {
     parent::fieldPurgeData($entity, $field, $instance);
     $table_name = static::fieldTableName($field);
     $revision_name = static::fieldRevisionTableName($field);
@@ -1172,7 +1172,7 @@ class DatabaseStorageController extends EntityStorageControllerBase {
   /**
    * {@inheritdoc}
    */
-  protected function fieldValues(EntityInterface $entity, Field $field, FieldInstance $instance) {
+  protected function fieldValues(EntityInterface $entity, FieldInterface $field, FieldInstance $instance) {
     $field_name = $field->id();
     $columns = array();
     foreach ($field->getColumns() as $column_name => $data) {
@@ -1188,7 +1188,7 @@ class DatabaseStorageController extends EntityStorageControllerBase {
   /**
    * {@inheritdoc}
    */
-  public function fieldPurge(Field $field) {
+  public function fieldPurge(FieldInterface $field) {
     $table_name = static::fieldTableName($field);
     $revision_name = static::fieldRevisionTableName($field);
     $this->database->schema()->dropTable($table_name);

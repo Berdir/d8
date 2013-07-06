@@ -6,7 +6,7 @@
  */
 
 namespace Drupal\Core\Entity;
-use Drupal\field\Plugin\Core\Entity\Field;
+use Drupal\field\Plugin\Core\Entity\FieldInterface;
 use Drupal\field\Plugin\Core\Entity\FieldInstance;
 use Symfony\Component\DependencyInjection\Container;
 
@@ -516,7 +516,7 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
   /**
    * {@inheritdoc}
    */
-  public function handleUpdateField(Field $field, Field $original) {
+  public function handleUpdateField(FieldInterface $field, FieldInterface $original) {
 
   }
 
@@ -530,14 +530,14 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
   /**
    * {@inheritdoc}
    */
-  public function handleDeleteField(Field $field) {
+  public function handleDeleteField(FieldInterface $field) {
 
   }
 
   /**
    * {@inheritdoc}
    */
-  public function fieldPurgeData(EntityInterface  $entity, Field $field, FieldInstance $instance) {
+  public function fieldPurgeData(EntityInterface  $entity, FieldInterface $field, FieldInstance $instance) {
     $values = $this->fieldValues($entity, $field, $instance);
     foreach ($values as $value) {
       $definition = _field_generate_entity_field_definition($field, $instance);
@@ -550,18 +550,18 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
    * Get the field values for a single field of a single entity.
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity_id
-   * @param Field $field
+   * @param FieldInterface $field
    * @param FieldInstance $instance
    * @return array
    */
-  protected function fieldValues(EntityInterface $entity, Field $field, FieldInstance $instance) {
+  protected function fieldValues(EntityInterface $entity, FieldInterface $field, FieldInstance $instance) {
     return array();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function fieldPurge(Field $field) {
+  public function fieldPurge(FieldInterface $field) {
 
   }
 

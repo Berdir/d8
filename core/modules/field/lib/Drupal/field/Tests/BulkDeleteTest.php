@@ -9,7 +9,7 @@ namespace Drupal\field\Tests;
 
 use Drupal\Core\Entity\DatabaseStorageController;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\field\Plugin\Core\Entity\Field;
+use Drupal\field\Plugin\Core\Entity\FieldInterface;
 
 
 /**
@@ -205,9 +205,9 @@ class BulkDeleteTest extends FieldUnitTestBase {
   /**
    * Test that the actual stored content didn't change during delete.
    *
-   * @param Field $field
+   * @param FieldInterface $field
    */
-  protected function checkFieldTableContents(Field $field) {
+  protected function checkFieldTableContents(FieldInterface $field) {
     $schema = DatabaseStorageController::fieldSqlSchema($field);
     $table = DatabaseStorageController::fieldTableName($field);
     $column = DatabaseStorageController::fieldColumnName($field, 'value');
