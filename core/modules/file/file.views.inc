@@ -489,7 +489,7 @@ function file_field_views_data_views_data_alter(&$data, $field) {
       'help' => t('Relate each @entity with a @field set to the file.', array('@entity' => $entity, '@field' => $label)),
       'id' => 'entity_reverse',
       'field_name' => $field['field_name'],
-      'field table' => DatabaseStorageController::fieldTableName($field),
+      'field table' => DatabaseStorageController::_fieldTableName($field),
       'field field' => $field['field_name'] . '_target_id',
       'base' => $entity_info['base_table'],
       'base field' => $entity_info['entity_keys']['id'],

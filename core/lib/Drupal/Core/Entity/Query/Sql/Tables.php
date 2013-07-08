@@ -158,7 +158,7 @@ class Tables {
           $column = 'value';
         }
         $table = $this->ensureFieldTable($index_prefix, $field, $type, $langcode, $base_table, $entity_id_field, $field_id_field);
-        $sql_column = DatabaseStorageController::fieldColumnName($field, $column);
+        $sql_column = DatabaseStorageController::_fieldColumnName($field, $column);
       }
       // This is an entity property (non-configurable field).
       else {
@@ -243,7 +243,7 @@ class Tables {
   protected function ensureFieldTable($index_prefix, &$field, $type, $langcode, $base_table, $entity_id_field, $field_id_field) {
     $field_name = $field['field_name'];
     if (!isset($this->fieldTables[$index_prefix . $field_name])) {
-      $table = $this->sqlQuery->getMetaData('age') == FIELD_LOAD_CURRENT ? DatabaseStorageController::fieldTableName($field) : DatabaseStorageController::fieldRevisionTableName($field);
+      $table = $this->sqlQuery->getMetaData('age') == FIELD_LOAD_CURRENT ? DatabaseStorageController::_fieldTableName($field) : DatabaseStorageController::_fieldRevisionTableName($field);
       if ($field['cardinality'] != 1) {
         $this->sqlQuery->addMetaData('simple_query', FALSE);
       }

@@ -54,7 +54,7 @@ function _update_8003_field_create_field(array &$field_config) {
  * @param array $instance_config
  *   An array of field instance properties.
  * @param bool $first
- *   TRUE ff this is the first instance of the field. Defaults to TRUE.
+ *   TRUE if this is the first instance of the field. Defaults to TRUE.
  *
  * @ingroup update_api
  */
@@ -81,7 +81,7 @@ function _update_8003_field_create_instance(array $field_config, array &$instanc
     ->setData($instance_config)
     ->save();
   if ($first) {
-    $schema = DatabaseStorageController::fieldSqlSchema(new Field($field_config));
+    $schema = DatabaseStorageController::_fieldSqlSchema(new Field($field_config));
     foreach ($schema as $name => $table) {
       db_create_table($name, $table);
     }
@@ -91,9 +91,17 @@ function _update_8003_field_create_instance(array $field_config, array &$instanc
 /**
  * Writes field data directly to SQL storage.
  *
+ *
+ * @param string $entity_type
+ * @param string $bundle
+ * @param int $entity_id
+ * @param int $revision_id
+ * @param int $field_name
+ * @param array $data
+ *
  * @ingroup update_api
  */
-function _update_8000_field_sql_storage_write($entity_type, $bundle, $entity_id, $revision_id, $field_name, $data) {
+function _update_8000_field_sql_storage_write($entity_type, $bundle, $entity_id, $revision_id, $field_name, array $data) {
   $table_name = "field_data_{$field_name}";
   $revision_name = "field_revision_{$field_name}";
 
@@ -342,8 +350,8 @@ function field_update_8003() {
       // this would belong in an update in field_sql_storage.module, but it is
       // easier to do it now, when the old numeric ID is available.
       $tables = array(
-        "field_deleted_data_{$record['id']}" => DatabaseStorageController::fieldTableName($field),
-        "field_deleted_revision_{$record['id']}" => DatabaseStorageController::fieldRevisionTableName($field),
+        "field_deleted_data_{$record['id']}" => DatabaseStorageController::_fieldTableName($field),
+        "field_deleted_revision_{$record['id']}" => DatabaseStorageController::_fieldRevisionTableName($field),
       );
       foreach ($tables as $table_old => $table_new) {
         if (db_table_exists($table_old)) {
@@ -487,7 +495,7 @@ function field_update_8006(&$sandbox) {
   }
 
   $field = new Field($field_config);
-  $base_table = DatabaseStorageController::fieldTableName($field);
+  $base_table = DatabaseStorageController::_fieldTableName($field);
   if (db_table_exists($base_table)) {
 
     // Prepare updated schema data structures.
@@ -517,7 +525,7 @@ function field_update_8006(&$sandbox) {
     );
     $table_info = array(
       $base_table => $primary_key_data,
-      DatabaseStorageController::fieldRevisionTableName($field) => $primary_key_revision,
+      DatabaseStorageController::_fieldRevisionTableName($field) => $primary_key_revision,
     );
 
     foreach ($table_info as $table => $primary_key) {

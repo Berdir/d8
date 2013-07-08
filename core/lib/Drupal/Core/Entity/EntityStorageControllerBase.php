@@ -391,6 +391,8 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
    * Default values (if any) will be saved for fields not present in the
    * $entity.
    *
+   * It should be enough to override doFieldInsert() instead of this method.
+   *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity with fields to save.
    * @return
@@ -412,6 +414,8 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
 
   /**
    * Saves field data for an existing entity.
+   *
+   * It should be enough to override doFieldUpdate() instead of this method.
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity with fields to save.
@@ -438,6 +442,8 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
    * Deletes field data for an existing entity. This deletes all revisions of
    * field data for the entity.
    *
+   * It should be enough to override doFieldDelete() instead of this method.
+   *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity whose field data to delete.
    */
@@ -457,6 +463,9 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
    * Delete field data for a single revision of an existing entity. The passed
    * entity must have a revision ID attribute.
    *
+   * It should be enough to override doFieldRevisionDelete() instead of this
+   * method.
+   *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity with fields to save.
    */
@@ -464,22 +473,52 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
     $this->dofieldRevisionDelete($entity->getBCEntity());
   }
 
+  /**
+   * Insert configurable fields into storage.
+   *
+   * @param EntityInterface $entity
+   *   The entity.
+   */
   protected function doFieldInsert(EntityInterface $entity) {
 
   }
 
+  /**
+   * Update configurable fields in storage.
+   *
+   * @param EntityInterface $entity
+   *   The entity.
+   */
   protected function doFieldUpdate(EntityInterface $entity) {
 
   }
 
+  /**
+   * Delete configurable fields from storage.
+   *
+   * @param EntityInterface $entity
+   *   The entity.
+   */
   protected function doFieldDelete(EntityInterface $entity) {
 
   }
 
+  /**
+   * Delete specific revision of configurable fields from storage.
+   *
+   * @param EntityInterface $entity
+   *   The entity.
+   */
   protected function doFieldRevisionDelete(EntityInterface $entity) {
 
   }
 
+  /**
+   * Load configurable fields from storage.
+   *
+   * @param EntityInterface $entity
+   *   The entity.
+   */
   protected function doFieldLoad($entity_type, $queried_entities, $age) {
 
   }

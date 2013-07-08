@@ -59,7 +59,7 @@ class ContactFieldsTest extends ViewTestBase {
    * Tests the views data generation.
    */
   public function testViewsData() {
-    $table_name = DatabaseStorageController::fieldTableName($this->field);
+    $table_name = DatabaseStorageController::_fieldTableName($this->field);
     $data = $this->container->get('views.views_data')->get($table_name);
 
     // Test that the expected data array is returned.

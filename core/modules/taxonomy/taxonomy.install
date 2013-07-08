@@ -365,8 +365,8 @@ function taxonomy_update_8007() {
       $field = new Field($field_config->get());
 
       $tables = array(
-        DatabaseStorageController::fieldTableName($field),
-        DatabaseStorageController::fieldRevisionTableName($field),
+        DatabaseStorageController::_fieldTableName($field),
+        DatabaseStorageController::_fieldRevisionTableName($field),
       );
 
       foreach ($tables as $table_name) {

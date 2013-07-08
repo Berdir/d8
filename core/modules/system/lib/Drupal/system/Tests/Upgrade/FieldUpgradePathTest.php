@@ -208,10 +208,10 @@ class FieldUpgradePathTest extends UpgradePathTestBase {
 
     // Check that pre-existing deleted field table is renamed correctly.
     $field_entity = new Field($deleted_field);
-    $table_name = DatabaseStorageController::fieldTableName($field_entity);
+    $table_name = DatabaseStorageController::_fieldTableName($field_entity);
     $this->assertEqual("field_deleted_data_" . substr(hash('sha256', $deleted_field['uuid']), 0, 10), $table_name);
     $deleted_value = db_select($table_name, 't')
-      ->fields('t', array(DatabaseStorageController::fieldColumnName($field_entity, 'value')))
+      ->fields('t', array(DatabaseStorageController::_fieldColumnName($field_entity, 'value')))
       ->condition('entity_type', 'node')
       ->condition('entity_id', 2)
       ->condition('langcode', Language::LANGCODE_NOT_SPECIFIED)

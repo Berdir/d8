@@ -208,9 +208,9 @@ class BulkDeleteTest extends FieldUnitTestBase {
    * @param FieldInterface $field
    */
   protected function checkFieldTableContents(FieldInterface $field) {
-    $schema = DatabaseStorageController::fieldSqlSchema($field);
-    $table = DatabaseStorageController::fieldTableName($field);
-    $column = DatabaseStorageController::fieldColumnName($field, 'value');
+    $schema = DatabaseStorageController::_fieldSqlSchema($field);
+    $table = DatabaseStorageController::_fieldTableName($field);
+    $column = DatabaseStorageController::_fieldColumnName($field, 'value');
     $result = db_select($table, 't')
       ->fields('t', array_keys($schema[$table]['fields']))
       ->execute();

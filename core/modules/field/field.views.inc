@@ -101,8 +101,8 @@ function field_views_field_default_views_data(FieldInterface $field) {
 
   $data = array();
 
-  $current_table = DatabaseStorageController::fieldTableName($field);
-  $revision_table = DatabaseStorageController::fieldRevisionTableName($field);
+  $current_table = DatabaseStorageController::_fieldTableName($field);
+  $revision_table = DatabaseStorageController::_fieldRevisionTableName($field);
 
   // The list of entity:bundle that this field is used in.
   $bundles_names = array();
@@ -174,7 +174,7 @@ function field_views_field_default_views_data(FieldInterface $field) {
 
   $add_fields = array('delta', 'langcode', 'bundle');
   foreach ($field['columns'] as $column_name => $attributes) {
-    $add_fields[] = DatabaseStorageController::fieldColumnName($field, $column_name);
+    $add_fields[] = DatabaseStorageController::_fieldColumnName($field, $column_name);
   }
 
   // Note: we don't have a label available here, because we are at the field
@@ -298,10 +298,10 @@ function field_views_field_default_views_data(FieldInterface $field) {
       else {
         $group = t('@group (historical data)', array('@group' => $group_name));
       }
-      $column_real_name = DatabaseStorageController::fieldColumnName($field, $column);
+      $column_real_name = DatabaseStorageController::_fieldColumnName($field, $column);
 
       // Load all the fields from the table by default.
-      $field_sql_schema = DatabaseStorageController::fieldSqlSchema($field);
+      $field_sql_schema = DatabaseStorageController::_fieldSqlSchema($field);
       $additional_fields = array_keys($field_sql_schema[$current_table]['fields']);
 
       $data[$table][$column_real_name] = array(
