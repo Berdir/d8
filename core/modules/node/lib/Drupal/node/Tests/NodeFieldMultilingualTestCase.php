@@ -136,7 +136,7 @@ class NodeFieldMultilingualTestCase extends WebTestBase {
       ':id' => 'node-' . $node->id(),
       ':class' => 'content',
     ));
-    $this->assertEqual(current($body), $node->body['en'][0]['value'], 'Node body found.');
+    $this->assertEqual(current($body), $node->body->value, 'Node body found.');
   }
 
 }
