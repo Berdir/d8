@@ -87,7 +87,7 @@ class CommentTokenReplaceTest extends CommentTestBase {
     $tests['[comment:title]'] = $comment->subject->value;
     $tests['[comment:body]'] = $comment->comment_body->value;
     $tests['[comment:parent:title]'] = $parent_comment->subject->value;
-    $tests['[comment:node:title]'] = $node->title;
+    $tests['[comment:node:title]'] = $node->label();
     $tests['[comment:author:name]'] = $this->admin_user->name;
 
     foreach ($tests as $input => $expected) {
