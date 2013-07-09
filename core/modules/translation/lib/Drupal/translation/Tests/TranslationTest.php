@@ -116,7 +116,7 @@ class TranslationTest extends WebTestBase {
 
     // Update original and mark translation as outdated.
     $node_body = $this->randomName();
-    $node->body[Language::LANGCODE_NOT_SPECIFIED][0]['value'] = $node_body;
+    $node->body->value = $node_body;
     $edit = array();
     $edit["body[$langcode][0][value]"] = $node_body;
     $edit['translation[retranslate]'] = TRUE;
@@ -139,7 +139,7 @@ class TranslationTest extends WebTestBase {
     $this->drupalGet('node/add/page');
     $this->assertFieldByXPath('//select[@name="langcode"]//option', Language::LANGCODE_NOT_SPECIFIED, 'Language neutral is available in language selection with disabled languages.');
     $node2 = $this->createPage($this->randomName(), $this->randomName(), Language::LANGCODE_NOT_SPECIFIED);
-    $this->assertRaw($node2->body[Language::LANGCODE_NOT_SPECIFIED][0]['value'], 'Language neutral content created with disabled languages available.');
+    $this->assertRaw($node2->body->value, 'Language neutral content created with disabled languages available.');
 
     // Leave just one language installed and check that the translation overview
     // page is still accessible.

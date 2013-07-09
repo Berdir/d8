@@ -107,7 +107,7 @@ class HandlerFieldFieldTest extends FieldTestBase {
       for ($key = 0; $key < 2; $key++) {
         $field = $this->fields[$key];
         $rendered_field = $view->style_plugin->getField($i, $field['field_name']);
-        $expected_field = $this->nodes[$i]->{$field['field_name']}[Language::LANGCODE_NOT_SPECIFIED][0]['value'];
+        $expected_field = $this->nodes[$i]->{$field['field_name']}->value;
         $this->assertEqual($rendered_field, $expected_field);
       }
     }
