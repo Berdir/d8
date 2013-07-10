@@ -1126,11 +1126,11 @@ function template_preprocess_forum_topic_list(&$variables) {
       }
       else {
         $variables['topics'][$id]->moved = FALSE;
-        $variables['topics'][$id]->title = l($topic->getTitle(), 'node/' . $topic->id());
+        $variables['topics'][$id]->title_link = l($topic->getTitle(), 'node/' . $topic->id());
         $variables['topics'][$id]->message = '';
       }
       $forum_submitted = array('#theme' => 'forum_submitted', '#topic' => $topic);
-      $variables['topics'][$id]->created = drupal_render($forum_submitted);
+      $variables['topics'][$id]->submitted = drupal_render($forum_submitted);
       $forum_submitted = array(
         '#theme' => 'forum_submitted',
         '#topic' => isset($topic->last_reply) ? $topic->last_reply : NULL,
