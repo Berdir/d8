@@ -73,7 +73,7 @@ class FilterSecurityTest extends WebTestBase {
     // Create a new node.
     $node = $this->drupalCreateNode(array('promote' => 1));
     $body_raw = $node->body->value;
-    $format_id = $node->body[Language::LANGCODE_NOT_SPECIFIED][0]['format'];
+    $format_id = $node->body->format;
     $this->drupalGet('node/' . $node->id());
     $this->assertText($body_raw, 'Node body found.');
 

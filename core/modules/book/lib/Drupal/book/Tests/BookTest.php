@@ -206,7 +206,7 @@ class BookTest extends WebTestBase {
     // Check printer friendly version.
     $this->drupalGet('book/export/html/' . $node->id());
     $this->assertText($node->label(), 'Printer friendly title found.');
-    $this->assertRaw(check_markup($node->body->value, $node->body[Language::LANGCODE_NOT_SPECIFIED][0]['format']), 'Printer friendly body found.');
+    $this->assertRaw(check_markup($node->body->value, $node->body->format), 'Printer friendly body found.');
 
     $number++;
   }
@@ -281,7 +281,7 @@ class BookTest extends WebTestBase {
     // Make sure each part of the book is there.
     foreach ($nodes as $node) {
       $this->assertText($node->label(), 'Node title found in printer friendly version.');
-      $this->assertRaw(check_markup($node->body->value, $node->body[Language::LANGCODE_NOT_SPECIFIED][0]['format']), 'Node body found in printer friendly version.');
+      $this->assertRaw(check_markup($node->body->value, $node->body->format), 'Node body found in printer friendly version.');
     }
 
     // Make sure we can't export an unsupported format.
