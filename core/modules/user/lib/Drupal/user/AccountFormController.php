@@ -7,13 +7,13 @@
 
 namespace Drupal\user;
 
-use Drupal\Core\Entity\EntityFormController;
+use Drupal\Core\Entity\EntityFormControllerNG;
 use Drupal\Core\Language\Language;
 
 /**
  * Form controller for the user account forms.
  */
-abstract class AccountFormController extends EntityFormController {
+abstract class AccountFormController extends EntityFormControllerNG {
 
   /**
    * Overrides Drupal\Core\Entity\EntityFormController::form().
