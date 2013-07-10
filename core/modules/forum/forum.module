@@ -1113,7 +1113,7 @@ function template_preprocess_forum_topic_list(&$variables) {
         '#new_posts' => $topic->new,
         '#num_posts' => $topic->comment_count,
         '#comment_mode' => $topic->comment_mode,
-        '#sticky' => $topic->sticky,
+        '#sticky' => $topic->isSticky(),
         '#first_new' => $topic->first_new,
       );
       $variables['topics'][$id]->zebra = $row % 2 == 0 ? 'odd' : 'even';
@@ -1129,10 +1129,10 @@ function template_preprocess_forum_topic_list(&$variables) {
       }
       else {
         $variables['topics'][$id]->moved = FALSE;
-        $variables['topics'][$id]->title = l($topic->title, 'node/' . $topic->id());
+        $variables['topics'][$id]->title_link = l($topic->label(), 'node/' . $topic->id());
         $variables['topics'][$id]->message = '';
       }
-      $variables['topics'][$id]->created = theme('forum_submitted', array('topic' => $topic));
+      $variables['topics'][$id]->submitted = theme('forum_submitted', array('topic' => $topic));
       $variables['topics'][$id]->last_reply = theme('forum_submitted', array('topic' => isset($topic->last_reply) ? $topic->last_reply : NULL));
 
       $variables['topics'][$id]->new_text = '';
