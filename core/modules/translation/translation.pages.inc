@@ -56,7 +56,7 @@ function translation_node_overview(EntityInterface $node) {
         }
       }
       $status = $translation_node->isPublished() ? t('Published') : t('Not published');
-      $status .= $translation_node->translate ? ' - <span class="marker">' . t('outdated') . '</span>' : '';
+      $status .= $translation_node->translate->value ? ' - <span class="marker">' . t('outdated') . '</span>' : '';
       if ($translation_node->id() == $tnid) {
         $language_name = t('<strong>@language_name</strong> (source)', array('@language_name' => $language_name));
       }
