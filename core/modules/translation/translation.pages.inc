@@ -22,14 +22,14 @@ use Drupal\Core\Entity\EntityInterface;
 function translation_node_overview(EntityInterface $node) {
   include_once DRUPAL_ROOT . '/core/includes/language.inc';
 
-  if ($node->tnid) {
+  if ($node->tnid->value) {
     // Already part of a set, grab that set.
-    $tnid = $node->tnid;
-    $translations = translation_node_get_translations($node->tnid);
+    $tnid = $node->tnid->value;
+    $translations = translation_node_get_translations($node->tnid->value);
   }
   else {
     // We have no translation source nid, this could be a new set, emulate that.
-    $tnid = $node->nid;
+    $tnid = $node->id();
     $translations = array($node->language()->id => $node);
   }
 
