@@ -48,6 +48,8 @@ class UserStorageController extends DatabaseStorageControllerNG implements UserS
    *   An array of entity info for the entity type.
    * @param \Drupal\Core\Database\Connection $database
    *   The database connection to be used.
+   * @param \Drupal\field\FieldInfo $field_info
+   *   The field info service.
    * @param \Drupal\Core\Password\PasswordInterface $password
    *   The password hashing service.
    * @param \Drupal\user\UserDataInterface $user_data

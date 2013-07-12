@@ -53,6 +53,8 @@ class MenuLinkStorageController extends DatabaseStorageController implements Men
    *   An array of entity info for the entity type.
    * @param \Drupal\Core\Database\Connection $database
    *   The database connection to be used.
+   * @param \Drupal\field\FieldInfo $field_info
+   *   The field info service.
    * @param \Symfony\Cmf\Component\Routing\RouteProviderInterface $route_provider
    *   The route provider service.
    */

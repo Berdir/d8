@@ -88,6 +88,8 @@ class DatabaseStorageController extends EntityStorageControllerBase {
    *   An array of entity info for the entity type.
    * @param \Drupal\Core\Database\Connection $database
    *   The database connection to be used.
+   * @param \Drupal\field\FieldInfo $field_info
+   *   The field info service.
    */
   public function __construct($entity_type, array $entity_info, Connection $database, FieldInfo $field_info) {
     parent::__construct($entity_type, $entity_info);
