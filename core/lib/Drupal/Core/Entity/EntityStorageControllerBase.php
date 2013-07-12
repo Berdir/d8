@@ -284,10 +284,6 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
    * Loads all fields for each entity object in a group of a single entity type.
    * The loaded field values are added directly to the entity objects.
    *
-   * field_attach_load() is automatically called by the default entity controller
-   * class, and thus, in most cases, doesn't need to be explicitly called by the
-   * entity type module.
-   *
    * @param $entities
    *   An array of entities for which to load fields, keyed by entity ID. Each
    *   entity needs to have its 'bundle', 'id' and (if applicable) 'revision' keys
@@ -342,7 +338,7 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
     if ($queried_entities) {
       // The invoke order is:
       // - hook_field_storage_pre_load()
-      // - storage backend's hook_field_storage_load()
+      // - Entity storage controller's doFieldLoad() method
       // - Field class's prepareCache() method.
       // - hook_field_attach_load()
 
@@ -402,8 +398,7 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
     // Ensure we are working with a BC mode entity.
     $entity = $entity->getBCEntity();
 
-    // Let any module insert field data before the storage engine, accumulating
-    // saved fields along the way.
+    // Let any module insert field data before the storage engine.
     foreach (module_implements('field_storage_pre_insert') as $module) {
       $function = $module . '_field_storage_pre_insert';
       $function($entity);
