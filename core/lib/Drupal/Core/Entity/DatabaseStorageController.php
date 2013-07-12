@@ -348,14 +348,9 @@ class DatabaseStorageController extends EntityStorageControllerBase {
    *   (optional) TRUE if the revision should be loaded, defaults to FALSE.
    */
   protected function attachLoad(&$queried_entities, $load_revision = FALSE) {
-    // Attach fields.
+    // Attach field values.
     if ($this->entityInfo['fieldable']) {
-      if ($load_revision) {
-        $this->fieldLoad($queried_entities, FIELD_LOAD_REVISION);
-      }
-      else {
-        $this->fieldLoad($queried_entities, FIELD_LOAD_CURRENT);
-      }
+      $this->fieldLoad($queried_entities, $load_revision ? FIELD_LOAD_REVISION : FIELD_LOAD_CURRENT);
     }
 
     // Call hook_entity_load().
