@@ -333,7 +333,7 @@ class FieldAttachStorageTest extends FieldUnitTestBase {
     // Verify the field data is present on load.
     $controller = $this->container->get('plugin.manager.entity')->getStorageController($entity->entityType());
     $controller->resetCache();
-    $entitt = $controller->load($entity->id());
+    $entity = $controller->load($entity->id());
     $this->assertEqual(count($entity->{$this->field_name}), $this->field['cardinality'], "Bundle name has been updated in the field storage");
   }
 

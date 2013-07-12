@@ -556,7 +556,7 @@ class DatabaseStorageController extends EntityStorageControllerBase {
   /**
    * {@inheritdoc}
    */
-  function doFieldLoad($entity_type, $entities, $age) {
+  protected function doFieldLoad($entity_type, $entities, $age) {
     $load_current = $age == FIELD_LOAD_CURRENT;
     $bundles = array();
     $ids = $load_current ? array_keys($entities) : array();
@@ -724,7 +724,7 @@ class DatabaseStorageController extends EntityStorageControllerBase {
   /**
    * {@inheritdoc}
    */
-  protected function dofieldDelete(EntityInterface $entity) {
+  protected function doFieldDelete(EntityInterface $entity) {
     foreach ($this->fieldInfo->getBundleInstances($entity->getType(), $entity->bundle()) as $instance) {
       $field = $instance->getField();
       $table_name = static::_fieldTableName($field);
@@ -927,7 +927,6 @@ class DatabaseStorageController extends EntityStorageControllerBase {
           'not null' => FALSE,
           'description' => 'The entity revision id this data is attached to, or NULL if the entity type is not versioned',
         ),
-        // @todo Consider storing langcode as integer.
         'langcode' => array(
           'type' => 'varchar',
           'length' => 32,
