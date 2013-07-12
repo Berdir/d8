@@ -233,17 +233,18 @@ interface EntityStorageControllerInterface {
    * The entity itself is not being deleted, and it is quite possible that
    * other field data will remain attached to it.
    *
-   * @param int $entity_id
-   *   The entity id for the entity whose field data is being purged.
-   * @param $field
-   *   The (possibly deleted) field whose data is being purged.
-   * @param $instance
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity whose field data is being purged.
+   * @param \Drupal\field\FieldInstanceInterface $instance
    *   The deleted field instance whose data is being purged.
    */
-  public function fieldPurgeData(EntityInterface $entity, FieldInterface $field, FieldInstanceInterface $instance);
+  public function fieldPurgeData(EntityInterface $entity, FieldInstanceInterface $instance);
 
   /**
-   * All the field data is gone, final cleanup.
+   * Performs final cleanup after all data on all instances have been purged.
+   *
+   * @param \Drupal\field\FieldInterface $instance
+   *   The field being purged.
    */
   public function fieldPurge(FieldInterface $field);
 
