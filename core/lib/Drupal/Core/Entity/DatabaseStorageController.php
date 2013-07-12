@@ -553,7 +553,7 @@ class DatabaseStorageController extends EntityStorageControllerBase {
   /**
    * {@inheritdoc}
    */
-  protected function doFieldLoad($entity_type, $entities, $age) {
+  protected function doFieldLoad($entities, $age) {
     $load_current = $age == FIELD_LOAD_CURRENT;
     $bundles = array();
     $ids = $load_current ? array_keys($entities) : array();
@@ -563,7 +563,7 @@ class DatabaseStorageController extends EntityStorageControllerBase {
     }
     $fields = array();
     foreach ($bundles as $bundle => $v) {
-      foreach ($this->fieldInfo->getBundleInstances($entity_type, $bundle) as $field_name => $instance) {
+      foreach ($this->fieldInfo->getBundleInstances($this->entityType, $bundle) as $field_name => $instance) {
         $fields[$field_name] = $instance->getField();
       }
     }
@@ -572,9 +572,9 @@ class DatabaseStorageController extends EntityStorageControllerBase {
 
       $results = $this->database->select($table, 't')
         ->fields('t')
-        ->condition('entity_type', $entity_type)
+        ->condition('entity_type', $this->entityType)
         ->condition($load_current ? 'entity_id' : 'revision_id', $ids, 'IN')
-        ->condition('langcode', field_available_languages($entity_type, $field), 'IN')
+        ->condition('langcode', field_available_languages($this->entityType, $field), 'IN')
         ->orderBy('delta')
         ->condition('deleted', 0)
         ->execute();

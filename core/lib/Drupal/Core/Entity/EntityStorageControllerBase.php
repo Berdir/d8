@@ -353,7 +353,8 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
         $function($this->entityType, $queried_entities, $age);
       }
 
-      $this->doFieldLoad($this->entityType, $queried_entities, $age);
+      // Let the storage controller actually load the values.
+      $this->doFieldLoad($queried_entities, $age);
 
       // Invoke the field type's prepareCache() method.
       foreach ($queried_entities as $entity) {
