@@ -202,28 +202,39 @@ interface EntityStorageControllerInterface {
   public function handleBundleDelete($bundle);
 
   /**
-   * Allows reaction to instance creation.
-   *
-   * @param \Drupal\field\FieldInstanceInterface $instance
-   *   The instance created.
-   * @param bool $first
-   *   TRUE when the first instance is created, FALSE if other instances
-   *   exist.
-   */
-  public function handleInstanceCreate(FieldInstanceInterface $instance, $first);
-
-  /**
    * Allows reaction to the update of a configurable field.
+   *
+   * @param \Drupal\field\FieldInterface $field
+   *   The field being updated.
+   * @param \Drupal\field\FieldInterface $original
+   *   The previous state of the field.
    */
   public function handleFieldUpdate(FieldInterface $field, FieldInterface $original);
 
   /**
    * Allows reaction to the deletion of a configurable field.
+   *
+   * @param \Drupal\field\FieldInterface $field
+   *   The field being deleted.
    */
   public function handleFieldDelete(FieldInterface $field);
 
   /**
+   * Allows reaction to the creation of a configurable field instance.
+   *
+   * @param \Drupal\field\FieldInstanceInterface $instance
+   *   The instance being created.
+   * @param bool $first
+   *   TRUE when this is the first instance for the field, FALSE if other
+   *   instances exist.
+   */
+  public function handleInstanceCreate(FieldInstanceInterface $instance, $first);
+
+  /**
    * Allows reaction to the deletion of a configurable field instance.
+   *
+   * @param \Drupal\field\FieldInstanceInterface $instance
+   *   The instance being deleted.
    */
   public function handleInstanceDelete(FieldInstanceInterface $instance);
 
