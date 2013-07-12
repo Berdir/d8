@@ -21,7 +21,7 @@ function field_views_data() {
   $data = array();
   $module_handler = Drupal::moduleHandler();
   foreach (field_info_fields() as $field) {
-    if ($sql_entity_types = field_views_get_sql_entity_types($field)) {
+    if ($sql_entity_types = _field_views_get_sql_entity_types($field)) {
       $module = $field['module'];
       $result = (array) $module_handler->invoke($module, 'field_views_data', array($field, $sql_entity_types));
 
@@ -49,7 +49,7 @@ function field_views_data() {
  */
 function field_views_data_alter(&$data) {
   foreach (field_info_fields() as $field) {
-    if ($sql_entity_types = field_views_get_sql_entity_types($field)) {
+    if ($sql_entity_types = _field_views_get_sql_entity_types($field)) {
       $function = $field['module'] . '_field_views_data_views_data_alter';
       if (function_exists($function)) {
         $function($data, $field, $sql_entity_types);
@@ -58,7 +58,17 @@ function field_views_data_alter(&$data) {
   }
 }
 
-function field_views_get_sql_entity_types($field) {
+/**
+ * Returns the SQL-based entity types where the field appears in.
+ *
+ * @param \Drupal\field\FieldInterface $field
+ *   The field definition.
+ *
+ * @return array
+ *   The array of entity types using DatabaseStorageController where the field
+ *   appears in.
+ */
+function _field_views_get_sql_entity_types(FieldInterface $field) {
   $sql_entity_types = array();
   $entity_manager = Drupal::entityManager();
   foreach ($field['bundles'] as $entity_type => $bundles) {
