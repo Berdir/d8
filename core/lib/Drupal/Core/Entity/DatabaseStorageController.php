@@ -349,10 +349,10 @@ class DatabaseStorageController extends EntityStorageControllerBase {
     // Attach fields.
     if ($this->entityInfo['fieldable']) {
       if ($load_revision) {
-        $this->fieldLoad($this->entityType, $queried_entities, FIELD_LOAD_REVISION);
+        $this->fieldLoad($queried_entities, FIELD_LOAD_REVISION);
       }
       else {
-        $this->fieldLoad($this->entityType, $queried_entities, FIELD_LOAD_CURRENT);
+        $this->fieldLoad($queried_entities, FIELD_LOAD_CURRENT);
       }
     }
 

@@ -288,8 +288,6 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
    * class, and thus, in most cases, doesn't need to be explicitly called by the
    * entity type module.
    *
-   * @param $entity_type
-   *   The type of entities in $entities; e.g., 'node' or 'user'.
    * @param $entities
    *   An array of entities for which to load fields, keyed by entity ID. Each
    *   entity needs to have its 'bundle', 'id' and (if applicable) 'revision' keys
@@ -299,10 +297,10 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
    *   FIELD_LOAD_CURRENT to load the most recent revision for all fields, or
    *   FIELD_LOAD_REVISION to load the version indicated by each entity.
    */
-  protected function fieldLoad($entity_type, $entities, $age) {
+  protected function fieldLoad($entities, $age) {
     $load_current = $age == FIELD_LOAD_CURRENT;
 
-    $info = entity_get_info($entity_type);
+    $info = entity_get_info($this->entityType);
     // Only the most current revision of non-deleted fields for cacheable entity
     // types can be cached.
     $use_cache = $load_current && $info['field_cache'];
@@ -324,13 +322,13 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
       // Build the list of cache entries to retrieve.
       $cids = array();
       foreach ($entities as $id => $entity) {
-        $cids[] = "field:$entity_type:$id";
+        $cids[] = "field:$this->entityType:$id";
       }
       $cache = cache('field')->getMultiple($cids);
       // Put the cached field values back into the entities and remove them from
       // the list of entities to query.
       foreach ($entities as $id => $entity) {
-        $cid = "field:$entity_type:$id";
+        $cid = "field:$this->entityType:$id";
         if (isset($cache[$cid])) {
           unset($queried_entities[$id]);
           foreach ($cache[$cid]->data as $field_name => $values) {
@@ -352,31 +350,31 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
       // data before the storage engine, accumulating along the way.
       foreach (module_implements('field_storage_pre_load') as $module) {
         $function = $module . '_field_storage_pre_load';
-        $function($entity_type, $queried_entities, $age);
+        $function($this->entityType, $queried_entities, $age);
       }
 
-      $this->doFieldLoad($entity_type, $queried_entities, $age);
+      $this->doFieldLoad($this->entityType, $queried_entities, $age);
 
       // Invoke the field type's prepareCache() method.
       foreach ($queried_entities as $entity) {
         \Drupal::entityManager()
-          ->getStorageController($entity_type)
+          ->getStorageController($this->entityType)
           ->invokeFieldItemPrepareCache($entity);
       }
 
       // Invoke hook_field_attach_load(): let other modules act on loading the
       // entity.
-      module_invoke_all('field_attach_load', $entity_type, $queried_entities, $age);
+      module_invoke_all('field_attach_load', $this->entityType, $queried_entities, $age);
 
       // Build cache data.
       if ($use_cache) {
         foreach ($queried_entities as $id => $entity) {
           $data = array();
-          $instances = field_info_instances($entity_type, $entity->bundle());
+          $instances = field_info_instances($this->entityType, $entity->bundle());
           foreach ($instances as $instance) {
             $data[$instance['field_name']] = $queried_entities[$id]->{$instance['field_name']};
           }
-          $cid = "field:$entity_type:$id";
+          $cid = "field:$this->entityType:$id";
           cache('field')->set($cid, $data);
         }
       }

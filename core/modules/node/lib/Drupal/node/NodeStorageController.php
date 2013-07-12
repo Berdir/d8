@@ -47,10 +47,10 @@ class NodeStorageController extends DatabaseStorageControllerNG {
     }
 
     if ($load_revision) {
-      $this->fieldLoad($this->entityType, $queried_entities, FIELD_LOAD_REVISION);
+      $this->fieldLoad($queried_entities, FIELD_LOAD_REVISION);
     }
     else {
-      $this->fieldLoad($this->entityType, $queried_entities, FIELD_LOAD_CURRENT);
+      $this->fieldLoad($queried_entities, FIELD_LOAD_CURRENT);
     }
 
     // Besides the list of nodes, pass one additional argument to
