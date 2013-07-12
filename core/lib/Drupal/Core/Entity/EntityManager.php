@@ -139,6 +139,9 @@ class EntityManager extends PluginManagerBase {
    *
    * This is usually only necessary for uninstall purposes.
    *
+   * @todo Remove this method, along with doDiscovery(), when
+   * https://drupal.org/node/1199946 is fixed.
+   *
    * @param \Traversable $namespaces
    *
    * @see comment_uninstall()
