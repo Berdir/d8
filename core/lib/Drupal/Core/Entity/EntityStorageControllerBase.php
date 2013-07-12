@@ -473,9 +473,7 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
    * @param EntityInterface $entity
    *   The entity.
    */
-  protected function doFieldInsert(EntityInterface $entity) {
-
-  }
+  protected function doFieldInsert(EntityInterface $entity) { }
 
   /**
    * Update configurable fields in storage.
@@ -483,9 +481,7 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
    * @param EntityInterface $entity
    *   The entity.
    */
-  protected function doFieldUpdate(EntityInterface $entity) {
-
-  }
+  protected function doFieldUpdate(EntityInterface $entity) { }
 
   /**
    * Delete configurable fields from storage.
@@ -493,9 +489,7 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
    * @param EntityInterface $entity
    *   The entity.
    */
-  protected function doFieldDelete(EntityInterface $entity) {
-
-  }
+  protected function doFieldDelete(EntityInterface $entity) { }
 
   /**
    * Delete specific revision of configurable fields from storage.
@@ -503,9 +497,7 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
    * @param EntityInterface $entity
    *   The entity.
    */
-  protected function doFieldRevisionDelete(EntityInterface $entity) {
-
-  }
+  protected function doFieldRevisionDelete(EntityInterface $entity) { }
 
   /**
    * Load configurable fields from storage.
@@ -513,59 +505,42 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
    * @param EntityInterface $entity
    *   The entity.
    */
-  protected function doFieldLoad($entity_type, $queried_entities, $age) {
-
-  }
+  protected function doFieldLoad($queried_entities, $age) { }
 
   /**
    * {@inheritdoc}
    */
-  public function handleBundleCreate($bundle) {
-
-  }
+  public function handleBundleCreate($bundle) { }
 
   /**
    * {@inheritdoc}
    */
-  public function handleBundleRename($bundle, $bundle_new) {
-
-  }
-
+  public function handleBundleRename($bundle, $bundle_new) { }
 
   /**
    * {@inheritdoc}
    */
-  public function handleBundleDelete($bundle) {
-
-  }
+  public function handleBundleDelete($bundle) { }
 
   /**
    * {@inheritdoc}
    */
-  public function handleInstanceCreate(FieldInstanceInterface $instance, $first) {
-
-  }
+  public function handleInstanceCreate(FieldInstanceInterface $instance, $first) { }
 
   /**
    * {@inheritdoc}
    */
-  public function handleFieldUpdate(FieldInterface $field, FieldInterface $original) {
-
-  }
+  public function handleFieldUpdate(FieldInterface $field, FieldInterface $original) { }
 
   /**
    * {@inheritdoc}
    */
-  public function handleInstanceDelete(FieldInstanceInterface $instance) {
-
-  }
+  public function handleInstanceDelete(FieldInstanceInterface $instance) { }
 
   /**
    * {@inheritdoc}
    */
-  public function handleFieldDelete(FieldInterface $field) {
-
-  }
+  public function handleFieldDelete(FieldInterface $field) { }
 
   /**
    * {@inheritdoc}
@@ -598,8 +573,6 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
   /**
    * {@inheritdoc}
    */
-  public function fieldPurge(FieldInterface $field) {
-
-  }
+  public function fieldPurge(FieldInterface $field) { }
 
 }
