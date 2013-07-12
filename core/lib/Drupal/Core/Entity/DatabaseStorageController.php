@@ -587,8 +587,8 @@ class DatabaseStorageController extends EntityStorageControllerBase {
 
         if ($field['cardinality'] == FIELD_CARDINALITY_UNLIMITED || $delta_count[$row->entity_id][$row->langcode] < $field['cardinality']) {
           $item = array();
-          // For each column declared by the field, populate the item
-          // from the prefixed database column.
+          // For each column declared by the field, populate the item from the
+          // prefixed database column.
           foreach ($field['columns'] as $column => $attributes) {
             $column_name = static::_fieldColumnName($field, $column);
             // Unserialize the value if specified in the column schema.
@@ -618,7 +618,7 @@ class DatabaseStorageController extends EntityStorageControllerBase {
   }
 
   /**
-   * Perform the actual storage write on behalf of doFieldInsert / doFieldUpdate.
+   * Performs the actual write on behalf of doFieldInsert / doFieldUpdate.
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity being written.
@@ -823,9 +823,9 @@ class DatabaseStorageController extends EntityStorageControllerBase {
       if ($field['columns'] != $original['columns']) {
         throw new FieldUpdateForbiddenException("The SQL storage cannot change the schema for an existing field with data.");
       }
-      // There is data, so there are no column changes. Drop all the
-      // prior indexes and create all the new ones, except for all the
-      // priors that exist unchanged.
+      // There is data, so there are no column changes. Drop all the prior
+      // indexes and create all the new ones, except for all the priors that
+      // exist unchanged.
       $table = static::_fieldTableName($original);
       $revision_table = static::_fieldRevisionTableName($original);
 
@@ -1012,8 +1012,8 @@ class DatabaseStorageController extends EntityStorageControllerBase {
     if ($field['deleted']) {
       // When a field is a deleted, the table is renamed to
       // {field_deleted_data_FIELD_UUID}. To make sure we don't end up with
-      // table names longer than 64 characters, we hash the uuid and return
-      // the first 10 characters so we end up with a short unique ID.
+      // table names longer than 64 characters, we hash the uuid and return the
+      // first 10 characters so we end up with a short unique ID.
       return "field_deleted_data_" . substr(hash('sha256', $field['uuid']), 0, 10);
     }
     else {
@@ -1040,9 +1040,9 @@ class DatabaseStorageController extends EntityStorageControllerBase {
   static public function _fieldRevisionTableName(FieldInterface $field) {
     if ($field['deleted']) {
       // When a field is a deleted, the table is renamed to
-      // {field_deleted_revision_FIELD_UUID}. To make sure we don't end up
-      // with table names longer than 64 characters, we hash the uuid and
-      // return the first 10 characters so we end up with a short unique ID.
+      // {field_deleted_revision_FIELD_UUID}. To make sure we don't end up with
+      // table names longer than 64 characters, we hash the uuid and return the
+      // first 10 characters so we end up with a short unique ID.
       return "field_deleted_revision_" . substr(hash('sha256', $field['uuid']), 0, 10);
     }
     else {
@@ -1136,7 +1136,8 @@ class DatabaseStorageController extends EntityStorageControllerBase {
       ->fields(array('deleted' => 1))
       ->execute();
 
-    // Move the table to a unique name while the table contents are being deleted.
+    // Move the table to a unique name while the table contents are being
+    // deleted.
     $field['deleted'] = TRUE;
     $new_table = static::_fieldTableName($field);
     $revision_new_table = static::_fieldRevisionTableName($field);
