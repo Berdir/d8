@@ -285,24 +285,21 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
    * The loaded field values are added directly to the entity objects.
    *
    * @param $entities
-   *   An array of entities for which to load fields, keyed by entity ID. Each
-   *   entity needs to have its 'bundle', 'id' and (if applicable) 'revision' keys
-   *   filled in. The function adds the loaded field data directly in the entity
-   *   objects of the $entities array.
+   *   An array of entities for which to load fields, keyed by entity ID.
    * @param $age
    *   FIELD_LOAD_CURRENT to load the most recent revision for all fields, or
    *   FIELD_LOAD_REVISION to load the version indicated by each entity.
    */
   protected function fieldLoad($entities, $age) {
-    $load_current = $age == FIELD_LOAD_CURRENT;
-
-    $info = entity_get_info($this->entityType);
-    // Only the most current revision of non-deleted fields for cacheable entity
-    // types can be cached.
-    $use_cache = $load_current && $info['field_cache'];
     if (empty($entities)) {
       return;
     }
+
+    // Only the most current revision of non-deleted fields for cacheable entity
+    // types can be cached.
+    $load_current = $age == FIELD_LOAD_CURRENT;
+    $info = entity_get_info($this->entityType);
+    $use_cache = $load_current && $info['field_cache'];
 
     // Ensure we are working with a BC mode entity.
     foreach ($entities as $id => $entity) {
@@ -342,8 +339,8 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
       // - Field class's prepareCache() method.
       // - hook_field_attach_load()
 
-      // Invoke hook_field_storage_pre_load(): let any module load field
-      // data before the storage engine, accumulating along the way.
+      // Invoke hook_field_storage_pre_load(): let any module load field data
+      // before the storage engine, accumulating along the way.
       foreach (module_implements('field_storage_pre_load') as $module) {
         $function = $module . '_field_storage_pre_load';
         $function($this->entityType, $queried_entities, $age);
@@ -383,8 +380,6 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
    *
    * The passed-in entity must already contain its id and (if applicable)
    * revision id attributes.
-   * Default values (if any) will be saved for fields not present in the
-   * $entity.
    *
    * It should be enough to override doFieldInsert() instead of this method.
    *
