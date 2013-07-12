@@ -22,7 +22,7 @@ function tracker_page($account = NULL, $set_title = FALSE) {
     $query = db_select('tracker_user', 't')
       ->extend('Drupal\Core\Database\Query\PagerSelectExtender')
       ->addMetaData('base_table', 'tracker_user')
-      ->condition('t.uid', $account->uid);
+      ->condition('t.uid', $account->id());
 
     if ($set_title) {
       // When viewed from user/%user/track, display the name of the user
@@ -83,7 +83,7 @@ function tracker_page($account = NULL, $set_title = FALSE) {
         'type' => check_plain(node_get_type_label($node)),
         // Do not use $node->label(), because $node comes from the database.
         'title' => array('data' => l($node->title, 'node/' . $node->nid) . ' ' . drupal_render($mark_build)),
-        'author' => array('data' => array('#theme' => 'username', '#account' => $node)),
+        'author' => array('data' => array('#theme' => 'username', '#account' => user_load($node->uid))),
         'replies' => array('class' => array('replies'), 'data' => $comments),
         'last updated' => array('data' => t('!time ago', array('!time' => format_interval(REQUEST_TIME - $node->last_activity)))),
       );

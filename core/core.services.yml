@@ -169,6 +169,12 @@ services:
   plugin.manager.action:
     class: Drupal\Core\Action\ActionManager
     arguments: ['@container.namespaces']
+  plugin.manager.menu.local_action:
+    class: Drupal\Core\Menu\LocalActionManager
+    arguments: ['@container.namespaces', '@controller_resolver', '@request', '@module_handler']
+  plugin.manager.menu.local_task:
+    class: Drupal\Core\Menu\LocalTaskManager
+    arguments: ['@container.namespaces', '@controller_resolver', '@request', '@router.route_provider', '@module_handler']
   request:
     class: Symfony\Component\HttpFoundation\Request
     # @TODO the synthetic setting must be uncommented whenever drupal_session_initialize()
@@ -490,7 +496,7 @@ services:
     arguments: ['@module_handler']
   date:
     class: Drupal\Core\Datetime\Date
-    arguments: ['@config.factory', '@language_manager']
+    arguments: ['@plugin.manager.entity', '@language_manager']
   feed.bridge.reader:
     class: Drupal\Component\Bridge\ZfExtensionManagerSfContainer
     calls:

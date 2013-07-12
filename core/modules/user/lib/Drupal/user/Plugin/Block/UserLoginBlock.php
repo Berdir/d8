@@ -63,7 +63,7 @@ class UserLoginBlock extends BlockBase implements ContainerFactoryPluginInterfac
   }
 
   /**
-   * {@inheritdo}
+   * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, array $plugin_definition) {
     return new static(
@@ -79,7 +79,7 @@ class UserLoginBlock extends BlockBase implements ContainerFactoryPluginInterfac
    * Overrides \Drupal\block\BlockBase::access().
    */
   public function access() {
-    return (!$GLOBALS['user']->uid && !(arg(0) == 'user' && !is_numeric(arg(1))));
+    return (!$GLOBALS['user']->id() && !(arg(0) == 'user' && !is_numeric(arg(1))));
   }
 
   /**

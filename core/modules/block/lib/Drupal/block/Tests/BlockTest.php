@@ -49,7 +49,7 @@ class BlockTest extends BlockTestBase {
     $this->drupalGet('user');
     $this->assertNoText($title, 'Block was not displayed according to block visibility rules.');
 
-    $this->drupalGet('USER/' . $this->adminUser->uid);
+    $this->drupalGet('USER/' . $this->adminUser->id());
     $this->assertNoText($title, 'Block was not displayed according to block visibility rules regardless of path case.');
 
     // Confirm that the block is not displayed to anonymous users.
@@ -161,7 +161,7 @@ class BlockTest extends BlockTestBase {
     $edit = array(
       'settings[label_display]' => FALSE,
     );
-    $this->drupalPost('admin/structure/block/manage/' . $default_theme . '.' . $machine_name . '/configure', $edit, t('Save block'));
+    $this->drupalPost('admin/structure/block/manage/' . $default_theme . '.' . $machine_name, $edit, t('Save block'));
     $this->assertText('The block configuration has been saved.', 'Block was saved');
 
     $this->drupalGet('user');

@@ -37,7 +37,7 @@ class UserPasswordResetTest extends WebTestBase {
     // Activate user by logging in.
     $this->drupalLogin($account);
 
-    $this->account = user_load($account->uid);
+    $this->account = user_load($account->id());
     $this->drupalLogout();
 
     // Set the last login time that is used to generate the one-time link so
@@ -45,7 +45,7 @@ class UserPasswordResetTest extends WebTestBase {
     $account->login = REQUEST_TIME - mt_rand(10, 100000);
     db_update('users')
       ->fields(array('login' => $account->login))
-      ->condition('uid', $account->uid)
+      ->condition('uid', $account->id())
       ->execute();
   }
 
@@ -60,14 +60,14 @@ class UserPasswordResetTest extends WebTestBase {
     $this->drupalPost(NULL, $edit, t('E-mail new password'));
 
     $this->assertText(t('Sorry, @name is not recognized as a username or an e-mail address.', array('@name' => $edit['name'])), 'Validation error message shown when trying to request password for invalid account.');
-    $this->assertEqual(count($this->drupalGetMails(array('id' => 'user_password_reset'))), 0, t('No e-mail was sent when requesting a password for an invalid account.'));
+    $this->assertEqual(count($this->drupalGetMails(array('id' => 'user_password_reset'))), 0, 'No e-mail was sent when requesting a password for an invalid account.');
 
     // Reset the password by username via the password reset page.
     $edit['name'] = $this->account->name;
     $this->drupalPost(NULL, $edit, t('E-mail new password'));
 
      // Verify that the user was sent an e-mail.
-    $this->assertMail('to', $this->account->mail, t('Password e-mail sent to user.'));
+    $this->assertMail('to', $this->account->mail, 'Password e-mail sent to user.');
     $subject = t('Replacement login information for @username at @site', array('@username' => $this->account->name, '@site' => config('system.site')->get('name')));
     $this->assertMail('subject', $subject, 'Password reset e-mail subject is correct.');
 
@@ -99,7 +99,7 @@ class UserPasswordResetTest extends WebTestBase {
     // Create a password reset link as if the request time was 60 seconds older than the allowed limit.
     $timeout = config('user.settings')->get('password_reset_timeout');
     $bogus_timestamp = REQUEST_TIME - $timeout - 60;
-    $_uid = $this->account->uid;
+    $_uid = $this->account->id();
     $this->drupalGet("user/reset/$_uid/$bogus_timestamp/" . user_pass_rehash($this->account->pass, $bogus_timestamp, $this->account->login));
     $this->assertText(t('You have tried to use a one-time login link that has expired. Please request a new one using the form below.'), 'Expired password reset request rejected.');
   }

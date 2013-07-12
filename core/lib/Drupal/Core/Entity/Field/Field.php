@@ -51,6 +51,14 @@ class Field extends ItemList implements FieldInterface {
   /**
    * {@inheritdoc}
    */
+  public function getFieldDefinition() {
+    // @todo https://drupal.org/node/1988612
+    return NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function filterEmptyValues() {
     if (isset($this->list)) {
       $this->list = array_values(array_filter($this->list, function($item) {
@@ -164,8 +172,8 @@ class Field extends ItemList implements FieldInterface {
    */
   public function access($operation = 'view', AccountInterface $account = NULL) {
     global $user;
-    if (!isset($account) && $user->uid) {
-      $account = user_load($user->uid);
+    if (!isset($account)) {
+      $account = $user;
     }
     // Get the default access restriction that lives within this field.
     $access = $this->defaultAccess($operation, $account);

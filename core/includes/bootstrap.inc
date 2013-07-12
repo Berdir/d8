@@ -1550,7 +1550,7 @@ function watchdog($type, $message, array $variables = NULL, $severity = WATCHDOG
     $in_error_state = TRUE;
 
     // The user object may not exist in all conditions, so 0 is substituted if needed.
-    $user_uid = isset($user->uid) ? $user->uid : 0;
+    $user_uid = isset($user) ? $user->id() : 0;
 
     // Prepare the fields to be logged
     $log_entry = array(
@@ -1898,7 +1898,7 @@ function drupal_get_user_timezone() {
   global $user;
   $config = config('system.timezone');
 
-  if ($user && $config->get('user.configurable') && $user->uid && $user->timezone) {
+  if ($user && $config->get('user.configurable') && $user->id() && $user->timezone) {
     return $user->timezone;
   }
   else {
@@ -2024,12 +2024,7 @@ function _drupal_bootstrap_kernel() {
 function _drupal_bootstrap_page_cache() {
   global $user;
 
-  // Allow specifying special cache handlers in settings.php, like
-  // using memcached or files for storing cache information.
   require_once __DIR__ . '/cache.inc';
-  foreach (variable_get('cache_backends', array()) as $include) {
-    require_once DRUPAL_ROOT . '/' . $include;
-  }
   // Check for a cache mode force from settings.php.
   if (settings()->get('page_cache_without_database')) {
     $cache_enabled = TRUE;
