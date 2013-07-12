@@ -466,8 +466,8 @@ function field_views_field_default_views_data(FieldInterface $field, $sql_entity
 /**
  * Have a different filter handler for lists. This should allow to select values of the list.
  */
-function list_field_views_data($field) {
-  $data = field_views_field_default_views_data($field);
+function list_field_views_data($field, $sql_entity_types) {
+  $data = field_views_field_default_views_data($field, $sql_entity_types);
   foreach ($data as $table_name => $table_data) {
     foreach ($table_data as $field_name => $field_data) {
       if (isset($field_data['filter']) && $field_name != 'delta') {

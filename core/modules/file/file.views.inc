@@ -452,8 +452,8 @@ function file_views_data() {
  *
  * @see field_views_field_default_views_data()
  */
-function file_field_views_data($field) {
-  $data = field_views_field_default_views_data($field);
+function file_field_views_data($field, $sql_entity_types) {
+  $data = field_views_field_default_views_data($field, $sql_entity_types);
   foreach ($data as $table_name => $table_data) {
     // Add the relationship only on the fid field.
     $data[$table_name][$field['field_name'] . '_target_id']['relationship'] = array(

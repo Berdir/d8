@@ -336,8 +336,8 @@ function taxonomy_views_data_alter(&$data) {
  *
  * @see field_views_field_default_views_data()
  */
-function taxonomy_field_views_data($field) {
-  $data = field_views_field_default_views_data($field);
+function taxonomy_field_views_data($field, $sql_entity_types) {
+  $data = field_views_field_default_views_data($field, $sql_entity_types);
   foreach ($data as $table_name => $table_data) {
     foreach ($table_data as $field_name => $field_data) {
       if (isset($field_data['filter']) && $field_name != 'delta') {
