@@ -326,7 +326,6 @@ function field_update_8003() {
       'indexes' => $record['data']['indexes'] ?: array(),
       'status' => 1,
       'langcode' => 'und',
-      'storageType' => 'sql',
     );
 
     // Reassign all list.module fields to be controlled by options.module.

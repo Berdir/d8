@@ -202,35 +202,25 @@ interface EntityStorageControllerInterface {
   public function handleBundleDelete($bundle);
 
   /**
-   * The type of storage.
+   * Allows reaction to instance creation.
    *
-   * Drupal core provides a basic 'sql' storage type by default which stores
-   * every field in a separate table. Contrib or custom modules can provide
-   * alternative storage types.
-   *
-   * @return string
+   * @param \Drupal\field\FieldInstanceInterface $instance
+   *   The instance created.
+   * @param bool $first
+   *   TRUE when the first instance is created, FALSE if other instances
+   *   exist.
    */
-  public function storageType();
-
-  /**
-   * Allows reaction to first instance created.
-   *
-   * As there is no storage controller yet for the field when it is created,
-   * this is the first chance for the storage controller to react. Further
-   * instance creations and updates have no handling methods as instance
-   * changes do not affect the storage.
-   */
-  public function handleFirstInstance(FieldInstanceInterface $instance);
+  public function handleInstanceCreate(FieldInstanceInterface $instance, $first);
 
   /**
    * Allows reaction to the update of a configurable field.
    */
-  public function handleUpdateField(FieldInterface $field, FieldInterface $original);
+  public function handleFieldUpdate(FieldInterface $field, FieldInterface $original);
 
   /**
    * Allows reaction to the deletion of a configurable field.
    */
-  public function handleDeleteField(FieldInterface $field);
+  public function handleFieldDelete(FieldInterface $field);
 
   /**
    * Allows reaction to the deletion of a configurable field instance.

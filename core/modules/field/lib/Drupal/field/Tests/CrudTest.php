@@ -151,35 +151,6 @@ class CrudTest extends FieldUnitTestBase {
   }
 
   /**
-   * Test failure to change the storage type of a field.
-   */
-  function testCreateFieldFail() {
-    $this->assertFalse(field_info_field('field_1'), 'field_1 does not exist');
-    $field_definition = array(
-      'field_name' => 'field_1',
-      'type' => 'test_field',
-    );
-    entity_create('field_entity', $field_definition)->save();
-    $instance_definition = array(
-      'field_name' => $field_definition['field_name'],
-      'entity_type' => 'entity_test',
-      'bundle' => 'entity_test',
-    );
-    entity_create('field_instance', $instance_definition)->save();
-    $field = field_info_field('field_1');
-    // Check that not-changing does not throw an exception.
-    $storage_type = $field->getStorageType();
-    $field->setStorageType($storage_type);
-    try {
-      $field->setStorageType($storage_type . 'x');
-      $this->fail('Field storage type can not be changed.');
-    }
-    catch (FieldException $e) {
-      $this->assertEqual($e->getMessage(), 'Field storage type can not be changed.');
-    }
-  }
-
-  /**
    * Tests reading a single field definition.
    */
   function testReadField() {

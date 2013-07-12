@@ -175,14 +175,6 @@ class Field extends ConfigEntityBase implements FieldInterface {
   public $deleted = FALSE;
 
   /**
-   * The storage type this field is in. Typically 'sql'.
-   *
-   * @var string
-   */
-  protected $storageType;
-
-
-  /**
    * The field schema.
    *
    * @var array
@@ -256,7 +248,6 @@ class Field extends ConfigEntityBase implements FieldInterface {
       'cardinality',
       'translatable',
       'indexes',
-      'storageType',
     );
     $properties = array();
     foreach ($names as $name) {
@@ -368,15 +359,6 @@ class Field extends ConfigEntityBase implements FieldInterface {
 
     $original = $storage_controller->loadUnchanged($this->id());
     $this->original = $original;
-    $original_storage_type = $this->original->getStorageType();
-    // Disallow changing storage types. Explicit changes of storage types are
-    // disallowed by setStorageType() so this can only happen if an existing
-    // field object gets out of sync with the stored field config, for example
-    // by creating a field, an instance and then re-saving the original field
-    // object.
-    if ($original_storage_type && $this->storageType != $this->original->getStorageType()) {
-      $this->storageType = $this->original->getStorageType();
-    }
 
     // Some updates are always disallowed.
     if ($this->type != $original->type) {
@@ -400,7 +382,7 @@ class Field extends ConfigEntityBase implements FieldInterface {
       // Tell the storage engine to update the field. The storage engine can
       // reject the definition update as invalid by raising an exception,
       // which stops execution before the definition is written to config.
-      $data_storage_controller->handleUpdateField($this, $original);
+      $data_storage_controller->handleFieldUpdate($this, $original);
     }
 
 
@@ -450,7 +432,7 @@ class Field extends ConfigEntityBase implements FieldInterface {
 
       // The only case $entity_type is empty when there never were instances.
       if ($attached_entity_type) {
-        \Drupal::entityManager()->getStorageController($attached_entity_type)->handleDeleteField($this);
+        \Drupal::entityManager()->getStorageController($attached_entity_type)->handleFieldDelete($this);
       }
 
       // Delete the configuration of this field and save the field configuration
@@ -722,27 +704,4 @@ class Field extends ConfigEntityBase implements FieldInterface {
     return FALSE;
   }
 
-  public function getStorageType() {
-    return $this->storageType;
-  }
-
-  /**
-   * Set the storage type.
-   *
-   * @param $storage_type
-   *   The storage type.
-   * @return bool
-   *   TRUE when there was no storage type before.
-   * @throws \Drupal\field\FieldException
-   */
-  public function setStorageType($storage_type) {
-    if (!$this->storageType && $storage_type) {
-      $this->storageType = $storage_type;
-      return TRUE;
-    }
-    elseif ($storage_type != $this->storageType) {
-      throw new FieldException('Field storage type can not be changed.');
-    }
-    return FALSE;
-  }
 }

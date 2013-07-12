@@ -19,21 +19,20 @@ use Drupal\field\FieldInterface;
  */
 function field_views_data() {
   $data = array();
+  $module_handler = Drupal::moduleHandler();
   foreach (field_info_fields() as $field) {
-    if ($field->getStorageType() != 'sql') {
-      continue;
-    }
+    if ($sql_entity_types = field_views_get_sql_entity_types($field)) {
+      $module = $field['module'];
+      $result = (array) $module_handler->invoke($module, 'field_views_data', array($field, $sql_entity_types));
 
-    $module = $field['module'];
-    $result = (array) module_invoke($module, 'field_views_data', $field);
+      if (empty($result)) {
+        $result = field_views_field_default_views_data($field, $sql_entity_types);
+      }
+      $module_handler->alter('field_views_data', $result, $field, $sql_entity_types);
 
-    if (empty($result)) {
-      $result = field_views_field_default_views_data($field);
-    }
-    Drupal::moduleHandler()->alter('field_views_data', $result, $field, $module);
-
-    if (is_array($result)) {
-      $data = NestedArray::mergeDeep($result, $data);
+      if (is_array($result)) {
+        $data = NestedArray::mergeDeep($result, $data);
+      }
     }
   }
 
@@ -50,15 +49,24 @@ function field_views_data() {
  */
 function field_views_data_alter(&$data) {
   foreach (field_info_fields() as $field) {
-    if ($field->getStorageType() != 'sql') {
-      continue;
-    }
-
-    $function = $field['module'] . '_field_views_data_views_data_alter';
-    if (function_exists($function)) {
-      $function($data, $field);
+    if ($sql_entity_types = field_views_get_sql_entity_types($field)) {
+      $function = $field['module'] . '_field_views_data_views_data_alter';
+      if (function_exists($function)) {
+        $function($data, $field, $sql_entity_types);
+      }
     }
   }
+}
+
+function field_views_get_sql_entity_types($field) {
+  $sql_entity_types = array();
+  $entity_manager = Drupal::entityManager();
+  foreach ($field['bundles'] as $entity_type => $bundles) {
+    if ($entity_manager->getStorageController($entity_type) instanceof DatabaseStorageController) {
+      $sql_entity_types[] = $entity_type;
+    }
+  }
+  return $sql_entity_types;
 }
 
 /**
@@ -91,12 +99,12 @@ function field_views_field_label($field_name) {
 /**
  * Default views data implementation for a field.
  */
-function field_views_field_default_views_data(FieldInterface $field) {
+function field_views_field_default_views_data(FieldInterface $field, $sql_entity_types) {
   $field_types = field_info_field_types();
 
   // Check the field module is available.
   if (!isset($field_types[$field['type']])) {
-    return;
+    return array();
   }
 
   $data = array();
@@ -115,35 +123,39 @@ function field_views_field_default_views_data(FieldInterface $field) {
   $group_name = count($field['bundles']) > 1 ? t('Field') : NULL;
 
   // Build the relationships between the field table and the entity tables.
-  foreach ($field['bundles'] as $entity => $bundles) {
-    $entity_info = entity_get_info($entity);
-    $groups[$entity] = $entity_info['label'];
+  $entity_manager = Drupal::entityManager();
+  foreach ($sql_entity_types as $entity_type) {
+    if (!$entity_manager->getStorageController($entity_type) instanceof DatabaseStorageController) {
+      continue;
+    }
+    $entity_info = $entity_manager->getDefinition($entity_type);
+    $groups[$entity_type] = $entity_info['label'];
 
     // Override Node to Content.
-    if ($groups[$entity] == t('Node')) {
-      $groups[$entity] = t('Content');
+    if ($groups[$entity_type] == t('Node')) {
+      $groups[$entity_type] = t('Content');
     }
 
     // If only one bundle use this as the default name.
     if (empty($group_name)) {
-      $group_name = $groups[$entity];
+      $group_name = $groups[$entity_type];
     }
 
     if (!isset($entity_info['base_table'])) {
       continue;
     }
-    $entity_tables[$entity_info['base_table']] = $entity;
-    $current_tables[$entity] = $entity_info['base_table'];
+    $entity_tables[$entity_info['base_table']] = $entity_type;
+    $current_tables[$entity_type] = $entity_info['base_table'];
     if (isset($entity_info['revision_table'])) {
-      $entity_tables[$entity_info['revision_table']] = $entity;
-      $revision_tables[$entity] = $entity_info['revision_table'];
+      $entity_tables[$entity_info['revision_table']] = $entity_type;
+      $revision_tables[$entity_type] = $entity_info['revision_table'];
     }
 
     $data[$current_table]['table']['join'][$entity_info['base_table']] = array(
       'left_field' => $entity_info['entity_keys']['id'],
       'field' => 'entity_id',
       'extra' => array(
-        array('field' => 'entity_type', 'value' => $entity),
+        array('field' => 'entity_type', 'value' => $entity_type),
         array('field' => 'deleted', 'value' => 0, 'numeric' => TRUE),
       ),
     );
@@ -153,7 +165,7 @@ function field_views_field_default_views_data(FieldInterface $field) {
         'left_field' => $entity_info['entity_keys']['revision'],
         'field' => 'revision_id',
         'extra' => array(
-          array('field' => 'entity_type', 'value' => $entity),
+          array('field' => 'entity_type', 'value' => $entity_type),
           array('field' => 'deleted', 'value' => 0, 'numeric' => TRUE),
         ),
       );
@@ -161,9 +173,13 @@ function field_views_field_default_views_data(FieldInterface $field) {
       $supports_revisions = TRUE;
     }
 
-    foreach ($bundles as $bundle) {
-      $bundles_names[] = t('@entity:@bundle', array('@entity' => $entity, '@bundle' => $bundle));
+    foreach ($field['bundles'][$entity_type] as $bundle) {
+      $bundles_names[] = t('@entity:@bundle', array('@entity' => $entity_type, '@bundle' => $bundle));
     }
+  }
+  // If the field had no instances in the SQL storage then there is nothing to bbe done.
+  if (!$data) {
+    return $data;
   }
 
   $tables = array();

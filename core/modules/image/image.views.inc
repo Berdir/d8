@@ -36,8 +36,8 @@ function image_field_views_data($field) {
  *
  * Views integration to provide reverse relationships on image fields.
  */
-function image_field_views_data_views_data_alter(&$data, $field) {
-  foreach ($field['bundles'] as $entity_type => $bundles) {
+function image_field_views_data_views_data_alter(&$data, $field, $sql_entity_types) {
+  foreach ($sql_entity_types as $entity_type) {
     $entity_info = entity_get_info($entity_type);
     $pseudo_field_name = 'reverse_' . $field['field_name'] . '_' . $entity_type;
 

@@ -786,14 +786,7 @@ class DatabaseStorageController extends EntityStorageControllerBase {
   /**
    * {@inheritdoc}
    */
-  public function storageType() {
-    return 'sql';
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function handleUpdateField(FieldInterface $field, FieldInterface $original) {
+  public function handleFieldUpdate(FieldInterface $field, FieldInterface $original) {
     if (!$field->hasData()) {
       // There is no data. Re-create the tables completely.
 
@@ -1106,10 +1099,12 @@ class DatabaseStorageController extends EntityStorageControllerBase {
   /**
    * {@inheritdoc}
    */
-  public function handleFirstInstance(FieldInstanceInterface $instance) {
-    $schema = $this->_fieldSqlSchema($instance->getField());
-    foreach ($schema as $name => $table) {
-      $this->database->schema()->createTable($name, $table);
+  public function handleInstanceCreate(FieldInstanceInterface $instance, $first) {
+    if ($first) {
+      $schema = $this->_fieldSqlSchema($instance->getField());
+      foreach ($schema as $name => $table) {
+        $this->database->schema()->createTable($name, $table);
+      }
     }
   }
 
@@ -1135,7 +1130,7 @@ class DatabaseStorageController extends EntityStorageControllerBase {
   /**
    * {@inheritdoc}
    */
-  public function handleDeleteField(FieldInterface $field) {
+  public function handleFieldDelete(FieldInterface $field) {
     // Mark all data associated with the field for deletion.
     $field['deleted'] = FALSE;
     $table = static::_fieldTableName($field);
@@ -1173,7 +1168,6 @@ class DatabaseStorageController extends EntityStorageControllerBase {
    * {@inheritdoc}
    */
   protected function fieldValues(EntityInterface $entity, FieldInterface $field, FieldInstanceInterface $instance) {
-    $field_name = $field->id();
     $columns = array();
     foreach ($field->getColumns() as $column_name => $data) {
       $columns[] = static::_fieldColumnName($field, $column_name);

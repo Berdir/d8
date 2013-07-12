@@ -7,6 +7,7 @@
 
 namespace Drupal\field\Plugin\Core\Entity;
 
+use Drupal\Component\Utility\String;
 use Drupal\Core\Entity\Annotation\EntityType;
 use Drupal\Core\Annotation\Translation;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
@@ -353,16 +354,16 @@ class FieldInstance extends ConfigEntityBase implements FieldInstanceInterface {
    */
   protected function saveNew() {
     $instance_controller = \Drupal::entityManager()->getStorageController($this->entityType);
+    $data_storage_controller = \Drupal::entityManager()->getStorageController($this->entity_type);
 
     // Check that the field can be attached to this entity type.
     if (!empty($this->field->entity_types) && !in_array($this->entity_type, $this->field->entity_types)) {
       throw new FieldException(format_string('Attempt to create an instance of field @field_id on forbidden entity type @entity_type.', array('@field_id' => $this->field->id, '@entity_type' => $this->entity_type)));
     }
-    $data_storage_controller = \Drupal::entityManager()->getStorageController($this->entity_type);
-    if ($this->field->setStorageType($data_storage_controller->storageType())) {
-      $this->field->save();
-      $data_storage_controller->handleFirstInstance($this);
-    }
+    // The field bundles can not yet contain this instance because this is
+    // saveNew and parent::save() is callled below this.
+    $bundles = $this->field->getBundles();
+    $data_storage_controller->handleInstanceCreate($this, empty($bundles));
 
     // Assign the ID.
     $this->id = $this->id();

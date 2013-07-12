@@ -548,14 +548,14 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
   /**
    * {@inheritdoc}
    */
-  public function handleFirstInstance(FieldInstanceInterface $instance) {
+  public function handleInstanceCreate(FieldInstanceInterface $instance, $first) {
 
   }
 
   /**
    * {@inheritdoc}
    */
-  public function handleUpdateField(FieldInterface $field, FieldInterface $original) {
+  public function handleFieldUpdate(FieldInterface $field, FieldInterface $original) {
 
   }
 
@@ -569,7 +569,7 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
   /**
    * {@inheritdoc}
    */
-  public function handleDeleteField(FieldInterface $field) {
+  public function handleFieldDelete(FieldInterface $field) {
 
   }
 
@@ -590,7 +590,7 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity_id
    * @param FieldInterface $field
-   * @param FieldInstance $instance
+   * @param \Drupal\field\Plugin\Core\Entity\FieldInstance $instance
    * @return array
    */
   protected function fieldValues(EntityInterface $entity, FieldInterface $field, FieldInstanceInterface $instance) {

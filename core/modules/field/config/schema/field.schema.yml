@@ -47,22 +47,6 @@ field.field.*:
       sequence:
         - type: string
           label: 'Entity type'
-    storage:
-      type: mapping
-      label: 'Storage'
-      mapping:
-        type:
-          type: string
-          label: 'Type'
-        settings:
-          type: field_storage.[%parent.type].settings
-          label: 'Settings'
-        module:
-          type: string
-          label: 'Module'
-        active:
-          type: boolean
-          label: 'Active'
     locked:
       type: boolean
       label: 'Locked'

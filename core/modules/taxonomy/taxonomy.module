@@ -5,6 +5,7 @@
  * Enables the organization of content into categories.
  */
 
+use Drupal\Core\Entity\DatabaseStorageController;
 use Drupal\node\Plugin\Core\Entity\Node;
 use Drupal\taxonomy\Plugin\Core\Entity\Term;
 use Drupal\taxonomy\Plugin\Core\Entity\Vocabulary;
@@ -1116,18 +1117,18 @@ function taxonomy_node_insert(EntityInterface $node) {
 function taxonomy_build_node_index($node) {
   // We maintain a denormalized table of term/node relationships, containing
   // only data for current, published nodes.
-  $status = NULL;
-  if (config('taxonomy.settings')->get('maintain_index_table')) {
-    // If a node property is not set in the node object when $node->save() is
-    // called, the old value from $node->original is used.
-    if (!empty($node->original)) {
-      $status = (int)(!empty($node->status) || (!isset($node->status) && !empty($node->original->status)));
-      $sticky = (int)(!empty($node->sticky) || (!isset($node->sticky) && !empty($node->original->sticky)));
-    }
-    else {
-      $status = (int)(!empty($node->status));
-      $sticky = (int)(!empty($node->sticky));
-    }
+  if (!config('taxonomy.settings')->get('maintain_index_table') || !Drupal::entityManager()->getStorageController('node') instanceof DatabaseStorageController) {
+    return;
+  }
+  // If a node property is not set in the node object when $node->save() is
+  // called, the old value from $node->original is used.
+  if (!empty($node->original)) {
+    $status = (int)(!empty($node->status) || (!isset($node->status) && !empty($node->original->status)));
+    $sticky = (int)(!empty($node->sticky) || (!isset($node->sticky) && !empty($node->original->sticky)));
+  }
+  else {
+    $status = (int)(!empty($node->status));
+    $sticky = (int)(!empty($node->sticky));
   }
   // We only maintain the taxonomy index for published nodes.
   if ($status && $node->isDefaultRevision()) {
@@ -1136,7 +1137,7 @@ function taxonomy_build_node_index($node) {
     foreach (field_info_instances('node', $node->type) as $instance) {
       $field_name = $instance['field_name'];
       $field = field_info_field($field_name);
-      if ($field['module'] == 'taxonomy' && $field->getStorageType() == 'sql') {
+      if ($field['module'] == 'taxonomy') {
         // If a field value is not set in the node object when $node->save() is
         // called, the old value from $node->original is used.
         if (isset($node->{$field_name})) {
