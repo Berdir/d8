@@ -269,7 +269,7 @@ function field_purge_batch($batch_size) {
         $ids->revision_id = $revision_id;
         $ids->entity_id = $entity_id;
         $entity = _field_create_entity_from_ids($ids);
-        Drupal::entityManager()->getStorageController($instance->entity_type)->fieldPurgeData($entity, $field, $instance);
+        Drupal::entityManager()->getStorageController($instance->entity_type)->fieldPurgeData($entity, $instance);
       }
     }
     else {

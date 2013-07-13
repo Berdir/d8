@@ -110,6 +110,10 @@ function field_views_field_label($field_name) {
  * Default views data implementation for a field.
  */
 function field_views_field_default_views_data(FieldInterface $field, $sql_entity_types) {
+  // If the field had no instances in the SQL storage then there is nothing to be done.
+  if (!$sql_entity_types) {
+    return array();
+  }
   $field_types = field_info_field_types();
 
   // Check the field module is available.
@@ -135,9 +139,6 @@ function field_views_field_default_views_data(FieldInterface $field, $sql_entity
   // Build the relationships between the field table and the entity tables.
   $entity_manager = Drupal::entityManager();
   foreach ($sql_entity_types as $entity_type) {
-    if (!$entity_manager->getStorageController($entity_type) instanceof DatabaseStorageController) {
-      continue;
-    }
     $entity_info = $entity_manager->getDefinition($entity_type);
     $groups[$entity_type] = $entity_info['label'];
 
@@ -186,10 +187,6 @@ function field_views_field_default_views_data(FieldInterface $field, $sql_entity
     foreach ($field['bundles'][$entity_type] as $bundle) {
       $bundles_names[] = t('@entity:@bundle', array('@entity' => $entity_type, '@bundle' => $bundle));
     }
-  }
-  // If the field had no instances in the SQL storage then there is nothing to bbe done.
-  if (!$data) {
-    return $data;
   }
 
   $tables = array();
