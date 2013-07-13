@@ -242,7 +242,7 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
    * @param $hook
    *   One of 'presave', 'insert', 'update', 'predelete', 'delete', or
    *  'revision_delete'.
-   * @param $entity
+   * @param \Drupal\Core\Entity\EntityInterface  $entity
    *   The entity object.
    */
   protected function invokeHook($hook, EntityInterface $entity) {
@@ -465,7 +465,7 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
   /**
    * Insert configurable fields into storage.
    *
-   * @param EntityInterface $entity
+   * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity.
    */
   protected function doFieldInsert(EntityInterface $entity) { }
@@ -473,7 +473,7 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
   /**
    * Update configurable fields in storage.
    *
-   * @param EntityInterface $entity
+   * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity.
    */
   protected function doFieldUpdate(EntityInterface $entity) { }
@@ -481,7 +481,7 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
   /**
    * Delete configurable fields from storage.
    *
-   * @param EntityInterface $entity
+   * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity.
    */
   protected function doFieldDelete(EntityInterface $entity) { }
@@ -489,7 +489,7 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
   /**
    * Delete specific revision of configurable fields from storage.
    *
-   * @param EntityInterface $entity
+   * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity.
    */
   protected function doFieldRevisionDelete(EntityInterface $entity) { }
@@ -497,7 +497,7 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
   /**
    * Load configurable fields from storage.
    *
-   * @param EntityInterface $entity
+   * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity.
    */
   protected function doFieldLoad($queried_entities, $age) { }
