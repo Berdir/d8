@@ -176,32 +176,6 @@ interface EntityStorageControllerInterface {
   public function invokeFieldItemPrepareCache(EntityInterface $entity);
 
   /**
-   * Allows reaction to a bundle being created.
-   *
-   * @param string $bundle
-   *   The name of the bundle created.
-   */
-  public function handleBundleCreate($bundle);
-
-  /**
-   * Allows reaction to a bundle being renamed.
-   *
-   * @param string $bundle
-   *   The name of the bundle being renamed.
-   * @param string $bundle_new
-   *   The new name of the bundle.
-   */
-  public function handleBundleRename($bundle, $bundle_new);
-
-  /**
-   * Allows reaction to a bundle being deleted.
-   *
-   * @param string $bundle
-   *   The name of the bundle being deleted.
-   */
-  public function handleBundleDelete($bundle);
-
-  /**
    * Allows reaction to the update of a configurable field.
    *
    * @param \Drupal\field\FieldInterface $field
@@ -237,6 +211,32 @@ interface EntityStorageControllerInterface {
    *   The instance being deleted.
    */
   public function handleInstanceDelete(FieldInstanceInterface $instance);
+
+  /**
+   * Allows reaction to a bundle being created.
+   *
+   * @param string $bundle
+   *   The name of the bundle created.
+   */
+  public function handleBundleCreate($bundle);
+
+  /**
+   * Allows reaction to a bundle being renamed.
+   *
+   * @param string $bundle
+   *   The name of the bundle being renamed.
+   * @param string $bundle_new
+   *   The new name of the bundle.
+   */
+  public function handleBundleRename($bundle, $bundle_new);
+
+  /**
+   * Allows reaction to a bundle being deleted.
+   *
+   * @param string $bundle
+   *   The name of the bundle being deleted.
+   */
+  public function handleBundleDelete($bundle);
 
   /**
    * Purges the field data for a single field on a single entity.

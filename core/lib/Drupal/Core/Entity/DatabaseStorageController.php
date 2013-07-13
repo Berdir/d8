@@ -757,32 +757,6 @@ class DatabaseStorageController extends EntityStorageControllerBase {
   /**
    * {@inheritdoc}
    */
-  public function handleBundleRename($bundle, $bundle_new) {
-    // We need to account for deleted or inactive fields and instances.
-    $instances = field_read_instances(array('entity_type' => $this->entityType, 'bundle' => $bundle_new), array('include_deleted' => TRUE, 'include_inactive' => TRUE));
-    foreach ($instances as $instance) {
-      $field = field_info_field_by_id($instance['field_id']);
-      if ($field['storage']['type'] == 'field_sql_storage') {
-        $table_name = static::_fieldTableName($field);
-        $revision_name = static::_fieldRevisionTableName($field);
-        $this->database->update($table_name)
-          ->fields(array('bundle' => $bundle_new))
-          ->condition('entity_type', $this->entityType)
-          ->condition('bundle', $bundle)
-          ->execute();
-        $this->database->update($revision_name)
-          ->fields(array('bundle' => $bundle_new))
-          ->condition('entity_type', $this->entityType)
-          ->condition('bundle', $bundle)
-          ->execute();
-      }
-    }
-
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function handleFieldUpdate(FieldInterface $field, FieldInterface $original) {
     if (!$field->hasData()) {
       // There is no data. Re-create the tables completely.
@@ -863,6 +837,127 @@ class DatabaseStorageController extends EntityStorageControllerBase {
         }
       }
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function handleFieldDelete(FieldInterface $field) {
+    // Mark all data associated with the field for deletion.
+    $field['deleted'] = FALSE;
+    $table = static::_fieldTableName($field);
+    $revision_table = static::_fieldRevisionTableName($field);
+    $this->database->update($table)
+      ->fields(array('deleted' => 1))
+      ->execute();
+
+    // Move the table to a unique name while the table contents are being
+    // deleted.
+    $field['deleted'] = TRUE;
+    $new_table = static::_fieldTableName($field);
+    $revision_new_table = static::_fieldRevisionTableName($field);
+    $this->database->schema()->renameTable($table, $new_table);
+    $this->database->schema()->renameTable($revision_table, $revision_new_table);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function handleInstanceCreate(FieldInstanceInterface $instance, $first) {
+    if ($first) {
+      $schema = $this->_fieldSqlSchema($instance->getField());
+      foreach ($schema as $name => $table) {
+        $this->database->schema()->createTable($name, $table);
+      }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function handleInstanceDelete(FieldInstanceInterface $instance) {
+    $field = $instance->getField();
+    $table_name = static::_fieldTableName($field);
+    $revision_name = static::_fieldRevisionTableName($field);
+    $this->database->update($table_name)
+      ->fields(array('deleted' => 1))
+      ->condition('entity_type', $instance['entity_type'])
+      ->condition('bundle', $instance['bundle'])
+      ->execute();
+    $this->database->update($revision_name)
+      ->fields(array('deleted' => 1))
+      ->condition('entity_type', $instance['entity_type'])
+      ->condition('bundle', $instance['bundle'])
+      ->execute();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function handleBundleRename($bundle, $bundle_new) {
+    // We need to account for deleted or inactive fields and instances.
+    $instances = field_read_instances(array('entity_type' => $this->entityType, 'bundle' => $bundle_new), array('include_deleted' => TRUE, 'include_inactive' => TRUE));
+    foreach ($instances as $instance) {
+      $field = field_info_field_by_id($instance['field_id']);
+      if ($field['storage']['type'] == 'field_sql_storage') {
+        $table_name = static::_fieldTableName($field);
+        $revision_name = static::_fieldRevisionTableName($field);
+        $this->database->update($table_name)
+          ->fields(array('bundle' => $bundle_new))
+          ->condition('entity_type', $this->entityType)
+          ->condition('bundle', $bundle)
+          ->execute();
+        $this->database->update($revision_name)
+          ->fields(array('bundle' => $bundle_new))
+          ->condition('entity_type', $this->entityType)
+          ->condition('bundle', $bundle)
+          ->execute();
+      }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function fieldPurgeData(EntityInterface $entity, FieldInstanceInterface $instance) {
+    parent::fieldPurgeData($entity, $instance);
+    $field = $instance->getField();
+    $table_name = static::_fieldTableName($field);
+    $revision_name = static::_fieldRevisionTableName($field);
+    $this->database->delete($table_name)
+      ->condition('entity_type', $instance->entity_type)
+      ->condition('entity_id', $entity->id())
+      ->execute();
+    $this->database->delete($revision_name)
+      ->condition('entity_type', $instance->entity_type)
+      ->condition('entity_id', $entity->id())
+      ->execute();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function fieldValues(EntityInterface $entity, FieldInstanceInterface $instance) {
+    $field = $instance->getField;
+    $columns = array();
+    foreach ($field->getColumns() as $column_name => $data) {
+      $columns[] = static::_fieldColumnName($field, $column_name);
+    }
+    return $this->database->select(static::_fieldTableName($field), 't')
+      ->fields('t', $columns)
+      ->condition('entity_id', $entity->id())
+      ->execute()
+      ->fetchAll();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function fieldPurge(FieldInterface $field) {
+    $table_name = static::_fieldTableName($field);
+    $revision_name = static::_fieldRevisionTableName($field);
+    $this->database->schema()->dropTable($table_name);
+    $this->database->schema()->dropTable($revision_name);
   }
 
   /**
@@ -1091,102 +1186,6 @@ class DatabaseStorageController extends EntityStorageControllerBase {
    */
   static public function _fieldColumnName(FieldInterface $field, $column) {
     return in_array($column, Field::getReservedColumns()) ? $column : $field->id() . '_' . $column;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function handleInstanceCreate(FieldInstanceInterface $instance, $first) {
-    if ($first) {
-      $schema = $this->_fieldSqlSchema($instance->getField());
-      foreach ($schema as $name => $table) {
-        $this->database->schema()->createTable($name, $table);
-      }
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function handleInstanceDelete(FieldInstanceInterface $instance) {
-    $field = $instance->getField();
-    $table_name = static::_fieldTableName($field);
-    $revision_name = static::_fieldRevisionTableName($field);
-    $this->database->update($table_name)
-      ->fields(array('deleted' => 1))
-      ->condition('entity_type', $instance['entity_type'])
-      ->condition('bundle', $instance['bundle'])
-      ->execute();
-    $this->database->update($revision_name)
-      ->fields(array('deleted' => 1))
-      ->condition('entity_type', $instance['entity_type'])
-      ->condition('bundle', $instance['bundle'])
-      ->execute();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function handleFieldDelete(FieldInterface $field) {
-    // Mark all data associated with the field for deletion.
-    $field['deleted'] = FALSE;
-    $table = static::_fieldTableName($field);
-    $revision_table = static::_fieldRevisionTableName($field);
-    $this->database->update($table)
-      ->fields(array('deleted' => 1))
-      ->execute();
-
-    // Move the table to a unique name while the table contents are being
-    // deleted.
-    $field['deleted'] = TRUE;
-    $new_table = static::_fieldTableName($field);
-    $revision_new_table = static::_fieldRevisionTableName($field);
-    $this->database->schema()->renameTable($table, $new_table);
-    $this->database->schema()->renameTable($revision_table, $revision_new_table);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function fieldPurgeData(EntityInterface $entity, FieldInstanceInterface $instance) {
-    parent::fieldPurgeData($entity, $instance);
-    $field = $instance->getField();
-    $table_name = static::_fieldTableName($field);
-    $revision_name = static::_fieldRevisionTableName($field);
-    $this->database->delete($table_name)
-      ->condition('entity_type', $instance->entity_type)
-      ->condition('entity_id', $entity->id())
-      ->execute();
-    $this->database->delete($revision_name)
-      ->condition('entity_type', $instance->entity_type)
-      ->condition('entity_id', $entity->id())
-      ->execute();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function fieldValues(EntityInterface $entity, FieldInstanceInterface $instance) {
-    $field = $instance->getField;
-    $columns = array();
-    foreach ($field->getColumns() as $column_name => $data) {
-      $columns[] = static::_fieldColumnName($field, $column_name);
-    }
-    return $this->database->select(static::_fieldTableName($field), 't')
-      ->fields('t', $columns)
-      ->condition('entity_id', $entity->id())
-      ->execute()
-      ->fetchAll();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function fieldPurge(FieldInterface $field) {
-    $table_name = static::_fieldTableName($field);
-    $revision_name = static::_fieldRevisionTableName($field);
-    $this->database->schema()->dropTable($table_name);
-    $this->database->schema()->dropTable($revision_name);
   }
 
 }

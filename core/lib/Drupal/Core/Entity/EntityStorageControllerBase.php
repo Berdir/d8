@@ -463,6 +463,14 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
   }
 
   /**
+   * Load configurable fields from storage.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity.
+   */
+  protected function doFieldLoad($queried_entities, $age) { }
+
+  /**
    * Insert configurable fields into storage.
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
@@ -495,12 +503,24 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
   protected function doFieldRevisionDelete(EntityInterface $entity) { }
 
   /**
-   * Load configurable fields from storage.
-   *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
-   *   The entity.
+   * {@inheritdoc}
    */
-  protected function doFieldLoad($queried_entities, $age) { }
+  public function handleFieldUpdate(FieldInterface $field, FieldInterface $original) { }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function handleFieldDelete(FieldInterface $field) { }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function handleInstanceCreate(FieldInstanceInterface $instance, $first) { }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function handleInstanceDelete(FieldInstanceInterface $instance) { }
 
   /**
    * {@inheritdoc}
@@ -516,26 +536,6 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
    * {@inheritdoc}
    */
   public function handleBundleDelete($bundle) { }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function handleInstanceCreate(FieldInstanceInterface $instance, $first) { }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function handleFieldUpdate(FieldInterface $field, FieldInterface $original) { }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function handleInstanceDelete(FieldInstanceInterface $instance) { }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function handleFieldDelete(FieldInterface $field) { }
 
   /**
    * {@inheritdoc}
