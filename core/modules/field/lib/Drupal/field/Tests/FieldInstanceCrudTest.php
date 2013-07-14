@@ -44,14 +44,14 @@ class FieldInstanceCrudTest extends FieldUnitTestBase {
     parent::setUp();
 
     $this->field_definition = array(
-      'field_name' => drupal_strtolower($this->randomName()),
+      'name' => drupal_strtolower($this->randomName()),
+      'entity_type' => 'entity_test',
       'type' => 'test_field',
     );
     $this->field = entity_create('field_entity', $this->field_definition);
     $this->field->save();
     $this->instance_definition = array(
       'field_name' => $this->field['field_name'],
-      'entity_type' => 'entity_test',
       'bundle' => 'entity_test',
     );
   }
