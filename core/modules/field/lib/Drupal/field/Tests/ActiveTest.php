@@ -39,10 +39,7 @@ class ActiveTest extends FieldTestBase {
     );
     entity_create('field_entity', $field_definition)->save();
 
-    // Test disabling and enabling:
-    // - the field type module,
-    // - the storage module,
-    // - both.
+    // Test disabling and enabling the field type module,
     $modules = array('field_test');
     $field_name = $field_definition['field_name'];
 

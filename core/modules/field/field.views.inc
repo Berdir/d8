@@ -22,8 +22,7 @@ function field_views_data() {
   $module_handler = Drupal::moduleHandler();
   foreach (field_info_fields() as $field) {
     if ($sql_entity_types = _field_views_get_sql_entity_types($field)) {
-      $module = $field['module'];
-      $result = (array) $module_handler->invoke($module, 'field_views_data', array($field, $sql_entity_types));
+      $result = (array) $module_handler->invoke($field['module'], 'field_views_data', array($field, $sql_entity_types));
 
       if (empty($result)) {
         $result = field_views_field_default_views_data($field, $sql_entity_types);
