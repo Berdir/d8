@@ -164,11 +164,11 @@ abstract class ContentTranslationTestBase extends WebTestBase {
     entity_create('field_entity', array(
       'field_name' => $this->fieldName,
       'type' => 'text',
+      'entity_type' => $this->entityType,
       'cardinality' => 1,
       'translatable' => TRUE,
     ))->save();
     entity_create('field_instance', array(
-      'entity_type' => $this->entityType,
       'field_name' => $this->fieldName,
       'bundle' => $this->bundle,
       'label' => 'Test translatable text-field',

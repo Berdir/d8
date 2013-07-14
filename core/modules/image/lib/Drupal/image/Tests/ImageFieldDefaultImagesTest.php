@@ -52,7 +52,7 @@ class ImageFieldDefaultImagesTest extends ImageFieldTestBase {
       'preview_image_style' => 'medium',
     );
     $instance = $this->createImageField($field_name, 'article', $field_settings, $instance_settings, $widget_settings);
-    $field = field_info_field($field_name);
+    $field = field_info_field('node', $field_name);
 
     // Add another instance with another default image to the page content type.
     $instance2 = entity_create('field_instance', array(

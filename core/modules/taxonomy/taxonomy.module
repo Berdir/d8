@@ -1136,7 +1136,7 @@ function taxonomy_build_node_index($node) {
     $tid_all = array();
     foreach (field_info_instances('node', $node->type) as $instance) {
       $field_name = $instance['field_name'];
-      $field = field_info_field($field_name);
+      $field = $instance->getField();
       if ($field['module'] == 'taxonomy') {
         // If a field value is not set in the node object when $node->save() is
         // called, the old value from $node->original is used.

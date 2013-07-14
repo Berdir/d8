@@ -231,7 +231,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     $this->drupalPost("admin/structure/types/manage/article/fields/node.article.$field_name/field", $edit, t('Save field settings'));
     // Clear field info cache so the new default image is detected.
     field_info_cache_clear();
-    $field = field_info_field($field_name);
+    $field = field_info_field('node', $field_name);
     $image = file_load($field['settings']['default_image']);
     $this->assertTrue($image->isPermanent(), 'The default image status is permanent.');
     $default_output = theme('image', array('uri' => $image->getFileUri()));
@@ -259,7 +259,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     $this->drupalPost("admin/structure/types/manage/article/fields/node.article.$field_name/field", $edit, t('Save field settings'));
     // Clear field info cache so the new default image is detected.
     field_info_cache_clear();
-    $field = field_info_field($field_name);
+    $field = field_info_field('node', $field_name);
     $this->assertFalse($field['settings']['default_image'], 'Default image removed from field.');
     // Create an image field that uses the private:// scheme and test that the
     // default image works as expected.
@@ -273,7 +273,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     // Clear field info cache so the new default image is detected.
     field_info_cache_clear();
 
-    $private_field = field_info_field($private_field_name);
+    $private_field = field_info_field('node', $private_field_name);
     $image = file_load($private_field['settings']['default_image']);
     $this->assertEqual('private', file_uri_scheme($image->getFileUri()), 'Default image uses private:// scheme.');
     $this->assertTrue($image->isPermanent(), 'The default image status is permanent.');

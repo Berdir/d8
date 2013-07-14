@@ -45,6 +45,7 @@ class TermFieldMultipleVocabularyTest extends TaxonomyTestBase {
     entity_create('field_entity', array(
       'field_name' => $this->field_name,
       'type' => 'taxonomy_term_reference',
+      'entity_type' => 'entity_test',
       'cardinality' => FIELD_CARDINALITY_UNLIMITED,
       'settings' => array(
         'allowed_values' => array(
@@ -61,7 +62,6 @@ class TermFieldMultipleVocabularyTest extends TaxonomyTestBase {
     ))->save();
     entity_create('field_instance', array(
       'field_name' => $this->field_name,
-      'entity_type' => 'entity_test',
       'bundle' => 'entity_test',
     ))->save();
     entity_get_form_display('entity_test', 'entity_test', 'default')
@@ -125,7 +125,7 @@ class TermFieldMultipleVocabularyTest extends TaxonomyTestBase {
     $this->assertNoText($term2->label(), 'Term 2 name is not displayed.');
 
     // Verify that field and instance settings are correct.
-    $field_info = field_info_field($this->field_name);
+    $field_info = field_info_field('entity_test', $this->field_name);
     $this->assertEqual(count($field_info['settings']['allowed_values']), 1, 'Only one vocabulary is allowed for the field.');
 
     // The widget should still be displayed.

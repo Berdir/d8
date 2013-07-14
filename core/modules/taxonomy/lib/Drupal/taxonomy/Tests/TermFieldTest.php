@@ -48,6 +48,7 @@ class TermFieldTest extends TaxonomyTestBase {
     $this->field = entity_create('field_entity', array(
       'field_name' => $this->field_name,
       'type' => 'taxonomy_term_reference',
+      'entity_type' => 'entity_test',
       'settings' => array(
         'allowed_values' => array(
           array(
@@ -60,7 +61,6 @@ class TermFieldTest extends TaxonomyTestBase {
     $this->field->save();
     entity_create('field_instance', array(
       'field_name' => $this->field_name,
-      'entity_type' => 'entity_test',
       'bundle' => 'entity_test',
     ))->save();
     entity_get_form_display('entity_test', 'entity_test', 'default')
@@ -159,7 +159,7 @@ class TermFieldTest extends TaxonomyTestBase {
     $this->vocabulary->save();
 
     // Check that the field instance is still attached to the vocabulary.
-    $field = field_info_field($this->field_name);
+    $field = field_info_field('entity_test', $this->field_name);
     $allowed_values = $field['settings']['allowed_values'];
     $this->assertEqual($allowed_values[0]['vocabulary'], $new_name, 'Index 0: Machine name was updated correctly.');
     $this->assertEqual($allowed_values[1]['vocabulary'], $new_name, 'Index 1: Machine name was updated correctly.');

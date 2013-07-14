@@ -231,7 +231,7 @@ class ManageFieldsTest extends FieldUiTestBase {
     // Reset the fields info.
     field_info_cache_clear();
     // Assert field settings.
-    $field = field_info_field($field_name);
+    $field = field_info_field($entity_type, $field_name);
     $this->assertTrue($field['settings']['test_field_setting'] == $string, 'Field settings were found.');
 
     // Assert instance settings.
