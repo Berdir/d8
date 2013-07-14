@@ -26,7 +26,6 @@ function _update_8003_field_create_field(array &$field_config) {
   // Merge in default values.
   $field_config += array(
     'uuid' => $uuid->generate(),
-    'entity_types' => array(),
     'cardinality' => 1,
     'translatable' => FALSE,
     'locked' => FALSE,
@@ -323,7 +322,6 @@ function field_update_8003() {
       'locked' => $record['locked'],
       'cardinality' => $record['cardinality'],
       'translatable' => $record['translatable'],
-      'entity_types' => $record['data']['entity_types'],
       'indexes' => $record['data']['indexes'] ?: array(),
       'status' => 1,
       'langcode' => 'und',

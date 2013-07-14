@@ -103,40 +103,6 @@ class FieldInstanceCrudTest extends FieldUnitTestBase {
       $this->pass(t('Cannot create an instance of a non-existing field.'));
     }
 
-    // Create a field restricted to a specific entity type.
-    $field_restricted_definition = array(
-      'field_name' => drupal_strtolower($this->randomName()),
-      'type' => 'test_field',
-      'entity_types' => array('entity_test_cache'),
-    );
-    $field_restricted = entity_create('field_entity', $field_restricted_definition);
-    $field_restricted->save();
-
-    // Check that an instance can be added to an entity type allowed
-    // by the field.
-    try {
-      $instance = $this->instance_definition;
-      $instance['field_name'] = $field_restricted_definition['field_name'];
-      $instance['entity_type'] = 'entity_test_cache';
-      entity_create('field_instance', $instance)->save();
-      $this->pass(t('Can create an instance on an entity type allowed by the field.'));
-    }
-    catch (FieldException $e) {
-      $this->fail(t('Can create an instance on an entity type allowed by the field.'));
-    }
-
-    // Check that an instance cannot be added to an entity type
-    // forbidden by the field.
-    try {
-      $instance = $this->instance_definition;
-      $instance['field_name'] = $field_restricted_definition['field_name'];
-      entity_create('field_instance', $instance)->save();
-      $this->fail(t('Cannot create an instance on an entity type forbidden by the field.'));
-    }
-    catch (FieldException $e) {
-      $this->pass(t('Cannot create an instance on an entity type forbidden by the field.'));
-    }
-
     // TODO: test other failures.
   }
 

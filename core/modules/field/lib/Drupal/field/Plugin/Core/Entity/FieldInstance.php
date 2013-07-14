@@ -62,13 +62,6 @@ class FieldInstance extends ConfigEntityBase implements FieldInstanceInterface {
   public $field_uuid;
 
   /**
-   * The name of the entity type the instance is attached to.
-   *
-   * @var string
-   */
-  public $entity_type;
-
-  /**
    * The name of the bundle the instance is attached to.
    *
    * @var string
@@ -356,10 +349,6 @@ class FieldInstance extends ConfigEntityBase implements FieldInstanceInterface {
     $instance_controller = \Drupal::entityManager()->getStorageController($this->entityType);
     $data_storage_controller = \Drupal::entityManager()->getStorageController($this->entity_type);
 
-    // Check that the field can be attached to this entity type.
-    if (!empty($this->field->entity_types) && !in_array($this->entity_type, $this->field->entity_types)) {
-      throw new FieldException(format_string('Attempt to create an instance of field @field_id on forbidden entity type @entity_type.', array('@field_id' => $this->field->id, '@entity_type' => $this->entity_type)));
-    }
     // The field bundles can not yet contain this instance because this is
     // saveNew and parent::save() is callled below this.
     $bundles = $this->field->getBundles();

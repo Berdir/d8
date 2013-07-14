@@ -66,6 +66,13 @@ class Field extends ConfigEntityBase implements FieldInterface {
   public $uuid;
 
   /**
+   * The name of the entity type the field is attached to.
+   *
+   * @var string
+   */
+  public $entity_type;
+
+  /**
    * The field type.
    *
    * Example: text, number_integer.
@@ -116,16 +123,6 @@ class Field extends ConfigEntityBase implements FieldInterface {
    * @var bool
    */
   public $translatable = FALSE;
-
-  /**
-   * The entity types on which the field is allowed to have instances.
-   *
-   * If empty or not specified, the field is allowed to have instances in any
-   * entity type.
-   *
-   * @var array
-   */
-  public $entity_types = array();
 
   /**
    * Flag indicating whether the field is available for editing.
@@ -239,11 +236,11 @@ class Field extends ConfigEntityBase implements FieldInterface {
       'uuid',
       'status',
       'langcode',
+      'entity_type',
       'type',
       'settings',
       'module',
       'active',
-      'entity_types',
       'locked',
       'cardinality',
       'translatable',
@@ -301,8 +298,8 @@ class Field extends ConfigEntityBase implements FieldInterface {
     if ($this->type != $original->type) {
       throw new FieldException("Cannot change an existing field's type.");
     }
-    if ($this->entity_types != $original->entity_types) {
-      throw new FieldException("Cannot change an existing field's entity_types property.");
+    if ($this->entity_type != $original->entity_type) {
+      throw new FieldException("Cannot change an existing field's entity_type.");
     }
 
     // Make sure all settings are present, so that a complete field definition

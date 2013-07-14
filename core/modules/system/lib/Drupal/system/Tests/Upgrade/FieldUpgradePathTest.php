@@ -130,6 +130,7 @@ class FieldUpgradePathTest extends UpgradePathTestBase {
     unset($config['uuid']);
     $this->assertEqual($config, array(
       'id' => 'body',
+      'entity_type' => 'node',
       'type' => 'text_with_summary',
       'module' => 'text',
       'active' => '1',
@@ -137,7 +138,6 @@ class FieldUpgradePathTest extends UpgradePathTestBase {
       'locked' => 0,
       'cardinality' => 1,
       'translatable' => 0,
-      'entity_types' => array('node'),
       'indexes' => array(
         'format' => array('format')
       ),
@@ -156,7 +156,6 @@ class FieldUpgradePathTest extends UpgradePathTestBase {
         'id' => "node.$node_type.body",
         'field_uuid' => $field_uuid,
         'field_type' => 'text_with_summary',
-        'entity_type' => 'node',
         'bundle' => $node_type,
         'label' => 'Body',
         'description' => '',

@@ -15,7 +15,6 @@ storage:
 locked: '0'
 cardinality: '-1'
 translatable: '0'
-entity_types: {  }
 indexes:
   target_id:
     - target_id

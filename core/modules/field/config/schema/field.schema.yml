@@ -30,6 +30,9 @@ field.field.*:
     langcode:
       type: string
       label: 'Default language'
+    entity_type:
+      type: string
+      label: 'Entity type'
     type:
       type: string
       label: 'Type'
@@ -41,12 +44,6 @@ field.field.*:
     active:
       type: boolean
       label: 'Active'
-    entity_types:
-      type: sequence
-      label: 'Allowed entity types'
-      sequence:
-        - type: string
-          label: 'Entity type'
     locked:
       type: boolean
       label: 'Locked'
@@ -85,9 +82,6 @@ field.instance.*.*.*:
     field_uuid:
       type: string
       label: 'Field UUID'
-    entity_type:
-      type: string
-      label: 'Allowed entity types'
     bundle:
       type: string
       label: 'Bundle'

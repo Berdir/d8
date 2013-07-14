@@ -456,12 +456,10 @@ class FieldOverview extends OverviewBase {
             // Don't show
             // - locked fields,
             // - fields already in the current bundle,
-            // - fields that cannot be added to the entity type,
             // - fields that should not be added via user interface.
 
             if (empty($field['locked'])
               && !field_info_instance($this->entity_type, $field['field_name'], $this->bundle)
-              && (empty($field['entity_types']) || in_array($this->entity_type, $field['entity_types']))
               && empty($field_types[$field['type']]['no_ui'])) {
               $info[$instance['field_name']] = array(
                 'type' => $field['type'],

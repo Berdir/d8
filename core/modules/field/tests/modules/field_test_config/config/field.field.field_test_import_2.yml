@@ -5,7 +5,6 @@ settings:
   max_length: '255'
 module: text
 active: '1'
-entity_types: {  }
 storage:
   type: field_sql_storage
   settings: {  }
