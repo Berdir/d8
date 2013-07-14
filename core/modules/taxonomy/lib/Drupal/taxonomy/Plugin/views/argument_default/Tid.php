@@ -138,7 +138,7 @@ class Tid extends ArgumentDefaultPluginBase {
         $instances = field_info_instances('node', $node->type);
         foreach ($instances as $instance) {
           $field = $instance->getField();
-          if ( ['type'] == 'taxonomy_term_reference') {
+          if ($field['type'] == 'taxonomy_term_reference') {
             foreach (field_get_items($node, $field['name']) as $item) {
               $taxonomy[$item['tid']] = $field['settings']['allowed_values'][0]['vocabulary'];
             }

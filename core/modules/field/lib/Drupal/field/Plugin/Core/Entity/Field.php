@@ -414,7 +414,7 @@ class Field extends ConfigEntityBase implements FieldInterface {
   /**
    * {@inheritdoc}
    */
-  public function delete($attached_entity_type = '') {
+  public function delete() {
     if (!$this->deleted) {
       $instance_controller = \Drupal::entityManager()->getStorageController('field_instance');
       $state = \Drupal::state();
