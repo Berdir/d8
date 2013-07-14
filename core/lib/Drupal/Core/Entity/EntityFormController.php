@@ -330,7 +330,7 @@ class EntityFormController implements EntityFormControllerInterface {
     // Map errors back to form elements.
     if ($violations) {
       foreach ($violations as $field_name => $field_violations) {
-        $langcode = field_is_translatable($entity->entityType(), field_info_field($field_name)) ? $entity_langcode : Language::LANGCODE_NOT_SPECIFIED;
+        $langcode = field_is_translatable($entity->entityType(), field_info_field($this->entityType, $field_name)) ? $entity_langcode : Language::LANGCODE_NOT_SPECIFIED;
         $field_state = field_form_get_state($form['#parents'], $field_name, $langcode, $form_state);
         $field_state['constraint_violations'] = $field_violations;
         field_form_set_state($form['#parents'], $field_name, $langcode, $form_state, $field_state);
@@ -459,8 +459,8 @@ class EntityFormController implements EntityFormControllerInterface {
       $current_langcode = $this->isDefaultFormLangcode($form_state) ? $form_state['values']['langcode'] : $this->getFormLangcode($form_state);
 
       foreach (field_info_instances($entity_type, $entity->bundle()) as $instance) {
+        $field = $instance->getField();
         $field_name = $instance['field_name'];
-        $field = field_info_field($field_name);
         $previous_langcode = $form[$field_name]['#language'];
 
         // Handle a possible language change: new language values are inserted,

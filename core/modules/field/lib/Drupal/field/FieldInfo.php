@@ -233,7 +233,7 @@ class FieldInfo {
     // Fill the name/ID map.
     foreach ($this->fieldsById as $field) {
       if (!$field['deleted']) {
-        $this->fieldIdsByName[$field['id']] = $field['uuid'];
+        $this->fieldIdsByName[$field->entity_type][$field->name] = $field['uuid'];
       }
     }
 
@@ -294,36 +294,38 @@ class FieldInfo {
    *
    * This method only retrieves active, non-deleted fields.
    *
+   * @param $entity_type
+   *   The entity type.
    * @param $field_name
    *   The field name.
    *
    * @return
    *   The field definition, or NULL if no field was found.
    */
-  public function getField($field_name) {
+  public function getField($entity_type, $field_name) {
     // Read from the "static" cache.
-    if (isset($this->fieldIdsByName[$field_name])) {
-      $field_id = $this->fieldIdsByName[$field_name];
+    if (isset($this->fieldIdsByName[$entity_type][$field_name])) {
+      $field_id = $this->fieldIdsByName[$entity_type][$field_name];
       return $this->fieldsById[$field_id];
     }
-    if (isset($this->unknownFields[$field_name])) {
+    if (isset($this->unknownFields[$entity_type][$field_name])) {
       return;
     }
 
     // Do not check the (large) persistent cache, but read the definition.
 
     // Cache miss: read from definition.
-    if ($field = field_read_field($field_name)) {
+    if ($field = entity_load('field_entity', $entity_type . '.' . $field_name)) {
       $field = $this->prepareField($field);
 
       // Save in the "static" cache.
       $this->fieldsById[$field['uuid']] = $field;
-      $this->fieldIdsByName[$field['field_name']] = $field['uuid'];
+      $this->fieldIdsByName[$entity_type][$field_name] = $field['uuid'];
 
       return $field;
     }
     else {
-      $this->unknownFields[$field_name] = TRUE;
+      $this->unknownFields[$entity_type][$field_name] = TRUE;
     }
   }
 
@@ -358,7 +360,7 @@ class FieldInfo {
       // Store in the static cache.
       $this->fieldsById[$field['uuid']] = $field;
       if (!$field['deleted']) {
-        $this->fieldIdsByName[$field['field_name']] = $field['uuid'];
+        $this->fieldIdsByName[$field->entity_type][$field->name] = $field['uuid'];
       }
 
       return $field;
@@ -400,7 +402,7 @@ class FieldInfo {
         if (!isset($this->fieldsById[$field['uuid']])) {
           $this->fieldsById[$field['uuid']] = $field;
           if (!$field['deleted']) {
-            $this->fieldIdsByName[$field['field_name']] = $field['uuid'];
+            $this->fieldIdsByName[$field->entity_type][$field->name] = $field['uuid'];
           }
         }
       }
@@ -450,7 +452,7 @@ class FieldInfo {
             $field = $this->prepareField($field);
 
             $this->fieldsById[$field['uuid']] = $field;
-            $this->fieldIdsByName[$field['field_name']] = $field['uuid'];
+            $this->fieldIdsByName[$field->entity_type][$field->name] = $field['uuid'];
           }
         }
       }

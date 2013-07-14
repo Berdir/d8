@@ -189,8 +189,10 @@ function field_info_fields() {
 }
 
 /**
- * Returns data about an individual field, given a field name.
+ * Returns data about an individual field.
  *
+ * @param $entity_type
+ *   The entity type.
  * @param $field_name
  *   The name of the field to retrieve. $field_name can only refer to a
  *   non-deleted, active field. For deleted fields, use
@@ -208,8 +210,8 @@ function field_info_fields() {
  * @deprecated as of Drupal 8.0. Use
  *   Field::fieldInfo()->getField($field_name).
  */
-function field_info_field($field_name) {
-  return Field::fieldInfo()->getField($field_name);
+function field_info_field($entity_type, $field_name) {
+  return Field::fieldInfo()->getField($entity_type, $field_name);
 }
 
 /**

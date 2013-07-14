@@ -229,7 +229,7 @@ class FieldInstance extends ConfigEntityBase implements FieldInstanceInterface {
     // Accept incoming 'field_name' instead of 'field_uuid', for easier DX on
     // creation of new instances.
     if (isset($values['field_name']) && !isset($values['field_uuid'])) {
-      $field = field_info_field($values['field_name']);
+      $field = field_info_field($values['entity_type'], $values['field_name']);
       if (!$field) {
         throw new FieldException(format_string('Attempt to create an instance of unknown, disabled, or deleted field @field_id', array('@field_id' => $values['field_name'])));
       }
