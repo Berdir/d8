@@ -259,17 +259,14 @@ class FieldInstance extends ConfigEntityBase implements FieldInstanceInterface {
     unset($values['field_type']);
 
     // Check required properties.
-    if (empty($values['entity_type'])) {
-      throw new FieldException(format_string('Attempt to create an instance of field @field_id without an entity type.', array('@field_id' => $this->field->id)));
-    }
     if (empty($values['bundle'])) {
       throw new FieldException(format_string('Attempt to create an instance of field @field_id without a bundle.', array('@field_id' => $this->field->id)));
     }
 
-    // 'Label' defaults to the field ID (mostly useful for field instances
+    // 'Label' defaults to the field name (mostly useful for field instances
     // created in tests).
     $values += array(
-      'label' => $this->field->id,
+      'label' => $this->field->name,
     );
     parent::__construct($values, $entity_type);
   }
@@ -278,7 +275,7 @@ class FieldInstance extends ConfigEntityBase implements FieldInstanceInterface {
    * {@inheritdoc}
    */
   public function id() {
-    return $this->entity_type . '.' . $this->bundle . '.' . $this->field->id;
+    return $this->entity_type . '.' . $this->bundle . '.' . $this->field->name;
   }
 
   /**
@@ -347,19 +344,13 @@ class FieldInstance extends ConfigEntityBase implements FieldInstanceInterface {
    */
   protected function saveNew() {
     $instance_controller = \Drupal::entityManager()->getStorageController($this->entityType);
-    $data_storage_controller = \Drupal::entityManager()->getStorageController($this->entity_type);
-
-    // The field bundles can not yet contain this instance because this is
-    // saveNew and parent::save() is callled below this.
-    $bundles = $this->field->getBundles();
-    $data_storage_controller->handleInstanceCreate($this, empty($bundles));
 
     // Assign the ID.
     $this->id = $this->id();
 
     // Ensure the field instance is unique within the bundle.
     if ($prior_instance = $instance_controller->load($this->id)) {
-      throw new FieldException(format_string('Attempt to create an instance of field @field_id on bundle @bundle that already has an instance of that field.', array('@field_id' => $this->field->id, '@bundle' => $this->bundle)));
+      throw new FieldException(format_string('Attempt to create an instance of field %name on bundle @bundle that already has an instance of that field.', array('%name' => $this->field->name, '@bundle' => $this->bundle)));
     }
 
     // Set the field UUID.
@@ -388,7 +379,6 @@ class FieldInstance extends ConfigEntityBase implements FieldInstanceInterface {
    *   In case of failures at the configuration storage level.
    */
   protected function saveUpdated() {
-    $module_handler = \Drupal::moduleHandler();
     $instance_controller = \Drupal::entityManager()->getStorageController($this->entityType);
 
     $original = $instance_controller->loadUnchanged($this->getOriginalID());
@@ -454,7 +444,7 @@ class FieldInstance extends ConfigEntityBase implements FieldInstanceInterface {
 
       // Remove the instance from the entity form displays.
       if ($form_display = entity_load('entity_form_display', $this->entity_type . '.' . $this->bundle . '.default')) {
-        $form_display->removeComponent($this->field->id())->save();
+        $form_display->removeComponent($this->field->name)->save();
       }
 
       // Remove the instance from the entity displays.
@@ -464,7 +454,7 @@ class FieldInstance extends ConfigEntityBase implements FieldInstanceInterface {
         $ids[] = $this->entity_type . '.' . $this->bundle . '.' . $view_mode;
       }
       foreach (entity_load_multiple('entity_display', $ids) as $display) {
-        $display->removeComponent($this->field->id())->save();
+        $display->removeComponent($this->field->name)->save();
       }
 
       // Delete the field itself if we just deleted its last instance.
@@ -485,7 +475,7 @@ class FieldInstance extends ConfigEntityBase implements FieldInstanceInterface {
    * {@inheritdoc}
    */
   public function getFieldName() {
-    return $this->field->id;
+    return $this->field->name;
   }
 
   /**
@@ -579,7 +569,7 @@ class FieldInstance extends ConfigEntityBase implements FieldInstanceInterface {
       return $this->field_uuid;
     }
     if ($offset == 'field_name') {
-      return $this->field->id;
+      return $this->field->name;
     }
     return $this->{$offset};
   }

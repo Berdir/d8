@@ -57,6 +57,19 @@ class Field extends ConfigEntityBase implements FieldInterface {
   public $id;
 
   /**
+   * The field name.
+   *
+   * This is the name of the property under which the field values are placed in
+   * an entity : $entity-{>$field_id}. The maximum length is
+   * Field:ID_MAX_LENGTH.
+   *
+   * Example: body, field_main_image.
+   *
+   * @var string
+   */
+  public $name;
+
+  /**
    * The field UUID.
    *
    * This is assigned automatically when the field is created.
@@ -66,7 +79,7 @@ class Field extends ConfigEntityBase implements FieldInterface {
   public $uuid;
 
   /**
-   * The name of the entity type the field is attached to.
+   * The name of the entity type the field can be attached to.
    *
    * @var string
    */
@@ -193,8 +206,9 @@ class Field extends ConfigEntityBase implements FieldInterface {
    *   elements will be used to set the corresponding properties on the class;
    *   see the class property documentation for details. Some array elements
    *   have special meanings and a few are required. Special elements are:
-   *   - id: required. As a temporary Backwards Compatibility layer right now,
+   *   - name: required. As a temporary Backwards Compatibility layer right now,
    *     a 'field_name' property can be accepted in place of 'id'.
+   *   - entity_type: required.
    *   - type: required.
    *
    * In most cases, Field entities are created via
@@ -207,24 +221,27 @@ class Field extends ConfigEntityBase implements FieldInterface {
    */
   public function __construct(array $values, $entity_type = 'field_entity') {
     // Check required properties.
+    if (empty($values['name'])) {
+      throw new FieldException('Attempt to create an unnamed field.');
+    }
+    if (!preg_match('/^[_a-z]+[_a-z0-9]*$/', $values['name'])) {
+      throw new FieldException('Attempt to create a field with invalid characters. Only lowercase alphanumeric characters and underscores are allowed, and only lowercase letters and underscore are allowed as the first character');
+    }
     if (empty($values['type'])) {
       throw new FieldException('Attempt to create a field with no type.');
     }
-    // Temporary BC layer: accept both 'id' and 'field_name'.
-    // @todo $field_name and the handling for it will be removed in
-    //   http://drupal.org/node/1953408.
-    if (empty($values['field_name']) && empty($values['id'])) {
-      throw new FieldException('Attempt to create an unnamed field.');
-    }
-    if (empty($values['id'])) {
-      $values['id'] = $values['field_name'];
-      unset($values['field_name']);
-    }
-    if (!preg_match('/^[_a-z]+[_a-z0-9]*$/', $values['id'])) {
-      throw new FieldException('Attempt to create a field with invalid characters. Only lowercase alphanumeric characters and underscores are allowed, and only lowercase letters and underscore are allowed as the first character');
+    if (empty($values['entity_type'])) {
+      throw new FieldException('Attempt to create a field with no entity_type.');
     }
 
     parent::__construct($values, $entity_type);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function id() {
+    return $this->entity_type . '.' . $this->name;
   }
 
   /**
@@ -277,6 +294,75 @@ class Field extends ConfigEntityBase implements FieldInterface {
   }
 
   /**
+   * Saves a new field definition.
+   *
+   * @return int
+   *   SAVED_NEW if the definition was saved.
+   *
+   * @throws \Drupal\field\FieldException
+   *   If the field definition is invalid.
+   * @throws \Drupal\Core\Entity\EntityStorageException
+   *   In case of failures at the configuration storage level.
+   */
+  protected function saveNew() {
+    $entity_manager = \Drupal::entityManager();
+    $storage_controller = $entity_manager->getStorageController($this->entityType);
+
+    // Assign the ID.
+    $this->id = $this->id();
+
+    // Field name cannot be longer than Field::ID_MAX_LENGTH characters. We
+    // use drupal_strlen() because the DB layer assumes that column widths
+    // are given in characters rather than bytes.
+    if (drupal_strlen($this->name) > static::ID_MAX_LENGTH) {
+      throw new FieldException(format_string(
+        'Attempt to create a field with an ID longer than @max characters: %name', array(
+          '@max' => static::ID_MAX_LENGTH,
+          '%name' => $this->name,
+        )
+      ));
+    }
+
+    // Ensure the field name is unique (we do not care about deleted fields).
+    if ($prior_field = $storage_controller->load($this->id)) {
+      $message = $prior_field->active ?
+        'Attempt to create field name %name which already exists and is active.' :
+        'Attempt to create field name %name which already exists, although it is inactive.';
+      throw new FieldException(format_string($message, array('%name' => $this->name)));
+    }
+
+    // Disallow reserved field names. This can't prevent all field name
+    // collisions with existing entity properties, but some is better than
+    // none.
+    foreach ($entity_manager->getDefinitions() as $type => $info) {
+      if (in_array($this->name, $info['entity_keys'])) {
+        throw new FieldException(format_string('Attempt to create field %name which is reserved by entity type %type.', array('%name' => $this->name, '%type' => $type)));
+      }
+    }
+
+    // Check that the field type is known.
+    $field_type = field_info_field_types($this->type);
+    if (!$field_type) {
+      throw new FieldException(format_string('Attempt to create a field of unknown type %type.', array('%type' => $this->type)));
+    }
+    $this->module = $field_type['module'];
+    $this->active = TRUE;
+
+    // Make sure all settings are present, so that a complete field
+    // definition is passed to the various hooks and written to config.
+    $this->settings += $field_type['settings'];
+
+    // Notify the entity storage controller.
+    $entity_manager->getStorageController($this->entity_type)->handleFieldCreate($this);
+
+    // Save the configuration.
+    $result = parent::save();
+    field_cache_clear();
+
+    return $result;
+  }
+
+  /**
    * Saves an updated field definition.
    *
    * @return int
@@ -289,7 +375,8 @@ class Field extends ConfigEntityBase implements FieldInterface {
    */
   protected function saveUpdated() {
     $module_handler = \Drupal::moduleHandler();
-    $storage_controller = \Drupal::entityManager()->getStorageController($this->entityType);
+    $entity_manager = \Drupal::entityManager();
+    $storage_controller = $entity_manager->getStorageController($this->entityType);
 
     $original = $storage_controller->loadUnchanged($this->id());
     $this->original = $original;
@@ -311,13 +398,10 @@ class Field extends ConfigEntityBase implements FieldInterface {
     // invokes hook_field_update_forbid().
     $module_handler->invokeAll('field_update_forbid', array($this, $original));
 
-    foreach ($this->getBundles() as $entity_type => $bundles) {
-      $data_storage_controller = \Drupal::entityManager()->getStorageController($entity_type);
-      // Tell the storage engine to update the field. The storage engine can
-      // reject the definition update as invalid by raising an exception,
-      // which stops execution before the definition is written to config.
-      $data_storage_controller->handleFieldUpdate($this, $original);
-    }
+    // Notify the storage controller. The controller can reject the definition
+    // update as invalid by raising an exception, which stops execution before
+    // the definition is written to config.
+    $entity_manager->getStorageController($this->entity_type)->handleFieldUpdate($this, $original);
 
     // Save the configuration.
     $result = parent::save();
@@ -349,7 +433,7 @@ class Field extends ConfigEntityBase implements FieldInterface {
       $instance_ids = array();
       foreach ($this->getBundles() as $entity_type => $bundles) {
         foreach ($bundles as $bundle) {
-          $instance_ids[] = "$entity_type.$bundle.$this->id";
+          $instance_ids[] = "$entity_type.$bundle.$this->name";
         }
         // A field only can be instantiated on one storage type, it does not
         // matter which $entity_type is used as long as there is one.
@@ -383,69 +467,6 @@ class Field extends ConfigEntityBase implements FieldInterface {
       // Clear the cache.
       field_cache_clear();
     }
-  }
-
-  /**
-   * Saves a new field definition.
-   *
-   * @return int
-   *   SAVED_NEW if the definition was saved.
-   *
-   * @throws \Drupal\field\FieldException
-   *   If the field definition is invalid.
-   * @throws \Drupal\Core\Entity\EntityStorageException
-   *   In case of failures at the configuration storage level.
-   */
-  protected function saveNew() {
-    $entity_manager = \Drupal::entityManager();
-    $storage_controller = $entity_manager->getStorageController($this->entityType);
-
-    // Field name cannot be longer than Field::ID_MAX_LENGTH characters. We
-    // use drupal_strlen() because the DB layer assumes that column widths
-    // are given in characters rather than bytes.
-    if (drupal_strlen($this->id) > static::ID_MAX_LENGTH) {
-      throw new FieldException(format_string(
-        'Attempt to create a field with an ID longer than @max characters: %id', array(
-          '@max' => static::ID_MAX_LENGTH,
-          '%id' => $this->id,
-        )
-      ));
-    }
-
-    // Ensure the field name is unique (we do not care about deleted fields).
-    if ($prior_field = $storage_controller->load($this->id)) {
-      $message = $prior_field->active ?
-        'Attempt to create field name %id which already exists and is active.' :
-        'Attempt to create field name %id which already exists, although it is inactive.';
-      throw new FieldException(format_string($message, array('%id' => $this->id)));
-    }
-
-    // Disallow reserved field names. This can't prevent all field name
-    // collisions with existing entity properties, but some is better than
-    // none.
-    foreach ($entity_manager->getDefinitions() as $type => $info) {
-      if (in_array($this->id, $info['entity_keys'])) {
-        throw new FieldException(format_string('Attempt to create field %id which is reserved by entity type %type.', array('%id' => $this->id, '%type' => $type)));
-      }
-    }
-
-    // Check that the field type is known.
-    $field_type = field_info_field_types($this->type);
-    if (!$field_type) {
-      throw new FieldException(format_string('Attempt to create a field of unknown type %type.', array('%type' => $this->type)));
-    }
-    $this->module = $field_type['module'];
-    $this->active = TRUE;
-
-    // Make sure all settings are present, so that a complete field
-    // definition is passed to the various hooks and written to config.
-    $this->settings += $field_type['settings'];
-
-    // Save the configuration.
-    $result = parent::save();
-    field_cache_clear();
-
-    return $result;
   }
 
   /**
@@ -495,8 +516,8 @@ class Field extends ConfigEntityBase implements FieldInterface {
   public function getBundles() {
     if (empty($this->deleted)) {
       $map = field_info_field_map();
-      if (isset($map[$this->id]['bundles'])) {
-        return $map[$this->id]['bundles'];
+      if (isset($map[$this->name]['bundles'])) {
+        return $map[$this->name]['bundles'];
       }
     }
     return array();
@@ -506,7 +527,7 @@ class Field extends ConfigEntityBase implements FieldInterface {
    * {@inheritdoc}
    */
   public function getFieldName() {
-    return $this->id;
+    return $this->name;
   }
 
   /**
@@ -605,7 +626,7 @@ class Field extends ConfigEntityBase implements FieldInterface {
         return $this->uuid;
 
       case 'field_name':
-        return $this->id;
+        return $this->name;
 
       case 'columns':
         $this->getSchema();
@@ -684,7 +705,7 @@ class Field extends ConfigEntityBase implements FieldInterface {
       $query = $factory->get($entity_type);
       $group = $query->orConditionGroup();
       foreach ($columns as $column) {
-        $group->exists($this->id() . '.' . $column);
+        $group->exists($this->name . '.' . $column);
       }
       $result = $query
         ->condition($group)
