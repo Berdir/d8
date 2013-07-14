@@ -1,6 +1,7 @@
-id: field_test_import_staging_2
-uuid: 2165d9aa-9a0c-41a1-be02-2a49f3405c00
+id: entity_test.field_test_import_2
 langcode: und
+name: field_test_import_2
+entity_type: entity_test
 type: text
 settings:
   max_length: '255'
@@ -13,7 +14,7 @@ storage:
   active: '1'
 locked: '0'
 cardinality: '1'
-translatable: '0'
+translatable: false
 indexes:
   format:
     - format

@@ -1,4 +1,6 @@
-id: field_image
+id: node.field_image
+name: field_image
+entity_type: node
 type: image
 module: image
 active: '1'

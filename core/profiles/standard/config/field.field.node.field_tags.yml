@@ -1,4 +1,6 @@
-id: field_tags
+id: node.field_tags
+name: field_tags
+entity_type: node
 type: taxonomy_term_reference
 module: taxonomy
 active: '1'

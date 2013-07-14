@@ -1,6 +1,5 @@
 id: node.article.field_tags
 field_name: field_tags
-entity_type: node
 bundle: article
 label: Tags
 description: 'Enter a comma-separated list of words to describe your content.'

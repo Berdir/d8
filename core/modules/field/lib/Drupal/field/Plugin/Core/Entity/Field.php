@@ -253,6 +253,7 @@ class Field extends ConfigEntityBase implements FieldInterface {
       'uuid',
       'status',
       'langcode',
+      'name',
       'entity_type',
       'type',
       'settings',

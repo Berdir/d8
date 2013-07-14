@@ -1,5 +1,7 @@
-id: field_test_import
+id: entity_test.field_test_import
 langcode: und
+name: field_test_import
+entity_type: entity_test
 type: text
 settings:
   max_length: '255'
