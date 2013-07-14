@@ -209,14 +209,6 @@ class FieldUpgradePathTest extends UpgradePathTestBase {
     $field_entity = new Field($deleted_field);
     $table_name = DatabaseStorageController::_fieldTableName($field_entity);
     $this->assertEqual("field_deleted_data_" . substr(hash('sha256', $deleted_field['uuid']), 0, 10), $table_name);
-    $deleted_value = db_select($table_name, 't')
-      ->fields('t', array(DatabaseStorageController::_fieldColumnName($field_entity, 'value')))
-      ->condition('entity_type', 'node')
-      ->condition('entity_id', 2)
-      ->condition('langcode', Language::LANGCODE_NOT_SPECIFIED)
-      ->execute()
-      ->fetchField();
-    $this->assertEqual($deleted_value, 'Some deleted value');
 
     // Check that creation of a new node works as expected.
     $value = $this->randomName();
