@@ -403,7 +403,7 @@ function field_test_field_storage_delete_field($field) {
 function field_test_field_storage_delete_instance($instance) {
   $data = _field_test_storage_data();
 
-  $field = field_info_field($instance['field_name']);
+  $field = $instance->getField();
   $field_data = &$data[$field['uuid']];
   foreach (array('current', 'revisions') as $sub_table) {
     foreach ($field_data[$sub_table] as &$row) {

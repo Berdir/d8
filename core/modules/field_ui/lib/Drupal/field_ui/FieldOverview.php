@@ -74,7 +74,7 @@ class FieldOverview extends OverviewBase {
 
     // Fields.
     foreach ($instances as $name => $instance) {
-      $field = field_info_field($instance['field_name']);
+      $field = $instance->getField();
       $admin_field_path = $this->adminPath . '/fields/' . $instance->id();
       $table[$name] = array(
         '#attributes' => array(
@@ -452,7 +452,7 @@ class FieldOverview extends OverviewBase {
         // No need to look in the current bundle.
         if (!($existing_bundle == $this->bundle && $existing_entity_type == $this->entity_type)) {
           foreach ($instances as $instance) {
-            $field = field_info_field($instance['field_name']);
+          $field = $instance->getField();
             // Don't show
             // - locked fields,
             // - fields already in the current bundle,

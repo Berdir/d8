@@ -55,6 +55,7 @@ function forum_enable() {
     entity_create('field_entity', array(
       'field_name' => 'taxonomy_forums',
       'type' => 'taxonomy_term_reference',
+      'entity_type' => 'node',
       'settings' => array(
         'allowed_values' => array(
           array(
@@ -78,7 +79,6 @@ function forum_enable() {
     // Create the instance on the bundle.
     entity_create('field_instance', array(
       'field_name' => 'taxonomy_forums',
-      'entity_type' => 'node',
       'label' => $vocabulary->name,
       'bundle' => 'forum',
       'required' => TRUE,
@@ -114,7 +114,7 @@ function forum_uninstall() {
   // Load the dependent Taxonomy module, in case it has been disabled.
   drupal_load('module', 'taxonomy');
 
-  if ($field = field_info_field('taxonomy_forums')) {
+  if ($field = field_info_field('node', 'taxonomy_forums')) {
     $field->delete();
   }
 

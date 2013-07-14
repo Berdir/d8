@@ -36,9 +36,8 @@ class FileFieldRevisionTest extends FileFieldTestBase {
     $type_name = 'article';
     $field_name = strtolower($this->randomName());
     $this->createFileField($field_name, $type_name);
-
-    // Attach the same fields to users.
-    $this->attachFileField($field_name, 'user', 'user');
+    // Create the same fields for users.
+    $this->createFileField($field_name, 'user', array(), array(), array(), 'user');
 
     $test_file = $this->getTestFile('text');
 

@@ -247,15 +247,14 @@ class CrudTest extends FieldUnitTestBase {
     // TODO: Also test deletion of the data stored in the field ?
 
     // Create two fields (so we can test that only one is deleted).
-    $this->field = array('field_name' => 'field_1', 'type' => 'test_field');
+    $this->field = array('field_name' => 'field_1', 'type' => 'test_field', 'entity_type' => 'entity_test');
     entity_create('field_entity', $this->field)->save();
-    $this->another_field = array('field_name' => 'field_2', 'type' => 'test_field');
+    $this->another_field = array('field_name' => 'field_2', 'type' => 'test_field', 'entity_type' => 'entity_test');
     entity_create('field_entity', $this->another_field)->save();
 
     // Create instances for each.
     $this->instance_definition = array(
       'field_name' => $this->field['field_name'],
-      'entity_type' => 'entity_test',
       'bundle' => 'entity_test',
     );
     entity_create('field_instance', $this->instance_definition)->save();
@@ -266,7 +265,7 @@ class CrudTest extends FieldUnitTestBase {
     // Test that the first field is not deleted, and then delete it.
     $field = field_read_field($this->field['field_name'], array('include_deleted' => TRUE));
     $this->assertTrue(!empty($field) && empty($field['deleted']), 'A new field is not marked for deletion.');
-    field_info_field($this->field['field_name'])->delete();
+    field_info_field('entity_test', $this->field['field_name'])->delete();
 
     // Make sure that the field is marked as deleted when it is specifically
     // loaded.

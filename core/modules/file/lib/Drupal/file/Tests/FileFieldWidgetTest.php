@@ -325,7 +325,7 @@ class FileFieldWidgetTest extends FileFieldTestBase {
       $this->drupalGet("node/$nid/edit");
       $test_file_text = $this->getTestFile('text');
       $test_file_image = $this->getTestFile('image');
-      $field = field_info_field($field_name);
+      $field = field_info_field('ndde', $field_name);
       $name = 'files[' . $field_name . '_' . Language::LANGCODE_NOT_SPECIFIED . '_0]';
 
       // Upload file with incorrect extension, check for validation error.

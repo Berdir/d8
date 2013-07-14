@@ -185,7 +185,7 @@ function forum_menu_local_tasks(&$data, $router_item, $root_path) {
     if ($forum_term) {
       $links = array();
       // Loop through all bundles for forum taxonomy vocabulary field.
-      $field = field_info_field('taxonomy_forums');
+      $field = field_info_field('node', 'taxonomy_forums');
       foreach ($field['bundles']['node'] as $type_name) {
         if (($type = entity_load('node_type', $type_name)) && node_access('create', $type_name)) {
           $links[$type_name] = array(

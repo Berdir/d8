@@ -264,7 +264,7 @@ class TranslationTest extends FieldUnitTestBase {
     // enabled.
     foreach ($instances as $instance) {
       $field_name = $instance['field_name'];
-      $field = field_info_field($field_name);
+      $field = $instance->getField();
       do {
         // Index 0 is reserved for the requested language, this way we ensure
         // that no field is actually populated with it.

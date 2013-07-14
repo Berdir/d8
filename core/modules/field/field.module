@@ -255,7 +255,7 @@ function field_populate_default_values(EntityInterface $entity, $langcode = NULL
   $entity_type = $entity->entityType();
   $langcode = $langcode ?: $entity->language()->id;
   foreach (field_info_instances($entity_type, $entity->bundle()) as $field_name => $instance) {
-    $field = field_info_field($field_name);
+    $field = $instance->getField();
     $field_langcode = field_is_translatable($entity_type, $field) ? $langcode : Language::LANGCODE_NOT_SPECIFIED;
     // We need to preserve existing values.
     if (empty($entity->{$field_name}) || !array_key_exists($field_langcode, $entity->{$field_name})) {
@@ -672,7 +672,7 @@ function field_view_value(EntityInterface $entity, $field_name, $item, $display 
   // Ensure we are working with a BC mode entity.
   $entity = $entity->getBCEntity();
 
-  if ($field = field_info_field($field_name)) {
+  if ($field = field_info_field($entity->entityType(), $field_name)) {
     // Determine the langcode that will be used by language fallback.
     $langcode = field_language($entity, $field_name, $langcode);
 
@@ -762,7 +762,7 @@ function field_view_field(EntityInterface $entity, $field_name, $display_options
     $view_mode = '_custom';
     // hook_field_attach_display_alter() needs to receive the 'prepared'
     // $display_options, so we cannot let preparation happen internally.
-    $field = field_info_field($field_name);
+    $field = field_info_field($entity_type, $field_name);
     $formatter_manager = drupal_container()->get('plugin.manager.field.formatter');
     $display_options = $formatter_manager->prepareConfiguration($field['type'], $display_options);
     $formatter = $formatter_manager->getInstance(array(

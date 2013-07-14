@@ -1050,7 +1050,7 @@ function hook_field_storage_delete_field($field) {
  *   The instance being deleted.
  */
 function hook_field_storage_delete_instance($instance) {
-  $field = field_info_field($instance['field_name']);
+  $field = $instance->getField();
   $table_name = _field_sql_storage_tablename($field);
   $revision_name = _field_sql_storage_revision_tablename($field);
   db_update($table_name)

@@ -113,6 +113,7 @@ class FieldInfoTest extends FieldUnitTestBase {
   function testFieldPrepare() {
     $field_definition = array(
       'field_name' => 'field',
+      'entity_type' => 'entity_test',
       'type' => 'test_field',
     );
     $field = entity_create('field_entity', $field_definition);
@@ -127,7 +128,7 @@ class FieldInfoTest extends FieldUnitTestBase {
     field_info_cache_clear();
 
     // Read the field back.
-    $field = field_info_field($field_definition['field_name']);
+    $field = field_info_field('entity_test', $field_definition['field_name']);
 
     // Check that all expected settings are in place.
     $field_type = field_info_field_types($field_definition['type']);

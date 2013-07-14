@@ -111,7 +111,7 @@ class EntityReferenceItemTest extends FieldUnitTestBase {
    * Tests foreign key support.
    */
   public function testEntityReferenceFieldSchema() {
-    $field = field_info_field('field_test_taxonomy');
+    $field = field_info_field('entity_test', 'field_test_taxonomy');
     $foreign_key_column_name = 'target_id';
 
     // Grab the SQL schema and verify that the 'foreign keys' are present.
@@ -128,7 +128,7 @@ class EntityReferenceItemTest extends FieldUnitTestBase {
     // foreign key is present.
     $field_name = 'field_test_vocabulary';
     entity_reference_create_instance('entity_test', 'entity_test', $field_name, 'Test vocabulary reference', 'taxonomy_vocabulary');
-    $field = field_info_field($field_name);
+    $field = field_info_field('entity_test', $field_name);
 
     $schemas = DatabaseStorageController::_fieldSqlSchema($field);
     $schema = $schemas[DatabaseStorageController::_fieldTableName($field)];
