@@ -26,7 +26,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * This class can be used as-is by most simple entity types. Entity types
  * requiring special handling can extend the class.
  */
-class DatabaseStorageController extends EntityStorageControllerBase {
+class DatabaseStorageController extends FieldableEntityStorageControllerBase {
 
   /**
    * Name of entity's revision database table field, if it supports revisions.

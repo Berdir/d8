@@ -280,69 +280,6 @@ class Field extends ConfigEntityBase implements FieldInterface {
   }
 
   /**
-   * Saves a new field definition.
-   *
-   * @return int
-   *   SAVED_NEW if the definition was saved.
-   *
-   * @throws \Drupal\field\FieldException
-   *   If the field definition is invalid.
-   * @throws \Drupal\Core\Entity\EntityStorageException
-   *   In case of failures at the configuration storage level.
-   */
-  protected function saveNew() {
-    $entity_manager = \Drupal::entityManager();
-    $storage_controller = $entity_manager->getStorageController($this->entityType);
-
-    // Field name cannot be longer than Field::ID_MAX_LENGTH characters. We
-    // use drupal_strlen() because the DB layer assumes that column widths
-    // are given in characters rather than bytes.
-    if (drupal_strlen($this->id) > static::ID_MAX_LENGTH) {
-      throw new FieldException(format_string(
-        'Attempt to create a field with an ID longer than @max characters: %id', array(
-          '@max' => static::ID_MAX_LENGTH,
-          '%id' => $this->id,
-        )
-      ));
-    }
-
-    // Ensure the field name is unique (we do not care about deleted fields).
-    if ($prior_field = $storage_controller->load($this->id)) {
-      $message = $prior_field->active ?
-        'Attempt to create field name %id which already exists and is active.' :
-        'Attempt to create field name %id which already exists, although it is inactive.';
-      throw new FieldException(format_string($message, array('%id' => $this->id)));
-    }
-
-    // Disallow reserved field names. This can't prevent all field name
-    // collisions with existing entity properties, but some is better than
-    // none.
-    foreach ($entity_manager->getDefinitions() as $type => $info) {
-      if (in_array($this->id, $info['entity_keys'])) {
-        throw new FieldException(format_string('Attempt to create field %id which is reserved by entity type %type.', array('%id' => $this->id, '%type' => $type)));
-      }
-    }
-
-    // Check that the field type is known.
-    $field_type = field_info_field_types($this->type);
-    if (!$field_type) {
-      throw new FieldException(format_string('Attempt to create a field of unknown type %type.', array('%type' => $this->type)));
-    }
-    $this->module = $field_type['module'];
-    $this->active = TRUE;
-
-    // Make sure all settings are present, so that a complete field
-    // definition is passed to the various hooks and written to config.
-    $this->settings += $field_type['settings'];
-
-    // Save the configuration.
-    $result = parent::save();
-    field_cache_clear();
-
-    return $result;
-  }
-
-  /**
    * Saves an updated field definition.
    *
    * @return int
@@ -377,14 +314,13 @@ class Field extends ConfigEntityBase implements FieldInterface {
     // invokes hook_field_update_forbid().
     $module_handler->invokeAll('field_update_forbid', array($this, $original));
 
-    if ($entity_types = array_keys($this->getBundles())) {
-      $data_storage_controller = \Drupal::entityManager()->getStorageController($entity_types[0]);
+    foreach ($this->getBundles() as $entity_type => $bundles) {
+      $data_storage_controller = \Drupal::entityManager()->getStorageController($entity_type);
       // Tell the storage engine to update the field. The storage engine can
       // reject the definition update as invalid by raising an exception,
       // which stops execution before the definition is written to config.
       $data_storage_controller->handleFieldUpdate($this, $original);
     }
-
 
     // Save the configuration.
     $result = parent::save();
@@ -450,6 +386,69 @@ class Field extends ConfigEntityBase implements FieldInterface {
       // Clear the cache.
       field_cache_clear();
     }
+  }
+
+  /**
+   * Saves a new field definition.
+   *
+   * @return int
+   *   SAVED_NEW if the definition was saved.
+   *
+   * @throws \Drupal\field\FieldException
+   *   If the field definition is invalid.
+   * @throws \Drupal\Core\Entity\EntityStorageException
+   *   In case of failures at the configuration storage level.
+   */
+  protected function saveNew() {
+    $entity_manager = \Drupal::entityManager();
+    $storage_controller = $entity_manager->getStorageController($this->entityType);
+
+    // Field name cannot be longer than Field::ID_MAX_LENGTH characters. We
+    // use drupal_strlen() because the DB layer assumes that column widths
+    // are given in characters rather than bytes.
+    if (drupal_strlen($this->id) > static::ID_MAX_LENGTH) {
+      throw new FieldException(format_string(
+        'Attempt to create a field with an ID longer than @max characters: %id', array(
+          '@max' => static::ID_MAX_LENGTH,
+          '%id' => $this->id,
+        )
+      ));
+    }
+
+    // Ensure the field name is unique (we do not care about deleted fields).
+    if ($prior_field = $storage_controller->load($this->id)) {
+      $message = $prior_field->active ?
+        'Attempt to create field name %id which already exists and is active.' :
+        'Attempt to create field name %id which already exists, although it is inactive.';
+      throw new FieldException(format_string($message, array('%id' => $this->id)));
+    }
+
+    // Disallow reserved field names. This can't prevent all field name
+    // collisions with existing entity properties, but some is better than
+    // none.
+    foreach ($entity_manager->getDefinitions() as $type => $info) {
+      if (in_array($this->id, $info['entity_keys'])) {
+        throw new FieldException(format_string('Attempt to create field %id which is reserved by entity type %type.', array('%id' => $this->id, '%type' => $type)));
+      }
+    }
+
+    // Check that the field type is known.
+    $field_type = field_info_field_types($this->type);
+    if (!$field_type) {
+      throw new FieldException(format_string('Attempt to create a field of unknown type %type.', array('%type' => $this->type)));
+    }
+    $this->module = $field_type['module'];
+    $this->active = TRUE;
+
+    // Make sure all settings are present, so that a complete field
+    // definition is passed to the various hooks and written to config.
+    $this->settings += $field_type['settings'];
+
+    // Save the configuration.
+    $result = parent::save();
+    field_cache_clear();
+
+    return $result;
   }
 
   /**
