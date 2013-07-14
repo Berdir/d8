@@ -30,6 +30,8 @@ class EntityAccessController implements EntityAccessControllerInterface {
   protected $entityType;
 
   /**
+   * Constructs an access controller instance.
+   *
    * @param string $entity_type
    *   The entity type of the access controller instance.
    */
@@ -134,11 +136,9 @@ class EntityAccessController implements EntityAccessControllerInterface {
    *   cache.
    */
   protected function getCache($cid, $operation, $langcode, AccountInterface $account) {
-    $uid = $account ? $account->id() : 0;
-
     // Return from cache if a value has been set for it previously.
-    if (isset($this->accessCache[$uid][$cid][$langcode][$operation])) {
-      return $this->accessCache[$uid][$cid][$langcode][$operation];
+    if (isset($this->accessCache[$account->id()][$cid][$langcode][$operation])) {
+      return $this->accessCache[$account->id()][$cid][$langcode][$operation];
     }
   }
 
@@ -162,10 +162,8 @@ class EntityAccessController implements EntityAccessControllerInterface {
    *   TRUE if access was granted, FALSE otherwise.
    */
   protected function setCache($access, $cid, $operation, $langcode, AccountInterface $account) {
-    $uid = $account ? $account->id() : 0;
-
     // Save the given value in the static cache and directly return it.
-    return $this->accessCache[$uid][$cid][$langcode][$operation] = (bool) $access;
+    return $this->accessCache[$account->id()][$cid][$langcode][$operation] = (bool) $access;
   }
 
   /**
