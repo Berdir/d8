@@ -856,12 +856,10 @@ class DatabaseStorageController extends FieldableEntityStorageControllerBase {
   /**
    * {@inheritdoc}
    */
-  public function handleInstanceCreate(FieldInstanceInterface $instance, $first) {
-    if ($first) {
-      $schema = $this->_fieldSqlSchema($instance->getField());
-      foreach ($schema as $name => $table) {
-        $this->database->schema()->createTable($name, $table);
-      }
+  public function handleFieldCreate(FieldInstanceInterface $instance) {
+    $schema = $this->_fieldSqlSchema($instance->getField());
+    foreach ($schema as $name => $table) {
+      $this->database->schema()->createTable($name, $table);
     }
   }
 

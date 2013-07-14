@@ -33,15 +33,20 @@ interface FieldableEntityStorageControllerInterface extends EntityStorageControl
   public function handleFieldDelete(FieldInterface $field);
 
   /**
+   * Allows reaction to the creation of a configurable field.
+   *
+   * @param \Drupal\field\FieldInterface $field
+   *   The field being created.
+   */
+  public function handleFieldCreate(FieldInstanceInterface $field);
+
+  /**
    * Allows reaction to the creation of a configurable field instance.
    *
    * @param \Drupal\field\FieldInstanceInterface $instance
    *   The instance being created.
-   * @param bool $first
-   *   TRUE when this is the first instance for the field, FALSE if other
-   *   instances exist.
    */
-  public function handleInstanceCreate(FieldInstanceInterface $instance, $first);
+  public function handleInstanceCreate(FieldInstanceInterface $instance);
 
   /**
    * Allows reaction to the deletion of a configurable field instance.
