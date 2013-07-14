@@ -112,7 +112,7 @@ class Field extends FieldPluginBase {
   public function init(ViewExecutable $view, DisplayPluginBase $display, array &$options = NULL) {
     parent::init($view, $display, $options);
 
-    $this->field_info = $field = field_info_field($this->definition['field_name']);
+    $this->field_info = $field = field_info_field($this->definition['entity_type'], $this->definition['field_name']);
     $this->multiple = FALSE;
     $this->limit_values = FALSE;
 
@@ -287,7 +287,7 @@ class Field extends FieldPluginBase {
     }
 
     $this->ensureMyTable();
-    $field = field_info_field($this->definition['field_name']);
+    $field = field_info_field($this->definition['entity_type'], $this->definition['field_name']);
     $column = DatabaseStorageController::_fieldColumnName($field, $this->options['click_sort_column']);
     if (!isset($this->aliases[$column])) {
       // Column is not in query; add a sort on it (without adding the column).
@@ -300,7 +300,7 @@ class Field extends FieldPluginBase {
     $options = parent::defineOptions();
 
     // defineOptions runs before init/construct, so no $this->field_info
-    $field = field_info_field($this->definition['field_name']);
+    $field = field_info_field($this->definition['entity_type'], $this->definition['field_name']);
     $field_type = field_info_field_types($field['type']);
     $column_names = array_keys($field['columns']);
     $default_column = '';

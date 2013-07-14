@@ -272,6 +272,7 @@ function field_views_field_default_views_data(FieldInterface $field, $sql_entity
       'table' => $table,
       'id' => 'field',
       'field_name' => $field['field_name'],
+      'entity_type' => $field['entity_type'],
       // Provide a real field for group by.
       'real field' => $column . '_' . $real_field,
       'additional fields' => $add_fields,
@@ -371,6 +372,7 @@ function field_views_field_default_views_data(FieldInterface $field, $sql_entity
         'id' => $argument,
         'additional fields' => $additional_fields,
         'field_name' => $field['field_name'],
+        'entity_type' => $field['entity_type'],
         'empty field name' => t('- No value -'),
       );
       $data[$table][$column_real_name]['filter'] = array(
@@ -379,6 +381,7 @@ function field_views_field_default_views_data(FieldInterface $field, $sql_entity
         'id' => $filter,
         'additional fields' => $additional_fields,
         'field_name' => $field['field_name'],
+        'entity_type' => $field['entity_type'],
         'allow empty' => TRUE,
       );
       if (!empty($allow_sort)) {
@@ -388,6 +391,7 @@ function field_views_field_default_views_data(FieldInterface $field, $sql_entity
           'id' => $sort,
           'additional fields' => $additional_fields,
           'field_name' => $field['field_name'],
+          'entity_type' => $field['entity_type'],
         );
       }
 
@@ -412,6 +416,7 @@ function field_views_field_default_views_data(FieldInterface $field, $sql_entity
           'additional fields' => $additional_fields,
           'empty field name' => t('- No value -'),
           'field_name' => $field['field_name'],
+          'entity_type' => $field['entity_type'],
         );
         $data[$table]['delta']['filter'] = array(
           'field' => 'delta',
@@ -419,6 +424,7 @@ function field_views_field_default_views_data(FieldInterface $field, $sql_entity
           'id' => 'numeric',
           'additional fields' => $additional_fields,
           'field_name' => $field['field_name'],
+          'entity_type' => $field['entity_type'],
           'allow empty' => TRUE,
         );
         $data[$table]['delta']['sort'] = array(
@@ -427,6 +433,7 @@ function field_views_field_default_views_data(FieldInterface $field, $sql_entity
           'id' => 'standard',
           'additional fields' => $additional_fields,
           'field_name' => $field['field_name'],
+          'entity_type' => $field['entity_type'],
         );
       }
 
@@ -451,6 +458,7 @@ function field_views_field_default_views_data(FieldInterface $field, $sql_entity
           'additional fields' => $additional_fields,
           'empty field name' => t('<No value>'),
           'field_name' => $field['field_name'],
+          'entity_type' => $field['entity_type'],
         );
         $data[$table]['language']['filter'] = array(
           'field' => 'language',
@@ -458,6 +466,7 @@ function field_views_field_default_views_data(FieldInterface $field, $sql_entity
           'id' => 'language',
           'additional fields' => $additional_fields,
           'field_name' => $field['field_name'],
+          'entity_type' => $field['entity_type'],
           'allow empty' => TRUE,
         );
         $data[$table]['language']['sort'] = array(
@@ -466,6 +475,7 @@ function field_views_field_default_views_data(FieldInterface $field, $sql_entity
           'id' => 'standard',
           'additional fields' => $additional_fields,
           'field_name' => $field['field_name'],
+          'entity_type' => $field['entity_type'],
         );
       }
     }
