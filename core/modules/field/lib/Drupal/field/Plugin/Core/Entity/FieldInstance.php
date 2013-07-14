@@ -62,6 +62,13 @@ class FieldInstance extends ConfigEntityBase implements FieldInstanceInterface {
   public $field_uuid;
 
   /**
+   * The name of the entity type the instance is attached to.
+   *
+   * @var string
+   */
+  public $entity_type;
+
+  /**
    * The name of the bundle the instance is attached to.
    *
    * @var string
