@@ -57,8 +57,10 @@ abstract class FileFieldTestBase extends WebTestBase {
    *
    * @param $name
    *   The name of the new field (all lowercase), exclude the "field_" prefix.
-   * @param $type_name
-   *   The node type that this field will be added to.
+   * @param $entity_type
+   *   The entity type.
+   * @param $bundle
+   *   The bundle that this field will be added to.
    * @param $field_settings
    *   A list of field settings that will be added to the defaults.
    * @param $instance_settings
@@ -66,11 +68,11 @@ abstract class FileFieldTestBase extends WebTestBase {
    * @param $widget_settings
    *   A list of widget settings that will be added to the widget defaults.
    */
-  function createFileField($name, $type_name, $field_settings = array(), $instance_settings = array(), $widget_settings = array(), $entity_type = 'node') {
+  function createFileField($name, $entity_type, $bundle, $field_settings = array(), $instance_settings = array(), $widget_settings = array()) {
     $field_definition = array(
+      'entity_type' => $entity_type,
       'field_name' => $name,
       'type' => 'file',
-      'entity_type' => $entity_type,
       'settings' => array(),
       'cardinality' => !empty($field_settings['cardinality']) ? $field_settings['cardinality'] : 1,
     );
@@ -78,7 +80,7 @@ abstract class FileFieldTestBase extends WebTestBase {
     $field = entity_create('field_entity', $field_definition);
     $field->save();
 
-    $this->attachFileField($name, $entity_type, $type_name, $instance_settings, $widget_settings);
+    $this->attachFileField($name, $entity_type, $bundle, $instance_settings, $widget_settings);
     return $field;
   }
 
