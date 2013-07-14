@@ -1120,7 +1120,7 @@ class DatabaseStorageController extends FieldableEntityStorageControllerBase {
       return "field_deleted_revision_" . substr(hash('sha256', $field['uuid']), 0, 10);
     }
     else {
-      return "field_revision_{$field['field_name']}";
+      return "field_revision_{$field['entity_type']}_{$field['field_name']}";
     }
   }
 
