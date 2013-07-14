@@ -72,8 +72,13 @@ function _field_views_get_sql_entity_types(FieldInterface $field) {
   $sql_entity_types = array();
   $entity_manager = Drupal::entityManager();
   foreach ($field['bundles'] as $entity_type => $bundles) {
-    if ($entity_manager->getStorageController($entity_type) instanceof DatabaseStorageController) {
-      $sql_entity_types[] = $entity_type;
+    try {
+      if ($entity_manager->getStorageController($entity_type) instanceof DatabaseStorageController) {
+        $sql_entity_types[] = $entity_type;
+      }
+    }
+    catch (\InvalidArgumentException $e) {
+      // Disabled entity type, nothing to do.
     }
   }
   return $sql_entity_types;

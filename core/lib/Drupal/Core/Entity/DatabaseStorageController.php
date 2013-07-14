@@ -938,7 +938,7 @@ class DatabaseStorageController extends EntityStorageControllerBase {
    * {@inheritdoc}
    */
   protected function fieldValues(EntityInterface $entity, FieldInstanceInterface $instance) {
-    $field = $instance->getField;
+    $field = $instance->getField();
     $columns = array();
     foreach ($field->getColumns() as $column_name => $data) {
       $columns[] = static::_fieldColumnName($field, $column_name);
