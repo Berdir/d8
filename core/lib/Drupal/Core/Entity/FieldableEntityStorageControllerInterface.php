@@ -38,7 +38,7 @@ interface FieldableEntityStorageControllerInterface extends EntityStorageControl
    * @param \Drupal\field\FieldInterface $field
    *   The field being created.
    */
-  public function handleFieldCreate(FieldInstanceInterface $field);
+  public function handleFieldCreate(FieldInterface $field);
 
   /**
    * Allows reaction to the creation of a configurable field instance.

@@ -262,7 +262,7 @@ abstract class FieldableEntityStorageControllerBase extends EntityStorageControl
   /**
    * {@inheritdoc}
    */
-  public function handleFieldCreate(FieldInstanceInterface $instance) { }
+  public function handleFieldCreate(FieldInterface $field) { }
 
   /**
    * {@inheritdoc}
