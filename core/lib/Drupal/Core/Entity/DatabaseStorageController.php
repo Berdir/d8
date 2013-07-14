@@ -572,7 +572,6 @@ class DatabaseStorageController extends FieldableEntityStorageControllerBase {
 
       $results = $this->database->select($table, 't')
         ->fields('t')
-        ->condition('entity_type', $this->entityType)
         ->condition($load_current ? 'entity_id' : 'revision_id', $ids, 'IN')
         ->condition('langcode', field_available_languages($this->entityType, $field), 'IN')
         ->orderBy('delta')
@@ -652,13 +651,11 @@ class DatabaseStorageController extends FieldableEntityStorageControllerBase {
           // of an entity.
           if ($entity->isDefaultRevision()) {
             $this->database->delete($table_name)
-              ->condition('entity_type', $entity_type)
               ->condition('entity_id', $id)
               ->condition('langcode', $langcodes, 'IN')
               ->execute();
           }
           $this->database->delete($revision_name)
-            ->condition('entity_type', $entity_type)
             ->condition('entity_id', $id)
             ->condition('revision_id', $vid)
             ->condition('langcode', $langcodes, 'IN')
@@ -668,7 +665,7 @@ class DatabaseStorageController extends FieldableEntityStorageControllerBase {
 
       // Prepare the multi-insert query.
       $do_insert = FALSE;
-      $columns = array('entity_type', 'entity_id', 'revision_id', 'bundle', 'delta', 'langcode');
+      $columns = array('entity_id', 'revision_id', 'bundle', 'delta', 'langcode');
       foreach ($field['columns'] as $column => $attributes) {
         $columns[] = static::_fieldColumnName($field, $column);
       }
@@ -682,7 +679,6 @@ class DatabaseStorageController extends FieldableEntityStorageControllerBase {
           // We now know we have someting to insert.
           $do_insert = TRUE;
           $record = array(
-            'entity_type' => $entity_type,
             'entity_id' => $id,
             'revision_id' => $vid,
             'bundle' => $bundle,
@@ -727,11 +723,9 @@ class DatabaseStorageController extends FieldableEntityStorageControllerBase {
       $table_name = static::_fieldTableName($field);
       $revision_name = static::_fieldRevisionTableName($field);
       $this->database->delete($table_name)
-        ->condition('entity_type', $entity->entityType())
         ->condition('entity_id', $entity->id())
         ->execute();
       $this->database->delete($revision_name)
-        ->condition('entity_type', $entity->entityType())
         ->condition('entity_id', $entity->id())
         ->execute();
     }
@@ -746,7 +740,6 @@ class DatabaseStorageController extends FieldableEntityStorageControllerBase {
       foreach ($this->fieldInfo->getBundleInstances($entity->getType(), $entity->bundle()) as $instance) {
         $revision_name = static::_fieldRevisionTableName($instance->getField());
         $this->database->delete($revision_name)
-          ->condition('entity_type', $entity->entityType())
           ->condition('entity_id', $entity->id())
           ->condition('revision_id', $vid)
           ->execute();
@@ -881,12 +874,10 @@ class DatabaseStorageController extends FieldableEntityStorageControllerBase {
     $revision_name = static::_fieldRevisionTableName($field);
     $this->database->update($table_name)
       ->fields(array('deleted' => 1))
-      ->condition('entity_type', $instance['entity_type'])
       ->condition('bundle', $instance['bundle'])
       ->execute();
     $this->database->update($revision_name)
       ->fields(array('deleted' => 1))
-      ->condition('entity_type', $instance['entity_type'])
       ->condition('bundle', $instance['bundle'])
       ->execute();
   }
@@ -904,12 +895,10 @@ class DatabaseStorageController extends FieldableEntityStorageControllerBase {
         $revision_name = static::_fieldRevisionTableName($field);
         $this->database->update($table_name)
           ->fields(array('bundle' => $bundle_new))
-          ->condition('entity_type', $this->entityType)
           ->condition('bundle', $bundle)
           ->execute();
         $this->database->update($revision_name)
           ->fields(array('bundle' => $bundle_new))
-          ->condition('entity_type', $this->entityType)
           ->condition('bundle', $bundle)
           ->execute();
       }
@@ -925,11 +914,9 @@ class DatabaseStorageController extends FieldableEntityStorageControllerBase {
     $table_name = static::_fieldTableName($field);
     $revision_name = static::_fieldRevisionTableName($field);
     $this->database->delete($table_name)
-      ->condition('entity_type', $instance->entity_type)
       ->condition('entity_id', $entity->id())
       ->execute();
     $this->database->delete($revision_name)
-      ->condition('entity_type', $instance->entity_type)
       ->condition('entity_id', $entity->id())
       ->execute();
   }
@@ -979,13 +966,6 @@ class DatabaseStorageController extends FieldableEntityStorageControllerBase {
     $current = array(
       'description' => "Data storage for {$deleted}field {$field['id']} ({$field['field_name']})",
       'fields' => array(
-        'entity_type' => array(
-          'type' => 'varchar',
-          'length' => 128,
-          'not null' => TRUE,
-          'default' => '',
-          'description' => 'The entity type this data is attached to',
-        ),
         'bundle' => array(
           'type' => 'varchar',
           'length' => 128,
@@ -1026,9 +1006,8 @@ class DatabaseStorageController extends FieldableEntityStorageControllerBase {
           'description' => 'The sequence number for this data item, used for multi-value fields',
         ),
       ),
-      'primary key' => array('entity_type', 'entity_id', 'deleted', 'delta', 'langcode'),
+      'primary key' => array('entity_id', 'deleted', 'delta', 'langcode'),
       'indexes' => array(
-        'entity_type' => array('entity_type'),
         'bundle' => array('bundle'),
         'deleted' => array('deleted'),
         'entity_id' => array('entity_id'),
@@ -1076,7 +1055,7 @@ class DatabaseStorageController extends FieldableEntityStorageControllerBase {
     // Construct the revision table.
     $revision = $current;
     $revision['description'] = "Revision archive storage for {$deleted}field {$field['id']} ({$field['field_name']})";
-    $revision['primary key'] = array('entity_type', 'entity_id', 'revision_id', 'deleted', 'delta', 'langcode');
+    $revision['primary key'] = array('entity_id', 'revision_id', 'deleted', 'delta', 'langcode');
     $revision['fields']['revision_id']['not null'] = TRUE;
     $revision['fields']['revision_id']['description'] = 'The entity revision id this data is attached to';
 
@@ -1112,7 +1091,7 @@ class DatabaseStorageController extends FieldableEntityStorageControllerBase {
       return "field_deleted_data_" . substr(hash('sha256', $field['uuid']), 0, 10);
     }
     else {
-      return "field_data_{$field['field_name']}";
+      return "field_{$field['entity_type']}_{$field['field_name']}";
     }
   }
 
