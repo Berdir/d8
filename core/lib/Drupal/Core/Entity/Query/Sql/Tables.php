@@ -109,7 +109,7 @@ class Tables {
         $field = field_info_field_by_id(substr($specifier, 3));
       }
       elseif (isset($field_map[$specifier])) {
-        $field = field_info_field($specifier);
+        $field = field_info_field($entity_type, $specifier);
       }
       else {
         $field = FALSE;

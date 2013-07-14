@@ -95,7 +95,7 @@ function _content_translation_form_language_content_settings_form_alter(array &$
           // @todo Exploit field definitions once all core entities and field
           // types are migrated to the Entity Field API.
           foreach ($fields as $field_name => $instance) {
-            $field = field_info_field($field_name);
+            $field = $instance->getField();
             $form['settings'][$entity_type][$bundle]['fields'][$field_name] = array(
               '#label' => $instance['label'],
               '#type' => 'checkbox',
