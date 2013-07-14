@@ -1,5 +1,6 @@
 id: node.article.field_image
 field_name: field_image
+entity_type: node
 bundle: article
 label: Image
 description: 'Upload an image to go with this article.'

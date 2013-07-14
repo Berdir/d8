@@ -326,7 +326,7 @@ function _content_translation_update_field_translatability($settings) {
         foreach ($bundle_settings['fields'] as $field_name => $translatable) {
           // If a field is enabled for translation for at least one instance we
           // need to mark it as translatable.
-          $fields[$entity_type][$field_name] = $translatable || !empty($fields[$field_name]);
+          $fields[$entity_type][$field_name] = $translatable || !empty($fields[$entity_type][$field_name]);
         }
       }
       // @todo Store non-configurable field settings to be able to alter their
@@ -335,8 +335,8 @@ function _content_translation_update_field_translatability($settings) {
   }
 
   $operations = array();
-  foreach ($fields as $entity_type => $entity_fields) {
-    foreach ($entity_fields as $field_name => $translatable) {
+  foreach ($fields as $entity_type => $entity_type_fields) {
+    foreach ($entity_type_fields as $field_name => $translatable) {
       $field = field_info_field($entity_type, $field_name);
       if ($field['translatable'] != $translatable) {
         // If a field is untranslatable, it can have no data except under

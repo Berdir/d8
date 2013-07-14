@@ -750,6 +750,16 @@ class DatabaseStorageController extends FieldableEntityStorageControllerBase {
   /**
    * {@inheritdoc}
    */
+  public function handleFieldCreate(FieldInterface $field) {
+    $schema = $this->_fieldSqlSchema($field);
+    foreach ($schema as $name => $table) {
+      $this->database->schema()->createTable($name, $table);
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function handleFieldUpdate(FieldInterface $field, FieldInterface $original) {
     if (!$field->hasData()) {
       // There is no data. Re-create the tables completely.
@@ -851,16 +861,6 @@ class DatabaseStorageController extends FieldableEntityStorageControllerBase {
     $revision_new_table = static::_fieldRevisionTableName($field);
     $this->database->schema()->renameTable($table, $new_table);
     $this->database->schema()->renameTable($revision_table, $revision_new_table);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function handleFieldCreate(FieldInterface $field) {
-    $schema = $this->_fieldSqlSchema($field);
-    foreach ($schema as $name => $table) {
-      $this->database->schema()->createTable($name, $table);
-    }
   }
 
   /**

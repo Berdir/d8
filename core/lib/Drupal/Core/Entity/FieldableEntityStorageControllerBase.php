@@ -252,6 +252,11 @@ abstract class FieldableEntityStorageControllerBase extends EntityStorageControl
   /**
    * {@inheritdoc}
    */
+  public function handleFieldCreate(FieldInterface $field) { }
+
+  /**
+   * {@inheritdoc}
+   */
   public function handleFieldUpdate(FieldInterface $field, FieldInterface $original) { }
 
   /**
@@ -262,12 +267,12 @@ abstract class FieldableEntityStorageControllerBase extends EntityStorageControl
   /**
    * {@inheritdoc}
    */
-  public function handleFieldCreate(FieldInterface $field) { }
+  public function handleInstanceCreate(FieldInstanceInterface $instance) { }
 
   /**
    * {@inheritdoc}
    */
-  public function handleInstanceCreate(FieldInstanceInterface $instance) { }
+  public function handleInstanceUpdate(FieldInstanceInterface $instance, FieldInstanceInterface $orignal) { }
 
   /**
    * {@inheritdoc}

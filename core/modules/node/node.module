@@ -399,6 +399,7 @@ function node_add_body_field(NodeTypeInterface $type, $label = 'Body') {
   $instance = field_info_instance('node', 'body', $type->id());
   if (empty($field)) {
     $field = entity_create('field_entity', array(
+      'entity_type' => 'node',
       'field_name' => 'body',
       'type' => 'text_with_summary',
       'entity_types' => array('node'),

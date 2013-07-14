@@ -62,6 +62,13 @@ class FieldInstance extends ConfigEntityBase implements FieldInstanceInterface {
   public $field_uuid;
 
   /**
+   * The name of the entity type the instance is attached to.
+   *
+   * @var string
+   */
+  public $entity_type;
+
+  /**
    * The name of the bundle the instance is attached to.
    *
    * @var string
@@ -398,6 +405,9 @@ class FieldInstance extends ConfigEntityBase implements FieldInstanceInterface {
     // Ensure default values are present.
     $this->prepareSave();
 
+    // Notify the entity storage controller.
+    \Drupal::entityManager()->getStorageController($this->entity_type)->handleInstanceUpdate($this, $original);
+
     // Save the configuration.
     $result = parent::save();
     field_cache_clear();
@@ -438,7 +448,9 @@ class FieldInstance extends ConfigEntityBase implements FieldInstanceInterface {
 
       parent::delete();
 
+      // Notify the entity storage controller.
       \Drupal::entityManager()->getStorageController($this->entity_type)->handleInstanceDelete($this);
+
       // Clear the cache.
       field_cache_clear();
 
@@ -459,7 +471,7 @@ class FieldInstance extends ConfigEntityBase implements FieldInstanceInterface {
 
       // Delete the field itself if we just deleted its last instance.
       if ($field_cleanup && count($this->field->getBundles()) == 0) {
-        $this->field->delete($this->entity_type);
+        $this->field->delete();
       }
     }
   }

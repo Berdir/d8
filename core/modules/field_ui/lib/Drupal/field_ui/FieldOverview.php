@@ -452,7 +452,7 @@ class FieldOverview extends OverviewBase {
         // No need to look in the current bundle.
         if (!($existing_bundle == $this->bundle && $existing_entity_type == $this->entity_type)) {
           foreach ($instances as $instance) {
-          $field = $instance->getField();
+            $field = $instance->getField();
             // Don't show
             // - locked fields,
             // - fields already in the current bundle,
