@@ -85,7 +85,8 @@ class TranslationTest extends FieldUnitTestBase {
     $this->entity_type = 'entity_test';
 
     $this->field_definition = array(
-      'field_name' => $this->field_name,
+      'name' => $this->field_name,
+      'entity_type' => $this->entity_type,
       'type' => 'test_field',
       'cardinality' => 4,
       'translatable' => TRUE,
@@ -178,7 +179,7 @@ class TranslationTest extends FieldUnitTestBase {
     // Test default values.
     $field_name_default = drupal_strtolower($this->randomName() . '_field_name');
     $field_definition = $this->field_definition;
-    $field_definition['field_name'] = $field_name_default;
+    $field_definition['name'] = $field_name_default;
     entity_create('field_entity', $field_definition)->save();
 
     $instance_definition = $this->instance_definition;
@@ -236,7 +237,8 @@ class TranslationTest extends FieldUnitTestBase {
     // We need an additional field here to properly test display language
     // suggestions.
     $field = array(
-      'field_name' => $field_name,
+      'name' => $field_name,
+      'entity_type' => $entity_type,
       'type' => 'test_field',
       'cardinality' => 2,
       'translatable' => TRUE,

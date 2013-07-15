@@ -47,10 +47,20 @@ class HandlerFieldFieldTest extends FieldTestBase {
     $this->setUpFields(3);
 
     // Setup a field with cardinality > 1.
-    $this->fields[3] = $field = entity_create('field_entity', array('field_name' => 'field_name_3', 'type' => 'text', 'cardinality' => FIELD_CARDINALITY_UNLIMITED));
+    $this->fields[3] = $field = entity_create('field_entity', array(
+      'name' => 'field_name_3',
+      'entity_type' => 'node',
+      'type' => 'text',
+      'cardinality' => FIELD_CARDINALITY_UNLIMITED,
+    ));
     $field->save();
     // Setup a field that will have no value.
-    $this->fields[4] = $field = entity_create('field_entity', array('field_name' => 'field_name_4', 'type' => 'text', 'cardinality' => FIELD_CARDINALITY_UNLIMITED));
+    $this->fields[4] = $field = entity_create('field_entity', array(
+      'name' => 'field_name_4',
+      'entity_type' => 'node',
+      'type' => 'text',
+      'cardinality' => FIELD_CARDINALITY_UNLIMITED,
+    ));
     $field->save();
 
     $this->setUpInstances();
