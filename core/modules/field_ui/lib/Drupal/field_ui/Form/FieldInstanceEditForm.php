@@ -136,7 +136,7 @@ class FieldInstanceEditForm extends FieldInstanceFormBase {
 
       // Extract the 'default value'.
       $items = array();
-      $entity_form_display->getRenderer($this->instance->getField()->id)->extractFormValues($entity, Language::LANGCODE_NOT_SPECIFIED, $items, $element, $form_state);
+      $entity_form_display->getRenderer($this->instance->getField()->name)->extractFormValues($entity, Language::LANGCODE_NOT_SPECIFIED, $items, $element, $form_state);
 
       // @todo Simplify when all entity types are converted to EntityNG.
       if ($entity instanceof EntityNG) {
@@ -160,7 +160,7 @@ class FieldInstanceEditForm extends FieldInstanceFormBase {
         field_form_set_state($element['#parents'], $field_name, Language::LANGCODE_NOT_SPECIFIED, $form_state, $field_state);
 
         // Assign reported errors to the correct form element.
-        $entity_form_display->getRenderer($this->instance->getField()->id)->flagErrors($entity, Language::LANGCODE_NOT_SPECIFIED, $items, $element, $form_state);
+        $entity_form_display->getRenderer($this->instance->getField()->name)->flagErrors($entity, Language::LANGCODE_NOT_SPECIFIED, $items, $element, $form_state);
       }
     }
   }
@@ -178,7 +178,7 @@ class FieldInstanceEditForm extends FieldInstanceFormBase {
 
       // Extract field values.
       $items = array();
-      $entity_form_display->getRenderer($this->instance->getField()->id)->extractFormValues($entity, Language::LANGCODE_NOT_SPECIFIED, $items, $element, $form_state);
+      $entity_form_display->getRenderer($this->instance->getField()->name)->extractFormValues($entity, Language::LANGCODE_NOT_SPECIFIED, $items, $element, $form_state);
 
       $this->instance['default_value'] = $items ? $items : NULL;
     }
@@ -250,7 +250,7 @@ class FieldInstanceEditForm extends FieldInstanceFormBase {
     if (!empty($this->instance['default_value'])) {
       $items = (array) $this->instance['default_value'];
     }
-    $element += $entity_form_display->getRenderer($this->instance->getField()->id)->form($entity, Language::LANGCODE_NOT_SPECIFIED, $items, $element, $form_state);
+    $element += $entity_form_display->getRenderer($this->instance->getField()->name)->form($entity, Language::LANGCODE_NOT_SPECIFIED, $items, $element, $form_state);
 
     return $element;
   }

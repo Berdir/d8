@@ -445,35 +445,41 @@ class FieldOverview extends OverviewBase {
    *   An array of existing fields keyed by field name.
    */
   protected function getExistingFieldOptions() {
-    $info = array();
-    $field_types = field_info_field_types();
+    $options = array();
 
-    foreach (field_info_instances() as $existing_entity_type => $bundles) {
-      foreach ($bundles as $existing_bundle => $instances) {
-        // No need to look in the current bundle.
-        if (!($existing_bundle == $this->bundle && $existing_entity_type == $this->entity_type)) {
-          foreach ($instances as $instance) {
-            $field = $instance->getField();
-            // Don't show
-            // - locked fields,
-            // - fields already in the current bundle,
-            // - fields that should not be added via user interface.
+    // Collect candidate field instances.
+    $field_map = field_info_field_map();
+    $instance_ids = array();
+    foreach ($field_map as $field_name => $data) {
+      // @todo do not consider the current bundle.
 
-            if (empty($field['locked'])
-              && !field_info_instance($this->entity_type, $field['field_name'], $this->bundle)
-              && empty($field_types[$field['type']]['no_ui'])) {
-              $info[$instance['field_name']] = array(
-                'type' => $field['type'],
-                'type_label' => $field_types[$field['type']]['label'],
-                'field' => $field['field_name'],
-                'label' => $instance['label'],
-              );
-            }
-          }
+      if (isset($data['bundles'][$this->entity_type]) && !in_array($this->bundle, $data['bundles'][$this->entity_type])) {
+        $bundle = reset($data['bundles'][$this->entity_type]);
+        $instance_ids[] = $this->entity_type . '.' . $bundle . '.' . $field_name;
+      }
+    }
+
+    // Load the instances and build the list of options.
+    if ($instance_ids) {
+      $field_types = field_info_field_types();
+      $instances = $this->entityManager->getStorageController('field_instance')->loadMultiple($instance_ids);
+      foreach ($instances as $instance) {
+        $field = $instance->getField();
+        // Do not show:
+        // - locked fields,
+        // - fields that should not be added via user interface.
+        if (empty($field['locked']) && empty($field_types[$field['type']]['no_ui'])) {
+          $options[$field->name] = array(
+            'type' => $field->type,
+            'type_label' => $field_types[$field->type]['label'],
+            'field' => $field->name,
+            'label' => $instance->label,
+          );
         }
       }
     }
-    return $info;
+
+    return $options;
   }
 
   /**
