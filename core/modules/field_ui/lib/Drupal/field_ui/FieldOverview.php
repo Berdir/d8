@@ -358,14 +358,14 @@ class FieldOverview extends OverviewBase {
         // default widget and settings). It stays hidden for other form modes
         // until it is explicitly configured.
         entity_get_form_display($this->entity_type, $this->bundle, 'default')
-          ->setComponent($field['field_name'])
+          ->setComponent($values['field_name'])
           ->save();
 
         // Make sure the field is displayed in the 'default' view mode (using
         // default formatter and settings). It stays hidden for other view
         // modes until it is explicitly configured.
         entity_get_display($this->entity_type, $this->bundle, 'default')
-          ->setComponent($field['field_name'])
+          ->setComponent($values['field_name'])
           ->save();
 
         // Always show the field settings step, as the cardinality needs to be
@@ -374,7 +374,7 @@ class FieldOverview extends OverviewBase {
         $destinations[] = $this->adminPath . '/fields/' . $new_instance->id();
 
         // Store new field information for any additional submit handlers.
-        $form_state['fields_added']['_add_new_field'] = $field['field_name'];
+        $form_state['fields_added']['_add_new_field'] = $values['field_name'];
       }
       catch (\Exception $e) {
         drupal_set_message(t('There was a problem creating field %label: !message', array('%label' => $instance['label'], '!message' => $e->getMessage())), 'error');
@@ -384,7 +384,7 @@ class FieldOverview extends OverviewBase {
     // Re-use existing field.
     if (!empty($form_values['_add_existing_field']['field_name'])) {
       $values = $form_values['_add_existing_field'];
-      $field = field_info_field($values['field_name']);
+      $field = field_info_field($this->entity_type, $values['field_name']);
       if (!empty($field['locked'])) {
         drupal_set_message(t('The field %label cannot be added because it is locked.', array('%label' => $values['label'])), 'error');
       }
