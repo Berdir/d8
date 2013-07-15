@@ -268,7 +268,8 @@ function user_install() {
  */
 function user_install_picture_field() {
   $field = array(
-    'field_name' => 'user_picture',
+    'name' => 'user_picture',
+    'entity_type' => 'user',
     'module' => 'image',
     'type' => 'image',
     'cardinality' => 1,

@@ -46,7 +46,7 @@ use Drupal\field\FieldException;
  *   entity_load('field_entity', 'field_name').
  */
 function field_read_field($field_name, $include_additional = array()) {
-  $fields = field_read_fields(array('field_name' => $field_name), $include_additional);
+  $fields = field_read_fields(array('name' => $field_name), $include_additional);
   return $fields ? current($fields) : FALSE;
 }
 
