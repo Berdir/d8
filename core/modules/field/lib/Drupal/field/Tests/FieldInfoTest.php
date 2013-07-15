@@ -112,7 +112,7 @@ class FieldInfoTest extends FieldUnitTestBase {
    */
   function testFieldPrepare() {
     $field_definition = array(
-      'field_name' => 'field',
+      'name' => 'field',
       'entity_type' => 'entity_test',
       'type' => 'test_field',
     );
@@ -140,7 +140,8 @@ class FieldInfoTest extends FieldUnitTestBase {
    */
   function testInstancePrepare() {
     $field_definition = array(
-      'field_name' => 'field',
+      'name' => 'field',
+      'entity_type' => 'entity_test',
       'type' => 'test_field',
     );
     entity_create('field_entity', $field_definition)->save();
@@ -175,7 +176,8 @@ class FieldInfoTest extends FieldUnitTestBase {
     // For this test the field type and the entity type must be exposed by
     // different modules.
     $field_definition = array(
-      'field_name' => 'field',
+      'name' => 'field',
+      'entity_type' => 'comment',
       'type' => 'test_field',
     );
     entity_create('field_entity', $field_definition)->save();
@@ -211,11 +213,18 @@ class FieldInfoTest extends FieldUnitTestBase {
     // Create a couple fields.
     $fields  = array(
       array(
-        'field_name' => 'field_1',
+        'name' => 'field_1',
+        'entity_type' => 'entity_test',
         'type' => 'test_field',
       ),
       array(
-        'field_name' => 'field_2',
+        'name' => 'field_2',
+        'entity_type' => 'entity_test',
+        'type' => 'hidden_test_field',
+      ),
+      array(
+        'name' => 'field_2',
+        'entity_type' => 'entity_test_cache',
         'type' => 'hidden_test_field',
       ),
     );
@@ -301,7 +310,8 @@ class FieldInfoTest extends FieldUnitTestBase {
     // field_info_fields().
     $field_name = drupal_strtolower($this->randomName());
     $field = entity_create('field_entity', array(
-      'field_name' => $field_name,
+      'name' => $field_name,
+      'entity_type' => 'entity_test',
       'type' => 'test_field',
     ));
     $field->save();
