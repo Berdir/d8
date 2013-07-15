@@ -247,16 +247,15 @@ function block_update_8008() {
 
     // First, create the body field.
     $body_field = array(
-      'id' => 'block_body',
+      'name' => 'block_body',
+      'entity_type' => 'custom_block',
       'type' => 'text_with_summary',
-      'entity_types' => array('custom_block'),
       'module' => 'text',
       'cardinality' => 1,
     );
     _update_8003_field_create_field($body_field);
 
     $instance = array(
-      'id' => 'custom_block.basic.block_body',
       'entity_type' => 'custom_block',
       'bundle' => 'basic',
       'label' => 'Block body',

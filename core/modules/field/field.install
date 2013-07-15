@@ -25,6 +25,7 @@ function _update_8003_field_create_field(array &$field_config) {
 
   // Merge in default values.
   $field_config += array(
+    'id' => $field_config['entity_type'] . '.' . $field_config['name'],
     'uuid' => $uuid->generate(),
     'cardinality' => 1,
     'translatable' => FALSE,
@@ -37,9 +38,16 @@ function _update_8003_field_create_field(array &$field_config) {
   );
 
   // Save in config.
-  Drupal::config('field.field.' . $field_config['id'])
+  Drupal::config('field.field.' . $field_config['entity_type'] . '.' . $field_config['name'])
     ->setData($field_config)
     ->save();
+
+  // Create storage for the field. This requires a field entity, but cannot use
+  // the regular entity_create() function here.
+  $schema = DatabaseStorageController::_fieldSqlSchema(new Field($field_config));
+  foreach ($schema as $name => $table) {
+    db_create_table($name, $table);
+  }
 }
 
 /**
@@ -52,16 +60,15 @@ function _update_8003_field_create_field(array &$field_config) {
  *   An array of field properties.
  * @param array $instance_config
  *   An array of field instance properties.
- * @param bool $first
- *   TRUE if this is the first instance of the field. Defaults to TRUE.
  *
  * @ingroup update_api
  */
-function _update_8003_field_create_instance(array $field_config, array &$instance_config, $first = TRUE) {
+function _update_8003_field_create_instance(array $field_config, array &$instance_config) {
   $uuid = new Uuid();
 
   // Merge in defaults.
   $instance_config += array(
+    'id' => $instance_config['entity_type'] . '.' . $instance_config['bundle'] . '.' . $field_config['name'],
     'description' => '',
     'required' => FALSE,
     'uuid' => $uuid->generate(),
@@ -79,12 +86,6 @@ function _update_8003_field_create_instance(array $field_config, array &$instanc
   Drupal::config('field.instance.' . $instance_config['id'])
     ->setData($instance_config)
     ->save();
-  if ($first) {
-    $schema = DatabaseStorageController::_fieldSqlSchema(new Field($field_config));
-    foreach ($schema as $name => $table) {
-      db_create_table($name, $table);
-    }
-  }
 }
 
 /**

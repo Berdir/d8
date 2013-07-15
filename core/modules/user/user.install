@@ -656,7 +656,8 @@ function user_update_8011() {
 
   // Create the field and instance.
   $field = array(
-    'id' => 'user_picture',
+    'name' => 'user_picture',
+    'entity_type' => 'user',
     'module' => 'image',
     'type' => 'image',
     'cardinality' => 1,
@@ -670,10 +671,9 @@ function user_update_8011() {
   _update_8003_field_create_field($field);
 
   $instance = array(
-    'id' => 'user.user.user_picture',
     'entity_type' => 'user',
-    'label' => 'Picture',
     'bundle' => 'user',
+    'label' => 'Picture',
     'description' => update_variable_get('user_picture_guidelines', ''),
     'required' => FALSE,
     'settings' => array(
