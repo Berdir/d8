@@ -68,7 +68,8 @@ class TextPlainUnitTest extends DrupalUnitTestBase {
     $this->formatter_settings = array();
 
     $this->field = entity_create('field_entity', array(
-      'field_name' => $this->field_name,
+      'name' => $this->field_name,
+      'entity_type' => $this->entity_type,
       'type' => $this->field_type,
       'settings' => $this->field_settings,
     ));

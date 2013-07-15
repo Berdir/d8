@@ -56,7 +56,8 @@ class TaggedWithTest extends WizardTestBase {
 
     // Create the tag field itself.
     $this->tag_field = entity_create('field_entity', array(
-      'field_name' => 'field_views_testing_tags',
+      'name' => 'field_views_testing_tags',
+      'entity_type' => 'node',
       'type' => 'taxonomy_term_reference',
       'cardinality' => FIELD_CARDINALITY_UNLIMITED,
       'settings' => array(

@@ -50,7 +50,8 @@ class TextFieldTest extends WebTestBase {
     // Create a field with settings to validate.
     $max_length = 3;
     $this->field = entity_create('field_entity', array(
-      'field_name' => drupal_strtolower($this->randomName()),
+      'name' => drupal_strtolower($this->randomName()),
+      'entity_type' => 'entity_test',
       'type' => 'text',
       'settings' => array(
         'max_length' => $max_length,
@@ -93,7 +94,8 @@ class TextFieldTest extends WebTestBase {
     $entity_type = 'entity_test';
     $this->field_name = drupal_strtolower($this->randomName());
     $this->field = entity_create('field_entity', array(
-      'field_name' => $this->field_name,
+      'name' => $this->field_name,
+      'entity_type' => 'entity_test',
       'type' => $field_type
     ));
     $this->field->save();
@@ -161,7 +163,8 @@ class TextFieldTest extends WebTestBase {
     // Setup a field and instance
     $this->field_name = drupal_strtolower($this->randomName());
     $this->field = entity_create('field_entity', array(
-      'field_name' => $this->field_name,
+      'name' => $this->field_name,
+      'entity_type' => 'entity_test',
       'type' => $field_type
     ));
     $this->field->save();
