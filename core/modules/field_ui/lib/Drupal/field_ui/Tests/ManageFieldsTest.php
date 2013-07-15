@@ -42,7 +42,8 @@ class ManageFieldsTest extends FieldUiTestBase {
     $vocabulary->save();
 
     $field = array(
-      'field_name' => 'field_' . $vocabulary->id(),
+      'name' => 'field_' . $vocabulary->id(),
+      'entity_type' => 'node',
       'type' => 'taxonomy_term_reference',
     );
     entity_create('field_entity', $field)->save();
@@ -276,7 +277,8 @@ class ManageFieldsTest extends FieldUiTestBase {
     // Create a test field and instance.
     $field_name = 'test';
     entity_create('field_entity', array(
-      'field_name' => $field_name,
+      'name' => $field_name,
+      'entity_type' => 'node',
       'type' => 'test_field'
     ))->save();
     $instance = entity_create('field_instance', array(
@@ -386,7 +388,8 @@ class ManageFieldsTest extends FieldUiTestBase {
     // Create a locked field and attach it to a bundle. We need to do this
     // programatically as there's no way to create a locked field through UI.
     $field = entity_create('field_entity', array(
-      'field_name' => strtolower($this->randomName(8)),
+      'name' => strtolower($this->randomName(8)),
+      'entity_type' => 'node',
       'type' => 'test_field',
       'cardinality' => 1,
       'locked' => TRUE
@@ -425,7 +428,11 @@ class ManageFieldsTest extends FieldUiTestBase {
 
     // Create a field and an instance programmatically.
     $field_name = 'hidden_test_field';
-    entity_create('field_entity', array('field_name' => $field_name, 'type' => $field_name))->save();
+    entity_create('field_entity', array(
+      'name' => $field_name,
+      'entity_type' => 'node',
+      'type' => $field_name,
+    ))->save();
     $instance = array(
       'field_name' => $field_name,
       'bundle' => $this->type,
@@ -501,7 +508,7 @@ class ManageFieldsTest extends FieldUiTestBase {
     // Check that the field instance was deleted.
     $this->assertNull(field_info_instance('taxonomy_term', $this->field_name, 'tags'), 'Field instance was deleted.');
     // Check that the field was deleted too.
-    $this->assertNull(field_info_field($this->field_name), 'Field was deleted.');
+    $this->assertNull(field_info_field('taxonomy_term', $this->field_name), 'Field was deleted.');
   }
 
   /**
@@ -510,7 +517,8 @@ class ManageFieldsTest extends FieldUiTestBase {
   function testHelpDescriptions() {
     // Create an image field
     entity_create('field_entity', array(
-      'field_name' => 'field_image',
+      'name' => 'field_image',
+      'entity_type' => 'node',
       'type' => 'image',
     ))->save();
 
