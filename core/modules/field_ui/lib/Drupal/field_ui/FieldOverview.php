@@ -336,13 +336,13 @@ class FieldOverview extends OverviewBase {
       $values = $form_values['_add_new_field'];
 
       $field = array(
-        'field_name' => $values['field_name'],
+        'name' => $values['field_name'],
         'entity_type' => $this->entity_type,
         'type' => $values['type'],
         'translatable' => $values['translatable'],
       );
       $instance = array(
-        'field_name' => $field['field_name'],
+        'field_name' => $values['field_name'],
         'entity_type' => $this->entity_type,
         'bundle' => $this->bundle,
         'label' => $values['label'],
