@@ -64,7 +64,8 @@ class OptionsWidgetsTest extends FieldTestBase {
 
     // Field with cardinality 1.
     $this->card_1 = entity_create('field_entity', array(
-      'field_name' => 'card_1',
+      'name' => 'card_1',
+      'entity_type' => 'entity_test',
       'type' => 'list_integer',
       'cardinality' => 1,
       'settings' => array(
@@ -76,7 +77,8 @@ class OptionsWidgetsTest extends FieldTestBase {
 
     // Field with cardinality 2.
     $this->card_2 = entity_create('field_entity', array(
-      'field_name' => 'card_2',
+      'name' => 'card_2',
+      'entity_type' => 'entity_test',
       'type' => 'list_integer',
       'cardinality' => 2,
       'settings' => array(
@@ -88,7 +90,8 @@ class OptionsWidgetsTest extends FieldTestBase {
 
     // Boolean field.
     $this->bool = entity_create('field_entity', array(
-      'field_name' => 'bool',
+      'name' => 'bool',
+      'entity_type' => 'entity_test',
       'type' => 'list_boolean',
       'cardinality' => 1,
       'settings' => array(

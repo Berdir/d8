@@ -259,7 +259,7 @@ class OptionsFieldUITest extends FieldTestBase {
   protected function createOptionsField($type) {
     // Create a test field and instance.
     entity_create('field_entity', array(
-      'field_name' => $this->field_name,
+      'name' => $this->field_name,
       'entity_type' => 'node',
       'type' => $type,
     ))->save();

@@ -43,9 +43,9 @@ class TermFieldMultipleVocabularyTest extends TaxonomyTestBase {
     // Set up a field and instance.
     $this->field_name = drupal_strtolower($this->randomName());
     entity_create('field_entity', array(
-      'field_name' => $this->field_name,
-      'type' => 'taxonomy_term_reference',
+      'name' => $this->field_name,
       'entity_type' => 'entity_test',
+      'type' => 'taxonomy_term_reference',
       'cardinality' => FIELD_CARDINALITY_UNLIMITED,
       'settings' => array(
         'allowed_values' => array(

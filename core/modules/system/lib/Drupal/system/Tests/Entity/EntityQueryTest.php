@@ -63,7 +63,8 @@ class EntityQueryTest extends EntityUnitTestBase {
     $greetings = drupal_strtolower($this->randomName());
     foreach (array($figures => 'shape', $greetings => 'text') as $field_name => $field_type) {
       $field = entity_create('field_entity', array(
-        'field_name' => $field_name,
+        'name' => $field_name,
+        'entity_type' => 'entity_test_mulrev',
         'type' => $field_type,
         'cardinality' => 2,
         'translatable' => TRUE,

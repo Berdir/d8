@@ -70,7 +70,7 @@ abstract class ImageFieldTestBase extends WebTestBase {
    */
   function createImageField($name, $type_name, $field_settings = array(), $instance_settings = array(), $widget_settings = array()) {
     $field = array(
-      'field_name' => $name,
+      'name' => $name,
       'entity_type' => 'node',
       'type' => 'image',
       'settings' => array(),

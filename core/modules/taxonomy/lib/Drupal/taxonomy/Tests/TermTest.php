@@ -29,7 +29,8 @@ class TermTest extends TaxonomyTestBase {
     $this->vocabulary = $this->createVocabulary();
 
     $field = array(
-      'field_name' => 'taxonomy_' . $this->vocabulary->id(),
+      'name' => 'taxonomy_' . $this->vocabulary->id(),
+      'entity_type' => 'node',
       'type' => 'taxonomy_term_reference',
       'cardinality' => FIELD_CARDINALITY_UNLIMITED,
       'settings' => array(
