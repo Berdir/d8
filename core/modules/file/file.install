@@ -315,11 +315,11 @@ function file_update_8003() {
 
       foreach ($tables as $table_name) {
         // Skip fields which were created during the upgrade process.
-        if (!db_field_exists($table_name, $field->id() . '_fid')) {
+        if (!db_field_exists($table_name, $field->name . '_fid')) {
           continue 2;
         }
 
-        db_change_field($table_name, $field->id() . '_fid', $field->id() . '_target_id', array(
+        db_change_field($table_name, $field->name . '_fid', $field->name . '_target_id', array(
           'description' => 'The ID of the target entity.',
           'type' => 'int',
           'unsigned' => TRUE,
@@ -327,8 +327,8 @@ function file_update_8003() {
         ));
 
         // Change the index.
-        db_drop_index($table_name, $field->id() . '_fid');
-        db_add_index($table_name, $field->id() . '_target_id', array($field->id() . '_target_id'));
+        db_drop_index($table_name, $field->name . '_fid');
+        db_add_index($table_name, $field->name . '_target_id', array($field->name . '_target_id'));
       }
 
       // Update the indexes in field config as well.

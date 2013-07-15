@@ -370,7 +370,7 @@ function taxonomy_update_8007() {
       );
 
       foreach ($tables as $table_name) {
-        db_change_field($table_name, $field->id() . '_tid', $field->id() . '_target_id', array(
+        db_change_field($table_name, $field->name . '_tid', $field->name . '_target_id', array(
           'description' => 'The ID of the target entity.',
           'type' => 'int',
           'unsigned' => TRUE,
@@ -378,8 +378,8 @@ function taxonomy_update_8007() {
         ));
 
         // Change the index.
-        db_drop_index($table_name, $field->id() . '_tid');
-        db_add_index($table_name, $field->id() . '_target_id', array($field->id() . '_target_id'));
+        db_drop_index($table_name, $field->name . '_tid');
+        db_add_index($table_name, $field->name . '_target_id', array($field->name . '_target_id'));
       }
 
       // Update the indexes in field config as well.

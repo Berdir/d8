@@ -216,9 +216,8 @@ class CrudTest extends FieldUnitTestBase {
     );
     $field = entity_create('field_entity', $field_definition);
     $field->save();
-    $id = $field->id();
     field_cache_clear();
-    $field = entity_load('field_entity', $id);
+    $field = entity_load('field_entity', $field->id());
     $schema = $field->getSchema();
     $expected_indexes = array('value' => array('value'));
     $this->assertEqual($schema['indexes'], $expected_indexes, 'Field type indexes saved by default');
@@ -235,9 +234,8 @@ class CrudTest extends FieldUnitTestBase {
     );
     $field = entity_create('field_entity', $field_definition);
     $field->save();
-    $id = $field->id();
     field_cache_clear();
-    $field = entity_load('field_entity', $id);
+    $field = entity_load('field_entity', $field->id());
     $schema = $field->getSchema();
     $expected_indexes = array('value' => array());
     $this->assertEqual($schema['indexes'], $expected_indexes, 'Field definition indexes override field type indexes');
