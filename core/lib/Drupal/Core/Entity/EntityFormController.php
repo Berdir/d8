@@ -295,6 +295,7 @@ class EntityFormController implements EntityFormControllerInterface {
    */
   public function validate(array $form, array &$form_state) {
     $entity = $this->buildEntity($form, $form_state);
+    $entity_type = $entity->entityType();
     $entity_langcode = $entity->language()->id;
 
     $violations = array();
@@ -311,9 +312,9 @@ class EntityFormController implements EntityFormControllerInterface {
     else {
       // For BC entities, iterate through each field instance and
       // instantiate NG items objects manually.
-      $definitions = \Drupal::entityManager()->getFieldDefinitions($entity->entityType(), $entity->bundle());
-      foreach (field_info_instances($entity->entityType(), $entity->bundle()) as $field_name => $instance) {
-        $langcode = field_is_translatable($entity->entityType(), $instance->getField()) ? $entity_langcode : Language::LANGCODE_NOT_SPECIFIED;
+      $definitions = \Drupal::entityManager()->getFieldDefinitions($entity_type, $entity->bundle());
+      foreach (field_info_instances($entity_type, $entity->bundle()) as $field_name => $instance) {
+        $langcode = field_is_translatable($entity_type, $instance->getField()) ? $entity_langcode : Language::LANGCODE_NOT_SPECIFIED;
 
         // Create the field object.
         $items = isset($entity->{$field_name}[$langcode]) ? $entity->{$field_name}[$langcode] : array();
@@ -330,7 +331,7 @@ class EntityFormController implements EntityFormControllerInterface {
     // Map errors back to form elements.
     if ($violations) {
       foreach ($violations as $field_name => $field_violations) {
-        $langcode = field_is_translatable($entity->entityType(), field_info_field($this->entityType, $field_name)) ? $entity_langcode : Language::LANGCODE_NOT_SPECIFIED;
+        $langcode = field_is_translatable($entity_type , field_info_field($entity_type, $field_name)) ? $entity_langcode : Language::LANGCODE_NOT_SPECIFIED;
         $field_state = field_form_get_state($form['#parents'], $field_name, $langcode, $form_state);
         $field_state['constraint_violations'] = $field_violations;
         field_form_set_state($form['#parents'], $field_name, $langcode, $form_state, $field_state);
