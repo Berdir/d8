@@ -42,7 +42,8 @@ function translation_node_overview(EntityInterface $node) {
     if (isset($translations[$langcode])) {
       // Existing translation in the translation set: display status.
       // We load the full node to check whether the user can edit it.
-      $translation_node = node_load($translations[$langcode]->nid);
+      $nid = $translations[$langcode] instanceof EntityInterface ? $translations[$langcode]->id() : $translations[$langcode]->nid;
+      $translation_node = node_load($nid);
       $path = 'node/' . $translation_node->id();
       $links = language_negotiation_get_switch_links($type, $path);
       $title = empty($links->links[$langcode]['href']) ? l($translation_node->label(), $path) : l($translation_node->label(), $links->links[$langcode]['href'], $links->links[$langcode]);
