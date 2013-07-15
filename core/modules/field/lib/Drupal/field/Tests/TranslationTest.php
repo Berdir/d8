@@ -92,7 +92,7 @@ class TranslationTest extends FieldUnitTestBase {
       'translatable' => TRUE,
     );
     entity_create('field_entity', $this->field_definition)->save();
-    $this->field = field_read_field($this->field_name);
+    $this->field = field_read_field($this->entity_type, $this->field_name);
 
     $this->instance_definition = array(
       'field_name' => $this->field_name,

@@ -70,7 +70,7 @@ class TranslationWebTest extends FieldTestBase {
       'translatable' => TRUE,
     );
     entity_create('field_entity', $field)->save();
-    $this->field = field_read_field($this->field_name);
+    $this->field = field_read_field($this->entity_type, $this->field_name);
 
     $instance = array(
       'field_name' => $this->field_name,

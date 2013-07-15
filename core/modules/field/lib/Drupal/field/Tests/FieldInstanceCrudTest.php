@@ -178,7 +178,7 @@ class FieldInstanceCrudTest extends FieldUnitTestBase {
     $another_instance->delete();
     $deleted_fields = \Drupal::state()->get('field.field.deleted');
     $this->assertTrue(isset($deleted_fields[$another_instance['field_id']]), 'A deleted field is marked for deletion.');
-    $field = field_read_field($another_instance['field_name']);
+    $field = field_read_field($another_instance['entity_type'], $another_instance['field_name']);
     $this->assertFalse($field, 'The field marked to be deleted is not found anymore in the configuration.');
   }
 
