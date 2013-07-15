@@ -99,21 +99,21 @@ class FieldListController extends ConfigEntityListController {
   /**
    * {@inheritdoc}
    */
-  public function buildRow(EntityInterface $entity) {
-    if ($entity->locked) {
+  public function buildRow(EntityInterface $field) {
+    if ($field->locked) {
       $row['class'] = array('menu-disabled');
-      $row['data']['id'] =  t('@field_name (Locked)', array('@field_name' => $entity->id()));
+      $row['data']['id'] =  t('@field_name (Locked)', array('@field_name' => $field->name));
     }
     else {
-      $row['data']['id'] = $entity->id();
+      $row['data']['id'] = $field->name;
     }
 
-    $field_type = $this->fieldTypes[$entity->getFieldType()];
+    $field_type = $this->fieldTypes[$field->type];
     $row['data']['type'] = t('@type (module: @module)', array('@type' => $field_type['label'], '@module' => $field_type['module']));
 
     $usage = array();
-    foreach($this->fieldInfo[$entity->id()]['bundles'] as $entity_type => $field_bundles) {
-      foreach($field_bundles as $bundle) {
+    foreach ($field->getBundles() as $entity_type => $field_bundles) {
+      foreach ($field_bundles as $bundle) {
         $admin_path = $this->entityManager->getAdminPath($entity_type, $bundle);
         $usage[] = $admin_path ? l($this->bundles[$entity_type][$bundle]['label'], $admin_path . '/fields') : $this->bundles[$entity_type][$bundle]['label'];
       }

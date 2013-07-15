@@ -117,13 +117,6 @@ class ManageFieldsTest extends FieldUiTestBase {
       'fields[_add_new_field][field_name]' => $this->field_name_input,
     );
     $this->fieldUIAddNewField('admin/structure/types/manage/' . $this->type, $edit);
-
-    // Assert the field appears in the "re-use existing field" section for
-    // different entity types; e.g. if a field was added in a node entity, it
-    // should also appear in the 'taxonomy term' entity.
-    $vocabulary = taxonomy_vocabulary_load('tags');
-    $this->drupalGet('admin/structure/taxonomy/manage/' . $vocabulary->id() . '/fields');
-    $this->assertTrue($this->xpath('//select[@name="fields[_add_existing_field][field_name]"]//option[@value="' . $this->field_name . '"]'), 'Existing field was found in taxonomy term fields.');
   }
 
   /**
@@ -163,9 +156,8 @@ class ManageFieldsTest extends FieldUiTestBase {
     $this->drupalGet('admin/structure/types/manage/page/fields');
     $this->assertRaw(t('Re-use existing field'), '"Re-use existing field" was found.');
 
-    // Check that the list of options respects entity type restrictions on
-    // fields. The 'comment' field is restricted to the 'comment' entity type
-    // and should not appear in the list.
+    // Check that fields of other entity types (here, the 'comment_body' field)
+    // do not show up in the "Re-use existing field" list.
     $this->assertFalse($this->xpath('//select[@id="edit-add-existing-field-field-name"]//option[@value="comment"]'), 'The list of options respects entity type restrictions.');
 
     // Add a new field based on an existing field.
@@ -368,7 +360,7 @@ class ManageFieldsTest extends FieldUiTestBase {
     // Check that the field instance was deleted.
     $this->assertNull(field_info_instance('node', $this->field_name, $this->type), 'Field instance was deleted.');
     // Check that the field was not deleted
-    $this->assertNotNull(field_info_field($this->field_name), 'Field was not deleted.');
+    $this->assertNotNull(field_info_field('node', $this->field_name), 'Field was not deleted.');
 
     // Delete the second instance.
     $this->fieldUIDeleteField($bundle_path2, "node.$type_name2.$this->field_name", $this->field_label, $type_name2);
@@ -378,7 +370,7 @@ class ManageFieldsTest extends FieldUiTestBase {
     // Check that the field instance was deleted.
     $this->assertNull(field_info_instance('node', $this->field_name, $type_name2), 'Field instance was deleted.');
     // Check that the field was deleted too.
-    $this->assertNull(field_info_field($this->field_name), 'Field was deleted.');
+    $this->assertNull(field_info_field('node', $this->field_name), 'Field was deleted.');
   }
 
   /**
