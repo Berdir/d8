@@ -269,7 +269,7 @@ class FieldInfo {
         $this->getFields();
 
         foreach (field_read_instances() as $instance) {
-          $field = $this->getField($instance['field_name']);
+          $field = $this->getField($instance['entity_type'], $instance['field_name']);
           $instance = $this->prepareInstance($instance, $field['type']);
           $this->bundleInstances[$instance['entity_type']][$instance['bundle']][$instance['field_name']] = $instance;
         }
