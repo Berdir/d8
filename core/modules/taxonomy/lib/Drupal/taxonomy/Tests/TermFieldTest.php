@@ -46,7 +46,7 @@ class TermFieldTest extends TaxonomyTestBase {
     // Setup a field and instance.
     $this->field_name = drupal_strtolower($this->randomName());
     $this->field = entity_create('field_entity', array(
-      'field_name' => $this->field_name,
+      'name' => $this->field_name,
       'type' => 'taxonomy_term_reference',
       'entity_type' => 'entity_test',
       'settings' => array(
@@ -61,6 +61,7 @@ class TermFieldTest extends TaxonomyTestBase {
     $this->field->save();
     entity_create('field_instance', array(
       'field_name' => $this->field_name,
+      'entity_type' => 'entity_test',
       'bundle' => 'entity_test',
     ))->save();
     entity_get_form_display('entity_test', 'entity_test', 'default')

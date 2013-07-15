@@ -265,6 +265,7 @@ class OptionsFieldUITest extends FieldTestBase {
     ))->save();
     entity_create('field_instance', array(
       'field_name' => $this->field_name,
+      'entity_type' => 'node',
       'bundle' => $this->type,
     ))->save();
 

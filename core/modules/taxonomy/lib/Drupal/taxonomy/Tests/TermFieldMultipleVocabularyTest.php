@@ -62,6 +62,7 @@ class TermFieldMultipleVocabularyTest extends TaxonomyTestBase {
     ))->save();
     entity_create('field_instance', array(
       'field_name' => $this->field_name,
+      'entity_type' => 'entity_test',
       'bundle' => 'entity_test',
     ))->save();
     entity_get_form_display('entity_test', 'entity_test', 'default')
