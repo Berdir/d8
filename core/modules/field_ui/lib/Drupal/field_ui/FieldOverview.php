@@ -337,6 +337,7 @@ class FieldOverview extends OverviewBase {
 
       $field = array(
         'field_name' => $values['field_name'],
+        'entity_type' => $this->entity_type,
         'type' => $values['type'],
         'translatable' => $values['translatable'],
       );
