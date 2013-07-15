@@ -174,7 +174,7 @@ class FieldEditForm implements FormInterface, ControllerInterface {
     unset($field_values['container']);
 
     // Merge incoming form values into the existing field.
-    $field = Field::fieldInfo()->getField($this->instance->entity_type, $this->entity['field_name']);
+    $field = $this->instance->getField();
     foreach ($field_values as $key => $value) {
       $field[$key] = $value;
     }
