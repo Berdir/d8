@@ -166,7 +166,7 @@ class FieldInfo {
     }
 
     // Read from persistent cache.
-    if (FALSE && $cached = $this->cacheBackend->get('field_info:field_map')) {
+    if ($cached = $this->cacheBackend->get('field_info:field_map')) {
       $map = $cached->data;
 
       // Save in "static" cache.
@@ -394,7 +394,7 @@ class FieldInfo {
     }
 
     // Read from the persistent cache.
-    if (FALSE && $cached = $this->cacheBackend->get("field_info:bundle:$entity_type:$bundle")) {
+    if ($cached = $this->cacheBackend->get("field_info:bundle:$entity_type:$bundle")) {
       $info = $cached->data;
 
       // Extract the field definitions and save them in the "static" cache.
@@ -438,22 +438,24 @@ class FieldInfo {
 
       // Load and prepare the corresponding fields and instances entities.
       if ($config_ids) {
+        // Place the fields in our global "static".
         $loaded_fields = entity_load_multiple('field_entity', array_keys($config_ids));
-        $loaded_instances = entity_load_multiple('field_instance', array_values($config_ids));
-
-        foreach ($loaded_instances as $instance) {
-          $field = $instance->getField();
-
-          $instance = $this->prepareInstance($instance, $field['type']);
-          $instances[$field['field_name']] = $instance;
-
-          // If the field is not in our global "static" list yet, add it.
+        foreach ($loaded_fields as $field) {
           if (!isset($this->fieldsById[$field['uuid']])) {
             $field = $this->prepareField($field);
 
             $this->fieldsById[$field['uuid']] = $field;
             $this->fieldIdsByName[$field->entity_type][$field->name] = $field['uuid'];
           }
+        }
+
+        // Then collect the instances.
+        $loaded_instances = entity_load_multiple('field_instance', array_values($config_ids));
+        foreach ($loaded_instances as $instance) {
+          $field = $instance->getField();
+
+          $instance = $this->prepareInstance($instance, $field['type']);
+          $instances[$field['field_name']] = $instance;
         }
       }
     }
