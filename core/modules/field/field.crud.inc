@@ -254,7 +254,7 @@ function field_purge_batch($batch_size) {
       'bundle' => $instance['bundle'],
     );
     // field_purge_data() will need the field array.
-    $field = field_info_field_by_id($instance['field_id']);
+    $field = $instance->getField();
     // Retrieve some entities.
     $query = $factory->get($entity_type)
       ->condition('id:' . $field['uuid'] . '.deleted', 1)
@@ -300,7 +300,7 @@ function field_purge_batch($batch_size) {
  */
 function field_purge_instance($instance) {
   // Notify the storage engine.
-  $field = field_info_field_by_id($instance['field_id']);
+  $field = $instance->getField();
   module_invoke($field['storage']['module'], 'field_storage_purge_instance', $instance);
 
   $state = Drupal::state();

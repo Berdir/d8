@@ -810,7 +810,7 @@ function hook_field_storage_write(\Drupal\Core\Entity\EntityInterface $entity, $
 function hook_field_storage_delete(\Drupal\Core\Entity\EntityInterface $entity, $fields) {
   foreach (field_info_instances($entity->entityType(), $entity->bundle()) as $instance) {
     if (isset($fields[$instance['field_id']])) {
-      $field = field_info_field_by_id($instance['field_id']);
+      $field = $instance->getField();
       field_sql_storage_field_storage_purge($entity, $field, $instance);
     }
   }

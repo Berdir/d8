@@ -166,7 +166,7 @@ class FieldInfo {
     }
 
     // Read from persistent cache.
-    if ($cached = $this->cacheBackend->get('field_info:field_map')) {
+    if (FALSE && $cached = $this->cacheBackend->get('field_info:field_map')) {
       $map = $cached->data;
 
       // Save in "static" cache.
@@ -192,8 +192,8 @@ class FieldInfo {
       // entity types.
       if (isset($fields[$field_uuid])) {
         $field = $fields[$field_uuid];
-        $map[$field['id']]['bundles'][$instance_config['entity_type']][] = $instance_config['bundle'];
-        $map[$field['id']]['type'] = $field['type'];
+        $map[$field['name']]['bundles'][$instance_config['entity_type']][] = $instance_config['bundle'];
+        $map[$field['name']]['type'] = $field['type'];
       }
     }
 
@@ -394,7 +394,7 @@ class FieldInfo {
     }
 
     // Read from the persistent cache.
-    if ($cached = $this->cacheBackend->get("field_info:bundle:$entity_type:$bundle")) {
+    if (FALSE && $cached = $this->cacheBackend->get("field_info:bundle:$entity_type:$bundle")) {
       $info = $cached->data;
 
       // Extract the field definitions and save them in the "static" cache.
@@ -432,7 +432,7 @@ class FieldInfo {
       $config_ids = array();
       foreach ($this->getFieldMap() as $field_name => $field_data) {
         if (isset($field_data['bundles'][$entity_type]) && in_array($bundle, $field_data['bundles'][$entity_type])) {
-          $config_ids[$field_name] = "$entity_type.$bundle.$field_name";
+          $config_ids["$entity_type.$field_name"] = "$entity_type.$bundle.$field_name";
         }
       }
 
@@ -442,7 +442,7 @@ class FieldInfo {
         $loaded_instances = entity_load_multiple('field_instance', array_values($config_ids));
 
         foreach ($loaded_instances as $instance) {
-          $field = $loaded_fields[$instance['field_name']];
+          $field = $instance->getField();
 
           $instance = $this->prepareInstance($instance, $field['type']);
           $instances[$field['field_name']] = $instance;

@@ -51,7 +51,7 @@ class CrudTest extends FieldUnitTestBase {
     // Read the configuration. Check against raw configuration data rather than
     // the loaded ConfigEntity, to be sure we check that the defaults are
     // applied on write.
-    $field_config = \Drupal::config('field.field.' . $field->id())->get();
+    $field_config = \Drupal::config('field.field.' . $field->getFieldName())->get();
 
     // Ensure that basic properties are preserved.
     $this->assertEqual($field_config['id'], $field_definition['field_name'], 'The field name is properly saved.');

@@ -122,7 +122,7 @@ class FieldInfoTest extends FieldUnitTestBase {
     // Simulate a stored field definition missing a field setting (e.g. a
     // third-party module adding a new field setting has been enabled, and
     // existing fields do not know the setting yet).
-    \Drupal::config('field.field.' . $field->id())
+    \Drupal::config('field.field.' . $field->getFieldName())
       ->set('settings', array())
       ->save();
     field_info_cache_clear();

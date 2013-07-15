@@ -302,7 +302,7 @@ abstract class FieldableEntityStorageControllerBase extends EntityStorageControl
     $field = $instance->getField();
     foreach ($values as $value) {
       $definition = _field_generate_entity_field_definition($field, $instance);
-      $items = \Drupal::typedData()->create($definition, $value, $field->id(), $entity);
+      $items = \Drupal::typedData()->create($definition, $value, $field->getFieldName(), $entity);
       $items->delete();
     }
   }

@@ -306,7 +306,7 @@ function field_entity_field_info($entity_type) {
 function _field_generate_entity_field_definition(FieldInterface $field, FieldInstanceInterface $instance = NULL) {
   // @todo: Allow for adding field type settings.
   $definition = array(
-    'label' => t('Field !name', array('!name' => $field->id())),
+    'label' => t('Field !name', array('!name' => $field->getFieldName())),
     'type' => 'field_item:' . $field->type,
     'list' => TRUE,
     'configurable' => TRUE,

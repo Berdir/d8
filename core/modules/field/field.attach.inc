@@ -130,7 +130,7 @@ function field_invoke_method($method, $target_function, EntityInterface $entity,
     $target = call_user_func($target_function, $instance);
 
     if (method_exists($target, $method)) {
-      $field = field_info_field_by_id($instance['field_id']);
+      $field = $instance->getField();
       $field_name = $field['field_name'];
 
       // Determine the list of languages to iterate on.
@@ -242,7 +242,7 @@ function field_invoke_method_multiple($method, $target_function, array $entities
 
         // Unless a language code suggestion is provided we iterate on all the
         // available language codes.
-        $field = field_info_field_by_id($instance['field_id']);
+        $field = $instance->getField();
         $available_langcodes = field_available_languages($entity_type, $field);
         $langcode = !empty($options['langcode'][$id]) ? $options['langcode'][$id] : $options['langcode'];
         $langcodes = _field_language_suggestion($available_langcodes, $langcode, $field_name);

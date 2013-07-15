@@ -887,7 +887,7 @@ class DatabaseStorageController extends FieldableEntityStorageControllerBase {
     // We need to account for deleted or inactive fields and instances.
     $instances = field_read_instances(array('entity_type' => $this->entityType, 'bundle' => $bundle_new), array('include_deleted' => TRUE, 'include_inactive' => TRUE));
     foreach ($instances as $instance) {
-      $field = field_info_field_by_id($instance['field_id']);
+      $field = $instance->getField();
       if ($field['storage']['type'] == 'field_sql_storage') {
         $table_name = static::_fieldTableName($field);
         $revision_name = static::_fieldRevisionTableName($field);
@@ -1139,7 +1139,7 @@ class DatabaseStorageController extends FieldableEntityStorageControllerBase {
    *   unique among all other fields.
    */
   static public function _fieldIndexName(FieldInterface $field, $index) {
-    return $field->id() . '_' . $index;
+    return $field->getFieldName() . '_' . $index;
   }
 
   /**
@@ -1162,7 +1162,7 @@ class DatabaseStorageController extends FieldableEntityStorageControllerBase {
    *   unique among all other fields.
    */
   static public function _fieldColumnName(FieldInterface $field, $column) {
-    return in_array($column, Field::getReservedColumns()) ? $column : $field->id() . '_' . $column;
+    return in_array($column, Field::getReservedColumns()) ? $column : $field->getFieldName() . '_' . $column;
   }
 
 }
