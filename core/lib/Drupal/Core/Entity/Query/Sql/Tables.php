@@ -248,7 +248,7 @@ class Tables {
         $this->sqlQuery->addMetaData('simple_query', FALSE);
       }
       $entity_type = $this->sqlQuery->getMetaData('entity_type');
-      $this->fieldTables[$index_prefix . $field_name] = $this->addJoin($type, $table, "%alias.$field_id_field = $base_table.$entity_id_field AND %alias.entity_type = '$entity_type'", $langcode);
+      $this->fieldTables[$index_prefix . $field_name] = $this->addJoin($type, $table, "%alias.$field_id_field = $base_table.$entity_id_field", $langcode);
     }
     return $this->fieldTables[$index_prefix . $field_name];
   }
