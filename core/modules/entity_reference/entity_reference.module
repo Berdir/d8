@@ -412,7 +412,7 @@ function entity_reference_create_instance($entity_type, $bundle, $field_name, $f
 
   if (empty($field)) {
     $field = array(
-      'field_name' => $field_name,
+      'name' => $field_name,
       'type' => 'entity_reference',
       'entity_type' => $entity_type,
       'settings' => array(

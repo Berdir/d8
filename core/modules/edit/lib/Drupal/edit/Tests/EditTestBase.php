@@ -55,7 +55,8 @@ class EditTestBase extends DrupalUnitTestBase {
   function createFieldWithInstance($field_name, $type, $cardinality, $label, $instance_settings, $widget_type, $widget_settings, $formatter_type, $formatter_settings) {
     $field = $field_name . '_field';
     $this->$field = entity_create('field_entity', array(
-      'field_name' => $field_name,
+      'name' => $field_name,
+      'entity_type' => 'entity_test',
       'type' => $type,
       'cardinality' => $cardinality,
     ));

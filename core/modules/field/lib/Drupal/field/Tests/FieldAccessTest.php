@@ -52,7 +52,8 @@ class FieldAccessTest extends FieldTestBase {
     $content_type = $content_type_info->type;
 
     $field = array(
-      'field_name' => 'test_view_field',
+      'name' => 'test_view_field',
+      'entity_type' => 'node',
       'type' => 'text',
     );
     entity_create('field_entity', $field)->save();

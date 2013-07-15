@@ -324,9 +324,9 @@ function _comment_body_field_create($info) {
   // Create the field if needed.
   if (!field_read_field('comment_body', array('include_inactive' => TRUE))) {
     $field = entity_create('field_entity', array(
-      'field_name' => 'comment_body',
+      'name' => 'comment_body',
       'type' => 'text_long',
-      'entity_types' => array('comment'),
+      'entity_type' => 'comment',
     ));
     $field->save();
   }

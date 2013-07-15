@@ -61,12 +61,13 @@ class EntityReferenceSelectionAccessTest extends WebTestBase {
   public function testNodeHandler() {
     // Create a field and instance.
     $field = entity_create('field_entity', array(
+      'name' => 'test_field',
+      'entity_type' => 'entity_test',
       'translatable' => FALSE,
       'entity_types' => array(),
       'settings' => array(
         'target_type' => 'node',
       ),
-      'field_name' => 'test_field',
       'type' => 'entity_reference',
       'cardinality' => '1',
     ));
@@ -204,12 +205,12 @@ class EntityReferenceSelectionAccessTest extends WebTestBase {
   public function testUserHandler() {
     // Create a field and instance.
     $field = entity_create('field_entity', array(
+      'name' => 'test_field',
+      'entity_type' => 'entity_test',
       'translatable' => FALSE,
-      'entity_types' => array(),
       'settings' => array(
         'target_type' => 'user',
       ),
-      'field_name' => 'test_field',
       'type' => 'entity_reference',
       'cardinality' => '1',
     ));
@@ -349,12 +350,13 @@ class EntityReferenceSelectionAccessTest extends WebTestBase {
   public function testCommentHandler() {
     // Create a field and instance.
     $field = entity_create('field_entity', array(
+      'name' => 'test_field',
+      'entity_type' => 'entity_test',
       'translatable' => FALSE,
       'entity_types' => array(),
       'settings' => array(
         'target_type' => 'comment',
       ),
-      'field_name' => 'test_field',
       'type' => 'entity_reference',
       'cardinality' => '1',
     ));

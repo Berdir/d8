@@ -37,7 +37,8 @@ class CrudTest extends FieldUnitTestBase {
    */
   function testCreateField() {
     $field_definition = array(
-      'field_name' => 'field_2',
+      'name' => 'field_2',
+      'entity_type' => 'entity_test',
       'type' => 'test_field',
     );
     field_test_memorize();
@@ -75,7 +76,8 @@ class CrudTest extends FieldUnitTestBase {
     // Check that field type is required.
     try {
       $field_definition = array(
-        'field_name' => 'field_1',
+        'name' => 'field_1',
+        'entity_type' => 'entity_type',
       );
       entity_create('field_entity', $field_definition)->save();
       $this->fail(t('Cannot create a field with no type.'));
@@ -87,7 +89,8 @@ class CrudTest extends FieldUnitTestBase {
     // Check that field name is required.
     try {
       $field_definition = array(
-        'type' => 'test_field'
+        'type' => 'test_field',
+        'entity_type' => 'entity_test',
       );
       entity_create('field_entity', $field_definition)->save();
       $this->fail(t('Cannot create an unnamed field.'));
@@ -95,11 +98,24 @@ class CrudTest extends FieldUnitTestBase {
     catch (FieldException $e) {
       $this->pass(t('Cannot create an unnamed field.'));
     }
+    // Check that entity type is required.
+    try {
+      $field_definition = array(
+        'name' => 'test_field',
+        'type' => 'test_field'
+      );
+      entity_create('field_entity', $field_definition)->save();
+      $this->fail('Cannot create a field without an entity type.');
+    }
+    catch (FieldException $e) {
+      $this->pass('Cannot create a field without an entity type.');
+    }
 
     // Check that field name must start with a letter or _.
     try {
       $field_definition = array(
-        'field_name' => '2field_2',
+        'name' => '2field_2',
+        'entity_type' => 'entity_test',
         'type' => 'test_field',
       );
       entity_create('field_entity', $field_definition)->save();
@@ -112,7 +128,8 @@ class CrudTest extends FieldUnitTestBase {
     // Check that field name must only contain lowercase alphanumeric or _.
     try {
       $field_definition = array(
-        'field_name' => 'field#_3',
+        'name' => 'field#_3',
+        'entity_type' => 'entity_test',
         'type' => 'test_field',
       );
       entity_create('field_entity', $field_definition)->save();
@@ -125,7 +142,8 @@ class CrudTest extends FieldUnitTestBase {
     // Check that field name cannot be longer than 32 characters long.
     try {
       $field_definition = array(
-        'field_name' => '_12345678901234567890123456789012',
+        'name' => '_12345678901234567890123456789012',
+        'entity_type' => 'entity_test',
         'type' => 'test_field',
       );
       entity_create('field_entity', $field_definition)->save();
@@ -140,7 +158,8 @@ class CrudTest extends FieldUnitTestBase {
     try {
       $field_definition = array(
         'type' => 'test_field',
-        'field_name' => 'id',
+        'name' => 'id',
+        'entity_type' => 'entity_test',
       );
       entity_create('field_entity', $field_definition)->save();
       $this->fail(t('Cannot create a field bearing the name of an entity key.'));
@@ -155,7 +174,8 @@ class CrudTest extends FieldUnitTestBase {
    */
   function testReadField() {
     $field_definition = array(
-      'field_name' => 'field_1',
+      'name' => 'field_1',
+      'entity_type' => 'entity_test',
       'type' => 'test_field',
     );
     entity_create('field_entity', $field_definition)->save();
@@ -170,7 +190,8 @@ class CrudTest extends FieldUnitTestBase {
    */
   function testReadFields() {
     $field_definition = array(
-      'field_name' => 'field_1',
+      'name' => 'field_1',
+      'entity_type' => 'entity_test',
       'type' => 'test_field',
     );
     entity_create('field_entity', $field_definition)->save();
@@ -200,7 +221,8 @@ class CrudTest extends FieldUnitTestBase {
   function testFieldIndexes() {
     // Check that indexes specified by the field type are used by default.
     $field_definition = array(
-      'field_name' => 'field_1',
+      'name' => 'field_1',
+      'entity_type' => 'entity_test',
       'type' => 'test_field',
     );
     entity_create('field_entity', $field_definition)->save();
@@ -212,7 +234,8 @@ class CrudTest extends FieldUnitTestBase {
     // Check that indexes specified by the field definition override the field
     // type indexes.
     $field_definition = array(
-      'field_name' => 'field_2',
+      'name' => 'field_2',
+      'entity_type' => 'entity_test',
       'type' => 'test_field',
       'indexes' => array(
         'value' => array(),
@@ -227,7 +250,8 @@ class CrudTest extends FieldUnitTestBase {
     // Check that indexes specified by the field definition add to the field
     // type indexes.
     $field_definition = array(
-      'field_name' => 'field_3',
+      'name' => 'field_3',
+      'entity_type' => 'entity_test',
       'type' => 'test_field',
       'indexes' => array(
         'value_2' => array('value'),
@@ -247,9 +271,17 @@ class CrudTest extends FieldUnitTestBase {
     // TODO: Also test deletion of the data stored in the field ?
 
     // Create two fields (so we can test that only one is deleted).
-    $this->field = array('field_name' => 'field_1', 'type' => 'test_field', 'entity_type' => 'entity_test');
+    $this->field = array(
+      'name' => 'field_1',
+      'type' => 'test_field',
+      'entity_type' => 'entity_test',
+    );
     entity_create('field_entity', $this->field)->save();
-    $this->another_field = array('field_name' => 'field_2', 'type' => 'test_field', 'entity_type' => 'entity_test');
+    $this->another_field = array(
+      'name' => 'field_2',
+      'type' => 'test_field',
+      'entity_type' => 'entity_test',
+    );
     entity_create('field_entity', $this->another_field)->save();
 
     // Create instances for each.
@@ -314,7 +346,11 @@ class CrudTest extends FieldUnitTestBase {
   }
 
   function testUpdateFieldType() {
-    $field_definition = array('field_name' => 'field_type', 'type' => 'number_decimal');
+    $field_definition = array(
+      'name' => 'field_type',
+      'entity_type' => 'entity_test',
+      'type' => 'number_decimal',
+    );
     $field = entity_create('field_entity', $field_definition);
     $field->save();
 
@@ -337,7 +373,8 @@ class CrudTest extends FieldUnitTestBase {
     // systems, it makes a good test case.
     $cardinality = 4;
     $field = entity_create('field_entity', array(
-      'field_name' => 'field_update',
+      'name' => 'field_update',
+      'entity_type' => 'entity_test',
       'type' => 'test_field',
       'cardinality' => $cardinality,
     ));
@@ -374,7 +411,8 @@ class CrudTest extends FieldUnitTestBase {
    */
   function testUpdateFieldForbid() {
     $field = entity_create('field_entity', array(
-      'field_name' => 'forbidden',
+      'name' => 'forbidden',
+      'entit_type' => 'entity_test',
       'type' => 'test_field',
       'settings' => array(
         'changeable' => 0,

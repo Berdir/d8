@@ -125,7 +125,11 @@ class FieldAttachStorageTest extends FieldUnitTestBase {
     );
     for ($i = 1; $i <= 3; $i++) {
       $field_names[$i] = 'field_' . $i;
-      $field = entity_create('field_entity', array('field_name' => $field_names[$i], 'type' => 'test_field'));
+      $field = entity_create('field_entity', array(
+        'name' => $field_names[$i],
+        'entity_type' => $entity_type,
+        'type' => 'test_field',
+      ));
       $field->save();
       $field_ids[$i] = $field['uuid'];
       foreach ($field_bundles_map[$i] as $bundle) {
@@ -354,7 +358,12 @@ class FieldAttachStorageTest extends FieldUnitTestBase {
 
     // Create a second field for the test bundle
     $field_name = drupal_strtolower($this->randomName() . '_field_name');
-    $field = array('field_name' => $field_name, 'type' => 'test_field', 'cardinality' => 1);
+    $field = array(
+      'name' => $field_name,
+      'entity_type' => $entity_type,
+      'type' => 'test_field',
+      'cardinality' => 1,
+    );
     entity_create('field_entity', $field)->save();
     $instance = array(
       'field_name' => $field_name,

@@ -14,7 +14,7 @@ class ActiveTest extends FieldTestBase {
    *
    * @var array
    */
-  public static $modules = array('field_test');
+  public static $modules = array('field_test', 'entity_test');
 
   public static function getInfo() {
     return array(
@@ -29,13 +29,9 @@ class ActiveTest extends FieldTestBase {
    */
   function testActive() {
     $field_definition = array(
-      'field_name' => 'field_1',
+      'name' => 'field_1',
+      'entity_type' => 'entity_test',
       'type' => 'test_field',
-      // For this test, we need a storage backend provided by a different
-      // module than field_test.module.
-      'storage' => array(
-        'type' => 'field_sql_storage',
-      ),
     );
     entity_create('field_entity', $field_definition)->save();
 

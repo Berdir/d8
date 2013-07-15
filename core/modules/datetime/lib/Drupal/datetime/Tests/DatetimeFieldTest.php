@@ -57,7 +57,8 @@ class DatetimeFieldTest extends WebTestBase {
 
     // Create a field with settings to validate.
     $this->field = entity_create('field_entity', array(
-      'field_name' => drupal_strtolower($this->randomName()),
+      'name' => drupal_strtolower($this->randomName()),
+      'entity_type' => 'entity_test',
       'type' => 'datetime',
       'settings' => array('datetime_type' => 'date'),
     ));

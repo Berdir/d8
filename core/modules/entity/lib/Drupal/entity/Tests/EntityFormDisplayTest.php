@@ -64,7 +64,8 @@ class EntityFormDisplayTest extends DrupalUnitTestBase {
     // Create a field and an instance.
     $field_name = 'test_field';
     $field = entity_create('field_entity', array(
-      'field_name' => $field_name,
+      'name' => $field_name,
+      'entity_type' => 'entity_test',
       'type' => 'test_field'
     ));
     $field->save();
