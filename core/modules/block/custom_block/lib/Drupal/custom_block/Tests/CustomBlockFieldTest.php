@@ -72,7 +72,7 @@ class CustomBlockFieldTest extends CustomBlockTestBase {
     ));
     $this->field->save();
     $this->instance = entity_create('field_instance', array(
-      'field_name' => $this->field->id(),
+      'field_name' => $this->field->getFieldName(),
       'entity_type' => 'custom_block',
       'bundle' => 'link',
       'settings' => array(

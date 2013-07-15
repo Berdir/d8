@@ -64,7 +64,7 @@ class DatetimeFieldTest extends WebTestBase {
     ));
     $this->field->save();
     $this->instance = entity_create('field_instance', array(
-      'field_name' => $this->field->id(),
+      'name' => $this->field->id(),
       'entity_type' => 'entity_test',
       'bundle' => 'entity_test',
       'settings' => array(
