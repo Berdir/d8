@@ -1089,7 +1089,7 @@ class DatabaseStorageController extends FieldableEntityStorageControllerBase {
       return "field_deleted_data_" . substr(hash('sha256', $field['uuid']), 0, 10);
     }
     else {
-      return "field_{$field['entity_type']}_{$field['field_name']}";
+      return "field_{$field['entity_type']}__{$field['field_name']}";
     }
   }
 
@@ -1118,7 +1118,7 @@ class DatabaseStorageController extends FieldableEntityStorageControllerBase {
       return "field_deleted_revision_" . substr(hash('sha256', $field['uuid']), 0, 10);
     }
     else {
-      return "field_rev_{$field['entity_type']}_{$field['field_name']}";
+      return "field_rev_{$field['entity_type']}__{$field['field_name']}";
     }
   }
 
