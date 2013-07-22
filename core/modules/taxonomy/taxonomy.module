@@ -1121,7 +1121,7 @@ function taxonomy_node_insert(EntityInterface $node) {
 function taxonomy_build_node_index($node) {
   // We maintain a denormalized table of term/node relationships, containing
   // only data for current, published nodes.
-  if (!config('taxonomy.settings')->get('maintain_index_table') || !Drupal::entityManager()->getStorageController('node') instanceof DatabaseStorageController) {
+  if (!config('taxonomy.settings')->get('maintain_index_table') || !(Drupal::entityManager()->getStorageController('node') instanceof DatabaseStorageController)) {
     return;
   }
   // If a node property is not set in the node object when $node->save() is
