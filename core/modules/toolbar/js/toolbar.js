@@ -31,6 +31,7 @@ var $messages;
  * Holds the mediaQueryList object.
  */
 var mql = {
+  narrow: null,
   standard: null,
   wide: null
 };
@@ -45,6 +46,11 @@ var mql = {
  */
 Drupal.behaviors.toolbar = {
   attach: function(context) {
+    // Verify that the sser agent understands media queries. Complex admin
+    // toolbar layouts require media query support.
+    if (!window.matchMedia('only screen').matches) {
+      return;
+    };
     var options = $.extend(this.options, drupalSettings.toolbar);
     var $toolbarOnce = $(context).find('#toolbar-administration').once('toolbar');
     if ($toolbarOnce.length) {
@@ -66,17 +72,22 @@ Drupal.behaviors.toolbar = {
       // readers.
       $messages = $(Drupal.theme('toolbarMessageBox')).appendTo($toolbar);
       // Store the trays in a scoped variable.
-      $trays = $toolbar.find('.tray');
+      $trays = $toolbar.find('.toolbar-tray');
       $trays
         // Add the tray orientation toggles.
-        .find('.lining')
+        .find('.toolbar-lining')
         .append(Drupal.theme('toolbarOrientationToggle'));
-      // Store media queries.
+      // Store media queries and attach a handler.
+      mql.narrow = window.matchMedia(options.breakpoints['module.toolbar.narrow']);
+      mql.narrow.addListener(Drupal.toolbar.narrowMediaQueryChangeHandler);
       mql.standard = window.matchMedia(options.breakpoints['module.toolbar.standard']);
-      // Set up switching between the vertical and horizontal presentation
-      // of the toolbar trays based on a breakpoint.
+      mql.standard.addListener(Drupal.toolbar.standardMediaQueryChangeHandler);
       mql.wide = window.matchMedia(options.breakpoints['module.toolbar.wide']);
-      mql.wide.addListener(Drupal.toolbar.mediaQueryChangeHandler);
+      mql.wide.addListener(Drupal.toolbar.wideMediaQueryChangeHandler);
+      // Fire each MediaQuery change handler so they process once.
+      Drupal.toolbar.narrowMediaQueryChangeHandler.call(this, mql.narrow);
+      Drupal.toolbar.standardMediaQueryChangeHandler.call(this, mql.standard);
+      Drupal.toolbar.wideMediaQueryChangeHandler.call(this, mql.wide);
       // Set the orientation of the tray.
       // If the tray is set to vertical in localStorage, persist the vertical
       // presentation. If the tray is not locked to vertical, let the media
@@ -89,8 +100,8 @@ Drupal.behaviors.toolbar = {
         .on('drupalViewportOffsetChange.toolbar', Drupal.toolbar.adjustPlacement);
       // Attach behaviors to the toolbar.
       $toolbar
-        .on('click.toolbar', '.bar a', Drupal.toolbar.toggleTray)
-        .on('click.toolbar', '.toggle-orientation button', Drupal.toolbar.orientationChangeHandler);
+        .on('click.toolbar', '.toolbar-bar a', Drupal.toolbar.toggleTray)
+        .on('click.toolbar', '.toolbar-toggle-orientation button', Drupal.toolbar.orientationChangeHandler);
       // Restore the open tab. Only open the tab on wide screens.
       if (activeTab && window.matchMedia(options.breakpoints['module.toolbar.standard']).matches) {
         $toolbar.find('[data-toolbar-tray="' + activeTab + '"]').trigger('click.toolbar');
@@ -106,6 +117,7 @@ Drupal.behaviors.toolbar = {
   // Default options.
   options: {
     breakpoints: {
+      'module.toolbar.narrow': '',
       'module.toolbar.standard': '',
       'module.toolbar.wide': ''
     }
@@ -133,7 +145,7 @@ Drupal.toolbar.toggleTray = function (event) {
   var $tab = $(event.target);
   var name = $tab.attr('data-toolbar-tray');
   // Activate the selected tab and associated tray.
-  var $activateTray = $toolbar.find('[data-toolbar-tray="' + name + '"].tray').toggleClass('active');
+  var $activateTray = $toolbar.find('[data-toolbar-tray="' + name + '"].toolbar-tray').toggleClass('active');
   if ($activateTray.length) {
     event.preventDefault();
     event.stopPropagation();
@@ -154,12 +166,12 @@ Drupal.toolbar.toggleTray = function (event) {
       localStorage.removeItem('Drupal.toolbar.activeTab');
     }
     // Disable non-selected tabs and trays.
-    $toolbar.find('.bar .trigger')
+    $toolbar.find('.toolbar-bar .trigger')
       .not($tab)
       .removeClass('active')
       // Set aria-pressed to false.
       .prop('aria-pressed', false);
-    $toolbar.find('.tray').not($activateTray).removeClass('active');
+    $toolbar.find('.toolbar-tray').not($activateTray).removeClass('active');
   }
   // Update the page and toolbar dimension indicators.
   updatePeripherals();
@@ -176,18 +188,23 @@ Drupal.toolbar.toggleTray = function (event) {
  *   viewport offset distances calculated by Drupal.displace().
  */
 Drupal.toolbar.adjustPlacement = function (event, offsets) {
-  // Set the top of the all the trays to the height of the bar.
-  var barHeight = $toolbar.find('.bar').outerHeight();
-  var bhpx =  barHeight + 'px';
-  var tray;
-  for (var i = 0, il = $trays.length; i < il; i++) {
-    tray = $trays[i];
-    if (!tray.style.top.length || (tray.style.top !== bhpx)) {
-      tray.style.top = bhpx;
-    }
+  if (!mql.narrow.matches) {
+    var $body = $('body');
+    var $trays = $toolbar.find('.toolbar-tray');
+    // Alter the padding on the top of the body element.
+    $body.css('padding-top', 0);
+    $trays.css('padding-top', 0);
+    // Remove any orientation classes. Make vertical the default for trays.
+    $body.removeClass('toolbar-vertical toolbar-horizontal');
+    $trays.removeClass('toolbar-tray-horizontal').addClass('toolbar-tray-vertical');
   }
-  // Alter the padding on the top of the body element.
-  $('body').css('padding-top', offsets.top);
+  else {
+    // Alter the padding on the top of the body element.
+    $('body').css('padding-top', offsets.top);
+    // The navbar container is invisible. Its placement is used to determine the
+    // container for the trays.
+    $toolbar.find('.toolbar-tray').css('padding-top', $toolbar.find('.toolbar-bar').outerHeight());
+  }
 };
 
 /**
@@ -199,20 +216,53 @@ Drupal.toolbar.adjustPlacement = function (event, offsets) {
 Drupal.toolbar.setTrayWidth = function () {
   var dir = document.documentElement.dir;
   var edge = (dir === 'rtl') ? 'right' : 'left';
-  // Remove the left offset from the trays.
-  $toolbar.find('.tray').removeAttr('data-offset-' + edge + ' data-offset-top');
-  // If an active vertical tray exists, mark it as an offset element.
-  $toolbar.find('.tray.vertical.active').attr('data-offset-' + edge, '');
-  // If an active horizontal tray exists, mark it as an offset element.
-  $toolbar.find('.tray.horizontal.active').attr('data-offset-top', '');
+  // Remove the side offset from the trays.
+  $toolbar.find('.toolbar-tray').removeAttr('data-offset-' + edge + ' data-offset-top');
+  // If the page is wider than the narrow media query, apply offset attributes.
+  if (mql.narrow.matches) {
+    // If an active vertical tray exists, mark it as an offset element.
+    $toolbar.find('.toolbar-tray.toolbar-tray-vertical.active').attr('data-offset-' + edge, '');
+    // If an active horizontal tray exists, mark it as an offset element.
+    $toolbar.find('.toolbar-tray.toolbar-tray-horizontal.active').attr('data-offset-top', '');
+  }
   // Trigger a recalculation of viewport displacing elements.
   Drupal.displace();
 };
 
 /**
- * Respond to configured media query applicability changes.
+ * Respond to configured narrow media query changes.
  */
-Drupal.toolbar.mediaQueryChangeHandler = function (mql) {
+Drupal.toolbar.narrowMediaQueryChangeHandler = function (mql) {
+  var $bar = $toolbar.find('.toolbar-bar');
+  if (mql.matches) {
+    $bar.attr('data-offset-top', '');
+  }
+  else {
+    $bar.removeAttr('data-offset-top');
+  }
+  // Toggle between a basic vertical view and a more sophisticated horizontal
+  // and vertical display of the toolbar bar and trays.
+  $toolbar.toggleClass('toolbar-oriented', mql.matches);
+  if (mql.matches) {
+    changeOrientation('vertical');
+  }
+  // Update the page and toolbar dimension indicators.
+  updatePeripherals();
+};
+
+/**
+ * Respond to configured standard media query changes.
+ */
+Drupal.toolbar.standardMediaQueryChangeHandler = function (mql) {
+  $('body').toggleClass('toolbar-paneled', mql.matches);
+  // Update the page and toolbar dimension indicators.
+  updatePeripherals();
+};
+
+/**
+ * Respond to configured wide media query changes.
+ */
+Drupal.toolbar.wideMediaQueryChangeHandler = function (mql) {
   var orientation = (mql.matches) ? 'horizontal' : 'vertical';
   changeOrientation(orientation);
   // Update the page and toolbar dimension indicators.
@@ -253,8 +303,8 @@ function changeOrientation (newOrientation, isLock) {
   }
   if ((!locked && newOrientation === 'horizontal') || newOrientation === 'vertical') {
     $trays
-      .removeClass('horizontal vertical')
-      .addClass(newOrientation);
+      .removeClass('toolbar-tray-horizontal toolbar-tray-vertical')
+      .addClass('toolbar-tray-' + newOrientation);
     orientation = newOrientation;
     toggleOrientationToggle((newOrientation === 'vertical') ? 'horizontal' : 'vertical');
   }
@@ -280,14 +330,14 @@ function toggleOrientationToggle (orientation) {
     vertical: Drupal.t('Vertical orientation')
   };
   var antiOrientation = (orientation === 'vertical') ? 'horizontal' : 'vertical';
-  var iconClass = 'icon-toggle-' + orientation;
-  var iconAntiClass = 'icon-toggle-' + antiOrientation;
+  var iconClass = 'toolbar-icon-toggle-' + orientation;
+  var iconAntiClass = 'toolbar-icon-toggle-' + antiOrientation;
   // Append a message that the tray orientation has been changed.
   setMessage(Drupal.t('Tray orientation changed to @orientation.', {
     '@orientation': antiOrientation
   }));
   // Change the tray orientation.
-  $trays.find('.toggle-orientation button')
+  $trays.find('.toolbar-toggle-orientation button')
     .val(orientation)
     .text(strings[orientation])
     .removeClass(iconAntiClass)
@@ -326,8 +376,8 @@ function setMessage (message) {
  *   A string representing a DOM fragment.
  */
 Drupal.theme.toolbarOrientationToggle = function () {
-  return '<div class="toggle-orientation"><div class="lining">' +
-    '<button class="icon" type="button"></button>' +
+  return '<div class="toolbar-toggle-orientation"><div class="toolbar-lining">' +
+    '<button class="toolbar-icon" type="button"></button>' +
     '</div></div>';
 };
 

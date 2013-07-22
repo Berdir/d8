@@ -713,7 +713,7 @@ function drupal_settings_initialize() {
  *
  * This function plays a key role in allowing Drupal's resources (modules
  * and themes) to be located in different places depending on a site's
- * configuration. For example, a module 'foo' may legally be be located
+ * configuration. For example, a module 'foo' may legally be located
  * in any of these three places:
  *
  * core/modules/foo/foo.module
@@ -724,7 +724,7 @@ function drupal_settings_initialize() {
  * the above, depending on where the module is located.
  *
  * @param $type
- *   The type of the item (i.e. theme, theme_engine, module, profile).
+ *   The type of the item (theme, theme_engine, module, profile).
  * @param $name
  *   The name of the item for which the filename is requested.
  * @param $filename
@@ -2430,10 +2430,7 @@ function language_types_get_default() {
  *   TRUE if more than one language is enabled.
  */
 function language_multilingual() {
-  // The "language_count" variable stores the number of enabled languages to
-  // avoid unnecessarily querying the database when building the list of
-  // enabled languages on monolingual sites.
-  return variable_get('language_count', 1) > 1;
+  return Drupal::languageManager()->isMultilingual();
 }
 
 /**

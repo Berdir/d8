@@ -100,10 +100,6 @@ function user_theme() {
       'file' => 'user.pages.inc',
       'template' => 'user',
     ),
-    'user_admin_permissions' => array(
-      'render element' => 'form',
-      'file' => 'user.admin.inc',
-    ),
     'user_permission_description' => array(
       'variables' => array('permission_item' => NULL, 'hide' => NULL),
       'file' => 'user.admin.inc',
@@ -446,12 +442,11 @@ function _user_role_permissions_update($roles) {
  * @param \Drupal\Core\Session\AccountInterface $account
  *   (optional) The account to check, if not given use currently logged in user.
  *
- * @return
+ * @return bool
  *   Boolean TRUE if the current user has the requested permission.
  *
- * All permission checks in Drupal should go through this function. This
- * way, we guarantee consistent behavior, and ensure that the superuser
- * can perform all actions.
+ * @deprecated as of Drupal 8.0. Use
+ *   \Drupal\Core\Session\AccountInterface::hasPermission()
  */
 function user_access($string, AccountInterface $account = NULL) {
   global $user;
@@ -462,27 +457,7 @@ function user_access($string, AccountInterface $account = NULL) {
     $account = Drupal::request()->attributes->get('account') ?: $user;
   }
 
-  // User #1 has all privileges:
-  if ($account->id() == 1) {
-    return TRUE;
-  }
-
-  // To reduce the number of SQL queries, we cache the user's permissions
-  // in a static variable.
-  // Use the advanced drupal_static() pattern, since this is called very often.
-  static $drupal_static_fast;
-  if (!isset($drupal_static_fast)) {
-    $drupal_static_fast['perm'] = &drupal_static(__FUNCTION__);
-  }
-  $perm = &$drupal_static_fast['perm'];
-  if (!isset($perm[$account->id()])) {
-    $perm[$account->id()] = array();
-    foreach (user_role_permissions($account->getRoles()) as $role_permissions) {
-      $perm[$account->id()] += array_fill_keys($role_permissions, TRUE);
-    }
-  }
-
-  return isset($perm[$account->id()][$string]);
+  return $account->hasPermission($string);
 }
 
 /**
@@ -1744,8 +1719,6 @@ function user_role_grant_permissions($rid, array $permissions = array()) {
     $role->grantPermission($permission);
   }
   $role->save();
-  // Clear the user access cache.
-  drupal_static_reset('user_access');
 }
 
 /**
@@ -1766,8 +1739,6 @@ function user_role_revoke_permissions($rid, array $permissions = array()) {
     $role->revokePermission($permission);
   }
   $role->save();
-  // Clear the user access cache.
-  drupal_static_reset('user_access');
 }
 
 function user_multiple_cancel_confirm($form, &$form_state) {
@@ -2129,7 +2100,7 @@ function user_toolbar() {
       '#options' => array(
         'attributes' => array(
           'title' => t('My account'),
-          'class' => array('icon', 'icon-user'),
+          'class' => array('toolbar-icon', 'toolbar-icon-user'),
         ),
       ),
     ),

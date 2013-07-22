@@ -461,14 +461,16 @@ class EntityFormController implements EntityFormControllerInterface {
 
       foreach (field_info_instances($entity_type, $entity->bundle()) as $instance) {
         $field = $instance->getField();
-        $field_name = $instance['field_name'];
-        $previous_langcode = $form[$field_name]['#language'];
+        $field_name = $field->name;
+        if (isset($form[$field_name]['#language'])) {
+          $previous_langcode = $form[$field_name]['#language'];
 
-        // Handle a possible language change: new language values are inserted,
-        // previous ones are deleted.
-        if ($field['translatable'] && $previous_langcode != $current_langcode) {
-          $form_state['values'][$field_name][$current_langcode] = $form_state['values'][$field_name][$previous_langcode];
-          $form_state['values'][$field_name][$previous_langcode] = array();
+          // Handle a possible language change: new language values are inserted,
+          // previous ones are deleted.
+          if ($field['translatable'] && $previous_langcode != $current_langcode) {
+            $form_state['values'][$field_name][$current_langcode] = $form_state['values'][$field_name][$previous_langcode];
+            $form_state['values'][$field_name][$previous_langcode] = array();
+          }
         }
       }
     }
