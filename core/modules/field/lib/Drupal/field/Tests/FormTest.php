@@ -93,7 +93,7 @@ class FormTest extends FieldTestBase {
 
   function testFieldFormSingle() {
     $field = $this->field_single;
-    $field_name = $field['field_name'];
+    $field_name = $field['name'];
     $this->instance['field_name'] = $field_name;
     entity_create('field_entity', $field)->save();
     entity_create('field_instance', $this->instance)->save();
@@ -176,7 +176,7 @@ class FormTest extends FieldTestBase {
    */
   function testFieldFormDefaultValue() {
     $field = $this->field_single;
-    $field_name = $field['field_name'];
+    $field_name = $field['name'];
     $this->instance['field_name'] = $field_name;
     $default = rand(1, 127);
     $this->instance['default_value'] = array(array('value' => $default));
@@ -208,7 +208,7 @@ class FormTest extends FieldTestBase {
 
   function testFieldFormSingleRequired() {
     $field = $this->field_single;
-    $field_name = $field['field_name'];
+    $field_name = $field['name'];
     $this->instance['field_name'] = $field_name;
     $this->instance['required'] = TRUE;
     entity_create('field_entity', $field)->save();
@@ -345,7 +345,7 @@ class FormTest extends FieldTestBase {
   function testFieldFormMultivalueWithRequiredRadio() {
     // Create a multivalue test field.
     $field = $this->field_unlimited;
-    $field_name = $field['field_name'];
+    $field_name = $field['name'];
     $this->instance['field_name'] = $field_name;
     entity_create('field_entity', $field)->save();
     entity_create('field_instance', $this->instance)->save();

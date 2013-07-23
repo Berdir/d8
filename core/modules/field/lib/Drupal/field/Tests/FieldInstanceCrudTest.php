@@ -51,7 +51,8 @@ class FieldInstanceCrudTest extends FieldUnitTestBase {
     $this->field = entity_create('field_entity', $this->field_definition);
     $this->field->save();
     $this->instance_definition = array(
-      'field_name' => $this->field['field_name'],
+      'field_name' => $this->field->name,
+      'entity_type' => 'entity_test',
       'bundle' => 'entity_test',
     );
   }

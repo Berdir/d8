@@ -246,7 +246,7 @@ class TranslationTest extends FieldUnitTestBase {
     entity_create('field_entity', $field)->save();
 
     $instance = array(
-      'field_name' => $field['field_name'],
+      'field_name' => $field['name'],
       'entity_type' => $entity_type,
       'bundle' => 'entity_test',
     );

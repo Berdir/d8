@@ -91,7 +91,6 @@ class TextFieldTest extends WebTestBase {
    */
   function _testTextfieldWidgets($field_type, $widget_type) {
     // Setup a field and instance
-    $entity_type = 'entity_test';
     $this->field_name = drupal_strtolower($this->randomName());
     $this->field = entity_create('field_entity', array(
       'name' => $this->field_name,
