@@ -308,7 +308,7 @@ function field_update_8003() {
   $field_data = array();
 
   // Migrate field definitions.
-  $records = db_query("SELECT DISTINCT entity_type, fc.* FROM {field_config} fc INNER JOIN {field_config_instance} fci ON fc.field_id = fci.field_id")->fetchAll(PDO::FETCH_ASSOC);
+  $records = db_query("SELECT DISTINCT entity_type, fc.* FROM {field_config} fc INNER JOIN {field_config_instance} fci ON fc.id = fci.field_id")->fetchAll(PDO::FETCH_ASSOC);
   foreach ($records as $record) {
     $record['data'] = unserialize($record['data']);
 
