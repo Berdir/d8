@@ -109,7 +109,7 @@ class TaggedWithTest extends WizardTestBase {
     $node_add_path = 'node/add/' . $this->node_type_with_tags->type;
 
     // Create three nodes, with different tags.
-    $tag_field = $this->tag_field->id() . '[' . Language::LANGCODE_NOT_SPECIFIED . ']';
+    $tag_field = $this->tag_field->name . '[' . Language::LANGCODE_NOT_SPECIFIED . ']';
     $edit = array();
     $edit['title'] = $node_tag1_title = $this->randomName();
     $edit[$tag_field] = 'tag1';

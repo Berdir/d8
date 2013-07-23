@@ -111,13 +111,13 @@ class OptionsWidgetsTest extends FieldTestBase {
   function testRadioButtons() {
     // Create an instance of the 'single value' field.
     $instance = entity_create('field_instance', array(
-      'field_name' => $this->card_1->id(),
+      'field_name' => $this->card_1->name,
       'entity_type' => 'entity_test',
       'bundle' => 'entity_test',
     ));
     $instance->save();
     entity_get_form_display('entity_test', 'entity_test', 'default')
-      ->setComponent($this->card_1->id(), array(
+      ->setComponent($this->card_1->name, array(
         'type' => 'options_buttons',
       ))
       ->save();
@@ -170,13 +170,13 @@ class OptionsWidgetsTest extends FieldTestBase {
   function testCheckBoxes() {
     // Create an instance of the 'multiple values' field.
     $instance = entity_create('field_instance', array(
-      'field_name' => $this->card_2->id(),
+      'field_name' => $this->card_2->name,
       'entity_type' => 'entity_test',
       'bundle' => 'entity_test',
     ));
     $instance->save();
     entity_get_form_display('entity_test', 'entity_test', 'default')
-      ->setComponent($this->card_2->id(), array(
+      ->setComponent($this->card_2->name, array(
         'type' => 'options_buttons',
       ))
       ->save();
@@ -262,14 +262,14 @@ class OptionsWidgetsTest extends FieldTestBase {
   function testSelectListSingle() {
     // Create an instance of the 'single value' field.
     $instance = entity_create('field_instance', array(
-      'field_name' => $this->card_1->id(),
+      'field_name' => $this->card_1->name,
       'entity_type' => 'entity_test',
       'bundle' => 'entity_test',
       'required' => TRUE,
     ));
     $instance->save();
     entity_get_form_display('entity_test', 'entity_test', 'default')
-      ->setComponent($this->card_1->id(), array(
+      ->setComponent($this->card_1->name, array(
         'type' => 'options_select',
       ))
       ->save();
@@ -364,13 +364,13 @@ class OptionsWidgetsTest extends FieldTestBase {
   function testSelectListMultiple() {
     // Create an instance of the 'multiple values' field.
     $instance = entity_create('field_instance', array(
-      'field_name' => $this->card_2->id(),
+      'field_name' => $this->card_2->name,
       'entity_type' => 'entity_test',
       'bundle' => 'entity_test',
     ));
     $instance->save();
     entity_get_form_display('entity_test', 'entity_test', 'default')
-      ->setComponent($this->card_2->id(), array(
+      ->setComponent($this->card_2->name, array(
         'type' => 'options_select',
       ))
       ->save();
@@ -486,12 +486,12 @@ class OptionsWidgetsTest extends FieldTestBase {
   function testOnOffCheckbox() {
     // Create an instance of the 'boolean' field.
     entity_create('field_instance', array(
-      'field_name' => $this->bool->id(),
+      'field_name' => $this->bool->name,
       'entity_type' => 'entity_test',
       'bundle' => 'entity_test',
     ))->save();
     entity_get_form_display('entity_test', 'entity_test', 'default')
-      ->setComponent($this->bool->id(), array(
+      ->setComponent($this->bool->name, array(
         'type' => 'options_onoff',
       ))
       ->save();
@@ -541,7 +541,7 @@ class OptionsWidgetsTest extends FieldTestBase {
     $fieldUpdate['settings']['allowed_values'] = array(0 => 0, 1 => 'MyOnValue');
     $fieldUpdate->save();
     entity_create('field_instance', array(
-      'field_name' => $this->bool->id(),
+      'field_name' => $this->bool->name,
       'entity_type' => 'node',
       'bundle' => 'page',
     ))->save();

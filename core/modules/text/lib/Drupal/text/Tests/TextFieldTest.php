@@ -59,7 +59,7 @@ class TextFieldTest extends WebTestBase {
     ));
     $this->field->save();
     entity_create('field_instance', array(
-      'field_name' => $this->field->id(),
+      'field_name' => $this->field->name,
       'entity_type' => 'entity_test',
       'bundle' => 'entity_test',
     ))->save();
@@ -67,8 +67,8 @@ class TextFieldTest extends WebTestBase {
     // Test validation with valid and invalid values.
     $entity = entity_create('entity_test', array());
     for ($i = 0; $i <= $max_length + 2; $i++) {
-      $entity->{$this->field->id()}->value = str_repeat('x', $i);
-      $violations = $entity->{$this->field->id()}->validate();
+      $entity->{$this->field->name}->value = str_repeat('x', $i);
+      $violations = $entity->{$this->field->name}->validate();
       if ($i <= $max_length) {
         $this->assertEqual(count($violations), 0, "Length $i does not cause validation error when max_length is $max_length");
       }

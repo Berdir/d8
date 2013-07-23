@@ -64,7 +64,7 @@ class DatetimeFieldTest extends WebTestBase {
     ));
     $this->field->save();
     $this->instance = entity_create('field_instance', array(
-      'name' => $this->field->id(),
+      'field_name' => $this->field->name,
       'entity_type' => 'entity_test',
       'bundle' => 'entity_test',
       'settings' => array(
@@ -74,7 +74,7 @@ class DatetimeFieldTest extends WebTestBase {
     $this->instance->save();
 
     entity_get_form_display($this->instance->entity_type, $this->instance->bundle, 'default')
-      ->setComponent($this->field->id(), array(
+      ->setComponent($this->field->name, array(
         'type' => 'datetime_default',
       ))
       ->save();
@@ -85,7 +85,7 @@ class DatetimeFieldTest extends WebTestBase {
       'settings' => array('format_type' => 'medium'),
     );
     entity_get_display($this->instance->entity_type, $this->instance->bundle, 'full')
-      ->setComponent($this->field->id(), $this->display_options)
+      ->setComponent($this->field->name, $this->display_options)
       ->save();
   }
 
@@ -93,7 +93,7 @@ class DatetimeFieldTest extends WebTestBase {
    * Tests date field functionality.
    */
   function testDateField() {
-    $field_name = $this->field->id();
+    $field_name = $this->field->name;
 
     // Display creation form.
     $this->drupalGet('entity_test/add');
@@ -161,7 +161,7 @@ class DatetimeFieldTest extends WebTestBase {
    * Tests date and time field.
    */
   function testDatetimeField() {
-    $field_name = $this->field->id();
+    $field_name = $this->field->name;
     // Change the field to a datetime field.
     $this->field['settings']['datetime_type'] = 'datetime';
     $this->field->save();
@@ -230,7 +230,7 @@ class DatetimeFieldTest extends WebTestBase {
    * Tests Date List Widget functionality.
    */
   function testDatelistWidget() {
-    $field_name = $this->field->id();
+    $field_name = $this->field->name;
     // Change the field to a datetime field.
     $this->field->settings['datetime_type'] = 'datetime';
     $this->field->save();
@@ -300,7 +300,7 @@ class DatetimeFieldTest extends WebTestBase {
     // Change the field to a datetime field.
     $this->field->settings['datetime_type'] = 'datetime';
     $this->field->save();
-    $field_name = $this->field->id();
+    $field_name = $this->field->name;
 
     // Set the default value to 'now'.
     $this->instance->settings['default_value'] = 'now';
@@ -342,7 +342,7 @@ class DatetimeFieldTest extends WebTestBase {
     // Change the field to a datetime field.
     $this->field->settings['datetime_type'] = 'datetime';
     $this->field->save();
-    $field_name = $this->field->id();
+    $field_name = $this->field->name;
 
     // Display creation form.
     $this->drupalGet('entity_test/add');

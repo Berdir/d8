@@ -48,7 +48,7 @@ class ContactFieldsTest extends ViewTestBase {
     $this->field->save();
 
     entity_create('field_instance', array(
-      'field_name' => $this->field->id(),
+      'field_name' => $this->field->name,
       'entity_type' => 'contact_message',
       'bundle' => 'contact_message',
     ))->save();
@@ -67,7 +67,7 @@ class ContactFieldsTest extends ViewTestBase {
     $expected = array('', '_value', '_format');
     $this->assertEqual(count($data), count($expected), 'The expected amount of array keys were found.');
     foreach ($expected as $suffix) {
-      $this->assertTrue(isset($data[$this->field->id() . $suffix]));
+      $this->assertTrue(isset($data[$this->field->name . $suffix]));
     }
     $this->assertTrue(empty($data['table']['join']), 'The field is not joined to the non existent contact message base table.');
   }

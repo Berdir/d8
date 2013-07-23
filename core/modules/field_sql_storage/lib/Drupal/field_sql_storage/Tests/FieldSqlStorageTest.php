@@ -464,36 +464,6 @@ class FieldSqlStorageTest extends EntityUnitTestBase {
   }
 
   /**
-   * Test the storage details.
-   */
-  function testFieldStorageDetails() {
-    $current = _field_sql_storage_tablename($this->field);
-    $revision = _field_sql_storage_revision_tablename($this->field);
-
-    // Retrieve the field and instance with field_info so the storage details are attached.
-    $field = field_info_field($this->field_name);
-    $instance = field_info_instance($this->instance->entity_type, $field->id(), $this->instance->bundle);
-
-    // The storage details are indexed by a storage engine type.
-    $storage_details = $field->getStorageDetails();
-    $this->assertTrue(array_key_exists('sql', $storage_details), 'The storage type is SQL.');
-
-    // The SQL details are indexed by table name.
-    $details = $storage_details['sql'];
-    $this->assertTrue(array_key_exists($current, $details[FIELD_LOAD_CURRENT]), 'Table name is available in the instance array.');
-    $this->assertTrue(array_key_exists($revision, $details[FIELD_LOAD_REVISION]), 'Revision table name is available in the instance array.');
-
-    // Test current and revision storage details together because the columns
-    // are the same.
-    $schema = $this->field->getSchema();
-    foreach ($schema['columns'] as $column_name => $attributes) {
-      $storage_column_name = _field_sql_storage_columnname($this->field_name, $column_name);
-      $this->assertEqual($details[FIELD_LOAD_CURRENT][$current][$column_name], $storage_column_name, t('Column name %value matches the definition in %bin.', array('%value' => $column_name, '%bin' => $current)));
-      $this->assertEqual($details[FIELD_LOAD_REVISION][$revision][$column_name], $storage_column_name, t('Column name %value matches the definition in %bin.', array('%value' => $column_name, '%bin' => $revision)));
-    }
-  }
-
-  /**
    * Test foreign key support.
    */
   function testFieldSqlStorageForeignKeys() {
