@@ -37,7 +37,7 @@ class ActiveTest extends FieldTestBase {
 
     // Test disabling and enabling the field type module,
     $modules = array('field_test');
-    $field_name = $field_definition['field_name'];
+    $field_name = $field_definition['name'];
 
     // Read the field.
     $field = field_read_field('entity_test', $field_name);
