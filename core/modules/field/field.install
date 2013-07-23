@@ -313,7 +313,8 @@ function field_update_8003() {
     $record['data'] = unserialize($record['data']);
 
     $config = array(
-      'id' => $record['field_name'],
+      'id' => $record['entity_type'] . '.' . $record['field_name'],
+      'name' => $record['field_name'],
       'uuid' => $uuid->generate(),
       'type' => $record['type'],
       'module' => $record['module'],
