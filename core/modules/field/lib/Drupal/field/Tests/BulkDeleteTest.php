@@ -135,7 +135,7 @@ class BulkDeleteTest extends FieldUnitTestBase {
     foreach ($this->bundles as $bundle) {
       foreach ($this->fields as $field) {
         entity_create('field_instance', array(
-          'field_name' => $field->getFieldName(),
+          'field_name' => $field->name,
           'entity_type' => $this->entity_type,
           'bundle' => $bundle,
         ))->save();
@@ -166,7 +166,7 @@ class BulkDeleteTest extends FieldUnitTestBase {
   function testDeleteFieldInstance() {
     $bundle = reset($this->bundles);
     $field = reset($this->fields);
-    $field_name = $field->getFieldName();
+    $field_name = $field->name;
     $factory = \Drupal::service('entity.query');
 
     // There are 10 entities of this bundle.
@@ -176,7 +176,7 @@ class BulkDeleteTest extends FieldUnitTestBase {
     $this->assertEqual(count($found), 10, 'Correct number of entities found before deleting');
 
     // Delete the instance.
-    $instance = field_info_instance($this->entity_type, $field->getFieldName(), $bundle);
+    $instance = field_info_instance($this->entity_type, $field->name, $bundle);
     $instance->delete();
 
     // The instance still exists, deleted.
@@ -217,7 +217,7 @@ class BulkDeleteTest extends FieldUnitTestBase {
       ->fields('t', array_keys($schema[$table]['fields']))
       ->execute();
     foreach ($result as $row) {
-      $this->assertEqual($this->entities[$row->entity_id]->{$field->getFieldName()}->value, $row->$column);
+      $this->assertEqual($this->entities[$row->entity_id]->{$field->name}->value, $row->$column);
     }
   }
 
@@ -233,7 +233,7 @@ class BulkDeleteTest extends FieldUnitTestBase {
     $field = reset($this->fields);
 
     // Delete the instance.
-    $instance = field_info_instance($this->entity_type, $field->getFieldName(), $bundle);
+    $instance = field_info_instance($this->entity_type, $field->name, $bundle);
     $instance->delete();
 
     // No field hooks were called.
@@ -248,7 +248,7 @@ class BulkDeleteTest extends FieldUnitTestBase {
       // There are $count deleted entities left.
       $found = \Drupal::entityQuery('entity_test')
         ->condition('type', $bundle)
-        ->condition($field->getFieldName() . '.deleted', 1)
+        ->condition($field->name . '.deleted', 1)
         ->execute();
       $this->assertEqual(count($found), $count, 'Correct number of entities found after purging 2');
     }
@@ -292,7 +292,7 @@ class BulkDeleteTest extends FieldUnitTestBase {
 
     // Delete the first instance.
     $bundle = reset($this->bundles);
-    $instance = field_info_instance($this->entity_type, $field->getFieldName(), $bundle);
+    $instance = field_info_instance($this->entity_type, $field->name, $bundle);
     $instance->delete();
 
     // Assert that hook_field_delete() was not called yet.
@@ -322,7 +322,7 @@ class BulkDeleteTest extends FieldUnitTestBase {
 
     // Delete the second instance.
     $bundle = next($this->bundles);
-    $instance = field_info_instance($this->entity_type, $field->getFieldName(), $bundle);
+    $instance = field_info_instance($this->entity_type, $field->name, $bundle);
     $instance->delete();
 
     // Assert that hook_field_delete() was not called yet.

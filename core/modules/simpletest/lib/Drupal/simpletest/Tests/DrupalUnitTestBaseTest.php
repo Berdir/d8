@@ -238,7 +238,7 @@ class DrupalUnitTestBaseTest extends DrupalUnitTestBase {
     ));
     $field->save();
     entity_create('field_instance', array(
-      'field_name' => $field->getFieldName(),
+      'field_name' => $field->name,
       'entity_type' => 'entity_test',
       'bundle' => 'entity_test',
     ))->save();

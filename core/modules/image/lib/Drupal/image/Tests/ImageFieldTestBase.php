@@ -80,7 +80,7 @@ abstract class ImageFieldTestBase extends WebTestBase {
     entity_create('field_entity', $field)->save();
 
     $instance = array(
-      'field_name' => $field['field_name'],
+      'field_name' => $field['name'],
       'label' => $name,
       'bundle' => $type_name,
       'required' => !empty($instance_settings['required']),

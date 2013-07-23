@@ -82,7 +82,7 @@ class EntityQueryTest extends EntityUnitTestBase {
       entity_test_create_bundle($bundle);
       foreach ($fields as $field) {
         entity_create('field_instance', array(
-          'field_name' => $field->getFieldName(),
+          'field_name' => $field->name,
           'entity_type' => 'entity_test_mulrev',
           'bundle' => $bundle,
         ))->save();
