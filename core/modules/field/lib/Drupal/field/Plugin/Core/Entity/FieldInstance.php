@@ -235,7 +235,7 @@ class FieldInstance extends ConfigEntityBase implements FieldInstanceInterface {
   public function __construct(array $values, $entity_type = 'field_instance') {
     // Accept incoming 'field_name' instead of 'field_uuid', for easier DX on
     // creation of new instances.
-    if (isset($values['field_name']) && !isset($values['field_uuid'])) {
+    if (isset($values['field_name']) && isset($values['entity_type']) && !isset($values['field_uuid'])) {
       $field = field_info_field($values['entity_type'], $values['field_name']);
       if (!$field) {
         throw new FieldException(format_string('Attempt to create an instance of unknown, disabled, or deleted field @field_id', array('@field_id' => $values['field_name'])));
@@ -266,8 +266,11 @@ class FieldInstance extends ConfigEntityBase implements FieldInstanceInterface {
     unset($values['field_type']);
 
     // Check required properties.
+    if (empty($values['entity_type'])) {
+      throw new FieldException(format_string('Attempt to create an instance of field @field_id without an entity_type.', array('@field_id' => $this->field->name)));
+    }
     if (empty($values['bundle'])) {
-      throw new FieldException(format_string('Attempt to create an instance of field @field_id without a bundle.', array('@field_id' => $this->field->id)));
+      throw new FieldException(format_string('Attempt to create an instance of field @field_id without a bundle.', array('@field_id' => $this->field->name)));
     }
 
     // 'Label' defaults to the field name (mostly useful for field instances
