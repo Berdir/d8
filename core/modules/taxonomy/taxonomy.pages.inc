@@ -98,19 +98,21 @@ function taxonomy_term_feed(Term $term) {
  *   };
  * @endcode
  *
+ * @param $entity_type
+ *   The entity_type.
  * @param $field_name
  *   The name of the term reference field.
  *
  * @see taxonomy_menu()
  * @see taxonomy_field_widget_info()
  */
-function taxonomy_autocomplete($field_name) {
+function taxonomy_autocomplete($entity_type, $field_name) {
   // A comma-separated list of term names entered in the autocomplete form
   // element. Only the last term is used for autocompletion.
   $tags_typed = Drupal::request()->query->get('q');
 
   // Make sure the field exists and is a taxonomy field.
-  if (!($field = field_info_field($field_name)) || $field['type'] !== 'taxonomy_term_reference') {
+  if (!($field = field_info_field($entity_type, $field_name)) || $field['type'] !== 'taxonomy_term_reference') {
     // Error string. The JavaScript handler will realize this is not JSON and
     // will display it as debugging information.
     print t('Taxonomy field @field_name not found.', array('@field_name' => $field_name));
