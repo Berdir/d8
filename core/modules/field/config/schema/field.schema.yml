@@ -4,9 +4,6 @@ field.settings:
   type: mapping
   label: 'Field settings'
   mapping:
-    default_storage:
-      type: string
-      label: 'The default storage backend for a field'
     language_fallback:
       type: boolean
       label: 'Whether the field display falls back to global language fallback configuration'

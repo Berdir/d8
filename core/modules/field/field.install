@@ -421,14 +421,13 @@ function field_update_8003() {
 }
 
 /**
- * Moves field_storage_default and field_language_fallback to config.
+ * Moves field_language_fallback to config.
  *
  * @ingroup config_upgrade
  */
 function field_update_8004() {
   update_variable_set('field_language_fallback', TRUE);
   update_variables_to_config('field.settings', array(
-    'field_storage_default' => 'default_storage',
     'field_language_fallback' => 'language_fallback',
   ));
 }
