@@ -41,6 +41,7 @@ class UserCreateTest extends WebTestBase {
     $field_name = 'test_field';
     $field = array(
       'name' => $field_name,
+      'entity_type' => 'user',
       'module' => 'image',
       'type' => 'image',
       'cardinality' => 1,
