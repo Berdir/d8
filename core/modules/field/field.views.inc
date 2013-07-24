@@ -456,7 +456,7 @@ function field_views_field_default_views_data(FieldInterface $field, $sql_entity
           'table' => $table,
           'id' => 'language',
           'additional fields' => $additional_fields,
-          'empty field name' => t('<No value>'),
+          'empty field name' => t('- No value -'),
           'field_name' => $field['field_name'],
           'entity_type' => $field['entity_type'],
         );
