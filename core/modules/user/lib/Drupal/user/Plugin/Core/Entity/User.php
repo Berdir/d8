@@ -12,9 +12,7 @@ use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Entity\EntityNG;
 use Drupal\Core\Entity\Annotation\EntityType;
 use Drupal\Core\Annotation\Translation;
-use Drupal\user\UserBCDecorator;
 use Drupal\user\UserInterface;
-use Drupal\Core\Language\Language;
 
 /**
  * Defines the user entity class.
@@ -146,19 +144,6 @@ class User extends EntityNG implements UserInterface {
     $uids = array_keys($entities);
     \Drupal::service('user.data')->delete(NULL, $uids);
     $storage_controller->deleteUserRoles($uids);
-  }
-
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getBCEntity() {
-    if (!isset($this->bcEntity)) {
-      // Initialize field definitions so that we can pass them by reference.
-      $this->getPropertyDefinitions();
-      $this->bcEntity = new UserBCDecorator($this, $this->fieldDefinitions);
-    }
-    return $this->bcEntity;
   }
 
   /**
