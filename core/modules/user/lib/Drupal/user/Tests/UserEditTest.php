@@ -27,7 +27,7 @@ class UserEditTest extends WebTestBase {
    */
   function testUserEdit() {
     // Test user edit functionality.
-    $user1 = $this->drupalCreateUser(array('change own username'));
+    $user1 = $this->drupalCreateUser(array('change own username', 'administer permissions'));
     $user2 = $this->drupalCreateUser(array());
     $this->drupalLogin($user1);
 
@@ -68,7 +68,7 @@ class UserEditTest extends WebTestBase {
 
     // Try again with the current password.
     $edit['current_pass'] = $user1->pass_raw;
-    $this->drupalPost("user/" . $user1->id() . "/edit", $edit, t('Save'));
+    $this->drupalPost(NULL, $edit, t('Save'));
     $this->assertRaw(t("The changes have been saved."));
 
     // Make sure the user can log in with their new password.

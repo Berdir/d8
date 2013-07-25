@@ -28,16 +28,6 @@ class ProfileFormController extends AccountFormController {
   }
 
   /**
-   * Overrides Drupal\Core\Entity\EntityFormController::submit().
-   */
-  public function submit(array $form, array &$form_state) {
-    // @todo Consider moving this into the parent method.
-    // Remove unneeded values.
-    form_state_values_clean($form_state);
-    parent::submit($form, $form_state);
-  }
-
-  /**
    * Overrides Drupal\Core\Entity\EntityFormController::save().
    */
   public function save(array $form, array &$form_state) {

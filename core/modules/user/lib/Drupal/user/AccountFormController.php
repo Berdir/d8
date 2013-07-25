@@ -235,9 +235,9 @@ abstract class AccountFormController extends EntityFormControllerNG {
     //   set on the field, which throws an exception as the list requires
     //   numeric keys. Allow to override this per field. As this function is
     //   called twice, we have to prevent it from getting the array keys twice.
-    if (empty($this->roles_filtered)) {
+
+    if (is_string(key($form_state['values']['roles']))) {
       $form_state['values']['roles'] = array_keys(array_filter($form_state['values']['roles']));
-      $this->roles_filtered = TRUE;
     }
     return parent::buildEntity($form, $form_state);
   }
