@@ -26,11 +26,13 @@ class FieldImportCreateTest extends FieldUnitTestBase {
    * Tests creating fields and instances during default config import.
    */
   function testImportCreateDefault() {
-    $field_id = 'field_test_import';
-    $instance_id = "entity_test.entity_test.$field_id";
-    $field_id_2 = 'field_test_import_2';
-    $instance_id_2a = "entity_test.entity_test.$field_id_2";
-    $instance_id_2b = "entity_test.entity_test.$field_id_2";
+    $field_name = 'field_test_import';
+    $field_id = "entity_test.$field_name";
+    $instance_id = "entity_test.entity_test.$field_name";
+    $field_name_2 = 'field_test_import_2';
+    $field_id_2 = "entity_test.$field_name_2";
+    $instance_id_2a = "entity_test.entity_test.$field_name_2";
+    $instance_id_2b = "entity_test.test_bundle.$field_name_2";
 
     // Check that the fields and instances do not exist yet.
     $this->assertFalse(entity_load('field_entity', $field_id));
@@ -56,9 +58,9 @@ class FieldImportCreateTest extends FieldUnitTestBase {
     $field_2 = entity_load('field_entity', $field_id_2);
     $this->assertTrue($field_2, 'The second field was created.');
     $instance_2a = entity_load('field_instance', $instance_id_2a);
-    $this->assertTrue($instance->bundle, 'test_bundle', 'The second field instance was created on bundle test_bundle.');
+    $this->assertTrue($instance_2a->bundle, 'entity_test', 'The second field instance was created on bundle entity_test.');
     $instance_2b = entity_load('field_instance', $instance_id_2b);
-    $this->assertTrue($instance->bundle, 'test_bundle_2', 'The second field instance was created on bundle test_bundle_2.');
+    $this->assertTrue($instance_2b->bundle, 'test_bundle', 'The second field instance was created on bundle test_bundle.');
 
     // Tests field info contains the right data.
     $instances = Field::fieldInfo()->getInstances('entity_test');
@@ -74,15 +76,17 @@ class FieldImportCreateTest extends FieldUnitTestBase {
    */
   function testImportCreate() {
     // One field with one field instance.
-    $field_id = 'field_test_import_staging';
-    $instance_id = "entity_test.entity_test.$field_id";
+    $field_name = 'test_staging';
+    $field_id = "entity_test.$field_name";
+    $instance_id = "entity_test.entity_test.$field_name";
     $field_config_name = "field.field.$field_id";
     $instance_config_name = "field.instance.$instance_id";
 
     // One field with two field instances.
-    $field_id_2 = 'field_test_import_staging_2';
-    $instance_id_2a = "entity_test.test_bundle.$field_id_2";
-    $instance_id_2b = "entity_test.test_bundle_2.$field_id_2";
+    $field_name_2 = 'test_staging_2';
+    $field_id_2 = "entity_test.$field_name_2";
+    $instance_id_2a = "entity_test.test_bundle.$field_name_2";
+    $instance_id_2b = "entity_test.test_bundle_2.$field_name_2";
     $field_config_name_2 = "field.field.$field_id_2";
     $instance_config_name_2a = "field.instance.$instance_id_2a";
     $instance_config_name_2b = "field.instance.$instance_id_2b";
