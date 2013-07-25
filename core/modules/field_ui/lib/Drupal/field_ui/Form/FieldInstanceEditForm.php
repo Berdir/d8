@@ -234,7 +234,7 @@ class FieldInstanceEditForm extends FieldInstanceFormBase {
 
     // Insert the widget. Since we do not use the "official" instance definition,
     // the whole flow cannot use field_invoke_method().
-    $items = $entity->getNGEntity()->{$this->instance->getField()->id};
+    $items = $entity->getNGEntity()->{$this->instance->getField()->name};
     if (!empty($this->instance['default_value'])) {
       $items->setValue((array) $this->instance['default_value']);
     }
