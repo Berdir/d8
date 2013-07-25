@@ -516,12 +516,12 @@ function field_update_8006(&$sandbox) {
         $from_fields[] = $sql_column;
         $insert_fields[] = $sql_column;
       }
-      $from_query = db_select($original_table)
-        ->fields($from_fields)
+      $from_query = db_select($original_table, 'original')
+        ->fields('original', $from_fields)
         ->condition('entity_type', $field_config['entity_type']);
       db_insert($table)
         ->fields($insert_fields)
-        ->fromQuery($from_query)
+        ->from($from_query)
         ->execute();
     }
   }
