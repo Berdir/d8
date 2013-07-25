@@ -12,7 +12,7 @@ use Drupal\Core\KeyValueStore\KeyValueCacheDecorator;
 use Drupal\Core\Lock\NullLockBackend;
 
 /**
- * Tests the key-value keyvalue database storage.
+ * Tests the key-value keyvalue cache decorator.
  */
 class CacheDecoratorTest extends StorageTestBase {
 

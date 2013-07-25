@@ -172,7 +172,7 @@ abstract class DrupalUnitTestBase extends UnitTestBase {
       $container->register('state', 'Drupal\Core\KeyValueStore\KeyValueStoreInterface')
         ->setFactoryService(new Reference('keyvalue'))
         ->setFactoryMethod('get')
-       ->addArgument('state');
+        ->addArgument('state');
     }
 
     if ($container->hasDefinition('path_processor_alias')) {
