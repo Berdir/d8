@@ -566,7 +566,7 @@ function translation_language_switch_links_alter(array &$links, $type, $path) {
     foreach ($links as $langcode => $link) {
       if (isset($translations[$langcode]) && $translations[$langcode]->status) {
         // Translation in a different node.
-        $nid = $translations[$langcode]->nid;
+        $nid = $translations[$langcode] instanceof EntityInterface ? $translations[$langcode]->id() : $translations[$langcode]->nid;
         $links[$langcode]['href'] = 'node/' . $nid  . $matches[2];
       }
       else {
