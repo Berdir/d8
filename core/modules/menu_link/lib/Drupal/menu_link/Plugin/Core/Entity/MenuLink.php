@@ -447,9 +447,15 @@ class MenuLink extends EntityNG implements \ArrayAccess, MenuLinkInterface {
     if (in_array($offset, $this->oldRoutingProperties)) {
       return $this->oldRouterItem[$offset];
     }
-
-    return $this->{$offset}->value;
-//    return $this->{$offset};
+    elseif ($offset == 'localized_options' || $offset == 'options') {
+      return $this->{$offset}[0];
+    }
+    elseif ($this->getPropertyDefinition($offset)) {
+      return $this->{$offset}->value;
+    }
+    else {
+      return $this->{$offset};
+    }
   }
 
   /**
@@ -459,10 +465,12 @@ class MenuLink extends EntityNG implements \ArrayAccess, MenuLinkInterface {
     if (in_array($offset, $this->oldRoutingProperties)) {
       $this->oldRouterItem[$offset] = $value;
     }
-    else {
+    elseif ($this->getPropertyDefinition($offset)) {
       $this->{$offset}->value = $value;
     }
-//    $this->{$offset} = $value;
+    else {
+      $this->{$offset} = $value;
+    }
   }
 
   /**

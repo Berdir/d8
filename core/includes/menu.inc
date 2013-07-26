@@ -870,7 +870,7 @@ function menu_tail_load($arg, &$map, $index) {
  */
 function _menu_link_translate(&$item, $translate = FALSE) {
   if (!is_array($item['options'])) {
-    $item['options'] = unserialize($item['options']);
+    //$item['options'] = unserialize($item['options']);
   }
   if ($item['external']) {
     $item['access'] = 1;
@@ -1886,7 +1886,7 @@ function menu_navigation_links($menu_name, $level = 0) {
   foreach ($tree as $item) {
     if (!$item['link']['hidden']) {
       $class = '';
-      $l = $item['link']['localized_options'];
+      $l = $item['link']['localized_options']->getValue();
       $l['href'] = $item['link']['href'];
       $l['title'] = $item['link']['title'];
       if ($item['link']['in_active_trail']) {
@@ -2654,7 +2654,7 @@ function menu_get_active_breadcrumb() {
     }
 
     foreach ($active_trail as $parent) {
-      $breadcrumb[] = l($parent['title'], $parent['href'], $parent['localized_options']);
+      $breadcrumb[] = l($parent['title'], $parent['href'], is_array($parent['localized_options']) ? $parent['localized_options'] : $parent['localized_options']->getValue());
     }
   }
   return $breadcrumb;

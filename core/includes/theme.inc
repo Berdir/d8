@@ -1724,9 +1724,9 @@ function theme_links($variables) {
       // Handle title-only text items.
       else {
         // Merge in default array properties into $link.
-        $link += array(
-          'html' => FALSE,
-        );
+        if (!isset($link['html'])) {
+          $link['html'] = FALSE;
+        }
         $item = ($link['html'] ? $link['title'] : check_plain($link['title']));
         if (isset($link['attributes'])) {
           $item = '<span' . new Attribute($link['attributes']) . '>' . $item . '</span>';
