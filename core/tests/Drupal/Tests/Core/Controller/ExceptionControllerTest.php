@@ -1,21 +1,24 @@
 <?php
 
 /**
- * Definition of Drupal\system\Tests\System\ExceptionControllerTest.
+ * @file
+ * Contains \Drupal\Tests\Core\Controller\ExceptionControllerTest.
  */
 
-namespace Drupal\system\Tests\System;
+namespace Drupal\Tests\Core\Controller;
 
 use \Drupal\Core\ContentNegotiation;
 use \Drupal\Core\Controller\ExceptionController;
-use \Drupal\simpletest\UnitTestBase;
+use \Drupal\Tests\UnitTestCase;
 use \Symfony\Component\HttpFoundation\Request;
 use \Symfony\Component\HttpKernel\Exception\FlattenException;
 
 /**
  * Tests exception controller.
+ *
+ * @see \Drupal\Core\Controller\ExceptionController
  */
-class ExceptionControllerTest extends UnitTestBase {
+class ExceptionControllerTest extends UnitTestCase {
 
   public static function getInfo() {
     return array(
@@ -28,12 +31,13 @@ class ExceptionControllerTest extends UnitTestBase {
   /**
    * Ensure the execute() method returns a valid response on 405 exceptions.
    */
-  public function test405HTML() {
+  public function test405Html() {
     $exception = new \Exception('Test exception');
     $flat_exception = FlattenException::create($exception, 405);
     $exception_controller = new ExceptionController(new ContentNegotiation());
     $response = $exception_controller->execute($flat_exception, new Request());
-    $this->assertEqual($response->getStatusCode(), 405, 'HTTP status of response is correct.');
-    $this->assertEqual($response->getContent(), 'Method Not Allowed', 'HTTP response body is correct.');
+    $this->assertEquals($response->getStatusCode(), 405, 'HTTP status of response is correct.');
+    $this->assertEquals($response->getContent(), 'Method Not Allowed', 'HTTP response body is correct.');
   }
+
 }
