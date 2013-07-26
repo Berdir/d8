@@ -1133,7 +1133,11 @@ function template_preprocess_forum_topic_list(&$variables) {
       $variables['topics'][$id]->submitted = drupal_render($forum_submitted);
       $forum_submitted = array(
         '#theme' => 'forum_submitted',
-        '#topic' => isset($topic->last_reply) ? $topic->last_reply : NULL,
+        '#topic' => (object) array(
+          'uid' => $topic->getAuthorId(),
+          'name' => $topic->getAuthor()->getUsername(),
+          'created' => $topic->getCreatedTime(),
+        ),
       );
       $variables['topics'][$id]->last_reply = drupal_render($forum_submitted);
 
