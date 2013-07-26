@@ -10,7 +10,6 @@ namespace Drupal\menu_link;
 use Symfony\Component\Routing\Route;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityStorageControllerInterface;
 
 /**
  * Provides an interface defining a menu link entity.
@@ -85,7 +84,7 @@ interface MenuLinkInterface extends ContentEntityInterface {
    *  - else, for system menu links (derived from hook_menu()), reparent
    *    based on the path hierarchy.
    *
-   * @param \Drupal\Core\Entity\EntityStorageControllerInterface $storage_controller
+   * @param \Drupal\menu_link\MenuLinkStorageControllerInterface $storage_controller
    *   Storage controller object.
    * @param array $parent_candidates
    *   An array of menu link entities keyed by mlid.
@@ -94,5 +93,5 @@ interface MenuLinkInterface extends ContentEntityInterface {
    *   A menu link entity structure of the possible parent or FALSE if no valid
    *   parent has been found.
    */
-  public function findParent(EntityStorageControllerInterface $storage_controller, array $parent_candidates = array());
+  public function findParent(MenuLinkStorageControllerInterface $storage_controller, array $parent_candidates = array());
 }

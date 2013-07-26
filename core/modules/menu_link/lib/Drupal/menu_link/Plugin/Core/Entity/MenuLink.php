@@ -7,17 +7,16 @@
 
 namespace Drupal\menu_link\Plugin\Core\Entity;
 
+use Drupal\Core\Annotation\Translation;
+use Drupal\Core\Entity\Annotation\EntityType;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityNG;
+use Drupal\Core\Entity\EntityStorageControllerInterface;
+use Drupal\Core\Language\Language;
 use Drupal\menu_link\MenuLinkInterface;
+use Drupal\menu_link\MenuLinkStorageControllerInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\HttpFoundation\Request;
-
-use Drupal\Core\Entity\Annotation\EntityType;
-use Drupal\Core\Annotation\Translation;
-use Drupal\Core\Entity\EntityStorageException;
-use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityStorageControllerInterface;
-use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\Core\Entity\Entity;
 
 /**
  * Defines the menu link entity class.
@@ -48,14 +47,14 @@ use Drupal\Core\Entity\Entity;
  *   }
  * )
  */
-class MenuLink extends Entity implements \ArrayAccess, MenuLinkInterface {
+class MenuLink extends EntityNG implements \ArrayAccess, MenuLinkInterface {
 
   /**
    * The link's menu name.
    *
-   * @var string
+   * @var \Drupal\Core\Entity\Field\FieldInterface
    */
-  public $menu_name = 'tools';
+  public $menu_name;
 
   /**
    * The link's bundle.
@@ -67,21 +66,21 @@ class MenuLink extends Entity implements \ArrayAccess, MenuLinkInterface {
   /**
    * The menu link ID.
    *
-   * @var int
+   * @var \Drupal\Core\Entity\Field\FieldInterface
    */
   public $mlid;
 
   /**
    * The menu link UUID.
    *
-   * @var string
+   * @var \Drupal\Core\Entity\Field\FieldInterface
    */
   public $uuid;
 
   /**
    * The parent link ID.
    *
-   * @var int
+   * @var \Drupal\Core\Entity\Field\FieldInterface
    */
   public $plid;
 
@@ -96,89 +95,89 @@ class MenuLink extends Entity implements \ArrayAccess, MenuLinkInterface {
    * For links corresponding to a Drupal path (external = 0), this connects the
    * link to a {menu_router}.path for joins.
    *
-   * @var string
+   * @var \Drupal\Core\Entity\Field\FieldInterface
    */
   public $router_path;
 
   /**
    * The entity label.
    *
-   * @var string
+   * @var \Drupal\Core\Entity\Field\FieldInterface
    */
-  public $link_title = '';
+  public $link_title;
 
   /**
    * A serialized array of options to be passed to the url() or l() function,
    * such as a query string or HTML attributes.
    *
-   * @var array
+   * @var \Drupal\Core\Entity\Field\FieldInterface
    */
-  public $options = array();
+  public $options;
 
   /**
    * The name of the module that generated this link.
    *
-   * @var string
+   * @var \Drupal\Core\Entity\Field\FieldInterface
    */
-  public $module = 'menu';
+  public $module;
 
   /**
    * A flag for whether the link should be rendered in menus.
    *
-   * @var int
+   * @var \Drupal\Core\Entity\Field\FieldInterface
    */
-  public $hidden = 0;
+  public $hidden;
 
   /**
    * A flag to indicate if the link points to a full URL starting with a
    * protocol, like http:// (1 = external, 0 = internal).
    *
-   * @var int
+   * @var \Drupal\Core\Entity\Field\FieldInterface
    */
   public $external;
 
   /**
    * Flag indicating whether any links have this link as a parent.
    *
-   * @var int
+   * @var \Drupal\Core\Entity\Field\FieldInterface
    */
-  public $has_children = 0;
+  public $has_children;
 
   /**
    * Flag for whether this link should be rendered as expanded in menus.
    * Expanded links always have their child links displayed, instead of only
    * when the link is in the active trail.
    *
-   * @var int
+   * @var \Drupal\Core\Entity\Field\FieldInterface
    */
-  public $expanded = 0;
+  public $expanded;
 
   /**
    * Link weight among links in the same menu at the same depth.
    *
-   * @var int
+   * @var \Drupal\Core\Entity\Field\FieldInterface
    */
-  public $weight = 0;
+  public $weight;
 
   /**
    * The depth relative to the top level. A link with plid == 0 will have
    * depth == 1.
    *
-   * @var int
+   * @var \Drupal\Core\Entity\Field\FieldInterface
    */
   public $depth;
 
   /**
    * A flag to indicate that the user has manually created or edited the link.
    *
-   * @var int
+   * @var \Drupal\Core\Entity\Field\FieldInterface
    */
-  public $customized = 0;
+  public $customized;
 
   /**
    * The first entity ID in the materialized path.
    *
-   * @var int
+   * @var \Drupal\Core\Entity\Field\FieldInterface
    *
    * @todo Investigate whether the p1, p2, .. pX properties can be moved to a
    * single array property.
@@ -188,72 +187,91 @@ class MenuLink extends Entity implements \ArrayAccess, MenuLinkInterface {
   /**
    * The second entity ID in the materialized path.
    *
-   * @var int
+   * @var \Drupal\Core\Entity\Field\FieldInterface
    */
   public $p2;
 
   /**
    * The third entity ID in the materialized path.
    *
-   * @var int
+   * @var \Drupal\Core\Entity\Field\FieldInterface
    */
   public $p3;
 
   /**
    * The fourth entity ID in the materialized path.
    *
-   * @var int
+   * @var \Drupal\Core\Entity\Field\FieldInterface
    */
   public $p4;
 
   /**
    * The fifth entity ID in the materialized path.
    *
-   * @var int
+   * @var \Drupal\Core\Entity\Field\FieldInterface
    */
   public $p5;
 
   /**
    * The sixth entity ID in the materialized path.
    *
-   * @var int
+   * @var \Drupal\Core\Entity\Field\FieldInterface
    */
   public $p6;
 
   /**
    * The seventh entity ID in the materialized path.
    *
-   * @var int
+   * @var \Drupal\Core\Entity\Field\FieldInterface
    */
   public $p7;
 
   /**
    * The eighth entity ID in the materialized path.
    *
-   * @var int
+   * @var \Drupal\Core\Entity\Field\FieldInterface
    */
   public $p8;
 
   /**
    * The ninth entity ID in the materialized path.
    *
-   * @var int
+   * @var \Drupal\Core\Entity\Field\FieldInterface
    */
   public $p9;
 
   /**
    * The menu link modification timestamp.
    *
-   * @var int
+   * @var \Drupal\Core\Entity\Field\FieldInterface
    */
-  public $updated = 0;
+  public $updated;
 
   /**
    * The name of the route associated with this menu link, if any.
    *
-   * @var string
+   * @var \Drupal\Core\Entity\Field\FieldInterface
    */
   public $route_name;
+
+  /**
+   * Default values for the menu link.
+   *
+   * @var array
+   */
+  protected $values = array(
+    'langcode' => array(Language::LANGCODE_DEFAULT => array(0 => array('value' => Language::LANGCODE_NOT_SPECIFIED))),
+    'menu_name' => array(Language::LANGCODE_DEFAULT => array(0 => array('value' => 'tools'))),
+    'link_title' => array(Language::LANGCODE_DEFAULT => array(0 => array('value' => ''))),
+    'options' => array(Language::LANGCODE_DEFAULT => array(0 => array('value' => array()))),
+    'module' => array(Language::LANGCODE_DEFAULT => array(0 => array('value' => 'menu'))),
+    'hidden' => array(Language::LANGCODE_DEFAULT => array(0 => array('value' => 0))),
+    'has_children' => array(Language::LANGCODE_DEFAULT => array(0 => array('value' => 0))),
+    'expanded' => array(Language::LANGCODE_DEFAULT => array(0 => array('value' => 0))),
+    'weight' => array(Language::LANGCODE_DEFAULT => array(0 => array('value' => 0))),
+    'customized' => array(Language::LANGCODE_DEFAULT => array(0 => array('value' => 0))),
+    'updated' => array(Language::LANGCODE_DEFAULT => array(0 => array('value' => 0))),
+  );
 
   /**
    * The route object associated with this menu link, if any.
@@ -263,10 +281,35 @@ class MenuLink extends Entity implements \ArrayAccess, MenuLinkInterface {
   protected $routeObject;
 
   /**
-   * Overrides Entity::id().
+   * Crap coming from the old routing system.
+   *
+   * @todo Remove when we rip out the old routing system.
+   *
+   * @var array
+   */
+  protected $oldRouterItem = array();
+
+  /**
+   * Properties of the old routing system.
+   *
+   * @todo Remove when we rip out the old routing system.
+   *
+   * @var array
+   */
+  protected $oldRoutingProperties = array(
+    'path', 'load_functions', 'to_arg_functions', 'access_callback',
+    'access_arguments', 'page_callback', 'page_arguments', 'fit',
+    'number_parts', 'context', 'tab_parent', 'tab_root', 'title',
+    'title_callback', 'title_arguments', 'theme_callback', 'theme_arguments',
+    'type', 'description', 'description_callback', 'description_arguments',
+    'position', 'include_file', 'route_name',
+  );
+
+  /**
+   * {@inheritdoc}
    */
   public function id() {
-    return $this->mlid;
+    return $this->get('mlid')->value;
   }
 
   /**
@@ -277,11 +320,46 @@ class MenuLink extends Entity implements \ArrayAccess, MenuLinkInterface {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  protected function init() {
+    parent::init();
+    // We unset all defined properties, so magic getters apply.
+    unset($this->menu_name);
+    unset($this->mlid);
+    unset($this->uuid);
+    unset($this->plid);
+    unset($this->link_path);
+    unset($this->router_path);
+    unset($this->link_title);
+    unset($this->options);
+    unset($this->module);
+    unset($this->hidden);
+    unset($this->external);
+    unset($this->has_children);
+    unset($this->expanded);
+    unset($this->weight);
+    unset($this->depth);
+    unset($this->customized);
+    unset($this->p1);
+    unset($this->p2);
+    unset($this->p3);
+    unset($this->p4);
+    unset($this->p5);
+    unset($this->p6);
+    unset($this->p7);
+    unset($this->p8);
+    unset($this->p9);
+    unset($this->updated);
+    unset($this->route_name);
+  }
+
+  /**
    * Overrides Entity::createDuplicate().
    */
   public function createDuplicate() {
     $duplicate = parent::createDuplicate();
-    $duplicate->plid = NULL;
+    $duplicate->get('plid')->offsetGet(0)->set('value', NULL);
     return $duplicate;
   }
 
@@ -289,12 +367,12 @@ class MenuLink extends Entity implements \ArrayAccess, MenuLinkInterface {
    * {@inheritdoc}
    */
   public function getRoute() {
-    if (!$this->route_name) {
+    if (!$this->route_name->value) {
       return NULL;
     }
     if (!($this->routeObject instanceof Route)) {
       $route_provider = \Drupal::service('router.route_provider');
-      $this->routeObject = $route_provider->getRouteByName($this->route_name);
+      $this->routeObject = $route_provider->getRouteByName($this->route_name->value);
     }
     return $this->routeObject;
   }
@@ -316,11 +394,11 @@ class MenuLink extends Entity implements \ArrayAccess, MenuLinkInterface {
     // not stored anywhere else. Since resetting a link happens rarely and this
     // is a one-time operation, retrieving the full menu router does no harm.
     $menu = menu_get_router();
-    $router_item = $menu[$this->router_path];
+    $router_item = $menu[$this->router_path->value];
     $new_link = self::buildFromRouterItem($router_item);
     // Merge existing menu link's ID and 'has_children' property.
     foreach (array('mlid', 'has_children') as $key) {
-      $new_link->{$key} = $this->{$key};
+      $new_link->{$key}->value = $this->{$key}->value;
     }
     $new_link->save();
     return $new_link;
@@ -351,31 +429,62 @@ class MenuLink extends Entity implements \ArrayAccess, MenuLinkInterface {
   }
 
   /**
-   * Implements ArrayAccess::offsetExists().
+   * {@inheritdoc}
    */
   public function offsetExists($offset) {
-    return isset($this->{$offset});
+    if (in_array($offset, $this->oldRoutingProperties)) {
+      return isset($this->oldRouterItem[$offset]);
+    }
+
+    return isset($this->{$offset}->value);
+//    return isset($this->{$offset});
   }
 
   /**
-   * Implements ArrayAccess::offsetGet().
+   * {@inheritdoc}
    */
-  public function &offsetGet($offset) {
-    return $this->{$offset};
+  public function offsetGet($offset) {
+    if (in_array($offset, $this->oldRoutingProperties)) {
+      return $this->oldRouterItem[$offset];
+    }
+
+    return $this->{$offset}->value;
+//    return $this->{$offset};
   }
 
   /**
-   * Implements ArrayAccess::offsetSet().
+   * {@inheritdoc}
    */
   public function offsetSet($offset, $value) {
-    $this->{$offset} = $value;
+    if (in_array($offset, $this->oldRoutingProperties)) {
+      $this->oldRouterItem[$offset] = $value;
+    }
+    else {
+      $this->{$offset}->value = $value;
+    }
+//    $this->{$offset} = $value;
   }
 
   /**
-   * Implements ArrayAccess::offsetUnset().
+   * {@inheritdoc}
    */
   public function offsetUnset($offset) {
-    unset($this->{$offset});
+    if (in_array($offset, $this->oldRoutingProperties)) {
+      unset($this->oldRouterItem[$offset]);
+    }
+    else {
+      $this->{$offset}->value = NULL;
+    }
+//    unset($this->{$offset});
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function preCreate(EntityStorageControllerInterface $storage_controller, array &$values) {
+    if (empty($values['menu_name'])) {
+      $values['menu_name'] = $values['bundle'] = 'tools';
+    }
   }
 
   /**
@@ -389,10 +498,10 @@ class MenuLink extends Entity implements \ArrayAccess, MenuLinkInterface {
 
     foreach ($entities as $entity) {
       // Children get re-attached to the item's parent.
-      if ($entity->has_children) {
-        $children = $storage_controller->loadByProperties(array('plid' => $entity->plid));
+      if ($entity->has_children->value) {
+        $children = $storage_controller->loadByProperties(array('plid' => $entity->plid->target_id));
         foreach ($children as $child) {
-          $child->plid = $entity->plid;
+          $child->plid->target_id = $entity->plid->target_id;
           $storage_controller->save($child);
         }
       }
@@ -411,8 +520,8 @@ class MenuLink extends Entity implements \ArrayAccess, MenuLinkInterface {
       }
 
       // Store all menu names for which we need to clear the cache.
-      if (!isset($affected_menus[$entity->menu_name])) {
-        $affected_menus[$entity->menu_name] = $entity->menu_name;
+      if (!isset($affected_menus[$entity->menu_name->value])) {
+        $affected_menus[$entity->menu_name->value] = $entity->menu_name->value;
       }
     }
 
@@ -428,63 +537,64 @@ class MenuLink extends Entity implements \ArrayAccess, MenuLinkInterface {
   public function preSave(EntityStorageControllerInterface $storage_controller) {
     // This is the easiest way to handle the unique internal path '<front>',
     // since a path marked as external does not need to match a router path.
-    $this->external = (url_is_external($this->link_path) || $this->link_path == '<front>') ? 1 : 0;
+    $this->external->value = (url_is_external($this->link_path->value) || $this->link_path->value == '<front>') ? 1 : 0;
 
     // Try to find a parent link. If found, assign it and derive its menu.
     $parent_candidates = !empty($this->parentCandidates) ? $this->parentCandidates : array();
     $parent = $this->findParent($storage_controller, $parent_candidates);
     if ($parent) {
-      $this->plid = $parent->id();
-      $this->menu_name = $parent->menu_name;
+      $this->plid->target_id = $parent->id();
+      $this->menu_name->value = $parent->menu_name->value;
     }
     // If no corresponding parent link was found, move the link to the top-level.
     else {
-      $this->plid = 0;
+      $this->plid->target_id = 0;
     }
 
     // Directly fill parents for top-level links.
-    if ($this->plid == 0) {
-      $this->p1 = $this->id();
+    if ($this->plid->target_id == 0) {
+      $this->p1->value = $this->id();
       for ($i = 2; $i <= MENU_MAX_DEPTH; $i++) {
         $parent_property = "p$i";
-        $this->{$parent_property} = 0;
+        $this->{$parent_property}->value = 0;
       }
-      $this->depth = 1;
+      $this->depth->value = 1;
     }
     // Otherwise, ensure that this link's depth is not beyond the maximum depth
     // and fill parents based on the parent link.
     else {
-      if ($this->has_children && $this->original) {
+      if ($this->has_children->value && $this->original) {
         $limit = MENU_MAX_DEPTH - $storage_controller->findChildrenRelativeDepth($this->original) - 1;
       }
       else {
         $limit = MENU_MAX_DEPTH - 1;
       }
-      if ($parent->depth > $limit) {
+      if ($parent->depth->value > $limit) {
         return FALSE;
       }
-      $this->depth = $parent->depth + 1;
+      $this->depth->value = $parent->depth->value + 1;
       $this->setParents($parent);
     }
 
     // Need to check both plid and menu_name, since plid can be 0 in any menu.
-    if (isset($this->original) && ($this->plid != $this->original->plid || $this->menu_name != $this->original->menu_name)) {
+    if (isset($this->original) && ($this->plid->target_id != $this->original->plid->target_id || $this->menu_name->value != $this->original->menu_name->value)) {
       $storage_controller->moveChildren($this, $this->original);
     }
     // Find the router_path.
-    if (empty($this->router_path) || empty($this->original) || (isset($this->original) && $this->original->link_path != $this->link_path)) {
-      if ($this->external) {
-        $this->router_path = '';
+    if (empty($this->router_path->value) || empty($this->original) || (isset($this->original) && $this->original->link_path->value != $this->link_path->value)) {
+      if ($this->external->value) {
+        $this->router_path->value = '';
       }
       else {
         // Find the router path which will serve this path.
-        $this->parts = explode('/', $this->link_path, MENU_MAX_PARTS);
-        $this->router_path = _menu_find_router_path($this->link_path);
+        // @todo Where do we need 'parts'?
+        $this->parts = explode('/', $this->link_path->value, MENU_MAX_PARTS);
+        $this->router_path->value = _menu_find_router_path($this->link_path->value);
       }
     }
     // Find the route_name.
-    if (!isset($this->route_name)) {
-      $this->route_name = $this::findRouteName($this->link_path);
+    if (!isset($this->route_name->value)) {
+      $this->route_name->value = $this::findRouteName($this->link_path->value);
     }
   }
 
@@ -495,9 +605,9 @@ class MenuLink extends Entity implements \ArrayAccess, MenuLinkInterface {
     // Check the has_children status of the parent.
     $storage_controller->updateParentalStatus($this);
 
-    menu_cache_clear($this->menu_name);
-    if (isset($this->original) && $this->menu_name != $this->original->menu_name) {
-      menu_cache_clear($this->original->menu_name);
+    menu_cache_clear($this->menu_name->value);
+    if (isset($this->original) && $this->menu_name->value != $this->original->menu_name->value) {
+      menu_cache_clear($this->original->menu_name->value);
     }
 
     // Now clear the cache.
@@ -528,41 +638,41 @@ class MenuLink extends Entity implements \ArrayAccess, MenuLinkInterface {
    */
   public function setParents(EntityInterface $parent) {
     $i = 1;
-    while ($i < $this->depth) {
+    while ($i < $this->depth->value) {
       $p = 'p' . $i++;
-      $this->{$p} = $parent->{$p};
+      $this->{$p}->value = $parent->{$p}->value;
     }
     $p = 'p' . $i++;
     // The parent (p1 - p9) corresponding to the depth always equals the mlid.
-    $this->{$p} = $this->id();
+    $this->{$p}->value = $this->id();
     while ($i <= MENU_MAX_DEPTH) {
       $p = 'p' . $i++;
-      $this->{$p} = 0;
+      $this->{$p}->value = 0;
     }
   }
 
   /**
    * {@inheritdoc}
    */
-  public function findParent(EntityStorageControllerInterface $storage_controller, array $parent_candidates = array()) {
+  public function findParent(MenuLinkStorageControllerInterface $storage_controller, array $parent_candidates = array()) {
     $parent = FALSE;
 
     // This item is explicitely top-level, skip the rest of the parenting.
-    if (isset($this->plid) && empty($this->plid)) {
+    if (isset($this->plid->target_id) && empty($this->plid->target_id)) {
       return $parent;
     }
 
     // If we have a parent link ID, try to use that.
     $candidates = array();
-    if (isset($this->plid)) {
-      $candidates[] = $this->plid;
+    if (isset($this->plid->target_id)) {
+      $candidates[] = $this->plid->target_id;
     }
 
     // Else, if we have a link hierarchy try to find a valid parent in there.
-    if (!empty($this->depth) && $this->depth > 1) {
-      for ($depth = $this->depth - 1; $depth >= 1; $depth--) {
+    if (!empty($this->depth->value) && $this->depth->value > 1) {
+      for ($depth = $this->depth->value - 1; $depth >= 1; $depth--) {
         $parent_property = "p$depth";
-        $candidates[] = $this->$parent_property;
+        $candidates[] = $this->$parent_property->value;
       }
     }
 
@@ -581,12 +691,11 @@ class MenuLink extends Entity implements \ArrayAccess, MenuLinkInterface {
     // If everything else failed, try to derive the parent from the path
     // hierarchy. This only makes sense for links derived from menu router
     // items (ie. from hook_menu()).
-    if ($this->module == 'system') {
+    if ($this->module->value == 'system') {
       $parent = $storage_controller->getParentFromHierarchy($this);
     }
 
     return $parent;
   }
-
 
 }

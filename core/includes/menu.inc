@@ -2902,8 +2902,8 @@ function _menu_navigation_links_rebuild($menu) {
         $existing_item = NULL;
       }
 
-      if ($existing_item && $existing_item->customized) {
-        $parent_candidates[$existing_item->mlid] = $existing_item;
+      if ($existing_item && $existing_item->customized->value) {
+        $parent_candidates[$existing_item->id()] = $existing_item;
       }
       else {
         $menu_link = MenuLink::buildFromRouterItem($router_item);
@@ -2920,14 +2920,14 @@ function _menu_navigation_links_rebuild($menu) {
   // Updated and customized items whose router paths are gone need new ones.
   $menu_links = $menu_link_controller->loadUpdatedCustomized($paths);
   foreach ($menu_links as $menu_link) {
-    $router_path = _menu_find_router_path($menu_link->link_path);
-    if (!empty($router_path) && ($router_path != $menu_link->router_path || $menu_link->updated)) {
+    $router_path = _menu_find_router_path($menu_link->link_path->value);
+    if (!empty($router_path) && ($router_path != $menu_link->router_path->value || $menu_link->updated->value)) {
       // If the router path and the link path matches, it's surely a working
       // item, so we clear the updated flag.
-      $updated = $menu_link->updated && $router_path != $menu_link->link_path;
+      $updated = $menu_link->updated->value && $router_path != $menu_link->link_path->value;
 
-      $menu_link->router_path = $router_path;
-      $menu_link->updated = (int) $updated;
+      $menu_link->router_path->value = $router_path;
+      $menu_link->updated->value = (int) $updated;
       $menu_link_controller->save($menu_link);
     }
   }
