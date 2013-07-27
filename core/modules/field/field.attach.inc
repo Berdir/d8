@@ -10,6 +10,7 @@ use Drupal\Core\Entity\EntityNG;
 use Drupal\entity\Plugin\Core\Entity\EntityDisplay;
 use Drupal\entity\Plugin\Core\Entity\EntityFormDisplay;
 use Drupal\Core\Language\Language;
+use Drupal\Core\Entity\Field\PrepareCacheInterface;
 
 /**
  * @defgroup field_attach Field Attach API
@@ -479,7 +480,7 @@ function field_attach_form(EntityInterface $entity, &$form, &$form_state, $langc
 
   // Let other modules make changes to the form.
   // Avoid module_invoke_all() to let parameters be taken by reference.
-  foreach (module_implements('field_attach_form') as $module) {
+  foreach (Drupal::moduleHandler()->getImplementations('field_attach_form') as $module) {
     $function = $module . '_field_attach_form';
     $function($entity, $form, $form_state, $langcode);
   }
@@ -576,13 +577,169 @@ function field_attach_extract_form_values(EntityInterface $entity, $form, &$form
 
   // Let other modules act on submitting the entity.
   // Avoid module_invoke_all() to let $form_state be taken by reference.
-  foreach (module_implements('field_attach_extract_form_values') as $module) {
+  foreach (Drupal::moduleHandler()->getImplementations('field_attach_extract_form_values') as $module) {
     $function = $module . 'field_attach_extract_form_values';
     $function($entity, $form, $form_state);
   }
 }
 
 /**
+<<<<<<< HEAD
+=======
+ * Save field data for a new entity.
+ *
+ * The passed-in entity must already contain its id and (if applicable)
+ * revision id attributes.
+ * Default values (if any) will be saved for fields not present in the
+ * $entity.
+ *
+ * @param \Drupal\Core\Entity\EntityInterface $entity
+ *   The entity with fields to save.
+ * @return
+ *   Default values (if any) will be added to the $entity parameter for fields
+ *   it leaves unspecified.
+ *
+ * @deprecated as of Drupal 8.0. Use the entity system instead.
+ */
+function field_attach_insert(EntityInterface $entity) {
+  // Ensure we are working with a BC mode entity.
+  $entity = $entity->getBCEntity();
+
+  // Let any module insert field data before the storage engine, accumulating
+  // saved fields along the way.
+  $skip_fields = array();
+  foreach (Drupal::moduleHandler()->getImplementations('field_storage_pre_insert') as $module) {
+    $function = $module . '_field_storage_pre_insert';
+    $function($entity, $skip_fields);
+  }
+
+  // Collect the storage backends used by the remaining fields in the entities.
+  $storages = array();
+  foreach (field_info_instances($entity->entityType(), $entity->bundle()) as $instance) {
+    $field = field_info_field_by_id($instance['field_id']);
+    $field_id = $field['uuid'];
+    $field_name = $field['field_name'];
+    if (!empty($entity->$field_name)) {
+      // Collect the storage backend if the field has not been written yet.
+      if (!isset($skip_fields[$field_id])) {
+        $storages[$field['storage']['type']][$field_id] = $field_id;
+      }
+    }
+  }
+
+  // Field storage backends save any remaining unsaved fields.
+  foreach ($storages as $storage => $fields) {
+    $storage_info = field_info_storage_types($storage);
+    module_invoke($storage_info['module'], 'field_storage_write', $entity, FIELD_STORAGE_INSERT, $fields);
+  }
+}
+
+/**
+ * Saves field data for an existing entity.
+ *
+ * @param \Drupal\Core\Entity\EntityInterface $entity
+ *   The entity with fields to save.
+ *
+ * @deprecated as of Drupal 8.0. Use the entity system instead.
+ */
+function field_attach_update(EntityInterface $entity) {
+  // Ensure we are working with a BC mode entity.
+  $entity = $entity->getBCEntity();
+
+  // Let any module update field data before the storage engine, accumulating
+  // saved fields along the way.
+  $skip_fields = array();
+  foreach (Drupal::moduleHandler()->getImplementations('field_storage_pre_update') as $module) {
+    $function = $module . '_field_storage_pre_update';
+    $function($entity, $skip_fields);
+  }
+
+  // Collect the storage backends used by the remaining fields in the entities.
+  $storages = array();
+  foreach (field_info_instances($entity->entityType(), $entity->bundle()) as $instance) {
+    $field = field_info_field_by_id($instance['field_id']);
+    $field_id = $field['uuid'];
+    // Collect the storage backend if the field has not been written yet.
+    if (!isset($skip_fields[$field_id])) {
+      $storages[$field['storage']['type']][$field_id] = $field_id;
+    }
+  }
+
+  // Field storage backends save any remaining unsaved fields.
+  foreach ($storages as $storage => $fields) {
+    $storage_info = field_info_storage_types($storage);
+    module_invoke($storage_info['module'], 'field_storage_write', $entity, FIELD_STORAGE_UPDATE, $fields);
+  }
+
+  $entity_info = $entity->entityInfo();
+  if ($entity_info['field_cache']) {
+    cache('field')->delete('field:' . $entity->entityType() . ':' . $entity->id());
+  }
+}
+
+/**
+ * Deletes field data for an existing entity. This deletes all revisions of
+ * field data for the entity.
+ *
+ * @param \Drupal\Core\Entity\EntityInterface $entity
+ *   The entity whose field data to delete.
+ *
+ * @deprecated as of Drupal 8.0. Use the entity system instead.
+ */
+function field_attach_delete(EntityInterface $entity) {
+  // Ensure we are working with a BC mode entity.
+  $entity = $entity->getBCEntity();
+
+  // Collect the storage backends used by the fields in the entities.
+  $storages = array();
+  foreach (field_info_instances($entity->entityType(), $entity->bundle()) as $instance) {
+    $field = field_info_field_by_id($instance['field_id']);
+    $field_id = $field['uuid'];
+    $storages[$field['storage']['type']][$field_id] = $field_id;
+  }
+
+  // Field storage backends delete their data.
+  foreach ($storages as $storage => $fields) {
+    $storage_info = field_info_storage_types($storage);
+    module_invoke($storage_info['module'], 'field_storage_delete', $entity, $fields);
+  }
+
+  $entity_info = $entity->entityInfo();
+  if ($entity_info['field_cache']) {
+    cache('field')->delete('field:' . $entity->entityType() . ':' . $entity->id());
+  }
+}
+
+/**
+ * Delete field data for a single revision of an existing entity. The passed
+ * entity must have a revision ID attribute.
+ *
+ * @param \Drupal\Core\Entity\EntityInterface $entity
+ *   The entity with fields to save.
+ *
+ * @deprecated as of Drupal 8.0. Use the entity system instead.
+ */
+function field_attach_delete_revision(EntityInterface $entity) {
+  // Ensure we are working with a BC mode entity.
+  $entity = $entity->getBCEntity();
+
+  // Collect the storage backends used by the fields in the entities.
+  $storages = array();
+  foreach (field_info_instances($entity->entityType(), $entity->bundle()) as $instance) {
+    $field = field_info_field_by_id($instance['field_id']);
+    $field_id = $field['uuid'];
+    $storages[$field['storage']['type']][$field_id] = $field_id;
+  }
+
+  // Field storage backends delete their data.
+  foreach ($storages as $storage => $fields) {
+    $storage_info = field_info_storage_types($storage);
+    module_invoke($storage_info['module'], 'field_storage_delete_revision', $entity, $fields);
+  }
+}
+
+/**
+>>>>>>> 8.x
  * Prepares field data prior to display.
  *
  * This function lets field types and formatters load additional data needed for

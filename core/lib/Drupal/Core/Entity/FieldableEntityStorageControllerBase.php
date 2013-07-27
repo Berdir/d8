@@ -87,11 +87,8 @@ abstract class FieldableEntityStorageControllerBase extends EntityStorageControl
       // - hook_field_attach_load()
 
       // Invoke hook_field_storage_pre_load(): let any module load field data
-      // before the storage engine, accumulating along the way.
-      foreach (module_implements('field_storage_pre_load') as $module) {
-        $function = $module . '_field_storage_pre_load';
-        $function($this->entityType, $queried_entities, $age);
-      }
+      // before the storage engine.
+      \Drupal::moduleHandler()->invokeAll('field_storage_pre_load', array($this->entityType, $queried_entities, $age));
 
       // Let the storage controller actually load the values.
       $this->doFieldLoad($queried_entities, $age);
@@ -105,7 +102,7 @@ abstract class FieldableEntityStorageControllerBase extends EntityStorageControl
 
       // Invoke hook_field_attach_load(): let other modules act on loading the
       // entity.
-      module_invoke_all('field_attach_load', $this->entityType, $queried_entities, $age);
+      \Drupal::moduleHandler()->invokeAll('field_attach_load', array($this->entityType, $queried_entities, $age));
 
       // Build cache data.
       if ($use_cache) {
@@ -141,10 +138,8 @@ abstract class FieldableEntityStorageControllerBase extends EntityStorageControl
     $entity = $entity->getBCEntity();
 
     // Let any module insert field data before the storage engine.
-    foreach (module_implements('field_storage_pre_insert') as $module) {
-      $function = $module . '_field_storage_pre_insert';
-      $function($entity);
-    }
+    \Drupal::moduleHandler()->invokeAll('field_storage_pre_insert', array($entity));
+
     $this->doFieldInsert($entity);
   }
 
@@ -161,10 +156,7 @@ abstract class FieldableEntityStorageControllerBase extends EntityStorageControl
     $entity = $entity->getBCEntity();
 
     // Let any module update field data before the storage engine
-    foreach (module_implements('field_storage_pre_update') as $module) {
-      $function = $module . '_field_storage_pre_update';
-      $function($entity);
-    }
+    \Drupal::moduleHandler()->invokeAll('field_storage_pre_update', array($entity));
 
     $this->doFieldUpdate($entity);
 
