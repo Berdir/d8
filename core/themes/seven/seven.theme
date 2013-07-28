@@ -98,7 +98,7 @@ function seven_admin_block_content($variables) {
     foreach ($content as $item) {
       $output .= '<li>';
       $content = '<span class="label">' . filter_xss_admin($item['title']) . '</span>';
-      $options = $item['localized_options'];
+      $options = $item['localized_options']->getValue();
       $options['html'] = TRUE;
       if (isset($item['description']) && !system_admin_compact_mode()) {
         $content .= '<div class="description">' . filter_xss_admin($item['description']) . '</div>';

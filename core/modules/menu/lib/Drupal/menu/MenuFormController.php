@@ -323,7 +323,7 @@ class MenuFormController extends EntityFormController implements EntityControlle
         $mlid = 'mlid:' . $item['mlid'];
         $form[$mlid]['#item'] = $item;
         $form[$mlid]['#attributes'] = $item['hidden'] ? array('class' => array('menu-disabled')) : array('class' => array('menu-enabled'));
-        $form[$mlid]['title']['#markup'] = l($item['title'], $item['href'], $item['localized_options']);
+        $form[$mlid]['title']['#markup'] = l($item['title'], $item['href'], $item['localized_options']->getValue());
         if ($item['hidden']) {
           $form[$mlid]['title']['#markup'] .= ' (' . t('disabled') . ')';
         }

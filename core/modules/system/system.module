@@ -2456,7 +2456,7 @@ function system_admin_menu_block($item) {
     $menu_links = entity_load_multiple_by_properties('menu_link', array('router_path' => $item['path'], 'module' => 'system'));
     $menu_link = reset($menu_links);
     $item['mlid'] = $menu_link->id();
-    $item['menu_name'] = $menu_link->menu_name;
+    $item['menu_name'] = $menu_link->menu_name->value;
   }
 
   if (isset($cache[$item['mlid']])) {

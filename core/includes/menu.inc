@@ -1662,7 +1662,7 @@ function theme_menu_link(array $variables) {
   if ($element['#below']) {
     $sub_menu = drupal_render($element['#below']);
   }
-  $output = l($element['#title'], $element['#href'], $element['#localized_options']);
+  $output = l($element['#title'], $element['#href'], $element['#localized_options']->getValue());
   return '<li' . new Attribute($element['#attributes']) . '>' . $output . $sub_menu . "</li>\n";
 }
 

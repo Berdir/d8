@@ -125,7 +125,7 @@ class MenuLinkFormController extends EntityFormControllerNG implements EntityCon
       $form['_path'] = array(
         '#type' => 'item',
         '#title' => t('Path'),
-        '#description' => l($menu_link->link_title->value, $menu_link->href->value, $menu_link->options->value),
+        '#description' => l($menu_link->link_title->value, $menu_link->href, $menu_link->options->get('value')->getValue()),
       );
     }
 
@@ -252,23 +252,16 @@ class MenuLinkFormController extends EntityFormControllerNG implements EntityCon
     parent::validate($form, $form_state);
   }
 
-  /**
-   * Overrides EntityFormController::submit().
-   */
-  public function submit(array $form, array &$form_state) {
-    // Build the menu link object from the submitted values.
-    $menu_link = parent::submit($form, $form_state);
-
+  public function buildEntity(array $form, array &$form_state) {
+    $entity = parent::buildEntity($form, $form_state);
     // The value of "hidden" is the opposite of the value supplied by the
     // "enabled" checkbox.
-    $menu_link->hidden->value = (int) !$menu_link->enabled->value;
-    // @todo Check out this 'enabled' stuff.
-//    unset($menu_link->enabled);
-
-    $menu_link->options->value['attributes']['title'] = $menu_link->description->value;
-    list($menu_link->menu_name->value, $menu_link->plid->target_id) = explode(':', $menu_link->parent);
-
-    return $menu_link;
+    $entity->hidden->value = (int) !$form_state['values']['enabled'];
+    list($entity->menu_name->value, $entity->plid->target_id) = explode(':', $form_state['values']['parent']);
+    $attributes = $entity->options->value['attributes'];
+    $attributes['title'] = $form_state['values']['description'];
+    $entity->options->value['attributes'] = $attributes;
+    return $entity;
   }
 
   /**

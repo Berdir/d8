@@ -435,9 +435,7 @@ class MenuLink extends EntityNG implements \ArrayAccess, MenuLinkInterface {
     if (in_array($offset, $this->oldRoutingProperties)) {
       return isset($this->oldRouterItem[$offset]);
     }
-
     return isset($this->{$offset}->value);
-//    return isset($this->{$offset});
   }
 
   /**
