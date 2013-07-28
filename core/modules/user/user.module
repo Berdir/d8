@@ -963,7 +963,7 @@ function user_menu_link_presave(MenuLink $menu_link) {
   // anonymous users should not see it at all. Therefore, invoke
   // user_menu_link_load() to conditionally hide the link.
   if ($menu_link->link_path->value == 'user' && $menu_link->module->value == 'system') {
-    $menu_link->options['alter'] = TRUE;
+    //$menu_link->options['alter'] = TRUE;
   }
 
   // Force the Logout link to appear on the top-level of 'account' menu by
