@@ -500,10 +500,11 @@ class FormTest extends FieldTestBase {
    * Tests fields with no 'edit' access.
    */
   function testFieldFormAccess() {
+    $entity_type = 'entity_test_rev';
     // Create a "regular" field.
     $field = $this->field_single;
+    $field['entity_type'] = $entity_type;
     $field_name = $field['name'];
-    $entity_type = 'entity_test_rev';
     $instance = $this->instance;
     $instance['field_name'] = $field_name;
     $instance['entity_type'] = $entity_type;
@@ -593,6 +594,7 @@ class FormTest extends FieldTestBase {
   function testFieldFormHiddenWidget() {
     $entity_type = 'entity_test_rev';
     $field = $this->field_single;
+    $field['entity_type'] = $entity_type;
     $field_name = $field['name'];
     $this->instance['field_name'] = $field_name;
     $this->instance['default_value'] = array(0 => array('value' => 99));

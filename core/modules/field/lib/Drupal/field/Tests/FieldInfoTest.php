@@ -42,7 +42,8 @@ class FieldInfoTest extends FieldUnitTestBase {
     // Create a field, verify it shows up.
     $core_fields = field_info_fields();
     $field = entity_create('field_entity', array(
-      'field_name' => drupal_strtolower($this->randomName()),
+      'name' => drupal_strtolower($this->randomName()),
+      'entity_type' => 'entity_test',
       'type' => 'test_field',
     ));
     $field->save();
@@ -60,7 +61,7 @@ class FieldInfoTest extends FieldUnitTestBase {
 
     // Create an instance, verify that it shows up
     $instance_definition = array(
-      'field_name' => $field['field_name'],
+      'field_name' => $field['name'],
       'entity_type' => 'entity_test',
       'bundle' => 'entity_test',
       'label' => $this->randomName(),
@@ -128,7 +129,7 @@ class FieldInfoTest extends FieldUnitTestBase {
     field_info_cache_clear();
 
     // Read the field back.
-    $field = field_info_field('entity_test', $field_definition['field_name']);
+    $field = field_info_field('entity_test', $field_definition['name']);
 
     // Check that all expected settings are in place.
     $field_type = field_info_field_types($field_definition['type']);
@@ -146,7 +147,7 @@ class FieldInfoTest extends FieldUnitTestBase {
     );
     entity_create('field_entity', $field_definition)->save();
     $instance_definition = array(
-      'field_name' => $field_definition['field_name'],
+      'field_name' => $field_definition['name'],
       'entity_type' => 'entity_test',
       'bundle' => 'entity_test',
     );
