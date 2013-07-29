@@ -12,7 +12,6 @@ use Drupal\Core\Entity\EntityStorageControllerInterface;
 use Drupal\Core\Entity\Annotation\EntityType;
 use Drupal\Core\Annotation\Translation;
 use Drupal\node\NodeInterface;
-use Drupal\node\NodeBCDecorator;
 
 /**
  * Defines the node entity class.
@@ -118,17 +117,6 @@ class Node extends EntityNG implements NodeInterface {
     if ($this->isDefaultRevision()) {
       \Drupal::entityManager()->getAccessController('node')->writeGrants($this, $update);
     }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getBCEntity() {
-    if (!isset($this->bcEntity)) {
-      $this->getPropertyDefinitions();
-      $this->bcEntity = new NodeBCDecorator($this, $this->fieldDefinitions);
-    }
-    return $this->bcEntity;
   }
 
   /**
