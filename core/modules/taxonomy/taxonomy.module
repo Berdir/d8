@@ -296,7 +296,7 @@ function taxonomy_menu() {
   $items['taxonomy/autocomplete/%/%'] = array(
     'title' => 'Autocomplete taxonomy',
     'page callback' => 'taxonomy_autocomplete',
-    'page arguments' => array(2),
+    'page arguments' => array(2, 3),
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
     'file' => 'taxonomy.pages.inc',
