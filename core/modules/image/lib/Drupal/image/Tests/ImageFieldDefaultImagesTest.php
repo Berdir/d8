@@ -67,12 +67,12 @@ class ImageFieldDefaultImagesTest extends ImageFieldTestBase {
     ));
     $instance2->save();
 
-    $widget_settings = entity_get_form_display($instance['entity_type'], $instance['bundle'], 'default')->getComponent($field['field_name']);
+    $widget_settings = entity_get_form_display($instance['entity_type'], $instance['bundle'], 'default')->getComponent($field_name);
     entity_get_form_display('node', 'page', 'default')
-      ->setComponent($field->name, $widget_settings)
+      ->setComponent($field_name, $widget_settings)
       ->save();
     entity_get_display('node', 'page', 'default')
-      ->setComponent($field->name)
+      ->setComponent($field_name)
       ->save();
 
     // Confirm the defaults are present on the article field settings form.

@@ -89,14 +89,14 @@ abstract class ImageFieldTestBase extends WebTestBase {
     $field_instance->save();
 
     entity_get_form_display('node', $type_name, 'default')
-      ->setComponent($field['field_name'], array(
+      ->setComponent($field['name'], array(
         'type' => 'image_image',
         'settings' => $widget_settings,
       ))
       ->save();
 
     entity_get_display('node', $type_name, 'default')
-      ->setComponent($field['field_name'])
+      ->setComponent($field['name'])
       ->save();
 
     return $field_instance;
