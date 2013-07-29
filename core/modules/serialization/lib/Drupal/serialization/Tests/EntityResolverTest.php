@@ -38,7 +38,7 @@ class EntityResolverTest extends NormalizerTestBase {
       'settings' => array(
         'target_type' => 'entity_test_mulrev',
       ),
-      'name' => 'field_test_entity_reference',
+      'name' => 'field_entity_reference',
       'entity_type' => 'entity_test_mulrev',
       'type' => 'entity_reference',
     ))->save();
@@ -46,7 +46,7 @@ class EntityResolverTest extends NormalizerTestBase {
     // Create the test field instance.
     entity_create('field_instance', array(
       'entity_type' => 'entity_test_mulrev',
-      'field_name' => 'field_test_entity_reference',
+      'field_name' => 'field_entity_reference',
       'bundle' => 'entity_test_mulrev',
     ))->save();
   }
@@ -58,7 +58,7 @@ class EntityResolverTest extends NormalizerTestBase {
     // Create an entity to get the UUID from.
     $entity = entity_create('entity_test_mulrev', array('type' => 'entity_test_mulrev'));
     $entity->set('name', 'foobar');
-    $entity->set('field_test_entity_reference', array(array('target_id' => 1)));
+    $entity->set('field_entity_reference', array(array('target_id' => 1)));
     $entity->save();
 
     $field_uri = url('rest/relation/entity_test_mulrev/entity_test_mulrev/field_test_entity_reference', array('absolute' => TRUE));
@@ -91,7 +91,7 @@ class EntityResolverTest extends NormalizerTestBase {
     );
 
     $denormalized = $this->container->get('serializer')->denormalize($data, 'Drupal\entity_test\Plugin\Core\Entity\EntityTestMulRev', $this->format);
-    $field_value = $denormalized->get('field_test_entity_reference')->getValue();
+    $field_value = $denormalized->get('field_entity_reference')->getValue();
     $this->assertEqual($field_value[0]['target_id'], 1, 'Entity reference resolved using UUID.');
   }
 

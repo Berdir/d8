@@ -24,9 +24,9 @@ class NormalizeTest extends NormalizerTestBase {
    * Tests the normalize function.
    */
   public function testNormalize() {
-    $target_entity_de = entity_create('entity_test', (array('langcode' => 'de', 'field_test_entity_reference' => NULL)));
+    $target_entity_de = entity_create('entity_test', (array('langcode' => 'de', 'field_entity_reference' => NULL)));
     $target_entity_de->save();
-    $target_entity_en = entity_create('entity_test', (array('langcode' => 'en', 'field_test_entity_reference' => NULL)));
+    $target_entity_en = entity_create('entity_test', (array('langcode' => 'en', 'field_entity_reference' => NULL)));
     $target_entity_en->save();
 
     // Create a German entity.
@@ -38,14 +38,14 @@ class NormalizeTest extends NormalizerTestBase {
         'value' => $this->randomName(),
         'format' => 'full_html',
       ),
-      'field_test_entity_reference' => array(
+      'field_entity_reference' => array(
         'target_id' => $target_entity_de->id(),
       ),
     );
     // Array of translated values.
     $translation_values = array(
       'name' => $this->randomName(),
-      'field_test_entity_reference' => array(
+      'field_entity_reference' => array(
         'target_id' => $target_entity_en->id(),
       )
     );
@@ -54,7 +54,7 @@ class NormalizeTest extends NormalizerTestBase {
     $entity->save();
     // Add an English value for name and entity reference properties.
     $entity->getTranslation('en')->set('name', array(0 => array('value' => $translation_values['name'])));
-    $entity->getTranslation('en')->set('field_test_entity_reference', array(0 => $translation_values['field_test_entity_reference']));
+    $entity->getTranslation('en')->set('field_entity_reference', array(0 => $translation_values['field_entity_reference']));
     $entity->save();
 
     $type_uri = url('rest/type/entity_test/entity_test', array('absolute' => TRUE));

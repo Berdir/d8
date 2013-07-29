@@ -132,7 +132,7 @@ class DenormalizeTest extends NormalizerTestBase {
           'format' => 'full_html',
         ),
       ),
-      'field_test_translatable_text' => array(
+      'field_translatable_text' => array(
         array(
           'value' => $this->randomName(),
           'format' => 'full_html',
@@ -156,28 +156,28 @@ class DenormalizeTest extends NormalizerTestBase {
 
     $expected_value_default = array(
       array (
-        'value' => $data['field_test_translatable_text'][0]['value'],
+        'value' => $data['field_translatable_text'][0]['value'],
         'format' => 'full_html',
       ),
       array (
-        'value' => $data['field_test_translatable_text'][1]['value'],
+        'value' => $data['field_translatable_text'][1]['value'],
         'format' => 'filtered_html',
       ),
     );
     $expected_value_de = array(
       array (
-        'value' => $data['field_test_translatable_text'][2]['value'],
+        'value' => $data['field_translatable_text'][2]['value'],
         'format' => 'filtered_html',
       ),
       array (
-        'value' => $data['field_test_translatable_text'][3]['value'],
+        'value' => $data['field_translatable_text'][3]['value'],
         'format' => 'full_html',
       ),
     );
     $denormalized = $this->serializer->denormalize($data, $this->entityClass, $this->format);
     $this->assertEqual($data['uuid'], $denormalized->get('uuid')->getValue(), 'A preset value (e.g. UUID) is overridden by incoming data.');
     $this->assertEqual($data['field_test_text'], $denormalized->get('field_test_text')->getValue(), 'A basic text field is denormalized.');
-    $this->assertEqual($expected_value_default, $denormalized->get('field_test_translatable_text')->getValue(), 'Values in the default language are properly handled for a translatable field.');
-    $this->assertEqual($expected_value_de, $denormalized->getTranslation('de')->get('field_test_translatable_text')->getValue(), 'Values in a translation language are properly handled for a translatable field.');
+    $this->assertEqual($expected_value_default, $denormalized->get('field_translatable_text')->getValue(), 'Values in the default language are properly handled for a translatable field.');
+    $this->assertEqual($expected_value_de, $denormalized->getTranslation('de')->get('field_translatable_text')->getValue(), 'Values in a translation language are properly handled for a translatable field.');
   }
 }
