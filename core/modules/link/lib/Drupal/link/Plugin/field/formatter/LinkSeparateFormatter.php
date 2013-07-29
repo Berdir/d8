@@ -16,14 +16,12 @@ use Drupal\field\Annotation\FieldFormatter;
 use Drupal\Core\Annotation\Translation;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Field\FieldInterface;
-use Drupal\field\Plugin\Type\Formatter\FormatterBase;
 
 /**
  * Plugin implementation of the 'link_separate' formatter.
  *
  * @FieldFormatter(
  *   id = "link_separate",
- *   module = "link",
  *   label = @Translation("Separate link text and URL"),
  *   field_types = {
  *     "link"
@@ -67,12 +65,14 @@ class LinkSeparateFormatter extends LinkFormatter {
         $link_title = truncate_utf8($link_title, $settings['trim_length'], FALSE, TRUE);
         $url_title = truncate_utf8($item->url, $settings['trim_length'], FALSE, TRUE);
       }
+
+      $link = $this->buildLink($item);
       $element[$delta] = array(
         '#theme' => 'link_formatter_link_separate',
         '#title' => $link_title,
         '#url_title' => $url_title,
-        '#href' => $item->path,
-        '#options' => $item->options,
+        '#href' => $link['path'],
+        '#options' => $link['options'],
       );
     }
     return $element;

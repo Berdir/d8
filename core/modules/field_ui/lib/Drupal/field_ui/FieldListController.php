@@ -109,7 +109,7 @@ class FieldListController extends ConfigEntityListController {
     }
 
     $field_type = $this->fieldTypes[$field->type];
-    $row['data']['type'] = t('@type (module: @module)', array('@type' => $field_type['label'], '@module' => $field_type['module']));
+    $row['data']['type'] = t('@type (module: @module)', array('@type' => $field_type['label'], '@module' => $field_type['provider']));
 
     $usage = array();
     foreach ($field->getBundles() as $entity_type => $field_bundles) {
