@@ -79,11 +79,10 @@ function book_admin_edit_submit($form, &$form_state) {
       // Update the title if changed.
       if ($row['title']['#default_value'] != $values['title']) {
         $node = node_load($values['nid']);
-        $langcode = Language::LANGCODE_NOT_SPECIFIED;
         $node->title = $values['title'];
-        $node->book['link_title'] = $values['title'];
+        $node->book->link_title = $values['title'];
         $node->setNewRevision();
-        $node->log = t('Title changed from %original to %current.', array('%original' => $node->title, '%current' => $values['title']));
+        $node->log = t('Title changed from %original to %current.', array('%original' => $node->label(), '%current' => $values['title']));
 
         $node->save();
         watchdog('content', 'book: updated %title.', array('%title' => $node->label()), WATCHDOG_NOTICE, l(t('view'), 'node/' . $node->id()));

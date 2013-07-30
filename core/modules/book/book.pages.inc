@@ -72,7 +72,7 @@ function book_export_html(EntityInterface $node) {
     if (isset($node->book)) {
       $tree = book_menu_subtree_data($node->book);
       $contents = book_export_traverse($tree, 'book_node_export');
-      $book_exported_html = array('#theme' => 'book_export_html', '#title' => $node->label(), '#contents' => $contents, '#depth' => $node->book['depth']);
+      $book_exported_html = array('#theme' => 'book_export_html', '#title' => $node->label(), '#contents' => $contents, '#depth' => $node->book->depth);
       return drupal_render($book_exported_html);
     }
     else {
@@ -118,12 +118,12 @@ function book_outline_form($form, &$form_state, EntityInterface $node) {
     $node->book = _book_link_defaults($node->id());
   }
   else {
-    $node->book['original_bid'] = $node->book['bid'];
+    $node->book->original_bid = $node->book->bid;
   }
 
   // Find the depth limit for the parent select.
-  if (!isset($node->book['parent_depth_limit'])) {
-    $node->book['parent_depth_limit'] = _book_parent_depth_limit($node->book);
+  if (!isset($node->book->parent_depth_limit)) {
+    $node->book->parent_depth_limit = _book_parent_depth_limit($node->book);
   }
   $form['#node'] = $node;
   $form['#id'] = 'book-outline';
@@ -131,7 +131,7 @@ function book_outline_form($form, &$form_state, EntityInterface $node) {
 
   $form['update'] = array(
     '#type' => 'submit',
-    '#value' => $node->book['original_bid'] ? t('Update book outline') : t('Add to book outline'),
+    '#value' => $node->book->original_bid ? t('Update book outline') : t('Add to book outline'),
     '#weight' => 15,
   );
 
@@ -175,7 +175,7 @@ function book_outline_form_submit($form, &$form_state) {
   $book_link['menu_name'] = book_menu_name($book_link['bid']);
   $node->book = $book_link;
   if (_book_update_outline($node)) {
-    if ($node->book['parent_mismatch']) {
+    if ($node->book->parent_mismatch) {
       // This will usually only happen when JS is disabled.
       drupal_set_message(t('The post has been added to the selected book. You may now position it relative to other pages.'));
       $form_state['redirect'] = "node/" . $node->id() . "/outline";
@@ -203,7 +203,7 @@ function book_remove_form($form, &$form_state, EntityInterface $node) {
   $form['#node'] = $node;
   $title = array('%title' => $node->label());
 
-  if ($node->book['has_children']) {
+  if ($node->book->has_children) {
     $description = t('%title has associated child pages, which will be relocated automatically to maintain their connection to the book. To recreate the hierarchy (as it was before removing this page), %title may be added again using the Outline tab, and each of its former child pages will need to be relocated manually.', $title);
   }
   else {
@@ -219,7 +219,7 @@ function book_remove_form($form, &$form_state, EntityInterface $node) {
 function book_remove_form_submit($form, &$form_state) {
   $node = $form['#node'];
   if (_book_node_is_removable($node)) {
-    menu_link_delete($node->book['mlid']);
+    menu_link_delete($node->book->mlid);
     db_delete('book')
       ->condition('nid', $node->id())
       ->execute();

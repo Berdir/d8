@@ -64,7 +64,7 @@ class BookNavigationBlock extends BlockBase {
   public function build() {
     $current_bid = 0;
     if ($node = menu_get_object()) {
-      $current_bid = empty($node->book['bid']) ? 0 : $node->book['bid'];
+      $current_bid = $node->book->bid;
     }
     if ($this->configuration['block_mode'] == 'all pages') {
       $book_menus = array();
@@ -73,7 +73,7 @@ class BookNavigationBlock extends BlockBase {
         if ($book['bid'] == $current_bid) {
           // If the current page is a node associated with a book, the menu
           // needs to be retrieved.
-          $book_menus[$book_id] = menu_tree_output(menu_tree_all_data($node->book['menu_name'], $node->book));
+          $book_menus[$book_id] = menu_tree_output(menu_tree_all_data($node->book->menu_name, $node->book));
         }
         else {
           // Since we know we will only display a link to the top node, there
@@ -97,7 +97,7 @@ class BookNavigationBlock extends BlockBase {
       // Only display this block when the user is browsing a book.
       $select = db_select('node', 'n')
         ->fields('n', array('nid'))
-        ->condition('n.nid', $node->book['bid'])
+        ->condition('n.nid', $node->book->bid)
         ->addTag('node_access');
       $nid = $select->execute()->fetchField();
       // Only show the block if the user has view access for the top-level node.

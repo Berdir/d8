@@ -80,6 +80,8 @@ class BookTest extends WebTestBase {
 
     $this->book = $this->createBookNode('new');
     $book = $this->book;
+    debug($book->id());
+    debug($book->getPropertyValues());
 
     /*
      * Add page hierarchy to book.
@@ -92,8 +94,11 @@ class BookTest extends WebTestBase {
      */
     $nodes = array();
     $nodes[] = $this->createBookNode($book->id()); // Node 0.
-    $nodes[] = $this->createBookNode($book->id(), $nodes[0]->book['mlid']); // Node 1.
-    $nodes[] = $this->createBookNode($book->id(), $nodes[0]->book['mlid']); // Node 2.
+    debug(1);
+    $nodes[] = $this->createBookNode($book->id(), $nodes[0]->book->mlid); // Node 1.
+    debug(2);
+    $nodes[] = $this->createBookNode($book->id(), $nodes[0]->book->mlid); // Node 2.
+    debug($nodes[0]->book->getValue());
     $nodes[] = $this->createBookNode($book->id()); // Node 3.
     $nodes[] = $this->createBookNode($book->id()); // Node 4.
 
@@ -494,7 +499,7 @@ class BookTest extends WebTestBase {
     $this->drupalLogin($this->admin_user);
     $node1 = $this->createBookNode($book->id());
     $node2 = $this->createBookNode($book->id());
-    $plid = $node1->book['mlid'];
+    $plid = $node1->book->mlid;
 
     // Head to admin screen and attempt to re-order.
     $this->drupalGet('admin/structure/book/' . $book->id());
