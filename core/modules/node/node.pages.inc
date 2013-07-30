@@ -109,21 +109,6 @@ function node_add($node_type) {
  */
 function node_preview(NodeInterface $node) {
   if (node_access('create', $node) || node_access('update', $node)) {
-    // Load the user's name when needed.
-    if (isset($node->name)) {
-      // The use of isset() is mandatory in the context of user IDs, because
-      // user ID 0 denotes the anonymous user.
-      if ($user = user_load_by_name($node->name)) {
-        $node->setAuthorId($user->id());
-      }
-      else {
-        $node->setAuthorId(0); // anonymous user
-      }
-    }
-    elseif ($node->getAuthorId()) {
-      $user = $node->getAuthor();
-      $node->name = $user->getUsername();
-    }
 
     $node->changed = REQUEST_TIME;
 
