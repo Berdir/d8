@@ -191,7 +191,7 @@ class NodeFormController extends EntityFormControllerNG {
       '#title' => t('Authored by'),
       '#maxlength' => 60,
       '#autocomplete_route_name' => 'user_autocomplete',
-      '#default_value' => !empty($node->name) ? $node->name : '',
+      '#default_value' => $node->getAuthorId()? $node->getAuthor()->getUsername() : '',
       '#weight' => -1,
       '#description' => t('Leave blank for %anonymous.', array('%anonymous' => $user_config->get('anonymous'))),
     );
@@ -332,11 +332,11 @@ class NodeFormController extends EntityFormControllerNG {
     }
 
     // Validate the "authored by" field.
-    if (!empty($node->name) && !($account = user_load_by_name($node->name))) {
+    if (!empty($form_state['values']['name']) && !($account = user_load_by_name($form_state['values']['name']))) {
       // The use of empty() is mandatory in the context of usernames
       // as the empty string denotes the anonymous user. In case we
       // are dealing with an anonymous user we set the user ID to 0.
-      form_set_error('name', t('The username %name does not exist.', array('%name' => $node->name)));
+      form_set_error('name', t('The username %name does not exist.', array('%name' => $form_state['values']['name'])));
     }
 
     // Validate the "authored on" field.
@@ -440,13 +440,11 @@ class NodeFormController extends EntityFormControllerNG {
     $entity = parent::buildEntity($form, $form_state);
     // A user might assign the node author by entering a user name in the node
     // form, which we then need to translate to a user ID.
-    if (!empty($form_state['values']['name'])) {
-      if ($account = user_load_by_name($form_state['values']['name'])) {
-        $entity->setAuthorId($account->id());
-      }
-      else {
-        $entity->setAuthorId(0);
-      }
+    if (!empty($form_state['values']['name']) && $account = user_load_by_name($form_state['values']['name'])) {
+      $entity->setAuthorId($account->id());
+    }
+    else {
+      $entity->setAuthorId(0);
     }
 
     if (!empty($form_state['values']['date']) && $form_state['values']['date'] instanceOf DrupalDateTime) {
