@@ -528,7 +528,12 @@ class OptionsWidgetsTest extends FieldTestBase {
     // Display form: with 'off' value, option is unchecked.
     $this->drupalGet('entity_test/manage/' . $entity->id() . '/edit');
     $this->assertNoFieldChecked("edit-bool-$langcode");
+  }
 
+  /**
+   * Tests that the 'options_onoff' widget has a 'display_label' setting.
+   */
+  function testOnOffCheckboxLabelSetting() {
     // Create Basic page node type.
     $this->drupalCreateContentType(array('type' => 'page', 'name' => 'Basic page'));
 
@@ -537,11 +542,17 @@ class OptionsWidgetsTest extends FieldTestBase {
     $this->drupalLogin($admin_user);
 
     // Create a test field instance.
-    $fieldUpdate = $this->bool;
-    $fieldUpdate['settings']['allowed_values'] = array(0 => 0, 1 => 'MyOnValue');
-    $fieldUpdate->save();
+    entity_create('field_entity', array(
+      'name' => 'bool',
+      'entity_type' => 'node',
+      'type' => 'list_boolean',
+      'cardinality' => 1,
+      'settings' => array(
+        'allowed_values' => array(0 => 'Zero', 1 => 'Some <script>dangerous</script> & unescaped <strong>markup</strong>'),
+      ),
+    ))->save();
     entity_create('field_instance', array(
-      'field_name' => $this->bool->name,
+      'field_name' => 'bool',
       'entity_type' => 'node',
       'bundle' => 'page',
     ))->save();
@@ -587,4 +598,5 @@ class OptionsWidgetsTest extends FieldTestBase {
       t('Display label changes label of the checkbox')
     );
   }
+  
 }
