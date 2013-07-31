@@ -1994,11 +1994,11 @@ function file_get_file_references(File $file, $field = NULL, $age = FIELD_LOAD_R
   // Filter the static cache down to the requested entries. The usual static
   // cache is very small so this will be very fast.
   if ($field || $field_type) {
-    $fields = entity_load_multiple('field_entity', array_keys($return));
-    foreach ($return as $field_id => $data) {
-      $current_field = $fields[$field_id];
+    foreach ($return as $field_name => $data) {
+      foreach (array_keys($data) as $entity_type) {
+      $current_field = field_info_field($entity_type, $field_name);
       if (($field_type && $current_field['type'] != $field_type) || ($field && $field['id'] != $current_field['id'])) {
-        unset($return[$field_id]);
+        unset($return[$field_name][$entity_type]);
       }
     }
   }
