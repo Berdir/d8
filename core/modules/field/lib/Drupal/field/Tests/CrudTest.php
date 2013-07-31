@@ -192,7 +192,7 @@ class CrudTest extends FieldUnitTestBase {
     // Check that 'multi column' criteria works.
     $fields = field_read_fields(array('id' => $id, 'type' => $field_definition['type']));
     $this->assertTrue(count($fields) == 1 && isset($fields[$id]), 'The field was properly read.');
-    $fields = field_read_fields(array('field_name' => $field_definition['name'], 'type' => 'foo'));
+    $fields = field_read_fields(array('name' => $field_definition['name'], 'type' => 'foo'));
     $this->assertTrue(empty($fields), 'No field was found.');
 
     // Create an instance of the field.

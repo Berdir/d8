@@ -128,7 +128,7 @@ class FieldStorageController extends ConfigStorageController {
         // Extract the actual value against which the condition is checked.
         switch ($key) {
           case 'field_name';
-            $checked_value = $field->id;
+            $checked_value = $field->name;
             break;
 
           default:
