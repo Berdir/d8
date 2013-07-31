@@ -380,6 +380,7 @@ function taxonomy_field_views_data_views_data_alter(&$data, $field, $sql_entity_
       'help' => t('Relate each @entity with a @field set to the term.', array('@entity' => $entity, '@field' => $label)),
       'id' => 'entity_reverse',
       'field_name' => $field['field_name'],
+      'entity_type' => $field['entity_type'],
       'field table' => DatabaseStorageController::_fieldTableName($field),
       'field field' => $field['field_name'] . '_target_id',
       'base' => $entity_info['base_table'],
@@ -387,10 +388,6 @@ function taxonomy_field_views_data_views_data_alter(&$data, $field, $sql_entity_
       'label' => t('!field_name', array('!field_name' => $field['field_name'])),
       'join_extra' => array(
         0 => array(
-          'field' => 'entity_type',
-          'value' => $entity_type,
-        ),
-        1 => array(
           'field' => 'deleted',
           'value' => 0,
           'numeric' => TRUE,
