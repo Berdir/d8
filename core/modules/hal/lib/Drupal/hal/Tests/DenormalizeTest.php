@@ -95,7 +95,7 @@ class DenormalizeTest extends NormalizerTestBase {
       ),
     );
     $no_field_denormalized = $this->serializer->denormalize($no_field_data, $this->entityClass, $this->format);
-    $no_field_value = $no_field_denormalized->field_test_text->getValue();
+    $no_field_value = $no_field_denormalized->test_text->getValue();
 
     $empty_field_data = array(
       '_links' => array(
@@ -103,10 +103,10 @@ class DenormalizeTest extends NormalizerTestBase {
           'href' => url('rest/type/entity_test/entity_test', array('absolute' => TRUE)),
         ),
       ),
-      'field_test_text' => array(),
+      'test_text' => array(),
     );
     $empty_field_denormalized = $this->serializer->denormalize($empty_field_data, $this->entityClass, $this->format);
-    $empty_field_value = $empty_field_denormalized->field_test_text->getValue();
+    $empty_field_value = $empty_field_denormalized->test_text->getValue();
 
     $this->assertTrue(!empty($no_field_value) && empty($empty_field_value), 'A field set to an empty array in the data is structured differently than an empty field.');
   }
@@ -126,13 +126,13 @@ class DenormalizeTest extends NormalizerTestBase {
           'value' => 'e5c9fb96-3acf-4a8d-9417-23de1b6c3311',
         ),
       ),
-      'field_test_text' => array(
+      'test_text' => array(
         array(
           'value' => $this->randomName(),
           'format' => 'full_html',
         ),
       ),
-      'field_translatable_text' => array(
+      'translatable_text' => array(
         array(
           'value' => $this->randomName(),
           'format' => 'full_html',
@@ -156,28 +156,28 @@ class DenormalizeTest extends NormalizerTestBase {
 
     $expected_value_default = array(
       array (
-        'value' => $data['field_translatable_text'][0]['value'],
+        'value' => $data['translatable_text'][0]['value'],
         'format' => 'full_html',
       ),
       array (
-        'value' => $data['field_translatable_text'][1]['value'],
+        'value' => $data['translatable_text'][1]['value'],
         'format' => 'filtered_html',
       ),
     );
     $expected_value_de = array(
       array (
-        'value' => $data['field_translatable_text'][2]['value'],
+        'value' => $data['translatable_text'][2]['value'],
         'format' => 'filtered_html',
       ),
       array (
-        'value' => $data['field_translatable_text'][3]['value'],
+        'value' => $data['translatable_text'][3]['value'],
         'format' => 'full_html',
       ),
     );
     $denormalized = $this->serializer->denormalize($data, $this->entityClass, $this->format);
     $this->assertEqual($data['uuid'], $denormalized->get('uuid')->getValue(), 'A preset value (e.g. UUID) is overridden by incoming data.');
-    $this->assertEqual($data['field_test_text'], $denormalized->get('field_test_text')->getValue(), 'A basic text field is denormalized.');
-    $this->assertEqual($expected_value_default, $denormalized->get('field_translatable_text')->getValue(), 'Values in the default language are properly handled for a translatable field.');
-    $this->assertEqual($expected_value_de, $denormalized->getTranslation('de')->get('field_translatable_text')->getValue(), 'Values in a translation language are properly handled for a translatable field.');
+    $this->assertEqual($data['test_text'], $denormalized->get('test_text')->getValue(), 'A basic text field is denormalized.');
+    $this->assertEqual($expected_value_default, $denormalized->get('translatable_text')->getValue(), 'Values in the default language are properly handled for a translatable field.');
+    $this->assertEqual($expected_value_de, $denormalized->getTranslation('de')->get('translatable_text')->getValue(), 'Values in a translation language are properly handled for a translatable field.');
   }
 }

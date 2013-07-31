@@ -24,9 +24,9 @@ class NormalizeTest extends NormalizerTestBase {
    * Tests the normalize function.
    */
   public function testNormalize() {
-    $target_entity_de = entity_create('entity_test', (array('langcode' => 'de', 'field_entity_reference' => NULL)));
+    $target_entity_de = entity_create('entity_test', (array('langcode' => 'de', 'entity_ref' => NULL)));
     $target_entity_de->save();
-    $target_entity_en = entity_create('entity_test', (array('langcode' => 'en', 'field_entity_reference' => NULL)));
+    $target_entity_en = entity_create('entity_test', (array('langcode' => 'en', 'entity_ref' => NULL)));
     $target_entity_en->save();
 
     // Create a German entity.
@@ -34,18 +34,18 @@ class NormalizeTest extends NormalizerTestBase {
       'langcode' => 'de',
       'name' => $this->randomName(),
       'user_id' => 1,
-      'field_test_text' => array(
+      'test_text' => array(
         'value' => $this->randomName(),
         'format' => 'full_html',
       ),
-      'field_entity_reference' => array(
+      'entity_ref' => array(
         'target_id' => $target_entity_de->id(),
       ),
     );
     // Array of translated values.
     $translation_values = array(
       'name' => $this->randomName(),
-      'field_entity_reference' => array(
+      'entity_ref' => array(
         'target_id' => $target_entity_en->id(),
       )
     );
@@ -54,11 +54,11 @@ class NormalizeTest extends NormalizerTestBase {
     $entity->save();
     // Add an English value for name and entity reference properties.
     $entity->getTranslation('en')->set('name', array(0 => array('value' => $translation_values['name'])));
-    $entity->getTranslation('en')->set('field_entity_reference', array(0 => $translation_values['field_entity_reference']));
+    $entity->getTranslation('en')->set('entity_ref', array(0 => $translation_values['entity_ref']));
     $entity->save();
 
     $type_uri = url('rest/type/entity_test/entity_test', array('absolute' => TRUE));
-    $relation_uri = url('rest/relation/entity_test/entity_test/field_test_entity_reference', array('absolute' => TRUE));
+    $relation_uri = url('rest/relation/entity_test/entity_test/entity_ref', array('absolute' => TRUE));
 
     $expected_array = array(
       '_links' => array(
@@ -142,10 +142,10 @@ class NormalizeTest extends NormalizerTestBase {
           'lang' => 'en',
         ),
       ),
-      'field_test_text' => array(
+      'test_text' => array(
         array(
-          'value' => $values['field_test_text']['value'],
-          'format' => $values['field_test_text']['format'],
+          'value' => $values['test_text']['value'],
+          'format' => $values['test_text']['format'],
         ),
       ),
     );
@@ -157,7 +157,7 @@ class NormalizeTest extends NormalizerTestBase {
     $this->assertFalse(isset($normalized['id']), 'Internal id is not exposed.');
     $this->assertEqual($normalized['uuid'], $expected_array['uuid'], 'Non-translatable fields is normalized.');
     $this->assertEqual($normalized['name'], $expected_array['name'], 'Translatable field with multiple language values is normalized.');
-    $this->assertEqual($normalized['field_test_text'], $expected_array['field_test_text'], 'Field with properties is normalized.');
+    $this->assertEqual($normalized['test_text'], $expected_array['test_text'], 'Field with properties is normalized.');
     $this->assertEqual($normalized['_embedded'][$relation_uri], $expected_array['_embedded'][$relation_uri], 'Entity reference field is normalized.');
     $this->assertEqual($normalized['_links'][$relation_uri], $expected_array['_links'][$relation_uri], 'Links are added for entity reference field.');
   }
