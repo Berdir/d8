@@ -176,6 +176,7 @@ class FieldInfoTest extends FieldUnitTestBase {
   function testInstanceDisabledEntityType() {
     // For this test the field type and the entity type must be exposed by
     // different modules.
+    $this->enableModules(array('node', 'comment'));
     $field_definition = array(
       'name' => 'field',
       'entity_type' => 'comment',
@@ -187,14 +188,7 @@ class FieldInfoTest extends FieldUnitTestBase {
       'entity_type' => 'comment',
       'bundle' => 'comment_node_article',
     );
-    $instance = entity_create('field_instance', $instance_definition);
-    try {
-      $instance->save();
-      $this->fail('No exception was thrown');
-    }
-    catch (\InvalidArgumentException $e) {
-      $this->assertEqual($e->getMessage(), 'The comment entity type does not exist.');
-    }
+    entity_create('field_instance', $instance_definition);
 
     // Disable coment module. This clears field_info cache.
     module_disable(array('comment'));
