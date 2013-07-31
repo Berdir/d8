@@ -62,7 +62,7 @@ function node_access_test_language_enable() {
   $field_private->save();
 
   entity_create('field_instance', array(
-    'field_name' => $field_private->id(),
+    'field_name' => $field_private->name,
     'entity_type' => 'node',
     'bundle' => 'page',
     'widget' => array(
