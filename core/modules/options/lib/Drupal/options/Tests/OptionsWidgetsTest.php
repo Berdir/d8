@@ -598,5 +598,5 @@ class OptionsWidgetsTest extends FieldTestBase {
       t('Display label changes label of the checkbox')
     );
   }
-  
+
 }
