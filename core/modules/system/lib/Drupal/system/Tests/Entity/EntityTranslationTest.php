@@ -50,7 +50,7 @@ class EntityTranslationTest extends EntityUnitTestBase {
     $this->state->set('entity_test.translation', TRUE);
 
     // Create a translatable test field.
-    $this->field_name = drupal_strtolower($this->randomName() . '_field_name');
+    $this->field_name = drupal_strtolower($this->randomName(3) . '_field_name');
 
     // Create instance in all entity variations.
     foreach (entity_test_entity_types() as $entity_type) {
