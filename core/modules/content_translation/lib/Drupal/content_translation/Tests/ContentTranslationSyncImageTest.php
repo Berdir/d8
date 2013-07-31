@@ -53,7 +53,7 @@ class ContentTranslationSyncImageTest extends ContentTranslationTestBase {
    * Creates the test image field.
    */
   protected function setupTestFields() {
-    $this->fieldName = 'field_test_et_ui_image';
+    $this->fieldName = 'field_sync_image';
     $this->cardinality = 3;
 
     entity_create('field_entity', array(
