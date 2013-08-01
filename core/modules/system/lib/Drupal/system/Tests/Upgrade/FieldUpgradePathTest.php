@@ -141,9 +141,8 @@ class FieldUpgradePathTest extends UpgradePathTestBase {
       'locked' => 0,
       'cardinality' => 1,
       'translatable' => 0,
-      'indexes' => array(
-        'format' => array('format')
-      ),
+      // Custom indexes are not upgraded.
+      'indexes' => array(),
       'status' => 1,
       'langcode' => 'und',
     ));
@@ -185,10 +184,11 @@ class FieldUpgradePathTest extends UpgradePathTestBase {
         ->condition('langcode', Language::LANGCODE_NOT_SPECIFIED)
         ->orderBy('delta')
         ->condition('deleted', 0)
-        ->execute();
-    $this->assertEqual($body->value, 'Some value');
-    $this->assertEqual($body->summary, 'Some summary');
-    $this->assertEqual($body->format, 'filtered_html');
+        ->execute()
+        ->fetchObject();
+    $this->assertEqual($body->body_value, 'Some value');
+    $this->assertEqual($body->body_summary, 'Some summary');
+    $this->assertEqual($body->body_format, 'filtered_html');
 
     // Check that the definition of a deleted field is stored in state rather
     // than config.
@@ -200,7 +200,7 @@ class FieldUpgradePathTest extends UpgradePathTestBase {
     $uuid_key = key($deleted_fields);
     $deleted_field = $deleted_fields[$uuid_key];
     $this->assertEqual($deleted_field['uuid'], $uuid_key);
-    $this->assertEqual($deleted_field['id'], 'test_deleted_field');
+    $this->assertEqual($deleted_field['id'], 'node.test_deleted_field');
 
     // Check that the definition of a deleted instance is stored in state rather
     // than config.

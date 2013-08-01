@@ -324,6 +324,7 @@ function field_update_8003() {
       'locked' => $record['locked'],
       'cardinality' => $record['cardinality'],
       'translatable' => $record['translatable'],
+      // Custom indexes are not upgraded.
       'indexes' => array(),
       'status' => 1,
       'langcode' => 'und',
