@@ -96,7 +96,7 @@ class HandlerFieldFieldTest extends FieldTestBase {
     $view->initDisplay();
     foreach ($this->fields as $key => $field) {
       $view->display_handler->options['fields'][$field['field_name']]['id'] = $field['field_name'];
-      $view->display_handler->options['fields'][$field['field_name']]['table'] = 'field_data_' . $field['field_name'];
+      $view->display_handler->options['fields'][$field['field_name']]['table'] = 'field_node__' . $field['field_name'];
       $view->display_handler->options['fields'][$field['field_name']]['field'] = $field['field_name'];
     }
   }
