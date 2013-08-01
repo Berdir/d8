@@ -511,7 +511,7 @@ function field_update_8006(&$sandbox) {
       }
       $from_fields = array('bundle', 'deleted', 'entity_id', 'revision_id', 'language', 'delta');
       $insert_fields = array('bundle', 'deleted', 'entity_id', 'revision_id', 'langcode', 'delta');
-      foreach ($field->getColumns() as $column) {
+      foreach ($field->getColumns() as $column => $data) {
         $sql_column = DatabaseStorageController::_fieldColumnName($field, $column);
         $from_fields[] = $sql_column;
         $insert_fields[] = $sql_column;
