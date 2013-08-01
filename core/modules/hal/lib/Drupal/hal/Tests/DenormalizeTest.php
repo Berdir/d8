@@ -191,7 +191,7 @@ class DenormalizeTest extends NormalizerTestBase {
           'href' => url('rest/type/entity_test/entity_test', array('absolute' => TRUE)),
         ),
       ),
-      'field_test_text' => array(
+      'test_text' => array(
         array(
           'value' => $this->randomName(),
           'format' => 'full_html',
@@ -200,9 +200,9 @@ class DenormalizeTest extends NormalizerTestBase {
     );
     $denormalized = $this->serializer->denormalize($data, $this->entityClass, $this->format, array('request_method' => 'patch'));
     // Check that the one field got populated as expected.
-    $this->assertEqual($data['field_test_text'], $denormalized->get('field_test_text')->getValue());
+    $this->assertEqual($data['test_text'], $denormalized->get('test_text')->getValue());
     // Unset that field so that now all fields are NULL.
-    $denormalized->set('field_test_text', NULL);
+    $denormalized->set('test_text', NULL);
     // Assert that all fields are NULL and not set to default values. Example:
     // the UUID field is NULL and not initialized as usual.
     foreach ($denormalized as $field_name => $field) {
