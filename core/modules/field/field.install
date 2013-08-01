@@ -43,7 +43,7 @@ function _update_8003_field_create_field(array &$field_config) {
   );
 
   // Save in config.
-  Drupal::config('field.field.' . $field_config['entity_type'] . '.' . $field_config['name'])
+  Drupal::config('field.field.' . $field_config['id'])
     ->setData($field_config)
     ->save();
 
