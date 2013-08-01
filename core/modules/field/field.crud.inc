@@ -312,7 +312,7 @@ function field_purge_instance($instance) {
   field_info_cache_clear();
 
   // Invoke external hooks after the cache is cleared for API consistency.
-  module_invoke_all('field_purge_instance', $instance);
+  Drupal::moduleHandler()->invokeAll('field_purge_instance', array($instance));
 }
 
 /**
@@ -342,7 +342,7 @@ function field_purge_field($field) {
   field_info_cache_clear();
 
   // Invoke external hooks after the cache is cleared for API consistency.
-  module_invoke_all('field_purge_field', $field);
+  Drupal::moduleHandler()->invokeAll('field_purge_field', array($field));
 }
 
 /**

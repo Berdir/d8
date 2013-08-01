@@ -65,7 +65,7 @@ function entity_get_bundles($entity_type = NULL) {
       $bundles = $cache->data;
     }
     else {
-      $bundles = module_invoke_all('entity_bundle_info');
+      $bundles = Drupal::moduleHandler()->invokeAll('entity_bundle_info');
       // If no bundles are provided, use the entity type name and label.
       foreach (entity_get_info() as $type => $entity_info) {
         if (!isset($bundles[$type])) {
@@ -104,7 +104,7 @@ function entity_invoke_bundle_hook($hook, $entity_type, $bundle, $bundle_new = N
   entity_info_cache_clear();
   $method = 'handleBundle' . ucfirst($hook);
   Drupal::entityManager()->getStorageController($entity_type)->$method($bundle, $bundle_new);
-  module_invoke_all('entity_bundle_' . $hook, $entity_type, $bundle, $bundle_new);
+  Drupal::moduleHandler()->invokeAll('entity_bundle_' . $hook, array($entity_type, $bundle, $bundle_new));
 }
 
 /**
