@@ -112,7 +112,7 @@ class TranslationTest extends WebTestBase {
     $edit["body[$langcode][0][value]"] = $this->randomName();
     $this->drupalPost('node/add/page', $edit, t('Save'), array('query' => array('translation' => $node->id(), 'language' => 'es')));
     $duplicate = $this->drupalGetNodeByTitle($edit["title"]);
-    $this->assertEqual($duplicate->tnid, 0, 'The node does not have a tnid.');
+    $this->assertEqual($duplicate->tnid->value, 0, 'The node does not have a tnid.');
 
     // Update original and mark translation as outdated.
     $node_body = $this->randomName();
@@ -171,7 +171,7 @@ class TranslationTest extends WebTestBase {
     // Unpublish the Spanish translation to check that the related language
     // switch link is not shown.
     $this->drupalLogin($this->admin_user);
-    $this->drupalPost("node/$translation_es->nid/edit", array(), t('Save and unpublish'));
+    $this->drupalPost('node/' . $translation_es->id() . '/edit', array(), t('Save and unpublish'));
     $this->drupalLogin($this->translator);
     $this->assertLanguageSwitchLinks($node, $translation_es, FALSE);
 
@@ -181,7 +181,7 @@ class TranslationTest extends WebTestBase {
     $edit = array('language_interface[enabled][language-url]' => FALSE);
     $this->drupalPost('admin/config/regional/language/detection', $edit, t('Save settings'));
     $this->resetCaches();
-    $this->drupalPost("node/$translation_es->nid/edit", array(), t('Save and publish'));
+    $this->drupalPost('node/' . $translation_es->id() . '/edit', array(), t('Save and publish'));
     $this->drupalLogin($this->translator);
     $this->assertLanguageSwitchLinks($node, $translation_es, TRUE, 'node');
   }
@@ -396,7 +396,7 @@ class TranslationTest extends WebTestBase {
     // Check to make sure that translation was successful.
     $translation = $this->drupalGetNodeByTitle($title);
     $this->assertTrue($translation, 'Node found in database.');
-    $this->assertTrue($translation->tnid == $node->id(), 'Translation set id correctly stored.');
+    $this->assertTrue($translation->tnid->value == $node->id(), 'Translation set id correctly stored.');
 
     return $translation;
   }
@@ -449,10 +449,9 @@ class TranslationTest extends WebTestBase {
     }
 
     $result = TRUE;
-    $languages = language_list();
-    $page_language = $languages[$node->language()->id];
-    $translation_language = $languages[$translation->langcode];
-    $url = url("node/$translation->nid", array('language' => $translation_language));
+    $page_language = $node->language();
+    $translation_language = $translation->language();
+    $url = url('node/' . $translation->id(), array('language' => $translation_language));
 
     $this->drupalGet('node/' . $node->id(), array('language' => $page_language));
 

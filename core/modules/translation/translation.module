@@ -331,8 +331,8 @@ function translation_node_prepare_form(NodeInterface $node, $form_display, $oper
     }
 
     // Ensure we don't have an existing translation in this language.
-    if (!empty($source_node->tnid)) {
-      $translations = translation_node_get_translations($source_node->tnid);
+    if (!empty($source_node->tnid->value)) {
+      $translations = translation_node_get_translations($source_node->tnid->value);
       if (isset($translations[$langcode])) {
         drupal_set_message(t('A translation of %title in %language already exists, a new %type will be created instead of a translation.', array('%title' => $source_node->label(), '%language' => $language_list[$langcode]->name, '%type' => $node->getType())), 'error');
         return;
@@ -462,7 +462,7 @@ function translation_remove_from_set(NodeInterface $node) {
       // If the node being removed was the source of the translation set,
       // we pick a new source - preferably one that is up to date.
       if ($node->tnid->value == $node->id()) {
-        $new_tnid = db_query('SELECT nid FROM {node} WHERE tnid = :tnid ORDER BY translate ASC, nid ASC', array(':tnid' => $node->tnid))->fetchField();
+        $new_tnid = db_query('SELECT nid FROM {node} WHERE tnid = :tnid ORDER BY translate ASC, nid ASC', array(':tnid' => $node->tnid->value))->fetchField();
         db_update('node')
           ->fields(array('tnid' => $new_tnid))
           ->condition('tnid', $node->tnid->value)
