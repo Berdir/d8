@@ -123,17 +123,20 @@ class FieldUpgradePathTest extends UpgradePathTestBase {
     $this->assertTrue($this->performUpgrade(), 'The upgrade was completed successfully.');
 
     // Check that the configuration for the 'body' field is correct.
-    $config = \Drupal::config('field.field.body')->get();
+    $config = \Drupal::config('field.field.node.body')->get();
+    // This will be necessary to retrieve the table name.
+    $field_entity = new Field($config);
     // We cannot predict the value of the UUID, we just check it's present.
     $this->assertFalse(empty($config['uuid']));
     $field_uuid = $config['uuid'];
     unset($config['uuid']);
     $this->assertEqual($config, array(
-      'id' => 'body',
-      'entity_type' => 'node',
+      'id' => 'node.body',
+      'name' => 'body',
       'type' => 'text_with_summary',
       'module' => 'text',
       'active' => '1',
+      'entity_type' => 'node',
       'settings' => array(),
       'locked' => 0,
       'cardinality' => 1,
@@ -156,6 +159,7 @@ class FieldUpgradePathTest extends UpgradePathTestBase {
         'id' => "node.$node_type.body",
         'field_uuid' => $field_uuid,
         'field_type' => 'text_with_summary',
+        'entity_type' => 'node',
         'bundle' => $node_type,
         'label' => 'Body',
         'description' => '',
@@ -175,7 +179,13 @@ class FieldUpgradePathTest extends UpgradePathTestBase {
     }
 
     // Check that field values in a pre-existing node are read correctly.
-    $body = node_load(1)->get('body');
+    $body = db_select(DatabaseStorageController::_fieldTableName($field_entity), 't')
+        ->fields('t')
+        ->condition('entity_id', 1)
+        ->condition('langcode', Language::LANGCODE_NOT_SPECIFIED)
+        ->orderBy('delta')
+        ->condition('deleted', 0)
+        ->execute();
     $this->assertEqual($body->value, 'Some value');
     $this->assertEqual($body->summary, 'Some summary');
     $this->assertEqual($body->format, 'filtered_html');

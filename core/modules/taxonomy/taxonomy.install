@@ -206,7 +206,7 @@ function taxonomy_update_dependencies() {
   // Convert the 'tid' column of the taxonomy reference field to 'target_id'
   // after fields and instances have been moved to the config system...
   $dependencies['taxonomy'][8007] = array(
-    'field' => 8003,
+    'field' => 8006,
   );
   // ... but before the field storage tables are renamed.
   $dependencies['field'][8006] = array(

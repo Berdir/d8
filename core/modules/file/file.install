@@ -251,7 +251,7 @@ function file_update_dependencies() {
   // Convert the 'fid' column of file fields to 'target_id' after fields and
   // instances have been moved to the config system.
   $dependencies['file'][8003] = array(
-    'field' => 8003,
+    'field' => 8006,
   );
   return $dependencies;
 }

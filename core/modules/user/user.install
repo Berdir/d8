@@ -346,7 +346,7 @@ function user_update_dependencies() {
   // Convert user picture to field after the fields and instances are converted
   // to ConfigEntities.
   $dependencies['user'][8011] = array(
-    'field' => 8003,
+    'field' => 8006,
   );
   return $dependencies;
 }
