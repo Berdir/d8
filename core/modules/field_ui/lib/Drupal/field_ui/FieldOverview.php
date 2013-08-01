@@ -7,6 +7,8 @@
 
 namespace Drupal\field_ui;
 
+use Drupal\Core\Entity\EntityManager;
+use Drupal\Core\Entity\Field\FieldTypePluginManager;
 use Drupal\field_ui\OverviewBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\field\Plugin\Core\Entity\Field;
@@ -15,6 +17,36 @@ use Drupal\field\Plugin\Core\Entity\Field;
  * Field UI field overview form.
  */
 class FieldOverview extends OverviewBase {
+
+  /**
+   *  The field type manager.
+   *
+   * @var \Drupal\Core\Entity\Field\FieldTypePluginManager
+   */
+  protected $fieldTypeManager;
+
+  /**
+   * Constructs a new FieldOverview.
+   *
+   * @param \Drupal\Core\Entity\EntityManager $entity_manager
+   *   The entity manager.
+   * @param \Drupal\Core\Entity\Field\FieldTypePluginManager $field_type_manager
+   *   The field type manager
+   */
+  public function __construct(EntityManager $entity_manager, FieldTypePluginManager $field_type_manager) {
+    $this->entityManager = $entity_manager;
+    $this->fieldTypeManager = $field_type_manager;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('plugin.manager.entity'),
+      $container->get('plugin.manager.entity.field.field_type')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -45,7 +77,7 @@ class FieldOverview extends OverviewBase {
 
     // Gather bundle information.
     $instances = field_info_instances($this->entity_type, $this->bundle);
-    $field_types = field_info_field_types();
+    $field_types = $this->fieldTypeManager->getDefinitions();
 
     // Field prefix.
     $field_prefix = config('field_ui.settings')->get('field_prefix');
@@ -447,12 +479,11 @@ class FieldOverview extends OverviewBase {
   protected function getExistingFieldOptions() {
     $options = array();
 
-    // Collect candidate field instances.
+    // Collect candidate field instances: all instances of fields for this
+    // entity type that are not already present in the current bundle.
     $field_map = field_info_field_map();
     $instance_ids = array();
     foreach ($field_map as $field_name => $data) {
-      // @todo do not consider the current bundle.
-
       if (isset($data['bundles'][$this->entity_type]) && !in_array($this->bundle, $data['bundles'][$this->entity_type])) {
         $bundle = reset($data['bundles'][$this->entity_type]);
         $instance_ids[] = $this->entity_type . '.' . $bundle . '.' . $field_name;
