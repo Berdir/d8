@@ -2761,6 +2761,17 @@ function drupal_add_library($module, $name, $every_page = NULL) {
       );
       foreach (array('js', 'css') as $type) {
         foreach ($elements['#attached'][$type] as $data => $options) {
+          // If the value is not an array, it's a filename and passed as first
+          // (and only) argument.
+          if (!is_array($options)) {
+            // Remove the previous array key, use the filename as key for a new
+            // entry.
+            unset($elements['#attached'][$type][$data]);
+            $data = $options;
+            $elements['#attached'][$type][$data] = array();
+            $options = array();
+          }
+
           // Apply the JS_LIBRARY group if it isn't explicitly given.
           if ($type == 'js' && !isset($options['group'])) {
             $elements['#attached']['js'][$data]['group'] = JS_LIBRARY;
