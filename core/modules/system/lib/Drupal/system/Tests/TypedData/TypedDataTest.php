@@ -52,16 +52,12 @@ class TypedDataTest extends DrupalUnitTestBase {
    * @see Drupal\Core\TypedData\TypedDataManager::create().
    */
   protected function createTypedData($definition, $value = NULL, $name = NULL) {
-    // Save the type that was passed in so we can compare with it later.
-    $type = $definition['type'];
     // Construct the object.
     $data = $this->typedData->create($definition, $value, $name);
     // Assert the definition of the wrapper.
     $this->assertTrue($data instanceof \Drupal\Core\TypedData\TypedDataInterface, 'Typed data object is an instance of the typed data interface.');
     $definition = $data->getDefinition();
     $this->assertTrue(!empty($definition['type']), format_string('!type data definition was returned.', array('!type' => $definition['type'])));
-    // Assert that the correct type was constructed.
-    $this->assertEqual($data->getType(), $type, format_string('!type object returned type.', array('!type' => $definition['type'])));
     return $data;
   }
 
