@@ -492,7 +492,7 @@ class FieldOverview extends OverviewBase {
 
     // Load the instances and build the list of options.
     if ($instance_ids) {
-      $field_types = field_info_field_types();
+      $field_types = $this->fieldTypeManager->getDefinitions();
       $instances = $this->entityManager->getStorageController('field_instance')->loadMultiple($instance_ids);
       foreach ($instances as $instance) {
         $field = $instance->getField();
