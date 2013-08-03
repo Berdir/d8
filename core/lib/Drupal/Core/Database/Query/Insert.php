@@ -266,8 +266,8 @@ class Insert extends Query {
    * @return
    *   TRUE if the validation was successful, FALSE if not.
    *
-   * @throws Drupal\Core\Database\Query\FieldsOverlapException
-   * @throws Drupal\Core\Database\Query\NoFieldsException
+   * @throws \Drupal\Core\Database\Query\FieldsOverlapException
+   * @throws \Drupal\Core\Database\Query\NoFieldsException
    */
   public function preExecute() {
     // Confirm that the user did not try to specify an identical
@@ -284,9 +284,8 @@ class Insert extends Query {
       // first call to fields() does have an effect.
       $this->fields(array_merge(array_keys($this->fromQuery->getFields()), array_keys($this->fromQuery->getExpressions())));
     }
-
     // Don't execute query without fields.
-    if (count($this->insertFields) + count($this->defaultFields) == 0) {
+    elseif (count($this->insertFields) + count($this->defaultFields) == 0) {
       throw new NoFieldsException('There are no fields available to insert with.');
     }
 

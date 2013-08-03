@@ -165,5 +165,21 @@ class InsertTest extends DatabaseTestBase {
 
     $saved_age = db_query('SELECT age FROM {test} WHERE name = :name', array(':name' => 'Meredith'))->fetchField();
     $this->assertIdentical($saved_age, '30', 'Can retrieve after inserting.');
+
+    // Test the "INSERT INTO ... SELECT * FROM" syntax.
+    $query = db_select('test_people', 'tp')
+      ->fields('tp')
+      ->condition('tp.name', 'Meredith');
+    // The resulting query should be equivalent to:
+    // INSERT INTO test_people_copy
+    // SELECT *
+    // FROM test_people tp
+    // WHERE tp.name = 'Meredith'
+    db_insert('test_people_copy')
+      ->from($query)
+      ->execute();
+
+    $saved_age = db_query('SELECT age FROM {test_people_copy} WHERE name = :name', array(':name' => 'Meredith'))->fetchField();
+    $this->assertIdentical($saved_age, '30', 'Can retrieve after inserting.');
   }
 }
