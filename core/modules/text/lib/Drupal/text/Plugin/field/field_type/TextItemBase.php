@@ -79,7 +79,7 @@ abstract class TextItemBase extends ConfigFieldItemBase implements PrepareCacheI
       $itemBC = $this->getValue();
       $langcode = $this->getParent()->getParent()->language()->id;
       $this->set('safe_value', text_sanitize($text_processing, $langcode, $itemBC, 'value'));
-      if ($this->getType() == 'field_item:text_with_summary') {
+      if ($this->getPluginId() == 'field_item:text_with_summary') {
         $this->set('safe_summary', text_sanitize($text_processing, $langcode, $itemBC, 'summary'));
       }
     }
