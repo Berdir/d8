@@ -248,10 +248,10 @@ function file_update_dependencies() {
     'file' => 8001,
   );
 
-  // Convert the 'fid' column of file fields to 'target_id' after fields and
-  // instances have been moved to the config system.
+  // Convert the 'fid' column of file fields to 'target_id' after the field
+  // tables have been reorganized.
   $dependencies['file'][8003] = array(
-    'field' => 8003,
+    'field' => 8006,
   );
   return $dependencies;
 }
