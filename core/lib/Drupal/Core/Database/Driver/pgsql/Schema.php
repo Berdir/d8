@@ -348,6 +348,15 @@ class Schema extends DatabaseSchema {
     $this->connection->query('ALTER TABLE {' . $table . '} RENAME TO ' . $prefixInfo['table']);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function copyTable($source, $destination) {
+    parent::copyTable($source, $destination);
+    $info = $this->getPrefixInfo($destination);
+    return $this->connection->query('CREATE TABLE `' . $info['table'] . '` (LIKE {' . $source . '} INCLUDING ALL)');
+  }
+
   public function dropTable($table) {
     if (!$this->tableExists($table)) {
       return FALSE;

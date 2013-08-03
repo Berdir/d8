@@ -327,6 +327,15 @@ class Schema extends DatabaseSchema {
     return TRUE;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function copyTable($source, $destination) {
+    parent::copyTable($source, $destination);
+    $info = $this->getPrefixInfo($destination);
+    return $this->connection->query('CREATE TABLE `' . $info['table'] . '` LIKE {' . $source . '}');
+  }
+
   public function addField($table, $field, $spec, $keys_new = array()) {
     if (!$this->tableExists($table)) {
       throw new SchemaObjectDoesNotExistException(t("Cannot add field @table.@field: table doesn't exist.", array('@field' => $field, '@table' => $table)));

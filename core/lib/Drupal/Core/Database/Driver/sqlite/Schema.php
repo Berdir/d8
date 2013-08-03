@@ -272,6 +272,14 @@ class Schema extends DatabaseSchema {
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function copyTable($source, $destination) {
+    parent::copyTable($source, $destination);
+    $this->createTable($destination, $this->introspectSchema($source));
+  }
+
   public function dropTable($table) {
     if (!$this->tableExists($table)) {
       return FALSE;

@@ -87,6 +87,19 @@ class SchemaTest extends UnitTestBase {
     $index_exists = Database::getConnection()->schema()->indexExists('test_table2', 'test_field');
     $this->assertTrue($index_exists, 'Index was renamed.');
 
+    // Copy the schema of the table.
+    db_copy_table('test_table2', 'test_table3');
+
+    // Index should be copied.
+    $index_exists = Database::getConnection()->schema()->indexExists('test_table3', 'test_field');
+    $this->assertTrue($index_exists, 'Index was copied.');
+
+    // Data should still exist on the old table but not on the new one.
+    $count = db_select('test_table2')->countQuery()->execute()->fetchField();
+    $this->assertEqual($count, 1, 'The old table still has its content.');
+    $count = db_select('test_table3')->countQuery()->execute()->fetchField();
+    $this->assertEqual($count, 0, 'The new table has no content.');
+
     // We need the default so that we can insert after the rename.
     db_field_set_default('test_table2', 'test_field', 0);
     $this->assertFalse($this->tryInsert(), 'Insert into the old table failed.');
@@ -154,9 +167,9 @@ class SchemaTest extends UnitTestBase {
    */
   function tryInsert($table = 'test_table') {
     try {
-       db_insert($table)
-         ->fields(array('id' => mt_rand(10, 20)))
-         ->execute();
+      db_insert($table)
+        ->fields(array('id' => mt_rand(10, 20)))
+        ->execute();
       return TRUE;
     }
     catch (\Exception $e) {
@@ -227,8 +240,8 @@ class SchemaTest extends UnitTestBase {
   function tryUnsignedInsert($table_name, $column_name) {
     try {
       db_insert($table_name)
-         ->fields(array($column_name => -1))
-         ->execute();
+        ->fields(array($column_name => -1))
+        ->execute();
       return TRUE;
     }
     catch (\Exception $e) {
