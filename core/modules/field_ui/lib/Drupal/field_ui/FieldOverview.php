@@ -188,7 +188,7 @@ class FieldOverview extends OverviewBase {
           '#description' => t('A unique machine-readable name containing letters, numbers, and underscores.'),
           // Calculate characters depending on the length of the field prefix
           // setting. Maximum length is 32.
-          '#maxlength' => Field::ID_MAX_LENGTH - strlen($field_prefix),
+          '#maxlength' => Field::NAME_MAX_LENGTH - strlen($field_prefix),
           '#prefix' => '<div class="add-new-placeholder">&nbsp;</div>',
           '#machine_name' => array(
             'source' => array('fields', $name, 'label'),

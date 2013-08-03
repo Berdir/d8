@@ -35,7 +35,7 @@ use Drupal\field\FieldInstanceInterface;
 class FieldInstance extends ConfigEntityBase implements FieldInstanceInterface {
 
   /**
-   * The instance ID (machine name).
+   * The instance ID.
    *
    * The ID consists of 3 parts: the entity type, bundle and the field name.
    *

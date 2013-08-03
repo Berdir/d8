@@ -37,20 +37,18 @@ use Drupal\field\FieldInterface;
 class Field extends ConfigEntityBase implements FieldInterface {
 
   /**
-   * The maximum length of the field ID (machine name), in characters.
+   * The maximum length of the field name, in characters.
    *
    * For fields created through Field UI, this includes the 'field_' prefix.
    */
-  const ID_MAX_LENGTH = 32;
+  const NAME_MAX_LENGTH = 32;
 
   /**
-   * The field ID (machine name).
+   * The field ID.
    *
-   * This is the name of the property under which the field values are placed in
-   * an entity : $entity-{>$field_id}. The maximum length is
-   * Field:ID_MAX_LENGTH.
+   * The ID consists of 2 parts: the entity type and the field name.
    *
-   * Example: body, field_main_image.
+   * Example: node.body, user.field_main_image.
    *
    * @var string
    */
@@ -60,8 +58,8 @@ class Field extends ConfigEntityBase implements FieldInterface {
    * The field name.
    *
    * This is the name of the property under which the field values are placed in
-   * an entity : $entity-{>$field_id}. The maximum length is
-   * Field:ID_MAX_LENGTH.
+   * an entity: $entity->{$field_name}. The maximum length is
+   * Field:NAME_MAX_LENGTH.
    *
    * Example: body, field_main_image.
    *
@@ -312,13 +310,13 @@ class Field extends ConfigEntityBase implements FieldInterface {
     // Assign the ID.
     $this->id = $this->id();
 
-    // Field name cannot be longer than Field::ID_MAX_LENGTH characters. We
+    // Field name cannot be longer than Field::NAME_MAX_LENGTH characters. We
     // use drupal_strlen() because the DB layer assumes that column widths
     // are given in characters rather than bytes.
-    if (drupal_strlen($this->name) > static::ID_MAX_LENGTH) {
+    if (drupal_strlen($this->name) > static::NAME_MAX_LENGTH) {
       throw new FieldException(format_string(
         'Attempt to create a field with an ID longer than @max characters: %name', array(
-          '@max' => static::ID_MAX_LENGTH,
+          '@max' => static::NAME_MAX_LENGTH,
           '%name' => $this->name,
         )
       ));
