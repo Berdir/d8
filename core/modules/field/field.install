@@ -329,8 +329,7 @@ function field_update_8003() {
       'locked' => $record['locked'],
       'cardinality' => $record['cardinality'],
       'translatable' => $record['translatable'],
-      // Custom indexes are not upgraded.
-      'indexes' => array(),
+      'indexes' => $record['data']['indexes'] ?: array(),
       'status' => 1,
       'langcode' => 'und',
     );
@@ -499,13 +498,11 @@ function field_update_8006(&$sandbox) {
 
   $field = new Field($field_config);
   $tables = array(
-    'field_data_' . $field_config['name'] => DatabaseStorageController::_fieldTableName($field),
-    'field_revision_' . $field_config['name'] => DatabaseStorageController::_fieldRevisionTableName($field),
+    DatabaseStorageController::_fieldTableName($field),
+    DatabaseStorageController::_fieldRevisionTableName($field),
   );
-  foreach ($tables as $original_table => $table) {
-    if (!empty($field_config['deleted'])) {
-      $original_table = 'old_' . $table;
-    }
+  foreach ($tables as $table) {
+    $original_table = empty($field_config['deleted']) ? 'field_data_' . $field_config['name'] : 'old_' . $table;
     if (db_table_exists($original_table)) {
       if (!db_table_exists($table)) {
         $schema = DatabaseStorageController::_fieldSqlSchema($field);
@@ -517,16 +514,12 @@ function field_update_8006(&$sandbox) {
       $insert_fields = array('bundle', 'deleted', 'entity_id', 'revision_id', 'langcode', 'delta');
       foreach ($field->getColumns() as $column => $data) {
         $sql_column = DatabaseStorageController::_fieldColumnName($field, $column);
-        $from_fields[$column] = $sql_column;
+        $from_fields[] = $sql_column;
         $insert_fields[] = $sql_column;
       }
       $from_query = db_select($original_table, 'original')
         ->fields('original', $from_fields)
         ->condition('entity_type', $field_config['entity_type']);
-      $function = $field_config['module'] . '_update_field_split';
-      if (function_exists($function)) {
-        $function($field, $from_query);
-      }
       db_insert($table)
         ->fields($insert_fields)
         ->from($from_query)

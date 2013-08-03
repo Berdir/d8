@@ -6,8 +6,7 @@
  */
 
 use Drupal\Component\Uuid\Uuid;
-use Drupal\Core\Database\Query\SelectInterface;
-use Drupal\field\FieldInterface;
+use Drupal\field\Plugin\Core\Entity\Field;
 
 /**
  * Implements hook_install().
@@ -142,13 +141,6 @@ function _image_update_get_style_with_effects(array $style) {
     $effects[$effect['uuid']] = $effect;
   }
   return $effects;
-}
-
-/**
- * Implements hook_update_field_split().
- */
-function image_update_field_split(FieldInterface $field, SelectInterface $query) {
-  file_update_field_split($field, $query);
 }
 
 /**
