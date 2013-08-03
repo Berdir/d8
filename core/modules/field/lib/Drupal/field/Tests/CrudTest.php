@@ -179,7 +179,8 @@ class CrudTest extends FieldUnitTestBase {
    */
   function testCreateFieldWithExplicitSchema() {
     $field_definition = array(
-      'field_name' => 'field_2',
+      'name' => 'field_2',
+      'entity_type' => 'entity_test',
       'type' => 'test_field',
       'schema' => array(
         'dummy' => 'foobar'
