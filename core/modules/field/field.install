@@ -496,66 +496,67 @@ function field_update_8006(&$sandbox) {
     $field_config = $deleted_fields[$sandbox['index'] - count($config_names)];
   }
 
-  $field = new Field($field_config);
   // Prepare updated schema data structures.
-  $primary_key_data = array(
-    'entity_type',
-    'entity_id',
-    'deleted',
-    'delta',
-    'langcode',
-  );
-  $primary_key_revision = array(
-    'entity_type',
-    'entity_id',
-    'revision_id',
-    'deleted',
-    'delta',
-    'langcode',
-  );
-  $langcode_index = array(
-    'langcode',
-  );
-  $field_langcode = array(
-    'type' => 'varchar',
-    'length' => 32,
-    'not null' => TRUE,
-    'default' => '',
-  );
+  $field = new Field($field_config);
   $tables = array(
     array(
       'old_table' => 'field_data_' . $field_config['name'],
       'new_table' => DatabaseStorageController::_fieldTableName($field),
-      'primary_key' => $primary_key_data,
+      'primary_key' => array(
+        'entity_id',
+        'deleted',
+        'delta',
+        'langcode',
+      ),
     ),
     array(
       'old_table' => 'field_revision_' . $field_config['name'],
       'new_table' => DatabaseStorageController::_fieldRevisionTableName($field),
-      'primary_key' => $primary_key_revision,
+      'primary_key' => array(
+        'entity_id',
+        'revision_id',
+        'deleted',
+        'delta',
+        'langcode',
+      ),
     ),
   );
+
+  // Move the field data to the new table.
   foreach ($tables as $table_data) {
+    // Split data from the old "per field" table to the new "per entity type and
+    // field" table.
     $new_table = $table_data['new_table'];
     $original_table = empty($field_config['deleted']) ? $table_data['old_table'] : 'old_' . $new_table;
     if (db_table_exists($original_table)) {
+      // Create the new table, with the same schema as the old one.
       if (!db_table_exists($new_table)) {
         db_copy_table($original_table, $new_table);
       }
+      // Copy relevant rows.
       $from_query = db_select($original_table, 'original')
         ->fields('original')
         ->condition('entity_type', $field_config['entity_type']);
       db_insert($new_table)
         ->from($from_query)
         ->execute();
-    }
-    // Do not update tables which already have the langcode column,
-    // created during the upgrade before this update function.
-    if (db_field_exists($new_table, 'language')) {
+      // Drop the 'entity_type' column and previous primary key.
       db_drop_primary_key($new_table);
-      db_drop_index($new_table, 'language');
-      db_change_field($new_table, 'language', 'langcode', $field_langcode);
+      db_drop_field($new_table, 'entity_type');
+      // Rename 'language' to 'langcode'. Tables created during the upgrade
+      // before this update function might already have the langcode column.
+      if (db_field_exists($new_table, 'language')) {
+        db_drop_index($new_table, 'language');
+        db_change_field($new_table, 'language', 'langcode', array(
+          'type' => 'varchar',
+          'length' => 32,
+          'not null' => TRUE,
+          'default' => '',
+        ));
+        db_add_index($new_table, 'langcode', array('langcode'));
+      }
+      // Create new primary key.
       db_add_primary_key($new_table, $table_data['primary_key']);
-      db_add_index($new_table, 'langcode', $langcode_index);
     }
   }
 
