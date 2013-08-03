@@ -219,6 +219,7 @@ class FieldUpgradePathTest extends UpgradePathTestBase {
     $field_entity = new Field($deleted_field);
     $table_name = DatabaseStorageController::_fieldTableName($field_entity);
     $this->assertEqual("field_deleted_data_" . substr(hash('sha256', $deleted_field['uuid']), 0, 10), $table_name);
+    $this->assertTrue(db_table_exists($table_name));
 
     // Check that creation of a new node works as expected.
     $value = $this->randomName();
