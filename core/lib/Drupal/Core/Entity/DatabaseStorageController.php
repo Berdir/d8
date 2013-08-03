@@ -952,14 +952,16 @@ class DatabaseStorageController extends FieldableEntityStorageControllerBase {
    * strongly discouraged. This function is not considered part of the public
    * API and modules relying on it might break even in minor releases.
    *
-   * @param \Drupal\field\Plugin\Core\Entity\FieldInterface $field
-   *   The field object.
+   * @param \Drupal\field\FieldInterface $field
+   *   The field object
+   * @param $schema
+   *   The field schema array. Mandatory for upgrades, omit otherwise.
    *
    * @return array
    *   The same as a hook_schema() implementation for the data and the
    *   revision tables.
    */
-  public static function _fieldSqlSchema(FieldInterface $field) {
+  public static function _fieldSqlSchema(FieldInterface $field, array $schema = NULL) {
     $deleted = $field['deleted'] ? 'deleted ' : '';
     $current = array(
       'description' => "Data storage for {$deleted}field {$field['id']} ({$field['field_name']})",
@@ -1014,7 +1016,9 @@ class DatabaseStorageController extends FieldableEntityStorageControllerBase {
       ),
     );
 
-    $schema = $field->getSchema();
+    if (!$schema) {
+      $schema = $field->getSchema();
+    }
 
     // Add field columns.
     foreach ($schema['columns'] as $column_name => $attributes) {

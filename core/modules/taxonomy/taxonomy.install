@@ -208,7 +208,7 @@ function taxonomy_update_dependencies() {
   $dependencies['taxonomy'][8007] = array(
     'field' => 8003,
   );
-  // ... but before the field storage tables are renamed.
+  // ... but before the field storage tables are split.
   $dependencies['field'][8006] = array(
     'taxonomy' => 8007,
   );

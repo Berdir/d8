@@ -49,7 +49,7 @@ function _update_8003_field_create_field(array &$field_config) {
 
   // Create storage for the field. This requires a field entity, but cannot use
   // the regular entity_create() function here.
-  $schema = DatabaseStorageController::_fieldSqlSchema(new Field($field_config));
+  $schema = DatabaseStorageController::_fieldSqlSchema(new Field($field_config), $field_config['schema']);
   foreach ($schema as $name => $table) {
     db_create_table($name, $table);
   }
@@ -497,39 +497,73 @@ function field_update_8006(&$sandbox) {
   }
 
   $field = new Field($field_config);
-  $tables = array(
-    DatabaseStorageController::_fieldTableName($field),
-    DatabaseStorageController::_fieldRevisionTableName($field),
+  // Prepare updated schema data structures.
+  $primary_key_data = array(
+    'entity_type',
+    'entity_id',
+    'deleted',
+    'delta',
+    'langcode',
   );
-  foreach ($tables as $table) {
-    $original_table = empty($field_config['deleted']) ? 'field_data_' . $field_config['name'] : 'old_' . $table;
+  $primary_key_revision = array(
+    'entity_type',
+    'entity_id',
+    'revision_id',
+    'deleted',
+    'delta',
+    'langcode',
+  );
+  $langcode_index = array(
+    'langcode',
+  );
+  $field_langcode = array(
+    'type' => 'varchar',
+    'length' => 32,
+    'not null' => TRUE,
+    'default' => '',
+  );
+  $tables = array(
+    array(
+      'old_table' => 'field_data_' . $field_config['name'],
+      'new_table' => DatabaseStorageController::_fieldTableName($field),
+      'primary_key' => $primary_key_data,
+    ),
+    array(
+      'old_table' => 'field_revision_' . $field_config['name'],
+      'new_table' => DatabaseStorageController::_fieldRevisionTableName($field),
+      'primary_key' => $primary_key_revision,
+    ),
+  );
+  foreach ($tables as $table_data) {
+    $new_table = $table_data['new_table'];
+    $original_table = empty($field_config['deleted']) ? $table_data['old_table'] : 'old_' . $new_table;
     if (db_table_exists($original_table)) {
-      if (!db_table_exists($table)) {
-        $schema = DatabaseStorageController::_fieldSqlSchema($field);
-        foreach ($schema as $name => $field_table) {
-          db_create_table($name, $field_table);
-        }
-      }
-      $from_fields = array('bundle', 'deleted', 'entity_id', 'revision_id', 'language', 'delta');
-      $insert_fields = array('bundle', 'deleted', 'entity_id', 'revision_id', 'langcode', 'delta');
-      foreach ($field->getColumns() as $column => $data) {
-        $sql_column = DatabaseStorageController::_fieldColumnName($field, $column);
-        $from_fields[] = $sql_column;
-        $insert_fields[] = $sql_column;
+      if (!db_table_exists($new_table)) {
+        db_copy_table($original_table, $new_table);
       }
       $from_query = db_select($original_table, 'original')
-        ->fields('original', $from_fields)
+        ->fields('original')
         ->condition('entity_type', $field_config['entity_type']);
-      db_insert($table)
-        ->fields($insert_fields)
+      db_insert($new_table)
         ->from($from_query)
         ->execute();
+    }
+    // Do not update tables which already have the langcode column,
+    // created during the upgrade before this update function.
+    if (db_field_exists($new_table, 'language')) {
+      db_drop_primary_key($new_table);
+      db_drop_index($new_table, 'language');
+      db_change_field($new_table, 'language', 'langcode', $field_langcode);
+      db_add_primary_key($new_table, $table_data['primary_key']);
+      db_add_index($new_table, 'langcode', $langcode_index);
     }
   }
 
   $sandbox['index']++;
   $sandbox['#finished'] = empty($sandbox['max']) ? 1 : ($sandbox['index'] / $sandbox['max']);
 }
+
+
 
 /**
  * @} End of "addtogroup updates-7.x-to-8.x".

@@ -283,6 +283,7 @@ function block_update_8008() {
     );
     _update_8003_field_create_field($body_field);
 
+
     $instance = array(
       'entity_type' => 'custom_block',
       'bundle' => 'basic',

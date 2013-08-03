@@ -141,8 +141,9 @@ class FieldUpgradePathTest extends UpgradePathTestBase {
       'locked' => 0,
       'cardinality' => 1,
       'translatable' => 0,
-      // Custom indexes are not upgraded.
-      'indexes' => array(),
+      'indexes' => array(
+        'format' => array('format')
+      ),
       'status' => 1,
       'langcode' => 'und',
     ));

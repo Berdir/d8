@@ -344,9 +344,9 @@ function user_install_picture_field() {
  */
 function user_update_dependencies() {
   // Convert user picture to field after the fields and instances are converted
-  // to ConfigEntities.
+  // to ConfigEntities and the tables are split.
   $dependencies['user'][8011] = array(
-    'field' => 8003,
+    'field' => 8006,
   );
   return $dependencies;
 }
@@ -817,9 +817,8 @@ function user_update_8012(&$sandbox) {
     $rows = db_query_range('SELECT uid, picture FROM {users} WHERE picture > 0', 0, 20)->fetchAllKeyed();
     foreach ($rows as $uid => $fid) {
       // Add a row to the field data and revision tables.
-      db_insert('field_data_user_picture')
+      db_insert('field_user__user_picture')
         ->fields(array(
-          'entity_type' => 'user',
           'bundle' => 'user',
           'entity_id' => $uid,
           'revision_id' => $uid,
@@ -828,9 +827,8 @@ function user_update_8012(&$sandbox) {
           'user_picture_target_id' => $fid,
         ))
         ->execute();
-      db_insert('field_revision_user_picture')
+      db_insert('field_rev_user__user_picture')
         ->fields(array(
-          'entity_type' => 'user',
           'bundle' => 'user',
           'entity_id' => $uid,
           'revision_id' => $uid,
