@@ -2761,17 +2761,6 @@ function drupal_add_library($module, $name, $every_page = NULL) {
       );
       foreach (array('js', 'css') as $type) {
         foreach ($elements['#attached'][$type] as $data => $options) {
-          // If the value is not an array, it's a filename and passed as first
-          // (and only) argument.
-          if (!is_array($options)) {
-            // Remove the previous array key, use the filename as key for a new
-            // entry.
-            unset($elements['#attached'][$type][$data]);
-            $data = $options;
-            $elements['#attached'][$type][$data] = array();
-            $options = array();
-          }
-
           // Apply the JS_LIBRARY group if it isn't explicitly given.
           if ($type == 'js' && !isset($options['group'])) {
             $elements['#attached']['js'][$data]['group'] = JS_LIBRARY;
@@ -2845,7 +2834,9 @@ function drupal_get_library($module, $name = NULL) {
           if (is_scalar($options)) {
             // The JavaScript or CSS file has been specified in shorthand
             // format, without an array of options. In this case $options is the
-            // filename.
+            // filename. Convert the shorthand version and remove the old array
+            // key.
+            unset($module_libraries[$key]['js'][$file]);
             $file = $options;
             $options = array();
           }
