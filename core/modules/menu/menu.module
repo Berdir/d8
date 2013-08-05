@@ -599,7 +599,7 @@ function menu_form_node_form_alter(&$form, $form_state) {
   );
 
   // Get number of items in menu so the weight selector is sized appropriately.
-  $delta = entity_get_controller('menu_link')->countMenuLinks($link->menu_name);
+  $delta = entity_get_controller('menu_link')->countMenuLinks($link->menu_name->value);
   if ($delta < 50) {
     // Old hardcoded value
     $delta = 50;

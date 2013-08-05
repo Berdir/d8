@@ -58,7 +58,7 @@ function book_entity_bundle_info() {
 function book_menu_link_load($entities) {
   foreach ($entities as $entity) {
     // Change the bundle of menu links related to a book.
-    if (strpos($entity->menu_name, 'book-toc-') === 0) {
+    if (strpos($entity->menu_name->value, 'book-toc-') === 0) {
       $entity->bundle = 'book-toc';
     }
   }

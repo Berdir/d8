@@ -1103,17 +1103,19 @@ function menu_tree_output($tree) {
       $class[] = 'leaf';
     }
     // Set a class if the link is in the active trail.
+    $localized_options = $data['link']['localized_options']->getValue();
     if ($data['link']['in_active_trail']) {
       $class[] = 'active-trail';
-      $data['link']['localized_options']['attributes']['class'][] = 'active-trail';
+      $localized_options['attributes']['class'][] = 'active-trail';
     }
     // Normally, l() compares the href of every link with the current path and
     // sets the active class accordingly. But local tasks do not appear in menu
     // trees, so if the current path is a local task, and this link is its
     // tab root, then we have to set the class manually.
     if ($data['link']['href'] == $router_item['tab_root_href'] && $data['link']['href'] != current_path()) {
-      $data['link']['localized_options']['attributes']['class'][] = 'active';
+      $localized_options['attributes']['class'][] = 'active';
     }
+    $data['link']['localized_options']->setValue($localized_options);
 
     // Allow menu-specific theme overrides.
     $element['#theme'] = 'menu_link__' . strtr($data['link']['menu_name'], '-', '_');

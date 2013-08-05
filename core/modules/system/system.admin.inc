@@ -24,7 +24,7 @@ function system_admin_config_page() {
     $system_link = reset($system_link);
     $query = Drupal::entityQuery('menu_link')
       ->condition('link_path', 'admin/help', '<>')
-      ->condition('menu_name', $system_link->menu_name)
+      ->condition('menu_name', $system_link->menu_name->value)
       ->condition('plid', $system_link->id())
       ->condition('hidden', 0);
     $result = $query->execute();
@@ -433,7 +433,7 @@ function theme_admin_block_content($variables) {
     }
     $output .= '<dl class="' . $class . '">';
     foreach ($content as $item) {
-      $output .= '<dt>' . l($item['title'], $item['href'], $item['localized_options']) . '</dt>';
+      $output .= '<dt>' . l($item['title'], $item['href'], $item['localized_options']->getValue()) . '</dt>';
       if (!$compact && isset($item['description'])) {
         $output .= '<dd>' . filter_xss_admin($item['description']) . '</dd>';
       }

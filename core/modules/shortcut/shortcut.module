@@ -233,9 +233,9 @@ function shortcut_link_access($menu_link) {
  */
 function shortcut_menu_link_delete($menu_link) {
   // If the deleted menu link was in a shortcut set, remove it.
-  if (strpos($menu_link->menu_name, 'shortcut-') === 0) {
-    $shortcut = entity_load('shortcut_set', str_replace('shortcut-', '', $menu_link->menu_name));
-    unset($shortcut->links[$menu_link->uuid]);
+  if (strpos($menu_link->menu_name->value, 'shortcut-') === 0) {
+    $shortcut = entity_load('shortcut_set', str_replace('shortcut-', '', $menu_link->menu_name->value));
+    unset($shortcut->links[$menu_link->uuid()]);
     $shortcut->save();
   }
 }
