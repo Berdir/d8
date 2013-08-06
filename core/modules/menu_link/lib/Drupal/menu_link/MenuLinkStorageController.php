@@ -438,6 +438,9 @@ class MenuLinkStorageController extends DatabaseStorageControllerNG implements M
       'label' => t('Menu name'),
       'description' => t('The menu name. All links with the same menu name (such as "tools") are part of the same menu.'),
       'type' => 'string_field',
+      'settings' => array(
+        'default_value' => 'tools',
+      ),
     );
     $properties['mlid'] = array(
       'label' => t('Menu link ID'),
@@ -476,6 +479,9 @@ class MenuLinkStorageController extends DatabaseStorageControllerNG implements M
       'label' => t('Title'),
       'description' => t('The text displayed for the link, which may be modified by a title callback stored in {menu_router}.'),
       'type' => 'string_field',
+      'settings' => array(
+        'default_value' => '',
+      ),
     );
     $properties['options'] = array(
       'label' => t('Options'),
@@ -486,31 +492,49 @@ class MenuLinkStorageController extends DatabaseStorageControllerNG implements M
       'label' => t('Module'),
       'description' => t('The name of the module that generated this link.'),
       'type' => 'string_field',
+      'settings' => array(
+        'default_value' => 'menu',
+      ),
     );
     $properties['hidden'] = array(
       'label' => t('Hidden'),
       'description' => t('A flag for whether the link should be rendered in menus. (1 = a disabled menu item that may be shown on admin screens, -1 = a menu callback, 0 = a normal, visible link).'),
       'type' => 'boolean_field',
+      'settings' => array(
+        'default_value' => 0,
+      ),
     );
     $properties['external'] = array(
       'label' => t('External'),
       'description' => t('A flag to indicate if the link points to a full URL starting with a protocol, like http:// (1 = external, 0 = internal).'),
       'type' => 'boolean_field',
+      'settings' => array(
+        'default_value' => 0,
+      ),
     );
     $properties['has_children'] = array(
       'label' => t('Has children'),
       'description' => t('Flag indicating whether any links have this link as a parent (1 = children exist, 0 = no children).'),
       'type' => 'boolean_field',
+      'settings' => array(
+        'default_value' => 0,
+      ),
     );
     $properties['expanded'] = array(
       'label' => t('Expanded'),
       'description' => t('Flag for whether this link should be rendered as expanded in menus - expanded links always have their child links displayed, instead of only when the link is in the active trail (1 = expanded, 0 = not expanded).'),
       'type' => 'boolean_field',
+      'settings' => array(
+        'default_value' => 0,
+      ),
     );
     $properties['weight'] = array(
       'label' => t('Weight'),
       'description' => t('Link weight among links in the same menu at the same depth.'),
       'type' => 'integer_field',
+      'settings' => array(
+        'default_value' => 0,
+      ),
     );
     $properties['depth'] = array(
       'label' => t('Depth'),
@@ -521,6 +545,9 @@ class MenuLinkStorageController extends DatabaseStorageControllerNG implements M
       'label' => t('Customized'),
       'description' => t('A flag to indicate that the user has manually created or edited the link (1 = customized, 0 = not customized).'),
       'type' => 'boolean_field',
+      'settings' => array(
+        'default_value' => 0,
+      ),
     );
     // @todo Declaring these pX properties as integer for the moment, we need to
     // investigate if using 'entity_reference_field' cripples performance.

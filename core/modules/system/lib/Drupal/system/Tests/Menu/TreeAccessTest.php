@@ -20,6 +20,13 @@ use Symfony\Component\Routing\RouteCollection;
 class TreeAccessTest extends DrupalUnitTestBase {
 
   /**
+   * Modules to enable.
+   *
+   * @var array
+   */
+  public static $modules = array('menu_link');
+
+  /**
    * A list of menu links used for this test.
    *
    * @var array
@@ -93,8 +100,8 @@ class TreeAccessTest extends DrupalUnitTestBase {
 
     // Setup the links with the route items.
     $this->links = array(
-      new MenuLink(array('mlid' => 1, 'route_name' => 'menu_test_1', 'depth' => 1, 'link_path' => 'menu_test/test_1'), 'menu_link'),
-      new MenuLink(array('mlid' => 2, 'route_name' => 'menu_test_2', 'depth' => 1, 'link_path' => 'menu_test/test_2'), 'menu_link'),
+      entity_create('menu_link', array('mlid' => 1, 'route_name' => 'menu_test_1', 'depth' => 1, 'link_path' => 'menu_test/test_1')),
+      entity_create('menu_link', array('mlid' => 2, 'route_name' => 'menu_test_2', 'depth' => 1, 'link_path' => 'menu_test/test_2')),
     );
 
     // Build the menu tree and check access for all of the items.

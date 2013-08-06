@@ -255,25 +255,6 @@ class MenuLink extends EntityNG implements \ArrayAccess, MenuLinkInterface {
   public $route_name;
 
   /**
-   * Default values for the menu link.
-   *
-   * @var array
-   */
-  protected $values = array(
-    'langcode' => array(Language::LANGCODE_DEFAULT => array(0 => array('value' => Language::LANGCODE_NOT_SPECIFIED))),
-    'menu_name' => array(Language::LANGCODE_DEFAULT => array(0 => array('value' => 'tools'))),
-    'link_title' => array(Language::LANGCODE_DEFAULT => array(0 => array('value' => ''))),
-    'options' => array(Language::LANGCODE_DEFAULT => array(0 => array('value' => array()))),
-    'module' => array(Language::LANGCODE_DEFAULT => array(0 => array('value' => 'menu'))),
-    'hidden' => array(Language::LANGCODE_DEFAULT => array(0 => array('value' => 0))),
-    'has_children' => array(Language::LANGCODE_DEFAULT => array(0 => array('value' => 0))),
-    'expanded' => array(Language::LANGCODE_DEFAULT => array(0 => array('value' => 0))),
-    'weight' => array(Language::LANGCODE_DEFAULT => array(0 => array('value' => 0))),
-    'customized' => array(Language::LANGCODE_DEFAULT => array(0 => array('value' => 0))),
-    'updated' => array(Language::LANGCODE_DEFAULT => array(0 => array('value' => 0))),
-  );
-
-  /**
    * The route object associated with this menu link, if any.
    *
    * @var \Symfony\Component\Routing\Route
