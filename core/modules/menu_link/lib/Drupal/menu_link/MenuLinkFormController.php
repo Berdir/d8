@@ -258,9 +258,9 @@ class MenuLinkFormController extends EntityFormControllerNG implements EntityCon
     // "enabled" checkbox.
     $entity->hidden->value = (int) !$form_state['values']['enabled'];
     list($entity->menu_name->value, $entity->plid->target_id) = explode(':', $form_state['values']['parent']);
-    $attributes = $entity->options->value['attributes'];
+    $attributes = $entity->options[0]['attributes'];
     $attributes['title'] = $form_state['values']['description'];
-    $entity->options->value['attributes'] = $attributes;
+    $entity->options->setValue(array('attributes' => $attributes));
     return $entity;
   }
 

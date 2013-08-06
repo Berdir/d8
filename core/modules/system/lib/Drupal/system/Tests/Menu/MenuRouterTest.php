@@ -374,7 +374,7 @@ class MenuRouterTest extends WebTestBase {
 
     $links = array();
     foreach ($menu_links as $menu_link) {
-      $links[$menu_link->router_path] = $menu_link;
+      $links[$menu_link->router_path->value] = $menu_link;
     }
 
     $parent = $links['menu-test/hidden/menu'];
@@ -426,7 +426,7 @@ class MenuRouterTest extends WebTestBase {
 
     $links = array();
     foreach ($menu_links as $menu_link) {
-      $links[$menu_link->router_path] = $menu_link;
+      $links[$menu_link->router_path->value] = $menu_link;
     }
 
     $parent = $links['menu-test/hidden/block'];
