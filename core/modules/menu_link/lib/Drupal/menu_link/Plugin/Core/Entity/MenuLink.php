@@ -50,107 +50,11 @@ use Symfony\Component\HttpFoundation\Request;
 class MenuLink extends EntityNG implements \ArrayAccess, MenuLinkInterface {
 
   /**
-   * The link's menu name.
-   *
-   * @var \Drupal\Core\Entity\Field\FieldInterface
-   */
-  public $menu_name;
-
-  /**
    * The link's bundle.
    *
    * @var string
    */
   public $bundle = 'tools';
-
-  /**
-   * The menu link ID.
-   *
-   * @var \Drupal\Core\Entity\Field\FieldInterface
-   */
-  public $mlid;
-
-  /**
-   * The menu link UUID.
-   *
-   * @var \Drupal\Core\Entity\Field\FieldInterface
-   */
-  public $uuid;
-
-  /**
-   * The parent link ID.
-   *
-   * @var \Drupal\Core\Entity\Field\FieldInterface
-   */
-  public $plid;
-
-  /**
-   * The Drupal path or external path this link points to.
-   *
-   * @var string
-   */
-  public $link_path;
-
-  /**
-   * For links corresponding to a Drupal path (external = 0), this connects the
-   * link to a {menu_router}.path for joins.
-   *
-   * @var \Drupal\Core\Entity\Field\FieldInterface
-   */
-  public $router_path;
-
-  /**
-   * The entity label.
-   *
-   * @var \Drupal\Core\Entity\Field\FieldInterface
-   */
-  public $link_title;
-
-  /**
-   * A serialized array of options to be passed to the url() or l() function,
-   * such as a query string or HTML attributes.
-   *
-   * @var \Drupal\Core\Entity\Field\FieldInterface
-   */
-  public $options;
-
-  /**
-   * The name of the module that generated this link.
-   *
-   * @var \Drupal\Core\Entity\Field\FieldInterface
-   */
-  public $module;
-
-  /**
-   * A flag for whether the link should be rendered in menus.
-   *
-   * @var \Drupal\Core\Entity\Field\FieldInterface
-   */
-  public $hidden;
-
-  /**
-   * A flag to indicate if the link points to a full URL starting with a
-   * protocol, like http:// (1 = external, 0 = internal).
-   *
-   * @var \Drupal\Core\Entity\Field\FieldInterface
-   */
-  public $external;
-
-  /**
-   * Flag indicating whether any links have this link as a parent.
-   *
-   * @var \Drupal\Core\Entity\Field\FieldInterface
-   */
-  public $has_children;
-
-  /**
-   * Flag for whether this link should be rendered as expanded in menus.
-   * Expanded links always have their child links displayed, instead of only
-   * when the link is in the active trail.
-   *
-   * @var \Drupal\Core\Entity\Field\FieldInterface
-   */
-  public $expanded;
 
   /**
    * Link weight among links in the same menu at the same depth.
@@ -166,13 +70,6 @@ class MenuLink extends EntityNG implements \ArrayAccess, MenuLinkInterface {
    * @var \Drupal\Core\Entity\Field\FieldInterface
    */
   public $depth;
-
-  /**
-   * A flag to indicate that the user has manually created or edited the link.
-   *
-   * @var \Drupal\Core\Entity\Field\FieldInterface
-   */
-  public $customized;
 
   /**
    * The first entity ID in the materialized path.
