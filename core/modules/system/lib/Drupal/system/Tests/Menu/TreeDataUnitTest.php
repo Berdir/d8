@@ -8,12 +8,20 @@
 namespace Drupal\system\Tests\Menu;
 
 use Drupal\menu_link\Plugin\Core\Entity\MenuLink;
-use Drupal\simpletest\UnitTestBase;
+use Drupal\simpletest\DrupalUnitTestBase;
 
 /**
  * Menu tree data related tests.
  */
-class TreeDataUnitTest extends UnitTestBase {
+class TreeDataUnitTest extends DrupalUnitTestBase {
+
+  /**
+   * Modules to enable.
+   *
+   * @var array
+   */
+  public static $modules = array('menu_link');
+
   /**
    * Dummy link structure acceptable for menu_tree_data().
    */
@@ -32,11 +40,11 @@ class TreeDataUnitTest extends UnitTestBase {
    */
   public function testMenuTreeData() {
     $this->links = array(
-      1 => new MenuLink(array('mlid' => 1, 'depth' => 1), 'menu_link'),
-      2 => new MenuLink(array('mlid' => 2, 'depth' => 1), 'menu_link'),
-      3 => new MenuLink(array('mlid' => 3, 'depth' => 2), 'menu_link'),
-      4 => new MenuLink(array('mlid' => 4, 'depth' => 3), 'menu_link'),
-      5 => new MenuLink(array('mlid' => 5, 'depth' => 1), 'menu_link'),
+      1 => entity_create('menu_link', array('mlid' => 1, 'depth' => 1)),
+      2 => entity_create('menu_link', array('mlid' => 2, 'depth' => 1)),
+      3 => entity_create('menu_link', array('mlid' => 3, 'depth' => 2)),
+      4 => entity_create('menu_link', array('mlid' => 4, 'depth' => 3)),
+      5 => entity_create('menu_link', array('mlid' => 5, 'depth' => 1)),
     );
 
     $tree = menu_tree_data($this->links);
