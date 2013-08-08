@@ -31,3 +31,43 @@ a.block-demo-backlink:visited {
 a.block-demo-backlink:hover {
   text-decoration: underline;
 }
+
+.block-list-region {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.block-list-left {
+  float: left; /* LTR */
+  padding-right: 2em; /* LTR */
+  width: 75%;
+}
+[dir="rtl"] .block-list-left {
+  float: right;
+  padding-left: 2em;
+  padding-right: 0;
+}
+.block-list-right {
+  border: 1px solid #bfbfbf;
+  border-bottom-width: 0;
+  float: right; /* LTR */
+  width: 25%;
+}
+[dir="rtl"] .block-list-right {
+  float: left;
+}
+
+.block-list {
+  padding: 0 0.75em;
+  margin: 0;
+}
+.block-list li {
+  list-style: none;
+  padding: 0.1em 0;
+}
+.block-list a:before {
+  content: '+ ';
+}
+.block-list-right .form-type-search {
+  padding: 0 1em;
+}

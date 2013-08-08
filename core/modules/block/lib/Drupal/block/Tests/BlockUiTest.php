@@ -106,15 +106,6 @@ class BlockUiTest extends WebTestBase {
   }
 
   /**
-   * Test block search.
-   */
-  function testBlockSearch() {
-    $block = t('Administration');
-    $blocks = drupal_json_decode($this->drupalGet('block/autocomplete', array('query' => array('q' => $block))));
-    $this->assertEqual($blocks['system_menu_block:menu-admin'], $block, t('Can search for block with name !block.', array('!block' => $block)));
-  }
-
-  /**
    * Tests that the BlockFormController populates machine name correctly.
    */
   public function testMachineNameSuggestion() {
