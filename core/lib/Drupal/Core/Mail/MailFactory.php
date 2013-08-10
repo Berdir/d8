@@ -16,11 +16,11 @@ use Drupal\Component\Utility\String;
 class MailFactory {
 
   /**
-   * Holds mail interface configurations
+   * Config object for mail system configurations.
    *
-   * @var array
+   * @var \Drupal\Core\Config\Config
    */
-  protected $configuration;
+  protected $mailConfig;
 
   /**
    * List of already instantiated mail system objects.
@@ -30,7 +30,7 @@ class MailFactory {
   protected $instances = array();
 
   public function __construct(ConfigFactory $configFactory) {
-    $this->configuration = $configFactory->get('system.mail')->get('interface');
+    $this->mailConfig = $configFactory->get('system.mail');
   }
 
 
@@ -40,28 +40,15 @@ class MailFactory {
    * Allows for one or more custom mail backends to format and send mail messages
    * composed using drupal_mail().
    *
-   * An implementation needs to implement the following methods:
-   * - format: Allows to preprocess, format, and postprocess a mail
-   *   message before it is passed to the sending system. By default, all messages
-   *   may contain HTML and are converted to plain-text by the
-   *   Drupal\Core\Mail\PhpMail implementation. For example, an alternative
-   *   implementation could override the default implementation and additionally
-   *   sanitize the HTML for usage in a MIME-encoded e-mail, but still invoking
-   *   the Drupal\Core\Mail\PhpMail implementation to generate an alternate
-   *   plain-text version for sending.
-   * - mail: Sends a message through a custom mail sending engine.
-   *   By default, all messages are sent via PHP's mail() function by the
-   *   Drupal\Core\Mail\PhpMail implementation.
-   *
    * The selection of a particular implementation is controlled via the config
-   * 'system.mail.interface', which is a keyed array.  The default implementation
-   * is the class whose name is the value of 'default' key. A more specific match
-   * first to key and then to module will be used in preference to the default. To
-   * specify a different class for all mail sent by one module, set the class
-   * name as the value for the key corresponding to the module name. To specify
-   * a class for a particular message sent by one module, set the class name as
-   * the value for the array key that is the message id, which is
-   * "${module}_${key}".
+   * 'system.mail.interface', which is a keyed array.  The default
+   * implementation is the class whose name is the value of 'default' key. A
+   * more specific match first to key and then to module will be used in
+   * preference to the default. To specify a different class for all mail sent
+   * by one module, set the class name as the value for the key corresponding to
+   * the module name. To specify a class for a particular message sent by one
+   * module, set the class name as the value for the array key that is the
+   * message id, which is "${module}_${key}".
    *
    * For example to debug all mail sent by the user module by logging it to a
    * file, you might set the variable as something like:
@@ -85,9 +72,9 @@ class MailFactory {
    * @endcode
    *
    * Other possible uses for system include a mail-sending class that actually
-   * sends (or duplicates) each message to SMS, Twitter, instant message, etc, or
-   * a class that queues up a large number of messages for more efficient bulk
-   * sending or for sending via a remote gateway so as to reduce the load
+   * sends (or duplicates) each message to SMS, Twitter, instant message, etc,
+   * or a class that queues up a large number of messages for more efficient
+   * bulk sending or for sending via a remote gateway so as to reduce the load
    * on the local server.
    *
    * @param string $module
@@ -102,20 +89,20 @@ class MailFactory {
    * @throws \Exception
    */
   public function get($module, $key) {
-    $this->instances = &drupal_static(__FUNCTION__, array());
-
     $id = $module . '_' . $key;
+
+    $configuration = $this->mailConfig->get('interface');
 
     // Look for overrides for the default class, starting from the most specific
     // id, and falling back to the module name.
-    if (isset($this->configuration[$id])) {
-      $class = $this->configuration[$id];
+    if (isset($configuration[$id])) {
+      $class = $configuration[$id];
     }
-    elseif (isset($this->configuration[$module])) {
-      $class = $this->configuration[$module];
+    elseif (isset($configuration[$module])) {
+      $class = $configuration[$module];
     }
     else {
-      $class = $this->configuration['default'];
+      $class = $configuration['default'];
     }
 
     if (empty($this->instances[$class])) {
@@ -130,5 +117,4 @@ class MailFactory {
     return $this->instances[$class];
   }
 
-
-} 
+}

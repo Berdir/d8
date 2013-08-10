@@ -214,7 +214,7 @@ function drupal_mail($module, $key, $to, $langcode, $params = array(), $from = N
  * @see \Drupal\Core\Mail\MailFactory::get()
  */
 function drupal_mail_system($module, $key) {
-  Drupal::service('mail.factory')->get($module, $key);
+  return Drupal::service('mail.factory')->get($module, $key);
 }
 
 /**
