@@ -10,6 +10,7 @@ namespace Drupal\field\Plugin\Core\Entity;
 use Drupal\Core\Entity\Annotation\EntityType;
 use Drupal\Core\Annotation\Translation;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\field\FieldException;
 use Drupal\field\FieldInstanceInterface;
 
@@ -560,6 +561,19 @@ class FieldInstance extends ConfigEntityBase implements FieldInstanceInterface {
    */
   public function isFieldRequired() {
     return $this->required;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getFieldDefaultValue(EntityInterface $entity) {
+    if (!empty($this->default_value_function)) {
+      $function = $this->default_value_function;
+      return $function($entity, $this->getField(), $this, $entity->language()->id);
+    }
+    elseif (!empty($this->default_value)) {
+      return $this->default_value;
+    }
   }
 
   /**

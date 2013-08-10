@@ -7,6 +7,8 @@
 
 namespace Drupal\Core\Entity\Field;
 
+use Drupal\Core\Entity\EntityInterface;
+
 /**
  * Defines an interface for entity field definitions.
  *
@@ -156,9 +158,21 @@ interface FieldDefinitionInterface {
    * Currently, required-ness is only enforced at the Form API level in entity
    * edit forms, not during direct API saves.
    *
-   * @var bool
+   * @return bool
    *   TRUE if the field is required.
    */
   public function isFieldRequired();
+
+  /**
+   * Returns the default value for the field in a newly created entity.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity being created.
+   *
+   * @return array
+   *   The default value for the field, as an array keyed by delta and by
+   *   property names.
+   */
+  public function getFieldDefaultValue(EntityInterface $entity);
 
 }
