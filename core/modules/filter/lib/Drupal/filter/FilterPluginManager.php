@@ -42,7 +42,7 @@ class FilterPluginManager extends DefaultPluginManager {
     $annotation_namespaces = array('Drupal\filter\Annotation' => $namespaces['Drupal\filter']);
     parent::__construct('Plugin/Filter', $namespaces, $annotation_namespaces, 'Drupal\filter\Annotation\Filter');
     $this->alterInfo($module_handler, 'filter_info');
-    $this->setCacheBackend($cache_backend, $language_manager, 'filter_plugins');
+    $this->setCacheBackend($cache_backend, $language_manager, 'filter_plugins', array('filter_formats' => TRUE));
   }
 
 }
