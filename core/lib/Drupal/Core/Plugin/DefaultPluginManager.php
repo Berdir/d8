@@ -124,8 +124,8 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
    *   Cache key prefix to use, the language code will be appended
    *   automatically.
    * @param array $cache_tags
-   *   When providing a list of cache tags, the cached definitions are tagged
-   *   and are used to clear the cache.
+   *   (optional) When providing a list of cache tags, the cached definitions
+   *   are tagged and are used to clear the cache.
    */
   public function setCacheBackend(CacheBackendInterface $cache_backend, LanguageManager $language_manager, $cache_key_prefix, array $cache_tags = array()) {
     $this->languageManager = $language_manager;
