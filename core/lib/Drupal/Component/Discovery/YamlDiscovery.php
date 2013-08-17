@@ -22,7 +22,7 @@ class YamlDiscovery implements DiscoverableInterface {
   protected $name;
 
   /**
-   * An array of directories to scan.
+   * An array of directories to scan, keyed by the provider.
    *
    * @var array
    */
@@ -41,8 +41,7 @@ class YamlDiscovery implements DiscoverableInterface {
    * @param string $name
    *   The
    * @param array $directories
-   *   An array of directories to scan. If an associative array is provided the
-   *   return array will use these keys.
+   *   An array of directories to scan, keyed by the provider.
    */
   public function __construct($name, array $directories) {
     $this->name = $name;
@@ -83,26 +82,13 @@ class YamlDiscovery implements DiscoverableInterface {
    */
   protected function findFiles() {
     $files = array();
-    foreach ($this->directories as $key => $directory) {
-      $file = $directory . '/' . $this->fileBaseName($directory) . '.yml';
+    foreach ($this->directories as $provider => $directory) {
+      $file = $directory . '/' . $provider . '.' . $this->name . '.yml';
       if (file_exists($file)) {
-        $files[$key] = $file;
+        $files[$provider] = $file;
       }
     }
     return $files;
-  }
-
-  /**
-   * Returns the base filename for the current directory.
-   *
-   * @param string $directory
-   *   The current directory path.
-   *
-   * @return string
-   *   The file name, without the .yml extension.
-   */
-  protected function fileBaseName($directory) {
-    return basename($directory) . '.' . $this->name;
   }
 
 }
