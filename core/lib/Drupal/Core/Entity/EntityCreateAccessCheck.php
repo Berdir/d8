@@ -52,6 +52,15 @@ class EntityCreateAccessCheck implements StaticAccessCheckInterface {
    */
   public function access(Route $route, Request $request) {
     list($entity_type, $bundle) = explode(':', $route->getRequirement($this->requirementsKey) . ':');
+
+    // The bundle argument can contain request arguments like {name},
+    // replace those with the raw value of that argument.
+    if ($bundle && strpos($bundle, '{') !== FALSE) {
+      foreach ($request->get('_raw_variables')->all() as $name => $value) {
+        $bundle = str_replace('{' . $name . '}', $value, $bundle);
+      }
+    }
+
     return $this->entityManager->getAccessController($entity_type)->createAccess($bundle);
   }
 
