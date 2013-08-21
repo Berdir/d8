@@ -7,8 +7,7 @@
 
 namespace Drupal\system\Tests\Upgrade;
 
-use Drupal\Core\Entity\DatabaseStorageController;
-use Drupal\field\Plugin\Core\Entity\Field;
+use Drupal\field\Field;
 
 /**
  * Tests upgrade of system variables.
