@@ -440,7 +440,7 @@ class TranslationTest extends WebTestBase {
    * @return
    *   TRUE if the language switch links are found, FALSE if not.
    */
-  function assertLanguageSwitchLinks(NodeInterface $node, $translation, $find = TRUE, $types = NULL) {
+  function assertLanguageSwitchLinks(NodeInterface $node, NodeInterface $translation, $find = TRUE, $types = NULL) {
     if (empty($types)) {
       $types = array('node', 'block-language');
     }
@@ -467,7 +467,7 @@ class TranslationTest extends WebTestBase {
       // node uses the article tag.
       $tag = $type == 'node' ? 'article' : 'div';
 
-      if ($translation->nid) {
+      if ($translation->id()) {
         $xpath = '//' . $tag . '[contains(@class, :type)]//a[@href=:url]';
       }
       else {

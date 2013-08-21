@@ -201,8 +201,7 @@ function translation_form_node_form_alter(&$form, &$form_state) {
   $node = $form_state['controller']->getEntity();
   if (translation_supported_type($node->getType())) {
     if (!empty($node->translation_source)) {
-      // We are creating a translation. Add values and lock language field.
-      $form['translation_source'] = array('#type' => 'value', '#value' => $node->translation_source);
+      // We are creating a translation. Lock language field.
       $form['langcode']['#disabled'] = TRUE;
     }
     elseif (!$node->isNew() && $node->tnid->value) {
@@ -216,7 +215,6 @@ function translation_form_node_form_alter(&$form, &$form_state) {
         }
       }
       // Add translation values and workflow options.
-      $form['tnid'] = array('#type' => 'value', '#value' => $node->tnid->value);
       $form['translation'] = array(
         '#type' => 'details',
         '#title' => t('Translation settings'),
@@ -243,7 +241,19 @@ function translation_form_node_form_alter(&$form, &$form_state) {
           '#description' => t('When this option is checked, this translation needs to be updated because the source post has changed. Uncheck when the translation is up to date again.'),
         );
       }
+      $form['#entity_builders'][] = 'translation_node_builder';
     }
+  }
+}
+
+/**
+ * Entity form builder to add translation metadata to the node.
+ *
+ * @todo: Remove this in favor of an entity field.
+ */
+function translation_node_builder($entity_type, $entity, &$form, &$form_state) {
+  if (isset($form_state['values']['translation'])) {
+    $entity->translation = $form_state['values']['translation'];
   }
 }
 

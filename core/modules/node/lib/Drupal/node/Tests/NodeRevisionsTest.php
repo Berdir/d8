@@ -183,7 +183,7 @@ class NodeRevisionsTest extends NodeTestBase {
     $this->drupalGet('node/' . $node->id());
     $this->assertText($new_title, 'New node title appears on the page.');
     $node_revision = node_load($node->id(), TRUE);
-    $this->assertEqual($node_revision->log, $log, 'After an existing node revision is re-saved without a log message, the original log message is preserved.');
+    $this->assertEqual($node_revision->log->value, $log, 'After an existing node revision is re-saved without a log message, the original log message is preserved.');
 
     // Create another node with an initial log message.
     $node = $this->drupalCreateNode(array('log' => $log));
@@ -201,6 +201,6 @@ class NodeRevisionsTest extends NodeTestBase {
     $this->drupalGet('node/' . $node->id());
     $this->assertText($new_title, 'New node title appears on the page.');
     $node_revision = node_load($node->id(), TRUE);
-    $this->assertTrue(empty($node_revision->log), 'After a new node revision is saved with an empty log message, the log message for the node is empty.');
+    $this->assertTrue(empty($node_revision->log->value), 'After a new node revision is saved with an empty log message, the log message for the node is empty.');
   }
 }
