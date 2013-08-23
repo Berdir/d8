@@ -128,6 +128,7 @@ services:
     arguments: ['@cache.cache', '@lock', '@keyvalue', state]
     tags:
       - { name: needs_destruction }
+      - { name: persist }
   queue:
     class: Drupal\Core\Queue\QueueFactory
     arguments: ['@settings']
