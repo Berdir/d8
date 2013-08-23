@@ -105,6 +105,19 @@ class LocaleStringTest extends WebTestBase {
     $this->assertFalse($string, 'Successfully deleted source string.');
     $deleted = $search = $this->storage->getTranslations(array('lid' => $lid));
     $this->assertFalse($deleted, 'Successfully deleted all translation strings.');
+
+    // Test various locations
+    $source_location = $this->buildSourceString();
+    $source_location->addLocation('javascript', $this->randomString(8));
+    $source_location->addLocation('path', $this->randomString(50));
+    $source_location->addLocation('code', $this->randomString(100));
+    $source_location->addLocation('configuration', $location = $this->randomString(300));
+    $source_location->save();
+
+    $rows = db_query('SELECT * FROM {locales_location} WHERE sid = :sid', array(':sid' => $source_location->lid))->fetchAllKeyed();
+    // Make sure that 4 location rows have been written.
+    $this->assertEqual(count($rows), 4, '4 source locations have been persisted.');
+    $this->assertEqual($rows[4]->name, substr($location, 0, 255), 'Too long location has been limited to 255 characters.');
   }
 
   /**
@@ -166,6 +179,9 @@ class LocaleStringTest extends WebTestBase {
 
   /**
    * Creates random source string object.
+   *
+   * @return \Drupal\locale\StringInterface
+   *   A locale string.
    */
   function buildSourceString($values = array()) {
     return $this->storage->createString($values += array(
