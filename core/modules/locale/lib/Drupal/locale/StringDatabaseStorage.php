@@ -143,7 +143,6 @@ class StringDatabaseStorage implements StringStorageInterface {
    */
   protected function updateLocation($string) {
     if ($locations = $string->getLocations(TRUE)) {
-      debug($locations);
       $created = FALSE;
       foreach ($locations as $type => $location) {
         foreach ($location as $name => $lid) {

@@ -114,8 +114,7 @@ class LocaleStringTest extends WebTestBase {
     $source_location->addLocation('configuration', $location = $this->randomString(300));
     $source_location->save();
 
-    $rows = db_query('SELECT * FROM {locales_location} WHERE sid = :sid', array(':sid' => $source_location->lid))->fetchAllKeyed();
-    // Make sure that 4 location rows have been written.
+    $rows = db_query('SELECT * FROM {locales_location} WHERE sid = :sid', array(':sid' => $source_location->lid))->fetchAllAssoc('lid');
     $this->assertEqual(count($rows), 4, '4 source locations have been persisted.');
     $this->assertEqual($rows[4]->name, substr($location, 0, 255), 'Too long location has been limited to 255 characters.');
   }
