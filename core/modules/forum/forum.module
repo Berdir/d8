@@ -285,7 +285,6 @@ function forum_node_validate(EntityInterface $node, $form) {
         // If no term was selected (e.g. when no terms exist yet), remove the
         // item.
         if (empty($item->target_id)) {
-          // @todo: Does this work?
           unset($node->taxonomy_forums[$delta]);
           continue;
         }

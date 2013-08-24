@@ -337,7 +337,6 @@ function book_form_node_form_alter(&$form, &$form_state, $form_id) {
  * @todo: Remove this in favor of an entity field.
  */
 function book_node_builder($entity_type, $entity, &$form, &$form_state) {
-  debug($form_state['values']['book']);
   $entity->book = $form_state['values']['book'];
 }
 
