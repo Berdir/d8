@@ -768,4 +768,18 @@ class Field extends ConfigEntityBase implements FieldInterface {
 
     return FALSE;
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isFieldConfigurable() {
+    return TRUE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isFieldQueryable() {
+    return TRUE;
+  }
 }

@@ -10,6 +10,7 @@ namespace Drupal\Core\Entity;
 use Drupal\Component\Plugin\PluginManagerBase;
 use Drupal\Component\Plugin\Factory\DefaultFactory;
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Entity\Field\FieldDefinition;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageManager;
 use Drupal\Core\Language\Language;
@@ -374,15 +375,8 @@ class EntityManager extends PluginManagerBase {
    *   is passed, no bundle-specific fields are included. Defaults to NULL.
    *
    * @return array
-   *   An array of field definitions of entity fields, keyed by field
-   *   name. In addition to the typed data definition keys as described at
-   *   \Drupal\Core\TypedData\TypedDataManager::create() the following keys are
-   *   supported:
-   *   - queryable: Whether the field is queryable via QueryInterface.
-   *     Defaults to TRUE if 'computed' is FALSE or not set, to FALSE otherwise.
-   *   - translatable: Whether the field is translatable. Defaults to FALSE.
-   *   - configurable: A boolean indicating whether the field is configurable
-   *     via field.module. Defaults to FALSE.
+   *   An array of entity field definitions, keyed by field name. See
+   *   \Drupal\Core\Entity\Field\FieldDefinitionInterface.
    *
    * @see \Drupal\Core\TypedData\TypedDataManager::create()
    * @see \Drupal\Core\Entity\EntityManager::getFieldDefinitionsByConstraints()
@@ -413,12 +407,16 @@ class EntityManager extends PluginManagerBase {
         $hooks = array('entity_field_info', $entity_type . '_field_info');
         $this->moduleHandler->alter($hooks, $this->entityFieldInfo[$entity_type], $entity_type);
 
-        // Enforce fields to be multiple by default.
-        foreach ($this->entityFieldInfo[$entity_type]['definitions'] as &$definition) {
-          $definition['list'] = TRUE;
+        // Enforce field definitions to be objects.
+        foreach ($this->entityFieldInfo[$entity_type]['definitions'] as $field_name => &$definition) {
+          if (is_array($definition)) {
+            $definition = FieldDefinition::createFromOldStyleDefinition($field_name, $definition);
+          }
         }
-        foreach ($this->entityFieldInfo[$entity_type]['optional'] as &$definition) {
-          $definition['list'] = TRUE;
+        foreach ($this->entityFieldInfo[$entity_type]['optional'] as $field_name => &$definition) {
+          if (is_array($definition)) {
+            $definition = FieldDefinition::createFromOldStyleDefinition($field_name, $definition);
+          }
         }
         $this->cache->set($cid, $this->entityFieldInfo[$entity_type], CacheBackendInterface::CACHE_PERMANENT, array('entity_info' => TRUE, 'entity_field_info' => TRUE));
       }

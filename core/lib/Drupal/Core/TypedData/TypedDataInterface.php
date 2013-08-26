@@ -18,7 +18,9 @@ interface TypedDataInterface {
    * Gets the data definition.
    *
    * @return array
-   *   The data definition array.
+   *   The data definition represented as array.
+   *
+   * @see \Drupal\Core\TypedData\DataDefinition
    */
   public function getDefinition();
 

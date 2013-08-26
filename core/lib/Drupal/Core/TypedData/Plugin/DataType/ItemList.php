@@ -2,16 +2,26 @@
 
 /**
  * @file
- * Contains \Drupal\Core\TypedData\List.
+ * Contains \Drupal\Core\TypedData\Plugin\DataType\ItemList.
  */
 
-namespace Drupal\Core\TypedData;
+namespace Drupal\Core\TypedData\Plugin\DataType;
+
+use Drupal\Core\TypedData\Annotation\DataType;
+use Drupal\Core\Annotation\Translation;
+use Drupal\Core\TypedData\ListInterface;
+use Drupal\Core\TypedData\TypedData;
 
 /**
  * A generic list class.
  *
  * This class can serve as list for any type of items.
  * Note: The class cannot be called "List" as list is a reserved PHP keyword.
+ *
+ * @DataType(
+ *   id = "list",
+ *   label = @Translation("List of items")
+ * )
  */
 class ItemList extends TypedData implements \IteratorAggregate, ListInterface {
 
@@ -92,7 +102,11 @@ class ItemList extends TypedData implements \IteratorAggregate, ListInterface {
    * Overrides \Drupal\Core\TypedData\TypedData::getConstraints().
    */
   public function getConstraints() {
-    // Apply the constraints to the list items only.
+    if (isset($this->definition['item_definition']) && isset($this->definition['constraints'])) {
+      return $this->definition['constraints'];
+    }
+    // BC: If no item definition is specified, we apply possibly specified
+    // constraints to the list items only.
     return array();
   }
 
@@ -140,6 +154,11 @@ class ItemList extends TypedData implements \IteratorAggregate, ListInterface {
    * Implements \Drupal\Core\TypedData\ListInterface::getItemDefinition().
    */
   public function getItemDefinition() {
+    if (isset($this->definition['item_definition'])) {
+      return $this->definition['item_definition'];
+    }
+    // For BC, fall back to generating an item definition from the list
+    // definition.
     return array('list' => FALSE) + $this->definition;
   }
 

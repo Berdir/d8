@@ -10,7 +10,7 @@ namespace Drupal\Core\Entity\Field;
 use Drupal\Core\Entity\Field\FieldInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
-use Drupal\Core\TypedData\ItemList;
+use Drupal\Core\TypedData\Plugin\DataType\ItemList;
 
 /**
  * Represents an entity field; that is, a list of field item objects.
@@ -52,8 +52,7 @@ class Field extends ItemList implements FieldInterface {
    * {@inheritdoc}
    */
   public function getFieldDefinition() {
-    // @todo https://drupal.org/node/1988612
-    return NULL;
+    return new FieldDefinition($this->definition);
   }
 
   /**
@@ -82,7 +81,7 @@ class Field extends ItemList implements FieldInterface {
   }
 
   /**
-   * Overrides \Drupal\Core\TypedData\ItemList::setValue().
+   * Overrides \Drupal\Core\TypedData\Plugin\DataType\ItemList::setValue().
    */
   public function setValue($values, $notify = TRUE) {
     if (!isset($values) || $values === array()) {
