@@ -20,9 +20,9 @@ class EntityTestAccessController extends EntityAccessController {
   /**
    * {@inheritdoc}
    */
-  protected function checkAccess(EntityInterface $entity, $operation, $langcode, AccountInterface $account) {
+  protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
     if ($operation === 'view') {
-      if ($langcode != Language::LANGCODE_DEFAULT) {
+      if ($entity->language()->id != Language::LANGCODE_DEFAULT) {
         return user_access('view test entity translations', $account);
       }
       return user_access('view test entity', $account);

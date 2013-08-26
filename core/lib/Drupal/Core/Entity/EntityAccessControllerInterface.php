@@ -7,7 +7,6 @@
 
 namespace Drupal\Core\Entity;
 
-use Drupal\Core\Language\Language;
 use Drupal\Core\Session\AccountInterface;
 
 /**
@@ -26,9 +25,6 @@ interface EntityAccessControllerInterface {
    * @param string $operation
    *   The operation access should be checked for.
    *   Usually one of "view", "update" or "delete".
-   * @param string $langcode
-   *   (optional) The language code for which to check access. Defaults to
-   *   Language::LANGCODE_DEFAULT.
    * @param \Drupal\Core\Session\AccountInterface $account
    *   (optional) The user session for which to check access, or NULL to check
    *   access for the current user. Defaults to NULL.
@@ -36,7 +32,7 @@ interface EntityAccessControllerInterface {
    * @return bool
    *   TRUE if access was granted, FALSE otherwise.
    */
-  public function access(EntityInterface $entity, $operation, $langcode = Language::LANGCODE_DEFAULT, AccountInterface $account = NULL);
+  public function access(EntityInterface $entity, $operation, AccountInterface $account = NULL);
 
   /**
    * Checks access to create an entity.

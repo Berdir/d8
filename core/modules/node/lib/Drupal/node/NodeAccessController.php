@@ -69,14 +69,14 @@ class NodeAccessController extends EntityAccessController implements NodeAccessC
   /**
    * {@inheritdoc}
    */
-  public function access(EntityInterface $entity, $operation, $langcode = Language::LANGCODE_DEFAULT, AccountInterface $account = NULL) {
+  public function access(EntityInterface $entity, $operation, AccountInterface $account = NULL) {
     if (user_access('bypass node access', $account)) {
       return TRUE;
     }
     if (!user_access('access content', $account)) {
       return FALSE;
     }
-    return parent::access($entity, $operation, $langcode, $account);
+    return parent::access($entity, $operation, $account);
   }
 
   /**
@@ -98,10 +98,10 @@ class NodeAccessController extends EntityAccessController implements NodeAccessC
   /**
    * {@inheritdoc}
    */
-  protected function checkAccess(EntityInterface $node, $operation, $langcode, AccountInterface $account) {
+  protected function checkAccess(EntityInterface $node, $operation, AccountInterface $account) {
     // Fetch information from the node object if possible.
-    $status = $node->getTranslation($langcode)->isPublished();
-    $uid = $node->getTranslation($langcode)->getAuthorId();
+    $status = $node->isPublished();
+    $uid = $node->getAuthorId();
 
     // Check if authors can view their own unpublished nodes.
     if ($operation === 'view' && !$status && user_access('view own unpublished content', $account)) {
@@ -113,7 +113,7 @@ class NodeAccessController extends EntityAccessController implements NodeAccessC
 
     // If no module specified either allow or deny, we fall back to the
     // node_access table.
-    if (($grants = $this->grantStorage->access($node, $operation, $langcode, $account)) !== NULL) {
+    if (($grants = $this->grantStorage->access($node, $operation, $account)) !== NULL) {
       return $grants;
     }
 

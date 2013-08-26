@@ -21,7 +21,7 @@ class MenuLinkAccessController extends EntityAccessController {
   /**
    * {@inheritdoc}
    */
-  protected function checkAccess(EntityInterface $entity, $operation, $langcode, AccountInterface $account) {
+  protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
     $access = $account->hasPermission('administer menu');
     if ($access) {
       switch ($operation) {

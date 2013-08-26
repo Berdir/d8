@@ -420,7 +420,7 @@ class EntityNG extends Entity {
     }
     return \Drupal::entityManager()
       ->getAccessController($this->entityType)
-      ->access($this, $operation, $this->activeLangcode, $account);
+      ->access($this, $operation, $account);
   }
 
   /**

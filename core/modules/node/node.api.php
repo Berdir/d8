@@ -557,8 +557,6 @@ function hook_node_load($nodes, $types) {
  *   - "view"
  * @param object $account
  *   The user object to perform the access check operation on.
- * @param object $langcode
- *   The language code to perform the access check operation on.
  *
  * @return string
  *   - NODE_ACCESS_ALLOW: if the operation is to be allowed.
@@ -567,7 +565,7 @@ function hook_node_load($nodes, $types) {
  *
  * @ingroup node_access
  */
-function hook_node_access(\Drupal\node\NodeInterface $node, $op, $account, $langcode) {
+function hook_node_access(\Drupal\node\NodeInterface $node, $op, $account) {
   $type = is_string($node) ? $node : $node->getType();
 
   $configured_types = node_permissions_get_configured_types();

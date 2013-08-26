@@ -140,7 +140,7 @@ function _node_access_test_node_write(EntityInterface $node) {
 /**
  * Implements hook_node_access().
  */
-function node_access_test_node_access($node, $op, $account, $langcode) {
+function node_access_test_node_access($node, $op, $account) {
   $secret_catalan = Drupal::state()->get('node_access_test_secret_catalan') ?: 0;
   if ($secret_catalan && $langcode == 'ca') {
     // Make all Catalan content secret.

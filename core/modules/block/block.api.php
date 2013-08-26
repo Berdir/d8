@@ -80,8 +80,6 @@ function hook_block_view_BASE_BLOCK_ID_alter(array &$build, \Drupal\block\BlockP
  *   The operation to be performed, e.g., 'view', 'create', 'delete', 'update'.
  * @param \Drupal\user\Entity\User $account
  *   The user object to perform the access check operation on.
- * @param string $langcode
- *   The language code to perform the access check operation on.
  *
  * @return bool|NULL
  *   FALSE denies access. TRUE allows access unless another module returns
@@ -91,7 +89,7 @@ function hook_block_view_BASE_BLOCK_ID_alter(array &$build, \Drupal\block\BlockP
  * @see \Drupal\Core\Entity\EntityAccessController::access()
  * @see \Drupal\block\BlockAccessController::checkAccess()
  */
-function hook_block_access(\Drupal\block\Entity\Block $block, $operation, \Drupal\user\Entity\User $account, $langcode) {
+function hook_block_access(\Drupal\block\Entity\Block $block, $operation, \Drupal\user\Entity\User $account) {
   // Example code that would prevent displaying the 'Powered by Drupal' block in
   // a region different than the footer.
   if ($operation == 'view' && $block->get('plugin') == 'system_powered_by_block' && $block->get('region') != 'footer') {

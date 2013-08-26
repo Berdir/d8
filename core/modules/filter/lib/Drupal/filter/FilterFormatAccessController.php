@@ -19,7 +19,7 @@ class FilterFormatAccessController extends EntityAccessController {
   /**
    * {@inheritdoc}
    */
-  protected function checkAccess(EntityInterface $entity, $operation, $langcode, AccountInterface $account) {
+  protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
     // Handle special cases up front. All users have access to the fallback
     // format.
     if ($entity->isFallbackFormat()) {

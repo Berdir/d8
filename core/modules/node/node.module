@@ -2059,7 +2059,7 @@ function node_access($op, $node, $account = NULL, $langcode = NULL) {
       }
     }
   }
-  return $access_controller->access($node, $op, $langcode, $account);
+  return $access_controller->access($node->getTranslation($langcode), $op, $account);
 }
 
 /**

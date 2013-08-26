@@ -20,7 +20,7 @@ class CategoryAccessController extends EntityAccessController {
   /**
    * {@inheritdoc}
    */
-  public function checkAccess(EntityInterface $entity, $operation, $langcode, AccountInterface $account) {
+  public function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
     if ($operation == 'delete' || $operation == 'update') {
       // Do not allow delete 'personal' category used for personal contact form.
       return user_access('administer contact forms', $account) && $entity->id() !== 'personal';

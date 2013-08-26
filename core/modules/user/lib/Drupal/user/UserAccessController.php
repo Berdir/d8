@@ -19,10 +19,10 @@ class UserAccessController extends EntityAccessController {
   /**
    * {@inheritdoc}
    */
-  protected function checkAccess(EntityInterface $entity, $operation, $langcode, AccountInterface $account) {
+  protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
     switch ($operation) {
       case 'view':
-        return $this->viewAccess($entity, $langcode, $account);
+        return $this->viewAccess($entity, $account);
         break;
 
       case 'update':
@@ -52,7 +52,7 @@ class UserAccessController extends EntityAccessController {
    *
    * See EntityAccessControllerInterface::view() for parameters.
    */
-  protected function viewAccess(EntityInterface $entity, $langcode, AccountInterface $account) {
+  protected function viewAccess(EntityInterface $entity, AccountInterface $account) {
     // Never allow access to view the anonymous user account.
     if ($entity->id()) {
       // Admins can view all, users can view own profiles at all times.

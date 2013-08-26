@@ -101,8 +101,6 @@ interface NodeGrantDatabaseStorageInterface {
    * @param string $operation
    *   The entity operation. Usually one of 'view', 'edit', 'create' or
    *   'delete'.
-   * @param string $langcode
-   *   The language code for which to check access.
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The user for which to check access.
    *
@@ -111,7 +109,7 @@ interface NodeGrantDatabaseStorageInterface {
    *   module implements hook_node_grants(), the node does not (yet) have an id
    *   or none of the implementing modules explicitly granted or denied access.
    */
-  public function access(EntityInterface $node, $operation, $langcode, AccountInterface $account);
+  public function access(EntityInterface $node, $operation, AccountInterface $account);
 
   /**
    * Counts available node grants.

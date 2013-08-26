@@ -42,8 +42,9 @@ class EntityAccessController implements EntityAccessControllerInterface {
   /**
    * {@inheritdoc}
    */
-  public function access(EntityInterface $entity, $operation, $langcode = Language::LANGCODE_DEFAULT, AccountInterface $account = NULL) {
+  public function access(EntityInterface $entity, $operation, AccountInterface $account = NULL) {
     $account = $this->prepareUser($account);
+    $langcode = $entity->language()->id;
 
     if (($access = $this->getCache($entity->uuid(), $operation, $langcode, $account)) !== NULL) {
       // Cache hit, no work necessary.
@@ -58,12 +59,12 @@ class EntityAccessController implements EntityAccessControllerInterface {
     // We grant access to the entity if both of these conditions are met:
     // - No modules say to deny access.
     // - At least one module says to grant access.
-    $access = module_invoke_all($entity->entityType() . '_access', $entity->getBCEntity(), $operation, $account, $langcode);
+    $access = module_invoke_all($entity->entityType() . '_access', $entity->getBCEntity(), $operation, $account);
 
     if (($return = $this->processAccessHookResults($access)) === NULL) {
       // No module had an opinion about the access, so let's the access
       // controller check create access.
-      $return = (bool) $this->checkAccess($entity, $operation, $langcode, $account);
+      $return = (bool) $this->checkAccess($entity, $operation, $account);
     }
     return $this->setCache($return, $entity->uuid(), $operation, $langcode, $account);
   }
@@ -103,8 +104,6 @@ class EntityAccessController implements EntityAccessControllerInterface {
    * @param string $operation
    *   The entity operation. Usually one of 'view', 'update', 'create' or
    *   'delete'.
-   * @param string $langcode
-   *   The language code for which to check access.
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The user for which to check access.
    *
@@ -112,7 +111,7 @@ class EntityAccessController implements EntityAccessControllerInterface {
    *   TRUE if access was granted, FALSE if access was denied and NULL if access
    *   could not be determined.
    */
-  protected function checkAccess(EntityInterface $entity, $operation, $langcode, AccountInterface $account) {
+  protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
     return NULL;
   }
 

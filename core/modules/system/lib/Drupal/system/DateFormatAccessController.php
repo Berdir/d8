@@ -19,7 +19,7 @@ class DateFormatAccessController extends EntityAccessController {
   /**
    * {@inheritdoc}
    */
-  protected function checkAccess(EntityInterface $entity, $operation, $langcode, AccountInterface $account) {
+  protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
     // There are no restrictions on viewing a date format.
     if ($operation == 'view') {
       return TRUE;

@@ -280,7 +280,7 @@ class Entity implements IteratorAggregate, EntityInterface {
     }
     return \Drupal::entityManager()
       ->getAccessController($this->entityType)
-      ->access($this, $operation, Language::LANGCODE_DEFAULT, $account);
+      ->access($this, $operation, $account);
   }
 
   /**
