@@ -148,7 +148,7 @@ class NodeRevisionAccessCheck implements AccessCheckInterface {
       else {
         // First check the access to the default revision and finally, if the
         // node passed in is not the default revision then access to that, too.
-        $this->access[$cid] = $this->nodeAccess->access($this->nodeStorage->load($node->id()), $op, $langcode, $account) && ($node->isDefaultRevision() || $this->nodeAccess->access($node, $op, $langcode, $account));
+        $this->access[$cid] = $this->nodeAccess->access($this->nodeStorage->load($node->id()), $op, $langcode, $account) && ($node->isDefaultRevision() || $this->nodeAccess->access($node, $op, $account));
       }
     }
 
