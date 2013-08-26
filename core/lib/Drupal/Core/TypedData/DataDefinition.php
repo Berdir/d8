@@ -279,7 +279,9 @@ class DataDefinition implements DataDefinitionInterface, \ArrayAccess {
    * {@inheritdoc}
    */
   public function offsetGet($offset) {
-    return $this->definition[$offset];
+    if (isset($this->definition[$offset])) {
+      return $this->definition[$offset];
+    };
   }
 
   /**

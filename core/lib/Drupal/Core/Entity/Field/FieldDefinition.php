@@ -6,6 +6,7 @@
  */
 
 namespace Drupal\Core\Entity\Field;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\TypedData\DataDefinition;
 
 /**
@@ -171,6 +172,13 @@ class FieldDefinition extends DataDefinition implements FieldDefinitionInterface
    */
   public function isFieldConfigurable() {
     return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getFieldDefaultValue(EntityInterface $entity) {
+    return $this->getFieldSetting('default_value');
   }
 
   /**
