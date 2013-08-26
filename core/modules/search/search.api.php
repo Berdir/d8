@@ -206,7 +206,7 @@ function hook_search_execute($keys = NULL, $conditions = NULL) {
   foreach ($find as $item) {
     // Render the node.
     $node = node_load($item->sid);
-    $build = node_view($node, 'search_result', $item->langcode);
+    $build = node_view($node->getTranslation($item->langcode), 'search_result');
     unset($build['#theme']);
     $node->rendered = drupal_render($build);
 

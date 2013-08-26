@@ -60,10 +60,10 @@ class EntityViewController implements ControllerInterface {
    * @return array
    *   A render array as expected by drupal_render().
    */
-  public function view(EntityInterface $_entity, $view_mode = 'full', $langcode = NULL) {
+  public function view(EntityInterface $_entity, $view_mode = 'full') {
     return $this->entityManager
       ->getRenderController($_entity->entityType())
-      ->view($_entity, $view_mode, $langcode);
+      ->view($_entity, $view_mode);
   }
 
 }

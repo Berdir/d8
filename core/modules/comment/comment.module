@@ -850,15 +850,12 @@ function comment_prepare_thread(&$comments) {
  *   The comment object.
  * @param $view_mode
  *   View mode, e.g. 'full', 'teaser'...
- * @param $langcode
- *   (optional) A language code to use for rendering. Defaults to the global
- *   content language of the current request.
  *
  * @return
  *   An array as expected by drupal_render().
  */
-function comment_view(Comment $comment, $view_mode = 'full', $langcode = NULL) {
-  return entity_view($comment, $view_mode, $langcode);
+function comment_view(Comment $comment, $view_mode = 'full') {
+  return entity_view($comment, $view_mode);
 }
 
 /**
@@ -942,8 +939,8 @@ function comment_links(Comment $comment, EntityInterface $node) {
  *
  * @see drupal_render()
  */
-function comment_view_multiple($comments, $view_mode = 'full', $langcode = NULL) {
-  return entity_view_multiple($comments, $view_mode, $langcode);
+function comment_view_multiple($comments, $view_mode = 'full') {
+  return entity_view_multiple($comments, $view_mode);
 }
 
 /**
@@ -1213,7 +1210,7 @@ function comment_node_update_index(EntityInterface $node, $langcode) {
     if ($node->comment && $cids = comment_get_thread($node, $mode, $comments_per_page)) {
       $comments = comment_load_multiple($cids);
       comment_prepare_thread($comments);
-      $build = comment_view_multiple($comments, $langcode);
+      $build = comment_view_multiple($comments);
       return drupal_render($build);
     }
   }

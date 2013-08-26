@@ -1067,7 +1067,7 @@ function field_attach_delete_revision(EntityInterface $entity) {
  *
  * @deprecated as of Drupal 8.0. Use the entity system instead.
  */
-function field_attach_prepare_view($entity_type, array $entities, array $displays, $langcode = NULL) {
+function field_attach_prepare_view($entity_type, array $entities, array $displays) {
   // To ensure hooks are only run once per entity, only process items without
   // the _field_view_prepared flag.
   // @todo: resolve this more generally for both entity and field level hooks.

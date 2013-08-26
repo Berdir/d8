@@ -18,22 +18,22 @@ class BlockRenderController implements EntityRenderControllerInterface {
   /**
    * Implements \Drupal\Core\Entity\EntityRenderControllerInterface::buildContent().
    */
-  public function buildContent(array $entities, array $displays, $view_mode, $langcode = NULL) {
+  public function buildContent(array $entities, array $displays, $view_mode) {
     return array();
   }
 
   /**
    * Implements Drupal\Core\Entity\EntityRenderControllerInterface::view().
    */
-  public function view(EntityInterface $entity, $view_mode = 'full', $langcode = NULL) {
-    $build = $this->viewMultiple(array($entity), $view_mode, $langcode);
+  public function view(EntityInterface $entity, $view_mode = 'full') {
+    $build = $this->viewMultiple(array($entity), $view_mode);
     return reset($build);
   }
 
   /**
    * Implements Drupal\Core\Entity\EntityRenderControllerInterface::viewMultiple().
    */
-  public function viewMultiple(array $entities = array(), $view_mode = 'full', $langcode = NULL) {
+  public function viewMultiple(array $entities = array(), $view_mode = 'full') {
     $build = array();
     foreach ($entities as $entity_id => $entity) {
       $plugin = $entity->getPlugin();

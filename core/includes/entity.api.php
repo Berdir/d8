@@ -339,8 +339,6 @@ function hook_entity_query_alter(\Drupal\Core\Entity\Query\QueryInterface $query
  *   entity components.
  * @param $view_mode
  *   The view mode the entity is rendered in.
- * @param $langcode
- *   The language code used for rendering.
  *
  * The module may add elements to $entity->content prior to rendering. The
  * structure of $entity->content is a renderable array as expected by
@@ -351,7 +349,7 @@ function hook_entity_query_alter(\Drupal\Core\Entity\Query\QueryInterface $query
  * @see hook_node_view()
  * @see hook_user_view()
  */
-function hook_entity_view(\Drupal\Core\Entity\EntityInterface $entity, \Drupal\entity\Entity\EntityDisplay $display, $view_mode, $langcode) {
+function hook_entity_view(\Drupal\Core\Entity\EntityInterface $entity, \Drupal\entity\Entity\EntityDisplay $display, $view_mode) {
   // Only do the extra work if the component is configured to be displayed.
   // This assumes a 'mymodule_addition' extra field has been defined for the
   // entity bundle in hook_field_extra_fields().

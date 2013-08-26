@@ -626,10 +626,10 @@ function entity_render_controller($entity_type) {
  * @return array
  *   A render array for the entity.
  */
-function entity_view(EntityInterface $entity, $view_mode, $langcode = NULL) {
+function entity_view(EntityInterface $entity, $view_mode) {
   return Drupal::entityManager()
     ->getRenderController($entity->entityType())
-    ->view($entity, $view_mode, $langcode);
+    ->view($entity, $view_mode);
 }
 
 /**
@@ -647,10 +647,10 @@ function entity_view(EntityInterface $entity, $view_mode, $langcode = NULL) {
  *   A render array for the entities, indexed by the same keys as the
  *   entities array passed in $entities.
  */
-function entity_view_multiple(array $entities, $view_mode, $langcode = NULL) {
+function entity_view_multiple(array $entities, $view_mode) {
   return Drupal::entityManager()
     ->getRenderController(reset($entities)->entityType())
-    ->viewMultiple($entities, $view_mode, $langcode);
+    ->viewMultiple($entities, $view_mode);
 }
 
 /**

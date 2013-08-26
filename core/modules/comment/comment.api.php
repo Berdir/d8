@@ -86,12 +86,10 @@ function hook_comment_load(Drupal\comment\Comment $comments) {
  *   comment components.
  * @param $view_mode
  *   View mode, e.g. 'full', 'teaser'...
- * @param $langcode
- *   The language code used for rendering.
  *
  * @see hook_entity_view()
  */
-function hook_comment_view(\Drupal\comment\Entity\Comment $comment, \Drupal\entity\Entity\EntityDisplay $display, $view_mode, $langcode) {
+function hook_comment_view(\Drupal\comment\Entity\Comment $comment, \Drupal\entity\Entity\EntityDisplay $display, $view_mode) {
   // Only do the extra work if the component is configured to be displayed.
   // This assumes a 'mymodule_addition' extra field has been defined for the
   // node type in hook_field_extra_fields().

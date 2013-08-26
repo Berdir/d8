@@ -937,15 +937,15 @@ function node_search_execute($keys = NULL, $conditions = NULL) {
   $results = array();
   foreach ($find as $item) {
     // Render the node.
-    $node = node_load($item->sid);
-    $build = node_view($node, 'search_result', $item->langcode);
+    $node = node_load($item->sid)->getTranslation($item->langcode);
+    $build = node_view($node, 'search_result');
     unset($build['#theme']);
     $node->rendered = drupal_render($build);
 
     // Fetch comments for snippet.
-    $node->rendered .= ' ' . module_invoke('comment', 'node_update_index', $node, $item->langcode);
+    $node->rendered .= ' ' . module_invoke('comment', 'node_update_index', $node);
 
-    $extra = Drupal::moduleHandler()->invokeAll('node_search_result', array($node, $item->langcode));
+    $extra = Drupal::moduleHandler()->invokeAll('node_search_result', array($node));
 
     $language = language_load($item->langcode);
     $uri = $node->uri();
@@ -956,7 +956,7 @@ function node_search_execute($keys = NULL, $conditions = NULL) {
     $results[] = array(
       'link' => url($uri['path'], array_merge($uri['options'], array('absolute' => TRUE, 'language' => $language))),
       'type' => check_plain(node_get_type_label($node)),
-      'title' => $node->label($item->langcode),
+      'title' => $node->label(),
       'user' => drupal_render($username),
       'date' => $node->getChangedTime(),
       'node' => $node,
@@ -1647,15 +1647,12 @@ function node_feed($nids = FALSE, $channel = array()) {
  *   A node entity.
  * @param $view_mode
  *   (optional) View mode, e.g., 'full', 'teaser'... Defaults to 'full.'
- * @param $langcode
- *   (optional) A language code to use for rendering. Defaults to NULL which is
- *   the global content language of the current request.
  *
  * @return
  *   An array as expected by drupal_render().
  */
-function node_view(EntityInterface $node, $view_mode = 'full', $langcode = NULL) {
-  return entity_view($node, $view_mode, $langcode);
+function node_view(EntityInterface $node, $view_mode = 'full') {
+  return entity_view($node, $view_mode);
 }
 
 /**
@@ -1665,15 +1662,12 @@ function node_view(EntityInterface $node, $view_mode = 'full', $langcode = NULL)
  *   An array of nodes as returned by node_load_multiple().
  * @param $view_mode
  *   (optional) View mode, e.g., 'full', 'teaser'... Defaults to 'teaser.'
- * @param $langcode
- *   (optional) A language code to use for rendering. Defaults to the global
- *   content language of the current request.
  *
  * @return
  *   An array in the format expected by drupal_render().
  */
-function node_view_multiple($nodes, $view_mode = 'teaser', $langcode = NULL) {
-  return entity_view_multiple($nodes, $view_mode, $langcode);
+function node_view_multiple($nodes, $view_mode = 'teaser') {
+  return entity_view_multiple($nodes, $view_mode);
 }
 
 /**

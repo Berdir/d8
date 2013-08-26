@@ -255,12 +255,10 @@ function hook_taxonomy_term_delete(Drupal\taxonomy\Term $term) {
  *   term components.
  * @param $view_mode
  *   The $view_mode parameter from taxonomy_term_view().
- * @param $langcode
- *   The language code used for rendering.
  *
  * @see hook_entity_view()
  */
-function hook_taxonomy_term_view(\Drupal\taxonomy\Entity\Term $term, \Drupal\entity\Entity\EntityDisplay $display, $view_mode, $langcode) {
+function hook_taxonomy_term_view(\Drupal\taxonomy\Entity\Term $term, \Drupal\entity\Entity\EntityDisplay $display, $view_mode) {
   // Only do the extra work if the component is configured to be displayed.
   // This assumes a 'mymodule_addition' extra field has been defined for the
   // vocabulary in hook_field_extra_fields().

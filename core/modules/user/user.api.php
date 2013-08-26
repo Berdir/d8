@@ -319,13 +319,11 @@ function hook_user_logout($account) {
  *   user components.
  * @param $view_mode
  *   View mode, e.g. 'full'.
- * @param $langcode
- *   The language code used for rendering.
  *
  * @see hook_user_view_alter()
  * @see hook_entity_view()
  */
-function hook_user_view(\Drupal\user\UserInterface $account, \Drupal\entity\Entity\EntityDisplay $display, $view_mode, $langcode) {
+function hook_user_view(\Drupal\user\UserInterface $account, \Drupal\entity\Entity\EntityDisplay $display, $view_mode) {
   // Only do the extra work if the component is configured to be displayed.
   // This assumes a 'mymodule_addition' extra field has been defined for the
   // user entity type in hook_field_extra_fields().

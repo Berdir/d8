@@ -793,8 +793,6 @@ function hook_node_submit(\Drupal\Core\Entity\EntityInterface $node, $form, &$fo
  *   node components.
  * @param string $view_mode
  *   The $view_mode parameter from node_view().
- * @param string $langcode
- *   The language code used for rendering.
  *
  * @see forum_node_view()
  * @see comment_node_view()
@@ -802,7 +800,7 @@ function hook_node_submit(\Drupal\Core\Entity\EntityInterface $node, $form, &$fo
  *
  * @ingroup node_api_hooks
  */
-function hook_node_view(\Drupal\Core\Entity\EntityInterface $node, \Drupal\entity\Entity\EntityDisplay $display, $view_mode, $langcode) {
+function hook_node_view(\Drupal\Core\Entity\EntityInterface $node, \Drupal\entity\Entity\EntityDisplay $display, $view_mode) {
   // Only do the extra work if the component is configured to be displayed.
   // This assumes a 'mymodule_addition' extra field has been defined for the
   // node type in hook_field_extra_fields().
