@@ -19,8 +19,8 @@ class EntityTestRenderController extends EntityRenderController {
   /**
    * Overrides Drupal\Core\Entity\EntityRenderController::buildContent().
    */
-  public function buildContent(array $entities, array $displays, $view_mode, $langcode = NULL) {
-    parent::buildContent($entities, $displays, $view_mode, $langcode);
+  public function buildContent(array $entities, array $displays, $view_mode) {
+    parent::buildContent($entities, $displays, $view_mode);
 
     foreach ($entities as $entity) {
       $entity->content['label'] = array(

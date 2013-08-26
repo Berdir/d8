@@ -22,14 +22,11 @@ interface EntityRenderControllerInterface {
    *   configured for the entity components, keyed by bundle name.
    * @param string $view_mode
    *   The view mode in which the entity is being viewed.
-   * @param string $langcode
-   *   (optional) For which language the entity should be build, defaults to
-   *   the current content language.
    *
    * @return array
    *   The content array.
    */
-  public function buildContent(array $entities, array $displays, $view_mode, $langcode = NULL);
+  public function buildContent(array $entities, array $displays, $view_mode);
 
   /**
    * Returns the render array for the provided entity.
@@ -38,9 +35,6 @@ interface EntityRenderControllerInterface {
    *   The entity to render.
    * @param string $view_mode
    *   (optional) The view mode that should be used to render the entity.
-   * @param string $langcode
-   *   (optional) For which language the entity should be rendered, defaults to
-   *   the current content language.
    *
    * @return array
    *   A render array for the entity.
@@ -51,7 +45,7 @@ interface EntityRenderControllerInterface {
    *   comment belongs to, or not passing one, and having the comment node not
    *   be available for loading.
    */
-  public function view(EntityInterface $entity, $view_mode = 'full', $langcode = NULL);
+  public function view(EntityInterface $entity, $view_mode = 'full');
 
   /**
    * Returns the render array for the provided entities.
@@ -60,9 +54,6 @@ interface EntityRenderControllerInterface {
    *   An array of entities implementing EntityInterface to view.
    * @param string $view_mode
    *   (optional) The view mode that should be used to render the entity.
-   * @param string $langcode
-   *   (optional) For which language the entity should be rendered, defaults to
-   *   the current content language.
    *
    * @return
    *   A render array for the entities, indexed by the same keys as the
@@ -74,5 +65,5 @@ interface EntityRenderControllerInterface {
    *   comments belongs to, or not passing one, and having the comments node not
    *   be available for loading.
    */
-  public function viewMultiple(array $entities = array(), $view_mode = 'full', $langcode = NULL);
+  public function viewMultiple(array $entities = array(), $view_mode = 'full');
 }

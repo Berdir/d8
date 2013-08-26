@@ -18,8 +18,8 @@ class FeedRenderController extends EntityRenderController {
   /**
    * Overrides Drupal\Core\Entity\EntityRenderController::getBuildDefaults().
    */
-  protected function getBuildDefaults(EntityInterface $entity, $view_mode, $langcode) {
-    $defaults = parent::getBuildDefaults($entity, $view_mode, $langcode);
+  protected function getBuildDefaults(EntityInterface $entity, $view_mode) {
+    $defaults = parent::getBuildDefaults($entity, $view_mode);
     $defaults['#theme'] = 'aggregator_feed_source';
     return $defaults;
   }

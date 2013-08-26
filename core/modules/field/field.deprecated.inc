@@ -1068,8 +1068,6 @@ function field_attach_delete_revision(EntityInterface $entity) {
  * @deprecated as of Drupal 8.0. Use the entity system instead.
  */
 function field_attach_prepare_view($entity_type, array $entities, array $displays, $langcode = NULL) {
-  $options['langcode'] = array();
-
   // To ensure hooks are only run once per entity, only process items without
   // the _field_view_prepared flag.
   // @todo: resolve this more generally for both entity and field level hooks.
@@ -1081,10 +1079,6 @@ function field_attach_prepare_view($entity_type, array $entities, array $display
 
       // Add this entity to the items to be prepared.
       $prepare[$id] = $entity;
-
-      // Determine the actual language code to display for each field, given the
-      // language codes available in the field data.
-      $options['langcode'][$id] = field_language($entity, NULL, $langcode);
 
       // Mark this item as prepared.
       $entity->_field_view_prepared = TRUE;
@@ -1131,12 +1125,9 @@ function field_attach_prepare_view($entity_type, array $entities, array $display
  *
  * @deprecated as of Drupal 8.0. Use the entity system instead.
  */
-function field_attach_view(EntityInterface $entity, EntityDisplay $display, $langcode = NULL, array $options = array()) {
+function field_attach_view(EntityInterface $entity, EntityDisplay $display, array $options = array()) {
   // Ensure we are working with a BC mode entity.
   $entity = $entity->getBCEntity();
-  // Determine the actual language code to display for each field, given the
-  // language codes available in the field data.
-  $options['langcode'] = field_language($entity, NULL, $langcode);
 
   // For each instance, call the view() method on the formatter object handed
   // by the entity display.
@@ -1154,7 +1145,6 @@ function field_attach_view(EntityInterface $entity, EntityDisplay $display, $lan
     'entity' => $entity,
     'view_mode' => $view_mode,
     'display_options' => $view_mode,
-    'langcode' => $langcode,
   );
   drupal_alter('field_attach_view', $output, $context);
 

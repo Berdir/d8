@@ -18,8 +18,8 @@ class MessageRenderController extends EntityRenderController {
   /**
    * Overrides Drupal\Core\Entity\EntityRenderController::buildContent().
    */
-  public function buildContent(array $entities, array $displays, $view_mode, $langcode = NULL) {
-    parent::buildContent($entities, $displays, $view_mode, $langcode);
+  public function buildContent(array $entities, array $displays, $view_mode) {
+    parent::buildContent($entities, $displays, $view_mode);
 
     foreach ($entities as $entity) {
       // Add the message extra field, if enabled.
@@ -37,8 +37,8 @@ class MessageRenderController extends EntityRenderController {
   /**
    * Overrides Drupal\Core\Entity\EntityRenderController::view().
    */
-  public function view(EntityInterface $entity, $view_mode = 'full', $langcode = NULL) {
-    $build = parent::view($entity, $view_mode, $langcode);
+  public function view(EntityInterface $entity, $view_mode = 'full') {
+    $build = parent::view($entity, $view_mode);
 
     if ($view_mode == 'mail') {
       // Convert field labels into headings.

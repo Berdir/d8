@@ -19,7 +19,7 @@ class NodeRenderController extends EntityRenderController {
   /**
    * Overrides Drupal\Core\Entity\EntityRenderController::buildContent().
    */
-  public function buildContent(array $entities, array $displays, $view_mode, $langcode = NULL) {
+  public function buildContent(array $entities, array $displays, $view_mode) {
     $return = array();
     if (empty($entities)) {
       return $return;
@@ -28,7 +28,7 @@ class NodeRenderController extends EntityRenderController {
     // Attach user account.
     user_attach_accounts($entities);
 
-    parent::buildContent($entities, $displays, $view_mode, $langcode);
+    parent::buildContent($entities, $displays, $view_mode);
 
     foreach ($entities as $entity) {
       $bundle = $entity->bundle();
@@ -69,7 +69,7 @@ class NodeRenderController extends EntityRenderController {
         $entity->content['language'] = array(
           '#type' => 'item',
           '#title' => t('Language'),
-          '#markup' => language_name($langcode),
+          '#markup' => $entity->language()->name,
           '#prefix' => '<div id="field-language-display">',
           '#suffix' => '</div>'
         );
@@ -80,8 +80,8 @@ class NodeRenderController extends EntityRenderController {
   /**
    * Overrides Drupal\Core\Entity\EntityRenderController::alterBuild().
    */
-  protected function alterBuild(array &$build, EntityInterface $entity, EntityDisplay $display, $view_mode, $langcode = NULL) {
-    parent::alterBuild($build, $entity, $display, $view_mode, $langcode);
+  protected function alterBuild(array &$build, EntityInterface $entity, EntityDisplay $display, $view_mode) {
+    parent::alterBuild($build, $entity, $display, $view_mode);
     if ($entity->id()) {
       $build['#contextual_links']['node'] = array('node', array($entity->id()));
     }

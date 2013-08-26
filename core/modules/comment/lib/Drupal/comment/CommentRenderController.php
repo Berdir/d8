@@ -22,7 +22,7 @@ class CommentRenderController extends EntityRenderController {
    * In addition to modifying the content key on entities, this implementation
    * will also set the node key which all comments carry.
    */
-  public function buildContent(array $entities, array $displays, $view_mode, $langcode = NULL) {
+  public function buildContent(array $entities, array $displays, $view_mode) {
     $return = array();
     if (empty($entities)) {
       return $return;
@@ -35,7 +35,7 @@ class CommentRenderController extends EntityRenderController {
     }
     user_load_multiple(array_unique($uids));
 
-    parent::buildContent($entities, $displays, $view_mode, $langcode);
+    parent::buildContent($entities, $displays, $view_mode);
 
     // Load all nodes of all comments at once.
     $nids = array();
@@ -72,8 +72,8 @@ class CommentRenderController extends EntityRenderController {
   /**
    * Overrides Drupal\Core\Entity\EntityRenderController::alterBuild().
    */
-  protected function alterBuild(array &$build, EntityInterface $comment, EntityDisplay $display, $view_mode, $langcode = NULL) {
-    parent::alterBuild($build, $comment, $display, $view_mode, $langcode);
+  protected function alterBuild(array &$build, EntityInterface $comment, EntityDisplay $display, $view_mode) {
+    parent::alterBuild($build, $comment, $display, $view_mode);
     if (empty($comment->in_preview)) {
       $prefix = '';
       $is_threaded = isset($comment->divs)

@@ -19,8 +19,8 @@ class TermRenderController extends EntityRenderController {
   /**
    * Overrides Drupal\Core\Entity\EntityRenderController::buildContent().
    */
-  public function buildContent(array $entities, array $displays, $view_mode, $langcode = NULL) {
-    parent::buildContent($entities, $displays, $view_mode, $langcode);
+  public function buildContent(array $entities, array $displays, $view_mode) {
+    parent::buildContent($entities, $displays, $view_mode);
 
     foreach ($entities as $entity) {
       // Add the description if enabled.
@@ -38,8 +38,8 @@ class TermRenderController extends EntityRenderController {
   /**
    * Overrides \Drupal\Core\Entity\EntityRenderController::getBuildDefaults().
    */
-  protected function getBuildDefaults(EntityInterface $entity, $view_mode, $langcode) {
-    $return = parent::getBuildDefaults($entity, $view_mode, $langcode);
+  protected function getBuildDefaults(EntityInterface $entity, $view_mode) {
+    $return = parent::getBuildDefaults($entity, $view_mode);
 
     // TODO: rename "term" to "taxonomy_term" in theme_taxonomy_term().
     $return['#term'] = $return["#{$this->entityType}"];
@@ -51,8 +51,8 @@ class TermRenderController extends EntityRenderController {
   /**
    * Overrides \Drupal\Core\Entity\EntityRenderController::alterBuild().
    */
-  protected function alterBuild(array &$build, EntityInterface $entity, EntityDisplay $display, $view_mode, $langcode = NULL) {
-    parent::alterBuild($build, $entity, $display, $view_mode, $langcode);
+  protected function alterBuild(array &$build, EntityInterface $entity, EntityDisplay $display, $view_mode) {
+    parent::alterBuild($build, $entity, $display, $view_mode);
     $build['#attached']['css'][] = drupal_get_path('module', 'taxonomy') . '/css/taxonomy.module.css';
     $build['#contextual_links']['taxonomy'] = array('taxonomy/term', array($entity->id()));
   }

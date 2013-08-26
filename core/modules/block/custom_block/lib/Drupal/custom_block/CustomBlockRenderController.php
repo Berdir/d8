@@ -19,8 +19,8 @@ class CustomBlockRenderController extends EntityRenderController {
   /**
    * Overrides \Drupal\Core\Entity\EntityRenderController::alterBuild().
    */
-  protected function alterBuild(array &$build, EntityInterface $entity, EntityDisplay $display, $view_mode, $langcode = NULL) {
-    parent::alterBuild($build, $entity, $display, $view_mode, $langcode);
+  protected function alterBuild(array &$build, EntityInterface $entity, EntityDisplay $display, $view_mode) {
+    parent::alterBuild($build, $entity, $display, $view_mode);
     // Add contextual links for this custom block.
     if (!empty($entity->id->value) && $view_mode == 'full') {
       $build['#contextual_links']['custom_block'] = array('block', array($entity->id()));

@@ -18,7 +18,7 @@ class TourRenderController extends EntityRenderController {
   /**
    * Overrides \Drupal\Core\Entity\EntityRenderController::viewMultiple().
    */
-  public function viewMultiple(array $entities = array(), $view_mode = 'full', $langcode = NULL) {
+  public function viewMultiple(array $entities = array(), $view_mode = 'full') {
     $build = array();
     foreach ($entities as $entity_id => $entity) {
       $tips = $entity->getTips();

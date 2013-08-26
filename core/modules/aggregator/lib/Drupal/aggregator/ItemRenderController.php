@@ -18,8 +18,8 @@ class ItemRenderController extends EntityRenderController {
   /**
    * Overrides Drupal\Core\Entity\EntityRenderController::getBuildDefaults().
    */
-  protected function getBuildDefaults(EntityInterface $entity, $view_mode, $langcode) {
-    $defaults = parent::getBuildDefaults($entity, $view_mode, $langcode);
+  protected function getBuildDefaults(EntityInterface $entity, $view_mode) {
+    $defaults = parent::getBuildDefaults($entity, $view_mode);
 
     // Use a different template for the summary view mode.
     if ($view_mode == 'summary') {
