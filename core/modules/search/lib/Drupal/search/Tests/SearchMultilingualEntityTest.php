@@ -120,8 +120,10 @@ class SearchMultilingualEntityTest extends SearchTestBase {
     search_update_totals();
     foreach ($this->searchable_nodes as $node) {
       // Each searchable node that we created contains values in the body field
-      // in one or more languages.
-      $plugin->setSearch($node->body->value, array(), array());
+      // in one or more languages. Let's pick the last language variant from the
+      // body array and execute a search using that as a search keyword.
+      $languages = $node->getTranslationLanguages();
+      $plugin->setSearch($node->getTranslation(end($languages)->id)->body->value, array(), array());
       // Do the search and assert the results.
       $search_result = $plugin->execute();
       // See whether we get the same node as a result.

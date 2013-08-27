@@ -229,10 +229,7 @@ class NodeSearch extends SearchPluginBase implements AccessibleInterface, Search
 
     foreach ($find as $item) {
       // Render the node.
-      $entities = $node_storage->loadMultiple(array($item->sid));
-      // Convert to BCEntity to match node_load_multiple().
-      // @todo - remove this when code that receives this object is updated.
-      $node = $entities[$item->sid]->getBCEntity();
+      $node = $node_storage->load($item->sid);
       $build = $node_render->view($node, 'search_result', $item->langcode);
       unset($build['#theme']);
       $node->rendered = drupal_render($build);
@@ -246,7 +243,7 @@ class NodeSearch extends SearchPluginBase implements AccessibleInterface, Search
       $uri = $node->uri();
       $username = array(
         '#theme' => 'username',
-        '#account' => $this->entityManager->getStorageController('user')->load($node->uid),
+        '#account' => $node->getAuthor(),
       );
       $results[] = array(
         'link' => url($uri['path'], array_merge($uri['options'], array('absolute' => TRUE, 'language' => $language))),
@@ -303,10 +300,7 @@ class NodeSearch extends SearchPluginBase implements AccessibleInterface, Search
     // of a node.
     $counter = 0;
     $node_storage = $this->entityManager->getStorageController('node');
-    foreach ($node_storage->loadMultiple($nids) as $entity) {
-      // Convert to BCEntity to match node_load_multiple().
-      // @todo - remove this when hooks passed this object are updated.
-      $node = $entity->getBCEntity();
+    foreach ($node_storage->loadMultiple($nids) as $node) {
       // Determine when the maximum number of indexable items is reached.
       $counter += count($node->getTranslationLanguages());
       if ($counter > $limit) {
