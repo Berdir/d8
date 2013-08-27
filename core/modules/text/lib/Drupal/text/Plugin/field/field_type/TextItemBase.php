@@ -83,10 +83,10 @@ abstract class TextItemBase extends ConfigFieldItemBase implements PrepareCacheI
       // source' of a TextProcessed computed property.
       // @todo Clean up this mess by making the TextProcessed property type
       //   support its own cache integration: https://drupal.org/node/2026339.
-      foreach ($this->getPropertyDefinitions() as $definition) {
+      foreach ($this->getPropertyDefinitions() as $property => $definition) {
         if (isset($definition['class']) && ($definition['class'] == '\Drupal\text\TextProcessed')) {
-          $source_property = $definition['settings']['text source'];
-          $this->set('safe_' . $source_property, text_sanitize($text_processing, $langcode, $itemBC, $source_property));
+          // Calculate the processed values, so that it can be cached later on.
+          $this->get($property)->getValue();
         }
       }
     }

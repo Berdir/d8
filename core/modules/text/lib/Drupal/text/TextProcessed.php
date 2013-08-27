@@ -21,18 +21,11 @@ use InvalidArgumentException;
 class TextProcessed extends TypedData {
 
   /**
-   * The text property.
+   * Cached processed text.
    *
-   * @var \Drupal\Core\TypedData\TypedDataInterface
+   * @var string|false
    */
-  protected $text;
-
-  /**
-   * The text format property.
-   *
-   * @var \Drupal\Core\TypedData\TypedDataInterface
-   */
-  protected $format;
+  protected $processed = FALSE;
 
   /**
    * Overrides TypedData::__construct().
@@ -51,8 +44,8 @@ class TextProcessed extends TypedData {
   public function setContext($name = NULL, TypedDataInterface $parent = NULL) {
     parent::setContext($name, $parent);
     if (isset($parent)) {
-      $this->text = $parent->get($this->definition['settings']['text source']);
-      $this->format = $parent->get('format');
+      $this->text = $parent->{($this->definition['settings']['text source'])};
+      $this->format = $parent->format;
     }
   }
 
@@ -60,22 +53,28 @@ class TextProcessed extends TypedData {
    * Implements \Drupal\Core\TypedData\TypedDataInterface::getValue().
    */
   public function getValue($langcode = NULL) {
+    if ($this->processed !== FALSE) {
+      return $this->processed;
+    }
 
-    if (!isset($this->text)) {
+    if (empty($this->definition['settings']['text source'])) {
       throw new InvalidArgumentException('Computed properties require context for computation.');
     }
+    $text = $this->parent->{($this->definition['settings']['text source'])};
 
     $field = $this->parent->getParent();
     $entity = $field->getParent();
     $instance = field_info_instance($entity->entityType(), $field->getName(), $entity->bundle());
 
-    if (!empty($instance['settings']['text_processing']) && $this->format->getValue()) {
-      return check_markup($this->text->getValue(), $this->format->getValue(), $entity->language()->id);
+    if (!empty($instance['settings']['text_processing']) && $this->parent->format) {
+      $this->processed = check_markup($text, $this->parent->format, $entity->language()->id);
     }
     else {
-      // If no format is available, still make sure to sanitize the text.
-      return check_plain($this->text->getValue());
+      // Escape all HTML and retain newlines.
+      // @see \Drupal\text\Plugin\field\formatter\TextPlainFormatter
+      $this->processed = nl2br(check_plain($text));
     }
+    return $this->processed;
   }
 
   /**
@@ -83,9 +82,7 @@ class TextProcessed extends TypedData {
    */
   public function setValue($value, $notify = TRUE) {
     if (isset($value)) {
-      // @todo This is triggered from DatabaseStorageController::invokeFieldMethod()
-      // in the case of case of non-NG entity types.
-      // throw new ReadOnlyException('Unable to set a computed property.');
+      $this->processed = $value;
     }
   }
 
