@@ -23,9 +23,9 @@ class TextProcessed extends TypedData {
   /**
    * Cached processed text.
    *
-   * @var string|false
+   * @var string|null
    */
-  protected $processed = FALSE;
+  protected $processed = NULL;
 
   /**
    * Overrides TypedData::__construct().
@@ -39,34 +39,20 @@ class TextProcessed extends TypedData {
   }
 
   /**
-   * Overrides TypedData::setContext().
-   */
-  public function setContext($name = NULL, TypedDataInterface $parent = NULL) {
-    parent::setContext($name, $parent);
-    if (isset($parent)) {
-      $this->text = $parent->{($this->definition['settings']['text source'])};
-      $this->format = $parent->format;
-    }
-  }
-
-  /**
    * Implements \Drupal\Core\TypedData\TypedDataInterface::getValue().
    */
   public function getValue($langcode = NULL) {
-    if ($this->processed !== FALSE) {
+    if ($this->processed !== NULL) {
       return $this->processed;
-    }
-
-    if (empty($this->definition['settings']['text source'])) {
-      throw new InvalidArgumentException('Computed properties require context for computation.');
     }
     $text = $this->parent->{($this->definition['settings']['text source'])};
 
     $field = $this->parent->getParent();
     $entity = $field->getParent();
-    $instance = field_info_instance($entity->entityType(), $field->getName(), $entity->bundle());
 
-    if (!empty($instance['settings']['text_processing']) && $this->parent->format) {
+    if ($field->getFieldDefinition()->getFieldSetting('text_processing') && $this->parent->format) {
+      // @todo: The entity language might not be the correct language to use,
+      //   fix in https://drupal.org/node/2061331.
       $this->processed = check_markup($text, $this->parent->format, $entity->language()->id);
     }
     else {
@@ -81,8 +67,10 @@ class TextProcessed extends TypedData {
    * Implements \Drupal\Core\TypedData\TypedDataInterface::setValue().
    */
   public function setValue($value, $notify = TRUE) {
-    if (isset($value)) {
-      $this->processed = $value;
+    $this->processed = $value;
+    // Notify the parent of any changes.
+    if ($notify && isset($this->parent)) {
+      $this->parent->onChange($this->name);
     }
   }
 

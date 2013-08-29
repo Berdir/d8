@@ -97,7 +97,7 @@ class NodeTokenReplaceTest extends NodeTestBase {
 
     // Generate and test sanitized token - use full body as expected value.
     $tests = array();
-    $tests['[node:summary]'] = $node->body->summary_processed;
+    $tests['[node:summary]'] = $node->body->processed;
 
     // Test to make sure that we generated something for each token.
     $this->assertFalse(in_array(0, array_map('strlen', $tests)), 'No empty tokens generated for node without a summary.');
