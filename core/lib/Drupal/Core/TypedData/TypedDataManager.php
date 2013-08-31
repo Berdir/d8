@@ -82,7 +82,6 @@ class TypedDataManager extends DefaultPluginManager {
 
     // Allow per-data definition overrides of the used classes, i.e. take over
     // classes specified in the data definition.
-    // For BC, support definitions using the 'list' flag with 'list_class'.
     $key = empty($configuration['list']) ? 'class' : 'list_class';
     if (isset($configuration[$key])) {
       $class = $configuration[$key];
@@ -100,9 +99,34 @@ class TypedDataManager extends DefaultPluginManager {
   /**
    * Creates a new typed data object instance.
    *
-   * @param \Drupal\Core\TypedData\DataDefinitionInterface $definition
-   *   The data definition of the typed data object. For backwards-compatibility
-   *   an array representation of the data definition may be passed also.
+   * @param array $definition
+   *   The data definition array with the following array keys and values:
+   *   - type: The data type of the data to wrap. Required.
+   *   - label: A human readable label.
+   *   - description: A human readable description.
+   *   - list: Whether the data is multi-valued, i.e. a list of data items.
+   *     Defaults to FALSE.
+   *   - computed: A boolean specifying whether the data value is computed by
+   *     the object, e.g. depending on some other values.
+   *   - read-only: A boolean specifying whether the data is read-only. Defaults
+   *     to TRUE for computed properties, to FALSE otherwise.
+   *   - class: If set and 'list' is FALSE, the class to use for creating the
+   *     typed data object; otherwise the default class of the data type will be
+   *     used.
+   *   - list_class: If set and 'list' is TRUE, the class to use for creating
+   *     the typed data object; otherwise the default list class of the data
+   *     type will be used.
+   *   - settings: An array of settings, as required by the used 'class'. See
+   *     the documentation of the class for supported or required settings.
+   *   - list_settings: An array of settings as required by the used
+   *     'list_class'. See the documentation of the list class for support or
+   *     required settings.
+   *   - constraints: An array of validation constraints. See
+   *     \Drupal\Core\TypedData\TypedDataManager::getConstraints() for details.
+   *   - required: A boolean specifying whether a non-NULL value is mandatory.
+   *   Further keys may be supported in certain usages, e.g. for further keys
+   *   supported for entity field definitions see
+   *   \Drupal\Core\Entity\StorageControllerInterface::getPropertyDefinitions().
    * @param mixed $value
    *   (optional) The data value. If set, it has to match one of the supported
    *   data type format as documented for the data type classes.
@@ -127,11 +151,9 @@ class TypedDataManager extends DefaultPluginManager {
    * @see \Drupal\Core\TypedData\Plugin\DataType\Date
    * @see \Drupal\Core\TypedData\Plugin\DataType\Uri
    * @see \Drupal\Core\TypedData\Plugin\DataType\Binary
+   * @see \Drupal\Core\Entity\Field\EntityWrapper
    */
-  public function create($definition, $value = NULL, $name = NULL, $parent = NULL) {
-    if (is_object($definition)) {
-      $definition = $definition->toArray();
-    }
+  public function create(array $definition, $value = NULL, $name = NULL, $parent = NULL) {
     $wrapper = $this->createInstance($definition['type'], $definition, $name, $parent);
     if (isset($value)) {
       $wrapper->setValue($value, FALSE);

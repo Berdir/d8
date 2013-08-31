@@ -50,8 +50,6 @@ use Drupal\Core\Entity\EntityInterface;
  * abstractly, and present Views configuration options to the administrator
  * based on that abstract definition, even though that abstract definition can
  * differ from the concrete definition of any particular node's body field.
- *
- * @todo Extends this from DataDefinitionInterface.
  */
 interface FieldDefinitionInterface {
 
