@@ -12,7 +12,7 @@ use Drupal\Core\TypedData\DataDefinition;
 /**
  * A class for defining entity fields.
  */
-class FieldDefinition extends DataDefinition implements FieldDefinitionInterface, \ArrayAccess {
+class FieldDefinition implements FieldDefinitionInterface {
 
   /**
    * {@inheritdoc}
