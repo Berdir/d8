@@ -62,14 +62,6 @@ class DataType extends Plugin {
   public $description;
 
   /**
-   * The typed data class used for wrapping multiple data items of the type.
-   * Must implement the \Drupal\Core\TypedData\ListInterface.
-   *
-   * @var string
-   */
-  public $list_class = '\Drupal\Core\TypedData\ItemList';
-
-  /**
    * The pre-defined primitive type that this data type maps to.
    *
    * If set, it must be a constant defined by \Drupal\Core\TypedData\Primitive

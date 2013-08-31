@@ -50,6 +50,8 @@ use Drupal\Core\Entity\EntityInterface;
  * abstractly, and present Views configuration options to the administrator
  * based on that abstract definition, even though that abstract definition can
  * differ from the concrete definition of any particular node's body field.
+ *
+ * @todo Extends this from DataDefinitionInterface.
  */
 interface FieldDefinitionInterface {
 
@@ -68,10 +70,9 @@ interface FieldDefinitionInterface {
    * Returns the field type.
    *
    * @return string
-   *   The field type.
+   *   The field type, i.e. the id of a field type plugin. For example 'text'.
    *
-   * @todo Provide more information about field types after
-   *   https://drupal.org/node/1969728 is implemented.
+   * @see \Drupal\Core\Entity\Field\FieldTypePluginManager
    */
   public function getFieldType();
 
@@ -121,6 +122,20 @@ interface FieldDefinitionInterface {
    *   TRUE if the field is translatable.
    */
   public function isFieldTranslatable();
+
+  /**
+   * Determines whether the field is configurable via field.module.
+   *
+   * @return bool
+   */
+  public function isFieldConfigurable();
+
+  /**
+   * Determines whether the field is queryable via QueryInterface.
+   *
+   * @return bool
+   */
+  public function isFieldQueryable();
 
   /**
    * Returns the human-readable label for the field.
