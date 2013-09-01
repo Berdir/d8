@@ -667,6 +667,7 @@ class EntityNG extends Entity {
    * Overrides Entity::getBCEntity().
    */
   public function getBCEntity() {
+    return $this;
     if (!isset($this->bcEntity)) {
       // Initialize field definitions so that we can pass them by reference.
       $this->getPropertyDefinitions();
