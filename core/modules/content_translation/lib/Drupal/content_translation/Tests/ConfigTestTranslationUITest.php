@@ -67,9 +67,8 @@ class ConfigTestTranslationUITest extends ContentTranslationUITest {
     $entity = entity_load($this->entityType, $id, TRUE);
     $this->assertTrue($entity, 'Entity found in the database.');
 
-    $translation = $this->getTranslation($entity, $default_langcode);
     foreach ($values[$default_langcode] as $property => $value) {
-      $stored_value = $this->getValue($translation, $property, $default_langcode);
+      $stored_value = $entity->{$property};
       $value = is_array($value) ? $value[0]['value'] : $value;
       $message = format_string('@property correctly stored in the default language.', array('@property' => $property));
       $this->assertIdentical($stored_value, $value, $message);

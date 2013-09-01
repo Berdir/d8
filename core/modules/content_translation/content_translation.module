@@ -610,19 +610,9 @@ function content_translation_form_alter(array &$form, array &$form_state) {
     // Handle fields shared between translations when there is at least one
     // translation available or a new one is being created.
     if (!$entity->isNew() && (!isset($translations[$form_langcode]) || count($translations) > 1)) {
-      $entity = $entity->getNGEntity();
-      if ($entity instanceof EntityNG) {
-        foreach ($entity->getPropertyDefinitions() as $property_name => $definition) {
-          if (isset($form[$property_name])) {
-            $form[$property_name]['#multilingual'] = !empty($definition['translatable']);
-          }
-        }
-      }
-      else {
-        foreach (field_info_instances($entity->entityType(), $entity->bundle()) as $instance) {
-          $field_name = $instance['field_name'];
-          $field = $instance->getField();
-          $form[$field_name]['#multilingual'] = !empty($field['translatable']);
+      foreach ($entity->getPropertyDefinitions() as $property_name => $definition) {
+        if (isset($form[$property_name])) {
+          $form[$property_name]['#multilingual'] = !empty($definition['translatable']);
         }
       }
     }

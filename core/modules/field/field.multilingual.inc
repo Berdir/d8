@@ -297,6 +297,7 @@ function field_valid_language($langcode, $default = TRUE) {
  *   keyed by field name otherwise.
  */
 function field_language(EntityInterface $entity, $field_name = NULL, $langcode = NULL) {
+  $entity = $entity->getBCEntity();
   $display_langcodes = &drupal_static(__FUNCTION__, array());
   $id = $entity->id();
   $bundle = $entity->bundle();
