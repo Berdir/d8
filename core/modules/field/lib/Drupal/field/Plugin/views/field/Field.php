@@ -202,6 +202,7 @@ class Field extends FieldPluginBase {
       $options += is_array($this->options['group_columns']) ? $this->options['group_columns'] : array();
 
       $fields = array();
+      // @todo: What is this?
       $rkey = $this->definition['is revision'] ? 'FIELD_LOAD_REVISION' : 'FIELD_LOAD_CURRENT';
       // Go through the list and determine the actual column name from field api.
       foreach ($options as $column) {

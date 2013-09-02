@@ -10,16 +10,6 @@ namespace Drupal\Tests\block;
 use Drupal\block\BlockFormController;
 use Drupal\Tests\UnitTestCase;
 
-// @todo Remove once the constants are replaced with constants on classes.
-if (!defined('BLOCK_REGION_NONE')) {
-  define('BLOCK_REGION_NONE', -1);
-}
-
-// @todo Remove once the constants are replaced with constants on classes.
-if (!defined('FIELD_LOAD_CURRENT')) {
-  define('FIELD_LOAD_CURRENT', 'FIELD_LOAD_CURRENT');
-}
-
 /**
  * Tests the block form controller.
  *
