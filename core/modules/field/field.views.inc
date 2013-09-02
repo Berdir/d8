@@ -167,7 +167,7 @@ function field_views_field_default_views_data(FieldInterface $field) {
     ),
   );
   if ($supports_revisions) {
-    $table_alias = $field_tables[FIELD_LOAD_REVISION]['alias'];
+    $table_alias = $field_tables[EntityStorageControllerInterface::FIELD_LOAD_REVISION]['alias'];
     $data[$table_alias]['table']['join'][$entity_revision_table] = array(
       'left_field' => $entity_info['entity_keys']['revision'],
       'field' => 'revision_id',
@@ -256,7 +256,7 @@ function field_views_field_default_views_data(FieldInterface $field) {
       'entity_tables' => $entity_tables,
       // Default the element type to div, let the UI change it if necessary.
       'element type' => 'div',
-      'is revision' => $type == FIELD_LOAD_REVISION,
+      'is revision' => $type == EntityStorageControllerInterface::FIELD_LOAD_REVISION,
     );
   }
 
