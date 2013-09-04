@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\Core\Entity\EntityNG.
+ * Contains \Drupal\Core\Entity\ContentEntityBase.
  */
 
 namespace Drupal\Core\Entity;
@@ -22,7 +22,7 @@ use Drupal\Core\TypedData\TypedDataInterface;
  * @todo: Once all entity types have been converted, merge improvements into the
  * Entity class and overhaul the EntityInterface.
  */
-class EntityNG extends Entity {
+abstract class ContentEntityBase extends Entity implements \IteratorAggregate, ContentEntityInterface {
 
   /**
    * Status code indentifying a removed translation.
@@ -85,7 +85,7 @@ class EntityNG extends Entity {
   /**
    * Local cache for field definitions.
    *
-   * @see EntityNG::getPropertyDefinitions()
+   * @see ContentEntityBase::getPropertyDefinitions()
    *
    * @var array
    */
@@ -127,6 +127,20 @@ class EntityNG extends Entity {
   protected $translationInitialize = FALSE;
 
   /**
+   * Boolean indicating whether a new revision should be created on save.
+   *
+   * @var bool
+   */
+  protected $newRevision = FALSE;
+
+  /**
+   * Indicates whether this is the default revision.
+   *
+   * @var bool
+   */
+  protected $isDefaultRevision = TRUE;
+
+  /**
    * Overrides Entity::__construct().
    */
   public function __construct(array $values, $entity_type, $bundle = FALSE, $translations = array()) {
@@ -157,6 +171,142 @@ class EntityNG extends Entity {
     }
 
     $this->init();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setNewRevision($value = TRUE) {
+    $this->newRevision = $value;
+  }
+  /**
+   * {@inheritdoc}
+   */
+  public function isNewRevision() {
+    $info = $this->entityInfo();
+    return $this->newRevision || (!empty($info['entity_keys']['revision']) && !$this->getRevisionId());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getRevisionId() {
+    return NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isTranslatable() {
+    // @todo Inject the entity manager and retrieve bundle info from it.
+    $bundles = entity_get_bundles($this->entityType);
+    return !empty($bundles[$this->bundle()]['translatable']);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function preSaveRevision(EntityStorageControllerInterface $storage_controller, \stdClass $record) {
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDefinition() {
+    // @todo: This does not make much sense, so remove once TypedDataInterface
+    // is removed. See https://drupal.org/node/2002138.
+    if ($this->bundle() != $this->entityType()) {
+      $type = 'entity:' . $this->entityType() . ':' . $this->bundle();
+    }
+    else {
+      $type = 'entity:' . $this->entityType();
+    }
+    return array('type' => $type);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getValue() {
+    // @todo: This does not make much sense, so remove once TypedDataInterface
+    // is removed. See https://drupal.org/node/2002138.
+    return $this->getPropertyValues();
+  }
+
+  /**
+   * Implements \Drupal\Core\TypedData\TypedDataInterface::setValue().
+   */
+  public function setValue($value, $notify = TRUE) {
+    // @todo: This does not make much sense, so remove once TypedDataInterface
+    // is removed. See https://drupal.org/node/2002138.
+    $this->setPropertyValues($value);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getString() {
+    return $this->label();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function validate() {
+    // @todo: Add the typed data manager as proper dependency.
+    return \Drupal::typedData()->getValidator()->validate($this);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function applyDefaultValue($notify = TRUE) {
+    foreach ($this->getProperties() as $property) {
+      $property->applyDefaultValue(FALSE);
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getConstraints() {
+    return array();
+  }
+
+  /**
+   * Implements \Drupal\Core\TypedData\TypedDataInterface::getName().
+   */
+  public function getName() {
+    return NULL;
+  }
+
+  /**
+   * Implements \Drupal\Core\TypedData\TypedDataInterface::getRoot().
+   */
+  public function getRoot() {
+    return $this;
+  }
+
+  /**
+   * Implements \Drupal\Core\TypedData\TypedDataInterface::getPropertyPath().
+   */
+  public function getPropertyPath() {
+    return '';
+  }
+
+  /**
+   * Implements \Drupal\Core\TypedData\TypedDataInterface::getParent().
+   */
+  public function getParent() {
+    return NULL;
+  }
+
+  /**
+   * Implements \Drupal\Core\TypedData\TypedDataInterface::setContext().
+   */
+  public function setContext($name = NULL, TypedDataInterface $parent = NULL) {
+    // As entities are always the root of the tree of typed data, we do not need
+    // to set any parent or name.
   }
 
   /**
@@ -378,7 +528,7 @@ class EntityNG extends Entity {
    */
   protected function getDefaultLanguage() {
     // Keep a local cache of the language object and clear it if the langcode
-    // gets changed, see EntityNG::onChange().
+    // gets changed, see ContentEntityBase::onChange().
     if (!isset($this->language)) {
       // Get the language code if the property exists.
       if ($this->getPropertyDefinition('langcode') && ($item = $this->get('langcode')) && isset($item->language)) {

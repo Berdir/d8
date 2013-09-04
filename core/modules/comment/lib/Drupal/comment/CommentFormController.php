@@ -8,13 +8,13 @@
 namespace Drupal\comment;
 
 use Drupal\Core\Datetime\DrupalDateTime;
-use Drupal\Core\Entity\EntityFormControllerNG;
+use Drupal\Core\Entity\ContentEntityFormController;
 use Drupal\Core\Language\Language;
 
 /**
  * Base for controller for comment forms.
  */
-class CommentFormController extends EntityFormControllerNG {
+class CommentFormController extends ContentEntityFormController {
 
   /**
    * Overrides Drupal\Core\Entity\EntityFormController::form().

@@ -477,6 +477,10 @@ class EntityManager extends PluginManagerBase {
       }
       else {
         $class = $this->factory->getPluginClass($entity_type, $this->getDefinition($entity_type));
+        // @todo: This shouldn't be called...
+        if (!in_array('Drupal\Core\Entity\ContentEntityInterface', class_implements($class))) {
+          return array();
+        }
         $this->entityFieldInfo[$entity_type] = array(
           'definitions' => $class::baseFieldDefinitions($entity_type),
           // Contains definitions of optional (per-bundle) fields.

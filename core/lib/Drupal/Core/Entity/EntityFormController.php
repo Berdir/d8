@@ -8,6 +8,7 @@
 namespace Drupal\Core\Entity;
 
 use Drupal\Core\Form\FormBase;
+use Drupal\Core\TypedData\TranslatableInterface;
 use Drupal\entity\EntityFormDisplayInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\Language;
@@ -120,10 +121,6 @@ class EntityFormController extends FormBase implements EntityFormControllerInter
     // module-provided form handlers there.
     $form_state['controller'] = $this;
 
-    // Ensure we act on the translation object corresponding to the current form
-    // language.
-    $this->entity = $this->getTranslatedEntity($form_state);
-
     // Prepare the entity to be presented in the entity form.
     $this->prepareEntity();
 
@@ -167,7 +164,7 @@ class EntityFormController extends FormBase implements EntityFormControllerInter
       // new entities.
       $form['langcode'] = array(
         '#type' => 'value',
-        '#value' => !$entity->isNew() ? $entity->getUntranslated()->language()->id : language_default()->id,
+        '#value' => !$entity->isNew() ? $entity->language()->id : language_default()->id,
       );
     }
     return $form;
@@ -272,30 +269,6 @@ class EntityFormController extends FormBase implements EntityFormControllerInter
    * Implements \Drupal\Core\Entity\EntityFormControllerInterface::validate().
    */
   public function validate(array $form, array &$form_state) {
-    $entity = $this->buildEntity($form, $form_state);
-    $entity_type = $entity->entityType();
-    $entity_langcode = $entity->language()->id;
-
-    $violations = array();
-
-    foreach ($entity as $field_name => $field) {
-      $field_violations = $field->validate();
-      if (count($field_violations)) {
-        $violations[$field_name] = $field_violations;
-      }
-    }
-
-    // Map errors back to form elements.
-    if ($violations) {
-      foreach ($violations as $field_name => $field_violations) {
-        $field_state = field_form_get_state($form['#parents'], $field_name, $form_state);
-        $field_state['constraint_violations'] = $field_violations;
-        field_form_set_state($form['#parents'], $field_name, $form_state, $field_state);
-      }
-
-      field_invoke_method('flagErrors', _field_invoke_widget_target($form_state['form_display']), $entity, $form, $form_state);
-    }
-
     // @todo Remove this.
     // Execute legacy global validation handlers.
     unset($form_state['validate_handlers']);
@@ -350,36 +323,18 @@ class EntityFormController extends FormBase implements EntityFormControllerInter
   }
 
   /**
-   * Implements \Drupal\Core\Entity\EntityFormControllerInterface::getFormLangcode().
+   * {@inheritdoc}
    */
   public function getFormLangcode(array $form_state) {
-    $entity = $this->entity;
-
-    if (!empty($form_state['langcode'])) {
-      $langcode = $form_state['langcode'];
-    }
-    else {
-      // If no form langcode was provided we default to the current content
-      // language and inspect existing translations to find a valid fallback,
-      // if any.
-      $translations = $entity->getTranslationLanguages();
-      $langcode = language(Language::TYPE_CONTENT)->id;
-      $fallback = language_multilingual() ? language_fallback_get_candidates() : array();
-      while (!empty($langcode) && !isset($translations[$langcode])) {
-        $langcode = array_shift($fallback);
-      }
-    }
-
-    // If the site is not multilingual or no translation for the given form
-    // language is available, fall back to the entity language.
-    return !empty($langcode) ? $langcode : $entity->getUntranslated()->language()->id;
+    return $this->entity->language()->id;
   }
 
   /**
    * Implements \Drupal\Core\Entity\EntityFormControllerInterface::isDefaultFormLangcode().
    */
   public function isDefaultFormLangcode(array $form_state) {
-    return $this->getFormLangcode($form_state) == $this->entity->getUntranslated()->language()->id;
+    // The entity is not translatable, this is always the default language.
+    return TRUE;
   }
 
   /**
@@ -418,17 +373,6 @@ class EntityFormController extends FormBase implements EntityFormControllerInter
   }
 
   /**
-   * Returns the translation object corresponding to the form language.
-   *
-   * @param array $form_state
-   *   A keyed array containing the current state of the form.
-   */
-  protected function getTranslatedEntity(array $form_state) {
-    $langcode = $this->getFormLangcode($form_state);
-    return $this->entity->getTranslation($langcode);
-  }
-
-  /**
    * Implements \Drupal\Core\Entity\EntityFormControllerInterface::setEntity().
    */
   public function setEntity(EntityInterface $entity) {
@@ -456,7 +400,7 @@ class EntityFormController extends FormBase implements EntityFormControllerInter
       if (function_exists($function)) {
         // Ensure we pass an updated translation object and form display at
         // each invocation, since they depend on form state which is alterable.
-        $args = array($this->getTranslatedEntity($form_state), $this->getFormDisplay($form_state), $this->operation, &$form_state);
+        $args = array($this->entity, $this->getFormDisplay($form_state), $this->operation, &$form_state);
         call_user_func_array($function, $args);
       }
     }

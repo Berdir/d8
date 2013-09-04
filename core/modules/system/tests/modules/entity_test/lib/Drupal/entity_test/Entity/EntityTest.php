@@ -7,7 +7,7 @@
 
 namespace Drupal\entity_test\Entity;
 
-use Drupal\Core\Entity\EntityNG;
+use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\Annotation\EntityType;
 use Drupal\Core\Annotation\Translation;
 use Drupal\Core\Language\Language;
@@ -39,7 +39,7 @@ use Drupal\Core\Language\Language;
  *   menu_base_path = "entity-test/manage/%entity_test"
  * )
  */
-class EntityTest extends EntityNG {
+class EntityTest extends ContentEntityBase {
 
   /**
    * The entity ID.

@@ -520,9 +520,9 @@ class EntityCrudHookTest extends EntityUnitTestBase {
   }
 
   /**
-   * Tests rollback from failed insert in EntityNG.
+   * Tests rollback from failed entity save.
    */
-  function testEntityNGRollback() {
+  function testEntityRollback() {
     // Create a block.
     try {
       $entity = entity_create('entity_test', array('name' => 'fail_insert'))->save();

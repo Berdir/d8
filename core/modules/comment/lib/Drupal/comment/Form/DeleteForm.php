@@ -8,13 +8,13 @@
 namespace Drupal\comment\Form;
 
 use Drupal\Core\Cache\Cache;
-use Drupal\Core\Entity\EntityNGConfirmFormBase;
+use Drupal\Core\Entity\ContentEntityConfirmFormBase;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Provides the comment delete confirmation form.
  */
-class DeleteForm extends EntityNGConfirmFormBase {
+class DeleteForm extends ContentEntityConfirmFormBase {
 
   /**
    * {@inheritdoc}

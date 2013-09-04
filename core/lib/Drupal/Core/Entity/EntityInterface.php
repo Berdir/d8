@@ -8,8 +8,6 @@
 namespace Drupal\Core\Entity;
 
 use Drupal\Core\TypedData\AccessibleInterface;
-use Drupal\Core\TypedData\ComplexDataInterface;
-use Drupal\Core\TypedData\TranslatableInterface;
 
 /**
  * Defines a common interface for all entity objects.
@@ -27,7 +25,7 @@ use Drupal\Core\TypedData\TranslatableInterface;
  * @see \Drupal\Core\TypedData\TypedDataManager
  * @see \Drupal\Core\Field\FieldInterface
  */
-interface EntityInterface extends ComplexDataInterface, AccessibleInterface, TranslatableInterface {
+interface EntityInterface extends AccessibleInterface {
 
   /**
    * Returns the entity UUID (Universally Unique Identifier).
@@ -50,6 +48,14 @@ interface EntityInterface extends ComplexDataInterface, AccessibleInterface, Tra
   public function id();
 
   /**
+   * Returns the default language.
+   *
+   * @return
+   *   The language object.
+   */
+  public function language();
+
+  /**
    * Returns whether the entity is new.
    *
    * Usually an entity is new if no ID exists for it yet. However, entities may
@@ -61,26 +67,6 @@ interface EntityInterface extends ComplexDataInterface, AccessibleInterface, Tra
    * @see \Drupal\Core\Entity\EntityInterface::enforceIsNew()
    */
   public function isNew();
-
-  /**
-   * Returns whether a new revision should be created on save.
-   *
-   * @return bool
-   *   TRUE if a new revision should be created.
-   *
-   * @see \Drupal\Core\Entity\EntityInterface::setNewRevision()
-   */
-  public function isNewRevision();
-
-  /**
-   * Enforces an entity to be saved as a new revision.
-   *
-   * @param bool $value
-   *   (optional) Whether a new revision should be saved.
-   *
-   * @see \Drupal\Core\Entity\EntityInterface::isNewRevision()
-   */
-  public function setNewRevision($value = TRUE);
 
   /**
    * Enforces an entity to be new.
@@ -176,16 +162,6 @@ interface EntityInterface extends ComplexDataInterface, AccessibleInterface, Tra
   public function preSave(EntityStorageControllerInterface $storage_controller);
 
   /**
-   * Acts on a revision before it gets saved.
-   *
-   * @param EntityStorageControllerInterface $storage_controller
-   *   The entity storage controller object.
-   * @param \stdClass $record
-   *   The revision object.
-   */
-  public function preSaveRevision(EntityStorageControllerInterface $storage_controller, \stdClass $record);
-
-  /**
    * Acts on a saved entity before the insert or update hook is invoked.
    *
    * Used after the entity is saved, but before invoking the insert or update
@@ -270,6 +246,7 @@ interface EntityInterface extends ComplexDataInterface, AccessibleInterface, Tra
   public function entityInfo();
 
   /**
+<<<<<<< HEAD
    * Returns the revision identifier of the entity.
    *
    * @return
