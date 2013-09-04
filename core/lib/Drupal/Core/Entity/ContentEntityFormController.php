@@ -96,15 +96,20 @@ class ContentEntityFormController extends EntityFormController {
    */
   public function getFormLangcode(array $form_state) {
     $entity = $this->entity;
-    // If no form langcode was provided we default to the current content
-    // language and inspect existing translations to find a valid fallback,
-    // if any.
-    $translations = $entity->getTranslationLanguages();
-    $languageManager = \Drupal::languageManager();
-    $langcode = $languageManager->getLanguage(Language::TYPE_CONTENT)->id;
-    $fallback = $languageManager->isMultilingual() ? language_fallback_get_candidates() : array();
-    while (!empty($langcode) && !isset($translations[$langcode])) {
-      $langcode = array_shift($fallback);
+    if (!empty($form_state['langcode'])) {
+      $langcode = $form_state['langcode'];
+    }
+    else {
+      // If no form langcode was provided we default to the current content
+      // language and inspect existing translations to find a valid fallback,
+      // if any.
+      $translations = $entity->getTranslationLanguages();
+      $languageManager = \Drupal::languageManager();
+      $langcode = $languageManager->getLanguage(Language::TYPE_CONTENT)->id;
+      $fallback = $languageManager->isMultilingual() ? language_fallback_get_candidates() : array();
+      while (!empty($langcode) && !isset($translations[$langcode])) {
+        $langcode = array_shift($fallback);
+      }
     }
 
     // If the site is not multilingual or no translation for the given form
