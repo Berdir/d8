@@ -2,17 +2,26 @@
 
 /**
  * @file
- * Contains \Drupal\field_test\Type\TestItem.
+ * Contains \Drupal\field_test\Plugin\field\field_type\HiddenTestItem.
  */
 
-namespace Drupal\field_test\Type;
+namespace Drupal\field_test\Plugin\field\field_type;
 
-use Drupal\field\Plugin\field\field_type\LegacyConfigFieldItem;
+use Drupal\Core\Entity\Annotation\FieldType;
+use Drupal\Core\Annotation\Translation;
 
 /**
- * Defines the 'test_field' entity field item.
+ * Defines the 'hidden_test_field' entity field item.
+ *
+ * @FieldType(
+ *   id = "hidden_test_field",
+ *   label = @Translation("Hidden from UI test field"),
+ *   description = @Translation("Dummy hidden field type used for tests."),
+ *   default_widget = "test_field_widget",
+ *   default_formatter = "field_test_default"
+ * )
  */
-class TestItem extends LegacyConfigFieldItem {
+class HiddenTestItem extends TestItem {
 
   /**
    * Property definitions of the contained properties.
