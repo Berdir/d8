@@ -55,49 +55,49 @@ abstract class Entity implements EntityInterface {
   }
 
   /**
-   * Implements \Drupal\Core\Entity\EntityInterface::id().
+   * {@inheritdoc}
    */
   public function id() {
     return isset($this->id) ? $this->id : NULL;
   }
 
   /**
-   * Implements \Drupal\Core\Entity\EntityInterface::uuid().
+   * {@inheritdoc}
    */
   public function uuid() {
     return isset($this->uuid) ? $this->uuid : NULL;
   }
 
   /**
-   * Implements \Drupal\Core\Entity\EntityInterface::isNew().
+   * {@inheritdoc}
    */
   public function isNew() {
     return !empty($this->enforceIsNew) || !$this->id();
   }
 
   /**
-   * Implements \Drupal\Core\Entity\EntityInterface::enforceIsNew().
+   * {@inheritdoc}
    */
   public function enforceIsNew($value = TRUE) {
     $this->enforceIsNew = $value;
   }
 
   /**
-   * Implements \Drupal\Core\Entity\EntityInterface::entityType().
+   * {@inheritdoc}
    */
   public function entityType() {
     return $this->entityType;
   }
 
   /**
-   * Implements \Drupal\Core\Entity\EntityInterface::bundle().
+   * {@inheritdoc}
    */
   public function bundle() {
     return $this->entityType;
   }
 
   /**
-   * Implements \Drupal\Core\Entity\EntityInterface::label().
+   * {@inheritdoc}
    */
   public function label($langcode = NULL) {
     $label = NULL;
@@ -230,27 +230,9 @@ abstract class Entity implements EntityInterface {
     return isset($entity_info['links']) ? array_keys($entity_info['links']) : array();
   }
 
-  /**
-   * Implements \Drupal\Core\Entity\EntityInterface::get().
-   */
-  public function get($property_name) {
-    // @todo: Replace by EntityNG implementation once all entity types have been
-    // converted to use the entity field API.
-    return isset($this->{$property_name}) ? $this->{$property_name} : NULL;
-  }
 
   /**
-   * Implements \Drupal\Core\TypedData\ComplexDataInterface::set().
-   */
-  public function set($property_name, $value, $notify = TRUE) {
-    // @todo: Replace by EntityNG implementation once all entity types have been
-    // converted to use the entity field API.
-    $this->{$property_name} = $value;
-  }
-
-
-  /**
-   * Implements \Drupal\Core\TypedData\AccessibleInterface::access().
+   * {@inheritdoc}
    */
   public function access($operation = 'view', AccountInterface $account = NULL) {
     if ($operation == 'create') {
@@ -276,14 +258,14 @@ abstract class Entity implements EntityInterface {
   }
 
   /**
-   * Implements \Drupal\Core\Entity\EntityInterface::save().
+   * {@inheritdoc}
    */
   public function save() {
     return \Drupal::entityManager()->getStorageController($this->entityType)->save($this);
   }
 
   /**
-   * Implements \Drupal\Core\Entity\EntityInterface::delete().
+   * {@inheritdoc}
    */
   public function delete() {
     if (!$this->isNew()) {
@@ -292,7 +274,7 @@ abstract class Entity implements EntityInterface {
   }
 
   /**
-   * Implements \Drupal\Core\Entity\EntityInterface::createDuplicate().
+   * {@inheritdoc}
    */
   public function createDuplicate() {
     $duplicate = clone $this;
@@ -308,21 +290,10 @@ abstract class Entity implements EntityInterface {
   }
 
   /**
-   * Implements \Drupal\Core\Entity\EntityInterface::entityInfo().
+   * {@inheritdoc}
    */
   public function entityInfo() {
     return \Drupal::entityManager()->getDefinition($this->entityType());
-  }
-
-  /**
-   * Implements \Drupal\Core\Entity\EntityInterface::isDefaultRevision().
-   */
-  public function isDefaultRevision($new_value = NULL) {
-    $return = $this->isDefaultRevision;
-    if (isset($new_value)) {
-      $this->isDefaultRevision = (bool) $new_value;
-    }
-    return $return;
   }
 
   /**

@@ -182,6 +182,17 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
   /**
    * {@inheritdoc}
    */
+  public function isDefaultRevision($new_value = NULL) {
+    $return = $this->isDefaultRevision;
+    if (isset($new_value)) {
+      $this->isDefaultRevision = (bool) $new_value;
+    }
+    return $return;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getRevisionId() {
     return NULL;
   }
