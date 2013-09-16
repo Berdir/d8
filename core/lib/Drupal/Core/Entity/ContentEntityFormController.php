@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\Core\Entity\EntityFormControllerNG.
+ * Contains \Drupal\Core\Entity\ContentEntityFormController.
  */
 
 namespace Drupal\Core\Entity;
@@ -17,7 +17,7 @@ use Drupal\Core\Language\Language;
 class ContentEntityFormController extends EntityFormController {
 
   /**
-   * Overrides EntityFormController::form().
+   * {@inheritdoc}
    */
   public function form(array $form, array &$form_state) {
     $entity = $this->entity;
@@ -35,7 +35,7 @@ class ContentEntityFormController extends EntityFormController {
   }
 
   /**
-   * Implements \Drupal\Core\Entity\EntityFormControllerInterface::validate().
+   * {@inheritdoc}
    */
   public function validate(array $form, array &$form_state) {
     $entity = $this->buildEntity($form, $form_state);
@@ -92,7 +92,7 @@ class ContentEntityFormController extends EntityFormController {
   }
 
   /**
-   * Implements \Drupal\Core\Entity\EntityFormControllerInterface::getFormLangcode().
+   * {@inheritdoc}
    */
   public function getFormLangcode(array $form_state) {
     $entity = $this->entity;
@@ -124,14 +124,14 @@ class ContentEntityFormController extends EntityFormController {
   }
 
   /**
-   * Implements \Drupal\Core\Entity\EntityFormControllerInterface::isDefaultFormLangcode().
+   * {@inheritdoc}
    */
   public function isDefaultFormLangcode(array $form_state) {
     return $this->getFormLangcode($form_state) == $this->entity->getUntranslated()->language()->id;
   }
 
   /**
-   * Overrides EntityFormController::buildEntity().
+   * {@inheritdoc}
    */
   public function buildEntity(array $form, array &$form_state) {
     $entity = clone $this->entity;

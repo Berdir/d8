@@ -266,7 +266,7 @@ class EntityFormController extends FormBase implements EntityFormControllerInter
   }
 
   /**
-   * Implements \Drupal\Core\Entity\EntityFormControllerInterface::validate().
+   * {@inheritdoc}
    */
   public function validate(array $form, array &$form_state) {
     // @todo Remove this.
@@ -276,7 +276,7 @@ class EntityFormController extends FormBase implements EntityFormControllerInter
   }
 
   /**
-   * Implements \Drupal\Core\Entity\EntityFormControllerInterface::submit().
+   * {@inheritdoc}
    *
    * This is the default entity object builder function. It is called before any
    * other submit handler to build the new entity object to be passed to the
@@ -330,7 +330,7 @@ class EntityFormController extends FormBase implements EntityFormControllerInter
   }
 
   /**
-   * Implements \Drupal\Core\Entity\EntityFormControllerInterface::isDefaultFormLangcode().
+   * {@inheritdoc}
    */
   public function isDefaultFormLangcode(array $form_state) {
     // The entity is not translatable, this is always the default language.
@@ -351,7 +351,7 @@ class EntityFormController extends FormBase implements EntityFormControllerInter
   }
 
   /**
-   * Implements \Drupal\Core\Entity\EntityFormControllerInterface::buildEntity().
+   * {@inheritdoc}
    */
   public function buildEntity(array $form, array &$form_state) {
     $entity = clone $this->entity;
@@ -366,14 +366,14 @@ class EntityFormController extends FormBase implements EntityFormControllerInter
   }
 
   /**
-   * Implements \Drupal\Core\Entity\EntityFormControllerInterface::getEntity().
+   * {@inheritdoc}
    */
   public function getEntity() {
     return $this->entity;
   }
 
   /**
-   * Implements \Drupal\Core\Entity\EntityFormControllerInterface::setEntity().
+   * {@inheritdoc}
    */
   public function setEntity(EntityInterface $entity) {
     $this->entity = $entity;
@@ -422,7 +422,7 @@ class EntityFormController extends FormBase implements EntityFormControllerInter
   }
 
   /**
-   * Implements \Drupal\Core\Entity\EntityFormControllerInterface::getOperation().
+   * {@inheritdoc}
    */
   public function getOperation() {
     return $this->operation;

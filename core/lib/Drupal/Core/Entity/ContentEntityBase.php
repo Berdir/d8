@@ -13,14 +13,6 @@ use Drupal\Core\TypedData\TypedDataInterface;
 
 /**
  * Implements Entity Field API specific enhancements to the Entity class.
- *
- * Entity(..)NG classes are variants of the Entity(...) classes that implement
- * the next generation (NG) entity field API. They exist during conversion to
- * the new API only and changes will be merged into the respective original
- * classes once the conversion is complete.
- *
- * @todo: Once all entity types have been converted, merge improvements into the
- * Entity class and overhaul the EntityInterface.
  */
 abstract class ContentEntityBase extends Entity implements \IteratorAggregate, ContentEntityInterface {
 
@@ -234,7 +226,7 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
   }
 
   /**
-   * Implements \Drupal\Core\TypedData\TypedDataInterface::setValue().
+   * {@inheritdoc}
    */
   public function setValue($value, $notify = TRUE) {
     // @todo: This does not make much sense, so remove once TypedDataInterface
@@ -274,35 +266,35 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
   }
 
   /**
-   * Implements \Drupal\Core\TypedData\TypedDataInterface::getName().
+   * {@inheritdoc}
    */
   public function getName() {
     return NULL;
   }
 
   /**
-   * Implements \Drupal\Core\TypedData\TypedDataInterface::getRoot().
+   * {@inheritdoc}
    */
   public function getRoot() {
     return $this;
   }
 
   /**
-   * Implements \Drupal\Core\TypedData\TypedDataInterface::getPropertyPath().
+   * {@inheritdoc}
    */
   public function getPropertyPath() {
     return '';
   }
 
   /**
-   * Implements \Drupal\Core\TypedData\TypedDataInterface::getParent().
+   * {@inheritdoc}
    */
   public function getParent() {
     return NULL;
   }
 
   /**
-   * Implements \Drupal\Core\TypedData\TypedDataInterface::setContext().
+   * {@inheritdoc}
    */
   public function setContext($name = NULL, TypedDataInterface $parent = NULL) {
     // As entities are always the root of the tree of typed data, we do not need
@@ -338,14 +330,14 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
   }
 
   /**
-   * Implements \Drupal\Core\Entity\EntityInterface::id().
+   * {@inheritdoc}
    */
   public function id() {
     return $this->id->value;
   }
 
   /**
-   * Implements \Drupal\Core\Entity\EntityInterface::bundle().
+   * {@inheritdoc}
    */
   public function bundle() {
     return $this->bundle;
@@ -359,7 +351,7 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
   }
 
   /**
-   * Implements \Drupal\Core\TypedData\ComplexDataInterface::get().
+   * {@inheritdoc}
    */
   public function get($property_name) {
     if (!isset($this->fields[$property_name][$this->activeLangcode])) {
@@ -404,14 +396,14 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
   }
 
   /**
-   * Implements \Drupal\Core\TypedData\ComplexDataInterface::set().
+   * {@inheritdoc}
    */
   public function set($property_name, $value, $notify = TRUE) {
     $this->get($property_name)->setValue($value, FALSE);
   }
 
   /**
-   * Implements \Drupal\Core\TypedData\ComplexDataInterface::getProperties().
+   * {@inheritdoc}
    */
   public function getProperties($include_computed = FALSE) {
     $properties = array();
@@ -424,14 +416,14 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
   }
 
   /**
-   * Implements \IteratorAggregate::getIterator().
+   * {@inheritdoc}
    */
   public function getIterator() {
     return new \ArrayIterator($this->getProperties());
   }
 
   /**
-   * Implements \Drupal\Core\TypedData\ComplexDataInterface::getPropertyDefinition().
+   * {@inheritdoc}
    */
   public function getPropertyDefinition($name) {
     if (!isset($this->fieldDefinitions)) {
@@ -446,7 +438,7 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
   }
 
   /**
-   * Implements \Drupal\Core\TypedData\ComplexDataInterface::getPropertyDefinitions().
+   * {@inheritdoc}
    */
   public function getPropertyDefinitions() {
     if (!isset($this->fieldDefinitions)) {
@@ -457,7 +449,7 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
   }
 
   /**
-   * Implements \Drupal\Core\TypedData\ComplexDataInterface::getPropertyValues().
+   * {@inheritdoc}
    */
   public function getPropertyValues() {
     $values = array();
@@ -468,7 +460,7 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
   }
 
   /**
-   * Implements \Drupal\Core\TypedData\ComplexDataInterface::setPropertyValues().
+   * {@inheritdoc}
    */
   public function setPropertyValues($values) {
     foreach ($values as $name => $value) {
@@ -477,7 +469,7 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
   }
 
   /**
-   * Implements \Drupal\Core\TypedData\ComplexDataInterface::isEmpty().
+   * {@inheritdoc}
    */
   public function isEmpty() {
     if (!$this->isNew()) {
@@ -554,7 +546,7 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
   }
 
   /**
-   * Implements \Drupal\Core\TypedData\TranslatableInterface::getTranslation().
+   * {@inheritdoc}
    *
    * @return \Drupal\Core\Entity\EntityInterface
    */

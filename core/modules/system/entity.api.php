@@ -5,6 +5,8 @@
  * Hooks provided the Entity module.
  */
 
+use Drupal\Core\Entity\ContentEntityInterface;
+
 /**
  * @addtogroup hooks
  * @{
@@ -251,7 +253,7 @@ function hook_entity_info_alter(&$entity_info) {
  *   The entity object.
  */
 function hook_entity_create(\Drupal\Core\Entity\EntityInterface $entity) {
-  if ($entity instanceof \Drupal\Core\Entity\ContentEntityBase && !$entity->foo->value) {
+  if ($entity instanceof ContentEntityInterface && !$entity->foo->value) {
     $entity->foo->value = 'some_initial_value';
   }
 }
