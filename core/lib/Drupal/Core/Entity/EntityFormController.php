@@ -359,9 +359,24 @@ class EntityFormController extends FormBase implements EntityFormControllerInter
     // the controller to be the one before caching. Ensure to have the
     // controller of the current request.
     $form_state['controller'] = $this;
-    // @todo Move entity_form_submit_build_entity() here.
-    // @todo Exploit the Field API to process the submitted entity field.
-    entity_form_submit_build_entity($entity->entityType(), $entity, $form, $form_state, array('langcode' => $this->getFormLangcode($form_state)));
+
+    // Copy top-level form values to entity properties, without changing
+    // existing entity properties that are not being edited by
+    // this form.
+    // @todo: This relies on a method that only exists for config and content
+    //   entities, in a different way. Consider moving this logic to a config
+    //   entity specific implementation.
+    foreach ($form_state['values'] as $key => $value) {
+      $entity->set($key, $value);
+    }
+
+    // Invoke all specified builders for copying form values to entity properties.
+    if (isset($form['#entity_builders'])) {
+      foreach ($form['#entity_builders'] as $function) {
+        call_user_func_array($function, array($entity->entityType(), $entity, &$form, &$form_state));
+      }
+    }
+
     return $entity;
   }
 
