@@ -442,14 +442,15 @@ class EntityManager extends PluginManagerBase {
   }
 
   /**
-   * Gets an array of entity field definitions.
+   * Gets an array of content entity field definitions.
    *
    * If a bundle is passed, fields specific to this bundle are included. Entity
    * fields are always multi-valued, so 'list' is TRUE for each returned field
    * definition.
    *
    * @param string $entity_type
-   *   The entity type to get field definitions for.
+   *   The entity type to get field definitions for. Only entity types that
+   *   implement \Drupal\Core\Entity\ContentEntityInterface are supported.
    * @param string $bundle
    *   (optional) The entity bundle for which to get field definitions. If NULL
    *   is passed, no bundle-specific fields are included. Defaults to NULL.
@@ -477,10 +478,6 @@ class EntityManager extends PluginManagerBase {
       }
       else {
         $class = $this->factory->getPluginClass($entity_type, $this->getDefinition($entity_type));
-        // @todo: This shouldn't be called...
-        if (!in_array('Drupal\Core\Entity\ContentEntityInterface', class_implements($class))) {
-          return array();
-        }
         $this->entityFieldInfo[$entity_type] = array(
           'definitions' => $class::baseFieldDefinitions($entity_type),
           // Contains definitions of optional (per-bundle) fields.

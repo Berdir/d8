@@ -50,8 +50,7 @@ abstract class LegacyConfigFieldItem extends ConfigFieldItemBase implements Prep
     // properties.
     $item = $this->getValue(TRUE);
     // The previous hook was never called on an empty item, but
-    // ContentEntityBase always
-    // creates a FieldItem element for an empty field.
+    // ContentEntityBase always creates a FieldItem element for an empty field.
     return empty($item) || $callback($item, $this->getFieldDefinition()->getFieldType());
   }
 

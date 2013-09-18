@@ -244,7 +244,8 @@ class MenuLinkFormController extends EntityFormController {
    * {@inheritdoc}
    */
   public function buildEntity(array $form, array &$form_state) {
-    // @todo: Remove this when menu links are content entities.
+    // @todo: Remove this when menu links are converted to content entities in
+    //   http://drupal.org/node/1842858.
     $entity = clone $this->entity;
     // If you submit a form, the form state comes from caching, which forces
     // the controller to be the one before caching. Ensure to have the

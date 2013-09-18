@@ -541,7 +541,7 @@ function _editor_get_file_uuids_by_field(EntityInterface $entity) {
  * @return array
  *   The names of the fields on this entity that have text processing enabled.
  */
-function _editor_get_processed_text_fields(EntityInterface $entity) {
+function _editor_get_processed_text_fields(ContentEntityInterface $entity) {
   $properties = $entity->getPropertyDefinitions();
   if (empty($properties)) {
     return array();

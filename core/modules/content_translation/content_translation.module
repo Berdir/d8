@@ -8,7 +8,6 @@
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityFormControllerInterface;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\TypedData\TranslatableInterface;
@@ -266,7 +265,6 @@ function _content_translation_menu_strip_loaders($path) {
  *   The entity whose translation overview should be displayed.
  */
 function content_translation_translate_access(EntityInterface $entity) {
-  $entity_type = $entity->entityType();
   return $entity instanceof ContentEntityInterface && empty($entity->getUntranslated()->language()->locked) && language_multilingual() && $entity->isTranslatable() &&
     (user_access('create content translations') || user_access('update content translations') || user_access('delete content translations'));
 }
@@ -588,7 +586,7 @@ function content_translation_permission() {
  * Implements hook_form_alter().
  */
 function content_translation_form_alter(array &$form, array &$form_state) {
-  if (($form_controller = content_translation_form_controller($form_state)) && ($entity = $form_controller->getEntity()) && !$entity->isNew() && $entity instanceof TranslatableInterface && $entity->isTranslatable()) {
+  if (($form_controller = content_translation_form_controller($form_state)) && ($entity = $form_controller->getEntity()) && !$entity->isNew() && $entity instanceof ContentEntityInterface && $entity->isTranslatable()) {
     $controller = content_translation_controller($entity->entityType());
     $controller->entityFormAlter($form, $form_state, $entity);
 
@@ -599,7 +597,7 @@ function content_translation_form_alter(array &$form, array &$form_state) {
 
     // Handle fields shared between translations when there is at least one
     // translation available or a new one is being created.
-    if ($entity instanceof ContentEntityInterface && !$entity->isNew() && (!isset($translations[$form_langcode]) || count($translations) > 1)) {
+     if (!$entity->isNew() && (!isset($translations[$form_langcode]) || count($translations) > 1)) {
       foreach ($entity->getPropertyDefinitions() as $property_name => $definition) {
         if (isset($form[$property_name])) {
           $form[$property_name]['#multilingual'] = !empty($definition['translatable']);
