@@ -103,7 +103,11 @@ class TypedDataManager extends DefaultPluginManager {
    *   - list: Whether the data is multi-valued, i.e. a list of data items.
    *     Defaults to FALSE.
    *   - computed: A boolean specifying whether the data value is computed by
-   *     the object, e.g. depending on some other values.
+   *     the object, e.g. depending on some other values. Defaults to FALSE.
+   *   - cache: (only supported for FieldItem objects) A boolean specifying
+   *     whether the value should be cached as part of the field values cache.
+   *     This only applies to computed properties since the field cache always
+   *     includes non-computed properties. Defaults to FALSE.
    *   - read-only: A boolean specifying whether the data is read-only. Defaults
    *     to TRUE for computed properties, to FALSE otherwise.
    *   - class: If set and 'list' is FALSE, the class to use for creating the

@@ -89,8 +89,23 @@ abstract class FieldableEntityStorageControllerBase extends EntityStorageControl
           $instances = field_info_instances($this->entityType, $entity->bundle());
           foreach ($entity->getTranslationLanguages() as $langcode => $language) {
             $translation = $entity->getTranslation($langcode);
-            foreach ($instances as $instance) {
-              $data[$langcode][$instance['field_name']] = $translation->{$instance['field_name']}->getValue();
+            foreach ($instances as $field_name => $instance) {
+              $items = $translation->get($field_name);
+              if (!$items->isEmpty()) {
+                // First collect all non-computed properties.
+                $field_data = $items->getValue();
+                // Then individually collect cacheable computed properties. All
+                // items have the same properties, so we optimize by iterating on
+                // the properties of the first item.
+                foreach ($items->offsetGet(0)->getPropertyDefinitions() as $property => $definition) {
+                  if (!empty($definition['computed']) && !empty($definition['cache'])) {
+                    foreach ($items as $delta => $item) {
+                      $field_data[$delta][$property] = $item->get($property)->getValue();
+                    }
+                  }
+                }
+                $data[$langcode][$field_name] = $field_data;
+              }
             }
           }
           $cid = "field:{$this->entityType}:$id";

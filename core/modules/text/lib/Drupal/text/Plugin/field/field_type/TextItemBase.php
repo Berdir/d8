@@ -40,6 +40,7 @@ abstract class TextItemBase extends ConfigFieldItemBase implements PrepareCacheI
         'label' => t('Processed text'),
         'description' => t('The text value with the text format applied.'),
         'computed' => TRUE,
+        'cache' => TRUE,
         'class' => '\Drupal\text\TextProcessed',
         'settings' => array(
           'text source' => 'value',
