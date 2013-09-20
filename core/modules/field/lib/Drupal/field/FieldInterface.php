@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\field\FieldInterface.
+ * Contains \Drupal\field\FieldItemListInterface.
  */
 
 namespace Drupal\field;
