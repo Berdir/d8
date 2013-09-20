@@ -172,4 +172,11 @@ class ConfigEntityReferenceItemBase extends EntityReferenceItem implements Confi
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function prepareCache() {
+    return $this->getValue();
+  }
+
 }

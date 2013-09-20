@@ -9,6 +9,8 @@ namespace Drupal\Core\Entity;
 
 use Drupal\field\FieldInterface;
 use Drupal\field\FieldInstanceInterface;
+use Drupal\field\Plugin\Type\FieldType\ConfigFieldInterface;
+use Drupal\field\Plugin\Type\FieldType\ConfigFieldItemInterface;
 use Symfony\Component\DependencyInjection\Container;
 
 abstract class FieldableEntityStorageControllerBase extends EntityStorageControllerBase implements FieldableEntityStorageControllerInterface {
@@ -77,34 +79,19 @@ abstract class FieldableEntityStorageControllerBase extends EntityStorageControl
       // Let the storage controller actually load the values.
       $this->doLoadFieldItems($queried_entities, $age);
 
-      // Invoke the field type's prepareCache() method.
-      foreach ($queried_entities as $entity) {
-        $this->invokeFieldItemPrepareCache($entity);
-      }
-
       // Build cache data.
       if ($use_cache) {
         foreach ($queried_entities as $id => $entity) {
           $data = array();
-          $instances = field_info_instances($this->entityType, $entity->bundle());
           foreach ($entity->getTranslationLanguages() as $langcode => $language) {
             $translation = $entity->getTranslation($langcode);
-            foreach ($instances as $field_name => $instance) {
-              $items = $translation->get($field_name);
-              if (!$items->isEmpty()) {
-                // First collect all non-computed properties.
-                $field_data = $items->getValue();
-                // Then individually collect cacheable computed properties. All
-                // items have the same properties, so we optimize by iterating on
-                // the properties of the first item.
-                foreach ($items->offsetGet(0)->getPropertyDefinitions() as $property => $definition) {
-                  if (!empty($definition['computed']) && !empty($definition['cache'])) {
-                    foreach ($items as $delta => $item) {
-                      $field_data[$delta][$property] = $item->get($property)->getValue();
-                    }
+            foreach ($translation as $field_name => $items) {
+              if (!$items->isEmpty() && $items instanceof ConfigFieldInterface) {
+                foreach ($items as $delta => $item) {
+                  if ($item instanceof ConfigFieldItemInterface) {
+                    $data[$langcode][$field_name][$delta] = $item->prepareCache();
                   }
                 }
-                $data[$langcode][$field_name] = $field_data;
               }
             }
           }

@@ -13,7 +13,7 @@ use Drupal\Core\Entity\Field\PrepareCacheInterface;
 /**
  * Base class for 'text' configurable field types.
  */
-abstract class TextItemBase extends ConfigFieldItemBase implements PrepareCacheInterface {
+abstract class TextItemBase extends ConfigFieldItemBase {
 
   /**
    * Definitions of the contained properties.
@@ -40,7 +40,6 @@ abstract class TextItemBase extends ConfigFieldItemBase implements PrepareCacheI
         'label' => t('Processed text'),
         'description' => t('The text value with the text format applied.'),
         'computed' => TRUE,
-        'cache' => TRUE,
         'class' => '\Drupal\text\TextProcessed',
         'settings' => array(
           'text source' => 'value',
@@ -72,6 +71,7 @@ abstract class TextItemBase extends ConfigFieldItemBase implements PrepareCacheI
    * {@inheritdoc}
    */
   public function prepareCache() {
+    $values = parent::prepareCache();
     // Where possible, generate the processed (sanitized) version of each
     // textual property (e.g., 'value', 'summary') within this field item early
     // so that it is cached in the field cache. This avoids the need to look up
@@ -80,10 +80,11 @@ abstract class TextItemBase extends ConfigFieldItemBase implements PrepareCacheI
     if (!$text_processing || filter_format_allowcache($this->get('format')->getValue())) {
       foreach ($this->getPropertyDefinitions() as $property => $definition) {
         if (isset($definition['class']) && ($definition['class'] == '\Drupal\text\TextProcessed')) {
-          $this->get($property)->getValue();
+          $values[$property] = $this->get($property)->getValue();
         }
       }
     }
+    return $values;
   }
 
   /**

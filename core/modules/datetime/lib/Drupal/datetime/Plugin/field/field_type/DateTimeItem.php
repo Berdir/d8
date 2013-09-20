@@ -31,7 +31,7 @@ use Drupal\field\Plugin\Type\FieldType\ConfigFieldItemBase;
  *   default_formatter = "datetime_default"
  * )
  */
-class DateTimeItem extends ConfigFieldItemBase implements PrepareCacheInterface {
+class DateTimeItem extends ConfigFieldItemBase {
 
   /**
    * Field definitions of the contained properties.
@@ -115,23 +115,24 @@ class DateTimeItem extends ConfigFieldItemBase implements PrepareCacheInterface 
    * {@inheritdoc}
    */
   public function prepareCache() {
+    $values = parent::prepareCache();
     // The function generates a Date object for each field early so that it is
     // cached in the field cache. This avoids the need to generate the object
     // later. The date will be retrieved in UTC, the local timezone adjustment
     // must be made in real time, based on the preferences of the site and user.
-    $value = $this->get('value')->getValue();
-    if (!empty($value)) {
+    if (!empty($values['value'])) {
       $storage_format = $this->getFieldSetting('datetime_type') == 'date' ? DATETIME_DATE_STORAGE_FORMAT : DATETIME_DATETIME_STORAGE_FORMAT;
       try {
-        $date = DrupalDateTime::createFromFormat($storage_format, $value, DATETIME_STORAGE_TIMEZONE);
+        $date = DrupalDateTime::createFromFormat($storage_format, $values['value'], DATETIME_STORAGE_TIMEZONE);
         if ($date instanceOf DrupalDateTime && !$date->hasErrors()) {
-          $this->set('date', $date);
+          $values['date'] = $date;
         }
       }
       catch (\Exception $e) {
         // @todo Handle this.
       }
     }
+    return $values;
   }
 
   /**

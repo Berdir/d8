@@ -51,7 +51,6 @@ class TextWithSummaryItem extends TextItemBase {
         'label' => t('Processed summary text'),
         'description' => t('The summary text value with the text format applied.'),
         'computed' => TRUE,
-        'cache' => TRUE,
         'class' => '\Drupal\text\TextProcessed',
         'settings' => array(
           'text source' => 'summary',

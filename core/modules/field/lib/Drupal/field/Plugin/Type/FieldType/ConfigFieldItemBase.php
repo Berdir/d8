@@ -28,4 +28,12 @@ abstract class ConfigFieldItemBase extends FieldItemBase implements ConfigFieldI
     return array();
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function prepareCache() {
+    return $this->getValue();
+  }
+
+
 }

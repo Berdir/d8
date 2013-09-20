@@ -89,4 +89,20 @@ interface ConfigFieldItemInterface extends FieldItemInterface {
    */
   public function instanceSettingsForm(array $form, array &$form_state);
 
+  /**
+   * Massages loaded field values before they enter the field cache.
+   *
+   * You should never load fieldable entities within this method, since this is
+   * likely to cause infinite recursions. Use the prepareView() method instead.
+   *
+   * Also note that the method is not called on field values displayed during
+   * entity preview. If the method adds elements that might be needed during
+   * display, you might want to also use prepareView() to add those elements in
+   * case they are not present.
+   *
+   * @return array
+   *   Array of field item values that should be cached.
+   */
+  public function prepareCache();
+
 }

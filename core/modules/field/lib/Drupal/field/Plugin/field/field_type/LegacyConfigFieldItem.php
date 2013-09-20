@@ -26,7 +26,7 @@ use Drupal\field\FieldInstanceInterface;
  * @todo Remove once all core field types have been converted (see
  * http://drupal.org/node/2014671).
  */
-abstract class LegacyConfigFieldItem extends ConfigFieldItemBase implements PrepareCacheInterface {
+abstract class LegacyConfigFieldItem extends ConfigFieldItemBase {
 
   /**
    * {@inheritdoc}
@@ -105,7 +105,9 @@ abstract class LegacyConfigFieldItem extends ConfigFieldItemBase implements Prep
       );
       call_user_func_array($callback, $args);
       $this->setValue($items[$entity_id][0]);
+      return $items[$entity_id][0];
     }
+    return $this->getValue();
   }
 
   /**

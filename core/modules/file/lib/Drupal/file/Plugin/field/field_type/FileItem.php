@@ -344,4 +344,11 @@ class FileItem extends EntityReferenceItem implements ConfigFieldItemInterface {
     return $validators;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function prepareCache() {
+    return $this->getValue();
+  }
+
 }
