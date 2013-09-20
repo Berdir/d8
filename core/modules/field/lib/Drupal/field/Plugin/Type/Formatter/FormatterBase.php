@@ -73,7 +73,7 @@ abstract class FormatterBase extends PluginSettingsBase implements FormatterInte
   /**
    * {@inheritdoc}
    */
-  public function view(FieldtemListInterface $items) {
+  public function view(FieldItemListInterface $items) {
     $addition = array();
 
     $elements = $this->viewElements($items);
