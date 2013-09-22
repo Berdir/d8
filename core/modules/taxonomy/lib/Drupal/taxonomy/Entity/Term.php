@@ -130,7 +130,7 @@ class Term extends ContentEntityBase implements TermInterface {
   }
 
   /**
-   * Overides \Drupal\Core\Entity\EntityNG::init().
+   * {@inheritdoc}
    */
   protected function init() {
     parent::init();

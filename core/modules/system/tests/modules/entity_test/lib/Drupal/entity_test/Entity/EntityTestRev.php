@@ -48,7 +48,7 @@ class EntityTestRev extends EntityTest {
   public $revision_id;
 
   /**
-   * Overrides EntityNG::init().
+   * {@inheritdoc}
    */
   public function init() {
     parent::init();

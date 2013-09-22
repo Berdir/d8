@@ -135,7 +135,7 @@ class Feed extends ContentEntityBase implements FeedInterface {
   public $modified;
 
   /**
-   * Overrides Drupal\Core\Entity\EntityNG::init().
+   * {@inheritdoc}
    */
   public function init() {
     parent::init();

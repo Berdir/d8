@@ -346,24 +346,7 @@ abstract class Entity implements EntityInterface {
    * {@inheritdoc}
    */
   public function referencedEntities() {
-    $referenced_entities = array();
-
-    // @todo Remove when all entities are converted to EntityNG.
-    if (!$this->getPropertyDefinitions()) {
-      return $referenced_entities;
-    }
-
-    // Gather a list of referenced entities.
-    foreach ($this->getProperties() as $name => $definition) {
-      $field_items = $this->get($name);
-      foreach ($field_items as $offset => $field_item) {
-        if ($field_item instanceof EntityReferenceItem && $entity = $field_item->entity) {
-          $referenced_entities[] = $entity;
-        }
-      }
-    }
-
-    return $referenced_entities;
+    return array();
   }
 
   /**

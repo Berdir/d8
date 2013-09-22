@@ -7,6 +7,7 @@
 
 namespace Drupal\Core\Entity;
 
+use Drupal\Core\Entity\Plugin\DataType\EntityReference;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
@@ -919,6 +920,27 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
       $label = $this->{$entity_info['entity_keys']['label']}->value;
     }
     return $label;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function referencedEntities() {
+    $referenced_entities = array();
+
+    // Gather a list of referenced entities.
+    foreach ($this->getProperties() as $field_items) {
+      foreach ($field_items as $field_item) {
+        // Loop over all properties of a field item.
+        foreach ($field_item->getProperties(TRUE) as $property) {
+          if ($property instanceof EntityReference && $entity = $property->getTarget()) {
+            $referenced_entities[] = $entity;
+          }
+        }
+      }
+    }
+
+    return $referenced_entities;
   }
 
 }
