@@ -110,7 +110,7 @@ class NodeSearch extends SearchPluginBase implements AccessibleInterface, Search
       $container->get('plugin.manager.entity'),
       $container->get('module_handler'),
       $container->get('config.factory')->get('search.settings'),
-      $container->get('keyvalue')->get('state'),
+      $container->get('state'),
       $container->get('request')->attributes->get('_account')
     );
   }
