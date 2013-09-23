@@ -7,6 +7,7 @@
 
 namespace Drupal\Core\Language;
 
+use Drupal\Core\KeyValueStore\StateInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Drupal\Core\KeyValueStore\KeyValueStoreInterface;
 
@@ -56,10 +57,10 @@ class LanguageManager {
   /**
    * Constructs an LanguageManager object.
    *
-   * @param \Drupal\Core\KeyValueStore\KeyValueStoreInterface $state
+   * @param \Drupal\Core\KeyValueStore\StateInterface $state
    *   The state keyvalue store.
    */
-  public function __construct(KeyValueStoreInterface $state = NULL) {
+  public function __construct(StateInterface $state = NULL) {
     $this->state = $state;
   }
 

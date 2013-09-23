@@ -14,7 +14,7 @@ use Drupal\Core\Database\Query\SelectExtender;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityManager;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\Core\KeyValueStore\KeyValueStoreInterface;
+use Drupal\Core\KeyValueStore\StateInterface;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\TypedData\AccessibleInterface;
@@ -67,7 +67,7 @@ class NodeSearch extends SearchPluginBase implements AccessibleInterface, Search
   /**
    * The Drupal state object used to set 'node.cron_last'.
    *
-   * @var \Drupal\Core\KeyValueStore\KeyValueStoreInterface
+   * @var \Drupal\Core\KeyValueStore\StateInterface
    */
   protected $state;
 
@@ -132,12 +132,12 @@ class NodeSearch extends SearchPluginBase implements AccessibleInterface, Search
    *   A module manager object.
    * @param \Drupal\Core\Config\Config $search_settings
    *   A config object for 'search.settings'.
-   * @param \Drupal\Core\KeyValueStore\KeyValueStoreInterface $state
+   * @param \Drupal\Core\KeyValueStore\StateInterface $state
    *   The Drupal state object used to set 'node.cron_last'.
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The $account object to use for checking for access to advanced search.
    */
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition, Connection $database, EntityManager $entity_manager, ModuleHandlerInterface $module_handler, Config $search_settings, KeyValueStoreInterface $state, AccountInterface $account = NULL) {
+  public function __construct(array $configuration, $plugin_id, array $plugin_definition, Connection $database, EntityManager $entity_manager, ModuleHandlerInterface $module_handler, Config $search_settings, StateInterface $state, AccountInterface $account = NULL) {
     $this->database = $database;
     $this->entityManager = $entity_manager;
     $this->moduleHandler = $module_handler;

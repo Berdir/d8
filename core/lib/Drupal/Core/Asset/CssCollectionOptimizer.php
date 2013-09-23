@@ -54,7 +54,7 @@ class CssCollectionOptimizer implements AssetCollectionOptimizerInterface {
    * @param \Drupal\Core\KeyValueStore\KeyValueStoreInterface
    *   The state key/value store.
    */
-  public function __construct(AssetCollectionGrouperInterface $grouper, AssetOptimizerInterface $optimizer, AssetDumperInterface $dumper, KeyValueStoreInterface $state) {
+  public function __construct(AssetCollectionGrouperInterface $grouper, AssetOptimizerInterface $optimizer, AssetDumperInterface $dumper, StateInterface $state) {
     $this->grouper = $grouper;
     $this->optimizer = $optimizer;
     $this->dumper = $dumper;
