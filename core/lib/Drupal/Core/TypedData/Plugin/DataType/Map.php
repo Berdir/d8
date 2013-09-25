@@ -48,10 +48,12 @@ class Map extends TypedData implements \IteratorAggregate, ComplexDataInterface 
    */
   public function getPropertyDefinitions() {
     $definitions = array();
-    foreach ($this->values as $name => $value) {
-      $definitions[$name] = array(
-        'type' => 'any',
-      );
+    if (!empty($this->values)) {
+      foreach ($this->values as $name => $value) {
+        $definitions[$name] = array(
+          'type' => 'any',
+        );
+      }
     }
     return $definitions;
   }

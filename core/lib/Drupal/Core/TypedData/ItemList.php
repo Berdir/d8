@@ -133,6 +133,10 @@ class ItemList extends TypedData implements \IteratorAggregate, ListInterface {
    * @return \Drupal\Core\TypedData\TypedDataInterface
    */
   protected function createItem($offset = 0, $value = NULL) {
+    // If no value is set but it's a list, store an empty array instead NULL.
+    if (!isset($value) && !empty($this->definition['list'])) {
+      $value = array();
+    }
     return \Drupal::typedData()->getPropertyInstance($this, $offset, $value);
   }
 

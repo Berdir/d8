@@ -108,7 +108,7 @@ class DenormalizeTest extends NormalizerTestBase {
     $empty_field_denormalized = $this->serializer->denormalize($empty_field_data, $this->entityClass, $this->format);
     $empty_field_value = $empty_field_denormalized->field_test_text->getValue();
 
-    $this->assertTrue(!empty($no_field_value) && empty($empty_field_value), 'A field set to an empty array in the data is structured differently than an empty field.');
+    $this->assertTrue(!isset($no_field_value) && empty($empty_field_value) && is_array($empty_field_value), 'A field set to an empty array in the data is structured differently than an empty field.');
   }
 
   /**

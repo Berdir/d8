@@ -250,9 +250,8 @@ class TypedDataManager extends DefaultPluginManager {
     // data value if necessary.
     $property = clone $this->prototypes[$key];
     $property->setContext($property_name, $object);
-    if (isset($value)) {
-      $property->setValue($value, FALSE);
-    }
+    // Set even NULL values to make sure the value is set accordingly.
+    $property->setValue($value, FALSE);
     return $property;
   }
 
