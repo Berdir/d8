@@ -42,60 +42,12 @@ use Drupal\Core\Language\Language;
 class EntityTest extends EntityNG {
 
   /**
-   * The entity ID.
-   *
-   * @var \Drupal\Core\Entity\Field\FieldInterface
-   */
-  public $id;
-
-  /**
-   * The entity UUID.
-   *
-   * @var \Drupal\Core\Entity\Field\FieldInterface
-   */
-  public $uuid;
-
-  /**
-   * The bundle of the test entity.
-   *
-   * @var \Drupal\Core\Entity\Field\FieldInterface
-   */
-  public $type;
-
-  /**
-   * The name of the test entity.
-   *
-   * @var \Drupal\Core\Entity\Field\FieldInterface
-   */
-  public $name;
-
-  /**
-   * The associated user.
-   *
-   * @var \Drupal\Core\Entity\Field\FieldInterface
-   */
-  public $user_id;
-
-  /**
-   * Initialize the object. Invoked upon construction and wake up.
-   */
-  protected function init() {
-    parent::init();
-    // We unset all defined properties, so magic getters apply.
-    unset($this->id);
-    unset($this->uuid);
-    unset($this->name);
-    unset($this->user_id);
-    unset($this->type);
-  }
-
-  /**
    * Overrides Drupal\entity\Entity::label().
    */
   public function label($langcode = Language::LANGCODE_DEFAULT) {
     $info = $this->entityInfo();
     if (isset($info['entity_keys']['label']) && $info['entity_keys']['label'] == 'name') {
-      return $this->getTranslation($langcode)->name->value;
+      return $this->getTranslation($langcode)->getName();
     }
     else {
       return parent::label($langcode);
@@ -147,4 +99,54 @@ class EntityTest extends EntityNG {
     );
     return $fields;
   }
+
+  /**
+   * Sets the name.
+   *
+   * @param string $name
+   *   Name of the entity.
+   */
+  public function setName($name) {
+    $this->set('name', $name);
+  }
+
+  /**
+   * Returns the name.
+   *
+   * @return string
+   */
+  public function getName() {
+    return $this->name;
+  }
+
+  /**
+   * Sets the author ID.
+   *
+   * @param int $user_id
+   *   The author user ID.
+   */
+  public function setAuthorId($user_id) {
+    $this->user_id = $user_id;
+  }
+
+  /**
+   * Gets the author ID.
+   *
+   * @return int
+   *   The author user ID.
+   */
+  public function getAuthorId() {
+    return $this->user_id;
+  }
+
+  /**
+   * Returns the author user entity.
+   *
+   * @return \Drupal\user\UserInterface
+   *   The user entity.
+   */
+  public function getAuthor() {
+    return $this->user_id->entity;
+  }
+
 }

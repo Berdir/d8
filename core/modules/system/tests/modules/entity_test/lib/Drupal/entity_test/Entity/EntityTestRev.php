@@ -41,21 +41,6 @@ use Drupal\Core\Annotation\Translation;
 class EntityTestRev extends EntityTest {
 
   /**
-   * The entity revision id.
-   *
-   * @var \Drupal\Core\Entity\Field\FieldInterface
-   */
-  public $revision_id;
-
-  /**
-   * Overrides EntityNG::init().
-   */
-  public function init() {
-    parent::init();
-    unset($this->revision_id);
-  }
-
-  /**
    * Implements Drupal\Core\Entity\EntityInterface::getRevisionId().
    */
   public function getRevisionId() {

@@ -155,16 +155,6 @@ class EntityNG extends Entity {
         }
       }
     }
-
-    $this->init();
-  }
-
-  /**
-   * Initialize the object. Invoked upon construction and wake up.
-   */
-  protected function init() {
-    // We unset all defined properties, so magic getters apply.
-    unset($this->langcode);
   }
 
   /**
@@ -180,7 +170,6 @@ class EntityNG extends Entity {
    * Magic __wakeup() implementation.
    */
   public function __wakeup() {
-    $this->init();
     // @todo This should be done before serializing the entity, but we would
     //   need to provide the full list of data to be serialized. See the
     //   dedicated issue at https://drupal.org/node/2027795.
