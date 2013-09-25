@@ -27,6 +27,10 @@ class CustomBlockFormController extends EntityFormControllerNG {
   protected function prepareEntity() {
     $block = $this->entity;
     // Set up default values, if required.
+    if (!$block->isNew()) {
+      $block->setRevisionLog(NULL);
+    }
+
     $block_type = entity_load('custom_block_type', $block->bundle());
     // Always use the default revision setting.
     $block->setNewRevision($block_type->revision);
@@ -62,7 +66,7 @@ class CustomBlockFormController extends EntityFormControllerNG {
       '#type' => 'textfield',
       '#title' => t('Block description'),
       '#required' => TRUE,
-      '#default_value' => $block->getInfo(),
+      '#default_value' => $block->info->value,
       '#weight' => -5,
       '#description' => t('A brief description of your block. Used on the <a href="@overview">Blocks administration page</a>.', array('@overview' => url('admin/structure/block'))),
     );

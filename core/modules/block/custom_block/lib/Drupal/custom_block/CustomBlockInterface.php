@@ -16,14 +16,6 @@ use Drupal\Core\Entity\EntityChangedInterface;
 interface CustomBlockInterface extends ContentEntityInterface, EntityChangedInterface {
 
   /**
-   * Returns the block description.
-   *
-   * @return string
-   *   The block description.
-   */
-  public function getInfo();
-
-  /**
    * Returns the block revision log message.
    *
    * @return string

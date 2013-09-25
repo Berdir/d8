@@ -55,7 +55,8 @@ class CustomBlockRevisionsTest extends CustomBlockTestBase {
     $revision_count = 3;
     for ($i = 0; $i < $revision_count; $i++) {
       $block->setNewRevision(TRUE);
-      $logs[] = $block->setRevisionLog($this->randomName(32));
+      $block->setRevisionLog($this->randomName(32));
+      $logs[] = $block->getRevisionLog();
       $block->save();
       $blocks[] = $block->getRevisionId();
     }
@@ -75,7 +76,7 @@ class CustomBlockRevisionsTest extends CustomBlockTestBase {
       // Confirm the correct revision text appears.
       $loaded = entity_revision_load('custom_block', $revision_id);
       // Verify log is the same.
-      $this->assertEqual($loaded->getRevisionId(), $logs[$delta], format_string('Correct log message found for revision !revision', array(
+      $this->assertEqual($loaded->getRevisionLog(), $logs[$delta], format_string('Correct log message found for revision !revision', array(
         '!revision' => $loaded->getRevisionId()
       )));
     }
@@ -87,7 +88,7 @@ class CustomBlockRevisionsTest extends CustomBlockTestBase {
     // This will create a new revision that is not "front facing".
     // Save this as a non-default revision.
     $loaded->setNewRevision();
-    $loaded->isDefaultRevision = FALSE;
+    $loaded->isDefaultRevision(FALSE);
     $loaded->block_body = $this->randomName(8);
     $loaded->save();
 

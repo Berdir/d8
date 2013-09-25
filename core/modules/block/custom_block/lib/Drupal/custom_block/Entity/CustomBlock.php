@@ -65,13 +65,6 @@ class CustomBlock extends EntityNG implements CustomBlockInterface {
   /**
    * {@inheritdoc}
    */
-  public function getInfo() {
-    return $this->get('info')->value;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getRevisionLog() {
     return $this->get('log')->value;
   }
