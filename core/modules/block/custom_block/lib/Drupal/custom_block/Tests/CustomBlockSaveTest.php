@@ -88,7 +88,6 @@ class CustomBlockSaveTest extends CustomBlockTestBase {
     // The hook implementations custom_block_test_custom_block_presave() and
     // custom_block_test_custom_block_update() determine changes and change the
     // title as well as programatically set the 'changed' timestamp.
-    debug($block->label());
     $this->assertEqual($block->label(), 'updated_presave_update', 'Changes have been determined.');
     $this->assertEqual($block->getChangedTime(), 979534800, 'Saving a custom block uses "changed" timestamp set in presave hook.');
 
