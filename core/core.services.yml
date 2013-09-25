@@ -127,6 +127,8 @@ services:
   state:
     class: Drupal\Core\KeyValueStore\State
     arguments: ['@keyvalue']
+    tags:
+      - { name: persist }
   queue:
     class: Drupal\Core\Queue\QueueFactory
     arguments: ['@settings']

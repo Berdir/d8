@@ -7,7 +7,7 @@
 namespace Drupal\Core\Asset;
 
 use Drupal\Core\Asset\AssetCollectionOptimizerInterface;
-use Drupal\Core\KeyValueStore\KeyValueStoreInterface;
+use Drupal\Core\KeyValueStore\StateInterface;
 
 
 /**
@@ -39,7 +39,7 @@ class JsCollectionOptimizer implements AssetCollectionOptimizerInterface {
   /**
    * The state key/value store.
    *
-   * @var \Drupal\Core\KeyValueStore\KeyValueStoreInterface
+   * @var \Drupal\Core\KeyValueStore\StateInterface
    */
   protected $state;
 
