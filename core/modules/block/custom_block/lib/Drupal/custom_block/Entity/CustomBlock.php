@@ -58,29 +58,8 @@ class CustomBlock extends EntityNG implements CustomBlockInterface {
   /**
    * {@inheritdoc}
    */
-  public function id() {
-    return $this->get('id')->value;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getRevisionId() {
     return $this->get('revision_id')->value;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function uuid() {
-    return $this->get('uuid')->value;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function bundle() {
-    return $this->get('type')->value;
   }
 
   /**
@@ -93,8 +72,22 @@ class CustomBlock extends EntityNG implements CustomBlockInterface {
   /**
    * {@inheritdoc}
    */
-  public function getLog() {
+  public function getRevisionLog() {
     return $this->get('log')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setInfo($info) {
+    return $this->set('info', $info);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setRevisionLog($log) {
+    return $this->set('log', $log);
   }
 
   /**
@@ -107,16 +100,6 @@ class CustomBlock extends EntityNG implements CustomBlockInterface {
    * @var string
    */
   protected $theme;
-
-  /**
-   * {@inheritdoc}
-   */
-  public function createDuplicate() {
-    $duplicate = parent::createDuplicate();
-    $duplicate->revision_id->value = NULL;
-    $duplicate->id->value = NULL;
-    return $duplicate;
-  }
 
   /**
    * {@inheritdoc}
@@ -194,7 +177,7 @@ class CustomBlock extends EntityNG implements CustomBlockInterface {
     elseif (isset($this->original) && (!isset($record->log) || $record->log === '')) {
       // If we are updating an existing custom_block without adding a new
       // revision and the user did not supply a log, keep the existing one.
-      $record->log = $this->original->log->value;
+      $record->log = $this->original->getRevisionLog();
     }
   }
 

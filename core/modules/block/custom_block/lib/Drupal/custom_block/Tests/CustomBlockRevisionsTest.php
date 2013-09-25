@@ -48,16 +48,16 @@ class CustomBlockRevisionsTest extends CustomBlockTestBase {
     $logs = array();
 
     // Get original block.
-    $blocks[] = $block->revision_id->value;
+    $blocks[] = $block->getRevisionId();
     $logs[] = '';
 
     // Create three revisions.
     $revision_count = 3;
     for ($i = 0; $i < $revision_count; $i++) {
       $block->setNewRevision(TRUE);
-      $logs[] = $block->log->value = $this->randomName(32);
+      $logs[] = $block->setRevisionLog($this->randomName(32));
       $block->save();
-      $blocks[] = $block->revision_id->value;
+      $blocks[] = $block->getRevisionId();
     }
 
     $this->blocks = $blocks;
@@ -75,8 +75,8 @@ class CustomBlockRevisionsTest extends CustomBlockTestBase {
       // Confirm the correct revision text appears.
       $loaded = entity_revision_load('custom_block', $revision_id);
       // Verify log is the same.
-      $this->assertEqual($loaded->log->value, $logs[$delta], format_string('Correct log message found for revision !revision', array(
-        '!revision' => $loaded->revision_id->value
+      $this->assertEqual($loaded->getRevisionId(), $logs[$delta], format_string('Correct log message found for revision !revision', array(
+        '!revision' => $loaded->getRevisionId()
       )));
     }
 
@@ -91,13 +91,13 @@ class CustomBlockRevisionsTest extends CustomBlockTestBase {
     $loaded->block_body = $this->randomName(8);
     $loaded->save();
 
-    $this->drupalGet('block/' . $loaded->id->value);
+    $this->drupalGet('block/' . $loaded->id());
     $this->assertNoText($loaded->block_body->value, 'Revision body text is not present on default version of block.');
 
     // Verify that the non-default revision id is greater than the default
     // revision id.
-    $default_revision = entity_load('custom_block', $loaded->id->value);
-    $this->assertTrue($loaded->revision_id->value > $default_revision->revision_id->value, 'Revision id is greater than default revision id.');
+    $default_revision = entity_load('custom_block', $loaded->id());
+    $this->assertTrue($loaded->getRevisionId() > $default_revision->getRevisionId(), 'Revision id is greater than default revision id.');
   }
 
 }
