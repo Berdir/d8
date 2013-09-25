@@ -56,64 +56,46 @@ use Drupal\custom_block\CustomBlockInterface;
 class CustomBlock extends EntityNG implements CustomBlockInterface {
 
   /**
-   * The block ID.
-   *
-   * @var \Drupal\Core\Entity\Field\FieldInterface
+   * {@inheritdoc}
    */
-  public $id;
+  public function id() {
+    return $this->get('id')->value;
+  }
 
   /**
-   * The block revision ID.
-   *
-   * @var \Drupal\Core\Entity\Field\FieldInterface
+   * {@inheritdoc}
    */
-  public $revision_id;
+  public function getRevisionId() {
+    return $this->get('revision_id')->value;
+  }
 
   /**
-   * Indicates whether this is the default block revision.
-   *
-   * The default revision of a block is the one loaded when no specific revision
-   * has been specified. Only default revisions are saved to the block_custom
-   * table.
-   *
-   * @var \Drupal\Core\Entity\Field\FieldInterface
+   * {@inheritdoc}
    */
-  public $isDefaultRevision = TRUE;
+  public function uuid() {
+    return $this->get('uuid')->value;
+  }
 
   /**
-   * The block UUID.
-   *
-   * @var \Drupal\Core\Entity\Field\FieldInterface
+   * {@inheritdoc}
    */
-  public $uuid;
+  public function bundle() {
+    return $this->get('type')->value;
+  }
 
   /**
-   * The custom block type (bundle).
-   *
-   * @var \Drupal\Core\Entity\Field\FieldInterface
+   * {@inheritdoc}
    */
-  public $type;
+  public function getInfo() {
+    return $this->get('info')->value;
+  }
 
   /**
-   * The block language code.
-   *
-   * @var \Drupal\Core\Entity\Field\FieldInterface
+   * {@inheritdoc}
    */
-  public $langcode;
-
-  /**
-   * The block description.
-   *
-   * @var \Drupal\Core\Entity\Field\FieldInterface
-   */
-  public $info;
-
-  /**
-   * The block revision log message.
-   *
-   * @var \Drupal\Core\Entity\Field\FieldInterface
-   */
-  public $log;
+  public function getLog() {
+    return $this->get('log')->value;
+  }
 
   /**
    * The theme the block is being created in.
@@ -139,13 +121,6 @@ class CustomBlock extends EntityNG implements CustomBlockInterface {
   /**
    * {@inheritdoc}
    */
-  public function getRevisionId() {
-    return $this->revision_id->value;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function setTheme($theme) {
     $this->theme = $theme;
   }
@@ -155,23 +130,6 @@ class CustomBlock extends EntityNG implements CustomBlockInterface {
    */
   public function getTheme() {
     return $this->theme;
-  }
-
-  /**
-   * Initialize the object. Invoked upon construction and wake up.
-   */
-  protected function init() {
-    parent::init();
-    // We unset all defined properties except theme, so magic getters apply.
-    // $this->theme is a special use-case that is only used in the lifecycle of
-    // adding a new block using the block library.
-    unset($this->id);
-    unset($this->info);
-    unset($this->revision_id);
-    unset($this->log);
-    unset($this->uuid);
-    unset($this->type);
-    unset($this->new);
   }
 
   /**
@@ -211,7 +169,7 @@ class CustomBlock extends EntityNG implements CustomBlockInterface {
    * {@inheritdoc}
    */
   public function getInstances() {
-    return entity_load_multiple_by_properties('block', array('plugin' => 'custom_block:' . $this->uuid->value));
+    return entity_load_multiple_by_properties('block', array('plugin' => 'custom_block:' . $this->uuid()));
   }
 
   /**

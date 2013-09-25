@@ -16,6 +16,36 @@ use Drupal\Core\Entity\EntityChangedInterface;
 interface CustomBlockInterface extends ContentEntityInterface, EntityChangedInterface {
 
   /**
+   * The block ID.
+   */
+  public function id();
+
+  /**
+   * The revision ID.
+   */
+  public function getRevisionId();
+
+  /**
+   * The block UUID.
+   */
+  public function uuid();
+
+  /**
+   * The custom block type (bundle).
+   */
+  public function bundle();
+
+  /**
+   * The block description.
+   */
+  public function getInfo();
+
+  /**
+   * The block revision log message.
+   */
+  public function getLog();
+
+  /**
    * Sets the theme value.
    *
    * When creating a new custom block from the block library, the user is
