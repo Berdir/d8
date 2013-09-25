@@ -72,6 +72,7 @@ class LanguageListTest extends WebTestBase {
     );
     $this->drupalPostForm(NULL, $edit, t('Save configuration'));
     $this->assertNoOptionSelected('edit-site-default-language', 'en', 'Default language updated.');
+    \Drupal::state()->resetCache();
     $this->assertEqual($this->getUrl(), url($path, array('absolute' => TRUE)), 'Correct page redirection.');
 
     // Ensure we can't delete the default language.
@@ -96,6 +97,7 @@ class LanguageListTest extends WebTestBase {
       'site_default_language' => 'en',
     );
     $this->drupalPostForm($path, $edit, t('Save configuration'));
+    \Drupal::state()->resetCache();
     // Ensure 'delete' link works.
     $this->drupalGet('admin/config/regional/language');
     $this->clickLink(t('Delete'));
@@ -125,6 +127,7 @@ class LanguageListTest extends WebTestBase {
     $this->drupalPostForm('admin/config/regional/language/delete/fr', array(), t('Delete'));
     // Get the count of languages.
     drupal_static_reset('language_list');
+    \Drupal::state()->resetCache();
     $languages = language_list();
     // We need raw here because %language and %langcode will add HTML.
     $t_args = array('%language' => 'French', '%langcode' => 'fr');

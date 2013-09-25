@@ -156,6 +156,7 @@ class TrailTest extends MenuTestBase {
 
       // Check that the initial trail (during the Drupal bootstrap) matches
       // what we expect.
+      \Drupal::state()->resetCache();
       $initial_trail = \Drupal::state()->get('menu_test.active_trail_initial') ?: array();
       $this->assertEqual(count($initial_trail), count($expected_trail[$status_code]['initial']), format_string('The initial active trail for a @status_code page contains the expected number of items (expected: @expected, found: @found).', array(
         '@status_code' => $status_code,

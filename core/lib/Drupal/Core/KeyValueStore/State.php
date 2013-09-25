@@ -113,4 +113,11 @@ class State implements StateInterface {
     $this->deleteMultiple(array($key));
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function resetCache() {
+    $this->cache = array();
+  }
+
 }

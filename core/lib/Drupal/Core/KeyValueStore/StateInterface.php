@@ -68,4 +68,11 @@ interface StateInterface {
    */
   public function deleteMultiple(array $keys);
 
+  /**
+   * Resets the static cache.
+   *
+   * This is only needed for Simpletest.
+   */
+  public function resetCache();
+
 }

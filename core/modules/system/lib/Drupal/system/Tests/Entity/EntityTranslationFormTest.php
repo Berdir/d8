@@ -113,6 +113,7 @@ class EntityTranslationFormTest extends WebTestBase {
     $node->getTranslation($langcode2)->body->value = $this->randomName(16);
     $node->save();
     $this->drupalGet($langcode2 . '/node/' . $node->id() . '/edit');
+    \Drupal::state()->resetCache();
     $form_langcode = \Drupal::state()->get('entity_test.form_langcode') ?: FALSE;
     $this->assertTrue($langcode2 == $form_langcode, "Node edit form language is $langcode2.");
   }

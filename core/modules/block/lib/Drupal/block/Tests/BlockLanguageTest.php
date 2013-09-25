@@ -75,6 +75,7 @@ class BlockLanguageTest extends WebTestBase {
 
     // Reset the static cache of the language list.
     drupal_static_reset('language_list');
+    \Drupal::state()->resetCache();
 
     // Check that a page has a block.
     $this->drupalget('', array('language' => language_load('en')));

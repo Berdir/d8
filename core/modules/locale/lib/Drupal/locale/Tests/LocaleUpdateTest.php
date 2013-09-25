@@ -130,6 +130,7 @@ class LocaleUpdateTest extends LocaleUpdateBase {
 
     // Get status of translation sources at both local and remote locations.
     $this->drupalGet('admin/reports/translations/check');
+    \Drupal::state()->resetCache();
     $result = locale_translation_get_status();
     $this->assertEqual($result['contrib_module_one']['de']->type, LOCALE_TRANSLATION_REMOTE, 'Translation of contrib_module_one found');
     $this->assertEqual($result['contrib_module_one']['de']->timestamp, $this->timestamp_new, 'Translation timestamp found');

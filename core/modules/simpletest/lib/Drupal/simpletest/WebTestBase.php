@@ -2367,6 +2367,7 @@ abstract class WebTestBase extends TestBase {
    *   An array containing e-mail messages captured during the current test.
    */
   protected function drupalGetMails($filter = array()) {
+    \Drupal::state()->resetCache();
     $captured_emails = \Drupal::state()->get('system.test_email_collector') ?: array();
     $filtered_emails = array();
 

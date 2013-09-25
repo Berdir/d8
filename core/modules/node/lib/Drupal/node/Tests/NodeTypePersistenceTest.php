@@ -55,6 +55,7 @@ class NodeTypePersistenceTest extends NodeTestBase {
     $this->drupalPostForm('admin/modules/uninstall', $edit, t('Uninstall'));
     $this->drupalPostForm(NULL, array(), t('Uninstall'));
     $forum = entity_load('node_type', 'forum');
+    \Drupal::state()->resetCache();
     $this->assertFalse($forum->isLocked(), 'Forum node type is not locked');
     $this->drupalGet('node/add');
     $this->assertNoText('forum', 'forum type is no longer found on node/add');

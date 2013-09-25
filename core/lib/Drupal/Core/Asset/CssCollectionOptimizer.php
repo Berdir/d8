@@ -8,6 +8,7 @@ namespace Drupal\Core\Asset;
 
 use Drupal\Core\Asset\AssetCollectionOptimizerInterface;
 use Drupal\Core\KeyValueStore\KeyValueStoreInterface;
+use Drupal\Core\KeyValueStore\StateInterface;
 
 /**
  * Optimizes CSS assets.
@@ -38,7 +39,7 @@ class CssCollectionOptimizer implements AssetCollectionOptimizerInterface {
   /**
    * The state key/value store.
    *
-   * @var \Drupal\Core\KeyValueStore\KeyValueStoreInterface
+   * @var \Drupal\Core\KeyValueStore\StateInterface
    */
   protected $state;
 
@@ -51,7 +52,7 @@ class CssCollectionOptimizer implements AssetCollectionOptimizerInterface {
    *   The optimizer for a single CSS asset.
    * @param \Drupal\Core\Asset\AssetDumperInterface
    *   The dumper for optimized CSS assets.
-   * @param \Drupal\Core\KeyValueStore\KeyValueStoreInterface
+   * @param \Drupal\Core\KeyValueStore\StateInterface
    *   The state key/value store.
    */
   public function __construct(AssetCollectionGrouperInterface $grouper, AssetOptimizerInterface $optimizer, AssetDumperInterface $dumper, StateInterface $state) {

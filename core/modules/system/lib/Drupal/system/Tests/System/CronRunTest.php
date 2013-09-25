@@ -68,6 +68,7 @@ class CronRunTest extends WebTestBase {
     \Drupal::state()->set('system.cron_last', $cron_last);
     $this->drupalGet('');
     sleep(1);
+    \Drupal::state()->resetCache();
     $this->assertTrue($cron_last < \Drupal::state()->get('system.cron_last'), 'Cron runs when the cron threshold is passed.');
 
     // Disable the cron threshold through the interface.

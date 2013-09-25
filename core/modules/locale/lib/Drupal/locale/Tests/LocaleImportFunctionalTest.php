@@ -136,6 +136,7 @@ class LocaleImportFunctionalTest extends WebTestBase {
     $this->drupalPostForm('admin/config/regional/translate', $search, t('Filter'));
     $this->assertNoText(t('No strings available.'), 'String overwritten by imported string.');
     // This import should have changed number of plural forms.
+    \Drupal::state()->resetCache();
     $locale_plurals = \Drupal::state()->get('locale.translation.plurals') ?: array();
     $this->assert($locale_plurals['fr']['plurals'] == 3, 'Plural numbers changed.');
 

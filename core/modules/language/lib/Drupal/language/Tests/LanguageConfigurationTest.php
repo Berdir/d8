@@ -72,6 +72,8 @@ class LanguageConfigurationTest extends WebTestBase {
     );
     $this->drupalPostForm(NULL, $edit, t('Save configuration'));
     $this->assertOptionSelected('edit-site-default-language', 'fr', 'Default language updated.');
+
+    \Drupal::state()->resetCache();
     $this->assertEqual($this->getUrl(), url('admin/config/regional/settings', array('absolute' => TRUE)), 'Correct page redirection.');
 
     // Check if a valid language prefix is added after changing the default

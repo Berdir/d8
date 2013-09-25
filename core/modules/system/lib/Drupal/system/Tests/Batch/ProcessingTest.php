@@ -54,6 +54,7 @@ class ProcessingTest extends WebTestBase {
     $edit = array('batch' => 'batch_1');
     $this->drupalPostForm('batch-test/simple', $edit, 'Submit');
     $this->assertBatchMessages($this->_resultMessages('batch_1'), 'Batch with simple operations performed successfully.');
+    \Drupal::state()->resetCache();
     $this->assertEqual(batch_test_stack(), $this->_resultStack('batch_1'), 'Execution order was correct.');
     $this->assertText('Redirection successful.', 'Redirection after batch execution is correct.');
 
@@ -61,6 +62,7 @@ class ProcessingTest extends WebTestBase {
     $edit = array('batch' => 'batch_2');
     $this->drupalPostForm('batch-test/simple', $edit, 'Submit');
     $this->assertBatchMessages($this->_resultMessages('batch_2'), 'Batch with multistep operation performed successfully.');
+    \Drupal::state()->resetCache();
     $this->assertEqual(batch_test_stack(), $this->_resultStack('batch_2'), 'Execution order was correct.');
     $this->assertText('Redirection successful.', 'Redirection after batch execution is correct.');
 
@@ -68,6 +70,7 @@ class ProcessingTest extends WebTestBase {
     $edit = array('batch' => 'batch_3');
     $this->drupalPostForm('batch-test/simple', $edit, 'Submit');
     $this->assertBatchMessages($this->_resultMessages('batch_3'), 'Batch with simple and multistep operations performed successfully.');
+    \Drupal::state()->resetCache();
     $this->assertEqual(batch_test_stack(), $this->_resultStack('batch_3'), 'Execution order was correct.');
     $this->assertText('Redirection successful.', 'Redirection after batch execution is correct.');
 
@@ -75,6 +78,7 @@ class ProcessingTest extends WebTestBase {
     $edit = array('batch' => 'batch_4');
     $this->drupalPostForm('batch-test/simple', $edit, 'Submit');
     $this->assertBatchMessages($this->_resultMessages('batch_4'), 'Nested batch performed successfully.');
+    \Drupal::state()->resetCache();
     $this->assertEqual(batch_test_stack(), $this->_resultStack('batch_4'), 'Execution order was correct.');
     $this->assertText('Redirection successful.', 'Redirection after batch execution is correct.');
   }
