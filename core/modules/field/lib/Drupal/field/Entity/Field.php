@@ -718,4 +718,17 @@ class Field extends ConfigEntityBase implements FieldInterface {
     $this->__construct($values);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function isFieldConfigurable() {
+    return TRUE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isFieldQueryable() {
+    return TRUE;
+  }
 }
