@@ -219,7 +219,9 @@ class FileItem extends EntityReferenceItem implements ConfigFieldItemInterface {
     $entity = $this->getRoot();
 
     // Delete all file usages within this entity.
-    file_usage()->delete($this->entity, 'file', $entity->entityType(), $entity->id(), 0);
+    if ($this->entity) {
+      file_usage()->delete($this->entity, 'file', $entity->entityType(), $entity->id(), 0);
+    }
   }
 
   /**
