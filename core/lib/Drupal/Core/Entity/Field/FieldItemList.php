@@ -47,6 +47,7 @@ class FieldItemList extends ItemList implements FieldItemListInterface {
    */
   public function __construct(array $definition, $name = NULL, TypedDataInterface $parent = NULL) {
     parent::__construct($definition, $name, $parent);
+    $this->definition['field_name'] = $name;
     // Always initialize one empty item as most times a value for at least one
     // item will be present. That way prototypes created by
     // \Drupal\Core\TypedData\TypedDataManager::getPropertyInstance() will
@@ -79,7 +80,7 @@ class FieldItemList extends ItemList implements FieldItemListInterface {
    * {@inheritdoc}
    */
   public function getFieldDefinition() {
-    return FieldDefinition::createFromOldStyleDefinition($this->definition['type'], $this->definition);
+    return new FieldDefinition($this->definition);
   }
 
   /**

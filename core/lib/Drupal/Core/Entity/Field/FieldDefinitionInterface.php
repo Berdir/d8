@@ -129,13 +129,6 @@ interface FieldDefinitionInterface {
   public function isFieldConfigurable();
 
   /**
-   * Determines whether the field is queryable via QueryInterface.
-   *
-   * @return bool
-   */
-  public function isFieldQueryable();
-
-  /**
    * Returns the human-readable label for the field.
    *
    * @return string
