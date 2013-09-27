@@ -188,6 +188,20 @@ class FieldDefinition implements FieldDefinitionInterface {
   }
 
   /**
+   * Sets whether the field is required.
+   *
+   * @param bool $required
+   *   TRUE if the field is required, FALSE otherwise.
+   *
+   * @return \Drupal\Core\Entity\Field\FieldDefinition
+   *   The object itself for chaining.
+   */
+  public function setFieldRequired($required) {
+    return $this->definition['required'] = $required;
+    return $this;
+  }
+
+  /**
    * Sets constraints for a given field item property.
    *
    * @param string $name

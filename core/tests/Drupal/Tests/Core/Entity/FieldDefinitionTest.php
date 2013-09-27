@@ -46,7 +46,7 @@ class FieldDefinitionTest extends UnitTestCase {
   }
 
   /**
-   * Tests field label methods.
+   * Tests field description methods.
    */
   public function testFieldDescription() {
     $definition = new FieldDefinition();
@@ -78,7 +78,7 @@ class FieldDefinitionTest extends UnitTestCase {
   }
 
   /**
-   * Tests field settings methods.
+   * Tests field default value.
    */
   public function testFieldDefaultValue() {
     $definition = new FieldDefinition();
@@ -117,6 +117,10 @@ class FieldDefinitionTest extends UnitTestCase {
    */
   public function testFieldRequired() {
     $definition = new FieldDefinition();
+    $this->assertFalse($definition->isFieldRequired());
+    $definition->setFieldRequired(TRUE);
+    $this->assertTrue($definition->isFieldRequired());
+    $definition->setFieldRequired(FALSE);
     $this->assertFalse($definition->isFieldRequired());
   }
 
