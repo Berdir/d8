@@ -617,13 +617,6 @@ class FieldInstance extends ConfigEntityBase implements FieldInstanceInterface {
   /**
    * {@inheritdoc}
    */
-  public function isFieldQueryable() {
-    return TRUE;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function offsetExists($offset) {
     return (isset($this->{$offset}) || $offset == 'field_id' || $offset == 'field_name');
   }

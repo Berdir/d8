@@ -725,10 +725,4 @@ class Field extends ConfigEntityBase implements FieldInterface {
     return TRUE;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function isFieldQueryable() {
-    return TRUE;
-  }
 }
