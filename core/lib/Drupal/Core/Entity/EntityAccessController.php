@@ -274,10 +274,7 @@ class EntityAccessController implements EntityAccessControllerInterface {
    * {@inheritdoc}
    */
   public function fieldAccess($operation, FieldDefinitionInterface $field_definition, AccountInterface $account = NULL, FieldItemListInterface $field = NULL) {
-    global $user;
-    if (!isset($account)) {
-      $account = $user;
-    }
+    $account = $this->prepareUser($account);
 
     // Get the default access restriction that lives within this field.
     $default = $field ? $field->defaultAccess($operation, $account) : TRUE;
@@ -285,9 +282,9 @@ class EntityAccessController implements EntityAccessControllerInterface {
     // Invoke hook and collect grants/denies for field access from other
     // modules. Our default access flag is masked under the ':default' key.
     $grants = array(':default' => $default);
-    $hook_implementations = \Drupal::moduleHandler()->getImplementations('entity_field_access');
+    $hook_implementations = $this->moduleHandler->getImplementations('entity_field_access');
     foreach ($hook_implementations as $module) {
-      $grants = array_merge($grants, array($module => module_invoke($module, 'entity_field_access', $operation, $field_definition, $account, $field)));
+      $grants = array_merge($grants, array($module => $this->moduleHandler->invoke($module, 'entity_field_access', array($operation, $field_definition, $account, $field))));
     }
 
     // Also allow modules to alter the returned grants/denies.
@@ -297,7 +294,7 @@ class EntityAccessController implements EntityAccessControllerInterface {
       'field' => $field,
       'account' => $account,
     );
-    drupal_alter('entity_field_access', $grants, $context);
+    $this->moduleHandler->alter('entity_field_access', $grants, $context);
 
     // One grant being FALSE is enough to deny access immediately.
     if (in_array(FALSE, $grants, TRUE)) {
