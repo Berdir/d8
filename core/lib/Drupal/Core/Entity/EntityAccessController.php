@@ -273,25 +273,25 @@ class EntityAccessController implements EntityAccessControllerInterface {
   /**
    * {@inheritdoc}
    */
-  public function fieldAccess($operation, FieldDefinitionInterface $field_definition, AccountInterface $account = NULL, FieldItemListInterface $field = NULL) {
+  public function fieldAccess($operation, FieldDefinitionInterface $field_definition, AccountInterface $account = NULL, FieldItemListInterface $items = NULL) {
     $account = $this->prepareUser($account);
 
     // Get the default access restriction that lives within this field.
-    $default = $field ? $field->defaultAccess($operation, $account) : TRUE;
+    $default = $items ? $items->defaultAccess($operation, $account) : TRUE;
 
     // Invoke hook and collect grants/denies for field access from other
     // modules. Our default access flag is masked under the ':default' key.
     $grants = array(':default' => $default);
     $hook_implementations = $this->moduleHandler->getImplementations('entity_field_access');
     foreach ($hook_implementations as $module) {
-      $grants = array_merge($grants, array($module => $this->moduleHandler->invoke($module, 'entity_field_access', array($operation, $field_definition, $account, $field))));
+      $grants = array_merge($grants, array($module => $this->moduleHandler->invoke($module, 'entity_field_access', array($operation, $field_definition, $account, $items))));
     }
 
     // Also allow modules to alter the returned grants/denies.
     $context = array(
       'operation' => $operation,
       'field_definition' => $field_definition,
-      'field' => $field,
+      'items' => $items,
       'account' => $account,
     );
     $this->moduleHandler->alter('entity_field_access', $grants, $context);
