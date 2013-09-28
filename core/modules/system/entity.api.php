@@ -712,11 +712,12 @@ function hook_entity_operation_alter(array &$operations, \Drupal\Core\Entity\Ent
  *   The operation to be performed. See
  *   \Drupal\Core\TypedData\AccessibleInterface::access() for possible values.
  * @param \Drupal\Core\Entity\Field\FieldDefinitionInterface $field_definition
- *   The field definition
+ *   The field definition.
  * @param \Drupal\Core\Session\AccountInterface $account
  *   The user account to check.
  * @param \Drupal\Core\Entity\Field\FieldItemListInterface $items
- *   (optional) The entity field object on which the operation is to be performed.
+ *   (optional) The entity field object on which the operation is to be
+ *   performed.
  *
  * @return bool|NULL
  *   TRUE if access should be allowed, FALSE if access should be denied and NULL

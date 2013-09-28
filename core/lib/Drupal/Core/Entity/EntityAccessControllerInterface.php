@@ -77,7 +77,7 @@ interface EntityAccessControllerInterface {
    *
    * @param string $operation
    *   The operation access should be checked for.
-   *   Usually one of "view" or "edit".
+   *   Usually one of "view" or "update".
    * @param \Drupal\Core\Entity\Field\FieldDefinitionInterface $field_definition
    *   The field definition.
    * @param \Drupal\Core\Session\AccountInterface $account
