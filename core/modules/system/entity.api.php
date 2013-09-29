@@ -724,7 +724,7 @@ function hook_entity_operation_alter(array &$operations, \Drupal\Core\Entity\Ent
  *   if the implementation has no opinion.
  */
 function hook_entity_field_access($operation, \Drupal\Core\Entity\Field\FieldDefinitionInterface $field_definition, \Drupal\Core\Session\AccountInterface $account, \Drupal\Core\Entity\Field\FieldItemListInterface $items = NULL) {
-  if ($field_definition->getFieldName() == 'field_of_interest' && $operation == 'update') {
+  if ($field_definition->getFieldName() == 'field_of_interest' && $operation == 'edit') {
     return user_access('update field of interest', $account);
   }
 }

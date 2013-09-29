@@ -128,7 +128,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface 
             'field-widget-' . drupal_html_class($this->getPluginId()),
           ),
         ),
-        '#access' => $items->access('update'),
+        '#access' => $items->access('edit'),
         'widget' => $elements,
       ),
     );
