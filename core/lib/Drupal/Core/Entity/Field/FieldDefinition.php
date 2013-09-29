@@ -197,7 +197,7 @@ class FieldDefinition implements FieldDefinitionInterface {
    *   The object itself for chaining.
    */
   public function setFieldRequired($required) {
-    return $this->definition['required'] = $required;
+    $this->definition['required'] = $required;
     return $this;
   }
 
