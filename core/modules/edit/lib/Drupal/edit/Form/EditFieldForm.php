@@ -87,7 +87,7 @@ class EditFieldForm implements FormInterface, ContainerInjectionInterface {
     }
 
     // Add the field form.
-    $field = $entity->getNGEntity()->get($field_name);
+    $field = $entity->get($field_name);
     if ($field->getFieldDefinition() instanceof FieldInstanceInterface) {
       field_attach_form($form_state['entity'], $form, $form_state, $form_state['langcode'], array('field_name' =>  $form_state['field_name']));
     }
@@ -146,7 +146,7 @@ class EditFieldForm implements FormInterface, ContainerInjectionInterface {
   public function validateForm(array &$form, array &$form_state) {
     $entity = $this->buildEntity($form, $form_state);
     $field_name = $form_state['field_name'];
-    $field = $entity->getNGEntity()->get($field_name);
+    $field = $entity->get($field_name);
     if ($field->getFieldDefinition() instanceof FieldInstanceInterface) {
       field_attach_form_validate($entity, $form, $form_state, array('field_name' => $field_name));
     }

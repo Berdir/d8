@@ -351,7 +351,7 @@ class Node extends ContentEntityBase implements NodeInterface {
       'label' => t('Title'),
       'description' => t('The title of this node, always treated as non-markup plain text.'),
       'type' => 'field_item:text',
-      'list_class' => '\Drupal\Core\Entity\Field\Field',
+      'list_class' => '\Drupal\Core\Entity\Field\FieldItemList',
       'required' => TRUE,
       'settings' => array(
         'default_value' => '',
