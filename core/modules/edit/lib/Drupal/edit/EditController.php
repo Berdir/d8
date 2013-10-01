@@ -26,6 +26,7 @@ use Drupal\edit\Ajax\EntitySavedCommand;
 use Drupal\edit\Ajax\MetadataCommand;
 use Drupal\edit\Form\EditFieldForm;
 use Drupal\user\TempStoreFactory;
+use Drupal\field\FieldInstanceInterface;
 
 /**
  * Returns responses for Edit module routes.
@@ -133,10 +134,13 @@ class EditController extends ContainerAware implements ContainerInjectionInterfa
       }
 
       // Validate the field name and language.
-      if (!$field_name || !($instance = $this->fieldInfo->getInstance($entity->entityType(), $entity->bundle(), $field_name))) {
+      if (!$field_name) {
         throw new NotFoundHttpException();
       }
       if (!$langcode || (field_valid_language($langcode) !== $langcode)) {
+        throw new NotFoundHttpException();
+      }
+      if (!($field_definition = $entity->getTranslation($langcode)->get($field_name)->getFieldDefinition())) {
         throw new NotFoundHttpException();
       }
 
@@ -146,7 +150,7 @@ class EditController extends ContainerAware implements ContainerInjectionInterfa
         $metadata[$entity_id] = $this->metadataGenerator->generateEntity($entity, $langcode);
       }
 
-      $metadata[$field] = $this->metadataGenerator->generateField($entity, $instance, $langcode, $view_mode);
+      $metadata[$field] = $this->metadataGenerator->generateField($entity, $field_definition, $langcode, $view_mode);
     }
 
     return new JsonResponse($metadata);
@@ -216,7 +220,14 @@ class EditController extends ContainerAware implements ContainerInjectionInterfa
       // The form submission saved the entity in tempstore. Return the
       // updated view of the field from the tempstore copy.
       $entity = $this->tempStoreFactory->get('edit')->get($entity->uuid());
-      $output = field_view_field($entity, $field_name, $view_mode_id, $langcode);
+
+      $field = $entity->get($field_name);
+      if ($field->getFieldDefinition() instanceof FieldInstanceInterface) {
+        $output = field_view_field($entity, $field_name, $view_mode_id, $langcode);
+      }
+      else {
+        $output = \Drupal::service('plugin.manager.field.formatter')->viewBaseField($field);
+      }
 
       $response->addCommand(new FieldFormSavedCommand(drupal_render($output)));
     }

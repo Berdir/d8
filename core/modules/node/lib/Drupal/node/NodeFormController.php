@@ -101,14 +101,8 @@ class NodeFormController extends ContentEntityFormController {
 
     $node_type = node_type_load($node->getType());
     if ($node_type->has_title) {
-      $form['title'] = array(
-        '#type' => 'textfield',
-        '#title' => check_plain($node_type->title_label),
-        '#required' => TRUE,
-        '#default_value' => $node->title->value,
-        '#maxlength' => 255,
-        '#weight' => -5,
-      );
+      $form['title'] = \Drupal::service('plugin.manager.field.widget')->baseFieldForm($node->title, $form, $form_state, $this->getFormLangcode($form_state));
+      $form['title']['#weight'] = -5;
     }
 
     $language_configuration = module_invoke('language', 'get_default_configuration', 'node', $node->getType());
@@ -437,25 +431,25 @@ class NodeFormController extends ContentEntityFormController {
    * {@inheritdoc}
    */
   public function buildEntity(array $form, array &$form_state) {
-    $entity = parent::buildEntity($form, $form_state);
+    $node = parent::buildEntity($form, $form_state);
     // A user might assign the node author by entering a user name in the node
     // form, which we then need to translate to a user ID.
     if (!empty($form_state['values']['name']) && $account = user_load_by_name($form_state['values']['name'])) {
-      $entity->setAuthorId($account->id());
+      $node->setAuthorId($account->id());
     }
     else {
-      $entity->setAuthorId(0);
+      $node->setAuthorId(0);
     }
 
     if (!empty($form_state['values']['date']) && $form_state['values']['date'] instanceOf DrupalDateTime) {
-      $entity->setCreatedTime($form_state['values']['date']->getTimestamp());
+      $node->setCreatedTime($form_state['values']['date']->getTimestamp());
     }
     else {
-      $entity->setCreatedTime(REQUEST_TIME);
+      $node->setCreatedTime(REQUEST_TIME);
     }
-    return $entity;
+    \Drupal::service('plugin.manager.field.widget')->baseFieldExtractFormValues($node->title, $form, $form_state, $this->getFormLangcode($form_state));
+    return $node;
   }
-
 
   /**
    * Overrides Drupal\Core\Entity\EntityFormController::save().

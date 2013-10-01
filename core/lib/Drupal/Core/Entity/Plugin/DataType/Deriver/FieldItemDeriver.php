@@ -77,6 +77,16 @@ class FieldItemDeriver implements ContainerDerivativeInterface {
    */
   public function getDerivativeDefinitions(array $base_plugin_definition) {
     foreach ($this->fieldTypePluginManager->getDefinitions() as $plugin_id => $definition) {
+      // Provide easy access to the field type without requiring consuming code
+      // to parse it from the full data type.
+      $definition['field_type'] = $plugin_id;
+
+      // The distinction between 'settings' and 'instance_settings' is only
+      // meaningful at the field type plugin level. At the Typed data API level,
+      // merge them.
+      $definition['settings'] = $definition['instance_settings'] + $definition['settings'];
+      unset($definition['instance_settings']);
+
       $this->derivatives[$plugin_id] = $definition;
     }
     return $this->derivatives;

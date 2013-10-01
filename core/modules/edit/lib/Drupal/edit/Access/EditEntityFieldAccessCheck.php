@@ -94,11 +94,14 @@ class EditEntityFieldAccessCheck implements StaticAccessCheckInterface, EditEnti
 
     // Validate the field name and language.
     $field_name = $request->attributes->get('field_name');
-    if (!$field_name || !$this->fieldInfo->getInstance($entity->entityType(), $entity->bundle(), $field_name)) {
+    if (!$field_name) {
       throw new NotFoundHttpException();
     }
     $langcode = $request->attributes->get('langcode');
     if (!$langcode || (field_valid_language($langcode) !== $langcode)) {
+      throw new NotFoundHttpException();
+    }
+    if (!($field_definition = $entity->getTranslation($langcode)->get($field_name)->getFieldDefinition())) {
       throw new NotFoundHttpException();
     }
   }

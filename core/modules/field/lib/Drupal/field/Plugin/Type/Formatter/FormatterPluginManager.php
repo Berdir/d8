@@ -17,7 +17,7 @@ use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Plugin\Discovery\CacheDecorator;
 use Drupal\Core\Plugin\Discovery\AnnotatedClassDiscovery;
 use Drupal\Core\Plugin\Discovery\AlterDecorator;
-use Drupal\field\Entity\FieldInstance;
+use Drupal\Core\Entity\Field\FieldInterface;
 
 /**
  * Plugin type manager for field formatters.
@@ -204,6 +204,30 @@ class FormatterPluginManager extends DefaultPluginManager {
   public function getDefaultSettings($type) {
     $info = $this->getDefinition($type);
     return isset($info['settings']) ? $info['settings'] : array();
+  }
+
+  /**
+   * @todo Document.
+   */
+  public function viewBaseField(FieldInterface $field) {
+    $options = array(
+      'field_definition' => $field->getFieldDefinition(),
+      'view_mode' => 'default',
+      'configuration' => array(
+        'label' => 'hidden',
+      ),
+    );
+    $formatter = $this->getInstance($options);
+
+    $entity = $field->getParent()->getBCEntity();
+    $entity_id = $entity->id();
+    $langcode = $entity->language()->id;
+
+    $items_multi = array($entity_id => $field);
+    $formatter->prepareView(array($entity_id => $entity), $langcode, $items_multi);
+    $result = $formatter->view($entity, $langcode, $field);
+    $field_name = $field->getName();
+    return isset($result[$field_name]) ? $result[$field_name] : array();
   }
 
 }

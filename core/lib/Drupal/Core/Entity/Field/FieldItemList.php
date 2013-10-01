@@ -8,6 +8,7 @@
 namespace Drupal\Core\Entity\Field;
 
 use Drupal\Core\Entity\Field\FieldItemListInterface;
+use Drupal\Core\Entity\Field\FieldDefinition;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\Core\TypedData\ItemList;

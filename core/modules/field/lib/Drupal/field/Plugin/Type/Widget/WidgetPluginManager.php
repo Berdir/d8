@@ -18,6 +18,7 @@ use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Plugin\Discovery\CacheDecorator;
 use Drupal\Core\Plugin\Discovery\AlterDecorator;
 use Drupal\Core\Plugin\Discovery\AnnotatedClassDiscovery;
+use Drupal\Core\Entity\Field\FieldInterface;
 
 /**
  * Plugin type manager for field widgets.
@@ -208,6 +209,47 @@ class WidgetPluginManager extends DefaultPluginManager {
   public function getDefaultSettings($type) {
     $info = $this->getDefinition($type);
     return isset($info['settings']) ? $info['settings'] : array();
+  }
+
+  /**
+   * @todo Document.
+   */
+  public function baseFieldForm(FieldInterface $field, array &$form, array &$form_state, $langcode) {
+    $options = array(
+      'field_definition' => $field->getFieldDefinition(),
+      'form_mode' => 'default',
+      'configuration' => array(),
+    );
+    if (($field_data_definition = $field->getDefinition()) && isset($field_data_definition['default_widget'])) {
+      $options['configuration']['type'] = $field_data_definition['default_widget'];
+    }
+    $widget = $this->getInstance($options);
+
+    $entity = $field->getParent()->getBCEntity();
+
+    $form += array('#parents' => array());
+    $result = $widget->form($entity, $langcode, $field, $form, $form_state);
+    $field_name = $field->getName();
+    return isset($result[$field_name]) ? $result[$field_name] : array();
+  }
+
+  /**
+   * @todo Document.
+   */
+  public function baseFieldExtractFormValues(FieldInterface $field, array &$form, array &$form_state, $langcode) {
+    $options = array(
+      'field_definition' => $field->getFieldDefinition(),
+      'form_mode' => 'default',
+      'configuration' => array(),
+    );
+    if (($field_data_definition = $field->getDefinition()) && isset($field_data_definition['default_widget'])) {
+      $options['configuration']['type'] = $field_data_definition['default_widget'];
+    }
+    $widget = $this->getInstance($options);
+
+    $entity = $field->getParent()->getBCEntity();
+
+    $widget->extractFormValues($entity, $langcode, $field, $form, $form_state);
   }
 
 }

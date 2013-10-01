@@ -688,7 +688,7 @@ function template_preprocess_node(&$variables) {
 
   $uri = $node->uri();
   $variables['node_url']  = url($uri['path'], $uri['options']);
-  $variables['label'] = check_plain($node->label());
+  $variables['label'] = Drupal::service('plugin.manager.field.formatter')->viewBaseField($node->getNGEntity()->title);
   $variables['page'] = $variables['view_mode'] == 'full' && node_is_page($node);
 
   // Helpful $content variable for templates.
