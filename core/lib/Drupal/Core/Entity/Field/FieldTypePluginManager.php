@@ -8,6 +8,7 @@
 
 namespace Drupal\Core\Entity\Field;
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageManager;
@@ -25,7 +26,6 @@ class FieldTypePluginManager extends DefaultPluginManager {
   protected $defaults = array(
     'settings' => array(),
     'instance_settings' => array(),
-    'list_class' => '\Drupal\field\Plugin\Type\FieldType\ConfigFieldItemList',
   );
 
   /**
@@ -50,6 +50,20 @@ class FieldTypePluginManager extends DefaultPluginManager {
     // http://drupal.org/node/2014671).
     $this->discovery = new LegacyFieldTypeDiscoveryDecorator($this->discovery, $module_handler);
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function processDefinition(&$definition, $plugin_id) {
+    parent::processDefinition($definition, $plugin_id);
+    if ($definition['configurable']) {
+      $definition['list_class'] = '\Drupal\field\Plugin\Type\FieldType\ConfigFieldItemList';
+    }
+    else {
+      $definition['list_class'] = '\Drupal\Core\Entity\Field\FieldItemList';
+    }
+  }
+
 
   /**
    * Returns the default field-level settings for a field type.
@@ -79,6 +93,29 @@ class FieldTypePluginManager extends DefaultPluginManager {
   public function getDefaultInstanceSettings($type) {
     $info = $this->getDefinition($type);
     return isset($info['instance_settings']) ? $info['instance_settings'] : array();
+  }
+
+  /**
+   * Gets the definition of all field types.
+   *
+   * @param Boolean $configurable
+   *   Configurable flag to indicate whether return configurable field types.
+   *
+   * @return array
+   *   An array of field type definitions.
+   */
+  public function getDefinitions($configurable = NULL) {
+    $definitions = $this->getCachedDefinitions();
+    if (!isset($definitions)) {
+      $definitions = $this->findDefinitions();
+      $this->setCachedDefinitions($definitions);
+    }
+    if ($configurable) {
+      return array_filter($this->definitions, function ($defintion) {
+        return $defintion['configurable'];
+      });
+    }
+    return $definitions;
   }
 
 }

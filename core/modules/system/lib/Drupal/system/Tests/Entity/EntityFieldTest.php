@@ -536,7 +536,7 @@ class EntityFieldTest extends EntityUnitTestBase  {
     $entity->save();
     // Create a reference field item and let it reference the entity.
     $definition = array(
-      'type' => 'entity_reference_field',
+      'type' => 'field_item:entity_reference',
       'settings' => array(
         'target_type' => 'entity_test',
       ),
@@ -563,7 +563,7 @@ class EntityFieldTest extends EntityUnitTestBase  {
 
     // Test bundle validation.
     $definition = array(
-      'type' => 'entity_reference_field',
+      'type' => 'field_item:entity_reference',
       'settings' => array(
         'target_type' => 'node',
         'target_bundle' => 'article',

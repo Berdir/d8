@@ -51,11 +51,8 @@ class CommentItem extends ConfigFieldItemBase {
           'label' => t('Comment status value'),
         ),
         'cid' => array(
-          'type' => 'entity_reference_field',
           'label' => t('Last comment ID'),
-          'settings' => array(
-            'target_type' => 'comment',
-          ),
+          'type' => 'integer',
         ),
         'last_comment_timestamp' => array(
           'label' => t('Last comment timestamp'),
@@ -68,11 +65,8 @@ class CommentItem extends ConfigFieldItemBase {
           'type' => 'string',
         ),
         'last_comment_uid' => array(
-          'type' => 'entity_reference_field',
+          'type' => 'integer',
           'label' => t('Last comment user ID'),
-          'settings' => array(
-            'target_type' => 'user',
-          ),
         ),
         'comment_count' => array(
           'label' => t('Number of comments'),

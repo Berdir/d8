@@ -7,32 +7,12 @@
 
 namespace Drupal\entity_reference\Plugin\field\field_type;
 
-use Drupal\Core\Annotation\Translation;
-use Drupal\Core\Entity\Annotation\FieldType;
-use Drupal\Core\Entity\Field\Type\EntityReferenceItem;
 use Drupal\field\Plugin\Type\FieldType\ConfigEntityReferenceItemBase;
-use Drupal\field\Plugin\Type\FieldType\ConfigFieldItemBase;
 use Drupal\field\Plugin\Type\FieldType\ConfigFieldItemInterface;
 use Drupal\field\FieldInterface;
 
 /**
  * Plugin implementation of the 'entity_reference' field type.
- *
- * @FieldType(
- *   id = "entity_reference",
- *   label = @Translation("Entity Reference"),
- *   description = @Translation("This field references another entity."),
- *   settings = {
- *     "target_type" = "node"
- *   },
- *   instance_settings = {
- *     "handler" = "default",
- *     "handler_settings" = { }
- *   },
- *   default_widget = "entity_reference_autocomplete",
- *   default_formatter = "entity_reference_label",
- *   constraints = {"ValidReference" = TRUE}
- * )
  *
  * Extends the Core 'entity_reference' entity field item with properties for
  * revision ids, labels (for autocreate) and access.

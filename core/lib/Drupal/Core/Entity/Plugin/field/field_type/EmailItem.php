@@ -2,28 +2,55 @@
 
 /**
  * @file
- * Contains \Drupal\email\Plugin\field\field_type\ConfigurableEmailItem.
+ * Contains \Drupal\Core\Entity\Plugin\field\field_type\EmailItem.
  */
 
-namespace Drupal\email\Plugin\field\field_type;
+namespace Drupal\Core\Entity\Plugin\field\field_type;
 
-use Drupal\Core\Entity\Annotation\FieldType;
-use Drupal\Core\Annotation\Translation;
-use Drupal\Core\Entity\Plugin\DataType\EmailItem;
 use Drupal\field\FieldInterface;
+use Drupal\field\Plugin\Type\FieldType\ConfigFieldItemBase;
 
 /**
- * Plugin implementation of the 'email' field type.
+ * Defines the 'email' entity field type.
  *
  * @FieldType(
  *   id = "email",
  *   label = @Translation("E-mail"),
- *   description = @Translation("This field stores an e-mail address in the database."),
- *   default_widget = "email_default",
- *   default_formatter = "email_mailto"
+ *   description = @Translation("An entity field containing an e-mail value.")
  * )
  */
-class ConfigurableEmailItem extends EmailItem {
+class EmailItem extends ConfigFieldItemBase {
+
+  /**
+   * Definitions of the contained properties.
+   *
+   * @see EmailItem::getPropertyDefinitions()
+   *
+   * @var array
+   */
+  static $propertyDefinitions;
+
+  /**
+   * Implements ComplexDataInterface::getPropertyDefinitions().
+   */
+  public function getPropertyDefinitions() {
+
+    if (!isset(static::$propertyDefinitions)) {
+      static::$propertyDefinitions['value'] = array(
+        'type' => 'email',
+        'label' => t('E-mail value'),
+      );
+    }
+    return static::$propertyDefinitions;
+  }
+
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isEmpty() {
+    return $this->value === NULL || $this->value === '';
+  }
 
   /**
    * Defines the max length for an email address
