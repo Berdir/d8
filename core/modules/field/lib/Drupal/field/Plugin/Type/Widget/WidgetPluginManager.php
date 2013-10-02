@@ -235,7 +235,7 @@ class WidgetPluginManager extends DefaultPluginManager {
   /**
    * @todo Document.
    */
-  public function baseFieldExtractFormValues(FieldItemListInterfaceInterface $field, array &$form, array &$form_state) {
+  public function baseFieldExtractFormValues(FieldItemListInterface $field, array &$form, array &$form_state) {
     $options = array(
       'field_definition' => $field->getFieldDefinition(),
       'form_mode' => 'default',
