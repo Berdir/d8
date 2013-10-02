@@ -177,18 +177,18 @@ class EditFieldForm implements FormInterface, ContainerInjectionInterface {
     $entity = clone $form_state['entity'];
 
     $field_name = $form_state['field_name'];
-    $field = $entity->getNGEntity()->get($field_name);
-    if ($field->getFieldDefinition() instanceof FieldInstanceInterface) {
+    $items = $entity->get($field_name);
+    if ($items->getFieldDefinition() instanceof FieldInstanceInterface) {
       field_attach_extract_form_values($entity, $form, $form_state, array('field_name' => $field_name));
     }
     else {
-      \Drupal::service('plugin.manager.field.widget')->baseFieldExtractFormValues($field, $form, $form_state, $form_state['langcode']);
+      \Drupal::service('plugin.manager.field.widget')->baseFieldExtractFormValues($items, $form, $form_state);
     }
 
     // @todo Refine automated log messages and abstract them to all entity
     //   types: http://drupal.org/node/1678002.
     if ($entity->entityType() == 'node' && $entity->isNewRevision() && !isset($entity->log)) {
-      $entity->log = t('Updated the %field-name field through in-place editing.', array('%field-name' => $field->getFieldDefinition()->getFieldLabel()));
+      $entity->log = t('Updated the %field-name field through in-place editing.', array('%field-name' => $items->getFieldDefinition()->getFieldLabel()));
     }
 
     return $entity;

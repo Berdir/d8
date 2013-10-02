@@ -447,7 +447,7 @@ class NodeFormController extends ContentEntityFormController {
     else {
       $node->setCreatedTime(REQUEST_TIME);
     }
-    \Drupal::service('plugin.manager.field.widget')->baseFieldExtractFormValues($node->title, $form, $form_state, $this->getFormLangcode($form_state));
+    \Drupal::service('plugin.manager.field.widget')->baseFieldExtractFormValues($node->title, $form, $form_state);
     return $node;
   }
 

@@ -11,6 +11,7 @@ use Drupal\Component\Plugin\Factory\DefaultFactory;
 use Drupal\Component\Plugin\PluginManagerBase;
 use Drupal\Component\Plugin\Discovery\ProcessDecorator;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Entity\Field\FieldItemListInterface;
 use Drupal\Core\Entity\Field\FieldTypePluginManager;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageManager;
@@ -214,7 +215,7 @@ class WidgetPluginManager extends DefaultPluginManager {
   /**
    * @todo Document.
    */
-  public function baseFieldForm(FieldInterface $field, array &$form, array &$form_state, $langcode) {
+  public function baseFieldForm(FieldItemListInterface $field, array &$form, array &$form_state) {
     $options = array(
       'field_definition' => $field->getFieldDefinition(),
       'form_mode' => 'default',
@@ -225,18 +226,16 @@ class WidgetPluginManager extends DefaultPluginManager {
     }
     $widget = $this->getInstance($options);
 
-    $entity = $field->getParent()->getBCEntity();
-
     $form += array('#parents' => array());
-    $result = $widget->form($entity, $langcode, $field, $form, $form_state);
-    $field_name = $field->getName();
+    $result = $widget->form($field, $form, $form_state);
+    $field_name = $field->getFieldDefinition()->getFieldName();
     return isset($result[$field_name]) ? $result[$field_name] : array();
   }
 
   /**
    * @todo Document.
    */
-  public function baseFieldExtractFormValues(FieldInterface $field, array &$form, array &$form_state, $langcode) {
+  public function baseFieldExtractFormValues(FieldItemListInterfaceInterface $field, array &$form, array &$form_state) {
     $options = array(
       'field_definition' => $field->getFieldDefinition(),
       'form_mode' => 'default',
@@ -247,9 +246,7 @@ class WidgetPluginManager extends DefaultPluginManager {
     }
     $widget = $this->getInstance($options);
 
-    $entity = $field->getParent()->getBCEntity();
-
-    $widget->extractFormValues($entity, $langcode, $field, $form, $form_state);
+    $widget->extractFormValues($field, $form, $form_state);
   }
 
 }

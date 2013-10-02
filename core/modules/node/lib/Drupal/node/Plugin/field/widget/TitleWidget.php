@@ -7,6 +7,7 @@
 
 namespace Drupal\node\Plugin\field\widget;
 
+use Drupal\Core\Entity\Field\FieldItemListInterface;
 use Drupal\field\Annotation\FieldWidget;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Annotation\Translation;
@@ -31,8 +32,10 @@ class TitleWidget extends WidgetBase {
   /**
    * {@inheritdoc}
    */
-  public function form(EntityInterface $entity, $langcode, FieldInterface $items, array &$form, array &$form_state, $get_delta = NULL) {
+  public function form(FieldItemListInterface $items, array &$form, array &$form_state, $get_delta = NULL) {
     $field_name = $this->fieldDefinition->getFieldName();
+
+    $entity = $items->getEntity();
 
     // @todo Make EntityManager::getFieldDefinitions() allow for per-bundle
     //   definitions of base fields, so that here, we could just call
@@ -58,7 +61,7 @@ class TitleWidget extends WidgetBase {
   /**
    * {@inheritdoc}
    */
-  public function extractFormValues(EntityInterface $entity, $langcode, FieldInterface $items, array $form, array &$form_state) {
+  public function extractFormValues(FieldItemListInterface $items, array $form, array &$form_state) {
     $field_name = $this->fieldDefinition->getFieldName();
 
     // Extract the values from $form_state['values'].
@@ -74,7 +77,7 @@ class TitleWidget extends WidgetBase {
   /**
    * {@inheritdoc}
    */
-  public function formElement(FieldInterface $items, $delta, array $element, $langcode, array &$form, array &$form_state) {
+  public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, array &$form_state) {
     return array();
   }
 }
