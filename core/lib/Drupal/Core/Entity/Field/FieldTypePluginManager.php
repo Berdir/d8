@@ -56,11 +56,13 @@ class FieldTypePluginManager extends DefaultPluginManager {
    */
   public function processDefinition(&$definition, $plugin_id) {
     parent::processDefinition($definition, $plugin_id);
-    if ($definition['configurable']) {
-      $definition['list_class'] = '\Drupal\field\Plugin\Type\FieldType\ConfigFieldItemList';
-    }
-    else {
-      $definition['list_class'] = '\Drupal\Core\Entity\Field\FieldItemList';
+    if (!isset($definition['list_class'])) {
+      if ($definition['configurable']) {
+        $definition['list_class'] = '\Drupal\field\Plugin\Type\FieldType\ConfigFieldItemList';
+      }
+      else {
+        $definition['list_class'] = '\Drupal\Core\Entity\Field\FieldItemList';
+      }
     }
   }
 
