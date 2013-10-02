@@ -10,6 +10,7 @@ namespace Drupal\field\Plugin\Type\Formatter;
 use Drupal\Component\Plugin\PluginManagerBase;
 use Drupal\Component\Plugin\Factory\DefaultFactory;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Entity\Field\FieldItemListInterface;
 use Drupal\Core\Entity\Field\FieldTypePluginManager;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageManager;
@@ -209,9 +210,9 @@ class FormatterPluginManager extends DefaultPluginManager {
   /**
    * @todo Document.
    */
-  public function viewBaseField(FieldInterface $field) {
+  public function viewBaseField(FieldItemListInterface $items) {
     $options = array(
-      'field_definition' => $field->getFieldDefinition(),
+      'field_definition' => $items->getFieldDefinition(),
       'view_mode' => 'default',
       'configuration' => array(
         'label' => 'hidden',
@@ -219,14 +220,12 @@ class FormatterPluginManager extends DefaultPluginManager {
     );
     $formatter = $this->getInstance($options);
 
-    $entity = $field->getParent()->getBCEntity();
-    $entity_id = $entity->id();
-    $langcode = $entity->language()->id;
+    $entity = $items->getEntity();
 
-    $items_multi = array($entity_id => $field);
-    $formatter->prepareView(array($entity_id => $entity), $langcode, $items_multi);
-    $result = $formatter->view($entity, $langcode, $field);
-    $field_name = $field->getName();
+    $items_multi = array($entity->id() => $items);
+    $formatter->prepareView($items_multi);
+    $result = $formatter->view($items);
+    $field_name = $items->getFieldDefinition()->getFieldName();
     return isset($result[$field_name]) ? $result[$field_name] : array();
   }
 
