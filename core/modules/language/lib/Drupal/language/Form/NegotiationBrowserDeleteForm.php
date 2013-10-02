@@ -66,6 +66,8 @@ class NegotiationBrowserDeleteForm extends ConfirmFormBase {
       language_set_browser_drupal_langcode_mappings($mappings);
     }
 
+    // Rebuild the container to update the submitted settings.
+    drupal_rebuild_language_negotiation_settings();
     $form_state['redirect'] = 'admin/config/regional/language/detection/browser';
   }
 

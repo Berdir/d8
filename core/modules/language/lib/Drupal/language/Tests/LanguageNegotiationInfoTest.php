@@ -96,7 +96,7 @@ class LanguageNegotiationInfoTest extends WebTestBase {
     // Check language negotiation results.
     $this->drupalGet('');
     $last = \Drupal::state()->get('language_test.language_negotiation_last');
-    foreach (language_types_get_all() as $type) {
+    foreach (Drupal::languageManager()->getLanguageTypes() as $type) {
       $langcode = $last[$type];
       $value = $type == Language::TYPE_CONTENT || strpos($type, 'test') !== FALSE ? 'it' : 'en';
       $this->assertEqual($langcode, $value, format_string('The negotiated language for %type is %language', array('%type' => $type, '%language' => $value)));
@@ -107,7 +107,7 @@ class LanguageNegotiationInfoTest extends WebTestBase {
     $this->languageNegotiationUpdate('uninstall');
 
     // Check that only the core language types are available.
-    foreach (language_types_get_all() as $type) {
+    foreach (Drupal::languageManager()->getLanguageTypes() as $type) {
       $this->assertTrue(strpos($type, 'test') === FALSE, format_string('The %type language is still available', array('%type' => $type)));
     }
 

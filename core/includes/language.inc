@@ -113,42 +113,6 @@ const LANGUAGE_NEGOTIATION_INTERFACE = 'language-interface';
  */
 
 /**
- * Chooses a language based on language negotiation method settings.
- *
- * @param $type
- *   The language type key to find the language for.
- *
- * @param $request
- *   The HttpReqeust object representing the current request.
- *
- * @return
- *   The negotiated language object.
- */
-function language_types_initialize($type, $request = NULL) {
-  // Execute the language negotiation methods in the order they were set up and
-  // return the first valid language found.
-  $negotiation = variable_get("language_negotiation_$type", array());
-
-  foreach ($negotiation as $method_id => $method) {
-    // Skip negotiation methods not appropriate for this type.
-    if (isset($method['types']) && !in_array($type, $method['types'])) {
-      continue;
-    }
-    $language = language_negotiation_method_invoke($method_id, $method, $request);
-    if ($language) {
-      // Remember the method ID used to detect the language.
-      $language->method_id = $method_id;
-      return $language;
-    }
-  }
-
-  // If no other language was found use the default one.
-  $language = language_default();
-  $language->method_id = LANGUAGE_NEGOTIATION_SELECTED;
-  return $language;
-}
-
-/**
  * Returns information about all defined language types.
  *
  * @return
@@ -315,28 +279,7 @@ function language_negotiation_method_enabled($method_id, $type = NULL) {
  *   A keyed array of links ready to be themed.
  */
 function language_negotiation_get_switch_links($type, $path) {
-  $links = FALSE;
-  $negotiation = variable_get("language_negotiation_$type", array());
-
-  foreach ($negotiation as $method_id => $method) {
-    if (isset($method['callbacks']['language_switch'])) {
-      if (isset($method['file'])) {
-        require_once DRUPAL_ROOT . '/' . $method['file'];
-      }
-
-      $callback = $method['callbacks']['language_switch'];
-      $result = $callback($type, $path);
-
-      if (!empty($result)) {
-        // Allow modules to provide translations for specific links.
-        drupal_alter('language_switch_links', $result, $type, $path);
-        $links = (object) array('links' => $result, 'method_id' => $method_id);
-        break;
-      }
-    }
-  }
-
-  return $links;
+  return Drupal::languageManager()->getLanguageNegotiationSwitchLinks($type, $path);
 }
 
 /**
@@ -411,138 +354,7 @@ function language_negotiation_set($type, $method_weights) {
  *   An array of language negotiation methods.
  */
 function language_negotiation_info() {
-  $negotiation_info = &drupal_static(__FUNCTION__);
-
-  if (!isset($negotiation_info)) {
-    // Collect all the module-defined language negotiation methods.
-    $negotiation_info = \Drupal::moduleHandler()->invokeAll('language_negotiation_info');
-    $languages = language_list();
-    $selected_language = $languages[language_from_selected($languages)];
-    $description = 'Language based on a selected language. ';
-    $description .= ($selected_language->id == language_default()->id) ? "(Site's default language (@language_name))" : '(@language_name)';
-    // Add the default language negotiation method.
-    $negotiation_info[LANGUAGE_NEGOTIATION_SELECTED] = array(
-      'callbacks' => array(
-        'negotiation' => 'language_from_selected',
-      ),
-      'weight' => 12,
-      'name' => t('Selected language'),
-      'description' => t($description, array('@language_name' => $selected_language->name)),
-      'config' => 'admin/config/regional/language/detection/selected',
-    );
-
-     // Let other modules alter the list of language negotiation methods.
-     drupal_alter('language_negotiation_info', $negotiation_info);
-  }
-
-  return $negotiation_info;
-}
-
-/**
- * Invokes a language negotiation method and caches the results.
- *
- * @param $method_id
- *   The language negotiation method's identifier.
- * @param $method
- *   (optional) An associative array of information about the method to be
- *   invoked (see hook_language_negotiation_info() for details). If not passed
- *   in, it will be loaded through language_negotiation_info().
- *
- * @param $request
- *   (optional) The HttpRequest object representing the current request.
- *
- * @return
- *   A language object representing the language chosen by the method.
- */
-function language_negotiation_method_invoke($method_id, $method = NULL, $request = NULL) {
-  $results = &drupal_static(__FUNCTION__);
-
-  if (!isset($results[$method_id])) {
-    global $user;
-
-    $languages = language_list();
-
-    if (!isset($method)) {
-      $negotiation_info = language_negotiation_info();
-      $method = $negotiation_info[$method_id];
-    }
-
-    if (isset($method['file'])) {
-      require_once DRUPAL_ROOT . '/' . $method['file'];
-    }
-    // Check for a cache mode force from settings.php.
-    if (settings()->get('page_cache_without_database')) {
-      $cache_enabled = TRUE;
-    }
-    else {
-      drupal_bootstrap(DRUPAL_BOOTSTRAP_VARIABLES, FALSE);
-      $config = \Drupal::config('system.performance');
-      $cache_enabled = $config->get('cache.page.use_internal');
-    }
-    // If the language negotiation method has no cache preference or this is
-    // satisfied we can execute the callback.
-    $cache = !isset($method['cache']) || $user->isAuthenticated() || $method['cache'] == $cache_enabled;
-    $callback = isset($method['callbacks']['negotiation']) ? $method['callbacks']['negotiation'] : FALSE;
-    $langcode = $cache && function_exists($callback) ? $callback($languages, $request) : FALSE;
-    $results[$method_id] = isset($languages[$langcode]) ? $languages[$langcode] : FALSE;
-  }
-
-  // Since objects are resources, we need to return a clone to prevent the
-  // language negotiation method cache from being unintentionally altered. The
-  // same methods might be used with different language types based on
-  // configuration.
-  return !empty($results[$method_id]) ? clone($results[$method_id]) : $results[$method_id];
-}
-
- /**
-  * Identifies language from configuration.
-  *
-  * @param $languages
-  *   An array of valid language objects.
-  *
-  * @return
-  *   A valid language code on success, FALSE otherwise.
-  */
-function language_from_selected($languages) {
-  $langcode = (string) \Drupal::config('language.negotiation')->get('selected_langcode');
-  // Replace the site's default langcode by its real value.
-  if ($langcode == 'site_default') {
-    $langcode = language_default()->id;
-  }
-  return isset($languages[$langcode]) ? $langcode : language_default()->id;
-}
-
-/**
- * Splits the given path into prefix and actual path.
- *
- * Parse the given path and return the language object identified by the prefix
- * and the actual path.
- *
- * @param $path
- *   The path to split.
- * @param $languages
- *   An array of valid languages.
- *
- * @return
- *   An array composed of:
- *    - A language object corresponding to the identified prefix on success,
- *      FALSE otherwise.
- *    - The path without the prefix on success, the given path otherwise.
- */
-function language_url_split_prefix($path, $languages) {
-  $args = empty($path) ? array() : explode('/', $path);
-  $prefix = array_shift($args);
-
-  // Search prefix within enabled languages.
-  $prefixes = language_negotiation_url_prefixes();
-  foreach ($languages as $language) {
-    if (isset($prefixes[$language->id]) && $prefixes[$language->id] == $prefix) {
-      // Rebuild $path with the language removed.
-      return array($language, implode('/', $args));
-    }
-  }
-
-  return array(FALSE, $path);
+  return Drupal::service('plugin.manager.language_negotiation_method')->getDefinitions();
 }
 
 /**

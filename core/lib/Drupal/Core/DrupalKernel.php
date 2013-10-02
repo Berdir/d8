@@ -510,6 +510,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     $container->register('class_loader')->setSynthetic(TRUE);
     $container->register('kernel', 'Symfony\Component\HttpKernel\KernelInterface')->setSynthetic(TRUE);
     $container->register('service_container', 'Symfony\Component\DependencyInjection\ContainerInterface')->setSynthetic(TRUE);
+    // Register the kernel-level config storage.
+    $container->set('kernel.config.storage', $this->configStorage);
     $yaml_loader = new YamlFileLoader($container);
     foreach ($this->serviceYamls as $filename) {
       $yaml_loader->load($filename);

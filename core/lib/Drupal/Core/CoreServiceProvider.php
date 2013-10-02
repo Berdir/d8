@@ -13,6 +13,7 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\Compiler\ModifyServiceDefinitionsPass;
 use Drupal\Core\DependencyInjection\Compiler\RegisterKernelListenersPass;
 use Drupal\Core\DependencyInjection\Compiler\RegisterAccessChecksPass;
+use Drupal\Core\DependencyInjection\Compiler\RegisterLanguageNegotiationPass;
 use Drupal\Core\DependencyInjection\Compiler\RegisterPathProcessorsPass;
 use Drupal\Core\DependencyInjection\Compiler\RegisterRouteFiltersPass;
 use Drupal\Core\DependencyInjection\Compiler\RegisterRouteEnhancersPass;
@@ -51,6 +52,7 @@ class CoreServiceProvider implements ServiceProviderInterface  {
     $this->registerTwig($container);
     $this->registerModuleHandler($container);
     $this->registerUuid($container);
+    $this->registerLanguage($container);
 
     $container->addCompilerPass(new RegisterRouteFiltersPass());
     // Add a compiler pass for registering event subscribers.
@@ -160,5 +162,25 @@ class CoreServiceProvider implements ServiceProviderInterface  {
     $container->register('uuid', $uuid_class);
     return $uuid_class;
   }
+
+  /**
+   * Registers language related services.
+   */
+  protected function registerLanguage(ContainerBuilder $container) {
+    // @todo Refactor this when all language negotiation settings are converted
+    //   a single configuration object.
+    $storage = $container->get('kernel.config.storage');
+    $config = $storage->read('language.negotiation') ?: array();
+    $config += array('browser' => array('mappings' => $storage->read('language.mappings')));
+
+    // Register the 'language_manager' service.
+    $container->register('plugin.manager.language_negotiation_method', 'Drupal\Core\Language\LanguageNegotiationMethodManager')
+      ->addArgument(new Reference('container.namespaces'))
+      ->addArgument(new Reference('cache.cache'));
+    $container->register('language_manager', 'Drupal\Core\Language\LanguageManager')
+      ->addArgument($config)
+      ->addArgument(new Reference('plugin.manager.language_negotiation_method'))
+      ->addArgument(new Reference('state'));
+   }
 
 }

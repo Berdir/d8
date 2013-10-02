@@ -88,55 +88,6 @@ function hook_language_types_info_alter(array &$language_types) {
 }
 
 /**
- * Define language negotiation methods.
- *
- * @return
- *   An associative array of language negotiation method definitions. The keys
- *   are method identifiers, and the values are associative arrays definining
- *   each method, with the following elements:
- *   - types: An array of allowed language types. If a language negotiation
- *     method does not specify which language types it should be used with, it
- *     will be available for all the configurable language types.
- *   - callbacks: An associative array of functions that will be called to
- *     perform various tasks. Possible elements are:
- *     - negotiation: (required) Name of the callback function that determines
- *       the language value.
- *     - language_switch: (optional) Name of the callback function that
- *       determines links for a language switcher block associated with this
- *       method. See language_switcher_url() for an example.
- *     - url_rewrite: (optional) Name of the callback function that provides URL
- *       rewriting, if needed by this method.
- *   - file: The file where callback functions are defined (this file will be
- *     included before the callbacks are invoked).
- *   - weight: The default weight of the method.
- *   - name: The translated human-readable name for the method.
- *   - description: A translated longer description of the method.
- *   - config: An internal path pointing to the method's configuration page.
- *   - cache: The value Drupal's page cache should be set to for the current
- *     method to be invoked.
- *
- * @see hook_language_negotiation_info_alter()
- * @ingroup language_negotiation
- */
-function hook_language_negotiation_info() {
-  return array(
-    'custom_language_negotiation_method' => array(
-      'callbacks' => array(
-        'negotiation' => 'custom_negotiation_callback',
-        'language_switch' => 'custom_language_switch_callback',
-        'url_rewrite' => 'custom_url_rewrite_callback',
-      ),
-      'file' => drupal_get_path('module', 'custom') . '/custom.module',
-      'weight' => -4,
-      'types' => array('custom_language_type'),
-      'name' => t('Custom language negotiation method'),
-      'description' => t('This is a custom language negotiation method.'),
-      'cache' => 0,
-    ),
-  );
-}
-
-/**
  * Perform alterations on language negotiation methods.
  *
  * @param $negotiation_info

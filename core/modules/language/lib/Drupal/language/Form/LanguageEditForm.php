@@ -54,6 +54,8 @@ class LanguageEditForm extends LanguageFormBase {
     $language->name = $form_state['values']['name'];
     $language->direction = $form_state['values']['direction'];
     language_save($language);
+    // Rebuild the container to update the submitted settings.
+    drupal_rebuild_language_negotiation_settings();
     $form_state['redirect'] = 'admin/config/regional/language';
   }
 

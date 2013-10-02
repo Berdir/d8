@@ -117,14 +117,14 @@ class LanguageListTest extends WebTestBase {
     $this->drupalGet('admin/config/regional/language/delete/' . $langcode);
     $this->assertResponse(404, 'Language no longer found.');
     // Make sure the "language_count" state has been updated correctly.
-    drupal_static_reset('language_list');
+    $this->container->get('language_manager')->reset();
     $languages = language_list();
     $language_count =  $this->container->get('state')->get('language_count') ?: 1;
     $this->assertEqual($language_count, count($languages), 'Language count is correct.');
     // Delete French.
     $this->drupalPostForm('admin/config/regional/language/delete/fr', array(), t('Delete'));
     // Get the count of languages.
-    drupal_static_reset('language_list');
+    $this->container->get('language_manager')->reset();
     $languages = language_list();
     // We need raw here because %language and %langcode will add HTML.
     $t_args = array('%language' => 'French', '%langcode' => 'fr');

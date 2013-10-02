@@ -17,6 +17,23 @@ namespace Drupal\Core\Language;
  * @see language_default()
  */
 class Language {
+
+  /**
+   * The values to use to instantiate the default language.
+   *
+   * @todo Remove once converted to config.
+   *
+   * @var array
+   */
+  public static $defaultValues = array(
+    'id' => 'en',
+    'name' => 'English',
+    'direction' => 0,
+    'weight' => 0,
+    'locked' => 0,
+    'default' => TRUE,
+  );
+
   // Properties within the Language are set up as the default language.
   public $name = '';
   public $id = '';

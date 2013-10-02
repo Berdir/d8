@@ -156,7 +156,7 @@ class LanguageConfigurationTest extends WebTestBase {
    */
   protected function checkConfigurableLanguageWeight($state = 'by default') {
     // Reset language list.
-    drupal_static_reset('language_list');
+    $this->container->get('language_manager')->reset();
     $max_configurable_language_weight = $this->getHighestConfigurableLanguageWeight();
     $replacements = array('@event' => $state);
     foreach (language_list(Language::STATE_LOCKED) as $locked_language) {

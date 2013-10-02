@@ -56,33 +56,6 @@ function language_test_language_types_info_alter(array &$language_types) {
 }
 
 /**
- * Implements hook_language_negotiation_info().
- */
-function language_test_language_negotiation_info() {
-  if (\Drupal::state()->get('language_test.language_negotiation_info')) {
-    $info = array(
-      'callbacks' => array(
-        'negotiation' => 'language_test_language_negotiation_method',
-      ),
-      'file' => drupal_get_path('module', 'language_test') .'/language_test.module',
-      'weight' => -10,
-      'description' => t('This is a test language negotiation method.'),
-    );
-
-    return array(
-      'test_language_negotiation_method' => array(
-        'name' => t('Test'),
-        'types' => array(Language::TYPE_CONTENT, 'test_language_type', 'fixed_test_language_type'),
-      ) + $info,
-      'test_language_negotiation_method_ts' => array(
-        'name' => t('Type-specific test'),
-        'types' => array('test_language_type'),
-      ) + $info,
-    );
-  }
-}
-
-/**
  * Implements hook_language_negotiation_info_alter().
  */
 function language_test_language_negotiation_info_alter(array &$negotiation_info) {
@@ -96,16 +69,9 @@ function language_test_language_negotiation_info_alter(array &$negotiation_info)
  */
 function language_test_store_language_negotiation() {
   $last = array();
-  print_r(language_types_get_all());
-  foreach (language_types_get_all() as $type) {
+  print_r(Drupal::languageManager()->getLanguageTypes());
+  foreach (Drupal::languageManager()->getLanguageTypes() as $type) {
     $last[$type] = language($type)->id;
   }
   \Drupal::state()->set('language_test.language_negotiation_last', $last);
-}
-
-/**
- * Provides a test language negotiation method.
- */
-function language_test_language_negotiation_method($languages) {
-  return 'it';
 }

@@ -85,6 +85,7 @@ class LanguageConfigurationElementTest extends WebTestBase {
     $langcode = language_get_default_langcode('custom_type', 'custom_bundle');
     $language_interface = language(Language::TYPE_INTERFACE);
     $this->assertEqual($langcode, $language_interface->id);
+    drupal_rebuild_language_negotiation_settings();
 
     // Site's default.
     $old_default = language_default();

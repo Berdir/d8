@@ -2369,33 +2369,6 @@ function language($type) {
 }
 
 /**
- * Returns an array of the available language types.
- *
- * @return array
- *   An array of all language types where the keys of each are the language type
- *   name and its value is its configurability (TRUE/FALSE).
- */
-function language_types_get_all() {
-  $types = \Drupal::config('system.language.types')->get('all');
-  return $types ? $types : array_keys(language_types_get_default());
-}
-
-/**
- * Returns a list of the built-in language types.
- *
- * @return array
- *   An array of key-values pairs where the key is the language type name and
- *   the value is its configurability (TRUE/FALSE).
- */
-function language_types_get_default() {
-  return array(
-    Language::TYPE_INTERFACE => TRUE,
-    Language::TYPE_CONTENT => FALSE,
-    Language::TYPE_URL => FALSE,
-  );
-}
-
-/**
  * Returns TRUE if there is more than one language enabled.
  *
  * @return bool
@@ -2418,65 +2391,7 @@ function language_multilingual() {
  *   weight ascending and name ascending.
  */
 function language_list($flags = Language::STATE_CONFIGURABLE) {
-
-  $languages = &drupal_static(__FUNCTION__);
-
-  // Initialize master language list.
-  if (!isset($languages)) {
-    // Initialize local language list cache.
-   $languages = array();
-
-    // Fill in master language list based on current configuration.
-    $default = language_default();
-    if (language_multilingual() || module_exists('language')) {
-      // Use language module configuration if available.
-      $language_entities = config_get_storage_names_with_prefix('language.entity');
-
-      // Initialize default property so callers have an easy reference and can
-      // save the same object without data loss.
-      foreach ($language_entities as $langcode_config_name) {
-        $langcode = substr($langcode_config_name, strlen('language.entity.'));
-        $info = \Drupal::config($langcode_config_name)->get();
-        $languages[$langcode] = new Language(array(
-          'default' => ($info['id'] == $default->id),
-          'name' => $info['label'],
-          'id' => $info['id'],
-          'direction' => $info['direction'],
-          'locked' => $info['locked'],
-          'weight' => $info['weight'],
-        ));
-      }
-      Language::sort($languages);
-    }
-    else {
-      // No language module, so use the default language only.
-      $languages = array($default->id => $default);
-      // Add the special languages, they will be filtered later if needed.
-      $languages += language_default_locked_languages($default->weight);
-    }
-  }
-
-  // Filter the full list of languages based on the value of the $all flag. By
-  // default we remove the locked languages, but the caller may request for
-  // those languages to be added as well.
-  $filtered_languages = array();
-
-  // Add the site's default language if flagged as allowed value.
-  if ($flags & Language::STATE_SITE_DEFAULT) {
-    $default = isset($default) ? $default : language_default();
-    // Rename the default language.
-    $default->name = t("Site's default language (@lang_name)", array('@lang_name' => $default->name));
-    $filtered_languages['site_default'] = $default;
-  }
-
-  foreach ($languages as $langcode => $language) {
-    if (($language->locked && !($flags & Language::STATE_LOCKED)) || (!$language->locked && !($flags & Language::STATE_CONFIGURABLE))) {
-      continue;
-     }
-    $filtered_languages[$langcode] = $language;
-  }
-
-  return $filtered_languages;
+  return Drupal::languageManager()->getLanguageList($flags);
 }
 
 /**
@@ -2490,24 +2405,7 @@ function language_list($flags = Language::STATE_CONFIGURABLE) {
  *   An array of language objects.
  */
 function language_default_locked_languages($weight = 0) {
-  $locked_language = array(
-    'default' => FALSE,
-    'locked' => TRUE,
-    'enabled' => TRUE,
-  );
-
-  $languages = array();
-  $languages[Language::LANGCODE_NOT_SPECIFIED] = new Language(array(
-    'id' => Language::LANGCODE_NOT_SPECIFIED,
-    'name' => t('Not specified'),
-    'weight' => ++$weight,
-  ) + $locked_language);
-  $languages[Language::LANGCODE_NOT_APPLICABLE] = new Language(array(
-    'id' => Language::LANGCODE_NOT_APPLICABLE,
-    'name' => t('Not applicable'),
-    'weight' => ++$weight,
-  ) + $locked_language);
-  return $languages;
+  return Drupal::languageManager()->getDefaultLockedLanguages($weight);
 }
 
 /**
@@ -2518,10 +2416,11 @@ function language_default_locked_languages($weight = 0) {
  *
  * @return \Drupal\core\Language\Language|null
  *   A fully-populated language object or NULL.
+ *
+ * @see \Druoal\Core\Language\LanguageManager::loadLanguage().
  */
 function language_load($langcode) {
-  $languages = language_list(Language::STATE_ALL);
-  return isset($languages[$langcode]) ? $languages[$langcode] : NULL;
+  return Drupal::languageManager()->loadLanguage($langcode);
 }
 
 /**
@@ -2568,15 +2467,8 @@ function language_is_locked($langcode) {
  *   A language object.
  */
 function language_default() {
-  $info = variable_get('language_default', array(
-    'id' => 'en',
-    'name' => 'English',
-    'direction' => 0,
-    'weight' => 0,
-    'locked' => 0,
-  ));
-  $info['default'] = TRUE;
-  return new Language($info);
+  $default_info = variable_get('language_default', Language::$defaultValues);
+  return new Language($default_info + array('default' => TRUE));
 }
 
 /**

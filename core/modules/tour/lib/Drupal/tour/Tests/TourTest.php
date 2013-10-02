@@ -108,6 +108,7 @@ class TourTest extends TourTestBasic {
     // Enable Italian language and navigate to it/tour-test1 and verify italian
     // version of tip is found.
     language_save(new Language(array('id' => 'it')));
+    drupal_rebuild_language_negotiation_settings();
     $this->drupalGet('it/tour-test-1');
 
     $elements = $this->xpath('//li[@data-id=:data_id and ./h2[contains(., :text)]]', array(

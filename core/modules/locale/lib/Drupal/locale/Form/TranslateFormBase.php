@@ -161,7 +161,7 @@ abstract class TranslateFormBase extends FormBase {
     $filters = array();
 
     // Get all languages, except English.
-    drupal_static_reset('language_list');
+    $this->languageManager->reset();
     $languages = language_list();
     $language_options = array();
     foreach ($languages as $langcode => $language) {

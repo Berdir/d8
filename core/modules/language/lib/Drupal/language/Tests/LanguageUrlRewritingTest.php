@@ -46,8 +46,6 @@ class LanguageUrlRewritingTest extends WebTestBase {
     $edit = array('language_interface[enabled][language-url]' => 1);
     $this->drupalPostForm('admin/config/regional/language/detection', $edit, t('Save settings'));
 
-    // Reset static caching.
-    drupal_static_reset('language_list');
   }
 
   /**
@@ -119,7 +117,7 @@ class LanguageUrlRewritingTest extends WebTestBase {
       ->save();
 
     // Reset static caching.
-    drupal_static_reset('language_list');
+    $this->container->get('language_manager')->reset();
 
     // In case index.php is part of the URLs, we need to adapt the asserted
     // URLs as well.

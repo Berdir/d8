@@ -197,9 +197,6 @@ services:
   http_kernel:
     class: Drupal\Core\HttpKernel
     arguments: ['@event_dispatcher', '@service_container', '@controller_resolver']
-  language_manager:
-    class: Drupal\Core\Language\LanguageManager
-    arguments: ['@state']
   string_translator.custom_strings:
     class: Drupal\Core\StringTranslation\Translator\CustomStrings
     arguments: ['@settings']

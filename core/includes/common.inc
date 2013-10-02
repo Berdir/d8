@@ -4839,6 +4839,14 @@ function drupal_flush_all_caches() {
 }
 
 /**
+ * Rebuild the container to store updated language negotiation settings.
+ */
+function drupal_rebuild_language_negotiation_settings() {
+  Drupal::service('plugin.manager.language_negotiation_method')->clearCachedDefinitions();
+  PhpStorageFactory::get('service_container')->deleteAll();
+}
+
+/**
  * Changes the dummy query string added to all CSS and JavaScript files.
  *
  * Changing the dummy query string appended to CSS and JavaScript files forces

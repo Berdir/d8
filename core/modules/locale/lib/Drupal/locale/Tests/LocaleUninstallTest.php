@@ -90,10 +90,10 @@ class LocaleUninstallTest extends WebTestBase {
 
     // Change language negotiation options.
     drupal_load('module', 'locale');
-    \Drupal::config('system.language.types')->set('configurable', language_types_get_default() + array('language_custom' => TRUE))->save();
-    variable_set('language_negotiation_' . Language::TYPE_INTERFACE, language_language_negotiation_info());
-    variable_set('language_negotiation_' . Language::TYPE_CONTENT, language_language_negotiation_info());
-    variable_set('language_negotiation_' . Language::TYPE_URL, language_language_negotiation_info());
+    \Drupal::config('system.language.types')->set('configurable', $this->container->get('language_manager')->getTypeDefaults() + array('language_custom' => TRUE))->save();
+    variable_set('language_negotiation_' . Language::TYPE_INTERFACE, language_negotiation_info());
+    variable_set('language_negotiation_' . Language::TYPE_CONTENT, language_negotiation_info());
+    variable_set('language_negotiation_' . Language::TYPE_URL, language_negotiation_info());
 
     // Change language negotiation settings.
     \Drupal::config('language.negotiation')
@@ -119,7 +119,7 @@ class LocaleUninstallTest extends WebTestBase {
 
     // Check language negotiation.
     require_once DRUPAL_ROOT . '/core/includes/language.inc';
-    $this->assertTrue(count(language_types_get_all()) == count(language_types_get_default()), 'Language types reset');
+    $this->assertTrue(count($this->container->get('language_manager')->getLanguageTypes()) == count($this->container->get('language_manager')->getTypeDefaults()), 'Language types reset');
     $language_negotiation = language_negotiation_method_get_first(Language::TYPE_INTERFACE) == LANGUAGE_NEGOTIATION_SELECTED;
     $this->assertTrue($language_negotiation, String::format('Interface language negotiation: %setting', array('%setting' => $language_negotiation ? 'none' : 'set')));
     $language_negotiation = language_negotiation_method_get_first(Language::TYPE_CONTENT) == LANGUAGE_NEGOTIATION_SELECTED;

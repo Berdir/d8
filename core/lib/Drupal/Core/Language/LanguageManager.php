@@ -7,6 +7,7 @@
 
 namespace Drupal\Core\Language;
 
+use Drupal\Component\Plugin\PluginManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Drupal\Core\KeyValueStore\KeyValueStoreInterface;
 
@@ -16,18 +17,16 @@ use Drupal\Core\KeyValueStore\KeyValueStoreInterface;
 class LanguageManager {
 
   /**
-   * A request object.
-   *
-   * @var \Symfony\Component\HttpFoundation\Request
+   * The language negotiation method id for the language manager.
    */
-  protected $request;
+  const METHOD_ID = 'language-default';
 
   /**
    * The Key/Value Store to use for state.
    *
    * @var \Drupal\Core\KeyValueStore\KeyValueStoreInterface
    */
-  protected $state = NULL;
+  protected $state;
 
   /**
    * An array of language objects keyed by language type.
@@ -35,6 +34,34 @@ class LanguageManager {
    * @var array
    */
   protected $languages;
+
+  /**
+   * An array of all the available languages keyed by language code.
+   *
+   * @var array
+   */
+  protected $languageList;
+
+  /**
+   * An array of configuration.
+   *
+   * @var array
+   */
+  protected $config;
+
+  /**
+   * The language negotiation method plugin manager.
+   *
+   * @var \Drupal\Component\Plugin\PluginManagerInterface
+   */
+  protected $negotiatorManager;
+
+  /**
+   * A request object.
+   *
+   * @var \Symfony\Component\HttpFoundation\Request
+   */
+  protected $request;
 
   /**
    * Whether or not the language manager has been initialized.
@@ -46,20 +73,23 @@ class LanguageManager {
   /**
    * Whether already in the process of language initialization.
    *
-   * @todo This is only needed due to the circular dependency between language
-   *   and config. See http://drupal.org/node/1862202 for the plan to fix this.
-   *
    * @var bool
    */
   protected $initializing = FALSE;
 
   /**
-   * Constructs an LanguageManager object.
+   * Constructs a new LanguageManager object.
    *
-   * @param \Drupal\Core\KeyValueStore\KeyValueStoreInterface $state
-   *   The state keyvalue store.
+   * @param array $config
+   *   An array of configuration.
+   * @param \Drupal\Component\Plugin\PluginManagerInterface $negotiator_manager
+   *   The language negotiation methods plugin manager
+   * @param \Drupal\Core\KeyValueStoreInterface $state
+   *   The state key value store.
    */
-  public function __construct(KeyValueStoreInterface $state = NULL) {
+  public function __construct(array $config, PluginManagerInterface $negotiator_manager, KeyValueStoreInterface $state) {
+    $this->config = $config;
+    $this->negotiatorManager = $negotiator_manager;
     $this->state = $state;
   }
 
@@ -71,9 +101,11 @@ class LanguageManager {
       return;
     }
     if ($this->isMultilingual()) {
-      foreach ($this->getLanguageTypes() as $type) {
-        $this->getLanguage($type);
-      }
+      // This is still assumed by various functions to be loaded.
+      include_once DRUPAL_ROOT . '/core/includes/language.inc';
+    }
+    foreach ($this->getLanguageTypes() as $type) {
+      $this->getLanguage($type);
     }
     $this->initialized = TRUE;
   }
@@ -105,28 +137,116 @@ class LanguageManager {
       return $this->languages[$type];
     }
 
+    // Ensure we have a valid value for this language type.
+    $this->languages[$type] = $this->getLanguageDefault();
+
     if ($this->isMultilingual() && $this->request) {
       if (!$this->initializing) {
         $this->initializing = TRUE;
-        // @todo Objectify the language system so that we don't have to load an
-        //   include file and call out to procedural code. See
-        //   http://drupal.org/node/1862202
-        include_once DRUPAL_ROOT . '/core/includes/language.inc';
-        $this->languages[$type] = language_types_initialize($type, $this->request);
+        $this->languages[$type] = $this->initializeType($type);
         $this->initializing = FALSE;
       }
-      else {
-        // Config has called getLanguage() during initialization of a language
-        // type. Simply return the default language without setting it on the
-        // $this->languages property. See the TODO in the docblock for the
-        // $initializing property.
-        return $this->getLanguageDefault();
+      // If the current interface language needs to be retrieved during
+      // initialization we return the system language. This way t() calls
+      // happening during initialization will return the original strings which
+      // can be translated by calling t() again afterwards. This can happen for
+      // instance while parsing negotiation method definitions.
+      elseif ($type == Language::TYPE_INTERFACE) {
+        return new Language(array('id' => Language::LANGCODE_SYSTEM));
       }
     }
-    else {
-      $this->languages[$type] = $this->getLanguageDefault();
-    }
+
     return $this->languages[$type];
+  }
+
+  /**
+   * Initializes the specified language type.
+   *
+   * @param string $type
+   *   The language type to be initialized.
+   */
+  public function initializeType($type) {
+    // Execute the language negotiation methods in the order they were set up
+    // and return the first valid language found.
+    foreach ($this->getNegotiationForType($type) as $method_id) {
+      if (!isset($this->negotiated[$method_id])) {
+        $this->negotiated[$method_id] = $this->negotiateLanguage($type, $method_id);
+      }
+
+      // Since objects are references, we need to return a clone to prevent the
+      // language negotiation method cache from being unintentionally altered.
+      // The same methods might be used with different language types based on
+      // configuration.
+      $language = !empty($this->negotiated[$method_id]) ? clone($this->negotiated[$method_id]) : FALSE;
+
+      if ($language) {
+        // Remember the method ID used to detect the language.
+        $language->method_id = $method_id;
+        return $language;
+      }
+    }
+
+    // If no other language was found use the default one.
+    $language = $this->getLanguageDefault();
+    $language->method_id = LanguageManager::METHOD_ID;
+    return $language;
+  }
+
+  /**
+   * Returns the negotiation settings for the specified language type.
+   *
+   * @param string $type
+   *   The type of the language to retireve the negotiation settings for.
+   *
+   * @returns array
+   *   An array of language negotiation method identifiers ordered by method
+   *   weight.
+   */
+  protected function getNegotiationForType($type) {
+    // @todo convert to CMI https://drupal.org/node/1827038
+    return array_keys(variable_get("language_negotiation_$type", array()));
+  }
+
+  /**
+   * Performs language negotiation using the specified negotiation method.
+   *
+   * @param string $type
+   *   The language type to be initialized.
+   * @param string $method_id
+   *   The string identifier of the language negotiation method to use to detect
+   *   language.
+   *
+   * @return \Drupal\Core\Language\Language|FALSE
+   *   Negotiated language object for given type and method, FALSE otherwise.
+   */
+  protected function negotiateLanguage($type, $method_id) {
+    global $user;
+    $langcode = FALSE;
+    $languages = $this->getLanguageList();
+    $method = $this->negotiatorManager->getDefinition($method_id);
+
+    if (!isset($method['types']) || in_array($type, $method['types'])) {
+
+      // Check for a cache mode force from settings.php.
+      if (settings()->get('page_cache_without_database')) {
+        $cache_enabled = TRUE;
+      }
+      else {
+        drupal_bootstrap(DRUPAL_BOOTSTRAP_VARIABLES, FALSE);
+        $config = \Drupal::config('system.performance');
+        $cache_enabled = $config->get('cache.page.use_internal');
+      }
+
+      // If the language negotiation method has no cache preference or this is
+      // satisfied we can execute the callback.
+      if ($cache = !isset($method['cache']) || $user->isAuthenticated() || $method['cache'] == $cache_enabled;) {
+        $negotiator = $this->negotiatorManager->createInstance($method_id, $this->config);
+        $negotiator->setLanguageManager($this);
+        $langcode = $negotiator->negotiateLanguage($languages, $this->request);
+      }
+    }
+
+    return isset($languages[$langcode]) ? $languages[$langcode] : FALSE;
   }
 
   /**
@@ -141,6 +261,7 @@ class LanguageManager {
     if (!isset($type)) {
       $this->languages = array();
       $this->initialized = FALSE;
+      $this->languageList = NULL;
     }
     elseif (isset($this->languages[$type])) {
       unset($this->languages[$type]);
@@ -154,21 +275,70 @@ class LanguageManager {
    *   TRUE if more than one language is enabled, FALSE otherwise.
    */
   public function isMultilingual() {
-    if (!isset($this->state)) {
-      // No state service in install time.
-      return FALSE;
-    }
     return ($this->state->get('language_count') ?: 1) > 1;
   }
 
   /**
    * Returns an array of the available language types.
    *
-   * @return array()
-   *   An array of all language types.
+   * @return array
+   *   An array of all language types where the keys of each are the language type
+   *   name and its value is its configurability (TRUE/FALSE).
    */
-  protected function getLanguageTypes() {
-    return language_types_get_all();
+  public function getLanguageTypes() {
+    $types = \Drupal::config('system.language.types')->get('all');
+    return $types ? $types : array_keys($this->getTypeDefaults());
+  }
+
+  /**
+   * Returns a list of the built-in language types.
+   *
+   * @return array
+   *   An array of key-values pairs where the key is the language type name and
+   *   the value is its configurability (TRUE/FALSE).
+   */
+  public function getTypeDefaults() {
+    return array(
+      Language::TYPE_INTERFACE => TRUE,
+      Language::TYPE_CONTENT => FALSE,
+      Language::TYPE_URL => FALSE,
+    );
+  }
+
+  /**
+   * Returns the language switch links for the given language type.
+   *
+   * @param $type
+   *   The language type.
+   * @param $path
+   *   The internal path the switch links will be relative to.
+   *
+   * @return array
+   *   A keyed array of links ready to be themed.
+   */
+  function getLanguageNegotiationSwitchLinks($type, $path) {
+    $links = FALSE;
+    $negotiation = variable_get("language_negotiation_$type", array());
+
+    foreach ($negotiation as $method_id => $method) {
+      if (isset($method['callbacks']['language_switch'])) {
+        if (isset($method['file'])) {
+          require_once DRUPAL_ROOT . '/' . $method['file'];
+        }
+
+        $callback = $method['callbacks']['language_switch'];
+        $result = $callback($type, $path);
+
+        if (!empty($result)) {
+          // Allow modules to provide translations for specific links.
+          \Drupal::moduleHandler()->alter('language_switch_links', $result, $type, $path);
+          $links = (object) array('links' => $result, 'method_id' => $method_id);
+          break;
+        }
+      }
+    }
+
+    return $links;
   }
 
   /**
@@ -177,16 +347,104 @@ class LanguageManager {
    * @return \Drupal\Core\Language\Language
    *   A language object.
    */
-  protected function getLanguageDefault() {
-    $default_info = variable_get('language_default', array(
-      'id' => 'en',
-      'name' => 'English',
-      'direction' => 0,
-      'weight' => 0,
-      'locked' => 0,
-    ));
-    $default_info['default'] = TRUE;
-    return new Language($default_info);
+  public function getLanguageDefault() {
+    // @todo convert to CMI https://drupal.org/node/1827038
+    $default_info = variable_get('language_default', Language::$defaultValues);
+    return new Language($default_info + array('default' => TRUE));
+  }
+
+  /**
+    * Returns a list of languages set up on the site.
+    *
+    * @param $flags
+    *   (optional) Specifies the state of the languages that have to be returned.
+    *   It can be: Language::STATE_CONFIGURABLE, Language::STATE_LOCKED, Language::STATE_ALL.
+    *
+    * @return array
+    *   An associative array of languages, keyed by the language code, ordered by
+    *   weight ascending and name ascending.
+    */
+  public function getLanguageList($flags = Language::STATE_CONFIGURABLE) {
+    // Initialize master language list.
+    if (!isset($this->languageList)) {
+      // Initialize local language list cache.
+      $this->languageList = array();
+      // Fill in master language list based on current configuration.
+      $default = $this->getLanguageDefault();
+      // No language module, so use the default language only.
+      $this->languageList = array($default->id => $default);
+      // Add the special languages, they will be filtered later if needed.
+      $this->languageList += $this->getDefaultLockedLanguages($default->weight);
+    }
+
+    // Filter the full list of languages based on the value of the $all flag. By
+    // default we remove the locked languages, but the caller may request for
+    // those languages to be added as well.
+    $filtered_languages = array();
+
+    // Add the site's default language if flagged as allowed value.
+    if ($flags & Language::STATE_SITE_DEFAULT) {
+      $default = isset($default) ? $default : $this->getLanguageDefault();
+      // Rename the default language.
+      $default->name = t("Site's default language (@lang_name)", array('@lang_name' => $default->name));
+      $filtered_languages['site_default'] = $default;
+    }
+
+    foreach ($this->languageList as $id => $language) {
+      if (($language->locked && !($flags & Language::STATE_LOCKED)) || (!$language->locked && !($flags & Language::STATE_CONFIGURABLE))) {
+        continue;
+       }
+      $filtered_languages[$id] = $language;
+    }
+
+    return $filtered_languages;
+  }
+
+  /**
+   * Loads a language object from the database.
+   *
+   * @param string $langcode
+   *   The language code.
+   *
+   * @return \Drupal\core\Language\Language|null
+   *   A fully-populated language object or NULL.
+   */
+  public function loadLanguage($langcode) {
+    $languages = $this->getLanguageList(Language::STATE_ALL);
+    return isset($languages[$langcode]) ? $languages[$langcode] : NULL;
+  }
+
+  /**
+   * Returns a list of the default locked languages.
+   *
+   * @param int $weight
+   *   (optional) An integer value that is used as the start value for the
+   *   weights of the locked languages.
+   *
+   * @return array
+   *   An array of language objects.
+   */
+  public function getDefaultLockedLanguages($weight = 0) {
+    $languages = array();
+
+    $locked_language = array(
+      'default' => FALSE,
+      'locked' => TRUE,
+      'enabled' => TRUE,
+     );
+    $languages[Language::LANGCODE_NOT_SPECIFIED] = new Language(array(
+      'id' => Language::LANGCODE_NOT_SPECIFIED,
+      'name' => t('Not specified'),
+      'weight' => ++$weight,
+    ) + $locked_language);
+
+    $languages[Language::LANGCODE_NOT_APPLICABLE] = new Language(array(
+      'id' => Language::LANGCODE_NOT_APPLICABLE,
+      'name' => t('Not applicable'),
+      'weight' => ++$weight,
+    ) + $locked_language);
+
+    return $languages;
   }
 
   /**
@@ -306,6 +564,16 @@ class LanguageManager {
       'zh-hans' => array('Chinese, Simplified', '简体中文'),
       'zh-hant' => array('Chinese, Traditional', '繁體中文'),
     );
+  }
+
+  /**
+   * Returns an array of the available language types.
+   *
+   * @return array
+   *   An array of all language types where the keys of each are the language type
+   *   name and its value is its configurability (TRUE/FALSE).
+   */
+  public function getTypes() {
   }
 
 }

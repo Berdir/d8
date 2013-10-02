@@ -42,51 +42,43 @@ class PathProcessorLanguage implements InboundPathProcessorInterface, OutboundPa
    */
   protected $languageManager;
 
-  /**
-   * An array of enabled languages.
-   *
-   * @var array
-   */
-  protected $languages;
-
 
   /**
    * Constructs a PathProcessorLanguage object.
    *
    * @param \Drupal\Core\Config\ConfigFactory $config
    *   A config factory object for retrieving configuration settings.
-   *
-   * @param array $languages
-   *   An array of languages, keyed by language code, representing the languages
-   *   currently enabled on the site.
+   * @param LanguageManager $language_manager
+   *   A LanguageManager object.
    */
-  public function __construct(ConfigFactory $config, Settings $settings, LanguageManager $language_manager, array $languages = array()) {
+  public function __construct(ConfigFactory $config, Settings $settings, LanguageManager $language_manager) {
     $this->config = $config;
     $this->mixedModeSessions = $settings->get('mixed_mode_sessions', FALSE);
     $this->languageManager = $language_manager;
-    if (empty($languages)) {
-      $languages = language_list();
-    }
-    $this->languages = $languages;
   }
 
   /**
    * Implements Drupal\Core\PathProcessor\InboundPathProcessorInterface::processInbound().
    */
   public function processInbound($path, Request $request) {
-    if (!empty($path)) {
-      $args = explode('/', $path);
-      $prefix = array_shift($args);
-
-      // Search prefix within enabled languages.
-      $prefixes = $this->config->get('language.negotiation')->get('url.prefixes');
-      foreach ($this->languages as $language) {
-        if (isset($prefixes[$language->id]) && $prefixes[$language->id] == $prefix) {
-          // Rebuild $path with the language removed.
-          return implode('/', $args);
-        }
-      }
+    if (empty($path)) {
+      return $path;
     }
+
+    $languages = $this->languageManager->getLanguageList();
+    $prefixes = $this->config->get('language.negotiation')->get('url.prefixes');
+    $parts = explode('/', $path);
+    $prefix = array_shift($parts);
+
+    // Search prefix within enabled languages.
+    foreach ($languages as $language) {
+      if (isset($prefixes[$language->id]) && $prefixes[$language->id] == $prefix) {
+        // Rebuild $path with the language removed.
+        $path = implode('/', $parts);
+        break;
+       }
+    }
+
     return $path;
   }
 
@@ -103,7 +95,7 @@ class PathProcessorLanguage implements InboundPathProcessorInterface, OutboundPa
       $url_scheme = $request->getScheme();
       $port = $request->getPort();
     }
-    $languages = array_flip(array_keys($this->languages));
+    $languages = array_flip(array_keys($this->languageManager->getLanguageList()));
     // Language can be passed as an option, or we go for current URL language.
     if (!isset($options['language'])) {
       $language_url = $this->languageManager->getLanguage(Language::TYPE_URL);

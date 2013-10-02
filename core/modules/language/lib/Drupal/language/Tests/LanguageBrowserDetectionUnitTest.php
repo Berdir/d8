@@ -9,6 +9,8 @@ namespace Drupal\language\Tests;
 
 use Drupal\simpletest\WebTestBase;
 use Drupal\Core\Language\Language;
+use Drupal\Core\Language\Plugin\LanguageNegotiation\LanguageNegotiationBrowser;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Test browser language detection.
@@ -153,9 +155,11 @@ class LanguageBrowserDetectionUnitTest extends WebTestBase {
       'zh-cht' => 'zh-hant',
     );
 
+    $mappings = $this->container->get('config.factory')->get('language.mappings')->get();
+    $language_neg = new LanguageNegotiationBrowser(array('browser' => array('mappings' => $mappings)));
     foreach ($test_cases as $accept_language => $expected_result) {
-      $_SERVER['HTTP_ACCEPT_LANGUAGE'] = $accept_language;
-      $result = language_from_browser($languages);
+      $request = Request::create('', 'GET', array(), array(), array(), array('HTTP_ACCEPT_LANGUAGE' => $accept_language));
+      $result = $language_neg->negotiateLanguage($languages, $request);
       $this->assertIdentical($result, $expected_result, format_string("Language selection '@accept-language' selects '@result', result = '@actual'", array('@accept-language' => $accept_language, '@result' => $expected_result, '@actual' => isset($result) ? $result : 'none')));
     }
   }

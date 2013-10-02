@@ -106,7 +106,7 @@ class LanguageUILanguageNegotiationTest extends WebTestBase {
     // into database when seen by t(). Without doing this, our target string
     // is for some reason not found when doing translate search. This might
     // be some bug.
-    drupal_static_reset('language_list');
+    $this->container->get('language_manager')->reset();
     $languages = language_list();
     variable_set('language_default', (array) $languages['vi']);
     // First visit this page to make sure our target string is searchable.
@@ -235,7 +235,7 @@ class LanguageUILanguageNegotiationTest extends WebTestBase {
     }
 
     // Unknown language prefix should return 404.
-    variable_set('language_negotiation_' . Language::TYPE_INTERFACE, language_language_negotiation_info());
+    variable_set('language_negotiation_' . Language::TYPE_INTERFACE, language_negotiation_info());
     $this->drupalGet("$langcode_unknown/admin/config", array(), $http_header_browser_fallback);
     $this->assertResponse(404, "Unknown language path prefix should return 404");
 

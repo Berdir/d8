@@ -79,7 +79,10 @@ class LinkGeneratorTest extends UnitTestCase {
 
     $this->urlGenerator = $this->getMock('\Drupal\Core\Routing\UrlGenerator', array(), array(), '', FALSE);
     $this->moduleHandler = $this->getMock('Drupal\Core\Extension\ModuleHandlerInterface');
-    $this->languageManager = $this->getMock('Drupal\Core\Language\LanguageManager');
+    $this->languageManager = $this->getMockBuilder('Drupal\Core\Language\LanguageManager')
+      ->disableOriginalConstructor()
+      ->getMock();
+
 
     $this->linkGenerator = new LinkGenerator($this->urlGenerator, $this->moduleHandler, $this->languageManager);
   }

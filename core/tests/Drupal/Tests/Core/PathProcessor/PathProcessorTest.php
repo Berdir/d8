@@ -46,10 +46,15 @@ class PathProcessorTest extends UnitTestCase {
     $this->languages = $languages;
 
     // Create a language manager stub.
-    $language_manager = $this->getMock('Drupal\Core\Language\LanguageManager');
+    $language_manager = $this->getMockBuilder('Drupal\Core\Language\LanguageManager')
+      ->disableOriginalConstructor()
+      ->getMock();
     $language_manager->expects($this->any())
       ->method('getLanguage')
       ->will($this->returnValue($languages['en']));
+    $language_manager->expects($this->any())
+      ->method('getLanguageList')
+      ->will($this->returnValue($this->languages));
 
     $this->languageManager = $language_manager;
   }
@@ -95,7 +100,7 @@ class PathProcessorTest extends UnitTestCase {
     $alias_processor = new PathProcessorAlias($alias_manager);
     $decode_processor = new PathProcessorDecode();
     $front_processor = new PathProcessorFront($config_factory_stub);
-    $language_processor = new PathProcessorLanguage($config_factory_stub, new Settings(array()), $this->languageManager, $this->languages);
+    $language_processor = new PathProcessorLanguage($config_factory_stub, new Settings(array()), $this->languageManager);
 
     // First, test the processor manager with the processors in the incorrect
     // order. The alias processor will run before the language processor, meaning

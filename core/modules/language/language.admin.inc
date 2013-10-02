@@ -281,6 +281,9 @@ function language_negotiation_configure_form_submit($form, &$form_state) {
     \Drupal::service('plugin.manager.block')->clearCachedDefinitions();
   }
 
+  // Rebuild the container to update the submitted settings.
+  drupal_rebuild_language_negotiation_settings();
+
   $form_state['redirect'] = 'admin/config/regional/language/detection';
   drupal_set_message(t('Language negotiation configuration saved.'));
 }

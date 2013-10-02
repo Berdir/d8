@@ -10,6 +10,7 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Database\Install\TaskException;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageManager;
+use Drupal\Core\Language\Plugin\LanguageNegotiation\LanguageNegotiationBrowser;
 use Drupal\Core\StringTranslation\Translator\FileTranslation;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
@@ -370,6 +371,14 @@ function install_begin_request(&$install_state) {
   else {
     // @todo Move into a proper Drupal\Core\DependencyInjection\InstallContainerBuilder.
     $container = new ContainerBuilder();
+    // Register Core's namespaces just for the installer.
+    $namespaces = array(
+      'Drupal\Core' => DRUPAL_ROOT . '/core/lib',
+      'Drupal\Component' => DRUPAL_ROOT . '/core/lib',
+    );
+    $container->register('container.namespaces', 'ArrayObject')
+      ->addArgument('%container.namespaces%');
+    $container->setParameter('container.namespaces', $namespaces);
 
     $container->register('event_dispatcher', 'Symfony\Component\EventDispatcher\EventDispatcher');
 
@@ -387,9 +396,12 @@ function install_begin_request(&$install_state) {
       ->addArgument(new Reference('config.context'));
 
     // Register the 'language_manager' service.
-    $container
-      ->register('language_manager', 'Drupal\Core\Language\LanguageManager')
-      ->addArgument(NULL);
+    $container->register('plugin.manager.language_negotiation_method', 'Drupal\Core\Language\LanguageNegotiationMethodManager')
+      ->addArgument(new Reference('container.namespaces'))
+      ->addArgument(new Reference('cache.cache'));
+    $container->register('language_manager', 'Drupal\Core\Language\InstallLanguageManager')
+      ->addArgument(array())
+      ->addArgument(new Reference('plugin.manager.language_negotiation_method'));
 
     // Register the translation services.
     install_register_translation_service($container);
@@ -1613,7 +1625,8 @@ function install_select_language_form($form, &$form_state, $files = array()) {
     }
   }
 
-  $browser_langcode = language_from_browser($browser_options);
+  $method = new LanguageNegotiationBrowser(array('browser' => array('mappings' => array())));
+  $browser_langcode = $method->negotiateLanguage($browser_options, Request::createFromGlobals());
   $form['langcode'] = array(
     '#type' => 'select',
     '#title' => t('Choose language'),
