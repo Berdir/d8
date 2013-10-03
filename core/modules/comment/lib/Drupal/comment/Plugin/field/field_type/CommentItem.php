@@ -51,8 +51,8 @@ class CommentItem extends ConfigFieldItemBase {
           'label' => t('Comment status value'),
         ),
         'cid' => array(
-          'label' => t('Last comment ID'),
           'type' => 'integer',
+          'label' => t('Last comment ID'),
         ),
         'last_comment_timestamp' => array(
           'label' => t('Last comment timestamp'),

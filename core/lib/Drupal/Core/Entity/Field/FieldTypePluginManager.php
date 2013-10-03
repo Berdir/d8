@@ -66,7 +66,6 @@ class FieldTypePluginManager extends DefaultPluginManager {
     }
   }
 
-
   /**
    * Returns the default field-level settings for a field type.
    *
@@ -100,21 +99,22 @@ class FieldTypePluginManager extends DefaultPluginManager {
   /**
    * Gets the definition of all field types.
    *
-   * @param Boolean $configurable
-   *   Configurable flag to indicate whether return configurable field types.
+   * @param bool $configurable
+   *   (optional) Whether to return only configurable field types. Defaults to
+   *   FALSE.
    *
    * @return array
    *   An array of field type definitions.
    */
-  public function getDefinitions($configurable = NULL) {
+  public function getDefinitions($configurable = FALSE) {
     $definitions = $this->getCachedDefinitions();
     if (!isset($definitions)) {
       $definitions = $this->findDefinitions();
       $this->setCachedDefinitions($definitions);
     }
     if ($configurable) {
-      return array_filter($this->definitions, function ($defintion) {
-        return $defintion['configurable'];
+      return array_filter($this->definitions, function ($definition) {
+        return $definition['configurable'];
       });
     }
     return $definitions;

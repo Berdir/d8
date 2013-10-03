@@ -15,7 +15,7 @@ use Drupal\field\FieldInterface;
  * Implements hook_field_info_alter().
  */
 function entity_reference_field_info_alter(&$info) {
-  // Make he entity reference field configurable.
+  // Make the entity reference field configurable.
   $info['entity_reference']['configurable'] = TRUE;
   $info['entity_reference']['class'] = '\Drupal\entity_reference\Plugin\field\field_type\ConfigurableEntityReferenceItem';
   $info['entity_reference']['list_class'] = '\Drupal\field\Plugin\Type\FieldType\ConfigFieldItemList';

@@ -72,7 +72,7 @@ abstract class Entity implements EntityInterface {
    * {@inheritdoc}
    */
   public function isNew() {
-    return !empty($this->enforceIsNew) || !$this->id();
+    return !empty($this->enforceIsNew) || $this->id() === NULL;
   }
 
   /**

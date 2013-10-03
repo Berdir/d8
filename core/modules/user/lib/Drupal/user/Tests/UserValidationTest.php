@@ -108,10 +108,12 @@ class UserValidationTest extends DrupalUnitTestBase {
 
     $mail = $this->randomName(EMAIL_MAX_LENGTH - 11) . '@example.com';
     $user->set('mail', $mail);
+    // @todo: There are two separate violations in case of an invalid e-mail.
+    //   Unifiy field item and field property constraints.
     $violations = $user->validate();
-    $this->assertEqual(count($violations), 1, 'Violation found when email is too long');
+    $this->assertEqual(count($violations), 2, 'Violations found when email is too long');
     $this->assertEqual($violations[0]->getPropertyPath(), 'mail.0.value');
-    $this->assertEqual($violations[0]->getMessage(), t('This value is not a valid email address.'));
+    $this->assertEqual($violations[1]->getMessage(), t('This value is not a valid email address.'));
 
     // Provoke a e-mail collision with an exsiting user.
     $user->set('mail', 'existing@exmaple.com');
