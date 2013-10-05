@@ -68,14 +68,14 @@ class Migration extends ConfigEntityBase  {
    *
    * @var string
    */
-  public $source_id;
+  protected $source_id;
 
   /**
    * The source configuration.
    *
    * @var array
    */
-  public $source_configuration;
+  protected $source_configuration;
 
   /**
    * @var \Drupal\migrate\Plugin\MigrateSourceInterface
@@ -87,26 +87,40 @@ class Migration extends ConfigEntityBase  {
    *
    * @var string
    */
-  public $mapping_id;
+  protected $mapping_id;
 
   /**
    * The destination plugin id.
    *
    * @var string
    */
-  public $destination_id;
+  protected $destination_id;
 
   /**
    * The destination configuration.
    *
    * @var array
    */
-  public $destination_configuration;
+  protected $destination_configuration;
 
   /**
    * @var \Drupal\migrate\Plugin\MigrateDestinationInterface
    */
   protected $destination;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getExportProperties() {
+    $properties = parent::getExportProperties();
+    foreach (array('source', 'mapping', 'destination') as $prefix) {
+      foreach (array('id', 'configuration') as $postfix) {
+        $property = $prefix . '_' . $postfix;
+        $properties[$property] = $this->$property;
+      }
+    }
+    return $properties;
+  }
 
   /**
    * @return \Drupal\migrate\Plugin\MigrateSourceInterface
