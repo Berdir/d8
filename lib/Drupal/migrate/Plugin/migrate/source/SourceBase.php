@@ -113,14 +113,9 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
   protected $cache;
 
   /**
-   * Derived classes must implement fields(), returning a list of available
-   * source fields.
-   *
-   * @return array
-   *  Keys: machine names of the fields (to be passed to addFieldMapping)
-   *  Values: Human-friendly descriptions of the fields.
+   * @var \MigrateMap
    */
-  abstract public function fields();
+  protected $activeMap;
 
   public function getCurrentKey() {
     return $this->currentKey;
@@ -146,6 +141,7 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
    * Returns -1 if the source is not countable.
    *
    * @param boolean $refresh
+   * @return int
    */
   public function count($refresh = FALSE) {
     if ($this->skipCount) {
@@ -180,20 +176,19 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
   }
 
   /**
-   * Derived classes must implement computeCount(), to retrieve a fresh count of
-   * source records.
-   */
-  //abstract public function computeCount();
-
-  /**
    * Class constructor.
    *
    * @param array $configuration
    *  Optional array of options.
+   * @param string $plugin_id
+   * @param array $plugin_definition
+   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
+   * @param \Migration $migration
    */
-  function __construct(array $configuration, $plugin_id, array $plugin_definition, CacheBackendInterface $cache) {
+  function __construct(array $configuration, $plugin_id, array $plugin_definition, CacheBackendInterface $cache, \Migration $migration) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->cache = $cache;
+    $this->migration = $migration;
     if (!empty($configuration['cache_counts'])) {
       $this->cacheCounts = TRUE;
     }
@@ -253,6 +248,19 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
    * source records.
    */
   public function rewind() {
+    $this->activeMap = $this->migration->getMap();
+    $this->numProcessed = 0;
+    $this->numIgnored = 0;
+    $this->highwaterField = $this->migration->getHighwaterField();
+    if (!empty($this->highwaterField)) {
+      $this->originalHighwater = $this->migration->getHighwater();
+    }
+    if ($this->migration->getOption('idlist')) {
+      $this->idList = explode(',', $this->migration->getOption('idlist'));
+    }
+    else {
+      $this->idList = array();
+    }
     migrate_instrument_start(get_class($this) . ' performRewind');
     $this->performRewind();
     migrate_instrument_stop(get_class($this) . ' performRewind');
@@ -272,7 +280,7 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
       migrate_instrument_stop(get_class($this) . ' getNextRow');
 
       // Populate the source key for this row
-      $this->currentKey = $this->activeMigration->prepareKey(
+      $this->currentKey = $this->migration->prepareKey(
         $this->activeMap->getSourceKey(), $row);
 
       // Pick up the existing map row, if any, unless getNextRow() did it.
@@ -307,7 +315,7 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
         // Fall through
       }
       // 3. If the row is marked as needing update, pass it.
-      elseif ($row->migrate_map_needs_update == MigrateMap::STATUS_NEEDS_UPDATE) {
+      elseif ($row->migrate_map_needs_update == \MigrateMap::STATUS_NEEDS_UPDATE) {
         // Fall through
       }
       // 4. At this point, we have a row which has previously been imported and
@@ -381,29 +389,25 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
   }
 
   /**
-   * @return \stdClass
-   */
-  abstract function getNextRow();
-
-  /**
    * Give the calling migration a shot at manipulating, and possibly rejecting,
    * the source row.
    *
+   * @param $row
    * @return bool
    *  FALSE if the row is to be skipped.
    */
   protected function prepareRow($row) {
-    migrate_instrument_start(get_class($this->activeMigration) . ' prepareRow');
-    $return = $this->activeMigration->prepareRow($row);
-    migrate_instrument_stop(get_class($this->activeMigration) . ' prepareRow');
+    migrate_instrument_start(get_class($this->migration) . ' prepareRow');
+    $return = $this->migration->prepareRow($row);
+    migrate_instrument_stop(get_class($this->migration) . ' prepareRow');
     // We're explicitly skipping this row - keep track in the map table
     if ($return === FALSE) {
       // Make sure we replace any previous messages for this item with any
       // new ones.
-      $this->activeMigration->getMap()->delete($this->currentKey, TRUE);
-      $this->activeMigration->saveQueuedMessages();
-      $this->activeMigration->getMap()->saveIDMapping($row, array(),
-        MigrateMap::STATUS_IGNORED, $this->activeMigration->rollbackAction);
+      $this->migration->getMap()->delete($this->currentKey, TRUE);
+      $this->migration->saveQueuedMessages();
+      $this->migration->getMap()->saveIDMapping($row, array(),
+        \MigrateMap::STATUS_IGNORED, $this->migration->rollbackAction);
       $this->numIgnored++;
       $this->currentRow = NULL;
       $this->currentKey = NULL;
@@ -467,5 +471,30 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
     migrate_instrument_stop('MigrateSource::hash');
     return $hash;
   }
+
+  /**
+   * Derived classes must implement fields(), returning a list of available
+   * source fields.
+   *
+   * @return array
+   *  Keys: machine names of the fields (to be passed to addFieldMapping)
+   *  Values: Human-friendly descriptions of the fields.
+   */
+  abstract public function fields();
+
+  /**
+   * Derived classes must implement computeCount(), to retrieve a fresh count of
+   * source records.
+   *
+   * @return int
+   */
+  abstract function computeCount();
+
+  /**
+   * @return \stdClass
+   */
+  abstract function getNextRow();
+
+  abstract function performRewind();
 
 }
