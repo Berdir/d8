@@ -87,7 +87,19 @@ class Migration extends ConfigEntityBase  {
    *
    * @var string
    */
-  protected $mapping_id;
+  protected $map_id;
+
+  /**
+   * The map configuration.
+   *
+   * @var array
+   */
+  protected $map_configuration;
+
+  /**
+   * @var \Drupal\migrate\Plugin\MigrateMapInterface
+   */
+  protected $map;
 
   /**
    * The destination plugin id.
@@ -113,7 +125,7 @@ class Migration extends ConfigEntityBase  {
    */
   public function getExportProperties() {
     $properties = parent::getExportProperties();
-    foreach (array('source', 'mapping', 'destination') as $prefix) {
+    foreach (array('source', 'map', 'destination') as $prefix) {
       foreach (array('id', 'configuration') as $postfix) {
         $property = $prefix . '_' . $postfix;
         $properties[$property] = $this->$property;
@@ -133,6 +145,16 @@ class Migration extends ConfigEntityBase  {
   }
 
   /**
+   * @return \Drupal\migrate\Plugin\MigrateMapInterface
+   */
+  public function getMap() {
+    if (!isset($this->map)) {
+      $this->map = \Drupal::service('plugin.manager.migrate.map')->createInstance($this->map_id, $this->map_configuration);
+    }
+    return $this->map;
+  }
+
+  /**
    * @return \Drupal\migrate\Plugin\MigrateDestinationInterface
    */
   public function getDestination() {
@@ -141,4 +163,5 @@ class Migration extends ConfigEntityBase  {
     }
     return $this->destination;
   }
+
 }
