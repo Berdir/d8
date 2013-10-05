@@ -97,6 +97,18 @@ class Migration extends ConfigEntityBase  {
   public $destination_id;
 
   /**
+   * The destination configuration.
+   *
+   * @var array
+   */
+  public $destination_configuration;
+
+  /**
+   * @var \Drupal\migrate\Plugin\MigrateDestinationInterface
+   */
+  protected $destination;
+
+  /**
    * @return \Drupal\migrate\Plugin\MigrateSourceInterface
    */
   public function getSource() {
@@ -106,4 +118,13 @@ class Migration extends ConfigEntityBase  {
     return $this->source;
   }
 
+  /**
+   * @return \Drupal\migrate\Plugin\MigrateDestinationInterface
+   */
+  public function getDestination() {
+    if (!isset($this->destination)) {
+      $this->destination = \Drupal::service('plugin.manager.migrate.destination')->createInstance($this->destination_id, $this->destination_configuration);
+    }
+    return $this->destination;
+  }
 }
