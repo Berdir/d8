@@ -7,5 +7,11 @@ services:
     factory_service: cache_factory
     arguments: [migrate]
   plugin.manager.migrate.source:
-    class: Drupal\migrate\MigrateSourcePluginManager
-    arguments: ['@container.namespaces', '@cache.cache', '@language_manager', '@module_handler']
+    class: Drupal\migrate\MigratePluginManager
+    arguments: [source, '@container.namespaces', '@cache.cache', '@language_manager', '@module_handler']
+  plugin.manager.migrate.mapping:
+    class: Drupal\migrate\MigratePluginManager
+    arguments: [mapping, '@container.namespaces', '@cache.cache', '@language_manager', '@module_handler']
+  plugin.manager.migrate.destination:
+    class: Drupal\migrate\MigratePluginManager
+    arguments: [destination, '@container.namespaces', '@cache.cache', '@language_manager', '@module_handler']
