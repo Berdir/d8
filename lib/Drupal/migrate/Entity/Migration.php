@@ -7,7 +7,6 @@
 
 namespace Drupal\migrate\Entity;
 
-
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 
 /**
@@ -40,5 +39,71 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  * )
  */
 class Migration extends ConfigEntityBase  {
+
+  /**
+   * The migration ID (machine name).
+   *
+   * @var string
+   */
+  public $id;
+
+  /**
+   * The migration UUID.
+   *
+   * This is assigned automatically when the migration is created.
+   *
+   * @var string
+   */
+  public $uuid;
+
+  /**
+   * The human-readable label for the migration.
+   *
+   * @var string
+   */
+  public $label;
+
+  /**
+   * The source plugin id.
+   *
+   * @var string
+   */
+  public $source_id;
+
+  /**
+   * The source configuration.
+   *
+   * @var array
+   */
+  public $source_configuration;
+
+  /**
+   * @var \Drupal\migrate\Plugin\MigrateSourceInterface
+   */
+  protected $source;
+
+  /**
+   * The map plugin id.
+   *
+   * @var string
+   */
+  public $mapping_id;
+
+  /**
+   * The destination plugin id.
+   *
+   * @var string
+   */
+  public $destination_id;
+
+  /**
+   * @return \Drupal\migrate\Plugin\MigrateSourceInterface
+   */
+  public function getSource() {
+    if (!isset($this->source)) {
+      $this->source = \Drupal::service('plugin.manager.migrate.source')->createInstance($this->source_id, $this->source_configuration);
+    }
+    return $this->source;
+  }
 
 }
