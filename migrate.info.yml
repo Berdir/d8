@@ -1,0 +1,8 @@
+name: Migrate
+type: module
+description: 'Handles migratiosn
+package: Core
+version: VERSION
+core: 8.x
+required: true
+configure: admin/structure/migrate
