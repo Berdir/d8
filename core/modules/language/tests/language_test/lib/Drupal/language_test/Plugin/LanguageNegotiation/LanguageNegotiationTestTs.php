@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
  * Class for identifying language from a selected language.
  *
  * @Plugin(
- *   id = LanguageNegotiationTestTs::METHOD_ID,
+ *   id = Drupal\language_test\\Plugin\LanguageNegotiation\LanguageNegotiationTestTs::METHOD_ID,
  *   weight = -10,
  *   name = @Translation("Type-specific test"),
  *   description = @Translation("This is a test language negotiation method."),

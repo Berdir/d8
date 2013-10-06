@@ -2417,7 +2417,7 @@ function language_default_locked_languages($weight = 0) {
  * @return \Drupal\core\Language\Language|null
  *   A fully-populated language object or NULL.
  *
- * @see \Druoal\Core\Language\LanguageManager::loadLanguage().
+ * @see \Drupal\Core\Language\LanguageManager::loadLanguage().
  */
 function language_load($langcode) {
   return Drupal::languageManager()->loadLanguage($langcode);
