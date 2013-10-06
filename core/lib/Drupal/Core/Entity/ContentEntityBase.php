@@ -332,6 +332,21 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
   }
 
   /**
+   * Magic __sleep() implementation.
+   */
+  function __sleep() {
+    // Get the values of instantiated field objects, only serialize the values.
+    foreach ($this->fields as $name => $fields) {
+      foreach ($fields as $langcode => $field) {
+        $this->values[$name][$langcode] = $field->getValue();
+      }
+    }
+    $this->fields = array();
+    return array_keys(get_object_vars($this));
+  }
+
+
+  /**
    * Magic __wakeup() implementation.
    */
   public function __wakeup() {
