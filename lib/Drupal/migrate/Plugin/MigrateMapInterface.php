@@ -6,7 +6,9 @@
 
 namespace Drupal\migrate\Plugin;
 
-
+/**
+ * Map object tracking relationships between source and destination data.
+ */
 interface MigrateMapInterface {
   // Status of each processed row
   const STATUS_IMPORTED = 0;

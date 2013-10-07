@@ -7,25 +7,18 @@
 
 namespace Drupal\migrate;
 
-use Drupal\migrate\Entity\Migration;
+use Drupal\migrate\Entity\MigrationInterface;
 
 class MigrateExecutable {
 
   /**
-   * @var \Drupal\migrate\Entity\Migration
+   * @var \Drupal\migrate\Entity\MigrationInterface
    */
   protected $migration;
 
-  public function __construct(Migration $migration) {
+  public function __construct(MigrationInterface $migration) {
     $this->migration = $migration;
   }
-
-    /**
-   * Source object for the migration, derived from MigrateSource.
-   *
-   * @var \Drupal\migrate\Plugin\MigrateSourceInterface
-   */
-  protected $source;
 
   /**
    * @return \Drupal\migrate\Plugin\MigrateSourceInterface
@@ -35,71 +28,10 @@ class MigrateExecutable {
   }
 
   /**
-   * Destination object for the migration, derived from MigrateDestination.
-   *
-   * @var MigrateDestination
+   * @return \Drupal\migrate\Plugin\MigrateDestinationInterface
    */
-  protected $destination;
   public function getDestination() {
-    return $this->destination;
-  }
-  public function setDestination(MigrateDestination $destination) {
-    $this->destination = $destination;
-  }
-
-  /**
-   * Map object tracking relationships between source and destination data
-   *
-   * @var MigrateMap
-   */
-  protected $map;
-  public function getMap() {
-    return $this->map;
-  }
-  public function setMap(MigrateMap $map) {
-    $this->map = $map;
-  }
-
-  /**
-   * Indicate whether the primary system of record for this migration is the
-   * source, or the destination (Drupal). In the source case, migration of
-   * an existing object will completely replace the Drupal object with data from
-   * the source side. In the destination case, the existing Drupal object will
-   * be loaded, then changes from the source applied; also, rollback will not be
-   * supported.
-   *
-   * @var int
-   */
-  const SOURCE = 1;
-  const DESTINATION = 2;
-  protected $systemOfRecord = Migration::SOURCE;
-  public function getSystemOfRecord() {
-    return $this->systemOfRecord;
-  }
-  public function setSystemOfRecord($system_of_record) {
-    $this->systemOfRecord = $system_of_record;
-  }
-
-  /**
-   * Specify value of needs_update for current map row. Usually set by
-   * MigrateFieldHandler implementations.
-   *
-   * @var int
-   */
-  public $needsUpdate = MigrateMap::STATUS_IMPORTED;
-
-  /**
-   * The default rollback action for this migration. Can be overridden on
-   * a per-row basis by setting $row->rollbackAction in prepareRow().
-   *
-   * @var int
-   */
-  protected $defaultRollbackAction = MigrateMap::ROLLBACK_DELETE;
-  public function getDefaultRollbackAction() {
-    return $this->defaultRollbackAction;
-  }
-  public function setDefaultRollbackAction($rollback_action) {
-    $this->defaultRollbackAction = $rollback_action;
+    return $this->migration->getDestination();
   }
 
   /**
@@ -108,48 +40,6 @@ class MigrateExecutable {
    * @var int
    */
   public $rollbackAction;
-
-  /**
-   * Field mappings defined in code.
-   *
-   * @var array
-   */
-  protected $storedFieldMappings = array();
-  protected $storedFieldMappingsRetrieved = FALSE;
-  public function getStoredFieldMappings() {
-    if (!$this->storedFieldMappingsRetrieved) {
-      $this->loadFieldMappings();
-      $this->storedFieldMappingsRetrieved = TRUE;
-    }
-    return $this->storedFieldMappings;
-  }
-
-  /**
-   * Field mappings retrieved from storage.
-   *
-   * @var array
-   */
-  protected $codedFieldMappings = array();
-  public function getCodedFieldMappings() {
-    return $this->codedFieldMappings;
-  }
-
-  /**
-   * All field mappings, with those retrieved from the database overriding those
-   * defined in code.
-   *
-   * @var array
-   */
-  protected $allFieldMappings = array();
-  public function getFieldMappings() {
-    if (empty($allFieldMappings)) {
-      $this->allFieldMappings = array_merge($this->getCodedFieldMappings(),
-                                            $this->getStoredFieldMappings());
-      // Make sure primary fields come before their subfields
-      ksort($this->allFieldMappings);
-    }
-    return $this->allFieldMappings;
-  }
 
   /**
    * An array of counts. Initially used for cache hit/miss tracking.
@@ -183,7 +73,7 @@ class MigrateExecutable {
 
   /**
    * The object currently being constructed
-   * @var stdClass
+   * @var \stdClass
    */
   protected $destinationValues;
 
@@ -281,26 +171,6 @@ class MigrateExecutable {
     }
   }
 
-  /**
-   * Load any stored field mappings from the database.
-   */
-  public function loadFieldMappings() {
-    $result = db_select('migrate_field_mapping', 'mfm')
-              ->fields('mfm', array('destination_field', 'source_field', 'options'))
-              ->condition('machine_name', $this->machineName)
-              ->execute();
-    foreach ($result as $row) {
-      $field_mapping = unserialize($row->options);
-      $field_mapping->setMappingSource(MigrateFieldMapping::MAPPING_SOURCE_DB);
-      if (empty($row->destination_field)) {
-        $this->storedFieldMappings[] = $field_mapping;
-      }
-      else {
-        $this->storedFieldMappings[$row->destination_field] = $field_mapping;
-      }
-    }
-  }
-
   ////////////////////////////////////////////////////////////////////
   // Processing
 
@@ -319,6 +189,8 @@ class MigrateExecutable {
   public function addFieldMapping($destination_field, $source_field = NULL,
                                   $warn_on_override = TRUE) {
     // Warn of duplicate mappings
+    /*
+     * @TODO: uncomment this.
     if ($warn_on_override && !is_null($destination_field) &&
         isset($this->codedFieldMappings[$destination_field])) {
       self::displayMessage(
@@ -327,7 +199,8 @@ class MigrateExecutable {
                 '!source' => $this->codedFieldMappings[$destination_field]->getSourceField())),
         'warning');
     }
-    $mapping = new MigrateFieldMapping($destination_field, $source_field);
+    */
+    $mapping = new \MigrateFieldMapping($destination_field, $source_field);
     if (is_null($destination_field)) {
       $this->codedFieldMappings[] = $mapping;
     }
@@ -672,39 +545,40 @@ class MigrateExecutable {
    */
   protected function import() {
     $return = MigrationBase::RESULT_COMPLETED;
+    $source = $this->getSource();
+    $destination = $this->getDestination();
 
     try {
-      $this->source->rewind();
+      $source->rewind();
     }
-    catch (Exception $e) {
+    catch (\Exception $e) {
       self::displayMessage(
         t('Migration failed with source plugin exception: !e',
           array('!e' => $e->getMessage())));
       return MigrationBase::RESULT_FAILED;
     }
-    while ($this->source->valid()) {
-      $data_row = $this->source->current();
+    while ($this->getSource()->valid()) {
+      $data_row = $source->current();
 
       // Wipe old messages, and save any new messages.
       $this->map->delete($this->currentSourceKey(), TRUE);
       $this->saveQueuedMessages();
 
-      $this->sourceValues = $data_row;
-      $this->applyMappings();
+      $this->applyColumnMappings($data_row);
 
       try {
         migrate_instrument_start('destination import', TRUE);
-        $ids = $this->destination->import($this->destinationValues, $this->sourceValues);
+        $ids = $destination->import($data_row);
         migrate_instrument_stop('destination import');
         if ($ids) {
-          $this->map->saveIDMapping($this->sourceValues, $ids,
+          $this->map->saveIDMapping($sourceValues, $ids,
             $this->needsUpdate, $this->rollbackAction,
             $data_row->migrate_map_hash);
           $this->successes_since_feedback++;
           $this->total_successes++;
         }
         else {
-          $this->map->saveIDMapping($this->sourceValues, array(),
+          $this->map->saveIDMapping($sourceValues, array(),
             MigrateMap::STATUS_FAILED, $this->rollbackAction,
             $data_row->migrate_map_hash);
           if ($this->map->messageCount() == 0) {
@@ -715,13 +589,13 @@ class MigrateExecutable {
         }
       }
       catch (MigrateException $e) {
-        $this->map->saveIDMapping($this->sourceValues, array(),
+        $this->map->saveIDMapping($sourceValues, array(),
           $e->getStatus(), $this->rollbackAction, $data_row->migrate_map_hash);
         $this->saveMessage($e->getMessage(), $e->getLevel());
         self::displayMessage($e->getMessage());
       }
       catch (Exception $e) {
-        $this->map->saveIDMapping($this->sourceValues, array(),
+        $this->map->saveIDMapping($sourceValues, array(),
           MigrateMap::STATUS_FAILED, $this->rollbackAction,
           $data_row->migrate_map_hash);
         $this->handleException($e);
@@ -729,17 +603,17 @@ class MigrateExecutable {
       $this->total_processed++;
       $this->processed_since_feedback++;
       if ($this->highwaterField) {
-        $this->saveHighwater($this->sourceValues->{$this->highwaterField['name']});
+        $this->saveHighwater($sourceValues->{$this->highwaterField['name']});
       }
 
       // Reset row properties.
-      unset($this->sourceValues, $this->destinationValues);
+      unset($sourceValues, $destinationValues);
       $this->needsUpdate = MigrateMap::STATUS_IMPORTED;
 
       // TODO: Temporary. Remove when http://drupal.org/node/375494 is committed.
       // TODO: Should be done in MigrateDestinationEntity
-      if (!empty($this->destination->entityType)) {
-        entity_get_controller($this->destination->entityType)->resetCache();
+      if (!empty($destination->entityType)) {
+        entity_get_controller($destination->entityType)->resetCache();
       }
 
       if ($this->timeOptionExceeded()) {
@@ -752,9 +626,9 @@ class MigrateExecutable {
         break;
       }
       try {
-        $this->source->next();
+        $source->next();
       }
-      catch (Exception $e) {
+      catch (\Exception $e) {
         self::displayMessage(
           t('Migration failed with source plugin exception: !e',
             array('!e' => $e->getMessage())));
@@ -813,7 +687,7 @@ class MigrateExecutable {
       // until applyMappings() applies the xpath()
       if (is_a($this, 'XMLMigration') && isset($row->xml)) {
         $this->sourceValues = $row;
-        $this->applyMappings();
+        $this->applyColumnMappings();
         $row = $this->sourceValues;
         unset($row->xml);
       }
@@ -895,7 +769,7 @@ class MigrateExecutable {
    * @return array
    */
   protected function currentSourceKey() {
-    return $this->source->getCurrentKey();
+    return $this->getSource()->getCurrentKey();
   }
 
   /**
@@ -1168,114 +1042,9 @@ class MigrateExecutable {
    * Apply field mappings to a data row received from the source, returning
    * a populated destination object.
    */
-  protected function applyMappings() {
-    $this->destinationValues = new stdClass;
-    foreach ($this->getFieldMappings() as $mapping) {
-      $destination = $mapping->getDestinationField();
-      // Skip mappings with no destination (source fields marked DNM)
-      if ($destination) {
-        $source = $mapping->getSourceField();
-        $default = $mapping->getDefaultValue();
-
-        // When updating existing items, make sure we don't create a destination
-        // field that is not mapped to anything (a source field or a default value)
-        if (!$source && !isset($default)) {
-          continue;
-        }
-
-        $destination_values = NULL;
-
-        // If there's a source mapping, and a source value in the data row, copy
-        // to the destination
-        if ($source && property_exists($this->sourceValues, $source)) {
-          $destination_values = $this->sourceValues->$source;
-        }
-        // Otherwise, apply the default value (if any)
-        elseif (!is_null($default)) {
-          $destination_values = $default;
-        }
-
-        // If there's a separator specified for this destination, then it
-        // will be populated as an array exploded from the source value
-        $separator = $mapping->getSeparator();
-        if ($separator && isset($destination_values)) {
-          $destination_values = explode($separator, $destination_values);
-        }
-
-        // If a source migration is supplied, use the current value for this field
-        // to look up a destination ID from the provided migration
-        $source_migration = $mapping->getSourceMigration();
-        if ($source_migration && isset($destination_values)) {
-          $destination_values = $this->handleSourceMigration($source_migration, $destination_values, $default, $this);
-        }
-
-        // Call any designated callbacks
-        $callbacks = $mapping->getCallbacks();
-        foreach ($callbacks as $callback) {
-          if (isset($destination_values)) {
-            $destination_values = call_user_func($callback, $destination_values);
-          }
-        }
-
-        // If specified, assure a unique value for this property.
-        $dedupe = $mapping->getDedupe();
-        if ($dedupe && isset($destination_values)) {
-          $destination_values = $this->handleDedupe($dedupe, $destination_values);
-        }
-
-        // Assign any arguments
-        if (isset($destination_values)) {
-          $arguments = $mapping->getArguments();
-          if ($arguments) {
-            if (!is_array($destination_values)) {
-              $destination_values = array($destination_values);
-            }
-            // TODO: Stuffing arguments into the destination field is gross - can
-            // we come up with a better way to communicate them to the field
-            // handlers?
-            $destination_values['arguments'] = array();
-            foreach ($arguments as $argname => $destarg) {
-              if (is_array($destarg) && isset($destarg['source_field']) && property_exists($this->sourceValues, $destarg['source_field'])) {
-                $destination_values['arguments'][$argname] = $this->sourceValues->$destarg['source_field'];
-              }
-              elseif (is_array($destarg) && isset($destarg['default_value'])) {
-                $destination_values['arguments'][$argname] = $destarg['default_value'];
-              }
-              else {
-                $destination_values['arguments'][$argname] = $destarg;
-              }
-            }
-          }
-        }
-
-        // Are we dealing with the primary value of the destination field, or a
-        // subfield?
-        $destination = explode(':', $destination);
-        $destination_field = $destination[0];
-        if (isset($destination[1])) {
-          $subfield = $destination[1];
-          // We're processing the subfield before the primary value, initialize it
-          if (!property_exists($this->destinationValues, $destination_field)) {
-            $this->destinationValues->$destination_field = array();
-          }
-          // We have a value, and need to convert to an array so we can add
-          // arguments.
-          elseif (!is_array($this->destinationValues->$destination_field)) {
-            $this->destinationValues->$destination_field = array($this->destinationValues->$destination_field);
-          }
-          // Add the subfield value to the arguments array.
-          $this->destinationValues->{$destination_field}['arguments'][$subfield] = $destination_values;
-        }
-        // Just the primary value, the first time through for this field, simply
-        // set it.
-        elseif (!property_exists($this->destinationValues, $destination_field)) {
-          $this->destinationValues->$destination_field = $destination_values;
-        }
-        // We've seen a subfield, so add as an array value.
-        else {
-          $this->destinationValues->{$destination_field}[] = $destination_values;
-        }
-      }
+  protected function applyColumnMappings(MigrateRow $row) {
+    foreach ($this->migration->getColumnMappings() as $mapping) {
+      $mapping->apply($row, $this);
     }
   }
 
@@ -1298,7 +1067,7 @@ class MigrateExecutable {
    *   a single key was passed in, or an array of values if there were multiple
    *   keys to look up.
    */
-  protected function handleSourceMigration($source_migrations, $source_keys, $default = NULL, $migration = NULL) {
+  public function handleSourceMigration($source_migrations, $source_keys, $default = NULL, $migration = NULL) {
     // Handle the source migration(s) as an array.
     $source_migrations = (array) $source_migrations;
 
@@ -1328,7 +1097,7 @@ class MigrateExecutable {
 
     // Instantiate each migration, and store back in the array.
     foreach ($source_migrations as $key => $source_migration) {
-      $source_migrations[$key] = Migration::getInstance($source_migration);
+      $source_migrations[$key] = \Migration::getInstance($source_migration);
     }
 
     $results = array();
@@ -1409,7 +1178,7 @@ class MigrateExecutable {
    *  The value to use - either the original, or a variation created by appending
    *  a sequence number.
    */
-  protected function handleDedupe($dedupe, $original) {
+  public function handleDedupe($dedupe, $original) {
     // If we're remigrating a previously-existing value, simply running through
     // our normal process will re-dedupe it - we must be sure to preserve the
     // previously-written value. Note that this means that you cannot migrate

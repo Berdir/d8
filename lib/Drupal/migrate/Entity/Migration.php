@@ -8,6 +8,8 @@
 namespace Drupal\migrate\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\migrate\Plugin\MigrateColumnMappingBag;
+use Drupal\migrate\Plugin\MigrateMapInterface;
 
 /**
  * Defines the Migration entity.
@@ -38,7 +40,11 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *   }
  * )
  */
-class Migration extends ConfigEntityBase  {
+class Migration extends ConfigEntityBase implements MigrationInterface {
+
+  const SOURCE='source';
+
+  const DESTINATION='destination';
 
   /**
    * The migration ID (machine name).
@@ -64,94 +70,79 @@ class Migration extends ConfigEntityBase  {
   public $label;
 
   /**
-   * The source plugin id.
-   *
-   * @var string
-   */
-  protected $source_id;
-
-  /**
-   * The source configuration.
+   * The source configuration, with at least a 'plugin' key.
    *
    * @var array
    */
-  protected $source_configuration;
+  public $source;
 
   /**
    * @var \Drupal\migrate\Plugin\MigrateSourceInterface
    */
-  protected $source;
+  protected $source_plugin;
 
   /**
-   * The map plugin id.
-   *
-   * @var string
-   */
-  protected $map_id;
-
-  /**
-   * The map configuration.
+   * The configuration describing the column mappings.
    *
    * @var array
    */
-  protected $map_configuration;
+  public $column_mapping;
 
   /**
-   * @var \Drupal\migrate\Plugin\MigrateMapInterface
+   * @var \Drupal\Migrate\Plugin\MigrateColumnMappingBag;
    */
-  protected $map;
+  protected $columnMappingBag;
 
   /**
-   * The destination plugin id.
-   *
-   * @var string
-   */
-  protected $destination_id;
-
-  /**
-   * The destination configuration.
+   * The destination configuration, with at least a 'plugin' key.
    *
    * @var array
    */
-  protected $destination_configuration;
+  public $destination;
 
   /**
    * @var \Drupal\migrate\Plugin\MigrateDestinationInterface
    */
-  protected $destination;
+  protected $destination_plugin;
+
+  /**
+   * Indicate whether the primary system of record for this migration is the
+   * source, or the destination (Drupal). In the source case, migration of
+   * an existing object will completely replace the Drupal object with data from
+   * the source side. In the destination case, the existing Drupal object will
+   * be loaded, then changes from the source applied; also, rollback will not be
+   * supported.
+   *
+   * @var string
+   */
+  public $systemOfRecord = self::SOURCE;
+
+  /**
+   * Specify value of needs_update for current map row. Usually set by
+   * MigrateFieldHandler implementations.
+   *
+   * @var int
+   */
+  public $needsUpdate = MigrateMapInterface::STATUS_IMPORTED;
 
   /**
    * {@inheritdoc}
    */
-  public function getExportProperties() {
-    $properties = parent::getExportProperties();
-    foreach (array('source', 'map', 'destination') as $prefix) {
-      foreach (array('id', 'configuration') as $postfix) {
-        $property = $prefix . '_' . $postfix;
-        $properties[$property] = $this->$property;
-      }
-    }
-    return $properties;
-  }
-
-  /**
-   * @return \Drupal\migrate\Plugin\MigrateSourceInterface
-   */
   public function getSource() {
-    if (!isset($this->source)) {
-      $this->source = \Drupal::service('plugin.manager.migrate.source')->createInstance($this->source_id, $this->source_configuration);
+    if (!isset($this->source_plugin)) {
+      $this->source_plugin = \Drupal::service('plugin.manager.migrate.source')->createInstance($this->source['plugin'], $this->source);
     }
-    return $this->source;
+    return $this->source_plugin;
   }
 
   /**
-   * @return \Drupal\migrate\Plugin\MigrateMapInterface
+   * @return \Drupal\migrate\Plugin\MigrateColumnMappingBag
    */
-  public function getMap() {
-    if (!isset($this->map)) {
-      $this->map = \Drupal::service('plugin.manager.migrate.map')->createInstance($this->map_id, $this->map_configuration);
+  public function getColumnMappings() {
+    if (!$this->columnMappingBag) {
+      $this->columnMappingBag = new MigrateColumnMappingBag(\Drupal::service('plugin.manager.migrate.map'), $this->column_mapping);
     }
-    return $this->map;
+    return $this->columnMappingBag;
   }
 
   /**
@@ -159,7 +150,7 @@ class Migration extends ConfigEntityBase  {
    */
   public function getDestination() {
     if (!isset($this->destination)) {
-      $this->destination = \Drupal::service('plugin.manager.migrate.destination')->createInstance($this->destination_id, $this->destination_configuration);
+      $this->destination = \Drupal::service('plugin.manager.migrate.destination')->createInstance($this->destination['plugin'], $this->destination);
     }
     return $this->destination;
   }
