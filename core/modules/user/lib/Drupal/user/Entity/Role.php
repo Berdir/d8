@@ -27,6 +27,7 @@ use Drupal\user\RoleInterface;
  *       "delete" = "Drupal\user\Form\UserRoleDelete"
  *     }
  *   },
+ *   access_permission = "administer permission",
  *   config_prefix = "user.role",
  *   entity_keys = {
  *     "id" = "id",

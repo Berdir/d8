@@ -40,6 +40,13 @@ class EntityAccessController implements EntityAccessControllerInterface {
   protected $moduleHandler;
 
   /**
+   * The entity manager used to get the access plugin definition.
+   *
+   * @var \Drupal\Core\Entity\EntityManager
+   */
+  protected $entityManager;
+
+  /**
    * Constructs an access controller instance.
    *
    * @param string $entity_type
@@ -47,6 +54,18 @@ class EntityAccessController implements EntityAccessControllerInterface {
    */
   public function __construct($entity_type) {
     $this->entityType = $entity_type;
+  }
+
+  /**
+   * Returns the entity manager.
+   *
+   * @return \Drupal\Core\Entity\EntityManager
+   */
+  protected function entityManager() {
+    if (!isset($this->entityManager)) {
+      $this->entityManager = \Drupal::entityManager();
+    }
+    return $this->entityManager;
   }
 
   /**
@@ -127,7 +146,13 @@ class EntityAccessController implements EntityAccessControllerInterface {
    *   could not be determined.
    */
   protected function checkAccess(EntityInterface $entity, $operation, $langcode, AccountInterface $account) {
-    return NULL;
+    $entity_info = $this->entityManager()->getDefinition($entity->entityType());
+    if (!empty($entity_info['access_permission'])) {
+      return $account->hasPermission($entity_info['access_permission']);
+    }
+    else {
+      return NULL;
+    }
   }
 
   /**
@@ -243,7 +268,13 @@ class EntityAccessController implements EntityAccessControllerInterface {
    *   could not be determined.
    */
   protected function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
-    return NULL;
+    $entity_info = $this->entityManager()->getDefinition($entity->entityType());
+    if (!empty($entity_info['access_permission'])) {
+      return $account->hasPermission($entity_info['access_permission']);
+    }
+    else {
+      return NULL;
+    }
   }
 
   /**

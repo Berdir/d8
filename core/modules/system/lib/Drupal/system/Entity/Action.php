@@ -24,8 +24,9 @@ use Drupal\Component\Plugin\ConfigurablePluginInterface;
  *   module = "system",
  *   controllers = {
  *     "storage" = "Drupal\Core\Config\Entity\ConfigStorageController",
- *     "access" = "Drupal\action\ActionAccessController"
+ *     "access" = "\Drupal\Core\Entity\EntityAccessController"
  *   },
+ *   access_permission = "administer actions",
  *   config_prefix = "system.action",
  *   entity_keys = {
  *     "id" = "id",
