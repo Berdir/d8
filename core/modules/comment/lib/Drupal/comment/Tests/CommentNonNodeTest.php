@@ -37,7 +37,7 @@ class CommentNonNodeTest extends WebTestBase {
     parent::setUp();
 
     // Create a bundle for entity_test.
-    entity_test_create_bundle('entity_test', 'Entity Test Render', 'entity_test');
+    entity_test_create_bundle('entity_test', 'Entity Test', 'entity_test');
     // Create comment field on entity_test bundle.
     $this->container->get('comment.manager')->addDefaultField('entity_test', 'entity_test');
 
@@ -308,7 +308,7 @@ class CommentNonNodeTest extends WebTestBase {
     // We've changed role permissions, so need to reset render cache.
     // @todo Revisit after https://drupal.org/node/2099105
     \Drupal::entityManager()->getViewBuilder('entity_test')->resetCache(array($this->entity->id()));
-    $this->drupalGet('entity-test/' . $this->entity->id());
+    $this->drupalGet('entity_test/' . $this->entity->id());
     $this->assertPattern('@<h2[^>]*>Comments</h2>@', 'Comments were displayed.');
     $this->assertLink('Log in', 0, 'Link to log in was found.');
     $this->assertLink('register', 0, 'Link to register was found.');
@@ -327,7 +327,7 @@ class CommentNonNodeTest extends WebTestBase {
     // We've changed role permissions, so need to reset render cache.
     // @todo Revisit after https://drupal.org/node/2099105
     \Drupal::entityManager()->getViewBuilder('entity_test')->resetCache(array($this->entity->id()));
-    $this->drupalGet('entity-test/' . $this->entity->id());
+    $this->drupalGet('entity_test/' . $this->entity->id());
     $this->assertNoPattern('@<h2[^>]*>Comments</h2>@', 'Comments were not displayed.');
     $this->assertFieldByName('subject', '', 'Subject field found.');
     $this->assertFieldByName('comment_body[0][value]', '', 'Comment field found.');
