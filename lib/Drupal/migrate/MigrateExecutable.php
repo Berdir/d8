@@ -1043,8 +1043,8 @@ class MigrateExecutable {
    * a populated destination object.
    */
   protected function applyColumnMappings(MigrateRow $row) {
-    foreach ($this->migration->getColumnMappings() as $mapping) {
-      $mapping->apply($row, $this);
+    foreach ($this->migration->getProcess() as $process) {
+      $process->apply($row, $this);
     }
   }
 

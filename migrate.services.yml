@@ -9,9 +9,9 @@ services:
   plugin.manager.migrate.source:
     class: Drupal\migrate\MigratePluginManager
     arguments: [source, '@container.namespaces', '@cache.cache', '@language_manager', '@module_handler']
-  plugin.manager.migrate.column_mapping:
+  plugin.manager.migrate.process:
     class: Drupal\migrate\MigratePluginManager
-    arguments: [column_mapping, '@container.namespaces', '@cache.cache', '@language_manager', '@module_handler']
+    arguments: [process, '@container.namespaces', '@cache.cache', '@language_manager', '@module_handler']
   plugin.manager.migrate.destination:
     class: Drupal\migrate\MigratePluginManager
     arguments: [destination, '@container.namespaces', '@cache.cache', '@language_manager', '@module_handler']

@@ -8,7 +8,7 @@
 namespace Drupal\migrate\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
-use Drupal\migrate\Plugin\MigrateColumnMappingBag;
+use Drupal\migrate\Plugin\MigrateProcessBag;
 use Drupal\migrate\Plugin\MigrateMapInterface;
 
 /**
@@ -82,16 +82,16 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
   protected $source_plugin;
 
   /**
-   * The configuration describing the column mappings.
+   * The configuration describing the process plugins.
    *
    * @var array
    */
-  public $column_mapping;
+  public $process;
 
   /**
-   * @var \Drupal\Migrate\Plugin\MigrateColumnMappingBag;
+   * @var \Drupal\Migrate\Plugin\MigrateProcessBag
    */
-  protected $columnMappingBag;
+  protected $migrateProcessBag;
 
   /**
    * The destination configuration, with at least a 'plugin' key.
@@ -136,13 +136,13 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
   }
 
   /**
-   * @return \Drupal\migrate\Plugin\MigrateColumnMappingBag
+   * @return \Drupal\migrate\Plugin\MigrateProcessBag
    */
-  public function getColumnMappings() {
-    if (!$this->columnMappingBag) {
-      $this->columnMappingBag = new MigrateColumnMappingBag(\Drupal::service('plugin.manager.migrate.map'), $this->column_mapping);
+  public function getprocess() {
+    if (!$this->migrateProcessBag) {
+      $this->migrateProcessBag = new MigrateProcessBag(\Drupal::service('plugin.manager.migrate.process'), $this->process);
     }
-    return $this->columnMappingBag;
+    return $this->migrateProcessBag;
   }
 
   /**
