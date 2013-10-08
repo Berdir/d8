@@ -22,6 +22,7 @@ use Drupal\Core\Language\Language;
  *   controllers = {
  *     "storage" = "Drupal\entity_test\EntityTestStorageController",
  *     "list" = "Drupal\entity_test\EntityTestListController",
+ *     "view_builder" = "Drupal\entity_test\EntityTestViewBuilder",
  *     "access" = "Drupal\entity_test\EntityTestAccessController",
  *     "form" = {
  *       "default" = "Drupal\entity_test\EntityTestFormController"
@@ -36,7 +37,11 @@ use Drupal\Core\Language\Language;
  *     "uuid" = "uuid",
  *     "bundle" = "type",
  *   },
- *   menu_base_path = "entity-test/manage/%entity_test"
+ *   menu_base_path = "entity-test/manage/%entity_test",
+ *   links = {
+ *     "canonical" = "/entity_test/{entity_test_render}",
+ *     "edit-form" = "/entity_test/manage/{entity_test_render}/edit"
+ *   }
  * )
  */
 class EntityTest extends ContentEntityBase {

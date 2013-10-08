@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\comment\CommentRenderController.
+ * Definition of Drupal\comment\CommentViewBuilder.
  */
 
 namespace Drupal\comment;
@@ -10,8 +10,9 @@ namespace Drupal\comment;
 use Drupal\Core\Entity\EntityControllerInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityManager;
-use Drupal\Core\Entity\EntityRenderController;
+use Drupal\Core\Entity\EntityViewBuilderInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Entity\EntityViewBuilder;
 use Drupal\entity\Entity\EntityDisplay;
 use Drupal\field\FieldInfo;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -19,7 +20,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Render controller for comments.
  */
-class CommentRenderController extends EntityRenderController implements EntityControllerInterface {
+class CommentViewBuilder extends EntityViewBuilder implements EntityViewBuilderInterface {
 
   /**
    * The entity manager service.
@@ -144,7 +145,7 @@ class CommentRenderController extends EntityRenderController implements EntityCo
   }
 
   /**
-   * Overrides Drupal\Core\Entity\EntityRenderController::alterBuild().
+   * {@inheritdoc}
    */
   protected function alterBuild(array &$build, EntityInterface $comment, EntityDisplay $display, $view_mode, $langcode = NULL) {
     parent::alterBuild($build, $comment, $display, $view_mode, $langcode);

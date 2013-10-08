@@ -81,8 +81,8 @@ class AreaEntityTest extends ViewTestBase {
     $entities = array();
     for ($i = 0; $i < 2; $i++) {
       $random_label = $this->randomName();
-      $data = array('bundle' => 'entity_test_render', 'name' => $random_label);
-      $entity_test = $this->container->get('entity.manager')->getStorageController('entity_test_render')->create($data);
+      $data = array('bundle' => 'entity_test', 'name' => $random_label);
+      $entity_test = $this->container->get('entity.manager')->getStorageController('entity_test')->create($data);
       $entity_test->save();
       $entities[] = $entity_test;
     }
@@ -101,9 +101,9 @@ class AreaEntityTest extends ViewTestBase {
 
     // Change the view mode of the area handler.
     $view = views_get_view('test_entity_area');
-    $item = $view->getItem('default', 'header', 'entity_entity_test_render');
+    $item = $view->getItem('default', 'header', 'entity_entity_test');
     $item['view_mode'] = 'test';
-    $view->setItem('default', 'header', 'entity_entity_test_render', $item);
+    $view->setItem('default', 'header', 'entity_entity_test', $item);
 
     $preview = $view->preview('default', array($entities[1]->id()));
     $this->drupalSetContent(drupal_render($preview));
