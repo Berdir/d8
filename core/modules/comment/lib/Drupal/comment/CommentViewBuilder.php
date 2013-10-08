@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Render controller for comments.
  */
-class CommentViewBuilder extends EntityViewBuilder implements EntityViewBuilderInterface {
+class CommentViewBuilder extends EntityViewBuilder implements EntityViewBuilderInterface, EntityControllerInterface {
 
   /**
    * The entity manager service.
@@ -56,7 +56,7 @@ class CommentViewBuilder extends EntityViewBuilder implements EntityViewBuilderI
   }
 
   /**
-   * Constructs a new CommentRenderController.
+   * Constructs a new CommentViewBuilder.
    *
    * @param string $entity_type
    *   The entity type.
@@ -75,7 +75,7 @@ class CommentViewBuilder extends EntityViewBuilder implements EntityViewBuilderI
   }
 
   /**
-   * Overrides Drupal\Core\Entity\EntityRenderController::buildContent().
+   * Overrides Drupal\Core\Entity\EntityViewBuilder::buildContent().
    *
    * In addition to modifying the content key on entities, this implementation
    * will also set the comment entity key which all comments carry.

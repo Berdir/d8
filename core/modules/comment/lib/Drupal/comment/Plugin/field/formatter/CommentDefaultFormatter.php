@@ -8,7 +8,7 @@
 namespace Drupal\comment\Plugin\field\formatter;
 
 use Drupal\comment\CommentStorageControllerInterface;
-use Drupal\Core\Entity\EntityRenderControllerInterface;
+use Drupal\Core\Entity\EntityViewBuilderInterface;
 use Drupal\Core\Entity\Field\FieldItemListInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\field\Annotation\FieldFormatter;
@@ -49,9 +49,9 @@ class CommentDefaultFormatter extends FormatterBase implements ContainerFactoryP
   /**
    * The comment render controller.
    *
-   * @var \Drupal\Core\Entity\EntityRenderControllerInterface
+   * @var \Drupal\Core\Entity\EntityViewBuilderInterface
    */
-  protected $renderController;
+  protected $viewBuilder;
 
   /**
    * {@inheritdoc}
@@ -66,7 +66,7 @@ class CommentDefaultFormatter extends FormatterBase implements ContainerFactoryP
       $configuration['view_mode'],
       $container->get('current_user'),
       $container->get('entity.manager')->getStorageController('comment'),
-      $container->get('entity.manager')->getRenderController('comment')
+      $container->get('entity.manager')->getViewBuilder('comment')
     );
   }
 
@@ -89,12 +89,12 @@ class CommentDefaultFormatter extends FormatterBase implements ContainerFactoryP
    *   The current user.
    * @param \Drupal\comment\CommentStorageControllerInterface
    *   The comment storage controller.
-   * @param \Drupal\Core\Entity\EntityRenderControllerInterface
-   *   The comment render controller.
+   * @param \Drupal\Core\Entity\EntityViewBuilderInterface
+   *   The comment view builder.
    */
-  public function __construct($plugin_id, array $plugin_definition,  FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, AccountInterface $current_user, CommentStorageControllerInterface $comment_storage_controller, EntityRenderControllerInterface $comment_render_controller) {
+  public function __construct($plugin_id, array $plugin_definition,  FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, AccountInterface $current_user, CommentStorageControllerInterface $comment_storage_controller, EntityViewBuilderInterface $comment_view_builder) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode);
-    $this->renderController = $comment_render_controller;
+    $this->viewBuilder = $comment_view_builder;
     $this->storageController = $comment_storage_controller;
     $this->currentUser = $current_user;
   }
@@ -129,7 +129,7 @@ class CommentDefaultFormatter extends FormatterBase implements ContainerFactoryP
         if ($cids = comment_get_thread($entity, $field_name, $mode, $comments_per_page)) {
           $comments = $this->storageController->loadMultiple($cids);
           comment_prepare_thread($comments);
-          $build = $this->renderController->viewMultiple($comments);
+          $build = $this->viewBuilder->viewMultiple($comments);
           $build['pager']['#theme'] = 'pager';
           $output['comments'] = $build;
         }

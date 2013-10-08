@@ -365,7 +365,7 @@ abstract class Entity implements EntityInterface {
     }
 
     foreach ($referenced_entity_ids as $entity_type => $entity_ids) {
-      if (\Drupal::entityManager()->hasController($entity_type, 'render')) {
+      if (\Drupal::entityManager()->hasController($entity_type, 'view_builder')) {
         \Drupal::entityManager()->getViewBuilder($entity_type)->resetCache(array_keys($entity_ids));
       }
     }

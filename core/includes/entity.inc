@@ -52,7 +52,7 @@ function entity_info_cache_clear() {
 function entity_render_cache_clear() {
   $entity_manager = Drupal::entityManager();
   foreach ($entity_manager->getDefinitions() as $entity_type => $info) {
-    if ($entity_manager->hasController($entity_type, 'render')) {
+    if ($entity_manager->hasController($entity_type, 'view_builder')) {
       $entity_manager->getViewBuilder($entity_type)->resetCache();
     }
   }
