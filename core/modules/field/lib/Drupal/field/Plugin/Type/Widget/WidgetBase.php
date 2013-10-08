@@ -411,7 +411,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface 
     $cardinality = $this->fieldDefinition->getFieldCardinality();
     $is_multiple = ($cardinality == FIELD_CARDINALITY_UNLIMITED) || ($cardinality > 1);
     if ($is_multiple && isset($items[0]->_weight)) {
-      $itemValues = $items->getValue(TRUE);
+      $itemValues = $items->getValue();
       usort($itemValues, function ($a, $b) {
         $a_weight = (is_array($a) ? $a['_weight'] : 0);
         $b_weight = (is_array($b) ? $b['_weight'] : 0);

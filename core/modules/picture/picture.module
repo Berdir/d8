@@ -178,23 +178,21 @@ function theme_picture_formatter($variables) {
 
   $picture = array(
     '#theme' => 'picture',
-    '#width' => $variables['item']['width'],
-    '#height' => $variables['item']['height'],
+    '#width' => $variables['item']->width,
+    '#height' => $variables['item']->height,
     '#style_name' => $variables['image_style'],
     '#breakpoints' => $variables['breakpoints'],
   );
-  if (isset($variables['item']['uri'])) {
+  if (isset($variables['item']->uri)) {
     $picture['#uri'] = $variables['item']['uri'];
   }
-  elseif (isset($variables['item']['entity'])) {
-    $picture['#uri'] = $variables['item']['entity']->getFileUri();
-    $picture['#entity'] = $variables['item']['entity'];
+  elseif (isset($variables['item']->entity)) {
+    $picture['#uri'] = $variables['item']->entity->getFileUri();
+    $picture['#entity'] = $variables['item']->entity;
   }
-  if (isset($variables['item']['alt'])) {
-    $picture['#alt'] = $variables['item']['alt'];
-  }
-  if (isset($variables['item']['title']) && drupal_strlen($variables['item']['title']) != 0) {
-    $picture['#title'] = $variables['item']['title'];
+  $picture['#alt'] = $variables['item']->alt;
+  if (drupal_strlen($variables['item']->title) != 0) {
+    $picture['#title'] = $variables['item']->title;
   }
   if (isset($variables['path']['path'])) {
     $path = $variables['path']['path'];

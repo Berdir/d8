@@ -115,7 +115,7 @@ class ImageFormatter extends ImageFormatterBase {
         }
         $elements[$delta] = array(
           '#theme' => 'image_formatter',
-          '#item' => $item->getValue(TRUE),
+          '#item' => $item,
           '#image_style' => $image_style_setting,
           '#path' => isset($uri) ? $uri : '',
         );

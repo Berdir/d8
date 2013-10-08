@@ -515,7 +515,7 @@ function file_field_find_file_reference_column(FieldInterface $field) {
  *
  * @param $variables
  *   An associative array containing:
- *   - items: An array of file attachments.
+ *   - items: An array of file field items.
  *
  * @ingroup themeable
  */
@@ -523,15 +523,15 @@ function theme_file_formatter_table($variables) {
   $header = array(t('Attachment'), t('Size'));
   $rows = array();
   foreach ($variables['items'] as $delta => $item) {
-    if ($item['display'] && $item['entity']) {
+    if ($item->display && $item->entity) {
       $rows[] = array(
         array(
           'data' => array(
             '#theme' => 'file_link',
-            '#file' => $item['entity'],
+            '#file' => $item->entity,
           ),
         ),
-        format_size($item['entity']->getSize()),
+        format_size($item->entity->getSize()),
       );
     }
   }

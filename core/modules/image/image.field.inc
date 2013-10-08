@@ -171,21 +171,19 @@ function theme_image_formatter($variables) {
   $image = array();
 
   // Do not output an empty 'title' attribute.
-  if (isset($item['title']) && drupal_strlen($item['title']) != 0) {
-    $image['#title'] = $item['title'];
+  if (drupal_strlen($item->title) != 0) {
+    $image['#title'] = $item->title;
   }
 
-  if (isset($item['entity']) && empty($item['uri'])) {
-    $image['#uri'] = $item['entity']->getFileUri();
+  if (isset($item->entity) && empty($item->uri)) {
+    $image['#uri'] = $item->entity->getFileUri();
   }
   else {
-    $image['#uri'] = $item['uri'];
+    $image['#uri'] = $item->uri;
   }
 
   foreach (array('width', 'height', 'alt', 'attributes') as $key) {
-    if (isset($item[$key]) || array_key_exists($key, $item)) {
-      $image["#$key"] = $item[$key];
-    }
+    $image["#$key"] = $item->$key;
   }
 
   if ($variables['image_style']) {
