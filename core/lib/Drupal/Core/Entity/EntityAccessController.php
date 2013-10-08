@@ -33,6 +33,13 @@ class EntityAccessController implements EntityAccessControllerInterface {
   protected $entityType;
 
   /**
+   * The entity info array.
+   *
+   * @var array
+   */
+  protected $entityInfo;
+
+  /**
    * The module handler service.
    *
    * @var \Drupal\Core\Extension\ModuleHandlerInterface
@@ -40,32 +47,16 @@ class EntityAccessController implements EntityAccessControllerInterface {
   protected $moduleHandler;
 
   /**
-   * The entity manager used to get the access plugin definition.
-   *
-   * @var \Drupal\Core\Entity\EntityManager
-   */
-  protected $entityManager;
-
-  /**
    * Constructs an access controller instance.
    *
    * @param string $entity_type
    *   The entity type of the access controller instance.
+   * @param array $entity_info
+   *   An array of entity info for the entity type.
    */
-  public function __construct($entity_type) {
+  public function __construct($entity_type, array $entity_info) {
     $this->entityType = $entity_type;
-  }
-
-  /**
-   * Returns the entity manager.
-   *
-   * @return \Drupal\Core\Entity\EntityManager
-   */
-  protected function entityManager() {
-    if (!isset($this->entityManager)) {
-      $this->entityManager = \Drupal::entityManager();
-    }
-    return $this->entityManager;
+    $this->entityInfo = $entity_info;
   }
 
   /**
@@ -146,9 +137,8 @@ class EntityAccessController implements EntityAccessControllerInterface {
    *   could not be determined.
    */
   protected function checkAccess(EntityInterface $entity, $operation, $langcode, AccountInterface $account) {
-    $entity_info = $this->entityManager()->getDefinition($entity->entityType());
-    if (!empty($entity_info['access_permission'])) {
-      return $account->hasPermission($entity_info['access_permission']);
+    if (!empty($this->entityInfo['admin_permission'])) {
+      return $account->hasPermission($this->entityInfo['admin_permission']);
     }
     else {
       return NULL;
@@ -268,9 +258,8 @@ class EntityAccessController implements EntityAccessControllerInterface {
    *   could not be determined.
    */
   protected function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
-    $entity_info = $this->entityManager()->getDefinition($entity->entityType());
-    if (!empty($entity_info['access_permission'])) {
-      return $account->hasPermission($entity_info['access_permission']);
+    if (!empty($this->entityInfo['admin_permission'])) {
+      return $account->hasPermission($this->entityInfo['admin_permission']);
     }
     else {
       return NULL;

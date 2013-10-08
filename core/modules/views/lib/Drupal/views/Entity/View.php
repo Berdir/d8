@@ -25,7 +25,7 @@ use Drupal\views\ViewExecutable;
  *     "storage" = "Drupal\views\ViewStorageController",
  *     "access" = "Drupal\views\ViewAccessController"
  *   },
- *   access_permission = "administer views",
+ *   admin_permission = "administer views",
  *   config_prefix = "views.view",
  *   entity_keys = {
  *     "id" = "id",
