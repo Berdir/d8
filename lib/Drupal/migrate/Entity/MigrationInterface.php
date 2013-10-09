@@ -18,11 +18,15 @@ interface MigrationInterface extends ConfigEntityInterface {
   /**
    * @return \Drupal\migrate\Plugin\MigrateProcessBag
    */
-  public function getColumnMappings();
+  public function getProcess();
 
   /**
    * @return \Drupal\migrate\Plugin\MigrateDestinationInterface
    */
   public function getDestination();
 
+  /**
+   * @return int
+   */
+  public function getSystemOfRecord();
 }

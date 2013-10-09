@@ -15,7 +15,7 @@ class MigrateProcessBag extends DefaultPluginBag {
   /**
    * {@inheritdoc}
    *
-   * @return \Drupal\migrate\Plugin\ProcessInterface
+   * @return \Drupal\migrate\Plugin\MigrateProcessInterface
    */
   public function &get($instance_id) {
     return parent::get($instance_id);

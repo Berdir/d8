@@ -5,8 +5,9 @@
  * Contains \Drupal\migrate\MigraterPluginManager.
  */
 
-namespace Drupal\migrate;
+namespace Drupal\migrate\Plugin;
 
+use Drupal\Component\Plugin\Factory\DefaultFactory;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageManager;
@@ -23,7 +24,7 @@ class MigratePluginManager extends DefaultPluginManager {
    * Constructs a MigraterPluginManager object.
    *
    * @param string $type
-   *   The type of the plugin: source, process, destination.
+   *   The type of the plugin: row, source, process, destination.
    * @param \Traversable $namespaces
    *   An object that implements \Traversable which contains the root paths
    *   keyed by the corresponding namespace to look for plugin implementations.
@@ -39,5 +40,4 @@ class MigratePluginManager extends DefaultPluginManager {
     $this->alterInfo($module_handler, 'migrate_' . $type . '_info');
     $this->setCacheBackend($cache_backend, $language_manager, 'migrate_plugins_' . $type);
   }
-
 }

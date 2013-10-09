@@ -7,6 +7,7 @@
 
 namespace Drupal\migrate;
 
+use Drupal\migrate\Entity\Migration;
 use Drupal\migrate\Entity\MigrationInterface;
 
 class MigrateExecutable {
@@ -79,7 +80,7 @@ class MigrateExecutable {
 
   /**
    * The current data row retrieved from the source.
-   * @var stdClass
+   * @var \stdClass
    */
   protected $sourceValues;
 
@@ -146,143 +147,6 @@ class MigrateExecutable {
     }
   }
 
-  /**
-   * Record an array of field mappings to the database.
-   *
-   * @param $machine_name
-   * @param array $field_mappings
-   */
-  static public function saveFieldMappings($machine_name, array $field_mappings) {
-    // Clear existing field mappings
-    db_delete('migrate_field_mapping')
-      ->condition('machine_name', $machine_name)
-      ->execute();
-    foreach ($field_mappings as $field_mapping) {
-      $destination_field = $field_mapping->getDestinationField();
-      $source_field = $field_mapping->getSourceField();
-      db_insert('migrate_field_mapping')
-        ->fields(array(
-            'machine_name' => $machine_name,
-            'destination_field' => is_null($destination_field) ? '' : $destination_field,
-            'source_field' => is_null($source_field) ? '' : $source_field,
-            'options' => serialize($field_mapping)
-          ))
-        ->execute();
-    }
-  }
-
-  ////////////////////////////////////////////////////////////////////
-  // Processing
-
-  /**
-   * Add a mapping for a destination field, specifying a source field and/or
-   * a default value.
-   *
-   * @param string $destinationField
-   *  Name of the destination field.
-   * @param string $sourceField
-   *  Name of the source field (optional).
-   * @param boolean $warn_on_override
-   *  Set to FALSE to prevent warnings when there's an existing mapping
-   *  for this destination field.
-   */
-  public function addFieldMapping($destination_field, $source_field = NULL,
-                                  $warn_on_override = TRUE) {
-    // Warn of duplicate mappings
-    /*
-     * @TODO: uncomment this.
-    if ($warn_on_override && !is_null($destination_field) &&
-        isset($this->codedFieldMappings[$destination_field])) {
-      self::displayMessage(
-        t('!name addFieldMapping: !dest was previously mapped from !source, overridden',
-          array('!name' => $this->machineName, '!dest' => $destination_field,
-                '!source' => $this->codedFieldMappings[$destination_field]->getSourceField())),
-        'warning');
-    }
-    */
-    $mapping = new \MigrateFieldMapping($destination_field, $source_field);
-    if (is_null($destination_field)) {
-      $this->codedFieldMappings[] = $mapping;
-    }
-    else {
-      $this->codedFieldMappings[$destination_field] = $mapping;
-    }
-    return $mapping;
-  }
-
-  /**
-   * Remove any existing coded mappings for a given destination or source field.
-   *
-   * @param string $destination_field
-   *  Name of the destination field.
-   * @param string $source_field
-   *  Name of the source field.
-   */
-  public function removeFieldMapping($destination_field, $source_field = NULL) {
-    if (isset($destination_field)) {
-      unset($this->codedFieldMappings[$destination_field]);
-    }
-    if (isset($source_field)) {
-      foreach ($this->codedFieldMappings as $key => $mapping) {
-        if ($mapping->getSourceField() == $source_field) {
-          unset($this->codedFieldMappings[$key]);
-        }
-      }
-    }
-  }
-
-  /**
-   * Shortcut for adding several fields which have the same name on both source
-   * and destination sides.
-   *
-   * @param array $fields
-   *  List of field names to map.
-   */
-  public function addSimpleMappings(array $fields) {
-    foreach ($fields as $field) {
-      $this->addFieldMapping($field, $field);
-    }
-  }
-
-  /**
-   * Shortcut for adding several destination fields which are to be explicitly
-   * not migrated.
-   *
-   * @param array $fields
-   *  List of fields to mark as not for migration.
-   *
-   * @param string $issue_group
-   *  Issue group name to apply to the generated mappings (defaults to 'DNM').
-   */
-  public function addUnmigratedDestinations(array $fields, $issue_group = NULL, $warn_on_override = TRUE) {
-    if (!$issue_group) {
-      $issue_group = t('DNM');
-    }
-    foreach ($fields as $field) {
-      $this->addFieldMapping($field, NULL, $warn_on_override)
-           ->issueGroup($issue_group);
-    }
-  }
-
-  /**
-   * Shortcut for adding several source fields which are to be explicitly
-   * not migrated.
-   *
-   * @param array $fields
-   *  List of fields to mark as not for migration.
-   *
-   * @param string $issue_group
-   *  Issue group name to apply to the generated mappings (defaults to 'DNM').
-   */
-  public function addUnmigratedSources(array $fields, $issue_group = NULL, $warn_on_override = TRUE) {
-    if (!$issue_group) {
-      $issue_group = t('DNM');
-    }
-    foreach ($fields as $field) {
-      $this->addFieldMapping(NULL, $field, $warn_on_override)
-           ->issueGroup($issue_group);
-    }
-  }
 
   /**
    * Reports whether this migration process is complete (i.e., all available
@@ -307,7 +171,10 @@ class MigrateExecutable {
    *  Migration::STATUS_IMPORTING or Migration::STATUS_ROLLING_BACK
    */
   protected function beginProcess($newStatus) {
+    /**
+     * @TODO: resolve this from base.inc.
     parent::beginProcess($newStatus);
+     */
 
     // Do some standard setup
     if (isset($this->options['feedback']) && isset($this->options['feedback']['value']) &&
@@ -357,26 +224,26 @@ class MigrateExecutable {
    * call parent::preImport() etc.
    */
   protected function preImport() {
-    if (method_exists($this->destination, 'preImport')) {
-      $this->destination->preImport();
+    if (method_exists($this->getDestination(), 'preImport')) {
+      $this->getDestination()->preImport();
     }
   }
 
   protected function preRollback() {
-    if (method_exists($this->destination, 'preRollback')) {
-      $this->destination->preRollback();
+    if (method_exists($this->getDestination(), 'preRollback')) {
+      $this->getDestination()->preRollback();
     }
   }
 
   protected function postImport() {
-    if (method_exists($this->destination, 'postImport')) {
-      $this->destination->postImport();
+    if (method_exists($this->getDestination(), 'postImport')) {
+      $this->getDestination()->postImport();
     }
   }
 
   protected function postRollback() {
-    if (method_exists($this->destination, 'postRollback')) {
-      $this->destination->postRollback();
+    if (method_exists($this->getDestination(), 'postRollback')) {
+      $this->getDestination()->postRollback();
     }
   }
 
@@ -392,7 +259,7 @@ class MigrateExecutable {
       $idlist = array_flip(explode(',', $idlist));
     }
 
-    if (method_exists($this->destination, 'bulkRollback')) {
+    if (method_exists($this->getDestination(), 'bulkRollback')) {
       // Too many at once can lead to memory issues, so batch 'em up
       $destids = array();
       $sourceids = array();
@@ -428,10 +295,10 @@ class MigrateExecutable {
         $batch_count++;
         if ($batch_count >= $this->rollbackBatchSize) {
           try {
-            if ($this->systemOfRecord == Migration::SOURCE) {
+            if ($this->migration->getSystemOfRecord() == Migration::SOURCE) {
               if (!empty($destids)) {
                 migrate_instrument_start('destination bulkRollback');
-                $this->destination->bulkRollback($destids);
+                $this->getDestination()->bulkRollback($destids);
                 migrate_instrument_stop('destination bulkRollback');
               }
             }
@@ -457,10 +324,10 @@ class MigrateExecutable {
         }
       }
       if ($batch_count > 0) {
-        if ($this->systemOfRecord == Migration::SOURCE) {
+        if ($this->migration->getSystemOfRecord() == Migration::SOURCE) {
           if (!empty($destids)) {
             migrate_instrument_start('destination bulkRollback');
-            $this->destination->bulkRollback($destids);
+            $this->getDestination()->bulkRollback($destids);
             migrate_instrument_stop('destination bulkRollback');
           }
           $this->total_processed += $batch_count;
@@ -493,7 +360,7 @@ class MigrateExecutable {
 
         // Rollback one record
         try {
-          if ($this->systemOfRecord == Migration::SOURCE) {
+          if ($this->migration->getSystemOfRecord() == Migration::SOURCE) {
             // Skip when the destination key is null
             $skip = FALSE;
             foreach ($destination_key as $key_value) {
@@ -506,7 +373,7 @@ class MigrateExecutable {
               $map_row = $this->map->getRowByDestination((array)$destination_key);
               if ($map_row['rollback_action'] == MigrateMap::ROLLBACK_DELETE) {
                 migrate_instrument_start('destination rollback');
-                $this->destination->rollback((array)$destination_key);
+                $this->getDestination()->rollback((array)$destination_key);
                 migrate_instrument_stop('destination rollback');
               }
             }
@@ -564,7 +431,7 @@ class MigrateExecutable {
       $this->map->delete($this->currentSourceKey(), TRUE);
       $this->saveQueuedMessages();
 
-      $this->applyColumnMappings($data_row);
+      $this->processRow($data_row);
 
       try {
         migrate_instrument_start('destination import', TRUE);
@@ -687,7 +554,7 @@ class MigrateExecutable {
       // until applyMappings() applies the xpath()
       if (is_a($this, 'XMLMigration') && isset($row->xml)) {
         $this->sourceValues = $row;
-        $this->applyColumnMappings();
+        $this->processRow($row);
         $row = $this->sourceValues;
         unset($row->xml);
       }
@@ -980,8 +847,8 @@ class MigrateExecutable {
         array('!numitems' => $numitems,
               '!successes' => $this->successes_since_feedback,
               '!failed' => $this->processed_since_feedback - $this->successes_since_feedback,
-              '!created' => $this->destination->getCreated(),
-              '!updated' => $this->destination->getUpdated(),
+              '!created' => $this->getDestination()->getCreated(),
+              '!updated' => $this->getDestination()->getUpdated(),
               '!ignored' => $this->source->getIgnored(),
               '!time' => $time,
               '!perminute' => $perminute,
@@ -1009,7 +876,7 @@ class MigrateExecutable {
       $this->lastfeedback = time();
       $this->processed_since_feedback = $this->successes_since_feedback = 0;
       $this->source->resetStats();
-      $this->destination->resetStats();
+      $this->getDestination()->resetStats();
     }
   }
 
@@ -1042,7 +909,7 @@ class MigrateExecutable {
    * Apply field mappings to a data row received from the source, returning
    * a populated destination object.
    */
-  protected function applyColumnMappings(MigrateRow $row) {
+  protected function processRow(SimpleRow $row) {
     foreach ($this->migration->getProcess() as $process) {
       $process->apply($row, $this);
     }
@@ -1185,7 +1052,7 @@ class MigrateExecutable {
     // changes to this field - the originally-migrated value will always
     // remain, because we can't tell what the original was.
     if (isset($this->sourceValues->migrate_map_destid1)) {
-      $key_field = key($this->destination->getKeySchema());
+      $key_field = key($this->getDestination()->getKeySchema());
       $existing_value = db_select($dedupe['table'], 't')
                         ->fields('t', array($dedupe['column']))
                         ->range(0, 1)

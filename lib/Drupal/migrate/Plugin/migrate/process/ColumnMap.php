@@ -8,15 +8,15 @@
 namespace Drupal\migrate\Plugin\migrate\process;
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\migrate\MigrateExecutable;
-use Drupal\migrate\MigrateRow;
-use Drupal\migrate\Plugin\ProcessInterface;
+use Drupal\migrate\SimpleRow;
+use Drupal\migrate\Plugin\MigrateProcessInterface;
 
 /**
  * This class tracks mappings between source and destination.
  *
  * @PluginId("column_map")
  */
-class ColumnMap extends PluginBase implements ProcessInterface {
+class ColumnMap extends PluginBase implements MigrateProcessInterface {
 
   /**
    * Destination field name for the mapping. If empty, the mapping is just a
@@ -126,7 +126,7 @@ class ColumnMap extends PluginBase implements ProcessInterface {
    * Apply field mappings to a data row received from the source, returning
    * a populated destination object.
    */
-  public function apply(MigrateRow $row, MigrateExecutable $migrate_executable) {
+  public function apply(SimpleRow $row, MigrateExecutable $migrate_executable) {
     $destination_values = NULL;
 
     // If there's a source mapping, and a source value in the data row, copy

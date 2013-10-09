@@ -7,7 +7,7 @@
 
 namespace Drupal\migrate;
 
-class MigrateRow {
+class SimpleRow {
 
   /**
    * @var \stdClass

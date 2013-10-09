@@ -10,7 +10,10 @@ namespace Drupal\migrate\Plugin\migrate\source;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginBase;
+use Drupal\migrate\Entity\Migration;
+use Drupal\migrate\Plugin\MigratePluginManager;
 use Drupal\migrate\Plugin\MigrateSourceInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 abstract class SourceBase extends PluginBase implements ContainerFactoryPluginInterface, MigrateSourceInterface {
 
@@ -183,12 +186,14 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
    * @param string $plugin_id
    * @param array $plugin_definition
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache
-   * @param \Migration $migration
+   * @param \Drupal\migrate\Entity\Migration $migration
    */
-  function __construct(array $configuration, $plugin_id, array $plugin_definition, CacheBackendInterface $cache, \Migration $migration) {
+  function __construct(array $configuration, $plugin_id, array $plugin_definition, Migration $migration, CacheBackendInterface $cache,
+                       MigratePluginManager $row_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->cache = $cache;
     $this->migration = $migration;
+    $this->rowManager = $row_manager;
     if (!empty($configuration['cache_counts'])) {
       $this->cacheCounts = TRUE;
     }
@@ -210,6 +215,17 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
     if (!empty($configuration['idList'])) {
       $this->idList = $configuration['idList'];
     }
+  }
+
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, array $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $configuration['migration'],
+      $container->get('cache.migrate'),
+      $container->get('plugin.manager.migrate.row')
+    );
   }
 
   /**
@@ -277,6 +293,7 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
 
     migrate_instrument_start(get_class($this) . ' getNextRow');
     while ($row = $this->getNextRow()) {
+      $row_plugin = $this->rowManager->createInstance($this->migration->row, $row);
       migrate_instrument_stop(get_class($this) . ' getNextRow');
 
       // Populate the source key for this row

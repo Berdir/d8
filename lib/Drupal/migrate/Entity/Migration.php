@@ -47,6 +47,16 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
   const DESTINATION='destination';
 
   /**
+   * Codes representing the current status of a migration, and stored in the
+   * migrate_status table.
+   */
+  const STATUS_IDLE = 0;
+  const STATUS_IMPORTING = 1;
+  const STATUS_ROLLING_BACK = 2;
+  const STATUS_STOPPING = 3;
+  const STATUS_DISABLED = 4;
+
+  /**
    * The migration ID (machine name).
    *
    * @var string
@@ -68,6 +78,13 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
    * @var string
    */
   public $label;
+
+  /**
+   * The plugin ID for the row.
+   *
+   * @var string
+   */
+  public $row;
 
   /**
    * The source configuration, with at least a 'plugin' key.
@@ -138,7 +155,7 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
   /**
    * @return \Drupal\migrate\Plugin\MigrateProcessBag
    */
-  public function getprocess() {
+  public function getProcess() {
     if (!$this->migrateProcessBag) {
       $this->migrateProcessBag = new MigrateProcessBag(\Drupal::service('plugin.manager.migrate.process'), $this->process);
     }
@@ -153,6 +170,13 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
       $this->destination = \Drupal::service('plugin.manager.migrate.destination')->createInstance($this->destination['plugin'], $this->destination);
     }
     return $this->destination;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSystemOfRecord() {
+    return $this->systemOfRecord;
   }
 
 }
