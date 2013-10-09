@@ -86,6 +86,7 @@ class AutocompleteWidget extends AutocompleteWidgetBase {
         array_pop($element['#parents']);
       }
     }
+    debug($element['#parents']);
     form_set_value($element, $value, $form_state);
   }
 }

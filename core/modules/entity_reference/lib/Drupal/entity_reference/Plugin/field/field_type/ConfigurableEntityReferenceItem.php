@@ -88,7 +88,10 @@ class ConfigurableEntityReferenceItem extends ConfigEntityReferenceItemBase impl
     $entity = $this->get('entity')->getValue();
     $target_id = $this->get('target_id')->getValue();
 
+    debug($target_id);
+    debug($entity->id());
     if (empty($target_id) && !empty($entity) && $entity->isNew()) {
+      debug('save');
       $entity->save();
       $this->set('target_id', $entity->id());
     }

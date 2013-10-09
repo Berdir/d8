@@ -102,6 +102,7 @@ class EntityReferenceAutoCreateTest extends WebTestBase {
       'title' => $this->randomName(),
       'test_field[0][target_id]' => $new_title,
     );
+    debug($edit);
     $this->drupalPostForm("node/add/$this->referencing_type", $edit, 'Save');
 
     // Assert referenced node was created.
