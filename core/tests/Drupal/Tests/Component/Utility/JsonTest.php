@@ -56,7 +56,7 @@ class JsonTest extends UnitTestCase {
     // Setup a string with the full ASCII table.
     // @todo: Add tests for non-ASCII characters and Unicode.
     $this->string = '';
-    for ($i=0; $i < 128; $i++) {
+    for ($i = 1; $i < 128; $i++) {
       $this->string .= chr($i);
     }
 
