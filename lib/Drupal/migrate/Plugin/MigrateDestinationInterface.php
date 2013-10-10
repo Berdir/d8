@@ -17,6 +17,11 @@ interface MigrateDestinationInterface {
   public function getKeySchema();
   // WTF: Review the cases where we need the Migration parameter, can we avoid that?
   public function fields(Migration $migration = NULL);
+  // Interaction during import/rollback.
+  public function preImport();
+  public function preRollback();
+  public function postImport();
+  public function postRollback();
   // Yes, the classes will vary...
   public function import(\stdClass $destination_object, \stdClass $source_row);
   public function rollbackMultiple(array $destination_keys);

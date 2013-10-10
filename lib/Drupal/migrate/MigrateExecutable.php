@@ -219,31 +219,23 @@ class MigrateExecutable {
 
   /**
    * Default implementations of pre/post import/rollback methods. These call
-   * the destination methods (if they exist) - when overriding, always
-   * call parent::preImport() etc.
+   * the destination methods. When overriding, always call corresponding parent
+   * method.
    */
   protected function preImport() {
-    if (method_exists($this->getDestination(), 'preImport')) {
-      $this->getDestination()->preImport();
-    }
+    $this->getDestination()->preImport();
   }
 
   protected function preRollback() {
-    if (method_exists($this->getDestination(), 'preRollback')) {
-      $this->getDestination()->preRollback();
-    }
+    $this->getDestination()->preRollback();
   }
 
   protected function postImport() {
-    if (method_exists($this->getDestination(), 'postImport')) {
-      $this->getDestination()->postImport();
-    }
+    $this->getDestination()->postImport();
   }
 
   protected function postRollback() {
-    if (method_exists($this->getDestination(), 'postRollback')) {
-      $this->getDestination()->postRollback();
-    }
+    $this->getDestination()->postRollback();
   }
 
   /**
@@ -1155,7 +1147,4 @@ class MigrateExecutable {
     }
     $this->map->setUpdate($source_key);
   }
-}
-
-
 }
