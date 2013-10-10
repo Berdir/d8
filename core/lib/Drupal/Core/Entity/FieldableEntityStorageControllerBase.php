@@ -316,32 +316,4 @@ abstract class FieldableEntityStorageControllerBase extends EntityStorageControl
     }
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function invokeFieldItemPrepareCache(EntityInterface $entity) {
-    foreach (array_keys($entity->getTranslationLanguages()) as $langcode) {
-      $translation = $entity->getTranslation($langcode);
-      foreach ($translation->getPropertyDefinitions() as $property => $definition) {
-        $type_definition = \Drupal::typedData()->getDefinition($definition['type']);
-        // Only create the item objects if needed.
-        if (is_subclass_of($type_definition['class'], '\Drupal\Core\Entity\Field\PrepareCacheInterface')
-          // Prevent legacy field types from skewing performance too much by
-          // checking the existence of the legacy function directly, instead
-          // of making LegacyConfigFieldItem implement PrepareCacheInterface.
-          // @todo Remove once all core field types have been converted (see
-          // http://drupal.org/node/2014671).
-          || (is_subclass_of($type_definition['class'], '\Drupal\field\Plugin\field\field_type\LegacyConfigFieldItem')
-            && isset($type_definition['provider']) && function_exists($type_definition['provider'] . '_field_load'))) {
-
-          // Call the prepareCache() method directly on each item
-          // individually.
-          foreach ($translation->get($property) as $item) {
-            $item->prepareCache();
-          }
-        }
-      }
-    }
-  }
-
 }
