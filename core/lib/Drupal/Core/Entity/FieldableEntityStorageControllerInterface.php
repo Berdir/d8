@@ -122,4 +122,22 @@ interface FieldableEntityStorageControllerInterface extends EntityStorageControl
    */
   public function onFieldPurge(FieldInterface $field);
 
+  /**
+   * Invokes a method on the Field objects within an entity.
+   *
+   * @param string $method
+   *   The method name.
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity object.
+   */
+  public function invokeFieldMethod($method, EntityInterface $entity);
+
+  /**
+   * Invokes the prepareCache() method on all the relevant FieldItem objects.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity object.
+   */
+  public function invokeFieldItemPrepareCache(EntityInterface $entity);
+
 }
