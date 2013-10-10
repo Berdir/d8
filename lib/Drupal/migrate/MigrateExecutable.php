@@ -7,7 +7,6 @@
 
 namespace Drupal\migrate;
 
-use Drupal\migrate\Entity\Migration;
 use Drupal\migrate\Entity\MigrationInterface;
 
 class MigrateExecutable {
@@ -168,7 +167,7 @@ class MigrateExecutable {
    * are present.
    *
    * @param int $newStatus
-   *  Migration::STATUS_IMPORTING or Migration::STATUS_ROLLING_BACK
+   *  MigrationInterface::STATUS_IMPORTING or MigrationInterface::STATUS_ROLLING_BACK
    */
   protected function beginProcess($newStatus) {
     /**
@@ -194,10 +193,10 @@ class MigrateExecutable {
       $this->processed_since_feedback = $this->successes_since_feedback = 0;
 
     // Call pre-process methods
-    if ($this->status == Migration::STATUS_IMPORTING) {
+    if ($this->status == MigrationInterface::STATUS_IMPORTING) {
       $this->preImport();
     }
-    elseif ($this->status == Migration::STATUS_ROLLING_BACK) {
+    elseif ($this->status == MigrationInterface::STATUS_ROLLING_BACK) {
       $this->preRollback();
     }
   }
@@ -208,10 +207,10 @@ class MigrateExecutable {
    */
   public function endProcess() {
     // Call post-process methods
-    if ($this->status == Migration::STATUS_IMPORTING) {
+    if ($this->status == MigrationInterface::STATUS_IMPORTING) {
       $this->postImport();
     }
-    elseif ($this->status == Migration::STATUS_ROLLING_BACK) {
+    elseif ($this->status == MigrationInterface::STATUS_ROLLING_BACK) {
       $this->postRollback();
     }
 
@@ -295,7 +294,7 @@ class MigrateExecutable {
         $batch_count++;
         if ($batch_count >= $this->rollbackBatchSize) {
           try {
-            if ($this->migration->getSystemOfRecord() == Migration::SOURCE) {
+            if ($this->migration->getSystemOfRecord() == MigrationInterface::SOURCE) {
               if (!empty($destids)) {
                 migrate_instrument_start('destination bulkRollback');
                 $this->getDestination()->bulkRollback($destids);
@@ -324,7 +323,7 @@ class MigrateExecutable {
         }
       }
       if ($batch_count > 0) {
-        if ($this->migration->getSystemOfRecord() == Migration::SOURCE) {
+        if ($this->migration->getSystemOfRecord() == MigrationInterface::SOURCE) {
           if (!empty($destids)) {
             migrate_instrument_start('destination bulkRollback');
             $this->getDestination()->bulkRollback($destids);
@@ -360,7 +359,7 @@ class MigrateExecutable {
 
         // Rollback one record
         try {
-          if ($this->migration->getSystemOfRecord() == Migration::SOURCE) {
+          if ($this->migration->getSystemOfRecord() == MigrationInterface::SOURCE) {
             // Skip when the destination key is null
             $skip = FALSE;
             foreach ($destination_key as $key_value) {
@@ -790,7 +789,7 @@ class MigrateExecutable {
    * Outputs a progress message, reflecting the current status of a migration process.
    *
    * @param int $result
-   *  Status of the process, represented by one of the Migration::RESULT_* constants.
+   *  Status of the process, represented by one of the MigrationInterface::RESULT_* constants.
    */
   protected function progressMessage($result) {
     $time = microtime(TRUE) - $this->lastfeedback;
@@ -802,21 +801,21 @@ class MigrateExecutable {
       $perminute = '?';
     }
 
-    if ($this->status == Migration::STATUS_IMPORTING) {
+    if ($this->status == MigrationInterface::STATUS_IMPORTING) {
       switch ($result) {
-        case Migration::RESULT_COMPLETED:
+        case MigrationInterface::RESULT_COMPLETED:
           $basetext = "Processed !numitems (!created created, !updated updated, !failed failed, !ignored ignored) in !time sec (!perminute/min) - done with '!name'";
           $type = 'completed';
           break;
-        case Migration::RESULT_FAILED:
+        case MigrationInterface::RESULT_FAILED:
           $basetext = "Processed !numitems (!created created, !updated updated, !failed failed, !ignored ignored) in !time sec (!perminute/min) - failure with '!name'";
           $type = 'failed';
           break;
-        case Migration::RESULT_INCOMPLETE:
+        case MigrationInterface::RESULT_INCOMPLETE:
           $basetext = "Processed !numitems (!created created, !updated updated, !failed failed, !ignored ignored) in !time sec (!perminute/min) - continuing with '!name'";
           $type = 'status';
           break;
-        case Migration::RESULT_STOPPED:
+        case MigrationInterface::RESULT_STOPPED:
           $basetext = "Processed !numitems (!created created, !updated updated, !failed failed, !ignored ignored) in !time sec (!perminute/min) - stopped '!name'";
           $type = 'warning';
           break;
@@ -824,19 +823,19 @@ class MigrateExecutable {
     }
     else {
       switch ($result) {
-        case Migration::RESULT_COMPLETED:
+        case MigrationInterface::RESULT_COMPLETED:
           $basetext = "Rolled back !numitems in !time sec (!perminute/min) - done with '!name'";
           $type = 'completed';
           break;
-        case Migration::RESULT_FAILED:
+        case MigrationInterface::RESULT_FAILED:
           $basetext = "Rolled back !numitems in !time sec (!perminute/min) - failure with '!name'";
           $type = 'failed';
           break;
-        case Migration::RESULT_INCOMPLETE:
+        case MigrationInterface::RESULT_INCOMPLETE:
           $basetext = "Rolled back !numitems in !time sec (!perminute/min) - continuing with '!name'";
           $type = 'status';
           break;
-        case Migration::RESULT_STOPPED:
+        case MigrationInterface::RESULT_STOPPED:
           $basetext = "Rolled back !numitems in !time sec (!perminute/min) - stopped '!name'";
           $type = 'warning';
           break;
@@ -856,7 +855,7 @@ class MigrateExecutable {
     self::displayMessage($message, $type);
 
     // Report on lookup_cache hit rate. Only visible at 'debug' level.
-    if ($result != Migration::RESULT_INCOMPLETE && !empty($this->counts['lookup_cache'])) {
+    if ($result != MigrationInterface::RESULT_INCOMPLETE && !empty($this->counts['lookup_cache'])) {
       foreach ($this->counts['lookup_cache'] as $name => $tallies) {
         $tallies += array('hit' => 0, 'miss_hit' => 0, 'miss_miss' => 0); // Set defaults to avoid NOTICE.
         $sum = $tallies['hit']+$tallies['miss_hit']+$tallies['miss_miss'];
@@ -872,7 +871,7 @@ class MigrateExecutable {
       }
       $this->counts['lookup_cache'] = array();
     }
-    if ($result == Migration::RESULT_INCOMPLETE) {
+    if ($result == MigrationInterface::RESULT_INCOMPLETE) {
       $this->lastfeedback = time();
       $this->processed_since_feedback = $this->successes_since_feedback = 0;
       $this->source->resetStats();
@@ -891,7 +890,7 @@ class MigrateExecutable {
     if ($this->timeExceeded()) {
       return MigrationBase::RESULT_INCOMPLETE;
     }
-    if ($this->getStatus() == Migration::STATUS_STOPPING) {
+    if ($this->getStatus() == MigrationInterface::STATUS_STOPPING) {
       return MigrationBase::RESULT_STOPPED;
     }
     // If feedback is requested, produce a progress message at the proper time
@@ -964,7 +963,7 @@ class MigrateExecutable {
 
     // Instantiate each migration, and store back in the array.
     foreach ($source_migrations as $key => $source_migration) {
-      $source_migrations[$key] = \Migration::getInstance($source_migration);
+      $source_migrations[$key] = \MigrationInterface::getInstance($source_migration);
     }
 
     $results = array();
@@ -1083,8 +1082,8 @@ class MigrateExecutable {
                    array('!column' => $dedupe['column'],
                          '!original' => $original,
                          '!candidate' => $candidate));
-      $migration = Migration::currentMigration();
-      $migration->saveMessage($message, Migration::MESSAGE_INFORMATIONAL);
+      $migration = MigrationInterface::currentMigration();
+      $migration->saveMessage($message, MigrationInterface::MESSAGE_INFORMATIONAL);
     }
     return $candidate;
   }

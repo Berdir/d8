@@ -24,7 +24,7 @@ class MigratePluginManager extends DefaultPluginManager {
    * Constructs a MigraterPluginManager object.
    *
    * @param string $type
-   *   The type of the plugin: row, source, process, destination.
+   *   The type of the plugin: row, source, process, destination, id_map.
    * @param \Traversable $namespaces
    *   An object that implements \Traversable which contains the root paths
    *   keyed by the corresponding namespace to look for plugin implementations.

@@ -42,20 +42,6 @@ use Drupal\migrate\Plugin\MigrateMapInterface;
  */
 class Migration extends ConfigEntityBase implements MigrationInterface {
 
-  const SOURCE='source';
-
-  const DESTINATION='destination';
-
-  /**
-   * Codes representing the current status of a migration, and stored in the
-   * migrate_status table.
-   */
-  const STATUS_IDLE = 0;
-  const STATUS_IMPORTING = 1;
-  const STATUS_ROLLING_BACK = 2;
-  const STATUS_STOPPING = 3;
-  const STATUS_DISABLED = 4;
-
   /**
    * The migration ID (machine name).
    *
@@ -96,7 +82,7 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
   /**
    * @var \Drupal\migrate\Plugin\MigrateSourceInterface
    */
-  protected $source_plugin;
+  protected $sourcePlugin;
 
   /**
    * The configuration describing the process plugins.
@@ -120,7 +106,14 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
   /**
    * @var \Drupal\migrate\Plugin\MigrateDestinationInterface
    */
-  protected $destination_plugin;
+  protected $destinationPlugin;
+
+  /**
+   * @var strubg
+   */
+  public $id_map = 'sql';
+
+  protected $id_map_plugin;
 
   /**
    * Indicate whether the primary system of record for this migration is the
@@ -146,10 +139,10 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
    * {@inheritdoc}
    */
   public function getSource() {
-    if (!isset($this->source_plugin)) {
-      $this->source_plugin = \Drupal::service('plugin.manager.migrate.source')->createInstance($this->source['plugin'], $this->source);
+    if (!isset($this->sourcePlugin)) {
+      $this->sourcePlugin = \Drupal::service('plugin.manager.migrate.source')->createInstance($this->source['plugin'], $this->source);
     }
-    return $this->source_plugin;
+    return $this->sourcePlugin;
   }
 
   /**
