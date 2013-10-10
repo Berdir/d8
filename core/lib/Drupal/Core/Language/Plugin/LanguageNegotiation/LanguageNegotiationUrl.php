@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @Plugin(
  *   id = Drupal\Core\Language\Plugin\LanguageNegotiation\LanguageNegotiationUrl::METHOD_ID,
+ *   types = {Drupal\Core\Language\Language::TYPE_URL, Drupal\Core\Language\Language::TYPE_CONTENT, Drupal\Core\Language\Language::TYPE_URL},
  *   weight = -8,
  *   name = @Translation("URL"),
  *   description = @Translation("Language from the URL (Path prefix or domain)."),
@@ -93,6 +94,27 @@ class LanguageNegotiationUrl extends LanguageNegotiationMethodBase {
     }
 
     return $langcode;
+  }
+
+  /**
+   * Return links for the URL language switcher block.
+   *
+   * Translation links may be provided by other modules.
+   */
+  function languageSwitchLinks($type, $path) {
+    $languages = language_list();
+    $links = array();
+
+    foreach ($languages as $language) {
+      $links[$language->id] = array(
+        'href'       => $path,
+        'title'      => $language->name,
+        'language'   => $language,
+        'attributes' => array('class' => array('language-link')),
+      );
+    }
+
+    return $links;
   }
 
 }

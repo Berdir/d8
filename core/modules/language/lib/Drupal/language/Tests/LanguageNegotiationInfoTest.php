@@ -144,7 +144,6 @@ class LanguageNegotiationInfoTest extends WebTestBase {
     }
 
     drupal_static_reset('language_types_info');
-    drupal_static_reset('language_negotiation_info');
     $function = "language_modules_{$op}ed";
     if (function_exists($function)) {
       $function($modules);

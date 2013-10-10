@@ -7,9 +7,6 @@
 
 namespace Drupal\language_test\Plugin\LanguageNegotiation;
 
-use Drupal\Component\Annotation\Plugin;
-use Drupal\Core\Annotation\Translation;
-use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageNegotiationMethodBase;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -17,11 +14,11 @@ use Symfony\Component\HttpFoundation\Request;
  * Class for identifying language from a selected language.
  *
  * @Plugin(
- *   id = LanguageNegotiationTest::METHOD_ID,
+ *   id = "test_language_negotiation_method",
  *   weight = -10,
  *   name = @Translation("Test"),
  *   description = @Translation("This is a test language negotiation method."),
- *   types = {Language::TYPE_CONTENT, "test_language_type", "fixed_test_language_type"}
+ *   types = {Drupal\Core\Language\Language::TYPE_CONTENT, "test_language_type", "fixed_test_language_type"}
  * )
  */
 class LanguageNegotiationTest extends LanguageNegotiationMethodBase {

@@ -50,58 +50,6 @@ const LANGUAGE_NEGOTIATION_URL_PREFIX = 'path_prefix';
 const LANGUAGE_NEGOTIATION_URL_DOMAIN = 'domain';
 
 /**
- * Return links for the URL language switcher block.
- *
- * Translation links may be provided by other modules.
- */
-function language_switcher_url($type, $path) {
-  $languages = language_list();
-  $links = array();
-
-  foreach ($languages as $language) {
-    $links[$language->id] = array(
-      'href'       => $path,
-      'title'      => $language->name,
-      'language'   => $language,
-      'attributes' => array('class' => array('language-link')),
-    );
-  }
-
-  return $links;
-}
-
-/**
- * Return the session language switcher block.
- */
-function language_switcher_session($type, $path) {
-  $param = \Drupal::config('language.negotiation')->get('session.parameter');
-  $language_query = isset($_SESSION[$param]) ? $_SESSION[$param] : language($type)->id;
-
-  $languages = language_list();
-  $links = array();
-
-  $query = $_GET;
-
-  foreach ($languages as $language) {
-    $langcode = $language->id;
-    $links[$langcode] = array(
-      'href'       => $path,
-      'title'      => $language->name,
-      'attributes' => array('class' => array('language-link')),
-      'query'      => $query,
-    );
-    if ($language_query != $langcode) {
-      $links[$langcode]['query'][$param] = $langcode;
-    }
-    else {
-      $links[$langcode]['attributes']['class'][] = ' session-active';
-    }
-  }
-
-  return $links;
-}
-
-/**
  * Reads language prefixes and uses the langcode if no prefix is set.
  */
 function language_negotiation_url_prefixes() {

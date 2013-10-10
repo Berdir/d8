@@ -171,7 +171,6 @@ function language_types_set(array $configurable_language_types) {
   // \Drupal\Core\Extension\ModuleHandler::uninstall() could invalidate the
   // cached information.
   drupal_static_reset('language_types_info');
-  drupal_static_reset('language_negotiation_info');
 
   $language_types = array();
   $negotiation_info = language_negotiation_info();
@@ -220,10 +219,6 @@ function language_types_set(array $configurable_language_types) {
   $config = \Drupal::config('system.language.types');
   $config->set('configurable', array_keys(array_filter($language_types)))->save();
   $config->set('all', array_keys($language_types))->save();
-
-  // Ensure that subsequent calls of language_types_get_configurable() return
-  // the updated language type information.
-  drupal_static_reset('language_types_get_configurable');
 }
 
 /**
@@ -290,7 +285,7 @@ function language_negotiation_purge() {
   // invocation of \Drupal\Core\Extension\ModuleHandler::install() or
   // \Drupal\Core\Extension\ModuleHandler::uninstall() could invalidate the
   // cached information.
-  drupal_static_reset('language_negotiation_info');
+  Drupal::service('plugin.manager.language_negotiation_method')->clearCachedDefinitions();
   drupal_static_reset('language_types_info');
 
   $negotiation_info = language_negotiation_info();
@@ -330,7 +325,7 @@ function language_negotiation_set($type, $method_weights) {
       $method = $negotiation_info[$method_id];
       // If the language negotiation method does not express any preference
       // about types, make it available for any configurable type.
-      $types = array_flip(isset($method['types']) ? $method['types'] : $default_types);
+      $types = array_flip(!empty($method['types']) ? $method['types'] : $default_types);
       // Check whether the method is defined and has the right type.
       if (isset($types[$type])) {
         $method_data = array();

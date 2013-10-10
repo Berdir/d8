@@ -321,13 +321,10 @@ class LanguageManager {
     $negotiation = variable_get("language_negotiation_$type", array());
 
     foreach ($negotiation as $method_id => $method) {
-      if (isset($method['callbacks']['language_switch'])) {
-        if (isset($method['file'])) {
-          require_once DRUPAL_ROOT . '/' . $method['file'];
-        }
-
-        $callback = $method['callbacks']['language_switch'];
-        $result = $callback($type, $path);
+      $definition = $this->negotiatorManager->getDefinition($method_id);
+      if (method_exists($definition['class'], 'languageSwitchLinks')) {
+        $instance = $this->negotiatorManager->createInstance($method_id, $this->config);
+        $result = $instance->languageSwitchLinks($type, $path);
 
         if (!empty($result)) {
           // Allow modules to provide translations for specific links.

@@ -53,4 +53,35 @@ class LanguageNegotiationSession extends LanguageNegotiationMethodBase {
     return FALSE;
   }
 
+  /**
+   * Return the session language switcher block.
+   */
+  function languageSwitchLinks($type, $path) {
+    $param = \Drupal::config('language.negotiation')->get('session.parameter');
+    $language_query = isset($_SESSION[$param]) ? $_SESSION[$param] : language($type)->id;
+
+    $languages = language_list();
+    $links = array();
+
+    $query = $_GET;
+
+    foreach ($languages as $language) {
+      $langcode = $language->id;
+      $links[$langcode] = array(
+        'href'       => $path,
+        'title'      => $language->name,
+        'attributes' => array('class' => array('language-link')),
+        'query'      => $query,
+      );
+      if ($language_query != $langcode) {
+        $links[$langcode]['query'][$param] = $langcode;
+      }
+      else {
+        $links[$langcode]['attributes']['class'][] = ' session-active';
+      }
+    }
+
+    return $links;
+  }
+
 }

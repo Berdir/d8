@@ -36,7 +36,7 @@ abstract class ContentTranslationUITest extends ContentTranslationTestBase {
   function testTranslationUI() {
     $this->assertBasicTranslation();
     $this->doTestTranslationOverview();
-    $this->assertOutdatedStatus();
+    $this->doOutdatedStatus();
     $this->assertPublishedStatus();
     $this->assertAuthoringInfo();
     $this->assertTranslationDeletion();
@@ -117,7 +117,7 @@ abstract class ContentTranslationUITest extends ContentTranslationTestBase {
   /**
    * Tests up-to-date status tracking.
    */
-  protected function assertOutdatedStatus() {
+  protected function doOutdatedStatus() {
     $entity = entity_load($this->entityType, $this->entityId, TRUE);
     $langcode = 'fr';
     $default_langcode = $this->langcodes[0];

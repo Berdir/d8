@@ -37,7 +37,7 @@ use Symfony\Component\HttpFoundation\Request;
  *   types = {Drupal\Core\Language\Language::TYPE_URL},
  *   weight = 8,
  *   name = @Translation("URL fallback"),
- *   description = @Translation("Use an already detected language for URLs if none is found..")
+ *   description = @Translation("Use an already detected language for URLs if none is found.")
  * )
  */
 class LanguageNegotiationUrlFallback extends LanguageNegotiationMethodBase {
