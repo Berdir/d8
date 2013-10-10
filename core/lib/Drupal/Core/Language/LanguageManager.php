@@ -239,7 +239,7 @@ class LanguageManager {
 
       // If the language negotiation method has no cache preference or this is
       // satisfied we can execute the callback.
-      if ($cache = !isset($method['cache']) || $user->isAuthenticated() || $method['cache'] == $cache_enabled;) {
+      if ($cache = !isset($method['cache']) || $user->isAuthenticated() || $method['cache'] == $cache_enabled) {
         $negotiator = $this->negotiatorManager->createInstance($method_id, $this->config);
         $negotiator->setLanguageManager($this);
         $langcode = $negotiator->negotiateLanguage($languages, $this->request);
