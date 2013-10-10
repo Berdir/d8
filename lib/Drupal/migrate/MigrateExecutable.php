@@ -1156,6 +1156,3 @@ class MigrateExecutable {
     $this->map->setUpdate($source_key);
   }
 }
-
-
-}

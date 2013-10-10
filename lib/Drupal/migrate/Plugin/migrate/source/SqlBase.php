@@ -34,7 +34,7 @@ abstract class SqlBase extends SourceBase implements ContainerFactoryPluginInter
       $plugin_id,
       $plugin_definition,
       $configuration['source_key'],
-      $container->get()
+      $container->get(),
       $container->get('database')
     );
   }
