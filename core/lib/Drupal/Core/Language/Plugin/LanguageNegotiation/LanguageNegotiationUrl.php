@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @Plugin(
  *   id = Drupal\Core\Language\Plugin\LanguageNegotiation\LanguageNegotiationUrl::METHOD_ID,
- *   types = {Drupal\Core\Language\Language::TYPE_URL, Drupal\Core\Language\Language::TYPE_CONTENT, Drupal\Core\Language\Language::TYPE_URL},
+ *   types = {Drupal\Core\Language\Language::TYPE_INTERFACE, Drupal\Core\Language\Language::TYPE_CONTENT, Drupal\Core\Language\Language::TYPE_URL},
  *   weight = -8,
  *   name = @Translation("URL"),
  *   description = @Translation("Language from the URL (Path prefix or domain)."),

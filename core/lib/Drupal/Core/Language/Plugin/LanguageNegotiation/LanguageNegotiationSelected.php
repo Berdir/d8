@@ -34,7 +34,11 @@ class LanguageNegotiationSelected extends LanguageNegotiationMethodBase {
   public function negotiateLanguage(array $languages, Request $request = NULL) {
     // Replace the site's default langcode by its real value.
     $langcode = isset($this->config['selected_langcode']) ? $this->config['selected_langcode'] : FALSE;
-    return $langcode != 'site_default' ? $langcode : $this->languageManager->getLanguageDefault()->id;
+    // Replace the site's default langcode by its real value.
+    if ($langcode == 'site_default') {
+     $langcode = language_default()->id;
+    }
+    return isset($languages[$langcode]) ? $langcode : $this->languageManager->getLanguageDefault()->id;
   }
 
 }

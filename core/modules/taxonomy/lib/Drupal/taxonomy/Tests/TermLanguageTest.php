@@ -79,6 +79,9 @@ class TermLanguageTest extends TaxonomyTestBase {
   }
 
   function testDefaultTermLanguage() {
+    // @todo: Why is this necessary?
+    drupal_rebuild_language_negotiation_settings();
+
     // Configure the vocabulary to not hide the language selector, and make the
     // default language of the terms fixed.
     $edit = array(

@@ -96,7 +96,7 @@ class LanguageNegotiationInfoTest extends WebTestBase {
     // Check language negotiation results.
     $this->drupalGet('');
     $last = \Drupal::state()->get('language_test.language_negotiation_last');
-    foreach (Drupal::languageManager()->getLanguageTypes() as $type) {
+    foreach (\Drupal::languageManager()->getLanguageTypes() as $type) {
       $langcode = $last[$type];
       $value = $type == Language::TYPE_CONTENT || strpos($type, 'test') !== FALSE ? 'it' : 'en';
       $this->assertEqual($langcode, $value, format_string('The negotiated language for %type is %language', array('%type' => $type, '%language' => $value)));
@@ -107,7 +107,7 @@ class LanguageNegotiationInfoTest extends WebTestBase {
     $this->languageNegotiationUpdate('uninstall');
 
     // Check that only the core language types are available.
-    foreach (Drupal::languageManager()->getLanguageTypes() as $type) {
+    foreach (\Drupal::languageManager()->getLanguageTypes() as $type) {
       $this->assertTrue(strpos($type, 'test') === FALSE, format_string('The %type language is still available', array('%type' => $type)));
     }
 
@@ -139,14 +139,12 @@ class LanguageNegotiationInfoTest extends WebTestBase {
     // Install/uninstall language_test only if we did not already before.
     if ($last_op != $op) {
       call_user_func(array($this->container->get('module_handler'), $op), $modules);
-      // Reset hook implementation cache.
-      $this->container->get('module_handler')->resetImplementations();
     }
-
-    drupal_static_reset('language_types_info');
-    $function = "language_modules_{$op}ed";
-    if (function_exists($function)) {
-      $function($modules);
+    else {
+      $function = "language_modules_{$op}ed";
+      if (function_exists($function)) {
+        $function($modules);
+      }
     }
 
     $this->drupalGet('admin/config/regional/language/detection');

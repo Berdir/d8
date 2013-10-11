@@ -33,12 +33,16 @@ class LanguageNegotiationUserAdmin extends LanguageNegotiationMethodBase {
    */
   public function negotiateLanguage(array $languages, Request $request = NULL) {
     // User preference (only for authenticated users).
-    $user = $request->attributes->get('_account');
+    $user = \Drupal::currentUser();
 
     // @todo Avoid calling _current_path() and path_is_admin() directly.
     $request_path = $request ? urldecode(trim($request->getPathInfo(), '/')) : _current_path();
-    if ($user->isAuthenticated() && isset($languages[$user->getPreferredAdminLangcode()]) && path_is_admin($request_path)) {
-      return $user->getPreferredAdminLangcode();
+    if ($user->isAuthenticated() && path_is_admin($request_path)) {
+      $langcode = $user->getPreferredAdminLangcode();
+      $default_langcode = $this->languageManager->getLanguageDefault()->id;
+      if (!empty($langcode) && $langcode != $default_langcode && isset($languages[$langcode])) {
+        return $langcode;
+      }
     }
 
     // No language preference from the user or not on an admin path.

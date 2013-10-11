@@ -32,10 +32,14 @@ class LanguageNegotiationUser extends LanguageNegotiationMethodBase {
    */
   public function negotiateLanguage(array $languages, Request $request = NULL) {
     // User preference (only for authenticated users).
-    $user = $request->attributes->get('_account');
+    $user = \Drupal::currentUser();
 
-    if ($user->isAuthenticated() && isset($languages[$user->getPreferredLangcode()])) {
-      return $user->getPreferredLangcode();
+    if ($user->isAuthenticated()) {
+      $langcode = $user->getPreferredLangcode();
+      $default_langcode = $this->languageManager->getLanguageDefault()->id;
+      if (!empty($langcode) && $langcode != $default_langcode && isset($languages[$langcode])) {
+        return $langcode;
+      }
     }
 
     // No language preference from the user.

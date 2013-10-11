@@ -45,6 +45,8 @@ class NegotiationSelectedForm extends ConfigFormBase {
       ->set('selected_langcode', $form_state['values']['selected_langcode'])
       ->save();
 
+    drupal_rebuild_language_negotiation_settings();
+
     parent::submitForm($form, $form_state);
   }
 

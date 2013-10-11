@@ -97,6 +97,8 @@ class LanguageListController extends DraggableListController {
 
     drupal_rebuild_language_negotiation_settings();
 
+    \Drupal::languageManager()->reset();
+
     // Update weight of locked system languages.
     language_update_locked_weights();
 

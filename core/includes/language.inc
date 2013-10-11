@@ -170,6 +170,7 @@ function language_types_set(array $configurable_language_types) {
   // invocation of \Drupal\Core\Extension\ModuleHandler::install() or
   // \Drupal\Core\Extension\ModuleHandler::uninstall() could invalidate the
   // cached information.
+  \Drupal::service('plugin.manager.language_negotiation_method')->clearCachedDefinitions();
   drupal_static_reset('language_types_info');
 
   $language_types = array();
