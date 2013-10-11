@@ -73,11 +73,16 @@ class LanguageNegotiationBrowser extends LanguageNegotiationMethodBase {
         }
         // We can safely use strtolower() here, tags are ASCII.
         // RFC2616 mandates that the decimal part is no more than three digits,
-        // so we multiply the qvalue by 1000 to avoid floating point
-        // comparisons.
+        // so we multiply the qvalue by 1000 to avoid floating point comparisons.
         $langcode = strtolower($match[1]);
         $qvalue = isset($match[2]) ? (float) $match[2] : 1;
-        $browser_langcodes[$langcode] = (int) ($qvalue * 1000);
+        // Take the highest qvalue for this langcode. Although the request
+        // supposedly contains unique langcodes, our mapping possibly resolves
+        // to the same langcode for different qvalues. Keep the highest.
+        $browser_langcodes[$langcode] = max(
+          (int) ($qvalue * 1000),
+          (isset($browser_langcodes[$langcode]) ? $browser_langcodes[$langcode] : 0)
+        );
       }
     }
 

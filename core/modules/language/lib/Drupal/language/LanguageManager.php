@@ -67,6 +67,7 @@ class LanguageManager extends LanguageManagerBase {
         $langcode = $language_config->get('id');
         $info = $language_config->get();
         $info['default'] = ($langcode == $default->id);
+        $info['name'] = $info['label'];
         $this->languageList[$langcode] = new Language($info);
       }
     }

@@ -156,10 +156,10 @@ class LanguageConfigurationTest extends WebTestBase {
    */
   protected function checkConfigurableLanguageWeight($state = 'by default') {
     // Reset language list.
-    $this->container->get('language_manager')->reset();
+    \Drupal::languageManager()->reset();
     $max_configurable_language_weight = $this->getHighestConfigurableLanguageWeight();
     $replacements = array('@event' => $state);
-    foreach (language_list(Language::STATE_LOCKED) as $locked_language) {
+    foreach (\Drupal::languageManager()->getLanguageList(Language::STATE_LOCKED) as $locked_language) {
       $replacements['%language'] = $locked_language->name;
       $this->assertTrue($locked_language->weight > $max_configurable_language_weight, format_string('System language %language has higher weight than configurable languages @event', $replacements));
     }
