@@ -114,11 +114,11 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
   protected $destinationPlugin;
 
   /**
-   * @var strubg
+   * @var string
    */
-  public $id_map = 'sql';
+  public $idMap = array();
 
-  protected $id_map_plugin;
+  protected $idMapPlugin;
 
   /**
    * Indicate whether the primary system of record for this migration is the
@@ -170,4 +170,15 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
     return $this->destination;
   }
 
+  public function getIdMap() {
+    if (!isset($this->idMapPlugin)) {
+      $configuration = $this->idMap;
+      $plugin = isset($configuration['plugin']) ? $configuration['plugin'] : 'sql';
+      if ($plugin == 'sql' && !isset($configuration['database'])) {
+        $configuration['database_service'] = 'database';
+      }
+      $this->idMapPlugin = \Drupal::service('plugin.manager.migrate.id_map')->createInstance($configuration['plugin'], $configuration);
+    }
+    return $this->idMapPlugin;
+  }
 }
