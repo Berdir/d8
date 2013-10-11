@@ -8,6 +8,7 @@
 namespace Drupal\Core\Language;
 
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 
 /**
@@ -22,17 +23,19 @@ class LanguageNegotiationMethodManager extends DefaultPluginManager {
    *   An object that implements \Traversable which contains the root paths
    *   keyed by the corresponding namespace to look for plugin implementations.
    */
-  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend) {
+  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
     parent::__construct('Plugin/LanguageNegotiation', $namespaces);
     $this->cacheBackend = $cache_backend;
     $this->cacheKeyPrefix = 'language_negotiation_plugins';
     $this->cacheKey = 'language_negotiation_plugins';
+    $this->alterInfo($module_handler, 'language_negotiation_info');
   }
 
   /**
    * {@inheritdoc}
    */
   public function clearCachedDefinitions() {
+    $this->definitions = NULL;
     $this->cacheBackend->delete($this->cacheKey);
   }
 

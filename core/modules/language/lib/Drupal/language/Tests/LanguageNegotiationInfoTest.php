@@ -139,6 +139,7 @@ class LanguageNegotiationInfoTest extends WebTestBase {
     // Install/uninstall language_test only if we did not already before.
     if ($last_op != $op) {
       call_user_func(array($this->container->get('module_handler'), $op), $modules);
+      $last_op = $op;
     }
     else {
       $function = "language_modules_{$op}ed";

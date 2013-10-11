@@ -53,7 +53,7 @@ class LanguageUILanguageNegotiationTest extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'UI language negotiation',
-      'description' => 'Test UI language switching by URL path prefix and domain.',
+      'description' => 'Test UI language switching.',
       'group' => 'Language',
     );
   }
@@ -322,40 +322,6 @@ class LanguageUILanguageNegotiationTest extends WebTestBase {
     );
     $this->runTest($test);
 
-    // Setup for domain negotiation, first configure the language to have domain
-    // URL.
-    $edit = array("domain[$langcode]" => $language_domain);
-    $this->drupalPostForm("admin/config/regional/language/detection/url", $edit, t('Save configuration'));
-    // Set the site to use domain language negotiation.
-
-    $tests = array(
-      // Default domain, browser preference should have no influence.
-      array(
-        'language_negotiation' => array(LANGUAGE_NEGOTIATION_URL, LANGUAGE_NEGOTIATION_SELECTED),
-        'language_negotiation_url_part' => LANGUAGE_NEGOTIATION_URL_DOMAIN,
-        'path' => 'admin/config',
-        'expect' => $default_string,
-        'expected_method_id' => LANGUAGE_NEGOTIATION_SELECTED,
-        'http_header' => $http_header_browser_fallback,
-        'message' => 'URL (DOMAIN) > DEFAULT: default domain should get default language',
-      ),
-      // Language domain specific URL, we set the $_SERVER['HTTP_HOST'] in
-      // \Drupal\language_test\LanguageTestManager to simulate this.
-      array(
-        'language_negotiation' => array(LANGUAGE_NEGOTIATION_URL, LANGUAGE_NEGOTIATION_SELECTED),
-        'language_negotiation_url_part' => LANGUAGE_NEGOTIATION_URL_DOMAIN,
-        'language_test_domain' => $language_domain . ':88',
-        'path' => 'admin/config',
-        'expect' => $language_string,
-        'expected_method_id' => LANGUAGE_NEGOTIATION_URL,
-        'http_header' => $http_header_browser_fallback,
-        'message' => 'URL (DOMAIN) > DEFAULT: domain example.cn should switch to Chinese',
-      ),
-    );
-
-    foreach ($tests as $test) {
-      $this->runTest($test);
-    }
   }
 
   protected function runTest($test) {

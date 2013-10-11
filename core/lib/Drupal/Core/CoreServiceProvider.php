@@ -176,7 +176,8 @@ class CoreServiceProvider implements ServiceProviderInterface  {
     // Register the 'language_manager' service.
     $container->register('plugin.manager.language_negotiation_method', 'Drupal\Core\Language\LanguageNegotiationMethodManager')
       ->addArgument(new Reference('container.namespaces'))
-      ->addArgument(new Reference('cache.cache'));
+      ->addArgument(new Reference('cache.cache'))
+      ->addArgument(new Reference('module_handler'));
     $container->register('language_manager', 'Drupal\Core\Language\LanguageManager')
       ->addArgument($config)
       ->addArgument(new Reference('plugin.manager.language_negotiation_method'))
