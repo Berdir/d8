@@ -35,9 +35,4 @@ interface MigrationInterface extends ConfigEntityInterface {
    * @return \Drupal\migrate\Plugin\MigrateDestinationInterface
    */
   public function getDestination();
-
-  /**
-   * @return int
-   */
-  public function getSystemOfRecord();
 }

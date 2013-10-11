@@ -7,6 +7,7 @@
 
 namespace Drupal\migrate;
 
+use Doctrine\Common\Proxy\Exception\InvalidArgumentException;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\migrate\Plugin\MigrateRowInterface;
 
@@ -22,7 +23,11 @@ class SimpleRow implements MigrateRowInterface {
    */
   protected $source = array();
 
+  protected $keys = array();
+
   protected $destination = array();
+
+  protected $idMap = array();
 
   /**
    * Constructs a Migrate>Row object.
@@ -31,10 +36,27 @@ class SimpleRow implements MigrateRowInterface {
    *   (optional) An array of values to add as properties on the object.
    */
   public function __construct(array $values = array()) {
-    $this->source = $values;
+    if (empty($values['keys']) || !is_array($values['keys']) || empty($values['data']) || !is_array($values['keys'])) {
+      throw new \InvalidArgumentException('A row must have an array of keys.');
+    }
+    else {
+      $this->source = $values['data'];
+      foreach ($values['keys'] as $key) {
+        if ($this->hasSourceProperty($key)) {
+          $this->keys[$key] = $values['data'][$key];
+        }
+        else {
+          throw new InvalidArgumentException("$key has no value");
+        }
+      }
+    }
   }
 
   public function prepare() {
+  }
+
+  public function getSourceKeys() {
+    return $this->keys;
   }
 
   public function hasSourceProperty($property) {
@@ -47,9 +69,6 @@ class SimpleRow implements MigrateRowInterface {
     }
   }
 
-  public function getSource() {
-    return $this->getSource();
-  }
 
   public function hasDestinationProperty($property) {
     return isset($this->destination[$property]) || array_key_exists($property, $this->destination);
@@ -65,5 +84,22 @@ class SimpleRow implements MigrateRowInterface {
 
   public function getDestination() {
     return $this->destination;
+  }
+
+  public function setIdMap(array $id_map) {
+    $this->idMap = $id_map;
+  }
+
+  public function getIddMapProperty($property) {
+    if ($this->hasIdMapProperty($property)) {
+      return $this->idMap[$property];
+    }
+  }
+
+  /**
+   * @return bool
+   */
+  public function hasIdMapProperty($property) {
+    return isset($this->idMap[$property]) || array_key_exists($property, $this->idMap);
   }
 }

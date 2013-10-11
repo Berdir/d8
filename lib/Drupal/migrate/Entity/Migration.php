@@ -73,6 +73,11 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
   public $row;
 
   /**
+   * The source keys.
+   */
+  public $sourceKeys = array();
+
+  /**
    * The source configuration, with at least a 'plugin' key.
    *
    * @var array
@@ -163,13 +168,6 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
       $this->destination = \Drupal::service('plugin.manager.migrate.destination')->createInstance($this->destination['plugin'], $this->destination);
     }
     return $this->destination;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getSystemOfRecord() {
-    return $this->systemOfRecord;
   }
 
 }

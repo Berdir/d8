@@ -286,7 +286,7 @@ class MigrateExecutable {
         $batch_count++;
         if ($batch_count >= $this->rollbackBatchSize) {
           try {
-            if ($this->migration->getSystemOfRecord() == MigrationInterface::SOURCE) {
+            if ($this->migration->get('systemOfRecord') == MigrationInterface::SOURCE) {
               if (!empty($destids)) {
                 migrate_instrument_start('destination bulkRollback');
                 $this->getDestination()->bulkRollback($destids);
@@ -315,7 +315,7 @@ class MigrateExecutable {
         }
       }
       if ($batch_count > 0) {
-        if ($this->migration->getSystemOfRecord() == MigrationInterface::SOURCE) {
+        if ($this->migration->get('systemOfRecord') == MigrationInterface::SOURCE) {
           if (!empty($destids)) {
             migrate_instrument_start('destination bulkRollback');
             $this->getDestination()->bulkRollback($destids);
@@ -351,7 +351,7 @@ class MigrateExecutable {
 
         // Rollback one record
         try {
-          if ($this->migration->getSystemOfRecord() == MigrationInterface::SOURCE) {
+          if ($this->migration->get('systemOfRecord') == MigrationInterface::SOURCE) {
             // Skip when the destination key is null
             $skip = FALSE;
             foreach ($destination_key as $key_value) {
