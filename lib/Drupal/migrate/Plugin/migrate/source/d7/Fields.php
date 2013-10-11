@@ -60,7 +60,7 @@ class Fields {
         $result = $query->execute();
         foreach ($result as $row) {
           $data = !empty($row->data) ? unserialize($row->data) : array();
-          // Although a format column is present for text fields with text
+          // Although a format property is present for text fields with text
           // filtering disabled, we want to skip it
           if (substr($row->type, 0, 4) == 'text' &&
               $data['settings']['text_processing'] == 0) {
@@ -72,7 +72,7 @@ class Fields {
           $this->sourceFieldInfo[trim($row->field_name)] = array(
             'label' => $data['label'],
             'type' => $row->type,
-            'columns' => $this->getSourceFieldColumns($row->field_name, $skip_format),
+            'properties' => $this->getSourceFieldProperties($row->field_name, $skip_format),
           );
         }
       }
@@ -82,7 +82,7 @@ class Fields {
   }
 
   /**
-   * Pick up the list of database columns used for a given field. Unlike D6 CCK,
+   * Pick up the list of database properties used for a given field. Unlike D6 CCK,
    * we don't have a definitive list in the configuration tables, so we query
    * the field table.
    *
@@ -90,26 +90,26 @@ class Fields {
    *
    * @return array
    */
-  public function getSourceFieldColumns($field_name) {
+  public function getSourceFieldProperties($field_name) {
     $table = 'field_data_' . $field_name;
     $row = $this->database->select($table, 'r')
                      ->fields('r')
                      ->range(0, 1)
                      ->execute()
                      ->fetchAssoc();
-    $columns = array();
+    $properties = array();
     if (!empty($row)) {
       $prefix = $field_name . '_';
       $prefix_len = strlen($prefix);
-      foreach ($row as $column_name => $value) {
-        if ($prefix == substr($column_name, 0, $prefix_len)) {
-          $suffix = substr($column_name, $prefix_len);
+      foreach ($row as $property_name => $value) {
+        if ($prefix == substr($property_name, 0, $prefix_len)) {
+          $suffix = substr($property_name, $prefix_len);
           $display_name = $field_name . ':' . $suffix;
-          $columns[$display_name] = $column_name;
+          $properties[$display_name] = $property_name;
         }
       }
     }
-    return $columns;
+    return $properties;
   }
 
   /**
@@ -134,9 +134,9 @@ class Fields {
                 ->execute();
       foreach ($result as $field_row) {
         $i = 0;
-        // We assume the first column is the "primary" value of the field, and
-        // assign the field name rather than the column name for it.
-        foreach ($field_name['columns'] as $display_name => $column_name) {
+        // We assume the first property is the "primary" value of the field, and
+        // assign the field name rather than the property name for it.
+        foreach ($field_name['properties'] as $display_name => $property_name) {
           if ($i++ == 0) {
             $index = $field_name;
           }
@@ -146,7 +146,7 @@ class Fields {
           if (isset($row->$index) && !is_array($row->$index)) {
             $row->$index = array($row->$index);
           }
-          $row->{$index}[] = $field_row->$column_name;
+          $row->{$index}[] = $field_row->$property_name;
         }
       }
     }

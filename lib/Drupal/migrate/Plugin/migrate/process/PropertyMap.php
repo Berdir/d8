@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Plugin\migrate\process\ColumnMap.
+ * Contains \Drupal\migrate\Plugin\migrate\process\PropertyMap.
  */
 
 namespace Drupal\migrate\Plugin\migrate\process;
@@ -14,9 +14,9 @@ use Drupal\migrate\Plugin\MigrateProcessInterface;
 /**
  * This class tracks mappings between source and destination.
  *
- * @PluginId("column_map")
+ * @PluginId("property_map")
  */
-class ColumnMap extends PluginBase implements MigrateProcessInterface {
+class PropertyMap extends PluginBase implements MigrateProcessInterface {
 
   /**
    * Destination field name for the mapping. If empty, the mapping is just a
@@ -43,7 +43,7 @@ class ColumnMap extends PluginBase implements MigrateProcessInterface {
 
   /**
    * Default value for simple mappings, when there is no source mapping or the
-   * source field is empty. If both this and the sourceColumn are omitted, the
+   * source field is empty. If both this and the sourceProperty are omitted, the
    * mapping is just a stub for annotating the destination field.
    *
    * @var mixed
@@ -68,7 +68,7 @@ class ColumnMap extends PluginBase implements MigrateProcessInterface {
   /**
    * An associative array with keys:
    *   - table: The table for querying for a duplicate.
-   *   - column: The column for querying for a duplicate.
+   *   - property: The property for querying for a duplicate.
    *
    * @todo: Let fields declare this data and a replacement pattern. Then
    * developers won't have to specify this.
@@ -99,10 +99,10 @@ class ColumnMap extends PluginBase implements MigrateProcessInterface {
   public function __construct(array $configuration, $plugin_id, array $plugin_definition) {
     // Must have one or the other
     if (empty($configuration['destination'])) {
-      throw new \Exception('Column mappings must have a destination column.');
+      throw new \Exception('Property mappings must have a destination property.');
     }
     if (!isset($configuration['default']) && empty($configuration['source'])) {
-      throw new \Exception('Column mappings must have a source column or a default.');
+      throw new \Exception('Property mappings must have a source property or a default.');
     }
     $defined_properties = array_keys(get_class_vars(__CLASS__));
     $this->issueGroup = t('Done');
@@ -145,7 +145,7 @@ class ColumnMap extends PluginBase implements MigrateProcessInterface {
       $destination_values = explode($this->separator, $destination_values);
     }
 
-    // If a source migration is supplied, use the current value for this column
+    // If a source migration is supplied, use the current value for this property
     // to look up a destination ID from the provided migration
     if ($this->source_migration && isset($destination_values)) {
       $destination_values = $migrate_executable->handleSourceMigration($this->source_migration, $destination_values, $this->default, $this);

@@ -58,7 +58,7 @@ class MigrateExecutable {
 
   /**
    * If present, an array with keys name and alias (optional). Name refers to
-   * the source columns used for tracking highwater marks. alias is an
+   * the source properties used for tracking highwater marks. alias is an
    * optional table alias.
    *
    * @var array
@@ -274,7 +274,7 @@ class MigrateExecutable {
           continue;
         }
 
-        // Note that bulk rollback is only supported for single-column keys
+        // Note that bulk rollback is only supported for single-property keys
         $sourceids[] = $current_source_key;
         if (!empty($destination_key->destid1)) {
           $map_row = $this->map->getRowByDestination((array)$destination_key);
@@ -1028,8 +1028,8 @@ class MigrateExecutable {
    * For fields which require uniqueness, assign a new unique value if necessary.
    *
    * @param array $dedupe
-   *  An array with two keys, 'table' the name of the Drupal table and 'column'
-   *  the column within that table where uniqueness must be maintained.
+   *  An array with two keys, 'table' the name of the Drupal table and 'property'
+   *  the property within that table where uniqueness must be maintained.
    * @param $original
    *  The value coming in, which must be checked for uniqueness.
    * @return string
@@ -1045,7 +1045,7 @@ class MigrateExecutable {
     if (isset($this->sourceValues->migrate_map_destid1)) {
       $key_field = key($this->getDestination()->getKeySchema());
       $existing_value = db_select($dedupe['table'], 't')
-                        ->fields('t', array($dedupe['column']))
+                        ->fields('t', array($dedupe['property']))
                         ->range(0, 1)
                         ->condition($key_field, $this->sourceValues->migrate_map_destid1)
                         ->execute()
@@ -1059,9 +1059,9 @@ class MigrateExecutable {
     $i = 1;
     $candidate = $original;
     while ($candidate_found = db_select($dedupe['table'], 't')
-                      ->fields('t', array($dedupe['column']))
+                      ->fields('t', array($dedupe['property']))
                       ->range(0, 1)
-                      ->condition('t.' . $dedupe['column'], $candidate)
+                      ->condition('t.' . $dedupe['property'], $candidate)
                       ->execute()
                       ->fetchField()) {
       // We already have the candidate value. Find a non-existing value.
@@ -1070,8 +1070,8 @@ class MigrateExecutable {
       $candidate = $original . '_' . $i;
     }
     if ($i > 1) {
-      $message = t('Replacing !column !original with !candidate',
-                   array('!column' => $dedupe['column'],
+      $message = t('Replacing !property !original with !candidate',
+                   array('!property' => $dedupe['property'],
                          '!original' => $original,
                          '!candidate' => $candidate));
       $migration = MigrationInterface::currentMigration();

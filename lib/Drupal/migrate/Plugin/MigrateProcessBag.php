@@ -22,7 +22,7 @@ class MigrateProcessBag extends DefaultPluginBag {
   }
 
   public function initializePlugin($instance_id) {
-    $this->configurations[$instance_id] += array('id' => 'column_map');
+    $this->configurations[$instance_id] += array('id' => 'property_map');
     parent::initializePlugin($instance_id);
   }
 
