@@ -9,6 +9,7 @@ namespace Drupal\user;
 
 use Drupal\Core\Entity\ContentEntityFormController;
 use Drupal\Core\Language\Language;
+use Drupal\Core\Language\Plugin\LanguageNegotiation\LanguageNegotiationSelected;
 
 /**
  * Form controller for the user account forms.
@@ -183,7 +184,7 @@ abstract class AccountFormController extends ContentEntityFormController {
 
     // Is default the interface language?
     include_once DRUPAL_ROOT . '/core/includes/language.inc';
-    $interface_language_is_default = language_negotiation_method_get_first(Language::TYPE_INTERFACE) != LANGUAGE_NEGOTIATION_SELECTED;
+    $interface_language_is_default = language_negotiation_method_get_first(Language::TYPE_INTERFACE) != LanguageNegotiationSelected::METHOD_ID;
     $form['language'] = array(
       '#type' => language_multilingual() ? 'details' : 'container',
       '#title' => $this->t('Language settings'),

@@ -10,6 +10,7 @@ namespace Drupal\system\Tests\Upgrade;
 use Drupal\Core\Database\DatabaseException;
 
 use Drupal\Core\Language\Language;
+use Drupal\Core\Language\Plugin\LanguageNegotiation\LanguageNegotiationSelected;
 
 /**
  * Tests upgrading a filled database with language data.
@@ -126,14 +127,9 @@ class LanguageUpgradePathTest extends UpgradePathTestBase {
     $this->assertTrue(isset($current_weights['language-selected']), 'Language-selected is present.');
     $this->assertFalse(isset($current_weights['language-default']), 'Language-default is not present.');
 
-    // @todo We only need language.inc here because LANGUAGE_NEGOTIATION_SELECTED
-    //   is defined there. Remove this line once that has been converted to a class
-    //   constant.
-    require_once DRUPAL_ROOT . '/core/includes/language.inc';
-
     // Check that negotiation callback was added to language_negotiation_language_interface.
     $language_negotiation_language_interface = update_variable_get('language_negotiation_language_interface', NULL);
-    $this->assertTrue(isset($language_negotiation_language_interface[LANGUAGE_NEGOTIATION_SELECTED]['callbacks']['negotiation']), 'Negotiation callback was added to language_negotiation_language_interface.');
+    $this->assertTrue(isset($language_negotiation_language_interface[LanguageNegotiationSelected::METHOD_ID]['callbacks']['negotiation']), 'Negotiation callback was added to language_negotiation_language_interface.');
 
     // Look up migrated plural string.
     $source_string = db_query('SELECT * FROM {locales_source} WHERE lid = 22')->fetchObject();

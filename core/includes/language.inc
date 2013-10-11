@@ -8,16 +8,8 @@
  */
 
 use Drupal\Core\Language\Language;
-
-/**
- * No language negotiation. The default language is used.
- */
-const LANGUAGE_NEGOTIATION_SELECTED = 'language-selected';
-
-/**
- * The language is determined using the current interface language.
- */
-const LANGUAGE_NEGOTIATION_INTERFACE = 'language-interface';
+use Drupal\Core\Language\Plugin\LanguageNegotiation\LanguageNegotiationSelected;
+use Drupal\Core\Language\Plugin\LanguageNegotiation\LanguageNegotiationUI;
 
 /**
  * @defgroup language_negotiation Language Negotiation API functionality
@@ -89,8 +81,8 @@ const LANGUAGE_NEGOTIATION_INTERFACE = 'language-interface';
  * function mymodule_language_negotiation_info_alter(&$negotiation_info) {
  *   // Replace the core function with our own function.
  *   module_load_include('language', 'inc', 'language.negotiation');
- *   $negotiation_info[LANGUAGE_NEGOTIATION_URL]['callbacks']['negotiation'] = 'mymodule_from_url';
- *   $negotiation_info[LANGUAGE_NEGOTIATION_URL]['file'] = drupal_get_path('module', 'mymodule') . '/mymodule.module';
+ *   $negotiation_info[\Drupal\Core\Language\Plugin\LanguageNegotiation\LanguageNegotiationUrl::METHOD_ID]['callbacks']['negotiation'] = 'mymodule_from_url';
+ *   $negotiation_info[\Drupal\Core\Language\Plugin\LanguageNegotiation\LanguageNegotiationUrl::METHOD_ID]['file'] = drupal_get_path('module', 'mymodule') . '/mymodule.module';
  * }
  *
  * function mymodule_from_url($languages) {
@@ -189,7 +181,7 @@ function language_types_set(array $configurable_language_types) {
       // language negotiation settings, we use the values negotiated for the
       // interface language which should always be available.
       if (!$configurable && !empty($info['fixed'])) {
-        $method_weights = array(LANGUAGE_NEGOTIATION_INTERFACE);
+        $method_weights = array(LanguageNegotiationUI::METHOD_ID);
         $method_weights = array_flip($method_weights);
         language_negotiation_set($type, $method_weights);
       }
@@ -234,7 +226,7 @@ function language_types_set(array $configurable_language_types) {
  */
 function language_negotiation_method_get_first($type) {
   $negotiation = variable_get("language_negotiation_$type", array());
-  return empty($negotiation) ? LANGUAGE_NEGOTIATION_SELECTED : key($negotiation);
+  return empty($negotiation) ? LanguageNegotiationSelected::METHOD_ID : key($negotiation);
 }
 
 /**

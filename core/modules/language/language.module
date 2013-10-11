@@ -5,6 +5,9 @@
  * Add language handling functionality to Drupal.
  */
 
+use Drupal\Core\Language\Plugin\LanguageNegotiation\LanguageNegotiationUI;
+use Drupal\Core\Language\Plugin\LanguageNegotiation\LanguageNegotiationUrl;
+use Drupal\Core\Language\Plugin\LanguageNegotiation\LanguageNegotiationUrlFallback;
 use Drupal\node\NodeTypeInterface;
 use Drupal\Core\Language\Language;
 
@@ -625,11 +628,11 @@ function language_language_types_info() {
     Language::TYPE_CONTENT => array(
       'name' => t('Content'),
       'description' => t('Order of language detection methods for content. If a version of content is available in the detected language, it will be displayed.'),
-      'fixed' => array(LANGUAGE_NEGOTIATION_INTERFACE),
+      'fixed' => array(LanguageNegotiationUI::METHOD_ID),
       'locked' => TRUE,
     ),
     Language::TYPE_URL => array(
-      'fixed' => array(LANGUAGE_NEGOTIATION_URL, LANGUAGE_NEGOTIATION_URL_FALLBACK),
+      'fixed' => array(LanguageNegotiationUrl::METHOD_ID, LanguageNegotiationUrlFallback::METHOD_ID),
       'locked' => TRUE,
     ),
   );

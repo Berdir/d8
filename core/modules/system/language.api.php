@@ -49,7 +49,7 @@ function hook_language_switch_links_alter(array &$links, $type, $path) {
  *   - fixed: A fixed array of language negotiation method identifiers to use to
  *     initialize this language. If locked is set to TRUE and fixed is set, it
  *     will always use the specified methods in the given priority order. If not
- *     present and locked is TRUE then LANGUAGE_NEGOTIATION_INTERFACE will be
+ *     present and locked is TRUE then language-interface will be
  *     used.
  *
  *  @todo Rename the 'fixed' key to something more meaningful, for instance
