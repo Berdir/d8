@@ -8,7 +8,7 @@
 namespace Drupal\migrate\Plugin\migrate\process;
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\migrate\MigrateExecutable;
-use Drupal\migrate\SimpleRow;
+use Drupal\migrate\Plugin\MigrateRowInterface;
 use Drupal\migrate\Plugin\MigrateProcessInterface;
 
 /**
@@ -61,7 +61,7 @@ class PropertyMap extends PluginBase implements MigrateProcessInterface {
   /**
    * Array of callbacks to be called on a source value.
    *
-   * @var string
+   * @var array
    */
   protected $callbacks = array();
 
@@ -126,13 +126,13 @@ class PropertyMap extends PluginBase implements MigrateProcessInterface {
    * Apply field mappings to a data row received from the source, returning
    * a populated destination object.
    */
-  public function apply(SimpleRow $row, MigrateExecutable $migrate_executable) {
+  public function apply(MigrateRowInterface $row, MigrateExecutable $migrate_executable) {
     $destination_values = NULL;
 
     // If there's a source mapping, and a source value in the data row, copy
     // to the destination
-    if ($this->source && property_exists($row->source, $this->source)) {
-      $destination_values = $row->{$this->source};
+    if ($this->source && $row->hasSourceProperty($this->source)) {
+      $destination_values = $row->getSourceProperty($this->source);
     }
     // Otherwise, apply the default value (if any)
     elseif (isset($this->default)) {
@@ -153,7 +153,7 @@ class PropertyMap extends PluginBase implements MigrateProcessInterface {
 
     // Call any designated callbacks
     foreach ($this->callbacks as $callback) {
-      if (isset($destination_values)) {
+      if (isset($destination_values) && is_callable($callback)) {
         $destination_values = call_user_func($callback, $destination_values);
       }
     }
@@ -166,8 +166,8 @@ class PropertyMap extends PluginBase implements MigrateProcessInterface {
     // Store the destination together with possible configuration.
     if (isset($destination_values)) {
       $keys = explode(':', $this->destination);
-      $row->set(array_merge($keys, array('values')), $destination_values);
-      $row->set(array_merge($keys, array('configuration')), $this->configuration);
+      $row->setDestinationPropertyDeep(array_merge($keys, array('values')), $destination_values);
+      $row->setDestinationPropertyDeep(array_merge($keys, array('configuration')), $this->configuration);
     }
   }
 }

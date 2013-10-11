@@ -7,12 +7,22 @@
 
 namespace Drupal\migrate;
 
-class SimpleRow {
+use Drupal\Component\Utility\NestedArray;
+use Drupal\migrate\Plugin\MigrateRowInterface;
+
+/**
+ * This just stores a row without any preparation.
+ *
+ * Most row classes will extnd this one, overriding prepare().
+ */
+class SimpleRow implements MigrateRowInterface {
 
   /**
-   * @var \stdClass
+   * @var array
    */
-  public $source;
+  protected $source = array();
+
+  protected $destination = array();
 
   /**
    * Constructs a Migrate>Row object.
@@ -21,21 +31,39 @@ class SimpleRow {
    *   (optional) An array of values to add as properties on the object.
    */
   public function __construct(array $values = array()) {
-    $this->source = new \stdClass;
-    foreach ($values as $key => $value) {
-      $this->{$key} = $value;
-    }
-    $this->destination = new \stdClass;
+    $this->source = $values;
   }
 
-  public function set(array $keys, $value) {
-    $ref = &$this->destination;
-    foreach ($keys as $key) {
-      if (!property_exists($ref, $key)) {
-        $ref->$key = new \stdClass;
-      }
-      $ref = &$ref->$key;
+  public function prepare() {
+  }
+
+  public function hasSourceProperty($property) {
+    return isset($this->source[$property]) || array_key_exists($property, $this->source);
+  }
+
+  public function getSourceProperty($property) {
+    if ($this->hasSourceProperty($property)) {
+      return $this->source[$property];
     }
-    $ref = $value;
+  }
+
+  public function getSource() {
+    return $this->getSource();
+  }
+
+  public function hasDestinationProperty($property) {
+    return isset($this->destination[$property]) || array_key_exists($property, $this->destination);
+  }
+
+  public function setDestinationProperty($property, $value) {
+    $this->destination[$property] = $value;
+  }
+
+  public function setDestinationPropertyDeep(array $property_keys, $value) {
+    NestedArray::setValue($this->destination, $property_keys, $value, TRUE);
+  }
+
+  public function getDestination() {
+    return $this->destination;
   }
 }
