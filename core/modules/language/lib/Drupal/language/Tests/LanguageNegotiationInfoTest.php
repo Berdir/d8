@@ -8,6 +8,7 @@
 namespace Drupal\language\Tests;
 
 use Drupal\Core\Language\Language;
+use Drupal\Core\Language\Plugin\LanguageNegotiation\LanguageNegotiationUI;
 use Drupal\simpletest\WebTestBase;
 
 /**
@@ -62,7 +63,7 @@ class LanguageNegotiationInfoTest extends WebTestBase {
     // Enable some core and custom language negotiation methods. The test
     // language type is supposed to be configurable.
     $test_type = 'test_language_type';
-    $interface_method_id = LANGUAGE_NEGOTIATION_INTERFACE;
+    $interface_method_id = LanguageNegotiationUI::METHOD_ID;
     $test_method_id = 'test_language_negotiation_method';
     $form_field = $type . '[enabled]['. $interface_method_id .']';
     $edit = array(

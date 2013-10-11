@@ -6,6 +6,7 @@
  */
 
 use Drupal\Core\Language\Language;
+use Drupal\Core\Language\Plugin\LanguageNegotiation\LanguageNegotiationSelected;
 
 /**
  * Implements hook_install().
@@ -845,13 +846,9 @@ function locale_update_8011() {
  * Renames language_default language negotiation method to language_selected.
  */
 function locale_update_8013() {
-  // @todo We only need language.inc here because LANGUAGE_NEGOTIATION_SELECTED
-  //   is defined there. Remove this line once that has been converted to a class
-  //   constant.
-  require_once DRUPAL_ROOT . '/core/includes/language.inc';
   $weight = update_variable_get('language_negotiation_methods_weight_language_interface', NULL);
   if ($weight !== NULL) {
-    $weight[LANGUAGE_NEGOTIATION_SELECTED] = $weight['language-default'];
+    $weight[LanguageNegotiationSelected::METHOD_ID] = $weight['language-default'];
     unset($weight['language-default']);
     update_variable_set('language_negotiation_methods_weight_language_interface', $weight);
   }
@@ -859,8 +856,8 @@ function locale_update_8013() {
   $negotiation_interface = update_variable_get('language_negotiation_language_interface', NULL);
   if ($negotiation_interface !== NULL) {
     if (isset($negotiation_interface['language-default'])) {
-      $negotiation_interface[LANGUAGE_NEGOTIATION_SELECTED] = $negotiation_interface['language-default'];
-      $negotiation_interface[LANGUAGE_NEGOTIATION_SELECTED]['callbacks']['negotiation'] = 'language_from_selected';
+      $negotiation_interface[LanguageNegotiationSelected::METHOD_ID] = $negotiation_interface['language-default'];
+      $negotiation_interface[LanguageNegotiationSelected::METHOD_ID]['callbacks']['negotiation'] = 'language_from_selected';
       unset($negotiation_interface['language-default']);
       update_variable_set('language_negotiation_language_interface', $negotiation_interface);
     }

@@ -7,6 +7,7 @@
 
 namespace Drupal\language\Tests;
 
+use Drupal\Core\Language\Plugin\LanguageNegotiation\LanguageNegotiationUrl;
 use Drupal\simpletest\WebTestBase;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -103,7 +104,7 @@ class LanguageUrlRewritingTest extends WebTestBase {
   function testDomainNameNegotiationPort() {
     $language_domain = 'example.fr';
     $edit = array(
-      'language_negotiation_url_part' => LANGUAGE_NEGOTIATION_URL_DOMAIN,
+      'language_negotiation_url_part' => LanguageNegotiationUrl::CONFIG_DOMAIN,
       'domain[fr]' => $language_domain
     );
     $this->drupalPostForm('admin/config/regional/language/detection/url', $edit, t('Save configuration'));
@@ -113,7 +114,7 @@ class LanguageUrlRewritingTest extends WebTestBase {
 
     // Enable domain configuration.
     \Drupal::config('language.negotiation')
-      ->set('url.source', LANGUAGE_NEGOTIATION_URL_DOMAIN)
+      ->set('url.source', LanguageNegotiationUrl::CONFIG_DOMAIN)
       ->save();
 
     // Reset static caching.

@@ -5,6 +5,7 @@
  * Displays the Drupal administration interface in an overlay.
  */
 
+use Drupal\Core\Language\Plugin\LanguageNegotiation\LanguageNegotiationUrl;
 use Drupal\Core\Template\RenderWrapper;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -503,7 +504,7 @@ function overlay_overlay_parent_initialize() {
   $path_prefixes = array();
   if (module_exists('language')) {
     language_negotiation_include();
-    if (\Drupal::config('language.negotiation')->get('url.source') == LANGUAGE_NEGOTIATION_URL_PREFIX) {
+    if (\Drupal::config('language.negotiation')->get('url.source') == LanguageNegotiationUrl::CONFIG_PATH_PREFIX) {
       // Skip the empty string indicating the default language. We always accept
       // paths without a prefix.
       $path_prefixes = language_negotiation_url_prefixes();

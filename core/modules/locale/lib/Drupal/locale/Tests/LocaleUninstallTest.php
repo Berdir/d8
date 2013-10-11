@@ -7,6 +7,8 @@
 
 namespace Drupal\locale\Tests;
 
+use Drupal\Core\Language\Plugin\LanguageNegotiation\LanguageNegotiationSelected;
+use Drupal\Core\Language\Plugin\LanguageNegotiation\LanguageNegotiationUrl;
 use Drupal\simpletest\WebTestBase;
 use Drupal\Core\Language\Language;
 use Drupal\Component\Utility\String;
@@ -97,7 +99,7 @@ class LocaleUninstallTest extends WebTestBase {
 
     // Change language negotiation settings.
     \Drupal::config('language.negotiation')
-      ->set('url.source', LANGUAGE_NEGOTIATION_URL_PREFIX)
+      ->set('url.source', LanguageNegotiationUrl::CONFIG_PATH_PREFIX)
       ->set('session.parameter', TRUE)
       ->save();
 
@@ -120,11 +122,11 @@ class LocaleUninstallTest extends WebTestBase {
     // Check language negotiation.
     require_once DRUPAL_ROOT . '/core/includes/language.inc';
     $this->assertTrue(count($this->container->get('language_manager')->getLanguageTypes()) == count($this->container->get('language_manager')->getTypeDefaults()), 'Language types reset');
-    $language_negotiation = language_negotiation_method_get_first(Language::TYPE_INTERFACE) == LANGUAGE_NEGOTIATION_SELECTED;
+    $language_negotiation = language_negotiation_method_get_first(Language::TYPE_INTERFACE) == LanguageNegotiationSelected::METHOD_ID;
     $this->assertTrue($language_negotiation, String::format('Interface language negotiation: %setting', array('%setting' => $language_negotiation ? 'none' : 'set')));
-    $language_negotiation = language_negotiation_method_get_first(Language::TYPE_CONTENT) == LANGUAGE_NEGOTIATION_SELECTED;
+    $language_negotiation = language_negotiation_method_get_first(Language::TYPE_CONTENT) == LanguageNegotiationSelected::METHOD_ID;
     $this->assertTrue($language_negotiation, String::format('Content language negotiation: %setting', array('%setting' => $language_negotiation ? 'none' : 'set')));
-    $language_negotiation = language_negotiation_method_get_first(Language::TYPE_URL) == LANGUAGE_NEGOTIATION_SELECTED;
+    $language_negotiation = language_negotiation_method_get_first(Language::TYPE_URL) == LanguageNegotiationSelected::METHOD_ID;
     $this->assertTrue($language_negotiation, String::format('URL language negotiation: %setting', array('%setting' => $language_negotiation ? 'none' : 'set')));
 
     // Check language negotiation method settings.

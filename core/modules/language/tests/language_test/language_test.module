@@ -5,10 +5,8 @@
  * Mock module for language layer tests.
  */
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
-
 use Drupal\Core\Language\Language;
+use Drupal\Core\Language\Plugin\LanguageNegotiation\LanguageNegotiationUI;
 
 /**
  * Implements hook_page_build().
@@ -60,7 +58,7 @@ function language_test_language_types_info_alter(array &$language_types) {
  */
 function language_test_language_negotiation_info_alter(array &$negotiation_info) {
   if (\Drupal::state()->get('language_test.language_negotiation_info_alter')) {
-    unset($negotiation_info[LANGUAGE_NEGOTIATION_INTERFACE]);
+    unset($negotiation_info[LanguageNegotiationUI::METHOD_ID]);
   }
 }
 
