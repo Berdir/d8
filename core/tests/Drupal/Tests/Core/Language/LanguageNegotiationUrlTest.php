@@ -14,9 +14,19 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Tests the URL and domain language negotiation.
  *
+ * @group Language
+ *
  * @see \Drupal\Core\Language\Plugin\LanguageNegotiation\LanguageNegotiationUrl
  */
 class LanguageNegotiationUrlTest extends UnitTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Language negotiation URL',
+      'description' => 'Tests the URL/domain Language negotiation plugin',
+      'group' => 'Language',
+    );
+  }
 
   /**
    * Test domain language negotiation.
