@@ -334,6 +334,10 @@ function language_negotiation_set($type, $method_weights) {
  *
  * @return
  *   An array of language negotiation methods.
+ *
+ * @deprecated as of 8.0, use
+ *   Drupal::service('plugin.manager.language_negotiation_method')->getDefinitions()
+ *   instead.
  */
 function language_negotiation_info() {
   return Drupal::service('plugin.manager.language_negotiation_method')->getDefinitions();

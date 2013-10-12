@@ -177,6 +177,7 @@ class NegotiationBrowserForm extends ConfigFormBase {
       $config = $this->configFactory->get('language.mappings');
       $config->setData($mappings);
       $config->save();
+      drupal_rebuild_language_negotiation_settings();
     }
     $form_state['redirect'] = 'admin/config/regional/language/detection';
 

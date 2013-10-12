@@ -46,6 +46,8 @@ class NegotiationSessionForm extends ConfigFormBase {
       ->set('session.parameter', $form_state['values']['language_negotiation_session_param'])
       ->save();
 
+    drupal_rebuild_language_negotiation_settings();
+
     parent::submitForm($form, $form_state);
   }
 

@@ -158,10 +158,11 @@ class LanguageUILanguageNegotiationTest extends WebTestBase {
       'http_header' => $http_header_browser_fallback,
       'message' => 'SELECTED: UI language is switched based on selected language.',
     );
-    $this->runTest($test);
+    $this->assertNegotation($test);
 
     // An invalid language is selected.
     \Drupal::config('language.negotiation')->set('selected_langcode', NULL)->save();
+    drupal_rebuild_language_negotiation_settings();
     $test = array(
       'language_negotiation' => array(LanguageNegotiationSelected::METHOD_ID),
       'path' => 'admin/config',
@@ -170,10 +171,11 @@ class LanguageUILanguageNegotiationTest extends WebTestBase {
       'http_header' => $http_header_browser_fallback,
       'message' => 'SELECTED > DEFAULT: UI language is switched based on selected language.',
     );
-    $this->runTest($test);
+    $this->assertNegotation($test);
 
     // No selected language is available.
     \Drupal::config('language.negotiation')->set('selected_langcode', $langcode_unknown)->save();
+    drupal_rebuild_language_negotiation_settings();
     $test = array(
       'language_negotiation' => array(LanguageNegotiationSelected::METHOD_ID),
       'path' => 'admin/config',
@@ -182,7 +184,7 @@ class LanguageUILanguageNegotiationTest extends WebTestBase {
       'http_header' => $http_header_browser_fallback,
       'message' => 'SELECTED > DEFAULT: UI language is switched based on selected language.',
     );
-    $this->runTest($test);
+    $this->assertNegotation($test);
 
     $tests = array(
       // Default, browser preference should have no influence.
@@ -233,11 +235,11 @@ class LanguageUILanguageNegotiationTest extends WebTestBase {
     );
 
     foreach ($tests as $test) {
-      //$this->runTest($test);
+      $this->assertNegotation($test);
     }
 
     // Unknown language prefix should return 404.
-    variable_set('language_negotiation_' . Language::TYPE_INTERFACE, language_negotiation_info());
+    variable_set('language_negotiation_' . Language::TYPE_INTERFACE, array_keys(language_negotiation_info()));
     $this->drupalGet("$langcode_unknown/admin/config", array(), $http_header_browser_fallback);
     $this->assertResponse(404, "Unknown language path prefix should return 404");
 
@@ -254,7 +256,7 @@ class LanguageUILanguageNegotiationTest extends WebTestBase {
       'http_header' => array(),
       'message' => 'USER > DEFAULT: no preferred user language setting, the UI language is default',
     );
-    $this->runTest($test);
+    $this->assertNegotation($test);
 
     // Set preferred langcode for user to unknown language.
     $account = $this->loggedInUser;
@@ -269,7 +271,7 @@ class LanguageUILanguageNegotiationTest extends WebTestBase {
       'http_header' => array(),
       'message' => 'USER > DEFAULT: invalid preferred user language setting, the UI language is default',
     );
-    $this->runTest($test);
+    $this->assertNegotation($test);
 
     // Set preferred langcode for user to non default.
     $account->preferred_langcode = $langcode;
@@ -283,7 +285,7 @@ class LanguageUILanguageNegotiationTest extends WebTestBase {
       'http_header' => array(),
       'message' => 'USER > DEFAULT: defined prefereed user language setting, the UI language is based on user setting',
     );
-    $this->runTest($test);
+    $this->assertNegotation($test);
 
     // Set preferred admin langcode for user to NULL.
     $account->preferred_admin_langcode = NULL;
@@ -297,7 +299,7 @@ class LanguageUILanguageNegotiationTest extends WebTestBase {
       'http_header' => array(),
       'message' => 'USER ADMIN > DEFAULT: no preferred user admin language setting, the UI language is default',
     );
-    $this->runTest($test);
+    $this->assertNegotation($test);
 
     // Set preferred admin langcode for user to unknown language.
     $account->preferred_admin_langcode = $langcode_unknown;
@@ -311,7 +313,7 @@ class LanguageUILanguageNegotiationTest extends WebTestBase {
       'http_header' => array(),
       'message' => 'USER ADMIN > DEFAULT: invalid preferred user admin language setting, the UI language is default',
     );
-    $this->runTest($test);
+    $this->assertNegotation($test);
 
     // Set preferred admin langcode for user to non default.
     $account->preferred_admin_langcode = $langcode;
@@ -325,11 +327,11 @@ class LanguageUILanguageNegotiationTest extends WebTestBase {
       'http_header' => array(),
       'message' => 'USER ADMIN > DEFAULT: defined prefereed user admin language setting, the UI language is based on user setting',
     );
-    $this->runTest($test);
+    $this->assertNegotation($test);
 
   }
 
-  protected function runTest($test) {
+  protected function assertNegotation($test) {
     if (!empty($test['language_negotiation'])) {
       $method_weights = array_flip($test['language_negotiation']);
       language_negotiation_set(Language::TYPE_INTERFACE, $method_weights);
@@ -417,7 +419,7 @@ class LanguageUILanguageNegotiationTest extends WebTestBase {
 
     // Change the domain for the Italian language.
     $edit = array(
-      'language_negotiation_url_part' => LanguageNegotiationUrl::METHOD_ID_DOMAIN,
+      'language_negotiation_url_part' => LanguageNegotiationUrl::CONFIG_DOMAIN,
       'domain[it]' => 'it.example.com',
     );
     $this->drupalPostForm('admin/config/regional/language/detection/url', $edit, t('Save configuration'));

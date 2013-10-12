@@ -196,7 +196,7 @@ class LanguageManager {
    * Returns the negotiation settings for the specified language type.
    *
    * @param string $type
-   *   The type of the language to retireve the negotiation settings for.
+   *   The type of the language to retrieve the negotiation settings for.
    *
    * @returns array
    *   An array of language negotiation method identifiers ordered by method
@@ -318,7 +318,7 @@ class LanguageManager {
    */
   function getLanguageNegotiationSwitchLinks($type, $path) {
     $links = FALSE;
-    $negotiation = variable_get("language_negotiation_$type", array());
+    $negotiation = $this->getNegotiationForType($type);
 
     foreach ($negotiation as $method_id) {
       $definition = $this->negotiatorManager->getDefinition($method_id);
