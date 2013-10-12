@@ -158,7 +158,7 @@ class LanguageUILanguageNegotiationTest extends WebTestBase {
       'http_header' => $http_header_browser_fallback,
       'message' => 'SELECTED: UI language is switched based on selected language.',
     );
-    $this->assertNegotation($test);
+    $this->runTest($test);
 
     // An invalid language is selected.
     \Drupal::config('language.negotiation')->set('selected_langcode', NULL)->save();
@@ -171,7 +171,7 @@ class LanguageUILanguageNegotiationTest extends WebTestBase {
       'http_header' => $http_header_browser_fallback,
       'message' => 'SELECTED > DEFAULT: UI language is switched based on selected language.',
     );
-    $this->assertNegotation($test);
+    $this->runTest($test);
 
     // No selected language is available.
     \Drupal::config('language.negotiation')->set('selected_langcode', $langcode_unknown)->save();
@@ -184,7 +184,7 @@ class LanguageUILanguageNegotiationTest extends WebTestBase {
       'http_header' => $http_header_browser_fallback,
       'message' => 'SELECTED > DEFAULT: UI language is switched based on selected language.',
     );
-    $this->assertNegotation($test);
+    $this->runTest($test);
 
     $tests = array(
       // Default, browser preference should have no influence.
@@ -235,7 +235,7 @@ class LanguageUILanguageNegotiationTest extends WebTestBase {
     );
 
     foreach ($tests as $test) {
-      $this->assertNegotation($test);
+      $this->runTest($test);
     }
 
     // Unknown language prefix should return 404.
@@ -256,7 +256,7 @@ class LanguageUILanguageNegotiationTest extends WebTestBase {
       'http_header' => array(),
       'message' => 'USER > DEFAULT: no preferred user language setting, the UI language is default',
     );
-    $this->assertNegotation($test);
+    $this->runTest($test);
 
     // Set preferred langcode for user to unknown language.
     $account = $this->loggedInUser;
@@ -271,7 +271,7 @@ class LanguageUILanguageNegotiationTest extends WebTestBase {
       'http_header' => array(),
       'message' => 'USER > DEFAULT: invalid preferred user language setting, the UI language is default',
     );
-    $this->assertNegotation($test);
+    $this->runTest($test);
 
     // Set preferred langcode for user to non default.
     $account->preferred_langcode = $langcode;
@@ -285,7 +285,7 @@ class LanguageUILanguageNegotiationTest extends WebTestBase {
       'http_header' => array(),
       'message' => 'USER > DEFAULT: defined prefereed user language setting, the UI language is based on user setting',
     );
-    $this->assertNegotation($test);
+    $this->runTest($test);
 
     // Set preferred admin langcode for user to NULL.
     $account->preferred_admin_langcode = NULL;
@@ -299,7 +299,7 @@ class LanguageUILanguageNegotiationTest extends WebTestBase {
       'http_header' => array(),
       'message' => 'USER ADMIN > DEFAULT: no preferred user admin language setting, the UI language is default',
     );
-    $this->assertNegotation($test);
+    $this->runTest($test);
 
     // Set preferred admin langcode for user to unknown language.
     $account->preferred_admin_langcode = $langcode_unknown;
@@ -313,7 +313,7 @@ class LanguageUILanguageNegotiationTest extends WebTestBase {
       'http_header' => array(),
       'message' => 'USER ADMIN > DEFAULT: invalid preferred user admin language setting, the UI language is default',
     );
-    $this->assertNegotation($test);
+    $this->runTest($test);
 
     // Set preferred admin langcode for user to non default.
     $account->preferred_admin_langcode = $langcode;
@@ -327,11 +327,11 @@ class LanguageUILanguageNegotiationTest extends WebTestBase {
       'http_header' => array(),
       'message' => 'USER ADMIN > DEFAULT: defined prefereed user admin language setting, the UI language is based on user setting',
     );
-    $this->assertNegotation($test);
+    $this->runTest($test);
 
   }
 
-  protected function assertNegotation($test) {
+  protected function runTest($test) {
     if (!empty($test['language_negotiation'])) {
       $method_weights = array_flip($test['language_negotiation']);
       language_negotiation_set(Language::TYPE_INTERFACE, $method_weights);

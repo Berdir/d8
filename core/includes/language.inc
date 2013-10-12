@@ -274,7 +274,7 @@ function language_negotiation_get_switch_links($type, $path) {
 }
 
 /**
- * Removes any language negotiation methods that are no longer defined.
+ * Resave all negotiation configuration to purge missing negotiation methods.
  */
 function language_negotiation_purge() {
   // Ensure that we are getting the defined language negotiation information. An
@@ -283,17 +283,8 @@ function language_negotiation_purge() {
   // cached information.
   Drupal::service('plugin.manager.language_negotiation_method')->clearCachedDefinitions();
   drupal_static_reset('language_types_info');
-
-  $negotiation_info = language_negotiation_info();
   foreach (language_types_info() as $type => $type_info) {
-    $weight = 0;
-    $method_weights = array();
-    foreach (variable_get("language_negotiation_$type", array()) as $method_id) {
-      if (isset($negotiation_info[$method_id])) {
-        $method_weights[$method_id] = $weight++;
-      }
-    }
-    language_negotiation_set($type, $method_weights);
+    language_negotiation_set($type, variable_get("language_negotiation_$type", array()));
   }
 }
 
@@ -306,13 +297,11 @@ function language_negotiation_purge() {
  *   An array of language negotiation method weights keyed by method ID.
  */
 function language_negotiation_set($type, $method_weights) {
-  $methods = array();
   $negotiation_info = language_negotiation_info();
   $default_types = language_types_get_configurable();
 
   // Order the language negotiation method list by weight.
   asort($method_weights);
-
   foreach ($method_weights as $method_id => $weight) {
     if (isset($negotiation_info[$method_id])) {
       $method = $negotiation_info[$method_id];
@@ -320,13 +309,15 @@ function language_negotiation_set($type, $method_weights) {
       // about types, make it available for any configurable type.
       $types = array_flip(!empty($method['types']) ? $method['types'] : $default_types);
       // Check whether the method is defined and has the right type.
-      if (isset($types[$type])) {
-        $methods[$method_id] = $method_id;
+      if (!isset($types[$type])) {
+        unset($method_weights[$method_id]);
       }
     }
+    else {
+      unset($method_weights[$method_id]);
+    }
   }
-
-  variable_set("language_negotiation_$type", $methods);
+  variable_set("language_negotiation_$type", $method_weights);
 }
 
 /**

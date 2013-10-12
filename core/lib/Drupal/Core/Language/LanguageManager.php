@@ -204,7 +204,7 @@ class LanguageManager {
    */
   protected function getNegotiationForType($type) {
     // @todo convert to CMI https://drupal.org/node/1827038
-    return variable_get("language_negotiation_$type", array());
+    return array_keys(variable_get("language_negotiation_$type", array()));
   }
 
   /**
