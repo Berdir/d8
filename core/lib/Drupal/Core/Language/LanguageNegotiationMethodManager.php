@@ -23,12 +23,14 @@ class LanguageNegotiationMethodManager extends DefaultPluginManager {
    *   An object that implements \Traversable which contains the root paths
    *   keyed by the corresponding namespace to look for plugin implementations.
    */
-  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
+  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler = NULL) {
     parent::__construct('Plugin/LanguageNegotiation', $namespaces);
     $this->cacheBackend = $cache_backend;
     $this->cacheKeyPrefix = 'language_negotiation_plugins';
     $this->cacheKey = 'language_negotiation_plugins';
-    $this->alterInfo($module_handler, 'language_negotiation_info');
+    if ($module_handler) {
+      $this->alterInfo($module_handler, 'language_negotiation_info');
+    }
   }
 
   /**
