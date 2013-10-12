@@ -204,7 +204,7 @@ class LanguageManager {
    */
   protected function getNegotiationForType($type) {
     // @todo convert to CMI https://drupal.org/node/1827038
-    return array_keys(variable_get("language_negotiation_$type", array()));
+    return variable_get("language_negotiation_$type", array());
   }
 
   /**
@@ -320,7 +320,7 @@ class LanguageManager {
     $links = FALSE;
     $negotiation = variable_get("language_negotiation_$type", array());
 
-    foreach ($negotiation as $method_id => $method) {
+    foreach ($negotiation as $method_id) {
       $definition = $this->negotiatorManager->getDefinition($method_id);
       if (method_exists($definition['class'], 'languageSwitchLinks')) {
         $instance = $this->negotiatorManager->createInstance($method_id, $this->config);
