@@ -33,7 +33,7 @@ class LanguageBlock extends BlockBase implements ContainerFactoryPluginInterface
   protected $languageManager;
 
   /**
-   * Constructs an AggregatorFeedBlock object.
+   * Constructs an LanguageBlock object.
    *
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
