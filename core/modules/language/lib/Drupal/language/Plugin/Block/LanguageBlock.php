@@ -10,6 +10,9 @@ namespace Drupal\language\Plugin\Block;
 use Drupal\block\BlockBase;
 use Drupal\block\Annotation\Block;
 use Drupal\Core\Annotation\Translation;
+use Drupal\Core\Language\LanguageManager;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a 'Language switcher' block.
@@ -20,13 +23,51 @@ use Drupal\Core\Annotation\Translation;
  *   derivative = "Drupal\language\Plugin\Derivative\LanguageBlock"
  * )
  */
-class LanguageBlock extends BlockBase {
+class LanguageBlock extends BlockBase implements ContainerFactoryPluginInterface {
+
+  /**
+   * The language manager.
+   *
+   * @var \Drupal\Core\Language\LanguageManager
+   */
+  protected $languageManager;
+
+  /**
+   * Constructs an AggregatorFeedBlock object.
+   *
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   * @param string $plugin_id
+   *   The plugin_id for the plugin instance.
+   * @param array $plugin_definition
+   *   The plugin implementation definition.
+   * @param \Drupal\Core\Language\LanguageManager $language_manager
+   *   The language manager.
+   */
+  public function __construct(array $configuration, $plugin_id, array $plugin_definition, LanguageManager $language_manager) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+    $this->languageManager = $language_manager;
+  }
+
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, array $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('language_manager')
+    );
+  }
+
 
   /**
    * Overrides \Drupal\block\BlockBase::access().
    */
   function access() {
-    return language_multilingual();
+    return $this->languageManager->isMultilingual();
   }
 
   /**
@@ -36,7 +77,7 @@ class LanguageBlock extends BlockBase {
     $build = array();
     $path = drupal_is_front_page() ? '<front>' : current_path();
     list(, $type) = explode(':', $this->getPluginId());
-    $links = language_negotiation_get_switch_links($type, $path);
+    $links = $this->languageManager->getLanguageNegotiationSwitchLinks($type, $path);
 
     if (isset($links->links)) {
       $build = array(

@@ -265,6 +265,9 @@ function language_negotiation_method_enabled($method_id, $type = NULL) {
  *
  * @return
  *   A keyed array of links ready to be themed.
+ *
+ * @deprecated as of 8.0, use
+ *   \Drupal::languageManager()->getLanguageNegotiationSwitchLinks() instead.
  */
 function language_negotiation_get_switch_links($type, $path) {
   return Drupal::languageManager()->getLanguageNegotiationSwitchLinks($type, $path);
@@ -285,7 +288,7 @@ function language_negotiation_purge() {
   foreach (language_types_info() as $type => $type_info) {
     $weight = 0;
     $method_weights = array();
-    foreach (variable_get("language_negotiation_$type", array()) as $method_id => $method) {
+    foreach (variable_get("language_negotiation_$type", array()) as $method_id) {
       if (isset($negotiation_info[$method_id])) {
         $method_weights[$method_id] = $weight++;
       }
@@ -303,10 +306,7 @@ function language_negotiation_purge() {
  *   An array of language negotiation method weights keyed by method ID.
  */
 function language_negotiation_set($type, $method_weights) {
-  // Save only the necessary fields.
-  $method_fields = array('callbacks', 'file', 'cache');
-
-  $negotiation = array();
+  $methods = array();
   $negotiation_info = language_negotiation_info();
   $default_types = language_types_get_configurable();
 
@@ -321,18 +321,12 @@ function language_negotiation_set($type, $method_weights) {
       $types = array_flip(!empty($method['types']) ? $method['types'] : $default_types);
       // Check whether the method is defined and has the right type.
       if (isset($types[$type])) {
-        $method_data = array();
-        foreach ($method_fields as $field) {
-          if (isset($method[$field])) {
-            $method_data[$field] = $method[$field];
-          }
-        }
-        $negotiation[$method_id] = $method_data;
+        $methods[$method_id] = $method_id;
       }
     }
   }
 
-  variable_set("language_negotiation_$type", $negotiation);
+  variable_set("language_negotiation_$type", $methods);
 }
 
 /**

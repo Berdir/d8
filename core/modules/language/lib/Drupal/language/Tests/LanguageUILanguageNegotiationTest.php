@@ -338,11 +338,11 @@ class LanguageUILanguageNegotiationTest extends WebTestBase {
       \Drupal::config('language.negotiation')
         ->set('url.source', $test['language_negotiation_url_part'])
         ->save();
+      drupal_rebuild_language_negotiation_settings();
     }
     if (!empty($test['language_test_domain'])) {
       \Drupal::state()->set('language_test.domain', $test['language_test_domain']);
     }
-    drupal_rebuild_language_negotiation_settings();
     $this->container->get('language_manager')->reset();
     $this->drupalGet($test['path'], array(), $test['http_header']);
     $this->assertText($test['expect'], $test['message']);

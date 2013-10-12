@@ -2373,6 +2373,9 @@ function language($type) {
  *
  * @return bool
  *   TRUE if more than one language is enabled.
+ *
+ * @deprecated as of Drupal 8.0, use
+ *   \Drupal::languageManager()->isMultilingual() instead.
  */
 function language_multilingual() {
   return \Drupal::languageManager()->isMultilingual();
