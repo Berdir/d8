@@ -8,12 +8,13 @@
 namespace Drupal\entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Core\Entity\Display\EntityDisplayInterface;
 
 /**
  * Base class for config entity types that store configuration for entity forms
  * and displays.
  */
-abstract class EntityDisplayBase extends ConfigEntityBase implements EntityDisplayBaseInterface {
+abstract class EntityDisplayBase extends ConfigEntityBase implements EntityDisplayInterface {
 
   /**
    * Unique ID for the config entity.

@@ -8,11 +8,11 @@
 namespace Drupal\comment;
 
 use Drupal\Core\Entity\EntityControllerInterface;
+use Drupal\Core\Entity\Display\EntityDisplayInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityManager;
 use Drupal\Core\Entity\EntityRenderController;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\entity\Entity\EntityDisplay;
 use Drupal\field\FieldInfo;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -146,7 +146,7 @@ class CommentRenderController extends EntityRenderController implements EntityCo
   /**
    * Overrides Drupal\Core\Entity\EntityRenderController::alterBuild().
    */
-  protected function alterBuild(array &$build, EntityInterface $comment, EntityDisplay $display, $view_mode, $langcode = NULL) {
+  protected function alterBuild(array &$build, EntityInterface $comment, EntityDisplayInterface $display, $view_mode, $langcode = NULL) {
     parent::alterBuild($build, $comment, $display, $view_mode, $langcode);
     if (empty($comment->in_preview)) {
       $prefix = '';

@@ -7,9 +7,9 @@
 
 namespace Drupal\node;
 
+use Drupal\Core\Entity\Display\EntityDisplayInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityRenderController;
-use Drupal\entity\Entity\EntityDisplay;
 
 /**
  * Render controller for nodes.
@@ -80,7 +80,7 @@ class NodeRenderController extends EntityRenderController {
   /**
    * Overrides Drupal\Core\Entity\EntityRenderController::alterBuild().
    */
-  protected function alterBuild(array &$build, EntityInterface $entity, EntityDisplay $display, $view_mode, $langcode = NULL) {
+  protected function alterBuild(array &$build, EntityInterface $entity, EntityDisplayInterface $display, $view_mode, $langcode = NULL) {
     parent::alterBuild($build, $entity, $display, $view_mode, $langcode);
     if ($entity->id()) {
       $build['#contextual_links']['node'] = array('node', array($entity->id()));

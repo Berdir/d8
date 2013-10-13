@@ -7,7 +7,7 @@
 
 namespace Drupal\Core\Entity;
 
-use Drupal\entity\Entity\EntityDisplay;
+use Drupal\Core\Entity\Display\EntityDisplayInterface;
 use Drupal\Core\Language\Language;
 
 /**
@@ -136,7 +136,7 @@ class EntityRenderController implements EntityRenderControllerInterface {
    *   The render array that is being created.
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity to be prepared.
-   * @param \Drupal\entity\Entity\EntityDisplay $display
+   * @param \Drupal\Core\Entity\Display\EntityDisplayInterface $display
    *   The entity_display object holding the display options configured for
    *   the entity components.
    * @param string $view_mode
@@ -145,7 +145,7 @@ class EntityRenderController implements EntityRenderControllerInterface {
    *   (optional) For which language the entity should be prepared, defaults to
    *   the current content language.
    */
-  protected function alterBuild(array &$build, EntityInterface $entity, EntityDisplay $display, $view_mode, $langcode = NULL) { }
+  protected function alterBuild(array &$build, EntityInterface $entity, EntityDisplayInterface $display, $view_mode, $langcode = NULL) { }
 
   /**
    * Implements \Drupal\Core\Entity\EntityRenderControllerInterface::view().

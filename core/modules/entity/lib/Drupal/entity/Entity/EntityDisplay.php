@@ -7,10 +7,11 @@
 
 namespace Drupal\entity\Entity;
 
+use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Entity\Annotation\EntityType;
 use Drupal\Core\Annotation\Translation;
+use Drupal\Core\Entity\Display\EntityDisplayInterface;
 use Drupal\entity\EntityDisplayBase;
-use Drupal\entity\EntityDisplayInterface;
 
 /**
  * Configuration entity that contains display options for all components of a
@@ -31,7 +32,7 @@ use Drupal\entity\EntityDisplayInterface;
  *   }
  * )
  */
-class EntityDisplay extends EntityDisplayBase implements EntityDisplayInterface {
+class EntityDisplay extends EntityDisplayBase implements EntityDisplayInterface, ConfigEntityInterface {
 
   /**
    * {@inheritdoc}
@@ -70,5 +71,4 @@ class EntityDisplay extends EntityDisplayBase implements EntityDisplayInterface 
     $this->plugins[$field_name] = $formatter;
     return $formatter;
   }
-
 }
