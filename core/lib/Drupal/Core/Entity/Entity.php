@@ -339,9 +339,36 @@ abstract class Entity implements EntityInterface {
   }
 
   /**
+   * Collects information for hook load.
+   *
+   * @param array $entities
+   *   An array of entities.
+   *
+   * @return array
+   *   A list of arguments to be passed by postLoad() to the entity load
+   *   hooks.
+   */
+  protected static function hookLoadArguments(array $entities) {
+    return array();
+  }
+
+  /**
    * {@inheritdoc}
    */
-  public static function postLoad(EntityStorageControllerInterface $storage_controller, array $entities) {
+  public static function postLoad(EntityStorageControllerInterface $storage_controller, array $entities, $revision_id = FALSE) {
+    $entity_type = $storage_controller->entityType();
+    // Call hook_entity_load().
+    foreach (\Drupal::moduleHandler()->getImplementations('entity_load') as $module) {
+      $function = $module . '_entity_load';
+      $function($entities, $entity_type);
+    }
+    // Call hook_TYPE_load(). The first argument for hook_TYPE_load() are
+    // always the queried entities, followed by additional arguments set in
+    // $this->hookLoadArguments
+    $args = array_merge(array($entities), static::hookLoadArguments($entities));
+    foreach (\Drupal::moduleHandler()->getImplementations($entity_type . '_load') as $module) {
+      call_user_func_array($module . '_' . $entity_type . '_load', $args);
+    }
   }
 
   /**

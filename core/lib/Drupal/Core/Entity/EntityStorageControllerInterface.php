@@ -153,4 +153,18 @@ interface EntityStorageControllerInterface {
    */
   public function getQueryServicename();
 
+  /**
+   * Returns the current entity type.
+   *
+   * @return string
+   */
+  public function entityType();
+
+  /**
+   * Returns the current entity info.
+   *
+   * @return string
+   */
+  public function entityInfo();
+
 }

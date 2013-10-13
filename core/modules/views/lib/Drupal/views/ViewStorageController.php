@@ -33,12 +33,12 @@ class ViewStorageController extends ConfigStorageController {
   /**
    * {@inheritdoc}
    */
-  protected function attachLoad(&$queried_entities, $revision_id = FALSE) {
+  protected function postLoad(array &$queried_entities, $revision_id_id = FALSE) {
     foreach ($queried_entities as $entity) {
       $entity->mergeDefaultDisplaysOptions();
     }
 
-    parent::attachLoad($queried_entities, $revision_id);
+    parent::postLoad($queried_entities, $revision_id_id);
   }
 
 

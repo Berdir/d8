@@ -199,6 +199,14 @@ class Feed extends ContentEntityBase implements FeedInterface {
   /**
    * {@inheritdoc}
    */
+  public static function postLoad(EntityStorageControllerInterface $storage_controller, array $entities, $revision_id = FALSE) {
+    $storage_controller->loadCategories($entities);
+    parent::postLoad($storage_controller, $entities, $revision_id = FALSE);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public static function preDelete(EntityStorageControllerInterface $storage_controller, array $entities) {
     $storage_controller->deleteCategories($entities);
     foreach ($entities as $entity) {

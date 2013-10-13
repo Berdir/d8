@@ -19,14 +19,6 @@ use Drupal\Core\Entity\FieldableDatabaseStorageController;
 class FeedStorageController extends FieldableDatabaseStorageController implements FeedStorageControllerInterface {
 
   /**
-   * Overrides Drupal\Core\Entity\DataBaseStorageController::attachLoad().
-   */
-  protected function attachLoad(&$queried_entities, $load_revision = FALSE) {
-    parent::attachLoad($queried_entities, $load_revision);
-    $this->loadCategories($queried_entities);
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function loadCategories(array $feeds) {

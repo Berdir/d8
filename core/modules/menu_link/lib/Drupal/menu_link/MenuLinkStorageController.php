@@ -106,12 +106,12 @@ class MenuLinkStorageController extends DatabaseStorageController implements Men
   }
 
   /**
-   * Overrides DatabaseStorageController::attachLoad().
+   * Overrides DatabaseStorageController::postLoad().
    *
-   * @todo Don't call parent::attachLoad() at all because we want to be able to
+   * @todo Don't call parent::postLoad() at all because we want to be able to
    * control the entity load hooks.
    */
-  protected function attachLoad(&$menu_links, $load_revision = FALSE) {
+  protected function postLoad(array &$menu_links, $revision_id = FALSE) {
     $routes = array();
 
     foreach ($menu_links as &$menu_link) {
@@ -142,7 +142,7 @@ class MenuLinkStorageController extends DatabaseStorageController implements Men
       }
     }
 
-    parent::attachLoad($menu_links, $load_revision);
+    parent::postLoad($menu_links, $revision_id);
   }
 
   /**

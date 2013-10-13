@@ -22,7 +22,7 @@ use Drupal\node\NodeInterface;
  *   bundle_label = @Translation("Content type"),
  *   module = "node",
  *   controllers = {
- *     "storage" = "Drupal\node\NodeStorageController",
+ *     "storage" = "Drupal\Core\Entity\FieldableDatabaseStorageController",
  *     "view_builder" = "Drupal\node\NodeViewBuilder",
  *     "access" = "Drupal\node\NodeAccessController",
  *     "form" = {
@@ -73,6 +73,27 @@ class Node extends ContentEntityBase implements NodeInterface {
    */
   public function getRevisionId() {
     return $this->get('vid')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected static function hookLoadArguments(array $nodes) {
+    $bundles = array();
+    foreach ($nodes as $id => $node) {
+      $bundles[$node->bundle()] = TRUE;
+    }
+    return array(array_keys($bundles));
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function preCreate(EntityStorageControllerInterface $storage_controller, array &$values) {
+    // @todo Handle this through property defaults.
+    if (empty($values['created'])) {
+      $values['created'] = REQUEST_TIME;
+    }
   }
 
   /**
@@ -145,6 +166,13 @@ class Node extends ContentEntityBase implements NodeInterface {
         search_reindex($entity->nid->value, 'node_search');
       }
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function postDelete(EntityStorageControllerInterface $storage_controller, array $nodes) {
+    \Drupal::service('node.grant_storage')->deleteNodeRecords(array_keys($nodes));
   }
 
   /**

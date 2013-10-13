@@ -21,14 +21,6 @@ use Drupal\Core\Entity\FieldableDatabaseStorageController;
 class ItemStorageController extends FieldableDatabaseStorageController implements ItemStorageControllerInterface {
 
   /**
-   * Overrides Drupal\Core\Entity\DataBaseStorageController::attachLoad().
-   */
-  protected function attachLoad(&$queried_entities, $load_revision = FALSE) {
-    parent::attachLoad($queried_entities, $load_revision);
-    $this->loadCategories($queried_entities);
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function loadCategories(array $entities) {

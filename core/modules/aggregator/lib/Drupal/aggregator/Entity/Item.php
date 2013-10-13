@@ -51,6 +51,14 @@ class Item extends ContentEntityBase implements ItemInterface {
   /**
    * {@inheritdoc}
    */
+  public static function postLoad(EntityStorageControllerInterface $storage_controller, array $entities, $revision_id = FALSE) {
+    $storage_controller->loadCategories($entities);
+    parent::postload($storage_controller, $entities, $revision_id);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function postCreate(EntityStorageControllerInterface $storage_controller) {
     parent::postCreate($storage_controller);
 
