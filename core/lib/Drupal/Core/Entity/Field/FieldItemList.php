@@ -149,49 +149,49 @@ class FieldItemList extends ItemList implements FieldItemListInterface {
    * Implements \Drupal\Core\Entity\Field\FieldItemListInterface::getPropertyDefinition().
    */
   public function getPropertyDefinition($name) {
-    return $this->offsetGet(0)->getPropertyDefinition($name);
+    return $this->first()->getPropertyDefinition($name);
   }
 
   /**
    * Implements \Drupal\Core\Entity\Field\FieldItemListInterface::getPropertyDefinitions().
    */
   public function getPropertyDefinitions() {
-    return $this->offsetGet(0)->getPropertyDefinitions();
+    return $this->first()->getPropertyDefinitions();
   }
 
   /**
    * Implements \Drupal\Core\Entity\Field\FieldItemListInterface::__get().
    */
   public function __get($property_name) {
-    return $this->offsetGet(0)->__get($property_name);
+    return $this->first()->__get($property_name);
   }
 
   /**
    * Implements \Drupal\Core\Entity\Field\FieldItemListInterface::get().
    */
   public function get($property_name) {
-    return $this->offsetGet(0)->get($property_name);
+    return $this->first()->get($property_name);
   }
 
   /**
    * Implements \Drupal\Core\Entity\Field\FieldItemListInterface::__set().
    */
   public function __set($property_name, $value) {
-    $this->offsetGet(0)->__set($property_name, $value);
+    $this->first()->__set($property_name, $value);
   }
 
   /**
    * Implements \Drupal\Core\Entity\Field\FieldItemListInterface::__isset().
    */
   public function __isset($property_name) {
-    return $this->offsetGet(0)->__isset($property_name);
+    return $this->first()->__isset($property_name);
   }
 
   /**
    * Implements \Drupal\Core\Entity\Field\FieldItemListInterface::__unset().
    */
   public function __unset($property_name) {
-    return $this->offsetGet(0)->__unset($property_name);
+    return $this->first()->__unset($property_name);
   }
 
   /**
@@ -222,7 +222,7 @@ class FieldItemList extends ItemList implements FieldItemListInterface {
     // are valid default values.
     if (!isset($value) || (is_array($value) && empty($value))) {
       // Create one field item and apply defaults.
-      $this->offsetGet(0)->applyDefaultValue(FALSE);
+      $this->first()->applyDefaultValue(FALSE);
     }
     else {
       $this->setValue($value, $notify);

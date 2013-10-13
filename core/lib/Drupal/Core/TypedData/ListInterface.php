@@ -43,4 +43,34 @@ interface ListInterface extends TypedDataInterface, \ArrayAccess, \Countable, \T
    *   The delta of the item which is changed.
    */
   public function onChange($delta);
+
+  /**
+   * Returns the item at the specified position in this list.
+   *
+   * @param int $index
+   *   Index of the item to return.
+   *
+   * @return
+   *   The item at the specified position in this list.
+   */
+  public function get($index);
+
+  /**
+   * Replaces the item at the specified position in this list.
+   *
+   * @param int $index
+   *   Index of the item to replace.
+   * @param mixed
+   *   Item to be stored at the specified position.
+   */
+  public function set($index, $item);
+
+  /**
+   * Returns the first item in this list.
+   *
+   * @return
+   *   The first item in this list.
+   */
+  public function first();
+
 }

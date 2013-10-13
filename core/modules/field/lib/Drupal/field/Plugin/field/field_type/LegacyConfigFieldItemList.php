@@ -49,7 +49,7 @@ class LegacyConfigFieldItemList extends ConfigFieldItemList {
           // error, so assume the first column...
           $property_names = $this->getFieldDefinition()->getFieldPropertyNames();
           $property_name = $property_names[0];
-          $violations->add(new ConstraintViolation($item_error['message'], $item_error['message'], array(), $this, $delta . '.' . $property_name, $this->offsetGet($delta)->get($property_name)->getValue(), NULL, $item_error['error']));
+          $violations->add(new ConstraintViolation($item_error['message'], $item_error['message'], array(), $this, $delta . '.' . $property_name, $this->get($delta)->$property_name, NULL, $item_error['error']));
         }
       }
     }
