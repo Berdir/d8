@@ -523,7 +523,7 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
    *   (Optional) ID of the revision that was loaded, or FALSE if the most
    *   current revision was loaded.
    */
-  protected function postLoad(&$queried_entities, $revision_id = FALSE) {
+  protected function postLoad(array &$queried_entities, $revision_id = FALSE) {
     // Map the loaded records into entity objects and according fields.
     $queried_entities = $this->mapFromStorageRecords($queried_entities, $revision_id);
 
