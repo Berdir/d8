@@ -5,7 +5,7 @@
  * Contains \Drupal\Core\Entity\Annotation\FieldType.
  */
 
-namespace Drupal\Core\Entity\Annotation;
+namespace Drupal\Core\Field\Annotation;
 
 use Drupal\Core\TypedData\Annotation\DataType;
 

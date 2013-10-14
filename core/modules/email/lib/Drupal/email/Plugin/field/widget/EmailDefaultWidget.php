@@ -8,7 +8,7 @@
 namespace Drupal\email\Plugin\field\widget;
 
 use Drupal\Core\Entity\Field\FieldItemListInterface;
-use Drupal\field\Plugin\Type\Widget\WidgetBase;
+use Drupal\Core\Field\WidgetBase;
 
 /**
  * Plugin implementation of the 'email_default' widget.
@@ -24,7 +24,7 @@ use Drupal\field\Plugin\Type\Widget\WidgetBase;
  *   }
  * )
  */
-class EmailDefaultWidget extends WidgetBase {
+class EmailDefaultWidget extends \Drupal\Core\Field\WidgetBase {
 
   /**
    * Implements Drupal\field\Plugin\Type\Widget\WidgetInterface::settingsForm().

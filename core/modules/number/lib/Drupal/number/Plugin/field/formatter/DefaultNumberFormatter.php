@@ -7,13 +7,13 @@
 
 namespace Drupal\number\Plugin\field\formatter;
 
-use Drupal\field\Plugin\Type\Formatter\FormatterBase;
+use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Entity\Field\FieldItemListInterface;
 
 /**
  * Parent plugin for decimal and integer formatters
  */
-abstract class DefaultNumberFormatter extends FormatterBase {
+abstract class DefaultNumberFormatter extends \Drupal\Core\Field\FormatterBase {
 
   /**
    * {@inheritdoc}

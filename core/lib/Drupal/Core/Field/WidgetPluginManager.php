@@ -5,14 +5,15 @@
  * Definition of Drupal\field\Plugin\Type\Widget\WidgetPluginManager.
  */
 
-namespace Drupal\field\Plugin\Type\Widget;
+namespace Drupal\Core\Field;
 
 use Drupal\Component\Plugin\Factory\DefaultFactory;
 use Drupal\Core\Cache\CacheBackendInterface;
-use Drupal\Core\Entity\Field\FieldTypePluginManager;
+use Drupal\Core\Field\FieldTypePluginManager;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageManager;
 use Drupal\Core\Plugin\DefaultPluginManager;
+use Drupal\Core\Field\WidgetFactory;
 
 /**
  * Plugin type manager for field widgets.
@@ -22,7 +23,7 @@ class WidgetPluginManager extends DefaultPluginManager {
   /**
    * The field type manager to define field.
    *
-   * @var \Drupal\Core\Entity\Field\FieldTypePluginManager
+   * @var \Drupal\Core\Field\FieldTypePluginManager
    */
   protected $fieldTypeManager;
 
@@ -45,11 +46,11 @@ class WidgetPluginManager extends DefaultPluginManager {
    *   The module handler.
    * @param \Drupal\Core\Language\LanguageManager $language_manager
    *   The language manager.
-   * @param \Drupal\Core\Entity\Field\FieldTypePluginManager $field_type_manager
+   * @param \Drupal\Core\Field\FieldTypePluginManager $field_type_manager
    *   The 'field type' plugin manager.
    */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, LanguageManager $language_manager, FieldTypePluginManager $field_type_manager) {
-    parent::__construct('Plugin/field/widget', $namespaces, 'Drupal\field\Annotation\FieldWidget');
+    parent::__construct('Plugin/Field/FieldWidget', $namespaces, 'Drupal\Core\Field\Annotation\FieldWidget');
 
     $this->setCacheBackend($cache_backend, $language_manager, 'field_widget_types');
     $this->alterInfo($module_handler, 'field_widget_info');
@@ -76,7 +77,7 @@ class WidgetPluginManager extends DefaultPluginManager {
    *     - settings: (array) Settings specific to the widget. Each setting
    *       defaults to the default value specified in the widget definition.
    *
-   * @return \Drupal\field\Plugin\Type\Widget\WidgetInterface
+   * @return \Drupal\Core\Field\WidgetInterface
    *   A Widget object.
    */
   public function getInstance(array $options) {

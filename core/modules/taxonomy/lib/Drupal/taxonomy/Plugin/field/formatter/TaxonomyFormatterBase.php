@@ -7,7 +7,7 @@
 
 namespace Drupal\taxonomy\Plugin\field\formatter;
 
-use Drupal\field\Plugin\Type\Formatter\FormatterBase;
+use Drupal\Core\Field\FormatterBase;
 
 /**
  * Base class for the taxonomy_term formatters.

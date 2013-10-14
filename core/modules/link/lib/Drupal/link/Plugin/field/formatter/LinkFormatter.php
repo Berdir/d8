@@ -10,7 +10,7 @@ namespace Drupal\link\Plugin\field\formatter;
 use Drupal\Component\Utility\Url;
 use Drupal\Core\Entity\Field\FieldItemListInterface;
 use Drupal\Core\Entity\Field\FieldItemInterface;
-use Drupal\field\Plugin\Type\Formatter\FormatterBase;
+use Drupal\Core\Field\FormatterBase;
 
 /**
  * Plugin implementation of the 'link' formatter.
@@ -36,7 +36,7 @@ class LinkFormatter extends FormatterBase {
    * {@inheritdoc}
    */
   public function settingsForm(array $form, array &$form_state) {
-    $elements = parent::settingsForm($form, $form_state);
+    $elements = \Drupal\Core\Field\parent::settingsForm($form, $form_state);
 
     $elements['trim_length'] = array(
       '#type' => 'number',

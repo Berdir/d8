@@ -5,10 +5,10 @@
  * Contains \Drupal\entity_reference\Plugin\field\widget\AutocompleteWidget.
  */
 
-namespace Drupal\entity_reference\Plugin\field\widget;
+namespace Drupal\entity_reference\Plugin\Field\FieldWidget;
 
 use Drupal\Core\Entity\Field\FieldItemListInterface;
-use Drupal\entity_reference\Plugin\field\widget\AutocompleteWidgetBase;
+use Drupal\entity_reference\Plugin\Field\FieldWidget\AutocompleteWidgetBase;
 
 /**
  * Plugin implementation of the 'entity_reference autocomplete' widget.

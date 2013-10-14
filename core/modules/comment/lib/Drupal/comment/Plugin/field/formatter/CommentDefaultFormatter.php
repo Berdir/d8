@@ -12,7 +12,7 @@ use Drupal\Core\Entity\EntityRenderControllerInterface;
 use Drupal\Core\Entity\Field\FieldItemListInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Entity\Field\FieldDefinitionInterface;
-use Drupal\field\Plugin\Type\Formatter\FormatterBase;
+use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 

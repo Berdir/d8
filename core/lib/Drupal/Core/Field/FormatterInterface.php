@@ -5,7 +5,7 @@
  * Contains \Drupal\field\Plugin\Type\Formatter\FormatterInterface.
  */
 
-namespace Drupal\field\Plugin\Type\Formatter;
+namespace Drupal\Core\Field;
 
 use Drupal\Core\Entity\Field\FieldItemListInterface;
 use Drupal\field\Plugin\PluginSettingsInterface;

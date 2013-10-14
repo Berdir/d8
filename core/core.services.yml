@@ -164,8 +164,14 @@ services:
   plugin.manager.entity:
     alias: entity.manager
   plugin.manager.entity.field.field_type:
-    class: Drupal\Core\Entity\Field\FieldTypePluginManager
-    arguments: ['@container.namespaces', '@cache.entity', '@language_manager', '@module_handler']
+    class: Drupal\Core\Field\FieldTypePluginManager
+    arguments: ['@container.namespaces', '@cache.field', '@language_manager', '@module_handler']
+  plugin.manager.field.widget:
+    class: Drupal\Core\Field\WidgetPluginManager
+    arguments: ['@container.namespaces', '@cache.field', '@module_handler', '@language_manager', '@plugin.manager.entity.field.field_type']
+  plugin.manager.field.formatter:
+    class: Drupal\Core\Field\FormatterPluginManager
+    arguments: ['@container.namespaces', '@cache.field', '@module_handler', '@language_manager', '@plugin.manager.entity.field.field_type']
   plugin.manager.archiver:
     class: Drupal\Core\Archiver\ArchiverManager
     arguments: ['@container.namespaces', '@cache.cache', '@language_manager', '@module_handler']

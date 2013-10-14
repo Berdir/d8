@@ -4,10 +4,10 @@
  * Contains \Drupal\datetime\Plugin\field\widget\DateTimeDefaultWidget.
  */
 
-namespace Drupal\datetime\Plugin\field\widget;
+namespace Drupal\datetime\Plugin\Field\FieldWidget;
 
 use Drupal\Core\Entity\Field\FieldItemListInterface;
-use Drupal\field\Plugin\Type\Widget\WidgetBase;
+use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Entity\Field\FieldDefinitionInterface;
 use Drupal\field\FieldInstanceInterface;
 

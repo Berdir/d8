@@ -10,7 +10,7 @@ namespace Drupal\options\Plugin\field\widget;
 use Drupal\Core\Entity\Field\FieldDefinitionInterface;
 use Drupal\Core\Entity\Field\FieldItemListInterface;
 use Drupal\Core\Entity\Field\FieldItemInterface;
-use Drupal\field\Plugin\Type\Widget\WidgetBase;
+use Drupal\Core\Field\WidgetBase;
 
 /**
  * Base class for the 'options_*' widgets.
@@ -22,7 +22,7 @@ use Drupal\field\Plugin\Type\Widget\WidgetBase;
  *
  * @see \Drupal\Core\TypedData\AllowedValuesInterface
  */
-abstract class OptionsWidgetBase extends WidgetBase {
+abstract class OptionsWidgetBase extends \Drupal\Core\Field\WidgetBase {
 
   /**
    * Identifies a 'None' option.

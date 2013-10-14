@@ -5,11 +5,11 @@
  * Definition of Drupal\field\Plugin\Type\Formatter\FormatterPluginManager..
  */
 
-namespace Drupal\field\Plugin\Type\Formatter;
+namespace Drupal\Core\Field;
 
 use Drupal\Component\Plugin\Factory\DefaultFactory;
 use Drupal\Core\Cache\CacheBackendInterface;
-use Drupal\Core\Entity\Field\FieldTypePluginManager;
+use Drupal\Core\Field\FieldTypePluginManager;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageManager;
 use Drupal\Core\Plugin\DefaultPluginManager;
@@ -29,7 +29,7 @@ class FormatterPluginManager extends DefaultPluginManager {
   /**
    * The field type manager to define field.
    *
-   * @var \Drupal\Core\Entity\Field\FieldTypePluginManager
+   * @var \Drupal\Core\Field\FieldTypePluginManager
    */
   protected $fieldTypeManager;
 
@@ -45,12 +45,12 @@ class FormatterPluginManager extends DefaultPluginManager {
    *   The module handler.
    * @param \Drupal\Core\Language\LanguageManager $language_manager
    *   The language manager.
-   * @param \Drupal\Core\Entity\Field\FieldTypePluginManager $field_type_manager
+   * @param \Drupal\Core\Field\FieldTypePluginManager $field_type_manager
    *   The 'field type' plugin manager.
    */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, LanguageManager $language_manager, FieldTypePluginManager $field_type_manager) {
 
-    parent::__construct('Plugin/field/formatter', $namespaces, 'Drupal\field\Annotation\FieldFormatter');
+    parent::__construct('Plugin/field/formatter', $namespaces, 'Drupal\Core\Field\Annotation\FieldFormatter');
 
     $this->setCacheBackend($cache_backend, $language_manager, 'field_formatter_types');
     $this->alterInfo($module_handler, 'field_formatter_info');
@@ -96,7 +96,7 @@ class FormatterPluginManager extends DefaultPluginManager {
    *     - settings: (array) Settings specific to the formatter. Each setting
    *       defaults to the default value specified in the formatter definition.
    *
-   * @return \Drupal\field\Plugin\Type\Formatter\FormatterInterface
+   * @return \Drupal\Core\Field\FormatterInterface
    *   A formatter object.
    */
   public function getInstance(array $options) {

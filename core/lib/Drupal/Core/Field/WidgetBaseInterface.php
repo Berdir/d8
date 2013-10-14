@@ -5,7 +5,7 @@
  * Definition of Drupal\field\Plugin\Type\Widget\WidgetBaseInterface.
  */
 
-namespace Drupal\field\Plugin\Type\Widget;
+namespace Drupal\Core\Field;
 
 use Drupal\Core\Entity\Field\FieldItemListInterface;
 use Drupal\field\Plugin\PluginSettingsInterface;

@@ -8,7 +8,7 @@
 namespace Drupal\link\Plugin\field\widget;
 
 use Drupal\Core\Entity\Field\FieldItemListInterface;
-use Drupal\field\Plugin\Type\Widget\WidgetBase;
+use Drupal\Core\Field\WidgetBase;
 
 /**
  * Plugin implementation of the 'link' widget.
@@ -25,7 +25,7 @@ use Drupal\field\Plugin\Type\Widget\WidgetBase;
  *   }
  * )
  */
-class LinkWidget extends WidgetBase {
+class LinkWidget extends \Drupal\Core\Field\WidgetBase {
 
   /**
    * {@inheritdoc}
@@ -79,7 +79,7 @@ class LinkWidget extends WidgetBase {
    * {@inheritdoc}
    */
   public function settingsForm(array $form, array &$form_state) {
-    $elements = parent::settingsForm($form, $form_state);
+    $elements = \Drupal\Core\Field\parent::settingsForm($form, $form_state);
 
     $elements['placeholder_url'] = array(
       '#type' => 'textfield',

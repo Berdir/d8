@@ -5,7 +5,7 @@
  * Contains \Drupal\field\Annotation\FieldWidget.
  */
 
-namespace Drupal\field\Annotation;
+namespace Drupal\Core\Field\Annotation;
 
 use Drupal\Component\Annotation\Plugin;
 

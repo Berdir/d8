@@ -8,7 +8,7 @@
 namespace Drupal\field_ui;
 
 use Drupal\Core\Entity\EntityManager;
-use Drupal\Core\Entity\Field\FieldTypePluginManager;
+use Drupal\Core\Field\FieldTypePluginManager;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\field_ui\OverviewBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -22,7 +22,7 @@ class FieldOverview extends OverviewBase {
   /**
    *  The field type manager.
    *
-   * @var \Drupal\Core\Entity\Field\FieldTypePluginManager
+   * @var \Drupal\Core\Field\FieldTypePluginManager
    */
   protected $fieldTypeManager;
 
@@ -38,7 +38,7 @@ class FieldOverview extends OverviewBase {
    *
    * @param \Drupal\Core\Entity\EntityManager $entity_manager
    *   The entity manager.
-   * @param \Drupal\Core\Entity\Field\FieldTypePluginManager $field_type_manager
+   * @param \Drupal\Core\Field\FieldTypePluginManager $field_type_manager
    *   The field type manager
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler to invoke hooks on.

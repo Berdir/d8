@@ -7,12 +7,12 @@
 
 namespace Drupal\entity_reference\Plugin\field\formatter;
 
-use Drupal\field\Plugin\Type\Formatter\FormatterBase;
+use Drupal\Core\Field\FormatterBase;
 
 /**
  * Parent plugin for entity reference formatters.
  */
-abstract class EntityReferenceFormatterBase extends FormatterBase {
+abstract class EntityReferenceFormatterBase extends \Drupal\Core\Field\FormatterBase {
 
   /**
    * Overrides \Drupal\field\Plugin\Type\Formatter\FormatterBase::prepareView().

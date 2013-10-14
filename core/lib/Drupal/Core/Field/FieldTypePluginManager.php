@@ -6,7 +6,7 @@
  * Contains \Drupal\Core\Entity\Field\FieldTypePluginManager.
  */
 
-namespace Drupal\Core\Entity\Field;
+namespace Drupal\Core\Field;
 
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -41,7 +41,7 @@ class FieldTypePluginManager extends DefaultPluginManager {
    *   The module handler.
    */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, LanguageManager $language_manager, ModuleHandlerInterface $module_handler) {
-    parent::__construct('Plugin/field/field_type', $namespaces, 'Drupal\Core\Entity\Annotation\FieldType');
+    parent::__construct('Plugin/field/field_type', $namespaces, 'Drupal\Core\Field\Annotation\FieldType');
     $this->alterInfo($module_handler, 'field_info');
     $this->setCacheBackend($cache_backend, $language_manager, 'field_types');
 

@@ -5,10 +5,10 @@
  * Contains \Drupal\number\Plugin\field\widget\NumberWidget.
  */
 
-namespace Drupal\number\Plugin\field\widget;
+namespace Drupal\number\Plugin\Field\FieldWidget;
 
 use Drupal\Core\Entity\Field\FieldItemListInterface;
-use Drupal\field\Plugin\Type\Widget\WidgetBase;
+use Drupal\Core\Field\WidgetBase;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 
 /**
@@ -27,7 +27,7 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
  *   }
  * )
  */
-class NumberWidget extends WidgetBase {
+class NumberWidget extends \Drupal\Core\Field\WidgetBase {
 
   /**
    * {@inheritdoc}

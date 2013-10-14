@@ -5,10 +5,11 @@
  * Contains \Drupal\field\Plugin\Type\Formatter\FormatterBase.
  */
 
-namespace Drupal\field\Plugin\Type\Formatter;
+namespace Drupal\Core\Field;
 
 use Drupal\Core\Entity\Field\FieldDefinitionInterface;
 use Drupal\Core\Entity\Field\FieldItemListInterface;
+use Drupal\Core\Field\FormatterInterface;
 use Drupal\field\Plugin\PluginSettingsBase;
 
 /**

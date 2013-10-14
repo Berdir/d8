@@ -5,9 +5,10 @@
  * Contains \Drupal\options\Plugin\field\widget\ButtonsWidget.
  */
 
-namespace Drupal\options\Plugin\field\widget;
+namespace Drupal\options\Plugin\Field\FieldWidget;
 
 use Drupal\Core\Entity\Field\FieldItemListInterface;
+use Drupal\options\Plugin\field\widget\OptionsWidgetBase;
 
 /**
  * Plugin implementation of the 'options_buttons' widget.

@@ -5,13 +5,14 @@
  * Contains \Drupal\field\Plugin\Type\Widget\WidgetBase.
  */
 
-namespace Drupal\field\Plugin\Type\Widget;
+namespace Drupal\Core\Field;
 
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\Field\FieldDefinitionInterface;
 use Drupal\Core\Entity\Field\FieldItemListInterface;
 use Drupal\field\FieldInstanceInterface;
 use Drupal\field\Plugin\PluginSettingsBase;
+use Drupal\Core\Field\WidgetInterface;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 
 /**

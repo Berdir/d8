@@ -7,7 +7,7 @@
  */
 namespace Drupal\text\Plugin\field\formatter;
 
-use Drupal\field\Plugin\Type\Formatter\FormatterBase;
+use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Entity\Field\FieldItemListInterface;
 
 /**
@@ -34,7 +34,7 @@ use Drupal\Core\Entity\Field\FieldItemListInterface;
  *   }
  * )
  */
-class TextTrimmedFormatter extends FormatterBase {
+class TextTrimmedFormatter extends \Drupal\Core\Field\FormatterBase {
 
   /**
    * {@inheritdoc}

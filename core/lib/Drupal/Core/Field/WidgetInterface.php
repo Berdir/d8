@@ -5,8 +5,9 @@
  * Definition of Drupal\field\Plugin\Type\Widget\WidgetInterface.
  */
 
-namespace Drupal\field\Plugin\Type\Widget;
+namespace Drupal\Core\Field;
 
+use Drupal\Core\Field\WidgetBaseInterface;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Drupal\Core\Entity\Field\FieldItemListInterface;
 

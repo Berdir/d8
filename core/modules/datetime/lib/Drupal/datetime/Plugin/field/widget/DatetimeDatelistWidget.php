@@ -7,7 +7,7 @@
 namespace Drupal\datetime\Plugin\field\widget;
 
 use Drupal\Core\Entity\Field\FieldItemListInterface;
-use Drupal\field\Plugin\Type\Widget\WidgetBase;
+use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Entity\Field\FieldDefinitionInterface;
 use Drupal\field\FieldInstanceInterface;
 use Drupal\datetime\DateHelper;

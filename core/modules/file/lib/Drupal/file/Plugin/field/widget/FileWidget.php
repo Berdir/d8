@@ -7,7 +7,7 @@
 
 namespace Drupal\file\Plugin\field\widget;
 
-use Drupal\field\Plugin\Type\Widget\WidgetBase;
+use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Entity\Field\FieldItemListInterface;
 
 /**
@@ -24,7 +24,7 @@ use Drupal\Core\Entity\Field\FieldItemListInterface;
  *   }
  * )
  */
-class FileWidget extends WidgetBase {
+class FileWidget extends \Drupal\Core\Field\WidgetBase {
 
   /**
    * {@inheritdoc}

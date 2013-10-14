@@ -5,7 +5,7 @@
  * Contains \Drupal\field\Plugin\WidgetFactory.
  */
 
-namespace Drupal\field\Plugin\Type\Widget;
+namespace Drupal\Core\Field;
 
 use Drupal\Component\Plugin\Factory\DefaultFactory;
 

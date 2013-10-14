@@ -5,10 +5,10 @@
  * Definition of Drupal\field_test\Plugin\field\widget\TestFieldWidgetMultiple.
  */
 
-namespace Drupal\field_test\Plugin\field\widget;
+namespace Drupal\field_test\Plugin\Field\FieldWidget;
 
 use Drupal\Core\Entity\Field\FieldItemListInterface;
-use Drupal\field\Plugin\Type\Widget\WidgetBase;
+use Drupal\Core\Field\WidgetBase;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 
 /**

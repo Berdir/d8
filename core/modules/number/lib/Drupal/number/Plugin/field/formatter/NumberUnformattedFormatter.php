@@ -7,7 +7,7 @@
 
 namespace Drupal\number\Plugin\field\formatter;
 
-use Drupal\field\Plugin\Type\Formatter\FormatterBase;
+use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Entity\Field\FieldItemListInterface;
 
 /**
@@ -23,7 +23,7 @@ use Drupal\Core\Entity\Field\FieldItemListInterface;
  *   }
  * )
  */
-class NumberUnformattedFormatter extends FormatterBase {
+class NumberUnformattedFormatter extends \Drupal\Core\Field\FormatterBase {
 
   /**
    * Implements Drupal\field\Plugin\Type\Formatter\FormatterInterface::viewElements().

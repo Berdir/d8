@@ -8,7 +8,7 @@
 namespace Drupal\text\Plugin\field\widget;
 
 use Drupal\Core\Entity\Field\FieldItemListInterface;
-use Drupal\field\Plugin\Type\Widget\WidgetBase;
+use Drupal\Core\Field\WidgetBase;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 
 /**
@@ -26,7 +26,7 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
  *   }
  * )
  */
-class TextareaWidget extends WidgetBase {
+class TextareaWidget extends \Drupal\Core\Field\WidgetBase {
 
   /**
    * {@inheritdoc}

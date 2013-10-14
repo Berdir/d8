@@ -5,10 +5,10 @@
  * Contains \Drupal\entity_reference\Plugin\field\widget\AutocompleteWidgetBase.
  */
 
-namespace Drupal\entity_reference\Plugin\field\widget;
+namespace Drupal\entity_reference\Plugin\Field\FieldWidget;
 
 use Drupal\Core\Entity\Field\FieldItemListInterface;
-use Drupal\field\Plugin\Type\Widget\WidgetBase;
+use Drupal\Core\Field\WidgetBase;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 
 /**

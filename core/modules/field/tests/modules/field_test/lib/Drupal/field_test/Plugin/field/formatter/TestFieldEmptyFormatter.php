@@ -8,7 +8,7 @@
 namespace Drupal\field_test\Plugin\field\formatter;
 
 use Drupal\Core\Entity\Field\FieldItemListInterface;
-use Drupal\field\Plugin\Type\Formatter\FormatterBase;
+use Drupal\Core\Field\FormatterBase;
 
 /**
  * Plugin implementation of the 'field_empty_test' formatter.
@@ -24,7 +24,7 @@ use Drupal\field\Plugin\Type\Formatter\FormatterBase;
  *   }
  * )
  */
-class TestFieldEmptyFormatter extends FormatterBase {
+class TestFieldEmptyFormatter extends \Drupal\Core\Field\FormatterBase {
 
   /**
    * {@inheritdoc}

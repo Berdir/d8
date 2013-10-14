@@ -7,9 +7,9 @@
 
 namespace Drupal\field_test\Plugin\field\formatter;
 
-use Drupal\field\Annotation\FieldFormatter;
+use Drupal\Core\Field\Annotation\FieldFormatter;
 use Drupal\Core\Annotation\Translation;
-use Drupal\field\Plugin\Type\Formatter\FormatterBase;
+use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Entity\Field\FieldItemListInterface;
 
 /**
@@ -26,7 +26,7 @@ use Drupal\Core\Entity\Field\FieldItemListInterface;
  *   }
  * )
  */
-class TestFieldEmptySettingFormatter extends FormatterBase {
+class TestFieldEmptySettingFormatter extends \Drupal\Core\Field\FormatterBase {
 
   /**
    * {@inheritdoc}

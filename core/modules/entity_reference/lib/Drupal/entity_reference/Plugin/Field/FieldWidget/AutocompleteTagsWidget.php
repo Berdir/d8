@@ -5,9 +5,9 @@
  * Contains \Drupal\entity_reference\Plugin\field\widget\AutocompleteTagsWidget.
  */
 
-namespace Drupal\entity_reference\Plugin\field\widget;
+namespace Drupal\entity_reference\Plugin\Field\FieldWidget;
 
-use Drupal\entity_reference\Plugin\field\widget\AutocompleteWidgetBase;
+use Drupal\entity_reference\Plugin\Field\FieldWidget\AutocompleteWidgetBase;
 
 /**
  * Plugin implementation of the 'entity_reference autocomplete-tags' widget.
