@@ -93,7 +93,7 @@ class EditAutocompleteTermTest extends WebTestBase {
         ),
       ),
     ))->save();
-    $instance = entity_create('field_instance', array(
+    $instance = entity_create('field_instance_config', array(
       'field_name' => $this->field_name,
       'entity_type' => 'node',
       'label' => 'Tags',

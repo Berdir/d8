@@ -61,8 +61,8 @@ class FieldInstanceEditForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, array &$form_state, FieldInstanceInterface $field_instance = NULL) {
-    $this->instance = $form_state['instance'] = $field_instance;
+  public function buildForm(array $form, array &$form_state, FieldInstanceInterface $field_instance_config = NULL) {
+    $this->instance = $form_state['instance'] = $field_instance_config;
 
     $bundle = $this->instance->bundle;
     $entity_type = $this->instance->entity_type;

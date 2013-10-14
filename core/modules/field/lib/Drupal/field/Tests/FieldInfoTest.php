@@ -41,7 +41,7 @@ class FieldInfoTest extends FieldUnitTestBase {
 
     // Create a field, verify it shows up.
     $core_fields = field_info_fields();
-    $field = entity_create('field_entity', array(
+    $field = entity_create('field_config', array(
       'name' => drupal_strtolower($this->randomName()),
       'entity_type' => 'entity_test',
       'type' => 'test_field',
@@ -68,7 +68,7 @@ class FieldInfoTest extends FieldUnitTestBase {
       'description' => $this->randomName(),
       'weight' => mt_rand(0, 127),
     );
-    $instance = entity_create('field_instance', $instance_definition);
+    $instance = entity_create('field_instance_config', $instance_definition);
     $instance->save();
 
     $info = entity_get_info('entity_test');
@@ -117,7 +117,7 @@ class FieldInfoTest extends FieldUnitTestBase {
       'entity_type' => 'entity_test',
       'type' => 'test_field',
     );
-    $field = entity_create('field_entity', $field_definition);
+    $field = entity_create('field_config', $field_definition);
     $field->save();
 
     // Simulate a stored field definition missing a field setting (e.g. a
@@ -145,13 +145,13 @@ class FieldInfoTest extends FieldUnitTestBase {
       'entity_type' => 'entity_test',
       'type' => 'test_field',
     );
-    entity_create('field_entity', $field_definition)->save();
+    entity_create('field_config', $field_definition)->save();
     $instance_definition = array(
       'field_name' => $field_definition['name'],
       'entity_type' => 'entity_test',
       'bundle' => 'entity_test',
     );
-    $instance = entity_create('field_instance', $instance_definition);
+    $instance = entity_create('field_instance_config', $instance_definition);
     $instance->save();
 
     // Simulate a stored instance definition missing various settings (e.g. a
@@ -182,13 +182,13 @@ class FieldInfoTest extends FieldUnitTestBase {
       'entity_type' => 'comment',
       'type' => 'test_field',
     );
-    entity_create('field_entity', $field_definition)->save();
+    entity_create('field_config', $field_definition)->save();
     $instance_definition = array(
       'field_name' => 'field',
       'entity_type' => 'comment',
       'bundle' => 'comment_node_article',
     );
-    entity_create('field_instance', $instance_definition);
+    entity_create('field_instance_config', $instance_definition);
 
     // Disable coment module. This clears field_info cache.
     module_uninstall(array('comment'));
@@ -224,7 +224,7 @@ class FieldInfoTest extends FieldUnitTestBase {
       ),
     );
     foreach ($fields as $field) {
-      entity_create('field_entity', $field)->save();
+      entity_create('field_config', $field)->save();
     }
 
     // Create a couple instances.
@@ -251,7 +251,7 @@ class FieldInfoTest extends FieldUnitTestBase {
       ),
     );
     foreach ($instances as $instance) {
-      entity_create('field_instance', $instance)->save();
+      entity_create('field_instance_config', $instance)->save();
     }
 
     $expected = array(
@@ -298,7 +298,7 @@ class FieldInfoTest extends FieldUnitTestBase {
     // Create a test field and ensure it's in the array returned by
     // field_info_fields().
     $field_name = drupal_strtolower($this->randomName());
-    $field = entity_create('field_entity', array(
+    $field = entity_create('field_config', array(
       'name' => $field_name,
       'entity_type' => 'entity_test',
       'type' => 'test_field',

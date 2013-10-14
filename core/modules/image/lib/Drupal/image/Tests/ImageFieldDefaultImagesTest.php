@@ -56,7 +56,7 @@ class ImageFieldDefaultImagesTest extends ImageFieldTestBase {
     // The instance default image id should be 2.
     $this->assertEqual($instance->getFieldSetting('default_image'), $default_images['instance']->id());
 
-    // Also test \Drupal\field\Entity\FieldInstance::getFieldSetting().
+    // Also test \Drupal\field\Entity\FieldInstanceConfig::getFieldSetting().
     $instance_field_settings = $instance->getFieldSettings();
     $this->assertEqual($instance_field_settings['default_image'], $default_images['instance']->id());
 
@@ -70,7 +70,7 @@ class ImageFieldDefaultImagesTest extends ImageFieldTestBase {
     $this->assertEqual($field_field_settings['default_image'], $default_images['field']->id());
 
     // Add another instance with another default image to the page content type.
-    $instance2 = entity_create('field_instance', array(
+    $instance2 = entity_create('field_instance_config', array(
       'field_name' => $field->name,
       'entity_type' => 'node',
       'bundle' => 'page',

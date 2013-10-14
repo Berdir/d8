@@ -190,7 +190,7 @@ class FieldAttachOtherTest extends FieldUnitTestBase {
     $formatter_setting = $this->randomName();
     $instance_definition = $this->instance_definition;
     $instance_definition['bundle'] = 'test_bundle_2';
-    $this->instance2 = entity_create('field_instance', $instance_definition);
+    $this->instance2 = entity_create('field_instance_config', $instance_definition);
     $this->instance2->save();
 
     $display_2 = entity_get_display('entity_test', 'test_bundle_2', 'full')

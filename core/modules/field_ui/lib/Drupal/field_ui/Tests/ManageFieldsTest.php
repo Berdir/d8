@@ -46,7 +46,7 @@ class ManageFieldsTest extends FieldUiTestBase {
       'entity_type' => 'node',
       'type' => 'taxonomy_term_reference',
     );
-    entity_create('field_entity', $field)->save();
+    entity_create('field_config', $field)->save();
 
     $instance = array(
       'field_name' => 'field_' . $vocabulary->id(),
@@ -54,7 +54,7 @@ class ManageFieldsTest extends FieldUiTestBase {
       'label' => 'Tags',
       'bundle' => 'article',
     );
-    entity_create('field_instance', $instance)->save();
+    entity_create('field_instance_config', $instance)->save();
 
     entity_get_form_display('node', 'article', 'default')
       ->setComponent('field_' . $vocabulary->id())
@@ -268,12 +268,12 @@ class ManageFieldsTest extends FieldUiTestBase {
   function testDefaultValue() {
     // Create a test field and instance.
     $field_name = 'test';
-    entity_create('field_entity', array(
+    entity_create('field_config', array(
       'name' => $field_name,
       'entity_type' => 'node',
       'type' => 'test_field'
     ))->save();
-    $instance = entity_create('field_instance', array(
+    $instance = entity_create('field_instance_config', array(
       'field_name' => $field_name,
       'entity_type' => 'node',
       'bundle' => $this->type,
@@ -374,7 +374,7 @@ class ManageFieldsTest extends FieldUiTestBase {
   function testLockedField() {
     // Create a locked field and attach it to a bundle. We need to do this
     // programatically as there's no way to create a locked field through UI.
-    $field = entity_create('field_entity', array(
+    $field = entity_create('field_config', array(
       'name' => strtolower($this->randomName(8)),
       'entity_type' => 'node',
       'type' => 'test_field',
@@ -382,7 +382,7 @@ class ManageFieldsTest extends FieldUiTestBase {
       'locked' => TRUE
     ));
     $field->save();
-    entity_create('field_instance', array(
+    entity_create('field_instance_config', array(
       'field_uuid' => $field->uuid,
       'entity_type' => 'node',
       'bundle' => $this->type,
@@ -415,7 +415,7 @@ class ManageFieldsTest extends FieldUiTestBase {
 
     // Create a field and an instance programmatically.
     $field_name = 'hidden_test_field';
-    entity_create('field_entity', array(
+    entity_create('field_config', array(
       'name' => $field_name,
       'entity_type' => 'node',
       'type' => $field_name,
@@ -426,7 +426,7 @@ class ManageFieldsTest extends FieldUiTestBase {
       'entity_type' => 'node',
       'label' => t('Hidden field'),
     );
-    entity_create('field_instance', $instance)->save();
+    entity_create('field_instance_config', $instance)->save();
     entity_get_form_display('node', $this->type, 'default')
       ->setComponent($field_name)
       ->save();
@@ -503,13 +503,13 @@ class ManageFieldsTest extends FieldUiTestBase {
    */
   function testHelpDescriptions() {
     // Create an image field
-    entity_create('field_entity', array(
+    entity_create('field_config', array(
       'name' => 'field_image',
       'entity_type' => 'node',
       'type' => 'image',
     ))->save();
 
-    entity_create('field_instance', array(
+    entity_create('field_instance_config', array(
       'field_name' => 'field_image',
       'entity_type' => 'node',
       'label' => 'Image',

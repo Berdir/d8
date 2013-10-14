@@ -32,7 +32,7 @@ class DatetimeFieldTest extends WebTestBase {
   /**
    * The instance used in this test class.
    *
-   * @var \Drupal\field\Entity\FieldInstance
+   * @var \Drupal\field\Entity\FieldInstanceConfig
    */
   protected $instance;
 
@@ -55,14 +55,14 @@ class DatetimeFieldTest extends WebTestBase {
     $this->drupalLogin($web_user);
 
     // Create a field with settings to validate.
-    $this->field = entity_create('field_entity', array(
+    $this->field = entity_create('field_config', array(
       'name' => drupal_strtolower($this->randomName()),
       'entity_type' => 'entity_test',
       'type' => 'datetime',
       'settings' => array('datetime_type' => 'date'),
     ));
     $this->field->save();
-    $this->instance = entity_create('field_instance', array(
+    $this->instance = entity_create('field_instance_config', array(
       'field_name' => $this->field->name,
       'entity_type' => 'entity_test',
       'bundle' => 'entity_test',

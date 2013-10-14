@@ -325,7 +325,7 @@ class FieldInfo {
     // Do not check the (large) persistent cache, but read the definition.
 
     // Cache miss: read from definition.
-    if ($field = entity_load('field_entity', $entity_type . '.' . $field_name)) {
+    if ($field = entity_load('field_config', $entity_type . '.' . $field_name)) {
       $field = $this->prepareField($field);
 
       // Save in the "static" cache.
@@ -456,7 +456,7 @@ class FieldInfo {
       // Load and prepare the corresponding fields and instances entities.
       if ($config_ids) {
         // Place the fields in our global "static".
-        $loaded_fields = entity_load_multiple('field_entity', array_keys($config_ids));
+        $loaded_fields = entity_load_multiple('field_config', array_keys($config_ids));
         foreach ($loaded_fields as $field) {
           if (!isset($this->fieldsById[$field->uuid()])) {
             $field = $this->prepareField($field);
@@ -469,7 +469,7 @@ class FieldInfo {
         }
 
         // Then collect the instances.
-        $loaded_instances = entity_load_multiple('field_instance', array_values($config_ids));
+        $loaded_instances = entity_load_multiple('field_instance_config', array_values($config_ids));
         foreach ($loaded_instances as $instance) {
           $instance = $this->prepareInstance($instance);
           $instances[$instance->getFieldName()] = $instance;

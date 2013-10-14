@@ -6,7 +6,7 @@
  */
 
 use Drupal\Core\Entity\FieldableDatabaseStorageController;
-use Drupal\field\Entity\Field;
+use Drupal\field\Entity\FieldConfig;
 
 /**
  * Creates a field by writing directly to configuration.
@@ -48,7 +48,7 @@ function _update_8003_field_create_field(array &$field_config) {
 
   // Create storage for the field. This requires a field entity, but cannot use
   // the regular entity_create() function here.
-  $schema = FieldableDatabaseStorageController::_fieldSqlSchema(new Field($field_config), $field_config['schema']);
+  $schema = FieldableDatabaseStorageController::_fieldSqlSchema(new FieldConfig($field_config), $field_config['schema']);
   foreach ($schema as $name => $table) {
     db_create_table($name, $table);
   }
@@ -116,7 +116,7 @@ function _update_8006_field_write_data_sql($entity_type, $bundle, $entity_id, $r
   }
 
   $field_config = \Drupal::config("field.field.$entity_type.$field_name");
-  $field = new Field($field_config);
+  $field = new FieldConfig($field_config);
 
   $table_name = FieldableDatabaseStorageController::_fieldTableName($field);
   $revision_name = FieldableDatabaseStorageController::_fieldRevisionTableName($field);
@@ -364,7 +364,7 @@ function field_update_8003() {
       $deleted_fields[$config['uuid']] = $config;
       // This will not be saved but the DatabaseStorageController helpers need
       // the field object.
-      $field = new Field($config);
+      $field = new FieldConfig($config);
       // Additionally, rename the data tables for deleted fields.
       $tables = array(
         "field_deleted_data_{$record['id']}" => 'old_' . FieldableDatabaseStorageController::_fieldTableName($field),
@@ -512,7 +512,7 @@ function field_update_8006(&$sandbox) {
   }
 
   // Prepare updated schema data structures.
-  $field = new Field($field_config);
+  $field = new FieldConfig($field_config);
   $tables = array(
     array(
       'old_table' => 'field_data_' . $field_config['name'],

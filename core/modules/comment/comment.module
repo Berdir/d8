@@ -248,9 +248,9 @@ function comment_count_unpublished() {
 }
 
 /**
- * Implements hook_ENTITY_TYPE_create() for 'field_instance'.
+ * Implements hook_ENTITY_TYPE_create() for 'field_instance_config'.
  */
-function comment_field_instance_create(FieldInstanceInterface $instance) {
+function comment_field_instance_config_create(FieldInstanceInterface $instance) {
   if ($instance->getFieldType() == 'comment') {
     \Drupal::service('comment.manager')->addBodyField($instance->entity_type, $instance->getFieldName());
     \Drupal::cache()->delete('comment_entity_info');
@@ -267,18 +267,18 @@ function comment_field_instance_create(FieldInstanceInterface $instance) {
 }
 
 /**
- * Implements hook_ENTITY_TYPE_update() for 'field_instance'.
+ * Implements hook_ENTITY_TYPE_update() for 'field_instance_config'.
  */
-function comment_field_instance_update(FieldInstanceInterface $instance) {
+function comment_field_instance_config_update(FieldInstanceInterface $instance) {
   if ($instance->getFieldType() == 'comment') {
     \Drupal::entityManager()->getRenderController($instance->entity_type)->resetCache();
   }
 }
 
 /**
- * Implements hook_ENTITY_TYPE_delete() for 'field_entity'.
+ * Implements hook_ENTITY_TYPE_delete() for 'field_config'.
  */
-function comment_field_entity_delete(FieldInterface $field) {
+function comment_field_config_delete(FieldInterface $field) {
   if ($field->getFieldType() == 'comment') {
     // Delete all fields and displays attached to the comment bundle.
     entity_invoke_bundle_hook('delete', 'comment', $field->getFieldName());
@@ -287,9 +287,9 @@ function comment_field_entity_delete(FieldInterface $field) {
 }
 
 /**
- * Implements hook_ENTITY_TYPE_delete() for 'field_instance'.
+ * Implements hook_ENTITY_TYPE_delete() for 'field_instance_config'.
  */
-function comment_field_instance_delete(FieldInstanceInterface $instance) {
+function comment_field_instance_config_delete(FieldInstanceInterface $instance) {
   if ($instance->getFieldType() == 'comment') {
     // Delete all comments that used by the entity bundle.
     $comments = db_query("SELECT cid FROM {comment} WHERE entity_type = :entity_type AND field_id = :field_id", array(

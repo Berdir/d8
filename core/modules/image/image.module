@@ -6,8 +6,8 @@
  */
 
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\field\Entity\Field;
-use Drupal\field\Entity\FieldInstance;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldInstanceConfig;
 use Drupal\file\Entity\File;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\field\FieldInterface;
@@ -428,9 +428,9 @@ function image_entity_presave(EntityInterface $entity, $type) {
 }
 
 /**
- * Implements hook_ENTITY_TYPE_update() for 'field_entity'.
+ * Implements hook_ENTITY_TYPE_update() for 'field_config'.
  */
-function image_field_entity_update(FieldInterface $field) {
+function image_field_config_update(FieldInterface $field) {
   if ($field->type != 'image') {
     // Only act on image fields.
     return;
@@ -472,20 +472,20 @@ function image_field_entity_update(FieldInterface $field) {
 }
 
 /**
- * Implements hook_ENTITY_TYPE_update() for 'field_instance'.
+ * Implements hook_ENTITY_TYPE_update() for 'field_instance_config'.
  */
-function image_field_instance_update(FieldInstanceInterface $field_instance) {
-  $field = $field_instance->getField();
+function image_field_instance_config_update(FieldInstanceInterface $field_instance_config) {
+  $field = $field_instance_config->getField();
   if ($field->type != 'image') {
     // Only act on image fields.
     return;
   }
 
-  $prior_instance = $field_instance->original;
+  $prior_instance = $field_instance_config->original;
 
   // The value of a managed_file element can be an array if the #extended
   // property is set to TRUE.
-  $fid_new = $field_instance->settings['default_image'];
+  $fid_new = $field_instance_config->settings['default_image'];
   if (isset($fid_new['fids'])) {
     $fid_new = $fid_new['fids'];
   }
@@ -501,11 +501,11 @@ function image_field_instance_update(FieldInstanceInterface $field_instance) {
     if ($file_new) {
       $file_new->status = FILE_STATUS_PERMANENT;
       $file_new->save();
-      file_usage()->add($file_new, 'image', 'default_image', $field_instance->uuid);
+      file_usage()->add($file_new, 'image', 'default_image', $field_instance_config->uuid);
     }
     // Delete the old file, if present.
     if ($fid_old && ($file_old = file_load($fid_old[0]))) {
-      file_usage()->delete($file_old, 'image', 'default_image', $field_instance->uuid);
+      file_usage()->delete($file_old, 'image', 'default_image', $field_instance_config->uuid);
     }
   }
 
@@ -518,9 +518,9 @@ function image_field_instance_update(FieldInstanceInterface $field_instance) {
 }
 
 /**
- * Implements hook_ENTITY_TYPE_delete() for 'field_entity'.
+ * Implements hook_ENTITY_TYPE_delete() for 'field_config'.
  */
-function image_field_entity_delete(FieldInterface $field) {
+function image_field_config_delete(FieldInterface $field) {
   if ($field->type != 'image') {
     // Only act on image fields.
     return;
@@ -534,10 +534,10 @@ function image_field_entity_delete(FieldInterface $field) {
 }
 
 /**
- * Implements hook_ENTITY_TYPE_delete() for 'field_instance'.
+ * Implements hook_ENTITY_TYPE_delete() for 'field_instance_config'.
  */
-function image_field_instance_delete(FieldInstanceInterface $field_instance) {
-  $field = $field_instance->getField();
+function image_field_instance_config_delete(FieldInstanceInterface $field_instance_config) {
+  $field = $field_instance_config->getField();
   if ($field->type != 'image') {
     // Only act on image fields.
     return;
@@ -545,13 +545,13 @@ function image_field_instance_delete(FieldInstanceInterface $field_instance) {
 
   // The value of a managed_file element can be an array if the #extended
   // property is set to TRUE.
-  $fid = $field_instance->settings['default_image'];
+  $fid = $field_instance_config->settings['default_image'];
   if (is_array($fid)) {
     $fid = $fid['fid'];
   }
 
   // Remove the default image when the instance is deleted.
   if ($fid && ($file = file_load($fid))) {
-    file_usage()->delete($file, 'image', 'default_image', $field_instance->uuid);
+    file_usage()->delete($file, 'image', 'default_image', $field_instance_config->uuid);
   }
 }

@@ -48,7 +48,7 @@ class FieldInstanceCrudTest extends FieldUnitTestBase {
       'entity_type' => 'entity_test',
       'type' => 'test_field',
     );
-    $this->field = entity_create('field_entity', $this->field_definition);
+    $this->field = entity_create('field_config', $this->field_definition);
     $this->field->save();
     $this->instance_definition = array(
       'field_name' => $this->field->getFieldName(),
@@ -67,7 +67,7 @@ class FieldInstanceCrudTest extends FieldUnitTestBase {
    * Test the creation of a field instance.
    */
   function testCreateFieldInstance() {
-    $instance = entity_create('field_instance', $this->instance_definition);
+    $instance = entity_create('field_instance_config', $this->instance_definition);
     $instance->save();
 
     // Read the configuration. Check against raw configuration data rather than
@@ -87,7 +87,7 @@ class FieldInstanceCrudTest extends FieldUnitTestBase {
 
     // Guarantee that the field/bundle combination is unique.
     try {
-      entity_create('field_instance', $this->instance_definition)->save();
+      entity_create('field_instance_config', $this->instance_definition)->save();
       $this->fail(t('Cannot create two instances with the same field / bundle combination.'));
     }
     catch (FieldException $e) {
@@ -97,7 +97,7 @@ class FieldInstanceCrudTest extends FieldUnitTestBase {
     // Check that the specified field exists.
     try {
       $this->instance_definition['field_name'] = $this->randomName();
-      entity_create('field_instance', $this->instance_definition)->save();
+      entity_create('field_instance_config', $this->instance_definition)->save();
       $this->fail(t('Cannot create an instance of a non-existing field.'));
     }
     catch (FieldException $e) {
@@ -111,7 +111,7 @@ class FieldInstanceCrudTest extends FieldUnitTestBase {
    * Test reading back an instance definition.
    */
   function testReadFieldInstance() {
-    entity_create('field_instance', $this->instance_definition)->save();
+    entity_create('field_instance_config', $this->instance_definition)->save();
 
     // Read the instance back.
     $instance = field_read_instance('entity_test', $this->instance_definition['field_name'], $this->instance_definition['bundle']);
@@ -124,7 +124,7 @@ class FieldInstanceCrudTest extends FieldUnitTestBase {
    * Test the update of a field instance.
    */
   function testUpdateFieldInstance() {
-    entity_create('field_instance', $this->instance_definition)->save();
+    entity_create('field_instance_config', $this->instance_definition)->save();
 
     // Check that basic changes are saved.
     $instance = field_read_instance('entity_test', $this->instance_definition['field_name'], $this->instance_definition['bundle']);
@@ -152,10 +152,10 @@ class FieldInstanceCrudTest extends FieldUnitTestBase {
 
     // Create two instances for the same field so we can test that only one
     // is deleted.
-    entity_create('field_instance', $this->instance_definition)->save();
+    entity_create('field_instance_config', $this->instance_definition)->save();
     $another_instance_definition = $this->instance_definition;
     $another_instance_definition['bundle'] .= '_another_bundle';
-    entity_create('field_instance', $another_instance_definition)->save();
+    entity_create('field_instance_config', $another_instance_definition)->save();
 
     // Test that the first instance is not deleted, and then delete it.
     $instance = field_read_instance('entity_test', $this->instance_definition['field_name'], $this->instance_definition['bundle'], array('include_deleted' => TRUE));

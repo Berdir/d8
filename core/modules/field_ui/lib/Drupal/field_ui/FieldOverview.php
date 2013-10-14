@@ -12,7 +12,7 @@ use Drupal\Core\Entity\Field\FieldTypePluginManager;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\field_ui\OverviewBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\field\Entity\Field;
+use Drupal\field\Entity\FieldConfig;
 
 /**
  * Field UI field overview form.
@@ -202,7 +202,7 @@ class FieldOverview extends OverviewBase {
           '#description' => $this->t('A unique machine-readable name containing letters, numbers, and underscores.'),
           // Calculate characters depending on the length of the field prefix
           // setting. Maximum length is 32.
-          '#maxlength' => Field::NAME_MAX_LENGTH - strlen($field_prefix),
+          '#maxlength' => FieldConfig::NAME_MAX_LENGTH - strlen($field_prefix),
           '#prefix' => '<div class="add-new-placeholder">&nbsp;</div>',
           '#machine_name' => array(
             'source' => array('fields', $name, 'label'),
@@ -396,8 +396,8 @@ class FieldOverview extends OverviewBase {
 
       // Create the field and instance.
       try {
-        $this->entityManager->getStorageController('field_entity')->create($field)->save();
-        $new_instance = $this->entityManager->getStorageController('field_instance')->create($instance);
+        $this->entityManager->getStorageController('field_config')->create($field)->save();
+        $new_instance = $this->entityManager->getStorageController('field_instance_config')->create($instance);
         $new_instance->save();
 
         // Make sure the field is displayed in the 'default' form mode (using
@@ -444,7 +444,7 @@ class FieldOverview extends OverviewBase {
         );
 
         try {
-          $new_instance = $this->entityManager->getStorageController('field_instance')->create($instance);
+          $new_instance = $this->entityManager->getStorageController('field_instance_config')->create($instance);
           $new_instance->save();
 
           // Make sure the field is displayed in the 'default' form mode (using
@@ -510,7 +510,7 @@ class FieldOverview extends OverviewBase {
     // Load the instances and build the list of options.
     if ($instance_ids) {
       $field_types = $this->fieldTypeManager->getDefinitions();
-      $instances = $this->entityManager->getStorageController('field_instance')->loadMultiple($instance_ids);
+      $instances = $this->entityManager->getStorageController('field_instance_config')->loadMultiple($instance_ids);
       foreach ($instances as $instance) {
         // Do not show:
         // - locked fields,

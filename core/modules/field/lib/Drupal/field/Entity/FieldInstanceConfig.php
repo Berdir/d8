@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\field\Entity\FieldInstance.
+ * Contains \Drupal\field\Entity\FieldInstanceConfig.
  */
 
 namespace Drupal\field\Entity;
@@ -16,7 +16,7 @@ use Drupal\field\FieldInstanceInterface;
  * Defines the Field instance entity.
  *
  * @EntityType(
- *   id = "field_instance",
+ *   id = "field_instance_config",
  *   label = @Translation("Field instance"),
  *   module = "field",
  *   controllers = {
@@ -30,7 +30,7 @@ use Drupal\field\FieldInstanceInterface;
  *   }
  * )
  */
-class FieldInstance extends ConfigEntityBase implements FieldInstanceInterface {
+class FieldInstanceConfig extends ConfigEntityBase implements FieldInstanceInterface {
 
   /**
    * The instance ID.
@@ -156,7 +156,7 @@ class FieldInstance extends ConfigEntityBase implements FieldInstanceInterface {
    *   The entity being created.
    * - \Drupal\field\Entity\Field $field
    *   The field object.
-   * - \Drupal\field\Entity\FieldInstance $instance
+   * - \Drupal\field\Entity\FieldInstanceConfig $instance
    *   The field instance object.
    * - string $langcode
    *   The language of the entity being created.
@@ -202,7 +202,7 @@ class FieldInstance extends ConfigEntityBase implements FieldInstanceInterface {
   /**
    * The original instance.
    *
-   * @var \Drupal\field\Entity\FieldInstance
+   * @var \Drupal\field\Entity\FieldInstanceConfig
    */
   public $original = NULL;
 
@@ -223,14 +223,14 @@ class FieldInstance extends ConfigEntityBase implements FieldInstanceInterface {
    *   - bundle: required.
    *
    * In most cases, Field instance entities are created via
-   * entity_create('field_instance', $values)), where $values is the same
+   * entity_create('field_instance_config', $values)), where $values is the same
    * parameter as in this constructor.
    *
    * @see entity_create()
    *
    * @ingroup field_crud
    */
-  public function __construct(array $values, $entity_type = 'field_instance') {
+  public function __construct(array $values, $entity_type = 'field_instance_config') {
     // Accept incoming 'field_name' instead of 'field_uuid', for easier DX on
     // creation of new instances.
     if (isset($values['field_name']) && isset($values['entity_type']) && !isset($values['field_uuid'])) {
@@ -611,7 +611,7 @@ class FieldInstance extends ConfigEntityBase implements FieldInstanceInterface {
     return TRUE;
   }
 
-  /*
+  /**
    * Implements the magic __sleep() method.
    *
    * Using the Serialize interface and serialize() / unserialize() methods

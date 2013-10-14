@@ -6,7 +6,7 @@
  */
 
 use Drupal\Core\Entity\FieldableDatabaseStorageController;
-use Drupal\field\Entity\Field;
+use Drupal\field\Entity\FieldConfig;
 
 /**
  * Implements hook_schema().
@@ -269,7 +269,7 @@ function file_update_8003() {
     $field_config = \Drupal::config($config_name);
     // Only update file fields that use the default SQL storage.
     if (in_array($field_config->get('type'), array('file', 'image'))) {
-      $field = new Field($field_config->get());
+      $field = new FieldConfig($field_config->get());
 
       if (db_table_exists(FieldableDatabaseStorageController::_fieldTableName($field))) {
         $tables = array(

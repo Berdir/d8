@@ -349,7 +349,7 @@ function field_info_instance($entity_type, $field_name, $bundle_name) {
  *   A field definition array, or FALSE.
  *
  * @deprecated as of Drupal 8.0. Use
- *   entity_load('field_entity', 'field_name').
+ *   entity_load('field_config', 'field_name').
  */
 function field_read_field($entity_type, $field_name, $include_additional = array()) {
   $fields = field_read_fields(array('entity_type' => $entity_type, 'name' => $field_name), $include_additional);
@@ -374,7 +374,7 @@ function field_read_field($entity_type, $field_name, $include_additional = array
  *   field ID, otherwise it is keyed by field name.
  *
  * @deprecated as of Drupal 8.0. Use
- *   entity_load_multiple_by_properties('field_entity', $conditions).
+ *   entity_load_multiple_by_properties('field_config', $conditions).
  */
 function field_read_fields($conditions = array(), $include_additional = array()) {
   // Include inactive fields if specified in the $include_additional parameter.
@@ -387,7 +387,7 @@ function field_read_fields($conditions = array(), $include_additional = array())
   $conditions['include_inactive'] = $include_inactive;
   $conditions['include_deleted'] = $include_deleted;
 
-  return entity_load_multiple_by_properties('field_entity', $conditions);
+  return entity_load_multiple_by_properties('field_config', $conditions);
 }
 
 /**
@@ -413,7 +413,7 @@ function field_read_fields($conditions = array(), $include_additional = array())
  *   An instance structure, or FALSE.
  *
  * @deprecated as of Drupal 8.0. Use
- *   entity_load('field_instance', 'field_name').
+ *   entity_load('field_instance_config', 'field_name').
  */
 function field_read_instance($entity_type, $field_name, $bundle, $include_additional = array()) {
   $instances = field_read_instances(array('entity_type' => $entity_type, 'field_name' => $field_name, 'bundle' => $bundle), $include_additional);
@@ -437,7 +437,7 @@ function field_read_instance($entity_type, $field_name, $bundle, $include_additi
  *   An array of instances matching the arguments.
  *
  * @deprecated as of Drupal 8.0. Use
- *   entity_load_multiple_by_properties('field_instance', $conditions).
+ *   entity_load_multiple_by_properties('field_instance_config', $conditions).
  */
 function field_read_instances($conditions = array(), $include_additional = array()) {
   // Include instances of inactive fields if specified in the
@@ -451,7 +451,7 @@ function field_read_instances($conditions = array(), $include_additional = array
   $conditions['include_inactive'] = $include_inactive;
   $conditions['include_deleted'] = $include_deleted;
 
-  return entity_load_multiple_by_properties('field_instance', $conditions);
+  return entity_load_multiple_by_properties('field_instance_config', $conditions);
 }
 
 /**

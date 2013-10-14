@@ -54,14 +54,14 @@ class EntityTranslationTest extends EntityUnitTestBase {
 
     // Create instance in all entity variations.
     foreach (entity_test_entity_types() as $entity_type) {
-      entity_create('field_entity', array(
+      entity_create('field_config', array(
         'name' => $this->field_name,
         'entity_type' => $entity_type,
         'type' => 'text',
         'cardinality' => 4,
         'translatable' => TRUE,
       ))->save();
-      entity_create('field_instance', array(
+      entity_create('field_instance_config', array(
         'field_name' => $this->field_name,
         'entity_type' => $entity_type,
         'bundle' => $entity_type,
@@ -483,7 +483,7 @@ class EntityTranslationTest extends EntityUnitTestBase {
     // Check that per-language defaults are properly populated.
     $entity = $this->reloadEntity($entity);
     $instance_id = implode('.', array($entity->entityType(), $entity->bundle(), $this->field_name));
-    $instance = $this->entityManager->getStorageController('field_instance')->load($instance_id);
+    $instance = $this->entityManager->getStorageController('field_instance_config')->load($instance_id);
     $instance->default_value_function = 'entity_test_field_default_value';
     $instance->save();
     $translation = $entity->addTranslation($langcode2);

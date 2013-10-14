@@ -10,13 +10,11 @@ namespace Drupal\Core\Entity;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Core\Language\Language;
-use Drupal\Component\Utility\NestedArray;
-use Drupal\Component\Uuid\Uuid;
 use Drupal\field\FieldInfo;
 use Drupal\field\FieldUpdateForbiddenException;
 use Drupal\field\FieldInterface;
 use Drupal\field\FieldInstanceInterface;
-use Drupal\field\Entity\Field;
+use Drupal\field\Entity\FieldConfig;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -1464,7 +1462,7 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
    *   unique among all other fields.
    */
   static public function _fieldColumnName(FieldInterface $field, $column) {
-    return in_array($column, Field::getReservedColumns()) ? $column : $field->getFieldName() . '_' . $column;
+    return in_array($column, FieldConfig::getReservedColumns()) ? $column : $field->getFieldName() . '_' . $column;
   }
 
 }

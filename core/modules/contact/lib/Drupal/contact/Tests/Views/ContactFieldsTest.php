@@ -40,14 +40,14 @@ class ContactFieldsTest extends ViewTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->field = entity_create('field_entity', array(
+    $this->field = entity_create('field_config', array(
       'name' => strtolower($this->randomName()),
       'entity_type' => 'contact_message',
       'type' => 'text'
     ));
     $this->field->save();
 
-    entity_create('field_instance', array(
+    entity_create('field_instance_config', array(
       'field_name' => $this->field->name,
       'entity_type' => 'contact_message',
       'bundle' => 'contact_message',

@@ -143,8 +143,8 @@ class CustomBlockTypeTest extends CustomBlockTestBase {
   public function testsCustomBlockAddTypes() {
     $this->drupalLogin($this->adminUser);
     // Create two block types programmatically.
-    $type = $this->createCustomBlockType('foo');
-    $type = $this->createCustomBlockType('bar');
+    $this->createCustomBlockType('foo');
+    $this->createCustomBlockType('bar');
 
     // Get the custom block storage controller.
     $storage_controller = $this->container

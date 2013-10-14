@@ -5,7 +5,7 @@
  * Provides support for field data purge after mass deletion.
  */
 
-use Drupal\field\Entity\Field;
+use Drupal\field\Entity\FieldConfig;
 use Drupal\field\FieldException;
 
 /**
@@ -121,7 +121,7 @@ function field_purge_batch($batch_size) {
   // Retrieve all deleted fields. Any that have no instances can be purged.
   $deleted_fields = \Drupal::state()->get('field.field.deleted') ?: array();
   foreach ($deleted_fields as $field) {
-    $field = new Field($field);
+    $field = new FieldConfig($field);
 
     // We cannot purge anything if the entity type is unknown (e.g. the
     // providing module was uninstalled).

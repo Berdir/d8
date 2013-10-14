@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\field\Entity\Field.
+ * Contains \Drupal\field\Entity\FieldConfig.
  */
 
 namespace Drupal\field\Entity;
@@ -16,11 +16,8 @@ use Drupal\field\FieldInterface;
 /**
  * Defines the Field entity.
  *
- * @todo use 'field' as the id once hook_field_load() and friends
- * are removed.
- *
  * @EntityType(
- *   id = "field_entity",
+ *   id = "field_config",
  *   label = @Translation("Field"),
  *   module = "field",
  *   controllers = {
@@ -34,7 +31,7 @@ use Drupal\field\FieldInterface;
  *   }
  * )
  */
-class Field extends ConfigEntityBase implements FieldInterface {
+class FieldConfig extends ConfigEntityBase implements FieldInterface {
 
   /**
    * The maximum length of the field name, in characters.
@@ -210,14 +207,14 @@ class Field extends ConfigEntityBase implements FieldInterface {
    *   - type: required.
    *
    * In most cases, Field entities are created via
-   * entity_create('field_entity', $values)), where $values is the same
+   * entity_create('field_config', $values)), where $values is the same
    * parameter as in this constructor.
    *
    * @see entity_create()
    *
    * @ingroup field_crud
    */
-  public function __construct(array $values, $entity_type = 'field_entity') {
+  public function __construct(array $values, $entity_type = 'field_config') {
     // Check required properties.
     if (empty($values['name'])) {
       throw new FieldException('Attempt to create an unnamed field.');
@@ -414,7 +411,7 @@ class Field extends ConfigEntityBase implements FieldInterface {
    */
   public function delete() {
     if (!$this->deleted) {
-      $instance_controller = \Drupal::entityManager()->getStorageController('field_instance');
+      $instance_controller = \Drupal::entityManager()->getStorageController('field_instance_config');
       $state = \Drupal::state();
 
       // Delete all non-deleted instances.
@@ -673,5 +670,4 @@ class Field extends ConfigEntityBase implements FieldInterface {
   public function isFieldConfigurable() {
     return TRUE;
   }
-
 }

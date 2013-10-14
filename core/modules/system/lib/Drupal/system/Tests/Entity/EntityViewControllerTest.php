@@ -74,12 +74,12 @@ class EntityViewControllerTest extends WebTestBase {
    */
   public function testFieldItemAttributes() {
     // Create a text field which will be rendered with custom item attributes.
-    entity_create('field_entity', array(
+    entity_create('field_config', array(
       'name' => 'field_test_text',
       'entity_type' => 'entity_test_render',
       'type' => 'text',
     ))->save();
-    entity_create('field_instance', array(
+    entity_create('field_instance_config', array(
       'entity_type' => 'entity_test_render',
       'field_name' => 'field_test_text',
       'bundle' => 'entity_test_render',

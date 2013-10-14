@@ -111,8 +111,8 @@ class EditIntegrationTest extends EditTestBase {
    */
   protected function getSelectedEditor($items, $field_name, $view_mode = 'default') {
     $options = entity_get_display('entity_test', 'entity_test', $view_mode)->getComponent($field_name);
-    $field_instance = field_info_instance('entity_test', $field_name, 'entity_test');
-    return $this->editorSelector->getEditor($options['type'], $field_instance, $items);
+    $field_instance_config = field_info_instance('entity_test', $field_name, 'entity_test');
+    return $this->editorSelector->getEditor($options['type'], $field_instance_config, $items);
   }
 
   /**

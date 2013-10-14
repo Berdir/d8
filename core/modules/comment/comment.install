@@ -7,14 +7,14 @@
 
 use Drupal\Core\Language\Language;
 use Drupal\comment\Plugin\field\field_type\CommentItem;
-use Drupal\field\Entity\Field;
+use Drupal\field\Entity\FieldConfig;
 
 /**
  * Implements hook_uninstall().
  */
 function comment_uninstall() {
   // Remove the comment fields.
-  $fields = entity_load_multiple_by_properties('field_entity', array(
+  $fields = entity_load_multiple_by_properties('field_config', array(
     'type' => 'comment',
     'include_inactive' => TRUE,
     'include_deleted' => FALSE,
@@ -47,13 +47,13 @@ function comment_install() {
  *   An array of comment fields keyed by field ID.
  */
 function _comment_get_comment_fields() {
-  $fields = entity_load_multiple_by_properties('field_entity', array(
+  $fields = entity_load_multiple_by_properties('field_config', array(
     'type' => 'comment',
     'include_inactive' => TRUE,
     'include_deleted' => FALSE,
   ));
   foreach ($fields as &$field) {
-    $instances = entity_load_multiple_by_properties('field_instance', array(
+    $instances = entity_load_multiple_by_properties('field_instance_config', array(
       'field_uuid' => $field->uuid,
       'include_inactive' => TRUE,
       'include_deleted' => FALSE,
@@ -550,7 +550,7 @@ function comment_update_8006(&$sandbox) {
       // Increment index.
       $index++;
     }
-    $field_object = new Field($field);
+    $field_object = new FieldConfig($field);
     $field['schema'] = CommentItem::schema($field_object);
     _update_8003_field_create_field($field);
 

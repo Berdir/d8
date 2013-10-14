@@ -10,8 +10,8 @@ use Drupal\Core\Entity\Field\FieldDefinitionInterface;
 use Drupal\Core\Entity\Field\FieldItemListInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\entity\Entity\EntityFormDisplay;
-use Drupal\field\Entity\Field;
-use Drupal\field\Entity\FieldInstance;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldInstanceConfig;
 
 /**
  * Filter that limits test entity list to revisable ones.
@@ -509,14 +509,14 @@ function entity_test_entity_test_mul_translation_delete(EntityInterface $transla
  *
  * @param \Drupal\Core\Entity\EntityInterface $entity
  *   The entity the field belongs to.
- * @param \Drupal\field\Entity\Field $field
+ * @param \Drupal\field\Entity\FieldConfig $field
  *   The field for which default values should be provided.
- * @param \Drupal\field\Entity\FieldInstance $instance
+ * @param \Drupal\field\Entity\FieldInstanceConfig $instance
  *   The field instance for which default values should be provided.
  * @param string $langcode
  *   The field language code to fill-in with the default value.
  */
-function entity_test_field_default_value(EntityInterface $entity, Field $field, FieldInstance $instance, $langcode) {
+function entity_test_field_default_value(EntityInterface $entity, FieldConfig $field, FieldInstanceConfig $instance, $langcode) {
   return array(array('value' => $field->getFieldName() . '_' . $langcode));
 }
 

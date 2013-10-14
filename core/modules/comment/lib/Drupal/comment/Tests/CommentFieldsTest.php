@@ -68,7 +68,7 @@ class CommentFieldsTest extends CommentTestBase {
     $this->drupalLogin($this->admin_user);
 
     // Drop default comment field added in CommentTestBase::setup().
-    entity_load('field_entity', 'node.comment')->delete();
+    entity_load('field_config', 'node.comment')->delete();
     if ($field = $this->container->get('field.info')->getField('node', 'comment_node_forum')) {
       $field->delete();
     }

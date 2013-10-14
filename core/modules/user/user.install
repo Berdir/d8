@@ -275,7 +275,7 @@ function user_install_picture_field() {
       'default_image' => FALSE,
     ),
   );
-  entity_create('field_entity', $field)->save();
+  entity_create('field_config', $field)->save();
 
   $instance = array(
     'field_name' => 'user_picture',
@@ -295,7 +295,7 @@ function user_install_picture_field() {
       'default_image' => 0,
     ),
   );
-  entity_create('field_instance', $instance)->save();
+  entity_create('field_instance_config', $instance)->save();
 
   // Assign form display settings for the 'default' view mode.
   entity_get_form_display('user', 'user', 'default')

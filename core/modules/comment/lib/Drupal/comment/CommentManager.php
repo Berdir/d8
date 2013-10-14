@@ -88,7 +88,7 @@ class CommentManager implements CommentManagerInterface {
     // Make sure the field doesn't already exist.
     if (!$this->fieldInfo->getField($entity_type, $field_name)) {
       // Add a default comment field for existing node comments.
-      $field = $this->entityManager->getStorageController('field_entity')->create(array(
+      $field = $this->entityManager->getStorageController('field_config')->create(array(
         'entity_type' => $entity_type,
         'name' => $field_name,
         'type' => 'comment',
@@ -99,7 +99,7 @@ class CommentManager implements CommentManagerInterface {
     }
     // Make sure the instance doesn't already exist.
     if (!$this->fieldInfo->getInstance($entity_type, $bundle, $field_name)) {
-      $instance = $this->entityManager->getStorageController('field_instance')->create(array(
+      $instance = $this->entityManager->getStorageController('field_instance_config')->create(array(
         'label' => 'Comment settings',
         'description' => '',
         'field_name' => $field_name,
@@ -143,9 +143,9 @@ class CommentManager implements CommentManagerInterface {
    */
   public function addBodyField($entity_type, $field_name) {
     // Create the field if needed.
-    $field = $this->entityManager->getStorageController('field_entity')->load('comment.comment_body');
+    $field = $this->entityManager->getStorageController('field_config')->load('comment.comment_body');
     if (!$field) {
-      $field = $this->entityManager->getStorageController('field_entity')->create(array(
+      $field = $this->entityManager->getStorageController('field_config')->create(array(
         'name' => 'comment_body',
         'type' => 'text_long',
         'entity_type' => 'comment',
@@ -154,12 +154,12 @@ class CommentManager implements CommentManagerInterface {
     }
     // Create the instance if needed, field name defaults to 'comment'.
     $comment_bundle = $entity_type . '__' . $field_name;
-    $field_instance = $this->entityManager
-      ->getStorageController('field_instance')
+    $field_instance_config = $this->entityManager
+      ->getStorageController('field_instance_config')
       ->load("comment.$comment_bundle.comment_body");
-    if (!$field_instance) {
+    if (!$field_instance_config) {
       // Attaches the body field by default.
-      $field_instance = $this->entityManager->getStorageController('field_instance')->create(array(
+      $field_instance_config = $this->entityManager->getStorageController('field_instance_config')->create(array(
         'field_name' => 'comment_body',
         'label' => 'Comment',
         'entity_type' => 'comment',
@@ -167,7 +167,7 @@ class CommentManager implements CommentManagerInterface {
         'settings' => array('text_processing' => 1),
         'required' => TRUE,
       ));
-      $field_instance->save();
+      $field_instance_config->save();
 
       // Assign widget settings for the 'default' form mode.
       entity_get_form_display('comment', $comment_bundle, 'default')

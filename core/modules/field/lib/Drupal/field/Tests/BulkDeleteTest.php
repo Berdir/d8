@@ -113,7 +113,7 @@ class BulkDeleteTest extends FieldUnitTestBase {
     }
 
     // Create two fields.
-    $field = entity_create('field_entity', array(
+    $field = entity_create('field_config', array(
       'name' => 'bf_1',
       'entity_type' => $this->entity_type,
       'type' => 'test_field',
@@ -121,7 +121,7 @@ class BulkDeleteTest extends FieldUnitTestBase {
     ));
     $field->save();
     $this->fields[] = $field;
-    $field = entity_create('field_entity', array(
+    $field = entity_create('field_config', array(
       'name' => 'bf_2',
       'entity_type' => $this->entity_type,
       'type' => 'test_field',
@@ -134,7 +134,7 @@ class BulkDeleteTest extends FieldUnitTestBase {
     // entities with values for each field.
     foreach ($this->bundles as $bundle) {
       foreach ($this->fields as $field) {
-        entity_create('field_instance', array(
+        entity_create('field_instance_config', array(
           'field_name' => $field->name,
           'entity_type' => $this->entity_type,
           'bundle' => $bundle,

@@ -247,7 +247,8 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     $this->drupalPostForm("admin/structure/types/manage/article/fields/node.article.$field_name/field", $edit, t('Save field settings'));
     // Clear field info cache so the new default image is detected.
     field_info_cache_clear();
-    $field = field_info_field('node', $field_name);
+    $field =  field_info_field('node', $field_name);
+    debug($field->getFieldSetting('default_image'));
     $file = file_load($field->getFieldSetting('default_image'));
     $this->assertTrue($file->isPermanent(), 'The default image status is permanent.');
     $image = array(

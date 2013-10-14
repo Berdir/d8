@@ -69,7 +69,8 @@ require_once __DIR__ . '/field.deprecated.inc';
  *   Field API.
  *
  * - @link field_purge Field API bulk data deletion @endlink: Cleans up after
- *   bulk deletion operations such as deletion of field or field_instance.
+ *   bulk deletion operations such as deletion of field_config or
+ *   field_instance_config.
  *
  * - @link field_language Field language API @endlink: Provides native
  *   multilingual support for the Field API.

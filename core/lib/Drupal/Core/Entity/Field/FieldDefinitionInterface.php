@@ -26,16 +26,16 @@ use Drupal\Core\Entity\EntityInterface;
  * It is up to the class implementing this interface to manage where the
  * information comes from. For example, field.module provides an implementation
  * based on two levels of configuration. It allows the site administrator to add
- * custom fields to any entity type and bundle via the "field_entity" and
- * "field_instance" configuration entities. The former for storing configuration
+ * custom fields to any entity type and bundle via the "field_config" and
+ * "field_instance_config" configuration entities. The former for storing configuration
  * that is independent of which entity type and bundle the field is added to,
  * and the latter for storing configuration that is specific to the entity type
- * and bundle. The class that implements "field_instance" configuration entities
+ * and bundle. The class that implements "field_instance_config" configuration entities
  * also implements this interface, returning information from either itself, or
- * from the corresponding "field_entity" configuration, as appropriate.
+ * from the corresponding "field_config" configuration, as appropriate.
  *
  * However, entity base fields, such as $node->title, are not managed by
- * field.module and its "field_entity"/"field_instance" configuration entities.
+ * field.module and its "field_config"/"field_instance_config" configuration entities.
  * Therefore, their definitions are provided by different objects that implement
  * this interface.
  * @todo That is still in progress: https://drupal.org/node/1949932. Update this

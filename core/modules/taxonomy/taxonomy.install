@@ -6,7 +6,7 @@
  */
 
 use Drupal\Core\Entity\FieldableDatabaseStorageController;
-use Drupal\field\Entity\Field;
+use Drupal\field\Entity\FieldConfig;
 
 /**
  * Implements hook_schema().
@@ -351,7 +351,7 @@ function taxonomy_update_8007() {
     $field_config = \Drupal::config($config_name);
     // Only update taxonomy reference fields that use the default SQL storage.
     if ($field_config->get('type') == 'taxonomy_term_reference') {
-      $field = new Field($field_config->get());
+      $field = new FieldConfig($field_config->get());
 
       if (db_table_exists(FieldableDatabaseStorageController::_fieldTableName($field))) {
         $tables = array(

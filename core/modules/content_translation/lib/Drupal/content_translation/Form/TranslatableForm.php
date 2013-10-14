@@ -8,7 +8,7 @@
 namespace Drupal\content_translation\Form;
 
 use Drupal\Core\Form\ConfirmFormBase;
-use Drupal\field\Entity\Field;
+use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Field as FieldInfo;
 
 /**
