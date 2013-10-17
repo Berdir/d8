@@ -7,16 +7,12 @@
 
 namespace Drupal\migrate;
 
-use Doctrine\Common\Proxy\Exception\InvalidArgumentException;
 use Drupal\Component\Utility\NestedArray;
-use Drupal\migrate\Plugin\MigrateRowInterface;
 
 /**
- * This just stores a row without any preparation.
- *
- * Most row classes will extnd this one, overriding prepare().
+ * This just stores a row.
  */
-class SimpleRow implements MigrateRowInterface {
+class Row {
 
   /**
    * @var array
@@ -35,8 +31,8 @@ class SimpleRow implements MigrateRowInterface {
    * @param array $values
    *   (optional) An array of values to add as properties on the object.
    */
-  public function __construct(array $values = array()) {
-    if (empty($values['keys']) || !is_array($values['keys']) || empty($values['data']) || !is_array($values['keys'])) {
+  public function __construct(array $keys, array $values) {
+    if (empty($values['keys'])) {
       throw new \InvalidArgumentException('A row must have an array of keys.');
     }
     else {
@@ -46,13 +42,10 @@ class SimpleRow implements MigrateRowInterface {
           $this->keys[$key] = $values['data'][$key];
         }
         else {
-          throw new InvalidArgumentException("$key has no value");
+          throw new \InvalidArgumentException("$key has no value");
         }
       }
     }
-  }
-
-  public function prepare() {
   }
 
   public function getSourceKeys() {

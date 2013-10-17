@@ -900,7 +900,7 @@ class MigrateExecutable {
    * Apply field mappings to a data row received from the source, returning
    * a populated destination object.
    */
-  protected function processRow(SimpleRow $row) {
+  protected function processRow(Row $row) {
     foreach ($this->migration->getProcess() as $process) {
       $process->apply($row, $this);
     }

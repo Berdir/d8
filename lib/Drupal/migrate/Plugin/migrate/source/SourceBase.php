@@ -11,9 +11,8 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\migrate\Entity\Migration;
-use Drupal\migrate\Plugin\MigratePluginManager;
-use Drupal\migrate\Plugin\MigrateRowInterface;
 use Drupal\migrate\Plugin\MigrateSourceInterface;
+use Drupal\migrate\Row;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 abstract class SourceBase extends PluginBase implements ContainerFactoryPluginInterface, MigrateSourceInterface {
@@ -119,7 +118,7 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
   /**
    * @var \MigrateMap
    */
-  protected $activeMap;
+  protected $idMap;
 
   public function getCurrentKey() {
     return $this->currentKey;
@@ -189,8 +188,7 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache
    * @param \Drupal\migrate\Entity\Migration $migration
    */
-  function __construct(array $configuration, $plugin_id, array $plugin_definition, Migration $migration, CacheBackendInterface $cache,
-                       MigratePluginManager $row_manager) {
+  function __construct(array $configuration, $plugin_id, array $plugin_definition, Migration $migration, CacheBackendInterface $cache) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->cache = $cache;
     $this->migration = $migration;
@@ -265,7 +263,7 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
    * source records.
    */
   public function rewind() {
-    $this->activeMap = $this->migration->getMap();
+    $this->idMap = $this->migration->getIdMap();
     $this->numProcessed = 0;
     $this->numIgnored = 0;
     $this->highwaterField = $this->migration->getHighwaterField();
@@ -293,18 +291,13 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
     $this->currentRow = NULL;
 
     while ($row_data = $this->getNextRow()) {
-      $configuration = array(
-        'data' => $row_data,
-        'keys' => $this->migration->get('sourceKeys'),
-      );
-      /** @var \Drupal\migrate\Plugin\MigrateRowInterface $row */
-      $row = $this->rowManager->createInstance($this->migration->get('row'), $configuration);
+      $row = new Row($this->migration->get('sourceKeys'), $row_data);
 
       // Populate the source key for this row
       $this->currentKey = $row->getSourceKeys();
 
       // Pick up the existing map row, if any, unless getNextRow() did it.
-      if (!$this->mapRowAdded && ($id_map = $this->activeMap->getRowBySource($this->currentKey))) {
+      if (!$this->mapRowAdded && ($id_map = $this->idMap->getRowBySource($this->currentKey))) {
         $row->setIdMap($id_map);
       }
 
@@ -328,7 +321,7 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
         // Fall through
       }
       // 3. If the row is marked as needing update, pass it.
-      elseif ($row->getSourceProperty('migrate_map_needs_update') == \MigrateMap::STATUS_NEEDS_UPDATE) {
+      elseif ($row->getIddMapProperty('needs_update') == \MigrateMap::STATUS_NEEDS_UPDATE) {
         // Fall through
       }
       // 4. At this point, we have a row which has previously been imported and
@@ -338,7 +331,7 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
       //    skip it.
       elseif (empty($this->highwaterField)) {
         if ($this->trackChanges) {
-          if ($row->prepare() !== FALSE) {
+          if ($this->prepareRow($row) !== FALSE) {
             if ($this->dataChanged($row)) {
               // This is a keeper
               $this->currentRow = $row;
@@ -369,7 +362,7 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
       //    field value is greater than the saved mark, otherwise skip it.
       else {
         // Call prepareRow() here, in case the highwaterField needs preparation
-        if ($row->prepare() !== FALSE) {
+        if ($this->prepareRow($row) !== FALSE) {
           if ($row->getSourceProperty($this->highwaterField['name']) > $this->originalHighwater) {
             $this->currentRow = $row;
             break;
@@ -385,7 +378,7 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
       // Allow the Migration to prepare this row. prepareRow() can return boolean
       // FALSE to ignore this row.
       if (!$prepared) {
-        if ($row->prepare() !== FALSE) {
+        if ($this->prepareRow($row) !== FALSE) {
           // Finally, we've got a keeper.
           $this->currentRow = $row;
           break;
@@ -401,19 +394,15 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
   }
 
   /**
-   * Give the calling migration a shot at manipulating, and possibly rejecting,
-   * the source row.
+   * Source classes should override this as necessary and manipulate $keep.
    *
-   * @param $row
+   * @param \Drupal\migrate\Row $row
    * @return bool
    *  FALSE if the row is to be skipped.
    */
-  protected function prepareRow($row) {
-    migrate_instrument_start(get_class($this->migration) . ' prepareRow');
-    $return = $this->migration->prepareRow($row);
-    migrate_instrument_stop(get_class($this->migration) . ' prepareRow');
+  protected function prepareRow(Row $row, $keep = TRUE) {
     // We're explicitly skipping this row - keep track in the map table
-    if ($return === FALSE) {
+    if ($keep === FALSE) {
       // Make sure we replace any previous messages for this item with any
       // new ones.
       $this->migration->getMap()->delete($this->currentKey, TRUE);
@@ -425,7 +414,6 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
       $this->currentKey = NULL;
     }
     else {
-      $return = TRUE;
       // When tracking changed data, We want to quietly skip (rather than
       // "ignore") rows with changes. The caller needs to make that decision,
       // so we need to provide them with the necessary information (before and
@@ -448,7 +436,7 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
     }
 
     $this->numProcessed++;
-    return $return;
+    return $keep;
   }
 
   /**
@@ -459,7 +447,7 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
    *
    * @return bool
    */
-  protected function dataChanged(MigrateRowInterface $row) {
+  protected function dataChanged(Row $row) {
     return $row->getIddMapProperty('original_hash') != $row->getIddMapProperty('hash');
   }
 
@@ -471,10 +459,7 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
    * @return string
    */
   protected function hash($row) {
-    migrate_instrument_start('MigrateSource::hash');
-    $hash = md5(serialize($row));
-    migrate_instrument_stop('MigrateSource::hash');
-    return $hash;
+    return hash('sha256', serialize($row));
   }
 
   /**

@@ -8,8 +8,8 @@
 namespace Drupal\migrate\Plugin\migrate\process;
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\migrate\MigrateExecutable;
-use Drupal\migrate\Plugin\MigrateRowInterface;
 use Drupal\migrate\Plugin\MigrateProcessInterface;
+use Drupal\migrate\Row;
 
 /**
  * This class tracks mappings between source and destination.
@@ -126,7 +126,7 @@ class PropertyMap extends PluginBase implements MigrateProcessInterface {
    * Apply field mappings to a data row received from the source, returning
    * a populated destination object.
    */
-  public function apply(MigrateRowInterface $row, MigrateExecutable $migrate_executable) {
+  public function apply(Row $row, MigrateExecutable $migrate_executable) {
     $destination_values = NULL;
 
     // If there's a source mapping, and a source value in the data row, copy
