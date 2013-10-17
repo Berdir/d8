@@ -10,7 +10,7 @@ namespace Drupal\migrate\Plugin\migrate\source;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginBase;
-use Drupal\migrate\Entity\Migration;
+use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\Plugin\MigrateSourceInterface;
 use Drupal\migrate\Row;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -178,10 +178,10 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
    *  Optional array of options.
    * @param string $plugin_id
    * @param array $plugin_definition
+   * @param \Drupal\migrate\Entity\MigrationInterface $migration
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache
-   * @param \Drupal\migrate\Entity\Migration $migration
    */
-  function __construct(array $configuration, $plugin_id, array $plugin_definition, Migration $migration, CacheBackendInterface $cache) {
+  function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration, CacheBackendInterface $cache) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->cache = $cache;
     $this->migration = $migration;
