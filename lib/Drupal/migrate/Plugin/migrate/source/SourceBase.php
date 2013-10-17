@@ -46,13 +46,6 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
   protected $numProcessed = 0;
 
   /**
-   * Information on the highwater mark for the current migration, if any.
-   *
-   * @var array
-   */
-  protected $highwaterField;
-
-  /**
    * The highwater mark at the beginning of the import operation.
    *
    * @var
@@ -204,9 +197,6 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
     if (!empty($configuration['track_changes'])) {
       $this->trackChanges = $configuration['track_changes'];
     }
-    if (!empty($configuration['highwater_field'])) {
-      $this->highwaterField = $configuration['highwater_field'];
-    }
     if (!empty($configuration['original_highwater'])) {
       $this->originalHighwater = $configuration['original_highwater'];
     }
@@ -264,10 +254,7 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
     $this->idMap = $this->migration->getIdMap();
     $this->numProcessed = 0;
     $this->numIgnored = 0;
-    $this->highwaterField = $this->migration->getHighwaterField();
-    if (!empty($this->highwaterField)) {
-      $this->originalHighwater = $this->migration->getHighwater();
-    }
+    $this->originalHighwater = $this->migration->getHighwater();
     if ($this->migration->getOption('idlist')) {
       $this->idList = explode(',', $this->migration->getOption('idlist'));
     }
@@ -287,6 +274,7 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
   public function next() {
     $this->currentKey = NULL;
     $this->currentRow = NULL;
+    $highwater = $this->migration->get('highwater');
 
     while ($row_data = $this->getNextRow()) {
       $row = new Row($this->migration->get('sourceKeys'), $row_data);
@@ -327,7 +315,7 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
       //    will not take this row. Except, if we're looking for changes in the
       //    data, we need to go through prepareRow() before we can decide to
       //    skip it.
-      elseif (empty($this->highwaterField)) {
+      elseif (!empty($highwater['field'])) {
         if ($this->trackChanges) {
           if ($this->prepareRow($row) !== FALSE) {
             if ($this->dataChanged($row)) {
@@ -405,7 +393,7 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
       // new ones.
       $this->migration->getIdMap()->delete($this->currentKey, TRUE);
       $this->migration->saveQueuedMessages();
-      $this->migration->getMap()->saveIDMapping($row, array(),
+      $this->migration->getIdMap()->saveIDMapping($row, array(),
         \MigrateMap::STATUS_IGNORED, $this->migration->rollbackAction);
       $this->numIgnored++;
       $this->currentRow = NULL;

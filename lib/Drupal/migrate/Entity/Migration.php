@@ -118,7 +118,17 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
    */
   public $idMap = array();
 
+  /**
+   * @var \Drupal\migrate\Plugin\MigrateIdMapInterface
+   */
   protected $idMapPlugin;
+
+  /**
+   * Information on the highwater mark.
+   *
+   * @var array
+   */
+  public $highwater;
 
   /**
    * Indicate whether the primary system of record for this migration is the
