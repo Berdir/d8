@@ -192,7 +192,6 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->cache = $cache;
     $this->migration = $migration;
-    $this->rowManager = $row_manager;
     if (!empty($configuration['cache_counts'])) {
       $this->cacheCounts = TRUE;
     }
@@ -222,8 +221,7 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
       $plugin_id,
       $plugin_definition,
       $configuration['migration'],
-      $container->get('cache.migrate'),
-      $container->get('plugin.manager.migrate.row')
+      $container->get('cache.migrate')
     );
   }
 
@@ -405,7 +403,7 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
     if ($keep === FALSE) {
       // Make sure we replace any previous messages for this item with any
       // new ones.
-      $this->migration->getMap()->delete($this->currentKey, TRUE);
+      $this->migration->getIdMap()->delete($this->currentKey, TRUE);
       $this->migration->saveQueuedMessages();
       $this->migration->getMap()->saveIDMapping($row, array(),
         \MigrateMap::STATUS_IGNORED, $this->migration->rollbackAction);

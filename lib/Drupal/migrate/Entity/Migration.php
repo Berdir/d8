@@ -170,6 +170,9 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
     return $this->destination;
   }
 
+  /**
+   * @return \Drupal\migrate\Plugin\MigrateIdMapInterface
+   */
   public function getIdMap() {
     if (!isset($this->idMapPlugin)) {
       $configuration = $this->idMap;
