@@ -7,9 +7,9 @@
 
 namespace Drupal\file\Plugin\Field\FieldType;
 
-use Drupal\Core\Entity\Plugin\Field\FieldType\EntityReferenceItem;
+use Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem;
 use Drupal\field\FieldInterface;
-use Drupal\field\Plugin\Type\FieldType\ConfigFieldItemInterface;
+use Drupal\Core\Field\ConfigFieldItemInterface;
 
 /**
  * Plugin implementation of the 'file' field type.
@@ -34,7 +34,7 @@ use Drupal\field\Plugin\Type\FieldType\ConfigFieldItemInterface;
  *   list_class = "\Drupal\file\Plugin\Field\FieldType\FileFieldItemList"
  * )
  */
-class FileItem extends EntityReferenceItem implements ConfigFieldItemInterface {
+class FileItem extends \Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem implements \Drupal\Core\Field\ConfigFieldItemInterface {
 
   /**
    * Property definitions of the contained properties.

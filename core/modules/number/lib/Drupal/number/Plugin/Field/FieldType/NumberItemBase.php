@@ -7,12 +7,12 @@
 
 namespace Drupal\number\Plugin\Field\FieldType;
 
-use Drupal\field\Plugin\Type\FieldType\ConfigFieldItemBase;
+use Drupal\Core\Field\ConfigFieldItemBase;
 
 /**
  * Base class for 'number' configurable field types.
  */
-abstract class NumberItemBase extends ConfigFieldItemBase {
+abstract class NumberItemBase extends \Drupal\Core\Field\ConfigFieldItemBase {
 
   /**
    * Definitions of the contained properties.
@@ -75,7 +75,7 @@ abstract class NumberItemBase extends ConfigFieldItemBase {
    */
   public function getConstraints() {
     $constraint_manager = \Drupal::typedData()->getValidationConstraintManager();
-    $constraints = parent::getConstraints();
+    $constraints = \Drupal\Core\Field\parent::getConstraints();
 
     $settings = $this->getFieldSettings();
     $label = $this->getFieldDefinition()->getFieldLabel();

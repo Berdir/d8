@@ -7,13 +7,13 @@
 
 namespace Drupal\text\Plugin\Field\FieldType;
 
-use Drupal\field\Plugin\Type\FieldType\ConfigFieldItemBase;
-use Drupal\Core\Entity\Field\PrepareCacheInterface;
+use Drupal\Core\Field\ConfigFieldItemBase;
+use Drupal\Core\Field\PrepareCacheInterface;
 
 /**
  * Base class for 'text' configurable field types.
  */
-abstract class TextItemBase extends ConfigFieldItemBase implements PrepareCacheInterface {
+abstract class TextItemBase extends \Drupal\Core\Field\ConfigFieldItemBase implements PrepareCacheInterface {
 
   /**
    * Definitions of the contained properties.

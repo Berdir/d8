@@ -7,7 +7,7 @@
 
 namespace Drupal\telephone\Plugin\Field\FieldType;
 
-use Drupal\field\Plugin\Type\FieldType\ConfigFieldItemBase;
+use Drupal\Core\Field\ConfigFieldItemBase;
 use Drupal\field\FieldInterface;
 
 /**
@@ -21,7 +21,7 @@ use Drupal\field\FieldInterface;
  *   default_formatter = "telephone_link"
  * )
  */
-class TelephoneItem extends ConfigFieldItemBase {
+class TelephoneItem extends \Drupal\Core\Field\ConfigFieldItemBase {
 
   /**
    * Definitions of the contained properties.

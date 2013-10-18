@@ -7,7 +7,7 @@
 
 namespace Drupal\file\Plugin\Field\FieldType;
 
-use Drupal\field\Plugin\Type\FieldType\ConfigFieldItemList;
+use Drupal\Core\Field\ConfigFieldItemList;
 
 /**
  * Represents a configurable entity file field.
@@ -23,7 +23,7 @@ class FileFieldItemList extends ConfigFieldItemList {
    * {@inheritdoc}
    */
   public function insert() {
-    parent::insert();
+    \Drupal\Core\Field\parent::insert();
     $entity = $this->getEntity();
 
     // Add a new usage for newly uploaded files.
@@ -92,7 +92,7 @@ class FileFieldItemList extends ConfigFieldItemList {
    * {@inheritdoc}
    */
   public function deleteRevision() {
-    parent::deleteRevision();
+    \Drupal\Core\Field\parent::deleteRevision();
     $entity = $this->getEntity();
 
     // Decrement the file usage by 1.

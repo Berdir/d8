@@ -8,7 +8,7 @@
 namespace Drupal\field_test\Plugin\Field\FieldType;
 
 use Drupal\field\FieldInterface;
-use Drupal\field\Plugin\Type\FieldType\ConfigFieldItemBase;
+use Drupal\Core\Field\ConfigFieldItemBase;
 
 /**
  * Defines the 'shape_field' entity field item.

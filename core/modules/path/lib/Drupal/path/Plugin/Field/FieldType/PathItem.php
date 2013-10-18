@@ -7,7 +7,7 @@
 
 namespace Drupal\path\Plugin\Field\FieldType;
 
-use Drupal\Core\Entity\Field\FieldItemBase;
+use Drupal\Core\Field\FieldItemBase;
 
 /**
  * Defines the 'path' entity field type.

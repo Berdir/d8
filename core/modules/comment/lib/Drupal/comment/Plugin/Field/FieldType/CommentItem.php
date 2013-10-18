@@ -8,7 +8,7 @@
 namespace Drupal\comment\Plugin\Field\FieldType;
 
 use Drupal\field\FieldInterface;
-use Drupal\field\Plugin\Type\FieldType\ConfigFieldItemBase;
+use Drupal\Core\Field\ConfigFieldItemBase;
 
 /**
  * Plugin implementation of the 'comment' field type.
@@ -29,7 +29,7 @@ use Drupal\field\Plugin\Type\FieldType\ConfigFieldItemBase;
  *   default_formatter = "comment_default"
  * )
  */
-class CommentItem extends ConfigFieldItemBase {
+class CommentItem extends \Drupal\Core\Field\ConfigFieldItemBase {
 
   /**
    * Definitions of the contained properties.
@@ -176,7 +176,7 @@ class CommentItem extends ConfigFieldItemBase {
       return $field_default_values[0]['status'];
     }
     else {
-      return parent::__get($name);
+      return \Drupal\Core\Field\parent::__get($name);
     }
   }
 

@@ -8,9 +8,9 @@
 namespace Drupal\datetime\Plugin\Field\FieldType;
 
 use Drupal\Core\Datetime\DrupalDateTime;
-use Drupal\Core\Entity\Field\PrepareCacheInterface;
+use Drupal\Core\Field\PrepareCacheInterface;
 use Drupal\field\FieldInterface;
-use Drupal\field\Plugin\Type\FieldType\ConfigFieldItemBase;
+use Drupal\Core\Field\ConfigFieldItemBase;
 
 /**
  * Plugin implementation of the 'datetime' field type.
@@ -29,7 +29,7 @@ use Drupal\field\Plugin\Type\FieldType\ConfigFieldItemBase;
  *   default_formatter = "datetime_default"
  * )
  */
-class DateTimeItem extends ConfigFieldItemBase implements PrepareCacheInterface {
+class DateTimeItem extends \Drupal\Core\Field\ConfigFieldItemBase implements PrepareCacheInterface {
 
   /**
    * Field definitions of the contained properties.

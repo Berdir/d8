@@ -11,7 +11,6 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageManager;
 use Drupal\Core\Plugin\DefaultPluginManager;
-use Drupal\field\Plugin\Type\FieldType\LegacyFieldTypeDiscoveryDecorator;
 
 /**
  * Plugin manager for 'field type' plugins.
@@ -56,10 +55,10 @@ class FieldTypePluginManager extends DefaultPluginManager {
     parent::processDefinition($definition, $plugin_id);
     if (!isset($definition['list_class'])) {
       if ($definition['configurable']) {
-        $definition['list_class'] = '\Drupal\field\Plugin\Type\FieldType\ConfigFieldItemList';
+        $definition['list_class'] = '\Drupal\Core\Field\ConfigFieldItemList';
       }
       else {
-        $definition['list_class'] = '\Drupal\Core\Entity\Field\FieldItemList';
+        $definition['list_class'] = '\Drupal\Core\Field\FieldItemList';
       }
     }
   }
