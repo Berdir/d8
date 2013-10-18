@@ -20,7 +20,7 @@ use Drupal\field\FieldInterface;
  * Required settings (below the definition's 'settings' key) are:
  *  - target_type: The entity type to reference.
  */
-class ConfigEntityReferenceItemBase extends EntityReferenceItem implements \Drupal\Core\Field\ConfigFieldItemInterface {
+class ConfigEntityReferenceItemBase extends EntityReferenceItem implements ConfigFieldItemInterface {
 
   /**
    * Definitions of the contained properties.

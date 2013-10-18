@@ -21,7 +21,7 @@ use Drupal\field\FieldInterface;
  *   default_formatter = "telephone_link"
  * )
  */
-class TelephoneItem extends \Drupal\Core\Field\ConfigFieldItemBase {
+class TelephoneItem extends ConfigFieldItemBase {
 
   /**
    * Definitions of the contained properties.

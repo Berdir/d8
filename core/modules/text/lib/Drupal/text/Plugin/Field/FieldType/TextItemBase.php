@@ -13,7 +13,7 @@ use Drupal\Core\Field\PrepareCacheInterface;
 /**
  * Base class for 'text' configurable field types.
  */
-abstract class TextItemBase extends \Drupal\Core\Field\ConfigFieldItemBase implements PrepareCacheInterface {
+abstract class TextItemBase extends ConfigFieldItemBase implements PrepareCacheInterface {
 
   /**
    * Definitions of the contained properties.

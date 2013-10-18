@@ -23,7 +23,7 @@ class FileFieldItemList extends ConfigFieldItemList {
    * {@inheritdoc}
    */
   public function insert() {
-    \Drupal\Core\Field\parent::insert();
+    parent::insert();
     $entity = $this->getEntity();
 
     // Add a new usage for newly uploaded files.
@@ -92,7 +92,7 @@ class FileFieldItemList extends ConfigFieldItemList {
    * {@inheritdoc}
    */
   public function deleteRevision() {
-    \Drupal\Core\Field\parent::deleteRevision();
+    parent::deleteRevision();
     $entity = $this->getEntity();
 
     // Decrement the file usage by 1.

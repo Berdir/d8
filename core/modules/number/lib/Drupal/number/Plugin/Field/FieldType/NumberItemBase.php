@@ -12,7 +12,7 @@ use Drupal\Core\Field\ConfigFieldItemBase;
 /**
  * Base class for 'number' configurable field types.
  */
-abstract class NumberItemBase extends \Drupal\Core\Field\ConfigFieldItemBase {
+abstract class NumberItemBase extends ConfigFieldItemBase {
 
   /**
    * Definitions of the contained properties.

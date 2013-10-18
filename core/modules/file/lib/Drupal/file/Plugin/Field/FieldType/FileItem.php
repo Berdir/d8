@@ -34,7 +34,7 @@ use Drupal\Core\Field\ConfigFieldItemInterface;
  *   list_class = "\Drupal\file\Plugin\Field\FieldType\FileFieldItemList"
  * )
  */
-class FileItem extends \Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem implements \Drupal\Core\Field\ConfigFieldItemInterface {
+class FileItem extends EntityReferenceItem implements ConfigFieldItemInterface {
 
   /**
    * Property definitions of the contained properties.
