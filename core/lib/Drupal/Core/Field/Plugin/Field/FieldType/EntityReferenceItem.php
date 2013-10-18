@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\Core\Entity\Plugin\Field\FieldType\EntityReferenceItem.
+ * Contains \Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem.
  */
 
 namespace Drupal\Core\Field\Plugin\Field\FieldType;

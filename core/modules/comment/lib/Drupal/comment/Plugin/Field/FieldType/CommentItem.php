@@ -176,7 +176,7 @@ class CommentItem extends \Drupal\Core\Field\ConfigFieldItemBase {
       return $field_default_values[0]['status'];
     }
     else {
-      return \Drupal\Core\Field\parent::__get($name);
+      return parent::__get($name);
     }
   }
 
