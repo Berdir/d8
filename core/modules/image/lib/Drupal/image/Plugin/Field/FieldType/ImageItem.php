@@ -108,7 +108,7 @@ class ImageItem extends FileItem {
     $this->definition['settings']['target_type'] = 'file';
 
     if (!isset(static::$propertyDefinitions)) {
-      static::$propertyDefinitions = \Drupal\file\Plugin\Field\FieldType\parent::getPropertyDefinitions();
+      static::$propertyDefinitions = parent::getPropertyDefinitions();
 
       static::$propertyDefinitions['alt'] = array(
         'type' => 'string',
@@ -169,7 +169,7 @@ class ImageItem extends FileItem {
    */
   public function instanceSettingsForm(array $form, array &$form_state) {
     // Get base form from FileItem::instanceSettingsForm().
-    $element = \Drupal\file\Plugin\Field\FieldType\parent::instanceSettingsForm($form, $form_state);
+    $element = parent::instanceSettingsForm($form, $form_state);
 
     $settings = $this->getFieldSettings();
 

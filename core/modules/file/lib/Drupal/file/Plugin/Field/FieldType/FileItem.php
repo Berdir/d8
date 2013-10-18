@@ -90,7 +90,7 @@ class FileItem extends EntityReferenceItem implements ConfigFieldItemInterface {
     $this->definition['settings']['target_type'] = 'file';
 
     if (!isset(static::$propertyDefinitions)) {
-      static::$propertyDefinitions = \Drupal\Core\Entity\Plugin\Field\FieldType\parent::getPropertyDefinitions();
+      static::$propertyDefinitions = parent::getPropertyDefinitions();
 
       static::$propertyDefinitions['display'] = array(
         'type' => 'boolean',
