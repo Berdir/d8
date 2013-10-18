@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\field\Plugin\Type\FieldType\LegacyFieldTypeDiscoveryDecorator.
+ * Contains \Drupal\Core\Field\LegacyFieldTypeDiscoveryDecorator.
  */
 
 namespace Drupal\Core\Field;
@@ -29,7 +29,7 @@ class LegacyFieldTypeDiscoveryDecorator implements DiscoveryInterface {
   protected $decorated;
 
   /**
-   * Creates a \Drupal\field\Plugin\Type\FieldType\LegacyFieldTypeDiscoveryDecorator object.
+   * Creates a \Drupal\Core\Field\LegacyFieldTypeDiscoveryDecorator object.
    *
    * @param \Drupal\Component\Plugin\Discovery\DiscoveryInterface $discovery
    *   The parent object implementing DiscoveryInterface that is being
@@ -66,7 +66,7 @@ class LegacyFieldTypeDiscoveryDecorator implements DiscoveryInterface {
           $definition['id'] = $plugin_id;
           $definition['provider'] = $module;
           $definition['configurable'] = TRUE;
-          $definition['list_class'] = '\Drupal\field\Plugin\Field\FieldType\LegacyConfigFieldItemList';
+          $definition['list_class'] = '\Drupal\Core\Field\Plugin\Field\FieldType\LegacyConfigFieldItemList';
           $definitions[$plugin_id] = $definition;
         }
       }

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\field\Plugin\Type\FieldType\ConfigEntityReferenceItemBase.
+ * Contains \Drupal\Core\Field\ConfigEntityReferenceItemBase.
  */
 
 namespace Drupal\Core\Field;

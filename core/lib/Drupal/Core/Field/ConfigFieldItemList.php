@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\field\Plugin\Type\FieldType\ConfigFieldItemList.
+ * Contains \Drupal\Core\Field\ConfigFieldItemList.
  */
 
 namespace Drupal\Core\Field;
