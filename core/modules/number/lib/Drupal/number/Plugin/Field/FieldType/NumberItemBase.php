@@ -75,7 +75,7 @@ abstract class NumberItemBase extends ConfigFieldItemBase {
    */
   public function getConstraints() {
     $constraint_manager = \Drupal::typedData()->getValidationConstraintManager();
-    $constraints =parent::getConstraints();
+    $constraints = parent::getConstraints();
 
     $settings = $this->getFieldSettings();
     $label = $this->getFieldDefinition()->getFieldLabel();
