@@ -29,7 +29,7 @@ use Drupal\Core\Field\ConfigFieldItemBase;
  *   default_formatter = "datetime_default"
  * )
  */
-class DateTimeItem extends \Drupal\Core\Field\ConfigFieldItemBase implements PrepareCacheInterface {
+class DateTimeItem extends ConfigFieldItemBase implements PrepareCacheInterface {
 
   /**
    * Field definitions of the contained properties.

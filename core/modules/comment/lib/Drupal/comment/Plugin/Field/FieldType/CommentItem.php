@@ -29,7 +29,7 @@ use Drupal\Core\Field\ConfigFieldItemBase;
  *   default_formatter = "comment_default"
  * )
  */
-class CommentItem extends \Drupal\Core\Field\ConfigFieldItemBase {
+class CommentItem extends ConfigFieldItemBase {
 
   /**
    * Definitions of the contained properties.
