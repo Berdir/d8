@@ -29,7 +29,7 @@ interface PrepareCacheInterface {
    *
    * The recommended way to implement it is to provide a computed field item
    * property that can accepts setting a value through setValue(). See
-   * \Drupal\text\Plugin\field\field_type\TextItemBase and the corresponding
+   * \Drupal\text\Plugin\Field\FieldType\TextItemBase and the corresponding
    * computed property Drupal\text\TextProcessed for an example.
    */
   public function getCacheData();

@@ -14,7 +14,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
  * Custom decorator to add legacy field types.
  *
  * Legacy field types are discovered through the old hook_field_info() hook,
- * and handled by the Drupal\field\Plugin\field\field_type\LegacyConfigFieldItem class.
+ * and handled by the Drupal\field\Plugin\Field\FieldType\LegacyConfigFieldItem class.
  *
  * @todo Remove once all core field types have been converted (see
  * http://drupal.org/node/2014671).
@@ -66,7 +66,7 @@ class LegacyFieldTypeDiscoveryDecorator implements DiscoveryInterface {
           $definition['id'] = $plugin_id;
           $definition['provider'] = $module;
           $definition['configurable'] = TRUE;
-          $definition['list_class'] = '\Drupal\field\Plugin\field\field_type\LegacyConfigFieldItemList';
+          $definition['list_class'] = '\Drupal\field\Plugin\Field\FieldType\LegacyConfigFieldItemList';
           $definitions[$plugin_id] = $definition;
         }
       }

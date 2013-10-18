@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\file\Plugin\field\field_type\FileFieldItemList.
+ * Contains \Drupal\file\Plugin\Field\FieldType\FileFieldItemList.
  */
 
-namespace Drupal\file\Plugin\field\field_type;
+namespace Drupal\file\Plugin\Field\FieldType;
 
 use Drupal\field\Plugin\Type\FieldType\ConfigFieldItemList;
 

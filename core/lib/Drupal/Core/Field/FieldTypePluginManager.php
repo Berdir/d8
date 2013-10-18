@@ -40,7 +40,7 @@ class FieldTypePluginManager extends DefaultPluginManager {
    *   The module handler.
    */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, LanguageManager $language_manager, ModuleHandlerInterface $module_handler) {
-    parent::__construct('Plugin/field/field_type', $namespaces, 'Drupal\Core\Field\Annotation\FieldType');
+    parent::__construct('Plugin/Field/FieldType', $namespaces, 'Drupal\Core\Field\Annotation\FieldType');
     $this->alterInfo($module_handler, 'field_info');
     $this->setCacheBackend($cache_backend, $language_manager, 'field_types_plugins');
 

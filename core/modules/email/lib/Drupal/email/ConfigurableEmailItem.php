@@ -7,7 +7,7 @@
 
 namespace Drupal\email;
 
-use Drupal\Core\Entity\Plugin\field\field_type\EmailItem;
+use Drupal\Core\Entity\Plugin\Field\FieldType\EmailItem;
 use Drupal\field\FieldInterface;
 use Drupal\field\Plugin\Type\FieldType\ConfigFieldItemInterface;
 

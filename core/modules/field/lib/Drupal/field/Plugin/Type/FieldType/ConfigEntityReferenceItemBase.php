@@ -7,7 +7,7 @@
 
 namespace Drupal\field\Plugin\Type\FieldType;
 
-use Drupal\Core\Entity\Plugin\field\field_type\EntityReferenceItem;
+use Drupal\Core\Entity\Plugin\Field\FieldType\EntityReferenceItem;
 use Drupal\field\FieldInstanceInterface;
 use Drupal\field\FieldInterface;
 use Drupal\field\Plugin\Type\FieldType\ConfigFieldItemInterface;
@@ -76,7 +76,7 @@ class ConfigEntityReferenceItemBase extends EntityReferenceItem implements Confi
   /**
    * {@inheritdoc}
    *
-   * Copied from \Drupal\field\Plugin\field\field_type\LegacyConfigFieldItem,
+   * Copied from \Drupal\field\Plugin\Field\FieldType\LegacyConfigFieldItem,
    * since we cannot extend it.
    */
   public static function schema(FieldInterface $field) {
@@ -108,7 +108,7 @@ class ConfigEntityReferenceItemBase extends EntityReferenceItem implements Confi
   /**
    * {@inheritdoc}
    *
-   * Copied from \Drupal\field\Plugin\field\field_type\LegacyConfigFieldItem,
+   * Copied from \Drupal\field\Plugin\Field\FieldType\LegacyConfigFieldItem,
    * since we cannot extend it.
    */
   public function settingsForm(array $form, array &$form_state, $has_data) {
@@ -127,7 +127,7 @@ class ConfigEntityReferenceItemBase extends EntityReferenceItem implements Confi
   /**
    * {@inheritdoc}
    *
-   * Copied from \Drupal\field\Plugin\field\field_type\LegacyConfigFieldItem,
+   * Copied from \Drupal\field\Plugin\Field\FieldType\LegacyConfigFieldItem,
    * since we cannot extend it.
    */
   public function instanceSettingsForm(array $form, array &$form_state) {
@@ -161,7 +161,7 @@ class ConfigEntityReferenceItemBase extends EntityReferenceItem implements Confi
   /**
    * Returns the legacy callback for a given field type "hook".
    *
-   * Copied from \Drupal\field\Plugin\field\field_type\LegacyConfigFieldItem,
+   * Copied from \Drupal\field\Plugin\Field\FieldType\LegacyConfigFieldItem,
    * since we cannot extend it.
    *
    * @param string $hook
