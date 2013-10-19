@@ -29,11 +29,6 @@ class Row {
   );
 
   /**
-   * @var bool
-   */
-  protected $hasIdMap;
-
-  /**
    * Constructs a Migrate>Row object.
    *
    * @param array $values
@@ -89,7 +84,6 @@ class Row {
 
   public function setIdMap(array $id_map) {
     $this->idMap = $id_map;
-    $this->hasIdMap = TRUE;
   }
 
   /**
@@ -97,13 +91,6 @@ class Row {
    */
   public function getIdMap() {
     return $this->idMap;
-  }
-
-  /**
-   * @return bool
-   */
-  public function hasIdMap() {
-    return $this->hasIdMap;
   }
 
   /**

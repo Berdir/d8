@@ -303,7 +303,7 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
       }
       // 2. If the row is not in the map (we have never tried to import it
       //    before), we always want to try it.
-      elseif (!$row->hasIdMap()) {
+      elseif (!$row->getIdMap()) {
         // Fall through
       }
       // 3. If the row is marked as needing update, pass it.
