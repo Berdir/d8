@@ -114,6 +114,11 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
    */
   protected $idMap;
 
+  /**
+   * @var array
+   */
+  protected $highwaterProperty;
+
   public function getCurrentKey() {
     return $this->currentKey;
   }
@@ -254,16 +259,15 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
     $this->idMap = $this->migration->getIdMap();
     $this->numProcessed = 0;
     $this->numIgnored = 0;
-    $this->originalHighwater = $this->highwaterStorage->get($this->migration->id());
+    $this->originalHighwater = $this->getHighwater();
+    $this->highwaterProperty = $this->migration->get('highwaterProperty');
     if ($id_list = $this->migration->get('idlist')) {
       $this->idList = explode(',', $id_list);
     }
     else {
       $this->idList = array();
     }
-    migrate_instrument_start(get_class($this) . ' performRewind');
     $this->performRewind();
-    migrate_instrument_stop(get_class($this) . ' performRewind');
     $this->next();
   }
 
@@ -274,7 +278,6 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
   public function next() {
     $this->currentKey = NULL;
     $this->currentRow = NULL;
-    $highwater_property = $this->migration->get('highwaterProperty');
 
     while ($row_data = $this->getNextRow()) {
       $row = new Row($this->migration->get('sourceKeys'), $row_data);
@@ -349,7 +352,7 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
       else {
         // Call prepareRow() here, in case the highwaterField needs preparation
         if ($this->prepareRow($row) !== FALSE) {
-          if ($row->getSourceProperty($highwater_property['name']) > $this->originalHighwater) {
+          if ($row->getSourceProperty($this->highwaterProperty['name']) > $this->originalHighwater) {
             $this->currentRow = $row;
             break;
           }
@@ -413,6 +416,10 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
     return $keep;
   }
 
+  protected function getHighwater() {
+    return $this->highwaterStorage->get($this->migration->id());
+  }
+
   /**
    * Derived classes must implement fields(), returning a list of available
    * source fields.
@@ -434,8 +441,8 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
   /**
    * @return \stdClass
    */
-  abstract function getNextRow();
+  abstract protected function getNextRow();
 
-  abstract function performRewind();
+  abstract protected function performRewind();
 
 }

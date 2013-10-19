@@ -40,7 +40,7 @@ class Row {
     }
     else {
       $this->source = $values['data'];
-      foreach ($values['keys'] as $key) {
+      foreach (array_keys($keys) as $key) {
         if ($this->hasSourceProperty($key)) {
           $this->keys[$key] = $values['data'][$key];
         }
