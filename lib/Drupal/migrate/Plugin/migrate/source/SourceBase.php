@@ -307,7 +307,7 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
         // Fall through
       }
       // 3. If the row is marked as needing update, pass it.
-      elseif ($row->getIddMapProperty('needs_update') == \MigrateMap::STATUS_NEEDS_UPDATE) {
+      elseif ($row->getIdMapProperty('needs_update') == \MigrateMap::STATUS_NEEDS_UPDATE) {
         // Fall through
       }
       // 4. At this point, we have a row which has previously been imported and
@@ -434,7 +434,7 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
    * @return bool
    */
   protected function dataChanged(Row $row) {
-    return $row->getIddMapProperty('original_hash') != $row->getIddMapProperty('hash');
+    return $row->getIdMapProperty('original_hash') != $row->getIdMapProperty('hash');
   }
 
   /**

@@ -83,7 +83,7 @@ class Row {
     $this->idMap = $id_map;
   }
 
-  public function getIddMapProperty($property) {
+  public function getIdMapProperty($property) {
     if ($this->hasIdMapProperty($property)) {
       return $this->idMap[$property];
     }
