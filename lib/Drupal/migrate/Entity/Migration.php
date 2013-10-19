@@ -128,7 +128,7 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
    *
    * @var array
    */
-  public $highwater;
+  public $highwaterProperty;
 
   /**
    * Indicate whether the primary system of record for this migration is the

@@ -23,7 +23,15 @@ class Row {
 
   protected $destination = array();
 
-  protected $idMap = array();
+  protected $idMap = array(
+    'original_hash' => '',
+    'hash' => '',
+  );
+
+  /**
+   * @var bool
+   */
+  protected $hasIdMap;
 
   /**
    * Constructs a Migrate>Row object.
@@ -57,7 +65,7 @@ class Row {
   }
 
   public function getSourceProperty($property) {
-    if ($this->hasSourceProperty($property)) {
+    if (isset($this->source[$property])) {
       return $this->source[$property];
     }
   }
@@ -81,18 +89,48 @@ class Row {
 
   public function setIdMap(array $id_map) {
     $this->idMap = $id_map;
+    $this->hasIdMap = TRUE;
   }
 
-  public function getIdMapProperty($property) {
-    if ($this->hasIdMapProperty($property)) {
-      return $this->idMap[$property];
-    }
+  /**
+   * @return array
+   */
+  public function getIdMap() {
+    return $this->idMap;
   }
 
   /**
    * @return bool
    */
-  public function hasIdMapProperty($property) {
-    return isset($this->idMap[$property]) || array_key_exists($property, $this->idMap);
+  public function hasIdMap() {
+    return $this->hasIdMap;
   }
+
+  /**
+   * Recalculate the hash for the row.
+   */
+  public function rehash() {
+    $this->idMap['original_hash'] = $this->idMap['hash'];
+    $this->idMap['hash'] = hash('sha256', serialize($this->source));
+  }
+
+  /**
+   * Checks whether the row has changed compared to the original id map.
+   *
+   * return bool
+   *   TRUE if the row has changed, FALSE otherwise. If setIdMap() was not
+   *   called, this always returns FALSE.
+   */
+  public function changed() {
+    return $this->idMap['original_hash'] != $this->idMap['hash'];
+  }
+
+  /**
+   * @return bool
+   *   TRUE if the row needs updating.
+   */
+  public function needsUpdate() {
+    return $this->idMap['needs_update'] == \MigrateMap::STATUS_NEEDS_UPDATE;
+  }
+
 }

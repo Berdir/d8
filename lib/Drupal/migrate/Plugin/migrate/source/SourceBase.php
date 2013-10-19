@@ -8,6 +8,7 @@
 namespace Drupal\migrate\Plugin\migrate\source;
 
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\KeyValueStore\KeyValueStoreInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\migrate\Entity\MigrationInterface;
@@ -181,10 +182,11 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
    * @param \Drupal\migrate\Entity\MigrationInterface $migration
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache
    */
-  function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration, CacheBackendInterface $cache) {
+  function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration, CacheBackendInterface $cache, KeyValueStoreInterface $highwater_storage) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->cache = $cache;
     $this->migration = $migration;
+    $this->highwaterStorage = $highwater_storage;
     if (!empty($configuration['cache_counts'])) {
       $this->cacheCounts = TRUE;
     }
@@ -197,9 +199,6 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
     if (!empty($configuration['track_changes'])) {
       $this->trackChanges = $configuration['track_changes'];
     }
-    if (!empty($configuration['original_highwater'])) {
-      $this->originalHighwater = $configuration['original_highwater'];
-    }
     if (!empty($configuration['idList'])) {
       $this->idList = $configuration['idList'];
     }
@@ -211,7 +210,8 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
       $plugin_id,
       $plugin_definition,
       $configuration['migration'],
-      $container->get('cache.migrate')
+      $container->get('cache.migrate'),
+      $container->get('keyvalue')->get('migrate:highwater')
     );
   }
 
@@ -254,9 +254,9 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
     $this->idMap = $this->migration->getIdMap();
     $this->numProcessed = 0;
     $this->numIgnored = 0;
-    $this->originalHighwater = $this->migration->getHighwater();
-    if ($this->migration->getOption('idlist')) {
-      $this->idList = explode(',', $this->migration->getOption('idlist'));
+    $this->originalHighwater = $this->highwaterStorage->get($this->migration->id());
+    if ($id_list = $this->migration->get('idlist')) {
+      $this->idList = explode(',', $id_list);
     }
     else {
       $this->idList = array();
@@ -274,7 +274,7 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
   public function next() {
     $this->currentKey = NULL;
     $this->currentRow = NULL;
-    $highwater = $this->migration->get('highwater');
+    $highwater_property = $this->migration->get('highwaterProperty');
 
     while ($row_data = $this->getNextRow()) {
       $row = new Row($this->migration->get('sourceKeys'), $row_data);
@@ -303,11 +303,11 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
       }
       // 2. If the row is not in the map (we have never tried to import it
       //    before), we always want to try it.
-      elseif (!$row->hasIdMapProperty('sourceid1')) {
+      elseif (!$row->hasIdMap()) {
         // Fall through
       }
       // 3. If the row is marked as needing update, pass it.
-      elseif ($row->getIdMapProperty('needs_update') == \MigrateMap::STATUS_NEEDS_UPDATE) {
+      elseif ($row->needsUpdate()) {
         // Fall through
       }
       // 4. At this point, we have a row which has previously been imported and
@@ -318,7 +318,7 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
       elseif (!empty($highwater['field'])) {
         if ($this->trackChanges) {
           if ($this->prepareRow($row) !== FALSE) {
-            if ($this->dataChanged($row)) {
+            if ($row->changed()) {
               // This is a keeper
               $this->currentRow = $row;
               break;
@@ -349,7 +349,7 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
       else {
         // Call prepareRow() here, in case the highwaterField needs preparation
         if ($this->prepareRow($row) !== FALSE) {
-          if ($row->getSourceProperty($this->highwaterField['name']) > $this->originalHighwater) {
+          if ($row->getSourceProperty($highwater_property['name']) > $this->originalHighwater) {
             $this->currentRow = $row;
             break;
           }
@@ -384,7 +384,7 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
    *
    * @param \Drupal\migrate\Row $row
    * @return bool
-   *  FALSE if the row is to be skipped.
+   *   FALSE if the row is to be skipped.
    */
   protected function prepareRow(Row $row, $keep = TRUE) {
     // We're explicitly skipping this row - keep track in the map table
@@ -405,19 +405,7 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
       // so we need to provide them with the necessary information (before and
       // after hashes).
       if ($this->trackChanges) {
-        $unhashed_row = clone ($row);
-        // Remove all map data, otherwise we'll have a false positive on the
-        // second import (attempt) on a row.
-        foreach ($unhashed_row as $field => $data) {
-          if (strpos($field, 'migrate_map_') === 0) {
-            unset($unhashed_row->$field);
-          }
-        }
-        $row->migrate_map_original_hash = $row->migrate_map_hash;
-        $row->migrate_map_hash = $this->hash($unhashed_row);
-      }
-      else {
-        $row->migrate_map_hash = '';
+        $row->rehash();
       }
     }
 
@@ -426,35 +414,12 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
   }
 
   /**
-   * Determine whether this row has changed, and therefore whether it should
-   * be processed.
-   *
-   * @param $row
-   *
-   * @return bool
-   */
-  protected function dataChanged(Row $row) {
-    return $row->getIdMapProperty('original_hash') != $row->getIdMapProperty('hash');
-  }
-
-  /**
-   * Generate a hash of the source row.
-   *
-   * @param $row
-   *
-   * @return string
-   */
-  protected function hash($row) {
-    return hash('sha256', serialize($row));
-  }
-
-  /**
    * Derived classes must implement fields(), returning a list of available
    * source fields.
    *
    * @return array
-   *  Keys: machine names of the fields (to be passed to addFieldMapping)
-   *  Values: Human-friendly descriptions of the fields.
+   *   Keys: machine names of the fields (to be passed to addFieldMapping)
+   *   Values: Human-friendly descriptions of the fields.
    */
   abstract public function fields();
 
