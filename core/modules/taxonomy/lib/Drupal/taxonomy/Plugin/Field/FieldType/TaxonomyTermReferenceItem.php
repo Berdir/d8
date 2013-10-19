@@ -15,7 +15,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\TypedData\AllowedValuesInterface;
 
 /**
- *  Plugin implementation of the 'term_reference' field type.
+ * Plugin implementation of the 'term_reference' field type.
  *
  * @FieldType(
  *   id = "taxonomy_term_reference",
