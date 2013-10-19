@@ -154,4 +154,8 @@ interface MigrateIdMapInterface {
    */
   public function destroy();
 
+  /**
+   * @TODO: YUCK THIS IS SQL BOUND!
+   */
+  public function getQualifiedMapTable();
 }

@@ -110,7 +110,7 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
   protected $cache;
 
   /**
-   * @var \MigrateMap
+   * @var \Drupal\migrate\Plugin\MigrateIdMapInterface
    */
   protected $idMap;
 

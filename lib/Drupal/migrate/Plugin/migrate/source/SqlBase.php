@@ -8,13 +8,10 @@
 namespace Drupal\migrate\Plugin\migrate\source;
 
 use Drupal\Core\Cache\CacheBackendInterface;
-use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
 use Drupal\Core\KeyValueStore\KeyValueStoreInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\migrate\Entity\MigrationInterface;
-use Drupal\system\Tests\Database\DatabaseExceptionWrapperTest;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 abstract class SqlBase extends SourceBase implements ContainerFactoryPluginInterface {
 
@@ -79,7 +76,7 @@ abstract class SqlBase extends SourceBase implements ContainerFactoryPluginInter
         // multiple fields, we need to build things up.
         $count = 1;
 
-        foreach ($this->idMap->getSourceKey() as $field_name => $field_schema) {
+        foreach ($this->idMap->getSourceKeys() as $field_name => $field_schema) {
           if (isset($field_schema['alias'])) {
             $field_name = $field_schema['alias'] . '.' . $field_name;
           }
@@ -100,12 +97,12 @@ abstract class SqlBase extends SourceBase implements ContainerFactoryPluginInter
         $condition_added = TRUE;
 
         // And as long as we have the map table, add its data to the row.
-        $n = $this->idMap->getSourceKey();
+        $n = $this->idMap->getSourceKeys();
         for ($count = 1; $count <= $n; $count++) {
           $map_key = 'sourceid' . $count++;
           $this->query->addField($alias, $map_key, "migrate_map_$map_key");
         }
-        $n = count($this->idMap->getDestinationKey());
+        $n = count($this->idMap->getDestinationKeys());
         for ($count = 1; $count <= $n; $count++) {
           $map_key = 'destid' . $count++;
           $this->query->addField($alias, $map_key, "migrate_map_$map_key");
