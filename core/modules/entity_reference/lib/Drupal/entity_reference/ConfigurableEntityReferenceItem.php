@@ -17,10 +17,54 @@ use Drupal\Core\Field\ConfigFieldItemInterface;
  * Replaces the Core 'entity_reference' entity field type implementation, this
  * supports configurable fields, auto-creation of referenced entities and more.
  *
+ * Required settings (below the definition's 'settings' key) are:
+ *  - target_type: The entity type to reference.
+ *
  * @see entity_reference_field_info_alter().
  *
  */
 class ConfigurableEntityReferenceItem extends ConfigEntityReferenceItemBase implements ConfigFieldItemInterface {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPropertyDefinitions() {
+    $target_type = $this->definition['settings']['target_type'];
+
+    // Definitions vary by entity type and bundle, so key them accordingly.
+    $key = $target_type . ':';
+    $key .= isset($this->definition['settings']['target_bundle']) ? $this->definition['settings']['target_bundle'] : '';
+
+    if (!isset(static::$propertyDefinitions[$key])) {
+      // Call the parent to define the target_id and entity properties.
+      parent::getPropertyDefinitions();
+
+      // Only add the revision ID property if the target entity type supports
+      // revisions.
+      $target_type_info = \Drupal::entityManager()->getDefinition($target_type);
+      if (!empty($target_type_info['entity_keys']['revision']) && !empty($target_type_info['revision_table'])) {
+        static::$propertyDefinitions[$key]['revision_id'] = array(
+          'type' => 'integer',
+          'label' => t('Revision ID'),
+          'constraints' => array(
+            'Range' => array('min' => 0),
+          ),
+        );
+      }
+
+      static::$propertyDefinitions[$key]['label'] = array(
+        'type' => 'string',
+        'label' => t('Label (auto-create)'),
+        'computed' => TRUE,
+      );
+      static::$propertyDefinitions[$key]['access'] = array(
+        'type' => 'boolean',
+        'label' => t('Access'),
+        'computed' => TRUE,
+      );
+    }
+    return static::$propertyDefinitions[$key];
+  }
 
   /**
    * {@inheritdoc}
@@ -63,19 +107,6 @@ class ConfigurableEntityReferenceItem extends ConfigEntityReferenceItemBase impl
     );
 
     return $schema;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function preSave() {
-    $entity = $this->get('entity')->getValue();
-    $target_id = $this->get('target_id')->getValue();
-
-    if (!$target_id && !empty($entity) && $entity->isNew()) {
-      $entity->save();
-      $this->set('target_id', $entity->id());
-    }
   }
 
   /**

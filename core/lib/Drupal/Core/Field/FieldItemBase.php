@@ -224,4 +224,10 @@ abstract class FieldItemBase extends Map implements FieldItemInterface {
    */
   public function deleteRevision() { }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getMainPropertyName() {
+    return 'value';
+  }
 }
