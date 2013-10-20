@@ -21,6 +21,8 @@ interface MigrationInterface extends ConfigEntityInterface {
   const STATUS_STOPPING = 3;
   const STATUS_DISABLED = 4;
 
+  const MESSAGE_ERROR = 1;
+
   /**
    * @return \Drupal\migrate\Plugin\MigrateSourceInterface
    */

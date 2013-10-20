@@ -8,6 +8,7 @@
 namespace Drupal\migrate\Plugin;
 
 use Drupal\migrate\Entity\Migration;
+use Drupal\migrate\Entity\MigrationInterface;
 
 interface MigrateIdMapInterface {
 
@@ -62,7 +63,7 @@ interface MigrateIdMapInterface {
    * @param int $level
    *  Optional message severity (defaults to MESSAGE_ERROR).
    */
-  public function saveMessage($source_key, $message, $level = Migration::MESSAGE_ERROR);
+  public function saveMessage($source_key, $message, $level = MigrationInterface::MESSAGE_ERROR);
 
   /**
    * Prepare to run a full update - mark all previously-imported content as

@@ -7,7 +7,6 @@
 
 namespace Drupal\migrate\Tests;
 
-
 use Drupal\Tests\UnitTestCase;
 use Drupal\migrate\Plugin\migrate\source\d6\Comment;
 
@@ -31,6 +30,11 @@ class D6CommentSourceTest extends UnitTestCase {
    */
   protected $connection;
 
+  /**
+   * @var \Drupal\migrate\Entity\MigrationInterface
+   */
+  protected $migration;
+
   public static function getInfo() {
     return array(
       'name' => 'D6 comment source functionality',
@@ -43,19 +47,24 @@ class D6CommentSourceTest extends UnitTestCase {
     $this->connection = $this->getMockBuilder('Drupal\Core\Database\Connection')
       ->disableOriginalConstructor()
       ->getMock();
-
     // @todo Figure out how Comment::query() is used.
     // @todo create a StatementInterface object with relevant data attached? (or mocks)
     $statement = null;
     $this->connection->expects($this->any())
       ->method('query')
       ->will($this->returnValue($statement));
+    $idmap = $this->getMock('Drupal\migrate\Plugin\MigrateIdMapInterface');
+    $this->migration = $this->getMock('Drupal\migrate\Entity\MigrationInterface');
+    $this->migration->expects($this->any())
+      ->method('idMap')
+      ->will($this->returnValue($idmap));
 
     $configuration = array();
     $plugin_definition = array();
     // @todo Instanciate a CacheBackendInterface object;
-    $cache = null;
-    $this->source = new Comment($configuration, 'drupal6_comment', $plugin_definition, $cache, $this->connection);
+    $cache = $this->getMock('Drupal\Core\Cache\CacheBackendInterface');
+    $keyvalue = $this->getMock('Drupal\Core\KeyValueStore\KeyValueStoreInterface');
+    $this->source = new Comment($configuration, 'drupal6_comment', $plugin_definition, $this->migration, $cache, $keyvalue);
   }
 
   /**
