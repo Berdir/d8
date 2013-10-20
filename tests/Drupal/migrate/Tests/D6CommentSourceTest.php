@@ -7,6 +7,7 @@
 
 namespace Drupal\migrate\Tests;
 
+use Drupal\Core\Database\Query\Select;
 use Drupal\Tests\UnitTestCase;
 use Drupal\migrate\Plugin\migrate\source\d6\Comment;
 
@@ -28,7 +29,7 @@ class D6CommentSourceTest extends UnitTestCase {
    *
    * @var \Drupal\Core\Database\Connection
    */
-  protected $connection;
+  protected $database;
 
   /**
    * @var \Drupal\migrate\Entity\MigrationInterface
@@ -53,10 +54,13 @@ class D6CommentSourceTest extends UnitTestCase {
       ->method('current')
       ->will($this->returnValue(array('whatever')));
 
-    $this->connection = $this->getMockBuilder('Drupal\Core\Database\Connection')
+    $this->database = $this->getMockBuilder('Drupal\Core\Database\Connection')
       ->disableOriginalConstructor()
       ->getMock();
-    $this->connection->expects($this->once())
+    $this->database->expects($this->once())
+      ->method('select')
+      ->will($this->returnValue(new Select('comment', 'c', $this->database)));
+    $this->database->expects($this->once())
       ->method('query')
       ->will($this->returnValue($statement));
 
@@ -64,9 +68,10 @@ class D6CommentSourceTest extends UnitTestCase {
     $idmap->expects($this->once())
       ->method('getQualifiedMapTable')
       ->will($this->returnValue('test_map'));
+
     $migration = $this->getMock('Drupal\migrate\Entity\MigrationInterface');
     $migration->expects($this->any())
-      ->method('idMap')
+      ->method('getIdMap')
       ->will($this->returnValue($idmap));
     $configuration = array(
       'id' => 'test',
@@ -76,18 +81,17 @@ class D6CommentSourceTest extends UnitTestCase {
     $migration->expects($this->any())
       ->method('get')
       ->will($this->returnCallback(function ($argument) use ($configuration) { return $configuration[$argument]; }));
-
     $this->migration= $migration;
+
     $configuration = array();
     $plugin_definition = array();
-    // @todo Instanciate a CacheBackendInterface object;
     $cache = $this->getMock('Drupal\Core\Cache\CacheBackendInterface');
-    $keyvalue = $this->getMock('Drupal\Core\KeyValueStore\KeyValueStoreInterface');
-    $this->source = new Comment($configuration, 'drupal6_comment', $plugin_definition, $migration, $cache, $keyvalue);
+    $key_value = $this->getMock('Drupal\Core\KeyValueStore\KeyValueStoreInterface');
+    $this->source = new Comment($configuration, 'drupal6_comment', $plugin_definition, $migration, $cache, $key_value);
     $reflection = new \ReflectionClass($this->source);
     $reflection_property = $reflection->getProperty('database');
     $reflection_property->setAccessible(TRUE);
-    $reflection_property->setValue($this->source, $this->connection);
+    $reflection_property->setValue($this->source, $this->database);
   }
 
 
