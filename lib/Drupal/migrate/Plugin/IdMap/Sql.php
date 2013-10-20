@@ -7,6 +7,7 @@
 
 namespace Drupal\migrate\Plugin\IdMap;
 
+use Drupal\Core\Database\Database;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
 
 class Sql implements MigrateIdMapInterface {

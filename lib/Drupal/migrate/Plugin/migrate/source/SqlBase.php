@@ -30,6 +30,14 @@ abstract class SqlBase extends SourceBase implements ContainerFactoryPluginInter
     $this->mapJoinable = TRUE;
   }
 
+  protected function getDatabase() {
+    if (!isset($this->database)) {
+      $key = 'migrate_' . $this->migration->id();
+      Database::addConnectionInfo('default', $key, $this->configuration['connection']);
+      $this->database = Database::getConnection('default', $key);
+    }
+  }
+
   /**
    * Implementation of MigrateSource::performRewind().
    *
@@ -37,9 +45,6 @@ abstract class SqlBase extends SourceBase implements ContainerFactoryPluginInter
    * we will take advantage of the PDO-based API to optimize the query up-front.
    */
   protected function performRewind() {
-    $key = 'migrate_' . $this->migration->id();
-    Database::addConnectionInfo('default', $key, $this->configuration['connection']);
-    $this->database = Database::getConnection('default', $key);
     $this->result = NULL;
     $this->query = clone $this->query();
 

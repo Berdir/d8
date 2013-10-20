@@ -44,45 +44,69 @@ class D6CommentSourceTest extends UnitTestCase {
   }
 
   protected function setUp() {
+    // The interface can't be mocked because of
+    $statement = $this->getMock('Drupal\Core\Database\StatementEmpty');
+    $statement->expects($this->exactly(2))
+      ->method('valid')
+      ->will($this->onConsecutiveCalls(TRUE, FALSE));
+    $statement->expects($this->once())
+      ->method('current')
+      ->will($this->returnValue(array('whatever')));
+
     $this->connection = $this->getMockBuilder('Drupal\Core\Database\Connection')
       ->disableOriginalConstructor()
       ->getMock();
-    // @todo Figure out how Comment::query() is used.
-    // @todo create a StatementInterface object with relevant data attached? (or mocks)
-    $statement = null;
-    $this->connection->expects($this->any())
+    $this->connection->expects($this->once())
       ->method('query')
       ->will($this->returnValue($statement));
+
     $idmap = $this->getMock('Drupal\migrate\Plugin\MigrateIdMapInterface');
-    $this->migration = $this->getMock('Drupal\migrate\Entity\MigrationInterface');
-    $this->migration->expects($this->any())
+    $idmap->expects($this->once())
+      ->method('getQualifiedMapTable')
+      ->will($this->returnValue('test_map'));
+    $migration = $this->getMock('Drupal\migrate\Entity\MigrationInterface');
+    $migration->expects($this->any())
       ->method('idMap')
       ->will($this->returnValue($idmap));
+    $configuration = array(
+      'id' => 'test',
+      'highwaterProperty' => array('field' => 'test'),
+      'idlist' => array(),
+    );
+    $migration->expects($this->any())
+      ->method('get')
+      ->will($this->returnCallback(function ($argument) use ($configuration) { return $configuration[$argument]; }));
 
+    $this->migration= $migration;
     $configuration = array();
     $plugin_definition = array();
     // @todo Instanciate a CacheBackendInterface object;
     $cache = $this->getMock('Drupal\Core\Cache\CacheBackendInterface');
     $keyvalue = $this->getMock('Drupal\Core\KeyValueStore\KeyValueStoreInterface');
-    $this->source = new Comment($configuration, 'drupal6_comment', $plugin_definition, $this->migration, $cache, $keyvalue);
+    $this->source = new Comment($configuration, 'drupal6_comment', $plugin_definition, $migration, $cache, $keyvalue);
+    $reflection = new \ReflectionClass($this->source);
+    $reflection_property = $reflection->getProperty('database');
+    $reflection_property->setAccessible(TRUE);
+    $reflection_property->setValue($this->source, $this->connection);
   }
+
 
   /**
    * Tests retrieval.
    */
   public function testRetrieval() {
-    $source->rewind();
+    $this->source->rewind();
     // @todo mock two rows.
     $expected_data_keys = array('cid', 'pid', 'nid', 'uid', 'subject', 'comment', 'hostname', 'timestamp', 'status', 'thread', 'name', 'mail', 'homepage', 'format');
     // First row.
     $this->assertTrue($this->source->valid(), 'Valid row found in source.');
-    $data_row = $source->current();
+    $data_row = $this->source->current();
     foreach ($expected_data_keys as $expected_data_key) {
       $this->assertTrue(isset($data_row[$expected_data_key]), sprintf('Found key "%s" on source data row.', $expected_data_key));
     }
     // Second row.
-    $data_row = $source->current();
-    $source->next();
+    $data_row = $this->source->current();
+    $this->source->next();
     foreach ($expected_data_keys as $expected_data_key) {
       $this->assertTrue(isset($data_row[$expected_data_key]), sprintf('Found key "%s" on source data row.', $expected_data_key));
     }
