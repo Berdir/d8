@@ -27,21 +27,7 @@ interface MigrateIdMapInterface {
   const ROLLBACK_DELETE = 0;
   const ROLLBACK_PRESERVE = 1;
 
-  /**
-   * list of key properties for the source.
-   *
-   * @return array
-   */
-  public function getSourceKeys();
-
-  /**
-   * List of key properties for the destination.
-   *
-   * @return array
-   */
-  public function getDestinationKeys();
-
-  /**
+ /**
    * Save a mapping from the key values in the source row to the destination
    * keys.
    *

@@ -31,15 +31,22 @@ abstract class MigrateSqlSourceTestCase extends UnitTestCase {
    */
   protected $migration;
 
-  protected $migration_configuration = array();
+  protected $migrationConfiguration = array();
+
+  protected $tableContents = array();
 
   const PLUGIN_CLASS = '';
 
   const PLUGIN_ID = '';
 
   protected function setUp() {
-    // The interface can't be mocked because of
+    $this->tableContents[] = FALSE;
+    // The interface can't be mocked because it extends \Traversable so use
+    // StatementEmpty instead.
     $statement = $this->getMock('Drupal\Core\Database\StatementEmpty');
+    $statement->expects($this->exactly(count($this->tableContents) + 1))
+      ->method('fetchAssoc')
+      ->will($this->onConsecutiveCalls($this->tableContents));
 
     $this->database = $this->getMockBuilder('Drupal\Core\Database\Connection')
       ->disableOriginalConstructor()
@@ -55,21 +62,12 @@ abstract class MigrateSqlSourceTestCase extends UnitTestCase {
     $idmap->expects($this->once())
       ->method('getQualifiedMapTable')
       ->will($this->returnValue('test_map'));
-    $idmap->expects($this->exactly(3))
-      ->method('getSourceKeys')
-      ->will($this->returnValue(array(
-        'test' => array(
-          'type' => 'varchar',
-          'length' => 255,
-          'not null' => TRUE,
-        ),
-    )));
 
     $migration = $this->getMock('Drupal\migrate\Entity\MigrationInterface');
     $migration->expects($this->exactly(2))
       ->method('getIdMap')
       ->will($this->returnValue($idmap));
-    $configuration = $this->migration_configuration;
+    $configuration = $this->migrationConfiguration;
     $migration->expects($this->any())
       ->method('get')
       ->will($this->returnCallback(function ($argument) use ($configuration) { return $configuration[$argument]; }));
@@ -87,4 +85,20 @@ abstract class MigrateSqlSourceTestCase extends UnitTestCase {
     $reflection_property->setValue($this->source, $this->database);
   }
 
+
+  /**
+   * Tests retrieval.
+   */
+  public function testRetrieval() {
+    $this->source->rewind();
+    // First row.
+    $this->assertTrue($this->source->valid(), 'Valid row found in source.');
+    foreach ($this->tableContents as $row) {
+      $data_row = $this->source->current();
+      foreach ($row as $key => $value) {
+        $this->assertSame((string) $data_row[$key], (string) $value);
+      }
+    }
+    $this->assertFalse($this->source->valid(), 'Table size correct');
+  }
 }

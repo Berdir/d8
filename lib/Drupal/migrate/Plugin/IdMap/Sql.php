@@ -47,19 +47,6 @@ class Sql implements MigrateIdMapInterface {
   }
 
   /**
-   * sourceKey and destinationKey arrays are keyed by the field names; values
-   * are the Drupal schema definition for the field.
-   *
-   * @var array
-   */
-  public function getSourceKeys() {
-    return $this->sourceKeys;
-  }
-  public function getDestinationKeys() {
-    return $this->destinationKeys;
-  }
-
-  /**
    * Drupal connection object on which to create the map/message tables
    * @var DatabaseConnection
    */

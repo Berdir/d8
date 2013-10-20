@@ -53,7 +53,7 @@ abstract class SqlBase extends SourceBase implements ContainerFactoryPluginInter
     // Get the key values, for potential use in joining to the map table, or
     // enforcing idlist.
     $keys = array();
-    foreach ($this->migration->getIdMap()->getSourceKeys() as $field_name => $field_schema) {
+    foreach ($this->migration->get('sourceKeys') as $field_name => $field_schema) {
       if (isset($field_schema['alias'])) {
         $field_name = $field_schema['alias'] . '.' . $field_name;
       }
@@ -83,7 +83,7 @@ abstract class SqlBase extends SourceBase implements ContainerFactoryPluginInter
         // multiple fields, we need to build things up.
         $count = 1;
 
-        foreach ($this->idMap->getSourceKeys() as $field_name => $field_schema) {
+        foreach ($this->migration->get('sourceKeys') as $field_name => $field_schema) {
           if (isset($field_schema['alias'])) {
             $field_name = $field_schema['alias'] . '.' . $field_name;
           }
@@ -104,12 +104,12 @@ abstract class SqlBase extends SourceBase implements ContainerFactoryPluginInter
         $condition_added = TRUE;
 
         // And as long as we have the map table, add its data to the row.
-        $n = count($this->idMap->getSourceKeys());
+        $n = count($this->migration->get('sourceKeys'));
         for ($count = 1; $count <= $n; $count++) {
           $map_key = 'sourceid' . $count;
           $this->query->addField($alias, $map_key, "migrate_map_$map_key");
         }
-        $n = count($this->idMap->getDestinationKeys());
+        $n = count($this->migration->get('destinationKeys'));
         for ($count = 1; $count <= $n; $count++) {
           $map_key = 'destid' . $count++;
           $this->query->addField($alias, $map_key, "migrate_map_$map_key");
