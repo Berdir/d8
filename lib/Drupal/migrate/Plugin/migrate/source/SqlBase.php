@@ -9,9 +9,11 @@ namespace Drupal\migrate\Plugin\migrate\source;
 
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Database\Database;
+use Drupal\Core\Database\Query\Condition;
 use Drupal\Core\KeyValueStore\KeyValueStoreInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\migrate\Entity\MigrationInterface;
+use Drupal\migrate\Plugin\MigrateIdMapInterface;
 
 abstract class SqlBase extends SourceBase implements ContainerFactoryPluginInterface {
 
@@ -74,7 +76,7 @@ abstract class SqlBase extends SourceBase implements ContainerFactoryPluginInter
       //    conditions in the query). So, ultimately the SQL condition will look
       //    like (original conditions) AND (map IS NULL OR map needs update
       //      OR above highwater).
-      $conditions = db_or();
+      $conditions = new Condition('OR');
       $condition_added = FALSE;
       if ($this->mapJoinable) {
         // Build the join to the map table. Because the source key could have
@@ -98,13 +100,13 @@ abstract class SqlBase extends SourceBase implements ContainerFactoryPluginInter
         $alias = $this->query->leftJoin($this->idMap->getQualifiedMapTable(),
                                         'map', $map_join);
         $conditions->isNull($alias . '.sourceid1');
-        $conditions->condition($alias . '.needs_update', \MigrateMap::STATUS_NEEDS_UPDATE);
+        $conditions->condition($alias . '.needs_update', MigrateIdMapInterface::STATUS_NEEDS_UPDATE);
         $condition_added = TRUE;
 
         // And as long as we have the map table, add its data to the row.
-        $n = $this->idMap->getSourceKeys();
+        $n = count($this->idMap->getSourceKeys());
         for ($count = 1; $count <= $n; $count++) {
-          $map_key = 'sourceid' . $count++;
+          $map_key = 'sourceid' . $count;
           $this->query->addField($alias, $map_key, "migrate_map_$map_key");
         }
         $n = count($this->idMap->getDestinationKeys());
