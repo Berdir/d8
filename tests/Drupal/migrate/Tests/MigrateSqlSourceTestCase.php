@@ -82,16 +82,24 @@ abstract class MigrateSqlSourceTestCase extends UnitTestCase {
    * Tests retrieval.
    */
   public function testRetrieval() {
-    $this->source->rewind();
-    // First row.
-    $this->assertTrue($this->source->valid(), 'Valid row found in source.');
-    foreach ($this->results as $expected_row) {
+    $result_keys = array_keys($this->results[0]);
+    $match_field = reset($result_keys);
+    $count = 0;
+    for ($this->source->rewind(); $this->source->valid(); $this->source->next()) {
       $data_row = $this->source->current();
-      foreach ($expected_row as $key => $expected_value) {
-        $this->assertSame((string) $expected_value, (string) $data_row->getSourceProperty($key));
+      $match = FALSE;
+      foreach ($this->results as $expected_row) {
+        if ((string) $expected_row[$match_field] === (string) $data_row->getSourceProperty($match_field)) {
+          $match = TRUE;
+          $count++;
+          foreach ($expected_row as $key => $expected_value) {
+            $this->assertSame((string) $expected_value, (string) $data_row->getSourceProperty($key));
+          }
+          break;
+        }
       }
-      $this->source->next();
+      $this->assertTrue($match);
     }
-    $this->assertFalse($this->source->valid(), 'Table size correct');
+    $this->assertSame(count($this->results), $count);
   }
 }

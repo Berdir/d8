@@ -132,14 +132,14 @@ class FakeSelect implements SelectInterface {
         foreach ($results as $row) {
           foreach ($this->databaseContents[$table_info['table']] as $candidate_row) {
             if ($row[$table_info['original_field']] == $candidate_row[$table_info['added_field']]) {
-              $new_rows[] = array_intersect_key($candidate_row, $fields[$table_alias]);
+              $new_rows[] = $row + array_intersect_key($candidate_row, $fields[$table_alias]);
             }
             elseif ($table_info['join type'] == 'LEFT') {
-              $new_rows[] = $fields[$table_alias];
+              $new_rows[] = $row + $fields[$table_alias];
             }
           }
         }
-        $results = array_merge($results, $new_rows);
+        $results = $new_rows;
       }
       else {
         foreach ($this->databaseContents[$table_info['table']] as $candidate_row) {
