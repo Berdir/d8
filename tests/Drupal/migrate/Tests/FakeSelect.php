@@ -126,13 +126,13 @@ class FakeSelect implements SelectInterface {
     }
 
     $results = array();
-    foreach ($this->getTables() as $table_alias => $table_info) {
+    foreach ($this->tables as $table_alias => $table_info) {
       if (isset($table_info['join type'])) {
         $new_rows = array();
         foreach ($results as $row) {
           foreach ($this->databaseContents[$table_info['table']] as $candidate_row) {
             if ($row[$table_info['original_field']] == $candidate_row[$table_info['added_field']]) {
-              $new_rows[] = array_intersect_key($fields[$table_alias], $candidate_row);
+              $new_rows[] = array_intersect_key($candidate_row, $fields[$table_alias]);
             }
             elseif ($table_info['join type'] == 'LEFT') {
               $new_rows[] = $fields[$table_alias];
@@ -143,7 +143,7 @@ class FakeSelect implements SelectInterface {
       }
       else {
         foreach ($this->databaseContents[$table_info['table']] as $candidate_row) {
-          $results[] = array_intersect_key($fields[$table_alias], $candidate_row);
+          $results[] = array_intersect_key($candidate_row, $fields[$table_alias]);
         }
       }
     }
