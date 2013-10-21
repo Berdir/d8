@@ -24,14 +24,16 @@ class FakeStatement extends \ArrayIterator implements StatementInterface {
   }
 
   public function fetchField($index = 0) {
-    $this->next();
     $row = array_values($this->current());
-    return $row[$index];
+    $return = $row[$index];
+    $this->next();
+    return $return;
   }
 
   public function fetchAssoc() {
+    $return = $this->current();
     $this->next();
-    return $this->current();
+    return $return;
   }
 
   public function fetchCol($index = 0) {

@@ -49,9 +49,11 @@ abstract class MigrateSqlSourceTestCase extends UnitTestCase {
       ->will($this->returnValue($query));
 
     $idmap = $this->getMock('Drupal\migrate\Plugin\MigrateIdMapInterface');
+    /*
     $idmap->expects($this->once())
       ->method('getQualifiedMapTable')
       ->will($this->returnValue('test_map'));
+    */
 
     $migration = $this->getMock('Drupal\migrate\Entity\MigrationInterface');
     $migration->expects($this->any())
@@ -82,6 +84,8 @@ abstract class MigrateSqlSourceTestCase extends UnitTestCase {
    * Tests retrieval.
    */
   public function testRetrieval() {
+    // As there is no ordering yet, we need to figure out which row is
+    // in the results.
     $result_keys = array_keys($this->results[0]);
     $match_field = reset($result_keys);
     $count = 0;
