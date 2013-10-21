@@ -35,18 +35,13 @@ class Row {
    *   (optional) An array of values to add as properties on the object.
    */
   public function __construct(array $keys, array $values) {
-    if (empty($values['keys'])) {
-      throw new \InvalidArgumentException('A row must have an array of keys.');
-    }
-    else {
-      $this->source = $values['data'];
-      foreach (array_keys($keys) as $key) {
-        if ($this->hasSourceProperty($key)) {
-          $this->keys[$key] = $values['data'][$key];
-        }
-        else {
-          throw new \InvalidArgumentException("$key has no value");
-        }
+    $this->source = $values;
+    foreach (array_keys($keys) as $key) {
+      if ($this->hasSourceProperty($key)) {
+        $this->keys[$key] = $values[$key];
+      }
+      else {
+        throw new \InvalidArgumentException("$key has no value");
       }
     }
   }

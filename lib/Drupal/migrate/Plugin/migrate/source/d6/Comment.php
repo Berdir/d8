@@ -24,8 +24,7 @@ class Comment extends SqlBase {
         'comment', 'hostname', 'timestamp', 'status', 'thread', 'name',
         'mail', 'homepage', 'format'));
     $query->join('node', 'n', 'c.nid = n.nid');
-    // @todo Pass node type on constructor to filter?.
-    $query->orderBy('timestamp');
+    $query->fields('n', array('type'));
     return $query;
   }
 

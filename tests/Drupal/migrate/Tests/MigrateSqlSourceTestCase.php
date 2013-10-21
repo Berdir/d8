@@ -19,18 +19,6 @@ abstract class MigrateSqlSourceTestCase extends UnitTestCase {
    */
   protected $source;
 
-  /**
-   * Database connection to use.
-   *
-   * @var \Drupal\Core\Database\Connection
-   */
-  protected $database;
-
-  /**
-   * @var \Drupal\migrate\Entity\MigrationInterface
-   */
-  protected $migration;
-
   protected $migrationConfiguration = array();
 
   protected $tableContents = array();
@@ -38,6 +26,15 @@ abstract class MigrateSqlSourceTestCase extends UnitTestCase {
   const PLUGIN_CLASS = '';
 
   const PLUGIN_ID = '';
+
+  const BASE_TABLE = '';
+
+  const BASE_ALIAS = '';
+
+  /**
+   * @var \Drupal\Core\Database\Query\Select
+   */
+  protected $query;
 
   protected function setUp() {
     $this->tableContents[] = FALSE;
@@ -48,13 +45,14 @@ abstract class MigrateSqlSourceTestCase extends UnitTestCase {
       ->method('fetchAssoc')
       ->will($this->onConsecutiveCalls($this->tableContents));
 
-    $this->database = $this->getMockBuilder('Drupal\Core\Database\Connection')
+    $database = $this->getMockBuilder('Drupal\Core\Database\Connection')
       ->disableOriginalConstructor()
       ->getMock();
-    $this->database->expects($this->once())
+    $this->query = new Select(static::BASE_TABLE, static::BASE_ALIAS, $database);
+    $database->expects($this->once())
       ->method('select')
-      ->will($this->returnValue(new Select('comment', 'c', $this->database)));
-    $this->database->expects($this->once())
+      ->will($this->returnValue($this->query));
+    $database->expects($this->once())
       ->method('query')
       ->will($this->returnValue($statement));
 
@@ -64,14 +62,13 @@ abstract class MigrateSqlSourceTestCase extends UnitTestCase {
       ->will($this->returnValue('test_map'));
 
     $migration = $this->getMock('Drupal\migrate\Entity\MigrationInterface');
-    $migration->expects($this->exactly(2))
+    $migration->expects($this->any())
       ->method('getIdMap')
       ->will($this->returnValue($idmap));
     $configuration = $this->migrationConfiguration;
     $migration->expects($this->any())
       ->method('get')
       ->will($this->returnCallback(function ($argument) use ($configuration) { return $configuration[$argument]; }));
-    $this->migration= $migration;
 
     $configuration = array();
     $plugin_definition = array();
@@ -82,7 +79,10 @@ abstract class MigrateSqlSourceTestCase extends UnitTestCase {
     $reflection = new \ReflectionClass($this->source);
     $reflection_property = $reflection->getProperty('database');
     $reflection_property->setAccessible(TRUE);
-    $reflection_property->setValue($this->source, $this->database);
+    $reflection_property->setValue($this->source, $database);
+    $migration->expects($this->any())
+      ->method('getSource')
+      ->will($this->returnValue($this->source));
   }
 
 
@@ -98,6 +98,7 @@ abstract class MigrateSqlSourceTestCase extends UnitTestCase {
       foreach ($row as $key => $value) {
         $this->assertSame((string) $data_row[$key], (string) $value);
       }
+      $this->source->next();
     }
     $this->assertFalse($this->source->valid(), 'Table size correct');
   }

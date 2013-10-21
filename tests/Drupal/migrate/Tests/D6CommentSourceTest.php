@@ -18,6 +18,10 @@ class D6CommentSourceTest extends MigrateSqlSourceTestCase {
 
   const PLUGIN_ID = 'drupal6_comment';
 
+  const BASE_TABLE = 'comment';
+
+  const BASE_ALIAS = 'c';
+
   protected $migrationConfiguration = array(
     'id' => 'test',
     'highwaterProperty' => array('field' => 'test'),
