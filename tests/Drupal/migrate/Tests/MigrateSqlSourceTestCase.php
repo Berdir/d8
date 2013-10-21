@@ -23,6 +23,8 @@ abstract class MigrateSqlSourceTestCase extends UnitTestCase {
 
   protected $tableContents = array();
 
+  protected $results = array();
+
   const PLUGIN_CLASS = '';
 
   const PLUGIN_ID = '';
@@ -37,24 +39,14 @@ abstract class MigrateSqlSourceTestCase extends UnitTestCase {
   protected $query;
 
   protected function setUp() {
-    $this->tableContents[] = FALSE;
-    // The interface can't be mocked because it extends \Traversable so use
-    // StatementEmpty instead.
-    $statement = $this->getMock('Drupal\Core\Database\StatementEmpty');
-    $statement->expects($this->exactly(count($this->tableContents) + 1))
-      ->method('fetchAssoc')
-      ->will($this->onConsecutiveCalls($this->tableContents));
+    $query = new FakeSelect(static::BASE_TABLE, static::BASE_ALIAS, $this->tableContents);
 
     $database = $this->getMockBuilder('Drupal\Core\Database\Connection')
       ->disableOriginalConstructor()
       ->getMock();
-    $this->query = new Select(static::BASE_TABLE, static::BASE_ALIAS, $database);
     $database->expects($this->once())
       ->method('select')
-      ->will($this->returnValue($this->query));
-    $database->expects($this->once())
-      ->method('query')
-      ->will($this->returnValue($statement));
+      ->will($this->returnValue($query));
 
     $idmap = $this->getMock('Drupal\migrate\Plugin\MigrateIdMapInterface');
     $idmap->expects($this->once())
@@ -93,7 +85,7 @@ abstract class MigrateSqlSourceTestCase extends UnitTestCase {
     $this->source->rewind();
     // First row.
     $this->assertTrue($this->source->valid(), 'Valid row found in source.');
-    foreach ($this->tableContents as $row) {
+    foreach ($this->results as $row) {
       $data_row = $this->source->current();
       foreach ($row as $key => $value) {
         $this->assertSame((string) $data_row[$key], (string) $value);

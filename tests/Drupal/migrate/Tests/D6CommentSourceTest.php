@@ -38,7 +38,7 @@ class D6CommentSourceTest extends MigrateSqlSourceTestCase {
     ),
   );
 
-  protected $tableContents = array(
+  protected $results = array(
     array(
       'cid' => 1,
       'pid' => 0,
@@ -54,6 +54,7 @@ class D6CommentSourceTest extends MigrateSqlSourceTestCase {
       'mail' => '',
       'homepage' => '',
       'format' => 'testformat1',
+      'type' => 'article',
     ),
     array(
       'cid' => 2,
@@ -70,6 +71,7 @@ class D6CommentSourceTest extends MigrateSqlSourceTestCase {
       'mail' => '',
       'homepage' => '',
       'format' => 'testformat2',
+      'type' => 'page',
     ),
   );
 
@@ -80,4 +82,15 @@ class D6CommentSourceTest extends MigrateSqlSourceTestCase {
       'group' => 'Migrate',
     );
   }
+
+  public function setUp() {
+    foreach ($this->results as $k => $row) {
+      $this->tableContents['node'][$k]['nid'] = $row['nid'];
+      $this->tableContents['node'][$k]['type'] = $row['type'];
+      unset($row['type']);
+      $this->tableContents['comments'][$k] = $row;
+    }
+    parent::setUp();
+  }
+
 }

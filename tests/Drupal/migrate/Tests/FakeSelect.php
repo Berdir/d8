@@ -8,6 +8,7 @@
 
 namespace Drupal\migrate\Tests;
 
+use Drupal\Component\Utility\String;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\Query\Select;
 use Drupal\Core\Database\Query\SelectInterface;
@@ -66,6 +67,9 @@ class FakeSelect extends Select {
   }
 
   public function condition($field, $value = NULL, $operator = NULL) {
+    if (!isset($operator)) {
+      $operator = is_array($value) ? 'IN' : '=';
+    }
     $this->conditions[] = array(
       'field' => $field,
       'value' => $value,
@@ -164,7 +168,6 @@ class FakeSelect extends Select {
   }
 
   public function execute() {
-    $results = array();
     $fields = array();
     $null_row = array();
     foreach ($this->fields as $field_info) {
@@ -173,6 +176,7 @@ class FakeSelect extends Select {
       $null_row[$table_alias] = array_combine($field_info['field'], array_fill(0, count($field_info['field']), NULL));
     }
 
+    $results = array();
     foreach ($this->getTables() as $table_alias => $table_info) {
       if (isset($table_info['join type'])) {
         $new_rows = array();
@@ -196,7 +200,28 @@ class FakeSelect extends Select {
       }
     }
 
-    
+    foreach ($this->conditions as $condition) {
+      foreach ($results as $k => $row) {
+        if (!$this->match($row, $condition)) {
+          unset($results[$k]);
+        }
+      }
+    }
+    return new \ArrayIterator($results);
+  }
+
+  protected function match($row, $condition) {
+    switch ($condition['operator']) {
+      case '=': return $row[$condition['field']] == $condition['value'];
+      case '<=': return $row[$condition['field']] <= $condition['value'];
+      case '>=': return $row[$condition['field']] >= $condition['value'];
+      case '!=': return $row[$condition['field']] != $condition['value'];
+      case '<>': return $row[$condition['field']] != $condition['value'];
+      case '<': return $row[$condition['field']] < $condition['value'];
+      case '>': return $row[$condition['field']] > $condition['value'];
+      case 'IN': return in_array($row[$condition['field']], $condition['value']);
+      default: throw new \Exception(sprintf('operator %s is not supported', $condition['operator']));
+    }
   }
 
 }
