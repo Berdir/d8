@@ -85,10 +85,10 @@ abstract class MigrateSqlSourceTestCase extends UnitTestCase {
     $this->source->rewind();
     // First row.
     $this->assertTrue($this->source->valid(), 'Valid row found in source.');
-    foreach ($this->results as $row) {
+    foreach ($this->results as $expected_row) {
       $data_row = $this->source->current();
-      foreach ($row as $key => $value) {
-        $this->assertSame((string) $data_row[$key], (string) $value);
+      foreach ($expected_row as $key => $expected_value) {
+        $this->assertSame((string) $expected_value, (string) $data_row->getSourceProperty($key));
       }
       $this->source->next();
     }

@@ -22,6 +22,7 @@ class FakeStatement extends \ArrayIterator implements StatementInterface {
   public function rowCount() {
     return $this->count();
   }
+
   public function fetchField($index = 0) {
     $this->next();
     $row = array_values($this->current());
