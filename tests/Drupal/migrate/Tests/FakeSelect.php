@@ -23,12 +23,16 @@ class FakeSelect extends Select {
   /**
    * @var array
    */
-  protected $conditions;
+  protected $conditions = array();
 
   public function __construct($table, $alias, array $database_contents) {
     $options['return'] = Database::RETURN_STATEMENT;
     $this->addJoin(NULL, $table, $alias);
     $this->databaseContents = $database_contents;
+  }
+
+  public function leftJoin($table, $alias = NULL, $condition = NULL, $arguments = array()) {
+    return $this->addJoin('LEFT', $table, $alias, $condition, $arguments);
   }
 
   /**
@@ -39,29 +43,31 @@ class FakeSelect extends Select {
       // @todo implement this.
       throw new \Exception('Subqueries are not supported at this moment.');
     }
-    if (isset($type) && $type != 'INNER' && $type != 'LEFT') {
-      throw new \Exception('Only INNER and LEFT joins are supported.');
-    }
     $alias = parent::addJoin($type, $table, $alias, $condition, $arguments);
-    if (!preg_match('/(\w+)\.(\w+)\s*=\s*(\w+)\.(\w+)/', $condition, $matches)) {
-      throw new \Exception('Only x.field1 = y.field2 conditions are supported.');
-    }
-    if ($matches[1] == $alias) {
-      $this->tables[$alias] = array(
-        'added_field' => $matches[2],
-        'original_table_alias' => $matches[3],
-        'original_field' => $matches[4],
-      );
-    }
-    elseif ($matches[3] == $alias) {
-      $this->tables[$alias] = array(
-        'added_field' => $matches[4],
-        'original_table_alias' => $matches[1],
-        'original_field' => $matches[2],
-      );
-    }
-    else {
-      throw new \Exception('The added table is not joined.');
+    if (isset($type)) {
+      if ($type != 'INNER' && $type != 'LEFT') {
+        throw new \Exception(sprintf('%s type not supported, only INNER and LEFT.',$type));
+      }
+      if (!preg_match('/(\w+)\.(\w+)\s*=\s*(\w+)\.(\w+)/', $condition, $matches)) {
+        throw new \Exception('Only x.field1 = y.field2 conditions are supported.'. $condition);
+      }
+      if ($matches[1] == $alias) {
+        $this->tables[$alias] += array(
+          'added_field' => $matches[2],
+          'original_table_alias' => $matches[3],
+          'original_field' => $matches[4],
+        );
+      }
+      elseif ($matches[3] == $alias) {
+        $this->tables[$alias] += array(
+          'added_field' => $matches[4],
+          'original_table_alias' => $matches[1],
+          'original_field' => $matches[2],
+        );
+      }
+      else {
+        throw new \Exception('The added table is not joined.');
+      }
     }
     return $alias;
   }
@@ -169,11 +175,9 @@ class FakeSelect extends Select {
 
   public function execute() {
     $fields = array();
-    $null_row = array();
     foreach ($this->fields as $field_info) {
       $table_alias = $field_info['table'];
-      $fields[$table_alias][$field_info['field']] = TRUE;
-      $null_row[$table_alias] = array_combine($field_info['field'], array_fill(0, count($field_info['field']), NULL));
+      $fields[$table_alias][$field_info['field']] = NULL;
     }
 
     $results = array();
@@ -181,12 +185,12 @@ class FakeSelect extends Select {
       if (isset($table_info['join type'])) {
         $new_rows = array();
         foreach ($results as $row) {
-          foreach ($this->databaseContents[$table_alias] as $candidate_row) {
+          foreach ($this->databaseContents[$table_info['table']] as $candidate_row) {
             if ($row[$table_info['original_field']] == $candidate_row[$table_info['added_field']]) {
               $new_rows[] = array_intersect_key($fields[$table_alias], $candidate_row);
             }
             elseif ($table_info['join type'] == 'LEFT') {
-              $new_rows[] = $null_row[$table_alias];
+              $new_rows[] = $fields[$table_alias];
             }
           }
         }
@@ -194,7 +198,7 @@ class FakeSelect extends Select {
       }
       else {
         // @TODO add support for all_fields.
-        foreach ($this->databaseContents[$table_alias] as $candidate_row) {
+        foreach ($this->databaseContents[$table_info['table']] as $candidate_row) {
           $results[] = array_intersect_key($fields[$table_alias], $candidate_row);
         }
       }
@@ -207,7 +211,11 @@ class FakeSelect extends Select {
         }
       }
     }
-    return new \ArrayIterator($results);
+    return new FakeStatement($results);
+  }
+
+  public function __clone() {
+    // Nothing to do here.
   }
 
   protected function match($row, $condition) {

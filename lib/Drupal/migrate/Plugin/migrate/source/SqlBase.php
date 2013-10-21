@@ -29,7 +29,7 @@ abstract class SqlBase extends SourceBase implements ContainerFactoryPluginInter
 
   function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration, CacheBackendInterface $cache, KeyValueStoreInterface $highwater_storage) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration, $cache, $highwater_storage);
-    $this->mapJoinable = TRUE;
+    $this->mapJoinable = FALSE;
   }
 
   protected function getDatabase() {

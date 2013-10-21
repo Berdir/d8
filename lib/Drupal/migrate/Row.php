@@ -8,6 +8,7 @@
 namespace Drupal\migrate;
 
 use Drupal\Component\Utility\NestedArray;
+use Drupal\migrate\Plugin\MigrateIdMapInterface;
 
 /**
  * This just stores a row.
@@ -26,6 +27,7 @@ class Row {
   protected $idMap = array(
     'original_hash' => '',
     'hash' => '',
+    'needs_update' => MigrateIdMapInterface::STATUS_NEEDS_UPDATE,
   );
 
   /**
@@ -112,7 +114,7 @@ class Row {
    *   TRUE if the row needs updating.
    */
   public function needsUpdate() {
-    return $this->idMap['needs_update'] == \MigrateMap::STATUS_NEEDS_UPDATE;
+    return $this->idMap['needs_update'] == MigrateIdMapInterface::STATUS_NEEDS_UPDATE;
   }
 
 }

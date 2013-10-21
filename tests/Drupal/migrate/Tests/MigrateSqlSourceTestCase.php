@@ -21,7 +21,7 @@ abstract class MigrateSqlSourceTestCase extends UnitTestCase {
 
   protected $migrationConfiguration = array();
 
-  protected $tableContents = array();
+  protected $databaseContents = array();
 
   protected $results = array();
 
@@ -39,7 +39,7 @@ abstract class MigrateSqlSourceTestCase extends UnitTestCase {
   protected $query;
 
   protected function setUp() {
-    $query = new FakeSelect(static::BASE_TABLE, static::BASE_ALIAS, $this->tableContents);
+    $query = new FakeSelect(static::BASE_TABLE, static::BASE_ALIAS, $this->databaseContents);
 
     $database = $this->getMockBuilder('Drupal\Core\Database\Connection')
       ->disableOriginalConstructor()

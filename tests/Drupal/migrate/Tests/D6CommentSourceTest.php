@@ -85,10 +85,10 @@ class D6CommentSourceTest extends MigrateSqlSourceTestCase {
 
   public function setUp() {
     foreach ($this->results as $k => $row) {
-      $this->tableContents['node'][$k]['nid'] = $row['nid'];
-      $this->tableContents['node'][$k]['type'] = $row['type'];
+      $this->databaseContents['node'][$k]['nid'] = $row['nid'];
+      $this->databaseContents['node'][$k]['type'] = $row['type'];
       unset($row['type']);
-      $this->tableContents['comments'][$k] = $row;
+      $this->databaseContents['comment'][$k] = $row;
     }
     parent::setUp();
   }
