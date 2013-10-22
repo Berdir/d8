@@ -64,7 +64,7 @@ class FakeCondition extends Condition {
     $and = $condition_group->conjuction == 'AND';
     $match = TRUE;
     foreach ($condition_group->conditions as $condition) {
-      $match = $condition instanceof FakeCondition ? $this->matchGroup($row, $condition) : $this->matchSingle($row, $condition);
+      $match = $condition['field'] instanceof FakeCondition ? $this->matchGroup($row, $condition['field']) : $this->matchSingle($row, $condition);
       // For AND, finish matching on the first fail. For OR, finish on first
       // success.
       if ($and != $match) {
