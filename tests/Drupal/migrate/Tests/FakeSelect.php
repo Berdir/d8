@@ -85,10 +85,24 @@ class FakeSelect extends Select {
    * {@inheritdoc}
    */
   public function execute() {
-    // @TODO add support for all_fields.
-    // @TODO: Implement range() processing.
     // @todo: Implement distinct() handling.
 
+    $results = $this->executeJoins();
+    $this->where->resolve($results);
+    usort($results, array($this, 'sort'));
+    if (!empty($this->range)) {
+      $results = array_slice($results, $this->range['start'], $this->range['length']);
+    }
+    return new FakeStatement($results);
+  }
+
+  /**
+   * Create an initial result set by executing the joins.
+   *
+   * @return array
+   */
+  protected function executeJoins() {
+    // @TODO add support for all_fields.
     $fields = array();
     foreach ($this->fields as $field_info) {
       $table_alias = $field_info['table'];
@@ -117,10 +131,7 @@ class FakeSelect extends Select {
         }
       }
     }
-
-    $this->where->resolve($results);
-    usort($results, array($this, 'sort'));
-    return new FakeStatement($results);
+    return $results;
   }
 
   protected function sort($a, $b) {
