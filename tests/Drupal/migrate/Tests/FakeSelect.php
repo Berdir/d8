@@ -11,9 +11,10 @@ namespace Drupal\migrate\Tests;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\Query\PlaceholderInterface;
+use Drupal\Core\Database\Query\Select;
 use Drupal\Core\Database\Query\SelectInterface;
 
-class FakeSelect implements SelectInterface {
+class FakeSelect extends Select {
 
   /**
    * @var array
@@ -34,15 +35,9 @@ class FakeSelect implements SelectInterface {
   public function __construct($table, $alias, array $database_contents) {
     $options['return'] = Database::RETURN_STATEMENT;
     $this->addJoin(NULL, $table, $alias);
+    $this->where = new FakeCondition;
+    $this->having = new FakeCondition;
     $this->databaseContents = $database_contents;
-  }
-
-  public function join($table, $alias = NULL, $condition = NULL, $arguments = array()) {
-    return $this->addJoin('INNER', $table, $alias, $condition, $arguments);
-  }
-
-  public function innerJoin($table, $alias = NULL, $condition = NULL, $arguments = array()) {
-    return $this->addJoin('INNER', $table, $alias, $condition, $arguments);
   }
 
   public function leftJoin($table, $alias = NULL, $condition = NULL, $arguments = array()) {
@@ -57,19 +52,7 @@ class FakeSelect implements SelectInterface {
       // @todo implement this.
       throw new \Exception('Subqueries are not supported at this moment.');
     }
-    if (empty($alias)) {
-      $alias = $table;
-    }
-    $alias_candidate = $alias;
-    $count = 2;
-    while (!empty($this->tables[$alias_candidate])) {
-      $alias_candidate = $alias . '_' . $count++;
-    }
-    $alias = $alias_candidate;
-
-    if (is_string($condition)) {
-      $condition = str_replace('%alias', $alias, $condition);
-    }
+    $alias = parent::addJoin($type, $table, $alias, $condition, $arguments);
 
     $this->tables[$alias] = array(
       'join type' => $type,
@@ -106,19 +89,15 @@ class FakeSelect implements SelectInterface {
     return $alias;
   }
 
-  public function condition($field, $value = NULL, $operator = NULL) {
-    if (!isset($operator)) {
-      $operator = is_array($value) ? 'IN' : '=';
-    }
-    $this->conditions[] = array(
-      'field' => $field,
-      'value' => $value,
-      'operator' => $operator,
-    );
-    return $this;
-  }
-
+  /**
+   * {@inheritdoc}
+   */
   public function execute() {
+    // @TODO add support for all_fields.
+    // @TODO: Implement orderBy() processing.
+    // @TODO: Implement range() processing.
+    // @todo: Implement distinct() handling.
+
     $fields = array();
     foreach ($this->fields as $field_info) {
       $table_alias = $field_info['table'];
@@ -158,10 +137,6 @@ class FakeSelect implements SelectInterface {
     return new FakeStatement($results);
   }
 
-  public function __clone() {
-    // Nothing to do here.
-  }
-
   protected function match($row, $condition) {
     switch ($condition['operator']) {
       case '=': return $row[$condition['field']] == $condition['value'];
@@ -176,104 +151,8 @@ class FakeSelect implements SelectInterface {
     }
   }
 
-
-  public function addTag($tag) {
-    $this->alterTags[$tag] = 1;
-    return $this;
-  }
-
-  public function hasTag($tag) {
-    return isset($this->alterTags[$tag]);
-  }
-
-  public function hasAllTags() {
-    return !(boolean)array_diff(func_get_args(), array_keys($this->alterTags));
-  }
-
-  public function hasAnyTag() {
-    return (boolean)array_intersect(func_get_args(), array_keys($this->alterTags));
-  }
-
-  public function addMetaData($key, $object) {
-    $this->alterMetaData[$key] = $object;
-    return $this;
-  }
-
-  public function getMetaData($key) {
-    return isset($this->alterMetaData[$key]) ? $this->alterMetaData[$key] : NULL;
-  }
-
-  public function addField($table_alias, $field, $alias = NULL) {
-    if (empty($alias)) {
-      $alias = $field;
-    }
-
-    // If that's already in use, try the table name and field name.
-    if (!empty($this->fields[$alias])) {
-      $alias = $table_alias . '_' . $field;
-    }
-
-    // If that is already used, just add a counter until we find an unused alias.
-    $alias_candidate = $alias;
-    $count = 2;
-    while (!empty($this->fields[$alias_candidate])) {
-      $alias_candidate = $alias . '_' . $count++;
-    }
-    $alias = $alias_candidate;
-
-    $this->fields[$alias] = array(
-      'field' => $field,
-      'table' => $table_alias,
-      'alias' => $alias,
-    );
-
-    return $alias;
-  }
-
-  public function fields($table_alias, array $fields = array()) {
-    if ($fields) {
-      foreach ($fields as $field) {
-        $this->addField($table_alias, $field);
-      }
-    }
-    else {
-      // @TODO add support for all_fields.
-      throw new \Exception('All fields are not supported');
-      $this->tables[$table_alias]['all_fields'] = TRUE;
-    }
-
-    return $this;
-  }
-
-  // ================== we should support these.
-
-  public function orderBy($field, $direction = 'ASC') {
-    // TODO: Implement orderBy() processing.
-    throw new \Exception('This method is not supported');
-    $this->order[$field] = $direction;
-    return $this;
-  }
-
-  public function range($start = NULL, $length = NULL) {
-    // TODO: Implement range() method.
-    throw new \Exception('This method is not supported');
-  }
-
-  public function isNull($field) {
-    // TODO: Implement isNull() method.
-  }
-
-  public function isNotNull($field) {
-    // TODO: Implement isNotNull() method.
-  }
-
-  public function notExists(SelectInterface $select) {
-    // TODO: Implement notExists() method.
-  }
-
-  public function distinct($distinct = TRUE) {
-    // @todo: Implement distinct() method.
-    throw new \Exception('This method is not supported');
+  public function conditionGroupFactory($conjunction = 'AND') {
+    return new FakeCondition($conjunction);
   }
 
   // ================== we could support these.
@@ -300,21 +179,6 @@ class FakeSelect implements SelectInterface {
 
   public function uniqueIdentifier() {
     // TODO: Implement uniqueIdentifier() method.
-    throw new \Exception('This method is not supported');
-  }
-
-  public function conditionGroupFactory($conjunction = 'AND') {
-    // TODO: Implement conditionGroupFactory() method.
-    throw new \Exception('This method is not supported');
-  }
-
-  public function andConditionGroup() {
-    // TODO: Implement andConditionGroup() method.
-    throw new \Exception('This method is not supported');
-  }
-
-  public function orConditionGroup() {
-    // TODO: Implement orConditionGroup() method.
     throw new \Exception('This method is not supported');
   }
 
@@ -390,6 +254,10 @@ class FakeSelect implements SelectInterface {
   }
 
   public function exists(SelectInterface $select) {
+    throw new \Exception('This method is not supported');
+  }
+
+  public function notExists(SelectInterface $select) {
     throw new \Exception('This method is not supported');
   }
 
