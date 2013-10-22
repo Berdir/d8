@@ -47,7 +47,7 @@ class FakeCondition extends Condition {
    */
   public function resolve(array &$rows) {
     foreach ($rows as $k => $row) {
-      if (!$this->matchRow($row, $this)) {
+      if (!$this->matchGroup($row, $this)) {
         unset($rows[$k]);
       }
     }
@@ -60,11 +60,11 @@ class FakeCondition extends Condition {
    * @param FakeCondition $condition_group
    * @return bool
    */
-  protected function matchRow(array $row, FakeCondition $condition_group) {
+  protected function matchGroup(array $row, FakeCondition $condition_group) {
     $and = $condition_group->conjuction == 'AND';
     $match = TRUE;
     foreach ($condition_group->conditions as $condition) {
-      $match = $this->match($row, $condition);
+      $match = $condition instanceof FakeCondition ? $this->matchGroup($row, $condition) : $this->matchSingle($row, $condition);
       // For AND, finish matching on the first fail. For OR, finish on first
       // success.
       if ($and != $match) {
@@ -77,15 +77,12 @@ class FakeCondition extends Condition {
   /**
    * @param array $row
    *   The row to match.
-   * @param array|FakeCondition $condition
-   *   Either a condition group or an array representing a condition.
+   * @param array $condition
+   *   An array representing a single condition.
    * @return bool
    *   TRUE if the condition matches.
    */
-  protected function match(array $row, $condition) {
-    if ($condition instanceof FakeCondition) {
-      return $this->matchRow($row, $condition);
-    }
+  protected function matchSingle(array $row, array $condition) {
     switch ($condition['operator']) {
       case '=': return $row[$condition['field']] == $condition['value'];
       case '<=': return $row[$condition['field']] <= $condition['value'];
