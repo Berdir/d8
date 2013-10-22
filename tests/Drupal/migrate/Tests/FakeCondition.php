@@ -13,10 +13,10 @@ use Drupal\Core\Database\Query\PlaceholderInterface;
 
 class FakeCondition extends Condition {
 
-  protected $conjuction;
+  protected $conjunction;
 
-  public function __construct($conjuction = 'AND') {
-    $this->conjuction = $conjuction;
+  public function __construct($conjunction = 'AND') {
+    $this->conjuction = $conjunction;
   }
 
   /**
