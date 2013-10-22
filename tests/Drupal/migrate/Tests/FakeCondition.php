@@ -58,7 +58,7 @@ class FakeCondition extends Condition {
     $match = TRUE;
     foreach ($condition->conditions as $condition) {
       $match = $this->match($row, $condition);
-      // For AND, finish matching on the first fail. For OR, finish or first
+      // For AND, finish matching on the first fail. For OR, finish on first
       // success.
       if ($and != $match) {
         break;
