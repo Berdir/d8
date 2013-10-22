@@ -137,7 +137,7 @@ class FakeSelect extends Select {
   protected function sort($a, $b) {
     foreach ($this->order as $field => $direction) {
       if ($a[$field] != $b[$field]) {
-        return (($a[$field] < $b[$field]) == ($direction == 'ASC')) ? 1 : -1;
+        return (($a[$field] < $b[$field]) == ($direction == 'ASC')) ? -1 : 1;
       }
     }
     return 0;

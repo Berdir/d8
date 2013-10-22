@@ -25,6 +25,7 @@ class Comment extends SqlBase {
         'mail', 'homepage', 'format'));
     $query->join('node', 'n', 'c.nid = n.nid');
     $query->fields('n', array('type'));
+    $query->orderBy('timestamp');
     return $query;
   }
 

@@ -84,25 +84,15 @@ abstract class MigrateSqlSourceTestCase extends UnitTestCase {
    * Tests retrieval.
    */
   public function testRetrieval() {
-    // As there is no ordering yet, we need to figure out which row is
-    // in the results.
-    $result_keys = array_keys($this->results[0]);
-    $match_field = reset($result_keys);
+    // TODO: make count() work in SOurceBase.
+    // $this->assertSame(count($this->results), count($this->source));
     $count = 0;
-    for ($this->source->rewind(); $this->source->valid(); $this->source->next()) {
-      $data_row = $this->source->current();
-      $match = FALSE;
-      foreach ($this->results as $expected_row) {
-        if ((string) $expected_row[$match_field] === (string) $data_row->getSourceProperty($match_field)) {
-          $match = TRUE;
-          $count++;
-          foreach ($expected_row as $key => $expected_value) {
-            $this->assertSame((string) $expected_value, (string) $data_row->getSourceProperty($key));
-          }
-          break;
-        }
+    foreach ($this->source as $data_row) {
+      $expected_row = $this->results[$count];
+      $count++;
+      foreach ($expected_row as $key => $expected_value) {
+        $this->assertSame((string) $expected_value, (string) $data_row->getSourceProperty($key), $key);
       }
-      $this->assertTrue($match);
     }
     $this->assertSame(count($this->results), $count);
   }

@@ -151,7 +151,7 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
     }
 
     if (!isset($this->cacheKey)) {
-      $this->cacheKey = md5((string)$this);
+      $this->cacheKey = md5((string) $this);
     }
 
     // If a refresh is requested, or we're not caching counts, ask the derived
