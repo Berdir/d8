@@ -9,7 +9,6 @@
 namespace Drupal\migrate\Tests;
 
 use Drupal\Core\Database\Connection;
-use Drupal\Core\Database\Database;
 use Drupal\Core\Database\Query\PlaceholderInterface;
 use Drupal\Core\Database\Query\Select;
 use Drupal\Core\Database\Query\SelectInterface;
@@ -33,7 +32,6 @@ class FakeSelect extends Select {
   protected $alterTags;
 
   public function __construct($table, $alias, array $database_contents) {
-    $options['return'] = Database::RETURN_STATEMENT;
     $this->addJoin(NULL, $table, $alias);
     $this->where = new FakeCondition;
     $this->having = new FakeCondition;
