@@ -127,28 +127,8 @@ class FakeSelect extends Select {
       }
     }
 
-    foreach ($this->conditions as $condition) {
-      foreach ($results as $k => $row) {
-        if (!$this->match($row, $condition)) {
-          unset($results[$k]);
-        }
-      }
-    }
+    $this->where->resolve($results);
     return new FakeStatement($results);
-  }
-
-  protected function match($row, $condition) {
-    switch ($condition['operator']) {
-      case '=': return $row[$condition['field']] == $condition['value'];
-      case '<=': return $row[$condition['field']] <= $condition['value'];
-      case '>=': return $row[$condition['field']] >= $condition['value'];
-      case '!=': return $row[$condition['field']] != $condition['value'];
-      case '<>': return $row[$condition['field']] != $condition['value'];
-      case '<': return $row[$condition['field']] < $condition['value'];
-      case '>': return $row[$condition['field']] > $condition['value'];
-      case 'IN': return in_array($row[$condition['field']], $condition['value']);
-      default: throw new \Exception(sprintf('operator %s is not supported', $condition['operator']));
-    }
   }
 
   public function conditionGroupFactory($conjunction = 'AND') {
