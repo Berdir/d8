@@ -26,7 +26,6 @@ class FakeCondition extends Condition {
     return '';
   }
 
-
   /**
    * {@inheritdoc}
    */
@@ -41,6 +40,11 @@ class FakeCondition extends Condition {
     return new FakeCondition($conjunction);
   }
 
+  /**
+   * Resolves conditions by removing non-matching rows.
+   *
+   * @param array $rows
+   */
   public function resolve(array &$rows) {
     foreach ($rows as $k => $row) {
       if (!$this->matchRow($row, $this)) {

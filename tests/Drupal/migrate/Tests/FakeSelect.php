@@ -53,14 +53,6 @@ class FakeSelect extends Select {
       throw new \Exception('Subqueries are not supported at this moment.');
     }
     $alias = parent::addJoin($type, $table, $alias, $condition, $arguments);
-
-    $this->tables[$alias] = array(
-      'join type' => $type,
-      'table' => $table,
-      'alias' => $alias,
-      'condition' => $condition,
-      'arguments' => $arguments,
-    );
     if (isset($type)) {
       if ($type != 'INNER' && $type != 'LEFT') {
         throw new \Exception(sprintf('%s type not supported, only INNER and LEFT.',$type));
@@ -94,7 +86,6 @@ class FakeSelect extends Select {
    */
   public function execute() {
     // @TODO add support for all_fields.
-    // @TODO: Implement orderBy() processing.
     // @TODO: Implement range() processing.
     // @todo: Implement distinct() handling.
 
@@ -128,19 +119,29 @@ class FakeSelect extends Select {
     }
 
     $this->where->resolve($results);
+    usort($results, array($this, 'sort'));
     return new FakeStatement($results);
+  }
+
+  protected function sort($a, $b) {
+    foreach ($this->order as $field => $direction) {
+      if ($a[$field] != $b[$field]) {
+        return (($a[$field] < $b[$field]) == ($direction == 'ASC')) ? 1 : -1;
+      }
+    }
+    return 0;
   }
 
   public function conditionGroupFactory($conjunction = 'AND') {
     return new FakeCondition($conjunction);
   }
 
-  // ================== we could support these.
-
-  public function nextPlaceholder() {
-    // TODO: Implement nextPlaceholder() method.
-    throw new \Exception('This method is not supported');
+  public function orderBy($field, $direction = 'ASC') {
+    $this->order[$field] = strtoupper($direction);
+    return $this;
   }
+
+  // ================== we could support these.
 
   public function groupBy($field) {
     // @todo: Implement groupBy() method.
@@ -163,6 +164,11 @@ class FakeSelect extends Select {
   }
 
   // ================== the rest won't be supported, ever.
+
+  public function nextPlaceholder() {
+    // TODO: Implement nextPlaceholder() method.
+    throw new \Exception('This method is not supported');
+  }
 
   public function isPrepared() {
     throw new \Exception('This method is not supported');
