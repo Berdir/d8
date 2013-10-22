@@ -53,10 +53,17 @@ class FakeCondition extends Condition {
     }
   }
 
-  protected function matchRow($row, FakeCondition $condition) {
-    $and = $condition->conjuction == 'AND';
+  /**
+   * Match a row against a group of conditions.
+   *
+   * @param array $row
+   * @param FakeCondition $condition_group
+   * @return bool
+   */
+  protected function matchRow(array $row, FakeCondition $condition_group) {
+    $and = $condition_group->conjuction == 'AND';
     $match = TRUE;
-    foreach ($condition->conditions as $condition) {
+    foreach ($condition_group->conditions as $condition) {
       $match = $this->match($row, $condition);
       // For AND, finish matching on the first fail. For OR, finish on first
       // success.
@@ -67,7 +74,15 @@ class FakeCondition extends Condition {
     return $match;
   }
 
-  protected function match($row, $condition) {
+  /**
+   * @param array $row
+   *   The row to match.
+   * @param array|FakeCondition $condition
+   *   Either a condition group or an array representing a condition.
+   * @return bool
+   *   TRUE if the condition matches.
+   */
+  protected function match(array $row, $condition) {
     if ($condition instanceof FakeCondition) {
       return $this->matchRow($row, $condition);
     }
