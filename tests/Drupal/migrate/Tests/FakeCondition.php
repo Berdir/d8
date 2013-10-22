@@ -7,7 +7,9 @@
 
 namespace Drupal\migrate\Tests;
 
+use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Query\Condition;
+use Drupal\Core\Database\Query\PlaceholderInterface;
 
 class FakeCondition extends Condition {
 
@@ -24,6 +26,14 @@ class FakeCondition extends Condition {
     return '';
   }
 
+
+  /**
+   * {@inheritdoc}
+   */
+  public function compile(Connection $connection, PlaceholderInterface $queryPlaceholder) {
+    throw new \Exception('Fake conditions can not be compiled.');
+  }
+
   /**
    * {@inheritdoc}
    */
@@ -31,17 +41,34 @@ class FakeCondition extends Condition {
     return new FakeCondition($conjunction);
   }
 
-  public function resolve(array &$all_rows) {
-    foreach ($this->conditions as $condition) {
-      foreach ($all_rows as $k => $row) {
-        if (!$this->match($row, $condition)) {
-          unset($all_rows[$k]);
-        }
+  public function resolve(array &$rows) {
+    foreach ($rows as $k => $row) {
+      if (!$this->matchRow($row, $this)) {
+        unset($rows[$k]);
       }
     }
   }
 
+  protected function matchRow($row, FakeCondition $condition) {
+    $and = $condition->conjuction == 'AND';
+    $match = TRUE;
+    foreach ($condition->conditions as $condition) {
+      $match = $this->match($row, $condition);
+      if ($and != $match) {
+        break;
+      }
+    }
+    // 1. AND, MATCH: the loop finished.
+    // 2. AND, !MATCH: the loop terminates at first such, there is no match.
+    // 3. OR, MATCH: the loop terminated, we have a match.
+    // 4. OR, !$MATCH, the loop finished, there is no match.
+    return $match;
+  }
+
   protected function match($row, $condition) {
+    if ($condition instanceof FakeCondition) {
+      return $this->matchRow($row, $condition);
+    }
     switch ($condition['operator']) {
       case '=': return $row[$condition['field']] == $condition['value'];
       case '<=': return $row[$condition['field']] <= $condition['value'];
