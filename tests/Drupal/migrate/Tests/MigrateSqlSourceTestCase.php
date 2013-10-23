@@ -7,7 +7,6 @@
 
 namespace Drupal\migrate\Tests;
 
-use Drupal\Core\Database\Query\Select;
 use Drupal\Tests\UnitTestCase;
 
 abstract class MigrateSqlSourceTestCase extends UnitTestCase {

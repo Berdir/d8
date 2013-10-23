@@ -92,6 +92,8 @@ class FakeCondition extends Condition {
       case '<': return $row[$condition['field']] < $condition['value'];
       case '>': return $row[$condition['field']] > $condition['value'];
       case 'IN': return in_array($row[$condition['field']], $condition['value']);
+      case 'IS NULL': return !isset($row[$condition['field']]);
+      case 'IS NOT NULL': return isset($row[$condition['field']]);
       default: throw new \Exception(sprintf('operator %s is not supported', $condition['operator']));
     }
   }
