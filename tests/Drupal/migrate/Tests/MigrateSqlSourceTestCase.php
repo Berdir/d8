@@ -63,11 +63,19 @@ abstract class MigrateSqlSourceTestCase extends UnitTestCase {
     $migration->expects($this->any())
       ->method('get')
       ->will($this->returnCallback(function ($argument) use ($configuration) { return $configuration[$argument]; }));
+    $migration->expects($this->any())
+      ->method('id')
+      ->will($this->returnValue($this->migrationConfiguration['id']));
+
+    $key_value = $this->getMock('Drupal\Core\KeyValueStore\KeyValueStoreInterface');
+    $key_value->expects($this->once())
+      ->method('get')
+      ->with($this->equalTo($this->migrationConfiguration['id']))
+      ->will($this->returnValue(1));
 
     $configuration = array();
     $plugin_definition = array();
     $cache = $this->getMock('Drupal\Core\Cache\CacheBackendInterface');
-    $key_value = $this->getMock('Drupal\Core\KeyValueStore\KeyValueStoreInterface');
     $plugin_class = static::PLUGIN_CLASS;
     $this->source = new $plugin_class($configuration, static::PLUGIN_ID, $plugin_definition, $migration, $cache, $key_value);
     $reflection = new \ReflectionClass($this->source);

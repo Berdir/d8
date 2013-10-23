@@ -24,7 +24,7 @@ class D6CommentSourceTest extends MigrateSqlSourceTestCase {
 
   protected $migrationConfiguration = array(
     'id' => 'test',
-    'highwaterProperty' => array('field' => 'test'),
+    'highwaterProperty' => array('field' => 'timestamp'),
     'idlist' => array(),
     'sourceKeys' => array(
       'cid' => array(

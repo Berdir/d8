@@ -82,19 +82,14 @@ abstract class SqlBase extends SourceBase implements ContainerFactoryPluginInter
         // Build the join to the map table. Because the source key could have
         // multiple fields, we need to build things up.
         $count = 1;
-
+        $map_join = '';
+        $delimiter = '';
         foreach ($this->migration->get('sourceKeys') as $field_name => $field_schema) {
           if (isset($field_schema['alias'])) {
             $field_name = $field_schema['alias'] . '.' . $field_name;
           }
-          $map_key = 'sourceid' . $count++;
-          if (!isset($map_join)) {
-            $map_join = '';
-          }
-          else {
-            $map_join .= ' AND ';
-          }
-          $map_join .= "$field_name = map.$map_key";
+          $map_join .= "$delimiter$field_name = map.sourceid" . $count++;
+          $delimiter = ' AND ';
         }
 
         $alias = $this->query->leftJoin($this->idMap->getQualifiedMapTable(),
