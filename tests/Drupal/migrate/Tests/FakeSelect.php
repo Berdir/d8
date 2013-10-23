@@ -9,6 +9,7 @@
 namespace Drupal\migrate\Tests;
 
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\Query\Condition;
 use Drupal\Core\Database\Query\PlaceholderInterface;
 use Drupal\Core\Database\Query\Select;
 use Drupal\Core\Database\Query\SelectInterface;
@@ -33,8 +34,8 @@ class FakeSelect extends Select {
 
   public function __construct($table, $alias, array $database_contents) {
     $this->addJoin(NULL, $table, $alias);
-    $this->where = new FakeCondition;
-    $this->having = new FakeCondition;
+    $this->where = new Condition('AND');
+    $this->having = new Condition('AND');
     $this->databaseContents = $database_contents;
   }
 
@@ -86,7 +87,7 @@ class FakeSelect extends Select {
     // @todo: Implement distinct() handling.
 
     $results = $this->executeJoins();
-    $this->where->resolve($results);
+    $this->resolveConditions($this->where, $results);
     usort($results, array($this, 'sort'));
     if (!empty($this->range)) {
       $results = array_slice($results, $this->range['start'], $this->range['length']);
@@ -143,8 +144,64 @@ class FakeSelect extends Select {
     return 0;
   }
 
-  public function conditionGroupFactory($conjunction = 'AND') {
-    return new FakeCondition($conjunction);
+  /**
+   * Resolves conditions by removing non-matching rows.
+   *
+   * @param array $rows
+   */
+  public function resolveConditions(Condition $condition_group, array &$rows) {
+    foreach ($rows as $k => $row) {
+      if (!$this->matchGroup($row, $condition_group)) {
+        unset($rows[$k]);
+      }
+    }
+  }
+
+  /**
+   * Match a row against a group of conditions.
+   *
+   * @param array $row
+   * @param \Drupal\Core\Database\Query\Condition $condition_group
+   * @return bool
+   */
+  protected function matchGroup(array $row, Condition $condition_group) {
+    $conditions = $condition_group->conditions();
+    $and = $conditions['#conjunction'] == 'AND';
+    unset($conditions['#conjunction']);
+    $match = TRUE;
+    foreach ($conditions as $condition) {
+      $match = $condition['field'] instanceof Condition ? $this->matchGroup($row, $condition['field']) : $this->matchSingle($row, $condition);
+      // For AND, finish matching on the first fail. For OR, finish on first
+      // success.
+      if ($and != $match) {
+        break;
+      }
+    }
+    return $match;
+  }
+
+  /**
+   * @param array $row
+   *   The row to match.
+   * @param array $condition
+   *   An array representing a single condition.
+   * @return bool
+   *   TRUE if the condition matches.
+   */
+  protected function matchSingle(array $row, array $condition) {
+    switch ($condition['operator']) {
+      case '=': return $row[$condition['field']] == $condition['value'];
+      case '<=': return $row[$condition['field']] <= $condition['value'];
+      case '>=': return $row[$condition['field']] >= $condition['value'];
+      case '!=': return $row[$condition['field']] != $condition['value'];
+      case '<>': return $row[$condition['field']] != $condition['value'];
+      case '<': return $row[$condition['field']] < $condition['value'];
+      case '>': return $row[$condition['field']] > $condition['value'];
+      case 'IN': return in_array($row[$condition['field']], $condition['value']);
+      case 'IS NULL': return !isset($row[$condition['field']]);
+      case 'IS NOT NULL': return isset($row[$condition['field']]);
+      default: throw new \Exception(sprintf('operator %s is not supported', $condition['operator']));
+    }
   }
 
   public function orderBy($field, $direction = 'ASC') {
