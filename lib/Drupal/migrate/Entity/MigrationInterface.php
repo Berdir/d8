@@ -1,13 +1,17 @@
 <?php
+
 /**
  * @file
- * Contains
+ * Contains \Drupal\migrate\Entity\MigrationInterface.
  */
 
 namespace Drupal\migrate\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 
+/**
+ * Interface for migrations.
+ */
 interface MigrationInterface extends ConfigEntityInterface {
   const SOURCE = 'source';
   const DESTINATION = 'destination';

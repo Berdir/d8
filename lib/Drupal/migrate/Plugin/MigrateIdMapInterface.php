@@ -10,6 +10,12 @@ namespace Drupal\migrate\Plugin;
 use Drupal\migrate\Entity\Migration;
 use Drupal\migrate\Entity\MigrationInterface;
 
+/**
+ * An interface for migrate id mappings.
+ *
+ * Migrate id mappings maintains relations between migrate sources and
+ * destinations, so its ids are tracked.
+ */
 interface MigrateIdMapInterface {
 
   /**
