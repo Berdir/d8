@@ -33,6 +33,8 @@ abstract class MigrateSqlSourceTestCase extends UnitTestCase {
 
   const BASE_ALIAS = '';
 
+  const ORIGINAL_HIGHWATER = '';
+
   /**
    * @var \Drupal\Core\Database\Query\Select
    */
@@ -62,7 +64,7 @@ abstract class MigrateSqlSourceTestCase extends UnitTestCase {
     $configuration = $this->migrationConfiguration;
     $migration->expects($this->any())
       ->method('get')
-      ->will($this->returnCallback(function ($argument) use ($configuration) { return $configuration[$argument]; }));
+      ->will($this->returnCallback(function ($argument) use ($configuration) { return isset($configuration[$argument]) ? $configuration[$argument] : ''; }));
     $migration->expects($this->any())
       ->method('id')
       ->will($this->returnValue($this->migrationConfiguration['id']));
@@ -71,7 +73,7 @@ abstract class MigrateSqlSourceTestCase extends UnitTestCase {
     $key_value->expects($this->once())
       ->method('get')
       ->with($this->equalTo($this->migrationConfiguration['id']))
-      ->will($this->returnValue(1));
+      ->will($this->returnValue(static::ORIGINAL_HIGHWATER));
 
     $configuration = array();
     $plugin_definition = array();
