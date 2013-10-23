@@ -32,10 +32,10 @@ class FakeSelect extends Select {
   protected $alterMetaData;
   protected $alterTags;
 
-  public function __construct($table, $alias, array $database_contents) {
+  public function __construct($table, $alias, array $database_contents, $conjunction = 'AND') {
     $this->addJoin(NULL, $table, $alias);
-    $this->where = new Condition('AND');
-    $this->having = new Condition('AND');
+    $this->where = new Condition($conjunction);
+    $this->having = new Condition($conjunction);
     $this->databaseContents = $database_contents;
   }
 
@@ -88,7 +88,7 @@ class FakeSelect extends Select {
 
     $results = $this->executeJoins();
     $this->resolveConditions($this->where, $results);
-    usort($results, array($this, 'sort'));
+    usort($results, array($this, 'sortCallback'));
     if (!empty($this->range)) {
       $results = array_slice($results, $this->range['start'], $this->range['length']);
     }
@@ -135,7 +135,10 @@ class FakeSelect extends Select {
     return $results;
   }
 
-  protected function sort($a, $b) {
+  /**
+   * usort callback to order the results.
+   */
+  protected function sortCallback($a, $b) {
     foreach ($this->order as $field => $direction) {
       if ($a[$field] != $b[$field]) {
         return (($a[$field] < $b[$field]) == ($direction == 'ASC')) ? -1 : 1;
