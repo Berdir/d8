@@ -29,7 +29,7 @@ abstract class SqlBase extends SourceBase implements ContainerFactoryPluginInter
 
   function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration, CacheBackendInterface $cache, KeyValueStoreInterface $highwater_storage) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration, $cache, $highwater_storage);
-    $this->mapJoinable = FALSE;
+    $this->mapJoinable = TRUE;
   }
 
   protected function getDatabase() {
@@ -76,7 +76,7 @@ abstract class SqlBase extends SourceBase implements ContainerFactoryPluginInter
       //    conditions in the query). So, ultimately the SQL condition will look
       //    like (original conditions) AND (map IS NULL OR map needs update
       //      OR above highwater).
-      $conditions = new Condition('OR');
+      $conditions = $this->query->orConditionGroup();
       $condition_added = FALSE;
       if ($this->mapJoinable) {
         // Build the join to the map table. Because the source key could have
@@ -92,8 +92,7 @@ abstract class SqlBase extends SourceBase implements ContainerFactoryPluginInter
           $delimiter = ' AND ';
         }
 
-        $alias = $this->query->leftJoin($this->idMap->getQualifiedMapTable(),
-                                        'map', $map_join);
+        $alias = $this->query->leftJoin($this->idMap->getQualifiedMapTable(), 'map', $map_join);
         $conditions->isNull($alias . '.sourceid1');
         $conditions->condition($alias . '.needs_update', MigrateIdMapInterface::STATUS_NEEDS_UPDATE);
         $condition_added = TRUE;

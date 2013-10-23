@@ -28,6 +28,7 @@ class D6CommentSourceTest extends MigrateSqlSourceTestCase {
     'sourceKeys' => array(
       'cid' => array(
         // This is where the field schema would go.
+        'alias' => 'c',
       ),
     ),
     'destinationKeys' => array(
