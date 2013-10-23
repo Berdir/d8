@@ -12,7 +12,7 @@ namespace Drupal\migrate\Tests;
  *
  * @group migrate
  */
-class D6CommentSourceTestWithHighwater extends D6CommentSourceTest {
+class D6CommentSourceWithHighwaterTest extends D6CommentSourceTest {
 
   public static function getInfo() {
     return array(
