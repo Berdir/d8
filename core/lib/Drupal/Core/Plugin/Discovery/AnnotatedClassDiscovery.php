@@ -57,7 +57,7 @@ class AnnotatedClassDiscovery extends ComponentAnnotatedClassDiscovery {
   /**
    * {@inheritdoc}
    */
-  protected function getAnnotationReader() {
+  public function getAnnotationReader() {
     if (!isset($this->annotationReader)) {
       $reader = parent::getAnnotationReader();
 
