@@ -216,118 +216,118 @@ class FakeSelect extends Select {
 
   public function groupBy($field) {
     // @todo: Implement groupBy() method.
-    throw new \Exception('This method is not supported');
+    throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
   public function countQuery() {
     // @todo: Implement countQuery() method.
-    throw new \Exception('This method is not supported');
+    throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
   public function havingCondition($field, $value = NULL, $operator = NULL) {
     // @todo: Implement havingCondition() method.
-    throw new \Exception('This method is not supported');
+    throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
   public function uniqueIdentifier() {
     // TODO: Implement uniqueIdentifier() method.
-    throw new \Exception('This method is not supported');
+    throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
   // ================== the rest won't be supported, ever.
 
   public function nextPlaceholder() {
     // TODO: Implement nextPlaceholder() method.
-    throw new \Exception('This method is not supported');
+    throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
   public function isPrepared() {
-    throw new \Exception('This method is not supported');
+    throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
   public function preExecute(SelectInterface $query = NULL) {
-    throw new \Exception('This method is not supported');
+    throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
   public function where($snippet, $args = array()) {
-    throw new \Exception('This method is not supported');
+    throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
   public function extend($extender_name) {
-    throw new \Exception('This method is not supported');
+    throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
   public function &getExpressions() {
-    throw new \Exception('This method is not supported');
+    throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
   public function &getGroupBy() {
-    throw new \Exception('This method is not supported');
+    throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
   public function &getUnion() {
-    throw new \Exception('This method is not supported');
+    throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
   public function forUpdate($set = TRUE) {
-    throw new \Exception('This method is not supported');
+    throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
   public function rightJoin($table, $alias = NULL, $condition = NULL, $arguments = array()) {
-    throw new \Exception('This method is not supported');
+    throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
   public function &conditions() {
-    throw new \Exception('This method is not supported');
+    throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
   public function orderRandom() {
     // We could implement this but why bother.
-    throw new \Exception('This method is not supported');
+    throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
   public function union(SelectInterface $query, $type = '') {
-    throw new \Exception('This method is not supported');
+    throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
   public function addExpression($expression, $alias = NULL, $arguments = array()) {
-    throw new \Exception('This method is not supported');
+    throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
   public function &getTables() {
-    throw new \Exception('This method is not supported');
+    throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
   public function getArguments(PlaceholderInterface $queryPlaceholder = NULL) {
-    throw new \Exception('This method is not supported');
+    throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
   public function &getOrderBy() {
-    throw new \Exception('This method is not supported');
+    throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
   public function &getFields() {
-    throw new \Exception('This method is not supported');
+    throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
   public function exists(SelectInterface $select) {
-    throw new \Exception('This method is not supported');
+    throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
   public function notExists(SelectInterface $select) {
-    throw new \Exception('This method is not supported');
+    throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
   public function arguments() {
-    throw new \Exception('This method is not supported');
+    throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
   public function compile(Connection $connection, PlaceholderInterface $queryPlaceholder) {
-    throw new \Exception('This method is not supported');
+    throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
   public function compiled() {
-    throw new \Exception('This method is not supported');
+    throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
 }
