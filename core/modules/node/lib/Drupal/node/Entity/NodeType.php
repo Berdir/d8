@@ -10,18 +10,15 @@ namespace Drupal\node\Entity;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
 use Drupal\node\NodeTypeInterface;
-use Drupal\Core\Entity\Annotation\EntityType;
-use Drupal\Core\Annotation\Translation;
 
 /**
  * Defines the Node type configuration entity.
  *
- * @EntityType(
+ * @ConfigEntityType(
  *   id = "node_type",
  *   label = @Translation("Content type"),
  *   module = "node",
  *   controllers = {
- *     "storage" = "Drupal\Core\Config\Entity\ConfigStorageController",
  *     "access" = "Drupal\node\NodeTypeAccessController",
  *     "form" = {
  *       "add" = "Drupal\node\NodeTypeFormController",

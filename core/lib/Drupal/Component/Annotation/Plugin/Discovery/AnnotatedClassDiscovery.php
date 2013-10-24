@@ -63,7 +63,7 @@ class AnnotatedClassDiscovery implements DiscoveryInterface {
    * @return \Doctrine\Common\Annotations\Reader
    *   The annotation reader.
    */
-  protected function getAnnotationReader() {
+  public function getAnnotationReader() {
     if (!isset($this->annotationReader)) {
       $this->annotationReader = new SimpleAnnotationReader();
 

@@ -33,6 +33,15 @@ class EntityType extends Plugin {
   public $class;
 
   /**
+   * Group this entity type belongs to, commonly either Configuration or Content.
+   *
+   * @ingroup plugin_translatable
+   *
+   * @var \Drupal\Core\Annotation\Translation
+   */
+  public $group;
+
+  /**
    * The name of the entity type's base table.
    *
    * @todo This is only used by \Drupal\Core\Entity\DatabaseStorageController.
