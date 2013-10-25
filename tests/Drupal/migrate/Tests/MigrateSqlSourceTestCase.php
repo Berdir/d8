@@ -46,7 +46,7 @@ abstract class MigrateSqlSourceTestCase extends UnitTestCase {
     $database = $this->getMockBuilder('Drupal\Core\Database\Connection')
       ->disableOriginalConstructor()
       ->getMock();
-    $database->expects($this->once())
+    $database->expects($this->any())
       ->method('select')
       ->will($this->returnValue($query));
 
@@ -93,7 +93,7 @@ abstract class MigrateSqlSourceTestCase extends UnitTestCase {
    */
   public function testRetrieval() {
     // TODO: make count() work in SOurceBase.
-    // $this->assertSame(count($this->results), count($this->source));
+    $this->assertSame(count($this->results), count($this->source));
     $count = 0;
     foreach ($this->source as $data_row) {
       $expected_row = $this->results[$count];

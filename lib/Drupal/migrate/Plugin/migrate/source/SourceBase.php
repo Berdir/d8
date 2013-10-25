@@ -16,6 +16,12 @@ use Drupal\migrate\Plugin\MigrateSourceInterface;
 use Drupal\migrate\Row;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * A base class for migrate sources.
+ *
+ * Derived classes are expected to define __toString(), returning a string
+ * describing the source and significant options, i.e. the query.
+ */
 abstract class SourceBase extends PluginBase implements ContainerFactoryPluginInterface, MigrateSourceInterface {
 
   /**

@@ -32,6 +32,13 @@ abstract class SqlBase extends SourceBase implements ContainerFactoryPluginInter
     $this->mapJoinable = TRUE;
   }
 
+  /**
+   * The query is a good identifier for sql sources.
+   */
+  function __toString() {
+    return (string) $this->query;
+  }
+
   protected function getDatabase() {
     if (!isset($this->database)) {
       $key = 'migrate_' . $this->migration->id();
