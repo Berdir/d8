@@ -34,21 +34,17 @@ abstract class MigrateSqlSourceTestCase extends UnitTestCase {
 
   const ORIGINAL_HIGHWATER = '';
 
-  /**
-   * @var \Drupal\Core\Database\Query\Select
-   */
-  protected $query;
-
   protected function setUp() {
-    $this->databaseContents += array('test_map' => array());
-    $query = new FakeSelect(static::BASE_TABLE, static::BASE_ALIAS, $this->databaseContents);
+    $database_contents = $this->databaseContents + array('test_map' => array());
+    $base_table = static::BASE_TABLE;
+    $base_alias = static::BASE_ALIAS;
 
     $database = $this->getMockBuilder('Drupal\Core\Database\Connection')
       ->disableOriginalConstructor()
       ->getMock();
     $database->expects($this->any())
       ->method('select')
-      ->will($this->returnValue($query));
+      ->will($this->returnCallback(function () use ($database_contents, $base_table, $base_alias) { return new FakeSelect($base_table, $base_alias, $database_contents);}));
 
     $idmap = $this->getMock('Drupal\migrate\Plugin\MigrateIdMapInterface');
     $idmap->expects($this->once())
