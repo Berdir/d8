@@ -50,6 +50,8 @@ class D6CommentSourceTest extends MigrateSqlSourceTestCase {
     ),
   );
 
+  // We need to set up the database contents; it's easier to do that below.
+
   protected $results = array(
     array(
       'cid' => 1,
@@ -97,6 +99,7 @@ class D6CommentSourceTest extends MigrateSqlSourceTestCase {
 
   public function setUp() {
     foreach ($this->results as $k => $row) {
+      // This array stores the database.
       $this->databaseContents['node'][$k]['nid'] = $row['nid'];
       $this->databaseContents['node'][$k]['type'] = $row['type'];
       unset($row['type']);
