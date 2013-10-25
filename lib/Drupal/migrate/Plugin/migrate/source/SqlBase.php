@@ -144,4 +144,11 @@ abstract class SqlBase extends SourceBase implements ContainerFactoryPluginInter
    */
   abstract function query();
 
+  /**
+   * {@inheritdoc}
+   */
+  public function computeCount() {
+    return $this->query()->countQuery()->execute()->fetchField();
+  }
+
 }

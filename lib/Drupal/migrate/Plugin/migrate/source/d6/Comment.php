@@ -40,14 +40,4 @@ class Comment extends SqlBase {
   public function fields() {
     // TODO: Implement fields() method.
   }
-
-  /**
-   * Derived classes must implement computeCount(), to retrieve a fresh count of
-   * source records.
-   *
-   * @return int
-   */
-  function computeCount() {
-    // TODO: Implement computeCount() method.
-  }
 }
