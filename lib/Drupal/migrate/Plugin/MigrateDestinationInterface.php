@@ -15,7 +15,7 @@ interface MigrateDestinationInterface {
   public function __construct(array $options);
   // Note this was formerly static. The EntityAPI implementation in migrate_extras
   // demonstrates the necessity of making this instance-specific.
-  public function getKeySchema();
+  public function getIdsSchema();
   // WTF: Review the cases where we need the Migration parameter, can we avoid that?
   public function fields(Migration $migration = NULL);
   // Interaction during import/rollback.
@@ -25,7 +25,7 @@ interface MigrateDestinationInterface {
   public function postRollback();
   // Yes, the classes will vary...
   public function import(Row $row);
-  public function rollbackMultiple(array $destination_keys);
+  public function rollbackMultiple(array $destination_identifiers);
   // Statistics. Possible WTF - is this the place to do the tracking?
   public function getCreated();
   public function getUpdated();

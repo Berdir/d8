@@ -20,8 +20,20 @@ class Row {
    */
   protected $source = array();
 
-  protected $keys = array();
+  /**
+   * The value of the source identifiers.
+   *
+   * This is a subset of the $source array.
+   *
+   * @var array
+   */
+  protected $sourceIdValues = array();
 
+  /**
+   * The destination values.
+   *
+   * @var array
+   */
   protected $destination = array();
 
   protected $idMap = array(
@@ -36,20 +48,20 @@ class Row {
    * @param array $values
    *   (optional) An array of values to add as properties on the object.
    */
-  public function __construct(array $keys, array $values) {
+  public function __construct(array $source_ids, array $values) {
     $this->source = $values;
-    foreach (array_keys($keys) as $key) {
-      if ($this->hasSourceProperty($key)) {
-        $this->keys[$key] = $values[$key];
+    foreach (array_keys($source_ids) as $id) {
+      if ($this->hasSourceProperty($id)) {
+        $this->sourceIdValues[$id] = $values[$id];
       }
       else {
-        throw new \InvalidArgumentException("$key has no value");
+        throw new \InvalidArgumentException("$id has no value");
       }
     }
   }
 
-  public function getSourceKeys() {
-    return $this->keys;
+  public function getSourceIdValues() {
+    return $this->sourceIdValues;
   }
 
   public function hasSourceProperty($property) {
@@ -62,6 +74,12 @@ class Row {
     }
   }
 
+  /**
+   * This returns the whole source array. There is no setter; the source is
+   * immutable.
+   *
+   * @return array
+   */
   public function getSource() {
     return $this->source;
   }

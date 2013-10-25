@@ -9,6 +9,7 @@ namespace Drupal\migrate\Plugin;
 
 use Drupal\migrate\Entity\Migration;
 use Drupal\migrate\Entity\MigrationInterface;
+use Drupal\migrate\Row;
 
 /**
  * An interface for migrate id mappings.
@@ -34,16 +35,20 @@ interface MigrateIdMapInterface {
   const ROLLBACK_PRESERVE = 1;
 
  /**
-   * Save a mapping from the key values in the source row to the destination
-   * keys.
+   * Save a mapping from the source identifiers to the destination
+  * identifiers.
    *
-   * @param $source_row
-   * @param $dest_ids
+   * @param $row
+  *    The row containing the current values of the source identifiers.
+  * @param $destination_ids
+  *   An array of destination identifiers: the keys are the name of the
+  *   properties, the values are dependent on the actual mapping
+  *   implementation.
    * @param $status
    * @param $rollback_action
    * @param $hash
    */
-  public function saveIDMapping($row, array $dest_ids, $status = self::STATUS_IMPORTED, $rollback_action = self::ROLLBACK_DELETE, $hash = NULL);
+  public function saveIDMapping(Row $row, array $destination_ids, $status = self::STATUS_IMPORTED, $rollback_action = self::ROLLBACK_DELETE, $hash = NULL);
 
   /**
    * Record a message related to a source record

@@ -289,7 +289,7 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
       $row = new Row($this->migration->get('sourceKeys'), $row_data);
 
       // Populate the source key for this row
-      $this->currentKey = $row->getSourceKeys();
+      $this->currentKey = $row->getSourceIdValues();
 
       // Pick up the existing map row, if any, unless getNextRow() did it.
       if (!$this->mapRowAdded && ($id_map = $this->idMap->getRowBySource($this->currentKey))) {

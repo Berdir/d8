@@ -7,7 +7,6 @@
 
 namespace Drupal\migrate;
 
-use Drupal\migrate\Entity\Migration;
 use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\Plugin\MigrateMapInterface;
 
@@ -1051,7 +1050,7 @@ class MigrateExecutable {
     // changes to this field - the originally-migrated value will always
     // remain, because we can't tell what the original was.
     if (isset($this->sourceValues->migrate_map_destid1)) {
-      $key_field = key($this->getDestination()->getKeySchema());
+      $key_field = key($this->getDestination()->getIdsSchema());
       $existing_value = db_select($dedupe['table'], 't')
                         ->fields('t', array($dedupe['property']))
                         ->range(0, 1)

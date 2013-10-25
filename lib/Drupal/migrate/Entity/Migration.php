@@ -73,11 +73,6 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
   public $row;
 
   /**
-   * The source keys.
-   */
-  public $sourceKeys = array();
-
-  /**
    * The source configuration, with at least a 'plugin' key.
    *
    * @var array
@@ -122,6 +117,16 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
    * @var \Drupal\migrate\Plugin\MigrateIdMapInterface
    */
   protected $idMapPlugin;
+
+  /**
+   * The source identifiers.
+   *
+   * An array of source identifiers: the keys are the name of the properties,
+   * the values are dependent on the id map plugin.
+   *
+   * @var array
+   */
+  public $sourceIds = array();
 
   /**
    * Information on the highwater mark.
