@@ -6,44 +6,56 @@
 
 namespace Drupal\migrate\Plugin\migrate\destination;
 
-use Symfony\Component\Yaml\Dumper;
+use Drupal\Core\Config\ConfigFactory;
+use Drupal\Core\Plugin\PluginBase;
+use Drupal\migrate\Entity\Migration;
+use Drupal\migrate\Plugin\MigrateDestinationInterface;
+use Drupal\migrate\Row;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Persist data to the config system.
  *
  * @PluginId("config")
  */
-class Config extends MigrateDestination {
+class Config extends PluginBase implements  MigrateDestinationInterface {
 
   /**
    * The config name to use when saving.
    *
    * @var string
    */
-  protected $config_name;
+  protected $configName;
 
-  public function __construct(array $options) {
-    $this->config_name = $options['config_name'];
+  public function __construct(array $configuration, $plugin_id, array $plugin_definition, ConfigFactory $config_factory) {
+    $this->configName = $configuration['config_name'];
+    $this->configFactory = $config_factory;
+  }
+
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, array $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('config.factory')
+    );
   }
 
   /**
    * {@inheritdoc}
    */
   function import(Row $row) {
-    $dumper = new Dumper();
-    $dumper->setIndentation(2);
-    $yaml = $dumper->dump($row->data);
-    $config = Drupal::config($this->config_name);
-    $config->setData($yaml);
-    $config->save();
+    $this->configFactory->get($this->configName)
+      ->setData($row->getDestination())
+      ->save();
   }
 
   public function getKeySchema() {
-    return array($this->config_name);
+    return array($this->configName);
   }
 
-  public function public function rollbackMultiple(array $destination_keys) {
-    // Not wise to delete config? Nothing to do.
+  public function rollbackMultiple(array $destination_keys) {
+    throw new \MigrateException('Configuration can not be rolled back');
   }
 
   public function fields(Migration $migration = NULL) {

@@ -9,10 +9,10 @@ namespace Drupal\migrate\Plugin;
 
 use Drupal\migrate\Entity\Migration;
 use Drupal\migrate\Row;
+use Drupal\views\Plugin\views\PluginInterface;
 
-interface MigrateDestinationInterface {
+interface MigrateDestinationInterface extends PluginInterface {
 
-  public function __construct(array $options);
   // Note this was formerly static. The EntityAPI implementation in migrate_extras
   // demonstrates the necessity of making this instance-specific.
   public function getIdsSchema();
