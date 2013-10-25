@@ -20,6 +20,8 @@ abstract class MigrateSqlSourceTestCase extends UnitTestCase {
 
   protected $migrationConfiguration = array();
 
+  protected $sourceConfiguration = array();
+
   protected $databaseContents = array();
 
   protected $results = array();
@@ -69,11 +71,10 @@ abstract class MigrateSqlSourceTestCase extends UnitTestCase {
       ->with($this->equalTo($this->migrationConfiguration['id']))
       ->will($this->returnValue(static::ORIGINAL_HIGHWATER));
 
-    $configuration = array();
     $plugin_definition = array();
     $cache = $this->getMock('Drupal\Core\Cache\CacheBackendInterface');
     $plugin_class = static::PLUGIN_CLASS;
-    $this->source = new $plugin_class($configuration, static::PLUGIN_ID, $plugin_definition, $migration, $cache, $key_value);
+    $this->source = new $plugin_class($this->sourceConfiguration, static::PLUGIN_ID, $plugin_definition, $migration, $cache, $key_value);
     $reflection = new \ReflectionClass($this->source);
     $reflection_property = $reflection->getProperty('database');
     $reflection_property->setAccessible(TRUE);
