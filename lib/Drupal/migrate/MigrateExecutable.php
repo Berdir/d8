@@ -7,14 +7,23 @@
 
 namespace Drupal\migrate;
 
+use Drupal\migrate\Entity\Migration;
 use Drupal\migrate\Entity\MigrationInterface;
+use Drupal\migrate\Plugin\MigrateMapInterface;
 
+/**
+ * @property mixed processed_since_feedback
+ */
 class MigrateExecutable {
 
   /**
    * @var \Drupal\migrate\Entity\MigrationInterface
    */
   protected $migration;
+  protected $successes_since_feedback;
+  protected $total_successes;
+  protected $needsUpdate;
+  protected $total_processed;
 
   public function __construct(MigrationInterface $migration) {
     $this->migration = $migration;
@@ -402,7 +411,7 @@ class MigrateExecutable {
    * Perform an import operation - migrate items from source to destination.
    */
   protected function import() {
-    $return = MigrationBase::RESULT_COMPLETED;
+    $return = MigrationInterface::RESULT_COMPLETED;
     $source = $this->getSource();
     $destination = $this->getDestination();
 
@@ -413,49 +422,48 @@ class MigrateExecutable {
       self::displayMessage(
         t('Migration failed with source plugin exception: !e',
           array('!e' => $e->getMessage())));
-      return MigrationBase::RESULT_FAILED;
+      return MigrationInterface::RESULT_FAILED;
     }
     while ($this->getSource()->valid()) {
-      $data_row = $source->current();
+      /** @var Row $row */
+      $row = $source->current();
 
       // Wipe old messages, and save any new messages.
-      $this->map->delete($this->currentSourceKey(), TRUE);
+      $this->migration->getIdMap()->delete($this->currentSourceKey(), TRUE);
       $this->saveQueuedMessages();
 
-      $this->processRow($data_row);
+      $this->processRow($row);
 
       try {
-        migrate_instrument_start('destination import', TRUE);
-        $ids = $destination->import($data_row);
-        migrate_instrument_stop('destination import');
+        $ids = $this->migration->getDestination()->import($row);
         if ($ids) {
-          $this->map->saveIDMapping($sourceValues, $ids,
+          $this->migration->getIdMap()->saveIDMapping($row->getSource(), $ids,
             $this->needsUpdate, $this->rollbackAction,
-            $data_row->migrate_map_hash);
+            $row->getHash());
           $this->successes_since_feedback++;
           $this->total_successes++;
         }
         else {
-          $this->map->saveIDMapping($sourceValues, array(),
-            MigrateMap::STATUS_FAILED, $this->rollbackAction,
-            $data_row->migrate_map_hash);
-          if ($this->map->messageCount() == 0) {
+          $this->migration->getIdMap()->saveIDMapping($row->getSource(), array(),
+            MigrateMapInterface::STATUS_FAILED, $this->rollbackAction,
+            $row->getHash());
+          if ($this->migration->getIdMap()->messageCount() == 0) {
             $message = t('New object was not saved, no error provided');
             $this->saveMessage($message);
             self::displayMessage($message);
           }
         }
       }
-      catch (MigrateException $e) {
-        $this->map->saveIDMapping($sourceValues, array(),
-          $e->getStatus(), $this->rollbackAction, $data_row->migrate_map_hash);
+      catch (\MigrateException $e) {
+        $this->migration->getIdMap()->saveIDMapping($row->getSource(), array(),
+          $e->getStatus(), $this->rollbackAction, $row->getHash());
         $this->saveMessage($e->getMessage(), $e->getLevel());
         self::displayMessage($e->getMessage());
       }
-      catch (Exception $e) {
-        $this->map->saveIDMapping($sourceValues, array(),
-          MigrateMap::STATUS_FAILED, $this->rollbackAction,
-          $data_row->migrate_map_hash);
+      catch (\Exception $e) {
+        $this->migration->getIdMap()->saveIDMapping($row->getSource(), array(),
+          MigrateMapInterface::STATUS_FAILED, $this->rollbackAction,
+          $row->getHash());
         $this->handleException($e);
       }
       $this->total_processed++;
@@ -466,7 +474,7 @@ class MigrateExecutable {
 
       // Reset row properties.
       unset($sourceValues, $destinationValues);
-      $this->needsUpdate = MigrateMap::STATUS_IMPORTED;
+      $this->needsUpdate = MigrateMapInterface::STATUS_IMPORTED;
 
       // TODO: Temporary. Remove when http://drupal.org/node/375494 is committed.
       // TODO: Should be done in MigrateDestinationEntity
@@ -477,7 +485,7 @@ class MigrateExecutable {
       if ($this->timeOptionExceeded()) {
         break;
       }
-      if (($return = $this->checkStatus()) != MigrationBase::RESULT_COMPLETED) {
+      if (($return = $this->checkStatus()) != MigrationInterface::RESULT_COMPLETED) {
         break;
       }
       if ($this->itemOptionExceeded()) {
@@ -490,7 +498,7 @@ class MigrateExecutable {
         self::displayMessage(
           t('Migration failed with source plugin exception: !e',
             array('!e' => $e->getMessage())));
-        return MigrationBase::RESULT_FAILED;
+        return MigrationInterface::RESULT_FAILED;
       }
     }
 
@@ -1147,4 +1155,5 @@ class MigrateExecutable {
     }
     $this->map->setUpdate($source_key);
   }
+
 }

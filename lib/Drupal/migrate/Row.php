@@ -62,6 +62,10 @@ class Row {
     }
   }
 
+  public function getSource() {
+    return $this->source;
+  }
+
 
   public function hasDestinationProperty($property) {
     return isset($this->destination[$property]) || array_key_exists($property, $this->destination);
@@ -117,4 +121,7 @@ class Row {
     return $this->idMap['needs_update'] == MigrateIdMapInterface::STATUS_NEEDS_UPDATE;
   }
 
+  public function getHash() {
+    return $this->idMap['hash'];
+  }
 }

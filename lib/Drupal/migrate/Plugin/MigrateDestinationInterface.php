@@ -8,6 +8,7 @@
 namespace Drupal\migrate\Plugin;
 
 use Drupal\migrate\Entity\Migration;
+use Drupal\migrate\Row;
 
 interface MigrateDestinationInterface {
 
@@ -23,7 +24,7 @@ interface MigrateDestinationInterface {
   public function postImport();
   public function postRollback();
   // Yes, the classes will vary...
-  public function import(\stdClass $destination_object, \stdClass $source_row);
+  public function import(Row $row);
   public function rollbackMultiple(array $destination_keys);
   // Statistics. Possible WTF - is this the place to do the tracking?
   public function getCreated();
