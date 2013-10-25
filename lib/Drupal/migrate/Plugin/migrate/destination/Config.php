@@ -7,6 +7,7 @@
 namespace Drupal\migrate\Plugin\migrate\destination;
 
 use Drupal\Core\Config\ConfigFactory;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\migrate\Entity\Migration;
 use Drupal\migrate\Plugin\MigrateDestinationInterface;
@@ -18,7 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @PluginId("config")
  */
-class Config extends PluginBase implements  MigrateDestinationInterface {
+class Config extends DestinationBase implements ContainerFactoryPluginInterface {
 
   /**
    * The config name to use when saving.
@@ -28,6 +29,7 @@ class Config extends PluginBase implements  MigrateDestinationInterface {
   protected $configName;
 
   public function __construct(array $configuration, $plugin_id, array $plugin_definition, ConfigFactory $config_factory) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->configName = $configuration['config_name'];
     $this->configFactory = $config_factory;
   }
@@ -50,10 +52,6 @@ class Config extends PluginBase implements  MigrateDestinationInterface {
       ->save();
   }
 
-  public function getKeySchema() {
-    return array($this->configName);
-  }
-
   public function rollbackMultiple(array $destination_keys) {
     throw new \MigrateException('Configuration can not be rolled back');
   }
@@ -62,5 +60,9 @@ class Config extends PluginBase implements  MigrateDestinationInterface {
     return array(
       'data' => t('A PHP array to be saved as config.'),
     );
+  }
+
+  public function getIdsSchema() {
+    return array($this->configName);
   }
 }
