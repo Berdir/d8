@@ -57,9 +57,7 @@ class Config extends DestinationBase implements ContainerFactoryPluginInterface 
   }
 
   public function fields(Migration $migration = NULL) {
-    return array(
-      'data' => t('A PHP array to be saved as config.'),
-    );
+    // @todo Dynamically fetch fields using Config Schema API.
   }
 
   public function getIdsSchema() {
