@@ -286,7 +286,7 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
     $this->currentRow = NULL;
 
     while ($row_data = $this->getNextRow()) {
-      $row = new Row($this->migration->get('sourceKeys'), $row_data);
+      $row = new Row($this->migration->get('sourceIds'), $row_data);
 
       // Populate the source key for this row
       $this->currentKey = $row->getSourceIdValues();

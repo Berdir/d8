@@ -25,13 +25,13 @@ class D6UserSourceTest extends MigrateSqlSourceTestCase {
   protected $migrationConfiguration = array(
     'id' => 'test',
     'idlist' => array(),
-    'sourceKeys' => array(
+    'sourceIds' => array(
       'uid' => array(
         // This is where the field schema would go.
         'alias' => 'u',
       ),
     ),
-    'destinationKeys' => array(
+    'destinationIds' => array(
       'uid' => array(
         // This is where the field schema would go.
       ),

@@ -24,12 +24,12 @@ class D6NodeSourceNoFieldsTest extends MigrateSqlSourceTestCase {
     'id' => 'test',
     // Leave it empty for now.
     'idlist' => array(),
-    'sourceKeys' => array(
+    'sourceIds' => array(
       'nid' => array(
         'alias' => 'n',
       ),
     ),
-    'destinationKeys' => array(
+    'destinationIds' => array(
       'nid' => array(
         // This is where the field schema would go.
       ),

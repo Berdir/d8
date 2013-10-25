@@ -35,7 +35,7 @@ class D6CommentSourceTest extends MigrateSqlSourceTestCase {
     'idlist' => array(),
     // This needs to be the identifier of the actual key: cid for comment, nid
     // for node and so on.
-    'sourceKeys' => array(
+    'sourceIds' => array(
       'cid' => array(
         // This is where the field schema would go but for now we need to
         // specify the table alias for the key. Most likely this will be the
@@ -43,7 +43,7 @@ class D6CommentSourceTest extends MigrateSqlSourceTestCase {
         'alias' => 'c',
       ),
     ),
-    'destinationKeys' => array(
+    'destinationIds' => array(
       'cid' => array(
         // This is where the field schema would go.
       ),

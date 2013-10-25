@@ -62,8 +62,8 @@ class Sql implements MigrateIdMapInterface {
    */
   protected $ensured;
 
-  public function __construct($machine_name, array $source_key,
-      array $destination_key, $connection_key = 'default', $options = array()) {
+  public function __construct($machine_name, array $source_id,
+      array $destination_id, $connection_key = 'default', $options = array()) {
     if (isset($options['track_last_imported'])) {
       $this->trackLastImported = TRUE;
     }
@@ -76,18 +76,18 @@ class Sql implements MigrateIdMapInterface {
     $this->mapTable = drupal_substr($this->mapTable, 0, 63 - $prefixLength);
     $this->messageTable = 'migrate_message_' . drupal_strtolower($machine_name);
     $this->messageTable = drupal_substr($this->messageTable, 0, 63 - $prefixLength);
-    $this->sourceKeys = $source_key;
-    $this->destinationKeys = $destination_key;
+    $this->sourceIds = $source_id;
+    $this->destinationIds = $destination_id;
 
     // Build the source and destination key maps
     $this->sourceKeyMap = array();
     $count = 1;
-    foreach ($source_key as $field => $schema) {
+    foreach ($source_id as $field => $schema) {
       $this->sourceKeyMap[$field] = 'sourceid' . $count++;
     }
     $this->destinationKeyMap = array();
     $count = 1;
-    foreach ($destination_key as $field => $schema) {
+    foreach ($destination_id as $field => $schema) {
       $this->destinationKeyMap[$field] = 'destid' . $count++;
     }
     $this->ensureTables();
@@ -102,20 +102,20 @@ class Sql implements MigrateIdMapInterface {
         // Generate appropriate schema info for the map and message tables,
         // and map from the source field names to the map/msg field names
         $count = 1;
-        $source_key_schema = array();
+        $source_id_schema = array();
         $pks = array();
-        foreach ($this->sourceKeys as $field_schema) {
+        foreach ($this->sourceIds as $field_schema) {
           $mapkey = 'sourceid' . $count++;
-          $source_key_schema[$mapkey] = $field_schema;
+          $source_id_schema[$mapkey] = $field_schema;
           $pks[] = $mapkey;
         }
 
-        $fields = $source_key_schema;
+        $fields = $source_id_schema;
 
         // Add destination keys to map table
         // TODO: How do we discover the destination schema?
         $count = 1;
-        foreach ($this->destinationKeys as $field_schema) {
+        foreach ($this->destinationIds as $field_schema) {
           // Allow dest key fields to be NULL (for IGNORED/FAILED cases)
           $field_schema['not null'] = FALSE;
           $mapkey = 'destid' . $count++;
@@ -164,7 +164,7 @@ class Sql implements MigrateIdMapInterface {
           'unsigned' => TRUE,
           'not null' => TRUE,
         );
-        $fields += $source_key_schema;
+        $fields += $source_id_schema;
 
         $fields['level'] = array(
           'type' => 'int',
@@ -371,18 +371,18 @@ class Sql implements MigrateIdMapInterface {
   /**
    * Record a message in the migration's message table.
    *
-   * @param array $source_key
+   * @param array $source_id
    *  Source ID of the record in error
    * @param string $message
    *  The message to record.
    * @param int $level
    *  Optional message severity (defaults to MESSAGE_ERROR).
    */
-  public function saveMessage($source_key, $message, $level = Migration::MESSAGE_ERROR) {
+  public function saveMessage($source_id, $message, $level = Migration::MESSAGE_ERROR) {
     // Source IDs as arguments
     $count = 1;
-    if (is_array($source_key)) {
-      foreach ($source_key as $key_value) {
+    if (is_array($source_id)) {
+      foreach ($source_id as $key_value) {
         $fields['sourceid' . $count++] = $key_value;
         // If any key value is empty, we can't save - print out and abort
         if (empty($key_value)) {
@@ -482,15 +482,15 @@ class Sql implements MigrateIdMapInterface {
   /**
    * Delete the map entry and any message table entries for the specified source row.
    *
-   * @param array $source_key
+   * @param array $source_id
    */
-  public function delete(array $source_key, $messages_only = FALSE) {
+  public function delete(array $source_id, $messages_only = FALSE) {
     if (!$messages_only) {
       $map_query = $this->connection->delete($this->mapTable);
     }
     $message_query = $this->connection->delete($this->messageTable);
     $count = 1;
-    foreach ($source_key as $key_value) {
+    foreach ($source_id as $key_value) {
       if (!$messages_only) {
         $map_query->condition('sourceid' . $count, $key_value);
       }
@@ -507,21 +507,21 @@ class Sql implements MigrateIdMapInterface {
   /**
    * Delete the map entry and any message table entries for the specified destination row.
    *
-   * @param array $destination_key
+   * @param array $destination_id
    */
-  public function deleteDestination(array $destination_key) {
+  public function deleteDestination(array $destination_id) {
     $map_query = $this->connection->delete($this->mapTable);
     $message_query = $this->connection->delete($this->messageTable);
-    $source_key = $this->lookupSourceID($destination_key);
-    if (!empty($source_key)) {
+    $source_id = $this->lookupSourceID($destination_id);
+    if (!empty($source_id)) {
       $count = 1;
-      foreach ($destination_key as $key_value) {
+      foreach ($destination_id as $key_value) {
         $map_query->condition('destid' . $count, $key_value);
         $count++;
       }
       $map_query->execute();
       $count = 1;
-      foreach ($source_key as $key_value) {
+      foreach ($source_id as $key_value) {
         $message_query->condition('sourceid' . $count, $key_value);
         $count++;
       }
@@ -532,11 +532,11 @@ class Sql implements MigrateIdMapInterface {
   /**
    * Set the specified row to be updated, if it exists.
    */
-  public function setUpdate(array $source_key) {
+  public function setUpdate(array $source_id) {
     $query = $this->connection->update($this->mapTable)
                               ->fields(array('needs_update' => MigrateMap::STATUS_NEEDS_UPDATE));
     $count = 1;
-    foreach ($source_key as $key_value) {
+    foreach ($source_id as $key_value) {
       $query->condition('sourceid' . $count++, $key_value);
     }
     $query->execute();
@@ -545,15 +545,15 @@ class Sql implements MigrateIdMapInterface {
   /**
    * Delete all map and message table entries specified.
    *
-   * @param array $source_keys
+   * @param array $source_ids
    *  Each array member is an array of key fields for one source row.
    */
-  public function deleteBulk(array $source_keys) {
+  public function deleteBulk(array $source_ids) {
     // If we have a single-column key, we can shortcut it
-    if (count($this->sourceKeys) == 1) {
+    if (count($this->sourceIds) == 1) {
       $sourceids = array();
-      foreach ($source_keys as $source_key) {
-        $sourceids[] = $source_key;
+      foreach ($source_ids as $source_id) {
+        $sourceids[] = $source_id;
       }
       $this->connection->delete($this->mapTable)
         ->condition('sourceid1', $sourceids, 'IN')
@@ -563,11 +563,11 @@ class Sql implements MigrateIdMapInterface {
         ->execute();
     }
     else {
-      foreach ($source_keys as $source_key) {
+      foreach ($source_ids as $source_id) {
         $map_query = $this->connection->delete($this->mapTable);
         $message_query = $this->connection->delete($this->messageTable);
         $count = 1;
-        foreach ($source_key as $key_value) {
+        foreach ($source_id as $key_value) {
           $map_query->condition('sourceid' . $count, $key_value);
           $message_query->condition('sourceid' . $count++, $key_value);
         }

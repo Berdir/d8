@@ -35,7 +35,7 @@ class D6RoleSourceTest extends MigrateSqlSourceTestCase {
     'idlist' => array(),
     // This needs to be the identifier of the actual key: rid for comment, nid
     // for node and so on.
-    'sourceKeys' => array(
+    'sourceIds' => array(
       'rid' => array(
         // This is where the field schema would go but for now we need to
         // specify the table alias for the key. Most likely this will be the
@@ -43,7 +43,7 @@ class D6RoleSourceTest extends MigrateSqlSourceTestCase {
         'alias' => 'r',
       ),
     ),
-    'destinationKeys' => array(
+    'destinationIds' => array(
       'rid' => array(
         // This is where the field schema would go.
       ),

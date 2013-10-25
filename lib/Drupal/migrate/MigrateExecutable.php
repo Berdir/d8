@@ -263,7 +263,7 @@ class MigrateExecutable {
       $destids = array();
       $sourceids = array();
       $batch_count = 0;
-      foreach ($this->map as $destination_key) {
+      foreach ($this->map as $destination_id) {
         if ($this->timeOptionExceeded()) {
           break;
         }
@@ -284,10 +284,10 @@ class MigrateExecutable {
 
         // Note that bulk rollback is only supported for single-property keys
         $sourceids[] = $current_source_key;
-        if (!empty($destination_key->destid1)) {
-          $map_row = $this->map->getRowByDestination((array)$destination_key);
+        if (!empty($destination_id->destid1)) {
+          $map_row = $this->map->getRowByDestination((array)$destination_id);
           if ($map_row['rollback_action'] == MigrateMap::ROLLBACK_DELETE) {
-            $destids[] = $destination_key->destid1;
+            $destids[] = $destination_id->destid1;
           }
         }
 
@@ -340,7 +340,7 @@ class MigrateExecutable {
       }
     }
     else {
-      foreach ($this->map as $destination_key) {
+      foreach ($this->map as $destination_id) {
         if ($this->timeOptionExceeded()) {
           break;
         }
@@ -362,17 +362,17 @@ class MigrateExecutable {
           if ($this->migration->get('systemOfRecord') == MigrationInterface::SOURCE) {
             // Skip when the destination key is null
             $skip = FALSE;
-            foreach ($destination_key as $key_value) {
+            foreach ($destination_id as $key_value) {
               if (is_null($key_value)) {
                 $skip = TRUE;
                 break;
               }
             }
             if (!$skip) {
-              $map_row = $this->map->getRowByDestination((array)$destination_key);
+              $map_row = $this->map->getRowByDestination((array)$destination_id);
               if ($map_row['rollback_action'] == MigrateMap::ROLLBACK_DELETE) {
                 migrate_instrument_start('destination rollback');
-                $this->getDestination()->rollback((array)$destination_key);
+                $this->getDestination()->rollback((array)$destination_id);
                 migrate_instrument_stop('destination rollback');
               }
             }
@@ -918,11 +918,11 @@ class MigrateExecutable {
    *
    * @param mixed $source_migrations
    *   An array of source migrations, or string for a single migration.
-   * @param mixed $source_keys
-   *   Key(s) to be looked up against the source migration(s). This may be a simple
-   *   value (one single-field key), an array of values (multiple single-field keys
-   *   to each be looked up), or an array of arrays (multiple multi-field keys to
-   *   each be looked up).
+   * @param mixed $source_ids
+   *   Id(s) to be looked up against the source migration(s). This may be a simple
+   *   value (one single-field key), an array of values (multiple single-field
+   *   identifiers to each be looked up), or an array of arrays (multiple
+   *   multi-field ids to each be looked up).
    * @param mixed $default
    *   The default value, if no ID was found.
    * @param $migration
@@ -930,34 +930,34 @@ class MigrateExecutable {
    * @return
    *   Destination value(s) from the source migration(s), as a single value if
    *   a single key was passed in, or an array of values if there were multiple
-   *   keys to look up.
+   *   ids to look up.
    */
-  public function handleSourceMigration($source_migrations, $source_keys, $default = NULL, $migration = NULL) {
+  public function handleSourceMigration($source_migrations, $source_ids, $default = NULL, $migration = NULL) {
     // Handle the source migration(s) as an array.
     $source_migrations = (array) $source_migrations;
 
-    // We want to treat source keys consistently as an array of arrays (each
+    // We want to treat source ids consistently as an array of arrays (each
     // representing one key).
-    if (is_array($source_keys)) {
-      if (empty($source_keys)) {
+    if (is_array($source_ids)) {
+      if (empty($source_ids)) {
         // Empty value should return empty results.
         return NULL;
       }
-      elseif (is_array(reset($source_keys))) {
+      elseif (is_array(reset($source_ids))) {
         // Already an array of key arrays, fall through
       }
       else {
         // An array of single-key values - make each one an array
-        $new_source_keys = array();
-        foreach ($source_keys as $source_key) {
-          $new_source_keys[] = array($source_key);
+        $new_source_ids = array();
+        foreach ($source_ids as $source_key) {
+          $new_source_ids[] = array($source_key);
         }
-        $source_keys = $new_source_keys;
+        $source_ids = $new_source_ids;
       }
     }
     else {
       // A simple value - make it an array within an array
-      $source_keys = array(array($source_keys));
+      $source_ids = array(array($source_ids));
     }
 
     // Instantiate each migration, and store back in the array.
@@ -967,8 +967,8 @@ class MigrateExecutable {
 
     $results = array();
     // Each $source_key will be an array of key values
-    foreach ($source_keys as $source_key) {
-      // If any source keys are NULL, skip this set
+    foreach ($source_ids as $source_key) {
+      // If any source ids are NULL, skip this set
       $continue = FALSE;
       foreach ($source_key as $value) {
         if (!isset($value)) {
@@ -1022,7 +1022,7 @@ class MigrateExecutable {
       }
     }
     // Return a single result if we had a single key
-    if (count($source_keys) > 1) {
+    if (count($source_ids) > 1) {
       return $results;
     }
     else {

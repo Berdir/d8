@@ -35,7 +35,7 @@ class D6MenuSourceTest extends MigrateSqlSourceTestCase {
     'idlist' => array(),
     // This needs to be the identifier of the actual key: cid for comment, nid
     // for node and so on.
-    'sourceKeys' => array(
+    'sourceIds' => array(
       'menu_name' => array(
         // This is where the field schema would go but for now we need to
         // specify the table alias for the key. Most likely this will be the
@@ -43,7 +43,7 @@ class D6MenuSourceTest extends MigrateSqlSourceTestCase {
         'alias' => 'm',
       ),
     ),
-    'destinationKeys' => array(
+    'destinationIds' => array(
       'menu_name' => array(
         // This is where the field schema would go.
       ),

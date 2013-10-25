@@ -105,9 +105,9 @@ interface MigrateIdMapInterface {
   /**
    * Delete the map and message entries for a set of given source records.
    *
-   * @param array $source_keys
+   * @param array $source_ids
    */
-  public function deleteBulk(array $source_keys);
+  public function deleteBulk(array $source_ids);
 
   /**
    * Clear all messages from the map.
