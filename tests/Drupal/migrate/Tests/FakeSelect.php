@@ -73,7 +73,7 @@ class FakeSelect extends Select {
         );
       }
       else {
-        throw new \Exception('The added table is not joined.');
+        throw new \Exception('The JOIN condition does not contain the alias of the joined table.');
       }
     }
     return $alias;
