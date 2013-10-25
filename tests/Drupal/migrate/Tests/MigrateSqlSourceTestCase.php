@@ -47,6 +47,9 @@ abstract class MigrateSqlSourceTestCase extends UnitTestCase {
     $database->expects($this->any())
       ->method('select')
       ->will($this->returnCallback(function () use ($base_table, $base_alias, $database_contents) { return new FakeSelect($base_table, $base_alias, $database_contents);}));
+    $database->expects($this->any())
+      ->method('schema')
+      ->will($this->returnCallback(function () use ($database, $database_contents) { return new FakeDatabaseSchema($database, $database_contents);}));
 
     $idmap = $this->getMock('Drupal\migrate\Plugin\MigrateIdMapInterface');
     $idmap->expects($this->once())
