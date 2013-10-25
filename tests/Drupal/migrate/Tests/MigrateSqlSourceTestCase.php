@@ -95,7 +95,7 @@ abstract class MigrateSqlSourceTestCase extends UnitTestCase {
       $expected_row = $this->results[$count];
       $count++;
       foreach ($expected_row as $key => $expected_value) {
-        $this->assertSame((string) $expected_value, (string) $data_row->getSourceProperty($key), $key);
+        $this->assertSame((string) $expected_value, (string) $data_row->getSourceProperty($key), sprintf('Value matches for key "%s"', $key));
       }
     }
     $this->assertSame(count($this->results), $count);
