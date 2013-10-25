@@ -88,7 +88,6 @@ abstract class MigrateSqlSourceTestCase extends UnitTestCase {
    * Tests retrieval.
    */
   public function testRetrieval() {
-    // TODO: make count() work in SOurceBase.
     $this->assertSame(count($this->results), count($this->source));
     $count = 0;
     foreach ($this->source as $data_row) {
