@@ -14,20 +14,32 @@ namespace Drupal\migrate\Tests;
  */
 class D6CommentSourceTest extends MigrateSqlSourceTestCase {
 
+  // The plugin system is not working during unit testing so the source plugin
+  // class needs to be manually specified.
   const PLUGIN_CLASS = 'Drupal\migrate\Plugin\migrate\source\d6\Comment';
 
+  // The source plugin ID.
   const PLUGIN_ID = 'drupal6_comment';
 
+  // The table passed to $this->database->select.
   const BASE_TABLE = 'comment';
 
+  // The base alias passed to $this->database->select.
   const BASE_ALIAS = 'c';
 
+  // The fake Migration configuration entity.
   protected $migrationConfiguration = array(
+    // The id of the entity, can be any string.
     'id' => 'test',
+    // Leave it empty for now.
     'idlist' => array(),
+    // This needs to be the identifier of the actual key: cid for comment, nid
+    // for node and so on.
     'sourceKeys' => array(
       'cid' => array(
-        // This is where the field schema would go.
+        // This is where the field schema would go but for now we need to
+        // specify the table alias for the key. Most likely this will be the
+        // same as BASE_ALIAS.
         'alias' => 'c',
       ),
     ),
