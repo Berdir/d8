@@ -29,8 +29,7 @@ class FakeSelect extends Select {
   protected $tables = array();
 
   protected $fields = array();
-  protected $alterMetaData;
-  protected $alterTags;
+  protected $countQuery = FALSE;
 
   public function __construct($table, $alias, array $database_contents, $conjunction = 'AND') {
     $this->addJoin(NULL, $table, $alias);
@@ -92,6 +91,9 @@ class FakeSelect extends Select {
     if (!empty($this->range)) {
       $results = array_slice($results, $this->range['start'], $this->range['length']);
     }
+    if ($this->countQuery) {
+      $results = array(array(count($results)));
+    }
     return new FakeStatement($results);
   }
 
@@ -133,6 +135,22 @@ class FakeSelect extends Select {
       }
     }
     return $results;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function countQuery() {
+    $query = clone $this;
+    return $query->setCountQuery();
+  }
+
+  /**
+   * Set this query to be a count query.
+   */
+  public function setCountQuery() {
+    $this->countQuery = TRUE;
+    return $this;
   }
 
   /**
