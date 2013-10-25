@@ -148,7 +148,7 @@ class FakeSelect extends Select {
   /**
    * Set this query to be a count query.
    */
-  public function setCountQuery() {
+  protected function setCountQuery() {
     $this->countQuery = TRUE;
     return $this;
   }
