@@ -170,7 +170,7 @@ class FakeSelect extends Select {
    *
    * @param array $rows
    */
-  public function resolveConditions(Condition $condition_group, array &$rows) {
+  protected function resolveConditions(Condition $condition_group, array &$rows) {
     foreach ($rows as $k => $row) {
       if (!$this->matchGroup($row, $condition_group)) {
         unset($rows[$k]);
