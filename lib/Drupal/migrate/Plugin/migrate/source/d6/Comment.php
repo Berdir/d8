@@ -12,11 +12,10 @@ use Drupal\migrate\Plugin\migrate\source\SqlBase;
 /**
  * Drupal 6 comment source from database.
  *
- * @fixme Make this work.
- *
  * @PluginId("drupal6_comment")
  */
 class Comment extends SqlBase {
+
   /**
    * {@inheritdoc}
    */
@@ -33,12 +32,7 @@ class Comment extends SqlBase {
   }
 
   /**
-   * Derived classes must implement fields(), returning a list of available
-   * source fields.
-   *
-   * @return array
-   *   Keys: machine names of the fields (to be passed to addFieldMapping)
-   *   Values: Human-friendly descriptions of the fields.
+   * {@inheritdoc}
    */
   public function fields() {
     return array(
@@ -58,4 +52,5 @@ class Comment extends SqlBase {
       'homepage' => t("The comment author's home page address from the comment form, if user is anonymous, and the 'Anonymous users may/must leave their contact information' setting is turned on."),
     );
   }
+
 }

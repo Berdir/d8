@@ -15,6 +15,10 @@ use Drupal\migrate\Plugin\migrate\source\SqlBase;
  * @PluginId("drupal6_user")
  */
 class User extends SqlBase {
+
+  /**
+   * {@inheritdoc}
+   */
   function query() {
     $query = $this->database
       ->select('users', 'u')
@@ -49,4 +53,5 @@ class User extends SqlBase {
       'data' => t('Data'),
     );
   }
+
 }
