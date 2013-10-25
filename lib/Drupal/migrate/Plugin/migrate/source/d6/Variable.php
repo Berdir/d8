@@ -19,7 +19,7 @@ class Variable extends SqlBase {
   /**
    * The variable names to fetch.
    *
-   * @var mixed
+   * @var array
    */
   protected $sourceNames;
 
@@ -33,7 +33,7 @@ class Variable extends SqlBase {
 
     $query = $this->database
       ->select('variables', 'v')
-      ->fields('v', array('name', 'value'));
+      ->fields('v', array('name', 'value'))
       ->condition('name', explode(',', $this->sourceNames), 'IN');
     return $query;
   }
@@ -44,11 +44,11 @@ class Variable extends SqlBase {
    * @return array
    */
   public function getNextRow() {
-    $rows = $this->result->fetchAssoc();
-    foreach ($rows as $name => $value) {
-      $rows[$name] = unserialize($value);
+    $row = parent::getNextRow();
+    foreach ($row as $name => $value) {
+      $row[$name] = unserialize($value);
     }
-    return $rows;
+    return $row;
   }
 
   /**
