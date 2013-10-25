@@ -237,11 +237,6 @@ class FakeSelect extends Select {
     throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
-  public function countQuery() {
-    // @todo: Implement countQuery() method.
-    throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
-  }
-
   public function havingCondition($field, $value = NULL, $operator = NULL) {
     // @todo: Implement havingCondition() method.
     throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
