@@ -63,6 +63,6 @@ class Config extends DestinationBase implements ContainerFactoryPluginInterface 
   }
 
   public function getIdsSchema() {
-    return array($this->configName);
+    return array($this->configName => array());
   }
 }
