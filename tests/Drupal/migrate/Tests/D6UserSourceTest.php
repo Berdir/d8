@@ -40,7 +40,7 @@ class D6UserSourceTest extends MigrateSqlSourceTestCase {
 
   protected $results = array(
     array(
-      'uid' => '1',
+      'uid' => 1,
       'name' => 'admin',
       // @todo d6 hash?
       'pass' => '1234',
@@ -63,7 +63,7 @@ class D6UserSourceTest extends MigrateSqlSourceTestCase {
       'data' => null,
     ),
     array(
-      'uid' => '4',
+      'uid' => 4,
       'name' => 'alice',
       // @todo d6 hash?
       'pass' => '1234',
