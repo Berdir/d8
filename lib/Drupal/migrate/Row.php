@@ -84,7 +84,6 @@ class Row {
     return $this->source;
   }
 
-
   public function hasDestinationProperty($property) {
     return isset($this->destination[$property]) || array_key_exists($property, $this->destination);
   }
