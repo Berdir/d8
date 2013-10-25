@@ -17,6 +17,31 @@ use Drupal\Core\Database\Query\SelectInterface;
 class FakeSelect extends Select {
 
   /**
+   * Contents of the pseudo-database.
+   *
+   * Keys are table names and values are arrays of rows in the table.
+   * Every row there contains all table fields keyed by field name.
+   *
+   * @code
+   * array(
+   *   'user' => array(
+   *     array(
+   *       'uid' => 1,
+   *       'name' => 'admin',
+   *     ),
+   *     array(
+   *       'uid' => 2,
+   *       'name' => 'alice',
+   *     ),
+   *   ),
+   *   'node' => array(
+   *     array(
+   *       'nid' => 1,
+   *     )
+   *   )
+   * )
+   * @endcode
+   *
    * @var array
    */
   protected $databaseContents;
