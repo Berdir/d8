@@ -87,7 +87,9 @@ class FakeSelect extends Select {
 
     $results = $this->executeJoins();
     $this->resolveConditions($this->where, $results);
-    usort($results, array($this, 'sortCallback'));
+    if (!empty($this->order)) {
+      usort($results, array($this, 'sortCallback'));
+    }
     if (!empty($this->range)) {
       $results = array_slice($results, $this->range['start'], $this->range['length']);
     }
