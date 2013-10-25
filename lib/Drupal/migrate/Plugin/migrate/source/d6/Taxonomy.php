@@ -27,7 +27,7 @@ class Taxonomy extends SqlBase {
   function query() {
 
     // @todo: determine how to pass in arguments via plugin config constructor
-    $this->sourceVocabulary = '5,6';
+    $this->sourceVocabulary = $this->configuration['vocabulary'];
 
     // Note the explode - this supports the (admittedly unusual) case of
     // consolidating multiple vocabularies into one.

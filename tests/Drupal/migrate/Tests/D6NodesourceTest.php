@@ -24,6 +24,10 @@ class D6NodeSourceNoFieldsTest extends MigrateSqlSourceTestCase {
     'id' => 'test',
     // Leave it empty for now.
     'idlist' => array(),
+    // The fake configuration for the source.
+    'source' => array(
+      'node_type' => 'page',
+    ),
     'sourceIds' => array(
       'nid' => array(
         'alias' => 'n',
@@ -34,10 +38,6 @@ class D6NodeSourceNoFieldsTest extends MigrateSqlSourceTestCase {
         // This is where the field schema would go.
       ),
     ),
-  );
-  // The fake configuration for the source.
-  protected $sourceConfiguration = array(
-    'node_type' => 'page',
   );
 
   protected $results = array(

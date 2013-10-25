@@ -146,11 +146,11 @@ class FakeSelect extends Select {
           foreach ($this->databaseContents[$table_info['table']] as $candidate_row) {
             if ($row[$table_info['original_field']] == $candidate_row[$table_info['added_field']]) {
               $joined = TRUE;
-              $new_rows[] = $row + array_intersect_key($candidate_row, $fields[$table_alias]);
+              $new_rows[] = array_intersect_key($candidate_row, $fields[$table_alias]) + $row;
             }
           }
           if (!$joined && $table_info['join type'] == 'LEFT') {
-            $new_rows[] = $row + $fields[$table_alias];
+            $new_rows[] = $fields[$table_alias] + $row;
           }
         }
         $results = $new_rows;

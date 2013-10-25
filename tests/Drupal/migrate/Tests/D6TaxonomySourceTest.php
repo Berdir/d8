@@ -26,6 +26,9 @@ class D6TaxonomySourceTest extends MigrateSqlSourceTestCase {
     'id' => 'test',
     'highwaterProperty' => array('field' => 'test'),
     'idlist' => array(),
+    'source' => array(
+      'vocabulary' => '5,6',
+    ),
     'sourceIds' => array(
       'tid' => array(
         'alias' => 't',
