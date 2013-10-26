@@ -46,15 +46,8 @@ class FakeSelect extends Select {
    */
   protected $databaseContents;
 
-  /**
-   * @var array
-   */
-  protected $conditions = array();
-
-  protected $tables = array();
-
-  protected $fields = array();
   protected $countQuery = FALSE;
+  protected $fieldsWithTable = array();
 
   public function __construct($table, $alias, array $database_contents, $conjunction = 'AND') {
     $this->addJoin(NULL, $table, $alias);
@@ -110,10 +103,18 @@ class FakeSelect extends Select {
   public function execute() {
     // @todo: Implement distinct() handling.
 
-    $results = $this->executeJoins();
-    $this->resolveConditions($this->where, $results);
+    $all_rows = $this->executeJoins();
+    $this->resolveConditions($this->where, $all_rows);
     if (!empty($this->order)) {
-      usort($results, array($this, 'sortCallback'));
+      usort($all_rows, array($this, 'sortCallback'));
+    }
+    $results = array();
+    foreach ($all_rows as $table_rows) {
+      $result_row = array();
+      foreach ($table_rows as $row) {
+        $result_row += $row;
+      }
+      $results[] = $result_row;
     }
     if (!empty($this->range)) {
       $results = array_slice($results, $this->range['start'], $this->range['length']);
@@ -133,8 +134,8 @@ class FakeSelect extends Select {
     // @TODO add support for all_fields.
     $fields = array();
     foreach ($this->fields as $field_info) {
-      $table_alias = $field_info['table'];
-      $fields[$table_alias][$field_info['field']] = NULL;
+      $this->fieldsWithTable[$field_info['table'] . '.' . $field_info['field']] = $field_info;
+      $fields[$field_info['table']][$field_info['field']] = NULL;
     }
 
     $results = array();
@@ -144,20 +145,20 @@ class FakeSelect extends Select {
         foreach ($results as $row) {
           $joined = FALSE;
           foreach ($this->databaseContents[$table_info['table']] as $candidate_row) {
-            if ($row[$table_info['original_field']] == $candidate_row[$table_info['added_field']]) {
+            if ($row[$table_info['original_table_alias']][$table_info['original_field']] == $candidate_row[$table_info['added_field']]) {
               $joined = TRUE;
-              $new_rows[] = array_intersect_key($candidate_row, $fields[$table_alias]) + $row;
+              $new_rows[] = array($table_alias => array_intersect_key($candidate_row, $fields[$table_alias])) + $row;
             }
           }
           if (!$joined && $table_info['join type'] == 'LEFT') {
-            $new_rows[] = $fields[$table_alias] + $row;
+            $new_rows[] = array($table_alias => $fields[$table_alias]) + $row;
           }
         }
         $results = $new_rows;
       }
       else {
         foreach ($this->databaseContents[$table_info['table']] as $candidate_row) {
-          $results[] = array_intersect_key($candidate_row, $fields[$table_alias]);
+          $results[] = array($table_alias => array_intersect_key($candidate_row, $fields[$table_alias]));
         }
       }
     }
@@ -185,11 +186,18 @@ class FakeSelect extends Select {
    */
   protected function sortCallback($a, $b) {
     foreach ($this->order as $field => $direction) {
-      if ($a[$field] != $b[$field]) {
-        return (($a[$field] < $b[$field]) == ($direction == 'ASC')) ? -1 : 1;
+      $field_info = $this->getFieldInfo($field);
+      $a_value = $a[$field_info['table']][$field_info['field']];
+      $b_value = $b[$field_info['table']][$field_info['field']];
+      if ($a_value != $b_value) {
+        return (($a_value < $b_value) == ($direction == 'ASC')) ? -1 : 1;
       }
     }
     return 0;
+  }
+
+  protected function getFieldInfo($field) {
+    return isset($this->fieldsWithTable[$field])? $this->fieldsWithTable[$field] : $this->fields[$field];
   }
 
   /**
@@ -237,17 +245,19 @@ class FakeSelect extends Select {
    *   TRUE if the condition matches.
    */
   protected function matchSingle(array $row, array $condition) {
+    $field_info = $this->getFieldInfo($condition['field']);
+    $row_value = $row[$field_info['table']][$field_info['field']];
     switch ($condition['operator']) {
-      case '=': return $row[$condition['field']] == $condition['value'];
-      case '<=': return $row[$condition['field']] <= $condition['value'];
-      case '>=': return $row[$condition['field']] >= $condition['value'];
-      case '!=': return $row[$condition['field']] != $condition['value'];
-      case '<>': return $row[$condition['field']] != $condition['value'];
-      case '<': return $row[$condition['field']] < $condition['value'];
-      case '>': return $row[$condition['field']] > $condition['value'];
-      case 'IN': return in_array($row[$condition['field']], $condition['value']);
-      case 'IS NULL': return !isset($row[$condition['field']]);
-      case 'IS NOT NULL': return isset($row[$condition['field']]);
+      case '=': return $row_value == $condition['value'];
+      case '<=': return $row_value <= $condition['value'];
+      case '>=': return $row_value >= $condition['value'];
+      case '!=': return $row_value != $condition['value'];
+      case '<>': return $row_value != $condition['value'];
+      case '<': return $row_value < $condition['value'];
+      case '>': return $row_value > $condition['value'];
+      case 'IN': return in_array($row_value, $condition['value']);
+      case 'IS NULL': return !isset($row_value);
+      case 'IS NOT NULL': return isset($row_value);
       default: throw new \Exception(sprintf('operator %s is not supported', $condition['operator']));
     }
   }
