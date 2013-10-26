@@ -18,9 +18,6 @@ class D6RoleSourceTest extends MigrateSqlSourceTestCase {
   // class needs to be manually specified.
   const PLUGIN_CLASS = 'Drupal\migrate\Plugin\migrate\source\d6\Role';
 
-  // The source plugin ID.
-  const PLUGIN_ID = 'drupal6_role';
-
   // The table passed to $this->database->select.
   const BASE_TABLE = 'role';
 
@@ -35,6 +32,9 @@ class D6RoleSourceTest extends MigrateSqlSourceTestCase {
     'idlist' => array(),
     // This needs to be the identifier of the actual key: rid for comment, nid
     // for node and so on.
+    'source' => array(
+      'plugin' => 'drupal6_role',
+    ),
     'sourceIds' => array(
       'rid' => array(
         // This is where the field schema would go but for now we need to

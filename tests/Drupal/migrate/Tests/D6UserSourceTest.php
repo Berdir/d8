@@ -16,8 +16,6 @@ class D6UserSourceTest extends MigrateSqlSourceTestCase {
 
   const PLUGIN_CLASS = 'Drupal\migrate\Plugin\migrate\source\d6\User';
 
-  const PLUGIN_ID = 'drupal6_user';
-
   const BASE_TABLE = 'users';
 
   const BASE_ALIAS = 'u';
@@ -25,6 +23,9 @@ class D6UserSourceTest extends MigrateSqlSourceTestCase {
   protected $migrationConfiguration = array(
     'id' => 'test',
     'idlist' => array(),
+    'source' => array(
+      'plugin' => 'drupal6_user',
+    ),
     'sourceIds' => array(
       'uid' => array(
         // This is where the field schema would go.

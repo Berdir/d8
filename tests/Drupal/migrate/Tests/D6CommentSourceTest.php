@@ -18,9 +18,6 @@ class D6CommentSourceTest extends MigrateSqlSourceTestCase {
   // class needs to be manually specified.
   const PLUGIN_CLASS = 'Drupal\migrate\Plugin\migrate\source\d6\Comment';
 
-  // The source plugin ID.
-  const PLUGIN_ID = 'drupal6_comment';
-
   // The table passed to $this->database->select.
   const BASE_TABLE = 'comment';
 
@@ -35,6 +32,9 @@ class D6CommentSourceTest extends MigrateSqlSourceTestCase {
     'idlist' => array(),
     // This needs to be the identifier of the actual key: cid for comment, nid
     // for node and so on.
+    'source' => array(
+      'plugin' => 'drupal6_comment',
+    ),
     'sourceIds' => array(
       'cid' => array(
         // This is where the field schema would go but for now we need to

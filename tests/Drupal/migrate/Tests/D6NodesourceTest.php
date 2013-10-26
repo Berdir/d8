@@ -15,7 +15,6 @@ namespace Drupal\migrate\Tests;
 class D6NodeSourceNoFieldsTest extends MigrateSqlSourceTestCase {
 
   const PLUGIN_CLASS = 'Drupal\migrate\Plugin\migrate\source\d6\Node';
-  const PLUGIN_ID = 'drupal6_node';
   const BASE_TABLE = 'node';
   const BASE_ALIAS = 'n';
 
@@ -27,6 +26,7 @@ class D6NodeSourceNoFieldsTest extends MigrateSqlSourceTestCase {
     // The fake configuration for the source.
     'source' => array(
       'node_type' => 'page',
+      'plugin' => 'drupal6_node',
     ),
     'sourceIds' => array(
       'nid' => array(

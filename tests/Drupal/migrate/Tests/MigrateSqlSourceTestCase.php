@@ -26,8 +26,6 @@ abstract class MigrateSqlSourceTestCase extends UnitTestCase {
 
   const PLUGIN_CLASS = '';
 
-  const PLUGIN_ID = '';
-
   const BASE_TABLE = '';
 
   const BASE_ALIAS = '';
