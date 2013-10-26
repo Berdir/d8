@@ -7,6 +7,7 @@
 
 namespace Drupal\migrate\Tests;
 
+use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\Row;
 use Drupal\Tests\UnitTestCase;
 
@@ -71,6 +72,14 @@ class RowTest extends UnitTestCase {
     $this->assertSame($this->test_hash, $row->getHash(), 'Correct hash.');
     $row->rehash();
     $this->assertSame($this->test_hash, $row->getHash(), 'Correct hash even doing it twice.');
+    $test_id_map = array(
+      'original_hash' => '',
+      'hash' => '',
+      'needs_update' => MigrateIdMapInterface::STATUS_NEEDS_UPDATE,
+    );
+    $row->setIdMap($test_id_map);
+    $row->rehash();
+    $this->assertSame($this->test_hash, $row->getHash(), 'Correct hash even if id_mpa have changed.');
   }
 
 }
