@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Tests\D6NodeSourceTest.
+ * Contains \Drupal\migrate\Tests\D6NodeWithoutFieldsSourceTest.
  */
 
 namespace Drupal\migrate\Tests;
@@ -12,7 +12,7 @@ namespace Drupal\migrate\Tests;
  *
  * @group migrate
  */
-class D6NodeSourceNoFieldsTest extends MigrateSqlSourceTestCase {
+class D6NodeWithoutFieldsSourceTest extends MigrateSqlSourceTestCase {
 
   const PLUGIN_CLASS = 'Drupal\migrate\Plugin\migrate\source\d6\Node';
   const BASE_TABLE = 'node';
