@@ -32,6 +32,13 @@ abstract class MigrateSqlSourceTestCase extends UnitTestCase {
 
   const ORIGINAL_HIGHWATER = '';
 
+  /**
+   * @TODO: does this need to be derived from the source/destination plugin?
+   *
+   * @var bool
+   */
+  protected $mapJoinable = TRUE;
+
   protected function setUp() {
     $database_contents = $this->databaseContents + array('test_map' => array());
     $base_table = static::BASE_TABLE;
@@ -48,9 +55,11 @@ abstract class MigrateSqlSourceTestCase extends UnitTestCase {
       ->will($this->returnCallback(function () use ($database, $database_contents) { return new FakeDatabaseSchema($database, $database_contents);}));
 
     $idmap = $this->getMock('Drupal\migrate\Plugin\MigrateIdMapInterface');
-    $idmap->expects($this->once())
-      ->method('getQualifiedMapTable')
-      ->will($this->returnValue('test_map'));
+    if ($this->mapJoinable) {
+      $idmap->expects($this->once())
+        ->method('getQualifiedMapTable')
+        ->will($this->returnValue('test_map'));
+    }
 
     $migration = $this->getMock('Drupal\migrate\Entity\MigrationInterface');
     $migration->expects($this->any())

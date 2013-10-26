@@ -24,22 +24,19 @@ class Variable extends SqlBase {
    *
    * @var array
    */
-  protected $sourceNames;
+  protected $variables;
 
   function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration, CacheBackendInterface $cache, KeyValueStoreInterface $highwater_storage) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration, $cache, $highwater_storage);
-    $this->sourceNames = $this->configuration['sourceNames'];
+    $this->variables = $this->configuration['variables'];
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function query() {
-    $query = $this->database
-      ->select('variables', 'v')
-      ->fields('v', array('name', 'value'))
-      ->condition('name', explode(',', $this->sourceNames), 'IN');
-    return $query;
+  protected function performRewind() {
+    $this->result = array(array_map('unserialize', $this->query()->execute()->fetchAllKeyed()));
+  }
+
+  public function computeCount() {
+    return 1;
   }
 
   /**
@@ -48,18 +45,23 @@ class Variable extends SqlBase {
    * @return array
    */
   public function getNextRow() {
-    $row = parent::getNextRow();
-    foreach ($row as $name => $value) {
-      $row[$name] = unserialize($value);
-    }
-    return $row;
+    return array_shift($this->result);
   }
 
   /**
    * {@inheritdoc}
    */
   public function fields() {
-    return drupal_map_assoc($this->sourceNames);
+    return drupal_map_assoc($this->variables);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  function query() {
+    return $this->database
+      ->select('variables', 'v')
+      ->fields('v', array('name', 'value'))
+      ->condition('name', $this->variables, 'IN');
+  }
 }
