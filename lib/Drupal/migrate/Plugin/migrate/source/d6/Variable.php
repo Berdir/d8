@@ -29,7 +29,7 @@ class Variable extends SqlBase {
   function query() {
 
     // @todo: determine how to pass in arguments via plugin config constructor
-    $this->sourceNames = array('site_name');
+    $this->sourceNames = $this->configuration['sourceNames'];
 
     $query = $this->database
       ->select('variables', 'v')
