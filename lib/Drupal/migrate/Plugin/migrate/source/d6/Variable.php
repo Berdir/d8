@@ -7,6 +7,9 @@
 
 namespace Drupal\migrate\Plugin\migrate\source\d6;
 
+use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\KeyValueStore\KeyValueStoreInterface;
+use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\Plugin\migrate\source\SqlBase;
 
 /**
@@ -23,14 +26,15 @@ class Variable extends SqlBase {
    */
   protected $sourceNames;
 
+  function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration, CacheBackendInterface $cache, KeyValueStoreInterface $highwater_storage) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $migration, $cache, $highwater_storage);
+    $this->sourceNames = $this->configuration['sourceNames'];
+  }
+
   /**
    * {@inheritdoc}
    */
-  function query() {
-
-    // @todo: determine how to pass in arguments via plugin config constructor
-    $this->sourceNames = $this->configuration['sourceNames'];
-
+  public function query() {
     $query = $this->database
       ->select('variables', 'v')
       ->fields('v', array('name', 'value'))
