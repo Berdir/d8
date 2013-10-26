@@ -42,6 +42,8 @@ class Row {
     'needs_update' => MigrateIdMapInterface::STATUS_NEEDS_UPDATE,
   );
 
+  protected $frozen = FALSE;
+
   /**
    * Constructs a Migrate>Row object.
    *
@@ -78,13 +80,35 @@ class Row {
   }
 
   /**
-   * This returns the whole source array. There is no setter; the source is
-   * immutable.
+   * This returns the whole source array.
    *
    * @return array
    */
   public function getSource() {
     return $this->source;
+  }
+
+  /**
+   * Sets a source property. This can only be called from the source plugin
+   *
+   * @param string $property
+   * @param mixed $data
+   * @throws \Exception
+   */
+  public function setSourceProperty($property, $data) {
+    if ($this->frozen) {
+      throw new \Exception("The source is frozen and can't be changed any more");
+    }
+    else {
+      $this->source[$property] = $data;
+    }
+  }
+
+  /**
+   * Freezes the source.
+   */
+  public function freezeSource() {
+    $this->frozen = TRUE;
   }
 
   public function hasDestinationProperty($property) {

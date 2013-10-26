@@ -383,7 +383,10 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
         }
       }
     }
-    if (!$this->currentRow) {
+    if ($this->currentRow) {
+      $this->currentRow->freezeSource();
+    }
+    else {
       $this->currentKey = NULL;
     }
   }
@@ -445,7 +448,7 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
   abstract function computeCount();
 
   /**
-   * @return \stdClass
+   * @return array
    */
   abstract protected function getNextRow();
 
