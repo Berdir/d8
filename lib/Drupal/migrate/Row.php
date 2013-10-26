@@ -45,8 +45,11 @@ class Row {
   /**
    * Constructs a Migrate>Row object.
    *
+   * @param array $source_ids
+   *   An array containing the ids of the source using the keys as the field
+   *   names.
    * @param array $values
-   *   (optional) An array of values to add as properties on the object.
+   *   An array of values to add as properties on the object.
    */
   public function __construct(array $source_ids, array $values) {
     $this->source = $values;
