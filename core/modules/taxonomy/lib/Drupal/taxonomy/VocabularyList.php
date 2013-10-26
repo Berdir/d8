@@ -2,18 +2,18 @@
 
 /**
  * @file
- * Contains \Drupal\taxonomy\VocabularyListController.
+ * Contains \Drupal\taxonomy\VocabularyList.
  */
 
 namespace Drupal\taxonomy;
 
-use Drupal\Core\Config\Entity\DraggableListController;
+use Drupal\Core\Config\Entity\DraggableList;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Provides a listing of vocabularies.
  */
-class VocabularyListController extends DraggableListController {
+class VocabularyList extends DraggableList {
 
   /**
    * {@inheritdoc}

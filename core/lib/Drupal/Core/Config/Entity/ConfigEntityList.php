@@ -2,21 +2,21 @@
 
 /**
  * @file
- * Definition of Drupal\Core\Config\Entity\ConfigEntityListController.
+ * Definition of Drupal\Core\Config\Entity\ConfigEntityList.
  */
 
 namespace Drupal\Core\Config\Entity;
 
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityListController;
+use Drupal\Core\Entity\EntityList;
 
 /**
- * Defines the default list controller for ConfigEntity objects.
+ * Defines the default list of configuration entities.
  */
-class ConfigEntityListController extends EntityListController {
+class ConfigEntityList extends EntityList {
 
   /**
-   * Overrides Drupal\Core\Entity\EntityListController::load().
+   * {@inheritdoc}
    */
   public function load() {
     $entities = parent::load();

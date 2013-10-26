@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\block\Controller\BlockListController.
+ * Contains \Drupal\block\Controller\BlockList.
  */
 
 namespace Drupal\block\Controller;
@@ -29,7 +29,7 @@ class BlockListController extends EntityListController {
    */
   public function listing($theme = NULL, Request $request = NULL) {
     $theme = $theme ?: $this->config('system.theme')->get('default');
-    return $this->entityManager()->getListController('block')->render($theme, $request);
+    return $this->entityManager()->getList('block')->render($theme, $request);
   }
 
 }

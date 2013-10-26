@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\views_ui\ViewListController.
+ * Contains \Drupal\views_ui\ViewList.
  */
 
 namespace Drupal\views_ui;
@@ -10,8 +10,7 @@ namespace Drupal\views_ui;
 use Drupal\Component\Utility\String;
 use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Config\Entity\ConfigEntityListController;
-use Drupal\Core\Entity\EntityControllerInterface;
+use Drupal\Core\Config\Entity\ConfigEntityList;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -19,7 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Provides a listing of Views.
  */
-class ViewListController extends ConfigEntityListController implements EntityControllerInterface {
+class ViewList extends ConfigEntityList {
 
   /**
    * The views display plugin manager to use.
@@ -42,7 +41,7 @@ class ViewListController extends ConfigEntityListController implements EntityCon
   }
 
   /**
-   * Constructs a new EntityListController object.
+   * Constructs a new EntityList object.
    *
    * @param string $entity_type.
    *   The type of entity to be listed.

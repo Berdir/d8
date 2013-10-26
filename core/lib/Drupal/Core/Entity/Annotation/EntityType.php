@@ -55,7 +55,7 @@ class EntityType extends Plugin {
    *   similar. The classes must implement
    *   \Drupal\Core\Entity\EntityFormControllerInterface
    * - list: The name of the class that provides listings of the entities. The
-   *   class must implement \Drupal\Core\Entity\EntityListControllerInterface.
+   *   class must implement \Drupal\Core\Entity\EntityListInterface.
    * - render: The name of the class that is used to render the entities. The
    *   class must implement \Drupal\Core\Entity\EntityViewBuilderInterface.
    * - access: The name of the class that is used for access checks. The class

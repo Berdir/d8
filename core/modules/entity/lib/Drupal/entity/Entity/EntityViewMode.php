@@ -35,7 +35,7 @@ use Drupal\entity\EntityViewModeInterface;
  *   label = @Translation("View mode"),
  *   module = "entity",
  *   controllers = {
- *     "list" = "Drupal\entity\EntityDisplayModeListController",
+ *     "list" = "Drupal\entity\EntityDisplayModeList",
  *     "form" = {
  *       "add" = "Drupal\entity\Form\EntityDisplayModeAddForm",
  *       "edit" = "Drupal\entity\Form\EntityDisplayModeEditForm",

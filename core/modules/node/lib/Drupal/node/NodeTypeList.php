@@ -1,13 +1,12 @@
 <?php
 
 /**
- * Contains \Drupal\node\NodeTypeListController.
+ * Contains \Drupal\node\NodeTypeList.
  */
 
 namespace Drupal\node;
 
-use Drupal\Core\Config\Entity\ConfigEntityListController;
-use Drupal\Core\Entity\EntityControllerInterface;
+use Drupal\Core\Config\Entity\ConfigEntityList;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -19,7 +18,7 @@ use Drupal\Component\Utility\String;
 /**
  * Provides a listing of node types.
  */
-class NodeTypeListController extends ConfigEntityListController implements EntityControllerInterface {
+class NodeTypeList extends ConfigEntityList {
 
   /**
    * The url generator service.

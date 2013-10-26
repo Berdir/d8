@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\entity\EntityFormModeListController.
+ * Contains \Drupal\entity\EntityFormModeList.
  */
 
 namespace Drupal\entity;
@@ -10,7 +10,7 @@ namespace Drupal\entity;
 /**
  * Provides the listing for entity display modes.
  */
-class EntityFormModeListController extends EntityDisplayModeListController {
+class EntityFormModeList extends EntityDisplayModeList {
 
   /**
    * Filters entities based on their controllers.

@@ -2,14 +2,14 @@
 
 /**
  * @file
- * Contains \Drupal\filter\FilterFormatListController.
+ * Contains \Drupal\filter\FilterFormatList.
  */
 
 namespace Drupal\filter;
 
 use Drupal\Component\Utility\String;
 use Drupal\Core\Config\ConfigFactory;
-use Drupal\Core\Config\Entity\DraggableListController;
+use Drupal\Core\Config\Entity\DraggableList;
 use Drupal\Core\Entity\EntityControllerInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
@@ -17,9 +17,9 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Defines the filter format list controller.
+ * Defines the filter format list.
  */
-class FilterFormatListController extends DraggableListController implements EntityControllerInterface {
+class FilterFormatList extends DraggableList implements EntityControllerInterface {
 
   /**
    * {@inheritdoc}
@@ -34,7 +34,7 @@ class FilterFormatListController extends DraggableListController implements Enti
   protected $configFactory;
 
   /**
-   * Constructs a new FilterFormatListController.
+   * Constructs a new FilterFormatList.
    *
    * @param string $entity_type
    *   The type of entity to be listed.

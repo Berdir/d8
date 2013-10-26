@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\views_ui\Tests\ViewListControllerTest
+ * Contains \Drupal\views_ui\Tests\ViewListTest
  */
 
 namespace Drupal\views_ui\Tests {
@@ -13,12 +13,12 @@ use Drupal\Tests\UnitTestCase;
 use Drupal\views\Entity\View;
 use Drupal\views\ViewExecutableFactory;
 
-class ViewListControllerTest extends UnitTestCase {
+class ViewListTest extends UnitTestCase {
 
   public static function getInfo() {
     return array(
       'name' => 'Views List Controller Unit Test',
-      'description' => 'Unit tests the views list controller',
+      'description' => 'Unit tests the views list',
       'group' => 'Views UI',
     );
   }
@@ -26,7 +26,7 @@ class ViewListControllerTest extends UnitTestCase {
   /**
    * Tests the listing of displays on a views list.
    *
-   * @see \Drupal\views_ui\ViewListController::getDisplaysList().
+   * @see \Drupal\views_ui\ViewList::getDisplaysList()
    */
   public function testBuildRowEntityList() {
     $storage_controller = $this->getMockBuilder('Drupal\views\ViewStorageController')
@@ -124,7 +124,7 @@ class ViewListControllerTest extends UnitTestCase {
       ->disableOriginalConstructor()
       ->getMock();
 
-    // Setup a view list controller with a mocked buildOperations method,
+    // Setup a view list with a mocked buildOperations method,
     // because t() is called on there.
     $view_list_controller = $this->getMock('Drupal\views_ui\ViewListController', array('buildOperations'), array('view', $storage_controller, $entity_info, $display_manager, $module_handler));
     $view_list_controller->expects($this->any())

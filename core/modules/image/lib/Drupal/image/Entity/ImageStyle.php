@@ -32,7 +32,7 @@ use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
  *       "delete" = "Drupal\image\Form\ImageStyleDeleteForm"
  *     },
  *     "storage" = "Drupal\Core\Config\Entity\ConfigStorageController",
- *     "list" = "Drupal\image\ImageStyleListController",
+ *     "list" = "Drupal\image\ImageStyleList",
  *   },
  *   admin_permission = "administer image styles",
  *   config_prefix = "image.style",

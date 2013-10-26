@@ -35,7 +35,7 @@ use Symfony\Component\Routing\Route;
  * block.admin_display:
  *   path: '/admin/structure/block'
  *   defaults:
- *     _content: '\Drupal\block\Controller\BlockListController::listing'
+ *     _content: '\Drupal\block\Controller\BlockList::listing'
  *   requirements:
  *     _permission: 'administer blocks'
  * @endcode

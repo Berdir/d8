@@ -2,18 +2,18 @@
 
 /**
  * @file
- * Contains \Drupal\user\RoleListController.
+ * Contains \Drupal\user\RoleList.
  */
 
 namespace Drupal\user;
 
-use Drupal\Core\Config\Entity\DraggableListController;
+use Drupal\Core\Config\Entity\DraggableList;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Provides a listing of user roles.
  */
-class RoleListController extends DraggableListController {
+class RoleList extends DraggableList {
 
   /**
    * {@inheritdoc}

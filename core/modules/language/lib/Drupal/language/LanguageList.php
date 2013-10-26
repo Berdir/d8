@@ -1,18 +1,18 @@
 <?php
 /**
  * @file
- * Contains \Drupal\language\Form\LanguageListController.
+ * Contains \Drupal\language\Form\LanguageList.
  */
 
 namespace Drupal\language;
 
-use Drupal\Core\Config\Entity\DraggableListController;
+use Drupal\Core\Config\Entity\DraggableList;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
  * User interface for the language overview screen.
  */
-class LanguageListController extends DraggableListController {
+class LanguageList extends DraggableList {
 
   /**
    * {@inheritdoc}

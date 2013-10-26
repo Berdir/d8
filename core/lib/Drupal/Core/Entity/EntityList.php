@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\Core\Entity\EntityListController.
+ * Contains \Drupal\Core\Entity\EntityList.
  */
 
 namespace Drupal\Core\Entity;
@@ -13,9 +13,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Component\Utility\String;
 
 /**
- * Provides a generic implementation of an entity list controller.
+ * Provides a generic implementation of an entity list.
  */
-class EntityListController implements EntityListControllerInterface, EntityControllerInterface {
+class EntityList implements EntityListInterface, EntityControllerInterface {
 
   /**
    * The entity storage controller class.
@@ -67,7 +67,7 @@ class EntityListController implements EntityListControllerInterface, EntityContr
   }
 
   /**
-   * Constructs a new EntityListController object.
+   * Constructs a new EntityList object.
    *
    * @param string $entity_type
    *   The type of entity to be listed.
@@ -86,14 +86,14 @@ class EntityListController implements EntityListControllerInterface, EntityContr
   }
 
   /**
-   * Implements \Drupal\Core\Entity\EntityListControllerInterface::getStorageController().
+   * {@inheritdoc}
    */
   public function getStorageController() {
     return $this->storage;
   }
 
   /**
-   * Implements \Drupal\Core\Entity\EntityListControllerInterface::load().
+   * {@inheritdoc}
    */
   public function load() {
     return $this->storage->loadMultiple();
@@ -145,7 +145,7 @@ class EntityListController implements EntityListControllerInterface, EntityContr
    * @return array
    *   A render array structure of header strings.
    *
-   * @see \Drupal\Core\Entity\EntityListController::render()
+   * @see \Drupal\Core\Entity\EntityList::render()
    */
   public function buildHeader() {
     $row['operations'] = t('Operations');
@@ -161,7 +161,7 @@ class EntityListController implements EntityListControllerInterface, EntityContr
    * @return array
    *   A render array structure of fields for this entity.
    *
-   * @see \Drupal\Core\Entity\EntityListController::render()
+   * @see \Drupal\Core\Entity\EntityList::render()
    */
   public function buildRow(EntityInterface $entity) {
     $row['operations']['data'] = $this->buildOperations($entity);
@@ -177,7 +177,7 @@ class EntityListController implements EntityListControllerInterface, EntityContr
    * @return array
    *   A renderable array of operation links.
    *
-   * @see \Drupal\Core\Entity\EntityListController::render()
+   * @see \Drupal\Core\Entity\EntityList::render()
    */
   public function buildOperations(EntityInterface $entity) {
     // Retrieve and sort operations.
@@ -192,7 +192,7 @@ class EntityListController implements EntityListControllerInterface, EntityContr
   }
 
   /**
-   * Implements \Drupal\Core\Entity\EntityListControllerInterface::render().
+   * {@inheritdoc}
    *
    * Builds the entity list as renderable array for theme_table().
    *

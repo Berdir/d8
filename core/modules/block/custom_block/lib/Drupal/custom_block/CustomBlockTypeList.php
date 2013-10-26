@@ -2,18 +2,18 @@
 
 /**
  * @file
- * Contains \Drupal\custom_block\CustomBlockTypeListController.
+ * Contains \Drupal\custom_block\CustomBlockTypeList.
  */
 
 namespace Drupal\custom_block;
 
-use Drupal\Core\Config\Entity\ConfigEntityListController;
+use Drupal\Core\Config\Entity\ConfigEntityList;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Provides a listing of custom block types.
  */
-class CustomBlockTypeListController extends ConfigEntityListController {
+class CustomBlockTypeList extends ConfigEntityList {
 
   /**
    * {@inheritdoc}
@@ -29,7 +29,7 @@ class CustomBlockTypeListController extends ConfigEntityListController {
   }
 
   /**
-   * Overrides \Drupal\Core\Entity\EntityListController::buildHeader().
+   * Overrides \Drupal\Core\Entity\EntityList::buildHeader().
    */
   public function buildHeader() {
     $header['type'] = t('Block type');
@@ -38,7 +38,7 @@ class CustomBlockTypeListController extends ConfigEntityListController {
   }
 
   /**
-   * Overrides \Drupal\Core\Entity\EntityListController::buildRow().
+   * Overrides \Drupal\Core\Entity\EntityList::buildRow().
    */
   public function buildRow(EntityInterface $entity) {
     $uri = $entity->uri();

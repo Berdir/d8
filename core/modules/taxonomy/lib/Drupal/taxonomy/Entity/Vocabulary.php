@@ -22,7 +22,7 @@ use Drupal\taxonomy\VocabularyInterface;
  *   module = "taxonomy",
  *   controllers = {
  *     "storage" = "Drupal\taxonomy\VocabularyStorageController",
- *     "list" = "Drupal\taxonomy\VocabularyListController",
+ *     "list" = "Drupal\taxonomy\VocabularyList",
  *     "form" = {
  *       "default" = "Drupal\taxonomy\VocabularyFormController",
  *       "reset" = "Drupal\taxonomy\Form\VocabularyResetForm",

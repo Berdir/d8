@@ -23,7 +23,7 @@ use Drupal\language\LanguageInterface;
  *   module = "language",
  *   controllers = {
  *     "storage" = "Drupal\Core\Config\Entity\ConfigStorageController",
- *     "list" = "Drupal\language\LanguageListController",
+ *     "list" = "Drupal\language\LanguageList",
  *     "access" = "Drupal\language\LanguageAccessController",
  *     "form" = {
  *       "add" = "Drupal\language\Form\LanguageAddForm",

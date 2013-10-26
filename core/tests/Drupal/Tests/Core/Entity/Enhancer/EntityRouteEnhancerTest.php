@@ -55,12 +55,12 @@ class EntityRouteEnhancerTest extends UnitTestCase {
     $defaults = $route_enhancer->enhance($defaults, $request);
     $this->assertEquals('\Drupal\Core\Entity\HtmlEntityFormController::content', $defaults['_controller'], 'The entity form controller was not set.');
 
-    // Set _entity_list and ensure that the entity list controller is set.
+    // Set _entity_list and ensure that the entity list is set.
     $defaults = array();
     $defaults['_entity_list'] = 'entity_test.default';
     $defaults = $route_enhancer->enhance($defaults, $request);
     $this->assertEquals('controller.page:content', $defaults['_controller']);
-    $this->assertEquals('\Drupal\Core\Entity\Controller\EntityListController::listing', $defaults['_content'], 'The entity list controller was not set.');
+    $this->assertEquals('\Drupal\Core\Entity\Controller\EntityListController::listing', $defaults['_content'], 'The entity list was not set.');
     $this->assertEquals('entity_test.default', $defaults['entity_type']);
     $this->assertFalse(isset($defaults['_entity_list']));
 

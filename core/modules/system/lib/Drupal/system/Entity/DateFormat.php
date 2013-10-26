@@ -24,7 +24,7 @@ use Drupal\Core\Annotation\Translation;
  *   controllers = {
  *     "storage" = "Drupal\Core\Config\Entity\ConfigStorageController",
  *     "access" = "Drupal\system\DateFormatAccessController",
- *     "list" = "Drupal\system\DateFormatListController",
+ *     "list" = "Drupal\system\DateFormatList",
  *     "form" = {
  *       "add" = "Drupal\system\Form\DateFormatAddForm",
  *       "edit" = "Drupal\system\Form\DateFormatEditForm",

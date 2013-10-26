@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\Tests\Core\Entity\EntityListControllerTest.
+ * Contains \Drupal\Tests\Core\Entity\EntityListTest.
  */
 
 namespace Drupal\Tests\Core\Entity;
@@ -10,31 +10,31 @@ namespace Drupal\Tests\Core\Entity;
 use Drupal\Tests\UnitTestCase;
 
 /**
- * Tests the entity list controller.
+ * Tests the entity list.
  *
  * @group Entity
  *
- * @see \Drupal\entity_test\EntityTestListController
+ * @see \Drupal\entity_test\EntityTestList
  */
-class EntityListControllerTest extends UnitTestCase {
+class EntityListTest extends UnitTestCase {
 
   /**
-   * The entity used to construct the EntityListController.
+   * The entity used to construct the EntityList.
    *
    * @var \Drupal\user\Entity\Role
    */
   protected $role;
 
   /**
-   * The EntityListController object to test.
+   * The EntityList object to test.
    *
-   * @var \Drupal\Core\Entity\EntityListController
+   * @var \Drupal\Core\Entity\EntityList
    */
   protected $entityListController;
 
   public static function getInfo() {
     return array(
-      'name' => 'Entity list controller test',
+      'name' => 'Entity list test',
       'description' => 'Unit test of entity access checking system.',
       'group' => 'Entity'
     );
@@ -132,13 +132,13 @@ class EntityListControllerTest extends UnitTestCase {
   public function providerTestBuildRow() {
     $tests = array();
     // Checks that invalid multi-byte sequences are rejected.
-    $tests[] = array("Foo\xC0barbaz", '', 'EntityTestListController::buildRow() rejects invalid sequence "Foo\xC0barbaz"', TRUE);
-    $tests[] = array("\xc2\"", '', 'EntityTestListController::buildRow() rejects invalid sequence "\xc2\""', TRUE);
-    $tests[] = array("Fooÿñ", "Fooÿñ", 'EntityTestListController::buildRow() accepts valid sequence "Fooÿñ"');
+    $tests[] = array("Foo\xC0barbaz", '', 'EntityTestList::buildRow() rejects invalid sequence "Foo\xC0barbaz"', TRUE);
+    $tests[] = array("\xc2\"", '', 'EntityTestList::buildRow() rejects invalid sequence "\xc2\""', TRUE);
+    $tests[] = array("Fooÿñ", "Fooÿñ", 'EntityTestList::buildRow() accepts valid sequence "Fooÿñ"');
 
     // Checks that special characters are escaped.
-    $tests[] = array("<script>", '&lt;script&gt;', 'EntityTestListController::buildRow() escapes &lt;script&gt;');
-    $tests[] = array('<>&"\'', '&lt;&gt;&amp;&quot;&#039;', 'EntityTestListController::buildRow() escapes reserved HTML characters.');
+    $tests[] = array("<script>", '&lt;script&gt;', 'EntityTestList::buildRow() escapes &lt;script&gt;');
+    $tests[] = array('<>&"\'', '&lt;&gt;&amp;&quot;&#039;', 'EntityTestList::buildRow() escapes reserved HTML characters.');
 
     return $tests;
 

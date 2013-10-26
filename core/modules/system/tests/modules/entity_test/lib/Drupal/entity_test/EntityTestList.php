@@ -2,18 +2,18 @@
 
 /**
  * @file
- * Contains \Drupal\entity_test\EntityTestListController.
+ * Contains \Drupal\entity_test\EntityTestList.
  */
 
 namespace Drupal\entity_test;
 
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityListController;
+use Drupal\Core\Entity\EntityList;
 
 /**
- * Provides a list controller for entity_test.
+ * Provides a list for entity_test.
  */
-class EntityTestListController extends EntityListController {
+class EntityTestList extends EntityList {
 
   /**
    * {@inheritdoc}

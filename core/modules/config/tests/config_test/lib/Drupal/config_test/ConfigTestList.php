@@ -2,18 +2,18 @@
 
 /**
  * @file
- * Contains \Drupal\config_test\ConfigTestListController.
+ * Contains \Drupal\config_test\ConfigTestList.
  */
 
 namespace Drupal\config_test;
 
-use Drupal\Core\Config\Entity\ConfigEntityListController;
+use Drupal\Core\Config\Entity\ConfigEntityList;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
- * Provides a list controller for config_test.
+ * Provides a list for config_test.
  */
-class ConfigTestListController extends ConfigEntityListController {
+class ConfigTestList extends ConfigEntityList {
 
   /**
    * {@inheritdoc}

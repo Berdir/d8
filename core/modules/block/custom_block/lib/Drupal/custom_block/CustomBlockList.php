@@ -2,18 +2,18 @@
 
 /**
  * @file
- * Contains \Drupal\custom_block\CustomBlockListController.
+ * Contains \Drupal\custom_block\CustomBlockList.
  */
 
 namespace Drupal\custom_block;
 
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityListController;
+use Drupal\Core\Entity\EntityList;
 
 /**
  * Provides a listing of custom block entities.
  */
-class CustomBlockListController extends EntityListController {
+class CustomBlockList extends EntityList {
 
   /**
    * {@inheritdoc}

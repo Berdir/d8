@@ -2,18 +2,18 @@
 
 /**
  * @file
- * Contains Drupal\picture\PictureListController.
+ * Contains Drupal\picture\PictureList.
  */
 
 namespace Drupal\picture;
 
-use Drupal\Core\Config\Entity\ConfigEntityListController;
+use Drupal\Core\Config\Entity\ConfigEntityList;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Provides a listing of Pictures.
  */
-class PictureMappingListController extends ConfigEntityListController {
+class PictureMappingList extends ConfigEntityList {
 
   /**
    * {@inheritdoc}

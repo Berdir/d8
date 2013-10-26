@@ -19,7 +19,7 @@ use Drupal\Core\Annotation\Translation;
  *   module = "config_test",
  *   controllers = {
  *     "storage" = "Drupal\config_test\ConfigTestStorageController",
- *     "list" = "Drupal\Core\Config\Entity\ConfigEntityListController",
+ *     "list" = "Drupal\Core\Config\Entity\ConfigEntityList",
  *     "form" = {
  *       "default" = "Drupal\config_test\ConfigTestFormController"
  *     }

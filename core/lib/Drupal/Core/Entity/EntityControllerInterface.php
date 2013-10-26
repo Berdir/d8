@@ -7,7 +7,6 @@
 
 namespace Drupal\Core\Entity;
 
-use Drupal\Core\Entity\EntityStorageControllerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**

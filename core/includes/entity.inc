@@ -536,19 +536,19 @@ function entity_get_form(EntityInterface $entity, $operation = 'default', array 
 }
 
 /**
- * Returns an entity list controller for a given entity type.
+ * Returns an entity list for a given entity type.
  *
  * @param string $entity_type
  *   The type of the entity.
  *
- * @return \Drupal\Core\Entity\EntityListControllerInterface
- *   An entity list controller.
+ * @return \Drupal\Core\Entity\EntityListInterface
+ *   An entity list.
  *
  * @deprecated Use \Drupal\Core\Entity\EntityManager::getFormController().
  */
 function entity_list_controller($entity_type) {
   return \Drupal::entityManager()
-    ->getListController($entity_type);
+    ->getList($entity_type);
 }
 
 /**

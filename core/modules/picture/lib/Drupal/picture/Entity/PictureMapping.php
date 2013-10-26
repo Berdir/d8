@@ -21,7 +21,7 @@ use Drupal\picture\PictureMappingInterface;
  *   module = "picture",
  *   controllers = {
  *     "storage" = "Drupal\Core\Config\Entity\ConfigStorageController",
- *     "list" = "Drupal\picture\PictureMappingListController",
+ *     "list" = "Drupal\picture\PictureMappingList",
  *     "form" = {
  *       "edit" = "Drupal\picture\PictureMappingFormController",
  *       "add" = "Drupal\picture\PictureMappingFormController",

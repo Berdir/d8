@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Provides a user administrative listing.
  *
- * @todo Convert this to a entity list controller once table sort is supported.
+ * @todo Convert this to a entity list once table sort is supported.
  */
 class UserAdmin extends ControllerBase implements ContainerInjectionInterface {
 

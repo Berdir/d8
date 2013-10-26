@@ -2,12 +2,12 @@
 
 /**
  * @file
- * Contains \Drupal\entity\EntityDisplayModeListController.
+ * Contains \Drupal\entity\EntityDisplayModeList.
  */
 
 namespace Drupal\entity;
 
-use Drupal\Core\Config\Entity\ConfigEntityListController;
+use Drupal\Core\Config\Entity\ConfigEntityList;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Provides the listing for entity display modes.
  */
-class EntityDisplayModeListController extends ConfigEntityListController {
+class EntityDisplayModeList extends ConfigEntityList {
 
   /**
    * The entity info for all entity types.
@@ -26,7 +26,7 @@ class EntityDisplayModeListController extends ConfigEntityListController {
   protected $entityInfoComplete;
 
   /**
-   * Constructs a new EntityListController object.
+   * Constructs a new EntityList object.
    *
    * @param string $entity_type
    *   The type of entity to be listed.

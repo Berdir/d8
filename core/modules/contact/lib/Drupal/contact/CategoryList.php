@@ -1,21 +1,21 @@
 <?php
 
 /**
- * Definition of Drupal\contact\CategoryListController.
+ * Definition of Drupal\contact\CategoryList.
  */
 
 namespace Drupal\contact;
 
-use Drupal\Core\Config\Entity\ConfigEntityListController;
+use Drupal\Core\Config\Entity\ConfigEntityList;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Provides a listing of contact categories.
  */
-class CategoryListController extends ConfigEntityListController {
+class CategoryList extends ConfigEntityList {
 
   /**
-   * Overrides Drupal\Core\Entity\EntityListController::buildHeader().
+   * {@inheritdoc}
    */
   public function buildHeader() {
     $header['category'] = t('Category');
@@ -25,7 +25,7 @@ class CategoryListController extends ConfigEntityListController {
   }
 
   /**
-   * Overrides Drupal\Core\Entity\EntityListController::buildRow().
+   * {@inheritdoc}
    */
   public function buildRow(EntityInterface $entity) {
     $row['category'] = $this->getLabel($entity);

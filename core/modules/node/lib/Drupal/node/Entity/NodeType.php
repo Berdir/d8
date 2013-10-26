@@ -28,7 +28,7 @@ use Drupal\Core\Annotation\Translation;
  *       "edit" = "Drupal\node\NodeTypeFormController",
  *       "delete" = "Drupal\node\Form\NodeTypeDeleteConfirm"
  *     },
- *     "list" = "Drupal\node\NodeTypeListController",
+ *     "list" = "Drupal\node\NodeTypeList",
  *   },
  *   admin_permission = "administer content types",
  *   config_prefix = "node.type",

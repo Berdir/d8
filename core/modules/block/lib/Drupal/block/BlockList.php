@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\block\BlockListController.
+ * Contains \Drupal\block\BlockList.
  */
 
 namespace Drupal\block;
@@ -10,8 +10,7 @@ namespace Drupal\block;
 use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Component\Utility\Json;
 use Drupal\Component\Utility\String;
-use Drupal\Core\Config\Entity\ConfigEntityListController;
-use Drupal\Core\Entity\EntityControllerInterface;
+use Drupal\Core\Config\Entity\ConfigEntityList;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -20,9 +19,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Defines the block list controller.
+ * Defines the block list.
  */
-class BlockListController extends ConfigEntityListController implements FormInterface, EntityControllerInterface {
+class BlockList extends ConfigEntityList implements FormInterface {
 
   /**
    * The regions containing the blocks.
@@ -53,7 +52,7 @@ class BlockListController extends ConfigEntityListController implements FormInte
   protected $blockManager;
 
   /**
-   * Constructs a new BlockListController object.
+   * Constructs a new BlockList object.
    *
    * @param string $entity_type
    *   The type of entity to be listed.
@@ -86,7 +85,7 @@ class BlockListController extends ConfigEntityListController implements FormInte
   }
 
   /**
-   * Overrides \Drupal\Core\Config\Entity\ConfigEntityListController::load().
+   * Overrides \Drupal\Core\Config\Entity\ConfigEntityList::load().
    */
   public function load() {
     // If no theme was specified, use the current theme.
@@ -107,7 +106,7 @@ class BlockListController extends ConfigEntityListController implements FormInte
   }
 
   /**
-   * Overrides \Drupal\Core\Entity\EntityListController::render().
+   * Overrides \Drupal\Core\Entity\EntityList::render().
    *
    * @param string|null $theme
    *   (optional) The theme to display the blocks for. If NULL, the current

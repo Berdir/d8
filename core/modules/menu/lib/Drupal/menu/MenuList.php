@@ -1,21 +1,21 @@
 <?php
 
 /**
- * Contains \Drupal\menu\MenuListController.
+ * Contains \Drupal\menu\MenuList.
  */
 
 namespace Drupal\menu;
 
-use Drupal\Core\Config\Entity\ConfigEntityListController;
+use Drupal\Core\Config\Entity\ConfigEntityList;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Provides a listing of menus.
  */
-class MenuListController extends ConfigEntityListController {
+class MenuList extends ConfigEntityList {
 
   /**
-   * Overrides \Drupal\Core\Entity\EntityListController::buildHeader().
+   * Overrides \Drupal\Core\Entity\EntityList::buildHeader().
    */
   public function buildHeader() {
     $header['title'] = t('Title');
@@ -27,7 +27,7 @@ class MenuListController extends ConfigEntityListController {
   }
 
   /**
-   * Overrides \Drupal\Core\Entity\EntityListController::buildRow().
+   * Overrides \Drupal\Core\Entity\EntityList::buildRow().
    */
   public function buildRow(EntityInterface $entity) {
     $row['title'] = array(
@@ -61,7 +61,7 @@ class MenuListController extends ConfigEntityListController {
   }
 
   /**
-   * Overrides \Drupal\Core\Entity\EntityListController::render();
+   * Overrides \Drupal\Core\Entity\EntityList::render();
    */
   public function render() {
     $build = parent::render();

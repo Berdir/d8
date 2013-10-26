@@ -51,7 +51,7 @@ function views_ui_menu() {
  */
 function views_ui_entity_info(&$entity_info) {
   $entity_info['view']['controllers'] += array(
-    'list' => 'Drupal\views_ui\ViewListController',
+    'list' => 'Drupal\views_ui\ViewList',
     'form' => array(
       'edit' => 'Drupal\views_ui\ViewEditFormController',
       'add' => 'Drupal\views_ui\ViewAddFormController',

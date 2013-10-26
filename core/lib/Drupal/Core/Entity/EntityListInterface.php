@@ -2,21 +2,21 @@
 
 /**
  * @file
- * Contains \Drupal\Core\Entity\EntityListControllerInterface.
+ * Contains \Drupal\Core\Entity\EntityListInterface.
  */
 
 namespace Drupal\Core\Entity;
 
 /**
- * Defines an interface for entity list controllers.
+ * Defines an interface for entity lists.
  */
-interface EntityListControllerInterface {
+interface EntityListInterface {
 
   /**
    * Gets the entity storage controller.
    *
    * @return \Drupal\Core\Entity\EntityStorageControllerInterface
-   *   The storage controller used by this list controller.
+   *   The storage controller used by this list.
    */
   public function getStorageController();
 

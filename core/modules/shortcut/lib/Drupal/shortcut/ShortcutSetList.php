@@ -2,21 +2,21 @@
 
 /**
  * @file
- * Contains \Drupal\shortcut\ShortcutSetListController.
+ * Contains \Drupal\shortcut\ShortcutSetList.
  */
 
 namespace Drupal\shortcut;
 
-use Drupal\Core\Config\Entity\ConfigEntityListController;
+use Drupal\Core\Config\Entity\ConfigEntityList;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Provides a listing of shortcut sets.
  */
-class ShortcutSetListController extends ConfigEntityListController {
+class ShortcutSetList extends ConfigEntityList {
 
   /**
-   * Overrides \Drupal\Core\Entity\EntityListController::buildHeader().
+   * Overrides \Drupal\Core\Entity\EntityList::buildHeader().
    */
   public function buildHeader() {
     $header['name'] = t('Name');
@@ -43,7 +43,7 @@ class ShortcutSetListController extends ConfigEntityListController {
   }
 
   /**
-   * Overrides \Drupal\Core\Entity\EntityListController::buildRow().
+   * Overrides \Drupal\Core\Entity\EntityList::buildRow().
    */
   public function buildRow(EntityInterface $entity) {
     $row['name'] = $this->getLabel($entity);

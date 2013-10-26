@@ -251,7 +251,7 @@ function field_ui_element_info() {
  */
 function field_ui_entity_info(&$entity_info) {
   $entity_info['field_instance']['controllers']['form']['delete'] = 'Drupal\field_ui\Form\FieldDeleteForm';
-  $entity_info['field_entity']['controllers']['list'] = 'Drupal\field_ui\FieldListController';
+  $entity_info['field_entity']['controllers']['list'] = 'Drupal\field_ui\FieldList';
 }
 
 /**

@@ -2,15 +2,14 @@
 
 /**
  * @file
- * Contains \Drupal\action\ActionListController.
+ * Contains \Drupal\action\ActionList.
  */
 
 namespace Drupal\action;
 
 use Drupal\Core\Action\ActionManager;
-use Drupal\Core\Entity\EntityControllerInterface;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Config\Entity\ConfigEntityListController;
+use Drupal\Core\Config\Entity\ConfigEntityList;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -18,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Provides a listing of Actions.
  */
-class ActionListController extends ConfigEntityListController implements EntityControllerInterface {
+class ActionList extends ConfigEntityList {
 
   /**
    * @var bool
@@ -33,7 +32,7 @@ class ActionListController extends ConfigEntityListController implements EntityC
   protected $actionManager;
 
   /**
-   * Constructs a new ActionListController object.
+   * Constructs a new ActionList object.
    *
    * @param string $entity_type
    *   The entity type.

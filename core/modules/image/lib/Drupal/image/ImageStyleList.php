@@ -2,13 +2,12 @@
 
 /**
  * @file
- * Contains \Drupal\image\ImageStyleListController.
+ * Contains \Drupal\image\ImageStyleList.
  */
 
 namespace Drupal\image;
 
-use Drupal\Core\Config\Entity\ConfigEntityListController;
-use Drupal\Core\Entity\EntityControllerInterface;
+use Drupal\Core\Config\Entity\ConfigEntityList;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -19,7 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Provides a listing of image styles.
  */
-class ImageStyleListController extends ConfigEntityListController implements EntityControllerInterface {
+class ImageStyleList extends ConfigEntityList {
 
   /**
    * The URL generator.
@@ -29,7 +28,7 @@ class ImageStyleListController extends ConfigEntityListController implements Ent
   protected $urlGenerator;
 
   /**
-   * Constructs a new ImageStyleListController object.
+   * Constructs a new ImageStyleList object.
    *
    * @param string $entity_type
    *   The type of entity to be listed.

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains Drupal\Core\Config\Entity\DraggableListController.
+ * Contains Drupal\Core\Config\Entity\DraggableList.
  */
 
 namespace Drupal\Core\Config\Entity;
@@ -13,9 +13,9 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormInterface;
 
 /**
- * Provides a list controller for draggable configuration entities.
+ * Provides a list of draggable configuration entities.
  */
-abstract class DraggableListController extends ConfigEntityListController implements FormInterface {
+abstract class DraggableList extends ConfigEntityList implements FormInterface {
 
   /**
    * The key to use for the form element containing the entities.

@@ -255,15 +255,15 @@ class EntityManager extends PluginManagerBase {
   }
 
   /**
-   * Creates a new list controller instance.
+   * Creates a new list instance.
    *
    * @param string $entity_type
-   *   The entity type for this list controller.
+   *   The entity type for this list.
    *
-   * @return \Drupal\Core\Entity\EntityListControllerInterface
-   *   A list controller instance.
+   * @return \Drupal\Core\Entity\EntityListInterface
+   *   A list instance.
    */
-  public function getListController($entity_type) {
+  public function getList($entity_type) {
     if (!isset($this->controllers['listing'][$entity_type])) {
       $class = $this->getControllerClass($entity_type, 'list');
       if (in_array('Drupal\Core\Entity\EntityControllerInterface', class_implements($class))) {

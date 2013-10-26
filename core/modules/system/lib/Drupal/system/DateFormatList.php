@@ -2,13 +2,13 @@
 
 /**
  * @file
- * Contains \Drupal\system\DateFormatListController.
+ * Contains \Drupal\system\DateFormatList.
  */
 
 namespace Drupal\system;
 
 use Drupal\Component\Utility\String;
-use Drupal\Core\Config\Entity\ConfigEntityListController;
+use Drupal\Core\Config\Entity\ConfigEntityList;
 use Drupal\Core\Datetime\Date;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Provides a listing of date formats.
  */
-class DateFormatListController extends ConfigEntityListController {
+class DateFormatList extends ConfigEntityList {
 
   /**
    * The date service.
@@ -28,7 +28,7 @@ class DateFormatListController extends ConfigEntityListController {
   protected $dateService;
 
   /**
-   * Constructs a new DateFormatListController object.
+   * Constructs a new DateFormatList object.
    *
    * @param string $entity_type
    *   The type of entity to be listed.

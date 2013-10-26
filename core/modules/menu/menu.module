@@ -115,7 +115,7 @@ function menu_menu() {
  * Implements hook_entity_info().
  */
 function menu_entity_info(&$entity_info) {
-  $entity_info['menu']['controllers']['list'] = 'Drupal\menu\MenuListController';
+  $entity_info['menu']['controllers']['list'] = 'Drupal\menu\MenuList';
   $entity_info['menu']['links']['edit-form'] = 'admin/structure/menu/manage/{menu}';
   $entity_info['menu']['controllers']['form'] = array(
     'add' => 'Drupal\menu\MenuFormController',
