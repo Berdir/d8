@@ -36,7 +36,7 @@ class Variable extends SqlBase {
   }
 
   public function computeCount() {
-    return 1;
+    return intval($this->query()->countQuery()->execute()->fetchField() > 0);
   }
 
   /**
