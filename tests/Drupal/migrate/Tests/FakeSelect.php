@@ -108,6 +108,8 @@ class FakeSelect extends Select {
     if (!empty($this->order)) {
       usort($all_rows, array($this, 'sortCallback'));
     }
+    // Now flatten the rows so that each row becomes a field alias => value
+    // array.
     $results = array();
     foreach ($all_rows as $table_rows) {
       $result_row = array();
@@ -126,9 +128,12 @@ class FakeSelect extends Select {
   }
 
   /**
-   * Create an initial result set by executing the joins.
+   * Create an initial result set by executing the joins and picking fields.
    *
    * @return array
+   *   A multidimensional array, the first key are table aliases, the second
+   *   are field aliases, the values are the database contents or NULL in case
+   *   of JOINs.
    */
   protected function executeJoins() {
     // @TODO add support for all_fields.
