@@ -55,20 +55,17 @@ class PropertyMapTest extends MigrateTestCase {
     $this->row = new Row($this->sourceIds, $this->values);
   }
 
-  /**
-   * Tests object creation.
-   */
   public function testNoSourceDefaultProvided() {
     $configuration = array(
-      'destination' => 'testcolumn',
+      'destination' => 'testproperty',
       'default' => 'test',
       'foo' => 'bar',
     );
     $map = new PropertyMap($configuration, 'property_map', array());
     $map->apply($this->row, $this->migrateExecutable);
     $destination = $this->row->getDestination();
-    $this->assertSame($destination['testcolumn']['values'], 'test');
-    $this->assertSame($destination['testcolumn']['configuration']['foo'], 'bar');
+    $this->assertSame($destination['testproperty']['values'], 'test');
+    $this->assertSame($destination['testproperty']['configuration']['foo'], 'bar');
   }
 
   /**
@@ -76,11 +73,25 @@ class PropertyMapTest extends MigrateTestCase {
    */
   public function testNoSourceNoDefaultProvided() {
     $configuration = array(
-      'destination' => 'testcolumn',
+      'destination' => 'testproperty',
       'foo' => 'bar',
     );
     $map = new PropertyMap($configuration, 'property_map', array());
     $map->apply($this->row, $this->migrateExecutable);
   }
 
+  public function testNoSourceSubpropertyDefaultProvided() {
+    $configuration = array(
+      'destination' => 'testproperty:testsubproperty',
+      'default' => 'test',
+      'foo' => 'bar',
+    );
+    $map = new PropertyMap($configuration, 'property_map', array());
+    $map->apply($this->row, $this->migrateExecutable);
+    $destination = $this->row->getDestination();
+    $this->assertSame($destination['testproperty']['testsubproperty']['values'], 'test');
+    $this->assertSame($destination['testproperty']['testsubproperty']['configuration']['foo'], 'bar');
+  }
+
+  
 }
