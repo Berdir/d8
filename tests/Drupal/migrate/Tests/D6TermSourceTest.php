@@ -8,7 +8,7 @@
 namespace Drupal\migrate\Tests;
 
 /**
- * Tests taxonomy migration from D6 to D8.
+ * Tests taxonomy term migration from D6 to D8.
  *
  * @group migrate
  */
@@ -43,19 +43,35 @@ class D6TermSourceTest extends MigrateSqlSourceTestCase {
       'parent' => 0,
     ),
     array(
-      'tid' => 2,
+      'tid' => 3,
       'vid' => 6,
+      'name' => 'name value 3',
+      'description' => 'description value 3',
+      'weight' => 0,
+      'parent' => 0,
+    ),
+    array(
+      'tid' => 2,
+      'vid' => 5,
       'name' => 'name value 2',
       'description' => 'description value 2',
       'weight' => 1,
       'parent' => 1,
     ),
+    array(
+      'tid' => 4,
+      'vid' => 6,
+      'name' => 'name value 4',
+      'description' => 'description value 4',
+      'weight' => 1,
+      'parent' => 3,
+    ),
   );
 
   public static function getInfo() {
     return array(
-      'name' => 'D6 taxonomy source functionality',
-      'description' => 'Tests D6 taxonomy source plugin.',
+      'name' => 'D6 taxonomy term source functionality',
+      'description' => 'Tests D6 taxonomy term source plugin.',
       'group' => 'Migrate',
     );
   }

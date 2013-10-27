@@ -22,16 +22,6 @@ use Drupal\migrate\Plugin\migrate\source\SqlBase;
 class Term extends SqlBase {
 
   /**
-   * The vocabulary ID.
-   *
-   * As mentioned in query(), this can be a comma separated list of vocabulary
-   * ids.
-   *
-   * @var mixed
-   */
-  protected $vocabulary;
-
-  /**
    * {@inheritdoc}
    */
   function query() {
@@ -43,7 +33,7 @@ class Term extends SqlBase {
       // @todo: working, but not is there support for distinct() in FakeSelect?
       ->distinct();
     if (isset($this->configuration['vocabulary'])) {
-      $query->condition('vid', $this->vocabulary, 'IN');
+      $query->condition('vid', $this->configuration['vocabulary'], 'IN');
     }
     // Join to the hierarchy so we can sort on parent, but we'll pull the
     // actual parent values in separately in case there are multiples.
