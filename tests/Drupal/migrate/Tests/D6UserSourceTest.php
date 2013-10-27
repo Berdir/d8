@@ -16,10 +16,6 @@ class D6UserSourceTest extends MigrateSqlSourceTestCase {
 
   const PLUGIN_CLASS = 'Drupal\migrate\Plugin\migrate\source\d6\User';
 
-  const BASE_TABLE = 'users';
-
-  const BASE_ALIAS = 'u';
-
   protected $migrationConfiguration = array(
     'id' => 'test',
     'idlist' => array(),

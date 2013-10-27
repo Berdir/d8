@@ -16,10 +16,6 @@ class D6TaxonomySourceTest extends MigrateSqlSourceTestCase {
 
   const PLUGIN_CLASS = 'Drupal\migrate\Plugin\migrate\source\d6\Taxonomy';
 
-  const BASE_TABLE = 'term_data';
-
-  const BASE_ALIAS = 'td';
-
   protected $migrationConfiguration = array(
     'id' => 'test',
     'highwaterProperty' => array('field' => 'test'),

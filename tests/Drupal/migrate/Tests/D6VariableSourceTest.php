@@ -11,10 +11,6 @@ class D6VariableSourceTest extends MigrateSqlSourceTestCase {
 
   const PLUGIN_CLASS = 'Drupal\migrate\Plugin\migrate\source\d6\Variable';
 
-  const BASE_TABLE = 'variables';
-
-  const BASE_ALIAS = 'v';
-
   protected $migrationConfiguration = array(
     'id' => 'test',
     'highwaterProperty' => array('field' => 'test'),

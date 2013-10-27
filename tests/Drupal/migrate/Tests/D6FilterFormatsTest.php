@@ -18,12 +18,6 @@ class D6FilterFormatsSourceTest extends MigrateSqlSourceTestCase {
   // class needs to be manually specified.
   const PLUGIN_CLASS = 'Drupal\migrate\Plugin\migrate\source\d6\FilterFormats';
 
-  // The table passed to $this->database->select.
-  const BASE_TABLE = 'filter_formats';
-
-  // The base alias passed to $this->database->select.
-  const BASE_ALIAS = 'f';
-
   // The fake Migration configuration entity.
   protected $migrationConfiguration = array(
     'id' => 'test',

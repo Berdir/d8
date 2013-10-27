@@ -18,12 +18,6 @@ class D6RoleSourceTest extends MigrateSqlSourceTestCase {
   // class needs to be manually specified.
   const PLUGIN_CLASS = 'Drupal\migrate\Plugin\migrate\source\d6\Role';
 
-  // The table passed to $this->database->select.
-  const BASE_TABLE = 'role';
-
-  // The base alias passed to $this->database->select.
-  const BASE_ALIAS = 'r';
-
   // The fake Migration configuration entity.
   protected $migrationConfiguration = array(
     // The id of the entity, can be any string.
