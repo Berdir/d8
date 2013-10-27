@@ -11,6 +11,7 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\KeyValueStore\KeyValueStoreInterface;
 use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\Plugin\migrate\source\SqlBase;
+use Drupal\migrate\Row;
 
 /**
  * Drupal 6 taxonomy terms source from database.
@@ -35,11 +36,6 @@ class Term extends SqlBase {
     if (isset($this->configuration['vocabulary'])) {
       $query->condition('vid', $this->configuration['vocabulary'], 'IN');
     }
-    // Join to the hierarchy so we can sort on parent, but we'll pull the
-    // actual parent values in separately in case there are multiples.
-    $query->leftJoin('term_hierarchy', 'th', 'td.tid = th.tid');
-    $query->fields('th', array('parent'));
-    $query->orderBy('parent');
     return $query;
   }
 
@@ -53,8 +49,23 @@ class Term extends SqlBase {
       'name' => t('The name of the term.'),
       'description' => t('The term description.'),
       'weight' => t('Weight'),
-      'parent' => t("The Drupal term ID of the term's parent."),
+      'parents' => t("The Drupal term IDs of the term's parents."),
     );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  function prepareRow(Row $row, $keep = TRUE) {
+    // Find parents for this row.
+    $parents = $this->database
+      ->select('term_hierarchy', 'th')
+      ->fields('th', array('parent', 'tid'))
+      ->condition('tid', $row->getSourceProperty('tid'))
+      ->execute()
+      ->fetchCol();
+    $row->setSourceProperty('parents', $parents);
+    return parent::prepareRow($row);
   }
 
 }

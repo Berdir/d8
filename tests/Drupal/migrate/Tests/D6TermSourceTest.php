@@ -40,7 +40,15 @@ class D6TermSourceTest extends MigrateSqlSourceTestCase {
       'name' => 'name value 1',
       'description' => 'description value 1',
       'weight' => 0,
-      'parent' => 0,
+      'parents' => array(0),
+    ),
+    array(
+      'tid' => 2,
+      'vid' => 6,
+      'name' => 'name value 2',
+      'description' => 'description value 2',
+      'weight' => 0,
+      'parents' => array(0),
     ),
     array(
       'tid' => 3,
@@ -48,23 +56,31 @@ class D6TermSourceTest extends MigrateSqlSourceTestCase {
       'name' => 'name value 3',
       'description' => 'description value 3',
       'weight' => 0,
-      'parent' => 0,
-    ),
-    array(
-      'tid' => 2,
-      'vid' => 5,
-      'name' => 'name value 2',
-      'description' => 'description value 2',
-      'weight' => 1,
-      'parent' => 1,
+      'parents' => array(0),
     ),
     array(
       'tid' => 4,
-      'vid' => 6,
+      'vid' => 5,
       'name' => 'name value 4',
       'description' => 'description value 4',
       'weight' => 1,
-      'parent' => 3,
+      'parents' => array(1),
+    ),
+    array(
+      'tid' => 5,
+      'vid' => 6,
+      'name' => 'name value 5',
+      'description' => 'description value 5',
+      'weight' => 1,
+      'parents' => array(2),
+    ),
+    array(
+      'tid' => 6,
+      'vid' => 6,
+      'name' => 'name value 6',
+      'description' => 'description value 6',
+      'weight' => 0,
+      'parents' => array(3, 2),
     ),
   );
 
@@ -78,9 +94,13 @@ class D6TermSourceTest extends MigrateSqlSourceTestCase {
 
   public function setUp() {
     foreach ($this->results as $k => $row) {
-      $this->databaseContents['term_hierarchy'][$k]['tid'] = $row['tid'];
-      $this->databaseContents['term_hierarchy'][$k]['parent'] = $row['parent'];
-      unset($row['parent']);
+      foreach ($row['parents'] as $parent) {
+        $this->databaseContents['term_hierarchy'][] = array(
+          'tid' => $row['tid'],
+          'parent' => $parent,
+        );
+      }
+      unset($row['parents']);
       $this->databaseContents['term_data'][$k] = $row;
     }
     parent::setUp();
