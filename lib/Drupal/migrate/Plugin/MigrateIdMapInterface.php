@@ -14,8 +14,8 @@ use Drupal\migrate\Row;
 /**
  * An interface for migrate id mappings.
  *
- * Migrate id mappings maintains relations between migrate sources and
- * destinations, so its ids are tracked.
+ * Migrate id mappings maintain a relation between source ID and
+ * destination ID for audit and rollback purposes.
  */
 interface MigrateIdMapInterface {
 
@@ -36,17 +36,18 @@ interface MigrateIdMapInterface {
 
  /**
    * Save a mapping from the source identifiers to the destination
-  * identifiers.
+   * identifiers.
    *
    * @param $row
-  *    The row containing the current values of the source identifiers.
-  * @param $destination_ids
-  *   An array of destination identifiers: the keys are the name of the
-  *   properties, the values are dependent on the actual mapping
-  *   implementation.
+   *    The row containing the current values of the source identifiers.
+   * @param $destination_ids
+   *   An array of destination identifiers: the keys are the name of the
+   *   properties, the values are dependent on the actual mapping
+   *   implementation.
    * @param $status
    * @param $rollback_action
-   * @param $hash
+   * @param string $hash
+   *   A hash of the contents of the Row. Used as a key when the source has no other key.
    */
   public function saveIDMapping(Row $row, array $destination_ids, $status = self::STATUS_IMPORTED, $rollback_action = self::ROLLBACK_DELETE, $hash = NULL);
 
