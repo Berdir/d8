@@ -18,12 +18,6 @@ class D6CommentSourceTest extends MigrateSqlSourceTestCase {
   // class needs to be manually specified.
   const PLUGIN_CLASS = 'Drupal\migrate\Plugin\migrate\source\d6\Comment';
 
-  // The table passed to $this->database->select.
-  const BASE_TABLE = 'comment';
-
-  // The base alias passed to $this->database->select.
-  const BASE_ALIAS = 'c';
-
   // The fake Migration configuration entity.
   protected $migrationConfiguration = array(
     // The id of the entity, can be any string.
@@ -103,7 +97,7 @@ class D6CommentSourceTest extends MigrateSqlSourceTestCase {
       $this->databaseContents['node'][$k]['nid'] = $row['nid'];
       $this->databaseContents['node'][$k]['type'] = $row['type'];
       unset($row['type']);
-      $this->databaseContents['comment'][$k] = $row;
+      $this->databaseContents['comments'][$k] = $row;
     }
     parent::setUp();
   }

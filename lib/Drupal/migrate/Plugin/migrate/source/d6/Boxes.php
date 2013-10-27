@@ -21,7 +21,7 @@ class Boxes extends SqlBase {
    */
   function query() {
     $query = $this->database
-      ->select('bid', 'b')
+      ->select('boxes', 'b')
       ->fields('b', array('bid', 'body', 'info', 'format'));
     $query->orderBy('bid');
 
