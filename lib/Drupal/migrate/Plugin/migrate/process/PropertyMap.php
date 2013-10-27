@@ -124,21 +124,6 @@ class PropertyMap extends PluginBase implements ProcessInterface {
     if (!isset($configuration['default']) && empty($configuration['source'])) {
       throw new \Exception('Property mappings must have a source property or a default.');
     }
-    $defined_properties = array_keys(get_class_vars(__CLASS__));
-    $this->issueGroup = $this->t('Done');
-    foreach ($defined_properties as $key) {
-      if ($key != 'configuration' && isset($configuration[$key])) {
-        $this->$key = $configuration[$key];
-        unset($configuration[$key]);
-      }
-    }
-    $this->configuration = $configuration;
-    if (count(self::$priorities) == 0) {
-      self::$priorities[self::ISSUE_PRIORITY_OK] = $this->t('OK');
-      self::$priorities[self::ISSUE_PRIORITY_LOW] = $this->t('Low');
-      self::$priorities[self::ISSUE_PRIORITY_MEDIUM] = $this->t('Medium');
-      self::$priorities[self::ISSUE_PRIORITY_BLOCKER] = $this->t('Blocker');
-    }
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 
@@ -151,41 +136,43 @@ class PropertyMap extends PluginBase implements ProcessInterface {
 
     // If there's a source mapping, and a source value in the data row, copy
     // to the destination
-    if ($this->source && $row->hasSourceProperty($this->source)) {
-      $destination_values = $row->getSourceProperty($this->source);
+    if (!empty($this->configuration['source']) && $row->hasSourceProperty($this->configuration['source'])) {
+      $destination_values = $row->getSourceProperty($this->configuration['source']);
     }
     // Otherwise, apply the default value (if any)
-    elseif (isset($this->default)) {
-      $destination_values = $this->default;
+    elseif (isset($this->configuration['default'])) {
+      $destination_values = $this->configuration['default'];
     }
 
     // If there's a separator specified for this destination, then it
     // will be populated as an array exploded from the source value
-    if ($this->separator && isset($destination_values)) {
-      $destination_values = explode($this->separator, $destination_values);
+    if (!empty($this->configuration['separator']) && isset($destination_values)) {
+      $destination_values = explode($this->configuration['separator'], $destination_values);
     }
 
     // If a source migration is supplied, use the current value for this property
     // to look up a destination ID from the provided migration
-    if ($this->source_migration && isset($destination_values)) {
-      $destination_values = $migrate_executable->handleSourceMigration($this->source_migration, $destination_values, $this->default, $this);
+    if (!empty($this->configuration['source_migration']) && isset($destination_values)) {
+      $destination_values = $migrate_executable->handleSourceMigration($this->configuration['source_migration'], $destination_values, $this->configuration['default'], $this);
     }
 
     // Call any designated callbacks
-    foreach ($this->callbacks as $callback) {
-      if (isset($destination_values) && is_callable($callback)) {
-        $destination_values = call_user_func($callback, $destination_values);
+    if (!empty($this->configuration['callbacks'])) {
+      foreach ($this->callbacks as $callback) {
+        if (isset($destination_values) && is_callable($callback)) {
+          $destination_values = call_user_func($callback, $destination_values);
+        }
       }
     }
 
     // If specified, assure a unique value for this property.
-    if ($this->dedupe && isset($destination_values)) {
-      $destination_values = $migrate_executable->handleDedupe($this->dedupe, $destination_values);
+    if (!empty($this->configuration['dedupe'])&& isset($destination_values)) {
+      $destination_values = $migrate_executable->handleDedupe($this->configuration['dedupe'], $destination_values);
     }
 
     // Store the destination together with possible configuration.
     if (isset($destination_values)) {
-      $keys = explode(':', $this->destination);
+      $keys = explode(':', $this->configuration['destination']);
       $row->setDestinationPropertyDeep(array_merge($keys, array('values')), $destination_values);
       $row->setDestinationPropertyDeep(array_merge($keys, array('configuration')), $this->configuration);
     }

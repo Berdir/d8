@@ -52,9 +52,6 @@ class PropertyMapTest extends MigrateTestCase {
     $this->migrateExecutable = $this->getMockBuilder('Drupal\migrate\MigrateExecutable')
       ->disableOriginalConstructor()
       ->getMock();
-    $container = new ContainerBuilder;
-    $container->register('string_translation', $this->getMock('Drupal\Core\StringTranslation\TranslationInterface'));
-    \Drupal::setContainer($container);
     $this->row = new Row($this->sourceIds, $this->values);
   }
 
@@ -71,7 +68,7 @@ class PropertyMapTest extends MigrateTestCase {
     $map->apply($this->row, $this->migrateExecutable);
     $destination = $this->row->getDestination();
     $this->assertSame($destination['testcolumn']['values'], 'test');
-    $this->assertSame($destination['testcolumn']['configuration'], array('foo' => 'bar'));
+    $this->assertSame($destination['testcolumn']['configuration']['foo'], 'bar');
   }
 
 }
