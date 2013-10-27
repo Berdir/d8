@@ -13,7 +13,9 @@ use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\Plugin\migrate\source\SqlBase;
 
 /**
- * Drupal 6 taxonomy terms source.
+ * Drupal 6 taxonomy terms source from database.
+ *
+ * @todo Support term_relation, term_synonym table if possible.
  *
  * @PluginId("drupal6_term")
  */
@@ -62,15 +64,17 @@ class Term extends SqlBase {
   }
 
   /**
-   * Derived classes must implement fields(), returning a list of available
-   * source fields.
-   *
-   * @return array
-   *   Keys: machine names of the fields (to be passed to addFieldMapping)
-   *   Values: Human-friendly descriptions of the fields.
+   * {@inheritdoc}
    */
   public function fields() {
-    // TODO: Implement fields() method.
+    return array(
+      'tid' => t('The term ID.'),
+      'vid' => t('Existing term VID'),
+      'name' => t('The name of the term.'),
+      'description' => t('The term description.'),
+      'weight' => t('Weight'),
+      'parent' => t("The Drupal term ID of the term's parent."),
+    );
   }
 
 }
