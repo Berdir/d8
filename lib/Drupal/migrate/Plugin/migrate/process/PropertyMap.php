@@ -77,14 +77,34 @@ class PropertyMap extends PluginBase implements MigrateProcessInterface {
    */
   protected $dedupe;
 
+  /**
+   * Optional notes about a mapping.
+   *
+   * @var string
+   */
   protected $description = '';
 
   protected $issueGroup;
 
+  /**
+   * An optional issue ID corresponding to a mapping.
+   *
+   * @var string
+   */
   protected $issueNumber;
 
+  /**
+   * An optional priority corresponding to a mapping.
+   *
+   * @var string
+   */
   protected $issuePriority = self::ISSUE_PRIORITY_OK;
 
+  /**
+   * Priority levels that are available for mappings.
+   *
+   * @var string
+   */
   const ISSUE_PRIORITY_OK = 1;
   const ISSUE_PRIORITY_LOW = 2;
   const ISSUE_PRIORITY_MEDIUM = 3;
