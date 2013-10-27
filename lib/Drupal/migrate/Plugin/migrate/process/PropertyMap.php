@@ -7,6 +7,7 @@
 
 namespace Drupal\migrate\Plugin\migrate\process;
 use Drupal\Core\Plugin\PluginBase;
+use Drupal\migrate\MigrateException;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate\Plugin\ProcessInterface;
 use Drupal\migrate\Row;
@@ -119,10 +120,10 @@ class PropertyMap extends PluginBase implements ProcessInterface {
   public function __construct(array $configuration, $plugin_id, array $plugin_definition) {
     // Must have one or the other
     if (empty($configuration['destination'])) {
-      throw new \Exception('Property mappings must have a destination property.');
+      throw new MigrateException('Property mappings must have a destination property.');
     }
     if (!isset($configuration['default']) && empty($configuration['source'])) {
-      throw new \Exception('Property mappings must have a source property or a default.');
+      throw new MigrateException('Property mappings must have a source property or a default.');
     }
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }

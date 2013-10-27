@@ -71,4 +71,16 @@ class PropertyMapTest extends MigrateTestCase {
     $this->assertSame($destination['testcolumn']['configuration']['foo'], 'bar');
   }
 
+  /**
+   * @expectedException \Drupal\migrate\MigrateException
+   */
+  public function testNoSourceNoDefaultProvided() {
+    $configuration = array(
+      'destination' => 'testcolumn',
+      'foo' => 'bar',
+    );
+    $map = new PropertyMap($configuration, 'property_map', array());
+    $map->apply($this->row, $this->migrateExecutable);
+  }
+
 }
