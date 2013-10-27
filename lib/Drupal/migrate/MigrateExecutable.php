@@ -1119,7 +1119,7 @@ class MigrateExecutable {
    * @param int $level
    *  Optional message severity (defaults to MESSAGE_ERROR).
    */
-  public function saveMessage($message, $level = MigrationBase::MESSAGE_ERROR) {
+  public function saveMessage($message, $level = MigrationInterface::MESSAGE_ERROR) {
     $this->map->saveMessage($this->currentSourceKey(), $message, $level);
   }
 
@@ -1131,7 +1131,7 @@ class MigrateExecutable {
    * @param int $level
    *  Optional message severity (defaults to MESSAGE_ERROR).
    */
-  public function queueMessage($message, $level = MigrationBase::MESSAGE_ERROR) {
+  public function queueMessage($message, $level = MigrationInterface::MESSAGE_ERROR) {
     $this->queuedMessages[] = array('message' => $message, 'level' => $level);
   }
 

@@ -7,9 +7,7 @@
 
 namespace Drupal\migrate\Tests;
 
-use Drupal\Tests\UnitTestCase;
-
-abstract class MigrateSqlSourceTestCase extends UnitTestCase {
+abstract class MigrateSqlSourceTestCase extends MigrateTestCase {
 
   /**
    * The tested source plugin.
@@ -18,8 +16,6 @@ abstract class MigrateSqlSourceTestCase extends UnitTestCase {
    */
   protected $source;
 
-  protected $migrationConfiguration = array();
-
   protected $databaseContents = array();
 
   protected $results = array();
@@ -27,13 +23,6 @@ abstract class MigrateSqlSourceTestCase extends UnitTestCase {
   const PLUGIN_CLASS = '';
 
   const ORIGINAL_HIGHWATER = '';
-
-  /**
-   * @TODO: does this need to be derived from the source/destination plugin?
-   *
-   * @var bool
-   */
-  protected $mapJoinable = TRUE;
 
   protected function setUp() {
     $database_contents = $this->databaseContents + array('test_map' => array());
@@ -47,25 +36,6 @@ abstract class MigrateSqlSourceTestCase extends UnitTestCase {
       ->method('schema')
       ->will($this->returnCallback(function () use ($database, $database_contents) { return new FakeDatabaseSchema($database, $database_contents);}));
 
-    $idmap = $this->getMock('Drupal\migrate\Plugin\MigrateIdMapInterface');
-    if ($this->mapJoinable) {
-      $idmap->expects($this->once())
-        ->method('getQualifiedMapTable')
-        ->will($this->returnValue('test_map'));
-    }
-
-    $migration = $this->getMock('Drupal\migrate\Entity\MigrationInterface');
-    $migration->expects($this->any())
-      ->method('getIdMap')
-      ->will($this->returnValue($idmap));
-    $configuration = $this->migrationConfiguration;
-    $migration->expects($this->any())
-      ->method('get')
-      ->will($this->returnCallback(function ($argument) use ($configuration) { return isset($configuration[$argument]) ? $configuration[$argument] : ''; }));
-    $migration->expects($this->any())
-      ->method('id')
-      ->will($this->returnValue($this->migrationConfiguration['id']));
-
     $key_value = $this->getMock('Drupal\Core\KeyValueStore\KeyValueStoreInterface');
     $key_value->expects($this->once())
       ->method('get')
@@ -74,6 +44,8 @@ abstract class MigrateSqlSourceTestCase extends UnitTestCase {
 
     $plugin_definition = array();
     $cache = $this->getMock('Drupal\Core\Cache\CacheBackendInterface');
+
+    $migration = $this->getMigration();
 
     $plugin_class = static::PLUGIN_CLASS;
     $this->source = new $plugin_class($this->migrationConfiguration['source'], $this->migrationConfiguration['source']['plugin'], $plugin_definition, $migration, $cache, $key_value);

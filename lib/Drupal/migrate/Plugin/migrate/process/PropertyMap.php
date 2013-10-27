@@ -8,7 +8,7 @@
 namespace Drupal\migrate\Plugin\migrate\process;
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\migrate\MigrateExecutable;
-use Drupal\migrate\Plugin\MigrateProcessInterface;
+use Drupal\migrate\Plugin\ProcessInterface;
 use Drupal\migrate\Row;
 
 /**
@@ -16,7 +16,7 @@ use Drupal\migrate\Row;
  *
  * @PluginId("property_map")
  */
-class PropertyMap extends PluginBase implements MigrateProcessInterface {
+class PropertyMap extends PluginBase implements ProcessInterface {
 
   /**
    * Destination field name for the mapping. If empty, the mapping is just a
@@ -125,7 +125,7 @@ class PropertyMap extends PluginBase implements MigrateProcessInterface {
       throw new \Exception('Property mappings must have a source property or a default.');
     }
     $defined_properties = array_keys(get_class_vars(__CLASS__));
-    $this->issueGroup = t('Done');
+    $this->issueGroup = $this->t('Done');
     foreach ($defined_properties as $key) {
       if ($key != 'configuration' && isset($configuration[$key])) {
         $this->$key = $configuration[$key];
@@ -134,10 +134,10 @@ class PropertyMap extends PluginBase implements MigrateProcessInterface {
     }
     $this->configuration = $configuration;
     if (count(self::$priorities) == 0) {
-      self::$priorities[self::ISSUE_PRIORITY_OK] = t('OK');
-      self::$priorities[self::ISSUE_PRIORITY_LOW] = t('Low');
-      self::$priorities[self::ISSUE_PRIORITY_MEDIUM] = t('Medium');
-      self::$priorities[self::ISSUE_PRIORITY_BLOCKER] = t('Blocker');
+      self::$priorities[self::ISSUE_PRIORITY_OK] = $this->t('OK');
+      self::$priorities[self::ISSUE_PRIORITY_LOW] = $this->t('Low');
+      self::$priorities[self::ISSUE_PRIORITY_MEDIUM] = $this->t('Medium');
+      self::$priorities[self::ISSUE_PRIORITY_BLOCKER] = $this->t('Blocker');
     }
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }

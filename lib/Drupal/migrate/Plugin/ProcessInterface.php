@@ -13,7 +13,7 @@ use Drupal\migrate\Row;
 /**
  * An interface for migrate processes.
  */
-interface MigrateProcessInterface {
+interface ProcessInterface {
 
   /**
    * Performs the associated process.
