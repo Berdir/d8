@@ -56,6 +56,7 @@ class D6VocabularySourceTest extends MigrateSqlSourceTestCase {
       'tags' => 1,
       'module' => 'taxonomy',
       'weight' => 0,
+      'node_types' => array('page', 'article'),
     ),
     array(
       'vid' => 2,
@@ -69,9 +70,13 @@ class D6VocabularySourceTest extends MigrateSqlSourceTestCase {
       'tags' => 0,
       'module' => 'taxonomy',
       'weight' => 0,
+      'node_types' => array('article'),
     ),
   );
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'D6 vocabulary source functionality',
@@ -80,7 +85,19 @@ class D6VocabularySourceTest extends MigrateSqlSourceTestCase {
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
+    foreach ($this->results as $row) {
+      foreach ($row['node_types'] as $type) {
+        $this->databaseContents['vocabulary_node_types'][] = array(
+          'type' => $type,
+          'vid' => $row['vid'],
+        );
+      }
+      unset($row['node_types']);
+    }
     $this->databaseContents['vocabulary'] = $this->results;
     parent::setUp();
   }
