@@ -11,25 +11,25 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\migrate\Entity\Migration;
 use Drupal\migrate\Row;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Config\Config as ConfigObject;
 
 /**
  * Persist data to the config system.
  *
- * @PluginId("config")
+ * @PluginId("d8_config")
  */
 class Config extends DestinationBase implements ContainerFactoryPluginInterface {
 
   /**
-   * The config name to use when saving.
+   * The config object.
    *
-   * @var string
+   * @var \Drupal\Core\Config\Config
    */
-  protected $configName;
+  protected $config;
 
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition, ConfigFactory $config_factory) {
+  public function __construct(array $configuration, $plugin_id, array $plugin_definition, ConfigObject $config) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->configName = $configuration['config_name'];
-    $this->configFactory = $config_factory;
+    $this->config = $config;
   }
 
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, array $plugin_definition) {
@@ -37,7 +37,7 @@ class Config extends DestinationBase implements ContainerFactoryPluginInterface 
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('config.factory')
+      $container->get('config.factory')->get($configuration['config_name'])
     );
   }
 
@@ -45,7 +45,7 @@ class Config extends DestinationBase implements ContainerFactoryPluginInterface 
    * {@inheritdoc}
    */
   function import(Row $row) {
-    $this->configFactory->get($this->configName)
+    $this->config
       ->setData($row->getDestination())
       ->save();
   }
@@ -59,6 +59,6 @@ class Config extends DestinationBase implements ContainerFactoryPluginInterface 
   }
 
   public function getIdsSchema() {
-    return array($this->configName => array());
+    return array($this->config->getName() => array());
   }
 }
