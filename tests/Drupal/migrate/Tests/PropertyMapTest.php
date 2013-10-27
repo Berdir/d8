@@ -63,15 +63,15 @@ class PropertyMapTest extends MigrateTestCase {
    */
   public function testNoSourceDefaultProvided() {
     $configuration = array(
-      'destination' => 'test',
+      'destination' => 'testcolumn',
       'default' => 'test',
       'foo' => 'bar',
     );
     $map = new PropertyMap($configuration, 'property_map', array());
     $map->apply($this->row, $this->migrateExecutable);
     $destination = $this->row->getDestination();
-    $this->assertSame($destination['test']['values'], 'test');
-    $this->assertSame($destination['test']['configuration'], array('foo' => 'bar'));
+    $this->assertSame($destination['testcolumn']['values'], 'test');
+    $this->assertSame($destination['testcolumn']['configuration'], array('foo' => 'bar'));
   }
 
 }
