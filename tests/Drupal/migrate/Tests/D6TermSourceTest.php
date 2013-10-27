@@ -22,7 +22,6 @@ class D6TermSourceTest extends MigrateSqlSourceTestCase {
     'idlist' => array(),
     'source' => array(
       'plugin' => 'drupal6_term',
-      'vocabulary' => '5,6',
     ),
     'sourceIds' => array(
       'tid' => array(
