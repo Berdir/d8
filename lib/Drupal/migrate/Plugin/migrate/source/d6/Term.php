@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Plugin\migrate\source\d6\Taxonomy.
+ * Contains \Drupal\migrate\Plugin\migrate\source\d6\Term.
  */
 
 namespace Drupal\migrate\Plugin\migrate\source\d6;
@@ -13,11 +13,11 @@ use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\Plugin\migrate\source\SqlBase;
 
 /**
- * Drupal 6 taxonomy source.
+ * Drupal 6 taxonomy terms source.
  *
- * @PluginId("drupal6_taxonomy")
+ * @PluginId("drupal6_term")
  */
-class Taxonomy extends SqlBase {
+class Term extends SqlBase {
 
   /**
    * The vocabulary ID.

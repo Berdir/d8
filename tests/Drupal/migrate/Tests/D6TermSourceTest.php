@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Tests\D6TaxonomySourceTest.
+ * Contains \Drupal\migrate\Tests\D6TermSourceTest.
  */
 
 namespace Drupal\migrate\Tests;
@@ -12,16 +12,16 @@ namespace Drupal\migrate\Tests;
  *
  * @group migrate
  */
-class D6TaxonomySourceTest extends MigrateSqlSourceTestCase {
+class D6TermSourceTest extends MigrateSqlSourceTestCase {
 
-  const PLUGIN_CLASS = 'Drupal\migrate\Plugin\migrate\source\d6\Taxonomy';
+  const PLUGIN_CLASS = 'Drupal\migrate\Plugin\migrate\source\d6\Term';
 
   protected $migrationConfiguration = array(
     'id' => 'test',
     'highwaterProperty' => array('field' => 'test'),
     'idlist' => array(),
     'source' => array(
-      'plugin' => 'drupal6_taxonomy',
+      'plugin' => 'drupal6_term',
       'vocabulary' => '5,6',
     ),
     'sourceIds' => array(
