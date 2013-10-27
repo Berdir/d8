@@ -152,7 +152,7 @@ class FakeSelect extends Select {
           foreach ($this->databaseContents[$table_info['table']] as $candidate_row) {
             if ($row[$table_info['original_table_alias']][$table_info['original_field']] == $candidate_row[$table_info['added_field']]) {
               $joined = TRUE;
-              $new_rows[] = array($table_alias => array_intersect_key($candidate_row, $fields[$table_alias])) + $row;
+              $new_rows[] = $this->getNewRow($table_alias, $fields, $candidate_row, $row);
             }
           }
           if (!$joined && $table_info['join type'] == 'LEFT') {
@@ -163,11 +163,19 @@ class FakeSelect extends Select {
       }
       else {
         foreach ($this->databaseContents[$table_info['table']] as $candidate_row) {
-          $results[] = array($table_alias => array_intersect_key($candidate_row, $fields[$table_alias]));
+          $results[] = $this->getNewRow($table_alias, $fields, $candidate_row);
         }
       }
     }
     return $results;
+  }
+
+  protected function getNewRow($table_alias, $fields, $candidate_row, $row = array()) {
+    $new_row = array();
+    foreach ($fields[$table_alias] as $field => $v) {
+      $new_row[$table_alias][$field] = $candidate_row[$field];
+    }
+    return $new_row + $row;
   }
 
   /**

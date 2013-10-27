@@ -38,8 +38,8 @@ class FakeStatement extends \ArrayIterator implements StatementInterface {
 
   public function fetchCol($index = 0) {
     $return = array();
-    for ($this->rewind(); $this->valid(); $this->next()) {
-      $row = array_values($this->current());
+    foreach ($this as $row) {
+      $row = array_values($row);
       $return[] = $row[$index];
     }
     return $return;
@@ -47,8 +47,8 @@ class FakeStatement extends \ArrayIterator implements StatementInterface {
 
   public function fetchAllKeyed($key_index = 0, $value_index = 1) {
     $return = array();
-    for ($this->rewind(); $this->valid(); $this->next()) {
-      $row = array_values($this->current());
+    foreach ($this as $row) {
+      $row = array_values($row);
       $return[$row[$key_index]] = $row[$value_index];
     }
     return $return;
@@ -56,8 +56,7 @@ class FakeStatement extends \ArrayIterator implements StatementInterface {
 
   public function fetchAllAssoc($key, $fetch = NULL) {
     $return = array();
-    for ($this->rewind(); $this->valid(); $this->next()) {
-      $row = array_values($this->current());
+    foreach ($this as $row) {
       $return[$row[$key]] = $row;
     }
     return $return;

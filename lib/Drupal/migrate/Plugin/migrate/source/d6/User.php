@@ -22,7 +22,7 @@ class User extends SqlBase {
   function query() {
     $query = $this->database
       ->select('users', 'u')
-      ->fields('u', array('uid', 'name', 'pass', 'mail', 'mode', 'sort', 'threshold', 'theme', 'signature', 'signature_format', 'created', 'access', 'login', 'status', 'timezone', 'language', 'picture', 'init', 'data', 'timezone_name'))
+      ->fields('u', array('uid', 'name', 'pass', 'mail', 'mode', 'sort', 'threshold', 'theme', 'signature', 'signature_format', 'created', 'access', 'login', 'status', 'timezone', 'language', 'picture', 'init', 'data', 'timezone'))
       ->condition('uid', 0, '>');
     return $query;
   }

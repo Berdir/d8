@@ -33,7 +33,6 @@ class Vocabulary extends SqlBase {
         'required',
         'tags',
         'module',
-        'modified',
         'weight',
       ));
     return $query;
