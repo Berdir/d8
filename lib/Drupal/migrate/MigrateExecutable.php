@@ -8,7 +8,7 @@
 namespace Drupal\migrate;
 
 use Drupal\migrate\Entity\MigrationInterface;
-use Drupal\migrate\Plugin\MigrateMapInterface;
+use Drupal\migrate\Plugin\MigrateIdMapInterface;
 
 /**
  * @property mixed processed_since_feedback
@@ -444,7 +444,7 @@ class MigrateExecutable {
         }
         else {
           $this->migration->getIdMap()->saveIDMapping($row->getSource(), array(),
-            MigrateMapInterface::STATUS_FAILED, $this->rollbackAction,
+            MigrateIdMapInterface::STATUS_FAILED, $this->rollbackAction,
             $row->getHash());
           if ($this->migration->getIdMap()->messageCount() == 0) {
             $message = t('New object was not saved, no error provided');
@@ -473,7 +473,7 @@ class MigrateExecutable {
 
       // Reset row properties.
       unset($sourceValues, $destinationValues);
-      $this->needsUpdate = MigrateMapInterface::STATUS_IMPORTED;
+      $this->needsUpdate = MigrateIdMapInterface::STATUS_IMPORTED;
 
       // TODO: Temporary. Remove when http://drupal.org/node/375494 is committed.
       // TODO: Should be done in MigrateDestinationEntity
@@ -1155,4 +1155,32 @@ class MigrateExecutable {
     $this->map->setUpdate($source_key);
   }
 
+  /**
+   * Test whether we've exceeded the designated time limit.
+   *
+   * @return boolean
+   *  TRUE if the threshold is exceeded, FALSE if not.
+   */
+  protected function timeOptionExceeded() {
+    if (!$timelimit = $this->getTimeLimit()) {
+      return FALSE;
+    }
+    $time_elapsed = time() - REQUEST_TIME;
+    if ($time_elapsed >= $timelimit) {
+      return TRUE;
+    }
+    else {
+      return FALSE;
+    }
+  }
+
+  public function getTimeLimit() {
+    if (isset($this->options['limit']) &&
+        ($this->options['limit']['unit'] == 'seconds' || $this->options['limit']['unit'] == 'second')) {
+      return $this->options['limit']['value'];
+    }
+    else {
+      return NULL;
+    }
+  }
 }
