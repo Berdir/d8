@@ -13,10 +13,16 @@ use Drupal\migrate\Plugin\MigrateDestinationInterface;
 
 abstract class DestinationBase extends PluginBase implements MigrateDestinationInterface {
 
+  /**
+   * Modify the Row before it is imported.
+   */
   public function preImport() {
     // TODO: Implement preImport() method.
   }
 
+  /**
+   * Modify the Row before it is rolled back.
+   */
   public function preRollback() {
     // TODO: Implement preRollback() method.
   }

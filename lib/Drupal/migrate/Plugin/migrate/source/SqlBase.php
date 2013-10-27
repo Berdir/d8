@@ -15,6 +15,9 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
 
+/**
+ * Sources whose data may be fetched via DBTNG.
+ */
 abstract class SqlBase extends SourceBase implements ContainerFactoryPluginInterface {
 
   /**
