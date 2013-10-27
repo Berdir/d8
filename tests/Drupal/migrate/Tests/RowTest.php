@@ -26,6 +26,8 @@ class RowTest extends UnitTestCase {
     'title' => 'node 1',
   );
   protected $test_hash = '85795d4cde4a2425868b812cc88052ecd14fc912e7b9b4de45780f66750e8b1e';
+  // after changing title value to 'new title'
+  protected $test_hash_mod = '9476aab0b62b3f47342cc6530441432e5612dcba7ca84115bbab5cceaca1ecb3';
 
   public static function getInfo() {
     return array(
@@ -63,6 +65,26 @@ class RowTest extends UnitTestCase {
   }
 
   /**
+   * Tests source inmutability after freeze.
+   */
+  public function testSourceFreeze() {
+    $row = new Row($this->test_source_ids, $this->test_values);
+    $row->rehash();
+    $this->assertSame($this->test_hash, $row->getHash(), 'Correct hash.');
+    $row->setSourceProperty('title', 'new title');
+    $row->rehash();
+    $this->assertSame($this->test_hash_mod, $row->getHash(), 'Hash changed correctly.');
+    $row->freezeSource();
+    try {
+      $row->setSourceProperty('title', 'new title');
+      $this->fail('Row source changed after freeze.');
+    }
+    catch (\Exception $exception) {
+      // Exception thrown correctly.
+    }
+  }
+
+  /**
    * Tests hashing.
    */
   public function testHashing() {
@@ -80,6 +102,9 @@ class RowTest extends UnitTestCase {
     $row->setIdMap($test_id_map);
     $row->rehash();
     $this->assertSame($this->test_hash, $row->getHash(), 'Correct hash even if id_mpa have changed.');
+    $row->setSourceProperty('title', 'new title');
+    $row->rehash();
+    $this->assertSame($this->test_hash_mod, $row->getHash(), 'Hash changed correctly.');
   }
 
 }
