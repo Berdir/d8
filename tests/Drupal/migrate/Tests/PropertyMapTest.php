@@ -80,7 +80,7 @@ class PropertyMapTest extends MigrateTestCase {
     $map->apply($this->row, $this->migrateExecutable);
   }
 
-  public function testNoSourceSubpropertyDefaultProvided() {
+  public function testNoSourceDefaultProvidedDestinationSubproperty() {
     $configuration = array(
       'destination' => 'testproperty:testsubproperty',
       'default' => 'test',
@@ -93,5 +93,30 @@ class PropertyMapTest extends MigrateTestCase {
     $this->assertSame($destination['testproperty']['testsubproperty']['configuration']['foo'], 'bar');
   }
 
-  
+  public function testSource() {
+    $configuration = array(
+      'source' => 'nid',
+      'destination' => 'testproperty',
+      'foo' => 'bar',
+    );
+    $map = new PropertyMap($configuration, 'property_map', array());
+    $map->apply($this->row, $this->migrateExecutable);
+    $destination = $this->row->getDestination();
+    $this->assertSame($destination['testproperty']['values'], 1);
+    $this->assertSame($destination['testproperty']['configuration']['foo'], 'bar');
+  }
+
+  public function testSourceMigration() {
+    $configuration = array(
+      'source' => 'nid',
+      'destination' => 'testproperty',
+      'foo' => 'bar',
+    );
+    $map = new PropertyMap($configuration, 'property_map', array());
+    $map->apply($this->row, $this->migrateExecutable);
+    $destination = $this->row->getDestination();
+    $this->assertSame($destination['testproperty']['values'], 1);
+    $this->assertSame($destination['testproperty']['configuration']['foo'], 'bar');
+  }
+
 }
