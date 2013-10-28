@@ -428,7 +428,7 @@ class MigrateExecutable {
       $row = $source->current();
 
       // Wipe old messages, and save any new messages.
-      $this->migration->getIdMap()->delete($this->currentSourceKey(), TRUE);
+      $this->migration->getIdMap()->delete($this->currentSourceIds(), TRUE);
       $this->saveQueuedMessages();
 
       $this->processRow($row);
@@ -633,8 +633,8 @@ class MigrateExecutable {
    *
    * @return array
    */
-  protected function currentSourceKey() {
-    return $this->getSource()->getCurrentKey();
+  protected function currentSourceIds() {
+    return $this->getSource()->getCurrentIds();
   }
 
   /**
@@ -994,7 +994,7 @@ class MigrateExecutable {
         foreach ($source_migrations as $source_migration) {
           // Is this a self reference?
           if ($source_migration->machineName == $this->machineName) {
-            if (!array_diff($source_key, $this->currentSourceKey())) {
+            if (!array_diff($source_key, $this->currentSourceIds())) {
               $destids = array();
               $this->needsUpdate = MigrateMap::STATUS_NEEDS_UPDATE;
               break;
@@ -1120,7 +1120,7 @@ class MigrateExecutable {
    *  Optional message severity (defaults to MESSAGE_ERROR).
    */
   public function saveMessage($message, $level = MigrationInterface::MESSAGE_ERROR) {
-    $this->map->saveMessage($this->currentSourceKey(), $message, $level);
+    $this->map->saveMessage($this->currentSourceIds(), $message, $level);
   }
 
   /**
@@ -1150,7 +1150,7 @@ class MigrateExecutable {
    */
   public function setUpdate(array $source_key = NULL) {
     if (!$source_key) {
-      $source_key = $this->currentSourceKey();
+      $source_key = $this->currentSourceIds();
     }
     $this->map->setUpdate($source_key);
   }

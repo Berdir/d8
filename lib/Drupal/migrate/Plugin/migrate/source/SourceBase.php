@@ -36,7 +36,7 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
    *
    * @var array
    */
-  protected $currentKey;
+  protected $currentIds;
 
   /**
    * Number of rows intentionally ignored (prepareRow() returned FALSE)
@@ -108,7 +108,7 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
   /**
    * @var array
    */
-  protected $sourceKey;
+  protected $sourceIds;
 
   /**
    * @var \Drupal\Core\Cache\CacheBackendInterface
@@ -125,8 +125,8 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
    */
   protected $highwaterProperty;
 
-  public function getCurrentKey() {
-    return $this->currentKey;
+  public function getCurrentIds() {
+    return $this->currentIds;
   }
 
   public function getIgnored() {
@@ -242,10 +242,10 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
   /**
    * Implementation of Iterator::key - called when entering a loop iteration, returning
    * the key of the current row. It must be a scalar - we will serialize
-   * to fulfill the requirement, but using getCurrentKey() is preferable.
+   * to fulfill the requirement, but using getCurrentIds() is preferable.
    */
   public function key() {
-    return serialize($this->currentKey);
+    return serialize($this->currentIds);
   }
 
   /**
@@ -282,17 +282,17 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
    * implement getNextRow() to retrieve the next valid source rocord to process.
    */
   public function next() {
-    $this->currentKey = NULL;
+    $this->currentIds = NULL;
     $this->currentRow = NULL;
 
     while ($row_data = $this->getNextRow()) {
       $row = new Row($this->migration->get('sourceIds'), $row_data);
 
       // Populate the source key for this row
-      $this->currentKey = $row->getSourceIdValues();
+      $this->currentIds = $row->getSourceIdValues();
 
       // Pick up the existing map row, if any, unless getNextRow() did it.
-      if (!$this->mapRowAdded && ($id_map = $this->idMap->getRowBySource($this->currentKey))) {
+      if (!$this->mapRowAdded && ($id_map = $this->idMap->getRowBySource($this->currentIds))) {
         $row->setIdMap($id_map);
       }
 
@@ -302,7 +302,7 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
       //    highwaters and map rows).
       $prepared = FALSE;
       if (!empty($this->idList)) {
-        if (in_array(reset($this->currentKey), $this->idList)) {
+        if (in_array(reset($this->currentIds), $this->idList)) {
           // In the list, fall through.
         }
         else {
@@ -387,7 +387,7 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
       $this->currentRow->freezeSource();
     }
     else {
-      $this->currentKey = NULL;
+      $this->currentIds = NULL;
     }
   }
 
@@ -403,13 +403,13 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
     if ($keep === FALSE) {
       // Make sure we replace any previous messages for this item with any
       // new ones.
-      $this->migration->getIdMap()->delete($this->currentKey, TRUE);
+      $this->migration->getIdMap()->delete($this->currentIds, TRUE);
       $this->migration->saveQueuedMessages();
       $this->migration->getIdMap()->saveIDMapping($row, array(),
         \MigrateMap::STATUS_IGNORED, $this->migration->rollbackAction);
       $this->numIgnored++;
       $this->currentRow = NULL;
-      $this->currentKey = NULL;
+      $this->currentIds = NULL;
     }
     else {
       // When tracking changed data, We want to quietly skip (rather than

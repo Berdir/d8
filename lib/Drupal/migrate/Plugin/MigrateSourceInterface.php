@@ -18,7 +18,7 @@ interface MigrateSourceInterface extends \Iterator, \Countable {
    * @return array
    *   An array representing the primary key of current row.
    */
-  public function getCurrentKey();
+  public function getCurrentIds();
 
   /**
    * Returns available fields on the source.
