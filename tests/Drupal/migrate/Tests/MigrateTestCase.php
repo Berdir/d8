@@ -41,4 +41,16 @@ abstract class MigrateTestCase extends UnitTestCase {
       ->will($this->returnValue($configuration['id']));
     return $migration;
   }
+
+  /**
+   * Provide meta information about this battery of tests.
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Migrate test',
+      'description' => 'Tests for migrate plugin.',
+      'group' => 'Migrate',
+    );
+  }
+
 }

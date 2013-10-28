@@ -141,4 +141,15 @@ class FakeDatabaseSchema extends Schema {
     throw new \Exception(sprintf('Unsupported method "%s"', __METHOD__));
   }
 
+  /**
+   * Provide meta information about this battery of tests.
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Fake database schema',
+      'description' => 'Tests for fake database schema plugin.',
+      'group' => 'Migrate',
+    );
+  }
+
 }

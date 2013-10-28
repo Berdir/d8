@@ -393,4 +393,15 @@ class FakeSelect extends Select {
     throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
+  /**
+   * Provide meta information about this battery of tests.
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Fake select test',
+      'description' => 'Tests for fake select plugin.',
+      'group' => 'Migrate',
+    );
+  }
+
 }

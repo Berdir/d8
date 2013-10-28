@@ -61,4 +61,16 @@ class FakeStatement extends \ArrayIterator implements StatementInterface {
     }
     return $return;
   }
+
+  /**
+   * Provide meta information about this battery of tests.
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Fake statement test',
+      'description' => 'Tests for fake statement plugin.',
+      'group' => 'Migrate',
+    );
+  }
+
 }

@@ -86,4 +86,15 @@ abstract class MigrateSqlSourceTestCase extends MigrateTestCase {
     }
   }
 
+  /**
+   * Provide meta information about this battery of tests.
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'SQL source test',
+      'description' => 'Tests for SQL source plugin.',
+      'group' => 'Migrate',
+    );
+  }
+
 }

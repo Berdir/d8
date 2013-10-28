@@ -38,4 +38,16 @@ class ConfigDestinationTest extends UnitTestCase {
     $destination = new Config(array(), 'd8_config', array('pluginId' => 'd8_config'), $config);
     $destination->import($row);
   }
+
+  /**
+   * Provide meta information about this battery of tests.
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Destination test',
+      'description' => 'Tests for destination plugin.',
+      'group' => 'Migrate',
+    );
+  }
+
 }
