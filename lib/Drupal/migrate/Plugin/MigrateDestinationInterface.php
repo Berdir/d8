@@ -60,10 +60,4 @@ interface MigrateDestinationInterface extends PluginInspectionInterface {
    * @param array $destination_identifiers
    */
   public function rollbackMultiple(array $destination_identifiers);
-
-  // Statistics. Possible WTF - is this the place to do the tracking?
-  public function getCreated();
-  public function getUpdated();
-  public function resetStats();
-
 }

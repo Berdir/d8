@@ -28,9 +28,4 @@ interface MigrateSourceInterface extends \Iterator, \Countable {
    *   in field mappings, values are descriptions.
    */
   public function fields();
-
-  // Statistics. Possible WTF - should the migration class do all tracking?
-  public function getIgnored();
-  public function getProcessed();
-  public function resetStats();
 }
