@@ -172,7 +172,7 @@ class MigrateExecutable {
       if (($return = $this->checkStatus()) != MigrationInterface::RESULT_COMPLETED) {
         break;
       }
-      if ($this->itemOptionExceeded()) {
+      if ($this->timeOptionExceeded()) {
         break;
       }
       try {
@@ -186,7 +186,7 @@ class MigrateExecutable {
       }
     }
 
-    $this->progressMessage($return);
+    #$this->progressMessage($return);
 
     return $return;
   }
