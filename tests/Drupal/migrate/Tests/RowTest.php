@@ -38,34 +38,47 @@ class RowTest extends UnitTestCase {
   }
 
   /**
-   * Tests object creation.
+   * Tests object creation: empty.
    */
-  public function testConstructor() {
+  public function testRowWithoutData() {
     $row = new Row(array(), array());
     $this->assertSame(array(), $row->getSource(), 'Empty row');
+  }
 
+  /**
+   * Tests object creation: basic.
+   */
+  public function testRowWithBasicData() {
     $row = new Row($this->test_source_ids, $this->test_values);
     $this->assertSame($this->test_values, $row->getSource(), 'Row with data, simple id.');
+  }
 
+  /**
+   * Tests object creation: multiple source ids.
+   */
+  public function testRowWithMultipleSourceIds() {
     $multi_source_ids = $this->test_source_ids + array('vid' => 'Node revision');
     $multi_source_ids_values = $this->test_values + array('vid' => 1);
     $row = new Row($multi_source_ids, $multi_source_ids_values);
     $this->assertSame($multi_source_ids_values, $row->getSource(), 'Row with data, multifield id.');
+  }
 
+  /**
+   * Tests object creation: invalid values.
+   *
+   * @expectedException Exception
+   */
+  public function testRowWithInvalidData() {
     $invalid_values = array(
       'title' => 'node X',
     );
-    try {
-      $row = new Row($this->test_source_ids, $invalid_values);
-      $this->fail('Row with invalid data was created');
-    }
-    catch (\Exception $exception) {
-      // Exception thrown correctly.
-    }
+    $row = new Row($this->test_source_ids, $invalid_values);
   }
 
   /**
    * Tests source inmutability after freeze.
+   *
+   * @expectedException Exception
    */
   public function testSourceFreeze() {
     $row = new Row($this->test_source_ids, $this->test_values);
@@ -75,13 +88,7 @@ class RowTest extends UnitTestCase {
     $row->rehash();
     $this->assertSame($this->test_hash_mod, $row->getHash(), 'Hash changed correctly.');
     $row->freezeSource();
-    try {
-      $row->setSourceProperty('title', 'new title');
-      $this->fail('Row source changed after freeze.');
-    }
-    catch (\Exception $exception) {
-      // Exception thrown correctly.
-    }
+    $row->setSourceProperty('title', 'new title');
   }
 
   /**
