@@ -43,8 +43,6 @@ abstract class MigrateSqlSourceTestCase extends MigrateTestCase {
       ->method('schema')
       ->will($this->returnCallback(function () use ($database, $database_contents) { return new FakeDatabaseSchema($database, $database_contents);}));
 
-    $cache = $this->getMock('Drupal\Core\Cache\CacheBackendInterface');
-
     $migration = $this->getMigration();
     $migration->expects($this->any())
       ->method('getHighwater')
@@ -57,6 +55,8 @@ abstract class MigrateSqlSourceTestCase extends MigrateTestCase {
       ->method('getSource')
       ->will($this->returnValue($plugin));
     $this->source = new Source($migration);
+    
+    $cache = $this->getMock('Drupal\Core\Cache\CacheBackendInterface');
     $this->writeAttribute($this->source, 'cache', $cache);
   }
 
