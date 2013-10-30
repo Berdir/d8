@@ -44,20 +44,57 @@ class D6RoleSourceTest extends MigrateSqlSourceTestCase {
     ),
   );
 
-  // We need to set up the database contents; it's easier to do that below.
-
   protected $results = array(
     array(
       'rid' => 1,
       'name' => 'anonymous user',
+      'permissions' => array(
+        array(
+          'pid' => 1,
+          'rid' => 1,
+          'perm' => array(
+            'access content',
+          ),
+          'tid' => 0,
+        ),
+      ),
     ),
     array(
       'rid' => 2,
       'name' => 'authenticated user',
+      'permissions' => array(
+        array(
+          'pid' => 2,
+          'rid' => 2,
+          'perm' => array(
+            'access comments',
+            'access content',
+            'post comments',
+            'post comments without approval',
+          ),
+          'tid' => 0,
+        ),
+      ),
     ),
     array(
-      'rid' => 4,
-      'name' => 'example role 1',
+      'rid' => 3,
+      'name' => 'administrator',
+      'permissions' => array(
+        array(
+          'pid' => 3,
+          'rid' => 3,
+          'perm' => array(
+            'access comments',
+            'administer comments',
+            'post comments',
+            'post comments without approval',
+            'access content',
+            'administer content types',
+            'administer nodes',
+          ),
+          'tid' => 0,
+        ),
+      ),
     ),
   );
 
@@ -71,6 +108,12 @@ class D6RoleSourceTest extends MigrateSqlSourceTestCase {
 
   public function setUp() {
     foreach ($this->results as $k => $row) {
+      foreach ($row['permissions'] as $perm) {
+        $this->databaseContents['permissions'][$perm['pid']] = $perm;
+        $this->databaseContents['permissions'][$perm['pid']]['perm'] = implode(',', $perm['perm']);
+        $this->databaseContents['permissions'][$perm['pid']]['rid'] = $row['rid'];
+      }
+      unset($row['permissions']);
       $this->databaseContents['role'][$k] = $row;
     }
     parent::setUp();

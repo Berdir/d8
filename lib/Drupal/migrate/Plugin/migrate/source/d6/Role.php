@@ -8,6 +8,7 @@
 namespace Drupal\migrate\Plugin\migrate\source\d6;
 
 use Drupal\migrate\Plugin\migrate\source\SqlBase;
+use Drupal\migrate\Row;
 
 /**
  * Drupal 6 role source from database.
@@ -35,6 +36,28 @@ class Role extends SqlBase {
       'rid' => t('Role ID.'),
       'name' => t('The name of the user role.'),
     );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  function prepareRow(Row $row, $keep = TRUE) {
+    $permissions = array();
+    $results = $this->database
+      ->select('permissions', 'p', array('fetch' => \PDO::FETCH_ASSOC))
+      ->fields('p', array('pid', 'rid', 'perm', 'tid'))
+      ->condition('rid', $row->getSourceProperty('rid'))
+      ->execute();
+    foreach ($results as $perm) {
+      $permissions[] = array(
+        'pid' => $perm['pid'],
+        'rid' => $perm['rid'],
+        'perm' => array_map('trim', explode(',', $perm['perm'])),
+        'tid' => $perm['tid'],
+      );
+    }
+    $row->setSourceProperty('permissions', $permissions);
+    return parent::prepareRow($row);
   }
 
 }
