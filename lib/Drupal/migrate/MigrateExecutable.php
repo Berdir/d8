@@ -29,10 +29,13 @@ class MigrateExecutable {
   }
 
   /**
-   * @return \Drupal\migrate\Plugin\MigrateSourceInterface
+   * @return \Drupal\migrate\Source
    */
   public function getSource() {
-    return $this->migration->getSource();
+    if (!isset($this->source)) {
+      $this->source = new Source($this->migration->getExportProperties(), $this->migration);
+    }
+    return $this->source;
   }
 
   /**
