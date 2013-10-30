@@ -56,7 +56,7 @@ abstract class MigrateSqlSourceTestCase extends MigrateTestCase {
     $migration->expects($this->any())
       ->method('getSource')
       ->will($this->returnValue($plugin));
-    $this->source = new Source($this->migrationConfiguration, $migration);
+    $this->source = new Source($migration);
     $this->writeAttribute($this->source, 'cache', $cache);
   }
 

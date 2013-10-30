@@ -33,7 +33,7 @@ class MigrateExecutable {
    */
   public function getSource() {
     if (!isset($this->source)) {
-      $this->source = new Source($this->migration->getExportProperties(), $this->migration);
+      $this->source = new Source($this->migration);
     }
     return $this->source;
   }

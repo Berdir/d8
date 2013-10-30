@@ -180,15 +180,11 @@ class Source implements \Iterator, \Countable {
   /**
    * Class constructor.
    *
-   * @param array $configuration
-   *  Optional array of options.
-   * @param string $plugin_id
-   * @param array $plugin_definition
    * @param \Drupal\migrate\Entity\MigrationInterface $migration
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
    */
-  function __construct(array $configuration, MigrationInterface $migration) {
+  function __construct(MigrationInterface $migration) {
     $this->migration = $migration;
+    $configuration = $migration->get('source');
     if (!empty($configuration['cache_counts'])) {
       $this->cacheCounts = TRUE;
     }
