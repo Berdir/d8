@@ -7,7 +7,8 @@
 
 namespace Drupal\migrate\Plugin\migrate\source\d6;
 
-use Drupal\migrate\Plugin\migrate\source\SqlBase;
+use Drupal\migrate\Plugin\RequirementsInterface;
+use Drupal\migrate\Plugin\migrate\source\d6\Drupal6SqlBase;
 use Drupal\migrate\Row;
 
 /**
@@ -15,7 +16,7 @@ use Drupal\migrate\Row;
  *
  * @PluginId("drupal6_vocabulary")
  */
-class Vocabulary extends SqlBase {
+class Vocabulary extends Drupal6SqlBase implements RequirementsInterface {
 
   /**
    * {@inheritdoc}
@@ -73,4 +74,12 @@ class Vocabulary extends SqlBase {
     $row->setSourceProperty('node_types', $node_types);
     return parent::prepareRow($row);
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function checkRequirements() {
+    return $this->moduleExists('taxonomy');
+  }
+
 }
