@@ -26,26 +26,17 @@ class Variable extends SqlBase {
    */
   protected $variables;
 
-  function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration, CacheBackendInterface $cache, KeyValueStoreInterface $highwater_storage) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition, $migration, $cache, $highwater_storage);
+  function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $migration);
     $this->variables = $this->configuration['variables'];
   }
 
-  protected function performRewind() {
-    $this->result = array(array_map('unserialize', $this->query()->execute()->fetchAllKeyed()));
+  protected function runQuery() {
+    return new \ArrayIterator(array(array_map('unserialize', $this->query()->execute()->fetchAllKeyed())));
   }
 
-  public function computeCount() {
+  public function count() {
     return intval($this->query()->countQuery()->execute()->fetchField() > 0);
-  }
-
-  /**
-   * Unserialize each value.
-   *
-   * @return array
-   */
-  public function getNextRow() {
-    return array_shift($this->result);
   }
 
   /**

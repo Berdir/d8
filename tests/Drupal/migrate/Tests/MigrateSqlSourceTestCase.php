@@ -55,7 +55,7 @@ abstract class MigrateSqlSourceTestCase extends MigrateTestCase {
       ->method('getSource')
       ->will($this->returnValue($plugin));
     $this->source = new Source($migration);
-    
+
     $cache = $this->getMock('Drupal\Core\Cache\CacheBackendInterface');
     $this->writeAttribute($this->source, 'cache', $cache);
   }
@@ -71,7 +71,7 @@ abstract class MigrateSqlSourceTestCase extends MigrateTestCase {
    * Tests retrieval.
    */
   public function testRetrieval() {
-    $this->assertSame(count($this->results), count($this->source));
+    $this->assertSame(count($this->results), count($this->source), 'Number of results match');
     $count = 0;
     foreach ($this->source as $data_row) {
       $expected_row = $this->results[$count];

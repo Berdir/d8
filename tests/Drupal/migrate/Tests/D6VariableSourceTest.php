@@ -7,6 +7,9 @@
 
 namespace Drupal\migrate\Tests;
 
+/**
+ * @group migrate
+ */
 class D6VariableSourceTest extends MigrateSqlSourceTestCase {
 
   const PLUGIN_CLASS = 'Drupal\migrate\Plugin\migrate\source\d6\Variable';
