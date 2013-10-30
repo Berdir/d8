@@ -6,19 +6,12 @@
  */
 
 namespace Drupal\migrate\Plugin;
+use Drupal\migrate\Row;
 
 /**
- * Defines an iterface for migrate sources.
+ * Defines an interface for migrate sources.
  */
-interface MigrateSourceInterface extends \Iterator, \Countable {
-
-  /**
-   * Returns this source current row primary key representation.
-   *
-   * @return array
-   *   An array representing the primary key of current row.
-   */
-  public function getCurrentIds();
+interface MigrateSourceInterface extends \Countable {
 
   /**
    * Returns available fields on the source.
@@ -28,4 +21,24 @@ interface MigrateSourceInterface extends \Iterator, \Countable {
    *   in field mappings, values are descriptions.
    */
   public function fields();
+
+
+  /**
+   * Returns the iterator that will yield the row arrays to be processed.
+   *
+   * @return \Iterator
+   */
+  public function getIterator();
+
+  /**
+   * Add additional data to the row.
+   *
+   * @param \Drupal\Migrate\Row $row
+   *
+   * @return bool
+   *   FALSE if this row needs to be skipped.
+   */
+  public function prepareRow(Row $row);
+
+  public function __toString();
 }

@@ -5,16 +5,9 @@
  * Contains \Drupal\migrate\Plugin\migrate\source\SourceBase.
  */
 
-namespace Drupal\migrate\Plugin\migrate\source;
+namespace Drupal\migrate;
 
-use Drupal\Core\Cache\CacheBackendInterface;
-use Drupal\Core\KeyValueStore\KeyValueStoreInterface;
-use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\Core\Plugin\PluginBase;
 use Drupal\migrate\Entity\MigrationInterface;
-use Drupal\migrate\Plugin\MigrateSourceInterface;
-use Drupal\migrate\Row;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * A base class for migrate sources.
@@ -22,12 +15,12 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Derived classes are expected to define __toString(), returning a string
  * describing the source and significant options, i.e. the query.
  */
-abstract class SourceBase extends PluginBase implements ContainerFactoryPluginInterface, MigrateSourceInterface {
+class Source implements \Iterator, \Countable {
 
   /**
    * The current row from the quey
    *
-   * @var \stdClass
+   * @var \Drupal\Migrate\Row
    */
   protected $currentRow;
 
@@ -155,15 +148,16 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
     if ($this->skipCount) {
       return -1;
     }
+    $source = $this->migration->getSource();
 
     if (!isset($this->cacheKey)) {
-      $this->cacheKey = md5((string) $this);
+      $this->cacheKey = md5((string) $source);
     }
 
     // If a refresh is requested, or we're not caching counts, ask the derived
     // class to get the count from the source.
     if ($refresh || !$this->cacheCounts) {
-      $count = $this->computeCount();
+      $count = $source->count();
       $this->cache->set($this->cacheKey, $count, 'cache');
     }
     else {
@@ -176,7 +170,7 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
       else {
         // No cached count, ask the derived class to count 'em up, and cache
         // the result
-        $count = $this->computeCount();
+        $count = $source->count();
         $this->cache->set($this->cacheKey, $count, 'cache');
       }
     }
@@ -193,11 +187,8 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
    * @param \Drupal\migrate\Entity\MigrationInterface $migration
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache
    */
-  function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration, CacheBackendInterface $cache, KeyValueStoreInterface $highwater_storage) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->cache = $cache;
+  function __construct(array $configuration, MigrationInterface $migration) {
     $this->migration = $migration;
-    $this->highwaterStorage = $highwater_storage;
     if (!empty($configuration['cache_counts'])) {
       $this->cacheCounts = TRUE;
     }
@@ -210,30 +201,30 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
     if (!empty($configuration['track_changes'])) {
       $this->trackChanges = $configuration['track_changes'];
     }
-    if (!empty($configuration['idList'])) {
-      $this->idList = $configuration['idList'];
-    }
-  }
-
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, array $plugin_definition) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $configuration['migration'],
-      $container->get('cache.migrate'),
-      $container->get('keyvalue')->get('migrate:highwater')
-    );
   }
 
   /**
-   * Default implementations of Iterator methods - many derivations will find
-   * these adequate and will only need to implement rewind() and next()
+   * @return \Drupal\Core\Cache\CacheBackendInterface
    */
+  protected function getCache() {
+    if (!isset($this->cache)) {
+      $this->cache = \Drupal::cache('migrate');
+    }
+    return $this->cache;
+  }
 
   /**
-   * Implementation of Iterator::current() - called when entering a loop
-   * iteration, returning the current row
+   * @return \Iterator
+   */
+  protected function getIterator() {
+    if (!isset($this->iterator)) {
+      $this->iterator = $this->migration->getSource()->getIterator();
+    }
+    return $this->iterator;
+  }
+
+  /**
+   * {@inheritdoc}
    */
   public function current() {
     return $this->currentRow;
@@ -253,7 +244,7 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
    * TRUE to process the loop and FALSE to terminate it
    */
   public function valid() {
-    return !is_null($this->currentRow);
+    return isset($this->currentRow);
   }
 
   /**
@@ -265,27 +256,24 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
     $this->idMap = $this->migration->getIdMap();
     $this->numProcessed = 0;
     $this->numIgnored = 0;
-    $this->originalHighwater = $this->getHighwater();
+    $this->originalHighwater = $this->migration->getHighwater();
     $this->highwaterProperty = $this->migration->get('highwaterProperty');
     if ($id_list = $this->migration->get('idlist')) {
-      $this->idList = explode(',', $id_list);
+      $this->idList = $id_list;
     }
-    else {
-      $this->idList = array();
-    }
-    $this->performRewind();
     $this->next();
   }
 
   /**
-   * Implementation of Iterator::next() - subclasses of MigrateSource should
-   * implement getNextRow() to retrieve the next valid source rocord to process.
+   * {@inheritdoc}
    */
   public function next() {
     $this->currentIds = NULL;
     $this->currentRow = NULL;
 
-    while ($row_data = $this->getNextRow()) {
+    while ($this->getIterator()->valid()) {
+      $row_data = $this->getIterator()->current();
+      $this->getIterator()->next();
       $row = new Row($this->migration->get('sourceIds'), $row_data);
 
       // Populate the source key for this row
@@ -395,12 +383,10 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
    * Source classes should override this as necessary and manipulate $keep.
    *
    * @param \Drupal\migrate\Row $row
-   * @return bool
-   *   FALSE if the row is to be skipped.
    */
-  protected function prepareRow(Row $row, $keep = TRUE) {
+  protected function prepareRow(Row $row) {
     // We're explicitly skipping this row - keep track in the map table
-    if ($keep === FALSE) {
+    if ($this->migration->getSource()->prepareRow($row) === FALSE) {
       // Make sure we replace any previous messages for this item with any
       // new ones.
       $this->migration->getIdMap()->delete($this->currentIds, TRUE);
@@ -420,38 +406,6 @@ abstract class SourceBase extends PluginBase implements ContainerFactoryPluginIn
         $row->rehash();
       }
     }
-
     $this->numProcessed++;
-    return $keep;
   }
-
-  protected function getHighwater() {
-    return $this->highwaterStorage->get($this->migration->id());
-  }
-
-  /**
-   * Derived classes must implement fields(), returning a list of available
-   * source fields.
-   *
-   * @return array
-   *   Keys: machine names of the fields (to be passed to addFieldMapping)
-   *   Values: Human-friendly descriptions of the fields.
-   */
-  abstract public function fields();
-
-  /**
-   * Derived classes must implement computeCount(), to retrieve a fresh count of
-   * source records.
-   *
-   * @return int
-   */
-  abstract function computeCount();
-
-  /**
-   * @return array
-   */
-  abstract protected function getNextRow();
-
-  abstract protected function performRewind();
-
 }

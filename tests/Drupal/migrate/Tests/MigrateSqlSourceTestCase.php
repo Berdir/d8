@@ -7,6 +7,8 @@
 
 namespace Drupal\migrate\Tests;
 
+use Drupal\migrate\Source;
+
 abstract class MigrateSqlSourceTestCase extends MigrateTestCase {
 
   /**
@@ -24,6 +26,11 @@ abstract class MigrateSqlSourceTestCase extends MigrateTestCase {
 
   const ORIGINAL_HIGHWATER = '';
 
+  /**
+   * @var \Drupal\migrate\Plugin\MigrateSourceInterface
+   */
+  protected $plugin;
+
   protected function setUp() {
     $database_contents = $this->databaseContents + array('test_map' => array());
     $database = $this->getMockBuilder('Drupal\Core\Database\Connection')
@@ -36,28 +43,29 @@ abstract class MigrateSqlSourceTestCase extends MigrateTestCase {
       ->method('schema')
       ->will($this->returnCallback(function () use ($database, $database_contents) { return new FakeDatabaseSchema($database, $database_contents);}));
 
-    $key_value = $this->getMock('Drupal\Core\KeyValueStore\KeyValueStoreInterface');
-    $key_value->expects($this->once())
-      ->method('get')
-      ->with($this->equalTo($this->migrationConfiguration['id']))
-      ->will($this->returnValue(static::ORIGINAL_HIGHWATER));
-
-    $plugin_definition = array();
     $cache = $this->getMock('Drupal\Core\Cache\CacheBackendInterface');
 
     $migration = $this->getMigration();
+    $migration->expects($this->any())
+      ->method('getHighwater')
+      ->will($this->returnValue(static::ORIGINAL_HIGHWATER));
 
     $plugin_class = static::PLUGIN_CLASS;
-    $this->source = new $plugin_class($this->migrationConfiguration['source'], $this->migrationConfiguration['source']['plugin'], $plugin_definition, $migration, $cache, $key_value);
-    $reflection = new \ReflectionClass($this->source);
-    $reflection_property = $reflection->getProperty('database');
-    $reflection_property->setAccessible(TRUE);
-    $reflection_property->setValue($this->source, $database);
+    $plugin = new $plugin_class($this->migrationConfiguration['source'], $this->migrationConfiguration['source']['plugin'], array(), $migration);
+    $this->writeAttribute($plugin, 'database', $database);
     $migration->expects($this->any())
       ->method('getSource')
-      ->will($this->returnValue($this->source));
+      ->will($this->returnValue($plugin));
+    $this->source = new Source($this->migrationConfiguration, $migration);
+    $this->writeAttribute($this->source, 'cache', $cache);
   }
 
+  protected function writeAttribute($object, $attributeName, $value) {
+    $reflection = new \ReflectionClass($object);
+    $reflection_property = $reflection->getProperty($attributeName);
+    $reflection_property->setAccessible(TRUE);
+    $reflection_property->setValue($object, $value);
+  }
 
   /**
    * Tests retrieval.

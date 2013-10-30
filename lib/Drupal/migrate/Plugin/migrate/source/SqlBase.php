@@ -7,18 +7,17 @@
 
 namespace Drupal\migrate\Plugin\migrate\source;
 
-use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Database\Database;
-use Drupal\Core\Database\Query\Condition;
-use Drupal\Core\KeyValueStore\KeyValueStoreInterface;
-use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Plugin\PluginBase;
 use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
+use Drupal\migrate\Plugin\MigrateSourceInterface;
+use Drupal\migrate\Row;
 
 /**
  * Sources whose data may be fetched via DBTNG.
  */
-abstract class SqlBase extends SourceBase implements ContainerFactoryPluginInterface {
+abstract class SqlBase extends PluginBase implements MigrateSourceInterface {
 
   /**
    * @var \Drupal\Core\Database\Connection
@@ -31,15 +30,21 @@ abstract class SqlBase extends SourceBase implements ContainerFactoryPluginInter
   protected $query;
 
   /**
+   * @var \Drupal\migrate\Entity\MigrationInterface
+   */
+  protected $migration;
+
+  /**
    * {@inheritdoc}
    */
-  function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration, CacheBackendInterface $cache, KeyValueStoreInterface $highwater_storage) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition, $migration, $cache, $highwater_storage);
+  function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $migration);
+    $this->migration = $migration;
     $this->mapJoinable = TRUE;
   }
 
   /**
-   * The query is a good identifier for sql sources.
+   * @return \Drupal\Core\Database\Connection
    */
   function __toString() {
     return (string) $this->query;
@@ -51,6 +56,7 @@ abstract class SqlBase extends SourceBase implements ContainerFactoryPluginInter
       Database::addConnectionInfo('default', $key, $this->configuration['connection']);
       $this->database = Database::getConnection('default', $key);
     }
+    return $this->database;
   }
 
   /**
@@ -59,9 +65,9 @@ abstract class SqlBase extends SourceBase implements ContainerFactoryPluginInter
    * We could simply execute the query and be functionally correct, but
    * we will take advantage of the PDO-based API to optimize the query up-front.
    */
-  protected function performRewind() {
-    $this->result = NULL;
+  protected function runQuery() {
     $this->query = clone $this->query();
+    $highwaterProperty = $this->migration->get('highwaterProperty');
 
     // Get the key values, for potential use in joining to the map table, or
     // enforcing idlist.
@@ -77,8 +83,8 @@ abstract class SqlBase extends SourceBase implements ContainerFactoryPluginInter
     // follows (applying first applicable rule)
     // 1. If idlist is provided, then only process items in that list (AND key
     //    IN (idlist)). Only applicable with single-value keys.
-    if ($this->idList) {
-      $this->query->condition($keys[0], $this->idList, 'IN');
+    if ($id_list = $this->migration->get('idlist')) {
+      $this->query->condition($keys[0], $id_list, 'IN');
     }
     else {
       // 2. If the map is joinable, join it. We will want to accept all rows
@@ -105,7 +111,7 @@ abstract class SqlBase extends SourceBase implements ContainerFactoryPluginInter
           $delimiter = ' AND ';
         }
 
-        $alias = $this->query->leftJoin($this->idMap->getQualifiedMapTable(), 'map', $map_join);
+        $alias = $this->query->leftJoin($this->migration->getIdMap()->getQualifiedMapTable(), 'map', $map_join);
         $conditions->isNull($alias . '.sourceid1');
         $conditions->condition($alias . '.needs_update', MigrateIdMapInterface::STATUS_NEEDS_UPDATE);
         $condition_added = TRUE;
@@ -125,12 +131,12 @@ abstract class SqlBase extends SourceBase implements ContainerFactoryPluginInter
       }
       // 3. If we are using highwater marks, also include rows above the mark.
       //    But, include all rows if the highwater mark is not set.
-      if (isset($this->highwaterProperty['name']) && ($highwater = $this->getHighwater()) !== '') {
-        if (isset($this->highwaterProperty['alias'])) {
-          $highwater = $this->highwaterProperty['alias'] . '.' . $this->highwaterProperty['name'];
+      if (isset($highwaterProperty['name']) && ($highwater = $this->migration->getHighwater()) !== '') {
+        if (isset($highwaterProperty['alias'])) {
+          $highwater = $highwaterProperty['alias'] . '.' . $highwaterProperty['name'];
         }
         else {
-          $highwater = $this->highwaterProperty['name'];
+          $highwater = $highwaterProperty['name'];
         }
         $conditions->condition($highwater, $highwater, '>');
         $condition_added = TRUE;
@@ -140,16 +146,7 @@ abstract class SqlBase extends SourceBase implements ContainerFactoryPluginInter
       }
     }
 
-    $this->result = $this->query->execute();
-  }
-
-  /**
-   * Implementation of MigrateSource::getNextRow().
-   *
-   * @return array
-   */
-  public function getNextRow() {
-    return $this->result->fetchAssoc();
+    return $this->query->execute();
   }
 
   /**
@@ -160,8 +157,23 @@ abstract class SqlBase extends SourceBase implements ContainerFactoryPluginInter
   /**
    * {@inheritdoc}
    */
-  public function computeCount() {
+  public function count() {
     return $this->query()->countQuery()->execute()->fetchField();
   }
 
+  /**
+   * Returns the iterator that will yield the row arrays to be processed.
+   *
+   * @return \Iterator
+   */
+  public function getIterator() {
+    if (!isset($this->iterator)) {
+      $this->iterator = $this->runQuery();
+    }
+    return $this->iterator;
+  }
+
+  public function prepareRow(Row $row) {
+
+  }
 }

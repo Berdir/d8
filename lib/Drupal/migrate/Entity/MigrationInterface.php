@@ -64,7 +64,12 @@ interface MigrationInterface extends ConfigEntityInterface {
   public function getDestination();
 
   /**
-   *@return \Drupal\migrate\Plugin\MigrateIdMapInterface
+   * @return \Drupal\migrate\Plugin\MigrateIdMapInterface
    */
   public function getIdMap();
+
+  /**
+   * @return int
+   */
+  public function getHighwater();
 }

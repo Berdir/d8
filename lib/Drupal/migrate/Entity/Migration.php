@@ -8,6 +8,7 @@
 namespace Drupal\migrate\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\Plugin\MigrateProcessBag;
 use Drupal\migrate\Plugin\MigrateMapInterface;
 
@@ -153,7 +154,12 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
    *
    * @var int
    */
-  public $needsUpdate = MigrateMapInterface::STATUS_IMPORTED;
+  public $needsUpdate = MigrateIdMapInterface::STATUS_IMPORTED;
+
+  /**
+   * @var \Drupal\Core\KeyValueStore\KeyValueStoreInterface
+   */
+  protected $highwaterStorage;
 
   /**
    * {@inheritdoc}
@@ -199,4 +205,19 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
     }
     return $this->idMapPlugin;
   }
+
+  /**
+   * @return \Drupal\Core\KeyValueStore\KeyValueStoreInterface
+   */
+  protected function getHigherWaterStorage() {
+    if (!isset($this->highwaterStorage)) {
+      $this->highwaterStorage = \Drupal::keyValue('migrate:highwater');
+    }
+    return $this->highwaterStorage;
+  }
+
+  public function getHighwater() {
+    return $this->getHigherWaterStorage()->get($this->id());
+  }
+
 }

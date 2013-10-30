@@ -29,8 +29,8 @@ class Node extends SqlBase {
   /**
    * {@inheritdoc}
    */
-  function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration, CacheBackendInterface $cache, KeyValueStoreInterface $highwater_storage) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition, $migration, $cache, $highwater_storage);
+  function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $migration);
     if (empty($configuration['node_type'])) {
       // @todo MigrateException?
       throw new \Exception('A node type is required to instanciate a D6 Node source.');
