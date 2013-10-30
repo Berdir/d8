@@ -174,6 +174,6 @@ abstract class SqlBase extends PluginBase implements MigrateSourceInterface {
   }
 
   public function prepareRow(Row $row) {
-
+    return TRUE;
   }
 }

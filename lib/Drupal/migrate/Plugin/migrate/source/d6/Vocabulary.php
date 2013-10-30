@@ -62,7 +62,7 @@ class Vocabulary extends SqlBase {
   /**
    * {@inheritdoc}
    */
-  public function prepareRow(Row $row, $keep = TRUE) {
+  public function prepareRow(Row $row) {
     // Find node types for this row.
     $node_types = $this->database
       ->select('vocabulary_node_types', 'nt', array('fetch' => \PDO::FETCH_ASSOC))

@@ -56,7 +56,7 @@ class Term extends SqlBase {
   /**
    * {@inheritdoc}
    */
-  function prepareRow(Row $row, $keep = TRUE) {
+  function prepareRow(Row $row) {
     // Find parents for this row.
     $parents = $this->database
       ->select('term_hierarchy', 'th')
