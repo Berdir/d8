@@ -9,6 +9,7 @@ namespace Drupal\migrate\Plugin;
 
 use Drupal\migrate\Entity\Migration;
 use Drupal\migrate\Entity\MigrationInterface;
+use Drupal\migrate\MigrateMessageInterface;
 use Drupal\migrate\Row;
 
 /**
@@ -46,10 +47,8 @@ interface MigrateIdMapInterface {
    *   implementation.
    * @param $status
    * @param $rollback_action
-   * @param string $hash
-   *   A hash of the contents of the Row. Used as a key when the source has no other key.
    */
-  public function saveIDMapping(Row $row, array $destination_ids, $status = self::STATUS_IMPORTED, $rollback_action = self::ROLLBACK_DELETE, $hash = NULL);
+  public function saveIDMapping(Row $row, array $destination_ids, $status = self::STATUS_IMPORTED, $rollback_action = self::ROLLBACK_DELETE);
 
   /**
    * Record a message related to a source record
@@ -61,7 +60,7 @@ interface MigrateIdMapInterface {
    * @param int $level
    *  Optional message severity (defaults to MESSAGE_ERROR).
    */
-  public function saveMessage($source_key, $message, $level = MigrationInterface::MESSAGE_ERROR);
+  public function saveMessage(array $source_key, $message, $level = MigrationInterface::MESSAGE_ERROR);
 
   /**
    * Prepare to run a full update - mark all previously-imported content as
@@ -157,4 +156,6 @@ interface MigrateIdMapInterface {
    * @TODO: YUCK THIS IS SQL BOUND!
    */
   public function getQualifiedMapTable();
+
+  public function setMessage(MigrateMessageInterface $message);
 }

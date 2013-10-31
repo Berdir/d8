@@ -220,4 +220,7 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
     return $this->getHigherWaterStorage()->get($this->id());
   }
 
+  public function saveHighwater($highwater) {
+    $this->getHigherWaterStorage()->set($this->id(), $highwater);
+  }
 }

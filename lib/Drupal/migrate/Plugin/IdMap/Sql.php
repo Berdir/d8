@@ -8,7 +8,10 @@
 namespace Drupal\migrate\Plugin\IdMap;
 
 use Drupal\Core\Database\Database;
+use Drupal\migrate\Entity\MigrationInterface;
+use Drupal\migrate\MigrateMessageInterface;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
+use Drupal\migrate\Row;
 
 class Sql implements MigrateIdMapInterface {
 
@@ -18,6 +21,12 @@ class Sql implements MigrateIdMapInterface {
    * @var string
    */
   protected $mapTable, $messageTable;
+
+  /**
+   * @var \Drupal\migrate\MigrateMessageInterface
+   */
+  protected $message;
+
   public function getMapTable() {
     return $this->mapTable;
   }
@@ -91,6 +100,10 @@ class Sql implements MigrateIdMapInterface {
       $this->destinationKeyMap[$field] = 'destid' . $count++;
     }
     $this->ensureTables();
+  }
+
+  public function setMessage(MigrateMessageInterface $message) {
+    $this->message = $message;
   }
 
   /**
@@ -316,7 +329,7 @@ class Sql implements MigrateIdMapInterface {
    * to the destination key. Also may be called, setting the third parameter to
    * NEEDS_UPDATE, to signal an existing record should be remigrated.
    *
-   * @param stdClass $source_row
+   * @param stdClass $row
    *  The raw source data. We use the key map derived from the source object
    *  to get the source key values.
    * @param array $dest_ids
@@ -329,28 +342,26 @@ class Sql implements MigrateIdMapInterface {
    * $param string $hash
    *  If hashing is enabled, the hash of the raw source row.
    */
-  public function saveIDMapping(stdClass $source_row, array $dest_ids,
-      $needs_update = MigrateMap::STATUS_IMPORTED,
-      $rollback_action = MigrateMap::ROLLBACK_DELETE, $hash = NULL) {
-    migrate_instrument_start('saveIDMapping');
+  public function saveIDMapping(Row $row, array $dest_ids, $needs_update = MigrateIdMapInterface::STATUS_IMPORTED, $rollback_action = MigrateIdMapInterface::ROLLBACK_DELETE) {
     // Construct the source key
     $keys = array();
+    $destination = $row->getDestination();
     foreach ($this->sourceKeyMap as $field_name => $key_name) {
       // A NULL key value will fail.
-      if (is_null($source_row->$field_name)) {
-        Migration::displayMessage(t(
+      if (!isset($destination[$field_name])) {
+        $this->message->display(t(
           'Could not save to map table due to NULL value for key field !field',
           array('!field' => $field_name)));
         migrate_instrument_stop('saveIDMapping');
         return;
       }
-      $keys[$key_name] = $source_row->$field_name;
+      $keys[$key_name] = $destination[$field_name];
     }
 
     $fields = array(
-      'needs_update' => (int)$needs_update,
-      'rollback_action' => (int)$rollback_action,
-      'hash' => $hash,
+      'needs_update' => (int) $needs_update,
+      'rollback_action' => (int) $rollback_action,
+      'hash' => $row->getHash(),
     );
     $count = 1;
     if (!empty($dest_ids)) {
@@ -365,7 +376,6 @@ class Sql implements MigrateIdMapInterface {
       ->key($keys)
       ->fields($fields)
       ->execute();
-    migrate_instrument_stop('saveIDMapping');
   }
 
   /**
