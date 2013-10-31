@@ -190,10 +190,10 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
    * @return \Drupal\migrate\Plugin\MigrateDestinationInterface
    */
   public function getDestination() {
-    if (!isset($this->destination)) {
-      $this->destination = \Drupal::service('plugin.manager.migrate.destination')->createInstance($this->destination['plugin'], $this->destination, $this);
+    if (!isset($this->destinationPlugin)) {
+      $this->destinationPlugin = \Drupal::service('plugin.manager.migrate.destination')->createInstance($this->destination['plugin'], $this->destination, $this);
     }
-    return $this->destination;
+    return $this->destinationPlugin;
   }
 
   /**

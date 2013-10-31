@@ -44,7 +44,7 @@ class Config extends DestinationBase implements ContainerFactoryPluginInterface 
   /**
    * {@inheritdoc}
    */
-  function import(Row $row) {
+  public function import(Row $row) {
     $this->config
       ->setData($row->getDestination())
       ->save();

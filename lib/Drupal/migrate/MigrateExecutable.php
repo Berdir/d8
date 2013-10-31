@@ -103,13 +103,6 @@ class MigrateExecutable {
   }
 
   /**
-   * @return \Drupal\migrate\Plugin\MigrateDestinationInterface
-   */
-  public function getDestination() {
-    return $this->migration->getDestination();
-  }
-
-  /**
    * The rollback action to be saved for the current row.
    *
    * @var int
@@ -149,7 +142,7 @@ class MigrateExecutable {
   public function import() {
     $return = MigrationInterface::RESULT_COMPLETED;
     $source = $this->getSource();
-    $destination = $this->getDestination();
+    $destination = $this->migration->getDestination();
     $id_map = $this->migration->getIdMap();
 
     try {
