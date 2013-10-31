@@ -146,7 +146,7 @@ class MigrateExecutable {
   /**
    * Perform an import operation - migrate items from source to destination.
    */
-  protected function import() {
+  public function import() {
     $return = MigrationInterface::RESULT_COMPLETED;
     $source = $this->getSource();
     $destination = $this->getDestination();

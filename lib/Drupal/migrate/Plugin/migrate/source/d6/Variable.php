@@ -15,7 +15,7 @@ use Drupal\migrate\Plugin\migrate\source\SqlBase;
 /**
  * Drupal 6 variable source from database.
  *
- * @PluginId("drupal6_variable")
+ * @PluginID("drupal6_variable")
  */
 class Variable extends SqlBase {
 

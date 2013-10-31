@@ -53,14 +53,14 @@ interface MigrateIdMapInterface {
   /**
    * Record a message related to a source record
    *
-   * @param array $source_key
+   * @param array $source_id_values
    *  Source ID of the record in error
    * @param string $message
    *  The message to record.
    * @param int $level
    *  Optional message severity (defaults to MESSAGE_ERROR).
    */
-  public function saveMessage(array $source_key, $message, $level = MigrationInterface::MESSAGE_ERROR);
+  public function saveMessage(array $source_id_value, $message, $level = MigrationInterface::MESSAGE_ERROR);
 
   /**
    * Prepare to run a full update - mark all previously-imported content as

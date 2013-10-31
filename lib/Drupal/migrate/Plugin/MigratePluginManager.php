@@ -12,6 +12,7 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageManager;
 use Drupal\Core\Plugin\DefaultPluginManager;
+use Drupal\migrate\Entity\MigrationInterface;
 
 /**
  * Manages migrate sources and steps.
@@ -40,4 +41,11 @@ class MigratePluginManager extends DefaultPluginManager {
     $this->alterInfo($module_handler, 'migrate_' . $type . '_info');
     $this->setCacheBackend($cache_backend, $language_manager, 'migrate_plugins_' . $type);
   }
+
+  public function createInstance($plugin_id, array $configuration, MigrationInterface $migration = NULL) {
+    $plugin_definition = $this->discovery->getDefinition($plugin_id);
+    $plugin_class = DefaultFactory::getPluginClass($plugin_id, $plugin_definition);
+    return new $plugin_class($configuration, $plugin_id, $plugin_definition, $migration);
+  }
+
 }

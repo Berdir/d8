@@ -8,9 +8,9 @@
 namespace Drupal\migrate\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Core\Database\Database;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\Plugin\MigrateProcessBag;
-use Drupal\migrate\Plugin\MigrateMapInterface;
 
 /**
  * Defines the Migration entity.
@@ -162,6 +162,11 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
   protected $highwaterStorage;
 
   /**
+   * @var bool
+   */
+  public $trackLastImported = FALSE;
+
+  /**
    * {@inheritdoc}
    */
   public function getSource() {
@@ -199,9 +204,10 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
       $configuration = $this->idMap;
       $plugin = isset($configuration['plugin']) ? $configuration['plugin'] : 'sql';
       if ($plugin == 'sql' && !isset($configuration['database'])) {
-        $configuration['database_service'] = 'database';
+        $connection = Database::getConnectionInfo('default');;
+        $configuration['connection'] = $connection['default'];
       }
-      $this->idMapPlugin = \Drupal::service('plugin.manager.migrate.id_map')->createInstance($configuration['plugin'], $configuration);
+      $this->idMapPlugin = \Drupal::service('plugin.manager.migrate.id_map')->createInstance($plugin, $configuration, $this);
     }
     return $this->idMapPlugin;
   }

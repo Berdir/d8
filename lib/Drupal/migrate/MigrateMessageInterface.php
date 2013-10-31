@@ -9,5 +9,5 @@ namespace Drupal\migrate;
 
 interface MigrateMessageInterface {
 
-  function display();
+  function display($message, $type = 'status');
 }
