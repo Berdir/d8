@@ -214,8 +214,10 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
           'description' => t('Messages generated during a migration process'),
           'fields' => $fields,
           'primary key' => array('msgid'),
-          'indexes' => array('sourcekey' => $pks),
         );
+        if ($pks) {
+          $schema['indexes']['sourcekey'] = $pks;
+        }
         $this->getDatabase()->schema()->createTable($this->messageTable, $schema);
       }
       else {
