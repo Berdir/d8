@@ -49,7 +49,23 @@ class Node extends Drupal6SqlBase {
     // Select node in its last revision.
     $query = $this->database
       ->select('node', 'n')
-      ->fields('n', array('nid', 'vid', 'type', 'language', 'title', 'uid', 'status', 'created', 'changed', 'comment', 'promote', 'moderate', 'sticky', 'tnid', 'translate'))
+      ->fields('n', array(
+        'nid',
+        'vid',
+        'type',
+        'language',
+        'title',
+        'uid',
+        'status',
+        'created',
+        'changed',
+        'comment',
+        'promote',
+        'moderate',
+        'sticky',
+        'tnid',
+        'translate',
+      ))
       ->condition('n.type', $this->type);
     $query->innerJoin('node_revisions', 'nr', 'n.vid = nr.vid');
     $query->fields('nr', array('body', 'teaser', 'format'));
