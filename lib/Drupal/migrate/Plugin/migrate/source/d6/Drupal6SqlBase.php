@@ -18,23 +18,39 @@ use Drupal\migrate\Plugin\migrate\source\SqlBase;
 abstract class Drupal6SqlBase extends SqlBase {
 
   /**
+   * Retrieves all system data informationfrom origin system.
+   *
+   * @return array
+   *   List of system table informationi keyed by type and name.
+   */
+  public function getSystemData() {
+    static $system_data;
+    if (isset($system_data)) {
+      return $system_data;
+    }
+    $results = $this->database
+      ->select('system', 's')
+      ->fields('s')
+      ->execute();
+    foreach ($results as $result) {
+      $system_data[$result['type']][$result['name']] = $result;
+    }
+    return $system_data;
+  }
+
+  /**
    * Get a module schema_version value in the source installation.
    *
    * @param string $module
    *   Name of module.
    *
-   * @return int
-   *   The current module schema version on the origin system table.
+   * @return mixed
+   *   The current module schema version on the origin system table or FALSE if
+   *   not found.
    */
   protected function getModuleSchemaVersion($module) {
-    $schema_version= $this->database
-      ->select('system', 's')
-      ->fields('s', array('schema_version'))
-      ->condition('name', $module)
-      ->condition('type', 'module')
-      ->execute()
-      ->fetchField();
-    return $schema_version;
+    $system_data = $this->getSystemData();
+    return isset($system_data['module'][$module]['schema_version']) ? $system_data['module'][$module]['schema_version'] : FALSE;
   }
 
   /**
@@ -47,14 +63,7 @@ abstract class Drupal6SqlBase extends SqlBase {
    *   TRUE if module is enabled on the origin system, FALSE if not.
    */
   protected function moduleExists($module) {
-    $exists = $this->database
-      ->select('system', 's')
-      ->fields('s', array('status'))
-      ->condition('name', $module)
-      ->condition('type', 'module')
-      ->execute()
-      ->fetchField();
-    return (bool) $exists;
+    return isset($system_data['module'][$module]['status']) ? (bool) $system_data['module'][$module]['status'] : FALSE;
   }
 
 }
