@@ -7,14 +7,15 @@
 
 namespace Drupal\migrate\Plugin\migrate\source\d6;
 
-use Drupal\migrate\Plugin\migrate\source\SqlBase;
+use Drupal\migrate\Plugin\RequirementsInterface;
+use Drupal\migrate\Plugin\migrate\source\d6\Drupal6SqlBase;
 
 /**
  * Drupal 6 contact category source from database.
  *
  * @PluginId("drupal6_contact_category")
  */
-class ContactCategory extends SqlBase {
+class ContactCategory extends Drupal6SqlBase implements RequirementsInterface {
 
   /**
    * {@inheritdoc}
@@ -39,6 +40,13 @@ class ContactCategory extends SqlBase {
       'weight' => t("The category's weight."),
       'selected' => t('Flag to indicate whether or not category is selected by default. (1 = Yes, 0 = No)'),
     );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function checkRequirements() {
+    return $this->moduleExists('contact');
   }
 
 }

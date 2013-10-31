@@ -7,14 +7,14 @@
 
 namespace Drupal\migrate\Plugin\migrate\source\d6;
 
-use Drupal\migrate\Plugin\migrate\source\SqlBase;
+use Drupal\migrate\Plugin\migrate\source\d6\Drupal6SqlBase;
 
 /**
  * Drupal 6 action source from database.
  *
  * @PluginId("drupal6_action")
  */
-class Action extends SqlBase {
+class Action extends Drupal6SqlBase {
 
   /**
    * {@inheritdoc}

@@ -7,14 +7,15 @@
 
 namespace Drupal\migrate\Plugin\migrate\source\d6;
 
-use Drupal\migrate\Plugin\migrate\source\SqlBase;
+use Drupal\migrate\Plugin\migrate\source\d6\Drupal6SqlBase;
+use Drupal\migrate\Plugin\RequirementsInterface;
 
 /**
  * Drupal 6 menu source from database.
  *
  * @PluginId("drupal6_menu")
  */
-class Menu extends SqlBase {
+class Menu extends Drupal6SqlBase implements RequirementsInterface {
 
   /**
    * {@inheritdoc}
@@ -35,6 +36,13 @@ class Menu extends SqlBase {
       'title' => t('The human-readable name of the menu.'),
       'description' => t('A description of the menu'),
     );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function checkRequirements() {
+    return $this->moduleExists('menu');
   }
 
 }

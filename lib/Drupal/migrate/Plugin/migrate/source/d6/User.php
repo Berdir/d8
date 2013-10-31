@@ -7,14 +7,14 @@
 
 namespace Drupal\migrate\Plugin\migrate\source\d6;
 
-use Drupal\migrate\Plugin\migrate\source\SqlBase;
+use Drupal\migrate\Plugin\migrate\source\d6\Drupal6SqlBase;
 
 /**
  * Drupal 6 user source from database.
  *
  * @PluginId("drupal6_user")
  */
-class User extends SqlBase {
+class User extends Drupal6SqlBase {
 
   /**
    * {@inheritdoc}

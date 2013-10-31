@@ -7,14 +7,14 @@
 
 namespace Drupal\migrate\Plugin\migrate\source\d6;
 
-use Drupal\migrate\Plugin\migrate\source\SqlBase;
+use Drupal\migrate\Plugin\migrate\source\d6\Drupal6SqlBase;
 
 /**
  * Drupal 6 block source from database.
  *
  * @PluginId("drupal6_boxes")
  */
-class Boxes extends SqlBase {
+class Boxes extends Drupal6SqlBase {
 
   /**
    * {@inheritdoc}

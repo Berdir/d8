@@ -10,7 +10,8 @@ namespace Drupal\migrate\Plugin\migrate\source\d6;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\KeyValueStore\KeyValueStoreInterface;
 use Drupal\migrate\Entity\MigrationInterface;
-use Drupal\migrate\Plugin\migrate\source\SqlBase;
+use Drupal\migrate\Plugin\migrate\source\d6\Drupal6SqlBase;
+use Drupal\migrate\Plugin\RequirementsInterface;
 use Drupal\migrate\Row;
 
 /**
@@ -20,7 +21,7 @@ use Drupal\migrate\Row;
  *
  * @PluginId("drupal6_term")
  */
-class Term extends SqlBase {
+class Term extends Drupal6SqlBase implements RequirementsInterface {
 
   /**
    * {@inheritdoc}
@@ -66,6 +67,13 @@ class Term extends SqlBase {
       ->fetchCol();
     $row->setSourceProperty('parents', $parents);
     return parent::prepareRow($row);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function checkRequirements() {
+    return $this->moduleExists('taxonomy');
   }
 
 }

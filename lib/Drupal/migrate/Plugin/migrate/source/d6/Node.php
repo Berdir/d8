@@ -7,17 +7,17 @@
 
 namespace Drupal\migrate\Plugin\migrate\source\d6;
 
-use Drupal\migrate\Plugin\migrate\source\SqlBase;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\KeyValueStore\KeyValueStoreInterface;
 use Drupal\migrate\Entity\MigrationInterface;
+use Drupal\migrate\Plugin\migrate\source\d6\Drupal6SqlBase;
 
 /**
  * Drupal 6 node source from database.
  *
  * @PluginId("drupal6_node")
  */
-class Node extends SqlBase {
+class Node extends Drupal6SqlBase {
 
   /**
    * The node type this source provides.

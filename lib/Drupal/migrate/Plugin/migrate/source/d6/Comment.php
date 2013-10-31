@@ -7,14 +7,15 @@
 
 namespace Drupal\migrate\Plugin\migrate\source\d6;
 
-use Drupal\migrate\Plugin\migrate\source\SqlBase;
+use Drupal\migrate\Plugin\RequirementsInterface;
+use Drupal\migrate\Plugin\migrate\source\d6\Drupal6SqlBase;
 
 /**
  * Drupal 6 comment source from database.
  *
  * @PluginId("drupal6_comment")
  */
-class Comment extends SqlBase {
+class Comment extends Drupal6SqlBase implements RequirementsInterface {
 
   /**
    * {@inheritdoc}
@@ -51,6 +52,13 @@ class Comment extends SqlBase {
       'mail' => t("The comment author's e-mail address from the comment form, if user is anonymous, and the 'Anonymous users may/must leave their contact information' setting is turned on."),
       'homepage' => t("The comment author's home page address from the comment form, if user is anonymous, and the 'Anonymous users may/must leave their contact information' setting is turned on."),
     );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function checkRequirements() {
+    return $this->moduleExists('comment');
   }
 
 }
