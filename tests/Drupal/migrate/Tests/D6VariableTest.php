@@ -40,7 +40,7 @@ class D6VariableTest extends MigrateSqlSourceTestCase {
     ),
   );
 
-  protected $databaseContents = array('variables' => array(
+  protected $databaseContents = array('variable' => array(
     array('name' => 'foo', 'value' => 'i:1;'),
     array('name' => 'bar', 'value' => 'b:0;'),
   ));

@@ -47,8 +47,8 @@ class D6Variable extends SqlBase {
    * {@inheritdoc}
    */
   function query() {
-    return $this->database
-      ->select('variables', 'v')
+    return $this->getDatabase()
+      ->select('variable', 'v')
       ->fields('v', array('name', 'value'))
       ->condition('name', $this->variables, 'IN');
   }

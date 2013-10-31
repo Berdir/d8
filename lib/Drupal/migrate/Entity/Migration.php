@@ -171,7 +171,7 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
    */
   public function getSource() {
     if (!isset($this->sourcePlugin)) {
-      $this->sourcePlugin = \Drupal::service('plugin.manager.migrate.source')->createInstance($this->source['plugin'], $this->source);
+      $this->sourcePlugin = \Drupal::service('plugin.manager.migrate.source')->createInstance($this->source['plugin'], $this->source, $this);
     }
     return $this->sourcePlugin;
   }
@@ -191,7 +191,7 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
    */
   public function getDestination() {
     if (!isset($this->destination)) {
-      $this->destination = \Drupal::service('plugin.manager.migrate.destination')->createInstance($this->destination['plugin'], $this->destination);
+      $this->destination = \Drupal::service('plugin.manager.migrate.destination')->createInstance($this->destination['plugin'], $this->destination, $this);
     }
     return $this->destination;
   }
