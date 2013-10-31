@@ -59,7 +59,7 @@ abstract class Drupal6SqlBase extends SqlBase {
    * @param string $module
    *   Name of module to check.
    *
-   * @return boolean
+   * @return bool
    *   TRUE if module is enabled on the origin system, FALSE if not.
    */
   protected function moduleExists($module) {
