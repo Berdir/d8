@@ -20,7 +20,7 @@ class FilterFormats extends Drupal6SqlBase {
   /**
    * {@inheritdoc}
    */
-  function query() {
+  public function query() {
     $query = $this->database
       ->select('filter_formats', 'f')
       ->fields('f', array('format', 'name', 'roles', 'cache'));
@@ -40,7 +40,10 @@ class FilterFormats extends Drupal6SqlBase {
     );
   }
 
-  function prepareRow(Row $row) {
+  /**
+   * {@inheritdoc}
+   */
+  public function prepareRow(Row $row) {
     $filters = array();
     // Find filters for this row.
     $results = $this->database

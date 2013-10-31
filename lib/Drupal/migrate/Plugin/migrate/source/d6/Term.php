@@ -26,7 +26,7 @@ class Term extends Drupal6SqlBase implements RequirementsInterface {
   /**
    * {@inheritdoc}
    */
-  function query() {
+  public function query() {
     // Note the explode - this supports the (admittedly unusual) case of
     // consolidating multiple vocabularies into one.
     $query = $this->database

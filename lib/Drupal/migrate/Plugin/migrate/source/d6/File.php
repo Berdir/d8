@@ -19,7 +19,7 @@ class File extends Drupal6SqlBase {
   /**
    * {@inheritdoc}
    */
-  function query() {
+  public function query() {
     $query = $this->database
       ->select('files', 'f')
       ->fields('f', array('fid', 'uid', 'filename',

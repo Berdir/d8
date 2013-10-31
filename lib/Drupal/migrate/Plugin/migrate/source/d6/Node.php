@@ -29,7 +29,7 @@ class Node extends Drupal6SqlBase {
   /**
    * {@inheritdoc}
    */
-  function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration) {
+  public function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration);
     if (empty($configuration['node_type'])) {
       // @todo MigrateException?
@@ -45,11 +45,27 @@ class Node extends Drupal6SqlBase {
    *
    * @todo Support importing all revisions.
    */
-  function query() {
+  public function query() {
     // Select node in its last revision.
     $query = $this->database
       ->select('node', 'n')
-      ->fields('n', array('nid', 'vid', 'type', 'language', 'title', 'uid', 'status', 'created', 'changed', 'comment', 'promote', 'moderate', 'sticky', 'tnid', 'translate'))
+      ->fields('n', array(
+        'nid',
+        'vid',
+        'type',
+        'language',
+        'title',
+        'uid',
+        'status',
+        'created',
+        'changed',
+        'comment',
+        'promote',
+        'moderate',
+        'sticky',
+        'tnid',
+        'translate',
+      ))
       ->condition('n.type', $this->type);
     $query->innerJoin('node_revisions', 'nr', 'n.vid = nr.vid');
     $query->fields('nr', array('body', 'teaser', 'format'));

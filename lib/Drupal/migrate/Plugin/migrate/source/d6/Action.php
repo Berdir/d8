@@ -19,10 +19,17 @@ class Action extends Drupal6SqlBase {
   /**
    * {@inheritdoc}
    */
-  function query() {
+  public function query() {
     $query = $this->database
       ->select('actions', 'a')
-      ->fields('a', array('aid', 'type', 'callback', 'parameters', 'description'));
+      ->fields('a', array(
+        'aid',
+        'type',
+        'callback',
+        'parameters',
+        'description',
+      )
+    );
     return $query;
   }
 
