@@ -20,7 +20,7 @@ class Role extends Drupal6SqlBase {
   /**
    * {@inheritdoc}
    */
-  function query() {
+  public function query() {
     $query = $this->database
       ->select('role', 'r')
       ->fields('r', array('rid', 'name'));

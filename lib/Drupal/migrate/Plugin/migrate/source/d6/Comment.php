@@ -20,7 +20,7 @@ class Comment extends Drupal6SqlBase implements RequirementsInterface {
   /**
    * {@inheritdoc}
    */
-  function query() {
+  public function query() {
     $query = $this->database
       ->select('comments', 'c')
       ->fields('c', array('cid', 'pid', 'nid', 'uid', 'subject',

@@ -45,7 +45,7 @@ class Node extends Drupal6SqlBase {
    *
    * @todo Support importing all revisions.
    */
-  function query() {
+  public function query() {
     // Select node in its last revision.
     $query = $this->database
       ->select('node', 'n')

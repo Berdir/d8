@@ -16,7 +16,7 @@ use Drupal\migrate\Plugin\migrate\source\SqlBase;
  */
 class Node extends SqlBase {
 
-  function query() {
+  public function query() {
     return $this->database->select('node', 'n')
      ->fields('n', array('nid', 'vid', 'language', 'title', 'uid',
        'status', 'created', 'changed', 'comment', 'promote', 'sticky',
