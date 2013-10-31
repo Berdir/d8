@@ -7,7 +7,6 @@
 
 namespace Drupal\migrate\Plugin;
 
-use Drupal\migrate\Entity\Migration;
 use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\MigrateMessageInterface;
 use Drupal\migrate\Row;

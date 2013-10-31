@@ -16,7 +16,7 @@ $values = array(
   ),
   'destination' => array(
     'plugin' => 'd8_config',
-    'config_name' => 'test',
+    'config_name' => 'migrate.test',
   ),
 );
 
