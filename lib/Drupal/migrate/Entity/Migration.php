@@ -8,9 +8,9 @@
 namespace Drupal\migrate\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Core\Database\Database;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\Plugin\MigrateProcessBag;
-use Drupal\migrate\Plugin\MigrateMapInterface;
 
 /**
  * Defines the Migration entity.
@@ -162,11 +162,16 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
   protected $highwaterStorage;
 
   /**
+   * @var bool
+   */
+  public $trackLastImported = FALSE;
+
+  /**
    * {@inheritdoc}
    */
   public function getSource() {
     if (!isset($this->sourcePlugin)) {
-      $this->sourcePlugin = \Drupal::service('plugin.manager.migrate.source')->createInstance($this->source['plugin'], $this->source);
+      $this->sourcePlugin = \Drupal::service('plugin.manager.migrate.source')->createInstance($this->source['plugin'], $this->source, $this);
     }
     return $this->sourcePlugin;
   }
@@ -186,7 +191,7 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
    */
   public function getDestination() {
     if (!isset($this->destination)) {
-      $this->destination = \Drupal::service('plugin.manager.migrate.destination')->createInstance($this->destination['plugin'], $this->destination);
+      $this->destination = \Drupal::service('plugin.manager.migrate.destination')->createInstance($this->destination['plugin'], $this->destination, $this);
     }
     return $this->destination;
   }
@@ -199,9 +204,10 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
       $configuration = $this->idMap;
       $plugin = isset($configuration['plugin']) ? $configuration['plugin'] : 'sql';
       if ($plugin == 'sql' && !isset($configuration['database'])) {
-        $configuration['database_service'] = 'database';
+        $connection = Database::getConnectionInfo('default');;
+        $configuration['connection'] = $connection['default'];
       }
-      $this->idMapPlugin = \Drupal::service('plugin.manager.migrate.id_map')->createInstance($configuration['plugin'], $configuration);
+      $this->idMapPlugin = \Drupal::service('plugin.manager.migrate.id_map')->createInstance($plugin, $configuration, $this);
     }
     return $this->idMapPlugin;
   }
@@ -220,4 +226,7 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
     return $this->getHigherWaterStorage()->get($this->id());
   }
 
+  public function saveHighwater($highwater) {
+    $this->getHigherWaterStorage()->set($this->id(), $highwater);
+  }
 }

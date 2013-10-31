@@ -72,4 +72,6 @@ interface MigrationInterface extends ConfigEntityInterface {
    * @return int
    */
   public function getHighwater();
+
+  public function saveHighwater($highwater);
 }

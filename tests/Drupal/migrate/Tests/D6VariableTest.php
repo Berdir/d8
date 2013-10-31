@@ -10,9 +10,9 @@ namespace Drupal\migrate\Tests;
 /**
  * @group migrate
  */
-class D6VariableSourceTest extends MigrateSqlSourceTestCase {
+class D6VariableTest extends MigrateSqlSourceTestCase {
 
-  const PLUGIN_CLASS = 'Drupal\migrate\Plugin\migrate\source\d6\Variable';
+  const PLUGIN_CLASS = 'Drupal\migrate\Plugin\migrate\source\D6Variable';
 
   protected $migrationConfiguration = array(
     'id' => 'test',
@@ -40,7 +40,7 @@ class D6VariableSourceTest extends MigrateSqlSourceTestCase {
     ),
   );
 
-  protected $databaseContents = array('variables' => array(
+  protected $databaseContents = array('variable' => array(
     array('name' => 'foo', 'value' => 'i:1;'),
     array('name' => 'bar', 'value' => 'b:0;'),
   ));

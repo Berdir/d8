@@ -5,19 +5,16 @@
  * Contains \Drupal\migrate\Plugin\migrate\source\d6\Variable.
  */
 
-namespace Drupal\migrate\Plugin\migrate\source\d6;
+namespace Drupal\migrate\Plugin\migrate\source;
 
-use Drupal\Core\Cache\CacheBackendInterface;
-use Drupal\Core\KeyValueStore\KeyValueStoreInterface;
 use Drupal\migrate\Entity\MigrationInterface;
-use Drupal\migrate\Plugin\migrate\source\SqlBase;
 
 /**
  * Drupal 6 variable source from database.
  *
- * @PluginId("drupal6_variable")
+ * @PluginID("drupal6_variable")
  */
-class Variable extends Drupal6SqlBase {
+class D6Variable extends Drupal6SqlBase {
 
   /**
    * The variable names to fetch.
@@ -50,8 +47,8 @@ class Variable extends Drupal6SqlBase {
    * {@inheritdoc}
    */
   function query() {
-    return $this->database
-      ->select('variables', 'v')
+    return $this->getDatabase()
+      ->select('variable', 'v')
       ->fields('v', array('name', 'value'))
       ->condition('name', $this->variables, 'IN');
   }

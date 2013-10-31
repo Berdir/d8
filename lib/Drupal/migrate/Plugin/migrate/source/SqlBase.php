@@ -38,7 +38,7 @@ abstract class SqlBase extends PluginBase implements MigrateSourceInterface {
    * {@inheritdoc}
    */
   function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition, $migration);
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->migration = $migration;
     $this->mapJoinable = TRUE;
   }
