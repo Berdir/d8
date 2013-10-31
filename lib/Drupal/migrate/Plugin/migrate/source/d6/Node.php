@@ -29,7 +29,7 @@ class Node extends Drupal6SqlBase {
   /**
    * {@inheritdoc}
    */
-  function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration) {
+  public function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration);
     if (empty($configuration['node_type'])) {
       // @todo MigrateException?
