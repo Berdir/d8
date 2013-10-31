@@ -9,6 +9,7 @@ namespace Drupal\migrate\Plugin\migrate\destination;
 use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\migrate\Entity\Migration;
+use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\Row;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Config\Config as ConfigObject;

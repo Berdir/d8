@@ -356,7 +356,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
    * $param string $hash
    *  If hashing is enabled, the hash of the raw source row.
    */
-  public function saveIDMapping(Row $row, array $dest_ids, $needs_update = MigrateIdMapInterface::STATUS_IMPORTED, $rollback_action = MigrateIdMapInterface::ROLLBACK_DELETE) {
+  public function saveIDMapping(Row $row, array $destination_id_values, $needs_update = MigrateIdMapInterface::STATUS_IMPORTED, $rollback_action = MigrateIdMapInterface::ROLLBACK_DELETE) {
     // Construct the source key
     $keys = array();
     $destination = $row->getDestination();
@@ -366,7 +366,6 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
         $this->message->display(t(
           'Could not save to map table due to NULL value for key field !field',
           array('!field' => $field_name)));
-        migrate_instrument_stop('saveIDMapping');
         return;
       }
       $keys[$key_name] = $destination[$field_name];
@@ -378,18 +377,18 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
       'hash' => $row->getHash(),
     );
     $count = 1;
-    if (!empty($dest_ids)) {
-      foreach ($dest_ids as $dest_id) {
-        $fields['destid' . $count++] = $dest_id;
-      }
+    foreach ($destination_id_values as $dest_id) {
+      $fields['destid' . $count++] = $dest_id;
     }
     if ($this->migration->get('trackLastImported')) {
       $fields['last_imported'] = time();
     }
-    $this->getDatabase()->merge($this->mapTable)
-      ->key($keys)
-      ->fields($fields)
-      ->execute();
+    if ($keys) {
+      $this->getDatabase()->merge($this->mapTable)
+        ->key($keys)
+        ->fields($fields)
+        ->execute();
+    }
   }
 
   /**

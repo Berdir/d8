@@ -40,15 +40,13 @@ interface MigrateIdMapInterface {
    * identifiers.
    *
    * @param $row
-   *    The row containing the current values of the source identifiers.
-   * @param $destination_ids
-   *   An array of destination identifiers: the keys are the name of the
-   *   properties, the values are dependent on the actual mapping
-   *   implementation.
+   *    The current row..
+   * @param $destination_id_values
+   *   An array of destination identifier values.
    * @param $status
    * @param $rollback_action
    */
-  public function saveIDMapping(Row $row, array $destination_ids, $status = self::STATUS_IMPORTED, $rollback_action = self::ROLLBACK_DELETE);
+  public function saveIDMapping(Row $row, array $destination_id_values, $status = self::STATUS_IMPORTED, $rollback_action = self::ROLLBACK_DELETE);
 
   /**
    * Record a message related to a source record

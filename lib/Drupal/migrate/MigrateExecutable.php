@@ -23,7 +23,7 @@ class MigrateExecutable {
   protected $total_successes;
   protected $needsUpdate;
   protected $total_processed;
-  protected $queuedMessages;
+  protected $queuedMessages = array();
   protected $options;
 
   /**
@@ -165,9 +165,9 @@ class MigrateExecutable {
       $this->processRow($row);
 
       try {
-        $ids = $destination->import($row);
-        if ($ids) {
-          $id_map->saveIDMapping($row, $ids, $this->needsUpdate, $this->rollbackAction);
+        $destination_id_values = $destination->import($row);
+        if ($destination_id_values) {
+          $id_map->saveIDMapping($row, $destination_id_values, $this->needsUpdate, $this->rollbackAction);
           $this->successes_since_feedback++;
           $this->total_successes++;
         }
@@ -181,15 +181,12 @@ class MigrateExecutable {
         }
       }
       catch (\MigrateException $e) {
-        $this->migration->getIdMap()->saveIDMapping($row->getSource(), array(),
-          $e->getStatus(), $this->rollbackAction, $row->getHash());
+        $this->migration->getIdMap()->saveIDMapping($row, array(), $e->getStatus(), $this->rollbackAction);
         $this->saveMessage($e->getMessage(), $e->getLevel());
         $this->message->display($e->getMessage());
       }
       catch (\Exception $e) {
-        $this->migration->getIdMap()->saveIDMapping($row->getSource(), array(),
-          MigrateIdMapInterface::STATUS_FAILED, $this->rollbackAction,
-          $row->getHash());
+        $this->migration->getIdMap()->saveIDMapping($row, array(), MigrateIdMapInterface::STATUS_FAILED, $this->rollbackAction);
         $this->handleException($e);
       }
       $this->total_processed++;
