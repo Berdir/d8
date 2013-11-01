@@ -174,8 +174,7 @@ class PropertyMap extends PluginBase implements ProcessInterface {
     // Store the destination together with possible configuration.
     if (isset($destination_values)) {
       $keys = explode(':', $this->configuration['destination']);
-      $row->setDestinationPropertyDeep(array_merge($keys, array('values')), $destination_values);
-      $row->setDestinationPropertyDeep(array_merge($keys, array('configuration')), $this->configuration);
+      $row->setDestinationPropertyDeep($keys, $destination_values);
     }
   }
 }
