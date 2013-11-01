@@ -29,6 +29,9 @@ class RowTest extends UnitTestCase {
   // after changing title value to 'new title'
   protected $testHashMod = '9476aab0b62b3f47342cc6530441432e5612dcba7ca84115bbab5cceaca1ecb3';
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'Row class functionality',
