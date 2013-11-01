@@ -7,7 +7,6 @@
 
 namespace Drupal\migrate\Tests;
 
-use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\migrate\Row;
 use Drupal\migrate\Plugin\migrate\process\PropertyMap;
 
