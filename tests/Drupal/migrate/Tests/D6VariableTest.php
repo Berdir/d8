@@ -25,10 +25,8 @@ class D6VariableTest extends MigrateSqlSourceTestCase {
         'bar',
       ),
     ),
-    'sourceIds' => array(
-    ),
-    'destinationIds' => array(
-    ),
+    'sourceIds' => array(),
+    'destinationIds' => array(),
   );
 
   protected $mapJoinable = FALSE;
@@ -40,11 +38,16 @@ class D6VariableTest extends MigrateSqlSourceTestCase {
     ),
   );
 
-  protected $databaseContents = array('variable' => array(
-    array('name' => 'foo', 'value' => 'i:1;'),
-    array('name' => 'bar', 'value' => 'b:0;'),
-  ));
+  protected $databaseContents = array(
+    'variable' => array(
+      array('name' => 'foo', 'value' => 'i:1;'),
+      array('name' => 'bar', 'value' => 'b:0;'),
+    ),
+  );
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'D6 variabe source functionality',

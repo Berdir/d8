@@ -36,7 +36,6 @@ class D6VocabularySourceTest extends MigrateSqlSourceTestCase {
       ),
     ),
     'destinationIds' => array(
-      // @todo
       'vid' => array(
         // This is where the field schema would go.
       ),

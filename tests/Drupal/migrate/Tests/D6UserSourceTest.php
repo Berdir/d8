@@ -57,7 +57,7 @@ class D6UserSourceTest extends MigrateSqlSourceTestCase {
       // @todo Add the file when needed.
       'picture' => 'sites/default/files/pictures/picture-1.jpg',
       'init' => 'admin@example.com',
-      'data' => null,
+      'data' => NULL,
     ),
     array(
       'uid' => 4,
@@ -79,10 +79,13 @@ class D6UserSourceTest extends MigrateSqlSourceTestCase {
       'language' => 'en',
       'picture' => '',
       'init' => 'alice@example.com',
-      'data' => null,
+      'data' => NULL,
     ),
   );
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'D6 user source functionality',
@@ -91,6 +94,9 @@ class D6UserSourceTest extends MigrateSqlSourceTestCase {
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     foreach ($this->results as $k => $row) {
       $this->databaseContents['users'][$k] = $row;

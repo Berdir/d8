@@ -18,17 +18,20 @@ use Drupal\Tests\UnitTestCase;
  */
 class RowTest extends UnitTestCase {
 
-  protected $test_source_ids = array(
+  protected $testSourceIds = array(
     'nid' => 'Node ID',
   );
-  protected $test_values = array(
+  protected $testValues = array(
     'nid' => 1,
     'title' => 'node 1',
   );
-  protected $test_hash = '85795d4cde4a2425868b812cc88052ecd14fc912e7b9b4de45780f66750e8b1e';
-  // after changing title value to 'new title'
-  protected $test_hash_mod = '9476aab0b62b3f47342cc6530441432e5612dcba7ca84115bbab5cceaca1ecb3';
+  protected $testHash = '85795d4cde4a2425868b812cc88052ecd14fc912e7b9b4de45780f66750e8b1e';
+  // After changing title value to 'new title'.
+  protected $testHashMod = '9476aab0b62b3f47342cc6530441432e5612dcba7ca84115bbab5cceaca1ecb3';
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'Row class functionality',
@@ -49,16 +52,16 @@ class RowTest extends UnitTestCase {
    * Tests object creation: basic.
    */
   public function testRowWithBasicData() {
-    $row = new Row($this->test_source_ids, $this->test_values);
-    $this->assertSame($this->test_values, $row->getSource(), 'Row with data, simple id.');
+    $row = new Row($this->testSourceIds, $this->testValues);
+    $this->assertSame($this->testValues, $row->getSource(), 'Row with data, simple id.');
   }
 
   /**
    * Tests object creation: multiple source ids.
    */
   public function testRowWithMultipleSourceIds() {
-    $multi_source_ids = $this->test_source_ids + array('vid' => 'Node revision');
-    $multi_source_ids_values = $this->test_values + array('vid' => 1);
+    $multi_source_ids = $this->testSourceIds + array('vid' => 'Node revision');
+    $multi_source_ids_values = $this->testValues + array('vid' => 1);
     $row = new Row($multi_source_ids, $multi_source_ids_values);
     $this->assertSame($multi_source_ids_values, $row->getSource(), 'Row with data, multifield id.');
   }
@@ -66,27 +69,27 @@ class RowTest extends UnitTestCase {
   /**
    * Tests object creation: invalid values.
    *
-   * @expectedException Exception
+   * @expectedException \Exception
    */
   public function testRowWithInvalidData() {
     $invalid_values = array(
       'title' => 'node X',
     );
-    $row = new Row($this->test_source_ids, $invalid_values);
+    $row = new Row($this->testSourceIds, $invalid_values);
   }
 
   /**
-   * Tests source inmutability after freeze.
+   * Tests source immutability after freeze.
    *
-   * @expectedException Exception
+   * @expectedException \Exception
    */
   public function testSourceFreeze() {
-    $row = new Row($this->test_source_ids, $this->test_values);
+    $row = new Row($this->testSourceIds, $this->testValues);
     $row->rehash();
-    $this->assertSame($this->test_hash, $row->getHash(), 'Correct hash.');
+    $this->assertSame($this->testHash, $row->getHash(), 'Correct hash.');
     $row->setSourceProperty('title', 'new title');
     $row->rehash();
-    $this->assertSame($this->test_hash_mod, $row->getHash(), 'Hash changed correctly.');
+    $this->assertSame($this->testHashMod, $row->getHash(), 'Hash changed correctly.');
     $row->freezeSource();
     $row->setSourceProperty('title', 'new title');
   }
@@ -95,12 +98,12 @@ class RowTest extends UnitTestCase {
    * Tests hashing.
    */
   public function testHashing() {
-    $row = new Row($this->test_source_ids, $this->test_values);
+    $row = new Row($this->testSourceIds, $this->testValues);
     $this->assertSame('', $row->getHash(), 'No hash at creation');
     $row->rehash();
-    $this->assertSame($this->test_hash, $row->getHash(), 'Correct hash.');
+    $this->assertSame($this->testHash, $row->getHash(), 'Correct hash.');
     $row->rehash();
-    $this->assertSame($this->test_hash, $row->getHash(), 'Correct hash even doing it twice.');
+    $this->assertSame($this->testHash, $row->getHash(), 'Correct hash even doing it twice.');
     $test_id_map = array(
       'original_hash' => '',
       'hash' => '',
@@ -108,10 +111,10 @@ class RowTest extends UnitTestCase {
     );
     $row->setIdMap($test_id_map);
     $row->rehash();
-    $this->assertSame($this->test_hash, $row->getHash(), 'Correct hash even if id_mpa have changed.');
+    $this->assertSame($this->testHash, $row->getHash(), 'Correct hash even if id_mpa have changed.');
     $row->setSourceProperty('title', 'new title');
     $row->rehash();
-    $this->assertSame($this->test_hash_mod, $row->getHash(), 'Hash changed correctly.');
+    $this->assertSame($this->testHashMod, $row->getHash(), 'Hash changed correctly.');
   }
 
 }

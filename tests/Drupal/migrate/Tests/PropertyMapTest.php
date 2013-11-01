@@ -7,7 +7,6 @@
 
 namespace Drupal\migrate\Tests;
 
-use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\migrate\Row;
 use Drupal\migrate\Plugin\migrate\process\PropertyMap;
 
@@ -17,10 +16,6 @@ use Drupal\migrate\Plugin\migrate\process\PropertyMap;
  * @group migrate
  */
 class PropertyMapTest extends MigrateTestCase {
-
-  protected $plugin_id;
-
-  protected $plugin_definition;
 
   protected $sourceIds = array(
     'nid' => 'Node ID',
@@ -40,6 +35,9 @@ class PropertyMapTest extends MigrateTestCase {
    */
   protected $row;
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'PropertyMap class functionality',
@@ -48,6 +46,9 @@ class PropertyMapTest extends MigrateTestCase {
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp() {
     $this->migrateExecutable = $this->getMockBuilder('Drupal\migrate\MigrateExecutable')
       ->disableOriginalConstructor()
@@ -55,7 +56,10 @@ class PropertyMapTest extends MigrateTestCase {
     $this->row = new Row($this->sourceIds, $this->values);
   }
 
-  public function testNoSourceDefaultProvided() {
+  /**
+   * Tests missing source default.
+   */
+  public function testMatchingSourceDefault() {
     $configuration = array(
       'destination' => 'testproperty',
       'default' => 'test',
@@ -67,9 +71,11 @@ class PropertyMapTest extends MigrateTestCase {
   }
 
   /**
+   * Tests missing source default.
+   *
    * @expectedException \Drupal\migrate\MigrateException
    */
-  public function testNoSourceNoDefaultProvided() {
+  public function testNoSourceDefaultProvided() {
     $configuration = array(
       'destination' => 'testproperty',
     );
@@ -77,7 +83,10 @@ class PropertyMapTest extends MigrateTestCase {
     $map->apply($this->row, $this->migrateExecutable);
   }
 
-  public function testNoSourceDefaultProvidedDestinationSubproperty() {
+  /**
+   * Tests source default sub-property.
+   */
+  public function testMatchingSourceDefaultProvidedDestinationSubproperty() {
     $configuration = array(
       'destination' => 'testproperty:testsubproperty',
       'default' => 'test',
@@ -88,6 +97,9 @@ class PropertyMapTest extends MigrateTestCase {
     $this->assertSame($destination['testproperty']['testsubproperty'], 'test');
   }
 
+  /**
+   * Tests source.
+   */
   public function testSource() {
     $configuration = array(
       'source' => 'nid',
@@ -99,6 +111,9 @@ class PropertyMapTest extends MigrateTestCase {
     $this->assertSame($destination['testproperty'], 1);
   }
 
+  /**
+   * Tests source migration.
+   */
   public function testSourceMigration() {
     $configuration = array(
       'source' => 'nid',

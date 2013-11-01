@@ -9,6 +9,9 @@ namespace Drupal\migrate\Tests;
 
 use Drupal\migrate\Source;
 
+/**
+ * Provides setup and helper methods for Migrate module source tests.
+ */
 abstract class MigrateSqlSourceTestCase extends MigrateTestCase {
 
   /**
@@ -31,17 +34,20 @@ abstract class MigrateSqlSourceTestCase extends MigrateTestCase {
    */
   protected $plugin;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp() {
     $database_contents = $this->databaseContents + array('test_map' => array());
     $database = $this->getMockBuilder('Drupal\Core\Database\Connection')
       ->disableOriginalConstructor()
       ->getMock();
-    $database->expects($this->any())
-      ->method('select')
-      ->will($this->returnCallback(function ($base_table, $base_alias) use ($database_contents) { return new FakeSelect($base_table, $base_alias, $database_contents);}));
-    $database->expects($this->any())
-      ->method('schema')
-      ->will($this->returnCallback(function () use ($database, $database_contents) { return new FakeDatabaseSchema($database, $database_contents);}));
+    $database->expects($this->any())->method('select')->will($this->returnCallback(function ($base_table, $base_alias) use ($database_contents) {
+      return new FakeSelect($base_table, $base_alias, $database_contents);
+    }));
+    $database->expects($this->any())->method('schema')->will($this->returnCallback(function () use ($database, $database_contents) {
+      return new FakeDatabaseSchema($database, $database_contents);
+    }));
 
     $migration = $this->getMigration();
     $migration->expects($this->any())
@@ -60,9 +66,19 @@ abstract class MigrateSqlSourceTestCase extends MigrateTestCase {
     $this->writeAttribute($this->source, 'cache', $cache);
   }
 
-  protected function writeAttribute($object, $attributeName, $value) {
+  /**
+   * Sets attribute values for a source test.
+   *
+   * @param object $object
+   *   The destination of the written attribute value.
+   * @param string $attribute_name
+   *   The name of the attribute to write.
+   * @param mixed $value
+   *   The value of the written attribute.
+   */
+  protected function writeAttribute($object, $attribute_name, $value) {
     $reflection = new \ReflectionClass($object);
-    $reflection_property = $reflection->getProperty($attributeName);
+    $reflection_property = $reflection->getProperty($attribute_name);
     $reflection_property->setAccessible(TRUE);
     $reflection_property->setValue($object, $value);
   }
@@ -83,6 +99,16 @@ abstract class MigrateSqlSourceTestCase extends MigrateTestCase {
     $this->assertSame(count($this->results), $count);
   }
 
+  /**
+   * Asserts tested values during test retrieval.
+   *
+   * @param mixed $expected_value
+   *   The incoming expected value to test.
+   * @param mixed $actual_value
+   *   The incoming value itself.
+   * @param string $message
+   *   The tested result as a formatted string.
+   */
   protected function retrievalAssertHelper($expected_value, $actual_value, $message) {
     if (is_array($expected_value)) {
       foreach ($expected_value as $k => $v) {
@@ -95,7 +121,7 @@ abstract class MigrateSqlSourceTestCase extends MigrateTestCase {
   }
 
   /**
-   * Provide meta information about this battery of tests.
+   * {@inheritdoc}
    */
   public static function getInfo() {
     return array(
