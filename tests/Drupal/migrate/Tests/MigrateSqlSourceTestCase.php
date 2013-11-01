@@ -42,12 +42,12 @@ abstract class MigrateSqlSourceTestCase extends MigrateTestCase {
     $database = $this->getMockBuilder('Drupal\Core\Database\Connection')
       ->disableOriginalConstructor()
       ->getMock();
-    $database->expects($this->any())
-      ->method('select')
-      ->will($this->returnCallback(function ($base_table, $base_alias) use ($database_contents) { return new FakeSelect($base_table, $base_alias, $database_contents);}));
-    $database->expects($this->any())
-      ->method('schema')
-      ->will($this->returnCallback(function () use ($database, $database_contents) { return new FakeDatabaseSchema($database, $database_contents);}));
+    $database->expects($this->any())->method('select')->will($this->returnCallback(function ($base_table, $base_alias) use ($database_contents) {
+      return new FakeSelect($base_table, $base_alias, $database_contents);
+    }));
+    $database->expects($this->any())->method('schema')->will($this->returnCallback(function () use ($database, $database_contents) {
+      return new FakeDatabaseSchema($database, $database_contents);
+    }));
 
     $migration = $this->getMigration();
     $migration->expects($this->any())
