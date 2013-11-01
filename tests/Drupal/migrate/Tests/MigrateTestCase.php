@@ -9,6 +9,9 @@ namespace Drupal\migrate\Tests;
 
 use Drupal\Tests\UnitTestCase;
 
+/**
+ * Provides setup and helper methods for migrate module tests.
+ */
 abstract class MigrateTestCase extends UnitTestCase {
 
   /**
@@ -20,6 +23,12 @@ abstract class MigrateTestCase extends UnitTestCase {
 
   protected $migrationConfiguration = array();
 
+  /**
+   * Retrieve a mocked migration.
+   *
+   * @return \PHPUnit_Framework_MockObject_MockObject
+   *   The mocked migration.
+   */
   protected function getMigration() {
     $idmap = $this->getMock('Drupal\migrate\Plugin\MigrateIdMapInterface');
     if ($this->mapJoinable) {
