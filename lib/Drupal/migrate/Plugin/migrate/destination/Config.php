@@ -6,7 +6,6 @@
 
 namespace Drupal\migrate\Plugin\migrate\destination;
 
-use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\migrate\Entity\Migration;
@@ -47,12 +46,9 @@ class Config extends DestinationBase implements ContainerFactoryPluginInterface 
    * {@inheritdoc}
    */
   public function import(Row $row) {
-    $destination = $row->getDestination();
-    foreach ($row->getDestinationArrayKeys() as $keys) {
-      $property = NestedArray::getValue($destination, $keys);
-      $this->config->set(implode('.', $keys), $property['value']);
-    }
-    $this->config->save();
+    $this->config
+      ->setData($row->getDestination())
+      ->save();
   }
 
   public function rollbackMultiple(array $destination_keys) {

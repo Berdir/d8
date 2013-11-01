@@ -43,7 +43,6 @@ class Row {
   );
 
   protected $frozen = FALSE;
-  protected $destinationArrayKeys = array();
 
   /**
    * Constructs a Migrate>Row object.
@@ -116,21 +115,16 @@ class Row {
     return isset($this->destination[$property]) || array_key_exists($property, $this->destination);
   }
 
-  public function setDestinationProperty($property, array $configuration, $value) {
-    $this->setDestinationPropertyDeep(array($property), $configuration, $value);
+  public function setDestinationProperty($property, $value) {
+    $this->destination[$property] = $value;
   }
 
-  public function setDestinationPropertyDeep(array $property_keys, array $configuration, $value) {
-    $this->destinationArrayKeys[] = $property_keys;
-    NestedArray::setValue($this->destination, $property_keys, array('configuration' => $configuration, 'value' => $value), TRUE);;
+  public function setDestinationPropertyDeep(array $property_keys, $value) {
+    NestedArray::setValue($this->destination, $property_keys, $value, TRUE);
   }
 
   public function getDestination() {
     return $this->destination;
-  }
-
-  public function getDestinationArrayKeys() {
-    return $this->destinationArrayKeys;
   }
 
   public function setIdMap(array $id_map) {
