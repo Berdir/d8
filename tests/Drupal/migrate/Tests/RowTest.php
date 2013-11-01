@@ -79,7 +79,7 @@ class RowTest extends UnitTestCase {
   }
 
   /**
-   * Tests source inmutability after freeze.
+   * Tests source immutability after freeze.
    *
    * @expectedException Exception
    */
