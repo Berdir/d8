@@ -42,9 +42,9 @@ abstract class MigrateTestCase extends UnitTestCase {
       ->method('getIdMap')
       ->will($this->returnValue($idmap));
     $configuration = $this->migrationConfiguration;
-    $migration->expects($this->any())
-      ->method('get')
-      ->will($this->returnCallback(function ($argument) use ($configuration) { return isset($configuration[$argument]) ? $configuration[$argument] : ''; }));
+    $migration->expects($this->any())->method('get')->will($this->returnCallback(function ($argument) use ($configuration) {
+      return isset($configuration[$argument]) ? $configuration[$argument] : '';
+    }));
     $migration->expects($this->any())
       ->method('id')
       ->will($this->returnValue($configuration['id']));
