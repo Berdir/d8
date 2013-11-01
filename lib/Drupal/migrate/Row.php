@@ -42,6 +42,13 @@ class Row {
     'needs_update' => MigrateIdMapInterface::STATUS_NEEDS_UPDATE,
   );
 
+  /**
+   * Whether the source has been frozen already.
+   *
+   * Once frozen the source can not be changed any more.
+   *
+   * @var bool
+   */
   protected $frozen = FALSE;
 
   /**
