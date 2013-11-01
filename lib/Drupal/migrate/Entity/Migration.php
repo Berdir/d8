@@ -182,7 +182,7 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
    */
   public function getProcess() {
     if (!$this->migrateProcessBag) {
-      $this->migrateProcessBag = new MigrateProcessBag(\Drupal::service('plugin.manager.migrate.process'), $this->process);
+      $this->migrateProcessBag = new MigrateProcessBag(\Drupal::service('plugin.manager.migrate.process'), $this->process, $this);
     }
     return $this->migrateProcessBag;
   }
