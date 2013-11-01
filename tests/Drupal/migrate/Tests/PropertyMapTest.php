@@ -61,10 +61,10 @@ class PropertyMapTest extends MigrateTestCase {
     $this->row = new Row($this->sourceIds, $this->values);
   }
 
-  public function testNoSourceDefaultProvided() {
   /**
    * Tests missing source default.
    */
+  public function testMatchingSourceDefault() {
     $configuration = array(
       'destination' => 'testproperty',
       'default' => 'test',
@@ -80,7 +80,7 @@ class PropertyMapTest extends MigrateTestCase {
    *
    * @expectedException \Drupal\migrate\MigrateException
    */
-  public function testNoSourceNoDefaultProvided() {
+  public function testNoSourceDefaultProvided() {
     $configuration = array(
       'destination' => 'testproperty',
     );
@@ -88,10 +88,10 @@ class PropertyMapTest extends MigrateTestCase {
     $map->apply($this->row, $this->migrateExecutable);
   }
 
-  public function testNoSourceDefaultProvidedDestinationSubproperty() {
   /**
    * Tests source default sub-property.
    */
+  public function testMatchingSourceDefaultProvidedDestinationSubproperty() {
     $configuration = array(
       'destination' => 'testproperty:testsubproperty',
       'default' => 'test',
