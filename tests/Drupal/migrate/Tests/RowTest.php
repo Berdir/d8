@@ -69,7 +69,7 @@ class RowTest extends UnitTestCase {
   /**
    * Tests object creation: invalid values.
    *
-   * @expectedException Exception
+   * @expectedException \Exception
    */
   public function testRowWithInvalidData() {
     $invalid_values = array(
@@ -81,7 +81,7 @@ class RowTest extends UnitTestCase {
   /**
    * Tests source immutability after freeze.
    *
-   * @expectedException Exception
+   * @expectedException \Exception
    */
   public function testSourceFreeze() {
     $row = new Row($this->testSourceIds, $this->testValues);
