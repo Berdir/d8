@@ -51,11 +51,10 @@ abstract class SqlBase extends PluginBase implements MigrateSourceInterface {
   }
 
   protected function getDatabase() {
-    // Make the class easy to unit test.
-    if  (isset($this->database)) {
-      return $this->database;
+    if  (!isset($this->database)) {
+      $this->database = static::getDatabaseConnection($this->migration->id(), $this->configuration);
     }
-    return static::getDatabaseConnection($this->migration->id(), $this->configuration);
+    return $this->database;
   }
 
   public static function getDatabaseConnection($id, array $configuration) {
