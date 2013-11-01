@@ -66,9 +66,19 @@ abstract class MigrateSqlSourceTestCase extends MigrateTestCase {
     $this->writeAttribute($this->source, 'cache', $cache);
   }
 
-  protected function writeAttribute($object, $attributeName, $value) {
+  /**
+   * Sets attribute values for a source test.
+   *
+   * @param object $object
+   *   The destination of the written attribute value.
+   * @param string $attribute_name
+   *   The name of the attribute to write.
+   * @param mixed $value
+   *   The value of the written attribute.
+   */
+  protected function writeAttribute($object, $attribute_name, $value) {
     $reflection = new \ReflectionClass($object);
-    $reflection_property = $reflection->getProperty($attributeName);
+    $reflection_property = $reflection->getProperty($attribute_name);
     $reflection_property->setAccessible(TRUE);
     $reflection_property->setValue($object, $value);
   }
