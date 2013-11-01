@@ -63,7 +63,7 @@ class FakeStatement extends \ArrayIterator implements StatementInterface {
   }
 
   /**
-   * Provide meta information about this battery of tests.
+   * {@inheritdoc}
    */
   public static function getInfo() {
     return array(
