@@ -10,9 +10,6 @@ namespace Drupal\migrate;
 use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
 
-/**
- * @property mixed processed_since_feedback
- */
 class MigrateExecutable {
 
   /**
@@ -62,6 +59,7 @@ class MigrateExecutable {
    * @var array
    */
   protected $sourceIdValues;
+  protected $processed_since_feedback = 0;
 
   public function __construct(MigrationInterface $migration, MigrateMessageInterface $message) {
     $this->migration = $migration;
