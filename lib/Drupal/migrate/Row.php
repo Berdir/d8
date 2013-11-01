@@ -72,7 +72,7 @@ class Row {
    * Retrieves the values of the source identifiers.
    *
    * @return array
-   *   An array containing the ids of the source.
+   *   An array containing the values of the source identifiers.
    */
   public function getSourceIdValues() {
     return $this->sourceIdValues;
@@ -203,7 +203,7 @@ class Row {
    * Retrieves the Migrate id mappings.
    *
    * @return array
-   *   An array of id mappings between source ID and destination ID.
+   *   An array of id mappings between source and destination identifiers.
    */
   public function getIdMap() {
     return $this->idMap;
@@ -229,7 +229,7 @@ class Row {
   }
 
   /**
-   * Returns if this id mapping needs an update.
+   * Returns if this row needs an update.
    *
    * @return bool
    *   TRUE if the row needs updating, FALSE otherwise.
@@ -239,10 +239,10 @@ class Row {
   }
 
   /**
-   * Returns the hash for this id mapping.
+   * Returns the hash for the source values..
    *
    * @return mixed
-   *   The hashed source id mapping.
+   *   The hash of the source values.
    */
   public function getHash() {
     return $this->idMap['hash'];
