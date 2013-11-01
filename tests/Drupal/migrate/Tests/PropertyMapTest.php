@@ -40,6 +40,9 @@ class PropertyMapTest extends MigrateTestCase {
    */
   protected $row;
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'PropertyMap class functionality',
@@ -48,6 +51,9 @@ class PropertyMapTest extends MigrateTestCase {
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp() {
     $this->migrateExecutable = $this->getMockBuilder('Drupal\migrate\MigrateExecutable')
       ->disableOriginalConstructor()
@@ -56,6 +62,9 @@ class PropertyMapTest extends MigrateTestCase {
   }
 
   public function testNoSourceDefaultProvided() {
+  /**
+   * Tests missing source default.
+   */
     $configuration = array(
       'destination' => 'testproperty',
       'default' => 'test',
@@ -67,6 +76,8 @@ class PropertyMapTest extends MigrateTestCase {
   }
 
   /**
+   * Tests missing source default.
+   *
    * @expectedException \Drupal\migrate\MigrateException
    */
   public function testNoSourceNoDefaultProvided() {
@@ -78,6 +89,9 @@ class PropertyMapTest extends MigrateTestCase {
   }
 
   public function testNoSourceDefaultProvidedDestinationSubproperty() {
+  /**
+   * Tests source default sub-property.
+   */
     $configuration = array(
       'destination' => 'testproperty:testsubproperty',
       'default' => 'test',
@@ -88,6 +102,9 @@ class PropertyMapTest extends MigrateTestCase {
     $this->assertSame($destination['testproperty']['testsubproperty'], 'test');
   }
 
+  /**
+   * Tests source.
+   */
   public function testSource() {
     $configuration = array(
       'source' => 'nid',
@@ -99,6 +116,9 @@ class PropertyMapTest extends MigrateTestCase {
     $this->assertSame($destination['testproperty'], 1);
   }
 
+  /**
+   * Tests source migration.
+   */
   public function testSourceMigration() {
     $configuration = array(
       'source' => 'nid',
