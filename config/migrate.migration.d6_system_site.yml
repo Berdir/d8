@@ -1,0 +1,39 @@
+id: d6_system_site
+source:
+  plugin: drupal6_variable
+  variables:
+    - site_name
+    - site_mail
+    - site_slogan
+    - site_frontpage
+    - site_403
+    - drupal_weight_select_max
+    - admin_compact_mode
+process:
+  -
+    source: site_name
+    destination: name
+  -
+    source: site_mail
+    destination: mail
+  -
+    source: site_slogan
+    destination: slogan
+  -
+    source: site_frontpage
+    destination: page:front
+  -
+    source: site_403
+    destination: page:403
+  -
+    source: site_404
+    destination: page:404
+  -
+    source: drupal_weight_select_max
+    destination: weight_select_max
+  -
+    source: admin_compact_mode
+    destination: admin_compact_mode
+destination:
+  plugin: d8_config
+  config_name: system.site
