@@ -10,7 +10,7 @@ namespace Drupal\migrate\Tests;
 use Drupal\Tests\UnitTestCase;
 
 /**
- * Provides setup and helper methods for migrate module tests.
+ * Provides setup and helper methods for Migrate module tests.
  */
 abstract class MigrateTestCase extends UnitTestCase {
 
