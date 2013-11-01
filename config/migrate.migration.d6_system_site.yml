@@ -7,6 +7,7 @@ source:
     - site_slogan
     - site_frontpage
     - site_403
+    - site_404
     - drupal_weight_select_max
     - admin_compact_mode
 process:
