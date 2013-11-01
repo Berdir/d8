@@ -17,10 +17,6 @@ use Drupal\migrate\Plugin\migrate\process\PropertyMap;
  */
 class PropertyMapTest extends MigrateTestCase {
 
-  protected $pluginId;
-
-  protected $pluginDefinition;
-
   protected $sourceIds = array(
     'nid' => 'Node ID',
   );
