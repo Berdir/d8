@@ -19,6 +19,8 @@ class MigrateProcessBag extends DefaultPluginBag {
    */
   protected $migration;
 
+  protected $pluginKey = 'plugin';
+
   public function __construct(PluginManagerInterface $manager, array $configurations = array(), MigrationInterface $migration) {
     parent::__construct($manager, $configurations);
     $this->migration = $migration;
@@ -33,6 +35,9 @@ class MigrateProcessBag extends DefaultPluginBag {
     return parent::get($instance_id);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function initializePlugin($instance_id) {
     $this->configurations[$instance_id] += array('id' => 'property_map');
     $configuration = isset($this->configurations[$instance_id]) ? $this->configurations[$instance_id] : array();

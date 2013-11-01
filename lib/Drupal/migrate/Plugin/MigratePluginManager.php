@@ -42,6 +42,11 @@ class MigratePluginManager extends DefaultPluginManager {
     $this->setCacheBackend($cache_backend, $language_manager, 'migrate_plugins_' . $type);
   }
 
+  /**
+   * {@inheritdoc}
+   *
+   * A specific createInstance method is necessary to pass the migration on.
+   */
   public function createInstance($plugin_id, array $configuration, MigrationInterface $migration = NULL) {
     $plugin_definition = $this->discovery->getDefinition($plugin_id);
     $plugin_class = DefaultFactory::getPluginClass($plugin_id, $plugin_definition);
