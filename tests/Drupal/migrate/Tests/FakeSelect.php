@@ -5,7 +5,6 @@
  * Contains \Drupal\migrate\Tests\FakeSelect.
  */
 
-
 namespace Drupal\migrate\Tests;
 
 use Drupal\Core\Database\Connection;
@@ -49,6 +48,21 @@ class FakeSelect extends Select {
   protected $countQuery = FALSE;
   protected $fieldsWithTable = array();
 
+  /**
+   * Constructs a new FakeSelect.
+   *
+   * @param string $table
+   *   The base table name used within fake select.
+   *
+   * @param string $alias
+   *   The base table alias used within fake select.
+   *
+   * @param array $database_contents
+   *   An array of mocked database content.
+   *
+   * @param string $conjunction
+   *   The operator to use to combine conditions: 'AND' or 'OR'.
+   */
   public function __construct($table, $alias, array $database_contents, $conjunction = 'AND') {
     $this->addJoin(NULL, $table, $alias);
     $this->where = new Condition($conjunction);
@@ -56,12 +70,15 @@ class FakeSelect extends Select {
     $this->databaseContents = $database_contents;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function leftJoin($table, $alias = NULL, $condition = NULL, $arguments = array()) {
     return $this->addJoin('LEFT', $table, $alias, $condition, $arguments);
   }
 
   /**
-   * {@#inheritdoc}
+   * {@inheritdoc}
    */
   public function addJoin($type, $table, $alias = NULL, $condition = NULL, $arguments = array()) {
     if ($table instanceof SelectInterface) {
@@ -71,10 +88,10 @@ class FakeSelect extends Select {
     $alias = parent::addJoin($type, $table, $alias, $condition, $arguments);
     if (isset($type)) {
       if ($type != 'INNER' && $type != 'LEFT') {
-        throw new \Exception(sprintf('%s type not supported, only INNER and LEFT.',$type));
+        throw new \Exception(sprintf('%s type not supported, only INNER and LEFT.', $type));
       }
       if (!preg_match('/(\w+)\.(\w+)\s*=\s*(\w+)\.(\w+)/', $condition, $matches)) {
-        throw new \Exception('Only x.field1 = y.field2 conditions are supported.'. $condition);
+        throw new \Exception('Only x.field1 = y.field2 conditions are supported.' . $condition);
       }
       if ($matches[1] == $alias) {
         $this->tables[$alias] += array(
@@ -102,7 +119,6 @@ class FakeSelect extends Select {
    */
   public function execute() {
     // @todo: Implement distinct() handling.
-
     $all_rows = $this->executeJoins();
     $this->resolveConditions($this->where, $all_rows);
     if (!empty($this->order)) {
@@ -170,6 +186,16 @@ class FakeSelect extends Select {
     return $results;
   }
 
+  /**
+   * Retrieves a new row.
+   *
+   * @param string $table_alias
+   * @param array $fields
+   * @param array $candidate_row
+   * @param array $row
+   *
+   * @return array
+   */
   protected function getNewRow($table_alias, $fields, $candidate_row, $row = array()) {
     $new_row = array();
     foreach ($fields[$table_alias] as $field => $v) {
@@ -210,13 +236,14 @@ class FakeSelect extends Select {
   }
 
   protected function getFieldInfo($field) {
-    return isset($this->fieldsWithTable[$field])? $this->fieldsWithTable[$field] : $this->fields[$field];
+    return isset($this->fieldsWithTable[$field]) ? $this->fieldsWithTable[$field] : $this->fields[$field];
   }
 
   /**
    * Resolves conditions by removing non-matching rows.
    *
    * @param array $rows
+   *   An array of rows excluding non-matching rows.
    */
   protected function resolveConditions(Condition $condition_group, array &$rows) {
     foreach ($rows as $k => $row) {
@@ -230,7 +257,9 @@ class FakeSelect extends Select {
    * Match a row against a group of conditions.
    *
    * @param array $row
+   *
    * @param \Drupal\Core\Database\Query\Condition $condition_group
+   *
    * @return bool
    */
   protected function matchGroup(array $row, Condition $condition_group) {
@@ -250,10 +279,14 @@ class FakeSelect extends Select {
   }
 
   /**
+   * Match a single row and its condition.
+   *
    * @param array $row
    *   The row to match.
+   *
    * @param array $condition
    *   An array representing a single condition.
+   *
    * @return bool
    *   TRUE if the condition matches.
    */
@@ -261,134 +294,234 @@ class FakeSelect extends Select {
     $field_info = $this->getFieldInfo($condition['field']);
     $row_value = $row[$field_info['table']][$field_info['field']];
     switch ($condition['operator']) {
-      case '=': return $row_value == $condition['value'];
-      case '<=': return $row_value <= $condition['value'];
-      case '>=': return $row_value >= $condition['value'];
-      case '!=': return $row_value != $condition['value'];
-      case '<>': return $row_value != $condition['value'];
-      case '<': return $row_value < $condition['value'];
-      case '>': return $row_value > $condition['value'];
-      case 'IN': return in_array($row_value, $condition['value']);
-      case 'IS NULL': return !isset($row_value);
-      case 'IS NOT NULL': return isset($row_value);
-      default: throw new \Exception(sprintf('operator %s is not supported', $condition['operator']));
+      case '=':
+        return $row_value == $condition['value'];
+
+      case '<=':
+        return $row_value <= $condition['value'];
+
+      case '>=':
+        return $row_value >= $condition['value'];
+
+      case '!=':
+        return $row_value != $condition['value'];
+
+      case '<>':
+        return $row_value != $condition['value'];
+
+      case '<':
+        return $row_value < $condition['value'];
+
+      case '>':
+        return $row_value > $condition['value'];
+
+      case 'IN':
+        return in_array($row_value, $condition['value']);
+
+      case 'IS NULL':
+        return !isset($row_value);
+
+      case 'IS NOT NULL':
+        return isset($row_value);
+
+      default:
+        throw new \Exception(sprintf('operator %s is not supported', $condition['operator']));
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function orderBy($field, $direction = 'ASC') {
     $this->order[$field] = strtoupper($direction);
     return $this;
   }
 
   // ================== we could support these.
-
+  /**
+   * {@inheritdoc}
+   */
   public function groupBy($field) {
     // @todo: Implement groupBy() method.
     throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function havingCondition($field, $value = NULL, $operator = NULL) {
     // @todo: Implement havingCondition() method.
     throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function uniqueIdentifier() {
     // TODO: Implement uniqueIdentifier() method.
     throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
   // ================== the rest won't be supported, ever.
-
+  /**
+   * {@inheritdoc}
+   */
   public function nextPlaceholder() {
     // TODO: Implement nextPlaceholder() method.
     throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function isPrepared() {
     throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function preExecute(SelectInterface $query = NULL) {
     throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function where($snippet, $args = array()) {
     throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function extend($extender_name) {
     throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function &getExpressions() {
     throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function &getGroupBy() {
     throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function &getUnion() {
     throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function forUpdate($set = TRUE) {
     throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function rightJoin($table, $alias = NULL, $condition = NULL, $arguments = array()) {
     throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function &conditions() {
     throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function orderRandom() {
     // We could implement this but why bother.
     throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function union(SelectInterface $query, $type = '') {
     throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function addExpression($expression, $alias = NULL, $arguments = array()) {
     throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function &getTables() {
     throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
-  public function getArguments(PlaceholderInterface $queryPlaceholder = NULL) {
+  /**
+   * {@inheritdoc}
+   */
+  public function getArguments(PlaceholderInterface $query_place_holder = NULL) {
     throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function &getOrderBy() {
     throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function &getFields() {
     throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function exists(SelectInterface $select) {
     throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function notExists(SelectInterface $select) {
     throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function arguments() {
     throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
-  public function compile(Connection $connection, PlaceholderInterface $queryPlaceholder) {
+  /**
+   * {@inheritdoc}
+   */
+  public function compile(Connection $connection, PlaceholderInterface $query_place_holder) {
     throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function compiled() {
     throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
