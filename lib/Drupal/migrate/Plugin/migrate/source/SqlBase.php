@@ -20,11 +20,6 @@ use Drupal\migrate\Row;
 abstract class SqlBase extends PluginBase implements MigrateSourceInterface {
 
   /**
-   * @var \Drupal\Core\Database\Connection
-   */
-  protected $database;
-
-  /**
    * @var \Drupal\Core\Database\Query\SelectInterface
    */
   protected $query;
@@ -51,12 +46,18 @@ abstract class SqlBase extends PluginBase implements MigrateSourceInterface {
   }
 
   protected function getDatabase() {
-    if (!isset($this->database)) {
-      $key = 'migrate_' . $this->migration->id();
-      Database::addConnectionInfo('default', $key, $this->configuration['connection']);
-      $this->database = Database::getConnection('default', $key);
+    return static::getDatabaseConnection($this->migration->id(), $this->configuration);
+  }
+
+  public static function getDatabaseConnection($id, array $configuration) {
+    if (isset($configuration['database'])) {
+      $key = 'migrate_' . $id;
+      Database::addConnectionInfo($key, 'default', $configuration['database']);
     }
-    return $this->database;
+    else {
+      $key = 'default';
+    }
+    return Database::getConnection('default', $key);
   }
 
   /**

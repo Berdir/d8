@@ -11,6 +11,7 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\MigrateMessageInterface;
+use Drupal\migrate\Plugin\migrate\source\SqlBase;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\Row;
 
@@ -111,14 +112,8 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
   }
 
   protected function getDatabase() {
-    if (!isset($this->database)) {
-      $key = 'migrate_' . $this->migration->id();
-      Database::addConnectionInfo($key, 'default', $this->configuration['connection']);
-      $this->database = Database::getConnection('default', $key);
-    }
-    return $this->database;
+    return SqlBase::getDatabaseConnection($this->migration->id(), $this->configuration);
   }
-
 
   public function setMessage(MigrateMessageInterface $message) {
     $this->message = $message;

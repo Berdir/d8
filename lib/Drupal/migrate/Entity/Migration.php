@@ -204,10 +204,6 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
     if (!isset($this->idMapPlugin)) {
       $configuration = $this->idMap;
       $plugin = isset($configuration['plugin']) ? $configuration['plugin'] : 'sql';
-      if ($plugin == 'sql' && !isset($configuration['database'])) {
-        $connection = Database::getConnectionInfo('default');;
-        $configuration['connection'] = $connection['default'];
-      }
       $this->idMapPlugin = \Drupal::service('plugin.manager.migrate.id_map')->createInstance($plugin, $configuration, $this);
     }
     return $this->idMapPlugin;
