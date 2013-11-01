@@ -26,7 +26,7 @@ class RowTest extends UnitTestCase {
     'title' => 'node 1',
   );
   protected $testHash = '85795d4cde4a2425868b812cc88052ecd14fc912e7b9b4de45780f66750e8b1e';
-  // after changing title value to 'new title'
+  // After changing title value to 'new title'.
   protected $testHashMod = '9476aab0b62b3f47342cc6530441432e5612dcba7ca84115bbab5cceaca1ecb3';
 
   /**
