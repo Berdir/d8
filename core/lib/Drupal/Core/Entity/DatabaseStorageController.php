@@ -259,10 +259,6 @@ class DatabaseStorageController extends EntityStorageControllerBase {
     }
     $entity->postCreate($this);
 
-    // Modules might need to add or change the data initially held by the new
-    // entity object, for instance to fill-in default values.
-    $this->invokeHook('create', $entity);
-
     return $entity;
   }
 
@@ -279,9 +275,6 @@ class DatabaseStorageController extends EntityStorageControllerBase {
     try {
       $entity_class = $this->entityInfo['class'];
       $entity_class::preDelete($this, $entities);
-      foreach ($entities as $entity) {
-        $this->invokeHook('predelete', $entity);
-      }
       $ids = array_keys($entities);
 
       $this->database->delete($this->entityInfo['base_table'])
@@ -292,9 +285,6 @@ class DatabaseStorageController extends EntityStorageControllerBase {
       $this->resetCache($ids);
 
       $entity_class::postDelete($this, $entities);
-      foreach ($entities as $entity) {
-        $this->invokeHook('delete', $entity);
-      }
       // Ignore slave server temporarily.
       db_ignore_slave();
     }
@@ -317,13 +307,11 @@ class DatabaseStorageController extends EntityStorageControllerBase {
       }
 
       $entity->preSave($this);
-      $this->invokeHook('presave', $entity);
 
       if (!$entity->isNew()) {
         $return = drupal_write_record($this->entityInfo['base_table'], $entity, $this->idKey);
         $this->resetCache(array($entity->id()));
         $entity->postSave($this, TRUE);
-        $this->invokeHook('update', $entity);
       }
       else {
         $return = drupal_write_record($this->entityInfo['base_table'], $entity);
@@ -332,7 +320,6 @@ class DatabaseStorageController extends EntityStorageControllerBase {
 
         $entity->enforceIsNew(FALSE);
         $entity->postSave($this, FALSE);
-        $this->invokeHook('insert', $entity);
       }
 
       // Ignore slave server temporarily.

@@ -191,10 +191,6 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
     }
     $entity->postCreate($this);
 
-    // Modules might need to add or change the data initially held by the new
-    // entity object, for instance to fill-in default values.
-    $this->invokeHook('create', $entity);
-
     return $entity;
   }
 
@@ -549,9 +545,6 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
       $entity_class = $this->entityClass;
       $entity_class::preDelete($this, $entities);
 
-      foreach ($entities as $entity) {
-        $this->invokeHook('predelete', $entity);
-      }
       $ids = array_keys($entities);
 
       $this->database->delete($this->entityInfo['base_table'])
@@ -583,7 +576,6 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
       foreach ($entities as $entity) {
         $this->invokeFieldMethod('delete', $entity);
         $this->deleteFieldItems($entity);
-        $this->invokeHook('delete', $entity);
       }
       // Ignore slave server temporarily.
       db_ignore_slave();
@@ -611,7 +603,6 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
 
       $entity->preSave($this);
       $this->invokeFieldMethod('preSave', $entity);
-      $this->invokeHook('presave', $entity);
 
       // Create the storage record to be saved.
       $record = $this->mapToStorageRecord($entity);

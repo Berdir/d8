@@ -302,12 +302,14 @@ abstract class Entity implements EntityInterface {
    * {@inheritdoc}
    */
   public function preSave(EntityStorageControllerInterface $storage_controller) {
+    $this->invokeHook('presave');
   }
 
   /**
    * {@inheritdoc}
    */
   public function postSave(EntityStorageControllerInterface $storage_controller, $update = TRUE) {
+    $this->invokeHook($update ? 'update' : 'insert');
     $this->changed();
   }
 
@@ -321,12 +323,18 @@ abstract class Entity implements EntityInterface {
    * {@inheritdoc}
    */
   public function postCreate(EntityStorageControllerInterface $storage_controller) {
+    // Modules might need to add or change the data initially held by the new
+    // entity object, for instance to fill-in default values.
+    $this->invokeHook('create');
   }
 
   /**
    * {@inheritdoc}
    */
   public static function preDelete(EntityStorageControllerInterface $storage_controller, array $entities) {
+    foreach ($entities as $entity) {
+      $entity->invokeHook('predelete');
+    }
   }
 
   /**
@@ -334,22 +342,9 @@ abstract class Entity implements EntityInterface {
    */
   public static function postDelete(EntityStorageControllerInterface $storage_controller, array $entities) {
     foreach ($entities as $entity) {
+      $entity->invokeHook('delete');
       $entity->changed();
     }
-  }
-
-  /**
-   * Collects information for hook load.
-   *
-   * @param array $entities
-   *   An array of entities.
-   *
-   * @return array
-   *   A list of arguments to be passed by postLoad() to the entity load
-   *   hooks.
-   */
-  protected static function hookLoadArguments(array $entities) {
-    return array();
   }
 
   /**
@@ -357,18 +352,30 @@ abstract class Entity implements EntityInterface {
    */
   public static function postLoad(EntityStorageControllerInterface $storage_controller, array $entities, $revision_id = FALSE) {
     $entity_type = $storage_controller->entityType();
+    // Call hook_TYPE_load().
+    foreach (\Drupal::moduleHandler()->getImplementations($entity_type . '_load') as $module) {
+      $function = $module . '_entity_load';
+      $function($entities);
+    }
     // Call hook_entity_load().
     foreach (\Drupal::moduleHandler()->getImplementations('entity_load') as $module) {
       $function = $module . '_entity_load';
       $function($entities, $entity_type);
     }
-    // Call hook_TYPE_load(). The first argument for hook_TYPE_load() are
-    // always the queried entities, followed by additional arguments set in
-    // $this->hookLoadArguments
-    $args = array_merge(array($entities), static::hookLoadArguments($entities));
-    foreach (\Drupal::moduleHandler()->getImplementations($entity_type . '_load') as $module) {
-      call_user_func_array($module . '_' . $entity_type . '_load', $args);
-    }
+  }
+
+  /**
+   * Invokes a hook on behalf of the entity.
+   *
+   * @param string $hook
+   *   One of 'presave', 'insert', 'update', 'predelete', 'delete', or
+   *  'revision_delete'.
+   */
+  protected function invokeHook($hook) {
+    // Invoke the hook.
+    \Drupal::moduleHandler()->invokeAll($this->entityType() . '_' . $hook, array($this));
+    // Invoke the respective entity-level hook.
+    \Drupal::moduleHandler('entity_' . $hook, array($this, $this->entityType()));
   }
 
   /**

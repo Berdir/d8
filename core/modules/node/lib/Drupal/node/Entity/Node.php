@@ -78,17 +78,6 @@ class Node extends ContentEntityBase implements NodeInterface {
   /**
    * {@inheritdoc}
    */
-  protected static function hookLoadArguments(array $nodes) {
-    $bundles = array();
-    foreach ($nodes as $id => $node) {
-      $bundles[$node->bundle()] = TRUE;
-    }
-    return array(array_keys($bundles));
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public static function preCreate(EntityStorageControllerInterface $storage_controller, array &$values) {
     // @todo Handle this through property defaults.
     if (empty($values['created'])) {

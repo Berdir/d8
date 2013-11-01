@@ -306,10 +306,6 @@ class ConfigStorageController extends EntityStorageControllerBase {
     }
     $entity->postCreate($this);
 
-    // Modules might need to add or change the data initially held by the new
-    // entity object, for instance to fill-in default values.
-    $this->invokeHook('create', $entity);
-
     // Default status to enabled.
     if (!empty($this->statusKey) && !isset($entity->{$this->statusKey})) {
       $entity->{$this->statusKey} = TRUE;
@@ -329,9 +325,6 @@ class ConfigStorageController extends EntityStorageControllerBase {
 
     $entity_class = $this->entityInfo['class'];
     $entity_class::preDelete($this, $entities);
-    foreach ($entities as $entity) {
-      $this->invokeHook('predelete', $entity);
-    }
 
     foreach ($entities as $entity) {
       $config = $this->configFactory->get($this->getConfigPrefix() . $entity->id());
@@ -339,9 +332,6 @@ class ConfigStorageController extends EntityStorageControllerBase {
     }
 
     $entity_class::postDelete($this, $entities);
-    foreach ($entities as $entity) {
-      $this->invokeHook('delete', $entity);
-    }
   }
 
   /**
@@ -386,7 +376,6 @@ class ConfigStorageController extends EntityStorageControllerBase {
     }
 
     $entity->preSave($this);
-    $this->invokeHook('presave', $entity);
 
     // Retrieve the desired properties and set them in config.
     foreach ($entity->getExportProperties() as $key => $value) {
@@ -397,7 +386,6 @@ class ConfigStorageController extends EntityStorageControllerBase {
       $return = SAVED_UPDATED;
       $config->save();
       $entity->postSave($this, TRUE);
-      $this->invokeHook('update', $entity);
 
       // Immediately update the original ID.
       $entity->setOriginalID($entity->id());
@@ -407,7 +395,6 @@ class ConfigStorageController extends EntityStorageControllerBase {
       $config->save();
       $entity->enforceIsNew(FALSE);
       $entity->postSave($this, FALSE);
-      $this->invokeHook('insert', $entity);
     }
 
     unset($entity->original);

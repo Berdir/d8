@@ -309,15 +309,4 @@ class CustomBlock extends ContentEntityBase implements CustomBlockInterface {
     return $this->get('changed')->value;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  protected static function hookLoadArguments(array $blocks) {
-    $types = array();
-    // Create an array of block types for passing as a load argument.
-    foreach ($blocks as $id => $entity) {
-      $types[$entity->bundle()] = $entity->bundle();
-    }
-    return array($types);
-  }
 }

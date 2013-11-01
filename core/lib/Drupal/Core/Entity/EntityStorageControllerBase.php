@@ -142,22 +142,6 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
   }
 
   /**
-   * Invokes a hook on behalf of the entity.
-   *
-   * @param string $hook
-   *   One of 'presave', 'insert', 'update', 'predelete', 'delete', or
-   *  'revision_delete'.
-   * @param \Drupal\Core\Entity\EntityInterface  $entity
-   *   The entity object.
-   */
-  protected function invokeHook($hook, EntityInterface $entity) {
-    // Invoke the hook.
-    module_invoke_all($this->entityType . '_' . $hook, $entity);
-    // Invoke the respective entity-level hook.
-    module_invoke_all('entity_' . $hook, $entity, $this->entityType);
-  }
-
-  /**
    * Attaches data to entities upon loading.
    *
    * @param $queried_entities
