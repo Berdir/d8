@@ -39,7 +39,7 @@ class MigrateProcessBag extends DefaultPluginBag {
    * {@inheritdoc}
    */
   public function initializePlugin($instance_id) {
-    $this->configurations[$instance_id] += array('id' => 'property_map');
+    $this->configurations[$instance_id] += array('plugin' => 'property_map');
     $configuration = isset($this->configurations[$instance_id]) ? $this->configurations[$instance_id] : array();
     if (!isset($configuration[$this->pluginKey])) {
       throw new UnknownPluginException($instance_id);
