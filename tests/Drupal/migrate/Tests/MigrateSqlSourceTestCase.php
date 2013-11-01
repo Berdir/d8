@@ -9,6 +9,9 @@ namespace Drupal\migrate\Tests;
 
 use Drupal\migrate\Source;
 
+/**
+ * Provides setup and helper methods for Migrate module source tests.
+ */
 abstract class MigrateSqlSourceTestCase extends MigrateTestCase {
 
   /**
@@ -31,6 +34,9 @@ abstract class MigrateSqlSourceTestCase extends MigrateTestCase {
    */
   protected $plugin;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp() {
     $database_contents = $this->databaseContents + array('test_map' => array());
     $database = $this->getMockBuilder('Drupal\Core\Database\Connection')
@@ -83,6 +89,16 @@ abstract class MigrateSqlSourceTestCase extends MigrateTestCase {
     $this->assertSame(count($this->results), $count);
   }
 
+  /**
+   * Asserts tested values during test retrieval.
+   *
+   * @param mixed $expected_value
+   *   The incoming expected value to test.
+   * @param mixed $actual_value
+   *   The incoming value itself.
+   * @param string $message
+   *   The tested result as a formatted string.
+   */
   protected function retrievalAssertHelper($expected_value, $actual_value, $message) {
     if (is_array($expected_value)) {
       foreach ($expected_value as $k => $v) {
@@ -95,7 +111,7 @@ abstract class MigrateSqlSourceTestCase extends MigrateTestCase {
   }
 
   /**
-   * Provide meta information about this battery of tests.
+   * {@inheritdoc}
    */
   public static function getInfo() {
     return array(
