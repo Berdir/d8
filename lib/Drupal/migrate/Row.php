@@ -36,6 +36,11 @@ class Row {
    */
   protected $destination = array();
 
+  /**
+   * The mapping between source and destination identifiers.
+   *
+   * @var array
+   */
   protected $idMap = array(
     'original_hash' => '',
     'hash' => '',
@@ -210,7 +215,7 @@ class Row {
    * Retrieves the Migrate id mappings.
    *
    * @return array
-   *   An array of id mappings between source and destination identifiers.
+   *   An array of mapping between source and destination identifiers.
    */
   public function getIdMap() {
     return $this->idMap;
