@@ -30,6 +30,11 @@ abstract class SqlBase extends PluginBase implements MigrateSourceInterface {
   protected $migration;
 
   /**
+   * @var \Drupal\Core\Database\Connection
+   */
+  protected $database;
+
+  /**
    * {@inheritdoc}
    */
   function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration) {
@@ -46,6 +51,10 @@ abstract class SqlBase extends PluginBase implements MigrateSourceInterface {
   }
 
   protected function getDatabase() {
+    // Make the class easy to unit test.
+    if  (isset($this->database)) {
+      return $this->database;
+    }
     return static::getDatabaseConnection($this->migration->id(), $this->configuration);
   }
 

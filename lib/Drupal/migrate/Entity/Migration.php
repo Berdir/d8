@@ -29,7 +29,7 @@ use Drupal\migrate\Plugin\MigrateProcessBag;
  *       "delete" = "Drupal\Core\Entity\EntityFormController"
  *     }
  *   },
- *   config_prefix = "migrate.migration",
+ *   config_prefix = "migrate.D6ActionSourceTest.phpmigration",
  *   entity_keys = {
  *     "id" = "id",
  *     "label" = "label",
