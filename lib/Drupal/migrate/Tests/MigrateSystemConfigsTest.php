@@ -23,7 +23,7 @@ class MigrateSystemConfigsTest extends MigrateTestBase {
   function testSystemSite() {
     $migration = entity_load('migration', 'd6_system_site');
     $dumps = array(
-      drupal_get_path('module', 'migrate') . '/tests/upgrade/Drupal6SystemSite.php',
+      drupal_get_path('module', 'migrate') . '/ib/Drupal/migrate/Tests/Dump/Drupal6SystemSite.php',
     );
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, new DrupalMessage);
