@@ -8,6 +8,7 @@
 namespace Drupal\migrate;
 
 use Drupal\migrate\Entity\MigrationInterface;
+use Drupal\migrate\Plugin\MigrateIdMapInterface;
 
 /**
  * A base class for migrate sources.
@@ -182,8 +183,9 @@ class Source implements \Iterator, \Countable {
    *
    * @param \Drupal\migrate\Entity\MigrationInterface $migration
    */
-  function __construct(MigrationInterface $migration) {
+  function __construct(MigrationInterface $migration, MigrateExecutable $migrate_executable) {
     $this->migration = $migration;
+    $this->migrateExecutable = $migrate_executable;
     $configuration = $migration->get('source');
     if (!empty($configuration['cache_counts'])) {
       $this->cacheCounts = TRUE;
@@ -385,10 +387,10 @@ class Source implements \Iterator, \Countable {
     if ($this->migration->getSource()->prepareRow($row) === FALSE) {
       // Make sure we replace any previous messages for this item with any
       // new ones.
-      $this->migration->getIdMap()->delete($this->currentIds, TRUE);
-      $this->migration->saveQueuedMessages();
-      $this->migration->getIdMap()->saveIDMapping($row, array(),
-        \MigrateMap::STATUS_IGNORED, $this->migration->rollbackAction);
+      $id_map = $this->migration->getIdMap();
+      $id_map->delete($this->currentIds, TRUE);
+      $this->migrateExecutable->saveQueuedMessages();
+      $id_map->saveIDMapping($row, array(), MigrateIdMapInterface::STATUS_IGNORED, $this->migrateExecutable->rollbackAction);
       $this->numIgnored++;
       $this->currentRow = NULL;
       $this->currentIds = NULL;
