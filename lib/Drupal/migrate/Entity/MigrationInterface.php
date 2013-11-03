@@ -13,8 +13,10 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
  * Interface for migrations.
  */
 interface MigrationInterface extends ConfigEntityInterface {
+
   const SOURCE = 'source';
   const DESTINATION = 'destination';
+
   /**
    * Codes representing the current status of a migration, and stored in the
    * migrate_status table.
@@ -27,9 +29,9 @@ interface MigrationInterface extends ConfigEntityInterface {
 
   /**
    * Message types to be passed to saveMessage() and saved in message tables.
-   * MESSAGE_INFORMATIONAL represents a condition that did not prevent the operation
-   * from succeeding - all others represent different severities of conditions
-   * resulting in a source record not being imported.
+   * MESSAGE_INFORMATIONAL represents a condition that did not prevent the
+   * operation from succeeding - all others represent different severities of
+   * conditions resulting in a source record not being imported.
    */
   const MESSAGE_ERROR = 1;
   const MESSAGE_WARNING = 2;
@@ -49,21 +51,29 @@ interface MigrationInterface extends ConfigEntityInterface {
   const RESULT_DISABLED = 6;    // This migration is disabled, skipping
 
   /**
+   * Returns the initialized source plugin.
+   *
    * @return \Drupal\migrate\Plugin\MigrateSourceInterface
    */
   public function getSource();
 
   /**
+   * Returns the initialized process plugin.
+   *
    * @return \Drupal\migrate\Plugin\MigrateProcessBag
    */
   public function getProcess();
 
   /**
+   * Returns the initialized destination plugin.
+   *
    * @return \Drupal\migrate\Plugin\MigrateDestinationInterface
    */
   public function getDestination();
 
   /**
+   * Returns the initialized id_map plugin.
+   *
    * @return \Drupal\migrate\Plugin\MigrateIdMapInterface
    */
   public function getIdMap();
@@ -74,4 +84,5 @@ interface MigrationInterface extends ConfigEntityInterface {
   public function getHighwater();
 
   public function saveHighwater($highwater);
+
 }

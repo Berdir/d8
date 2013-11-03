@@ -8,12 +8,14 @@
 namespace Drupal\migrate\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
-use Drupal\Core\Database\Database;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\Plugin\MigrateProcessBag;
 
 /**
  * Defines the Migration entity.
+ *
+ * The migration entity stores the information about a single migration, like
+ * the source, process and destination plugins.
  *
  * @EntityType(
  *   id = "migration",
@@ -128,6 +130,15 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
    * @var array
    */
   public $sourceIds = array();
+
+  /**
+   * The destination identifiers.
+   *
+   * An array of destination identifiers: the keys are the name of the
+   * properties, the values are dependent on the id map plugin.
+   *
+   * @var array
+   */
   public $destinationIds = array();
 
   /**
@@ -178,7 +189,7 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
   }
 
   /**
-   * @return \Drupal\migrate\Plugin\MigrateProcessBag
+   * {@inheritdoc}
    */
   public function getProcess() {
     if (!$this->migrateProcessBag) {
@@ -188,7 +199,7 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
   }
 
   /**
-   * @return \Drupal\migrate\Plugin\MigrateDestinationInterface
+   * {@inheritdoc}
    */
   public function getDestination() {
     if (!isset($this->destinationPlugin)) {
@@ -198,7 +209,7 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
   }
 
   /**
-   * @return \Drupal\migrate\Plugin\MigrateIdMapInterface
+   * {@inheritdoc}
    */
   public function getIdMap() {
     if (!isset($this->idMapPlugin)) {
