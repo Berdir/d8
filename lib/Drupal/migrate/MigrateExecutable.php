@@ -175,12 +175,12 @@ class MigrateExecutable {
       try {
         $destination_id_values = $destination->import($row);
         if ($destination_id_values) {
-          $id_map->saveIDMapping($row, $destination_id_values, $this->needsUpdate, $this->rollbackAction);
+          $id_map->saveIdMapping($row, $destination_id_values, $this->needsUpdate, $this->rollbackAction);
           $this->successes_since_feedback++;
           $this->total_successes++;
         }
         else {
-          $id_map->saveIDMapping($row, array(), MigrateIdMapInterface::STATUS_FAILED, $this->rollbackAction);
+          $id_map->saveIdMapping($row, array(), MigrateIdMapInterface::STATUS_FAILED, $this->rollbackAction);
           if ($id_map->messageCount() == 0) {
             $message = t('New object was not saved, no error provided');
             $this->saveMessage($message);
@@ -189,12 +189,12 @@ class MigrateExecutable {
         }
       }
       catch (MigrateException $e) {
-        $this->migration->getIdMap()->saveIDMapping($row, array(), $e->getStatus(), $this->rollbackAction);
+        $this->migration->getIdMap()->saveIdMapping($row, array(), $e->getStatus(), $this->rollbackAction);
         $this->saveMessage($e->getMessage(), $e->getLevel());
         $this->message->display($e->getMessage());
       }
       catch (\Exception $e) {
-        $this->migration->getIdMap()->saveIDMapping($row, array(), MigrateIdMapInterface::STATUS_FAILED, $this->rollbackAction);
+        $this->migration->getIdMap()->saveIdMapping($row, array(), MigrateIdMapInterface::STATUS_FAILED, $this->rollbackAction);
         $this->handleException($e);
       }
       $this->total_processed++;

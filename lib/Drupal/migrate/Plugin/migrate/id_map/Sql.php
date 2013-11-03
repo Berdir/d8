@@ -363,7 +363,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
    * $param string $hash
    *  If hashing is enabled, the hash of the raw source row.
    */
-  public function saveIDMapping(Row $row, array $destination_id_values, $needs_update = MigrateIdMapInterface::STATUS_IMPORTED, $rollback_action = MigrateIdMapInterface::ROLLBACK_DELETE) {
+  public function saveIdMapping(Row $row, array $destination_id_values, $needs_update = MigrateIdMapInterface::STATUS_IMPORTED, $rollback_action = MigrateIdMapInterface::ROLLBACK_DELETE) {
     // Construct the source key
     $keys = array();
     $destination = $row->getDestination();

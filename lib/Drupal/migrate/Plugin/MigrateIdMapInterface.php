@@ -45,7 +45,7 @@ interface MigrateIdMapInterface {
    * @param $status
    * @param $rollback_action
    */
-  public function saveIDMapping(Row $row, array $destination_id_values, $status = self::STATUS_IMPORTED, $rollback_action = self::ROLLBACK_DELETE);
+  public function saveIdMapping(Row $row, array $destination_id_values, $status = self::STATUS_IMPORTED, $rollback_action = self::ROLLBACK_DELETE);
 
   /**
    * Record a message related to a source record

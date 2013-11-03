@@ -390,7 +390,7 @@ class Source implements \Iterator, \Countable {
       $id_map = $this->migration->getIdMap();
       $id_map->delete($this->currentIds, TRUE);
       $this->migrateExecutable->saveQueuedMessages();
-      $id_map->saveIDMapping($row, array(), MigrateIdMapInterface::STATUS_IGNORED, $this->migrateExecutable->rollbackAction);
+      $id_map->saveIdMapping($row, array(), MigrateIdMapInterface::STATUS_IGNORED, $this->migrateExecutable->rollbackAction);
       $this->numIgnored++;
       $this->currentRow = NULL;
       $this->currentIds = NULL;
