@@ -95,7 +95,7 @@ class MigrateExecutable {
    */
   public function getSource() {
     if (!isset($this->source)) {
-      $this->source = new Source($this->migration);
+      $this->source = new Source($this->migration, $this);
     }
     return $this->source;
   }
