@@ -11,10 +11,12 @@ use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
 
 /**
- * A base class for migrate sources.
+ * Source is a caching / decision making wrapper around the source plugin.
  *
  * Derived classes are expected to define __toString(), returning a string
  * describing the source and significant options, i.e. the query.
+ *
+ * @see \Drupal\migrate\MigrateSourceInterface
  */
 class Source implements \Iterator, \Countable {
 

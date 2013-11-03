@@ -16,6 +16,8 @@ use Drupal\migrate\Plugin\MigrateIdMapInterface;
 class Row {
 
   /**
+   * The actual values of the source row.
+   *
    * @var array
    */
   protected $source = array();
@@ -57,7 +59,7 @@ class Row {
   protected $frozen = FALSE;
 
   /**
-   * Constructs a Migrate>Row object.
+   * Constructs a \Drupal\Migrate\Row object.
    *
    * @param array $source_ids
    *   An array containing the ids of the source using the keys as the field
