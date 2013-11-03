@@ -14,7 +14,10 @@ use Drupal\Tests\UnitTestCase;
 /**
  * Tests for Row class.
  *
+ * @group Drupal
  * @group migrate
+ *
+ * @covers \Drupal\migrate\Row
  */
 class RowTest extends UnitTestCase {
 
@@ -95,6 +98,18 @@ class RowTest extends UnitTestCase {
   }
 
   /**
+   * Tests setting on a frozen row.
+   *
+   * @expectedException \Exception
+   * @expectedExceptionMessage The source is frozen and can't be changed any more
+   */
+  public function testSetFrozenRow() {
+    $row = new Row($this->testSourceIds, $this->testValues);
+    $row->freezeSource();
+    $row->setSourceProperty('title', 'new title');
+  }
+
+  /**
    * Tests hashing.
    */
   public function testHashing() {
@@ -104,17 +119,118 @@ class RowTest extends UnitTestCase {
     $this->assertSame($this->testHash, $row->getHash(), 'Correct hash.');
     $row->rehash();
     $this->assertSame($this->testHash, $row->getHash(), 'Correct hash even doing it twice.');
+
+    // Set the map to needs update.
     $test_id_map = array(
       'original_hash' => '',
       'hash' => '',
       'needs_update' => MigrateIdMapInterface::STATUS_NEEDS_UPDATE,
     );
     $row->setIdMap($test_id_map);
+    $this->assertTrue($row->needsUpdate());
+
     $row->rehash();
     $this->assertSame($this->testHash, $row->getHash(), 'Correct hash even if id_mpa have changed.');
     $row->setSourceProperty('title', 'new title');
     $row->rehash();
     $this->assertSame($this->testHashMod, $row->getHash(), 'Hash changed correctly.');
+
+    // Set the map to successfully imported.
+    $test_id_map = array(
+      'original_hash' => '',
+      'hash' => '',
+      'needs_update' => MigrateIdMapInterface::STATUS_IMPORTED,
+    );
+    $row->setIdMap($test_id_map);
+    $this->assertFalse($row->needsUpdate());
+
+    // Set the same hash value and ensure it was not changed.
+    $random = $this->randomName();
+    $test_id_map = array(
+      'original_hash' => $random,
+      'hash' => $random,
+      'needs_update' => MigrateIdMapInterface::STATUS_NEEDS_UPDATE,
+    );
+    $row->setIdMap($test_id_map);
+    $this->assertFalse($row->changed());
+
+    // Set different has values to ensure it is marked as changed.
+    $test_id_map = array(
+      'original_hash' => $this->randomName(),
+      'hash' => $this->randomName(),
+      'needs_update' => MigrateIdMapInterface::STATUS_NEEDS_UPDATE,
+    );
+    $row->setIdMap($test_id_map);
+    $this->assertTrue($row->changed());
+  }
+
+  /**
+   * Tests getting/setting the idMap.
+   *
+   * @covers \Drupal\migrate\Row::setIdMap()
+   * @covers \Drupal\migrate\Row::getIdMap()
+   */
+  public function testGetSetIdMap() {
+    $row = new Row($this->testSourceIds, $this->testValues);
+    $test_id_map = array(
+      'original_hash' => '',
+      'hash' => '',
+      'needs_update' => MigrateIdMapInterface::STATUS_NEEDS_UPDATE,
+    );
+    $row->setIdMap($test_id_map);
+    $this->assertEquals($test_id_map, $row->getIdMap());
+  }
+
+  /**
+   * Tests the source ID.
+   */
+  public function testSourceIdValues() {
+    $row = new Row($this->testSourceIds, $this->testValues);
+    $this->assertSame(array('nid' => $this->testValues['nid']), $row->getSourceIdValues());
+  }
+
+  /**
+   * Tests getting the source property.
+   *
+   * @covers \Drupal\migrate\Row::getSourceProperty()
+   */
+  public function testGetSourceProperty() {
+    $row = new Row($this->testSourceIds, $this->testValues);
+    $this->assertSame($this->testValues['nid'], $row->getSourceProperty('nid'));
+    $this->assertSame($this->testValues['title'], $row->getSourceProperty('title'));
+    $this->assertNull($row->getSourceProperty('non_existing'));
+  }
+
+  /**
+   * Tests setting and getting the destination.
+   */
+  public function testDestination() {
+    $row = new Row($this->testSourceIds, $this->testValues);
+    $this->assertEmpty($row->getDestination());
+    $this->assertFalse($row->hasDestinationProperty('nid'));
+
+    // Set a destination.
+    $row->setDestinationProperty('nid', 2);
+    $this->assertTrue($row->hasDestinationProperty('nid'));
+    $this->assertEquals(array('nid' => 2), $row->getDestination());
+  }
+
+  /**
+   * Tests setting/getting multiple destination IDs.
+   */
+  public function testMultipleDestination() {
+    $row = new Row($this->testSourceIds, $this->testValues);
+    // Set some deep nested values.
+    $row->setDestinationPropertyDeep(array('image', 'alt'), 'alt text');
+    $row->setDestinationPropertyDeep(array('image', 'fid'), 3);
+
+    $this->assertTrue($row->hasDestinationProperty('image'));
+    $this->assertFalse($row->hasDestinationProperty('alt'));
+    $this->assertFalse($row->hasDestinationProperty('fid'));
+
+    $destination = $row->getDestination();
+    $this->assertEquals('alt text', $destination['image']['alt']);
+    $this->assertEquals(3, $destination['image']['fid']);
   }
 
 }
