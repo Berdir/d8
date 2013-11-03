@@ -89,6 +89,7 @@ interface MigrateIdMapInterface {
    * Delete the map and message entries for a given source record
    *
    * @param array $source_key
+   * @param bool $messages_only
    */
   public function delete(array $source_key, $messages_only = FALSE);
 
@@ -115,7 +116,16 @@ interface MigrateIdMapInterface {
    * Retrieve map data for a given source or destination item
    */
   public function getRowBySource(array $source_id);
-  public function getRowByDestination(array $destination_id);
+
+
+  /**
+   * Retrieve a row by the destination identifiers.
+   *
+   * @param array $destination_id
+   *
+   * @return array
+   */
+  public function getRowByDestination(array $destination_id_values);
 
   /**
    * Retrieve an array of map rows marked as needing update.

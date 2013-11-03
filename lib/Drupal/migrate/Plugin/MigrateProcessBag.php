@@ -21,6 +21,11 @@ class MigrateProcessBag extends DefaultPluginBag {
 
   protected $pluginKey = 'plugin';
 
+  /**
+   * @param PluginManagerInterface $manager
+   * @param array $configurations
+   * @param MigrationInterface $migration
+   */
   public function __construct(PluginManagerInterface $manager, array $configurations = array(), MigrationInterface $migration) {
     parent::__construct($manager, $configurations);
     $this->migration = $migration;

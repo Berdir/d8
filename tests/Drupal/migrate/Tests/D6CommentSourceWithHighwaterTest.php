@@ -14,6 +14,9 @@ namespace Drupal\migrate\Tests;
  */
 class D6CommentSourceWithHighwaterTest extends D6CommentSourceTest {
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'D6 comment source + highwater',

@@ -77,6 +77,9 @@ class D6ActionSourceTest extends MigrateSqlSourceTestCase {
     ),
   );
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'D6 action source functionality',

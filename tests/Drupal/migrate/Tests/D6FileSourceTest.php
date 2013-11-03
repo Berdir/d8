@@ -62,6 +62,9 @@ class D6FileSourceTest extends MigrateSqlSourceTestCase {
     ),
   );
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'D6 file source functionality',
@@ -70,6 +73,9 @@ class D6FileSourceTest extends MigrateSqlSourceTestCase {
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     $this->databaseContents['files'] = $this->results;
     parent::setUp();

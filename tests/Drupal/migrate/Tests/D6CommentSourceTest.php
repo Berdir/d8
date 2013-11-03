@@ -83,6 +83,9 @@ class D6CommentSourceTest extends MigrateSqlSourceTestCase {
     ),
   );
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'D6 comment source functionality',

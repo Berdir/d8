@@ -24,6 +24,9 @@ class D6Variable extends Drupal6SqlBase {
    */
   protected $variables;
 
+  /**
+   * {@inheritdoc}
+   */
   function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration);
     $this->variables = $this->configuration['variables'];

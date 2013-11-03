@@ -98,6 +98,9 @@ class D6RoleSourceTest extends MigrateSqlSourceTestCase {
     ),
   );
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'D6 role source functionality',
@@ -106,6 +109,9 @@ class D6RoleSourceTest extends MigrateSqlSourceTestCase {
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     foreach ($this->results as $k => $row) {
       foreach ($row['permissions'] as $perm) {

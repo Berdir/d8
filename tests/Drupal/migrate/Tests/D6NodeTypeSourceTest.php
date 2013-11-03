@@ -90,7 +90,7 @@ class D6NodeTypesSourceTest extends MigrateSqlSourceTestCase {
   }
 
   /**
-   * Provide meta information about this battery of tests.
+   * {@inheritdoc}
    */
   public static function getInfo() {
     return array(

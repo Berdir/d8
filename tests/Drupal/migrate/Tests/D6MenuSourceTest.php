@@ -59,6 +59,9 @@ class D6MenuSourceTest extends MigrateSqlSourceTestCase {
     ),
   );
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'D6 menu source functionality',
@@ -67,6 +70,9 @@ class D6MenuSourceTest extends MigrateSqlSourceTestCase {
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     // This array stores the database.
     foreach ($this->results as $k => $row) {

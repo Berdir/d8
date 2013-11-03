@@ -54,6 +54,15 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
    */
   protected $migration;
 
+  /**
+   * @var array
+   */
+  protected $sourceIdFields;
+
+  /**
+   * @var array
+   */
+  protected $destinationIdFields;
 
   /**
    * Qualifying the map table name with the database name makes cross-db joins
@@ -98,15 +107,15 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
     $this->destinationIds = $migration->get('destinationIds');
 
     // Build the source and destination key maps
-    $this->sourceKeyMap = array();
+    $this->sourceIdFields = array();
     $count = 1;
     foreach ($this->sourceIds as $field => $schema) {
-      $this->sourceKeyMap[$field] = 'sourceid' . $count++;
+      $this->sourceIdFields[$field] = 'sourceid' . $count++;
     }
-    $this->destinationKeyMap = array();
+    $this->destinationIdFields = array();
     $count = 1;
     foreach ($this->destinationIds as $field => $schema) {
-      $this->destinationKeyMap[$field] = 'destid' . $count++;
+      $this->destinationIdFields[$field] = 'destid' . $count++;
     }
     $this->ensureTables();
   }
@@ -250,7 +259,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
   public function getRowBySource(array $source_id) {
     $query = $this->getDatabase()->select($this->mapTable, 'map')
               ->fields('map');
-    foreach ($this->sourceKeyMap as $key_name) {
+    foreach ($this->sourceIdFields as $key_name) {
       $query = $query->condition("map.$key_name", array_shift($source_id), '=');
     }
     $result = $query->execute();
@@ -260,12 +269,15 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
   /**
    * Retrieve a row from the map table, given a destination ID
    *
-   * @param array $source_id
+   * @param array $destination_id
+   *
+   * @return mixed
+   *   The row(s) of data
    */
   public function getRowByDestination(array $destination_id) {
     $query = $this->getDatabase()->select($this->mapTable, 'map')
               ->fields('map');
-    foreach ($this->destinationKeyMap as $key_name) {
+    foreach ($this->destinationIdFields as $key_name) {
       $query = $query->condition("map.$key_name", array_shift($destination_id), '=');
     }
     $result = $query->execute();
@@ -304,8 +316,8 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
    */
   public function lookupSourceID(array $destination_id) {
     $query = $this->getDatabase()->select($this->mapTable, 'map')
-              ->fields('map', $this->sourceKeyMap);
-    foreach ($this->destinationKeyMap as $key_name) {
+              ->fields('map', $this->sourceIdFields);
+    foreach ($this->destinationIdFields as $key_name) {
       $query = $query->condition("map.$key_name", array_shift($destination_id), '=');
     }
     $result = $query->execute();
@@ -324,8 +336,8 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
    */
   public function lookupDestinationID(array $source_id) {
     $query = $this->getDatabase()->select($this->mapTable, 'map')
-              ->fields('map', $this->destinationKeyMap);
-    foreach ($this->sourceKeyMap as $key_name) {
+              ->fields('map', $this->destinationIdFields);
+    foreach ($this->sourceIdFields as $key_name) {
       $query = $query->condition("map.$key_name", array_shift($source_id), '=');
     }
     $result = $query->execute();
@@ -338,7 +350,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
    * to the destination key. Also may be called, setting the third parameter to
    * NEEDS_UPDATE, to signal an existing record should be remigrated.
    *
-   * @param stdClass $row
+   * @param Row $row
    *  The raw source data. We use the key map derived from the source object
    *  to get the source key values.
    * @param array $dest_ids
@@ -355,7 +367,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
     // Construct the source key
     $keys = array();
     $destination = $row->getDestination();
-    foreach ($this->sourceKeyMap as $field_name => $key_name) {
+    foreach ($this->sourceIdFields as $field_name => $key_name) {
       // A NULL key value will fail.
       if (!isset($destination[$field_name])) {
         $this->message->display(t(
@@ -619,10 +631,10 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
   public function rewind() {
     $this->currentRow = NULL;
     $fields = array();
-    foreach ($this->sourceKeyMap as $field) {
+    foreach ($this->sourceIdFields as $field) {
       $fields[] = $field;
     }
-    foreach ($this->destinationKeyMap as $field) {
+    foreach ($this->destinationIdFields as $field) {
       $fields[] = $field;
     }
 
@@ -665,7 +677,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
       $this->currentRow = NULL;
     }
     else {
-      foreach ($this->sourceKeyMap as $map_field) {
+      foreach ($this->sourceIdFields as $map_field) {
         $this->currentKey[$map_field] = $this->currentRow->$map_field;
         // Leave only destination fields
         unset($this->currentRow->$map_field);

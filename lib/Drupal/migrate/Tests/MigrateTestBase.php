@@ -23,6 +23,12 @@ class MigrateTestBase extends WebTestBase {
 
   public static $modules = array('migrate');
 
+  /**
+   * @param MigrationInterface $migration
+   * @param array $files
+   *
+   * @return \Drupal\Core\Database\Connection
+   */
   protected function prepare(MigrationInterface $migration, array $files = array()) {
     $databasePrefix = 'simpletest_m_' . mt_rand(1000, 1000000);
     $connection_info = Database::getConnectionInfo('default');

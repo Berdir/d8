@@ -85,6 +85,9 @@ class D6NodeWithoutFieldsSourceTest extends MigrateSqlSourceTestCase {
     ),
   );
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'D6 node source functionality',
@@ -93,6 +96,9 @@ class D6NodeWithoutFieldsSourceTest extends MigrateSqlSourceTestCase {
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     foreach ($this->results as $k => $row) {
       $this->databaseContents['node_revisions'][$k]['nid'] = $row['nid'];

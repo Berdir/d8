@@ -10,6 +10,7 @@ use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\migrate\Entity\Migration;
 use Drupal\migrate\Entity\MigrationInterface;
+use Drupal\migrate\MigrateException;
 use Drupal\migrate\Row;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Config\Config as ConfigObject;
@@ -28,6 +29,12 @@ class Config extends DestinationBase implements ContainerFactoryPluginInterface 
    */
   protected $config;
 
+  /**
+   * @param array $configuration
+   * @param string $plugin_id
+   * @param array $plugin_definition
+   * @param ConfigObject $config
+   */
   public function __construct(array $configuration, $plugin_id, array $plugin_definition, ConfigObject $config) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->config = $config;
@@ -51,10 +58,27 @@ class Config extends DestinationBase implements ContainerFactoryPluginInterface 
       ->save();
   }
 
+  /**
+   * @param array $destination_keys
+   *
+   * @throws \Drupal\migrate\MigrateException
+   */
   public function rollbackMultiple(array $destination_keys) {
-    throw new \MigrateException('Configuration can not be rolled back');
+    throw new MigrateException('Configuration can not be rolled back');
   }
 
+  /**
+   * Derived classes must implement fields(), returning a list of available
+   * destination fields.
+   *
+   * @todo Review the cases where we need the Migration parameter, can we avoid that?
+   *
+   * @param Migration $migration
+   *   Optionally, the migration containing this destination.
+   * @return array
+   *  - Keys: machine names of the fields
+   *  - Values: Human-friendly descriptions of the fields.
+   */
   public function fields(Migration $migration = NULL) {
     // @todo Dynamically fetch fields using Config Schema API.
   }

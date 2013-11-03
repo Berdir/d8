@@ -142,7 +142,7 @@ class FakeDatabaseSchema extends Schema {
   }
 
   /**
-   * Provide meta information about this battery of tests.
+   * {@inheritdoc}
    */
   public static function getInfo() {
     return array(

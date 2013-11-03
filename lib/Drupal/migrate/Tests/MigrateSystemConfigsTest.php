@@ -12,6 +12,9 @@ use Drupal\migrate\MigrateExecutable;
 
 class MigrateSystemConfigsTest extends MigrateTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name'  => 'Migrate variables to system.site.yml',

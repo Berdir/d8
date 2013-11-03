@@ -59,8 +59,18 @@ class MigrateExecutable {
    * @var array
    */
   protected $sourceIdValues;
+
+  /**
+   * @var int
+   */
   protected $processed_since_feedback = 0;
 
+  /**
+   * @param MigrationInterface $migration
+   * @param MigrateMessageInterface $message
+   *
+   * @throws \Drupal\migrate\MigrateException
+   */
   public function __construct(MigrationInterface $migration, MigrateMessageInterface $message) {
     $this->migration = $migration;
     $this->message = $message;
@@ -82,7 +92,7 @@ class MigrateExecutable {
             $limit *= 1024;
             break;
           default:
-            throw new \Exception(t('Invalid PHP memory_limit !limit',
+            throw new MigrateException(t('Invalid PHP memory_limit !limit',
               array('!limit' => $limit)));
         }
       }
@@ -178,7 +188,7 @@ class MigrateExecutable {
           }
         }
       }
-      catch (\MigrateException $e) {
+      catch (MigrateException $e) {
         $this->migration->getIdMap()->saveIDMapping($row, array(), $e->getStatus(), $this->rollbackAction);
         $this->saveMessage($e->getMessage(), $e->getLevel());
         $this->message->display($e->getMessage());

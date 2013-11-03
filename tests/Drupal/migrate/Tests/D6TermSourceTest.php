@@ -84,6 +84,9 @@ class D6TermSourceTest extends MigrateSqlSourceTestCase {
     ),
   );
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'D6 taxonomy term source functionality',
@@ -92,6 +95,9 @@ class D6TermSourceTest extends MigrateSqlSourceTestCase {
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     foreach ($this->results as $k => $row) {
       foreach ($row['parents'] as $parent) {

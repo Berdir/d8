@@ -108,6 +108,9 @@ class D6FilterFormatsSourceTest extends MigrateSqlSourceTestCase {
     ),
   );
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'D6 Filter Formats source functionality',
@@ -116,6 +119,9 @@ class D6FilterFormatsSourceTest extends MigrateSqlSourceTestCase {
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     foreach ($this->results as $k => $row) {
       foreach ($row['filters'] as $filter) {

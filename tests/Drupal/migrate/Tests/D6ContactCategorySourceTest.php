@@ -51,6 +51,9 @@ class D6ContactCategorySourceTest extends MigrateSqlSourceTestCase {
     ),
   );
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'D6 contact category source functionality',
@@ -59,6 +62,9 @@ class D6ContactCategorySourceTest extends MigrateSqlSourceTestCase {
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     foreach ($this->results as $k => $row) {
       $this->databaseContents['contact'][$k] = $row;

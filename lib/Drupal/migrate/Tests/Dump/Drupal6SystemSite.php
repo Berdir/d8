@@ -4,8 +4,14 @@ namespace Drupal\migrate\Tests\Dump;
 
 use Drupal\Core\Database\Connection;
 
+/**
+ * Database dump for testing system.site.yml migration.
+ */
 class Drupal6SystemSite {
 
+  /**
+   * @param \Drupal\Core\Database\Connection $database
+   */
   public static function load(Connection $database) {
     $database->schema()->createTable('variable', array(
       'fields' => array(

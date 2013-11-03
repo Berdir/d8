@@ -16,6 +16,10 @@ class MigrateException extends \Exception {
    * @var int
    */
   protected $level;
+
+  /**
+   * @return int
+   */
   public function getLevel() {
     return $this->level;
   }

@@ -13,6 +13,9 @@ namespace Drupal\migrate\Tests;
  */
 class D6TermSourceWithVocabularyFilterTest extends D6TermSourceTest {
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'D6 taxonomy term source with vocabulary filter functionality',
@@ -21,6 +24,9 @@ class D6TermSourceWithVocabularyFilterTest extends D6TermSourceTest {
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     $this->migrationConfiguration['source']['vocabulary'] = array(5);
     parent::setUp();

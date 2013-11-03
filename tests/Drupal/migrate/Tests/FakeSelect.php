@@ -289,6 +289,9 @@ class FakeSelect extends Select {
    *
    * @return bool
    *   TRUE if the condition matches.
+   *
+   * @throws \Exception
+   *
    */
   protected function matchSingle(array $row, array $condition) {
     $field_info = $this->getFieldInfo($condition['field']);
@@ -527,7 +530,7 @@ class FakeSelect extends Select {
   }
 
   /**
-   * Provide meta information about this battery of tests.
+   * {@inheritdoc}
    */
   public static function getInfo() {
     return array(
