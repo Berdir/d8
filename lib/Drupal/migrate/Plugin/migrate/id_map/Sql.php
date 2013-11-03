@@ -7,7 +7,8 @@
 
 namespace Drupal\migrate\Plugin\migrate\id_map;
 
-use Drupal\Core\Database\Database;
+use Drupal\Component\Utility\String;
+use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\MigrateMessageInterface;
@@ -16,6 +17,11 @@ use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\Row;
 
 /**
+ * Defines the sql based ID map implementation.
+ *
+ * It creates one map and one message table per migration entity to store the
+ * relevant information.
+ *
  * @PluginID("sql")
  */
 class Sql extends PluginBase implements MigrateIdMapInterface {
@@ -40,6 +46,8 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
   }
 
   /**
+   * The database connection for the map/message tables on the destination.
+   *
    * @var \Drupal\Core\Database\Connection
    */
   protected $database;
@@ -86,7 +94,9 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
   }
 
   /**
-   * We don't need to check the tables more than once per request.
+   * Stores whether the the tables (map/message) already exist.
+   *
+   * This is determined just once per request/instance of the class.
    *
    * @var boolean
    */
@@ -94,19 +104,20 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
 
   public function __construct($configuration, $plugin_id, $plugin_definition, MigrationInterface $migration) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
+
     $this->migration = $migration;
     $machine_name = $migration->id();
 
-    // Default generated table names, limited to 63 characters
+    // Default generated table names, limited to 63 characters.
     $prefixLength = strlen($this->getDatabase()->tablePrefix()) ;
-    $this->mapTable = 'migrate_map_' . drupal_strtolower($machine_name);
-    $this->mapTable = drupal_substr($this->mapTable, 0, 63 - $prefixLength);
-    $this->messageTable = 'migrate_message_' . drupal_strtolower($machine_name);
-    $this->messageTable = drupal_substr($this->messageTable, 0, 63 - $prefixLength);
+    $this->mapTable = 'migrate_map_' . Unicode::strtolower($machine_name);
+    $this->mapTable = Unicode::substr($this->mapTable, 0, 63 - $prefixLength);
+    $this->messageTable = 'migrate_message_' . Unicode::strtolower($machine_name);
+    $this->messageTable = Unicode::substr($this->messageTable, 0, 63 - $prefixLength);
     $this->sourceIds = $migration->get('sourceIds');
     $this->destinationIds = $migration->get('destinationIds');
 
-    // Build the source and destination key maps
+    // Build the source and destination key maps.
     $this->sourceIdFields = array();
     $count = 1;
     foreach ($this->sourceIds as $field => $schema) {
@@ -124,6 +135,9 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
     return SqlBase::getDatabaseConnection($this->migration->id(), $this->configuration);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setMessage(MigrateMessageInterface $message) {
     $this->message = $message;
   }
@@ -252,9 +266,13 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
   }
 
   /**
-   * Retrieve a row from the map table, given a source ID
+   * Retrieve a row from the map table, given a source ID.
    *
    * @param array $source_id
+   *   A list of source IDs, even there is just one source ID.
+   *
+   * @return array
+   *   The raw row data as associative array.
    */
   public function getRowBySource(array $source_id) {
     $query = $this->getDatabase()->select($this->mapTable, 'map')
@@ -270,6 +288,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
    * Retrieve a row from the map table, given a destination ID
    *
    * @param array $destination_id
+   *   A list of destination IDs, even there is just one destination ID.
    *
    * @return mixed
    *   The row(s) of data
