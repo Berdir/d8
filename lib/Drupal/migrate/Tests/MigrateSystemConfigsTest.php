@@ -7,7 +7,7 @@
 
 namespace Drupal\migrate\Tests;
 
-use Drupal\migrate\DrupalMessage;
+use Drupal\migrate\MigrateMessage;
 use Drupal\migrate\MigrateExecutable;
 
 class MigrateSystemConfigsTest extends MigrateTestBase {
@@ -26,7 +26,7 @@ class MigrateSystemConfigsTest extends MigrateTestBase {
       drupal_get_path('module', 'migrate') . '/ib/Drupal/migrate/Tests/Dump/Drupal6SystemSite.php',
     );
     $this->prepare($migration, $dumps);
-    $executable = new MigrateExecutable($migration, new DrupalMessage);
+    $executable = new MigrateExecutable($migration, new MigrateMessage);
     $executable->import();
     $config = \Drupal::config('system.site');
     $this->assertIdentical($config->get('name'), 'drupal');
