@@ -14,6 +14,9 @@ use Drupal\migrate\Plugin\migrate\process\PropertyMap;
  * Tests for PropertyMap class.
  *
  * @group migrate
+ * @group Drupal
+ *
+ * @covers \Drupal\migrate\Plugin\migrate\process\PropertyMap
  */
 class PropertyMapTest extends MigrateTestCase {
 
@@ -71,6 +74,20 @@ class PropertyMapTest extends MigrateTestCase {
   }
 
   /**
+   * Tests missing destination.
+   *
+   * @expectedException \Drupal\migrate\MigrateException
+   * @expectedException
+   */
+  public function testNoDestination() {
+    $configuration = array(
+      'default' => 'test',
+    );
+    $map = new PropertyMap($configuration, 'property_map', array());
+    $map->apply($this->row, $this->migrateExecutable);
+  }
+
+  /**
    * Tests missing source default.
    *
    * @expectedException \Drupal\migrate\MigrateException
@@ -109,6 +126,35 @@ class PropertyMapTest extends MigrateTestCase {
     $map->apply($this->row, $this->migrateExecutable);
     $destination = $this->row->getDestination();
     $this->assertSame($destination['testproperty'], 1);
+  }
+
+  /**
+   * Tests source separator.
+   */
+  public function testSourceSeparator() {
+    $configuration = array(
+      'source' => 'nid',
+      'separator' => '|',
+      'destination' => 'testproperty',
+    );
+    $map = new PropertyMap($configuration, 'property_map', array());
+    $map->apply($this->row, $this->migrateExecutable);
+    $destination = $this->row->getDestination();
+    $this->assertEquals(array(1), $destination['testproperty']);
+  }
+
+  /**
+   * Tests sub destination.
+   */
+  public function testSubDestination() {
+    $configuration = array(
+      'source' => 'nid',
+      'destination' => 'testproperty:sub',
+    );
+    $map = new PropertyMap($configuration, 'property_map', array());
+    $map->apply($this->row, $this->migrateExecutable);
+    $destination = $this->row->getDestination();
+    $this->assertEquals(1, $destination['testproperty']['sub']);
   }
 
   /**

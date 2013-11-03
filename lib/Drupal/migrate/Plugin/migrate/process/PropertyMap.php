@@ -6,6 +6,7 @@
  */
 
 namespace Drupal\migrate\Plugin\migrate\process;
+
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\migrate\MigrateException;
 use Drupal\migrate\MigrateExecutable;
