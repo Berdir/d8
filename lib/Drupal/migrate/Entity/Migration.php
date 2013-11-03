@@ -212,7 +212,7 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
   /**
    * @return \Drupal\Core\KeyValueStore\KeyValueStoreInterface
    */
-  protected function getHigherWaterStorage() {
+  protected function getHighWaterStorage() {
     if (!isset($this->highwaterStorage)) {
       $this->highwaterStorage = \Drupal::keyValue('migrate:highwater');
     }
@@ -220,10 +220,10 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
   }
 
   public function getHighwater() {
-    return $this->getHigherWaterStorage()->get($this->id());
+    return $this->getHighWaterStorage()->get($this->id());
   }
 
   public function saveHighwater($highwater) {
-    $this->getHigherWaterStorage()->set($this->id(), $highwater);
+    $this->getHighWaterStorage()->set($this->id(), $highwater);
   }
 }
