@@ -60,7 +60,10 @@ abstract class MigrateSqlSourceTestCase extends MigrateTestCase {
     $migration->expects($this->any())
       ->method('getSource')
       ->will($this->returnValue($plugin));
-    $this->source = new Source($migration);
+    $migrateExecutable = $this->getMockBuilder('Drupal\migrate\MigrateExecutable')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $this->source = new Source($migration, $migrateExecutable);
 
     $cache = $this->getMock('Drupal\Core\Cache\CacheBackendInterface');
     $this->writeAttribute($this->source, 'cache', $cache);
