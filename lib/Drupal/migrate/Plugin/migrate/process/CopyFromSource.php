@@ -26,7 +26,7 @@ class CopyFromSource extends PluginBase implements ProcessInterface {
     foreach ($this->configuration as $from => $to) {
       if ($row->hasSourceProperty($from)) {
         $destination_values = $row->getSourceProperty($from);
-        $row->setDestinationPropertyDeep($to, $destination_values);
+        $row->setDestinationProperty($to, $destination_values);
       }
     }
   }
