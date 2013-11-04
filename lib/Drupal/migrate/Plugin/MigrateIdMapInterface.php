@@ -147,12 +147,12 @@ interface MigrateIdMapInterface {
    * Given a (possibly multi-field) source key, return the (possibly multi-field)
    * destination key it is mapped to.
    *
-   * @param array $source_id
-   *  Array of source key values.
+   * @param array $source_id_values
+   *  Array of source identifier values.
    * @return array
    *  Array of destination key values, or NULL on failure.
    */
-  public function lookupDestinationID(array $source_id);
+  public function lookupDestinationID(array $source_id_values);
 
   /**
    * Remove any persistent storage used by this map (e.g., map and message tables)

@@ -221,8 +221,8 @@ class RowTest extends UnitTestCase {
   public function testMultipleDestination() {
     $row = new Row($this->testValues, $this->testSourceIds);
     // Set some deep nested values.
-    $row->setDestinationPropertyDeep(array('image', 'alt'), 'alt text');
-    $row->setDestinationPropertyDeep(array('image', 'fid'), 3);
+    $row->setDestinationProperty('image:alt', 'alt text');
+    $row->setDestinationProperty('image:fid', 3);
 
     $this->assertTrue($row->hasDestinationProperty('image'));
     $this->assertFalse($row->hasDestinationProperty('alt'));
@@ -231,6 +231,8 @@ class RowTest extends UnitTestCase {
     $destination = $row->getDestination();
     $this->assertEquals('alt text', $destination['image']['alt']);
     $this->assertEquals(3, $destination['image']['fid']);
+    $this->assertEquals('alt text', $row->getDestinationProperty('image:alt'));
+    $this->assertEquals(3, $row->getDestinationProperty('image:fid'));
   }
 
 }

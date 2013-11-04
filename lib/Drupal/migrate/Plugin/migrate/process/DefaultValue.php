@@ -25,10 +25,9 @@ class DefaultValue extends PluginBase implements ProcessInterface {
    * {@inheritdoc}
    */
   public function apply(Row $row, MigrateExecutable $migrate_executable) {
-    foreach ($this->configuration as $key_string => $default_value) {
-      $keys = explode(':', $key_string);
-      if (!$row->hasDestinationPropertyDeep($keys)) {
-        $row->setDestinationPropertyDeep($keys, $default_value);
+    foreach ($this->configuration as $key => $default_value) {
+      if (!$row->hasDestinationProperty($key)) {
+        $row->setDestinationPropertyDeep($key, $default_value);
       }
     }
   }

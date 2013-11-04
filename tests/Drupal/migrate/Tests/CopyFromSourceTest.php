@@ -23,6 +23,9 @@ class CopyFromSourceTest extends MigrateTestCase {
   protected $sourceIds = array(
     'nid' => 'Node ID',
   );
+  protected $destinationIds = array(
+    'nid' => 'Destination Id',
+  );
   protected $values = array(
     'nid' => 1,
     'title' => 'node 1',
@@ -56,7 +59,7 @@ class CopyFromSourceTest extends MigrateTestCase {
     $this->migrateExecutable = $this->getMockBuilder('Drupal\migrate\MigrateExecutable')
       ->disableOriginalConstructor()
       ->getMock();
-    $this->row = new Row($this->sourceIds, $this->values);
+    $this->row = new Row($this->values, $this->sourceIds, $this->destinationIds);
   }
 
   /**
@@ -69,7 +72,7 @@ class CopyFromSourceTest extends MigrateTestCase {
     $map = new CopyFromSource($configuration, 'copy_from_source', array());
     $map->apply($this->row, $this->migrateExecutable);
     $destination = $this->row->getDestination();
-    $this->assertEquals(1, $destination['testproperty']['sub']);
+    $this->assertSame(1, $destination['testproperty']['sub']);
   }
 
   /**
@@ -82,7 +85,7 @@ class CopyFromSourceTest extends MigrateTestCase {
     $map = new CopyFromSource($configuration, 'copy_from_source', array());
     $map->apply($this->row, $this->migrateExecutable);
     $destination = $this->row->getDestination();
-    $this->assertEquals(array(), $destination);
+    $this->assertSame(array(), $destination);
   }
 
 }

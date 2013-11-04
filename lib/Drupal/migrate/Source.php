@@ -274,7 +274,7 @@ class Source implements \Iterator, \Countable {
     while ($this->getIterator()->valid()) {
       $row_data = $this->getIterator()->current();
       $this->getIterator()->next();
-      $row = new Row($this->migration->get('sourceIds'), $row_data);
+      $row = new Row($row_data, $this->migration->get('sourceIds'), $this->migration->get('destinationIds'));
 
       // Populate the source key for this row
       $this->currentIds = $row->getSourceIdValues();

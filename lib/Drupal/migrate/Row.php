@@ -156,58 +156,43 @@ class Row {
   }
 
   /**
-   * Determines whether a destination has a property.
-   *
-   * @param string $property
-   *   A property on the destination.
-   *
-   * @return bool
-   *   TRUE if the destination has property; FALSE otherwise.
-   */
-  public function hasDestinationProperty($property) {
-    return isset($this->destination[$property]) || array_key_exists($property, $this->destination);
-  }
-
-  /**
    * @param array $property_keys
    *   An array of properties on the destination.
    */
-  public function hasDestinationPropertyDeep($keys) {
-    return NestedArray::keyExists($this->destination, $keys);
-  }
-
-  /**
-   * Sets a destination property.
-   *
-   * @param string $property
-   *   A property on the destination.
-   * @param mixed $value
-   *   The property value to set on the destination.
-   */
-  public function setDestinationProperty($property, $value) {
-    $this->destination[$property] = $value;
+  public function hasDestinationProperty($property) {
+    return NestedArray::keyExists($this->destination, explode(':', $property));
   }
 
   /**
    * Sets destination properties.
    *
-   * @param array $property_keys
-   *   An array of properties on the destination.
+   * @param string $property
+   *   The name of the destination property.
    * @param mixed $value
    *   The property value to set on the destination.
    */
-  public function setDestinationPropertyDeep(array $property_keys, $value) {
-    NestedArray::setValue($this->destination, $property_keys, $value, TRUE);
+  public function setDestinationProperty($property, $value) {
+    NestedArray::setValue($this->destination, explode(':', $property), $value, TRUE);
   }
 
   /**
    * This returns the whole destination array.
    *
    * @return array
-   *   An array of destination plugins.
+   *   An array of destination values.
    */
   public function getDestination() {
     return $this->destination;
+  }
+
+  /**
+   * Return a the value of a destination property.
+   *
+   * @return mixed
+   *  The destination value.
+   */
+  public function getDestinationProperty($property) {
+    return NestedArray::getValue($this->destination, explode(':', $property));
   }
 
   /**
