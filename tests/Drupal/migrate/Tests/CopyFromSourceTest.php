@@ -67,7 +67,7 @@ class CopyFromSourceTest extends MigrateTestCase {
    */
   public function testSubDestination() {
     $configuration = array(
-      'nid' => 'testproperty:sub',
+      'testproperty:sub' => 'nid',
     );
     $map = new CopyFromSource($configuration, 'copy_from_source', array());
     $map->apply($this->row, $this->migrateExecutable);
@@ -80,7 +80,7 @@ class CopyFromSourceTest extends MigrateTestCase {
    */
   public function testNoSourceValue() {
     $configuration = array(
-      'foo' => 'testproperty:sub',
+      'testproperty:sub' => 'foo',
     );
     $map = new CopyFromSource($configuration, 'copy_from_source', array());
     $map->apply($this->row, $this->migrateExecutable);
