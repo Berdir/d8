@@ -30,13 +30,6 @@ class Row {
   protected $sourceIds = array();
 
   /**
-   * The destination identifiers.
-   *
-   * @var array
-   */
-  protected $destinationIds = array();
-
-  /**
    * The destination values.
    *
    * @var array
@@ -78,10 +71,9 @@ class Row {
    * @throws \InvalidArgumentException
    *   Thrown when a source id property does not exist.
    */
-  public function __construct(array $values, array $source_ids, array $destination_ids) {
+  public function __construct(array $values, array $source_ids) {
     $this->source = $values;
     $this->sourceIds = $source_ids;
-    $this->destinationIds = $destination_ids;
     foreach (array_keys($source_ids) as $id) {
       if (!$this->hasSourceProperty($id)) {
         throw new \InvalidArgumentException("$id has no value");
@@ -216,10 +208,6 @@ class Row {
    */
   public function getDestination() {
     return $this->destination;
-  }
-
-  public function getDestinationIdValues() {
-    return array_intersect_key($this->destination, $this->destinationIds);
   }
 
   /**
