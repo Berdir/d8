@@ -24,7 +24,17 @@ class MigrateProcessBag extends DefaultPluginBag {
    */
   protected $migration;
 
+  /**
+   * The key within the plugin configuration that contains the plugin ID.
+   *
+   * @var string
+   */
   protected $pluginKey = 'plugin';
+
+  /**
+   * @var \Drupal\migrate\Plugin\MigratePluginManager
+   */
+  protected $manager;
 
   /**
    * Constructs a new MigrateProcessBag.
@@ -48,12 +58,14 @@ class MigrateProcessBag extends DefaultPluginBag {
    * Extends in order to pass the migration entity to the plugin manager.
    */
   public function initializePlugin($instance_id) {
-    $this->configurations[$instance_id] += array('plugin' => 'property_map');
+    $this->configurations[$instance_id] += array('plugin' => 'copy_from_source');
     $configuration = isset($this->configurations[$instance_id]) ? $this->configurations[$instance_id] : array();
     if (!isset($configuration[$this->pluginKey])) {
       throw new UnknownPluginException($instance_id);
     }
-    $this->pluginInstances[$instance_id] = $this->manager->createInstance($configuration[$this->pluginKey], $configuration, $this->migration);
+    $plugin_key = $configuration[$this->pluginKey];
+    unset($configuration[$this->pluginKey]);
+    $this->pluginInstances[$instance_id] = $this->manager->createInstance($plugin_key, $configuration, $this->migration);
     $this->addInstanceID($instance_id);
   }
 

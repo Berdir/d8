@@ -170,6 +170,14 @@ class Row {
   }
 
   /**
+   * @param array $property_keys
+   *   An array of properties on the destination.
+   */
+  public function hasDestinationPropertyDeep($keys) {
+    return NestedArray::keyExists($this->destination, $keys);
+  }
+
+  /**
    * Sets a destination property.
    *
    * @param string $property

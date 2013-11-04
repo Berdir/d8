@@ -16,6 +16,8 @@ use Drupal\migrate\Row;
 /**
  * This class tracks mappings between source and destination.
  *
+ * @TODO: remove this completely.
+ *
  * @PluginId("property_map")
  */
 class PropertyMap extends PluginBase implements ProcessInterface {
