@@ -23,13 +23,18 @@ class Row {
   protected $source = array();
 
   /**
-   * The value of the source identifiers.
-   *
-   * This is a subset of the $source array.
+   * The source identifiers.
    *
    * @var array
    */
-  protected $sourceIdValues = array();
+  protected $sourceIds = array();
+
+  /**
+   * The destination identifiers.
+   *
+   * @var array
+   */
+  protected $destinationIds = array();
 
   /**
    * The destination values.
@@ -61,22 +66,24 @@ class Row {
   /**
    * Constructs a \Drupal\Migrate\Row object.
    *
+   * @param array $values
+   *   An array of values to add as properties on the object.
    * @param array $source_ids
    *   An array containing the ids of the source using the keys as the field
    *   names.
-   * @param array $values
-   *   An array of values to add as properties on the object.
+   * @param array $destination_ids
+   *   An array containing the ids of the destination using the keys as the field
+   *   names.
    *
    * @throws \InvalidArgumentException
    *   Thrown when a source id property does not exist.
    */
-  public function __construct(array $source_ids, array $values) {
+  public function __construct(array $values, array $source_ids, array $destination_ids) {
     $this->source = $values;
+    $this->sourceIds = $source_ids;
+    $this->destinationIds = $destination_ids;
     foreach (array_keys($source_ids) as $id) {
-      if ($this->hasSourceProperty($id)) {
-        $this->sourceIdValues[$id] = $values[$id];
-      }
-      else {
+      if (!$this->hasSourceProperty($id)) {
         throw new \InvalidArgumentException("$id has no value");
       }
     }
@@ -89,7 +96,7 @@ class Row {
    *   An array containing the values of the source identifiers.
    */
   public function getSourceIdValues() {
-    return $this->sourceIdValues;
+    return array_intersect_key($this->source, $this->sourceIds);
   }
 
   /**
@@ -209,6 +216,10 @@ class Row {
    */
   public function getDestination() {
     return $this->destination;
+  }
+
+  public function getDestinationIdValues() {
+    return array_intersect_key($this->destination, $this->destinationIds);
   }
 
   /**
