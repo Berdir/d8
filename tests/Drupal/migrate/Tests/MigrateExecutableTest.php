@@ -55,11 +55,11 @@ class MigrateExecutableTest extends MigrateTestCase {
   protected function setUp() {
     $this->migration = $this->getMock('Drupal\migrate\Entity\MigrationInterface');
     $this->message = $this->getMock('Drupal\migrate\MigrateMessageInterface');
-    $this->idMap = $this->getMock('Drupal\migrate\Plugin\MigrateIdMapInterface');
+    $id_map = $this->getMock('Drupal\migrate\Plugin\MigrateIdMapInterface');
 
     $this->migration->expects($this->any())
       ->method('getIdMap')
-      ->will($this->returnValue($this->idMap));
+      ->will($this->returnValue($id_map));
 
     $this->executable = new MigrateExecutable($this->migration, $this->message);
     $translation = $this->getMock('Drupal\Core\StringTranslation\TranslationInterface');
