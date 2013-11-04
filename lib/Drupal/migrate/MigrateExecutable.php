@@ -66,6 +66,13 @@ class MigrateExecutable {
   protected $processed_since_feedback = 0;
 
   /**
+   * The translation manager.
+   *
+   * @var \Drupal\Core\StringTranslation\TranslationInterface
+   */
+  protected $translationManager;
+
+  /**
    * @param MigrationInterface $migration
    * @param MigrateMessageInterface $message
    *
@@ -92,7 +99,7 @@ class MigrateExecutable {
             $limit *= 1024;
             break;
           default:
-            throw new MigrateException(t('Invalid PHP memory_limit !limit',
+            throw new MigrateException($this->t('Invalid PHP memory_limit !limit',
               array('!limit' => $limit)));
         }
       }
@@ -158,7 +165,7 @@ class MigrateExecutable {
     }
     catch (\Exception $e) {
       $this->message->display(
-        t('Migration failed with source plugin exception: !e',
+        $this->t('Migration failed with source plugin exception: !e',
           array('!e' => $e->getMessage())));
       return MigrationInterface::RESULT_FAILED;
     }
@@ -182,7 +189,7 @@ class MigrateExecutable {
         else {
           $id_map->saveIdMapping($row, array(), MigrateIdMapInterface::STATUS_FAILED, $this->rollbackAction);
           if ($id_map->messageCount() == 0) {
-            $message = t('New object was not saved, no error provided');
+            $message = $this->t('New object was not saved, no error provided');
             $this->saveMessage($message);
             $this->message->display($message);
           }
@@ -227,7 +234,7 @@ class MigrateExecutable {
       }
       catch (\Exception $e) {
         $this->message->display(
-          t('Migration failed with source plugin exception: !e',
+          $this->t('Migration failed with source plugin exception: !e',
             array('!e' => $e->getMessage())));
         return MigrationInterface::RESULT_FAILED;
       }
@@ -365,7 +372,7 @@ class MigrateExecutable {
     $pct_memory = $usage / $this->memoryLimit;
     if ($pct_memory > $this->memoryThreshold) {
       $this->message->display(
-        t('Memory usage is !usage (!pct% of limit !limit), resetting statics',
+        $this->t('Memory usage is !usage (!pct% of limit !limit), resetting statics',
           array('!pct' => round($pct_memory*100),
                 '!usage' => format_size($usage),
                 '!limit' => format_size($this->memoryLimit))),
@@ -379,7 +386,7 @@ class MigrateExecutable {
       // coming back here and trimming a tiny amount
       if ($pct_memory > (.90 * $this->memoryThreshold)) {
         $this->message->display(
-          t('Memory usage is now !usage (!pct% of limit !limit), not enough reclaimed, starting new batch',
+          $this->t('Memory usage is now !usage (!pct% of limit !limit), not enough reclaimed, starting new batch',
             array('!pct' => round($pct_memory*100),
                   '!usage' => format_size($usage),
                   '!limit' => format_size($this->memoryLimit))),
@@ -388,7 +395,7 @@ class MigrateExecutable {
       }
       else {
         $this->message->display(
-          t('Memory usage is now !usage (!pct% of limit !limit), reclaimed enough, continuing',
+          $this->t('Memory usage is now !usage (!pct% of limit !limit), reclaimed enough, continuing',
             array('!pct' => round($pct_memory*100),
                   '!usage' => format_size($usage),
                   '!limit' => format_size($this->memoryLimit))),
@@ -440,4 +447,25 @@ class MigrateExecutable {
     $this->message->display($message);
   }
 
+  /**
+   * Translates a string to the current language or to a given language.
+   *
+   * See the t() documentation for details.
+   */
+  protected function t($string, array $args = array(), array $options = array()) {
+    return $this->translationManager()->translate($string, $args, $options);
+  }
+
+  /**
+   * Gets the translation manager.
+   *
+   * @return \Drupal\Core\StringTranslation\TranslationInterface
+   *   The translation manager.
+   */
+  protected function translationManager() {
+    if (!$this->translationManager) {
+      $this->translationManager = \Drupal::translation();
+    }
+    return $this->translationManager;
+  }
 }

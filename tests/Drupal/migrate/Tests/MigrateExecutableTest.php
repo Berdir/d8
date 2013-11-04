@@ -7,10 +7,8 @@
 
 namespace Drupal\migrate\Tests;
 
-use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\MigrateExecutable;
-use Drupal\Tests\UnitTestCase;
 
 /**
  * Tests the migrate executable.
@@ -20,7 +18,7 @@ use Drupal\Tests\UnitTestCase;
  *
  * @covers \Drupal\migrate\Tests\MigrateExecutableTest
  */
-class MigrateExecutableTest extends UnitTestCase {
+class MigrateExecutableTest extends MigrateTestCase {
 
   /**
    * The mocked migration entity.
@@ -64,8 +62,11 @@ class MigrateExecutableTest extends UnitTestCase {
       ->will($this->returnValue($this->idMap));
 
     $this->executable = new MigrateExecutable($this->migration, $this->message);
-
-    $this->executable->setTranslationManager($this->getStringTranslationStub());
+    $translation = $this->getMock('Drupal\Core\StringTranslation\TranslationInterface');
+    $translation->expects($this->any())
+      ->method('translate')
+      ->will($this->returnCallback(function ($string, array $args = array()) { return strtr($string, $args); }));
+    $this->writeAttribute($this->executable, 'translationManager', $translation);
   }
 
   /**
