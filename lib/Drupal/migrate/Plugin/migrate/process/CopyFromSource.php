@@ -25,11 +25,12 @@ class CopyFromSource extends PluginBase implements ProcessInterface {
    * {@inheritdoc}
    */
   public function apply(Row $row, MigrateExecutable $migrate_executable) {
-    foreach ($this->configuration as $from => $to)
-    if ($row->hasSourceProperty($from)) {
-      $destination_values = $row->getSourceProperty($from);
-      $keys = explode(':', $to);
-      $row->setDestinationPropertyDeep($keys, $destination_values);
+    foreach ($this->configuration as $from => $to) {
+      if ($row->hasSourceProperty($from)) {
+        $destination_values = $row->getSourceProperty($from);
+        $keys = explode(':', $to);
+        $row->setDestinationPropertyDeep($keys, $destination_values);
+      }
     }
   }
 
