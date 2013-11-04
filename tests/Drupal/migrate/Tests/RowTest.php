@@ -55,7 +55,7 @@ class RowTest extends UnitTestCase {
    * Tests object creation: basic.
    */
   public function testRowWithBasicData() {
-    $row = new Row($this->testSourceIds, $this->testValues);
+    $row = new Row($this->testValues, $this->testSourceIds);
     $this->assertSame($this->testValues, $row->getSource(), 'Row with data, simple id.');
   }
 
@@ -65,7 +65,7 @@ class RowTest extends UnitTestCase {
   public function testRowWithMultipleSourceIds() {
     $multi_source_ids = $this->testSourceIds + array('vid' => 'Node revision');
     $multi_source_ids_values = $this->testValues + array('vid' => 1);
-    $row = new Row($multi_source_ids, $multi_source_ids_values);
+    $row = new Row($multi_source_ids_values, $multi_source_ids);
     $this->assertSame($multi_source_ids_values, $row->getSource(), 'Row with data, multifield id.');
   }
 
@@ -78,7 +78,7 @@ class RowTest extends UnitTestCase {
     $invalid_values = array(
       'title' => 'node X',
     );
-    $row = new Row($this->testSourceIds, $invalid_values);
+    $row = new Row($invalid_values, $this->testSourceIds);
   }
 
   /**
@@ -87,7 +87,7 @@ class RowTest extends UnitTestCase {
    * @expectedException \Exception
    */
   public function testSourceFreeze() {
-    $row = new Row($this->testSourceIds, $this->testValues);
+    $row = new Row($this->testValues, $this->testSourceIds);
     $row->rehash();
     $this->assertSame($this->testHash, $row->getHash(), 'Correct hash.');
     $row->setSourceProperty('title', 'new title');
@@ -104,7 +104,7 @@ class RowTest extends UnitTestCase {
    * @expectedExceptionMessage The source is frozen and can't be changed any more
    */
   public function testSetFrozenRow() {
-    $row = new Row($this->testSourceIds, $this->testValues);
+    $row = new Row($this->testValues, $this->testSourceIds);
     $row->freezeSource();
     $row->setSourceProperty('title', 'new title');
   }
@@ -113,7 +113,7 @@ class RowTest extends UnitTestCase {
    * Tests hashing.
    */
   public function testHashing() {
-    $row = new Row($this->testSourceIds, $this->testValues);
+    $row = new Row($this->testValues, $this->testSourceIds);
     $this->assertSame('', $row->getHash(), 'No hash at creation');
     $row->rehash();
     $this->assertSame($this->testHash, $row->getHash(), 'Correct hash.');
@@ -171,7 +171,7 @@ class RowTest extends UnitTestCase {
    * @covers \Drupal\migrate\Row::getIdMap()
    */
   public function testGetSetIdMap() {
-    $row = new Row($this->testSourceIds, $this->testValues);
+    $row = new Row($this->testValues, $this->testSourceIds);
     $test_id_map = array(
       'original_hash' => '',
       'hash' => '',
@@ -185,7 +185,7 @@ class RowTest extends UnitTestCase {
    * Tests the source ID.
    */
   public function testSourceIdValues() {
-    $row = new Row($this->testSourceIds, $this->testValues);
+    $row = new Row($this->testValues, $this->testSourceIds);
     $this->assertSame(array('nid' => $this->testValues['nid']), $row->getSourceIdValues());
   }
 
@@ -195,7 +195,7 @@ class RowTest extends UnitTestCase {
    * @covers \Drupal\migrate\Row::getSourceProperty()
    */
   public function testGetSourceProperty() {
-    $row = new Row($this->testSourceIds, $this->testValues);
+    $row = new Row($this->testValues, $this->testSourceIds);
     $this->assertSame($this->testValues['nid'], $row->getSourceProperty('nid'));
     $this->assertSame($this->testValues['title'], $row->getSourceProperty('title'));
     $this->assertNull($row->getSourceProperty('non_existing'));
@@ -205,7 +205,7 @@ class RowTest extends UnitTestCase {
    * Tests setting and getting the destination.
    */
   public function testDestination() {
-    $row = new Row($this->testSourceIds, $this->testValues);
+    $row = new Row($this->testValues, $this->testSourceIds);
     $this->assertEmpty($row->getDestination());
     $this->assertFalse($row->hasDestinationProperty('nid'));
 
@@ -219,7 +219,7 @@ class RowTest extends UnitTestCase {
    * Tests setting/getting multiple destination IDs.
    */
   public function testMultipleDestination() {
-    $row = new Row($this->testSourceIds, $this->testValues);
+    $row = new Row($this->testValues, $this->testSourceIds);
     // Set some deep nested values.
     $row->setDestinationPropertyDeep(array('image', 'alt'), 'alt text');
     $row->setDestinationPropertyDeep(array('image', 'fid'), 3);
