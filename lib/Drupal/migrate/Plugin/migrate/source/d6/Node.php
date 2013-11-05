@@ -7,8 +7,6 @@
 
 namespace Drupal\migrate\Plugin\migrate\source\d6;
 
-use Drupal\Core\Cache\CacheBackendInterface;
-use Drupal\Core\KeyValueStore\KeyValueStoreInterface;
 use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\Plugin\migrate\source\d6\Drupal6SqlBase;
 
