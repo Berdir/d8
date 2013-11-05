@@ -53,7 +53,7 @@ abstract class MigrateSqlSourceTestCase extends MigrateTestCase {
     $migration->expects($this->any())
       ->method('getHighwater')
       ->will($this->returnValue(static::ORIGINAL_HIGHWATER));
-
+    // Need the test class, not the original because we need a setDatabase method. This is not pretty :/
     $plugin_class  = preg_replace('/^(Drupal\\\\\w+\\\\)Plugin\\\\migrate(\\\\source(\\\\.+)?\\\\)([^\\\\]+)$/', '\1Tests\2Test\4', static::PLUGIN_CLASS);
     $plugin = new $plugin_class($this->migrationConfiguration['source'], $this->migrationConfiguration['source']['plugin'], array(), $migration);
     $plugin->setDatabase($database);
