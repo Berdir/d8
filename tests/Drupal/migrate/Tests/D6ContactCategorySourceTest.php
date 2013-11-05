@@ -73,3 +73,14 @@ class D6ContactCategorySourceTest extends MigrateSqlSourceTestCase {
   }
 
 }
+
+namespace Drupal\migrate\Tests\source\d6;
+
+use Drupal\Core\Database\Connection;
+use Drupal\migrate\Plugin\migrate\source\d6\ContactCategory;
+
+class TestContactCategory extends ContactCategory {
+  function setDatabase(Connection $database) {
+    $this->database = $database;
+  }
+}

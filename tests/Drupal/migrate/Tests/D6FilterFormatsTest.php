@@ -134,3 +134,14 @@ class D6FilterFormatsSourceTest extends MigrateSqlSourceTestCase {
     parent::setUp();
   }
 }
+
+namespace Drupal\migrate\Tests\source\d6;
+
+use Drupal\Core\Database\Connection;
+use Drupal\migrate\Plugin\migrate\source\d6\FilterFormats;
+
+class TestFilterFormats extends FilterFormats {
+  function setDatabase(Connection $database) {
+    $this->database = $database;
+  }
+}

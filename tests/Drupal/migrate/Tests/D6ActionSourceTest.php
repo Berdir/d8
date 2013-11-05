@@ -94,3 +94,14 @@ class D6ActionSourceTest extends MigrateSqlSourceTestCase {
   }
 
 }
+
+namespace Drupal\migrate\Tests\source\d6;
+
+use Drupal\Core\Database\Connection;
+use Drupal\migrate\Plugin\migrate\source\d6\Action;
+
+class TestAction extends Action {
+  function setDatabase(Connection $database) {
+    $this->database = $database;
+  }
+}

@@ -7,6 +7,7 @@
 
 namespace Drupal\migrate\Tests;
 
+use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\MigrateExecutable;
 
@@ -61,12 +62,8 @@ class MigrateExecutableTest extends MigrateTestCase {
       ->method('getIdMap')
       ->will($this->returnValue($id_map));
 
-    $this->executable = new MigrateExecutable($this->migration, $this->message);
-    $translation = $this->getMock('Drupal\Core\StringTranslation\TranslationInterface');
-    $translation->expects($this->any())
-      ->method('translate')
-      ->will($this->returnCallback(function ($string, array $args = array()) { return strtr($string, $args); }));
-    $this->writeAttribute($this->executable, 'translationManager', $translation);
+    $this->executable = new TestMigrateExecutable($this->migration, $this->message);
+    $this->executable->setTranslationManager($this->getStringTranslationStub());
   }
 
   /**
@@ -97,4 +94,11 @@ class MigrateExecutableTest extends MigrateTestCase {
     $this->assertEquals(MigrationInterface::RESULT_FAILED, $result);
   }
 
+}
+
+class TestMigrateExecutable extends MigrateExecutable {
+
+  public function setTranslationManager(TranslationInterface $translation_manager) {
+    $this->translationManager = $translation_manager;
+  }
 }

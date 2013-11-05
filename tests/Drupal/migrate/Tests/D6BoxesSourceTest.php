@@ -85,3 +85,14 @@ class D6BoxesSourceTest extends MigrateSqlSourceTestCase {
   }
 
 }
+
+namespace Drupal\migrate\Tests\source\d6;
+
+use Drupal\Core\Database\Connection;
+use Drupal\migrate\Plugin\migrate\source\d6\Boxes;
+
+class TestBoxes extends Boxes {
+  function setDatabase(Connection $database) {
+    $this->database = $database;
+  }
+}

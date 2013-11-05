@@ -105,3 +105,14 @@ class D6UserSourceTest extends MigrateSqlSourceTestCase {
   }
 
 }
+
+namespace Drupal\migrate\Tests\source\d6;
+
+use Drupal\Core\Database\Connection;
+use Drupal\migrate\Plugin\migrate\source\d6\User;
+
+class TestUser extends User {
+  function setDatabase(Connection $database) {
+    $this->database = $database;
+  }
+}

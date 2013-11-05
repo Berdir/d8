@@ -54,19 +54,19 @@ abstract class MigrateSqlSourceTestCase extends MigrateTestCase {
       ->method('getHighwater')
       ->will($this->returnValue(static::ORIGINAL_HIGHWATER));
 
-    $plugin_class = static::PLUGIN_CLASS;
+    $plugin_class  = preg_replace('/^(Drupal\\\\\w+\\\\)Plugin\\\\migrate(\\\\source(\\\\.+)?\\\\)([^\\\\]+)$/', '\1Tests\2Test\4', static::PLUGIN_CLASS);
     $plugin = new $plugin_class($this->migrationConfiguration['source'], $this->migrationConfiguration['source']['plugin'], array(), $migration);
-    $this->writeAttribute($plugin, 'database', $database);
+    $plugin->setDatabase($database);
     $migration->expects($this->any())
       ->method('getSource')
       ->will($this->returnValue($plugin));
     $migrateExecutable = $this->getMockBuilder('Drupal\migrate\MigrateExecutable')
       ->disableOriginalConstructor()
       ->getMock();
-    $this->source = new Source($migration, $migrateExecutable);
+    $this->source = new TestSource($migration, $migrateExecutable);
 
     $cache = $this->getMock('Drupal\Core\Cache\CacheBackendInterface');
-    $this->writeAttribute($this->source, 'cache', $cache);
+    $this->source->setCache($cache);
   }
 
   /**
