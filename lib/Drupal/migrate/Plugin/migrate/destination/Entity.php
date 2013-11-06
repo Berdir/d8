@@ -55,6 +55,7 @@ class Entity extends DestinationBase implements ContainerFactoryPluginInterface 
       $field_type = $instance->getFieldType();
       if ($this->pluginManager->getDefinition($field_type)) {
         $destination_value = $this->pluginManager->createInstance($field_type)->import($instance, $row->getDestinationProperty($field_name));
+        // @TODO: check for NULL return? Add an unset to $row? Maybe needed in exception handling? Propagate exception?
         $row->setDestinationProperty($field_name, $destination_value);
       }
     }
