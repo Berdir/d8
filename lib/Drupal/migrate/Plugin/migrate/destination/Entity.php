@@ -43,7 +43,6 @@ class Entity extends DestinationBase implements ContainerFactoryPluginInterface 
    * {@inheritdoc}
    */
   public function import(Row $row) {
-    $map = $this->fieldInfo->getFieldMap();
     $all_instances = $this->fieldInfo->getInstances($this->configuration['entity_type']);
     if (isset($this->entityInfo['entity keys']['bundle'])) {
       // @TODO: validate!
