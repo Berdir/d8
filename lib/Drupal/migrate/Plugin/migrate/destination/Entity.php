@@ -58,6 +58,7 @@ class Entity extends DestinationBase implements ContainerFactoryPluginInterface 
         $row->setDestinationProperty($field_name, $destination_value);
       }
     }
+    // @TODO: validate! this will fatal if create() fails.
     $this->storageController->create($row->getDestination())->save();
   }
 
