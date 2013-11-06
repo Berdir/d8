@@ -17,7 +17,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class Entity extends DestinationBase implements ContainerFactoryPluginInterface {
 
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition, EntityStorageControllerInterface $storage_controller, MigratePluginManager $plugin_manager, FieldInfo $field_info) {
+  public function __construct(array $configuration, $plugin_id, array $plugin_definition, array $entity_info, EntityStorageControllerInterface $storage_controller, MigratePluginManager $plugin_manager, FieldInfo $field_info) {
+    $this->entityInfo = $entity_info;
     $this->storageController = $storage_controller;
     $this->pluginManager = $plugin_manager;
     $this->fieldInfo = $field_info;
@@ -31,8 +32,9 @@ class Entity extends DestinationBase implements ContainerFactoryPluginInterface 
       $configuration,
       $plugin_id,
       $plugin_definition,
+      $container->get('entity.manager')->getDefinition($configuration['entity_type']),
       $container->get('entity.manager')->getStorageController($configuration['entity_type']),
-      $container->get('plugin.manager.migrate.entity_field:'),
+      $container->get('plugin.manager.migrate.entity_field'),
       $container->get('field.info')
     );
   }
@@ -42,10 +44,18 @@ class Entity extends DestinationBase implements ContainerFactoryPluginInterface 
    */
   public function import(Row $row) {
     $map = $this->fieldInfo->getFieldMap();
-    foreach ($map[$this->configuration['entity_type']] as $field_name => $field_data) {
-      $field_type = $field_data['type'];
+    $all_instances = $this->fieldInfo->getInstances($this->configuration['entity_type']);
+    if (isset($this->entityInfo['entity keys']['bundle'])) {
+      // @TODO: validate!
+      $instances = $all_instances[$row->getDestinationProperty($this->entityInfo['entity keys']['bundle'])];
+    }
+    else {
+      $instances = reset($all_instances);
+    }
+    foreach ($instances as $field_name => $instance) {
+      $field_type = $instance->getFieldType();
       if ($this->pluginManager->getDefinition($field_type)) {
-        $destination_value = $this->pluginManager->createInstance($field_type)->import($row->getDestinationProperty($field_name));
+        $destination_value = $this->pluginManager->createInstance($field_type)->import($instance, $row->getDestinationProperty($field_name));
         $row->setDestinationProperty($field_name, $destination_value);
       }
     }
