@@ -78,11 +78,15 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
   /**
    * The source configuration, with at least a 'plugin' key.
    *
+   * Used to initialize the $sourcePlugin.
+   *
    * @var array
    */
   public $source;
 
   /**
+   * The source plugin.
+   *
    * @var \Drupal\migrate\Plugin\MigrateSourceInterface
    */
   protected $sourcePlugin;
@@ -90,11 +94,15 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
   /**
    * The configuration describing the process plugins.
    *
+   * Used to initialize $migrateProcessBag.
+   *
    * @var array
    */
   public $process;
 
   /**
+   * The object which stores all active process plugins.
+   *
    * @var \Drupal\Migrate\Plugin\MigrateProcessBag
    */
   protected $migrateProcessBag;
@@ -102,21 +110,31 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
   /**
    * The destination configuration, with at least a 'plugin' key.
    *
+   * Used to initialize $destinationPlugin.
+   *
    * @var array
    */
   public $destination;
 
   /**
+   * The destination plugin.
+   *
    * @var \Drupal\migrate\Plugin\MigrateDestinationInterface
    */
   protected $destinationPlugin;
 
   /**
+   * The identifier map data.
+   *
+   * Used to initialize $idMapPlugin.
+   *
    * @var string
    */
   public $idMap = array();
 
   /**
+   * The identifier map.
+   *
    * @var \Drupal\migrate\Plugin\MigrateIdMapInterface
    */
   protected $idMapPlugin;
