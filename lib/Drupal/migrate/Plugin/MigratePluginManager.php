@@ -25,7 +25,7 @@ class MigratePluginManager extends DefaultPluginManager {
    * Constructs a MigraterPluginManager object.
    *
    * @param string $type
-   *   The type of the plugin: row, source, process, destination, id_map.
+   *   The type of the plugin: row, source, process, destination, entity_field, id_map.
    * @param \Traversable $namespaces
    *   An object that implements \Traversable which contains the root paths
    *   keyed by the corresponding namespace to look for plugin implementations.
@@ -47,7 +47,7 @@ class MigratePluginManager extends DefaultPluginManager {
    *
    * A specific createInstance method is necessary to pass the migration on.
    */
-  public function createInstance($plugin_id, array $configuration, MigrationInterface $migration = NULL) {
+  public function createInstance($plugin_id, array $configuration = array(), MigrationInterface $migration = NULL) {
     $plugin_definition = $this->discovery->getDefinition($plugin_id);
     $plugin_class = DefaultFactory::getPluginClass($plugin_id, $plugin_definition);
     // If the plugin provides a factory method, pass the container to it.
