@@ -273,9 +273,6 @@ class MigrateExecutable {
         entity_get_controller($destination->entityType)->resetCache();
       }
 
-      if ($this->timeOptionExceeded()) {
-        break;
-      }
       if (($return = $this->checkStatus()) != MigrationInterface::RESULT_COMPLETED) {
         break;
       }
