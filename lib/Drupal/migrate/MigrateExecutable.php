@@ -10,17 +10,70 @@ namespace Drupal\migrate;
 use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
 
+/**
+ * Defines a migrate executable class.
+ */
 class MigrateExecutable {
 
   /**
+   * The migration to do.
+   *
    * @var \Drupal\migrate\Entity\MigrationInterface
    */
   protected $migration;
+
+  /**
+   * The number of successfully imported rows since feedback was given.
+   *
+   * @var int
+   */
   protected $successes_since_feedback;
+
+  /**
+   * The number of rows that were successfully processed.
+   *
+   * @var int
+   */
   protected $total_successes;
+
+  /**
+   * Status of one row.
+   *
+   * The value is a MigrateIdMapInterface::STATUS_* constant, for example:
+   * STATUS_IMPORTED.
+   *
+   * @var int
+   */
   protected $needsUpdate;
+
+  /**
+   * The number of rows processed.
+   *
+   * The total attempted, whether or not they were successful.
+   *
+   * @var int
+   */
   protected $total_processed;
+
+  /**
+   * The queued messages not yet saved.
+   *
+   * Each element in the array is an array with two keys:
+   * - 'message': The message string.
+   * - 'level': The level, a MigrationInterface::MESSAGE_* constant.
+   *
+   * @var array
+   */
   protected $queuedMessages = array();
+
+  /**
+   * The options that can be set when executing the migration.
+   *
+   * Values can be set for:
+   * - 'limit': Sets a time limit.
+   *
+   * @var array
+   */
   protected $options;
 
   /**
@@ -468,4 +521,5 @@ class MigrateExecutable {
     }
     return $this->translationManager;
   }
+
 }
