@@ -8,6 +8,7 @@
 namespace Drupal\migrate\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\migrate\MigrateException;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\Plugin\MigrateProcessBag;
 
@@ -216,9 +217,12 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
         if (isset($configuration['source'])) {
           $this->processPlugins[$property][] = \Drupal::service('plugin.manager.migrate.process')->createInstance('get', $configuration, $this);
         }
-        // Get is already hendled.
+        // Get is already handled.
         if ($configuration['plugin'] != 'get') {
           $this->processPlugins[$property][] = \Drupal::service('plugin.manager.migrate.process')->createInstance($configuration['plugin'], $configuration, $this);
+        }
+        if (!$this->processPlugins[$property]) {
+          throw new MigrateException("Invalid process configuration for $property");
         }
       }
     }

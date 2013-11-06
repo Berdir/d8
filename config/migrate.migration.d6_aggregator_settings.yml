@@ -11,16 +11,15 @@ source:
         - aggregator_summary_items
         - aggregator_category_selector
 process:
-    -
-        plugin: copy_from_source
-        fetcher: aggregator_fetcher
-        parser: aggregator_parser
-        processors: aggregator_processors
-        'items:allowed_html': aggregator_allowed_html_tags
-        'items:teaser_length': aggregator_teaser_length
-        'items:expire': aggregator_clear
-        'source:list_max': aggregator_summary_items
-        'source:category_selector': aggregator_category_selector
+    plugin: copy_from_source
+    fetcher: aggregator_fetcher
+    parser: aggregator_parser
+    processors: aggregator_processors
+    'items:allowed_html': aggregator_allowed_html_tags
+    'items:teaser_length': aggregator_teaser_length
+    'items:expire': aggregator_clear
+    'source:list_max': aggregator_summary_items
+    'source:category_selector': aggregator_category_selector
 destination:
     plugin: d8_config
     config_name: aggregator.settings
