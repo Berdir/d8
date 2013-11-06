@@ -44,9 +44,9 @@ class Entity extends DestinationBase implements ContainerFactoryPluginInterface 
     $map = $this->fieldInfo->getFieldMap();
     foreach ($map[$this->configuration['entity_type']] as $field_name => $field_data) {
       $field_type = $field_data['type'];
-      // @TODO add && $row->hasDestinationProperty($field_name) or not?
       if ($this->pluginManager->getDefinition($field_type)) {
-        $this->pluginManager->createInstance($field_type)->import($row, $field_name);
+        $destination_value = $this->pluginManager->createInstance($field_type)->import($row->getDestinationProperty($field_name));
+        $row->setDestinationProperty($field_name, $destination_value);
       }
     }
     $this->storageController->create($row->getDestination())->save();
