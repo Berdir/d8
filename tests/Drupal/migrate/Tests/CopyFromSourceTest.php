@@ -7,7 +7,7 @@
 namespace Drupal\migrate\Tests;
 
 
-use Drupal\migrate\Plugin\migrate\process\CopyFromSource;
+use Drupal\migrate\Plugin\migrate\process\Get;
 use Drupal\migrate\Row;
 
 /**
@@ -69,7 +69,7 @@ class CopyFromSourceTest extends MigrateTestCase {
     $configuration = array(
       'testproperty:sub' => 'nid',
     );
-    $map = new CopyFromSource($configuration, 'copy_from_source', array());
+    $map = new Get($configuration, 'copy_from_source', array());
     $map->apply($this->row, $this->migrateExecutable);
     $destination = $this->row->getDestination();
     $this->assertSame(1, $destination['testproperty']['sub']);
@@ -82,7 +82,7 @@ class CopyFromSourceTest extends MigrateTestCase {
     $configuration = array(
       'testproperty:sub' => 'foo',
     );
-    $map = new CopyFromSource($configuration, 'copy_from_source', array());
+    $map = new Get($configuration, 'copy_from_source', array());
     $map->apply($this->row, $this->migrateExecutable);
     $destination = $this->row->getDestination();
     $this->assertSame(array(), $destination);

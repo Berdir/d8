@@ -101,11 +101,11 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
   public $process;
 
   /**
-   * The object which stores all active process plugins.
+   * The array which stores all active process plugins.
    *
-   * @var \Drupal\Migrate\Plugin\MigrateProcessBag
+   * @var array
    */
-  protected $migrateProcessBag;
+  protected $processPlugins = array();
 
   /**
    * The destination configuration, with at least a 'plugin' key.
@@ -210,10 +210,42 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
    * {@inheritdoc}
    */
   public function getProcess() {
-    if (!$this->migrateProcessBag) {
-      $this->migrateProcessBag = new MigrateProcessBag(\Drupal::service('plugin.manager.migrate.process'), $this->process, $this);
+    foreach ($this->getProcessNormalized() as $property => $configurations) {
+      foreach ($configurations as $configuration) {
+        $plugin_array = array();
+        if (isset($configuration['source'])) {
+          $plugin_array[] = \Drupal::service('plugin.manager.migrate.process')->createInstance('get', $configuration, $this);
+        }
+        // Copying doesn't need a plugin.
+        if ($configuration['plugin'] != 'copy') {
+          $plugin_array[] = \Drupal::service('plugin.manager.migrate.process')->createInstance($configuration['plugin'], $configuration, $this);
+        }
+        if ($plugin_array) {
+          $this->processPlugins[$property][] = $plugin_array;
+        }
+        else {
+          throw new \MigrateException('wtf dude');
+        }
+      }
     }
-    return $this->migrateProcessBag;
+    return $this->processPlugins;
+  }
+
+  protected function getProcessNormalized() {
+    $normalized_configurations = array();
+    foreach ($this->process as $destination => $configuration) {
+      if (is_string($configuration)) {
+        $configuration = array(
+          'plugin' => 'copy',
+          'source' => $configuration,
+        );
+      }
+      if (isset($configuration['plugin'])) {
+        $configuration = array($configuration);
+      }
+      $normalized_configurations[$destination] = $configuration;
+    }
+    return $normalized_configurations;
   }
 
   /**

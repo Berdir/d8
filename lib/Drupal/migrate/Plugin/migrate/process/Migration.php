@@ -14,16 +14,16 @@ use Drupal\Core\Plugin\PluginBase;
 use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
-use Drupal\migrate\Plugin\ProcessInterface;
+use Drupal\migrate\Plugin\MigrateProcessInterface;
 use Drupal\migrate\Row;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Calculates the value of a property based on a previous migration.
  *
- * @PluginId("value_from_migrations")
+ * @PluginId("migration")
  */
-class ValueFromMigrations extends PluginBase implements ProcessInterface, ContainerFactoryPluginInterface {
+class Migration extends PluginBase implements MigrateProcessInterface, ContainerFactoryPluginInterface {
 
   /**
    * {@inheritdoc}
@@ -50,7 +50,7 @@ class ValueFromMigrations extends PluginBase implements ProcessInterface, Contai
   /**
    * {@inheritdoc}
    */
-  public function apply(Row $row, MigrateExecutable $migrate_executable) {
+  public function transform($value, MigrateExecutable $migrate_executable, Row $row, $destination_property) {
     $migration_ids = $this->configuration['migration'];
     if (!is_array($migration_ids)) {
       $migration_ids = array($migration_ids);
@@ -95,12 +95,11 @@ class ValueFromMigrations extends PluginBase implements ProcessInterface, Contai
       if ($continue || empty($property)) {
         continue;
       }
-      $destination_value = $row->getDestinationProperty($this->configuration['property']);
       // Loop through each source migration, checking for an existing dest ID.
       /** @var \Drupal\migrate\Entity\MigrationInterface $migration */
       foreach ($migrations as $migration) {
         // Break out of the loop as soon as a destination ID is found.
-        if ($destids = $migration->getIdMap()->lookupDestinationID($destination_value)) {
+        if ($destids = $migration->getIdMap()->lookupDestinationID($value)) {
           if (!empty($destids['destid1'])) {
             break;
           }

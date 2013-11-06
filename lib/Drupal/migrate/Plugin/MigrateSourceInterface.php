@@ -6,12 +6,13 @@
  */
 
 namespace Drupal\migrate\Plugin;
+use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\migrate\Row;
 
 /**
  * Defines an interface for migrate sources.
  */
-interface MigrateSourceInterface extends \Countable {
+interface MigrateSourceInterface extends \Countable, PluginInspectionInterface {
 
   /**
    * Returns available fields on the source.

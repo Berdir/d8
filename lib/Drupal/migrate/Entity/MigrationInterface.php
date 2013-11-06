@@ -58,9 +58,9 @@ interface MigrationInterface extends ConfigEntityInterface {
   public function getSource();
 
   /**
-   * Returns the initialized process plugin.
+   * Returns the process plugins.
    *
-   * @return \Drupal\migrate\Plugin\MigrateProcessBag
+   * @return array
    */
   public function getProcess();
 

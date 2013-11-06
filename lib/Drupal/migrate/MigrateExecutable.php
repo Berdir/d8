@@ -299,12 +299,17 @@ class MigrateExecutable {
   }
 
   /**
-   * Apply field mappings to a data row received from the source, returning
-   * a populated destination object.
+   * Apply transformations to a data row received from the source.
    */
   protected function processRow(Row $row) {
-    foreach ($this->migration->getProcess() as $process) {
-      $process->apply($row, $this);
+    $value = NULL;
+    foreach ($this->migration->getProcess() as $destination => $plugin_arrays) {
+      foreach ($plugin_arrays as $plugin_array) {
+        foreach ($plugin_array as $plugin) {
+          $value = $plugin->transform($value, $this, $row, $destination);
+          $row->setDestinationProperty($destination, $value);
+        }
+      }
     }
   }
 

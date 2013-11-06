@@ -7,6 +7,7 @@
 
 namespace Drupal\migrate\Plugin;
 
+use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\MigrateMessageInterface;
 use Drupal\migrate\Row;
@@ -17,7 +18,7 @@ use Drupal\migrate\Row;
  * Migrate id mappings maintain a relation between source ID and
  * destination ID for audit and rollback purposes.
  */
-interface MigrateIdMapInterface {
+interface MigrateIdMapInterface extends PluginInspectionInterface {
 
   /**
    * Codes reflecting the current status of a map row.
