@@ -303,11 +303,9 @@ class MigrateExecutable {
    */
   protected function processRow(Row $row) {
     $value = NULL;
-    foreach ($this->migration->getProcess() as $destination => $plugin_arrays) {
-      foreach ($plugin_arrays as $plugin_array) {
-        foreach ($plugin_array as $plugin) {
-          $value = $plugin->transform($value, $this, $row, $destination);
-        }
+    foreach ($this->migration->getProcess() as $destination => $plugins) {
+      foreach ($plugins as $plugin) {
+        $value = $plugin->transform($value, $this, $row, $destination);
       }
       $row->setDestinationProperty($destination, $value);
     }

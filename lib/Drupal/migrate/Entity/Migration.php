@@ -212,19 +212,13 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
   public function getProcess() {
     foreach ($this->getProcessNormalized() as $property => $configurations) {
       foreach ($configurations as $configuration) {
-        $plugin_array = array();
+        $this->processPlugins[$property] = array();
         if (isset($configuration['source'])) {
-          $plugin_array[] = \Drupal::service('plugin.manager.migrate.process')->createInstance('get', $configuration, $this);
+          $this->processPlugins[$property][] = \Drupal::service('plugin.manager.migrate.process')->createInstance('get', $configuration, $this);
         }
-        // Copying doesn't need a plugin.
-        if ($configuration['plugin'] != 'copy') {
-          $plugin_array[] = \Drupal::service('plugin.manager.migrate.process')->createInstance($configuration['plugin'], $configuration, $this);
-        }
-        if ($plugin_array) {
-          $this->processPlugins[$property][] = $plugin_array;
-        }
-        else {
-          throw new \MigrateException('wtf dude');
+        // Get is already hendled.
+        if ($configuration['plugin'] != 'get') {
+          $this->processPlugins[$property][] = \Drupal::service('plugin.manager.migrate.process')->createInstance($configuration['plugin'], $configuration, $this);
         }
       }
     }
@@ -236,7 +230,7 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
     foreach ($this->process as $destination => $configuration) {
       if (is_string($configuration)) {
         $configuration = array(
-          'plugin' => 'copy',
+          'plugin' => 'get',
           'source' => $configuration,
         );
       }
