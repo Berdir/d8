@@ -25,15 +25,6 @@ class MigrateException extends \Exception {
   protected $level;
 
   /**
-   * Gets the level.
-   *
-   * @return int
-   */
-  public function getLevel() {
-    return $this->level;
-  }
-
-  /**
    * The status to record in the map table for the current item.
    *
    * The value is a MigrateMap::STATUS_* constant.
@@ -41,15 +32,6 @@ class MigrateException extends \Exception {
    * @var int
    */
   protected $status;
-
-  /**
-   * Gets the status of the current item.
-   *
-   * @return int
-   */
-  public function getStatus() {
-    return $this->status;
-  }
 
   /**
    * Constructs a MigrateException object.
@@ -70,6 +52,24 @@ class MigrateException extends \Exception {
     $this->level = $level;
     $this->status = $status;
     parent::__construct($message);
+  }
+
+  /**
+   * Gets the level.
+   *
+   * @return int
+   */
+  public function getLevel() {
+    return $this->level;
+  }
+
+  /**
+   * Gets the status of the current item.
+   *
+   * @return int
+   */
+  public function getStatus() {
+    return $this->status;
   }
 
 }
