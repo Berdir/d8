@@ -307,9 +307,9 @@ class MigrateExecutable {
       foreach ($plugin_arrays as $plugin_array) {
         foreach ($plugin_array as $plugin) {
           $value = $plugin->transform($value, $this, $row, $destination);
-          $row->setDestinationProperty($destination, $value);
         }
       }
+      $row->setDestinationProperty($destination, $value);
     }
   }
 
