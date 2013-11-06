@@ -60,3 +60,14 @@ class D6UserPictureSourceTest extends MigrateSqlSourceTestCase {
   }
 
 }
+
+namespace Drupal\migrate\Tests\source\d6;
+
+use Drupal\Core\Database\Connection;
+use Drupal\migrate\Plugin\migrate\source\d6\UserPicture;
+
+class TestUserPicture extends UserPicture {
+  function setDatabase(Connection $database) {
+    $this->database = $database;
+  }
+}
