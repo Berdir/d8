@@ -229,6 +229,12 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
     return $this->processPlugins;
   }
 
+  /**
+   * Resolve shorthands into a list of plugin configurations.
+   *
+   * @return array
+   *   The normalized process configuration.
+   */
   protected function getProcessNormalized() {
     $normalized_configurations = array();
     foreach ($this->process as $destination => $configuration) {
