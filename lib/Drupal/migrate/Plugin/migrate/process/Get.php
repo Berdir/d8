@@ -33,7 +33,7 @@ class Get extends PluginBase implements MigrateProcessInterface {
       else {
         $is_source = TRUE;
         if ($property[0] == '@') {
-          $property = preg_replace_callback('/^(@?)((?:@@)*)([^@])/', function ($matches) use (&$is_source) {
+          $property = preg_replace_callback('/^(@?)((?:@@)*)([^@]|$)/', function ($matches) use (&$is_source) {
             // If there are an odd number of @ in the beginning, it's a
             // destination.
             $is_source = empty($matches[1]);
