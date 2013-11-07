@@ -30,21 +30,24 @@ class Get extends PluginBase implements MigrateProcessInterface {
       if (empty($property)) {
         $return[] = $value;
       }
-      elseif ($property[0] == '@') {
-        // This either references a destination property.
-        if (preg_match('/^@(@@)*\w', $property)) {
-          // Which might contain @ characters.
-          $property = str_replace('@@', '@', substr($property, 1));
-          $return[] = $row->getDestinationProperty($property);
+      else {
+        $is_source = TRUE;
+        if ($property[0] == '@') {
+          $property = preg_replace_callback('/^(@?)((?:@@)*)([^@])/', function ($matches) use (&$is_source) {
+            // If there are an odd number of @ in the beginning, it's a
+            // destination.
+            $is_source = empty($matches[1]);
+            // Remove the possible escaping and do not lose the terminating
+            // non-@ either.
+            return str_replace('@@', '@', $matches[2]) . $matches[3];
+          }, $property);
         }
-        else {
-          // Or a source which might also contain @ characters.
-          $property = str_replace('@@', '@', $property);
+        if ($is_source) {
           $return[] = $row->getSourceProperty($property);
         }
-      }
-      else {
-        $return[] = $row->getSourceProperty($property);
+        else {
+          $return[] = $row->getDestinationProperty($property);
+        }
       }
     }
     return is_string($source) ? $return[0] : $return;
