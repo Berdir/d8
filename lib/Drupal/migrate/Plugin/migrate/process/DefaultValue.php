@@ -24,12 +24,7 @@ class DefaultValue extends PluginBase implements MigrateProcessInterface {
  /**
    * {@inheritdoc}
    */
-  public function apply(Row $row, MigrateExecutable $migrate_executable) {
-    foreach ($this->configuration as $key => $default_value) {
-      if (!$row->hasDestinationProperty($key)) {
-        $row->setDestinationProperty($key, $default_value);
-      }
-    }
+  public function transform($value, MigrateExecutable $migrate_executable, Row $row, $destination_property) {
+    return $this->configuration['value'];
   }
-
 }
