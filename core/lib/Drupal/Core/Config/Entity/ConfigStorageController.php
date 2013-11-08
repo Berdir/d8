@@ -134,6 +134,15 @@ class ConfigStorageController extends EntityStorageControllerBase {
     // array for later comparison with the entity cache, or FALSE if no $ids
     // were passed.
     $passed_ids = !empty($ids) ? array_flip($ids) : FALSE;
+    // Try to load entities from the static cache, if the entity type supports
+    // static caching.
+    if ($this->cache && $ids) {
+      $entities += $this->cacheGet($ids);
+      // If any entities were loaded, remove them from the ids still to load.
+      if ($passed_ids) {
+        $ids = array_keys(array_diff_key($passed_ids, $entities));
+      }
+    }
 
     // Load any remaining entities. This is the case if $ids is set to NULL (so
     // we load all entities).
@@ -149,13 +158,20 @@ class ConfigStorageController extends EntityStorageControllerBase {
       $entities += $queried_entities;
     }
 
+    if ($this->cache) {
+      // Add entities to the cache.
+      if (!empty($queried_entities)) {
+        $this->cacheSet($queried_entities);
+      }
+    }
+
     // Ensure that the returned array is ordered the same as the original
     // $ids array if this was passed in and remove any invalid ids.
     if ($passed_ids) {
       // Remove any invalid ids from the array.
       $passed_ids = array_intersect_key($passed_ids, $entities);
       foreach ($entities as $entity) {
-        $passed_ids[$entity->{$this->idKey}] = $entity;
+        $passed_ids[$entity->id()] = $entity;
       }
       $entities = $passed_ids;
     }
@@ -252,7 +268,7 @@ class ConfigStorageController extends EntityStorageControllerBase {
    * See Drupal\comment\CommentStorageController::buildQuery() or
    * Drupal\taxonomy\TermStorageController::buildQuery() for examples.
    *
-   * @param $ids
+   * @param array|null $ids
    *   An array of entity IDs, or NULL to load all entities.
    * @param $revision_id
    *   The ID of the revision to load, or FALSE if this query is asking for the
@@ -370,6 +386,9 @@ class ConfigStorageController extends EntityStorageControllerBase {
       $config->delete();
     }
 
+    // Reset the cache as soon as the changes have been applied.
+    $this->resetCache(array_keys($entities));
+
     $entity_class::postDelete($this, $entities);
     foreach ($entities as $entity) {
       $this->invokeHook('delete', $entity);
@@ -428,6 +447,7 @@ class ConfigStorageController extends EntityStorageControllerBase {
     if (!$is_new) {
       $return = SAVED_UPDATED;
       $config->save();
+      $this->resetCache(array($entity->id()));
       $entity->postSave($this, TRUE);
       $this->invokeHook('update', $entity);
 
@@ -445,6 +465,58 @@ class ConfigStorageController extends EntityStorageControllerBase {
     unset($entity->original);
 
     return $return;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function resetCache(array $ids = NULL) {
+    $context_uuid = $this->getCurrentContextUuid();
+    if ($this->cache && isset($ids)) {
+      foreach ($ids as $id) {
+        unset($this->entityCache[$context_uuid][$id]);
+      }
+    }
+    else {
+      $this->entityCache[$context_uuid] = array();
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function cacheGet($ids) {
+    $entities = array();
+    $context_uuid = $this->getCurrentContextUuid();
+    // Load any available entities from the internal cache.
+    if ($this->cache && !empty($this->entityCache[$context_uuid])) {
+      $entities += array_intersect_key($this->entityCache[$context_uuid], array_flip($ids));
+    }
+    return $entities;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function cacheSet($entities) {
+    if ($this->cache) {
+      $context_uuid = $this->getCurrentContextUuid();
+      if (!isset($this->entityCache[$context_uuid])) {
+        $this->entityCache[$context_uuid] = array();
+      }
+      $this->entityCache[$context_uuid] += $entities;
+    }
+  }
+
+  /**
+   * Gets the current configuration context UUID.
+   *
+   * @return string
+   *   The UUID for the current \Drupal\Core\Config\Context\ContextInterface
+   *   instance.
+   */
+  protected function getCurrentContextUuid() {
+    return $this->configFactory->getContext()->getUuid();
   }
 
   /**
