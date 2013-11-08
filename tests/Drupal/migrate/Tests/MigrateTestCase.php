@@ -61,18 +61,4 @@ abstract class MigrateTestCase extends UnitTestCase {
       'group' => 'Migrate',
     );
   }
-
-  /**
-   * Returns a stub translation manager that just returns the passed string.
-   *
-   * @return \PHPUnit_Framework_MockObject_MockBuilder
-   *   A MockBuilder of \Drupal\Core\StringTranslation\TranslationInterface
-   */
-  public function getStringTranslationStub() {
-    $translation = $this->getMock('Drupal\Core\StringTranslation\TranslationInterface');
-    $translation->expects($this->any())
-      ->method('translate')
-      ->will($this->returnCallback(function ($string, array $args = array()) { return strtr($string, $args); }));
-    return $translation;
-  }
 }

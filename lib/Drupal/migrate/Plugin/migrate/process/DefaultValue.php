@@ -7,7 +7,6 @@
 
 
 namespace Drupal\migrate\Plugin\migrate\process;
-use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate\Plugin\MigrateProcessInterface;
