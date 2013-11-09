@@ -48,6 +48,9 @@ abstract class MigrateSqlSourceTestCase extends MigrateTestCase {
     $database->expects($this->any())->method('schema')->will($this->returnCallback(function () use ($database, $database_contents) {
       return new FakeDatabaseSchema($database, $database_contents);
     }));
+    $module_handler = $this->getMockBuilder('Drupal\Core\Extension\ModuleHandlerInterface')
+      ->disableOriginalConstructor()
+      ->getMock();
 
     $migration = $this->getMigration();
     $migration->expects($this->any())
@@ -57,6 +60,7 @@ abstract class MigrateSqlSourceTestCase extends MigrateTestCase {
     $plugin_class  = preg_replace('/^(Drupal\\\\\w+\\\\)Plugin\\\\migrate(\\\\source(\\\\.+)?\\\\)([^\\\\]+)$/', '\1Tests\2Test\4', static::PLUGIN_CLASS);
     $plugin = new $plugin_class($this->migrationConfiguration['source'], $this->migrationConfiguration['source']['plugin'], array(), $migration);
     $plugin->setDatabase($database);
+    $plugin->setModuleHandler($module_handler);
     $migration->expects($this->any())
       ->method('getSource')
       ->will($this->returnValue($plugin));

@@ -61,10 +61,14 @@ class D6VariableTest extends MigrateSqlSourceTestCase {
 namespace Drupal\migrate\Tests\source;
 
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\migrate\Plugin\migrate\source\D6Variable;
 
 class TestD6Variable extends D6Variable {
   function setDatabase(Connection $database) {
     $this->database = $database;
+  }
+  function setModuleHandler(ModuleHandlerInterface $module_handler) {
+    $this->moduleHandler = $module_handler;
   }
 }

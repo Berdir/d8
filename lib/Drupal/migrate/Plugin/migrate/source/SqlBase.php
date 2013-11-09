@@ -17,7 +17,7 @@ use Drupal\migrate\Row;
 /**
  * Sources whose data may be fetched via DBTNG.
  */
-abstract class SqlBase extends PluginBase implements MigrateSourceInterface {
+abstract class SqlBase extends SourcePluginBase {
 
   /**
    * @var \Drupal\Core\Database\Query\SelectInterface
@@ -38,8 +38,7 @@ abstract class SqlBase extends PluginBase implements MigrateSourceInterface {
    * {@inheritdoc}
    */
   function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->migration = $migration;
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $migration);
     $this->mapJoinable = TRUE;
   }
 
@@ -182,7 +181,4 @@ abstract class SqlBase extends PluginBase implements MigrateSourceInterface {
     return $this->iterator;
   }
 
-  public function prepareRow(Row $row) {
-    return TRUE;
-  }
 }
