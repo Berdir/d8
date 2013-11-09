@@ -75,6 +75,9 @@ abstract class SqlBase extends SourcePluginBase {
    */
   protected function runQuery() {
     $this->query = clone $this->query();
+    $this->query->addTag('migrate');
+    $this->query->addTag('migrate_' . $this->migration->id());
+    $this->query->addMetaData('migration', $this->migration);
     $highwaterProperty = $this->migration->get('highwaterProperty');
 
     // Get the key values, for potential use in joining to the map table, or
