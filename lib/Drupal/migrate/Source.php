@@ -154,7 +154,7 @@ class Source implements \Iterator, \Countable {
     $source = $this->migration->getSource();
 
     if (!isset($this->cacheKey)) {
-      $this->cacheKey = md5((string) $source);
+      $this->cacheKey = hash('sha256', (string) $source);
     }
 
     // If a refresh is requested, or we're not caching counts, ask the derived
