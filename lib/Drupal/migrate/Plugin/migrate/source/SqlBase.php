@@ -49,7 +49,10 @@ abstract class SqlBase extends SourcePluginBase {
     return (string) $this->query;
   }
 
-  protected function getDatabase() {
+  /**
+   * @return \Drupal\Core\Database\Connection
+   */
+  public function getDatabase() {
     if  (!isset($this->database)) {
       $this->database = static::getDatabaseConnection($this->migration->id(), $this->configuration);
     }

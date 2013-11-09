@@ -46,7 +46,7 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
    * {@inheritdoc}
    */
   public function prepareRow(Row $row) {
-    $this->getModuleHandler()->invokeAll('migrate_prepare_row', $row, $this->migration);
+    $this->getModuleHandler()->invokeAll('migrate_prepare_row', $row, $this, $this->migration);
     return TRUE;
   }
 
