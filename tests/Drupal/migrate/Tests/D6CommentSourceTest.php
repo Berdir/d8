@@ -20,7 +20,7 @@ class D6CommentSourceTest extends MigrateSqlSourceTestCase {
 
   // The fake Migration configuration entity.
   protected $migrationConfiguration = array(
-    // The id of the entity, can be any string.
+    // The ID of the entity, can be any string.
     'id' => 'test',
     // Leave it empty for now.
     'idlist' => array(),

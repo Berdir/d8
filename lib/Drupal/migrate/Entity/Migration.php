@@ -144,7 +144,7 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
    * The source identifiers.
    *
    * An array of source identifiers: the keys are the name of the properties,
-   * the values are dependent on the id map plugin.
+   * the values are dependent on the ID map plugin.
    *
    * @var array
    */
@@ -154,7 +154,7 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
    * The destination identifiers.
    *
    * An array of destination identifiers: the keys are the name of the
-   * properties, the values are dependent on the id map plugin.
+   * properties, the values are dependent on the ID map plugin.
    *
    * @var array
    */

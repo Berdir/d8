@@ -60,7 +60,7 @@ class RowTest extends UnitTestCase {
   }
 
   /**
-   * Tests object creation: multiple source ids.
+   * Tests object creation: multiple source IDs.
    */
   public function testRowWithMultipleSourceIds() {
     $multi_source_ids = $this->testSourceIds + array('vid' => 'Node revision');

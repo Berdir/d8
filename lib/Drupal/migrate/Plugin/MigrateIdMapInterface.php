@@ -13,9 +13,9 @@ use Drupal\migrate\MigrateMessageInterface;
 use Drupal\migrate\Row;
 
 /**
- * An interface for migrate id mappings.
+ * An interface for migrate ID mappings.
  *
- * Migrate id mappings maintain a relation between source ID and
+ * Migrate ID mappings maintain a relation between source ID and
  * destination ID for audit and rollback purposes.
  */
 interface MigrateIdMapInterface extends PluginInspectionInterface {

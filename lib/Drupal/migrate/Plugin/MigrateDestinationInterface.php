@@ -51,12 +51,12 @@ interface MigrateDestinationInterface extends PluginInspectionInterface {
 
   /**
    * Derived classes must implement import(), to construct one new object (pre-populated
-   * using id mappings in the Migration).
+   * using ID mappings in the Migration).
    */
   public function import(Row $row);
 
   /**
-   * Delete the specified ids from the target Drupal.
+   * Delete the specified IDs from the target Drupal.
    * @param array $destination_identifiers
    */
   public function rollbackMultiple(array $destination_identifiers);

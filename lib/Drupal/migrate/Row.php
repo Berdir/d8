@@ -62,14 +62,14 @@ class Row {
    * @param array $values
    *   An array of values to add as properties on the object.
    * @param array $source_ids
-   *   An array containing the ids of the source using the keys as the field
+   *   An array containing the IDs of the source using the keys as the field
    *   names.
    * @param array $destination_ids
-   *   An array containing the ids of the destination using the keys as the field
+   *   An array containing the IDs of the destination using the keys as the field
    *   names.
    *
    * @throws \InvalidArgumentException
-   *   Thrown when a source id property does not exist.
+   *   Thrown when a source ID property does not exist.
    */
   public function __construct(array $values, array $source_ids) {
     $this->source = $values;
@@ -196,7 +196,7 @@ class Row {
   }
 
   /**
-   * Sets the Migrate id mappings.
+   * Sets the Migrate ID mappings.
    *
    * @param array $id_map
    *   An array of mappings between source ID and destination ID.
@@ -206,7 +206,7 @@ class Row {
   }
 
   /**
-   * Retrieves the Migrate id mappings.
+   * Retrieves the Migrate ID mappings.
    *
    * @return array
    *   An array of mapping between source and destination identifiers.
@@ -224,7 +224,7 @@ class Row {
   }
 
   /**
-   * Checks whether the row has changed compared to the original id map.
+   * Checks whether the row has changed compared to the original ID map.
    *
    * return bool
    *   TRUE if the row has changed, FALSE otherwise. If setIdMap() was not
