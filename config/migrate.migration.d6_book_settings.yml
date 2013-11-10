@@ -6,7 +6,6 @@ source:
         - book_block_mode
         - book_allowed_types
 process:
-    plugin: copy_from_source
     child_type: book_child_type
     'block:navigation:mode': book_block_mode
     allowed_types: book_allowed_types

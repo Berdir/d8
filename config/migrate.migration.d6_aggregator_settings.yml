@@ -11,7 +11,6 @@ source:
         - aggregator_summary_items
         - aggregator_category_selector
 process:
-    plugin: copy_from_source
     fetcher: aggregator_fetcher
     parser: aggregator_parser
     processors: aggregator_processors

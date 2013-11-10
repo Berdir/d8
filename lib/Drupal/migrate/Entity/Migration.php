@@ -10,7 +10,6 @@ namespace Drupal\migrate\Entity;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\migrate\MigrateException;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
-use Drupal\migrate\Plugin\MigrateProcessBag;
 
 /**
  * Defines the Migration entity.
@@ -95,7 +94,7 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
   /**
    * The configuration describing the process plugins.
    *
-   * Used to initialize $migrateProcessBag.
+   * Used to initialize $processPlugins.
    *
    * @var array
    */

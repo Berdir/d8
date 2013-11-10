@@ -11,7 +11,6 @@ source:
         - drupal_weight_select_max
         - admin_compact_mode
 process:
-    plugin: copy_from_source
     name: site_name
     mail: site_mail
     slogan: site_slogan
