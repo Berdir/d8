@@ -1,3 +1,4 @@
+id: d6_filter_formats
 source:
     plugin: drupal6_filter_formats
 process:
