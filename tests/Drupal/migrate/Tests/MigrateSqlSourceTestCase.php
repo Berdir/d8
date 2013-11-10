@@ -48,6 +48,7 @@ abstract class MigrateSqlSourceTestCase extends MigrateTestCase {
     $database->expects($this->any())->method('schema')->will($this->returnCallback(function () use ($database, $database_contents) {
       return new FakeDatabaseSchema($database, $database_contents);
     }));
+    $database->expects($this->any())->method('query')->will($this->throwException(new \Exception('Query is not supported')));
     $module_handler = $this->getMockBuilder('Drupal\Core\Extension\ModuleHandlerInterface')
       ->disableOriginalConstructor()
       ->getMock();
@@ -102,7 +103,7 @@ abstract class MigrateSqlSourceTestCase extends MigrateTestCase {
   protected function retrievalAssertHelper($expected_value, $actual_value, $message) {
     if (is_array($expected_value)) {
       foreach ($expected_value as $k => $v) {
-        $this->retrievalAssertHelper($v, $actual_value[$k], $message);
+        $this->retrievalAssertHelper($v, $actual_value[$k], $message . '['. $k . ']');
       }
     }
     else {

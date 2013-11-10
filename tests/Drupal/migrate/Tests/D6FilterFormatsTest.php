@@ -12,7 +12,7 @@ namespace Drupal\migrate\Tests;
  *
  * @group migrate
  */
-class D6FilterFormatsSourceTest extends MigrateSqlSourceTestCase {
+class D6FilterFormatsTest extends MigrateSqlSourceTestCase {
 
   // The plugin system is not working during unit testing so the source plugin
   // class needs to be manually specified.
@@ -46,19 +46,16 @@ class D6FilterFormatsSourceTest extends MigrateSqlSourceTestCase {
       'cache' => 1,
       'filters' => array(
         array(
-          'fid' => 1,
           'module' => 'filter',
           'delta' => 2,
           'weight' => 0,
         ),
         array(
-          'fid' => 2,
           'module' => 'filter',
           'delta' => 0,
           'weight' => 1,
         ),
         array(
-          'fid' => 3,
           'module' => 'filter',
           'delta' => 1,
           'weight' => 2,
@@ -72,19 +69,16 @@ class D6FilterFormatsSourceTest extends MigrateSqlSourceTestCase {
       'cache' => 1,
       'filters' => array(
         array(
-          'fid' => 5,
           'module' => 'filter',
           'delta' => 2,
           'weight' => 0,
         ),
         array(
-          'fid' => 6,
           'module' => 'filter',
           'delta' => 1,
           'weight' => 1,
         ),
         array(
-          'fid' => 7,
           'module' => 'filter',
           'delta' => 3,
           'weight' => 10,
@@ -99,7 +93,6 @@ class D6FilterFormatsSourceTest extends MigrateSqlSourceTestCase {
       'filters' => array(
         // This custom format uses a filter defined by a contrib module.
         array(
-          'fid' => 8,
           'module' => 'markdown',
           'delta' => 1,
           'weight' => 10,
@@ -123,10 +116,13 @@ class D6FilterFormatsSourceTest extends MigrateSqlSourceTestCase {
    * {@inheritdoc}
    */
   public function setUp() {
+    $fid = 1;
     foreach ($this->results as $k => $row) {
       foreach ($row['filters'] as $filter) {
-        $this->databaseContents['filters'][$filter['fid']] = $filter;
-        $this->databaseContents['filters'][$filter['fid']]['format'] = $row['format'];
+        $this->databaseContents['filters'][$fid] = $filter;
+        $this->databaseContents['filters'][$fid]['format'] = $row['format'];
+        $this->databaseContents['filters'][$fid]['fid'] = $fid;
+        $fid++;
       }
       unset($row['filters']);
       $this->databaseContents['filter_formats'][$k] = $row;

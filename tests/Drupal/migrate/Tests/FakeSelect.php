@@ -8,6 +8,7 @@
 namespace Drupal\migrate\Tests;
 
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\DatabaseNotFoundException;
 use Drupal\Core\Database\Query\Condition;
 use Drupal\Core\Database\Query\PlaceholderInterface;
 use Drupal\Core\Database\Query\Select;
@@ -130,7 +131,7 @@ class FakeSelect extends Select {
     foreach ($all_rows as $table_rows) {
       $result_row = array();
       foreach ($table_rows as $row) {
-        $result_row += $row;
+        $result_row += $row['result'];
       }
       $results[] = $result_row;
     }
@@ -158,6 +159,18 @@ class FakeSelect extends Select {
       $this->fieldsWithTable[$field_info['table'] . '.' . $field_info['field']] = $field_info;
       $fields[$field_info['table']][$field_info['field']] = NULL;
     }
+    foreach ($this->tables as $alias => $table_info) {
+      if ($table = reset($this->databaseContents[$table_info['table']])) {
+        foreach (array_keys($table) as $field) {
+          if (!isset($this->fields[$field])) {
+            $this->fieldsWithTable[$field] = array(
+              'table' => $alias,
+              'field' => $field,
+            );
+          }
+        }
+      }
+    }
 
     $results = array();
     foreach ($this->tables as $table_alias => $table_info) {
@@ -166,13 +179,19 @@ class FakeSelect extends Select {
         foreach ($results as $row) {
           $joined = FALSE;
           foreach ($this->databaseContents[$table_info['table']] as $candidate_row) {
-            if ($row[$table_info['original_table_alias']][$table_info['original_field']] == $candidate_row[$table_info['added_field']]) {
+            if ($row[$table_info['original_table_alias']]['result'][$table_info['original_field']] == $candidate_row[$table_info['added_field']]) {
               $joined = TRUE;
               $new_rows[] = $this->getNewRow($table_alias, $fields, $candidate_row, $row);
             }
           }
           if (!$joined && $table_info['join type'] == 'LEFT') {
-            $new_rows[] = array($table_alias => $fields[$table_alias]) + $row;
+            $keys = array_keys($candidate_row);
+            $values = array_fill(0, count($keys), NULL);
+            $new_row = array(
+              'result' => $fields[$table_alias],
+              'all' => array_combine($keys, $values),
+            );
+            $new_rows[] = array($table_alias => $new_row) + $row;
           }
         }
         $results = $new_rows;
@@ -197,9 +216,9 @@ class FakeSelect extends Select {
    * @return array
    */
   protected function getNewRow($table_alias, $fields, $candidate_row, $row = array()) {
-    $new_row = array();
+    $new_row[$table_alias]['all'] = $candidate_row;
     foreach ($fields[$table_alias] as $field => $v) {
-      $new_row[$table_alias][$field] = $candidate_row[$field];
+      $new_row[$table_alias]['result'][$field] = $candidate_row[$field];
     }
     return $new_row + $row;
   }
@@ -226,8 +245,8 @@ class FakeSelect extends Select {
   protected function sortCallback($a, $b) {
     foreach ($this->order as $field => $direction) {
       $field_info = $this->getFieldInfo($field);
-      $a_value = $a[$field_info['table']][$field_info['field']];
-      $b_value = $b[$field_info['table']][$field_info['field']];
+      $a_value = $this->getValue($a, $field_info);
+      $b_value = $this->getValue($b, $field_info);
       if ($a_value != $b_value) {
         return (($a_value < $b_value) == ($direction == 'ASC')) ? -1 : 1;
       }
@@ -279,6 +298,27 @@ class FakeSelect extends Select {
   }
 
   /**
+   * Gets the value of a field from a row.
+   *
+   * @param $row
+   *   The row array, three levels of indexes: first is the table alias, the
+   *   second is either all or result, the third is the field alias.
+   * @param $field_info
+   *   The field information array containing the table alias and the
+   *   field alias.
+   * @return mixed
+   */
+  protected function getValue($row, $field_info) {
+    if (array_key_exists($field_info['field'], $row[$field_info['table']]['result'])) {
+      $index = 'result';
+    }
+    else {
+      $index = 'all';
+    }
+    return $row[$field_info['table']][$index][$field_info['field']];
+  }
+
+  /**
    * Match a single row and its condition.
    *
    * @param array $row
@@ -295,7 +335,7 @@ class FakeSelect extends Select {
    */
   protected function matchSingle(array $row, array $condition) {
     $field_info = $this->getFieldInfo($condition['field']);
-    $row_value = $row[$field_info['table']][$field_info['field']];
+    $row_value = $this->getValue($row, $field_info);
     switch ($condition['operator']) {
       case '=':
         return $row_value == $condition['value'];

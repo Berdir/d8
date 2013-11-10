@@ -45,7 +45,6 @@ class D6FilterFormats extends Drupal6SqlBase {
    */
   public function prepareRow(Row $row) {
     $filters = array();
-    $weights = array();
     $format = $row->getSourceProperty('format');
     // Find filters for this row.
     $results = $this->database
@@ -53,18 +52,18 @@ class D6FilterFormats extends Drupal6SqlBase {
       ->fields('f', array('module', 'delta', 'weight'))
       ->condition('format', $format)
       ->execute();
-    foreach ($results as $row) {
-      $weights[] = $row['weight'];
-      $module = $row['module'];
-      $delta = $row['delta'];
+    foreach ($results as $raw_filter) {
+      $module = $raw_filter['module'];
+      $delta = $raw_filter['delta'];
       $filter = array(
         'module' => $module,
         'delta' => $delta,
+        'weight' => $raw_filter['weight'],
         'settings' => array(),
       );
       // Load the filter settings for the filter module, modules can use
       // hook_migration_drupal6_filter_formats_prepare_row() to add theirs.
-      if ($row['module'] == 'filter') {
+      if ($raw_filter['module'] == 'filter') {
         if (!$delta) {
           if ($setting = $this->variableGet("allowed_html_$format", NULL)) {
             $filter['settings']['allowed_html'] = $setting;
@@ -83,7 +82,6 @@ class D6FilterFormats extends Drupal6SqlBase {
       $filters[] = $filter;
     }
 
-    array_multisort($filters, $weights);
     $row->setSourceProperty('filters', $filters);
     return parent::prepareRow($row);
   }

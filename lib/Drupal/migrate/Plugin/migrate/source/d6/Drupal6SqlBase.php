@@ -18,10 +18,10 @@ use Drupal\migrate\Plugin\migrate\source\SqlBase;
 abstract class Drupal6SqlBase extends SqlBase {
 
   /**
-   * Retrieves all system data informationfrom origin system.
+   * Retrieves all system data information from origin system.
    *
    * @return array
-   *   List of system table informationi keyed by type and name.
+   *   List of system table information keyed by type and name.
    */
   public function getSystemData() {
     static $system_data;
@@ -67,8 +67,15 @@ abstract class Drupal6SqlBase extends SqlBase {
   }
 
   protected function variableGet($name, $default) {
-    $result = $this->database->query('SELECT value FROM {variable} WHERE name = :name', array(':name' => $name))
-      ->fetchField();
+    try {
+      $result = $this->database
+        ->query('SELECT value FROM {variable} WHERE name = :name', array(':name' => $name))
+        ->fetchField();
+    }
+    // The table might not exist.
+    catch (\Exception $e) {
+      $result = FALSE;
+    }
     return $result !== FALSE ? unserialize($result) : $default;
   }
 
