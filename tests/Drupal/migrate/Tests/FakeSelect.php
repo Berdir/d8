@@ -185,6 +185,7 @@ class FakeSelect extends Select {
             }
           }
           if (!$joined && $table_info['join type'] == 'LEFT') {
+            // @TODO: empty tables? Those are a problem.
             $keys = array_keys($candidate_row);
             $values = array_fill(0, count($keys), NULL);
             $new_row = array(
