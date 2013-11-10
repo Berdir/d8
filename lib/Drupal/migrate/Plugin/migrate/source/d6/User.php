@@ -8,6 +8,7 @@
 namespace Drupal\migrate\Plugin\migrate\source\d6;
 
 use Drupal\migrate\Plugin\migrate\source\d6\Drupal6SqlBase;
+use Drupal\migrate\Row;
 
 /**
  * Drupal 6 user source from database.
@@ -31,6 +32,7 @@ class User extends Drupal6SqlBase {
    * {@inheritdoc}
    */
   public function fields() {
+    //TODO: Added profile fields if module profile is enable.
     return array(
       'uid' => t('User ID'),
       'name' => t('Username'),
@@ -52,6 +54,30 @@ class User extends Drupal6SqlBase {
       'init' => t('Init'),
       'data' => t('Data'),
     );
+  }
+
+  function prepareRow(Row $row, $keep = TRUE) {
+    if ($this->moduleExists('profile')) {
+      // Find profile values for this row.
+      $query = $this->database
+        ->select('profile_values', 'pv', array('fetch' => \PDO::FETCH_ASSOC))
+        ->fields('pv', array('fid', 'value'));
+      $query->leftJoin('profile_fields', 'pf', 'pf.fid=pv.fid');
+      $query->fields('pf', array('name', 'type'));
+      $query->condition('uid', $row->getSourceProperty('uid'));
+      $results = $query->execute();
+
+      foreach ($results as $profile_value) {
+        //Check special case for date. We need unserialize.
+        if ($profile_value['type'] == 'date') {
+          $row->setSourceProperty($profile_value['name'], array(unserialize($profile_value['value'])));
+        }
+        else {
+          $row->setSourceProperty($profile_value['name'], array($profile_value['value']));
+        }
+      }
+    }
+    return parent::prepareRow($row);
   }
 
 }
