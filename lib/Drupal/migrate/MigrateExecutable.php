@@ -302,9 +302,9 @@ class MigrateExecutable {
   /**
    * Apply transformations to a data row received from the source.
    */
-  protected function processRow(Row $row) {
+  public function processRow(Row $row, array $process = NULL) {
     $value = NULL;
-    foreach ($this->migration->getProcess() as $destination => $plugins) {
+    foreach ($this->migration->getProcess($process) as $destination => $plugins) {
       foreach ($plugins as $plugin) {
         $value = $plugin->transform($value, $this, $row, $destination);
       }

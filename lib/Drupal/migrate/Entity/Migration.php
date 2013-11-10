@@ -210,8 +210,11 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
   /**
    * {@inheritdoc}
    */
-  public function getProcess() {
-    foreach ($this->getProcessNormalized() as $property => $configurations) {
+  public function getProcess($process = NULL) {
+    if (!isset($process)) {
+      $process = $this->process;
+    }
+    foreach ($this->getProcessNormalized($process) as $property => $configurations) {
       foreach ($configurations as $configuration) {
         $this->processPlugins[$property] = array();
         if (isset($configuration['source'])) {
@@ -235,9 +238,9 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
    * @return array
    *   The normalized process configuration.
    */
-  protected function getProcessNormalized() {
+  protected function getProcessNormalized($process) {
     $normalized_configurations = array();
-    foreach ($this->process as $destination => $configuration) {
+    foreach ($process as $destination => $configuration) {
       if (is_string($configuration)) {
         $configuration = array(
           'plugin' => 'get',

@@ -66,4 +66,10 @@ abstract class Drupal6SqlBase extends SqlBase {
     return isset($system_data['module'][$module]['status']) ? (bool) $system_data['module'][$module]['status'] : FALSE;
   }
 
+  protected function variableGet($name, $default) {
+    $result = $this->database->query('SELECT value FROM {variable} WHERE name = :name', array(':name' => $name))
+      ->fetchField();
+    return $result !== FALSE ? unserialize($result) : $default;
+  }
+
 }

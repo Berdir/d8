@@ -45,22 +45,47 @@ class D6FilterFormats extends Drupal6SqlBase {
    */
   public function prepareRow(Row $row) {
     $filters = array();
+    $weights = array();
+    $format = $row->getSourceProperty('format');
     // Find filters for this row.
     $results = $this->database
       ->select('filters', 'f', array('fetch' => \PDO::FETCH_ASSOC))
-      ->fields('f', array('fid', 'format', 'module', 'delta', 'weight'))
-      ->condition('format', $row->getSourceProperty('format'))
+      ->fields('f', array('module', 'delta', 'weight'))
+      ->condition('format', $format)
       ->execute();
-    foreach ($results as $filter) {
-      $filters[] = array(
-        'fid' => $filter['fid'],
-        'module' => $filter['module'],
-        'delta' => $filter['delta'],
-        'weight' => $filter['weight'],
+    foreach ($results as $row) {
+      $weights[] = $row['weight'];
+      $module = $row['module'];
+      $delta = $row['delta'];
+      $filter = array(
+        'module' => $module,
+        'delta' => $delta,
+        'settings' => array(),
       );
+      // Load the filter settings for the filter module, modules can use
+      // hook_migration_drupal6_filter_formats_prepare_row() to add theirs.
+      if ($row['module'] == 'filter') {
+        if (!$delta) {
+          if ($setting = $this->variableGet("allowed_html_$format", NULL)) {
+            $filter['settings']['allowed_html'] = $setting;
+          }
+          if ($setting = $this->variableGet("filter_html_help_$format", NULL)) {
+            $filter['settings']['filter_html_help'] = $setting;
+          }
+          if ($setting = $this->variableGet("filter_html_nofollow_$format", NULL)) {
+            $filter['settings']['filter_html_nofollow'] = $setting;
+          }
+        }
+        elseif ($delta == 2 && ($setting = $this->variableGet("filter_url_length_$format", NULL))) {
+          $filter['settings']['filter_url_length'] = $setting;
+        }
+      }
+      $filters[] = $filter;
     }
 
+    array_multisort($filters, $weights);
     $row->setSourceProperty('filters', $filters);
     return parent::prepareRow($row);
   }
+
 }
