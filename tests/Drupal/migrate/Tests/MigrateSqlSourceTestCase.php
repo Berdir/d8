@@ -63,7 +63,7 @@ abstract class MigrateSqlSourceTestCase extends MigrateTestCase {
     $plugin->setDatabase($database);
     $plugin->setModuleHandler($module_handler);
     $migration->expects($this->any())
-      ->method('getSource')
+      ->method('getSourcePlugin')
       ->will($this->returnValue($plugin));
     $migrateExecutable = $this->getMockBuilder('Drupal\migrate\MigrateExecutable')
       ->disableOriginalConstructor()

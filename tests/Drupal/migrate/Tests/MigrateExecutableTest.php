@@ -82,7 +82,7 @@ class MigrateExecutableTest extends MigrateTestCase {
       ->will($this->returnValue($iterator));
 
     $this->migration->expects($this->any())
-      ->method('getSource')
+      ->method('getSourcePlugin')
       ->will($this->returnValue($source));
 
     // Ensure that a message with the proper message was added.

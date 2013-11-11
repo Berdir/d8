@@ -42,7 +42,7 @@ class D6FilterFormatsTest extends MigrateSqlSourceTestCase {
     array(
       'format' => 1,
       'name' => 'Filtered HTML',
-      'roles' => ',1,2,',
+      'roles' => array(1, 2),
       'cache' => 1,
       'filters' => array(
         array(
@@ -65,7 +65,7 @@ class D6FilterFormatsTest extends MigrateSqlSourceTestCase {
     array(
       'format' => 2,
       'name' => 'Full HTML',
-      'roles' => '',
+      'roles' => array(),
       'cache' => 1,
       'filters' => array(
         array(
@@ -88,7 +88,7 @@ class D6FilterFormatsTest extends MigrateSqlSourceTestCase {
     array(
       'format' => 4,
       'name' => 'Example Custom Format',
-      'roles' => ',4,',
+      'roles' => array(4),
       'cache' => 1,
       'filters' => array(
         // This custom format uses a filter defined by a contrib module.
@@ -118,6 +118,7 @@ class D6FilterFormatsTest extends MigrateSqlSourceTestCase {
   public function setUp() {
     $fid = 1;
     foreach ($this->results as $k => $row) {
+      $row['roles'] = ',' . implode(',', $row['roles']) . ',';
       foreach ($row['filters'] as $filter) {
         $this->databaseContents['filters'][$fid] = $filter;
         $this->databaseContents['filters'][$fid]['format'] = $row['format'];
