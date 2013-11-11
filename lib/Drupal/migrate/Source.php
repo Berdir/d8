@@ -151,7 +151,7 @@ class Source implements \Iterator, \Countable {
     if ($this->skipCount) {
       return -1;
     }
-    $source = $this->migration->getSource();
+    $source = $this->migration->getSourcePlugin();
 
     if (!isset($this->cacheKey)) {
       $this->cacheKey = hash('sha256', (string) $source);
@@ -218,7 +218,7 @@ class Source implements \Iterator, \Countable {
    */
   protected function getIterator() {
     if (!isset($this->iterator)) {
-      $this->iterator = $this->migration->getSource()->getIterator();
+      $this->iterator = $this->migration->getSourcePlugin()->getIterator();
     }
     return $this->iterator;
   }
@@ -261,6 +261,7 @@ class Source implements \Iterator, \Countable {
     if ($id_list = $this->migration->get('idlist')) {
       $this->idList = $id_list;
     }
+    $this->getIterator()->rewind();
     $this->next();
   }
 
@@ -386,7 +387,7 @@ class Source implements \Iterator, \Countable {
    */
   protected function prepareRow(Row $row) {
     // We're explicitly skipping this row - keep track in the map table
-    if ($this->migration->getSource()->prepareRow($row) === FALSE) {
+    if ($this->migration->getSourcePlugin()->prepareRow($row) === FALSE) {
       // Make sure we replace any previous messages for this item with any
       // new ones.
       $id_map = $this->migration->getIdMap();

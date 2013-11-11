@@ -70,6 +70,11 @@ abstract class SqlBase extends SourcePluginBase {
     return Database::getConnection('default', $key);
   }
 
+  protected function select($table, $alias = NULL, array $options = array()) {
+    $options['fetch'] = \PDO::FETCH_ASSOC;
+    return $this->getDatabase()->select($table, $alias, $options);
+  }
+
   /**
    * Implementation of MigrateSource::performRewind().
    *
@@ -160,7 +165,7 @@ abstract class SqlBase extends SourcePluginBase {
       }
     }
 
-    return $this->query->execute();
+    return new \IteratorIterator($this->query->execute());
   }
 
   /**

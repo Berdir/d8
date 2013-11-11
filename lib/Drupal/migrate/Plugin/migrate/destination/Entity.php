@@ -15,6 +15,9 @@ use Drupal\migrate\Plugin\MigratePluginManager;
 use Drupal\migrate\Row;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * @PluginId("entity")
+ */
 class Entity extends DestinationBase implements ContainerFactoryPluginInterface {
 
   public function __construct(array $configuration, $plugin_id, array $plugin_definition, array $entity_info, EntityStorageControllerInterface $storage_controller, MigratePluginManager $plugin_manager, FieldInfo $field_info) {
@@ -43,20 +46,21 @@ class Entity extends DestinationBase implements ContainerFactoryPluginInterface 
    * {@inheritdoc}
    */
   public function import(Row $row) {
-    $all_instances = $this->fieldInfo->getInstances($this->configuration['entity_type']);
-    if (isset($this->entityInfo['entity keys']['bundle'])) {
-      // @TODO: validate!
-      $instances = $all_instances[$row->getDestinationProperty($this->entityInfo['entity keys']['bundle'])];
-    }
-    else {
+    if ($all_instances = $this->fieldInfo->getInstances($this->configuration['entity_type'])) {
       $instances = reset($all_instances);
-    }
-    foreach ($instances as $field_name => $instance) {
-      $field_type = $instance->getFieldType();
-      if ($this->pluginManager->getDefinition($field_type)) {
-        $destination_value = $this->pluginManager->createInstance($field_type)->import($instance, $row->getDestinationProperty($field_name));
-        // @TODO: check for NULL return? Add an unset to $row? Maybe needed in exception handling? Propagate exception?
-        $row->setDestinationProperty($field_name, $destination_value);
+      if (isset($this->entityInfo['entity keys']['bundle'])) {
+        $bundle = $row->getDestinationProperty($this->entityInfo['entity keys']['bundle']);
+        if (isset($all_instances[$bundle])) {
+          $instances = $all_instances[$bundle];
+        }
+      }
+      foreach ($instances as $field_name => $instance) {
+        $field_type = $instance->getFieldType();
+        if ($this->pluginManager->getDefinition($field_type)) {
+          $destination_value = $this->pluginManager->createInstance($field_type)->import($instance, $row->getDestinationProperty($field_name));
+          // @TODO: check for NULL return? Add an unset to $row? Maybe needed in exception handling? Propagate exception?
+          $row->setDestinationProperty($field_name, $destination_value);
+        }
       }
     }
     // @TODO: validate! this will fatal if create() fails.

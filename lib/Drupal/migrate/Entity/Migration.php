@@ -94,18 +94,9 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
   /**
    * The configuration describing the process plugins.
    *
-   * Used to initialize $processPlugins.
-   *
    * @var array
    */
   public $process;
-
-  /**
-   * The array which stores all active process plugins.
-   *
-   * @var array
-   */
-  protected $processPlugins = array();
 
   /**
    * The destination configuration, with at least a 'plugin' key.
@@ -199,7 +190,7 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
   /**
    * {@inheritdoc}
    */
-  public function getSource() {
+  public function getSourcePlugin() {
     if (!isset($this->sourcePlugin)) {
       $this->sourcePlugin = \Drupal::service('plugin.manager.migrate.source')->createInstance($this->source['plugin'], $this->source, $this);
     }
@@ -209,26 +200,27 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
   /**
    * {@inheritdoc}
    */
-  public function getProcess($process = NULL) {
+  public function getProcessPlugins($process = NULL) {
     if (!isset($process)) {
       $process = $this->process;
     }
+    $process_plugins = array();
     foreach ($this->getProcessNormalized($process) as $property => $configurations) {
       foreach ($configurations as $configuration) {
-        $this->processPlugins[$property] = array();
+        $process_plugins[$property] = array();
         if (isset($configuration['source'])) {
-          $this->processPlugins[$property][] = \Drupal::service('plugin.manager.migrate.process')->createInstance('get', $configuration, $this);
+          $process_plugins[$property][] = \Drupal::service('plugin.manager.migrate.process')->createInstance('get', $configuration, $this);
         }
         // Get is already handled.
         if ($configuration['plugin'] != 'get') {
-          $this->processPlugins[$property][] = \Drupal::service('plugin.manager.migrate.process')->createInstance($configuration['plugin'], $configuration, $this);
+          $process_plugins[$property][] = \Drupal::service('plugin.manager.migrate.process')->createInstance($configuration['plugin'], $configuration, $this);
         }
-        if (!$this->processPlugins[$property]) {
+        if (!$process_plugins[$property]) {
           throw new MigrateException("Invalid process configuration for $property");
         }
       }
     }
-    return $this->processPlugins;
+    return $process_plugins;
   }
 
   /**
@@ -257,7 +249,7 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
   /**
    * {@inheritdoc}
    */
-  public function getDestination() {
+  public function getDestinationPlugin() {
     if (!isset($this->destinationPlugin)) {
       $this->destinationPlugin = \Drupal::service('plugin.manager.migrate.destination')->createInstance($this->destination['plugin'], $this->destination, $this);
     }

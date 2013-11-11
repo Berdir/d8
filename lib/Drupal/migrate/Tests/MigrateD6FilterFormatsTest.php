@@ -17,14 +17,14 @@ class MigrateD6FilterFormatsTest extends MigrateTestBase {
    */
   public static function getInfo() {
     return array(
-      'name'  => 'Migrate variables to system.site.yml',
-      'description'  => 'Upgrade variables to system.site.yml',
+      'name'  => 'Migrate variables to filter.formats.*.yml',
+      'description'  => 'Upgrade variables to filter.formats.*.yml',
       'group' => 'Migrate',
     );
   }
 
-  function testSystemSite() {
-    $migration = entity_load('migration', 'd6_system_site');
+  function testFilterFormats() {
+    $migration = entity_load('migration', 'd6_filter_formats');
     $dumps = array(
       drupal_get_path('module', 'migrate') . '/ib/Drupal/migrate/Tests/Dump/Drupal6FilterFormats.php',
     );

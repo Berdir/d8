@@ -30,11 +30,15 @@ class MigrateTestBase extends WebTestBase {
    * @return \Drupal\Core\Database\Connection
    */
   protected function prepare(MigrationInterface $migration, array $files = array()) {
-    $databasePrefix = 'simpletest_m_' . mt_rand(1000, 1000000);
+    $databasePrefix = 'm_';
     $connection_info = Database::getConnectionInfo('default');
-    $connection_info['default']['prefix']['default'] .= $databasePrefix;
+    foreach ($connection_info as $target => $value) {
+      $connection_info[$target]['prefix'] = array(
+        'default' => $value['prefix']['default'] . $databasePrefix,
+      );
+    }
     $database = SqlBase::getDatabaseConnection($migration->id(), array('database' => $connection_info['default']));
-    foreach (array('source', 'destination', 'id_map') as $key) {
+    foreach (array('source', 'destination', 'idMap') as $key) {
       $configuration = $migration->get($key);
       $configuration['database'] = $database;
       $migration->set($key, $configuration);

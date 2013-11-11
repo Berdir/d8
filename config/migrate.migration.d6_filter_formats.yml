@@ -1,13 +1,24 @@
 id: d6_filter_formats
+sourceIds:
+    name:
+        type: varchar
+        length: 255
+destinationIds:
+    name:
+        type: varchar
+        length: 255
 source:
     plugin: drupal6_filter_formats
 process:
-    format: format
+    # this will need the dedupe process plugin.
+    format: name
+    name: name
+    # this will need an iterator + plugin: migration, id: role.
     roles: roles
     cache: cache
-    filter:
+    filters:
         plugin: iterator
-        source: filter
+        source: filters
         process:
             name:
                 plugin: map
@@ -24,3 +35,6 @@ process:
                     php:
                         - php_code
             settings: settings
+destination:
+    plugin: entity
+    entity_type: filter_format

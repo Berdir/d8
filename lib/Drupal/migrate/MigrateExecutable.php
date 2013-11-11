@@ -210,7 +210,7 @@ class MigrateExecutable {
   public function import() {
     $return = MigrationInterface::RESULT_COMPLETED;
     $source = $this->getSource();
-    $destination = $this->migration->getDestination();
+    $destination = $this->migration->getDestinationPlugin();
     $id_map = $this->migration->getIdMap();
 
     try {
@@ -222,7 +222,7 @@ class MigrateExecutable {
           array('!e' => $e->getMessage())));
       return MigrationInterface::RESULT_FAILED;
     }
-    while ($this->getSource()->valid()) {
+    while ($source->valid()) {
       $row = $source->current();
       $this->sourceIdValues = $row->getSourceIdValues();
 
@@ -304,7 +304,7 @@ class MigrateExecutable {
    */
   public function processRow(Row $row, array $process = NULL) {
     $value = NULL;
-    foreach ($this->migration->getProcess($process) as $destination => $plugins) {
+    foreach ($this->migration->getProcessPlugins($process) as $destination => $plugins) {
       foreach ($plugins as $plugin) {
         $value = $plugin->transform($value, $this, $row, $destination);
       }

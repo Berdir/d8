@@ -55,21 +55,21 @@ interface MigrationInterface extends ConfigEntityInterface {
    *
    * @return \Drupal\migrate\Plugin\MigrateSourceInterface
    */
-  public function getSource();
+  public function getSourcePlugin();
 
   /**
    * Returns the process plugins.
    *
    * @return array
    */
-  public function getProcess();
+  public function getProcessPlugins();
 
   /**
    * Returns the initialized destination plugin.
    *
    * @return \Drupal\migrate\Plugin\MigrateDestinationInterface
    */
-  public function getDestination();
+  public function getDestinationPlugin();
 
   /**
    * Returns the initialized id_map plugin.

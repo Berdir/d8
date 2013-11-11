@@ -21,10 +21,9 @@ class D6FilterFormats extends Drupal6SqlBase {
    * {@inheritdoc}
    */
   public function query() {
-    $query = $this->database
-      ->select('filter_formats', 'f')
-      ->fields('f', array('format', 'name', 'roles', 'cache'));
-    $query->orderBy('format');
+    $query = $this->select('filter_formats', 'f')
+      ->fields('f', array('format', 'name', 'roles', 'cache'))
+      ->orderBy('format');
     return $query;
   }
 
@@ -45,6 +44,8 @@ class D6FilterFormats extends Drupal6SqlBase {
    */
   public function prepareRow(Row $row) {
     $filters = array();
+    $roles = $row->getSourceProperty('roles');
+    $row->setSourceProperty('roles', array_filter(explode(',', $roles)));
     $format = $row->getSourceProperty('format');
     // Find filters for this row.
     $results = $this->database
