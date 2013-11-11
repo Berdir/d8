@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Tests\D6FilterFormatsSourceTest.
+ * Contains \Drupal\migrate\Tests\D6FilterFormatsTest.
  */
 
 namespace Drupal\migrate\Tests;

@@ -12,7 +12,7 @@ namespace Drupal\migrate\Tests;
  *
  * @group migrate
  */
-class D6NodeTypesSourceTest extends MigrateSqlSourceTestCase {
+class D6NodeTypeSourceTest extends MigrateSqlSourceTestCase {
 
   // The plugin system is not working during unit testing so the source plugin
   // class needs to be manually specified.
