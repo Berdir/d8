@@ -60,9 +60,12 @@ interface MigrationInterface extends ConfigEntityInterface {
   /**
    * Returns the process plugins.
    *
+   * @param array $process
+   *   A process configuration array.
    * @return array
+   *   A list of process plugins.
    */
-  public function getProcessPlugins();
+  public function getProcessPlugins(array $process = NULL);
 
   /**
    * Returns the initialized destination plugin.

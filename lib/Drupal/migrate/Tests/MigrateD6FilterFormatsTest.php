@@ -26,7 +26,7 @@ class MigrateD6FilterFormatsTest extends MigrateTestBase {
   function testFilterFormats() {
     $migration = entity_load('migration', 'd6_filter_formats');
     $dumps = array(
-      drupal_get_path('module', 'migrate') . '/ib/Drupal/migrate/Tests/Dump/Drupal6FilterFormats.php',
+      drupal_get_path('module', 'migrate') . '/lib/Drupal/migrate/Tests/Dump/Drupal6FilterFormats.php',
     );
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, new MigrateMessage);

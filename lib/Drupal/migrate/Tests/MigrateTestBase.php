@@ -51,7 +51,9 @@ class MigrateTestBase extends WebTestBase {
         $file = "compress.zlib://$file";
         require $file;
       }
-      $class = 'Drupal\migrate\Tests\Dump\\' . basename($file, '.php');
+      $namespaces = preg_filter('/^namespace (.*);/', '\1', file($file));
+      // trim() is necessary to remove the line break file() keeps.
+      $class = trim(reset($namespaces)) . '\\' . basename($file, '.php');
       $class::load($database);
     }
     return $database;

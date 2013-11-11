@@ -200,7 +200,7 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
   /**
    * {@inheritdoc}
    */
-  public function getProcessPlugins($process = NULL) {
+  public function getProcessPlugins(array $process = NULL) {
     if (!isset($process)) {
       $process = $this->process;
     }
