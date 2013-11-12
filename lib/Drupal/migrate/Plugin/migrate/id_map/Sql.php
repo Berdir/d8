@@ -81,7 +81,21 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
    */
   protected $ensured;
 
-  public function __construct($configuration, $plugin_id, $plugin_definition, MigrationInterface $migration) {
+  /**
+   * Constructs an SQL object.
+   *
+   * Sets up the tables and builds the maps,
+   *
+   * @param array $configuration
+   *   The configuration.
+   * @param string $plugin_id
+   *   The plugin ID for the migration process to do.
+   * @param array $plugin_definition
+   *   The configuration for the plugin.
+   * @param \Drupal\migrate\Entity\MigrationInterface $migration
+   *   The migration to do.
+   */
+  public function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->migration = $migration;
@@ -151,6 +165,11 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
     }
   }
 
+  /**
+   * Gets the database connection.
+   *
+   * @return \Drupal\Core\Database\Connection
+   */
   protected function getDatabase() {
     return SqlBase::getDatabaseConnection($this->migration->id(), $this->configuration);
   }
@@ -287,13 +306,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
   }
 
   /**
-   * Retrieve a row from the map table, given a source ID.
-   *
-   * @param array $source_ids
-   *   A list of source IDs, even there is just one source ID.
-   *
-   * @return array
-   *   The raw row data as associative array.
+   * {@inheritdoc}
    */
   public function getRowBySource(array $source_ids) {
     $query = $this->getDatabase()->select($this->mapTable, 'map')
@@ -319,12 +332,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
   }
 
   /**
-   * Retrieve an array of map rows marked as needing update.
-   *
-   * @param int $count
-   *  Maximum rows to return; defaults to 10,000
-   * @return array
-   *  Array of map row objects with needs_update==1.
+   * {@inheritdoc}
    */
   public function getRowsNeedingUpdate($count) {
     $rows = array();
@@ -354,13 +362,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
   }
 
   /**
-   * Given a (possibly multi-field) source key, return the (possibly multi-field)
-   * destination key it is mapped to.
-   *
-   * @param array $source_id
-   *  Array of source key values.
-   * @return array
-   *  Array of destination key values, or NULL on failure.
+   * {@inheritdoc}
    */
   public function lookupDestinationID(array $source_id) {
     $query = $this->getDatabase()->select($this->mapTable, 'map')
@@ -374,22 +376,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
   }
 
   /**
-   * Called upon import of one record, we record a mapping from the source key
-   * to the destination key. Also may be called, setting the third parameter to
-   * NEEDS_UPDATE, to signal an existing record should be remigrated.
-   *
-   * @param Row $row
-   *   The raw source data. We use the key map derived from the source object
-   *   to get the source key values.
-   * @param array $destination_id_values
-   *   The destination key values.
-   * @param int $needs_update
-   *   Status of the source row in the map. Defaults to STATUS_IMPORTED.
-   * @param int $rollback_action
-   *   How to handle the destination object on rollback. Defaults to
-   *   ROLLBACK_DELETE.
-   * $param string $hash
-   *   If hashing is enabled, the hash of the raw source row.
+   * {@inheritdoc}
    */
   public function saveIdMapping(Row $row, array $destination_id_values, $needs_update = MigrateIdMapInterface::STATUS_IMPORTED, $rollback_action = MigrateIdMapInterface::ROLLBACK_DELETE) {
     // Construct the source key
@@ -427,14 +414,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
   }
 
   /**
-   * Record a message in the migration's message table.
-   *
-   * @param array $source_id_values
-   *  Source ID of the record in error
-   * @param string $message
-   *  The message to record.
-   * @param int $level
-   *  Optional message severity (defaults to MESSAGE_ERROR).
+   * {@inheritdoc}
    */
   public function saveMessage(array $source_id_values, $message, $level = MigrationInterface::MESSAGE_ERROR) {
     // Source IDs as arguments
@@ -455,9 +435,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
   }
 
   /**
-   * Prepares this migration to run as an update - that is, in addition to
-   * unmigrated content (source records not in the map table) being imported,
-   * previously-migrated content will also be updated in place.
+   * {@inheritdoc}
    */
   public function prepareUpdate() {
     $this->getDatabase()->update($this->mapTable)
@@ -466,10 +444,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
   }
 
   /**
-   * Returns a count of records in the map table (i.e., the number of
-   * source records which have been processed for this migration).
-   *
-   * @return int
+   * {@inheritdoc}
    */
   public function processedCount() {
     $query = $this->getDatabase()->select($this->mapTable);
@@ -479,9 +454,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
   }
 
   /**
-   * Returns a count of imported records in the map table.
-   *
-   * @return int
+   * {@inheritdoc}
    */
   public function importedCount() {
     $query = $this->getDatabase()->select($this->mapTable);
@@ -492,9 +465,10 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
   }
 
   /**
-   * Returns a count of records which are marked as needing update.
+   * Returns a count of items which are marked as needing update.
    *
    * @return int
+   *   The number of items which need updating.
    */
   public function updateCount() {
     $query = $this->getDatabase()->select($this->mapTable);
@@ -505,10 +479,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
   }
 
   /**
-   * Get the number of source records which failed to import.
-   *
-   * @return int
-   *  Number of records errored out.
+   * {@inheritdoc}
    */
   public function errorCount() {
     $query = $this->getDatabase()->select($this->mapTable);
@@ -519,10 +490,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
   }
 
   /**
-   * Get the number of messages saved.
-   *
-   * @return int
-   *  Number of messages.
+   * {@inheritdoc}
    */
   public function messageCount() {
     $query = $this->getDatabase()->select($this->messageTable);
@@ -555,9 +523,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
   }
 
   /**
-   * Delete the map entry and any message table entries for the specified destination row.
-   *
-   * @param array $destination_id
+   * {@inheritdoc}
    */
   public function deleteDestination(array $destination_id) {
     $map_query = $this->getDatabase()->delete($this->mapTable);
@@ -580,7 +546,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
   }
 
   /**
-   * Set the specified row to be updated, if it exists.
+   * Sets the specified row to be updated, if it exists.
    */
   public function setUpdate(array $source_id) {
     $query = $this->getDatabase()->update($this->mapTable)
@@ -593,10 +559,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
   }
 
   /**
-   * Delete all map and message table entries specified.
-   *
-   * @param array $source_ids
-   *  Each array member is an array of key fields for one source row.
+   * {@inheritdoc}
    */
   public function deleteBulk(array $source_ids) {
     // If we have a single-column key, we can shortcut it
@@ -628,7 +591,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
   }
 
   /**
-   * Clear all messages from the message table.
+   * {@inheritdoc}
    */
   public function clearMessages() {
     $this->getDatabase()->truncate($this->messageTable)
@@ -636,7 +599,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
   }
 
   /**
-   * Remove the associated map and message tables.
+   * {@inheritdoc}
    */
   public function destroy() {
     $this->getDatabase()->schema()->dropTable($this->mapTable);
@@ -719,4 +682,5 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
     // TODO: Check numProcessed against itemlimit
     return !is_null($this->currentRow);
   }
+
 }

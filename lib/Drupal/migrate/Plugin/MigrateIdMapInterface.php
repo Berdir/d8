@@ -37,19 +37,24 @@ interface MigrateIdMapInterface extends PluginInspectionInterface {
   /**
    * Saves a mapping from the source identifiers to the destination identifiers.
    *
+   * Called upon import of one record, we record a mapping from the source ID
+   * to the destination ID. Also may be called, setting the third parameter to
+   * NEEDS_UPDATE, to signal an existing record should be remigrated.
+   *
    * @param \Drupal\migrate\Row $row
-   *   The current row.
+   *   The raw source data. We use the ID map derived from the source object
+   *   to get the source identifier values.
    * @param array $destination_id_values
    *   An array of destination identifier values.
    * @param int $status
-   *   The status to save for the mapping.
+   *   Status of the source row in the map.
    * @param int $rollback_action
-   *   The way to handle a rollback.
+   *   How to handle the destination object on rollback.
    */
   public function saveIdMapping(Row $row, array $destination_id_values, $status = self::STATUS_IMPORTED, $rollback_action = self::ROLLBACK_DELETE);
 
   /**
-   * Records a message related to a source record.
+   * Saves a message related to a source record in the migration message table.
    *
    * @param array $source_id_values
    *   Source ID of the record in error.
@@ -63,27 +68,42 @@ interface MigrateIdMapInterface extends PluginInspectionInterface {
   /**
    * Prepares to run a full update.
    *
-   * Mark all previously-imported content as ready to be re-imported.
+   * Prepares this migration to run as an update - that is, in addition to
+   * unmigrated content (source records not in the map table) being imported,
+   * previously-migrated content will also be updated in place by marking all
+   * previously-imported content as ready to be re-imported.
    */
   public function prepareUpdate();
 
   /**
-   * Reports the number of processed items in the map.
+   * Returns the number of processed items in the map.
+   *
+   * @return int
+   *   The count of records in the map table.
    */
   public function processedCount();
 
   /**
-   * Reports the number of imported items in the map.
+   * Returns the number of imported items in the map.
+   *
+   * @return int
+   *   The number of imported items.
    */
   public function importedCount();
 
   /**
-   * Reports the number of items that failed to import.
+   * Returns the number of items that failed to import.
+   *
+   * @return int
+   *   The number of items that errored out.
    */
   public function errorCount();
 
   /**
-   * Reports the number of messages.
+   * Returns the number of messages saved.
+   *
+   * @return int
+   *   The number of messages.
    */
   public function messageCount();
 
@@ -98,7 +118,7 @@ interface MigrateIdMapInterface extends PluginInspectionInterface {
   public function delete(array $source_id, $messages_only = FALSE);
 
   /**
-   * Deletes the map and message entries for a given destination record.
+   * Deletes the map and message table entries for a given destination row.
    *
    * @param array $destination_id
    *   The ID of the destination we should do the deletes for.
@@ -109,7 +129,8 @@ interface MigrateIdMapInterface extends PluginInspectionInterface {
    * Deletes the map and message entries for a set of given source records.
    *
    * @param array $source_ids
-   *   The IDs of the sources we should do the deletes for.
+   *   The IDs of the sources we should do the deletes for. Each array member is
+   *   an array of identifier fields for one source row.
    */
   public function deleteBulk(array $source_ids);
 
@@ -144,7 +165,10 @@ interface MigrateIdMapInterface extends PluginInspectionInterface {
    * Retrieves an array of map rows marked as needing update.
    *
    * @param int $count
-   *   The maximum number of rows to get in the next batch.
+   *   The maximum number of rows to return.
+   *
+   * @return array
+   *   Array of map row objects that need updating.
    */
   public function getRowsNeedingUpdate($count);
 
