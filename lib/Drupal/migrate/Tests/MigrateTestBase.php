@@ -51,9 +51,8 @@ class MigrateTestBase extends WebTestBase {
         $file = "compress.zlib://$file";
         require $file;
       }
-      $namespaces = preg_filter('/^namespace (.*);/', '\1', file($file));
-      // trim() is necessary to remove the line break file() keeps.
-      $class = trim(reset($namespaces)) . '\\' . basename($file, '.php');
+      preg_match('/^namespace (.*);$/m', file_get_contents($file), $matches);
+      $class = $matches[1] . '\\' . basename($file, '.php');
       $class::load($database);
     }
     return $database;
