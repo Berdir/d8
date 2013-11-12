@@ -7,32 +7,13 @@
 namespace Drupal\migrate\Tests\process;
 
 use Drupal\migrate\Plugin\migrate\process\TestGet;
-use Drupal\migrate\Tests\MigrateTestCase;
 
-class GetTest extends MigrateTestCase {
-
-  /**
-   * @var \Drupal\migrate\Plugin\migrate\process\TestGet
-   */
-  protected $plugin;
-
-  /**
-   * @var \Drupal\migrate\Row
-   */
-  protected $row;
-
-  /**
-   * @var \Drupal\migrate\MigrateExecutable
-   */
-  protected $migrateExecutable;
+/**
+ * @group migrate
+ */
+class GetTest extends MigrateProcessTestCase {
 
   function setUp() {
-    $this->row = $this->getMockBuilder('Drupal\migrate\Row')
-      ->disableOriginalConstructor()
-      ->getMock();
-    $this->migrateExecutable = $this->getMockBuilder('Drupal\migrate\MigrateExecutable')
-      ->disableOriginalConstructor()
-      ->getMock();
     $this->plugin = new TestGet();
     parent::setUp();
   }
