@@ -188,6 +188,9 @@ class Row {
   /**
    * Return a the value of a destination property.
    *
+   * @param string $property
+   *   The provided destination property.
+   *
    * @return mixed
    *  The destination value.
    */
