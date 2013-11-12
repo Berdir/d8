@@ -157,13 +157,13 @@ class Row {
   /**
    * Tests if destination property exists.
    *
-   * @param array $property
+   * @param array|string $property
    *   An array of properties on the destination.
    *
    * @return boolean
    *   TRUE if the destination property exists.
    */
-  public function hasDestinationProperty(array $property) {
+  public function hasDestinationProperty($property) {
     return NestedArray::keyExists($this->destination, explode(':', $property));
   }
 
@@ -192,13 +192,13 @@ class Row {
   /**
    * Returns the value of a destination property.
    *
-   * @param array $property
+   * @param array|string $property
    *   An array of properties on the destination.
    *
    * @return mixed
    *  The destination value.
    */
-  public function getDestinationProperty(array $property) {
+  public function getDestinationProperty($property) {
     return NestedArray::getValue($this->destination, explode(':', $property));
   }
 
