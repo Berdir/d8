@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Plugin\IdMapInterface.
+ * Contains \Drupal\migrate\Plugin\MigrateIdMapInterface.
  */
 
 namespace Drupal\migrate\Plugin;
@@ -13,10 +13,10 @@ use Drupal\migrate\MigrateMessageInterface;
 use Drupal\migrate\Row;
 
 /**
- * An interface for migrate ID mappings.
+ * Defines an interface for migrate ID mappings.
  *
- * Migrate ID mappings maintain a relation between source ID and
- * destination ID for audit and rollback purposes.
+ * Migrate ID mappings maintain a relation between source ID and destination ID
+ * for audit and rollback purposes.
  */
 interface MigrateIdMapInterface extends PluginInspectionInterface {
 
@@ -30,26 +30,26 @@ interface MigrateIdMapInterface extends PluginInspectionInterface {
 
   /**
    * Codes reflecting how to handle the destination item on rollback.
-   *
    */
   const ROLLBACK_DELETE = 0;
   const ROLLBACK_PRESERVE = 1;
 
- /**
-   * Save a mapping from the source identifiers to the destination
-   * identifiers.
+  /**
+   * Saves a mapping from the source identifiers to the destination identifiers.
    *
-   * @param $row
-   *    The current row..
-   * @param $destination_id_values
-   *   An array of destination identifier values.
-   * @param $status
-   * @param $rollback_action
+   * @param \Drupal\migrate\Row $row
+   *  The current row.
+   * @param array $destination_id_values
+   *  An array of destination identifier values.
+   * @param int $status
+   *  The status to save for the mapping.
+   * @param int $rollback_action
+   *  The way to handle a rollback.
    */
   public function saveIdMapping(Row $row, array $destination_id_values, $status = self::STATUS_IMPORTED, $rollback_action = self::ROLLBACK_DELETE);
 
   /**
-   * Record a message related to a source record
+   * Records a message related to a source record.
    *
    * @param array $source_id_values
    *  Source ID of the record in error
@@ -61,33 +61,34 @@ interface MigrateIdMapInterface extends PluginInspectionInterface {
   public function saveMessage(array $source_id_values, $message, $level = MigrationInterface::MESSAGE_ERROR);
 
   /**
-   * Prepare to run a full update - mark all previously-imported content as
-   * ready to be re-imported.
+   * Prepares to run a full update.
+   *
+   * Mark all previously-imported content as ready to be re-imported.
    */
   public function prepareUpdate();
 
   /**
-   * Report the number of processed items in the map
+   * Reports the number of processed items in the map.
    */
   public function processedCount();
 
   /**
-   * Report the number of imported items in the map
+   * Reports the number of imported items in the map.
    */
   public function importedCount();
 
   /**
-   * Report the number of items that failed to import
+   * Reports the number of items that failed to import.
    */
   public function errorCount();
 
   /**
-   * Report the number of messages
+   * Reports the number of messages.
    */
   public function messageCount();
 
   /**
-   * Delete the map and message entries for a given source record
+   * Deletes the map and message entries for a given source record.
    *
    * @param array $source_ids
    * @param bool $messages_only
@@ -95,70 +96,77 @@ interface MigrateIdMapInterface extends PluginInspectionInterface {
   public function delete(array $source_ids, $messages_only = FALSE);
 
   /**
-   * Delete the map and message entries for a given destination record
+   * Deletes the map and message entries for a given destination record.
    *
    * @param array $destination_ids
    */
   public function deleteDestination(array $destination_ids);
 
   /**
-   * Delete the map and message entries for a set of given source records.
+   * Deletes the map and message entries for a set of given source records.
    *
    * @param array $source_ids
    */
   public function deleteBulk(array $source_ids);
 
   /**
-   * Clear all messages from the map.
+   * Clears all messages from the map.
    */
   public function clearMessages();
 
   /**
-   * Retrieve map data for a given source or destination item
+   * Retrieves map data for a given source or destination item.
    */
   public function getRowBySource(array $source_ids);
 
-
   /**
-   * Retrieve a row by the destination identifiers.
+   * Retrieves a row by the destination identifiers.
    *
    * @param array $destination_ids
    *   A list of destination IDs, even there is just one destination ID.
    *
    * @return array
-   *   The row(s) of data
+   *   The row(s) of data.
    */
   public function getRowByDestination(array $destination_id_values);
 
   /**
-   * Retrieve an array of map rows marked as needing update.
+   * Retrieves an array of map rows marked as needing update.
    */
   public function getRowsNeedingUpdate($count);
 
   /**
+   * Looks up the source identifier.
+   *
    * Given a (possibly multi-field) destination identifier value, return the
    * (possibly multi-field) source identifier value mapped to it.
    *
    * @param array $destination_ids
    *   Array of destination identifier values.
+   *
    * @return array
    *   Array of source identifier values, or NULL on failure.
    */
   public function lookupSourceID(array $destination_ids);
 
   /**
+   * Looks up the destination identifier.
+   *
    * Given a (possibly multi-field) source identifier value, return the
    * (possibly multi-field) destination identifier value it is mapped to.
    *
    * @param array $source_id_values
    *  Array of source identifier values.
+   *
    * @return array
    *  Array of destination identifier values, or NULL on failure.
    */
   public function lookupDestinationID(array $source_id_values);
 
   /**
-   * Remove any persistent storage used by this map (e.g., map and message tables)
+   * Removes any persistent storage used by this map.
+   *
+   * For example, remove the map and message tables.
    */
   public function destroy();
 
@@ -168,4 +176,5 @@ interface MigrateIdMapInterface extends PluginInspectionInterface {
   public function getQualifiedMapTable();
 
   public function setMessage(MigrateMessageInterface $message);
+
 }
