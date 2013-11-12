@@ -82,6 +82,27 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
   protected $ensured;
 
   /**
+   * The result.
+   *
+   * @var null
+   */
+  protected $result = NULL;
+
+  /**
+   * The current row.
+   *
+   * @var null
+   */
+  protected $currentRow = NULL;
+
+  /**
+   * The current key.
+   *
+   * @var array
+   */
+  protected $currentKey = array();
+
+  /**
    * Constructs an SQL object.
    *
    * Sets up the tables and builds the maps,
@@ -142,6 +163,16 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
    */
   public function getMessageTable() {
     return $this->messageTable;
+  }
+
+  /**
+   * Returns the current key.
+   *
+   * @return array
+   *   The current key.
+   */
+  public function getCurrentKey() {
+    return $this->currentKey;
   }
 
   /**
@@ -604,13 +635,6 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
   public function destroy() {
     $this->getDatabase()->schema()->dropTable($this->mapTable);
     $this->getDatabase()->schema()->dropTable($this->messageTable);
-  }
-
-  protected $result = NULL;
-  protected $currentRow = NULL;
-  protected $currentKey = array();
-  public function getCurrentKey() {
-    return $this->currentKey;
   }
 
   /**
