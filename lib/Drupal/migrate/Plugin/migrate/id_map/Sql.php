@@ -117,7 +117,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
     $this->sourceIds = $migration->get('sourceIds');
     $this->destinationIds = $migration->get('destinationIds');
 
-    // Build the source and destination key maps.
+    // Build the source and destination identifier maps.
     $this->sourceIdFields = array();
     $count = 1;
     foreach ($this->sourceIds as $field => $schema) {
@@ -161,11 +161,12 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
 
         $fields = $source_id_schema;
 
-        // Add destination keys to map table
+        // Add destination identifiers to map table
         // TODO: How do we discover the destination schema?
         $count = 1;
         foreach ($this->destinationIds as $field_schema) {
-          // Allow dest key fields to be NULL (for IGNORED/FAILED cases)
+          // Allow dest identifier fields to be NULL (for IGNORED/FAILED
+          // cases).
           $field_schema['not null'] = FALSE;
           $mapkey = 'destid' . $count++;
           $fields[$mapkey] = $field_schema;
@@ -200,7 +201,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
           'description' => 'Hash of source row data, for detecting changes',
         );
         $schema = array(
-          'description' => t('Mappings from source key to destination key'),
+          'description' => t('Mappings from source identifier value(s) to destination identifier value(s).'),
           'fields' => $fields,
         );
         if ($pks) {
@@ -268,36 +269,30 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
   /**
    * Retrieve a row from the map table, given a source ID.
    *
-   * @param array $source_id
+   * @param array $source_ids
    *   A list of source IDs, even there is just one source ID.
    *
    * @return array
    *   The raw row data as associative array.
    */
-  public function getRowBySource(array $source_id) {
+  public function getRowBySource(array $source_ids) {
     $query = $this->getDatabase()->select($this->mapTable, 'map')
               ->fields('map');
-    foreach ($this->sourceIdFields as $key_name) {
-      $query = $query->condition("map.$key_name", array_shift($source_id), '=');
+    foreach ($this->sourceIdFields as $id_name) {
+      $query = $query->condition("map.$id_name", array_shift($source_ids), '=');
     }
     $result = $query->execute();
     return $result->fetchAssoc();
   }
 
   /**
-   * Retrieve a row from the map table, given a destination ID
-   *
-   * @param array $destination_id
-   *   A list of destination IDs, even there is just one destination ID.
-   *
-   * @return mixed
-   *   The row(s) of data
+   * {@inheritdoc}
    */
-  public function getRowByDestination(array $destination_id) {
+  public function getRowByDestination(array $destination_ids) {
     $query = $this->getDatabase()->select($this->mapTable, 'map')
               ->fields('map');
-    foreach ($this->destinationIdFields as $key_name) {
-      $query = $query->condition("map.$key_name", array_shift($destination_id), '=');
+    foreach ($this->destinationIdFields as $id_name) {
+      $query = $query->condition("map.$id_name", array_shift($destination_ids), '=');
     }
     $result = $query->execute();
     return $result->fetchAssoc();
@@ -325,13 +320,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
   }
 
   /**
-   * Given a (possibly multi-field) destination key, return the (possibly multi-field)
-   * source key mapped to it.
-   *
-   * @param array $destination_id
-   *  Array of destination key values.
-   * @return array
-   *  Array of source key values, or NULL on failure.
+   * {@inheritdoc}
    */
   public function lookupSourceID(array $destination_id) {
     $query = $this->getDatabase()->select($this->mapTable, 'map')

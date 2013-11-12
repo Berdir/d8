@@ -58,7 +58,7 @@ interface MigrateIdMapInterface extends PluginInspectionInterface {
    * @param int $level
    *  Optional message severity (defaults to MESSAGE_ERROR).
    */
-  public function saveMessage(array $source_id_value, $message, $level = MigrationInterface::MESSAGE_ERROR);
+  public function saveMessage(array $source_id_values, $message, $level = MigrationInterface::MESSAGE_ERROR);
 
   /**
    * Prepare to run a full update - mark all previously-imported content as
@@ -89,17 +89,17 @@ interface MigrateIdMapInterface extends PluginInspectionInterface {
   /**
    * Delete the map and message entries for a given source record
    *
-   * @param array $source_key
+   * @param array $source_ids
    * @param bool $messages_only
    */
-  public function delete(array $source_key, $messages_only = FALSE);
+  public function delete(array $source_ids, $messages_only = FALSE);
 
   /**
    * Delete the map and message entries for a given destination record
    *
-   * @param array $destination_key
+   * @param array $destination_ids
    */
-  public function deleteDestination(array $destination_key);
+  public function deleteDestination(array $destination_ids);
 
   /**
    * Delete the map and message entries for a set of given source records.
@@ -116,15 +116,17 @@ interface MigrateIdMapInterface extends PluginInspectionInterface {
   /**
    * Retrieve map data for a given source or destination item
    */
-  public function getRowBySource(array $source_id);
+  public function getRowBySource(array $source_ids);
 
 
   /**
    * Retrieve a row by the destination identifiers.
    *
-   * @param array $destination_id
+   * @param array $destination_ids
+   *   A list of destination IDs, even there is just one destination ID.
    *
    * @return array
+   *   The row(s) of data
    */
   public function getRowByDestination(array $destination_id_values);
 
@@ -134,24 +136,24 @@ interface MigrateIdMapInterface extends PluginInspectionInterface {
   public function getRowsNeedingUpdate($count);
 
   /**
-   * Given a (possibly multi-field) destination key, return the (possibly multi-field)
-   * source key mapped to it.
+   * Given a (possibly multi-field) destination identifier value, return the
+   * (possibly multi-field) source identifier value mapped to it.
    *
-   * @param array $destination_id
-   *  Array of destination key values.
+   * @param array $destination_ids
+   *   Array of destination identifier values.
    * @return array
-   *  Array of source key values, or NULL on failure.
+   *   Array of source identifier values, or NULL on failure.
    */
-  public function lookupSourceID(array $destination_id);
+  public function lookupSourceID(array $destination_ids);
 
   /**
-   * Given a (possibly multi-field) source key, return the (possibly multi-field)
-   * destination key it is mapped to.
+   * Given a (possibly multi-field) source identifier value, return the
+   * (possibly multi-field) destination identifier value it is mapped to.
    *
    * @param array $source_id_values
    *  Array of source identifier values.
    * @return array
-   *  Array of destination key values, or NULL on failure.
+   *  Array of destination identifier values, or NULL on failure.
    */
   public function lookupDestinationID(array $source_id_values);
 
