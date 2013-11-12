@@ -219,7 +219,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
     if (!$this->ensured) {
       if (!$this->getDatabase()->schema()->tableExists($this->mapTable)) {
         // Generate appropriate schema info for the map and message tables,
-        // and map from the source field names to the map/msg field names
+        // and map from the source field names to the map/msg field names.
         $count = 1;
         $source_id_schema = array();
         $pks = array();
@@ -231,7 +231,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
 
         $fields = $source_id_schema;
 
-        // Add destination identifiers to map table
+        // Add destination identifiers to map table.
         // TODO: How do we discover the destination schema?
         $count = 1;
         foreach ($this->destinationIds as $field_schema) {
@@ -279,7 +279,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
         }
         $this->getDatabase()->schema()->createTable($this->mapTable, $schema);
 
-        // Now for the message table
+        // Now do the message table.
         $fields = array();
         $fields['msgid'] = array(
           'type' => 'serial',
@@ -310,7 +310,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
         $this->getDatabase()->schema()->createTable($this->messageTable, $schema);
       }
       else {
-        // Add any missing columns to the map table
+        // Add any missing columns to the map table.
         if (!$this->getDatabase()->schema()->fieldExists($this->mapTable,
                                                       'rollback_action')) {
           $this->getDatabase()->schema()->addField($this->mapTable,
@@ -410,7 +410,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
    * {@inheritdoc}
    */
   public function saveIdMapping(Row $row, array $destination_id_values, $needs_update = MigrateIdMapInterface::STATUS_IMPORTED, $rollback_action = MigrateIdMapInterface::ROLLBACK_DELETE) {
-    // Construct the source key
+    // Construct the source key.
     $keys = array();
     $destination = $row->getDestination();
     foreach ($this->sourceIdFields as $field_name => $key_name) {
@@ -448,11 +448,10 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
    * {@inheritdoc}
    */
   public function saveMessage(array $source_id_values, $message, $level = MigrationInterface::MESSAGE_ERROR) {
-    // Source IDs as arguments
     $count = 1;
     foreach ($source_id_values as $id_value) {
       $fields['sourceid' . $count++] = $id_value;
-      // If any key value is empty, we can't save - print out and abort
+      // If any key value is empty, we can't save - print out and abort.
       if (empty($id_value)) {
         print($message);
         return;
@@ -593,7 +592,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
    * {@inheritdoc}
    */
   public function deleteBulk(array $source_ids) {
-    // If we have a single-column key, we can shortcut it
+    // If we have a single-column key, we can shortcut it.
     if (count($this->sourceIds) == 1) {
       $sourceids = array();
       foreach ($source_ids as $source_id) {
@@ -692,7 +691,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
     else {
       foreach ($this->sourceIdFields as $map_field) {
         $this->currentKey[$map_field] = $this->currentRow->$map_field;
-        // Leave only destination fields
+        // Leave only destination fields.
         unset($this->currentRow->$map_field);
       }
     }
@@ -703,7 +702,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
    * TRUE to process the loop and FALSE to terminate it
    */
   public function valid() {
-    // TODO: Check numProcessed against itemlimit
+    // TODO: Check numProcessed against itemlimit.
     return !is_null($this->currentRow);
   }
 
