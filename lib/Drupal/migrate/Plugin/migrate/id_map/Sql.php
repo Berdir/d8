@@ -637,8 +637,11 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
   }
 
   /**
-   * Implementation of Iterator::rewind() - called before beginning a foreach loop.
-   * TODO: Support idlist, itemlimit
+   * Implementation of Iterator::rewind().
+   *
+   * This is called before beginning a foreach loop.
+   *
+   * @todo Support idlist, itemlimit.
    */
   public function rewind() {
     $this->currentRow = NULL;
@@ -650,7 +653,8 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
       $fields[] = $field;
     }
 
-    /* TODO
+    // @todo Make this work.
+    /*
     if (isset($this->options['itemlimit'])) {
       $query = $query->range(0, $this->options['itemlimit']);
     }
@@ -662,25 +666,30 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
   }
 
   /**
-   * Implementation of Iterator::current() - called when entering a loop
-   * iteration, returning the current row
+   * Implementation of Iterator::current().
+   *
+   * This is called when entering a loop iteration, returning the current row.
    */
   public function current() {
     return $this->currentRow;
   }
 
   /**
-   * Implementation of Iterator::key - called when entering a loop iteration, returning
-   * the key of the current row. It must be a scalar - we will serialize
-   * to fulfill the requirement, but using getCurrentKey() is preferable.
+   * Implementation of Iterator::key().
+   *
+   * This is called when entering a loop iteration, returning the key of the
+   * current row. It must be a scalar - we will serialize to fulfill the
+   * requirement, but using getCurrentKey() is preferable.
    */
   public function key() {
     return serialize($this->currentKey);
   }
 
   /**
-   * Implementation of Iterator::next() - called at the bottom of the loop implicitly,
-   * as well as explicitly from rewind().
+   * Implementation of Iterator::next().
+   *
+   * This is called at the bottom of the loop implicitly, as well as explicitly
+   * from rewind().
    */
   public function next() {
     $this->currentRow = $this->result->fetchObject();
@@ -698,11 +707,13 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
   }
 
   /**
-   * Implementation of Iterator::valid() - called at the top of the loop, returning
-   * TRUE to process the loop and FALSE to terminate it
+   * Implementation of Iterator::valid().
+   *
+   * This is called at the top of the loop, returning TRUE to process the loop
+   * and FALSE to terminate it.
    */
   public function valid() {
-    // TODO: Check numProcessed against itemlimit.
+    // @todo Check numProcessed against itemlimit.
     return !is_null($this->currentRow);
   }
 
