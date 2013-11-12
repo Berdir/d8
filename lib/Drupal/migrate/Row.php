@@ -64,9 +64,6 @@ class Row {
    * @param array $source_ids
    *   An array containing the IDs of the source using the keys as the field
    *   names.
-   * @param array $destination_ids
-   *   An array containing the IDs of the destination using the keys as the field
-   *   names.
    *
    * @throws \InvalidArgumentException
    *   Thrown when a source ID property does not exist.
@@ -156,8 +153,13 @@ class Row {
   }
 
   /**
-   * @param array $property_keys
+   * Tests if destination property exists.
+   *
+   * @param array $property
    *   An array of properties on the destination.
+   *
+   * @return boolean
+   *   TRUE if the destination property exists.
    */
   public function hasDestinationProperty($property) {
     return NestedArray::keyExists($this->destination, explode(':', $property));
@@ -176,7 +178,7 @@ class Row {
   }
 
   /**
-   * This returns the whole destination array.
+   * Returns the whole destination array.
    *
    * @return array
    *   An array of destination values.
@@ -186,10 +188,10 @@ class Row {
   }
 
   /**
-   * Return a the value of a destination property.
+   * Returns the value of a destination property.
    *
-   * @param string $property
-   *   The provided destination property.
+   * @param array $property
+   *   An array of properties on the destination.
    *
    * @return mixed
    *  The destination value.
