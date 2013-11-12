@@ -33,16 +33,11 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
   protected $mapTable, $messageTable;
 
   /**
+   * The migrate message.
+   *
    * @var \Drupal\migrate\MigrateMessageInterface
    */
   protected $message;
-
-  public function getMapTable() {
-    return $this->mapTable;
-  }
-  public function getMessageTable() {
-    return $this->messageTable;
-  }
 
   /**
    * The database connection for the map/message tables on the destination.
@@ -57,40 +52,25 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
   protected $query;
 
   /**
+   * The migration being done.
+   *
    * @var \Drupal\migrate\Entity\MigrationInterface
    */
   protected $migration;
 
   /**
+   * The source ID fields.
+   *
    * @var array
    */
   protected $sourceIdFields;
 
   /**
+   * The destination ID fields.
+   *
    * @var array
    */
   protected $destinationIdFields;
-
-  /**
-   * Qualifying the map table name with the database name makes cross-db joins
-   * possible. Note that, because prefixes are applied after we do this (i.e.,
-   * it will prefix the string we return), we do not qualify the table if it has
-   * a prefix. This will work fine when the source data is in the default
-   * (prefixed) database (in particular, for simpletest), but not if the primary
-   * query is in an external database.
-   *
-   * @return string
-   */
-  public function getQualifiedMapTable() {
-    $options = $this->getDatabase()->getConnectionOptions();
-    $prefix = $this->getDatabase()->tablePrefix($this->mapTable);
-    if ($prefix) {
-      return $this->mapTable;
-    }
-    else {
-      return $options['database'] . '.' . $this->mapTable;
-    }
-  }
 
   /**
    * Stores whether the the tables (map/message) already exist.
@@ -128,6 +108,47 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
       $this->destinationIdFields[$field] = 'destid' . $count++;
     }
     $this->ensureTables();
+  }
+
+  /**
+   * Gets the name of the map table.
+   *
+   * @return string
+   *   The name of the map table.
+   */
+  public function getMapTable() {
+    return $this->mapTable;
+  }
+
+  /**
+   * Gets the name of the message table.
+   *
+   * @return string
+   *   The name of the message table.
+   */
+  public function getMessageTable() {
+    return $this->messageTable;
+  }
+
+  /**
+   * Qualifying the map table name with the database name makes cross-db joins
+   * possible. Note that, because prefixes are applied after we do this (i.e.,
+   * it will prefix the string we return), we do not qualify the table if it has
+   * a prefix. This will work fine when the source data is in the default
+   * (prefixed) database (in particular, for simpletest), but not if the primary
+   * query is in an external database.
+   *
+   * @return string
+   */
+  public function getQualifiedMapTable() {
+    $options = $this->getDatabase()->getConnectionOptions();
+    $prefix = $this->getDatabase()->tablePrefix($this->mapTable);
+    if ($prefix) {
+      return $this->mapTable;
+    }
+    else {
+      return $options['database'] . '.' . $this->mapTable;
+    }
   }
 
   protected function getDatabase() {
