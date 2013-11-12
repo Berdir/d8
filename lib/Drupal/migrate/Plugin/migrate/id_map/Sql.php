@@ -513,13 +513,13 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
   /**
    * {@inheritdoc}
    */
-  public function delete(array $source_keys, $messages_only = FALSE) {
+  public function delete(array $source_ids, $messages_only = FALSE) {
     if (!$messages_only) {
       $map_query = $this->getDatabase()->delete($this->mapTable);
     }
     $message_query = $this->getDatabase()->delete($this->messageTable);
     $count = 1;
-    foreach ($source_keys as $key_value) {
+    foreach ($source_ids as $key_value) {
       if (!$messages_only) {
         $map_query->condition('sourceid' . $count, $key_value);
       }
