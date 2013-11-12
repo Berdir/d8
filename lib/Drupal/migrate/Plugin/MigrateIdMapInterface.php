@@ -90,20 +90,20 @@ interface MigrateIdMapInterface extends PluginInspectionInterface {
   /**
    * Deletes the map and message entries for a given source record.
    *
-   * @param array $source_ids
-   *   The IDs of the sources we should do the deletes for.
+   * @param array $source_id
+   *   The ID of the source we should do the delete for.
    * @param bool $messages_only
    *   Flag to only delete the messages.
    */
-  public function delete(array $source_ids, $messages_only = FALSE);
+  public function delete(array $source_id, $messages_only = FALSE);
 
   /**
    * Deletes the map and message entries for a given destination record.
    *
-   * @param array $destination_ids
-   *   The IDs of the destinations we should do the deletes for.
+   * @param array $destination_id
+   *   The ID of the destination we should do the deletes for.
    */
-  public function deleteDestination(array $destination_ids);
+  public function deleteDestination(array $destination_id);
 
   /**
    * Deletes the map and message entries for a set of given source records.
