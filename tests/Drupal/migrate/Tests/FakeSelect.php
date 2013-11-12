@@ -8,7 +8,6 @@
 namespace Drupal\migrate\Tests;
 
 use Drupal\Core\Database\Connection;
-use Drupal\Core\Database\DatabaseNotFoundException;
 use Drupal\Core\Database\Query\Condition;
 use Drupal\Core\Database\Query\PlaceholderInterface;
 use Drupal\Core\Database\Query\Select;
@@ -262,6 +261,8 @@ class FakeSelect extends Select {
   /**
    * Resolves conditions by removing non-matching rows.
    *
+   * @param \Drupal\Core\Database\Query\Condition $condition_group
+   *   The condition group to check.
    * @param array $rows
    *   An array of rows excluding non-matching rows.
    */

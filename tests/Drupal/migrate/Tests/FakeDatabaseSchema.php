@@ -10,12 +10,6 @@ namespace Drupal\migrate\Tests;
 
 use Drupal\Core\Database\Schema;
 
-use Drupal\Core\Database\Connection;
-use Drupal\Core\Database\Query\Condition;
-use Drupal\Core\Database\Query\PlaceholderInterface;
-use Drupal\Core\Database\Query\Select;
-use Drupal\Core\Database\Query\SelectInterface;
-
 class FakeDatabaseSchema extends Schema {
 
   /**

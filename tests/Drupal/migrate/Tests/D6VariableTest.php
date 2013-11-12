@@ -50,7 +50,7 @@ class D6VariableTest extends MigrateSqlSourceTestCase {
    */
   public static function getInfo() {
     return array(
-      'name' => 'D6 variabe source functionality',
+      'name' => 'D6 variable source functionality',
       'description' => 'Tests D6 variable source plugin.',
       'group' => 'Migrate',
     );

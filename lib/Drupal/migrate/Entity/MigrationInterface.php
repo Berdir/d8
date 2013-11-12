@@ -62,6 +62,7 @@ interface MigrationInterface extends ConfigEntityInterface {
    *
    * @param array $process
    *   A process configuration array.
+   *
    * @return array
    *   A list of process plugins.
    */

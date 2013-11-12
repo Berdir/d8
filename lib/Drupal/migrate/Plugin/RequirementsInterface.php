@@ -13,7 +13,7 @@ namespace Drupal\migrate\Plugin;
 interface RequirementsInterface {
 
   /**
-   * Checks if requiremens for this plugin are OK.
+   * Checks if requirements for this plugin are OK.
    *
    * @return boolean
    *   TRUE if it is possible to use the plugin, FALSE if not.

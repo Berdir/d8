@@ -7,7 +7,6 @@
 
 namespace Drupal\migrate\Plugin\migrate\id_map;
 
-use Drupal\Component\Utility\String;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\migrate\Entity\MigrationInterface;
@@ -359,17 +358,17 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
    * NEEDS_UPDATE, to signal an existing record should be remigrated.
    *
    * @param Row $row
-   *  The raw source data. We use the key map derived from the source object
-   *  to get the source key values.
-   * @param array $dest_ids
-   *  The destination key values.
+   *   The raw source data. We use the key map derived from the source object
+   *   to get the source key values.
+   * @param array $destination_id_values
+   *   The destination key values.
    * @param int $needs_update
-   *  Status of the source row in the map. Defaults to STATUS_IMPORTED.
+   *   Status of the source row in the map. Defaults to STATUS_IMPORTED.
    * @param int $rollback_action
-   *  How to handle the destination object on rollback. Defaults to
-   *  ROLLBACK_DELETE.
+   *   How to handle the destination object on rollback. Defaults to
+   *   ROLLBACK_DELETE.
    * $param string $hash
-   *  If hashing is enabled, the hash of the raw source row.
+   *   If hashing is enabled, the hash of the raw source row.
    */
   public function saveIdMapping(Row $row, array $destination_id_values, $needs_update = MigrateIdMapInterface::STATUS_IMPORTED, $rollback_action = MigrateIdMapInterface::ROLLBACK_DELETE) {
     // Construct the source key
@@ -512,17 +511,15 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
   }
 
   /**
-   * Delete the map entry and any message table entries for the specified source row.
-   *
-   * @param array $source_id
+   * {@inheritdoc}
    */
-  public function delete(array $source_id, $messages_only = FALSE) {
+  public function delete(array $source_keys, $messages_only = FALSE) {
     if (!$messages_only) {
       $map_query = $this->getDatabase()->delete($this->mapTable);
     }
     $message_query = $this->getDatabase()->delete($this->messageTable);
     $count = 1;
-    foreach ($source_id as $key_value) {
+    foreach ($source_keys as $key_value) {
       if (!$messages_only) {
         $map_query->condition('sourceid' . $count, $key_value);
       }

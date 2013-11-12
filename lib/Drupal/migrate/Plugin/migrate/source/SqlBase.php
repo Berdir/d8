@@ -8,11 +8,8 @@
 namespace Drupal\migrate\Plugin\migrate\source;
 
 use Drupal\Core\Database\Database;
-use Drupal\Core\Plugin\PluginBase;
 use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
-use Drupal\migrate\Plugin\MigrateSourceInterface;
-use Drupal\migrate\Row;
 
 /**
  * Sources whose data may be fetched via DBTNG.

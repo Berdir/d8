@@ -7,8 +7,6 @@
 
 namespace Drupal\migrate\Tests;
 
-use Drupal\migrate\Source;
-
 /**
  * Provides setup and helper methods for Migrate module source tests.
  */
