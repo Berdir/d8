@@ -52,7 +52,7 @@ interface MigrateIdMapInterface extends PluginInspectionInterface {
    * Records a message related to a source record.
    *
    * @param array $source_id_values
-   *   Source ID of the record in error
+   *   Source ID of the record in error.
    * @param string $message
    *   The message to record.
    * @param int $level
@@ -91,9 +91,9 @@ interface MigrateIdMapInterface extends PluginInspectionInterface {
    * Deletes the map and message entries for a given source record.
    *
    * @param array $source_id
-   *   The ID of the source we should do the delete for.
+   *   The source ID of the record to delete.
    * @param bool $messages_only
-   *   Flag to only delete the messages.
+   *   TRUE to only delete the migrate messages.
    */
   public function delete(array $source_id, $messages_only = FALSE);
 
@@ -119,7 +119,13 @@ interface MigrateIdMapInterface extends PluginInspectionInterface {
   public function clearMessages();
 
   /**
-   * Retrieves map data for a given source or destination item.
+   * Retrieves a row from the map table, given a source ID.
+   *
+   * @param array $source_ids
+   *   A list of source IDs, even if there is just one source ID.
+   *
+   * @return array
+   *   The raw row data as an associative array.
    */
   public function getRowBySource(array $source_ids);
 
