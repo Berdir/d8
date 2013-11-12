@@ -91,7 +91,9 @@ interface MigrateIdMapInterface extends PluginInspectionInterface {
    * Deletes the map and message entries for a given source record.
    *
    * @param array $source_ids
+   *   The IDs of the sources we should do the deletes for.
    * @param bool $messages_only
+   *   Flag to only delete the messages.
    */
   public function delete(array $source_ids, $messages_only = FALSE);
 
@@ -99,6 +101,7 @@ interface MigrateIdMapInterface extends PluginInspectionInterface {
    * Deletes the map and message entries for a given destination record.
    *
    * @param array $destination_ids
+   *   The IDs of the destinations we should do the deletes for.
    */
   public function deleteDestination(array $destination_ids);
 
@@ -106,6 +109,7 @@ interface MigrateIdMapInterface extends PluginInspectionInterface {
    * Deletes the map and message entries for a set of given source records.
    *
    * @param array $source_ids
+   *   The IDs of the sources we should do the deletes for.
    */
   public function deleteBulk(array $source_ids);
 
@@ -122,7 +126,7 @@ interface MigrateIdMapInterface extends PluginInspectionInterface {
   /**
    * Retrieves a row by the destination identifiers.
    *
-   * @param array $destination_ids
+   * @param array $destination_id_values
    *   A list of destination IDs, even there is just one destination ID.
    *
    * @return array
@@ -132,6 +136,9 @@ interface MigrateIdMapInterface extends PluginInspectionInterface {
 
   /**
    * Retrieves an array of map rows marked as needing update.
+   *
+   * @param int $count
+   *   The maximum number of rows to get in the next batch.
    */
   public function getRowsNeedingUpdate($count);
 
@@ -171,10 +178,18 @@ interface MigrateIdMapInterface extends PluginInspectionInterface {
   public function destroy();
 
   /**
-   * @TODO: YUCK THIS IS SQL BOUND!
+   * Gets the qualified map table.
+   *
+   * @todo Change this to not be for SQL only.
    */
   public function getQualifiedMapTable();
 
+  /**
+   * Sets the migrate message.
+   *
+   * @param \Drupal\migrate\MigrateMessageInterface $message
+   *   The message to display.
+   */
   public function setMessage(MigrateMessageInterface $message);
 
 }
