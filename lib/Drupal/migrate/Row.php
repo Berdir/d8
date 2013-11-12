@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\MigrateRow.
+ * Contains \Drupal\migrate\Row.
  */
 
 namespace Drupal\migrate;
@@ -11,7 +11,7 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
 
 /**
- * This just stores a row.
+ * Stores a row.
  */
 class Row {
 
@@ -117,7 +117,7 @@ class Row {
   }
 
   /**
-   * This returns the whole source array.
+   * Returns the whole source array.
    *
    * @return array
    *   An array of source plugins.
@@ -127,7 +127,9 @@ class Row {
   }
 
   /**
-   * Sets a source property. This can only be called from the source plugin.
+   * Sets a source property.
+   *
+   * This can only be called from the source plugin.
    *
    * @param string $property
    *   A property on the source.
@@ -161,7 +163,7 @@ class Row {
    * @return boolean
    *   TRUE if the destination property exists.
    */
-  public function hasDestinationProperty($property) {
+  public function hasDestinationProperty(array $property) {
     return NestedArray::keyExists($this->destination, explode(':', $property));
   }
 
@@ -196,7 +198,7 @@ class Row {
    * @return mixed
    *  The destination value.
    */
-  public function getDestinationProperty($property) {
+  public function getDestinationProperty(array $property) {
     return NestedArray::getValue($this->destination, explode(':', $property));
   }
 
@@ -221,7 +223,7 @@ class Row {
   }
 
   /**
-   * Recalculate the hash for the row.
+   * Recalculates the hash for the row.
    */
   public function rehash() {
     $this->idMap['original_hash'] = $this->idMap['hash'];
@@ -231,7 +233,7 @@ class Row {
   /**
    * Checks whether the row has changed compared to the original ID map.
    *
-   * return bool
+   * @return bool
    *   TRUE if the row has changed, FALSE otherwise. If setIdMap() was not
    *   called, this always returns FALSE.
    */
@@ -258,4 +260,5 @@ class Row {
   public function getHash() {
     return $this->idMap['hash'];
   }
+
 }
