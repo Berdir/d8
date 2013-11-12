@@ -38,13 +38,13 @@ interface MigrateIdMapInterface extends PluginInspectionInterface {
    * Saves a mapping from the source identifiers to the destination identifiers.
    *
    * @param \Drupal\migrate\Row $row
-   *  The current row.
+   *   The current row.
    * @param array $destination_id_values
-   *  An array of destination identifier values.
+   *   An array of destination identifier values.
    * @param int $status
-   *  The status to save for the mapping.
+   *   The status to save for the mapping.
    * @param int $rollback_action
-   *  The way to handle a rollback.
+   *   The way to handle a rollback.
    */
   public function saveIdMapping(Row $row, array $destination_id_values, $status = self::STATUS_IMPORTED, $rollback_action = self::ROLLBACK_DELETE);
 
@@ -52,11 +52,11 @@ interface MigrateIdMapInterface extends PluginInspectionInterface {
    * Records a message related to a source record.
    *
    * @param array $source_id_values
-   *  Source ID of the record in error
+   *   Source ID of the record in error
    * @param string $message
-   *  The message to record.
+   *   The message to record.
    * @param int $level
-   *  Optional message severity (defaults to MESSAGE_ERROR).
+   *   Optional message severity (defaults to MESSAGE_ERROR).
    */
   public function saveMessage(array $source_id_values, $message, $level = MigrationInterface::MESSAGE_ERROR);
 
@@ -156,10 +156,10 @@ interface MigrateIdMapInterface extends PluginInspectionInterface {
    * (possibly multi-field) destination identifier value it is mapped to.
    *
    * @param array $source_id_values
-   *  Array of source identifier values.
+   *   Array of source identifier values.
    *
    * @return array
-   *  Array of destination identifier values, or NULL on failure.
+   *   Array of destination identifier values, or NULL on failure.
    */
   public function lookupDestinationID(array $source_id_values);
 
