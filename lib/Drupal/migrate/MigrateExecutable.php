@@ -305,7 +305,9 @@ class MigrateExecutable {
    * @param array $process
    *   A process pipeline configuration.
    * @param mixed $value
-   *   The initial value of the pipeline. Optional, defaults to NULL.
+   *   The initial value of the pipeline for the first destination. Optional,
+   *   defaults to NULL and unless the caller makes sure the $process contains
+   *   only one destination it should not be set.
    */
   public function processRow(Row $row, array $process = NULL, $value = NULL) {
     foreach ($this->migration->getProcessPlugins($process) as $destination => $plugins) {
