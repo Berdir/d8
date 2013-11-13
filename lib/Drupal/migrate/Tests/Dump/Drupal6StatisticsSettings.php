@@ -15,7 +15,7 @@ use Drupal\Core\Database\Connection;
 class Drupal6StatisticsSettings {
 
   /**
-   * Mock the database schema and values.
+   * Sample database schema and values.
    *
    * @param \Drupal\Core\Database\Connection $database
    *   The database connection.
