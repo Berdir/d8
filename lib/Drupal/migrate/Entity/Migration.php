@@ -206,8 +206,8 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
     }
     $process_plugins = array();
     foreach ($this->getProcessNormalized($process) as $property => $configurations) {
+      $process_plugins[$property] = array();
       foreach ($configurations as $configuration) {
-        $process_plugins[$property] = array();
         if (isset($configuration['source'])) {
           $process_plugins[$property][] = \Drupal::service('plugin.manager.migrate.process')->createInstance('get', $configuration, $this);
         }

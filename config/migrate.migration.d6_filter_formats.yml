@@ -1,17 +1,24 @@
 id: d6_filter_formats
 sourceIds:
-    name:
-        type: varchar
-        length: 255
+    format:
+        type: int
+        "not null": true,
+        default: 0
 destinationIds:
-    name:
+    format:
         type: varchar
         length: 255
 source:
     plugin: drupal6_filter_formats
 process:
-    # this will need the dedupe process plugin.
-    format: name
+    format:
+        -
+            plugin: machine_name
+            source: name
+        -
+            plugin: dedupe_entity
+            entity_type: filter_format
+            field: format
     name: name
     # this will need an iterator + plugin: migration, id: role.
     roles: roles

@@ -31,5 +31,7 @@ class MigrateD6FilterFormatsTest extends MigrateTestBase {
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, new MigrateMessage);
     $executable->import();
+    $filter_format = entity_load('filter.format', 'filtered_html');
+
   }
 }

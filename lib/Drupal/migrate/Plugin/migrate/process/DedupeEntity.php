@@ -22,7 +22,7 @@ class DedupeEntity extends DedupeBase {
    * {@inheritdoc}
    */
   protected function exists($value) {
-    return $this->entityQuery->condition($this->configuration['field'], $value)->count()->execute();
+    return $this->getEntityQuery()->condition($this->configuration['field'], $value)->count()->execute();
   }
 
   /**

@@ -411,17 +411,16 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
    */
   public function saveIdMapping(Row $row, array $destination_id_values, $needs_update = MigrateIdMapInterface::STATUS_IMPORTED, $rollback_action = MigrateIdMapInterface::ROLLBACK_DELETE) {
     // Construct the source key.
-    $keys = array();
-    $destination = $row->getDestination();
+    $source_id_values = $row->getSourceIdValues();
     foreach ($this->sourceIdFields as $field_name => $key_name) {
       // A NULL key value will fail.
-      if (!isset($destination[$field_name])) {
+      if (!isset($source_id_values[$field_name])) {
         $this->message->display(t(
           'Could not save to map table due to NULL value for key field !field',
           array('!field' => $field_name)));
         return;
       }
-      $keys[$key_name] = $destination[$field_name];
+      $keys[$key_name] = $source_id_values[$field_name];
     }
 
     $fields = array(
