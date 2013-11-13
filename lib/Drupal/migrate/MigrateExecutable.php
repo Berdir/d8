@@ -303,11 +303,15 @@ class MigrateExecutable {
    * @param Row $row
    *   The $row to be processed.
    * @param array $process
-   *   A process pipeline configuration.
+   *   A process pipeline configuration. If not set, the top level process
+   *   configuration in the migration entity is used.
    * @param mixed $value
-   *   The initial value of the pipeline for the first destination. Optional,
-   *   defaults to NULL and unless the caller makes sure the $process contains
-   *   only one destination it should not be set.
+   *   Optional initial value of the pipeline for the first destination.
+   *   Usually setting this is not necessary as $process typically starts with
+   *   a 'get'. This is useful only when the $process contains a single
+   *   destination and needs to access a value outside of the source. See
+   *   \Drupal\migrate\Plugin\migrate\process\Iterator::transformKey for an
+   *   example.
    */
   public function processRow(Row $row, array $process = NULL, $value = NULL) {
     foreach ($this->migration->getProcessPlugins($process) as $destination => $plugins) {
