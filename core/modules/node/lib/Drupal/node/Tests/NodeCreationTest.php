@@ -9,11 +9,12 @@ namespace Drupal\node\Tests;
 
 use Drupal\Core\Database\Database;
 use Drupal\Core\Language\Language;
+use Drupal\simpletest\WebTestBase;
 
 /**
  * Tests creating and saving a node.
  */
-class NodeCreationTest extends NodeTestBase {
+class NodeCreationTest extends WebTestBase {
 
   /**
    * Modules to enable.
@@ -22,7 +23,7 @@ class NodeCreationTest extends NodeTestBase {
    *
    * @var array
    */
-  public static $modules = array('node_test_exception', 'dblog', 'test_page_test');
+  public static $modules = array('node', 'node_test_exception', 'dblog', 'test_page_test');
 
   public static function getInfo() {
     return array(
@@ -35,6 +36,8 @@ class NodeCreationTest extends NodeTestBase {
   function setUp() {
     parent::setUp();
 
+    $this->drupalCreateContentType(array('type' => 'page', 'name' => 'Basic page'));
+
     $web_user = $this->drupalCreateUser(array('create page content', 'edit own page content'));
     $this->drupalLogin($web_user);
   }
@@ -42,7 +45,7 @@ class NodeCreationTest extends NodeTestBase {
   /**
    * Creates a "Basic page" node and verifies its consistency in the database.
    */
-  function testNodeCreation() {
+  function dtestNodeCreation() {
     // Create a node.
     $edit = array();
     $edit["title"] = $this->randomName(8);
@@ -60,7 +63,7 @@ class NodeCreationTest extends NodeTestBase {
   /**
    * Verifies that a transaction rolls back the failed creation.
    */
-  function testFailedPageCreation() {
+  function dtestFailedPageCreation() {
     // Create a node.
     $edit = array(
       'uid'      => $this->loggedInUser->id(),
@@ -101,7 +104,7 @@ class NodeCreationTest extends NodeTestBase {
   /**
    * Creates an unpublished node and confirms correct redirect behavior.
    */
-  function testUnpublishedNodeCreation() {
+  function dtestUnpublishedNodeCreation() {
     // Set the front page to the test page.
     \Drupal::config('system.site')->set('page.front', 'test-page')->save();
 
@@ -123,9 +126,58 @@ class NodeCreationTest extends NodeTestBase {
   }
 
   /**
+   * Creates nodes with different authored dates.
+   */
+  function testAuthoredDate() {
+    $admin = $this->drupalCreateUser(array('create page content', 'edit own page content', 'administer nodes'));
+    $this->drupalLogin($admin);
+
+    // Create a node with the default creation date.
+    $edit = array();
+    $edit['title'] = $this->randomName(8);
+    $edit['body[0][value]'] = $this->randomName(16);
+    $this->drupalPostForm('node/add/page', $edit, t('Save and publish'));
+
+    $node = $this->drupalGetNodeByTitle($edit['title']);
+    $this->assertNotEqual(NULL, $node->getCreatedTime());
+
+    // Create a node with the custom creation date in the past.
+    $date = REQUEST_TIME - 86400;
+    $edit = array();
+    $edit['title'] = $this->randomName(8);
+    $edit['body[0][value]'] = $this->randomName(16);
+    $edit['date'] = date('Y-d-m H:m:i', $date);
+    $this->drupalPostForm('node/add/page', $edit, t('Save and publish'));
+
+    $node = $this->drupalGetNodeByTitle($edit['title']);
+    $this->assertEqual($date, $node->getCreatedTime());
+
+    // Create a node with the custom creation date in the future.
+    $date = REQUEST_TIME + 86400;
+    $edit = array();
+    $edit['title'] = $this->randomName(8);
+    $edit['body[0][value]'] = $this->randomName(16);
+    $edit['date'] = date('Y-d-m H:m:i', $date);
+    debug($edit);
+    $this->drupalPostForm('node/add/page', $edit, t('Save and publish'));
+
+    $node = $this->drupalGetNodeByTitle($edit['title']);
+    $this->assertEqual($date, $node->getCreatedTime());
+
+    // Test an invalid date.
+    $edit = array();
+    $edit['title'] = $this->randomName(8);
+    $edit['body[0][value]'] = $this->randomName(16);
+    $edit['date'] = 'Invalid date';
+    $this->drupalPostForm('node/add/page', $edit, t('Save and publish'));
+    $this->assertText(t('You have to specify a valid date.'));
+    $this->assertFalse($this->drupalGetNodeByTitle($edit['title']));
+  }
+
+  /**
    * Tests the author autocompletion textfield.
    */
-  public function testAuthorAutocomplete() {
+  public function dtestAuthorAutocomplete() {
     $admin_user = $this->drupalCreateUser(array('administer nodes', 'create page content'));
     $this->drupalLogin($admin_user);
 
