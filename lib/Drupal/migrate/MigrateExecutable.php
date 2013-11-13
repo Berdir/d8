@@ -300,15 +300,21 @@ class MigrateExecutable {
   }
 
   /**
-   * Apply transformations to a data row received from the source.
+   * @param Row $row
+   *   The $row to be processed.
+   * @param array $process
+   *   A process pipeline configuration.
+   * @param mixed $value
+   *   The initial value of the pipeline. Optional, defaults to NULL.
    */
-  public function processRow(Row $row, array $process = NULL) {
+  public function processRow(Row $row, array $process = NULL, $value = NULL) {
     foreach ($this->migration->getProcessPlugins($process) as $destination => $plugins) {
-      $value = NULL;
       foreach ($plugins as $plugin) {
         $value = $plugin->transform($value, $this, $row, $destination);
       }
       $row->setDestinationProperty($destination, $value);
+      // Reset the value.
+      $value = NULL;
     }
   }
 
