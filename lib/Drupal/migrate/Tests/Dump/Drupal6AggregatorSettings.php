@@ -14,13 +14,7 @@ use Drupal\Core\Database\Connection;
  */
 class Drupal6AggregatorSettings {
 
-  /**
-   * Sample database schema and values.
-   *
-   * @param \Drupal\Core\Database\Connection $database
-   *   The database connection.
-   */
-  public static function load(Connection $database) {
+Drupal6FieldSettings  public static function load(Connection $database) {
     $database->schema()->createTable('variable', array(
       'fields' => array(
         'name' => array(
