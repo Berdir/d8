@@ -43,6 +43,9 @@ process:
                     php:
                         - php_code
             settings: settings
+            status:
+                plugin: default_value
+                default_value: true
 destination:
     plugin: entity
     entity_type: filter_format
