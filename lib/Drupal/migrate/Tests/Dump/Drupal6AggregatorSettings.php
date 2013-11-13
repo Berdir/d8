@@ -18,7 +18,7 @@ class Drupal6AggregatorSettings {
    * Mock the database schema and values.
    *
    * @param \Drupal\Core\Database\Connection $database
-   *   The mocked database connection.
+   *   The database connection.
    */
   public static function load(Connection $database) {
     $database->schema()->createTable('variable', array(

@@ -18,7 +18,7 @@ class Drupal6SyslogSettings {
    * Mock the database schema and values.
    *
    * @param \Drupal\Core\Database\Connection $database
-   *   The mocked database connection.
+   *   The database connection.
    */
   public static function load(Connection $database) {
     $facility = defined('LOG_LOCAL0') ? LOG_LOCAL0 : LOG_USER;
