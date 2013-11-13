@@ -7,7 +7,7 @@
 
 namespace Drupal\migrate\Plugin\migrate\source\d6;
 
-use Drupal\migrate\Plugin\migrate\source\d6\Drupal6SqlBase;
+
 use Drupal\migrate\Plugin\RequirementsInterface;
 
 /**

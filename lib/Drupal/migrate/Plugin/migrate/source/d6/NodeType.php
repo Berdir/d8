@@ -7,7 +7,7 @@
 
 namespace Drupal\migrate\Plugin\migrate\source\d6;
 
-use Drupal\migrate\Plugin\migrate\source\d6\Drupal6SqlBase;
+
 
 /**
  * Drupal 6 Node types source from database.

@@ -8,7 +8,7 @@
 namespace Drupal\migrate\Plugin\migrate\source\d6;
 
 use Drupal\migrate\Plugin\RequirementsInterface;
-use Drupal\migrate\Plugin\migrate\source\d6\Drupal6SqlBase;
+
 
 /**
  * Drupal 6 profile fields source from database.
