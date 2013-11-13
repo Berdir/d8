@@ -28,7 +28,13 @@ class Iterator extends PluginBase implements MigrateProcessInterface {
     foreach ($value as $key => $new_value) {
       $new_row = new Row($new_value, array());
       $migrate_executable->processRow($new_row, $this->configuration['process']);
-      $return[$key] = $new_row->getDestination();
+      $destination = $new_row->getDestination();
+      if (isset($this->configuration['key'])) {
+        $process = array('key' => $this->configuration['key']);
+        $migrate_executable->processRow($new_row, $process);
+        $key = $new_row->getDestinationProperty('key');
+      }
+      $return[$key] = $destination;
     }
     return $return;
   }

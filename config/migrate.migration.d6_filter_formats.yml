@@ -26,15 +26,16 @@ process:
     filters:
         plugin: iterator
         source: filters
+        key: @id
         process:
-            name:
+            id:
                 plugin: map
                 source:
                     - module
                     - delta
                 map:
                     filter:
-                        - filter_html
+                        - filter_html_escape
                         - filter_autop
                         - filter_url
                         - filter_htmlcorrector
