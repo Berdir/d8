@@ -187,7 +187,7 @@ class FakeSelect extends Select {
         $new_rows = array();
 
         // Dynamically build a set of joined rows. Check existing rows and see
-        // if they can be joined with incoming rows
+        // if they can be joined with incoming rows.
         foreach ($results as $row) {
           $joined = FALSE;
           foreach ($this->databaseContents[$table_info['table']] as $candidate_row) {
