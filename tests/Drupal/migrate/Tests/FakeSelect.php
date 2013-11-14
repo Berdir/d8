@@ -170,11 +170,24 @@ class FakeSelect extends Select {
         }
       }
     }
-
+    // This will contain a multiple dimensional array. The first key will be a
+    // table alias, the second either result or all, the third will be a field
+    // alias. all contains every field in the table with the original field
+    // names while result contains only the fields requested. This allows for
+    // filtering on fields that were not added via addField().
     $results = array();
     foreach ($this->tables as $table_alias => $table_info) {
-      if (isset($table_info['join type'])) {
+      // The base table for this query.
+      if (empty($table_info['join type'])) {
+        foreach ($this->databaseContents[$table_info['table']] as $candidate_row) {
+          $results[] = $this->getNewRow($table_alias, $fields, $candidate_row);
+        }
+      }
+      else {
         $new_rows = array();
+
+        // Dynamically build a set of joined rows. Check existing rows and see
+        // if they can be joined with incoming rows
         foreach ($results as $row) {
           $joined = FALSE;
           foreach ($this->databaseContents[$table_info['table']] as $candidate_row) {
@@ -184,6 +197,9 @@ class FakeSelect extends Select {
             }
           }
           if (!$joined && $table_info['join type'] == 'LEFT') {
+            // Because PHP doesn't scope their foreach statements,
+            // $candidate_row may contain the last value assigned to it from the
+            // previous statement.
             // @TODO: empty tables? Those are a problem.
             $keys = array_keys($candidate_row);
             $values = array_fill(0, count($keys), NULL);
@@ -195,11 +211,6 @@ class FakeSelect extends Select {
           }
         }
         $results = $new_rows;
-      }
-      else {
-        foreach ($this->databaseContents[$table_info['table']] as $candidate_row) {
-          $results[] = $this->getNewRow($table_alias, $fields, $candidate_row);
-        }
       }
     }
     return $results;
