@@ -299,7 +299,7 @@ class DateTimePlus extends \DateTime {
       if (!empty($prepared_time)) {
         $test = date_parse($prepared_time);
         if (!empty($test['errors'])) {
-          $this->errors[] = $test['errors'];
+          $this->errors = array_merge($this->errors, $test['errors']);
         }
       }
 

@@ -45,7 +45,7 @@ class NodeCreationTest extends WebTestBase {
   /**
    * Creates a "Basic page" node and verifies its consistency in the database.
    */
-  function dtestNodeCreation() {
+  function testNodeCreation() {
     // Create a node.
     $edit = array();
     $edit["title"] = $this->randomName(8);
@@ -63,7 +63,7 @@ class NodeCreationTest extends WebTestBase {
   /**
    * Verifies that a transaction rolls back the failed creation.
    */
-  function dtestFailedPageCreation() {
+  function testFailedPageCreation() {
     // Create a node.
     $edit = array(
       'uid'      => $this->loggedInUser->id(),
@@ -104,7 +104,7 @@ class NodeCreationTest extends WebTestBase {
   /**
    * Creates an unpublished node and confirms correct redirect behavior.
    */
-  function dtestUnpublishedNodeCreation() {
+  function testUnpublishedNodeCreation() {
     // Set the front page to the test page.
     \Drupal::config('system.site')->set('page.front', 'test-page')->save();
 
@@ -146,7 +146,7 @@ class NodeCreationTest extends WebTestBase {
     $edit = array();
     $edit['title'] = $this->randomName(8);
     $edit['body[0][value]'] = $this->randomName(16);
-    $edit['date'] = date('Y-d-m H:m:i', $date);
+    $edit['date'] = date('Y-m-d H:i:s O', $date);
     $this->drupalPostForm('node/add/page', $edit, t('Save and publish'));
 
     $node = $this->drupalGetNodeByTitle($edit['title']);
@@ -157,8 +157,7 @@ class NodeCreationTest extends WebTestBase {
     $edit = array();
     $edit['title'] = $this->randomName(8);
     $edit['body[0][value]'] = $this->randomName(16);
-    $edit['date'] = date('Y-d-m H:m:i', $date);
-    debug($edit);
+    $edit['date'] = date('Y-m-d H:i:s O', $date);
     $this->drupalPostForm('node/add/page', $edit, t('Save and publish'));
 
     $node = $this->drupalGetNodeByTitle($edit['title']);
@@ -168,7 +167,7 @@ class NodeCreationTest extends WebTestBase {
     $edit = array();
     $edit['title'] = $this->randomName(8);
     $edit['body[0][value]'] = $this->randomName(16);
-    $edit['date'] = 'Invalid date';
+    $edit['date'] = '2013-13-13 13:13:13 +13:00';
     $this->drupalPostForm('node/add/page', $edit, t('Save and publish'));
     $this->assertText(t('You have to specify a valid date.'));
     $this->assertFalse($this->drupalGetNodeByTitle($edit['title']));
@@ -177,7 +176,7 @@ class NodeCreationTest extends WebTestBase {
   /**
    * Tests the author autocompletion textfield.
    */
-  public function dtestAuthorAutocomplete() {
+  public function testAuthorAutocomplete() {
     $admin_user = $this->drupalCreateUser(array('administer nodes', 'create page content'));
     $this->drupalLogin($admin_user);
 

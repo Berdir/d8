@@ -200,7 +200,7 @@ class NodeFormController extends ContentEntityFormController {
     $form['author']['date'] = array(
       '#type' => 'textfield',
       '#title' => t('Authored on'),
-      '#maxlength' => 25,
+      '#maxlength' => 26,
       '#description' => t('Format: %time. The date format is YYYY-MM-DD and %timezone is the time zone offset from UTC. Leave blank to use the time of form submission.', array('%time' => !empty($node->date) ? date_format(date_create($node->date), 'Y-m-d H:i:s O') : format_date($node->getCreatedTime(), 'custom', 'Y-m-d H:i:s O'), '%timezone' => !empty($node->date) ? date_format(date_create($node->date), 'O') : format_date($node->getCreatedTime(), 'custom', 'O'))),
       '#default_value' => !empty($node->date) ? $node->date : '',
     );
@@ -449,8 +449,18 @@ class NodeFormController extends ContentEntityFormController {
       $entity->setAuthorId(0);
     }
 
-    if (!empty($form_state['values']['date']) && $form_state['values']['date'] instanceOf DrupalDateTime) {
-      $entity->setCreatedTime($form_state['values']['date']->getTimestamp());
+    if (!empty($form_state['values']['date'])) {
+      $date = $form_state['values']['date'];
+      if (!$date instanceof DrupalDateTime) {
+        if (is_array($date)) {
+          $date = $date['date'] . ' ' . $date['time'];
+        }
+        $date = new DrupalDateTime($date);
+      }
+      $entity->date = $date;
+      if (!$date->hasErrors()) {
+        $entity->setCreatedTime($date->getTimestamp());
+      }
     }
     else {
       $entity->setCreatedTime(REQUEST_TIME);
