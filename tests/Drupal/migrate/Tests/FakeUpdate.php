@@ -29,15 +29,21 @@ class FakeUpdate extends Update {
     $this->databaseContents = $database_contents;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function execute() {
+    $affected = 0;
     if (count($this->condition) && isset($this->databaseContents[$this->table])) {
       foreach ($this->databaseContents[$this->table] as $key  => $row_array) {
         $row = new DatabaseRow($row_array);
         if (ConditionResolver::matchGroup($row, $this->condition)) {
           $this->databaseContents[$this->table][$key] = $this->fields + $this->databaseContents[$this->table][$key];
+          $affected++;
         }
       }
     }
+    return $affected;
   }
 
   public function exists(SelectInterface $select) {
