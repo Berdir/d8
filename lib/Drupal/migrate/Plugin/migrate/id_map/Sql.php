@@ -412,6 +412,8 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
   public function saveIdMapping(Row $row, array $destination_id_values, $needs_update = MigrateIdMapInterface::STATUS_IMPORTED, $rollback_action = MigrateIdMapInterface::ROLLBACK_DELETE) {
     // Construct the source key.
     $source_id_values = $row->getSourceIdValues();
+    // Construct the source key and initialize to empty variable keys.
+    $keys = array();
     foreach ($this->sourceIdFields as $field_name => $key_name) {
       // A NULL key value will fail.
       if (!isset($source_id_values[$field_name])) {
