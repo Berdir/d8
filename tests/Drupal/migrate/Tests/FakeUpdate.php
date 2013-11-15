@@ -23,6 +23,9 @@ class FakeUpdate extends Update {
    */
   protected $databaseContents;
 
+  /**
+   * Constructs a FakeUpdate object.
+   */
   public function __construct($table, $database_contents) {
     $this->table = $table;
     $this->condition = new Condition('AND');
@@ -46,14 +49,23 @@ class FakeUpdate extends Update {
     return $affected;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function exists(SelectInterface $select) {
     throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function where($snippet, $args = array()) {
     throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function expression($field, $expression, array $arguments = NULL) {
     throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
