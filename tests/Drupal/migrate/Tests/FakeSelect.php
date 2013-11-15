@@ -254,19 +254,16 @@ class FakeSelect extends Select {
    * usort callback to order the results.
    */
   protected function sortCallback($a, $b) {
+    $a_row = new DatabaseRowSelect($a, $this->fieldsWithTable, $this->fields);
+    $b_row = new DatabaseRowSelect($b, $this->fieldsWithTable, $this->fields);
     foreach ($this->order as $field => $direction) {
-      $field_info = $this->getFieldInfo($field);
-      $a_value = $this->getValue($a, $field_info);
-      $b_value = $this->getValue($b, $field_info);
+      $a_value = $a_row->getValue($field);
+      $b_value = $b_row->getValue($field);
       if ($a_value != $b_value) {
         return (($a_value < $b_value) == ($direction == 'ASC')) ? -1 : 1;
       }
     }
     return 0;
-  }
-
-  protected function getFieldInfo($field) {
-    return isset($this->fieldsWithTable[$field]) ? $this->fieldsWithTable[$field] : $this->fields[$field];
   }
 
   /**
@@ -278,110 +275,11 @@ class FakeSelect extends Select {
    *   An array of rows excluding non-matching rows.
    */
   protected function resolveConditions(Condition $condition_group, array &$rows) {
-    foreach ($rows as $k => $row) {
-      if (!$this->matchGroup($row, $condition_group)) {
+    foreach ($rows as $k => $row_array) {
+      $row = new DatabaseRowSelect($row_array, $this->fieldsWithTable, $this->fields);
+      if (!ConditionResolver::matchGroup($row, $condition_group)) {
         unset($rows[$k]);
       }
-    }
-  }
-
-  /**
-   * Match a row against a group of conditions.
-   *
-   * @param array $row
-   *
-   * @param \Drupal\Core\Database\Query\Condition $condition_group
-   *
-   * @return bool
-   */
-  protected function matchGroup(array $row, Condition $condition_group) {
-    $conditions = $condition_group->conditions();
-    $and = $conditions['#conjunction'] == 'AND';
-    unset($conditions['#conjunction']);
-    $match = TRUE;
-    foreach ($conditions as $condition) {
-      $match = $condition['field'] instanceof Condition ? $this->matchGroup($row, $condition['field']) : $this->matchSingle($row, $condition);
-      // For AND, finish matching on the first fail. For OR, finish on first
-      // success.
-      if ($and != $match) {
-        break;
-      }
-    }
-    return $match;
-  }
-
-  /**
-   * Gets the value of a field from a row.
-   *
-   * @param $row
-   *   The row array, three levels of indexes: first is the table alias, the
-   *   second is either all or result, the third is the field alias.
-   * @param $field_info
-   *   The field information array containing the table alias and the
-   *   field alias.
-   * @return mixed
-   */
-  protected function getValue($row, $field_info) {
-    if (array_key_exists($field_info['field'], $row[$field_info['table']]['result'])) {
-      $index = 'result';
-    }
-    else {
-      $index = 'all';
-    }
-    return $row[$field_info['table']][$index][$field_info['field']];
-  }
-
-  /**
-   * Match a single row and its condition.
-   *
-   * @param array $row
-   *   The row to match.
-   *
-   * @param array $condition
-   *   An array representing a single condition.
-   *
-   * @return bool
-   *   TRUE if the condition matches.
-   *
-   * @throws \Exception
-   *
-   */
-  protected function matchSingle(array $row, array $condition) {
-    $field_info = $this->getFieldInfo($condition['field']);
-    $row_value = $this->getValue($row, $field_info);
-    switch ($condition['operator']) {
-      case '=':
-        return $row_value == $condition['value'];
-
-      case '<=':
-        return $row_value <= $condition['value'];
-
-      case '>=':
-        return $row_value >= $condition['value'];
-
-      case '!=':
-        return $row_value != $condition['value'];
-
-      case '<>':
-        return $row_value != $condition['value'];
-
-      case '<':
-        return $row_value < $condition['value'];
-
-      case '>':
-        return $row_value > $condition['value'];
-
-      case 'IN':
-        return in_array($row_value, $condition['value']);
-
-      case 'IS NULL':
-        return !isset($row_value);
-
-      case 'IS NOT NULL':
-        return isset($row_value);
-
-      default:
-        throw new \Exception(sprintf('operator %s is not supported', $condition['operator']));
     }
   }
 
