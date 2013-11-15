@@ -82,10 +82,6 @@ abstract class ContentTranslationTestBase extends WebTestBase {
     $this->setupTestFields();
 
     $this->controller = content_translation_controller($this->entityType);
-
-    // Rebuild the container so that the new languages are picked up by services
-    // that hold a list of languages.
-    $this->rebuildContainer();
   }
 
   /**
