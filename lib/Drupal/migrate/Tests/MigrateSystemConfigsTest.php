@@ -43,7 +43,7 @@ class MigrateSystemConfigsTest extends MigrateTestBase {
   }
 
   /**
-   * Tests migration of book variables to system.cron.yml.
+   * Tests migration of system (cron) variables to system.cron.yml.
    */
   public function testSystemCron() {
     $migration = entity_load('migration', 'd6_system_cron');
@@ -56,5 +56,20 @@ class MigrateSystemConfigsTest extends MigrateTestBase {
     $config = \Drupal::config('system.cron');
     $this->assertIdentical($config->get('threshold.warning'), 172800);
     $this->assertIdentical($config->get('threshold.error'), 1209600);
+  }
+
+  /**
+   * Tests migration of system (rss) variables to system.rss.yml.
+   */
+  public function testSystemRss() {
+    $migration = entity_load('migration', 'd6_system_rss');
+    $dumps = array(
+      drupal_get_path('module', 'migrate') . '/lib/Drupal/migrate/Tests/Dump/Drupal6SystemRss.php',
+    );
+    $this->prepare($migration, $dumps);
+    $executable = new MigrateExecutable($migration, new MigrateMessage());
+    $executable->import();
+    $config = \Drupal::config('system.rss');
+    $this->assertIdentical($config->get('items.limit'), 10);
   }
 }
