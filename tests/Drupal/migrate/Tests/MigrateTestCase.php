@@ -23,6 +23,10 @@ abstract class MigrateTestCase extends UnitTestCase {
 
   protected $migrationConfiguration = array();
 
+  protected $results = array();
+
+  protected $iter;
+
   /**
    * Retrieve a mocked migration.
    *
@@ -61,4 +65,52 @@ abstract class MigrateTestCase extends UnitTestCase {
       'group' => 'Migrate',
     );
   }
+
+
+  /**
+   * Tests retrieval.
+   */
+  public function queryResultTest() {
+    $this->assertSame(count($this->results), count($this->iter), 'Number of results match');
+    $count = 0;
+    foreach ($this->iter as $data_row) {
+      $expected_row = $this->results[$count];
+      $count++;
+      foreach ($expected_row as $key => $expected_value) {
+        $this->retrievalAssertHelper($expected_value, $this->getValue($data_row, $key), sprintf('Value matches for key "%s"', $key));
+      }
+    }
+    $this->assertSame(count($this->results), $count);
+  }
+
+  /**
+   * @param array $row
+   * @param string $key
+   * @return mixed
+   */
+  protected function getValue($row, $key) {
+    return $row[$key];
+  }
+
+  /**
+   * Asserts tested values during test retrieval.
+   *
+   * @param mixed $expected_value
+   *   The incoming expected value to test.
+   * @param mixed $actual_value
+   *   The incoming value itself.
+   * @param string $message
+   *   The tested result as a formatted string.
+   */
+  protected function retrievalAssertHelper($expected_value, $actual_value, $message) {
+    if (is_array($expected_value)) {
+      foreach ($expected_value as $k => $v) {
+        $this->retrievalAssertHelper($v, $actual_value[$k], $message . '['. $k . ']');
+      }
+    }
+    else {
+      $this->assertSame((string) $expected_value, (string) $actual_value, $message);
+    }
+  }
+
 }

@@ -21,8 +21,6 @@ abstract class MigrateSqlSourceTestCase extends MigrateTestCase {
 
   protected $databaseContents = array();
 
-  protected $results = array();
-
   const PLUGIN_CLASS = '';
 
   const ORIGINAL_HIGHWATER = '';
@@ -72,41 +70,18 @@ abstract class MigrateSqlSourceTestCase extends MigrateTestCase {
     $this->source->setCache($cache);
   }
 
-  /**
-   * Tests retrieval.
-   */
   public function testRetrieval() {
-    $this->assertSame(count($this->results), count($this->source), 'Number of results match');
-    $count = 0;
-    foreach ($this->source as $data_row) {
-      $expected_row = $this->results[$count];
-      $count++;
-      foreach ($expected_row as $key => $expected_value) {
-        $this->retrievalAssertHelper($expected_value, $data_row->getSourceProperty($key), sprintf('Value matches for key "%s"', $key));
-      }
-    }
-    $this->assertSame(count($this->results), $count);
+    $this->iter = $this->source;
+    $this->queryResultTest();
   }
 
   /**
-   * Asserts tested values during test retrieval.
-   *
-   * @param mixed $expected_value
-   *   The incoming expected value to test.
-   * @param mixed $actual_value
-   *   The incoming value itself.
-   * @param string $message
-   *   The tested result as a formatted string.
+   * @param \Drupal\migrate\Row $row
+   * @param string $key
+   * @return mixed
    */
-  protected function retrievalAssertHelper($expected_value, $actual_value, $message) {
-    if (is_array($expected_value)) {
-      foreach ($expected_value as $k => $v) {
-        $this->retrievalAssertHelper($v, $actual_value[$k], $message . '['. $k . ']');
-      }
-    }
-    else {
-      $this->assertSame((string) $expected_value, (string) $actual_value, $message);
-    }
+  protected function getValue($row, $key) {
+    return $row->getSourceProperty($key);
   }
 
   /**
