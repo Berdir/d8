@@ -13,6 +13,17 @@ use Drupal\migrate\Plugin\migrate\process\TestMap;
  */
 class MapTest extends MigrateProcessTestCase {
 
+  /**
+   * {@inheritdoc}
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Map process plugin',
+      'description' => 'Tests the map process plugin.',
+      'group' => 'Migrate',
+    );
+  }
+
   function setUp() {
     $this->row = $this->getMockBuilder('Drupal\migrate\Row')
       ->disableOriginalConstructor()

@@ -13,6 +13,17 @@ use Drupal\migrate\Plugin\migrate\process\TestGet;
  */
 class GetTest extends MigrateProcessTestCase {
 
+  /**
+   * {@inheritdoc}
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Get process plugin',
+      'description' => 'Tests the get process plugin.',
+      'group' => 'Migrate',
+    );
+  }
+
   function setUp() {
     $this->plugin = new TestGet();
     parent::setUp();
