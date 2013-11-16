@@ -33,7 +33,7 @@ class D6TermSourceTest extends MigrateSqlSourceTestCase {
     ),
   );
 
-  protected $results = array(
+  protected $expectedResults = array(
     array(
       'tid' => 1,
       'vid' => 5,
@@ -99,7 +99,7 @@ class D6TermSourceTest extends MigrateSqlSourceTestCase {
    * {@inheritdoc}
    */
   public function setUp() {
-    foreach ($this->results as $k => $row) {
+    foreach ($this->expectedResults as $k => $row) {
       foreach ($row['parents'] as $parent) {
         $this->databaseContents['term_hierarchy'][] = array(
           'tid' => $row['tid'],

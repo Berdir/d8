@@ -42,7 +42,7 @@ class D6VocabularySourceTest extends MigrateSqlSourceTestCase {
     ),
   );
 
-  protected $results = array(
+  protected $expectedResults = array(
     array(
       'vid' => 1,
       'name' => 'Tags',
@@ -88,7 +88,7 @@ class D6VocabularySourceTest extends MigrateSqlSourceTestCase {
    * {@inheritdoc}
    */
   public function setUp() {
-    foreach ($this->results as $row) {
+    foreach ($this->expectedResults as $row) {
       foreach ($row['node_types'] as $type) {
         $this->databaseContents['vocabulary_node_types'][] = array(
           'type' => $type,
@@ -97,7 +97,7 @@ class D6VocabularySourceTest extends MigrateSqlSourceTestCase {
       }
       unset($row['node_types']);
     }
-    $this->databaseContents['vocabulary'] = $this->results;
+    $this->databaseContents['vocabulary'] = $this->expectedResults;
     parent::setUp();
   }
 

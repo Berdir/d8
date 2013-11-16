@@ -38,7 +38,7 @@ class D6FilterFormatsTest extends MigrateSqlSourceTestCase {
     ),
   );
 
-  protected $results = array(
+  protected $expectedResults = array(
     array(
       'format' => 1,
       'name' => 'Filtered HTML',
@@ -117,7 +117,7 @@ class D6FilterFormatsTest extends MigrateSqlSourceTestCase {
    */
   public function setUp() {
     $fid = 1;
-    foreach ($this->results as $k => $row) {
+    foreach ($this->expectedResults as $k => $row) {
       $row['roles'] = ',' . implode(',', $row['roles']) . ',';
       foreach ($row['filters'] as $filter) {
         $this->databaseContents['filters'][$fid] = $filter;

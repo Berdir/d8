@@ -44,7 +44,7 @@ class D6RoleSourceTest extends MigrateSqlSourceTestCase {
     ),
   );
 
-  protected $results = array(
+  protected $expectedResults = array(
     array(
       'rid' => 1,
       'name' => 'anonymous user',
@@ -113,7 +113,7 @@ class D6RoleSourceTest extends MigrateSqlSourceTestCase {
    * {@inheritdoc}
    */
   public function setUp() {
-    foreach ($this->results as $k => $row) {
+    foreach ($this->expectedResults as $k => $row) {
       foreach ($row['permissions'] as $perm) {
         $this->databaseContents['permissions'][$perm['pid']] = $perm;
         $this->databaseContents['permissions'][$perm['pid']]['perm'] = implode(',', $perm['perm']);

@@ -38,7 +38,7 @@ class D6NodeWithoutFieldsSourceTest extends MigrateSqlSourceTestCase {
     ),
   );
 
-  protected $results = array(
+  protected $expectedResults = array(
     array(
       // Node fields.
       'nid' => 1,
@@ -100,7 +100,7 @@ class D6NodeWithoutFieldsSourceTest extends MigrateSqlSourceTestCase {
    * {@inheritdoc}
    */
   public function setUp() {
-    foreach ($this->results as $k => $row) {
+    foreach ($this->expectedResults as $k => $row) {
       $this->databaseContents['node_revisions'][$k]['nid'] = $row['nid'];
       $this->databaseContents['node_revisions'][$k]['vid'] = $row['vid'];
       $this->databaseContents['node_revisions'][$k]['body'] = $row['body'];

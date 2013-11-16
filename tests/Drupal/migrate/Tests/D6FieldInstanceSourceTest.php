@@ -46,7 +46,7 @@ class D6FieldInstanceSourceTest extends MigrateSqlSourceTestCase {
 
   // We need to set up the database contents; it's easier to do that below.
   // These are sample result queries.
-  protected $results = array(
+  protected $expectedResults = array(
     array(
       'field_name' => 'field_body',
       'type_name' => 'page',
@@ -65,7 +65,7 @@ class D6FieldInstanceSourceTest extends MigrateSqlSourceTestCase {
    * Prepopulate contents with results.
    */
   public function setUp() {
-    $this->results[0]['widget_settings'] = array(
+    $this->expectedResults[0]['widget_settings'] = array(
       'rows' => 5,
       'size' => 60,
       'default_value' => array(
@@ -76,7 +76,7 @@ class D6FieldInstanceSourceTest extends MigrateSqlSourceTestCase {
         ),
       ),
     );
-    $this->results[0]['display_settings'] = array(
+    $this->expectedResults[0]['display_settings'] = array(
       'label' => array(
         'format' => 'above',
         'exclude' => 0,
@@ -90,7 +90,7 @@ class D6FieldInstanceSourceTest extends MigrateSqlSourceTestCase {
         'exclude' => 0,
       ),
     );
-    $this->databaseContents['content_node_field_instance'] = $this->results;
+    $this->databaseContents['content_node_field_instance'] = $this->expectedResults;
     $this->databaseContents['content_node_field_instance'][0]['widget_settings'] = serialize($this->databaseContents['content_node_field_instance'][0]['widget_settings']);
     $this->databaseContents['content_node_field_instance'][0]['display_settings'] = serialize($this->databaseContents['content_node_field_instance'][0]['display_settings']);
     parent::setUp();

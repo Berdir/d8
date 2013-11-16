@@ -50,7 +50,7 @@ class D6BoxesSourceTest extends MigrateSqlSourceTestCase {
 
   // We need to set up the database contents; it's easier to do that below.
   // These are sample result queries.
-  protected $results = array(
+  protected $expectedResults = array(
     array(
       'bid' => 1,
       'body' => '<p>I made some custom content.</p>',
@@ -69,7 +69,7 @@ class D6BoxesSourceTest extends MigrateSqlSourceTestCase {
    * Prepopulate contents with results.
    */
   public function setUp() {
-    $this->databaseContents['boxes'] = $this->results;
+    $this->databaseContents['boxes'] = $this->expectedResults;
     parent::setUp();
   }
 

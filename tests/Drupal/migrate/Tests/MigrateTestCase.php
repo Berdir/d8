@@ -23,9 +23,7 @@ abstract class MigrateTestCase extends UnitTestCase {
 
   protected $migrationConfiguration = array();
 
-  protected $results = array();
-
-  protected $iter;
+  protected $expectedResults = array();
 
   /**
    * Retrieve a mocked migration.
@@ -68,19 +66,22 @@ abstract class MigrateTestCase extends UnitTestCase {
 
 
   /**
-   * Tests retrieval.
+   * Tests a query
+   *
+   * @param array|\Traversable
+   *   The countable. foreach-able actual results if a query is being run.
    */
-  public function queryResultTest() {
-    $this->assertSame(count($this->results), count($this->iter), 'Number of results match');
+  public function queryResultTest($iter) {
+    $this->assertSame(count($this->expectedResults), count($iter), 'Number of results match');
     $count = 0;
-    foreach ($this->iter as $data_row) {
-      $expected_row = $this->results[$count];
+    foreach ($iter as $data_row) {
+      $expected_row = $this->expectedResults[$count];
       $count++;
       foreach ($expected_row as $key => $expected_value) {
         $this->retrievalAssertHelper($expected_value, $this->getValue($data_row, $key), sprintf('Value matches for key "%s"', $key));
       }
     }
-    $this->assertSame(count($this->results), $count);
+    $this->assertSame(count($this->expectedResults), $count);
   }
 
   /**

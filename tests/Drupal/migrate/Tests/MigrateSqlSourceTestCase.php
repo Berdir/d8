@@ -71,8 +71,7 @@ abstract class MigrateSqlSourceTestCase extends MigrateTestCase {
   }
 
   public function testRetrieval() {
-    $this->iter = $this->source;
-    $this->queryResultTest();
+    $this->queryResultTest($this->source);
   }
 
   /**

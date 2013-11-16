@@ -31,7 +31,7 @@ class D6VariableTest extends MigrateSqlSourceTestCase {
 
   protected $mapJoinable = FALSE;
 
-  protected $results = array(
+  protected $expectedResults = array(
     array(
       'foo' => 1,
       'bar' => FALSE,

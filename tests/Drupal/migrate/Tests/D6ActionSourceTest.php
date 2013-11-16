@@ -46,7 +46,7 @@ class D6ActionSourceTest extends MigrateSqlSourceTestCase {
 
   // We need to set up the database contents; it's easier to do that below.
 
-  protected $results = array(
+  protected $expectedResults = array(
     array(
       'aid' => '1',
       'type' => 'system',
@@ -89,7 +89,7 @@ class D6ActionSourceTest extends MigrateSqlSourceTestCase {
   }
 
   public function setUp() {
-    $this->databaseContents['actions'] = $this->results;
+    $this->databaseContents['actions'] = $this->expectedResults;
     parent::setUp();
   }
 

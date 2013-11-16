@@ -47,7 +47,7 @@ class D6ProfileFieldsSourceTest extends MigrateSqlSourceTestCase {
   // We need to set up the database contents; it's easier to do that below.
   // These are sample result queries.
   //TODO: Add multiple cases
-  protected $results = array(
+  protected $expectedResults = array(
     array(
       'fid' => 1,
       'title' => 'First name',
@@ -99,7 +99,7 @@ class D6ProfileFieldsSourceTest extends MigrateSqlSourceTestCase {
    * Prepopulate contents with results.
    */
   public function setUp() {
-    $this->databaseContents['profile_fields'] = $this->results;
+    $this->databaseContents['profile_fields'] = $this->expectedResults;
     parent::setUp();
   }
 

@@ -33,7 +33,7 @@ class D6UserPictureSourceTest extends MigrateSqlSourceTestCase {
     ),
   );
 
-  protected $results = array(
+  protected $expectedResults = array(
     array(
       'uid' => 1,
       'access' => 1382835435,
@@ -47,7 +47,7 @@ class D6UserPictureSourceTest extends MigrateSqlSourceTestCase {
   );
 
   public function setUp() {
-    $this->databaseContents['users'] = $this->results;
+    $this->databaseContents['users'] = $this->expectedResults;
     parent::setUp();
   }
 

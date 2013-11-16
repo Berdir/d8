@@ -46,7 +46,7 @@ class D6MenuSourceTest extends MigrateSqlSourceTestCase {
 
   // We need to set up the database contents; it's easier to do that below.
 
-  protected $results = array(
+  protected $expectedResults = array(
     array(
       'menu_name' => 'menu-name-1',
       'title' => 'menu custom value 1',
@@ -75,7 +75,7 @@ class D6MenuSourceTest extends MigrateSqlSourceTestCase {
    */
   public function setUp() {
     // This array stores the database.
-    foreach ($this->results as $k => $row) {
+    foreach ($this->expectedResults as $k => $row) {
       $this->databaseContents['menu_custom'][$k] = $row;
     }
     parent::setUp();

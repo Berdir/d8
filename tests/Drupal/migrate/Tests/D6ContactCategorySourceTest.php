@@ -32,7 +32,7 @@ class D6ContactCategorySourceTest extends MigrateSqlSourceTestCase {
     ),
   );
 
-  protected $results = array(
+  protected $expectedResults = array(
     array(
       'cid' => 1,
       'category' => 'contact category value 1',
@@ -66,7 +66,7 @@ class D6ContactCategorySourceTest extends MigrateSqlSourceTestCase {
    * {@inheritdoc}
    */
   public function setUp() {
-    foreach ($this->results as $k => $row) {
+    foreach ($this->expectedResults as $k => $row) {
       $this->databaseContents['contact'][$k] = $row;
     }
     parent::setUp();

@@ -29,7 +29,7 @@ class D6CommentSourceWithHighwaterTest extends D6CommentSourceTest {
 
   public function setUp() {
     $this->migrationConfiguration['highwaterProperty']['field'] = 'timestamp';
-    array_shift($this->results);
+    array_shift($this->expectedResults);
     parent::setUp();
   }
 

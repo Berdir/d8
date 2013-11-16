@@ -35,7 +35,7 @@ class D6UserSourceTest extends MigrateSqlSourceTestCase {
     ),
   );
 
-  protected $results = array(
+  protected $expectedResults = array(
     array(
       'uid' => 1,
       'name' => 'admin',
@@ -98,7 +98,7 @@ class D6UserSourceTest extends MigrateSqlSourceTestCase {
    * {@inheritdoc}
    */
   public function setUp() {
-    foreach ($this->results as $k => $row) {
+    foreach ($this->expectedResults as $k => $row) {
       $this->databaseContents['users'][$k] = $row;
     }
     parent::setUp();

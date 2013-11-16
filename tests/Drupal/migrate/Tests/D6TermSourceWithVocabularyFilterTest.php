@@ -30,7 +30,7 @@ class D6TermSourceWithVocabularyFilterTest extends D6TermSourceTest {
   public function setUp() {
     $this->migrationConfiguration['source']['vocabulary'] = array(5);
     parent::setUp();
-    $this->results = array_values(array_filter($this->results, function($result) {
+    $this->expectedResults = array_values(array_filter($this->expectedResults, function($result) {
       return $result['vid'] == 5;
     }));
   }

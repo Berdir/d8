@@ -39,7 +39,7 @@ class D6FileSourceTest extends MigrateSqlSourceTestCase {
     ),
   );
 
-  protected $results = array(
+  protected $expectedResults = array(
     array(
       'fid' => 1,
       'uid' => 1,
@@ -77,7 +77,7 @@ class D6FileSourceTest extends MigrateSqlSourceTestCase {
    * {@inheritdoc}
    */
   public function setUp() {
-    $this->databaseContents['files'] = $this->results;
+    $this->databaseContents['files'] = $this->expectedResults;
     parent::setUp();
   }
 
