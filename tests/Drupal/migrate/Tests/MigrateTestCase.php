@@ -54,18 +54,6 @@ abstract class MigrateTestCase extends UnitTestCase {
   }
 
   /**
-   * Provide meta information about this battery of tests.
-   */
-  public static function getInfo() {
-    return array(
-      'name' => 'Migrate test',
-      'description' => 'Tests for migrate plugin.',
-      'group' => 'Migrate',
-    );
-  }
-
-
-  /**
    * Tests a query
    *
    * @param array|\Traversable
