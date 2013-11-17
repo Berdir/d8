@@ -119,20 +119,37 @@ class FakeSelect extends Select {
    */
   public function execute() {
     // @todo: Implement distinct() handling.
-    $all_rows = $this->executeJoins();
-    $this->resolveConditions($this->where, $all_rows);
-    if (!empty($this->order)) {
-      usort($all_rows, array($this, 'sortCallback'));
-    }
-    // Now flatten the rows so that each row becomes a field alias => value
-    // array.
-    $results = array();
-    foreach ($all_rows as $table_rows) {
-      $result_row = array();
-      foreach ($table_rows as $row) {
-        $result_row += $row['result'];
+
+    // Single table count queries often do not contain fields which this class
+    // does not support otherwise, so add a shortcut.
+    if (count($this->tables) == 1 && $this->countQuery) {
+      $table_info = reset($this->tables);
+      $where = $this->where;
+      if (!empty($this->databaseContents[$table_info['table']])) {
+        $results = array_filter($this->databaseContents[$table_info['table']], function ($row_array) use ($where) {
+          return ConditionResolver::matchGroup(new DatabaseRow($row_array), $where);
+        });
       }
-      $results[] = $result_row;
+      else {
+        $results = array();
+      }
+    }
+    else {
+      $all_rows = $this->executeJoins();
+      $all_rows = $this->resolveConditions($this->where, $all_rows);
+      if (!empty($this->order)) {
+        usort($all_rows, array($this, 'sortCallback'));
+      }
+      // Now flatten the rows so that each row becomes a field alias => value
+      // array.
+      $results = array();
+      foreach ($all_rows as $table_rows) {
+        $result_row = array();
+        foreach ($table_rows as $row) {
+          $result_row += $row['result'];
+        }
+        $results[] = $result_row;
+      }
     }
     if (!empty($this->range)) {
       $results = array_slice($results, $this->range['start'], $this->range['length']);
@@ -275,12 +292,12 @@ class FakeSelect extends Select {
    *   An array of rows excluding non-matching rows.
    */
   protected function resolveConditions(Condition $condition_group, array &$rows) {
-    foreach ($rows as $k => $row_array) {
-      $row = new DatabaseRowSelect($row_array, $this->fieldsWithTable, $this->fields);
-      if (!ConditionResolver::matchGroup($row, $condition_group)) {
-        unset($rows[$k]);
-      }
-    }
+    $fields_with_table = $this->fieldsWithTable;
+    $fields = $this->fields;
+    return array_filter($rows, function ($row_array) use ($condition_group, $fields_with_table, $fields) {
+      $row = new DatabaseRowSelect($row_array, $fields_with_table, $fields);
+      return ConditionResolver::matchGroup($row, $condition_group);
+    });
   }
 
   /**

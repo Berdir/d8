@@ -9,7 +9,10 @@ namespace Drupal\migrate\Tests;
 
 use Drupal\migrate\Row;
 
-class MigrateSqlIdMapTestCase extends MigrateTestCase {
+/**
+ * @group migrate
+ */
+class MigrateSqlIdMapTest extends MigrateTestCase {
 
   /**
    * @var \Drupal\migrate\Plugin\MigrateIdMapInterface
@@ -38,8 +41,8 @@ class MigrateSqlIdMapTestCase extends MigrateTestCase {
    */
   public static function getInfo() {
     return array(
-      'name' => 'Get process plugin',
-      'description' => 'Tests the get process plugin.',
+      'name' => 'Sql id map plugin',
+      'description' => 'Tests the Sql id map plugin.',
       'group' => 'Migrate',
     );
   }
