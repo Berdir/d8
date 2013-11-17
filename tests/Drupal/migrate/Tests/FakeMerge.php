@@ -17,6 +17,7 @@ class FakeMerge extends Merge {
   function __construct(&$database_contents, $table) {
     $this->databaseContents = &$database_contents;
     $this->table = $table;
+    $this->conditionTable = $table;
     $this->condition = new Condition('AND');
   }
 
@@ -27,8 +28,8 @@ class FakeMerge extends Merge {
     if (!empty($this->databaseContents[$this->table])) {
       $first_row = reset($this->databaseContents[$this->table]);
       list($field, ) = each($first_row);
-      $select = new Fakeselect($this->conditionTable, 'c', $this->databaseContents);
-      $select
+      $select = new FakeSelect($this->conditionTable, 'c', $this->databaseContents);
+      $select = $select
         ->fields('c', array($field))
         ->condition($this->condition)
         ->countQuery();
