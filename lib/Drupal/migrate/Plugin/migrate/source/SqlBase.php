@@ -51,15 +51,15 @@ abstract class SqlBase extends SourcePluginBase {
    */
   public function getDatabase() {
     if  (!isset($this->database)) {
-      $this->database = static::getDatabaseConnection($this->migration);
+      $this->database = static::getDatabaseConnection($this->migration->id(), $this->configuration);
     }
     return $this->database;
   }
 
-  public static function getDatabaseConnection(MigrationInterface $migration) {
-    if ($database = $migration->get('database')) {
-      $key = 'migrate_' . $migration->id();
-      Database::addConnectionInfo($key, 'default', $database);
+  public static function getDatabaseConnection($id, array $configuration) {
+    if (isset($configuration['database'])) {
+      $key = 'migrate_' . $id;
+      Database::addConnectionInfo($key, 'default', $configuration['database']);
     }
     else {
       $key = 'default';

@@ -37,8 +37,12 @@ class MigrateTestBase extends WebTestBase {
         'default' => $value['prefix']['default'] . $databasePrefix,
       );
     }
-    $migration->set('database', $connection_info['default']);
-    $database = SqlBase::getDatabaseConnection($migration);
+    $database = SqlBase::getDatabaseConnection($migration->id(), array('database' => $connection_info['default']));
+    foreach (array('source', 'destination', 'idMap') as $key) {
+      $configuration = $migration->get($key);
+      $configuration['database'] = $database;
+      $migration->set($key, $configuration);
+    }
 
     // Load the database from the portable PHP dump.
     // The files may be gzipped.
