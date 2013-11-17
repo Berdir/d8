@@ -202,7 +202,10 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
    * @return \Drupal\Core\Database\Connection
    */
   protected function getDatabase() {
-    return SqlBase::getDatabaseConnection($this->migration->id(), $this->configuration);
+    if (!isset($this->database)) {
+      $this->database = SqlBase::getDatabaseConnection($this->migration->id(), $this->configuration);
+    }
+    return $this->database;
   }
 
   /**
@@ -271,7 +274,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
           'description' => 'Hash of source row data, for detecting changes',
         );
         $schema = array(
-          'description' => t('Mappings from source identifier value(s) to destination identifier value(s).'),
+          'description' => 'Mappings from source identifier value(s) to destination identifier value(s).',
           'fields' => $fields,
         );
         if ($pks) {
@@ -300,7 +303,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
           'not null' => TRUE,
         );
         $schema = array(
-          'description' => t('Messages generated during a migration process'),
+          'description' => 'Messages generated during a migration process',
           'fields' => $fields,
           'primary key' => array('msgid'),
         );

@@ -25,6 +25,8 @@ abstract class MigrateSqlSourceTestCase extends MigrateTestCase {
 
   const ORIGINAL_HIGHWATER = '';
 
+  protected $expectedResults = array();
+
   /**
    * @var \Drupal\migrate\Plugin\MigrateSourceInterface
    */
@@ -34,17 +36,6 @@ abstract class MigrateSqlSourceTestCase extends MigrateTestCase {
    * {@inheritdoc}
    */
   protected function setUp() {
-    $database_contents = $this->databaseContents + array('test_map' => array());
-    $database = $this->getMockBuilder('Drupal\Core\Database\Connection')
-      ->disableOriginalConstructor()
-      ->getMock();
-    $database->expects($this->any())->method('select')->will($this->returnCallback(function ($base_table, $base_alias) use ($database_contents) {
-      return new FakeSelect($base_table, $base_alias, $database_contents);
-    }));
-    $database->expects($this->any())->method('schema')->will($this->returnCallback(function () use ($database, $database_contents) {
-      return new FakeDatabaseSchema($database, $database_contents);
-    }));
-    $database->expects($this->any())->method('query')->will($this->throwException(new \Exception('Query is not supported')));
     $module_handler = $this->getMockBuilder('Drupal\Core\Extension\ModuleHandlerInterface')
       ->disableOriginalConstructor()
       ->getMock();
@@ -56,7 +47,7 @@ abstract class MigrateSqlSourceTestCase extends MigrateTestCase {
     // Need the test class, not the original because we need a setDatabase method. This is not pretty :/
     $plugin_class  = preg_replace('/^(Drupal\\\\\w+\\\\)Plugin\\\\migrate(\\\\source(\\\\.+)?\\\\)([^\\\\]+)$/', '\1Tests\2Test\4', static::PLUGIN_CLASS);
     $plugin = new $plugin_class($this->migrationConfiguration['source'], $this->migrationConfiguration['source']['plugin'], array(), $migration);
-    $plugin->setDatabase($database);
+    $plugin->setDatabase($this->getDatabase($this->databaseContents + array('test_map' => array())));
     $plugin->setModuleHandler($module_handler);
     $migration->expects($this->any())
       ->method('getSourcePlugin')
@@ -71,7 +62,7 @@ abstract class MigrateSqlSourceTestCase extends MigrateTestCase {
   }
 
   public function testRetrieval() {
-    $this->queryResultTest($this->source);
+    $this->queryResultTest($this->source, $this->expectedResults);
   }
 
   /**

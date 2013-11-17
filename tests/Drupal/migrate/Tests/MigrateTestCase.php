@@ -23,8 +23,6 @@ abstract class MigrateTestCase extends UnitTestCase {
 
   protected $migrationConfiguration = array();
 
-  protected $expectedResults = array();
-
   /**
    * Retrieve a mocked migration.
    *
@@ -54,22 +52,60 @@ abstract class MigrateTestCase extends UnitTestCase {
   }
 
   /**
+   * @return \Drupal\Core\Database\Connection
+   */
+  protected function getDatabase($database_contents) {
+    $database = $this->getMockBuilder('Drupal\Core\Database\Connection')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $database->databaseContents = &$database_contents;
+    $database->expects($this->any())
+      ->method('select')->will($this->returnCallback(function ($base_table, $base_alias) use (&$database_contents) {
+      return new FakeSelect($base_table, $base_alias, $database_contents);
+    }));
+    $database->expects($this->any())
+      ->method('schema')
+      ->will($this->returnCallback(function () use (&$database_contents) {
+      return new FakeDatabaseSchema($database_contents);
+    }));
+    $database->expects($this->any())
+      ->method('insert')
+      ->will($this->returnCallback(function ($table) use (&$database_contents) {
+      return new FakeInsert($database_contents, $table);
+    }));
+    $database->expects($this->any())
+      ->method('update')
+      ->will($this->returnCallback(function ($table) use (&$database_contents) {
+      return new FakeUpdate($database_contents, $table);
+    }));
+    $database->expects($this->any())
+      ->method('merge')
+      ->will($this->returnCallback(function ($table) use (&$database_contents) {
+      return new FakeMerge($database_contents, $table);
+    }));
+    $database->expects($this->any())
+      ->method('query')
+      ->will($this->throwException(new \Exception('Query is not supported')));
+    return $database;
+  }
+
+  /**
    * Tests a query
    *
    * @param array|\Traversable
    *   The countable. foreach-able actual results if a query is being run.
    */
-  public function queryResultTest($iter) {
-    $this->assertSame(count($this->expectedResults), count($iter), 'Number of results match');
+  public function queryResultTest($iter, $expected_results) {
+    $this->assertSame(count($expected_results), count($iter), 'Number of results match');
     $count = 0;
     foreach ($iter as $data_row) {
-      $expected_row = $this->expectedResults[$count];
+      $expected_row = $expected_results[$count];
       $count++;
       foreach ($expected_row as $key => $expected_value) {
         $this->retrievalAssertHelper($expected_value, $this->getValue($data_row, $key), sprintf('Value matches for key "%s"', $key));
       }
     }
-    $this->assertSame(count($this->expectedResults), $count);
+    $this->assertSame(count($expected_results), $count);
   }
 
   /**

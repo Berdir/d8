@@ -25,11 +25,13 @@ class FakeUpdate extends Update {
 
   /**
    * Constructs a FakeUpdate object.
+   * @param \Drupal\Core\Database\Connection $database_contents
+   * @param string $table
    */
-  public function __construct($table, $database_contents) {
+  public function __construct(&$database_contents, $table) {
     $this->table = $table;
     $this->condition = new Condition('AND');
-    $this->databaseContents = $database_contents;
+    $this->databaseContents = &$database_contents;
   }
 
   /**

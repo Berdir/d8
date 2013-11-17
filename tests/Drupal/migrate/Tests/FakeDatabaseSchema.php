@@ -17,8 +17,8 @@ class FakeDatabaseSchema extends Schema {
    */
   protected $databaseContents;
 
-  public function __construct($connection, $database_contents) {
-    parent::__construct($connection);
+  public function __construct($database_contents) {
+    $this->uniqueIdentifier = uniqid('', TRUE);
     // @todo Maybe we can generate an internal representation.
     $this->databaseContents = $database_contents;
   }
@@ -68,7 +68,7 @@ class FakeDatabaseSchema extends Schema {
   }
 
   public function createTable($name, $table) {
-    throw new \Exception(sprintf('Unsupported method "%s"', __METHOD__));
+    #throw new \Exception(sprintf('Unsupported method "%s"', __METHOD__));
   }
 
   public function dropField($table, $field) {

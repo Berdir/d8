@@ -24,9 +24,12 @@ class FakeInsert extends Insert {
 
   /**
    * Constructs a fake insert object.
+   * @param \Drupal\Core\Database\Connection $database_contents
+   * @param string $table
+   * @param array $options
    */
-  public function __construct($table, $database_contents = array(), array $options = array()) {
-    $this->databaseContents = $database_contents;
+  public function __construct(&$database_contents, $table, array $options = array()) {
+    $this->databaseContents = &$database_contents;
     $this->table = $table;
   }
 
@@ -53,5 +56,5 @@ class FakeInsert extends Insert {
     }
   }
 
-  
+
 }
