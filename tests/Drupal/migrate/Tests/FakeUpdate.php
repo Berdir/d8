@@ -40,13 +40,15 @@ class FakeUpdate extends Update {
   public function execute() {
     $affected = 0;
     if (count($this->condition) && isset($this->databaseContents[$this->table])) {
-      foreach ($this->databaseContents[$this->table] as $key  => $row_array) {
+      $fields = $this->fields;
+      $condition = $this->condition;
+      array_walk($this->databaseContents[$this->table], function (&$row_array) use ($fields, $condition, &$affected) {
         $row = new DatabaseRow($row_array);
-        if (ConditionResolver::matchGroup($row, $this->condition)) {
-          $this->databaseContents[$this->table][$key] = $this->fields + $this->databaseContents[$this->table][$key];
+        if (ConditionResolver::matchGroup($row, $condition)) {
+          $row_array = $fields + $row_array;
           $affected++;
         }
-      }
+      });
     }
     return $affected;
   }
