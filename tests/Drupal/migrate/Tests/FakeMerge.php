@@ -29,11 +29,13 @@ class FakeMerge extends Merge {
       $first_row = reset($this->databaseContents[$this->table]);
       list($field, ) = each($first_row);
       $select = new FakeSelect($this->conditionTable, 'c', $this->databaseContents);
-      $select = $select
+      $count = $select
         ->fields('c', array($field))
         ->condition($this->condition)
-        ->countQuery();
-      if ($select->execute()->fetchField()) {
+        ->countQuery()
+        ->execute()
+        ->fetchField();
+      if ($count) {
         $update = new FakeUpdate($this->databaseContents, $this->table);
         $update
           ->fields($this->updateFields)
