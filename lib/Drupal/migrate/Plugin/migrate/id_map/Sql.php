@@ -478,21 +478,21 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
    * {@inheritdoc}
    */
   public function processedCount() {
-    $query = $this->getDatabase()->select($this->mapTable);
-    $query->addExpression('COUNT(*)', 'count');
-    $count = $query->execute()->fetchField();
-    return $count;
+    return $this->getDatabase()->select($this->mapTable)
+      ->countQuery()
+      ->execute()
+      ->fetchField();
   }
 
   /**
    * {@inheritdoc}
    */
   public function importedCount() {
-    $query = $this->getDatabase()->select($this->mapTable);
-    $query->addExpression('COUNT(*)', 'count');
-    $query->condition('needs_update', array(MigrateIdMapInterface::STATUS_IMPORTED, MigrateIdMapInterface::STATUS_NEEDS_UPDATE), 'IN');
-    $count = $query->execute()->fetchField();
-    return $count;
+    return $this->getDatabase()->select($this->mapTable)
+      ->condition('needs_update', array(MigrateIdMapInterface::STATUS_IMPORTED, MigrateIdMapInterface::STATUS_NEEDS_UPDATE), 'IN')
+      ->countQuery()
+      ->execute()
+      ->fetchField();
   }
 
   /**
@@ -502,32 +502,32 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
    *   The number of items which need updating.
    */
   public function updateCount() {
-    $query = $this->getDatabase()->select($this->mapTable);
-    $query->addExpression('COUNT(*)', 'count');
-    $query->condition('needs_update', MigrateIdMapInterface::STATUS_NEEDS_UPDATE);
-    $count = $query->execute()->fetchField();
-    return $count;
+    return $this->getDatabase()->select($this->mapTable)
+      ->condition('needs_update', MigrateIdMapInterface::STATUS_NEEDS_UPDATE)
+      ->countQuery()
+      ->execute()
+      ->fetchField();
   }
 
   /**
    * {@inheritdoc}
    */
   public function errorCount() {
-    $query = $this->getDatabase()->select($this->mapTable);
-    $query->addExpression('COUNT(*)', 'count');
-    $query->condition('needs_update', MigrateIdMapInterface::STATUS_FAILED);
-    $count = $query->execute()->fetchField();
-    return $count;
+    return $this->getDatabase()->select($this->mapTable)
+      ->condition('needs_update', MigrateIdMapInterface::STATUS_FAILED)
+      ->countQuery()
+      ->execute()
+      ->fetchField();
   }
 
   /**
    * {@inheritdoc}
    */
   public function messageCount() {
-    $query = $this->getDatabase()->select($this->messageTable);
-    $query->addExpression('COUNT(*)', 'count');
-    $count = $query->execute()->fetchField();
-    return $count;
+    return $this->getDatabase()->select($this->messageTable)
+      ->countQuery()
+      ->execute()
+      ->fetchField();
   }
 
   /**
