@@ -60,6 +60,13 @@ class MigrateSqlIdMapTestCase extends MigrateTestCase {
     );
     $row = new Row($source, array('source_id_property' => array()));
     $this->idMap->saveIdMapping($row, array('destination_id_property' => 2));
-    $this->assertSame(1, count($this->database->databaseContents));
+    $expected_result = array(array(
+      'sourceid1' => 'source_value',
+      'destid1' => 2,
+      'needs_update' => 0,
+      'rollback_action' => 0,
+      'hash' => '',
+    ));
+    $this->queryResultTest($this->database->databaseContents['migrate_map_sql_idmap_test'], $expected_result);
   }
 }
