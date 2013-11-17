@@ -60,7 +60,7 @@ abstract class MigrateTestCase extends UnitTestCase {
       ->getMock();
     $database->databaseContents = &$database_contents;
     $database->expects($this->any())
-      ->method('select')->will($this->returnCallback(function ($base_table, $base_alias) use (&$database_contents) {
+      ->method('select')->will($this->returnCallback(function ($base_table, $base_alias) use ($database_contents) {
       return new FakeSelect($base_table, $base_alias, $database_contents);
     }));
     $database->expects($this->any())

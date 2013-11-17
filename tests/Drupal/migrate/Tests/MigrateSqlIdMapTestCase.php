@@ -7,7 +7,6 @@
 
 namespace Drupal\migrate\Tests;
 
-use Drupal\migrate\Plugin\migrate\id_map\Sql;
 use Drupal\migrate\Row;
 
 class MigrateSqlIdMapTestCase extends MigrateTestCase {
