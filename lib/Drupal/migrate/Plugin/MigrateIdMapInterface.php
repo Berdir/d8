@@ -37,9 +37,9 @@ interface MigrateIdMapInterface extends PluginInspectionInterface {
   /**
    * Saves a mapping from the source identifiers to the destination identifiers.
    *
-   * Called upon import of one record, we record a mapping from the source ID
+   * Called upon import of one row, we record a mapping from the source ID
    * to the destination ID. Also may be called, setting the third parameter to
-   * NEEDS_UPDATE, to signal an existing record should be remigrated.
+   * NEEDS_UPDATE, to signal an existing record should be re-migrated.
    *
    * @param \Drupal\migrate\Row $row
    *   The raw source data. We use the ID map derived from the source object
@@ -57,7 +57,7 @@ interface MigrateIdMapInterface extends PluginInspectionInterface {
    * Saves a message related to a source record in the migration message table.
    *
    * @param array $source_id_values
-   *   Source ID of the record in error.
+   *   The source identifier values of the record in error.
    * @param string $message
    *   The message to record.
    * @param int $level
@@ -119,29 +119,29 @@ interface MigrateIdMapInterface extends PluginInspectionInterface {
   /**
    * Deletes the map and message entries for a given source record.
    *
-   * @param array $source_id
-   *   The source ID of the record to delete.
+   * @param array $source_id_values
+   *   The source identifier values of the record to delete.
    * @param bool $messages_only
    *   TRUE to only delete the migrate messages.
    */
-  public function delete(array $source_id, $messages_only = FALSE);
+  public function delete(array $source_id_values, $messages_only = FALSE);
 
   /**
    * Deletes the map and message table entries for a given destination row.
    *
-   * @param array $destination_id
-   *   The ID of the destination we should do the deletes for.
+   * @param array $destination_id_values
+   *   The destination identifier values we should do the deletes for.
    */
-  public function deleteDestination(array $destination_id);
+  public function deleteDestination(array $destination_id_values);
 
   /**
    * Deletes the map and message entries for a set of given source records.
    *
-   * @param array $source_ids
-   *   The IDs of the sources we should do the deletes for. Each array member is
-   *   an array of identifier fields for one source row.
+   * @param array $source_id_values
+   *   The identifier values of the sources we should do the deletes for. Each
+   *   array member is an array of identifier values for one source row.
    */
-  public function deleteBulk(array $source_ids);
+  public function deleteBulk(array $source_id_values);
 
   /**
    * Clears all messages from the map.
@@ -149,21 +149,21 @@ interface MigrateIdMapInterface extends PluginInspectionInterface {
   public function clearMessages();
 
   /**
-   * Retrieves a row from the map table, given a source ID.
+   * Retrieves a row from the map table based on source identifier values.
    *
-   * @param array $source_ids
-   *   A list of source IDs, even if there is just one source ID.
+   * @param array $source_id_values
+   *   The source identifier values of the record to retrieve.
    *
    * @return array
    *   The raw row data as an associative array.
    */
-  public function getRowBySource(array $source_ids);
+  public function getRowBySource(array $source_id_values);
 
   /**
    * Retrieves a row by the destination identifiers.
    *
    * @param array $destination_id_values
-   *   A list of destination IDs, even there is just one destination ID.
+   *   The destination identifier values of the record to retrieve.
    *
    * @return array
    *   The row(s) of data.
@@ -187,13 +187,13 @@ interface MigrateIdMapInterface extends PluginInspectionInterface {
    * Given a (possibly multi-field) destination identifier value, return the
    * (possibly multi-field) source identifier value mapped to it.
    *
-   * @param array $destination_ids
-   *   Array of destination identifier values.
+   * @param array $destination_id_values
+   *   The destination identifier values of the record.
    *
    * @return array
-   *   Array of source identifier values, or NULL on failure.
+   *   The source identifier values of the record, or NULL on failure.
    */
-  public function lookupSourceID(array $destination_ids);
+  public function lookupSourceID(array $destination_id_values);
 
   /**
    * Looks up the destination identifier.
@@ -201,11 +201,11 @@ interface MigrateIdMapInterface extends PluginInspectionInterface {
    * Given a (possibly multi-field) source identifier value, return the
    * (possibly multi-field) destination identifier value it is mapped to.
    *
-   * @param array $source_id_values
-   *   Array of source identifier values.
+   * @param array $destination_id_values
+   *   The source identifier values of the record.
    *
    * @return array
-   *   Array of destination identifier values, or NULL on failure.
+   *   The destination identifier values of the record, or NULL on failure.
    */
   public function lookupDestinationID(array $source_id_values);
 
@@ -231,4 +231,11 @@ interface MigrateIdMapInterface extends PluginInspectionInterface {
    */
   public function setMessage(MigrateMessageInterface $message);
 
+  /**
+   * Sets a specified record to be updated, if it exists.
+   *
+   * @param $source_id_values
+   *   The source identifier values of the record.
+   */
+  public function setUpdate(array $source_id_values);
 }
