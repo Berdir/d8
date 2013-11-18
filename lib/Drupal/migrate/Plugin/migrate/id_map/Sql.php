@@ -146,36 +146,6 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
   }
 
   /**
-   * Gets the name of the map table.
-   *
-   * @return string
-   *   The name of the map table.
-   */
-  public function getMapTable() {
-    return $this->mapTable;
-  }
-
-  /**
-   * Gets the name of the message table.
-   *
-   * @return string
-   *   The name of the message table.
-   */
-  public function getMessageTable() {
-    return $this->messageTable;
-  }
-
-  /**
-   * Returns the current key.
-   *
-   * @return array
-   *   The current key.
-   */
-  public function getCurrentKey() {
-    return $this->currentKey;
-  }
-
-  /**
    * Qualifying the map table name with the database name makes cross-db joins
    * possible. Note that, because prefixes are applied after we do this (i.e.,
    * it will prefix the string we return), we do not qualify the table if it has

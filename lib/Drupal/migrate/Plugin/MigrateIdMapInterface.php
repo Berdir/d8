@@ -210,7 +210,7 @@ interface MigrateIdMapInterface extends PluginInspectionInterface {
   /**
    * Gets the qualified map table.
    *
-   * @todo Change this to not be for SQL only.
+   * @todo Remove this as this is SQL only and so doesn't belong to the interface.
    */
   public function getQualifiedMapTable();
 
