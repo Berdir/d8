@@ -38,9 +38,6 @@ use Drupal\migrate\Plugin\MigrateIdMapInterface;
  *     "weight" = "weight",
  *     "uuid" = "uuid"
  *   },
- *   links = {
- *     "edit-form" = "admin/config/migration/{migration_entity}"
- *   }
  * )
  */
 class Migration extends ConfigEntityBase implements MigrationInterface {
