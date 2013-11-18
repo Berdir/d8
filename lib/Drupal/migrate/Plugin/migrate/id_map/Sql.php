@@ -469,38 +469,42 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
   }
 
   /**
-   * Returns a count of items which are marked as needing update.
-   *
-   * @return int
-   *   The number of items which need updating.
+   * {@inheritdoc}
    */
   public function updateCount() {
-    return $this->getDatabase()->select($this->mapTable)
-      ->condition('needs_update', MigrateIdMapInterface::STATUS_NEEDS_UPDATE)
-      ->countQuery()
-      ->execute()
-      ->fetchField();
+    return $this->countHelper(MigrateIdMapInterface::STATUS_NEEDS_UPDATE);
   }
 
   /**
    * {@inheritdoc}
    */
   public function errorCount() {
-    return $this->getDatabase()->select($this->mapTable)
-      ->condition('needs_update', MigrateIdMapInterface::STATUS_FAILED)
-      ->countQuery()
-      ->execute()
-      ->fetchField();
+    return $this->countHelper(MigrateIdMapInterface::STATUS_FAILED);
   }
 
   /**
    * {@inheritdoc}
    */
   public function messageCount() {
-    return $this->getDatabase()->select($this->messageTable)
-      ->countQuery()
-      ->execute()
-      ->fetchField();
+    return $this->countHelper(NULL, $this->messageTable);
+  }
+
+  /**
+   * Counts records in a table.
+   *
+   * @param $status
+   *   An integer for the needs_update column.
+   * @param $table
+   *   The table to work
+   * @return int
+   *   The number of records.
+   */
+  protected function countHelper($status, $table = NULL) {
+    $query = $this->getDatabase()->select($table ?: $this->mapTable);
+    if (isset($status)) {
+      $query->condition('needs_update', $status);
+    }
+    return $query->countQuery()->execute()->fetchField();
   }
 
   /**

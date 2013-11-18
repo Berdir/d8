@@ -91,6 +91,15 @@ interface MigrateIdMapInterface extends PluginInspectionInterface {
    */
   public function importedCount();
 
+
+  /**
+   * Returns a count of items which are marked as needing update.
+   *
+   * @return int
+   *   The number of items which need updating.
+   */
+  public function updateCount();
+
   /**
    * Returns the number of items that failed to import.
    *
