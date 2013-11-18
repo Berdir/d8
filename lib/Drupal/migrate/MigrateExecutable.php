@@ -224,11 +224,11 @@ class MigrateExecutable {
     }
     while ($source->valid()) {
       $row = $source->current();
-      $this->sourceIdValues = $row->getSourceIdValues();
-
-      // Wipe old messages, and save any new messages.
-      $id_map->delete($row->getSourceIdValues(), TRUE);
-      $this->saveQueuedMessages();
+      if ($this->sourceIdValues = $row->getSourceIdValues()) {
+        // Wipe old messages, and save any new messages.
+        $id_map->delete($row->getSourceIdValues(), TRUE);
+        $this->saveQueuedMessages();
+      }
 
       $this->processRow($row);
 
