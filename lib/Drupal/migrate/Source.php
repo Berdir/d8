@@ -220,9 +220,6 @@ class Source implements \Iterator, \Countable {
   protected function getIterator() {
     if (!isset($this->iterator)) {
       $this->iterator = $this->migration->getSourcePlugin()->getIterator();
-      if (!$this->iterator) {
-        throw new \Exception('Invalid source iterator.');
-      }
     }
     return $this->iterator;
   }

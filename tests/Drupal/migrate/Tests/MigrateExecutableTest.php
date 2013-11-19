@@ -70,7 +70,17 @@ class MigrateExecutableTest extends MigrateTestCase {
    * Tests an import with an incomplete rewinding.
    */
   public function testImportWithFailingRewind() {
+    $iterator = $this->getMock('\Iterator');
+    $iterator->expects($this->once())
+      ->method('valid')
+      ->will($this->returnCallback(function() {
+        throw new \Exception('invalid source iteration');
+      }));
     $source = $this->getMock('Drupal\migrate\Plugin\MigrateSourceInterface');
+    $source->expects($this->any())
+      ->method('getIterator')
+      ->will($this->returnValue($iterator));
+
     $this->migration->expects($this->any())
       ->method('getSourcePlugin')
       ->will($this->returnValue($source));
@@ -78,7 +88,7 @@ class MigrateExecutableTest extends MigrateTestCase {
     // Ensure that a message with the proper message was added.
     $this->message->expects($this->once())
       ->method('display')
-      ->with('Migration failed with source plugin exception: Invalid source iterator.');
+      ->with('Migration failed with source plugin exception: invalid source iteration');
 
     $result = $this->executable->import();
     $this->assertEquals(MigrationInterface::RESULT_FAILED, $result);
