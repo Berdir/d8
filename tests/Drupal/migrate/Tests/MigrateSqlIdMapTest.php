@@ -61,9 +61,9 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
    *
    * Create two id mappings and update the second to verify that:
    *
-   * - mergeon empty tables work.
-   * - merge-insert on nonempty tables work.
-   * - merge-update on nonempty tables work.
+   * - saving new to empty tables work.
+   * - saving new to nonempty tables work.
+   * - updating work.
    */
   public function testSsaveIdMapping() {
     $source = array(
