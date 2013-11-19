@@ -72,4 +72,21 @@ class MigrateSystemConfigsTest extends MigrateTestBase {
     $config = \Drupal::config('system.rss');
     $this->assertIdentical($config->get('items.limit'), 10);
   }
+
+  /**
+   * Tests migration of system (Performance) variables to system.performance.yml.
+   */
+  public function testSystemPerformance() {
+    $migration = entity_load('migration', 'd6_system_performance');
+    $dumps = array(
+      drupal_get_path('module', 'migrate') . '/lib/Drupal/migrate/Tests/Dump/Drupal6SystemPerformance.php',
+    );
+    $this->prepare($migration, $dumps);
+    $executable = new MigrateExecutable($migration, new MigrateMessage());
+    $executable->import();
+    $config = \Drupal::config('system.performance');
+    $this->assertIdentical($config->get('css.preprocess'), 0);
+    $this->assertIdentical($config->get('js.preprocess'), 0);
+    $this->assertIdentical($config->get('cache.page.max_age'), 0);
+  }
 }
