@@ -37,7 +37,7 @@ use Drupal\migrate\Plugin\MigrateIdMapInterface;
  *     "label" = "label",
  *     "weight" = "weight",
  *     "uuid" = "uuid"
- *   },
+ *   }
  * )
  */
 class Migration extends ConfigEntityBase implements MigrationInterface {

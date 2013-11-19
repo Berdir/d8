@@ -10,6 +10,7 @@ use Drupal\migrate\Plugin\migrate\process\TestGet;
 
 /**
  * @group migrate
+ * @group Drupal
  */
 class GetTest extends MigrateProcessTestCase {
 

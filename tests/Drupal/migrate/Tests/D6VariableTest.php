@@ -9,6 +9,7 @@ namespace Drupal\migrate\Tests;
 
 /**
  * @group migrate
+ * @group Drupal
  */
 class D6VariableTest extends MigrateSqlSourceTestCase {
 

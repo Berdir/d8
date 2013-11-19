@@ -9,7 +9,8 @@ namespace Drupal\migrate\Tests\process;
 
 use Drupal\migrate\Tests\MigrateTestCase;
 
-class MigrateProcessTestCase extends MigrateTestCase {
+abstract class MigrateProcessTestCase extends MigrateTestCase {
+
   /**
    * @var \Drupal\migrate\Plugin\migrate\process\TestGet
    */
