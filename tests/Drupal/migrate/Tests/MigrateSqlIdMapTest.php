@@ -53,7 +53,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
     $id_map = new TestSqlIdmap($this->database, array(), 'sql', array(), $migration);
     $migration->expects($this->any())
       ->method('getIdMap')
-      ->will($this->returnValue($this->idMap));
+      ->will($this->returnValue($id_map));
     return $id_map;
   }
 
