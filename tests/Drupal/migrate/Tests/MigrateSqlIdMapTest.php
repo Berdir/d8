@@ -14,13 +14,6 @@ use Drupal\migrate\Row;
  */
 class MigrateSqlIdMapTest extends MigrateTestCase {
 
-  /**
-   * @var \Drupal\migrate\Plugin\MigrateIdMapInterface
-   */
-  protected $idMap;
-
-  protected $mapJoinable = FALSE;
-
   protected $migrationConfiguration = array(
     'id' => 'sql_idmap_test',
     'sourceIds' => array(
@@ -47,13 +40,14 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
     );
   }
 
-  public function setUp() {
+  public function getIdMap($database_contents = array()) {
     $migration = $this->getMigration();
-    $this->database = $this->getDatabase(array());
-    $this->idMap = new TestSqlIdmap($this->database, array(), 'sql', array(), $migration);
+    $this->database = $this->getDatabase($database_contents);
+    $id_map = new TestSqlIdmap($this->database, array(), 'sql', array(), $migration);
     $migration->expects($this->any())
       ->method('getIdMap')
       ->will($this->returnValue($this->idMap));
+    return $id_map;
   }
 
   /**
@@ -70,7 +64,8 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
       'source_id_property' => 'source_value',
     );
     $row = new Row($source, array('source_id_property' => array()));
-    $this->idMap->saveIdMapping($row, array('destination_id_property' => 2));
+    $id_map = $this->getIdMap();
+    $id_map->saveIdMapping($row, array('destination_id_property' => 2));
     $expected_defaults = array(
       'needs_update' => 0,
       'rollback_action' => 0,
@@ -85,13 +80,13 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
       'source_id_property' => 'source_value_1',
     );
     $row = new Row($source, array('source_id_property' => array()));
-    $this->idMap->saveIdMapping($row, array('destination_id_property' => 3));
+    $id_map->saveIdMapping($row, array('destination_id_property' => 3));
     $expected_result[] = array(
       'sourceid1' => 'source_value_1',
       'destid1' => 3,
     ) + $expected_defaults;
     $this->queryResultTest($this->database->databaseContents['migrate_map_sql_idmap_test'], $expected_result);
-    $this->idMap->saveIdMapping($row, array('destination_id_property' => 4));
+    $id_map->saveIdMapping($row, array('destination_id_property' => 4));
     $expected_result[1]['destid1'] = 4;
     $this->queryResultTest($this->database->databaseContents['migrate_map_sql_idmap_test'], $expected_result);
   }
