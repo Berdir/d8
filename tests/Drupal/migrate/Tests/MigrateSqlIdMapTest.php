@@ -40,6 +40,13 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
     );
   }
 
+  /**
+   * @param array $database_contents
+   *   An array keyed by table names. Value are list of rows where each row is
+   *   an associative array of field => value.
+   *
+   * @return TestSqlIdmap
+   */
   public function getIdMap($database_contents = array()) {
     $migration = $this->getMigration();
     $this->database = $this->getDatabase($database_contents);
