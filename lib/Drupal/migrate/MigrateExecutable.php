@@ -353,9 +353,9 @@ class MigrateExecutable {
   }
 
   public function getTimeLimit() {
-    if (isset($this->options['limit']) &&
-        ($this->options['limit']['unit'] == 'seconds' || $this->options['limit']['unit'] == 'second')) {
-      return $this->options['limit']['value'];
+    $limit = $this->migration->get('limit');
+    if (isset($limit['unit']) && isset($limit['value']) && ($limit['unit'] == 'seconds' || $limit['unit'] == 'second')) {
+      return $limit['value'];
     }
     else {
       return NULL;

@@ -42,6 +42,13 @@ class MigrateExecutableTest extends MigrateTestCase {
    */
   protected $executable;
 
+  protected $mapJoinable = FALSE;
+
+  protected $migrationConfiguration = array(
+    'id' => 'test',
+    'limit' => array('units' => 'seconds', 'value' => 5),
+  );
+
   /**
    * {@inheritdoc}
    */
@@ -54,7 +61,7 @@ class MigrateExecutableTest extends MigrateTestCase {
   }
 
   protected function setUp() {
-    $this->migration = $this->getMock('Drupal\migrate\Entity\MigrationInterface');
+    $this->migration = $this->getMigration();
     $this->message = $this->getMock('Drupal\migrate\MigrateMessageInterface');
     $id_map = $this->getMock('Drupal\migrate\Plugin\MigrateIdMapInterface');
 
