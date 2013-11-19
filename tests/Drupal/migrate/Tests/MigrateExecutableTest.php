@@ -78,7 +78,7 @@ class MigrateExecutableTest extends MigrateTestCase {
     // Ensure that a message with the proper message was added.
     $this->message->expects($this->once())
       ->method('display')
-      ->with('Migration failed with source plugin exception: invalid source iteration');
+      ->with('Migration failed with source plugin exception: Invalid source iterator.');
 
     $result = $this->executable->import();
     $this->assertEquals(MigrationInterface::RESULT_FAILED, $result);
