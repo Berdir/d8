@@ -14,6 +14,8 @@ use Drupal\migrate\Row;
  */
 class MigrateSqlIdMapTest extends MigrateTestCase {
 
+  protected $mapJoinable = FALSE;
+
   protected $migrationConfiguration = array(
     'id' => 'sql_idmap_test',
     'sourceIds' => array(
