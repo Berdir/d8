@@ -43,11 +43,14 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
   }
 
   /**
+   * Creates a test sql id map plugin.
+   *
    * @param array $database_contents
    *   An array keyed by table names. Value are list of rows where each row is
    *   an associative array of field => value.
    *
-   * @return TestSqlIdmap
+   * @return \Drupal\migrate\Tests\TestSqlIdmap
+   *   A sql id map plugin test instance.
    */
   public function getIdMap($database_contents = array()) {
     $migration = $this->getMigration();
@@ -80,10 +83,12 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
       'rollback_action' => 0,
       'hash' => '',
     );
-    $expected_result = array(array(
-      'sourceid1' => 'source_value',
-      'destid1' => 2,
-    ) + $expected_defaults);
+    $expected_result = array(
+      array(
+        'sourceid1' => 'source_value',
+        'destid1' => 2,
+      ) + $expected_defaults,
+    );
     $this->queryResultTest($this->database->databaseContents['migrate_map_sql_idmap_test'], $expected_result);
     $source = array(
       'source_id_property' => 'source_value_1',
@@ -99,4 +104,15 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
     $expected_result[1]['destid1'] = 4;
     $this->queryResultTest($this->database->databaseContents['migrate_map_sql_idmap_test'], $expected_result);
   }
+
+  /**
+   * Tests the sql id map set message method.
+   */
+  public function testSetMessage() {
+    $message = $this->getMock('Drupal\migrate\MigrateMessageInterface');
+    $id_map = $this->getIdMap();
+    $id_map->setMessage($message);
+    $this->assertAttributeEquals($message, 'message', $id_map);
+  }
+
 }
