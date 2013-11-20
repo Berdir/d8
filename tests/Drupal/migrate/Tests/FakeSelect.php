@@ -169,7 +169,6 @@ class FakeSelect extends Select {
    *   of JOINs.
    */
   protected function executeJoins() {
-    // @TODO add support for all_fields.
     $fields = array();
     foreach ($this->fields as $field_info) {
       $this->fieldsWithTable[$field_info['table'] . '.' . $field_info['field']] = $field_info;
@@ -508,4 +507,19 @@ class FakeSelect extends Select {
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function fields($table_alias, array $fields = array()) {
+    if (!$fields) {
+      $table = $this->tables[$table_alias]['table'];
+      if (!empty($this->databaseContents[$table])) {
+        $fields = array_keys(reset($this->databaseContents[$table]));
+      }
+      else {
+        throw new \Exception('All fields on empty table is not supported.');
+      }
+    }
+    return parent::fields($table_alias, $fields);
+  }
 }
