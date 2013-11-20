@@ -63,7 +63,7 @@ class FakeSelect extends Select {
    * @param string $conjunction
    *   The operator to use to combine conditions: 'AND' or 'OR'.
    */
-  public function __construct($table, $alias, array $database_contents, $conjunction = 'AND') {
+  public function __construct($table, $alias, array &$database_contents, $conjunction = 'AND') {
     $this->addJoin(NULL, $table, $alias);
     $this->where = new Condition($conjunction);
     $this->having = new Condition($conjunction);
