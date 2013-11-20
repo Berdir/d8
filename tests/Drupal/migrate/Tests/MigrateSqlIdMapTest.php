@@ -52,7 +52,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
    * @return \Drupal\migrate\Tests\TestSqlIdmap
    *   A sql id map plugin test instance.
    */
-  public function getIdMap($database_contents = array()) {
+  protected function getIdMap($database_contents = array()) {
     $migration = $this->getMigration();
     $this->database = $this->getDatabase($database_contents);
     $id_map = new TestSqlIdmap($this->database, array(), 'sql', array(), $migration);
@@ -60,6 +60,14 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
       ->method('getIdMap')
       ->will($this->returnValue($id_map));
     return $id_map;
+  }
+
+  protected function idMapDefaults() {
+    return array(
+      'needs_update' => 0,
+      'rollback_action' => 0,
+      'hash' => '',
+    );
   }
 
   /**
@@ -78,16 +86,11 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
     $row = new Row($source, array('source_id_property' => array()));
     $id_map = $this->getIdMap();
     $id_map->saveIdMapping($row, array('destination_id_property' => 2));
-    $expected_defaults = array(
-      'needs_update' => 0,
-      'rollback_action' => 0,
-      'hash' => '',
-    );
     $expected_result = array(
       array(
         'sourceid1' => 'source_value',
         'destid1' => 2,
-      ) + $expected_defaults,
+      ) + $this->idMapDefaults(),
     );
     $this->queryResultTest($this->database->databaseContents['migrate_map_sql_idmap_test'], $expected_result);
     $source = array(
@@ -98,7 +101,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
     $expected_result[] = array(
       'sourceid1' => 'source_value_1',
       'destid1' => 3,
-    ) + $expected_defaults;
+    ) + $this->idMapDefaults();
     $this->queryResultTest($this->database->databaseContents['migrate_map_sql_idmap_test'], $expected_result);
     $id_map->saveIdMapping($row, array('destination_id_property' => 4));
     $expected_result[1]['destid1'] = 4;
@@ -115,4 +118,25 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
     $this->assertAttributeEquals($message, 'message', $id_map);
   }
 
+  /**
+   * Test the getRowBySource method when it succeeds.
+   */
+  public function testGetSourceByIdSucceeds() {
+    $row = array(
+      'sourceid1' => 'source_id_value_1',
+      'sourceid2' => 'source_id_value_2',
+      'destid1' => 'destination_id_value_1',
+    ) + $this->idMapDefaults();
+    $database_contents['migrate_map_sql_idmap_test'][] = $row;
+    $row = array(
+      'sourceid1' => 'source_id_value_3',
+      'sourceid2' => 'source_id_value_4',
+      'destid1' => 'destination_id_value_1',
+    ) + $this->idMapDefaults();
+    $database_contents['migrate_map_sql_idmap_test'][] = $row;
+    $source_id_values = array($row['sourceid1'], $row['sourceid2']);
+    $id_map = $this->getIdMap($database_contents);
+    $result_row = $id_map->getRowBySource($source_id_values);
+    $this->assertSame($row, $result_row);
+  }
 }
