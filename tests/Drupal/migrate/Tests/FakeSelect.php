@@ -182,6 +182,10 @@ class FakeSelect extends Select {
               'table' => $alias,
               'field' => $field,
             );
+            $this->fieldsWithTable["$alias.$field"] = array(
+              'table' => $alias,
+              'field' => $field,
+            );
           }
         }
       }
