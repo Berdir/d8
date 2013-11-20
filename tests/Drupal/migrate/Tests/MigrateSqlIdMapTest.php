@@ -79,7 +79,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
    * - saving new to nonempty tables work.
    * - updating work.
    */
-  public function testSsaveIdMapping() {
+  public function testSaveIdMapping() {
     $source = array(
       'source_id_property' => 'source_value',
     );
