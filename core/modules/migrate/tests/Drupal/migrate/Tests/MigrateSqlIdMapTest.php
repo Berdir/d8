@@ -139,4 +139,58 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
     $result_row = $id_map->getRowBySource($source_id_values);
     $this->assertSame($row, $result_row);
   }
+
+  /**
+   * Test the destination ID lookup method.
+   *
+   * Scenarios to test (for both hits and misses) are:
+   *
+   * - Single-value source ID to single-value destination ID.
+   * - Multi-value source ID to multi-value destination ID.
+   * - Single-value source ID to multi-value destination ID.
+   * - Multi-value source ID to single-value destination ID.
+   */
+  public function testLookupDestinationIDMapping() {
+    $this->performLookupDestinationIDTest(1, 1);
+    $this->performLookupDestinationIDTest(2, 2);
+    $this->performLookupDestinationIDTest(1, 2);
+    $this->performLookupDestinationIDTest(2, 1);
+  }
+
+  /**
+   * Actually perform the destination ID test with a given number of source
+   * and destination fields.
+   *
+   * @param $num_source_fields
+   * @param $num_destination_fields
+   */
+  protected function performLookupDestinationIDTest($num_source_fields, $num_destination_fields) {
+    // Adjust the migration configuration according to the number of source and
+    // destination fields.
+    $this->migrationConfiguration['sourceIds'] = array();
+    $this->migrationConfiguration['destinationIds'] = array();
+    $source_id_values = array();
+    $nonexistent_id_values = array();
+    $row = $this->idMapDefaults();
+    for ($i = 1; $i <= $num_source_fields; $i++) {
+      $row["sourceid$i"] = "source_id_value_$i";
+      $source_id_values[] = "source_id_value_$i";
+      $nonexistent_id_values[] = "nonexistent_source_id_value_$i";
+      $this->migrationConfiguration['sourceIds']["source_id_property_$i"] = array();
+    }
+    $expected_result = array();
+    for ($i = 1; $i <= $num_destination_fields; $i++) {
+      $row["destid$i"] = "destination_id_value_$i";
+      $expected_result[] = "destination_id_value_$i";
+      $this->migrationConfiguration['destinationIds']["destination_id_property_$i"] = array();
+    }
+    $database_contents['migrate_map_sql_idmap_test'][] = $row;
+    $id_map = $this->getIdMap($database_contents);
+    // Test for a valid hit.
+    $destination_id = array_values($id_map->lookupDestinationID($source_id_values));
+    $this->assertSame($expected_result, $destination_id);
+    // Test for a miss.
+    $destination_id = $id_map->lookupDestinationID($nonexistent_id_values);
+    $this->assertNull($destination_id);
+  }
 }
