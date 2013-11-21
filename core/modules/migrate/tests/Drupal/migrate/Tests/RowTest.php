@@ -124,7 +124,7 @@ class RowTest extends UnitTestCase {
     $test_id_map = array(
       'original_hash' => '',
       'hash' => '',
-      'needs_update' => MigrateIdMapInterface::STATUS_NEEDS_UPDATE,
+      'source_row_status' => MigrateIdMapInterface::STATUS_NEEDS_UPDATE,
     );
     $row->setIdMap($test_id_map);
     $this->assertTrue($row->needsUpdate());
@@ -139,7 +139,7 @@ class RowTest extends UnitTestCase {
     $test_id_map = array(
       'original_hash' => '',
       'hash' => '',
-      'needs_update' => MigrateIdMapInterface::STATUS_IMPORTED,
+      'source_row_status' => MigrateIdMapInterface::STATUS_IMPORTED,
     );
     $row->setIdMap($test_id_map);
     $this->assertFalse($row->needsUpdate());
@@ -149,7 +149,7 @@ class RowTest extends UnitTestCase {
     $test_id_map = array(
       'original_hash' => $random,
       'hash' => $random,
-      'needs_update' => MigrateIdMapInterface::STATUS_NEEDS_UPDATE,
+      'source_row_status' => MigrateIdMapInterface::STATUS_NEEDS_UPDATE,
     );
     $row->setIdMap($test_id_map);
     $this->assertFalse($row->changed());
@@ -158,7 +158,7 @@ class RowTest extends UnitTestCase {
     $test_id_map = array(
       'original_hash' => $this->randomName(),
       'hash' => $this->randomName(),
-      'needs_update' => MigrateIdMapInterface::STATUS_NEEDS_UPDATE,
+      'source_row_status' => MigrateIdMapInterface::STATUS_NEEDS_UPDATE,
     );
     $row->setIdMap($test_id_map);
     $this->assertTrue($row->changed());
@@ -175,7 +175,7 @@ class RowTest extends UnitTestCase {
     $test_id_map = array(
       'original_hash' => '',
       'hash' => '',
-      'needs_update' => MigrateIdMapInterface::STATUS_NEEDS_UPDATE,
+      'source_row_status' => MigrateIdMapInterface::STATUS_NEEDS_UPDATE,
     );
     $row->setIdMap($test_id_map);
     $this->assertEquals($test_id_map, $row->getIdMap());

@@ -215,7 +215,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
           $mapkey = 'destid' . $count++;
           $fields[$mapkey] = $field_schema;
         }
-        $fields['needs_update'] = array(
+        $fields['source_row_status'] = array(
           'type' => 'int',
           'size' => 'tiny',
           'unsigned' => TRUE,
@@ -343,7 +343,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
     $rows = array();
     $result = $this->getDatabase()->select($this->mapTable, 'map')
                       ->fields('map')
-                      ->condition('needs_update', MigrateIdMapInterface::STATUS_NEEDS_UPDATE)
+                      ->condition('source_row_status', MigrateIdMapInterface::STATUS_NEEDS_UPDATE)
                       ->range(0, $count)
                       ->execute();
     foreach ($result as $row) {
@@ -383,7 +383,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
   /**
    * {@inheritdoc}
    */
-  public function saveIdMapping(Row $row, array $destination_id_values, $needs_update = MigrateIdMapInterface::STATUS_IMPORTED, $rollback_action = MigrateIdMapInterface::ROLLBACK_DELETE) {
+  public function saveIdMapping(Row $row, array $destination_id_values, $source_row_status = MigrateIdMapInterface::STATUS_IMPORTED, $rollback_action = MigrateIdMapInterface::ROLLBACK_DELETE) {
     // Construct the source key.
     $source_id_values = $row->getSourceIdValues();
     // Construct the source key and initialize to empty variable keys.
@@ -400,7 +400,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
     }
 
     $fields = array(
-      'needs_update' => (int) $needs_update,
+      'source_row_status' => (int) $source_row_status,
       'rollback_action' => (int) $rollback_action,
       'hash' => $row->getHash(),
     );
@@ -444,7 +444,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
    */
   public function prepareUpdate() {
     $this->getDatabase()->update($this->mapTable)
-    ->fields(array('needs_update' => MigrateIdMapInterface::STATUS_NEEDS_UPDATE))
+    ->fields(array('source_row_status' => MigrateIdMapInterface::STATUS_NEEDS_UPDATE))
     ->execute();
   }
 
@@ -463,7 +463,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
    */
   public function importedCount() {
     return $this->getDatabase()->select($this->mapTable)
-      ->condition('needs_update', array(MigrateIdMapInterface::STATUS_IMPORTED, MigrateIdMapInterface::STATUS_NEEDS_UPDATE), 'IN')
+      ->condition('source_row_status', array(MigrateIdMapInterface::STATUS_IMPORTED, MigrateIdMapInterface::STATUS_NEEDS_UPDATE), 'IN')
       ->countQuery()
       ->execute()
       ->fetchField();
@@ -494,7 +494,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
    * Counts records in a table.
    *
    * @param $status
-   *   An integer for the needs_update column.
+   *   An integer for the source_row_status column.
    * @param $table
    *   The table to work
    * @return int
@@ -503,7 +503,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
   protected function countHelper($status, $table = NULL) {
     $query = $this->getDatabase()->select($table ?: $this->mapTable);
     if (isset($status)) {
-      $query->condition('needs_update', $status);
+      $query->condition('source_row_status', $status);
     }
     return $query->countQuery()->execute()->fetchField();
   }
@@ -566,7 +566,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
     }
     $query = $this->getDatabase()
       ->update($this->mapTable)
-      ->fields(array('needs_update' => MigrateIdMapInterface::STATUS_NEEDS_UPDATE));
+      ->fields(array('source_row_status' => MigrateIdMapInterface::STATUS_NEEDS_UPDATE));
     $count = 1;
     foreach ($source_id as $key_value) {
       $query->condition('sourceid' . $count++, $key_value);

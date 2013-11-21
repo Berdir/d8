@@ -113,7 +113,7 @@ class Migration extends PluginBase implements MigrateProcessInterface, Container
           if ($migration->id() == $this->migration->id()) {
             if (!array_diff($property, $row->getSourceIdValues())) {
               $destids = array();
-              $this->needsUpdate = MigrateIdMapInterface::STATUS_NEEDS_UPDATE;
+              $this->sourceRowStatus = MigrateIdMapInterface::STATUS_NEEDS_UPDATE;
               break;
             }
           }

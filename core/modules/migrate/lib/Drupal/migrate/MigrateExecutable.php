@@ -44,7 +44,7 @@ class MigrateExecutable {
    *
    * @var int
    */
-  protected $needsUpdate;
+  protected $sourceRowStatus;
 
   /**
    * The number of rows processed.
@@ -236,7 +236,7 @@ class MigrateExecutable {
         $destination_id_values = $destination->import($row);
         // @TODO handle the successful but no ID case like config.
         if ($destination_id_values) {
-          $id_map->saveIdMapping($row, $destination_id_values, $this->needsUpdate, $this->rollbackAction);
+          $id_map->saveIdMapping($row, $destination_id_values, $this->sourceRowStatus, $this->rollbackAction);
           $this->successes_since_feedback++;
           $this->total_successes++;
         }
@@ -266,7 +266,7 @@ class MigrateExecutable {
 
       // Reset row properties.
       unset($sourceValues, $destinationValues);
-      $this->needsUpdate = MigrateIdMapInterface::STATUS_IMPORTED;
+      $this->sourceRowStatus = MigrateIdMapInterface::STATUS_IMPORTED;
 
       // TODO: Temporary. Remove when http://drupal.org/node/375494 is committed.
       // TODO: Should be done in MigrateDestinationEntity

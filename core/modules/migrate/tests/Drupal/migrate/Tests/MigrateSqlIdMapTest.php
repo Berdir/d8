@@ -64,7 +64,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
 
   protected function idMapDefaults() {
     return array(
-      'needs_update' => 0,
+      'source_row_status' => 0,
       'rollback_action' => 0,
       'hash' => '',
     );
