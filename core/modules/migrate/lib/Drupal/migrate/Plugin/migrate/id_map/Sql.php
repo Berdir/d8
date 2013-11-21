@@ -313,11 +313,11 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
   /**
    * {@inheritdoc}
    */
-  public function getRowBySource(array $source_id_value) {
+  public function getRowBySource(array $source_id_values) {
     $query = $this->getDatabase()->select($this->mapTable, 'map')
               ->fields('map');
     foreach ($this->sourceIdFields as $source_id) {
-      $query = $query->condition("map.$source_id", array_shift($source_id_value), '=');
+      $query = $query->condition("map.$source_id", array_shift($source_id_values), '=');
     }
     $result = $query->execute();
     return $result->fetchAssoc();
