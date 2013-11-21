@@ -8,6 +8,7 @@
 namespace Drupal\migrate\Tests;
 
 use Drupal\migrate\Row;
+use Drupal\migrate\Plugin\MigrateIdMapInterface;
 
 /**
  * @group migrate
@@ -64,8 +65,8 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
 
   protected function idMapDefaults() {
     return array(
-      'source_row_status' => 0,
-      'rollback_action' => 0,
+      'source_row_status' => MigrateIdMapInterface::STATUS_IMPORTED,
+      'rollback_action' => MigrateIdMapInterface::ROLLBACK_DELETE,
       'hash' => '',
     );
   }
@@ -246,5 +247,49 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
     // Test for a miss.
     $source_id = $id_map->lookupSourceID($nonexistent_id_values);
     $this->assertNull($source_id);
+  }
+
+  /**
+   * Test the error count method.
+   *
+   * Scenarios to test for:
+   *
+   * - No errors.
+   * - One error.
+   * - Multiple errors.
+   */
+  public function testErrorCount() {
+    $this->performErrorCountTest(0);
+    $this->performErrorCountTest(1);
+    $this->performErrorCountTest(3);
+  }
+
+  /**
+   * Actually perform the source ID test with a given number of source
+   * and destination fields.
+   *
+   * @param $num_source_fields
+   * @param $num_destination_fields
+   */
+  protected function performErrorCountTest($num_error_rows) {
+    $database_contents['migrate_map_sql_idmap_test'] = array();
+    for ($i = 0; $i < 5; $i++) {
+      $row = $this->idMapDefaults();
+      $row['sourceid1'] = "source_id_value_$i";
+      $row['destid1'] = "destination_id_value_$i";
+      $row['source_row_status'] = MigrateIdMapInterface::STATUS_IMPORTED;
+      $database_contents['migrate_map_sql_idmap_test'][] = $row;
+    }
+    for (; $i < 5 + $num_error_rows; $i++) {
+      $row = $this->idMapDefaults();
+      $row['sourceid1'] = "source_id_value_$i";
+      $row['destid1'] = "destination_id_value_$i";
+      $row['source_row_status'] = MigrateIdMapInterface::STATUS_FAILED;
+      $database_contents['migrate_map_sql_idmap_test'][] = $row;
+    }
+
+    $id_map = $this->getIdMap($database_contents);
+    $count = $id_map->errorCount();
+    $this->assertSame($num_error_rows, $count);
   }
 }
