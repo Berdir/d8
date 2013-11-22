@@ -188,7 +188,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
     $database_contents['migrate_map_sql_idmap_test'][] = $row;
     $id_map = $this->getIdMap($database_contents);
     // Test for a valid hit.
-    $destination_id = array_values($id_map->lookupDestinationID($source_id_values));
+    $destination_id = $id_map->lookupDestinationID($source_id_values);
     $this->assertSame($expected_result, $destination_id);
     // Test for a miss.
     $destination_id = $id_map->lookupDestinationID($nonexistent_id_values);
@@ -242,7 +242,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
     $database_contents['migrate_map_sql_idmap_test'][] = $row;
     $id_map = $this->getIdMap($database_contents);
     // Test for a valid hit.
-    $source_id = array_values($id_map->lookupSourceID($destination_id_values));
+    $source_id = $id_map->lookupSourceID($destination_id_values);
     $this->assertSame($expected_result, $source_id);
     // Test for a miss.
     $source_id = $id_map->lookupSourceID($nonexistent_id_values);

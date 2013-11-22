@@ -363,7 +363,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
     }
     $result = $query->execute();
     $source_id = $result->fetchAssoc();
-    return $source_id;
+    return array_values($source_id);
   }
 
   /**
@@ -377,7 +377,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
     }
     $result = $query->execute();
     $destination_id = $result->fetchAssoc();
-    return $destination_id;
+    return array_values($destination_id);
   }
 
   /**
