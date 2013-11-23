@@ -17,10 +17,11 @@ class FakeDatabaseSchema extends Schema {
    *
    * @var array
    */
-  protected $databaseContents;
+  public $databaseContents;
 
   public function __construct($database_contents) {
     $this->uniqueIdentifier = uniqid('', TRUE);
+
     // @todo Maybe we can generate an internal representation.
     $this->databaseContents = $database_contents;
   }
@@ -86,7 +87,7 @@ class FakeDatabaseSchema extends Schema {
   }
 
   public function dropTable($table) {
-    throw new \Exception(sprintf('Unsupported method "%s"', __METHOD__));
+    unset($this->databaseContents[$table]);
   }
 
   public function dropUniqueKey($table, $name) {
@@ -140,7 +141,7 @@ class FakeDatabaseSchema extends Schema {
   }
 
   public function uniqueIdentifier() {
-    throw new \Exception(sprintf('Unsupported method "%s"', __METHOD__));
+    return $this->uniqueIdentifier;
   }
 
   /**

@@ -127,7 +127,7 @@ abstract class SqlBase extends SourcePluginBase {
           $delimiter = ' AND ';
         }
 
-        $alias = $this->query->leftJoin($this->migration->getIdMap()->getQualifiedMapTable(), 'map', $map_join);
+        $alias = $this->query->leftJoin($this->migration->getIdMap()->getQualifiedMapTableName(), 'map', $map_join);
         $conditions->isNull($alias . '.sourceid1');
         $conditions->condition($alias . '.source_row_status', MigrateIdMapInterface::STATUS_NEEDS_UPDATE);
         $condition_added = TRUE;

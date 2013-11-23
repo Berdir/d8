@@ -33,7 +33,7 @@ abstract class MigrateTestCase extends UnitTestCase {
     $idmap = $this->getMock('Drupal\migrate\Plugin\MigrateIdMapInterface');
     if ($this->mapJoinable) {
       $idmap->expects($this->once())
-        ->method('getQualifiedMapTable')
+        ->method('getQualifiedMapTableName')
         ->will($this->returnValue('test_map'));
     }
 
@@ -59,6 +59,7 @@ abstract class MigrateTestCase extends UnitTestCase {
       ->disableOriginalConstructor()
       ->getMock();
     $database->databaseContents = &$database_contents;
+
     // Although select doesn't modify the contents of the database, it still
     // eneds to be a reference so that we can SELECT previously INSERT /
     // UPDATE'd rows.
