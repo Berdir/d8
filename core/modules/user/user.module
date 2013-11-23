@@ -659,8 +659,8 @@ function template_preprocess_username(&$variables) {
     // space-separated set of values, so initialize it as an array to make it
     // easier for other preprocess functions to append to it.
     $variables['link_options']['attributes']['rel'] = 'nofollow';
-    $variables['link_path'] = $account->homepage;
-    $variables['homepage'] = $account->homepage;
+    $variables['link_path'] = $account->homepage->value;
+    $variables['homepage'] = $account->homepage->value;
   }
   // We do not want the l() function to check_plain() a second time.
   $variables['link_options']['html'] = TRUE;

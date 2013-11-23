@@ -167,27 +167,16 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
 
     // We have to determine the bundle first.
     $bundle = FALSE;
-    if ($this->bundleKey) {
-      if (!isset($values[$this->bundleKey])) {
-        throw new EntityStorageException(format_string('Missing bundle for entity type @type', array('@type' => $this->entityType)));
-      }
+    if ($this->bundleKey && isset($values[$this->bundleKey])) {
       $bundle = $values[$this->bundleKey];
     }
-    $entity = new $entity_class(array(), $this->entityType, $bundle);
+    $entity = \Drupal::entityManager()->createInstance($this->entityType, $values, $bundle);
 
-    foreach ($entity as $name => $field) {
-      if (isset($values[$name])) {
-        $entity->$name = $values[$name];
-      }
-      elseif (!array_key_exists($name, $values)) {
+    // Apply default values.
+    foreach ($entity->getPropertyDefinitions() as $name => $property_definition) {
+      if (!array_key_exists($name, $values)) {
         $entity->get($name)->applyDefaultValue();
       }
-      unset($values[$name]);
-    }
-
-    // Set any passed values for non-defined fields also.
-    foreach ($values as $name => $value) {
-      $entity->$name = $value;
     }
     $entity->postCreate($this);
 

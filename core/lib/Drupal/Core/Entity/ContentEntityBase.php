@@ -141,21 +141,28 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
     $this->bundle = $bundle ? $bundle : $this->entityType;
     $this->languages = language_list(Language::STATE_ALL);
 
-    foreach ($values as $key => $value) {
-      // If the key matches an existing property set the value to the property
-      // to ensure non converted properties have the correct value.
-      if (property_exists($this, $key) && isset($value[Language::LANGCODE_DEFAULT])) {
-        $this->$key = $value[Language::LANGCODE_DEFAULT];
-      }
-      $this->values[$key] = $value;
+    // This is weird, any bright ideas anyone?
+    if (!empty($values['isDefaultRevision'])) {
+      $this->isDefaultRevision($values['isDefaultRevision'][Language::LANGCODE_DEFAULT]);
+      unset($values['isDefaultRevision']);
     }
+
+    // Initialize language information of the entity.
+    $values_langcode = Language::LANGCODE_DEFAULT;
+    if (!empty($values['langcode'])) {
+      $raw_langcode = (is_array($values['langcode'])) ? reset($values['langcode']) : $values['langcode'];
+      if (!empty($raw_langcode)) {
+        $values_langcode = $raw_langcode;
+      }
+    }
+    $this->language = $this->languages[$values_langcode];
+    $default_langcode = $values_langcode;
 
     // Initialize translations. Ensure we have at least an entry for the entity
     // original language.
     $data = array('status' => static::TRANSLATION_EXISTING);
     $this->translations[Language::LANGCODE_DEFAULT] = $data;
     if ($translations) {
-      $default_langcode = $this->language()->id;
       foreach ($translations as $langcode) {
         if ($langcode != $default_langcode && $langcode != Language::LANGCODE_DEFAULT) {
           $this->translations[$langcode] = $data;
@@ -163,7 +170,25 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
       }
     }
 
+    // Ensure we hit the magic setter when setting properties.
     $this->init();
+
+    $this->getPropertyDefinitions();
+
+    // Currently each stored value has its own internal language structure.
+    // Ensure the passed-in values meet the required structure and set them to
+    // the plain values array of the entity. The plain values array will be used
+    // whenever properties accessed.
+    // @todo Change the raw values array structure to hold field values per
+    //   language instead languages per field.
+    foreach ($values as $field => $value) {
+      // If the value doesn't meet the required raw values structure and is a
+      // defined field, wrap it.
+      if ((!is_array($value) || !isset($value[Language::LANGCODE_DEFAULT])) && isset($this->fieldDefinitions[$field])) {
+        $value = array(Language::LANGCODE_DEFAULT => $value);
+      }
+      $this->values[$field] = $value;
+    }
   }
 
   /**

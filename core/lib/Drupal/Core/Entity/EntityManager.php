@@ -8,7 +8,6 @@
 namespace Drupal\Core\Entity;
 
 use Drupal\Component\Plugin\PluginManagerBase;
-use Drupal\Component\Plugin\Factory\DefaultFactory;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -142,7 +141,6 @@ class EntityManager extends PluginManagerBase implements EntityManagerInterface 
     $this->discovery = new InfoHookDecorator($this->discovery, 'entity_info');
     $this->discovery = new AlterDecorator($this->discovery, 'entity_info');
     $this->discovery = new CacheDecorator($this->discovery, 'entity_info:' . $this->languageManager->getLanguage(Language::TYPE_INTERFACE)->id, 'cache', CacheBackendInterface::CACHE_PERMANENT, array('entity_info' => TRUE));
-    $this->factory = new DefaultFactory($this->discovery);
     $this->container = $container;
   }
 
@@ -161,6 +159,73 @@ class EntityManager extends PluginManagerBase implements EntityManagerInterface 
   public function hasController($entity_type, $controller_type) {
     $definition = $this->getDefinition($entity_type);
     return !empty($definition['controllers'][$controller_type]);
+  }
+
+  /**
+   * Creates an entity object instance based on its values.
+   *
+   * Returns an empty entity object. If you need an entity object with default
+   * values applied use \Drupal\Core\Entity\EntityManager::create() instead.
+   *
+   * @see entity_create()
+   * @see \Drupal\Core\Entity\EntityManager::create()
+   *
+   * @param string $entity_type
+   *   The type of the entity.
+   * @param array $values
+   *   The values to create an entity instance with. By default available keys
+   *   are
+   *   - bundle: the bundle of the entity,
+   *   - values: An array of values to set, keyed by property name,
+   *   - translations: An array of available translations of this entity.
+   * @param string|false $bundle
+   *   The bundle of the entity.
+   * @param array $translations
+   *   The langcodes of the available translations of the entity.
+   *
+   * @throws \InvalidArgumentException
+   *   If mandatory arguments are missing.
+   *
+   * @return \Drupal\Core\Entity\EntityInterface
+   *   An empty new entity object.
+   */
+  public function createInstance($entity_type, array $values = array(), $bundle = FALSE, array $translations = array()) {
+    $definition = $this->getDefinition($entity_type);
+    if (!$definition) {
+      throw new \InvalidArgumentException(sprintf('The %s entity type does not exist.', $entity_type));
+    }
+    // Check if this entity type has bundles and if so if a bundle is defined.
+    $bundle_key = !empty($definition['entity_keys']['bundle']) ? $definition['entity_keys']['bundle'] : FALSE;
+    if ($bundle_key) {
+      if (empty($bundle)) {
+        throw new \InvalidArgumentException(format_string('Missing bundle for entity type @type', array('@type' => $entity_type)));
+      }
+      // Make sure the bundle is part of the values too.
+      $values[$bundle_key] = $bundle;
+    }
+    return $definition['class']::createInstance(\Drupal::getContainer(), $values, $entity_type, $bundle, $translations);
+  }
+
+  /**
+   * Constructs a new entity object with default values, without saving it.
+   *
+   * Returns an entity object with default values applied. If you need an empty
+   * entity object use \Drupal\Core\Entity\EntityManager::createInstance()
+   * instead.
+   *
+   * @see \Drupal\Core\Entity\EntityManager::createInstance()
+   *
+   * @param string $entity_type
+   *   The type of the entity.
+   * @param array $values
+   *   An array of values to set, keyed by property name. If the entity type has
+   *   bundles the bundle key has to be specified.
+   *
+   * @return \Drupal\Core\Entity\EntityInterface
+   *   A new entity object with default values applied.
+   */
+  public function createEntity($entity_type, array $values) {
+    return $this->getStorageController($entity_type)->create($values);
   }
 
   /**
@@ -333,7 +398,8 @@ class EntityManager extends PluginManagerBase implements EntityManagerInterface 
         $this->entityFieldInfo[$entity_type] = $cache->data;
       }
       else {
-        $class = $this->factory->getPluginClass($entity_type, $this->getDefinition($entity_type));
+        $entity_definition = $this->getDefinition($entity_type);
+        $class = $entity_definition['class'];
 
         $base_definitions = $class::baseFieldDefinitions($entity_type);
         foreach ($base_definitions as &$base_definition) {

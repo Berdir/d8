@@ -95,7 +95,7 @@ abstract class AutocompleteWidgetBase extends WidgetBase {
       '#placeholder' => $this->getSetting('placeholder'),
       '#element_validate' => array(array($this, 'elementValidate')),
       // @todo: Use wrapper to get the user if exists or needed.
-      '#autocreate_uid' => isset($entity->uid) ? $entity->uid : $user->id(),
+      '#autocreate_uid' => isset($entity->uid->value) ? $entity->uid->value : $user->id(),
     );
 
     return array('target_id' => $element);

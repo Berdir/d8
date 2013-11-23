@@ -16,6 +16,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\views\Plugin\views\query\Sql;
 use Drupal\views\Entity\View;
 use Drupal\views\ViewStorageInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Stores UI related temporary settings.
@@ -159,6 +160,16 @@ class ViewUI implements ViewStorageInterface {
       $executable = Views::executableFactory()->get($this);
     }
     $this->executable = $executable;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function createInstance(ContainerInterface $container, array $values, $entity_type, $bundle = FALSE, $translations = array()) {
+    // This class shouldn't be used like an entity and thus shouldn't be
+    // instantiated using this helper function. Therefore we break with the
+    // interface and just throw an error.
+    throw new \Exception('ViewUI cannot be handled as entity. Use the normal constructor to create an instance instead.');
   }
 
   /**

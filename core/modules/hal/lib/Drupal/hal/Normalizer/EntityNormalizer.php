@@ -99,7 +99,8 @@ class EntityNormalizer extends NormalizerBase {
       $langcode = Language::LANGCODE_NOT_SPECIFIED;
     }
 
-    $entity = entity_create($typed_data_ids['entity_type'], array('langcode' => $langcode, 'type' => $typed_data_ids['bundle']));
+    // Create an entity object without default values applied.
+    $entity = \Drupal::entityManager()->createInstance($typed_data_ids['entity_type'], array('langcode' => $langcode), $typed_data_ids['bundle']);
 
     // Special handling for PATCH: destroy all possible default values that
     // might have been set on entity creation. We want an "empty" entity that

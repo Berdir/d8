@@ -374,23 +374,26 @@ function entity_delete_multiple($entity_type, array $ids) {
   $entities = $controller->loadMultiple($ids);
   $controller->delete($entities);
 }
-
 /**
- * Constructs a new entity object, without permanently saving it.
+ * Constructs a new entity object with default values, without saving it.
  *
- * @param $entity_type
+ * Returns an entity object with default values applied. If you need an empty
+ * entity object use \Drupal\Core\Entity\EntityManager::createInstance()
+ * instead.
+ *
+ * @see Drupal\Core\Entity\EntityManager::createInstance()
+ *
+ * @param string $entity_type
  *   The type of the entity.
- * @param $values
+ * @param array $values
  *   An array of values to set, keyed by property name. If the entity type has
  *   bundles the bundle key has to be specified.
  *
  * @return \Drupal\Core\Entity\EntityInterface
- *   A new entity object.
+ *   A new entity object with default values applied.
  */
 function entity_create($entity_type, array $values) {
-  return \Drupal::entityManager()
-    ->getStorageController($entity_type)
-    ->create($values);
+  return \Drupal::entityManager()->createEntity($entity_type, $values);
 }
 
 /**

@@ -10,6 +10,7 @@ namespace Drupal\Core\Entity;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Defines a base entity class.
@@ -59,6 +60,13 @@ abstract class Entity implements EntityInterface {
     foreach ($values as $key => $value) {
       $this->$key = $value;
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function createInstance(ContainerInterface $container, array $values, $entity_type, $bundle = FALSE, $translations = array()) {
+    return new static($values, $entity_type, $bundle, $translations);
   }
 
   /**

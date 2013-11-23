@@ -8,11 +8,31 @@
 namespace Drupal\Core\Entity;
 
 use Drupal\Core\Access\AccessibleInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Defines a common interface for all entity objects.
  */
 interface EntityInterface extends AccessibleInterface {
+
+  /**
+   * Creates an entity object based on its values.
+   *
+   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   *   The service container this object should use.
+   * @param array $values
+   *   An array of values to set, keyed by property name.
+   * @param string $entity_type
+   *   The type of the entity to create.
+   * @param string|FALSE $bundle
+   *   The bundle of the entity.
+   * @param array $translations
+   *   List of available translations of this entity.
+   *
+   * @return \Drupal\Core\Entity\EntityInterface
+   *   An empty new entity object.
+   */
+  public static function createInstance(ContainerInterface $container, array $values, $entity_type, $bundle = FALSE, $translations = array());
 
   /**
    * Returns the entity UUID (Universally Unique Identifier).

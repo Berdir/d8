@@ -119,8 +119,9 @@ class TranslationTest extends FieldUnitTestBase {
   function testFieldAvailableLanguages() {
     // Test 'translatable' fieldable info.
     field_test_entity_info_translatable('entity_test', FALSE);
-    $field = clone($this->field);
-    $field->field_name .= '_untranslatable';
+    $field = $this->field->createDuplicate();
+    $field->enforceIsNew(TRUE);
+    $field->name .= '_ut';
     $field->save();
 
     // Enable field translations for the entity.

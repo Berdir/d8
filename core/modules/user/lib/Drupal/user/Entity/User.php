@@ -550,6 +550,12 @@ class User extends ContentEntityBase implements UserInterface {
       // https://drupal.org/node/2044859
       'type' => 'string_field',
     );
+    $properties['homepage'] = array(
+      'label' => t('Homepage'),
+      'description' => t("The user's home page address."),
+      'type' => 'string_field',
+      'computed' => TRUE,
+    );
     return $properties;
   }
 

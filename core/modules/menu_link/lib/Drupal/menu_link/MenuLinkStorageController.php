@@ -78,6 +78,10 @@ class MenuLinkStorageController extends DatabaseStorageController implements Men
     if (!isset($values['bundle']) && isset($values['menu_name'])) {
       $values['bundle'] = $values['menu_name'];
     }
+    elseif (!isset($values['bundle'])) {
+      // Set the default bundle if none could be found.
+      $values['bundle'] = 'tools';
+    }
     return parent::create($values);
   }
 

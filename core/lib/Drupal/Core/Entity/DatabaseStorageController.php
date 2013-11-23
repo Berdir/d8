@@ -267,7 +267,8 @@ class DatabaseStorageController extends EntityStorageControllerBase {
     $entity_class = $this->entityInfo['class'];
     $entity_class::preCreate($this, $values);
 
-    $entity = new $entity_class($values, $this->entityType);
+    $bundle = (isset($this->entityInfo['entity_keys']['bundle']) && $values[$this->entityInfo['entity_keys']['bundle']]) ? $values[$this->entityInfo['entity_keys']['bundle']] : FALSE;
+    $entity = \Drupal::entityManager()->createInstance($this->entityType, $values, $bundle);
 
     // Assign a new UUID if there is none yet.
     if ($this->uuidKey && !isset($entity->{$this->uuidKey})) {
