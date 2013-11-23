@@ -173,15 +173,11 @@ class EntityManager extends PluginManagerBase implements EntityManagerInterface 
    * @param string $entity_type
    *   The type of the entity.
    * @param array $values
-   *   The values to create an entity instance with. By default available keys
-   *   are
-   *   - bundle: the bundle of the entity,
-   *   - values: An array of values to set, keyed by property name,
-   *   - translations: An array of available translations of this entity.
+   *   The values to create an entity instance with.
    * @param string|false $bundle
    *   The bundle of the entity.
    * @param array $translations
-   *   The langcodes of the available translations of the entity.
+   *   The language codes of the available translations of the entity.
    *
    * @throws \InvalidArgumentException
    *   If mandatory arguments are missing.
