@@ -16,7 +16,7 @@ use Drupal\migrate\Plugin\MigrateIdMapInterface;
 class MigrateExecutable {
 
   /**
-   * The migration to do.
+   * The configuration of the migration to do.
    *
    * @var \Drupal\migrate\Entity\MigrationInterface
    */
@@ -78,6 +78,7 @@ class MigrateExecutable {
 
   /**
    * The fraction of the memory limit at which an operation will be interrupted.
+   *
    * Can be overridden by a Migration subclass if one would like to push the
    * envelope. Defaults to 85%.
    *
@@ -94,6 +95,7 @@ class MigrateExecutable {
 
   /**
    * The fraction of the time limit at which an operation will be interrupted.
+   *
    * Can be overridden by a Migration subclass if one would like to push the
    * envelope. Defaults to 90%.
    *
@@ -109,11 +111,15 @@ class MigrateExecutable {
   protected $timeLimit;
 
   /**
+   * The configuration values of the source.
+   *
    * @var array
    */
   protected $sourceIdValues;
 
   /**
+   * The number of rows processed since feedback was given.
+   *
    * @var int
    */
   protected $processed_since_feedback = 0;
@@ -126,8 +132,12 @@ class MigrateExecutable {
   protected $translationManager;
 
   /**
-   * @param MigrationInterface $migration
-   * @param MigrateMessageInterface $message
+   * Constructs a MigrateExecutable and verifies and sets the memory limit.
+   *
+   * @param \Drupal\migrate\Entity\MigrationInterface $migration
+   *   The migration to run.
+   * @param \Drupal\migrate\MigrateMessageInterface $message
+   *   The message to record.
    *
    * @throws \Drupal\migrate\MigrateException
    */
@@ -161,7 +171,12 @@ class MigrateExecutable {
   }
 
   /**
+   * Returns the source.
+   *
+   * Makes sure source is initialized based on migration settings.
+   *
    * @return \Drupal\migrate\Source
+   *   The source.
    */
   public function getSource() {
     if (!isset($this->source)) {
