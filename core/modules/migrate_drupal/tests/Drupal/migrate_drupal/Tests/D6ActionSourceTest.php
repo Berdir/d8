@@ -12,7 +12,7 @@ use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
 /**
  * Tests action migration from D6 to D8.
  *
- * @group migrate
+ * @group migrate_drupal
  */
 class D6ActionSourceTest extends MigrateSqlSourceTestCase {
 

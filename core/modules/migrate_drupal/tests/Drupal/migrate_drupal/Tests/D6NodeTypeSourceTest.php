@@ -12,7 +12,7 @@ use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
 /**
  * Tests Node Types migration from D6 to D8.
  *
- * @group migrate
+ * @group migrate_drupal
  */
 class D6NodeTypeSourceTest extends MigrateSqlSourceTestCase {
 

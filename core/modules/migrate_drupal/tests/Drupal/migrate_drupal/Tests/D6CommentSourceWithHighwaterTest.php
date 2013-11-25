@@ -12,7 +12,7 @@ use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
 /**
  * Tests comment migration from D6 to D8 w/ highwater handling.
  *
- * @group migrate
+ * @group migrate_drupal
  */
 class D6CommentSourceWithHighwaterTest extends D6CommentSourceTest {
 

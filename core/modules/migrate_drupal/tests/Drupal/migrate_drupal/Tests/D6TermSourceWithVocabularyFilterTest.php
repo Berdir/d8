@@ -11,7 +11,7 @@ use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
 /**
  * Tests taxonomy term migration with vocabulary filter from D6 to D8.
  *
- * @group migrate
+ * @group migrate_drupal
  */
 class D6TermSourceWithVocabularyFilterTest extends D6TermSourceTest {
 

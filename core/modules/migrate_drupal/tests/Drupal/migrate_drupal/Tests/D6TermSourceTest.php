@@ -12,7 +12,7 @@ use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
 /**
  * Tests taxonomy term migration from D6 to D8.
  *
- * @group migrate
+ * @group migrate_drupal
  */
 class D6TermSourceTest extends MigrateSqlSourceTestCase {
 
