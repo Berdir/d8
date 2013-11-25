@@ -444,8 +444,8 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
     $count = 1;
     foreach ($source_id_values as $id_value) {
       $fields['sourceid' . $count++] = $id_value;
-      // If any key value is empty, we can't save - print out and abort.
-      if (empty($id_value)) {
+      // If any key value is not set, we can't save - print out and abort.
+      if (!isset($id_value)) {
         print($message);
         return;
       }
