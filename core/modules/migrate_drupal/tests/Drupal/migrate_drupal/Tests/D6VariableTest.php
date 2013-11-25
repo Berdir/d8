@@ -5,7 +5,7 @@
  * Contains \Drupal\migrate\Tests\D6VariableSourceTest.
  */
 
-namespace Drupal\migrate\Tests;
+namespace Drupal\migrate_drupal\Tests;
 
 /**
  * @group migrate
@@ -59,7 +59,7 @@ class D6VariableTest extends MigrateSqlSourceTestCase {
 
 }
 
-namespace Drupal\migrate\Tests\source;
+namespace Drupal\migrate_drupal\Tests\source;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Extension\ModuleHandlerInterface;

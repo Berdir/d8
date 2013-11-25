@@ -5,7 +5,7 @@
  * Contains \Drupal\migrate\Tests\D6MenuSourceTest.
  */
 
-namespace Drupal\migrate\Tests;
+namespace Drupal\migrate_drupal\Tests;
 
 /**
  * Tests menu migration from D6 to D8.
@@ -83,7 +83,7 @@ class D6MenuSourceTest extends MigrateSqlSourceTestCase {
 
 }
 
-namespace Drupal\migrate\Tests\source\d6;
+namespace Drupal\migrate_drupal\Tests\source\d6;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Extension\ModuleHandlerInterface;

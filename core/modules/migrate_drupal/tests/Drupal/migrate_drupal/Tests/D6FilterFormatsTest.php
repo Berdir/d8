@@ -5,7 +5,7 @@
  * Contains \Drupal\migrate\Tests\D6FilterFormatsTest.
  */
 
-namespace Drupal\migrate\Tests;
+namespace Drupal\migrate_drupal\Tests;
 
 /**
  * Tests comment migration from D6 to D8.
@@ -132,7 +132,7 @@ class D6FilterFormatsTest extends MigrateSqlSourceTestCase {
   }
 }
 
-namespace Drupal\migrate\Tests\source;
+namespace Drupal\migrate_drupal\Tests\source;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Extension\ModuleHandlerInterface;

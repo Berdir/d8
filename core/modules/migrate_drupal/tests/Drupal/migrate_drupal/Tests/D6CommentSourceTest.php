@@ -5,7 +5,7 @@
  * Contains \Drupal\migrate\Tests\D6CommentSourceTest.
  */
 
-namespace Drupal\migrate\Tests;
+namespace Drupal\migrate_drupal\Tests;
 
 /**
  * Tests comment migration from D6 to D8.

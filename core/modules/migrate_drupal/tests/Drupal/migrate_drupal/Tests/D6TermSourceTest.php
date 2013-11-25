@@ -5,7 +5,7 @@
  * Contains \Drupal\migrate\Tests\D6TermSourceTest.
  */
 
-namespace Drupal\migrate\Tests;
+namespace Drupal\migrate_drupal\Tests;
 
 /**
  * Tests taxonomy term migration from D6 to D8.

@@ -3,7 +3,7 @@
  * @file
  */
 
-namespace Drupal\migrate\Tests;
+namespace Drupal\migrate_drupal\Tests;
 
 
 /**
