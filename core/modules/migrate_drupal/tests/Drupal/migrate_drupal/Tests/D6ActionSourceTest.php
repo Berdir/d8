@@ -86,7 +86,7 @@ class D6ActionSourceTest extends MigrateSqlSourceTestCase {
     return array(
       'name' => 'D6 action source functionality',
       'description' => 'Tests D6 actions source plugin.',
-      'group' => 'Migrate',
+      'group' => 'Migrate Drupal',
     );
   }
 

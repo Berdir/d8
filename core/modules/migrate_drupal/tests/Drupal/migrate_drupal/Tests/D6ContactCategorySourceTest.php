@@ -60,7 +60,7 @@ class D6ContactCategorySourceTest extends MigrateSqlSourceTestCase {
     return array(
       'name' => 'D6 contact category source functionality',
       'description' => 'Tests D6 contact category source plugin.',
-      'group' => 'Migrate',
+      'group' => 'Migrate Drupal',
     );
   }
 

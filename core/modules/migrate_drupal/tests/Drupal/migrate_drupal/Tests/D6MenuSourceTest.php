@@ -68,7 +68,7 @@ class D6MenuSourceTest extends MigrateSqlSourceTestCase {
     return array(
       'name' => 'D6 menu source functionality',
       'description' => 'Tests D6 menu source plugin.',
-      'group' => 'Migrate',
+      'group' => 'Migrate Drupal',
     );
   }
 

@@ -82,7 +82,7 @@ class D6VocabularySourceTest extends MigrateSqlSourceTestCase {
     return array(
       'name' => 'D6 vocabulary source functionality',
       'description' => 'Tests D6 vocabulary source plugin.',
-      'group' => 'Migrate',
+      'group' => 'Migrate Drupal',
     );
   }
 

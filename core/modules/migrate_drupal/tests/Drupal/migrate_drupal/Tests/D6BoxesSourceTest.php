@@ -82,7 +82,7 @@ class D6BoxesSourceTest extends MigrateSqlSourceTestCase {
     return array(
       'name' => 'D6 block boxes source functionality',
       'description' => 'Tests D6 block boxes source plugin.',
-      'group' => 'Migrate',
+      'group' => 'Migrate Drupal',
     );
   }
 

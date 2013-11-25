@@ -94,7 +94,7 @@ class D6NodeWithoutFieldsSourceTest extends MigrateSqlSourceTestCase {
     return array(
       'name' => 'D6 node source functionality',
       'description' => 'Tests D6 node source plugin.',
-      'group' => 'Migrate',
+      'group' => 'Migrate Drupal',
     );
   }
 

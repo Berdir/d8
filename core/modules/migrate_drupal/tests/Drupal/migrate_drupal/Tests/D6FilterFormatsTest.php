@@ -110,7 +110,7 @@ class D6FilterFormatsTest extends MigrateSqlSourceTestCase {
     return array(
       'name' => 'D6 Filter Formats source functionality',
       'description' => 'Tests D6 filter_formats table source plugin.',
-      'group' => 'Migrate',
+      'group' => 'Migrate Drupal',
     );
   }
 

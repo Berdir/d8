@@ -57,7 +57,7 @@ class D6UserPictureSourceTest extends MigrateSqlSourceTestCase {
     return array(
       'name' => 'D6 user picture source functionality',
       'description' => 'Tests D6 user picture source plugin.',
-      'group' => 'Migrate',
+      'group' => 'Migrate Drupal',
     );
   }
 

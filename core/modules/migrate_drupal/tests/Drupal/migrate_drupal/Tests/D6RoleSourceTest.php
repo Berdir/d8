@@ -107,7 +107,7 @@ class D6RoleSourceTest extends MigrateSqlSourceTestCase {
     return array(
       'name' => 'D6 role source functionality',
       'description' => 'Tests D6 role source plugin.',
-      'group' => 'Migrate',
+      'group' => 'Migrate Drupal',
     );
   }
 

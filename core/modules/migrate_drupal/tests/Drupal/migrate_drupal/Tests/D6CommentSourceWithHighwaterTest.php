@@ -23,7 +23,7 @@ class D6CommentSourceWithHighwaterTest extends D6CommentSourceTest {
     return array(
       'name' => 'D6 comment source + highwater',
       'description' => 'Tests D6 comment source plugin with highwater handling.',
-      'group' => 'Migrate',
+      'group' => 'Migrate Drupal',
     );
   }
 

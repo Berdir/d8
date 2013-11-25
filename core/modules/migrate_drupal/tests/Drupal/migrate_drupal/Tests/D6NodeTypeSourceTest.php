@@ -98,7 +98,7 @@ class D6NodeTypeSourceTest extends MigrateSqlSourceTestCase {
     return array(
       'name' => 'D6 node type source functionality',
       'description' => 'Tests D6 node type source plugin.',
-      'group' => 'Migrate',
+      'group' => 'Migrate Drupal',
     );
   }
 

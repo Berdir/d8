@@ -105,7 +105,7 @@ class D6FieldInstanceSourceTest extends MigrateSqlSourceTestCase {
     return array(
       'name' => 'D6 field instance source functionality',
       'description' => 'Tests D6 field instance source plugin.',
-      'group' => 'Migrate',
+      'group' => 'Migrate Drupal',
     );
   }
 

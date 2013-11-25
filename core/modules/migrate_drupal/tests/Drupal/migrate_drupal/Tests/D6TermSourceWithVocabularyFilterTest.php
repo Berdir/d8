@@ -22,7 +22,7 @@ class D6TermSourceWithVocabularyFilterTest extends D6TermSourceTest {
     return array(
       'name' => 'D6 taxonomy term source with vocabulary filter functionality',
       'description' => 'Tests D6 taxonomy term source plugin with vocabulary filter.',
-      'group' => 'Migrate',
+      'group' => 'Migrate Drupal',
     );
   }
 

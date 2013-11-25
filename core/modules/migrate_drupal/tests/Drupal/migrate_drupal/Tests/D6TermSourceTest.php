@@ -93,7 +93,7 @@ class D6TermSourceTest extends MigrateSqlSourceTestCase {
     return array(
       'name' => 'D6 taxonomy term source functionality',
       'description' => 'Tests D6 taxonomy term source plugin.',
-      'group' => 'Migrate',
+      'group' => 'Migrate Drupal',
     );
   }
 

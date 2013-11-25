@@ -92,7 +92,7 @@ class D6UserSourceTest extends MigrateSqlSourceTestCase {
     return array(
       'name' => 'D6 user source functionality',
       'description' => 'Tests D6 user source plugin.',
-      'group' => 'Migrate',
+      'group' => 'Migrate Drupal',
     );
   }
 

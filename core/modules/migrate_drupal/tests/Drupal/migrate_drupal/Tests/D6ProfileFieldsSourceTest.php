@@ -112,7 +112,7 @@ class D6ProfileFieldsSourceTest extends MigrateSqlSourceTestCase {
     return array(
       'name' => 'D6 profile field source functionality',
       'description' => 'Tests D6 profile field source plugin.',
-      'group' => 'Migrate',
+      'group' => 'Migrate Drupal',
     );
   }
 

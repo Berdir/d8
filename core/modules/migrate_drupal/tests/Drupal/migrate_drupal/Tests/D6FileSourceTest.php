@@ -71,7 +71,7 @@ class D6FileSourceTest extends MigrateSqlSourceTestCase {
     return array(
       'name' => 'D6 file source functionality',
       'description' => 'Tests D6 file source plugin.',
-      'group' => 'Migrate',
+      'group' => 'Migrate Drupal',
     );
   }
 

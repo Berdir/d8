@@ -55,7 +55,7 @@ class D6VariableTest extends MigrateSqlSourceTestCase {
     return array(
       'name' => 'D6 variable source functionality',
       'description' => 'Tests D6 variable source plugin.',
-      'group' => 'Migrate',
+      'group' => 'Migrate Drupal',
     );
   }
 

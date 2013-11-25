@@ -92,7 +92,7 @@ class D6CommentSourceTest extends MigrateSqlSourceTestCase {
     return array(
       'name' => 'D6 comment source functionality',
       'description' => 'Tests D6 comment source plugin.',
-      'group' => 'Migrate',
+      'group' => 'Migrate Drupal',
     );
   }
 
