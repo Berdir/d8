@@ -19,11 +19,11 @@ class FakeDatabaseSchema extends Schema {
    */
   public $databaseContents;
 
-  public function __construct($database_contents) {
+  public function __construct(&$database_contents) {
     $this->uniqueIdentifier = uniqid('', TRUE);
 
     // @todo Maybe we can generate an internal representation.
-    $this->databaseContents = $database_contents;
+    $this->databaseContents = &$database_contents;
   }
 
   public function tableExists($table) {
