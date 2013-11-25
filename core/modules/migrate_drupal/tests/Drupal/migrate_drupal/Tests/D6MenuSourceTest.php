@@ -18,7 +18,7 @@ class D6MenuSourceTest extends MigrateSqlSourceTestCase {
 
   // The plugin system is not working during unit testing so the source plugin
   // class needs to be manually specified.
-  const PLUGIN_CLASS = 'Drupal\migrate\Plugin\migrate\source\d6\Menu';
+  const PLUGIN_CLASS = 'Drupal\migrate_drupal\Plugin\migrate\source\d6\Menu';
 
   // The fake Migration configuration entity.
   protected $migrationConfiguration = array(
@@ -89,7 +89,7 @@ namespace Drupal\migrate_drupal\Tests\source\d6;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\migrate\Plugin\migrate\source\d6\Menu;
+use Drupal\migrate_drupal\Plugin\migrate\source\d6\Menu;
 
 class TestMenu extends Menu {
   function setDatabase(Connection $database) {

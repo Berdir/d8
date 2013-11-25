@@ -5,9 +5,7 @@
  * Contains \Drupal\migrate\Plugin\migrate\source\d6\Action.
  */
 
-namespace Drupal\migrate\Plugin\migrate\source\d6;
-
-
+namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
 
 /**
  * Drupal 6 action source from database.

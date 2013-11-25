@@ -16,7 +16,7 @@ use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
  */
 class D6FileSourceTest extends MigrateSqlSourceTestCase {
 
-  const PLUGIN_CLASS = 'Drupal\migrate\Plugin\migrate\source\d6\File';
+  const PLUGIN_CLASS = 'Drupal\migrate_drupal\Plugin\migrate\source\d6\File';
   const BASE_TABLE = 'file';
   const BASE_ALIAS = 'f';
 
@@ -89,7 +89,7 @@ namespace Drupal\migrate_drupal\Tests\source\d6;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\migrate\Plugin\migrate\source\d6\File;
+use Drupal\migrate_drupal\Plugin\migrate\source\d6\File;
 
 class TestFile extends File {
   function setDatabase(Connection $database) {

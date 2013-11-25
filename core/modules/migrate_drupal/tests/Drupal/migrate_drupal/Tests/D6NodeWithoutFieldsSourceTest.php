@@ -16,7 +16,7 @@ use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
  */
 class D6NodeWithoutFieldsSourceTest extends MigrateSqlSourceTestCase {
 
-  const PLUGIN_CLASS = 'Drupal\migrate\Plugin\migrate\source\d6\Node';
+  const PLUGIN_CLASS = 'Drupal\migrate_drupal\Plugin\migrate\source\d6\Node';
 
   // The fake Migration configuration entity.
   protected $migrationConfiguration = array(
@@ -123,7 +123,7 @@ namespace Drupal\migrate_drupal\Tests\source\d6;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\migrate\Plugin\migrate\source\d6\Node;
+use Drupal\migrate_drupal\Plugin\migrate\source\d6\Node;
 
 class TestNode extends Node {
   function setDatabase(Connection $database) {

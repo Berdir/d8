@@ -18,7 +18,7 @@ class D6FilterFormatsTest extends MigrateSqlSourceTestCase {
 
   // The plugin system is not working during unit testing so the source plugin
   // class needs to be manually specified.
-  const PLUGIN_CLASS = 'Drupal\migrate\Plugin\migrate\source\D6FilterFormats';
+  const PLUGIN_CLASS = 'Drupal\migrate_drupal\Tests\source\TestD6FilterFormats';
 
   // The fake Migration configuration entity.
   protected $migrationConfiguration = array(
@@ -138,7 +138,7 @@ namespace Drupal\migrate_drupal\Tests\source;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\migrate\Plugin\migrate\source\D6FilterFormats;
+use Drupal\migrate_drupal\Plugin\migrate\source\D6FilterFormats;
 
 class TestD6FilterFormats extends D6FilterFormats {
   function setDatabase(Connection $database) {

@@ -5,9 +5,7 @@
  * Contains \Drupal\migrate\Plugin\migrate\source\d6\Boxes.
  */
 
-namespace Drupal\migrate\Plugin\migrate\source\d6;
-
-
+namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
 
 /**
  * Drupal 6 block source from database.

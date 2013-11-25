@@ -16,7 +16,7 @@ use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
  */
 class D6VocabularySourceTest extends MigrateSqlSourceTestCase {
 
-  const PLUGIN_CLASS = 'Drupal\migrate\Plugin\migrate\source\d6\Vocabulary';
+  const PLUGIN_CLASS = 'Drupal\migrate_drupal\Plugin\migrate\source\d6\Vocabulary';
 
   // The fake Migration configuration entity.
   protected $migrationConfiguration = array(
@@ -109,7 +109,7 @@ namespace Drupal\migrate_drupal\Tests\source\d6;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\migrate\Plugin\migrate\source\d6\Vocabulary;
+use Drupal\migrate_drupal\Plugin\migrate\source\d6\Vocabulary;
 
 class TestVocabulary extends Vocabulary {
   function setDatabase(Connection $database) {

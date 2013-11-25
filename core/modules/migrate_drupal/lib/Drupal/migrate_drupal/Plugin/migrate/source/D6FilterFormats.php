@@ -5,9 +5,9 @@
  * Contains \Drupal\migrate\Plugin\migrate\source\d6\FilterFormats.
  */
 
-namespace Drupal\migrate\Plugin\migrate\source;
+namespace Drupal\migrate_drupal\Plugin\migrate\source;
 
-use Drupal\migrate\Plugin\migrate\source\d6\Drupal6SqlBase;
+use Drupal\migrate_drupal\Plugin\migrate\source\d6\Drupal6SqlBase;
 use Drupal\migrate\Row;
 
 /**
