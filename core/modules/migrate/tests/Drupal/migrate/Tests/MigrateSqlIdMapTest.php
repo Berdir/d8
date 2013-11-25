@@ -292,4 +292,32 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
     $count = $id_map->errorCount();
     $this->assertSame($num_error_rows, $count);
   }
+
+  /**
+   * Test the destroy method.
+   *
+   * Scenarios to test for:
+   *
+   * - No errors.
+   * - One error.
+   * - Multiple errors.
+   */
+  public function testDestroy() {
+    $id_map = $this->getIdMap();
+    $map_table_name = $id_map->getMapTableName();
+    $message_table_name = $id_map->getMessageTableName();
+    $row = new Row(array('source_id_property' => 'source_value'),
+                   array('source_id_property' => array()));
+    $id_map->saveIdMapping($row, array('destination_id_property' => 2));
+    $id_map->saveMessage(array('source_value'), 'A message');
+    $this->assertTrue($this->database->schema()->tableExists($map_table_name),
+                      "$map_table_name exists");
+    $this->assertTrue($this->database->schema()->tableExists($message_table_name),
+                      "$message_table_name exists");
+    $id_map->destroy();
+    $this->assertFalse($this->database->schema()->tableExists($map_table_name),
+                       "$map_table_name does not exist");
+    $this->assertFalse($this->database->schema()->tableExists($message_table_name),
+                       "$message_table_name does not exist");
+  }
 }
