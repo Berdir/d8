@@ -95,6 +95,48 @@ class Drupal6FilterFormats {
       'primary key' => array('format'),
       'unique keys' => array('name' => array('name')),
     ));
+    $database->schema()->createTable('variable', array(
+      'fields' => array(
+        'name' => array(
+          'type' => 'varchar',
+          'length' => 128,
+          'not null' => TRUE,
+          'default' => '',
+        ),
+        'value' => array(
+          'type' => 'blob',
+          'not null' => TRUE,
+          'size' => 'big',
+          'translatable' => TRUE,
+        ),
+      ),
+      'primary key' => array(
+        'name',
+      ),
+      'module' => 'filter',
+      'name' => 'variable',
+    ));
+    $database->insert('variable')->fields(array(
+      'name',
+      'value',
+    ))
+    ->values(array(
+      'name' => 'allowed_html_1',
+      'value' => 's:61:"<a> <em> <strong> <cite> <code> <ul> <ol> <li> <dl> <dt> <dd>";',
+    ))
+    ->values(array(
+      'name' => 'filter_html_help_1',
+      'value' => 'i:1;',
+    ))
+    ->values(array(
+      'name' => 'filter_html_nofollow_1',
+      'value' => 'i:0;',
+    ))
+    ->values(array(
+      'name' => 'filter_url_length_1',
+      'value' => 's:2:"72";',
+    ))
+    ->execute();
     $database->insert('filter_formats')->fields(array(
       'format',
       'name',

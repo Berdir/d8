@@ -32,5 +32,18 @@ class MigrateD6FilterFormatsTest extends MigrateDrupalTestBase {
     $executable = new MigrateExecutable($migration, new MigrateMessage);
     $executable->import();
     $filter_format = entity_load('filter_format', 'filtered_html');
+
+    // Check filter status.
+    $filters = $filter_format->get('filters');
+    foreach ($filters as $filter) {
+      $this->assertTrue($filter['status']);
+    }
+
+    //Check variables migrated into filter
+    $this->assertIdentical($filters['filter_html_escape']['settings']['allowed_html'], '<a> <em> <strong> <cite> <code> <ul> <ol> <li> <dl> <dt> <dd>');
+    $this->assertIdentical($filters['filter_html_escape']['settings']['filter_html_help'], 1);
+    $this->assertIdentical($filters['filter_html']['settings']['filter_html_nofollow'], 0);
+    $this->assertIdentical($filters['filter_url']['settings']['filter_url_length'] , '72');
   }
+
 }
