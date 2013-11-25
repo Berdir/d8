@@ -120,6 +120,22 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
   }
 
   /**
+   * Tests the sql id map message count method by counting and saving messages
+   */
+  public function testMessageCount() {
+    $message = 'Hello world.';
+    $expected_results = array(0, 1, 2, 3);
+    $id_map = $this->getIdMap();
+
+    // Test count message multiple times starting from 0.
+    foreach ($expected_results as $key => $expected_result) {
+      $count = $id_map->messageCount();
+      $this->assertEquals($expected_result, $count);
+      $id_map->saveMessage(array($key), $message);
+    }
+  }
+
+  /**
    * Test the getRowBySource method when it succeeds.
    */
   public function testGetSourceByIdSucceeds() {
