@@ -7,7 +7,6 @@
 
 namespace Drupal\migrate_drupal\Tests;
 
-use Drupal\migrate\Tests\MigrateTestBase;
 use Drupal\migrate\MigrateMessage;
 use Drupal\migrate\MigrateExecutable;
 
