@@ -5,15 +5,16 @@
  * Contains \Drupal\system\Tests\Upgrade\MigrateFieldConfigsTest.
  */
 
-namespace Drupal\migrate\Tests;
+namespace Drupal\migrate_drupal\Tests;
 
+use Drupal\migrate\Tests\MigrateTestBase;
 use Drupal\migrate\MigrateMessage;
 use Drupal\migrate\MigrateExecutable;
 
 /**
  * Tests migration of variables from the Field module.
  */
-class MigrateFieldConfigsTest extends MigrateTestBase {
+class MigrateFieldConfigsTest extends MigrateDrupalTestBase {
 
   /**
    * {@inheritdoc}
@@ -22,7 +23,7 @@ class MigrateFieldConfigsTest extends MigrateTestBase {
     return array(
       'name'  => 'Migrate variables to field.settings.yml',
       'description'  => 'Upgrade variables to field.settings.yml',
-      'group' => 'Migrate',
+      'group' => 'Migrate Drupal',
     );
   }
 
@@ -32,7 +33,7 @@ class MigrateFieldConfigsTest extends MigrateTestBase {
   public function testFieldSettings() {
     $migration = entity_load('migration', 'd6_field_settings');
     $dumps = array(
-      drupal_get_path('module', 'migrate') . '/lib/Drupal/migrate/Tests/Dump/Drupal6FieldSettings.php',
+      drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6FieldSettings.php',
     );
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, new MigrateMessage());

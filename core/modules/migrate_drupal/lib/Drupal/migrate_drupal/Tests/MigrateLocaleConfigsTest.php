@@ -5,15 +5,16 @@
  * Contains \Drupal\system\Tests\Upgrade\MigrateLocaleConfigsTest.
  */
 
-namespace Drupal\migrate\Tests;
+namespace Drupal\migrate_drupal\Tests;
 
+use Drupal\migrate\Tests\MigrateTestBase;
 use Drupal\migrate\MigrateMessage;
 use Drupal\migrate\MigrateExecutable;
 
 /**
  * Tests migration of variables from the Locale module.
  */
-class MigrateLocaleConfigsTest extends MigrateTestBase {
+class MigrateLocaleConfigsTest extends MigrateDrupalTestBase {
 
   /**
    * {@inheritdoc}
@@ -22,7 +23,7 @@ class MigrateLocaleConfigsTest extends MigrateTestBase {
     return array(
       'name'  => 'Migrate variables to locale.settings.yml',
       'description'  => 'Upgrade variables to locale.settings.yml',
-      'group' => 'Migrate',
+      'group' => 'Migrate Drupal',
     );
   }
 
@@ -32,7 +33,7 @@ class MigrateLocaleConfigsTest extends MigrateTestBase {
   public function testLocaleSettings() {
     $migration = entity_load('migration', 'd6_locale_settings');
     $dumps = array(
-      drupal_get_path('module', 'migrate') . '/lib/Drupal/migrate/Tests/Dump/Drupal6LocaleSettings.php',
+      drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6LocaleSettings.php',
     );
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, new MigrateMessage());

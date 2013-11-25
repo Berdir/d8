@@ -5,15 +5,16 @@
  * Contains \Drupal\system\Tests\Upgrade\MigrateDblogConfigsTest.
  */
 
-namespace Drupal\migrate\Tests;
+namespace Drupal\migrate_drupal\Tests;
 
+use Drupal\migrate\Tests\MigrateTestBase;
 use Drupal\migrate\MigrateMessage;
 use Drupal\migrate\MigrateExecutable;
 
 /**
  * Tests migration of variables from the dblog module.
  */
-class MigrateDblogConfigsTest extends MigrateTestBase {
+class MigrateDblogConfigsTest extends MigrateDrupalTestBase {
 
   /**
    * {@inheritdoc}
@@ -22,7 +23,7 @@ class MigrateDblogConfigsTest extends MigrateTestBase {
     return array(
       'name'  => 'Migrate variables to dblog.settings.yml',
       'description'  => 'Upgrade variables to dblog.settings.yml',
-      'group' => 'Migrate',
+      'group' => 'Migrate Drupal',
     );
   }
 
@@ -32,7 +33,7 @@ class MigrateDblogConfigsTest extends MigrateTestBase {
   public function testBookSettings() {
     $migration = entity_load('migration', 'd6_dblog_settings');
     $dumps = array(
-      drupal_get_path('module', 'migrate') . '/lib/Drupal/migrate/Tests/Dump/Drupal6DblogSettings.php',
+      drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6DblogSettings.php',
     );
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, new MigrateMessage());

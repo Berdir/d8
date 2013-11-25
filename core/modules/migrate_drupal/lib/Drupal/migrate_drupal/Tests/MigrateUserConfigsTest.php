@@ -5,15 +5,16 @@
  * Contains \Drupal\system\Tests\Upgrade\MigrateUserConfigsTest.
  */
 
-namespace Drupal\migrate\Tests;
+namespace Drupal\migrate_drupal\Tests;
 
+use Drupal\migrate\Tests\MigrateTestBase;
 use Drupal\migrate\MigrateMessage;
 use Drupal\migrate\MigrateExecutable;
 
 /**
  * Tests migration of variables from the User module.
  */
-class MigrateUserConfigsTest extends MigrateTestBase {
+class MigrateUserConfigsTest extends MigrateDrupalTestBase {
 
   /**
    * {@inheritdoc}
@@ -22,7 +23,7 @@ class MigrateUserConfigsTest extends MigrateTestBase {
     return array(
       'name'  => 'Migrate variables to user.*.yml',
       'description'  => 'Upgrade variables to user.*.yml',
-      'group' => 'Migrate',
+      'group' => 'Migrate Drupal',
     );
   }
 
@@ -32,7 +33,7 @@ class MigrateUserConfigsTest extends MigrateTestBase {
   public function testUserMail() {
     $migration = entity_load('migration', 'd6_user_mail');
     $dumps = array(
-      drupal_get_path('module', 'migrate') . '/lib/Drupal/migrate/Tests/Dump/Drupal6UserMail.php',
+      drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6UserMail.php',
     );
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, new MigrateMessage());

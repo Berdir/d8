@@ -5,15 +5,16 @@
  * Contains \Drupal\system\Tests\Upgrade\MigrateActionConfigsTest.
  */
 
-namespace Drupal\migrate\Tests;
+namespace Drupal\migrate_drupal\Tests;
 
+use Drupal\migrate\Tests\MigrateTestBase;
 use Drupal\migrate\MigrateMessage;
 use Drupal\migrate\MigrateExecutable;
 
 /**
  * Tests migration of variables from the Action module.
  */
-class MigrateActionConfigsTest extends MigrateTestBase {
+class MigrateActionConfigsTest extends MigrateDrupalTestBase {
 
   /**
    * {@inheritdoc}
@@ -22,7 +23,7 @@ class MigrateActionConfigsTest extends MigrateTestBase {
     return array(
       'name'  => 'Migrate variables to action.settings.yml',
       'description'  => 'Upgrade variables to action.settings.yml',
-      'group' => 'Migrate',
+      'group' => 'Migrate Drupal',
     );
   }
 
@@ -32,7 +33,7 @@ class MigrateActionConfigsTest extends MigrateTestBase {
   public function testActionSettings() {
     $migration = entity_load('migration', 'd6_action_settings');
     $dumps = array(
-      drupal_get_path('module', 'migrate') . '/lib/Drupal/migrate/Tests/Dump/Drupal6ActionSettings.php',
+      drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6ActionSettings.php',
     );
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, new MigrateMessage());

@@ -5,15 +5,16 @@
  * Contains \Drupal\system\Tests\Upgrade\MigrateContactConfigsTest.
  */
 
-namespace Drupal\migrate\Tests;
+namespace Drupal\migrate_drupal\Tests;
 
+use Drupal\migrate\Tests\MigrateTestBase;
 use Drupal\migrate\MigrateMessage;
 use Drupal\migrate\MigrateExecutable;
 
 /**
  * Tests migration of variables from the Contact module.
  */
-class MigrateContactConfigsTest extends MigrateTestBase {
+class MigrateContactConfigsTest extends MigrateDrupalTestBase {
 
   /**
    * {@inheritdoc}
@@ -22,7 +23,7 @@ class MigrateContactConfigsTest extends MigrateTestBase {
     return array(
       'name'  => 'Migrate variables to contact.settings',
       'description'  => 'Upgrade variables to contact.settings.yml',
-      'group' => 'Migrate',
+      'group' => 'Migrate Drupal',
     );
   }
 
@@ -32,7 +33,7 @@ class MigrateContactConfigsTest extends MigrateTestBase {
   public function testContactSettings() {
     $migration = entity_load('migration', 'd6_contact_settings');
     $dumps = array(
-      drupal_get_path('module', 'migrate') . '/lib/Drupal/migrate/Tests/Dump/Drupal6ContactSettings.php',
+      drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6ContactSettings.php',
     );
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, new MigrateMessage());

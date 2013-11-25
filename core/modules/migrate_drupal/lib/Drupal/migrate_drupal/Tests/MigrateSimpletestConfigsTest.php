@@ -5,15 +5,16 @@
  * Contains \Drupal\system\Tests\Upgrade\MigrateSimpletestConfigsTest.
  */
 
-namespace Drupal\migrate\Tests;
+namespace Drupal\migrate_drupal\Tests;
 
+use Drupal\migrate\Tests\MigrateTestBase;
 use Drupal\migrate\MigrateMessage;
 use Drupal\migrate\MigrateExecutable;
 
 /**
  * Tests migration of variables from the Simpletest module.
  */
-class MigrateSimpletestConfigsTest extends MigrateTestBase {
+class MigrateSimpletestConfigsTest extends MigrateDrupalTestBase {
 
   /**
    * {@inheritdoc}
@@ -22,7 +23,7 @@ class MigrateSimpletestConfigsTest extends MigrateTestBase {
     return array(
       'name'  => 'Migrate variables to simpletest.settings.yml',
       'description'  => 'Upgrade variables to simpletest.settings.yml',
-      'group' => 'Migrate',
+      'group' => 'Migrate Drupal',
     );
   }
 
@@ -32,7 +33,7 @@ class MigrateSimpletestConfigsTest extends MigrateTestBase {
   public function testSimpletestSettings() {
     $migration = entity_load('migration', 'd6_simpletest_settings');
     $dumps = array(
-      drupal_get_path('module', 'migrate') . '/lib/Drupal/migrate/Tests/Dump/Drupal6SimpletestSettings.php',
+      drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6SimpletestSettings.php',
     );
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, new MigrateMessage());

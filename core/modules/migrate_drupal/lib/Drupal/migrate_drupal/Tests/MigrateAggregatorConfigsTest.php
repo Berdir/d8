@@ -5,15 +5,16 @@
  * Contains \Drupal\system\Tests\Upgrade\MigrateAggregatorConfigsTest.
  */
 
-namespace Drupal\migrate\Tests;
+namespace Drupal\migrate_drupal\Tests;
 
+use Drupal\migrate\Tests\MigrateTestBase;
 use Drupal\migrate\MigrateMessage;
 use Drupal\migrate\MigrateExecutable;
 
 /**
  * Tests migration of variables from the Aggregator module.
  */
-class MigrateAggregatorConfigsTest extends MigrateTestBase {
+class MigrateAggregatorConfigsTest extends MigrateDrupalTestBase {
 
   /**
    * {@inheritdoc}
@@ -22,7 +23,7 @@ class MigrateAggregatorConfigsTest extends MigrateTestBase {
     return array(
       'name'  => 'Migrate variables to aggregator.settings.yml',
       'description'  => 'Upgrade variables to aggregator.settings.yml',
-      'group' => 'Migrate',
+      'group' => 'Migrate Drupal',
     );
   }
 
@@ -32,7 +33,7 @@ class MigrateAggregatorConfigsTest extends MigrateTestBase {
   public function testAggregatorSettings() {
     $migration = entity_load('migration', 'd6_aggregator_settings');
     $dumps = array(
-      drupal_get_path('module', 'migrate') . '/lib/Drupal/migrate/Tests/Dump/Drupal6AggregatorSettings.php',
+      drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6AggregatorSettings.php',
     );
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, new MigrateMessage());

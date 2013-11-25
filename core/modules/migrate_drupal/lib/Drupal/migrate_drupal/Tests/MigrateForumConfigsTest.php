@@ -5,15 +5,16 @@
  * Contains \Drupal\system\Tests\Upgrade\MigrateForumConfigsTest.
  */
 
-namespace Drupal\migrate\Tests;
+namespace Drupal\migrate_drupal\Tests;
 
+use Drupal\migrate\Tests\MigrateTestBase;
 use Drupal\migrate\MigrateMessage;
 use Drupal\migrate\MigrateExecutable;
 
 /**
  * Tests migration of variables for the Forum module.
  */
-class MigrateForumConfigsTest extends MigrateTestBase {
+class MigrateForumConfigsTest extends MigrateDrupalTestBase {
 
   /**
    * {@inheritdoc}
@@ -22,7 +23,7 @@ class MigrateForumConfigsTest extends MigrateTestBase {
     return array(
       'name'  => 'Migrate variables to forum.settings.yml',
       'description'  => 'Upgrade variables to forum.settings.yml',
-      'group' => 'Migrate',
+      'group' => 'Migrate Drupal',
     );
   }
 
@@ -32,7 +33,7 @@ class MigrateForumConfigsTest extends MigrateTestBase {
   public function testForumSettings() {
     $migration = entity_load('migration', 'd6_forum_settings');
     $dumps = array(
-      drupal_get_path('module', 'migrate') . '/lib/Drupal/migrate/Tests/Dump/Drupal6ForumSettings.php',
+      drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6ForumSettings.php',
     );
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, new MigrateMessage());

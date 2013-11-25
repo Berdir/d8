@@ -5,15 +5,16 @@
  * Contains \Drupal\system\Tests\Upgrade\MigrateTaxonomyConfigsTest.
  */
 
-namespace Drupal\migrate\Tests;
+namespace Drupal\migrate_drupal\Tests;
 
+use Drupal\migrate\Tests\MigrateTestBase;
 use Drupal\migrate\MigrateMessage;
 use Drupal\migrate\MigrateExecutable;
 
 /**
  * Tests migration of variables from the Taxonomy module.
  */
-class MigrateTaxonomyConfigsTest extends MigrateTestBase {
+class MigrateTaxonomyConfigsTest extends MigrateDrupalTestBase {
 
   /**
    * {@inheritdoc}
@@ -22,7 +23,7 @@ class MigrateTaxonomyConfigsTest extends MigrateTestBase {
     return array(
       'name'  => 'Migrate variables to taxonomy.settings.yml',
       'description'  => 'Upgrade variables to taxonomy.settings.yml',
-      'group' => 'Migrate',
+      'group' => 'Migrate Drupal',
     );
   }
 
@@ -32,7 +33,7 @@ class MigrateTaxonomyConfigsTest extends MigrateTestBase {
   public function testTaxonomySettings() {
     $migration = entity_load('migration', 'd6_taxonomy_settings');
     $dumps = array(
-      drupal_get_path('module', 'migrate') . '/lib/Drupal/migrate/Tests/Dump/Drupal6TaxonomySettings.php',
+      drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6TaxonomySettings.php',
     );
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, new MigrateMessage());

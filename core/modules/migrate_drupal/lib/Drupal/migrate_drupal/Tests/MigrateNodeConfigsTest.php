@@ -5,12 +5,13 @@
  * Contains \Drupal\system\Tests\Upgrade\MigrateSystemSiteTest.
  */
 
-namespace Drupal\migrate\Tests;
+namespace Drupal\migrate_drupal\Tests;
 
+use Drupal\migrate\Tests\MigrateTestBase;
 use Drupal\migrate\MigrateMessage;
 use Drupal\migrate\MigrateExecutable;
 
-class MigrateNodeConfigsTest extends MigrateTestBase {
+class MigrateNodeConfigsTest extends MigrateDrupalTestBase {
 
   /**
    * {@inheritdoc}
@@ -19,14 +20,14 @@ class MigrateNodeConfigsTest extends MigrateTestBase {
     return array(
       'name'  => 'Migrate variables to node.settings.yml',
       'description'  => 'Upgrade variables to node.settings.yml',
-      'group' => 'Migrate',
+      'group' => 'Migrate Drupal',
     );
   }
 
   function testNodeSettings() {
     $migration = entity_load('migration', 'd6_node_settings');
     $dumps = array(
-      drupal_get_path('module', 'migrate') . '/lib/Drupal/migrate/Tests/Dump/Drupal6NodeSettings.php',
+      drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6NodeSettings.php',
     );
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, new MigrateMessage);

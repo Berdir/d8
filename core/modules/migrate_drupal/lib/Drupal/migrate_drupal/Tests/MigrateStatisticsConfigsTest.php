@@ -5,15 +5,16 @@
  * Contains \Drupal\system\Tests\Upgrade\MigrateStatisticsConfigsTest.
  */
 
-namespace Drupal\migrate\Tests;
+namespace Drupal\migrate_drupal\Tests;
 
+use Drupal\migrate\Tests\MigrateTestBase;
 use Drupal\migrate\MigrateMessage;
 use Drupal\migrate\MigrateExecutable;
 
 /**
  * Tests migration of variables from the Statistics module.
  */
-class MigrateStatisticsConfigsTest extends MigrateTestBase {
+class MigrateStatisticsConfigsTest extends MigrateDrupalTestBase {
 
   /**
    * {@inheritdoc}
@@ -22,7 +23,7 @@ class MigrateStatisticsConfigsTest extends MigrateTestBase {
     return array(
       'name'  => 'Migrate variables to statistics.settings.yml',
       'description'  => 'Upgrade variables to statistics.settings.yml',
-      'group' => 'Migrate',
+      'group' => 'Migrate Drupal',
     );
   }
 
@@ -32,7 +33,7 @@ class MigrateStatisticsConfigsTest extends MigrateTestBase {
   public function testStatisticsSettings() {
     $migration = entity_load('migration', 'd6_statistics_settings');
     $dumps = array(
-      drupal_get_path('module', 'migrate') . '/lib/Drupal/migrate/Tests/Dump/Drupal6StatisticsSettings.php',
+      drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6StatisticsSettings.php',
     );
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, new MigrateMessage());
