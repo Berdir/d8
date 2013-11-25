@@ -5,6 +5,8 @@
 
 namespace Drupal\migrate_drupal\Tests;
 
+use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
+
 
 /**
  * Tests taxonomy term migration with vocabulary filter from D6 to D8.

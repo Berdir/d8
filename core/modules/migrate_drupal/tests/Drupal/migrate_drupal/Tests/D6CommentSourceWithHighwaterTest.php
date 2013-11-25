@@ -7,6 +7,8 @@
 
 namespace Drupal\migrate_drupal\Tests;
 
+use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
+
 /**
  * Tests comment migration from D6 to D8 w/ highwater handling.
  *

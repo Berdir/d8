@@ -7,6 +7,8 @@
 
 namespace Drupal\migrate_drupal\Tests;
 
+use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
+
 /**
  * @group migrate
  * @group Drupal

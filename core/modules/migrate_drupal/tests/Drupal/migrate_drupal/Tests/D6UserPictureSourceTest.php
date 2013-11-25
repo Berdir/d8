@@ -7,6 +7,8 @@
 
 namespace Drupal\migrate_drupal\Tests;
 
+use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
+
 /**
  * Tests user picture migration from D6 to D8.
  *
