@@ -11,6 +11,9 @@ use Drupal\migrate\Row;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
 
 /**
+ * Tests the sql based ID map implementation.
+ *
+ * @group Drupal
  * @group migrate
  */
 class MigrateSqlIdMapTest extends MigrateTestCase {
@@ -63,6 +66,9 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
     return $id_map;
   }
 
+  /**
+   * Sets defaults for sql id map plugin tests.
+   */
   protected function idMapDefaults() {
     return array(
       'source_row_status' => MigrateIdMapInterface::STATUS_IMPORTED,
@@ -72,7 +78,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
   }
 
   /**
-   * Test the id mapping method.
+   * Tests the id mapping method.
    *
    * Create two id mappings and update the second to verify that:
    *
@@ -120,7 +126,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
   }
 
   /**
-   * Tests the sql id map message count method by counting and saving messages
+   * Tests the sql id map message count method by counting and saving messages.
    */
   public function testMessageCount() {
     $message = 'Hello world.';
@@ -136,7 +142,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
   }
 
   /**
-   * Test the getRowBySource method when it succeeds.
+   * Tests the getRowBySource method when it succeeds.
    */
   public function testGetSourceByIdSucceeds() {
     $row = array(
@@ -158,7 +164,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
   }
 
   /**
-   * Test the destination ID lookup method.
+   * Tests the destination ID lookup method.
    *
    * Scenarios to test (for both hits and misses) are:
    *
@@ -175,11 +181,12 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
   }
 
   /**
-   * Actually perform the destination ID test with a given number of source
-   * and destination fields.
+   * Performs destination ID test on source and destination fields.
    *
-   * @param $num_source_fields
-   * @param $num_destination_fields
+   * @param int $num_source_fields
+   *   Number of source fields to test.
+   * @param int $num_destination_fields
+   *   Number of destination fields to test.
    */
   protected function performLookupDestinationIDTest($num_source_fields, $num_destination_fields) {
     // Adjust the migration configuration according to the number of source and
@@ -212,7 +219,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
   }
 
   /**
-   * Test the source ID lookup method.
+   * Tests the source ID lookup method.
    *
    * Scenarios to test (for both hits and misses) are:
    *
@@ -229,11 +236,12 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
   }
 
   /**
-   * Actually perform the source ID test with a given number of source
-   * and destination fields.
+   * Performs the source ID test on source and destination fields.
    *
-   * @param $num_source_fields
-   * @param $num_destination_fields
+   * @param int $num_source_fields
+   *   Number of source fields to test.
+   * @param int $num_destination_fields
+   *   Number of destination fields to test.
    */
   protected function performLookupSourceIDTest($num_source_fields, $num_destination_fields) {
     // Adjust the migration configuration according to the number of source and
@@ -266,7 +274,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
   }
 
   /**
-   * Test the error count method.
+   * Tests the error count method.
    *
    * Scenarios to test for:
    *
@@ -281,11 +289,10 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
   }
 
   /**
-   * Actually perform the source ID test with a given number of source
-   * and destination fields.
+   * Performs error count test with a given number of error rows.
    *
-   * @param $num_source_fields
-   * @param $num_destination_fields
+   * @param int $num_error_rows
+   *   Number of error rows to test.
    */
   protected function performErrorCountTest($num_error_rows) {
     $database_contents['migrate_map_sql_idmap_test'] = array();
@@ -310,7 +317,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
   }
 
   /**
-   * Test the destroy method.
+   * Tests the destroy method.
    *
    * Scenarios to test for:
    *
@@ -322,8 +329,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
     $id_map = $this->getIdMap();
     $map_table_name = $id_map->getMapTableName();
     $message_table_name = $id_map->getMessageTableName();
-    $row = new Row(array('source_id_property' => 'source_value'),
-                   array('source_id_property' => array()));
+    $row = new Row(array('source_id_property' => 'source_value'), array('source_id_property' => array()));
     $id_map->saveIdMapping($row, array('destination_id_property' => 2));
     $id_map->saveMessage(array('source_value'), 'A message');
     $this->assertTrue($this->database->schema()->tableExists($map_table_name),
