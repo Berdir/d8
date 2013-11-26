@@ -89,4 +89,20 @@ class MigrateSystemConfigsTest extends MigrateDrupalTestBase {
     $this->assertIdentical($config->get('js.preprocess'), 0);
     $this->assertIdentical($config->get('cache.page.max_age'), 0);
   }
+
+  /**
+   * Tests migration of system (theme) variables to system.theme.yml.
+   */
+  public function testSystemTheme() {
+    $migration = entity_load('migration', 'd6_system_theme');
+    $dumps = array(
+      drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6SystemTheme.php',
+    );
+    $this->prepare($migration, $dumps);
+    $executable = new MigrateExecutable($migration, new MigrateMessage());
+    $executable->import();
+    $config = \Drupal::config('system.theme');
+    $this->assertIdentical($config->get('admin'), 0);
+    $this->assertIdentical($config->get('default'), 'garland');
+  }
 }
