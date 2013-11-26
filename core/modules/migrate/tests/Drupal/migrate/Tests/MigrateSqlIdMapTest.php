@@ -327,6 +327,48 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
   }
 
   /**
+   * Tests the update count method.
+   *
+   * Scenarios to test for:
+   *
+   * - No errors.
+   * - One error.
+   * - Multiple errors.
+   */
+  public function testUpdateCount() {
+    $this->performUpdateCountTest(0);
+    $this->performUpdateCountTest(1);
+    $this->performUpdateCountTest(3);
+  }
+
+  /**
+   * Performs the update count test with a given number of update rows.
+   *
+   * @param int $num_update_rows
+   *   The number of update rows to test.
+   */
+  protected function performUpdateCountTest($num_update_rows) {
+    $database_contents['migrate_map_sql_idmap_test'] = array();
+    for ($i = 0; $i < 5; $i++) {
+      $row = $this->idMapDefaults();
+      $row['sourceid1'] = "source_id_value_$i";
+      $row['destid1'] = "destination_id_value_$i";
+      $row['source_row_status'] = MigrateIdMapInterface::STATUS_IMPORTED;
+      $database_contents['migrate_map_sql_idmap_test'][] = $row;
+    }
+    for (; $i < 5 + $num_update_rows; $i++) {
+      $row = $this->idMapDefaults();
+      $row['sourceid1'] = "source_id_value_$i";
+      $row['destid1'] = "destination_id_value_$i";
+      $row['source_row_status'] = MigrateIdMapInterface::STATUS_NEEDS_UPDATE;
+      $database_contents['migrate_map_sql_idmap_test'][] = $row;
+    }
+    $id_map = $this->getIdMap($database_contents);
+    $count = $id_map->updateCount();
+    $this->assertSame($num_update_rows, $count);
+  }
+
+  /**
    * Tests the error count method.
    *
    * Scenarios to test for:
