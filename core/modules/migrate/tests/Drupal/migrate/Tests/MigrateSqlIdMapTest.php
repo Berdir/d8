@@ -126,6 +126,59 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
   }
 
   /**
+   * Tests the getRowsNeedingUpdate method for rows that need an update.
+   */
+  public function testGetRowsNeedingUpdate() {
+    $id_map = $this->getIdMap();
+    $row_statuses = array(
+      MigrateIdMapInterface::STATUS_IMPORTED,
+      MigrateIdMapInterface::STATUS_NEEDS_UPDATE,
+      MigrateIdMapInterface::STATUS_IGNORED,
+      MigrateIdMapInterface::STATUS_FAILED,
+    );
+    // Create a mapping row for each STATUS constant.
+    foreach ($row_statuses as $status) {
+      $source = array('source_id_property' => 'source_value_' . $status);
+      $row = new Row($source, array('source_id_property' => array()));
+      $destination = array('destination_id_property' => 'destination_value_' . $status);
+      $id_map->saveIdMapping($row, $destination, $status);
+      $expected_results[] = array(
+        'sourceid1' => 'source_value_' . $status,
+        'destid1' => 'destination_value_' . $status,
+        'source_row_status' => $status,
+        'rollback_action' => MigrateIdMapInterface::ROLLBACK_DELETE,
+        'hash' => '',
+      );
+      // Assert zero rows need an update.
+      if ($status == MigrateIdMapInterface::STATUS_IMPORTED) {
+        $rows_needing_update = $id_map->getRowsNeedingUpdate(1);
+        $this->assertCount(0, $rows_needing_update);
+      }
+    }
+    // Assert that test values exist.
+    $this->queryResultTest($this->database->databaseContents['migrate_map_sql_idmap_test'], $expected_results);
+
+    // Assert a single row needs an update.
+    $row_needing_update = $id_map->getRowsNeedingUpdate(1);
+    $this->assertCount(1, $row_needing_update);
+
+    // Assert the row matches its original source.
+    $source_id = $expected_results[MigrateIdMapInterface::STATUS_NEEDS_UPDATE]['sourceid1'];
+    $test_row = $id_map->getRowBySource(array($source_id));
+    $this->assertSame($test_row, $row_needing_update[0]);
+
+    // Add additional row that needs an update.
+    $source = array('source_id_property' => 'source_value_multiple');
+    $row = new Row($source, array('source_id_property' => array()));
+    $destination = array('destination_id_property' => 'destination_value_multiple');
+    $id_map->saveIdMapping($row, $destination, MigrateIdMapInterface::STATUS_NEEDS_UPDATE);
+
+    // Assert multiple rows need an update.
+    $rows_needing_update = $id_map->getRowsNeedingUpdate(2);
+    $this->assertCount(2, $rows_needing_update);
+  }
+
+  /**
    * Tests the sql id map message count method by counting and saving messages.
    */
   public function testMessageCount() {
