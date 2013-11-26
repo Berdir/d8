@@ -169,4 +169,22 @@ class MigrateSystemConfigsTest extends MigrateDrupalTestBase {
     $this->assertIdentical($config->get('jpeg_quality'), 75);
   }
 
+  /**
+   * Tests migration of system (file) variables to system.file.yml.
+   */
+  public function testSystemFile() {
+    $migration = entity_load('migration', 'd6_system_file');
+    $dumps = array(
+      drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6SystemFile.php',
+    );
+    $this->prepare($migration, $dumps);
+    $executable = new MigrateExecutable($migration, new MigrateMessage());
+    $executable->import();
+    config_context_enter('config.context.free');
+    $config = \Drupal::config('system.file');
+    $this->assertIdentical($config->get('path.private'), 'files/test');
+    $this->assertIdentical($config->get('path.temporary'), 'files/temp');
+    config_context_leave();
+  }
+
 }
