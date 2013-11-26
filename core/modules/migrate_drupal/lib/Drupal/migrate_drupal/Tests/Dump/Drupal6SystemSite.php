@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @file
+ * Contains \Drupal\migrate_drupal\Tests\Drupal6SystemSite.
+ */
+
 namespace Drupal\migrate_drupal\Tests\Dump;
 
 use Drupal\Core\Database\Connection;
@@ -10,7 +15,10 @@ use Drupal\Core\Database\Connection;
 class Drupal6SystemSite {
 
   /**
+   * Sample database schema and values.
+   *
    * @param \Drupal\Core\Database\Connection $database
+   *   The database connection.
    */
   public static function load(Connection $database) {
     $database->schema()->createTable('variable', array(
@@ -40,31 +48,27 @@ class Drupal6SystemSite {
     ))
     ->values(array(
       'name' => 'site_name',
-      'value' => 's:6:"drupal";',
+      'value' => 's:6:"Drupal";',
     ))
     ->values(array(
       'name' => 'site_mail',
-      'value' => 's:17:"admin@example.com";',
+      'value' => serialize(ini_get('sendmail_from')),
     ))
     ->values(array(
       'name' => 'site_slogan',
-      'value' => 's:13:"Migrate rocks";',
-    ))
-    ->values(array(
-      'name' => 'site_frontpage',
-      'value' => 's:12:"anonymous-hp";',
+      'value' => 's:0:"";',
     ))
     ->values(array(
       'name' => 'site_403',
-      'value' => 's:4:"user";',
+      'value' => 's:0:"";',
     ))
     ->values(array(
       'name' => 'site_404',
-      'value' => 's:14:"page-not-found";',
+      'value' => 's:0:"";',
     ))
     ->values(array(
-      'name' => 'drupal_weight_select_max',
-      'value' => 'i:99;',
+      'name' => 'site_frontpage',
+      'value' => 's:4:"node";',
     ))
     ->values(array(
       'name' => 'admin_compact_mode',
@@ -72,4 +76,5 @@ class Drupal6SystemSite {
     ))
     ->execute();
   }
+
 }

@@ -23,25 +23,6 @@ class MigrateSystemConfigsTest extends MigrateDrupalTestBase {
     );
   }
 
-  function testSystemSite() {
-    $migration = entity_load('migration', 'd6_system_site');
-    $dumps = array(
-      drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6SystemSite.php',
-    );
-    $this->prepare($migration, $dumps);
-    $executable = new MigrateExecutable($migration, new MigrateMessage);
-    $executable->import();
-    $config = \Drupal::config('system.site');
-    $this->assertIdentical($config->get('name'), 'drupal');
-    $this->assertIdentical($config->get('mail'), 'admin@example.com');
-    $this->assertIdentical($config->get('slogan'), 'Migrate rocks');
-    $this->assertIdentical($config->get('page.front'), 'anonymous-hp');
-    $this->assertIdentical($config->get('page.403'), 'user');
-    $this->assertIdentical($config->get('page.404'), 'page-not-found');
-    $this->assertIdentical($config->get('weight_select_max'), 99);
-    $this->assertIdentical($config->get('admin_compact_mode'), FALSE);
-  }
-
   /**
    * Tests migration of system (cron) variables to system.cron.yml.
    */
@@ -120,6 +101,27 @@ class MigrateSystemConfigsTest extends MigrateDrupalTestBase {
     $config = \Drupal::config('system.maintenance');
     $this->assertIdentical($config->get('enable'), 0);
     $this->assertIdentical($config->get('message'), 'Drupal is currently under maintenance. We should be back shortly. Thank you for your patience.');
+  }
+
+  /**
+   * Tests migration of system (site) variables to system.site.yml.
+   */
+  public function testSystemSite() {
+    $migration = entity_load('migration', 'd6_system_site');
+    $dumps = array(
+      drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6SystemSite.php',
+    );
+    $this->prepare($migration, $dumps);
+    $executable = new MigrateExecutable($migration, new MigrateMessage());
+    $executable->import();
+    $config = \Drupal::config('system.site');
+    $this->assertIdentical($config->get('name'), 'Drupal');
+    $this->assertIdentical($config->get('mail'), ini_get('sendmail_from'));
+    $this->assertIdentical($config->get('slogan'), '');
+    $this->assertIdentical($config->get('page.403'), '');
+    $this->assertIdentical($config->get('page.404'), '');
+    $this->assertIdentical($config->get('page.front'), 'node');
+    $this->assertIdentical($config->get('admin_compact_mode'), FALSE);
   }
 
 }
