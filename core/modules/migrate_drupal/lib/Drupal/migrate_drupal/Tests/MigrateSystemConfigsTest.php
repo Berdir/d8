@@ -139,4 +139,34 @@ class MigrateSystemConfigsTest extends MigrateDrupalTestBase {
     $this->assertIdentical($config->get('protocols'), array('http', 'https', 'ftp', 'news', 'nntp', 'tel', 'telnet', 'mailto', 'irc', 'ssh', 'sftp', 'webcal', 'rtsp'));
   }
 
+  /**
+   * Tests migration of system (image) variables to system.image.yml.
+   */
+  public function testSystemImage() {
+    $migration = entity_load('migration', 'd6_system_image');
+    $dumps = array(
+      drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6SystemImage.php',
+    );
+    $this->prepare($migration, $dumps);
+    $executable = new MigrateExecutable($migration, new MigrateMessage());
+    $executable->import();
+    $config = \Drupal::config('system.image');
+    $this->assertIdentical($config->get('toolkit'), 'gd');
+  }
+
+  /**
+   * Tests migration of system (image GD) variables to system.image.gd.yml.
+   */
+  public function testSystemImageGd() {
+    $migration = entity_load('migration', 'd6_system_image_gd');
+    $dumps = array(
+      drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6SystemImageGd.php',
+    );
+    $this->prepare($migration, $dumps);
+    $executable = new MigrateExecutable($migration, new MigrateMessage());
+    $executable->import();
+    $config = \Drupal::config('system.image.gd');
+    $this->assertIdentical($config->get('jpeg_quality'), 75);
+  }
+
 }
