@@ -124,4 +124,19 @@ class MigrateSystemConfigsTest extends MigrateDrupalTestBase {
     $this->assertIdentical($config->get('admin_compact_mode'), FALSE);
   }
 
+  /**
+   * Tests migration of system (filter) variables to system.filter.yml.
+   */
+  public function testSystemFilter() {
+    $migration = entity_load('migration', 'd6_system_filter');
+    $dumps = array(
+      drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6SystemFilter.php',
+    );
+    $this->prepare($migration, $dumps);
+    $executable = new MigrateExecutable($migration, new MigrateMessage());
+    $executable->import();
+    $config = \Drupal::config('system.filter');
+    $this->assertIdentical($config->get('protocols'), array('http', 'https', 'ftp', 'news', 'nntp', 'tel', 'telnet', 'mailto', 'irc', 'ssh', 'sftp', 'webcal', 'rtsp'));
+  }
+
 }
