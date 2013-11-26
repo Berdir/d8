@@ -105,4 +105,21 @@ class MigrateSystemConfigsTest extends MigrateDrupalTestBase {
     $this->assertIdentical($config->get('admin'), 0);
     $this->assertIdentical($config->get('default'), 'garland');
   }
+
+  /**
+   * Tests migration of system (maintenance) variables to system.maintenance.yml.
+   */
+  public function testSystemMaintenance() {
+    $migration = entity_load('migration', 'd6_system_maintenance');
+    $dumps = array(
+      drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6SystemMaintenance.php',
+    );
+    $this->prepare($migration, $dumps);
+    $executable = new MigrateExecutable($migration, new MigrateMessage());
+    $executable->import();
+    $config = \Drupal::config('system.maintenance');
+    $this->assertIdentical($config->get('enable'), 0);
+    $this->assertIdentical($config->get('message'), 'Drupal is currently under maintenance. We should be back shortly. Thank you for your patience.');
+  }
+
 }
