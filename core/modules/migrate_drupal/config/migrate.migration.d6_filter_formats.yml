@@ -1,51 +1,51 @@
 id: d6_filter_formats
 sourceIds:
-    format:
-        type: int
-        "not null": true,
-        default: 0
+  format:
+    type: int
+    "not null": true,
+    default: 0
 destinationIds:
-    format:
-        type: varchar
-        length: 255
+  format:
+    type: varchar
+    length: 255
 source:
-    plugin: drupal6_filter_formats
+  plugin: drupal6_filter_formats
 process:
-    format:
-        -
-            plugin: machine_name
-            source: name
-        -
-            plugin: dedupe_entity
-            entity_type: filter_format
-            field: format
-    name: name
-    # this will need an iterator + plugin: migration, id: role.
-    roles: roles
-    cache: cache
-    filters:
-        plugin: iterator
-        source: filters
-        key: @id
-        process:
-            id:
-                plugin: map
-                source:
-                    - module
-                    - delta
-                map:
-                    filter:
-                        - filter_html_escape
-                        - filter_autop
-                        - filter_url
-                        - filter_htmlcorrector
-                        - filter_html_escape
-                    php:
-                        - php_code
-            settings: settings
-            status:
-                plugin: default_value
-                default_value: true
+  format:
+    -
+      plugin: machine_name
+      source: name
+    -
+      plugin: dedupe_entity
+      entity_type: filter_format
+      field: format
+  name: name
+  # this will need an iterator + plugin: migration, id: role.
+  roles: roles
+  cache: cache
+  filters:
+    plugin: iterator
+    source: filters
+    key: @id
+    process:
+      id:
+        plugin: map
+        source:
+          - module
+          - delta
+        map:
+          filter:
+            - filter_html_escape
+            - filter_autop
+            - filter_url
+            - filter_htmlcorrector
+            - filter_html_escape
+          php:
+            - php_code
+      settings: settings
+      status:
+        plugin: default_value
+        default_value: true
 destination:
-    plugin: entity
-    entity_type: filter_format
+  plugin: entity
+  entity_type: filter_format
