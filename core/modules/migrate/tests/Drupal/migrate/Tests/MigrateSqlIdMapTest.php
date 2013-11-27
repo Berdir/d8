@@ -367,6 +367,43 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
   }
 
   /**
+   * Tests the number of processed source rows.
+   *
+   * Scenarios to test for:
+   *
+   * - No processed rows.
+   * - One processed row.
+   * - Multiple processed rows.
+   */
+  public function testProcessedCount() {
+    $id_map = $this->getIdMap();
+    // Assert zero rows have been processed before adding rows.
+    $processed_count = $id_map->processedCount();
+    $this->assertSame(0, $processed_count);
+    $row_statuses = array(
+      MigrateIdMapInterface::STATUS_IMPORTED,
+      MigrateIdMapInterface::STATUS_NEEDS_UPDATE,
+      MigrateIdMapInterface::STATUS_IGNORED,
+      MigrateIdMapInterface::STATUS_FAILED,
+    );
+    // Create a mapping row for each STATUS constant.
+    foreach ($row_statuses as $status) {
+      $source = array('source_id_property' => 'source_value_' . $status);
+      $row = new Row($source, array('source_id_property' => array()));
+      $destination = array('destination_id_property' => 'destination_value_' . $status);
+      $id_map->saveIdMapping($row, $destination, $status);
+      if ($status == MigrateIdMapInterface::STATUS_IMPORTED) {
+        // Assert a single row has been processed.
+        $processed_count = $id_map->processedCount();
+        $this->assertSame(1, $processed_count);
+      }
+    }
+    // Assert multiple rows have been processed.
+    $processed_count = $id_map->processedCount();
+    $this->assertSame(count($row_statuses), $processed_count);
+  }
+
+  /**
    * Tests the update count method.
    *
    * Scenarios to test for:
