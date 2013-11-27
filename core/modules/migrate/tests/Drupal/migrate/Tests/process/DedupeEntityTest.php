@@ -103,6 +103,9 @@ class DedupeEntityTest extends MigrateProcessTestCase {
 
   /**
    * Helper adding expectations to the mock entity object.
+   *
+   * @param $count
+   *   The number of deduplications to be set up.
    */
   protected function entityQueryExpects($count) {
     $this->entityQuery->expects($this->exactly($count + 1))
