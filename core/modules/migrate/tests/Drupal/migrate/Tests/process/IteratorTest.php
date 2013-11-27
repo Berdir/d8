@@ -8,8 +8,7 @@ namespace Drupal\migrate\Tests\process;
 
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate\Plugin\migrate\process\Get;
-use Drupal\migrate\Plugin\migrate\process\MigratationExecutableIteratorTest;
-use Drupal\migrate\Plugin\migrate\process\TestIterator;
+use Drupal\migrate\Plugin\migrate\process\Iterator;
 use Drupal\migrate\Row;
 use Drupal\migrate\Tests\MigrateTestCase;
 
@@ -42,34 +41,28 @@ class IteratorTest extends MigrateTestCase {
   }
 
   /**
-   * {@inheritdoc}
-   */
-  function setUp() {
-    $this->plugin = new TestIterator();
-    parent::setUp();
-  }
-
-  /**
    * Test the iterator process plugin.
    */
   function testIterator() {
     $migration = $this->getMigration();
     // Set up the properties for the iterator.
-    $properties = array(
-      'foo' => 'source_foo',
-      'id' => 'source_id'
+    $configuration = array(
+      'process' => array(
+        'foo' => 'source_foo',
+        'id' => 'source_id',
+      ),
+      'key' => '@id',
     );
-    $this->plugin->setProcess($properties);
+    $plugin = new Iterator($configuration, 'iterator', array());
     // Manually create the plugins. Migration::getProcessPlugins does this
     // normally but the plugin system is not working.
-    foreach ($properties as $destination => $source) {
+    foreach ($configuration['process'] as $destination => $source) {
       $iterator_plugins[$destination][] = new Get(array('source' => $source), 'get', array());
     }
     $migration->expects($this->at(1))
       ->method('getProcessPlugins')
       ->will($this->returnValue($iterator_plugins));
-    // Set up the key for the iterator.
-    $this->plugin->setKey('@id');
+    // Set up the key plugins.
     $key_plugin['key'][] = new Get(array('source' => '@id'), 'get', array());
     $migration->expects($this->at(2))
       ->method('getProcessPlugins')
@@ -84,23 +77,10 @@ class IteratorTest extends MigrateTestCase {
     );
     // This is not used but the interface requires it, so create an empty row.
     $row = new Row(array(), array());
-    $new_value = $this->plugin->transform($current_value, $migrate_executable, $row, 'test');
+    $new_value = $plugin->transform($current_value, $migrate_executable, $row, 'test');
     $this->assertSame(count($new_value), 1);
     $this->assertSame(count($new_value[42]), 2);
     $this->assertSame($new_value[42]['foo'], 'test');
     $this->assertSame($new_value[42]['id'], 42);
-  }
-}
-
-namespace Drupal\migrate\Plugin\migrate\process;
-
-class TestIterator extends Iterator {
-  function __construct() {
-  }
-  function setKey($key) {
-    $this->configuration['key'] = $key;
-  }
-  function setProcess($process) {
-    $this->configuration['process'] = $process;
   }
 }
