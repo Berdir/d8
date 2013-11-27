@@ -24,6 +24,9 @@ class Map extends PluginBase implements MigrateProcessInterface {
    */
   public function transform($value, MigrateExecutable $migrate_executable, Row $row, $destination_property) {
     $map = $this->configuration['map'];
+    if (!is_array($value)) {
+      $value = array($value);
+    }
     foreach ($value as $key) {
       $map = $map[$key];
     }

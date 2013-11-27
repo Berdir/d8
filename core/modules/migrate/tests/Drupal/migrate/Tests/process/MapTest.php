@@ -25,16 +25,36 @@ class MapTest extends MigrateProcessTestCase {
     );
   }
 
-  function testMap() {
-    $row = $this->getMockBuilder('Drupal\migrate\Row')
+  /**
+   * {@inheritdoc}
+   */
+  function setUp() {
+    $this->row = $this->getMockBuilder('Drupal\migrate\Row')
       ->disableOriginalConstructor()
       ->getMock();
-    $migrate_executable = $this->getMockBuilder('Drupal\migrate\MigrateExecutable')
+    $this->migrateExecutable = $this->getMockBuilder('Drupal\migrate\MigrateExecutable')
       ->disableOriginalConstructor()
       ->getMock();
+    parent::setUp();
+  }
+
+  /**
+   * Test map when the source is a string.
+   */
+  function testMapWithSourceString() {
+    $configuration['map']['foo'] = 'bar';
+    $plugin = new Map($configuration, 'map', array());
+    $value = $plugin->transform('foo', $this->migrateExecutable, $this->row, 'destinationproperty');
+    $this->assertSame($value, 'bar');
+  }
+
+  /**
+   * Test map when the source is a list.
+   */
+  function testMapWithSourceList() {
     $configuration['map']['foo']['bar'] = 'baz';
     $plugin = new Map($configuration, 'map', array());
-    $value = $plugin->transform(array('foo', 'bar'), $migrate_executable, $row, 'destinationproperty');
+    $value = $plugin->transform(array('foo', 'bar'), $this->migrateExecutable, $this->row, 'destinationproperty');
     $this->assertSame($value, 'baz');
   }
 }
