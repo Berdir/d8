@@ -54,11 +54,13 @@ abstract class MigrateTestCase extends UnitTestCase {
   /**
    * @return \Drupal\Core\Database\Connection
    */
-  protected function getDatabase($database_contents) {
+  protected function getDatabase($database_contents, $connection_options = array(), $prefix = '') {
     $database = $this->getMockBuilder('Drupal\Core\Database\Connection')
       ->disableOriginalConstructor()
       ->getMock();
     $database->databaseContents = &$database_contents;
+    $database->fakeConnectionOptions = &$connection_options;
+    $database->fakePrefixes = array('default' => $prefix);
 
     // Although select doesn't modify the contents of the database, it still
     // eneds to be a reference so that we can SELECT previously INSERT /
@@ -90,6 +92,18 @@ abstract class MigrateTestCase extends UnitTestCase {
     $database->expects($this->any())
       ->method('query')
       ->will($this->throwException(new \Exception('Query is not supported')));
+    $database->expects($this->any())
+      ->method('getConnectionOptions')
+      ->will($this->returnCallback(function () use (&$database) {
+      return $database->fakeConnectionOptions;
+    }));
+    // Only supports a default prefix.
+    $database->expects($this->any())
+      ->method('tablePrefix')
+      ->will($this->returnCallback(function ($table = 'default') use (&$database) {
+      return $database->fakePrefixes['default'];
+    }));
+
     return $database;
   }
 

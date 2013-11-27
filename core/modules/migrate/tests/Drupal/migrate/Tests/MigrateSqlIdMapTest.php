@@ -52,13 +52,17 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
    * @param array $database_contents
    *   An array keyed by table names. Value are list of rows where each row is
    *   an associative array of field => value.
+   * @param array $connection_options
+   *   An optional array of database connection options.
+   * @param array $prefix
+   *   Option default database prefix.
    *
    * @return \Drupal\migrate\Tests\TestSqlIdmap
    *   A sql id map plugin test instance.
    */
-  protected function getIdMap($database_contents = array()) {
+  protected function getIdMap($database_contents = array(), $connection_options = array(), $prefix = '') {
     $migration = $this->getMigration();
-    $this->database = $this->getDatabase($database_contents);
+    $this->database = $this->getDatabase($database_contents, $connection_options, $prefix);
     $id_map = new TestSqlIdmap($this->database, array(), 'sql', array(), $migration);
     $migration->expects($this->any())
       ->method('getIdMap')
@@ -436,5 +440,23 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
                        "$map_table_name does not exist");
     $this->assertFalse($this->database->schema()->tableExists($message_table_name),
                        "$message_table_name does not exist");
+  }
+
+  /**
+   * Tests the getQualifiedMapTable method with an unprefixed database.
+   */
+  public function testGetQualifiedMapTableNoPrefix() {
+    $id_map = $this->getIdMap(array(), array('database' => 'source_database'));
+    $qualified_map_table = $id_map->getQualifiedMapTableName();
+    $this->assertEquals('source_database.migrate_map_sql_idmap_test', $qualified_map_table);
+  }
+
+  /**
+   * Tests the getQualifiedMapTable method with a prefixed database.
+   */
+  public function testGetQualifiedMapTablePrefix() {
+    $id_map = $this->getIdMap(array(), array('database' => 'source_database'), 'prefix');
+    $qualified_map_table = $id_map->getQualifiedMapTableName();
+    $this->assertEquals('migrate_map_sql_idmap_test', $qualified_map_table);
   }
 }
