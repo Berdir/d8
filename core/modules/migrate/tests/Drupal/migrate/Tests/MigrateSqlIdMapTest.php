@@ -331,13 +331,49 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
   }
 
   /**
+   * Tests the imported count method.
+   *
+   * Scenarios to test for:
+   *
+   * - No imports.
+   * - One import.
+   * - Multiple imports.
+   */
+  public function testImportedCount() {
+    $id_map = $this->getIdMap();
+    // Add a single failed row and assert zero imported rows.
+    $source = array('source_id_property' => 'source_value_failed');
+    $row = new Row($source, array('source_id_property' => array()));
+    $destination = array('destination_id_property' => 'destination_value_failed');
+    $id_map->saveIdMapping($row, $destination, MigrateIdMapInterface::STATUS_FAILED);
+    $imported_count = $id_map->importedCount();
+    $this->assertSame(0, $imported_count);
+
+    // Add an imported row and assert single count.
+    $source = array('source_id_property' => 'source_value_imported');
+    $row = new Row($source, array('source_id_property' => array()));
+    $destination = array('destination_id_property' => 'destination_value_imported');
+    $id_map->saveIdMapping($row, $destination, MigrateIdMapInterface::STATUS_IMPORTED);
+    $imported_count = $id_map->importedCount();
+    $this->assertSame(1, $imported_count);
+
+    // Add a row needing update and assert multiple imported rows.
+    $source = array('source_id_property' => 'source_value_update');
+    $row = new Row($source, array('source_id_property' => array()));
+    $destination = array('destination_id_property' => 'destination_value_update');
+    $id_map->saveIdMapping($row, $destination, MigrateIdMapInterface::STATUS_NEEDS_UPDATE);
+    $imported_count = $id_map->importedCount();
+    $this->assertSame(2, $imported_count);
+  }
+
+  /**
    * Tests the update count method.
    *
    * Scenarios to test for:
    *
-   * - No errors.
-   * - One error.
-   * - Multiple errors.
+   * - No updates.
+   * - One update.
+   * - Multiple updates.
    */
   public function testUpdateCount() {
     $this->performUpdateCountTest(0);
