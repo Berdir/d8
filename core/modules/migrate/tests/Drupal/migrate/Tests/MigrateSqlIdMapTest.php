@@ -9,6 +9,7 @@ namespace Drupal\migrate\Tests;
 
 use Drupal\migrate\Row;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
+use Drupal\migrate\MigrateException;
 
 /**
  * Tests the sql based ID map implementation.
@@ -486,6 +487,53 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
     $id_map = $this->getIdMap($database_contents);
     $count = $id_map->errorCount();
     $this->assertSame($num_error_rows, $count);
+  }
+
+  /**
+   * Tests setting a row source_row_status to STATUS_NEEDS_UPDATE.
+   */
+  public function testSetUpdate() {
+    $id_map = $this->getIdMap();
+    $row_statuses = array(
+      MigrateIdMapInterface::STATUS_IMPORTED,
+      MigrateIdMapInterface::STATUS_NEEDS_UPDATE,
+      MigrateIdMapInterface::STATUS_IGNORED,
+      MigrateIdMapInterface::STATUS_FAILED,
+    );
+    // Create a mapping row for each STATUS constant.
+    foreach ($row_statuses as $status) {
+      $source = array('source_id_property' => 'source_value_' . $status);
+      $row = new Row($source, array('source_id_property' => array()));
+      $destination = array('destination_id_property' => 'destination_value_' . $status);
+      $id_map->saveIdMapping($row, $destination, $status);
+      $expected_results[] = array(
+        'sourceid1' => 'source_value_' . $status,
+        'destid1' => 'destination_value_' . $status,
+        'source_row_status' => $status,
+        'rollback_action' => MigrateIdMapInterface::ROLLBACK_DELETE,
+        'hash' => '',
+      );
+    }
+    // Assert that test values exist.
+    $this->queryResultTest($this->database->databaseContents['migrate_map_sql_idmap_test'], $expected_results);
+    // Mark each row as STATUS_NEEDS_UPDATE.
+    foreach ($row_statuses as $status) {
+      $id_map->setUpdate(array('source_value_' . $status));
+    }
+    // Update expected results.
+    foreach ($expected_results as $key => $value) {
+      $expected_results[$key]['source_row_status'] = MigrateIdMapInterface::STATUS_NEEDS_UPDATE;
+    }
+    // Assert that updated expected values match.
+    $this->queryResultTest($this->database->databaseContents['migrate_map_sql_idmap_test'], $expected_results);
+    // Assert an exception is thrown when source identifiers are not provided.
+    try {
+      $id_map->setUpdate(array());
+      $this->assertFalse(FALSE, 'MigrateException not thrown, when source identifiers were provided to update.');
+    }
+    catch (MigrateException $e) {
+      $this->assertTrue(TRUE, "MigrateException thrown, when source identifiers were not provided to update.");
+    }
   }
 
   /**

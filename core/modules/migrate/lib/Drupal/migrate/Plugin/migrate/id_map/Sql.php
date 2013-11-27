@@ -579,7 +579,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
    * {@inheritdoc}
    */
   public function setUpdate(array $source_id) {
-    if (empty($source_ids)) {
+    if (empty($source_id)) {
       throw new MigrateException('No source identifiers provided to update.');
     }
     $query = $this->getDatabase()
