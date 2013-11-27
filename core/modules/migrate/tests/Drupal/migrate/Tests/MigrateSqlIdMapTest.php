@@ -272,7 +272,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
     $this->assertSame($expected_result, $destination_id);
     // Test for a miss.
     $destination_id = $id_map->lookupDestinationID($nonexistent_id_values);
-    $this->assertNull($destination_id);
+    $this->assertSame(0, count($destination_id));
   }
 
   /**
@@ -327,7 +327,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
     $this->assertSame($expected_result, $source_id);
     // Test for a miss.
     $source_id = $id_map->lookupSourceID($nonexistent_id_values);
-    $this->assertNull($source_id);
+    $this->assertSame(0, count($source_id));
   }
 
   /**
