@@ -55,56 +55,7 @@ abstract class MigrateTestCase extends UnitTestCase {
    * @return \Drupal\Core\Database\Connection
    */
   protected function getDatabase($database_contents, $connection_options = array(), $prefix = '') {
-    $database = $this->getMockBuilder('Drupal\Core\Database\Connection')
-      ->disableOriginalConstructor()
-      ->getMock();
-    $database->databaseContents = &$database_contents;
-    $database->fakeConnectionOptions = &$connection_options;
-    $database->fakePrefixes = array('default' => $prefix);
-
-    // Although select doesn't modify the contents of the database, it still
-    // eneds to be a reference so that we can SELECT previously INSERT /
-    // UPDATE'd rows.
-    $database->expects($this->any())
-      ->method('select')->will($this->returnCallback(function ($base_table, $base_alias) use (&$database_contents) {
-      return new FakeSelect($base_table, $base_alias, $database_contents);
-    }));
-    $database->expects($this->any())
-      ->method('schema')
-      ->will($this->returnCallback(function () use (&$database_contents) {
-      return new FakeDatabaseSchema($database_contents);
-    }));
-    $database->expects($this->any())
-      ->method('insert')
-      ->will($this->returnCallback(function ($table) use (&$database_contents) {
-      return new FakeInsert($database_contents, $table);
-    }));
-    $database->expects($this->any())
-      ->method('update')
-      ->will($this->returnCallback(function ($table) use (&$database_contents) {
-      return new FakeUpdate($database_contents, $table);
-    }));
-    $database->expects($this->any())
-      ->method('merge')
-      ->will($this->returnCallback(function ($table) use (&$database_contents) {
-      return new FakeMerge($database_contents, $table);
-    }));
-    $database->expects($this->any())
-      ->method('query')
-      ->will($this->throwException(new \Exception('Query is not supported')));
-    $database->expects($this->any())
-      ->method('getConnectionOptions')
-      ->will($this->returnCallback(function () use (&$database) {
-      return $database->fakeConnectionOptions;
-    }));
-    // Only supports a default prefix.
-    $database->expects($this->any())
-      ->method('tablePrefix')
-      ->will($this->returnCallback(function ($table = 'default') use (&$database) {
-      return $database->fakePrefixes['default'];
-    }));
-
-    return $database;
+    return new FakeConnection($database_contents, $connection_options, $prefix);
   }
 
   /**

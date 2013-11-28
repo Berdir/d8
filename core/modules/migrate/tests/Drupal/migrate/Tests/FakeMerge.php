@@ -25,7 +25,7 @@ class FakeMerge extends Merge {
     if (!count($this->condition)) {
       throw new InvalidMergeQueryException(t('Invalid merge query: no conditions'));
     }
-    $select = new FakeSelect($this->conditionTable, 'c', $this->databaseContents);
+    $select = new FakeSelect($this->databaseContents, $this->conditionTable, 'c');
     $count = $select
       ->condition($this->condition)
       ->countQuery()

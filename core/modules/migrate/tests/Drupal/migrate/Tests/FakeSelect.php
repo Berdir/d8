@@ -51,21 +51,20 @@ class FakeSelect extends Select {
   /**
    * Constructs a new FakeSelect.
    *
+   * @param array $database_contents
+   *   An array of mocked database content.
    * @param string $table
    *   The base table name used within fake select.
    * @param string $alias
    *   The base table alias used within fake select.
-   * @param array $database_contents
-   *   An array of mocked database content.
-   *
    * @param string $conjunction
    *   The operator to use to combine conditions: 'AND' or 'OR'.
    */
-  public function __construct($table, $alias, array $database_contents, $conjunction = 'AND') {
+  public function __construct(array $database_contents, $table, $alias, $conjunction = 'AND') {
+    $this->databaseContents = $database_contents;
     $this->addJoin(NULL, $table, $alias);
     $this->where = new Condition($conjunction);
     $this->having = new Condition($conjunction);
-    $this->databaseContents = $database_contents;
   }
 
   /**

@@ -16,4 +16,8 @@ class TestSqlIdmap extends Sql {
     $this->database = $database;
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration);
   }
+
+  public function getDatabase() {
+    return parent::getDatabase();
+  }
 }
