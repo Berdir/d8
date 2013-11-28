@@ -131,6 +131,26 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
   }
 
   /**
+   * Test the clear messages method.
+   */
+  public function testClearMessages() {
+    $message = 'Hello world.';
+    $expected_results = array(0, 1, 2, 3);
+    $id_map = $this->getIdMap();
+
+    // Insert 4 message for later delete.
+    foreach ($expected_results as $key => $expected_result) {
+      $count = $id_map->messageCount();
+      $id_map->saveMessage(array($key), $message);
+    }
+
+    //Truncate and check that 4 messages were deleted.
+    $id_map->clearMessages();
+    $count = $id_map->messageCount();
+    $this->assertEquals($count, 0);
+  }
+
+  /**
    * Tests the getRowsNeedingUpdate method for rows that need an update.
    */
   public function testGetRowsNeedingUpdate() {
