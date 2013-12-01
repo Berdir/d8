@@ -495,7 +495,7 @@ function _editor_record_file_usage(array $uuids, EntityInterface $entity) {
       $file->status = FILE_STATUS_PERMANENT;
       $file->save();
     }
-    file_usage()->add($file, 'editor', $entity->entityType(), $entity->id());
+    \Drupal::service('file.usage')->add($file, 'editor', $entity->entityType(), $entity->id());
   }
 }
 
@@ -515,7 +515,7 @@ function _editor_record_file_usage(array $uuids, EntityInterface $entity) {
 function _editor_delete_file_usage(array $uuids, EntityInterface $entity, $count) {
   foreach ($uuids as $uuid) {
     $file = entity_load_by_uuid('file', $uuid);
-    file_usage()->delete($file, 'editor', $entity->entityType(), $entity->id(), $count);
+    \Drupal::service('file.usage')->delete($file, 'editor', $entity->entityType(), $entity->id(), $count);
   }
 }
 
@@ -557,7 +557,7 @@ function _editor_get_processed_text_fields(ContentEntityInterface $entity) {
   // Find all configurable fields, because only they could have a
   // text_processing setting.
   $configurable_fields = array_keys(array_filter($properties, function ($definition) {
-    return isset($definition['configurable']) && $definition['configurable'] === TRUE;
+    return $definition->isFieldConfigurable();
   }));
   if (empty($configurable_fields)) {
     return array();

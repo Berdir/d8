@@ -285,28 +285,6 @@ function drupal_get_profile() {
   return $profile;
 }
 
-
-/**
- * Sets the breadcrumb trail for the current page.
- *
- * @param $breadcrumb
- *   Array of links, starting with "home" and proceeding up to but not including
- *   the current page.
- *
- * @deprecated This will be removed in 8.0. Instead, register a new breadcrumb
- *   builder service.
- *
- * @see \Drupal\Core\Breadcrumb\BreadcrumbBuilderInterface
- */
-function drupal_set_breadcrumb($breadcrumb = NULL) {
-  $stored_breadcrumb = &drupal_static(__FUNCTION__);
-
-  if (isset($breadcrumb)) {
-    $stored_breadcrumb = $breadcrumb;
-  }
-  return $stored_breadcrumb;
-}
-
 /**
  * Adds output to the HEAD tag of the HTML page.
  *
@@ -2215,11 +2193,18 @@ function drupal_add_js($data = NULL, $options = NULL) {
           $scriptPath = $GLOBALS['script_path'];
           $pathPrefix = '';
           url('', array('script' => &$scriptPath, 'prefix' => &$pathPrefix));
+          $current_path = current_path();
+          $current_path_is_admin = FALSE;
+          // The function path_is_admin() is not available on update.php pages.
+          if (!(defined('MAINTENANCE_MODE') && MAINTENANCE_MODE === 'update')) {
+            $current_path_is_admin = path_is_admin($current_path);
+          }
           $javascript['settings']['data'][] = array(
             'basePath' => base_path(),
             'scriptPath' => $scriptPath,
             'pathPrefix' => $pathPrefix,
-            'currentPath' => current_path(),
+            'currentPath' => $current_path,
+            'currentPathIsAdmin' => $current_path_is_admin,
           );
         }
         // All JavaScript settings are placed in the header of the page with

@@ -738,7 +738,7 @@ function system_menu() {
     'title' => 'Date and time formats',
     'description' => 'Configure display format strings for date and time.',
     'route_name' => 'system.date_format_list',
-    'weight' => -9,
+    'weight' => -5,
   );
   $items['admin/config/regional/date-time/formats/manage/%'] = array(
     'title' => 'Edit date format',
@@ -1104,7 +1104,7 @@ function system_library_info() {
 
   // A utility that measures and reports viewport offset dimensions from
   // elements like the toolbar that can potentially displace the positioning of
-  // elements like the overlay.
+  // elements.
   $libraries['drupal.displace'] = array(
     'title' => 'Drupal displace',
     'version' => \Drupal::VERSION,
@@ -2773,7 +2773,7 @@ function confirm_form($form, $question, $path, $description = NULL, $yes = NULL,
     $options = array('path' => $path);
   }
 
-  drupal_set_title($question, PASS_THROUGH);
+  $form['#title'] = $question;
 
   $form['#attributes']['class'][] = 'confirmation';
   $form['description'] = array('#markup' => $description);
