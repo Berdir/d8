@@ -38,7 +38,7 @@ class MigrateExecutableTest extends MigrateTestCase {
   /**
    * The tested migrate executable.
    *
-   * @var \Drupal\migrate\MigrateExecutable
+   * @var \Drupal\migrate\Tests\TestMigrateExecutable
    */
   protected $executable;
 
@@ -47,6 +47,7 @@ class MigrateExecutableTest extends MigrateTestCase {
   protected $migrationConfiguration = array(
     'id' => 'test',
     'limit' => array('units' => 'seconds', 'value' => 5),
+    'timeThreshold' => 0.9,
   );
 
   /**
@@ -102,6 +103,23 @@ class MigrateExecutableTest extends MigrateTestCase {
     $this->assertEquals(MigrationInterface::RESULT_FAILED, $result);
   }
 
+  /**
+   * Tests maximum execution time (max_execution_time) of an import.
+   */
+  public function testMaxExecTimeExceeded() {
+    // Assert no max_execution_time value.
+    $this->executable->setMaxExecTime(0);
+    $this->assertFalse($this->executable->maxExecTimeExceeded());
+    // Assert default max_execution_time value does not exceed.
+    $this->executable->setMaxExecTime(30);
+    $this->assertFalse($this->executable->maxExecTimeExceeded());
+    // Assert max_execution_time value is exceeded.
+    $this->executable->setMaxExecTime(1);
+    // Sleep to force a higher execution time but not slow other tests.
+    sleep(1);
+    $this->assertTrue($this->executable->maxExecTimeExceeded());
+  }
+
 }
 
 class TestMigrateExecutable extends MigrateExecutable {
@@ -109,4 +127,26 @@ class TestMigrateExecutable extends MigrateExecutable {
   public function setTranslationManager(TranslationInterface $translation_manager) {
     $this->translationManager = $translation_manager;
   }
+
+  /**
+   * Allows access to set protected maxExecTime property.
+   */
+  public function setMaxExecTime($max_exec_time) {
+    $this->maxExecTime = $max_exec_time;
+  }
+
+  /**
+   * Allows access to protected maxExecTime property.
+   */
+  public function getMaxExecTime() {
+    return $this->maxExecTime;
+  }
+
+  /**
+   * Allows access to protected maxExecTimeExceeded method.
+   */
+  public function maxExecTimeExceeded() {
+    return parent::maxExecTimeExceeded();
+  }
+
 }

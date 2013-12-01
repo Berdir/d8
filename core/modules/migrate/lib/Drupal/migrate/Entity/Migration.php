@@ -185,6 +185,16 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
   public $trackLastImported = FALSE;
 
   /**
+   * The fraction of the time limit at which an operation will be interrupted.
+   *
+   * Can be overridden by a Migration subclass if one would like to push the
+   * envelope. Defaults to 90%.
+   *
+   * @var float
+   */
+  public $timeThreshold = 0.90;
+
+  /**
    * {@inheritdoc}
    */
   public function getSourcePlugin() {

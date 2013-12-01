@@ -94,21 +94,11 @@ class MigrateExecutable {
   protected $memoryLimit;
 
   /**
-   * The fraction of the time limit at which an operation will be interrupted.
-   *
-   * Can be overridden by a Migration subclass if one would like to push the
-   * envelope. Defaults to 90%.
-   *
-   * @var float
-   */
-  protected $timeThreshold = 0.90;
-
-  /**
    * The PHP max_execution_time.
    *
    * @var int
    */
-  protected $timeLimit;
+  protected $maxExecTime;
 
   /**
    * The configuration values of the source.
@@ -168,6 +158,8 @@ class MigrateExecutable {
       }
       $this->memoryLimit = $limit;
     }
+    // Record the maximum execution time limit.
+    $this->maxExecTime = ini_get('max_execution_time');
   }
 
   /**
@@ -419,7 +411,7 @@ class MigrateExecutable {
     if ($this->memoryExceeded()) {
       return MigrationInterface::RESULT_INCOMPLETE;
     }
-    if ($this->timeExceeded()) {
+    if ($this->maxExecTimeExceeded()) {
       return MigrationInterface::RESULT_INCOMPLETE;
     }
     /*
@@ -490,18 +482,18 @@ class MigrateExecutable {
   }
 
   /**
-   * Test whether we're approaching the PHP time limit.
+   * Test whether we're approaching the PHP maximum execution time limit.
    *
    * @return boolean
    *  TRUE if the threshold is exceeded, FALSE if not.
    */
-  protected function timeExceeded() {
-    if ($this->timeLimit == 0) {
+  protected function maxExecTimeExceeded() {
+    if ($this->maxExecTime == 0) {
       return FALSE;
     }
     $time_elapsed = time() - REQUEST_TIME;
-    $pct_time = $time_elapsed / $this->timeLimit;
-    if ($pct_time > $this->timeThreshold) {
+    $pct_time = $time_elapsed / $this->maxExecTime;
+    if ($pct_time > $this->migration->get('timeThreshold')) {
       return TRUE;
     }
     else {
