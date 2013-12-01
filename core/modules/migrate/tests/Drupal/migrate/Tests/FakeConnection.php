@@ -7,7 +7,9 @@
 
 namespace Drupal\migrate\Tests;
 
-class FakeConnection {
+use Drupal\Core\Database\Connection;
+
+class FakeConnection extends Connection {
 
   /**
    * @var string
@@ -57,4 +59,35 @@ class FakeConnection {
     return $this->connectionOptions;
   }
 
+  public function query($query, array $args = array(), $options = array()) {
+    throw new \Exception('Method not supported');
+  }
+
+  public function queryRange($query, $from, $count, array $args = array(), array $options = array()) {
+    throw new \Exception('Method not supported');
+  }
+
+  public function queryTemporary($query, array $args = array(), array $options = array()) {
+    throw new \Exception('Method not supported');
+  }
+
+  public function driver() {
+    throw new \Exception('Method not supported');
+  }
+
+  public function databaseType() {
+    throw new \Exception('Method not supported');
+  }
+
+  public function createDatabase($database) {
+    // There is nothing to do.
+  }
+
+  public function mapConditionOperator($operator) {
+    throw new \Exception('Method not supported');
+  }
+
+  public function nextId($existing_id = 0) {
+    throw new \Exception('Method not supported');
+  }
 }
