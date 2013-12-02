@@ -39,7 +39,7 @@ class FakeUpdate extends Update {
    */
   public function execute() {
     $affected = 0;
-    if (count($this->condition) && isset($this->databaseContents[$this->table])) {
+    if (isset($this->databaseContents[$this->table])) {
       $fields = $this->fields;
       $condition = $this->condition;
       array_walk($this->databaseContents[$this->table], function (&$row_array) use ($fields, $condition, &$affected) {
