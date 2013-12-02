@@ -10,6 +10,7 @@ namespace Drupal\migrate\Tests;
 use Drupal\migrate\Row;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\MigrateException;
+use Drupal\migrate\Entity\MigrationInterface;
 
 /**
  * Tests the sql based ID map implementation.
@@ -217,6 +218,42 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
       $this->assertEquals($expected_result, $count);
       $id_map->saveMessage(array($key), $message);
     }
+  }
+
+  /**
+   * Tests the sql id map save message method.
+   */
+  public function testMessageSave() {
+    $message = 'Hello world.';
+    $expected_results = array(
+      1 => array('message' => $message, 'level' => MigrationInterface::MESSAGE_ERROR),
+      2 => array('message' => $message, 'level' => MigrationInterface::MESSAGE_WARNING),
+      3 => array('message' => $message, 'level' => MigrationInterface::MESSAGE_NOTICE),
+      4 => array('message' => $message, 'level' => MigrationInterface::MESSAGE_INFORMATIONAL),
+    );
+    $id_map = $this->getIdMap();
+
+    foreach ($expected_results as $key => $expected_result) {
+      $id_map->saveMessage(array($key), $message, $expected_result['level']);
+      $message_row = $this->database->select($id_map->getMessageTableName(), 'message')
+                       ->fields('message')
+                       ->condition('level',$expected_result['level'])
+                       ->condition('message',$expected_result['message'])
+                       ->execute()
+                       ->fetchAssoc();
+    $this->assertEquals($expected_result['message'], $message_row['message'], 'Message from database was read.');
+    }
+
+    // Insert with default level.
+    $message_default = 'Hello world default.';
+    $id_map->saveMessage(array(5), $message_default);
+    $message_row = $this->database->select($id_map->getMessageTableName(), 'message')
+                     ->fields('message')
+                     ->condition('level', 1)
+                     ->condition('message', $message_default)
+                     ->execute()
+                     ->fetchAssoc();
+    $this->assertEquals($message_default, $message_row['message'], 'Message from database was read.');
   }
 
   /**
