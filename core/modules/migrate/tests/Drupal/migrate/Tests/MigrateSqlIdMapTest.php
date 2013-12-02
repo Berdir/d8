@@ -297,6 +297,33 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
   }
 
   /**
+   * Test the getRowByDestination method.
+   */
+  public function testGetRowByDestination() {
+    $row = array(
+      'sourceid1' => 'source_id_value_1',
+      'sourceid2' => 'source_id_value_2',
+      'destid1' => 'destination_id_value_1',
+    ) + $this->idMapDefaults();
+    $database_contents['migrate_map_sql_idmap_test'][] = $row;
+    $row = array(
+      'sourceid1' => 'source_id_value_3',
+      'sourceid2' => 'source_id_value_4',
+      'destid1' => 'destination_id_value_2',
+    ) + $this->idMapDefaults();
+    $database_contents['migrate_map_sql_idmap_test'][] = $row;
+    $dest_id_values = array($row['destid1']);
+    $id_map = $this->getIdMap($database_contents);
+    $result_row = $id_map->getRowByDestination($dest_id_values);
+    $this->assertSame($row, $result_row);
+    // This value does not exist.
+    $dest_id_values = array('invalid_destination_id_property');
+    $id_map = $this->getIdMap($database_contents);
+    $result_row = $id_map->getRowByDestination($dest_id_values);
+    $this->assertFalse($result_row);
+  }
+
+  /**
    * Tests the source ID lookup method.
    *
    * Scenarios to test (for both hits and misses) are:
