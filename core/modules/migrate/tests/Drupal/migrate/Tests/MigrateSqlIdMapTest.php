@@ -257,9 +257,9 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
   }
 
   /**
-   * Tests the getRowBySource method when it succeeds.
+   * Tests the getRowBySource method..
    */
-  public function testGetSourceByIdSucceeds() {
+  public function testGetRowBySource() {
     $row = array(
       'sourceid1' => 'source_id_value_1',
       'sourceid2' => 'source_id_value_2',
@@ -269,13 +269,16 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
     $row = array(
       'sourceid1' => 'source_id_value_3',
       'sourceid2' => 'source_id_value_4',
-      'destid1' => 'destination_id_value_1',
+      'destid1' => 'destination_id_value_2',
     ) + $this->idMapDefaults();
     $database_contents['migrate_map_sql_idmap_test'][] = $row;
     $source_id_values = array($row['sourceid1'], $row['sourceid2']);
     $id_map = $this->getIdMap($database_contents);
     $result_row = $id_map->getRowBySource($source_id_values);
     $this->assertSame($row, $result_row);
+    $source_id_values = array('missing_value_1', 'missing_value_2');
+    $result_row = $id_map->getRowBySource($source_id_values);
+    $this->assertFalse($result_row);
   }
 
   /**
