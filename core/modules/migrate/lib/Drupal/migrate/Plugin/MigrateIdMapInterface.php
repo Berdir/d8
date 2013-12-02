@@ -18,7 +18,7 @@ use Drupal\migrate\Row;
  * Migrate ID mappings maintain a relation between source ID and destination ID
  * for audit and rollback purposes.
  */
-interface MigrateIdMapInterface extends PluginInspectionInterface {
+interface MigrateIdMapInterface extends \Iterator, PluginInspectionInterface {
 
   /**
    * Codes reflecting the current status of a map row.

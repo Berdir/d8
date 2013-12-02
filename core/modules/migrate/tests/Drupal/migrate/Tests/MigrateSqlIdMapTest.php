@@ -600,4 +600,30 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
     $qualified_map_table = $id_map->getQualifiedMapTableName();
     $this->assertEquals('migrate_map_sql_idmap_test', $qualified_map_table);
   }
+
+  /**
+   * Test all the iterator methods in one swing.
+   *
+   * - Sql::rewind()
+   * - Sql::next()
+   * - Sql::valid()
+   * - Sql::key()
+   * - Sql::current()
+   */
+  public function testIterators() {
+
+    $database_contents['migrate_map_sql_idmap_test'] = array();
+    for ($i = 0; $i < 3; $i++) {
+      $row = $this->idMapDefaults();
+      $row['sourceid1'] = "source_id_value_$i";
+      $row['destid1'] = "destination_id_value_$i";
+      $row['source_row_status'] = MigrateIdMapInterface::STATUS_IMPORTED;
+      $expected_results[serialize(array('sourceid1' => $row['sourceid1']))] = array('destid1' => $row['destid1']);
+      $database_contents['migrate_map_sql_idmap_test'][] = $row;
+    }
+
+    $id_map = $this->getIdMap($database_contents);
+    $this->assertSame(iterator_to_array($id_map), $expected_results);
+  }
+
 }

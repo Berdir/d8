@@ -695,16 +695,13 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
    * from rewind().
    */
   public function next() {
-    $this->currentRow = $this->result->fetchObject();
+    $this->currentRow = $this->result->fetchAssoc();
     $this->currentKey = array();
-    if (!is_object($this->currentRow)) {
-      $this->currentRow = NULL;
-    }
-    else {
+    if ($this->currentRow) {
       foreach ($this->sourceIdFields as $map_field) {
-        $this->currentKey[$map_field] = $this->currentRow->$map_field;
+        $this->currentKey[$map_field] = $this->currentRow[$map_field];
         // Leave only destination fields.
-        unset($this->currentRow->$map_field);
+        unset($this->currentRow[$map_field]);
       }
     }
   }
@@ -717,7 +714,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
    */
   public function valid() {
     // @todo Check numProcessed against itemlimit.
-    return !is_null($this->currentRow);
+    return $this->currentRow !== FALSE;
   }
 
 }
