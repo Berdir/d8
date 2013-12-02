@@ -249,7 +249,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
     $id_map->saveMessage(array(5), $message_default);
     $message_row = $this->database->select($id_map->getMessageTableName(), 'message')
                      ->fields('message')
-                     ->condition('level', 1)
+                     ->condition('level', MigrationInterface::MESSAGE_ERROR)
                      ->condition('message', $message_default)
                      ->execute()
                      ->fetchAssoc();
@@ -618,6 +618,47 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
     catch (MigrateException $e) {
       $this->assertTrue(TRUE, "MigrateException thrown, when source identifiers were not provided to update.");
     }
+  }
+
+  /**
+   * Test prepareUpdate().
+   */
+  public function testPrepareUpdate() {
+    $id_map = $this->getIdMap();
+    $row_statuses = array(
+      MigrateIdMapInterface::STATUS_IMPORTED,
+      MigrateIdMapInterface::STATUS_NEEDS_UPDATE,
+      MigrateIdMapInterface::STATUS_IGNORED,
+      MigrateIdMapInterface::STATUS_FAILED,
+    );
+
+    // Create a mapping row for each STATUS constant.
+    foreach ($row_statuses as $status) {
+      $source = array('source_id_property' => 'source_value_' . $status);
+      $row = new Row($source, array('source_id_property' => array()));
+      $destination = array('destination_id_property' => 'destination_value_' . $status);
+      $id_map->saveIdMapping($row, $destination, $status);
+      $expected_results[] = array(
+        'sourceid1' => 'source_value_' . $status,
+        'destid1' => 'destination_value_' . $status,
+        'source_row_status' => $status,
+        'rollback_action' => MigrateIdMapInterface::ROLLBACK_DELETE,
+        'hash' => '',
+      );
+    }
+
+    // Assert that test values exist.
+    $this->queryResultTest($this->database->databaseContents['migrate_map_sql_idmap_test'], $expected_results);
+
+    // Mark all rows as STATUS_NEEDS_UPDATE.
+    $id_map->prepareUpdate();
+
+    // Update expected results.
+    foreach ($expected_results as $key => $value) {
+      $expected_results[$key]['source_row_status'] = MigrateIdMapInterface::STATUS_NEEDS_UPDATE;
+    }
+    // Assert that updated expected values match.
+    $this->queryResultTest($this->database->databaseContents['migrate_map_sql_idmap_test'], $expected_results);
   }
 
   /**
