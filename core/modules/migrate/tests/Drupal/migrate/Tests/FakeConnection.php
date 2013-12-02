@@ -27,31 +27,31 @@ class FakeConnection extends Connection {
     $this->tablePrefix = $prefix;
   }
 
-  public function select($base_table, $base_alias = NULL) {
-    return new FakeSelect($this->databaseContents, $base_table, $base_alias);
+  public function select($table, $alias = NULL, array $options = array()) {
+    return new FakeSelect($this->databaseContents, $table, $alias);
   }
 
   public function schema() {
     return new FakeDatabaseSchema($this->databaseContents);
   }
 
-  public function insert($table) {
+  public function insert($table, array $options = array()) {
     return new FakeInsert($this->databaseContents, $table);
   }
 
-  public function update($table) {
+  public function update($table, array $options = array()) {
     return new FakeUpdate($this->databaseContents, $table);
   }
 
-  public function merge($table) {
+  public function merge($table, array $options = array()) {
     return new FakeMerge($this->databaseContents, $table);
   }
 
-  public function truncate($table) {
+  public function truncate($table, array $options = array()) {
     return new FakeTruncate($this->databaseContents, $table);
   }
 
-  public function tablePrefix() {
+  public function tablePrefix($table = 'default') {
     return $this->tablePrefix;
   }
 
