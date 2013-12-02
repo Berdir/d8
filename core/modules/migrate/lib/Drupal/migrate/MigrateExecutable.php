@@ -249,7 +249,7 @@ class MigrateExecutable {
         }
         else {
           $id_map->saveIdMapping($row, array(), MigrateIdMapInterface::STATUS_FAILED, $this->rollbackAction);
-          if ($id_map->messageCount() == 0) {
+          if (!$id_map->messageCount()) {
             $message = $this->t('New object was not saved, no error provided');
             $this->saveMessage($message);
             $this->message->display($message);
@@ -488,17 +488,14 @@ class MigrateExecutable {
    *  TRUE if the threshold is exceeded, FALSE if not.
    */
   protected function maxExecTimeExceeded() {
-    if ($this->maxExecTime == 0) {
-      return FALSE;
+    if ($this->maxExecTime) {
+      $time_elapsed = time() - REQUEST_TIME;
+      $pct_time = $time_elapsed / $this->maxExecTime;
+      if ($pct_time > $this->migration->get('timeThreshold')) {
+        return TRUE;
+      }
     }
-    $time_elapsed = time() - REQUEST_TIME;
-    $pct_time = $time_elapsed / $this->maxExecTime;
-    if ($pct_time > $this->migration->get('timeThreshold')) {
-      return TRUE;
-    }
-    else {
-      return FALSE;
-    }
+    return FALSE;
   }
 
   /**
