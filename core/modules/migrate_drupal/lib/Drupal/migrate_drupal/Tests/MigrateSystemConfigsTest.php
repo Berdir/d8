@@ -116,11 +116,11 @@ class MigrateSystemConfigsTest extends MigrateDrupalTestBase {
     $executable->import();
     $config = \Drupal::config('system.site');
     $this->assertIdentical($config->get('name'), 'Drupal');
-    $this->assertIdentical($config->get('mail'), ini_get('sendmail_from'));
-    $this->assertIdentical($config->get('slogan'), '');
-    $this->assertIdentical($config->get('page.403'), '');
-    $this->assertIdentical($config->get('page.404'), '');
-    $this->assertIdentical($config->get('page.front'), 'node');
+    $this->assertIdentical($config->get('mail'), 'admin@example.com');
+    $this->assertIdentical($config->get('slogan'), 'Migrate rocks');
+    $this->assertIdentical($config->get('page.403'), 'user');
+    $this->assertIdentical($config->get('page.404'), 'page-not-found');
+    $this->assertIdentical($config->get('page.front'), 'anonymous-hp');
     $this->assertIdentical($config->get('admin_compact_mode'), FALSE);
   }
 

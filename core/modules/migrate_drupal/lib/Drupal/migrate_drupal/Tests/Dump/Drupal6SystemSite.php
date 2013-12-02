@@ -48,33 +48,32 @@ class Drupal6SystemSite {
     ))
     ->values(array(
       'name' => 'site_name',
-      'value' => 's:6:"Drupal";',
+      'value' => serialize('Drupal'),
     ))
     ->values(array(
       'name' => 'site_mail',
-      'value' => serialize(ini_get('sendmail_from')),
+      'value' => serialize('admin@example.com'),
     ))
     ->values(array(
       'name' => 'site_slogan',
-      'value' => 's:0:"";',
-    ))
-    ->values(array(
-      'name' => 'site_403',
-      'value' => 's:0:"";',
-    ))
-    ->values(array(
-      'name' => 'site_404',
-      'value' => 's:0:"";',
+      'value' => serialize('Migrate rocks'),
     ))
     ->values(array(
       'name' => 'site_frontpage',
-      'value' => 's:4:"node";',
+      'value' => serialize('anonymous-hp'),
+    ))
+    ->values(array(
+      'name' => 'site_403',
+      'value' => serialize('user'),
+    ))
+    ->values(array(
+      'name' => 'site_404',
+      'value' => serialize('page-not-found'),
     ))
     ->values(array(
       'name' => 'admin_compact_mode',
-      'value' => 'b:0;',
+      'value' => serialize(FALSE),
     ))
     ->execute();
   }
-
 }
