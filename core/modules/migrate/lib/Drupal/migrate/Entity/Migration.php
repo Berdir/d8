@@ -195,6 +195,13 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
   public $timeThreshold = 0.90;
 
   /**
+   * The time limit when executing the migration.
+   *
+   * @var array
+   */
+  public $limit = array();
+
+  /**
    * {@inheritdoc}
    */
   public function getSourcePlugin() {

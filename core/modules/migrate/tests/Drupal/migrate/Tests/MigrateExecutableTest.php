@@ -46,7 +46,7 @@ class MigrateExecutableTest extends MigrateTestCase {
 
   protected $migrationConfiguration = array(
     'id' => 'test',
-    'limit' => array('units' => 'seconds', 'value' => 5),
+    'limit' => array('unit' => 'second', 'value' => 1),
     'timeThreshold' => 0.9,
   );
 
@@ -104,6 +104,43 @@ class MigrateExecutableTest extends MigrateTestCase {
   }
 
   /**
+   * Tests time limit option method.
+   */
+  public function testTimeOptionExceeded() {
+    // Assert time limit of one second (test configuration default) is exceeded.
+    $this->assertTrue($this->executable->timeOptionExceeded());
+    // Assert time limit not exceeded.
+    $this->migration->set('limit', array('unit' => 'seconds', 'value' => (REQUEST_TIME - 3600)));
+    $this->assertFalse($this->executable->timeOptionExceeded());
+    // Assert no time limit.
+    $this->migration->set('limit', array());
+    $this->assertFalse($this->executable->timeOptionExceeded());
+  }
+
+  /**
+   * Tests get time limit method.
+   */
+  public function testGetTimeLimit() {
+    // Assert time limit has a unit of one second (test configuration default).
+    $limit = $this->migration->get('limit');
+    $this->assertArrayHasKey('unit', $limit);
+    $this->assertSame('second', $limit['unit']);
+    $this->assertSame($limit['value'], $this->executable->getTimeLimit());
+    // Assert time limit has a unit of multiple seconds.
+    $this->migration->set('limit', array('unit' => 'seconds', 'value' => 30));
+    $limit = $this->migration->get('limit');
+    $this->assertArrayHasKey('unit', $limit);
+    $this->assertSame('seconds', $limit['unit']);
+    $this->assertSame($limit['value'], $this->executable->getTimeLimit());
+    // Assert no time limit.
+    $this->migration->set('limit', array());
+    $limit = $this->migration->get('limit');
+    $this->assertArrayNotHasKey('unit', $limit);
+    $this->assertArrayNotHasKey('value', $limit);
+    $this->assertNull($this->executable->getTimeLimit());
+  }
+
+  /**
    * Tests maximum execution time (max_execution_time) of an import.
    */
   public function testMaxExecTimeExceeded() {
@@ -126,6 +163,13 @@ class TestMigrateExecutable extends MigrateExecutable {
 
   public function setTranslationManager(TranslationInterface $translation_manager) {
     $this->translationManager = $translation_manager;
+  }
+
+  /**
+   * Allows access to protected timeOptionExceeded method.
+   */
+  public function timeOptionExceeded() {
+    return parent::timeOptionExceeded();
   }
 
   /**
