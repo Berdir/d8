@@ -141,6 +141,35 @@ class MigrateExecutableTest extends MigrateTestCase {
   }
 
   /**
+   * Tests the queuing of messages.
+   */
+  public function testQueueMessage() {
+    // Assert no queued messages.
+    $expected_messages = array();
+    $this->assertAttributeEquals(array(), 'queuedMessages', $this->executable);
+    // Assert a single (default level) queued message.
+    $expected_messages[] = array(
+      'message' => 'message 1',
+      'level' => MigrationInterface::MESSAGE_ERROR,
+    );
+    $this->executable->queueMessage('message 1');
+    $this->assertAttributeEquals($expected_messages, 'queuedMessages', $this->executable);
+    // Assert multiple queued messages.
+    $expected_messages[] = array(
+      'message' => 'message 2',
+      'level' => MigrationInterface::MESSAGE_WARNING,
+    );
+    $this->executable->queueMessage('message 2', MigrationInterface::MESSAGE_WARNING);
+    $this->assertAttributeEquals($expected_messages, 'queuedMessages', $this->executable);
+    $expected_messages[] = array(
+      'message' => 'message 3',
+      'level' => MigrationInterface::MESSAGE_INFORMATIONAL,
+    );
+    $this->executable->queueMessage('message 3', MigrationInterface::MESSAGE_INFORMATIONAL);
+    $this->assertAttributeEquals($expected_messages, 'queuedMessages', $this->executable);
+  }
+
+  /**
    * Tests maximum execution time (max_execution_time) of an import.
    */
   public function testMaxExecTimeExceeded() {
