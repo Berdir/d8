@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains
+ * Contains \Drupal\migrate\Tests\process\StaticMapTest.
  */
 
 namespace Drupal\migrate\Tests\process;
