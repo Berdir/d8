@@ -40,7 +40,7 @@ class StaticMapTest extends MigrateProcessTestCase {
   }
 
   /**
-   * Test map when the source is a string.
+   * Tests map when the source is a string.
    */
   function testMapWithSourceString() {
     $value = $this->plugin->transform('foo', $this->migrateExecutable, $this->row, 'destinationproperty');
@@ -48,7 +48,7 @@ class StaticMapTest extends MigrateProcessTestCase {
   }
 
   /**
-   * Test map when the source is a list.
+   * Tests map when the source is a list.
    */
   function testMapWithSourceList() {
     $value = $this->plugin->transform(array('foo', 'bar'), $this->migrateExecutable, $this->row, 'destinationproperty');
@@ -56,7 +56,7 @@ class StaticMapTest extends MigrateProcessTestCase {
   }
 
   /**
-   * Test when the source is empty.
+   * Tests when the source is empty.
    *
    * @expectedException \Drupal\migrate\MigrateException
    */
@@ -65,7 +65,7 @@ class StaticMapTest extends MigrateProcessTestCase {
   }
 
   /**
-   * Test when the source is invalid.
+   * Tests when the source is invalid.
    *
    * @expectedException \Drupal\migrate\MigrateException
    */

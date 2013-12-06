@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains
+ * Contains \Drupal\migrate\Tests\process\MachineNameTest.
  */
 
 namespace Drupal\migrate\Tests\process;
@@ -9,6 +9,8 @@ namespace Drupal\migrate\Tests\process;
 use Drupal\migrate\Plugin\migrate\process\TestMachineName;
 
 /**
+ * Tests the machine name process plugin.
+ *
  * @group migrate
  * @group Drupal
  */
@@ -21,7 +23,9 @@ class MachineNameTest extends MigrateProcessTestCase {
    */
   protected $transliteration;
 
-
+  /**
+   * @var bool
+   */
   protected $mapJoinable = FALSE;
 
   /**
@@ -52,7 +56,7 @@ class MachineNameTest extends MigrateProcessTestCase {
   }
 
   /**
-   * Test machine name transformation of non-alphanumeric characters.
+   * Tests machine name transformation of non-alphanumeric characters.
    */
   public function testMachineNames() {
 
