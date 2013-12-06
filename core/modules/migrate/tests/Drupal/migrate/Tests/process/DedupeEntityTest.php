@@ -44,7 +44,7 @@ class DedupeEntityTest extends MigrateProcessTestCase {
   }
 
   /**
-   * Test the entity deduplication plugin when there is no duplication.
+   * Tests the entity deduplication plugin when there is no duplication.
    */
   public function testDedupeEntityNoDuplication() {
     $configuration = array(
@@ -59,7 +59,7 @@ class DedupeEntityTest extends MigrateProcessTestCase {
   }
 
   /**
-   * Test the entity deduplication plugin when there is duplication.
+   * Tests the entity deduplication plugin when there is duplication.
    */
   public function testDedupeEntityDuplication() {
     $configuration = array(
@@ -74,7 +74,7 @@ class DedupeEntityTest extends MigrateProcessTestCase {
   }
 
   /**
-   * Test the entity deduplication plugin when there is no duplication.
+   * Tests the entity deduplication plugin when there is no duplication.
    */
   public function testDedupeEntityNoDuplicationWithPostfix() {
     $configuration = array(
@@ -90,7 +90,7 @@ class DedupeEntityTest extends MigrateProcessTestCase {
   }
 
   /**
-   * Test the entity deduplication plugin when there is duplication.
+   * Tests the entity deduplication plugin when there is duplication.
    */
   public function testDedupeEntityDuplicationWithPostfix() {
     $configuration = array(
@@ -106,9 +106,9 @@ class DedupeEntityTest extends MigrateProcessTestCase {
   }
 
   /**
-   * Helper adding expectations to the mock entity object.
+   * Helper function to add expectations to the mock entity query object.
    *
-   * @param $count
+   * @param int $count
    *   The number of deduplications to be set up.
    */
   protected function entityQueryExpects($count) {

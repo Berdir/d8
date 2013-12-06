@@ -5,7 +5,6 @@
  * Contains \Drupal\migrate\Plugin\migrate\process\DedupeEntity.
  */
 
-
 namespace Drupal\migrate\Plugin\migrate\process;
 
 /**
@@ -28,7 +27,10 @@ class DedupeEntity extends DedupeBase {
   }
 
   /**
+   * Returns an entity query object.
+   *
    * @return \Drupal\Core\Entity\Query\QueryInterface
+   *   The entity query object for the configured entity type.
    */
   protected function getEntityQuery() {
     if (!isset($this->entityQuery)) {
