@@ -8,16 +8,17 @@
 namespace Drupal\migrate\Plugin\migrate\process;
 
 use Drupal\Core\Plugin\PluginBase;
+use Drupal\migrate\MigrateException;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate\Plugin\MigrateProcessInterface;
 use Drupal\migrate\Row;
 
 /**
- * This plugin sets a destination property based on multiple sources and a map.
+ * This plugin changes the current value based on a static lookup map.
  *
- * @PluginId("map")
+ * @PluginId("static_map")
  */
-class Map extends PluginBase implements MigrateProcessInterface {
+class StaticMap extends PluginBase implements MigrateProcessInterface {
 
   /**
    * {@inheritdoc}
@@ -27,7 +28,13 @@ class Map extends PluginBase implements MigrateProcessInterface {
     if (!is_array($value)) {
       $value = array($value);
     }
+    if (!$value) {
+      throw new MigrateException('Can not lookup without a value.');
+    }
     foreach ($value as $key) {
+      if (!isset($map[$key])) {
+        throw new MigrateException('Lookup failed.');
+      }
       $map = $map[$key];
     }
     return $map;
