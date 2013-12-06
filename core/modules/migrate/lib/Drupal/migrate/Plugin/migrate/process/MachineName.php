@@ -31,7 +31,7 @@ class MachineName extends PluginBase implements MigrateProcessInterface {
   public function transform($value, MigrateExecutable $migrate_executable, Row $row, $destination_property) {
     $new_value = $this->getTransliteration()->transliterate($value, Language::LANGCODE_DEFAULT, '_');
     $new_value = strtolower($new_value);
-    $new_value = preg_replace('/[^a-z0-9_.]+/', '_', $new_value);
+    $new_value = preg_replace('/[^a-z0-9_]+/', '_', $new_value);
     return preg_replace('/_+/', '_', $new_value);
   }
 
