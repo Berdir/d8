@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains
+ * Contains \Drupal\migrate\Tests\process\DedupeEntityTest.
  */
 
 namespace Drupal\migrate\Tests\process;
@@ -9,6 +9,10 @@ namespace Drupal\migrate\Tests\process;
 use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\migrate\Plugin\migrate\process\DedupeEntity;
 
+/**
+ * @group migrate
+ * @group Drupal
+ */
 class DedupeEntityTest extends MigrateProcessTestCase {
 
   /**

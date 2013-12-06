@@ -5,7 +5,6 @@
  * Contains \Drupal\migrate\Plugin\migrate\process\DedupeBase.
  */
 
-
 namespace Drupal\migrate\Plugin\migrate\process;
 
 use Drupal\Core\Plugin\PluginBase;
@@ -15,6 +14,11 @@ use Drupal\migrate\Row;
 
 /**
  * This abstract base contains the dedupe logic.
+ *
+ * These plugins avoid duplication at the destination. For example, when
+ * creating filter format names, the current value is checked against the
+ * existing filter format names and if it exists, a numeric postfix is added
+ * and incremented until a unique value is created.
  */
 abstract class DedupeBase extends PluginBase implements MigrateProcessInterface {
 
