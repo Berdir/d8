@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains
+ * Contains Drupal\migrate\Tests\process\IteratorTest.
  */
 
 namespace Drupal\migrate\Tests\process;
@@ -19,14 +19,22 @@ use Drupal\migrate\Tests\MigrateTestCase;
 class IteratorTest extends MigrateTestCase {
 
   /**
+   * The iterator plugin being tested.
+   *
    * @var \Drupal\migrate\Plugin\migrate\process\TestIterator
    */
   protected $plugin;
 
+  /**
+   * @var array
+   */
   protected $migrationConfiguration = array(
     'id' => 'test',
   );
 
+  /**
+   * @var bool
+   */
   protected $mapJoinable = FALSE;
 
   /**
@@ -41,7 +49,7 @@ class IteratorTest extends MigrateTestCase {
   }
 
   /**
-   * Test the iterator process plugin.
+   * Tests the iterator process plugin.
    */
   function testIterator() {
     $migration = $this->getMigration();

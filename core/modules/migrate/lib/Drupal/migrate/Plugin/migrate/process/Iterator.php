@@ -5,7 +5,6 @@
  * Contains \Drupal\migrate\Plugin\migrate\process\Iterator.
  */
 
-
 namespace Drupal\migrate\Plugin\migrate\process;
 
 use Drupal\Core\Plugin\PluginBase;
@@ -38,11 +37,13 @@ class Iterator extends PluginBase implements MigrateProcessInterface {
   }
 
   /**
-   * @param $key
+   * Runs the process pipeline for the current key.
+   *
+   * @param string|int $key
    *   The current key.
-   * @param MigrateExecutable $migrate_executable
+   * @param \Drupal\migrate\MigrateExecutable $migrate_executable
    *   The migrate executable helper class.
-   * @param Row $row
+   * @param \Drupal\migrate\Row $row
    *   The current row after processing.
    * @return mixed
    *   The transformed key.
