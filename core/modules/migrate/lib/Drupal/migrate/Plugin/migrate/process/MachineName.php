@@ -14,7 +14,11 @@ use Drupal\migrate\Plugin\MigrateProcessInterface;
 use Drupal\migrate\Row;
 
 /**
- * This plugin sets a destination property based on multiple sources and a map.
+ * This plugin creates a machine name.
+ *
+ * The current value gets transliterated, non-alphanumeric characters removed
+ * and replaced by an underscore and multiple underscores are collapsed into
+ * one.
  *
  * @PluginId("machine_name")
  */

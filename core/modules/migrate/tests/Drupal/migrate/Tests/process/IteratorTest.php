@@ -13,6 +13,8 @@ use Drupal\migrate\Row;
 use Drupal\migrate\Tests\MigrateTestCase;
 
 /**
+ * Tests the iterator process plugin.
+ *
  * @group migrate
  * @group Drupal
  */
