@@ -10,6 +10,7 @@ namespace Drupal\migrate\Tests;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\MigrateExecutable;
+use Drupal\migrate\Row;
 
 /**
  * Tests the migrate executable.
@@ -208,6 +209,31 @@ class MigrateExecutableTest extends MigrateTestCase {
     $this->assertTrue($this->executable->maxExecTimeExceeded());
   }
 
+  /**
+   * Tests the processRow method.
+   */
+  public function testProcessRow() {
+    $expected = array(
+      'test' => 'test destination',
+      'test1' => 'test1 destination'
+    );
+    foreach ($expected as $key => $value) {
+      $plugins[$key][0] = $this->getMock('Drupal\migrate\Plugin\MigrateProcessInterface');
+      $plugins[$key][0]->expects($this->once())
+        ->method('transform')
+        ->will($this->returnValue($value));
+    }
+    $this->migration->expects($this->once())
+      ->method('getProcessPlugins')
+      ->with(NULL)
+      ->will($this->returnValue($plugins));
+    $row = new Row(array(), array());
+    $this->executable->processRow($row);
+    foreach ($expected as $key => $value) {
+      $this->assertSame($row->getDestinationProperty($key), $value);
+    }
+    $this->assertSame(count($row->getDestination()), count($expected));
+  }
 }
 
 class TestMigrateExecutable extends MigrateExecutable {
