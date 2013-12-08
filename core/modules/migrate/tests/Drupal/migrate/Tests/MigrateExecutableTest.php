@@ -141,6 +141,28 @@ class MigrateExecutableTest extends MigrateTestCase {
   }
 
   /**
+   * Tests saving of queued messages.
+   */
+  public function testSaveQueuedMessages() {
+    // Assert no queued messages before save.
+    $this->assertAttributeEquals(array(), 'queuedMessages', $this->executable);
+    // Set required source_id_values for MigrateIdMapInterface::saveMessage().
+    $expected_messages[] = array('message' => 'message 1', 'level' => MigrationInterface::MESSAGE_ERROR);
+    $expected_messages[] = array('message' => 'message 2', 'level' => MigrationInterface::MESSAGE_WARNING);
+    $expected_messages[] = array('message' => 'message 3', 'level' => MigrationInterface::MESSAGE_INFORMATIONAL);
+    foreach ($expected_messages as $queued_message) {
+      $this->executable->queueMessage($queued_message['message'], $queued_message['level']);
+    }
+    $this->executable->setSourceIdValues(array());
+    $this->assertAttributeEquals($expected_messages, 'queuedMessages', $this->executable);
+    // No asserts of saved messages since coverage exists
+    // in MigrateSqlIdMapTest::saveMessage().
+    $this->executable->saveQueuedMessages();
+    // Assert no queued messages after save.
+    $this->assertAttributeEquals(array(), 'queuedMessages', $this->executable);
+  }
+
+  /**
    * Tests the queuing of messages.
    */
   public function testQueueMessage() {
@@ -220,6 +242,13 @@ class TestMigrateExecutable extends MigrateExecutable {
    */
   public function maxExecTimeExceeded() {
     return parent::maxExecTimeExceeded();
+  }
+
+  /**
+   * Allows access to protected sourceIdValues property.
+   */
+  public function setSourceIdValues($source_id_values) {
+    $this->sourceIdValues = $source_id_values;
   }
 
 }
