@@ -5,7 +5,7 @@
  * Contains \Drupal\migrate\Plugin\migrate\source\d6\FilterFormats.
  */
 
-namespace Drupal\migrate_drupal\Plugin\migrate\source;
+namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
 
 use Drupal\migrate_drupal\Plugin\migrate\source\d6\Drupal6SqlBase;
 use Drupal\migrate\Row;
@@ -15,7 +15,7 @@ use Drupal\migrate\Row;
  *
  * @PluginId("drupal6_filter_formats")
  */
-class D6FilterFormats extends Drupal6SqlBase {
+class FilterFormat extends Drupal6SqlBase {
 
   /**
    * {@inheritdoc}

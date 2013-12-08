@@ -13,12 +13,13 @@ use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
  * Tests comment migration from D6 to D8.
  *
  * @group migrate_drupal
+ * @group Drupal
  */
-class D6FilterFormatsTest extends MigrateSqlSourceTestCase {
+class D6FilterFormatTest extends MigrateSqlSourceTestCase {
 
   // The plugin system is not working during unit testing so the source plugin
   // class needs to be manually specified.
-  const PLUGIN_CLASS = 'Drupal\migrate_drupal\Tests\source\D6FilterFormats';
+  const PLUGIN_CLASS = 'Drupal\migrate_drupal\Plugin\migrate\source\d6\FilterFormat';
 
   // The fake Migration configuration entity.
   protected $migrationConfiguration = array(
@@ -134,13 +135,13 @@ class D6FilterFormatsTest extends MigrateSqlSourceTestCase {
   }
 }
 
-namespace Drupal\migrate_drupal\Tests\source;
+namespace Drupal\migrate_drupal\Tests\source\d6;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\migrate_drupal\Plugin\migrate\source\D6FilterFormats;
+use Drupal\migrate_drupal\Plugin\migrate\source\d6\FilterFormat;
 
-class TestD6FilterFormats extends D6FilterFormats {
+class TestFilterFormat extends FilterFormat {
   function setDatabase(Connection $database) {
     $this->database = $database;
   }
