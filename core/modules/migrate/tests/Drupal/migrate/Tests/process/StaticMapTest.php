@@ -10,6 +10,7 @@ use Drupal\migrate\Plugin\migrate\process\StaticMap;
 
 /**
  * @group migrate
+ * @group Drupal
  */
 class StaticMapTest extends MigrateProcessTestCase {
 

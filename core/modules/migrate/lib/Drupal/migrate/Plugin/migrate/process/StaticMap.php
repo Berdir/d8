@@ -7,6 +7,7 @@
 
 namespace Drupal\migrate\Plugin\migrate\process;
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\migrate\MigrateException;
 use Drupal\migrate\MigrateExecutable;
@@ -16,6 +17,8 @@ use Drupal\migrate\Row;
 /**
  * This plugin changes the current value based on a static lookup map.
  *
+ * @see https://drupal.org/node/2143521
+ *
  * @PluginId("static_map")
  */
 class StaticMap extends PluginBase implements MigrateProcessInterface {
@@ -24,20 +27,17 @@ class StaticMap extends PluginBase implements MigrateProcessInterface {
    * {@inheritdoc}
    */
   public function transform($value, MigrateExecutable $migrate_executable, Row $row, $destination_property) {
-    $map = $this->configuration['map'];
     if (!is_array($value)) {
       $value = array($value);
     }
     if (!$value) {
       throw new MigrateException('Can not lookup without a value.');
     }
-    foreach ($value as $key) {
-      if (!isset($map[$key])) {
-        throw new MigrateException('Lookup failed.');
-      }
-      $map = $map[$key];
+    $new_value = NestedArray::getValue($this->configuration['map'], $value, $key_exists);
+    if (!$key_exists) {
+      throw new MigrateException('Lookup failed.');
     }
-    return $map;
+    return $new_value;
   }
 
 }
