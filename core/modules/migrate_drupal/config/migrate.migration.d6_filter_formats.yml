@@ -2,7 +2,7 @@ id: d6_filter_formats
 sourceIds:
   format:
     type: int
-    "not null": true,
+    "not null": true
     default: 0
 destinationIds:
   format:
@@ -29,7 +29,7 @@ process:
     key: @id
     process:
       id:
-        plugin: map
+        plugin: static_map
         source:
           - module
           - delta

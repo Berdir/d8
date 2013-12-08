@@ -18,7 +18,7 @@ class D6FilterFormatsTest extends MigrateSqlSourceTestCase {
 
   // The plugin system is not working during unit testing so the source plugin
   // class needs to be manually specified.
-  const PLUGIN_CLASS = 'Drupal\migrate_drupal\Tests\source\TestD6FilterFormats';
+  const PLUGIN_CLASS = 'Drupal\migrate_drupal\Tests\source\D6FilterFormats';
 
   // The fake Migration configuration entity.
   protected $migrationConfiguration = array(
