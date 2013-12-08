@@ -237,6 +237,13 @@ class MigrateExecutableTest extends MigrateTestCase {
 
 class TestMigrateExecutable extends MigrateExecutable {
 
+  /**
+   * (Fake) )number of seconds elapsed since the start of the test.
+   *
+   * @var int
+   */
+  protected $timeElapsed;
+
   public function setTranslationManager(TranslationInterface $translation_manager) {
     $this->translationManager = $translation_manager;
   }
@@ -282,4 +289,12 @@ class TestMigrateExecutable extends MigrateExecutable {
   public function setTimeElapsed($time) {
     $this->timeElapsed = $time;
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getTimeElapsed() {
+    return $this->timeElapsed;
+  }
+
 }

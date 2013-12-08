@@ -504,11 +504,6 @@ class MigrateExecutable {
    * This allows a test to set a fake elapsed time.
    */
   protected function getTimeElapsed() {
-    if (isset($this->timeElapsed)) {
-      return $this->timeElapsed;
-    }
-    // Unlike other getters this does not set the timeElapsed property: the
-    // return value in non-test scenarios is changing per call.
     return time() - REQUEST_TIME;
   }
 
