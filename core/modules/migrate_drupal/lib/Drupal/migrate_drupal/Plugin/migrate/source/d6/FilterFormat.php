@@ -13,7 +13,7 @@ use Drupal\migrate\Row;
 /**
  * Drupal 6 role source from database.
  *
- * @PluginId("drupal6_filter_formats")
+ * @PluginId("drupal6_filter_format")
  */
 class FilterFormat extends Drupal6SqlBase {
 

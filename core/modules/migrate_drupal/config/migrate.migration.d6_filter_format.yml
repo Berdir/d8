@@ -1,4 +1,4 @@
-id: d6_filter_formats
+id: d6_filter_format
 sourceIds:
   format:
     type: int
@@ -9,7 +9,7 @@ destinationIds:
     type: varchar
     length: 255
 source:
-  plugin: drupal6_filter_formats
+  plugin: drupal6_filter_format
 process:
   format:
     -

@@ -11,7 +11,7 @@ use Drupal\Core\Database\Connection;
 /**
  * Database dump for testing filter format migration.
  */
-class Drupal6FilterFormats {
+class Drupal6FilterFormat {
 
 
   /**

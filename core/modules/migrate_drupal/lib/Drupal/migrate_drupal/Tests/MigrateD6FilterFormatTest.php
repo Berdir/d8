@@ -10,7 +10,7 @@ namespace Drupal\migrate_drupal\Tests;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate\MigrateMessage;
 
-class MigrateD6FilterFormatsTest extends MigrateDrupalTestBase {
+class MigrateD6FilterFormatTest extends MigrateDrupalTestBase {
 
   /**
    * {@inheritdoc}
@@ -23,10 +23,10 @@ class MigrateD6FilterFormatsTest extends MigrateDrupalTestBase {
     );
   }
 
-  function testFilterFormats() {
-    $migration = entity_load('migration', 'd6_filter_formats');
+  function testFilterFormat() {
+    $migration = entity_load('migration', 'd6_filter_format');
     $dumps = array(
-      drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6FilterFormats.php',
+      drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6FilterFormat.php',
     );
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, new MigrateMessage);
