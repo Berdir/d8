@@ -204,8 +204,7 @@ class MigrateExecutableTest extends MigrateTestCase {
     $this->assertFalse($this->executable->maxExecTimeExceeded());
     // Assert max_execution_time value is exceeded.
     $this->executable->setMaxExecTime(1);
-    // Sleep to force a higher execution time but not slow other tests.
-    sleep(1);
+    $this->executable->setTimeElapsed(time() + 2);
     $this->assertTrue($this->executable->maxExecTimeExceeded());
   }
 
@@ -277,4 +276,10 @@ class TestMigrateExecutable extends MigrateExecutable {
     $this->sourceIdValues = $source_id_values;
   }
 
+  /**
+   * Allows setting a fake elapsed time.
+   */
+  public function setTimeElapsed($time) {
+    $this->timeElapsed = $time;
+  }
 }

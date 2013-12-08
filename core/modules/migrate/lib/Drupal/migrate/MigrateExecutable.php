@@ -489,13 +489,27 @@ class MigrateExecutable {
    */
   protected function maxExecTimeExceeded() {
     if ($this->maxExecTime) {
-      $time_elapsed = time() - REQUEST_TIME;
+      $time_elapsed = $this->getTimeElapsed();
       $pct_time = $time_elapsed / $this->maxExecTime;
       if ($pct_time > $this->migration->get('timeThreshold')) {
         return TRUE;
       }
     }
     return FALSE;
+  }
+
+  /**
+   * Returns the time elapsed.
+   *
+   * This allows a test to set a fake elapsed time.
+   */
+  protected function getTimeElapsed() {
+    if (isset($this->timeElapsed)) {
+      return $this->timeElapsed;
+    }
+    // Unlike other getters this does not set the timeElapsed property: the
+    // return value in non-test scenarios is changing per call.
+    return time() - REQUEST_TIME;
   }
 
   /**
