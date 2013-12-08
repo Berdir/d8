@@ -10,9 +10,9 @@ namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
 /**
  * Drupal 6 block source from database.
  *
- * @PluginId("drupal6_boxes")
+ * @PluginId("drupal6_box")
  */
-class Boxes extends Drupal6SqlBase {
+class Box extends Drupal6SqlBase {
 
   /**
    * {@inheritdoc}

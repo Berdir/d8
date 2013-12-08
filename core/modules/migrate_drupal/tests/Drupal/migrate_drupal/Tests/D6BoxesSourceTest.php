@@ -13,12 +13,13 @@ use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
  * Tests Boxes migration from D6 to D8.
  *
  * @group migrate_drupal
+ * @group Drupal
  */
-class D6BoxesSourceTest extends MigrateSqlSourceTestCase {
+class D6BoxSourceTest extends MigrateSqlSourceTestCase {
 
   // The plugin system is not working during unit testing so the source plugin
   // class needs to be manually specified.
-  const PLUGIN_CLASS = 'Drupal\migrate_drupal\Plugin\migrate\source\d6\Boxes';
+  const PLUGIN_CLASS = 'Drupal\migrate_drupal\Plugin\migrate\source\d6\Box';
 
   // The fake Migration configuration entity.
   protected $migrationConfiguration = array(
@@ -92,9 +93,9 @@ namespace Drupal\migrate_drupal\Tests\source\d6;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\migrate_drupal\Plugin\migrate\source\d6\Boxes;
+use Drupal\migrate_drupal\Plugin\migrate\source\d6\Box;
 
-class TestBoxes extends Boxes {
+class TestBox extends Box {
   function setDatabase(Connection $database) {
     $this->database = $database;
   }
