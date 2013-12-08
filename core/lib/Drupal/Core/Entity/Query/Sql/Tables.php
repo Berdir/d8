@@ -169,7 +169,7 @@ class Tables implements TablesInterface {
       else {
         // ensureEntityTable() decides whether an entity property will be
         // queried from the data table or the base table based on where it
-        // finds the property first. The data table is prefered, which is why
+        // finds the property first. The data table is preferred, which is why
         // it gets added before the base table.
         $entity_tables = array();
         if (isset($entity_info['data_table'])) {
@@ -204,7 +204,7 @@ class Tables implements TablesInterface {
         // Check for a valid relationship.
         if (isset($propertyDefinitions[$relationship_specifier]) && $entity->{$specifier}->get('entity') instanceof EntityReference) {
           // If it is, use the entity type.
-          $entity_type = $propertyDefinitions[$relationship_specifier]['constraints']['EntityType'];
+          $entity_type = $propertyDefinitions[$relationship_specifier]->getConstraint('EntityType');
           $entity_info = $entity_manager->getDefinition($entity_type);
           // Add the new entity base table using the table and sql column.
           $join_condition= '%alias.' . $entity_info['entity_keys']['id'] . " = $table.$sql_column";

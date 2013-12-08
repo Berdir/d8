@@ -65,7 +65,7 @@ class IteratorTest extends MigrateTestCase {
     );
     $plugin = new Iterator($configuration, 'iterator', array());
     // Manually create the plugins. Migration::getProcessPlugins does this
-    // normally but the plugin system is not working.
+    // normally but the plugin system is not available.
     foreach ($configuration['process'] as $destination => $source) {
       $iterator_plugins[$destination][] = new Get(array('source' => $source), 'get', array());
     }
@@ -78,6 +78,7 @@ class IteratorTest extends MigrateTestCase {
       ->method('getProcessPlugins')
       ->will($this->returnValue($key_plugin));
     $migrate_executable = new MigrateExecutable($migration, $this->getMock('Drupal\migrate\MigrateMessageInterface'));
+
     // The current value of the pipeline.
     $current_value = array(
       array(
@@ -87,6 +88,10 @@ class IteratorTest extends MigrateTestCase {
     );
     // This is not used but the interface requires it, so create an empty row.
     $row = new Row(array(), array());
+
+    // After transformation, check to make sure that source_foo and source_id's
+    // values ended up in the proper destinations, and that the value of the
+    // key (@id) is the same as the destination ID (42).
     $new_value = $plugin->transform($current_value, $migrate_executable, $row, 'test');
     $this->assertSame(count($new_value), 1);
     $this->assertSame(count($new_value[42]), 2);

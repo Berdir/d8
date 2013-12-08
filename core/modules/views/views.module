@@ -12,6 +12,7 @@
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Database\Query\AlterableInterface;
 use Drupal\Core\Language\Language;
+use Drupal\views\Plugin\Derivative\ViewsLocalTask;
 use Drupal\views\ViewExecutable;
 use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\views\Entity\View;
@@ -990,14 +991,14 @@ function views_get_view($name) {
  */
 function views_view_has_form_elements($view) {
   foreach ($view->field as $field) {
-    if (property_exists($field, 'views_form_callback') || method_exists($field, 'views_form')) {
+    if (property_exists($field, 'views_form_callback') || method_exists($field, 'viewsForm')) {
       return TRUE;
     }
   }
   $area_handlers = array_merge(array_values($view->header), array_values($view->footer));
   $empty = empty($view->result);
   foreach ($area_handlers as $area) {
-    if (method_exists($area, 'views_form') && !$area->views_form_empty($empty)) {
+    if (method_exists($area, 'viewsForm') && !$area->viewsFormEmpty($empty)) {
       return TRUE;
     }
   }
@@ -1099,7 +1100,7 @@ function views_exposed_form($form, &$form_state) {
 
   $form['actions'] = array('#type' => 'actions');
   $form['actions']['submit'] = array(
-    // Prevent from showing up in $_GET.
+    // Prevent from showing up in \Drupal::request()->query.
     '#name' => '',
     '#type' => 'submit',
     '#value' => t('Apply'),
@@ -1217,7 +1218,7 @@ function views_query_views_alter(AlterableInterface $query) {
     }
   }
 
-  // Replaces substitions in filter criterias.
+  // Replaces substitions in filter criteria.
   _views_query_tag_alter_condition($query, $where, $substitutions);
 }
 
@@ -1235,7 +1236,7 @@ function _views_query_tag_alter_condition(AlterableInterface $query, &$condition
         _views_query_tag_alter_condition($query, $sub_conditions, $substitutions);
       }
       // $condition['value'] is a subquery so alter the subquery recursive.
-      // Therefore take sure to get the metadata of the main query.
+      // Therefore make sure to get the metadata of the main query.
       if (is_object($condition['value'])) {
         $subquery = $condition['value'];
         $subquery->addMetaData('views_substitutions', $query->getMetaData('views_substitutions'));
@@ -1354,4 +1355,13 @@ function views_element_validate_tags($element, &$form_state) {
       return;
     }
   }
+}
+
+/**
+ * Implements hook_local_tasks_alter().
+ */
+function views_local_tasks_alter(&$local_tasks) {
+  $container = \Drupal::getContainer();
+  $local_task = ViewsLocalTask::create($container, 'views_view');
+  $local_task->alterLocalTasks($local_tasks);
 }

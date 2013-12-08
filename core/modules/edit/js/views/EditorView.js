@@ -1,4 +1,9 @@
-(function ($, _, Backbone, Drupal) {
+/**
+ * @file
+ * An abstract Backbone View that controls an in-place editor.
+ */
+
+(function ($, Backbone, Drupal) {
 
 "use strict";
 
@@ -10,6 +15,8 @@
  *
  * Look at Drupal.edit.editors.form and Drupal.edit.editors.plain_text for
  * examples.
+ *
+ * @see Drupal.edit.EditorModel
  */
 Drupal.edit.EditorView = Backbone.View.extend({
 
@@ -74,7 +81,7 @@ Drupal.edit.EditorView = Backbone.View.extend({
    *    insert its own toolbar UI into Edit's tightly integrated toolbar.
    *  - Boolean fullWidthToolbar: indicates whether Edit's tightly integrated
    *    toolbar should consume the full width of the element, rather than being
-   *    just long enough to accomodate a label.
+   *    just long enough to accommodate a label.
    */
   getEditUISettings: function () {
     return { padding: false, unifiedToolbar: false, fullWidthToolbar: false, popup: false };
@@ -278,4 +285,4 @@ Drupal.edit.EditorView = Backbone.View.extend({
 
 });
 
-}(jQuery, _, Backbone, Drupal));
+}(jQuery, Backbone, Drupal));

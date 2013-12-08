@@ -65,7 +65,7 @@ class EditFieldForm implements FormInterface, ContainerInjectionInterface {
     return new static(
       $container->get('user.tempstore'),
       $container->get('module_handler'),
-      $container->get('plugin.manager.entity')->getStorageController('node_type')
+      $container->get('entity.manager')->getStorageController('node_type')
     );
   }
 
@@ -128,18 +128,8 @@ class EditFieldForm implements FormInterface, ContainerInjectionInterface {
     $form_state['field_name'] = $field_name;
 
     // @todo Allow the usage of different form modes by exposing a hook and the
-    // UI for them.
-    $form_display = entity_get_render_form_display($entity, 'default');
-
-    // Let modules alter the form display.
-    $form_display_context = array(
-      'entity_type' => $entity->entityType(),
-      'bundle' => $entity->bundle(),
-      'form_mode' => 'default',
-    );
-    $this->moduleHandler->alter('entity_form_display', $form_display, $form_display_context);
-
-    $form_state['form_display'] = $form_display;
+    //   UI for them.
+    $form_state['form_display'] = entity_get_render_form_display($entity, 'default');
   }
 
   /**
@@ -180,14 +170,14 @@ class EditFieldForm implements FormInterface, ContainerInjectionInterface {
    */
   protected function buildEntity(array $form, array &$form_state) {
     $entity = clone $form_state['entity'];
+    $field_name = $form_state['field_name'];
 
-    field_attach_extract_form_values($entity, $form, $form_state, array('field_name' =>  $form_state['field_name']));
+    field_attach_extract_form_values($entity, $form, $form_state, array('field_name' => $field_name));
 
     // @todo Refine automated log messages and abstract them to all entity
     //   types: http://drupal.org/node/1678002.
     if ($entity->entityType() == 'node' && $entity->isNewRevision() && !isset($entity->log)) {
-      $instance = field_info_instance($entity->entityType(), $form_state['field_name'], $entity->bundle());
-      $entity->log = t('Updated the %field-name field through in-place editing.', array('%field-name' => $instance->getFieldLabel()));
+      $entity->log = t('Updated the %field-name field through in-place editing.', array('%field-name' => $entity->get($field_name)->getFieldDefinition()->getFieldLabel()));
     }
 
     return $entity;
@@ -243,8 +233,8 @@ class EditFieldForm implements FormInterface, ContainerInjectionInterface {
    */
   protected function getChangedFieldName(EntityInterface $entity) {
     foreach ($entity as $field_name => $field) {
-      $definition = $field->getDefinition();
-      if (isset($definition['property_constraints']['value']['EntityChanged'])) {
+      $constraints = $field->getItemDefinition()->getConstraints();
+      if (isset($constraints['ComplexData']['value']['EntityChanged'])) {
         return $field_name;
       }
     }

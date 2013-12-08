@@ -108,7 +108,7 @@ class NodeSearch extends SearchPluginBase implements AccessibleInterface, Search
       $plugin_id,
       $plugin_definition,
       $container->get('database'),
-      $container->get('plugin.manager.entity'),
+      $container->get('entity.manager'),
       $container->get('module_handler'),
       $container->get('config.factory')->get('search.settings'),
       $container->get('keyvalue')->get('state'),
@@ -176,8 +176,8 @@ class NodeSearch extends SearchPluginBase implements AccessibleInterface, Search
       ->searchExpression($keys, $this->getPluginId());
 
     // Handle advanced search filters in the f query string.
-    // $_GET['f'] is an array that looks like this in the URL:
-    // ?f[]=type:page&f[]=term:27&f[]=term:13&f[]=langcode:en
+    // \Drupal::request()->query->get('f') is an array that looks like this in
+    // the URL: ?f[]=type:page&f[]=term:27&f[]=term:13&f[]=langcode:en
     // So $parameters['f'] looks like:
     // array('type:page', 'term:27', 'term:13', 'langcode:en');
     // We need to parse this out into query conditions.

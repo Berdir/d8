@@ -352,7 +352,7 @@ abstract class FilterPluginBase extends HandlerBase {
     $this->buildExposedFiltersGroupForm($form, $form_state);
 
     // When we click the expose button, we add new gadgets to the form but they
-    // have no data in $_POST so their defaults get wiped out. This prevents
+    // have no data in POST so their defaults get wiped out. This prevents
     // these defaults from getting wiped out. This setting will only be TRUE
     // during a 2nd pass rerender.
     if (!empty($form_state['force_build_group_options'])) {
@@ -1202,12 +1202,12 @@ abstract class FilterPluginBase extends HandlerBase {
    * Transform the input from a grouped filter into a standard filter.
    *
    * When a filter is a group, find the set of operator and values
-   * that the choosed item represents, and inform views that a normal
+   * that the chosen item represents, and inform views that a normal
    * filter was submitted by telling the operator and the value selected.
    *
    * The param $selected_group_id is only passed when the filter uses the
    * checkboxes widget, and this function will be called for each item
-   * choosed in the checkboxes.
+   * chosen in the checkboxes.
    */
   public function convertExposedInput(&$input, $selected_group_id = NULL) {
     if ($this->isAGroup()) {

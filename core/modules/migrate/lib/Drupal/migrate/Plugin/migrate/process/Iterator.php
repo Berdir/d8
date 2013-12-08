@@ -15,12 +15,14 @@ use Drupal\migrate\Row;
 /**
  * This plugin iterates and processes an array.
  *
+ * @see https://drupal.org/node/2135345
+ *
  * @PluginId("iterator")
  */
 class Iterator extends PluginBase implements MigrateProcessInterface {
 
   /**
-   * {@inheritdoc}
+   * Runs a process pipeline on each destination property per list item.
    */
   public function transform($value, MigrateExecutable $migrate_executable, Row $row, $destination_property) {
     $return = array();

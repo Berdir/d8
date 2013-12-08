@@ -9,6 +9,7 @@ use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
 use Drupal\user\RoleInterface;
 use Drupal\Core\Template\Attribute;
+use Drupal\Core\TypedData\DataDefinition;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Drupal\menu_link\Entity\MenuLink;
@@ -350,10 +351,9 @@ function user_load_by_name($name) {
  *
  */
 function user_validate_name($name) {
-  $data = \Drupal::typedData()->create(array(
-    'type' => 'string',
-    'constraints' => array('UserName' => array()),
-  ));
+  $definition = DataDefinition::create('string')
+    ->setConstraints(array('UserName' => array()));
+  $data = \Drupal::typedData()->create($definition);
   $data->setValue($name);
   $violations = $data->validate();
   if (count($violations) > 0) {
@@ -571,9 +571,6 @@ function user_preprocess_block(&$variables) {
       case 'user_new_block':
         $variables['attributes']['role'] = 'complementary';
         break;
-      case 'user_online_block':
-        $variables['attributes']['role'] = 'complementary';
-        break;
     }
   }
 }
@@ -770,16 +767,13 @@ function user_menu() {
     'position' => 'left',
     'weight' => -4,
   );
-  $items['admin/people/list'] = array(
-    'title' => 'List',
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-  );
+
   // Permissions and role forms.
   $items['admin/people/permissions'] = array(
     'title' => 'Permissions',
     'description' => 'Determine access to features by selecting permissions for roles.',
     'route_name' => 'user.admin_permissions',
-    'type' => MENU_LOCAL_TASK,
+    'type' => MENU_SIBLING_LOCAL_TASK,
   );
 
   $items['admin/people/roles/manage/%user_role'] = array(
@@ -1433,8 +1427,8 @@ function user_role_names($membersonly = FALSE, $permission = NULL) {
  * Implements hook_user_role_insert().
  */
 function user_user_role_insert(RoleInterface $role) {
-  // Ignore the authenticated and anonymous roles.
-  if (in_array($role->id(), array(DRUPAL_AUTHENTICATED_RID, DRUPAL_ANONYMOUS_RID))) {
+  // Ignore the authenticated and anonymous roles or the role is being synced.
+  if (in_array($role->id(), array(DRUPAL_AUTHENTICATED_RID, DRUPAL_ANONYMOUS_RID)) || $role->isSyncing()) {
     return;
   }
 
@@ -1470,8 +1464,8 @@ function user_user_role_insert(RoleInterface $role) {
  * Implements hook_user_role_delete().
  */
 function user_user_role_delete(RoleInterface $role) {
-  // Ignore the authenticated and anonymous roles.
-  if (in_array($role->id(), array(DRUPAL_AUTHENTICATED_RID, DRUPAL_ANONYMOUS_RID))) {
+  // Ignore the authenticated and anonymous roles or the role is being synced.
+  if (in_array($role->id(), array(DRUPAL_AUTHENTICATED_RID, DRUPAL_ANONYMOUS_RID)) || $role->isSyncing()) {
     return;
   }
 
