@@ -9,6 +9,7 @@ namespace Drupal\migrate\Tests\process;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate\Plugin\migrate\process\Get;
 use Drupal\migrate\Plugin\migrate\process\Iterator;
+use Drupal\migrate\Plugin\migrate\process\StaticMap;
 use Drupal\migrate\Row;
 use Drupal\migrate\Tests\MigrateTestCase;
 
@@ -109,10 +110,12 @@ class IteratorTest extends MigrateTestCase {
       'process' => array(
         'test' => 'value',
       ),
+      'extract' => 'test'
     );
     $plugin = new Iterator($configuration, 'iterator', array());
     foreach ($configuration['process'] as $destination => $source) {
       $iterator_plugins[$destination][] = new Get(array('source' => $source), 'get', array());
+      $iterator_plugins[$destination][] = new StaticMap(array('map' => array('foo' => 'foo_mapped', 'bar' => 'bar_mapped')), 'map', array());
     }
     $migration->expects($this->exactly(2))
       ->method('getProcessPlugins')
@@ -121,6 +124,6 @@ class IteratorTest extends MigrateTestCase {
     $row = new Row(array(), array());
     $current_value = array('foo', 'bar');
     $new_value = $plugin->transform($current_value, $migrate_executable, $row, 'test');
-    $this->assertSame($new_value, array(array('test' => 'foo'), array('test' => 'bar')));
+    $this->assertSame($new_value, array('foo_mapped', 'bar_mapped'));
   }
 }
