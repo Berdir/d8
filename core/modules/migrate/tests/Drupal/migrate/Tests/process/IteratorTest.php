@@ -104,26 +104,31 @@ class IteratorTest extends MigrateTestCase {
    * Tests the iterator process plugin over a list of strings.
    */
   function testIteratorListOfScalars() {
-    $migration = $this->getMigration();
+    $map = array('foo' => 'foo_mapped', 'bar' => 'bar_mapped');
     // Set up the properties for the iterator.
     $configuration = array(
       'process' => array(
-        'test' => 'value',
+        'temp' => array(
+          'source' => 'value',
+          'plugin' => 'static_map',
+          'map' => $map,
+        ),
       ),
-      'extract' => 'test'
+      'extract' => 'temp'
     );
     $plugin = new Iterator($configuration, 'iterator', array());
-    foreach ($configuration['process'] as $destination => $source) {
-      $iterator_plugins[$destination][] = new Get(array('source' => $source), 'get', array());
-      $iterator_plugins[$destination][] = new StaticMap(array('map' => array('foo' => 'foo_mapped', 'bar' => 'bar_mapped')), 'map', array());
+    foreach ($configuration['process'] as $destination => $pipeline) {
+      $iterator_plugins[$destination][] = new Get(array('source' => $pipeline['source']), 'get', array());
+      $iterator_plugins[$destination][] = new StaticMap($pipeline, 'map', array());
     }
+    $migration = $this->getMigration();
     $migration->expects($this->exactly(2))
       ->method('getProcessPlugins')
       ->will($this->returnValue($iterator_plugins));
     $migrate_executable = new MigrateExecutable($migration, $this->getMock('Drupal\migrate\MigrateMessageInterface'));
     $row = new Row(array(), array());
     $current_value = array('foo', 'bar');
-    $new_value = $plugin->transform($current_value, $migrate_executable, $row, 'test');
+    $new_value = $plugin->transform($current_value, $migrate_executable, $row, 'temp');
     $this->assertSame($new_value, array('foo_mapped', 'bar_mapped'));
   }
 }
