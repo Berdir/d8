@@ -53,7 +53,7 @@ class IteratorTest extends MigrateTestCase {
   /**
    * Tests the iterator process plugin.
    */
-  public function testIterator() {
+  function testIterator() {
     $migration = $this->getMigration();
     // Set up the properties for the iterator.
     $configuration = array(
@@ -97,30 +97,5 @@ class IteratorTest extends MigrateTestCase {
     $this->assertSame(count($new_value[42]), 2);
     $this->assertSame($new_value[42]['foo'], 'test');
     $this->assertSame($new_value[42]['id'], 42);
-  }
-
-  /**
-   * Tests the iterator process plugin over a list of strings.
-   */
-  function testIteratorListOfScalars() {
-    $migration = $this->getMigration();
-    // Set up the properties for the iterator.
-    $configuration = array(
-      'process' => array(
-        'test' => 'value',
-      ),
-    );
-    $plugin = new Iterator($configuration, 'iterator', array());
-    foreach ($configuration['process'] as $destination => $source) {
-      $iterator_plugins[$destination][] = new Get(array('source' => $source), 'get', array());
-    }
-    $migration->expects($this->exactly(2))
-      ->method('getProcessPlugins')
-      ->will($this->returnValue($iterator_plugins));
-    $migrate_executable = new MigrateExecutable($migration, $this->getMock('Drupal\migrate\MigrateMessageInterface'));
-    $row = new Row(array(), array());
-    $current_value = array('foo', 'bar');
-    $new_value = $plugin->transform($current_value, $migrate_executable, $row, 'test');
-    $this->assertSame($new_value, array(array('test' => 'foo'), array('test' => 'bar')));
   }
 }
