@@ -30,7 +30,7 @@ class ExtractTest extends MigrateProcessTestCase {
   /**
    * {@inheritdoc}
    */
-  function setUp() {
+  public function setUp() {
     $configuration['indexes'] = array('foo');
     $this->plugin = new Extract($configuration, 'map', array());
     parent::setUp();
@@ -39,7 +39,7 @@ class ExtractTest extends MigrateProcessTestCase {
   /**
    * Tests successful extraction.
    */
-  function testExtract() {
+  public function testExtract() {
     $value = $this->plugin->transform(array('foo' => 'bar'), $this->migrateExecutable, $this->row, 'destinationproperty');
     $this->assertSame($value, 'bar');
   }
@@ -48,9 +48,9 @@ class ExtractTest extends MigrateProcessTestCase {
    * Tests invalid input.
    *
    * @expectedException \Drupal\migrate\MigrateException
-   * @expectedExceptionMessage Invalid input.
+   * @expectedExceptionMessage Input should be an array.
    */
-  function testExtractFromString() {
+  public function testExtractFromString() {
     $this->plugin->transform('bar', $this->migrateExecutable, $this->row, 'destinationproperty');
   }
 
@@ -58,9 +58,9 @@ class ExtractTest extends MigrateProcessTestCase {
    * Tests unsuccessful extraction.
    *
    * @expectedException \Drupal\migrate\MigrateException
-   * @expectedExceptionMessage Extraction failed.
+   * @expectedExceptionMessage Array indexes missing, extraction failed.
    */
-  function testExtractFail() {
+  public function testExtractFail() {
     $this->plugin->transform(array('bar' => 'foo'), $this->migrateExecutable, $this->row, 'destinationproperty');
   }
 

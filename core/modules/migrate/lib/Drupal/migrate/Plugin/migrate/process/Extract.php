@@ -15,9 +15,9 @@ use Drupal\migrate\Plugin\MigrateProcessInterface;
 use Drupal\migrate\Row;
 
 /**
- * This plugin changes the current value based on a static lookup map.
+ * This plugin extract a value from an array.
  *
- * @see https://drupal.org/node/2143521
+ * @see https://drupal.org/node/2152731
  *
  * @PluginId("extract")
  */
@@ -28,11 +28,11 @@ class Extract extends PluginBase implements MigrateProcessInterface {
    */
   public function transform($value, MigrateExecutable $migrate_executable, Row $row, $destination_property) {
     if (!is_array($value)) {
-      throw new MigrateException('Invalid input.');
+      throw new MigrateException('Input should be an array.');
     }
     $new_value = NestedArray::getValue($value, $this->configuration['indexes'], $key_exists);
     if (!$key_exists) {
-      throw new MigrateException('Extraction failed.');
+      throw new MigrateException('Array indexes missing, extraction failed.');
     }
     return $new_value;
   }
