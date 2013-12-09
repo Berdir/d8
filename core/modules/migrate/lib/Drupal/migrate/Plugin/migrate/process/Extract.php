@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Plugin\migrate\process\MultipleColumnsMap.
+ * Contains \Drupal\migrate\Plugin\migrate\process\Extract.
  */
 
 namespace Drupal\migrate\Plugin\migrate\process;
@@ -28,7 +28,7 @@ class Extract extends PluginBase implements MigrateProcessInterface {
    */
   public function transform($value, MigrateExecutable $migrate_executable, Row $row, $destination_property) {
     if (!is_array($value)) {
-      throw new MigrateException('Extraction failed.');
+      throw new MigrateException('Invalid input.');
     }
     $new_value = NestedArray::getValue($value, $this->configuration['indexes'], $key_exists);
     if (!$key_exists) {
