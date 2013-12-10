@@ -22,7 +22,7 @@ use Drupal\migrate\Entity\MigrationInterface;
 class MigratePluginManager extends DefaultPluginManager {
 
   /**
-   * Constructs a MigraterPluginManager object.
+   * Constructs a MigratePluginManager object.
    *
    * @param string $type
    *   The type of the plugin: row, source, process, destination, entity_field, id_map.
@@ -38,7 +38,7 @@ class MigratePluginManager extends DefaultPluginManager {
    */
   public function __construct($type, \Traversable $namespaces, CacheBackendInterface $cache_backend, LanguageManager $language_manager, ModuleHandlerInterface $module_handler) {
     if ($type == 'process') {
-      $annotation = 'Drupal\migrate\Annotation\ProcessPlugin';
+      $annotation = 'Drupal\migrate\Annotation\MigrateProcessPlugin';
     }
     else {
       $annotation = 'Drupal\Component\Annotation\PluginID';
