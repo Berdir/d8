@@ -672,7 +672,6 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
         $this->resetCache(array($entity->id()));
         $entity->setNewRevision(FALSE);
         $entity->postSave($this, TRUE);
-        $this->invokeFieldMethod('update', $entity);
         $this->saveFieldItems($entity, TRUE);
         $this->invokeHook('update', $entity);
         if ($this->dataTable) {
@@ -701,7 +700,6 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
 
         $entity->enforceIsNew(FALSE);
         $entity->postSave($this, FALSE);
-        $this->invokeFieldMethod('insert', $entity);
         $this->saveFieldItems($entity, FALSE);
         $this->invokeHook('insert', $entity);
       }

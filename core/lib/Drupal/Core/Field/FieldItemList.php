@@ -246,20 +246,6 @@ class FieldItemList extends ItemList implements FieldItemListInterface {
   /**
    * {@inheritdoc}
    */
-  public function insert() {
-    $this->delegateMethod('insert');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function update() {
-    $this->delegateMethod('update');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function delete() {
     $this->delegateMethod('delete');
   }

@@ -194,16 +194,6 @@ abstract class FieldItemBase extends Map implements FieldItemInterface {
   /**
    * {@inheritdoc}
    */
-  public function insert() { }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function update() { }
-
-  /**
-   * {@inheritdoc}
-   */
   public function delete() { }
 
   /**

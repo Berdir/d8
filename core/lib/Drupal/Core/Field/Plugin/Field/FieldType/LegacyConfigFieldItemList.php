@@ -70,20 +70,6 @@ class LegacyConfigFieldItemList extends ConfigFieldItemList {
   /**
    * {@inheritdoc}
    */
-  public function insert() {
-    $this->legacyCallback('insert');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function update() {
-    $this->legacyCallback('update');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function delete() {
     $this->legacyCallback('delete');
   }
