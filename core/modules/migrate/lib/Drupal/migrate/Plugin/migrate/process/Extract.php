@@ -8,10 +8,9 @@
 namespace Drupal\migrate\Plugin\migrate\process;
 
 use Drupal\Component\Utility\NestedArray;
-use Drupal\Core\Plugin\PluginBase;
+use Drupal\migrate\ProcessPluginBase;
 use Drupal\migrate\MigrateException;
 use Drupal\migrate\MigrateExecutable;
-use Drupal\migrate\Plugin\MigrateProcessInterface;
 use Drupal\migrate\Row;
 
 /**
@@ -19,9 +18,11 @@ use Drupal\migrate\Row;
  *
  * @see https://drupal.org/node/2152731
  *
- * @PluginId("extract")
+ * @MigrateProcessPlugin(
+ *   id = "extract"
+ * )
  */
-class Extract extends PluginBase implements MigrateProcessInterface {
+class Extract extends ProcessPluginBase {
 
   /**
    * {@inheritdoc}

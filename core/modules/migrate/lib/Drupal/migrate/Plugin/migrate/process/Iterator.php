@@ -7,9 +7,8 @@
 
 namespace Drupal\migrate\Plugin\migrate\process;
 
-use Drupal\Core\Plugin\PluginBase;
+use Drupal\migrate\ProcessPluginBase;
 use Drupal\migrate\MigrateExecutable;
-use Drupal\migrate\Plugin\MigrateProcessInterface;
 use Drupal\migrate\Row;
 
 /**
@@ -17,9 +16,12 @@ use Drupal\migrate\Row;
  *
  * @see https://drupal.org/node/2135345
  *
- * @PluginId("iterator")
+ * @MigrateProcessPlugin(
+ *   id = "iterator",
+ *   handle_multiples = TRUE
+ * )
  */
-class Iterator extends PluginBase implements MigrateProcessInterface {
+class Iterator extends ProcessPluginBase {
 
   /**
    * Runs a process pipeline on each destination property per list item.
@@ -27,17 +29,9 @@ class Iterator extends PluginBase implements MigrateProcessInterface {
   public function transform($value, MigrateExecutable $migrate_executable, Row $row, $destination_property) {
     $return = array();
     foreach ($value as $key => $new_value) {
-      if (!is_array($new_value)) {
-        $new_value = array('value' => $new_value);
-      }
       $new_row = new Row($new_value, array());
       $migrate_executable->processRow($new_row, $this->configuration['process']);
-      if (isset($this->configuration['extract'])) {
-        $destination = $new_row->getDestinationProperty($this->configuration['extract']);
-      }
-      else {
-        $destination = $new_row->getDestination();
-      }
+      $destination = $new_row->getDestination();
       if (array_key_exists('key', $this->configuration)) {
         $key = $this->transformKey($key, $migrate_executable, $new_row);
       }
@@ -64,4 +58,7 @@ class Iterator extends PluginBase implements MigrateProcessInterface {
     return $row->getDestinationProperty('key');
   }
 
+  public function multiple() {
+    return TRUE;
+  }
 }

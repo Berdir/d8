@@ -10,20 +10,21 @@ namespace Drupal\migrate\Plugin\migrate\process;
 
 use Drupal\Core\Entity\EntityStorageControllerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\Core\Plugin\PluginBase;
+use Drupal\migrate\ProcessPluginBase;
 use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
-use Drupal\migrate\Plugin\MigrateProcessInterface;
 use Drupal\migrate\Row;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Calculates the value of a property based on a previous migration.
  *
- * @PluginId("migration")
+ * @MigrateProcessPlugin(
+ *   id = "migration"
+ * )
  */
-class Migration extends PluginBase implements MigrateProcessInterface, ContainerFactoryPluginInterface {
+class Migration extends ProcessPluginBase implements  ContainerFactoryPluginInterface {
 
   /**
    * {@inheritdoc}

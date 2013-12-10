@@ -33,4 +33,8 @@ interface MigrateProcessInterface extends PluginInspectionInterface {
    */
   public function transform($value, MigrateExecutable $migrate_executable, Row $row, $destination_property);
 
+  /**
+   * @return bool
+   */
+  public function multiple();
 }

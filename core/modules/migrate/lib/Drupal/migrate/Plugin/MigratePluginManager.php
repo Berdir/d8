@@ -37,7 +37,13 @@ class MigratePluginManager extends DefaultPluginManager {
    *   The module handler to invoke the alter hook with.
    */
   public function __construct($type, \Traversable $namespaces, CacheBackendInterface $cache_backend, LanguageManager $language_manager, ModuleHandlerInterface $module_handler) {
-    parent::__construct("Plugin/migrate/$type", $namespaces, 'Drupal\Component\Annotation\PluginID');
+    if ($type == 'process') {
+      $annotation = 'Drupal\migrate\Annotation\ProcessPlugin';
+    }
+    else {
+      $annotation = 'Drupal\Component\Annotation\PluginID';
+    }
+    parent::__construct("Plugin/migrate/$type", $namespaces, $annotation);
     $this->alterInfo($module_handler, 'migrate_' . $type . '_info');
     $this->setCacheBackend($cache_backend, $language_manager, 'migrate_plugins_' . $type);
   }

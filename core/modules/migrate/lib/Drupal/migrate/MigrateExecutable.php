@@ -322,8 +322,23 @@ class MigrateExecutable {
    */
   public function processRow(Row $row, array $process = NULL, $value = NULL) {
     foreach ($this->migration->getProcessPlugins($process) as $destination => $plugins) {
+      $multiple = FALSE;
       foreach ($plugins as $plugin) {
-        $value = $plugin->transform($value, $this, $row, $destination);
+        $definition = $plugin->getPluginDefinition();
+        // If the definition is for a single  but the pipeline contains
+        // multiple values and the next plugin does not handle that iself
+        // then iterate over the values and transform them invidually.
+        if ($multiple && !$definition['handle_multiples']) {
+          $new_value = array();
+          foreach ($value as $scalar_value) {
+            $new_value[] = $plugin->transform($scalar_value, $this, $row, $destination);
+          }
+          $value = $new_value;
+        }
+        else {
+          $value = $plugin->transform($value, $this, $row, $destination);
+          $multiple = $multiple || $plugin->multiple();
+        }
       }
       $row->setDestinationProperty($destination, $value);
       // Reset the value.
