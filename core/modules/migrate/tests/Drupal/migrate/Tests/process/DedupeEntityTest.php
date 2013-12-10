@@ -44,9 +44,11 @@ class DedupeEntityTest extends MigrateProcessTestCase {
   }
 
   /**
-   * @dataProvider provider
+   * Tests entity based deduplication based on providerTestDedupe() values.
+   *
+   * @dataProvider providerTestDedupe
    */
-  public function test($count, $postfix = '') {
+  public function testDedupe($count, $postfix = '') {
     $configuration = array(
       'entity_type' => 'test_entity_type',
       'field' => 'test_field',
@@ -61,7 +63,10 @@ class DedupeEntityTest extends MigrateProcessTestCase {
     $this->assertSame($return, 'test' . ($count ? $postfix . $count : ''));
   }
 
-  public function provider() {
+  /**
+   * Data provider for testDedupe().
+   */
+  public function providerTestDedupe() {
     return array(
       // Tests the entity deduplication plugin when there is no duplication
       // and no postfix.
