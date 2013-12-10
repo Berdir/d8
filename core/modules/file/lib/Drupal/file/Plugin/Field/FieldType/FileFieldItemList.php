@@ -23,7 +23,7 @@ class FileFieldItemList extends ConfigFieldItemList {
    * {@inheritdoc}
    */
   public function preSave() {
-    parent::insert();
+    parent::preSave();
     $entity = $this->getEntity();
 
     // Add a new usage for newly uploaded files.
