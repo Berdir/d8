@@ -219,6 +219,9 @@ class MigrateExecutableTest extends MigrateTestCase {
     foreach ($expected as $key => $value) {
       $plugins[$key][0] = $this->getMock('Drupal\migrate\Plugin\MigrateProcessInterface');
       $plugins[$key][0]->expects($this->once())
+        ->method('getPluginDefinition')
+        ->will($this->returnValue(array()));
+      $plugins[$key][0]->expects($this->once())
         ->method('transform')
         ->will($this->returnValue($value));
     }
