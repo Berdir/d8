@@ -15,7 +15,7 @@ use Drupal\migrate\Row;
  * This plugin copies from the source to the destination.
  *
  * @MigrateProcessPlugin(
- *   id = get"
+ *   id = "get"
  * )
  */
 class Get extends ProcessPluginBase {
