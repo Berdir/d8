@@ -63,6 +63,9 @@ class Get extends ProcessPluginBase {
     return $return;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function multiple() {
     return $this->multiple;
   }
