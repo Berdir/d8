@@ -14,7 +14,7 @@ use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate\Row;
 
 /**
- * This plugin extract a value from an array.
+ * This plugin extracts a value from an array.
  *
  * @see https://drupal.org/node/2152731
  *
