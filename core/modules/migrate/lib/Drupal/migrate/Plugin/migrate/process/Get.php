@@ -21,6 +21,11 @@ use Drupal\migrate\Row;
 class Get extends ProcessPluginBase {
 
   /**
+   * @var bool
+   */
+  protected $multiple;
+
+  /**
    * {@inheritdoc}
    */
   public function transform($value, MigrateExecutable $migrate_executable, Row $row, $destination_property) {
@@ -56,5 +61,9 @@ class Get extends ProcessPluginBase {
       return $return[0];
     }
     return $return;
+  }
+
+  public function multiple() {
+    return $this->multiple;
   }
 }
