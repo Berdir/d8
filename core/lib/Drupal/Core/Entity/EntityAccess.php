@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\Core\Entity\EntityAccessController.
+ * Contains \Drupal\Core\Entity\EntityAccess.
  */
 
 namespace Drupal\Core\Entity;
@@ -16,7 +16,7 @@ use Drupal\Core\Session\AccountInterface;
 /**
  * Defines a default implementation for entity access controllers.
  */
-class EntityAccessController implements EntityAccessInterface {
+class EntityAccess implements EntityAccessInterface {
 
   /**
    * Stores calculcated access check results.
@@ -72,7 +72,7 @@ class EntityAccessController implements EntityAccessInterface {
 
     // Invoke hook_entity_access() and hook_ENTITY_TYPE_access(). Hook results
     // take precedence over overridden implementations of
-    // EntityAccessController::checkAccess(). Entities that have checks that
+    // EntityAccess::checkAccess(). Entities that have checks that
     // need to be done before the hook is invoked should do so by overriding
     // this method.
 
@@ -219,7 +219,7 @@ class EntityAccessController implements EntityAccessInterface {
 
     // Invoke hook_entity_create_access() and hook_ENTITY_TYPE_create_access().
     // Hook results take precedence over overridden implementations of
-    // EntityAccessController::checkAccess(). Entities that have checks that
+    // EntityAccess::checkAccess(). Entities that have checks that
     // need to be done before the hook is invoked should do so by overriding
     // this method.
 

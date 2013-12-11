@@ -7,7 +7,7 @@
 
 namespace Drupal\contact;
 
-use Drupal\Core\Entity\EntityAccessController;
+use Drupal\Core\Entity\EntityAccess;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 /**
@@ -15,7 +15,7 @@ use Drupal\Core\Session\AccountInterface;
  *
  * @see \Drupal\contact\Entity\Category.
  */
-class CategoryAccessController extends EntityAccessController {
+class CategoryAccessController extends EntityAccess {
 
   /**
    * {@inheritdoc}

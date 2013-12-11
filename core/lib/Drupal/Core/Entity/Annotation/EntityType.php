@@ -53,7 +53,7 @@ class EntityType extends Plugin {
    *   class must implement \Drupal\Core\Entity\EntityViewBuilderInterface.
    * - access: The name of the class that is used for access checks. The class
    *   must implement \Drupal\Core\Entity\EntityAccessInterface.
-   *   Defaults to \Drupal\Core\Entity\EntityAccessController.
+   *   Defaults to \Drupal\Core\Entity\EntityAccess.
    * - translation: The name of the controller class that should be used to
    *   handle the translation process. The class must implement
    *   \Drupal\content_translation\ContentTranslationControllerInterface.
@@ -64,13 +64,13 @@ class EntityType extends Plugin {
    * @var array
    */
   public $controllers = array(
-    'access' => 'Drupal\Core\Entity\EntityAccessController',
+    'access' => 'Drupal\Core\Entity\EntityAccess',
   );
 
   /**
    * The name of the default administrative permission.
    *
-   * The default \Drupal\Core\Entity\EntityAccessController class checks this
+   * The default \Drupal\Core\Entity\EntityAccess class checks this
    * permission for all operations in its checkAccess() method. Entities with
    * more complex permissions can extend this class to do their own access
    * checks.

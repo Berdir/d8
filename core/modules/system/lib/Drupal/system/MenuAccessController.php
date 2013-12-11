@@ -8,13 +8,13 @@
 namespace Drupal\system;
 
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityAccessController;
+use Drupal\Core\Entity\EntityAccess;
 use Drupal\Core\Session\AccountInterface;
 
 /**
  * Defines the access controller for the menu entity type.
  */
-class MenuAccessController extends EntityAccessController {
+class MenuAccessController extends EntityAccess {
 
   /**
    * {@inheritdoc}

@@ -24,7 +24,7 @@ use Drupal\migrate\Plugin\MigrateIdMapInterface;
  *   controllers = {
  *     "storage" = "Drupal\Core\Config\Entity\ConfigStorageController",
  *     "list" = "Drupal\Core\Config\Entity\DraggableListController",
- *     "access" = "Drupal\Core\Entity\EntityAccessController",
+ *     "access" = "Drupal\Core\Entity\EntityAccess",
  *     "form" = {
  *       "add" = "Drupal\Core\Entity\EntityFormController",
  *       "edit" = "Drupal\Core\Entity\EntityFormController",

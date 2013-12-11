@@ -8,14 +8,14 @@
 namespace Drupal\entity_test;
 
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityAccessController;
+use Drupal\Core\Entity\EntityAccess;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Session\AccountInterface;
 
 /**
  * Defines the access controller for the test entity type.
  */
-class EntityTestAccessController extends EntityAccessController {
+class EntityTestAccessController extends EntityAccess {
 
   /**
    * {@inheritdoc}

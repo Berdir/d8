@@ -7,14 +7,14 @@
 
 namespace Drupal\system;
 
-use Drupal\Core\Entity\EntityAccessController;
+use Drupal\Core\Entity\EntityAccess;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
  * Provides an access controller for date formats.
  */
-class DateFormatAccessController extends EntityAccessController {
+class DateFormatAccessController extends EntityAccess {
 
   /**
    * {@inheritdoc}

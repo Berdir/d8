@@ -8,13 +8,13 @@
 namespace Drupal\shortcut;
 
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityAccessController;
+use Drupal\Core\Entity\EntityAccess;
 use Drupal\Core\Session\AccountInterface;
 
 /**
  * Defines the access controller for the shortcut entity type.
  */
-class ShortcutSetAccessController extends EntityAccessController {
+class ShortcutSetAccessController extends EntityAccess {
 
   /**
    * {@inheritdoc}

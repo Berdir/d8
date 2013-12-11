@@ -7,7 +7,7 @@
 
 namespace Drupal\views;
 
-use Drupal\Core\Entity\EntityAccessController;
+use Drupal\Core\Entity\EntityAccess;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Session\AccountInterface;
@@ -15,7 +15,7 @@ use Drupal\Core\Session\AccountInterface;
 /**
  * Defines the access controller for the view entity type.
  */
-class ViewAccessController extends EntityAccessController {
+class ViewAccessController extends EntityAccess {
 
   /**
    * {@inheritdoc}

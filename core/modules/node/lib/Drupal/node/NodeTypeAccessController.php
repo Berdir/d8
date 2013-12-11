@@ -7,7 +7,7 @@
 
 namespace Drupal\node;
 
-use Drupal\Core\Entity\EntityAccessController;
+use Drupal\Core\Entity\EntityAccess;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 
@@ -16,7 +16,7 @@ use Drupal\Core\Session\AccountInterface;
  *
  * @see \Drupal\node\Entity\NodeType.
  */
-class NodeTypeAccessController extends EntityAccessController {
+class NodeTypeAccessController extends EntityAccess {
 
   /**
    * {@inheritdoc}

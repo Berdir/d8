@@ -8,13 +8,13 @@
 namespace Drupal\custom_block;
 
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityAccessController;
+use Drupal\Core\Entity\EntityAccess;
 use Drupal\Core\Session\AccountInterface;
 
 /**
  * Defines the access controller for the custom block entity type.
  */
-class CustomBlockAccessController extends EntityAccessController {
+class CustomBlockAccessController extends EntityAccess {
 
   /**
    * {@inheritdoc}

@@ -7,14 +7,14 @@
 
 namespace Drupal\filter;
 
-use Drupal\Core\Entity\EntityAccessController;
+use Drupal\Core\Entity\EntityAccess;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
  * Defines the access controller for the filter format entity type.
  */
-class FilterFormatAccessController extends EntityAccessController {
+class FilterFormatAccessController extends EntityAccess {
 
   /**
    * {@inheritdoc}

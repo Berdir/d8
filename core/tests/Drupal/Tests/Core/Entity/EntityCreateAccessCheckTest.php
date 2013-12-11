@@ -84,7 +84,7 @@ class EntityCreateAccessCheckTest extends UnitTestCase {
     // Don't expect a call to the access controller when we have a bundle
     // argument requirement but no bundle is provided.
     if ($entity_bundle || strpos($requirement, '{') === FALSE) {
-      $access_controller = $this->getMock('Drupal\Core\Entity\EntityAccessControllerInterface');
+      $access_controller = $this->getMock('Drupal\Core\Entity\EntityAccessInterface');
       $access_controller->expects($this->once())
         ->method('createAccess')
         ->with($entity_bundle)

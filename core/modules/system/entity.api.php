@@ -29,7 +29,7 @@ use Drupal\Core\Field\FieldDefinition;
  *   A boolean to explicitly allow or deny access, or NULL to neither allow nor
  *   deny access.
  *
- * @see \Drupal\Core\Entity\EntityAccessController
+ * @see \Drupal\Core\Entity\EntityAccess
  */
 function hook_entity_access(\Drupal\Core\Entity\EntityInterface $entity, $operation, \Drupal\Core\Session\AccountInterface $account, $langcode) {
   return NULL;
@@ -51,7 +51,7 @@ function hook_entity_access(\Drupal\Core\Entity\EntityInterface $entity, $operat
  *   A boolean to explicitly allow or deny access, or NULL to neither allow nor
  *   deny access.
  *
- * @see \Drupal\Core\Entity\EntityAccessController
+ * @see \Drupal\Core\Entity\EntityAccess
  */
 function hook_ENTITY_TYPE_access(\Drupal\Core\Entity\EntityInterface $entity, $operation, \Drupal\Core\Session\AccountInterface $account, $langcode) {
   return NULL;
@@ -69,7 +69,7 @@ function hook_ENTITY_TYPE_access(\Drupal\Core\Entity\EntityInterface $entity, $o
  *   A boolean to explicitly allow or deny access, or NULL to neither allow nor
  *   deny access.
  *
- * @see \Drupal\Core\Entity\EntityAccessController
+ * @see \Drupal\Core\Entity\EntityAccess
  */
 function hook_entity_create_access(\Drupal\Core\Session\AccountInterface $account, $langcode) {
   return NULL;
@@ -87,7 +87,7 @@ function hook_entity_create_access(\Drupal\Core\Session\AccountInterface $accoun
  *   A boolean to explicitly allow or deny access, or NULL to neither allow nor
  *   deny access.
  *
- * @see \Drupal\Core\Entity\EntityAccessController
+ * @see \Drupal\Core\Entity\EntityAccess
  */
 function hook_ENTITY_TYPE_create_access(\Drupal\Core\Session\AccountInterface $account, $langcode) {
   return NULL;
@@ -710,7 +710,7 @@ function hook_entity_operation_alter(array &$operations, \Drupal\Core\Entity\Ent
  * Control access to fields.
  *
  * This hook is invoked from
- * \Drupal\Core\Entity\EntityAccessController::fieldAccess() to let modules
+ * \Drupal\Core\Entity\EntityAccess::fieldAccess() to let modules
  * grant or deny operations on fields.
  *
  * @param string $operation

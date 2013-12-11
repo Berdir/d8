@@ -11,7 +11,7 @@ use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Entity\EntityControllerInterface;
 use Drupal\Core\Language\Language;
-use Drupal\Core\Entity\EntityAccessController;
+use Drupal\Core\Entity\EntityAccess;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Session\AccountInterface;
@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Defines the access controller for the node entity type.
  */
-class NodeAccessController extends EntityAccessController implements NodeAccessControllerInterface, EntityControllerInterface {
+class NodeAccessController extends EntityAccess implements NodeAccessControllerInterface, EntityControllerInterface {
 
   /**
    * The node grant storage.

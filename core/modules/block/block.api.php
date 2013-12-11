@@ -88,7 +88,7 @@ function hook_block_view_BASE_BLOCK_ID_alter(array &$build, \Drupal\block\BlockP
  *   FALSE. If all modules return NULL, then default access rules from
  *   \Drupal\block\BlockAccessController::checkAccess() are used.
  *
- * @see \Drupal\Core\Entity\EntityAccessController::access()
+ * @see \Drupal\Core\Entity\EntityAccess::access()
  * @see \Drupal\block\BlockAccessController::checkAccess()
  */
 function hook_block_access(\Drupal\block\Entity\Block $block, $operation, \Drupal\user\Entity\User $account, $langcode) {

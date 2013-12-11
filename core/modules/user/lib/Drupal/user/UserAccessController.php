@@ -8,13 +8,13 @@
 namespace Drupal\user;
 
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityAccessController;
+use Drupal\Core\Entity\EntityAccess;
 use Drupal\Core\Session\AccountInterface;
 
 /**
  * Defines the access controller for the user entity type.
  */
-class UserAccessController extends EntityAccessController {
+class UserAccessController extends EntityAccess {
 
   /**
    * {@inheritdoc}
