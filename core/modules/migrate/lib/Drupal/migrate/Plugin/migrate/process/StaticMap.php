@@ -33,6 +33,8 @@ class StaticMap extends ProcessPluginBase {
       if (!$value) {
         throw new MigrateException('Can not lookup without a value.');
       }
+    }
+    else {
       $new_value = array($value);
     }
     $new_value = NestedArray::getValue($this->configuration['map'], $new_value, $key_exists);
