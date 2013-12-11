@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\views\ViewAccessController.
+ * Contains \Drupal\views\ViewAccess.
  */
 
 namespace Drupal\views;
@@ -13,9 +13,11 @@ use Drupal\Core\Language\Language;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Defines the access controller for the view entity type.
+ * Defines the access class for the view entity type.
+ *
+ * @see \Drupal\views\Entity\View
  */
-class ViewAccessController extends EntityAccess {
+class ViewAccess extends EntityAccess {
 
   /**
    * {@inheritdoc}

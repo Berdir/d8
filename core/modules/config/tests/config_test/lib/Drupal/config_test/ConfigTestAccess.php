@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\config_test\ConfigTestAccessController.
+ * Contains \Drupal\config_test\ConfigTestAccess.
  */
 
 namespace Drupal\config_test;
@@ -10,12 +10,13 @@ namespace Drupal\config_test;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Entity\EntityAccess;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Language\Language;
 
 /**
- * Defines the access controller for the config_test entity type.
+ * Defines the access class for the config_test entity type.
+ *
+ * @see \Drupal\config_test\Entity\ConfigTest
  */
-class ConfigTestAccessController extends EntityAccess {
+class ConfigTestAccess extends EntityAccess {
 
   /**
    * {@inheritdoc}

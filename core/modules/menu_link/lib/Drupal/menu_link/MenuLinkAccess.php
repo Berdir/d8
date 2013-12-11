@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\menu_link\MenuLinkAccessController.
+ * Contains \Drupal\menu_link\MenuLinkAccess.
  */
 
 namespace Drupal\menu_link;
@@ -12,11 +12,11 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Defines an access controller for the menu link entity.
+ * Defines the access class for the menu link entity.
  *
  * @see \Drupal\menu_link\Entity\MenuLink
  */
-class MenuLinkAccessController extends EntityAccess {
+class MenuLinkAccess extends EntityAccess {
 
   /**
    * {@inheritdoc}

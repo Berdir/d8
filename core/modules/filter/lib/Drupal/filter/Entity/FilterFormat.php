@@ -27,7 +27,7 @@ use Drupal\filter\FilterBag;
  *       "disable" = "Drupal\filter\Form\FilterDisableForm"
  *     },
  *     "list" = "Drupal\filter\FilterFormatListController",
- *     "access" = "Drupal\filter\FilterFormatAccessController",
+ *     "access" = "Drupal\filter\FilterFormatAccess",
  *     "storage" = "Drupal\Core\Config\Entity\ConfigStorageController"
  *   },
  *   config_prefix = "filter.format",

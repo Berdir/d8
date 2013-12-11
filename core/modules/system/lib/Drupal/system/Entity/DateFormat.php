@@ -22,7 +22,7 @@ use Drupal\Core\Annotation\Translation;
  *   label = @Translation("Date format"),
  *   controllers = {
  *     "storage" = "Drupal\Core\Config\Entity\ConfigStorageController",
- *     "access" = "Drupal\system\DateFormatAccessController",
+ *     "access" = "Drupal\system\DateFormatAccess",
  *     "list" = "Drupal\system\DateFormatListController",
  *     "form" = {
  *       "add" = "Drupal\system\Form\DateFormatAddForm",

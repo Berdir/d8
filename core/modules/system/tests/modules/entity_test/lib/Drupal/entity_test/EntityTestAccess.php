@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains Drupal\entity_test\EntityTestAccessController.
+ * Contains Drupal\entity_test\EntityTestAccess.
  */
 
 namespace Drupal\entity_test;
@@ -13,9 +13,11 @@ use Drupal\Core\Language\Language;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Defines the access controller for the test entity type.
+ * Defines the access class for the test entity type.
+ *
+ * @see \Drupal\entity_test\Entity\EntityTest
  */
-class EntityTestAccessController extends EntityAccess {
+class EntityTestAccess extends EntityAccess {
 
   /**
    * {@inheritdoc}

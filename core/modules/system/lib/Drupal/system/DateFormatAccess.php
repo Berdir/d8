@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\system\DateFormatAccessController.
+ * Contains \Drupal\system\DateFormatAccess.
  */
 
 namespace Drupal\system;
@@ -12,9 +12,11 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Provides an access controller for date formats.
+ * Defines the access class for the date format entity type.
+ *
+ * @see \Drupal\system\Entity\DateFormat
  */
-class DateFormatAccessController extends EntityAccess {
+class DateFormatAccess extends EntityAccess {
 
   /**
    * {@inheritdoc}

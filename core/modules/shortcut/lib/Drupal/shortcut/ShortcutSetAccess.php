@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\shortcut\ShortcutSetAccessController.
+ * Contains \Drupal\shortcut\ShortcutSetAccess.
  */
 
 namespace Drupal\shortcut;
@@ -12,9 +12,11 @@ use Drupal\Core\Entity\EntityAccess;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Defines the access controller for the shortcut entity type.
+ * Defines the access class for the shortcut entity type.
+ *
+ * @see \Drupal\shortcut\Entity\ShortcutSet
  */
-class ShortcutSetAccessController extends EntityAccess {
+class ShortcutSetAccess extends EntityAccess {
 
   /**
    * {@inheritdoc}

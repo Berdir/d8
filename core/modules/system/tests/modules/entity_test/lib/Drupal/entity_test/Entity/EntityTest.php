@@ -23,7 +23,7 @@ use Drupal\Core\Language\Language;
  *     "storage" = "Drupal\entity_test\EntityTestStorageController",
  *     "list" = "Drupal\entity_test\EntityTestListController",
  *     "view_builder" = "Drupal\entity_test\EntityTestViewBuilder",
- *     "access" = "Drupal\entity_test\EntityTestAccessController",
+ *     "access" = "Drupal\entity_test\EntityTestAccess",
  *     "form" = {
  *       "default" = "Drupal\entity_test\EntityTestFormController"
  *     },

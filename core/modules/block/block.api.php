@@ -86,10 +86,10 @@ function hook_block_view_BASE_BLOCK_ID_alter(array &$build, \Drupal\block\BlockP
  * @return bool|null
  *   FALSE denies access. TRUE allows access unless another module returns
  *   FALSE. If all modules return NULL, then default access rules from
- *   \Drupal\block\BlockAccessController::checkAccess() are used.
+ *   \Drupal\block\BlockAccess::checkAccess() are used.
  *
  * @see \Drupal\Core\Entity\EntityAccess::access()
- * @see \Drupal\block\BlockAccessController::checkAccess()
+ * @see \Drupal\block\BlockAccess::checkAccess()
  */
 function hook_block_access(\Drupal\block\Entity\Block $block, $operation, \Drupal\user\Entity\User $account, $langcode) {
   // Example code that would prevent displaying the 'Powered by Drupal' block in

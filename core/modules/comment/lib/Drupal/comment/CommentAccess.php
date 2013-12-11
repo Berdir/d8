@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\comment\CommentAccessController
+ * Contains \Drupal\comment\CommentAccess
  */
 
 namespace Drupal\comment;
@@ -12,11 +12,11 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Access controller for the comment entity.
+ * Defines the access class for the comment entity type.
  *
- * @see \Drupal\comment\Entity\Comment.
+ * @see \Drupal\comment\Entity\Comment
  */
-class CommentAccessController extends EntityAccess {
+class CommentAccess extends EntityAccess {
 
   /**
    * {@inheritdoc}

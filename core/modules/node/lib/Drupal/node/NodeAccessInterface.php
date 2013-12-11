@@ -8,7 +8,7 @@ namespace Drupal\node;
 
 use Drupal\Core\Session\AccountInterface;
 
-interface NodeAccessControllerInterface {
+interface NodeAccessInterface {
 
   /**
    * Gets the list of node access grants.

@@ -34,7 +34,7 @@ interface BlockPluginInterface extends ConfigurablePluginInterface, PluginFormIn
    * @return bool
    *   TRUE if the block should be shown, or FALSE otherwise.
    *
-   * @see \Drupal\block\BlockAccessController
+   * @see \Drupal\block\BlockAccess
    */
   public function access(AccountInterface $account);
 

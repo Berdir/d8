@@ -22,7 +22,7 @@ use Drupal\Core\Entity\EntityStorageControllerInterface;
  *   label = @Translation("Block"),
  *   controllers = {
  *     "storage" = "Drupal\Core\Config\Entity\ConfigStorageController",
- *     "access" = "Drupal\block\BlockAccessController",
+ *     "access" = "Drupal\block\BlockAccess",
  *     "view_builder" = "Drupal\block\BlockViewBuilder",
  *     "list" = "Drupal\block\BlockListController",
  *     "form" = {

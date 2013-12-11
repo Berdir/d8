@@ -21,7 +21,7 @@ use Drupal\Core\Annotation\Translation;
  *   controllers = {
  *     "storage" = "Drupal\entity_test\EntityTestStorageController",
  *     "view_builder" = "Drupal\entity_test\EntityTestViewBuilder",
- *     "access" = "Drupal\entity_test\EntityTestAccessController",
+ *     "access" = "Drupal\entity_test\EntityTestAccess",
  *     "form" = {
  *       "default" = "Drupal\entity_test\EntityTestFormController"
  *     },

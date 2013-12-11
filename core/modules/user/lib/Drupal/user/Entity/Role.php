@@ -19,7 +19,7 @@ use Drupal\user\RoleInterface;
  *   label = @Translation("Role"),
  *   controllers = {
  *     "storage" = "Drupal\user\RoleStorageController",
- *     "access" = "Drupal\user\RoleAccessController",
+ *     "access" = "Drupal\user\RoleAccess",
  *     "list" = "Drupal\user\RoleListController",
  *     "form" = {
  *       "default" = "Drupal\user\RoleFormController",

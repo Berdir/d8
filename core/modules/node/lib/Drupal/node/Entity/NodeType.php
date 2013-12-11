@@ -21,7 +21,7 @@ use Drupal\Core\Annotation\Translation;
  *   label = @Translation("Content type"),
  *   controllers = {
  *     "storage" = "Drupal\Core\Config\Entity\ConfigStorageController",
- *     "access" = "Drupal\node\NodeTypeAccessController",
+ *     "access" = "Drupal\node\NodeTypeAccess",
  *     "form" = {
  *       "add" = "Drupal\node\NodeTypeFormController",
  *       "edit" = "Drupal\node\NodeTypeFormController",

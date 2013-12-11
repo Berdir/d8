@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\system\MenuAccessController.
+ * Contains \Drupal\system\MenuAccess.
  */
 
 namespace Drupal\system;
@@ -12,9 +12,11 @@ use Drupal\Core\Entity\EntityAccess;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Defines the access controller for the menu entity type.
+ * Defines the access class for the menu entity type.
+ *
+ * @see \Drupal\system\Entity\Menu
  */
-class MenuAccessController extends EntityAccess {
+class MenuAccess extends EntityAccess {
 
   /**
    * {@inheritdoc}

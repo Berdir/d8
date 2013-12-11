@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\taxonomy\TermAccessController.
+ * Contains \Drupal\taxonomy\TermAccess.
  */
 
 namespace Drupal\taxonomy;
@@ -12,11 +12,11 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Defines an access controller for the taxonomy term entity.
+ * Defines the access class for the taxonomy term entity.
  *
  * @see \Drupal\taxonomy\Entity\Term
  */
-class TermAccessController extends EntityAccess {
+class TermAccess extends EntityAccess {
 
   /**
    * {@inheritdoc}

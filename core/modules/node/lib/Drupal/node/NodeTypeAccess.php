@@ -2,26 +2,28 @@
 
 /**
  * @file
- * Contains \Drupal\custom_block\CustomBlockAccessController.
+ * Contains \Drupal\taxonomy\NodeTypeAccess.
  */
 
-namespace Drupal\custom_block;
+namespace Drupal\node;
 
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityAccess;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Defines the access controller for the custom block entity type.
+ * Defines the access class for the node type entity.
+ *
+ * @see \Drupal\node\Entity\NodeType.
  */
-class CustomBlockAccessController extends EntityAccess {
+class NodeTypeAccess extends EntityAccess {
 
   /**
    * {@inheritdoc}
    */
   protected function checkAccess(EntityInterface $entity, $operation, $langcode, AccountInterface $account) {
-    if ($operation === 'view') {
-      return TRUE;
+    if ($operation == 'delete' && $entity->isLocked()) {
+      return FALSE;
     }
     return parent::checkAccess($entity, $operation, $langcode, $account);
   }

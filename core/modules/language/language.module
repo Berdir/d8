@@ -88,7 +88,7 @@ function language_menu() {
 /**
  * Editing or deleting locked languages should not be possible.
  *
- * @deprecated Use \Drupal\language\LanguageAccessController instead.
+ * @deprecated Use \Drupal\language\LanguageAccess instead.
  */
 function language_access_language_edit_or_delete($language) {
   return !$language->locked && user_access('administer languages');

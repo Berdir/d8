@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\node\NodeAccessController.
+ * Contains \Drupal\node\NodeAccess.
  */
 
 namespace Drupal\node;
@@ -19,9 +19,11 @@ use Drupal\user\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Defines the access controller for the node entity type.
+ * Defines the access class for the node entity type.
+ *
+ * @see \Drupal\node\Entity\Node
  */
-class NodeAccessController extends EntityAccess implements NodeAccessControllerInterface, EntityControllerInterface {
+class NodeAccess extends EntityAccess implements NodeAccessInterface, EntityControllerInterface {
 
   /**
    * The node grant storage.
@@ -31,7 +33,7 @@ class NodeAccessController extends EntityAccess implements NodeAccessControllerI
   protected $grantStorage;
 
   /**
-   * Constructs a NodeAccessController object.
+   * Constructs a NodeAccess object.
    *
    * @param string $entity_type
    *   The entity type of the access controller instance.

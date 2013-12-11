@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\contact\CategoryAccessController.
+ * Contains \Drupal\contact\CategoryAccess.
  */
 
 namespace Drupal\contact;
@@ -10,12 +10,13 @@ namespace Drupal\contact;
 use Drupal\Core\Entity\EntityAccess;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
+
 /**
- * Defines an access controller for the contact category entity.
+ * Defines the access class for the contact category entity type.
  *
- * @see \Drupal\contact\Entity\Category.
+ * @see \Drupal\contact\Entity\Category
  */
-class CategoryAccessController extends EntityAccess {
+class CategoryAccess extends EntityAccess {
 
   /**
    * {@inheritdoc}

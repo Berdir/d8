@@ -25,7 +25,7 @@ use Drupal\Core\TypedData\DataDefinition;
  *   bundle_label = @Translation("Content type"),
  *   controllers = {
  *     "storage" = "Drupal\comment\CommentStorageController",
- *     "access" = "Drupal\comment\CommentAccessController",
+ *     "access" = "Drupal\comment\CommentAccess",
  *     "view_builder" = "Drupal\comment\CommentViewBuilder",
  *     "form" = {
  *       "default" = "Drupal\comment\CommentFormController",

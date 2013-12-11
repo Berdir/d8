@@ -24,7 +24,7 @@ use Drupal\node\NodeInterface;
  *   controllers = {
  *     "storage" = "Drupal\node\NodeStorageController",
  *     "view_builder" = "Drupal\node\NodeViewBuilder",
- *     "access" = "Drupal\node\NodeAccessController",
+ *     "access" = "Drupal\node\NodeAccess",
  *     "form" = {
  *       "default" = "Drupal\node\NodeFormController",
  *       "delete" = "Drupal\node\Form\NodeDeleteForm",

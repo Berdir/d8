@@ -25,7 +25,7 @@ use Drupal\config_test\ConfigTestInterface;
  *       "default" = "Drupal\config_test\ConfigTestFormController",
  *       "delete" = "Drupal\config_test\Form\ConfigTestDeleteForm"
  *     },
- *     "access" = "Drupal\config_test\ConfigTestAccessController"
+ *     "access" = "Drupal\config_test\ConfigTestAccess"
  *   },
  *   config_prefix = "config_test.dynamic",
  *   entity_keys = {

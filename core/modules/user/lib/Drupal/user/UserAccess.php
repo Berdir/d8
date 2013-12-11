@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\user\UserAccessController.
+ * Contains \Drupal\user\UserAccess.
  */
 
 namespace Drupal\user;
@@ -12,9 +12,11 @@ use Drupal\Core\Entity\EntityAccess;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Defines the access controller for the user entity type.
+ * Defines the access class for the user entity type.
+ *
+ * @see \Drupal\user\Entity\User
  */
-class UserAccessController extends EntityAccess {
+class UserAccess extends EntityAccess {
 
   /**
    * {@inheritdoc}

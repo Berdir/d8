@@ -2,17 +2,21 @@
 
 /**
  * @file
- * Contains \Drupal\language\LanguageAccessController.
+ * Contains \Drupal\language\LanguageAccess.
  */
 
 namespace Drupal\language;
 
 use Drupal\Core\Entity\EntityAccess;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Language\Language;
 use Drupal\Core\Session\AccountInterface;
 
-class LanguageAccessController extends EntityAccess {
+/**
+ * Defines the access class for the language entity type.
+ *
+ * @see \Drupal\language\Entity\Language
+ */
+class LanguageAccess extends EntityAccess {
 
   /**
    * {@inheritdoc}

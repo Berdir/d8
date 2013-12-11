@@ -23,7 +23,7 @@ use Drupal\views\ViewExecutable;
  *   label = @Translation("View"),
  *   controllers = {
  *     "storage" = "Drupal\views\ViewStorageController",
- *     "access" = "Drupal\views\ViewAccessController"
+ *     "access" = "Drupal\views\ViewAccess"
  *   },
  *   admin_permission = "administer views",
  *   config_prefix = "views.view",
