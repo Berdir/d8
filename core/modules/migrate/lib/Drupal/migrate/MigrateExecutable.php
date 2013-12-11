@@ -330,6 +330,9 @@ class MigrateExecutable {
         // then iterate over the values and transform them invidually.
         if ($multiple && !$definition['handle_multiples']) {
           $new_value = array();
+          if (!is_array($value)) {
+            throw new MigrateException(sprintf('Pipeline failed for destination %s: %s got instead of an array,', $destination, $value));
+          }
           foreach ($value as $scalar_value) {
             $new_value[] = $plugin->transform($scalar_value, $this, $row, $destination);
           }
