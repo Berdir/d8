@@ -82,6 +82,7 @@ class FilterSecurityTest extends WebTestBase {
       'filters[filter_test_replace][status]' => 1,
     );
     $this->drupalPostForm('admin/config/content/formats/manage/' . $format_id, $edit, t('Save configuration'));
+    \Drupal::entityManager()->getStorageController('node')->resetCache(array($node->id()));
 
     // Verify that filter_test_replace filter replaced the content.
     $this->drupalGet('node/' . $node->id());

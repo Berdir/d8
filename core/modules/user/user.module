@@ -979,6 +979,7 @@ function user_login_finalize(UserInterface $account) {
     ->fields(array('login' => $user->getLastLoginTime()))
     ->condition('uid', $user->id())
     ->execute();
+  \Drupal::entityManager()->getStorageController('user')->resetCache(array($account->id()));
 
   // Regenerate the session ID to prevent against session fixation attacks.
   // This is called before hook_user in case one of those functions fails

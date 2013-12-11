@@ -7,12 +7,12 @@
 
 namespace Drupal\Core\Entity;
 
+use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\Query\QueryInterface;
+use Drupal\Core\Field\PrepareCacheInterface;
 use Drupal\Core\Language\Language;
-use Drupal\Component\Utility\NestedArray;
-use Drupal\Component\Uuid\Uuid;
 use Drupal\field\FieldInfo;
 use Drupal\field\FieldUpdateForbiddenException;
 use Drupal\field\FieldInterface;
@@ -84,6 +84,13 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
   protected $fieldInfo;
 
   /**
+   * Cache backend.
+   *
+   * @var \Drupal\Core\Cache\CacheBackendInterface
+   */
+  protected $cacheBackend;
+
+  /**
    * The entity bundle key.
    *
    * @var string|bool
@@ -104,7 +111,8 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
     return new static(
       $entity_info,
       $container->get('database'),
-      $container->get('field.info')
+      $container->get('field.info'),
+      $container->get('cache.entity')
     );
   }
 
@@ -117,12 +125,15 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
    *   The database connection to be used.
    * @param \Drupal\field\FieldInfo $field_info
    *   The field info service.
+   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
+   *   Cache backend instance to use.
    */
-  public function __construct(EntityTypeInterface $entity_info, Connection $database, FieldInfo $field_info) {
+  public function __construct(EntityTypeInterface $entity_info, Connection $database, FieldInfo $field_info, CacheBackendInterface $cache) {
     parent::__construct($entity_info);
 
     $this->database = $database;
     $this->fieldInfo = $field_info;
+    $this->cacheBackend = $cache;
     $this->bundleKey = $this->entityInfo->getKey('bundle');
     $this->entityClass = $this->entityInfo->getClass();
 
@@ -203,14 +214,10 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
     // and we need to know if it's empty for this reason to avoid querying the
     // database when all requested entities are loaded from cache.
     $passed_ids = !empty($ids) ? array_flip($ids) : FALSE;
-    // Try to load entities from the static cache, if the entity type supports
-    // static caching.
+    // Try to load entities from the cache, if the entity type supports
+    // static caching. This will remove ID's that were loaded from $ids.
     if ($this->cache && $ids) {
       $entities += $this->cacheGet($ids);
-      // If any entities were loaded, remove them from the ids still to load.
-      if ($passed_ids) {
-        $ids = array_keys(array_diff_key($passed_ids, $entities));
-      }
     }
 
     // Load any remaining entities from the database. This is the case if $ids
@@ -630,6 +637,7 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
         $this->resetCache(array($entity->id()));
         $entity->postSave($this, TRUE);
         $this->invokeHook('update', $entity);
+        $this->resetCache(array($entity->id()));
         if ($this->dataTable) {
           $this->invokeTranslationHooks($entity);
         }
@@ -831,9 +839,26 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
   }
 
   /**
-   * {@inheritdoc}
+   * Loads values of configurable fields for a group of entities.
+   *
+   * Loads all fields for each entity object in a group of a single entity type.
+   * The loaded field values are added directly to the entity objects.
+   *
+   * @param \Drupal\Core\Entity\ContentEntityInterface[] $entities
+   *   An array of entities keyed by entity ID.
    */
-  protected function doLoadFieldItems($entities, $age) {
+  protected function loadFieldItems(array $entities) {
+    if (empty($entities) || !$this->entityInfo->isFieldDataCacheable()) {
+      return;
+    }
+
+    $age = static::FIELD_LOAD_CURRENT;
+    foreach ($entities as $entity) {
+      if (!$entity->isDefaultRevision()) {
+        $age = static::FIELD_LOAD_REVISION;
+        break;
+      }
+    }
     $load_current = $age == static::FIELD_LOAD_CURRENT;
 
     // Collect entities ids, bundles and languages.
@@ -900,9 +925,14 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
   }
 
   /**
-   * {@inheritdoc}
+   * Saves values of configurable fields for an entity.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity.
+   * @param bool $update
+   *   TRUE if the entity is being updated, FALSE if it is being inserted.
    */
-  protected function doSaveFieldItems(EntityInterface $entity, $update) {
+  protected function saveFieldItems(EntityInterface $entity, $update = TRUE) {
     $vid = $entity->getRevisionId();
     $id = $entity->id();
     $bundle = $entity->bundle();
@@ -985,9 +1015,12 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
   }
 
   /**
-   * {@inheritdoc}
+   * Deletes values of configurable fields for all revisions of an entity.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity.
    */
-  protected function doDeleteFieldItems(EntityInterface $entity) {
+  protected function deleteFieldItems(EntityInterface $entity) {
     foreach ($this->fieldInfo->getBundleInstances($entity->entityType(), $entity->bundle()) as $instance) {
       $field = $instance->getField();
       $table_name = static::_fieldTableName($field);
@@ -1002,9 +1035,12 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
   }
 
   /**
-   * {@inheritdoc}
+   * Deletes values of configurable fields for a single revision of an entity.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity. It must have a revision ID.
    */
-  protected function doDeleteFieldItemsRevision(EntityInterface $entity) {
+  protected function deleteFieldItemsRevision(EntityInterface $entity) {
     $vid = $entity->getRevisionId();
     if (isset($vid)) {
       foreach ($this->fieldInfo->getBundleInstances($entity->entityType(), $entity->bundle()) as $instance) {
@@ -1478,6 +1514,160 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
    */
   static public function _fieldColumnName(FieldInterface $field, $column) {
     return in_array($column, Field::getReservedColumns()) ? $column : $field->getName() . '_' . $column;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function cacheGet(&$ids) {
+    // The parent implementation provides the static cache, so first attempt
+    // to load entities from it.
+    $entities = parent::cacheGet($ids);
+    // @todo: Rename field_cache?
+    if ($this->entityInfo->isFieldDataCacheable() && $ids) {
+      // Now attempt to load the remaining ID's (those that were loaded have been
+      // removed from $ids already) from the persistent cache.
+      // Build the list of cache entries to retrieve.
+      $cids = array();
+      foreach ($ids as $id) {
+        $cids[] = $this->buildCacheId($id);
+      }
+      if ($cache = $this->cacheBackend->getMultiple($cids)) {
+        // Create entity objects based on the loaded values from the cache.
+        // Put them in a temporary variable so that we can call the load hooks
+        // for those.
+        // @todo: Avoid this, which requires that all cached data must
+        //   be in defined fields or find a way to extract non-defined values
+        //   too.
+        $entities_from_cache = array();
+        foreach ($ids as $index => $id) {
+          $cid = $this->buildCacheId($id);
+          if (isset($cache[$cid])) {
+            $values = $cache[$cid]->data['values'];
+            $translations = $cache[$cid]->data['translations'];
+            $bundle = $this->bundleKey ? $cache[$cid]->data['bundle'] : FALSE;
+            $entities_from_cache[$id] = new $this->entityClass($values, $this->entityType, $bundle, $translations);
+            // Already put the loaded entity into the cache. This will prevent
+            // cacheSet() from unnecessarily writing them back into the cache
+            // backend. Do not call that method directly to prevent that.
+            $this->entityCache[$id] = $entities_from_cache[$id];
+            unset($ids[$index]);
+          }
+        }
+
+        // Call the load hooks on the entities loaded from the persistent cache.
+        if (!empty($entities_from_cache)) {
+          $this->invokeLoadHook($entities_from_cache);
+          foreach ($entities_from_cache as $id => $entity) {
+            $entities[$id] = $entity;
+          }
+        }
+      }
+    }
+    return $entities;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function cacheSet($entities) {
+    if ($this->entityInfo->isFieldDataCacheable()) {
+      foreach ($entities as $id => $entity) {
+        // Skip entities that are already in the static cache.
+        if (isset($this->entityCache[$id])) {
+          continue;
+        }
+
+        $data = array(
+          'id' => $entity->id(),
+          'bundle' => $entity->bundle(),
+          'translations' => array_keys($entity->getTranslationLanguages()),
+          'values' => array(),
+        );
+        $default_langcode = $entity->getUntranslated()->language()->id;
+        foreach ($entity->getTranslationLanguages() as $langcode => $language) {
+          $translation = $entity->getTranslation($langcode);
+
+          // Make sure the default language is valid.
+          if ($default_langcode == $langcode) {
+            $langcode = Language::LANGCODE_DEFAULT;
+          }
+
+          foreach ($translation as $field_name => $items) {
+            if (!$items->isEmpty()) {
+              foreach ($items as $delta => $item) {
+                // If the field item needs to be prepare the cache data, call
+                // the corresponding method, otherwise use the values as cache
+                // data.
+                if ($item instanceof PrepareCacheInterface) {
+                  $data['values'][$field_name][$langcode][$delta] = $item->getCacheData();
+                }
+                else {
+                  $data['values'][$field_name][$langcode][$delta] = $item->getValue();
+                }
+              }
+            }
+          }
+        }
+        $this->cacheBackend->set($this->buildCacheId($id), $data, CacheBackendInterface::CACHE_PERMANENT, array($this->entityType . '_values' => TRUE));
+      }
+    }
+    parent::cacheSet($entities);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function resetCache(array $ids = NULL) {
+    parent::resetCache($ids);
+    if ($this->entityInfo->isFieldDataCacheable()) {
+      if ($ids) {
+        $cids = array();
+        foreach ($ids as $id) {
+          $cids[] = $this->buildCacheId($id);
+        }
+        $this->cacheBackend->deleteMultiple($cids);
+      }
+      else {
+        $this->cacheBackend->deleteTags(array($this->entityType . '_values' => TRUE));
+      }
+    }
+  }
+
+  /**
+   * Invokes the entity load hooks on the given entities.
+   *
+   * @param array $entities
+   *   List of entities to invoke the hook for.
+   */
+  protected function invokeLoadHook($entities) {
+    // Call hook_entity_load().
+    foreach (\Drupal::moduleHandler()
+               ->getImplementations('entity_load') as $module) {
+      $function = $module . '_entity_load';
+      $function($entities, $this->entityType);
+    }
+    // Call hook_TYPE_load(). The first argument for hook_TYPE_load() are
+    // always the queried entities, followed by additional arguments set in
+    // $this->hookLoadArguments.
+    $args = array_merge(array($entities), $this->hookLoadArguments);
+    foreach (\Drupal::moduleHandler()
+               ->getImplementations($this->entityType . '_load') as $module) {
+      call_user_func_array($module . '_' . $this->entityType . '_load', $args);
+    }
+  }
+
+  /**
+   * Returns the cache ID for the passed in entity ID.
+   *
+   * @param int $id
+   *   Entity ID for which the cache ID should be built.
+   *
+   * @return string
+   *   Cache ID that can be passed to the cache backend.
+   */
+  protected function buildCacheId($id) {
+    return "values:{$this->entityType}:$id";
   }
 
 }

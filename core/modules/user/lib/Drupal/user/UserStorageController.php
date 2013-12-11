@@ -8,6 +8,7 @@
 namespace Drupal\user;
 
 use Drupal\Component\Uuid\UuidInterface;
+use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Password\PasswordInterface;
@@ -48,15 +49,15 @@ class UserStorageController extends FieldableDatabaseStorageController implement
    *   The database connection to be used.
    * @param \Drupal\field\FieldInfo $field_info
    *   The field info service.
-   * @param \Drupal\Component\Uuid\UuidInterface $uuid_service
-   *   The UUID Service.
+   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
+   *   Cache backend instance to use.
    * @param \Drupal\Core\Password\PasswordInterface $password
    *   The password hashing service.
    * @param \Drupal\user\UserDataInterface $user_data
    *   The user data service.
    */
-  public function __construct(EntityTypeInterface $entity_info, Connection $database, FieldInfo $field_info, UuidInterface $uuid_service, PasswordInterface $password, UserDataInterface $user_data) {
-    parent::__construct($entity_info, $database, $field_info, $uuid_service);
+  public function __construct(EntityTypeInterface $entity_info, Connection $database, FieldInfo $field_info, CacheBackendInterface $cache, PasswordInterface $password, UserDataInterface $user_data) {
+    parent::__construct($entity_info, $database, $field_info, $cache);
 
     $this->password = $password;
     $this->userData = $user_data;
@@ -70,7 +71,7 @@ class UserStorageController extends FieldableDatabaseStorageController implement
       $entity_info,
       $container->get('database'),
       $container->get('field.info'),
-      $container->get('uuid'),
+      $container->get('cache.entity'),
       $container->get('password'),
       $container->get('user.data')
     );

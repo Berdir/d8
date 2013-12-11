@@ -126,38 +126,36 @@ class TextWithSummaryItemTest extends FieldUnitTestBase {
     // Load the entity and check that the field cache contains the expected
     // data.
     $entity = entity_load($entity_type, $entity->id());
-    $cache = cache('field')->get("field:$entity_type:" . $entity->id());
-    $this->assertEqual($cache->data, array(
-      Language::LANGCODE_NOT_SPECIFIED => array(
-        'summary_field' => array(
-          0 => array(
-            'value' => $value,
-            'summary' => $summary,
-            'format' => 'plain_text',
-            'processed' => $value,
-            'summary_processed' => $summary,
-          ),
+    $cache = cache('entity')->get("values:$entity_type:" . $entity->id());
+    $this->assertEqual($cache->data['values']['summary_field'], array(
+      Language::LANGCODE_DEFAULT => array(
+        0 => array(
+          'value' => $value,
+          'summary' => $summary,
+          'format' => 'plain_text',
+          'processed' => $value,
+          'summary_processed' => $summary,
         ),
       ),
     ));
 
     // Inject fake processed values into the cache to make sure that these are
     // used as-is and not re-calculated when the entity is loaded.
-    $data = array(
-      Language::LANGCODE_NOT_SPECIFIED => array(
-        'summary_field' => array(
-          0 => array(
-            'value' => $value,
-            'summary' => $summary,
-            'format' => 'plain_text',
-            'processed' => 'Cached processed value',
-            'summary_processed' => 'Cached summary processed value',
-          ),
+    $data = $cache->data;
+    $data['values']['summary_field'] = array(
+      Language::LANGCODE_DEFAULT => array(
+        0 => array(
+          'value' => $value,
+          'summary' => $summary,
+          'format' => 'plain_text',
+          'processed' => 'Cached processed value',
+          'summary_processed' => 'Cached summary processed value',
         ),
       ),
     );
-    cache('field')->set("field:$entity_type:" . $entity->id(), $data);
-    $entity = entity_load($entity_type, $entity->id(), TRUE);
+    \Drupal::entityManager()->getStorageController($entity_type)->resetCache();
+    cache('entity')->set("values:$entity_type:" . $entity->id(), $data);
+    $entity = entity_load($entity_type, $entity->id());
     $this->assertEqual($entity->summary_field->processed, 'Cached processed value');
     $this->assertEqual($entity->summary_field->summary_processed, 'Cached summary processed value');
 

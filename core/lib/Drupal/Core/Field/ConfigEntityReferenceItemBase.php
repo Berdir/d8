@@ -23,7 +23,7 @@ class ConfigEntityReferenceItemBase extends EntityReferenceItem {
   public function isEmpty() {
     // Avoid loading the entity by first checking the 'target_id'.
     $target_id = $this->target_id;
-    if (!empty($target_id)) {
+    if ($target_id !== NULL && $target_id !== '') {
       return FALSE;
     }
     // Allow auto-create entities.
