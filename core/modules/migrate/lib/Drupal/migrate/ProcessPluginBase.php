@@ -11,7 +11,7 @@ use Drupal\Core\Plugin\PluginBase;
 use Drupal\migrate\Plugin\MigrateProcessInterface;
 
 /**
- * The base class for all plugins.
+ * The base class for all process plugins.
  */
 abstract class ProcessPluginBase extends PluginBase implements MigrateProcessInterface {
 

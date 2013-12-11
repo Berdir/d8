@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Annotation\ProcessPlugin.
+ * Contains \Drupal\migrate\Annotation\MigrateProcessPlugin.
  */
 
 namespace Drupal\migrate\Annotation;
@@ -22,7 +22,13 @@ class MigrateProcessPlugin extends Plugin {
   public $id;
 
   /**
-   * Whether the plugin handles multiples itself
+   * Whether the plugin handles multiples itself.
+   *
+   * Typically these plugins will expect an array as input and iterate over it
+   * themselves, changing the whole array. For example the 'iterator' and the
+   * 'flatten' plugins. If the plugin only need to change a single value it
+   * can skip setting this attribute and let
+   * \Drupal\migrate\MigrateExecutable::processRow() handle the iteration.
    *
    * @var bool (optional)
    */
