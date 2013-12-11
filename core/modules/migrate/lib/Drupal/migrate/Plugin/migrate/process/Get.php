@@ -57,7 +57,7 @@ class Get extends ProcessPluginBase {
       }
     }
     if (is_string($source)) {
-      $this->multiple = array($return[0]);
+      $this->multiple = is_array($return[0]);
       return $return[0];
     }
     return $return;

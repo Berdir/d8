@@ -14,7 +14,8 @@ use Drupal\migrate\Row;
  * This plugin flattens the current value.
  *
  * @MigrateProcessPlugin(
- *   id = "flatten"
+ *   id = "flatten",
+ *   handle_multiples = TRUE
  * )
  */
 class Flatten extends ProcessPluginBase {

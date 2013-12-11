@@ -28,15 +28,21 @@ class StaticMap extends ProcessPluginBase {
    * {@inheritdoc}
    */
   public function transform($value, MigrateExecutable $migrate_executable, Row $row, $destination_property) {
-    if (!is_array($value)) {
-      $value = array($value);
+    $new_value = $value;
+    if (is_array($value)) {
+      if (!$value) {
+        throw new MigrateException('Can not lookup without a value.');
+      }
+      $new_value = array($value);
     }
-    if (!$value) {
-      throw new MigrateException('Can not lookup without a value.');
-    }
-    $new_value = NestedArray::getValue($this->configuration['map'], $value, $key_exists);
+    $new_value = NestedArray::getValue($this->configuration['map'], $new_value, $key_exists);
     if (!$key_exists) {
-      throw new MigrateException('Lookup failed.');
+      if (empty($this->configuration['bypass'])) {
+        throw new MigrateException('Lookup failed.');
+      }
+      else {
+        return $value;
+      }
     }
     return $new_value;
   }
