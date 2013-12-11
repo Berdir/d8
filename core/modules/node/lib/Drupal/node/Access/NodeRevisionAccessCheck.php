@@ -30,7 +30,7 @@ class NodeRevisionAccessCheck implements AccessCheckInterface {
   /**
    * The node access controller.
    *
-   * @var \Drupal\Core\Entity\EntityAccessControllerInterface
+   * @var \Drupal\Core\Entity\EntityAccessInterface
    */
   protected $nodeAccess;
 

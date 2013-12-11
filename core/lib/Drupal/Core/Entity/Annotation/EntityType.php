@@ -52,7 +52,7 @@ class EntityType extends Plugin {
    * - render: The name of the class that is used to render the entities. The
    *   class must implement \Drupal\Core\Entity\EntityViewBuilderInterface.
    * - access: The name of the class that is used for access checks. The class
-   *   must implement \Drupal\Core\Entity\EntityAccessControllerInterface.
+   *   must implement \Drupal\Core\Entity\EntityAccessInterface.
    *   Defaults to \Drupal\Core\Entity\EntityAccessController.
    * - translation: The name of the controller class that should be used to
    *   handle the translation process. The class must implement

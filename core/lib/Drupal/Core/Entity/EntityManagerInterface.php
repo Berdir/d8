@@ -48,7 +48,7 @@ interface EntityManagerInterface extends PluginManagerInterface {
    * @param string $entity_type
    *   The entity type for this access controller.
    *
-   * @return \Drupal\Core\Entity\EntityAccessControllerInterface.
+   * @return \Drupal\Core\Entity\EntityAccessInterface.
    *   A access controller instance.
    */
   public function getAccess($entity_type);

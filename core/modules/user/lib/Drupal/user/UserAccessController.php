@@ -43,7 +43,7 @@ class UserAccessController extends EntityAccessController {
   /**
    * Check view access.
    *
-   * See EntityAccessControllerInterface::view() for parameters.
+   * See EntityAccessInterface::view() for parameters.
    */
   protected function viewAccess(EntityInterface $entity, $langcode, AccountInterface $account) {
     // Never allow access to view the anonymous user account.

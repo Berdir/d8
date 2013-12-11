@@ -16,7 +16,7 @@ use Drupal\Core\Session\AccountInterface;
 /**
  * Defines a default implementation for entity access controllers.
  */
-class EntityAccessController implements EntityAccessControllerInterface {
+class EntityAccessController implements EntityAccessInterface {
 
   /**
    * Stores calculcated access check results.

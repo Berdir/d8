@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\Core\Entity\EntityAccessControllerInterface.
+ * Contains \Drupal\Core\Entity\EntityAccessInterface.
  */
 
 namespace Drupal\Core\Entity;
@@ -14,14 +14,14 @@ use Drupal\Core\Language\Language;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Defines a common interface for entity access controller classes.
+ * Defines a common interface for entity access classes.
  */
-interface EntityAccessControllerInterface {
+interface EntityAccessInterface {
 
   /**
    * Checks access to an operation on a given entity or entity translation.
    *
-   * Use \Drupal\Core\Entity\EntityAccessControllerInterface::createAccess()
+   * Use \Drupal\Core\Entity\EntityAccessInterface::createAccess()
    * to check access to create an entity.
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
@@ -68,7 +68,7 @@ interface EntityAccessControllerInterface {
    *   The module handler.
    *
    * @return self
-   *   The entity access controller.
+   *   The entity access object.
    */
   public function setModuleHandler(ModuleHandlerInterface $module_handler);
 

@@ -433,7 +433,7 @@ function entity_page_label(EntityInterface $entity, $langcode = NULL) {
  * @param string $entity_type
  *   The type of the entity.
  *
- * @return \Drupal\Core\Entity\EntityAccessControllerInterface
+ * @return \Drupal\Core\Entity\EntityAccessInterface
  *   An entity access controller instance.
  *
  * @deprecated Use \Drupal\Core\Entity\EntityManagerInterface::getAccess().

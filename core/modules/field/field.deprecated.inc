@@ -825,7 +825,7 @@ function field_get_default_value(EntityInterface $entity, $field, $instance, $la
  *   TRUE if the operation is allowed; FALSE if the operation is denied.
  *
  * @deprecated as of Drupal 8.0. Use
- *   Drupal\Core\Entity\EntityAccessControllerInterface::fieldAccess()
+ *   Drupal\Core\Entity\EntityAccessInterface::fieldAccess()
  */
 function field_access($op, FieldInterface $field, $entity_type, $entity = NULL, $account = NULL) {
   $access_controller = \Drupal::entityManager()->getAccess($entity_type);
