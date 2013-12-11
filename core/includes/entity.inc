@@ -436,11 +436,11 @@ function entity_page_label(EntityInterface $entity, $langcode = NULL) {
  * @return \Drupal\Core\Entity\EntityAccessControllerInterface
  *   An entity access controller instance.
  *
- * @deprecated Use \Drupal\Core\Entity\EntityManagerInterface::getAccessController().
+ * @deprecated Use \Drupal\Core\Entity\EntityManagerInterface::getAccess().
  */
 function entity_access_controller($entity_type) {
   return \Drupal::entityManager()
-    ->getAccessController($entity_type);
+    ->getAccess($entity_type);
 }
 
 /**
@@ -855,5 +855,5 @@ function entity_page_access(EntityInterface $entity, $operation = 'view') {
  *   TRUE if the access is granted. FALSE if access is denied.
  */
 function entity_page_create_access($entity_type, $bundle = NULL) {
-  return \Drupal::entityManager()->getAccessController($entity_type)->createAccess($bundle);
+  return \Drupal::entityManager()->getAccess($entity_type)->createAccess($bundle);
 }

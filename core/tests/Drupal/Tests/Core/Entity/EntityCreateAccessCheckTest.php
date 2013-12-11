@@ -91,7 +91,7 @@ class EntityCreateAccessCheckTest extends UnitTestCase {
         ->will($this->returnValue($access));
 
       $entity_manager->expects($this->any())
-        ->method('getAccessController')
+        ->method('getAccess')
         ->will($this->returnValue($access_controller));
     }
 

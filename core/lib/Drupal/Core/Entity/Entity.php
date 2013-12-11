@@ -254,11 +254,11 @@ abstract class Entity implements EntityInterface {
   public function access($operation = 'view', AccountInterface $account = NULL) {
     if ($operation == 'create') {
       return \Drupal::entityManager()
-        ->getAccessController($this->entityType)
+        ->getAccess($this->entityType)
         ->createAccess($this->bundle(), $account);
     }
     return \Drupal::entityManager()
-      ->getAccessController($this->entityType)
+      ->getAccess($this->entityType)
       ->access($this, $operation, Language::LANGCODE_DEFAULT, $account);
   }
 

@@ -58,7 +58,7 @@ class NodeRevisionAccessCheck implements AccessCheckInterface {
    */
   public function __construct(EntityManagerInterface $entity_manager, Connection $connection) {
     $this->nodeStorage = $entity_manager->getStorageController('node');
-    $this->nodeAccess = $entity_manager->getAccessController('node');
+    $this->nodeAccess = $entity_manager->getAccess('node');
     $this->connection = $connection;
   }
 

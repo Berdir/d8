@@ -51,7 +51,7 @@ interface EntityManagerInterface extends PluginManagerInterface {
    * @return \Drupal\Core\Entity\EntityAccessControllerInterface.
    *   A access controller instance.
    */
-  public function getAccessController($entity_type);
+  public function getAccess($entity_type);
 
   /**
    * Returns the route information for an entity type's bundle.

@@ -828,7 +828,7 @@ function field_get_default_value(EntityInterface $entity, $field, $instance, $la
  *   Drupal\Core\Entity\EntityAccessControllerInterface::fieldAccess()
  */
 function field_access($op, FieldInterface $field, $entity_type, $entity = NULL, $account = NULL) {
-  $access_controller = \Drupal::entityManager()->getAccessController($entity_type);
+  $access_controller = \Drupal::entityManager()->getAccess($entity_type);
 
   $items = $entity ? $entity->get($field->id()) : NULL;
   return $access_controller->fieldAccess($op, $field, $account, $items);

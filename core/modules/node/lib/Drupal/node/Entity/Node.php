@@ -125,7 +125,7 @@ class Node extends ContentEntityBase implements NodeInterface {
     // default revision. There's no need to delete existing records if the node
     // is new.
     if ($this->isDefaultRevision()) {
-      \Drupal::entityManager()->getAccessController('node')->writeGrants($this, $update);
+      \Drupal::entityManager()->getAccess('node')->writeGrants($this, $update);
     }
 
     // Reindex the node when it is updated. The node is automatically indexed
@@ -165,7 +165,7 @@ class Node extends ContentEntityBase implements NodeInterface {
     }
 
     return \Drupal::entityManager()
-      ->getAccessController($this->entityType)
+      ->getAccess($this->entityType)
       ->access($this, $operation, $this->prepareLangcode(), $account);
   }
 

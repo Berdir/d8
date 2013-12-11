@@ -527,11 +527,11 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
   public function access($operation = 'view', AccountInterface $account = NULL) {
     if ($operation == 'create') {
       return \Drupal::entityManager()
-        ->getAccessController($this->entityType)
+        ->getAccess($this->entityType)
         ->createAccess($this->bundle(), $account);
     }
     return \Drupal::entityManager()
-      ->getAccessController($this->entityType)
+      ->getAccess($this->entityType)
       ->access($this, $operation, $this->activeLangcode, $account);
   }
 

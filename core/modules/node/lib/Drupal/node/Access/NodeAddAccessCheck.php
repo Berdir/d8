@@ -26,7 +26,7 @@ class NodeAddAccessCheck extends EntityCreateAccessCheck {
    * {@inheritdoc}
    */
   public function access(Route $route, Request $request, AccountInterface $account) {
-    $access_controller = $this->entityManager->getAccessController('node');
+    $access_controller = $this->entityManager->getAccess('node');
     // If a node type is set on the request, just check that.
     if ($request->attributes->has('node_type')) {
       return $access_controller->createAccess($request->attributes->get('node_type')->type, $account) ? static::ALLOW : static::DENY;

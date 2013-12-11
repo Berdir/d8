@@ -155,7 +155,7 @@ class NodeAccessLanguageTest extends NodeTestBase {
     $this->assertNodeAccess($expected_node_access_no_access, $node_private_no_language, $web_user, 'hr');
 
     // Reset the node access cache and turn on our test node access code.
-    entity_access_controller('node')->resetCache();
+    \Drupal::entityManager()->getAccess('node')->resetCache();
     \Drupal::state()->set('node_access_test_secret_catalan', 1);
 
     // Tests that access is not granted if requested with no language.

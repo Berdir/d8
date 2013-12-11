@@ -174,7 +174,7 @@ class Field extends FieldPluginBase {
    */
   public function access() {
     $base_table = $this->get_base_table();
-    $access_controller = $this->entityManager->getAccessController($this->definition['entity_tables'][$base_table]);
+    $access_controller = $this->entityManager->getAccess($this->definition['entity_tables'][$base_table]);
     return $access_controller->fieldAccess('view', $this->field_info);
   }
 

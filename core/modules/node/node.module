@@ -1695,7 +1695,7 @@ function node_access_view_all_nodes($account = NULL) {
     $access[$account->id()] = TRUE;
   }
   else {
-    $access[$account->id()] = \Drupal::entityManager()->getAccessController('node')->checkAllGrants($account);
+    $access[$account->id()] = \Drupal::entityManager()->getAccess('node')->checkAllGrants($account);
   }
 
   return $access[$account->id()];
@@ -1819,7 +1819,7 @@ function node_access_needs_rebuild($rebuild = NULL) {
  * @see node_access_needs_rebuild()
  */
 function node_access_rebuild($batch_mode = FALSE) {
-  $access_controller = \Drupal::entityManager()->getAccessController('node');
+  $access_controller = \Drupal::entityManager()->getAccess('node');
   $access_controller->deleteGrants();
   // Only recalculate if the site is using a node_access module.
   if (count(\Drupal::moduleHandler()->getImplementations('node_grants'))) {
@@ -1893,7 +1893,7 @@ function _node_access_rebuild_batch_operation(&$context) {
     // To preserve database integrity, only write grants if the node
     // loads successfully.
     if (!empty($node)) {
-      \Drupal::entityManager()->getAccessController('node')->writeGrants($node);
+      \Drupal::entityManager()->getAccess('node')->writeGrants($node);
     }
     $context['sandbox']['progress']++;
     $context['sandbox']['current_node'] = $nid;

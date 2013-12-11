@@ -30,7 +30,7 @@ use Drupal\node\NodeInterface;
 function node_add_page() {
   $content = array();
   // Only use node types the user has access to.
-  $access_controller = Drupal::entityManager()->getAccessController('node');
+  $access_controller = Drupal::entityManager()->getAccess('node');
   foreach (node_type_get_types() as $type) {
     if ($access_controller->createAccess($type->type)) {
       $content[$type->type] = $type;
