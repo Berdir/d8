@@ -13,7 +13,7 @@ use Drupal\migrate\Row;
 /**
  * Drupal 6 role source from database.
  *
- * @PluginId("drupal6_role")
+ * @PluginId("drupal6_user_role")
  */
 class Role extends Drupal6SqlBase {
 
@@ -21,10 +21,9 @@ class Role extends Drupal6SqlBase {
    * {@inheritdoc}
    */
   public function query() {
-    $query = $this->database
-      ->select('role', 'r')
-      ->fields('r', array('rid', 'name'));
-    $query->orderBy('rid');
+    $query = $this->select('role', 'r')
+      ->fields('r', array('rid', 'name'))
+      ->orderBy('rid');
     return $query;
   }
 
@@ -44,7 +43,7 @@ class Role extends Drupal6SqlBase {
   function prepareRow(Row $row, $keep = TRUE) {
     $permissions = array();
     $results = $this->database
-      ->select('permissions', 'p', array('fetch' => \PDO::FETCH_ASSOC))
+      ->select('permission', 'p', array('fetch' => \PDO::FETCH_ASSOC))
       ->fields('p', array('pid', 'rid', 'perm', 'tid'))
       ->condition('rid', $row->getSourceProperty('rid'))
       ->execute();

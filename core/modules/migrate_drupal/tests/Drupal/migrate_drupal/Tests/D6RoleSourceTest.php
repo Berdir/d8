@@ -10,7 +10,7 @@ namespace Drupal\migrate_drupal\Tests;
 use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
 
 /**
- * Tests comment migration from D6 to D8.
+ * Tests user role migration from D6 to D8.
  *
  * @group migrate_drupal
  */
@@ -29,7 +29,7 @@ class D6RoleSourceTest extends MigrateSqlSourceTestCase {
     // This needs to be the identifier of the actual key: rid for comment, nid
     // for node and so on.
     'source' => array(
-      'plugin' => 'drupal6_role',
+      'plugin' => 'drupal6_user_role',
     ),
     'sourceIds' => array(
       'rid' => array(
