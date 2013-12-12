@@ -83,8 +83,9 @@ function template_preprocess_search_result(&$variables) {
   if (isset($result['extra']) && is_array($result['extra'])) {
     $info = array_merge($info, $result['extra']);
   }
-  // Check for existence. User search does not include snippets.
+  // Check for existence. User search does not include snippets or rendered.
   $variables['snippet'] = isset($result['snippet']) ? $result['snippet'] : '';
+  $variables['rendered'] = isset($result['rendered']) ? $result['rendered'] : '';
   // Provide separated and grouped meta information..
   $variables['info_split'] = $info;
   $variables['info'] = implode(' - ', $info);

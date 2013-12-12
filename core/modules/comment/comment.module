@@ -543,7 +543,7 @@ function comment_entity_view(EntityInterface $entity, EntityDisplay $display, $v
           }
         }
       }
-      elseif ($view_mode != 'search_index' && $view_mode != 'search_result') {
+      elseif ($view_mode != 'search_index' && $view_mode != 'search_result' && $view_mode != 'search_result_extra') {
         // Entity in other view modes: add a "post comment" link if the user is
         // allowed to post comments and if this entity is allowing new comments.
         // But we don't want this link if we're building the entity for search

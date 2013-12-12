@@ -229,7 +229,7 @@ class NodeSearch extends SearchPluginBase implements AccessibleInterface, Search
     $node_render = $this->entityManager->getViewBuilder('node');
 
     foreach ($find as $item) {
-      // Render the node.
+      // Render the node for the excerpt.
       $node = $node_storage->load($item->sid)->getTranslation($item->langcode);
       $build = $node_render->view($node, 'search_result', $item->langcode);
       unset($build['#theme']);
@@ -237,6 +237,22 @@ class NodeSearch extends SearchPluginBase implements AccessibleInterface, Search
 
       // Fetch comment count for snippet.
       $node->rendered .= ' ' . $this->moduleHandler->invoke('comment', 'node_update_index', array($node, $item->langcode));
+
+      // Render the node for the extra fields, but only if it has been
+      // customized for this content type.
+      $display = entity_load('entity_display', 'node.' . $node->bundle() . '.search_result_extra');
+      if ($display) {
+        $build = $node_render->view($node, 'search_result_extra', $item->langcode);
+        // Remove some components "helpfully" added automatically during node
+        // view building.
+        unset($build['title']);
+        unset($build['links']);
+        unset($build['#theme']);
+        $node->extra_rendered = drupal_render($build);
+      }
+      else {
+        $node->extra_rendered = '';
+      }
 
       $extra = $this->moduleHandler->invokeAll('node_search_result', array($node, $item->langcode));
 
@@ -256,6 +272,7 @@ class NodeSearch extends SearchPluginBase implements AccessibleInterface, Search
         'extra' => $extra,
         'score' => $item->calculated_score,
         'snippet' => search_excerpt($keys, $node->rendered, $item->langcode),
+        'rendered' => $node->extra_rendered,
         'langcode' => $node->language()->id,
       );
     }

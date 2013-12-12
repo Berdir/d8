@@ -11,6 +11,8 @@
  * - url: URL of the result.
  * - title: Title of the result.
  * - snippet: A small preview of the result. Does not apply to user searches.
+ * - rendered: Extra fields to display with the result. Does not apply to user
+ *   searches.
  * - info: String of all the meta information ready for print. Does not apply
  *   to user searches.
  * - plugin_id: The machine-readable name of the plugin being executed,such
@@ -66,6 +68,9 @@
   <div class="search-snippet-info">
     {% if snippet %}
       <p class="search-snippet"{{ content_attributes }}>{{ snippet }}</p>
+    {% endif %}
+    {% if rendered %}
+      <div class="search-rendered"{{ content_attributes }}>{{ rendered }}</div>
     {% endif %}
     {% if info %}
       <p class="search-info">{{ info }}</p>

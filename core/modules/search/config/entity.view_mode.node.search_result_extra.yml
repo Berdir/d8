@@ -1,0 +1,6 @@
+id: node.search_result_extra
+uuid: 9ffc2b11-b47f-466b-bf00-b3bac1d3a55f
+label: 'Search result display'
+targetEntityType: node
+status: false
+cache: true
