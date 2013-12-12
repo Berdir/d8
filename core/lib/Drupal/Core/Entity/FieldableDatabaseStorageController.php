@@ -1269,6 +1269,50 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
       $description_revision = "Revision archive storage for {$field->entity_type} field {$field->getName()}.";
     }
 
+    $entity_type = $field->entity_type;
+    $entity_manager = \Drupal::entityManager();
+    $info = $entity_manager->getDefinition($entity_type);
+    $definitions = $entity_manager->getFieldDefinitions($entity_type);
+
+    // Define the entity ID schema based on the field definitions.
+    $id_definition = $definitions[$info['entity_keys']['id']];
+    if ($id_definition->getType() == 'integer') {
+      $id_schema = array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'The entity id this data is attached to',
+      );
+    }
+    else {
+      $id_schema = array(
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'description' => 'The entity id this data is attached to',
+      );
+    }
+
+    // Define the revision ID schema, default to integer if there is no revision
+    // ID.
+    $revision_id_definition = isset($info['entity_keys']['revision_id']) ? $definitions[$info['entity_keys']['id']] : NULL;
+    if (!$revision_id_definition || $revision_id_definition->getType() == 'integer') {
+      $revision_id_schema = array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+        'description' => 'The entity revision id this data is attached to, or NULL if the entity type is not versioned',
+      );
+    }
+    else {
+      $revision_id_schema = array(
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => FALSE,
+        'description' => 'The entity revision id this data is attached to, or NULL if the entity type is not versioned',
+      );
+    }
+
     $current = array(
       'description' => $description_current,
       'fields' => array(
@@ -1286,18 +1330,8 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
           'default' => 0,
           'description' => 'A boolean indicating whether this data item has been deleted'
         ),
-        'entity_id' => array(
-          'type' => 'int',
-          'unsigned' => TRUE,
-          'not null' => TRUE,
-          'description' => 'The entity id this data is attached to',
-        ),
-        'revision_id' => array(
-          'type' => 'int',
-          'unsigned' => TRUE,
-          'not null' => FALSE,
-          'description' => 'The entity revision id this data is attached to, or NULL if the entity type is not versioned',
-        ),
+        'entity_id' => $id_schema,
+        'revision_id' => $revision_id_schema,
         'langcode' => array(
           'type' => 'varchar',
           'length' => 32,
