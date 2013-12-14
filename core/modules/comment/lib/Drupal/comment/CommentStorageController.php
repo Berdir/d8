@@ -27,29 +27,6 @@ class CommentStorageController extends FieldableDatabaseStorageController implem
   /**
    * {@inheritdoc}
    */
-  protected function buildQuery($ids, $revision_id = FALSE) {
-    $query = parent::buildQuery($ids, $revision_id);
-    // Specify additional fields from the user table.
-    $query->innerJoin('users', 'u', 'base.uid = u.uid');
-    // @todo: Move to a computed 'name' field instead.
-    $query->addField('u', 'name', 'registered_name');
-    return $query;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function postLoad(array &$queried_entities) {
-    // Prepare standard comment fields.
-    foreach ($queried_entities as &$record) {
-      $record->name = $record->uid ? $record->registered_name : $record->name;
-    }
-    parent::postLoad($queried_entities);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function updateEntityStatistics(CommentInterface $comment) {
     // Allow bulk updates and inserts to temporarily disable the maintenance of
     // the {comment_entity_statistics} table.
