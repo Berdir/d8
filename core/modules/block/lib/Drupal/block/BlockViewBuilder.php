@@ -67,4 +67,10 @@ class BlockViewBuilder implements EntityViewBuilderInterface {
    */
   public function resetCache(array $ids = NULL) { }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function preprocess(array &$variables) {
+  }
+
 }

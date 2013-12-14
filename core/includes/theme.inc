@@ -2013,6 +2013,12 @@ function template_preprocess(&$variables, $hook, $info) {
       $variables['attributes'] = NestedArray::mergeDeep($variables['attributes'], $variables[$key]['#attributes']);
     }
   }
+
+  // If this is an entity being rendered, call the preprocess() method on the
+  // view builder.
+  if (isset($variables['elements']['#entity_type'])) {
+    \Drupal::entityManager()->getViewBuilder($variables['elements']['#entity_type'])->preprocess($variables);
+  }
 }
 
 /**

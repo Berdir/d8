@@ -134,6 +134,7 @@ class EntityViewBuilder implements EntityControllerInterface, EntityViewBuilderI
       "#{$this->entityType}" => $entity,
       '#view_mode' => $view_mode,
       '#langcode' => $langcode,
+      '#entity_type' => $this->entityType,
     );
 
     // Cache the rendered output if permitted by the view mode and global entity
@@ -266,4 +267,19 @@ class EntityViewBuilder implements EntityControllerInterface, EntityViewBuilderI
       \Drupal::cache($this->cacheBin)->deleteTags(array($this->entityType . '_view' => TRUE));
     }
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function preprocess(array &$variables) {
+    $variables['view_mode'] = $variables['elements']['#view_mode'];
+    $variables[$this->entityType] = $variables['elements']['#' . $this->entityType];
+
+    // Helpful $content variable for templates.
+    $variables += array('content' => array());
+    foreach (element_children($variables['elements']) as $key) {
+      $variables['content'][$key] = $variables['elements'][$key];
+    }
+  }
+
 }

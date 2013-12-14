@@ -106,16 +106,6 @@ function user_pass_reset($form, &$form_state, $uid, $timestamp, $hashed_pass, $a
  *   - account: The user account.
  */
 function template_preprocess_user(&$variables) {
-  $account = $variables['elements']['#user'];
-
-  // Helpful $content variable for templates.
-  foreach (element_children($variables['elements']) as $key) {
-    $variables['content'][$key] = $variables['elements'][$key];
-  }
-
-  // Preprocess fields.
-  field_attach_preprocess($account, $variables['elements'], $variables);
-
   // Set up attributes.
   $variables['attributes']['class'][] = 'profile';
 }

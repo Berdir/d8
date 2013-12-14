@@ -662,10 +662,8 @@ function node_theme_suggestions_node(array $variables) {
  *   - view_mode: View mode; e.g., 'full', 'teaser'...
  */
 function template_preprocess_node(&$variables) {
-  $variables['view_mode'] = $variables['elements']['#view_mode'];
   // Provide a distinct $teaser boolean.
   $variables['teaser'] = $variables['view_mode'] == 'teaser';
-  $variables['node'] = $variables['elements']['#node'];
   $node = $variables['node'];
 
   $variables['date'] = format_date($node->getCreatedTime());
@@ -681,15 +679,6 @@ function template_preprocess_node(&$variables) {
   $variables['label'] = $variables['elements']['title'];
   unset($variables['elements']['title']);
   $variables['page'] = $variables['view_mode'] == 'full' && node_is_page($node);
-
-  // Helpful $content variable for templates.
-  $variables += array('content' => array());
-  foreach (element_children($variables['elements']) as $key) {
-    $variables['content'][$key] = $variables['elements'][$key];
-  }
-
-  // Make the field variables available with the appropriate language.
-  field_attach_preprocess($node, $variables['content'], $variables);
 
   // Display post information only on certain node types.
   // Avoid loading the entire node type config entity here.

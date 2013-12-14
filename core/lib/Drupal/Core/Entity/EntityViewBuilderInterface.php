@@ -84,4 +84,12 @@ interface EntityViewBuilderInterface {
    */
   public function resetCache(array $entities = NULL);
 
+  /**
+   * Preprocess variables.
+   *
+   * @param array $variables
+   *   An associative array containing the entity variables to be rendered.
+   */
+  public function preprocess(array &$variables);
+
 }
