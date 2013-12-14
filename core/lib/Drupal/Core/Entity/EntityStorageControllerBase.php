@@ -111,24 +111,17 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
   /**
    * Gets entities from the static cache.
    *
-   * @param array &$ids
-   *   If not empty, return entities that match these IDs. ID's that were found
-   *   will be removed from the list.
+   * @param $ids
+   *   If not empty, return entities that match these IDs.
    *
-   * @return \Drupal\Core\Entity\EntityInterface[]
+   * @return
    *   Array of entities from the entity cache.
    */
-  protected function cacheGet(&$ids) {
+  protected function cacheGet($ids) {
     $entities = array();
     // Load any available entities from the internal cache.
     if ($this->cache && !empty($this->entityCache)) {
-      foreach ($ids as $index => $id) {
-        if (isset($this->entityCache[$id])) {
-          $entities[$id] = $this->entityCache[$id];
-          // Remove the ID from the list
-          unset($ids[$index]);
-        }
-      }
+      $entities += array_intersect_key($this->entityCache, array_flip($ids));
     }
     return $entities;
   }
@@ -136,7 +129,7 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
   /**
    * Stores entities in the static entity cache.
    *
-   * @param \Drupal\Core\Entity\EntityInterface[] $entities
+   * @param $entities
    *   Entities to store in the cache.
    */
   protected function cacheSet($entities) {

@@ -80,23 +80,20 @@ class UserStorageController extends FieldableDatabaseStorageController implement
   /**
    * {@inheritdoc}
    */
-  function postLoad(array &$queried_users) {
-    foreach ($queried_users as $key => $record) {
-      $queried_users[$key]->roles = array();
+  function mapFromStorageRecords(array $records) {
+    foreach ($records as $key => $record) {
+      $records[$key]->roles = array();
       if ($record->uid) {
-        $queried_users[$record->uid]->roles[] = DRUPAL_AUTHENTICATED_RID;
+        $records[$record->uid]->roles[] = DRUPAL_AUTHENTICATED_RID;
       }
       else {
-        $queried_users[$record->uid]->roles[] = DRUPAL_ANONYMOUS_RID;
+        $records[$record->uid]->roles[] = DRUPAL_ANONYMOUS_RID;
       }
     }
 
     // Add any additional roles from the database.
-    $this->addRoles($queried_users);
-
-    // Call the default postLoad() method. This will add fields and call
-    // hook_user_load().
-    parent::postLoad($queried_users);
+    $this->addRoles($records);
+    return parent::mapFromStorageRecords($records);
   }
 
   /**

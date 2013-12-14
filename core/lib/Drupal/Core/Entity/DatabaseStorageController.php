@@ -105,9 +105,13 @@ class DatabaseStorageController extends EntityStorageControllerBase {
     // database when all requested entities are loaded from cache.
     $passed_ids = !empty($ids) ? array_flip($ids) : FALSE;
     // Try to load entities from the static cache, if the entity type supports
-    // static caching. This will remove ID's that were loaded from $ids.
+    // static caching.
     if ($this->cache && $ids) {
       $entities += $this->cacheGet($ids);
+      // If any entities were loaded, remove them from the ids still to load.
+      if ($passed_ids) {
+        $ids = array_keys(array_diff_key($passed_ids, $entities));
+      }
     }
 
     // Load any remaining entities from the database. This is the case if $ids
