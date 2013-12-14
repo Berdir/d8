@@ -285,11 +285,13 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
           $this->cacheSet($queried_entities);
         }
 
-        // Add them to the persistent cache.
+        // Add them to the caches.
         if ($this->persistentCache) {
           $this->setPersistentCache($queried_entities);
         }
-
+        if ($this->staticCache) {
+          $this->setStaticCache($queried_entities);
+        }
         $entities += $queried_entities;
       }
 
@@ -449,8 +451,8 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
       // Pass all entities loaded from the database through $this->postLoad(),
       // to invoke the load hooks and postLoad() method on the entity class.
       $this->postLoad($entities);
+      return reset($entities);
     }
-    return reset($entities);
   }
 
   /**
@@ -1591,7 +1593,7 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
       foreach ($ids as $index => $id) {
         if (isset($this->entities[$id])) {
           $entities[$id] = $this->entities[$id];
-          // Remove the ID from the list
+          // Remove the ID from the list.
           unset($ids[$index]);
         }
       }
