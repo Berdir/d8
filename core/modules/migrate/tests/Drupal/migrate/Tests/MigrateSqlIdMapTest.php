@@ -719,7 +719,6 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
    * - Sql::current()
    */
   public function testIterators() {
-
     $database_contents['migrate_map_sql_idmap_test'] = array();
     for ($i = 0; $i < 3; $i++) {
       $row = $this->idMapDefaults();
