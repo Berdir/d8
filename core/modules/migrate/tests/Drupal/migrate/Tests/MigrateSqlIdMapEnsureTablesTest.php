@@ -186,7 +186,6 @@ class MigrateSqlIdMapEnsureTablesTest extends MigrateTestCase {
     $database->expects($this->any())
       ->method('schema')
       ->will($this->returnValue($schema));
-    //
     new TestSqlIdmap($database, array(), 'sql', array(), $this->getMigration());
   }
 
