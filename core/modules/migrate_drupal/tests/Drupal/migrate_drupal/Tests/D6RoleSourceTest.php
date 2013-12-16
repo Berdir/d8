@@ -117,9 +117,9 @@ class D6RoleSourceTest extends MigrateSqlSourceTestCase {
   public function setUp() {
     foreach ($this->expectedResults as $k => $row) {
       foreach ($row['permissions'] as $perm) {
-        $this->databaseContents['permissions'][$perm['pid']] = $perm;
-        $this->databaseContents['permissions'][$perm['pid']]['perm'] = implode(',', $perm['perm']);
-        $this->databaseContents['permissions'][$perm['pid']]['rid'] = $row['rid'];
+        $this->databaseContents['permission'][$perm['pid']] = $perm;
+        $this->databaseContents['permission'][$perm['pid']]['perm'] = implode(',', $perm['perm']);
+        $this->databaseContents['permission'][$perm['pid']]['rid'] = $row['rid'];
       }
       unset($row['permissions']);
       $this->databaseContents['role'][$k] = $row;
