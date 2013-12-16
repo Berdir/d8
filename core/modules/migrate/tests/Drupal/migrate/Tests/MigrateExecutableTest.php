@@ -9,6 +9,8 @@ namespace Drupal\migrate\Tests;
 
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\migrate\Entity\MigrationInterface;
+use Drupal\migrate\Plugin\MigrateIdMapInterface;
+use Drupal\migrate\MigrateException;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate\Row;
 
@@ -65,11 +67,6 @@ class MigrateExecutableTest extends MigrateTestCase {
   protected function setUp() {
     $this->migration = $this->getMigration();
     $this->message = $this->getMock('Drupal\migrate\MigrateMessageInterface');
-    $id_map = $this->getMock('Drupal\migrate\Plugin\MigrateIdMapInterface');
-
-    $this->migration->expects($this->any())
-      ->method('getIdMap')
-      ->will($this->returnValue($id_map));
 
     $this->executable = new TestMigrateExecutable($this->migration, $this->message);
     $this->executable->setTranslationManager($this->getStringTranslationStub());
@@ -82,10 +79,8 @@ class MigrateExecutableTest extends MigrateTestCase {
     $iterator = $this->getMock('\Iterator');
     $exception_message = $this->getRandomGenerator()->string();
     $iterator->expects($this->once())
-      ->method('valid')
-      ->will($this->returnCallback(function() use ($exception_message) {
-        throw new \Exception($exception_message);
-      }));
+      ->method('rewind')
+      ->will($this->throwException(new \Exception($exception_message)));
     $source = $this->getMock('Drupal\migrate\Plugin\MigrateSourceInterface');
     $source->expects($this->any())
       ->method('getIterator')
@@ -102,6 +97,198 @@ class MigrateExecutableTest extends MigrateTestCase {
 
     $result = $this->executable->import();
     $this->assertEquals(MigrationInterface::RESULT_FAILED, $result);
+  }
+
+  /**
+   * Tests the import method with a valid row.
+   */
+  public function testImportWithValidRow() {
+    $source = $this->getMockSource();
+
+    $row = $this->getMockBuilder('Drupal\migrate\Row')
+      ->disableOriginalConstructor()
+      ->getMock();
+
+    $source->expects($this->once())
+      ->method('current')
+      ->will($this->returnValue($row));
+
+    $this->executable->setSource($source);
+
+    $this->migration->expects($this->once())
+      ->method('getProcessPlugins')
+      ->will($this->returnValue(array()));
+
+    $destination = $this->getMock('Drupal\migrate\Plugin\MigrateDestinationInterface');
+    $destination->expects($this->once())
+      ->method('import')
+      ->with($row)
+      ->will($this->returnValue(array('id' => 'test')));
+
+    $this->migration->expects($this->once())
+      ->method('getDestinationPlugin')
+      ->will($this->returnValue($destination));
+
+    $this->assertSame(MigrationInterface::RESULT_COMPLETED, $this->executable->import());
+
+    $this->assertSame(1, $this->executable->getSuccessesSinceFeedback());
+    $this->assertSame(1, $this->executable->getTotalSuccesses());
+    $this->assertSame(1, $this->executable->getTotalProcessed());
+    $this->assertSame(1, $this->executable->getProcessedSinceFeedback());
+  }
+
+  /**
+   * Tests the import method with a valid row.
+   */
+  public function testImportWithValidRowNoDestinationValues() {
+    $source = $this->getMockSource();
+
+    $row = $this->getMockBuilder('Drupal\migrate\Row')
+      ->disableOriginalConstructor()
+      ->getMock();
+
+    $row->expects($this->once())
+      ->method('getSourceIdValues')
+      ->will($this->returnValue(array('id' => 'test')));
+
+    $source->expects($this->once())
+      ->method('current')
+      ->will($this->returnValue($row));
+
+    $this->executable->setSource($source);
+
+    $this->migration->expects($this->once())
+      ->method('getProcessPlugins')
+      ->will($this->returnValue(array()));
+
+    $destination = $this->getMock('Drupal\migrate\Plugin\MigrateDestinationInterface');
+    $destination->expects($this->once())
+      ->method('import')
+      ->with($row)
+      ->will($this->returnValue(array()));
+
+    $this->migration->expects($this->once())
+      ->method('getDestinationPlugin')
+      ->will($this->returnValue($destination));
+
+    $this->idMap->expects($this->once())
+      ->method('delete')
+      ->with(array('id' => 'test'), TRUE);
+
+    $this->idMap->expects($this->once())
+      ->method('saveIdMapping')
+      ->with($row, array(), MigrateIdMapInterface::STATUS_FAILED, NULL);
+
+    $this->idMap->expects($this->once())
+      ->method('messageCount')
+      ->will($this->returnValue(0));
+
+    $this->idMap->expects($this->once())
+      ->method('saveMessage');
+
+    $this->message->expects($this->once())
+      ->method('display')
+      ->with('New object was not saved, no error provided');
+
+    $this->assertSame(MigrationInterface::RESULT_COMPLETED, $this->executable->import());
+  }
+
+  /**
+   * Tests the import method with a MigrateException being thrown.
+   */
+  public function testImportWithValidRowWithMigrateException() {
+    $exception_message = $this->getRandomGenerator()->string();
+    $source = $this->getMockSource();
+
+    $row = $this->getMockBuilder('Drupal\migrate\Row')
+      ->disableOriginalConstructor()
+      ->getMock();
+
+    $row->expects($this->once())
+      ->method('getSourceIdValues')
+      ->will($this->returnValue(array('id' => 'test')));
+
+    $source->expects($this->once())
+      ->method('current')
+      ->will($this->returnValue($row));
+
+    $this->executable->setSource($source);
+
+    $this->migration->expects($this->once())
+      ->method('getProcessPlugins')
+      ->will($this->returnValue(array()));
+
+    $destination = $this->getMock('Drupal\migrate\Plugin\MigrateDestinationInterface');
+    $destination->expects($this->once())
+      ->method('import')
+      ->with($row)
+      ->will($this->throwException(new MigrateException($exception_message)));
+
+    $this->migration->expects($this->once())
+      ->method('getDestinationPlugin')
+      ->will($this->returnValue($destination));
+
+    $this->idMap->expects($this->once())
+      ->method('saveIdMapping')
+      ->with($row, array(), MigrateIdMapInterface::STATUS_FAILED, NULL);
+
+    $this->idMap->expects($this->once())
+      ->method('saveMessage');
+
+    $this->message->expects($this->once())
+      ->method('display')
+      ->with($exception_message);
+
+    $this->assertSame(MigrationInterface::RESULT_COMPLETED, $this->executable->import());
+  }
+
+  /**
+   * Tests the import method with a regular Exception being thrown.
+   */
+  public function testImportWithValidRowWithException() {
+    $exception_message = $this->getRandomGenerator()->string();
+    $source = $this->getMockSource();
+
+    $row = $this->getMockBuilder('Drupal\migrate\Row')
+      ->disableOriginalConstructor()
+      ->getMock();
+
+    $row->expects($this->once())
+      ->method('getSourceIdValues')
+      ->will($this->returnValue(array('id' => 'test')));
+
+    $source->expects($this->once())
+      ->method('current')
+      ->will($this->returnValue($row));
+
+    $this->executable->setSource($source);
+
+    $this->migration->expects($this->once())
+      ->method('getProcessPlugins')
+      ->will($this->returnValue(array()));
+
+    $destination = $this->getMock('Drupal\migrate\Plugin\MigrateDestinationInterface');
+    $destination->expects($this->once())
+      ->method('import')
+      ->with($row)
+      ->will($this->throwException(new \Exception($exception_message)));
+
+    $this->migration->expects($this->once())
+      ->method('getDestinationPlugin')
+      ->will($this->returnValue($destination));
+
+    $this->idMap->expects($this->once())
+      ->method('saveIdMapping')
+      ->with($row, array(), MigrateIdMapInterface::STATUS_FAILED, NULL);
+
+    $this->idMap->expects($this->once())
+      ->method('saveMessage');
+
+    $this->message->expects($this->once())
+      ->method('display')
+      ->with($exception_message);
+
+    $this->assertSame(MigrationInterface::RESULT_COMPLETED, $this->executable->import());
   }
 
   /**
@@ -236,6 +423,31 @@ class MigrateExecutableTest extends MigrateTestCase {
     }
     $this->assertSame(count($row->getDestination()), count($expected));
   }
+
+  /**
+   * Returns a mock migration source instance.
+   *
+   * @return \Drupal\migrate\Source|\PHPUnit_Framework_MockObject_MockObject
+   */
+  protected function getMockSource() {
+    $iterator = $this->getMock('\Iterator');
+
+    $source = $this->getMockBuilder('Drupal\migrate\Source')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $source->expects($this->any())
+      ->method('getIterator')
+      ->will($this->returnValue($iterator));
+    $source->expects($this->once())
+      ->method('rewind')
+      ->will($this->returnValue(TRUE));
+    $source->expects($this->any())
+      ->method('valid')
+      ->will($this->onConsecutiveCalls(TRUE, FALSE));
+
+    return $source;
+  }
+
 }
 
 class TestMigrateExecutable extends MigrateExecutable {
@@ -272,11 +484,34 @@ class TestMigrateExecutable extends MigrateExecutable {
     return $this->maxExecTime;
   }
 
+  public function getSuccessesSinceFeedback() {
+    return $this->successes_since_feedback;
+  }
+
+  public function getTotalSuccesses() {
+    return $this->total_successes;
+  }
+
+  public function getTotalProcessed() {
+    return $this->total_processed;
+  }
+
+  public function getProcessedSinceFeedback() {
+    return $this->processed_since_feedback;
+  }
+
   /**
    * Allows access to protected maxExecTimeExceeded method.
    */
   public function maxExecTimeExceeded() {
     return parent::maxExecTimeExceeded();
+  }
+
+  /**
+   *
+   */
+  public function setSource($source) {
+    $this->source = $source;
   }
 
   /**
@@ -298,6 +533,17 @@ class TestMigrateExecutable extends MigrateExecutable {
    */
   public function getTimeElapsed() {
     return $this->timeElapsed;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function handleException($exception, $save = TRUE) {
+    $message = $exception->getMessage();
+    if ($save) {
+      $this->saveMessage($message);
+    }
+    $this->message->display($message);
   }
 
 }

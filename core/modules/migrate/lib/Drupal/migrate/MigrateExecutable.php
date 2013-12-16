@@ -229,11 +229,12 @@ class MigrateExecutable {
           array('!e' => $e->getMessage())));
       return MigrationInterface::RESULT_FAILED;
     }
+
     while ($source->valid()) {
       $row = $source->current();
       if ($this->sourceIdValues = $row->getSourceIdValues()) {
         // Wipe old messages, and save any new messages.
-        $id_map->delete($row->getSourceIdValues(), TRUE);
+        $id_map->delete($this->sourceIdValues, TRUE);
         $this->saveQueuedMessages();
       }
 

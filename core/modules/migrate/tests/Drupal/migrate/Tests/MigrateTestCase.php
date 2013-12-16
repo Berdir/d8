@@ -30,9 +30,10 @@ abstract class MigrateTestCase extends UnitTestCase {
    *   The mocked migration.
    */
   protected function getMigration() {
-    $idmap = $this->getMock('Drupal\migrate\Plugin\MigrateIdMapInterface');
+    $this->idMap = $this->getMock('Drupal\migrate\Plugin\MigrateIdMapInterface');
+
     if ($this->mapJoinable) {
-      $idmap->expects($this->once())
+      $this->idMap->expects($this->once())
         ->method('getQualifiedMapTableName')
         ->will($this->returnValue('test_map'));
     }
@@ -40,7 +41,7 @@ abstract class MigrateTestCase extends UnitTestCase {
     $migration = $this->getMock('Drupal\migrate\Entity\MigrationInterface');
     $migration->expects($this->any())
       ->method('getIdMap')
-      ->will($this->returnValue($idmap));
+      ->will($this->returnValue($this->idMap));
     $configuration = &$this->migrationConfiguration;
     $migration->expects($this->any())->method('get')->will($this->returnCallback(function ($argument) use (&$configuration) {
       return isset($configuration[$argument]) ? $configuration[$argument] : '';
