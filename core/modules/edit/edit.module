@@ -12,10 +12,7 @@
  */
 
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\edit\Form\EditFieldForm;
-use Drupal\Component\Utility\NestedArray;
-use Drupal\entity\Entity\EntityDisplay;
-use Drupal\user\TempStoreFactory;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 
 /**
  * Implements hook_menu().
@@ -76,6 +73,7 @@ function edit_library_info() {
     'js' => array(
       // Core.
       $path . '/js/edit.js' => $options,
+      $path . '/js/util.js' => $options,
       // Models.
       $path . '/js/models/AppModel.js' => $options,
       $path . '/js/models/EntityModel.js' => $options,
@@ -83,14 +81,13 @@ function edit_library_info() {
       $path . '/js/models/EditorModel.js' => $options,
       // Views.
       $path . '/js/views/AppView.js' => $options,
-      $path . '/js/views/EditorDecorationView.js' => $options,
+      $path . '/js/views/FieldDecorationView.js' => $options,
       $path . '/js/views/EntityDecorationView.js' => $options,
       $path . '/js/views/EntityToolbarView.js' => $options,
       $path . '/js/views/ContextualLinkView.js' => $options,
       $path . '/js/views/FieldToolbarView.js' => $options,
       $path . '/js/views/EditorView.js' => $options,
       // Other.
-      $path . '/js/util.js' => $options,
       $path . '/js/theme.js' => $options,
     ),
     'css' => array(
@@ -197,7 +194,7 @@ function edit_preprocess_field(&$variables) {
 /**
  * Implements hook_entity_view_alter().
  */
-function edit_entity_view_alter(&$build, EntityInterface $entity, EntityDisplay $display) {
+function edit_entity_view_alter(&$build, EntityInterface $entity, EntityViewDisplayInterface $display) {
   $build['#attributes']['data-edit-entity-id'] = $entity->entityType() . '/' . $entity->id();
 }
 

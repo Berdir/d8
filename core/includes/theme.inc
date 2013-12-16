@@ -210,12 +210,18 @@ function _drupal_theme_initialize($theme, $base_theme = array()) {
     }
   }
 
-  // And now add the stylesheets properly
+  // And now add the stylesheets properly.
+  $css = array();
   foreach ($final_stylesheets as $media => $stylesheets) {
     foreach ($stylesheets as $stylesheet) {
-      drupal_add_css($stylesheet, array('group' => CSS_AGGREGATE_THEME, 'every_page' => TRUE, 'media' => $media));
+      $css['#attached']['css'][$stylesheet] = array(
+        'group' => CSS_AGGREGATE_THEME,
+        'every_page' => TRUE,
+        'media' => $media
+      );
     }
   }
+  drupal_render($css);
 
   // Do basically the same as the above for scripts
   $final_scripts = array();
@@ -1241,6 +1247,7 @@ function theme_links($variables) {
         'href' => NULL,
         'route_name' => NULL,
         'route_parameters' => NULL,
+        'ajax' => NULL,
       );
 
       $class = array();
@@ -1262,13 +1269,8 @@ function theme_links($variables) {
         '#href' => $link['href'],
         '#route_name' => $link['route_name'],
         '#route_parameters' => $link['route_parameters'],
+        '#ajax' => $link['ajax'],
       );
-
-      // @todo Reconcile Views usage of 'ajax' as a boolean with the rest of
-      //   core's usage of it as an array.
-      if (isset($link['ajax']) && is_array($link['ajax'])) {
-        $link_element['#ajax'] = $link['ajax'];
-      }
 
       // Handle links and ensure that the active class is added on the LIs.
       if (isset($link['route_name'])) {
@@ -1709,37 +1711,6 @@ function theme_table($variables) {
 
   $output .= "</table>\n";
   return $output;
-}
-
-/**
- * Prepares variables for tablesort indicator templates.
- *
- * Default template: tablesort-indicator.html.twig.
- *
- * @param array $variables
- *   An associative array containing:
- *   - style: Set to either 'asc' or 'desc'. This determines which icon to show.
- */
-function template_preprocess_tablesort_indicator(&$variables) {
-  // Provide the image attributes for an ascending or descending image.
-  if ($variables['style'] == 'asc') {
-    $variables['uri'] = 'core/misc/arrow-asc.png';
-    $alt_title = t('sort ascending');
-  }
-  else {
-    $variables['uri'] = 'core/misc/arrow-desc.png';
-    $alt_title = t('sort descending');
-  }
-
-  // Add the image element.
-  $variables['image'] = array(
-    '#theme' => 'image',
-    '#uri' => $variables['uri'],
-    '#width' => 13,
-    '#height' => 13,
-    '#alt' => $alt_title,
-    '#title' => $alt_title,
-  );
 }
 
 /**
@@ -2387,6 +2358,8 @@ function theme_get_suggestions($args, $base, $delimiter = '__') {
  * @param array $variables
  *   An associative array containing:
  *   - content - An array of page content.
+ *
+ * @see system_page_build()
  */
 function template_preprocess_maintenance_page(&$variables) {
   global $theme;
@@ -2453,21 +2426,31 @@ function template_preprocess_maintenance_page(&$variables) {
       $head_title['slogan'] = strip_tags(filter_xss_admin($site_slogan));
     }
   }
-  $path = drupal_get_path('module', 'system');
 
   // These are usually added from system_page_build() except maintenance.css.
   // When the database is inactive it's not called so we add it here.
-  $default_css = array(
-    '#attached' => array(
-      'css' => array(
-        $path . '/css/system.module.css',
-        $path . '/css/system.theme.css',
-        $path . '/css/system.admin.css',
-        $path . '/css/system.maintenance.css',
-      ),
-    ),
+  $default_css['library'][] = array('system', 'normalize');
+  $path = drupal_get_path('module', 'system');
+  // Adjust the weights to load these early.
+  $default_css['css'][$path . '/css/system.module.css'] = array(
+    'weight' => CSS_COMPONENT - 10,
+    'every_page' => TRUE,
   );
-  drupal_render($default_css);
+  $default_css['css'][$path . '/css/system.theme.css'] = array(
+    'weight' => CSS_SKIN - 10,
+    'every_page' => TRUE,
+  );
+  // Unlike regular pages, the admin.css is added for every maintenance page.
+  $default_css['css'][$path . '/css/system.admin.css'] = array(
+    'weight' => CSS_COMPONENT - 10,
+    'every_page' => TRUE,
+  );
+  $default_css['css'][$path . '/css/system.maintenance.css'] = array(
+    'weight' => CSS_COMPONENT - 10,
+    'every_page' => TRUE,
+  );
+  $attached = array('#attached' => $default_css);
+  drupal_render($attached);
 
   $variables['head_title_array']  = $head_title;
   $variables['head_title']        = implode(' | ', $head_title);

@@ -9,12 +9,12 @@ namespace Drupal\comment;
 
 use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\Entity\EntityControllerInterface;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Entity\EntityViewBuilderInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Entity\EntityViewBuilder;
-use Drupal\entity\Entity\EntityDisplay;
 use Drupal\field\FieldInfo;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -231,7 +231,7 @@ class CommentViewBuilder extends EntityViewBuilder implements EntityViewBuilderI
           'html' => TRUE,
         );
       }
-      if ($entity->status->value == COMMENT_NOT_PUBLISHED && $entity->access('approve')) {
+      if ($entity->status->value == CommentInterface::NOT_PUBLISHED && $entity->access('approve')) {
         $links['comment-approve'] = array(
           'title' => t('Approve'),
           'route_name' => 'comment.approve',
@@ -271,14 +271,14 @@ class CommentViewBuilder extends EntityViewBuilder implements EntityViewBuilderI
   /**
    * {@inheritdoc}
    */
-  protected function alterBuild(array &$build, EntityInterface $comment, EntityDisplay $display, $view_mode, $langcode = NULL) {
+  protected function alterBuild(array &$build, EntityInterface $comment, EntityViewDisplayInterface $display, $view_mode, $langcode = NULL) {
     parent::alterBuild($build, $comment, $display, $view_mode, $langcode);
     if (empty($comment->in_preview)) {
       $prefix = '';
       $commented_entity = $this->entityManager->getStorageController($comment->entity_type->value)->load($comment->entity_id->value);
       $instance = $this->fieldInfo->getInstance($commented_entity->entityType(), $commented_entity->bundle(), $comment->field_name->value);
       $is_threaded = isset($comment->divs)
-        && $instance->getFieldSetting('default_mode') == COMMENT_MODE_THREADED;
+        && $instance->getSetting('default_mode') == COMMENT_MODE_THREADED;
 
       // Add indentation div or close open divs as needed.
       if ($is_threaded) {

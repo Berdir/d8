@@ -14,14 +14,12 @@ use Symfony\Component\HttpFoundation\Response;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Database\Query\AlterableInterface;
 use Drupal\Core\Database\Query\SelectInterface;
-use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\node\NodeTypeInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 use Drupal\Core\Template\Attribute;
-use Drupal\entity\Entity\EntityDisplay;
-use Drupal\entity\Entity\EntityFormDisplay;
 use Drupal\file\Entity\File;
-use Drupal\user\UserInterface;
 
 /**
  * Denotes that the node is not published.
@@ -194,7 +192,7 @@ function node_entity_bundle_info() {
 /**
  * Implements hook_entity_display_alter().
  */
-function node_entity_display_alter(EntityDisplay $display, $context) {
+function node_entity_display_alter(EntityViewDisplayInterface $display, $context) {
   if ($context['entity_type'] == 'node') {
     // Hide field labels in search index.
     if ($context['view_mode'] == 'search_index') {
@@ -217,7 +215,7 @@ function node_entity_display_alter(EntityDisplay $display, $context) {
 /**
  * Implements hook_entity_form_display_alter().
  */
-function node_entity_form_display_alter(EntityFormDisplay $form_display, $context) {
+function node_entity_form_display_alter(EntityFormDisplayInterface $form_display, $context) {
   if ($context['entity_type'] == 'node') {
     // @todo Manage base field displays in the YAML:
     //   https://drupal.org/node/2144919.
@@ -308,10 +306,10 @@ function node_title_list($result, $title = NULL) {
  *   One of the MARK constants.
  */
 function node_mark($nid, $timestamp) {
-  global $user;
+
   $cache = &drupal_static(__FUNCTION__, array());
 
-  if ($user->isAnonymous() || !\Drupal::moduleHandler()->moduleExists('history')) {
+  if (\Drupal::currentUser()->isAnonymous() || !\Drupal::moduleHandler()->moduleExists('history')) {
     return MARK_READ;
   }
   if (!isset($cache[$nid])) {
@@ -481,7 +479,7 @@ function node_field_extra_fields() {
   foreach (node_type_get_types() as $bundle) {
     if ($bundle->has_title) {
       $extra['node'][$bundle->type]['form']['title'] = array(
-        'label' => $bundle->title_label,
+        'label' => check_plain($bundle->title_label),
         'description' => $description,
         'weight' => -5,
       );
@@ -1112,7 +1110,7 @@ function node_get_recent($number = 10) {
     // If the user is able to view their own unpublished nodes, allow them
     // to see these in addition to published nodes. Check that they actually
     // have some unpublished nodes to view before adding the condition.
-    if (user_access('view own unpublished content') && $own_unpublished = db_query('SELECT DISTINCT nid FROM {node_field_data} WHERE uid = :uid AND status = :status', array(':uid' => $GLOBALS['user']->id(), ':status' => NODE_NOT_PUBLISHED))->fetchCol()) {
+    if (user_access('view own unpublished content') && $own_unpublished = db_query('SELECT DISTINCT nid FROM {node_field_data} WHERE uid = :uid AND status = :status', array(':uid' => \Drupal::currentUser()->id(), ':status' => NODE_NOT_PUBLISHED))->fetchCol()) {
       $query->condition(db_or()
         ->condition('n.status', NODE_PUBLISHED)
         ->condition('n.nid', $own_unpublished, 'IN')
@@ -1645,7 +1643,7 @@ function node_permissions_get_configured_types() {
 function node_access_grants($op, $account = NULL) {
 
   if (!isset($account)) {
-    $account = $GLOBALS['user'];
+    $account = \Drupal::currentUser();
   }
 
   // Fetch node access grants from other modules.
@@ -1679,9 +1677,9 @@ function node_access_grants($op, $account = NULL) {
  * @see node_query_node_access_alter()
  */
 function node_access_view_all_nodes($account = NULL) {
-  global $user;
+
   if (!$account) {
-    $account = $user;
+    $account = \Drupal::currentUser();
   }
 
   // Statically cache results in an array keyed by $account->id().
@@ -1707,7 +1705,7 @@ function node_access_view_all_nodes($account = NULL) {
  *
  * This is the hook_query_alter() for queries tagged with 'node_access'. It adds
  * node access checks for the user account given by the 'account' meta-data (or
- * global $user if not provided), for an operation given by the 'op' meta-data
+ * current user if not provided), for an operation given by the 'op' meta-data
  * (or 'view' if not provided; other possible values are 'update' and 'delete').
  *
  * Queries tagged with 'node_access' that are not against the {node} table

@@ -8,13 +8,14 @@
 namespace Drupal\entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Core\Entity\Display\EntityDisplayInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 
 /**
  * Base class for config entity types that store configuration for entity forms
  * and displays.
  */
-abstract class EntityDisplayBase extends ConfigEntityBase implements EntityDisplayBaseInterface {
+abstract class EntityDisplayBase extends ConfigEntityBase implements EntityDisplayInterface {
 
   /**
    * Unique ID for the config entity.
@@ -254,7 +255,6 @@ abstract class EntityDisplayBase extends ConfigEntityBase implements EntityDispl
       $max = $this->getHighestWeight();
       $options['weight'] = isset($max) ? $max + 1 : 0;
     }
-
     // See remark in getComponent().
     // @todo Cleanup after https://drupal.org/node/2144919 is fixed.
     $extra_fields = field_info_extra_fields($this->targetEntityType, $this->bundle, $this->displayContext);
@@ -262,7 +262,7 @@ abstract class EntityDisplayBase extends ConfigEntityBase implements EntityDispl
       $options['visible'] = TRUE;
     }
     elseif ($field_definition = $this->getFieldDefinition($name)) {
-      $options = $this->pluginManager->prepareConfiguration($field_definition->getFieldType(), $options);
+      $options = $this->pluginManager->prepareConfiguration($field_definition->getType(), $options);
     }
 
     // Clear the persisted plugin, if any.

@@ -58,6 +58,9 @@ class Iterator extends ProcessPluginBase {
     return $row->getDestinationProperty('key');
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function multiple() {
     return TRUE;
   }

@@ -3,7 +3,7 @@
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\entity\Entity\EntityDisplay;
+use \Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\file\Entity\File;
 use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
@@ -154,26 +154,6 @@ function user_uri($user) {
   return array(
     'path' => 'user/' . $user->id(),
   );
-}
-
-/**
- * Entity label callback.
- *
- * This label callback has langcode for security reasons. The username is the
- * visual identifier for a user and needs to be consistent in all languages.
- *
- * @param $entity_type
- *   The entity type.
- * @param $entity
- *   The entity object.
- *
- * @return
- *   The name of the user.
- *
- * @see user_format_name()
- */
-function user_label($entity_type, $entity) {
-  return $entity->getUsername();
 }
 
 /**
@@ -514,7 +494,7 @@ function user_permission() {
 /**
  * Implements hook_user_view().
  */
-function user_user_view(UserInterface $account, EntityDisplay $display) {
+function user_user_view(UserInterface $account, EntityViewDisplayInterface $display) {
   if ($display->getComponent('member_for')) {
     $account->content['member_for'] = array(
       '#type' => 'item',
@@ -1775,7 +1755,7 @@ function user_form_process_password_confirm($element) {
  *   \Drupal\node\NodeViewBuilder::buildContent(). Update code that
  *   depends on these properties.
  */
-function user_node_load($nodes, $types) {
+function user_node_load($nodes) {
   // Build an array of all uids for node authors, keyed by nid.
   $uids = array();
   foreach ($nodes as $nid => $node) {

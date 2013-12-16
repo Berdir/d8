@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "414745173d1e926721e1d7511a65dcec",
+    "hash": "06006c1512fb829fcdb498b7e515901d",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -207,17 +207,28 @@
         },
         {
             "name": "doctrine/common",
-            "version": "2.4.0-RC4",
+            "version": "dev-bmaster",
             "source": {
                 "type": "git",
-                "url": "https://github.com/doctrine/common.git",
-                "reference": "2.4.0-RC4"
+                "url": "https://github.com/dawehner/common.git",
+                "reference": "99b44f52a1b844f9c4c34e618b160664d5c27daf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/common/zipball/2.4.0-RC4",
-                "reference": "2.4.0-RC4",
+                "url": "https://api.github.com/repos/dawehner/common/zipball/99b44f52a1b844f9c4c34e618b160664d5c27daf",
+                "reference": "99b44f52a1b844f9c4c34e618b160664d5c27daf",
                 "shasum": ""
+            },
+            "archive": {
+                "exclude": [
+                    "!vendor",
+                    "tests",
+                    "*phpunit.xml",
+                    ".travis.yml",
+                    "build.xml",
+                    "build.properties",
+                    "composer.phar"
+                ]
             },
             "require": {
                 "doctrine/annotations": "1.*",
@@ -230,7 +241,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.4.x-dev"
+                    "dev-master": "2.5.x-dev"
                 }
             },
             "autoload": {
@@ -238,20 +249,13 @@
                     "Doctrine\\Common\\": "lib/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
             "authors": [
                 {
-                    "name": "Jonathan Wage",
-                    "email": "jonwage@gmail.com",
-                    "homepage": "http://www.jwage.com/"
-                },
-                {
                     "name": "Guilherme Blanco",
-                    "email": "guilhermeblanco@gmail.com",
-                    "homepage": "http://www.instaclick.com"
+                    "email": "guilhermeblanco@gmail.com"
                 },
                 {
                     "name": "Roman Borschel",
@@ -262,10 +266,12 @@
                     "email": "kontakt@beberlei.de"
                 },
                 {
-                    "name": "Johannes M. Schmitt",
-                    "email": "schmittjoh@gmail.com",
-                    "homepage": "https://github.com/schmittjoh",
-                    "role": "Developer of wrapped JMSSerializerBundle"
+                    "name": "Jonathan Wage",
+                    "email": "jonwage@gmail.com"
+                },
+                {
+                    "name": "Johannes Schmitt",
+                    "email": "schmittjoh@gmail.com"
                 }
             ],
             "description": "Common Library for Doctrine projects",
@@ -277,7 +283,10 @@
                 "persistence",
                 "spl"
             ],
-            "time": "2013-06-21 12:11:28"
+            "support": {
+                "source": "https://github.com/dawehner/common/tree/bmaster"
+            },
+            "time": "2013-12-12 18:37:37"
         },
         {
             "name": "doctrine/inflector",
@@ -2056,7 +2065,7 @@
     ],
     "minimum-stability": "stable",
     "stability-flags": {
-        "doctrine/common": 10,
+        "doctrine/common": 20,
         "doctrine/annotations": 20,
         "kriswallsmith/assetic": 15,
         "symfony-cmf/routing": 15,

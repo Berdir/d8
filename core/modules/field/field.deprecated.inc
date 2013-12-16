@@ -8,8 +8,8 @@
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Language\Language;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
-use Drupal\entity\Entity\EntityDisplay;
 use Drupal\field\Field;
 
 /**
@@ -599,7 +599,7 @@ function field_attach_form_validate(ContentEntityInterface $entity, $form, &$for
   $has_violations = FALSE;
   foreach ($entity as $field_name => $field) {
     $definition = $field->getDefinition();
-    if ($definition->isFieldConfigurable() && (empty($options['field_name']) || $options['field_name'] == $field_name)) {
+    if ($definition->isConfigurable() && (empty($options['field_name']) || $options['field_name'] == $field_name)) {
       $field_violations = $field->validate();
       if (count($field_violations)) {
         $has_violations = TRUE;
@@ -699,7 +699,7 @@ function field_attach_prepare_view($entity_type, array $entities, array $display
   // the entity display.
   $target_function = function (FieldDefinitionInterface $field_definition, $bundle) use ($displays) {
     if (isset($displays[$bundle])) {
-      return $displays[$bundle]->getRenderer($field_definition->getFieldName());
+      return $displays[$bundle]->getRenderer($field_definition->getName());
     }
   };
   $null = NULL;
@@ -720,7 +720,7 @@ function field_attach_prepare_view($entity_type, array $entities, array $display
  *
  * @param \Drupal\Core\Entity\EntityInterface $entity
  *   The entity with fields to render.
- * @param \Drupal\entity\Entity\EntityDisplay $display
+ * @param \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display
  *   The entity display object.
  * @param $langcode
  *   The language the field values are to be shown in. If no language is
@@ -734,11 +734,11 @@ function field_attach_prepare_view($entity_type, array $entities, array $display
  *
  * @deprecated as of Drupal 8.0. Use the entity system instead.
  */
-function field_attach_view(EntityInterface $entity, EntityDisplay $display, $langcode = NULL, array $options = array()) {
+function field_attach_view(EntityInterface $entity, EntityViewDisplayInterface $display, $langcode = NULL, array $options = array()) {
   // For each field, call the view() method on the formatter object handed
   // by the entity display.
   $target_function = function (FieldDefinitionInterface $field_definition) use ($display) {
-    return $display->getRenderer($field_definition->getFieldName());
+    return $display->getRenderer($field_definition->getName());
   };
   $null = NULL;
   $output = field_invoke_method('view', $target_function, $entity, $null, $null, $options);
@@ -799,10 +799,10 @@ function field_get_items(EntityInterface $entity, $field_name, $langcode = NULL)
  *   The default value for the field.
  *
  * @deprecated as of Drupal 8.0. Use
- *   $instance->getFieldDefaultValue($entity)
+ *   $instance->getDefaultValue($entity)
  */
 function field_get_default_value(EntityInterface $entity, $field, $instance, $langcode = NULL) {
-  return $instance->getFieldDefaultValue($entity);
+  return $instance->getDefaultValue($entity);
 }
 
 /**
@@ -895,18 +895,15 @@ function field_valid_language($langcode, $default = TRUE) {
  */
 function field_language(EntityInterface $entity, $field_name = NULL, $langcode = NULL) {
   $langcode = \Drupal::entityManager()->getTranslationFromContext($entity, $langcode)->language()->id;
-  $definitions = $entity->getPropertyDefinitions();
   $translatable = field_has_translation_handler($entity->entityType());
   if (!isset($field_name)) {
     $display_langcodes = array();
-    foreach ($definitions as $name => $definition) {
-      if ($definition->isFieldConfigurable()) {
-        $display_langcodes[$name] = $translatable ? $langcode : Language::LANGCODE_NOT_SPECIFIED;
-      }
+    foreach ($entity->getPropertyDefinitions() as $name => $definition) {
+      $display_langcodes[$name] = $translatable ? $langcode : Language::LANGCODE_NOT_SPECIFIED;
     }
     return $display_langcodes;
   }
-  elseif ($definitions[$field_name]->isFieldConfigurable()) {
+  else {
     return $translatable ? $langcode : Language::LANGCODE_NOT_SPECIFIED;
   }
 }

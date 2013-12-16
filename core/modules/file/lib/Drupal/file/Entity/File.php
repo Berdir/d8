@@ -233,7 +233,7 @@ class File extends ContentEntityBase implements FileInterface {
     $fields['uid'] = FieldDefinition::create('entity_reference')
       ->setLabel(t('User ID'))
       ->setDescription(t('The user ID of the file.'))
-      ->setFieldSetting('target_type', 'user');
+      ->setSetting('target_type', 'user');
 
     $fields['filename'] = FieldDefinition::create('string')
       ->setLabel(t('Filename'))
@@ -247,8 +247,7 @@ class File extends ContentEntityBase implements FileInterface {
       ->setLabel(t('File MIME type'))
       ->setDescription(t("The file's MIME type."));
 
-    // @todo Convert to an integer field in https://drupal.org/node/2149877.
-    $fields['filesize'] = FieldDefinition::create('boolean')
+    $fields['filesize'] = FieldDefinition::create('integer')
       ->setLabel(t('File size'))
       ->setDescription(t('The size of the file in bytes.'));
 

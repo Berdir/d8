@@ -43,7 +43,7 @@ class EntityTranslationTest extends EntityLanguageTestBase {
   protected function _testEntityLanguageMethods($entity_type) {
     $entity = entity_create($entity_type, array(
       'name' => 'test',
-      'user_id' => $GLOBALS['user']->id(),
+      'user_id' => $this->container->get('current_user')->id(),
     ));
     $this->assertEqual($entity->language()->id, Language::LANGCODE_NOT_SPECIFIED, format_string('%entity_type: Entity language not specified.', array('%entity_type' => $entity_type)));
     $this->assertFalse($entity->getTranslationLanguages(FALSE), format_string('%entity_type: No translations are available', array('%entity_type' => $entity_type)));
@@ -515,17 +515,17 @@ class EntityTranslationTest extends EntityLanguageTestBase {
     $this->state->set('entity_test.field_definitions.translatable', array('name' => FALSE));
     $this->entityManager->clearCachedFieldDefinitions();
     $definitions = $this->entityManager->getFieldDefinitions($entity_type);
-    $this->assertFalse($definitions['name']->isFieldTranslatable(), 'Field translatability can be disabled programmatically.');
+    $this->assertFalse($definitions['name']->isTranslatable(), 'Field translatability can be disabled programmatically.');
 
     $this->state->set('entity_test.field_definitions.translatable', array('name' => TRUE));
     $this->entityManager->clearCachedFieldDefinitions();
     $definitions = $this->entityManager->getFieldDefinitions($entity_type);
-    $this->assertTrue($definitions['name']->isFieldTranslatable(), 'Field translatability can be enabled programmatically.');
+    $this->assertTrue($definitions['name']->isTranslatable(), 'Field translatability can be enabled programmatically.');
 
     // Check that field translatability is disabled by default.
     $base_field_definitions = EntityTestMulRev::baseFieldDefinitions($entity_type);
     $this->assertTrue(!isset($base_field_definitions['id']->translatable), 'Translatability for the <em>id</em> field is not defined.');
-    $this->assertFalse($definitions['id']->isFieldTranslatable(), 'Field translatability is disabled by default.');
+    $this->assertFalse($definitions['id']->isTranslatable(), 'Field translatability is disabled by default.');
 
     // Check that entity ids and langcode fields cannot be translatable.
     foreach (array('id', 'uuid', 'revision_id', 'type', 'langcode') as $name) {

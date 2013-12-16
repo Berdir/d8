@@ -65,7 +65,7 @@ abstract class FieldItemBase extends Map implements FieldItemInterface {
    *   The array of settings.
    */
   protected function getFieldSettings() {
-    return $this->getFieldDefinition()->getFieldSettings();
+    return $this->getFieldDefinition()->getSettings();
   }
 
   /**
@@ -78,7 +78,7 @@ abstract class FieldItemBase extends Map implements FieldItemInterface {
    *   The setting value.
    */
   protected function getFieldSetting($setting_name) {
-    return $this->getFieldDefinition()->getFieldSetting($setting_name);
+    return $this->getFieldDefinition()->getSetting($setting_name);
   }
 
   /**
@@ -210,5 +210,12 @@ abstract class FieldItemBase extends Map implements FieldItemInterface {
    * {@inheritdoc}
    */
   public function deleteRevision() { }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getMainPropertyName() {
+    return 'value';
+  }
 
 }

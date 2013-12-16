@@ -10,6 +10,8 @@ namespace Drupal\migrate\Annotation;
 use Drupal\Component\Annotation\Plugin;
 
 /**
+ * Defines a migration process plugin annotation object.
+ *
  * @Annotation
  */
 class MigrateProcessPlugin extends Plugin {

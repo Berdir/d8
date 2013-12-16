@@ -326,9 +326,10 @@ class MigrateExecutable {
       $multiple = FALSE;
       foreach ($plugins as $plugin) {
         $definition = $plugin->getPluginDefinition();
-        // If the definition is for a single  but the pipeline contains
-        // multiple values and the next plugin does not handle that iself
-        // then iterate over the values and transform them invidually.
+        // Many plugins expect a scalar value but the current value of the
+        // pipeline might be multiple scalars (this is set by the previous
+        // plugin) and in this case the current value needs to be iterated
+        // and each scalar separately transformed.
         if ($multiple && !$definition['handle_multiples']) {
           $new_value = array();
           if (!is_array($value)) {

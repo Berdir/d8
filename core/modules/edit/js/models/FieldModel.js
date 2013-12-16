@@ -20,6 +20,10 @@ Drupal.edit.FieldModel = Backbone.Model.extend({
     // A field ID, of the form
     // "<entity type>/<id>/<field name>/<language>/<view mode>", e.g.
     // "node/1/field_tags/und/full".
+    fieldID: null,
+    // The unique ID of this field within its entity instance on the page, of
+    // the form "<entity type>/<id>/<field name>/<language>/<view mode>[entity instance ID]",
+    // e.g. "node/1/field_tags/und/full[0]".
     id: null,
     // A Drupal.edit.EntityModel. Its "fields" attribute, which is a
     // FieldCollection, is automatically updated to include this FieldModel.
@@ -40,7 +44,7 @@ Drupal.edit.FieldModel = Backbone.Model.extend({
     // states in which the field is still changed.
     isChanged: false,
     // Is tracked by the EntityModel, is mirrored here solely for decorative
-    // purposes: so that EditorDecorationView.renderChanged() can react to it.
+    // purposes: so that FieldDecorationView.renderChanged() can react to it.
     inTempStore: false,
     // The full HTML representation of this field (with the element that has
     // the data-edit-field-id as the outer element). Used to propagate changes
@@ -107,7 +111,7 @@ Drupal.edit.FieldModel = Backbone.Model.extend({
    *   An entity ID: a string of the format `<entity type>/<id>`.
    */
   getEntityID: function () {
-    return this.id.split('/').slice(0, 2).join('/');
+    return this.get('fieldID').split('/').slice(0, 2).join('/');
   }
 
 }, {

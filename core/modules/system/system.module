@@ -123,8 +123,7 @@ function system_help($path, $arg) {
       }
       break;
     case 'admin/config/development/maintenance':
-      global $user;
-      if ($user->id() == 1) {
+      if (\Drupal::currentUser()->id() == 1) {
         return '<p>' . t('Use maintenance mode when making major updates, particularly if the updates could disrupt visitors or the update process. Examples include upgrading, importing or exporting content, modifying a theme, modifying content types, and making backups.') . '</p>';
       }
       break;
@@ -182,9 +181,6 @@ function system_theme() {
     'system_admin_index' => array(
       'variables' => array('menu_items' => NULL),
       'file' => 'system.admin.inc',
-    ),
-    'system_powered_by' => array(
-      'variables' => array(),
     ),
     'system_compact_link' => array(
       'variables' => array(),
@@ -1091,7 +1087,7 @@ function system_library_info() {
     'title' => 'Drupal autocomplete',
     'version' => \Drupal::VERSION,
     'js' => array(
-      'core/misc/autocomplete.js' => array('group' => JS_DEFAULT),
+      'core/misc/autocomplete.js' => array('group' => JS_LIBRARY, 'weight' => -1),
     ),
     'dependencies' => array(
       array('system', 'jquery'),
@@ -2120,16 +2116,26 @@ function system_filetransfer_info() {
 
 /**
  * Implements hook_page_build().
+ *
+ * @see template_preprocess_maintenance_page()
  */
 function system_page_build(&$page) {
-  // Note: ensure the same CSS is loaded in _drupal_maintenance_theme().
+  // Ensure the same CSS is loaded in template_preprocess_maintenance_page().
   $page['#attached']['library'][] = array('system', 'normalize');
   $path = drupal_get_path('module', 'system');
   // Adjust the weights to load these early.
-  $page['#attached']['css'][$path . '/css/system.module.css'] = array('weight' => CSS_COMPONENT - 10, 'every_page' => TRUE);
-  $page['#attached']['css'][$path . '/css/system.theme.css'] = array('weight' => CSS_SKIN - 10, 'every_page' => TRUE);
+  $page['#attached']['css'][$path . '/css/system.module.css'] = array(
+    'weight' => CSS_COMPONENT - 10,
+    'every_page' => TRUE,
+  );
+  $page['#attached']['css'][$path . '/css/system.theme.css'] = array(
+    'weight' => CSS_SKIN - 10,
+    'every_page' => TRUE,
+  );
   if (path_is_admin(current_path())) {
-    $page['#attached']['css'][$path . '/css/system.admin.css'] = array('weight' => CSS_COMPONENT - 10);
+    $page['#attached']['css'][$path . '/css/system.admin.css'] = array(
+      'weight' => CSS_COMPONENT - 10,
+    );
   }
 }
 
@@ -2190,7 +2196,7 @@ function system_user_login($account) {
  * Add the time zone field to the user edit and register forms.
  */
 function system_user_timezone(&$form, &$form_state) {
-  global $user;
+  $user = \Drupal::currentUser();
 
   $account = $form_state['controller']->getEntity();
   $form['timezone'] = array(
@@ -2737,15 +2743,6 @@ function system_time_zones($blank = NULL) {
   // Sort the translated time zones alphabetically.
   asort($zones);
   return $zones;
-}
-
-/**
- * Returns HTML for the Powered by Drupal text.
- *
- * @ingroup themeable
- */
-function theme_system_powered_by() {
-  return '<span>' . t('Powered by <a href="@poweredby">Drupal</a>', array('@poweredby' => 'http://drupal.org')) . '</span>';
 }
 
 /**

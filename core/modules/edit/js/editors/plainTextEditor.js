@@ -2,6 +2,7 @@
  * @file
  * contentEditable-based in-place editor for plain text content.
  */
+
 (function ($, _, Drupal) {
 
 "use strict";
@@ -22,8 +23,9 @@ Drupal.edit.editors.plain_text = Drupal.edit.EditorView.extend({
 
     // Store the original value of this field. Necessary for reverting changes.
     var $textElement;
-    if (this.$el.is(':has(.field-item)')) {
-      $textElement = this.$textElement = this.$el.find('.field-item:first');
+    var $fieldItems = this.$el.find('.field-item');
+    if ($fieldItems.length) {
+      $textElement = this.$textElement = $fieldItems.eq(0);
     }
     else {
       $textElement = this.$textElement = this.$el;
@@ -60,7 +62,7 @@ Drupal.edit.editors.plain_text = Drupal.edit.EditorView.extend({
         break;
       case 'candidate':
         if (from !== 'inactive') {
-          this.$textElement.removeAttr('contentEditable');
+          this.$textElement.removeAttr('contenteditable');
         }
         if (from === 'invalid') {
           this.removeValidationErrors();
@@ -76,7 +78,7 @@ Drupal.edit.editors.plain_text = Drupal.edit.EditorView.extend({
         });
         break;
       case 'active':
-        this.$textElement.attr('contentEditable', 'true');
+        this.$textElement.attr('contenteditable', 'true');
         break;
       case 'changed':
         break;
