@@ -12,6 +12,7 @@ use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\entity_reference\Annotation\EntityReferenceSelection;
 use Drupal\entity_reference\Plugin\entity_reference\selection\SelectionBase;
+use Drupal\Component\Utility\String;
 
 /**
  * Provides specific access control for the taxonomy_term entity type.
@@ -67,7 +68,7 @@ class TermSelection extends SelectionBase {
       if ($vocabulary = entity_load('taxonomy_vocabulary', $bundle)) {
         if ($terms = taxonomy_get_tree($vocabulary->id(), 0)) {
           foreach ($terms as $term) {
-            $options[$vocabulary->id()][$term->id()] = str_repeat('-', $term->depth) . check_plain($term->name);
+            $options[$vocabulary->id()][$term->id()] = str_repeat('-', $term->depth) . String::checkPlain($term->getName());
           }
         }
       }

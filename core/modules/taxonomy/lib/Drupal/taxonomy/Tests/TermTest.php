@@ -8,6 +8,7 @@
 namespace Drupal\taxonomy\Tests;
 
 use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Component\Utility\String;
 
 /**
  * Tests for taxonomy term functions.
@@ -243,15 +244,15 @@ class TermTest extends TaxonomyTestBase {
   function testTermAutocompletion() {
     // Add a term with a slash in the name.
     $first_term = $this->createTerm($this->vocabulary);
-    $first_term->name = '10/16/2011';
+    $first_term->setName('10/16/2011');
     $first_term->save();
     // Add another term that differs after the slash character.
     $second_term = $this->createTerm($this->vocabulary);
-    $second_term->name = '10/17/2011';
+    $second_term->setName('10/17/2011');
     $second_term->save();
     // Add another term that has both a comma and a slash character.
     $third_term = $this->createTerm($this->vocabulary);
-    $third_term->name = 'term with, a comma and / a slash';
+    $third_term->setName('term with, a comma and / a slash');
     $third_term->save();
 
     // Try to autocomplete a term name that matches both terms.

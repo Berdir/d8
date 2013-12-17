@@ -15,4 +15,99 @@ use Drupal\Core\Entity\EntityChangedInterface;
  */
 interface TermInterface extends ContentEntityInterface, EntityChangedInterface {
 
+  /**
+   * Gets the term's description.
+   *
+   * @return string
+   *   The term description.
+   */
+  public function getDescription();
+
+  /**
+   * Sets the term's description.
+   *
+   * @param string $description
+   *   The term's description.
+   *
+   * @return \Drupal\taxonomy\TermInterface
+   *   The modified taxonomy term.
+   */
+  public function setDescription($description);
+
+  /**
+   * Gets the text format name for the term's description.
+   *
+   * @return string
+   *   The text format name.
+   */
+  public function getFormat();
+
+  /**
+   * Sets the text format name for the term's description.
+   *
+   * @param string $format
+   *   The term's decription text format.
+   *
+   * @return \Drupal\taxonomy\TermInterface
+   *   The modified taxonomy term.
+   */
+  public function setFormat($format);
+
+  /**
+   * Gets the name of the term.
+   *
+   * @return string
+   *   The name of the term.
+   */
+  public function getName();
+
+  /**
+   * Sets the name of the term.
+   *
+   * @param int $name
+   *   The term's name.
+   *
+   * @return \Drupal\taxonomy\TermInterface
+   *   The modified taxonomy term.
+   */
+  public function setName($name);
+
+  /**
+   * Gets the weight of this term.
+   *
+   * @return int
+   *   The weight of the term.
+   */
+  public function getWeight();
+
+  /**
+   * Gets the weight of this term.
+   *
+   * @param int $weight
+   *   The term's weight.
+   *
+   * @return \Drupal\taxonomy\TermInterface
+   *   The modified taxonomy term.
+   */
+  public function setWeight($weight);
+
+  /**
+   * Get the taxonomy vocabulary id this term belongs to.
+   *
+   * @return int
+   *   The id of the vocabulary.
+   */
+  public function getVocabularyId();
+
+  /**
+   * Set the taxonomy vocabulary id this term belongs to.
+   *
+   * @param int $vocabulary_id
+   *   A vocabulary id.
+   *
+   * @return \Drupal\taxonomy\TermInterface
+   *   The modified taxonomy term.
+   */
+  public function setVocabularyId($vocabulary_id);
+
 }

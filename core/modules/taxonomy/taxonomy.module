@@ -12,6 +12,7 @@ use Drupal\node\Entity\Node;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\taxonomy\VocabularyInterface;
+use Drupal\Component\Utility\String;
 
 /**
  * Denotes that no term in the vocabulary has a parent.
@@ -391,7 +392,7 @@ function template_preprocess_taxonomy_term(&$variables) {
   $uri = $term->uri();
   $variables['url']  = url($uri['path'], $uri['options']);
   // We use name here because that is what appears in the UI.
-  $variables['name'] = check_plain($term->label());
+  $variables['name'] = String::checkPlain($term->label());
   $variables['page'] = $variables['view_mode'] == 'full' && taxonomy_term_is_page($term);
 
   // Helpful $content variable for templates.

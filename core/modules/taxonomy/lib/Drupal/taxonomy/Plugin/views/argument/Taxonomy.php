@@ -9,6 +9,7 @@ namespace Drupal\taxonomy\Plugin\views\argument;
 
 use Drupal\views\Plugin\views\argument\Numeric;
 use Drupal\Component\Annotation\PluginID;
+use Drupal\Component\Utility\String;
 
 /**
  * Argument handler for basic taxonomy tid.
@@ -27,7 +28,7 @@ class Taxonomy extends Numeric {
     if ($this->argument) {
       $term = entity_load('taxonomy_term', $this->argument);
       if (!empty($term)) {
-        return check_plain($term->label());
+        return String::checkPlain($term->label());
       }
     }
     // TODO review text

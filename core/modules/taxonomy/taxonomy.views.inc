@@ -7,6 +7,7 @@
 
 use Drupal\Core\Entity\FieldableDatabaseStorageController;
 use Drupal\field\FieldInterface;
+use Drupal\Component\Utility\String;
 
 /**
  * Implements hook_views_data().
@@ -486,7 +487,7 @@ function views_taxonomy_set_breadcrumb(&$breadcrumb, &$argument) {
       $args[$argument->position] = $parent->id();
       $path = $argument->view->getUrl($args);
     }
-    $breadcrumb[$path] = check_plain($parent->label());
+    $breadcrumb[$path] = String::checkPlain($parent->label());
   }
 }
 
