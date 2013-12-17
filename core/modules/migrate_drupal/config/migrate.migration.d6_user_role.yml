@@ -26,7 +26,7 @@ process:
     -
       plugin: extract
       source: permissions
-      indexes:
+      index:
         - perm
     # the pipeline is now array(array('perm1', 'perm2'))
     - plugin: flatten

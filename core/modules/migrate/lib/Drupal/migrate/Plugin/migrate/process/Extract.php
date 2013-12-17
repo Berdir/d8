@@ -31,9 +31,9 @@ class Extract extends ProcessPluginBase {
     if (!is_array($value)) {
       throw new MigrateException('Input should be an array.');
     }
-    $new_value = NestedArray::getValue($value, $this->configuration['indexes'], $key_exists);
+    $new_value = NestedArray::getValue($value, $this->configuration['index'], $key_exists);
     if (!$key_exists) {
-      throw new MigrateException('Array indexes missing, extraction failed.');
+      throw new MigrateException('Array index missing, extraction failed.');
     }
     return $new_value;
   }
