@@ -29,7 +29,7 @@ interface TermInterface extends ContentEntityInterface, EntityChangedInterface {
    * @param string $description
    *   The term's description.
    *
-   * @return \Drupal\taxonomy\TermInterface
+   * @return static
    *   The modified taxonomy term.
    */
   public function setDescription($description);
@@ -48,7 +48,7 @@ interface TermInterface extends ContentEntityInterface, EntityChangedInterface {
    * @param string $format
    *   The term's decription text format.
    *
-   * @return \Drupal\taxonomy\TermInterface
+   * @return static
    *   The modified taxonomy term.
    */
   public function setFormat($format);
@@ -67,7 +67,7 @@ interface TermInterface extends ContentEntityInterface, EntityChangedInterface {
    * @param int $name
    *   The term's name.
    *
-   * @return \Drupal\taxonomy\TermInterface
+   * @return static
    *   The modified taxonomy term.
    */
   public function setName($name);
@@ -86,7 +86,7 @@ interface TermInterface extends ContentEntityInterface, EntityChangedInterface {
    * @param int $weight
    *   The term's weight.
    *
-   * @return \Drupal\taxonomy\TermInterface
+   * @return static
    *   The modified taxonomy term.
    */
   public function setWeight($weight);
@@ -105,7 +105,7 @@ interface TermInterface extends ContentEntityInterface, EntityChangedInterface {
    * @param int $vocabulary_id
    *   A vocabulary id.
    *
-   * @return \Drupal\taxonomy\TermInterface
+   * @return static
    *   The modified taxonomy term.
    */
   public function setVocabularyId($vocabulary_id);
