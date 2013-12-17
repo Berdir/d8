@@ -11,6 +11,7 @@ use Drupal\migrate\Plugin\migrate\process\Extract;
 /**
  * Tests the extract plugin.
  *
+ * @see \Drupal\migrate\Plugin\migrate\process\Extract
  * @group Drupal
  * @group migrate
  */
