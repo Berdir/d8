@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Tests\Drupal6ContactSettings.
+ * Contains \Drupal\migrate_drupal\Tests\Dump\Drupal6ContactSettings.
  */
 
 namespace Drupal\migrate_drupal\Tests\Dump;

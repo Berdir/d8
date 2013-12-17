@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\migrate_drupal\Tests\Dump\Drupal6BookSettings.
+ * Contains \Drupal\migrate_drupal\Tests\Dump\Drupal6MenuSettings.
  */
 
 namespace Drupal\migrate_drupal\Tests\Dump;
@@ -10,15 +10,14 @@ namespace Drupal\migrate_drupal\Tests\Dump;
 use Drupal\Core\Database\Connection;
 
 /**
- * Database dump for testing book.settings.yml migration.
+ * Database dump for testing menu.settings.yml migration.
  */
-class Drupal6BookSettings {
+class Drupal6MenuSettings {
 
   /**
    * Sample database schema and values.
    *
    * @param \Drupal\Core\Database\Connection $database
-   *   The database connection.
    */
   public static function load(Connection $database) {
     $database->schema()->createTable('variable', array(
@@ -39,7 +38,7 @@ class Drupal6BookSettings {
       'primary key' => array(
         'name',
       ),
-      'module' => 'book',
+      'module' => 'system',
       'name' => 'variable',
     ));
     $database->insert('variable')->fields(array(
@@ -47,16 +46,16 @@ class Drupal6BookSettings {
       'value',
     ))
     ->values(array(
-      'name' => 'book_allowed_types',
-      'value' => 'a:1:{i:0;s:4:"book";}',
+      'name' => 'menu_primary_links_source',
+      'value' => 's:13:"primary-links";',
     ))
     ->values(array(
-      'name' => 'book_block_mode',
-      'value' => 's:9:"all pages";',
+      'name' => 'menu_secondary_links_source',
+      'value' => 's:15:"secondary-links";',
     ))
     ->values(array(
-      'name' => 'book_child_type',
-      'value' => 's:4:"book";',
+      'name' => 'menu_override_parent_selector',
+      'value' => 'b:0;',
     ))
     ->execute();
   }

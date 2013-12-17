@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Tests\Drupal6SyslogSettings.
+ * Contains \Drupal\migrate_drupal\Tests\Dump\Drupal6SyslogSettings.
  */
 
 namespace Drupal\migrate_drupal\Tests\Dump;

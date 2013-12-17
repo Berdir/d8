@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\migrate_drupal\Tests\Dump\Drupal6BookSettings.
+ * Contains \Drupal\migrate\Tests\Drupal6SearchSettings.
  */
 
 namespace Drupal\migrate_drupal\Tests\Dump;
@@ -10,15 +10,15 @@ namespace Drupal\migrate_drupal\Tests\Dump;
 use Drupal\Core\Database\Connection;
 
 /**
- * Database dump for testing book.settings.yml migration.
+ * Database dump for testing forum.site.yml migration.
  */
-class Drupal6BookSettings {
+class Drupal6SearchSettings {
 
   /**
-   * Sample database schema and values.
+   * Mock the database schema and values.
    *
    * @param \Drupal\Core\Database\Connection $database
-   *   The database connection.
+   *   The mocked database connection.
    */
   public static function load(Connection $database) {
     $database->schema()->createTable('variable', array(
@@ -39,7 +39,7 @@ class Drupal6BookSettings {
       'primary key' => array(
         'name',
       ),
-      'module' => 'book',
+      'module' => 'forum',
       'name' => 'variable',
     ));
     $database->insert('variable')->fields(array(
@@ -47,16 +47,37 @@ class Drupal6BookSettings {
       'value',
     ))
     ->values(array(
-      'name' => 'book_allowed_types',
-      'value' => 'a:1:{i:0;s:4:"book";}',
+      'name' => 'minimum_word_size',
+      'value' => 's:1:"3";',
     ))
     ->values(array(
-      'name' => 'book_block_mode',
-      'value' => 's:9:"all pages";',
+      'name' => 'overlap_cjk',
+      'value' => 'i:1;',
     ))
     ->values(array(
-      'name' => 'book_child_type',
-      'value' => 's:4:"book";',
+      'name' => 'search_cron_limit',
+      'value' => 's:3:"100";',
+    ))
+    ->values(array(
+      'name' => 'search_tag_weights',
+      'value' => serialize(array(
+        'h1' => 25,
+        'h2' => 18,
+        'h3' => 15,
+        'h4' => 12,
+        'h5' => 9,
+        'h6' => 6,
+        'u' => 3,
+        'b' => 3,
+        'i' => 3,
+        'strong' => 3,
+        'em' => 3,
+        'a' => 10,
+      )),
+    ))
+    ->values(array(
+      'name' => 'search_and_or_limit',
+      'value' => 'i:7;',
     ))
     ->execute();
   }

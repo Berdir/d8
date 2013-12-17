@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Tests\Drupal6SystemRss.
+ * Contains \Drupal\migrate_drupal\Tests\Dump\Drupal6SystemRss.
  */
 
 namespace Drupal\migrate_drupal\Tests\Dump;
