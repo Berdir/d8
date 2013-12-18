@@ -275,8 +275,8 @@ class CommentAttributesTest extends CommentTestBase {
     $this->assertTrue($graph->hasProperty($comment_uri, 'http://purl.org/rss/1.0/modules/content/encoded', $expected_value), 'Comment body found in RDF output (content:encoded).');
 
     // The comment author can be a registered user or an anonymous user.
-    if ($comment->uid->value > 0) {
-      $author_uri = url('user/' . $comment->uid->value, array('absolute' => TRUE));
+    if ($comment->getAuthorId() > 0) {
+      $author_uri = url('user/' . $comment->getAuthorId(), array('absolute' => TRUE));
       // Comment relation to author.
       $expected_value = array(
         'type' => 'uri',
@@ -304,7 +304,7 @@ class CommentAttributesTest extends CommentTestBase {
     $this->assertTrue($graph->hasProperty($author_uri, 'http://xmlns.com/foaf/0.1/name', $expected_value), 'Comment author name found in RDF output (foaf:name).');
 
     // Comment author homepage (only for anonymous authors).
-    if ($comment->uid->value == 0) {
+    if ($comment->getAuthorId() == 0) {
       $expected_value = array(
         'type' => 'uri',
         'value' => 'http://example.org/',

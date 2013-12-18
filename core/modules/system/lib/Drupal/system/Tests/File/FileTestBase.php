@@ -37,7 +37,7 @@ abstract class FileTestBase extends WebTestBase {
    */
   function assertFileUnchanged(FileInterface $before, FileInterface $after) {
     $this->assertEqual($before->id(), $after->id(), t('File id is the same: %file1 == %file2.', array('%file1' => $before->id(), '%file2' => $after->id())), 'File unchanged');
-    $this->assertEqual($before->getOwner()->id(), $after->getOwner()->id(), t('File owner is the same: %file1 == %file2.', array('%file1' => $before->getOwner()->id(), '%file2' => $after->getOwner()->id())), 'File unchanged');
+    $this->assertEqual($before->getAuthorId(), $after->getAuthorId(), t('File owner is the same: %file1 == %file2.', array('%file1' => $before->getAuthorId(), '%file2' => $after->getAuthorId())), 'File unchanged');
     $this->assertEqual($before->getFilename(), $after->getFilename(), t('File name is the same: %file1 == %file2.', array('%file1' => $before->getFilename(), '%file2' => $after->getFilename())), 'File unchanged');
     $this->assertEqual($before->getFileUri(), $after->getFileUri(), t('File path is the same: %file1 == %file2.', array('%file1' => $before->getFileUri(), '%file2' => $after->getFileUri())), 'File unchanged');
     $this->assertEqual($before->getMimeType(), $after->getMimeType(), t('File MIME type is the same: %file1 == %file2.', array('%file1' => $before->getMimeType(), '%file2' => $after->getMimeType())), 'File unchanged');

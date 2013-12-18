@@ -99,7 +99,7 @@ class CommentViewBuilder extends EntityViewBuilder implements EntityViewBuilderI
     // Pre-load associated users into cache to leverage multiple loading.
     $uids = array();
     foreach ($entities as $entity) {
-      $uids[] = $entity->uid->target_id;
+      $uids[] = $entity->getAuthorId();
     }
     $this->entityManager->getStorageController('user')->loadMultiple(array_unique($uids));
 

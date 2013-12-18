@@ -625,7 +625,7 @@ function file_file_download($uri, $field_type = 'file') {
   // temporary files where the host entity has not yet been saved (for example,
   // an image preview on a node/add form) in which case, allow download by the
   // file's owner.
-  if (empty($references) && ($file->isPermanent() || $file->getOwner()->id() != $user->id())) {
+  if (empty($references) && ($file->isPermanent() || $file->getAuthorId() != $user->id())) {
     return;
   }
 
@@ -1041,7 +1041,7 @@ function file_tokens($type, $tokens, array $data = array(), array $options = arr
           break;
 
         case 'owner':
-          $name = $file->getOwner()->label();
+          $name = $file->getAuthor()->label();
           $replacements[$original] = $sanitize ? check_plain($name) : $name;
           break;
       }
@@ -1051,8 +1051,8 @@ function file_tokens($type, $tokens, array $data = array(), array $options = arr
       $replacements += $token_service->generate('date', $date_tokens, array('date' => $file->getChangedTime()), $options);
     }
 
-    if (($owner_tokens = $token_service->findWithPrefix($tokens, 'owner')) && $file->getOwner()) {
-      $replacements += $token_service->generate('user', $owner_tokens, array('user' => $file->getOwner()), $options);
+    if (($owner_tokens = $token_service->findWithPrefix($tokens, 'owner')) && $file->getAuthor()) {
+      $replacements += $token_service->generate('user', $owner_tokens, array('user' => $file->getAuthor()), $options);
     }
   }
 

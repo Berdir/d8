@@ -120,15 +120,31 @@ class File extends ContentEntityBase implements FileInterface {
   /**
    * {@inheritdoc}
    */
-  public function getOwner() {
+  public function getAuthor() {
     return $this->get('uid')->entity;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setOwner(UserInterface $user) {
-    return $this->get('uid')->entity = $user;
+  public function getAuthorId() {
+    return $this->get('uid')->target_id;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setAuthorId($uid) {
+    $this->set('uid', $uid);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setAuthor(UserInterface $account) {
+    $this->set('uid', $account->id());
+    return $this;
   }
 
   /**

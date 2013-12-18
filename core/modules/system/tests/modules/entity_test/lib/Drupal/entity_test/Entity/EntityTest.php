@@ -12,7 +12,9 @@ use Drupal\Core\Entity\Annotation\EntityType;
 use Drupal\Core\Annotation\Translation;
 use Drupal\Core\Field\FieldDefinition;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
+use Drupal\user\EntityAuthorInterface;
 use Drupal\Core\Language\Language;
+use Drupal\user\UserInterface;
 
 /**
  * Defines the test entity class.
@@ -46,7 +48,7 @@ use Drupal\Core\Language\Language;
  *   }
  * )
  */
-class EntityTest extends ContentEntityBase {
+class EntityTest extends ContentEntityBase implements EntityAuthorInterface {
 
   /**
    * The entity ID.
@@ -159,6 +161,36 @@ class EntityTest extends ContentEntityBase {
       ->setTranslatable(TRUE);
 
     return $fields;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getAuthor() {
+    return $this->get('user_id')->entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getAuthorId() {
+    return $this->get('user_id')->target_id;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setAuthorId($uid) {
+    $this->set('user_id', $uid);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setAuthor(UserInterface $account) {
+    $this->set('user_id', $account->id());
+    return $this;
   }
 
 }

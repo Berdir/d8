@@ -15,6 +15,7 @@ use Drupal\Core\Entity\EntityStorageControllerInterface;
 use Drupal\Core\Field\FieldDefinition;
 use Drupal\Core\Language\Language;
 use Drupal\Core\TypedData\DataDefinition;
+use Drupal\user\UserInterface;
 
 /**
  * Defines the comment entity class.
@@ -288,7 +289,7 @@ class Comment extends ContentEntityBase implements CommentInterface {
       }
       // We test the value with '===' because we need to modify anonymous
       // users as well.
-      if ($this->uid->target_id === \Drupal::currentUser()->id() && \Drupal::currentUser()->isAuthenticated()) {
+      if ($this->getAuthorId() === \Drupal::currentUser()->id() && \Drupal::currentUser()->isAuthenticated()) {
         $this->name->value = \Drupal::currentUser()->getUsername();
       }
       // Add the values which aren't passed into the function.
@@ -460,6 +461,36 @@ class Comment extends ContentEntityBase implements CommentInterface {
     if (empty($values['field_id']) && !empty($values['field_name']) && !empty($values['entity_type'])) {
       $values['field_id'] = $values['entity_type'] . '__' . $values['field_name'];
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getAuthor() {
+    return $this->get('uid')->entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getAuthorId() {
+    return $this->get('uid')->target_id;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setAuthorId($uid) {
+    $this->set('uid', $uid);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setAuthor(UserInterface $account) {
+    $this->set('uid', $account->id());
+    return $this;
   }
 
 }

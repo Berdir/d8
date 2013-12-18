@@ -88,7 +88,7 @@ class DefaultViewRecentComments extends ViewTestBase {
         'entity_type' => 'node',
         'entity_id' => $this->node->id(),
       ));
-      $comment->uid->target_id = 0;
+      $comment->setAuthorId(0);
       $comment->subject->value = 'Test comment ' . $i;
       $comment->comment_body->value = 'Test body ' . $i;
       $comment->comment_body->format = 'full_html';

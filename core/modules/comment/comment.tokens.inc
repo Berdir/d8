@@ -142,13 +142,13 @@ function comment_tokens($type, $tokens, array $data = array(), array $options = 
           break;
 
         case 'name':
-          $name = ($comment->uid->target_id == 0) ? \Drupal::config('user.settings')->get('anonymous') : $comment->name->value;
+          $name = ($comment->getAuthorId() == 0) ? \Drupal::config('user.settings')->get('anonymous') : $comment->name->value;
           $replacements[$original] = $sanitize ? filter_xss($name) : $name;
           break;
 
         case 'mail':
-          if ($comment->uid->target_id != 0) {
-            $mail = $comment->uid->entity->getEmail();
+          if ($comment->getAuthorId() != 0) {
+            $mail = $comment->getAuthor()->getEmail();
           }
           else {
             $mail = $comment->mail->value;
@@ -244,7 +244,7 @@ function comment_tokens($type, $tokens, array $data = array(), array $options = 
       $replacements += $token_service->generate('comment', $parent_tokens, array('comment' => $parent), $options);
     }
 
-    if (($author_tokens = $token_service->findwithPrefix($tokens, 'author')) && $account = $comment->uid->entity) {
+    if (($author_tokens = $token_service->findwithPrefix($tokens, 'author')) && $account = $comment->getAuthor()) {
       $replacements += $token_service->generate('user', $author_tokens, array('user' => $account), $options);
     }
   }

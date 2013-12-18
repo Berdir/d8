@@ -212,7 +212,7 @@ class CommentFormController extends ContentEntityFormController {
     // Used for conditional validation of author fields.
     $form['is_anonymous'] = array(
       '#type' => 'value',
-      '#value' => ($comment->id() ? !$comment->uid->target_id : $this->currentUser->isAnonymous()),
+      '#value' => ($comment->id() ? !$comment->getAuthorId() : $this->currentUser->isAnonymous()),
     );
 
     // Add internal comment properties.
@@ -319,7 +319,7 @@ class CommentFormController extends ContentEntityFormController {
     // @todo Too fragile. Should be prepared and stored in comment_form()
     // already.
     if (!$comment->is_anonymous && !empty($comment->name->value) && ($account = user_load_by_name($comment->name->value))) {
-      $comment->uid->target_id = $account->id();
+      $comment->setAuthorId($account->id());
     }
     // If the comment was posted by an anonymous user and no author name was
     // required, use "Anonymous" by default.

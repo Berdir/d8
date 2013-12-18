@@ -13,6 +13,7 @@ use Drupal\Core\Field\FieldDefinition;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\node\NodeInterface;
+use Drupal\user\UserInterface;
 
 /**
  * Defines the node entity class.
@@ -310,6 +311,14 @@ class Node extends ContentEntityBase implements NodeInterface {
    */
   public function setAuthorId($uid) {
     $this->set('uid', $uid);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setAuthor(UserInterface $account) {
+    $this->set('uid', $account->id());
     return $this;
   }
 

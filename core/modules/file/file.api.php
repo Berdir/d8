@@ -113,9 +113,9 @@ function hook_file_insert(Drupal\file\FileInterface $file) {
  */
 function hook_file_update(Drupal\file\FileInterface $file) {
   // Make sure that the file name starts with the owner's user name.
-  if (strpos($file->getFilename(), $file->getOwner()->name) !== 0) {
+  if (strpos($file->getFilename(), $file->getAuthor()->name) !== 0) {
     $old_filename = $file->getFilename();
-    $file->setFilename($file->getOwner()->name . '_' . $file->getFilename());
+    $file->setFilename($file->getAuthor()->name . '_' . $file->getFilename());
     $file->save();
 
     watchdog('file', t('%source has been renamed to %destination', array('%source' => $old_filename, '%destination' => $file->getFilename())));
@@ -134,8 +134,8 @@ function hook_file_update(Drupal\file\FileInterface $file) {
  */
 function hook_file_copy(Drupal\file\FileInterface $file, Drupal\file\FileInterface $source) {
   // Make sure that the file name starts with the owner's user name.
-  if (strpos($file->getFilename(), $file->getOwner()->name) !== 0) {
-    $file->setFilename($file->getOwner()->name . '_' . $file->getFilename());
+  if (strpos($file->getFilename(), $file->getAuthor()->name) !== 0) {
+    $file->setFilename($file->getAuthor()->name . '_' . $file->getFilename());
     $file->save();
 
     watchdog('file', t('Copied file %source has been renamed to %destination', array('%source' => $source->filename, '%destination' => $file->getFilename())));
@@ -154,8 +154,8 @@ function hook_file_copy(Drupal\file\FileInterface $file, Drupal\file\FileInterfa
  */
 function hook_file_move(Drupal\file\FileInterface $file, Drupal\file\FileInterface $source) {
   // Make sure that the file name starts with the owner's user name.
-  if (strpos($file->getFilename(), $file->getOwner()->name) !== 0) {
-    $file->setFilename($file->getOwner()->name . '_' . $file->getFilename());
+  if (strpos($file->getFilename(), $file->getAuthor()->name) !== 0) {
+    $file->setFilename($file->getAuthor()->name . '_' . $file->getFilename());
     $file->save();
 
     watchdog('file', t('Moved file %source has been renamed to %destination', array('%source' => $source->filename, '%destination' => $file->getFilename())));
