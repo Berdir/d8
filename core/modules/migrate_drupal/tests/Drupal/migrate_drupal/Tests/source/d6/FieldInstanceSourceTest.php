@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Tests\D6FieldInstanceSourceTest.
+ * Contains \Drupal\migrate\Tests\source\d6\FieldInstanceSourceTest.
  */
 
 namespace Drupal\migrate_drupal\Tests;
@@ -14,7 +14,7 @@ use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
  *
  * @group migrate_drupal
  */
-class D6FieldInstanceSourceTest extends MigrateSqlSourceTestCase {
+class FieldInstanceSourceTest extends MigrateSqlSourceTestCase {
 
   // The plugin system is not working during unit testing so the source plugin
   // class needs to be manually specified.

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Tests\D6CommentSourceTestWithHighwater.
+ * Contains \Drupal\migrate\Tests\source\d6\CommentSourceTestWithHighwater.
  */
 
 namespace Drupal\migrate_drupal\Tests;
@@ -14,7 +14,7 @@ use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
  *
  * @group migrate_drupal
  */
-class D6CommentSourceWithHighwaterTest extends D6CommentSourceTest {
+class CommentSourceWithHighwaterTest extends CommentSourceTest {
 
   /**
    * {@inheritdoc}

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Tests\D6ContactCategorySourceTest.
+ * Contains \Drupal\migrate\Tests\source\d6\ContactCategorySourceTest.
  */
 
 namespace Drupal\migrate_drupal\Tests;
@@ -14,7 +14,7 @@ use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
  *
  * @group migrate_drupal
  */
-class D6ContactCategorySourceTest extends MigrateSqlSourceTestCase {
+class ContactCategorySourceTest extends MigrateSqlSourceTestCase {
 
   const PLUGIN_CLASS = 'Drupal\migrate_drupal\Plugin\migrate\source\d6\ContactCategory';
 

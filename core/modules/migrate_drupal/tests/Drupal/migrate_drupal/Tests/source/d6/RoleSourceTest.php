@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Tests\D6RoleSourceTest.
+ * Contains \Drupal\migrate\Tests\source\d6\RoleSourceTest.
  */
 
 namespace Drupal\migrate_drupal\Tests;
@@ -14,7 +14,7 @@ use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
  *
  * @group migrate_drupal
  */
-class D6RoleSourceTest extends MigrateSqlSourceTestCase {
+class RoleSourceTest extends MigrateSqlSourceTestCase {
 
   // The plugin system is not working during unit testing so the source plugin
   // class needs to be manually specified.

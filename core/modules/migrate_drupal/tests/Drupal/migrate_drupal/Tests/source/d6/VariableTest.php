@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Tests\D6VariableSourceTest.
+ * Contains \Drupal\migrate\Tests\source\d6\VariableSourceTest.
  */
 
 namespace Drupal\migrate_drupal\Tests;
@@ -13,7 +13,7 @@ use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
  * @group migrate_drupal
  * @group Drupal
  */
-class D6VariableTest extends MigrateSqlSourceTestCase {
+class VariableTest extends MigrateSqlSourceTestCase {
 
   const PLUGIN_CLASS = 'Drupal\migrate_drupal\Plugin\migrate\source\d6\Variable';
 

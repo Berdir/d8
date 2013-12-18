@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Tests\D6MenuSourceTest.
+ * Contains \Drupal\migrate\Tests\source\d6\CommentSourceTest.
  */
 
 namespace Drupal\migrate_drupal\Tests;
@@ -10,15 +10,15 @@ namespace Drupal\migrate_drupal\Tests;
 use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
 
 /**
- * Tests menu migration from D6 to D8.
+ * Tests comment migration from D6 to D8.
  *
  * @group migrate_drupal
  */
-class D6MenuSourceTest extends MigrateSqlSourceTestCase {
+class CommentSourceTest extends MigrateSqlSourceTestCase {
 
   // The plugin system is not working during unit testing so the source plugin
   // class needs to be manually specified.
-  const PLUGIN_CLASS = 'Drupal\migrate_drupal\Plugin\migrate\source\d6\Menu';
+  const PLUGIN_CLASS = 'Drupal\migrate_drupal\Plugin\migrate\source\d6\Comment';
 
   // The fake Migration configuration entity.
   protected $migrationConfiguration = array(
@@ -29,18 +29,18 @@ class D6MenuSourceTest extends MigrateSqlSourceTestCase {
     // This needs to be the identifier of the actual key: cid for comment, nid
     // for node and so on.
     'source' => array(
-      'plugin' => 'drupal6_menu',
+      'plugin' => 'drupal6_comment',
     ),
     'sourceIds' => array(
-      'menu_name' => array(
+      'cid' => array(
         // This is where the field schema would go but for now we need to
         // specify the table alias for the key. Most likely this will be the
         // same as BASE_ALIAS.
-        'alias' => 'm',
+        'alias' => 'c',
       ),
     ),
     'destinationIds' => array(
-      'menu_name' => array(
+      'cid' => array(
         // This is where the field schema would go.
       ),
     ),
@@ -50,14 +50,38 @@ class D6MenuSourceTest extends MigrateSqlSourceTestCase {
 
   protected $expectedResults = array(
     array(
-      'menu_name' => 'menu-name-1',
-      'title' => 'menu custom value 1',
-      'description' => 'menu custom description value 1',
+      'cid' => 1,
+      'pid' => 0,
+      'nid' => 2,
+      'uid' => 3,
+      'subject' => 'subject value 1',
+      'comment' => 'comment value 1',
+      'hostname' => 'hostname value 1',
+      'timestamp' => 1382255613,
+      'status' => 1,
+      'thread' => '',
+      'name' => '',
+      'mail' => '',
+      'homepage' => '',
+      'format' => 'testformat1',
+      'type' => 'article',
     ),
     array(
-      'menu_name' => 'menu-name-2',
-      'title' => 'menu custom value 2',
-      'description' => 'menu custom description value 2',
+      'cid' => 2,
+      'pid' => 1,
+      'nid' => 3,
+      'uid' => 4,
+      'subject' => 'subject value 2',
+      'comment' => 'comment value 2',
+      'hostname' => 'hostname value 2',
+      'timestamp' => 1382255662,
+      'status' => 1,
+      'thread' => '',
+      'name' => '',
+      'mail' => '',
+      'homepage' => '',
+      'format' => 'testformat2',
+      'type' => 'page',
     ),
   );
 
@@ -66,19 +90,19 @@ class D6MenuSourceTest extends MigrateSqlSourceTestCase {
    */
   public static function getInfo() {
     return array(
-      'name' => 'D6 menu source functionality',
-      'description' => 'Tests D6 menu source plugin.',
+      'name' => 'D6 comment source functionality',
+      'description' => 'Tests D6 comment source plugin.',
       'group' => 'Migrate Drupal',
     );
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function setUp() {
-    // This array stores the database.
     foreach ($this->expectedResults as $k => $row) {
-      $this->databaseContents['menu_custom'][$k] = $row;
+      // This array stores the database.
+      $this->databaseContents['node'][$k]['nid'] = $row['nid'];
+      $this->databaseContents['node'][$k]['type'] = $row['type'];
+      unset($row['type']);
+      $this->databaseContents['comments'][$k] = $row;
     }
     parent::setUp();
   }
@@ -89,9 +113,9 @@ namespace Drupal\migrate_drupal\Tests\source\d6;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\migrate_drupal\Plugin\migrate\source\d6\Menu;
+use Drupal\migrate_drupal\Plugin\migrate\source\d6\Comment;
 
-class TestMenu extends Menu {
+class TestComment extends Comment {
   function setDatabase(Connection $database) {
     $this->database = $database;
   }

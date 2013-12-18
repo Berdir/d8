@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Tests\D6BoxesSourceTest.
+ * Contains \Drupal\migrate\Tests\source\d6\MenuSourceTest.
  */
 
 namespace Drupal\migrate_drupal\Tests;
@@ -10,16 +10,15 @@ namespace Drupal\migrate_drupal\Tests;
 use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
 
 /**
- * Tests Boxes migration from D6 to D8.
+ * Tests menu migration from D6 to D8.
  *
  * @group migrate_drupal
- * @group Drupal
  */
-class D6BoxSourceTest extends MigrateSqlSourceTestCase {
+class MenuSourceTest extends MigrateSqlSourceTestCase {
 
   // The plugin system is not working during unit testing so the source plugin
   // class needs to be manually specified.
-  const PLUGIN_CLASS = 'Drupal\migrate_drupal\Plugin\migrate\source\d6\Box';
+  const PLUGIN_CLASS = 'Drupal\migrate_drupal\Plugin\migrate\source\d6\Menu';
 
   // The fake Migration configuration entity.
   protected $migrationConfiguration = array(
@@ -27,64 +26,61 @@ class D6BoxSourceTest extends MigrateSqlSourceTestCase {
     'id' => 'test',
     // Leave it empty for now.
     'idlist' => array(),
-    'source' => array(
-      'plugin' => 'drupal6_boxes',
-    ),
     // This needs to be the identifier of the actual key: cid for comment, nid
     // for node and so on.
+    'source' => array(
+      'plugin' => 'drupal6_menu',
+    ),
     'sourceIds' => array(
-      // Box (block) ID.
-      'bid' => array(
+      'menu_name' => array(
         // This is where the field schema would go but for now we need to
         // specify the table alias for the key. Most likely this will be the
         // same as BASE_ALIAS.
-        'alias' => 'b',
+        'alias' => 'm',
       ),
     ),
     'destinationIds' => array(
-      'entity_id' => array(
+      'menu_name' => array(
         // This is where the field schema would go.
       ),
-      'deleted' => array(),
-      'delta' => array(),
-      'langcode' => array(),
     ),
   );
 
   // We need to set up the database contents; it's easier to do that below.
-  // These are sample result queries.
+
   protected $expectedResults = array(
     array(
-      'bid' => 1,
-      'body' => '<p>I made some custom content.</p>',
-      'info' => 'Static Block',
-      'format' => 1,
+      'menu_name' => 'menu-name-1',
+      'title' => 'menu custom value 1',
+      'description' => 'menu custom description value 1',
     ),
     array(
-      'bid' => 2,
-      'body' => '<p>I made some more custom content.</p>',
-      'info' => 'Test Content',
-      'format' => 1,
+      'menu_name' => 'menu-name-2',
+      'title' => 'menu custom value 2',
+      'description' => 'menu custom description value 2',
     ),
   );
-
-  /**
-   * Prepopulate contents with results.
-   */
-  public function setUp() {
-    $this->databaseContents['boxes'] = $this->expectedResults;
-    parent::setUp();
-  }
 
   /**
    * {@inheritdoc}
    */
   public static function getInfo() {
     return array(
-      'name' => 'D6 block boxes source functionality',
-      'description' => 'Tests D6 block boxes source plugin.',
+      'name' => 'D6 menu source functionality',
+      'description' => 'Tests D6 menu source plugin.',
       'group' => 'Migrate Drupal',
     );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp() {
+    // This array stores the database.
+    foreach ($this->expectedResults as $k => $row) {
+      $this->databaseContents['menu_custom'][$k] = $row;
+    }
+    parent::setUp();
   }
 
 }
@@ -93,9 +89,9 @@ namespace Drupal\migrate_drupal\Tests\source\d6;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\migrate_drupal\Plugin\migrate\source\d6\Box;
+use Drupal\migrate_drupal\Plugin\migrate\source\d6\Menu;
 
-class TestBox extends Box {
+class TestMenu extends Menu {
   function setDatabase(Connection $database) {
     $this->database = $database;
   }

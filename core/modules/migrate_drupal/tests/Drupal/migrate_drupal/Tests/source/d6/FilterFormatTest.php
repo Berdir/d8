@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Tests\D6FilterFormatsTest.
+ * Contains \Drupal\migrate\Tests\source\d6\FilterFormatsTest.
  */
 
 namespace Drupal\migrate_drupal\Tests;
@@ -15,7 +15,7 @@ use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
  * @group migrate_drupal
  * @group Drupal
  */
-class D6FilterFormatTest extends MigrateSqlSourceTestCase {
+class FilterFormatTest extends MigrateSqlSourceTestCase {
 
   // The plugin system is not working during unit testing so the source plugin
   // class needs to be manually specified.

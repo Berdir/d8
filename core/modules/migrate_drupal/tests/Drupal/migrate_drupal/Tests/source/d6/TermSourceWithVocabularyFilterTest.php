@@ -13,7 +13,7 @@ use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
  *
  * @group migrate_drupal
  */
-class D6TermSourceWithVocabularyFilterTest extends D6TermSourceTest {
+class TermSourceWithVocabularyFilterTest extends TermSourceTest {
 
   /**
    * {@inheritdoc}

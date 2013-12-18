@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Tests\D6ActionSourceTest.
+ * Contains \Drupal\migrate\Tests\source\d6\BoxesSourceTest.
  */
 
 namespace Drupal\migrate_drupal\Tests;
@@ -10,15 +10,16 @@ namespace Drupal\migrate_drupal\Tests;
 use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
 
 /**
- * Tests action migration from D6 to D8.
+ * Tests Boxes migration from D6 to D8.
  *
  * @group migrate_drupal
+ * @group Drupal
  */
-class D6ActionSourceTest extends MigrateSqlSourceTestCase {
+class BoxSourceTest extends MigrateSqlSourceTestCase {
 
   // The plugin system is not working during unit testing so the source plugin
   // class needs to be manually specified.
-  const PLUGIN_CLASS = 'Drupal\migrate_drupal\Plugin\migrate\source\d6\Action';
+  const PLUGIN_CLASS = 'Drupal\migrate_drupal\Plugin\migrate\source\d6\Box';
 
   // The fake Migration configuration entity.
   protected $migrationConfiguration = array(
@@ -27,72 +28,63 @@ class D6ActionSourceTest extends MigrateSqlSourceTestCase {
     // Leave it empty for now.
     'idlist' => array(),
     'source' => array(
-      'plugin' => 'drupal6_action',
+      'plugin' => 'drupal6_boxes',
     ),
     // This needs to be the identifier of the actual key: cid for comment, nid
     // for node and so on.
     'sourceIds' => array(
-      'aid' => array(
+      // Box (block) ID.
+      'bid' => array(
         // This is where the field schema would go but for now we need to
         // specify the table alias for the key. Most likely this will be the
         // same as BASE_ALIAS.
-        'alias' => 'a',
+        'alias' => 'b',
       ),
     ),
     'destinationIds' => array(
-      'aid' => array(
+      'entity_id' => array(
         // This is where the field schema would go.
       ),
+      'deleted' => array(),
+      'delta' => array(),
+      'langcode' => array(),
     ),
   );
 
   // We need to set up the database contents; it's easier to do that below.
-
+  // These are sample result queries.
   protected $expectedResults = array(
     array(
-      'aid' => '1',
-      'type' => 'system',
-      'callback' => 'system_goto_action',
-      'parameters' => 'a:1:{s:3:"url";s:4:"node";}',
-      'description' => 'Redirect to node list page',
+      'bid' => 1,
+      'body' => '<p>I made some custom content.</p>',
+      'info' => 'Static Block',
+      'format' => 1,
     ),
     array(
-      'aid' => '2',
-      'type' => 'system',
-      'callback' => 'system_send_email_action',
-      'parameters' => 'a:3:{s:9:"recipient";s:7:"%author";s:7:"subject";s:4:"Test";s:7:"message";s:4:"Test',
-      'description' => 'Test notice email',
-    ),
-    array(
-      'aid' => 'comment_publish_action',
-      'type' => 'comment',
-      'callback' => 'comment_publish_action',
-      'parameters' => null,
-      'description' => null,
-    ),
-    array(
-      'aid' => 'node_publish_action',
-      'type' => 'comment',
-      'callback' => 'node_publish_action',
-      'parameters' => null,
-      'description' => null,
+      'bid' => 2,
+      'body' => '<p>I made some more custom content.</p>',
+      'info' => 'Test Content',
+      'format' => 1,
     ),
   );
+
+  /**
+   * Prepopulate contents with results.
+   */
+  public function setUp() {
+    $this->databaseContents['boxes'] = $this->expectedResults;
+    parent::setUp();
+  }
 
   /**
    * {@inheritdoc}
    */
   public static function getInfo() {
     return array(
-      'name' => 'D6 action source functionality',
-      'description' => 'Tests D6 actions source plugin.',
+      'name' => 'D6 block boxes source functionality',
+      'description' => 'Tests D6 block boxes source plugin.',
       'group' => 'Migrate Drupal',
     );
-  }
-
-  public function setUp() {
-    $this->databaseContents['actions'] = $this->expectedResults;
-    parent::setUp();
   }
 
 }
@@ -101,9 +93,9 @@ namespace Drupal\migrate_drupal\Tests\source\d6;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\migrate_drupal\Plugin\migrate\source\d6\Action;
+use Drupal\migrate_drupal\Plugin\migrate\source\d6\Box;
 
-class TestAction extends Action {
+class TestBox extends Box {
   function setDatabase(Connection $database) {
     $this->database = $database;
   }
