@@ -21,7 +21,7 @@ interface EntityAuthorInterface {
   public function getAuthor();
 
   /**
-   * Returns the entity author's user entity.
+   * Sets the entity author's user entity.
    *
    * @param \Drupal\user\UserInterface $account
    *   The author user entity.
