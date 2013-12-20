@@ -5,17 +5,23 @@
  * Contains \Drupal\migrate\Tests\ConfigDestinationTest.
  */
 
-namespace Drupal\migrate\Tests;
+namespace Drupal\migrate_drupal\Tests\destination;
 
 use Drupal\migrate\Plugin\migrate\destination\Config;
 use Drupal\Tests\UnitTestCase;
 
 /**
+ * Test the raw config destination.
  *
- * @group migrate
+ * @see \Drupal\migrate_drupal\Plugin\migrate\destination\Config
+ * @group Drupal
+ * @group migrate_drupal
  */
 class ConfigDestinationTest extends UnitTestCase {
 
+  /**
+   * Test the import method.
+   */
   public function testImport() {
     $source = array(
       'test' => 'x',

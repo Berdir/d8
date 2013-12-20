@@ -10,7 +10,7 @@ namespace Drupal\migrate\Tests;
 use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\Plugin\migrate\id_map\Sql;
 
-class TestSqlIdmap extends Sql {
+class TestSqlIdmap extends Sql implements \Iterator {
 
   function __construct($database, array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration) {
     $this->database = $database;
