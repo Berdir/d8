@@ -110,9 +110,8 @@ abstract class ContentTranslationTestBase extends WebTestBase {
    * Returns the translate permissions for the current entity and bundle.
    */
   protected function getTranslatePermission() {
-    $info = entity_get_info($this->entityType);
-    if (!empty($info['permission_granularity'])) {
-      return $info['permission_granularity'] == 'bundle' ? "translate {$this->bundle} {$this->entityType}" : "translate {$this->entityType}";
+    if (($info = entity_get_info($this->entityType)) && $info->getPermissionGranularity()) {
+      return $info->getPermissionGranularity() == 'bundle' ? "translate {$this->bundle} {$this->entityType}" : "translate {$this->entityType}";
     }
   }
 
@@ -207,8 +206,8 @@ abstract class ContentTranslationTestBase extends WebTestBase {
     $entity_values = $values;
     $entity_values['langcode'] = $langcode;
     $info = entity_get_info($this->entityType);
-    if (!empty($info['entity_keys']['bundle'])) {
-      $entity_values[$info['entity_keys']['bundle']] = $bundle_name ?: $this->bundle;
+    if ($info->hasKey('bundle')) {
+      $entity_values[$info->getKey('bundle')] = $bundle_name ?: $this->bundle;
     }
     $controller = $this->container->get('entity.manager')->getStorageController($this->entityType);
     if (!($controller instanceof FieldableDatabaseStorageController)) {

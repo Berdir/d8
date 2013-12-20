@@ -104,7 +104,7 @@ function entity_entity_bundle_rename($entity_type, $bundle_old, $bundle_new) {
   if ($bundle_old !== $bundle_new) {
     $ids = config_get_storage_names_with_prefix('entity.display.' . $entity_type . '.' . $bundle_old);
     foreach ($ids as $id) {
-      $id = ConfigStorageController::getIDFromConfigName($id, $entity_info['config_prefix']);
+      $id = ConfigStorageController::getIDFromConfigName($id, $entity_info->getConfigPrefix());
       $display = entity_load('entity_display', $id);
       $new_id = $entity_type . '.' . $bundle_new . '.' . $display->mode;
       $display->id = $new_id;
@@ -118,7 +118,7 @@ function entity_entity_bundle_rename($entity_type, $bundle_old, $bundle_new) {
   if ($bundle_old !== $bundle_new) {
     $ids = config_get_storage_names_with_prefix('entity.form_display.' . $entity_type . '.' . $bundle_old);
     foreach ($ids as $id) {
-      $id = ConfigStorageController::getIDFromConfigName($id, $entity_info['config_prefix']);
+      $id = ConfigStorageController::getIDFromConfigName($id, $entity_info->getConfigPrefix());
       $form_display = entity_load('entity_form_display', $id);
       $new_id = $entity_type . '.' . $bundle_new . '.' . $form_display->mode;
       $form_display->id = $new_id;
@@ -136,7 +136,7 @@ function entity_entity_bundle_delete($entity_type, $bundle) {
   $entity_info = entity_get_info('entity_display');
   $ids = config_get_storage_names_with_prefix('entity.display.' . $entity_type . '.' . $bundle);
   foreach ($ids as &$id) {
-    $id = ConfigStorageController::getIDFromConfigName($id, $entity_info['config_prefix']);
+    $id = ConfigStorageController::getIDFromConfigName($id, $entity_info->getConfigPrefix());
   }
   entity_delete_multiple('entity_display', $ids);
 
@@ -144,7 +144,7 @@ function entity_entity_bundle_delete($entity_type, $bundle) {
   $entity_info = entity_get_info('entity_form_display');
   $ids = config_get_storage_names_with_prefix('entity.form_display.' . $entity_type . '.' . $bundle);
   foreach ($ids as &$id) {
-    $id = ConfigStorageController::getIDFromConfigName($id, $entity_info['config_prefix']);
+    $id = ConfigStorageController::getIDFromConfigName($id, $entity_info->getConfigPrefix());
   }
   entity_delete_multiple('entity_form_display', $ids);
 }

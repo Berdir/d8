@@ -1,0 +1,2 @@
+aggregator_feed: Drupal\aggregator\Plugin\Core\Entity\Feed
+aggregator_item: Drupal\aggregator\Plugin\Core\Entity\Item

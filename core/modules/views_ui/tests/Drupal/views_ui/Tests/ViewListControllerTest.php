@@ -8,6 +8,7 @@
 namespace Drupal\views_ui\Tests;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Entity\EntityType;
 use Drupal\Tests\UnitTestCase;
 use Drupal\views\Entity\View;
 use Drupal\views\ViewExecutableFactory;
@@ -31,7 +32,7 @@ class ViewListControllerTest extends UnitTestCase {
     $storage_controller = $this->getMockBuilder('Drupal\views\ViewStorageController')
       ->disableOriginalConstructor()
       ->getMock();
-    $entity_info = array();
+    $entity_info = new EntityType(array());
     $display_manager = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
       ->disableOriginalConstructor()
       ->getMock();

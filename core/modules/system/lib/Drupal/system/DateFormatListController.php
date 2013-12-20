@@ -12,6 +12,7 @@ use Drupal\Core\Config\Entity\ConfigEntityListController;
 use Drupal\Core\Datetime\Date;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
+use Drupal\Core\Entity\EntityType;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -32,7 +33,7 @@ class DateFormatListController extends ConfigEntityListController {
    *
    * @param string $entity_type
    *   The type of entity to be listed.
-   * @param array $entity_info
+   * @param \Drupal\Core\Entity\EntityType $entity_info
    *   An array of entity info for the entity type.
    * @param \Drupal\Core\Entity\EntityStorageControllerInterface $storage
    *   The entity storage controller class.
@@ -41,7 +42,7 @@ class DateFormatListController extends ConfigEntityListController {
    * @param \Drupal\Core\Datetime\Date $date_service
    *   The date service.
    */
-  public function __construct($entity_type, array $entity_info, EntityStorageControllerInterface $storage, ModuleHandlerInterface $module_handler, Date $date_service) {
+  public function __construct($entity_type, EntityType $entity_info, EntityStorageControllerInterface $storage, ModuleHandlerInterface $module_handler, Date $date_service) {
     parent::__construct($entity_type, $entity_info, $storage, $module_handler);
 
     $this->dateService = $date_service;
@@ -50,7 +51,7 @@ class DateFormatListController extends ConfigEntityListController {
   /**
    * {@inheritdoc}
    */
-  public static function createInstance(ContainerInterface $container, $entity_type, array $entity_info) {
+  public static function createInstance(ContainerInterface $container, $entity_type, EntityType $entity_info) {
     return new static(
       $entity_type,
       $entity_info,

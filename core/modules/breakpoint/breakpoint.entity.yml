@@ -1,0 +1,2 @@
+breakpoint: Drupal\breakpoint\Plugin\Core\Entity\Breakpoint
+breakpoint_group: Drupal\breakpoint\Plugin\Core\Entity\BreakpointGroup

@@ -1,0 +1,2 @@
+field_entity: Drupal\field\Plugin\Core\Entity\Field
+field_instance: Drupal\field\Plugin\Core\Entity\FieldInstance

@@ -712,7 +712,7 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
     // Instantiate a new empty entity so default values will be populated in the
     // specified language.
     $info = $this->entityInfo();
-    $default_values = array($info['entity_keys']['bundle'] => $this->bundle, 'langcode' => $langcode);
+    $default_values = array($info->getKey('bundle') => $this->bundle, 'langcode' => $langcode);
     $entity = \Drupal::entityManager()
       ->getStorageController($this->entityType())
       ->create($default_values);
@@ -898,17 +898,16 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
 
     $duplicate = clone $this;
     $entity_info = $this->entityInfo();
-    $duplicate->{$entity_info['entity_keys']['id']}->value = NULL;
+    $duplicate->{$entity_info->getKey('id')}->value = NULL;
 
     // Check if the entity type supports UUIDs and generate a new one if so.
-    if (!empty($entity_info['entity_keys']['uuid'])) {
-      // @todo Inject the UUID service into the Entity class once possible.
-      $duplicate->{$entity_info['entity_keys']['uuid']}->value = \Drupal::service('uuid')->generate();
+    if ($entity_info->hasKey('uuid')) {
+      $duplicate->{$entity_info->getKey('uuid')}->applyDefaultValue();
     }
 
     // Check whether the entity type supports revisions and initialize it if so.
-    if (!empty($entity_info['entity_keys']['revision'])) {
-      $duplicate->{$entity_info['entity_keys']['revision']}->value = NULL;
+    if ($entity_info->hasKey('revision')) {
+      $duplicate->{$entity_info->getKey('revision')}->value = NULL;
     }
 
     return $duplicate;
@@ -954,11 +953,14 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
     if (!isset($langcode)) {
       $langcode = $this->activeLangcode;
     }
-    if (isset($entity_info['label_callback']) && function_exists($entity_info['label_callback'])) {
-      $label = $entity_info['label_callback']($this, $langcode);
+    if (($label_callback = $entity_info->getLabelCallback()) && function_exists($label_callback)) {
+      $label = $label_callback($this, $langcode);
     }
-    elseif (!empty($entity_info['entity_keys']['label']) && isset($this->{$entity_info['entity_keys']['label']})) {
-      $label = $this->{$entity_info['entity_keys']['label']}->value;
+    elseif ($entity_info->hasKey('label')) {
+      $label_key = $entity_info->getKey('label');
+      if (isset($this->{$label_key})) {
+        $label = $this->{$label_key}->value;
+      }
     }
     return $label;
   }

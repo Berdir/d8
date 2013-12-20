@@ -8,6 +8,7 @@
 namespace Drupal\Core\Entity;
 
 use Drupal\Core\Entity\EntityStorageControllerInterface;
+use Drupal\Core\Entity\EntityType;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -38,6 +39,6 @@ interface EntityControllerInterface {
    * @return static
    *   A new instance of the entity controller.
    */
-  public static function createInstance(ContainerInterface $container, $entity_type, array $entity_info);
+  public static function createInstance(ContainerInterface $container, $entity_type, EntityType $entity_info);
 
 }

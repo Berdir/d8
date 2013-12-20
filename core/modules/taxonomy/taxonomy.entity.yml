@@ -1,0 +1,2 @@
+taxonomy_term: Drupal\taxonomy\Plugin\Core\Entity\Term
+taxonomy_vocabulary: Drupal\taxonomy\Plugin\Core\Entity\Vocabulary

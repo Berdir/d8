@@ -190,5 +190,5 @@ function field_is_translatable($entity_type, FieldInterface $field) {
  */
 function field_has_translation_handler($entity_type, $handler = NULL) {
   $info = entity_get_info($entity_type);
-  return !empty($info['translatable']);
+  return $info->isTranslatable();
 }

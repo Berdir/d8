@@ -39,18 +39,18 @@ function views_ui_menu() {
  * Implements hook_entity_info().
  */
 function views_ui_entity_info(&$entity_info) {
-  $entity_info['view']['controllers'] += array(
-    'list' => 'Drupal\views_ui\ViewListController',
-    'form' => array(
-      'edit' => 'Drupal\views_ui\ViewEditFormController',
-      'add' => 'Drupal\views_ui\ViewAddFormController',
-      'preview' => 'Drupal\views_ui\ViewPreviewFormController',
-      'clone' => 'Drupal\views_ui\ViewCloneFormController',
-      'delete' => 'Drupal\views_ui\ViewDeleteFormController',
-      'break_lock' => 'Drupal\views_ui\Form\BreakLockForm',
-    ),
-  );
-  $entity_info['view']['links']['edit-form'] = 'views_ui.edit';
+  if (isset($entity_info['view'])) {
+    $controllers = $entity_info['view']->getController('form');
+    $controllers['edit'] = 'Drupal\views_ui\ViewEditFormController';
+    $controllers['add'] = 'Drupal\views_ui\ViewAddFormController';
+    $controllers['preview'] = 'Drupal\views_ui\ViewPreviewFormController';
+    $controllers['clone'] = 'Drupal\views_ui\ViewCloneFormController';
+    $controllers['delete'] = 'Drupal\views_ui\ViewDeleteFormController';
+    $controllers['break_lock'] = 'Drupal\views_ui\Form\BreakLockForm';
+    $entity_info['view']->setController('form', $controllers);
+    $entity_info['view']->setController('list', 'Drupal\views_ui\ViewListController');
+    $entity_info['view']['links']['edit-form'] = 'views_ui.edit';
+  }
 }
 
 /**

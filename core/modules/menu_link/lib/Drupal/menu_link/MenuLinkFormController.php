@@ -8,6 +8,7 @@
 namespace Drupal\menu_link;
 
 use Drupal\Core\Entity\EntityFormController;
+use Drupal\Core\Entity\EntityType;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Path\AliasManagerInterface;
 use Drupal\Core\Routing\UrlGenerator;

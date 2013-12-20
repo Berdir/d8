@@ -7,15 +7,12 @@
 
 namespace Drupal\node;
 
-use Drupal\Core\Database\Connection;
-use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Entity\EntityControllerInterface;
+use Drupal\Core\Entity\EntityType;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Entity\EntityAccessController;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\user\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -26,7 +23,7 @@ class NodeAccessController extends EntityAccessController implements NodeAccessC
   /**
    * The node grant storage.
    *
-   * @var \Drupal\node\NodeGrantStorageControllerInterface
+   * @var \Drupal\node\NodeGrantDatabaseStorageInterface
    */
   protected $grantStorage;
 
@@ -48,7 +45,7 @@ class NodeAccessController extends EntityAccessController implements NodeAccessC
   /**
    * {@inheritdoc}
    */
-  public static function createInstance(ContainerInterface $container, $entity_type, array $entity_info) {
+  public static function createInstance(ContainerInterface $container, $entity_type, EntityType $entity_info) {
     return new static(
       $entity_type,
       $entity_info,

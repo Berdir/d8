@@ -491,8 +491,8 @@ function field_extract_bundle($entity_type, $bundle) {
   }
 
   $info = entity_get_info($entity_type);
-  if (is_object($bundle) && isset($info['bundle_keys']['bundle']) && isset($bundle->{$info['bundle_keys']['bundle']})) {
-    return $bundle->{$info['bundle_keys']['bundle']};
+  if (is_object($bundle) && $info->getBundleKey('bundle') && isset($bundle->{$info->getBundleKey('bundle')})) {
+    return $bundle->{$info->getBundleKey('bundle')};
   }
 }
 
@@ -703,14 +703,14 @@ function theme_field($variables) {
 function _field_create_entity_from_ids($ids) {
   $id_properties = array();
   $info = entity_get_info($ids->entity_type);
-  if (isset($info['entity_keys']['id'])) {
-    $id_properties[$info['entity_keys']['id']] = $ids->entity_id;
+  if ($info->hasKey('id')) {
+    $id_properties[$info->getKey('id')] = $ids->entity_id;
   }
-  if (!empty($info['entity_keys']['revision']) && isset($ids->revision_id)) {
-    $id_properties[$info['entity_keys']['revision']] = $ids->revision_id;
+  if ($info->hasKey('revision') && isset($ids->revision_id)) {
+    $id_properties[$info->getKey('revision')] = $ids->revision_id;
   }
-  if (!empty($info['entity_keys']['bundle']) && isset($ids->bundle)) {
-    $id_properties[$info['entity_keys']['bundle']] = $ids->bundle;
+  if ($info->hasKey('bundle') && isset($ids->bundle)) {
+    $id_properties[$info->getKey('bundle')] = $ids->bundle;
   }
   return entity_create($ids->entity_type, $id_properties);
 }

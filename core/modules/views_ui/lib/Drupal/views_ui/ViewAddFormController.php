@@ -7,6 +7,9 @@
 
 namespace Drupal\views_ui;
 
+use Drupal\Core\Entity\EntityControllerInterface;
+use Drupal\Core\Entity\EntityType;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\views\Plugin\views\wizard\WizardPluginBase;
 use Drupal\views\Plugin\views\wizard\WizardException;
 use Drupal\views\Plugin\ViewsPluginManager;

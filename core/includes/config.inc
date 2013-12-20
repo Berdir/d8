@@ -203,7 +203,7 @@ function config_context_leave() {
  */
 function config_get_entity_type_by_name($name) {
   $entities = array_filter(entity_get_info(), function($entity_info) use ($name) {
-    return (isset($entity_info['config_prefix']) && strpos($name, $entity_info['config_prefix'] . '.') === 0);
+    return ($entity_info->getConfigPrefix() && strpos($name, $entity_info->getConfigPrefix() . '.') === 0);
   });
   return key($entities);
 }

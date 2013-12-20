@@ -1,0 +1,4 @@
+entity_display: Drupal\entity\Plugin\Core\Entity\EntityDisplay
+entity_form_display: Drupal\entity\Plugin\Core\Entity\EntityFormDisplay
+form_mode: Drupal\entity\Plugin\Core\Entity\EntityFormMode
+view_mode: Drupal\entity\Plugin\Core\Entity\EntityViewMode

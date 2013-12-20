@@ -1,0 +1,3 @@
+action: Drupal\system\Plugin\Core\Entity\Action
+menu: Drupal\system\Plugin\Core\Entity\Menu
+date_format: Drupal\system\Plugin\Core\Entity\DateFormat

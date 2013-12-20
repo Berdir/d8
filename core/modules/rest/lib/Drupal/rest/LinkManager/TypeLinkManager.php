@@ -83,7 +83,7 @@ class TypeLinkManager implements TypeLinkManagerInterface {
     $entity_info = entity_get_info();
     foreach (entity_get_bundles() as $entity_type => $bundles) {
       $entity_type_info = $entity_info[$entity_type];
-      $reflection = new \ReflectionClass($entity_type_info['class']);
+      $reflection = new \ReflectionClass($entity_type_info->getClass());
       // Only content entities are supported currently.
       // @todo Consider supporting config entities.
       if ($reflection->implementsInterface('\Drupal\Core\Config\Entity\ConfigEntityInterface')) {

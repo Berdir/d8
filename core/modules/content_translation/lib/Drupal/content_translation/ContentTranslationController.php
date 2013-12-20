@@ -8,6 +8,7 @@
 namespace Drupal\content_translation;
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityType;
 use Drupal\Core\Language\Language;
 
 /**
@@ -25,7 +26,7 @@ class ContentTranslationController implements ContentTranslationControllerInterf
   /**
    * The entity info of the entity being translated.
    *
-   * @var array
+   * @var \Drupal\Core\Entity\EntityType
    */
   protected $entityInfo;
 
@@ -34,10 +35,10 @@ class ContentTranslationController implements ContentTranslationControllerInterf
    *
    * @param string $entity_type
    *   The type of the entity being translated.
-   * @param array $entity_info
+   * @param \Drupal\Core\Entity\EntityType $entity_info
    *   The info array of the given entity type.
    */
-  public function __construct($entity_type, $entity_info) {
+  public function __construct($entity_type, EntityType $entity_info) {
     $this->entityType = $entity_type;
     $this->entityInfo = $entity_info;
   }
@@ -54,6 +55,38 @@ class ContentTranslationController implements ContentTranslationControllerInterf
   }
 
   /**
+<<<<<<< HEAD
+=======
+   * Implements ContentTranslationControllerInterface::getBasePath().
+   */
+  public function getBasePath(EntityInterface $entity) {
+    // @fixme How to replace this.
+    return $this->getPathInstance($this->entityInfo->getMenuBasePath(), $entity->id());
+  }
+
+  /**
+   * Implements ContentTranslationControllerInterface::getEditPath().
+   */
+  public function getEditPath(EntityInterface $entity) {
+    // @fixme How to replace this.
+    if ($menu_edit_path = $this->entityInfo->getMenuEditPath()) {
+      return $this->getPathInstance($menu_edit_path, $entity->id());
+    }
+    return FALSE;
+  }
+
+  /**
+   * Implements ContentTranslationControllerInterface::getViewPath().
+   */
+  public function getViewPath(EntityInterface $entity) {
+    // @fixme How to replace this.
+    if ($menu_view_path = $this->entityInfo->getMenuViewPath()) {
+      return $this->getPathInstance($menu_view_path, $entity->id());
+    }
+  }
+
+  /**
+>>>>>>> applied patch
    * Implements ContentTranslationControllerInterface::getTranslationAccess().
    */
   public function getTranslationAccess(EntityInterface $entity, $op) {
@@ -63,8 +96,8 @@ class ContentTranslationController implements ContentTranslationControllerInterf
     $translate_permission = TRUE;
     // If no permission granularity is defined this entity type does not need an
     // explicit translate permission.
-    if (!user_access('translate any entity') && !empty($info['permission_granularity'])) {
-      $translate_permission = user_access($info['permission_granularity'] == 'bundle' ? "translate {$entity->bundle()} {$entity->entityType()}" : "translate {$entity->entityType()}");
+    if (!user_access('translate any entity') && $info->getPermissionGranularity()) {
+      $translate_permission = user_access($info->getPermissionGranularity() == 'bundle' ? "translate {$entity->bundle()} {$entity->entityType()}" : "translate {$entity->entityType()}");
     }
     return $translate_permission && user_access("$op content translations");
   }

@@ -21,8 +21,52 @@ function field_test_entity_info() {
  */
 function field_test_entity_info_alter(&$entity_info) {
   foreach (field_test_entity_info_translatable() as $entity_type => $translatable) {
-    $entity_info[$entity_type]['translatable'] = $translatable;
+    if (isset($entity_info[$entity_type])) {
+      $entity_info[$entity_type]->setTranslatable($translatable);
+    }
   }
+}
+
+/**
+ * Implements hook_entity_view_mode_info_alter().
+ */
+function field_test_entity_view_mode_info_alter(&$view_modes) {
+  $entity_info = entity_get_info();
+  foreach ($entity_info as $entity_type => $info) {
+    if ($entity_info[$entity_type]->getModule() == 'field_test') {
+      $view_modes[$entity_type] = array(
+        'full' => array(
+          'label' => t('Full object'),
+          'status' => TRUE,
+        ),
+        'teaser' => array(
+          'label' => t('Teaser'),
+          'status' => TRUE,
+        ),
+      );
+    }
+  }
+}
+
+/**
+ * Implements hook_entity_bundle_info().
+ */
+function field_test_entity_bundle_info() {
+  $bundles = array();
+
+  $entity_info = entity_get_info();
+  foreach ($entity_info as $entity_type => $info) {
+    if ($info->getModule() == 'field_test') {
+      $bundles[$entity_type] = Drupal::state()->get('field_test_bundles') ?: array('test_bundle' => array('label' => 'Test Bundle'));
+    }
+  }
+
+  $bundles['test_entity_bundle']['test_entity_2'] = array('label' => 'Test entity 2');
+
+  $bundles['test_entity_bundle_key']['bundle1'] = array('label' => 'Bundle1');
+  $bundles['test_entity_bundle_key']['bundle2'] = array('label' => 'Bundle2');
+
+  return $bundles;
 }
 
 /**
@@ -30,9 +74,10 @@ function field_test_entity_info_alter(&$entity_info) {
  */
 function field_test_entity_info_translatable($entity_type = NULL, $translatable = NULL) {
   drupal_static_reset('field_has_translation_handler');
-  $stored_value = &drupal_static(__FUNCTION__, array());
+  $stored_value = \Drupal::state()->get('field_test.translatable_entity_types') ?: array();
   if (isset($entity_type)) {
     $stored_value[$entity_type] = $translatable;
+    \Drupal::state()->set('field_test.translatable_entity_types', $stored_value);
     entity_info_cache_clear();
   }
   return $stored_value;

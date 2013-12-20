@@ -10,6 +10,7 @@ namespace Drupal\menu_link;
 use Drupal\Component\Uuid\UuidInterface;
 use Drupal\Core\Entity\DatabaseStorageController;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityType;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Database\Connection;
 use Drupal\field\FieldInfo;
@@ -59,7 +60,7 @@ class MenuLinkStorageController extends DatabaseStorageController implements Men
    * @param \Symfony\Cmf\Component\Routing\RouteProviderInterface $route_provider
    *   The route provider service.
    */
-  public function __construct($entity_type, array $entity_info, Connection $database, UuidInterface $uuid_service, RouteProviderInterface $route_provider) {
+  public function __construct($entity_type, EntityType $entity_info, Connection $database, UuidInterface $uuid_service, RouteProviderInterface $route_provider) {
     parent::__construct($entity_type, $entity_info, $database, $uuid_service);
 
     $this->routeProvider = $route_provider;
@@ -84,7 +85,7 @@ class MenuLinkStorageController extends DatabaseStorageController implements Men
   /**
    * {@inheritdoc}
    */
-  public static function createInstance(ContainerInterface $container, $entity_type, array $entity_info) {
+  public static function createInstance(ContainerInterface $container, $entity_type, EntityType $entity_info) {
     return new static(
       $entity_type,
       $entity_info,
@@ -123,7 +124,7 @@ class MenuLinkStorageController extends DatabaseStorageController implements Men
       }
 
       if ($entity->isNew()) {
-        $entity->mlid = $this->database->insert($this->entityInfo['base_table'])->fields(array('menu_name' => 'tools'))->execute();
+        $entity->mlid = $this->database->insert($this->entityInfo->getBaseTable())->fields(array('menu_name' => 'tools'))->execute();
         $entity->enforceIsNew();
       }
 
@@ -139,7 +140,7 @@ class MenuLinkStorageController extends DatabaseStorageController implements Men
       // $entity may have additional keys left over from building a router entry.
       // The intersect removes the extra keys, allowing a meaningful comparison.
       if ($entity->isNew() || (array_intersect_key(get_object_vars($entity), get_object_vars($entity->original)) != get_object_vars($entity->original))) {
-        $return = drupal_write_record($this->entityInfo['base_table'], $entity, $this->idKey);
+        $return = drupal_write_record($this->entityInfo->getBaseTable(), $entity, $this->idKey);
 
         if ($return) {
           if (!$entity->isNew()) {
@@ -201,7 +202,7 @@ class MenuLinkStorageController extends DatabaseStorageController implements Men
       );
     $query_result = $query->execute();
 
-    if (!empty($this->entityInfo['class'])) {
+    if ($entity_class = $this->entityInfo->getClass()) {
       // We provide the necessary arguments for PDO to create objects of the
       // specified entity class.
       // @see \Drupal\Core\Entity\EntityInterface::__construct()
@@ -281,7 +282,7 @@ class MenuLinkStorageController extends DatabaseStorageController implements Men
    * {@inheritdoc}
    */
   public function moveChildren(EntityInterface $entity) {
-    $query = $this->database->update($this->entityInfo['base_table']);
+    $query = $this->database->update($this->entityInfo->getBaseTable());
 
     $query->fields(array('menu_name' => $entity->menu_name));
 

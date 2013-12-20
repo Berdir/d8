@@ -52,7 +52,7 @@ class FieldListController extends ConfigEntityListController {
    *
    * @param string $entity_type
    *   The type of entity to be listed.
-   * @param array $entity_info
+   * @param \Drupal\Core\Entity\EntityType $entity_info
    *   An array of entity info for the entity type.
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
    *   The entity manager.
@@ -63,7 +63,7 @@ class FieldListController extends ConfigEntityListController {
    * @param \Drupal\Core\Field\FieldTypePluginManager $field_type_manager
    *   The 'field type' plugin manager.
    */
-  public function __construct($entity_type, array $entity_info, EntityManagerInterface $entity_manager, ModuleHandlerInterface $module_handler, FieldTypePluginManager $field_type_manager) {
+  public function __construct($entity_type, EntityType $entity_info, EntityManagerInterface $entity_manager, ModuleHandlerInterface $module_handler, FieldTypePluginManager $field_type_manager) {
     parent::__construct($entity_type, $entity_info, $entity_manager->getStorageController($entity_type), $module_handler);
 
     $this->entityManager = $entity_manager;
@@ -75,7 +75,7 @@ class FieldListController extends ConfigEntityListController {
   /**
    * {@inheritdoc}
    */
-  public static function createInstance(ContainerInterface $container, $entity_type, array $entity_info) {
+  public static function createInstance(ContainerInterface $container, $entity_type, EntityType $entity_info) {
     return new static(
       $entity_type,
       $entity_info,

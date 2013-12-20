@@ -10,6 +10,8 @@ namespace Drupal\action;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Action\ActionManager;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
+use Drupal\Core\Entity\EntityType;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**

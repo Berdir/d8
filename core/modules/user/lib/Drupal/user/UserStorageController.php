@@ -9,6 +9,7 @@ namespace Drupal\user;
 
 use Drupal\Component\Uuid\UuidInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityType;
 use Drupal\Core\Password\PasswordInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\field\FieldInfo;
@@ -66,7 +67,7 @@ class UserStorageController extends FieldableDatabaseStorageController implement
   /**
    * {@inheritdoc}
    */
-  public static function createInstance(ContainerInterface $container, $entity_type, array $entity_info) {
+  public static function createInstance(ContainerInterface $container, $entity_type, EntityType $entity_info) {
     return new static(
       $entity_type,
       $entity_info,

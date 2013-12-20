@@ -8,6 +8,8 @@
 namespace Drupal\Core\Config\Entity;
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityType;
+use Drupal\Core\Entity\EntityControllerInterface;
 use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Entity\EntityStorageControllerBase;
 use Drupal\Core\Config\Config;
@@ -92,18 +94,11 @@ class ConfigStorageController extends EntityStorageControllerBase {
    * @param \Drupal\Component\Uuid\UuidInterface $uuid_service
    *   The UUID service.
    */
-  public function __construct($entity_type, array $entity_info, ConfigFactory $config_factory, StorageInterface $config_storage, QueryFactory $entity_query_factory, UuidInterface $uuid_service) {
+  public function __construct($entity_type, EntityType $entity_info, ConfigFactory $config_factory, StorageInterface $config_storage, QueryFactory $entity_query_factory, UuidInterface $uuid_service) {
     parent::__construct($entity_type, $entity_info);
 
-    $this->idKey = $this->entityInfo['entity_keys']['id'];
-
-    if (isset($this->entityInfo['entity_keys']['status'])) {
-      $this->statusKey = $this->entityInfo['entity_keys']['status'];
-    }
-    else {
-      $this->statusKey = FALSE;
-    }
-
+    $this->idKey = $this->entityInfo->getKey('id');
+    $this->statusKey = $this->entityInfo->getKey('status');
     $this->configFactory = $config_factory;
     $this->configStorage = $config_storage;
     $this->entityQueryFactory = $entity_query_factory;
@@ -113,7 +108,7 @@ class ConfigStorageController extends EntityStorageControllerBase {
   /**
    * {@inheritdoc}
    */
-  public static function createInstance(ContainerInterface $container, $entity_type, array $entity_info) {
+  public static function createInstance(ContainerInterface $container, $entity_type, EntityType $entity_info) {
     return new static(
       $entity_type,
       $entity_info,
@@ -221,7 +216,7 @@ class ConfigStorageController extends EntityStorageControllerBase {
    *   The full configuration prefix, for example 'views.view.'.
    */
   public function getConfigPrefix() {
-    return $this->entityInfo['config_prefix'] . '.';
+    return $this->entityInfo->getConfigPrefix() . '.';
   }
 
   /**
@@ -262,7 +257,7 @@ class ConfigStorageController extends EntityStorageControllerBase {
    *   A SelectQuery object for loading the entity.
    */
   protected function buildQuery($ids, $revision_id = FALSE) {
-    $config_class = $this->entityInfo['class'];
+    $config_class = $this->entityInfo->getClass();
     $prefix = $this->getConfigPrefix();
 
     // Get the names of the configuration entities we are going to load.
@@ -289,7 +284,7 @@ class ConfigStorageController extends EntityStorageControllerBase {
    * Implements Drupal\Core\Entity\EntityStorageControllerInterface::create().
    */
   public function create(array $values) {
-    $class = $this->entityInfo['class'];
+    $class = $this->entityInfo->getClass();
     $class::preCreate($this, $values);
 
     // Set default language to site default if not provided.
@@ -327,7 +322,7 @@ class ConfigStorageController extends EntityStorageControllerBase {
       return;
     }
 
-    $entity_class = $this->entityInfo['class'];
+    $entity_class = $this->entityInfo->getClass();
     $entity_class::preDelete($this, $entities);
     foreach ($entities as $entity) {
       $this->invokeHook('predelete', $entity);
@@ -471,7 +466,7 @@ class ConfigStorageController extends EntityStorageControllerBase {
    *   A configuration object containing the old configuration data.
    */
   public function importUpdate($name, Config $new_config, Config $old_config) {
-    $id = static::getIDFromConfigName($name, $this->entityInfo['config_prefix']);
+    $id = static::getIDFromConfigName($name, $this->entityInfo->getConfigPrefix());
     $entity = $this->load($id);
     $entity->setSyncing(TRUE);
     $entity->original = clone $entity;
@@ -502,7 +497,7 @@ class ConfigStorageController extends EntityStorageControllerBase {
    *   A configuration object containing the old configuration data.
    */
   public function importDelete($name, Config $new_config, Config $old_config) {
-    $id = static::getIDFromConfigName($name, $this->entityInfo['config_prefix']);
+    $id = static::getIDFromConfigName($name, $this->entityInfo->getConfigPrefix());
     $entity = $this->load($id);
     $entity->setSyncing(TRUE);
     $entity->delete();

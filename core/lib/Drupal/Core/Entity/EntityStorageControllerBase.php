@@ -38,7 +38,7 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
   /**
    * Array of information about the entity.
    *
-   * @var array
+   * @var \Drupal\Core\Entity\EntityType
    *
    * @see entity_get_info()
    */
@@ -65,14 +65,14 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
    *
    * @param string $entity_type
    *   The entity type for which the instance is created.
-   * @param array $entity_info
+   * @param \Drupal\Core\Entity\EntityType $entity_info
    *   An array of entity info for the entity type.
    */
   public function __construct($entity_type, $entity_info) {
     $this->entityType = $entity_type;
-    $this->entityInfo = $entity_info;
+    $this->entityInfo = clone $entity_info;
     // Check if the entity type supports static caching of loaded entities.
-    $this->cache = !empty($this->entityInfo['static_cache']);
+    $this->cache = $this->entityInfo->staticCacheable();
   }
 
   /**

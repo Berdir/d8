@@ -85,7 +85,7 @@ function _content_translation_form_language_content_settings_form_alter(array &$
 
       // Only show the checkbox to enable translation if the bundles in the
       // entity might have fields and if there are fields to translate.
-      if (!empty($entity_info['fieldable'])) {
+      if ($entity_info->fieldsCacheable()) {
         $fields = $entity_manager->getFieldDefinitions($entity_type, $bundle);
         if ($fields) {
           $form['settings'][$entity_type][$bundle]['translatable'] = array(

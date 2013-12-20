@@ -1,0 +1,2 @@
+user: Drupal\user\Plugin\Core\Entity\User
+user_role: Drupal\user\Plugin\Core\Entity\Role

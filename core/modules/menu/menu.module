@@ -96,16 +96,22 @@ function menu_menu() {
  * Implements hook_entity_info().
  */
 function menu_entity_info(&$entity_info) {
-  $entity_info['menu']['controllers']['list'] = 'Drupal\menu\MenuListController';
-  $entity_info['menu']['links']['edit-form'] = 'menu.menu_edit';
-  $entity_info['menu']['controllers']['form'] = array(
-    'add' => 'Drupal\menu\MenuFormController',
-    'edit' => 'Drupal\menu\MenuFormController',
-    'delete' => 'Drupal\menu\Form\MenuDeleteForm',
-  );
-
-  $entity_info['menu_link']['controllers']['form']['delete'] = 'Drupal\menu\Form\MenuLinkDeleteForm';
-  $entity_info['menu_link']['controllers']['form']['reset'] = 'Drupal\menu\Form\MenuLinkResetForm';
+  if (isset($entity_info['menu'])) {
+    $entity_info['menu']->setController('list', 'Drupal\menu\MenuListController');
+    $entity_info['menu']->setController('access', 'Drupal\menu\MenuAccessController');
+    $entity_info['menu']->setUriCallback('menu_uri');
+    $entity_info['menu']->links['edit-form'] = 'menu.menu_edit';
+    $controllers = $entity_info['menu']->getController('form');
+    $controllers['default'] = 'Drupal\menu\MenuFormController';
+    $controllers['delete'] = 'Drupal\menu\Form\MenuDeleteForm';
+    $entity_info['menu']->setController('form', $controllers);
+  }
+  if (isset($entity_info['menu_link'])) {
+    $controllers = $entity_info['menu_link']->getController('form');
+    $controllers['delete'] = 'Drupal\menu\Form\MenuLinkDeleteForm';
+    $controllers['reset'] = 'Drupal\menu\Form\MenuLinkResetForm';
+    $entity_info['menu_link']->setController('form', $controllers);
+  }
 }
 
 /**

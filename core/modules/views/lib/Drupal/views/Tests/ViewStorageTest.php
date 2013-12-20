@@ -7,6 +7,7 @@
 
 namespace Drupal\views\Tests;
 
+use Drupal\Core\Entity\EntityType;
 use Drupal\views\ViewStorageController;
 use Drupal\views\Entity\View;
 use Drupal\views\Plugin\views\display\Page;
@@ -76,7 +77,7 @@ class ViewStorageTest extends ViewUnitTestBase {
     $this->controller = $this->container->get('entity.manager')->getStorageController('view');
 
     // Confirm that an info array has been returned.
-    $this->assertTrue(!empty($this->info) && is_array($this->info), 'The View info array is loaded.');
+    $this->assertTrue($this->info instanceof EntityType, 'The View info array is loaded.');
 
     // Confirm we have the correct controller class.
     $this->assertTrue($this->controller instanceof ViewStorageController, 'The correct controller is loaded.');

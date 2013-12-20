@@ -1,0 +1,10 @@
+entity_test: Drupal\entity_test\Plugin\Core\Entity\EntityTest
+entity_test_cache: Drupal\entity_test\Plugin\Core\Entity\EntityTestCache
+entity_test_default_access: Drupal\entity_test\Plugin\Core\Entity\EntityTestDefaultAccess
+entity_test_label: Drupal\entity_test\Plugin\Core\Entity\EntityTestLabel
+entity_test_label_callback: Drupal\entity_test\Plugin\Core\Entity\EntityTestLabelCallback
+entity_test_mul: Drupal\entity_test\Plugin\Core\Entity\EntityTestMul
+entity_test_mulrev: Drupal\entity_test\Plugin\Core\Entity\EntityTestMulRev
+entity_test_no_label: Drupal\entity_test\Plugin\Core\Entity\EntityTestNoLabel
+entity_test_render: Drupal\entity_test\Plugin\Core\Entity\EntityTestRender
+entity_test_rev: Drupal\entity_test\Plugin\Core\Entity\EntityTestRev

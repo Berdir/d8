@@ -20,7 +20,7 @@ class CustomBlockController extends ControllerBase implements ContainerInjection
   /**
    * The entity manager.
    *
-   * @var \Drupal\Component\Plugin\PluginManagerInterface
+   * @var \Drupal\Core\Entity\EntityManager
    */
   protected $entityManager;
 
@@ -53,14 +53,14 @@ class CustomBlockController extends ControllerBase implements ContainerInjection
   /**
    * Constructs a CustomBlock object.
    *
-   * @param \Drupal\Component\Plugin\PluginManagerInterface $entity_manager
+   * @param \Drupal\Core\Entity\EntityManager $entity_manager
    *   The entity manager.
    * @param \Drupal\Core\Entity\EntityStorageControllerInterface $custom_block_storage
    *   The custom block storage controller.
    * @param \Drupal\Core\Entity\EntityStorageControllerInterface $custom_block_type_storage
    *   The custom block type storage controller.
    */
-  public function __construct(PluginManagerInterface $entity_manager, EntityStorageControllerInterface $custom_block_storage, EntityStorageControllerInterface $custom_block_type_storage) {
+  public function __construct(EntityManager $entity_manager, EntityStorageControllerInterface $custom_block_storage, EntityStorageControllerInterface $custom_block_type_storage) {
     $this->customBlockStorage = $custom_block_storage;
     $this->customBlockTypeStorage = $custom_block_type_storage;
     $this->entityManager = $entity_manager;

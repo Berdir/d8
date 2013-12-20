@@ -29,7 +29,7 @@ class Bundle extends InOperator {
   /**
    * The entity info for the entity type.
    *
-   * @var array
+   * @var \Drupal\Core\Entity\Annotation\EntityType
    */
   protected $entityInfo;
 
@@ -41,7 +41,7 @@ class Bundle extends InOperator {
 
     $this->entityType = $this->getEntityType();
     $this->entityInfo = entity_get_info($this->entityType);
-    $this->real_field = $this->entityInfo['entity_keys']['bundle'];
+    $this->real_field = $this->entityInfo->getKey('bundle');
   }
 
   /**
@@ -50,7 +50,7 @@ class Bundle extends InOperator {
   public function getValueOptions() {
     if (!isset($this->value_options)) {
       $types = entity_get_bundles($this->entityType);
-      $this->value_title = t('@entity types', array('@entity' => $this->entityInfo['label']));
+      $this->value_title = t('@entity types', array('@entity' => $this->entityInfo->getLabel()));
 
       $options = array();
       foreach ($types as $type => $info) {

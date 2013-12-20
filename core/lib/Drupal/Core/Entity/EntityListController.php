@@ -41,7 +41,7 @@ class EntityListController implements EntityListControllerInterface, EntityContr
   /**
    * The entity info array.
    *
-   * @var array
+   * @var \Drupal\Core\Entity\Annotation\EntityType
    *
    * @see entity_get_info()
    */
@@ -57,7 +57,7 @@ class EntityListController implements EntityListControllerInterface, EntityContr
   /**
    * {@inheritdoc}
    */
-  public static function createInstance(ContainerInterface $container, $entity_type, array $entity_info) {
+  public static function createInstance(ContainerInterface $container, $entity_type, EntityType $entity_info) {
     return new static(
       $entity_type,
       $entity_info,
@@ -71,14 +71,14 @@ class EntityListController implements EntityListControllerInterface, EntityContr
    *
    * @param string $entity_type
    *   The type of entity to be listed.
-   * @param array $entity_info
+   * @param \Drupal\Core\Entity\EntityType $entity_info
    *   An array of entity info for the entity type.
    * @param \Drupal\Core\Entity\EntityStorageControllerInterface $storage
    *   The entity storage controller class.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler to invoke hooks on.
    */
-  public function __construct($entity_type, array $entity_info, EntityStorageControllerInterface $storage, ModuleHandlerInterface $module_handler) {
+  public function __construct($entity_type, EntityType $entity_info, EntityStorageControllerInterface $storage, ModuleHandlerInterface $module_handler) {
     $this->entityType = $entity_type;
     $this->storage = $storage;
     $this->entityInfo = $entity_info;
@@ -204,7 +204,7 @@ class EntityListController implements EntityListControllerInterface, EntityContr
       '#header' => $this->buildHeader(),
       '#title' => $this->getTitle(),
       '#rows' => array(),
-      '#empty' => $this->t('There is no @label yet.', array('@label' => $this->entityInfo['label'])),
+      '#empty' => $this->t('There is no @label yet.', array('@label' => $this->entityInfo->getLabel()])),
     );
     foreach ($this->load() as $entity) {
       if ($row = $this->buildRow($entity)) {

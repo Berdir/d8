@@ -72,18 +72,18 @@ function field_ui_permission() {
   $permissions = array();
 
   foreach (entity_get_info() as $entity_type => $entity_info) {
-    if ($entity_info['fieldable']) {
+    if ($entity_info->fieldsCacheable()) {
       // Create a permission for each fieldable entity to manage
       // the fields and the display.
       $permissions['administer ' . $entity_type . ' fields'] = array(
-        'title' => t('%entity_label: Administer fields', array('%entity_label' => $entity_info['label'])),
+        'title' => t('%entity_label: Administer fields', array('%entity_label' => $entity_info->getLabel())),
         'restrict access' => TRUE,
       );
       $permissions['administer ' . $entity_type . ' form display'] = array(
-        'title' => t('%entity_label: Administer form display', array('%entity_label' => $entity_info['label']))
+        'title' => t('%entity_label: Administer form display', array('%entity_label' => $entity_info->getLabel()))
       );
       $permissions['administer ' . $entity_type . ' display'] = array(
-        'title' => t('%entity_label: Administer display', array('%entity_label' => $entity_info['label']))
+        'title' => t('%entity_label: Administer display', array('%entity_label' => $entity_info->getLabel())),
       );
     }
   }
@@ -163,8 +163,14 @@ function field_ui_element_info() {
  * Implements hook_entity_info().
  */
 function field_ui_entity_info(&$entity_info) {
-  $entity_info['field_instance']['controllers']['form']['delete'] = 'Drupal\field_ui\Form\FieldDeleteForm';
-  $entity_info['field_entity']['controllers']['list'] = 'Drupal\field_ui\FieldListController';
+  if (isset($entity_info['field_instance'])) {
+    $controllers = $entity_info['field_instance']->getController('form');
+    $controllers['delete'] = 'Drupal\field_ui\Form\FieldDeleteForm';
+    $entity_info['field_instance']->setController('form', $controllers);
+  }
+  if (isset($entity_info['field_entity'])) {
+    $entity_info['field_entity']->setController('list',  'Drupal\field_ui\FieldListController');
+  }
 }
 
 /**

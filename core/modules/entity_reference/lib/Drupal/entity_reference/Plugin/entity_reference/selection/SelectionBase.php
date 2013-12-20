@@ -67,7 +67,7 @@ class SelectionBase implements SelectionInterface {
       'auto_create' => FALSE,
     );
 
-    if (!empty($entity_info['entity_keys']['bundle'])) {
+    if ($entity_info->hasKey('bundle')) {
       $bundle_options = array();
       foreach ($bundles as $bundle_name => $bundle_info) {
         $bundle_options[$bundle_name] = $bundle_info['label'];
@@ -101,10 +101,10 @@ class SelectionBase implements SelectionInterface {
     }
 
     $target_type_info = \Drupal::entityManager()->getDefinition($target_type);
-    if (is_subclass_of($target_type_info['class'], '\Drupal\Core\Entity\ContentEntityInterface')) {
+    if (is_subclass_of($target_type_info->getClass(), '\Drupal\Core\Entity\ContentEntityInterface')) {
       // @todo Use Entity::getPropertyDefinitions() when all entity types are
       // converted to the new Field API.
-      $fields = drupal_map_assoc(drupal_schema_fields_sql($entity_info['base_table']));
+      $fields = drupal_map_assoc(drupal_schema_fields_sql($entity_info->getBaseTable()));
       foreach (field_info_instances($target_type) as $bundle_instances) {
         foreach ($bundle_instances as $instance_name => $instance) {
           foreach ($instance->getField()->getColumns() as $column_name => $column_info) {
@@ -200,7 +200,7 @@ class SelectionBase implements SelectionInterface {
       $entity_info = entity_get_info($target_type);
       $query = $this->buildEntityQuery();
       $result = $query
-        ->condition($entity_info['entity_keys']['id'], $ids, 'IN')
+        ->condition($entity_info->getKey('id'), $ids, 'IN')
         ->execute();
     }
 
@@ -261,12 +261,13 @@ class SelectionBase implements SelectionInterface {
     $entity_info = entity_get_info($target_type);
 
     $query = \Drupal::entityQuery($target_type);
+
     if (!empty($handler_settings['target_bundles'])) {
-      $query->condition($entity_info['entity_keys']['bundle'], $handler_settings['target_bundles'], 'IN');
+      $query->condition($entity_info->getKey('bundle'), $handler_settings['target_bundles'], 'IN');
     }
 
-    if (isset($match) && isset($entity_info['entity_keys']['label'])) {
-      $query->condition($entity_info['entity_keys']['label'], $match, $match_operator);
+    if (isset($match) && $entity_info->hasKey('label')) {
+      $query->condition($entity_info->getKey('label'), $match, $match_operator);
     }
 
     // Add entity-access tag.

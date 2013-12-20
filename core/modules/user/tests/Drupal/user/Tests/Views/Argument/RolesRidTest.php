@@ -9,6 +9,7 @@ namespace Drupal\user\Tests\Views\Argument;
 
 use Drupal\Component\Utility\String;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Entity\EntityType;
 use Drupal\Tests\UnitTestCase;
 use Drupal\user\Entity\Role;
 use Drupal\user\Plugin\views\argument\RolesRid;
@@ -72,7 +73,7 @@ class RolesRidTest extends UnitTestCase {
     $entity_manager->expects($this->any())
       ->method('getDefinition')
       ->with($this->equalTo('user_role'))
-      ->will($this->returnValue(static::$entityInfo));
+      ->will($this->returnValue(new EntityType(static::$entityInfo)));
 
     $entity_manager
       ->expects($this->once())

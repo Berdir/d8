@@ -7,8 +7,8 @@
 
 namespace Drupal\Core\Entity;
 
-use Drupal\Component\Plugin\PluginManagerBase;
-use Drupal\Component\Plugin\Factory\DefaultFactory;
+use Drupal\Core\AnnotationReader;
+use Drupal\Core\Entity\EntityTypes;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Field\FieldDefinition;
 use Drupal\Core\Cache\CacheBackendInterface;
@@ -45,6 +45,13 @@ class EntityManager extends PluginManagerBase implements EntityManagerInterface 
    * @var \Symfony\Component\DependencyInjection\ContainerInterface
    */
   protected $container;
+
+  /**
+   * Stores all entity types objects.
+   *
+   * @var \Drupal\Core\Entity\EntityType[]
+   */
+  protected $entity_types;
 
   /**
    * Contains instantiated controllers keyed by controller type and entity type.
@@ -160,8 +167,10 @@ class EntityManager extends PluginManagerBase implements EntityManagerInterface 
    * {@inheritdoc}
    */
   public function hasController($entity_type, $controller_type) {
-    $definition = $this->getDefinition($entity_type);
-    return !empty($definition['controllers'][$controller_type]);
+    if (!$definition = $this->getDefinition($entity_type)) {
+      return FALSE;
+    }
+    return $definition->hasController($controller_type);
   }
 
   /**
@@ -181,8 +190,7 @@ class EntityManager extends PluginManagerBase implements EntityManagerInterface 
       throw new \InvalidArgumentException(sprintf('The entity type (%s) did not specify a %s controller.', $entity_type, $controller_type));
     }
 
-    $class = $definition[$controller_type];
-
+    $class = $this->getDefinition($entity_type)->getController($controller_type);
     // Some class definitions can be nested.
     if (isset($nested)) {
       if (empty($class[$nested])) {
@@ -210,16 +218,7 @@ class EntityManager extends PluginManagerBase implements EntityManagerInterface 
    * {@inheritdoc}
    */
   public function getListController($entity_type) {
-    if (!isset($this->controllers['listing'][$entity_type])) {
-      $class = $this->getControllerClass($entity_type, 'list');
-      if (in_array('Drupal\Core\Entity\EntityControllerInterface', class_implements($class))) {
-        $this->controllers['listing'][$entity_type] = $class::createInstance($this->container, $entity_type, $this->getDefinition($entity_type));
-      }
-      else {
-        $this->controllers['listing'][$entity_type] = new $class($entity_type, $this->getStorageController($entity_type));
-      }
-    }
-    return $this->controllers['listing'][$entity_type];
+    return $this->getController($entity_type, 'list');
   }
 
   /**
@@ -302,9 +301,9 @@ class EntityManager extends PluginManagerBase implements EntityManagerInterface 
     $admin_path = '';
     $entity_info = $this->getDefinition($entity_type);
     // Check for an entity type's admin base path.
-    if (isset($entity_info['links']['admin-form'])) {
-      $route_parameters[$entity_info['bundle_entity_type']] = $bundle;
-      $admin_path = \Drupal::urlGenerator()->getPathFromRoute($entity_info['links']['admin-form'], $route_parameters);
+    if (isset($entity_info->links['admin-form'])) {
+      $route_parameters[$entity_info->getBundlePrefix()] = $bundle;
+      $admin_path = \Drupal::urlGenerator()->getPathFromRoute($entity_info->links['admin-form'], $route_parameters);
     }
 
     return $admin_path;

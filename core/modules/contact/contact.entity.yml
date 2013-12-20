@@ -1,0 +1,2 @@
+contact_category: Drupal\contact\Plugin\Core\Entity\Category
+contact_message: Drupal\contact\Plugin\Core\Entity\Message

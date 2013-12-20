@@ -83,7 +83,19 @@ abstract class Entity implements EntityInterface {
   }
 
   /**
+<<<<<<< HEAD
    * {@inheritdoc}
+=======
+   * Implements \Drupal\Core\Entity\EntityInterface::isNewRevision().
+   */
+  public function isNewRevision() {
+    $info = $this->entityInfo();
+    return $this->newRevision || ($info->getKey('revision') && !$this->getRevisionId());
+  }
+
+  /**
+   * Implements \Drupal\Core\Entity\EntityInterface::enforceIsNew().
+>>>>>>> applied patch
    */
   public function enforceIsNew($value = TRUE) {
     $this->enforceIsNew = $value;
@@ -109,11 +121,15 @@ abstract class Entity implements EntityInterface {
   public function label($langcode = NULL) {
     $label = NULL;
     $entity_info = $this->entityInfo();
-    if (isset($entity_info['label_callback']) && function_exists($entity_info['label_callback'])) {
-      $label = $entity_info['label_callback']($this, $langcode);
+    $label_callback = $entity_info->getLabelCallback();
+    if (function_exists($label_callback)) {
+      $label = $label_callback($this, $langcode);
     }
-    elseif (!empty($entity_info['entity_keys']['label']) && isset($this->{$entity_info['entity_keys']['label']})) {
-      $label = $this->{$entity_info['entity_keys']['label']};
+    elseif ($entity_info->hasKey('label')) {
+      $label_key = $entity_info->getKey('label');
+      if (isset($this->{$label_key})) {
+        $label = $this->$label_key;
+      }
     }
     return $label;
   }
@@ -185,8 +201,8 @@ abstract class Entity implements EntityInterface {
     if (isset($bundles[$bundle]['uri_callback'])) {
       $uri_callback = $bundles[$bundle]['uri_callback'];
     }
-    elseif (isset($entity_info['uri_callback'])) {
-      $uri_callback = $entity_info['uri_callback'];
+    elseif ($entity_info->getUriCallback()) {
+      $uri_callback = $entity_info->getUriCallback();
     }
 
     // Invoke the callback to get the URI. If there is no callback, use the
@@ -244,7 +260,7 @@ abstract class Entity implements EntityInterface {
    */
   public function uriRelationships() {
     $entity_info = $this->entityInfo();
-    return isset($entity_info['links']) ? array_keys($entity_info['links']) : array();
+    return isset($entity_info->links) ? array_keys($entity_info->links) : array();
   }
 
 
@@ -275,7 +291,64 @@ abstract class Entity implements EntityInterface {
   }
 
   /**
+<<<<<<< HEAD
    * {@inheritdoc}
+=======
+   * Implements \Drupal\Core\TypedData\TranslatableInterface::getTranslation().
+   *
+   * @return \Drupal\Core\Entity\EntityInterface
+   */
+  public function getTranslation($langcode) {
+    // @todo: Replace by EntityNG implementation once all entity types have been
+    // converted to use the entity field API.
+    return $this;
+  }
+
+  /**
+   * Returns the languages the entity is translated to.
+   *
+   * @todo: Remove once all entity types implement the entity field API.
+   *   This is deprecated by
+   *   \Drupal\Core\TypedData\TranslatableInterface::getTranslationLanguages().
+   */
+  public function translations() {
+    return $this->getTranslationLanguages(FALSE);
+  }
+
+  /**
+   * Implements \Drupal\Core\TypedData\TranslatableInterface::getTranslationLanguages().
+   */
+  public function getTranslationLanguages($include_default = TRUE) {
+    // @todo: Replace by EntityNG implementation once all entity types have been
+    // converted to use the entity field API.
+    $default_language = $this->language();
+    $languages = array($default_language->id => $default_language);
+    $entity_info = $this->entityInfo();
+
+    if ($entity_info->isFieldable()) {
+      // Go through translatable properties and determine all languages for
+      // which translated values are available.
+      foreach (field_info_instances($this->entityType, $this->bundle()) as $field_name => $instance) {
+        $field = field_info_field($field_name);
+        if (field_is_translatable($this->entityType, $field) && isset($this->$field_name)) {
+          foreach (array_filter($this->$field_name) as $langcode => $value)  {
+            $languages[$langcode] = TRUE;
+          }
+        }
+      }
+      $languages = array_intersect_key(language_list(Language::STATE_ALL), $languages);
+    }
+
+    if (empty($include_default)) {
+      unset($languages[$default_language->id]);
+    }
+
+    return $languages;
+  }
+
+  /**
+   * Implements \Drupal\Core\Entity\EntityInterface::save().
+>>>>>>> applied patch
    */
   public function save() {
     return \Drupal::entityManager()->getStorageController($this->entityType)->save($this);
@@ -296,12 +369,12 @@ abstract class Entity implements EntityInterface {
   public function createDuplicate() {
     $duplicate = clone $this;
     $entity_info = $this->entityInfo();
-    $duplicate->{$entity_info['entity_keys']['id']} = NULL;
+    $duplicate->{$entity_info->getKey('id')} = NULL;
 
     // Check if the entity type supports UUIDs and generate a new one if so.
-    if (!empty($entity_info['entity_keys']['uuid'])) {
+    if ($entity_info->hasKey('uuid')) {
       // @todo Inject the UUID service into the Entity class once possible.
-      $duplicate->{$entity_info['entity_keys']['uuid']} = \Drupal::service('uuid')->generate();
+      $duplicate->{$entity_info->getKey('uuid')} = \Drupal::service('uuid')->generate();
     }
     return $duplicate;
   }

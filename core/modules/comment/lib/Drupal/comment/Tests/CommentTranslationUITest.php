@@ -124,10 +124,10 @@ class CommentTranslationUITest extends ContentTranslationUITest {
   }
 
   /**
-   * Overrides \Drupal\content_translation\Tests\ContentTranslationUITest::assertPublishedStatus().
+   * Overrides \Drupal\content_translation\Tests\ContentTranslationUITest::doPublishedStatus().
    */
-  protected function assertPublishedStatus() {
-    parent::assertPublishedStatus();
+  protected function doPublishedStatus() {
+    parent::doPublishedStatus();
     $entity = entity_load($this->entityType, $this->entityId);
     $user = $this->drupalCreateUser(array('access comments'));
     $this->drupalLogin($user);

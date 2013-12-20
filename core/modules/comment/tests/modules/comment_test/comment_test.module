@@ -12,9 +12,9 @@ use Drupal\comment\CommentInterface;
  * Implements hook_entity_info_alter().
  */
 function comment_test_entity_info_alter(&$info) {
-  if (language_multilingual()) {
+  if (isset($info['comment']) && language_multilingual()) {
     // Enable language handling for comment fields.
-    $info['comment']['translation']['comment_test'] = TRUE;
+    $info['comment']->translation['comment_test'] = TRUE;
   }
 }
 

@@ -1,0 +1,2 @@
+node: Drupal\node\Plugin\Core\Entity\Node
+node_type: Drupal\node\Plugin\Core\Entity\NodeType

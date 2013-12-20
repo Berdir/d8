@@ -1,0 +1,2 @@
+custom_block: Drupal\custom_block\Plugin\Core\Entity\CustomBlock
+custom_block_type: Drupal\custom_block\Plugin\Core\Entity\CustomBlockType

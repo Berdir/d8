@@ -130,7 +130,7 @@ class NodeTranslationUITest extends ContentTranslationUITest {
       }
       $entity = entity_load($this->entityType, $this->entityId, TRUE);
       foreach ($this->langcodes as $langcode) {
-        // The node is created as unpulished thus we switch to the published
+        // The node is created as unpublished thus we switch to the published
         // status first.
         $status = !$index;
         $this->assertEqual($status, $entity->translation[$langcode]['status'], 'The translation has been correctly unpublished.');
@@ -164,8 +164,8 @@ class NodeTranslationUITest extends ContentTranslationUITest {
 
     $entity = entity_load($this->entityType, $this->entityId, TRUE);
     foreach ($this->langcodes as $langcode) {
-      $this->assertEqual($entity->translation[$langcode]['uid'] == $values[$langcode]['uid'], 'Translation author correctly stored.');
-      $this->assertEqual($entity->translation[$langcode]['created'] == $values[$langcode]['created'], 'Translation date correctly stored.');
+      $this->assertEqual($entity->translation[$langcode]['uid'], $values[$langcode]['uid'], 'Translation author correctly stored.');
+      $this->assertEqual($entity->translation[$langcode]['created'], $values[$langcode]['created'], 'Translation date correctly stored.');
     }
   }
 

@@ -169,7 +169,7 @@ function field_views_field_default_views_data(FieldInterface $field) {
   if ($supports_revisions) {
     $table_alias = $field_tables[EntityStorageControllerInterface::FIELD_LOAD_REVISION]['alias'];
     $data[$table_alias]['table']['join'][$entity_revision_table] = array(
-      'left_field' => $entity_info['entity_keys']['revision'],
+      'left_field' => $entity_info->getKey('revision'),
       'field' => 'revision_id',
       'extra' => array(
         array('field' => 'deleted', 'value' => 0, 'numeric' => TRUE),

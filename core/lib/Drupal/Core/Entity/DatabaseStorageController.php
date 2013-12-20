@@ -60,7 +60,7 @@ class DatabaseStorageController extends EntityStorageControllerBase {
   /**
    * {@inheritdoc}
    */
-  public static function createInstance(ContainerInterface $container, $entity_type, array $entity_info) {
+  public static function createInstance(ContainerInterface $container, $entity_type, EntityType $entity_info) {
     return new static(
       $entity_type,
       $entity_info,
@@ -88,16 +88,10 @@ class DatabaseStorageController extends EntityStorageControllerBase {
     $this->uuidService = $uuid_service;
 
     // Check if the entity type supports IDs.
-    if (isset($this->entityInfo['entity_keys']['id'])) {
-      $this->idKey = $this->entityInfo['entity_keys']['id'];
-    }
-    else {
-      $this->idKey = FALSE;
-    }
-
+    $this->idKey = $this->entityInfo->getKey('id');
     // Check if the entity type supports UUIDs.
-    if (!empty($this->entityInfo['entity_keys']['uuid'])) {
-      $this->uuidKey = $this->entityInfo['entity_keys']['uuid'];
+    if ($this->entityInfo->hasKey('uuid')) {
+      $this->uuidKey = $this->entityInfo->getKey('uuid');
     }
     else {
       $this->uuidKey = FALSE;
@@ -133,11 +127,12 @@ class DatabaseStorageController extends EntityStorageControllerBase {
       // Build and execute the query.
       $query_result = $this->buildQuery($ids)->execute();
 
-      if (!empty($this->entityInfo['class'])) {
+      $entity_class = $this->getRecordClass();
+      if (!empty($entity_class)) {
         // We provide the necessary arguments for PDO to create objects of the
         // specified entity class.
         // @see \Drupal\Core\Entity\EntityInterface::__construct()
-        $query_result->setFetchMode(\PDO::FETCH_CLASS, $this->entityInfo['class'], array(array(), $this->entityType));
+        $query_result->setFetchMode(\PDO::FETCH_CLASS, $this->entityInfo->getClass(), array(array(), $this->entityType));
       }
       $queried_entities = $query_result->fetchAllAssoc($this->idKey);
     }
@@ -229,12 +224,13 @@ class DatabaseStorageController extends EntityStorageControllerBase {
    *   A SelectQuery object for loading the entity.
    */
   protected function buildQuery($ids, $revision_id = FALSE) {
-    $query = $this->database->select($this->entityInfo['base_table'], 'base');
+    $base_table = $this->entityInfo->getBaseTable();
+    $query = $this->database->select($this->entityInfo->getBaseTable(), 'base');
 
     $query->addTag($this->entityType . '_load_multiple');
 
     // Add fields from the {entity} table.
-    $entity_fields = drupal_schema_fields_sql($this->entityInfo['base_table']);
+    $entity_fields = drupal_schema_fields_sql($this->entityInfo->getBaseTable());
     $query->fields('base', $entity_fields);
 
     if ($ids) {
@@ -248,7 +244,7 @@ class DatabaseStorageController extends EntityStorageControllerBase {
    * {@inheritdoc}
    */
   public function create(array $values) {
-    $entity_class = $this->entityInfo['class'];
+    $entity_class = $this->entityInfo->getClass();
     $entity_class::preCreate($this, $values);
 
     $entity = new $entity_class($values, $this->entityType);
@@ -277,14 +273,14 @@ class DatabaseStorageController extends EntityStorageControllerBase {
     $transaction = $this->database->startTransaction();
 
     try {
-      $entity_class = $this->entityInfo['class'];
+      $entity_class = $this->entityInfo->getClass();
       $entity_class::preDelete($this, $entities);
       foreach ($entities as $entity) {
         $this->invokeHook('predelete', $entity);
       }
       $ids = array_keys($entities);
 
-      $this->database->delete($this->entityInfo['base_table'])
+      $this->database->delete($this->entityInfo->getBaseTable())
         ->condition($this->idKey, $ids, 'IN')
         ->execute();
 
@@ -320,13 +316,13 @@ class DatabaseStorageController extends EntityStorageControllerBase {
       $this->invokeHook('presave', $entity);
 
       if (!$entity->isNew()) {
-        $return = drupal_write_record($this->entityInfo['base_table'], $entity, $this->idKey);
+        $return = drupal_write_record($this->entityInfo->getBaseTable(), $entity, $this->idKey);
         $this->resetCache(array($entity->id()));
         $entity->postSave($this, TRUE);
         $this->invokeHook('update', $entity);
       }
       else {
-        $return = drupal_write_record($this->entityInfo['base_table'], $entity);
+        $return = drupal_write_record($this->entityInfo->getBaseTable(), $entity);
         // Reset general caches, but keep caches specific to certain entities.
         $this->resetCache(array());
 

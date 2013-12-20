@@ -17,7 +17,7 @@ use Drupal\Core\Language\Language;
  *   (optional) The entity type (e.g. 'node'). Leave NULL to retrieve
  *   information for all entity types.
  *
- * @return array
+ * @return \Drupal\Core\Entity\EntityType|\Drupal\Core\Entity\EntityType[]
  *   An array containing the entity type's definition, as retrieved with
  *   \Drupal\Core\Entity\EntityManagerInterface. If $entity_type is NULL, an
  *   associative array of all entity type definitions keyed by entity type is
@@ -267,10 +267,10 @@ function entity_revision_delete($entity_type, $revision_id) {
  */
 function entity_load_by_uuid($entity_type, $uuid, $reset = FALSE) {
   $entity_info = entity_get_info($entity_type);
-  if (empty($entity_info['entity_keys']['uuid'])) {
+  if (!$entity_info->hasKey('uuid')) {
     throw new EntityStorageException("Entity type $entity_type does not support UUIDs.");
   }
-  $uuid_key = $entity_info['entity_keys']['uuid'];
+  $uuid_key = $entity_info->getKey('uuid');
 
   $controller = \Drupal::entityManager()->getStorageController($entity_type);
   if ($reset) {
