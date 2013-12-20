@@ -27,14 +27,14 @@ class MigrateExecutable {
    *
    * @var int
    */
-  protected $successes_since_feedback;
+  protected $successesSinceFeedback;
 
   /**
    * The number of rows that were successfully processed.
    *
    * @var int
    */
-  protected $total_successes;
+  protected $totalSuccesses;
 
   /**
    * Status of one row.
@@ -53,7 +53,7 @@ class MigrateExecutable {
    *
    * @var int
    */
-  protected $total_processed;
+  protected $totalProcessed;
 
   /**
    * The queued messages not yet saved.
@@ -77,23 +77,6 @@ class MigrateExecutable {
   protected $options;
 
   /**
-   * The fraction of the memory limit at which an operation will be interrupted.
-   *
-   * Can be overridden by a Migration subclass if one would like to push the
-   * envelope. Defaults to 85%.
-   *
-   * @var float
-   */
-  protected $memoryThreshold = 0.85;
-
-  /**
-   * The PHP memory_limit expressed in bytes.
-   *
-   * @var int
-   */
-  protected $memoryLimit;
-
-  /**
    * The PHP max_execution_time.
    *
    * @var int
@@ -112,7 +95,14 @@ class MigrateExecutable {
    *
    * @var int
    */
-  protected $processed_since_feedback = 0;
+  protected $processedSinceFeedback = 0;
+
+  /**
+   * The PHP memory_limit expressed in bytes.
+   *
+   * @var int
+   */
+  protected $memoryLimit;
 
   /**
    * The translation manager.
@@ -245,8 +235,8 @@ class MigrateExecutable {
         // @TODO handle the successful but no ID case like config.
         if ($destination_id_values) {
           $id_map->saveIdMapping($row, $destination_id_values, $this->sourceRowStatus, $this->rollbackAction);
-          $this->successes_since_feedback++;
-          $this->total_successes++;
+          $this->successesSinceFeedback++;
+          $this->totalSuccesses++;
         }
         else {
           $id_map->saveIdMapping($row, array(), MigrateIdMapInterface::STATUS_FAILED, $this->rollbackAction);
@@ -266,8 +256,8 @@ class MigrateExecutable {
         $this->migration->getIdMap()->saveIdMapping($row, array(), MigrateIdMapInterface::STATUS_FAILED, $this->rollbackAction);
         $this->handleException($e);
       }
-      $this->total_processed++;
-      $this->processed_since_feedback++;
+      $this->totalProcessed++;
+      $this->processedSinceFeedback++;
       if ($highwater_property = $this->migration->get('highwaterProperty')) {
         $this->migration->saveHighwater($row->getSourceProperty($highwater_property['name']));
       }
@@ -461,28 +451,28 @@ class MigrateExecutable {
    *  TRUE if the threshold is exceeded, FALSE if not.
    */
   protected function memoryExceeded() {
-    $usage = memory_get_usage();
+    $usage = $this->getMemoryUsage();
     $pct_memory = $usage / $this->memoryLimit;
-    if ($pct_memory > $this->memoryThreshold) {
+    if (!$threshold = $this->migration->get('memoryThreshold')) {
+      return FALSE;
+    }
+    if ($pct_memory > $threshold) {
       $this->message->display(
-        $this->t('Memory usage is !usage (!pct% of limit !limit), resetting statics',
+        $this->t('Memory usage is !usage (!pct% of limit !limit), reclaiming memory.',
           array('!pct' => round($pct_memory*100),
-                '!usage' => format_size($usage),
-                '!limit' => format_size($this->memoryLimit))),
+                '!usage' => $this->formatSize($usage),
+                '!limit' => $this->formatSize($this->memoryLimit))),
         'warning');
-      // First, try resetting Drupal's static storage - this frequently releases
-      // plenty of memory to continue
-      drupal_static_reset();
-      $usage = memory_get_usage();
-      $pct_memory = $usage/$this->memoryLimit;
+      $usage = $this->attemptMemoryReclaim();
+      $pct_memory = $usage / $this->memoryLimit;
       // Use a lower threshold - we don't want to be in a situation where we keep
       // coming back here and trimming a tiny amount
-      if ($pct_memory > (.90 * $this->memoryThreshold)) {
+      if ($pct_memory > (.90 * $threshold)) {
         $this->message->display(
           $this->t('Memory usage is now !usage (!pct% of limit !limit), not enough reclaimed, starting new batch',
             array('!pct' => round($pct_memory*100),
-                  '!usage' => format_size($usage),
-                  '!limit' => format_size($this->memoryLimit))),
+                  '!usage' => $this->formatSize($usage),
+                  '!limit' => $this->formatSize($this->memoryLimit))),
           'warning');
         return TRUE;
       }
@@ -490,8 +480,8 @@ class MigrateExecutable {
         $this->message->display(
           $this->t('Memory usage is now !usage (!pct% of limit !limit), reclaimed enough, continuing',
             array('!pct' => round($pct_memory*100),
-                  '!usage' => format_size($usage),
-                  '!limit' => format_size($this->memoryLimit))),
+                  '!usage' => $this->formatSize($usage),
+                  '!limit' => $this->formatSize($this->memoryLimit))),
           'warning');
         return FALSE;
       }
@@ -499,6 +489,42 @@ class MigrateExecutable {
     else {
       return FALSE;
     }
+  }
+
+  /**
+   * Returns the memory usage so far.
+   *
+   * @return int
+   */
+  protected function getMemoryUsage() {
+    return memory_get_usage();
+  }
+
+  /**
+   * Try to reclaim memory.
+   *
+   * @return int
+   *   The memory usage after reclaim.
+   */
+  protected function attemptMemoryReclaim() {
+     // First, try resetting Drupal's static storage - this frequently releases
+    // plenty of memory to continue
+    drupal_static_reset();
+    // @TODO: explore kernel reset.
+    return memory_get_usage();
+  }
+
+  /**
+   * Generates a string representation for the given byte count.
+   *
+   * @param $size
+   *   A size in bytes.
+   *
+   * @return
+   *   A translated string representation of the size.
+   */
+  protected function formatSize($size) {
+    return format_size($size);
   }
 
   /**

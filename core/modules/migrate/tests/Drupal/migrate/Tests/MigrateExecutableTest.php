@@ -7,11 +7,9 @@
 
 namespace Drupal\migrate\Tests;
 
-use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\MigrateException;
-use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate\Row;
 
 /**
@@ -64,7 +62,11 @@ class MigrateExecutableTest extends MigrateTestCase {
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp() {
+    parent::setUp();
     $this->migration = $this->getMigration();
     $this->message = $this->getMock('Drupal\migrate\MigrateMessageInterface');
 
@@ -446,104 +448,6 @@ class MigrateExecutableTest extends MigrateTestCase {
       ->will($this->onConsecutiveCalls(TRUE, FALSE));
 
     return $source;
-  }
-
-}
-
-class TestMigrateExecutable extends MigrateExecutable {
-
-  /**
-   * (Fake) )number of seconds elapsed since the start of the test.
-   *
-   * @var int
-   */
-  protected $timeElapsed;
-
-  public function setTranslationManager(TranslationInterface $translation_manager) {
-    $this->translationManager = $translation_manager;
-  }
-
-  /**
-   * Allows access to protected timeOptionExceeded method.
-   */
-  public function timeOptionExceeded() {
-    return parent::timeOptionExceeded();
-  }
-
-  /**
-   * Allows access to set protected maxExecTime property.
-   */
-  public function setMaxExecTime($max_exec_time) {
-    $this->maxExecTime = $max_exec_time;
-  }
-
-  /**
-   * Allows access to protected maxExecTime property.
-   */
-  public function getMaxExecTime() {
-    return $this->maxExecTime;
-  }
-
-  public function getSuccessesSinceFeedback() {
-    return $this->successes_since_feedback;
-  }
-
-  public function getTotalSuccesses() {
-    return $this->total_successes;
-  }
-
-  public function getTotalProcessed() {
-    return $this->total_processed;
-  }
-
-  public function getProcessedSinceFeedback() {
-    return $this->processed_since_feedback;
-  }
-
-  /**
-   * Allows access to protected maxExecTimeExceeded method.
-   */
-  public function maxExecTimeExceeded() {
-    return parent::maxExecTimeExceeded();
-  }
-
-  /**
-   *
-   */
-  public function setSource($source) {
-    $this->source = $source;
-  }
-
-  /**
-   * Allows access to protected sourceIdValues property.
-   */
-  public function setSourceIdValues($source_id_values) {
-    $this->sourceIdValues = $source_id_values;
-  }
-
-  /**
-   * Allows setting a fake elapsed time.
-   */
-  public function setTimeElapsed($time) {
-    $this->timeElapsed = $time;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getTimeElapsed() {
-    return $this->timeElapsed;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function handleException($exception, $save = TRUE) {
-    $message = $exception->getMessage();
-    if ($save) {
-      $this->saveMessage($message);
-    }
-    $this->message->display($message);
   }
 
 }

@@ -175,6 +175,16 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
   public $sourceRowStatus = MigrateIdMapInterface::STATUS_IMPORTED;
 
   /**
+   * The fraction of the memory limit at which an operation will be interrupted.
+   *
+   * Can be overridden by a Migration subclass if one would like to push the
+   * envelope. Defaults to 85%.
+   *
+   * @var float
+   */
+  protected $memoryThreshold = 0.85;
+
+  /**
    * @var \Drupal\Core\KeyValueStore\KeyValueStoreInterface
    */
   protected $highwaterStorage;
