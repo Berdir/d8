@@ -83,19 +83,7 @@ abstract class Entity implements EntityInterface {
   }
 
   /**
-<<<<<<< HEAD
    * {@inheritdoc}
-=======
-   * Implements \Drupal\Core\Entity\EntityInterface::isNewRevision().
-   */
-  public function isNewRevision() {
-    $info = $this->entityInfo();
-    return $this->newRevision || ($info->getKey('revision') && !$this->getRevisionId());
-  }
-
-  /**
-   * Implements \Drupal\Core\Entity\EntityInterface::enforceIsNew().
->>>>>>> applied patch
    */
   public function enforceIsNew($value = TRUE) {
     $this->enforceIsNew = $value;
@@ -291,64 +279,7 @@ abstract class Entity implements EntityInterface {
   }
 
   /**
-<<<<<<< HEAD
    * {@inheritdoc}
-=======
-   * Implements \Drupal\Core\TypedData\TranslatableInterface::getTranslation().
-   *
-   * @return \Drupal\Core\Entity\EntityInterface
-   */
-  public function getTranslation($langcode) {
-    // @todo: Replace by EntityNG implementation once all entity types have been
-    // converted to use the entity field API.
-    return $this;
-  }
-
-  /**
-   * Returns the languages the entity is translated to.
-   *
-   * @todo: Remove once all entity types implement the entity field API.
-   *   This is deprecated by
-   *   \Drupal\Core\TypedData\TranslatableInterface::getTranslationLanguages().
-   */
-  public function translations() {
-    return $this->getTranslationLanguages(FALSE);
-  }
-
-  /**
-   * Implements \Drupal\Core\TypedData\TranslatableInterface::getTranslationLanguages().
-   */
-  public function getTranslationLanguages($include_default = TRUE) {
-    // @todo: Replace by EntityNG implementation once all entity types have been
-    // converted to use the entity field API.
-    $default_language = $this->language();
-    $languages = array($default_language->id => $default_language);
-    $entity_info = $this->entityInfo();
-
-    if ($entity_info->isFieldable()) {
-      // Go through translatable properties and determine all languages for
-      // which translated values are available.
-      foreach (field_info_instances($this->entityType, $this->bundle()) as $field_name => $instance) {
-        $field = field_info_field($field_name);
-        if (field_is_translatable($this->entityType, $field) && isset($this->$field_name)) {
-          foreach (array_filter($this->$field_name) as $langcode => $value)  {
-            $languages[$langcode] = TRUE;
-          }
-        }
-      }
-      $languages = array_intersect_key(language_list(Language::STATE_ALL), $languages);
-    }
-
-    if (empty($include_default)) {
-      unset($languages[$default_language->id]);
-    }
-
-    return $languages;
-  }
-
-  /**
-   * Implements \Drupal\Core\Entity\EntityInterface::save().
->>>>>>> applied patch
    */
   public function save() {
     return \Drupal::entityManager()->getStorageController($this->entityType)->save($this);

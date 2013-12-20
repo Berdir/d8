@@ -7,8 +7,8 @@
 
 namespace Drupal\Core\Entity;
 
-use Drupal\Core\AnnotationReader;
-use Drupal\Core\Entity\EntityTypes;
+use Drupal\Component\Plugin\PluginManagerBase;
+use Drupal\Component\Plugin\Factory\DefaultFactory;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Field\FieldDefinition;
 use Drupal\Core\Cache\CacheBackendInterface;
@@ -45,13 +45,6 @@ class EntityManager extends PluginManagerBase implements EntityManagerInterface 
    * @var \Symfony\Component\DependencyInjection\ContainerInterface
    */
   protected $container;
-
-  /**
-   * Stores all entity types objects.
-   *
-   * @var \Drupal\Core\Entity\EntityType[]
-   */
-  protected $entity_types;
 
   /**
    * Contains instantiated controllers keyed by controller type and entity type.

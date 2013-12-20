@@ -10,6 +10,8 @@ namespace Drupal\Core\Entity\Annotation;
 use Drupal\Component\Annotation\Plugin;
 
 /**
+ * Defines an Entity type annotation object.
+ *
  * @Annotation
  */
 class EntityType extends Plugin {
@@ -263,6 +265,12 @@ class EntityType extends Plugin {
   public $links = array();
 
   /**
+   * Specifies whether a module exposing permissions for the current entity type
+   * should use entity-type level granularity, bundle level granularity or just
+   * skip this entity. The allowed values are respectively "entity_type",
+   * "bundle" or FALSE.
+   *
+   * @var string|bool (optional)
    */
   public $permission_granularity = 'entity_type';
 

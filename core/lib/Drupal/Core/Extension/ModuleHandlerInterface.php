@@ -306,9 +306,4 @@ interface ModuleHandlerInterface {
    */
   public function getModuleDirectories();
 
-  /**
-   * @return array
-   */
-  public function getModuleDirectories();
-
 }
