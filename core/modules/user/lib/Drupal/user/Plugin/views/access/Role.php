@@ -8,8 +8,6 @@
 namespace Drupal\user\Plugin\views\access;
 
 use Drupal\views\Plugin\views\access\AccessPluginBase;
-use Drupal\views\Annotation\ViewsAccess;
-use Drupal\Core\Annotation\Translation;
 use Symfony\Component\Routing\Route;
 use Drupal\Core\Session\AccountInterface;
 
@@ -42,7 +40,9 @@ class Role extends AccessPluginBase {
    * {@inheritdoc}
    */
   public function alterRouteDefinition(Route $route) {
-    $route->setRequirement('_role_id', $this->options['role']);
+    if ($this->options['role']) {
+      $route->setRequirement('_role', (string) implode(',', $this->options['role']));
+    }
   }
 
   public function summaryTitle() {
@@ -74,7 +74,7 @@ class Role extends AccessPluginBase {
       '#type' => 'checkboxes',
       '#title' => t('Role'),
       '#default_value' => $this->options['role'],
-      '#options' => array_map('check_plain', $this->getRoles()),
+      '#options' => array_map('\Drupal\Component\Utility\String::checkPlain', user_role_names()),
       '#description' => t('Only the checked roles will be able to access this display. Note that users with "access all views" can see any view, regardless of role.'),
     );
   }

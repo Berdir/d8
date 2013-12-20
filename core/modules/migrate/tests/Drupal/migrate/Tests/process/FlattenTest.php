@@ -28,7 +28,7 @@ class FlattenTest extends MigrateProcessTestCase {
   }
 
   /**
-   * {@inheritdoc}
+   * Test that various array flatten operations work properly.
    */
   public function testFlatten() {
     $plugin = new Flatten(array(), 'flatten', array());
