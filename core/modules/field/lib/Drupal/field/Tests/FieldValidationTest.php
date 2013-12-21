@@ -58,6 +58,36 @@ class FieldValidationTest extends FieldUnitTestBase {
   }
 
   /**
+   * Tests that NULL is validated against the required constraint.
+   */
+  function testRequiredConstraint() {
+    $empty_values = array(NULL, array());
+
+    // The instance is created as not required. Ensure that setting both NULL
+    // and empty array are allowed.
+    foreach ($empty_values as $empty_value) {
+      $this->entity->set($this->field_name, $empty_value);
+      $violations = $this->entity->{$this->field_name}->validate();
+      $this->assertEqual(count($violations), 0);
+    }
+
+    // Set the field instance to required and recreate the entity. Ensure that
+    // setting both NULL and empty array are disallowed.
+    $this->instance->required = TRUE;
+    $this->instance->save();
+    $this->entity = entity_create($this->entityType, array(
+      'type' => $this->bundle,
+    ));
+    foreach ($empty_values as $empty_value) {
+      $this->entity->set($this->field_name, $empty_value);
+      $violations = $this->entity->{$this->field_name}->validate();
+      $this->assertEqual(count($violations), 1);
+      $this->assertEqual($violations[0]->getPropertyPath(), '');
+      $this->assertEqual($violations[0]->getMessage(), 'This value should not be null.');
+    }
+  }
+
+  /**
    * Tests that constraints defined by the field type are validated.
    */
   function testFieldConstraints() {

@@ -166,4 +166,12 @@ interface FieldItemListInterface extends ListInterface, AccessibleInterface {
    */
   public function deleteRevision();
 
+  /**
+   * Returns TRUE if the field is required.
+   *
+   * @return bool
+   *   TRUE if the field is required.
+   */
+  public function isRequired();
+
 }

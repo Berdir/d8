@@ -60,7 +60,7 @@ class ConfigFieldItemList extends FieldItemList implements ConfigFieldItemListIn
    * {@inheritdoc}
    */
   public function getConstraints() {
-    $constraints = array();
+    $constraints = $this->getConstraints();
     // Check that the number of values doesn't exceed the field cardinality. For
     // form submitted values, this can only happen with 'multiple value'
     // widgets.

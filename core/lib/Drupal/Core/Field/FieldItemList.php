@@ -236,6 +236,13 @@ class FieldItemList extends ItemList implements FieldItemListInterface {
   /**
    * {@inheritdoc}
    */
+  public function isRequired() {
+    return $this->definition->isRequired();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function preSave() {
     // Filter out empty items.
     $this->filterEmptyValues();
