@@ -452,17 +452,10 @@ function drupal_install_config_directories($mode = NULL) {
   if (empty($config_directories)) {
     $config_directories_hash = Crypt::randomStringHashed(55);
     $settings['config_directories'] = array(
-      CONFIG_ACTIVE_DIRECTORY => array(
-        'path' => (object) array(
-          'value' => 'config_' . $config_directories_hash . '/active',
-          'required' => TRUE,
-        ),
-      ),
-      CONFIG_STAGING_DIRECTORY => array(
-        'path' => (object) array(
-          'value' => 'config_' . $config_directories_hash . '/staging',
-          'required' => TRUE,
-        ),
+      'value' => array(
+        CONFIG_ACTIVE_DIRECTORY => conf_path() . '/files/config_' . $config_directories_hash . '/active',
+        CONFIG_STAGING_DIRECTORY => conf_path() . '/files/config_' . $config_directories_hash . '/staging',
+        'required' => TRUE,
       ),
     );
     // Rewrite settings.php, which also sets the value as global variable.
