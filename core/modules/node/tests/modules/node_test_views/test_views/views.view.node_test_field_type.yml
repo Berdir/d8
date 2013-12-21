@@ -16,5 +16,5 @@ display:
     id: default
     position: '0'
 label: ''
-id: test_field_type
+id: node_test_field_type
 tag: ''

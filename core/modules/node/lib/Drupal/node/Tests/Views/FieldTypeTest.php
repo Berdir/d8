@@ -17,7 +17,7 @@ class FieldTypeTest extends NodeTestBase {
    *
    * @var array
    */
-  public static $testViews = array('test_field_type');
+  public static $testViews = array('node_test_field_type');
 
   public static function getInfo() {
     return array(
@@ -38,7 +38,7 @@ class FieldTypeTest extends NodeTestBase {
       'node_field_data_type' => 'node_field_data_type',
     );
 
-    $view = views_get_view('test_field_type');
+    $view = views_get_view('node_test_field_type');
     $this->executeView($view);
     $this->assertIdenticalResultset($view, $expected_result, $column_map, 'The correct node type was displayed.');
   }
