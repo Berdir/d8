@@ -7,12 +7,14 @@
 
 namespace Drupal\Core\Config\Entity;
 
+use Drupal\Component\Utility\String;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Entity\EntityStorageControllerBase;
 use Drupal\Core\Config\Config;
 use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\Config\StorageInterface;
+use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\Query\QueryFactory;
 use Drupal\Component\Uuid\UuidInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -366,6 +368,12 @@ class ConfigStorageController extends EntityStorageControllerBase {
     }
     $config = $this->configFactory->get($prefix . $id);
     $is_new = $config->isNew();
+
+    // If the entity is new but a config file for it already exists, prevent
+    // it to be overwritten.
+    if ($entity->isNew() && !$config->isNew()) {
+      throw new EntityStorageException(String::format('@type entity with ID @id already exists.', array('@type' => $this->entityType, '@id' => $entity->id())));
+    }
 
     if (!$is_new && !isset($entity->original)) {
       $this->resetCache(array($id));
