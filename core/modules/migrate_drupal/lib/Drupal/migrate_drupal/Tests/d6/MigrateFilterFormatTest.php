@@ -5,12 +5,13 @@
  * Contains \Drupal\migrate\Tests\MigrateD6FilterFormatTest.
  */
 
-namespace Drupal\migrate_drupal\Tests;
+namespace Drupal\migrate_drupal\Tests\d6;
 
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate\MigrateMessage;
+use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
-class MigrateD6FilterFormatTest extends MigrateDrupalTestBase {
+class MigrateFilterFormatTest extends MigrateDrupalTestBase {
 
   /**
    * {@inheritdoc}

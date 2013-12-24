@@ -22,6 +22,8 @@ class NodeUpdate7008 extends ProcessPluginBase {
 
   /**
    * {@inheritdoc}
+   *
+   * Split the 'administer nodes' permission from 'access content overview'.
    */
   public function transform($value, MigrateExecutable $migrate_executable, Row $row, $destination_property) {
     if ($value === 'administer nodes') {

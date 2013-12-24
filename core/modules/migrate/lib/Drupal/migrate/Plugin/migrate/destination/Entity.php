@@ -46,6 +46,9 @@ class Entity extends DestinationBase implements ContainerFactoryPluginInterface 
    * {@inheritdoc}
    */
   public function import(Row $row) {
+    /*
+    // Field handling. Untested, unused and unnecessary yet. But it shows how
+    // it'll look.
     if ($all_instances = $this->fieldInfo->getInstances($this->configuration['entity_type'])) {
       $instances = reset($all_instances);
       if (isset($this->entityInfo['entity keys']['bundle'])) {
@@ -63,6 +66,7 @@ class Entity extends DestinationBase implements ContainerFactoryPluginInterface 
         }
       }
     }
+    */
     // @TODO: validate! this will fatal if create() fails.
     $this->storageController->create($row->getDestination())->save();
   }
