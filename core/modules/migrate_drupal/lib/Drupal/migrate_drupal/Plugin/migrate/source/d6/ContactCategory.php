@@ -21,8 +21,7 @@ class ContactCategory extends Drupal6SqlBase implements RequirementsInterface {
    * {@inheritdoc}
    */
   public function query() {
-    $query = $this->database
-      ->select('contact', 'c')
+    $query = $this->select('contact', 'c')
       ->fields('c', array(
         'cid',
         'category',
