@@ -51,12 +51,8 @@ class Drupal6ContactSettings {
       'value' => 'i:1;',
     ))
     ->values(array(
-      'name' => 'contact_threshold_limit',
+      'name' => 'contact_hourly_threshold',
       'value' => 'i:3;',
-    ))
-    ->values(array(
-      'name' => 'contact_threshold_window',
-      'value' => 'i:3600;',
     ))
     ->execute();
   }
