@@ -14,7 +14,7 @@ use Drupal\migrate\Row;
 /**
  * Drupal 6 vocabularies source from database.
  *
- * @PluginId("drupal6_vocabulary")
+ * @PluginId("drupal6_taxonomy_vocabulary")
  */
 class Vocabulary extends Drupal6SqlBase implements RequirementsInterface {
 
@@ -22,8 +22,7 @@ class Vocabulary extends Drupal6SqlBase implements RequirementsInterface {
    * {@inheritdoc}
    */
   public function query() {
-    $query = $this->database
-      ->select('vocabulary', 'v')
+    $query = $this->select('vocabulary', 'v')
       ->fields('v', array(
         'vid',
         'name',
