@@ -16,14 +16,14 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Defines the theme negotiator service for theme configured per user.
  */
-class UserNegotiator implements  ThemeNegotiatorInterface {
+class UserNegotiator implements ThemeNegotiatorInterface {
 
   /**
-   * The user storage controller.
+   * The entity manager.
    *
-   * @var \Drupal\user\UserStorageControllerInterface
+   * @var \Drupal\Core\Entity\EntityManagerInterface
    */
-  protected $userStorageController;
+  protected $entityManager;
 
   /**
    * The current user.
@@ -41,7 +41,7 @@ class UserNegotiator implements  ThemeNegotiatorInterface {
    *   The current user.
    */
   public function __construct(EntityManager $entity_manager, AccountInterface $current_user) {
-    $this->userStorageController = $entity_manager->getStorageController('user');
+    $this->entityManager = $entity_manager;
     $this->currentUser = $current_user;
   }
 
@@ -56,11 +56,13 @@ class UserNegotiator implements  ThemeNegotiatorInterface {
    * {@inheritdoc}
    */
   public function determineActiveTheme(Request $request) {
-    if ($user = $this->userStorageController->load($this->currentUser->id())) {;
-      // Only select the user selected theme if it is available in the
-      // list of themes that can be accessed.
-      if (!empty($user->theme) && drupal_theme_access($user->theme)) {
-        return $user->theme;
+    if ($this->currentUser->isAuthenticated()) {
+      if ($user = $this->entityManager->getStorageController('user')->load($this->currentUser->id())) {
+        // Only select the user selected theme if it is available in the
+        // list of themes that can be accessed.
+        if ($user->getDefaultTheme() && drupal_theme_access($user->getDefaultTheme())) {
+          return $user->getDefaultTheme();
+        }
       }
     }
   }
