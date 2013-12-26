@@ -140,16 +140,8 @@ class Role extends ConfigEntityBase implements RoleInterface {
   public function postSave(EntityStorageControllerInterface $storage_controller, $update = TRUE) {
     parent::postSave($storage_controller, $update);
 
-    Cache::invalidateTags(array('role' => $this->id()));
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function postSave(EntityStorageControllerInterface $storage_controller, $update = TRUE) {
-    parent::postSave($storage_controller, $update);
-
     if (!drupal_installation_attempted() && !$this->isSyncing()) {
+      Cache::invalidateTags(array('role' => $this->id()));
       // Clear render cache.
       entity_render_cache_clear();
     }
