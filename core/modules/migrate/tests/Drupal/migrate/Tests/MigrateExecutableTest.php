@@ -427,6 +427,19 @@ class MigrateExecutableTest extends MigrateTestCase {
   }
 
   /**
+   * Tests the processRow method with an empty pipeline.
+   */
+  public function testProcessRowEmptyPipeline() {
+    $this->migration->expects($this->once())
+      ->method('getProcessPlugins')
+      ->with(NULL)
+      ->will($this->returnValue(array('test' => array())));
+    $row = new Row(array(), array());
+    $this->executable->processRow($row);
+    $this->assertSame($row->getDestination(), array());
+  }
+
+  /**
    * Returns a mock migration source instance.
    *
    * @return \Drupal\migrate\Source|\PHPUnit_Framework_MockObject_MockObject

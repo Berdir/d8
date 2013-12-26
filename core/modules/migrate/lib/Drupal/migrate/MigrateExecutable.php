@@ -335,7 +335,10 @@ class MigrateExecutable {
           $multiple = $multiple || $plugin->multiple();
         }
       }
-      $row->setDestinationProperty($destination, $value);
+      // No plugins means do not set.
+      if ($plugins) {
+        $row->setDestinationProperty($destination, $value);
+      }
       // Reset the value.
       $value = NULL;
     }
