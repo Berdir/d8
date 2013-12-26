@@ -1803,6 +1803,36 @@ function user_modules_uninstalled($modules) {
 }
 
 /**
+ * Implements hook_module_preuninstall().
+ */
+function user_module_preuninstall($module) {
+  // Collect permission strings belonging to the module that is uninstalled.
+  $permission_strings = array();
+  $function = $module . '_permission';
+  if (function_exists($function)) {
+    $permissions = $function();
+    if (!empty($permissions)) {
+      $permission_strings = array_merge($permission_strings, array_keys($permissions));
+    }
+  }
+
+  // If there are any, look for user roles containing these permissions.
+  if (!empty($permission_strings)) {
+    $results = Drupal::entityQuery('user_role')
+      ->condition('permissions.*', $permission_strings, 'IN')
+      ->execute();
+    if ($results) {
+      // If there roles, load them, remove the permissions and save them again.
+      $user_roles = entity_load_multiple('user_role', $results);
+      foreach ($user_roles as $user_role) {
+        $user_role->permissions = array_diff($user_role->permissions, $permission_strings);
+        $user_role->save();
+      }
+    }
+  }
+}
+
+/**
  * Saves visitor information as a cookie so it can be reused.
  *
  * @param $values
