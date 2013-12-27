@@ -38,10 +38,10 @@ class MigrateTaxonomyVocabularyTest extends MigrateDrupalTestBase {
     for ($i = 0; $i < 3; $i++) {
       $j = $i + 1;
       $vocabulary = entity_load('taxonomy_vocabulary', "vocabulary_{$j}_i_{$i}_");
-      $this->assertIdentical($vocabulary->name, "vocabulary $j (i=$i)");
-      $this->assertIdentical($vocabulary->description, "description of vocabulary $j (i=$i)");
-      $this->assertIdentical($vocabulary->hierarchy, $i);
-      $this->assertIdentical($vocabulary->weight, $i);
+      $this->assertEqual($vocabulary->name, "vocabulary $j (i=$i)");
+      $this->assertEqual($vocabulary->description, "description of vocabulary $j (i=$i)");
+      $this->assertEqual($vocabulary->hierarchy, $i);
+      $this->assertEqual($vocabulary->weight, 4   + $i);
     }
 
   }

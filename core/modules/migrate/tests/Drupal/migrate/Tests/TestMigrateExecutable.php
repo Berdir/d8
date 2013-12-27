@@ -111,7 +111,7 @@ class TestMigrateExecutable extends MigrateExecutable {
   /**
    * {@inheritdoc}
    */
-  public function handleException($exception, $save = TRUE) {
+  public function handleException(\Exception $exception, $save = TRUE) {
     $message = $exception->getMessage();
     if ($save) {
       $this->saveMessage($message);

@@ -153,7 +153,7 @@ class Drupal6TaxonomyVocabulary {
       'required' => '0',
       'tags' => '0',
       'module' => 'taxonomy',
-      'weight' => '0',
+      'weight' => '4',
     ))
     ->values(array(
       'vid' => '2',
@@ -166,7 +166,7 @@ class Drupal6TaxonomyVocabulary {
       'required' => '0',
       'tags' => '0',
       'module' => 'taxonomy',
-      'weight' => '1',
+      'weight' => '5',
     ))
     ->values(array(
       'vid' => '3',
@@ -179,7 +179,7 @@ class Drupal6TaxonomyVocabulary {
       'required' => '0',
       'tags' => '0',
       'module' => 'taxonomy',
-      'weight' => '2',
+      'weight' => '6',
     ))
     ->execute();
   }
