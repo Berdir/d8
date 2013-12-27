@@ -112,6 +112,43 @@ class MigrateExecutable {
   protected $translationManager;
 
   /**
+   * The rollback action to be saved for the current row.
+   *
+   * @var int
+   */
+  public $rollbackAction;
+
+  /**
+   * An array of counts. Initially used for cache hit/miss tracking.
+   *
+   * @var array
+   */
+  protected $counts = array();
+
+  /**
+   * The maximum number of items to pass in a single call during a rollback.
+   *
+   * For use in bulkRollback(). Can be overridden in derived class constructor.
+   *
+   * @var int
+   */
+  protected $rollbackBatchSize = 50;
+
+  /**
+   * The object currently being constructed.
+   *
+   * @var \stdClass
+   */
+  protected $destinationValues;
+
+  /**
+   * The current data row retrieved from the source.
+   *
+   * @var \stdClass
+   */
+  protected $sourceValues;
+
+  /**
    * Constructs a MigrateExecutable and verifies and sets the memory limit.
    *
    * @param \Drupal\migrate\Entity\MigrationInterface $migration
@@ -136,8 +173,10 @@ class MigrateExecutable {
         switch ($last) {
           case 'g':
             $limit *= 1024;
+            break;
           case 'm':
             $limit *= 1024;
+            break;
           case 'k':
             $limit *= 1024;
             break;
@@ -168,41 +207,7 @@ class MigrateExecutable {
   }
 
   /**
-   * The rollback action to be saved for the current row.
-   *
-   * @var int
-   */
-  public $rollbackAction;
-
-  /**
-   * An array of counts. Initially used for cache hit/miss tracking.
-   *
-   * @var array
-   */
-  protected $counts = array();
-
-  /**
-   * When performing a bulkRollback(), the maximum number of items to pass in
-   * a single call. Can be overridden in derived class constructor.
-   *
-   * @var int
-   */
-  protected $rollbackBatchSize = 50;
-
-  /**
-   * The object currently being constructed
-   * @var \stdClass
-   */
-  protected $destinationValues;
-
-  /**
-   * The current data row retrieved from the source.
-   * @var \stdClass
-   */
-  protected $sourceValues;
-
-  /**
-   * Perform an import operation - migrate items from source to destination.
+   * Performs an import operation - migrate items from source to destination.
    */
   public function import() {
     $return = MigrationInterface::RESULT_COMPLETED;
@@ -232,7 +237,8 @@ class MigrateExecutable {
 
       try {
         $destination_id_values = $destination->import($row);
-        // @TODO handle the successful but no ID case like config.
+        // @todo Handle the successful but no ID case like config,
+        //   https://drupal.org/node/2160835.
         if ($destination_id_values) {
           $id_map->saveIdMapping($row, $destination_id_values, $this->sourceRowStatus, $this->rollbackAction);
           $this->successesSinceFeedback++;
@@ -266,8 +272,8 @@ class MigrateExecutable {
       unset($sourceValues, $destinationValues);
       $this->sourceRowStatus = MigrateIdMapInterface::STATUS_IMPORTED;
 
-      // TODO: Temporary. Remove when http://drupal.org/node/375494 is committed.
-      // TODO: Should be done in MigrateDestinationEntity
+      // @todo Remove when http://drupal.org/node/375494 is committed.
+      // TODO: Should be done in MigrateDestinationEntity.
       if (!empty($destination->entityType)) {
         entity_get_controller($destination->entityType)->resetCache();
       }
@@ -298,18 +304,22 @@ class MigrateExecutable {
   }
 
   /**
-   * @param Row $row
+   * Processes a row.
+   *
+   * @param \Drupal\migrate\Row $row
    *   The $row to be processed.
    * @param array $process
-   *   A process pipeline configuration. If not set, the top level process
-   *   configuration in the migration entity is used.
+   *   (optional) A process pipeline configuration. If not set, the top level
+   *   process configuration in the migration entity is used.
    * @param mixed $value
-   *   Optional initial value of the pipeline for the first destination.
+   *   (optional) Initial value of the pipeline for the first destination.
    *   Usually setting this is not necessary as $process typically starts with
    *   a 'get'. This is useful only when the $process contains a single
    *   destination and needs to access a value outside of the source. See
    *   \Drupal\migrate\Plugin\migrate\process\Iterator::transformKey for an
    *   example.
+   *
+   * @throws \Drupal\migrate\MigrateException
    */
   public function processRow(Row $row, array $process = NULL, $value = NULL) {
     foreach ($this->migration->getProcessPlugins($process) as $destination => $plugins) {
@@ -345,24 +355,27 @@ class MigrateExecutable {
   }
 
   /**
-   * Fetch the key array for the current source record.
+   * Fetches the key array for the current source record.
    *
    * @return array
+   *   The current source IDs.
    */
   protected function currentSourceIds() {
     return $this->getSource()->getCurrentIds();
   }
 
   /**
-   * Test whether we've exceeded the designated time limit.
+   * Tests whether we've exceeded the designated time limit.
    *
-   * @return boolean
-   *  TRUE if the threshold is exceeded, FALSE if not.
+   * @return bool
+   *   TRUE if the threshold is exceeded, FALSE if not.
    */
   protected function timeOptionExceeded() {
+    // If there is no time limit, then it is not exceeded.
     if (!$time_limit = $this->getTimeLimit()) {
       return FALSE;
     }
+    // Calculate if the time limit is exceeded.
     $time_elapsed = time() - REQUEST_TIME;
     if ($time_elapsed >= $time_limit) {
       return TRUE;
@@ -372,6 +385,12 @@ class MigrateExecutable {
     }
   }
 
+  /**
+   * Returns the time limit.
+   *
+   * @return null|int
+   *   The time limit, NULL if no limit or if the units were not in seconds.
+   */
   public function getTimeLimit() {
     $limit = $this->migration->get('limit');
     if (isset($limit['unit']) && isset($limit['value']) && ($limit['unit'] == 'seconds' || $limit['unit'] == 'second')) {
@@ -383,31 +402,31 @@ class MigrateExecutable {
   }
 
   /**
-   * Pass messages through to the map class.
+   * Passes messages through to the map class.
    *
    * @param string $message
-   *  The message to record.
+   *   The message to record.
    * @param int $level
-   *  Optional message severity (defaults to MESSAGE_ERROR).
+   *   (optional) Message severity (defaults to MESSAGE_ERROR).
    */
   public function saveMessage($message, $level = MigrationInterface::MESSAGE_ERROR) {
     $this->migration->getIdMap()->saveMessage($this->sourceIdValues, $message, $level);
   }
 
   /**
-   * Queue messages to be later saved through the map class.
+   * Queues messages to be later saved through the map class.
    *
    * @param string $message
-   *  The message to record.
+   *   The message to record.
    * @param int $level
-   *  Optional message severity (defaults to MESSAGE_ERROR).
+   *   (optional) Message severity (defaults to MESSAGE_ERROR).
    */
   public function queueMessage($message, $level = MigrationInterface::MESSAGE_ERROR) {
     $this->queuedMessages[] = array('message' => $message, 'level' => $level);
   }
 
   /**
-   * Save any messages we've queued up to the message table.
+   * Saves any messages we've queued up to the message table.
    */
   public function saveQueuedMessages() {
     foreach ($this->queuedMessages as $queued_message) {
@@ -417,8 +436,9 @@ class MigrateExecutable {
   }
 
   /**
-   * Standard top-of-loop stuff, common between rollback and import - check
-   * for exceptional conditions, and display feedback.
+   * Checks for exceptional conditions, and display feedback.
+   *
+   * Standard top-of-loop stuff, common between rollback and import.
    */
   protected function checkStatus() {
     if ($this->memoryExceeded()) {
@@ -448,10 +468,12 @@ class MigrateExecutable {
   }
 
   /**
-   * Test whether we've exceeded the desired memory threshold. If so, output a message.
+   * Tests whether we've exceeded the desired memory threshold.
    *
-   * @return boolean
-   *  TRUE if the threshold is exceeded, FALSE if not.
+   * If so, output a message.
+   *
+   * @return bool
+   *   TRUE if the threshold is exceeded, FALSE if not.
    */
   protected function memoryExceeded() {
     $usage = $this->getMemoryUsage();
@@ -498,20 +520,21 @@ class MigrateExecutable {
    * Returns the memory usage so far.
    *
    * @return int
+   *   The memory usage.
    */
   protected function getMemoryUsage() {
     return memory_get_usage();
   }
 
   /**
-   * Try to reclaim memory.
+   * Tries to reclaim memory.
    *
    * @return int
    *   The memory usage after reclaim.
    */
   protected function attemptMemoryReclaim() {
-     // First, try resetting Drupal's static storage - this frequently releases
-    // plenty of memory to continue
+    // First, try resetting Drupal's static storage - this frequently releases
+    // plenty of memory to continue.
     drupal_static_reset();
     // @TODO: explore kernel reset.
     return memory_get_usage();
@@ -520,10 +543,10 @@ class MigrateExecutable {
   /**
    * Generates a string representation for the given byte count.
    *
-   * @param $size
+   * @param int $size
    *   A size in bytes.
    *
-   * @return
+   * @return string
    *   A translated string representation of the size.
    */
   protected function formatSize($size) {
@@ -531,10 +554,10 @@ class MigrateExecutable {
   }
 
   /**
-   * Test whether we're approaching the PHP maximum execution time limit.
+   * Tests whether we're approaching the PHP maximum execution time limit.
    *
-   * @return boolean
-   *  TRUE if the threshold is exceeded, FALSE if not.
+   * @return bool
+   *   TRUE if the threshold is exceeded, FALSE if not.
    */
   protected function maxExecTimeExceeded() {
     if ($this->maxExecTime) {
@@ -557,16 +580,17 @@ class MigrateExecutable {
   }
 
   /**
-   * Takes an Exception object and both saves and displays it, pulling additional
-   * information on the location triggering the exception.
+   * Takes an Exception object and both saves and displays it.
+   *
+   * Pulls in additional information on the location triggering the exception.
    *
    * @param \Exception $exception
-   *  Object representing the exception.
-   * @param boolean $save
-   *  Whether to save the message in the migration's mapping table. Set to FALSE
-   *  in contexts where this doesn't make sense.
+   *   Object representing the exception.
+   * @param bool $save
+   *   (optional) Whether to save the message in the migration's mapping table.
+   *   Set to FALSE in contexts where this doesn't make sense.
    */
-  public function handleException($exception, $save = TRUE) {
+  public function handleException(\Exception $exception, $save = TRUE) {
     $result = _drupal_decode_exception($exception);
     $message = $result['!message'] . ' (' . $result['%file'] . ':' . $result['%line'] . ')';
     if ($save) {
