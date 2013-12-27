@@ -106,6 +106,29 @@ class Drupal6TaxonomyVocabulary {
         'list' => array('weight', 'name'),
       ),
     ));
+    $database->schema()->createTable('vocabulary_node_types', array(
+      'description' => 'Stores which node types vocabularies may be used with.',
+      'fields' => array(
+        'vid' => array(
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'default' => 0,
+          'description' => 'Primary Key: the {vocabulary}.vid of the vocabulary.',
+        ),
+        'type' => array(
+          'type' => 'varchar',
+          'length' => 32,
+          'not null' => TRUE,
+          'default' => '',
+          'description' => 'The {node}.type of the node type for which the vocabulary may be used.',
+        ),
+      ),
+      'primary key' => array('type', 'vid'),
+      'indexes' => array(
+        'vid' => array('vid'),
+      ),
+    ));
     $database->insert('vocabulary')->fields(array(
       'vid',
       'name',
