@@ -173,10 +173,8 @@ class MigrateExecutable {
         switch ($last) {
           case 'g':
             $limit *= 1024;
-            break;
           case 'm':
             $limit *= 1024;
-            break;
           case 'k':
             $limit *= 1024;
             break;
