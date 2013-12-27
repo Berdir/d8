@@ -17,31 +17,42 @@ class Drupal6TaxonomyVocabulary {
    * @param \Drupal\Core\Database\Connection $database
    */
   public static function load(Connection $database) {
-    $database->schema()->createTable('taxonomy_vocabulary', array(
+    $database->schema()->createTable('vocabulary', array(
+      'description' => 'Stores vocabulary information.',
       'fields' => array(
         'vid' => array(
           'type' => 'serial',
           'unsigned' => TRUE,
           'not null' => TRUE,
+          'description' => 'Primary Key: Unique vocabulary ID.',
         ),
         'name' => array(
           'type' => 'varchar',
           'length' => 255,
           'not null' => TRUE,
           'default' => '',
-          'translatable' => TRUE,
-        ),
-        'machine_name' => array(
-          'type' => 'varchar',
-          'length' => 255,
-          'not null' => TRUE,
-          'default' => '',
+          'description' => 'Name of the vocabulary.',
         ),
         'description' => array(
           'type' => 'text',
           'not null' => FALSE,
           'size' => 'big',
-          'translatable' => TRUE,
+          'description' => 'Description of the vocabulary.',
+        ),
+        'help' => array(
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'default' => '',
+          'description' => 'Help text to display for the vocabulary.',
+        ),
+        'relations' => array(
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'default' => 0,
+          'size' => 'tiny',
+          'description' => 'Whether or not related terms are enabled within the vocabulary. (0 = disabled, 1 = enabled)',
         ),
         'hierarchy' => array(
           'type' => 'int',
@@ -49,67 +60,101 @@ class Drupal6TaxonomyVocabulary {
           'not null' => TRUE,
           'default' => 0,
           'size' => 'tiny',
+          'description' => 'The type of hierarchy allowed within the vocabulary. (0 = disabled, 1 = single, 2 = multiple)',
+        ),
+        'multiple' => array(
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'default' => 0,
+          'size' => 'tiny',
+          'description' => 'Whether or not multiple terms from this vocabulary may be assigned to a node. (0 = disabled, 1 = enabled)',
+        ),
+        'required' => array(
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'default' => 0,
+          'size' => 'tiny',
+          'description' => 'Whether or not terms are required for nodes using this vocabulary. (0 = disabled, 1 = enabled)',
+        ),
+        'tags' => array(
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'default' => 0,
+          'size' => 'tiny',
+          'description' => 'Whether or not free tagging is enabled for the vocabulary. (0 = disabled, 1 = enabled)',
         ),
         'module' => array(
           'type' => 'varchar',
           'length' => 255,
           'not null' => TRUE,
           'default' => '',
+          'description' => 'The module which created the vocabulary.',
         ),
         'weight' => array(
           'type' => 'int',
           'not null' => TRUE,
           'default' => 0,
+          'size' => 'tiny',
+          'description' => 'The weight of the vocabulary in relation to other vocabularies.',
         ),
       ),
-      'primary key' => array(
-        'vid',
-      ),
+      'primary key' => array('vid'),
       'indexes' => array(
-        'list' => array(
-          'weight',
-          'name',
-        ),
-      ),
-      'unique keys' => array(
-        'machine_name' => array(
-          'machine_name',
-        ),
+        'list' => array('weight', 'name'),
       ),
     ));
-    $database->insert('taxonomy_vocabulary')->fields(array(
+    $database->insert('vocabulary')->fields(array(
       'vid',
       'name',
-      'machine_name',
       'description',
+      'help',
+      'relations',
       'hierarchy',
+      'multiple',
+      'required',
+      'tags',
       'module',
       'weight',
     ))
     ->values(array(
       'vid' => '1',
-      'name' => 'Tags',
-      'machine_name' => 'tags',
-      'description' => 'Use tags to group articles on similar topics into categories.',
+      'name' => 'vocabulary 1 (i=0)',
+      'description' => 'description of vocabulary 1 (i=0)',
+      'help' => '',
+      'relations' => '1',
       'hierarchy' => '0',
+      'multiple' => '0',
+      'required' => '0',
+      'tags' => '0',
       'module' => 'taxonomy',
       'weight' => '0',
     ))
     ->values(array(
       'vid' => '2',
-      'name' => 'Forums',
-      'machine_name' => 'forums',
-      'description' => 'Forum navigation vocabulary',
+      'name' => 'vocabulary 2 (i=1)',
+      'description' => 'description of vocabulary 2 (i=1)',
+      'help' => '',
+      'relations' => '1',
       'hierarchy' => '1',
-      'module' => 'forum',
-      'weight' => '-10',
+      'multiple' => '1',
+      'required' => '0',
+      'tags' => '0',
+      'module' => 'taxonomy',
+      'weight' => '1',
     ))
     ->values(array(
-      'vid' => '5',
+      'vid' => '3',
       'name' => 'vocabulary 3 (i=2)',
-      'machine_name' => 'vocabulary_3_2',
       'description' => 'description of vocabulary 3 (i=2)',
+      'help' => '',
+      'relations' => '1',
       'hierarchy' => '2',
+      'multiple' => '0',
+      'required' => '0',
+      'tags' => '0',
       'module' => 'taxonomy',
       'weight' => '2',
     ))

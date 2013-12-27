@@ -34,5 +34,7 @@ class MigrateTaxonomyVocabularyTest extends MigrateDrupalTestBase {
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, new MigrateMessage());
     $executable->import();
+
+    $vocabulary = entity_load('taxonomy_vocabulary', 'vocabulary_1_i_0_');
   }
 }
