@@ -376,7 +376,7 @@ class MigrateExecutable {
       return FALSE;
     }
     // Calculate if the time limit is exceeded.
-    $time_elapsed = time() - REQUEST_TIME;
+    $time_elapsed = $this->getTimeElapsed();
     if ($time_elapsed >= $time_limit) {
       return TRUE;
     }
