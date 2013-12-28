@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\system\Tests\Upgrade\MigrateLocaleConfigsTest.
+ * Contains \Drupal\migrate_drupal\Tests\d6\MigrateLocaleConfigsTest.
  */
 
 namespace Drupal\migrate_drupal\Tests\d6;

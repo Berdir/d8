@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\system\Tests\Upgrade\MigrateTaxonomyConfigsTest.
+ * Contains \Drupal\migrate_drupal\Tests\d6\MigrateTaxonomyConfigsTest.
  */
 
 namespace Drupal\migrate_drupal\Tests\d6;

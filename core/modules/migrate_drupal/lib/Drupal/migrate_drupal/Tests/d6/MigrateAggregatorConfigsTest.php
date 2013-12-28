@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\system\Tests\Upgrade\MigrateAggregatorConfigsTest.
+ * Contains \Drupal\migrate_drupal\Tests\d6\MigrateAggregatorConfigsTest.
  */
 
 namespace Drupal\migrate_drupal\Tests\d6;
