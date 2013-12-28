@@ -39,7 +39,7 @@ class MigrateContactConfigsTest extends MigrateDrupalTestBase {
     $executable = new MigrateExecutable($migration, new MigrateMessage());
     $executable->import();
     $config = \Drupal::config('contact.settings');
-    $this->assertIdentical($config->get('user_default_enabled'), 1);
+    $this->assertIdentical($config->get('user_default_enabled'), true);
     $this->assertIdentical($config->get('flood.limit'), 3);
   }
 }

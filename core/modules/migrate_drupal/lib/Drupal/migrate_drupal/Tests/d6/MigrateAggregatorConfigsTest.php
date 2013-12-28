@@ -42,10 +42,10 @@ class MigrateAggregatorConfigsTest extends MigrateDrupalTestBase {
     $this->assertIdentical($config->get('fetcher'), 'aggregator');
     $this->assertIdentical($config->get('parser'), 'aggregator');
     $this->assertIdentical($config->get('processors'), array('aggregator'));
-    $this->assertIdentical($config->get('items.teaser_length'), '600');
+    $this->assertIdentical($config->get('items.teaser_length'), 600);
     $this->assertIdentical($config->get('items.allowed_html'), '<a> <b> <br /> <dd> <dl> <dt> <em> <i> <li> <ol> <p> <strong> <u> <ul>');
-    $this->assertIdentical($config->get('items.expire'), '9676800');
-    $this->assertIdentical($config->get('source.list_max'), '3');
+    $this->assertIdentical($config->get('items.expire'), 9676800);
+    $this->assertIdentical($config->get('source.list_max'), 3);
     $this->assertIdentical($config->get('source.category_selector'), 'checkboxes');
   }
 }

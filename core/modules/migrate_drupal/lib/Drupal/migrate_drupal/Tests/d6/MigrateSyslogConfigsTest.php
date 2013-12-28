@@ -41,6 +41,7 @@ class MigrateSyslogConfigsTest extends MigrateDrupalTestBase {
     $executable->import();
     $config = \Drupal::config('syslog.settings');
     $this->assertIdentical($config->get('identity'), 'drupal');
-    $this->assertIdentical($config->get('facility'), $facility);
+    // @TODO: remove this typecast once there's schema of rhtis config.
+    $this->assertIdentical($config->get('facility'), (string) $facility);
   }
 }

@@ -33,6 +33,6 @@ class MigrateNodeConfigsTest extends MigrateDrupalTestBase {
     $executable = new MigrateExecutable($migration, new MigrateMessage);
     $executable->import();
     $config = \Drupal::config('node.settings');
-    $this->assertIdentical($config->get('use_admin_theme'), 0);
+    $this->assertIdentical($config->get('use_admin_theme'), false);
   }
 }

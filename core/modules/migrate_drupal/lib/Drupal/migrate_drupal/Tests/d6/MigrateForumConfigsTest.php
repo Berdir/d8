@@ -39,14 +39,14 @@ class MigrateForumConfigsTest extends MigrateDrupalTestBase {
     $executable = new MigrateExecutable($migration, new MigrateMessage());
     $executable->import();
     $config = \Drupal::config('forum.settings');
-    $this->assertIdentical($config->get('topics.hot_threshold'), '15');
-    $this->assertIdentical($config->get('topics.page_limit'), '25');
-    $this->assertIdentical($config->get('topics.order'), '1');
+    $this->assertIdentical($config->get('topics.hot_threshold'), 15);
+    $this->assertIdentical($config->get('topics.page_limit'), 25);
+    $this->assertIdentical($config->get('topics.order'), 1);
     // The vocabulary vid depends on existing vids when the Forum module was enabled. This would have to be user-selectable based on a query to the D6 vocabulary table.
     //$this->assertIdentical($config->get('forum_nav_vocabulary'), '1');
     // This is 'forum_block_num_0' in D6, but block:active:limit' in D8.
-    $this->assertIdentical($config->get('block.active.limit'), '5');
+    $this->assertIdentical($config->get('block.active.limit'), 5);
     // This is 'forum_block_num_1' in D6, but 'block:new:limit' in D8.
-    $this->assertIdentical($config->get('block.new.limit'), '5');
+    $this->assertIdentical($config->get('block.new.limit'), 5);
   }
 }

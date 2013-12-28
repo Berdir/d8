@@ -67,9 +67,10 @@ class MigrateSystemConfigsTest extends MigrateDrupalTestBase {
     $executable = new MigrateExecutable($migration, new MigrateMessage());
     $executable->import();
     $config = \Drupal::config('system.performance');
-    $this->assertIdentical($config->get('css.preprocess'), 0);
-    $this->assertIdentical($config->get('js.preprocess'), 0);
-    $this->assertIdentical($config->get('cache.page.max_age'), 0);
+    $this->assertIdentical($config->get('css.preprocess'), false);
+    $this->assertIdentical($config->get('js.preprocess'), false);
+    // @TODO: make this 0 once there's schema for cache.page.max_age.
+    $this->assertIdentical($config->get('cache.page.max_age'), '0');
   }
 
   /**

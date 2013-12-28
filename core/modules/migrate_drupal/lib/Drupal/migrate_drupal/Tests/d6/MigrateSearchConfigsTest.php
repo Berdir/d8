@@ -39,9 +39,9 @@ class MigrateSearchConfigsTest extends MigrateDrupalTestBase {
     $executable = new MigrateExecutable($migration, new MigrateMessage());
     $executable->import();
     $config = \Drupal::config('search.settings');
-    $this->assertIdentical($config->get('index.minimum_word_size'), '3');
+    $this->assertIdentical($config->get('index.minimum_word_size'), 3);
     $this->assertIdentical($config->get('index.overlap_cjk'), 1);
-    $this->assertIdentical($config->get('index.cron_limit'), '100');
+    $this->assertIdentical($config->get('index.cron_limit'), 100);
     // Not sure where these two variables are set in D6.
     $this->assertIdentical($config->get('index.tag_weights'), array(
         'h1' => 25,
