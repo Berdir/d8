@@ -338,10 +338,6 @@ class TypedDataManager extends DefaultPluginManager {
     // Add in constraints specified by the data type.
     if (isset($type_definition['constraints'])) {
       foreach ($type_definition['constraints'] as $name => $options) {
-        // Annotations do not support empty arrays.
-        if ($options === TRUE) {
-          $options = array();
-        }
         $constraints[] = $validation_manager->create($name, $options);
       }
     }

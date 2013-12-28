@@ -66,7 +66,11 @@ class ConstraintManager extends DefaultPluginManager {
    *   A validation constraint plugin.
    */
   public function create($name, $options) {
-    if (!is_array($options)) {
+    // Annotations do not support empty arrays, so support specifying TRUE also.
+    if ($options === TRUE || !isset($options)) {
+      $options = array();
+    }
+    elseif (!is_array($options)) {
       // Plugins need an array as configuration, so make sure we have one.
       // The constraint classes support passing the options as part of the
       // 'value' key also.

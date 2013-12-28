@@ -92,8 +92,7 @@ class Item extends ContentEntityBase implements ItemInterface {
       ->setLabel(t('Description'))
       ->setDescription(t('The body of the feed item.'));
 
-    // @todo Convert to a "timestamp" field in https://drupal.org/node/2145103.
-    $fields['timestamp'] = FieldDefinition::create('integer')
+    $fields['timestamp'] = FieldDefinition::create('timestamp')
       ->setLabel(t('Posted timestamp'))
       ->setDescription(t('Posted date of the feed item, as a Unix timestamp.'));
 

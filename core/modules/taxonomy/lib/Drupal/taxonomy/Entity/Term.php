@@ -175,16 +175,6 @@ class Term extends ContentEntityBase implements TermInterface {
   /**
    * {@inheritdoc}
    */
-  public function preSave(EntityStorageControllerInterface $storage_controller) {
-    parent::preSave($storage_controller);
-
-    // Before saving the term, set changed time.
-    $this->changed->value = REQUEST_TIME;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function postSave(EntityStorageControllerInterface $storage_controller, $update = TRUE) {
     parent::postSave($storage_controller, $update);
 
@@ -239,10 +229,9 @@ class Term extends ContentEntityBase implements TermInterface {
       ->setSetting('default_value', 0)
       ->setComputed(TRUE);
 
-    $fields['changed'] = FieldDefinition::create('integer')
+    $fields['changed'] = FieldDefinition::create('changed')
       ->setLabel(t('Changed'))
-      ->setDescription(t('The time that the term was last edited.'))
-      ->setPropertyConstraints('value', array('EntityChanged' => array()));
+      ->setDescription(t('The time that the term was last edited.'));
 
     return $fields;
   }
