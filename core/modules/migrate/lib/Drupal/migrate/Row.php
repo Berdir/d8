@@ -98,7 +98,7 @@ class Row {
    *   TRUE if the source has property; FALSE otherwise.
    */
   public function hasSourceProperty($property) {
-    return isset($this->source[$property]) || array_key_exists($property, $this->source);
+    return NestedArray::keyExists($this->source, explode(':', $property));
   }
 
   /**
@@ -111,8 +111,9 @@ class Row {
    *   The found returned property or NULL if not found.
    */
   public function getSourceProperty($property) {
-    if (isset($this->source[$property])) {
-      return $this->source[$property];
+    $return = NestedArray::getValue($this->source, explode(':', $property), $key_exists);
+    if ($key_exists) {
+      return $return;
     }
   }
 
