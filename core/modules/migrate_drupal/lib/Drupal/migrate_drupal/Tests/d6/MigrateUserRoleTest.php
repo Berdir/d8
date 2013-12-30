@@ -34,11 +34,13 @@ class MigrateUserRoleTest extends MigrateDrupalTestBase {
     $executable = new MigrateExecutable($migration, new MigrateMessage());
     $executable->import();
 
-    $migrate_test_role_1 = entity_load('user_role', 'migrate_test_role_1');
-    $this->assertTrue(is_object($migrate_test_role_1), 'The migrated test role 1 was retrieved from the database.');
+    $rid = 'migrate_test_role_1';
+    $migrate_test_role_1 = entity_load('user_role', $rid);
+    $this->assertEqual($migrate_test_role_1->id(), $rid);
     $this->assertEqual($migrate_test_role_1->permissions, array(0 => 'migrate test role 1 test permission'));
-    $migrate_test_role_2 = entity_load('user_role', 'migrate_test_role_2');
-    $this->assertTrue(is_object($migrate_test_role_2), 'The migrated test role 2 was retrieved from the database.');
+    $this->assertEqual(array($rid), $migration->getIdMap()->lookupDestinationID(array(3)));
+    $rid = 'migrate_test_role_2';
+    $migrate_test_role_2 = entity_load('user_role', $rid);
     $this->assertEqual($migrate_test_role_2->permissions, array(
       'migrate test role 2 test permission',
       'use PHP for settings',
@@ -56,6 +58,8 @@ class MigrateUserRoleTest extends MigrateDrupalTestBase {
       'administer nodes',
       'access content overview',
     ));
+    $this->assertEqual($migrate_test_role_2->id(), $rid);
+    $this->assertEqual(array($rid), $migration->getIdMap()->lookupDestinationID(array(4)));
   }
 
 }
