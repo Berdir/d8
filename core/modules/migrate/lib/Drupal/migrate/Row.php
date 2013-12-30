@@ -144,7 +144,7 @@ class Row {
       throw new \Exception("The source is frozen and can't be changed any more");
     }
     else {
-      $this->source[$property] = $data;
+      NestedArray::setValue($this->source, explode(':', $property), $data, TRUE);
     }
   }
 
