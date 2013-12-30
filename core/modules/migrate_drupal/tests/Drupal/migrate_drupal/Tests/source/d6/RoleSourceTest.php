@@ -13,6 +13,7 @@ use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
  * Tests user role migration from D6 to D8.
  *
  * @group migrate_drupal
+ * @group Drupal
  */
 class RoleSourceTest extends MigrateSqlSourceTestCase {
 

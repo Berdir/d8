@@ -20,10 +20,57 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class Entity extends DestinationBase implements ContainerFactoryPluginInterface {
 
+  /**
+   * The entity info definition.
+   *
+   * @var array
+   */
+  protected $entityInfo;
+
+  /**
+   * The entity storage controller.
+   *
+   * @var \Drupal\Core\Entity\EntityStorageControllerInterface
+   */
+  protected $storageController;
+
+  /**
+   * The plugin manager handling entity_field migrate plugins.
+   *
+   * @var \Drupal\migrate\Plugin\MigratePluginManager
+   */
+  protected $migrateEntityFieldPluginManager;
+
+  /**
+   * The field info service.
+   *
+   * @var \Drupal\field\FieldInfo
+   */
+  protected $fieldInfo;
+
+  /**
+   * Constructs an entity destination plugin.
+   *
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   * @param string $plugin_id
+   *   The plugin_id for the plugin instance.
+   * @param array $plugin_definition
+   *   The plugin implementation definition.
+   * @param array $entity_info
+   *   The definition of this entity type.
+   * @param EntityStorageControllerInterface $storage_controller
+   *   The storage controller for this entity type.
+   * @param MigratePluginManager $plugin_manager
+   *   The plugin manager handling entity_field migrate plugins.
+   * @param FieldInfo $field_info
+   *   The field info object.
+   */
   public function __construct(array $configuration, $plugin_id, array $plugin_definition, array $entity_info, EntityStorageControllerInterface $storage_controller, MigratePluginManager $plugin_manager, FieldInfo $field_info) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->entityInfo = $entity_info;
     $this->storageController = $storage_controller;
-    $this->pluginManager = $plugin_manager;
+    $this->migrateEntityFieldPluginManager = $plugin_manager;
     $this->fieldInfo = $field_info;
   }
 
@@ -59,7 +106,7 @@ class Entity extends DestinationBase implements ContainerFactoryPluginInterface 
       }
       foreach ($instances as $field_name => $instance) {
         $field_type = $instance->getFieldType();
-        if ($this->pluginManager->getDefinition($field_type)) {
+        if ($this->migrateEntityFieldPluginManager->getDefinition($field_type)) {
           $destination_value = $this->pluginManager->createInstance($field_type)->import($instance, $row->getDestinationProperty($field_name));
           // @TODO: check for NULL return? Add an unset to $row? Maybe needed in exception handling? Propagate exception?
           $row->setDestinationProperty($field_name, $destination_value);

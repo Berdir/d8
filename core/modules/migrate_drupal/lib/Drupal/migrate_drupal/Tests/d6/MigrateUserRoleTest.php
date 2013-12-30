@@ -25,6 +25,7 @@ class MigrateUserRoleTest extends MigrateDrupalTestBase {
   }
 
   function testUserRole() {
+    /** @var \Drupal\migrate\entity\Migration $migration */
     $migration = entity_load('migration', 'd6_user_role');
     $dumps = array(
       drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6UserRole.php',
