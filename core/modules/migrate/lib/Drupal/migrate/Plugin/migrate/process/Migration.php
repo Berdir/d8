@@ -57,8 +57,14 @@ class Migration extends ProcessPluginBase implements  ContainerFactoryPluginInte
       $migration_ids = array($migration_ids);
     }
     $migrations = $this->storageController->loadMultiple($migration_ids);
-
-    $properties = $this->configuration['properties'];
+    $destids = NULL;
+    foreach ($migrations as $migration) {
+      // Break out of the loop as soon as a destination ID is found.
+      if ($destids = $migration->getIdMap()->lookupDestinationID($value)) {
+        break;
+      }
+    }
+    return $destids;
     // We want to treat source keys consistently as an array of arrays (each
     // representing one key).
     if (is_array($properties)) {
