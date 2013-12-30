@@ -162,11 +162,9 @@ class TypedConfigManager extends PluginManagerBase implements TypedConfigManager
   public function getDefinitions() {
     if (!isset($this->definitions)) {
       $this->definitions = array();
-      foreach ($this->schemaStorage->listAll() as $name) {
-        if ($schema = $this->schemaStorage->read($name)) {
-          foreach ($schema as $type => $definition) {
-            $this->definitions[$type] = $definition;
-          }
+      foreach ($this->schemaStorage->readMultiple($this->schemaStorage->listAll()) as $schema) {
+        foreach ($schema as $type => $definition) {
+          $this->definitions[$type] = $definition;
         }
       }
     }
