@@ -7,6 +7,7 @@
 namespace Drupal\migrate\Tests\process;
 
 use Drupal\migrate\Plugin\migrate\process\TestGet;
+use Drupal\migrate\Row;
 
 /**
  * @group migrate
@@ -59,6 +60,20 @@ class GetTest extends MigrateProcessTestCase {
       ->method('getSourceProperty')
       ->will($this->returnCallback(function ($argument)  use ($map) { return $map[$argument]; } ));
     $value = $this->plugin->transform(NULL, $this->migrateExecutable, $this->row, 'destinationproperty');
+    $this->assertSame($value, array('source_value1', 'source_value2'));
+  }
+
+  /**
+   * Tests the Get plugin when source is a nested array.
+   */
+  function testTransformSourceNestedArray() {
+    $row_values = array(
+      'test1' => array('test2' => 'source_value1'),
+      'test3' => 'source_value2',
+    );
+    $this->plugin->setSource(array('test1:test2', 'test3'));
+    $row = new Row($row_values, array());
+    $value = $this->plugin->transform(NULL, $this->migrateExecutable, $row, 'destinationproperty');
     $this->assertSame($value, array('source_value1', 'source_value2'));
   }
 
