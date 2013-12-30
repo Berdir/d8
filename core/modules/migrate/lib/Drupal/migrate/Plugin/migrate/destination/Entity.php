@@ -93,28 +93,8 @@ class Entity extends DestinationBase implements ContainerFactoryPluginInterface 
    * {@inheritdoc}
    */
   public function import(Row $row) {
-    /*
-    // Field handling. Untested, unused and unnecessary yet. But it shows how
-    // it'll look.
-    if ($all_instances = $this->fieldInfo->getInstances($this->configuration['entity_type'])) {
-      $instances = reset($all_instances);
-      if (isset($this->entityInfo['entity keys']['bundle'])) {
-        $bundle = $row->getDestinationProperty($this->entityInfo['entity keys']['bundle']);
-        if (isset($all_instances[$bundle])) {
-          $instances = $all_instances[$bundle];
-        }
-      }
-      foreach ($instances as $field_name => $instance) {
-        $field_type = $instance->getFieldType();
-        if ($this->migrateEntityFieldPluginManager->getDefinition($field_type)) {
-          $destination_value = $this->pluginManager->createInstance($field_type)->import($instance, $row->getDestinationProperty($field_name));
-          // @TODO: check for NULL return? Add an unset to $row? Maybe needed in exception handling? Propagate exception?
-          $row->setDestinationProperty($field_name, $destination_value);
-        }
-      }
-    }
-    */
-    // @TODO: validate! this will fatal if create() fails.
+    // @TODO: add field handling. https://drupal.org/node/2164451
+    // @TODO: add validateion https://drupal.org/node/2164457
     $entity = $this->storageController->create($row->getDestination());
     $entity->save();
     return array($entity->id());
