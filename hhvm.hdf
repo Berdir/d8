@@ -1,0 +1,57 @@
+Server {
+  Port = 9000
+  SourceRoot = /home/berdir/Projekte/d8
+  IniFile = "/home/berdir/Projekte/d8/hhvm-php.ini"
+  DefaultDocument = index.php
+}
+ 
+Eval {
+  Jit = true
+}
+Log {
+  Level = Error
+  UseLogFile = true
+  File = /var/log/hhvm/error.log
+  Access {
+    * {
+      File = /var/log/hhvm/access.log
+      Format = %h %l %u %t \"%r\" %>s %b
+    }
+  }
+}
+ 
+VirtualHost {
+  * {
+    Pattern = .*
+    RewriteRules {
+      * {
+        pattern = (.*)$
+        to = index.php/$1
+        qsa = true
+      }
+    }
+  }
+}
+ 
+StaticFile {
+  FilesMatch {
+    * {
+      pattern = .*\.(dll|exe)
+      headers {
+        * = Content-Disposition: attachment
+      }
+    }
+  }
+  Extensions {
+    css = text/css
+    gif = image/gif
+    html = text/html
+    jpe = image/jpeg
+    jpeg = image/jpeg
+    jpg = image/jpeg
+    png = image/png
+    tif = image/tiff
+    tiff = image/tiff
+    txt = text/plain
+  }
+}
