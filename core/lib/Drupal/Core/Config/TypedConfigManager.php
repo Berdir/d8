@@ -11,7 +11,7 @@ use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Component\Plugin\PluginManagerBase;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\String;
-use Drupal\Core\Config\TypedConfigManagerInterface;
+use Drupal\Core\Cache\CacheBackendInterface;
 
 /**
  * Manages config type plugins.
@@ -40,16 +40,32 @@ class TypedConfigManager extends PluginManagerBase implements TypedConfigManager
   protected $definitions;
 
   /**
+   * Cache backend for the definitions.
+   *
+   * @var \Drupal\Core\Cache\CacheBackendInterface
+   */
+  protected $cache;
+
+  /**
+   * The cache ID for the definitions.
+   * @var string
+   */
+  protected $cid = 'typed_config_definitions';
+
+  /**
    * Creates a new typed configuration manager.
    *
    * @param \Drupal\Core\Config\StorageInterface $configStorage
    *   The storage controller object to use for reading schema data
    * @param \Drupal\Core\Config\StorageInterface $schemaStorage
    *   The storage controller object to use for reading schema data
+   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
+   *   The cache backend to use for caching the definitions.
    */
-  public function __construct(StorageInterface $configStorage, StorageInterface $schemaStorage) {
+  public function __construct(StorageInterface $configStorage, StorageInterface $schemaStorage, CacheBackendInterface $cache) {
     $this->configStorage = $configStorage;
     $this->schemaStorage = $schemaStorage;
+    $this->cache = $cache;
   }
 
   /**
@@ -157,18 +173,32 @@ class TypedConfigManager extends PluginManagerBase implements TypedConfigManager
   }
 
   /**
-   * Implements Drupal\Component\Plugin\Discovery\DiscoveryInterface::getDefinitions().
+   * {@inheritdoc}
    */
   public function getDefinitions() {
     if (!isset($this->definitions)) {
-      $this->definitions = array();
-      foreach ($this->schemaStorage->readMultiple($this->schemaStorage->listAll()) as $schema) {
-        foreach ($schema as $type => $definition) {
-          $this->definitions[$type] = $definition;
+      if ($cache = $this->cache->get($this->cid)) {
+        $this->definitions = $cache->data;
+      }
+      else {
+        $this->definitions = array();
+        foreach ($this->schemaStorage->readMultiple($this->schemaStorage->listAll()) as $schema) {
+          foreach ($schema as $type => $definition) {
+            $this->definitions[$type] = $definition;
+          }
         }
+        $this->cache->set($this->cid, $this->definitions);
       }
     }
     return $this->definitions;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function clearCachedDefinitions() {
+    $this->definitions = NULL;
+    $this->cache->delete($this->cid);
   }
 
   /**

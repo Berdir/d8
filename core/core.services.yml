@@ -24,13 +24,6 @@ services:
     factory_method: get
     factory_service: cache_factory
     arguments: [config]
-  cache.config_schema:
-    class: Drupal\Core\Cache\CacheBackendInterface
-    tags:
-      - { name: cache.bin }
-    factory_method: get
-    factory_service: cache_factory
-    arguments: [config_schema]
   cache.cache:
     class: Drupal\Core\Cache\CacheBackendInterface
     tags:
@@ -109,15 +102,12 @@ services:
     class: Drupal\Core\Config\DatabaseStorage
     arguments: ['@database', config_snapshot]
   config.storage.schema:
-    class: Drupal\Core\Config\CachedStorage
-    arguments: ['@config.storage.schema.disk', '@cache.config_schema']
-  config.storage.schema.disk:
     class: Drupal\Core\Config\Schema\SchemaStorage
   config.storage.installer:
     class: Drupal\Core\Config\InstallStorage
   config.typed:
     class: Drupal\Core\Config\TypedConfigManager
-    arguments: ['@config.storage', '@config.storage.schema']
+    arguments: ['@config.storage', '@config.storage.schema', '@cache.cache']
   database:
     class: Drupal\Core\Database\Connection
     factory_class: Drupal\Core\Database\Database
