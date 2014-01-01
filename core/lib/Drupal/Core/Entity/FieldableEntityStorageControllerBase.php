@@ -56,7 +56,7 @@ abstract class FieldableEntityStorageControllerBase extends EntityStorageControl
    * {@inheritdoc}
    */
   public function create(array $values) {
-    $entity_class = $this->entityInfo['class'];
+    $entity_class = $this->entityInfo->getClass();
     $entity_class::preCreate($this, $values);
 
     // We have to determine the bundle first.
