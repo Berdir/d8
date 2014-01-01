@@ -226,8 +226,6 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
    * {@inheritdoc}
    */
   public function loadMultiple(array $ids = NULL) {
-    $entities = array();
-
     // Create a new variable which is either a prepared version of the $ids
     // array for later comparison with the entity cache, or FALSE if no $ids
     // were passed. The $ids array is reduced as items are loaded from cache,
@@ -237,65 +235,17 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
 
     // Try to load entities from the static cache, if the entity type supports
     // static caching. This will remove ID's that were loaded from $ids.
-    if ($this->staticCache && $ids) {
-      $entities += $this->getFromStaticCache($ids);
-    }
+    $entities_from_static_cache = $this->getFromStaticCache($ids);
 
-    // Load remaining entities from the persistent cache.
-    if ($this->persistentCache && $ids) {
-      $loaded_enities = $this->getFromPersistentCache($ids);
-      // Pass all entities loaded from the persistent cache through
-      // $this->postLoad() to invoke the load hooks and postLoad() method on
-      // the entity class.
-      // @todo: Avoid this by caching non-field values of the entity.
-      if (!empty($loaded_enities)) {
-        $this->postLoad($loaded_enities);
-        // Also put entities from the persistent cache in the static cache.
-        if ($this->staticCache) {
-          $this->setStaticCache($loaded_enities);
-        }
+    $entities = $this->doLoadMultiple($ids);
 
-        $entities += $loaded_enities;
-      }
-    }
+    // Pass all entities loaded from the database through $this->postLoad(),
+    // to invoke the load hooks and postLoad() method on the entity class.
+    $this->postLoad($entities);
 
-    // Load any remaining entities from the database. This is the case if $ids
-    // is set to NULL (so we load all entities) or if there are any ids left to
-    // load.
-    if ($ids === NULL || $ids) {
-      // Build and execute the query.
-      $query_result = $this->buildQuery($ids)->execute();
-      $records = $query_result->fetchAllAssoc($this->idKey);
+    $this->setStaticCache($entities);
 
-      // Map the loaded records into entity objects and according fields.
-      if ($records) {
-        $queried_entities = $this->mapFromStorageRecords($records);
-
-        // Attach field values.
-        if ($this->entityInfo->isFieldable()) {
-          $this->loadFieldItems($queried_entities);
-        }
-
-        // Pass all entities loaded from the database through $this->postLoad(),
-        // to invoke the load hooks and postLoad() method on the entity class.
-        $this->postLoad($queried_entities);
-
-        // Add entities to the static cache.
-        if ($this->staticCache) {
-          $this->cacheSet($queried_entities);
-        }
-
-        // Add them to the caches.
-        if ($this->persistentCache) {
-          $this->setPersistentCache($queried_entities);
-        }
-        if ($this->staticCache) {
-          $this->setStaticCache($queried_entities);
-        }
-        $entities += $queried_entities;
-      }
-
-    }
+    $entities += $entities_from_static_cache;
 
     // Ensure that the returned array is ordered the same as the original
     // $ids array if this was passed in and remove any invalid ids.
@@ -309,6 +259,58 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
     }
 
     return $entities;
+  }
+
+  protected function doLoadMultiple($ids) {
+    if (is_array($ids) && empty($ids)) {
+      return array();
+    }
+
+    // Load remaining entities from the persistent cache.
+    $entities_from_cache = $this->loadMultipleFromCache($ids);
+
+    // Load any remaining entities from the database. This is the case if $ids
+    // is set to NULL (so we load all entities) or if there are any ids left to
+    // load.
+    $entities_from_storage = $this->loadMultipleFromStorage($ids);
+
+    $this->setPersistentCache($entities_from_storage);
+
+    return $entities_from_cache + $entities_from_storage;
+  }
+
+  protected function loadMultipleFromStorage($ids) {
+
+    $entities = array();
+
+    if ($ids === NULL || $ids) {
+      // Build and execute the query.
+      $query_result = $this->buildQuery($ids)->execute();
+      $records = $query_result->fetchAllAssoc($this->idKey);
+
+      // Map the loaded records into entity objects and according fields.
+      if ($records) {
+        $entities = $this->mapFromStorageRecords($records);
+
+        // Attach field values.
+        if ($this->entityInfo['fieldable']) {
+          $this->loadFieldItems($entities);
+        }
+      }
+    }
+
+    return $entities;
+  }
+
+  protected function loadMultipleFromCache(&$ids) {
+    if (!$this->persistentCache) {
+      return array();
+    }
+
+    $ids = !empty($ids) ? $ids : array();
+
+    // Load remaining entities from the persistent cache.
+    return $this->getFromPersistentCache($ids);
   }
 
   /**
@@ -1588,13 +1590,17 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
    */
   protected function getFromStaticCache(&$ids) {
     $entities = array();
-    // Load any available entities from the internal cache.
-    if (!empty($this->entities)) {
-      foreach ($ids as $index => $id) {
-        if (isset($this->entities[$id])) {
-          $entities[$id] = $this->entities[$id];
-          // Remove the ID from the list.
-          unset($ids[$index]);
+
+    if ($this->staticCache && $ids) {
+      $entities = array();
+      // Load any available entities from the internal cache.
+      if (!empty($this->entities)) {
+        foreach ($ids as $index => $id) {
+          if (isset($this->entities[$id])) {
+            $entities[$id] = $this->entities[$id];
+            // Remove the ID from the list.
+            unset($ids[$index]);
+          }
         }
       }
     }
@@ -1608,7 +1614,9 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
    *   Entities to store in the cache.
    */
   protected function setStaticCache(array $entities) {
-    $this->entities += $entities;
+    if ($this->staticCache) {
+      $this->entities += $entities;
+    }
   }
 
   /**
@@ -1641,6 +1649,10 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
    * {@inheritdoc}
    */
   protected function setPersistentCache($entities) {
+    if (!$this->persistentCache) {
+      return;
+    }
+
     foreach ($entities as $id => $entity) {
       $data = array(
         'id' => $entity->id(),

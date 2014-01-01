@@ -161,17 +161,19 @@ abstract class EntityStorageControllerBase implements EntityStorageControllerInt
    *   Associative array of query results, keyed on the entity ID.
    */
   protected function postLoad(array &$queried_entities) {
-    $entity_class = $this->entityInfo->getClass();
-    $entity_class::postLoad($this, $queried_entities);
-    // Call hook_entity_load().
-    foreach (\Drupal::moduleHandler()->getImplementations('entity_load') as $module) {
-      $function = $module . '_entity_load';
-      $function($queried_entities, $this->entityType);
-    }
-    // Call hook_TYPE_load().
-    foreach (\Drupal::moduleHandler()->getImplementations($this->entityType . '_load') as $module) {
-      $function = $module . '_' . $this->entityType . '_load';
-      $function($queried_entities);
+    if (!empty($queried_entities)) {
+      $entity_class = $this->entityInfo->getClass();
+      $entity_class::postLoad($this, $queried_entities);
+      // Call hook_entity_load().
+      foreach (\Drupal::moduleHandler()->getImplementations('entity_load') as $module) {
+        $function = $module . '_entity_load';
+        $function($queried_entities, $this->entityType);
+      }
+      // Call hook_TYPE_load().
+      foreach (\Drupal::moduleHandler()->getImplementations($this->entityType . '_load') as $module) {
+        $function = $module . '_' . $this->entityType . '_load';
+        $function($queried_entities);
+      }
     }
   }
 
