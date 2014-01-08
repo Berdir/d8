@@ -12,7 +12,7 @@ use Drupal\Core\Config\Context\ContextInterface;
 use Drupal\Core\Config\ConfigEvent;
 use Drupal\Core\Config\StorageDispatcher;
 use Drupal\Core\Language\Language;
-use Drupal\Core\Language\LanguageManager;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -29,7 +29,7 @@ class LocaleConfigSubscriber implements EventSubscriberInterface {
   /**
    * The language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManager
+   * @var \Drupal\Core\Language\LanguageManagerInterface
    */
   protected $languageManager;
 
@@ -48,7 +48,7 @@ class LocaleConfigSubscriber implements EventSubscriberInterface {
    * @param \Drupal\Core\Config\Context\ConfigContext $config_context
    *   The configuration context service.
    */
-  public function __construct(LanguageManager $language_manager, ContextInterface $config_context) {
+  public function __construct(LanguageManagerInterface $language_manager, ContextInterface $config_context) {
     $this->languageManager = $language_manager;
     $this->defaultConfigContext = $config_context;
   }
@@ -72,7 +72,7 @@ class LocaleConfigSubscriber implements EventSubscriberInterface {
     elseif ($account = $context->get('user.account')) {
       $context->set('locale.language', language_load($account->getPreferredLangcode()));
     }
-    elseif ($language = $this->languageManager->getLanguage(Language::TYPE_INTERFACE)) {
+    elseif ($language = $this->languageManager->getCurrentLanguage()) {
       $context->set('locale.language', $language);
     }
   }

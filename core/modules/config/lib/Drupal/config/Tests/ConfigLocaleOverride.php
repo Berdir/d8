@@ -35,6 +35,7 @@ class ConfigLocaleOverride extends DrupalUnitTestBase {
     parent::setUp();
     config_install_default_config('module', 'config_test');
     config_install_default_config('module', 'locale');
+    \Drupal::service('config.context')->init();
   }
 
   /**

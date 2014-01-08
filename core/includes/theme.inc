@@ -1237,7 +1237,7 @@ function theme_links($variables) {
     $num_links = count($links);
     $i = 0;
     $active = \Drupal::linkGenerator()->getActive();
-    $language_url = \Drupal::languageManager()->getLanguage(Language::TYPE_URL);
+    $language_url = \Drupal::languageManager()->getCurrentLanguage(Language::TYPE_URL);
 
     foreach ($links as $key => $link) {
       $i++;
@@ -2092,7 +2092,7 @@ function template_preprocess_html(&$variables) {
   $variables['html_attributes'] = new Attribute;
 
   // HTML element attributes.
-  $language_interface = \Drupal::service('language_manager')->getLanguage();
+  $language_interface = \Drupal::service('language_manager')->getCurrentLanguage();
   $variables['html_attributes']['lang'] = $language_interface->id;
   $variables['html_attributes']['dir'] = $language_interface->direction ? 'rtl' : 'ltr';
 
