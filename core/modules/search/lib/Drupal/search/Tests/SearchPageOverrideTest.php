@@ -38,11 +38,9 @@ class SearchPageOverrideTest extends SearchTestBase {
 
     // Enable the extra type module for searching.
     \Drupal::config('search.settings')->set('active_plugins', array('node_search', 'user_search', 'search_extra_type_search'))->save();
-    \Drupal::service('router.builder')->rebuild();
   }
 
   function testSearchPageHook() {
-    $this->container->get('router.builder')->rebuild();
     $keys = 'bike shed ' . $this->randomName();
     $this->drupalGet("search/dummy_path/{$keys}");
     $this->assertText('Dummy search snippet', 'Dummy search snippet is shown');

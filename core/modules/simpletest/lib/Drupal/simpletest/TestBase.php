@@ -790,6 +790,11 @@ abstract class TestBase {
           );
           $completion_check_id = TestBase::insertAssert($this->testId, $class, FALSE, t('The test did not complete due to a fatal error.'), 'Completion check', $caller);
           $this->setUp();
+          // If set up is broken we can get here without a container.
+          // @see \Drupal\simpletest\Tests\BrokenSetUpTest
+          if ($this->container instanceOf ContainerBuilder && $this->container->has('router.builder')) {
+            $this->container->get('router.builder')->rebuildIfNeeded();
+          }
           if ($this->setup) {
             try {
               $this->$method();

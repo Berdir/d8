@@ -75,7 +75,7 @@ class ThemeHandler implements ThemeHandlerInterface {
    *
    * @var \Drupal\Core\Routing\RouteBuilder
    */
-  protected $routerBuilder;
+  protected $routeBuilder;
 
   /**
    * The system listing info
@@ -456,7 +456,7 @@ class ThemeHandler implements ThemeHandlerInterface {
    */
   protected function resetSystem() {
     if ($this->routeBuilder) {
-      $this->routeBuilder->rebuild();
+      $this->routeBuilder->setRebuildNeeded();
     }
     $this->systemListReset();
 
