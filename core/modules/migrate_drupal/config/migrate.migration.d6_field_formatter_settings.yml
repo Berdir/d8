@@ -1,0 +1,300 @@
+id: d6_field_formatter_settings
+
+sourceIds:
+  type_name:
+    type: varchar
+    length: 32
+    "not null": true
+    default: ''
+  view_mode:
+    type: varchar
+    length: 32
+    "not null": true
+    default: ''
+
+destinationIds:
+  id:
+    type: varchar
+    length: 255
+
+source:
+  plugin: drupal6_field_instance_per_view_mode
+
+process:
+  mode:
+    -
+      plugin: migration
+      migration: d6_view_modes
+      source:
+        - view_mode
+    -
+      plugin: extract
+      index:
+        - 0
+  id:
+    plugin: entity_display_id_generator
+    source:
+      - entity_type
+      - type_name
+      - @mode
+  bundle: type_name
+  targetEntityType:
+    plugin: default_value
+    default_value: node
+  status:
+    plugin: default_value
+    default_value: 1
+  content:
+    plugin: iterator
+    source: fields
+    process:
+      label: label
+      weight: weight
+      type:
+        -
+          plugin: static_map
+          bypass: true
+          source:
+            - type
+            - "display_settings:format"
+          map:
+            text:
+              default: text_default
+              trimmed: text_trimmed
+            number_integer:
+              default: number_integer
+              us_0: number_integer
+              be_0: number_integer
+              fr_0: number_integer
+              unformatted: number_unformatted
+            number_float:
+              default: number_decimal
+              us_0: number_decimal
+              us_1: number_decimal
+              us_2: number_decimal
+              be_0: number_decimal
+              be_1: number_decimal
+              be_2: number_decimal
+              fr_0: number_decimal
+              fr_1: number_decimal
+              fr_2: number_decimal
+              unformatted: number_unformatted
+            number_decimal:
+              default: number_decimal
+              us_0: number_decimal
+              us_1: number_decimal
+              us_2: number_decimal
+              be_0: number_decimal
+              be_1: number_decimal
+              be_2: number_decimal
+              fr_0: number_decimal
+              fr_1: number_decimal
+              fr_2: number_decimal
+              unformatted: number_unformatted
+            email:
+              default: email_mailto
+              spamspan: email_mailto
+              contact: email_mailto
+              plain: text_plain
+            link:
+              default: link
+              plain: link
+              absolute: link
+              title_plain: link
+              url: link
+              short: link
+              label: link
+              separate: link_separate
+            filefield:
+              default: file_default
+              url_plain: file_url_plain
+              path_plain: file_url_plan #unsure about this?
+              image_plain: image
+              image_nodelink: image
+              image_imagelink: image
+            fr_phone:
+              default: text_plain
+            be_phone:
+              default: text_plain
+            it_phone:
+              default: text_plain
+            el_phone:
+              default: text_plain
+            ch_phone:
+              default: text_plain
+            ca_phone:
+              default: text_plain
+            cr_phone:
+              default: text_plain
+            pa_phone:
+              default: text_plain
+            gb_phone:
+              default: text_plain
+            ru_phone:
+              default: text_plain
+            ua_phone:
+              default: text_plain
+            es_phone:
+              default: text_plain
+            au_phone:
+              default: text_plain
+            cs_phone:
+              default: text_plain
+            hu_phone:
+              default: text_plain
+            pl_phone:
+              default: text_plain
+            nl_phone:
+              default: text_plain
+            se_phone:
+              default: text_plain
+            za_phone:
+              default: text_plain
+            il_phone:
+              default: text_plain
+            nz_phone:
+              default: text_plain
+            br_phone:
+              default: text_plain
+            cl_phone:
+              default: text_plain
+            cn_phone:
+              default: text_plain
+            hk_phone:
+              default: text_plain
+            mo_phone:
+              default: text_plain
+            ph_phone:
+              default: text_plain
+            sg_phone:
+              default: text_plain
+            jo_phone:
+              default: text_plain
+            eg_phone:
+              default: text_plain
+            pk_phone:
+              default: text_plain
+            int_phone:
+              default: text_plain
+        -
+          plugin: field_type_defaults
+
+      settings:
+        -
+          plugin: static_map
+          bypass: true
+          source:
+            - module
+            - "display_settings:format"
+          map:
+            number:
+              us_0:
+                scale: 0
+                decimal_separator: .
+                thousand_separator: ','
+              us_1:
+                scale: 1
+                decimal_separator: .
+                thousand_separator: ','
+              us_2:
+                scale: 2
+                decimal_separator: .
+                thousand_separator: ','
+              be_0:
+                scale: 0
+                decimal_separator: ','
+                thousand_separator: .
+              be_1:
+                scale: 1
+                decimal_separator: ','
+                thousand_separator: .
+              be_2:
+                scale: 2
+                decimal_separator: ','
+                thousand_separator: .
+              fr_0:
+                scale: 0
+                decimal_separator: ','
+                thousand_separator: ' '
+              fr_1:
+                scale: 1
+                decimal_separator: ','
+                thousand_separator: ' '
+              fr_2:
+                scale: 2
+                decimal_separator: ','
+                thousand_separator: ' '
+            link:
+              default:
+                trim_length: '80'
+                url_only: 0
+                url_plain: 0
+                rel: 0
+                target: 0
+              plain:
+                trim_length: '80'
+                url_only: 1
+                url_plain: 1
+                rel: 0
+                target: 0
+              absolute:
+                trim_length: '80'
+                url_only: 1
+                url_plain: 1
+                rel: 0
+                target: 0
+              title_plain: #can't support title as plain text.
+                trim_length: '80'
+                url_only: 1
+                url_plain: 1
+                rel: 0
+                target: 0
+              url:
+                trim_length: '80'
+                url_only: 1
+                url_plain: 0
+                rel: 0
+                target: 0
+              short: #can't support hardcoded link text?
+                trim_length: '80'
+                url_only: 0
+                url_plain: 0
+                rel: 0
+                target: 0
+              label: # can't support label as link text?
+                trim_length: '80'
+                url_only: 0
+                url_plain: 0
+                rel: 0
+                target: 0
+              separate:
+                trim_length: '80'
+                rel: 0
+                target: 0
+            filefield:
+              image_plain:
+                image_style: ''
+                image_link: ''
+              image_nodelink:
+                image_style: ''
+                image_link: content
+              image_imagelink:
+                image_style: ''
+                image_link: file
+            date:
+              default:
+                format: fallback
+              format_interval:
+                format: fallback
+              long:
+                format: long
+              medium:
+                format: medium
+              short:
+                format: short
+        -
+          plugin: field_formatter_settings_defaults
+
+destination:
+  plugin: entity
+  entity_type: entity_display
