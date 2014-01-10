@@ -85,7 +85,7 @@ class DrupalUnitTestBaseTest extends DrupalUnitTestBase {
     $this->assertFalse(in_array($module, $list), "{$module}_permission() in \Drupal::moduleHandler()->getImplementations() not found.");
 
     $this->assertFalse(db_table_exists($table), "'$table' database table not found.");
-    $schema = drupal_get_schema($table);
+    $schema = drupal_get_schema($table, TRUE);
     $this->assertFalse($schema, "'$table' table schema not found.");
 
     // Install the module.
@@ -200,30 +200,31 @@ class DrupalUnitTestBaseTest extends DrupalUnitTestBase {
   function testEnableModulesFixedList() {
     // Install system module.
     $this->container->get('module_handler')->install(array('system'));
+    $entity_manager = \Drupal::entityManager();
 
     // entity_test is loaded via $modules; its entity type should exist.
     $this->assertEqual($this->container->get('module_handler')->moduleExists('entity_test'), TRUE);
-    $this->assertTrue(TRUE == entity_get_info('entity_test'));
+    $this->assertTrue(TRUE == $entity_manager->getDefinition('entity_test'));
 
     // Load some additional modules; entity_test should still exist.
     $this->enableModules(array('entity', 'field', 'text', 'entity_test'));
     $this->assertEqual($this->container->get('module_handler')->moduleExists('entity_test'), TRUE);
-    $this->assertTrue(TRUE == entity_get_info('entity_test'));
+    $this->assertTrue(TRUE == $entity_manager->getDefinition('entity_test'));
 
     // Install some other modules; entity_test should still exist.
     $this->container->get('module_handler')->install(array('field', 'field_test'), FALSE);
     $this->assertEqual($this->container->get('module_handler')->moduleExists('entity_test'), TRUE);
-    $this->assertTrue(TRUE == entity_get_info('entity_test'));
+    $this->assertTrue(TRUE == $entity_manager->getDefinition('entity_test'));
 
     // Uninstall one of those modules; entity_test should still exist.
     $this->container->get('module_handler')->uninstall(array('field_test'));
     $this->assertEqual($this->container->get('module_handler')->moduleExists('entity_test'), TRUE);
-    $this->assertTrue(TRUE == entity_get_info('entity_test'));
+    $this->assertTrue(TRUE == $entity_manager->getDefinition('entity_test'));
 
     // Set the weight of a module; entity_test should still exist.
     module_set_weight('entity', -1);
     $this->assertEqual($this->container->get('module_handler')->moduleExists('entity_test'), TRUE);
-    $this->assertTrue(TRUE == entity_get_info('entity_test'));
+    $this->assertTrue(TRUE == $entity_manager->getDefinition('entity_test'));
 
     // Reactivate the previously uninstalled module.
     $this->enableModules(array('field_test'));

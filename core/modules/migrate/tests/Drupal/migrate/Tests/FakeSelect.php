@@ -19,7 +19,7 @@ class FakeSelect extends Select {
    * Contents of the pseudo-database.
    *
    * Keys are table names and values are arrays of rows in the table.
-   * Every row there contains all table fields keyed by field name.
+   * Every row there contains all table field values keyed by field name.
    *
    * @code
    * array(

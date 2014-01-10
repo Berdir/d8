@@ -7,6 +7,7 @@
 
 namespace Drupal\views\Tests;
 
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\views\ViewStorageController;
 use Drupal\views\Entity\View;
 use Drupal\views\Plugin\views\display\Page;
@@ -72,11 +73,11 @@ class ViewStorageTest extends ViewUnitTestBase {
    */
   function testConfigurationEntityCRUD() {
     // Get the configuration entity information and controller.
-    $this->info = entity_get_info('view');
+    $this->info = \Drupal::entityManager()->getDefinition('view');
     $this->controller = $this->container->get('entity.manager')->getStorageController('view');
 
     // Confirm that an info array has been returned.
-    $this->assertTrue(!empty($this->info) && is_array($this->info), 'The View info array is loaded.');
+    $this->assertTrue($this->info instanceof EntityTypeInterface, 'The View info array is loaded.');
 
     // Confirm we have the correct controller class.
     $this->assertTrue($this->controller instanceof ViewStorageController, 'The correct controller is loaded.');
@@ -141,6 +142,8 @@ class ViewStorageTest extends ViewUnitTestBase {
 
     // Create a new View instance with config values.
     $values = \Drupal::config('views.view.test_view_storage')->get();
+    $values['id'] = 'test_view_storage_new';
+    unset($values['uuid']);
     $created = $this->controller->create($values);
 
     $this->assertTrue($created instanceof View, 'Created object is a View.');
@@ -156,7 +159,6 @@ class ViewStorageTest extends ViewUnitTestBase {
     }
 
     // Check the UUID of the loaded View.
-    $created->set('id', 'test_view_storage_new');
     $created->save();
     $created_loaded = entity_load('view', 'test_view_storage_new');
     $this->assertIdentical($created->uuid(), $created_loaded->uuid(), 'The created UUID has been saved correctly.');

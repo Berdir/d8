@@ -175,10 +175,10 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
   public $sourceRowStatus = MigrateIdMapInterface::STATUS_IMPORTED;
 
   /**
-   * The fraction of the memory limit at which an operation will be interrupted.
+   * The ratio of the memory limit at which an operation will be interrupted.
    *
    * Can be overridden by a Migration subclass if one would like to push the
-   * envelope. Defaults to 85%.
+   * envelope. Defaults to 0.85.
    *
    * @var float
    */
@@ -195,10 +195,10 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
   public $trackLastImported = FALSE;
 
   /**
-   * The fraction of the time limit at which an operation will be interrupted.
+   * The ratio of the time limit at which an operation will be interrupted.
    *
    * Can be overridden by a Migration subclass if one would like to push the
-   * envelope. Defaults to 90%.
+   * envelope. Defaults to 0.9.
    *
    * @var float
    */

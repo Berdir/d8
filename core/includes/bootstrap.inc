@@ -11,6 +11,7 @@ use Drupal\Core\DrupalKernel;
 use Drupal\Core\Database\Database;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Utility\Title;
+use Drupal\Core\Utility\Error;
 use Symfony\Component\ClassLoader\ApcClassLoader;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
@@ -138,24 +139,19 @@ const DRUPAL_BOOTSTRAP_KERNEL = 1;
 const DRUPAL_BOOTSTRAP_PAGE_CACHE = 2;
 
 /**
- * Fourth bootstrap phase: initialize database layer.
+ * Fourth bootstrap phase: initialize the variable system.
  */
-const DRUPAL_BOOTSTRAP_DATABASE = 3;
+const DRUPAL_BOOTSTRAP_VARIABLES = 3;
 
 /**
- * Fifth bootstrap phase: initialize the variable system.
+ * Fifth bootstrap phase: load code for subsystems and modules.
  */
-const DRUPAL_BOOTSTRAP_VARIABLES = 4;
-
-/**
- * Sixth bootstrap phase: load code for subsystems and modules.
- */
-const DRUPAL_BOOTSTRAP_CODE = 5;
+const DRUPAL_BOOTSTRAP_CODE = 4;
 
 /**
  * Final bootstrap phase: initialize language, path, theme, and modules.
  */
-const DRUPAL_BOOTSTRAP_FULL = 6;
+const DRUPAL_BOOTSTRAP_FULL = 5;
 
 /**
  * Role ID for anonymous users; should match what's in the "role" table.
@@ -418,18 +414,9 @@ function config_get_config_directory($type = CONFIG_ACTIVE_DIRECTORY) {
   global $config_directories;
 
   if (!empty($config_directories[$type])) {
-    // Allow a configuration directory path to be outside of webroot.
-    if (empty($config_directories[$type]['absolute'])) {
-      $path = conf_path() . '/files/' . $config_directories[$type]['path'];
-    }
-    else {
-      $path = $config_directories[$type]['path'];
-    }
+    return $config_directories[$type];
   }
-  else {
-    throw new Exception(format_string('The configuration directory type %type does not exist.', array('%type' => $type)));
-  }
-  return $path;
+  throw new Exception(format_string('The configuration directory type %type does not exist.', array('%type' => $type)));
 }
 
 /**
@@ -1470,7 +1457,7 @@ function request_uri($omit_query_string = FALSE) {
  *   A link to associate with the message.
  *
  * @see watchdog()
- * @see _drupal_decode_exception()
+ * @see \Drupal\Core\Utility\Error::decodeException()
  */
 function watchdog_exception($type, Exception $exception, $message = NULL, $variables = array(), $severity = WATCHDOG_ERROR, $link = NULL) {
 
@@ -1478,7 +1465,7 @@ function watchdog_exception($type, Exception $exception, $message = NULL, $varia
    if (empty($message)) {
      // The exception message is run through
      // \Drupal\Component\Utility\String::checkPlain() by
-     // _drupal_decode_exception().
+     // \Drupal\Core\Utility\Error:decodeException().
      $message = '%type: !message in %function (line %line of %file).';
    }
    // $variables must be an array so that we can add the exception information.
@@ -1486,8 +1473,7 @@ function watchdog_exception($type, Exception $exception, $message = NULL, $varia
      $variables = array();
    }
 
-   require_once __DIR__ . '/errors.inc';
-   $variables += _drupal_decode_exception($exception);
+   $variables += Error::decodeException($exception);
    watchdog($type, $message, $variables, $severity, $link);
 }
 
@@ -1757,7 +1743,6 @@ function drupal_anonymous_user() {
  *   - DRUPAL_BOOTSTRAP_CONFIGURATION: Initializes configuration.
  *   - DRUPAL_BOOTSTRAP_KERNEL: Initalizes a kernel.
  *   - DRUPAL_BOOTSTRAP_PAGE_CACHE: Tries to serve a cached page.
- *   - DRUPAL_BOOTSTRAP_DATABASE: Initializes the database layer.
  *   - DRUPAL_BOOTSTRAP_VARIABLES: Initializes the variable system.
  *   - DRUPAL_BOOTSTRAP_CODE: Loads code for subsystems and modules.
  *   - DRUPAL_BOOTSTRAP_FULL: Fully loads Drupal. Validates and fixes input
@@ -1775,7 +1760,6 @@ function drupal_bootstrap($phase = NULL, $new_phase = TRUE) {
     DRUPAL_BOOTSTRAP_CONFIGURATION,
     DRUPAL_BOOTSTRAP_KERNEL,
     DRUPAL_BOOTSTRAP_PAGE_CACHE,
-    DRUPAL_BOOTSTRAP_DATABASE,
     DRUPAL_BOOTSTRAP_VARIABLES,
     DRUPAL_BOOTSTRAP_CODE,
     DRUPAL_BOOTSTRAP_FULL,
@@ -1816,10 +1800,6 @@ function drupal_bootstrap($phase = NULL, $new_phase = TRUE) {
 
         case DRUPAL_BOOTSTRAP_PAGE_CACHE:
           _drupal_bootstrap_page_cache();
-          break;
-
-        case DRUPAL_BOOTSTRAP_DATABASE:
-          _drupal_bootstrap_database();
           break;
 
         case DRUPAL_BOOTSTRAP_VARIABLES:
@@ -1954,15 +1934,15 @@ function _drupal_exception_handler($exception) {
 
   try {
     // Log the message to the watchdog and return an error page to the user.
-    _drupal_log_error(_drupal_decode_exception($exception), TRUE);
+    _drupal_log_error(Error::decodeException($exception), TRUE);
   }
   catch (Exception $exception2) {
     // Another uncaught exception was thrown while handling the first one.
     // If we are displaying errors, then do so with no possibility of a further uncaught exception being thrown.
     if (error_displayable()) {
       print '<h1>Additional uncaught exception thrown while handling exception.</h1>';
-      print '<h2>Original</h2><p>' . _drupal_render_exception_safe($exception) . '</p>';
-      print '<h2>Additional</h2><p>' . _drupal_render_exception_safe($exception2) . '</p><hr />';
+      print '<h2>Original</h2><p>' . Error::renderExceptionSafe($exception) . '</p>';
+      print '<h2>Additional</h2><p>' . Error::renderExceptionSafe($exception2) . '</p><hr />';
     }
   }
 }
@@ -2024,6 +2004,7 @@ function _drupal_bootstrap_page_cache() {
   global $user;
 
   require_once __DIR__ . '/cache.inc';
+  require_once __DIR__ . '/database.inc';
   // Check for a cache mode force from settings.php.
   if (settings()->get('page_cache_without_database')) {
     $cache_enabled = TRUE;
@@ -2098,15 +2079,6 @@ function _drupal_initialize_db_test_prefix() {
 }
 
 /**
- * Initializes the database system by loading database.inc.
- */
-function _drupal_bootstrap_database() {
-  // Initialize the database system. Note that the connection
-  // won't be initialized until it is actually requested.
-  require_once __DIR__ . '/database.inc';
-}
-
-/**
  * Loads system variables and all enabled bootstrap modules.
  */
 function _drupal_bootstrap_variables() {
@@ -2125,20 +2097,6 @@ function _drupal_bootstrap_variables() {
  */
 function drupal_get_bootstrap_phase() {
   return drupal_bootstrap();
-}
-
-/**
- * Retrieves the Drupal Container to standardize object construction.
- *
- * @deprecated This function has been replaced by the \Drupal class. Use that
- *   instead.
- *
- * @return Symfony\Component\DependencyInjection\ContainerInterface|bool
- *   The instance of the ContainerInterface used to set up and maintain
- *   object instances or FALSE if none exist yet.
- */
-function drupal_container() {
-  return \Drupal::getContainer();
 }
 
 /**
@@ -2307,7 +2265,7 @@ function _drupal_load_test_overrides($test_prefix) {
   $path_prefix = 'simpletest/' . substr($test_prefix, 10);
   $config_directories = array();
   foreach (array(CONFIG_ACTIVE_DIRECTORY, CONFIG_STAGING_DIRECTORY) as $type) {
-    $config_directories[$type] = array('path' => $path_prefix . '/config_' . $type);
+    $config_directories[$type] = conf_path() . '/files/' . $path_prefix . '/config_' . $type;
   }
 
   // Check for and load a settings.php file in the simpletest files directory.
@@ -2453,7 +2411,7 @@ function language_list($flags = Language::STATE_CONFIGURABLE) {
     $default = language_default();
     if (language_multilingual() || \Drupal::moduleHandler()->moduleExists('language')) {
       // Use language module configuration if available.
-      $language_entities = config_get_storage_names_with_prefix('language.entity');
+      $language_entities = config_get_storage_names_with_prefix('language.entity.');
 
       // Initialize default property so callers have an easy reference and can
       // save the same object without data loss.
@@ -3019,7 +2977,7 @@ function _drupal_shutdown_function() {
     require_once __DIR__ . '/errors.inc';
     if (error_displayable()) {
       print '<h1>Uncaught exception thrown in shutdown function.</h1>';
-      print '<p>' . _drupal_render_exception_safe($exception) . '</p><hr />';
+      print '<p>' . Error::renderExceptionSafe($exception) . '</p><hr />';
     }
     error_log($exception);
   }

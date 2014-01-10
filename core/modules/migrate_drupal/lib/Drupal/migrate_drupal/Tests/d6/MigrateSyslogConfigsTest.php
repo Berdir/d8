@@ -35,13 +35,12 @@ class MigrateSyslogConfigsTest extends MigrateDrupalTestBase {
     $dumps = array(
       drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6SyslogSettings.php',
     );
-    $facility = defined('LOG_LOCAL0') ? LOG_LOCAL0 : LOG_USER;
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, new MigrateMessage());
     $executable->import();
     $config = \Drupal::config('syslog.settings');
     $this->assertIdentical($config->get('identity'), 'drupal');
-    // @TODO: remove this typecast once there's schema of rhtis config.
-    $this->assertIdentical($config->get('facility'), (string) $facility);
+    // @TODO: change this to integer once there's schema of this config.
+    $this->assertIdentical($config->get('facility'), '128');
   }
 }

@@ -341,7 +341,7 @@ function install_begin_request(&$install_state) {
 
   // If it is not, replace the configuration storage with the InstallStorage
   // implementation, for the following reasons:
-  // - The first call into drupal_container() will try to set up the regular
+  // - The first call to $kernel->getContainer() will try to set up the regular
   //   runtime configuration storage, using the CachedStorage by default. It
   //   calls config_get_config_directory() to retrieve the config directory to
   //   use, but that throws an exception, since $config_directories is not
@@ -378,17 +378,18 @@ function install_begin_request(&$install_state) {
     $container->register('event_dispatcher', 'Symfony\Component\EventDispatcher\EventDispatcher');
 
     $container->register('config.storage', 'Drupal\Core\Config\InstallStorage');
-    $container->register('config.context.factory', 'Drupal\Core\Config\Context\ConfigContextFactory')
-      ->addArgument(new Reference('event_dispatcher'))
-      ->addArgument(new Reference('uuid'));
 
-    $container->register('config.context', 'Drupal\Core\Config\Context\ContextInterface')
-      ->setFactoryService(new Reference('config.context.factory'))
-      ->setFactoryMethod('get');
+    $container->register('config.storage.schema', 'Drupal\Core\Config\Schema\SchemaStorage');
+
+    $container->register('config.typed', 'Drupal\Core\Config\TypedConfigManager')
+      ->addArgument(new Reference('config.storage'))
+      ->addArgument(new Reference('config.storage.schema'))
+      ->addArgument(new Reference('cache.config'));
 
     $container->register('config.factory', 'Drupal\Core\Config\ConfigFactory')
       ->addArgument(new Reference('config.storage'))
-      ->addArgument(new Reference('config.context'));
+      ->addArgument(new Reference('event_dispatcher'))
+      ->addArgument(new Reference('config.typed'));
 
     // Register the 'language_manager' service.
     $container
@@ -1894,7 +1895,7 @@ function install_already_done_error() {
   global $base_url;
 
   drupal_set_title(t('Drupal already installed'));
-  return t('<ul><li>To start over, you must empty your existing database, delete your active configuration, and copy <em>default.settings.php</em> over <em>settings.php</em>.</li><li>To install to a different database, edit the appropriate <em>settings.php</em> file in the <em>sites</em> folder.</li><li>To locate your active configuration, view the appropriate <em>settings.php</em> file in the <em>sites</em> folder.</em></li></li><li>To upgrade an existing installation, proceed to the <a href="@base-url/core/update.php">update script</a>.</li><li>View your <a href="@base-url">existing site</a>.</li></ul>', array('@base-url' => $base_url));
+  return t('<ul><li>To start over, you must empty your existing database, delete your active configuration, and copy <em>default.settings.php</em> over <em>settings.php</em>.</li><li>To install to a different database, edit the appropriate <em>settings.php</em> file in the <em>sites</em> folder.</li><li>To locate your active configuration, view the appropriate <em>settings.php</em> file in the <em>sites</em> folder.</li><li>To upgrade an existing installation, proceed to the <a href="@base-url/core/update.php">update script</a>.</li><li>View your <a href="@base-url">existing site</a>.</li></ul>', array('@base-url' => $base_url));
 }
 
 /**
@@ -2096,12 +2097,13 @@ function install_configure_form($form, &$form_state, &$install_state) {
     drupal_set_message(t('All necessary changes to %dir and %file have been made, so you should remove write permissions to them now in order to avoid security risks. If you are unsure how to do so, consult the <a href="@handbook_url">online handbook</a>.', array('%dir' => $settings_dir, '%file' => $settings_file, '@handbook_url' => 'http://drupal.org/server-permissions')), 'warning');
   }
 
-  drupal_add_library('system', 'drupal.system');
+  $form['#attached']['library'][] = array('system', 'drupal.system');
   // Add JavaScript time zone detection.
-  drupal_add_library('system', 'drupal.timezone');
+  $form['#attached']['library'][] = array('system', 'drupal.timezone');
   // We add these strings as settings because JavaScript translation does not
   // work during installation.
-  drupal_add_js(array('copyFieldValue' => array('edit-site-mail' => array('edit-account-mail'))), 'setting');
+  $js = array('copyFieldValue' => array('edit-site-mail' => array('edit-account-mail')));
+  $form['#attached']['js'][] = array('data' => $js, 'type' => 'setting');
 
   // Cache a fully-built schema. This is necessary for any invocation of
   // index.php because: (1) setting cache table entries requires schema
@@ -2199,8 +2201,8 @@ function install_finished(&$install_state) {
   drupal_cron_run();
 
   // Save a snapshot of the initially installed configuration.
-  $active = drupal_container()->get('config.storage');
-  $snapshot = drupal_container()->get('config.storage.snapshot');
+  $active = \Drupal::service('config.storage');
+  $snapshot = \Drupal::service('config.storage.snapshot');
   config_import_create_snapshot($active, $snapshot);
 
   return $output;

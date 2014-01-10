@@ -69,8 +69,7 @@ class MigrateSystemConfigsTest extends MigrateDrupalTestBase {
     $config = \Drupal::config('system.performance');
     $this->assertIdentical($config->get('css.preprocess'), false);
     $this->assertIdentical($config->get('js.preprocess'), false);
-    // @TODO: make this 0 once there's schema for cache.page.max_age.
-    $this->assertIdentical($config->get('cache.page.max_age'), '0');
+    $this->assertIdentical($config->get('cache.page.max_age'), 0);
   }
 
   /**
@@ -85,7 +84,7 @@ class MigrateSystemConfigsTest extends MigrateDrupalTestBase {
     $executable = new MigrateExecutable($migration, new MigrateMessage());
     $executable->import();
     $config = \Drupal::config('system.theme');
-    $this->assertIdentical($config->get('admin'), 0);
+    $this->assertIdentical($config->get('admin'), '0');
     $this->assertIdentical($config->get('default'), 'garland');
   }
 
@@ -117,12 +116,12 @@ class MigrateSystemConfigsTest extends MigrateDrupalTestBase {
     $executable = new MigrateExecutable($migration, new MigrateMessage());
     $executable->import();
     $config = \Drupal::config('system.site');
-    $this->assertIdentical($config->get('name'), 'Drupal');
-    $this->assertIdentical($config->get('mail'), 'admin@example.com');
+    $this->assertIdentical($config->get('name'), 'site_name');
+    $this->assertIdentical($config->get('mail'), 'site_mail@example.com');
     $this->assertIdentical($config->get('slogan'), 'Migrate rocks');
     $this->assertIdentical($config->get('page.403'), 'user');
     $this->assertIdentical($config->get('page.404'), 'page-not-found');
-    $this->assertIdentical($config->get('page.front'), 'anonymous-hp');
+    $this->assertIdentical($config->get('page.front'), 'node');
     $this->assertIdentical($config->get('admin_compact_mode'), FALSE);
   }
 
@@ -182,11 +181,11 @@ class MigrateSystemConfigsTest extends MigrateDrupalTestBase {
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, new MigrateMessage());
     $executable->import();
-    config_context_enter('config.context.free');
+    \Drupal::configFactory()->disableOverrides();
     $config = \Drupal::config('system.file');
     $this->assertIdentical($config->get('path.private'), 'files/test');
     $this->assertIdentical($config->get('path.temporary'), 'files/temp');
-    config_context_leave();
+    \Drupal::configFactory()->enableOverrides();
   }
 
 }

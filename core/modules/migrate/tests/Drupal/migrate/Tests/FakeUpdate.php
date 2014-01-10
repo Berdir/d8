@@ -11,27 +11,38 @@ use Drupal\Core\Database\Query\Condition;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Database\Query\Update;
 
+/**
+ * Defines FakeUpdate for use in database tests.
+ */
 class FakeUpdate extends Update {
 
   /**
+   * The database table to update.
+   *
    * @var string
    */
   protected $table;
 
   /**
+   * The database contents.
+   *
    * @var array
    */
   protected $databaseContents;
 
   /**
-   * Constructs a FakeUpdate object.
-   * @param \Drupal\Core\Database\Connection $database_contents
+   * Constructs a FakeUpdate object and initializes the condition.
+   *
+   * @param array $database_contents
+   *   The database contents faked as an array. Each key is a table name, each
+   *   value is a list of table rows.
    * @param string $table
+   *   The table to update.
    */
-  public function __construct(&$database_contents, $table) {
+  public function __construct(array &$database_contents, $table) {
+    $this->databaseContents = &$database_contents;
     $this->table = $table;
     $this->condition = new Condition('AND');
-    $this->databaseContents = &$database_contents;
   }
 
   /**
@@ -73,4 +84,5 @@ class FakeUpdate extends Update {
   public function expression($field, $expression, array $arguments = NULL) {
     throw new \Exception(sprintf('Method "%s" is not supported', __METHOD__));
   }
+
 }

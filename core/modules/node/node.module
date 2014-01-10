@@ -131,12 +131,12 @@ function node_help($path, $arg) {
     case 'node/%/edit':
       $node = node_load($arg[1]);
       $type = node_type_load($node->bundle());
-      return (!empty($type->help) ? '<p>' . filter_xss_admin($type->help) . '</p>' : '');
+      return (!empty($type->help) ? filter_xss_admin($type->help) : '');
   }
 
   if ($arg[0] == 'node' && $arg[1] == 'add' && $arg[2]) {
     $type = node_type_load($arg[2]);
-    return (!empty($type->help) ? '<p>' . filter_xss_admin($type->help) . '</p>' : '');
+    return (!empty($type->help) ? filter_xss_admin($type->help) : '');
   }
 }
 
@@ -688,14 +688,12 @@ function template_preprocess_node(&$variables) {
     $variables['content'][$key] = $variables['elements'][$key];
   }
 
-  // Make the field variables available with the appropriate language.
-  field_attach_preprocess($node, $variables['content'], $variables);
-
   // Display post information only on certain node types.
-  // Avoid loading the entire node type config entity here.
-  $submitted = \Drupal::config('node.type.' . $node->bundle())->get('settings.node.submitted') ?: TRUE;
-  if ($submitted) {
-    $variables['display_submitted'] = TRUE;
+  // Avoid loading the entire node type config entity here that may not exist.
+  $node_type_config = \Drupal::config('node.type.' . $node->bundle());
+  // Display submitted by default.
+  $variables['display_submitted'] = $node_type_config->isNew() || $node_type_config->get('settings.node.submitted');
+  if ($variables['display_submitted']) {
     $variables['submitted'] = t('Submitted by !username on !datetime', array('!username' => $variables['name'], '!datetime' => $variables['date']));
     if (theme_get_setting('features.node_user_picture')) {
       // To change user picture settings (e.g. image style), edit the 'compact'
@@ -708,7 +706,6 @@ function template_preprocess_node(&$variables) {
     }
   }
   else {
-    $variables['display_submitted'] = FALSE;
     $variables['submitted'] = '';
     $variables['user_picture'] = '';
   }
@@ -911,7 +908,7 @@ function theme_node_search_admin($variables) {
 
   $output = drupal_render($form['info']);
 
-  $header = array(t('Factor'), t('Weight'));
+  $header = array(t('Factor'), t('Influence'));
   foreach (element_children($form['factors']) as $key) {
     $row = array();
     $row[] = $form['factors'][$key]['#title'];
@@ -956,21 +953,6 @@ function _node_revision_access(EntityInterface $node, $op = 'view', $account = N
     $account = \Drupal::currentUser();
   }
   return \Drupal::service('access_check.node.revision')->checkAccess($node, $account, $op, $langcode);
-}
-
-/**
- * Access callback: Checks whether the user has permission to add a node.
- *
- * @return
- *   TRUE if the user has add permission, otherwise FALSE.
- *
- * @see node_menu()
- *
- * @deprecated
- *   Use \Drupal::service('access_manager')->checkNamedRoute('node.add_page');
- */
-function _node_add_access() {
-  return \Drupal::service('access_manager')->checkNamedRoute('node.add_page', array(), \Drupal::currentUser());
 }
 
 /**

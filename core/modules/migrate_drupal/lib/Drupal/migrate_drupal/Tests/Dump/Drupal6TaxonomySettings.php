@@ -21,27 +21,7 @@ class Drupal6TaxonomySettings {
    *   The database connection.
    */
   public static function load(Connection $database) {
-    $database->schema()->createTable('variable', array(
-      'fields' => array(
-        'name' => array(
-          'type' => 'varchar',
-          'length' => 128,
-          'not null' => TRUE,
-          'default' => '',
-        ),
-        'value' => array(
-          'type' => 'blob',
-          'not null' => TRUE,
-          'size' => 'big',
-          'translatable' => TRUE,
-        ),
-      ),
-      'primary key' => array(
-        'name',
-      ),
-      'module' => 'taxonomy',
-      'name' => 'variable',
-    ));
+    Drupal6DumpCommon::createVariable($database);
     $database->insert('variable')->fields(array(
       'name',
       'value',

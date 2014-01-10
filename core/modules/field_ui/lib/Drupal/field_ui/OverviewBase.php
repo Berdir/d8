@@ -77,7 +77,7 @@ abstract class OverviewBase extends FormBase {
     if (!isset($form_state['bundle'])) {
       if (!$bundle) {
         $entity_info = $this->entityManager->getDefinition($entity_type);
-        $bundle = $this->getRequest()->attributes->get('_raw_variables')->get($entity_info['bundle_entity_type']);
+        $bundle = $this->getRequest()->attributes->get('_raw_variables')->get($entity_info->getBundleEntityType());
       }
       $form_state['bundle'] = $bundle;
     }
@@ -136,7 +136,15 @@ abstract class OverviewBase extends FormBase {
    * This function is assigned as a #pre_render callback in
    * field_ui_element_info().
    *
-   * @see drupal_render().
+   * @param array $element
+   *   A structured array containing two sub-levels of elements. Properties
+   *   used:
+   *   - #tabledrag: The value is a list of $options arrays that are passed to
+   *     drupal_attach_tabledrag(). The HTML ID of the table is added to each
+   *     $options array.
+   *
+   * @see drupal_render()
+   * @see drupal_pre_render_table()
    */
   public function tablePreRender($elements) {
     $js_settings = array();
@@ -206,6 +214,16 @@ abstract class OverviewBase extends FormBase {
       'type' => 'setting',
       'data' => array('fieldUIRowsData' => $js_settings),
     );
+
+    // If the custom #tabledrag is set and there is a HTML ID, add the table's
+    // HTML ID to the options and attach the behavior.
+    // @see drupal_pre_render_table()
+    if (!empty($elements['#tabledrag']) && isset($elements['#attributes']['id'])) {
+      foreach ($elements['#tabledrag'] as $options) {
+        $options['table_id'] = $elements['#attributes']['id'];
+        drupal_attach_tabledrag($elements, $options);
+      }
+    }
 
     return $elements;
   }

@@ -7,6 +7,7 @@
 
 namespace Drupal\migrate;
 
+use Drupal\Core\Utility\Error;
 use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
 
@@ -142,6 +143,13 @@ class MigrateExecutable {
   protected $destinationValues;
 
   /**
+   * The source.
+   *
+   * @var \Drupal\migrate\Source
+   */
+  protected $source;
+
+  /**
    * The current data row retrieved from the source.
    *
    * @var \stdClass
@@ -231,34 +239,43 @@ class MigrateExecutable {
         $this->saveQueuedMessages();
       }
 
-      $this->processRow($row);
-
       try {
-        $destination_id_values = $destination->import($row);
-        // @todo Handle the successful but no ID case like config,
-        //   https://drupal.org/node/2160835.
-        if ($destination_id_values) {
-          $id_map->saveIdMapping($row, $destination_id_values, $this->sourceRowStatus, $this->rollbackAction);
-          $this->successesSinceFeedback++;
-          $this->totalSuccesses++;
-        }
-        else {
-          $id_map->saveIdMapping($row, array(), MigrateIdMapInterface::STATUS_FAILED, $this->rollbackAction);
-          if (!$id_map->messageCount()) {
-            $message = $this->t('New object was not saved, no error provided');
-            $this->saveMessage($message);
-            $this->message->display($message);
+        $this->processRow($row);
+        $save = TRUE;
+      }
+      catch (MigrateSkipRowException $e) {
+        $id_map->saveIdMapping($row, array(), MigrateIdMapInterface::STATUS_IGNORED, $this->rollbackAction);
+        $save = FALSE;
+      }
+
+      if ($save) {
+        try {
+          $destination_id_values = $destination->import($row);
+          // @todo Handle the successful but no ID case like config,
+          //   https://drupal.org/node/2160835.
+          if ($destination_id_values) {
+            $id_map->saveIdMapping($row, $destination_id_values, $this->sourceRowStatus, $this->rollbackAction);
+            $this->successesSinceFeedback++;
+            $this->totalSuccesses++;
+          }
+          else {
+            $id_map->saveIdMapping($row, array(), MigrateIdMapInterface::STATUS_FAILED, $this->rollbackAction);
+            if (!$id_map->messageCount()) {
+              $message = $this->t('New object was not saved, no error provided');
+              $this->saveMessage($message);
+              $this->message->display($message);
+            }
           }
         }
-      }
-      catch (MigrateException $e) {
-        $this->migration->getIdMap()->saveIdMapping($row, array(), $e->getStatus(), $this->rollbackAction);
-        $this->saveMessage($e->getMessage(), $e->getLevel());
-        $this->message->display($e->getMessage());
-      }
-      catch (\Exception $e) {
-        $this->migration->getIdMap()->saveIdMapping($row, array(), MigrateIdMapInterface::STATUS_FAILED, $this->rollbackAction);
-        $this->handleException($e);
+        catch (MigrateException $e) {
+          $this->migration->getIdMap()->saveIdMapping($row, array(), $e->getStatus(), $this->rollbackAction);
+          $this->saveMessage($e->getMessage(), $e->getLevel());
+          $this->message->display($e->getMessage());
+        }
+        catch (\Exception $e) {
+          $this->migration->getIdMap()->saveIdMapping($row, array(), MigrateIdMapInterface::STATUS_FAILED, $this->rollbackAction);
+          $this->handleException($e);
+        }
       }
       $this->totalProcessed++;
       $this->processedSinceFeedback++;
@@ -269,12 +286,6 @@ class MigrateExecutable {
       // Reset row properties.
       unset($sourceValues, $destinationValues);
       $this->sourceRowStatus = MigrateIdMapInterface::STATUS_IMPORTED;
-
-      // @todo Remove when http://drupal.org/node/375494 is committed.
-      // TODO: Should be done in MigrateDestinationEntity.
-      if (!empty($destination->entityType)) {
-        entity_get_controller($destination->entityType)->resetCache();
-      }
 
       if (($return = $this->checkStatus()) != MigrationInterface::RESULT_COMPLETED) {
         break;
@@ -322,6 +333,7 @@ class MigrateExecutable {
   public function processRow(Row $row, array $process = NULL, $value = NULL) {
     foreach ($this->migration->getProcessPlugins($process) as $destination => $plugins) {
       $multiple = FALSE;
+      /** @var $plugin \Drupal\migrate\Plugin\MigrateProcessInterface */
       foreach ($plugins as $plugin) {
         $definition = $plugin->getPluginDefinition();
         // Many plugins expect a scalar value but the current value of the
@@ -471,7 +483,7 @@ class MigrateExecutable {
    * If so, output a message.
    *
    * @return bool
-   *   TRUE if the threshold is exceeded, FALSE if not.
+   *   TRUE if the threshold is exceeded, otherwise FALSE.
    */
   protected function memoryExceeded() {
     $usage = $this->getMemoryUsage();
@@ -490,7 +502,7 @@ class MigrateExecutable {
       $pct_memory = $usage / $this->memoryLimit;
       // Use a lower threshold - we don't want to be in a situation where we keep
       // coming back here and trimming a tiny amount
-      if ($pct_memory > (.90 * $threshold)) {
+      if ($pct_memory > (0.90 * $threshold)) {
         $this->message->display(
           $this->t('Memory usage is now !usage (!pct% of limit !limit), not enough reclaimed, starting new batch',
             array('!pct' => round($pct_memory*100),
@@ -534,7 +546,7 @@ class MigrateExecutable {
     // First, try resetting Drupal's static storage - this frequently releases
     // plenty of memory to continue.
     drupal_static_reset();
-    // @TODO: explore kernel reset.
+    // @TODO: explore resetting the container.
     return memory_get_usage();
   }
 
@@ -558,14 +570,7 @@ class MigrateExecutable {
    *   TRUE if the threshold is exceeded, FALSE if not.
    */
   protected function maxExecTimeExceeded() {
-    if ($this->maxExecTime) {
-      $time_elapsed = $this->getTimeElapsed();
-      $pct_time = $time_elapsed / $this->maxExecTime;
-      if ($pct_time > $this->migration->get('timeThreshold')) {
-        return TRUE;
-      }
-    }
-    return FALSE;
+    return $this->maxExecTime && (($this->getTimeElapsed() / $this->maxExecTime) > $this->migration->get('timeThreshold'));
   }
 
   /**
@@ -589,7 +594,7 @@ class MigrateExecutable {
    *   Set to FALSE in contexts where this doesn't make sense.
    */
   public function handleException(\Exception $exception, $save = TRUE) {
-    $result = _drupal_decode_exception($exception);
+    $result = Error::decodeException($exception);
     $message = $result['!message'] . ' (' . $result['%file'] . ':' . $result['%line'] . ')';
     if ($save) {
       $this->saveMessage($message);

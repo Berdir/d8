@@ -21,38 +21,18 @@ class Drupal6SystemSite {
    *   The database connection.
    */
   public static function load(Connection $database) {
-    $database->schema()->createTable('variable', array(
-      'fields' => array(
-        'name' => array(
-          'type' => 'varchar',
-          'length' => 128,
-          'not null' => TRUE,
-          'default' => '',
-        ),
-        'value' => array(
-          'type' => 'blob',
-          'not null' => TRUE,
-          'size' => 'big',
-          'translatable' => TRUE,
-        ),
-      ),
-      'primary key' => array(
-        'name',
-      ),
-      'module' => 'system',
-      'name' => 'variable',
-    ));
+    Drupal6DumpCommon::createVariable($database);
     $database->insert('variable')->fields(array(
       'name',
       'value',
     ))
     ->values(array(
       'name' => 'site_name',
-      'value' => serialize('Drupal'),
+      'value' => 's:9:"site_name";',
     ))
     ->values(array(
       'name' => 'site_mail',
-      'value' => serialize('admin@example.com'),
+      'value' => 's:21:"site_mail@example.com";',
     ))
     ->values(array(
       'name' => 'site_slogan',
@@ -60,7 +40,7 @@ class Drupal6SystemSite {
     ))
     ->values(array(
       'name' => 'site_frontpage',
-      'value' => serialize('anonymous-hp'),
+      'value' => 's:4:"node";',
     ))
     ->values(array(
       'name' => 'site_403',
@@ -68,7 +48,7 @@ class Drupal6SystemSite {
     ))
     ->values(array(
       'name' => 'site_404',
-      'value' => serialize('page-not-found'),
+      'value' => 's:14:"page-not-found";',
     ))
     ->values(array(
       'name' => 'admin_compact_mode',

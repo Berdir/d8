@@ -21,15 +21,37 @@ use Drupal\Tests\UnitTestCase;
  */
 class RowTest extends UnitTestCase {
 
+  /**
+   * The source IDs.
+   *
+   * @var array
+   */
   protected $testSourceIds = array(
     'nid' => 'Node ID',
   );
+
+  /**
+   * The test values.
+   *
+   * @var array
+   */
   protected $testValues = array(
     'nid' => 1,
     'title' => 'node 1',
   );
+
+  /**
+   * The test hash.
+   *
+   * @var string
+   */
   protected $testHash = '85795d4cde4a2425868b812cc88052ecd14fc912e7b9b4de45780f66750e8b1e';
-  // After changing title value to 'new title'.
+
+  /**
+   * The test hash after changing title value to 'new title'.
+   *
+   * @var string
+   */
   protected $testHashMod = '9476aab0b62b3f47342cc6530441432e5612dcba7ca84115bbab5cceaca1ecb3';
 
   /**
@@ -165,7 +187,7 @@ class RowTest extends UnitTestCase {
   }
 
   /**
-   * Tests getting/setting the idMap.
+   * Tests getting/setting the ID Map.
    *
    * @covers \Drupal\migrate\Row::setIdMap()
    * @covers \Drupal\migrate\Row::getIdMap()

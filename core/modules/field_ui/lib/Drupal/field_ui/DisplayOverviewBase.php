@@ -123,6 +123,20 @@ abstract class DisplayOverviewBase extends OverviewBase {
       // Add Ajax wrapper.
       '#prefix' => '<div id="field-display-overview-wrapper">',
       '#suffix' => '</div>',
+      '#tabledrag' => array(
+        array(
+          'action' => 'order',
+          'relationship' => 'sibling',
+          'group' => 'field-weight',
+        ),
+        array(
+          'action' => 'match',
+          'relationship' => 'parent',
+          'group' => 'field-parent',
+          'subgroup' => 'field-parent',
+          'source' => 'field-name',
+        ),
+      ),
     );
 
     // Field rows.
@@ -193,10 +207,6 @@ abstract class DisplayOverviewBase extends OverviewBase {
     $form['actions']['submit'] = array('#type' => 'submit', '#value' => $this->t('Save'));
 
     $form['#attached']['library'][] = array('field_ui', 'drupal.field_ui');
-
-    // Add tabledrag behavior.
-    $form['#attached']['drupal_add_tabledrag'][] = array('field-display-overview', 'order', 'sibling', 'field-weight');
-    $form['#attached']['drupal_add_tabledrag'][] = array('field-display-overview', 'match', 'parent', 'field-parent', 'field-parent', 'field-name');
 
     return $form;
   }
@@ -731,8 +741,8 @@ abstract class DisplayOverviewBase extends OverviewBase {
     $load_ids = array();
     $display_entity_type = $this->getDisplayType();
     $entity_info = $this->entityManager->getDefinition($display_entity_type);
-    $config_prefix = $entity_info['config_prefix'];
-    $ids = config_get_storage_names_with_prefix($config_prefix . '.' . $this->entity_type . '.' . $this->bundle);
+    $config_prefix = $entity_info->getConfigPrefix();
+    $ids = config_get_storage_names_with_prefix($config_prefix . '.' . $this->entity_type . '.' . $this->bundle . '.');
     foreach ($ids as $id) {
       $config_id = str_replace($config_prefix . '.', '', $id);
       list(,, $display_mode) = explode('.', $config_id);

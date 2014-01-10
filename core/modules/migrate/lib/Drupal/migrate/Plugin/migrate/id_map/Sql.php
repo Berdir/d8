@@ -387,7 +387,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
   /**
    * {@inheritdoc}
    */
-  public function lookupDestinationID(array $source_id) {
+  public function lookupDestinationId(array $source_id) {
     $query = $this->getDatabase()->select($this->mapTableName, 'map')
               ->fields('map', $this->destinationIdFields);
     foreach ($this->sourceIdFields as $key_name) {
@@ -444,9 +444,8 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
     $count = 1;
     foreach ($source_id_values as $id_value) {
       $fields['sourceid' . $count++] = $id_value;
-      // If any key value is not set, we can't save - print out and abort.
+      // If any key value is not set, we can't save.
       if (!isset($id_value)) {
-        print($message);
         return;
       }
     }

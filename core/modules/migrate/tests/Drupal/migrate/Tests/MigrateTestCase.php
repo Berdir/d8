@@ -56,9 +56,20 @@ abstract class MigrateTestCase extends UnitTestCase {
   }
 
   /**
-   * @return \Drupal\Core\Database\Connection
+   * Get a fake database connection object for use in tests.
+   *
+   * @param array $database_contents
+   *   The database contents faked as an array. Each key is a table name, each
+   *   value is a list of table rows, an associative array of field => value.
+   * @param array $connection_options
+   *   (optional) The array of connection options for the database.
+   * @param string $prefix
+   *   (optional) The table prefix on the database.
+   *
+   * @return \Drupal\migrate\Tests\FakeConnection
+   *   The database connection.
    */
-  protected function getDatabase($database_contents, $connection_options = array(), $prefix = '') {
+  protected function getDatabase(array $database_contents, $connection_options = array(), $prefix = '') {
     return new FakeConnection($database_contents, $connection_options, $prefix);
   }
 

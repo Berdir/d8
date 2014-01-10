@@ -8,7 +8,7 @@
 namespace Drupal\migrate\Tests;
 
 /**
- * Tests the MigrateExecuteable::memoryExceeded() method.
+ * Tests the \Drupal\migrate\MigrateExecutable::memoryExceeded() method.
  *
  * @group Drupal
  * @group migrate
@@ -36,8 +36,18 @@ class MigrateExecuteableMemoryExceededTest extends MigrateTestCase {
    */
   protected $executable;
 
+  /**
+   * Whether the map is joinable, initialized to FALSE.
+   *
+   * @var bool
+   */
   protected $mapJoinable = FALSE;
 
+  /**
+   * The migration configuration, initialized to set the ID to test.
+   *
+   * @var array
+   */
   protected $migrationConfiguration = array(
     'id' => 'test',
   );
@@ -73,14 +83,16 @@ class MigrateExecuteableMemoryExceededTest extends MigrateTestCase {
   /**
    * Runs the actual test.
    *
-   * @param $message
+   * @param string $message
    *   The second message to assert.
    * @param bool $memory_exceeded
    *   Whether to test the memory exceeded case.
    * @param int $memory_usage_first
+   *   (optional) The first memory usage value.
    * @param int $memory_usage_second
-   *   Used to set the second time the memory usage is queried: the first time
-   *   times this many will be returned.
+   *   (optional) The fake amount of memory usage reported after memory reclaim.
+   * @param int $memory_limit
+   *   (optional) The memory limit.
    */
   protected function runMemoryExceededTest($message, $memory_exceeded, $memory_usage_first = NULL, $memory_usage_second = NULL, $memory_limit = NULL) {
     $this->executable->setMemoryLimit($memory_limit ?: $this->memoryLimit);
@@ -123,4 +135,5 @@ class MigrateExecuteableMemoryExceededTest extends MigrateTestCase {
   public function testMemoryNotExceeded() {
     $this->runMemoryExceededTest('', FALSE, floor($this->memoryLimit * 0.85) - 1);
   }
+
 }

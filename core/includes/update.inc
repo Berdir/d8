@@ -14,6 +14,7 @@ use Drupal\Component\Utility\String;
 use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Config\ConfigException;
 use Drupal\Core\DrupalKernel;
+use Drupal\Core\Utility\Error;
 use Drupal\Component\Uuid\Uuid;
 use Drupal\Component\Utility\NestedArray;
 use Symfony\Component\HttpFoundation\Request;
@@ -142,7 +143,7 @@ function update_prepare_d8_bootstrap() {
   }
 
   // Bootstrap the database.
-  drupal_bootstrap(DRUPAL_BOOTSTRAP_DATABASE);
+  require_once __DIR__ . '/database.inc';
 
   // module.inc is not yet loaded but there are calls to module_config_sort()
   // below.
@@ -815,12 +816,11 @@ function update_do_one($module, $number, $dependency_map, &$context) {
     catch (Exception $e) {
       watchdog_exception('update', $e);
 
-      require_once __DIR__ . '/errors.inc';
-      $variables = _drupal_decode_exception($e);
+      $variables = Error::decodeException($e);
       unset($variables['backtrace']);
       // The exception message is run through
       // \Drupal\Component\Utility\String::checkPlain() by
-      // _drupal_decode_exception().
+      // \Drupal\Core\Utility\Error::decodeException().
       $ret['#abort'] = array('success' => FALSE, 'query' => t('%type: !message in %function (line %line of %file).', $variables));
     }
   }
@@ -1643,7 +1643,7 @@ function update_language_list($flags = Language::STATE_CONFIGURABLE) {
     if (language_multilingual() || \Drupal::moduleHandler()->moduleExists('language')) {
       // Use language module configuration if available. We can not use
       // entity_load_multiple() because this breaks during updates.
-      $language_entities = config_get_storage_names_with_prefix('language.entity');
+      $language_entities = config_get_storage_names_with_prefix('language.entity.');
 
       // Initialize default property so callers have an easy reference and can
       // save the same object without data loss.

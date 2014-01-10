@@ -10,15 +10,25 @@ namespace Drupal\migrate\Tests;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
 
 /**
- * Test the Drupal\migrate\Plugin\migrate\id_map\Sql::ensureTables() method.
+ * Tests the \Drupal\migrate\Plugin\migrate\id_map\Sql::ensureTables() method.
  *
  * @group Drupal
  * @group migrate
  */
 class MigrateSqlIdMapEnsureTablesTest extends MigrateTestCase {
 
+  /**
+   * Whether the map is joinable, initialized to FALSE.
+   *
+   * @var bool
+   */
   protected $mapJoinable = FALSE;
 
+  /**
+   * The migration configuration, initialized to set the ID and destination IDs.
+   *
+   * @var array
+   */
   protected $migrationConfiguration = array(
     'id' => 'sql_idmap_test',
     'sourceIds' => array(
@@ -40,13 +50,13 @@ class MigrateSqlIdMapEnsureTablesTest extends MigrateTestCase {
   public static function getInfo() {
     return array(
       'name' => 'Sql::ensureTables()',
-      'description' => 'Tests the Sql id map plugin ensureTables() method.',
+      'description' => 'Tests the SQL ID map plugin ensureTables() method.',
       'group' => 'Migrate',
     );
   }
 
   /**
-   * Test the ensureTables method.
+   * Tests the ensureTables method when the tables do not exist.
    */
   public function testEnsureTablesNotExist() {
     $fields['source_row_status'] = array(
@@ -130,6 +140,9 @@ class MigrateSqlIdMapEnsureTablesTest extends MigrateTestCase {
     $this->runEnsureTablesTest($schema);
   }
 
+  /**
+   * Tests the ensureTables method when the tables exist.
+   */
   public function testEnsureTablesExist() {
     $schema = $this->getMockBuilder('Drupal\Core\Database\Schema')
       ->disableOriginalConstructor()
@@ -172,9 +185,9 @@ class MigrateSqlIdMapEnsureTablesTest extends MigrateTestCase {
   }
 
   /**
-   * Actually run the
+   * Actually run the test.
    *
-   * @param $schema
+   * @param array $schema
    *   The mock schema object with expectations set. The Sql constructor calls
    *   ensureTables() which in turn calls this object and the expectations on
    *   it are the actual test and there are no additional asserts added.
@@ -186,7 +199,7 @@ class MigrateSqlIdMapEnsureTablesTest extends MigrateTestCase {
     $database->expects($this->any())
       ->method('schema')
       ->will($this->returnValue($schema));
-    new TestSqlIdmap($database, array(), 'sql', array(), $this->getMigration());
+    new TestSqlIdMap($database, array(), 'sql', array(), $this->getMigration());
   }
 
 }

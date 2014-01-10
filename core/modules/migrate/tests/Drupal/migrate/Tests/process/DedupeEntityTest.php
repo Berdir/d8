@@ -10,8 +10,12 @@ use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\migrate\Plugin\migrate\process\DedupeEntity;
 
 /**
+ * Test the deduplication entity process plugin.
+ *
  * @group migrate
  * @group Drupal
+ *
+ * @see \Drupal\migrate\Plugin\migrate\process\DedupeEntity
  */
 class DedupeEntityTest extends MigrateProcessTestCase {
 

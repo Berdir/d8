@@ -11,8 +11,6 @@ process:
     'index:minimum_word_size': minimum_word_size
     'index:overlap_cjk': overlap_cjk
     'index:cron_limit': search_cron_limit
-    'index:tag_weights': search_tag_weights
-    and_or_limit: search_and_or_limit
 destination:
     plugin: d8_config
     config_name: search.settings

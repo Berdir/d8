@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Tests\source\d6\RoleSourceTest.
+ * Contains \Drupal\migrate_drupal\Tests\source\d6\RoleSourceTest.
  */
 
-namespace Drupal\migrate_drupal\Tests;
+namespace Drupal\migrate_drupal\Tests\source\d6;
 
 use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
 
@@ -27,7 +27,7 @@ class RoleSourceTest extends MigrateSqlSourceTestCase {
     'id' => 'test',
     // Leave it empty for now.
     'idlist' => array(),
-    // This needs to be the identifier of the actual key: rid for comment, nid
+    // This needs to be the identifier of the actual key: cid for comment, nid
     // for node and so on.
     'source' => array(
       'plugin' => 'drupal6_user_role',
@@ -129,8 +129,6 @@ class RoleSourceTest extends MigrateSqlSourceTestCase {
   }
 
 }
-
-namespace Drupal\migrate_drupal\Tests\source\d6;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Extension\ModuleHandlerInterface;

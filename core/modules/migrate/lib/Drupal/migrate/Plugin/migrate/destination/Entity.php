@@ -21,32 +21,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class Entity extends DestinationBase implements ContainerFactoryPluginInterface {
 
   /**
-   * The entity info definition.
-   *
-   * @var array
-   */
-  protected $entityInfo;
-
-  /**
    * The entity storage controller.
    *
    * @var \Drupal\Core\Entity\EntityStorageControllerInterface
    */
   protected $storageController;
-
-  /**
-   * The plugin manager handling entity_field migrate plugins.
-   *
-   * @var \Drupal\migrate\Plugin\MigratePluginManager
-   */
-  protected $migrateEntityFieldPluginManager;
-
-  /**
-   * The field info service.
-   *
-   * @var \Drupal\field\FieldInfo
-   */
-  protected $fieldInfo;
 
   /**
    * Constructs an entity destination plugin.
@@ -57,21 +36,12 @@ class Entity extends DestinationBase implements ContainerFactoryPluginInterface 
    *   The plugin_id for the plugin instance.
    * @param array $plugin_definition
    *   The plugin implementation definition.
-   * @param array $entity_info
-   *   The definition of this entity type.
    * @param EntityStorageControllerInterface $storage_controller
    *   The storage controller for this entity type.
-   * @param MigratePluginManager $plugin_manager
-   *   The plugin manager handling entity_field migrate plugins.
-   * @param FieldInfo $field_info
-   *   The field info object.
    */
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition, array $entity_info, EntityStorageControllerInterface $storage_controller, MigratePluginManager $plugin_manager, FieldInfo $field_info) {
+  public function __construct(array $configuration, $plugin_id, array $plugin_definition, EntityStorageControllerInterface $storage_controller) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->entityInfo = $entity_info;
     $this->storageController = $storage_controller;
-    $this->migrateEntityFieldPluginManager = $plugin_manager;
-    $this->fieldInfo = $field_info;
   }
 
   /**
@@ -82,10 +52,7 @@ class Entity extends DestinationBase implements ContainerFactoryPluginInterface 
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('entity.manager')->getDefinition($configuration['entity_type']),
-      $container->get('entity.manager')->getStorageController($configuration['entity_type']),
-      $container->get('plugin.manager.migrate.entity_field'),
-      $container->get('field.info')
+      $container->get('entity.manager')->getStorageController($configuration['entity_type'])
     );
   }
 
@@ -94,7 +61,7 @@ class Entity extends DestinationBase implements ContainerFactoryPluginInterface 
    */
   public function import(Row $row) {
     // @TODO: add field handling. https://drupal.org/node/2164451
-    // @TODO: add validateion https://drupal.org/node/2164457
+    // @TODO: add validation https://drupal.org/node/2164457
     $entity = $this->storageController->create($row->getDestination());
     $entity->save();
     return array($entity->id());

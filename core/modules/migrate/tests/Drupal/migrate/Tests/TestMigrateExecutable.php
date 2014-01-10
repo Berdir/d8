@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\TestMigrateExecutable.
+ * Contains \Drupal\migrate\Tests\TestMigrateExecutable.
  */
 
 namespace Drupal\migrate\Tests;
@@ -10,18 +10,20 @@ namespace Drupal\migrate\Tests;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\migrate\MigrateExecutable;
 
+/**
+ * Tests MigrateExecutable.
+ */
 class TestMigrateExecutable extends MigrateExecutable {
 
-
   /**
-   * (Fake) number of seconds elapsed since the start of the test.
+   * The (fake) number of seconds elapsed since the start of the test.
    *
    * @var int
    */
   protected $timeElapsed;
 
   /**
-   * Fake memory usage in bytes.
+   * The fake memory usage in bytes.
    *
    * @var int
    */
@@ -29,15 +31,26 @@ class TestMigrateExecutable extends MigrateExecutable {
 
   /**
    * The cleared memory usage.
+   *
+   * @var int
    */
   protected $clearedMemoryUsage;
 
+  /**
+   * Sets the translation manager.
+   *
+   * @param \Drupal\Core\StringTranslation\TranslationInterface $translation_manager
+   *   The translation manager.
+   */
   public function setTranslationManager(TranslationInterface $translation_manager) {
     $this->translationManager = $translation_manager;
   }
 
   /**
    * Allows access to protected timeOptionExceeded method.
+   *
+   * @return bool
+   *   A threshold exceeded value.
    */
   public function timeOptionExceeded() {
     return parent::timeOptionExceeded();
@@ -45,6 +58,9 @@ class TestMigrateExecutable extends MigrateExecutable {
 
   /**
    * Allows access to set protected maxExecTime property.
+   *
+   * @param int $max_exec_time
+   *   The value to set.
    */
   public function setMaxExecTime($max_exec_time) {
     $this->maxExecTime = $max_exec_time;
@@ -52,36 +68,69 @@ class TestMigrateExecutable extends MigrateExecutable {
 
   /**
    * Allows access to protected maxExecTime property.
+   *
+   * @return int
+   *   The value of the protected property.
    */
   public function getMaxExecTime() {
     return $this->maxExecTime;
   }
 
+  /**
+   * Allows access to protected successesSinceFeedback property.
+   *
+   * @return int
+   *   The value of the protected property.
+   */
   public function getSuccessesSinceFeedback() {
     return $this->successesSinceFeedback;
   }
 
+  /**
+   * Allows access to protected totalSuccesses property.
+   *
+   * @return int
+   *   The value of the protected property.
+   */
   public function getTotalSuccesses() {
     return $this->totalSuccesses;
   }
 
+  /**
+   * Allows access to protected totalProcessed property.
+   *
+   * @return int
+   *   The value of the protected property.
+   */
   public function getTotalProcessed() {
     return $this->totalProcessed;
   }
 
+  /**
+   * Allows access to protected processedSinceFeedback property.
+   *
+   * @var int
+   *   The value of the protected property.
+   */
   public function getProcessedSinceFeedback() {
     return $this->processedSinceFeedback;
   }
 
   /**
    * Allows access to protected maxExecTimeExceeded method.
+   *
+   * @return bool
+   *   The threshold exceeded value.
    */
   public function maxExecTimeExceeded() {
     return parent::maxExecTimeExceeded();
   }
 
   /**
+   * Allows access to set protected source property.
    *
+   * @param \Drupal\migrate\Source $source
+   *   The value to set.
    */
   public function setSource($source) {
     $this->source = $source;
@@ -89,6 +138,9 @@ class TestMigrateExecutable extends MigrateExecutable {
 
   /**
    * Allows access to protected sourceIdValues property.
+   *
+   * @param array $source_id_values
+   *   The value to set.
    */
   public function setSourceIdValues($source_id_values) {
     $this->sourceIdValues = $source_id_values;
@@ -96,6 +148,9 @@ class TestMigrateExecutable extends MigrateExecutable {
 
   /**
    * Allows setting a fake elapsed time.
+   *
+   * @param int $time
+   *   The time in seconds.
    */
   public function setTimeElapsed($time) {
     $this->timeElapsed = $time;
@@ -123,6 +178,7 @@ class TestMigrateExecutable extends MigrateExecutable {
    * Allows access to the protected memoryExceeded method.
    *
    * @return bool
+   *   The memoryExceeded value.
    */
   public function memoryExceeded() {
     return parent::memoryExceeded();
@@ -143,7 +199,12 @@ class TestMigrateExecutable extends MigrateExecutable {
   }
 
   /**
-   * Set the fake memory usage.
+   * Sets the fake memory usage.
+   *
+   * @param int $memory_usage
+   *   The fake memory usage value.
+   * @param int $cleared_memory_usage
+   *   (optional) The fake cleared memory value.
    */
   public function setMemoryUsage($memory_usage, $cleared_memory_usage = NULL) {
     $this->memoryUsage = $memory_usage;
@@ -151,7 +212,10 @@ class TestMigrateExecutable extends MigrateExecutable {
   }
 
   /**
-   * Set the memory limit.
+   * Sets the memory limit.
+   *
+   * @param int $memory_limit
+   *   The memory limit.
    */
   public function setMemoryLimit($memory_limit) {
     $this->memoryLimit = $memory_limit;
