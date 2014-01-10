@@ -1,0 +1,20 @@
+id: d6_menu
+sourceIds:
+  menu_name:
+    type: varchar
+    length: 32
+    "not null": true
+    default: ''
+destinationIds:
+  id:
+    type: varchar
+    length: 255
+source:
+  plugin: drupal6_menu
+process:
+  id: menu_name
+  label: name
+  description: description
+destination:
+  plugin: entity
+  entity_type: menu

@@ -46,3 +46,4 @@ class Menu extends Drupal6SqlBase implements RequirementsInterface {
   }
 
 }
+
