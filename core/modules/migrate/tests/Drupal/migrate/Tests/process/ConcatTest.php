@@ -1,0 +1,70 @@
+<?php
+
+/**
+ * @file
+ * Contains \Drupal\migrate\Tests\process\ConcatTest.
+ */
+
+namespace Drupal\migrate\Tests\process;
+use Drupal\migrate\Plugin\migrate\process\Concat;
+
+/**
+ * @group migrate
+ * @group Drupal
+ */
+class ConcatTest extends MigrateProcessTestCase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Concat process plugin',
+      'description' => 'Tests the concat process plugin.',
+      'group' => 'Migrate',
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp() {
+    $this->plugin = new TestConcat();
+    parent::setUp();
+  }
+
+  /**
+   * Test concat works without a delimiter.
+   */
+  public function testConcatWithoutDelimiter() {
+    $this->plugin->setDelimiter('');
+    $value = $this->plugin->transform(array('foo', 'bar'), $this->migrateExecutable, $this->row, 'destinationproperty');
+    $this->assertSame($value, 'foobar');
+  }
+
+  /**
+   * Test concat fails properly on non-arrays.
+   *
+   * @expectedException \Drupal\migrate\MigrateException
+   */
+  public function testConcatWithNonArray() {
+    $this->plugin->transform('foo', $this->migrateExecutable, $this->row, 'destinationproperty');
+  }
+
+  /**
+   * Test concat works without a delimiter.
+   */
+  public function testConcatWithDelimiter() {
+    $value = $this->plugin->transform(array('foo', 'bar'), $this->migrateExecutable, $this->row, 'destinationproperty');
+    $this->assertSame($value, 'foo.bar');
+  }
+}
+
+class TestConcat extends Concat {
+  function __construct() {
+  }
+
+  public function setDelimiter($delimiter) {
+    $this->configuration['delimiter'] = $delimiter;
+  }
+}
