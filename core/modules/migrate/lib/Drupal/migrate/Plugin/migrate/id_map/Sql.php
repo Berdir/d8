@@ -411,7 +411,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
       if (!isset($source_id_values[$field_name])) {
         $this->message->display(t(
           'Could not save to map table due to NULL value for key field !field',
-          array('!field' => $field_name)));
+          array('!field' => $field_name)), 'error');
         return;
       }
       $keys[$key_name] = $source_id_values[$field_name];

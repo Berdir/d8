@@ -227,7 +227,7 @@ class MigrateExecutable {
     catch (\Exception $e) {
       $this->message->display(
         $this->t('Migration failed with source plugin exception: !e',
-          array('!e' => $e->getMessage())));
+          array('!e' => $e->getMessage())), 'error');
       return MigrationInterface::RESULT_FAILED;
     }
 
@@ -270,7 +270,7 @@ class MigrateExecutable {
         catch (MigrateException $e) {
           $this->migration->getIdMap()->saveIdMapping($row, array(), $e->getStatus(), $this->rollbackAction);
           $this->saveMessage($e->getMessage(), $e->getLevel());
-          $this->message->display($e->getMessage());
+          $this->message->display($e->getMessage(), 'error');
         }
         catch (\Exception $e) {
           $this->migration->getIdMap()->saveIdMapping($row, array(), MigrateIdMapInterface::STATUS_FAILED, $this->rollbackAction);
@@ -299,7 +299,7 @@ class MigrateExecutable {
       catch (\Exception $e) {
         $this->message->display(
           $this->t('Migration failed with source plugin exception: !e',
-            array('!e' => $e->getMessage())));
+            array('!e' => $e->getMessage())), 'error');
         return MigrationInterface::RESULT_FAILED;
       }
     }
@@ -599,7 +599,7 @@ class MigrateExecutable {
     if ($save) {
       $this->saveMessage($message);
     }
-    $this->message->display($message);
+    $this->message->display($message, 'error');
   }
 
   /**

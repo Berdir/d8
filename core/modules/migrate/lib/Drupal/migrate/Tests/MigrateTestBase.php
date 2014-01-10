@@ -9,10 +9,11 @@ namespace Drupal\migrate\Tests;
 
 use Drupal\Core\Database\Database;
 use Drupal\migrate\Entity\MigrationInterface;
+use Drupal\migrate\MigrateMessageInterface;
 use Drupal\migrate\Plugin\migrate\source\SqlBase;
 use Drupal\simpletest\WebTestBase;
 
-class MigrateTestBase extends WebTestBase {
+class MigrateTestBase extends WebTestBase implements MigrateMessageInterface {
 
   /**
    * The file path(s) to the dumped database(s) to load into the child site.
@@ -56,5 +57,17 @@ class MigrateTestBase extends WebTestBase {
       $class::load($database);
     }
     return $database;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function display($message, $type = 'status') {
+    if ($type == 'status') {
+      $this->pass($message);
+    }
+    else {
+      $this->fail($message);
+    }
   }
 }

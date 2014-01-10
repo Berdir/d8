@@ -13,14 +13,9 @@ namespace Drupal\migrate;
 class MigrateMessage implements MigrateMessageInterface {
 
   /**
-   * Displays a migrate message.
-   *
-   * @param string $message
-   *   The message to display.
-   * @param string $type
-   *   The type of message, for example: status or warning.
+   * {@inheritdoc}
    */
-  function display($message, $type = 'status') {
+  public function display($message, $type = 'status') {
     drupal_set_message($message, $type);
   }
 
