@@ -28,11 +28,6 @@ abstract class MigrateSqlSourceTestCase extends MigrateTestCase {
   protected $expectedResults = array();
 
   /**
-   * @var \Drupal\migrate\Plugin\MigrateSourceInterface
-   */
-  protected $plugin;
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp() {
