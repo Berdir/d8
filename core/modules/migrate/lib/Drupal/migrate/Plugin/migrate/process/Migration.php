@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Plugin\migrate\process\ValueFromMigration.
+ * Contains \Drupal\migrate\Plugin\migrate\process\Migration.
  */
 
 
@@ -10,10 +10,10 @@ namespace Drupal\migrate\Plugin\migrate\process;
 
 use Drupal\Core\Entity\EntityStorageControllerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\migrate\Plugin\MigratePluginManager;
 use Drupal\migrate\ProcessPluginBase;
 use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\MigrateExecutable;
-use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\Row;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -27,12 +27,23 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class Migration extends ProcessPluginBase implements  ContainerFactoryPluginInterface {
 
   /**
+   * @var \Drupal\migrate\Plugin\MigratePluginManager
+   */
+  protected $processPluginManager;
+
+  /**
+   * @var \Drupal\migrate\Entity\MigrationInterface
+   */
+  protected $migrationStorageController;
+
+  /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration, EntityStorageControllerInterface $storage_controller) {
+  public function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration, EntityStorageControllerInterface $storage_controller, MigratePluginManager $process_plugin_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->storageController = $storage_controller;
+    $this->migrationStorageController = $storage_controller;
     $this->migration = $migration;
+    $this->processPluginmanager = $process_plugin_manager;
   }
 
   /**
@@ -44,7 +55,8 @@ class Migration extends ProcessPluginBase implements  ContainerFactoryPluginInte
       $plugin_id,
       $plugin_definition,
       $migration,
-      $container->get('plugin.manager.entity')->getStorageController('migration')
+      $container->get('entity.manager')->getStorageController('migration'),
+      $container->get('plugin.manager.migrate.process')
     );
   }
 
@@ -56,107 +68,26 @@ class Migration extends ProcessPluginBase implements  ContainerFactoryPluginInte
     if (!is_array($migration_ids)) {
       $migration_ids = array($migration_ids);
     }
-    $migrations = $this->storageController->loadMultiple($migration_ids);
-    $destids = NULL;
-    foreach ($migrations as $migration) {
+    /** @var \Drupal\migrate\Entity\MigrationInterface[] $migrations */
+    $migrations = $this->migrationStorageController->loadMultiple($migration_ids);
+    $destination_ids = NULL;
+    foreach ($migrations as $migration_id => $migration) {
+      if (isset($this->configuration['source_ids'][$migration_id])) {
+        $configuration = array('source' => $this->configuration['source_ids'][$migration_id]);
+        $source_id_value = $this->processPluginManager
+          ->createInstance('get', $configuration, $this->migration)
+          ->transform(NULL, $migrate_executable, $row, $destination_property);
+      }
+      else {
+        $source_id_value = $value;
+      }
       // Break out of the loop as soon as a destination ID is found.
-      if ($destids = $migration->getIdMap()->lookupDestinationID($value)) {
+      if ($destination_ids = $migration->getIdMap()->lookupDestinationID($source_id_value)) {
         break;
       }
     }
-    return $destids;
-    // We want to treat source keys consistently as an array of arrays (each
-    // representing one key).
-    if (is_array($properties)) {
-      if (empty($properties)) {
-        // Empty value should return empty results.
-        return NULL;
-      }
-      elseif (is_array(reset($properties))) {
-        // Already an array of key arrays, fall through
-      }
-      else {
-        // An array of single-key values - make each one an array
-        $new_identifiers = array();
-        foreach ($properties as $property) {
-          $new_identifiers[] = array($property);
-        }
-        $properties = $new_identifiers;
-      }
-    }
-    else {
-      // A simple value - make it an array within an array
-      $properties = array(array($properties));
-    }
-    $results = array();
-    // Each $source_key will be an array of key values
-    foreach ($properties as $property) {
-      // If any source keys are NULL, skip this set
-      $continue = FALSE;
-      foreach ($property as $value) {
-        if (!isset($value)) {
-          $continue = TRUE;
-          break;
-        }
-      }
-      if ($continue || empty($property)) {
-        continue;
-      }
-      // Loop through each source migration, checking for an existing dest ID.
-      /** @var \Drupal\migrate\Entity\MigrationInterface $migration */
-      foreach ($migrations as $migration) {
-        // Break out of the loop as soon as a destination ID is found.
-        if ($destids = $migration->getIdMap()->lookupDestinationID($value)) {
-          if (!empty($destids['destid1'])) {
-            break;
-          }
-        }
-      }
-      // If no destination ID was found, give each source migration a chance to
-      // create a stub.
-      if (empty($destids)) {
-        foreach ($migrations as $migration) {
-          // Is this a self reference?
-          if ($migration->id() == $this->migration->id()) {
-            if (!array_diff($property, $row->getSourceIdValues())) {
-              $destids = array();
-              $this->sourceRowStatus = MigrateIdMapInterface::STATUS_NEEDS_UPDATE;
-              break;
-            }
-          }
-          // Break out of the loop if a stub was successfully created.
-          // @TODO: wtf is this?
-          /*
-          if ($destids = $migration->createStubWrapper($property, $migration)) {
-            break;
-          }
-          */
-        }
-      }
-      if (!empty($destids)) {
-        // Assume that if the destination key is a single value, it
-        // should be passed as such
-        if (count($destids) == 1) {
-          $results[] = reset($destids);
-        }
-        else {
-          $results[] = $destids;
-        }
-      }
-      // If no match found, apply the default value (if any)
-      elseif (isset($this->configuration['default'])) {
-        $results[] = $this->configuration['default'];
-      }
-    }
-    // Return a single result if we had a single key
-    if (count($properties) > 1) {
-      return $results;
-    }
-    else {
-      $value = reset($results);
-      return empty($value) && $value !== 0 && $value !== '0' ? NULL : $value;
-    }
-
+    // @TODO Add stubbing support.
+    return $destination_ids;
   }
 
 }
