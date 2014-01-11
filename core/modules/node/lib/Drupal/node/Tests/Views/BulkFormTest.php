@@ -21,6 +21,13 @@ class BulkFormTest extends NodeTestBase {
    */
   public static $testViews = array('test_node_bulk_form');
 
+  /**
+   * Modules to enable.
+   *
+   * @var array
+   */
+  public static $modules = array('entity_reference');
+
   public static function getInfo() {
     return array(
       'name' => 'Node: Bulk form',

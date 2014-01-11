@@ -7,10 +7,10 @@
 
 namespace Drupal\entity_reference;
 
-use Drupal\Core\TypedData\DataDefinition;
-use Drupal\Core\Field\FieldDefinitionInterface;
-use Drupal\Core\Field\ConfigEntityReferenceItemBase;
 use Drupal\Core\Field\ConfigFieldItemInterface;
+use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem;
+use Drupal\Core\TypedData\DataDefinition;
 
 /**
  * Alternative plugin implementation of the 'entity_reference' field type.
@@ -24,7 +24,7 @@ use Drupal\Core\Field\ConfigFieldItemInterface;
  * @see entity_reference_field_info_alter().
  *
  */
-class ConfigurableEntityReferenceItem extends ConfigEntityReferenceItemBase implements ConfigFieldItemInterface {
+class ConfigurableEntityReferenceItem extends EntityReferenceItem implements ConfigFieldItemInterface {
 
   /**
    * Definitions of the contained properties.

@@ -169,6 +169,20 @@ class EntityReferenceItem extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
+  public function getValue($include_computed = FALSE) {
+    $values = parent::getValue($include_computed);
+
+    // If there is an unsaved entity, return it as part of the field item values
+    // to ensure idempotency of getValue() / setValue().
+    if (empty($this->target_id) && !empty($this->entity)) {
+      $values['entity'] = $this->entity;
+    }
+    return $values;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function onChange($property_name) {
     // Make sure that the target ID and the target property stay in sync.
     if ($property_name == 'target_id') {
@@ -185,6 +199,32 @@ class EntityReferenceItem extends FieldItemBase {
    */
   public function getMainPropertyName() {
     return 'target_id';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isEmpty() {
+    // Avoid loading the entity by first checking the 'target_id'.
+    $target_id = $this->target_id;
+    if ($target_id !== NULL) {
+      return FALSE;
+    }
+    // Allow auto-create entities.
+    if ($target_id === NULL && ($entity = $this->entity) && $entity->isNew()) {
+      return FALSE;
+    }
+    return TRUE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function preSave() {
+    if ($this->target_id === NULL && ($entity = $this->entity) && $entity->isNew()) {
+      $entity->save();
+      $this->target_id = $entity->id();
+    }
   }
 
 }

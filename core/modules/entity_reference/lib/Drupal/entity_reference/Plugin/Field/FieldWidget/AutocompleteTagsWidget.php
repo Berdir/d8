@@ -59,9 +59,10 @@ class AutocompleteTagsWidget extends AutocompleteWidgetBase {
           $value[] = array('target_id' => $match);
         }
         elseif ($auto_create && (count($this->getSelectionHandlerSetting('target_bundles')) == 1 || count($bundles) == 1)) {
-          // Auto-create item. see entity_reference_field_presave().
+          // Auto-create item. See
+          //\Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem::presave().
           $value[] = array(
-            'target_id' => 0,
+            'target_id' => NULL,
             'entity' => $this->createNewEntity($input, $element['#autocreate_uid']),
           );
         }
