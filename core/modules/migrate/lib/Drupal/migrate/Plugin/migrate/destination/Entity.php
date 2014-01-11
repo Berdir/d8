@@ -7,7 +7,9 @@
 
 namespace Drupal\migrate\Plugin\migrate\destination;
 
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\field\FieldInfo;
 use Drupal\migrate\Entity\Migration;
@@ -28,6 +30,11 @@ class Entity extends DestinationBase implements ContainerFactoryPluginInterface 
   protected $storageController;
 
   /**
+   * @var \Drupal\Core\Entity\EntityTypeInterface
+   */
+  protected $entityType;
+
+  /**
    * Constructs an entity destination plugin.
    *
    * @param array $configuration
@@ -39,9 +46,10 @@ class Entity extends DestinationBase implements ContainerFactoryPluginInterface 
    * @param EntityStorageControllerInterface $storage_controller
    *   The storage controller for this entity type.
    */
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition, EntityStorageControllerInterface $storage_controller) {
+  public function __construct(array $configuration, $plugin_id, array $plugin_definition, EntityStorageControllerInterface $storage_controller, EntityTypeInterface $entity_type) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->storageController = $storage_controller;
+    $this->entityType = $entity_type;
   }
 
   /**
@@ -52,7 +60,8 @@ class Entity extends DestinationBase implements ContainerFactoryPluginInterface 
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('entity.manager')->getStorageController($configuration['entity_type'])
+      $container->get('entity.manager')->getStorageController($configuration['entity_type']),
+      $container->get('entity.manager')->getDefinition($configuration['entity_type'])
     );
   }
 
@@ -62,9 +71,35 @@ class Entity extends DestinationBase implements ContainerFactoryPluginInterface 
   public function import(Row $row) {
     // @TODO: add field handling. https://drupal.org/node/2164451
     // @TODO: add validation https://drupal.org/node/2164457
-    $entity = $this->storageController->create($row->getDestination());
+    $id_key = $this->entityType->getKey('id');
+    if ($entity = $this->storageController->load($row->getDestinationProperty($id_key))) {
+      foreach ($row->getRawDestination() as $property => $value) {
+        $this->setValue($entity, explode(':', $property), $value);
+      }
+    }
+    else {
+      $entity = $this->storageController->create($row->getDestination());
+    }
     $entity->save();
     return array($entity->id());
+  }
+
+  /**
+   * @param EntityInterface $entity
+   * @param array $keys
+   * @param $value
+   */
+  protected function setValue(EntityInterface $entity, array $keys, $value) {
+    $ref = &$entity;
+    foreach ($keys as $key) {
+      if (is_array($ref) || $ref instanceof \ArrayAccess) {
+        $ref = &$ref[$key];
+      }
+      elseif (is_object($ref)) {
+        $ref = &$ref->$key;
+      }
+    }
+    $ref = $value;
   }
 
   /**

@@ -57,6 +57,20 @@ class Row {
   protected $frozen = FALSE;
 
   /**
+   * The raw destination properties.
+   *
+   * Unlike $destination which is set by using
+   * \Drupal\Component\Utility\NestedArray::setValue() this array contains
+   * the destination as setDestinationProperty was called.
+   *
+   * @var array
+   *   The raw destination.
+   *
+   * @see getRawDestination()
+   */
+  protected $rawDestination;
+
+  /**
    * Constructs a \Drupal\Migrate\Row object.
    *
    * @param array $values
@@ -177,6 +191,7 @@ class Row {
    *   The property value to set on the destination.
    */
   public function setDestinationProperty($property, $value) {
+    $this->rawDestination[$property] = $value;
     NestedArray::setValue($this->destination, explode(':', $property), $value, TRUE);
   }
 
@@ -191,10 +206,25 @@ class Row {
   }
 
   /**
+   * Returns the raw destination. Rarely necessary.
+   *
+   * For example calling setDestination('foo:bar', 'baz') results in
+   * @code
+   * $this->destination['foo']['bar'] = 'baz';
+   * $this->rawDestination['foo:bar'] = 'baz';
+   *
+   * @return array
+   *   The raw destination values.
+   */
+  public function getRawDestination() {
+    return $this->rawDestination;
+  }
+
+  /**
    * Returns the value of a destination property.
    *
-   * @param array|string $property
-   *   An array of properties on the destination.
+   * @param string $property
+   *   The name of a property on the destination.
    *
    * @return mixed
    *  The destination value.
