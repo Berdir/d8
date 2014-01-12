@@ -20,8 +20,6 @@ process:
       entity_type: filter_format
       field: format
   name: name
-  # this will need an iterator + plugin: migration, id: role.
-  roles: roles
   cache: cache
   filters:
     plugin: iterator

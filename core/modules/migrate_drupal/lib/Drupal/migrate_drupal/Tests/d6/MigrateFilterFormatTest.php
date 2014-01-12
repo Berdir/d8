@@ -10,6 +10,7 @@ namespace Drupal\migrate_drupal\Tests\d6;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate\MigrateMessage;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
+use Drupal\Component\Utility\String;
 
 class MigrateFilterFormatTest extends MigrateDrupalTestBase {
 
@@ -30,21 +31,27 @@ class MigrateFilterFormatTest extends MigrateDrupalTestBase {
       drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6FilterFormat.php',
     );
     $this->prepare($migration, $dumps);
-    $executable = new MigrateExecutable($migration, new MigrateMessage);
+    $executable = new MigrateExecutable($migration, $this);
     $executable->import();
     $filter_format = entity_load('filter_format', 'filtered_html');
 
     // Check filter status.
     $filters = $filter_format->get('filters');
-    foreach ($filters as $filter) {
-      $this->assertTrue($filter['status']);
-    }
+    $this->assertTrue($filters['filter_autop']['status']);
+    $this->assertTrue($filters['filter_url']['status']);
+    $this->assertTrue($filters['filter_htmlcorrector']['status']);
+    $this->assertTrue($filters['filter_html_escape']['status']);
 
-    //Check variables migrated into filter
+    // These should be false by default.
+    $this->assertFalse($filters['filter_html']['status']);
+    $this->assertFalse($filters['filter_caption']['status']);
+    $this->assertFalse($filters['filter_html_image_secure']['status']);
+
+    // Check variables migrated into filter.
     $this->assertIdentical($filters['filter_html_escape']['settings']['allowed_html'], '<a> <em> <strong> <cite> <code> <ul> <ol> <li> <dl> <dt> <dd>');
     $this->assertIdentical($filters['filter_html_escape']['settings']['filter_html_help'], 1);
     $this->assertIdentical($filters['filter_html']['settings']['filter_html_nofollow'], 0);
-    $this->assertIdentical($filters['filter_url']['settings']['filter_url_length'] , '72');
+    $this->assertIdentical($filters['filter_url']['settings']['filter_url_length'], '72');
   }
 
 }

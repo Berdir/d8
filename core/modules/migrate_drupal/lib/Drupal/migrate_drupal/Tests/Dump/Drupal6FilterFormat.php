@@ -52,7 +52,7 @@ class Drupal6FilterFormat {
           'default' => 0,
           'size' => 'tiny',
           'description' => 'Weight of filter within format.',
-        )
+        ),
       ),
       'primary key' => array('fid'),
       'unique keys' => array(
@@ -82,7 +82,8 @@ class Drupal6FilterFormat {
           'length' => 255,
           'not null' => TRUE,
           'default' => '',
-          'description' => 'A comma-separated string of roles; references {role}.rid.', // This is bad since you can't use joins, nor index.
+          // This is bad since you can't use joins, nor index.
+          'description' => 'A comma-separated string of roles; references {role}.rid.',
         ),
         'cache' => array(
           'type' => 'int',
