@@ -8,7 +8,6 @@
 namespace Drupal\migrate\Plugin\migrate\destination;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\migrate\Row;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * @PluginId("entity_search_page")
