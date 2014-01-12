@@ -15,6 +15,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class EntityFieldInstance extends Entity {
 
+  /**
+   * {@inheritdoc}
+   */
   public function import(Row $row) {
     $row->setDestinationProperty('id', implode('.', array(
       $row->getDestinationProperty('entity_type'),
@@ -24,6 +27,9 @@ class EntityFieldInstance extends Entity {
     return parent::import($row);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, array $plugin_definition) {
     $configuration['entity_type'] = 'field_instance';
     return parent::create($container, $configuration, $plugin_id, $plugin_definition);
