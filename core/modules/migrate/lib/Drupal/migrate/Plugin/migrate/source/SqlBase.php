@@ -75,16 +75,28 @@ abstract class SqlBase extends SourcePluginBase {
   }
 
   /**
+   * A helper for adding tags and metadata to the query.
+   *
+   * @return \Drupal\Core\Database\Query\SelectInterface
+   *   The query with additional tags and metadata.
+   */
+  protected function prepareQuery() {
+    $this->query = clone $this->query();
+    $this->query->addTag('migrate');
+    $this->query->addTag('migrate_' . $this->migration->id());
+    $this->query->addMetaData('migration', $this->migration);
+
+    return $this->query;
+  }
+
+  /**
    * Implementation of MigrateSource::performRewind().
    *
    * We could simply execute the query and be functionally correct, but
    * we will take advantage of the PDO-based API to optimize the query up-front.
    */
   protected function runQuery() {
-    $this->query = clone $this->query();
-    $this->query->addTag('migrate');
-    $this->query->addTag('migrate_' . $this->migration->id());
-    $this->query->addMetaData('migration', $this->migration);
+    $this->prepareQuery();
     $highwaterProperty = $this->migration->get('highwaterProperty');
 
     // Get the key values, for potential use in joining to the map table, or

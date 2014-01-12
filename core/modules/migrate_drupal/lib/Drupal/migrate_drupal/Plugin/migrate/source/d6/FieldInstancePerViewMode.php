@@ -20,9 +20,8 @@ class FieldInstancePerViewMode extends Drupal6SqlBase {
    * {@inheritdoc}
    */
   protected function runQuery() {
-    // @TODO add tags https://drupal.org/node/2165287
     $rows = array();
-    $result = $this->query()->execute();
+    $result = $this->prepareQuery()->execute();
     while ($field_row = $result->fetchAssoc()) {
       // These are added to every view mode row.
       $field_row['display_settings'] = unserialize($field_row['display_settings']);

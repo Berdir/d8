@@ -35,7 +35,7 @@ class Variable extends Drupal6SqlBase {
   }
 
   protected function runQuery() {
-    return new \ArrayIterator(array(array_map('unserialize', $this->query()->execute()->fetchAllKeyed())));
+    return new \ArrayIterator(array(array_map('unserialize', $this->prepareQuery()->execute()->fetchAllKeyed())));
   }
 
   public function count() {
