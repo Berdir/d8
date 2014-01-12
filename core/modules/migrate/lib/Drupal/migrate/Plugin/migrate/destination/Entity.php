@@ -11,9 +11,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\field\FieldInfo;
 use Drupal\migrate\Entity\Migration;
-use Drupal\migrate\Plugin\MigratePluginManager;
 use Drupal\migrate\Row;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -73,15 +71,25 @@ class Entity extends DestinationBase implements ContainerFactoryPluginInterface 
     // @TODO: add validation https://drupal.org/node/2164457
     $id_key = $this->entityType->getKey('id');
     if ($entity = $this->storageController->load($row->getDestinationProperty($id_key))) {
-      foreach ($row->getRawDestination() as $property => $value) {
-        $this->setValue($entity, explode(':', $property), $value);
-      }
+      $this->update($entity, $row);
     }
     else {
       $entity = $this->storageController->create($row->getDestination());
     }
     $entity->save();
     return array($entity->id());
+  }
+
+  /**
+   * Update the entity with the contents of the row.
+   *
+   * @param EntityInterface $entity
+   * @param Row $row
+   */
+  protected function update(EntityInterface $entity, Row $row) {
+    foreach ($row->getRawDestination() as $property => $value) {
+      $this->setValue($entity, explode(':', $property), $value);
+    }
   }
 
   /**
