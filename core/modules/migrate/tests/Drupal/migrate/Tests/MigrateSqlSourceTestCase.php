@@ -6,6 +6,8 @@
  */
 
 namespace Drupal\migrate\Tests;
+use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\migrate\Source;
 
 /**
  * Provides setup and helper methods for Migrate module source tests.
@@ -80,4 +82,10 @@ abstract class MigrateSqlSourceTestCase extends MigrateTestCase {
     );
   }
 
+}
+
+class TestSource extends Source {
+  function setCache(CacheBackendInterface $cache) {
+    $this->cache = $cache;
+  }
 }
