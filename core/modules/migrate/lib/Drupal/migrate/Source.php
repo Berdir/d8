@@ -272,9 +272,10 @@ class Source implements \Iterator, \Countable {
   public function next() {
     $this->currentIds = NULL;
     $this->currentRow = NULL;
+    $source_configuration = $this->migration->get('source');
 
     while ($this->getIterator()->valid()) {
-      $row_data = $this->getIterator()->current();
+      $row_data = $this->getIterator()->current() + $source_configuration;
       $this->getIterator()->next();
       $row = new Row($row_data, $this->migration->get('sourceIds'), $this->migration->get('destinationIds'));
 

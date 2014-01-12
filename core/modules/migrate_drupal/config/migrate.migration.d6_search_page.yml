@@ -8,16 +8,14 @@ source:
     - node_rank_relevance
     - node_rank_sticky
     - node_rank_views
+  constants:
+    id: node_search
+    path: node
+    plugin: node_search
 process:
-  id:
-    plugin: default_value
-    default_value: node_search
-  path:
-    plugin: default_value
-    default_value: node
-  plugin:
-    plugin: default_value
-    default_value: node_search
+  id: constants:id
+  path: constants:path
+  plugin: constants:plugin
   'configuration:rankings':
     plugin: drupal6_search_configuration_rankings
 destination:
