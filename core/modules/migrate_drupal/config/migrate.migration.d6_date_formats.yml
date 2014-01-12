@@ -24,5 +24,4 @@ process:
       date_format_medium: medium
   'pattern:php': value
 destination:
-  plugin: entity
-  entity_type: date_format
+  plugin: entity_date_format
