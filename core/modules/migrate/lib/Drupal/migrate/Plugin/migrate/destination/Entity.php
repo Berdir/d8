@@ -54,12 +54,21 @@ class Entity extends DestinationBase implements ContainerFactoryPluginInterface 
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, array $plugin_definition) {
+    if (isset($configuration['entity_type'])) {
+      $entity_type = $configuration['entity_type'];
+    }
+    elseif (substr($plugin_id, 0, 7) == 'entity_') {
+      $entity_type = substr($plugin_id, 7);
+    }
+    else {
+      throw new \MigrateException('No entity type given.');
+    }
     return new static(
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('entity.manager')->getStorageController($configuration['entity_type']),
-      $container->get('entity.manager')->getDefinition($configuration['entity_type'])
+      $container->get('entity.manager')->getStorageController($entity_type),
+      $container->get('entity.manager')->getDefinition($entity_type)
     );
   }
 
