@@ -64,8 +64,7 @@ class Vocabulary extends Drupal6SqlBase implements RequirementsInterface {
    */
   public function prepareRow(Row $row) {
     // Find node types for this row.
-    $node_types = $this->database
-      ->select('vocabulary_node_types', 'nt', array('fetch' => \PDO::FETCH_ASSOC))
+    $node_types = $this->select('vocabulary_node_types', 'nt')
       ->fields('nt', array('type', 'vid'))
       ->condition('vid', $row->getSourceProperty('vid'))
       ->execute()

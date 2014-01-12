@@ -1,0 +1,40 @@
+id: d6_vocabulary_to_field
+sourceIds:
+  vid:
+    type: int
+    "not null": true
+    default: 0
+destinationIds:
+  id:
+    type: varchar
+    length: 255
+source:
+  plugin: drupal6_taxonomy_vocabulary
+
+process:
+  entity_type:
+    plugin: default_value
+    default_value: node
+  name:
+    -
+      plugin: migration
+      migration: d6_taxonomy_vocabulary
+      source:
+        - vid
+    -
+      plugin: extract
+      index:
+        - 0
+  id:
+    plugin: concat
+    delimiter: .
+    source:
+      - @entity_type
+      - @name
+  type:
+    plugin: default_value
+    default_value: taxonomy_term_reference
+  'settings:allowed_values:0:vocabulary': @name
+destination:
+  plugin: entity
+  entity_type: field_entity
