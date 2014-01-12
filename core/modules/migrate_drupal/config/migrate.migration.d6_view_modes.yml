@@ -13,7 +13,7 @@ destinationIds:
     length: 255
 
 source:
-  plugin: drupal6_field_instance_per_view_mode
+  plugin: drupal6_field_instance_view_mode
 
 process:
   mode:
