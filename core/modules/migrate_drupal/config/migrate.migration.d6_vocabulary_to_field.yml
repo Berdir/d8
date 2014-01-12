@@ -25,16 +25,9 @@ process:
       plugin: extract
       index:
         - 0
-  id:
-    plugin: concat
-    delimiter: .
-    source:
-      - @entity_type
-      - @name
   type:
     plugin: default_value
     default_value: taxonomy_term_reference
   'settings:allowed_values:0:vocabulary': @name
 destination:
-  plugin: entity
-  entity_type: field_entity
+  plugin: entity_field_entity
