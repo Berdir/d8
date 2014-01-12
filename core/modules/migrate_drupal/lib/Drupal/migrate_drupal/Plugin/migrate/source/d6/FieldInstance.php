@@ -21,9 +21,8 @@ class FieldInstance extends Drupal6SqlBase implements RequirementsInterface {
   /**
    * {@inheritdoc}
    */
-  function query() {
-    $query = $this->database
-      ->select('content_node_field_instance', 'cnfi')
+  public function query() {
+    $query = $this->select('content_node_field_instance', 'cnfi')
       ->fields('cnfi', array(
         'field_name',
         'type_name',
@@ -35,8 +34,12 @@ class FieldInstance extends Drupal6SqlBase implements RequirementsInterface {
         'description',
         'widget_module',
         'widget_active',
+      ))
+      ->fields('cnf', array(
+        'required',
+        'type',
       ));
-
+    $query->join('content_node_field', 'cnf', 'cnfi.field_name = cnf.field_name');
     $query->orderBy('type_name');
 
     return $query;
@@ -60,8 +63,11 @@ class FieldInstance extends Drupal6SqlBase implements RequirementsInterface {
     );
   }
 
-  function prepareRow(Row $row, $keep = TRUE) {
-    //Unserialize data
+  /**
+   * {@inheritdoc}
+   */
+  public function prepareRow(Row $row, $keep = TRUE) {
+    // Unserialize data.
     $widget_settings = unserialize($row->getSourceProperty('widget_settings'));
     $display_settings = unserialize($row->getSourceProperty('display_settings'));
     $row->setSourceProperty('widget_settings', $widget_settings);

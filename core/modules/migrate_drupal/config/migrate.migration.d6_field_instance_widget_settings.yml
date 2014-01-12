@@ -1,0 +1,67 @@
+id: d6_field_instance_widget_settings
+
+sourceIds:
+  type_name:
+    type: varchar
+    length: 32
+    "not null": true
+    default: ''
+
+destinationIds:
+  id:
+    type: varchar
+    length: 255
+
+source:
+  plugin: drupal6_field_instance_per_form_display
+  entity_type: node
+
+process:
+  id:
+    plugin: concat
+    delimiter: .
+    source:
+      - entity_type
+      - type_name
+      - view_mode
+  status: widget_active
+  targetEntityType:
+    plugin: default_value
+    default_value: node
+  bundle: type_name
+  mode:
+    plugin: default_value
+    default_value: default
+  content:
+    plugin: iterator
+    source: fields
+    process:
+      weight: weight
+      type:
+        plugin: static_map
+        bypass: true
+        source: widget_type
+        map:
+          text_textfield: text_textfield
+          number: number
+          link: link_default
+          email_textfield: email_default
+          date_select: datetime_default
+          date_text: datetime_default
+          filefield_widget: file_generic
+          imagefield_widget: image_image
+          phone_textfield: telephone_default
+          optionwidgets_onoff: options_onoff
+          optionwidgets_buttons: options_buttons
+          optionwidgets_select: options_select
+
+      settings:
+        -
+          plugin: field_instance_widget_settings
+          source:
+            - widget_type
+            - widget_settings
+
+destination:
+  plugin: entity
+  entity_type: entity_form_display
