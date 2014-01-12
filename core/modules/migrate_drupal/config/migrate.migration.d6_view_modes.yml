@@ -44,7 +44,8 @@ process:
     plugin: default_value
     default_value: node
   id:
-    plugin: view_mode_id_generator
+    plugin: concat
+    delimiter: .
     source:
       - @targetEntityType
       - @mode

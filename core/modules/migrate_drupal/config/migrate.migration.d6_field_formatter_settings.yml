@@ -32,7 +32,8 @@ process:
       index:
         - 0
   id:
-    plugin: entity_display_id_generator
+    plugin: concat
+    delimiter: .
     source:
       - entity_type
       - type_name
