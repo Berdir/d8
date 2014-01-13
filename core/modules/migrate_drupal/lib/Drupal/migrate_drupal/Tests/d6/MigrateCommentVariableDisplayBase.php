@@ -35,20 +35,20 @@ class MigrateCommentVariableDisplayBase extends MigrateDrupalTestBase {
     parent::setUp();
     entity_create('field_entity', array(
       'entity_type' => 'node',
-        'name' => 'comment',
-        'type' => 'comment',
-        'translatable' => '0',
+      'name' => 'comment',
+      'type' => 'comment',
+      'translatable' => '0',
     ))->save();
     $this->types = array('page', 'story');
     foreach ($this->types as $type) {
       entity_create('node_type', array('type' => $type))->save();
       entity_create('field_instance', array(
-          'label' => 'Comment settings',
-          'description' => '',
-          'field_name' => 'comment',
-          'entity_type' => 'node',
-          'bundle' => $type,
-          'required' => 1,
+        'label' => 'Comment settings',
+        'description' => '',
+        'field_name' => 'comment',
+        'entity_type' => 'node',
+        'bundle' => $type,
+        'required' => 1,
       ))->save();
     }
     $this->dumps = array(
