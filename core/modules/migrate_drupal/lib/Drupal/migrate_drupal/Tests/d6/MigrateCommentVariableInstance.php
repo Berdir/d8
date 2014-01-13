@@ -10,6 +10,9 @@ namespace Drupal\migrate_drupal\Tests\d6;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
+/**
+ * Tests comment variables migrated into a field instance.
+ */
 class MigrateCommentVariableInstance extends MigrateDrupalTestBase {
 
   static $modules = array('comment');
@@ -20,12 +23,15 @@ class MigrateCommentVariableInstance extends MigrateDrupalTestBase {
   public static function getInfo() {
     return array(
       'name'  => 'Migrate comment variables to a field instance,',
-      'description'  => 'Upgrade comment variables  to field.instance.node.comment.yml',
+      'description'  => 'Upgrade comment variables to field.instance.node.*.comment.yml',
       'group' => 'Migrate Drupal',
     );
   }
 
-  function testCommentField() {
+  /**
+   * Test the migrated field instance values.
+   */
+  public function testCommentFieldInstance() {
     foreach (array('page', 'story') as $type) {
       entity_create('node_type', array('type' => $type))->save();
     }

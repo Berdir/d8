@@ -1,0 +1,21 @@
+id: d6_comment_entity_display
+source:
+  plugin: drupal6_comment_variable
+  constants:
+    entity_type: node
+    field_name: comment
+    view_mode: default
+    options:
+      label: hidden
+      type: comment_default
+      weight: 20
+process:
+  entity_type: constants:entity_type
+  field_name: constants:field_name
+  view_mode: constants:view_mode
+  options: constants:options
+
+  bundle: node_type
+destination:
+  plugin: entity_display
+
