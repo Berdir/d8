@@ -20,8 +20,7 @@ class NodeType extends Drupal6SqlBase {
    * {@inheritdoc}
    */
   public function query() {
-    $query = $this->database
-      ->select('node_type', 't')
+    $query = $this->select('node_type', 't')
       ->fields('t', array(
         'type',
         'name',

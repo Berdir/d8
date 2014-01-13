@@ -1,0 +1,49 @@
+id: d6_node_body_instance
+
+sourceIds:
+  type:
+    type: varchar
+    length: 32
+    "not null": true
+    default: ''
+
+destinationIds:
+  id:
+    type: varchar
+    length: 255
+
+source:
+  plugin: drupal6_nodetype
+  constants:
+    entity_type: node
+    field_name: body
+    description: ''
+    required: false
+    default_value_function: ''
+    default_value: []
+    settings:
+      display_summary: true
+      text_processing: true
+    field_type: text_with_summary
+
+process:
+  entity_type: constants:entity_type
+  field_name: constants:field_name
+  bundle: type
+  label: body_label
+  description: constants:description
+  required: constants:required
+  status:
+    -
+      plugin: flag_skipping_row
+      source: has_body
+    -
+      plugin: get
+      value: has_body
+  default_value_function: constants:default_value_function
+  default_value: constants:default_value
+  settings: constants:settings
+  field_type: constants:field_type
+
+destination:
+  plugin: entity_field_instance
