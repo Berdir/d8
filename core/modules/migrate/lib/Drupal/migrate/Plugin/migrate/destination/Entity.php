@@ -14,6 +14,7 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\migrate\Entity\Migration;
 use Drupal\migrate\Row;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\migrate\MigrateException;
 
 /**
  * @PluginId("entity")
@@ -61,7 +62,7 @@ class Entity extends DestinationBase implements ContainerFactoryPluginInterface 
       $entity_type = substr($plugin_id, 7);
     }
     else {
-      throw new \MigrateException('No entity type given.');
+      throw new MigrateException('No entity type given.');
     }
     return new static(
       $configuration,
