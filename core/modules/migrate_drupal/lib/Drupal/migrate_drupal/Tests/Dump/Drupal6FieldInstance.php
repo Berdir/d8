@@ -120,6 +120,10 @@ class Drupal6FieldInstance {
           'label' => array(
             'format' => 'above',
           ),
+          1 => array(
+            'format' => 'default',
+            'exclude' => 0,
+          ),
           'teaser' => array(
             'format' => 'trimmed',
             'exclude' => 0,
