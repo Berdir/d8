@@ -1,0 +1,16 @@
+id: d6_comment_field
+source:
+  plugin: drupal6_comment_variable
+  constants:
+    entity_type: node
+    type: comment
+    id: node.comment
+    name: comment
+process:
+  entity_type: constants:entity_type
+  id: constants:id
+  name: constants:name
+  type: constants:type
+destination:
+  plugin: entity
+  entity_type: field_entity
