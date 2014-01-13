@@ -95,6 +95,12 @@ class FieldInstanceSourceTest extends MigrateSqlSourceTestCase {
     $this->databaseContents['content_node_field_instance'] = $this->expectedResults;
     $this->databaseContents['content_node_field_instance'][0]['widget_settings'] = serialize($this->databaseContents['content_node_field_instance'][0]['widget_settings']);
     $this->databaseContents['content_node_field_instance'][0]['display_settings'] = serialize($this->databaseContents['content_node_field_instance'][0]['display_settings']);
+
+    $this->databaseContents['content_node_field'][0] = array(
+      'field_name' => 'field_body',
+      'required' => 1,
+      'type' => 'text',
+    );
     parent::setUp();
   }
 
