@@ -6,7 +6,7 @@
  */
 
 namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
-
+use Drupal\migrate\Row;
 
 
 /**
@@ -17,10 +17,24 @@ namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
 class NodeType extends Drupal6SqlBase {
 
   /**
+   * The teaser length
+   *
+   * @var int
+   */
+  protected $teaserLength;
+
+  /**
+   * Node preview optional / required.
+   *
+   * @var int
+   */
+  protected $nodePreview;
+
+  /**
    * {@inheritdoc}
    */
   public function query() {
-    $query = $this->select('node_type', 't')
+    return $this->select('node_type', 't')
       ->fields('t', array(
         'type',
         'name',
@@ -35,12 +49,9 @@ class NodeType extends Drupal6SqlBase {
         'custom',
         'modified',
         'locked',
-        'orig_type'
-      ));
-
-    $query->orderBy('type');
-
-    return $query;
+        'orig_type',
+      ))
+      ->orderBy('t.type');
   }
 
   /**
@@ -48,21 +59,38 @@ class NodeType extends Drupal6SqlBase {
    */
   public function fields() {
     return array(
-      'type' => t('Machine name of the node type.'),
-      'name' => t('Human name of the node type.'),
-      'module' => t('The module providing the node type.'),
-      'description' => t('Description of the node type.'),
-      'help' => t('Help text for the node type.'),
-      'has_title' => t('Flag indicating the node type has a title.'),
-      'title_label' => t('Title label.'),
-      'has_body' => t('Flag indicating the node type has a body field.'),
-      'body_label' => t('Body label.'),
-      'min_word_count' => t('Minimum word count for the body field.'),
-      'custom' => t('Flag.'),
-      'modified' => t('Flag.'),
-      'locked' => t('Flag.'),
-      'orig_type' => t('The original type.'),
+      'type' => $this->t('Machine name of the node type.'),
+      'name' => $this->t('Human name of the node type.'),
+      'module' => $this->t('The module providing the node type.'),
+      'description' => $this->t('Description of the node type.'),
+      'help' => $this->t('Help text for the node type.'),
+      'has_title' => $this->t('Flag indicating the node type has a title.'),
+      'title_label' => $this->t('Title label.'),
+      'has_body' => $this->t('Flag indicating the node type has a body field.'),
+      'body_label' => $this->t('Body label.'),
+      'min_word_count' => $this->t('Minimum word count for the body field.'),
+      'custom' => $this->t('Flag.'),
+      'modified' => $this->t('Flag.'),
+      'locked' => $this->t('Flag.'),
+      'orig_type' => $this->t('The original type.'),
+      'teaser_length' => $this->t('Teaser length'),
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  protected function runQuery() {
+    $this->teaserLength = $this->variableGet('teaser_length', 600);
+    $this->nodePreview = $this->variableGet('node_preview', 0);
+    return parent::runQuery();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function prepareRow(Row $row) {
+    $row->setSourceProperty('teaser_length', $this->teaserLength);
+    $row->setSourceProperty('node_preview', $this->nodePreview);
+  }
 }

@@ -1,0 +1,23 @@
+id: d6_node_type_entity_display
+sourceIds:
+  type:
+    type: varchar
+    length: 255
+source:
+  plugin: drupal6_nodetype
+  constants:
+    entity_type: node
+    field_name: body
+    view_mode: default
+    options:
+      label: hidden
+      type: text_default
+process:
+  entity_type: constants:entity_type
+  field_name: constants:field_name
+  view_mode: constants:view_mode
+  options: constants:options
+
+  bundle: type
+destination:
+  plugin: entity_display

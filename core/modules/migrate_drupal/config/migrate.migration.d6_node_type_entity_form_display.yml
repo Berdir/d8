@@ -1,0 +1,22 @@
+id: d6_node_type_entity_form_display
+sourceIds:
+  type:
+    type: varchar
+    length: 255
+source:
+  plugin: drupal6_nodetype
+  constants:
+    entity_type: node
+    field_name: body
+    form_mode: default
+    options:
+      type: text_textarea_with_summary
+process:
+  entity_type: constants:entity_type
+  field_name: constants:field_name
+  form_mode: constants:form_mode
+  options: constants:options
+
+  bundle: type
+destination:
+  plugin: entity_form_display

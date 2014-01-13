@@ -68,7 +68,7 @@ abstract class Drupal6SqlBase extends SqlBase {
 
   protected function variableGet($name, $default) {
     try {
-      $result = $this->database
+      $result = $this->getDatabase()
         ->query('SELECT value FROM {variable} WHERE name = :name', array(':name' => $name))
         ->fetchField();
     }

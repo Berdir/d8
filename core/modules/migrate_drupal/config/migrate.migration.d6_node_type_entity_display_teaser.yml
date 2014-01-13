@@ -1,0 +1,25 @@
+id: d6_node_type_entity_display_teaser
+sourceIds:
+  type:
+    type: varchar
+    length: 255
+source:
+  plugin: drupal6_nodetype
+  constants:
+    entity_type: node
+    field_name: body
+    view_mode: teaser
+    options:
+      label: hidden
+      type: text_summary_or_trimmed
+process:
+  entity_type: constants:entity_type
+  field_name: constants:field_name
+  view_mode: constants:view_mode
+  options: constants:options
+
+  bundle: type
+  'options:settings:trim_length': teaser_length
+destination:
+  plugin: entity_display
+

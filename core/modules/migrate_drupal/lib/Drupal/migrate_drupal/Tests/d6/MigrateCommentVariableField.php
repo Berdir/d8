@@ -10,6 +10,9 @@ namespace Drupal\migrate_drupal\Tests\d6;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
+/**
+ * Tests comment variables migrated into a field entity.
+ */
 class MigrateCommentVariableField extends MigrateDrupalTestBase {
 
   static $modules = array('comment');
@@ -25,6 +28,9 @@ class MigrateCommentVariableField extends MigrateDrupalTestBase {
     );
   }
 
+  /**
+   * Tests comment variables migrated into a field entity.
+   */
   function testCommentField() {
     foreach (array('page', 'story', 'test') as $type) {
       entity_create('node_type', array('type' => $type))->save();
