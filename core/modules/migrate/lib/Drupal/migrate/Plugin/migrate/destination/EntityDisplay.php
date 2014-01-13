@@ -11,7 +11,7 @@ use Drupal\migrate\Entity\Migration;
 use Drupal\migrate\Row;
 
 /**
- * @PluginId("entity_form_display")
+ * @PluginId("entity_display")
  */
 class EntityDisplay extends DestinationBase {
 
