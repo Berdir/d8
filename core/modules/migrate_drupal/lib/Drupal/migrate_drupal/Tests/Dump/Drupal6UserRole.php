@@ -69,54 +69,18 @@ class Drupal6UserRole {
       'unique keys' => array('name' => array('name')),
       'primary key' => array('rid'),
     ));
-    $database->schema()->createTable('users_roles', array(
-      'description' => 'Maps users to roles.',
-      'fields' => array(
-        'uid' => array(
-          'type' => 'int',
-          'unsigned' => TRUE,
-          'not null' => TRUE,
-          'default' => 0,
-          'description' => 'Primary Key: {users}.uid for user.',
-        ),
-        'rid' => array(
-          'type' => 'int',
-          'unsigned' => TRUE,
-          'not null' => TRUE,
-          'default' => 0,
-          'description' => 'Primary Key: {role}.rid for role.',
-        ),
-      ),
-      'primary key' => array('uid', 'rid'),
-      'indexes' => array(
-        'rid' => array('rid'),
-      ),
-    ));
     $database->insert('permission')->fields(array('pid', 'rid', 'perm'))
+      ->values(array('pid' => 1, 'rid' => 1, 'perm' => 'migrate test anonymous permission'))
+      ->values(array('pid' => 2, 'rid' => 2, 'perm' => 'migrate test authenticated permission'))
       ->values(array('pid' => 3, 'rid' => 3, 'perm' => 'migrate test role 1 test permission'))
-      ->values(array('pid' => 4, 'rid' => 4, 'perm' => 'migrate test role 2 test permission'))
-      ->values(array('pid' => 5, 'rid' => 4, 'perm' => 'use PHP for settings'))
-      ->values(array('pid' => 6, 'rid' => 4, 'perm' => 'administer contact forms'))
-      ->values(array('pid' => 7, 'rid' => 4, 'perm' => 'skip comment approval'))
-      ->values(array('pid' => 8, 'rid' => 4, 'perm' => 'edit own blog content'))
-      ->values(array('pid' => 9, 'rid' => 4, 'perm' => 'edit any blog content'))
-      ->values(array('pid' => 10, 'rid' => 4, 'perm' => 'delete own blog content'))
-      ->values(array('pid' => 11, 'rid' => 4, 'perm' => 'delete any blog content'))
-      ->values(array('pid' => 12, 'rid' => 4, 'perm' => 'create forum content'))
-      ->values(array('pid' => 13, 'rid' => 4, 'perm' => 'delete any forum content'))
-      ->values(array('pid' => 14, 'rid' => 4, 'perm' => 'delete own forum content'))
-      ->values(array('pid' => 15, 'rid' => 4, 'perm' => 'edit any forum content'))
-      ->values(array('pid' => 16, 'rid' => 4, 'perm' => 'edit own forum content'))
-      ->values(array('pid' => 17, 'rid' => 4, 'perm' => 'administer nodes'))
+      ->values(array('pid' => 4, 'rid' => 4, 'perm' => 'migrate test role 2 test permission, use PHP for settings, administer contact forms, skip comment approval, edit own blog content, edit any blog content, delete own blog content, delete any blog content, create forum content, delete any forum content, delete own forum content, edit any forum content, edit own forum content, administer nodes'))
       ->execute();
     $database->insert('role')->fields(array('rid', 'name'))
+      ->values(array('rid' => 1, 'name' => 'anonymous user'))
+      ->values(array('rid' => 2, 'name' => 'authenticated user'))
       ->values(array('rid' => 3, 'name' => 'migrate test role 1'))
       ->values(array('rid' => 4, 'name' => 'migrate test role 2'))
       ->values(array('rid' => 5, 'name' => 'migrate test role 3'))
-      ->execute();
-    $database->insert('users_roles')->fields(array('uid', 'rid'))
-      ->values(array('uid' => 1, 'rid' => 3))
-      ->values(array('uid' => 1, 'rid' => 4))
       ->execute();
   }
 

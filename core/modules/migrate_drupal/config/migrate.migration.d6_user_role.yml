@@ -19,6 +19,8 @@ process:
       plugin: dedupe_entity
       entity_type: user_role
       field: id
+    -
+      plugin: user_update_8002
   label: name
 # permissions start as array(array('perm' => array('perm1', 'perm2'))), array('perm' => array('perm3', 'perm4')))
   permissions:

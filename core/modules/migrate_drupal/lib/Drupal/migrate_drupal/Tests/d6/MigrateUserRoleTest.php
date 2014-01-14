@@ -33,6 +33,16 @@ class MigrateUserRoleTest extends MigrateDrupalTestBase {
     $executable = new MigrateExecutable($migration, $this);
     $executable->import();
 
+    $rid = 'anonymous';
+    $anonymous = entity_load('user_role', $rid);
+    $this->assertEqual($anonymous->id(), $rid);
+    $this->assertEqual($anonymous->getPermissions(), array('migrate test anonymous permission'));
+    $this->assertEqual(array($rid), $migration->getIdMap()->lookupDestinationId(array(1)));
+    $rid = 'authenticated';
+    $authenticated = entity_load('user_role', $rid);
+    $this->assertEqual($authenticated->id(), $rid);
+    $this->assertEqual($authenticated->getPermissions(), array('migrate test authenticated permission'));
+    $this->assertEqual(array($rid), $migration->getIdMap()->lookupDestinationId(array(2)));
     $rid = 'migrate_test_role_1';
     $migrate_test_role_1 = entity_load('user_role', $rid);
     $this->assertEqual($migrate_test_role_1->id(), $rid);
