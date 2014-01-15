@@ -1,0 +1,71 @@
+id: d6_block
+sourceIds:
+  module:
+    type: varchar
+    "not null": true
+    length: 255
+  delta:
+    type: varchar
+    "not null": true
+    length: 255
+destinationIds:
+  id:
+    type: varchar
+    length: 255
+source:
+  plugin: drupal6_block
+process:
+  id:
+    # We need something unique, so aggregator, aggregator_1 etc will do.
+    plugin: dedupe_entity
+    entity_type: block
+    field: id
+    postfix: _
+    source: module
+  plugin:
+    -
+      plugin: static_map
+      source:
+        - module
+        - delta
+      map:
+        book:
+          0: book_navigation
+        comment:
+          0: views_block:comments_recent-block_1
+        forum:
+          0: forum_active_block
+          1: forum_new_block
+        locale:
+          0: language_block
+        node:
+          0: node_syndicate_block
+        search:
+          0: search_form_block
+        statistics:
+          0: statistics_popular_block
+        system:
+          0: system_powered_by_block
+        user:
+          0: user_login_block
+          1: system_menu_block:tools
+          2: views_block:who_s_new-block_1
+          3: views_block:who_s_online-who_s_online_block
+    -
+      plugin: drupal6_block_plugin_id
+  region: region
+  theme: theme
+  label: title
+  'visibility:path:visibility': visibility
+  'visibility:path:pages': pages
+  'visibility:role:roles': roles
+  weight: weight
+  settings:
+    plugin: drupal6_block_settings
+    source:
+      - @plugin
+      - delta
+      - settings
+destination:
+  plugin: entity
+  entity_type: block
