@@ -2,113 +2,130 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Tests\d6\MigrateFieldInstanceTest
+ * Contains \Drupal\migrate_drupal\Tests\d6\MigrateFieldInstanceTest.
  */
 
 namespace Drupal\migrate_drupal\Tests\d6;
 
-use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate\MigrateMessage;
+use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
+/**
+ * Tests migration of field instances.
+ */
 class MigrateFieldInstanceTest extends MigrateDrupalTestBase {
 
-  public static $modules = array('number', 'email', 'telephone', 'link', 'file', 'image', 'datetime');
+  public static $modules = array(
+    'number',
+    'email',
+    'telephone',
+    'link',
+    'file',
+    'image',
+    'datetime',
+  );
 
   /**
    * {@inheritdoc}
    */
   public static function getInfo() {
     return array(
-      'name' => 'Migrate form display widget settings.',
-      'description' => 'Migrate widget settings',
-      'group' => 'Migrate',
+      'name' => 'Migrate field instances to field.instance.*.*.*.yml',
+      'description' => 'Migrate field instances.',
+      'group' => 'Migrate Drupal',
     );
   }
 
-  /**
-   * Test that migrated view modes can be loaded using D8 API's.
+  /*
+   * Tests migration of file variables to file.settings.yml.
    */
-  public function testWidgetSettings() {
-
-    $migration = entity_load('migration', 'd6_field_instance_widget_settings');
+  public function testFieldInstanceSettings() {
+    $migration = entity_load('migration', 'd6_field_instance');
     $dumps = array(
       drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6FieldInstance.php',
     );
+    $this->createFields();
+
     $this->prepare($migration, $dumps);
-    $executable = new MigrateExecutable($migration, new MigrateMessage());
+    $executable = new MigrateExecutable($migration, $this);
     $executable->import();
 
-    // Test the config can be loaded.
-    $form_display = entity_load('entity_form_display', 'node.story.default');
-    $this->assertEqual(is_null($form_display), FALSE, "Form display node.story.default loaded with config.");
+    $entity = entity_create('node', array('type' => 'story'));
+    // Test a text field.
+    $field = entity_load('field_instance', 'node.story.field_test');
+    $this->assertEqual($field->label(), 'Text Field', 'Field field_test label correct');
+    $expected = array('max_length' => 255, 'text_processing' => 1);
+    $this->assertEqual($field->getSettings(), $expected, 'Field field_test settings are correct.');
+    $this->assertEqual('text for default value', $entity->field_test->value, 'Field field_test default_value is correct.');
 
-    // Text field.
-    $component = $form_display->getComponent('field_test');
-    $expected = array('weight' => 1, 'type' => 'text_textfield');
-    $expected['settings'] = array('size' => 60, 'placeholder' => '');
-    $this->assertEqual($component, $expected, 'Text field settings are correct.');
 
-    // Integer field.
-    $component = $form_display->getComponent('field_test_two');
-    $expected['type'] = 'number';
-    $expected['weight'] = 2;
-    $expected['settings'] = array('placeholder' => '');
-    $this->assertEqual($component, $expected, 'Integer field settings are correct.');
+    // Test a number field.
+    $field = entity_load('field_instance', 'node.story.field_test_two');
+    $this->assertEqual($field->label(), 'Integer Field');
+    $expected = array(
+      'min' => '10',
+      'max' => '100',
+      'prefix' => 'pref',
+      'suffix' => 'suf',
+    );
+    $this->assertEqual($field->getSettings(), $expected, 'Field field_test_two settings are correct.');
 
-    // Float field.
-    $component = $form_display->getComponent('field_test_three');
-    $expected['weight'] = 3;
-    $this->assertEqual($component, $expected, 'Float field settings are correct.');
+    // Test email field.
+    $field = entity_load('field_instance', 'node.story.field_test_email');
+    $this->assertEqual($field->label(), 'Email Field');
+    $this->assertEqual('benjy@example.com', $entity->field_test_email->value, 'Field field_test_email default_value is correct.');
 
-    // Email field.
-    $component = $form_display->getComponent('field_test_email');
-    $expected['type'] = 'email_default';
-    $expected['weight'] = 4;
-    $this->assertEqual($component, $expected, 'Email field settings are correct.');
+    // Test a filefield.
+    $field = entity_load('field_instance', 'node.story.field_test_filefield');
+    $this->assertEqual($field->label(), 'File Field');
+    $expected = array(
+      'file_extensions' => 'txt pdf doc',
+      'file_directory' => 'images',
+      'description_field' => '1',
+      'max_filesize' => '200KB',
+      'display_field' => '',
+      'display_default' => '',
+      'uri_scheme' => 'public',
+    );
+    $this->verbose(print_r(array($field, $field->getSettings(), $expected), 1));
+    $this->assertEqual($field->getSettings(), $expected, 'Field field_test_filefield settings are correct.');
 
-    // Link field.
-    $component = $form_display->getComponent('field_test_link');
-    $expected['type'] = 'link_default';
-    $expected['weight'] = 5;
-    $expected['settings'] = array('placeholder_uri' => '', 'placeholder_title' => '');
-    $this->assertEqual($component, $expected, 'Link field settings are correct.');
+    // Test a link field.
+    $field = entity_load('field_instance', 'node.story.field_test_link');
+    $this->assertEqual($field->label(), 'Link Field');
+    $expected = array('title' => 2);
+    $this->assertEqual($field->getSettings(), $expected, 'Field field_test_link settings are correct.');
+    $this->assertEqual('default link title', $entity->field_test_link->title, 'Field field_test_link default title is correct.');
+    $this->assertEqual('http://drupal.org', $entity->field_test_link->url, 'Field field_test_link default title is correct.');
 
-    // File field.
-    $component = $form_display->getComponent('field_test_filefield');
-    $expected['type'] = 'file_generic';
-    $expected['weight'] = 7;
-    $expected['settings'] = array('progress_indicator' => 'bar');
-    $this->assertEqual($component, $expected, 'File field settings are correct.');
+  }
 
-    // Image field.
-    $component = $form_display->getComponent('field_test_imagefield');
-    $expected['type'] = 'image_image';
-    $expected['weight'] = 8;
-    $expected['settings'] = array('progress_indicator' => 'bar', 'preview_image_style' => 'thumbnail');
-    $this->assertEqual($component, $expected, 'Image field settings are correct.');
+  /**
+   * Helper to create fields.
+   */
+  protected function createFields() {
+    $fields = array(
+      'field_test' => 'text',
+      'field_test_two' => 'number_integer',
+      'field_test_three' => 'number_float',
+      'field_test_email' => 'email',
+      'field_test_link' => 'link',
+      'field_test_filefield' => 'file',
+      'field_test_imagefield' => 'image',
+      'field_test_phone' => 'telephone',
+      'field_test_date' => 'datetime',
+      'field_test_datestamp' => 'datetime',
+      'field_test_datetime' => 'datetime',
+    );
+    foreach ($fields as $name => $type) {
+      entity_create('field_entity', array(
+        'name' => $name,
+        'entity_type' => 'node',
+        'type' => $type,
+      ))->save();
+    }
 
-    // Phone field.
-    $component = $form_display->getComponent('field_test_phone');
-    $expected['type'] = 'telephone_default';
-    $expected['weight'] = 9;
-    $expected['settings'] = array('placeholder' => '');
-    $this->assertEqual($component, $expected, 'Phone field settings are correct.');
-
-    // Date fields.
-    $component = $form_display->getComponent('field_test_date');
-    $expected['type'] = 'datetime_default';
-    $expected['weight'] = 10;
-    $expected['settings'] = array();
-    $this->assertEqual($component, $expected, 'Date field settings are correct.');
-
-    $component = $form_display->getComponent('field_test_datestamp');
-    $expected['weight'] = 11;
-    $this->assertEqual($component, $expected, 'Date stamp field settings are correct.');
-
-    $component = $form_display->getComponent('field_test_datetime');
-    $expected['weight'] = 12;
-    $this->assertEqual($component, $expected, 'Datetime field settings are correct.');
   }
 
 }

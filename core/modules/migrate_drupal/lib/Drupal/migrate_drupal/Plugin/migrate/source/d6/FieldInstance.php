@@ -14,7 +14,7 @@ use Drupal\migrate\Row;
 /**
  * Drupal 6 field instances source from database.
  *
- * @PluginId("drupal6_fieldinstance")
+ * @PluginId("drupal6_field_instance")
  */
 class FieldInstance extends Drupal6SqlBase implements RequirementsInterface {
 
@@ -34,12 +34,15 @@ class FieldInstance extends Drupal6SqlBase implements RequirementsInterface {
         'description',
         'widget_module',
         'widget_active',
+        'description',
       ))
       ->fields('cnf', array(
         'required',
-        'type',
+        'active',
+        'global_settings',
       ));
-    $query->join('content_node_field', 'cnf', 'cnfi.field_name = cnf.field_name');
+
+    $query->join('content_node_field', 'cnf', 'cnf.field_name = cnfi.field_name');
     $query->orderBy('type_name');
 
     return $query;
@@ -60,6 +63,7 @@ class FieldInstance extends Drupal6SqlBase implements RequirementsInterface {
       'description' => t('A description of field.'),
       'widget_module' => t('Module that implements widget.'),
       'widget_active' => t('Status of widget'),
+      'module' => t('The module that provides the field.'),
     );
   }
 
@@ -70,8 +74,10 @@ class FieldInstance extends Drupal6SqlBase implements RequirementsInterface {
     // Unserialize data.
     $widget_settings = unserialize($row->getSourceProperty('widget_settings'));
     $display_settings = unserialize($row->getSourceProperty('display_settings'));
+    $global_settings = unserialize($row->getSourceProperty('global_settings'));
     $row->setSourceProperty('widget_settings', $widget_settings);
     $row->setSourceProperty('display_settings', $display_settings);
+    $row->setSourceProperty('global_settings', $global_settings);
     return parent::prepareRow($row);
   }
 

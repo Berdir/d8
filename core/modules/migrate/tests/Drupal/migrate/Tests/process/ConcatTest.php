@@ -6,6 +6,7 @@
  */
 
 namespace Drupal\migrate\Tests\process;
+
 use Drupal\migrate\Plugin\migrate\process\Concat;
 
 /**
@@ -67,4 +68,5 @@ class TestConcat extends Concat {
   public function setDelimiter($delimiter) {
     $this->configuration['delimiter'] = $delimiter;
   }
+
 }
