@@ -1234,14 +1234,10 @@ function theme_links($variables) {
 
     $output .= '<ul' . new Attribute($attributes) . '>';
 
-    $num_links = count($links);
-    $i = 0;
     $active = \Drupal::linkGenerator()->getActive();
     $language_url = \Drupal::languageManager()->getLanguage(Language::TYPE_URL);
 
     foreach ($links as $key => $link) {
-      $i++;
-
       $link += array(
         'href' => NULL,
         'route_name' => NULL,
@@ -1252,14 +1248,6 @@ function theme_links($variables) {
       $class = array();
       // Use the array key as class name.
       $class[] = drupal_html_class($key);
-      // Add odd/even, first, and last classes.
-      $class[] = ($i % 2 ? 'odd' : 'even');
-      if ($i == 1) {
-        $class[] = 'first';
-      }
-      if ($i == $num_links) {
-        $class[] = 'last';
-      }
 
       $link_element = array(
         '#type' => 'link',
@@ -1558,7 +1546,8 @@ function theme_table($variables) {
 
   // Add sticky headers, if applicable.
   if (count($header) && $sticky) {
-    drupal_add_library('system', 'drupal.tableheader');
+    $attached['#attached']['library'][] = array('system', 'drupal.tableheader');
+    drupal_render($attached);
     // Add 'sticky-enabled' class to the table to identify it for JS.
     // This is needed to target tables constructed by this function.
     $attributes['class'][] = 'sticky-enabled';
@@ -1567,7 +1556,8 @@ function theme_table($variables) {
   // with the classes represented by the constants RESPONSIVE_PRIORITY_MEDIUM
   // and RESPONSIVE_PRIORITY_LOW, add the tableresponsive behaviors.
   if (count($header) && $responsive) {
-    drupal_add_library('system', 'drupal.tableresponsive');
+    $attached['#attached']['library'][] = array('system', 'drupal.tableresponsive');
+    drupal_render($attached);
     // Add 'responsive-enabled' class to the table to identify it for JS.
     // This is needed to target tables constructed by this function.
     $attributes['class'][] = 'responsive-enabled';
@@ -1808,23 +1798,13 @@ function theme_item_list($variables) {
   if ($items) {
     $output .= '<' . $list_type . new Attribute($list_attributes) . '>';
 
-    $num_items = count($items);
-    $i = 0;
     foreach ($items as &$item) {
-      $i++;
       $attributes = array();
       if (is_array($item)) {
         if (isset($item['#wrapper_attributes'])) {
           $attributes = $item['#wrapper_attributes'];
         }
         $item = drupal_render($item);
-      }
-      $attributes['class'][] = ($i % 2 ? 'odd' : 'even');
-      if ($i == 1) {
-        $attributes['class'][] = 'first';
-      }
-      if ($i == $num_items) {
-        $attributes['class'][] = 'last';
       }
       $output .= '<li' . new Attribute($attributes) . '>' . $item . '</li>';
     }
@@ -2160,7 +2140,8 @@ function template_preprocess_html(&$variables) {
     drupal_add_html_head($element, $name);
   }
 
-  drupal_add_library('system', 'html5shiv', TRUE);
+  $attached['#attached']['library'][] = array('system', 'html5shiv');
+  drupal_render($attached);
 
   $variables['page_top'][] = array('#markup' => $page->getBodyTop());
   $variables['page_bottom'][] = array('#markup' => $page->getBodyBottom());
