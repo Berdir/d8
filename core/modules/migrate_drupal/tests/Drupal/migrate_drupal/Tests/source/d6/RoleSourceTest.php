@@ -52,51 +52,30 @@ class RoleSourceTest extends MigrateSqlSourceTestCase {
       'rid' => 1,
       'name' => 'anonymous user',
       'permissions' => array(
-        array(
-          'pid' => 1,
-          'rid' => 1,
-          'perm' => array(
-            'access content',
-          ),
-          'tid' => 0,
-        ),
+        'access content',
       ),
     ),
     array(
       'rid' => 2,
       'name' => 'authenticated user',
       'permissions' => array(
-        array(
-          'pid' => 2,
-          'rid' => 2,
-          'perm' => array(
-            'access comments',
-            'access content',
-            'post comments',
-            'post comments without approval',
-          ),
-          'tid' => 0,
-        ),
+        'access comments',
+        'access content',
+        'post comments',
+        'post comments without approval',
       ),
     ),
     array(
       'rid' => 3,
       'name' => 'administrator',
       'permissions' => array(
-        array(
-          'pid' => 3,
-          'rid' => 3,
-          'perm' => array(
-            'access comments',
-            'administer comments',
-            'post comments',
-            'post comments without approval',
-            'access content',
-            'administer content types',
-            'administer nodes',
-          ),
-          'tid' => 0,
-        ),
+        'access comments',
+        'administer comments',
+        'post comments',
+        'post comments without approval',
+        'access content',
+        'administer content types',
+        'administer nodes',
       ),
     ),
   );
@@ -116,15 +95,18 @@ class RoleSourceTest extends MigrateSqlSourceTestCase {
    * {@inheritdoc}
    */
   public function setUp() {
-    foreach ($this->expectedResults as $k => $row) {
-      foreach ($row['permissions'] as $perm) {
-        $this->databaseContents['permission'][$perm['pid']] = $perm;
-        $this->databaseContents['permission'][$perm['pid']]['perm'] = implode(',', $perm['perm']);
-        $this->databaseContents['permission'][$perm['pid']]['rid'] = $row['rid'];
-      }
+    foreach ($this->expectedResults as $row) {
+      $this->databaseContents['permission'][] = array(
+        'perm' => implode(', ', $row['permissions']),
+        'rid' => $row['rid'],
+      );
       unset($row['permissions']);
-      $this->databaseContents['role'][$k] = $row;
+      $this->databaseContents['role'][] = $row;
     }
+    $this->databaseContents['filter_formats'][] = array(
+      'format' => 1,
+      'roles' => '',
+    );
     parent::setUp();
   }
 

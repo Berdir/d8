@@ -48,7 +48,10 @@ class Role extends Drupal6SqlBase {
    * {@inheritdoc}
    */
   protected function runQuery() {
-    $filter_roles = $this->getDatabase()->query('SELECT format, roles FROM {filter_formats}')->fetchAllKeyed();
+    $filter_roles = $this->select('filter_formats', 'f')
+      ->fields('f', array('format', 'roles'))
+      ->execute()
+      ->fetchAllKeyed();
     foreach ($filter_roles as $format => $roles) {
       // Drupal 6 code: $roles = ','. implode(',', $roles) .',';
       // Remove the beginning and ending comma.
@@ -64,8 +67,10 @@ class Role extends Drupal6SqlBase {
    */
   function prepareRow(Row $row, $keep = TRUE) {
     $rid = $row->getSourceProperty('rid');
-    $permissions = $this->getDatabase()
-      ->query('SELECT perm FROM {permission} WHERE rid = :rid', array(':rid' => $rid))
+    $permissions = $this->select('permission', 'p')
+      ->fields('p', array('perm'))
+      ->condition('rid', $rid)
+      ->execute()
       ->fetchField();
     $row->setSourceProperty('permissions', explode(', ', $permissions));
     if (isset($this->filterPermissions[$rid])) {
