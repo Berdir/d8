@@ -11,7 +11,7 @@ namespace Drupal\migrate_drupal\Plugin\migrate\Process\d6;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\MigrateExecutable;
-use Drupal\migrate\Plugin\MigratePluginManager;
+use Drupal\migrate\Plugin\MigrateProcessInterface;
 use Drupal\migrate\ProcessPluginBase;
 use Drupal\migrate\Row;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -27,17 +27,19 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class FilterFormatPermission extends ProcessPluginBase implements ContainerFactoryPluginInterface {
 
   /**
-   * @var \Drupal\migrate\Plugin\MigratePluginManager
+   * The migration plugin.
+   *
+   * @var \Drupal\migrate\Plugin\MigrateProcessInterface
    */
-  protected $processPluginManager;
+  protected $migrationPlugin;
 
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration, MigratePluginManager $process_plugin_manager) {
+  public function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration, MigrateProcessInterface $migration_plugin) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->migration = $migration;
-    $this->processPluginManager = $process_plugin_manager;
+    $this->migrationPlugin = $migration_plugin;
   }
 
   /**
@@ -49,7 +51,7 @@ class FilterFormatPermission extends ProcessPluginBase implements ContainerFacto
       $plugin_id,
       $plugin_definition,
       $migration,
-      $container->get('plugin.manager.migrate.process')
+      $container->get('plugin.manager.migrate.process')->createInstance('migration', array('migration' => 'd6_filter_format'), $migration)
     );
   }
 
@@ -62,10 +64,7 @@ class FilterFormatPermission extends ProcessPluginBase implements ContainerFacto
     $rid = $row->getSourceProperty('rid');
     if ($formats = $row->getSourceProperty("filter_permissions:$rid")) {
       foreach ($formats as $format) {
-        $configuration = array('migration' => 'd6_filter_format');
-        $new_id = $this->processPluginManager
-          ->createInstance('migration', $configuration, $this->migration)
-          ->transform(array($format), $migrate_executable, $row, $destination_property);
+        $new_id = $this->migrationPlugin->transform(array($format), $migrate_executable, $row, $destination_property);
         if ($new_id) {
           $value[] = 'use text format ' . $new_id[0];
         }
