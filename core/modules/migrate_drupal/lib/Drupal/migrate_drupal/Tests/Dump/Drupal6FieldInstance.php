@@ -108,7 +108,7 @@ class Drupal6FieldInstance {
         'size' => '60',
         'default_value' => array(
           0 => array(
-            'value' => '',
+            'value' => 'text for default value',
             '_error_element' => 'default_value_widget][field_test][0][value',
           ),
         ),
