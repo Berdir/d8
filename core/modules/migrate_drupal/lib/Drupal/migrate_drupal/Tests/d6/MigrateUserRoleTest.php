@@ -24,10 +24,28 @@ class MigrateUserRoleTest extends MigrateDrupalTestBase {
   }
 
   function testUserRole() {
+    // We need some sample data so we can use the Migration process plugin.
+    $table_name = entity_load('migration', 'd6_filter_format')->getIdMap()->getMapTableName();
+    db_insert($table_name)->fields(array(
+      'sourceid1',
+      'destid1',
+    ))
+    ->values(array(
+      'sourceid1' => 1,
+      'destid1' => 'filtered_html',
+    ))
+    ->values(array(
+      'sourceid1' => 2,
+      'destid1' => 'full_html',
+    ))
+    ->execute();
+
     /** @var \Drupal\migrate\entity\Migration $migration */
     $migration = entity_load('migration', 'd6_user_role');
+    $path = drupal_get_path('module', 'migrate_drupal');
     $dumps = array(
-      drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6UserRole.php',
+      $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6UserRole.php',
+      $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6FilterFormat.php',
     );
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, $this);
@@ -36,17 +54,17 @@ class MigrateUserRoleTest extends MigrateDrupalTestBase {
     $rid = 'anonymous';
     $anonymous = entity_load('user_role', $rid);
     $this->assertEqual($anonymous->id(), $rid);
-    $this->assertEqual($anonymous->getPermissions(), array('migrate test anonymous permission'));
+    $this->assertEqual($anonymous->getPermissions(), array('migrate test anonymous permission', 'use text format filtered_html'));
     $this->assertEqual(array($rid), $migration->getIdMap()->lookupDestinationId(array(1)));
     $rid = 'authenticated';
     $authenticated = entity_load('user_role', $rid);
     $this->assertEqual($authenticated->id(), $rid);
-    $this->assertEqual($authenticated->getPermissions(), array('migrate test authenticated permission'));
+    $this->assertEqual($authenticated->getPermissions(), array('migrate test authenticated permission', 'use text format filtered_html'));
     $this->assertEqual(array($rid), $migration->getIdMap()->lookupDestinationId(array(2)));
     $rid = 'migrate_test_role_1';
     $migrate_test_role_1 = entity_load('user_role', $rid);
     $this->assertEqual($migrate_test_role_1->id(), $rid);
-    $this->assertEqual($migrate_test_role_1->getPermissions(), array(0 => 'migrate test role 1 test permission'));
+    $this->assertEqual($migrate_test_role_1->getPermissions(), array(0 => 'migrate test role 1 test permission', 'use text format full_html'));
     $this->assertEqual(array($rid), $migration->getIdMap()->lookupDestinationId(array(3)));
     $rid = 'migrate_test_role_2';
     $migrate_test_role_2 = entity_load('user_role', $rid);

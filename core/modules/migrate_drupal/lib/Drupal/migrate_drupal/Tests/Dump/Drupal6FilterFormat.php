@@ -96,27 +96,7 @@ class Drupal6FilterFormat {
       'primary key' => array('format'),
       'unique keys' => array('name' => array('name')),
     ));
-    $database->schema()->createTable('variable', array(
-      'fields' => array(
-        'name' => array(
-          'type' => 'varchar',
-          'length' => 128,
-          'not null' => TRUE,
-          'default' => '',
-        ),
-        'value' => array(
-          'type' => 'blob',
-          'not null' => TRUE,
-          'size' => 'big',
-          'translatable' => TRUE,
-        ),
-      ),
-      'primary key' => array(
-        'name',
-      ),
-      'module' => 'filter',
-      'name' => 'variable',
-    ));
+    Drupal6DumpCommon::createVariable($database);
     $database->insert('variable')->fields(array(
       'name',
       'value',
@@ -153,7 +133,7 @@ class Drupal6FilterFormat {
     ->values(array(
       'format' => '2',
       'name' => 'Full HTML',
-      'roles' => '',
+      'roles' => '3',
       'cache' => '1',
     ))
     ->values(array(

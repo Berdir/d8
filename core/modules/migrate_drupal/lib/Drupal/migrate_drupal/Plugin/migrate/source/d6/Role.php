@@ -18,6 +18,13 @@ use Drupal\migrate\Row;
 class Role extends Drupal6SqlBase {
 
   /**
+   * List of filter IDs per role IDs.
+   *
+   * @var array
+   */
+  protected $filterPermissions = array();
+
+  /**
    * {@inheritdoc}
    */
   public function query() {
@@ -40,22 +47,30 @@ class Role extends Drupal6SqlBase {
   /**
    * {@inheritdoc}
    */
-  function prepareRow(Row $row, $keep = TRUE) {
-    $permissions = array();
-    $results = $this->database
-      ->select('permission', 'p', array('fetch' => \PDO::FETCH_ASSOC))
-      ->fields('p', array('pid', 'rid', 'perm', 'tid'))
-      ->condition('rid', $row->getSourceProperty('rid'))
-      ->execute();
-    foreach ($results as $perm) {
-      $permissions[] = array(
-        'pid' => $perm['pid'],
-        'rid' => $perm['rid'],
-        'perm' => array_map('trim', explode(',', $perm['perm'])),
-        'tid' => $perm['tid'],
-      );
+  protected function runQuery() {
+    $filter_roles = $this->getDatabase()->query('SELECT format, roles FROM {filter_formats}')->fetchAllKeyed();
+    foreach ($filter_roles as $format => $roles) {
+      // Drupal 6 code: $roles = ','. implode(',', $roles) .',';
+      // Remove the beginning and ending comma.
+      foreach (explode(',', trim($roles, ',')) as $rid) {
+        $this->filterPermissions[$rid][] = $format;
+      }
     }
-    $row->setSourceProperty('permissions', $permissions);
+    return parent::runQuery();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  function prepareRow(Row $row, $keep = TRUE) {
+    $rid = $row->getSourceProperty('rid');
+    $permissions = $this->getDatabase()
+      ->query('SELECT perm FROM {permission} WHERE rid = :rid', array(':rid' => $rid))
+      ->fetchField();
+    $row->setSourceProperty('permissions', explode(', ', $permissions));
+    if (isset($this->filterPermissions[$rid])) {
+      $row->setSourceProperty("filter_permissions:$rid", $this->filterPermissions[$rid]);
+    }
     return parent::prepareRow($row);
   }
 
