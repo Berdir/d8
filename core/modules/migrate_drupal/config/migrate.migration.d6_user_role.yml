@@ -1,9 +1,7 @@
 id: d6_user_role
 sourceIds:
   rid:
-    type: int
-    "not null": true
-    default: 0
+    type: integer.value
 destinationIds:
   id:
     type: varchar

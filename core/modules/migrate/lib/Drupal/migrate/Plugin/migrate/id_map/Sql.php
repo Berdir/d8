@@ -8,6 +8,7 @@
 namespace Drupal\migrate\Plugin\migrate\id_map;
 
 use Drupal\Component\Utility\Unicode;
+use Drupal\Core\Field\FieldDefinition;
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\MigrateException;
@@ -217,7 +218,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
         $pks = array();
         foreach ($this->sourceIds as $field_schema) {
           $mapkey = 'sourceid' . $count++;
-          $source_id_schema[$mapkey] = $field_schema;
+          $source_id_schema[$mapkey] = $this->getFieldSchema($field_schema);
           $pks[] = $mapkey;
         }
 
@@ -326,6 +327,22 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
       }
       $this->ensured = TRUE;
     }
+  }
+
+  /**
+   * @param array $schema
+   *   A field schema definition. Can be SQL schema or a type data
+   *   based schema. In the latter case, the value of type needs to be
+   *   $typed_data_type.$column
+   * @return array
+   */
+  protected function getFieldSchema(array $schema) {
+    $type_parts = explode('.', $schema['type']);
+    if (count($type_parts) == 2) {
+      $schema = FieldDefinition::create($type_parts[0])->getColumns();
+      return $schema[$type_parts[1]];
+    }
+    return $schema;
   }
 
   /**
