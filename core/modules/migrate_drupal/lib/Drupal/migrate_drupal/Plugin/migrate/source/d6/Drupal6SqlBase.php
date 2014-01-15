@@ -66,6 +66,15 @@ abstract class Drupal6SqlBase extends SqlBase {
     return isset($system_data['module'][$module]['status']) ? (bool) $system_data['module'][$module]['status'] : FALSE;
   }
 
+  /**
+   * Read a variable from a Drupal database.
+   *
+   * @param $name
+   *   Name of the variable.
+   * @param $default
+   *   The default value.
+   * @return mixed
+   */
   protected function variableGet($name, $default) {
     try {
       $result = $this->getDatabase()
