@@ -60,6 +60,9 @@ class FieldInstanceSourceTest extends MigrateSqlSourceTestCase {
       'description' => '',
       'widget_module' => 'text',
       'widget_active' => 1,
+      'required' => 1,
+      'active' => 1,
+      'global_settings' => array(),
     ),
   );
 
@@ -93,13 +96,15 @@ class FieldInstanceSourceTest extends MigrateSqlSourceTestCase {
       ),
     );
     $this->databaseContents['content_node_field_instance'] = $this->expectedResults;
-    $this->databaseContents['content_node_field_instance'][0]['widget_settings'] = serialize($this->databaseContents['content_node_field_instance'][0]['widget_settings']);
-    $this->databaseContents['content_node_field_instance'][0]['display_settings'] = serialize($this->databaseContents['content_node_field_instance'][0]['display_settings']);
+    $this->databaseContents['content_node_field_instance'][0]['widget_settings'] = serialize($this->expectedResults[0]['widget_settings']);
+    $this->databaseContents['content_node_field_instance'][0]['display_settings'] = serialize($this->expectedResults[0]['display_settings']);
 
     $this->databaseContents['content_node_field'][0] = array(
       'field_name' => 'field_body',
       'required' => 1,
       'type' => 'text',
+      'active' => 1,
+      'global_settings' => serialize(array()),
     );
     parent::setUp();
   }
