@@ -1,13 +1,10 @@
 id: d6_taxonomy_vocabulary
 sourceIds:
   vid:
-    type: int
-    "not null": true
-    default: 0
+    type: string
 destinationIds:
   vid:
-    type: varchar
-    length: 255
+    type: string
 source:
   plugin: drupal6_taxonomy_vocabulary
 process:

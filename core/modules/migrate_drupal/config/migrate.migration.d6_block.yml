@@ -1,17 +1,12 @@
 id: d6_block
 sourceIds:
   module:
-    type: varchar
-    "not null": true
-    length: 255
+    type: string
   delta:
-    type: varchar
-    "not null": true
-    length: 255
+    type: string
 destinationIds:
   id:
-    type: varchar
-    length: 255
+    type: string
 source:
   plugin: drupal6_block
 process:

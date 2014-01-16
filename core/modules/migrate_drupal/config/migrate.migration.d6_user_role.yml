@@ -1,11 +1,10 @@
 id: d6_user_role
 sourceIds:
   rid:
-    type: integer.value
+    type: integer
 destinationIds:
   id:
-    type: varchar
-    length: 255
+    type: string
 source:
   plugin: drupal6_user_role
 process:

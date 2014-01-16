@@ -216,9 +216,9 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
         $count = 1;
         $source_id_schema = array();
         $pks = array();
-        foreach ($this->sourceIds as $field_schema) {
+        foreach ($this->sourceIds as $id_definition) {
           $mapkey = 'sourceid' . $count++;
-          $source_id_schema[$mapkey] = $this->getFieldSchema($field_schema);
+          $source_id_schema[$mapkey] = $this->getFieldSchema($id_definition);
           $pks[] = $mapkey;
         }
 
@@ -227,12 +227,12 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
         // Add destination identifiers to map table.
         // TODO: How do we discover the destination schema?
         $count = 1;
-        foreach ($this->destinationIds as $field_schema) {
+        foreach ($this->destinationIds as $id_definition) {
           // Allow dest identifier fields to be NULL (for IGNORED/FAILED
           // cases).
-          $field_schema['not null'] = FALSE;
+          $id_definition['not null'] = FALSE;
           $mapkey = 'destid' . $count++;
-          $fields[$mapkey] = $field_schema;
+          $fields[$mapkey] = $this->getFieldSchema($id_definition);
         }
         $fields['source_row_status'] = array(
           'type' => 'int',
@@ -330,19 +330,21 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
   }
 
   /**
-   * @param array $schema
+   * Create schema from an id definition.
+   *
+   * @param array $id_definition
    *   A field schema definition. Can be SQL schema or a type data
    *   based schema. In the latter case, the value of type needs to be
    *   $typed_data_type.$column
    * @return array
    */
-  protected function getFieldSchema(array $schema) {
-    $type_parts = explode('.', $schema['type']);
-    if (count($type_parts) == 2) {
-      $schema = FieldDefinition::create($type_parts[0])->getColumns();
-      return $schema[$type_parts[1]];
+  protected function getFieldSchema(array $id_definition) {
+    $type_parts = explode('.', $id_definition['type']);
+    if (count($type_parts) == 1) {
+      $type_parts[] = 'value';
     }
-    return $schema;
+    $schema = FieldDefinition::create($type_parts[0])->getColumns();
+    return $schema[$type_parts[1]];
   }
 
   /**

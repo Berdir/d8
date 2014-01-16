@@ -1,13 +1,10 @@
 id: d6_date_formats
 sourceIds:
   name:
-    type: varchar
-    "not null": true
-    length: 128
+    type: string
 destinationIds:
   id:
-    type: varchar
-    length: 255
+    type: string
 source:
   plugin: drupal6_variable_multirow
   variables:

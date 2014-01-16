@@ -1,13 +1,10 @@
 id: d6_filter_format
 sourceIds:
   format:
-    type: int
-    "not null": true
-    default: 0
+    type: integer
 destinationIds:
   format:
-    type: varchar
-    length: 255
+    type: string
 source:
   plugin: drupal6_filter_format
 process:

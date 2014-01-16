@@ -2,16 +2,10 @@ id: d6_field_instance
 
 sourceIds:
   field_name:
-    type: varchar
-    length: 32
-    "not null": true
-    default: ''
+    type: string
     alias: cnfi
   type_name:
-    type: varchar
-    length: 32
-    "not null": true
-    default: ''
+    type: string
 
 destinationIds:
   id:

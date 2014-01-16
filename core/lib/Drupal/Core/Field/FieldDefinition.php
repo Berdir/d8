@@ -285,6 +285,7 @@ class FieldDefinition extends ListDefinition implements FieldDefinitionInterface
       // Get the schema from the field item class.
       $definition = \Drupal::service('plugin.manager.field.field_type')->getDefinition($this->getType());
       $class = $definition['class'];
+      $this->setSettings($definition['settings']);
       $schema = $class::schema($this);
       // Fill in default values for optional entries.
       $schema += array('indexes' => array(), 'foreign keys' => array());

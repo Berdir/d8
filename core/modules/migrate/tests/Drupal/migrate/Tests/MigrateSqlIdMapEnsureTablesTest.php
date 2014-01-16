@@ -33,13 +33,12 @@ class MigrateSqlIdMapEnsureTablesTest extends MigrateTestCase {
     'id' => 'sql_idmap_test',
     'sourceIds' => array(
       'source_id_property' => array(
-        'type' => 'int',
+        'type' => 'integer',
       ),
     ),
     'destinationIds' => array(
       'destination_id_property' => array(
-        'type' => 'varchar',
-        'length' => 255,
+        'type' => 'string',
       ),
     ),
   );
@@ -88,9 +87,15 @@ class MigrateSqlIdMapEnsureTablesTest extends MigrateTestCase {
       'not null' => FALSE,
       'description' => 'Hash of source row data, for detecting changes',
     );
-    $fields['sourceid1'] = $this->migrationConfiguration['sourceIds']['source_id_property'];
-    $fields['destid1'] = $this->migrationConfiguration['destinationIds']['destination_id_property'];
-    $fields['destid1']['not null'] = FALSE;
+    $fields['sourceid1'] = array(
+      'type' => 'int',
+      'not null' => TRUE,
+    );
+    $fields['destid1'] = array(
+      'type' => 'varchar',
+      'length' => 255,
+      'not null' => FALSE,
+    );
     $map_table_schema = array(
       'description' => 'Mappings from source identifier value(s) to destination identifier value(s).',
       'fields' => $fields,
@@ -113,7 +118,10 @@ class MigrateSqlIdMapEnsureTablesTest extends MigrateTestCase {
       'unsigned' => TRUE,
       'not null' => TRUE,
     );
-    $fields['sourceid1'] = $this->migrationConfiguration['sourceIds']['source_id_property'];
+    $fields['sourceid1'] = array(
+      'type' => 'int',
+      'not null' => TRUE,
+    );
     $fields['level'] = array(
       'type' => 'int',
       'unsigned' => TRUE,

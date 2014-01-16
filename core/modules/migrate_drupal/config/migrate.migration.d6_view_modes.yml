@@ -2,15 +2,11 @@ id: d6_view_modes
 
 sourceIds:
   view_mode:
-    type: varchar
-    length: 32
-    "not null": true
-    default: ''
+    type: string
 
 destinationIds:
   id:
-    type: varchar
-    length: 255
+    type: string
 
 source:
   plugin: drupal6_field_instance_view_mode

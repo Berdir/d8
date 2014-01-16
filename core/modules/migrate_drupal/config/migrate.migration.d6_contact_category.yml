@@ -2,14 +2,11 @@ id: d6_contact_category
 
 sourceIds:
   cid:
-    type: int
-    "not null": true
-    default: 0
+    type: integer
 
 destinationIds:
   id:
-    type: varchar
-    length: 255
+    type: string
 
 source:
   plugin: drupal6_contact_category
