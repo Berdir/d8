@@ -205,7 +205,7 @@ class MigrateFieldFormatterSettings extends MigrateDrupalTestBase {
     $component = $display->getComponent('field_test_datetime');
     $this->assertEqual($component, $expected, "node.story.full field_test_datetime is of type date_default with correct settings.");
     // Test that our Id map has the correct data.
-    $this->assertEqual(array('node.story.teaser'), $migration->getIdMap()->lookupDestinationID(array('story', 'teaser')), "Ensure Id map works.");
+    $this->assertEqual(array('node.story.teaser'), $migration->getIdMap()->lookupDestinationID(array('story', 'teaser', 'node', 'field_test')), "Ensure Id map works.");
   }
 
 }

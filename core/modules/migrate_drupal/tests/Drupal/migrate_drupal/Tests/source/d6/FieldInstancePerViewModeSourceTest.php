@@ -58,243 +58,45 @@ class FieldInstancePerViewModeSourceTest extends MigrateSqlSourceTestCase {
       'entity_type' => 'node',
       'view_mode' => 4,
       'type_name' => 'article',
-      'fields' => array(
-        'field_test' => array(
-          'field_name' => 'field_test',
-          'type' => 'text',
-          'module' => 'text',
-          'weight' => 1,
-          'label' => 'above',
-          'display_settings' => array(
-            'weight' => 1,
-            'parent' => '',
-            'label' => array(
-              'format' => 'above',
-            ),
-            4 => array(
-              'format' => 'trimmed',
-              'exclude' => 0,
-            ),
-          ),
-          'widget_settings' => array(),
+      'field_name' => 'field_test',
+      'type' => 'text',
+      'module' => 'text',
+      'weight' => 1,
+      'label' => 'above',
+      'display_settings' => array(
+        'weight' => 1,
+        'parent' => '',
+        'label' => array(
+          'format' => 'above',
+        ),
+        4 => array(
+          'format' => 'trimmed',
+          'exclude' => 0,
         ),
       ),
+      'widget_settings' => array(),
     ),
     array(
       'entity_type' => 'node',
       'view_mode' => 'teaser',
       'type_name' => 'story',
-      'fields' => array(
-        'field_test' => array(
-          'field_name' => 'field_test',
-          'type' => 'text',
-          'module' => 'text',
-          'weight' => 1,
-          'label' => 'above',
-          'display_settings' => array(
-            'weight' => 1,
-            'parent' => '',
-            'label' => array(
-              'format' => 'above',
-            ),
-            'teaser' => array(
-              'format' => 'trimmed',
-              'exclude' => 0,
-            ),
-          ),
-          'widget_settings' => array(),
+      'field_name' => 'field_test',
+      'type' => 'text',
+      'module' => 'text',
+      'weight' => 1,
+      'label' => 'above',
+      'display_settings' => array(
+        'weight' => 1,
+        'parent' => '',
+        'label' => array(
+          'format' => 'above',
         ),
-        'field_test_date' => array(
-          'field_name' => 'field_test_date',
-          'type' => 'date',
-          'module' => 'date',
-          'weight' => 10,
-          'label' => 'above',
-          'display_settings' => array(
-            'weight' => 10,
-            'parent' => '',
-            'label' => array(
-              'format' => 'above',
-            ),
-            'teaser' => array(
-              'format' => 'default',
-              'exclude' => 0,
-            ),
-          ),
-          'widget_settings' => array(),
-        ),
-        'field_test_datestamp' => array(
-          'field_name' => 'field_test_datestamp',
-          'type' => 'datestamp',
-          'module' => 'date',
-          'weight' => 11,
-          'label' => 'above',
-          'display_settings' => array(
-            'weight' => 11,
-            'parent' => '',
-            'label' => array(
-              'format' => 'above',
-            ),
-            'teaser' => array(
-              'format' => 'medium',
-              'exclude' => 0,
-            ),
-          ),
-          'widget_settings' => array(),
-        ),
-        'field_test_datetime' => array(
-          'field_name' => 'field_test_datetime',
-          'type' => 'datetime',
-          'module' => 'date',
-          'weight' => 12,
-          'label' => 'above',
-          'display_settings' => array(
-            'weight' => 12,
-            'parent' => '',
-            'label' => array(
-              'format' => 'above',
-            ),
-            'teaser' => array(
-              'format' => 'short',
-              'exclude' => 0,
-            ),
-          ),
-          'widget_settings' => array(),
-        ),
-        'field_test_email' => array(
-          'field_name' => 'field_test_email',
-          'type' => 'email',
-          'module' => 'email',
-          'weight' => 4,
-          'label' => 'above',
-          'display_settings' => array(
-            'weight' => 4,
-            'parent' => '',
-            'label' => array(
-              'format' => 'above',
-            ),
-            'teaser' => array(
-              'format' => 'default',
-              'exclude' => 0,
-            ),
-          ),
-          'widget_settings' => array(),
-        ),
-        'field_test_filefield' => array(
-          'field_name' => 'field_test_filefield',
-          'type' => 'filefield',
-          'module' => 'filefield',
-          'weight' => 7,
-          'label' => 'above',
-          'display_settings' => array(
-            'weight' => 7,
-            'parent' => '',
-            'label' => array(
-              'format' => 'above',
-            ),
-            'teaser' => array(
-              'format' => 'default',
-              'exclude' => 0,
-            ),
-          ),
-          'widget_settings' => array(),
-        ),
-        'field_test_imagefield' => array(
-          'field_name' => 'field_test_imagefield',
-          'type' => 'filefield',
-          'module' => 'filefield',
-          'weight' => 8,
-          'label' => 'above',
-          'display_settings' => array(
-            'weight' => 8,
-            'parent' => '',
-            'label' => array(
-              'format' => 'above',
-            ),
-            'teaser' => array(
-              'format' => 'image_imagelink',
-              'exclude' => 0,
-            ),
-          ),
-          'widget_settings' => array(),
-        ),
-        'field_test_link' => array(
-          'field_name' => 'field_test_link',
-          'type' => 'link',
-          'module' => 'link',
-          'weight' => 5,
-          'label' => 'above',
-          'display_settings' => array(
-            'weight' => 5,
-            'parent' => '',
-            'label' => array(
-              'format' => 'above',
-            ),
-            'teaser' => array(
-              'format' => 'default',
-              'exclude' => 0,
-            ),
-          ),
-          'widget_settings' => array(),
-        ),
-        'field_test_phone' => array(
-          'field_name' => 'field_test_phone',
-          'type' => 'au_phone',
-          'module' => 'phone',
-          'weight' => 9,
-          'label' => 'above',
-          'display_settings' => array(
-            'weight' => 9,
-            'parent' => '',
-            'label' => array(
-              'format' => 'above',
-            ),
-            'teaser' => array(
-              'format' => 'default',
-              'exclude' => 0,
-            ),
-          ),
-          'widget_settings' => array(),
-        ),
-        'field_test_three' => array(
-          'field_name' => 'field_test_three',
-          'type' => 'number_decimal',
-          'module' => 'number',
-          'weight' => 3,
-          'label' => 'above',
-          'display_settings' => array(
-            'weight' => 3,
-            'parent' => '',
-            'label' => array(
-              'format' => 'above',
-            ),
-            'teaser' => array(
-              'format' => 'unformatted',
-              'exclude' => 0,
-            ),
-          ),
-          'widget_settings' => array(),
-        ),
-        'field_test_two' => array(
-          'field_name' => 'field_test_two',
-          'type' => 'number_integer',
-          'module' => 'number',
-          'weight' => 2,
-          'label' => 'above',
-          'display_settings' => array(
-            'weight' => 2,
-            'parent' => '',
-            'label' => array(
-              'format' => 'above',
-            ),
-            'teaser' => array(
-              'format' => 'unformatted',
-              'exclude' => 0,
-            ),
-          ),
-          'widget_settings' => array(),
+        'teaser' => array(
+          'format' => 'trimmed',
+          'exclude' => 0,
         ),
       ),
+      'widget_settings' => array(),
     ),
   );
 
@@ -314,24 +116,24 @@ class FieldInstancePerViewModeSourceTest extends MigrateSqlSourceTestCase {
    * {@inheritdoc}
    */
   public function setUp() {
-    foreach ($this->expectedResults as $k => $view_mode) {
-      foreach ($view_mode['fields'] as $i => $field) {
-        // These are stored as serialized strings.
-        $field['display_settings'] = serialize($field['display_settings']);
-        $field['widget_settings'] = serialize($field['widget_settings']);
+    foreach ($this->expectedResults as $k => $field_view_mode) {
+      // These are stored as serialized strings.
+      $field_view_mode['display_settings'] = serialize($field_view_mode['display_settings']);
+      $field_view_mode['widget_settings'] = serialize($field_view_mode['widget_settings']);
 
-        $data = $field + array(
-          'entity_type' => $view_mode['entity_type'],
-          'view_mode' => $view_mode['view_mode'],
-          'type_name' => $view_mode['type_name'],
-        );
+      $this->databaseContents['content_node_field'][] = array(
+        'field_name' => $field_view_mode['field_name'],
+        'type' => $field_view_mode['type'],
+        'module' => $field_view_mode['module'],
+      );
+      unset($field_view_mode['type']);
+      unset($field_view_mode['module']);
 
-        $this->databaseContents['content_node_field_instance'][] = $data;
-        $this->databaseContents['content_node_field'][$field['field_name']] = $field;
+      $this->databaseContents['content_node_field_instance'][] = $field_view_mode;
 
-        $this->expectedResults[$k]['fields'][$i]['display_settings'] = $this->expectedResults[$k]['fields'][$i]['display_settings'][$view_mode['view_mode']];
+      // Update the expected display settings.
+      $this->expectedResults[$k]['display_settings'] = $this->expectedResults[$k]['display_settings'][$field_view_mode['view_mode']];
 
-      }
     }
     parent::setUp();
   }

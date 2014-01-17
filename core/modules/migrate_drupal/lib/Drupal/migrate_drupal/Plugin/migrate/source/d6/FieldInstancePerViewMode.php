@@ -28,22 +28,20 @@ class FieldInstancePerViewMode extends Drupal6SqlBase {
       $field_row['widget_settings'] = unserialize($field_row['widget_settings']);
       $bundle = $field_row['type_name'];
       $field_name = $field_row['field_name'];
+
       foreach ($this->getViewModes() as $view_mode) {
         if (isset($field_row['display_settings'][$view_mode]) && !$field_row['display_settings'][$view_mode]['exclude']) {
-          $index = $view_mode . "." . $bundle;
-          if (!isset($rows[$index])) {
-            $rows[$index]['entity_type'] = 'node';
-            $rows[$index]['view_mode'] = $view_mode;
-            $rows[$index]['type_name'] = $bundle;
-          }
-
-          $rows[$index]['fields'][$field_name]['field_name'] = $field_name;
-          $rows[$index]['fields'][$field_name]['type'] = $field_row['type'];
-          $rows[$index]['fields'][$field_name]['module'] = $field_row['module'];
-          $rows[$index]['fields'][$field_name]['weight'] = $field_row['display_settings']['weight'];
-          $rows[$index]['fields'][$field_name]['label'] = $field_row['display_settings']['label']['format'];
-          $rows[$index]['fields'][$field_name]['display_settings'] = $field_row['display_settings'][$view_mode];
-          $rows[$index]['fields'][$field_name]['widget_settings'] = $field_row['widget_settings'];
+          $index = $view_mode . "." . $bundle . "." . $field_name;
+          $rows[$index]['entity_type'] = 'node';
+          $rows[$index]['view_mode'] = $view_mode;
+          $rows[$index]['type_name'] = $bundle;
+          $rows[$index]['field_name'] = $field_name;
+          $rows[$index]['type'] = $field_row['type'];
+          $rows[$index]['module'] = $field_row['module'];
+          $rows[$index]['weight'] = $field_row['display_settings']['weight'];
+          $rows[$index]['label'] = $field_row['display_settings']['label']['format'];
+          $rows[$index]['display_settings'] = $field_row['display_settings'][$view_mode];
+          $rows[$index]['widget_settings'] = $field_row['widget_settings'];
         }
       }
     }
