@@ -20,9 +20,9 @@ class EntityDisplay extends DestinationBase {
    */
   public function import(Row $row) {
     $options = $row->getDestinationProperty('options') ?: array();
-    entity_get_display($row->getDestinationProperty('entity_type'), $row->getDestinationProperty('bundle'), $row->getDestinationProperty('view_mode'))
-      ->setComponent($row->getDestinationProperty('field_name'), $options)
-      ->save();
+    $entity = $this->getEntity($row->getDestinationProperty('entity_type'), $row->getDestinationProperty('bundle'), $row->getDestinationProperty('view_mode'));
+    $entity->setComponent($row->getDestinationProperty('field_name'), $options)->save();
+    return array($entity->id());
   }
 
   /**
@@ -37,6 +37,13 @@ class EntityDisplay extends DestinationBase {
    */
   public function fields(Migration $migration = NULL) {
     // TODO: Implement fields() method.
+  }
+
+  /**
+   * @return \Drupal\Core\Entity\Display\EntityViewDisplayInterface
+   */
+  protected function getEntity($entity_type, $bundle, $view_mode) {
+    return entity_get_display($entity_type, $bundle, $view_mode);
   }
 
 }
