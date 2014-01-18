@@ -85,6 +85,7 @@ class Entity extends DestinationBase implements ContainerFactoryPluginInterface 
     }
     else {
       $entity = $this->storageController->create($row->getDestination());
+      $entity->enforceIsNew();
     }
     $entity->save();
     return array($entity->id());
