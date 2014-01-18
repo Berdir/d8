@@ -25,11 +25,12 @@ function drush_migrate_manifest($db_url, $manifest) {
   $list = Yaml::parse($manifest);
   $message = new DrushMigrateMessage();
   $keep = drush_get_option('keep');
-  foreach (entity_load_multiple('migration', $list) as $migration) {
+  foreach (entity_load_multiple('migration', $list) as $migration_id => $migration) {
+    drush_log("Running $migration_id");
     $migration->source['database'] = TRUE;
     if (!$keep) {
       $table_name = $migration->getIdMap()->getMapTableName();
-      SqlBase::getDatabaseConnection($migration->source)->truncate($table_name);
+      SqlBase::getDatabaseConnection($migration->idMap)->truncate($table_name)->execute();
     }
     $executable = new MigrateExecutable($migration, $message);
     $executable->import();
