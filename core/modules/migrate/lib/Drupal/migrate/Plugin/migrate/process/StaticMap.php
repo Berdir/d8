@@ -46,7 +46,7 @@ class StaticMap extends ProcessPluginBase {
         return $this->configuration['default_value'];
       }
       if (empty($this->configuration['bypass'])) {
-        throw new MigrateException(sprintf('Lookup of %s failed.', var_export($new_value, TRUE)));
+        throw new MigrateException(sprintf('Lookup of %s failed.', var_export($value, TRUE)));
       }
       else {
         return $value;
