@@ -7,10 +7,16 @@
 
 namespace Drupal\migrate\Plugin\migrate\destination;
 
+use Drupal\Component\Utility\String;
+use Drupal\Core\Config\Entity\ConfigEntityInterface;
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\TypedData\ComplexDataInterface;
+use Drupal\Core\TypedData\ListInterface;
+use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\migrate\Entity\Migration;
 use Drupal\migrate\Row;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -99,18 +105,50 @@ class Entity extends DestinationBase implements ContainerFactoryPluginInterface 
    */
   protected function update(EntityInterface $entity, Row $row) {
     foreach ($row->getRawDestination() as $property => $value) {
-      $this->setValue($entity, explode(':', $property), $value);
+      $keys = explode(':', $property);
+      if ($entity instanceof ContentEntityInterface) {
+        $this->updateContentEntity($entity, $keys, $value);
+      }
+      if ($entity instanceof ConfigEntityInterface) {
+        $this->updateConfigEntity($entity, $keys, $value);
+      }
     }
   }
 
   /**
+   * @param ContentEntityInterface $entity
+   * @param array $parents
+   * @param mixed $value
+   * @throws \Drupal\migrate\MigrateException
+   */
+  protected function updateContentEntity(ContentEntityInterface $entity, array $parents, $value) {
+    $ref = $entity;
+    while ($parent = array_shift($parents)) {
+      if ($ref instanceof ListInterface && is_numeric($parent)) {
+        $ref = $ref->offsetGet($parent);
+      }
+      elseif ($ref instanceof ComplexDataInterface) {
+        $ref = $ref->get($parent);
+      }
+      elseif ($ref instanceof TypedDataInterface) {
+        // At this point we should have no more parents as there is nowhere to
+        // descend.
+        if ($parents) {
+          throw new MigrateException(String::format('Unexpected extra keys @parents', array('@parents' => $parents)));
+        }
+      }
+    }
+    $ref->setValue($value);
+  }
+
+  /**
    * @param EntityInterface $entity
-   * @param array $keys
+   * @param array $parents
    * @param $value
    */
-  protected function setValue(EntityInterface $entity, array $keys, $value) {
+  protected function updateConfigEntity(ConfigEntityInterface $entity, array $parents, $value) {
     $ref = &$entity;
-    foreach ($keys as $key) {
+    foreach ($parents as $key) {
       if (is_array($ref) || $ref instanceof \ArrayAccess) {
         $ref = &$ref[$key];
       }
