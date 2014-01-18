@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\migrate_drupal\Tests\d6\MigrateVocabularyToFieldTest.
+ * Contains \Drupal\migrate_drupal\Tests\d6\MigrateVocabularyEntityDisplayTest.
  */
 
 namespace Drupal\migrate_drupal\Tests\d6;
@@ -11,7 +11,7 @@ use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate\MigrateMessage;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
-class MigrateVocabularyToFieldTest extends MigrateDrupalTestBase {
+class MigrateVocabularyEntityDisplayTest extends MigrateDrupalTestBase {
 
 static $modules = array('taxonomy', 'field');
 
@@ -20,13 +20,13 @@ static $modules = array('taxonomy', 'field');
    */
   public static function getInfo() {
     return array(
-      'name'  => 'Vocabulary migration',
-      'description'  => 'Vocabulary migration',
+      'name'  => 'Vocabulary entity display migration',
+      'description'  => 'Vocabulary entity display migration',
       'group' => 'Migrate Drupal',
     );
   }
 
-  function testVocabularyToField() {
+  function testVocabularyEntityDisplay() {
 
     // Loading the migration creates the map table so we can insert our data.
     $table_name = entity_load('migration', 'd6_taxonomy_vocabulary')->getIdMap()->getMapTableName();
@@ -42,28 +42,20 @@ static $modules = array('taxonomy', 'field');
     ))
     ->execute();
 
-    entity_create('taxonomy_vocabulary', array(
-      'name' => 'Test Vocabulary',
-      'description' => 'Test Vocabulary',
-      'vid' => 'test_vocab',
-    ))->save();
-
-    $migration = entity_load('migration', 'd6_vocabulary_to_field');
+    $migration = entity_load('migration', 'd6_vocabulary_entity_display');
     $dumps = array(
-      drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6VocabularyToField.php',
+      drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6VocabularyField.php',
     );
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, $this);
     $executable->import();
 
     // Test that the field exists.
-    $field_id = 'node.tags';
-    $field = entity_load('field_entity', $field_id);
-    $this->assertEqual($field->id(), $field_id);
-    $settings = $field->getSettings();
-    $this->assertEqual('tags', $settings['allowed_values'][0]['vocabulary'], "Vocabulary has correct settings.");
-    $this->assertEqual(array('node.tags'), $migration->getIdMap()->lookupDestinationID(array(1)), "Test IdMap");
-
+    $component = entity_get_display('node', 'page', 'default')->getComponent('tags');
+    $this->assertEqual($component['type'], 'taxonomy_term_reference');
+    $this->assertEqual($component['weight'], 20);
+    // Test the Id map.
+    $this->assertEqual(array('node.article.default'), $migration->getIdMap()->lookupDestinationID(array(1, 'article')), "Test IdMap");
   }
 
 }

@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains \Drupal\migrate_drupal\Tests\Dump\Drupal6VocabularyToField.
+ * Contains \Drupal\migrate_drupal\Tests\Dump\Drupal6VocabularyField.
  */
 
 namespace Drupal\migrate_drupal\Tests\Dump;
@@ -11,7 +11,7 @@ use Drupal\Core\Database\Connection;
 /**
  * Database dump for testing vocabulary to field migration.
  */
-class Drupal6VocabularyToField {
+class Drupal6VocabularyField {
 
   /**
    * {@inheritdoc}
@@ -154,6 +154,20 @@ class Drupal6VocabularyToField {
         'vid' => array('vid'),
       ),
     ));
+
+    $database->insert('vocabulary_node_types')->fields(array(
+      'vid',
+      'type',
+    ))
+    ->values(array(
+      'vid' => '1',
+      'type' => 'article',
+    ))
+    ->values(array(
+      'vid' => '1',
+      'type' => 'page',
+    ))
+    ->execute();
   }
 
 }

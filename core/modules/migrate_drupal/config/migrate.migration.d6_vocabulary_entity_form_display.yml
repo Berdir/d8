@@ -1,0 +1,37 @@
+id: d6_vocabulary_entity_form_display
+sourceIds:
+  vid:
+    type: integer
+    alias: v
+  type:
+    type: string
+destinationIds:
+  id:
+    type: string
+source:
+  plugin: drupal6_taxonomy_vocabulary_per_type
+  constants:
+    entity_type: node
+    form_mode: default
+    options:
+      type: taxonomy_term_reference
+      weight: 20
+
+process:
+  entity_type: constants:entity_type
+  form_mode: constants:form_mode
+  options: constants:options
+  bundle: type
+  field_name:
+    -
+      plugin: migration
+      migration: d6_taxonomy_vocabulary
+      source:
+        - vid
+    -
+      plugin: extract
+      index:
+        - 0
+
+destination:
+  plugin: entity_form_display

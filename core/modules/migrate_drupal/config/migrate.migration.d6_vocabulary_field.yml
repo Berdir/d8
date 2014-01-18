@@ -1,4 +1,4 @@
-id: d6_vocabulary_to_field
+id: d6_vocabulary_field
 sourceIds:
   vid:
     type: integer
@@ -7,11 +7,14 @@ destinationIds:
     type: string
 source:
   plugin: drupal6_taxonomy_vocabulary
+  constants:
+    entity_type: node
+    type: taxonomy_term_reference
+    parent: 0
 
 process:
-  entity_type:
-    plugin: default_value
-    default_value: node
+  entity_type: constants:entity_type
+  type: constants:type
   name:
     -
       plugin: migration
@@ -22,9 +25,7 @@ process:
       plugin: extract
       index:
         - 0
-  type:
-    plugin: default_value
-    default_value: taxonomy_term_reference
   'settings:allowed_values:0:vocabulary': @name
+  'settings:allowed_values:0:parent': constants:parent
 destination:
   plugin: entity_field_entity

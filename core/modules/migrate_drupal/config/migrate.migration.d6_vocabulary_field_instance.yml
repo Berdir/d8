@@ -1,0 +1,33 @@
+id: d6_vocabulary_field_instance
+sourceIds:
+  vid:
+    type: integer
+    alias: v
+  type:
+    type: string
+destinationIds:
+  id:
+    type: string
+source:
+  plugin: drupal6_taxonomy_vocabulary_per_type
+  constants:
+    entity_type: node
+    parent: 0
+
+process:
+  entity_type: constants:entity_type
+  bundle: type
+  field_name:
+    -
+      plugin: migration
+      migration: d6_taxonomy_vocabulary
+      source:
+        - vid
+    -
+      plugin: extract
+      index:
+        - 0
+  'settings:allowed_values:0:vocabulary': @field_name
+  'settings:allowed_values:0:parent': constants:parent
+destination:
+  plugin: entity_field_instance
