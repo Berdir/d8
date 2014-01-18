@@ -19,15 +19,7 @@ class FieldInstancePerFormDisplay extends Drupal6SqlBase {
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition, $migration);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   protected function runQuery() {
-    // @TODO add tags https://drupal.org/node/2165287
     $rows = array();
     $result = $this->prepareQuery()->execute();
     while ($field_row = $result->fetchAssoc()) {
@@ -36,22 +28,15 @@ class FieldInstancePerFormDisplay extends Drupal6SqlBase {
       $bundle = $field_row['type_name'];
       $field_name = $field_row['field_name'];
 
-      // View mode will always be default for form displays.
-      $view_mode = "default";
-      $index = "$bundle.$view_mode";
-
-      if (!isset($rows[$index])) {
-        $rows[$index]['view_mode'] = $view_mode;
-        $rows[$index]['type_name'] = $bundle;
-        $rows[$index]['widget_active'] = (bool) $field_row['widget_active'];
-      }
-
-      $rows[$index]['fields'][$field_name]['field_name'] = $field_name;
-      $rows[$index]['fields'][$field_name]['type'] = $field_row['type'];
-      $rows[$index]['fields'][$field_name]['module'] = $field_row['module'];
-      $rows[$index]['fields'][$field_name]['weight'] = $field_row['display_settings']['weight'];
-      $rows[$index]['fields'][$field_name]['widget_type'] = $field_row['widget_type'];
-      $rows[$index]['fields'][$field_name]['widget_settings'] = $field_row['widget_settings'];
+      $index = "$bundle.$field_name";
+      $rows[$index]['type_name'] = $bundle;
+      $rows[$index]['widget_active'] = (bool) $field_row['widget_active'];
+      $rows[$index]['field_name'] = $field_name;
+      $rows[$index]['type'] = $field_row['type'];
+      $rows[$index]['module'] = $field_row['module'];
+      $rows[$index]['weight'] = $field_row['display_settings']['weight'];
+      $rows[$index]['widget_type'] = $field_row['widget_type'];
+      $rows[$index]['widget_settings'] = $field_row['widget_settings'];
     }
 
     return new \ArrayIterator($rows);
