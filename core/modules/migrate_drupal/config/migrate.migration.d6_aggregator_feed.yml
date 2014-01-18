@@ -1,0 +1,28 @@
+id: d6_aggregator_feed
+
+sourceIds:
+  fid:
+    type: integer
+
+destinationIds:
+  fid:
+    type: integer
+
+source:
+  plugin: drupal6_aggregator_feed
+
+process:
+  fid: fid
+  title: title
+  url: url
+  refresh: refresh
+  checked: checked
+  link: link
+  description: description
+  image: image
+  etag: etag
+  modified: modified
+
+destination:
+  plugin: entity
+  entity_type: aggregator_feed
