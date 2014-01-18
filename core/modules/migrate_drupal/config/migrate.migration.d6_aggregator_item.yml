@@ -1,0 +1,25 @@
+id: d6_aggregator_item
+sourceIds:
+  iid:
+    type: integer
+destinationIds:
+  iid:
+    type: integer
+source:
+  plugin: drupal6_aggregator_item
+process:
+  iid: iid
+  fid:
+    plugin: migration
+    migration: d6_aggregator_feed
+    source:
+      - fid
+  title: title
+  link: link
+  author: author
+  description: description
+  timestamp: timestamp
+  guid: guid
+destination:
+  plugin: entity
+  entity_type: aggregator_item
