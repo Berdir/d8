@@ -84,10 +84,18 @@ interface MigrationInterface extends ConfigEntityInterface {
   public function getIdMap();
 
   /**
+   * The current value of the highwater mark.
+   *
    * @return int
    */
   public function getHighwater();
 
+  /**
+   * Save the highwater mark.
+   *
+   * @return int
+   */
   public function saveHighwater($highwater);
+
 
 }
