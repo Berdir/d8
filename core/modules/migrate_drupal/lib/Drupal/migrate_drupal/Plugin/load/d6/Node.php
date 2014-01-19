@@ -69,7 +69,10 @@ class Node extends LoadBase implements ContainerFactoryPluginInterface {
       $values = $this->migration->getExportProperties();
       $values['id'] = 'd6_node_' . $node_type;
       $values['source']['configuration']['type'] = $node_type;
-      $migrations[$values['id']] = $this->storageController->create($values);
+      /** @var \Drupal\migrate\Entity\MigrationInterface $migration */
+      $migration = $this->storageController->create($values);
+      $migration->process = drupal_map_assoc(array_keys($migration->getSourcePlugin()->fields()));
+      $migrations[$migration->id()] = $migration;
     }
     return $migrations;
   }
