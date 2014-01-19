@@ -14,7 +14,7 @@ use Drupal\migrate\Entity\MigrationInterface;
  *
  * @PluginID("drupal6_field_instance_per_view_mode")
  */
-class FieldInstancePerViewMode extends Drupal6SqlBase {
+class FieldInstancePerViewMode extends ViewModeBase {
 
   /**
    * {@inheritdoc}
@@ -47,13 +47,6 @@ class FieldInstancePerViewMode extends Drupal6SqlBase {
     }
 
     return new \ArrayIterator($rows);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function count() {
-    return count($this->runQuery());
   }
 
   /**
@@ -94,35 +87,6 @@ class FieldInstancePerViewMode extends Drupal6SqlBase {
       'description' => t('A description of field.'),
       'widget_module' => t('Module that implements widget.'),
       'widget_active' => t('Status of widget'),
-    );
-  }
-
-  /**
-   * Get a list of D6 view modes.
-   *
-   * Drupal 6 supported the following view modes.
-   * NODE_BUILD_NORMAL = 0
-   * NODE_BUILD_PREVIEW = 1
-   * NODE_BUILD_SEARCH_INDEX = 2
-   * NODE_BUILD_SEARCH_RESULT = 3
-   * NODE_BUILD_RSS = 4
-   * NODE_BUILD_PRINT = 5
-   * teaser
-   * full
-   *
-   * @return array
-   *   The view mode names.
-   */
-  public function getViewModes() {
-    return array(
-      0,
-      1,
-      2,
-      3,
-      4,
-      5,
-      'teaser',
-      'full',
     );
   }
 
