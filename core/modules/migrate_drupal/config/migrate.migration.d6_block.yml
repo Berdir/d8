@@ -62,5 +62,4 @@ process:
       - delta
       - settings
 destination:
-  plugin: entity
-  entity_type: block
+  plugin: entity_block
