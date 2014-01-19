@@ -8,7 +8,6 @@
 namespace Drupal\migrate_drupal\Tests\d6;
 
 use Drupal\migrate\MigrateExecutable;
-use Drupal\migrate\MigrateMessage;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
 class MigrateVocabularyEntityDisplayTest extends MigrateDrupalTestBase {
@@ -55,7 +54,7 @@ static $modules = array('taxonomy', 'field');
     $this->assertEqual($component['type'], 'taxonomy_term_reference');
     $this->assertEqual($component['weight'], 20);
     // Test the Id map.
-    $this->assertEqual(array('node.article.default'), $migration->getIdMap()->lookupDestinationID(array(1, 'article')), "Test IdMap");
+    $this->assertEqual(array('node.article.default', 'tags'), $migration->getIdMap()->lookupDestinationID(array(1, 'article')));
   }
 
 }
