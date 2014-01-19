@@ -18,8 +18,7 @@ class Box extends Drupal6SqlBase {
    * {@inheritdoc}
    */
   public function query() {
-    $query = $this->database
-      ->select('boxes', 'b')
+    $query = $this->select('boxes', 'b')
       ->fields('b', array('bid', 'body', 'info', 'format'));
     $query->orderBy('bid');
 
