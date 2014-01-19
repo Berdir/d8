@@ -38,6 +38,7 @@ class MigrateTestBase extends WebTestBase implements MigrateMessageInterface {
         'default' => $value['prefix']['default'] . $databasePrefix,
       );
     }
+    Database::removeConnection('migrate');
     $database = SqlBase::getDatabaseConnection(array('database' => $connection_info['default']));
     foreach (array('source', 'destination', 'idMap') as $key) {
       $configuration = $migration->get($key);
