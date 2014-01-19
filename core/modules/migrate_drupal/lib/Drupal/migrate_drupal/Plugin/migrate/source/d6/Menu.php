@@ -21,8 +21,7 @@ class Menu extends Drupal6SqlBase implements RequirementsInterface {
    * {@inheritdoc}
    */
   public function query() {
-    $query = $this->database
-      ->select('menu_custom', 'm')
+    $query = $this->select('menu_custom', 'm')
       ->fields('m', array('menu_name', 'title', 'description'));
     return $query;
   }
