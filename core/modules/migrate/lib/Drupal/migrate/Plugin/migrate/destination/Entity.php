@@ -7,6 +7,7 @@
 
 namespace Drupal\migrate\Plugin\migrate\destination;
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\String;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
@@ -158,16 +159,7 @@ class Entity extends DestinationBase implements ContainerFactoryPluginInterface 
   protected function updateConfigEntity(ConfigEntityInterface $entity, array $parents, $value) {
     $top_key = array_shift($parents);
     $entity_value = $entity->get($top_key);
-    $ref = &$entity_value;
-    foreach ($parents as $key) {
-      if (is_array($ref) || $ref instanceof \ArrayAccess) {
-        $ref = &$ref[$key];
-      }
-      elseif (is_object($ref)) {
-        $ref = &$ref->$key;
-      }
-    }
-    $ref = $value;
+    NestedArray::setValue($entity_value, $parents, $value);
     $entity->set($top_key, $entity_value);
   }
 
