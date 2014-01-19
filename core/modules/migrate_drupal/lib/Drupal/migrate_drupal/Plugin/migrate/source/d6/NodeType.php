@@ -6,13 +6,13 @@
  */
 
 namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
-use Drupal\migrate\Row;
 
+use Drupal\migrate\Row;
 
 /**
  * Drupal 6 Node types source from database.
  *
- * @PluginId("drupal6_nodetype")
+ * @PluginId("drupal6_node_type")
  */
 class NodeType extends Drupal6SqlBase {
 
@@ -29,6 +29,13 @@ class NodeType extends Drupal6SqlBase {
    * @var int
    */
   protected $nodePreview;
+
+  /**
+   * An array of theme settings.
+   *
+   * @var array
+   */
+  protected $themeSettings;
 
   /**
    * {@inheritdoc}
@@ -83,6 +90,7 @@ class NodeType extends Drupal6SqlBase {
   protected function runQuery() {
     $this->teaserLength = $this->variableGet('teaser_length', 600);
     $this->nodePreview = $this->variableGet('node_preview', 0);
+    $this->themeSettings = $this->variableGet('theme_settings', array());
     return parent::runQuery();
   }
 
@@ -92,5 +100,17 @@ class NodeType extends Drupal6SqlBase {
   public function prepareRow(Row $row) {
     $row->setSourceProperty('teaser_length', $this->teaserLength);
     $row->setSourceProperty('node_preview', $this->nodePreview);
+
+    $type = $row->getSourceProperty('type');
+    $options = $this->variableGet('node_options_' . $type, array('promote', 'sticky'));
+    foreach (array('promote', 'sticky', 'status', 'revision') as $item) {
+      $options[$item] = isset($options[$item]);
+    }
+    $row->setSourceProperty('options', $options);
+    $submitted = isset($this->themeSettings['toggle_node_info_' . $type]) ? $this->themeSettings['toggle_node_info_' . $type] : FALSE;
+    $row->setSourceProperty('submitted', $submitted);
+
+    return parent::prepareRow($row);
   }
+
 }

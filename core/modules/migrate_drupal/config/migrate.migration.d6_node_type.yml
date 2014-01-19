@@ -1,0 +1,32 @@
+id: d6_node_type
+sourceIds:
+  type:
+    type: string
+    length: 32
+    "not null": true
+destinationIds:
+  type:
+    type: string
+    length: 255
+source:
+  plugin: drupal6_node_type
+  constants:
+    preview: 1 # DRUPAL_OPTIONAL
+process:
+  type:
+    -
+      plugin: machine_name
+      source: type
+  name: name
+  module: module
+  description: description
+  help: help
+  has_title: has_title
+  title_label: title_label
+  preview: constants:preview
+  submitted: submitted
+  options: options
+
+destination:
+  plugin: entity
+  entity_type: node_type

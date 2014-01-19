@@ -9,7 +9,7 @@ destinationIds:
     type: string
 
 source:
-  plugin: drupal6_nodetype
+  plugin: drupal6_node_type
   constants:
     entity_type: node
     field_name: body
