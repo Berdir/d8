@@ -15,6 +15,9 @@ services:
   plugin.manager.migrate.destination:
     class: Drupal\migrate\Plugin\MigratePluginManager
     arguments: [destination, '@container.namespaces', '@cache.cache', '@language_manager', '@module_handler']
+  plugin.manager.migrate.load:
+    class: Drupal\migrate\Plugin\MigratePluginManager
+    arguments: [load, '@container.namespaces', '@cache.cache', '@language_manager', '@module_handler']
   plugin.manager.migrate.id_map:
     class: Drupal\migrate\Plugin\MigratePluginManager
     arguments: [id_map, '@container.namespaces', '@cache.cache', '@language_manager', '@module_handler']
