@@ -24,7 +24,7 @@ interface MigrateDestinationInterface extends PluginInspectionInterface {
    * being implemented. These are used to construct the destination key fields
    * of the map table for a migration using this destination.
    */
-  public function getIdsSchema();
+  public function getIds();
 
   /**
    * Derived classes must implement fields(), returning a list of available

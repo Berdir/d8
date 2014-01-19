@@ -4,10 +4,6 @@ sourceIds:
   cid:
     type: integer
 
-destinationIds:
-  id:
-    type: string
-
 source:
   plugin: drupal6_contact_category
 

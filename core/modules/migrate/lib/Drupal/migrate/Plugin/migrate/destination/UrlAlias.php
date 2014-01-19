@@ -74,8 +74,9 @@ class UrlAlias extends DestinationBase implements ContainerFactoryPluginInterfac
   /**
    * {@inheritdoc}
    */
-  public function getIdsSchema() {
-    // TODO: Implement getIdsSchema() method.
+  public function getIds() {
+    $ids['pid']['type'] = 'integer';
+    return $ids;
   }
 
   /**

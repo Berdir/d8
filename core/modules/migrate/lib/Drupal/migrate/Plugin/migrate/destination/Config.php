@@ -33,16 +33,17 @@ class Config extends DestinationBase implements ContainerFactoryPluginInterface 
    * @param array $plugin_definition
    * @param ConfigObject $config
    */
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition, ConfigObject $config) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition);
+  public function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration, ConfigObject $config) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $migration);
     $this->config = $config;
   }
 
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, array $plugin_definition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration = NULL) {
     return new static(
       $configuration,
       $plugin_id,
       $plugin_definition,
+      $migration,
       $container->get('config.factory')->get($configuration['config_name'])
     );
   }
@@ -66,22 +67,16 @@ class Config extends DestinationBase implements ContainerFactoryPluginInterface 
   }
 
   /**
-   * Derived classes must implement fields(), returning a list of available
-   * destination fields.
-   *
-   * @todo Review the cases where we need the Migration parameter, can we avoid that?
-   *
-   * @param MigrationInterface $migration
-   *   Optionally, the migration containing this destination.
-   * @return array
-   *  - Keys: machine names of the fields
-   *  - Values: Human-friendly descriptions of the fields.
+   * {@inheritdoc}
    */
   public function fields(MigrationInterface $migration = NULL) {
     // @todo Dynamically fetch fields using Config Schema API.
   }
 
-  public function getIdsSchema() {
-    return array($this->config->getName() => array());
+  /**
+   * {@inheritdoc}
+   */
+  public function getIds() {
+    return array();
   }
 }

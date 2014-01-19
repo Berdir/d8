@@ -28,8 +28,12 @@ class EntityDisplay extends DestinationBase {
   /**
    * {@inheritdoc}
    */
-  public function getIdsSchema() {
-    // TODO: Implement getIdsSchema() method.
+  public function getIds() {
+    $ids['entity_type']['type'] = 'string';
+    $ids['bundle']['type'] = 'string';
+    $ids['view_mode']['type'] = 'string';
+    $ids['field_name']['type'] = 'string';
+    return $ids;
   }
 
   /**

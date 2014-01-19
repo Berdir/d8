@@ -6,10 +6,6 @@ sourceIds:
   field_name:
     type: string
 
-destinationIds:
-  id:
-    type: string
-
 source:
   plugin: drupal6_field_instance_per_form_display
   constants:

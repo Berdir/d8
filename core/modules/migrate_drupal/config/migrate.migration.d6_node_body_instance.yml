@@ -4,10 +4,6 @@ sourceIds:
   type:
     type: string
 
-destinationIds:
-  id:
-    type: string
-
 source:
   plugin: drupal6_node_type
   constants:

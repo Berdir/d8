@@ -7,10 +7,6 @@ sourceIds:
   type_name:
     type: string
 
-destinationIds:
-  id:
-    type: string
-
 source:
   plugin: drupal6_field_instance
 

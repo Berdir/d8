@@ -152,7 +152,7 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
    *
    * @var array
    */
-  public $destinationIds = array();
+  public $destinationIds = FALSE;
 
   /**
    * Information on the highwater mark.

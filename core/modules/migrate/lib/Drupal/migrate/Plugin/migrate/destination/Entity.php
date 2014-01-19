@@ -165,8 +165,10 @@ class Entity extends DestinationBase implements ContainerFactoryPluginInterface 
   /**
    * {@inheritdoc}
    */
-  public function getIdsSchema() {
-    // TODO: Implement getIdsSchema() method.
+  public function getIds() {
+    $id_key = $this->entityType->getKey('id');
+    $ids[$id_key]['type'] = is_subclass_of($this->entityType->getClass(), 'Drupal\Core\Config\Entity\ConfigEntityInterface') ? 'string' : 'integer';
+    return $ids;
   }
 
   /**

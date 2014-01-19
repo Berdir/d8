@@ -4,9 +4,6 @@ sourceIds:
     type: string
   delta:
     type: string
-destinationIds:
-  id:
-    type: string
 source:
   plugin: drupal6_block
 process:
