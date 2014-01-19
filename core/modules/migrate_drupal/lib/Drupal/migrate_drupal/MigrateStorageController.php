@@ -43,7 +43,7 @@ class MigrateStorageController extends ConfigStorageController {
     if (!isset($ids)) {
       foreach ($entities as $entity) {
         if ($plugin = $entity->getLoadPlugin()) {
-          $entities += $plugin->load();
+          $entities += $plugin->loadMultiple();
         }
       }
     }
@@ -51,7 +51,7 @@ class MigrateStorageController extends ConfigStorageController {
       foreach ($dynamic_ids as $base_id => $sub_ids) {
         $entity = $entities[$base_id];
         if ($plugin = $entity->getLoadPlugin()) {
-          $entities += $plugin->load($sub_ids);
+          $entities += $plugin->loadMultiple($sub_ids);
         }
       }
     }
