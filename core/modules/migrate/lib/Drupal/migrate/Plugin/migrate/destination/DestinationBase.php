@@ -9,9 +9,34 @@
 namespace Drupal\migrate\Plugin\migrate\destination;
 
 use Drupal\Core\Plugin\PluginBase;
+use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\Plugin\MigrateDestinationInterface;
 
 abstract class DestinationBase extends PluginBase implements MigrateDestinationInterface {
+
+  /**
+   * The migraiton
+   *
+   * @var \Drupal\migrate\Entity\MigrationInterface
+   */
+  protected $migration;
+
+  /**
+   * Constructs an entity destination plugin.
+   *
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   * @param string $plugin_id
+   *   The plugin_id for the plugin instance.
+   * @param array $plugin_definition
+   *   The plugin implementation definition.
+   * @param MigrationInterface $migration
+   *   The migration.
+   */
+  public function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+    $this->migration = $migration;
+  }
 
   /**
    * Modify the Row before it is imported.

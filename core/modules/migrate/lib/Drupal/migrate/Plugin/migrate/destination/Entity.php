@@ -18,7 +18,6 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\TypedData\ComplexDataInterface;
 use Drupal\Core\TypedData\ListInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
-use Drupal\migrate\Entity\Migration;
 use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\Row;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -28,12 +27,6 @@ use Drupal\migrate\MigrateException;
  * @PluginId("entity")
  */
 class Entity extends DestinationBase implements ContainerFactoryPluginInterface {
-
-  /**
-   * The migraiton
-   *
-   * @var \Drupal\migrate\Entity\MigrationInterface
-   */
 
   /**
    * The entity storage controller.
@@ -48,20 +41,21 @@ class Entity extends DestinationBase implements ContainerFactoryPluginInterface 
   protected $entityType;
 
   /**
-   * Constructs an entity destination plugin.
-   *
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
    *   The plugin_id for the plugin instance.
    * @param array $plugin_definition
    *   The plugin implementation definition.
+   * @param MigrationInterface $migration
+   *   The migration.
    * @param EntityStorageControllerInterface $storage_controller
    *   The storage controller for this entity type.
+   * @param EntityTypeInterface $entity_type
+   *   The entity type object.
    */
   public function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration, EntityStorageControllerInterface $storage_controller, EntityTypeInterface $entity_type) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->migration = $migration;
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $migration);
     $this->storageController = $storage_controller;
     $this->entityType = $entity_type;
   }
