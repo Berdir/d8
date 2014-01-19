@@ -22,6 +22,7 @@ process:
     process:
       id:
         plugin: static_map
+        default_value: filter_null
         source:
           - module
           - delta
