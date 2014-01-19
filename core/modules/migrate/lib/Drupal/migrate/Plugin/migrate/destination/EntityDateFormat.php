@@ -7,8 +7,7 @@
 
 namespace Drupal\migrate\Plugin\migrate\destination;
 
-use Drupal\Core\Entity\EntityInterface;
-use Drupal\migrate\Row;
+use Drupal\Core\Config\Entity\ConfigEntityInterface;
 
 /**
  * @PluginId("entity_date_format")
@@ -18,16 +17,12 @@ class EntityDateFormat extends Entity {
   /**
    * {@inheritdoc}
    */
-  protected function update(EntityInterface $entity, Row $row) {
-    /** @var \Drupal\system\Entity\DateFormat $entity */
-    foreach ($row->getRawDestination() as $property => $value) {
-      $keys = explode(':', $property);
-      if ($keys[0] == 'pattern') {
-        $entity->setPattern($value, $keys[1]);
-      }
-      else {
-        $this->setValue($entity, $keys, $value);
-      }
+  protected function updateConfigEntity(ConfigEntityInterface $entity, array $parents, $value) {
+    if ($parents[0] == 'pattern') {
+      $entity->setPattern($value, $parents[1]);
+    }
+    else {
+      parent::updateConfigEntity($entity, $parents, $value);
     }
   }
 }
