@@ -159,7 +159,12 @@ class Entity extends DestinationBase implements ContainerFactoryPluginInterface 
   protected function updateConfigEntity(ConfigEntityInterface $entity, array $parents, $value) {
     $top_key = array_shift($parents);
     $entity_value = $entity->get($top_key);
-    NestedArray::setValue($entity_value, $parents, $value);
+    if (is_array($entity_value)) {
+      NestedArray::setValue($entity_value, $parents, $value);
+    }
+    else {
+      $entity_value = $value;
+    }
     $entity->set($top_key, $entity_value);
   }
 
