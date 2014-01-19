@@ -9,7 +9,7 @@ source:
   plugin: drupal6_menu
 process:
   id: menu_name
-  label: name
+  label: title
   description: description
 destination:
   plugin: entity
