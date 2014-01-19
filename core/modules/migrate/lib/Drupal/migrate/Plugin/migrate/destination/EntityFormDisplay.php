@@ -21,18 +21,17 @@ class EntityFormDisplay extends DestinationBase {
    */
   public function import(Row $row) {
     $options = $row->getDestinationProperty('options') ?: array();
+    $field_name = $row->getDestinationProperty('field_name');
     $entity = $this->getEntity($row->getDestinationProperty('entity_type'), $row->getDestinationProperty('bundle'), $row->getDestinationProperty('form_mode'));
-    $entity->setComponent($row->getDestinationProperty('field_name'), $options)->save();
-    return array($entity->id());
+    $entity->setComponent($field_name, $options)->save();
+    return array($entity->id(), $field_name);
   }
 
   /**
    * {@inheritdoc}
    */
   public function getIds() {
-    $ids['entity_type']['type'] = 'string';
-    $ids['bundle']['type'] = 'string';
-    $ids['form_mode']['type'] = 'string';
+    $ids['id']['type'] = 'string';
     $ids['field_name']['type'] = 'string';
     return $ids;
   }
