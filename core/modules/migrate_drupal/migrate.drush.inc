@@ -35,4 +35,6 @@ function drush_migrate_manifest($db_url, $manifest) {
     $executable = new MigrateExecutable($migration, $message);
     $executable->import();
   }
+  include_once DRUPAL_ROOT . '/core/includes/utility.inc';
+  drupal_rebuild();
 }
