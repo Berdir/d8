@@ -5,7 +5,7 @@
  * Contains \Drupal\migrate_drupal\Plugin\load\d6\Node.
  */
 
-namespace Drupal\migrate_drupal\Plugin\load\d6;
+namespace Drupal\migrate_drupal\Plugin\migrate\load\d6;
 
 use Drupal\Core\Entity\EntityStorageControllerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
