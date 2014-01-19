@@ -18,6 +18,7 @@ use Drupal\Core\TypedData\ComplexDataInterface;
 use Drupal\Core\TypedData\ListInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\migrate\Entity\Migration;
+use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\Row;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\migrate\MigrateException;
@@ -26,6 +27,12 @@ use Drupal\migrate\MigrateException;
  * @PluginId("entity")
  */
 class Entity extends DestinationBase implements ContainerFactoryPluginInterface {
+
+  /**
+   * The migraiton
+   *
+   * @var \Drupal\migrate\Entity\MigrationInterface
+   */
 
   /**
    * The entity storage controller.
@@ -51,8 +58,9 @@ class Entity extends DestinationBase implements ContainerFactoryPluginInterface 
    * @param EntityStorageControllerInterface $storage_controller
    *   The storage controller for this entity type.
    */
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition, EntityStorageControllerInterface $storage_controller, EntityTypeInterface $entity_type) {
+  public function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration, EntityStorageControllerInterface $storage_controller, EntityTypeInterface $entity_type) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
+    $this->migration = $migration;
     $this->storageController = $storage_controller;
     $this->entityType = $entity_type;
   }
@@ -60,7 +68,7 @@ class Entity extends DestinationBase implements ContainerFactoryPluginInterface 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, array $plugin_definition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration = NULL) {
     if (isset($configuration['entity_type'])) {
       $entity_type = $configuration['entity_type'];
     }
@@ -74,6 +82,7 @@ class Entity extends DestinationBase implements ContainerFactoryPluginInterface 
       $configuration,
       $plugin_id,
       $plugin_definition,
+      $migration,
       $container->get('entity.manager')->getStorageController($entity_type),
       $container->get('entity.manager')->getDefinition($entity_type)
     );
@@ -169,7 +178,7 @@ class Entity extends DestinationBase implements ContainerFactoryPluginInterface 
   /**
    * {@inheritdoc}
    */
-  public function fields(Migration $migration = NULL) {
+  public function fields(MigrationInterface $migration = NULL) {
     // TODO: Implement fields() method.
   }
 

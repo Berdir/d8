@@ -8,6 +8,7 @@
 namespace Drupal\migrate\Plugin\migrate\destination;
 
 use Drupal\migrate\Entity\Migration;
+use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\Row;
 
 /**
@@ -35,7 +36,7 @@ class EntityFormDisplay extends DestinationBase {
   /**
    * {@inheritdoc}
    */
-  public function fields(Migration $migration = NULL) {
+  public function fields(MigrationInterface $migration = NULL) {
     // TODO: Implement fields() method.
   }
 

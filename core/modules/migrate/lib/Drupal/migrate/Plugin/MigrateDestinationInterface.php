@@ -9,6 +9,7 @@ namespace Drupal\migrate\Plugin;
 
 use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\migrate\Entity\Migration;
+use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\Row;
 
 /**
@@ -37,7 +38,7 @@ interface MigrateDestinationInterface extends PluginInspectionInterface {
    *  - Keys: machine names of the fields
    *  - Values: Human-friendly descriptions of the fields.
    */
-  public function fields(Migration $migration = NULL);
+  public function fields(MigrationInterface $migration = NULL);
 
   /**
    * Derived classes may implement preImport() and/or postImport(), to do any

@@ -7,7 +7,7 @@
 namespace Drupal\migrate\Plugin\migrate\destination;
 
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\migrate\Entity\Migration;
+use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\MigrateException;
 use Drupal\migrate\Row;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -71,13 +71,13 @@ class Config extends DestinationBase implements ContainerFactoryPluginInterface 
    *
    * @todo Review the cases where we need the Migration parameter, can we avoid that?
    *
-   * @param Migration $migration
+   * @param MigrationInterface $migration
    *   Optionally, the migration containing this destination.
    * @return array
    *  - Keys: machine names of the fields
    *  - Values: Human-friendly descriptions of the fields.
    */
-  public function fields(Migration $migration = NULL) {
+  public function fields(MigrationInterface $migration = NULL) {
     // @todo Dynamically fetch fields using Config Schema API.
   }
 
