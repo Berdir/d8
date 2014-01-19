@@ -63,7 +63,7 @@ class Node extends LoadBase implements ContainerFactoryPluginInterface {
     foreach ($node_type_migration->getSourcePlugin() as $node_type) {
       $types[] = $node_type['type'];
     }
-    $ids_to_add = $sub_ids ? array_intersect($types, $sub_ids) : $types;
+    $ids_to_add = isset($sub_ids) ? array_intersect($types, $sub_ids) : $types;
     $migrations = array();
     foreach ($ids_to_add as $node_type) {
       $values = $this->migration->getExportProperties();
