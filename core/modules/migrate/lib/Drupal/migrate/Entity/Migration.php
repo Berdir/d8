@@ -22,7 +22,7 @@ use Drupal\migrate\Plugin\MigrateIdMapInterface;
  *   label = @Translation("Migration"),
  *   module = "migrate",
  *   controllers = {
- *     "storage" = "Drupal\Core\Config\Entity\ConfigStorageController"
+ *     "storage" = "Drupal\migrate\MigrationStorageController"
  *   },
  *   config_prefix = "migrate.migration",
  *   entity_keys = {
@@ -103,6 +103,20 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
    * @var \Drupal\migrate\Plugin\MigrateDestinationInterface
    */
   protected $destinationPlugin;
+
+  /**
+   * The load plugin configuration, if any.
+   *
+   * @var array
+   */
+  public $load = array();
+
+  /**
+   * The load plugin.
+   *
+   * @var \Drupal\migrate\Plugin\MigrateLoadInterface|false
+   */
+  protected $loadPlugin = FALSE;
 
   /**
    * The identifier map data.
@@ -274,6 +288,16 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
       $this->destinationPlugin = \Drupal::service('plugin.manager.migrate.destination')->createInstance($this->destination['plugin'], $this->destination, $this);
     }
     return $this->destinationPlugin;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getLoadPlugin() {
+    if ($this->load && !$this->loadPlugin) {
+      $this->loadPlugin = \Drupal::service('plugin.manager.migrate.load')->createInstance($this->load['plugin'], $this->load, $this);
+    }
+    return $this->loadPlugin;
   }
 
   /**

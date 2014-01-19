@@ -77,6 +77,13 @@ interface MigrationInterface extends ConfigEntityInterface {
   public function getDestinationPlugin();
 
   /**
+   * Returns the initialized load plugin if there's one.
+   *
+   * @return \Drupal\migrate\Plugin\MigrateLoadInterface|false
+   */
+  public function getLoadPlugin();
+
+  /**
    * Returns the initialized id_map plugin.
    *
    * @return \Drupal\migrate\Plugin\MigrateIdMapInterface

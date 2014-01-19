@@ -5,12 +5,14 @@
  * Contains \Drupal\migrate_drupal\MigrateStorageController.
  */
 
-namespace Drupal\migrate_drupal;
-
+namespace Drupal\migrate;
 
 use Drupal\Core\Config\Entity\ConfigStorageController;
 
-class MigrateStorageController extends ConfigStorageController {
+/**
+ * Storage controller for migration entities.
+ */
+class MigrationStorageController extends ConfigStorageController {
 
   /**
    * {@inheritdoc}
@@ -35,10 +37,12 @@ class MigrateStorageController extends ConfigStorageController {
           $ids_to_load[] = $id;
         }
       }
+      $ids = array_flip($ids);
     }
     else {
       $ids_to_load = NULL;
     }
+    /** @var \Drupal\migrate\Entity\MigrationInterface[] $entities */
     $entities = parent::loadMultiple($ids_to_load);
     if (!isset($ids)) {
       foreach ($entities as $entity) {
@@ -50,6 +54,9 @@ class MigrateStorageController extends ConfigStorageController {
     else {
       foreach ($dynamic_ids as $base_id => $sub_ids) {
         $entity = $entities[$base_id];
+        if (!isset($ids[$base_id])) {
+          unset($entities[$base_id]);
+        }
         if ($plugin = $entity->getLoadPlugin()) {
           $entities += $plugin->loadMultiple($sub_ids);
         }
