@@ -12,6 +12,9 @@ use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\Plugin\MigrateSourceInterface;
 use Drupal\migrate\Row;
 
+/**
+ * The base class for all source plugins.
+ */
 abstract class SourcePluginBase extends PluginBase implements MigrateSourceInterface  {
 
   /**
