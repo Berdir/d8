@@ -143,61 +143,63 @@ class Node extends Drupal6SqlBase implements RequirementsInterface {
 
     if (!isset($this->sourceFieldInfo)) {
       $this->sourceFieldInfo = array();
+      if ($this->database->schema()->tableExists('content_node_field_instance')) {
 
-      // Get each field attached to this type.
-      $query = $this->select('content_node_field_instance', 'i')
-        ->fields('i', array(
-          'label',
-          'widget_settings',
-          'field_name',
-        ))
-        ->condition('type_name', $bundle);
+        // Get each field attached to this type.
+        $query = $this->select('content_node_field_instance', 'i')
+          ->fields('i', array(
+            'label',
+            'widget_settings',
+            'field_name',
+          ))
+          ->condition('type_name', $bundle);
 
-      $query->innerJoin('content_node_field', 'f', 'i.field_name = f.field_name');
-      $query->fields('f', array(
-          'field_name',
-          'type',
-          'db_columns',
-          'global_settings',
-          'multiple',
-          'db_storage')
-      );
-
-      $result = $query->execute();
-      foreach ($result as $row) {
-        $field_name = trim($row['field_name']);
-        $db_columns = $db_columns = !empty($row['db_columns']) ? unserialize($row['db_columns']) : array();
-        $columns = array();
-        foreach ($db_columns as $column_name => $column_info) {
-          // Special handling for the stuff packed into filefield's "data"
-          if ($row['type'] == 'filefield' && $column_name == 'data') {
-            $widget_settings = unserialize($row['widget_settings']);
-            $global_settings = unserialize($row['global_settings']);
-
-            if (!empty($widget_settings['custom_alt'])) {
-              $columns[$field_name . ':alt'] = $field_name . '_alt';
-            }
-            if (!empty($widget_settings['custom_title'])) {
-              $columns[$field_name . ':title'] = $field_name . '_title';
-            }
-            if (!empty($global_settings['description_field'])) {
-              $columns[$field_name . ':description'] = $field_name . '_description';
-            }
-          }
-          else {
-            $display_name = $field_name . ':' . $column_name;
-            $column_name = $field_name . '_' . $column_name;
-            $columns[$display_name] = $column_name;
-          }
-        }
-        $this->sourceFieldInfo[$field_name] = array(
-          'label' => $row['label'],
-          'type' => $row['type'],
-          'columns' => $columns,
-          'multiple' => $row['multiple'],
-          'db_storage' => $row['db_storage'],
-          'bundle' => $bundle,
+        $query->innerJoin('content_node_field', 'f', 'i.field_name = f.field_name');
+        $query->fields('f', array(
+            'field_name',
+            'type',
+            'db_columns',
+            'global_settings',
+            'multiple',
+            'db_storage')
         );
+
+        $result = $query->execute();
+        foreach ($result as $row) {
+          $field_name = trim($row['field_name']);
+          $db_columns = $db_columns = !empty($row['db_columns']) ? unserialize($row['db_columns']) : array();
+          $columns = array();
+          foreach ($db_columns as $column_name => $column_info) {
+            // Special handling for the stuff packed into filefield's "data"
+            if ($row['type'] == 'filefield' && $column_name == 'data') {
+              $widget_settings = unserialize($row['widget_settings']);
+              $global_settings = unserialize($row['global_settings']);
+
+              if (!empty($widget_settings['custom_alt'])) {
+                $columns[$field_name . ':alt'] = $field_name . '_alt';
+              }
+              if (!empty($widget_settings['custom_title'])) {
+                $columns[$field_name . ':title'] = $field_name . '_title';
+              }
+              if (!empty($global_settings['description_field'])) {
+                $columns[$field_name . ':description'] = $field_name . '_description';
+              }
+            }
+            else {
+              $display_name = $field_name . ':' . $column_name;
+              $column_name = $field_name . '_' . $column_name;
+              $columns[$display_name] = $column_name;
+            }
+          }
+          $this->sourceFieldInfo[$field_name] = array(
+            'label' => $row['label'],
+            'type' => $row['type'],
+            'columns' => $columns,
+            'multiple' => $row['multiple'],
+            'db_storage' => $row['db_storage'],
+            'bundle' => $bundle,
+          );
+        }
       }
     }
 
