@@ -13,6 +13,17 @@ use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
 class MigrateMenuTest extends MigrateDrupalTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
+  public static function getInfo() {
+    return array(
+      'name'  => 'Migrate menus',
+      'description'  => 'Upgrade menus to system.menu.*.yml',
+      'group' => 'Migrate Drupal',
+    );
+  }
+
   function testMenu() {
     $migration = entity_load('migration', 'd6_menu');
       $dumps = array(
@@ -23,9 +34,9 @@ class MigrateMenuTest extends MigrateDrupalTestBase {
       $executable->import();
 
       $navigation_menu = entity_load('menu', 'navigation');
-      $this->assertEqual($navigation_menu->menu_name, 'navigation');
-      $this->assertEqual($navigation_menu->title, 'Navigation');
-      $this->assertEqual($navigation_menu->description, 'Navigation description');
+      $this->assertEqual($navigation_menu->id, 'navigation');
+      $this->assertEqual($navigation_menu->label, 'Navigation');
+      $this->assertEqual($navigation_menu->description, 'The navigation menu is provided by Drupal and is the main interactive menu for any site. It is usually the only menu that contains personalized links for authenticated users, and is often not even visible to anonymous users.');
   }
 
 }
