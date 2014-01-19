@@ -156,7 +156,9 @@ class Entity extends DestinationBase implements ContainerFactoryPluginInterface 
    * @param $value
    */
   protected function updateConfigEntity(ConfigEntityInterface $entity, array $parents, $value) {
-    $ref = &$entity;
+    $top_key = array_shift($parents);
+    $entity_value = $entity->get($top_key);
+    $ref = &$entity_value;
     foreach ($parents as $key) {
       if (is_array($ref) || $ref instanceof \ArrayAccess) {
         $ref = &$ref[$key];
@@ -166,6 +168,7 @@ class Entity extends DestinationBase implements ContainerFactoryPluginInterface 
       }
     }
     $ref = $value;
+    $entity->set($top_key, $entity_value);
   }
 
   /**
