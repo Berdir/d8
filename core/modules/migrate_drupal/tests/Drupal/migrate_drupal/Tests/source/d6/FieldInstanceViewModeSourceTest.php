@@ -108,9 +108,9 @@ class FieldInstanceViewModeSourceTest extends MigrateSqlSourceTestCase {
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\migrate_drupal\Plugin\migrate\source\d6\FieldInstanceViewMode;
+use Drupal\migrate_drupal\Plugin\migrate\source\d6\ViewMode;
 
-class TestFieldInstanceViewMode extends FieldInstanceViewMode {
+class TestFieldInstanceViewMode extends ViewMode {
   function setDatabase(Connection $database) {
     $this->database = $database;
   }
