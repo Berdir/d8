@@ -40,4 +40,13 @@ class MigrateDrupalRunBatch {
     $context['finished'] = 1 - count($context['sandbox']['migration_ids']) / $context['sandbox']['max'];
   }
 
+  /**
+   * @param $success
+   * @param $results
+   * @param $operations
+   * @param $elapsed
+   */
+  public static function finished($success, $results, $operations, $elapsed) {
+
+  }
 }

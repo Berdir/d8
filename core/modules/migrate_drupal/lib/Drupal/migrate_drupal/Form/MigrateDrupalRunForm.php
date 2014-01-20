@@ -124,6 +124,11 @@ class MigrateDrupalRunForm extends FormBase {
     );
   }
 
+  /**
+   * Set a batch.
+   *
+   * @param $batch
+   */
   protected function batchSet($batch) {
     batch_set($batch);
   }
