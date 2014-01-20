@@ -21,8 +21,7 @@ class ProfileField extends Drupal6SqlBase implements RequirementsInterface {
    * {@inheritdoc}
    */
   public function query() {
-    $query = $this->database
-      ->select('profile_fields', 'pf')
+    $query = $this->select('profile_fields', 'pf')
       ->fields('pf', array(
         'fid',
         'title',
