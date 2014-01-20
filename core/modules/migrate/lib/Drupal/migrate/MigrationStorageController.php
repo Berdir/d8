@@ -45,19 +45,23 @@ class MigrationStorageController extends ConfigStorageController {
     /** @var \Drupal\migrate\Entity\MigrationInterface[] $entities */
     $entities = parent::loadMultiple($ids_to_load);
     if (!isset($ids)) {
-      foreach ($entities as $entity) {
+      // Changing the array being foreach()'d is not a good idea.
+      $return = array();
+      foreach ($entities as $entity_id => $entity) {
         if ($plugin = $entity->getLoadPlugin()) {
-          $entities += $plugin->loadMultiple();
+          $return += $plugin->loadMultiple();
+        }
+        else {
+          $return[$entity_id] = $entity;
         }
       }
+      $entities = $return;
     }
     else {
       foreach ($dynamic_ids as $base_id => $sub_ids) {
         $entity = $entities[$base_id];
-        if (!isset($ids[$base_id])) {
-          unset($entities[$base_id]);
-        }
         if ($plugin = $entity->getLoadPlugin()) {
+          unset($entities[$base_id]);
           $entities += $plugin->loadMultiple($sub_ids);
         }
       }
