@@ -402,7 +402,7 @@ function _batch_finished() {
       if (isset($batch_set['file']) && is_file($batch_set['file'])) {
         include_once DRUPAL_ROOT . '/' . $batch_set['file'];
       }
-      if (function_exists($batch_set['finished'])) {
+      if (is_callable($batch_set['finished'])) {
         $queue = _batch_queue($batch_set);
         $operations = $queue->getAllItems();
         $batch_set['finished']($batch_set['success'], $batch_set['results'], $operations, format_interval($batch_set['elapsed'] / 1000));
@@ -459,7 +459,7 @@ function _batch_finished() {
       $_SESSION['batch_form_state'] = $_batch['form_state'];
     }
     $function = $_batch['redirect_callback'];
-    if (function_exists($function)) {
+    if (is_callable($function)) {
       $function($_batch['source_url'], array('query' => array('op' => 'finish', 'id' => $_batch['id'])));
     }
     elseif ($function === NULL) {

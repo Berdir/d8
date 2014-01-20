@@ -48,8 +48,8 @@ class MigrateDrupalRunForm extends FormBase {
     // The multistep is for testing only. The final version will run a fixed
     // set of migrations.
     if (isset($form_state['database'])) {
-      Database::addConnectionInfo('migrate', 'default', $form_state['storage']['database']);
-      $migrations = $this->storageController->loadMultiple('migration');
+      Database::addConnectionInfo('migrate', 'default', $form_state['database']);
+      $migrations = $this->storageController->loadMultiple();
       $form['migrations'] = array(
         '#type' => 'checkboxes',
         '#options' => MapArray::copyValuesToKeys(array_keys($migrations)),
@@ -82,7 +82,7 @@ class MigrateDrupalRunForm extends FormBase {
       $batch = array(
         'title' => t('Running migrations'),
         'operations' => array(
-          array(array('Drupal\migrate_drupal\MigrateDrupalRunBatch', 'run'), array($migration_ids, $form_state['storage']['database'])),
+          array(array('Drupal\migrate_drupal\MigrateDrupalRunBatch', 'run'), array($migration_ids, $form_state['database'])),
         ),
         'finished' => array('Drupal\migrate_drupal\MigrateDrupalRunBatch', 'finished'),
         'progress_message' => '',
