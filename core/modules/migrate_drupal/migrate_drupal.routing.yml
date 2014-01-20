@@ -1,0 +1,7 @@
+migrate_drupal.run:
+  path: '/admin/structure/migrate/run'
+  defaults:
+    _form: '\Drupal\migrate_drupal\Form\MigrateDrupalRunForm'
+    _title: 'Run'
+  requirements:
+    _permission: 'administer site configuration'
