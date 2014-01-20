@@ -58,7 +58,7 @@ class EntityDisplayTest extends MigrateTestCase {
       ->with()
       ->will($this->returnValue('testid'));
     $plugin = new TestEntityDisplay($entity);
-    $this->assertSame($plugin->import($row), array('testid'));
+    $this->assertSame($plugin->import($row), array('testid', 'field_name_test'));
     $this->assertSame($plugin->getTestValues(), array('entity_type_test', 'bundle_test', 'view_mode_test'));
   }
 
