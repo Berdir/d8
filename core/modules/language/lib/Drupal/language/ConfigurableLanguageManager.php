@@ -107,7 +107,7 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
    * {@inheritdoc}
    */
   public function initConfigOverrides() {
-    $this->configFactory->setLanguage($this->getCurrentLanguage());
+    $this->configFactory->setLanguageManager($this);
   }
 
   /**

@@ -60,7 +60,7 @@ class ConfigOverridesPriorityTest extends DrupalUnitTestBase {
       'name' => 'French',
       'id' => 'fr',
     ));
-    $config_factory->setLanguage($language);
+    $config_factory->enforceLanguage($language);
     $language_config_name = $config_factory->getLanguageConfigName($language->id, 'system.site');
     $config_factory
       ->get($language_config_name)

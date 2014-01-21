@@ -1334,10 +1334,8 @@ function user_mail($key, &$message, $params) {
   $langcode = $message['langcode'];
   $variables = array('user' => $params['account']);
 
-  $original_language = \Drupal::configFactory()->getLanguage();
-
   $language = language_load($params['account']->getPreferredLangcode());
-  \Drupal::configFactory()->setLanguage($language);
+  \Drupal::configFactory()->enforceLanguage($language);
   $mail_config = \Drupal::config('user.mail');
 
    // We do not sanitize the token replacement, since the output of this
@@ -1346,7 +1344,7 @@ function user_mail($key, &$message, $params) {
   $message['subject'] .= $token_service->replace($mail_config->get($key . '.subject'), $variables, $token_options);
   $message['body'][] = $token_service->replace($mail_config->get($key . '.body'), $variables, $token_options);
 
-  \Drupal::configFactory()->setLanguage($original_language);
+  \Drupal::configFactory()->resetEnforcedLanguage();
 }
 
 /**

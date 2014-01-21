@@ -296,7 +296,6 @@ class ConfigImporter {
         // Config::validateName($name);
         if ($entity_type = config_get_entity_type_by_name($name)) {
           $old_config = new Config($name, $this->storageComparer->getTargetStorage(), $this->eventDispatcher, $this->typedConfigManager);
-          $old_config->load();
 
           $data = $this->storageComparer->getSourceStorage()->read($name);
           $new_config = new Config($name, $this->storageComparer->getTargetStorage(), $this->eventDispatcher, $this->typedConfigManager);

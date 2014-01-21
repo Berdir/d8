@@ -8,6 +8,7 @@
 namespace Drupal\Core\Config;
 
 use Drupal\Core\Language\Language;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -55,9 +56,16 @@ class ConfigFactory implements EventSubscriberInterface {
   /**
    * The language object used to override configuration data.
    *
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  protected $languageManager;
+
+  /**
+   * The language object used to override configuration data.
+   *
    * @var \Drupal\Core\Language\Language
    */
-  protected $language;
+  protected $enforcedLanguage;
 
   /**
    * Cached configuration objects.
@@ -82,16 +90,16 @@ class ConfigFactory implements EventSubscriberInterface {
    *   An event dispatcher instance to use for configuration events.
    * @param \Drupal\Core\Config\TypedConfigManager $typed_config
    *   The typed configuration manager.
-   * @param \Drupal\Core\Language\Language
-   *   (optional) The language for this configuration. The config factory will
-   *   use it to override configuration data if language overrides are
+   * @param \Drupal\Core\Language\LanguageManagerInterface::
+   *   (optional) The language manager for this configuration. The config
+   *   factory will use it to override configuration data if language overrides are
    *   available.
    */
-  public function __construct(StorageInterface $storage, EventDispatcher $event_dispatcher, TypedConfigManager $typed_config, Language $language = NULL) {
+  public function __construct(StorageInterface $storage, EventDispatcher $event_dispatcher, TypedConfigManager $typed_config, LanguageManagerInterface $language_manager = NULL) {
     $this->storage = $storage;
     $this->eventDispatcher = $event_dispatcher;
     $this->typedConfigManager = $typed_config;
-    $this->language = $language;
+    $this->languageManager = $language_manager;
   }
 
   /**
@@ -141,12 +149,13 @@ class ConfigFactory implements EventSubscriberInterface {
         // If the configuration object does not exist in the configuration
         // storage or static cache create a new object and add it to the static
         // cache.
-        $this->cache[$cache_key] = new Config($name, $this->storage, $this->eventDispatcher, $this->typedConfigManager, $this->language);
+        $this->cache[$cache_key] = new Config($name, $this->storage, $this->eventDispatcher, $this->typedConfigManager, $this->getLanguage());
 
         if ($this->canOverride($name)) {
-          // Get and apply any language overrides.
-          if ($this->language) {
-            $language_overrides = $this->storage->read($this->getLanguageConfigName($this->language->id, $name));
+          // Get and apply any language overrides if there is a language and
+          // this is not a language override config object already.
+          if ($this->getLanguage() && $this->getLanguageConfigName($this->getLanguage()->id, $name)) {
+            $language_overrides = $this->storage->read($this->getLanguageConfigName($this->getLanguage()->id, $name));
           }
           else {
             $language_overrides = FALSE;
@@ -226,7 +235,7 @@ class ConfigFactory implements EventSubscriberInterface {
         }
         $cache_key = $this->getCacheKey($name);
 
-        $this->cache[$cache_key] = new Config($name, $this->storage, $this->eventDispatcher, $this->typedConfigManager, $this->language);
+        $this->cache[$cache_key] = new Config($name, $this->storage, $this->eventDispatcher, $this->typedConfigManager, $this->getLanguage());
         $this->cache[$cache_key]->initWithData($data);
         if ($this->canOverride($name)) {
           if (isset($language_names[$name]) && isset($storage_data[$language_names[$name]])) {
@@ -256,7 +265,7 @@ class ConfigFactory implements EventSubscriberInterface {
    *   An array of overrides keyed by the configuration object name.
    */
   protected function loadModuleOverrides(array $names) {
-    $configOverridesEvent = new ConfigModuleOverridesEvent($names, $this->language);
+    $configOverridesEvent = new ConfigModuleOverridesEvent($names, $this->getLanguage());
     $this->eventDispatcher->dispatch('config.module.overrides', $configOverridesEvent);
     return $configOverridesEvent->getOverrides();
   }
@@ -308,8 +317,8 @@ class ConfigFactory implements EventSubscriberInterface {
     }
 
     $new_cache_key = $this->getCacheKey($new_name);
-    $this->cache[$new_cache_key] = new Config($new_name, $this->storage, $this->eventDispatcher, $this->typedConfigManager, $this->language);
-    $this->cache[$new_cache_key]->load();
+    $this->cache[$new_cache_key] = new Config($new_name, $this->storage, $this->eventDispatcher, $this->typedConfigManager, $this->getLanguage());
+    $this->cache[$new_cache_key]->initWithData($this->storage->read($new_name));
     return $this->cache[$new_cache_key];
   }
 
@@ -326,8 +335,8 @@ class ConfigFactory implements EventSubscriberInterface {
     $can_override = $this->canOverride($name);
     $cache_key = $name . ':' . ($can_override ? 'overrides' : 'raw');
 
-    if ($can_override && isset($this->language)) {
-      $cache_key =  $cache_key . ':' . $this->language->id;
+    if ($can_override && $this->getLanguage()) {
+      $cache_key =  $cache_key . ':' . $this->getLanguage()->id;
     }
     return $cache_key;
   }
@@ -360,7 +369,22 @@ class ConfigFactory implements EventSubscriberInterface {
   }
 
   /**
-   * Set the language to be used in configuration overrides.
+   * Sets the language manager, which will be used for language overrides.
+   *
+   * @param \Drupal\Core\Language\LanguageManagerInterface $language_$manager
+   *   The language manager to be set on the config factory. Used to override
+   *   configuration by language.
+   *
+   * @return $this
+   *   The config factory object.
+   */
+  public function setLanguageManager(LanguageManagerInterface $language_manager = NULL) {
+    $this->languageManager = $language_manager;
+    return $this;
+  }
+
+  /**
+   * Enforce a given language for language overrides.
    *
    * @param \Drupal\Core\Language\Language $language
    *   The language object to be set on the config factory. Used to override
@@ -368,10 +392,19 @@ class ConfigFactory implements EventSubscriberInterface {
    *
    * @return \Drupal\Core\Config\ConfigFactory
    *   The config factory object.
+   *
+   * @see \Drupal\Core\Config\ConfigFactory::removeEnforcedLanguage()
    */
-  public function setLanguage(Language $language = NULL) {
-    $this->language = $language;
+  public function enforceLanguage(Language $language = NULL) {
+    $this->enforcedLanguage = $language;
     return $this;
+  }
+
+  /**
+   * Removes an enforced language, falling back to the current language.
+   */
+  public function resetEnforcedLanguage() {
+    $this->enforcedLanguage = NULL;
   }
 
   /**
@@ -380,7 +413,15 @@ class ConfigFactory implements EventSubscriberInterface {
    * @return \Drupal\Core\Language\Language
    */
   public function getLanguage() {
-    return $this->language;
+    // If there is an enforced language, return it.
+    if ($this->enforcedLanguage) {
+      return $this->enforcedLanguage;
+    }
+    // Only return a language if there is a language manager and this is
+    // a multilingual site.
+    if ($this->languageManager && $this->languageManager->isMultilingual()) {
+      return $this->languageManager->getCurrentLanguage();
+    }
   }
 
   /**
@@ -397,9 +438,9 @@ class ConfigFactory implements EventSubscriberInterface {
    */
   public function getLanguageConfigNames(array $names) {
     $language_names = array();
-    if (isset($this->language)) {
+    if ($this->getLanguage()) {
       foreach ($names as $name) {
-        if ($language_name = $this->getLanguageConfigName($this->language->id, $name)) {
+        if ($language_name = $this->getLanguageConfigName($this->getLanguage()->id, $name)) {
           $language_names[$name] = $language_name;
         }
       }

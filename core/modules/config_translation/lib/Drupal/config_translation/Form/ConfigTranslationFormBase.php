@@ -171,8 +171,7 @@ abstract class ConfigTranslationFormBase extends FormBase implements BaseFormIdI
     $this->configFactory->enableOverrides();
 
     // Set the translation target language on the configuration factory.
-    $original_language = $this->configFactory->getLanguage();
-    $this->configFactory->setLanguage($this->language);
+    $this->configFactory->enforceLanguage($this->language);
 
     // Add some information to the form state for easier form altering.
     $form_state['config_translation_mapper'] = $this->mapper;
@@ -197,8 +196,8 @@ abstract class ConfigTranslationFormBase extends FormBase implements BaseFormIdI
       '#button_type' => 'primary',
     );
 
-    // Set the configuration language back.
-    $this->configFactory->setLanguage($original_language);
+    // Reset the enforced language, fall back to the current language.
+    $this->configFactory->resetEnforcedLanguage();
 
     return $form;
   }

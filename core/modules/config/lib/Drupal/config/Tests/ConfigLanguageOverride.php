@@ -33,7 +33,7 @@ class ConfigLanguageOverride extends DrupalUnitTestBase {
   public function setUp() {
     parent::setUp();
     $this->installConfig(array('config_test'));
-    \Drupal::configFactory()->setLanguage(language_default());
+    \Drupal::configFactory()->setLanguageManager(\Drupal::languageManager());
   }
 
   /**
@@ -52,11 +52,11 @@ class ConfigLanguageOverride extends DrupalUnitTestBase {
       'id' => 'de',
     )));
 
-    \Drupal::configFactory()->setLanguage(language_load('fr'));
+    \Drupal::configFactory()->enforceLanguage(language_load('fr'));
     $config = \Drupal::config('config_test.system');
     $this->assertIdentical($config->get('foo'), 'fr bar');
 
-    \Drupal::configFactory()->setLanguage(language_load('de'));
+    \Drupal::configFactory()->enforceLanguage(language_load('de'));
     $config = \Drupal::config('config_test.system');
     $this->assertIdentical($config->get('foo'), 'de bar');
 
