@@ -417,9 +417,8 @@ class ConfigFactory implements EventSubscriberInterface {
     if ($this->enforcedLanguage) {
       return $this->enforcedLanguage;
     }
-    // Only return a language if there is a language manager and this is
-    // a multilingual site.
-    if ($this->languageManager && $this->languageManager->isMultilingual()) {
+    // Only return a language if there is a language manager.
+    if ($this->languageManager) {
       return $this->languageManager->getCurrentLanguage();
     }
   }
