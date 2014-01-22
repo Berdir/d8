@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\migrate_drupal\Tests\source\d6\FieldInstanceViewModeSourceTest.
+ * Contains \Drupal\migrate_drupal\Tests\source\d6\ViewModeSourceTest.
  */
 
 namespace Drupal\migrate_drupal\Tests\source\d6;
@@ -15,11 +15,11 @@ use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
  * @group migrate_drupal
  * @group Drupal
  */
-class FieldInstanceViewModeSourceTest extends MigrateSqlSourceTestCase {
+class ViewModeSourceTest extends MigrateSqlSourceTestCase {
 
   // The plugin system is not working during unit testing so the source plugin
   // class needs to be manually specified.
-  const PLUGIN_CLASS = 'Drupal\migrate_drupal\Plugin\migrate\source\d6\FieldInstanceViewMode';
+  const PLUGIN_CLASS = 'Drupal\migrate_drupal\Plugin\migrate\source\d6\ViewMode';
 
   /**
    * @var bool
@@ -110,7 +110,7 @@ use Drupal\Core\Database\Connection;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\migrate_drupal\Plugin\migrate\source\d6\ViewMode;
 
-class TestFieldInstanceViewMode extends ViewMode {
+class TestViewMode extends ViewMode {
   function setDatabase(Connection $database) {
     $this->database = $database;
   }

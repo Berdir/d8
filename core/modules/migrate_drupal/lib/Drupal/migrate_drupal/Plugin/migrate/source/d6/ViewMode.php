@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Plugin\migrate\source\d6\FieldInstanceViewMode.
+ * Contains \Drupal\migrate\Plugin\migrate\source\d6\ViewMode.
  */
 
 namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
