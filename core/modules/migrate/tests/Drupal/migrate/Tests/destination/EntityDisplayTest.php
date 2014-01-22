@@ -7,7 +7,7 @@
 
 namespace Drupal\migrate\Tests\destination;
 
-use Drupal\migrate\Plugin\migrate\destination\EntityDisplay;
+use Drupal\migrate\Plugin\migrate\destination\EntityDisplayBase;
 use Drupal\migrate\Row;
 use Drupal\migrate\Tests\MigrateTestCase;
 
@@ -53,18 +53,15 @@ class EntityDisplayTest extends MigrateTestCase {
     $entity->expects($this->once())
       ->method('save')
       ->with();
-    $entity->expects($this->once())
-      ->method('id')
-      ->with()
-      ->will($this->returnValue('testid'));
     $plugin = new TestEntityDisplay($entity);
-    $this->assertSame($plugin->import($row), array('testid', 'field_name_test'));
+    $this->assertSame($plugin->import($row), array('entity_type_test', 'bundle_test', 'view_mode_test', 'field_name_test'));
     $this->assertSame($plugin->getTestValues(), array('entity_type_test', 'bundle_test', 'view_mode_test'));
   }
 
 }
 
-class TestEntityDisplay extends EntityDisplay {
+class TestEntityDisplay extends EntityDisplayBase {
+  const MODE_NAME = 'view_mode';
   protected $testValues;
   function __construct($entity) {
     $this->entity = $entity;

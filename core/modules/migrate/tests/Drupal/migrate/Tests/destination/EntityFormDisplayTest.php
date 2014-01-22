@@ -53,18 +53,15 @@ class EntityFormDisplayTest extends MigrateTestCase {
     $entity->expects($this->once())
       ->method('save')
       ->with();
-    $entity->expects($this->once())
-      ->method('id')
-      ->with()
-      ->will($this->returnValue('testid'));
     $plugin = new TestEntityFormDisplay($entity);
-    $this->assertSame($plugin->import($row), array('testid', 'field_name_test'));
+    $this->assertSame($plugin->import($row), array('entity_type_test', 'bundle_test', 'form_mode_test', 'field_name_test'));
     $this->assertSame($plugin->getTestValues(), array('entity_type_test', 'bundle_test', 'form_mode_test'));
   }
 
 }
 
 class TestEntityFormDisplay extends EntityFormDisplay {
+  const MODE_NAME = 'form_mode';
   protected $testValues;
   function __construct($entity) {
     $this->entity = $entity;

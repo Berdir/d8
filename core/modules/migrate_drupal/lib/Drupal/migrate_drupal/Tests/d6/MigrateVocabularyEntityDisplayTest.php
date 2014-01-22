@@ -54,7 +54,7 @@ static $modules = array('taxonomy', 'field');
     $this->assertEqual($component['type'], 'taxonomy_term_reference');
     $this->assertEqual($component['weight'], 20);
     // Test the Id map.
-    $this->assertEqual(array('node.article.default', 'tags'), $migration->getIdMap()->lookupDestinationID(array(1, 'article')));
+    $this->assertEqual(array('node', 'article', 'default', 'tags'), $migration->getIdMap()->lookupDestinationID(array(1, 'article')));
   }
 
 }
