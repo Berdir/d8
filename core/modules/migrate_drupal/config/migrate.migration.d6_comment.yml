@@ -1,0 +1,54 @@
+id: d6_comment
+sourceIds:
+  cid:
+    type: integer
+source:
+  plugin: drupal6_comment
+  constants:
+    field_id: node__comment
+process:
+  cid: cid
+  pid:
+    plugin: migration
+    migration: drupal6_comment
+    source:
+      - pid
+  entity_id:
+    plugin: migration
+    migration: drupal6_node
+    source:
+      - nid
+  entity_type:
+    plugin: migration
+    migration: drupal6_node_type
+    source:
+      - type
+  field_id: constants:field_id
+  subject: subject
+  uid:
+    plugin: migration
+    migration: drupal6_user
+    source:
+      - uid
+  name: name
+  mail: mail
+  homepage: homepage
+  hostname: hostname
+  created: timestamp
+  changed: timestamp
+  status: status #ToDo: In D6, published=0.
+  thread: thread
+  'body:value': comment
+  'body:format':
+    -
+      plugin: migration
+      migration: d6_filter_format
+      source:
+        - format
+    -
+      plugin: extract
+      index:
+        - 0
+destination:
+  plugin: entity
+  entity_type: comment

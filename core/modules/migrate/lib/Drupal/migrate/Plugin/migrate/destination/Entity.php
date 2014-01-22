@@ -41,6 +41,13 @@ class Entity extends DestinationBase implements ContainerFactoryPluginInterface 
   protected $entityType;
 
   /**
+   * The list of the bundles of this entity type.
+   *
+   * @var array
+   */
+  protected $bundles;
+
+  /**
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
@@ -54,10 +61,11 @@ class Entity extends DestinationBase implements ContainerFactoryPluginInterface 
    * @param EntityTypeInterface $entity_type
    *   The entity type object.
    */
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration, EntityStorageControllerInterface $storage_controller, EntityTypeInterface $entity_type) {
+  public function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration, EntityStorageControllerInterface $storage_controller, EntityTypeInterface $entity_type, array $bundles) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration);
     $this->storageController = $storage_controller;
     $this->entityType = $entity_type;
+    $this->bundles = $bundles;
   }
 
   /**
@@ -79,7 +87,8 @@ class Entity extends DestinationBase implements ContainerFactoryPluginInterface 
       $plugin_definition,
       $migration,
       $container->get('entity.manager')->getStorageController($entity_type),
-      $container->get('entity.manager')->getDefinition($entity_type)
+      $container->get('entity.manager')->getDefinition($entity_type),
+      array_keys($container->get('entity.manager')->getBundleInfo($entity_type))
     );
   }
 
@@ -94,7 +103,12 @@ class Entity extends DestinationBase implements ContainerFactoryPluginInterface 
       $this->update($entity, $row);
     }
     else {
-      $entity = $this->storageController->create($row->getDestination());
+      $values = $row->getDestination();
+      $bundle_key = $this->entityType->getKey('bunde');
+      if ($bundle_key && !isset($values[$bundle_key])) {
+        $values[$bundle_key] = reset($this->bundles);
+      }
+      $entity = $this->storageController->create($values);
       $entity->enforceIsNew();
     }
     $entity->save();
