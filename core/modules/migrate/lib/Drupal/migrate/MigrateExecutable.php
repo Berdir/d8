@@ -345,13 +345,27 @@ class MigrateExecutable {
           if (!is_array($value)) {
             throw new MigrateException(sprintf('Pipeline failed for destination %s: %s got instead of an array,', $destination, $value));
           }
+          $break = FALSE;
           foreach ($value as $scalar_value) {
-            $new_value[] = $plugin->transform($scalar_value, $this, $row, $destination);
+            try {
+              $new_value[] = $plugin->transform($scalar_value, $this, $row, $destination);
+            }
+            catch (MigrateSkipProcessException $e) {
+              $break = TRUE;
+            }
           }
           $value = $new_value;
+          if ($break) {
+            break;
+          }
         }
         else {
-          $value = $plugin->transform($value, $this, $row, $destination);
+          try {
+            $value = $plugin->transform($value, $this, $row, $destination);
+          }
+          catch (MigrateSkipProcessException $e) {
+            break;
+          }
           $multiple = $multiple || $plugin->multiple();
         }
       }
