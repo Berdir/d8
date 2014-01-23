@@ -12,11 +12,11 @@ process:
   pid:
     -
       plugin: drupal6_comment_pid
+      source:
+        - pid
     -
       plugin: migration
       migration: d6_comment
-      source:
-        - pid
     -
       plugin: extract
       index:

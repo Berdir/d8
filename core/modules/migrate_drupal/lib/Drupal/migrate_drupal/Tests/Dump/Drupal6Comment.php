@@ -172,8 +172,8 @@ class Drupal6Comment {
       'pid' => 0,
       'nid' => 1,
       'uid' => 0,
-      'subject' => 'The third comment.',
-      'comment' => 'The third comment body.',
+      'subject' => 'The second comment.',
+      'comment' => 'The second comment body.',
       'hostname' => '127.0.0.1',
       'timestamp' => 1390264948,
       // This comment is unpublished.
