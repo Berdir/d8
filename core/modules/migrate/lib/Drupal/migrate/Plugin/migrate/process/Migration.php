@@ -91,21 +91,30 @@ class Migration extends ProcessPluginBase implements  ContainerFactoryPluginInte
         break;
       }
     }
-    if (!$destination_ids && (($self && empty($this->configuration['no stub'])) || isset($this->configuration['stub_id'])))  {
+    if (!$destination_ids && (($self && empty($this->configuration['no stub'])) || isset($this->configuration['stub_id']) || count($migrations) == 1))  {
+      // If the lookup didn't succeed, figure out which migration will do the
+      // stubbing.
       if ($self) {
         $migration = $this->migration;
       }
-      else {
+      elseif (isset($this->configuration['stub_id'])) {
         $migration = $migrations[$this->configuration['stub_id']];
       }
+      else {
+        $migration = reset($migrations);
+      }
       $destination_plugin = $migration->getDestinationPlugin();
+      // Only keep the process necessary to produce the destination ID.
       $process = array_intersect_key($migration->get('process'), $destination_plugin->getIds());
+      // We already have the source id values but need to key them for the Row
+      // constructor.
       $source_ids = $migration->get('sourceIds');
       $values = array();
       foreach (array_keys($source_ids) as $index => $source_id) {
         $values[$source_id] = $source_id_values[$migration->id()][$index];
       }
       $stub_row = new Row($values, $source_ids);
+      // Do a normal migration with the stub row.
       $migrate_executable->processRow($stub_row, $process);
       $destination_ids = $destination_plugin->import($stub_row);
     }
