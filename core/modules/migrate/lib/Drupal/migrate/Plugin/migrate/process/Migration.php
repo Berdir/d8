@@ -100,7 +100,12 @@ class Migration extends ProcessPluginBase implements  ContainerFactoryPluginInte
       }
       $destination_plugin = $migration->getDestinationPlugin();
       $process = array_intersect_key($migration->get('process'), $destination_plugin->getIds());
-      $stub_row = new Row($migration->get('sourceIds'), $source_id_values[$migration->id()]);
+      $source_ids = $migration->get('sourceIds');
+      $values = array();
+      foreach (array_keys($source_ids) as $index => $source_id) {
+        $values[$source_id] = $source_id_values[$migration->id()][$index];
+      }
+      $stub_row = new Row($values, $source_ids);
       $migrate_executable->processRow($stub_row, $process);
       $destination_ids = $destination_plugin->import($row);
     }
