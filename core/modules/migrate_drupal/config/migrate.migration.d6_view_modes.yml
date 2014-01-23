@@ -7,6 +7,9 @@ sourceIds:
 
 source:
   plugin: drupal6_view_mode
+  constants:
+    targetEntityType: node
+    status: true
 
 process:
   mode:
@@ -33,19 +36,8 @@ process:
       5: "Print"
       teaser: "Teaser"
       full: "Full"
-  targetEntityType:
-    plugin: default_value
-    default_value: node
-  id:
-    plugin: concat
-    delimiter: .
-    source:
-      - @targetEntityType
-      - @mode
-  status:
-    plugin: default_value
-    default_value: true
+  targetEntityType: constants:targetEntityType
+  status: constants:status
 
 destination:
-  plugin: entity
-  entity_type: view_mode
+  plugin: entity_view_mode

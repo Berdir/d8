@@ -23,6 +23,8 @@ interface MigrateDestinationInterface extends PluginInspectionInterface {
    * schema field definition(s) corresponding to the primary key of the destination
    * being implemented. These are used to construct the destination key fields
    * of the map table for a migration using this destination.
+   *
+   * @return array
    */
   public function getIds();
 

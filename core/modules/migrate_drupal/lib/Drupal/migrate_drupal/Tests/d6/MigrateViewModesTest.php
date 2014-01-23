@@ -8,7 +8,6 @@
 namespace Drupal\migrate_drupal\Tests\d6;
 
 use Drupal\migrate\MigrateExecutable;
-use Drupal\migrate\MigrateMessage;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
 class MigrateViewModesTest extends MigrateDrupalTestBase {
@@ -41,7 +40,7 @@ class MigrateViewModesTest extends MigrateDrupalTestBase {
     $this->assertEqual(is_null($view_mode), FALSE, 'Preview view mode loaded.');
     $this->assertEqual($view_mode->label(), 'Preview', 'View mode has correct label.');
     // Test the Id Map.
-    $this->assertEqual(array('node.preview'), $migration->getIdMap()->lookupDestinationID(array(1)), "Ensure IdMap works.");
+    $this->assertEqual(array('node', 'preview'), $migration->getIdMap()->lookupDestinationID(array(1)));
   }
 
 }

@@ -104,7 +104,14 @@ class Entity extends DestinationBase implements ContainerFactoryPluginInterface 
   public function import(Row $row) {
     // @TODO: add field handling. https://drupal.org/node/2164451
     // @TODO: add validation https://drupal.org/node/2164457
+    $ids = $this->getIds();
     $id_key = $this->getKey('id');
+    if (count($ids) > 1) {
+      $id_keys = array_keys($ids);
+      if (!$row->getDestinationProperty($id_key)) {
+        $row->setDestinationProperty($id_key, $this->generateId($row, $id_keys));
+      }
+    }
     if ($entity = $this->storageController->load($row->getDestinationProperty($id_key))) {
       $this->update($entity, $row);
     }
@@ -118,6 +125,15 @@ class Entity extends DestinationBase implements ContainerFactoryPluginInterface 
       $entity->enforceIsNew();
     }
     $entity->save();
+    if (count($ids) > 1) {
+      // This can only be a config entity, content entities have their id key
+      // and that's it.
+      $return = array();
+      foreach ($id_keys as $id_key) {
+        $return[] = $entity->get($id_key);
+      }
+      return $return;
+    }
     return array($entity->id());
   }
 
@@ -204,6 +220,25 @@ class Entity extends DestinationBase implements ContainerFactoryPluginInterface 
     $id_key = $this->getKey('id');
     $ids[$id_key]['type'] = is_subclass_of($this->storageController->entityInfo()->getClass(), 'Drupal\Core\Config\Entity\ConfigEntityInterface') ? 'string' : 'integer';
     return $ids;
+  }
+
+  /**
+   * Generate an entity id.
+   *
+   * @param Row $row
+   *   The current row.
+   * @param array $ids
+   *   The destination ids.
+   *
+   * @return string
+   *   The generated entity id.
+   */
+  protected function generateId(Row $row, array $ids) {
+    $id_values = array();
+    foreach ($ids as $id) {
+      $id_values[] = $row->getDestinationProperty($id);
+    }
+    return implode('.', $id_values);
   }
 
   /**

@@ -8,7 +8,6 @@
 namespace Drupal\migrate\Plugin\migrate\destination;
 
 use Drupal\Core\Entity\EntityStorageControllerInterface;
-use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\KeyValueStore\StateInterface;
 use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\Row;

@@ -17,13 +17,11 @@ class EntityFieldInstance extends Entity {
   /**
    * {@inheritdoc}
    */
-  public function import(Row $row) {
-    $row->setDestinationProperty('id', implode('.', array(
-      $row->getDestinationProperty('entity_type'),
-      $row->getDestinationProperty('bundle'),
-      $row->getDestinationProperty('field_name'),
-    )));
-    return parent::import($row);
+  public function getIds() {
+    $ids['entity_type']['type'] = 'string';
+    $ids['bundle']['type'] = 'string';
+    $ids['field_name']['type'] = 'string';
+    return $ids;
   }
 
 }

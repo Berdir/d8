@@ -62,7 +62,7 @@ static $modules = array('taxonomy', 'field');
     $this->assertEqual($field->id(), $field_id);
     $settings = $field->getSettings();
     $this->assertEqual('tags', $settings['allowed_values'][0]['vocabulary'], "Vocabulary has correct settings.");
-    $this->assertEqual(array('node.tags'), $migration->getIdMap()->lookupDestinationID(array(1)), "Test IdMap");
+    $this->assertEqual(array('node', 'tags'), $migration->getIdMap()->lookupDestinationID(array(1)), "Test IdMap");
 
   }
 
