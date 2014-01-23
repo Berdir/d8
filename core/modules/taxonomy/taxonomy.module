@@ -761,7 +761,7 @@ function taxonomy_term_load($tid) {
  * Implements hook_file_download_access().
  */
 function taxonomy_file_download_access($field, EntityInterface $entity, FileInterface $file) {
-  if ($entity->entityType() == 'taxonomy_term') {
+  if ($entity->entityTypeId() == 'taxonomy_term') {
     return $entity->access('view');
   }
 }

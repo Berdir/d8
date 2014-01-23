@@ -347,8 +347,8 @@ function content_translation_translate_access(EntityInterface $entity) {
  *   the current user.
  */
 function content_translation_view_access(EntityInterface $entity, $langcode, AccountInterface $account = NULL) {
-  $entity_type = $entity->entityType();
-  $info = $entity->entityInfo();
+  $entity_type = $entity->entityTypeId();
+  $info = $entity->entityType();
   $permission = "translate $entity_type";
   if ($info->getPermissionGranularity() == 'bundle') {
     $permission = "translate {$entity->bundle()} $entity_type";
@@ -575,7 +575,7 @@ function content_translation_form_controller(array $form_state) {
  * @todo Move to \Drupal\content_translation\ContentTranslationManager.
  */
 function content_translation_access(EntityInterface $entity, $op) {
-  return content_translation_controller($entity->entityType())->getTranslationAccess($entity, $op) ;
+  return content_translation_controller($entity->entityTypeId())->getTranslationAccess($entity, $op) ;
 }
 
 /**
@@ -641,7 +641,7 @@ function content_translation_form_alter(array &$form, array &$form_state) {
   $entity = $form_controller ? $form_controller->getEntity() : NULL;
 
   if ($entity instanceof ContentEntityInterface && $entity->isTranslatable() && count($entity->getTranslationLanguages()) > 1) {
-    $controller = content_translation_controller($entity->entityType());
+    $controller = content_translation_controller($entity->entityTypeId());
     $controller->entityFormAlter($form, $form_state, $entity);
 
     // @todo Move the following lines to the code generating the property form
@@ -746,7 +746,7 @@ function content_translation_entity_insert(EntityInterface $entity) {
       'changed' => REQUEST_TIME,
     );
 
-    $translation['entity_type'] = $entity->entityType();
+    $translation['entity_type'] = $entity->entityTypeId();
     $translation['entity_id'] = $entity->id();
     $translation['langcode'] = $langcode;
 
@@ -772,7 +772,7 @@ function content_translation_entity_delete(EntityInterface $entity) {
   }
 
   db_delete('content_translation')
-    ->condition('entity_type', $entity->entityType())
+    ->condition('entity_type', $entity->entityTypeId())
     ->condition('entity_id', $entity->id())
     ->execute();
 }

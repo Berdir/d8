@@ -26,7 +26,7 @@ class EntityDisplayModeAddForm extends EntityDisplayModeFormBase {
     $this->entityType = $entity_type;
     $form = parent::buildForm($form, $form_state);
     $definition = $this->entityManager->getDefinition($this->entityType);
-    $form['#title'] = $this->t('Add new %label @entity-type', array('%label' => $definition->getLabel(), '@entity-type' => $this->entityInfo->getLowercaseLabel()));
+    $form['#title'] = $this->t('Add new %label @entity-type', array('%label' => $definition->getLabel(), '@entity-type' => $this->entityType->getLowercaseLabel()));
     return $form;
   }
 

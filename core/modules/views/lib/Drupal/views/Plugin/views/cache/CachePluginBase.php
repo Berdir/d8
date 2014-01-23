@@ -349,13 +349,13 @@ abstract class CachePluginBase extends PluginBase {
       // Collect entity IDs if there are view results.
       if (!empty($this->view->result)) {
         foreach ($this->view->result as $result) {
-          $type = $result->_entity->entityType();
+          $type = $result->_entity->entityTypeId();
 
           $tags[$type][] = $result->_entity->id();
           $tags[$type . '_view_' . $result->_entity->bundle()] = TRUE;
 
           foreach ($result->_relationship_entities as $entity) {
-            $type = $entity->entityType();
+            $type = $entity->entityTypeId();
 
             $tags[$type][] = $entity->id();
             $tags[$type . '_view_' . $entity->bundle()] = TRUE;

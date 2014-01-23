@@ -289,7 +289,7 @@ class MenuLink extends Entity implements \ArrayAccess, MenuLinkInterface {
    * {@inheritdoc}
    */
   public function isNewRevision() {
-    return $this->newRevision || ($this->entityInfo()->hasKey('revision') && !$this->getRevisionId());
+    return $this->newRevision || ($this->entityType()->hasKey('revision') && !$this->getRevisionId());
   }
 
   /**
@@ -304,7 +304,7 @@ class MenuLink extends Entity implements \ArrayAccess, MenuLinkInterface {
    */
   public function isTranslatable() {
     // @todo Inject the entity manager and retrieve bundle info from it.
-    $bundles = entity_get_bundles($this->entityType);
+    $bundles = entity_get_bundles($this->entityTypeId);
     return !empty($bundles[$this->bundle()]['translatable']);
   }
 

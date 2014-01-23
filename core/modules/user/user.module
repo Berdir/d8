@@ -1795,7 +1795,7 @@ function user_cookie_delete($cookie_name) {
  * Implements hook_file_download_access().
  */
 function user_file_download_access($field, EntityInterface $entity, File $file) {
-  if ($entity->entityType() == 'user') {
+  if ($entity->entityTypeId() == 'user') {
     return $entity->access('view');
   }
 }

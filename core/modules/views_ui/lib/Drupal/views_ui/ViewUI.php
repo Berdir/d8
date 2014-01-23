@@ -841,10 +841,10 @@ class ViewUI implements ViewStorageInterface {
   }
 
   /**
-   * Implements \Drupal\Core\Entity\EntityInterface::entityType().
+   * Implements \Drupal\Core\Entity\EntityInterface::entityTypeId().
    */
-  public function entityType() {
-    return $this->storage->entityType();
+  public function entityTypeId() {
+    return $this->storage->entityTypeId();
   }
 
   /**
@@ -855,10 +855,10 @@ class ViewUI implements ViewStorageInterface {
   }
 
   /**
-   * Implements \Drupal\Core\Entity\EntityInterface::entityInfo().
+   * Implements \Drupal\Core\Entity\EntityInterface::entityType().
    */
-  public function entityInfo() {
-    return $this->storage->entityInfo();
+  public function entityType() {
+    return $this->storage->entityType();
   }
 
   /**

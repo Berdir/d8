@@ -1848,7 +1848,7 @@ function node_modules_uninstalled($modules) {
  * Implements hook_file_download_access().
  */
 function node_file_download_access($field, EntityInterface $entity, File $file) {
-  if ($entity->entityType() == 'node') {
+  if ($entity->entityTypeId() == 'node') {
     return $entity->access('view');
   }
 }
