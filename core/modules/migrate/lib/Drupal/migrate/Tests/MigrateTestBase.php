@@ -61,6 +61,42 @@ class MigrateTestBase extends WebTestBase implements MigrateMessageInterface {
   }
 
   /**
+   * @param array $id_mappings
+   *   A list of id mappings keyed by migration ids. Each id mapping is a list
+   *   of two arrays, the first are source ids and the second are destination
+   *   ids.
+   */
+  protected function prepareIdMappings(array $id_mappings) {
+    /** @var \Drupal\migrate\Entity\MigrationInterface[] $migrations */
+    $migrations = entity_load_multiple('migration', array_keys($id_mappings));
+    foreach ($id_mappings as $migration_id => $data) {
+      $table_name = $migrations[$migration_id]->getIdMap()->getMapTableName();
+      $source_id_count = count($data[0][0]);
+      $fields = array();
+      for ($i = 1; $i <= $source_id_count; $i++) {
+        $fields[] = "sourceid$i";
+      }
+      $destination_id_count = count($data[0][0]);
+      for ($i = 1; $i <= $destination_id_count; $i++) {
+        $fields[] = "destid$i";
+      }
+      $insert = \Drupal::database()->insert($table_name)->fields($fields);
+
+      foreach ($data as $id_mapping) {
+        $values = array();
+        foreach ($id_mapping[0] as $key => $source_id) {
+          $values['sourceid' . ($key +1 )] = $source_id;
+        }
+        foreach ($id_mapping[1] as $key => $destination_id) {
+          $values['destid' . ($key +1 )] = $destination_id;
+        }
+        $insert->values($values);
+      }
+      $insert->execute();
+    }
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function display($message, $type = 'status') {
