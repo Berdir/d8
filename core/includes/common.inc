@@ -2474,7 +2474,7 @@ function drupal_pre_render_scripts($elements) {
  *   FALSE if there were any missing library dependencies; TRUE if all library
  *   dependencies were met.
  *
- * @see _drupal_add_library()
+ * @see drupal_add_library()
  * @see _drupal_add_js()
  * @see _drupal_add_css()
  * @see drupal_render()
@@ -2490,7 +2490,7 @@ function drupal_process_attached($elements, $dependency_check = FALSE) {
   // Add the libraries first.
   $success = TRUE;
   foreach ($elements['#attached']['library'] as $library) {
-    if (_drupal_add_library($library[0], $library[1]) === FALSE) {
+    if (drupal_add_library($library[0], $library[1]) === FALSE) {
       $success = FALSE;
       // Exit if the dependency is missing.
       if ($dependency_check) {
@@ -2692,7 +2692,7 @@ function drupal_process_states(&$elements) {
  * @see hook_library_info()
  * @see hook_library_info_alter()
  */
-function _drupal_add_library($module, $name, $every_page = NULL) {
+function drupal_add_library($module, $name, $every_page = NULL) {
   $added = &drupal_static(__FUNCTION__, array());
 
   // Only process the library if it exists and it was not added already.
@@ -2752,7 +2752,7 @@ function _drupal_add_library($module, $name, $every_page = NULL) {
  *   or FALSE if it does not exist. If no $name was passed, an associative array
  *   of libraries registered by $module is returned (which may be empty).
  *
- * @see _drupal_add_library()
+ * @see drupal_add_library()
  * @see hook_library_info()
  * @see hook_library_info_alter()
  *
@@ -3969,14 +3969,18 @@ function drupal_render(&$elements, $is_recursive_call = FALSE) {
   $suffix = isset($elements['#suffix']) ? $elements['#suffix'] : '';
   $elements['#markup'] = $prefix . $elements['#children'] . $suffix;
 
-  // Cache the processed element if #cache is set.
-  if (isset($elements['#cache'])) {
-    // Collect all #post_render_cache callbacks associated with this element.
+  // Collect all #post_render_cache callbacks associated with this element when:
+  // - about to store this element in the render cache, or when;
+  // - about to apply #post_render_cache callbacks.
+  if (isset($elements['#cache']) || !$is_recursive_call) {
     $post_render_cache = drupal_render_collect_post_render_cache($elements);
     if ($post_render_cache) {
       $elements['#post_render_cache'] = $post_render_cache;
     }
+  }
 
+  // Cache the processed element if #cache is set.
+  if (isset($elements['#cache'])) {
     drupal_render_cache_set($elements['#markup'], $elements);
   }
 
@@ -4531,11 +4535,12 @@ function drupal_render_cid_parts($granularity = NULL) {
   global $theme, $base_root, $user;
 
   $cid_parts[] = $theme;
-  // If Locale is enabled but we have only one language we do not need it as cid
-  // part.
-  if (language_multilingual()) {
-    foreach (language_types_get_configurable() as $language_type) {
-      $cid_parts[] = language($language_type)->id;
+
+  // If we have only one language enabled we do not need it as cid part.
+  $language_manager = \Drupal::languageManager();
+  if ($language_manager->isMultilingual()) {
+    foreach ($language_manager->getLanguageTypes() as $type) {
+      $cid_parts[] = $language_manager->getCurrentLanguage($type)->id;
     }
   }
 

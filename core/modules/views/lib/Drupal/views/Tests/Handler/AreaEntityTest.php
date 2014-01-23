@@ -54,7 +54,7 @@ class AreaEntityTest extends ViewTestBase {
     $entity_info = $this->container->get('entity.manager')->getDefinitions();
 
     $expected_entities = array_filter($entity_info, function (EntityTypeInterface $info) {
-      return $info->hasController('view_builder');
+      return $info->hasViewBuilderClass();
     });
 
     // Test that all expected entity types have data.
@@ -65,7 +65,7 @@ class AreaEntityTest extends ViewTestBase {
     }
 
     $expected_entities = array_filter($entity_info, function (EntityTypeInterface $info) {
-      return !$info->hasController('view_builder');
+      return !$info->hasViewBuilderClass();
     });
 
     // Test that no configuration entity types have data.
@@ -103,9 +103,9 @@ class AreaEntityTest extends ViewTestBase {
 
     // Change the view mode of the area handler.
     $view = views_get_view('test_entity_area');
-    $item = $view->getItem('default', 'header', 'entity_entity_test');
+    $item = $view->getHandler('default', 'header', 'entity_entity_test');
     $item['view_mode'] = 'test';
-    $view->setItem('default', 'header', 'entity_entity_test', $item);
+    $view->setHandler('default', 'header', 'entity_entity_test', $item);
 
     $preview = $view->preview('default', array($entities[1]->id()));
     $this->drupalSetContent(drupal_render($preview));

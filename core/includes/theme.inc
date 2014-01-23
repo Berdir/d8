@@ -627,8 +627,14 @@ function theme($hook, $variables = array()) {
   if (isset($info['base hook'])) {
     $suggestions[] = $hook;
   }
-  // Allow suggestions to be altered via hook_theme_suggestions_HOOK_alter().
-  Drupal::moduleHandler()->alter('theme_suggestions_' . $base_theme_hook, $suggestions, $variables);
+
+  // Invoke hook_theme_suggestions_alter() and
+  // hook_theme_suggestions_HOOK_alter().
+  $hooks = array(
+    'theme_suggestions',
+    'theme_suggestions_' . $base_theme_hook,
+  );
+  \Drupal::moduleHandler()->alter($hooks, $suggestions, $variables, $base_theme_hook);
 
   // Check if each suggestion exists in the theme registry, and if so,
   // use it instead of the hook that theme() was called with. For example, a
@@ -1235,7 +1241,7 @@ function theme_links($variables) {
     $output .= '<ul' . new Attribute($attributes) . '>';
 
     $active = \Drupal::linkGenerator()->getActive();
-    $language_url = \Drupal::languageManager()->getLanguage(Language::TYPE_URL);
+    $language_url = \Drupal::languageManager()->getCurrentLanguage(Language::TYPE_URL);
 
     foreach ($links as $key => $link) {
       $link += array(
@@ -1546,8 +1552,7 @@ function theme_table($variables) {
 
   // Add sticky headers, if applicable.
   if (count($header) && $sticky) {
-    $attached['#attached']['library'][] = array('system', 'drupal.tableheader');
-    drupal_render($attached);
+    drupal_add_library('system', 'drupal.tableheader');
     // Add 'sticky-enabled' class to the table to identify it for JS.
     // This is needed to target tables constructed by this function.
     $attributes['class'][] = 'sticky-enabled';
@@ -1556,8 +1561,7 @@ function theme_table($variables) {
   // with the classes represented by the constants RESPONSIVE_PRIORITY_MEDIUM
   // and RESPONSIVE_PRIORITY_LOW, add the tableresponsive behaviors.
   if (count($header) && $responsive) {
-    $attached['#attached']['library'][] = array('system', 'drupal.tableresponsive');
-    drupal_render($attached);
+    drupal_add_library('system', 'drupal.tableresponsive');
     // Add 'responsive-enabled' class to the table to identify it for JS.
     // This is needed to target tables constructed by this function.
     $attributes['class'][] = 'responsive-enabled';
@@ -2072,7 +2076,7 @@ function template_preprocess_html(&$variables) {
   $variables['html_attributes'] = new Attribute;
 
   // HTML element attributes.
-  $language_interface = \Drupal::service('language_manager')->getLanguage();
+  $language_interface = \Drupal::service('language_manager')->getCurrentLanguage();
   $variables['html_attributes']['lang'] = $language_interface->id;
   $variables['html_attributes']['dir'] = $language_interface->direction ? 'rtl' : 'ltr';
 
@@ -2140,8 +2144,7 @@ function template_preprocess_html(&$variables) {
     drupal_add_html_head($element, $name);
   }
 
-  $attached['#attached']['library'][] = array('system', 'html5shiv');
-  drupal_render($attached);
+  drupal_add_library('system', 'html5shiv', TRUE);
 
   $variables['page_top'][] = array('#markup' => $page->getBodyTop());
   $variables['page_bottom'][] = array('#markup' => $page->getBodyBottom());

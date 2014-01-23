@@ -5,6 +5,7 @@
  * Administration toolbar for quick access to top level administration items.
  */
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Template\Attribute;
@@ -637,7 +638,7 @@ function toolbar_user_role_update(RoleInterface $role) {
  *   A unique cache ID for the user.
  */
 function _toolbar_get_user_cid($uid) {
-  return 'toolbar_' . $uid . ':' . \Drupal::languageManager()->getLanguage(Language::TYPE_INTERFACE)->id;
+  return 'toolbar_' . $uid . ':' . \Drupal::languageManager()->getCurrentLanguage()->id;
 }
 
 /**
@@ -652,7 +653,7 @@ function _toolbar_clear_user_cache($uid = NULL) {
     // Clear by the 'user' tag in order to delete all caches, in any language,
     // associated with this user.
     if (isset($uid)) {
-      $cache->deleteTags(array('user' => array($uid)));
+      Cache::deleteTags(array('user' => array($uid)));
     } else {
       $cache->deleteAll();
     }

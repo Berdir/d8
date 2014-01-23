@@ -13,7 +13,6 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityListController;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\Language;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -37,13 +36,11 @@ class NodeListController extends EntityListController {
    *   The entity info for the entity type.
    * @param \Drupal\Core\Entity\EntityStorageControllerInterface $storage
    *   The entity storage controller class.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler to invoke hooks on.
    * @param \Drupal\Core\Datetime\Date $date_service
    *   The date service.
    */
-  public function __construct(EntityTypeInterface $entity_info, EntityStorageControllerInterface $storage, ModuleHandlerInterface $module_handler, Date $date_service) {
-    parent::__construct($entity_info, $storage, $module_handler);
+  public function __construct(EntityTypeInterface $entity_info, EntityStorageControllerInterface $storage, Date $date_service) {
+    parent::__construct($entity_info, $storage);
 
     $this->dateService = $date_service;
   }
@@ -55,7 +52,6 @@ class NodeListController extends EntityListController {
     return new static(
       $entity_info,
       $container->get('entity.manager')->getStorageController($entity_info->id()),
-      $container->get('module_handler'),
       $container->get('date')
     );
   }
@@ -81,7 +77,7 @@ class NodeListController extends EntityListController {
         'class' => array(RESPONSIVE_PRIORITY_LOW),
       ),
     );
-    if (language_multilingual()) {
+    if (\Drupal::languageManager()->isMultilingual()) {
       $header['language_name'] = array(
         'data' => $this->t('Language'),
         'class' => array(RESPONSIVE_PRIORITY_LOW),
@@ -114,8 +110,9 @@ class NodeListController extends EntityListController {
     );
     $row['status'] = $entity->isPublished() ? $this->t('published') : $this->t('not published');
     $row['changed'] = $this->dateService->format($entity->getChangedTime(), 'short');
-    if (language_multilingual()) {
-      $row['language_name'] = language_name($langcode);
+    $language_manager = \Drupal::languageManager();
+    if ($language_manager->isMultilingual()) {
+      $row['language_name'] = $language_manager->getLanguageName($langcode);
     }
     $row['operations']['data'] = $this->buildOperations($entity);
     return $row + parent::buildRow($entity);

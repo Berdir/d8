@@ -50,7 +50,7 @@ class NodeViewBuilder extends EntityViewBuilder {
         $entity->content['langcode'] = array(
           '#type' => 'item',
           '#title' => t('Language'),
-          '#markup' => language_name($langcode),
+          '#markup' => $this->languageManager->getLanguageName($langcode),
           '#prefix' => '<div id="field-language-display">',
           '#suffix' => '</div>'
         );
@@ -141,6 +141,7 @@ class NodeViewBuilder extends EntityViewBuilder {
     if ($entity->id()) {
       $build['#contextual_links']['node'] = array(
         'route_parameters' =>array('node' => $entity->id()),
+        'metadata' => array('changed' => $entity->getChangedTime()),
       );
     }
 
