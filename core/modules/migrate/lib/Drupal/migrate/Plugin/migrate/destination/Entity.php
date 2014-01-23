@@ -13,7 +13,6 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
-use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\TypedData\ComplexDataInterface;
 use Drupal\Core\TypedData\ListInterface;
@@ -36,11 +35,6 @@ class Entity extends DestinationBase implements ContainerFactoryPluginInterface 
   protected $storageController;
 
   /**
-   * @var \Drupal\Core\Entity\EntityTypeInterface
-   */
-  protected $entityType;
-
-  /**
    * The list of the bundles of this entity type.
    *
    * @var array
@@ -58,13 +52,12 @@ class Entity extends DestinationBase implements ContainerFactoryPluginInterface 
    *   The migration.
    * @param EntityStorageControllerInterface $storage_controller
    *   The storage controller for this entity type.
-   * @param EntityTypeInterface $entity_type
-   *   The entity type object.
+   * @param array $bundles
+   *   The list of bundles this entity type has.
    */
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration, EntityStorageControllerInterface $storage_controller, EntityTypeInterface $entity_type, array $bundles) {
+  public function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration, EntityStorageControllerInterface $storage_controller, array $bundles) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration);
     $this->storageController = $storage_controller;
-    $this->entityType = $entity_type;
     $this->bundles = $bundles;
   }
 
@@ -72,24 +65,37 @@ class Entity extends DestinationBase implements ContainerFactoryPluginInterface 
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration = NULL) {
-    if (isset($configuration['entity_type'])) {
-      $entity_type = $configuration['entity_type'];
-    }
-    elseif (substr($plugin_id, 0, 7) == 'entity_') {
-      $entity_type = substr($plugin_id, 7);
-    }
-    else {
-      throw new MigrateException('No entity type given.');
-    }
+    $entity_type = static::getEntityType($configuration, $plugin_id);
     return new static(
       $configuration,
       $plugin_id,
       $plugin_definition,
       $migration,
       $container->get('entity.manager')->getStorageController($entity_type),
-      $container->get('entity.manager')->getDefinition($entity_type),
       array_keys($container->get('entity.manager')->getBundleInfo($entity_type))
     );
+  }
+
+  /**
+   * Finds the entity type from configuration or plugin id.
+   *
+   * @param $configuration
+   *   The plugin configuration.
+   * @param $plugin_id
+   *   The plugin id.
+   *
+   * @return string
+   *   The entity type.
+   * @throws \Drupal\migrate\MigrateException
+   */
+  protected static function getEntityType($configuration, $plugin_id) {
+    if (isset($configuration['entity_type'])) {
+      return $configuration['entity_type'];
+    }
+    elseif (substr($plugin_id, 0, 7) == 'entity_') {
+      return substr($plugin_id, 7);
+    }
+    throw new MigrateException('No entity type given.');
   }
 
   /**
@@ -98,13 +104,13 @@ class Entity extends DestinationBase implements ContainerFactoryPluginInterface 
   public function import(Row $row) {
     // @TODO: add field handling. https://drupal.org/node/2164451
     // @TODO: add validation https://drupal.org/node/2164457
-    $id_key = $this->entityType->getKey('id');
+    $id_key = $this->getKey('id');
     if ($entity = $this->storageController->load($row->getDestinationProperty($id_key))) {
       $this->update($entity, $row);
     }
     else {
       $values = $row->getDestination();
-      $bundle_key = $this->entityType->getKey('bunde');
+      $bundle_key = $this->getKey('bundle');
       if ($bundle_key && !isset($values[$bundle_key])) {
         $values[$bundle_key] = reset($this->bundles);
       }
@@ -177,11 +183,26 @@ class Entity extends DestinationBase implements ContainerFactoryPluginInterface 
   }
 
   /**
+   * Returns a specific entity key.
+   *
+   * @param string $key
+   *   The name of the entity key to return.
+   *
+   * @return string|bool
+   *   The entity key, or FALSE if it does not exist.
+   *
+   * @see \Drupal\Core\Entity\EntityTypeInterface::getKeys()
+   */
+  protected function getKey($key) {
+    return $this->storageController->entityInfo()->getKey($key);
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function getIds() {
-    $id_key = $this->entityType->getKey('id');
-    $ids[$id_key]['type'] = is_subclass_of($this->entityType->getClass(), 'Drupal\Core\Config\Entity\ConfigEntityInterface') ? 'string' : 'integer';
+    $id_key = $this->getKey('id');
+    $ids[$id_key]['type'] = is_subclass_of($this->storageController->entityInfo()->getClass(), 'Drupal\Core\Config\Entity\ConfigEntityInterface') ? 'string' : 'integer';
     return $ids;
   }
 
