@@ -64,7 +64,6 @@ class CommentSourceTest extends MigrateSqlSourceTestCase {
       'mail' => '',
       'homepage' => '',
       'format' => 'testformat1',
-      'type' => 'article',
     ),
     array(
       'cid' => 2,
@@ -81,7 +80,6 @@ class CommentSourceTest extends MigrateSqlSourceTestCase {
       'mail' => '',
       'homepage' => '',
       'format' => 'testformat2',
-      'type' => 'page',
     ),
   );
 
@@ -98,11 +96,8 @@ class CommentSourceTest extends MigrateSqlSourceTestCase {
 
   public function setUp() {
     foreach ($this->expectedResults as $k => $row) {
-      // This array stores the database.
-      $this->databaseContents['node'][$k]['nid'] = $row['nid'];
-      $this->databaseContents['node'][$k]['type'] = $row['type'];
-      unset($row['type']);
       $this->databaseContents['comments'][$k] = $row;
+      $this->databaseContents['comments'][$k]['status'] = 1 - $this->databaseContents['comments'][$k]['status'];
     }
     parent::setUp();
   }

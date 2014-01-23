@@ -59,8 +59,9 @@ class MigrateNodeBodyInstanceTest extends MigrateDrupalTestBase {
     $this->assertNull($field, 'The body must not be created.');
 
     // Ensure Id map works.
-    $this->assertEqual(array('node.company.body'), $migration->getIdMap()->lookupDestinationID(array('company')), "The created body node key has been added to the Id map");
-    $this->assertEqual(array('node.employee.body'), $migration->getIdMap()->lookupDestinationID(array('employee')), "The created body node key has been added to the Id map");
-    $this->assertEqual(array(NULL), $migration->getIdMap()->lookupDestinationID(array('sponsor')), "The skipped body node key has not been added to the Id map");
+    $this->assertEqual(array('node', 'company', 'body'), $migration->getIdMap()->lookupDestinationID(array('company')));
+    $this->assertEqual(array('node', 'employee', 'body'), $migration->getIdMap()->lookupDestinationID(array('employee')));
+    // The skipped body node key should not be added to the Id map.
+    $this->assertEqual(array(NULL, NULL, NULL), $migration->getIdMap()->lookupDestinationID(array('sponsor')));
   }
 }

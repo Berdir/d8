@@ -12,7 +12,7 @@ namespace Drupal\migrate\Plugin\migrate\destination;
  */
 class EntityFormDisplay extends EntityDisplayBase {
 
-  const MODE_NAME = 'view_mode';
+  const MODE_NAME = 'form_mode';
 
   /**
    * {@inheritdoc}

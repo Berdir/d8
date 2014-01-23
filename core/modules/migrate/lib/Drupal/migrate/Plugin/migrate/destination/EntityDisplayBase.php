@@ -18,7 +18,12 @@ abstract class EntityDisplayBase extends DestinationBase {
    * {@inheritdoc}
    */
   public function import(Row $row) {
-    $values = array_intersect_key($row->getDestination(), $this->getIds());
+    $values = array();
+    // array_intersect_key() won't work because the order is important because
+    // this is also the return value.
+    foreach (array_keys($this->getIds()) as $id) {
+      $values[$id] = $row->getDestinationProperty($id);
+    }
     $entity = $this->getEntity($values['entity_type'], $values['bundle'], $values[static::MODE_NAME]);
     $entity
       ->setComponent($values['field_name'], $row->getDestinationProperty('options') ?: array())
