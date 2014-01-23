@@ -26,8 +26,6 @@ class Comment extends Drupal6SqlBase implements RequirementsInterface {
       ->fields('c', array('cid', 'pid', 'nid', 'uid', 'subject',
         'comment', 'hostname', 'timestamp', 'status', 'thread', 'name',
         'mail', 'homepage', 'format'));
-    $query->join('node', 'n', 'c.nid = n.nid');
-    $query->fields('n', array('type'));
     $query->orderBy('timestamp');
     return $query;
   }

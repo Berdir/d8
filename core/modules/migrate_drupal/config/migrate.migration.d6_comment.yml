@@ -6,30 +6,44 @@ source:
   plugin: drupal6_comment
   constants:
     field_id: node__comment
+    entity_type: node
 process:
   cid: cid
   pid:
-    plugin: migration
-    migration: drupal6_comment
-    source:
-      - pid
-  entity_id:
-    plugin: migration
-    migration: drupal6_node
-    source:
-      - nid
-  entity_type:
-    plugin: migration
-    migration: drupal6_node_type
-    source:
-      - type
+    -
+      plugin: drupal6_comment_pid
+    -
+      plugin: migration
+      migration: d6_comment
+      source:
+        - pid
+    -
+      plugin: extract
+      index:
+        - 0
+  entity_id: nid
+#    -
+#      plugin: migration
+#      migration: drupal6_node
+#      source:
+#        - nid
+#    -
+#      plugin: extract
+#      index:
+#        - 0
+  entity_type: constants:node
   field_id: constants:field_id
   subject: subject
-  uid:
-    plugin: migration
-    migration: drupal6_user
-    source:
-      - uid
+  uid: uid
+#    -
+#      plugin: migration
+#      migration: drupal6_user
+#      source:
+#        - uid
+#    -
+#      plugin: extract
+#      index:
+#        - 0
   name: name
   mail: mail
   homepage: homepage
@@ -38,8 +52,8 @@ process:
   changed: timestamp
   status: status #ToDo: In D6, published=0.
   thread: thread
-  'body:value': comment
-  'body:format':
+  'comment_body:value': comment
+  'comment_body:format':
     -
       plugin: migration
       migration: d6_filter_format
@@ -50,5 +64,4 @@ process:
       index:
         - 0
 destination:
-  plugin: entity
-  entity_type: comment
+  plugin: entity_comment
