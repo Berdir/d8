@@ -39,16 +39,26 @@ class MigrateNodeTest extends MigrateDrupalTestBase {
       'd6_node_type' => array(array(array('story'), array('story'))),
     );
     $this->prepareIdMappings($id_mappings);
+    entity_create('field_entity', array(
+      'entity_type' => 'node',
+      'name' => 'field_test',
+      'type' => 'text',
+    ))->save();
+    entity_create('field_instance', array(
+      'entity_type' => 'node',
+      'field_name' => 'field_test',
+      'bundle' => 'story',
+    ))->save();
 
-    /** @var \Drupal\migrate\entity\Migration $migration */
-    $migrations = entity_load_multiple('migration', array('d6_node:*'));
 
     $dumps = array(
       $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6Node.php',
       $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6FieldInstance.php',
     );
+    $this->loadDumps($dumps);
+    /** @var \Drupal\migrate\entity\Migration $migration */
+    $migrations = entity_load_multiple('migration', array('d6_node:*'));
     foreach ($migrations as $migration) {
-      $this->prepare($migration, $dumps);
       $executable = new MigrateExecutable($migration, $this);
       $executable->import();
     }
@@ -60,6 +70,7 @@ class MigrateNodeTest extends MigrateDrupalTestBase {
     $this->assertEqual($node->getCreatedTime(), 1388271197, 'Node has the correct created time.');
     $this->assertEqual($node->isSticky(), FALSE, 'Node has the correct sticky setting.');
     $this->assertEqual($node->getAuthorId(), 1, 'Node has the correct author id.');
+    $this->assertEqual($node->field_test->value, 'This is a text field');
 
 //
 //    $this->verbose(print_r($node, 1));
