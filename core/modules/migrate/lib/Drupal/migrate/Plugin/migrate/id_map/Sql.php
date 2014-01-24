@@ -174,7 +174,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
     $database = $this->getDatabase();
     $options = $database->getConnectionOptions();
     $prefix = $database->tablePrefix($this->mapTableName);
-    return new SelectHelper($options['database'] . '.' . $prefix . $this->mapTableName);
+    return new $options['database'] . '.' . $prefix . $this->mapTableName;
   }
 
   /**
