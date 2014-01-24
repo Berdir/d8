@@ -7,6 +7,7 @@
 
 namespace Drupal\migrate_drupal\Plugin\migrate\load\d6;
 
+use Drupal\Component\Utility\MapArray;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\migrate\Entity\MigrationInterface;
@@ -72,7 +73,7 @@ class Node extends LoadBase implements ContainerFactoryPluginInterface {
       $values['source']['type'] = $node_type;
       /** @var \Drupal\migrate\Entity\MigrationInterface $migration */
       $migration = $this->storageController->create($values);
-      $migration->process = drupal_map_assoc(array_keys($migration->getSourcePlugin()->fields()));
+      $migration->process = MapArray::copyValuesToKeys(array_keys($migration->getSourcePlugin()->fields()));
       $migrations[$migration->id()] = $migration;
     }
     return $migrations;
