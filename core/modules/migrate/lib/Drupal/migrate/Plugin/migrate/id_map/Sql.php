@@ -121,7 +121,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->migration = $migration;
-    $machine_name = $migration->id();
+    $machine_name = str_replace(':', '__', $migration->id());
 
     // Default generated table names, limited to 63 characters.
     $prefixLength = strlen($this->getDatabase()->tablePrefix()) ;

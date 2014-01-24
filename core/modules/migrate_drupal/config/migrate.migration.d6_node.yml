@@ -1,0 +1,33 @@
+id: d6_node
+load:
+  plugin: d6_node
+sourceIds:
+  nid:
+    type: integer
+    alias: n
+source:
+  plugin: drupal6_node
+
+process:
+  nid: nid
+  type: type
+  langcode: language
+  title: title
+  uid: uid
+  status: status
+  created: created
+  changed: changed
+  promote: promote
+  sticky: sticky
+
+
+
+#  unmapped d6 fields.
+#  tnid
+#  translate
+#  moderate
+#  comment
+
+destination:
+  plugin: entity
+  entity_type: node

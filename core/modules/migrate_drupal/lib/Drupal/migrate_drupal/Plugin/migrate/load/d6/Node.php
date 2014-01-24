@@ -60,15 +60,16 @@ class Node extends LoadBase implements ContainerFactoryPluginInterface {
     /** @var \Drupal\migrate\Entity\MigrationInterface $node_type_migration */
     $node_type_migration = $this->storageController->load('d6_node_type');
     $types = array();
-    foreach ($node_type_migration->getSourcePlugin() as $node_type) {
-      $types[] = $node_type['type'];
+    foreach ($node_type_migration->getIdMap() as $key => $row) {
+      $key = unserialize($key);
+      $types[] = $key['sourceid1'];
     }
     $ids_to_add = isset($sub_ids) ? array_intersect($types, $sub_ids) : $types;
     $migrations = array();
     foreach ($ids_to_add as $node_type) {
       $values = $this->migration->getExportProperties();
-      $values['id'] = 'd6_node_' . $node_type;
-      $values['source']['configuration']['type'] = $node_type;
+      $values['id'] = 'd6_node:' . $node_type;
+      $values['source']['type'] = $node_type;
       /** @var \Drupal\migrate\Entity\MigrationInterface $migration */
       $migration = $this->storageController->create($values);
       $migration->process = drupal_map_assoc(array_keys($migration->getSourcePlugin()->fields()));

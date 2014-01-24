@@ -7,7 +7,10 @@
 
 namespace Drupal\migrate;
 
+use Drupal\Component\Utility\String;
 use Drupal\Core\Config\Entity\ConfigStorageController;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityStorageException;
 
 /**
  * Storage controller for migration entities.
@@ -67,6 +70,16 @@ class MigrationStorageController extends ConfigStorageController {
       }
     }
     return $entities;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function save(EntityInterface $entity) {
+    if (strpos($entity->id(), ':') !== FALSE) {
+      throw new EntityStorageException(String::format("Dynamic migration %id can't be saved", array('$%id' => $entity->id())));
+    }
+    return parent::save($entity);
   }
 
 }

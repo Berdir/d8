@@ -9,6 +9,7 @@ namespace Drupal\migrate\Plugin\load;
 
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\migrate\Plugin\MigrateLoadInterface;
+use Drupal\migrate\Entity\MigrationInterface;
 
 /**
  * Base class for load plugins.

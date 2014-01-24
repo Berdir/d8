@@ -24,7 +24,7 @@ class Node extends Drupal6SqlBase implements RequirementsInterface {
    *
    * @var array
    */
-  protected $sourceFieldInfo;
+  protected $sourceFieldInfo = array();
 
   /**
    * {@inheritdoc}
@@ -67,8 +67,8 @@ class Node extends Drupal6SqlBase implements RequirementsInterface {
     $type = $row->getSourceProperty('type');
     // Pick up simple CCK fields.
     $cck_table = "content_type_$type";
-    $query = $this->query()->condition('vid', $row->getSourceProperty('vid'));
-    if ($this->database->schema()->tableExists($cck_table)) {
+    $query = $this->query()->condition('n.vid', $row->getSourceProperty('vid'));
+    if ($this->getDatabase()->schema()->tableExists($cck_table)) {
       $query->leftJoin($cck_table, 'f', 'n.vid = f.vid');
       // The main column for the field should be rendered with the field name,
       // not the column name (e.g., field_foo rather than field_foo_value).
@@ -104,9 +104,9 @@ class Node extends Drupal6SqlBase implements RequirementsInterface {
       }
     }
     $results = $query->execute()->fetchAssoc();
-
+    $source = $row->getSource();
     // We diff the results because the extra will be all the field columns.
-    $new_fields = array_diff($results, $row->getSource());
+    $new_fields = array_diff($results, $source);
     foreach ($new_fields as $key => $value) {
       $row->setSourceProperty($key, $value);
     }
@@ -141,9 +141,9 @@ class Node extends Drupal6SqlBase implements RequirementsInterface {
    */
   protected function getSourceFieldInfo($bundle) {
 
-    if (!isset($this->sourceFieldInfo)) {
+    if (empty($this->sourceFieldInfo)) {
       $this->sourceFieldInfo = array();
-      if ($this->database->schema()->tableExists('content_node_field_instance')) {
+      if ($this->getDatabase()->schema()->tableExists('content_node_field_instance')) {
 
         // Get each field attached to this type.
         $query = $this->select('content_node_field_instance', 'i')
@@ -164,8 +164,8 @@ class Node extends Drupal6SqlBase implements RequirementsInterface {
             'db_storage')
         );
 
-        $result = $query->execute();
-        foreach ($result as $row) {
+        $results = $query->execute();
+        foreach ($results as $row) {
           $field_name = trim($row['field_name']);
           $db_columns = $db_columns = !empty($row['db_columns']) ? unserialize($row['db_columns']) : array();
           $columns = array();
@@ -212,6 +212,7 @@ class Node extends Drupal6SqlBase implements RequirementsInterface {
   public function fields() {
     $fields = array(
       'nid' => t('Node ID'),
+      'type' => t('Type'),
       'title' => t('Title'),
       'body' => t('Body'),
       'format' => t('Format'),
