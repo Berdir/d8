@@ -196,7 +196,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
    */
   protected function getDatabase() {
     if (!isset($this->database)) {
-      $this->database = SqlBase::getDatabaseConnection($this->configuration);
+      $this->database = SqlBase::getDatabaseConnection();
     }
     return $this->database;
   }

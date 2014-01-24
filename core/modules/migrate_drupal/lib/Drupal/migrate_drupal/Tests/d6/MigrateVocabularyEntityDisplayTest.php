@@ -8,6 +8,7 @@
 namespace Drupal\migrate_drupal\Tests\d6;
 
 use Drupal\migrate\MigrateExecutable;
+use Drupal\migrate\Plugin\migrate\source\SqlBase;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
 class MigrateVocabularyEntityDisplayTest extends MigrateDrupalTestBase {
@@ -29,9 +30,8 @@ static $modules = array('taxonomy', 'field');
 
     // Loading the migration creates the map table so we can insert our data.
     $table_name = entity_load('migration', 'd6_taxonomy_vocabulary')->getIdMap()->getMapTableName();
-    $database = \Drupal::database();
     // We need some sample data so we can use the Migration process plugin.
-    $database->insert($table_name)->fields(array(
+    SqlBase::getDatabaseConnection()->insert($table_name)->fields(array(
       'sourceid1',
       'destid1',
     ))

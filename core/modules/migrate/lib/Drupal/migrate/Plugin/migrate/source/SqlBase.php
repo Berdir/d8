@@ -56,17 +56,8 @@ abstract class SqlBase extends SourcePluginBase {
     return $this->database;
   }
 
-  public static function getDatabaseConnection(array $configuration) {
-    if (isset($configuration['database'])) {
-      $key = 'migrate';
-      if (!Database::getConnectionInfo($key)) {
-        Database::addConnectionInfo($key, 'default', $configuration['database']);
-      }
-    }
-    else {
-      $key = 'default';
-    }
-    return Database::getConnection('default', $key);
+  public static function getDatabaseConnection() {
+    return Database::getConnection('default', 'migrate') ?: Database::getConnection();
   }
 
   protected function select($table, $alias = NULL, array $options = array()) {
@@ -141,7 +132,7 @@ abstract class SqlBase extends SourcePluginBase {
           $delimiter = ' AND ';
         }
 
-        $alias = $this->query->leftJoin($this->migration->getIdMap()->getQualifiedMapTableName(), 'map', $map_join);
+        $alias = $this->query->leftJoin($this->migration->getIdMap()->getMapTableName(), 'map', $map_join);
         $conditions->isNull($alias . '.sourceid1');
         $conditions->condition($alias . '.source_row_status', MigrateIdMapInterface::STATUS_NEEDS_UPDATE);
         $condition_added = TRUE;

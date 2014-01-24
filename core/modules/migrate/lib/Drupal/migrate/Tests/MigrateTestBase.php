@@ -24,6 +24,17 @@ class MigrateTestBase extends WebTestBase implements MigrateMessageInterface {
 
   public static $modules = array('migrate');
 
+  public function setUp() {
+    parent::setUp();
+    $connection_info = Database::getConnectionInfo('default');
+    foreach ($connection_info as $target => $value) {
+      $connection_info[$target]['prefix'] = array(
+        'default' => preg_replace('/simpletest(\d+)$/', 'simpletest_m\1', $value['prefix']['default']),
+      );
+    }
+    Database::addConnectionInfo('migrate', 'default', $connection_info['default']);
+  }
+
   /**
    * @param MigrationInterface $migration
    * @param array $files
@@ -31,21 +42,10 @@ class MigrateTestBase extends WebTestBase implements MigrateMessageInterface {
    * @return \Drupal\Core\Database\Connection
    */
   protected function prepare(MigrationInterface $migration, array $files = array()) {
-    $databasePrefix = 'm_';
-    $connection_info = Database::getConnectionInfo('default');
-    foreach ($connection_info as $target => $value) {
-      $connection_info[$target]['prefix'] = array(
-        'default' => $value['prefix']['default'] . $databasePrefix,
-      );
-    }
-    Database::removeConnection('migrate');
-    $database = SqlBase::getDatabaseConnection(array('database' => $connection_info['default']));
-    foreach (array('source', 'destination', 'idMap') as $key) {
-      $configuration = $migration->get($key);
-      $configuration['database'] = $database;
-      $migration->set($key, $configuration);
-    }
+    $this->loadDumps($files);
+  }
 
+  protected function loadDumps($files) {
     // Load the database from the portable PHP dump.
     // The files may be gzipped.
     foreach ($files as $file) {
@@ -55,9 +55,8 @@ class MigrateTestBase extends WebTestBase implements MigrateMessageInterface {
       }
       preg_match('/^namespace (.*);$/m', file_get_contents($file), $matches);
       $class = $matches[1] . '\\' . basename($file, '.php');
-      $class::load($database);
+      $class::load(Database::getConnection('default', 'migrate'));
     }
-    return $database;
   }
 
   /**
