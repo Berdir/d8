@@ -30,8 +30,7 @@ class MigrateAggregatorItemTest extends MigrateDrupalTestBase {
   function testAggregatorItem() {
     // We need some sample data so we can use the Migration process plugin.
     $table_name = entity_load('migration', 'd6_aggregator_feed')->getIdMap()->getMapTableName();
-    $database = \Drupal::database();
-    $database->insert($table_name)->fields(array(
+    \Drupal::database()->insert($table_name)->fields(array(
       'sourceid1',
       'destid1',
     ))

@@ -32,9 +32,8 @@ class MigrateCustomBlockTest extends MigrateDrupalTestBase {
 
   public function testBlockMigration() {
     $table_name = entity_load('migration', 'd6_filter_format')->getIdMap()->getMapTableName();
-    $database = \Drupal::database();
     // We need some sample data so we can use the Migration process plugin.
-    $database->insert($table_name)->fields(array(
+    \Drupal::database()->insert($table_name)->fields(array(
       'sourceid1',
       'destid1',
     ))

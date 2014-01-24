@@ -31,9 +31,8 @@ class MigrateFieldFormatterSettings extends MigrateDrupalTestBase {
 
     // Loading the migration creates the map table so we can insert our data.
     $table_name = entity_load('migration', 'd6_view_modes')->getIdMap()->getMapTableName();
-    $database = \Drupal::database();
     // We need some sample data so we can use the Migration process plugin.
-    $database->insert($table_name)->fields(array(
+    \Drupal::database()->insert($table_name)->fields(array(
       'sourceid1',
       'destid1',
     ))
