@@ -5,7 +5,7 @@
  * Contains \Drupal\migrate\Tests\source\d6\UserPictureSourceTest.
  */
 
-namespace Drupal\migrate_drupal\Tests;
+namespace Drupal\migrate_drupal\Tests\source\d6;
 
 use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
 

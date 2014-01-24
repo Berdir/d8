@@ -3,7 +3,7 @@
  * @file
  */
 
-namespace Drupal\migrate_drupal\Tests;
+namespace Drupal\migrate_drupal\Tests\source\d6;
 
 use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
 
