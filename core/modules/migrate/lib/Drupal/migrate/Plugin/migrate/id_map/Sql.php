@@ -130,6 +130,9 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
     $this->messageTableName = 'migrate_message_' . Unicode::strtolower($machine_name);
     $this->messageTableName = Unicode::substr($this->messageTableName, 0, 63 - $prefixLength);
     $this->sourceIds = $migration->get('sourceIds');
+    if ($this->sourceIds === array()) {
+      $this->sourceIds = $migration->getsourcePlugin()->getIds();
+    }
     $this->destinationIds = $migration->get('destinationIds');
     if ($this->destinationIds === FALSE) {
       $this->destinationIds = $migration->getDestinationPlugin()->getIds();
