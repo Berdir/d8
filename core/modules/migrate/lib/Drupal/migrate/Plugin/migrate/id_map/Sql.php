@@ -13,7 +13,6 @@ use Drupal\Core\Plugin\PluginBase;
 use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\MigrateException;
 use Drupal\migrate\MigrateMessageInterface;
-use Drupal\migrate\Plugin\migrate\source\SqlBase;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\Row;
 
@@ -169,24 +168,13 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
   }
 
   /**
-   * Qualifying the map table name with the database name makes cross-db joins
-   * possible. Note that, because prefixes are applied after we do this (i.e.,
-   * it will prefix the string we return), we do not qualify the table if it has
-   * a prefix. This will work fine when the source data is in the default
-   * (prefixed) database (in particular, for simpletest), but not if the primary
-   * query is in an external database.
-   *
    * @return string
    */
   public function getQualifiedMapTableName() {
-    $options = $this->getDatabase()->getConnectionOptions();
-    $prefix = $this->getDatabase()->tablePrefix($this->mapTableName);
-    if ($prefix) {
-      return $this->mapTableName;
-    }
-    else {
-      return $options['database'] . '.' . $this->mapTableName;
-    }
+    $database = $this->getDatabase();
+    $options = $database->getConnectionOptions();
+    $prefix = $database->tablePrefix($this->mapTableName);
+    return new SelectHelper($options['database'] . '.' . $prefix . $this->mapTableName);
   }
 
   /**
@@ -196,7 +184,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
    */
   protected function getDatabase() {
     if (!isset($this->database)) {
-      $this->database = SqlBase::getDatabaseConnection();
+      $this->database = \Drupal::database();
     }
     return $this->database;
   }

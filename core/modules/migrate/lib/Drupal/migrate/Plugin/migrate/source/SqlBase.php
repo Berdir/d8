@@ -50,14 +50,10 @@ abstract class SqlBase extends SourcePluginBase {
    * @return \Drupal\Core\Database\Connection
    */
   public function getDatabase() {
-    if  (!isset($this->database)) {
-      $this->database = static::getDatabaseConnection($this->configuration);
+    if (!isset($this->database)) {
+      $this->database = Database::getConnection('default', 'migrate');
     }
     return $this->database;
-  }
-
-  public static function getDatabaseConnection() {
-    return Database::getConnection('default', 'migrate') ?: Database::getConnection();
   }
 
   protected function select($table, $alias = NULL, array $options = array()) {
@@ -132,7 +128,7 @@ abstract class SqlBase extends SourcePluginBase {
           $delimiter = ' AND ';
         }
 
-        $alias = $this->query->leftJoin($this->migration->getIdMap()->getMapTableName(), 'map', $map_join);
+        $alias = $this->query->leftJoin($this->migration->getIdMap()->getQualifiedMapTableName(), 'map', $map_join);
         $conditions->isNull($alias . '.sourceid1');
         $conditions->condition($alias . '.source_row_status', MigrateIdMapInterface::STATUS_NEEDS_UPDATE);
         $condition_added = TRUE;
