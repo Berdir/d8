@@ -31,7 +31,6 @@ class MigrateDrupalRunBatch {
     $migration_id = reset($context['sandbox']['migration_ids']);
     $migration = entity_load('migration', $migration_id);
     // @TODO: if there are no source IDs then remove php.ini time limit.
-    $migration->source['database'] = TRUE;
     // @TODO: move time limit back into MigrateExecutable so we can set it here.
     $executable = new MigrateExecutable($migration, new MigrateMessage());
     if ($executable->import() == MigrationInterface::RESULT_COMPLETED) {
