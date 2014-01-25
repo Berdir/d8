@@ -1,7 +1,4 @@
 id: d6_vocabulary_field
-sourceIds:
-  vid:
-    type: integer
 source:
   plugin: drupal6_taxonomy_vocabulary
   constants:

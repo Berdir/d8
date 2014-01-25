@@ -32,4 +32,12 @@ class Vocabulary extends VocabularyBase implements RequirementsInterface {
     return parent::prepareRow($row);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getIds() {
+    $ids['vid']['type'] = 'integer';
+    return $ids;
+  }
+
 }
