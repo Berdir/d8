@@ -1,7 +1,4 @@
 id: d6_comment
-sourceIds:
-  cid:
-    type: integer
 source:
   plugin: drupal6_comment
   constants:
