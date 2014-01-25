@@ -12,7 +12,7 @@ namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
 /**
  * Drupal 6 file source from database.
  *
- * @PluginId("drupal6_file")
+ * @PluginID("drupal6_file")
  */
 class File extends Drupal6SqlBase {
 

@@ -12,7 +12,7 @@ use Drupal\migrate\Plugin\migrate\source\SqlBase;
 /**
  * Drupal 7 node source.
  *
- * @PluginId("drupal7_node")
+ * @PluginID("drupal7_node")
  */
 class Node extends SqlBase {
 

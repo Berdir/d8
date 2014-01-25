@@ -10,7 +10,7 @@ namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
 /**
  * Drupal 6 action source from database.
  *
- * @PluginId("drupal6_action")
+ * @PluginID("drupal6_action")
  */
 class Action extends Drupal6SqlBase {
 

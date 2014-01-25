@@ -11,7 +11,7 @@ use Drupal\field\Entity\FieldInstance;
 use Drupal\migrate\Plugin\MigrateEntityDestinationFieldInterface;
 
 /**
- * @PluginId{"file")
+ * @PluginID{"file")
  */
 class File implements MigrateEntityDestinationFieldInterface {
 

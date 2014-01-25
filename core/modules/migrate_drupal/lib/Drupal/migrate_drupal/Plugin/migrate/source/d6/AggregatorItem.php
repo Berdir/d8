@@ -13,7 +13,7 @@ use Drupal\migrate\Plugin\RequirementsInterface;
 /**
  * Drupal 6 aggregator item source from database.
  *
- * @PluginId("drupal6_aggregator_item")
+ * @PluginID("drupal6_aggregator_item")
  */
 class AggregatorItem extends Drupal6SqlBase implements RequirementsInterface {
 

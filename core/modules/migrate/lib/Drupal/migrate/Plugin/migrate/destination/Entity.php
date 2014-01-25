@@ -23,7 +23,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\migrate\MigrateException;
 
 /**
- * @PluginId("entity")
+ * @PluginID("entity")
  */
 class Entity extends DestinationBase implements ContainerFactoryPluginInterface {
 

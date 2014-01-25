@@ -13,7 +13,7 @@ use Drupal\migrate\Row;
 /**
  * Drupal 6 field source from database.
  *
- * @PluginId("drupal6_field")
+ * @PluginID("drupal6_field")
  */
 class Field extends Drupal6SqlBase implements RequirementsInterface {
 

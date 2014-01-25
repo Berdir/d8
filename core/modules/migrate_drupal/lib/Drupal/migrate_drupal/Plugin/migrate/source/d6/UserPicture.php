@@ -13,7 +13,7 @@ namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
  *
  * @todo Support default picture?
  *
- * @PluginId("drupal6_user_picture")
+ * @PluginID("drupal6_user_picture")
  */
 class UserPicture extends Drupal6SqlBase {
 

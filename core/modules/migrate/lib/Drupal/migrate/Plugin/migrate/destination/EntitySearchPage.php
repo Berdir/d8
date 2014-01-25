@@ -10,7 +10,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\migrate\Row;
 
 /**
- * @PluginId("entity_search_page")
+ * @PluginID("entity_search_page")
  */
 class EntitySearchPage extends Entity {
 

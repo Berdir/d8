@@ -13,7 +13,7 @@ use Drupal\migrate\Row;
 /**
  * Drupal 6 block source from database.
  *
- * @PluginId("drupal6_block")
+ * @PluginID("drupal6_block")
  */
 class Block extends Drupal6SqlBase {
 
