@@ -31,7 +31,20 @@ class Block extends Drupal6SqlBase {
    * {@inheritdoc}
    */
   public function fields() {
-    // TODO: Implement fields() method.
+    return array(
+      'bid' => t('The block numeric identifier.'),
+      'module' => t('The module providing the block.'),
+      'delta' => t('The block\'s delta.'),
+      'theme' => t('Which theme the block is placed in.'),
+      'status' => t('Whether or not the block is enabled.'),
+      'weight' => t('Weight of the block for ordering within regions.'),
+      'region' => t('Region the block is placed in.'),
+      'visibility' => t('Visibility expression.'),
+      'pages' => t('Pages list.'),
+      'title' => t('Block title.'),
+      'cache' => t('Cache rule.'),
+
+    );
   }
 
   public function prepareRow(Row $row) {
