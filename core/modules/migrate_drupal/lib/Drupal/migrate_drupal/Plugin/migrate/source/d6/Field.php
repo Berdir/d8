@@ -83,4 +83,15 @@ class Field extends Drupal6SqlBase implements RequirementsInterface {
     return $this->moduleExists('content') && $this->getModuleSchemaVersion('content') >= 6001;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getIds() {
+    $ids['field_name'] = array(
+      'type' => 'string',
+      'alias' => 'cnf'
+    );
+    return $ids;
+  }
+
 }
