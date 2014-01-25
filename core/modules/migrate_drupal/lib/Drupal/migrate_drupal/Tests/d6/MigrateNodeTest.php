@@ -26,15 +26,6 @@ class MigrateNodeTest extends MigrateDrupalTestBase {
   function testNode() {
 
     $path = drupal_get_path('module', 'migrate_drupal');
-//    $dumps = array(
-//      $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6NodeType.php',
-//    );
-//    /** @var \Drupal\migrate\entity\Migration $node_type_migration */
-//    $node_type_migration = entity_load('migration', 'd6_node_type');
-//    $this->prepare($node_type_migration, $dumps);
-//    $executable = new MigrateExecutable($node_type_migration , $this);
-//    $executable->import();
-
     $id_mappings = array(
       'd6_node_type' => array(array(array('story'), array('story'))),
     );
