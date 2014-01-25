@@ -209,7 +209,7 @@ class FileStorage implements StorageInterface {
     }
     $extension = '.' . static::getFileExtension();
     // \GlobIterator on Windows requires an absolute path.
-    $files = new \GlobIterator(realpath($this->directory . '/' . $prefix . '*' . $extension));
+    $files = new \GlobIterator(realpath($this->directory) . '/' . $prefix . '*' . $extension);
 
     $names = array();
     foreach ($files as $file) {
