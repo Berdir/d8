@@ -1,7 +1,4 @@
 id: d6_custom_block
-sourceIds:
-  bid:
-     type: integer
 source:
   plugin: drupal6_box
   constants:

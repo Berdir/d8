@@ -37,4 +37,11 @@ class Box extends Drupal6SqlBase {
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getIds() {
+    $ids['bid']['type'] = 'integer';
+    return $ids;
+  }
 }
