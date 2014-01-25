@@ -1,9 +1,5 @@
 id: d6_aggregator_feed
 
-sourceIds:
-  fid:
-    type: integer
-
 source:
   plugin: drupal6_aggregator_feed
 
