@@ -710,7 +710,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
   public function testGetQualifiedMapTablePrefix() {
     $id_map = $this->getIdMap(array(), array('database' => 'source_database'), 'prefix');
     $qualified_map_table = $id_map->getQualifiedMapTableName();
-    $this->assertEquals('migrate_map_sql_idmap_test', $qualified_map_table);
+    $this->assertEquals('source_database.prefixmigrate_map_sql_idmap_test', $qualified_map_table);
   }
 
   /**
