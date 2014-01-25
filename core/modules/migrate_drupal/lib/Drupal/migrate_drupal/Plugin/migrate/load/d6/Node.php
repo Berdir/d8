@@ -15,7 +15,7 @@ use Drupal\migrate\Plugin\load\LoadBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * @PluginId("d6_node")
+ * @PluginID("d6_node")
  */
 class Node extends LoadBase implements ContainerFactoryPluginInterface {
 
