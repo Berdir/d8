@@ -389,9 +389,9 @@ class Drupal6FieldInstance {
         'max_filesize_per_node' => '',
         'max_resolution' => '0',
         'min_resolution' => '0',
-        'alt' => '',
+        'alt' => 'Test alt',
         'custom_alt' => 0,
-        'title' => '',
+        'title' => 'Test title',
         'custom_title' => 0,
         'title_type' => 'textfield',
         'default_image' => NULL,
@@ -670,6 +670,7 @@ class Drupal6FieldInstance {
       'multiple',
       'db_storage',
       'db_columns',
+      'active',
     ))
     ->values(array(
       'field_name' => 'field_test',
@@ -687,7 +688,9 @@ class Drupal6FieldInstance {
           'views' => TRUE,
         ),
       )),
-    ))->values(array(
+      'active' => 1,
+    ))
+    ->values(array(
       'field_name' => 'field_test_two',
       'module' => 'number',
       'type' => 'number_integer',
@@ -695,7 +698,9 @@ class Drupal6FieldInstance {
       'multiple' => 0,
       'db_storage' => 1,
       'db_columns' => 'a:0:{}',
-    ))->values(array(
+      'active' => 1,
+    ))
+    ->values(array(
       'field_name' => 'field_test_three',
       'module' => 'number',
       'type' => 'number_decimal',
@@ -703,7 +708,9 @@ class Drupal6FieldInstance {
       'multiple' => 0,
       'db_storage' => 1,
       'db_columns' => 'a:0:{}',
-    ))->values(array(
+      'active' => 1,
+    ))
+    ->values(array(
       'field_name' => 'field_test_email',
       'module' => 'email',
       'type' => 'email',
@@ -711,7 +718,9 @@ class Drupal6FieldInstance {
       'multiple' => 0,
       'db_storage' => 1,
       'db_columns' => 'a:0:{}',
-    ))->values(array(
+      'active' => 1,
+    ))
+    ->values(array(
       'field_name' => 'field_test_link',
       'module' => 'link',
       'type' => 'link',
@@ -719,7 +728,9 @@ class Drupal6FieldInstance {
       'multiple' => 0,
       'db_storage' => 1,
       'db_columns' => 'a:0:{}',
-    ))->values(array(
+      'active' => 1,
+    ))
+    ->values(array(
       'field_name' => 'field_test_filefield',
       'module' => 'filefield',
       'type' => 'filefield',
@@ -727,7 +738,9 @@ class Drupal6FieldInstance {
       'multiple' => 0,
       'db_storage' => 1,
       'db_columns' => 'a:0:{}',
-    ))->values(array(
+      'active' => 1,
+    ))
+    ->values(array(
       'field_name' => 'field_test_imagefield',
       'module' => 'filefield',
       'type' => 'filefield',
@@ -735,7 +748,9 @@ class Drupal6FieldInstance {
       'multiple' => 0,
       'db_storage' => 1,
       'db_columns' => 'a:0:{}',
-    ))->values(array(
+      'active' => 1,
+    ))
+    ->values(array(
       'field_name' => 'field_test_phone',
       'module' => 'phone',
       'type' => 'au_phone',
@@ -743,7 +758,9 @@ class Drupal6FieldInstance {
       'multiple' => 0,
       'db_storage' => 1,
       'db_columns' => 'a:0:{}',
-    ))->values(array(
+      'active' => 1,
+    ))
+    ->values(array(
       'field_name' => 'field_test_date',
       'module' => 'date',
       'type' => 'date',
@@ -751,7 +768,9 @@ class Drupal6FieldInstance {
       'multiple' => 0,
       'db_storage' => 1,
       'db_columns' => 'a:0:{}',
-    ))->values(array(
+      'active' => 1,
+    ))
+    ->values(array(
       'field_name' => 'field_test_datestamp',
       'module' => 'date',
       'type' => 'datestamp',
@@ -759,7 +778,9 @@ class Drupal6FieldInstance {
       'multiple' => 0,
       'db_storage' => 1,
       'db_columns' => 'a:0:{}',
-    ))->values(array(
+      'active' => 1,
+    ))
+    ->values(array(
       'field_name' => 'field_test_datetime',
       'module' => 'date',
       'type' => 'datetime',
@@ -767,7 +788,9 @@ class Drupal6FieldInstance {
       'multiple' => 0,
       'db_storage' => 1,
       'db_columns' => 'a:0:{}',
-    ))->execute();
+      'active' => 0,
+    ))
+    ->execute();
 
   }
 

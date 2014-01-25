@@ -20,9 +20,8 @@ class Field extends Drupal6SqlBase implements RequirementsInterface {
   /**
    * {@inheritdoc}
    */
-  function query() {
-    $query = $this->database
-      ->select('content_node_field', 'cnf')
+  public function query() {
+    $query = $this->select('content_node_field', 'cnf')
       ->fields('cnf', array(
         'field_name',
         'type',
@@ -34,8 +33,12 @@ class Field extends Drupal6SqlBase implements RequirementsInterface {
         'db_columns',
         'active',
         'locked',
+      ))
+      ->fields('cnfi', array(
+        'widget_type',
+        'widget_settings',
       ));
-
+    $query->join('content_node_field_instance', 'cnfi', 'cnfi.field_name = cnf.field_name');
     $query->orderBy('field_name');
 
     return $query;
@@ -59,11 +62,16 @@ class Field extends Drupal6SqlBase implements RequirementsInterface {
     );
   }
 
-  function prepareRow(Row $row, $keep = TRUE) {
-    //Unserialize data
+  /**
+   * {@inheritdoc}
+   */
+  public function prepareRow(Row $row, $keep = TRUE) {
+    // Unserialize data.
     $global_settings = unserialize($row->getSourceProperty('global_settings'));
+    $widget_settings = unserialize($row->getSourceProperty('widget_settings'));
     $db_columns = unserialize($row->getSourceProperty('db_columns'));
     $row->setSourceProperty('global_settings', $global_settings);
+    $row->setSourceProperty('widget_settings', $widget_settings);
     $row->setSourceProperty('db_columns', $db_columns);
     return parent::prepareRow($row);
   }

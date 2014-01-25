@@ -5,7 +5,7 @@
  * Contains \Drupal\migrate\Tests\source\d6\FieldSourceTest.
  */
 
-namespace Drupal\migrate_drupal\Tests\source\d6;
+namespace Drupal\migrate_drupal\Tests;
 
 use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
 
@@ -85,6 +85,10 @@ class FieldSourceTest extends MigrateSqlSourceTestCase {
     $this->databaseContents['content_node_field'] = $this->expectedResults;
     $this->databaseContents['content_node_field'][0]['global_settings'] = serialize($this->databaseContents['content_node_field'][0]['global_settings']);
     $this->databaseContents['content_node_field'][0]['db_columns'] = serialize($this->databaseContents['content_node_field'][0]['db_columns']);
+
+    $this->databaseContents['content_node_field_instance'][0]['widget_settings'] = serialize(array());
+    $this->databaseContents['content_node_field_instance'][0]['widget_type'] = 'text_textarea';
+    $this->databaseContents['content_node_field_instance'][0]['field_name'] = 'field_body';
     parent::setUp();
   }
 
@@ -100,6 +104,7 @@ class FieldSourceTest extends MigrateSqlSourceTestCase {
   }
 
 }
+
 namespace Drupal\migrate_drupal\Tests\source\d6;
 
 use Drupal\Core\Database\Connection;
