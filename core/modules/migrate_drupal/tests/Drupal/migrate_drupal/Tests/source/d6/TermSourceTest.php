@@ -102,13 +102,13 @@ class TermSourceTest extends MigrateSqlSourceTestCase {
    */
   public function setUp() {
     foreach ($this->expectedResults as $k => $row) {
-      foreach ($row['parents'] as $parent) {
+      foreach ($row['parent'] as $parent) {
         $this->databaseContents['term_hierarchy'][] = array(
           'tid' => $row['tid'],
           'parent' => $parent,
         );
       }
-      unset($row['parents']);
+      unset($row['parent']);
       $this->databaseContents['term_data'][$k] = $row;
     }
     parent::setUp();
