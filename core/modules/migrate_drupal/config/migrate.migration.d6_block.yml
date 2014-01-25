@@ -17,6 +17,7 @@ process:
   plugin:
     -
       plugin: static_map
+      bypass: true
       source:
         - module
         - delta

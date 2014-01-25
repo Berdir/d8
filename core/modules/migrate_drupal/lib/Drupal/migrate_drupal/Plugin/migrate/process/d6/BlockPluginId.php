@@ -38,6 +38,10 @@ class BlockPluginId extends ProcessPluginBase {
         case 'menu':
           $value = "system_menu_block:$delta";
           break;
+        case 'block':
+          // @TODO: this needs to be custom_block:$uuid_of_the_custom_block
+          $value = '';
+          break;
         default:
           // @TODO skip row.
           // throw new MigrateSkipRowException();

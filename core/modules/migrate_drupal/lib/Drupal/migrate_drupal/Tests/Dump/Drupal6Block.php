@@ -171,8 +171,8 @@ class Drupal6Block {
       'visibility' => '0',
       'pages' => '',
       'title' => '',
-      'cache' => '-1',
-    ))
+      'cache' => '-1'
+     ))
     ->values(array(
       'bid' => '2',
       'module' => 'user',
@@ -186,7 +186,7 @@ class Drupal6Block {
       'visibility' => '0',
       'pages' => '',
       'title' => '',
-      'cache' => '-1',
+      'cache' => '-1'
     ))
     ->values(array(
       'bid' => '3',
@@ -194,16 +194,137 @@ class Drupal6Block {
       'delta' => '0',
       'theme' => 'garland',
       'status' => '1',
-      'weight' => '10',
+      'weight' => '-5',
       'region' => 'footer',
       'custom' => '0',
       'throttle' => '0',
       'visibility' => '0',
       'pages' => '',
       'title' => '',
-      'cache' => '-1',
+      'cache' => '-1'
+    ))
+    ->values(array(
+      'bid' => '4',
+      'module' => 'comment',
+      'delta' => '0',
+      'theme' => 'garland',
+      'status' => '0',
+      'weight' => '-6',
+      'region' => '',
+      'custom' => '0',
+      'throttle' => '0',
+      'visibility' => '0',
+      'pages' => '',
+      'title' => '',
+      'cache' => '1'
+    ))
+    ->values(array(
+      'bid' => '5',
+      'module' => 'menu',
+      'delta' => 'primary-links',
+      'theme' => 'garland',
+      'status' => '1',
+      'weight' => '-5',
+      'region' => 'header',
+      'custom' => '0',
+      'throttle' => '0',
+      'visibility' => '0',
+      'pages' => '',
+      'title' => '',
+      'cache' => '-1'
+    ))
+    ->values(array(
+      'bid' => '6',
+      'module' => 'menu',
+      'delta' => 'secondary-links',
+      'theme' => 'garland',
+      'status' => '0',
+      'weight' => '-5',
+      'region' => '',
+      'custom' => '0',
+      'throttle' => '0',
+      'visibility' => '0',
+      'pages' => '',
+      'title' => '',
+      'cache' => '-1'
+    ))
+    ->values(array(
+      'bid' => '7',
+      'module' => 'node',
+      'delta' => '0',
+      'theme' => 'garland',
+      'status' => '0',
+      'weight' => '-4',
+      'region' => '',
+      'custom' => '0',
+      'throttle' => '0',
+      'visibility' => '0',
+      'pages' => '',
+      'title' => '',
+      'cache' => '-1'
+    ))
+    ->values(array(
+      'bid' => '8',
+      'module' => 'user',
+      'delta' => '2',
+      'theme' => 'garland',
+      'status' => '0',
+      'weight' => '-3',
+      'region' => '',
+      'custom' => '0',
+      'throttle' => '0',
+      'visibility' => '0',
+      'pages' => '',
+      'title' => '',
+      'cache' => '1'
+    ))
+    ->values(array(
+      'bid' => '9',
+      'module' => 'user',
+      'delta' => '3',
+      'theme' => 'garland',
+      'status' => '0',
+      'weight' => '-1',
+      'region' => '',
+      'custom' => '0',
+      'throttle' => '0',
+      'visibility' => '0',
+      'pages' => '',
+      'title' => '',
+      'cache' => '-1'
+    ))
+/*
+    ->values(array(
+      'bid' => '10',
+      'module' => 'block',
+      'delta' => '1',
+      'theme' => 'garland',
+      'status' => '1',
+      'weight' => '0',
+      'region' => 'content',
+      'custom' => '0',
+      'throttle' => '0',
+      'visibility' => '1',
+      'pages' => '<front>',
+      'title' => 'Static Block',
+      'cache' => '-1'
+    ))
+*/
+    ->values(array(
+      'bid' => '11',
+      'module' => 'menu',
+      'delta' => 'menu-test-menu',
+      'theme' => 'garland',
+      'status' => '0',
+      'weight' => '-2',
+      'region' => '',
+      'custom' => '0',
+      'throttle' => '0',
+      'visibility' => '0',
+      'pages' => '',
+      'title' => '',
+      'cache' => '-1'
     ))
     ->execute();
-
   }
 }
