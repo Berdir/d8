@@ -8,6 +8,7 @@
 namespace Drupal\migrate\Plugin\migrate\process;
 
 use Drupal\migrate\MigrateExecutable;
+use Drupal\migrate\ProcessPluginBase;
 use Drupal\migrate\Row;
 
 /**
@@ -22,7 +23,8 @@ use Drupal\migrate\Row;
  * @MigrateProcessPlugin(
  *   id = "callback"
  * )
- */class Callback extends ProcessPluginBase {
+ */
+class Callback extends ProcessPluginBase {
 
   /**
    * {@inheritdoc}
