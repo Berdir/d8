@@ -240,4 +240,14 @@ class Node extends Drupal6SqlBase implements RequirementsInterface {
   public function checkRequirements() {
     return $this->moduleExists('content') && $this->getModuleSchemaVersion('content') >= 6001;
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getIds() {
+    $ids['nid']['type'] = 'integer';
+    $ids['nid']['alias'] = 'n';
+    return $ids;
+  }
+
 }
