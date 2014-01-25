@@ -135,6 +135,7 @@ class MigrateDrupalRunForm extends FormBase {
    * @return array
    */
   public function __sleep() {
+    // This apparently contains a PDOStatement somewhere.
     unset($this->storageController);
     return array();
   }
