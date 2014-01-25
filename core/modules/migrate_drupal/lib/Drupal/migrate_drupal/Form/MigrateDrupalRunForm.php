@@ -21,20 +21,6 @@ class MigrateDrupalRunForm extends FormBase {
   protected $storageController;
 
   /**
-   * @param EntityStorageControllerInterface $storage_controller
-   */
-  public function __construct(EntityStorageControllerInterface $storage_controller) {
-    $this->storageController = $storage_controller;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static($container->get('entity.manager')->getStorageController('migration'));
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function getFormId() {
@@ -49,7 +35,7 @@ class MigrateDrupalRunForm extends FormBase {
     // set of migrations.
     if (isset($form_state['database'])) {
       Database::addConnectionInfo('migrate', 'default', $form_state['database']);
-      $migrations = $this->storageController->loadMultiple();
+      $migrations = $this->storageController()->loadMultiple();
       $form['migrations'] = array(
         '#type' => 'checkboxes',
         '#options' => MapArray::copyValuesToKeys(array_keys($migrations)),
@@ -133,4 +119,23 @@ class MigrateDrupalRunForm extends FormBase {
     batch_set($batch);
   }
 
+  /**
+   * @return EntityStorageControllerInterface
+   */
+  protected function storageController() {
+    if (!isset($this->storageController)) {
+      $this->storageController = \Drupal::entityManager()->getStorageController('migration');
+    }
+    return $this->storageController;
+  }
+
+  /**
+   * Returns the properties to be serialized
+   *
+   * @return array
+   */
+  public function __sleep() {
+    unset($this->storageController);
+    return array();
+  }
 }
