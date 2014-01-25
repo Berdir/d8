@@ -89,7 +89,7 @@ abstract class SqlBase extends SourcePluginBase {
     // Get the key values, for potential use in joining to the map table, or
     // enforcing idlist.
     $keys = array();
-    foreach ($this->migration->get('sourceIds') as $field_name => $field_schema) {
+    foreach ($this->migration->getSourceIds() as $field_name => $field_schema) {
       if (isset($field_schema['alias'])) {
         $field_name = $field_schema['alias'] . '.' . $field_name;
       }
@@ -120,7 +120,7 @@ abstract class SqlBase extends SourcePluginBase {
         $count = 1;
         $map_join = '';
         $delimiter = '';
-        foreach ($this->migration->get('sourceIds') as $field_name => $field_schema) {
+        foreach ($this->migration->getSourceIds() as $field_name => $field_schema) {
           if (isset($field_schema['alias'])) {
             $field_name = $field_schema['alias'] . '.' . $field_name;
           }
@@ -134,7 +134,7 @@ abstract class SqlBase extends SourcePluginBase {
         $condition_added = TRUE;
 
         // And as long as we have the map table, add its data to the row.
-        $n = count($this->migration->get('sourceIds'));
+        $n = count($this->migration->getSourceIds());
         for ($count = 1; $count <= $n; $count++) {
           $map_key = 'sourceid' . $count;
           $this->query->addField($alias, $map_key, "migrate_map_$map_key");

@@ -221,6 +221,16 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
   /**
    * {@inheritdoc}
    */
+  public function getSourceIds() {
+    if (!$this->sourceIds && ($plugin = $this->getSourcePlugin()) && method_exists($plugin, 'getIds')) {
+      $this->sourceIds = $plugin->getIds();
+    }
+    return $this->sourceIds;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getSourcePlugin() {
     if (!isset($this->sourcePlugin)) {
       $this->sourcePlugin = \Drupal::service('plugin.manager.migrate.source')->createInstance($this->source['plugin'], $this->source, $this);
