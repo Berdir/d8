@@ -1,7 +1,4 @@
 id: d6_aggregator_item
-sourceIds:
-  iid:
-    type: integer
 source:
   plugin: drupal6_aggregator_item
 process:

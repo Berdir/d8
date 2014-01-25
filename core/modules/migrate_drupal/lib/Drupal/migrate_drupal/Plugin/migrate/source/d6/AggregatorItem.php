@@ -51,4 +51,12 @@ class AggregatorItem extends Drupal6SqlBase implements RequirementsInterface {
     return $this->moduleExists('aggregator');
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getIds() {
+    $ids['iid']['type'] = 'integer';
+    return $ids;
+  }
+
 }
