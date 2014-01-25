@@ -1,9 +1,4 @@
 id: d6_block
-sourceIds:
-  module:
-    type: string
-  delta:
-    type: string
 source:
   plugin: drupal6_block
 process:

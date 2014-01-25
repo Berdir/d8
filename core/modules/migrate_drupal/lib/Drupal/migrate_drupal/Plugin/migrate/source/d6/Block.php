@@ -97,4 +97,12 @@ class Block extends Drupal6SqlBase {
     $row->setSourceProperty('settings', $settings);
     return parent::prepareRow($row);
   }
+  /**
+   * {@inheritdoc}
+   */
+  public function getIds() {
+    $ids['module']['type'] = 'string';
+    $ids['delta']['type'] = 'string';
+    return $ids;
+  }
 }
