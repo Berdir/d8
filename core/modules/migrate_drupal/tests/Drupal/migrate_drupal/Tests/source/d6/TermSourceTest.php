@@ -23,7 +23,7 @@ class TermSourceTest extends MigrateSqlSourceTestCase {
     'highwaterProperty' => array('field' => 'test'),
     'idlist' => array(),
     'source' => array(
-      'plugin' => 'drupal6_term',
+      'plugin' => 'drupal6_taxonomy_term',
     ),
     'sourceIds' => array(
       'tid' => array(
@@ -42,7 +42,7 @@ class TermSourceTest extends MigrateSqlSourceTestCase {
       'name' => 'name value 1',
       'description' => 'description value 1',
       'weight' => 0,
-      'parents' => array(0),
+      'parent' => array(0),
     ),
     array(
       'tid' => 2,
@@ -50,7 +50,7 @@ class TermSourceTest extends MigrateSqlSourceTestCase {
       'name' => 'name value 2',
       'description' => 'description value 2',
       'weight' => 0,
-      'parents' => array(0),
+      'parent' => array(0),
     ),
     array(
       'tid' => 3,
@@ -58,7 +58,7 @@ class TermSourceTest extends MigrateSqlSourceTestCase {
       'name' => 'name value 3',
       'description' => 'description value 3',
       'weight' => 0,
-      'parents' => array(0),
+      'parent' => array(0),
     ),
     array(
       'tid' => 4,
@@ -66,7 +66,7 @@ class TermSourceTest extends MigrateSqlSourceTestCase {
       'name' => 'name value 4',
       'description' => 'description value 4',
       'weight' => 1,
-      'parents' => array(1),
+      'parent' => array(1),
     ),
     array(
       'tid' => 5,
@@ -74,7 +74,7 @@ class TermSourceTest extends MigrateSqlSourceTestCase {
       'name' => 'name value 5',
       'description' => 'description value 5',
       'weight' => 1,
-      'parents' => array(2),
+      'parent' => array(2),
     ),
     array(
       'tid' => 6,
@@ -82,7 +82,7 @@ class TermSourceTest extends MigrateSqlSourceTestCase {
       'name' => 'name value 6',
       'description' => 'description value 6',
       'weight' => 0,
-      'parents' => array(3, 2),
+      'parent' => array(3, 2),
     ),
   );
 

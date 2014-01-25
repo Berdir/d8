@@ -16,7 +16,7 @@ use Drupal\migrate\Row;
  *
  * @todo Support term_relation, term_synonym table if possible.
  *
- * @PluginId("drupal6_term")
+ * @PluginId("drupal6_taxonomy_term")
  */
 class Term extends Drupal6SqlBase implements RequirementsInterface {
 
@@ -26,8 +26,7 @@ class Term extends Drupal6SqlBase implements RequirementsInterface {
   public function query() {
     // Note the explode - this supports the (admittedly unusual) case of
     // consolidating multiple vocabularies into one.
-    $query = $this->database
-      ->select('term_data', 'td')
+    $query = $this->select('term_data', 'td')
       ->fields('td', array('tid', 'vid', 'name', 'description', 'weight'))
       // @todo: working, but not is there support for distinct() in FakeSelect?
       ->distinct();
@@ -47,7 +46,7 @@ class Term extends Drupal6SqlBase implements RequirementsInterface {
       'name' => t('The name of the term.'),
       'description' => t('The term description.'),
       'weight' => t('Weight'),
-      'parents' => t("The Drupal term IDs of the term's parents."),
+      'parent' => t("The Drupal term IDs of the term's parents."),
     );
   }
 
@@ -56,13 +55,12 @@ class Term extends Drupal6SqlBase implements RequirementsInterface {
    */
   function prepareRow(Row $row) {
     // Find parents for this row.
-    $parents = $this->database
-      ->select('term_hierarchy', 'th')
+    $parents = $this->select('term_hierarchy', 'th')
       ->fields('th', array('parent', 'tid'))
       ->condition('tid', $row->getSourceProperty('tid'))
       ->execute()
       ->fetchCol();
-    $row->setSourceProperty('parents', $parents);
+    $row->setSourceProperty('parent', $parents);
     return parent::prepareRow($row);
   }
 

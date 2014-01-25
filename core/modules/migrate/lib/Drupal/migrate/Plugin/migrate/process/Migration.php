@@ -68,6 +68,9 @@ class Migration extends ProcessPluginBase implements  ContainerFactoryPluginInte
     if (!is_array($migration_ids)) {
       $migration_ids = array($migration_ids);
     }
+    if (!is_array($value)) {
+      $value = array($value);
+    }
     $self = FALSE;
     /** @var \Drupal\migrate\Entity\MigrationInterface[] $migrations */
     $migrations = $this->migrationStorageController->loadMultiple($migration_ids);

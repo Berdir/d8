@@ -1,0 +1,34 @@
+id: d6_taxonomy_term
+sourceIds:
+  tid:
+    type: string
+source:
+  plugin: drupal6_taxonomy_term
+process:
+  tid: tid
+  vid:
+    -
+      plugin: migration
+      migration: d6_taxonomy_vocabulary
+      source:
+        - vid
+    -
+      plugin: extract
+      index:
+        - 0
+  name: name
+  description: description
+  weight: weight
+  parent:
+    -
+      plugin: migration
+      migration: d6_taxonomy_term
+      source: parent
+    -
+      plugin: extract
+      index:
+        - 0
+  changed: timestamp
+destination:
+  plugin: entity
+  entity_type: taxonomy_term
