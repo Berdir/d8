@@ -111,10 +111,10 @@ class Vocabulary extends ConfigEntityBase implements VocabularyInterface {
       // fields.
       $field_ids = array();
       $field_map = Field::fieldInfo()->getFieldMap();
-      foreach ($field_map as $module => $fields) {
+      foreach ($field_map as $entity_type => $fields) {
         foreach ($fields as $field => $info) {
           if ($info['type'] == 'taxonomy_term_reference') {
-            $field_ids[] = $module . '.' . $field;
+            $field_ids[] = $entity_type . '.' . $field;
           }
         }
       }
