@@ -1,7 +1,4 @@
 id: d6_url_alias
-sourceIds:
-  pid:
-    type: integer
 source:
   plugin: drupal6_url_alias
 

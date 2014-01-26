@@ -37,4 +37,11 @@ class UrlAlias extends Drupal6SqlBase {
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getIds() {
+    $ids['pid']['type'] = 'integer';
+    return $ids;
+  }
 }
