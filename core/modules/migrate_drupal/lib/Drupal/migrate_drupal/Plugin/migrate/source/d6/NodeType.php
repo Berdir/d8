@@ -113,4 +113,11 @@ class NodeType extends Drupal6SqlBase {
     return parent::prepareRow($row);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getIds() {
+    $ids['type']['type'] = 'string';
+    return $ids;
+  }
 }

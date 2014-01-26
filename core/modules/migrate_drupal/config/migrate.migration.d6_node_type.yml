@@ -1,9 +1,4 @@
 id: d6_node_type
-sourceIds:
-  type:
-    type: string
-    length: 32
-    "not null": true
 source:
   plugin: drupal6_node_type
   constants:
