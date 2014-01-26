@@ -40,6 +40,17 @@ class MigrateNodeTest extends MigrateDrupalTestBase {
       'field_name' => 'field_test',
       'bundle' => 'story',
     ))->save();
+    entity_create('field_entity', array(
+      'entity_type' => 'node',
+      'name' => 'field_test_two',
+      'type' => 'integer',
+      'cardinality' => -1,
+    ))->save();
+    entity_create('field_instance', array(
+      'entity_type' => 'node',
+      'field_name' => 'field_test_two',
+      'bundle' => 'story',
+    ))->save();
 
 
     $dumps = array(
@@ -61,11 +72,11 @@ class MigrateNodeTest extends MigrateDrupalTestBase {
     $this->assertEqual($node->getCreatedTime(), 1388271197, 'Node has the correct created time.');
     $this->assertEqual($node->isSticky(), FALSE, 'Node has the correct sticky setting.');
     $this->assertEqual($node->getAuthorId(), 1, 'Node has the correct author id.');
-    $this->assertEqual($node->field_test->value, 'This is a text field');
+    $this->assertEqual($node->field_test->value, 'This is a text field', "Single field storage field is correct.");
 
-//
-//    $this->verbose(print_r($node, 1));
-//    $this->assertEqual($node->field_test->value, 'This is a text field', "Single field storage field is correct.");
+    $this->assertEqual($node->field_test_two->value, 10, 'Multi field storage field is correct');
+    $this->assertEqual($node->field_test_two[1]->value, 20, 'Multi field second value is correct.');
+
 //    //$this->assertEqual($node->getRevisionCreationTime(), 1390095701, 'Node has the correct revision timestamp.');
 
   }

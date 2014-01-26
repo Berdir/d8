@@ -125,7 +125,7 @@ class Node extends Drupal6SqlBase implements RequirementsInterface {
           ->fetchAllKeyed();
 
         // Set it on the row.
-        $row->setSourceProperty($field_index, $data);
+        $row->setSourceProperty($field_name, $data);
       }
     }
   }

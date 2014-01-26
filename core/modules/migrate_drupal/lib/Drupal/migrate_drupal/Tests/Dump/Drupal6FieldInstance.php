@@ -695,9 +695,9 @@ class Drupal6FieldInstance {
       'module' => 'number',
       'type' => 'number_integer',
       'global_settings' => 'a:6:{s:6:"prefix";s:4:"pref";s:6:"suffix";s:3:"suf";s:3:"min";i:10;s:3:"max";i:100;s:14:"allowed_values";s:0:"";s:18:"allowed_values_php";s:0:"";}',
-      'multiple' => 0,
-      'db_storage' => 1,
-      'db_columns' => 'a:0:{}',
+      'multiple' => 1,
+      'db_storage' => 0,
+      'db_columns' => 'a:2:{s:5:"value";a:5:{s:4:"type";s:4:"text";s:4:"size";s:3:"big";s:8:"not null";b:0;s:8:"sortable";b:1;s:5:"views";b:1;}s:6:"format";a:4:{s:4:"type";s:3:"int";s:8:"unsigned";b:1;s:8:"not null";b:0;s:5:"views";b:0;}}',
       'active' => 1,
     ))
     ->values(array(
@@ -792,6 +792,66 @@ class Drupal6FieldInstance {
     ))
     ->execute();
 
+    $database->schema()->createTable('content_field_test_two', array(
+      'description' => 'Table for field_test_two',
+      'fields' => array(
+        'vid' => array(
+          'description' => 'The primary identifier for this version.',
+          'type' => 'serial',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ),
+        'nid' => array(
+          'description' => 'The {node} this version belongs to.',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'default' => 0,
+        ),
+        'field_test_two_value' => array(
+          'description' => 'Test field column.',
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'default' => '',
+        ),
+        'delta' => array(
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'default' => 0,
+        ),
+        'field_test_two_format' => array(
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'default' => 0,
+        ),
+      ),
+      'primary key' => array('vid', 'delta'),
+    ));
+    $database->insert('content_field_test_two')->fields(array(
+      'vid',
+      'nid',
+      'field_test_two_value',
+      'delta',
+      'field_test_two_format',
+    ))
+    ->values(array(
+      'vid' => 1,
+      'nid' => 1,
+      'field_test_two_value' => 10,
+      'delta' => 0,
+      'field_test_two_format' => 1,
+    ))
+    ->values(array(
+      'vid' => 1,
+      'nid' => 1,
+      'field_test_two_value' => 20,
+      'delta' => 1,
+      'field_test_two_format' => 1,
+    ))
+    ->execute();
   }
 
 }
