@@ -1,9 +1,5 @@
 id: d6_contact_category
 
-sourceIds:
-  cid:
-    type: integer
-
 source:
   plugin: drupal6_contact_category
 

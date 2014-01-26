@@ -56,4 +56,11 @@ class ContactCategory extends Drupal6SqlBase implements RequirementsInterface {
     return $this->moduleExists('contact');
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getIds() {
+    $ids['cid']['type'] = 'integer';
+    return $ids;
+  }
 }
