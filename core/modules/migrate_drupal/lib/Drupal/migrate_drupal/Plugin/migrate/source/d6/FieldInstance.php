@@ -88,4 +88,20 @@ class FieldInstance extends Drupal6SqlBase implements RequirementsInterface {
     return $this->moduleExists('content') && $this->getModuleSchemaVersion('content') >= 6001;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getIds() {
+    $ids = array(
+      'field_name' => array(
+        'type' => 'string',
+        'alias' => 'cnfi',
+      ),
+      'type_name' => array(
+        'type' => 'string',
+      )
+    );
+    return $ids;
+  }
+
 }
