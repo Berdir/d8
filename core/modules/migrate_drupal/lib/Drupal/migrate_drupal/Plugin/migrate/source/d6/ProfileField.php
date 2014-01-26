@@ -69,4 +69,11 @@ class ProfileField extends Drupal6SqlBase implements RequirementsInterface {
     return $this->moduleExists('profile');
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getIds() {
+    $ids['fid']['type'] = 'integer';
+    return $ids;
+  }
 }
