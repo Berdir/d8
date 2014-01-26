@@ -44,5 +44,12 @@ class Menu extends Drupal6SqlBase implements RequirementsInterface {
     return $this->moduleExists('menu');
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getIds() {
+    $ids['menu_name']['type'] = 'string';
+    return $ids;
+  }
 }
 
