@@ -39,5 +39,11 @@ class UserPicture extends Drupal6SqlBase {
       'picture' => "Path to the user's uploaded picture.",
     );
   }
-
+  /**
+   * {@inheritdoc}
+   */
+  public function getIds() {
+    $ids['fid']['type'] = 'integer';
+    return $ids;
+  }
 }
