@@ -80,4 +80,13 @@ class User extends Drupal6SqlBase {
     return parent::prepareRow($row);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getIds() {
+      $ids['uid']['type'] = 'integer';
+      return $ids;
+  }
 }
+
+
