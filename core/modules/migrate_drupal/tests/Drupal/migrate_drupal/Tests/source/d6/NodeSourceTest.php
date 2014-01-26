@@ -63,7 +63,7 @@ class NodeSourceTest extends MigrateSqlSourceTestCase {
       'teaser' => 'body for node 1',
       'format' => 1,
       'field_test_one_value' => 'text for node 1',
-      'field_test_two_value' => array(
+      'field_test_two' => array(
         'test field node 1, value 1',
         'test field node 1, value 2',
       ),
@@ -95,7 +95,7 @@ class NodeSourceTest extends MigrateSqlSourceTestCase {
       'teaser' => 'body for node 3',
       'format' => 1,
       'field_test_one_value' => 'text for node 2',
-      'field_test_two_value' => array(
+      'field_test_two' => array(
         'test field node 2',
       ),
 
