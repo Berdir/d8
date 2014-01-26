@@ -1,7 +1,4 @@
 id: d6_filter_format
-sourceIds:
-  format:
-    type: integer
 source:
   plugin: drupal6_filter_format
 process:

@@ -87,4 +87,13 @@ class FilterFormat extends Drupal6SqlBase {
     return parent::prepareRow($row);
   }
 
+  /**
+    * {@inheritdoc}
+    */
+  public function getIds() {
+    $ids['format']['type'] = 'integer';
+    return $ids;
+  }
 }
+
+
