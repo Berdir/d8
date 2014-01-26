@@ -59,4 +59,11 @@ class ViewMode extends ViewModeBase {
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getIds() {
+    $ids['view_mode']['type'] = 'string';
+    return $ids;
+  }
 }
