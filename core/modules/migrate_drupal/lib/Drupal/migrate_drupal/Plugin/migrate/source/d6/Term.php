@@ -71,4 +71,12 @@ class Term extends Drupal6SqlBase implements RequirementsInterface {
     return $this->moduleExists('taxonomy');
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getIds() {
+    $ids['vid']['type'] = 'string';
+    return $ids;
+  }
+
 }
