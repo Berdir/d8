@@ -29,9 +29,17 @@ class MigrateBlockTest extends MigrateDrupalTestBase {
   }
 
   public function testBlockMigration() {
-    entity_create('menu', array('id' => 'primary-links'))->save();
-    entity_create('menu', array('id' => 'secondary-links'))->save();
-    entity_create('menu', array('id' => 'menu-test-menu'))->save();
+    $entities = array(
+      entity_create('menu', array('id' => 'primary-links')),
+      entity_create('menu', array('id' => 'secondary-links')),
+      entity_create('menu', array('id' => 'menu-test-menu')),
+      entity_create('custom_block', array('id' => 1, 'type' => 'basic')),
+    );
+    foreach ($entities as $entity) {
+      $entity->enforceIsNew(TRUE);
+      $entity->save();
+    }
+    $this->prepareIdMappings(array('d6_custom_block'  => array(array(array(1), array(1)))));
     /** @var \Drupal\migrate\entity\Migration $migration */
     $migration = entity_load('migration', 'd6_block');
     $dumps = array(

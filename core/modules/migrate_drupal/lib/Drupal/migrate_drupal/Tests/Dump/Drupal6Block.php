@@ -293,7 +293,6 @@ class Drupal6Block {
       'title' => '',
       'cache' => '-1'
     ))
-/*
     ->values(array(
       'bid' => '10',
       'module' => 'block',
@@ -309,7 +308,6 @@ class Drupal6Block {
       'title' => 'Static Block',
       'cache' => '-1'
     ))
-*/
     ->values(array(
       'bid' => '11',
       'module' => 'menu',

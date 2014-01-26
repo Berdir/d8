@@ -32,7 +32,7 @@ class Migration extends ProcessPluginBase implements  ContainerFactoryPluginInte
   protected $processPluginManager;
 
   /**
-   * @var \Drupal\migrate\Entity\MigrationInterface
+   * @var \Drupal\Core\Entity\EntityStorageControllerInterface
    */
   protected $migrationStorageController;
 
@@ -43,7 +43,7 @@ class Migration extends ProcessPluginBase implements  ContainerFactoryPluginInte
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->migrationStorageController = $storage_controller;
     $this->migration = $migration;
-    $this->processPluginmanager = $process_plugin_manager;
+    $this->processPluginManager = $process_plugin_manager;
   }
 
   /**

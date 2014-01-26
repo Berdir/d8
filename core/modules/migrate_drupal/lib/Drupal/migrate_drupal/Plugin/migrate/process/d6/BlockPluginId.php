@@ -7,16 +7,55 @@
 
 namespace Drupal\migrate_drupal\Plugin\migrate\Process\d6;
 
+use Drupal\Core\Entity\EntityStorageControllerInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\MigrateExecutable;
+use Drupal\migrate\Plugin\MigratePluginManager;
 use Drupal\migrate\ProcessPluginBase;
 use Drupal\migrate\Row;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * @MigrateProcessPlugin(
  *   id = "drupal6_block_plugin_id"
  * )
  */
-class BlockPluginId extends ProcessPluginBase {
+class BlockPluginId extends ProcessPluginBase implements ContainerFactoryPluginInterface {
+
+  /**
+   * @var \Drupal\migrate\Plugin\MigratePluginManager
+   */
+  protected $processPluginManager;
+
+  /**
+   * @var \Drupal\Core\Entity\EntityStorageControllerInterface
+   */
+  protected $customBlockStorageController;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration, EntityStorageControllerInterface $storage_controller, MigratePluginManager $process_plugin_manager) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+    $this->customBlockStorageController = $storage_controller;
+    $this->migration = $migration;
+    $this->processPluginManager = $process_plugin_manager;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration = NULL) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $migration,
+      $container->get('entity.manager')->getStorageController('custom_block'),
+      $container->get('plugin.manager.migrate.process')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -39,8 +78,10 @@ class BlockPluginId extends ProcessPluginBase {
           $value = "system_menu_block:$delta";
           break;
         case 'block':
-          // @TODO: this needs to be custom_block:$uuid_of_the_custom_block
-          $value = '';
+          $block_ids = $this->processPluginManager
+            ->createInstance('migration', array('migration' => 'd6_custom_block'), $this->migration)
+            ->transform($delta, $migrate_executable, $row, $destination_property);
+          $value = 'custom_block:' . $this->customBlockStorageController->load($block_ids[0])->uuid();
           break;
         default:
           // @TODO skip row.
