@@ -112,7 +112,8 @@ class Entity extends DestinationBase implements ContainerFactoryPluginInterface 
         $row->setDestinationProperty($id_key, $this->generateId($row, $id_keys));
       }
     }
-    if ($entity = $this->storageController->load($row->getDestinationProperty($id_key))) {
+    $destination = $row->getDestinationProperty($id_key);
+    if (!empty($destination) && $entity = $this->storageController->load($destination)) {
       $this->update($entity, $row);
     }
     else {
