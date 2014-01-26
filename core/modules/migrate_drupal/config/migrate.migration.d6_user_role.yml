@@ -1,7 +1,4 @@
 id: d6_user_role
-sourceIds:
-  rid:
-    type: integer
 source:
   plugin: drupal6_user_role
 process:

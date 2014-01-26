@@ -79,4 +79,11 @@ class Role extends Drupal6SqlBase {
     return parent::prepareRow($row);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getIds() {
+    $ids['rid']['type'] = 'integer';
+    return $ids;
+  }
 }
