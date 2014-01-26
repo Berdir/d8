@@ -42,5 +42,11 @@ class File extends Drupal6SqlBase {
       'timestamp' => t('The time that the file was added.'),
     );
   }
-
+  /**
+   * {@inheritdoc}
+   */
+  public function getIds() {
+    $ids['fid']['type'] = 'integer';
+    return $ids;
+  }
 }
