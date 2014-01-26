@@ -34,5 +34,11 @@ class VariableMultiRow extends Drupal6SqlBase {
     return parent::prepareRow($row);
   }
 
-
+  /**
+   * {@inheritdoc}
+   */
+  public function getIds() {
+    $ids['fid']['type'] = 'integer';
+    return $ids;
+  }
 }
