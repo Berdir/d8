@@ -2,26 +2,27 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Tests\D6VariableMultirowTest.
+ * Contains \Drupal\migrate\Tests\source\d6\VariableMultiRowSourceTest.
  */
 
-namespace Drupal\migrate_drupal\Tests;
+namespace Drupal\migrate_drupal\Tests\source\d6;
 
 use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
 
 /**
- * Unit test the multirow variable class.
+ * Tests variable multirow migration from D6 to D8.
  *
- * @group migrate
- * @group Drupal
+ * @group migrate_drupal
  */
-class D6VariableMultiRowTest extends MigrateSqlSourceTestCase {
+class VariableMultiRowSourceTest extends MigrateSqlSourceTestCase {
 
+  // The plugin system is not working during unit testing so the source plugin
+  // class needs to be manually specified.
   const PLUGIN_CLASS = 'Drupal\migrate_drupal\Plugin\migrate\source\d6\VariableMultiRow';
 
+  // The fake Migration configuration entity.
   protected $migrationConfiguration = array(
     'id' => 'test',
-    'highwaterProperty' => array('field' => 'test'),
     'idlist' => array(),
     'source' => array(
       'plugin' => 'drupal6_variable_multirow',
@@ -60,7 +61,6 @@ class D6VariableMultiRowTest extends MigrateSqlSourceTestCase {
       'group' => 'Migrate Drupal',
     );
   }
-
 }
 
 namespace Drupal\migrate_drupal\Tests\source\d6;
