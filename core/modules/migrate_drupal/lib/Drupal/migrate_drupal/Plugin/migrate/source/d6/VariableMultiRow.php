@@ -41,4 +41,5 @@ class VariableMultiRow extends Drupal6SqlBase {
     $ids['fid']['type'] = 'integer';
     return $ids;
   }
+
 }

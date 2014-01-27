@@ -120,4 +120,5 @@ class NodeType extends Drupal6SqlBase {
     $ids['type']['type'] = 'string';
     return $ids;
   }
+
 }

@@ -1,7 +1,4 @@
 id: d6_node_type_entity_display
-sourceIds:
-  type:
-    type: string
 source:
   plugin: drupal6_node_type
   constants:

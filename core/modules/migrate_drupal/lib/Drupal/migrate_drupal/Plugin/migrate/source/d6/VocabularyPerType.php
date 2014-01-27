@@ -30,4 +30,13 @@ class VocabularyPerType extends Vocabulary implements RequirementsInterface {
     return $query;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getIds() {
+    $ids['vid']['type'] = 'integer';
+    $ids['type']['type'] = 'string';
+    return $ids;
+  }
+
 }

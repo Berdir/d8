@@ -1,7 +1,4 @@
 id: d6_date_formats
-sourceIds:
-  name:
-    type: string
 source:
   plugin: drupal6_variable_multirow
   variables:

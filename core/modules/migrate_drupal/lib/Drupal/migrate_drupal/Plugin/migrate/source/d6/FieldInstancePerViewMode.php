@@ -90,4 +90,14 @@ class FieldInstancePerViewMode extends ViewModeBase {
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getIds() {
+    $ids['type_name']['type'] = 'string';
+    $ids['view_mode']['type'] = 'string';
+    $ids['entity_type']['type'] = 'string';
+    $ids['field_name']['type'] = 'string';
+    return $ids;
+  }
 }

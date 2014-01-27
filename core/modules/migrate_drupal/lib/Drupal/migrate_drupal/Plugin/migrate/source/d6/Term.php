@@ -75,7 +75,7 @@ class Term extends Drupal6SqlBase implements RequirementsInterface {
    * {@inheritdoc}
    */
   public function getIds() {
-    $ids['vid']['type'] = 'string';
+    $ids['tid']['type'] = 'integer';
     return $ids;
   }
 
