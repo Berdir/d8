@@ -10,7 +10,6 @@ namespace Drupal\migrate\Tests;
 use Drupal\Core\Database\Database;
 use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\MigrateMessageInterface;
-use Drupal\migrate\Plugin\migrate\source\SqlBase;
 use Drupal\simpletest\WebTestBase;
 
 class MigrateTestBase extends WebTestBase implements MigrateMessageInterface {
@@ -29,7 +28,9 @@ class MigrateTestBase extends WebTestBase implements MigrateMessageInterface {
     $connection_info = Database::getConnectionInfo('default');
     foreach ($connection_info as $target => $value) {
       $connection_info[$target]['prefix'] = array(
-        'default' => preg_replace('/simpletest(\d+)$/', 'simpletest_m\1', $value['prefix']['default']),
+        // Simpletest uses 7 character prefixes at most so this can't cause
+        // collisions.
+        'default' => str_pad($value['prefix']['default'], 8, '0'),
       );
     }
     Database::addConnectionInfo('migrate', 'default', $connection_info['default']);
