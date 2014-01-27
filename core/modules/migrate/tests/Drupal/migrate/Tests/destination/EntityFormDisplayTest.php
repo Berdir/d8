@@ -45,7 +45,9 @@ class EntityFormDisplayTest extends MigrateTestCase {
     foreach ($values as $key => $value) {
       $row->setDestinationProperty($key, $value);
     }
-    $entity = $this->getMock('Drupal\Core\Entity\Display\EntityFormDisplayInterface');
+    $entity = $this->getMockBuilder('Drupal\entity\Entity\EntityFormDisplay')
+      ->disableOriginalConstructor()
+      ->getMock();
     $entity->expects($this->once())
       ->method('setComponent')
       ->with('field_name_test', array('test setting'))
