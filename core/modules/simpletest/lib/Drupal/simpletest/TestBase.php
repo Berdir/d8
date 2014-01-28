@@ -838,7 +838,7 @@ abstract class TestBase {
    * @see WebTestBase::setUp()
    */
   protected function prepareDatabasePrefix() {
-    $this->databasePrefix = 'simpletest' . mt_rand(1000, 1000000);
+    $this->databasePrefix = 'simpletest' . mt_rand(1000, 999999);
 
     // As soon as the database prefix is set, the test might start to execute.
     // All assertions as well as the SimpleTest batch operations are associated
