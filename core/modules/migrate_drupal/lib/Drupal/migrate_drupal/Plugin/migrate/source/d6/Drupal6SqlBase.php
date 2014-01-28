@@ -28,12 +28,16 @@ abstract class Drupal6SqlBase extends SqlBase {
     if (isset($system_data)) {
       return $system_data;
     }
-    $results = $this->database
-      ->select('system', 's')
-      ->fields('s')
-      ->execute();
-    foreach ($results as $result) {
-      $system_data[$result['type']][$result['name']] = $result;
+    try {
+      $results = $this->select('system', 's')
+        ->fields('s')
+        ->execute();
+      foreach ($results as $result) {
+        $system_data[$result['type']][$result['name']] = $result;
+      }
+    }
+    catch (\Exception $e) {
+      // The table might not exist for example in tests.
     }
     return $system_data;
   }
@@ -63,6 +67,8 @@ abstract class Drupal6SqlBase extends SqlBase {
    *   TRUE if module is enabled on the origin system, FALSE if not.
    */
   protected function moduleExists($module) {
+
+    $system_data = $this->getSystemData();
     return isset($system_data['module'][$module]['status']) ? (bool) $system_data['module'][$module]['status'] : FALSE;
   }
 
@@ -77,8 +83,10 @@ abstract class Drupal6SqlBase extends SqlBase {
    */
   protected function variableGet($name, $default) {
     try {
-      $result = $this->getDatabase()
-        ->query('SELECT value FROM {variable} WHERE name = :name', array(':name' => $name))
+      $result = $this->select('variable', 'v')
+        ->fields('v', array('value'))
+        ->condition('name', $name)
+        ->execute()
         ->fetchField();
     }
     // The table might not exist.
