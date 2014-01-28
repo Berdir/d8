@@ -107,7 +107,6 @@ function update_prepare_d8_bootstrap() {
 
   // Enable UpdateServiceProvider service overrides.
   // @see update_flush_all_caches()
-  // @todo global $config, https://drupal.org/node/1881582
   $GLOBALS['conf']['container_service_providers']['UpdateServiceProvider'] = 'Drupal\Core\DependencyInjection\UpdateServiceProvider';
   $GLOBALS['conf']['update_service_provider_overrides'] = TRUE;
 
@@ -1330,7 +1329,7 @@ function update_retrieve_dependencies() {
 /**
  * Gets the value of a variable from the database during 7.x-8.x upgrades.
  *
- * Use this during the 7.x-8.x upgrade path.
+ * Use this during the 7.x-8.x upgrade path instead of variable_get().
  *
  * @param string $name
  *   The name of the variable.
@@ -1355,7 +1354,7 @@ function update_variable_get($name, $default = NULL) {
 /**
  * Sets a persistent variable during the 7.x-8.x upgrade path.
  *
- * Use this during the 7.x-8.x upgrade path.
+ * Use this during the 7.x-8.x upgrade path instead of variable_set().
  *
  * @param string $name
  *   The name of the variable to set.
@@ -1381,7 +1380,7 @@ function update_variable_set($name, $value) {
 /**
  * Delete a variable from the database during the 7.x-8.x upgrade path.
  *
- * Use this during the 7.x-8.x upgrade path.
+ * Use this during the 7.x-8.x upgrade path instead of variable_del().
  *
  * @param string $name
  *   The name of the variable to delete.
@@ -1446,8 +1445,8 @@ function update_variables_to_config($config_name, array $variable_map) {
   foreach ($variable_map as $variable_name => $config_key) {
     // This function migrates variables regardless of their value, including
     // NULL values. Any possibly required customizations need to be performed
-    // manually, either via update_variable_set() before calling this function
-    // or via \Drupal::config() after calling this function.
+    // manually, either via variable_set() before calling this function or via
+    // \Drupal::config() after calling this function.
     if (isset($variables[$variable_name])) {
       $value = unserialize($variables[$variable_name]);
       $config->set($config_key, $value);

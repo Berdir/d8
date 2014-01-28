@@ -38,7 +38,6 @@ class ConfigOverrideTest extends DrupalUnitTestBase {
    * Tests configuration override.
    */
   function testConfOverride() {
-    // @todo global $config, https://drupal.org/node/1881582
     global $conf;
     $expected_original_data = array(
       'foo' => 'bar',

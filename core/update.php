@@ -86,7 +86,6 @@ function update_helpful_links() {
  * while updates are running.
  */
 function update_flush_all_caches() {
-  // @todo global $config, https://drupal.org/node/1881582
   $GLOBALS['conf']['update_service_provider_overrides'] = FALSE;
   \Drupal::service('kernel')->updateModules(\Drupal::moduleHandler()->getModuleList());
 
