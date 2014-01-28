@@ -85,6 +85,22 @@ abstract class TestBase {
   protected $skipClasses = array(__CLASS__ => TRUE);
 
   /**
+   * Flag to indicate whether the test has been set up.
+   *
+   * The setUp() method isolates the test from the parent Drupal site by
+   * creating a random prefix for the database and setting up a clean file
+   * storage directory. The tearDown() method then cleans up this test
+   * environment. We must ensure that setUp() has been run. Otherwise,
+   * tearDown() will act on the parent Drupal site rather than the test
+   * environment, destroying live data.
+   */
+  protected $setup = FALSE;
+
+  protected $setupDatabasePrefix = FALSE;
+
+  protected $setupEnvironment = FALSE;
+
+  /**
    * TRUE if verbose debugging is enabled.
    *
    * @var boolean
@@ -774,50 +790,20 @@ abstract class TestBase {
             'function' => $class . '->' . $method . '()',
           );
           $completion_check_id = TestBase::insertAssert($this->testId, $class, FALSE, t('The test did not complete due to a fatal error.'), 'Completion check', $caller);
-          try {
-            $this->prepareEnvironment();
-          }
-          catch (\Exception $e) {
-            $this->exceptionHandler($e);
-            // The prepareEnvironment() method isolates the test from the parent
-            // Drupal site by creating a random database prefix and test site
-            // directory. If this fails, a test would possibly operate in the
-            // parent site. Therefore, the entire test run for this test class
-            // has to be aborted.
-            // restoreEnvironment() cannot be called, because we do not know
-            // where exactly the environment setup failed.
-            break;
-          }
-          try {
-            $this->setUp();
-          }
-          catch (\Exception $e) {
-            $this->exceptionHandler($e);
-            // Abort if setUp() fails, since all test methods will fail.
-            // But ensure to clean up and restore the environment, since
-            // prepareEnvironment() succeeded.
-            $this->restoreEnvironment();
-            break;
-          }
-          try {
-            $this->$method();
-          }
-          catch (\Exception $e) {
-            $this->exceptionHandler($e);
-          }
-          try {
+          $this->setUp();
+          if ($this->setup) {
+            try {
+              $this->$method();
+              // Finish up.
+            }
+            catch (\Exception $e) {
+              $this->exceptionHandler($e);
+            }
             $this->tearDown();
           }
-          catch (\Exception $e) {
-            $this->exceptionHandler($e);
-            // If a test fails to tear down, abort the entire test class, since
-            // it is likely that all tests will fail in the same way and a
-            // failure here only results in additional test artifacts that have
-            // to be manually deleted.
-            $this->restoreEnvironment();
-            break;
+          else {
+            $this->fail(t("The test cannot be executed because it has not been set up properly."));
           }
-          $this->restoreEnvironment();
           // Remove the completion check record.
           TestBase::deleteAssert($completion_check_id);
         }
@@ -849,30 +835,34 @@ abstract class TestBase {
    *
    * @see WebTestBase::curlInitialize()
    * @see drupal_valid_test_ua()
+   * @see WebTestBase::setUp()
    */
-  private function prepareDatabasePrefix() {
+  protected function prepareDatabasePrefix() {
     $this->databasePrefix = 'simpletest' . mt_rand(1000, 1000000);
 
     // As soon as the database prefix is set, the test might start to execute.
     // All assertions as well as the SimpleTest batch operations are associated
     // with the testId, so the database prefix has to be associated with it.
-    $affected_rows = db_update('simpletest_test_id')
+    db_update('simpletest_test_id')
       ->fields(array('last_prefix' => $this->databasePrefix))
       ->condition('test_id', $this->testId)
       ->execute();
-    if (!$affected_rows) {
-      throw new \RuntimeException('Failed to set up database prefix.');
-    }
   }
 
   /**
    * Changes the database connection to the prefixed one.
    *
-   * @see TestBase::prepareEnvironment()
+   * @see WebTestBase::setUp()
    */
-  private function changeDatabasePrefix() {
+  protected function changeDatabasePrefix() {
     if (empty($this->databasePrefix)) {
       $this->prepareDatabasePrefix();
+      // If $this->prepareDatabasePrefix() failed to work, return without
+      // setting $this->setupDatabasePrefix to TRUE, so setUp() methods will
+      // know to bail out.
+      if (empty($this->databasePrefix)) {
+        return;
+      }
     }
 
     // Clone the current connection and replace the current prefix.
@@ -892,16 +882,9 @@ abstract class TestBase {
     // @todo Fix installer to use Database connection info.
     global $databases;
     $databases['default']['default'] = $connection_info['default'];
-  }
 
-  /**
-   * Act on global state information before the environment is altered for a test.
-   *
-   * Allows e.g. DrupalUnitTestBase to prime system/extension info from the
-   * parent site (and inject it into the test environment so as to improve
-   * performance).
-   */
-  protected function beforePrepareEnvironment() {
+    // Indicate the database prefix was set up correctly.
+    $this->setupDatabasePrefix = TRUE;
   }
 
   /**
@@ -909,26 +892,15 @@ abstract class TestBase {
    *
    * Backups various current environment variables and resets them, so they do
    * not interfere with the Drupal site installation in which tests are executed
-   * and can be restored in TestBase::restoreEnvironment().
+   * and can be restored in TestBase::tearDown().
    *
    * Also sets up new resources for the testing environment, such as the public
    * filesystem and configuration directories.
    *
-   * This method is private as it must only be called once by TestBase::run()
-   * (multiple invocations for the same test would have unpredictable
-   * consequences) and it must not be callable or overridable by test classes.
-   *
-   * @see TestBase::beforePrepareEnvironment()
+   * @see TestBase::tearDown()
    */
-  private function prepareEnvironment() {
+  protected function prepareEnvironment() {
     global $user, $conf;
-
-    // Allow (base) test classes to backup global state information.
-    $this->beforePrepareEnvironment();
-
-    // Create the database prefix for this test.
-    $this->prepareDatabasePrefix();
-
     $language_interface = language(Language::TYPE_INTERFACE);
 
     // When running the test runner within a test, back up the original database
@@ -993,9 +965,6 @@ abstract class TestBase {
 
     // Reset statics before the old container is replaced so that objects with a
     // __destruct() method still have access to it.
-    // All static variables need to be reset before the database prefix is
-    // changed, since \Drupal\Core\Utility\CacheArray implementations attempt to
-    // write back to persistent caches when they are destructed.
     // @todo: Remove once they have been converted to services.
     drupal_static_reset();
 
@@ -1033,13 +1002,8 @@ abstract class TestBase {
     $test_info['test_run_id'] = $this->databasePrefix;
     $test_info['in_child_site'] = FALSE;
 
-    // Change the database prefix.
-    $this->changeDatabasePrefix();
-
-    // Reset all variables to perform tests in a clean environment.
-    $conf = array();
-
-    drupal_set_time_limit($this->timeLimit);
+    // Indicate the environment was set up correctly.
+    $this->setupEnvironment = TRUE;
   }
 
   /**
@@ -1077,7 +1041,7 @@ abstract class TestBase {
    * old module list.
    *
    * @see TestBase::prepareEnvironment()
-   * @see TestBase::restoreEnvironment()
+   * @see TestBase::tearDown()
    *
    * @todo Fix http://drupal.org/node/1708692 so that module enable/disable
    *   changes are immediately reflected in \Drupal::getContainer(). Until then,
@@ -1100,12 +1064,6 @@ abstract class TestBase {
 
   /**
    * Performs cleanup tasks after each individual test method has been run.
-   */
-  protected function tearDown() {
-  }
-
-  /**
-   * Cleans up the test environment and restores the original environment.
    *
    * Deletes created files, database tables, and reverts environment changes.
    *
@@ -1115,7 +1073,7 @@ abstract class TestBase {
    * @see TestBase::changeDatabasePrefix()
    * @see TestBase::prepareEnvironment()
    */
-  private function restoreEnvironment() {
+  protected function tearDown() {
     global $user, $conf;
 
     // Reset all static variables.
@@ -1134,19 +1092,21 @@ abstract class TestBase {
       }
     }
 
-    // Remove all prefixed tables.
-    // @todo Connection prefix info is not normalized into an array.
-    $original_connection_info = Database::getConnectionInfo('simpletest_original_default');
-    $original_prefix = is_array($original_connection_info['default']['prefix']) ? $original_connection_info['default']['prefix']['default'] : $original_connection_info['default']['prefix'];
-    $test_connection_info = Database::getConnectionInfo('default');
-    $test_prefix = is_array($test_connection_info['default']['prefix']) ? $test_connection_info['default']['prefix']['default'] : $test_connection_info['default']['prefix'];
-    if ($original_prefix != $test_prefix) {
-      $tables = Database::getConnection()->schema()->findTables($test_prefix . '%');
-      $prefix_length = strlen($test_prefix);
+    // Ensure that TestBase::changeDatabasePrefix() has run and TestBase::$setup
+    // was not tricked into TRUE, since the following code would delete the
+    // entire parent site otherwise.
+    if ($this->setupDatabasePrefix) {
+      // Remove all prefixed tables.
+      $connection_info = Database::getConnectionInfo('default');
+      $tables = db_find_tables($connection_info['default']['prefix']['default'] . '%');
+      $prefix_length = strlen($connection_info['default']['prefix']['default']);
       foreach ($tables as $table) {
-        if (Database::getConnection()->schema()->dropTable(substr($table, $prefix_length))) {
+        if (db_drop_table(substr($table, $prefix_length))) {
           unset($tables[$table]);
         }
+      }
+      if (!empty($tables)) {
+        $this->fail('Failed to drop all prefixed tables.');
       }
     }
 
@@ -1423,9 +1383,8 @@ abstract class TestBase {
   /**
    * Ensures test files are deletable within file_unmanaged_delete_recursive().
    *
-   * Some tests chmod generated files to be read only. During
-   * TestBase::restoreEnvironment() and other cleanup operations, these files
-   * need to get deleted too.
+   * Some tests chmod generated files to be read only. During tearDown() and
+   * other cleanup operations, these files need to get deleted too.
    */
   public static function filePreDeleteCallback($path) {
     chmod($path, 0700);
