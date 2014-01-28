@@ -107,6 +107,7 @@ function update_prepare_d8_bootstrap() {
 
   // Enable UpdateServiceProvider service overrides.
   // @see update_flush_all_caches()
+  // @todo global $config, https://drupal.org/node/1881582
   $GLOBALS['conf']['container_service_providers']['UpdateServiceProvider'] = 'Drupal\Core\DependencyInjection\UpdateServiceProvider';
   $GLOBALS['conf']['update_service_provider_overrides'] = TRUE;
 
@@ -121,6 +122,8 @@ function update_prepare_d8_bootstrap() {
   // Do not attempt to dump and write it.
   $kernel = new DrupalKernel('update', drupal_classloader(), FALSE);
   $kernel->boot();
+  $request = Request::createFromGlobals();
+  \Drupal::getContainer()->set('request', $request);
 
   // If any of the required settings needs to be written, then settings.php
   // needs to be writable.
@@ -317,9 +320,8 @@ function update_prepare_d8_bootstrap() {
         update_add_cache_columns($table);
       }
 
-      // Bootstrap variables so we can update theme while preparing the update
-      // process.
-      drupal_bootstrap(DRUPAL_BOOTSTRAP_VARIABLES);
+      // Bootstrap to cache system.
+      drupal_bootstrap(DRUPAL_BOOTSTRAP_PAGE_CACHE);
 
       // Update the 'language_default' system variable, if configured.
       // Required to run before drupal_install_config_directories(), since that
@@ -460,6 +462,7 @@ function update_prepare_d8_bootstrap() {
   new Settings($settings);
   $kernel = new DrupalKernel('update', drupal_classloader(), FALSE);
   $kernel->boot();
+  \Drupal::getContainer()->set('request', $request);
 
   // Clear the D7 caches, to ensure that for example the theme_registry does not
   // take part in the upgrade process.
@@ -1327,7 +1330,7 @@ function update_retrieve_dependencies() {
 /**
  * Gets the value of a variable from the database during 7.x-8.x upgrades.
  *
- * Use this during the 7.x-8.x upgrade path instead of variable_get().
+ * Use this during the 7.x-8.x upgrade path.
  *
  * @param string $name
  *   The name of the variable.
@@ -1352,7 +1355,7 @@ function update_variable_get($name, $default = NULL) {
 /**
  * Sets a persistent variable during the 7.x-8.x upgrade path.
  *
- * Use this during the 7.x-8.x upgrade path instead of variable_set().
+ * Use this during the 7.x-8.x upgrade path.
  *
  * @param string $name
  *   The name of the variable to set.
@@ -1378,7 +1381,7 @@ function update_variable_set($name, $value) {
 /**
  * Delete a variable from the database during the 7.x-8.x upgrade path.
  *
- * Use this during the 7.x-8.x upgrade path instead of variable_del().
+ * Use this during the 7.x-8.x upgrade path.
  *
  * @param string $name
  *   The name of the variable to delete.
@@ -1443,8 +1446,8 @@ function update_variables_to_config($config_name, array $variable_map) {
   foreach ($variable_map as $variable_name => $config_key) {
     // This function migrates variables regardless of their value, including
     // NULL values. Any possibly required customizations need to be performed
-    // manually, either via variable_set() before calling this function or via
-    // \Drupal::config() after calling this function.
+    // manually, either via update_variable_set() before calling this function
+    // or via \Drupal::config() after calling this function.
     if (isset($variables[$variable_name])) {
       $value = unserialize($variables[$variable_name]);
       $config->set($config_key, $value);

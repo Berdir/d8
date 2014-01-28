@@ -113,6 +113,7 @@ function toolbar_element_info() {
  *   once Drupal's page caching itself is properly integrated.
  */
 function _toolbar_initialize_page_cache() {
+  // @todo global $config, https://drupal.org/node/1881582
   $GLOBALS['conf']['system.performance']['cache']['page']['enabled'] = TRUE;
   drupal_page_is_cacheable(TRUE);
 

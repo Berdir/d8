@@ -159,6 +159,7 @@ class ConfigFactory implements EventSubscriberInterface {
             $this->cache[$cache_key]->setModuleOverride($module_overrides[$name]);
           }
           // Apply any settings.php overrides.
+          // @todo global $config, https://drupal.org/node/1881582
           if (isset($conf[$name])) {
             $this->cache[$cache_key]->setSettingsOverride($conf[$name]);
           }
@@ -234,6 +235,7 @@ class ConfigFactory implements EventSubscriberInterface {
           if (isset($module_overrides[$name])) {
             $this->cache[$cache_key]->setModuleOverride($module_overrides[$name]);
           }
+          // @todo global $config, https://drupal.org/node/1881582
           if (isset($conf[$name])) {
             $this->cache[$cache_key]->setSettingsOverride($conf[$name]);
           }

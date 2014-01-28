@@ -94,6 +94,7 @@ abstract class DrupalUnitTestBase extends UnitTestBase {
     // Build a minimal, partially mocked environment for unit tests.
     $this->containerBuild(\Drupal::getContainer());
     // Make sure it survives kernel rebuilds.
+    // @todo Move into $settings? https://drupal.org/node/1881582
     $GLOBALS['conf']['container_service_providers']['TestServiceProvider'] = 'Drupal\simpletest\TestServiceProvider';
 
     \Drupal::state()->set('system.module.files', $this->moduleFiles);
@@ -152,7 +153,6 @@ abstract class DrupalUnitTestBase extends UnitTestBase {
    * @see \DrupalUnitTestBase::disableModules()
    */
   public function containerBuild(ContainerBuilder $container) {
-    global $conf;
     // Keep the container object around for tests.
     $this->container = $container;
 

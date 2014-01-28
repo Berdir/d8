@@ -1227,7 +1227,7 @@ function install_database_errors($database, $settings_file) {
  * @see install_settings_form_validate()
  */
 function install_settings_form_submit($form, &$form_state) {
-  global $install_state, $conf;
+  global $install_state;
 
   // Update global settings array and save.
   $settings = array();
@@ -1485,6 +1485,7 @@ function install_file_translation_service() {
  *   The path to the installation directory.
  */
 function install_translations_directory() {
+  // @todo global $config, https://drupal.org/node/1881582
   if (isset($GLOBALS['conf']['locale.settings']['translation.path'])) {
     $directory = $GLOBALS['conf']['locale.settings']['translation.path'];
   }

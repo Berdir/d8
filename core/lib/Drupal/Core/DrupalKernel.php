@@ -238,6 +238,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     }
 
     // Add site specific or test service providers.
+    // @todo Move to $settings? https://drupal.org/node/1881582
     if (!empty($GLOBALS['conf']['container_service_providers'])) {
       foreach ($GLOBALS['conf']['container_service_providers'] as $name => $class) {
         $serviceProviders[$name] = new $class();
@@ -245,6 +246,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       }
     }
     // Add site specific or test YAMLs.
+    // @todo Move to $settings? https://drupal.org/node/1881582
     if (!empty($GLOBALS['conf']['container_yamls'])) {
       $this->serviceYamls = array_merge($this->serviceYamls, $GLOBALS['conf']['container_yamls']);
     }
