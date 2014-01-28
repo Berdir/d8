@@ -7,6 +7,7 @@
 
 namespace Drupal\migrate\Tests;
 
+use Drupal\Component\Utility\String;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Query\Condition;
 use Drupal\Core\Database\Query\PlaceholderInterface;
@@ -518,7 +519,7 @@ class FakeSelect extends Select {
         $fields = array_keys(reset($this->databaseContents[$table]));
       }
       else {
-        throw new \Exception('All fields on empty table is not supported.');
+        throw new \Exception(String::format('All fields on empty table @table is not supported.', array('@table' => $table)));
       }
     }
     return parent::fields($table_alias, $fields);
