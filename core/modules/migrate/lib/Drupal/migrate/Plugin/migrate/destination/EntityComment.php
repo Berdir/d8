@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * @PluginID("entity_comment")
  */
-class EntityComment extends Entity {
+class EntityComment extends EntityContentBase {
 
   /**
    * The state storage object.

@@ -12,7 +12,7 @@ use Drupal\migrate\Row;
 /**
  * @PluginID("entity_field_instance")
  */
-class EntityFieldInstance extends Entity {
+class EntityFieldInstance extends EntityConfigBase {
 
   /**
    * {@inheritdoc}

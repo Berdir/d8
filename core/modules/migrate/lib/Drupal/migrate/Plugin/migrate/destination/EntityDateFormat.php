@@ -17,12 +17,12 @@ class EntityDateFormat extends Entity {
   /**
    * {@inheritdoc}
    */
-  protected function updateConfigEntity(ConfigEntityInterface $entity, array $parents, $value) {
+  protected function updateConfigEntityProperty(ConfigEntityInterface $entity, array $parents, $value) {
     if ($parents[0] == 'pattern') {
       $entity->setPattern($value, $parents[1]);
     }
     else {
-      parent::updateConfigEntity($entity, $parents, $value);
+      parent::updateConfigEntityProperty($entity, $parents, $value);
     }
   }
 }

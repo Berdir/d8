@@ -10,7 +10,7 @@ namespace Drupal\migrate\Plugin\migrate\destination;
 /**
  * @PluginID("entity_view_mode")
  */
-class EntityViewMode extends Entity {
+class EntityViewMode extends EntityConfigBase {
 
   /**
    * {@inheritdoc}

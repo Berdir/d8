@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * @PluginId("entity_user")
  */
-class EntityUser extends Entity {
+class EntityUser extends EntityContentBase {
 
   /**
    * The password service class.

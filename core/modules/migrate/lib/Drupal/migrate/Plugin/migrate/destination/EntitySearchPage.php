@@ -12,12 +12,12 @@ use Drupal\migrate\Row;
 /**
  * @PluginID("entity_search_page")
  */
-class EntitySearchPage extends Entity {
+class EntitySearchPage extends EntityConfigBase {
 
   /**
    * {@inheritdoc}
    */
-  protected function update(EntityInterface $entity, Row $row) {
+  protected function updateEntity(EntityInterface $entity, Row $row) {
     /** @var \Drupal\search\Entity\SearchPage $entity */
     $entity->setPlugin($row->getDestinationProperty('plugin'));
     $entity->getPlugin()->setConfiguration($row->getDestinationProperty('configuration'));
