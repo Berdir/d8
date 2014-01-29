@@ -8,7 +8,6 @@
 namespace Drupal\migrate_drupal\Tests\source\d6;
 
 use Drupal\migrate\Tests\MigrateTestCase;
-use Drupal\migrate_drupal\Plugin\migrate\source\d6\Drupal6SqlBase;
 
 /**
  * @group migrate_drupal
@@ -143,6 +142,7 @@ namespace Drupal\migrate_drupal\Tests\source\d6;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\migrate_drupal\Plugin\migrate\source\d6\Drupal6SqlBase;
 
 /**
  * Extends the Drupal6SqlBase abstract class.
