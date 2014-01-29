@@ -24,7 +24,7 @@ class EntityContentBase extends Entity {
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
     $entity = $this->getEntity($row);
     $violations = $entity->validate();
-    if ($violations) {
+    if (count($violations)) {
       throw new MigrateSkipRowException();
     }
     $entity->save();
