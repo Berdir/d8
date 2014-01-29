@@ -2,19 +2,11 @@ id: d6_field_instance
 
 source:
   plugin: drupal6_field_instance
+  constants:
+    entity_type: node
 
 process:
-  entity_type:
-    plugin: default_value
-    default_value: node
-  id:
-    plugin: concat
-    delimiter: .
-    source:
-      - @entity_type
-      - type_name
-      - field_name
-
+  entity_type: constants:entity_type
   field_name: field_name
   bundle: type_name
   label: label
@@ -36,5 +28,4 @@ process:
       - widget_settings
 
 destination:
-  plugin: entity
-  entity_type: field_instance
+  plugin: entity_field_instance
