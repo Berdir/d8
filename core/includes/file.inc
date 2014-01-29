@@ -202,12 +202,16 @@ function file_get_stream_wrappers($filter = STREAM_WRAPPERS_ALL) {
   $wrappers_storage = &drupal_static(__FUNCTION__);
 
   if (!isset($wrappers_storage)) {
-    $wrappers = \Drupal::moduleHandler()->invokeAll('stream_wrappers');
-    foreach ($wrappers as $scheme => $info) {
-      // Add defaults.
-      $wrappers[$scheme] += array('type' => STREAM_WRAPPERS_NORMAL);
+    $wrappers = array();
+    $container = \Drupal::getContainer();
+    if (is_object($container) && $container->has('module_handler')) {
+      $wrappers = \Drupal::moduleHandler()->invokeAll('stream_wrappers');
+      foreach ($wrappers as $scheme => $info) {
+        // Add defaults.
+        $wrappers[$scheme] += array('type' => STREAM_WRAPPERS_NORMAL);
+      }
+      \Drupal::moduleHandler()->alter('stream_wrappers', $wrappers);
     }
-    drupal_alter('stream_wrappers', $wrappers);
     $existing = stream_get_wrappers();
     foreach ($wrappers as $scheme => $info) {
       // We only register classes that implement our interface.
@@ -580,19 +584,23 @@ function file_ensure_htaccess() {
  * @param $private
  *   FALSE indicates that $directory should be an open and public directory.
  *   The default is TRUE which indicates a private and protected directory.
+ *
+ * @return bool
+ *   TRUE if the .htaccess file could be created or existed already, FALSE
+ *   otherwise.
  */
 function file_save_htaccess($directory, $private = TRUE) {
   if (file_uri_scheme($directory)) {
-    $directory = file_stream_wrapper_uri_normalize($directory);
+    $htaccess_path = file_stream_wrapper_uri_normalize($directory . '/.htaccess');
   }
   else {
     $directory = rtrim($directory, '/\\');
+    $htaccess_path = $directory . '/.htaccess';
   }
-  $htaccess_path =  $directory . '/.htaccess';
 
   if (file_exists($htaccess_path)) {
     // Short circuit if the .htaccess file already exists.
-    return;
+    return TRUE;
   }
 
   if ($private) {
@@ -605,12 +613,13 @@ function file_save_htaccess($directory, $private = TRUE) {
   }
 
   // Write the .htaccess file.
-  if (file_put_contents($htaccess_path, $htaccess_lines)) {
-    drupal_chmod($htaccess_path, 0444);
+  if (file_exists($directory) && is_writable($directory) && file_put_contents($htaccess_path, $htaccess_lines)) {
+    return drupal_chmod($htaccess_path, 0444);
   }
   else {
     $variables = array('%directory' => $directory, '!htaccess' => '<br />' . nl2br(String::checkPlain($htaccess_lines)));
     watchdog('security', "Security warning: Couldn't write .htaccess file. Please create a .htaccess file in your %directory directory which contains the following lines: <code>!htaccess</code>", $variables, WATCHDOG_ERROR);
+    return FALSE;
   }
 }
 
@@ -1145,18 +1154,18 @@ function file_unmanaged_save_data($data, $destination = NULL, $replace = FILE_EX
 /**
  * Finds all files that match a given mask in a given directory.
  *
- * Directories and files beginning with a period are excluded; this
- * prevents hidden files and directories (such as SVN working directories)
- * from being scanned.
+ * Directories and files beginning with a dot are excluded; this prevents
+ * hidden files and directories (such as SVN working directories) from being
+ * scanned.
  *
  * @param $dir
  *   The base directory or URI to scan, without trailing slash.
  * @param $mask
- *   The preg_match() regular expression of the files to find.
+ *   The preg_match() regular expression for files to be included.
  * @param $options
  *   An associative array of additional options, with the following elements:
- *   - 'nomask': The preg_match() regular expression of the files to ignore.
- *     Defaults to '/(\.\.?|CVS)$/'.
+ *   - 'nomask': The preg_match() regular expression for files to be excluded.
+ *     There is no default.
  *   - 'callback': The callback function to call for each match. There is no
  *     default callback.
  *   - 'recurse': When TRUE, the directory scan will recurse the entire tree
@@ -1168,17 +1177,16 @@ function file_unmanaged_save_data($data, $destination = NULL, $replace = FILE_EX
  *   - 'min_depth': Minimum depth of directories to return files from. Defaults
  *     to 0.
  * @param $depth
- *   Current depth of recursion. This parameter is only used internally and
+ *   The current depth of recursion. This parameter is only used internally and
  *   should not be passed in.
  *
  * @return
  *   An associative array (keyed on the chosen key) of objects with 'uri',
- *   'filename', and 'name' members corresponding to the matching files.
+ *   'filename', and 'name' properties corresponding to the matched files.
  */
 function file_scan_directory($dir, $mask, $options = array(), $depth = 0) {
   // Merge in defaults.
   $options += array(
-    'nomask' => '/^CVS$/',
     'callback' => 0,
     'recurse' => TRUE,
     'key' => 'uri',
@@ -1198,7 +1206,7 @@ function file_scan_directory($dir, $mask, $options = array(), $depth = 0) {
     if ($handle = @opendir($dir)) {
       while (FALSE !== ($filename = readdir($handle))) {
         // Skip this file if it matches the nomask or starts with a dot.
-        if ($filename[0] != '.' && !preg_match($options['nomask'], $filename)) {
+        if ($filename[0] != '.' && !(isset($options['nomask']) && preg_match($options['nomask'], $filename))) {
           if ($depth == 0 && $dir_has_slash) {
             $uri = "$dir$filename";
           }

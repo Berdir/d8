@@ -482,7 +482,7 @@ function install_begin_request(&$install_state) {
     // ConfigFactory to try to load language override configuration which is not
     // supported by \Drupal\Core\Config\InstallStorage since loading a
     // non-existing file would throw an exception.
-    $container->get('config.factory')->disableOverrides();
+    $container->get('config.factory')->setOverrideState(FALSE);
   }
 
   // Set the request in the kernel to the new created Request above
@@ -1227,7 +1227,7 @@ function install_database_errors($database, $settings_file) {
  * @see install_settings_form_validate()
  */
 function install_settings_form_submit($form, &$form_state) {
-  global $install_state, $conf;
+  global $install_state;
 
   // Update global settings array and save.
   $settings = array();
