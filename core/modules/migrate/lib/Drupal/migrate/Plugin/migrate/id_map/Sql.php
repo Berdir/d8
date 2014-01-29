@@ -221,9 +221,9 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
         foreach ($this->destinationIds as $id_definition) {
           // Allow dest identifier fields to be NULL (for IGNORED/FAILED
           // cases).
-          $id_definition['not null'] = FALSE;
           $mapkey = 'destid' . $count++;
           $fields[$mapkey] = $this->getFieldSchema($id_definition);
+          $fields[$mapkey]['not null'] = FALSE;
         }
         $fields['source_row_status'] = array(
           'type' => 'int',
