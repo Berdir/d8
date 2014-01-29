@@ -7,22 +7,23 @@
 
 namespace Drupal\migrate\Plugin\migrate\destination;
 
-use Drupal\Core\Config\Entity\ConfigEntityInterface;
+use Drupal\Core\Entity\EntityInterface;
 
 /**
  * @PluginID("entity_date_format")
  */
-class EntityDateFormat extends Entity {
+class EntityDateFormat extends EntityConfigBase {
 
   /**
    * {@inheritdoc}
    */
-  protected function updateConfigEntityProperty(ConfigEntityInterface $entity, array $parents, $value) {
+  protected function updateEntityProperty(EntityInterface $entity, array $parents, $value) {
+    /** @var \Drupal\system\DateFormatInterface $entity */
     if ($parents[0] == 'pattern') {
       $entity->setPattern($value, $parents[1]);
     }
     else {
-      parent::updateConfigEntityProperty($entity, $parents, $value);
+      parent::updateEntityProperty($entity, $parents, $value);
     }
   }
 }
