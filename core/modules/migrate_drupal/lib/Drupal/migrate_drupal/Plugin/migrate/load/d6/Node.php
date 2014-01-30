@@ -11,7 +11,7 @@ use Drupal\Component\Utility\MapArray;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\migrate\Entity\MigrationInterface;
-use Drupal\migrate\Plugin\load\LoadBase;
+use Drupal\migrate\Plugin\migrate\load\LoadBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**

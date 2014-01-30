@@ -5,7 +5,7 @@
  * Contains \Drupal\migrate\Plugin\load\LoadBase.
  */
 
-namespace Drupal\migrate\Plugin\load;
+namespace Drupal\migrate\Plugin\migrate\load;
 
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\migrate\Plugin\MigrateLoadInterface;
