@@ -65,6 +65,11 @@ class MockBlockManager extends PluginManagerBase {
       'class' => 'Drupal\plugin_test\Plugin\plugin_test\mock_block\MockLayoutBlock',
       'derivative' => 'Drupal\plugin_test\Plugin\plugin_test\mock_block\MockLayoutBlockDeriver',
     ));
+    // A plugin defining itself as a derivative.
+    $this->discovery->setDefinition('layout:bar', array(
+      'label' => t('Layout Bar'),
+      'class' => 'Drupal\plugin_test\Plugin\plugin_test\mock_block\MockLayoutBlock',
+    ));
 
     // A block plugin that requires context to function. This block requires a
     // user object in order to return the user name from the getTitle() method.

@@ -70,6 +70,10 @@ abstract class PluginTestBase extends UnitTestBase {
         'label' => 'Layout Foo',
         'class' => 'Drupal\plugin_test\Plugin\plugin_test\mock_block\MockLayoutBlock',
       ),
+      'layout:bar' => array(
+        'label' => 'Layout Bar',
+        'class' => 'Drupal\plugin_test\Plugin\plugin_test\mock_block\MockLayoutBlock',
+      ),
       'user_name' => array(
         'label' => 'User name',
         'class' => 'Drupal\plugin_test\Plugin\plugin_test\mock_block\MockUserNameBlock',

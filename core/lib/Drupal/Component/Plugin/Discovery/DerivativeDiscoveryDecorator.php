@@ -40,13 +40,17 @@ class DerivativeDiscoveryDecorator implements DiscoveryInterface {
    *   not implement \Drupal\Component\Plugin\Derivative\DerivativeInterface.
    */
   public function getDefinition($plugin_id) {
+    $plugin_definition = $this->decorated->getDefinition($plugin_id);
     list($base_plugin_id, $derivative_id) = $this->decodePluginId($plugin_id);
-
-    $plugin_definition = $this->decorated->getDefinition($base_plugin_id);
-    if (isset($plugin_definition)) {
-      $derivative_fetcher = $this->getDerivativeFetcher($base_plugin_id, $plugin_definition);
-      if ($derivative_fetcher) {
-        $plugin_definition = $derivative_fetcher->getDerivativeDefinition($derivative_id, $plugin_definition);
+    // If this is a base plugin or no plugin defined itself as this derivative
+    // then try to find and run the deriver.
+    if (!$derivative_id || !$plugin_definition) {
+      $base_plugin_definition = $this->decorated->getDefinition($base_plugin_id);
+      if ($base_plugin_definition) {
+        $derivative_fetcher = $this->getDerivativeFetcher($base_plugin_id, $base_plugin_definition);
+        if ($derivative_fetcher) {
+          $plugin_definition = $derivative_fetcher->getDerivativeDefinition($derivative_id, $base_plugin_definition);
+        }
       }
     }
 
@@ -79,7 +83,11 @@ class DerivativeDiscoveryDecorator implements DiscoveryInterface {
         $derivative_definitions = $derivative_fetcher->getDerivativeDefinitions($plugin_definition);
         foreach ($derivative_definitions as $derivative_id => $derivative_definition) {
           $plugin_id = $this->encodePluginId($base_plugin_id, $derivative_id);
-          $plugin_definitions[$plugin_id] = $derivative_definition;
+          // Skip this definition if this is a derivative and a plugin already
+          // defined itself as this derivative.
+          if (!$derivative_id || !isset($base_plugin_definitions[$plugin_id])) {
+            $plugin_definitions[$plugin_id] = $derivative_definition;
+          }
         }
       }
       else {
