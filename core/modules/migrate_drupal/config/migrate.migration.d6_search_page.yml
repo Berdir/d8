@@ -19,4 +19,4 @@ process:
   'configuration:rankings':
     plugin: drupal6_search_configuration_rankings
 destination:
-  plugin: entity_search_page
+  plugin: entity:search_page

@@ -16,7 +16,9 @@ use Drupal\Core\Config\Config as ConfigObject;
 /**
  * Persist data to the config system.
  *
- * @PluginID("d8_config")
+ * @MigrateDestinationPlugin(
+ *   id = "config"
+ * )
  */
 class Config extends DestinationBase implements ContainerFactoryPluginInterface {
 

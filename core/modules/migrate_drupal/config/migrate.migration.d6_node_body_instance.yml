@@ -34,4 +34,4 @@ process:
   field_type: constants:field_type
 
 destination:
-  plugin: entity_field_instance
+  plugin: entity:field_instance

@@ -14,7 +14,9 @@ use Drupal\migrate\Row;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * @PluginID("entity_comment")
+ * @MigrateDestinationPlugin(
+ *   id = "entity:comment"
+ * )
  */
 class EntityComment extends EntityContentBase {
 
@@ -40,7 +42,7 @@ class EntityComment extends EntityContentBase {
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration = NULL) {
-    $entity_type = static::getEntityType($configuration, $plugin_id);
+    $entity_type = static::getEntityType($plugin_id);
     return new static(
       $configuration,
       $plugin_id,

@@ -77,5 +77,4 @@ process:
       - widget_settings
 
 destination:
-  plugin: entity
-  entity_type: field_entity
+  plugin: entity:field_entity

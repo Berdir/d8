@@ -61,4 +61,4 @@ process:
       index:
         - 0
 destination:
-  plugin: entity_comment
+  plugin: entity:comment

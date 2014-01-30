@@ -16,5 +16,4 @@ process:
   hierarchy: hierarchy
   weight: weight
 destination:
-  plugin: entity
-  entity_type: taxonomy_vocabulary
+  plugin: entity:taxonomy_vocabulary

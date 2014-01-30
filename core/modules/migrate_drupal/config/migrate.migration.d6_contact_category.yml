@@ -18,5 +18,4 @@ process:
   weight: weight
 
 destination:
-  plugin: entity
-  entity_type: contact_category
+  plugin: entity:contact_category

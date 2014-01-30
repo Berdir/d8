@@ -266,4 +266,4 @@ process:
       plugin: field_formatter_settings_defaults
 
 destination:
-  plugin: entity_display
+  plugin: entity:entity_display

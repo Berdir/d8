@@ -7,18 +7,18 @@
 
 namespace Drupal\migrate\Plugin\migrate\destination;
 
-use Drupal\Component\Utility\NestedArray;
-use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\Row;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\migrate\MigrateException;
 
 /**
- * @PluginID("entity")
+ * @MigrateDestinationPlugin(
+ *   id = "entity",
+ *   derivative = "Drupal\migrate\Plugin\Derivative\MigrateEntity"
+ * )
  */
 abstract class Entity extends DestinationBase implements ContainerFactoryPluginInterface {
 
@@ -65,23 +65,13 @@ abstract class Entity extends DestinationBase implements ContainerFactoryPluginI
    * EntityContentBase relies on TypeData while EntityConfigBase doesn't.
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration = NULL) {
-    $entity_type = static::getEntityType($configuration, $plugin_id);
-    $storage_controller = $container->get('entity.manager')->getStorageController($entity_type);
-    $class = get_called_class();
-    if ($class == 'Drupal\migrate\Plugin\migrate\destination\Entity') {
-      if (is_subclass_of($storage_controller , 'Drupal\Core\Config\Entity\ConfigEntityInterface')) {
-        $class = 'Drupal\migrate\Plugin\migrate\destination\EntityConfigBase';
-      }
-      else {
-        $class = 'Drupal\migrate\Plugin\migrate\destination\EntityContentBase';
-      }
-    }
-    return new $class(
+    $entity_type = static::getEntityType($plugin_id);
+    return new static(
       $configuration,
       $plugin_id,
       $plugin_definition,
       $migration,
-      $storage_controller,
+      $container->get('entity.manager')->getStorageController($entity_type),
       array_keys($container->get('entity.manager')->getBundleInfo($entity_type))
     );
   }
@@ -98,14 +88,9 @@ abstract class Entity extends DestinationBase implements ContainerFactoryPluginI
    *   The entity type.
    * @throws \Drupal\migrate\MigrateException
    */
-  protected static function getEntityType($configuration, $plugin_id) {
-    if (isset($configuration['entity_type'])) {
-      return $configuration['entity_type'];
-    }
-    elseif (substr($plugin_id, 0, 7) == 'entity_') {
-      return substr($plugin_id, 7);
-    }
-    throw new MigrateException('No entity type given.');
+  protected static function getEntityType($plugin_id) {
+    // Remove entity:
+    return substr($plugin_id, 7);
   }
 
   /**

@@ -12,5 +12,4 @@ process:
   name: constants:name
   type: constants:type
 destination:
-  plugin: entity
-  entity_type: field_entity
+  plugin: entity:field_entity

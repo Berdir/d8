@@ -19,5 +19,4 @@ process:
         - 0
   'body:value': body
 destination:
-  plugin: entity
-  entity_type: custom_block
+  plugin: entity:custom_block

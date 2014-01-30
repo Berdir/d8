@@ -6,5 +6,4 @@ process:
   label: title
   description: description
 destination:
-  plugin: entity
-  entity_type: menu
+  plugin: entity:menu

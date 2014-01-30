@@ -22,4 +22,4 @@ process:
   'settings:allowed_values:0:vocabulary': @name
   'settings:allowed_values:0:parent': constants:parent
 destination:
-  plugin: entity_field_entity
+  plugin: entity:field_entity

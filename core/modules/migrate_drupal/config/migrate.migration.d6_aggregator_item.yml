@@ -15,5 +15,4 @@ process:
   timestamp: timestamp
   guid: guid
 destination:
-  plugin: entity
-  entity_type: aggregator_item
+  plugin: entity:aggregator_item

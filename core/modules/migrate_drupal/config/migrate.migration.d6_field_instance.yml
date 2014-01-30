@@ -28,4 +28,4 @@ process:
       - widget_settings
 
 destination:
-  plugin: entity_field_instance
+  plugin: entity:field_instance

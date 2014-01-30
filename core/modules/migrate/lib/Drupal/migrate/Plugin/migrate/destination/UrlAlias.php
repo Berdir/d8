@@ -14,7 +14,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 
 /**
- * @PluginID("url_alias")
+ * @MigrateDestinationPlugin(
+ *   id = "url_alias"
+ * )
  */
 class UrlAlias extends DestinationBase implements ContainerFactoryPluginInterface {
 

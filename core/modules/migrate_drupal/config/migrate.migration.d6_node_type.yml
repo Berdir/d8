@@ -19,5 +19,4 @@ process:
   options: options
 
 destination:
-  plugin: entity
-  entity_type: node_type
+  plugin: entity:node_type

@@ -37,5 +37,4 @@ process:
         plugin: default_value
         default_value: true
 destination:
-  plugin: entity
-  entity_type: filter_format
+  plugin: entity:filter_format

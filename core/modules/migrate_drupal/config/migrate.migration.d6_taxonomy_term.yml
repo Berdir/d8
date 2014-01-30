@@ -27,5 +27,4 @@ process:
         - 0
   changed: timestamp
 destination:
-  plugin: entity
-  entity_type: taxonomy_term
+  plugin: entity:taxonomy_term

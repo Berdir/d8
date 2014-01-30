@@ -21,4 +21,4 @@ process:
   'settings:form_location': comment_form_location
   'settings:preview': comment_preview
 destination:
-  plugin: entity_field_instance
+  plugin: entity:field_instance

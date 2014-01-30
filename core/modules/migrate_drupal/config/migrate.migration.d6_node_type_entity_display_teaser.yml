@@ -17,5 +17,5 @@ process:
   bundle: type
   'options:settings:trim_length': teaser_length
 destination:
-  plugin: entity_display
+  plugin: entity:entity_display
 

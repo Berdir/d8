@@ -25,5 +25,4 @@ process:
 #  comment
 
 destination:
-  plugin: entity
-  entity_type: node
+  plugin: entity:node

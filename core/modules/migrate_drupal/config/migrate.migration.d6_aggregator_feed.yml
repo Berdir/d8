@@ -16,5 +16,4 @@ process:
   modified: modified
 
 destination:
-  plugin: entity
-  entity_type: aggregator_feed
+  plugin: entity:aggregator_feed
