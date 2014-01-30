@@ -9,7 +9,9 @@ namespace Drupal\migrate\Plugin\migrate\destination;
 
 use Drupal\Core\Entity\EntityStorageControllerInterface;
 use Drupal\Core\KeyValueStore\StateInterface;
+use Drupal\field\FieldInfo;
 use Drupal\migrate\Entity\MigrationInterface;
+use Drupal\migrate\Plugin\MigratePluginManager;
 use Drupal\migrate\Row;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -28,13 +30,29 @@ class EntityComment extends EntityContentBase {
   protected $state;
 
   /**
-   * {@inheritdoc}
+   * Builds an comment entity destination.
    *
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   * @param string $plugin_id
+   *   The plugin_id for the plugin instance.
+   * @param array $plugin_definition
+   *   The plugin implementation definition.
+   * @param MigrationInterface $migration
+   *   The migration.
+   * @param EntityStorageControllerInterface $storage_controller
+   *   The storage controller for this entity type.
+   * @param array $bundles
+   *   The list of bundles this entity type has.
+   * @param \Drupal\migrate\Plugin\MigratePluginManager $plugin_manager
+   *   The migrate plugin manager.
+   * @param \Drupal\field\FieldInfo $field_info
+   *   The field and instance definitions service.
    * @param \Drupal\Core\KeyValueStore\StateInterface $state
    *   The state storage object.
    */
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration, EntityStorageControllerInterface $storage_controller, array $bundles, StateInterface $state) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition, $migration, $storage_controller, $bundles);
+  public function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration, EntityStorageControllerInterface $storage_controller, array $bundles, MigratePluginManager $plugin_manager, FieldInfo $field_info, StateInterface $state) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $migration, $storage_controller, $bundles, $plugin_manager, $field_info);
     $this->state = $state;
   }
 
@@ -50,6 +68,8 @@ class EntityComment extends EntityContentBase {
       $migration,
       $container->get('entity.manager')->getStorageController($entity_type),
       array_keys($container->get('entity.manager')->getBundleInfo($entity_type)),
+      $container->get('plugin.manager.migrate.entity_field'),
+      $container->get('field.info'),
       $container->get('state')
     );
   }
