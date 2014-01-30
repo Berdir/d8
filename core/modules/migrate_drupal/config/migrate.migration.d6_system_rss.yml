@@ -6,5 +6,5 @@ source:
 process:
   'items:limit': feed_default_items
 destination:
-  plugin: d8_config
+  plugin: config
   config_name: system.rss

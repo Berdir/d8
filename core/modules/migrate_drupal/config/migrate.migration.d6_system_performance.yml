@@ -10,5 +10,5 @@ process:
   'js:preprocess': preprocess_js
   'cache:page:max_age': cache_lifetime
 destination:
-  plugin: d8_config
+  plugin: config
   config_name: system.performance

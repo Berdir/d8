@@ -6,5 +6,5 @@ source:
 process:
   language_fallback: field_language_fallback
 destination:
-  plugin: d8_config
+  plugin: config
   config_name: field.settings

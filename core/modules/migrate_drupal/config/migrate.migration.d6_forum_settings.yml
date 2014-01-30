@@ -14,5 +14,5 @@ process:
   'topics:page_limit': forum_per_page
   'topics:order': forum_order
 destination:
-  plugin: d8_config
+  plugin: config
   config_name: forum.settings

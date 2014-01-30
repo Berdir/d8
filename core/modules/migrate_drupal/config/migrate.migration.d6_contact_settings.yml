@@ -8,5 +8,5 @@ process:
   user_default_enabled: contact_default_status
   'flood:limit': contact_hourly_threshold
 destination:
-  plugin: d8_config
+  plugin: config
   config_name: contact.settings

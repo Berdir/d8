@@ -32,5 +32,5 @@ process:
   'status_blocked:subject': user_mail_status_blocked_subject
   'status_blocked:body': user_mail_status_blocked_body
 destination:
-  plugin: d8_config
+  plugin: config
   config_name: user.mail

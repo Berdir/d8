@@ -14,5 +14,5 @@ process:
   'httpauth:username': simpletest_httpauth_username
   verbose: simpletest_verbose
 destination:
-  plugin: d8_config
+  plugin: config
   config_name: simpletest.settings

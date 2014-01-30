@@ -8,5 +8,5 @@ process:
   cache_string: locale_cache_strings
   'javascript:directory': locale_js_directory
 destination:
-  plugin: d8_config
+  plugin: config
   config_name: locale.settings

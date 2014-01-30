@@ -10,5 +10,5 @@ process:
   'block:navigation:mode': book_block_mode
   allowed_types: book_allowed_types
 destination:
-  plugin: d8_config
+  plugin: config
   config_name: book.settings

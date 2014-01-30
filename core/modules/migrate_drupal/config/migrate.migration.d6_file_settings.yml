@@ -10,5 +10,5 @@ process:
   'description:length': file_description_length
   'icon:directory': file_icon_directory
 destination:
-  plugin: d8_config
+  plugin: config
   config_name: file.settings

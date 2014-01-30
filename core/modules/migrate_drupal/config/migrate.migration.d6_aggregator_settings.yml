@@ -20,5 +20,5 @@ process:
   'source:list_max': aggregator_summary_items
   'source:category_selector': aggregator_category_selector
 destination:
-  plugin: d8_config
+  plugin: config
   config_name: aggregator.settings

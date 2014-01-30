@@ -8,5 +8,5 @@ process:
   enable: site_offline
   message: site_offline_message
 destination:
-  plugin: d8_config
+  plugin: config
   config_name: system.maintenance

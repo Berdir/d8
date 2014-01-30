@@ -6,5 +6,5 @@ source:
 process:
   use_admin_theme: node_admin_theme
 destination:
-  plugin: d8_config
+  plugin: config
   config_name: node.settings

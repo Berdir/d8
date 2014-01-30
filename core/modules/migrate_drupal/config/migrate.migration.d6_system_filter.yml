@@ -6,5 +6,5 @@ source:
 process:
   protocols: filter_allowed_protocols
 destination:
-  plugin: d8_config
+  plugin: config
   config_name: system.filter

@@ -20,5 +20,5 @@ process:
   weight_select_max: drupal_weight_select_max
   admin_compact_mode: admin_compact_mode
 destination:
-  plugin: d8_config
+  plugin: config
   config_name: system.site

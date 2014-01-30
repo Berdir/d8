@@ -16,5 +16,5 @@ process:
   'block:popular:top_all_limit': statistics_block_top_all_num
   'block:popular:top_recent_limit': statistics_block_top_last_num
 destination:
-  plugin: d8_config
+  plugin: config
   config_name: statistics.settings

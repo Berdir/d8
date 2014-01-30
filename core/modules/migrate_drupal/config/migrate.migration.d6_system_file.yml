@@ -8,5 +8,5 @@ process:
   'path:private': file_directory_path
   'path:temporary': file_directory_temp
 destination:
-  plugin: d8_config
+  plugin: config
   config_name: system.file
