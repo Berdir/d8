@@ -18,9 +18,10 @@ class EntitySearchPage extends EntityConfigBase {
 
   /**
    * {@inheritdoc}
+   *
+   * @param \Drupal\search\Entity\SearchPage $entity
    */
   protected function updateEntity(EntityInterface $entity, Row $row) {
-    /** @var \Drupal\search\Entity\SearchPage $entity */
     $entity->setPlugin($row->getDestinationProperty('plugin'));
     $entity->getPlugin()->setConfiguration($row->getDestinationProperty('configuration'));
   }

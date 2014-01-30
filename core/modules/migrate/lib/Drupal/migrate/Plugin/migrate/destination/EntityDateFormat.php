@@ -18,9 +18,10 @@ class EntityDateFormat extends EntityConfigBase {
 
   /**
    * {@inheritdoc}
+   *
+   * @param \Drupal\system\DateFormatInterface $entity
    */
   protected function updateEntityProperty(EntityInterface $entity, array $parents, $value) {
-    /** @var \Drupal\system\DateFormatInterface $entity */
     if ($parents[0] == 'pattern') {
       $entity->setPattern($value, $parents[1]);
     }
