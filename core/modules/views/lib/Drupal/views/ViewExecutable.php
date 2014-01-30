@@ -78,7 +78,7 @@ class ViewExecutable {
    *
    * The array must use a numeric index starting at 0.
    *
-   * @var array
+   * @var \Drupal\views\ResultRow[]
    */
   public $result = array();
 
@@ -1529,6 +1529,30 @@ class ViewExecutable {
     // Execute the view
     if (isset($this->display_handler)) {
       return $this->display_handler->executeHookMenu($callbacks);
+    }
+  }
+
+  /**
+   * Returns default menu links from the view and the named display handler.
+   *
+   * @param string $display_id
+   *   A display ID.
+   * @param array $links
+   *   An array of default menu link items passed from
+   *   views_menu_link_defaults_alter().
+   *
+   * @return array|bool
+   */
+  public function executeHookMenuLinkDefaults($display_id = NULL, &$links = array()) {
+    // Prepare the view with the information we have. This was probably already
+    // called, but it's good to be safe.
+    if (!$this->setDisplay($display_id)) {
+      return FALSE;
+    }
+
+    // Execute the hook.
+    if (isset($this->display_handler)) {
+      return $this->display_handler->executeHookMenuLinkDefaults($links);
     }
   }
 
