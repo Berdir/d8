@@ -59,7 +59,7 @@ class EntityContentBase extends Entity {
    * {@inheritdoc}
    */
   public function import(Row $row) {
-    if ($all_instances = $this->fieldInfo->getInstances($this->storageController->entityType())) {
+    if ($all_instances = $this->fieldInfo->getInstances($this->storageController->getEntityTypeId())) {
       /** @var \Drupal\Field\Entity\FieldInstance[] $instances */
       $instances = array();
       if ($bundle_key = $this->getKey('bundle')) {

@@ -162,7 +162,7 @@ abstract class Entity extends DestinationBase implements ContainerFactoryPluginI
    * @see \Drupal\Core\Entity\EntityTypeInterface::getKeys()
    */
   protected function getKey($key) {
-    return $this->storageController->entityInfo()->getKey($key);
+    return $this->storageController->getEntityType()->getKey($key);
   }
 
 }
