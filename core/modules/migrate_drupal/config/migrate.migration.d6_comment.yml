@@ -28,8 +28,8 @@ process:
 #      plugin: extract
 #      index:
 #        - 0
-  entity_type: constants:node
-  field_id: constants:field_id
+  entity_type: constants.node
+  field_id: constants.field_id
   subject: subject
   uid: uid
 #    -
@@ -49,8 +49,8 @@ process:
   changed: timestamp
   status: status #ToDo: In D6, published=0.
   thread: thread
-  'comment_body:value': comment
-  'comment_body:format':
+  'comment_body.value': comment
+  'comment_body.format':
     -
       plugin: migration
       migration: d6_filter_format

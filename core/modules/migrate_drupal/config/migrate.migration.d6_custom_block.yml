@@ -5,9 +5,9 @@ source:
     type: basic
 process:
   id: bid
-  type: constants:type
+  type: constants.type
   info: info
-  'body:format':
+  'body.format':
     -
       plugin: migration
       migration: d6_filter_format
@@ -17,6 +17,6 @@ process:
       plugin: extract
       index:
         - 0
-  'body:value': body
+  'body.value': body
 destination:
   plugin: entity:custom_block

@@ -14,7 +14,7 @@ process:
   help: help
   has_title: has_title
   title_label: title_label
-  preview: constants:preview
+  preview: constants.preview
   submitted: submitted
   options: options
 

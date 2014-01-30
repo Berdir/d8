@@ -20,7 +20,7 @@ process:
         book:
           0: book_navigation
         comment:
-          0: views_block:comments_recent-block_1
+          0: views_block.comments_recent-block_1
         forum:
           0: forum_active_block
           1: forum_new_block
@@ -36,17 +36,17 @@ process:
           0: system_powered_by_block
         user:
           0: user_login_block
-          1: system_menu_block:tools
-          2: views_block:who_s_new-block_1
-          3: views_block:who_s_online-who_s_online_block
+          1: system_menu_block.tools
+          2: views_block.who_s_new-block_1
+          3: views_block.who_s_online-who_s_online_block
     -
       plugin: drupal6_block_plugin_id
   region: region
   theme: theme
   label: title
-  'visibility:path:visibility': visibility
-  'visibility:path:pages': pages
-  'visibility:role:roles': roles
+  'visibility.path.visibility': visibility
+  'visibility.path.pages': pages
+  'visibility.role.roles': roles
   weight: weight
   settings:
     plugin: drupal6_block_settings

@@ -112,7 +112,7 @@ class Row {
    *   TRUE if the source has property; FALSE otherwise.
    */
   public function hasSourceProperty($property) {
-    return NestedArray::keyExists($this->source, explode(':', $property));
+    return NestedArray::keyExists($this->source, explode('.', $property));
   }
 
   /**
@@ -125,7 +125,7 @@ class Row {
    *   The found returned property or NULL if not found.
    */
   public function getSourceProperty($property) {
-    $return = NestedArray::getValue($this->source, explode(':', $property), $key_exists);
+    $return = NestedArray::getValue($this->source, explode('.', $property), $key_exists);
     if ($key_exists) {
       return $return;
     }
@@ -158,7 +158,7 @@ class Row {
       throw new \Exception("The source is frozen and can't be changed any more");
     }
     else {
-      NestedArray::setValue($this->source, explode(':', $property), $data, TRUE);
+      NestedArray::setValue($this->source, explode('.', $property), $data, TRUE);
     }
   }
 
@@ -179,7 +179,7 @@ class Row {
    *   TRUE if the destination property exists.
    */
   public function hasDestinationProperty($property) {
-    return NestedArray::keyExists($this->destination, explode(':', $property));
+    return NestedArray::keyExists($this->destination, explode('.', $property));
   }
 
   /**
@@ -192,7 +192,7 @@ class Row {
    */
   public function setDestinationProperty($property, $value) {
     $this->rawDestination[$property] = $value;
-    NestedArray::setValue($this->destination, explode(':', $property), $value, TRUE);
+    NestedArray::setValue($this->destination, explode('.', $property), $value, TRUE);
   }
 
   /**
@@ -230,7 +230,7 @@ class Row {
    *  The destination value.
    */
   public function getDestinationProperty($property) {
-    return NestedArray::getValue($this->destination, explode(':', $property));
+    return NestedArray::getValue($this->destination, explode('.', $property));
   }
 
   /**

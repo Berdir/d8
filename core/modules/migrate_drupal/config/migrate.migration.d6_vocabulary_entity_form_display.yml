@@ -9,9 +9,9 @@ source:
       weight: 20
 
 process:
-  entity_type: constants:entity_type
-  form_mode: constants:form_mode
-  options: constants:options
+  entity_type: constants.entity_type
+  form_mode: constants.form_mode
+  options: constants.options
   bundle: type
   field_name:
     -
@@ -25,4 +25,4 @@ process:
         - 0
 
 destination:
-  plugin: entity_form_display
+  plugin: entity:form_display

@@ -136,7 +136,7 @@ abstract class Entity extends DestinationBase implements ContainerFactoryPluginI
    */
   protected function updateEntity(EntityInterface $entity, Row $row) {
     foreach ($row->getRawDestination() as $property => $value) {
-      $this->updateEntityProperty($entity, explode(':', $property), $value);
+      $this->updateEntityProperty($entity, explode('.', $property), $value);
     }
   }
 

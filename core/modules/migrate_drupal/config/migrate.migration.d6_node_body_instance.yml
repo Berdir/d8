@@ -15,12 +15,12 @@ source:
     field_type: text_with_summary
 
 process:
-  entity_type: constants:entity_type
-  field_name: constants:field_name
+  entity_type: constants.entity_type
+  field_name: constants.field_name
   bundle: type
   label: body_label
-  description: constants:description
-  required: constants:required
+  description: constants.description
+  required: constants.required
   status:
     -
       plugin: flag_skipping_row
@@ -28,10 +28,10 @@ process:
     -
       plugin: get
       value: has_body
-  default_value_function: constants:default_value_function
-  default_value: constants:default_value
-  settings: constants:settings
-  field_type: constants:field_type
+  default_value_function: constants.default_value_function
+  default_value: constants.default_value
+  settings: constants.settings
+  field_type: constants.field_type
 
 destination:
   plugin: entity:field_instance

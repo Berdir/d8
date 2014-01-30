@@ -8,11 +8,11 @@ source:
 
 process:
   bundle: type_name
-  form_mode: constants:form_mode
+  form_mode: constants.form_mode
   field_name: field_name
-  entity_type: constants:entity_type
-  "options:weight": weight
-  "options:type":
+  entity_type: constants.entity_type
+  "options.weight": weight
+  "options.type":
     type:
       plugin: static_map
       bypass: true
@@ -30,7 +30,7 @@ process:
         optionwidgets_onoff: options_onoff
         optionwidgets_buttons: options_buttons
         optionwidgets_select: options_select
-  "options:settings":
+  "options.settings":
     -
       plugin: field_instance_widget_settings
       source:
@@ -38,4 +38,4 @@ process:
         - widget_settings
 
 destination:
-  plugin: entity_form_display
+  plugin: entity:form_display

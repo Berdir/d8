@@ -7,9 +7,9 @@ source:
     id: node.comment
     name: comment
 process:
-  entity_type: constants:entity_type
-  id: constants:id
-  name: constants:name
-  type: constants:type
+  entity_type: constants.entity_type
+  id: constants.id
+  name: constants.name
+  type: constants.type
 destination:
   plugin: entity:field_entity

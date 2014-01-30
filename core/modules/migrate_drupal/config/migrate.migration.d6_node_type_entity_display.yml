@@ -9,11 +9,11 @@ source:
       label: hidden
       type: text_default
 process:
-  entity_type: constants:entity_type
-  field_name: constants:field_name
-  view_mode: constants:view_mode
-  options: constants:options
+  entity_type: constants.entity_type
+  field_name: constants.field_name
+  view_mode: constants.view_mode
+  options: constants.options
 
   bundle: type
 destination:
-  plugin: entity_display
+  plugin: entity:display

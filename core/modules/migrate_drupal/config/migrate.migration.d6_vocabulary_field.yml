@@ -7,8 +7,8 @@ source:
     parent: 0
 
 process:
-  entity_type: constants:entity_type
-  type: constants:type
+  entity_type: constants.entity_type
+  type: constants.type
   name:
     -
       plugin: migration
@@ -19,7 +19,7 @@ process:
       plugin: extract
       index:
         - 0
-  'settings:allowed_values:0:vocabulary': @name
-  'settings:allowed_values:0:parent': constants:parent
+  'settings.allowed_values.0.vocabulary': @name
+  'settings.allowed_values.0.parent': constants.parent
 destination:
   plugin: entity:field_entity
