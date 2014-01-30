@@ -26,4 +26,4 @@ process:
         - 0
 
 destination:
-  plugin: entity:entity_display
+  plugin: entity_display

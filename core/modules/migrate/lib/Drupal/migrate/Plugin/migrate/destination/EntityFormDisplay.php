@@ -9,7 +9,7 @@ namespace Drupal\migrate\Plugin\migrate\destination;
 
 /**
  * @MigrateDestinationPlugin(
- *   id = "entity:entity_form_display"
+ *   id = "entity_form_display"
  * )
  */
 class EntityFormDisplay extends EntityDisplayBase {
