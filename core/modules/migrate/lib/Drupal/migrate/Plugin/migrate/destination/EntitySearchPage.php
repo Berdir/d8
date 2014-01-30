@@ -11,7 +11,7 @@ use Drupal\migrate\Row;
 
 /**
  * @MigrateDestinationPlugin(
- *   id = "entity:entity_search_page"
+ *   id = "entity:search_page"
  * )
  */
 class EntitySearchPage extends EntityConfigBase {
