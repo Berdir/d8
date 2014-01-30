@@ -58,11 +58,6 @@ abstract class Entity extends DestinationBase implements ContainerFactoryPluginI
 
   /**
    * {@inheritdoc}
-   *
-   * When creating a generic entity destination plugin, an instance of
-   * EntityConfigBase or EntityContentBase will be returned instead of
-   * Entity as the two are too different to be handled by the same class.
-   * EntityContentBase relies on TypeData while EntityConfigBase doesn't.
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration = NULL) {
     $entity_type = static::getEntityType($plugin_id);

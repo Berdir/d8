@@ -14,10 +14,7 @@ use Drupal\migrate\Row;
 class EntityConfigBase extends Entity {
 
   /**
-   * Imports a configuration entity.
-   *
-   * @param Row $row
-   * @return array
+   * {@inheritdoc}
    */
   public function import(Row $row) {
     $ids = $this->getIds();
