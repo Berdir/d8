@@ -23,10 +23,6 @@ class EntityContentBase extends Entity {
     // @TODO: add field handling. https://drupal.org/node/2164451
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
     $entity = $this->getEntity($row);
-    $violations = $entity->validate();
-    if (count($violations)) {
-      throw new MigrateSkipRowException();
-    }
     $entity->save();
     return array($entity->id());
   }
