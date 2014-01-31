@@ -117,6 +117,7 @@ class Migration extends ProcessPluginBase implements  ContainerFactoryPluginInte
         $values[$source_id] = $source_id_values[$migration->id()][$index];
       }
       $stub_row = new Row($values, $source_ids);
+      $stub_row->stub(TRUE);
       // Do a normal migration with the stub row.
       $migrate_executable->processRow($stub_row, $process);
       $destination_ids = $destination_plugin->import($stub_row);

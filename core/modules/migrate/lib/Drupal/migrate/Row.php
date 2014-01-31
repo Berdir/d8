@@ -71,6 +71,13 @@ class Row {
   protected $rawDestination;
 
   /**
+   * TRUE when this row is a stub.
+   *
+   * @var bool
+   */
+  protected $stub = FALSE;
+
+  /**
    * Constructs a \Drupal\Migrate\Row object.
    *
    * @param array $values
@@ -292,4 +299,17 @@ class Row {
     return $this->idMap['hash'];
   }
 
+  /**
+   * Flags and reports this row as a stub.
+   *
+   * @param bool|null $new_value
+   *   TRUE when the row is a stub. Omit to determine whether the row is a
+   *   stub.
+   */
+  public function stub($new_value = NULL) {
+    if (isset($new_value)) {
+      $this->stub = $new_value;
+    }
+    return $this->stub;
+  }
 }
