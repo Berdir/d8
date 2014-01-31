@@ -33,11 +33,6 @@ class NodeFormController extends ContentEntityFormController {
     // Set up default values, if required.
     $type = entity_load('node_type', $node->bundle());
     $this->settings = $type->getModuleSettings('node');
-    $this->settings += array(
-      'options' => array('status', 'promote'),
-      'preview' => DRUPAL_OPTIONAL,
-      'submitted' => TRUE,
-    );
 
     // If this is a new node, fill in the default values.
     if ($node->isNew()) {
@@ -47,8 +42,6 @@ class NodeFormController extends ContentEntityFormController {
           $node->$key = (int) !empty($this->settings['options'][$key]);
         }
       }
-      $node->setAuthorId(\Drupal::currentUser()->id());
-      $node->setCreatedTime(REQUEST_TIME);
     }
     else {
       $node->date = format_date($node->getCreatedTime(), 'custom', 'Y-m-d H:i:s O');
@@ -84,15 +77,6 @@ class NodeFormController extends ContentEntityFormController {
     // name in 'TYPE-node-form' potentially clashes with third-party class
     // names.
     $form['#attributes']['class'][0] = drupal_html_class('node-' . $node->getType() . '-form');
-
-    // Basic node information.
-    // These elements are just values so they are not even sent to the client.
-    foreach (array('nid', 'vid', 'type') as $key) {
-      $form[$key] = array(
-        '#type' => 'value',
-        '#value' => isset($node->$key) ? $node->$key : NULL,
-      );
-    }
 
     // Changed must be sent to the client, for later overwrite error checking.
     $form['changed'] = array(
@@ -153,6 +137,7 @@ class NodeFormController extends ContentEntityFormController {
         ),
       ),
       '#group' => 'revision_information',
+      '#access' => user_access('administer nodes'),
     );
 
     // Node author information for administrators.
@@ -186,6 +171,7 @@ class NodeFormController extends ContentEntityFormController {
       '#weight' => -1,
       '#description' => t('Leave blank for %anonymous.', array('%anonymous' => $user_config->get('anonymous'))),
       '#group' => 'author',
+      '#access' => user_access('administer nodes'),
     );
     $form['created'] = array(
       '#type' => 'textfield',
@@ -194,6 +180,7 @@ class NodeFormController extends ContentEntityFormController {
       '#description' => t('Format: %time. The date format is YYYY-MM-DD and %timezone is the time zone offset from UTC. Leave blank to use the time of form submission.', array('%time' => !empty($node->date) ? date_format(date_create($node->date), 'Y-m-d H:i:s O') : format_date($node->getCreatedTime(), 'custom', 'Y-m-d H:i:s O'), '%timezone' => !empty($node->date) ? date_format(date_create($node->date), 'O') : format_date($node->getCreatedTime(), 'custom', 'O'))),
       '#default_value' => !empty($node->date) ? $node->date : '',
       '#group' => 'author',
+      '#access' => user_access('administer nodes'),
     );
 
     // Node options for administrators.
@@ -217,7 +204,7 @@ class NodeFormController extends ContentEntityFormController {
       '#title' => t('Promoted to front page'),
       '#default_value' => $node->isPromoted(),
       '#group' => 'options',
-
+      '#access' => user_access('administer nodes'),
     );
 
     $form['sticky'] = array(
@@ -225,6 +212,7 @@ class NodeFormController extends ContentEntityFormController {
       '#title' => t('Sticky at top of lists'),
       '#default_value' => $node->isSticky(),
       '#group' => 'options',
+      '#access' => user_access('administer nodes'),
     );
 
     return parent::form($form, $form_state, $node);
