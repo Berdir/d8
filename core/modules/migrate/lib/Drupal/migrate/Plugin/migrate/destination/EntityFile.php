@@ -20,16 +20,22 @@ use Drupal\migrate\Row;
  */
 class EntityFile extends EntityContentBase {
 
-    public function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration, EntityStorageControllerInterface $storage_controller, array $bundles, MigratePluginManager $plugin_manager, FieldInfo $field_info) {
-      $configuration += array(
-        'source_base_path' => '',
-        'source_path_property' => 'filepath',
-        'destination_path_property' => 'filepath',
-        'move' => FALSE,
-      );
-      parent::__construct($configuration, $plugin_id, $plugin_definition, $migration, $storage_controller, $bundles, $plugin_manager, $field_info);
-    }
+  /**
+   * {@inheritdoc}
+   */
+  public function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration, EntityStorageControllerInterface $storage_controller, array $bundles, MigratePluginManager $plugin_manager, FieldInfo $field_info) {
+    $configuration += array(
+      'source_base_path' => '',
+      'source_path_property' => 'filepath',
+      'destination_path_property' => 'filepath',
+      'move' => FALSE,
+    );
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $migration, $storage_controller, $bundles, $plugin_manager, $field_info);
+  }
 
+  /**
+   * {@inheritdoc}
+   */
   public function import(Row $row) {
     $source = $this->configuration['source_base_path'] . $row->getSourceProperty($this->configuration['source_path_property']);
     $destination = $row->getDestinationProperty($this->configuration['destination_path_property']);
