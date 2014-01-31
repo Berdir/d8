@@ -73,7 +73,7 @@ class ConfigSingleExportForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, array &$form_state, $config_type = NULL, $config_name = NULL) {
+  public function buildForm(array $form, array &$form_state, $config_typeId = NULL, $config_name = NULL) {
     foreach ($this->entityManager->getDefinitions() as $entity_type => $definition) {
       if ($definition->getConfigPrefix() && $definition->hasKey('uuid')) {
         $this->definitions[$entity_type] = $definition;
@@ -91,13 +91,13 @@ class ConfigSingleExportForm extends FormBase {
       '#title' => $this->t('Configuration type'),
       '#type' => 'select',
       '#options' => $config_types,
-      '#default_value' => $config_type,
+      '#default_value' => $config_typeId,
       '#ajax' => array(
         'callback' => array($this, 'updateConfigurationType'),
         'wrapper' => 'edit-config-type-wrapper',
       ),
     );
-    $default_type = isset($form_state['values']['config_type']) ? $form_state['values']['config_type'] : $config_type;
+    $default_type = isset($form_state['values']['config_type']) ? $form_state['values']['config_type'] : $config_typeId;
     $form['config_name'] = array(
       '#title' => $this->t('Configuration name'),
       '#type' => 'select',
@@ -120,9 +120,9 @@ class ConfigSingleExportForm extends FormBase {
       '#prefix' => '<div id="edit-export-wrapper">',
       '#suffix' => '</div>',
     );
-    if ($config_type && $config_name) {
+    if ($config_typeId && $config_name) {
       $fake_form_state = array('values' => array(
-        'config_type' => $config_type,
+        'config_type' => $config_typeId,
         'config_name' => $config_name,
       ));
       $form['export'] = $this->updateExport($form, $fake_form_state);

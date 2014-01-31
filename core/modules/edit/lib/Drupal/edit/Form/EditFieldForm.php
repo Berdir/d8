@@ -80,19 +80,19 @@ class EditFieldForm extends FormBase {
    *
    * Builds a form for a single entity field.
    */
-  public function buildForm(array $form, array &$form_state, EntityInterface $entity = NULL, $field_name = NULL) {
+  public function buildForm(array $form, array &$form_state, EntityInterface $entityId = NULL, $field_name = NULL) {
     if (!isset($form_state['entity'])) {
-      $this->init($form_state, $entity, $field_name);
+      $this->init($form_state, $entityId, $field_name);
     }
 
     // Add the field form.
     field_attach_form($form_state['entity'], $form, $form_state, $form_state['langcode'], array('field_name' =>  $form_state['field_name']));
 
     // Add a dummy changed timestamp field to attach form errors to.
-    if ($entity instanceof EntityChangedInterface) {
+    if ($entityId instanceof EntityChangedInterface) {
       $form['changed_field'] = array(
         '#type' => 'hidden',
-        '#value' => $entity->getChangedTime(),
+        '#value' => $entityId->getChangedTime(),
       );
     }
 

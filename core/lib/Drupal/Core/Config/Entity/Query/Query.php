@@ -85,8 +85,8 @@ class Query extends QueryBase implements QueryInterface {
    */
   public function execute() {
     // Load all config files.
-    $entity_info = $this->entityManager->getDefinition($this->getEntityType());
-    $prefix = $entity_info->getConfigPrefix() . '.';
+    $entity_type = $this->entityManager->getDefinition($this->getEntityType());
+    $prefix = $entity_type->getConfigPrefix() . '.';
     $prefix_length = strlen($prefix);
     $names = $this->configStorage->listAll($prefix);
     $configs = array();

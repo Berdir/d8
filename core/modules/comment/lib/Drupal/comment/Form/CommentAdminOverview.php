@@ -107,13 +107,13 @@ class CommentAdminOverview extends FormBase {
    *   An associative array containing the structure of the form.
    * @param array $form_state
    *   An associative array containing the current state of the form.
-   * @param string $type
+   * @param string $typeId
    *   The type of the overview form ('approval' or 'new').
    *
    * @return array
    *   The form structure.
    */
-  public function buildForm(array $form, array &$form_state, $type = 'new') {
+  public function buildForm(array $form, array &$form_state, $typeId = 'new') {
 
     // Build an 'Update options' form.
     $form['options'] = array(
@@ -122,7 +122,7 @@ class CommentAdminOverview extends FormBase {
       '#attributes' => array('class' => array('container-inline')),
     );
 
-    if ($type == 'approval') {
+    if ($typeId == 'approval') {
       $options['publish'] = $this->t('Publish the selected comments');
     }
     else {
@@ -143,7 +143,7 @@ class CommentAdminOverview extends FormBase {
     );
 
     // Load the comments that need to be displayed.
-    $status = ($type == 'approval') ? CommentInterface::NOT_PUBLISHED : CommentInterface::PUBLISHED;
+    $status = ($typeId == 'approval') ? CommentInterface::NOT_PUBLISHED : CommentInterface::PUBLISHED;
     $header = array(
       'subject' => array(
         'data' => $this->t('Subject'),
