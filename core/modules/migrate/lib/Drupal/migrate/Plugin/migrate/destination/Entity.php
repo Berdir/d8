@@ -118,6 +118,8 @@ abstract class Entity extends DestinationBase implements ContainerFactoryPluginI
     }
     else {
       $values = $row->getDestination();
+      // Stubs might not have the bundle specified.
+      // @TODO perhaps make stub rows explicit.
       $bundle_key = $this->getKey('bundle');
       if ($bundle_key && !isset($values[$bundle_key])) {
         $values[$bundle_key] = reset($this->bundles);
