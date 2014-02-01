@@ -7,6 +7,9 @@
 
 namespace Drupal\migrate\Plugin;
 
+use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Language\LanguageManager;
 use Drupal\migrate\Entity\MigrationInterface;
 
 class MigrateProcessPluginManager extends MigratePluginManager {
@@ -17,6 +20,13 @@ class MigrateProcessPluginManager extends MigratePluginManager {
    * @var array
    */
   protected $storage;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __construct($type, \Traversable $namespaces, CacheBackendInterface $cache_backend, LanguageManager $language_manager, ModuleHandlerInterface $module_handler, $annotation = 'Drupal\migrate\Annotation\MigrateProcessPlugin') {
+    parent::__construct($type, $namespaces, $cache_backend, $language_manager, $module_handler, $annotation);
+  }
 
   /**
    * {@inheritdoc}
