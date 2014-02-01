@@ -9,57 +9,19 @@ namespace Drupal\migrate_drupal\Plugin\migrate\load\d6;
 
 use Drupal\Component\Utility\MapArray;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
-use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\Plugin\migrate\load\LoadBase;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * @PluginID("d6_node")
  */
-class Node extends LoadBase implements ContainerFactoryPluginInterface {
-
-  /**
-   * @var \Drupal\migrate\MigrationStorageController
-   */
-  protected $storageController;
-
-  /**
-   * Constructs the load plugin.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
-   * @param array $plugin_definition
-   *   The plugin implementation definition.
-   * @param EntityStorageControllerInterface $storage_controller
-   *   The migration storage controller.
-   */
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration, EntityStorageControllerInterface $storage_controller) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition, $migration);
-    $this->storageController = $storage_controller;
-  }
+class Node extends LoadBase {
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration = NULL) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $migration,
-      $container->get('entity.manager')->getStorageController('migration')
-    );
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function loadMultiple(array $sub_ids = NULL) {
+  public function loadMultiple(EntityStorageControllerInterface $storage_controller, array $sub_ids = NULL) {
     /** @var \Drupal\migrate\Entity\MigrationInterface $node_type_migration */
-    $node_type_migration = $this->storageController->load('d6_node_type');
+    $node_type_migration = $storage_controller->load('d6_node_type');
     $types = array();
     foreach ($node_type_migration->getIdMap() as $key => $row) {
       $key = unserialize($key);
@@ -72,7 +34,7 @@ class Node extends LoadBase implements ContainerFactoryPluginInterface {
       $values['id'] = 'd6_node:' . $node_type;
       $values['source']['type'] = $node_type;
       /** @var \Drupal\migrate\Entity\MigrationInterface $migration */
-      $migration = $this->storageController->create($values);
+      $migration = $storage_controller->create($values);
       $migration->process = MapArray::copyValuesToKeys(array_keys($migration->getSourcePlugin()->fields()));
       $migrations[$migration->id()] = $migration;
     }

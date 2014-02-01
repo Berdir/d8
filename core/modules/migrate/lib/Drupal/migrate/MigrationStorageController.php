@@ -52,7 +52,7 @@ class MigrationStorageController extends ConfigStorageController {
       $return = array();
       foreach ($entities as $entity_id => $entity) {
         if ($plugin = $entity->getLoadPlugin()) {
-          $return += $plugin->loadMultiple();
+          $return += $plugin->loadMultiple($this);
         }
         else {
           $return[$entity_id] = $entity;
@@ -65,7 +65,7 @@ class MigrationStorageController extends ConfigStorageController {
         $entity = $entities[$base_id];
         if ($plugin = $entity->getLoadPlugin()) {
           unset($entities[$base_id]);
-          $entities += $plugin->loadMultiple($sub_ids);
+          $entities += $plugin->loadMultiple($this, $sub_ids);
         }
       }
     }

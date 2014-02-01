@@ -7,6 +7,7 @@
 
 namespace Drupal\migrate\Plugin\migrate\load;
 
+use Drupal\Core\Entity\EntityStorageControllerInterface;
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\migrate\Plugin\MigrateLoadInterface;
 use Drupal\migrate\Entity\MigrationInterface;
@@ -32,8 +33,9 @@ abstract class LoadBase extends PluginBase implements MigrateLoadInterface {
   /**
    * {@inheritdoc}
    */
-  public function load($sub_id) {
-    $entities = $this->loadMultiple(array($sub_id));
+  public function load(EntityStorageControllerInterface $storage_controller, $sub_id) {
+    $entities = $this->loadMultiple($storage_controller, array($sub_id));
     return isset($entities[$sub_id]) ? $entities[$sub_id] : FALSE;
   }
+
 }
