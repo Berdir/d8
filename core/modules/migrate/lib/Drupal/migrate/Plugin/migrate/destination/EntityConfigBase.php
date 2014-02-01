@@ -11,6 +11,16 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\migrate\Row;
 
+/**
+ * Class for importing configuration entities.
+ *
+ * This class serves as the import class for most configuration entities.
+ * It can be necessary to provide a specific entity class if the configuration
+ * entity has a compound id (see EntityFieldEntity) or it has specific setter
+ * methods (see EntityDateFormat). When implementing an entity destination for
+ * the latter case, make sure to add a test not only for importing but also
+ * for re-importing (if that is supported).
+ */
 class EntityConfigBase extends Entity {
 
   /**
