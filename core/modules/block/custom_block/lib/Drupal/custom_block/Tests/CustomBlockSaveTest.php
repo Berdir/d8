@@ -49,13 +49,13 @@ class CustomBlockSaveTest extends CustomBlockTestBase {
     $max_id = db_query('SELECT MAX(id) FROM {custom_block}')->fetchField();
     $test_id = $max_id + mt_rand(1000, 1000000);
     $info = $this->randomName(8);
-    $block = array(
+    $block_array = array(
       'info' => $info,
-      'body' => array(Language::LANGCODE_NOT_SPECIFIED => array(array('value' => $this->randomName(32)))),
+      'body' => array('value' => $this->randomName(32)),
       'type' => 'basic',
       'id' => $test_id
     );
-    $block = entity_create('custom_block', $block);
+    $block = entity_create('custom_block', $block_array);
     $block->enforceIsNew(TRUE);
     $block->save();
 
@@ -65,6 +65,7 @@ class CustomBlockSaveTest extends CustomBlockTestBase {
     // Test the import saved.
     $block_by_id = custom_block_load($test_id);
     $this->assertTrue($block_by_id, 'Custom block load by block ID.');
+    $this->assertIdentical($block_by_id->body->value, $block_array['body']['value']);
   }
 
   /**
@@ -106,7 +107,7 @@ class CustomBlockSaveTest extends CustomBlockTestBase {
    * @see block_test_block_insert()
    */
   public function testCustomBlockSaveOnInsert() {
-    // custom_block_test_custom_block_insert() tiggers a save on insert if the
+    // custom_block_test_custom_block_insert() triggers a save on insert if the
     // title equals 'new'.
     $block = $this->createCustomBlock('new');
     $this->assertEqual($block->label(), 'CustomBlock ' . $block->id(), 'Custom block saved on block insert.');

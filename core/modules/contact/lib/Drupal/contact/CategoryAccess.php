@@ -22,13 +22,17 @@ class CategoryAccess extends EntityAccess {
    * {@inheritdoc}
    */
   public function checkAccess(EntityInterface $entity, $operation, $langcode, AccountInterface $account) {
-    if ($operation == 'delete' || $operation == 'update') {
-      // Do not allow delete 'personal' category used for personal contact form.
-      return user_access('administer contact forms', $account) && $entity->id() !== 'personal';
+    if ($operation == 'view') {
+      // Do not allow access personal category via site-wide route.
+      return $account->hasPermission('access site-wide contact form') && $entity->id() !== 'personal';
     }
-    else {
-      return user_access('administer contact forms', $account);
+    elseif ($operation == 'delete' || $operation == 'update') {
+      // Do not allow the 'personal' category to be deleted, as it's used for
+      // the personal contact form.
+      return $account->hasPermission('administer contact forms') && $entity->id() !== 'personal';
     }
+
+    return parent::checkAccess($entity, $operation, $langcode, $account);
   }
 
 }

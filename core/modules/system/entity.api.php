@@ -96,21 +96,46 @@ function hook_ENTITY_TYPE_create_access(\Drupal\Core\Session\AccountInterface $a
 /**
  * Add to entity type definitions.
  *
- * Modules may implement this hook to add information to defined entity types.
+ * Modules may implement this hook to add information to defined entity types,
+ * as defined in \Drupal\Core\Entity\EntityTypeInterface.
  *
- * @param array $entity_info
+ * @param \Drupal\Core\Entity\EntityTypeInterface $entity_info
  *   An associative array of all entity type definitions, keyed by the entity
  *   type name. Passed by reference.
  *
  * @see \Drupal\Core\Entity\Entity
- * @see \Drupal\Core\Entity\EntityManagerInterface
- * @see entity_get_info()
+ * @see \Drupal\Core\Entity\EntityTypeInterface
  */
 function hook_entity_info(&$entity_info) {
+  /** @var $entity_info \Drupal\Core\Entity\EntityTypeInterface[] */
   // Add a form controller for a custom node form without overriding the default
-  // node form. To override the default node form, use hook_entity_info_alter()
-  // to alter $entity_info['node']['controllers']['form']['default'].
-  $entity_info['node']['controllers']['form']['mymodule_foo'] = 'Drupal\mymodule\NodeFooFormController';
+  // node form. To override the default node form, use hook_entity_info_alter().
+  $entity_info['node']->setFormClass('mymodule_foo', 'Drupal\mymodule\NodeFooFormController');
+}
+
+/**
+ * Alter the entity type definitions.
+ *
+ * Modules may implement this hook to alter the information that defines an
+ * entity type. All properties that are available in
+ * \Drupal\Core\Entity\Annotation\EntityType and all the ones additionally
+ * provided by modules can be altered here.
+ *
+ * Do not use this hook to add information to entity types, unless you are just
+ * filling-in default values. Use hook_entity_info() instead.
+ *
+ * @param \Drupal\Core\Entity\EntityTypeInterface $entity_info
+ *   An associative array of all entity type definitions, keyed by the entity
+ *   type name. Passed by reference.
+ *
+ * @see \Drupal\Core\Entity\Entity
+ * @see \Drupal\Core\Entity\EntityTypeInterface
+ */
+function hook_entity_info_alter(&$entity_info) {
+  /** @var $entity_info \Drupal\Core\Entity\EntityTypeInterface[] */
+  // Set the controller class for nodes to an alternate implementation of the
+  // Drupal\Core\Entity\EntityStorageControllerInterface interface.
+  $entity_info['node']->setStorageClass('Drupal\mymodule\MyCustomNodeStorageController');
 }
 
 /**
@@ -221,30 +246,6 @@ function hook_entity_bundle_delete($entity_type, $bundle) {
 }
 
 /**
- * Alter the entity type definitions.
- *
- * Modules may implement this hook to alter the information that defines an
- * entity type. All properties that are available in
- * \Drupal\Core\Entity\EntityManagerInterface can be altered here.
- *
- * Do not use this hook to add information to entity types. Use
- * hook_entity_info() for that instead.
- *
- * @param array $entity_info
- *   An associative array of all entity type definitions, keyed by the entity
- *   type name. Passed by reference.
- *
- * @see \Drupal\Core\Entity\Entity
- * @see \Drupal\Core\Entity\EntityManagerInterface
- * @see entity_get_info()
- */
-function hook_entity_info_alter(&$entity_info) {
-  // Set the controller class for nodes to an alternate implementation of the
-  // Drupal\Core\Entity\EntityStorageControllerInterface interface.
-  $entity_info['node']['controllers']['storage'] = 'Drupal\mymodule\MyCustomNodeStorageController';
-}
-
-/**
  * Act on a newly created entity.
  *
  * This hook runs after a new entity object has just been instantiated. It can
@@ -299,7 +300,7 @@ function hook_entity_insert(Drupal\Core\Entity\EntityInterface $entity) {
   // Insert the new entity into a fictional table of all entities.
   db_insert('example_entity')
     ->fields(array(
-      'type' => $entity->entityType(),
+      'type' => $entity->getEntityTypeId(),
       'id' => $entity->id(),
       'created' => REQUEST_TIME,
       'updated' => REQUEST_TIME,
@@ -322,7 +323,7 @@ function hook_entity_update(Drupal\Core\Entity\EntityInterface $entity) {
     ->fields(array(
       'updated' => REQUEST_TIME,
     ))
-    ->condition('type', $entity->entityType())
+    ->condition('type', $entity->getEntityTypeId())
     ->condition('id', $entity->id())
     ->execute();
 }
@@ -371,7 +372,7 @@ function hook_entity_predelete(Drupal\Core\Entity\EntityInterface $entity) {
   // Count references to this entity in a custom table before they are removed
   // upon entity deletion.
   $id = $entity->id();
-  $type = $entity->entityType();
+  $type = $entity->getEntityTypeId();
   $count = db_select('example_entity_data')
     ->condition('type', $type)
     ->condition('id', $id)
@@ -399,7 +400,7 @@ function hook_entity_predelete(Drupal\Core\Entity\EntityInterface $entity) {
 function hook_entity_delete(Drupal\Core\Entity\EntityInterface $entity) {
   // Delete the entity's entry from a fictional table of all entities.
   db_delete('example_entity')
-    ->condition('type', $entity->entityType())
+    ->condition('type', $entity->getEntityTypeId())
     ->condition('id', $entity->id())
     ->execute();
 }
@@ -436,7 +437,7 @@ function hook_entity_query_alter(\Drupal\Core\Entity\Query\QueryInterface $query
  *
  * @param \Drupal\Core\Entity\EntityInterface $entity
  *   The entity object.
- * @param \Drupal\entity\Entity\EntityDisplay $display
+ * @param \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display
  *   The entity_display object holding the display options configured for the
  *   entity components.
  * @param $view_mode
@@ -453,7 +454,7 @@ function hook_entity_query_alter(\Drupal\Core\Entity\Query\QueryInterface $query
  * @see hook_node_view()
  * @see hook_user_view()
  */
-function hook_entity_view(\Drupal\Core\Entity\EntityInterface $entity, \Drupal\entity\Entity\EntityDisplay $display, $view_mode, $langcode) {
+function hook_entity_view(\Drupal\Core\Entity\EntityInterface $entity, \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display, $view_mode, $langcode) {
   // Only do the extra work if the component is configured to be displayed.
   // This assumes a 'mymodule_addition' extra field has been defined for the
   // entity bundle in hook_field_extra_fields().
@@ -482,7 +483,7 @@ function hook_entity_view(\Drupal\Core\Entity\EntityInterface $entity, \Drupal\e
  *   A renderable array representing the entity content.
  * @param \Drupal\Core\Entity\EntityInterface $entity
  *   The entity object being rendered.
- * @param \Drupal\entity\Entity\EntityDisplay $display
+ * @param \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display
  *   The entity_display object holding the display options configured for the
  *   entity components.
  *
@@ -492,7 +493,7 @@ function hook_entity_view(\Drupal\Core\Entity\EntityInterface $entity, \Drupal\e
  * @see hook_taxonomy_term_view_alter()
  * @see hook_user_view_alter()
  */
-function hook_entity_view_alter(&$build, Drupal\Core\Entity\EntityInterface $entity, \Drupal\entity\Entity\EntityDisplay $display) {
+function hook_entity_view_alter(&$build, Drupal\Core\Entity\EntityInterface $entity, \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display) {
   if ($build['#view_mode'] == 'full' && isset($build['an_additional_field'])) {
     // Change its weight.
     $build['an_additional_field']['#weight'] = -10;
@@ -553,7 +554,7 @@ function hook_entity_prepare_view($entity_type, array $entities, array $displays
  */
 function hook_entity_view_mode_alter(&$view_mode, Drupal\Core\Entity\EntityInterface $entity, $context) {
   // For nodes, change the view mode when it is teaser.
-  if ($entity->entityType() == 'node' && $view_mode == 'teaser') {
+  if ($entity->getEntityTypeId() == 'node' && $view_mode == 'teaser') {
     $view_mode = 'my_custom_view_mode';
   }
 }
@@ -561,7 +562,7 @@ function hook_entity_view_mode_alter(&$view_mode, Drupal\Core\Entity\EntityInter
 /**
  * Alters the settings used for displaying an entity.
  *
- * @param \Drupal\entity\Entity\EntityDisplay $display
+ * @param \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display
  *   The entity_display object that will be used to display the entity
  *   components.
  * @param array $context
@@ -570,7 +571,7 @@ function hook_entity_view_mode_alter(&$view_mode, Drupal\Core\Entity\EntityInter
  *   - bundle: The bundle, e.g., 'page' or 'article'.
  *   - view_mode: The view mode, e.g. 'full', 'teaser'...
  */
-function hook_entity_display_alter(\Drupal\entity\Entity\EntityDisplay $display, array $context) {
+function hook_entity_display_alter(\Drupal\Core\Entity\Display\EntityViewDisplayInterface $display, array $context) {
   // Leave field labels out of the search index.
   if ($context['entity_type'] == 'node' && $context['view_mode'] == 'search_index') {
     foreach ($display->getComponents() as $name => $options) {
@@ -610,7 +611,7 @@ function hook_entity_prepare_form(\Drupal\Core\Entity\EntityInterface $entity, $
 /**
  * Alters the settings used for displaying an entity form.
  *
- * @param \Drupal\entity\Entity\EntityFormDisplay $form_display
+ * @param \Drupal\Core\Entity\Display\EntityFormDisplayInterface $form_display
  *   The entity_form_display object that will be used to display the entity form
  *   components.
  * @param array $context
@@ -619,7 +620,7 @@ function hook_entity_prepare_form(\Drupal\Core\Entity\EntityInterface $entity, $
  *   - bundle: The bundle, e.g., 'page' or 'article'.
  *   - form_mode: The form mode, e.g. 'default', 'profile', 'register'...
  */
-function hook_entity_form_display_alter(\Drupal\entity\Entity\EntityFormDisplay $form_display, array $context) {
+function hook_entity_form_display_alter(\Drupal\Core\Entity\Display\EntityFormDisplayInterface $form_display, array $context) {
   // Hide the 'user_picture' field from the register form.
   if ($context['entity_type'] == 'user' && $context['form_mode'] == 'register') {
     $form_display->setComponent('user_picture', array(
@@ -698,10 +699,9 @@ function hook_entity_field_info_alter(&$info, $entity_type) {
  *   The entity on which the linked operations will be performed.
  */
 function hook_entity_operation_alter(array &$operations, \Drupal\Core\Entity\EntityInterface $entity) {
-  $uri = $entity->uri();
   $operations['translate'] = array(
     'title' => t('Translate'),
-    'href' => $uri['path'] . '/translate',
+    'href' => $entity->getSystemPath() . '/translate',
     'weight' => 50,
   );
 }
@@ -735,7 +735,7 @@ function hook_entity_field_access($operation, \Drupal\Core\Field\FieldDefinition
 }
 
 /**
- * Alters the default access behaviour for a given field.
+ * Alters the default access behavior for a given field.
  *
  * Use this hook to override access grants from another module. Note that the
  * original default access flag is masked under the ':default' key.

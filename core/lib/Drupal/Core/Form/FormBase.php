@@ -133,8 +133,7 @@ abstract class FormBase extends DependencySerialization implements FormInterface
    * @param \Drupal\Core\StringTranslation\TranslationInterface $translation_manager
    *   The translation manager.
    *
-   * @return self
-   *   The entity form.
+   * @return $this
    */
   public function setTranslationManager(TranslationInterface $translation_manager) {
     $this->translationManager = $translation_manager;
@@ -147,8 +146,7 @@ abstract class FormBase extends DependencySerialization implements FormInterface
    * @param \Drupal\Core\Config\ConfigFactory $config_factory
    *   The config factory.
    *
-   * @return self
-   *   The form.
+   * @return $this
    */
   public function setConfigFactory(ConfigFactory $config_factory) {
     $this->configFactory = $config_factory;
@@ -173,9 +171,12 @@ abstract class FormBase extends DependencySerialization implements FormInterface
    *
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The request object.
+   *
+   * @return $this
    */
   public function setRequest(Request $request) {
     $this->request = $request;
+    return $this;
   }
 
   /**
@@ -206,18 +207,26 @@ abstract class FormBase extends DependencySerialization implements FormInterface
    *
    * @param \Drupal\Core\Routing\UrlGeneratorInterface
    *   The URL generator.
+   *
+   * @return $this
    */
   public function setUrlGenerator(UrlGeneratorInterface $url_generator) {
     $this->urlGenerator = $url_generator;
+    return $this;
   }
 
   /**
    * Returns the service container.
    *
+   * This method is marked private to prevent sub-classes from retrieving
+   * services from the container through it. Instead,
+   * \Drupal\Core\DependencyInjection\ContainerInjectionInterface should be used
+   * for injecting services.
+   *
    * @return \Symfony\Component\DependencyInjection\ContainerInterface $container
    *   The service container.
    */
-  protected function container() {
+  private function container() {
     return \Drupal::getContainer();
   }
 
@@ -245,9 +254,12 @@ abstract class FormBase extends DependencySerialization implements FormInterface
    *   (optional) The error message to present to the user.
    *
    * @see \Drupal\Core\Form\FormErrorInterface::setErrorByName()
+   *
+   * @return $this
    */
   protected function setFormError($name, array &$form_state, $message = '') {
     $this->errorHandler()->setErrorByName($name, $form_state, $message);
+    return $this;
   }
 
 }

@@ -8,8 +8,6 @@
 namespace Drupal\picture\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
-use Drupal\Core\Entity\Annotation\EntityType;
-use Drupal\Core\Annotation\Translation;
 use Drupal\picture\PictureMappingInterface;
 
 /**
@@ -37,7 +35,8 @@ use Drupal\picture\PictureMappingInterface;
  *     "uuid" = "uuid"
  *   },
  *   links = {
- *     "edit-form" = "picture.mapping_page_edit"
+ *     "edit-form" = "picture.mapping_page_edit",
+ *     "duplicate-form" = "picture.mapping_page_duplicate"
  *   }
  * )
  */

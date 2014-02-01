@@ -2,12 +2,15 @@
 
 /**
  * @file
- * Definition of Drupal\system\Tests\Theme\FunctionsTest.
+ * Contains \Drupal\system\Tests\Theme\FunctionsTest.
  */
 
 namespace Drupal\system\Tests\Theme;
 
+use Drupal\Core\Session\UserSession;
 use Drupal\simpletest\WebTestBase;
+use Symfony\Cmf\Component\Routing\RouteObjectInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Tests for common theme functions.
@@ -116,30 +119,30 @@ class FunctionsTest extends WebTestBase {
     );
 
     $inner_b = '<div class="item-list"><ol id="blist">';
-    $inner_b .= '<li class="odd first">ba</li>';
-    $inner_b .= '<li class="item-class-bb even last">bb</li>';
+    $inner_b .= '<li>ba</li>';
+    $inner_b .= '<li class="item-class-bb">bb</li>';
     $inner_b .= '</ol></div>';
 
     $inner_cb = '<div class="item-list"><ul>';
-    $inner_cb .= '<li class="odd first">cba</li>';
-    $inner_cb .= '<li class="even last">cbb</li>';
+    $inner_cb .= '<li>cba</li>';
+    $inner_cb .= '<li>cbb</li>';
     $inner_cb .= '</ul></div>';
 
     $inner_c = '<div class="item-list"><ul id="clist">';
-    $inner_c .= '<li class="odd first">ca</li>';
-    $inner_c .= '<li class="item-class-cb even">cb' . $inner_cb . '</li>';
-    $inner_c .= '<li class="odd last">cc</li>';
+    $inner_c .= '<li>ca</li>';
+    $inner_c .= '<li class="item-class-cb">cb' . $inner_cb . '</li>';
+    $inner_c .= '<li>cc</li>';
     $inner_c .= '</ul></div>';
 
     $expected = '<div class="item-list">';
     $expected .= '<h3>Some title</h3>';
     $expected .= '<ul id="parentlist">';
-    $expected .= '<li class="odd first">a</li>';
-    $expected .= '<li id="item-id-b" class="even">b' . $inner_b . '</li>';
-    $expected .= '<li class="odd">c' . $inner_c . '</li>';
-    $expected .= '<li id="item-id-d" class="even">d</li>';
-    $expected .= '<li id="item-id-e" class="odd"></li>';
-    $expected .= '<li class="even last">f</li>';
+    $expected .= '<li>a</li>';
+    $expected .= '<li id="item-id-b">b' . $inner_b . '</li>';
+    $expected .= '<li>c' . $inner_c . '</li>';
+    $expected .= '<li id="item-id-d">d</li>';
+    $expected .= '<li id="item-id-e"></li>';
+    $expected .= '<li>f</li>';
     $expected .= '</ul></div>';
 
     $this->assertThemeOutput('item_list', $variables, $expected);
@@ -158,12 +161,6 @@ class FunctionsTest extends WebTestBase {
     $variables['heading'] = 'Some title';
     $expected = '';
     $this->assertThemeOutput('links', $variables, $expected, 'Empty %callback with heading generates no output.');
-
-    // Set the current path to the front page path.
-    // Required to verify the "active" class in expected links below, and
-    // because the current path is different when running tests manually via
-    // simpletest.module ('batch') and via the testing framework ('').
-    _current_path(\Drupal::config('system.site')->get('page.front'));
 
     // Verify that a list of links is properly rendered.
     $variables = array();
@@ -189,10 +186,10 @@ class FunctionsTest extends WebTestBase {
 
     $expected_links = '';
     $expected_links .= '<ul id="somelinks">';
-    $expected_links .= '<li class="a-link odd first"><a href="' . url('a/link') . '">' . check_plain('A <link>') . '</a></li>';
-    $expected_links .= '<li class="plain-text even">' . check_plain('Plain "text"') . '</li>';
-    $expected_links .= '<li class="front-page odd active"><a href="' . url('<front>') . '" class="active">' . check_plain('Front page') . '</a></li>';
-    $expected_links .= '<li class="router-test even last"><a href="' . \Drupal::urlGenerator()->generate('router_test.1') . '">' . check_plain('Test route') . '</a></li>';
+    $expected_links .= '<li class="a-link"><a href="' . url('a/link') . '">' . check_plain('A <link>') . '</a></li>';
+    $expected_links .= '<li class="plain-text">' . check_plain('Plain "text"') . '</li>';
+    $expected_links .= '<li class="front-page"><a href="' . url('<front>') . '">' . check_plain('Front page') . '</a></li>';
+    $expected_links .= '<li class="router-test"><a href="' . \Drupal::urlGenerator()->generate('router_test.1') . '">' . check_plain('Test route') . '</a></li>';
     $expected_links .= '</ul>';
 
     // Verify that passing a string as heading works.
@@ -222,10 +219,23 @@ class FunctionsTest extends WebTestBase {
     );
     $expected_links = '';
     $expected_links .= '<ul id="somelinks">';
-    $expected_links .= '<li class="a-link odd first"><a href="' . url('a/link') . '" class="a/class">' . check_plain('A <link>') . '</a></li>';
-    $expected_links .= '<li class="plain-text even"><span class="a/class">' . check_plain('Plain "text"') . '</span></li>';
-    $expected_links .= '<li class="front-page odd active"><a href="' . url('<front>') . '" class="active">' . check_plain('Front page') . '</a></li>';
-    $expected_links .= '<li class="router-test even last"><a href="' . \Drupal::urlGenerator()->generate('router_test.1') . '">' . check_plain('Test route') . '</a></li>';
+    $expected_links .= '<li class="a-link"><a href="' . url('a/link') . '" class="a/class">' . check_plain('A <link>') . '</a></li>';
+    $expected_links .= '<li class="plain-text"><span class="a/class">' . check_plain('Plain "text"') . '</span></li>';
+    $expected_links .= '<li class="front-page"><a href="' . url('<front>') . '">' . check_plain('Front page') . '</a></li>';
+    $expected_links .= '<li class="router-test"><a href="' . \Drupal::urlGenerator()->generate('router_test.1') . '">' . check_plain('Test route') . '</a></li>';
+    $expected_links .= '</ul>';
+    $expected = $expected_heading . $expected_links;
+    $this->assertThemeOutput('links', $variables, $expected);
+
+    // Verify the data- attributes for setting the "active" class on links.
+    $this->container->set('current_user', new UserSession(array('uid' => 1)));
+    $variables['set_active_class'] = TRUE;
+    $expected_links = '';
+    $expected_links .= '<ul id="somelinks">';
+    $expected_links .= '<li class="a-link" data-drupal-link-system-path="a/link"><a href="' . url('a/link') . '" class="a/class" data-drupal-link-system-path="a/link">' . check_plain('A <link>') . '</a></li>';
+    $expected_links .= '<li class="plain-text"><span class="a/class">' . check_plain('Plain "text"') . '</span></li>';
+    $expected_links .= '<li class="front-page" data-drupal-link-system-path="&lt;front&gt;"><a href="' . url('<front>') . '" data-drupal-link-system-path="&lt;front&gt;">' . check_plain('Front page') . '</a></li>';
+    $expected_links .= '<li class="router-test" data-drupal-link-system-path="router_test/test1"><a href="' . \Drupal::urlGenerator()->generate('router_test.1') . '" data-drupal-link-system-path="router_test/test1">' . check_plain('Test route') . '</a></li>';
     $expected_links .= '</ul>';
     $expected = $expected_heading . $expected_links;
     $this->assertThemeOutput('links', $variables, $expected);

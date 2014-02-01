@@ -44,11 +44,10 @@ class NodeFormController extends ContentEntityFormController {
       foreach (array('status', 'promote', 'sticky') as $key) {
         // Multistep node forms might have filled in something already.
         if ($node->$key->isEmpty()) {
-          $node->$key = (int) in_array($key, $this->settings['options']);
+          $node->$key = (int) !empty($this->settings['options'][$key]);
         }
       }
-      global $user;
-      $node->setAuthorId($user->id());
+      $node->setAuthorId(\Drupal::currentUser()->id());
       $node->setCreatedTime(REQUEST_TIME);
     }
     else {
@@ -57,7 +56,7 @@ class NodeFormController extends ContentEntityFormController {
       $node->log = NULL;
     }
     // Always use the default revision setting.
-    $node->setNewRevision(in_array('revision', $this->settings['options']));
+    $node->setNewRevision(!empty($this->settings['options']['revision']));
   }
 
   /**
@@ -221,13 +220,6 @@ class NodeFormController extends ContentEntityFormController {
       '#default_value' => $node->isSticky(),
     );
 
-    // This form uses a button-level #submit handler for the form's main submit
-    // action. node_form_submit() manually invokes all form-level #submit
-    // handlers of the form. Without explicitly setting #submit, Form API would
-    // auto-detect node_form_submit() as submit handler, but that is the
-    // button-level #submit handler for the 'Save' action.
-    $form += array('#submit' => array());
-
     return parent::form($form, $form_state, $node);
   }
 
@@ -365,8 +357,7 @@ class NodeFormController extends ContentEntityFormController {
       $node->setNewRevision();
       // If a new revision is created, save the current user as revision author.
       $node->setRevisionCreationTime(REQUEST_TIME);
-      global $user;
-      $node->setRevisionAuthorId($user->id());
+      $node->setRevisionAuthorId(\Drupal::currentUser()->id());
     }
 
     $node->validated = TRUE;
@@ -390,7 +381,6 @@ class NodeFormController extends ContentEntityFormController {
     // @todo Remove this: we should not have explicit includes in autoloaded
     //   classes.
     module_load_include('inc', 'node', 'node.pages');
-    drupal_set_title(t('Preview'), PASS_THROUGH);
     $form_state['node_preview'] = node_preview($this->entity, $form_state);
     $form_state['rebuild'] = TRUE;
   }
@@ -491,27 +481,6 @@ class NodeFormController extends ContentEntityFormController {
 
     // Clear the page and block caches.
     cache_invalidate_tags(array('content' => TRUE));
-  }
-
-  /**
-   * Overrides Drupal\Core\Entity\EntityFormController::delete().
-   */
-  public function delete(array $form, array &$form_state) {
-    $destination = array();
-    $query = \Drupal::request()->query;
-    if ($query->has('destination')) {
-      $destination = drupal_get_destination();
-      $query->remove('destination');
-    }
-    $form_state['redirect_route'] = array(
-      'route_name' => 'node.delete_confirm',
-      'route_parameters' => array(
-        'node' => $this->entity->id(),
-      ),
-      'options' => array(
-        'query' => $destination,
-      ),
-    );
   }
 
 }

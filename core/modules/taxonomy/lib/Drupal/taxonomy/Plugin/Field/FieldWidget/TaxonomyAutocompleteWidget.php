@@ -73,7 +73,7 @@ class TaxonomyAutocompleteWidget extends WidgetBase {
       '#default_value' => taxonomy_implode_tags($tags),
       '#autocomplete_route_name' => $this->getSetting('autocomplete_route_name'),
       '#autocomplete_route_parameters' => array(
-        'entity_type' => $items->getEntity()->entityType(),
+        'entity_type' => $items->getEntity()->getEntityTypeId(),
         'field_name' => $this->fieldDefinition->getName(),
       ),
       '#size' => $this->getSetting('size'),
@@ -114,7 +114,7 @@ class TaxonomyAutocompleteWidget extends WidgetBase {
           'vid' => $vocabulary->id(),
           'name' => $value,
         ));
-        $item = array('target_id' => 0, 'entity' => $term);
+        $item = array('target_id' => NULL, 'entity' => $term);
       }
       $items[] = $item;
     }

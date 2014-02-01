@@ -245,14 +245,14 @@ function ajax_render($commands = array()) {
       $items[$type] = array();
     }
     else {
-      $function = 'drupal_add_' . $type;
+      $function = '_drupal_add_' . $type;
       $items[$type] = $function();
       drupal_alter($type, $items[$type]);
       // @todo Inline CSS and JS items are indexed numerically. These can't be
       //   reliably diffed with array_diff_key(), since the number can change
       //   due to factors unrelated to the inline content, so for now, we strip
       //   the inline items from Ajax responses, and can add support for them
-      //   when drupal_add_css() and drupal_add_js() are changed to use a hash
+      //   when _drupal_add_css() and _drupal_add_js() are changed to use a hash
       //   of the inline content as the array key.
       foreach ($items[$type] as $key => $item) {
         if (is_numeric($key)) {
@@ -290,7 +290,7 @@ function ajax_render($commands = array()) {
   }
 
   // Now add a command to merge changes and additions to drupalSettings.
-  $scripts = drupal_add_js();
+  $scripts = _drupal_add_js();
   if (!empty($scripts['settings'])) {
     $settings = drupal_merge_js_settings($scripts['settings']['data']);
     array_unshift($commands, ajax_command_settings($settings, TRUE));
@@ -300,42 +300,6 @@ function ajax_render($commands = array()) {
   drupal_alter('ajax_render', $commands);
 
   return drupal_json_encode($commands);
-}
-
-/**
- * Theme callback: Returns the correct theme for an Ajax request.
- *
- * Many different pages can invoke an Ajax request to system/ajax or another
- * generic Ajax path. It is almost always desired for an Ajax response to be
- * rendered using the same theme as the base page, because most themes are built
- * with the assumption that they control the entire page, so if the CSS for two
- * themes are both loaded for a given page, they may conflict with each other.
- * For example, Bartik is Drupal's default theme, and Seven is Drupal's default
- * administration theme. Depending on whether the "Use the administration theme
- * when editing or creating content" checkbox is checked, the node edit form may
- * be displayed in either theme, but the Ajax response to the Field module's
- * "Add another item" button should be rendered using the same theme as the rest
- * of the page. Therefore, system_menu() sets the 'theme callback' for
- * 'system/ajax' to this function, and it is recommended that modules
- * implementing other generic Ajax paths do the same.
- *
- * @see system_menu()
- * @see file_menu()
- */
-function ajax_base_page_theme() {
-  if (!empty($_POST['ajax_page_state']['theme']) && !empty($_POST['ajax_page_state']['theme_token'])) {
-    $theme = $_POST['ajax_page_state']['theme'];
-    $token = $_POST['ajax_page_state']['theme_token'];
-
-    // Prevent a request forgery from giving a person access to a theme they
-    // shouldn't be otherwise allowed to see. However, since everyone is allowed
-    // to see the default theme, token validation isn't required for that, and
-    // bypassing it allows most use-cases to work even when accessed from the
-    // page cache.
-    if ($theme === \Drupal::config('system.theme')->get('default') || drupal_valid_token($token, $theme)) {
-      return $theme;
-    }
-  }
 }
 
 /**
@@ -398,7 +362,8 @@ function ajax_prepare_response($page_callback_result) {
     $commands[] = ajax_command_insert(NULL, $html);
     // Add the status messages inside the new content's wrapper element, so that
     // on subsequent Ajax requests, it is treated as old content.
-    $commands[] = ajax_command_prepend(NULL, theme('status_messages'));
+    $status_messages = array('#theme' => 'status_messages');
+    $commands[] = ajax_command_prepend(NULL, drupal_render($status_messages));
   }
 
   return $commands;

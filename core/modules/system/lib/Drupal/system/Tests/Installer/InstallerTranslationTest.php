@@ -15,6 +15,13 @@ use Drupal\system\Tests\InstallerTest;
  */
 class InstallerTranslationTest extends InstallerTest {
 
+  /**
+   * Whether the installer has completed.
+   *
+   * @var bool
+   */
+  protected $isInstalled = FALSE;
+
   public static function getInfo() {
     return array(
       'name' => 'Installer translation test',
@@ -24,39 +31,8 @@ class InstallerTranslationTest extends InstallerTest {
   }
 
   protected function setUp() {
-    global $conf;
+    $this->isInstalled = FALSE;
 
-    // When running tests through the SimpleTest UI (vs. on the command line),
-    // SimpleTest's batch conflicts with the installer's batch. Batch API does
-    // not support the concept of nested batches (in which the nested is not
-    // progressive), so we need to temporarily pretend there was no batch.
-    // Back up the currently running SimpleTest batch.
-    $this->originalBatch = batch_get();
-
-    // Add the translations directory so we can retrieve German translations.
-    $conf['locale.settings']['translation.path'] = drupal_get_path('module', 'simpletest') . '/files/translations';
-
-    // Create the database prefix for this test.
-    $this->prepareDatabasePrefix();
-
-    // Prepare the environment for running tests.
-    $this->prepareEnvironment();
-    if (!$this->setupEnvironment) {
-      return FALSE;
-    }
-
-    // Reset all statics and variables to perform tests in a clean environment.
-    $conf = array();
-    drupal_static_reset();
-
-    // Change the database prefix.
-    // All static variables need to be reset before the database prefix is
-    // changed, since \Drupal\Core\Utility\CacheArray implementations attempt to
-    // write back to persistent caches when they are destructed.
-    $this->changeDatabasePrefix();
-    if (!$this->setupDatabasePrefix) {
-      return FALSE;
-    }
     $variable_groups = array(
       'system.file' => array(
         'path.private' =>  $this->private_files_directory,
@@ -106,9 +82,8 @@ class InstallerTranslationTest extends InstallerTest {
 
     // Reload config directories.
     include $this->public_files_directory . '/settings.php';
-    $prefix = substr($this->public_files_directory, strlen(conf_path() . '/files/'));
-    foreach ($config_directories as $type => $data) {
-      $GLOBALS['config_directories'][$type]['path'] = $prefix . '/files/' . $data['path'];
+    foreach ($config_directories as $type => $path) {
+      $GLOBALS['config_directories'][$type] = $path;
     }
     $this->rebuildContainer();
 
@@ -120,17 +95,27 @@ class InstallerTranslationTest extends InstallerTest {
       $config->save();
     }
 
-    // Use the test mail class instead of the default mail handler class.
-    \Drupal::config('system.mail')->set('interface.default', 'Drupal\Core\Mail\VariableLog')->save();
+    // Submit site configuration form.
+    $this->drupalPostForm(NULL, array(
+      'site_mail' => 'admin@test.de',
+      'account[name]' => 'admin',
+      'account[mail]' => 'admin@test.de',
+      'account[pass][pass1]' => '123',
+      'account[pass][pass2]' => '123',
+      'site_default_country' => 'DE',
+    ), $submit_value);
 
-    drupal_set_time_limit($this->timeLimit);
+    // Use the test mail class instead of the default mail handler class.
+    \Drupal::config('system.mail')->set('interface.default', 'Drupal\Core\Mail\TestMailCollector')->save();
+
     // When running from run-tests.sh we don't get an empty current path which
     // would indicate we're on the home page.
     $path = current_path();
     if (empty($path)) {
       _current_path('run-tests');
     }
-    $this->setup = TRUE;
+
+    $this->isInstalled = TRUE;
   }
 
 }

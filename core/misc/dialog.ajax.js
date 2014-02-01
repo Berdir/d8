@@ -98,14 +98,14 @@
     }
 
     // Bind dialogButtonsChange
-    $dialog.on('dialogButtonsChange', function() {
+    $dialog.on('dialogButtonsChange', function () {
       var buttons = Drupal.behaviors.dialog.prepareDialogButtons($dialog);
       $dialog.dialog('option', 'buttons', buttons);
     });
 
     // Open the dialog itself.
     response.dialogOptions = response.dialogOptions || {};
-    var dialog = Drupal.dialog($dialog, response.dialogOptions);
+    var dialog = Drupal.dialog($dialog.get(0), response.dialogOptions);
     if (response.dialogOptions.modal) {
       dialog.showModal();
     }
@@ -125,7 +125,7 @@
   Drupal.AjaxCommands.prototype.closeDialog = function (ajax, response, status) {
     var $dialog = $(response.selector);
     if ($dialog.length) {
-      Drupal.dialog($dialog).close();
+      Drupal.dialog($dialog.get(0)).close();
       if (!response.persist) {
         $dialog.remove();
       }

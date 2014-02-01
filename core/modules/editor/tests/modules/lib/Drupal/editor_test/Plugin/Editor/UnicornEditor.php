@@ -8,8 +8,6 @@
 namespace Drupal\editor_test\Plugin\Editor;
 
 use Drupal\editor\Plugin\EditorBase;
-use Drupal\editor\Annotation\Editor;
-use Drupal\Core\Annotation\Translation;
 use Drupal\editor\Entity\Editor as EditorEntity;
 
 /**
@@ -18,6 +16,7 @@ use Drupal\editor\Entity\Editor as EditorEntity;
  * @Editor(
  *   id = "unicorn",
  *   label = @Translation("Unicorn Editor"),
+ *   supports_content_filtering = TRUE,
  *   supports_inline_editing = TRUE
  * )
  */

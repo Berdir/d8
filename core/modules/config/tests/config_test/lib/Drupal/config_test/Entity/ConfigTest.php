@@ -8,8 +8,6 @@
 namespace Drupal\config_test\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
-use Drupal\Core\Entity\Annotation\EntityType;
-use Drupal\Core\Annotation\Translation;
 use Drupal\config_test\ConfigTestInterface;
 
 /**
@@ -35,7 +33,10 @@ use Drupal\config_test\ConfigTestInterface;
  *     "status" = "status"
  *   },
  *   links = {
- *     "edit-form" = "config_test.entity"
+ *     "edit-form" = "config_test.entity",
+ *     "delete-form" = "config_test.entity_delete",
+ *     "enable" = "config_test.entity_enable",
+ *     "disable" = "config_test.entity_disable"
  *   }
  * )
  */

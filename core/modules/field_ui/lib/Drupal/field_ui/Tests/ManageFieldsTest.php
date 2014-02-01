@@ -402,7 +402,7 @@ class ManageFieldsTest extends FieldUiTestBase {
       'bundle' => $this->type,
     ))->save();
     entity_get_form_display('node', $this->type, 'default')
-      ->setComponent($field->id, array(
+      ->setComponent($field->name, array(
         'type' => 'test_field_widget',
       ))
       ->save();
@@ -415,6 +415,8 @@ class ManageFieldsTest extends FieldUiTestBase {
     $this->assertFalse(in_array('edit', $edit_link), 'Edit option for locked field is not present the UI');
     $delete_link = $this->xpath('//tr[@id=:field_name]/td[4]', array(':field_name' => $field->name));
     $this->assertFalse(in_array('delete', $delete_link), 'Delete option for locked field is not present the UI');
+    $this->drupalGet('admin/structure/types/manage/' . $this->type . '/fields/node.' . $this->type . '.' . $field->name . '/delete');
+    $this->assertResponse(403);
   }
 
   /**
@@ -444,7 +446,7 @@ class ManageFieldsTest extends FieldUiTestBase {
     entity_get_form_display('node', $this->type, 'default')
       ->setComponent($field_name)
       ->save();
-    $this->assertTrue(field_read_instance('node', $field_name, $this->type), format_string('An instance of the field %field was created programmatically.', array('%field' => $field_name)));
+    $this->assertTrue(entity_load('field_instance', 'node.' . $this->type . '.' . $field_name), format_string('An instance of the field %field was created programmatically.', array('%field' => $field_name)));
 
     // Check that the newly added instance appears on the 'Manage Fields'
     // screen.
@@ -505,7 +507,7 @@ class ManageFieldsTest extends FieldUiTestBase {
    */
   function testDeleteTaxonomyField() {
     // Create a new field.
-    $bundle_path = 'admin/structure/taxonomy/manage/tags';
+    $bundle_path = 'admin/structure/taxonomy/manage/tags/overview';
     $edit1 = array(
       'fields[_add_new_field][label]' => $this->field_label,
       'fields[_add_new_field][field_name]' => $this->field_name_input,

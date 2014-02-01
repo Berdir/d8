@@ -74,14 +74,7 @@ interface FieldItemListInterface extends ListInterface, AccessibleInterface {
   /**
    * Filters out empty field items and re-numbers the item deltas.
    */
-  public function filterEmptyValues();
-
-  /**
-   * Gets a property object from the first field item.
-   *
-   * @see \Drupal\Core\Field\FieldItemInterface::get()
-   */
-  public function get($property_name);
+  public function filterEmptyItems();
 
   /**
    * Magic method: Gets a property value of to the first field item.

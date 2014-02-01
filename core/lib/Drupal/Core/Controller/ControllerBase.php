@@ -94,6 +94,13 @@ abstract class ControllerBase {
   protected $moduleHandler;
 
   /**
+   * The form builder.
+   *
+   * @var \Drupal\Core\Form\FormBuilderInterface
+   */
+  protected $formBuilder;
+
+  /**
    * Retrieves the entity manager service.
    *
    * @return \Drupal\Core\Entity\EntityManagerInterface
@@ -189,6 +196,18 @@ abstract class ControllerBase {
   }
 
   /**
+   * Returns the form builder service.
+   *
+   * @return \Drupal\Core\Form\FormBuilderInterface
+   */
+  protected function formBuilder() {
+    if (!$this->formBuilder) {
+      $this->formBuilder = $this->container()->get('form_builder');
+    }
+    return $this->formBuilder;
+  }
+
+  /**
    * Returns the URL generator service.
    *
    * @return \Drupal\Core\Routing\UrlGeneratorInterface
@@ -265,10 +284,15 @@ abstract class ControllerBase {
   /**
    * Returns the service container.
    *
+   * This method is marked private to prevent sub-classes from retrieving
+   * services from the container through it. Instead,
+   * \Drupal\Core\DependencyInjection\ContainerInjectionInterface should be used
+   * for injecting services.
+   *
    * @return \Symfony\Component\DependencyInjection\ContainerInterface $container
    *   The service container.
    */
-  protected function container() {
+  private function container() {
     return \Drupal::getContainer();
   }
 

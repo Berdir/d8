@@ -10,7 +10,6 @@ namespace Drupal\views\Plugin\views\filter;
 use Drupal\views\Plugin\views\HandlerBase;
 use Drupal\Component\Utility\String;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
-use Drupal\Component\Annotation\Plugin;
 use Drupal\views\ViewExecutable;
 
 /**
@@ -427,7 +426,7 @@ abstract class FilterPluginBase extends HandlerBase {
       $this->buildGroupOptions();
     }
 
-    $form_state['view']->getExecutable()->setItem($form_state['display_id'], $form_state['type'], $form_state['id'], $item);
+    $form_state['view']->getExecutable()->setHandler($form_state['display_id'], $form_state['type'], $form_state['id'], $item);
 
     $form_state['view']->addFormToStack($form_state['form_key'], $form_state['display_id'], $form_state['type'], $form_state['id'], TRUE, TRUE);
 
@@ -666,7 +665,7 @@ abstract class FilterPluginBase extends HandlerBase {
    */
   protected function buildGroupSubmit($form, &$form_state) {
     $groups = array();
-    uasort($form_state['values']['options']['group_info']['group_items'], 'drupal_sort_weight');
+    uasort($form_state['values']['options']['group_info']['group_items'], array('Drupal\Component\Utility\SortArray', 'sortByWeightElement'));
     // Filter out removed items.
 
     // Start from 1 to avoid problems with #default_value in the widget.
@@ -1090,7 +1089,7 @@ abstract class FilterPluginBase extends HandlerBase {
     // Add a new row.
     $item['group_info']['group_items'][] = array();
 
-    $form_state['view']->getExecutable()->setItem($form_state['display_id'], $form_state['type'], $form_state['id'], $item);
+    $form_state['view']->getExecutable()->setHandler($form_state['display_id'], $form_state['type'], $form_state['id'], $item);
 
     $form_state['view']->cacheSet();
     $form_state['rerender'] = TRUE;

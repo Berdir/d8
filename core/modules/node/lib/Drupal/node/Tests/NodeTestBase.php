@@ -23,21 +23,27 @@ abstract class NodeTestBase extends WebTestBase {
   public static $modules = array('node', 'datetime');
 
   /**
-   * The node access controller.
+   * The node access.
    *
    * @var \Drupal\Core\Entity\EntityAccessInterface
    */
-  protected $accessController;
+  protected $access;
 
   function setUp() {
     parent::setUp();
 
     // Create Basic page and Article node types.
     if ($this->profile != 'standard') {
-      $this->drupalCreateContentType(array('type' => 'page', 'name' => 'Basic page'));
+      $this->drupalCreateContentType(array('type' => 'page', 'name' => 'Basic page', 'settings' => array(
+        // Set proper default options for the page content type.
+        'node' => array(
+          'options' => array('promote' => FALSE),
+          'submitted' => FALSE,
+        ),
+      )));
       $this->drupalCreateContentType(array('type' => 'article', 'name' => 'Article'));
     }
-    $this->accessController = \Drupal::entityManager()->getAccess('node');
+    $this->access = \Drupal::entityManager()->getAccess('node');
   }
 
   /**
@@ -61,7 +67,7 @@ abstract class NodeTestBase extends WebTestBase {
       if (empty($langcode)) {
         $langcode = $node->prepareLangcode();
       }
-      $this->assertEqual($result, $this->accessController->access($node, $op, $langcode, $account), $this->nodeAccessAssertMessage($op, $result, $langcode));
+      $this->assertEqual($result, $this->access->access($node, $op, $langcode, $account), $this->nodeAccessAssertMessage($op, $result, $langcode));
     }
   }
 
@@ -79,7 +85,7 @@ abstract class NodeTestBase extends WebTestBase {
    *   to check. If NULL, the untranslated (fallback) access is checked.
    */
   function assertNodeCreateAccess($bundle, $result, AccountInterface $account, $langcode = NULL) {
-    $this->assertEqual($result, $this->accessController->createAccess($bundle, $account, array(
+    $this->assertEqual($result, $this->access->createAccess($bundle, $account, array(
       'langcode' => $langcode,
     )), $this->nodeAccessAssertMessage('create', $result, $langcode));
   }

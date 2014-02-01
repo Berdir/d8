@@ -18,31 +18,25 @@ use Drupal\Core\Entity\ContentEntityInterface;
  * @deprecated Use \Drupal\content_translation\Controller\ContentTranslationController::overview()
  */
 function content_translation_overview(EntityInterface $entity) {
-  $controller = content_translation_controller($entity->entityType());
-  $entity_manager = \Drupal::entityManager();
+  $controller = content_translation_controller($entity->getEntityTypeId());
   $languages = language_list();
   $original = $entity->getUntranslated()->language()->id;
   $translations = $entity->getTranslationLanguages();
-  $field_ui = \Drupal::moduleHandler()->moduleExists('field_ui') && user_access('administer ' . $entity->entityType() . ' fields');
+  $administrator = \Drupal::currentUser()->hasPermission('administer languages');
 
   $rel = array();
   foreach (array('canonical', 'edit-form', 'drupal:content-translation-overview') as $name) {
-    $rel[$name] = $entity->uri($name);
+    $rel[$name] = $entity->getSystemPath($name);
   }
 
   $header = array(t('Language'), t('Translation'), t('Source language'), t('Status'), t('Operations'));
   $rows = array();
 
-  if (language_multilingual()) {
-    // If we have a view path defined for the current entity get the switch
-    // links based on it.
-    if (!empty($rel['canonical'])) {
-      $links = _content_translation_get_switch_links($rel['canonical']['path']);
-    }
+  if (\Drupal::languageManager()->isMultilingual()) {
 
     // Determine whether the current entity is translatable.
     $translatable = FALSE;
-    foreach (field_info_instances($entity->entityType(), $entity->bundle()) as $instance) {
+    foreach (field_info_instances($entity->getEntityTypeId(), $entity->bundle()) as $instance) {
       if ($instance->isTranslatable()) {
         $translatable = TRUE;
         break;
@@ -53,13 +47,13 @@ function content_translation_overview(EntityInterface $entity) {
       $language_name = $language->name;
       $langcode = $language->id;
 
-      $add_path = $rel['drupal:content-translation-overview']['path'] . '/add/' . $original . '/' . $langcode;
-      $translate_path = $rel['drupal:content-translation-overview']['path'] . '/edit/' . $langcode;
+      $add_path = $rel['drupal:content-translation-overview'] . '/add/' . $original . '/' . $langcode;
+      $translate_path = $rel['drupal:content-translation-overview'] . '/edit/' . $langcode;
 
       $add_links = _content_translation_get_switch_links($add_path);
-      $edit_links = _content_translation_get_switch_links($rel['edit-form']['path']);
+      $edit_links = _content_translation_get_switch_links($rel['edit-form']);
       $translate_links = _content_translation_get_switch_links($translate_path);
-      $delete_links = _content_translation_get_switch_links($rel['drupal:content-translation-overview']['path'] . '/delete/' . $langcode);
+      $delete_links = _content_translation_get_switch_links($rel['drupal:content-translation-overview'] . '/delete/' . $langcode);
 
       $operations = array(
         'data' => array(
@@ -74,7 +68,7 @@ function content_translation_overview(EntityInterface $entity) {
         $source = isset($entity->translation[$langcode]['source']) ? $entity->translation[$langcode]['source'] : '';
         $is_original = $langcode == $original;
         $label = $entity->getTranslation($langcode)->label();
-        $link = isset($links->links[$langcode]['href']) ? $links->links[$langcode] : array('href' => $rel['canonical']['path'], 'language' => $language);
+        $link = isset($links->links[$langcode]['href']) ? $links->links[$langcode] : array('href' => $rel['canonical'], 'language' => $language);
         $row_title = l($label, $link['href'], $link);
 
         if (empty($link['href'])) {
@@ -85,7 +79,7 @@ function content_translation_overview(EntityInterface $entity) {
         // the entity form, otherwise if we are not dealing with the original
         // language we point the link to the translation form.
         if ($entity->access('update')) {
-          $links['edit'] = isset($edit_links->links[$langcode]['href']) ? $edit_links->links[$langcode] : array('href' => $rel['edit-form']['path'], 'language' => $language);
+          $links['edit'] = isset($edit_links->links[$langcode]['href']) ? $edit_links->links[$langcode] : array('href' => $rel['edit-form'], 'language' => $language);
         }
         elseif (!$is_original && $controller->getTranslationAccess($entity, 'update')) {
           $links['edit'] = isset($translate_links->links[$langcode]['href']) ? $translate_links->links[$langcode] : array('href' => $translate_path, 'language' => $language);
@@ -122,12 +116,8 @@ function content_translation_overview(EntityInterface $entity) {
             $links['add'] = isset($add_links->links[$langcode]['href']) ? $add_links->links[$langcode] : array('href' => $add_path, 'language' => $language);
             $links['add']['title'] = t('Add');
           }
-          elseif ($field_ui) {
-            $entity_path = $entity_manager->getAdminPath($entity->entityType(), $entity->bundle());
-            // Link directly to the fields tab to make it easier to find the
-            // setting to enable translation on fields.
-            $path = $entity_path . '/fields';
-            $links['nofields'] = array('title' => t('No translatable fields'), 'href' => $path, 'language' => $language);
+          elseif ($administrator) {
+            $links['nofields'] = array('title' => t('No translatable fields'), 'route_name' => 'language.content_settings_page', 'language' => $language);
           }
         }
 
@@ -138,7 +128,7 @@ function content_translation_overview(EntityInterface $entity) {
     }
   }
 
-  drupal_set_title(t('Translations of %label', array('%label' => $entity->label())), PASS_THROUGH);
+  $build['#title'] = t('Translations of %label', array('%label' => $entity->label()));
 
   // Add metadata to the build render array to let other modules know about
   // which entity this is.
@@ -163,12 +153,12 @@ function content_translation_overview(EntityInterface $entity) {
  *   A renderable array of language switch links.
  */
 function _content_translation_get_switch_links($path) {
-  $links = language_negotiation_get_switch_links(Language::TYPE_CONTENT, $path);
+  $links = \Drupal::languageManager()->getLanguageSwitchLinks(Language::TYPE_CONTENT, $path);
   if (empty($links)) {
     // If content language is set up to fall back to the interface language,
     // then there will be no switch links for Language::TYPE_CONTENT, ergo we
     // also need to use interface switch links.
-    $links = language_negotiation_get_switch_links(Language::TYPE_INTERFACE, $path);
+    $links = \Drupal::languageManager()->getLanguageSwitchLinks(Language::TYPE_INTERFACE, $path);
   }
   return $links;
 }
@@ -195,13 +185,11 @@ function content_translation_add_page(EntityInterface $entity, Language $source 
   $target = !empty($target) ? $target : language(Language::TYPE_CONTENT);
   // @todo Exploit the upcoming hook_entity_prepare() when available.
   content_translation_prepare_translation($entity, $source, $target);
-  $info = $entity->entityInfo();
-  $operation = isset($info['default_operation']) ? $info['default_operation'] : 'default';
   $form_state['langcode'] = $target->id;
   $form_state['content_translation']['source'] = $source;
   $form_state['content_translation']['target'] = $target;
   $form_state['content_translation']['translation_form'] = !$entity->access('update');
-  return \Drupal::entityManager()->getForm($entity, $operation, $form_state);
+  return \Drupal::entityManager()->getForm($entity, 'default', $form_state);
 }
 
 /**
@@ -220,11 +208,9 @@ function content_translation_add_page(EntityInterface $entity, Language $source 
  */
 function content_translation_edit_page(EntityInterface $entity, Language $language = NULL) {
   $language = !empty($language) ? $language : language(Language::TYPE_CONTENT);
-  $info = $entity->entityInfo();
-  $operation = isset($info['default_operation']) ? $info['default_operation'] : 'default';
   $form_state['langcode'] = $language->id;
   $form_state['content_translation']['translation_form'] = TRUE;
-  return \Drupal::entityManager()->getForm($entity, $operation, $form_state);
+  return \Drupal::entityManager()->getForm($entity, 'default', $form_state);
 }
 
 /**

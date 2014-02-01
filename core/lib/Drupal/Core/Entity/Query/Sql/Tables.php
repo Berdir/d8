@@ -83,16 +83,16 @@ class Tables implements TablesInterface {
     for ($key = 0; $key <= $count; $key ++) {
       // If there is revision support and only the current revision is being
       // queried then use the revision id. Otherwise, the entity id will do.
-      if (!empty($entity_info['entity_keys']['revision']) && $age == EntityStorageControllerInterface::FIELD_LOAD_CURRENT) {
+      if (($revision_key = $entity_info->getKey('revision')) && $age == EntityStorageControllerInterface::FIELD_LOAD_CURRENT) {
         // This contains the relevant SQL field to be used when joining entity
         // tables.
-        $entity_id_field = $entity_info['entity_keys']['revision'];
+        $entity_id_field = $revision_key;
         // This contains the relevant SQL field to be used when joining field
         // tables.
         $field_id_field = 'revision_id';
       }
       else {
-        $entity_id_field = $entity_info['entity_keys']['id'];
+        $entity_id_field = $entity_info->getKey('id');
         $field_id_field = 'entity_id';
       }
       // This can either be the name of an entity property (non-configurable
@@ -138,8 +138,8 @@ class Tables implements TablesInterface {
             $values = array();
             $field_name = $field->getName();
             // If there are bundles, pick one.
-            if (!empty($entity_info['entity_keys']['bundle'])) {
-              $values[$entity_info['entity_keys']['bundle']] = reset($field_map[$entity_type][$field_name]['bundles']);
+            if ($bundle_key = $entity_info->getKey('bundle')) {
+              $values[$bundle_key] = reset($field_map[$entity_type][$field_name]['bundles']);
             }
             $entity = $entity_manager
               ->getStorageController($entity_type)
@@ -151,7 +151,7 @@ class Tables implements TablesInterface {
             // column, i.e. target_id or fid.
             // Otherwise, the code executing the relationship will throw an
             // exception anyways so no need to do it here.
-            if (!$column && isset($propertyDefinitions[$relationship_specifier]) && $entity->{$field->getName()}->get('entity') instanceof EntityReference) {
+            if (!$column && isset($propertyDefinitions[$relationship_specifier]) && $entity->{$field->getName()}->first()->get('entity') instanceof EntityReference) {
               $column = current(array_keys($propertyDefinitions));
             }
             // Prepare the next index prefix.
@@ -172,11 +172,12 @@ class Tables implements TablesInterface {
         // finds the property first. The data table is preferred, which is why
         // it gets added before the base table.
         $entity_tables = array();
-        if (isset($entity_info['data_table'])) {
+        if ($data_table = $entity_info->getDataTable()) {
           $this->sqlQuery->addMetaData('simple_query', FALSE);
-          $entity_tables[$entity_info['data_table']] = drupal_get_schema($entity_info['data_table']);
+          $entity_tables[$data_table] = drupal_get_schema($data_table);
         }
-        $entity_tables[$entity_info['base_table']] = drupal_get_schema($entity_info['base_table']);
+        $entity_base_table = $entity_info->getBaseTable();
+        $entity_tables[$entity_base_table] = drupal_get_schema($entity_base_table);
         $sql_column = $specifier;
         $table = $this->ensureEntityTable($index_prefix, $specifier, $type, $langcode, $base_table, $entity_id_field, $entity_tables);
       }
@@ -190,9 +191,9 @@ class Tables implements TablesInterface {
           $values = array();
           // If there are bundles, pick one. It does not matter which,
           // properties exist on all bundles.
-          if (!empty($entity_info['entity_keys']['bundle'])) {
+          if ($bundle_key = $entity_info->getKey('bundle')) {
             $bundles = entity_get_bundles($entity_type);
-            $values[$entity_info['entity_keys']['bundle']] = key($bundles);
+            $values[$bundle_key] = key($bundles);
           }
           $entity = $entity_manager
             ->getStorageController($entity_type)
@@ -202,13 +203,13 @@ class Tables implements TablesInterface {
           $next_index_prefix = $relationship_specifier;
         }
         // Check for a valid relationship.
-        if (isset($propertyDefinitions[$relationship_specifier]) && $entity->{$specifier}->get('entity') instanceof EntityReference) {
+        if (isset($propertyDefinitions[$relationship_specifier]) && $entity->get($specifier)->first()->get('entity') instanceof EntityReference) {
           // If it is, use the entity type.
           $entity_type = $propertyDefinitions[$relationship_specifier]->getConstraint('EntityType');
           $entity_info = $entity_manager->getDefinition($entity_type);
           // Add the new entity base table using the table and sql column.
-          $join_condition= '%alias.' . $entity_info['entity_keys']['id'] . " = $table.$sql_column";
-          $base_table = $this->sqlQuery->leftJoin($entity_info['base_table'], NULL, $join_condition);
+          $join_condition= '%alias.' . $entity_info->getKey('id') . " = $table.$sql_column";
+          $base_table = $this->sqlQuery->leftJoin($entity_info->getBaseTable(), NULL, $join_condition);
           $propertyDefinitions = array();
           $key++;
           $index_prefix .= "$next_index_prefix.";

@@ -5,184 +5,9 @@
  * Admin page callbacks for the system module.
  */
 
-use Drupal\system\DateFormatInterface;
+use Drupal\Core\Cache\Cache;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-
-/**
- * Menu callback; displays a listing of all themes.
- *
- * @deprecated Use \Drupal\system\Controller\SystemController::themesPage()
- */
-function system_themes_page() {
-  // Get current list of themes.
-  $themes = system_rebuild_theme_data();
-  uasort($themes, 'system_sort_modules_by_info_name');
-
-  $theme_default = \Drupal::config('system.theme')->get('default');
-  $theme_groups  = array();
-  $admin_theme = \Drupal::config('system.theme')->get('admin');
-
-  foreach ($themes as &$theme) {
-    if (!empty($theme->info['hidden'])) {
-      continue;
-    }
-    $theme->is_default = ($theme->name == $theme_default);
-
-    // Identify theme screenshot.
-    $theme->screenshot = NULL;
-    // Create a list which includes the current theme and all its base themes.
-    if (isset($themes[$theme->name]->base_themes)) {
-      $theme_keys = array_keys($themes[$theme->name]->base_themes);
-      $theme_keys[] = $theme->name;
-    }
-    else {
-      $theme_keys = array($theme->name);
-    }
-    // Look for a screenshot in the current theme or in its closest ancestor.
-    foreach (array_reverse($theme_keys) as $theme_key) {
-      if (isset($themes[$theme_key]) && file_exists($themes[$theme_key]->info['screenshot'])) {
-        $theme->screenshot = array(
-          'uri' => $themes[$theme_key]->info['screenshot'],
-          'alt' => t('Screenshot for !theme theme', array('!theme' => $theme->info['name'])),
-          'title' => t('Screenshot for !theme theme', array('!theme' => $theme->info['name'])),
-          'attributes' => array('class' => array('screenshot')),
-        );
-        break;
-      }
-    }
-
-    if (empty($theme->status)) {
-     // Ensure this theme is compatible with this version of core.
-     // Require the 'content' region to make sure the main page
-     // content has a common place in all themes.
-      $theme->incompatible_core = !isset($theme->info['core']) || ($theme->info['core'] != \Drupal::CORE_COMPATIBILITY) || (!isset($theme->info['regions']['content']));
-      $theme->incompatible_php = version_compare(phpversion(), $theme->info['php']) < 0;
-      // Confirmed that the base theme is available.
-      $theme->incompatible_base = (isset($theme->info['base theme']) && !isset($themes[$theme->info['base theme']]));
-      // Confirm that the theme engine is available.
-      $theme->incompatible_engine = (isset($theme->info['engine']) && !isset($theme->owner));
-    }
-    $theme->operations = array();
-    if (!empty($theme->status) || !$theme->incompatible_core && !$theme->incompatible_php && !$theme->incompatible_base && !$theme->incompatible_engine) {
-      // Create the operations links.
-      $query['theme'] = $theme->name;
-      if (drupal_theme_access($theme)) {
-        $theme->operations[] = array(
-          'title' => t('Settings'),
-          'href' => 'admin/appearance/settings/' . $theme->name,
-          'attributes' => array('title' => t('Settings for !theme theme', array('!theme' => $theme->info['name']))),
-        );
-      }
-      if (!empty($theme->status)) {
-        if (!$theme->is_default) {
-          if ($theme->name != $admin_theme) {
-            $theme->operations[] = array(
-              'title' => t('Disable'),
-              'route_name' => 'system.theme_disable',
-              'query' => $query,
-              'attributes' => array('title' => t('Disable !theme theme', array('!theme' => $theme->info['name']))),
-            );
-          }
-          $theme->operations[] = array(
-            'title' => t('Set default'),
-            'route_name' => 'system.theme_set_default',
-            'query' => $query,
-            'attributes' => array('title' => t('Set !theme as default theme', array('!theme' => $theme->info['name']))),
-          );
-        }
-        $admin_theme_options[$theme->name] = $theme->info['name'];
-      }
-      else {
-        $theme->operations[] = array(
-          'title' => t('Enable'),
-          'route_name' => 'system.theme_enable',
-          'query' => $query,
-          'attributes' => array('title' => t('Enable !theme theme', array('!theme' => $theme->info['name']))),
-        );
-        $theme->operations[] = array(
-          'title' => t('Enable and set default'),
-          'route_name' => 'system.theme_set_default',
-          'query' => $query,
-          'attributes' => array('title' => t('Enable !theme as default theme', array('!theme' => $theme->info['name']))),
-        );
-      }
-    }
-
-    // Add notes to default and administration theme.
-    $theme->notes = array();
-    $theme->classes = array();
-    if ($theme->is_default) {
-      $theme->classes[] = 'theme-default';
-      $theme->notes[] = t('default theme');
-    }
-    if ($theme->name == $admin_theme || ($theme->is_default && $admin_theme == '0')) {
-      $theme->classes[] = 'theme-admin';
-      $theme->notes[] = t('admin theme');
-    }
-
-    // Sort enabled and disabled themes into their own groups.
-    $theme_groups[$theme->status ? 'enabled' : 'disabled'][] = $theme;
-  }
-
-  // There are two possible theme groups.
-  $theme_group_titles = array(
-    'enabled' => format_plural(count($theme_groups['enabled']), 'Enabled theme', 'Enabled themes'),
-  );
-  if (!empty($theme_groups['disabled'])) {
-    $theme_group_titles['disabled'] = format_plural(count($theme_groups['disabled']), 'Disabled theme', 'Disabled themes');
-  }
-
-  uasort($theme_groups['enabled'], 'system_sort_themes');
-  drupal_alter('system_themes_page', $theme_groups);
-
-  $build = array(
-    '#sorted' => TRUE,
-  );
-  $build['system_themes_page'] = array(
-    '#theme' => 'system_themes_page',
-    '#theme_groups' => $theme_groups,
-    '#theme_group_titles' => $theme_group_titles,
-  );
-  $build['admin_form'] = drupal_get_form('system_themes_admin_form', $admin_theme_options);
-  return $build;
-}
-
-/**
- * Form to select the administration theme.
- *
- * @ingroup forms
- * @see system_themes_admin_form_submit()
- */
-function system_themes_admin_form($form, &$form_state, $theme_options) {
-  // Administration theme settings.
-  $form['admin_theme'] = array(
-    '#type' => 'details',
-    '#title' => t('Administration theme'),
-  );
-  $form['admin_theme']['admin_theme'] = array(
-    '#type' => 'select',
-    '#options' => array(0 => t('Default theme')) + $theme_options,
-    '#title' => t('Administration theme'),
-    '#description' => t('Choose "Default theme" to always use the same theme as the rest of the site.'),
-    '#default_value' => \Drupal::config('system.theme')->get('admin'),
-  );
-  $form['admin_theme']['actions'] = array('#type' => 'actions');
-  $form['admin_theme']['actions']['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Save configuration'),
-  );
-  return $form;
-}
-
-/**
- * Process system_themes_admin_form form submissions.
- */
-function system_themes_admin_form_submit($form, &$form_state) {
-  drupal_set_message(t('The configuration options have been saved.'));
-  \Drupal::config('system.theme')->set('admin', $form_state['values']['admin_theme'])->save();
-}
 
 /**
  * Menu callback; Set the default theme.
@@ -208,12 +33,10 @@ function system_theme_default() {
       // Rebuild the menu. This duplicates the menu_router_rebuild() in
       // theme_enable(). However, modules must know the current default theme in
       // order to use this information in hook_menu() or hook_menu_alter()
-      // implementations, and doing the variable_set() before the theme_enable()
+      // implementations, and saving the configuration before the theme_enable()
       // could result in a race condition where the theme is default but not
       // enabled.
-      \Drupal::service('router.builder')->rebuild();
-      menu_router_rebuild();
-      \Drupal::cache('cache')->deleteTags(array('local_task' => 1));
+      \Drupal::service('router.builder')->setRebuildNeeded();
 
       // The status message depends on whether an admin theme is currently in use:
       // a value of 0 means the admin theme is set to be the default theme.
@@ -261,26 +84,6 @@ function _system_is_incompatible(&$incompatible, $files, $file) {
       return TRUE;
     }
   }
-}
-
-/**
- * Array sorting callback; sorts modules or themes by their name.
- */
-function system_sort_modules_by_info_name($a, $b) {
-  return strcasecmp($a->info['name'], $b->info['name']);
-}
-
-/**
- * Array sorting callback; sorts modules or themes by their name.
- */
-function system_sort_themes($a, $b) {
-  if ($a->is_default) {
-    return -1;
-  }
-  if ($b->is_default) {
-    return 1;
-  }
-  return strcasecmp($a->info['name'], $b->info['name']);
 }
 
 /**
@@ -344,7 +147,7 @@ function theme_admin_block_content($variables) {
     }
     $output .= '<dl class="' . $class . '">';
     foreach ($content as $item) {
-      $output .= '<dt>' . l($item['title'], $item['href'], $item['localized_options']) . '</dt>';
+      $output .= '<dt>' . l($item['title'], $item['link_path'], $item['localized_options']) . '</dt>';
       if (!$compact && isset($item['description'])) {
         $output .= '<dd>' . filter_xss_admin($item['description']) . '</dd>';
       }
@@ -463,7 +266,9 @@ function theme_system_admin_index($variables) {
 }
 
 /**
- * Returns HTML for the status report.
+ * Prepares variables for status report template.
+ *
+ * Default template: status-report.html.twig.
  *
  * This theme function is dependent on install.inc being loaded, because
  * that's where the constants are defined.
@@ -483,8 +288,7 @@ function theme_system_admin_index($variables) {
  *
  * @ingroup themeable
  */
-function theme_status_report($variables) {
-  $requirements = $variables['requirements'];
+function template_preprocess_status_report(&$variables) {
   $severities = array(
     REQUIREMENT_INFO => array(
       'title' => t('Info'),
@@ -503,11 +307,8 @@ function theme_status_report($variables) {
       'class' => 'error',
     ),
   );
-  $output = '<table class="system-status-report"><thead><tr class="visually-hidden">';
-  $output .= '<th>' . t('Status') . '</th><th>' . t('Component') . '</th><th>' . t('Details') . '</th>';
-  $output .= '</tr></thead><tbody>';
 
-  foreach ($requirements as $requirement) {
+  foreach ($variables['requirements'] as $i => $requirement) {
     // Always use the explicit requirement severity, if defined. Otherwise,
     // default to REQUIREMENT_OK in the installer to visually confirm that
     // installation requirements are met. And default to REQUIREMENT_INFO to
@@ -521,29 +322,9 @@ function theme_status_report($variables) {
     else {
       $severity = $severities[REQUIREMENT_INFO];
     }
-    // hook_requirements does not require value to be set. Set to null if not:
-    if (isset($requirement['value'])) {
-      $value = $requirement['value'];
-    }
-    else {
-      $value = NULL;
-    }
-
-    $severity['icon'] = '<div title="' . $severity['title'] . '"><span class="visually-hidden">' . $severity['title'] . '</span></div>';
-
-    // Output table rows.
-    $output .= '<tr class="' . $severity['class'] . '">';
-    $output .= '<td class="status-icon">' . $severity['icon'] . '</td>';
-    $output .= '<td class="status-title">' . $requirement['title'] . '</td>';
-    $output .= '<td class="status-value">' . $value;
-    if (!empty($requirement['description'])) {
-      $output .= '<div class="description">' . $requirement['description'] . '</div>';
-    }
-    $output .= '</td></tr>';
+    $variables['requirements'][$i]['severity_class'] = $severity['class'];
+    $variables['requirements'][$i]['severity_title'] = $severity['title'];
   }
-
-  $output .= '</tbody></table>';
-  return $output;
 }
 
 /**
@@ -777,3 +558,4 @@ function theme_system_themes_page($variables) {
 
   return $output;
 }
+

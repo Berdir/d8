@@ -7,10 +7,8 @@
 
 namespace Drupal\entity\Entity;
 
-use Drupal\Core\Entity\Annotation\EntityType;
-use Drupal\Core\Annotation\Translation;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\entity\EntityDisplayBase;
-use Drupal\entity\EntityDisplayInterface;
 
 /**
  * Configuration entity that contains display options for all components of a
@@ -30,14 +28,18 @@ use Drupal\entity\EntityDisplayInterface;
  *   }
  * )
  */
-class EntityDisplay extends EntityDisplayBase implements EntityDisplayInterface {
+class EntityDisplay extends EntityDisplayBase implements EntityViewDisplayInterface {
+
+  /**
+   * {@inheritdoc}
+   */
+  protected $displayContext = 'view';
 
   /**
    * {@inheritdoc}
    */
   public function __construct(array $values, $entity_type) {
     $this->pluginManager = \Drupal::service('plugin.manager.field.formatter');
-    $this->displayContext = 'display';
 
     parent::__construct($values, $entity_type);
   }

@@ -69,11 +69,11 @@ class UserPictureTest extends WebTestBase {
     // of the file is older than DRUPAL_MAXIMUM_TEMP_FILE_AGE.
     db_update('file_managed')
       ->fields(array(
-        'timestamp' => REQUEST_TIME - (DRUPAL_MAXIMUM_TEMP_FILE_AGE + 1),
+        'changed' => REQUEST_TIME - (DRUPAL_MAXIMUM_TEMP_FILE_AGE + 1),
       ))
       ->condition('fid', $file->id())
       ->execute();
-    drupal_cron_run();
+    \Drupal::service('cron')->run();
 
     // Verify that the image has been deleted.
     $this->assertFalse(file_load($file->id(), TRUE), 'File was removed from the database.');

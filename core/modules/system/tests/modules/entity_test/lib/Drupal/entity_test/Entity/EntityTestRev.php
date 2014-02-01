@@ -9,8 +9,6 @@ namespace Drupal\entity_test\Entity;
 
 use Drupal\Core\Field\FieldDefinition;
 use Drupal\entity_test\Entity\EntityTest;
-use Drupal\Core\Entity\Annotation\EntityType;
-use Drupal\Core\Annotation\Translation;
 
 /**
  * Defines the test entity class.
@@ -19,7 +17,7 @@ use Drupal\Core\Annotation\Translation;
  *   id = "entity_test_rev",
  *   label = @Translation("Test entity - revisions"),
  *   controllers = {
- *     "storage" = "Drupal\entity_test\EntityTestStorageController",
+ *     "storage" = "Drupal\Core\Entity\FieldableDatabaseStorageController",
  *     "access" = "Drupal\entity_test\EntityTestAccess",
  *     "form" = {
  *       "default" = "Drupal\entity_test\EntityTestFormController"

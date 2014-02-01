@@ -8,7 +8,7 @@
 namespace Drupal\node;
 
 use Drupal\Core\Entity\EntityFormController;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Component\Utility\MapArray;
 use Drupal\Component\Utility\String;
 
 /**
@@ -31,13 +31,8 @@ class NodeTypeFormController extends EntityFormController {
     }
 
     $node_settings = $type->getModuleSettings('node');
-    // Ensure default settings.
-    $node_settings += array(
-      'options' => array('status', 'promote'),
-      'preview' => DRUPAL_OPTIONAL,
-      'submitted' => TRUE,
-    );
-
+    // Prepare node options to be used for 'checkboxes' form element.
+    $node_settings['options'] = MapArray::copyValuesToKeys(array_keys(array_filter($node_settings['options'])));
     $form['name'] = array(
       '#title' => t('Name'),
       '#type' => 'textfield',
@@ -211,18 +206,6 @@ class NodeTypeFormController extends EntityFormController {
     }
 
     $form_state['redirect_route']['route_name'] = 'node.overview_types';
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function delete(array $form, array &$form_state) {
-    $form_state['redirect_route'] = array(
-      'route_name' => 'node.type_delete_confirm',
-      'route_parameters' => array(
-        'node_type' => $this->entity->id(),
-      ),
-    );
   }
 
 }

@@ -14,10 +14,10 @@ use Drupal\Component\Utility\Unicode;
  * It also applies when the database is unavailable or bootstrap was not
  * complete. Seven is always used for the initial install and update
  * operations. In other cases, Bartik is used, but this can be overridden by
- * setting a "maintenance_theme" key in the $conf variable in settings.php.
+ * setting a "maintenance_theme" key in the $settings variable in settings.php.
  */
 function _drupal_maintenance_theme() {
-  global $theme, $theme_key, $conf;
+  global $theme, $theme_key;
 
   // If $theme is already set, assume the others are set too, and do nothing.
   if (isset($theme)) {
@@ -95,11 +95,6 @@ function _drupal_maintenance_theme() {
   // Prime the theme registry.
   // @todo Remove global theme variables.
   Drupal::service('theme.registry');
-
-  // These CSS files are normally added by system_page_build(), except
-  // system.maintenance.css. When the database is inactive, it's not called so
-  // we add them here.
-  drupal_add_library('system', 'normalize');
 }
 
 /**

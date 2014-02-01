@@ -8,9 +8,7 @@
 namespace Drupal\taxonomy\Entity;
 
 use Drupal\Core\Entity\ContentEntityBase;
-use Drupal\Core\Entity\Annotation\EntityType;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
-use Drupal\Core\Annotation\Translation;
 use Drupal\Core\Field\FieldDefinition;
 use Drupal\Core\Language\Language;
 use Drupal\Core\TypedData\DataDefinition;
@@ -43,12 +41,10 @@ use Drupal\taxonomy\TermInterface;
  *     "label" = "name",
  *     "uuid" = "uuid"
  *   },
- *   bundle_keys = {
- *     "bundle" = "vid"
- *   },
  *   bundle_entity_type = "taxonomy_vocabulary",
  *   links = {
  *     "canonical" = "taxonomy.term_page",
+ *     "delete-form" = "taxonomy.term_delete",
  *     "edit-form" = "taxonomy.term_edit",
  *     "admin-form" = "taxonomy.overview_terms"
  *   },

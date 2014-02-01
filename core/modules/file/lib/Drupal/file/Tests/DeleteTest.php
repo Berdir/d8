@@ -15,7 +15,7 @@ class DeleteTest extends FileManagedTestBase {
     return array(
       'name' => 'File delete',
       'description' => 'Tests the file delete function.',
-      'group' => 'File API',
+      'group' => 'File Managed API',
     );
   }
 
@@ -65,11 +65,11 @@ class DeleteTest extends FileManagedTestBase {
     // of the file is older than DRUPAL_MAXIMUM_TEMP_FILE_AGE.
     db_update('file_managed')
       ->fields(array(
-        'timestamp' => REQUEST_TIME - (DRUPAL_MAXIMUM_TEMP_FILE_AGE + 1),
+        'changed' => REQUEST_TIME - (DRUPAL_MAXIMUM_TEMP_FILE_AGE + 1),
       ))
       ->condition('fid', $file->id())
       ->execute();
-    drupal_cron_run();
+    \Drupal::service('cron')->run();
 
     // system_cron() loads
     $this->assertFileHooksCalled(array('delete'));

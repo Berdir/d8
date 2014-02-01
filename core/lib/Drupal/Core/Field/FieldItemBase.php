@@ -32,7 +32,7 @@ abstract class FieldItemBase extends Map implements FieldItemInterface {
     // with the whole item.
     foreach ($this->getPropertyDefinitions() as $name => $definition) {
       if ($definition->isComputed()) {
-        $this->properties[$name] = \Drupal::typedData()->getPropertyInstance($this, $name);
+        $this->properties[$name] = \Drupal::typedDataManager()->getPropertyInstance($this, $name);
       }
     }
   }
@@ -210,5 +210,12 @@ abstract class FieldItemBase extends Map implements FieldItemInterface {
    * {@inheritdoc}
    */
   public function deleteRevision() { }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getMainPropertyName() {
+    return 'value';
+  }
 
 }

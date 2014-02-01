@@ -28,7 +28,7 @@ class CommentAccess extends EntityAccess {
         break;
 
       case 'update':
-        return ($account->id() && $account->id() == $entity->uid->value && $entity->status->value == COMMENT_PUBLISHED && user_access('edit own comments', $account)) || user_access('administer comments', $account);
+        return ($account->id() && $account->id() == $entity->uid->value && $entity->status->value == CommentInterface::PUBLISHED && user_access('edit own comments', $account)) || user_access('administer comments', $account);
         break;
 
       case 'delete':

@@ -113,9 +113,9 @@ class DefaultPluginManagerTest extends UnitTestCase {
       ->with($cid . ':en', $this->expectedDefinitions);
 
     $language = new Language(array('id' => 'en'));
-    $language_manager = $this->getMock('Drupal\Core\Language\LanguageManager');
+    $language_manager = $this->getMock('Drupal\Core\Language\LanguageManagerInterface');
     $language_manager->expects($this->once())
-      ->method('getLanguage')
+      ->method('getCurrentLanguage')
       ->with(Language::TYPE_INTERFACE)
       ->will($this->returnValue($language));
 
@@ -144,9 +144,9 @@ class DefaultPluginManagerTest extends UnitTestCase {
       ->method('set');
 
     $language = new Language(array('id' => 'en'));
-    $language_manager = $this->getMock('Drupal\Core\Language\LanguageManager');
+    $language_manager = $this->getMock('Drupal\Core\Language\LanguageManagerInterface');
     $language_manager->expects($this->once())
-      ->method('getLanguage')
+      ->method('getCurrentLanguage')
       ->with(Language::TYPE_INTERFACE)
       ->will($this->returnValue($language));
 
@@ -172,10 +172,21 @@ class DefaultPluginManagerTest extends UnitTestCase {
       ->expects($this->never())
       ->method('deleteMultiple');
 
+    $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+    $container->expects($this->any())
+      ->method('getParameter')
+      ->with('cache_bins')
+      ->will($this->returnValue(array('cache.test' => 'test')));
+    $container->expects($this->any())
+      ->method('get')
+      ->with('cache.test')
+      ->will($this->returnValue($cache_backend));
+    \Drupal::setContainer($container);
+
     $language = new Language(array('id' => 'en'));
-    $language_manager = $this->getMock('Drupal\Core\Language\LanguageManager');
+    $language_manager = $this->getMock('Drupal\Core\Language\LanguageManagerInterface');
     $language_manager->expects($this->once())
-      ->method('getLanguage')
+      ->method('getCurrentLanguage')
       ->with(Language::TYPE_INTERFACE)
       ->will($this->returnValue($language));
 

@@ -33,7 +33,7 @@ class FilterFormatAccess extends EntityAccess {
       return FALSE;
     }
 
-    if ($operation != 'view' && $account->hasPermission('administer filters')) {
+    if ($operation != 'view' && parent::checkAccess($entity, $operation, $langcode, $account)) {
       return TRUE;
     }
 
@@ -41,13 +41,6 @@ class FilterFormatAccess extends EntityAccess {
     // format so we return FALSE.
     $permission = $entity->getPermissionName();
     return !empty($permission) && $account->hasPermission($permission);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
-    return $account->hasPermission('administer filters');
   }
 
 }

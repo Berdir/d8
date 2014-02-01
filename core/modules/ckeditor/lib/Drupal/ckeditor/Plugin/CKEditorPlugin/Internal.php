@@ -9,8 +9,6 @@ namespace Drupal\ckeditor\Plugin\CKEditorPlugin;
 
 use Drupal\ckeditor\CKEditorPluginBase;
 use Drupal\Component\Utility\NestedArray;
-use Drupal\ckeditor\Annotation\CKEditorPlugin;
-use Drupal\Core\Annotation\Translation;
 use Drupal\editor\Entity\Editor;
 
 /**
@@ -47,7 +45,7 @@ class Internal extends CKEditorPluginBase {
       'customConfig' => '', // Don't load CKEditor's config.js file.
       'pasteFromWordPromptCleanup' => TRUE,
       'resize_dir' => 'vertical',
-      'justifyClasses' => array('align-left', 'align-center', 'align-right', 'align-justify'),
+      'justifyClasses' => array('text-align-left', 'text-align-center', 'text-align-right', 'text-align-justify'),
     );
 
     // Add the allowedContent setting, which ensures CKEditor only allows tags
@@ -260,7 +258,7 @@ class Internal extends CKEditorPluginBase {
     $possible_format_tags = array('h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'pre');
     foreach ($possible_format_tags as $tag) {
       $input = '<' . $tag . '>TEST</' . $tag . '>';
-      $output = trim(check_markup($input, $editor->format));
+      $output = trim(check_markup($input, $editor->format, '', TRUE));
       if ($input == $output) {
         $format_tags[] = $tag;
       }
@@ -287,7 +285,8 @@ class Internal extends CKEditorPluginBase {
    */
   protected function generateAllowedContentSetting(Editor $editor) {
     // When nothing is disallowed, set allowedContent to true.
-    $filter_types = filter_get_filter_types_by_format($editor->format);
+    $format = entity_load('filter_format', $editor->format);
+    $filter_types = $format->getFilterTypes();
     if (!in_array(FILTER_TYPE_HTML_RESTRICTOR, $filter_types)) {
       return TRUE;
     }
@@ -305,7 +304,7 @@ class Internal extends CKEditorPluginBase {
         }
       };
 
-      $html_restrictions = filter_get_html_restrictions_by_format($editor->format);
+      $html_restrictions = $format->getHtmlRestrictions();
       // When all HTML is allowed, also set allowedContent to true.
       if ($html_restrictions === FALSE) {
         return TRUE;

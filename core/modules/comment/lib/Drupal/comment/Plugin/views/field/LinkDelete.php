@@ -7,7 +7,7 @@
 
 namespace Drupal\comment\Plugin\views\field;
 
-use Drupal\Component\Annotation\PluginID;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\views\ResultRow;
 
 /**
@@ -19,9 +19,12 @@ use Drupal\views\ResultRow;
  */
 class LinkDelete extends Link {
 
-  public function access() {
+  /**
+   * {@inheritdoc}
+   */
+  public function access(AccountInterface $account) {
     //needs permission to administer comments in general
-    return user_access('administer comments');
+    return $account->hasPermission('administer comments');
   }
 
   /**
@@ -40,7 +43,7 @@ class LinkDelete extends Link {
     $comment = $this->getEntity($values);
 
     $this->options['alter']['make_link'] = TRUE;
-    $this->options['alter']['path'] = "comment/" . $comment->id(). "/delete";
+    $this->options['alter']['path'] = $comment->getSystemPath('delete-form');
     $this->options['alter']['query'] = drupal_get_destination();
 
     return $text;

@@ -42,7 +42,7 @@ class PathBasedBreadcrumbBuilder extends BreadcrumbBuilderBase {
   /**
    * The menu storage controller.
    *
-   * @var \Drupal\Core\Config\Entity\ConfigStorageController
+   * @var \Drupal\Core\Config\Entity\ConfigStorageControllerInterface
    */
   protected $menuStorage;
 
@@ -100,6 +100,13 @@ class PathBasedBreadcrumbBuilder extends BreadcrumbBuilderBase {
     $this->pathProcessor = $path_processor;
     $this->config = $config_factory->get('system.site');
     $this->titleResolver = $title_resolver;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function applies(array $attributes) {
+    return TRUE;
   }
 
   /**

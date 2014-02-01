@@ -7,8 +7,6 @@
 
 namespace Drupal\entity\Entity;
 
-use Drupal\Core\Entity\Annotation\EntityType;
-use Drupal\Core\Annotation\Translation;
 use Drupal\entity\EntityDisplayModeBase;
 use Drupal\entity\EntityFormModeInterface;
 
@@ -49,6 +47,7 @@ use Drupal\entity\EntityFormModeInterface;
  *     "uuid" = "uuid"
  *   },
  *   links = {
+ *     "delete-form" = "entity.form_mode_delete",
  *     "edit-form" = "entity.form_mode_edit"
  *   }
  * )

@@ -72,34 +72,6 @@ function theme_node_add_list($variables) {
   return $output;
 }
 
-
-/**
- * Page callback: Provides the node submission form.
- *
- * @param $node_type
- *   The node type object for the submitted node.
- *
- * @return array
- *   A node submission form.
- *
- * @see node_menu()
- *
- * @deprecated Use \Drupal\node\Controller\NodeController::add()
- */
-function node_add($node_type) {
-  $user = \Drupal::currentUser();
-
-  $type = $node_type->type;
-  $langcode = module_invoke('language', 'get_default_langcode', 'node', $type);
-  $node = entity_create('node', array(
-    'uid' => $user->id(),
-    'name' => $user->getUsername(),
-    'type' => $type,
-    'langcode' => $langcode ? $langcode : language_default()->id,
-  ));
-  return \Drupal::entityManager()->getForm($node);
-}
-
 /**
  * Generates a node preview.
  *

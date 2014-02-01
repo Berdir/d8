@@ -7,9 +7,8 @@
 
 namespace Drupal\edit\Plugin\InPlaceEditor;
 
-use Drupal\edit\EditorBase;
-use Drupal\edit\Annotation\InPlaceEditor;
-use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\edit\Plugin\InPlaceEditorBase;
 
 /**
  * Defines the form in-place editor.
@@ -18,12 +17,12 @@ use Drupal\Core\Field\FieldDefinitionInterface;
  *   id = "form"
  * )
  */
-class FormEditor extends EditorBase {
+class FormEditor extends InPlaceEditorBase {
 
   /**
    * {@inheritdoc}
    */
-  function isCompatible(FieldDefinitionInterface $field_definition, array $items) {
+  public function isCompatible(FieldItemListInterface $items) {
     return TRUE;
   }
 

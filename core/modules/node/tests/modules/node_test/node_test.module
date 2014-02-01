@@ -9,29 +9,13 @@
  */
 
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\entity\Entity\EntityDisplay;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\node\NodeInterface;
-
-/**
- * Implements hook_node_load().
- */
-function node_test_node_load($nodes, $types) {
-  // Add properties to each loaded node which record the parameters that were
-  // passed in to this function, so the tests can check that (a) this hook was
-  // called, and (b) the parameters were what we expected them to be.
-  $nids = array_keys($nodes);
-  ksort($nids);
-  sort($types);
-  foreach ($nodes as $node) {
-    $node->node_test_loaded_nids = $nids;
-    $node->node_test_loaded_types = $types;
-  }
-}
 
 /**
  * Implements hook_node_view().
  */
-function node_test_node_view(EntityInterface $node, EntityDisplay $display, $view_mode) {
+function node_test_node_view(EntityInterface $node, EntityViewDisplayInterface $display, $view_mode) {
   if ($view_mode == 'rss') {
     // Add RSS elements and namespaces when building the RSS feed.
     $node->rss_elements[] = array(
@@ -179,14 +163,5 @@ function node_test_node_insert(EntityInterface $node) {
   if ($node->getTitle() == 'new') {
     $node->setTitle('Node '. $node->id());
     $node->save();
-  }
-}
-
-/**
- * Implements hook_entity_info_alter().
- */
-function node_test_entity_info_alter(&$entity_info) {
-  if (\Drupal::state()->get('node_test.storage_controller')) {
-    $entity_info['node']['class'] = 'Drupal\node_test\NodeTest';
   }
 }

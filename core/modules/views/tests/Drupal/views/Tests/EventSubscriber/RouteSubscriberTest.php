@@ -78,9 +78,6 @@ class RouteSubscriberTest extends UnitTestCase {
    * @see \Drupal\views\EventSubscriber\RouteSubscriber::onDynamicRoutes()
    */
   public function testDynamicRoutes() {
-    $collection = new RouteCollection();
-    $route_event = new RouteBuildEvent($collection, 'views');
-
     list($view, $executable, $display_1, $display_2) = $this->setupMocks();
 
     $display_1->expects($this->once())
@@ -90,12 +87,12 @@ class RouteSubscriberTest extends UnitTestCase {
       ->method('collectRoutes')
       ->will($this->returnValue(array('test_id.page_2' => 'views.test_id.page_2')));
 
-    $this->assertNull($this->routeSubscriber->onDynamicRoutes($route_event));
+    $this->routeSubscriber->routes();
 
     $this->state->expects($this->once())
       ->method('set')
       ->with('views.view_route_names', array('test_id.page_1' => 'views.test_id.page_1', 'test_id.page_2' => 'views.test_id.page_2'));
-    $this->routeSubscriber->destruct();
+    $this->routeSubscriber->routeRebuildFinished();
   }
 
   /**
@@ -133,12 +130,12 @@ class RouteSubscriberTest extends UnitTestCase {
     // Ensure that after the alterRoutes the collectRoutes method is just called
     // once (not for page_1 anymore).
 
-    $this->assertNull($this->routeSubscriber->onDynamicRoutes($route_event));
+    $this->routeSubscriber->routes();
 
     $this->state->expects($this->once())
       ->method('set')
       ->with('views.view_route_names', array('test_id.page_1' => 'test_route', 'test_id.page_2' => 'views.test_id.page_2'));
-    $this->routeSubscriber->destruct();
+    $this->routeSubscriber->routeRebuildFinished();
   }
 
   /**

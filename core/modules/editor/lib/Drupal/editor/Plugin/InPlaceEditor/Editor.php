@@ -8,10 +8,8 @@
 namespace Drupal\editor\Plugin\InPlaceEditor;
 
 use Drupal\Component\Plugin\PluginBase;
-use Drupal\edit\Annotation\InPlaceEditor;
-use Drupal\Core\Annotation\Translation;
-use Drupal\edit\EditPluginInterface;
-use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\edit\Plugin\InPlaceEditorInterface;
 
 /**
  * Defines the formatted text in-place editor.
@@ -21,12 +19,14 @@ use Drupal\Core\Field\FieldDefinitionInterface;
  *   alternativeTo = {"plain_text"}
  * )
  */
-class Editor extends PluginBase implements EditPluginInterface {
+class Editor extends PluginBase implements InPlaceEditorInterface {
 
   /**
    * {@inheritdoc}
    */
-  function isCompatible(FieldDefinitionInterface $field_definition, array $items) {
+  public function isCompatible(FieldItemListInterface $items) {
+    $field_definition = $items->getFieldDefinition();
+
     // This editor is incompatible with multivalued fields.
     if ($field_definition->getCardinality() != 1) {
       return FALSE;
@@ -35,8 +35,7 @@ class Editor extends PluginBase implements EditPluginInterface {
     // if there is a currently active text format, that text format has an
     // associated editor and that editor supports inline editing.
     elseif ($field_definition->getSetting('text_processing')) {
-      $format_id = $items[0]['format'];
-      if (isset($format_id) && $editor = editor_load($format_id)) {
+      if ($editor = editor_load($items[0]->format)) {
         $definition = \Drupal::service('plugin.manager.editor')->getDefinition($editor->editor);
         if ($definition['supports_inline_editing'] === TRUE) {
           return TRUE;
@@ -50,8 +49,8 @@ class Editor extends PluginBase implements EditPluginInterface {
   /**
    * {@inheritdoc}
    */
-  function getMetadata(FieldDefinitionInterface $field_definition, array $items) {
-    $format_id = $items[0]['format'];
+  function getMetadata(FieldItemListInterface $items) {
+    $format_id = $items[0]->format;
     $metadata['format'] = $format_id;
     $metadata['formatHasTransformations'] = $this->textFormatHasTransformationFilters($format_id);
     return $metadata;
@@ -61,7 +60,8 @@ class Editor extends PluginBase implements EditPluginInterface {
    * Returns whether the text format has transformation filters.
    */
   protected function textFormatHasTransformationFilters($format_id) {
-    return (bool) count(array_intersect(array(FILTER_TYPE_TRANSFORM_REVERSIBLE, FILTER_TYPE_TRANSFORM_IRREVERSIBLE), filter_get_filter_types_by_format($format_id)));
+    $format = entity_load('filter_format', $format_id);
+    return (bool) count(array_intersect(array(FILTER_TYPE_TRANSFORM_REVERSIBLE, FILTER_TYPE_TRANSFORM_IRREVERSIBLE), $format->getFiltertypes()));
   }
 
   /**

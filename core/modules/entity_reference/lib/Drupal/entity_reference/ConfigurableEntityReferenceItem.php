@@ -7,7 +7,8 @@
 
 namespace Drupal\entity_reference;
 
-use Drupal\field\FieldInterface;
+use Drupal\Core\TypedData\DataDefinition;
+use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\ConfigEntityReferenceItemBase;
 use Drupal\Core\Field\ConfigFieldItemInterface;
 
@@ -17,65 +18,70 @@ use Drupal\Core\Field\ConfigFieldItemInterface;
  * Replaces the Core 'entity_reference' entity field type implementation, this
  * supports configurable fields, auto-creation of referenced entities and more.
  *
+ * Required settings (below the definition's 'settings' key) are:
+ *  - target_type: The entity type to reference.
+ *
  * @see entity_reference_field_info_alter().
  *
  */
 class ConfigurableEntityReferenceItem extends ConfigEntityReferenceItemBase implements ConfigFieldItemInterface {
 
   /**
+   * Definitions of the contained properties.
+   *
+   * @see ConfigurableEntityReferenceItem::getPropertyDefinitions()
+   *
+   * @var array
+   */
+  static $propertyDefinitions;
+
+  /**
    * {@inheritdoc}
    */
-  public static function schema(FieldInterface $field) {
-    $target_type = $field->getSetting('target_type');
-    $target_type_info = \Drupal::entityManager()->getDefinition($target_type);
+  public function getPropertyDefinitions() {
+    $settings = $this->definition->getSettings();
+    $target_type = $settings['target_type'];
 
-    if (is_subclass_of($target_type_info['class'], '\Drupal\Core\Entity\ContentEntityInterface')) {
-      $columns = array(
-        'target_id' => array(
-          'description' => 'The ID of the target entity.',
-          'type' => 'int',
-          'unsigned' => TRUE,
-          'not null' => TRUE,
-        ),
-        'revision_id' => array(
-          'description' => 'The revision ID of the target entity.',
-          'type' => 'int',
-          'unsigned' => TRUE,
-          'not null' => FALSE,
-        ),
-      );
-    }
-    else {
-      $columns = array(
-        'target_id' => array(
-          'description' => 'The ID of the target entity.',
-          'type' => 'varchar',
-          'length' => '255',
-        ),
-      );
+    // Definitions vary by entity type and bundle, so key them accordingly.
+    $key = $target_type . ':';
+    $key .= isset($settings['target_bundle']) ? $settings['target_bundle'] : '';
+
+    if (!isset(static::$propertyDefinitions[$key])) {
+      // Call the parent to define the target_id and entity properties.
+      parent::getPropertyDefinitions();
+
+      // Only add the revision ID property if the target entity type supports
+      // revisions.
+      $target_type_info = \Drupal::entityManager()->getDefinition($target_type);
+      if ($target_type_info->hasKey('revision') && $target_type_info->getRevisionTable()) {
+        static::$propertyDefinitions[$key]['revision_id'] = DataDefinition::create('integer')
+          ->setLabel(t('Revision ID'))
+          ->setConstraints(array('Range' => array('min' => 0)));
+      }
     }
 
-    $schema = array(
-      'columns' => $columns,
-      'indexes' => array(
-        'target_id' => array('target_id'),
-      ),
-    );
-
-    return $schema;
+    return static::$propertyDefinitions[$key];
   }
 
   /**
    * {@inheritdoc}
    */
-  public function preSave() {
-    $entity = $this->get('entity')->getValue();
-    $target_id = $this->get('target_id')->getValue();
+  public static function schema(FieldDefinitionInterface $field_definition) {
+    $schema = parent::schema($field_definition);
 
-    if (!$target_id && !empty($entity) && $entity->isNew()) {
-      $entity->save();
-      $this->set('target_id', $entity->id());
+    $target_type = $field_definition->getSetting('target_type');
+    $target_type_info = \Drupal::entityManager()->getDefinition($target_type);
+
+    if ($target_type_info->isSubclassOf('\Drupal\Core\Entity\ContentEntityInterface')) {
+      $schema['columns']['revision_id'] = array(
+        'description' => 'The revision ID of the target entity.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+      );
     }
+
+    return $schema;
   }
 
   /**

@@ -645,6 +645,9 @@ abstract class WebTestBase extends TestBase {
     if ($pass) {
       $this->loggedInUser = $account;
       $this->container->set('current_user', $account);
+      // @todo Temporary workaround for not being able to use synchronized
+      //   services in non dumped container.
+      $this->container->get('access_subscriber')->setCurrentUser($account);
     }
   }
 
@@ -658,8 +661,9 @@ abstract class WebTestBase extends TestBase {
     if (!isset($account->session_id)) {
       return FALSE;
     }
-    // @see _drupal_session_read()
-    return (bool) db_query("SELECT sid FROM {users} u INNER JOIN {sessions} s ON u.uid = s.uid WHERE s.sid = :sid", array(':sid' => $account->session_id))->fetchField();
+    // @see _drupal_session_read(). The session ID is hashed before being stored
+    // in the database.
+    return (bool) db_query("SELECT sid FROM {users} u INNER JOIN {sessions} s ON u.uid = s.uid WHERE s.sid = :sid", array(':sid' => Crypt::hashBase64($account->session_id)))->fetchField();
   }
 
   /**
@@ -695,60 +699,25 @@ abstract class WebTestBase extends TestBase {
   /**
    * Sets up a Drupal site for running functional and integration tests.
    *
-   * Generates a random database prefix and installs Drupal with the specified
-   * installation profile in \Drupal\simpletest\WebTestBase::$profile into the
-   * prefixed database. Afterwards, installs any additional modules specified by
-   * the test.
+   * Installs Drupal with the installation profile specified in
+   * \Drupal\simpletest\WebTestBase::$profile into the prefixed database.
+
+   * Afterwards, installs any additional modules specified in the static
+   * \Drupal\simpletest\WebTestBase::$modules property of each class in the
+   * class hierarchy.
    *
    * After installation all caches are flushed and several configuration values
    * are reset to the values of the parent site executing the test, since the
    * default values may be incompatible with the environment in which tests are
    * being executed.
-   *
-   * @param ...
-   *   List of modules to enable for the duration of the test. This can be
-   *   either a single array or a variable number of string arguments.
-   *
-   * @see \Drupal\simpletest\WebTestBase::prepareDatabasePrefix()
-   * @see \Drupal\simpletest\WebTestBase::changeDatabasePrefix()
-   * @see \Drupal\simpletest\WebTestBase::prepareEnvironment()
    */
   protected function setUp() {
-    global $conf;
-
     // When running tests through the Simpletest UI (vs. on the command line),
     // Simpletest's batch conflicts with the installer's batch. Batch API does
     // not support the concept of nested batches (in which the nested is not
     // progressive), so we need to temporarily pretend there was no batch.
     // Backup the currently running Simpletest batch.
     $this->originalBatch = batch_get();
-
-    // Create the database prefix for this test.
-    $this->prepareDatabasePrefix();
-
-    // Prepare the environment for running tests.
-    $this->prepareEnvironment();
-    if (!$this->setupEnvironment) {
-      return FALSE;
-    }
-
-    // Reset all statics and variables to perform tests in a clean environment.
-    $conf = array();
-    drupal_static_reset();
-
-    // Change the database prefix.
-    // All static variables need to be reset before the database prefix is
-    // changed, since \Drupal\Core\Utility\CacheArray implementations attempt to
-    // write back to persistent caches when they are destructed.
-    $this->changeDatabasePrefix();
-    if (!$this->setupDatabasePrefix) {
-      return FALSE;
-    }
-
-    // Set the 'simpletest_parent_profile' variable to add the parent profile's
-    // search path to the child site's search paths.
-    // @see drupal_system_listing()
-    $conf['simpletest_parent_profile'] = $this->originalProfile;
 
     // Define information about the user 1 account.
     $this->root_user = new UserSession(array(
@@ -841,16 +810,14 @@ abstract class WebTestBase extends TestBase {
     }
 
     // Use the test mail class instead of the default mail handler class.
-    \Drupal::config('system.mail')->set('interface.default', 'Drupal\Core\Mail\VariableLog')->save();
+    \Drupal::config('system.mail')->set('interface.default', 'Drupal\Core\Mail\TestMailCollector')->save();
 
-    drupal_set_time_limit($this->timeLimit);
     // Temporary fix so that when running from run-tests.sh we don't get an
     // empty current path which would indicate we're on the home page.
     $path = current_path();
     if (empty($path)) {
       _current_path('run-tests');
     }
-    $this->setup = TRUE;
   }
 
   /**
@@ -861,6 +828,11 @@ abstract class WebTestBase extends TestBase {
    */
   protected function installParameters() {
     $connection_info = Database::getConnectionInfo();
+    $driver = $connection_info['default']['driver'];
+    unset($connection_info['default']['driver']);
+    unset($connection_info['default']['namespace']);
+    unset($connection_info['default']['pdo']);
+    unset($connection_info['default']['init_commands']);
     $parameters = array(
       'interactive' => FALSE,
       'parameters' => array(
@@ -868,7 +840,10 @@ abstract class WebTestBase extends TestBase {
         'langcode' => 'en',
       ),
       'forms' => array(
-        'install_settings_form' => $connection_info['default'],
+        'install_settings_form' => array(
+          'driver' => $driver,
+          $driver => $connection_info['default'],
+        ),
         'install_configure_form' => array(
           'site_name' => 'Drupal',
           'site_mail' => 'simpletest@example.com',
@@ -982,31 +957,28 @@ abstract class WebTestBase extends TestBase {
     drupal_flush_all_caches();
     $this->container = \Drupal::getContainer();
 
-    // Reload global $conf array and permissions.
+    // Reset static variables and reload permissions.
     $this->refreshVariables();
     $this->checkPermissions(array(), TRUE);
   }
 
   /**
-   * Refreshes the in-memory set of variables.
+   * Refreshes in-memory configuration and state information.
    *
-   * Useful after a page request is made that changes a variable in a different
-   * thread.
+   * Useful after a page request is made that changes configuration or state in
+   * a different thread.
    *
    * In other words calling a settings page with $this->drupalPostForm() with a
-   * changed value would update a variable to reflect that change, but in the
-   * thread that made the call (thread running the test) the changed variable
+   * changed value would update configuration to reflect that change, but in the
+   * thread that made the call (thread running the test) the changed values
    * would not be picked up.
    *
-   * This method clears the variables cache and loads a fresh copy from the
-   * database to ensure that the most up-to-date set of variables is loaded.
+   * This method clears the cache and loads a fresh copy.
    */
   protected function refreshVariables() {
-    global $conf;
-    cache('bootstrap')->delete('variables');
-    $conf = variable_initialize();
     // Clear the tag cache.
     drupal_static_reset('Drupal\Core\Cache\CacheBackendInterface::tagCache');
+
     \Drupal::service('config.factory')->reset();
     \Drupal::state()->resetCache();
   }
@@ -2449,7 +2421,7 @@ abstract class WebTestBase extends TestBase {
    *   An array containing e-mail messages captured during the current test.
    */
   protected function drupalGetMails($filter = array()) {
-    $captured_emails = \Drupal::state()->get('system.test_email_collector') ?: array();
+    $captured_emails = \Drupal::state()->get('system.test_mail_collector') ?: array();
     $filtered_emails = array();
 
     foreach ($captured_emails as $message) {
@@ -3446,7 +3418,7 @@ abstract class WebTestBase extends TestBase {
    *   TRUE on pass, FALSE on fail.
    */
   protected function assertMail($name, $value = '', $message = '', $group = 'E-mail') {
-    $captured_emails = \Drupal::state()->get('system.test_email_collector') ?: array();
+    $captured_emails = \Drupal::state()->get('system.test_mail_collector') ?: array();
     $email = end($captured_emails);
     return $this->assertTrue($email && isset($email[$name]) && $email[$name] == $value, $message, $group);
   }

@@ -36,9 +36,11 @@ use Drupal\entity\Entity\EntityFormDisplay;
  *
  * The Field API reads the bundle name for a given entity from a particular
  * property of the entity object, and hook_entity_info_alter() defines which
- * property to use. For instance, node_entity_info_alter() specifies:
+ * property to use. For instance, \Drupal\node\Entity\Node specifies:
  * @code
- *   $info['entity_keys']['bundle'] = 'type'
+ *   entity_keys = {
+ *     "bundle" = "type"
+ *   }
  * @endcode
  * This indicates that for a particular node object, the bundle name can be
  * found in $node->type. This property can be omitted if the entity type only
@@ -83,7 +85,7 @@ use Drupal\entity\Entity\EntityFormDisplay;
  *   An array of returned values.
  */
 function field_invoke_method($method, $target_function, EntityInterface $entity, &$a = NULL, &$b = NULL, array $options = array()) {
-  $entity_type = $entity->entityType();
+  $entity_type = $entity->getEntityTypeId();
 
   // Determine the list of fields to iterate on.
   $field_definitions = _field_invoke_get_field_definitions($entity_type, $entity->bundle(), $options);
@@ -97,7 +99,7 @@ function field_invoke_method($method, $target_function, EntityInterface $entity,
 
     if (method_exists($target, $method)) {
       $items = $entity->get($field_definition->getName());
-      $items->filterEmptyValues();
+      $items->filterEmptyItems();
 
       $result = $target->$method($items, $a, $b);
 
@@ -125,7 +127,7 @@ function field_invoke_method($method, $target_function, EntityInterface $entity,
  * @param callable $target_function
  *   A function that receives a FieldDefinitionInterface object and a bundle
  *   name and returns the object on which the method should be invoked.
- * @param array $entities
+ * @param \Drupal\Core\Entity\EntityInterface[] $entities
  *   An array of entities, keyed by entity ID.
  * @param mixed $a
  *   (optional) A parameter for the invoked method. Defaults to NULL.
@@ -151,7 +153,7 @@ function field_invoke_method_multiple($method, $target_function, array $entities
   // Go through the entities and collect the instances on which the method
   // should be called.
   foreach ($entities as $entity) {
-    $entity_type = $entity->entityType();
+    $entity_type = $entity->getEntityTypeId();
     $bundle = $entity->bundle();
     $id = $entity->id();
 
@@ -177,7 +179,7 @@ function field_invoke_method_multiple($method, $target_function, array $entities
       // If there is a target, group the field items.
       if ($grouped_targets[$group_key]) {
         $items = $entity->get($field_name);
-        $items->filterEmptyValues();
+        $items->filterEmptyItems();
         $grouped_items[$group_key][$id] = $items;
       }
     }
@@ -261,38 +263,6 @@ function _field_invoke_widget_target($form_display) {
   return function (FieldDefinitionInterface $field_definition) use ($form_display) {
     return $form_display->getRenderer($field_definition->getName());
   };
-}
-
-/**
- * Populates the template variables with the available field values.
- *
- * The $variables array will be populated with all the field instance values
- * associated with the given entity type, keyed by field name; in case of
- * translatable fields the language currently chosen for display will be
- * selected.
- *
- * @param \Drupal\Core\Entity\EntityInterface $entity
- *   The entity with fields to render.
- * @param $element
- *   The structured array containing the values ready for rendering.
- * @param $variables
- *   The variables array is passed by reference and will be populated with field
- *   values.
- */
-function field_attach_preprocess(EntityInterface $entity, $element, &$variables) {
-  foreach (field_info_instances($entity->entityType(), $entity->bundle()) as $field_name => $instance) {
-    if (isset($element[$field_name]['#language'])) {
-      $langcode = $element[$field_name]['#language'];
-      $variables[$field_name] = $entity->getTranslation($langcode)->{$field_name}->getValue();
-    }
-  }
-
-  // Let other modules make changes to the $variables array.
-  $context = array(
-    'entity' => $entity,
-    'element' => $element,
-  );
-  drupal_alter('field_attach_preprocess', $variables, $context);
 }
 
 /**

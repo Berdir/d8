@@ -7,11 +7,9 @@
 
 namespace Drupal\language\Entity;
 
-use Drupal\Core\Entity\Annotation\EntityType;
-use Drupal\Core\Annotation\Translation;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
-use Drupal\Core\Language\LanguageManager;
+use Drupal\language\Exception\DeleteDefaultLanguageException;
 use Drupal\language\LanguageInterface;
 
 /**
@@ -39,6 +37,7 @@ use Drupal\language\LanguageInterface;
  *     "uuid" = "uuid"
  *   },
  *   links = {
+ *     "delete-form" = "language.delete",
  *     "edit-form" = "language.edit"
  *   }
  * )
@@ -100,4 +99,17 @@ class Language extends ConfigEntityBase implements LanguageInterface {
     $this->langcode = 'en';
   }
 
+  /**
+   * {@inheritdoc}
+   *
+   * @throws \RuntimeException
+   */
+  public static function preDelete(EntityStorageControllerInterface $storage_controller, array $entities) {
+    $default_language = \Drupal::service('language.default')->get();
+    foreach ($entities as $entity) {
+      if ($entity->id() == $default_language->id) {
+        throw new DeleteDefaultLanguageException('Can not delete the default language');
+      }
+    }
+  }
 }

@@ -62,13 +62,12 @@ interface EntityAccessInterface {
   public function resetCache();
 
   /**
-   * Sets the module handler for this form.
+   * Sets the module handler for this access controller.
    *
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
    *
-   * @return self
-   *   The entity access object.
+   * @return $this
    */
   public function setModuleHandler(ModuleHandlerInterface $module_handler);
 

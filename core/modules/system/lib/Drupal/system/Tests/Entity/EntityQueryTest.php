@@ -58,7 +58,6 @@ class EntityQueryTest extends EntityUnitTestBase {
   function setUp() {
     parent::setUp();
     $this->installSchema('entity_test', array('entity_test_mulrev', 'entity_test_mulrev_revision', 'entity_test_mulrev_property_data', 'entity_test_mulrev_property_revision'));
-    $this->installSchema('system', array('variable'));
     $this->installConfig(array('language'));
 
     $figures = drupal_strtolower($this->randomName());
@@ -126,8 +125,6 @@ class EntityQueryTest extends EntityUnitTestBase {
       'name' => $this->randomString(),
     ));
     language_save($langcode);
-    $field_langcodes = &drupal_static('field_available_languages');
-    $field_langcodes['entity_test_mulrev'][$greetings] = array('tr', 'pl');
     // Calculate the cartesian product of the unit array by looking at the
     // bits of $i and add the unit at the bits that are 1. For example,
     // decimal 13 is binary 1101 so unit 3,2 and 0 will be added to the

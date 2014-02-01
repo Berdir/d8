@@ -147,7 +147,7 @@ class View extends ConfigEntityBase implements ViewStorageInterface {
    *
    * When a certain view doesn't have a label return the ID.
    */
-  public function label($langcode = NULL) {
+  public function label() {
     if (!$label = $this->get('label')) {
       $label = $this->id();
     }
@@ -284,6 +284,16 @@ class View extends ConfigEntityBase implements ViewStorageInterface {
     $id = $this->id();
     Cache::deleteTags(array('view' => array($id => $id)));
     views_invalidate_cache();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function postLoad(EntityStorageControllerInterface $storage_controller, array &$entities) {
+    parent::postLoad($storage_controller, $entities);
+    foreach ($entities as $entity) {
+      $entity->mergeDefaultDisplaysOptions();
+    }
   }
 
   /**

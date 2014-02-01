@@ -1,6 +1,7 @@
 <?php
 
 use Drupal\Core\Database\Database;
+use Drupal\Core\Page\HtmlPage;
 use Drupal\simpletest\TestBase;
 use Symfony\Component\Process\PhpExecutableFinder;
 
@@ -44,6 +45,21 @@ function simpletest_menu() {
     'route_name' => 'simpletest.result_form',
   );
   return $items;
+}
+
+/**
+ * Implements hook_menu_link_defaults().
+ */
+function simpletest_menu_link_defaults() {
+  $links['simpletest.admin.config.development.testing'] = array(
+    'link_title' => 'Testing',
+    'description' => 'Run tests against Drupal core and your modules. These tests help assure that your site code is working as designed.',
+    'route_name' => 'simpletest.test_form',
+    'parent' => 'system.admin.config.development',
+    'weight' => -5,
+  );
+
+  return $links;
 }
 
 /**

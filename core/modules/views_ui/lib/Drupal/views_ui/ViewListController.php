@@ -13,7 +13,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Config\Entity\ConfigEntityListController;
 use Drupal\Core\Entity\EntityControllerInterface;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
-use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -31,32 +31,26 @@ class ViewListController extends ConfigEntityListController implements EntityCon
   /**
    * {@inheritdoc}
    */
-  public static function createInstance(ContainerInterface $container, $entity_type, array $entity_info) {
+  public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_info) {
     return new static(
-      $entity_type,
-      $container->get('entity.manager')->getStorageController($entity_type),
       $entity_info,
-      $container->get('plugin.manager.views.display'),
-      $container->get('module_handler')
+      $container->get('entity.manager')->getStorageController($entity_info->id()),
+      $container->get('plugin.manager.views.display')
     );
   }
 
   /**
    * Constructs a new EntityListController object.
    *
-   * @param string $entity_type.
-   *   The type of entity to be listed.
+   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_info
+   *   An array of entity info for this entity type.
    * @param \Drupal\Core\Entity\EntityStorageControllerInterface $storage.
    *   The entity storage controller class.
-   * @param array $entity_info
-   *   An array of entity info for this entity type.
    * @param \Drupal\Component\Plugin\PluginManagerInterface $display_manager
    *   The views display plugin manager to use.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
    */
-  public function __construct($entity_type, EntityStorageControllerInterface $storage, $entity_info, PluginManagerInterface $display_manager, ModuleHandlerInterface $module_handler) {
-    parent::__construct($entity_type, $entity_info, $storage, $module_handler);
+  public function __construct(EntityTypeInterface $entity_info, EntityStorageControllerInterface $storage, PluginManagerInterface $display_manager) {
+    parent::__construct($entity_info, $storage);
 
     $this->displayManager = $display_manager;
   }
@@ -142,43 +136,26 @@ class ViewListController extends ConfigEntityListController implements EntityCon
    */
   public function getOperations(EntityInterface $entity) {
     $operations = parent::getOperations($entity);
-    $uri = $entity->uri();
 
-    $operations['clone'] = array(
-      'title' => $this->t('Clone'),
-      'href' => $uri['path'] . '/clone',
-      'options' => $uri['options'],
-      'weight' => 15,
-    );
+    if ($entity->hasLinkTemplate('clone')) {
+      $operations['clone'] = array(
+        'title' => $this->t('Clone'),
+        'weight' => 15,
+      ) + $entity->urlInfo('clone');
+    }
 
     // Add AJAX functionality to enable/disable operations.
     foreach (array('enable', 'disable') as $op) {
       if (isset($operations[$op])) {
-        $operations[$op]['ajax'] = TRUE;
-        $operations[$op]['route_name'] = 'views_ui.operation';
-        $operations[$op]['route_parameters'] = array('view' => $entity->id(), 'op' => $op);
-        // @todo Remove this when entity links use route_names.
-        unset($operations[$op]['href']);
+        $operations[$op]['route_name'] = "views_ui.$op";
+        $operations[$op]['route_parameters'] = array('view' => $entity->id());
+
+        // Enable and disable operations should use AJAX.
+        $operations[$op]['attributes']['class'][] = 'use-ajax';
       }
     }
 
     return $operations;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function buildOperations(EntityInterface $entity) {
-    $build = parent::buildOperations($entity);
-
-    // Allow operations to specify that they use AJAX.
-    foreach ($build['#links'] as &$operation) {
-      if (!empty($operation['ajax'])) {
-        $operation['attributes']['class'][] = 'use-ajax';
-      }
-    }
-
-    return $build;
   }
 
   /**

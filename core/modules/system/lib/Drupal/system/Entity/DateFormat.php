@@ -11,8 +11,6 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
 use Drupal\system\DateFormatInterface;
-use Drupal\Core\Entity\Annotation\EntityType;
-use Drupal\Core\Annotation\Translation;
 
 /**
  * Defines the Date Format configuration entity class.
@@ -36,7 +34,9 @@ use Drupal\Core\Annotation\Translation;
  *     "label" = "label",
  *     "uuid" = "uuid"
  *   },
+ *   admin_permission = "administer site configuration",
  *   links = {
+ *     "delete-form" = "system.date_format_delete",
  *     "edit-form" = "system.date_format_edit"
  *   }
  * )

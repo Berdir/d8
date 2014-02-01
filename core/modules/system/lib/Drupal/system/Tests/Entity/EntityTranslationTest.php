@@ -432,7 +432,7 @@ class EntityTranslationTest extends EntityLanguageTestBase {
 
     // Check that per-language defaults are properly populated.
     $entity = $this->reloadEntity($entity);
-    $instance_id = implode('.', array($entity->entityType(), $entity->bundle(), $this->field_name));
+    $instance_id = implode('.', array($entity->getEntityTypeId(), $entity->bundle(), $this->field_name));
     $instance = $this->entityManager->getStorageController('field_instance')->load($instance_id);
     $instance->default_value_function = 'entity_test_field_default_value';
     $instance->save();
@@ -446,7 +446,7 @@ class EntityTranslationTest extends EntityLanguageTestBase {
    * Tests language fallback applied to field and entity translations.
    */
   function testLanguageFallback() {
-    $current_langcode = $this->container->get('language_manager')->getLanguage(Language::TYPE_CONTENT)->id;
+    $current_langcode = $this->languageManager->getCurrentLanguage(Language::TYPE_CONTENT)->id;
     $this->langcodes[] = $current_langcode;
 
     $values = array();
@@ -473,7 +473,7 @@ class EntityTranslationTest extends EntityLanguageTestBase {
     $this->assertEqual($translation->language()->id, $default_langcode, 'The current translation language matches the expected one.');
 
     // Check that language fallback respects language weight by default.
-    $languages = language_list();
+    $languages = $this->languageManager->getLanguages();
     $languages[$langcode]->weight = -1;
     language_save($languages[$langcode]);
     $translation = $this->entityManager->getTranslationFromContext($entity, $langcode2);

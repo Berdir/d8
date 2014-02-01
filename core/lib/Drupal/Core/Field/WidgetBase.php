@@ -237,7 +237,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface 
     $entity = $items->getEntity();
 
     $element += array(
-      '#entity_type' => $entity->entityType(),
+      '#entity_type' => $entity->getEntityTypeId(),
       '#bundle' => $entity->bundle(),
       '#entity' => $entity,
       '#field_name' => $this->fieldDefinition->getName(),
@@ -307,7 +307,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface 
       $this->sortItems($items);
 
       // Remove empty values.
-      $items->filterEmptyValues();
+      $items->filterEmptyItems();
 
       // Put delta mapping in $form_state, so that flagErrors() can use it.
       $field_state = field_form_get_state($form['#parents'], $field_name, $form_state);

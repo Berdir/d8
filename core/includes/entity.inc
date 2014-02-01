@@ -5,7 +5,7 @@
  * Entity API for handling entities like nodes or users.
  */
 
-use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Language\Language;
@@ -131,7 +131,7 @@ function entity_get_form_modes($entity_type = NULL) {
         $form_modes[$form_mode_entity_type][$form_mode_name] = (array) $form_mode;
       }
       drupal_alter('entity_form_mode_info', $form_modes);
-      cache()->set("entity_form_mode_info:$langcode", $form_modes, CacheBackendInterface::CACHE_PERMANENT, array('entity_info' => TRUE));
+      cache()->set("entity_form_mode_info:$langcode", $form_modes, Cache::PERMANENT, array('entity_info' => TRUE));
     }
   }
 
@@ -169,7 +169,7 @@ function entity_get_view_modes($entity_type = NULL) {
         $view_modes[$view_mode_entity_type][$view_mode_name] = (array) $view_mode;
       }
       drupal_alter('entity_view_mode_info', $view_modes);
-      cache()->set("entity_view_mode_info:$langcode", $view_modes, CacheBackendInterface::CACHE_PERMANENT, array('entity_info' => TRUE));
+      cache()->set("entity_view_mode_info:$langcode", $view_modes, Cache::PERMANENT, array('entity_info' => TRUE));
     }
   }
 
@@ -266,11 +266,10 @@ function entity_revision_delete($entity_type, $revision_id) {
  * @see \Drupal\Core\Entity\EntityManagerInterface
  */
 function entity_load_by_uuid($entity_type, $uuid, $reset = FALSE) {
-  $entity_info = entity_get_info($entity_type);
-  if (empty($entity_info['entity_keys']['uuid'])) {
+  $entity_info = \Drupal::entityManager()->getDefinition($entity_type);
+  if (!$uuid_key = $entity_info->getKey('uuid')) {
     throw new EntityStorageException("Entity type $entity_type does not support UUIDs.");
   }
-  $uuid_key = $entity_info['entity_keys']['uuid'];
 
   $controller = \Drupal::entityManager()->getStorageController($entity_type);
   if ($reset) {
@@ -444,79 +443,11 @@ function entity_access_controller($entity_type) {
 }
 
 /**
- * Returns an entity form controller for the given operation.
- *
- * Since there might be different scenarios in which an entity is edited,
- * multiple form controllers suitable to the different operations may be defined.
- * If no controller is found for the default operation, the base class will be
- * used. If a non-existing non-default operation is specified an exception will
- * be thrown.
- *
- * @see \Drupal\Core\Entity\EntityManagerInterface
- *
- * @param $entity_type
- *   The type of the entity.
- * @param $operation
- *   (optional) The name of an operation, such as creation, editing or deletion,
- *   identifying the controlled form. Defaults to 'default' which is the usual
- *   create/edit form.
- *
- * @return \Drupal\Core\Entity\EntityFormControllerInterface
- *   An entity form controller instance.
- *
- * @deprecated Use \Drupal\Core\Entity\EntityManagerInterface::getFormController().
- */
-function entity_form_controller($entity_type, $operation = 'default') {
-  return \Drupal::entityManager()
-    ->getFormController($entity_type, $operation);
-}
-
-/**
- * Returns the default form state for the given entity and operation.
- *
- * @param EntityInterface $entity
- *   The entity to be created or edited.
- * @param $operation
- *   (optional) The operation identifying the form to be processed.
- *
- * @return
- *   A $form_state array already filled the entity form controller.
- */
-function entity_form_state_defaults(EntityInterface $entity, $operation = 'default') {
-  $form_state = array();
-  $controller = \Drupal::entityManager()->getFormController($entity->entityType(), $operation);
-  $controller->setEntity($entity);
-  $form_state['build_info']['callback_object'] = $controller;
-  $form_state['build_info']['base_form_id'] = $controller->getBaseFormID();
-  $form_state['build_info']['args'] = array();
-  return $form_state;
-}
-
-/**
- * Retrieves, populates, and processes an entity form.
- *
- * @param EntityInterface $entity
- *   The entity to be created or edited.
- * @param $operation
- *   (optional) The operation identifying the form to be submitted.
- * @param $form_state
- *   (optional) A keyed array containing the current state of the form.
- *
- * @return
- *   A $form_state array already filled with the entity form controller.
- */
-function entity_form_submit(EntityInterface $entity, $operation = 'default', &$form_state = array()) {
-  $form_state += entity_form_state_defaults($entity, $operation);
-  $form_id = $form_state['build_info']['callback_object']->getFormId();
-  drupal_form_submit($form_id, $form_state);
-}
-
-/**
  * Returns the built and processed entity form for the given entity.
  *
- * @param EntityInterface $entity
+ * @param \Drupal\Core\Entity\EntityInterface $entity
  *   The entity to be created or edited.
- * @param $operation
+ * @param string $operation
  *   (optional) The operation identifying the form variation to be returned.
  * @param array $form_state
  *   (optional) An associative array containing the current state of the form.
@@ -526,7 +457,7 @@ function entity_form_submit(EntityInterface $entity, $operation = 'default', &$f
  *   $form = entity_get_form($entity, 'default', $form_state);
  *   @endcode
  *
- * @return
+ * @return array
  *   The processed form for the given entity and operation.
  *
  * @deprecated Use \Drupal::entityManager()->getForm() or _entity_form from a
@@ -570,7 +501,7 @@ function entity_list_controller($entity_type) {
  *   A render array for the entity.
  */
 function entity_view(EntityInterface $entity, $view_mode, $langcode = NULL, $reset = FALSE) {
-  $render_controller = \Drupal::entityManager()->getViewBuilder($entity->entityType());
+  $render_controller = \Drupal::entityManager()->getViewBuilder($entity->getEntityTypeId());
   if ($reset) {
     $render_controller->resetCache(array($entity->id()));
   }
@@ -580,7 +511,7 @@ function entity_view(EntityInterface $entity, $view_mode, $langcode = NULL, $res
 /**
  * Returns the render array for the provided entities.
  *
- * @param array $entities
+ * @param \Drupal\Core\Entity\EntityInterface[] $entities
  *   The entities to be rendered, must be of the same type.
  * @param string $view_mode
  *   The view mode that should be used to display the entity.
@@ -596,7 +527,7 @@ function entity_view(EntityInterface $entity, $view_mode, $langcode = NULL, $res
  *   entities array passed in $entities.
  */
 function entity_view_multiple(array $entities, $view_mode, $langcode = NULL, $reset = FALSE) {
-  $render_controller = \Drupal::entityManager()->getViewBuilder(reset($entities)->entityType());
+  $render_controller = \Drupal::entityManager()->getViewBuilder(reset($entities)->getEntityTypeId());
   if ($reset) {
     $render_controller->resetCache(array_keys($entities));
   }
@@ -639,7 +570,7 @@ function entity_view_multiple(array $entities, $view_mode, $langcode = NULL, $re
  *   The view mode, or 'default' to retrieve the 'default' display object for
  *   this bundle.
  *
- * @return \Drupal\entity\Entity\EntityDisplay
+ * @return \Drupal\Core\Entity\Display\EntityViewDisplayInterface
  *   The display object associated to the view mode.
  */
 function entity_get_display($entity_type, $bundle, $view_mode) {
@@ -682,18 +613,18 @@ function entity_get_display($entity_type, $bundle, $view_mode) {
  * @param string $view_mode
  *  The view mode being rendered.
  *
- * @return \Drupal\entity\Entity\EntityDisplay
+ * @return \Drupal\Core\Entity\Display\EntityViewDisplayInterface
  *   The display object that should be used to render the entity.
  *
  * @see entity_get_display().
  */
 function entity_get_render_display(EntityInterface $entity, $view_mode) {
-  $entity_type = $entity->entityType();
+  $entity_type = $entity->getEntityTypeId();
   $bundle = $entity->bundle();
   $render_view_mode = 'default';
 
-  // Look at the default display and display for the view mode, and fallback to
-  // the former if the latter does not exist is disabled.
+  // Fall back to the default display if the display for the view mode does
+  // not exist or is disabled.
   if ($view_mode != 'default') {
     $ids = array(
       'default' => $entity_type . '.' . $bundle . '.default',
@@ -751,7 +682,7 @@ function entity_get_render_display(EntityInterface $entity, $view_mode) {
  * @param string $form_mode
  *   The form mode.
  *
- * @return \Drupal\entity\Entity\EntityFormDisplay
+ * @return \Drupal\Core\Entity\Display\EntityFormDisplayInterface
  *   The EntityFormDisplay object associated to the form mode.
  */
 function entity_get_form_display($entity_type, $bundle, $form_mode) {
@@ -790,13 +721,13 @@ function entity_get_form_display($entity_type, $bundle, $form_mode) {
  * @param string $form_mode
  *   The form mode being rendered.
  *
- * @return \Drupal\entity\Entity\EntityFormDisplay
+ * @return \Drupal\Core\Entity\Display\EntityFormDisplayInterface
  *   The form display object that should be used to render the entity form.
  *
  * @see entity_get_form_display().
  */
 function entity_get_render_form_display(EntityInterface $entity, $form_mode) {
-  $entity_type = $entity->entityType();
+  $entity_type = $entity->getEntityTypeId();
   $bundle = $entity->bundle();
   $render_form_mode = 'default';
 

@@ -22,11 +22,9 @@ class Query extends QueryBase implements QueryInterface {
   /**
    * Contains the entity info for the entity type of that query.
    *
-   * @var array
-   *
-   * @see \Drupal\Core\Entity\EntityManagerInterface
+   * @var \Drupal\Core\Entity\EntityTypeInterface
    */
-  protected $entityInfo;
+  protected $entityType;
 
   /**
    * The build sql select query.
@@ -109,21 +107,20 @@ class Query extends QueryBase implements QueryInterface {
    *   Returns the called object.
    */
   protected function prepare() {
-    $entity_type = $this->entityType;
-    $this->entityInfo = $this->entityManager->getDefinition($entity_type);
-    if (!isset($this->entityInfo['base_table'])) {
+    $entity_type = $this->entityTypeId;
+    $this->entityType = $this->entityManager->getDefinition($entity_type);
+    if (!$base_table = $this->entityType->getBaseTable()) {
       throw new QueryException("No base table, invalid query.");
     }
-    $base_table = $this->entityInfo['base_table'];
     $simple_query = TRUE;
-    if (isset($this->entityInfo['data_table'])) {
+    if ($this->entityType->getDataTable()) {
       $simple_query = FALSE;
     }
     $this->sqlQuery = $this->connection->select($base_table, 'base_table', array('conjunction' => $this->conjunction));
     $this->sqlQuery->addMetaData('entity_type', $entity_type);
-    $id_field = $this->entityInfo['entity_keys']['id'];
+    $id_field = $this->entityType->getKey('id');
     // Add the key field for fetchAllKeyed().
-    if (empty($this->entityInfo['entity_keys']['revision'])) {
+    if (!$revision_field = $this->entityType->getKey('revision')) {
       // When there is no revision support, the key field is the entity key.
       $this->sqlFields["base_table.$id_field"] = array('base_table', $id_field);
       // Now add the value column for fetchAllKeyed(). This is always the
@@ -132,7 +129,6 @@ class Query extends QueryBase implements QueryInterface {
     }
     else {
       // When there is revision support, the key field is the revision key.
-      $revision_field = $this->entityInfo['entity_keys']['revision'];
       $this->sqlFields["base_table.$revision_field"] = array('base_table', $revision_field);
       // Now add the value column for fetchAllKeyed(). This is always the
       // entity id.
@@ -142,7 +138,7 @@ class Query extends QueryBase implements QueryInterface {
       $this->sqlQuery->addTag($entity_type . '_access');
     }
     $this->sqlQuery->addTag('entity_query');
-    $this->sqlQuery->addTag('entity_query_' . $this->entityType);
+    $this->sqlQuery->addTag('entity_query_' . $this->entityTypeId);
 
     // Add further tags added.
     if (isset($this->alterTags)) {
@@ -226,8 +222,8 @@ class Query extends QueryBase implements QueryInterface {
         // if the direction is descending.
         $function = $direction == 'ASC' ? 'min' : 'max';
         $expression = "$function($sql_alias)";
-        $this->sqlQuery->addExpression($expression);
-        $this->sqlQuery->orderBy($expression, $direction);
+        $expression_alias = $this->sqlQuery->addExpression($expression);
+        $this->sqlQuery->orderBy($expression_alias, $direction);
       }
     }
     return $this;

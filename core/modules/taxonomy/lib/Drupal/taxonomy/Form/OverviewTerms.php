@@ -199,8 +199,8 @@ class OverviewTerms extends FormBase {
       ),
     );
     foreach ($current_page as $key => $term) {
-      $uri = $term->uri();
-      $edit_uri = $term->uri('edit-form');
+      /** @var $term \Drupal\Core\Entity\EntityInterface */
+      $uri = $term->urlInfo();
       $form['terms'][$key]['#term'] = $term;
       $indentation = array();
       if (isset($term->depth) && $term->depth > 0) {
@@ -213,7 +213,8 @@ class OverviewTerms extends FormBase {
         '#prefix' => !empty($indentation) ? drupal_render($indentation) : '',
         '#type' => 'link',
         '#title' => $term->label(),
-        '#href' => $uri['path'],
+        '#route_name' => $uri['route_name'],
+        '#route_parameters' => $uri['route_parameters'],
       );
       if ($taxonomy_vocabulary->hierarchy != TAXONOMY_HIERARCHY_MULTIPLE && count($tree) > 1) {
         $parent_fields = TRUE;
@@ -256,21 +257,18 @@ class OverviewTerms extends FormBase {
       $operations = array(
         'edit' => array(
           'title' => $this->t('edit'),
-          'href' => $edit_uri['path'],
           'query' => $destination,
-        ),
+        ) + $term->urlInfo('edit-form'),
         'delete' => array(
           'title' => $this->t('delete'),
-          'href' => $uri['path'] . '/delete',
           'query' => $destination,
-        ),
+        ) + $term->urlInfo('delete-form'),
       );
       if ($this->moduleHandler->moduleExists('content_translation') && content_translation_translate_access($term)) {
         $operations['translate'] = array(
           'title' => $this->t('translate'),
-          'href' => $uri['path'] . '/translations',
           'query' => $destination,
-        );
+        ) + $term->urlInfo('drupal:content-translation-overview');
       }
       $form['terms'][$key]['operations'] = array(
         '#type' => 'operations',
@@ -307,20 +305,18 @@ class OverviewTerms extends FormBase {
 
     if ($parent_fields) {
       $form['terms']['#tabledrag'][] = array(
-        'match',
-        'parent',
-        'term-parent',
-        'term-parent',
-        'term-id',
-        FALSE,
+        'action' => 'match',
+        'relationship' => 'parent',
+        'group' => 'term-parent',
+        'subgroup' => 'term-parent',
+        'source' => 'term-id',
+        'hidden' => FALSE,
       );
       $form['terms']['#tabledrag'][] = array(
-        'depth',
-        'group',
-        'term-depth',
-        NULL,
-        NULL,
-        FALSE
+        'action' => 'depth',
+        'relationship' => 'group',
+        'group' => 'term-depth',
+        'hidden' => FALSE,
       );
       $form['terms']['#attached']['library'][] = array('taxonomy', 'drupal.taxonomy');
       $form['terms']['#attached']['js'][] = array(
@@ -328,7 +324,11 @@ class OverviewTerms extends FormBase {
         'type' => 'setting',
       );
     }
-    $form['terms']['#tabledrag'][] = array('order', 'sibling', 'term-weight');
+    $form['terms']['#tabledrag'][] = array(
+      'action' => 'order',
+      'relationship' => 'sibling',
+      'group' => 'term-weight',
+    );
 
     if ($taxonomy_vocabulary->hierarchy != TAXONOMY_HIERARCHY_MULTIPLE && count($tree) > 1) {
       $form['actions'] = array('#type' => 'actions', '#tree' => FALSE);
@@ -368,7 +368,7 @@ class OverviewTerms extends FormBase {
    */
   public function submitForm(array &$form, array &$form_state) {
     // Sort term order based on weight.
-    uasort($form_state['values']['terms'], 'drupal_sort_weight');
+    uasort($form_state['values']['terms'], array('Drupal\Component\Utility\SortArray', 'sortByWeightElement'));
 
     $vocabulary = $form_state['taxonomy']['vocabulary'];
     // Update the current hierarchy type as we go.
@@ -452,10 +452,9 @@ class OverviewTerms extends FormBase {
    * Redirects to confirmation form for the reset action.
    */
   public function submitReset(array &$form, array &$form_state) {
-    $form_state['redirect_route'] = array(
-      'route_name' => 'taxonomy.vocabulary_reset',
-      'route_parameters' => array('taxonomy_vocabulary' => $form_state['taxonomy']['vocabulary']->id()),
-    );
+    /** @var $vocabulary \Drupal\taxonomy\VocabularyInterface */
+    $vocabulary = $form_state['taxonomy']['vocabulary'];
+    $form_state['redirect_route'] = $vocabulary->urlInfo('reset');
   }
 
 }

@@ -22,7 +22,7 @@ use Drupal\node\NodeInterface;
  *   label = @Translation("Content"),
  *   bundle_label = @Translation("Content type"),
  *   controllers = {
- *     "storage" = "Drupal\node\NodeStorageController",
+ *     "storage" = "Drupal\Core\Entity\FieldableDatabaseStorageController",
  *     "view_builder" = "Drupal\node\NodeViewBuilder",
  *     "access" = "Drupal\node\NodeAccess",
  *     "form" = {
@@ -48,13 +48,11 @@ use Drupal\node\NodeInterface;
  *     "label" = "title",
  *     "uuid" = "uuid"
  *   },
- *   bundle_keys = {
- *     "bundle" = "type"
- *   },
  *   bundle_entity_type = "node_type",
  *   permission_granularity = "bundle",
  *   links = {
  *     "canonical" = "node.view",
+ *     "delete-form" = "node.delete_confirm",
  *     "edit-form" = "node.page_edit",
  *     "version-history" = "node.revision_overview",
  *     "admin-form" = "node.type_edit"
@@ -75,6 +73,17 @@ class Node extends ContentEntityBase implements NodeInterface {
    */
   public function getRevisionId() {
     return $this->get('vid')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function preCreate(EntityStorageControllerInterface $storage_controller, array &$values) {
+    parent::preCreate($storage_controller, $values);
+    // @todo Handle this through property defaults.
+    if (empty($values['created'])) {
+      $values['created'] = REQUEST_TIME;
+    }
   }
 
   /**
@@ -152,6 +161,14 @@ class Node extends ContentEntityBase implements NodeInterface {
   /**
    * {@inheritdoc}
    */
+  public static function postDelete(EntityStorageControllerInterface $storage_controller, array $nodes) {
+    parent::postDelete($storage_controller, $nodes);
+    \Drupal::service('node.grant_storage')->deleteNodeRecords(array_keys($nodes));
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getType() {
     return $this->bundle();
   }
@@ -165,7 +182,7 @@ class Node extends ContentEntityBase implements NodeInterface {
     }
 
     return \Drupal::entityManager()
-      ->getAccess($this->entityType)
+      ->getAccess($this->entityTypeId)
       ->access($this, $operation, $this->prepareLangcode(), $account);
   }
 
@@ -180,7 +197,7 @@ class Node extends ContentEntityBase implements NodeInterface {
       // Load languages the node exists in.
       $node_translations = $this->getTranslationLanguages();
       // Load the language from content negotiation.
-      $content_negotiation_langcode = \Drupal::languageManager()->getLanguage(Language::TYPE_CONTENT)->id;
+      $content_negotiation_langcode = \Drupal::languageManager()->getCurrentLanguage(Language::TYPE_CONTENT)->id;
       // If there is a translation available, use it.
       if (isset($node_translations[$content_negotiation_langcode])) {
         $langcode = $content_negotiation_langcode;
@@ -354,6 +371,8 @@ class Node extends ContentEntityBase implements NodeInterface {
       ->setDescription(t('The node language code.'));
 
     $fields['title'] = FieldDefinition::create('text')
+      // @todo Account for $node_type->title_label when per-bundle overrides are
+      //   possible - https://drupal.org/node/2114707.
       ->setLabel(t('Title'))
       ->setDescription(t('The title of this node, always treated as non-markup plain text.'))
       ->setClass('\Drupal\node\NodeTitleItemList')
@@ -363,7 +382,17 @@ class Node extends ContentEntityBase implements NodeInterface {
         'default_value' => '',
         'max_length' => 255,
         'text_processing' => 0,
-      ));
+      ))
+      ->setDisplayOptions('view', array(
+        'label' => 'hidden',
+        'type' => 'text_default',
+        'weight' => -5,
+      ))
+      ->setDisplayOptions('form', array(
+        'type' => 'text_textfield',
+        'weight' => -5,
+      ))
+      ->setDisplayConfigurable('form', TRUE);
 
     $fields['uid'] = FieldDefinition::create('entity_reference')
       ->setLabel(t('User ID'))

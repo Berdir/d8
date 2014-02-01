@@ -29,7 +29,7 @@ class BlockStorageUnitTest extends DrupalUnitTestBase {
   /**
    * The block storage controller.
    *
-   * @var \Drupal\Core\Config\Entity\ConfigStorageController.
+   * @var \Drupal\Core\Config\Entity\ConfigStorageControllerInterface.
    */
   protected $controller;
 
@@ -96,7 +96,7 @@ class BlockStorageUnitTest extends DrupalUnitTestBase {
       'status' => TRUE,
       'langcode' => language_default()->id,
       'theme' => 'stark',
-      'region' => -1,
+      'region' => '-1',
       'plugin' => 'test_html_id',
       'settings' => array(
         'cache' => 1,
@@ -106,7 +106,7 @@ class BlockStorageUnitTest extends DrupalUnitTestBase {
       ),
       'visibility' => NULL,
     );
-    $this->assertIdentical($actual_properties, $expected_properties, 'The block properties are exported correctly.');
+    $this->assertIdentical($actual_properties, $expected_properties);
 
     $this->assertTrue($entity->getPlugin() instanceof TestHtmlIdBlock, 'The entity has an instance of the correct block plugin.');
   }

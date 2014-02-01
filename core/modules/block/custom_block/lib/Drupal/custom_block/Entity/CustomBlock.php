@@ -9,8 +9,6 @@ namespace Drupal\custom_block\Entity;
 
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
-use Drupal\Core\Entity\Annotation\EntityType;
-use Drupal\Core\Annotation\Translation;
 use Drupal\Core\Field\FieldDefinition;
 use Drupal\custom_block\CustomBlockInterface;
 
@@ -22,7 +20,7 @@ use Drupal\custom_block\CustomBlockInterface;
  *   label = @Translation("Custom Block"),
  *   bundle_label = @Translation("Custom Block type"),
  *   controllers = {
- *     "storage" = "Drupal\custom_block\CustomBlockStorageController",
+ *     "storage" = "Drupal\Core\Entity\FieldableDatabaseStorageController",
  *     "access" = "Drupal\custom_block\CustomBlockAccess",
  *     "list" = "Drupal\custom_block\CustomBlockListController",
  *     "view_builder" = "Drupal\custom_block\CustomBlockViewBuilder",
@@ -39,6 +37,7 @@ use Drupal\custom_block\CustomBlockInterface;
  *   revision_table = "custom_block_revision",
  *   links = {
  *     "canonical" = "custom_block.edit",
+ *     "delete-form" = "custom_block.delete",
  *     "edit-form" = "custom_block.edit",
  *     "admin-form" = "custom_block.type_edit"
  *   },
@@ -50,9 +49,6 @@ use Drupal\custom_block\CustomBlockInterface;
  *     "bundle" = "type",
  *     "label" = "info",
  *     "uuid" = "uuid"
- *   },
- *   bundle_keys = {
- *     "bundle" = "type"
  *   },
  *   bundle_entity_type = "custom_block_type"
  * )

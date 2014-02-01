@@ -84,6 +84,19 @@ function custom_block_menu() {
 }
 
 /**
+ * Implements hook_menu_link_defaults().
+ */
+function custom_block_menu_link_defaults() {
+  $links['custom_block.add_page'] = array(
+    'link_title' => 'Add custom block',
+    'description' => 'Add custom block',
+    'route_name' => 'custom_block.add_page',
+  );
+
+  return $links;
+}
+
+/**
  * Implements hook_theme().
  */
 function custom_block_theme($existing, $type, $theme, $path) {
@@ -125,10 +138,13 @@ function custom_block_load($id) {
 /**
  * Implements hook_entity_info_alter().
  */
-function custom_block_entity_info_alter(&$types) {
+function custom_block_entity_info_alter(&$entity_info) {
+  /** @var $entity_info \Drupal\Core\Entity\EntityTypeInterface[] */
   // Add a translation handler for fields if the language module is enabled.
   if (\Drupal::moduleHandler()->moduleExists('language')) {
-    $types['custom_block']['translation']['custom_block'] = TRUE;
+    $translation = $entity_info['custom_block']->get('translation');
+    $translation['custom_block'] = TRUE;
+    $entity_info['custom_block']->set('translation', $translation);
   }
 }
 

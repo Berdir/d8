@@ -519,13 +519,13 @@ class EntityFieldTest extends EntityUnitTestBase  {
    * Makes sure data types are correctly derived for all entity types.
    */
   public function testDataTypes() {
-    $types = \Drupal::typedData()->getDefinitions();
+    $types = \Drupal::typedDataManager()->getDefinitions();
     foreach (entity_test_entity_types() as $entity_type) {
       $this->assertTrue($types['entity:' . $entity_type]['class'], 'Entity data type registed.');
     }
     // Check bundle types are provided as well.
     entity_test_create_bundle('bundle');
-    $types = \Drupal::typedData()->getDefinitions();
+    $types = \Drupal::typedDataManager()->getDefinitions();
     $this->assertTrue($types['entity:entity_test:bundle']['class'], 'Entity bundle data type registed.');
   }
 
@@ -539,8 +539,8 @@ class EntityFieldTest extends EntityUnitTestBase  {
     $definition = FieldDefinition::create('entity_reference')
       ->setLabel('Test entity')
       ->setSetting('target_type', 'entity_test');
-    $reference_field_item = \Drupal::TypedData()->create($definition);
-    $reference = $reference_field_item->get('entity');
+    $reference_field = \Drupal::typedDataManager()->create($definition);
+    $reference = $reference_field->first()->get('entity');
     $reference->setValue($entity);
 
     // Test validation the typed data object.
@@ -565,8 +565,8 @@ class EntityFieldTest extends EntityUnitTestBase  {
         'target_type' => 'node',
         'target_bundle' => 'article',
       ));
-    $reference_field_item = \Drupal::TypedData()->create($definition);
-    $reference = $reference_field_item->get('entity');
+    $reference_field = \Drupal::TypedDataManager()->create($definition);
+    $reference = $reference_field->first()->get('entity');
     $reference->setValue($node);
     $violations = $reference->validate();
     $this->assertEqual($violations->count(), 1);

@@ -7,8 +7,8 @@
 
 namespace Drupal\views\Plugin\Derivative;
 
-use Drupal\Core\KeyValueStore\KeyValueStoreInterface;
-use Drupal\Core\Menu\LocalTaskDerivativeBase;
+use Drupal\Core\KeyValueStore\StateInterface;
+use Drupal\Component\Plugin\Derivative\DerivativeBase;
 use Drupal\Core\Plugin\Discovery\ContainerDerivativeInterface;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\views\Views;
@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Provides local task definitions for all views configured as local tasks.
  */
-class ViewsLocalTask extends LocalTaskDerivativeBase implements ContainerDerivativeInterface {
+class ViewsLocalTask extends DerivativeBase implements ContainerDerivativeInterface {
 
   /**
    * The route provider.
@@ -29,7 +29,7 @@ class ViewsLocalTask extends LocalTaskDerivativeBase implements ContainerDerivat
   /**
    * The state key value store.
    *
-   * @var \Drupal\Core\KeyValueStore\KeyValueStoreInterface
+   * @var \Drupal\Core\KeyValueStore\StateInterface
    */
   protected $state;
 
@@ -41,7 +41,7 @@ class ViewsLocalTask extends LocalTaskDerivativeBase implements ContainerDerivat
    * @param \Drupal\Core\KeyValueStore\KeyValueStoreInterface $state
    *   The state key value store.
    */
-  public function __construct(RouteProviderInterface $route_provider, KeyValueStoreInterface $state) {
+  public function __construct(RouteProviderInterface $route_provider, StateInterface $state) {
     $this->routeProvider = $route_provider;
     $this->state = $state;
   }
@@ -85,9 +85,9 @@ class ViewsLocalTask extends LocalTaskDerivativeBase implements ContainerDerivat
           'title' => $menu['title'],
         ) + $base_plugin_definition;
 
-        // Default local tasks have themselves as tab root id.
+        // Default local tasks have themselves as root tab.
         if ($menu['type'] == 'default tab') {
-          $this->derivatives[$plugin_id]['tab_root_id'] = 'views_view:' . $plugin_id;
+          $this->derivatives[$plugin_id]['base_route'] = $route_name;
         }
       }
     }
@@ -95,7 +95,7 @@ class ViewsLocalTask extends LocalTaskDerivativeBase implements ContainerDerivat
   }
 
   /**
-   * Alters tab_root_id and tab_parent_id into the views local tasks.
+   * Alters base_route and parent_id into the views local tasks.
    */
   public function alterLocalTasks(&$local_tasks) {
     $view_route_names = $this->state->get('views.view_route_names');
@@ -107,7 +107,7 @@ class ViewsLocalTask extends LocalTaskDerivativeBase implements ContainerDerivat
       $executable->setDisplay($display_id);
       $menu = $executable->display_handler->getOption('menu');
 
-      // We already have set the tab_root_id for default tabs.
+      // We already have set the base_route for default tabs.
       if (in_array($menu['type'], array('tab'))) {
         $plugin_id = 'view.' . $executable->storage->id() . '.' . $display_id;
         $view_route_name = $view_route_names[$executable->storage->id() . '.' . $display_id];
@@ -128,9 +128,7 @@ class ViewsLocalTask extends LocalTaskDerivativeBase implements ContainerDerivat
         $pattern = '/' . str_replace('%', '{}', $path);
         if ($routes = $this->routeProvider->getRoutesByPattern($pattern)) {
           foreach ($routes->all() as $name => $route) {
-            if ($parent_task = $this->getPluginIdFromRoute($name, $local_tasks)) {
-              $local_tasks['views_view:' . $plugin_id]['tab_root_id'] = $parent_task;
-            }
+            $local_tasks['views_view:' . $plugin_id]['base_route'] = $name;
             // Skip after the first found route.
             break;
           }

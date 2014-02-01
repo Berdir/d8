@@ -7,10 +7,8 @@
 
 namespace Drupal\entity\Entity;
 
-use Drupal\Core\Entity\Annotation\EntityType;
-use Drupal\Core\Annotation\Translation;
+use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 use Drupal\entity\EntityDisplayBase;
-use Drupal\entity\EntityFormDisplayInterface;
 
 /**
  * Configuration entity that contains widget options for all components of a
@@ -35,9 +33,13 @@ class EntityFormDisplay extends EntityDisplayBase implements EntityFormDisplayIn
   /**
    * {@inheritdoc}
    */
+  protected $displayContext = 'form';
+
+  /**
+   * {@inheritdoc}
+   */
   public function __construct(array $values, $entity_type) {
     $this->pluginManager = \Drupal::service('plugin.manager.field.widget');
-    $this->displayContext = 'form';
 
     parent::__construct($values, $entity_type);
   }
@@ -74,7 +76,7 @@ class EntityFormDisplay extends EntityDisplayBase implements EntityFormDisplayIn
    */
   public function serialize() {
     // Only store the definition, not external objects or derived data.
-    $data = $this->getExportProperties() + array('entityType' => $this->entityType());
+    $data = $this->getExportProperties() + array('entityType' => $this->getEntityTypeId());
     return serialize($data);
   }
 

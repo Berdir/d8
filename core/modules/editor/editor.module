@@ -19,14 +19,13 @@ function editor_help($path, $arg) {
     case 'admin/help#editor':
       $output = '';
       $output .= '<h3>' . t('About') . '</h3>';
-      $output .= '<p>' . t('The Text Editor module provides a framework that other modules (such as <a href="@ckeditor">CKEditor module</a>) can use to provide toolbars and other functionality that allow users to format text more easily than typing HTML tags directly. For more information, see the <a href="@documentation">online documentation for the Text Editor module</a>.', array('@documentation' => 'https://drupal.org/documentation/modules/editor', '@ckeditor' => url('admin/help/ckeditor'))) . '</p>';
+      $output .= '<p>' . t('The Text Editor module provides a framework that other modules (such as <a href="!ckeditor">CKEditor module</a>) can use to provide toolbars and other functionality that allow users to format text more easily than typing HTML tags directly. For more information, see the <a href="!documentation">online documentation for the Text Editor module</a>.', array('!documentation' => 'https://drupal.org/documentation/modules/editor', '!ckeditor' => \Drupal::url('help.page', array('name' => 'ckeditor')))) . '</p>';
       $output .= '<h3>' . t('Uses') . '</h3>';
       $output .= '<dl>';
       $output .= '<dt>' . t('Installing text editors') . '</dt>';
-      $output .= '<dd>' . t('The Text Editor module provides a framework for managing editors. To use it, you also need to enable a text editor. This can either be the core <a href="@ckeditor">CKEditor module</a>, which can be enabled on the <a href="@extend">Extend page</a>, or a contributed module for any other text editor.
-When installing a contributed text editor module, be sure to check the installation instructions, because you will most likely need to download and install an external library as well as the Drupal module.', array('@ckeditor' => url('admin/help/ckeditor'), '@extend' => url('admin/modules'))) . '</dd>';
+      $output .= '<dd>' . t('The Text Editor module provides a framework for managing editors. To use it, you also need to enable a text editor. This can either be the core <a href="!ckeditor">CKEditor module</a>, which can be enabled on the <a href="!extend">Extend page</a>, or a contributed module for any other text editor. When installing a contributed text editor module, be sure to check the installation instructions, because you will most likely need to download and install an external library as well as the Drupal module.', array('!ckeditor' => \Drupal::url('help.page', array('name' => 'ckeditor')), '!extend' => \Drupal::url('system.modules_list'))) . '</dd>';
       $output .= '<dt>' . t('Enabling a text editor for a text format') . '</dt>';
-      $output .= '<dd>' . t('On the <a href="@formats">Text formats and editors page</a> you can see which text editor is associated with each text format. You can change this by clicking on the <em>Configure</em> link, and then choosing a text editor or <em>none</em> from the <em>Text editor</em> drop-down list. The text editor will then be displayed with any text field for which this text format is chosen.', array('@formats' => url('admin/config/content/formats'))) . '</dd>';
+      $output .= '<dd>' . t('On the <a href="!formats">Text formats and editors page</a> you can see which text editor is associated with each text format. You can change this by clicking on the <em>Configure</em> link, and then choosing a text editor or <em>none</em> from the <em>Text editor</em> drop-down list. The text editor will then be displayed with any text field for which this text format is chosen.', array('!formats' => \Drupal::url('filter.admin_overview'))) . '</dd>';
       $output .= '<dt>' . t('Configuring a text editor') . '</dt>';
       $output .= '<dd>' . t('Once a text editor is associated with a text format, you can configure it by clicking on the <em>Configure</em> link for this format. Depending on the specific text editor, you can configure it for example by adding buttons to its toolbar. Typically these buttons provide formatting or editing tools, and they often insert HTML tags into the field source. For details, see the help page of the specific text editor.') . '</dd>';
       $output .= '<dt>' . t('Using different text editors and formats') . '</dt>';
@@ -45,6 +44,14 @@ When installing a contributed text editor module, be sure to check the installat
 function editor_menu_alter(&$items) {
   $items['admin/config/content/formats']['title'] = 'Text formats and editors';
   $items['admin/config/content/formats']['description'] = 'Configure how user-contributed content is filtered and formatted, as well as the text editor user interface (WYSIWYGs or toolbars).';
+}
+
+/**
+ * Implements hook_menu_link_defaults_alter().
+ */
+function editor_menu_link_defaults_alter(array &$links) {
+  $links['filter.admin.formats']['link_title'] = 'Text formats and editors';
+  $links['filter.admin.formats']['description'] = 'Configure how user-contributed content is filtered and formatted, as well as the text editor user interface (WYSIWYGs or toolbars).';
 }
 
 /**
@@ -94,6 +101,7 @@ function editor_library_info() {
       array('system', 'drupal'),
       array('system', 'drupalSettings'),
       array('system', 'jquery.once'),
+      array('system', 'drupal.dialog'),
     ),
   );
 
@@ -119,14 +127,6 @@ function editor_library_info() {
         'scope' => 'footer',
         'attributes' => array('defer' => TRUE),
       ),
-      array(
-        'type' => 'setting',
-        'data' => array(
-          'editor' => array(
-            'getUntransformedTextURL' => url('editor/!entity_type/!id/!field_name/!langcode/!view_mode'),
-          )
-        )
-      ),
     ),
     'dependencies' => array(
       array('edit', 'edit'),
@@ -137,21 +137,6 @@ function editor_library_info() {
   );
 
   return $libraries;
-}
-
-/**
- * Implements hook_menu().
- */
-function editor_menu() {
-  // @todo Remove this menu item in http://drupal.org/node/1954892 when theme
-  //   callbacks are replaced with something else.
-  $items['editor/%/%/%/%/%'] = array(
-    'route_name' => 'editor.field_untransformed_text',
-    'theme callback' => 'ajax_base_page_theme',
-    'type' => MENU_CALLBACK,
-  );
-
-  return $items;
 }
 
 /**
@@ -495,7 +480,7 @@ function _editor_record_file_usage(array $uuids, EntityInterface $entity) {
       $file->status = FILE_STATUS_PERMANENT;
       $file->save();
     }
-    \Drupal::service('file.usage')->add($file, 'editor', $entity->entityType(), $entity->id());
+    \Drupal::service('file.usage')->add($file, 'editor', $entity->getEntityTypeId(), $entity->id());
   }
 }
 
@@ -515,7 +500,7 @@ function _editor_record_file_usage(array $uuids, EntityInterface $entity) {
 function _editor_delete_file_usage(array $uuids, EntityInterface $entity, $count) {
   foreach ($uuids as $uuid) {
     $file = entity_load_by_uuid('file', $uuid);
-    \Drupal::service('file.usage')->delete($file, 'editor', $entity->entityType(), $entity->id(), $count);
+    \Drupal::service('file.usage')->delete($file, 'editor', $entity->getEntityTypeId(), $entity->id(), $count);
   }
 }
 
@@ -566,9 +551,9 @@ function _editor_get_processed_text_fields(ContentEntityInterface $entity) {
   // Only return fields that have text processing enabled.
   return array_filter($configurable_fields, function ($field) use ($entity) {
     $settings = Field::fieldInfo()
-      ->getInstance($entity->entityType(), $entity->bundle(), $field)
+      ->getInstance($entity->getEntityTypeId(), $entity->bundle(), $field)
       ->getSettings();
-    return isset($settings['text_processing']) && $settings['text_processing'] === '1';
+    return isset($settings['text_processing']) && $settings['text_processing'] === TRUE;
   });
 }
 

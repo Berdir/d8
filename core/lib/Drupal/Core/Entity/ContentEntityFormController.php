@@ -50,8 +50,7 @@ class ContentEntityFormController extends EntityFormController {
     $entity = $this->entity;
     // @todo Exploit the Field API to generate the default widgets for the
     // entity fields.
-    $info = $entity->entityInfo();
-    if (!empty($info['fieldable'])) {
+    if ($entity->getEntityType()->isFieldable()) {
       field_attach_form($entity, $form, $form_state, $this->getFormLangcode($form_state));
     }
 
@@ -67,7 +66,7 @@ class ContentEntityFormController extends EntityFormController {
   public function validate(array $form, array &$form_state) {
     $this->updateFormLangcode($form_state);
     $entity = $this->buildEntity($form, $form_state);
-    $entity_type = $entity->entityType();
+    $entity_type = $entity->getEntityTypeId();
     $entity_langcode = $entity->language()->id;
 
     $violations = array();
@@ -131,15 +130,15 @@ class ContentEntityFormController extends EntityFormController {
    */
   public function buildEntity(array $form, array &$form_state) {
     $entity = clone $this->entity;
-    $entity_type = $entity->entityType();
-    $info = entity_get_info($entity_type);
+    $entity_type = $entity->getEntityTypeId();
+    $info = \Drupal::entityManager()->getDefinition($entity_type);
 
     // @todo Exploit the Entity Field API to process the submitted field values.
     // Copy top-level form values that are entity fields but not handled by
     // field API without changing existing entity fields that are not being
     // edited by this form. Values of fields handled by field API are copied
     // by field_attach_extract_form_values() below.
-    $values_excluding_fields = $info['fieldable'] ? array_diff_key($form_state['values'], field_info_instances($entity_type, $entity->bundle())) : $form_state['values'];
+    $values_excluding_fields = $info->isFieldable() ? array_diff_key($form_state['values'], field_info_instances($entity_type, $entity->bundle())) : $form_state['values'];
     $definitions = $entity->getPropertyDefinitions();
     foreach ($values_excluding_fields as $key => $value) {
       if (isset($definitions[$key])) {
@@ -155,7 +154,7 @@ class ContentEntityFormController extends EntityFormController {
     }
 
     // Invoke field API for copying field values.
-    if ($info['fieldable']) {
+    if ($info->isFieldable()) {
       field_attach_extract_form_values($entity, $form, $form_state, array('langcode' => $this->getFormLangcode($form_state)));
     }
     return $entity;

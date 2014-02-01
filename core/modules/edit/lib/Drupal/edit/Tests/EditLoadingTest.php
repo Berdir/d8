@@ -189,8 +189,7 @@ class EditLoadingTest extends WebTestBase {
     $this->assertIdentical('<form ', Unicode::substr($ajax_commands[0]['data'], 0, 6), 'The editFieldForm command contains a form.');
 
     // Prepare form values for submission. drupalPostAjaxForm() is not suitable
-    // for handling pages with JSON responses, so we need our own solution
-    // here.
+    // for handling pages with JSON responses, so we need our own solution here.
     $form_tokens_found = preg_match('/\sname="form_token" value="([^"]+)"/', $ajax_commands[0]['data'], $token_match) && preg_match('/\sname="form_build_id" value="([^"]+)"/', $ajax_commands[0]['data'], $build_id_match);
     $this->assertTrue($form_tokens_found, 'Form tokens found in output.');
 
@@ -208,14 +207,15 @@ class EditLoadingTest extends WebTestBase {
       );
       $post += $edit + $this->getAjaxPageStatePostData();
 
-      // Submit field form and check response. This should store the
-      // updated entity in TempStore on the server.
+      // Submit field form and check response. This should store the updated
+      // entity in TempStore on the server.
       $response = $this->drupalPost('edit/form/' . 'node/1/body/und/full', 'application/vnd.drupal-ajax', $post);
       $this->assertResponse(200);
       $ajax_commands = drupal_json_decode($response);
       $this->assertIdentical(1, count($ajax_commands), 'The field form HTTP request results in one AJAX command.');
       $this->assertIdentical('editFieldFormSaved', $ajax_commands[0]['command'], 'The first AJAX command is an editFieldFormSaved command.');
       $this->assertTrue(strpos($ajax_commands[0]['data'], 'Fine thanks.'), 'Form value saved and printed back.');
+      $this->assertIdentical($ajax_commands[0]['other_view_modes'], array(), 'Field was not rendered in any other view mode.');
 
       // Ensure the text on the original node did not change yet.
       $this->drupalGet('node/1');
@@ -244,7 +244,9 @@ class EditLoadingTest extends WebTestBase {
       // then again retrieve the field form, fill it, submit it (so it ends up
       // in TempStore) and then save the entity. Now there should be two
       // revisions.
-      $this->container->get('config.factory')->get('node.type.article')->set('settings.node.options', array('status', 'revision'))->save();
+      $node_type = entity_load('node_type', 'article');
+      $node_type->settings['node']['options']['revision'] = TRUE;
+      $node_type->save();
 
       // Retrieve field form.
       $post = array('nocssjs' => 'true', 'reset' => 'true');
@@ -426,6 +428,9 @@ class EditLoadingTest extends WebTestBase {
         'body[0][format]' => 'filtered_html',
         'op' => t('Save'),
       );
+      // Assume there is another field on this page, which doesn't use a custom
+      // render pipeline, but the default one, and it uses the "full" view mode.
+      $post += array('other_view_modes[]' => 'full');
 
       // Submit field form and check response. Should render with the custom
       // render pipeline.
@@ -436,6 +441,8 @@ class EditLoadingTest extends WebTestBase {
       $this->assertIdentical('editFieldFormSaved', $ajax_commands[0]['command'], 'The first AJAX command is an editFieldFormSaved command.');
       $this->assertTrue(strpos($ajax_commands[0]['data'], 'Fine thanks.'), 'Form value saved and printed back.');
       $this->assertTrue(strpos($ajax_commands[0]['data'], '<div class="edit-test-wrapper">') !== FALSE, 'Custom render pipeline used to render the value.');
+      $this->assertIdentical(array_keys($ajax_commands[0]['other_view_modes']), array('full'), 'Field was also rendered in the "full" view mode.');
+      $this->assertTrue(strpos($ajax_commands[0]['other_view_modes']['full'], 'Fine thanks.'), '"full" version of field contains the form value.');
     }
   }
 
@@ -447,6 +454,7 @@ class EditLoadingTest extends WebTestBase {
 
     $post = array('nocssjs' => 'true') + $this->getAjaxPageStatePostData();
     $response = $this->drupalPost('edit/form/' . 'node/1/body/und/full', 'application/vnd.drupal-ajax', $post);
+    $this->assertResponse(200);
     $ajax_commands = drupal_json_decode($response);
 
     // Prepare form values for submission. drupalPostAJAX() is not suitable for

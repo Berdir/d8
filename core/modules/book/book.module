@@ -9,10 +9,8 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\node\NodeInterface;
 use Drupal\node\NodeTypeInterface;
 use Drupal\Core\Language\Language;
-use Drupal\entity\Entity\EntityDisplay;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Template\Attribute;
-use Drupal\menu_link\Entity\MenuLink;
-use Drupal\menu_link\MenuLinkStorageController;
 
 /**
  * Implements hook_help().
@@ -117,7 +115,11 @@ function book_permission() {
  * Implements hook_entity_info().
  */
 function book_entity_info(&$entity_info) {
-  $entity_info['node']['controllers']['form']['book_outline'] = '\Drupal\book\Form\BookOutlineForm';
+  /** @var $entity_info \Drupal\Core\Entity\EntityTypeInterface[] */
+  $entity_info['node']
+    ->setFormClass('book_outline', 'Drupal\book\Form\BookOutlineForm')
+    ->setLinkTemplate('book-outline-form', 'book.outline')
+    ->setLinkTemplate('book-remove-form', 'book.remove');
 }
 
 /**
@@ -179,6 +181,26 @@ function book_menu() {
   );
 
   return $items;
+}
+
+/**
+ * Implements hook_menu_link_defaults().
+ */
+function book_menu_link_defaults() {
+  $links['book.admin.outlines'] = array(
+    'link_title' => 'Books',
+    'description' => "Manage your site's book outlines.",
+    'parent' => 'system.admin.structure',
+    'route_name' => 'book.admin',
+  );
+  $links['book'] = array(
+    'link_title' => 'Books',
+    'route_name' => 'book.render',
+    // @todo what to do about MENU_SUGGESTED_ITEM, maybe specify no menu_name?
+    'type' => MENU_SUGGESTED_ITEM,
+  );
+
+  return $links;
 }
 
 /**
@@ -435,7 +457,7 @@ function book_children($book_link) {
 /**
  * Implements hook_node_load().
  */
-function book_node_load($nodes, $types) {
+function book_node_load($nodes) {
   $result = db_query("SELECT * FROM {book} b INNER JOIN {menu_links} ml ON b.mlid = ml.mlid WHERE b.nid IN (:nids)", array(':nids' =>  array_keys($nodes)), array('fetch' => PDO::FETCH_ASSOC));
   foreach ($result as $record) {
     $nodes[$record['nid']]->book = $record;
@@ -448,7 +470,7 @@ function book_node_load($nodes, $types) {
 /**
  * Implements hook_node_view().
  */
-function book_node_view(EntityInterface $node, EntityDisplay $display, $view_mode) {
+function book_node_view(EntityInterface $node, EntityViewDisplayInterface $display, $view_mode) {
   if ($view_mode == 'full') {
     if (!empty($node->book['bid']) && empty($node->in_preview)) {
       $book_navigation = array( '#theme' => 'book_navigation', '#book_link' => $node->book);
@@ -650,7 +672,7 @@ function template_preprocess_book_navigation(&$variables) {
     $build = array();
 
     if ($prev = book_prev($book_link)) {
-      $prev_href = url($prev['href']);
+      $prev_href = url($prev['link_path']);
       $build['#attached']['drupal_add_html_head_link'][][] = array(
         'rel' => 'prev',
         'href' => $prev_href,
@@ -670,7 +692,7 @@ function template_preprocess_book_navigation(&$variables) {
     }
 
     if ($next = book_next($book_link)) {
-      $next_href = url($next['href']);
+      $next_href = url($next['link_path']);
       $build['#attached']['drupal_add_html_head_link'][][] = array(
         'rel' => 'next',
         'href' => $next_href,

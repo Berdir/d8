@@ -118,22 +118,18 @@ function hook_user_cancel($edit, $account, $method) {
     case 'user_cancel_block_unpublish':
       // Unpublish nodes (current revisions).
       module_load_include('inc', 'node', 'node.admin');
-      $nodes = db_select('node_field_data', 'n')
-        ->fields('n', array('nid'))
-        ->condition('uid', $account->id())
-        ->execute()
-        ->fetchCol();
+      $nodes = \Drupal::entityQuery('node')
+        ->condition('uid', $user->id())
+        ->execute();
       node_mass_update($nodes, array('status' => 0), NULL, TRUE);
       break;
 
     case 'user_cancel_reassign':
       // Anonymize nodes (current revisions).
       module_load_include('inc', 'node', 'node.admin');
-      $nodes = db_select('node_field_data', 'n')
-        ->fields('n', array('nid'))
-        ->condition('uid', $account->id())
-        ->execute()
-        ->fetchCol();
+      $nodes = \Drupal::entityQuery('node')
+        ->condition('uid', $user->id())
+        ->execute();
       node_mass_update($nodes, array('uid' => 0), NULL, TRUE);
       // Anonymize old revisions.
       db_update('node_field_revision')
@@ -167,8 +163,9 @@ function hook_user_cancel($edit, $account, $method) {
  * @see user_cancel_confirm_form()
  */
 function hook_user_cancel_methods_alter(&$methods) {
+  $account = \Drupal::currentUser();
   // Limit access to disable account and unpublish content method.
-  $methods['user_cancel_block_unpublish']['access'] = user_access('administer site configuration');
+  $methods['user_cancel_block_unpublish']['access'] = $account->hasPermission('administer site configuration');
 
   // Remove the content re-assigning method.
   unset($methods['user_cancel_reassign']);
@@ -178,7 +175,7 @@ function hook_user_cancel_methods_alter(&$methods) {
     'title' => t('Delete the account and remove all content.'),
     'description' => t('All your content will be replaced by empty strings.'),
     // access should be used for administrative methods only.
-    'access' => user_access('access zero-out account cancellation method'),
+    'access' => $account->hasPermission('access zero-out account cancellation method'),
   );
 }
 
@@ -313,7 +310,7 @@ function hook_user_logout($account) {
  *
  * @param \Drupal\user\UserInterface $account
  *   The user object on which the operation is being performed.
- * @param \Drupal\entity\Entity\EntityDisplay $display
+ * @param \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display
  *   The entity_display object holding the display options configured for the
  *   user components.
  * @param $view_mode
@@ -324,7 +321,7 @@ function hook_user_logout($account) {
  * @see hook_user_view_alter()
  * @see hook_entity_view()
  */
-function hook_user_view(\Drupal\user\UserInterface $account, \Drupal\entity\Entity\EntityDisplay $display, $view_mode, $langcode) {
+function hook_user_view(\Drupal\user\UserInterface $account, \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display, $view_mode, $langcode) {
   // Only do the extra work if the component is configured to be displayed.
   // This assumes a 'mymodule_addition' extra field has been defined for the
   // user entity type in hook_field_extra_fields().
@@ -353,14 +350,14 @@ function hook_user_view(\Drupal\user\UserInterface $account, \Drupal\entity\Enti
  *   A renderable array representing the user.
  * @param \Drupal\user\UserInterface $account
  *   The user account being rendered.
- * @param \Drupal\entity\Entity\EntityDisplay $display
+ * @param \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display
  *   The entity_display object holding the display options configured for the
  *   user components.
  *
  * @see user_view()
  * @see hook_entity_view_alter()
  */
-function hook_user_view_alter(&$build, \Drupal\user\UserInterface $account, \Drupal\entity\Entity\EntityDisplay $display) {
+function hook_user_view_alter(&$build, \Drupal\user\UserInterface $account, \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display) {
   // Check for the existence of a field added by another module.
   if (isset($build['an_additional_field'])) {
     // Change its weight.

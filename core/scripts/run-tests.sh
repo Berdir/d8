@@ -6,6 +6,7 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
+use Drupal\Component\Utility\Timer;
 use Drupal\Core\StreamWrapper\PublicStream;
 
 const SIMPLETEST_SCRIPT_COLOR_PASS = 32; // Green.
@@ -484,7 +485,7 @@ function simpletest_script_run_phpunit($test_id, $class) {
  * Bootstrap Drupal and run a single test.
  */
 function simpletest_script_run_one_test($test_id, $test_class) {
-  global $args, $conf;
+  global $args;
 
   try {
     // Bootstrap Drupal.
@@ -496,8 +497,8 @@ function simpletest_script_run_one_test($test_id, $test_class) {
     $container->set('request', $request);
 
     // Override configuration according to command line parameters.
-    $conf['simpletest.settings']['verbose'] = $args['verbose'];
-    $conf['simpletest.settings']['clear_results'] = !$args['keep-results'];
+    $GLOBALS['conf']['simpletest.settings']['verbose'] = $args['verbose'];
+    $GLOBALS['conf']['simpletest.settings']['clear_results'] = !$args['keep-results'];
 
     $test = new $test_class($test_id);
     $test->dieOnFail = (bool) $args['die-on-fail'];
@@ -724,7 +725,7 @@ function simpletest_script_reporter_init() {
 
   echo "Test run started:\n";
   echo " " . format_date($_SERVER['REQUEST_TIME'], 'long') . "\n";
-  timer_start('run-tests');
+  Timer::start('run-tests');
   echo "\n";
 
   echo "Test summary\n";
@@ -807,7 +808,7 @@ function simpletest_script_reporter_write_xml_results() {
  */
 function simpletest_script_reporter_timer_stop() {
   echo "\n";
-  $end = timer_stop('run-tests');
+  $end = Timer::stop('run-tests');
   echo "Test run duration: " . format_interval($end['time'] / 1000);
   echo "\n\n";
 }

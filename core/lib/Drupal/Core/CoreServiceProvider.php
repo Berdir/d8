@@ -23,6 +23,7 @@ use Drupal\Core\DependencyInjection\Compiler\RegisterStringTranslatorsPass;
 use Drupal\Core\DependencyInjection\Compiler\RegisterBreadcrumbBuilderPass;
 use Drupal\Core\DependencyInjection\Compiler\RegisterAuthenticationPass;
 use Drupal\Core\DependencyInjection\Compiler\RegisterTwigExtensionsPass;
+use Drupal\Core\Theme\ThemeNegotiatorPass;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Definition;
@@ -71,6 +72,9 @@ class CoreServiceProvider implements ServiceProviderInterface  {
     // Add the compiler pass that will process the tagged breadcrumb builder
     // services.
     $container->addCompilerPass(new RegisterBreadcrumbBuilderPass());
+    // Add the compiler pass that will process the tagged theme negotiator
+    // service.
+    $container->addCompilerPass(new ThemeNegotiatorPass());
     // Add the compiler pass that lets service providers modify existing
     // service definitions.
     $container->addCompilerPass(new ModifyServiceDefinitionsPass());
@@ -130,6 +134,8 @@ class CoreServiceProvider implements ServiceProviderInterface  {
         'debug' => settings()->get('twig_debug', FALSE),
         'auto_reload' => settings()->get('twig_auto_reload', NULL),
       ))
+      ->addArgument(new Reference('module_handler'))
+      ->addArgument(new Reference('theme_handler'))
       ->addMethodCall('addExtension', array(new Definition('Drupal\Core\Template\TwigExtension')))
       // @todo Figure out what to do about debugging functions.
       // @see http://drupal.org/node/1804998

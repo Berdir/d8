@@ -18,6 +18,20 @@ namespace Drupal\Core\Language;
  */
 class Language {
 
+  /**
+   * The values to use to instantiate the default language.
+   *
+   * @var array
+   */
+  public static $defaultValues = array(
+    'id' => 'en',
+    'name' => 'English',
+    'direction' => 0,
+    'weight' => 0,
+    'locked' => 0,
+    'default' => TRUE,
+  );
+
   // Properties within the Language are set up as the default language.
 
   /**
@@ -187,32 +201,13 @@ class Language {
   }
 
   /**
-   * Extend $this with properties from the given object.
-   *
-   * @todo Remove this function once $GLOBALS['language'] is gone.
-   */
-  public function extend($obj) {
-    $variables = get_object_vars($obj);
-    foreach ($variables as $variable => $value) {
-      $this->$variable = $value;
-    }
-  }
-
-  /**
    * Sort language objects.
    *
    * @param array $languages
    *   The array of language objects keyed by langcode.
    */
   public static function sort(&$languages) {
-    uasort($languages, function ($a, $b) {
-      $a_weight = isset($a->weight) ? $a->weight : 0;
-      $b_weight = isset($b->weight) ? $b->weight : 0;
-      if ($a_weight == $b_weight) {
-        return strnatcasecmp($a->name, $b->name);
-      }
-      return ($a_weight < $b_weight) ? -1 : 1;
-    });
+    uasort($languages, 'Drupal\Component\Utility\SortArray::sortByWeightAndTitleKey');
   }
 
 }

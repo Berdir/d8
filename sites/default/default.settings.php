@@ -246,14 +246,8 @@ $drupal_hash_salt = '';
  * Example:
  * @code
  *   $config_directories = array(
- *     CONFIG_ACTIVE_DIRECTORY => array(
- *       'path' => '/some/directory/outside/webroot',
- *       'absolute' => TRUE,
- *     ),
- *     CONFIG_STAGING_DIRECTORY => array(
- *       'path' => '/another/directory/outside/webroot',
- *       'absolute' => TRUE,
- *     ),
+ *     CONFIG_ACTIVE_DIRECTORY => '/some/directory/outside/webroot',
+ *     CONFIG_STAGING_DIRECTORY => '/another/directory/outside/webroot',
  *   );
  * @endcode
  */
@@ -454,6 +448,14 @@ $settings['update_free_access'] = FALSE;
  * Defaults to FALSE.
  */
 # $settings['mixed_mode_sessions'] = TRUE;
+
+/**
+ * Default mode for for directories and files written by Drupal.
+ *
+ * Value should be in PHP Octal Notation, with leading zero.
+ */
+# $settings['file_chmod_directory'] = 0775;
+# $settings['file_chmod_file'] = 0664;
 
 /**
  * Public file path:

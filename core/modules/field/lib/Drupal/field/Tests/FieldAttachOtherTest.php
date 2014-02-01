@@ -160,18 +160,6 @@ class FieldAttachOtherTest extends FieldUnitTestBase {
 
     // TODO:
     // - check display order with several fields
-
-    // Preprocess template.
-    $variables = array();
-    field_attach_preprocess($entity, $entity->content, $variables);
-    $result = TRUE;
-    foreach ($values as $delta => $item) {
-      if ($variables[$this->field_name][$delta]['value'] !== $item['value']) {
-        $result = FALSE;
-        break;
-      }
-    }
-    $this->assertTrue($result, format_string('Variable $@field_name correctly populated.', array('@field_name' => $this->field_name)));
   }
 
   /**
@@ -273,7 +261,7 @@ class FieldAttachOtherTest extends FieldUnitTestBase {
     $this->assertFalse(cache('field')->get($cid), 'Cached: no cache entry on insert');
 
     // Load, and check that a cache entry is present with the expected values.
-    $controller = $this->container->get('entity.manager')->getStorageController($entity->entityType());
+    $controller = $this->container->get('entity.manager')->getStorageController($entity->getEntityTypeId());
     $controller->resetCache();
     $controller->load($entity->id());
     $cache = cache('field')->get($cid);

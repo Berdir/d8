@@ -159,7 +159,7 @@ class NodeGrantDatabaseStorage implements NodeGrantDatabaseStorageInterface {
         $subquery->condition('na.grant_' . $op, 1, '>=');
 
         // Add langcode-based filtering if this is a multilingual site.
-        if (language_multilingual()) {
+        if (\Drupal::languageManager()->isMultilingual()) {
           // If no specific langcode to check for is given, use the grant entry
           // which is set as a fallback.
           // If a specific langcode is given, use the grant entry for it.
@@ -230,7 +230,7 @@ class NodeGrantDatabaseStorage implements NodeGrantDatabaseStorageInterface {
    * {@inheritdoc}
    */
   public function delete() {
-    $this->database->delete('node_access')->execute();
+    $this->database->truncate('node_access')->execute();
   }
 
   /**
@@ -254,6 +254,15 @@ class NodeGrantDatabaseStorage implements NodeGrantDatabaseStorageInterface {
    */
   public function count() {
     return $this->database->query('SELECT COUNT(*) FROM {node_access}')->fetchField();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function deleteNodeRecords(array $nids) {
+    $this->database->delete('node_access')
+      ->condition('nid', $nids, 'IN')
+      ->execute();
   }
 
 }

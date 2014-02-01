@@ -7,6 +7,7 @@
 
 namespace Drupal\Core\Theme;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\DestructableInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -238,7 +239,7 @@ class Registry implements DestructableInterface {
    * Persists the theme registry in the cache backend.
    */
   protected function setCache() {
-    $this->cache->set('theme_registry:' . $this->theme->name, $this->registry, CacheBackendInterface::CACHE_PERMANENT, array('theme_registry' => TRUE));
+    $this->cache->set('theme_registry:' . $this->theme->name, $this->registry, Cache::PERMANENT, array('theme_registry' => TRUE));
   }
 
   /**
@@ -311,7 +312,7 @@ class Registry implements DestructableInterface {
       }
       // Only cache this registry if all modules are loaded.
       if ($this->moduleHandler->isLoaded()) {
-        $this->cache->set("theme_registry:build:modules", $cache, CacheBackendInterface::CACHE_PERMANENT, array('theme_registry' => TRUE));
+        $this->cache->set("theme_registry:build:modules", $cache, Cache::PERMANENT, array('theme_registry' => TRUE));
       }
     }
 
@@ -550,7 +551,7 @@ class Registry implements DestructableInterface {
     $this->runtimeRegistry = NULL;
 
     $this->registry = NULL;
-    $this->cache->invalidateTags(array('theme_registry' => TRUE));
+    Cache::invalidateTags(array('theme_registry' => TRUE));
     return $this;
   }
 

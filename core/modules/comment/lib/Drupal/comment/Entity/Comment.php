@@ -7,9 +7,8 @@
 
 namespace Drupal\comment\Entity;
 
+use Drupal\Component\Utility\Number;
 use Drupal\Core\Entity\ContentEntityBase;
-use Drupal\Core\Entity\Annotation\EntityType;
-use Drupal\Core\Annotation\Translation;
 use Drupal\comment\CommentInterface;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
 use Drupal\Core\Field\FieldDefinition;
@@ -44,17 +43,20 @@ use Drupal\Core\TypedData\DataDefinition;
  *     "label" = "subject",
  *     "uuid" = "uuid"
  *   },
- *   bundle_keys = {
- *     "bundle" = "field_id"
- *   },
  *   links = {
  *     "canonical" = "comment.permalink",
+ *     "delete-form" = "comment.confirm_delete",
  *     "edit-form" = "comment.edit_page",
  *     "admin-form" = "comment.bundle"
  *   }
  * )
  */
 class Comment extends ContentEntityBase implements CommentInterface {
+
+  /**
+   * The thread for which a lock was acquired.
+   */
+  protected $threadLock = '';
 
   /**
    * The comment ID.
@@ -219,7 +221,7 @@ class Comment extends ContentEntityBase implements CommentInterface {
     parent::preSave($storage_controller);
 
     if (!isset($this->status->value)) {
-      $this->status->value = \Drupal::currentUser()->hasPermission('skip comment approval') ? COMMENT_PUBLISHED : COMMENT_NOT_PUBLISHED;
+      $this->status->value = \Drupal::currentUser()->hasPermission('skip comment approval') ? CommentInterface::PUBLISHED : CommentInterface::NOT_PUBLISHED;
     }
     if ($this->isNew()) {
       // Add the comment to database. This next section builds the thread field.
@@ -242,7 +244,7 @@ class Comment extends ContentEntityBase implements CommentInterface {
           $max = rtrim($max, '/');
           // We need to get the value at the correct depth.
           $parts = explode('.', $max);
-          $n = comment_alphadecimal_to_int($parts[0]);
+          $n = Number::alphadecimalToInt($parts[0]);
           $prefix = '';
         }
         else {
@@ -269,16 +271,17 @@ class Comment extends ContentEntityBase implements CommentInterface {
             // Get the value at the correct depth.
             $parts = explode('.', $max);
             $parent_depth = count(explode('.', $parent->thread->value));
-            $n = comment_alphadecimal_to_int($parts[$parent_depth]);
+            $n = Number::alphadecimalToInt($parts[$parent_depth]);
           }
         }
         // Finally, build the thread field for this new comment. To avoid
-        // race conditions, get a lock on the thread. If aother process already
+        // race conditions, get a lock on the thread. If another process already
         // has the lock, just move to the next integer.
         do {
-          $thread = $prefix . comment_int_to_alphadecimal(++$n) . '/';
-        } while (!lock()->acquire("comment:{$this->entity_id->value}:$thread"));
-        $this->threadLock = $thread;
+          $thread = $prefix . Number::intToAlphadecimal(++$n) . '/';
+          $lock_name = "comment:{$this->entity_id->value}:$thread";
+        } while (!\Drupal::lock()->acquire($lock_name));
+        $this->threadLock = $lock_name;
       }
       if (empty($this->created->value)) {
         $this->created->value = REQUEST_TIME;
@@ -306,7 +309,7 @@ class Comment extends ContentEntityBase implements CommentInterface {
     $this->releaseThreadLock();
     // Update the {comment_entity_statistics} table prior to executing the hook.
     $storage_controller->updateEntityStatistics($this);
-    if ($this->status->value == COMMENT_PUBLISHED) {
+    if ($this->status->value == CommentInterface::PUBLISHED) {
       module_invoke_all('comment_publish', $this);
     }
   }
@@ -316,7 +319,7 @@ class Comment extends ContentEntityBase implements CommentInterface {
    */
   protected function releaseThreadLock() {
     if ($this->threadLock) {
-      lock()->release($this->threadLock);
+      \Drupal::lock()->release($this->threadLock);
       $this->threadLock = '';
     }
   }
@@ -340,11 +343,10 @@ class Comment extends ContentEntityBase implements CommentInterface {
    */
   public function permalink() {
     $entity = entity_load($this->get('entity_type')->value, $this->get('entity_id')->value);
-    $uri = $entity->uri();
-    $url['path'] = $uri['path'];
-    $url['options'] = array('fragment' => 'comment-' . $this->id());
+    $uri = $entity->urlInfo();
+    $uri['options'] = array('fragment' => 'comment-' . $this->id());
 
-    return $url;
+    return $uri;
   }
 
   /**

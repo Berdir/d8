@@ -74,7 +74,7 @@ class BreadcrumbTest extends MenuTestBase {
     $trail += array(
       'admin/structure/taxonomy/manage/tags' => t('Tags'),
     );
-    $this->assertBreadcrumb('admin/structure/taxonomy/manage/tags/edit', $trail);
+    $this->assertBreadcrumb('admin/structure/taxonomy/manage/tags/overview', $trail);
     $this->assertBreadcrumb('admin/structure/taxonomy/manage/tags/fields', $trail);
     $this->assertBreadcrumb('admin/structure/taxonomy/manage/tags/add', $trail);
 
@@ -338,10 +338,7 @@ class BreadcrumbTest extends MenuTestBase {
     $trail += array(
       'user/' . $this->web_user->id() => $this->web_user->getUsername(),
     );
-    $tree = array(
-      'user' => t('My account'),
-    );
-    $this->assertBreadcrumb('user/' . $this->web_user->id() . '/edit', $trail, $this->web_user->getUsername(), $tree);
+    $this->assertBreadcrumb('user/' . $this->web_user->id() . '/edit', $trail, $this->web_user->getUsername());
 
     // Create an only slightly privileged user being able to access site reports
     // but not administration pages.

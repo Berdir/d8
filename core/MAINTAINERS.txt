@@ -213,6 +213,10 @@ Module maintainers
 Aggregator module
 - Paris Liakos 'rootatwc' http://drupal.org/user/1011436
 
+Basic Auth module
+- Klaus Purer 'klausi' http://drupal.org/user/262198
+- Juampy Novillo Requena 'juampy' https://drupal.org/user/682736
+
 Block module
 - Tim Plunkett 'tim.plunkett' http://drupal.org/user/241634
 - Ben Dougherty 'benjy' http://drupal.org/user/1852732
@@ -336,15 +340,11 @@ Path module
 Phone module
 - Dave Reid 'davereid' http://drupal.org/user/53892
 
-PHP module
-- ?
-
 Picture module
 - Peter Droogmans 'attiks' http://drupal.org/user/105002
 
 RDF module
 - Stéphane Corlosquet 'scor' http://drupal.org/user/52142
-- Lin Clark 'linclark' http://drupal.org/user/396253
 
 REST module
 - Klaus Purer 'klausi' http://drupal.org/user/262198
