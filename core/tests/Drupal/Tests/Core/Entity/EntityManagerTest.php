@@ -323,7 +323,7 @@ class EntityManagerTest extends UnitTestCase {
   /**
    * Tests the getAccess() method.
    *
-   * @covers ::GetAccess()
+   * @covers ::getAccess()
    */
   public function testgetAccess() {
     $class = $this->getTestControllerClass();
