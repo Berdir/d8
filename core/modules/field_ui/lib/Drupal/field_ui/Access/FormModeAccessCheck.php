@@ -39,7 +39,7 @@ class FormModeAccessCheck implements AccessInterface {
    * {@inheritdoc}
    */
   public function access(Route $route, Request $request, AccountInterface $account) {
-    if ($entity_type_id = $route->getDefault('entity_type')) {
+    if ($entity_type_id = $route->getDefault('entity_type_id')) {
       $form_mode = $request->attributes->get('form_mode_name');
 
       if (!($bundle = $request->attributes->get('bundle'))) {
