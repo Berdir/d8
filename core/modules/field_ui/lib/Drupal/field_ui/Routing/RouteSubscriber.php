@@ -73,7 +73,7 @@ class RouteSubscriber extends RouteSubscriberBase {
         $collection->add("field_ui.delete_$entity_type_id", $route);
 
         // If the entity type has no bundles, use the entity type.
-        $defaults['entity_type'] = $entity_type_id;
+        $defaults['entity_type_id'] = $entity_type_id;
         if (!$entity_type->hasKey('bundle')) {
           $defaults['bundle'] = $entity_type_id;
         }

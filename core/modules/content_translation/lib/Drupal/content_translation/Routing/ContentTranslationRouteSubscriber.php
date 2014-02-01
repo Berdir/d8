@@ -51,7 +51,7 @@ class ContentTranslationRouteSubscriber extends RouteSubscriberBase {
         array(
           '_content' => '\Drupal\content_translation\Controller\ContentTranslationController::overview',
           'account' => 'NULL',
-          '_entity_type' => $entity_type_id,
+          '_entity_type_id' => $entity_type_id,
         ),
         array(
           '_access_content_translation_overview' => $entity_type_id,
@@ -75,7 +75,7 @@ class ContentTranslationRouteSubscriber extends RouteSubscriberBase {
           'source' => NULL,
           'target' => NULL,
           '_title' => 'Add',
-          '_entity_type' => $entity_type_id,
+          '_entity_type_id' => $entity_type_id,
 
         ),
         array(
@@ -99,7 +99,7 @@ class ContentTranslationRouteSubscriber extends RouteSubscriberBase {
           '_content' => '\Drupal\content_translation\Controller\ContentTranslationController::edit',
           'language' => NULL,
           '_title' => 'Edit',
-          '_entity_type' => $entity_type_id,
+          '_entity_type_id' => $entity_type_id,
         ),
         array(
           '_permission' => 'translate any entity',
@@ -122,7 +122,7 @@ class ContentTranslationRouteSubscriber extends RouteSubscriberBase {
           '_form' => '\Drupal\content_translation\Form\ContentTranslationDeleteForm',
           'language' => NULL,
           '_title' => 'Delete',
-          '_entity_type' => $entity_type_id,
+          '_entity_type_id' => $entity_type_id,
         ),
         array(
           '_permission' => 'translate any entity',
