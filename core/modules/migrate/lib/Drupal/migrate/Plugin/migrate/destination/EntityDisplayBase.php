@@ -25,7 +25,7 @@ abstract class EntityDisplayBase extends DestinationBase {
       $values[$id] = $row->getDestinationProperty($id);
     }
     $entity = $this->getEntity($values['entity_type'], $values['bundle'], $values[static::MODE_NAME]);
-    if (empty($values['hidden'])) {
+    if (!$row->getDestinationProperty('hidden')) {
       $entity
         ->setComponent($values['field_name'], $row->getDestinationProperty('options') ?: array())
         ->save();

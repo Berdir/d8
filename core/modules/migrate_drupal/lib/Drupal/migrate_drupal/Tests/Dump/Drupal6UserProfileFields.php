@@ -222,7 +222,7 @@ class Drupal6UserProfileFields {
       'weight' => '4',
       'required' => '0',
       'register' => '0',
-      'visibility' => '1',
+      'visibility' => '2',
       'autocomplete' => '0',
       'options' => '',
     ))->execute();
