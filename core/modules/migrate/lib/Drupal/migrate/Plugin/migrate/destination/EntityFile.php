@@ -36,7 +36,7 @@ class EntityFile extends EntityContentBase {
   /**
    * {@inheritdoc}
    */
-  public function import(Row $row) {
+  public function import(Row $row, array $old_destination_id_values = array()) {
     $source = $this->configuration['source_base_path'] . $row->getSourceProperty($this->configuration['source_path_property']);
     $destination = $row->getDestinationProperty($this->configuration['destination_path_property']);
     $replace = FILE_EXISTS_REPLACE;
@@ -52,7 +52,7 @@ class EntityFile extends EntityContentBase {
     else {
       file_unmanaged_copy($source, $destination, $replace);
     }
-    parent::import($row);
+    parent::import($row, $old_destination_id_values);
   }
 
 }

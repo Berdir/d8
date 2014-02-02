@@ -91,16 +91,6 @@ abstract class Entity extends DestinationBase implements ContainerFactoryPluginI
   /**
    * {@inheritdoc}
    */
-  abstract public function import(Row $row);
-
-  /**
-   * {@inheritdoc}
-   */
-  abstract public function getIds();
-
-  /**
-   * {@inheritdoc}
-   */
   public function fields(MigrationInterface $migration = NULL) {
     // TODO: Implement fields() method.
   }

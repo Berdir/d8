@@ -17,7 +17,7 @@ abstract class EntityDisplayBase extends DestinationBase {
   /**
    * {@inheritdoc}
    */
-  public function import(Row $row) {
+  public function import(Row $row, array $old_destination_id_values = array()) {
     $values = array();
     // array_intersect_key() won't work because the order is important because
     // this is also the return value.

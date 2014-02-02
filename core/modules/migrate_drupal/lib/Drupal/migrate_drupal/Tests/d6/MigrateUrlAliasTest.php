@@ -8,6 +8,7 @@
 namespace Drupal\migrate_drupal\Tests\d6;
 
 use Drupal\migrate\MigrateExecutable;
+use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 use Drupal\Core\Database\Database;
 
@@ -64,12 +65,14 @@ class MigrateUrlAliasTest extends MigrateDrupalTestBase {
       ->condition('src', 'node/2')
       ->execute();
 
-    db_truncate($migration->getIdMap()->getMapTableName())->execute();
+    db_update($migration->getIdMap()->getMapTableName())
+      ->fields(array('source_row_status' => MigrateIdMapInterface::STATUS_NEEDS_UPDATE))
+      ->execute();
     $migration = entity_load_unchanged('migration', 'd6_url_alias');
     $executable = new MigrateExecutable($migration, $this);
     $executable->import();
 
-    $path = \Drupal::service('path.crud')->load($conditions);
+    $path = \Drupal::service('path.crud')->load(array('pid' => $path['pid']));
     $this->assertEqual($path['alias'], 'new-url-alias');
   }
 

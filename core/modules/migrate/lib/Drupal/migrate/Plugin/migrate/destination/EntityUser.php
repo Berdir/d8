@@ -80,8 +80,9 @@ class EntityUser extends EntityContentBase {
 
   /**
    * {@inheritdoc}
+   * @throws \Drupal\migrate\MigrateException
    */
-  public function import(Row $row) {
+  public function import(Row $row, array $old_destination_id_values = array()) {
     if ($this->password) {
       if ($this->password instanceof MigratePassword) {
         $this->password->enableMd5Prefixing();
@@ -90,7 +91,7 @@ class EntityUser extends EntityContentBase {
         throw new MigrateException('Password service has been altered by another module, aborting.');
       }
     }
-    $ids = parent::import($row);
+    $ids = parent::import($row, $old_destination_id_values);
     if ($this->password) {
       $this->password->disableMd5Prefixing();
     }

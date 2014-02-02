@@ -250,7 +250,7 @@ class MigrateExecutable {
 
       if ($save) {
         try {
-          $destination_id_values = $destination->import($row);
+          $destination_id_values = $destination->import($row, $id_map->lookupDestinationId($this->sourceIdValues));
           // @todo Handle the successful but no ID case like config,
           //   https://drupal.org/node/2160835.
           if ($destination_id_values) {

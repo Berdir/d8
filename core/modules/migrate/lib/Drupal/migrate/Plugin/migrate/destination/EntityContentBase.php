@@ -58,7 +58,7 @@ class EntityContentBase extends Entity {
   /**
    * {@inheritdoc}
    */
-  public function import(Row $row) {
+  public function import(Row $row, array $old_destination_id_values = array()) {
     if ($all_instances = $this->fieldInfo->getInstances($this->storageController->getEntityTypeId())) {
       /** @var \Drupal\Field\Entity\FieldInstance[] $instances */
       $instances = array();

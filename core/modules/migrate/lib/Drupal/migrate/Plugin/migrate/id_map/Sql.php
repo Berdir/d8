@@ -398,6 +398,9 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
    * {@inheritdoc}
    */
   public function lookupDestinationId(array $source_id) {
+    if (empty($source_id)) {
+      return array();
+    }
     $query = $this->getDatabase()->select($this->mapTableName, 'map')
               ->fields('map', $this->destinationIdFields);
     foreach ($this->sourceIdFields as $key_name) {

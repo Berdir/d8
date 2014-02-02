@@ -26,7 +26,7 @@ class EntityConfigBase extends Entity {
   /**
    * {@inheritdoc}
    */
-  public function import(Row $row) {
+  public function import(Row $row, array $old_destination_id_values = array()) {
     $ids = $this->getIds();
     $id_key = $this->getKey('id');
     if (count($ids) > 1) {
