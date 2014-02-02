@@ -132,28 +132,6 @@ abstract class Entity extends DestinationBase implements ContainerFactoryPluginI
   }
 
   /**
-   * Updates an entity with the contents of a row.
-   *
-   * @param EntityInterface $entity
-   * @param Row $row
-   */
-  protected function updateEntity(EntityInterface $entity, Row $row) {
-    foreach ($row->getRawDestination() as $property => $value) {
-      $this->updateEntityProperty($entity, explode('.', $property), $value);
-    }
-  }
-
-  /**
-   * Updates a (possible nested) entity property with a value.
-   *
-   * @param EntityInterface $entity
-   * @param array $parents
-   * @param $value
-   * @return mixed
-   */
-  abstract protected function updateEntityProperty(EntityInterface $entity, array $parents, $value);
-
-  /**
    * Returns a specific entity key.
    *
    * @param string $key

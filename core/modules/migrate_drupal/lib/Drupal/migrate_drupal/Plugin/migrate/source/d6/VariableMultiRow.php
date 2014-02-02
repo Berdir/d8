@@ -38,7 +38,7 @@ class VariableMultiRow extends Drupal6SqlBase {
    * {@inheritdoc}
    */
   public function getIds() {
-    $ids['fid']['type'] = 'integer';
+    $ids['name']['type'] = 'string';
     return $ids;
   }
 

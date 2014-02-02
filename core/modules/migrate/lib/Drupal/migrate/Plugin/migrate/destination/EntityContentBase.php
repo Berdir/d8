@@ -92,29 +92,16 @@ class EntityContentBase extends Entity {
   }
 
   /**
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
-   * @param array $parents
-   * @param mixed $value
-   * @throws \Drupal\migrate\MigrateException
+   * @param EntityInterface $entity
+   * @param Row $row
    */
-  protected function updateEntityProperty(EntityInterface $entity, array $parents, $value) {
-    $ref = $entity;
-    while ($parent = array_shift($parents)) {
-      if ($ref instanceof ListInterface && is_numeric($parent)) {
-        $ref = $ref->offsetGet($parent);
-      }
-      elseif ($ref instanceof ComplexDataInterface) {
-        $ref = $ref->get($parent);
-      }
-      elseif ($ref instanceof TypedDataInterface) {
-        // At this point we should have no more parents as there is nowhere to
-        // descend.
-        if ($parents) {
-          throw new MigrateException(String::format('Unexpected extra keys @parents', array('@parents' => $parents)));
-        }
+  protected function updateEntity(EntityInterface $entity, Row $row) {
+    foreach ($row->getDestination() as $field_name => $values) {
+      $field = $entity->$field_name;
+      if ($field instanceof TypedDataInterface) {
+        $field->setValue($values);
       }
     }
-    $ref->setValue($value);
   }
 
 }

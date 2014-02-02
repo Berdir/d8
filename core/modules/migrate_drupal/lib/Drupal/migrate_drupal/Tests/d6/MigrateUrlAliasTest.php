@@ -9,6 +9,7 @@ namespace Drupal\migrate_drupal\Tests\d6;
 
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
+use Drupal\Core\Database\Database;
 
 /**
  * Test the url alias migration.
@@ -56,6 +57,20 @@ class MigrateUrlAliasTest extends MigrateDrupalTestBase {
     $path = \Drupal::service('path.crud')->load($conditions);
     $this->assertNotNull($path, "Path alias for node/2 successfully loaded.");
 
+    // Test that we can re-import using the UrlAlias destination.
+    Database::getConnection('default', 'migrate')
+      ->update('url_alias')
+      ->fields(array('dst' => 'new-url-alias'))
+      ->condition('src', 'node/2')
+      ->execute();
+
+    db_truncate($migration->getIdMap()->getMapTableName())->execute();
+    $migration = entity_load_unchanged('migration', 'd6_url_alias');
+    $executable = new MigrateExecutable($migration, $this);
+    $executable->import();
+
+    $path = \Drupal::service('path.crud')->load($conditions);
+    $this->assertEqual($path['alias'], 'new-url-alias');
   }
 
 }

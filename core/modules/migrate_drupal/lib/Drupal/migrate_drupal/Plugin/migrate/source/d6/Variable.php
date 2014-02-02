@@ -58,4 +58,5 @@ class Variable extends Drupal6SqlBase {
       ->fields('v', array('name', 'value'))
       ->condition('name', $this->variables, 'IN');
   }
+
 }

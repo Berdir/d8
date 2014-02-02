@@ -58,7 +58,22 @@ class EntityConfigBase extends Entity {
     return $ids;
   }
 
+
   /**
+   * Updates an entity with the contents of a row.
+   *
+   * @param EntityInterface $entity
+   * @param Row $row
+   */
+  protected function updateEntity(EntityInterface $entity, Row $row) {
+    foreach ($row->getRawDestination() as $property => $value) {
+      $this->updateEntityProperty($entity, explode('.', $property), $value);
+    }
+  }
+
+  /**
+   * Updates a (possible nested) entity property with a value.
+   *
    * @param \Drupal\Core\Config\Entity\ConfigEntityInterface $entity
    * @param array $parents
    * @param $value

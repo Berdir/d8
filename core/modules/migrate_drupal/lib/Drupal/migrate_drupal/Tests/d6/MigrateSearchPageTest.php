@@ -9,6 +9,7 @@ namespace Drupal\migrate_drupal\Tests\d6;
 
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
+use Drupal\Core\Database\Database;
 
 class MigrateSearchPageTest extends MigrateDrupalTestBase {
 
@@ -47,6 +48,21 @@ class MigrateSearchPageTest extends MigrateDrupalTestBase {
       'views' => 1,
     ));
     $this->assertEqual($search_page->getPath(), 'node');
+
+    // Test that we can re-import using the EntitySearchPage destination.
+    Database::getConnection('default', 'migrate')
+      ->update('variable')
+      ->fields(array('value' => serialize(4)))
+      ->condition('name', 'node_rank_comments')
+      ->execute();
+
+    $migration = entity_load_unchanged('migration', 'd6_search_page');
+    $executable = new MigrateExecutable($migration, $this);
+    $executable->import();
+
+    $search_page = entity_load('search_page', $id);
+    $configuration = $search_page->getPlugin()->getConfiguration();
+    $this->assertEqual($configuration['rankings']['comments'], 4);
   }
 
 }

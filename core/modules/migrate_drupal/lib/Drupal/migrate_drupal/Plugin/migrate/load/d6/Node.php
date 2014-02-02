@@ -29,13 +29,18 @@ class Node extends LoadBase {
     }
     $ids_to_add = isset($sub_ids) ? array_intersect($types, $sub_ids) : $types;
     $migrations = array();
+    $processed_destinations = array_map(
+      function ($value) { $parts = explode('.', $value, 2); return $parts[0]; },
+      array_keys($this->migration->getProcessPlugins())
+    );
     foreach ($ids_to_add as $node_type) {
       $values = $this->migration->getExportProperties();
       $values['id'] = 'd6_node:' . $node_type;
       $values['source']['type'] = $node_type;
       /** @var \Drupal\migrate\Entity\MigrationInterface $migration */
       $migration = $storage_controller->create($values);
-      $migration->process = MapArray::copyValuesToKeys(array_keys($migration->getSourcePlugin()->fields()));
+      $fields = array_keys($migration->getSourcePlugin()->fields());
+      $migration->process += MapArray::copyValuesToKeys(array_diff($fields, $processed_destinations));
       $migrations[$migration->id()] = $migration;
     }
     return $migrations;
