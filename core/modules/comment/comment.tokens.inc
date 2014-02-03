@@ -38,7 +38,7 @@ function comment_token_info() {
     'name' => t("Name"),
     'description' => t("The name left by the comment author."),
   );
-  $comment['mail'] = array(           core/modules/comment/comment.module
+  $comment['mail'] = array(
     'name' => t("Email address"),
     'description' => t("The email address left by the comment author."),
   );
