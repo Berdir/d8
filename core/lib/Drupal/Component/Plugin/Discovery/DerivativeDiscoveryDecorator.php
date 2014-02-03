@@ -42,14 +42,18 @@ class DerivativeDiscoveryDecorator implements DiscoveryInterface {
   public function getDefinition($plugin_id) {
     $plugin_definition = $this->decorated->getDefinition($plugin_id);
     list($base_plugin_id, $derivative_id) = $this->decodePluginId($plugin_id);
-    // If this is a base plugin or no plugin defined itself as this derivative
-    // then try to find and run the deriver.
-    if (!$derivative_id || !$plugin_definition) {
-      $base_plugin_definition = $this->decorated->getDefinition($base_plugin_id);
-      if ($base_plugin_definition) {
-        $derivative_fetcher = $this->getDerivativeFetcher($base_plugin_id, $base_plugin_definition);
-        if ($derivative_fetcher) {
-          $plugin_definition = $derivative_fetcher->getDerivativeDefinition($derivative_id, $base_plugin_definition);
+    $base_plugin_definition = $this->decorated->getDefinition($base_plugin_id);
+    if ($base_plugin_definition) {
+      $derivative_fetcher = $this->getDerivativeFetcher($base_plugin_id, $base_plugin_definition);
+      if ($derivative_fetcher) {
+        $derivative_plugin_definition = $derivative_fetcher->getDerivativeDefinition($derivative_id, $base_plugin_definition);
+        // If a plugin defined itself as a derivative, merge in possible
+        // defaults from the derivative.
+        if ($derivative_id && isset($plugin_definition)) {
+          $plugin_definition += $derivative_plugin_definition ?: array();
+        }
+        else {
+          $plugin_definition = $derivative_plugin_definition;
         }
       }
     }
@@ -83,14 +87,17 @@ class DerivativeDiscoveryDecorator implements DiscoveryInterface {
         $derivative_definitions = $derivative_fetcher->getDerivativeDefinitions($plugin_definition);
         foreach ($derivative_definitions as $derivative_id => $derivative_definition) {
           $plugin_id = $this->encodePluginId($base_plugin_id, $derivative_id);
-          // Skip this definition if this is a derivative and a plugin already
-          // defined itself as this derivative.
-          if (!$derivative_id || !isset($base_plugin_definitions[$plugin_id])) {
-            $plugin_definitions[$plugin_id] = $derivative_definition;
+          // Use this definition as defaults if a plugin already defined
+          // itself as this derivative.
+          if ($derivative_id && isset($base_plugin_definitions[$plugin_id])) {
+            $derivative_definition = $base_plugin_definitions[$plugin_id] + ($derivative_definition ?: array());
           }
+          $plugin_definitions[$plugin_id] = $derivative_definition;
         }
       }
-      else {
+      // If a plugin already defined itself as a derivative it might already
+      // be merged into the definitions.
+      elseif (!isset($plugin_definitions[$base_plugin_id])) {
         $plugin_definitions[$base_plugin_id] = $plugin_definition;
       }
     }
