@@ -43,7 +43,7 @@ abstract class NodeTestBase extends WebTestBase {
       )));
       $this->drupalCreateContentType(array('type' => 'article', 'name' => 'Article'));
     }
-    $this->access = \Drupal::entityManager()->getAccess('node');
+    $this->access = \Drupal::entityManager()->getAccessHandler('node');
   }
 
   /**

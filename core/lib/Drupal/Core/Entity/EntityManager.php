@@ -231,7 +231,7 @@ class EntityManager extends PluginManagerBase implements EntityManagerInterface 
   /**
    * {@inheritdoc}
    */
-  public function getAccess($entity_type) {
+  public function getAccessHandler($entity_type) {
     return $this->getController($entity_type, 'access', 'getAccessClass');
   }
 

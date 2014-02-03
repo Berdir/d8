@@ -321,9 +321,9 @@ class EntityManagerTest extends UnitTestCase {
   }
 
   /**
-   * Tests the getAccess() method.
+   * Tests the getAccessHandler() method.
    *
-   * @covers ::getAccess()
+   * @covers ::getAccessHandler()
    */
   public function testGetAccess() {
     $class = $this->getTestControllerClass();
@@ -333,7 +333,7 @@ class EntityManagerTest extends UnitTestCase {
       ->will($this->returnValue($class));
     $this->setUpEntityManager(array('test_entity_type' => $entity));
 
-    $this->assertInstanceOf($class, $this->entityManager->getAccess('test_entity_type'));
+    $this->assertInstanceOf($class, $this->entityManager->getAccessHandler('test_entity_type'));
   }
 
   /**

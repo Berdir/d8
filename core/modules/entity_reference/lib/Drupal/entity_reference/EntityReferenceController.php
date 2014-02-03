@@ -74,7 +74,7 @@ class EntityReferenceController extends ControllerBase {
       throw new AccessDeniedHttpException();
     }
 
-    $access_controller = $this->entityManager()->getAccess($entity_type);
+    $access_controller = $this->entityManager()->getAccessHandler($entity_type);
     if ($instance->getType() != 'entity_reference' || !$access_controller->fieldAccess('edit', $instance)) {
       throw new AccessDeniedHttpException();
     }

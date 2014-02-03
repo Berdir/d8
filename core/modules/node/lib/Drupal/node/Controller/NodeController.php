@@ -35,7 +35,7 @@ class NodeController extends ControllerBase {
 
     // Only use node types the user has access to.
     foreach ($this->entityManager()->getStorageController('node_type')->loadMultiple() as $type) {
-      if ($this->entityManager()->getAccess('node')->createAccess($type->type)) {
+      if ($this->entityManager()->getAccessHandler('node')->createAccess($type->type)) {
         $content[$type->type] = $type;
       }
     }
