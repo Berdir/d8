@@ -270,8 +270,8 @@ class CommentViewBuilder extends EntityViewBuilder {
     parent::alterBuild($build, $comment, $display, $view_mode, $langcode);
     if (empty($comment->in_preview)) {
       $prefix = '';
-      $commented_entity = $this->entityManager->getStorageController($comment->entity_type->value)->load($comment->entity_id->value);
-      $instance = $this->fieldInfo->getInstance($commented_entity->getEntityTypeId(), $commented_entity->bundle(), $comment->field_name->value);
+      $commented_entity = $comment->getCommentedEntity();
+      $instance = $this->fieldInfo->getInstance($commented_entity->getEntityTypeId(), $commented_entity->bundle(), $comment->getFieldName());
       $is_threaded = isset($comment->divs)
         && $instance->getSetting('default_mode') == COMMENT_MODE_THREADED;
 

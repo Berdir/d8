@@ -471,8 +471,8 @@ function forum_permission() {
  * $comment->save() calls hook_comment_publish() for all published comments.
  */
 function forum_comment_publish($comment) {
-  if ($comment->entity_type->value == 'node') {
-    \Drupal::service('forum_manager')->updateIndex($comment->entity_id->value);
+  if ($comment->getCommentedEntityType() == 'node') {
+    \Drupal::service('forum_manager')->updateIndex($comment->getCommentedEntityId());
   }
 }
 
@@ -485,8 +485,8 @@ function forum_comment_publish($comment) {
 function forum_comment_update($comment) {
   // $comment->save() calls hook_comment_publish() for all published comments,
   // so we need to handle all other values here.
-  if (!$comment->status->value && $comment->entity_type->value == 'node') {
-    \Drupal::service('forum_manager')->updateIndex($comment->entity_id->value);
+  if (!$comment->isPublished() && $comment->getCommentedEntityType() == 'node') {
+    \Drupal::service('forum_manager')->updateIndex($comment->getCommentedEntityId());
   }
 }
 
@@ -494,8 +494,8 @@ function forum_comment_update($comment) {
  * Implements hook_comment_unpublish().
  */
 function forum_comment_unpublish($comment) {
-  if ($comment->entity_type->value == 'node') {
-    \Drupal::service('forum_manager')->updateIndex($comment->entity_id->value);
+  if ($comment->getCommentedEntityType() == 'node') {
+    \Drupal::service('forum_manager')->updateIndex($comment->getCommentedEntityId());
   }
 }
 
@@ -503,8 +503,8 @@ function forum_comment_unpublish($comment) {
  * Implements hook_comment_delete().
  */
 function forum_comment_delete($comment) {
-  if ($comment->entity_type->value == 'node') {
-    \Drupal::service('forum_manager')->updateIndex($comment->entity_id->value);
+  if ($comment->getCommentedEntityType() == 'node') {
+    \Drupal::service('forum_manager')->updateIndex($comment->getCommentedEntityId());
   }
 }
 
