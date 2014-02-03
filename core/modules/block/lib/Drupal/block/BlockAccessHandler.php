@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\block\BlockAccess.
+ * Contains \Drupal\block\BlockAccessHandler.
  */
 
 namespace Drupal\block;
@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @see \Drupal\block\Entity\Block
  */
-class BlockAccess extends EntityAccessHandler implements EntityControllerInterface {
+class BlockAccessHandler extends EntityAccessHandler implements EntityControllerInterface {
 
   /**
    * The node grant storage.
@@ -31,7 +31,7 @@ class BlockAccess extends EntityAccessHandler implements EntityControllerInterfa
   protected $aliasManager;
 
   /**
-   * Constructs a BlockAccess object.
+   * Constructs a BlockAccessHandler object.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_info
    *   The entity info for the entity type.

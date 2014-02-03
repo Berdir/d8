@@ -17,7 +17,7 @@ use Drupal\Core\Field\FieldDefinition;
  *   label = @Translation("Test entity - base field display"),
  *   controllers = {
  *     "storage" = "Drupal\Core\Entity\FieldableDatabaseStorageController",
- *     "access" = "Drupal\entity_test\EntityTestAccess",
+ *     "access" = "Drupal\entity_test\EntityTestAccessHandler",
  *     "form" = {
  *       "default" = "Drupal\entity_test\EntityTestFormController"
  *     },

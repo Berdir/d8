@@ -19,7 +19,7 @@ use Drupal\system\MenuInterface;
  *   label = @Translation("Menu"),
  *   controllers = {
  *     "storage" = "Drupal\Core\Config\Entity\ConfigStorageController",
- *     "access" = "Drupal\system\MenuAccess"
+ *     "access" = "Drupal\system\MenuAccessHandler"
  *   },
  *   config_prefix = "system.menu",
  *   admin_permission = "administer menu",

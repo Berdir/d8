@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains Drupal\entity_test\EntityTestAccess.
+ * Contains Drupal\entity_test\EntityTestAccessHandler.
  */
 
 namespace Drupal\entity_test;
@@ -17,7 +17,7 @@ use Drupal\Core\Session\AccountInterface;
  *
  * @see \Drupal\entity_test\Entity\EntityTest
  */
-class EntityTestAccess extends EntityAccessHandler {
+class EntityTestAccessHandler extends EntityAccessHandler {
 
   /**
    * {@inheritdoc}

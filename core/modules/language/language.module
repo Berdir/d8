@@ -117,7 +117,7 @@ function language_menu_link_defaults() {
 /**
  * Editing or deleting locked languages should not be possible.
  *
- * @deprecated Use \Drupal\language\LanguageAccess instead.
+ * @deprecated Use \Drupal\language\LanguageAccessHandler instead.
  */
 function language_access_language_edit_or_delete($language) {
   return !$language->locked && \Drupal::currentUser()->hasPermission('administer languages');

@@ -22,7 +22,7 @@ use Drupal\shortcut\ShortcutInterface;
  *   module = "shortcut",
  *   controllers = {
  *     "storage" = "Drupal\Core\Entity\FieldableDatabaseStorageController",
- *     "access" = "Drupal\shortcut\ShortcutAccess",
+ *     "access" = "Drupal\shortcut\ShortcutAccessHandler",
  *     "form" = {
  *       "default" = "Drupal\shortcut\ShortcutFormController",
  *       "add" = "Drupal\shortcut\ShortcutFormController",

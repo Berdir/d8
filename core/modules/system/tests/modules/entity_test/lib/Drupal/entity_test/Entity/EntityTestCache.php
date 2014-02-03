@@ -17,7 +17,7 @@ use Drupal\Core\Language\Language;
  *   label = @Translation("Test entity with field cache"),
  *   controllers = {
  *     "storage" = "Drupal\Core\Entity\FieldableDatabaseStorageController",
- *     "access" = "Drupal\entity_test\EntityTestAccess",
+ *     "access" = "Drupal\entity_test\EntityTestAccessHandler",
  *     "form" = {
  *       "default" = "Drupal\entity_test\EntityTestFormController"
  *     },

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\taxonomy\NodeTypeAccess.
+ * Contains \Drupal\taxonomy\NodeTypeAccessHandler.
  */
 
 namespace Drupal\node;
@@ -16,7 +16,7 @@ use Drupal\Core\Session\AccountInterface;
  *
  * @see \Drupal\node\Entity\NodeType.
  */
-class NodeTypeAccess extends EntityAccessHandler {
+class NodeTypeAccessHandler extends EntityAccessHandler {
 
   /**
    * {@inheritdoc}

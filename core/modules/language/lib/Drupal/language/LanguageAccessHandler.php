@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\language\LanguageAccess.
+ * Contains \Drupal\language\LanguageAccessHandler.
  */
 
 namespace Drupal\language;
@@ -16,7 +16,7 @@ use Drupal\Core\Session\AccountInterface;
  *
  * @see \Drupal\language\Entity\Language
  */
-class LanguageAccess extends EntityAccessHandler {
+class LanguageAccessHandler extends EntityAccessHandler {
 
   /**
    * {@inheritdoc}

@@ -1380,7 +1380,7 @@ function node_form_system_themes_admin_form_submit($form, &$form_state) {
  * @{
  * The node access system determines who can do what to which nodes.
  *
- * In determining access rights for a node, \Drupal\node\NodeAccess
+ * In determining access rights for a node, \Drupal\node\NodeAccessHandler
  * first checks whether the user has the "bypass node access" permission. Such
  * users have unrestricted access to all nodes. user 1 will always pass this
  * check.

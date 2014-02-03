@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\taxonomy\TermAccess.
+ * Contains \Drupal\taxonomy\TermAccessHandler.
  */
 
 namespace Drupal\taxonomy;
@@ -16,7 +16,7 @@ use Drupal\Core\Session\AccountInterface;
  *
  * @see \Drupal\taxonomy\Entity\Term
  */
-class TermAccess extends EntityAccessHandler {
+class TermAccessHandler extends EntityAccessHandler {
 
   /**
    * {@inheritdoc}

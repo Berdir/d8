@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\shortcut\ShortcutAccess.
+ * Contains \Drupal\shortcut\ShortcutAccessHandler.
  */
 
 namespace Drupal\shortcut;
@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Defines the access controller for the test entity type.
  */
-class ShortcutAccess extends EntityAccessHandler implements EntityControllerInterface {
+class ShortcutAccessHandler extends EntityAccessHandler implements EntityControllerInterface {
 
   /**
    * The shortcut_set storage controller.
@@ -27,7 +27,7 @@ class ShortcutAccess extends EntityAccessHandler implements EntityControllerInte
   protected $shortcutSetStorage;
 
   /**
-   * Constructs a ShortcutAccess object.
+   * Constructs a ShortcutAccessHandler object.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_info
    *   The entity info for the entity type.

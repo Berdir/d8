@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\filter\FilterFormatAccess.
+ * Contains \Drupal\filter\FilterFormatAccessHandler.
  */
 
 namespace Drupal\filter;
@@ -16,7 +16,7 @@ use Drupal\Core\Session\AccountInterface;
  *
  * @see \Drupal\filter\Entity\FilterFormat
  */
-class FilterFormatAccess extends EntityAccessHandler {
+class FilterFormatAccessHandler extends EntityAccessHandler {
 
   /**
    * {@inheritdoc}

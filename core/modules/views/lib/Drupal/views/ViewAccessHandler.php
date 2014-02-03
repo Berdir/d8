@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\views\ViewAccess.
+ * Contains \Drupal\views\ViewAccessHandler.
  */
 
 namespace Drupal\views;
@@ -17,7 +17,7 @@ use Drupal\Core\Session\AccountInterface;
  *
  * @see \Drupal\views\Entity\View
  */
-class ViewAccess extends EntityAccessHandler {
+class ViewAccessHandler extends EntityAccessHandler {
 
   /**
    * {@inheritdoc}

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\config_test\ConfigTestAccess.
+ * Contains \Drupal\config_test\ConfigTestAccessHandler.
  */
 
 namespace Drupal\config_test;
@@ -16,7 +16,7 @@ use Drupal\Core\Entity\EntityInterface;
  *
  * @see \Drupal\config_test\Entity\ConfigTest
  */
-class ConfigTestAccess extends EntityAccessHandler {
+class ConfigTestAccessHandler extends EntityAccessHandler {
 
   /**
    * {@inheritdoc}

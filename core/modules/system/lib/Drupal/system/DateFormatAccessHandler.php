@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\system\DateFormatAccess.
+ * Contains \Drupal\system\DateFormatAccessHandler.
  */
 
 namespace Drupal\system;
@@ -16,7 +16,7 @@ use Drupal\Core\Session\AccountInterface;
  *
  * @see \Drupal\system\Entity\DateFormat
  */
-class DateFormatAccess extends EntityAccessHandler {
+class DateFormatAccessHandler extends EntityAccessHandler {
 
   /**
    * {@inheritdoc}

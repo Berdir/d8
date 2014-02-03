@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\user\UserAccess.
+ * Contains \Drupal\user\UserAccessHandler.
  */
 
 namespace Drupal\user;
@@ -16,7 +16,7 @@ use Drupal\Core\Session\AccountInterface;
  *
  * @see \Drupal\user\Entity\User
  */
-class UserAccess extends EntityAccessHandler {
+class UserAccessHandler extends EntityAccessHandler {
 
   /**
    * {@inheritdoc}

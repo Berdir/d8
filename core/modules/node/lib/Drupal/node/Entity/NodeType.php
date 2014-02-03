@@ -21,7 +21,7 @@ use Drupal\node\NodeTypeInterface;
  *   label = @Translation("Content type"),
  *   controllers = {
  *     "storage" = "Drupal\Core\Config\Entity\ConfigStorageController",
- *     "access" = "Drupal\node\NodeTypeAccess",
+ *     "access" = "Drupal\node\NodeTypeAccessHandler",
  *     "form" = {
  *       "add" = "Drupal\node\NodeTypeFormController",
  *       "edit" = "Drupal\node\NodeTypeFormController",

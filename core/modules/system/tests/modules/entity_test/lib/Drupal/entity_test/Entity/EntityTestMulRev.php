@@ -18,7 +18,7 @@ use Drupal\entity_test\Entity\EntityTestRev;
  *   label = @Translation("Test entity - revisions and data table"),
  *   controllers = {
  *     "storage" = "Drupal\Core\Entity\FieldableDatabaseStorageController",
- *     "access" = "Drupal\entity_test\EntityTestAccess",
+ *     "access" = "Drupal\entity_test\EntityTestAccessHandler",
  *     "form" = {
  *       "default" = "Drupal\entity_test\EntityTestFormController"
  *     },

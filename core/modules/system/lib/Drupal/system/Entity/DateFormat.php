@@ -20,7 +20,7 @@ use Drupal\system\DateFormatInterface;
  *   label = @Translation("Date format"),
  *   controllers = {
  *     "storage" = "Drupal\Core\Config\Entity\ConfigStorageController",
- *     "access" = "Drupal\system\DateFormatAccess",
+ *     "access" = "Drupal\system\DateFormatAccessHandler",
  *     "list" = "Drupal\system\DateFormatListController",
  *     "form" = {
  *       "add" = "Drupal\system\Form\DateFormatAddForm",

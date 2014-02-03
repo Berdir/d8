@@ -19,7 +19,7 @@ use Drupal\entity_test\Entity\EntityTest;
  *   controllers = {
  *     "storage" = "Drupal\Core\Entity\FieldableDatabaseStorageController",
  *     "view_builder" = "Drupal\entity_test\EntityTestViewBuilder",
- *     "access" = "Drupal\entity_test\EntityTestAccess",
+ *     "access" = "Drupal\entity_test\EntityTestAccessHandler",
  *     "form" = {
  *       "default" = "Drupal\entity_test\EntityTestFormController"
  *     },

@@ -20,7 +20,7 @@ use Symfony\Component\Routing\Route;
  *   label = @Translation("Menu link"),
  *   controllers = {
  *     "storage" = "Drupal\menu_link\MenuLinkStorageController",
- *     "access" = "Drupal\menu_link\MenuLinkAccess",
+ *     "access" = "Drupal\menu_link\MenuLinkAccessHandler",
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "form" = {
  *       "default" = "Drupal\menu_link\MenuLinkFormController"

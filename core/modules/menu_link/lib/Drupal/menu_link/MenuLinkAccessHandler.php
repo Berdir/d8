@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\menu_link\MenuLinkAccess.
+ * Contains \Drupal\menu_link\MenuLinkAccessHandler.
  */
 
 namespace Drupal\menu_link;
@@ -16,7 +16,7 @@ use Drupal\Core\Session\AccountInterface;
  *
  * @see \Drupal\menu_link\Entity\MenuLink
  */
-class MenuLinkAccess extends EntityAccessHandler {
+class MenuLinkAccessHandler extends EntityAccessHandler {
 
   /**
    * {@inheritdoc}

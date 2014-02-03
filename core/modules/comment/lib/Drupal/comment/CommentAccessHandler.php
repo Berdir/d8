@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\comment\CommentAccess
+ * Contains \Drupal\comment\CommentAccessHandler
  */
 
 namespace Drupal\comment;
@@ -16,7 +16,7 @@ use Drupal\Core\Session\AccountInterface;
  *
  * @see \Drupal\comment\Entity\Comment
  */
-class CommentAccess extends EntityAccessHandler {
+class CommentAccessHandler extends EntityAccessHandler {
 
   /**
    * {@inheritdoc}

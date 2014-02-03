@@ -21,7 +21,7 @@ use Drupal\custom_block\CustomBlockInterface;
  *   bundle_label = @Translation("Custom Block type"),
  *   controllers = {
  *     "storage" = "Drupal\Core\Entity\FieldableDatabaseStorageController",
- *     "access" = "Drupal\custom_block\CustomBlockAccess",
+ *     "access" = "Drupal\custom_block\CustomBlockAccessHandler",
  *     "list" = "Drupal\custom_block\CustomBlockListController",
  *     "view_builder" = "Drupal\custom_block\CustomBlockViewBuilder",
  *     "form" = {

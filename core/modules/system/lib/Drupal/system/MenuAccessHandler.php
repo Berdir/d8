@@ -2,21 +2,21 @@
 
 /**
  * @file
- * Contains \Drupal\custom_block\CustomBlockAccess.
+ * Contains \Drupal\system\MenuAccessHandler.
  */
 
-namespace Drupal\custom_block;
+namespace Drupal\system;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityAccessHandler;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Defines the access class for the custom block entity type.
+ * Defines the access class for the menu entity type.
  *
- * @see \Drupal\custom_block\Entity\CustomBlock
+ * @see \Drupal\system\Entity\Menu
  */
-class CustomBlockAccess extends EntityAccessHandler {
+class MenuAccessHandler extends EntityAccessHandler {
 
   /**
    * {@inheritdoc}
@@ -25,6 +25,11 @@ class CustomBlockAccess extends EntityAccessHandler {
     if ($operation === 'view') {
       return TRUE;
     }
+    // Locked menus could not be deleted.
+    elseif ($operation == 'delete' && $entity->isLocked()) {
+      return FALSE;
+    }
+
     return parent::checkAccess($entity, $operation, $langcode, $account);
   }
 

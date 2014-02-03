@@ -25,7 +25,7 @@ use Drupal\user\UserInterface;
  *   controllers = {
  *     "storage" = "Drupal\Core\Entity\FieldableDatabaseStorageController",
  *     "view_builder" = "Drupal\node\NodeViewBuilder",
- *     "access" = "Drupal\node\NodeAccess",
+ *     "access" = "Drupal\node\NodeAccessHandler",
  *     "form" = {
  *       "default" = "Drupal\node\NodeFormController",
  *       "delete" = "Drupal\node\Form\NodeDeleteForm",

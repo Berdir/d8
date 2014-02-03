@@ -21,7 +21,7 @@ use Drupal\user\UserInterface;
  *   label = @Translation("User"),
  *   controllers = {
  *     "storage" = "Drupal\user\UserStorageController",
- *     "access" = "Drupal\user\UserAccess",
+ *     "access" = "Drupal\user\UserAccessHandler",
  *     "list" = "Drupal\user\Controller\UserListController",
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "form" = {

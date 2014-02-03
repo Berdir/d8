@@ -21,7 +21,7 @@ use Drupal\language\LanguageInterface;
  *   controllers = {
  *     "storage" = "Drupal\Core\Config\Entity\ConfigStorageController",
  *     "list" = "Drupal\language\LanguageListController",
- *     "access" = "Drupal\language\LanguageAccess",
+ *     "access" = "Drupal\language\LanguageAccessHandler",
  *     "form" = {
  *       "add" = "Drupal\language\Form\LanguageAddForm",
  *       "edit" = "Drupal\language\Form\LanguageEditForm",
