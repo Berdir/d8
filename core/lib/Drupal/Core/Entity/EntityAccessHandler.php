@@ -15,19 +15,19 @@ use Drupal\Core\Language\Language;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Defines a default implementation for entity access controllers.
+ * Defines a default implementation for entity access handler.
  */
 class EntityAccessHandler extends EntityControllerBase implements EntityAccessHandlerInterface {
 
   /**
-   * Stores calculcated access check results.
+   * Stores calculated access check results.
    *
    * @var array
    */
   protected $accessCache = array();
 
   /**
-   * The entity type ID of the access controller instance.
+   * The entity type ID of the access handler instance.
    *
    * @var string
    */
@@ -41,7 +41,7 @@ class EntityAccessHandler extends EntityControllerBase implements EntityAccessHa
   protected $entityType;
 
   /**
-   * Constructs an access controller instance.
+   * Constructs an access handler instance.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_info
    *   The entity info for the entity type.

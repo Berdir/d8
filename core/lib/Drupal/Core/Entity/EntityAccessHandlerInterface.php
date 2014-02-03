@@ -14,7 +14,7 @@ use Drupal\Core\Language\Language;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Defines a common interface for entity access classes.
+ * Defines a common interface for entity access handlers.
  */
 interface EntityAccessHandlerInterface {
 
