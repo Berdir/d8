@@ -317,14 +317,6 @@ function user_views_data() {
     ),
   );
 
-  $data['users']['user_bulk_form'] = array(
-    'title' => t('Bulk update'),
-    'help' => t('Add a form element that lets you run operations on multiple users.'),
-    'field' => array(
-      'id' => 'user_bulk_form',
-    ),
-  );
-
   // Define the base group of this table. Fields that don't have a group defined
   // will go into this field by default.
   $data['users_roles']['table']['group']  = t('User');
@@ -375,13 +367,14 @@ function user_views_data() {
 }
 
 /**
- * Implements hook_views_plugins_row_alter().
- *
- * Replaces the generic row plugin by a custom one for users.
- *
- * @see \Drupal\views\Plugin\views\row\EntityRow
+ * Implements hook_views_data_alter().
  */
-function user_views_plugins_row_alter(array &$plugins) {
-  $plugins['entity:user']['class'] = 'Drupal\user\Plugin\views\row\UserRow';
-  $plugins['entity:user']['provider'] = 'user';
+function user_views_data_alter(&$data) {
+  $data['users']['user_bulk_form'] = array(
+    'title' => t('Bulk update'),
+    'help' => t('Add a form element that lets you run operations on multiple users.'),
+    'field' => array(
+      'id' => 'user_bulk_form',
+    ),
+  );
 }

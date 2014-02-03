@@ -206,14 +206,6 @@ function node_views_data() {
     );
   }
 
-  $data['node']['node_bulk_form'] = array(
-    'title' => t('Node operations bulk form'),
-    'help' => t('Add a form element that lets you run operations on multiple nodes.'),
-    'field' => array(
-      'id' => 'node_bulk_form',
-    ),
-  );
-
   $data['node']['view_node'] = array(
     'field' => array(
       'title' => t('Link to content'),
@@ -631,6 +623,19 @@ function node_views_data() {
 }
 
 /**
+ * Implements hook_views_data_alter().
+ */
+function node_views_data_alter(&$data) {
+  $data['node']['node_bulk_form'] = array(
+    'title' => t('Node operations bulk form'),
+    'help' => t('Add a form element that lets you run operations on multiple nodes.'),
+    'field' => array(
+      'id' => 'node_bulk_form',
+    ),
+  );
+}
+
+/**
  * Implements hook_preprocess_node().
  */
 function node_row_node_view_preprocess_node(&$variables) {
@@ -650,16 +655,4 @@ function node_views_wizard() {
     $plugins['node']['available_sorts']['node_counter-totalcount:DESC'] = t('Number of hits');
   }
 
-}
-
-/**
- * Implements hook_views_plugins_row_alter().
- *
- * Replaces the generic row plugin by a custom one for nodes.
- *
- * @see \Drupal\views\Plugin\views\row\EntityRow
- */
-function node_views_plugins_row_alter(array &$plugins) {
-  $plugins['entity:node']['class'] = 'Drupal\node\Plugin\views\row\NodeRow';
-  $plugins['entity:node']['provider'] = 'node';
 }

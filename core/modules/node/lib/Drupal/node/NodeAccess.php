@@ -92,7 +92,9 @@ class NodeAccess extends EntityAccess implements NodeAccessInterface, EntityCont
   protected function checkAccess(EntityInterface $node, $operation, $langcode, AccountInterface $account) {
     // Fetch information from the node object if possible.
     $status = $node->getTranslation($langcode)->isPublished();
-    $uid = $node->getTranslation($langcode)->getAuthorId();
+    /** @var \Drupal\node\NodeInterface $translation */
+    $translation = $node->getTranslation($langcode);
+    $uid = $translation->getOwnerId();
 
     // Check if authors can view their own unpublished nodes.
     if ($operation === 'view' && !$status && user_access('view own unpublished content', $account)) {
