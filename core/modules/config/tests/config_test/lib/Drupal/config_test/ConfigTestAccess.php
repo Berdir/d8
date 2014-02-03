@@ -8,7 +8,7 @@
 namespace Drupal\config_test;
 
 use Drupal\Core\Session\AccountInterface;
-use Drupal\Core\Entity\EntityAccess;
+use Drupal\Core\Entity\EntityAccessHandler;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
@@ -16,7 +16,7 @@ use Drupal\Core\Entity\EntityInterface;
  *
  * @see \Drupal\config_test\Entity\ConfigTest
  */
-class ConfigTestAccess extends EntityAccess {
+class ConfigTestAccess extends EntityAccessHandler {
 
   /**
    * {@inheritdoc}

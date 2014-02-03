@@ -7,7 +7,7 @@
 
 namespace Drupal\taxonomy;
 
-use Drupal\Core\Entity\EntityAccess;
+use Drupal\Core\Entity\EntityAccessHandler;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 
@@ -16,7 +16,7 @@ use Drupal\Core\Session\AccountInterface;
  *
  * @see \Drupal\taxonomy\Entity\Term
  */
-class TermAccess extends EntityAccess {
+class TermAccess extends EntityAccessHandler {
 
   /**
    * {@inheritdoc}

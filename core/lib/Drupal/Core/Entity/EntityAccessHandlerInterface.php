@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\Core\Entity\EntityAccessInterface.
+ * Contains \Drupal\Core\Entity\EntityAccessHandlerInterface.
  */
 
 namespace Drupal\Core\Entity;
@@ -16,12 +16,12 @@ use Drupal\Core\Session\AccountInterface;
 /**
  * Defines a common interface for entity access classes.
  */
-interface EntityAccessInterface {
+interface EntityAccessHandlerInterface {
 
   /**
    * Checks access to an operation on a given entity or entity translation.
    *
-   * Use \Drupal\Core\Entity\EntityAccessInterface::createAccess()
+   * Use \Drupal\Core\Entity\EntityAccessHandlerInterface::createAccess()
    * to check access to create an entity.
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity

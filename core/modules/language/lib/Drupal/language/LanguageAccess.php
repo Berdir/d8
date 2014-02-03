@@ -7,7 +7,7 @@
 
 namespace Drupal\language;
 
-use Drupal\Core\Entity\EntityAccess;
+use Drupal\Core\Entity\EntityAccessHandler;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 
@@ -16,7 +16,7 @@ use Drupal\Core\Session\AccountInterface;
  *
  * @see \Drupal\language\Entity\Language
  */
-class LanguageAccess extends EntityAccess {
+class LanguageAccess extends EntityAccessHandler {
 
   /**
    * {@inheritdoc}

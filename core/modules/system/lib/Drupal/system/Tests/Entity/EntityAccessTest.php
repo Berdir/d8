@@ -10,7 +10,7 @@ namespace Drupal\system\Tests\Entity;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Access\AccessibleInterface;
-use Drupal\Core\Entity\EntityAccess;
+use Drupal\Core\Entity\EntityAccessHandler;
 
 /**
  * Tests the entity access controller.
@@ -84,7 +84,7 @@ class EntityAccessTest extends EntityLanguageTestBase  {
     // Check that the default access controller is used for entities that don't
     // have a specific access controller defined.
     $controller = $this->container->get('entity.manager')->getAccess('entity_test_default_access');
-    $this->assertTrue($controller instanceof EntityAccess, 'The default entity controller is used for the entity_test_default_access entity type.');
+    $this->assertTrue($controller instanceof EntityAccessHandler, 'The default entity controller is used for the entity_test_default_access entity type.');
 
     $entity = entity_create('entity_test_default_access', array());
     $this->assertEntityAccess(array(

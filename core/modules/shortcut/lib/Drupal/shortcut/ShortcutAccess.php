@@ -7,7 +7,7 @@
 
 namespace Drupal\shortcut;
 
-use Drupal\Core\Entity\EntityAccess;
+use Drupal\Core\Entity\EntityAccessHandler;
 use Drupal\Core\Entity\EntityControllerInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Defines the access controller for the test entity type.
  */
-class ShortcutAccess extends EntityAccess implements EntityControllerInterface {
+class ShortcutAccess extends EntityAccessHandler implements EntityControllerInterface {
 
   /**
    * The shortcut_set storage controller.

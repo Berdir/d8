@@ -7,7 +7,7 @@
 
 namespace Drupal\views;
 
-use Drupal\Core\Entity\EntityAccess;
+use Drupal\Core\Entity\EntityAccessHandler;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Session\AccountInterface;
@@ -17,7 +17,7 @@ use Drupal\Core\Session\AccountInterface;
  *
  * @see \Drupal\views\Entity\View
  */
-class ViewAccess extends EntityAccess {
+class ViewAccess extends EntityAccessHandler {
 
   /**
    * {@inheritdoc}

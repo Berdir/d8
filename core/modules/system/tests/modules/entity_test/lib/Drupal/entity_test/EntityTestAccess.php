@@ -8,7 +8,7 @@
 namespace Drupal\entity_test;
 
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityAccess;
+use Drupal\Core\Entity\EntityAccessHandler;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Session\AccountInterface;
 
@@ -17,7 +17,7 @@ use Drupal\Core\Session\AccountInterface;
  *
  * @see \Drupal\entity_test\Entity\EntityTest
  */
-class EntityTestAccess extends EntityAccess {
+class EntityTestAccess extends EntityAccessHandler {
 
   /**
    * {@inheritdoc}

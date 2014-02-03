@@ -8,7 +8,7 @@
 namespace Drupal\shortcut;
 
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityAccess;
+use Drupal\Core\Entity\EntityAccessHandler;
 use Drupal\Core\Session\AccountInterface;
 
 /**
@@ -16,7 +16,7 @@ use Drupal\Core\Session\AccountInterface;
  *
  * @see \Drupal\shortcut\Entity\ShortcutSet
  */
-class ShortcutSetAccess extends EntityAccess {
+class ShortcutSetAccess extends EntityAccessHandler {
 
   /**
    * {@inheritdoc}

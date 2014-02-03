@@ -7,7 +7,7 @@
 
 namespace Drupal\block;
 
-use Drupal\Core\Entity\EntityAccess;
+use Drupal\Core\Entity\EntityAccessHandler;
 use Drupal\Core\Entity\EntityControllerInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @see \Drupal\block\Entity\Block
  */
-class BlockAccess extends EntityAccess implements EntityControllerInterface {
+class BlockAccess extends EntityAccessHandler implements EntityControllerInterface {
 
   /**
    * The node grant storage.

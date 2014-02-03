@@ -8,7 +8,7 @@
 namespace Drupal\user;
 
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityAccess;
+use Drupal\Core\Entity\EntityAccessHandler;
 use Drupal\Core\Session\AccountInterface;
 
 /**
@@ -16,7 +16,7 @@ use Drupal\Core\Session\AccountInterface;
  *
  * @see \Drupal\user\Entity\User
  */
-class UserAccess extends EntityAccess {
+class UserAccess extends EntityAccessHandler {
 
   /**
    * {@inheritdoc}
@@ -45,7 +45,7 @@ class UserAccess extends EntityAccess {
   /**
    * Check view access.
    *
-   * See EntityAccessInterface::view() for parameters.
+   * See EntityAccessHandlerInterface::view() for parameters.
    */
   protected function viewAccess(EntityInterface $entity, $langcode, AccountInterface $account) {
     // Never allow access to view the anonymous user account.

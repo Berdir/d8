@@ -198,8 +198,8 @@ interface EntityTypeInterface {
    *   - render: The name of the class that is used to render the entities. The
    *     class must implement \Drupal\Core\Entity\EntityViewBuilderInterface.
    *   - access: The name of the class that is used for access checks. The class
-   *     must implement \Drupal\Core\Entity\EntityAccessInterface.
-   *     Defaults to \Drupal\Core\Entity\EntityAccess.
+   *     must implement \Drupal\Core\Entity\EntityAccessHandlerInterface.
+   *     Defaults to \Drupal\Core\Entity\EntityAccessHandler.
    */
   public function getControllerClasses();
 
@@ -348,7 +348,7 @@ interface EntityTypeInterface {
   /**
    * Returns the name of the default administrative permission.
    *
-   * The default \Drupal\Core\Entity\EntityAccess class checks this
+   * The default \Drupal\Core\Entity\EntityAccessHandler class checks this
    * permission for all operations in its checkAccess() method. Entities with
    * more complex permissions can extend this class to do their own access
    * checks.

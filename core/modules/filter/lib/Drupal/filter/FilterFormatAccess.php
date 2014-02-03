@@ -7,7 +7,7 @@
 
 namespace Drupal\filter;
 
-use Drupal\Core\Entity\EntityAccess;
+use Drupal\Core\Entity\EntityAccessHandler;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 
@@ -16,7 +16,7 @@ use Drupal\Core\Session\AccountInterface;
  *
  * @see \Drupal\filter\Entity\FilterFormat
  */
-class FilterFormatAccess extends EntityAccess {
+class FilterFormatAccess extends EntityAccessHandler {
 
   /**
    * {@inheritdoc}

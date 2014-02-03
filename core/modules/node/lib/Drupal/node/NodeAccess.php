@@ -12,7 +12,7 @@ use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Entity\EntityControllerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Language\Language;
-use Drupal\Core\Entity\EntityAccess;
+use Drupal\Core\Entity\EntityAccessHandler;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Session\AccountInterface;
@@ -24,7 +24,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @see \Drupal\node\Entity\Node
  */
-class NodeAccess extends EntityAccess implements NodeAccessInterface, EntityControllerInterface {
+class NodeAccess extends EntityAccessHandler implements NodeAccessInterface, EntityControllerInterface {
 
   /**
    * The node grant storage.

@@ -710,7 +710,7 @@ function hook_entity_operation_alter(array &$operations, \Drupal\Core\Entity\Ent
  * Control access to fields.
  *
  * This hook is invoked from
- * \Drupal\Core\Entity\EntityAccess::fieldAccess() to let modules
+ * \Drupal\Core\Entity\EntityAccessHandler::fieldAccess() to let modules
  * grant or deny operations on fields.
  *
  * @param string $operation

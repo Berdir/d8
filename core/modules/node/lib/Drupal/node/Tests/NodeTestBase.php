@@ -25,7 +25,7 @@ abstract class NodeTestBase extends WebTestBase {
   /**
    * The node access.
    *
-   * @var \Drupal\Core\Entity\EntityAccessInterface
+   * @var \Drupal\Core\Entity\EntityAccessHandlerInterface
    */
   protected $access;
 

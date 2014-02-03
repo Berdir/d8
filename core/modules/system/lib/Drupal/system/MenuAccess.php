@@ -8,7 +8,7 @@
 namespace Drupal\system;
 
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityAccess;
+use Drupal\Core\Entity\EntityAccessHandler;
 use Drupal\Core\Session\AccountInterface;
 
 /**
@@ -16,7 +16,7 @@ use Drupal\Core\Session\AccountInterface;
  *
  * @see \Drupal\system\Entity\Menu
  */
-class MenuAccess extends EntityAccess {
+class MenuAccess extends EntityAccessHandler {
 
   /**
    * {@inheritdoc}
