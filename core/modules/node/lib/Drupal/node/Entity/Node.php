@@ -63,13 +63,6 @@ use Drupal\user\UserInterface;
 class Node extends ContentEntityBase implements NodeInterface {
 
   /**
-   * Implements Drupal\Core\Entity\EntityInterface::id().
-   */
-  public function id() {
-    return $this->get('nid')->value;
-  }
-
-  /**
    * Overrides Drupal\Core\Entity\Entity::getRevisionId().
    */
   public function getRevisionId() {

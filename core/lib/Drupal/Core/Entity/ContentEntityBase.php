@@ -35,13 +35,6 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
   const TRANSLATION_CREATED = 2;
 
   /**
-   * Local cache holding the value of the bundle field.
-   *
-   * @var string
-   */
-  protected $bundle;
-
-  /**
    * The plain data values of the contained fields.
    *
    * This always holds the original, unchanged values of the entity. The values
@@ -129,11 +122,18 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
   protected $isDefaultRevision = TRUE;
 
   /**
+   * Holds entity keys like the ID, bundle and revision ID.
+   *
+   * @var array
+   */
+  protected $entityKeysCache = array();
+
+  /**
    * Overrides Entity::__construct().
    */
   public function __construct(array $values, $entity_type, $bundle = FALSE, $translations = array()) {
     $this->entityTypeId = $entity_type;
-    $this->bundle = $bundle ? $bundle : $this->entityTypeId;
+    $this->entityKeysCache['bundle'] = $bundle ? $bundle : $this->entityTypeId;
     $this->languages = language_list(Language::STATE_ALL);
 
     foreach ($values as $key => $value) {
@@ -190,7 +190,7 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
    * {@inheritdoc}
    */
   public function getRevisionId() {
-    return NULL;
+    return $this->getFromEntityKeyCache('revision');
   }
 
   /**
@@ -353,21 +353,21 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
    * {@inheritdoc}
    */
   public function id() {
-    return $this->id->value;
+    return $this->getFromEntityKeyCache('id');
   }
 
   /**
    * {@inheritdoc}
    */
   public function bundle() {
-    return $this->bundle;
+    return $this->getFromEntityKeyCache('bundle');
   }
 
   /**
-   * Overrides Entity::uuid().
+   * {inheritdoc}
    */
   public function uuid() {
-    return $this->get('uuid')->value;
+    return $this->getFromEntityKeyCache('uuid');
   }
 
   /**
@@ -485,7 +485,7 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
    */
   public function getPropertyDefinitions() {
     if (!isset($this->fieldDefinitions)) {
-      $bundle = $this->bundle != $this->entityTypeId ? $this->bundle : NULL;
+      $bundle = $this->bundle() != $this->entityTypeId ? $this->bundle() : NULL;
       $this->fieldDefinitions = \Drupal::entityManager()->getFieldDefinitions($this->entityTypeId, $bundle);
     }
     return $this->fieldDefinitions;
@@ -602,6 +602,9 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
       }
       $this->updateFieldLangcodes($this->defaultLangcode);
     }
+    if (isset($this->entityKeysCache[$name])) {
+      unset($this->entityKeysCache[$name]);
+    }
   }
 
   /**
@@ -717,7 +720,7 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
     // Instantiate a new empty entity so default values will be populated in the
     // specified language.
     $info = $this->getEntityType();
-    $default_values = array($info->getKey('bundle') => $this->bundle, 'langcode' => $langcode);
+    $default_values = array($info->getKey('bundle') => $this->bundle(), 'langcode' => $langcode);
     $entity = \Drupal::entityManager()
       ->getStorageController($this->getEntityTypeId())
       ->create($default_values);
@@ -985,6 +988,30 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
     }
 
     return $referenced_entities;
+  }
+
+  /**
+   * Returns the value of the given entity key, if defined.
+   *
+   * @param $key
+   *   Name of the entity key, for example id, revision or bundle.
+   *
+   * @return mixed
+   *   The value of the entity key, NULL if not defined.
+   */
+  protected function getFromEntityKeyCache($key) {
+    if (!isset($this->entityKeysCache[$key]) || !array_key_exists($key, $this->entityKeysCache)) {
+      if ($this->getEntityType()->hasKey($key)) {
+        $field_item = $this->get($this->getEntityType()->getKey($key))->first();
+        $property = $field_item->getMainPropertyName();
+        $this->entityKeysCache[$key] = $field_item->$property;
+      }
+      else {
+        $this->entityKeysCache[$key] = NULL;
+      }
+
+    }
+    return $this->entityKeysCache[$key];
   }
 
 }

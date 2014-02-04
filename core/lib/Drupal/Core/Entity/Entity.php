@@ -16,6 +16,13 @@ use Drupal\Core\Session\AccountInterface;
 abstract class Entity implements EntityInterface {
 
   /**
+   * Local cache holding the value of the ID key name from annotation.
+   *
+   * @var string
+   */
+  protected $idKeyName;
+
+  /**
    * The language code of the entity's default language.
    *
    * @var string
@@ -64,7 +71,10 @@ abstract class Entity implements EntityInterface {
    * {@inheritdoc}
    */
   public function id() {
-    return isset($this->id) ? $this->id : NULL;
+    if (!isset($this->idKeyName)) {
+      $this->idKeyName = $this->getEntityType()->getKey('id');
+    }
+    return isset($this->{$this->idKeyName}) ? $this->{$this->idKeyName} : NULL;
   }
 
   /**

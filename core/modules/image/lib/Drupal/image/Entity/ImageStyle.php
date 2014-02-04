@@ -90,13 +90,6 @@ class ImageStyle extends ConfigEntityBase implements ImageStyleInterface {
   protected $effectsBag;
 
   /**
-   * Overrides Drupal\Core\Entity\Entity::id().
-   */
-  public function id() {
-    return $this->name;
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function postSave(EntityStorageControllerInterface $storage_controller, $update = TRUE) {

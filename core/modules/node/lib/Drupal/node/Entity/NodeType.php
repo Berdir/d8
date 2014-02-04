@@ -137,13 +137,6 @@ class NodeType extends ConfigEntityBase implements NodeTypeInterface {
   /**
    * {@inheritdoc}
    */
-  public function id() {
-    return $this->type;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getModuleSettings($module) {
     if (isset($this->settings[$module]) && is_array($this->settings[$module])) {
       return $this->settings[$module];

@@ -96,13 +96,6 @@ class Vocabulary extends ConfigEntityBase implements VocabularyInterface {
   /**
    * {@inheritdoc}
    */
-  public function id() {
-    return $this->vid;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function postSave(EntityStorageControllerInterface $storage_controller, $update = TRUE) {
     parent::postSave($storage_controller, $update);
 

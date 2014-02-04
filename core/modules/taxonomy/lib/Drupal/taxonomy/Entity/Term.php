@@ -120,13 +120,6 @@ class Term extends ContentEntityBase implements TermInterface {
   public $parent;
 
   /**
-   * Implements Drupal\Core\Entity\EntityInterface::id().
-   */
-  public function id() {
-    return $this->get('tid')->value;
-  }
-
-  /**
    * {@inheritdoc}
    */
   protected function init() {

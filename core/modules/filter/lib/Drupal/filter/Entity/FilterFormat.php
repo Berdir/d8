@@ -136,13 +136,6 @@ class FilterFormat extends ConfigEntityBase implements FilterFormatInterface {
   /**
    * {@inheritdoc}
    */
-  public function id() {
-    return $this->format;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function filters($instance_id = NULL) {
     if (!isset($this->filterBag)) {
       $this->filterBag = new FilterBag(\Drupal::service('plugin.manager.filter'), $this->filters);

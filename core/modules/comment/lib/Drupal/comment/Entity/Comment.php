@@ -209,13 +209,6 @@ class Comment extends ContentEntityBase implements CommentInterface {
   }
 
   /**
-   * Implements Drupal\Core\Entity\EntityInterface::id().
-   */
-  public function id() {
-    return $this->get('cid')->value;
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function preSave(EntityStorageControllerInterface $storage_controller) {
