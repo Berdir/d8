@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\comment\CommentAccessHandler
+ * Contains \Drupal\comment\CommentAccessHandler.
  */
 
 namespace Drupal\comment;
