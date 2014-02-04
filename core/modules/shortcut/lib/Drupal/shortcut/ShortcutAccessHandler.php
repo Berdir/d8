@@ -15,7 +15,9 @@ use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Defines the access controller for the test entity type.
+ * Defines the access handler for the shortcut entity type.
+ *
+ * @see \Drupal\shortcut\Entity\Shortcut
  */
 class ShortcutAccessHandler extends EntityAccessHandler implements EntityControllerInterface {
 

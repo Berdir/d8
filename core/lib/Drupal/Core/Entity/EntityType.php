@@ -296,7 +296,7 @@ class EntityType implements EntityTypeInterface {
    */
   public function getControllerClasses() {
     return $this->controllers + array(
-      'access' => 'Drupal\Core\Entity\EntityAccess',
+      'access' => 'Drupal\Core\Entity\EntityAccessHandler',
     );
   }
 

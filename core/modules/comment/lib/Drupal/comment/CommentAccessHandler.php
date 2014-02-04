@@ -12,7 +12,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Defines the access class for the comment entity type.
+ * Defines the access handler for the comment entity type.
  *
  * @see \Drupal\comment\Entity\Comment
  */

@@ -12,7 +12,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Defines the access class for the contact category entity type.
+ * Defines the access handler for the contact category entity type.
  *
  * @see \Drupal\contact\Entity\Category
  */

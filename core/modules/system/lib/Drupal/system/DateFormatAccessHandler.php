@@ -12,7 +12,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Defines the access class for the date format entity type.
+ * Defines the access handler for the date format entity type.
  *
  * @see \Drupal\system\Entity\DateFormat
  */

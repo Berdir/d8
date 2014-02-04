@@ -20,7 +20,7 @@ use Drupal\user\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Defines the access class for the node entity type.
+ * Defines the access handler for the node entity type.
  *
  * @see \Drupal\node\Entity\Node
  */

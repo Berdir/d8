@@ -12,7 +12,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Defines the access class for the user_role entity type.
+ * Defines the access handler for the user role entity type.
  *
  * @see \Drupal\user\Entity\Role
  */

@@ -12,7 +12,7 @@ use Drupal\Core\Entity\EntityAccessHandler;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Defines the access class for the shortcut entity type.
+ * Defines the access handler for the shortcut set entity type.
  *
  * @see \Drupal\shortcut\Entity\ShortcutSet
  */

@@ -13,7 +13,9 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Defines the access controller for the search page entity type.
+ * Defines the access handler for the search page entity type.
+ *
+ * @see \Drupal\search\Entity\SearchPage
  */
 class SearchPageAccessHandler extends EntityAccessHandler {
 

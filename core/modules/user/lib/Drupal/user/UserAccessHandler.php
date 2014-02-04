@@ -12,7 +12,7 @@ use Drupal\Core\Entity\EntityAccessHandler;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Defines the access class for the user entity type.
+ * Defines the access handler for the user entity type.
  *
  * @see \Drupal\user\Entity\User
  */

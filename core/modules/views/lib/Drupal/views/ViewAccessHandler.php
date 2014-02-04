@@ -13,7 +13,7 @@ use Drupal\Core\Language\Language;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Defines the access class for the view entity type.
+ * Defines the access handler for the view entity type.
  *
  * @see \Drupal\views\Entity\View
  */

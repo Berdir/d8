@@ -12,7 +12,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Defines the access class for the node type entity.
+ * Defines the access handler for the node type entity type.
  *
  * @see \Drupal\node\Entity\NodeType.
  */

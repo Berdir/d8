@@ -12,7 +12,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Defines the access class for the filter format entity type.
+ * Defines the access handler for the filter format entity type.
  *
  * @see \Drupal\filter\Entity\FilterFormat
  */

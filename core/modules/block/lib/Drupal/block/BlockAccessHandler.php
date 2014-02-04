@@ -17,7 +17,7 @@ use Drupal\Component\Utility\Unicode;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Defines the access class for the block entity type.
+ * Defines the access handler for the block entity type.
  *
  * @see \Drupal\block\Entity\Block
  */

@@ -12,7 +12,7 @@ use Drupal\Core\Entity\EntityAccessHandler;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Defines the access class for the menu entity type.
+ * Defines the access handler for the menu entity type.
  *
  * @see \Drupal\system\Entity\Menu
  */

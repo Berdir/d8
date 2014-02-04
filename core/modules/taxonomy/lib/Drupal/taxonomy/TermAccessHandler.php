@@ -12,7 +12,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Defines the access class for the taxonomy term entity.
+ * Defines the access handler for the taxonomy term entity type.
  *
  * @see \Drupal\taxonomy\Entity\Term
  */

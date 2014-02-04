@@ -12,7 +12,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Defines the access class for the language entity type.
+ * Defines the access handler for the language entity type.
  *
  * @see \Drupal\language\Entity\Language
  */

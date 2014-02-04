@@ -13,7 +13,7 @@ use Drupal\Core\Language\Language;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Defines the access class for the test entity type.
+ * Defines the access handler for the test entity type.
  *
  * @see \Drupal\entity_test\Entity\EntityTest
  */
