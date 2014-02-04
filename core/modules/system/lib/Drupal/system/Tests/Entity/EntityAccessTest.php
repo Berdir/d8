@@ -83,7 +83,7 @@ class EntityAccessTest extends EntityLanguageTestBase  {
 
     // Check that the default access controller is used for entities that don't
     // have a specific access controller defined.
-    $controller = $this->container->get('entity.manager')->getAccess('entity_test_default_access');
+    $controller = $this->container->get('entity.manager')->getAccessHandler('entity_test_default_access');
     $this->assertTrue($controller instanceof EntityAccessHandler, 'The default entity controller is used for the entity_test_default_access entity type.');
 
     $entity = entity_create('entity_test_default_access', array());
