@@ -1280,7 +1280,7 @@ function comment_get_display_page($cid, $instance) {
  */
 function comment_preview(CommentInterface $comment, array &$form_state) {
   $preview_build = array();
-  $entity = entity_load($comment->getCommentedEntityType(), $comment->getCommentedEntityId());
+  $entity = $comment->getCommentedEntity();
 
   if (!form_get_errors($form_state)) {
     // Attach the user and time information.
