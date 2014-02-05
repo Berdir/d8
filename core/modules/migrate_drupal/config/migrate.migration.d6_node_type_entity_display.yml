@@ -16,4 +16,4 @@ process:
 
   bundle: type
 destination:
-  plugin: entity:entity_display
+  plugin: entity:display
