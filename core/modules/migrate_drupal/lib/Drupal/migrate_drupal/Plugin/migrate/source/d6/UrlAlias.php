@@ -30,10 +30,10 @@ class UrlAlias extends Drupal6SqlBase {
    */
   public function fields() {
     return array(
-      'pid' => t('The numeric identifier of the path alias.'),
-      'src' => t('The internal path.'),
-      'dst' => t('The user set path alias.'),
-      'language' => t('The language code of the url alias.'),
+      'pid' => $this->t('The numeric identifier of the path alias.'),
+      'src' => $this->t('The internal path.'),
+      'dst' => $this->t('The user set path alias.'),
+      'language' => $this->t('The language code of the url alias.'),
     );
   }
 

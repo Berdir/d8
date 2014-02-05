@@ -53,17 +53,17 @@ class FieldInstance extends Drupal6SqlBase implements RequirementsInterface {
    */
   public function fields() {
     return array(
-      'field_name' => t('The machine name of field.'),
-      'type_name' => t('Content type where is used this field.'),
-      'weight' => t('Weight.'),
-      'label' => t('A name to show.'),
-      'widget_type' => t('Widget type.'),
-      'widget_settings' => t('Serialize data with widget settings.'),
-      'display_settings' => t('Serialize data with display settings.'),
-      'description' => t('A description of field.'),
-      'widget_module' => t('Module that implements widget.'),
-      'widget_active' => t('Status of widget'),
-      'module' => t('The module that provides the field.'),
+      'field_name' => $this->t('The machine name of field.'),
+      'type_name' => $this->t('Content type where is used this field.'),
+      'weight' => $this->t('Weight.'),
+      'label' => $this->t('A name to show.'),
+      'widget_type' => $this->t('Widget type.'),
+      'widget_settings' => $this->t('Serialize data with widget settings.'),
+      'display_settings' => $this->t('Serialize data with display settings.'),
+      'description' => $this->t('A description of field.'),
+      'widget_module' => $this->t('Module that implements widget.'),
+      'widget_active' => $this->t('Status of widget'),
+      'module' => $this->t('The module that provides the field.'),
     );
   }
 

@@ -36,11 +36,11 @@ class Action extends Drupal6SqlBase {
    */
   public function fields() {
     return array(
-      'aid' => t('Action ID'),
-      'type' => t('Module'),
-      'callback' => t('Callback function'),
-      'parameters' => t('Action configuration'),
-      'description' => t('Action description'),
+      'aid' => $this->t('Action ID'),
+      'type' => $this->t('Module'),
+      'callback' => $this->t('Callback function'),
+      'parameters' => $this->t('Action configuration'),
+      'description' => $this->t('Action description'),
     );
   }
 

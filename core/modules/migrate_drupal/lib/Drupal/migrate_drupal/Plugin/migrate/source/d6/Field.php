@@ -49,16 +49,16 @@ class Field extends Drupal6SqlBase implements RequirementsInterface {
    */
   public function fields() {
     return array(
-      'field_name' => t('Field name'),
-      'type' => t('Type (text, integer, ....)'),
-      'global_settings' => t('Global settings. Shared with every field instance.'),
-      'required' => t('Required'),
-      'multiple' => t('Multiple'),
-      'db_storage' => t('DB storage'),
-      'module' => t('Module'),
-      'db_columns' => t('DB Columns'),
-      'active' => t('Active'),
-      'locked' => t('Locked'),
+      'field_name' => $this->t('Field name'),
+      'type' => $this->t('Type (text, integer, ....)'),
+      'global_settings' => $this->t('Global settings. Shared with every field instance.'),
+      'required' => $this->t('Required'),
+      'multiple' => $this->t('Multiple'),
+      'db_storage' => $this->t('DB storage'),
+      'module' => $this->t('Module'),
+      'db_columns' => $this->t('DB Columns'),
+      'active' => $this->t('Active'),
+      'locked' => $this->t('Locked'),
     );
   }
 

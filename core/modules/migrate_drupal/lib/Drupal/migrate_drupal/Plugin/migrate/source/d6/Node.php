@@ -222,22 +222,22 @@ class Node extends Drupal6SqlBase implements SourceEntityInterface {
    */
   public function fields() {
     $fields = array(
-      'nid' => t('Node ID'),
-      'type' => t('Type'),
-      'title' => t('Title'),
-      'body' => t('Body'),
-      'format' => t('Format'),
-      'teaser' => t('Teaser'),
-      'uid' => t('Authored by (uid)'),
-      'created' => t('Created timestamp'),
-      'changed' => t('Modified timestamp'),
-      'status' => t('Published'),
-      'promote' => t('Promoted to front page'),
-      'sticky' => t('Sticky at top of lists'),
-      'revision' => t('Create new revision'),
-      'log' => t('Revision Log message'),
-      'language' => t('Language (fr, en, ...)'),
-      'tnid' => t('The translation set id for this node'),
+      'nid' => $this->t('Node ID'),
+      'type' => $this->t('Type'),
+      'title' => $this->t('Title'),
+      'body' => $this->t('Body'),
+      'format' => $this->t('Format'),
+      'teaser' => $this->t('Teaser'),
+      'uid' => $this->t('Authored by (uid)'),
+      'created' => $this->t('Created timestamp'),
+      'changed' => $this->t('Modified timestamp'),
+      'status' => $this->t('Published'),
+      'promote' => $this->t('Promoted to front page'),
+      'sticky' => $this->t('Sticky at top of lists'),
+      'revision' => $this->t('Create new revision'),
+      'log' => $this->t('Revision Log message'),
+      'language' => $this->t('Language (fr, en, ...)'),
+      'tnid' => $this->t('The translation set id for this node'),
     );
     foreach ($this->getSourceFieldInfo($this->configuration['bundle']) as $field_name => $field_data) {
       $fields[$field_name] = $field_data['label'];

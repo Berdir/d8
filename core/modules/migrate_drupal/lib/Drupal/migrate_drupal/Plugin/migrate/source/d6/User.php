@@ -104,32 +104,32 @@ class User extends Drupal6SqlBase implements SourceEntityInterface {
    */
   protected function baseFields() {
     $fields = array(
-      'uid' => t('User ID'),
-      'name' => t('Username'),
-      'pass' => t('Password'),
-      'mail' => t('Email address'),
-      'signature' => t('Signature'),
-      'signature_format' => t('Signature format'),
-      'created' => t('Registered timestamp'),
-      'access' => t('Last access timestamp'),
-      'login' => t('Last login timestamp'),
-      'status' => t('Status'),
-      'timezone' => t('Timezone'),
-      'language' => t('Language'),
-      'picture' => t('Picture'),
-      'init' => t('Init'),
+      'uid' => $this->t('User ID'),
+      'name' => $this->t('Username'),
+      'pass' => $this->t('Password'),
+      'mail' => $this->t('Email address'),
+      'signature' => $this->t('Signature'),
+      'signature_format' => $this->t('Signature format'),
+      'created' => $this->t('Registered timestamp'),
+      'access' => $this->t('Last access timestamp'),
+      'login' => $this->t('Last login timestamp'),
+      'status' => $this->t('Status'),
+      'timezone' => $this->t('Timezone'),
+      'language' => $this->t('Language'),
+      'picture' => $this->t('Picture'),
+      'init' => $this->t('Init'),
     );
 
     // Possible field added by Date contributed module.
     // @see https://api.drupal.org/api/drupal/modules%21user%21user.install/function/user_update_7002/7
     if ($this->getDatabase()->schema()->fieldExists('users', 'timezone_name')) {
-      $fields['timezone_name'] = t('Timezone (Date)');
+      $fields['timezone_name'] = $this->t('Timezone (Date)');
     }
 
     // Possible field added by Event contributed module.
     // @see https://api.drupal.org/api/drupal/modules%21user%21user.install/function/user_update_7002/7
     if ($this->getDatabase()->schema()->fieldExists('users', 'timezone_id')) {
-      $fields['timezone_id'] = t('Timezone (Event)');
+      $fields['timezone_id'] = $this->t('Timezone (Event)');
     }
 
     return $fields;

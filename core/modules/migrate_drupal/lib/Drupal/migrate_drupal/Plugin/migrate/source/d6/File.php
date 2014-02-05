@@ -33,13 +33,13 @@ class File extends Drupal6SqlBase {
    */
   public function fields() {
     return array(
-      'fid' => t('File ID'),
-      'uid' => t('The {users}.uid who added the file. If set to 0, this file was added by an anonymous user.'),
-      'filename' => t('File name'),
-      'filepath' => t('File path'),
-      'filemime' => t('File Mime Type'),
-      'status' => t('The published status of a file.'),
-      'timestamp' => t('The time that the file was added.'),
+      'fid' => $this->t('File ID'),
+      'uid' => $this->t('The {users}.uid who added the file. If set to 0, this file was added by an anonymous user.'),
+      'filename' => $this->t('File name'),
+      'filepath' => $this->t('File path'),
+      'filemime' => $this->t('File Mime Type'),
+      'status' => $this->t('The published status of a file.'),
+      'timestamp' => $this->t('The time that the file was added.'),
     );
   }
   /**

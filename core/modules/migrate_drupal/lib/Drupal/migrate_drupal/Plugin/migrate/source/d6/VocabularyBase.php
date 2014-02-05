@@ -42,18 +42,18 @@ abstract class VocabularyBase extends Drupal6SqlBase implements RequirementsInte
    */
   public function fields() {
     return array(
-      'vid' => t('The vocabulary ID.'),
-      'name' => t('The name of the vocabulary.'),
-      'description' => t('The description of the vocabulary.'),
-      'help' => t('Help text to display for the vocabulary.'),
-      'relations' => t('Whether or not related terms are enabled within the vocabulary. (0 = disabled, 1 = enabled)'),
-      'hierarchy' => t('The type of hierarchy allowed within the vocabulary. (0 = disabled, 1 = single, 2 = multiple)'),
-      'multiple' => t('Whether or not multiple terms from this vocabulary may be assigned to a node. (0 = disabled, 1 = enabled)'),
-      'required' => t('Whether or not terms are required for nodes using this vocabulary. (0 = disabled, 1 = enabled)'),
-      'tags' => t('Whether or not free tagging is enabled for the vocabulary. (0 = disabled, 1 = enabled)'),
-      'weight' => t('The weight of the vocabulary in relation to other vocabularies.'),
-      'parents' => t("The Drupal term IDs of the term's parents."),
-      'node_types' => t('The names of the node types the vocabulary may be used with.'),
+      'vid' => $this->t('The vocabulary ID.'),
+      'name' => $this->t('The name of the vocabulary.'),
+      'description' => $this->t('The description of the vocabulary.'),
+      'help' => $this->t('Help text to display for the vocabulary.'),
+      'relations' => $this->t('Whether or not related terms are enabled within the vocabulary. (0 = disabled, 1 = enabled)'),
+      'hierarchy' => $this->t('The type of hierarchy allowed within the vocabulary. (0 = disabled, 1 = single, 2 = multiple)'),
+      'multiple' => $this->t('Whether or not multiple terms from this vocabulary may be assigned to a node. (0 = disabled, 1 = enabled)'),
+      'required' => $this->t('Whether or not terms are required for nodes using this vocabulary. (0 = disabled, 1 = enabled)'),
+      'tags' => $this->t('Whether or not free tagging is enabled for the vocabulary. (0 = disabled, 1 = enabled)'),
+      'weight' => $this->t('The weight of the vocabulary in relation to other vocabularies.'),
+      'parents' => $this->t("The Drupal term IDs of the term's parents."),
+      'node_types' => $this->t('The names of the node types the vocabulary may be used with.'),
     );
   }
 

@@ -39,8 +39,8 @@ class Role extends Drupal6SqlBase {
    */
   public function fields() {
     return array(
-      'rid' => t('Role ID.'),
-      'name' => t('The name of the user role.'),
+      'rid' => $this->t('Role ID.'),
+      'name' => $this->t('The name of the user role.'),
     );
   }
 

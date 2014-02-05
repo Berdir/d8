@@ -55,7 +55,7 @@ class ViewMode extends ViewModeBase {
    */
   public function fields() {
     return array(
-      'display_settings' => t('Serialize data with display settings.'),
+      'display_settings' => $this->t('Serialize data with display settings.'),
     );
   }
 

@@ -32,17 +32,17 @@ class Block extends Drupal6SqlBase {
    */
   public function fields() {
     return array(
-      'bid' => t('The block numeric identifier.'),
-      'module' => t('The module providing the block.'),
-      'delta' => t('The block\'s delta.'),
-      'theme' => t('Which theme the block is placed in.'),
-      'status' => t('Whether or not the block is enabled.'),
-      'weight' => t('Weight of the block for ordering within regions.'),
-      'region' => t('Region the block is placed in.'),
-      'visibility' => t('Visibility expression.'),
-      'pages' => t('Pages list.'),
-      'title' => t('Block title.'),
-      'cache' => t('Cache rule.'),
+      'bid' => $this->t('The block numeric identifier.'),
+      'module' => $this->t('The module providing the block.'),
+      'delta' => $this->t('The block\'s delta.'),
+      'theme' => $this->t('Which theme the block is placed in.'),
+      'status' => $this->t('Whether or not the block is enabled.'),
+      'weight' => $this->t('Weight of the block for ordering within regions.'),
+      'region' => $this->t('Region the block is placed in.'),
+      'visibility' => $this->t('Visibility expression.'),
+      'pages' => $this->t('Pages list.'),
+      'title' => $this->t('Block title.'),
+      'cache' => $this->t('Cache rule.'),
 
     );
   }

@@ -40,12 +40,12 @@ class ContactCategory extends Drupal6SqlBase implements RequirementsInterface {
    */
   public function fields() {
     return array(
-      'cid' => t('Primary Key: Unique category ID.'),
-      'category' => t('Category name.'),
-      'recipients' => t('Comma-separated list of recipient e-mail addresses.'),
-      'reply' => t('Text of the auto-reply message.'),
-      'weight' => t("The category's weight."),
-      'selected' => t('Flag to indicate whether or not category is selected by default. (1 = Yes, 0 = No)'),
+      'cid' => $this->t('Primary Key: Unique category ID.'),
+      'category' => $this->t('Category name.'),
+      'recipients' => $this->t('Comma-separated list of recipient e-mail addresses.'),
+      'reply' => $this->t('Text of the auto-reply message.'),
+      'weight' => $this->t("The category's weight."),
+      'selected' => $this->t('Flag to indicate whether or not category is selected by default. (1 = Yes, 0 = No)'),
     );
   }
 

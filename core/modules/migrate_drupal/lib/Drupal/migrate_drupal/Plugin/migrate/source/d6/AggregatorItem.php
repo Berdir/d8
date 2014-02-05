@@ -33,14 +33,14 @@ class AggregatorItem extends Drupal6SqlBase implements RequirementsInterface {
    */
   public function fields() {
     return array(
-      'iid' => t('Primary Key: Unique ID for feed item.'),
-      'fid' => t('The {aggregator_feed}.fid to which this item belongs.'),
-      'title' => t('Title of the feed item.'),
-      'link' => t('Link to the feed item.'),
-      'author' => t('Author of the feed item.'),
-      'description' => t('Body of the feed item.'),
-      'timestamp' => t('Post date of feed item, as a Unix timestamp.'),
-      'guid' => t('Unique identifier for the feed item.'),
+      'iid' => $this->t('Primary Key: Unique ID for feed item.'),
+      'fid' => $this->t('The {aggregator_feed}.fid to which this item belongs.'),
+      'title' => $this->t('Title of the feed item.'),
+      'link' => $this->t('Link to the feed item.'),
+      'author' => $this->t('Author of the feed item.'),
+      'description' => $this->t('Body of the feed item.'),
+      'timestamp' => $this->t('Post date of feed item, as a Unix timestamp.'),
+      'guid' => $this->t('Unique identifier for the feed item.'),
     );
   }
 

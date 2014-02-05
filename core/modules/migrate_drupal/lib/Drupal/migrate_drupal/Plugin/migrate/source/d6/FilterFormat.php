@@ -32,10 +32,10 @@ class FilterFormat extends Drupal6SqlBase {
    */
   public function fields() {
     return array(
-      'format' => t('Format ID.'),
-      'name' => t('The name of the filter format.'),
-      'roles' => t('The user roles that can use the format.'),
-      'cache' => t('Flag to indicate whether format is cachable. (1 = cachable, 0 = not cachable).'),
+      'format' => $this->t('Format ID.'),
+      'name' => $this->t('The name of the filter format.'),
+      'roles' => $this->t('The user roles that can use the format.'),
+      'cache' => $this->t('Flag to indicate whether format is cachable. (1 = cachable, 0 = not cachable).'),
     );
   }
 

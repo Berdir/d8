@@ -43,17 +43,17 @@ class AggregatorFeed extends Drupal6SqlBase implements RequirementsInterface {
    */
   public function fields() {
     return array(
-      'fid' => t('The feed ID.'),
-      'title' => t('Title of the feed.'),
-      'url' => t('URL to the feed.'),
-      'refresh' => t('Refresh frequency in seconds.'),
-      'checked' => t('Last-checked unix timestamp.'),
-      'link' => t('Parent website of feed.'),
-      'description' => t('Parent website\'s description fo the feed.'),
-      'image' => t('An image representing the feed.'),
-      'etag' => t('Entity tage HTTP response header.'),
-      'modified' => t('When the feed was last modified.'),
-      'block' => t("Number of items to display in the feed's block."),
+      'fid' => $this->t('The feed ID.'),
+      'title' => $this->t('Title of the feed.'),
+      'url' => $this->t('URL to the feed.'),
+      'refresh' => $this->t('Refresh frequency in seconds.'),
+      'checked' => $this->t('Last-checked unix timestamp.'),
+      'link' => $this->t('Parent website of feed.'),
+      'description' => $this->t('Parent website\'s description fo the feed.'),
+      'image' => $this->t('An image representing the feed.'),
+      'etag' => $this->t('Entity tage HTTP response header.'),
+      'modified' => $this->t('When the feed was last modified.'),
+      'block' => $this->t("Number of items to display in the feed's block."),
     );
   }
 

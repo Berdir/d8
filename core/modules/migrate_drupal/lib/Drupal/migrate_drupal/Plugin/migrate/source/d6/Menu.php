@@ -31,9 +31,9 @@ class Menu extends Drupal6SqlBase implements RequirementsInterface {
    */
   public function fields() {
     return array(
-      'menu_name' => t('The menu name. Primary key.'),
-      'title' => t('The human-readable name of the menu.'),
-      'description' => t('A description of the menu'),
+      'menu_name' => $this->t('The menu name. Primary key.'),
+      'title' => $this->t('The human-readable name of the menu.'),
+      'description' => $this->t('A description of the menu'),
     );
   }
 

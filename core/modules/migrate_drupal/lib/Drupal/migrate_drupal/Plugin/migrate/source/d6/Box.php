@@ -30,10 +30,10 @@ class Box extends Drupal6SqlBase {
    */
   public function fields() {
     return array(
-      'bid' => t('The numeric identifier of the block/box'),
-      'body' => t('The block/box content'),
-      'info' => t('Admin title of the block/box.'),
-      'format' => t('Input format of the custom block/box content.'),
+      'bid' => $this->t('The numeric identifier of the block/box'),
+      'body' => $this->t('The block/box content'),
+      'info' => $this->t('Admin title of the block/box.'),
+      'format' => $this->t('Input format of the custom block/box content.'),
     );
   }
 

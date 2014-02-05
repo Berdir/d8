@@ -41,12 +41,12 @@ class Term extends Drupal6SqlBase implements RequirementsInterface {
    */
   public function fields() {
     return array(
-      'tid' => t('The term ID.'),
-      'vid' => t('Existing term VID'),
-      'name' => t('The name of the term.'),
-      'description' => t('The term description.'),
-      'weight' => t('Weight'),
-      'parent' => t("The Drupal term IDs of the term's parents."),
+      'tid' => $this->t('The term ID.'),
+      'vid' => $this->t('Existing term VID'),
+      'name' => $this->t('The name of the term.'),
+      'description' => $this->t('The term description.'),
+      'weight' => $this->t('Weight'),
+      'parent' => $this->t("The Drupal term IDs of the term's parents."),
     );
   }
 
