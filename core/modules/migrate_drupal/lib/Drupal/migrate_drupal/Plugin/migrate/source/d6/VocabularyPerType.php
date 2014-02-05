@@ -35,6 +35,7 @@ class VocabularyPerType extends Vocabulary implements RequirementsInterface {
    */
   public function getIds() {
     $ids['vid']['type'] = 'integer';
+    $ids['vid']['alias'] = 'nt';
     $ids['type']['type'] = 'string';
     return $ids;
   }
