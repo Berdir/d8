@@ -141,10 +141,3 @@ class DefaultViewRecentComments extends ViewTestBase {
   }
 
 }
-      $comment = entity_create('comment', array(
-        'status' => CommentInterface::PUBLISHED,
-        'field_name' => 'comment',
-        'entity_type' => 'node',
-        'entity_id' => $this->node->id(),
-      ));
-      /** @var \Drupal\comment\CommentInterface $comment */
