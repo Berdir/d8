@@ -34,6 +34,24 @@ class RolesRidTest extends UnitTestCase {
    * @see \Drupal\user\Plugin\views\argument\RolesRid::title_query()
    */
   public function testTitleQuery() {
+    $entity_type = $this->getMock('Drupal\Core\Entity\EntityTypeInterface');
+    $entity_type->expects($this->any())
+      ->method('getKey')
+      ->will($this->returnValueMap(array(array('id', 'id'), array('label', 'label'))));
+
+    $entity_manager = $this->getMock('Drupal\Core\Entity\EntityManagerInterface');
+    $entity_manager->expects($this->any())
+      ->method('getDefinition')
+      ->with($this->equalTo('user_role'))
+      ->will($this->returnValue($entity_type));
+
+    // @todo \Drupal\Core\Entity\Entity::entityType() uses a global call to
+    //   entity_get_info(), which in turn wraps \Drupal::entityManager(). Set
+    //   the entity manager until this is fixed.
+    $container = new ContainerBuilder();
+    $container->set('entity.manager', $entity_manager);
+    \Drupal::setContainer($container);
+
     $role1 = new Role(array(
       'id' => 'test_rid_1',
       'label' => 'test rid 1'
@@ -53,30 +71,11 @@ class RolesRidTest extends UnitTestCase {
         array(array('test_rid_1', 'test_rid_2'), array('test_rid_1' => $role1, 'test_rid_2' => $role2)),
       )));
 
-    $entity_type = $this->getMock('Drupal\Core\Entity\EntityTypeInterface');
-    $entity_type->expects($this->any())
-      ->method('getKey')
-      ->with('label')
-      ->will($this->returnValue('label'));
-
-    $entity_manager = $this->getMock('Drupal\Core\Entity\EntityManagerInterface');
-    $entity_manager->expects($this->any())
-      ->method('getDefinition')
-      ->with($this->equalTo('user_role'))
-      ->will($this->returnValue($entity_type));
-
     $entity_manager
       ->expects($this->once())
       ->method('getStorageController')
       ->with($this->equalTo('user_role'))
       ->will($this->returnValue($role_storage_controller));
-
-    // @todo \Drupal\Core\Entity\Entity::entityType() uses a global call to
-    //   entity_get_info(), which in turn wraps \Drupal::entityManager(). Set
-    //   the entity manager until this is fixed.
-    $container = new ContainerBuilder();
-    $container->set('entity.manager', $entity_manager);
-    \Drupal::setContainer($container);
 
     $roles_rid_argument = new RolesRid(array(), 'users_roles_rid', array(), $entity_manager);
 

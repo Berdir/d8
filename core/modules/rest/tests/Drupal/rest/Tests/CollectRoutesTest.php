@@ -30,6 +30,13 @@ class CollectRoutesTest extends UnitTestCase {
    */
   protected $routes;
 
+  /**
+   * The mocked entity manager.
+   *
+   * @var \Drupal\Core\Entity\EntityManagerInterface|\PHPUnit_Framework_MockObject_MockObject
+   */
+  protected $entityManager;
+
   public static function getInfo() {
     return array(
       'name' => 'routes: REST export plugin',
@@ -57,16 +64,6 @@ class CollectRoutesTest extends UnitTestCase {
     $container->set('content_negotiation', $content_negotiation);
     $container->set('request', $request);
 
-    $this->view = $this->getMock('\Drupal\views\Entity\View', array('initHandlers'), array(
-      array('id' => 'test_view'),
-      'view',
-    ));
-
-    $view_executable = $this->getMock('\Drupal\views\ViewExecutable', array('initHandlers'), array(), '', FALSE);
-
-    $view_executable->storage = $this->view;
-    $view_executable->argument = array();
-
     $display_manager = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
       ->disableOriginalConstructor()
       ->getMock();
@@ -90,7 +87,33 @@ class CollectRoutesTest extends UnitTestCase {
       ->getMock();
     $container->set('plugin.manager.views.style', $style_manager);
 
+    $entity_manager = $this->getMock('Drupal\Core\Entity\EntityManagerInterface');
+
+    $entity_type = $this->getMock('Drupal\Core\Entity\EntityTypeInterface');
+    $entity_type->expects($this->any())
+      ->method('getKey')
+      ->with('id')
+      ->will($this->returnValue('id'));
+
+    $entity_manager
+      ->expects($this->any())
+      ->method('getDefinition')
+      ->with('view')
+      ->will($this->returnValue($entity_type));
+    $container->set('entity.manager', $entity_manager);
+
     \Drupal::setContainer($container);
+
+    $this->view = $this->getMock('\Drupal\views\Entity\View', array('initHandlers'), array(
+      array('id' => 'test_view'),
+      'view',
+    ));
+
+    $view_executable = $this->getMock('\Drupal\views\ViewExecutable', array('initHandlers'), array(), '', FALSE);
+
+    $view_executable->storage = $this->view;
+    $view_executable->argument = array();
+
 
     $this->restExport = RestExport::create($container, array(), "test_routes", array());
     $this->restExport->view = $view_executable;

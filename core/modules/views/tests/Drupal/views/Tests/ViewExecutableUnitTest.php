@@ -7,6 +7,7 @@
 
 namespace Drupal\views\Tests;
 
+use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Tests\UnitTestCase;
 use Drupal\views\Entity\View;
 use Drupal\views\ViewExecutable;
@@ -30,6 +31,22 @@ class ViewExecutableUnitTest extends UnitTestCase {
    * Tests the buildThemeFunctions() method.
    */
   public function testBuildThemeFunctions() {
+    $entity_type = $this->getMock('Drupal\Core\Entity\EntityTypeInterface');
+    $entity_type->expects($this->any())
+      ->method('getKey')
+      ->with('id')
+      ->will($this->returnValue('id'));
+
+    $entity_manager = $this->getMock('Drupal\Core\Entity\EntityManagerInterface');
+    $entity_manager->expects($this->any())
+      ->method('getDefinition')
+      ->with($this->equalTo('view'))
+      ->will($this->returnValue($entity_type));
+
+    $container = new ContainerBuilder();
+    $container->set('entity.manager', $entity_manager);
+    \Drupal::setContainer($container);
+
     $config = array(
       'id' => 'test_view',
       'tag' => 'OnE, TWO, and three',

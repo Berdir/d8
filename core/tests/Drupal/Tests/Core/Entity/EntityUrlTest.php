@@ -62,8 +62,6 @@ class EntityUrlTest extends UnitTestCase {
    * @dataProvider providerTestUrlInfo
    */
   public function testUrlInfo($entity_class, $link_template, $expected) {
-    /** @var $entity \Drupal\Core\Entity\EntityInterface */
-    $entity = new $entity_class(array('id' => 'test_entity_id'), 'test_entity_type');
 
     $entity_type = $this->getMock('Drupal\Core\Entity\EntityTypeInterface');
     $entity_type->expects($this->once())
@@ -72,11 +70,19 @@ class EntityUrlTest extends UnitTestCase {
         'edit-form' => 'test_entity_type.edit',
       )));
 
+    $entity_type->expects($this->any())
+      ->method('getKey')
+      ->with('id')
+      ->will($this->returnValue('id'));
+
     $this->entityManager
       ->expects($this->any())
       ->method('getDefinition')
       ->with('test_entity_type')
       ->will($this->returnValue($entity_type));
+
+    /** @var $entity \Drupal\Core\Entity\EntityInterface */
+    $entity = new $entity_class(array('id' => 'test_entity_id'), 'test_entity_type');
 
     // If no link template is given, call without a value to test the default.
     if ($link_template) {
@@ -120,6 +126,19 @@ class EntityUrlTest extends UnitTestCase {
    * @expectedException \Drupal\Core\Entity\EntityMalformedException
    */
   public function testUrlInfoForNewEntity() {
+    $entity_type = $this->getMock('Drupal\Core\Entity\EntityTypeInterface');
+
+    $entity_type->expects($this->any())
+      ->method('getKey')
+      ->with('id')
+      ->will($this->returnValue('id'));
+
+    $this->entityManager
+      ->expects($this->once())
+      ->method('getDefinition')
+      ->with('test_entity_type')
+      ->will($this->returnValue($entity_type));
+
     $entity = new TestEntity(array(), 'test_entity_type');
     $entity->urlInfo();
   }
@@ -137,8 +156,13 @@ class EntityUrlTest extends UnitTestCase {
         'canonical' => 'test_entity_type.view',
       )));
 
+    $entity_type->expects($this->any())
+      ->method('getKey')
+      ->with('id')
+      ->will($this->returnValue('id'));
+
     $this->entityManager
-      ->expects($this->exactly(4))
+      ->expects($this->exactly(7))
       ->method('getDefinition')
       ->with('test_entity_type')
       ->will($this->returnValue($entity_type));
@@ -189,8 +213,13 @@ class EntityUrlTest extends UnitTestCase {
       ->method('getBundleEntityType')
       ->will($this->returnValue('test_entity_type_bundle'));
 
+    $entity_type->expects($this->any())
+      ->method('getKey')
+      ->with('id')
+      ->will($this->returnValue('id'));
+
     $this->entityManager
-      ->expects($this->exactly(3))
+      ->expects($this->exactly(4))
       ->method('getDefinition')
       ->with('test_entity_type')
       ->will($this->returnValue($entity_type));
@@ -223,8 +252,13 @@ class EntityUrlTest extends UnitTestCase {
         'canonical' => 'test_entity_type.view',
       )));
 
+    $entity_type->expects($this->any())
+      ->method('getKey')
+      ->with('id')
+      ->will($this->returnValue('id'));
+
     $this->entityManager
-      ->expects($this->exactly(3))
+      ->expects($this->exactly(5))
       ->method('getDefinition')
       ->with('test_entity_type')
       ->will($this->returnValue($entity_type));

@@ -121,6 +121,20 @@ class ViewListControllerTest extends UnitTestCase {
     $container->set('plugin.manager.views.display', $display_manager);
     \Drupal::setContainer($container);
 
+    $entity_manager = $this->getMock('Drupal\Core\Entity\EntityManagerInterface');
+    $container->set('entity.manager', $entity_manager);
+
+    $entity_type = $this->getMock('Drupal\Core\Entity\EntityTypeInterface');
+    $entity_type->expects($this->any())
+      ->method('getKey')
+      ->with('id')
+      ->will($this->returnValue('id'));
+
+    $entity_manager->expects($this->any())
+      ->method('getDefinition')
+      ->with($this->equalTo('view'))
+      ->will($this->returnValue($entity_type));
+
     // Setup a view list controller with a mocked buildOperations method,
     // because t() is called on there.
     $entity_type = $this->getMock('Drupal\Core\Entity\EntityTypeInterface');
