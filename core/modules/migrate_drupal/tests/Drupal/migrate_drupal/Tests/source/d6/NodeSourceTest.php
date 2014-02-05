@@ -209,7 +209,6 @@ class NodeSourceTest extends MigrateSqlSourceTestCase {
       unset($row['teaser']);
       unset($row['format']);
       $this->databaseContents['node'][$k] = $row;
-      $this->databaseContents['node'][$k] = $row;
 
       // Add the column field storage data.
       $table = 'content_type_' . $row['type'];
@@ -237,6 +236,43 @@ class NodeSourceTest extends MigrateSqlSourceTestCase {
       }
     }
 
+    // Add another node with a different bundle to make sure the source
+    // filters it out.
+    $node = array(
+      // Node fields.
+      'nid' => 5,
+      'vid' => 5,
+      'type' => 'article',
+      'language' => 'en',
+      'title' => 'node title 5',
+      'uid' => 1,
+      'status' => 1,
+      'created' => 1279290908,
+      'changed' => 1279308993,
+      'comment' => 0,
+      'promote' => 1,
+      'moderate' => 0,
+      'sticky' => 0,
+      'tnid' => 0,
+      'translate' => 0,
+      // Node revision fields.
+      'body' => 'body for node 5',
+      'teaser' => 'body for node 5',
+      'format' => 1,
+      'field_test_one_value' => 'text for node 5',
+      'field_test_two' => array(
+        'test field node 5',
+      ),
+      'fields' => array(
+        'field_test_one' => 'text for node 5',
+      ),
+    );
+    $this->databaseContents['node_revisions'][] = $node;
+    unset($node['body']);
+    unset($node['teaser']);
+    unset($node['format']);
+    $this->databaseContents['node'][] = $node;
+
     parent::setUp();
   }
 
@@ -249,6 +285,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\migrate_drupal\Plugin\migrate\source\d6\Node;
 
 class TestNode extends Node {
+  protected $cckSchemaCorrect = true;
   function setDatabase(Connection $database) {
     $this->database = $database;
   }

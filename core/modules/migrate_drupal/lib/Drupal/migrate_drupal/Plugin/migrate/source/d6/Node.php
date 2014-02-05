@@ -65,7 +65,8 @@ class Node extends Drupal6SqlBase implements SourceEntityInterface {
         'sticky',
         'tnid',
         'translate',
-      ));
+      ))
+      ->condition('type', $this->configuration['node_type']);
     $query->innerJoin('node_revisions', 'nr', 'n.vid = nr.vid');
     $query->fields('nr', array('body', 'teaser', 'format'));
 
@@ -76,7 +77,7 @@ class Node extends Drupal6SqlBase implements SourceEntityInterface {
    * {@inheritdoc}
    */
   public function prepareRow(Row $row) {
-    $bundle = $row->getSourceProperty('bundle');
+    $bundle = $row->getSourceProperty('type');
     // Pick up simple CCK fields.
     $cck_table = "content_type_$bundle";
     $query = $this->query()->condition('n.vid', $row->getSourceProperty('vid'));
