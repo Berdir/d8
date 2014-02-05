@@ -669,7 +669,6 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
   protected function mapToStorageRecord(ContentEntityInterface $entity, $table_key = 'base_table') {
     $record = new \stdClass();
     $values = array();
-    $definitions = $entity->getPropertyDefinitions();
     $schema = drupal_get_schema($this->entityType->get($table_key));
     $is_new = $entity->isNew();
 
@@ -681,8 +680,13 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
         $multi_column_fields[$field] = TRUE;
         continue;
       }
-      $property = $entity->get($name)->first()->getMainPropertyName();
-      $values[$name] = isset($definitions[$name]) && isset($entity->$name->$property) ? $entity->$name->$property : NULL;
+      if ($entity->hasField($name)) {
+        $property = $entity->get($name)->first()->getMainPropertyName();
+        $values[$name] = $entity->$name->$property;
+      }
+      else {
+        $values[$name] = NULL;
+      }
     }
 
     // Handle fields that store multiple properties and match each property name
