@@ -2,17 +2,17 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Plugin\migrate\destination\EntityDisplay.
+ * Contains \Drupal\migrate\Plugin\migrate\destination\PerComponentEntityDisplay.
  */
 
 namespace Drupal\migrate\Plugin\migrate\destination;
 
 /**
  * @MigrateDestinationPlugin(
- *   id = "entity_display"
+ *   id = "component_entity_display"
  * )
  */
-class EntityDisplay extends EntityDisplayBase {
+class PerComponentEntityDisplay extends ComponentEntityDisplayBase {
 
   const MODE_NAME = 'view_mode';
 

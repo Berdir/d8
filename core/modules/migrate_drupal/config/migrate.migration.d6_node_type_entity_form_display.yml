@@ -15,4 +15,4 @@ process:
 
   bundle: type
 destination:
-  plugin: entity:form_display
+  plugin: component_entity_form_display

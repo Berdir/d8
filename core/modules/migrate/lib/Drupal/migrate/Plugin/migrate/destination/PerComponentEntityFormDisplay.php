@@ -2,17 +2,17 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Plugin\migrate\destination\EntityFormDisplay.
+ * Contains \Drupal\migrate\Plugin\migrate\destination\PerComponentEntityFormDisplay.
  */
 
 namespace Drupal\migrate\Plugin\migrate\destination;
 
 /**
  * @MigrateDestinationPlugin(
- *   id = "entity_form_display"
+ *   id = "component_entity_form_display"
  * )
  */
-class EntityFormDisplay extends EntityDisplayBase {
+class PerComponentEntityFormDisplay extends ComponentEntityDisplayBase {
 
   const MODE_NAME = 'form_mode';
 

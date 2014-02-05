@@ -10,7 +10,7 @@ namespace Drupal\migrate\Plugin\migrate\destination;
 use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\Row;
 
-abstract class EntityDisplayBase extends DestinationBase {
+abstract class ComponentEntityDisplayBase extends DestinationBase {
 
   const MODE_NAME = '';
 

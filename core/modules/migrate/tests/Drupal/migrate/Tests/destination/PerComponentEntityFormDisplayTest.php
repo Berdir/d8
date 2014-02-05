@@ -2,12 +2,12 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Tests\destination\EntityDisplayTest.
+ * Contains \Drupal\migrate\Tests\destination\EntityFormDisplayTest.
  */
 
 namespace Drupal\migrate\Tests\destination;
 
-use Drupal\migrate\Plugin\migrate\destination\EntityDisplayBase;
+use Drupal\migrate\Plugin\migrate\destination\PerComponentEntityFormDisplay;
 use Drupal\migrate\Row;
 use Drupal\migrate\Tests\MigrateTestCase;
 
@@ -17,7 +17,7 @@ use Drupal\migrate\Tests\MigrateTestCase;
  * @group Drupal
  * @group migrate
  */
-class EntityDisplayTest extends MigrateTestCase {
+class PerComponentEntityFormDisplayTest extends MigrateTestCase {
 
   /**
    * {@inheritdoc}
@@ -37,7 +37,7 @@ class EntityDisplayTest extends MigrateTestCase {
     $values = array(
       'entity_type' => 'entity_type_test',
       'bundle' => 'bundle_test',
-      'view_mode' => 'view_mode_test',
+      'form_mode' => 'form_mode_test',
       'field_name' => 'field_name_test',
       'options' => array('test setting'),
     );
@@ -45,7 +45,7 @@ class EntityDisplayTest extends MigrateTestCase {
     foreach ($values as $key => $value) {
       $row->setDestinationProperty($key, $value);
     }
-    $entity = $this->getMockBuilder('Drupal\entity\Entity\EntityDisplay')
+    $entity = $this->getMockBuilder('Drupal\entity\Entity\EntityFormDisplay')
       ->disableOriginalConstructor()
       ->getMock();
     $entity->expects($this->once())
@@ -55,20 +55,20 @@ class EntityDisplayTest extends MigrateTestCase {
     $entity->expects($this->once())
       ->method('save')
       ->with();
-    $plugin = new TestEntityDisplay($entity);
-    $this->assertSame($plugin->import($row), array('entity_type_test', 'bundle_test', 'view_mode_test', 'field_name_test'));
-    $this->assertSame($plugin->getTestValues(), array('entity_type_test', 'bundle_test', 'view_mode_test'));
+    $plugin = new TestPerComponentEntityFormDisplay($entity);
+    $this->assertSame($plugin->import($row), array('entity_type_test', 'bundle_test', 'form_mode_test', 'field_name_test'));
+    $this->assertSame($plugin->getTestValues(), array('entity_type_test', 'bundle_test', 'form_mode_test'));
   }
 
 }
 
-class TestEntityDisplay extends EntityDisplayBase {
-  const MODE_NAME = 'view_mode';
+class TestPerComponentEntityFormDisplay extends PerComponentEntityFormDisplay {
+  const MODE_NAME = 'form_mode';
   protected $testValues;
   function __construct($entity) {
     $this->entity = $entity;
   }
-  protected function getEntity($entity_type, $bundle, $view_mode) {
+  protected function getEntity($entity_type, $bundle, $form_mode) {
     $this->testValues = func_get_args();
     return $this->entity;
   }
