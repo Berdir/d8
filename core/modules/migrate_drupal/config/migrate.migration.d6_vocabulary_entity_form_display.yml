@@ -25,4 +25,4 @@ process:
         - 0
 
 destination:
-  plugin: entity:form_display
+  plugin: entity:entity_form_display

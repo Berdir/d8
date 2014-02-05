@@ -16,4 +16,4 @@ process:
 
   bundle: node_type
 destination:
-  plugin: entity:form_display
+  plugin: entity:entity_form_display
