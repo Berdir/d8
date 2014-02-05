@@ -128,6 +128,7 @@ class Node extends Drupal6SqlBase implements RequirementsInterface {
         $row->setSourceProperty($field_name, $data);
       }
     }
+    parent::prepareRow($row);
   }
 
   /**
