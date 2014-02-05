@@ -657,7 +657,7 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
   /**
    * Maps from an entity object to the storage record.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
    *   The entity object.
    * @param string $table_key
    *   (optional) The entity key identifying the target table. Defaults to
@@ -666,7 +666,7 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
    * @return \stdClass
    *   The record to store.
    */
-  protected function mapToStorageRecord(EntityInterface $entity, $table_key = 'base_table') {
+  protected function mapToStorageRecord(ContentEntityInterface $entity, $table_key = 'base_table') {
     $record = new \stdClass();
     $values = array();
     $definitions = $entity->getPropertyDefinitions();
@@ -681,7 +681,8 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
         $multi_column_fields[$field] = TRUE;
         continue;
       }
-      $values[$name] = isset($definitions[$name]) && isset($entity->$name->value) ? $entity->$name->value : NULL;
+      $property = $entity->get($name)->first()->getMainPropertyName();
+      $values[$name] = isset($definitions[$name]) && isset($entity->$name->$property) ? $entity->$name->$property : NULL;
     }
 
     // Handle fields that store multiple properties and match each property name
