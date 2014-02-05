@@ -7,7 +7,7 @@
 
 namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
 
-
+use Drupal\migrate\Plugin\SourceEntityInterface;
 use Drupal\migrate\Row;
 
 /**
@@ -15,52 +15,54 @@ use Drupal\migrate\Row;
  *
  * @PluginID("drupal6_user")
  */
-class User extends Drupal6SqlBase {
+class User extends Drupal6SqlBase implements SourceEntityInterface {
 
   /**
    * {@inheritdoc}
    */
   public function query() {
-    $query = $this->database
-      ->select('users', 'u')
-      ->fields('u', array('uid', 'name', 'pass', 'mail', 'mode', 'sort', 'threshold', 'theme', 'signature', 'signature_format', 'created', 'access', 'login', 'status', 'timezone', 'language', 'picture', 'init', 'data', 'timezone'))
-      ->condition('uid', 0, '>');
-    return $query;
+    return $this->select('users', 'u')
+      ->fields('u', array_keys($this->baseFields()))
+      ->condition('uid', 1, '>');
   }
 
   /**
    * {@inheritdoc}
    */
   public function fields() {
-    //TODO: Added profile fields if module profile is enable.
-    return array(
-      'uid' => t('User ID'),
-      'name' => t('Username'),
-      'pass' => t('Password'),
-      'mail' => t('Email address'),
-      'mode' => t('Per-user comment display mode'),
-      'sort' => t('Per-user comment sort order'),
-      'threshold' => t('Obsolete comment configuration'),
-      'theme' => t('Default theme'),
-      'signature' => t('Signature'),
-      'signature_format' => t('Signature format'),
-      'created' => t('Registered timestamp'),
-      'access' => t('Last access timestamp'),
-      'login' => t('Last login timestamp'),
-      'status' => t('Status'),
-      'timezone' => t('Timezone'),
-      'language' => t('Language'),
-      'picture' => t('Picture'),
-      'init' => t('Init'),
-      'data' => t('Data'),
-    );
+    $fields = $this->baseFields();
+
+    if ($this->moduleExists('profile')) {
+        // Profile fields.
+      $fields += $this->select('profile_fields', 'pf')
+        ->fields('pf', array('name', 'title'))
+        ->execute()
+        ->fetchAllKeyed();
+    }
+
+    return $fields;
   }
 
   function prepareRow(Row $row, $keep = TRUE) {
+    // We are adding here the Event contributed module column.
+    // @see https://api.drupal.org/api/drupal/modules%21user%21user.install/function/user_update_7002/7
+    if ($row->hasSourceProperty('timezone_id') && $row->getSourceProperty('timezone_id')) {
+      if ($this->getDatabase()->schema()->tableExists('event_timezones')) {
+        $event_timezone = $this->getDatabase()
+          ->select('event_timezones', 'e')
+          ->fields('e', array('name'))
+          ->condition('e.timezone', $row->getSourceProperty('timezone_id'))
+          ->execute()
+          ->fetchField();
+        if ($event_timezone) {
+          $row->setSourceProperty('event_timezone', $event_timezone);
+        }
+      }
+    }
+
     if ($this->moduleExists('profile')) {
       // Find profile values for this row.
-      $query = $this->database
-        ->select('profile_values', 'pv', array('fetch' => \PDO::FETCH_ASSOC))
+      $query = $this->select('profile_values', 'pv', array('fetch' => \PDO::FETCH_ASSOC))
         ->fields('pv', array('fid', 'value'));
       $query->leftJoin('profile_fields', 'pf', 'pf.fid=pv.fid');
       $query->fields('pf', array('name', 'type'));
@@ -68,9 +70,11 @@ class User extends Drupal6SqlBase {
       $results = $query->execute();
 
       foreach ($results as $profile_value) {
-        //Check special case for date. We need unserialize.
+        // Check special case for date. We need unserialize.
         if ($profile_value['type'] == 'date') {
-          $row->setSourceProperty($profile_value['name'], array(unserialize($profile_value['value'])));
+          $date = unserialize($profile_value['value']);
+          $date = date('Y-m-d', mktime(0, 0, 0, $date['month'], $date['day'], $date['year']));
+          $row->setSourceProperty($profile_value['name'], array('value' => $date));
         }
         else {
           $row->setSourceProperty($profile_value['name'], array($profile_value['value']));
@@ -84,9 +88,65 @@ class User extends Drupal6SqlBase {
    * {@inheritdoc}
    */
   public function getIds() {
-      $ids['uid']['type'] = 'integer';
-      return $ids;
+    return array(
+      'uid' => array(
+        'type' => 'integer',
+        'alias' => 'u',
+      ),
+    );
   }
+
+  /**
+   * Returns the user base fields to be migrated.
+   *
+   * @return array
+   *   Associative array having field name as key and description as value.
+   */
+  protected function baseFields() {
+    $fields = array(
+      'uid' => t('User ID'),
+      'name' => t('Username'),
+      'pass' => t('Password'),
+      'mail' => t('Email address'),
+      'signature' => t('Signature'),
+      'signature_format' => t('Signature format'),
+      'created' => t('Registered timestamp'),
+      'access' => t('Last access timestamp'),
+      'login' => t('Last login timestamp'),
+      'status' => t('Status'),
+      'timezone' => t('Timezone'),
+      'language' => t('Language'),
+      'picture' => t('Picture'),
+      'init' => t('Init'),
+    );
+
+    // Possible field added by Date contributed module.
+    // @see https://api.drupal.org/api/drupal/modules%21user%21user.install/function/user_update_7002/7
+    if ($this->getDatabase()->schema()->fieldExists('users', 'timezone_name')) {
+      $fields['timezone_name'] = t('Timezone (Date)');
+    }
+
+    // Possible field added by Event contributed module.
+    // @see https://api.drupal.org/api/drupal/modules%21user%21user.install/function/user_update_7002/7
+    if ($this->getDatabase()->schema()->fieldExists('users', 'timezone_id')) {
+      $fields['timezone_id'] = t('Timezone (Event)');
+    }
+
+    return $fields;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function bundleMigrationRequired() {
+    return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function entityTypeId() {
+    return 'user';
+  }
+
 }
-
-

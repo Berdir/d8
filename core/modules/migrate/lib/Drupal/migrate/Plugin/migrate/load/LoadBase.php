@@ -18,12 +18,23 @@ use Drupal\migrate\Entity\MigrationInterface;
 abstract class LoadBase extends PluginBase implements MigrateLoadInterface {
 
   /**
+   * The migration object.
+   *
    * @var \Drupal\migrate\Entity\MigrationInterface
    */
   protected $migration;
 
   /**
-   * {@inheritdoc}
+   * Builds a \Drupal\migrate\Plugin\load\LoadBase object.
+   *
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   * @param string $plugin_id
+   *   The plugin_id for the plugin instance.
+   * @param array $plugin_definition
+   *   The plugin implementation definition.
+   * @param \Drupal\migrate\Entity\MigrationInterface $migration
+   *   The migration object.
    */
   function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);

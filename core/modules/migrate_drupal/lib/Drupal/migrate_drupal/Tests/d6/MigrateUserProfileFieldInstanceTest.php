@@ -91,7 +91,7 @@ class MigrateUserProfileFieldInstanceTest extends MigrateDrupalTestBase {
       'profile_sold_to' => 'list_text',
       'profile_bands' => 'text',
       'profile_blog' => 'link',
-      'profile_birthdate' => 'date',
+      'profile_birthdate' => 'datetime',
     );
     foreach ($fields as $name => $type) {
       entity_create('field_entity', array(

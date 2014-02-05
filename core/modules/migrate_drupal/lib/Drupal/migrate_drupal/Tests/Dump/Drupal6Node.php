@@ -135,7 +135,6 @@ class Drupal6Node {
       ),
       'primary key' => array('nid'),
     ));
-
     $database->insert('node')->fields(
       array(
         'nid',
@@ -305,5 +304,7 @@ class Drupal6Node {
         'field_test_value' => 'This is a text field',
       ))
       ->execute();
+    Drupal6DumpCommon::createSystem($database);
+    Drupal6DumpCommon::setModuleVersion($database, 'content', 6001);
   }
 }

@@ -7,8 +7,7 @@
 
 namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
 
-use Drupal\migrate\Entity\MigrationInterface;
-use Drupal\migrate\Plugin\RequirementsInterface;
+use Drupal\migrate\Plugin\SourceEntityInterface;
 use Drupal\migrate\Row;
 
 
@@ -17,14 +16,28 @@ use Drupal\migrate\Row;
  *
  * @PluginID("drupal6_node")
  */
-class Node extends Drupal6SqlBase implements RequirementsInterface {
+class Node extends Drupal6SqlBase implements SourceEntityInterface {
 
   /**
    * The source field information for complex node fields.
    *
    * @var array
    */
-  protected $sourceFieldInfo = array();
+  protected $sourceFieldInfo;
+
+  /**
+   * Information on which tables exist.
+   *
+   * @var array
+   */
+  protected $tables;
+
+  /**
+   * TRUE when CCK is enabled and the schema is correct.
+   *
+   * @var bool
+   */
+  protected $cckSchemaCorrect;
 
   /**
    * {@inheritdoc}
@@ -63,16 +76,15 @@ class Node extends Drupal6SqlBase implements RequirementsInterface {
    * {@inheritdoc}
    */
   public function prepareRow(Row $row) {
-
-    $type = $row->getSourceProperty('type');
+    $bundle = $row->getSourceProperty('bundle');
     // Pick up simple CCK fields.
-    $cck_table = "content_type_$type";
+    $cck_table = "content_type_$bundle";
     $query = $this->query()->condition('n.vid', $row->getSourceProperty('vid'));
-    if ($this->getDatabase()->schema()->tableExists($cck_table)) {
+    if ($this->tableExists($cck_table)) {
       $query->leftJoin($cck_table, 'f', 'n.vid = f.vid');
       // The main column for the field should be rendered with the field name,
       // not the column name (e.g., field_foo rather than field_foo_value).
-      $field_info = $this->getSourceFieldInfo($type);
+      $field_info = $this->getSourceFieldInfo($bundle);
       foreach ($field_info as $field_name => $info) {
         if (isset($info['columns']) && !$info['multiple'] && $info['db_storage']) {
           $i = 0;
@@ -112,7 +124,7 @@ class Node extends Drupal6SqlBase implements RequirementsInterface {
     }
 
     // Handle fields that have their own table.
-    foreach ($this->sourceFieldInfo as $field_name => $field_info) {
+    foreach ($this->getSourceFieldInfo($bundle) as $field_name => $field_info) {
       if ($field_info['multiple'] && !$field_info['db_storage']) {
         // Select the data.
         $table = "content_$field_name";
@@ -141,11 +153,9 @@ class Node extends Drupal6SqlBase implements RequirementsInterface {
    *   An array of field info keyed by field name.
    */
   protected function getSourceFieldInfo($bundle) {
-
-    if (empty($this->sourceFieldInfo)) {
+    if (!isset($this->sourceFieldInfo)) {
       $this->sourceFieldInfo = array();
-      if ($this->getDatabase()->schema()->tableExists('content_node_field_instance')) {
-
+      if ($this->tableExists('content_node_field_instance')) {
         // Get each field attached to this type.
         $query = $this->select('content_node_field_instance', 'i')
           ->fields('i', array(
@@ -229,17 +239,10 @@ class Node extends Drupal6SqlBase implements RequirementsInterface {
       'language' => t('Language (fr, en, ...)'),
       'tnid' => t('The translation set id for this node'),
     );
-    foreach ($this->getSourceFieldInfo($this->configuration['type']) as $field_name => $field_data) {
+    foreach ($this->getSourceFieldInfo($this->configuration['bundle']) as $field_name => $field_data) {
       $fields[$field_name] = $field_data['label'];
     }
     return $fields;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function checkRequirements() {
-    return $this->moduleExists('content') && $this->getModuleSchemaVersion('content') >= 6001;
   }
 
   /**
@@ -249,6 +252,40 @@ class Node extends Drupal6SqlBase implements RequirementsInterface {
     $ids['nid']['type'] = 'integer';
     $ids['nid']['alias'] = 'n';
     return $ids;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function bundleMigrationRequired() {
+    return TRUE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function entityTypeId() {
+    return 'node';
+  }
+
+  /**
+   * Determines whether a specific CCK table exists.
+   */
+  protected function tableExists($table) {
+    if (!isset($this->tables[$table])) {
+      $this->tables[$table] = $this->cckSchemaCorrect() && $this->getDatabase()->schema()->tableExists($table);
+    }
+    return $this->tables[$table];
+  }
+
+  /**
+   * Determines whether CCK is enabled and is using the right schema.
+   */
+  protected function cckSchemaCorrect() {
+    if (!isset($this->cckSchemaCorrect)) {
+      $this->cckSchemaCorrect = $this->moduleExists('content') && $this->getModuleSchemaVersion('content') >= 6001;
+    }
+    return $this->cckSchemaCorrect;
   }
 
 }

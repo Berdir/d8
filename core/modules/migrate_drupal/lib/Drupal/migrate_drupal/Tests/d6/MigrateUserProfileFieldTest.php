@@ -16,7 +16,7 @@ use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
  */
 class MigrateUserProfileFieldTest extends MigrateDrupalTestBase {
 
-  static $modules = array('link', 'options');
+  static $modules = array('link', 'options', 'datetime');
 
   /**
    * {@inheritdoc}
@@ -69,7 +69,7 @@ class MigrateUserProfileFieldTest extends MigrateDrupalTestBase {
 
     // Migrated date field.
     $field = entity_load('field_entity', 'user.profile_birthdate');
-    $this->assertEqual($field->type, 'date', 'Field type is date.');
+    $this->assertEqual($field->type, 'datetime', 'Field type is datetime.');
   }
 
 }

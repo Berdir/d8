@@ -1,0 +1,30 @@
+id: d6_user
+source:
+  plugin: drupal6_user
+load:
+  plugin: d6_entity
+process:
+  uid: uid
+  name: name
+  pass: pass
+  mail: mail
+  signature: signature
+  signature_format:
+    -
+      plugin: migration
+      migration: d6_filter_format
+      source:
+        - signature_format
+  created: created
+  access: access
+  login: login
+  status: status
+  timezone:
+    -
+      plugin: user_update_7002
+      source: timezone
+  preferred_langcode: language
+  init: init
+destination:
+  plugin: entity:user
+  md5_passwords: true

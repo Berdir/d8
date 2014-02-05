@@ -14,7 +14,7 @@ process:
     source: type
     map:
       checkbox: list_integer
-      date: date
+      date: datetime
       list: text
       selection: list_text
       textfield: text
