@@ -491,6 +491,8 @@ class SelectTest extends DatabaseTestBase {
         ->fields('t')
         ->condition('age', array(), 'IN')
         ->execute();
+
+      $this->fail('Expected exception not thrown');
     }
     catch (InvalidQueryException $e) {
       $this->assertEqual("Query condition 'age IN ()' cannot be empty.", $e->getMessage());
@@ -501,6 +503,8 @@ class SelectTest extends DatabaseTestBase {
         ->fields('t')
         ->condition('age', array(), 'NOT IN')
         ->execute();
+
+      $this->fail('Expected exception not thrown');
     }
     catch (InvalidQueryException $e) {
       $this->assertEqual("Query condition 'age NOT IN ()' cannot be empty.", $e->getMessage());
