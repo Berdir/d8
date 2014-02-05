@@ -39,14 +39,11 @@ class UserSourceTest extends MigrateSqlSourceTestCase {
 
   protected $expectedResults = array(
     array(
-      'uid' => 1,
+      'uid' => 2,
       'name' => 'admin',
       // @todo d6 hash?
       'pass' => '1234',
       'mail' => 'admin@example.com',
-      'mode' => 0,
-      'sort' => 0,
-      'threshold' => 0,
       'theme' => '',
       'signature' => '',
       'signature_format' => 0,
@@ -67,9 +64,6 @@ class UserSourceTest extends MigrateSqlSourceTestCase {
       // @todo d6 hash?
       'pass' => '1234',
       'mail' => 'alice@example.com',
-      'mode' => 0,
-      'sort' => 0,
-      'threshold' => 0,
       'theme' => '',
       'signature' => '',
       'signature_format' => 0,
