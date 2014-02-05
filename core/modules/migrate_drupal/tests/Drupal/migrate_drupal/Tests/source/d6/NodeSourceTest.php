@@ -25,7 +25,7 @@ class NodeSourceTest extends MigrateSqlSourceTestCase {
     'idlist' => array(),
     // The fake configuration for the source.
     'source' => array(
-      'node_type' => 'page',
+      'bundle' => 'page',
       'plugin' => 'drupal6_node',
     ),
     'sourceIds' => array(

@@ -66,7 +66,7 @@ class Node extends Drupal6SqlBase implements SourceEntityInterface {
         'tnid',
         'translate',
       ))
-      ->condition('type', $this->configuration['node_type']);
+      ->condition('type', $this->configuration['bundle']);
     $query->innerJoin('node_revisions', 'nr', 'n.vid = nr.vid');
     $query->fields('nr', array('body', 'teaser', 'format'));
 
