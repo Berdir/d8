@@ -2,7 +2,7 @@ id: d6_user
 source:
   plugin: drupal6_user
 load:
-  plugin: d6_entity
+  plugin: drupal_entity
 process:
   uid: uid
   name: name

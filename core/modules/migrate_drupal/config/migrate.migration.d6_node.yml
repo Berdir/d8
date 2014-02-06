@@ -1,6 +1,6 @@
 id: d6_node
 load:
-  plugin: d6_entity
+  plugin: drupal_entity
   bundle_migration: d6_node_type
 
 source:

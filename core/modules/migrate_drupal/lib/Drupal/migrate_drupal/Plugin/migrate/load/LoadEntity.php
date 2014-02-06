@@ -5,19 +5,20 @@
  * Contains \Drupal\migrate\Plugin\load\LoadEntityBase.
  */
 
-namespace Drupal\migrate\Plugin\migrate\load;
+namespace Drupal\migrate_drupal\Plugin\migrate\load;
 
 use Drupal\Component\Utility\MapArray;
 use Drupal\Component\Utility\String;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
 use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\MigrateException;
+use Drupal\migrate\Plugin\migrate\load\LoadBase;
 use Drupal\migrate\Plugin\SourceEntityInterface;
 
 /**
  * Base class for entity load plugins.
  *
- * @PluginID("d6_entity")
+ * @PluginID("drupal_entity")
  */
 class LoadEntity extends LoadBase {
 
