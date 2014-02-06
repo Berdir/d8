@@ -38,7 +38,12 @@ abstract class MigrateTestCase extends UnitTestCase {
         ->will($this->returnValue('test_map'));
     }
 
-    $migration = $this->getMock('Drupal\migrate\Entity\MigrationInterface');
+    $migration = $this->getMockBuilder('Drupal\migrate\Entity\Migration')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $migration->expects($this->any())
+      ->method('checkRequirements')
+      ->will($this->returnValue(TRUE));
     $migration->expects($this->any())
       ->method('getIdMap')
       ->will($this->returnValue($this->idMap));
