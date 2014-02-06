@@ -49,9 +49,9 @@ class MigrateFilterFormatTest extends MigrateDrupalTestBase {
 
     // Check variables migrated into filter.
     $this->assertIdentical($filters['filter_html_escape']['settings']['allowed_html'], '<a> <em> <strong> <cite> <code> <ul> <ol> <li> <dl> <dt> <dd>');
-    $this->assertIdentical($filters['filter_html_escape']['settings']['filter_html_help'], 1);
-    $this->assertIdentical($filters['filter_html']['settings']['filter_html_nofollow'], 0);
-    $this->assertIdentical($filters['filter_url']['settings']['filter_url_length'], '72');
+    $this->assertIdentical($filters['filter_html_escape']['settings']['filter_html_help'], '1');
+    $this->assertIdentical($filters['filter_html']['settings']['filter_html_nofollow'], false);
+    $this->assertIdentical($filters['filter_url']['settings']['filter_url_length'], 72);
   }
 
 }
