@@ -56,7 +56,7 @@ class MigrateCustomBlockTest extends MigrateDrupalTestBase {
     $block = entity_load('custom_block', 1);
     $this->assertEqual('My block 1', $block->label());
     $this->assertEqual(1, $block->getRevisionId());
-    $this->assertEqual(NULL, $block->getChangedTime());
+    $this->assertTrue(REQUEST_TIME <= $block->getChangedTime() && $block->getChangedTime() <= time());
     $this->assertEqual(Language::LANGCODE_NOT_SPECIFIED, $block->language()->id);
     $this->assertEqual('<h3>My custom block body</h3>', $block->body->value);
     $this->assertEqual('restricted_html', $block->body->format);
