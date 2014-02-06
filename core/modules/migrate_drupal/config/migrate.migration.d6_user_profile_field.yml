@@ -28,3 +28,5 @@ process:
       list: -1
 destination:
   plugin: entity:field_entity
+dependencies:
+  - d6_field

@@ -28,3 +28,5 @@ process:
   changed: timestamp
 destination:
   plugin: entity:taxonomy_term
+dependencies:
+  - d6_taxonomy_vocabulary

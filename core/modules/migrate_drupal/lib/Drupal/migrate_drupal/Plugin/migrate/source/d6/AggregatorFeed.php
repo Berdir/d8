@@ -65,8 +65,8 @@ class AggregatorFeed extends Drupal6SqlBase implements RequirementsInterface {
   }
 
   /**
-  * {@inheritdoc}
-  */
+   * {@inheritdoc}
+   */
   public function getIds() {
     $ids['fid']['type'] = 'integer';
     return $ids;

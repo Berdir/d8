@@ -7,6 +7,7 @@
 
 namespace Drupal\migrate;
 
+use Drupal\Component\Graph\Graph;
 use Drupal\Component\Utility\String;
 use Drupal\Core\Config\Entity\ConfigStorageController;
 use Drupal\Core\Entity\EntityInterface;
@@ -69,7 +70,9 @@ class MigrationStorageController extends ConfigStorageController {
         }
       }
     }
-    return $entities;
+
+    // Build an array of dependencies and set the order of the migrations.
+    return $this->buildDependencyMigration($entities);
   }
 
   /**
@@ -80,6 +83,34 @@ class MigrationStorageController extends ConfigStorageController {
       throw new EntityStorageException(String::format("Dynamic migration %id can't be saved", array('$%id' => $entity->id())));
     }
     return parent::save($entity);
+  }
+
+  /**
+   * Build a dependency tree for the migrations and set their order.
+   */
+  public function buildDependencyMigration($migrations) {
+    $graph = array();
+    foreach ($migrations as $migration) {
+      $graph[$migration->id]['edges'] = array();
+      if (isset($migration->dependencies) && is_array($migration->dependencies)) {
+        foreach ($migration->dependencies as $dependency) {
+          $graph[$migration->id]['edges'][$dependency] = $dependency;
+        }
+      }
+    }
+    $graph_object = new Graph($graph);
+    $graph = $graph_object->searchAndSort();
+    $weights = array();
+    foreach ($migrations as $migration_id => $migration) {
+      // Populate a weights array to use with array_multisort later.
+      $weights[] = $graph[$migration_id]['weight'];
+      // If we're including more depth dependencies, include them in the array
+      // so we can throw more information on the requirements.
+      $migration->dependencies = $graph[$migration_id]['paths'];
+    }
+
+    array_multisort($weights, SORT_DESC, SORT_NUMERIC, $migrations);
+    return $migrations;
   }
 
 }

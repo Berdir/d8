@@ -20,3 +20,5 @@ process:
   'body.value': body
 destination:
   plugin: entity:custom_block
+dependencies:
+  - d6_filter_format

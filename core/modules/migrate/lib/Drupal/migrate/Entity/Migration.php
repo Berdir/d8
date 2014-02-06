@@ -7,9 +7,11 @@
 
 namespace Drupal\migrate\Entity;
 
+use Drupal\Component\Utility\String;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\migrate\MigrateException;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
+use Drupal\migrate\Plugin\RequirementsInterface;
 
 /**
  * Defines the Migration entity.
@@ -33,7 +35,7 @@ use Drupal\migrate\Plugin\MigrateIdMapInterface;
  *   }
  * )
  */
-class Migration extends ConfigEntityBase implements MigrationInterface {
+class Migration extends ConfigEntityBase implements MigrationInterface, RequirementsInterface {
 
   /**
    * The migration ID (machine name).
@@ -219,6 +221,13 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
   public $limit = array();
 
   /**
+   * Migration dependencies that need to be run before the current one.
+   *
+   * @var array
+   */
+  public $dependencies = array();
+
+  /**
    * {@inheritdoc}
    */
   public function getSourceIds() {
@@ -344,6 +353,37 @@ class Migration extends ConfigEntityBase implements MigrationInterface {
    */
   public function saveHighwater($highwater) {
     $this->getHighWaterStorage()->set($this->id(), $highwater);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function checkRequirements() {
+    // Check whether the current migration source and destination plugin
+    // requirements are met or not.
+    if ($this->getSourcePlugin() instanceof RequirementsInterface && !$this->getSourcePlugin()->checkRequirements()) {
+      return FALSE;
+    }
+    if ($this->getDestinationPlugin() instanceof RequirementsInterface && !$this->getDestinationPlugin()->checkRequirements()) {
+      return FALSE;
+    }
+
+    // Check if the dependencies are in good shape.
+    foreach ($this->dependencies as $depencency) {
+      $dependent_migration = entity_load('migration', $depencency);
+      // Make sure all migrations have source ids and fail otherwise.
+      if (!$dependent_migration->getSourceIds()) {
+        throw new MigrateException(String::format("@depencency has no source ids", array('@dependency' => $depencency)));
+      }
+
+      // If the dependent migration has not processed any record, it means the
+      // dependency requirement is not met.
+      if (!$dependent_migration->getIdMap()->processedCount()) {
+        return FALSE;
+      }
+    }
+
+    return TRUE;
   }
 
 }

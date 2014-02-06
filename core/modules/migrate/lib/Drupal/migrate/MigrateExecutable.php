@@ -7,6 +7,7 @@
 
 namespace Drupal\migrate;
 
+use Drupal\Component\Utility\String;
 use Drupal\Core\Utility\Error;
 use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
@@ -220,6 +221,11 @@ class MigrateExecutable {
     $source = $this->getSource();
     $destination = $this->migration->getDestinationPlugin();
     $id_map = $this->migration->getIdMap();
+
+    // Knock off migration if the requirements haven't been met.
+    if (!$this->migration->checkRequirements()) {
+      throw new MigrateException(String::format('Migration @id did not meet the requirements', array('@id' => $this->migration->id())));
+    }
 
     try {
       $source->rewind();

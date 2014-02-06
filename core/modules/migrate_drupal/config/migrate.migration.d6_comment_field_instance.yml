@@ -22,3 +22,6 @@ process:
   'settings.preview': comment_preview
 destination:
   plugin: entity:field_instance
+dependencies:
+  - d6_comment_field
+  - d6_field_instance

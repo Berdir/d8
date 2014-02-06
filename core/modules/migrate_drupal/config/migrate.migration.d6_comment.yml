@@ -62,3 +62,6 @@ process:
         - 0
 destination:
   plugin: entity:comment
+dependencies:
+  - d6_node
+  - d6_filter_format

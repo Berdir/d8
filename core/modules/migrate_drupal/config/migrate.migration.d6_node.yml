@@ -37,3 +37,5 @@ process:
 
 destination:
   plugin: entity:node
+dependencies:
+  - d6_node_type

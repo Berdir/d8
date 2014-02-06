@@ -13,3 +13,5 @@ process:
   type: constants.type
 destination:
   plugin: entity:field_entity
+dependencies:
+  - d6_field

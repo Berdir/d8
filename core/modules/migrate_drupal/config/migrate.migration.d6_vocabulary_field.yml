@@ -23,3 +23,6 @@ process:
   'settings.allowed_values.0.parent': constants.parent
 destination:
   plugin: entity:field_entity
+dependencies:
+  - d6_taxonomy_vocabulary
+  - d6_field
