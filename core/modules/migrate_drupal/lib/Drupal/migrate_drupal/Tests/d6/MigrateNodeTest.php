@@ -84,7 +84,7 @@ class MigrateNodeTest extends MigrateDrupalTestBase {
     $this->assertEqual($node->getTitle(), 'Test title', 'Node has the correct title.');
     $this->assertEqual($node->getCreatedTime(), 1388271197, 'Node has the correct created time.');
     $this->assertEqual($node->isSticky(), FALSE, 'Node has the correct sticky setting.');
-    $this->assertEqual($node->getAuthorId(), 1, 'Node has the correct author id.');
+    $this->assertEqual($node->getOwnerId(), 1, 'Node has the correct author id.');
     $this->assertEqual($node->field_test->value, 'This is a text field', "Single field storage field is correct.");
 
     $this->assertEqual($node->field_test_two->value, 10, 'Multi field storage field is correct');
