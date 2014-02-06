@@ -39,4 +39,4 @@ process:
       1: true # PROFILE_PRIVATE
       4: true # PROFILE_HIDDEN
 destination:
-  plugin: entity_form_display
+  plugin: component_entity_form_display
