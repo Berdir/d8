@@ -8,6 +8,8 @@
 namespace Drupal\migrate\Plugin\migrate\destination;
 
 /**
+ * This class imports one component of an entity form display.
+ *
  * @MigrateDestinationPlugin(
  *   id = "component_entity_form_display"
  * )
