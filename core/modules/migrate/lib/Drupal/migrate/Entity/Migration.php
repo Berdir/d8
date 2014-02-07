@@ -369,11 +369,11 @@ class Migration extends ConfigEntityBase implements MigrationInterface, Requirem
     }
 
     // Check if the dependencies are in good shape.
-    foreach ($this->dependencies as $depencency) {
-      $dependent_migration = entity_load('migration', $depencency);
+    foreach ($this->dependencies as $dependency) {
+      $dependent_migration = entity_load('migration', $dependency);
       // Make sure all migrations have source ids and fail otherwise.
       if (!$dependent_migration->getSourceIds()) {
-        throw new MigrateException(String::format("@depencency has no source ids", array('@dependency' => $depencency)));
+        throw new MigrateException(String::format("@dependency has no source ids", array('@dependency' => $dependency)));
       }
 
       // If the dependent migration has not processed any record, it means the
