@@ -1,0 +1,17 @@
+id: d6_file
+source:
+  plugin: drupal6_file
+process:
+  filename: filename
+  uri:
+    plugin: file_uri
+    source:
+      - filepath
+      - file_directory_path
+      - is_public
+  filemime: filemime
+  filesize: filesize
+  status: status
+  changed: timestamp
+destination:
+  plugin: entity:file

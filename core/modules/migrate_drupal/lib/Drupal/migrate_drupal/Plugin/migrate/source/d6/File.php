@@ -7,7 +7,7 @@
 
 namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
 
-
+use Drupal\migrate\Row;
 
 /**
  * Drupal 6 file source from database.
@@ -17,15 +17,57 @@ namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
 class File extends Drupal6SqlBase {
 
   /**
+   * The file directory path.
+   *
+   * @var string
+   */
+  protected $filePath;
+
+  /**
+   * Flag for private or public file storage.
+   *
+   * @var boolean
+   */
+  protected $isPublic;
+
+  /**
    * {@inheritdoc}
    */
   public function query() {
-    $query = $this->database
-      ->select('files', 'f')
-      ->fields('f', array('fid', 'uid', 'filename',
-        'filepath', 'filemime', 'filesize', 'status', 'timestamp'));
+    $query = $this->select('files', 'f')->fields('f', array(
+      'fid',
+      'uid',
+      'filename',
+      'filepath',
+      'filemime',
+      'filesize',
+      'status',
+      'timestamp',
+    ));
     $query->orderBy('timestamp');
     return $query;
+  }
+
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function runQuery() {
+    $conf_path = isset($this->configuration['conf_path']) ? $this->configuration['conf_path'] : 'sites/default';
+    $this->filePath = $this->variableGet('file_directory_path', $conf_path . '/files') . '/';
+
+    // FILE_DOWNLOADS_PUBLIC == 1 and FILE_DOWNLOADS_PRIVATE == 2.
+    $this->isPublic = $this->variableGet('file_downloads', 1) == 1;
+    return parent::runQuery();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function prepareRow(Row $row) {
+    $row->setSourceProperty('file_directory_path', $this->filePath);
+    $row->setSourceProperty('is_public', $this->isPublic);
+    return parent::prepareRow($row);
   }
 
   /**
@@ -40,6 +82,8 @@ class File extends Drupal6SqlBase {
       'filemime' => $this->t('File Mime Type'),
       'status' => $this->t('The published status of a file.'),
       'timestamp' => $this->t('The time that the file was added.'),
+      'file_directory_path' => $this->t('The Drupal files path.'),
+      'is_public' => $this->t('TRUE if the files directory is public otherwise FALSE.'),
     );
   }
   /**

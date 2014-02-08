@@ -27,7 +27,7 @@ class EntityFile extends EntityContentBase {
     $configuration += array(
       'source_base_path' => '',
       'source_path_property' => 'filepath',
-      'destination_path_property' => 'filepath',
+      'destination_path_property' => 'uri',
       'move' => FALSE,
     );
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration, $storage_controller, $bundles, $plugin_manager, $field_info);
@@ -46,13 +46,15 @@ class EntityFile extends EntityContentBase {
         $replace = FILE_EXISTS_RENAME;
       }
     }
+    $dirname = drupal_dirname($destination);
+    file_prepare_directory($dirname, FILE_CREATE_DIRECTORY);
     if ($this->configuration['move']) {
       file_unmanaged_move($source, $destination, $replace);
     }
     else {
       file_unmanaged_copy($source, $destination, $replace);
     }
-    parent::import($row, $old_destination_id_values);
+    return parent::import($row, $old_destination_id_values);
   }
 
 }
