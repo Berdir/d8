@@ -87,7 +87,7 @@ class MigrateTestBase extends WebTestBase implements MigrateMessageInterface {
       for ($i = 1; $i <= $source_id_count; $i++) {
         $fields[] = "sourceid$i";
       }
-      $destination_id_count = count($data[0][0]);
+      $destination_id_count = count($data[0][1]);
       for ($i = 1; $i <= $destination_id_count; $i++) {
         $fields[] = "destid$i";
       }
