@@ -23,6 +23,13 @@ use Drupal\migrate\Plugin\SourceEntityInterface;
 class LoadEntity extends LoadBase {
 
   /**
+   * The list of bundles being loaded.
+   *
+   * @var array
+   */
+  protected $bundles;
+
+  /**
    * {@inheritdoc}
    */
   function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration) {
@@ -45,16 +52,12 @@ class LoadEntity extends LoadBase {
     if (isset($this->configuration['bundle_migration'])) {
       /** @var \Drupal\migrate\Entity\MigrationInterface $bundle_migration */
       $bundle_migration = $storage_controller->load($this->configuration['bundle_migration']);
-      $bundles = array();
-      foreach ($bundle_migration->getIdMap() as $key => $row) {
-        $key = unserialize($key);
-        $bundles[] = $key['sourceid1'];
-      }
+      $this->processIdMap($bundle_migration->getIdMap());
     }
     else {
-      $bundles = array($this->migration->getSourcePlugin()->entityTypeId());
+      $this->bundles = array($this->migration->getSourcePlugin()->entityTypeId());
     }
-    $sub_ids_to_load = isset($sub_ids) ? array_intersect($bundles, $sub_ids) : $bundles;
+    $sub_ids_to_load = isset($sub_ids) ? array_intersect($this->bundles, $sub_ids) : $this->bundles;
     $migrations = array();
     $processed_destinations = array_map(
       function ($value) {
@@ -70,11 +73,22 @@ class LoadEntity extends LoadBase {
       /** @var \Drupal\migrate\Entity\MigrationInterface $migration */
       $migration = $storage_controller->create($values);
       $fields = array_keys($migration->getSourcePlugin()->fields());
-      $migration->process += MapArray::copyValuesToKeys(array_diff($fields, $processed_destinations));
+      $migration->process += MapArray::copyValuesToKeys(array_diff($fields, $processed_destinations));;
+      $this->additionalProcess($id, $migration);
       $migrations[$migration->id()] = $migration;
     }
 
     return $migrations;
   }
 
+  protected function processIdMap($id_map) {
+    $this->bundles = array();
+    foreach ($id_map as $key => $row) {
+      $key = unserialize($key);
+      $this->bundles[] = $key['sourceid1'];
+    }
+  }
+
+  protected function additionalProcess($id, MigrationInterface $migration) {
+  }
 }

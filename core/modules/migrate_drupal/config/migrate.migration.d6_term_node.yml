@@ -1,0 +1,17 @@
+id: d6_term_node
+load:
+  plugin: drupal6_term_node
+  bundle_migration: d6_vocabulary_field
+
+source:
+  plugin: drupal6_term_node
+
+process:
+  nid: nid
+  # The actual field name is dynamic and will be added by the load plugin.
+
+destination:
+  plugin: entity:node
+dependencies:
+  - d6_vocabulary_field
+  - d6_node

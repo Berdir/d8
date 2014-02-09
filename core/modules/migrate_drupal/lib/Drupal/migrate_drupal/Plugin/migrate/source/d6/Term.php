@@ -7,7 +7,6 @@
 
 namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
 
-
 use Drupal\migrate\Plugin\RequirementsInterface;
 use Drupal\migrate\Row;
 
