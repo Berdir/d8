@@ -582,7 +582,6 @@ function node_revision_delete($revision_id) {
  *   The ID of the node if this is a full page view, otherwise FALSE.
  */
 function node_is_page(NodeInterface $node) {
-  $page_node = menu_get_object();
   $request = \Drupal::request();
   if ($request->attributes->get(RouteObjectInterface::ROUTE_NAME) == 'node.view') {
     $page_node = $request->attributes->get('node');
