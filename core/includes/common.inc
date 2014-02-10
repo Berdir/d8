@@ -374,9 +374,13 @@ function drupal_add_feed($url = NULL, $title = '') {
   $stored_feed_links = &drupal_static(__FUNCTION__, array());
 
   if (isset($url)) {
-    $stored_feed_links[$url] = theme('feed_icon', array('url' => $url, 'title' => $title));
+    $feed_icon = array(
+      '#theme' => 'feed_icon',
+      '#url' => $url,
+      '#title' => $title,
+    );
 
-    $build['#attached']['drupal_add_html_head_link'][][] = array(
+    $feed_icon['#attached']['drupal_add_html_head_link'][][] = array(
       'rel' => 'alternate',
       'type' => 'application/rss+xml',
       'title' => $title,
@@ -384,7 +388,8 @@ function drupal_add_feed($url = NULL, $title = '') {
       // output by Drupal.
       'href' => url($url, array('absolute' => TRUE)),
     );
-    drupal_render($build);
+
+    $stored_feed_links[$url] = drupal_render($feed_icon);
   }
   return $stored_feed_links;
 }
@@ -3066,14 +3071,6 @@ function _drupal_bootstrap_code() {
   // Make sure all stream wrappers are registered.
   file_get_stream_wrappers();
 
-  // Now that stream wrappers are registered, log fatal errors from a simpletest
-  // child site to a test specific file directory.
-  $test_info = &$GLOBALS['drupal_test_info'];
-  if (!empty($test_info['in_child_site'])) {
-    ini_set('log_errors', 1);
-    ini_set('error_log', 'public://error.log');
-  }
-
   // Set the allowed protocols once we have the config available.
   $allowed_protocols = \Drupal::config('system.filter')->get('protocols');
   if (!isset($allowed_protocols)) {
@@ -3409,7 +3406,7 @@ function drupal_pre_render_link($element) {
  * Pre-render callback: Collects child links into a single array.
  *
  * This function can be added as a pre_render callback for a renderable array,
- * usually one which will be themed by theme_links(). It iterates through all
+ * usually one which will be themed by links.html.twig. It iterates through all
  * unrendered children of the element, collects any #links properties it finds,
  * merges them into the parent element's #links array, and prevents those
  * children from being rendered separately.
@@ -3430,21 +3427,21 @@ function drupal_pre_render_link($element) {
  *     '#theme' => 'links__node__comment',
  *     '#links' => array(
  *       // An array of links associated with node comments, suitable for
- *       // passing in to theme_links().
+ *       // passing in to links.html.twig.
  *     ),
  *   ),
  *   'statistics' => array(
  *     '#theme' => 'links__node__statistics',
  *     '#links' => array(
  *       // An array of links associated with node statistics, suitable for
- *       // passing in to theme_links().
+ *       // passing in to links.html.twig.
  *     ),
  *   ),
  *   'translation' => array(
  *     '#theme' => 'links__node__translation',
  *     '#links' => array(
  *       // An array of links associated with node translation, suitable for
- *       // passing in to theme_links().
+ *       // passing in to links.html.twig.
  *     ),
  *   ),
  * );
@@ -4130,7 +4127,7 @@ function drupal_render_cache_generate_placeholder($callback, array $context, $to
   foreach ($context as $key => $value) {
     $context_attribute .= $key . ':' . $value . ';';
   }
-  return '<drupal:render-cache-placeholder callback="' . $callback .  '" context="' . $context_attribute . '" token="'. $token . '" />';;
+  return '<drupal:render-cache-placeholder callback="' . $callback . '" context="' . $context_attribute . '" token="' . $token . '" />';
 }
 
 /**

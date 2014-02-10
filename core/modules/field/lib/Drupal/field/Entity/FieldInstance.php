@@ -431,7 +431,7 @@ class FieldInstance extends ConfigEntityBase implements FieldInstanceInterface {
       if (!$instance->deleted) {
         $view_modes = array('default' => array()) + entity_get_view_modes($instance->entity_type);
         foreach (array_keys($view_modes) as $mode) {
-          $displays_to_update['entity_display'][$instance->entity_type . '.' . $instance->bundle . '.' . $mode][] = $instance->field->name;
+          $displays_to_update['entity_view_display'][$instance->entity_type . '.' . $instance->bundle . '.' . $mode][] = $instance->field->name;
         }
         $form_modes = array('default' => array()) + entity_get_form_modes($instance->entity_type);
         foreach (array_keys($form_modes) as $mode) {
@@ -520,8 +520,8 @@ class FieldInstance extends ConfigEntityBase implements FieldInstanceInterface {
    */
   protected function urlRouteParameters($rel) {
     $parameters = parent::urlRouteParameters($rel);
-    $entity_info = \Drupal::entityManager()->getDefinition($this->entity_type);
-    $parameters[$entity_info->getBundleEntityType()] = $this->bundle;
+    $entity_type = \Drupal::entityManager()->getDefinition($this->entity_type);
+    $parameters[$entity_type->getBundleEntityType()] = $this->bundle;
     return $parameters;
   }
 

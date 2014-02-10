@@ -18,6 +18,7 @@ use Drupal\Core\Template\RenderWrapper;
 use Drupal\Core\Theme\ThemeSettings;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\MapArray;
+use Drupal\Core\Render\Element;
 
 /**
  * @defgroup content_flags Content markers
@@ -1167,9 +1168,11 @@ function template_preprocess_status_messages(&$variables) {
 }
 
 /**
- * Returns HTML for a set of links.
+ * Prepares variables for links templates.
  *
- * @param $variables
+ * Default template: links.html.twig.
+ *
+ * @param array $variables
  *   An associative array containing:
  *   - links: An associative array of links to be themed. The key for each link
  *     is used as its CSS class. Each link should be itself an array, with the
@@ -1193,13 +1196,12 @@ function template_preprocess_status_messages(&$variables) {
  *     l() as its $options parameter.
  *   - attributes: A keyed array of attributes for the UL containing the
  *     list of links.
- *   - set_active_class: (optional) Whether theme_links() should compare the
+ *   - set_active_class: (optional) Whether each link should compare the
  *     route_name + route_parameters or href (path), language and query options
- *     to the current URL for each of the links, to determine whether the link
- *     is "active". If so, an "active" class will be applied to the list item
- *     containing the link, as well as the link itself. It is important to use
- *     this sparingly since it is usually unnecessary and requires extra
- *     processing.
+ *     to the current URL, to determine whether the link is "active". If so, an
+ *     "active" class will be applied to the list item containing the link, as
+ *     well as the link itself. It is important to use this sparingly since it
+ *     is usually unnecessary and requires extra processing.
  *     For anonymous users, the "active" class will be calculated on the server,
  *     because most sites serve each anonymous user the same cached page anyway.
  *     For authenticated users, the "active" class will be calculated on the
@@ -1222,8 +1224,8 @@ function template_preprocess_status_messages(&$variables) {
  *     http://juicystudio.com/article/screen-readers-display-none.php and
  *     http://www.w3.org/TR/WCAG-TECHS/H42.html for more information.
  *
- * theme_links() unfortunately duplicates the "active" class handling of l() and
- * LinkGenerator::generate() because it needs to be able to set the "active"
+ * Unfortunately links templates duplicate the "active" class handling of l()
+ * and LinkGenerator::generate() because it needs to be able to set the "active"
  * class not on the links themselves ("a" tags), but on the list items ("li"
  * tags) that contain the links. This is necessary for CSS to be able to style
  * list items differently when the link is active, since CSS does not yet allow
@@ -1235,11 +1237,9 @@ function template_preprocess_status_messages(&$variables) {
  * @see \Drupal\Core\Utility\LinkGenerator::generate()
  * @see system_page_build()
  */
-function theme_links($variables) {
+function template_preprocess_links(&$variables) {
   $links = $variables['links'];
-  $attributes = $variables['attributes'];
-  $heading = $variables['heading'];
-  $output = '';
+  $heading = &$variables['heading'];
 
   if (!empty($links)) {
     // Prepend the heading to the list, if any.
@@ -1257,15 +1257,14 @@ function theme_links($variables) {
       if (isset($heading['class'])) {
         $heading['attributes']['class'] = $heading['class'];
       }
-
-      $output .= '<' . $heading['level'] . new Attribute($heading['attributes']) . '>';
-      $output .= String::checkPlain($heading['text']);
-      $output .= '</' . $heading['level'] . '>';
+      // Convert the attributes array into an Attribute object.
+      $heading['attributes'] = new Attribute($heading['attributes']);
+      $heading['text'] = String::checkPlain($heading['text']);
     }
 
-    $output .= '<ul' . new Attribute($attributes) . '>';
-
+    $variables['links'] = array();
     foreach ($links as $key => $link) {
+      $item = array();
       $link += array(
         'href' => NULL,
         'route_name' => NULL,
@@ -1319,29 +1318,23 @@ function theme_links($variables) {
           $li_attributes['data-drupal-link-system-path'] = \Drupal::service('path.alias_manager.cached')->getSystemPath($path);
         }
 
-        $item = drupal_render($link_element);
+        $item['link'] = $link_element;
       }
+
       // Handle title-only text items.
-      else {
-        // Merge in default array properties into $link.
-        $link += array(
-          'html' => FALSE,
-        );
-        $item = ($link['html'] ? $link['title'] : String::checkPlain($link['title']));
-        if (isset($link['attributes'])) {
-          $item = '<span' . new Attribute($link['attributes']) . '>' . $item . '</span>';
-        }
+      $text = (!empty($link['html']) ? $link['title'] : String::checkPlain($link['title']));
+      $item['text'] = $text;
+      if (isset($link['attributes'])) {
+        $item['text_attributes'] = new Attribute($link['attributes']);
       }
 
-      $output .= '<li' . new Attribute($li_attributes) . '>';
-      $output .= $item;
-      $output .= '</li>';
+      // Handle list item attributes.
+      $item['attributes'] = new Attribute($li_attributes);
+
+      // Add the item to the list of links.
+      $variables['links'][] = $item;
     }
-
-    $output .= '</ul>';
   }
-
-  return $output;
 }
 
 /**
@@ -1762,25 +1755,39 @@ function theme_mark($variables) {
 }
 
 /**
- * Preprocesses variables for theme_item_list().
+ * Prepares variables for item list templates.
+ *
+ * Default template: item-list.html.twig.
  *
  * @param array $variables
- *   An associative array containing theme variables for theme_item_list().
- *   'items' in variables will be preprocessed to automatically inherit the
- *   variables of this list to any possibly contained nested lists that do not
- *   specify custom render properties. This allows callers to specify larger
- *   nested lists, without having to explicitly specify and repeat the render
- *   properties for all nested child lists.
+ *   An associative array containing:
+ *   - items: An array of items to be displayed in the list. Each item can be
+ *     either a string or a render array. If #type, #theme, or #markup
+ *     properties are not specified for child render arrays, they will be
+ *     inherited from the parent list, allowing callers to specify larger
+ *     nested lists without having to explicitly specify and repeat the
+ *     render properties for all nested child lists.
+ *   - title: A title to be prepended to the list.
+ *   - list_type: The type of list to return (e.g. "ul", "ol").
+ *
+ * @see http://drupal.org/node/1842756
  */
 function template_preprocess_item_list(&$variables) {
+  $variables['title'] = (string) $variables['title'];
+
   foreach ($variables['items'] as &$item) {
+    $attributes = array();
     // If the item value is an array, then it is a render array.
     if (is_array($item)) {
+      // List items support attributes via the '#wrapper_attributes' property.
+      if (isset($item['#wrapper_attributes'])) {
+        $attributes = $item['#wrapper_attributes'];
+      }
       // Determine whether there are any child elements in the item that are not
       // fully-specified render arrays. If there are any, then the child
       // elements present nested lists and we automatically inherit the render
       // array properties of the current list to them.
-      foreach (element_children($item) as $key) {
+      foreach (Element::children($item) as $key) {
         $child = &$item[$key];
         // If this child element does not specify how it can be rendered, then
         // we need to inherit the render properties of the current list.
@@ -1805,60 +1812,13 @@ function template_preprocess_item_list(&$variables) {
         }
       }
     }
+
+    // Set the item's value and attributes for the template.
+    $item = array(
+      'value' => $item,
+      'attributes' => new Attribute($attributes),
+    );
   }
-}
-
-/**
- * Returns HTML for a list or nested list of items.
- *
- * @param $variables
- *   An associative array containing:
- *   - items: A list of items to render. Allowed values are strings or
- *     render arrays. Render arrays can specify list item attributes in the
- *     #wrapper_attributes property.
- *   - title: The title of the list.
- *   - list_type: The type of HTML list (e.g. "ul", "ol").
- *   - attributes: The attributes applied to the list element.
- *   - empty: A message to display when there are no items. Allowed value is a
- *     string or render array.
- */
-function theme_item_list($variables) {
-  $items = $variables['items'];
-  $title = (string) $variables['title'];
-  $list_type = $variables['list_type'];
-  $list_attributes = $variables['attributes'];
-
-  $output = '';
-  if ($items) {
-    $output .= '<' . $list_type . new Attribute($list_attributes) . '>';
-
-    foreach ($items as &$item) {
-      $attributes = array();
-      if (is_array($item)) {
-        if (isset($item['#wrapper_attributes'])) {
-          $attributes = $item['#wrapper_attributes'];
-        }
-        $item = drupal_render($item);
-      }
-      $output .= '<li' . new Attribute($attributes) . '>' . $item . '</li>';
-    }
-    $output .= "</$list_type>";
-  }
-  elseif (!empty($variables['empty'])) {
-    $output .= render($variables['empty']);
-  }
-
-  // Only output the list container and title, if there are any list items.
-  // Check to see whether the block title exists before adding a header.
-  // Empty headers are not semantic and present accessibility challenges.
-  if ($output !== '') {
-    if ($title !== '') {
-      $title = '<h3>' . $title . '</h3>';
-    }
-    $output = '<div class="item-list">' . $title . $output . '</div>';
-  }
-
-  return $output;
 }
 
 /**
@@ -2281,7 +2241,7 @@ function template_preprocess_page(&$variables) {
     );
   }
 
-  if ($node = menu_get_object()) {
+  if ($node = \Drupal::request()->attributes->get('node')) {
     $variables['node'] = $node;
   }
 
@@ -2479,6 +2439,10 @@ function template_preprocess_maintenance_page(&$variables) {
   );
   $attached = array('#attached' => $default_css);
   drupal_render($attached);
+  $variables['messages'] = array(
+    '#theme' => 'status_messages',
+    '#access' => $variables['show_messages'],
+  );
 
   $variables['head_title_array']  = $head_title;
   $variables['head_title']        = implode(' | ', $head_title);
@@ -2490,7 +2454,6 @@ function template_preprocess_maintenance_page(&$variables) {
   $variables['language']          = $language_interface;
   $variables['language']->dir     = $language_interface->direction ? 'rtl' : 'ltr';
   $variables['logo']              = theme_get_setting('logo.url');
-  $variables['messages']          = $variables['show_messages'] ? theme('status_messages') : '';
   $variables['main_menu']         = array();
   $variables['secondary_menu']    = array();
   $variables['site_name']         = (theme_get_setting('features.name') ? String::checkPlain($site_name) : '');
@@ -2608,6 +2571,7 @@ function drupal_common_theme() {
     ),
     'links' => array(
       'variables' => array('links' => array(), 'attributes' => array('class' => array('links')), 'heading' => array(), 'set_active_class' => FALSE),
+      'template' => 'links',
     ),
     'dropbutton_wrapper' => array(
       'variables' => array('children' => NULL),
@@ -2644,6 +2608,7 @@ function drupal_common_theme() {
     ),
     'item_list' => array(
       'variables' => array('items' => array(), 'title' => '', 'list_type' => 'ul', 'attributes' => array(), 'empty' => NULL),
+      'template' => 'item-list',
     ),
     'feed_icon' => array(
       'variables' => array('url' => NULL, 'title' => NULL),
@@ -2710,6 +2675,7 @@ function drupal_common_theme() {
     ),
     'details' => array(
       'render element' => 'element',
+      'template' => 'details',
     ),
     'radios' => array(
       'render element' => 'element',
@@ -2725,12 +2691,14 @@ function drupal_common_theme() {
     ),
     'textarea' => array(
       'render element' => 'element',
+      'template' => 'textarea',
     ),
     'tableselect' => array(
       'render element' => 'element',
     ),
     'form_element' => array(
       'render element' => 'element',
+      'template' => 'form-element',
     ),
     'form_required_marker' => array(
       'render element' => 'element',

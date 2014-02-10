@@ -70,6 +70,9 @@ services:
     class: Drupal\Core\Config\FileStorage
     factory_class: Drupal\Core\Config\FileStorageFactory
     factory_method: getActive
+  config.manager:
+    class: Drupal\Core\Config\ConfigManager
+    arguments: ['@entity.manager', '@config.factory', '@config.typed', '@string_translation']
   config.storage:
     class: Drupal\Core\Config\CachedStorage
     arguments: ['@config.cachedstorage.storage', '@cache.config']
@@ -83,7 +86,7 @@ services:
     arguments: ['@config.storage', '@event_dispatcher', '@config.typed']
   config.installer:
     class: Drupal\Core\Config\ConfigInstaller
-    arguments: ['@config.factory', '@config.storage', '@config.typed', '@entity.manager', '@event_dispatcher']
+    arguments: ['@config.factory', '@config.storage', '@config.typed', '@config.manager', '@event_dispatcher']
   config.storage.staging:
     class: Drupal\Core\Config\FileStorage
     factory_class: Drupal\Core\Config\FileStorageFactory
@@ -111,7 +114,7 @@ services:
     class: Drupal\Core\Form\FormBuilder
     arguments: ['@module_handler', '@keyvalue.expirable', '@event_dispatcher', '@url_generator', '@string_translation', '@?csrf_token', '@?http_kernel']
     calls:
-      - [setRequest, ['@?request']]
+      - [setRequest, ['@?request=']]
   keyvalue:
     class: Drupal\Core\KeyValueStore\KeyValueFactory
     arguments: ['@service_container', '@settings']
@@ -188,6 +191,9 @@ services:
   entity.manager:
     class: Drupal\Core\Entity\EntityManager
     arguments: ['@container.namespaces', '@service_container', '@module_handler', '@cache.cache', '@language_manager', '@string_translation']
+  entity.form_builder:
+    class: Drupal\Core\Entity\EntityFormBuilder
+    arguments: ['@entity.manager', '@form_builder']
   plugin.manager.field.field_type:
     class: Drupal\Core\Field\FieldTypePluginManager
     arguments: ['@container.namespaces', '@cache.field', '@language_manager', '@module_handler']
@@ -215,6 +221,9 @@ services:
   request:
     class: Symfony\Component\HttpFoundation\Request
     synthetic: true
+    synchronized: true
+  request_stack:
+    class: Symfony\Component\HttpFoundation\RequestStack
   event_dispatcher:
     class: Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher
     arguments: ['@service_container']
@@ -226,7 +235,7 @@ services:
     arguments: ['@controller_resolver', '@string_translation']
   http_kernel:
     class: Drupal\Core\HttpKernel
-    arguments: ['@event_dispatcher', '@service_container', '@controller_resolver']
+    arguments: ['@event_dispatcher', '@service_container', '@controller_resolver', '@request_stack']
   language_manager:
     class: Drupal\Core\Language\LanguageManager
     arguments: ['@language.default']
@@ -286,9 +295,7 @@ services:
       - [setContext, ['@?router.request_context']]
   link_generator:
     class: Drupal\Core\Utility\LinkGenerator
-    arguments: ['@url_generator', '@module_handler', '@language_manager', '@path.alias_manager.cached']
-    calls:
-      - [setRequest, ['@?request']]
+    arguments: ['@url_generator', '@module_handler', '@path.alias_manager.cached']
   router.dynamic:
     class: Symfony\Cmf\Component\Routing\DynamicRouter
     arguments: ['@router.request_context', '@router.matcher', '@url_generator']
@@ -342,8 +349,6 @@ services:
     class: Drupal\Core\ParamConverter\ParamConverterManager
     calls:
       - [setContainer, ['@service_container']]
-    tags:
-      - { name: route_enhancer }
   paramconverter_subscriber:
     class: Drupal\Core\EventSubscriber\ParamConverterSubscriber
     tags:
@@ -372,6 +377,12 @@ services:
   ajax_response_subscriber:
     class: Drupal\Core\EventSubscriber\AjaxResponseSubscriber
     tags:
+      - { name: event_subscriber }
+  route_enhancer.param_conversion:
+    class: Drupal\Core\Routing\Enhancer\ParamConversionEnhancer
+    arguments: ['@paramconverter_manager']
+    tags:
+      - { name: route_enhancer }
       - { name: event_subscriber }
   route_enhancer.authentication:
     class: Drupal\Core\Routing\Enhancer\AuthenticationEnhancer
@@ -435,10 +446,12 @@ services:
     class: Drupal\Core\EventSubscriber\HtmlViewSubscriber
     tags:
       - { name: event_subscriber }
-    arguments: ['@html_page_renderer']
+    arguments: ['@html_fragment_renderer', '@html_page_renderer']
+  html_fragment_renderer:
+    class: Drupal\Core\Page\DefaultHtmlFragmentRenderer
+    arguments: ['@language_manager']
   html_page_renderer:
     class: Drupal\Core\Page\DefaultHtmlPageRenderer
-    arguments: ['@language_manager']
   private_key:
     class: Drupal\Core\PrivateKey
     arguments: ['@state']
@@ -530,14 +543,14 @@ services:
     class: Drupal\Core\EventSubscriber\ConfigSnapshotSubscriber
     tags:
       - { name: event_subscriber }
-    arguments: ['@config.storage', '@config.storage.snapshot']
+    arguments: ['@config.manager', '@config.storage', '@config.storage.snapshot']
   exception_controller:
     class: Drupal\Core\Controller\ExceptionController
-    arguments: ['@content_negotiation', '@string_translation', '@title_resolver', '@html_page_renderer']
+    arguments: ['@content_negotiation', '@string_translation', '@title_resolver', '@html_page_renderer', '@html_fragment_renderer']
     calls:
       - [setContainer, ['@service_container']]
   exception_listener:
-    class: Symfony\Component\HttpKernel\EventListener\ExceptionListener
+    class: Drupal\Core\EventSubscriber\ExceptionListener
     tags:
       - { name: event_subscriber }
     arguments: [['@exception_controller', execute]]

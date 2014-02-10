@@ -44,7 +44,14 @@ class ExceptionController extends HtmlControllerBase implements ContainerAwareIn
    *
    * @var \Drupal\Core\Page\HtmlPageRendererInterface
    */
-  protected $renderer;
+  protected $htmlPageRenderer;
+
+  /**
+   * The fragment rendering service.
+   *
+   * @var \Drupal\Core\Page\HtmlFragmentRendererInterface
+   */
+  protected $fragmentRenderer;
 
   /**
    * Constructor.
@@ -58,11 +65,14 @@ class ExceptionController extends HtmlControllerBase implements ContainerAwareIn
    *   The title resolver.
    * @param \Drupal\Core\Page\HtmlPageRendererInterface $renderer
    *   The page renderer.
+   * @param \Drupal\Core\Page\HtmlFragmentRendererInterface $fragment_renderer
+   *   The fragment rendering service.
    */
-  public function __construct(ContentNegotiation $negotiation, TranslationInterface $translation_manager, TitleResolverInterface $title_resolver, HtmlPageRendererInterface $renderer) {
+  public function __construct(ContentNegotiation $negotiation, TranslationInterface $translation_manager, TitleResolverInterface $title_resolver, HtmlPageRendererInterface $renderer, $fragment_renderer) {
     parent::__construct($translation_manager, $title_resolver);
     $this->negotiation = $negotiation;
-    $this->renderer = $renderer;
+    $this->htmlPageRenderer = $renderer;
+    $this->fragmentRenderer = $fragment_renderer;
   }
 
   /**
@@ -136,7 +146,13 @@ class ExceptionController extends HtmlControllerBase implements ContainerAwareIn
         $request->query->set('destination', $system_path);
       }
 
-      $subrequest = Request::create($request->getBaseUrl() . '/' . $path, 'get', array('destination' => $system_path, '_exception_statuscode' => 403), $request->cookies->all(), array(), $request->server->all());
+      if ($request->getMethod() === 'POST') {
+        $subrequest = Request::create($request->getBaseUrl() . '/' . $path, 'POST', array('destination' => $system_path, '_exception_statuscode' => 403) + $request->request->all(), $request->cookies->all(), array(), $request->server->all());
+        $subrequest->query->set('destination', $system_path);
+      }
+      else {
+        $subrequest = Request::create($request->getBaseUrl() . '/' . $path, 'GET', array('destination' => $system_path, '_exception_statuscode' => 403), $request->cookies->all(), array(), $request->server->all());
+      }
 
       // The active trail is being statically cached from the parent request to
       // the subrequest, like any other static.  Unfortunately that means the
@@ -164,8 +180,8 @@ class ExceptionController extends HtmlControllerBase implements ContainerAwareIn
       );
 
       $fragment = $this->createHtmlFragment($page_content, $request);
-      $page = $this->renderer->render($fragment, 403);
-      $response = new Response($this->renderer->renderPage($page), $page->getStatusCode());
+      $page = $this->fragmentRenderer->render($fragment, 403);
+      $response = new Response($this->htmlPageRenderer->render($page), $page->getStatusCode());
       return $response;
     }
 
@@ -213,7 +229,13 @@ class ExceptionController extends HtmlControllerBase implements ContainerAwareIn
       // @todo The create() method expects a slash-prefixed path, but we store a
       //   normal system path in the site_404 variable.
 
-      $subrequest = Request::create($request->getBaseUrl() . '/' . $path, 'get', array('destination' => $system_path, '_exception_statuscode' => 403), $request->cookies->all(), array(), $request->server->all());
+      if ($request->getMethod() === 'POST') {
+        $subrequest = Request::create($request->getBaseUrl() . '/' . $path, 'POST', array('destination' => $system_path, '_exception_statuscode' => 404) + $request->request->all(), $request->cookies->all(), array(), $request->server->all());
+        $subrequest->query->set('destination', $system_path);
+      }
+      else {
+        $subrequest = Request::create($request->getBaseUrl() . '/' . $path, 'GET', array('destination' => $system_path, '_exception_statuscode' => 404), $request->cookies->all(), array(), $request->server->all());
+      }
 
       // The active trail is being statically cached from the parent request to
       // the subrequest, like any other static.  Unfortunately that means the
@@ -241,8 +263,8 @@ class ExceptionController extends HtmlControllerBase implements ContainerAwareIn
       );
 
       $fragment = $this->createHtmlFragment($page_content, $request);
-      $page = $this->renderer->render($fragment, 404);
-      $response = new Response($this->renderer->renderPage($page), $page->getStatusCode());
+      $page = $this->fragmentRenderer->render($fragment, 404);
+      $response = new Response($this->htmlPageRenderer->render($page), $page->getStatusCode());
       return $response;
     }
 
@@ -270,8 +292,7 @@ class ExceptionController extends HtmlControllerBase implements ContainerAwareIn
 
     // When running inside the testing framework, we relay the errors
     // to the tested site by the way of HTTP headers.
-    $test_info = &$GLOBALS['drupal_test_info'];
-    if (!empty($test_info['in_child_site']) && !headers_sent() && (!defined('SIMPLETEST_COLLECT_ERRORS') || SIMPLETEST_COLLECT_ERRORS)) {
+    if (DRUPAL_TEST_IN_CHILD_SITE && !headers_sent() && (!defined('SIMPLETEST_COLLECT_ERRORS') || SIMPLETEST_COLLECT_ERRORS)) {
       // $number does not use drupal_static as it should not be reset
       // as it uniquely identifies each PHP error.
       static $number = 0;

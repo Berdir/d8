@@ -9,6 +9,7 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Utility\ModuleInfo;
+use Drupal\block\BlockPluginInterface;
 use Drupal\menu_link\MenuLinkInterface;
 use Drupal\user\UserInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -1389,6 +1390,18 @@ function system_library_info() {
     ),
   );
 
+  // jQuery Intrinsic Measurements.
+  $libraries['jquery.intrinsic'] = array(
+    'title' => 'Instric Measurements',
+    'version' => '1.0',
+    'js' => array(
+      'core/misc/jquery.intrinsic.js' => array(),
+    ),
+    'dependencies' => array(
+      array('system', 'jquery'),
+    ),
+  );
+
   // jQuery Form Plugin.
   $libraries['jquery.form'] = array(
     'title' => 'jQuery Form Plugin',
@@ -2358,7 +2371,7 @@ function system_page_build(&$page) {
   // - applying a post-render cache callback if the current user is anonymous.
   // @see l()
   // @see \Drupal\Core\Utility\LinkGenerator::generate()
-  // @see theme_links()
+  // @see template_preprocess_links()
   // @see \Drupal\system\Controller\SystemController::setLinkActiveClass
   if (\Drupal::currentUser()->isAuthenticated()) {
     $page['#attached']['library'][] = array('system', 'drupal.active-link');
@@ -2578,7 +2591,6 @@ function _system_rebuild_module_data() {
     'package' => 'Other',
     'version' => NULL,
     'php' => DRUPAL_MINIMUM_PHP,
-    'files' => array(),
   );
 
   // Read info files for each module.
@@ -3089,6 +3101,24 @@ function system_page_alter(&$page) {
       $page[$region]['#region'] = $region;
     }
   }
+}
+
+/**
+ * Implements hook_block_view_BASE_BLOCK_ID_alter().
+ */
+function system_block_view_system_main_block_alter(array &$build, BlockPluginInterface $block) {
+  // Contextual links on the system_main block would basically duplicate the
+  // tabs/local tasks, so reduce the clutter.
+  unset($build['#contextual_links']);
+}
+
+/**
+ * Implements hook_block_view_BASE_BLOCK_ID_alter().
+ */
+function system_block_view_system_help_block_alter(array &$build, BlockPluginInterface $block) {
+  // Assume that most users do not need or want to perform contextual actions on
+  // the help block, so don't needlessly draw attention to it.
+  unset($build['#contextual_links']);
 }
 
 /**

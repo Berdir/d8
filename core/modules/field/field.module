@@ -7,6 +7,7 @@
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Template\Attribute;
+use Drupal\entity\Entity\EntityViewDisplay;
 
 /*
  * Load all public Field API functions. Drupal currently has no
@@ -428,7 +429,7 @@ function field_view_field(ContentEntityInterface $entity, $field_name, $display_
   // Get the formatter object.
   if (is_string($display_options)) {
     $view_mode = $display_options;
-    $formatter = entity_get_render_display($entity, $view_mode)->getRenderer($field_name);
+    $formatter = EntityViewDisplay::collectRenderDisplay($entity, $view_mode)->getRenderer($field_name);
   }
   else {
     $view_mode = '_custom';
@@ -676,14 +677,14 @@ function theme_field($variables) {
  */
 function _field_create_entity_from_ids($ids) {
   $id_properties = array();
-  $info = \Drupal::entityManager()->getDefinition($ids->entity_type);
-  if ($id_key = $info->getKey('id')) {
+  $entity_type = \Drupal::entityManager()->getDefinition($ids->entity_type);
+  if ($id_key = $entity_type->getKey('id')) {
     $id_properties[$id_key] = $ids->entity_id;
   }
-  if (isset($ids->revision_id) && $revision_key = $info->getKey('revision')) {
+  if (isset($ids->revision_id) && $revision_key = $entity_type->getKey('revision')) {
     $id_properties[$revision_key] = $ids->revision_id;
   }
-  if (isset($ids->bundle) && $bundle_key = $info->getKey('bundle')) {
+  if (isset($ids->bundle) && $bundle_key = $entity_type->getKey('bundle')) {
     $id_properties[$bundle_key] = $ids->bundle;
   }
   return entity_create($ids->entity_type, $id_properties);

@@ -60,6 +60,14 @@ class FunctionsTest extends WebTestBase {
     $expected = '<div class="item-list"><h3>Some title</h3>No items found.</div>';
     $this->assertThemeOutput('item_list', $variables, $expected, 'Empty %callback generates empty string with title.');
 
+    // Verify that empty text is not displayed when there are list items.
+    $variables = array();
+    $variables['title'] = 'Some title';
+    $variables['empty'] = 'No items found.';
+    $variables['items'] = array('Un', 'Deux', 'Trois');
+    $expected = '<div class="item-list"><h3>Some title</h3><ul><li>Un</li><li>Deux</li><li>Trois</li></ul></div>';
+    $this->assertThemeOutput('item_list', $variables, $expected, '%callback does not print empty text when there are list items.');
+
     // Verify nested item lists.
     $variables = array();
     $variables['title'] = 'Some title';
@@ -149,9 +157,13 @@ class FunctionsTest extends WebTestBase {
   }
 
   /**
-   * Tests theme_links().
+   * Tests links.html.twig.
    */
   function testLinks() {
+    // Turn off the query for the l() function to compare the active
+    // link correctly.
+    $original_query = \Drupal::request()->query->all();
+    \Drupal::request()->query->replace(array());
     // Verify that empty variables produce no output.
     $variables = array();
     $expected = '';
@@ -197,6 +209,9 @@ class FunctionsTest extends WebTestBase {
     $expected_heading = '<h2>Links heading</h2>';
     $expected = $expected_heading . $expected_links;
     $this->assertThemeOutput('links', $variables, $expected);
+
+    // Restore the original request's query.
+    \Drupal::request()->query->replace($original_query);
 
     // Verify that passing an array as heading works (core support).
     $variables['heading'] = array('text' => 'Links heading', 'level' => 'h3', 'class' => 'heading');

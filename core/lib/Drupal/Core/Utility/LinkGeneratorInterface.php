@@ -7,6 +7,8 @@
 
 namespace Drupal\Core\Utility;
 
+use Drupal\Core\Url;
+
 /**
  * Defines an interface for generating links from route names and parameters.
  */
@@ -78,15 +80,16 @@ interface LinkGeneratorInterface {
   public function generate($text, $route_name, array $parameters = array(), array $options = array());
 
   /**
-   * Returns information for the currently active route.
+   * Renders a link to a URL.
    *
-   * @return array
-   *   An array of active route information, containing the following keys:
-   *     - route_name: The currently active route_name
-   *     - language: The current language
-   *     - parameters: An array of request parameters and any query string
-   *       parameters.
+   * @param string $text
+   *   The link text for the anchor tag as a translated string.
+   * @param \Drupal\Core\Url $url
+   *   The URL object used for the link.
+   *
+   * @return string
+   *   An HTML string containing a link to the given route and parameters.
    */
-  public function getActive();
+  public function generateFromUrl($text, Url $url);
 
 }

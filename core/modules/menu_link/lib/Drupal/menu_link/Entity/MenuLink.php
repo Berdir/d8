@@ -9,6 +9,7 @@ namespace Drupal\menu_link\Entity;
 
 use Drupal\Core\Entity\Entity;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
+use Drupal\Core\Url;
 use Drupal\menu_link\MenuLinkInterface;
 use Symfony\Component\Routing\Route;
 
@@ -21,7 +22,6 @@ use Symfony\Component\Routing\Route;
  *   controllers = {
  *     "storage" = "Drupal\menu_link\MenuLinkStorageController",
  *     "access" = "Drupal\menu_link\MenuLinkAccessHandler",
- *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "form" = {
  *       "default" = "Drupal\menu_link\MenuLinkFormController"
  *     }
@@ -505,13 +505,9 @@ class MenuLink extends Entity implements \ArrayAccess, MenuLinkInterface {
 
     // Find the route_name.
     if (!isset($this->route_name)) {
-      if (!$this->external && $result = \Drupal::service('router.matcher.final_matcher')->findRouteNameParameters($this->link_path)) {
-        list($this->route_name, $this->route_parameters) = $result;
-      }
-      else {
-        $this->route_name = '';
-        $this->route_parameters = array();
-      }
+      $url = Url::createFromPath($this->link_path);
+      $this->route_name = $url->getRouteName();
+      $this->route_parameters = $url->getRouteParameters();
     }
     elseif (empty($this->link_path)) {
       $this->link_path = \Drupal::urlGenerator()->getPathFromRoute($this->route_name, $this->route_parameters);
@@ -537,7 +533,7 @@ class MenuLink extends Entity implements \ArrayAccess, MenuLinkInterface {
   }
 
   /**
-   * @inheritdoc}
+   * {@inheritdoc}
    */
   public static function postLoad(EntityStorageControllerInterface $storage_controller, array &$entities) {
     parent::postLoad($storage_controller, $entities);

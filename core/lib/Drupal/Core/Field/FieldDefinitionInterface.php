@@ -75,7 +75,7 @@ interface FieldDefinitionInterface extends ListDefinitionInterface {
    * @return string
    *   The field type, i.e. the id of a field type plugin. For example 'text'.
    *
-   * @see \Drupal\Core\Field\FieldTypePluginManager
+   * @see \Drupal\Core\Field\FieldTypePluginManagerInterface
    */
   public function getType();
 
@@ -143,7 +143,7 @@ interface FieldDefinitionInterface extends ListDefinitionInterface {
    * @return bool
    *   TRUE if the display for this field is configurable in the given context.
    *   If TRUE, the display options returned by getDisplayOptions() may be
-   *   overridden via the respective EntityDisplay.
+   *   overridden via the respective entity display.
    *
    * @see \Drupal\Core\Entity\Display\EntityDisplayInterface
    */
@@ -153,7 +153,7 @@ interface FieldDefinitionInterface extends ListDefinitionInterface {
    * Returns the default display options for the field.
    *
    * If the field's display is configurable, the returned display options act
-   * as default values and may be overridden via the respective EntityDisplay.
+   * as default values and may be overridden via the respective entity display.
    * Otherwise, the display options will be applied to entity displays as is.
    *
    * @param string $display_context

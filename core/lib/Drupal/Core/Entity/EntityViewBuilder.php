@@ -9,9 +9,9 @@ namespace Drupal\Core\Entity;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
-use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\entity\Entity\EntityViewDisplay;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -60,16 +60,16 @@ class EntityViewBuilder extends EntityControllerBase implements EntityController
   /**
    * Constructs a new EntityViewBuilder.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_info
-   *   The entity information array.
+   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   *   The entity type definition.
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
    *   The entity manager service.
    * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    *   The language manager.
    */
-  public function __construct(EntityTypeInterface $entity_info, EntityManagerInterface $entity_manager, LanguageManagerInterface $language_manager) {
-    $this->entityTypeId = $entity_info->id();
-    $this->entityType = $entity_info;
+  public function __construct(EntityTypeInterface $entity_type, EntityManagerInterface $entity_manager, LanguageManagerInterface $language_manager) {
+    $this->entityTypeId = $entity_type->id();
+    $this->entityType = $entity_type;
     $this->entityManager = $entity_manager;
     $this->languageManager = $language_manager;
   }
@@ -77,9 +77,9 @@ class EntityViewBuilder extends EntityControllerBase implements EntityController
   /**
    * {@inheritdoc}
    */
-  public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_info) {
+  public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type) {
     return new static(
-      $entity_info,
+      $entity_type,
       $container->get('entity.manager'),
       $container->get('language_manager')
     );
@@ -165,8 +165,8 @@ class EntityViewBuilder extends EntityControllerBase implements EntityController
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity to be prepared.
    * @param \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display
-   *   The entity_display object holding the display options configured for
-   *   the entity components.
+   *   The entity view display holding the display options configured for the
+   *   entity components.
    * @param string $view_mode
    *   The view mode that should be used to prepare the entity.
    * @param string $langcode
@@ -193,7 +193,6 @@ class EntityViewBuilder extends EntityControllerBase implements EntityController
 
     // Build the view modes and display objects.
     $view_modes = array();
-    $displays = array();
     $context = array('langcode' => $langcode);
     foreach ($entities as $key => $entity) {
       $bundle = $entity->bundle();
@@ -208,14 +207,10 @@ class EntityViewBuilder extends EntityControllerBase implements EntityController
       drupal_alter('entity_view_mode', $entity_view_mode, $entity, $context);
       // Store entities for rendering by view_mode.
       $view_modes[$entity_view_mode][$entity->id()] = $entity;
-
-      // Get the corresponding display settings.
-      if (!isset($displays[$entity_view_mode][$bundle])) {
-        $displays[$entity_view_mode][$bundle] = entity_get_render_display($entity, $entity_view_mode);
-      }
     }
 
     foreach ($view_modes as $mode => $view_mode_entities) {
+      $displays[$mode] = EntityViewDisplay::collectRenderDisplays($view_mode_entities, $mode);
       $this->buildContent($view_mode_entities, $displays[$mode], $mode, $langcode);
     }
 
