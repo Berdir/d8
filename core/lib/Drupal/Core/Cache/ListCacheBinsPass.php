@@ -27,7 +27,6 @@ class ListCacheBinsPass implements CompilerPassInterface {
         $cache_bins[$id] = substr($id, strpos($id, '.') + 1);
       }
     }
-    var_dump($cache_bins);
     $container->setParameter('cache_bins', $cache_bins);
   }
 }

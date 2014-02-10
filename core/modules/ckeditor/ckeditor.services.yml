@@ -4,4 +4,6 @@ services:
     parent: default_plugin_manager
   cache.ckeditor.languages:
     parent: cache_bin_default
+    tags:
+      - { name: cache.bin }
     arguments: [ckeditor]

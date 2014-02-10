@@ -1,6 +1,8 @@
 services:
   cache.migrate:
     parent: cache_bin_default
+    tags:
+      - { name: cache.bin }
     arguments: [migrate]
   plugin.manager.migrate.source:
     class: Drupal\migrate\Plugin\MigratePluginManager

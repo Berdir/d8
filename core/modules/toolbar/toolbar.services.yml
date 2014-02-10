@@ -1,4 +1,6 @@
 services:
   cache.toolbar:
     parent: cache_bin_default
+    tags:
+      - { name: cache.bin }
     arguments: [toolbar]

@@ -70,9 +70,13 @@ services:
     arguments: ['@module_handler']
   cache.views_info:
     parent: cache_bin_default
+    tags:
+      - { name: cache.bin }
     arguments: [views_info]
   cache.views_results:
     parent: cache_bin_default
+    tags:
+      - { name: cache.bin }
     arguments: [views_results]
   views.route_subscriber:
     class: Drupal\views\EventSubscriber\RouteSubscriber

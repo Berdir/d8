@@ -11,29 +11,44 @@ services:
     class: Drupal\Core\Cache\MemoryBackendFactory
   cache.bootstrap:
     parent: cache_bin_default
+    tags:
+      - { name: cache.bin }
     arguments: [bootstrap]
   cache.config:
     parent: cache_bin_default
     tags:
+      - { name: cache.bin }
       - { name: persist }
     arguments: [config]
   cache.cache:
     parent: cache_bin_default
+    tags:
+      - { name: cache.bin }
     arguments: [cache]
   cache.entity:
     parent: cache_bin_default
+    tags:
+      - { name: cache.bin }
     arguments: [entity]
   cache.field:
     parent: cache_bin_default
+    tags:
+      - { name: cache.bin }
     arguments: [field]
   cache.menu:
     parent: cache_bin_default
+    tags:
+      - { name: cache.bin }
     arguments: [menu]
   cache.page:
     parent: cache_bin_default
+    tags:
+      - { name: cache.bin }
     arguments: [page]
   cache.path:
     parent: cache_bin_default
+    tags:
+      - { name: cache.bin }
     arguments: [path]
   config.cachedstorage.storage:
     class: Drupal\Core\Config\FileStorage

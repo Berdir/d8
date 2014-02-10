@@ -4,6 +4,8 @@ services:
     arguments: ['@container.namespaces', '@cache.block', '@language_manager', '@module_handler', '@string_translation']
   cache.block:
     parent: cache_bin_default
+    tags:
+      - { name: cache.bin }
     arguments: [block]
   theme.negotiator.block.admin_demo:
     class: Drupal\block\Theme\AdminDemoNegotiator
