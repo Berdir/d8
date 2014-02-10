@@ -172,8 +172,6 @@ services:
   cache_bin_default:
     abstract: true
     class: Drupal\Core\Cache\CacheBackendInterface
-    tags:
-      - { name: cache.bin }
     factory_method: get
     factory_service: cache_factory
   theme_handler:
