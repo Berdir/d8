@@ -1,6 +1,6 @@
 services:
   cache.filter:
-    parent: default_cache_bin
+    parent: cache_bin_default
     arguments: [filter]
   access_check.filter_disable:
     class: Drupal\filter\Access\FormatDisableCheck

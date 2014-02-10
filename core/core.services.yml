@@ -10,29 +10,30 @@ services:
   cache.backend.memory:
     class: Drupal\Core\Cache\MemoryBackendFactory
   cache.bootstrap:
-    parent: default_cache_bin
+    parent: cache_bin_default
     arguments: [bootstrap]
   cache.config:
-    parent: default_cache_bin
+    parent: cache_bin_default
     tags:
       - { name: persist }
     arguments: [config]
   cache.cache:
-    parent: default_cache_bin
+    parent: cache_bin_default
     arguments: [cache]
   cache.entity:
-    parent: default_cache_bin
+    parent: cache_bin_default
     arguments: [entity]
   cache.field:
-    parent: default_cache_bin
+    parent: cache_bin_default
     arguments: [field]
   cache.menu:
-    parent: default_cache_bin
+    parent: cache_bin_default
     arguments: [menu]
   cache.page:
-    parent: default_cache_bin
+    parent: cache_bin_default
     arguments: [page]
-    parent: default_cache_bin
+  cache.path:
+    parent: cache_bin_default
     arguments: [path]
   config.cachedstorage.storage:
     class: Drupal\Core\Config\FileStorage
@@ -153,13 +154,13 @@ services:
   default_plugin_manager:
     abstract: true
     arguments: ['@container.namespaces', '@cache.cache', '@language_manager', '@module_handler']
-  default_cache_bin:
-      abstract: true
-      class: Drupal\Core\Cache\CacheBackendInterface
-      tags:
-        - { name: cache.bin }
-      factory_method: get
-      factory_service: cache_factory
+  cache_bin_default:
+    abstract: true
+    class: Drupal\Core\Cache\CacheBackendInterface
+    tags:
+      - { name: cache.bin }
+    factory_method: get
+    factory_service: cache_factory
   theme_handler:
     class: Drupal\Core\Extension\ThemeHandler
     arguments: ['@config.factory', '@module_handler', '@cache.cache', '@info_parser', '@config.installer', '@router.builder']
@@ -308,7 +309,7 @@ services:
     class: Drupal\Core\Path\Path
     arguments: ['@database', '@path.alias_manager']
 # The argument to the hashing service defined in services.yml, to the
-# constructor of PhpassHashedPassword is the log2 number of iterations for
+# constructor of Phpa[ssHashedPassword is the log2 number of iterations for
 # password stretching.
 # @todo increase by 1 every Drupal version in order to counteract increases in
 # the speed and power of computers available to crack the hashes. The current
