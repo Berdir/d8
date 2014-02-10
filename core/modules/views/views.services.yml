@@ -69,18 +69,10 @@ services:
     class: Drupal\views\Analyzer
     arguments: ['@module_handler']
   cache.views_info:
-    class: Drupal\Core\Cache\CacheBackendInterface
-    tags:
-      - { name: cache.bin }
-    factory_method: get
-    factory_service: cache_factory
+    parent: default_cache_bin
     arguments: [views_info]
   cache.views_results:
-    class: Drupal\Core\Cache\CacheBackendInterface
-    tags:
-      - { name: cache.bin }
-    factory_method: get
-    factory_service: cache_factory
+    parent: default_cache_bin
     arguments: [views_results]
   views.route_subscriber:
     class: Drupal\views\EventSubscriber\RouteSubscriber

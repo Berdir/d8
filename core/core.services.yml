@@ -10,61 +10,29 @@ services:
   cache.backend.memory:
     class: Drupal\Core\Cache\MemoryBackendFactory
   cache.bootstrap:
-    class: Drupal\Core\Cache\CacheBackendInterface
-    tags:
-      - { name: cache.bin }
-    factory_method: get
-    factory_service: cache_factory
+    parent: default_cache_bin
     arguments: [bootstrap]
   cache.config:
-    class: Drupal\Core\Cache\CacheBackendInterface
+    parent: default_cache_bin
     tags:
-      - { name: cache.bin }
       - { name: persist }
-    factory_method: get
-    factory_service: cache_factory
     arguments: [config]
   cache.cache:
-    class: Drupal\Core\Cache\CacheBackendInterface
-    tags:
-      - { name: cache.bin }
-    factory_method: get
-    factory_service: cache_factory
+    parent: default_cache_bin
     arguments: [cache]
   cache.entity:
-    class: Drupal\Core\Cache\CacheBackendInterface
-    tags:
-      - { name: cache.bin }
-    factory_method: get
-    factory_service: cache_factory
+    parent: default_cache_bin
     arguments: [entity]
   cache.field:
-    class: Drupal\Core\Cache\CacheBackendInterface
-    tags:
-      - { name: cache.bin }
-    factory_method: get
-    factory_service: cache_factory
+    parent: default_cache_bin
     arguments: [field]
   cache.menu:
-    class: Drupal\Core\Cache\CacheBackendInterface
-    tags:
-      - { name: cache.bin }
-    factory_method: get
-    factory_service: cache_factory
+    parent: default_cache_bin
     arguments: [menu]
   cache.page:
-    class: Drupal\Core\Cache\CacheBackendInterface
-    tags:
-      - { name: cache.bin }
-    factory_method: get
-    factory_service: cache_factory
+    parent: default_cache_bin
     arguments: [page]
-  cache.path:
-    class: Drupal\Core\Cache\CacheBackendInterface
-    tags:
-      - { name: cache.bin }
-    factory_method: get
-    factory_service: cache_factory
+    parent: default_cache_bin
     arguments: [path]
   config.cachedstorage.storage:
     class: Drupal\Core\Config\FileStorage
@@ -185,6 +153,13 @@ services:
   default_plugin_manager:
     abstract: true
     arguments: ['@container.namespaces', '@cache.cache', '@language_manager', '@module_handler']
+  default_cache_bin:
+      abstract: true
+      class: Drupal\Core\Cache\CacheBackendInterface
+      tags:
+        - { name: cache.bin }
+      factory_method: get
+      factory_service: cache_factory
   theme_handler:
     class: Drupal\Core\Extension\ThemeHandler
     arguments: ['@config.factory', '@module_handler', '@cache.cache', '@info_parser', '@config.installer', '@router.builder']

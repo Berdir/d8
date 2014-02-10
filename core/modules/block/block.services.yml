@@ -3,11 +3,7 @@ services:
     class: Drupal\block\Plugin\Type\BlockManager
     arguments: ['@container.namespaces', '@cache.block', '@language_manager', '@module_handler', '@string_translation']
   cache.block:
-    class: Drupal\Core\Cache\CacheBackendInterface
-    tags:
-      - { name: cache.bin }
-    factory_method: get
-    factory_service: cache_factory
+    parent: default_cache_bin
     arguments: [block]
   theme.negotiator.block.admin_demo:
     class: Drupal\block\Theme\AdminDemoNegotiator

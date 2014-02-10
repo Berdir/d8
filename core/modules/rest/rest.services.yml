@@ -3,11 +3,7 @@ services:
     class: Drupal\rest\Plugin\Type\ResourcePluginManager
     arguments: ['@container.namespaces', '@cache.rest', '@language_manager', '@module_handler']
   cache.rest:
-    class: Drupal\Core\Cache\CacheBackendInterface
-    tags:
-      - { name: cache.bin }
-    factory_method: get
-    factory_service: cache_factory
+    parent: default_cache_bin
     arguments: [rest]
   access_check.rest.csrf:
     class: Drupal\rest\Access\CSRFAccessCheck
