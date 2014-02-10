@@ -126,7 +126,7 @@ class Query extends QueryBase implements QueryInterface {
    *   Config records keyed by entity IDs.
    */
   protected function loadRecords() {
-    $entity_type = $this->entityManager->getDefinition($this->getEntityType());
+    $entity_type = $this->entityManager->getDefinition($this->getEntityTypeId());
     $prefix = $entity_type->getConfigPrefix() . '.';
     $prefix_length = strlen($prefix);
 

@@ -13,7 +13,7 @@ use Drupal\Core\Entity\EntityStorageControllerInterface;
 /**
  * The base entity query class.
  */
-abstract class QueryBase {
+abstract class QueryBase implements QueryInterface {
 
   /**
    * The entity type this query runs against.
@@ -139,9 +139,9 @@ abstract class QueryBase {
   }
 
   /**
-   * Implements \Drupal\Core\Entity\Query\QueryInterface::getEntityType().
+   * {@inheritdoc}
    */
-  public function getEntityType() {
+  public function getEntityTypeId() {
     return $this->entityTypeId;
   }
 
