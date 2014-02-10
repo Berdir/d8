@@ -27,4 +27,11 @@ class Container extends SymfonyContainer {
     return $service;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  function __sleep() {
+    throw new \Exception('Serializing the service container is not allowed.');
+  }
+
 }
