@@ -31,7 +31,8 @@ class Container extends SymfonyContainer {
    * {@inheritdoc}
    */
   function __sleep() {
-    throw new \Exception('Serializing the service container is not allowed.');
+    trigger_error('The container was serialized.', E_USER_ERROR);
+    return array_keys(get_object_vars($this));
   }
 
 }
