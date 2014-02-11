@@ -37,7 +37,6 @@ use Drupal\user\UserInterface;
  *   uri_callback = "comment_uri",
  *   fieldable = TRUE,
  *   translatable = TRUE,
- *   render_cache = FALSE,
  *   entity_keys = {
  *     "id" = "cid",
  *     "bundle" = "field_id",
