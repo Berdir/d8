@@ -389,7 +389,7 @@ class Source implements \Iterator, \Countable {
    */
   protected function prepareRow(Row $row) {
     // We're explicitly skipping this row - keep track in the map table
-    if ($this->migration->getSourcePlugin()->prepareRow($row) === FALSE) {
+    if (($result = $this->migration->getSourcePlugin()->prepareRow($row)) === FALSE) {
       // Make sure we replace any previous messages for this item with any
       // new ones.
       $id_map = $this->migration->getIdMap();
@@ -410,5 +410,6 @@ class Source implements \Iterator, \Countable {
       }
     }
     $this->numProcessed++;
+    return $result;
   }
 }
