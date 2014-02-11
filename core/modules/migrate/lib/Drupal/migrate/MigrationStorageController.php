@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\migrate_drupal\MigrateStorageController.
+ * Contains \Drupal\migrate\MigrateStorageController.
  */
 
 namespace Drupal\migrate;
@@ -16,7 +16,7 @@ use Drupal\Core\Entity\EntityStorageException;
 /**
  * Storage controller for migration entities.
  */
-class MigrationStorageController extends ConfigStorageController {
+class MigrationStorageController extends ConfigStorageController implements MigrateBuildDependencyInterface {
 
   /**
    * {@inheritdoc}
@@ -26,11 +26,15 @@ class MigrationStorageController extends ConfigStorageController {
     $dynamic_ids = array();
     if (isset($ids)) {
       foreach ($ids as $id) {
+        // Evaluate whether or not this migration is dynamic in the form of
+        // migration_id:* to load all the additional migrations.
         if (($n = strpos($id, ':')) !== FALSE) {
           $base_id = substr($id, 0, $n);
           $ids_to_load[] = $base_id;
+          // Get the ids of the additional migrations.
           $sub_id = substr($id, $n + 1);
           if ($sub_id == '*') {
+            // If the id of the additional migration is '*', get all of them.
             $dynamic_ids[$base_id] = NULL;
           }
           elseif (!isset($dynamic_ids[$base_id]) || is_array($dynamic_ids[$base_id])) {
@@ -46,6 +50,7 @@ class MigrationStorageController extends ConfigStorageController {
     else {
       $ids_to_load = NULL;
     }
+
     /** @var \Drupal\migrate\Entity\MigrationInterface[] $entities */
     $entities = parent::loadMultiple($ids_to_load);
     if (!isset($ids)) {
@@ -86,9 +91,9 @@ class MigrationStorageController extends ConfigStorageController {
   }
 
   /**
-   * Build a dependency tree for the migrations and set their order.
+   * {@inheritdoc}
    */
-  public function buildDependencyMigration($migrations) {
+  public function buildDependencyMigration(array $migrations) {
     $graph = array();
     foreach ($migrations as $migration) {
       $graph[$migration->id]['edges'] = array();

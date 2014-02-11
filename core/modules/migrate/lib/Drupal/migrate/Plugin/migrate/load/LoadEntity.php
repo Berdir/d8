@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Plugin\load\LoadEntityBase.
+ * Contains \Drupal\migrate\Plugin\load\LoadEntity.
  */
 
-namespace Drupal\migrate_drupal\Plugin\migrate\load;
+namespace Drupal\migrate\Plugin\migrate\load;
 
 use Drupal\Component\Utility\MapArray;
 use Drupal\Component\Utility\String;
@@ -47,7 +47,6 @@ class LoadEntity extends LoadBase {
    * {@inheritdoc}
    */
   public function loadMultiple(EntityStorageControllerInterface $storage_controller, array $sub_ids = NULL) {
-    $sub_ids_to_load = array();
     // This entity type has no bundles ('user', 'feed', etc).
     if (isset($this->configuration['bundle_migration'])) {
       /** @var \Drupal\migrate\Entity\MigrationInterface $bundle_migration */

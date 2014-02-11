@@ -8,7 +8,7 @@
 namespace Drupal\migrate_drupal\Plugin\migrate\load\d6;
 
 use Drupal\migrate\Entity\MigrationInterface;
-use Drupal\migrate_drupal\Plugin\migrate\load\LoadEntity;
+use Drupal\migrate\Plugin\migrate\load\LoadEntity;
 
 /**
  * @PluginID("drupal6_term_node")
