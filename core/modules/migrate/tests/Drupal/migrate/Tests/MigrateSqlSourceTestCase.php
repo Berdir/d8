@@ -71,9 +71,7 @@ abstract class MigrateSqlSourceTestCase extends MigrateTestCase {
    * {@inheritdoc}
    */
   protected function setUp() {
-    $module_handler = $this->getMockBuilder('Drupal\Core\Extension\ModuleHandlerInterface')
-      ->disableOriginalConstructor()
-      ->getMock();
+    $module_handler = $this->getMock('Drupal\Core\Extension\ModuleHandlerInterface');
 
     $migration = $this->getMigration();
     $migration->expects($this->any())
