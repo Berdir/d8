@@ -36,7 +36,6 @@ abstract class SqlBase extends SourcePluginBase {
    */
   function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration);
-    $this->mapJoinable = TRUE;
   }
 
   /**
@@ -89,12 +88,6 @@ abstract class SqlBase extends SourcePluginBase {
     // Get the key values, for potential use in joining to the map table, or
     // enforcing idlist.
     $keys = array();
-    foreach ($this->migration->getSourceIds() as $field_name => $field_schema) {
-      if (isset($field_schema['alias'])) {
-        $field_name = $field_schema['alias'] . '.' . $field_name;
-      }
-      $keys[] = $field_name;
-    }
 
     // The rules for determining what conditions to add to the query are as
     // follows (applying first applicable rule)
@@ -112,15 +105,16 @@ abstract class SqlBase extends SourcePluginBase {
       //    conditions in the query). So, ultimately the SQL condition will look
       //    like (original conditions) AND (map IS NULL OR map needs update
       //      OR above highwater).
-      $conditions = $this->query->orConditionGroup();
       $condition_added = FALSE;
-      if ($this->mapJoinable) {
+      $source_ids = $this->migration->getSourceIds();
+      if ($source_ids && $this->migration->getSourcePlugin() instanceof SqlBase) {
+        $conditions = $this->query->orConditionGroup();
         // Build the join to the map table. Because the source key could have
         // multiple fields, we need to build things up.
         $count = 1;
         $map_join = '';
         $delimiter = '';
-        foreach ($this->migration->getSourceIds() as $field_name => $field_schema) {
+        foreach ($source_ids as $field_name => $field_schema) {
           if (isset($field_schema['alias'])) {
             $field_name = $field_schema['alias'] . '.' . $field_name;
           }

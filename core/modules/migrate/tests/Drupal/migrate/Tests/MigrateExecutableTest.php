@@ -43,8 +43,6 @@ class MigrateExecutableTest extends MigrateTestCase {
    */
   protected $executable;
 
-  protected $mapJoinable = FALSE;
-
   protected $migrationConfiguration = array(
     'id' => 'test',
     'limit' => array('unit' => 'second', 'value' => 1),

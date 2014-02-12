@@ -37,13 +37,6 @@ class MigrateExecuteableMemoryExceededTest extends MigrateTestCase {
   protected $executable;
 
   /**
-   * Whether the map is joinable, initialized to FALSE.
-   *
-   * @var bool
-   */
-  protected $mapJoinable = FALSE;
-
-  /**
    * The migration configuration, initialized to set the ID to test.
    *
    * @var array

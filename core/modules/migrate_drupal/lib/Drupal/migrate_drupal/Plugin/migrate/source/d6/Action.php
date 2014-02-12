@@ -44,4 +44,11 @@ class Action extends Drupal6SqlBase {
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getIds() {
+    $ids['aid']['type'] = 'string';
+    return $ids;
+  }
 }

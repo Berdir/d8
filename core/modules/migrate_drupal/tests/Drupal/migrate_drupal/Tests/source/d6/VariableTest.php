@@ -32,8 +32,6 @@ class VariableTest extends MigrateSqlSourceTestCase {
     'destinationIds' => array(),
   );
 
-  protected $mapJoinable = FALSE;
-
   protected $expectedResults = array(
     array(
       'foo' => 1,

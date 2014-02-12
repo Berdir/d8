@@ -24,11 +24,6 @@ class MachineNameTest extends MigrateProcessTestCase {
   protected $transliteration;
 
   /**
-   * @var bool
-   */
-  protected $mapJoinable = FALSE;
-
-  /**
    * {@inheritdoc}
    */
   public static function getInfo() {

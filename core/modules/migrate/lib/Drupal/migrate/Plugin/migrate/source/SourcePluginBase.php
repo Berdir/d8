@@ -52,8 +52,9 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
     $resultHook = $this->getModuleHandler()->invokeAll('migrate_prepare_row', array($row, $this, $this->migration));
     $resultNamedHook = $this->getModuleHandler()->invokeAll('migrate_'. $this->migration->id() . '_prepare_row', array($row, $this, $this->migration));
     // If any of the hooks returned false, we want to skip the row.
-    $result = !in_array(FALSE, $resultHook) && !in_array(FALSE, $resultNamedHook);
-    return $result;
+    if (($resultHook && in_array(FALSE, $resultHook)) || ($resultNamedHook && in_array(FALSE, $resultNamedHook))) {
+      return FALSE;
+    }
   }
 
 }

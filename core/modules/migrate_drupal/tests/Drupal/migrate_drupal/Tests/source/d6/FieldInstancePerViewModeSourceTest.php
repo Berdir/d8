@@ -21,11 +21,6 @@ class FieldInstancePerViewModeSourceTest extends MigrateSqlSourceTestCase {
   // class needs to be manually specified.
   const PLUGIN_CLASS = 'Drupal\migrate_drupal\Plugin\migrate\source\d6\FieldInstancePerViewMode';
 
-  /**
-   * @var bool
-   */
-  protected $mapJoinable = FALSE;
-
   // The fake Migration configuration entity.
   protected $migrationConfiguration = array(
     // The ID of the entity, can be any string.

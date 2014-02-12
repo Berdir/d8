@@ -65,11 +65,6 @@ class Drupal6SqlBaseTest extends MigrateTestCase {
   /**
    * {@inheritdoc}
    */
-  protected $mapJoinable = FALSE;
-
-  /**
-   * {@inheritdoc}
-   */
   public static function getInfo() {
     return array(
       'name' => 'D6 SQL base class tests',
@@ -192,5 +187,9 @@ class TestDrupal6SqlBase extends Drupal6SqlBase {
 
   public function variableGetWrapper($name, $default) {
     return parent::variableGet($name, $default);
+  }
+
+  public function getIds() {
+    return array();
   }
 }

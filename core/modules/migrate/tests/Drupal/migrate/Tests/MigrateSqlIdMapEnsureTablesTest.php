@@ -18,13 +18,6 @@ use Drupal\migrate\Plugin\MigrateIdMapInterface;
 class MigrateSqlIdMapEnsureTablesTest extends MigrateTestCase {
 
   /**
-   * Whether the map is joinable, initialized to FALSE.
-   *
-   * @var bool
-   */
-  protected $mapJoinable = FALSE;
-
-  /**
    * The migration configuration, initialized to set the ID and destination IDs.
    *
    * @var array

@@ -45,4 +45,6 @@ interface MigrateSourceInterface extends \Countable, PluginInspectionInterface {
   public function prepareRow(Row $row);
 
   public function __toString();
+
+  public function getIds();
 }

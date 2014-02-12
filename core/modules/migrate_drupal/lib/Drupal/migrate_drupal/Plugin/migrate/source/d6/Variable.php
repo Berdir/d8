@@ -52,11 +52,16 @@ class Variable extends Drupal6SqlBase {
   /**
    * {@inheritdoc}
    */
-  function query() {
+  public function query() {
     return $this->getDatabase()
       ->select('variable', 'v')
       ->fields('v', array('name', 'value'))
       ->condition('name', $this->variables, 'IN');
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getIds() {
+  }
 }

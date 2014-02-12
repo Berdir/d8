@@ -21,13 +21,6 @@ use Drupal\migrate\Row;
 class MigrateSqlIdMapTest extends MigrateTestCase {
 
   /**
-   * Whether the map is joinable, initialized to FALSE.
-   *
-   * @var bool
-   */
-  protected $mapJoinable = FALSE;
-
-  /**
    * The migration configuration, initialized to set the ID and destination IDs.
    *
    * @var array

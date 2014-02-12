@@ -14,13 +14,6 @@ use Drupal\Tests\UnitTestCase;
  */
 abstract class MigrateTestCase extends UnitTestCase {
 
-  /**
-   * @TODO: does this need to be derived from the source/destination plugin?
-   *
-   * @var bool
-   */
-  protected $mapJoinable = TRUE;
-
   protected $migrationConfiguration = array();
 
   /**
@@ -32,11 +25,9 @@ abstract class MigrateTestCase extends UnitTestCase {
   protected function getMigration() {
     $this->idMap = $this->getMock('Drupal\migrate\Plugin\MigrateIdMapInterface');
 
-    if ($this->mapJoinable) {
-      $this->idMap->expects($this->once())
-        ->method('getQualifiedMapTableName')
-        ->will($this->returnValue('test_map'));
-    }
+    $this->idMap->expects($this->any())
+      ->method('getQualifiedMapTableName')
+      ->will($this->returnValue('test_map'));
 
     $migration = $this->getMockBuilder('Drupal\migrate\Entity\Migration')
       ->disableOriginalConstructor()
