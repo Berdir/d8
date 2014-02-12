@@ -47,7 +47,7 @@ process:
   hostname: hostname
   created: timestamp
   changed: timestamp
-  status: status #ToDo: In D6, published=0.
+  status: status #In D6, published=0. We reverse the value in prepareRow.
   thread: thread
   'comment_body.value': comment
   'comment_body.format':
