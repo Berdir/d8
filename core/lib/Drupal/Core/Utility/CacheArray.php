@@ -63,6 +63,8 @@ use Drupal\Core\Cache\Cache;
  *
  * @deprecated as of Drupal 8.0. Use \Drupal\Core\Cache\CacheCollector instead.
  *
+ * @todo Remove in https://drupal.org/node/2185015
+ *
  * @see SchemaCache
  */
 abstract class CacheArray implements \ArrayAccess {
@@ -200,6 +202,11 @@ abstract class CacheArray implements \ArrayAccess {
   protected function set($data, $lock = TRUE) {
     // Lock cache writes to help avoid stampedes.
     // To implement locking for cache misses, override __construct().
+    // This is sometimes invoked in tests when the test table doesn't exist
+    // anymore. Don't attempt to write if the table doesn't exist.
+    if (!db_table_exists('semaphore')) {
+      return;
+    }
     $lock_name = $this->cid . ':' . $this->bin;
     if (!$lock || lock()->acquire($lock_name)) {
       if ($cached = cache($this->bin)->get($this->cid)) {
