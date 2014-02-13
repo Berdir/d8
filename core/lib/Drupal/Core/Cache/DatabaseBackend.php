@@ -167,6 +167,9 @@ class DatabaseBackend implements CacheBackendInterface {
     $deleted_tags = &drupal_static('Drupal\Core\Cache\DatabaseBackend::deletedTags', array());
     // Re
     foreach ($flat_tags as $tag) {
+      if ($tag == 'configFindByPrefix:1' && !empty($GLOBALS['DEBUG'])) {
+        debug(isset($deleted_tags[$tag]), 'remove deleted tag cache' . $tag);
+      }
       if (isset($deleted_tags[$tag])) {
         unset($deleted_tags[$tag]);
       }
@@ -233,6 +236,9 @@ class DatabaseBackend implements CacheBackendInterface {
     $deleted_tags = &drupal_static('Drupal\Core\Cache\DatabaseBackend::deletedTags', array());
     foreach ($this->flattenTags($tags) as $tag) {
       // Only delete tags once per request unless they are written again.
+      if ($tag == 'configFindByPrefix:1' && !empty($GLOBALS['DEBUG'])) {
+        debug(isset($deleted_tags[$tag]), 'delete cache tag ' . $tag);
+      }
       if (isset($deleted_tags[$tag])) {
         continue;
       }
