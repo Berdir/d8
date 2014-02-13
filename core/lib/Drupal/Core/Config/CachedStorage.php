@@ -204,6 +204,7 @@ class CachedStorage implements StorageInterface, StorageCacheInterface {
       }
       else {
         $this->findByPrefixCache[$prefix] = $this->storage->listAll($prefix);
+        debug($prefix, 'find cache SET');
         $this->cache->set(
           'find:' . $prefix,
           $this->findByPrefixCache[$prefix],
