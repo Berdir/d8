@@ -230,16 +230,6 @@ class Migration extends ConfigEntityBase implements MigrationInterface, Requirem
   /**
    * {@inheritdoc}
    */
-  public function getSourceIds() {
-    if (!$this->sourceIds && ($plugin = $this->getSourcePlugin()) && method_exists($plugin, 'getIds')) {
-      $this->sourceIds = $plugin->getIds();
-    }
-    return $this->sourceIds;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getSourcePlugin() {
     if (!isset($this->sourcePlugin)) {
       $this->sourcePlugin = \Drupal::service('plugin.manager.migrate.source')->createInstance($this->source['plugin'], $this->source, $this);
@@ -370,9 +360,10 @@ class Migration extends ConfigEntityBase implements MigrationInterface, Requirem
 
     // Check if the dependencies are in good shape.
     foreach ($this->dependencies as $dependency) {
+      /** @var \Drupal\migrate\Entity\MigrationInterface $dependent_migration */
       $dependent_migration = entity_load('migration', $dependency);
       // Make sure all migrations have source ids and fail otherwise.
-      if (!$dependent_migration->getSourceIds()) {
+      if (!$dependent_migration->getSourcePlugin()->getIds()) {
         throw new MigrateException(String::format("@dependency has no source ids", array('@dependency' => $dependency)));
       }
 

@@ -111,7 +111,7 @@ class Migration extends ProcessPluginBase implements  ContainerFactoryPluginInte
       $process = array_intersect_key($migration->get('process'), $destination_plugin->getIds());
       // We already have the source id values but need to key them for the Row
       // constructor.
-      $source_ids = $migration->getSourceIds();
+      $source_ids = $migration->getSourcePlugin()->getIds();
       $values = array();
       foreach (array_keys($source_ids) as $index => $source_id) {
         $values[$source_id] = $source_id_values[$migration->id()][$index];

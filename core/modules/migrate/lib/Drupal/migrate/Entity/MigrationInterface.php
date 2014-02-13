@@ -51,13 +51,6 @@ interface MigrationInterface extends ConfigEntityInterface {
   const RESULT_DISABLED = 6;    // This migration is disabled, skipping
 
   /**
-   * Returns the source identifiers.
-   *
-   * @return array
-   */
-  public function getSourceIds();
-
-  /**
    * Returns the initialized source plugin.
    *
    * @return \Drupal\migrate\Plugin\MigrateSourceInterface

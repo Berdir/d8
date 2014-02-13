@@ -105,16 +105,15 @@ abstract class SqlBase extends SourcePluginBase {
       //    conditions in the query). So, ultimately the SQL condition will look
       //    like (original conditions) AND (map IS NULL OR map needs update
       //      OR above highwater).
+      $conditions = $this->query->orConditionGroup();
       $condition_added = FALSE;
-      $source_ids = $this->migration->getSourceIds();
-      if ($source_ids && $this->migration->getSourcePlugin() instanceof SqlBase) {
-        $conditions = $this->query->orConditionGroup();
+      if ($this->getIds()) {
         // Build the join to the map table. Because the source key could have
         // multiple fields, we need to build things up.
         $count = 1;
         $map_join = '';
         $delimiter = '';
-        foreach ($source_ids as $field_name => $field_schema) {
+        foreach ($this->getIds() as $field_name => $field_schema) {
           if (isset($field_schema['alias'])) {
             $field_name = $field_schema['alias'] . '.' . $field_name;
           }
@@ -128,7 +127,7 @@ abstract class SqlBase extends SourcePluginBase {
         $condition_added = TRUE;
 
         // And as long as we have the map table, add its data to the row.
-        $n = count($this->migration->getSourceIds());
+        $n = count($this->getIds());
         for ($count = 1; $count <= $n; $count++) {
           $map_key = 'sourceid' . $count;
           $this->query->addField($alias, $map_key, "migrate_map_$map_key");
