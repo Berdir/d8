@@ -9,4 +9,4 @@ destination:
   plugin: config
   config_name: node.settings
 dependencies:
-  - d6_node
+  - d6_node_type

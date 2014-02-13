@@ -36,6 +36,6 @@ process:
 destination:
   plugin: entity:field_instance
 dependencies:
-  - d6_node
+  - d6_node_type
   - d6_field
   - d6_field_instance
