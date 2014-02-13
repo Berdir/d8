@@ -37,11 +37,7 @@ class FeedLanguageTest extends AggregatorTestBase {
   }
 
   public function setUp() {
-    $GLOBALS['DEBUG'] = TRUE;
     parent::setUp();
-
-    debug('START');
-    debug(drupal_static('Drupal\Core\Cache\DatabaseBackend::deletedTags', array()));
 
     // Create test languages.
     $this->langcodes = array(language_load('en'));
@@ -53,9 +49,6 @@ class FeedLanguageTest extends AggregatorTestBase {
       language_save($language);
       $this->langcodes[$i] = $language;
     }
-    debug(\Drupal::languageManager()->getLanguages());
-
-    debug('END');
   }
 
   /**
