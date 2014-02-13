@@ -165,7 +165,8 @@ class DatabaseBackend implements CacheBackendInterface {
   protected function doSet($cid, $data, $expire, $tags) {
     $flat_tags = $this->flattenTags($tags);
     $deleted_tags = &drupal_static('Drupal\Core\Cache\DatabaseBackend::deletedTags', array());
-    // Re
+    // Remove tags that were already deleted during this request from the static
+    // cache so that another deletion for them will be correctly updated.
     foreach ($flat_tags as $tag) {
       if (isset($deleted_tags[$tag])) {
         unset($deleted_tags[$tag]);
