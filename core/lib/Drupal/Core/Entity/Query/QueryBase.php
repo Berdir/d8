@@ -9,6 +9,7 @@ namespace Drupal\Core\Entity\Query;
 
 use Drupal\Core\Database\Query\PagerSelectExtender;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
 
 /**
  * The base entity query class.
@@ -21,6 +22,13 @@ abstract class QueryBase implements QueryInterface {
    * @var string
    */
   protected $entityTypeId;
+
+  /**
+   * Information about the entity type.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeInterface
+   */
+  protected $entityType;
 
   /**
    * The list of sorts.
@@ -127,9 +135,18 @@ abstract class QueryBase implements QueryInterface {
 
   /**
    * Constructs this object.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   *   The entity type definition.
+   * @param string $conjunction
+   *   - AND: all of the conditions on the query need to match.
+   *   - OR: at least one of the conditions on the query need to match.
+   * @param array $namespaces
+   *   List of potential namespaces of the classes belonging to this query.
    */
-  public function __construct($entity_type, $conjunction, array $namespaces) {
-    $this->entityTypeId = $entity_type;
+  public function __construct(EntityTypeInterface $entity_type, $conjunction, array $namespaces) {
+    $this->entityTypeId = $entity_type->id();
+    $this->entityType = $entity_type;
     $this->conjunction = $conjunction;
     $this->namespaces = $namespaces;
     $this->condition = $this->conditionGroupFactory($conjunction);
