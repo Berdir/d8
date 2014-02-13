@@ -29,8 +29,6 @@ class FilterFormatTest extends MigrateSqlSourceTestCase {
     'source' => array(
       'plugin' => 'drupal6_filter_formats',
     ),
-    'destinationIds' => array(
-    ),
   );
 
   protected $expectedResults = array(

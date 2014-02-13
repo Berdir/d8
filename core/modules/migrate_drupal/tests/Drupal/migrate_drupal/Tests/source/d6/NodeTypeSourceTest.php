@@ -29,11 +29,6 @@ class NodeTypeSourceTest extends MigrateSqlSourceTestCase {
     'source' => array(
       'plugin' => 'drupal6_nodetype',
     ),
-    'destinationIds' => array(
-      'nodetype' => array(
-        // This is where the field schema would go.
-      ),
-    ),
   );
 
   // We need to set up the database contents; it's easier to do that below.

@@ -29,11 +29,6 @@ class BlockSourceTest extends MigrateSqlSourceTestCase {
     'source' => array(
       'plugin' => 'drupal6_block',
     ),
-    'destinationIds' => array(
-      'id' => array(
-        // This is where the field schema would go.
-      ),
-    ),
   );
 
   /**

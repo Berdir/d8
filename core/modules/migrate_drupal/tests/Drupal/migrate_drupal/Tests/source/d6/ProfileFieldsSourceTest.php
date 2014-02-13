@@ -29,11 +29,6 @@ class ProfileFieldsSourceTest extends MigrateSqlSourceTestCase {
     'source' => array(
       'plugin' => 'drupal6_profile_field',
     ),
-    'destinationIds' => array(
-      'profilefield' => array(
-        // This is where the field schema would go.
-      ),
-    ),
   );
 
   // We need to set up the database contents; it's easier to do that below.

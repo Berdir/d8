@@ -24,9 +24,6 @@ class ContactCategorySourceTest extends MigrateSqlSourceTestCase {
     'source' => array(
       'plugin' => 'drupal6_contact_category',
     ),
-    'destinationIds' => array(
-      'cid' => array(),
-    ),
   );
 
   protected $expectedResults = array(

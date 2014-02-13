@@ -27,13 +27,14 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
    */
   protected $migrationConfiguration = array(
     'id' => 'sql_idmap_test',
-    'destinationIds' => array(
-      'destination_id_property' => array(),
-    ),
   );
 
   protected $sourceIds = array(
     'source_id_property' => array(),
+  );
+
+  protected $destinationIds = array(
+    'destination_id_property' => array(),
   );
 
   /**
@@ -76,6 +77,13 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
       ->will($this->returnValue($this->sourceIds));
     $migration->expects($this->any())
       ->method('getSourcePlugin')
+      ->will($this->returnValue($plugin));
+    $plugin = $this->getMock('Drupal\migrate\Plugin\MigrateSourceInterface');
+    $plugin->expects($this->any())
+      ->method('getIds')
+      ->will($this->returnValue($this->destinationIds));
+    $migration->expects($this->any())
+      ->method('getDestinationPlugin')
       ->will($this->returnValue($plugin));
     $this->database = $this->getDatabase($database_contents, $connection_options, $prefix);
     $id_map = new TestSqlIdMap($this->database, array(), 'sql', array(), $migration);
@@ -321,7 +329,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
     // Adjust the migration configuration according to the number of source and
     // destination fields.
     $this->sourceIds = array();
-    $this->migrationConfiguration['destinationIds'] = array();
+    $this->destinationIds = array();
     $source_id_values = array();
     $nonexistent_id_values = array();
     $row = $this->idMapDefaults();
@@ -335,7 +343,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
     for ($i = 1; $i <= $num_destination_fields; $i++) {
       $row["destid$i"] = "destination_id_value_$i";
       $expected_result[] = "destination_id_value_$i";
-      $this->migrationConfiguration['destinationIds']["destination_id_property_$i"] = array();
+      $this->destinationIds["destination_id_property_$i"] = array();
     }
     $database_contents['migrate_map_sql_idmap_test'][] = $row;
     $id_map = $this->getIdMap($database_contents);
@@ -402,7 +410,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
     // Adjust the migration configuration according to the number of source and
     // destination fields.
     $this->sourceIds = array();
-    $this->migrationConfiguration['destinationIds'] = array();
+    $this->destinationIds = array();
     $row = $this->idMapDefaults();
     $expected_result = array();
     for ($i = 1; $i <= $num_source_fields; $i++) {
@@ -416,7 +424,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
       $row["destid$i"] = "destination_id_value_$i";
       $destination_id_values[] = "destination_id_value_$i";
       $nonexistent_id_values[] = "nonexistent_destination_id_value_$i";
-      $this->migrationConfiguration['destinationIds']["destination_id_property_$i"] = array();
+      $this->destinationIds["destination_id_property_$i"] = array();
     }
     $database_contents['migrate_map_sql_idmap_test'][] = $row;
     $id_map = $this->getIdMap($database_contents);

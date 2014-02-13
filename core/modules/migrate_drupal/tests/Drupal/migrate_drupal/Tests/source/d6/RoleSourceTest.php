@@ -32,11 +32,6 @@ class RoleSourceTest extends MigrateSqlSourceTestCase {
     'source' => array(
       'plugin' => 'drupal6_user_role',
     ),
-    'destinationIds' => array(
-      'rid' => array(
-        // This is where the field schema would go.
-      ),
-    ),
   );
 
   protected $expectedResults = array(

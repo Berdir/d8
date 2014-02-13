@@ -31,11 +31,6 @@ class MenuSourceTest extends MigrateSqlSourceTestCase {
     'source' => array(
       'plugin' => 'drupal6_menu',
     ),
-    'destinationIds' => array(
-      'menu_name' => array(
-        // This is where the field schema would go.
-      ),
-    ),
   );
 
   // We need to set up the database contents; it's easier to do that below.

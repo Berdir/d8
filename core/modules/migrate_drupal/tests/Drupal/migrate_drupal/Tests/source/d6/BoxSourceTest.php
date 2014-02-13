@@ -30,14 +30,6 @@ class BoxSourceTest extends MigrateSqlSourceTestCase {
     'source' => array(
       'plugin' => 'drupal6_boxes',
     ),
-    'destinationIds' => array(
-      'entity_id' => array(
-        // This is where the field schema would go.
-      ),
-      'deleted' => array(),
-      'delta' => array(),
-      'langcode' => array(),
-    ),
   );
 
   // We need to set up the database contents; it's easier to do that below.

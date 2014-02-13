@@ -27,11 +27,6 @@ class VocabularySourceTest extends MigrateSqlSourceTestCase {
     'source' => array(
       'plugin' => 'drupal6_vocabulary',
     ),
-    'destinationIds' => array(
-      'vid' => array(
-        // This is where the field schema would go.
-      ),
-    ),
   );
 
   protected $expectedResults = array(

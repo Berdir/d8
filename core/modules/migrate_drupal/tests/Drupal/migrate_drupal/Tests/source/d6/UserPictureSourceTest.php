@@ -24,10 +24,6 @@ class UserPictureSourceTest extends MigrateSqlSourceTestCase {
     'source' => array(
       'plugin' => 'drupal6_user_picture',
     ),
-    'destinationIds' => array(
-      'user_picture' => array(
-      ),
-    ),
   );
 
   protected $expectedResults = array(

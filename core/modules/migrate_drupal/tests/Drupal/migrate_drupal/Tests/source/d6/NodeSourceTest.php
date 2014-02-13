@@ -28,11 +28,6 @@ class NodeSourceTest extends MigrateSqlSourceTestCase {
       'bundle' => 'page',
       'plugin' => 'drupal6_node',
     ),
-    'destinationIds' => array(
-      'nid' => array(
-        // This is where the field schema would go.
-      ),
-    ),
   );
 
   protected $expectedResults = array(

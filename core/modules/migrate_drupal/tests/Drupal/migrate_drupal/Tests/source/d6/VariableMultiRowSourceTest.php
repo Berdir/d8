@@ -31,7 +31,6 @@ class VariableMultiRowSourceTest extends MigrateSqlSourceTestCase {
         'bar',
       ),
     ),
-    'destinationIds' => array(),
   );
 
   protected $expectedResults = array(

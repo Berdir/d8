@@ -24,11 +24,6 @@ class MigrateSqlIdMapEnsureTablesTest extends MigrateTestCase {
    */
   protected $migrationConfiguration = array(
     'id' => 'sql_idmap_test',
-    'destinationIds' => array(
-      'destination_id_property' => array(
-        'type' => 'string',
-      ),
-    ),
   );
 
   /**
@@ -206,6 +201,17 @@ class MigrateSqlIdMapEnsureTablesTest extends MigrateTestCase {
     )));
     $migration->expects($this->any())
       ->method('getSourcePlugin')
+      ->will($this->returnValue($plugin));
+    $plugin = $this->getMock('Drupal\migrate\Plugin\MigrateSourceInterface');
+    $plugin->expects($this->any())
+      ->method('getIds')
+      ->will($this->returnValue(array(
+      'destination_id_property' => array(
+        'type' => 'string',
+      ),
+    )));
+    $migration->expects($this->any())
+      ->method('getDestinationPlugin')
       ->will($this->returnValue($plugin));
     new TestSqlIdMap($database, array(), 'sql', array(), $migration);
   }

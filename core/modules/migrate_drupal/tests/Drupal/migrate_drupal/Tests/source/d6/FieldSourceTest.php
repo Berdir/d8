@@ -29,11 +29,6 @@ class FieldSourceTest extends MigrateSqlSourceTestCase {
     'source' => array(
       'plugin' => 'drupal6_field',
     ),
-    'destinationIds' => array(
-      'content_node_field' => array(
-        // This is where the field schema would go.
-      ),
-    ),
   );
 
   // We need to set up the database contents; it's easier to do that below.

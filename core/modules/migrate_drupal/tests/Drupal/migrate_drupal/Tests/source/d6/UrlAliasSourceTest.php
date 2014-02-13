@@ -24,9 +24,6 @@ class UrlAliasSourceTest extends MigrateSqlSourceTestCase {
     'source' => array(
       'plugin' => 'drupal6_url_alias',
     ),
-    'destinationIds' => array(
-      'pid' => array(),
-    ),
   );
 
   protected $expectedResults = array(

@@ -24,9 +24,6 @@ class AggregatorFeedSourceTest extends MigrateSqlSourceTestCase {
     'source' => array(
       'plugin' => 'drupal6_aggregator_feed',
     ),
-    'destinationIds' => array(
-      'fid' => array(),
-    ),
   );
 
   protected $expectedResults = array(

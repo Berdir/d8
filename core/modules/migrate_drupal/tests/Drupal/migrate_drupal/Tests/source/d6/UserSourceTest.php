@@ -24,11 +24,6 @@ class UserSourceTest extends MigrateSqlSourceTestCase {
     'source' => array(
       'plugin' => 'drupal6_user',
     ),
-    'destinationIds' => array(
-      'uid' => array(
-        // This is where the field schema would go.
-      ),
-    ),
   );
 
   protected $expectedResults = array(

@@ -27,11 +27,6 @@ class AggregatorItemSourceTest extends MigrateSqlSourceTestCase {
     'source' => array(
       'plugin' => 'drupal6_aggregator_item',
     ),
-    'destinationIds' => array(
-      'iid' => array(
-        // This is where the field schema would go.
-      ),
-    ),
   );
 
   protected $expectedResults = array(

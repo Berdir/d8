@@ -31,11 +31,6 @@ class CommentSourceTest extends MigrateSqlSourceTestCase {
     'source' => array(
       'plugin' => 'drupal6_comment',
     ),
-    'destinationIds' => array(
-      'cid' => array(
-        // This is where the field schema would go.
-      ),
-    ),
   );
 
   // We need to set up the database contents; it's easier to do that below.

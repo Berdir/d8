@@ -29,11 +29,6 @@ class FileSourceTest extends MigrateSqlSourceTestCase {
     'source' => array(
       'plugin' => 'drupal6_file',
     ),
-    'destinationIds' => array(
-      'fid' => array(
-        // This is where the field schema would go.
-      ),
-    ),
   );
 
   protected $expectedResults = array(
