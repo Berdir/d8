@@ -88,7 +88,17 @@ class FakeSelect extends Select {
       if ($type != 'INNER' && $type != 'LEFT') {
         throw new \Exception(sprintf('%s type not supported, only INNER and LEFT.', $type));
       }
-      if (!preg_match('/(\w+)\.(\w+)\s*=\s*(\w+)\.(\w+)/', $condition, $matches)) {
+      if (!preg_match('/(\w+\.)?(\w+)\s*=\s*(\w+)\.(\w+)/', $condition, $matches)) {
+        throw new \Exception('Only x.field1 = y.field2 conditions are supported.' . $condition);
+      }
+      if (!$matches[1] && count($this->tables) == 2) {
+        $aliases = array_keys($this->tables);
+        $matches[1] = $aliases[0];
+      }
+      else {
+        $matches[1] = substr($matches[1], 0, -1);
+      }
+      if (!$matches[1]) {
         throw new \Exception('Only x.field1 = y.field2 conditions are supported.' . $condition);
       }
       if ($matches[1] == $alias) {

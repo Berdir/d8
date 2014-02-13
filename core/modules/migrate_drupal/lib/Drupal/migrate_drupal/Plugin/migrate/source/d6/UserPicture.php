@@ -43,7 +43,7 @@ class UserPicture extends Drupal6SqlBase {
    * {@inheritdoc}
    */
   public function getIds() {
-    $ids['fid']['type'] = 'integer';
+    $ids['uid']['type'] = 'integer';
     return $ids;
   }
 }

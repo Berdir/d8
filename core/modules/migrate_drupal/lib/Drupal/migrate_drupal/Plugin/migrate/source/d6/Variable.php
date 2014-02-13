@@ -63,5 +63,6 @@ class Variable extends Drupal6SqlBase {
    * {@inheritdoc}
    */
   public function getIds() {
+    return array();
   }
 }
