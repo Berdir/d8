@@ -117,7 +117,7 @@ function content_translation_entity_type_alter(array &$entity_types) {
       if ($entity_type->hasLinkTemplate('canonical')) {
         // Provide default route names for the translation paths.
         if (!$entity_type->hasLinkTemplate('drupal:content-translation-overview')) {
-          $entity_type->setLinkTemplate('drupal:content-translation-overview', "content_translation.translation_overview_$entity_type");
+          $entity_type->setLinkTemplate('drupal:content-translation-overview', "content_translation.translation_overview_" . $entity_type->id());
         }
         // @todo Remove this as soon as menu access checks rely on the
         //   controller. See https://drupal.org/node/2155787.
