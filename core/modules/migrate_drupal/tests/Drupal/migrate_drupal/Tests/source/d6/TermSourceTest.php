@@ -25,11 +25,6 @@ class TermSourceTest extends MigrateSqlSourceTestCase {
     'source' => array(
       'plugin' => 'drupal6_taxonomy_term',
     ),
-    'sourceIds' => array(
-      'tid' => array(
-        'alias' => 't',
-      ),
-    ),
     'destinationIds' => array(
       'tid' => array(),
     ),

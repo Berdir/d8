@@ -29,14 +29,6 @@ class FilterFormatTest extends MigrateSqlSourceTestCase {
     'source' => array(
       'plugin' => 'drupal6_filter_formats',
     ),
-    'sourceIds' => array(
-      'format' => array(
-        // This is where the field schema would go but for now we need to
-        // specify the table alias for the key. Most likely this will be the
-        // same as BASE_ALIAS.
-        'alias' => 'f',
-      ),
-    ),
     'destinationIds' => array(
     ),
   );

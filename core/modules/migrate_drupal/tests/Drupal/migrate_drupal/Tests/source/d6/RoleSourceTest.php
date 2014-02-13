@@ -32,14 +32,6 @@ class RoleSourceTest extends MigrateSqlSourceTestCase {
     'source' => array(
       'plugin' => 'drupal6_user_role',
     ),
-    'sourceIds' => array(
-      'rid' => array(
-        // This is where the field schema would go but for now we need to
-        // specify the table alias for the key. Most likely this will be the
-        // same as BASE_ALIAS.
-        'alias' => 'r',
-      ),
-    ),
     'destinationIds' => array(
       'rid' => array(
         // This is where the field schema would go.

@@ -28,7 +28,6 @@ class VariableTest extends MigrateSqlSourceTestCase {
         'bar',
       ),
     ),
-    'sourceIds' => array(),
     'destinationIds' => array(),
   );
 

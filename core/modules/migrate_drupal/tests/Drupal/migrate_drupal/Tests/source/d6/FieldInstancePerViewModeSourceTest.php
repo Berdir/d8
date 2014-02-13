@@ -30,17 +30,6 @@ class FieldInstancePerViewModeSourceTest extends MigrateSqlSourceTestCase {
     'source' => array(
       'plugin' => 'drupal6_field_instance_per_view_mode',
     ),
-    'sourceIds' => array(
-      'type_name' => array(
-        // This is where the field schema would go but for now we need to
-        // specify the table alias for the key. Most likely this will be the
-        // same as BASE_ALIAS.
-        'alias' => 'cnfi',
-      ),
-      'view_mode' => array(
-        'alias' => 'cnfi',
-      ),
-    ),
     'destinationIds' => array(
       'id' => array(
         // This is where the field schema would go.

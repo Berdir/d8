@@ -29,17 +29,6 @@ class BlockSourceTest extends MigrateSqlSourceTestCase {
     'source' => array(
       'plugin' => 'drupal6_block',
     ),
-    // This needs to be the identifier of the actual key: cid for comment, nid
-    // for node and so on.
-    'sourceIds' => array(
-      // Block ID.
-      'bid' => array(
-        // This is where the field schema would go but for now we need to
-        // specify the table alias for the key. Most likely this will be the
-        // same as BASE_ALIAS.
-        'alias' => 'b',
-      ),
-    ),
     'destinationIds' => array(
       'id' => array(
         // This is where the field schema would go.

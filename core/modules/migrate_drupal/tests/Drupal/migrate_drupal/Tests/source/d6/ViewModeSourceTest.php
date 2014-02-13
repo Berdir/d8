@@ -30,11 +30,6 @@ class ViewModeSourceTest extends MigrateSqlSourceTestCase {
     'source' => array(
       'plugin' => 'drupal6_field_instance_view_mode',
     ),
-    'sourceIds' => array(
-      'view_mode' => array(
-        'alias' => 'cnfi',
-      ),
-    ),
     'destinationIds' => array(
       'id' => array(
         // This is where the field schema would go.

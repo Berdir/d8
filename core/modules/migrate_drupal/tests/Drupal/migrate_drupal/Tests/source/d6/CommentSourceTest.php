@@ -31,14 +31,6 @@ class CommentSourceTest extends MigrateSqlSourceTestCase {
     'source' => array(
       'plugin' => 'drupal6_comment',
     ),
-    'sourceIds' => array(
-      'cid' => array(
-        // This is where the field schema would go but for now we need to
-        // specify the table alias for the key. Most likely this will be the
-        // same as BASE_ALIAS.
-        'alias' => 'c',
-      ),
-    ),
     'destinationIds' => array(
       'cid' => array(
         // This is where the field schema would go.

@@ -31,11 +31,6 @@ class VariableMultiRowSourceTest extends MigrateSqlSourceTestCase {
         'bar',
       ),
     ),
-    'sourceIds' => array(
-      'name' => array(
-        'alias' => 'v',
-      ),
-    ),
     'destinationIds' => array(),
   );
 

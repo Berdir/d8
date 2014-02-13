@@ -29,16 +29,6 @@ class FieldSourceTest extends MigrateSqlSourceTestCase {
     'source' => array(
       'plugin' => 'drupal6_field',
     ),
-    // This needs to be the identifier of the actual key: cid for comment, nid
-    // for node and so on.
-    'sourceIds' => array(
-      'field_name' => array(
-        // This is where the field schema would go but for now we need to
-        // specify the table alias for the key. Most likely this will be the
-        // same as BASE_ALIAS.
-        'alias' => 'f',
-      ),
-    ),
     'destinationIds' => array(
       'content_node_field' => array(
         // This is where the field schema would go.

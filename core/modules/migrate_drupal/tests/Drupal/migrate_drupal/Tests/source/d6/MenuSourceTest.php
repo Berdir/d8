@@ -31,14 +31,6 @@ class MenuSourceTest extends MigrateSqlSourceTestCase {
     'source' => array(
       'plugin' => 'drupal6_menu',
     ),
-    'sourceIds' => array(
-      'menu_name' => array(
-        // This is where the field schema would go but for now we need to
-        // specify the table alias for the key. Most likely this will be the
-        // same as BASE_ALIAS.
-        'alias' => 'm',
-      ),
-    ),
     'destinationIds' => array(
       'menu_name' => array(
         // This is where the field schema would go.
