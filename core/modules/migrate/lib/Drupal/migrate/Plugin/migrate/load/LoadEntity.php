@@ -12,7 +12,6 @@ use Drupal\Component\Utility\String;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
 use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\MigrateException;
-use Drupal\migrate\Plugin\migrate\load\LoadBase;
 use Drupal\migrate\Plugin\SourceEntityInterface;
 
 /**

@@ -19,6 +19,11 @@ use Drupal\migrate\Row;
 class Node extends Drupal6SqlBase implements SourceEntityInterface {
 
   /**
+   * The join options between the node and the node_revisions_table.
+   */
+  const JOIN = 'n.vid = nr.vid';
+
+  /**
    * The source field information for complex node fields.
    *
    * @var array
@@ -44,18 +49,14 @@ class Node extends Drupal6SqlBase implements SourceEntityInterface {
    *
    * This also includes data from CCK fields.
    *
-   * @todo Support importing all revisions.
    */
   public function query() {
     // Select node in its last revision.
     $query = $this->select('node', 'n')
       ->fields('n', array(
         'nid',
-        'vid',
         'type',
         'language',
-        'title',
-        'uid',
         'status',
         'created',
         'changed',
@@ -66,9 +67,16 @@ class Node extends Drupal6SqlBase implements SourceEntityInterface {
         'tnid',
         'translate',
       ))
+      ->fields('nr', array(
+        'vid',
+        'uid',
+        'title',
+        'body',
+        'teaser',
+        'format',
+      ))
       ->condition('type', $this->configuration['bundle']);
-    $query->innerJoin('node_revisions', 'nr', 'n.vid = nr.vid');
-    $query->fields('nr', array('body', 'teaser', 'format'));
+    $query->innerJoin('node_revisions', 'nr', static::JOIN);
 
     return $query;
   }
@@ -80,9 +88,8 @@ class Node extends Drupal6SqlBase implements SourceEntityInterface {
     $bundle = $row->getSourceProperty('type');
     // Pick up simple CCK fields.
     $cck_table = "content_type_$bundle";
-    $query = $this->query()->condition('n.vid', $row->getSourceProperty('vid'));
     if ($this->tableExists($cck_table)) {
-      $query->leftJoin($cck_table, 'f', 'n.vid = f.vid');
+      $query = $this->select($cck_table, 'f')->condition('vid', $row->getSourceProperty('vid'));
       // The main column for the field should be rendered with the field name,
       // not the column name (e.g., field_foo rather than field_foo_value).
       $field_info = $this->getSourceFieldInfo($bundle);
@@ -115,13 +122,14 @@ class Node extends Drupal6SqlBase implements SourceEntityInterface {
           }
         }
       }
-    }
-    $results = $query->execute()->fetchAssoc();
-    $source = $row->getSource();
-    // We diff the results because the extra will be all the field columns.
-    $new_fields = array_diff($results, $source);
-    foreach ($new_fields as $key => $value) {
-      $row->setSourceProperty($key, $value);
+      if ($results = $query->execute()->fetchAssoc()) {
+        $source = $row->getSource();
+        // We diff the results because the extra will be all the field columns.
+        $new_fields = array_diff($results, $source);
+        foreach ($new_fields as $key => $value) {
+          $row->setSourceProperty($key, $value);
+        }
+      }
     }
 
     // Handle fields that have their own table.

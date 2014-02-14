@@ -99,7 +99,7 @@ abstract class Entity extends DestinationBase implements ContainerFactoryPluginI
    * Creates or loads an entity.
    *
    * @param Row $row
-   * @return EntityInterface
+   * @return \Drupal\Core\Entity\EntityInterface
    */
   protected function getEntity(Row $row) {
     $entity_id = $row->getDestinationProperty($this->getKey('id'));

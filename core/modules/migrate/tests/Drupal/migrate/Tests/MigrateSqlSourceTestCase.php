@@ -95,6 +95,9 @@ abstract class MigrateSqlSourceTestCase extends MigrateTestCase {
     $this->source->setCache($cache);
   }
 
+  /**
+   * Test the source returns the same rows as expected.
+   */
   public function testRetrieval() {
     $this->queryResultTest($this->source, $this->expectedResults);
   }

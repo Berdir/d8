@@ -2,19 +2,18 @@
 
 /**
  * @file
- * Contains \Drupal\migrate_drupal\Tests\d6\MigrateNodeTest.
+ * Contains \Drupal\migrate_drupal\Tests\d6\MigrateNodeRevisionTest.
  */
 
 namespace Drupal\migrate_drupal\Tests\d6;
 
 use Drupal\migrate\MigrateExecutable;
-use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 use Drupal\Core\Database\Database;
 
 /**
- * Test node migration from Drupal 6 to 8.
+ * Test node revisions migration from Drupal 6 to 8.
  */
-class MigrateNodeTest extends MigrateNodeTestBase {
+class MigrateNodeRevisionTest extends MigrateNodeTestBase {
 
   /**
    * {@inheritdoc}
@@ -27,6 +26,23 @@ class MigrateNodeTest extends MigrateNodeTestBase {
     );
   }
 
+  public function setUp() {
+    parent::setUp();
+    $id_mappings = array(
+      'd6_node' => array(
+        array(array(1), array(1)),
+      ),
+    );
+    $this->prepareIdMappings($id_mappings);
+    $node = entity_create('node', array(
+      'type' => 'story',
+      'nid' => 1,
+      'vid' => 1,
+    ));
+    $node->enforceIsNew();
+    $node->save();
+  }
+
   public function testNode() {
     $path = drupal_get_path('module', 'migrate_drupal');
     $dumps = array(
@@ -35,7 +51,7 @@ class MigrateNodeTest extends MigrateNodeTestBase {
     );
     $this->loadDumps($dumps);
     /** @var \Drupal\migrate\entity\Migration $migration */
-    $migrations = entity_load_multiple('migration', array('d6_node:*'));
+    $migrations = entity_load_multiple('migration', array('d6_node_revision:*'));
     foreach ($migrations as $migration) {
       $executable = new MigrateExecutable($migration, $this);
       $executable->import();
@@ -44,9 +60,11 @@ class MigrateNodeTest extends MigrateNodeTestBase {
       db_truncate($migration->getIdMap()->getMapTableName())->execute();
     }
 
-    $node = node_load(1);
+    $node = \Drupal::entityManager()->getStorageController('node')->loadRevision(2);
     $this->assertEqual($node->id(), 1, 'Node 1 loaded.');
-    $this->assertEqual($node->body->value, 'test');
+    $this->assertEqual($node->getRevisionId(), 2, 'Node 1 revision 2loaded.');
+    $this->assertEqual($node->body->value, 'test rev 2');
+    return;
     $this->assertEqual($node->body->format, 'restricted_html');
     $this->assertEqual($node->getType(), 'story', 'Node has the correct bundle.');
     $this->assertEqual($node->getTitle(), 'Test title', 'Node has the correct title.');
@@ -62,11 +80,12 @@ class MigrateNodeTest extends MigrateNodeTestBase {
 
     // Test that we can re-import using the EntityContentBase destination.
     $connection = Database::getConnection('default', 'migrate');
+    $connection->update('node')
+      ->fields(array('title' => 'New node title'))
+      ->condition('nid', 1)
+      ->execute();
     $connection->update('node_revisions')
-      ->fields(array(
-        'title' => 'New node title',
-        'format' => 2,
-      ))
+      ->fields(array('format' => 2))
       ->condition('vid', 1)
       ->execute();
     $connection->delete('content_field_test_two')

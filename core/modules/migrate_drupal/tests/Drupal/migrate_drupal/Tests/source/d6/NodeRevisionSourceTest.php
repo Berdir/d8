@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Tests\source\d6\NodeSourceTest.
+ * Contains \Drupal\migrate\Tests\source\d6\NodeRevisionSourceTest.
  */
 
 namespace Drupal\migrate_drupal\Tests\source\d6;
@@ -10,13 +10,13 @@ namespace Drupal\migrate_drupal\Tests\source\d6;
 use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
 
 /**
- * Tests node migration from D6 to D8.
+ * Tests node revision migration from D6 to D8.
  *
  * @group migrate_drupal
  */
-class NodeSourceTest extends MigrateSqlSourceTestCase {
+class NodeRevisionSourceTest extends MigrateSqlSourceTestCase {
 
-  const PLUGIN_CLASS = 'Drupal\migrate_drupal\Plugin\migrate\source\d6\Node';
+  const PLUGIN_CLASS = 'Drupal\migrate_drupal\Plugin\migrate\source\d6\NodeRevision';
 
   // The fake Migration configuration entity.
   protected $migrationConfiguration = array(
@@ -25,8 +25,19 @@ class NodeSourceTest extends MigrateSqlSourceTestCase {
     'idlist' => array(),
     // The fake configuration for the source.
     'source' => array(
+      'node_type' => 'page',
+      'plugin' => 'drupal6_node_revision',
       'bundle' => 'page',
-      'plugin' => 'drupal6_node',
+    ),
+    'sourceIds' => array(
+      'vid' => array(
+        'alias' => 'v',
+      ),
+    ),
+    'destinationIds' => array(
+      'vid' => array(
+        // This is where the field schema would go.
+      ),
     ),
   );
 
@@ -34,11 +45,8 @@ class NodeSourceTest extends MigrateSqlSourceTestCase {
     array(
       // Node fields.
       'nid' => 1,
-      'vid' => 1,
       'type' => 'page',
       'language' => 'en',
-      'title' => 'node title 1',
-      'uid' => 1,
       'status' => 1,
       'created' => 1279051598,
       'changed' => 1279051598,
@@ -49,8 +57,12 @@ class NodeSourceTest extends MigrateSqlSourceTestCase {
       'tnid' => 0,
       'translate' => 0,
       // Node revision fields.
-      'body' => 'body for node 1',
-      'teaser' => 'teaser for node 1',
+      'vid' => 1,
+      'uid' => 1,
+      'title' => 'title for revision 1 (node 1)',
+      'body' => 'body for revision 1 (node 1)',
+      'teaser' => 'teaser for revision 1 (node 1)',
+      'log' => 'log for revision 1 (node 1)',
       'format' => 1,
       'field_test_one_value' => 'text for node 1',
       'field_test_two' => array(
@@ -65,12 +77,74 @@ class NodeSourceTest extends MigrateSqlSourceTestCase {
     ),
     array(
       // Node fields.
-      'nid' => 2,
-      'vid' => 2,
+      'nid' => 1,
       'type' => 'page',
       'language' => 'en',
-      'title' => 'node title 2',
+      'status' => 1,
+      'created' => 1279051598,
+      'changed' => 1279051598,
+      'comment' => 2,
+      'promote' => 1,
+      'moderate' => 0,
+      'sticky' => 0,
+      'tnid' => 0,
+      'translate' => 0,
+      // Node revision fields.
+      'vid' => 3,
       'uid' => 1,
+      'title' => 'title for revision 3 (node 1)',
+      'body' => 'body for revision 3 (node 1)',
+      'teaser' => 'teaser for revision 3 (node 1)',
+      'log' => 'log for revision 3 (node 1)',
+      'format' => 1,
+      'field_test_one_value' => 'text for node 1',
+      'field_test_two' => array(
+        'test field node 1, value 1',
+        'test field node 1, value 2',
+      ),
+
+      // This is just to help with databaseContents and gets unset later.
+      'fields' => array(
+        'field_test_one' => 'text for node 1',
+      ),
+    ),
+    array(
+      // Node fields.
+      'nid' => 1,
+      'type' => 'page',
+      'language' => 'en',
+      'status' => 1,
+      'created' => 1279051598,
+      'changed' => 1279051598,
+      'comment' => 2,
+      'promote' => 1,
+      'moderate' => 0,
+      'sticky' => 0,
+      'tnid' => 0,
+      'translate' => 0,
+      // Node revision fields.
+      'vid' => 4,
+      'uid' => 1,
+      'title' => 'title for revision 4 (node 1)',
+      'body' => 'body for revision 4 (node 1)',
+      'teaser' => 'teaser for revision 4 (node 1)',
+      'log' => 'log for revision 4 (node 1)',
+      'format' => 1,
+      'field_test_one_value' => 'text for node 1',
+      'field_test_two' => array(
+        'test field node 1, value 1',
+        'test field node 1, value 2',
+      ),
+      // This is just to help with databaseContents and gets unset later.
+      'fields' => array(
+        'field_test_one' => 'text for node 1',
+      ),
+    ),
+    array(
+      // Node fields.
+      'nid' => 2,
+      'type' => 'page',
+      'language' => 'en',
       'status' => 1,
       'created' => 1279290908,
       'changed' => 1279308993,
@@ -81,10 +155,13 @@ class NodeSourceTest extends MigrateSqlSourceTestCase {
       'tnid' => 0,
       'translate' => 0,
       // Node revision fields.
-      'body' => 'body for node 2',
-      'teaser' => 'teaser for node 2',
+      'vid' => 2,
+      'uid' => 1,
+      'title' => 'title for revision 2 (node 2)',
+      'body' => 'body for revision 2 (node 2)',
+      'teaser' => 'teaser for revision 2 (node 2)',
+      'log' => 'log for revision 2 (node 2)',
       'format' => 1,
-      'field_test_one_value' => 'text for node 2',
       'field_test_two' => array(
         'test field node 2',
       ),
@@ -164,6 +241,30 @@ class NodeSourceTest extends MigrateSqlSourceTestCase {
           'delta' => 1,
         ),
         array(
+          'vid' => 3,
+          'nid' => 1,
+          'field_test_two_value' => 'test field node 1, value 1',
+          'delta' => 0,
+        ),
+        array(
+          'vid' => 3,
+          'nid' => 1,
+          'field_test_two_value' => 'test field node 1, value 2',
+          'delta' => 1,
+        ),
+        array(
+          'vid' => 4,
+          'nid' => 1,
+          'field_test_two_value' => 'test field node 1, value 1',
+          'delta' => 0,
+        ),
+        array(
+          'vid' => 4,
+          'nid' => 1,
+          'field_test_two_value' => 'test field node 1, value 2',
+          'delta' => 1,
+        ),
+        array(
           'vid' => 2,
           'nid' => 2,
           'field_test_two_value' => 'test field node 2',
@@ -178,8 +279,8 @@ class NodeSourceTest extends MigrateSqlSourceTestCase {
    */
   public static function getInfo() {
     return array(
-      'name' => 'D6 node source functionality',
-      'description' => 'Tests D6 node source plugin.',
+      'name' => 'D6 node revision source functionality',
+      'description' => 'Tests D6 node revision source plugin.',
       'group' => 'Migrate Drupal',
     );
   }
@@ -191,14 +292,20 @@ class NodeSourceTest extends MigrateSqlSourceTestCase {
     foreach ($this->expectedResults as $k => $row) {
       $this->databaseContents['node_revisions'][$k]['nid'] = $row['nid'];
       $this->databaseContents['node_revisions'][$k]['vid'] = $row['vid'];
+      $this->databaseContents['node_revisions'][$k]['uid'] = $row['uid'];
+      $this->databaseContents['node_revisions'][$k]['title'] = $row['title'];
       $this->databaseContents['node_revisions'][$k]['body'] = $row['body'];
       $this->databaseContents['node_revisions'][$k]['teaser'] = $row['teaser'];
       $this->databaseContents['node_revisions'][$k]['format'] = $row['format'];
+      $this->databaseContents['node_revisions'][$k]['log'] = $row['log'];
 
       unset($row['body']);
       unset($row['teaser']);
       unset($row['format']);
-      $this->databaseContents['node'][$k] = $row;
+      unset($row['log']);
+
+      //$this->databaseContents['node'][$k] = $row;
+      $this->databaseContents['node'][$row['nid']] = $row;
 
       // Add the column field storage data.
       $table = 'content_type_' . $row['type'];
@@ -226,44 +333,14 @@ class NodeSourceTest extends MigrateSqlSourceTestCase {
       }
     }
 
-    // Add another node with a different bundle to make sure the source
-    // filters it out.
-    $node = array(
-      // Node fields.
-      'nid' => 5,
-      'vid' => 5,
-      'type' => 'article',
-      'language' => 'en',
-      'title' => 'node title 5',
-      'uid' => 1,
-      'status' => 1,
-      'created' => 1279290908,
-      'changed' => 1279308993,
-      'comment' => 0,
-      'promote' => 1,
-      'moderate' => 0,
-      'sticky' => 0,
-      'tnid' => 0,
-      'translate' => 0,
-      // Node revision fields.
-      'body' => 'body for node 5',
-      'teaser' => 'body for node 5',
-      'format' => 1,
-      'field_test_one_value' => 'text for node 5',
-      'field_test_two' => array(
-        'test field node 5',
-      ),
-      'fields' => array(
-        'field_test_one' => 'text for node 5',
-      ),
-    );
-    $this->databaseContents['node_revisions'][] = $node;
-    unset($node['body']);
-    unset($node['teaser']);
-    unset($node['format']);
-    $this->databaseContents['node'][] = $node;
-
     parent::setUp();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function testRetrieval() {
+    // FakeSelect does not support multiple source identifiers, can not test.
   }
 
 }
@@ -272,10 +349,9 @@ namespace Drupal\migrate_drupal\Tests\source\d6;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\migrate_drupal\Plugin\migrate\source\d6\Node;
+use Drupal\migrate_drupal\Plugin\migrate\source\d6\NodeRevision;
 
-class TestNode extends Node {
-  protected $cckSchemaCorrect = true;
+class TestNodeRevision extends NodeRevision {
   function setDatabase(Connection $database) {
     $this->database = $database;
   }

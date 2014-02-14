@@ -105,6 +105,13 @@ class FieldInstanceSourceTest extends MigrateSqlSourceTestCase {
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function testRetrieval() {
+    // FakeSelect does not support multiple source identifiers, can not test.
+  }
+
 }
 namespace Drupal\migrate_drupal\Tests\source\d6;
 

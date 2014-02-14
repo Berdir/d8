@@ -15,7 +15,7 @@ use Drupal\migrate\Plugin\MigrateDestinationInterface;
 abstract class DestinationBase extends PluginBase implements MigrateDestinationInterface {
 
   /**
-   * The migraiton
+   * The migration.
    *
    * @var \Drupal\migrate\Entity\MigrationInterface
    */

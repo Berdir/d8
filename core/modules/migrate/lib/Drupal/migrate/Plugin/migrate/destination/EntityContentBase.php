@@ -7,15 +7,12 @@
 
 namespace Drupal\migrate\Plugin\migrate\destination;
 
-use Drupal\Component\Utility\String;
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
-use Drupal\Core\TypedData\ComplexDataInterface;
-use Drupal\Core\TypedData\ListInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\field\FieldInfo;
 use Drupal\migrate\Entity\MigrationInterface;
-use Drupal\migrate\MigrateException;
 use Drupal\migrate\Plugin\MigratePluginManager;
 use Drupal\migrate\Row;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -78,6 +75,17 @@ class EntityContentBase extends Entity {
       }
     }
     $entity = $this->getEntity($row);
+    return $this->save($entity, $old_destination_id_values);
+  }
+
+  /**
+   * Save the entity.
+   *
+   * @param ContentEntityInterface $entity
+   * @param array $old_destination_id_values
+   * @return array
+   */
+  protected function save(ContentEntityInterface $entity, array $old_destination_id_values = array()) {
     $entity->save();
     return array($entity->id());
   }
