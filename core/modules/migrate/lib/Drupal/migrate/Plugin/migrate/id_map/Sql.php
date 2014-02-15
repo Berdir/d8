@@ -75,13 +75,11 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
   protected $destinationIdFields;
 
   /**
-   * Stores whether the the tables (map/message) already exist.
-   *
-   * This is determined just once per request/instance of the class.
+   * Whether the plugin is already initialized.
    *
    * @var boolean
    */
-  protected $ensured;
+  protected $initialized;
 
   /**
    * The result.
@@ -179,6 +177,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
    * @return string
    */
   public function mapTableName() {
+    $this->init();
     return $this->mapTableName;
   }
 
@@ -188,6 +187,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
    * @return string
    */
   public function messageTableName() {
+    $this->init();
     return $this->messageTableName;
   }
 
@@ -210,8 +210,25 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
     if (!isset($this->database)) {
       $this->database = \Drupal::database();
     }
-    $this->ensureTables($this->database);
+    $this->init();
     return $this->database;
+  }
+
+  /**
+   * Initialize the plugin.
+   */
+  protected function init() {
+    if (!$this->initialized) {
+      $this->initialized = TRUE;
+      // Default generated table names, limited to 63 characters.
+      $machine_name = str_replace(':', '__', $this->migration->id());
+      $prefixLength = strlen($this->getDatabase()->tablePrefix()) ;
+      $this->mapTableName = 'migrate_map_' . Unicode::strtolower($machine_name);
+      $this->mapTableName = Unicode::substr($this->mapTableName, 0, 63 - $prefixLength);
+      $this->messageTableName = 'migrate_message_' . Unicode::strtolower($machine_name);
+      $this->messageTableName = Unicode::substr($this->messageTableName, 0, 63 - $prefixLength);
+      $this->ensureTables();
+    }
   }
 
   /**
@@ -224,131 +241,121 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
   /**
    * Create the map and message tables if they don't already exist.
    */
-  protected function ensureTables(Connection $database) {
-    if (!$this->ensured) {
-      // Default generated table names, limited to 63 characters.
-      $machine_name = str_replace(':', '__', $this->migration->id());
-      $prefixLength = strlen($database->tablePrefix()) ;
-      $this->mapTableName = 'migrate_map_' . Unicode::strtolower($machine_name);
-      $this->mapTableName = Unicode::substr($this->mapTableName, 0, 63 - $prefixLength);
-      $this->messageTableName = 'migrate_message_' . Unicode::strtolower($machine_name);
-      $this->messageTableName = Unicode::substr($this->messageTableName, 0, 63 - $prefixLength);
-      if (!$database->schema()->tableExists($this->mapTableName)) {
-        // Generate appropriate schema info for the map and message tables,
-        // and map from the source field names to the map/msg field names.
-        $count = 1;
-        $source_id_schema = array();
-        $pks = array();
-        foreach ($this->migration->getSourcePlugin()->getIds() as $id_definition) {
-          $mapkey = 'sourceid' . $count++;
-          $source_id_schema[$mapkey] = $this->getFieldSchema($id_definition);
-          $pks[] = $mapkey;
-        }
+  protected function ensureTables() {
+    if (!$this->getDatabase()->schema()->tableExists($this->mapTableName)) {
+      // Generate appropriate schema info for the map and message tables,
+      // and map from the source field names to the map/msg field names.
+      $count = 1;
+      $source_id_schema = array();
+      $pks = array();
+      foreach ($this->migration->getSourcePlugin()->getIds() as $id_definition) {
+        $mapkey = 'sourceid' . $count++;
+        $source_id_schema[$mapkey] = $this->getFieldSchema($id_definition);
+        $pks[] = $mapkey;
+      }
 
-        $fields = $source_id_schema;
+      $fields = $source_id_schema;
 
-        // Add destination identifiers to map table.
-        // TODO: How do we discover the destination schema?
-        $count = 1;
-        foreach ($this->migration->getDestinationPlugin()->getIds() as $id_definition) {
-          // Allow dest identifier fields to be NULL (for IGNORED/FAILED
-          // cases).
-          $mapkey = 'destid' . $count++;
-          $fields[$mapkey] = $this->getFieldSchema($id_definition);
-          $fields[$mapkey]['not null'] = FALSE;
-        }
-        $fields['source_row_status'] = array(
+      // Add destination identifiers to map table.
+      // TODO: How do we discover the destination schema?
+      $count = 1;
+      foreach ($this->migration->getDestinationPlugin()->getIds() as $id_definition) {
+        // Allow dest identifier fields to be NULL (for IGNORED/FAILED
+        // cases).
+        $mapkey = 'destid' . $count++;
+        $fields[$mapkey] = $this->getFieldSchema($id_definition);
+        $fields[$mapkey]['not null'] = FALSE;
+      }
+      $fields['source_row_status'] = array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => MigrateIdMapInterface::STATUS_IMPORTED,
+        'description' => 'Indicates current status of the source row',
+      );
+      $fields['rollback_action'] = array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => MigrateIdMapInterface::ROLLBACK_DELETE,
+        'description' => 'Flag indicating what to do for this item on rollback',
+      );
+      $fields['last_imported'] = array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'UNIX timestamp of the last time this row was imported',
+      );
+      $fields['hash'] = array(
+        'type' => 'varchar',
+        'length' => '64',
+        'not null' => FALSE,
+        'description' => 'Hash of source row data, for detecting changes',
+      );
+      $schema = array(
+        'description' => 'Mappings from source identifier value(s) to destination identifier value(s).',
+        'fields' => $fields,
+      );
+      if ($pks) {
+        $schema['primary key'] = $pks;
+      }
+      $this->getDatabase()->schema()->createTable($this->mapTableName, $schema);
+
+      // Now do the message table.
+      $fields = array();
+      $fields['msgid'] = array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      );
+      $fields += $source_id_schema;
+
+      $fields['level'] = array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 1,
+      );
+      $fields['message'] = array(
+        'type' => 'text',
+        'size' => 'medium',
+        'not null' => TRUE,
+      );
+      $schema = array(
+        'description' => 'Messages generated during a migration process',
+        'fields' => $fields,
+        'primary key' => array('msgid'),
+      );
+      if ($pks) {
+        $schema['indexes']['sourcekey'] = $pks;
+      }
+      $this->getDatabase()->schema()->createTable($this->messageTableName(), $schema);
+    }
+    else {
+      // Add any missing columns to the map table.
+      if (!$this->getDatabase()->schema()->fieldExists($this->mapTableName,
+                                                    'rollback_action')) {
+        $this->getDatabase()->schema()->addField($this->mapTableName,
+                                              'rollback_action', array(
           'type' => 'int',
           'size' => 'tiny',
-          'unsigned' => TRUE,
-          'not null' => TRUE,
-          'default' => MigrateIdMapInterface::STATUS_IMPORTED,
-          'description' => 'Indicates current status of the source row',
-        );
-        $fields['rollback_action'] = array(
-          'type' => 'int',
-          'size' => 'tiny',
-          'unsigned' => TRUE,
-          'not null' => TRUE,
-          'default' => MigrateIdMapInterface::ROLLBACK_DELETE,
-          'description' => 'Flag indicating what to do for this item on rollback',
-        );
-        $fields['last_imported'] = array(
-          'type' => 'int',
           'unsigned' => TRUE,
           'not null' => TRUE,
           'default' => 0,
-          'description' => 'UNIX timestamp of the last time this row was imported',
-        );
-        $fields['hash'] = array(
+          'description' => 'Flag indicating what to do for this item on rollback',
+        ));
+      }
+      if (!$this->getDatabase()->schema()->fieldExists($this->mapTableName, 'hash')) {
+        $this->getDatabase()->schema()->addField($this->mapTableName, 'hash', array(
           'type' => 'varchar',
           'length' => '64',
           'not null' => FALSE,
           'description' => 'Hash of source row data, for detecting changes',
-        );
-        $schema = array(
-          'description' => 'Mappings from source identifier value(s) to destination identifier value(s).',
-          'fields' => $fields,
-        );
-        if ($pks) {
-          $schema['primary key'] = $pks;
-        }
-        $database->schema()->createTable($this->mapTableName, $schema);
-
-        // Now do the message table.
-        $fields = array();
-        $fields['msgid'] = array(
-          'type' => 'serial',
-          'unsigned' => TRUE,
-          'not null' => TRUE,
-        );
-        $fields += $source_id_schema;
-
-        $fields['level'] = array(
-          'type' => 'int',
-          'unsigned' => TRUE,
-          'not null' => TRUE,
-          'default' => 1,
-        );
-        $fields['message'] = array(
-          'type' => 'text',
-          'size' => 'medium',
-          'not null' => TRUE,
-        );
-        $schema = array(
-          'description' => 'Messages generated during a migration process',
-          'fields' => $fields,
-          'primary key' => array('msgid'),
-        );
-        if ($pks) {
-          $schema['indexes']['sourcekey'] = $pks;
-        }
-        $database->schema()->createTable($this->messageTableName(), $schema);
+        ));
       }
-      else {
-        // Add any missing columns to the map table.
-        if (!$database->schema()->fieldExists($this->mapTableName,
-                                                      'rollback_action')) {
-          $database->schema()->addField($this->mapTableName,
-                                                'rollback_action', array(
-            'type' => 'int',
-            'size' => 'tiny',
-            'unsigned' => TRUE,
-            'not null' => TRUE,
-            'default' => 0,
-            'description' => 'Flag indicating what to do for this item on rollback',
-          ));
-        }
-        if (!$database->schema()->fieldExists($this->mapTableName, 'hash')) {
-          $database->schema()->addField($this->mapTableName, 'hash', array(
-            'type' => 'varchar',
-            'length' => '64',
-            'not null' => FALSE,
-            'description' => 'Hash of source row data, for detecting changes',
-          ));
-        }
-      }
-      $this->ensured = TRUE;
     }
   }
 
