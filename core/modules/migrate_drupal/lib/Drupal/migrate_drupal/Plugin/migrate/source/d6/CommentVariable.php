@@ -89,4 +89,11 @@ class CommentVariable extends Drupal6SqlBase {
     // Nothing to do here.
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getIds() {
+    $ids['node_type']['type'] = 'string';
+    return $ids;
+  }
 }
