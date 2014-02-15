@@ -3,6 +3,7 @@
 use Drupal\Core\Database\Database;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate\Plugin\migrate\source\SqlBase;
+use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Symfony\Component\Yaml\Yaml;
 
 function migrate_drush_command() {
@@ -10,9 +11,6 @@ function migrate_drush_command() {
     'arguments' => array(
       'db_url' => 'The source database URL',
       'manifest' => 'The name of the manifest file',
-    ),
-    'options' => array(
-      'keep' => 'To keep the id map of the previous migration. Omit to completely rerun migrations.',
     ),
   );
   return $items;
@@ -24,12 +22,11 @@ function drush_migrate_manifest($db_url, $manifest) {
   Database::addConnectionInfo('migrate', 'default', $db_spec);
   $list = Yaml::parse($manifest);
   $message = new DrushMigrateMessage();
-  $keep = drush_get_option('keep');
   foreach (entity_load_multiple('migration', $list) as $migration_id => $migration) {
     drush_log("Running $migration_id");
-    if (!$keep) {
-      db_truncate($migration->getIdMap()->getMapTableName())->execute();
-    }
+    db_update($migration->getIdMap()->getMapTableName())
+      ->fields(array('source_row_status' => MigrateIdMapInterface::STATUS_NEEDS_UPDATE))
+      ->execute();
     $executable = new MigrateExecutable($migration, $message);
     $executable->import();
   }
