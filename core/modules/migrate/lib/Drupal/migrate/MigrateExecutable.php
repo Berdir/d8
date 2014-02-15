@@ -219,12 +219,22 @@ class MigrateExecutable {
   public function import() {
     $return = MigrationInterface::RESULT_COMPLETED;
     $source = $this->getSource();
-    $destination = $this->migration->getDestinationPlugin();
     $id_map = $this->migration->getIdMap();
 
     // Knock off migration if the requirements haven't been met.
     if (!$this->migration->checkRequirements()) {
-      throw new MigrateException(String::format('Migration @id did not meet the requirements', array('@id' => $this->migration->id())));
+      $this->message->display(
+        $this->t('Migration @id did not meet the requirements', array('@id' => $this->migration->id())));
+      return MigrationInterface::RESULT_FAILED;
+    }
+    try {
+      $destination = $this->migration->getDestinationPlugin();
+    }
+    catch (\Exception $e) {
+      $this->message->display(
+        $this->t('Migration failed with destination plugin exception: !e',
+          array('!e' => $e->getMessage())), 'error');
+      return MigrationInterface::RESULT_FAILED;
     }
 
     try {
