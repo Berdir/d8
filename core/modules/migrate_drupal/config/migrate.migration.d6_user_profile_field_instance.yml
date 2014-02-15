@@ -15,4 +15,3 @@ destination:
   plugin: entity:field_instance
 dependencies:
   - d6_user_profile_field
-  - d6_field_instance
