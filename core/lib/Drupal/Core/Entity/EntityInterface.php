@@ -223,7 +223,7 @@ interface EntityInterface extends AccessibleInterface {
    *
    * @param \Drupal\Core\Entity\EntityStorageControllerInterface $storage_controller
    *   The entity storage controller object.
-   * @param array $values
+   * @param mixed[] $values
    *   An array of values to set, keyed by property name. If the entity type has
    *   bundles the bundle key has to be specified.
    */
@@ -232,7 +232,7 @@ interface EntityInterface extends AccessibleInterface {
   /**
    * Acts on an entity after it is created but before hooks are invoked.
    *
-   * @param EntityStorageControllerInterface $storage_controller
+   * @param \Drupal\Core\Entity\EntityStorageControllerInterface $storage_controller
    *   The entity storage controller object.
    */
   public function postCreate(EntityStorageControllerInterface $storage_controller);
@@ -244,7 +244,7 @@ interface EntityInterface extends AccessibleInterface {
    *
    * @param EntityStorageControllerInterface $storage_controller
    *   The entity storage controller object.
-   * @param \Drupal\Core\Entity\EntityInterface[] $entities
+   * @param static[] $entities
    *   An array of entities.
    */
   public static function preDelete(EntityStorageControllerInterface $storage_controller, array $entities);
@@ -256,7 +256,7 @@ interface EntityInterface extends AccessibleInterface {
    *
    * @param EntityStorageControllerInterface $storage_controller
    *   The entity storage controller object.
-   * @param \Drupal\Core\Entity\EntityInterface[] $entities
+   * @param static[] $entities
    *   An array of entities.
    */
   public static function postDelete(EntityStorageControllerInterface $storage_controller, array $entities);
@@ -266,7 +266,7 @@ interface EntityInterface extends AccessibleInterface {
    *
    * @param EntityStorageControllerInterface $storage_controller
    *   The entity storage controller object.
-   * @param \Drupal\Core\Entity\EntityInterface[] $entities
+   * @param static[] $entities
    *   An array of entities.
    */
   public static function postLoad(EntityStorageControllerInterface $storage_controller, array &$entities);
@@ -284,7 +284,7 @@ interface EntityInterface extends AccessibleInterface {
    * Returns the entity type definition.
    *
    * @return \Drupal\Core\Entity\EntityTypeInterface
-   *   Entity type definition.
+   *   The entity type definition.
    */
   public function getEntityType();
 

@@ -18,7 +18,7 @@ interface ConfigEntityInterface extends EntityInterface {
    * Returns the original ID.
    *
    * @return string|null
-   *   The original ID, if any.
+   *   The original ID or NULL.
    */
   public function getOriginalId();
 
@@ -28,23 +28,21 @@ interface ConfigEntityInterface extends EntityInterface {
    * @param string $id
    *   The new ID to set as original ID.
    *
-   * @return self
+   * @return $this
    */
   public function setOriginalId($id);
 
   /**
    * Enables the configuration entity.
    *
-   * @return \Drupal\Core\Config\Entity\ConfigEntityInterface
-   *   The configuration entity.
+   * @return $this
    */
   public function enable();
 
   /**
    * Disables the configuration entity.
    *
-   * @return \Drupal\Core\Config\Entity\ConfigEntityInterface
-   *   The configuration entity.
+   * @return $this
    */
   public function disable();
 
@@ -54,8 +52,7 @@ interface ConfigEntityInterface extends EntityInterface {
    * @param bool $status
    *   The status of the configuration entity.
    *
-   * @return \Drupal\Core\Config\Entity\ConfigEntityInterface
-   *   The class instance that this method is called on.
+   * @return $this
    */
   public function setStatus($status);
 
@@ -80,6 +77,7 @@ interface ConfigEntityInterface extends EntityInterface {
    *     checking and managing the status.
    *
    * @return bool
+   *   Whether the entity is enabled or not.
    */
   public function status();
 
@@ -88,6 +86,8 @@ interface ConfigEntityInterface extends EntityInterface {
    * through the import process.
    *
    * @return bool
+   *   Whether the configuration entity is created, updated or deleted through
+   *   the import process.
    */
   public function isSyncing();
 
@@ -98,7 +98,7 @@ interface ConfigEntityInterface extends EntityInterface {
    *   The name of the property that should be returned.
    *
    * @return mixed
-   *   The property, if existing, NULL otherwise.
+   *   The property if it exists, or NULL otherwise.
    */
   public function get($property_name);
 
@@ -117,7 +117,7 @@ interface ConfigEntityInterface extends EntityInterface {
    *
    * These are the values that get saved into config.
    *
-   * @return array
+   * @return mixed[]
    *   An array of exportable properties and their values.
    */
   public function getExportProperties();
