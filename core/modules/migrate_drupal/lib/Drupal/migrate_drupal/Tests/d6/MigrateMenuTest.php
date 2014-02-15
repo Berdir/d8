@@ -46,7 +46,7 @@ class MigrateMenuTest extends MigrateDrupalTestBase {
       ->condition('menu_name', 'navigation')
       ->execute();
 
-    db_truncate($migration->getIdMap()->getMapTableName())->execute();
+    db_truncate($migration->getIdMap()->mapTableName())->execute();
     $migration = entity_load_unchanged('migration', 'd6_menu');
     $executable = new MigrateExecutable($migration, $this);
     $executable->import();

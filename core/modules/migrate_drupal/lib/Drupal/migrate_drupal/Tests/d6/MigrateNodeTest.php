@@ -41,7 +41,7 @@ class MigrateNodeTest extends MigrateNodeTestBase {
       $executable->import();
 
       // This is required for the second import below.
-      db_truncate($migration->getIdMap()->getMapTableName())->execute();
+      db_truncate($migration->getIdMap()->mapTableName())->execute();
     }
 
     $node = node_load(1);

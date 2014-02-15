@@ -57,7 +57,7 @@ class MigrateNodeRevisionTest extends MigrateNodeTestBase {
       $executable->import();
 
       // This is required for the second import below.
-      db_truncate($migration->getIdMap()->getMapTableName())->execute();
+      db_truncate($migration->getIdMap()->mapTableName())->execute();
     }
 
     $node = \Drupal::entityManager()->getStorageController('node')->loadRevision(2);

@@ -65,7 +65,7 @@ class MigrateUrlAliasTest extends MigrateDrupalTestBase {
       ->condition('src', 'node/2')
       ->execute();
 
-    db_update($migration->getIdMap()->getMapTableName())
+    db_update($migration->getIdMap()->mapTableName())
       ->fields(array('source_row_status' => MigrateIdMapInterface::STATUS_NEEDS_UPDATE))
       ->execute();
     $migration = entity_load_unchanged('migration', 'd6_url_alias');

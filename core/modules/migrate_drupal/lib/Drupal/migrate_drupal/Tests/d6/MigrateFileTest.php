@@ -46,7 +46,7 @@ class MigrateFileTest extends MigrateDrupalTestBase {
     $this->assertEqual($file->getMimeType(), 'image/jpeg');
 
     // Test that we can re-import and also test with file_directory_path set.
-    db_truncate($migration->getIdMap()->getMapTableName())->execute();
+    db_truncate($migration->getIdMap()->mapTableName())->execute();
     $migration = entity_load_unchanged('migration', 'd6_file');
     $dumps = array(
       $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6SystemFile.php',

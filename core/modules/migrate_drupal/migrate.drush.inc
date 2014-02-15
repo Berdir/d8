@@ -24,9 +24,7 @@ function drush_migrate_manifest($db_url, $manifest) {
   $message = new DrushMigrateMessage();
   foreach (entity_load_multiple('migration', $list) as $migration_id => $migration) {
     drush_log("Running $migration_id");
-    db_update($migration->getIdMap()->getMapTableName())
-      ->fields(array('source_row_status' => MigrateIdMapInterface::STATUS_NEEDS_UPDATE))
-      ->execute();
+    #$migration->getIdMap()->prepareUpdate();
     $executable = new MigrateExecutable($migration, $message);
     $executable->import();
   }

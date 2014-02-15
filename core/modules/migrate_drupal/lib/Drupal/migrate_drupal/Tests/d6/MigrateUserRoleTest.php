@@ -25,7 +25,7 @@ class MigrateUserRoleTest extends MigrateDrupalTestBase {
 
   function testUserRole() {
     // We need some sample data so we can use the Migration process plugin.
-    $table_name = entity_load('migration', 'd6_filter_format')->getIdMap()->getMapTableName();
+    $table_name = entity_load('migration', 'd6_filter_format')->getIdMap()->mapTableName();
     db_insert($table_name)->fields(array(
       'sourceid1',
       'destid1',

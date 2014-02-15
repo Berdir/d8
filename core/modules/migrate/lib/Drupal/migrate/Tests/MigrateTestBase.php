@@ -81,7 +81,7 @@ class MigrateTestBase extends WebTestBase implements MigrateMessageInterface {
     /** @var \Drupal\migrate\Entity\MigrationInterface[] $migrations */
     $migrations = entity_load_multiple('migration', array_keys($id_mappings));
     foreach ($id_mappings as $migration_id => $data) {
-      $table_name = $migrations[$migration_id]->getIdMap()->getMapTableName();
+      $table_name = $migrations[$migration_id]->getIdMap()->mapTableName();
       $source_id_count = count($data[0][0]);
       $fields = array();
       for ($i = 1; $i <= $source_id_count; $i++) {

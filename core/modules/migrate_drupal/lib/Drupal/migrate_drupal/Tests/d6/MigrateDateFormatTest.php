@@ -49,7 +49,7 @@ class MigrateDateFormatTest extends MigrateDrupalTestBase {
       ->fields(array('value' => serialize('\S\H\O\R\T d/m/Y - H:i')))
       ->condition('name', 'date_format_short')
       ->execute();
-    db_truncate($migration->getIdMap()->getMapTableName())->execute();
+    db_truncate($migration->getIdMap()->mapTableName())->execute();
     $migration = entity_load_unchanged('migration', 'd6_date_formats');
     $executable = new MigrateExecutable($migration, $this);
     $executable->import();
