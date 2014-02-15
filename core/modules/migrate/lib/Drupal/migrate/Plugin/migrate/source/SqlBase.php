@@ -107,7 +107,7 @@ abstract class SqlBase extends SourcePluginBase {
       //      OR above highwater).
       $conditions = $this->query->orConditionGroup();
       $condition_added = FALSE;
-      if ($this->getIds()) {
+      if ($this->getIds() && ($this->migration->getIdMap() instanceof \Drupal\migrate\Plugin\migrate\id_map\Sql)) {
         // Build the join to the map table. Because the source key could have
         // multiple fields, we need to build things up.
         $count = 1;

@@ -255,7 +255,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
 
     foreach ($expected_results as $key => $expected_result) {
       $id_map->saveMessage(array($key), $message, $expected_result['level']);
-      $message_row = $this->database->select($id_map->getMessageTableName(), 'message')
+      $message_row = $this->database->select($id_map->messageTableName(), 'message')
                        ->fields('message')
                        ->condition('level',$expected_result['level'])
                        ->condition('message',$expected_result['message'])
@@ -267,7 +267,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
     // Insert with default level.
     $message_default = 'Hello world default.';
     $id_map->saveMessage(array(5), $message_default);
-    $message_row = $this->database->select($id_map->getMessageTableName(), 'message')
+    $message_row = $this->database->select($id_map->messageTableName(), 'message')
                      ->fields('message')
                      ->condition('level', MigrationInterface::MESSAGE_ERROR)
                      ->condition('message', $message_default)
@@ -688,8 +688,10 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
    */
   public function testDestroy() {
     $id_map = $this->getIdMap();
-    $map_table_name = $id_map->getMapTableName();
-    $message_table_name = $id_map->getMessageTableName();
+    // Initialize the id map.
+    $id_map->getDatabase();
+    $map_table_name = $id_map->mapTableName();
+    $message_table_name = $id_map->messageTableName();
     $row = new Row(array('source_id_property' => 'source_value'), array('source_id_property' => array()));
     $id_map->saveIdMapping($row, array('destination_id_property' => 2));
     $id_map->saveMessage(array('source_value'), 'A message');
