@@ -67,6 +67,11 @@ class Drupal6TermNode {
       'tid' => 2,
     ))
     ->values(array(
+      'nid' => 1,
+      'vid' => 2,
+      'tid' => 4,
+    ))
+    ->values(array(
       'nid' => 2,
       'vid' => 3,
       'tid' => 2,

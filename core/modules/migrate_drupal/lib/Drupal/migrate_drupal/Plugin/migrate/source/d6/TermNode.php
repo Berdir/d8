@@ -5,7 +5,6 @@
  * Contains \Drupal\migrate_drupal\Plugin\migrate\source\d6\TermNode.
  */
 
-
 namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
 
 use Drupal\migrate\Plugin\RequirementsInterface;
@@ -13,23 +12,27 @@ use Drupal\migrate\Plugin\SourceEntityInterface;
 use Drupal\migrate\Row;
 
 /**
- * Drupal 6 taxonomy term-node relationship source from database.
+ * Source returning tids from the term_node table for the current revision.
  *
  * @PluginID("drupal6_term_node")
  */
 class TermNode extends Drupal6SqlBase implements SourceEntityInterface, RequirementsInterface {
 
+    /**
+   * The join options between the node and the term node table.
+   */
+  const JOIN = 'tn.vid = n.vid';
+
   /**
    * {@inheritdoc}
    */
   public function query() {
-    // Select only the current revision -- adding vid to the fields would
-    // make the distinct pointless so only select the nodes.
     $query = $this->select('term_node', 'tn')
       // @todo: working, but not is there support for distinct() in FakeSelect?
       ->distinct()
-      ->fields('tn', array('nid'));
-    $query->join('node', 'n', 'tn.vid = n.vid');
+      ->fields('tn', array('nid', 'vid'));
+    // Because this is an inner join it enforces the current revision.
+    $query->innerJoin('node', 'n', static::JOIN);
     return $query;
 
   }
@@ -49,12 +52,11 @@ class TermNode extends Drupal6SqlBase implements SourceEntityInterface, Requirem
    * {@inheritdoc}
    */
   function prepareRow(Row $row) {
-    // Select the terms belonging the current revision, see query() why vid is
-    // not available.
+    // Select the terms belonging to the revision selected.
     $query = $this->select('term_node', 'tn')
       ->fields('tn', array('tid'))
       ->condition('n.nid', $row->getSourceProperty('nid'));
-    $query->join('node', 'n', 'tn.vid = n.vid');
+    $query->join('node', 'n', static::JOIN);
     $row->setSourceProperty('tid', $query->execute()->fetchCol());
     return parent::prepareRow($row);
   }
@@ -70,8 +72,8 @@ class TermNode extends Drupal6SqlBase implements SourceEntityInterface, Requirem
    * {@inheritdoc}
    */
   public function getIds() {
-    $ids['nid']['type'] = 'integer';
-    $ids['nid']['alias'] = 'tn';
+    $ids['vid']['type'] = 'integer';
+    $ids['vid']['alias'] = 'tn';
     return $ids;
   }
 

@@ -14,14 +14,7 @@ class MigrateTermNodeTestBase extends MigrateDrupalTestBase {
   /**
    * {@inheritdoc}
    */
-  static $modules = array('taxonomy');
-
-  /**
-   * The list of node ids created.
-   *
-   * @var array
-   */
-  protected $nids;
+  static $modules = array('node', 'taxonomy');
 
   public function setUp() {
     parent::setUp();
@@ -57,15 +50,28 @@ class MigrateTermNodeTestBase extends MigrateDrupalTestBase {
       'd6_vocabulary_field' => array(
         array(array(1), array('node', 'test')),
       ),
+      'd6_node' => array(
+        array(array(1), array(1)),
+        array(array(2), array(2)),
+      ),
     );
-    $this->nids = array();
-    for ($i = 1; $i <= 2; $i++) {
-      $node = entity_create('node', array('type' => 'story'));
-      $node->save();
-      $this->nids[$i] = $node->id();
-      $id_mappings['d6_node'][] = array(array($i), array($node->id()));
-    }
     $this->prepareIdMappings($id_mappings);
+    $vids = array(1, 2, 3);
+    for ($i = 1; $i <= 2; $i++) {
+      $node = entity_create('node', array(
+        'type' => 'story',
+        'nid' => $i,
+        'vid' => array_shift($vids),
+      ));
+      $node->enforceIsNew();
+      $node->save();
+      if ($i == 1) {
+        $node->vid->value = array_shift($vids);
+        $node->enforceIsNew(FALSE);
+        $node->isDefaultRevision(FALSE);
+        $node->save();
+      }
+    }
     $path =drupal_get_path('module', 'migrate_drupal');
     $dumps = array(
       $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6Node.php',

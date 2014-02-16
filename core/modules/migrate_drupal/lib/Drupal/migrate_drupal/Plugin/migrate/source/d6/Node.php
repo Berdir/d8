@@ -19,7 +19,7 @@ use Drupal\migrate\Row;
 class Node extends Drupal6SqlBase implements SourceEntityInterface {
 
   /**
-   * The join options between the node and the node_revisions_table.
+   * The join options between the node and the node_revisions table.
    */
   const JOIN = 'n.vid = nr.vid';
 
