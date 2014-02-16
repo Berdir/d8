@@ -4,10 +4,7 @@ source:
   constants:
     preview: 1 # DRUPAL_OPTIONAL
 process:
-  type:
-    -
-      plugin: machine_name
-      source: type
+  type: type
   name: name
   module: module
   description: description
@@ -17,6 +14,5 @@ process:
   preview: constants.preview
   submitted: submitted
   options: options
-
 destination:
   plugin: entity:node_type
