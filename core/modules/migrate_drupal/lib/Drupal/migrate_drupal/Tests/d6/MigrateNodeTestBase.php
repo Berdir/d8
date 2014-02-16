@@ -11,6 +11,8 @@ use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
 class MigrateNodeTestBase extends MigrateDrupalTestBase {
 
+  static $modules = array('node');
+
   public function setUp() {
     parent::setUp();
     $node_type = entity_create('node_type', array('type' => 'story'));
@@ -45,6 +47,12 @@ class MigrateNodeTestBase extends MigrateDrupalTestBase {
       'field_name' => 'field_test_two',
       'bundle' => 'story',
     ))->save();
+    $path = drupal_get_path('module', 'migrate_drupal');
+    $dumps = array(
+      $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6Node.php',
+      $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6FieldInstance.php',
+    );
+    $this->loadDumps($dumps);
   }
 
 }

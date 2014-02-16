@@ -8,7 +8,6 @@
 namespace Drupal\migrate_drupal\Tests\d6;
 
 use Drupal\migrate\MigrateExecutable;
-use Drupal\Core\Database\Database;
 
 /**
  * Test node revisions migration from Drupal 6 to 8.
@@ -21,7 +20,7 @@ class MigrateNodeRevisionTest extends MigrateNodeTestBase {
   public static function getInfo() {
     return array(
       'name'  => 'Migrate nodes',
-      'description'  => 'Node content migration',
+      'description'  => 'Node content revisions migration',
       'group' => 'Migrate Drupal',
     );
   }
@@ -41,15 +40,14 @@ class MigrateNodeRevisionTest extends MigrateNodeTestBase {
     ));
     $node->enforceIsNew();
     $node->save();
-  }
-
-  public function testNode() {
     $path = drupal_get_path('module', 'migrate_drupal');
     $dumps = array(
-      $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6Node.php',
-      $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6FieldInstance.php',
+      $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6NodeRevision.php',
     );
     $this->loadDumps($dumps);
+  }
+
+  public function testNodeRevision() {
     /** @var \Drupal\migrate\entity\Migration $migration */
     $migrations = entity_load_multiple('migration', array('d6_node_revision:*'));
     foreach ($migrations as $migration) {

@@ -1,0 +1,77 @@
+<?php
+
+/**
+ * @file
+ * Contains \Drupal\migrate_drupal\Tests\d6\MigrateTermNodeTestBase.
+ */
+
+namespace Drupal\migrate_drupal\Tests\d6;
+
+use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
+
+class MigrateTermNodeTestBase extends MigrateDrupalTestBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  static $modules = array('taxonomy');
+
+  /**
+   * The list of node ids created.
+   *
+   * @var array
+   */
+  protected $nids;
+
+  public function setUp() {
+    parent::setUp();
+    $vocabulary = entity_create('taxonomy_vocabulary', array(
+      'vid' => 'test',
+    ));
+    $vocabulary->save();
+    $node_type = entity_create('node_type', array('type' => 'story'));
+    $node_type->save();
+    entity_create('field_entity', array(
+      'name' => 'test',
+      'entity_type' => 'node',
+      'type' => 'taxonomy_term_reference',
+      'cardinality' => -1,
+      'settings' => array(
+        'allowed_values' => array(
+          array(
+            'vocabulary' => $vocabulary->id(),
+            'parent' => '0',
+          ),
+        ),
+      )
+    ))->save();
+    entity_create('field_instance', array(
+      'field_name' => 'test',
+      'entity_type' => 'node',
+      'bundle' => 'story',
+    ))->save();
+    $id_mappings = array(
+      'd6_taxonomy_vocabulary' => array(
+        array(array(1), array(1)),
+      ),
+      'd6_vocabulary_field' => array(
+        array(array(1), array('node', 'test')),
+      ),
+    );
+    $this->nids = array();
+    for ($i = 1; $i <= 2; $i++) {
+      $node = entity_create('node', array('type' => 'story'));
+      $node->save();
+      $this->nids[$i] = $node->id();
+      $id_mappings['d6_node'][] = array(array($i), array($node->id()));
+    }
+    $this->prepareIdMappings($id_mappings);
+    $path =drupal_get_path('module', 'migrate_drupal');
+    $dumps = array(
+      $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6Node.php',
+      $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6TermNode.php',
+    );
+    $this->loadDumps($dumps);
+  }
+
+}

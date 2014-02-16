@@ -28,12 +28,6 @@ class MigrateNodeTest extends MigrateNodeTestBase {
   }
 
   public function testNode() {
-    $path = drupal_get_path('module', 'migrate_drupal');
-    $dumps = array(
-      $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6Node.php',
-      $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6FieldInstance.php',
-    );
-    $this->loadDumps($dumps);
     /** @var \Drupal\migrate\entity\Migration $migration */
     $migrations = entity_load_multiple('migration', array('d6_node:*'));
     foreach ($migrations as $migration) {
