@@ -33,7 +33,7 @@ class MigrateTestBase extends WebTestBase implements MigrateMessageInterface {
       $connection_info[$target]['prefix'] = array(
         // Simpletest uses 7 character prefixes at most so this can't cause
         // collisions.
-        'default' => str_pad($value['prefix']['default'], 17, '0'),
+        'default' => $value['prefix']['default'] .'0',
       );
     }
     Database::addConnectionInfo('migrate', 'default', $connection_info['default']);
