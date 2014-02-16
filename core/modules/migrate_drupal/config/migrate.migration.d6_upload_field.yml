@@ -1,0 +1,25 @@
+id: d6_upload_field
+source:
+  plugin: drupal6_upload
+  constants:
+    entity_type: node
+    type: file
+    id: node.upload
+    name: upload
+    cardinality: -1
+process:
+  entity_type: constants.entity_type
+  id: constants.id
+  name: constants.name
+  type: constants.type
+  nid:
+    plugin: migration
+    migration: d6_node
+    source:
+      - nid
+  cardinality: constants.cardinality
+destination:
+  plugin: entity:field_entity
+dependencies:
+  - d6_field
+  - d6_node

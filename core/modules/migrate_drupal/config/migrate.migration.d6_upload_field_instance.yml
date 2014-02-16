@@ -1,0 +1,15 @@
+id: d6_upload_field_instance
+source:
+  plugin: drupal6_upload_instance
+  constants:
+    entity_type: node
+    name: upload
+process:
+  entity_type: constants.entity_type
+  bundle: node_type
+  field_name: constants.name
+destination:
+  plugin: entity:field_instance
+dependencies:
+  - d6_field_instance
+  - d6_upload_field

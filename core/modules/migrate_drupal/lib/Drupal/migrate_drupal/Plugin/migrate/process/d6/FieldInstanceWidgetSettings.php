@@ -52,8 +52,8 @@ class FieldInstanceWidgetSettings extends ProcessPluginBase {
         'placeholder' => '',
       ),
       'text_textarea' => array(
-         'rows' => $rows,
-        'placeholder' => ''
+        'rows' => $rows,
+        'placeholder' => '',
       ),
       'number' => array(
         'placeholder' => '',
