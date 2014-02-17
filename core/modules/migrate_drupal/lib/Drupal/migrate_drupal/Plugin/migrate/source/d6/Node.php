@@ -52,7 +52,7 @@ class Node extends Drupal6SqlBase implements SourceEntityInterface {
    */
   public function query() {
     // Select node in its last revision.
-    $query = $this->select('node', 'n')
+    $query = $this->select('node_revisions', 'nr')
       ->fields('n', array(
         'nid',
         'type',
@@ -76,7 +76,7 @@ class Node extends Drupal6SqlBase implements SourceEntityInterface {
         'format',
       ))
       ->condition('type', $this->configuration['bundle']);
-    $query->innerJoin('node_revisions', 'nr', static::JOIN);
+    $query->innerJoin('node', 'n', static::JOIN);
 
     return $query;
   }

@@ -189,15 +189,13 @@ class NodeSourceTest extends MigrateSqlSourceTestCase {
    */
   public function setUp() {
     foreach ($this->expectedResults as $k => $row) {
-      $this->databaseContents['node_revisions'][$k]['nid'] = $row['nid'];
-      $this->databaseContents['node_revisions'][$k]['vid'] = $row['vid'];
-      $this->databaseContents['node_revisions'][$k]['body'] = $row['body'];
-      $this->databaseContents['node_revisions'][$k]['teaser'] = $row['teaser'];
-      $this->databaseContents['node_revisions'][$k]['format'] = $row['format'];
-
-      unset($row['body']);
-      unset($row['teaser']);
-      unset($row['format']);
+      foreach (array('nid', 'vid', 'title', 'uid', 'body', 'teaser', 'format') as $i => $field) {
+        $this->databaseContents['node_revisions'][$k][$field] = $row[$field];
+        // Keep nid and vid.
+        if ($i > 1) {
+          unset($row[$field]);
+        }
+      }
       $this->databaseContents['node'][$k] = $row;
 
       // Add the column field storage data.
