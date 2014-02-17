@@ -86,6 +86,7 @@ class UserSourceTest extends MigrateSqlSourceTestCase {
     foreach ($this->expectedResults as $k => $row) {
       $this->databaseContents['users'][$k] = $row;
     }
+    $this->databaseContents['users_roles'] = array();
     parent::setUp();
   }
 
