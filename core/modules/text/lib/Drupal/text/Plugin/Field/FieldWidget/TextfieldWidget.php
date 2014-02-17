@@ -18,7 +18,8 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
  *   id = "text_textfield",
  *   label = @Translation("Text field"),
  *   field_types = {
- *     "text"
+ *     "text",
+ *     "string"
  *   },
  *   settings = {
  *     "size" = "60",

@@ -378,7 +378,7 @@ class Node extends ContentEntityBase implements NodeInterface {
       ->setLabel(t('Language code'))
       ->setDescription(t('The node language code.'));
 
-    $fields['title'] = FieldDefinition::create('text')
+    $fields['title'] = FieldDefinition::create('string')
       // @todo Account for $node_type->title_label when per-bundle overrides are
       //   possible - https://drupal.org/node/2114707.
       ->setLabel(t('Title'))
@@ -389,7 +389,6 @@ class Node extends ContentEntityBase implements NodeInterface {
       ->setSettings(array(
         'default_value' => '',
         'max_length' => 255,
-        'text_processing' => 0,
       ))
       ->setDisplayOptions('view', array(
         'label' => 'hidden',
