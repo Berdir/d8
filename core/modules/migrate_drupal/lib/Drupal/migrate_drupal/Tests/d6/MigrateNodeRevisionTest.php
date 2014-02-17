@@ -47,6 +47,9 @@ class MigrateNodeRevisionTest extends MigrateNodeTestBase {
     $this->loadDumps($dumps);
   }
 
+  /**
+   * Test node revisions migration from Drupal 6 to 8.
+   */
   public function testNodeRevision() {
     /** @var \Drupal\migrate\entity\Migration $migration */
     $migrations = entity_load_multiple('migration', array('d6_node_revision:*'));
