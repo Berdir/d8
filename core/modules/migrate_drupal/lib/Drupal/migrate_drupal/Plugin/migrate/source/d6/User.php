@@ -32,8 +32,11 @@ class User extends Drupal6SqlBase implements SourceEntityInterface {
   public function fields() {
     $fields = $this->baseFields();
 
+    // Add roles field.
+    $fields['roles'] = $this->t('Roles');
+
+    // Profile fields.
     if ($this->moduleExists('profile')) {
-        // Profile fields.
       $fields += $this->select('profile_fields', 'pf')
         ->fields('pf', array('name', 'title'))
         ->execute()
@@ -44,12 +47,19 @@ class User extends Drupal6SqlBase implements SourceEntityInterface {
   }
 
   function prepareRow(Row $row, $keep = TRUE) {
+    // User roles.
+    $roles = $this->select('users_roles', 'ur')
+      ->fields('ur', array('rid'))
+      ->condition('ur.uid', $row->getSourceProperty('uid'))
+      ->execute()
+      ->fetchCol();
+    $row->setSourceProperty('roles', $roles);
+
     // We are adding here the Event contributed module column.
     // @see https://api.drupal.org/api/drupal/modules%21user%21user.install/function/user_update_7002/7
     if ($row->hasSourceProperty('timezone_id') && $row->getSourceProperty('timezone_id')) {
       if ($this->getDatabase()->schema()->tableExists('event_timezones')) {
-        $event_timezone = $this->getDatabase()
-          ->select('event_timezones', 'e')
+        $event_timezone = $this->select('event_timezones', 'e')
           ->fields('e', array('name'))
           ->condition('e.timezone', $row->getSourceProperty('timezone_id'))
           ->execute()

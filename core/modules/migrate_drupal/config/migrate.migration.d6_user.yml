@@ -25,6 +25,20 @@ process:
       source: timezone
   preferred_langcode: language
   init: init
+  roles:
+    -
+      plugin: migration
+      migration: d6_user_role
+      source: roles
+    -
+      plugin: extract
+      index:
+        - 0
 destination:
   plugin: entity:user
   md5_passwords: true
+dependencies:
+  - d6_filter_format
+  - d6_user_role
+  - d6_user_profile_field
+  - d6_user_profile_field_instance

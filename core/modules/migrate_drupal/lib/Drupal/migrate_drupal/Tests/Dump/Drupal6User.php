@@ -214,6 +214,29 @@ class Drupal6User {
         ),
         'primary key' => array('uid'),
       ),
+      'users_roles' => array(
+        'description' => 'Maps users to roles.',
+        'fields' => array(
+          'uid' => array(
+            'type' => 'int',
+            'unsigned' => TRUE,
+            'not null' => TRUE,
+            'default' => 0,
+            'description' => 'Primary Key: {users}.uid for user.',
+          ),
+          'rid' => array(
+            'type' => 'int',
+            'unsigned' => TRUE,
+            'not null' => TRUE,
+            'default' => 0,
+            'description' => 'Primary Key: {role}.rid for role.',
+          ),
+        ),
+        'primary key' => array('uid', 'rid'),
+        'indexes' => array(
+          'rid' => array('rid'),
+        ),
+      ),
       'event_timezones' => array(
         'fields' => array(
           'timezone' => array(
@@ -357,6 +380,14 @@ class Drupal6User {
           'pass_plain' => 'joe.bloggs_pass',
           'expected_timezone' => NULL,
         ),
+      ),
+      'users_roles' => array(
+        array('uid' => 2, 'rid' => 3),
+        array('uid' => 8, 'rid' => 4),
+        array('uid' => 8, 'rid' => 5),
+        array('uid' => 15, 'rid' => 3),
+        array('uid' => 15, 'rid' => 4),
+        array('uid' => 15, 'rid' => 5),
       ),
       'event_timezones' => array(
         array(

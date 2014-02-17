@@ -46,6 +46,7 @@ class MigrateUserTest extends MigrateDrupal6TestBase{
     $dumps = array(
       $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6FilterFormat.php',
       $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6UserProfileFields.php',
+      $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6UserRole.php',
       $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6User.php',
     );
     $this->loadDumps($dumps);
@@ -65,6 +66,11 @@ class MigrateUserTest extends MigrateDrupal6TestBase{
     $executable = new MigrateExecutable($migration_instance, $this);
     $executable->import();
 
+    // Migrate user roles.
+    $migration_role = entity_load('migration', 'd6_user_role');
+    $executable = new MigrateExecutable($migration_role, $this);
+    $executable->import();
+
     // Migrate users.
     $migration = entity_load('migration', 'd6_user:user');
     $executable = new MigrateExecutable($migration, $this);
@@ -77,6 +83,19 @@ class MigrateUserTest extends MigrateDrupal6TestBase{
       ->fetchAll();
 
     foreach ($users as $source) {
+      // Get roles directly from the source.
+      $rids = Database::getConnection('default', 'migrate')
+        ->select('users_roles', 'ur')
+        ->fields('ur', array('rid'))
+        ->condition('ur.uid', $source->uid)
+        ->execute()
+        ->fetchCol();
+      $roles = array(DRUPAL_AUTHENTICATED_RID);
+      foreach ($rids as $rid) {debug($rid);
+        $role = $migration_role->getIdMap()->lookupDestinationId(array($rid));
+        $roles[] = reset($role);
+      }
+
       $user = user_load($source->uid);
 
       $this->assertEqual($user->id(), $source->uid);
@@ -97,6 +116,7 @@ class MigrateUserTest extends MigrateDrupal6TestBase{
       $time_zone =  $source->expected_timezone ?: \Drupal::config('system.date')->get('timezone.default');
       $this->assertEqual($user->getTimeZone(), $time_zone);
       $this->assertEqual($user->getInitialEmail(), $source->init);
+      $this->assertEqual($user->getRoles(), $roles);
 
       // Test each profile field.
       $profile = static::$profileData[$source->uid];
