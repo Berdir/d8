@@ -82,11 +82,19 @@ interface ConfigEntityInterface extends EntityInterface {
   public function status();
 
   /**
-   * Returns whether the configuration entity is created, updated or deleted
-   * through the import process.
+   * Returns if this entity is changed as part of an import process.
+   *
+   * Code that changes configuration based on new, changed or deleted
+   * configuration entities must check this flag and only be executed if it is
+   * FALSE.
+   *
+   * An example is the default body field that is created when a new content
+   * type is created. If that creation happens as part of a configuration sync,
+   * the default body field will either be explicitly created or has been
+   * removed.
    *
    * @return bool
-   *   Whether the configuration entity is created, updated or deleted through
+   *   TRUE if the configuration entity is created, updated or deleted through
    *   the import process.
    */
   public function isSyncing();
