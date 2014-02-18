@@ -426,12 +426,19 @@ abstract class DrupalUnitTestBase extends UnitTestBase {
     }
     // @todo Revamp Drupal's stream wrapper API for D8.
     // @see https://drupal.org/node/2028109
+    // Add the stream wrapper to the file_get_stream_wrappers() static cache,
+    // only set the ALL type so that other types will be recalculated when
+    // requested.
     $wrappers = &drupal_static('file_get_stream_wrappers');
-    $wrappers[$scheme] = array(
-      'type' => $type,
-      'class' => $class,
+    $existing = isset($wrappers[STREAM_WRAPPERS_ALL]) ? $wrappers[STREAM_WRAPPERS_ALL] : array();
+    $wrappers = array(
+      STREAM_WRAPPERS_ALL => array(
+        $scheme => array(
+          'type' => $type,
+          'class' => $class,
+        ) + $existing,
+      ),
     );
-    $wrappers[STREAM_WRAPPERS_ALL] = $wrappers;
   }
 
   /**
@@ -448,9 +455,13 @@ abstract class DrupalUnitTestBase extends UnitTestBase {
     unset($this->streamWrappers[$scheme]);
     // @todo Revamp Drupal's stream wrapper API for D8.
     // @see https://drupal.org/node/2028109
+    // Remove the stream wrapper from all existing types.
     $wrappers = &drupal_static('file_get_stream_wrappers');
-    unset($wrappers[$scheme]);
-    unset($wrappers[STREAM_WRAPPERS_ALL][$scheme]);
+    foreach ($wrappers as &$schemes) {
+      if (isset($schemes[$scheme])) {
+        unset($schemes[$scheme]);
+      }
+    }
   }
 
 }
