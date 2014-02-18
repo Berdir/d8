@@ -200,6 +200,7 @@ abstract class DrupalUnitTestBase extends UnitTestBase {
     foreach ($this->streamWrappers as $scheme) {
       $this->unregisterStreamWrapper($scheme);
     }
+    $this->streamWrappers = array();
     parent::tearDown();
   }
 
@@ -429,16 +430,12 @@ abstract class DrupalUnitTestBase extends UnitTestBase {
     // Add the stream wrapper to the file_get_stream_wrappers() static cache,
     // only set the ALL type so that other types will be recalculated when
     // requested.
-    $wrappers = &drupal_static('file_get_stream_wrappers');
-    $existing = isset($wrappers[STREAM_WRAPPERS_ALL]) ? $wrappers[STREAM_WRAPPERS_ALL] : array();
-    $wrappers = array(
-      STREAM_WRAPPERS_ALL => array(
-        $scheme => array(
-          'type' => $type,
-          'class' => $class,
-        ) + $existing,
-      ),
+    $wrappers = &drupal_static('file_get_stream_wrappers', array());
+    $wrappers[STREAM_WRAPPERS_ALL][$scheme] = array(
+      'type' => $type,
+      'class' => $class,
     );
+    $wrappers[$type][$scheme] = $wrappers[STREAM_WRAPPERS_ALL][$scheme];
   }
 
   /**
@@ -456,10 +453,15 @@ abstract class DrupalUnitTestBase extends UnitTestBase {
     // @todo Revamp Drupal's stream wrapper API for D8.
     // @see https://drupal.org/node/2028109
     // Remove the stream wrapper from all existing types.
-    $wrappers = &drupal_static('file_get_stream_wrappers');
-    foreach ($wrappers as &$schemes) {
-      if (isset($schemes[$scheme])) {
-        unset($schemes[$scheme]);
+    $wrappers = &drupal_static('file_get_stream_wrappers', array());
+    // @todo Some tests seem to reset the static cache to an explict
+    //   NULL, for example the module_uninstall() call in
+    //   \Drupal\field\Tests\FieldInfoTest::testInstanceDisabledEntityType().
+    if (is_array($wrappers)) {
+      foreach ($wrappers as &$schemes) {
+        if (isset($schemes[$scheme])) {
+          unset($schemes[$scheme]);
+        }
       }
     }
   }
