@@ -4,27 +4,16 @@ source:
 process:
   tid: tid
   vid:
-    -
-      plugin: migration
-      migration: d6_taxonomy_vocabulary
-      source:
-        - vid
-    -
-      plugin: extract
-      index:
-        - 0
+    plugin: migration
+    migration: d6_taxonomy_vocabulary
+    source: vid
   name: name
   description: description
   weight: weight
   parent:
-    -
-      plugin: migration
-      migration: d6_taxonomy_term
-      source: parent
-    -
-      plugin: extract
-      index:
-        - 0
+    plugin: migration
+    migration: d6_taxonomy_term
+    source: parent
   changed: timestamp
 destination:
   plugin: entity:taxonomy_term

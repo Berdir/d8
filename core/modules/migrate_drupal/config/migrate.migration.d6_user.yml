@@ -8,32 +8,24 @@ process:
   name: name
   pass: pass
   mail: mail
-  signature: signature
-  signature_format:
-    -
-      plugin: migration
-      migration: d6_filter_format
-      source:
-        - signature_format
   created: created
   access: access
   login: login
   status: status
   timezone:
-    -
-      plugin: user_update_7002
-      source: timezone
+    plugin: user_update_7002
+    source: timezone
   preferred_langcode: language
   init: init
   roles:
-    -
-      plugin: migration
-      migration: d6_user_role
-      source: roles
-    -
-      plugin: extract
-      index:
-        - 0
+    plugin: migration
+    migration: d6_user_role
+    source: roles
+  signature: signature
+  signature_format:
+    plugin: migration
+    migration: d6_filter_format
+    source: signature_format
 destination:
   plugin: entity:user
   md5_passwords: true

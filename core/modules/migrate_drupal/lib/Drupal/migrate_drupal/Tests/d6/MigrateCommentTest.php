@@ -17,7 +17,7 @@ use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
  */
 class MigrateCommentTest extends MigrateDrupalTestBase {
 
-  static $modules = array('comment');
+  static $modules = array('node', 'comment');
 
   /**
    * {@inheritdoc}

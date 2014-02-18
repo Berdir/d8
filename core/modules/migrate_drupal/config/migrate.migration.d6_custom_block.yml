@@ -8,15 +8,9 @@ process:
   type: constants.type
   info: info
   'body.format':
-    -
-      plugin: migration
-      migration: d6_filter_format
-      source:
-        - format
-    -
-      plugin: extract
-      index:
-        - 0
+    plugin: migration
+    migration: d6_filter_format
+    source: format
   'body.value': body
 destination:
   plugin: entity:custom_block

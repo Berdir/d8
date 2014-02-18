@@ -15,16 +15,9 @@ process:
   options: constants.options
   bundle: type
   field_name:
-    -
-      plugin: migration
-      migration: d6_taxonomy_vocabulary
-      source:
-        - vid
-    -
-      plugin: extract
-      index:
-        - 0
-
+    plugin: migration
+    migration: d6_taxonomy_vocabulary
+    source: vid
 destination:
   plugin: component_entity_display
 dependencies:

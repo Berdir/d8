@@ -9,15 +9,9 @@ process:
   entity_type: constants.entity_type
   bundle: type_name
   view_mode:
-    -
-      plugin: migration
-      migration: d6_view_modes
-      source:
-        - view_mode
-    -
-      plugin: extract
-      index:
-        - 0
+    plugin: migration
+    migration: d6_view_modes
+    source: view_mode
   field_name: field_name
   "options.label": label
   "options.weight": weight

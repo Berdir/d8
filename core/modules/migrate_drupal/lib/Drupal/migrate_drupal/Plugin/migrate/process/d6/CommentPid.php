@@ -26,7 +26,7 @@ class CommentPid extends ProcessPluginBase {
    * Skip the rest of the processing on 0.
    */
   public function transform($value, MigrateExecutable $migrate_executable, Row $row, $destination_property) {
-    if (!$value[0]) {
+    if (!$value) {
       throw new MigrateSkipProcessException();
     }
     return $value;

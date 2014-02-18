@@ -11,15 +11,9 @@ process:
   entity_type: constants.entity_type
   type: constants.type
   name:
-    -
-      plugin: migration
-      migration: d6_taxonomy_vocabulary
-      source:
-        - vid
-    -
-      plugin: extract
-      index:
-        - 0
+    plugin: migration
+    migration: d6_taxonomy_vocabulary
+    source: vid
   'settings.allowed_values.0.vocabulary': @name
   'settings.allowed_values.0.parent': constants.parent
   cardinality: constants.cardinality
