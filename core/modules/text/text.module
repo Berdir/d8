@@ -196,5 +196,13 @@ function text_filter_format_disable($format) {
  */
 function text_field_info_alter(&$info) {
   $info['string']['default_widget'] = 'text_textfield';
-  $info['string']['default_formatter'] = 'text_plain';
+}
+
+/**
+ * Implements hook_field_formatter_info_alter().
+ */
+function text_field_formatter_info_alter(&$info) {
+  $info['string']['field_types'][] = 'text';
+  $info['string']['field_types'][] = 'text_with_summary';
+  $info['string']['field_types'][] = 'text_long';
 }

@@ -21,7 +21,8 @@ use Drupal\Core\TypedData\DataDefinition;
  *   settings = {
  *     "max_length" = "255"
  *   },
- *   configurable = FALSE
+ *   configurable = FALSE,
+ *   default_formatter = "string"
  * )
  */
 class StringItem extends FieldItemBase {

@@ -2,32 +2,29 @@
 
 /**
  * @file
- * Contains \Drupal\text\Plugin\field\formatter\TextPlainFormatter.
+ * Contains \Drupal\Core\Field\Plugin\field\formatter\StringFormatter.
  */
 
-namespace Drupal\text\Plugin\Field\FieldFormatter;
+namespace Drupal\Core\Field\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Field\FieldItemListInterface;
 
 /**
- * Plugin implementation of the 'text_plain' formatter.
+ * Plugin implementation of the 'string' formatter.
  *
  * @FieldFormatter(
- *   id = "text_plain",
+ *   id = "string",
  *   label = @Translation("Plain text"),
  *   field_types = {
- *     "string",
- *     "text",
- *     "text_long",
- *     "text_with_summary"
+ *     "string"
  *   },
  *   edit = {
  *     "editor" = "plain_text"
  *   }
  * )
  */
-class TextPlainFormatter extends FormatterBase {
+class StringFormatter extends FormatterBase {
 
   /**
    * {@inheritdoc}

@@ -392,7 +392,7 @@ class Node extends ContentEntityBase implements NodeInterface {
       ))
       ->setDisplayOptions('view', array(
         'label' => 'hidden',
-        'type' => 'text_plain',
+        'type' => 'string',
         'weight' => -5,
       ))
       ->setDisplayOptions('form', array(

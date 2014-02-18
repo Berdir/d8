@@ -57,7 +57,7 @@ class TextProcessed extends TypedData {
     }
     else {
       // Escape all HTML and retain newlines.
-      // @see \Drupal\text\Plugin\field\formatter\TextPlainFormatter
+      // @see \Drupal\Core\Field\Plugin\field\formatter\StringFormatter
       $this->processed = nl2br(check_plain($text));
     }
     return $this->processed;

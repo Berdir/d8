@@ -35,12 +35,6 @@ function email_field_info_alter(&$info) {
   $info['email']['class'] = '\Drupal\email\ConfigurableEmailItem';
   $info['email']['list_class'] = '\Drupal\Core\Field\ConfigFieldItemList';
   $info['email']['default_widget'] = 'email_default';
-  if (\Drupal::moduleHandler()->moduleExists('text')) {
-    $info['email']['default_formatter'] = 'text_plain';
-  }
-  else {
-    $info['email']['default_formatter'] = 'email_mailto';
-  }
   $info['email']['provider'] = 'email';
 }
 
@@ -48,7 +42,5 @@ function email_field_info_alter(&$info) {
  * Implements hook_field_formatter_info_alter().
  */
 function email_field_formatter_info_alter(&$info) {
-  if (isset($info['text_plain'])) {
-    $info['text_plain']['field_types'][] = 'email';
-  }
+  $info['string']['field_types'][] = 'email';
 }
