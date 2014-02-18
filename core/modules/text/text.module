@@ -196,5 +196,5 @@ function text_filter_format_disable($format) {
  */
 function text_field_info_alter(&$info) {
   $info['string']['default_widget'] = 'text_textfield';
-  $info['string']['default_widget'] = 'text_default';
+  $info['string']['default_formatter'] = 'text_plain';
 }

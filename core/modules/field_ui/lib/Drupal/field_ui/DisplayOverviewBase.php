@@ -53,7 +53,7 @@ abstract class DisplayOverviewBase extends OverviewBase {
   public function __construct(EntityManagerInterface $entity_manager, FieldTypePluginManagerInterface $field_type_manager, PluginManagerBase $plugin_manager) {
     parent::__construct($entity_manager);
 
-    $this->fieldTypes = $field_type_manager->getConfigurableDefinitions();
+    $this->fieldTypes = $field_type_manager->getDefinitions();
     $this->pluginManager = $plugin_manager;
   }
 

@@ -17,6 +17,7 @@ use Drupal\Core\Field\FieldItemListInterface;
  *   id = "text_plain",
  *   label = @Translation("Plain text"),
  *   field_types = {
+ *     "string",
  *     "text",
  *     "text_long",
  *     "text_with_summary"
