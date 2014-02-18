@@ -31,7 +31,7 @@ class MigrateNodeConfigsTest extends MigrateDrupalTestBase {
     );
   }
 
-  function testNodeSettings() {
+  public function testNodeSettings() {
     $migration = entity_load('migration', 'd6_node_settings');
     $dumps = array(
       drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6NodeSettings.php',

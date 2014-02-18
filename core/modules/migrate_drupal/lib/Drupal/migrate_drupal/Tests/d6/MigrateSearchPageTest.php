@@ -26,7 +26,7 @@ class MigrateSearchPageTest extends MigrateDrupalTestBase {
     );
   }
 
-  function testSearchPage() {
+  public function testSearchPage() {
     /** @var \Drupal\migrate\entity\Migration $migration */
     $migration = entity_load('migration', 'd6_search_page');
     $dumps = array(

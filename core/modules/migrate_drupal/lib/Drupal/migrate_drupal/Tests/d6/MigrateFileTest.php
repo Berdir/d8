@@ -25,7 +25,7 @@ class MigrateFileTest extends MigrateDrupalTestBase {
     );
   }
 
-  function testFiles() {
+  public function testFiles() {
 
     $path = drupal_get_path('module', 'migrate_drupal');
     $dumps = array(

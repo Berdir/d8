@@ -274,10 +274,10 @@ use Drupal\migrate_drupal\Plugin\migrate\source\d6\Node;
 
 class TestNode extends Node {
   protected $cckSchemaCorrect = true;
-  function setDatabase(Connection $database) {
+  public function setDatabase(Connection $database) {
     $this->database = $database;
   }
-  function setModuleHandler(ModuleHandlerInterface $module_handler) {
+  public function setModuleHandler(ModuleHandlerInterface $module_handler) {
     $this->moduleHandler = $module_handler;
   }
 }

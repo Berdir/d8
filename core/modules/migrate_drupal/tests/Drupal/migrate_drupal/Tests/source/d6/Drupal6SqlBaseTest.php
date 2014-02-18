@@ -144,7 +144,7 @@ use Drupal\migrate_drupal\Plugin\migrate\source\d6\Drupal6SqlBase;
  */
 class TestDrupal6SqlBase extends Drupal6SqlBase {
 
-  function fields() {
+  public function fields() {
     return array(
       'filename' => t('The path of the primary file for this item.'),
       'name' => t('The name of the item; e.g. node.'),
@@ -159,18 +159,18 @@ class TestDrupal6SqlBase extends Drupal6SqlBase {
     );
   }
 
-  function query() {
+  public function query() {
     $query = $this->database
       ->select('system', 's')
       ->fields('s', array('filename', 'name', 'schema_version'));
     return $query;
   }
 
-  function setDatabase(Connection $database) {
+  public function setDatabase(Connection $database) {
     $this->database = $database;
   }
 
-  function setModuleHandler(ModuleHandlerInterface $module_handler) {
+  public function setModuleHandler(ModuleHandlerInterface $module_handler) {
     $this->moduleHandler = $module_handler;
   }
 

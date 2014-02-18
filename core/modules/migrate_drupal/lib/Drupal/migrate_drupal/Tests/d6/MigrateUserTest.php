@@ -34,7 +34,7 @@ class MigrateUserTest extends MigrateDrupal6TestBase{
     );
   }
 
-  function testUser() {
+  public function testUser() {
     // Enable 'profile' module on source.
     $this->enableSourceModule('profile', 'modules/profile/profile.module');
 

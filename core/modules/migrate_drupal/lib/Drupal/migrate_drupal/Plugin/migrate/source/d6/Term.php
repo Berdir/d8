@@ -52,7 +52,7 @@ class Term extends Drupal6SqlBase implements RequirementsInterface {
   /**
    * {@inheritdoc}
    */
-  function prepareRow(Row $row) {
+  public function prepareRow(Row $row) {
     // Find parents for this row.
     $parents = $this->select('term_hierarchy', 'th')
       ->fields('th', array('parent', 'tid'))

@@ -24,7 +24,7 @@ class MigrateDateFormatTest extends MigrateDrupalTestBase {
     );
   }
 
-  function testDateFormats() {
+  public function testDateFormats() {
     /** @var \Drupal\migrate\entity\Migration $migration */
     $migration = entity_load('migration', 'd6_date_formats');
     $dumps = array(

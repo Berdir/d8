@@ -23,7 +23,7 @@ class MigrateNodeBodyInstanceTest extends MigrateDrupalTestBase {
     );
   }
 
-  function testNodeBodyInstance() {
+  public function testNodeBodyInstance() {
     $field = entity_create('field_entity', array(
       'name' => 'body',
       'entity_type' => 'node',

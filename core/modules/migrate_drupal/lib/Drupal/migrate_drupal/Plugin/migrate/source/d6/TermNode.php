@@ -51,7 +51,7 @@ class TermNode extends Drupal6SqlBase implements SourceEntityInterface, Requirem
   /**
    * {@inheritdoc}
    */
-  function prepareRow(Row $row) {
+  public function prepareRow(Row $row) {
     // Select the terms belonging to the revision selected.
     $query = $this->select('term_node', 'tn')
       ->fields('tn', array('tid'))

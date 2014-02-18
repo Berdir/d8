@@ -65,7 +65,7 @@ class Role extends Drupal6SqlBase {
   /**
    * {@inheritdoc}
    */
-  function prepareRow(Row $row, $keep = TRUE) {
+  public function prepareRow(Row $row, $keep = TRUE) {
     $rid = $row->getSourceProperty('rid');
     $permissions = $this->select('permission', 'p')
       ->fields('p', array('perm'))

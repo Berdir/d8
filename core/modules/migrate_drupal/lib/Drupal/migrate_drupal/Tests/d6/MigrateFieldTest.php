@@ -26,7 +26,7 @@ class MigrateFieldTest extends MigrateDrupalTestBase {
     );
   }
 
-  function testFields() {
+  public function testFields() {
     /** @var \Drupal\migrate\entity\Migration $migration */
     $migration = entity_load('migration', 'd6_field');
     $dumps = array(

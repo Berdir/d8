@@ -24,7 +24,7 @@ class MigrateNodeTypeTest extends MigrateDrupalTestBase {
     );
   }
 
-  function testNodeType() {
+  public function testNodeType() {
     $migration = entity_load('migration', 'd6_node_type');
     $dumps = array(
       drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6NodeType.php',

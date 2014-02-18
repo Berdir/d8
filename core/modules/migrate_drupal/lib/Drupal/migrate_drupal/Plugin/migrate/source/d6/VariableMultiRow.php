@@ -14,7 +14,7 @@ class VariableMultiRow extends Drupal6SqlBase {
   /**
    * {@inheritdoc}
    */
-  function query() {
+  public function query() {
     return $this->select('variable', 'v')
       ->fields('v', array('name', 'value'))
       ->condition('name', $this->configuration['variables']);

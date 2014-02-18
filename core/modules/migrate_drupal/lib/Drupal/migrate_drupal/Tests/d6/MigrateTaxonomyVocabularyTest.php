@@ -26,7 +26,7 @@ class MigrateTaxonomyVocabularyTest extends MigrateDrupalTestBase {
     );
   }
 
-  function testContactCategory() {
+  public function testContactCategory() {
     $migration = entity_load('migration', 'd6_taxonomy_vocabulary');
     $dumps = array(
       drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6TaxonomyVocabulary.php',

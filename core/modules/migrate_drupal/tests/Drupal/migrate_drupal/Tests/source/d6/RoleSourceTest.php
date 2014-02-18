@@ -104,10 +104,10 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\migrate_drupal\Plugin\migrate\source\d6\Role;
 
 class TestRole extends Role {
-  function setDatabase(Connection $database) {
+  public function setDatabase(Connection $database) {
     $this->database = $database;
   }
-  function setModuleHandler(ModuleHandlerInterface $module_handler) {
+  public function setModuleHandler(ModuleHandlerInterface $module_handler) {
     $this->moduleHandler = $module_handler;
   }
 }

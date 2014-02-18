@@ -20,7 +20,7 @@ class UserPicture extends Drupal6SqlBase {
   /**
    * {@inheritdoc}
    */
-  function query() {
+  public function query() {
     $query = $this->database
       ->select('users', 'u')
       ->condition('picture', '', '<>')

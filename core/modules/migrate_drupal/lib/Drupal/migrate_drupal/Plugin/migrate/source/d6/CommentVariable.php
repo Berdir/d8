@@ -85,7 +85,7 @@ class CommentVariable extends Drupal6SqlBase {
   /**
    * {@inheritdoc}
    */
-  function query() {
+  public function query() {
     // Nothing to do here.
   }
 
