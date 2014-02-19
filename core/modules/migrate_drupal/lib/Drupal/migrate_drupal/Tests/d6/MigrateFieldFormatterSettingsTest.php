@@ -8,10 +8,14 @@
 namespace Drupal\migrate_drupal\Tests\d6;
 
 use Drupal\migrate\MigrateExecutable;
-use Drupal\migrate\MigrateMessage;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
-class MigrateFieldFormatterSettings extends MigrateDrupalTestBase {
+/**
+ * Test formatter settings to display modes.
+ */
+class MigrateFieldFormatterSettingsTest extends MigrateDrupalTestBase {
+
+  static $modules = array('node');
 
   /**
    * {@inheritdoc}
@@ -32,10 +36,10 @@ class MigrateFieldFormatterSettings extends MigrateDrupalTestBase {
     // Add some id mappings for the dependant migrations.
     $id_mappings = array(
       'd6_view_modes' => array(
-        array(array(1), array('preview')),
-        array(array(4), array('rss')),
-        array(array('teaser'), array('teaser')),
-        array(array('full'), array('full')),
+        array(array(1), array('node', 'preview')),
+        array(array(4), array('node', 'rss')),
+        array(array('teaser'), array('node', 'teaser')),
+        array(array('full'), array('node', 'full')),
       ),
     );
     $this->prepareIdMappings($id_mappings);
@@ -58,23 +62,23 @@ class MigrateFieldFormatterSettings extends MigrateDrupalTestBase {
     );
 
     // Make sure we don't have the excluded print entity display.
-    $display = entity_load('entity_display', 'node.story.print');
+    $display = entity_load('entity_view_display', 'node.story.print');
     $this->assertNull($display, "Print entity display not found.");
     // Can we load any entity display.
-    $display = entity_load('entity_display', 'node.story.teaser');
+    $display = entity_load('entity_view_display', 'node.story.teaser');
     $this->assertEqual($display->getComponent($field_name), $expected, "node.story.teaser formatter settings are the same.");
 
     // Test migrate worked with multiple bundles.
-    $display = entity_load('entity_display', 'node.article.teaser');
+    $display = entity_load('entity_view_display', 'node.article.teaser');
     $this->assertEqual($display->getComponent($field_name), $expected, "node.article.teaser formatter settings are the same.");
 
     // Test RSS because that has been converted from 4 to rss.
-    $display = entity_load('entity_display', 'node.story.rss');
+    $display = entity_load('entity_view_display', 'node.story.rss');
     $this->assertEqual($display->getComponent($field_name), $expected, "node.story.rss, view mode converted to rss and settings are the same.");
 
     // Test the full format with text_default which comes from a static map.
     $expected['type'] = 'text_default';
-    $display = entity_load('entity_display', 'node.story.full');
+    $display = entity_load('entity_view_display', 'node.story.full');
     $this->assertEqual($display->getComponent($field_name), $expected, "node.story.full formatter settings are the same.");
 
     // Check that we can migrate multiple fields.
@@ -119,7 +123,7 @@ class MigrateFieldFormatterSettings extends MigrateDrupalTestBase {
     $this->assertEqual($component, $expected, "node.story.full field_test_link has correct absolute link settings.");
     $expected['settings']['url_only'] = 0;
     $expected['settings']['url_plain'] = 0;
-    $display = entity_load('entity_display', 'node.story.teaser');
+    $display = entity_load('entity_view_display', 'node.story.teaser');
     $component = $display->getComponent('field_test_link');
     $this->assertEqual($component, $expected, "node.story.teaser field_test_link has correct default link settings.");
 
@@ -129,7 +133,7 @@ class MigrateFieldFormatterSettings extends MigrateDrupalTestBase {
     $expected['settings'] = array();
     $component = $display->getComponent('field_test_filefield');
     $this->assertEqual($component, $expected, "node.story.teaser field_test_filefield is of type file_default.");
-    $display = entity_load('entity_display', 'node.story.full');
+    $display = entity_load('entity_view_display', 'node.story.full');
     $expected['type'] = 'file_url_plain';
     $component = $display->getComponent('field_test_filefield');
     $this->assertEqual($component, $expected, "node.story.full field_test_filefield is of type file_url_plain.");
@@ -140,7 +144,7 @@ class MigrateFieldFormatterSettings extends MigrateDrupalTestBase {
     $expected['settings'] = array('image_style' => '', 'image_link' => '');
     $component = $display->getComponent('field_test_imagefield');
     $this->assertEqual($component, $expected, "node.story.full field_test_imagefield is of type image with the correct settings.");
-    $display = entity_load('entity_display', 'node.story.teaser');
+    $display = entity_load('entity_view_display', 'node.story.teaser');
     $expected['settings']['image_link'] = 'file';
     $component = $display->getComponent('field_test_imagefield');
     $this->assertEqual($component, $expected, "node.story.teaser field_test_imagefield is of type image with the correct settings.");
@@ -158,7 +162,7 @@ class MigrateFieldFormatterSettings extends MigrateDrupalTestBase {
     $expected['settings'] = array('format' => 'fallback');
     $component = $display->getComponent('field_test_date');
     $this->assertEqual($component, $expected, "node.story.teaser field_test_date is of type date_default.");
-    $display = entity_load('entity_display', 'node.story.full');
+    $display = entity_load('entity_view_display', 'node.story.full');
     $expected['settings']['format'] = 'long';
     $component = $display->getComponent('field_test_date');
     $this->assertEqual($component, $expected, "node.story.full field_test_date is of type date_default with correct settings.");
@@ -168,7 +172,7 @@ class MigrateFieldFormatterSettings extends MigrateDrupalTestBase {
     $expected['settings']['format'] = 'fallback';
     $component = $display->getComponent('field_test_datestamp');
     $this->assertEqual($component, $expected, "node.story.full field_test_datestamp is of type date_default with correct settings.");
-    $display = entity_load('entity_display', 'node.story.teaser');
+    $display = entity_load('entity_view_display', 'node.story.teaser');
     $expected['settings'] = array('format' => 'medium');
     $component = $display->getComponent('field_test_datestamp');
     $this->assertEqual($component, $expected, "node.story.teaser field_test_datestamp is of type date_default.");
@@ -178,14 +182,14 @@ class MigrateFieldFormatterSettings extends MigrateDrupalTestBase {
     $expected['settings'] = array('format' => 'short');
     $component = $display->getComponent('field_test_datetime');
     $this->assertEqual($component, $expected, "node.story.teaser field_test_datetime is of type date_default.");
-    $display = entity_load('entity_display', 'node.story.full');
+    $display = entity_load('entity_view_display', 'node.story.full');
     $expected['settings']['format'] = 'fallback';
     $component = $display->getComponent('field_test_datetime');
     $this->assertEqual($component, $expected, "node.story.full field_test_datetime is of type date_default with correct settings.");
 
     // Test a date field with a random format which should be mapped
     // to date_default.
-    $display = entity_load('entity_display', 'node.story.rss');
+    $display = entity_load('entity_view_display', 'node.story.rss');
     $expected['settings']['format'] = 'fallback';
     $component = $display->getComponent('field_test_datetime');
     $this->assertEqual($component, $expected, "node.story.full field_test_datetime is of type date_default with correct settings.");
