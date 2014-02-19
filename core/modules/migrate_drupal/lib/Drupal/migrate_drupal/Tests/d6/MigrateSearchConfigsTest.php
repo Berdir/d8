@@ -30,7 +30,7 @@ class MigrateSearchConfigsTest extends MigrateDrupalTestBase {
     return array(
       'name'  => 'Migrate variables to search.settings.yml',
       'description'  => 'Upgrade variables to search.settings.yml',
-      'group' => 'Migrate',
+      'group' => 'Migrate Drupal',
     );
   }
 

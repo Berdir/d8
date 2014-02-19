@@ -18,5 +18,4 @@ process:
 destination:
   plugin: component_entity_form_display
 dependencies:
-  - d6_field
   - d6_field_instance

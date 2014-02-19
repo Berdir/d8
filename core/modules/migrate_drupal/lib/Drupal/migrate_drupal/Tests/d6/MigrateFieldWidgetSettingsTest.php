@@ -41,7 +41,13 @@ class MigrateFieldWidgetSettingsTest extends MigrateDrupalTestBase {
    * Test that migrated view modes can be loaded using D8 API's.
    */
   public function testWidgetSettings() {
-
+    // Add some id mappings for the dependant migrations.
+    $id_mappings = array(
+      'd6_field_instance' => array(
+        array(array('fieldname', 'page'), array('fieldname', 'page')),
+      ),
+    );
+    $this->prepareIdMappings($id_mappings);
     $migration = entity_load('migration', 'd6_field_instance_widget_settings');
     $dumps = array(
       drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6FieldInstance.php',

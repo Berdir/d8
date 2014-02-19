@@ -13,6 +13,13 @@ use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 class MigrateNodeBodyInstanceTest extends MigrateDrupalTestBase {
 
   /**
+   * Modules to enable.
+   *
+   * @var array
+   */
+  public static $modules = array('node');
+
+  /**
    * {@inheritdoc}
    */
   public static function getInfo() {
@@ -24,6 +31,20 @@ class MigrateNodeBodyInstanceTest extends MigrateDrupalTestBase {
   }
 
   public function testNodeBodyInstance() {
+    // Add some id mappings for the dependant migrations.
+    $id_mappings = array(
+      'd6_field' => array(
+        array(array('field_name'), array('field_name')),
+      ),
+      'd6_field_instance' => array(
+        array(array('fieldname', 'page'), array('fieldname', 'page')),
+      ),
+      'd6_node_type' => array(
+        array(array('page'), array('page')),
+      ),
+    );
+    $this->prepareIdMappings($id_mappings);
+
     $field = entity_create('field_entity', array(
       'name' => 'body',
       'entity_type' => 'node',

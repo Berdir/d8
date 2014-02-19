@@ -16,6 +16,11 @@ use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
  */
 class MigrateFieldInstanceTest extends MigrateDrupalTestBase {
 
+  /**
+   * Modules to enable.
+   *
+   * @var array
+   */
   public static $modules = array(
     'number',
     'email',
@@ -24,6 +29,7 @@ class MigrateFieldInstanceTest extends MigrateDrupalTestBase {
     'file',
     'image',
     'datetime',
+    'node',
   );
 
   /**
@@ -41,6 +47,17 @@ class MigrateFieldInstanceTest extends MigrateDrupalTestBase {
    * Tests migration of file variables to file.settings.yml.
    */
   public function testFieldInstanceSettings() {
+    // Add some id mappings for the dependant migrations.
+    $id_mappings = array(
+      'd6_field' => array(
+        array(array('field_name'), array('field_name')),
+      ),
+      'd6_node_type' => array(
+        array(array('page'), array('page')),
+      ),
+    );
+    $this->prepareIdMappings($id_mappings);
+
     $migration = entity_load('migration', 'd6_field_instance');
     $dumps = array(
       drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6FieldInstance.php',

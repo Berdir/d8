@@ -21,7 +21,7 @@ class MigrateFilterFormatTest extends MigrateDrupalTestBase {
     return array(
       'name'  => 'Migrate variables to filter.formats.*.yml',
       'description'  => 'Upgrade variables to filter.formats.*.yml',
-      'group' => 'Migrate',
+      'group' => 'Migrate Drupal',
     );
   }
 

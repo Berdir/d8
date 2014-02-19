@@ -19,12 +19,15 @@ class MigrateTermNodeRevisionTest extends MigrateTermNodeTestBase {
    */
   public static function getInfo() {
     return array(
-      'name'  => 'Migrate taxonomy term node',
+      'name'  => 'Migrate taxonomy term node revisions',
       'description'  => 'Upgrade taxonomy term node associations',
       'group' => 'Migrate Drupal',
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     parent::setUp();
     $id_mappings = array(

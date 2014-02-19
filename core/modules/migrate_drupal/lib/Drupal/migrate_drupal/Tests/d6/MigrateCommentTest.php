@@ -33,9 +33,10 @@ class MigrateCommentTest extends MigrateDrupalTestBase {
   public function testComments() {
     $id_mappings = array(
       'd6_filter_format' => array(array(array(1), array('plain_text'))),
+      'd6_node' => array(array(array(1), array(1))),
     );
     $this->prepareIdMappings($id_mappings);
-    #entity_create('node_type', array('type' => 'page', 'name' => 'page'))->save();
+
     \Drupal::service('comment.manager')->addDefaultField('node', 'page');
     /** @var \Drupal\migrate\entity\Migration $migration */
     $migration = entity_load('migration', 'd6_comment');

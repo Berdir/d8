@@ -32,6 +32,17 @@ class MigrateCommentVariableInstance extends MigrateDrupalTestBase {
    * Test the migrated field instance values.
    */
   public function testCommentFieldInstance() {
+    // Add some id mappings for the dependant migrations.
+    $id_mappings = array(
+      'd6_comment_field' => array(
+        array(array('page'), array('page')),
+      ),
+      'd6_field_instance' => array(
+        array(array('fieldname', 'page'), array('fieldname', 'page')),
+      ),
+    );
+    $this->prepareIdMappings($id_mappings);
+
     foreach (array('page', 'story') as $type) {
       entity_create('node_type', array('type' => $type))->save();
     }

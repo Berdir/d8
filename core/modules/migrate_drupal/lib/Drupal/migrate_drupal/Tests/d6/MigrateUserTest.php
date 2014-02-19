@@ -9,10 +9,12 @@ namespace Drupal\migrate_drupal\Tests\d6;
 
 use Drupal\Core\Database\Database;
 use Drupal\migrate\MigrateExecutable;
+use Drupal\migrate_drupal\Tests\Dump\Drupal6DumpCommon;
 use Drupal\migrate_drupal\Tests\Dump\Drupal6User;
 use Drupal\migrate_drupal\Tests\Dump\Drupal6UserProfileFields;
+use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
-class MigrateUserTest extends MigrateDrupal6TestBase{
+class MigrateUserTest extends MigrateDrupalTestBase{
 
   static $modules = array('link', 'options', 'datetime', 'number', 'text');
 
@@ -35,8 +37,6 @@ class MigrateUserTest extends MigrateDrupal6TestBase{
   }
 
   public function testUser() {
-    // Enable 'profile' module on source.
-    $this->enableSourceModule('profile', 'modules/profile/profile.module');
 
     // Populate static::$profileData.
     $this->setProfileData();

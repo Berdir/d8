@@ -125,6 +125,8 @@ class Drupal6AggregatorFeed {
       'block' => 5,
     ))
     ->execute();
-
+    Drupal6DumpCommon::createSystem($database);
+    Drupal6DumpCommon::setModuleVersion($database, 'aggregator', 6001);
   }
+
 }

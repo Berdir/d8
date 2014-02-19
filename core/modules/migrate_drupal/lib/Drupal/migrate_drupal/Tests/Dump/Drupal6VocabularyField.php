@@ -168,6 +168,8 @@ class Drupal6VocabularyField {
       'type' => 'page',
     ))
     ->execute();
+    Drupal6DumpCommon::createSystem($database);
+    Drupal6DumpCommon::setModuleVersion($database, 'taxonomy', 6001);
   }
 
 }

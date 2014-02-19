@@ -15,7 +15,19 @@ use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
  */
 class MigrateBlockTest extends MigrateDrupalTestBase {
 
-  static $modules = array('block', 'views', 'comment', 'menu', 'custom_block');
+  /**
+   * Modules to enable.
+   *
+   * @var array
+   */
+  static $modules = array(
+    'block',
+    'views',
+    'comment',
+    'menu',
+    'custom_block',
+    'node',
+  );
 
   /**
    * {@inheritdoc}

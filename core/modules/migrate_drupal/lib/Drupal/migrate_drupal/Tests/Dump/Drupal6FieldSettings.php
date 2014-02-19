@@ -28,7 +28,7 @@ class Drupal6FieldSettings {
     ))
     ->values(array(
       'name' => 'field_language_fallback',
-        'value' => 'b:1;',
+      'value' => 'b:1;',
     ))
     ->execute();
   }

@@ -32,6 +32,14 @@ class MigrateCommentVariableField extends MigrateDrupalTestBase {
    * Tests comment variables migrated into a field entity.
    */
   public function testCommentField() {
+    // Add some id mappings for the dependant migrations.
+    $id_mappings = array(
+      'd6_field' => array(
+        array(array('fieldname'), array('fieldname')),
+      ),
+    );
+    $this->prepareIdMappings($id_mappings);
+
     foreach (array('page', 'story', 'test') as $type) {
       entity_create('node_type', array('type' => $type))->save();
     }

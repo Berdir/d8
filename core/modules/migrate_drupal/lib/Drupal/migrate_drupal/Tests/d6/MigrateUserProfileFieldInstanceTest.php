@@ -33,7 +33,13 @@ class MigrateUserProfileFieldInstanceTest extends MigrateDrupalTestBase {
    * Tests migration of user profile fields.
    */
   public function testUserProfileFields() {
-
+    // Add some id mappings for the dependant migrations.
+    $id_mappings = array(
+      'd6_user_profile_field' => array(
+        array(array(1), array('fieldname')),
+      ),
+    );
+    $this->prepareIdMappings($id_mappings);
     $this->createFields();
     /** @var \Drupal\migrate\entity\Migration $migration */
     $migration = entity_load('migration', 'd6_user_profile_field_instance');

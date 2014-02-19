@@ -26,20 +26,18 @@ static $modules = array('taxonomy', 'field');
     );
   }
 
+  /**
+   * Test the vocabulary field migration.
+   */
   public function testVocabularyField() {
 
-    // Loading the migration creates the map table so we can insert our data.
-    $table_name = entity_load('migration', 'd6_taxonomy_vocabulary')->getIdMap()->mapTableName();
-    // We need some sample data so we can use the Migration process plugin.
-    \Drupal::database()->insert($table_name)->fields(array(
-      'sourceid1',
-      'destid1',
-    ))
-    ->values(array(
-      'sourceid1' => 1,
-      'destid1' => 'tags',
-    ))
-    ->execute();
+    // Add some id mappings for the dependant migrations.
+    $id_mappings = array(
+      'd6_taxonomy_vocabulary' => array(
+        array(array(1), array('tags')),
+      ),
+    );
+    $this->prepareIdMappings($id_mappings);
 
     entity_create('taxonomy_vocabulary', array(
       'name' => 'Test Vocabulary',

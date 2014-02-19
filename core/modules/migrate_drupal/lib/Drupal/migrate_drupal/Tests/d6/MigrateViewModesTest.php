@@ -19,7 +19,7 @@ class MigrateViewModesTest extends MigrateDrupalTestBase {
     return array(
       'name'  => 'Migrate view modes to entity.view_mode.*.*.yml',
       'description'  => 'Migrate view modes',
-      'group' => 'Migrate',
+      'group' => 'Migrate Drupal',
     );
   }
 

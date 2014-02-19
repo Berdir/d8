@@ -99,7 +99,7 @@ class FieldInstance extends Drupal6SqlBase implements RequirementsInterface {
       ),
       'type_name' => array(
         'type' => 'string',
-      )
+      ),
     );
     return $ids;
   }

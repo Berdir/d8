@@ -89,7 +89,7 @@ class Field extends Drupal6SqlBase implements RequirementsInterface {
   public function getIds() {
     $ids['field_name'] = array(
       'type' => 'string',
-      'alias' => 'cnf'
+      'alias' => 'cnf',
     );
     return $ids;
   }

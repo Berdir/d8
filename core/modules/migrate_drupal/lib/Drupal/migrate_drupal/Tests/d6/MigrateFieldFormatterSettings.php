@@ -20,7 +20,7 @@ class MigrateFieldFormatterSettings extends MigrateDrupalTestBase {
     return array(
       'name'  => 'Migrate field formatter settings to entity.display.*.*.yml',
       'description'  => 'Upgrade field formatter settings to entity.display.*.*.yml',
-      'group' => 'Migrate',
+      'group' => 'Migrate Drupal',
     );
   }
 
@@ -29,37 +29,23 @@ class MigrateFieldFormatterSettings extends MigrateDrupalTestBase {
    */
   public function testEntityDisplaySettings() {
 
-    // Loading the migration creates the map table so we can insert our data.
-    $table_name = entity_load('migration', 'd6_view_modes')->getIdMap()->mapTableName();
-    // We need some sample data so we can use the Migration process plugin.
-    \Drupal::database()->insert($table_name)->fields(array(
-      'sourceid1',
-      'destid1',
-    ))
-    ->values(array(
-      'sourceid1' => 1,
-      'destid1' => 'preview',
-    ))
-    ->values(array(
-      'sourceid1' => 4,
-      'destid1' => 'rss',
-    ))
-    ->values(array(
-      'sourceid1' => 'teaser',
-      'destid1' => 'teaser',
-    ))
-    ->values(array(
-      'sourceid1' => 'full',
-      'destid1' => 'full',
-    ))
-    ->execute();
+    // Add some id mappings for the dependant migrations.
+    $id_mappings = array(
+      'd6_view_modes' => array(
+        array(array(1), array('preview')),
+        array(array(4), array('rss')),
+        array(array('teaser'), array('teaser')),
+        array(array('full'), array('full')),
+      ),
+    );
+    $this->prepareIdMappings($id_mappings);
 
     $migration = entity_load('migration', 'd6_field_formatter_settings');
     $dumps = array(
       drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6FieldInstance.php',
     );
     $this->prepare($migration, $dumps);
-    $executable = new MigrateExecutable($migration, new MigrateMessage());
+    $executable = new MigrateExecutable($migration, $this);
     $executable->import();
 
     // Run tests.

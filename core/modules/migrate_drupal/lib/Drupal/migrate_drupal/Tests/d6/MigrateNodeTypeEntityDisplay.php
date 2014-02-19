@@ -15,6 +15,13 @@ use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 class MigrateNodeTypeEntityDisplay extends MigrateDrupalTestBase {
 
   /**
+   * Modules to enable.
+   *
+   * @var array
+   */
+  public static $modules = array('node');
+
+  /**
    * The id of the migration being tested.
    *
    * @var string
@@ -56,7 +63,21 @@ class MigrateNodeTypeEntityDisplay extends MigrateDrupalTestBase {
     );
   }
 
+  /**
+   * Test the node type entity display migration.
+   */
   public function testNodeTypeEntityDisplay() {
+    // Add some id mappings for the dependant migrations.
+    $id_mappings = array(
+      'd6_field_instance' => array(
+        array(array('fieldname', 'page'), array('fieldname', 'page')),
+      ),
+      'd6_node_type' => array(
+        array(array('page'), array('page')),
+      ),
+    );
+    $this->prepareIdMappings($id_mappings);
+
     $types = array('company', 'employee', 'sponsor');
     foreach ($types as $type) {
       entity_create('node_type', array('type' => $type))->save();

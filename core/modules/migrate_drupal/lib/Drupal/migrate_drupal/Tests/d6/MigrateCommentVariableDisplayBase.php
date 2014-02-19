@@ -12,7 +12,12 @@ use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
 class MigrateCommentVariableDisplayBase extends MigrateDrupalTestBase {
 
-  static $modules = array('comment');
+  /**
+   * Modules to enable.
+   *
+   * @var array
+   */
+  static $modules = array('comment', 'node');
 
   /**
    * The database dumps used.
@@ -54,6 +59,14 @@ class MigrateCommentVariableDisplayBase extends MigrateDrupalTestBase {
     $this->dumps = array(
       drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6CommentVariable.php',
     );
+
+    // Add some id mappings for the dependant migrations.
+    $id_mappings = array(
+      'd6_field_instance' => array(
+        array(array('fieldname', 'page'), array('fieldname', 'page')),
+      ),
+    );
+    $this->prepareIdMappings($id_mappings);
   }
 
 }

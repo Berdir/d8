@@ -43,7 +43,7 @@ class Drupal6Box {
           'not null' => TRUE,
           'default' => 0,
           'description' => "Block body's {filter_formats}.format; for example, 1 = Filtered HTML.",
-        )
+        ),
       ),
       'unique keys' => array('info' => array('info')),
       'primary key' => array('bid'),
@@ -62,6 +62,5 @@ class Drupal6Box {
       'format' => 2,
     ))
     ->execute();
-
   }
 }

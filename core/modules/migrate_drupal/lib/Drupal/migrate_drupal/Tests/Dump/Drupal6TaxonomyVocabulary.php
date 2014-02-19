@@ -182,6 +182,8 @@ class Drupal6TaxonomyVocabulary {
       'weight' => '6',
     ))
     ->execute();
+    Drupal6DumpCommon::createSystem($database);
+    Drupal6DumpCommon::setModuleVersion($database, 'taxonomy', 6001);
   }
 
 }

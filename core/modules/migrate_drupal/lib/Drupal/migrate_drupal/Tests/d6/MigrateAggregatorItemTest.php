@@ -10,6 +10,7 @@ namespace Drupal\migrate_drupal\Tests\d6;
 use Drupal\aggregator\Entity\Item;
 use Drupal\Core\Language\Language;
 use Drupal\migrate\MigrateExecutable;
+use Drupal\migrate_drupal\Tests\Dump\Drupal6DumpCommon;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
 class MigrateAggregatorItemTest extends MigrateDrupalTestBase {
@@ -28,17 +29,14 @@ class MigrateAggregatorItemTest extends MigrateDrupalTestBase {
   }
 
   public function testAggregatorItem() {
-    // We need some sample data so we can use the Migration process plugin.
-    $table_name = entity_load('migration', 'd6_aggregator_feed')->getIdMap()->mapTableName();
-    \Drupal::database()->insert($table_name)->fields(array(
-      'sourceid1',
-      'destid1',
-    ))
-      ->values(array(
-        'sourceid1' => 1,
-        'destid1' => 5,
-      ))
-      ->execute();
+
+    // Add some id mappings for the dependant migrations.
+    $id_mappings = array(
+      'd6_aggregator_feed' => array(
+        array(array(1), array(5)),
+      ),
+    );
+    $this->prepareIdMappings($id_mappings);
 
     $entity = entity_create('aggregator_feed', array(
       'fid' => 5,
@@ -60,8 +58,6 @@ class MigrateAggregatorItemTest extends MigrateDrupalTestBase {
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, $this);
     $executable->import();
-
-    $item = entity_load('aggregator_feed', 1);
 
     /** @var Item $item */
     $item = entity_load('aggregator_item', 1);

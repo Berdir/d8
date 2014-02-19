@@ -115,6 +115,8 @@ class Drupal6UserProfileFields {
       }
       $query->execute();
     }
+    Drupal6DumpCommon::createSystem($database);
+    Drupal6DumpCommon::setModuleVersion($database, 'profile', 6001);
   }
 
   /**

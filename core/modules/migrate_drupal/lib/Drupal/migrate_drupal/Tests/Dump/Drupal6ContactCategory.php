@@ -78,5 +78,7 @@ class Drupal6ContactCategory {
         'selected' => '1',
       ))
       ->execute();
+    Drupal6DumpCommon::createSystem($database);
+    Drupal6DumpCommon::setModuleVersion($database, 'contact', '6001');
   }
 }

@@ -58,5 +58,8 @@ class Drupal6Menu {
         'description' => 'Secondary links are often used for pages like legal notices, contact details, and other secondary navigation items that play a lesser role than primary links',
       ))
       ->execute();
+    Drupal6DumpCommon::createSystem($database);
+    Drupal6DumpCommon::setModuleVersion($database, 'menu', '6001');
   }
+
 }

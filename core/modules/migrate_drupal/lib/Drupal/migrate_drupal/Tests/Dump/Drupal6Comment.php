@@ -105,7 +105,7 @@ class Drupal6Comment {
           'length' => 255,
           'not null' => FALSE,
           'description' => "The comment author's home page address from the comment form, if user is anonymous, and the 'Anonymous users may/must leave their contact information' setting is turned on.",
-        )
+        ),
       ),
       'indexes' => array(
         'pid'    => array('pid'),
@@ -185,6 +185,8 @@ class Drupal6Comment {
       'homepage' => 'http://drupal.org',
     ))
     ->execute();
+    Drupal6DumpCommon::createSystem($database);
+    Drupal6DumpCommon::setModuleVersion($database, 'comment', '6001');
   }
 
 }

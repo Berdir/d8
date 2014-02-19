@@ -68,7 +68,7 @@ class Drupal6AggregatorItem {
           'length' => 255,
           'not null' => FALSE,
           'description' => 'Unique identifier for the feed item.',
-        )
+        ),
       ),
       'primary key' => array('iid'),
       'indexes' => array('fid' => array('fid')),
@@ -84,17 +84,20 @@ class Drupal6AggregatorItem {
       'timestamp',
       'guid',
     ))
-      ->values(array(
-        'iid' => 1,
-        'fid' => 1,
-        'title' => 'This (three) weeks in Drupal Core - January 10th 2014',
-        'link' => 'https://groups.drupal.org/node/395218',
-        'author' => 'larowlan',
-        'description' => "<h2 id='new'>What's new with Drupal 8?</h2>",
-        'timestamp' => 1389297196,
-        'guid' => '395218 at https://groups.drupal.org',
-      ))
-      ->execute();
+    ->values(array(
+      'iid' => 1,
+      'fid' => 1,
+      'title' => 'This (three) weeks in Drupal Core - January 10th 2014',
+      'link' => 'https://groups.drupal.org/node/395218',
+      'author' => 'larowlan',
+      'description' => "<h2 id='new'>What's new with Drupal 8?</h2>",
+      'timestamp' => 1389297196,
+      'guid' => '395218 at https://groups.drupal.org',
+    ))
+    ->execute();
 
+    Drupal6DumpCommon::createSystem($database);
+    Drupal6DumpCommon::setModuleVersion($database, 'aggregator', '6001');
   }
+
 }

@@ -9,8 +9,9 @@ namespace Drupal\migrate_drupal\Tests\d6;
 
 use Drupal\Core\Database\Database;
 use Drupal\migrate\MigrateExecutable;
+use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
-class MigrateUploadInstanceTest extends MigrateDrupal6TestBase {
+class MigrateUploadInstanceTest extends MigrateDrupalTestBase {
 
   static $modules = array('file');
 

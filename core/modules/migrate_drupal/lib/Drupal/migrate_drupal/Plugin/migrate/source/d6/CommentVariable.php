@@ -96,4 +96,5 @@ class CommentVariable extends Drupal6SqlBase {
     $ids['node_type']['type'] = 'string';
     return $ids;
   }
+
 }

@@ -31,6 +31,13 @@ class MigrateFieldConfigsTest extends MigrateDrupalTestBase {
    * Tests migration of field variables to field.settings.yml.
    */
   public function testFieldSettings() {
+    // Add some id mappings for the dependant migrations.
+    $id_mappings = array(
+      'd6_field' => array(
+        array(array('field_name'), array('field_name')),
+      ),
+    );
+    $this->prepareIdMappings($id_mappings);
     $migration = entity_load('migration', 'd6_field_settings');
     $dumps = array(
       drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6FieldSettings.php',

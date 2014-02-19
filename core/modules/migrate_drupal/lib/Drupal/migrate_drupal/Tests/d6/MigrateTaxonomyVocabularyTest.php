@@ -32,7 +32,7 @@ class MigrateTaxonomyVocabularyTest extends MigrateDrupalTestBase {
       drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6TaxonomyVocabulary.php',
     );
     $this->prepare($migration, $dumps);
-    $executable = new MigrateExecutable($migration, new MigrateMessage());
+    $executable = new MigrateExecutable($migration, $this);
     $executable->import();
 
     for ($i = 0; $i < 3; $i++) {

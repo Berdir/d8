@@ -852,6 +852,9 @@ class Drupal6FieldInstance {
       'field_test_two_format' => 1,
     ))
     ->execute();
+    Drupal6DumpCommon::createSystem($database);
+    Drupal6DumpCommon::setModuleVersion($database, 'content', '6001');
+
   }
 
 }

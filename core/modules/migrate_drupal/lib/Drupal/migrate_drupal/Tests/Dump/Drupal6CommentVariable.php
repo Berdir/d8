@@ -234,6 +234,8 @@ class Drupal6CommentVariable {
       'value' => 's:1:"0";',
     ))
     ->execute();
+    Drupal6DumpCommon::createSystem($database);
+    Drupal6DumpCommon::setModuleVersion($database, 'comment', '6001');
   }
 
 }

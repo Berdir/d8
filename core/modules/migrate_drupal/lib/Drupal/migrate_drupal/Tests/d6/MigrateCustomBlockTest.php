@@ -61,4 +61,5 @@ class MigrateCustomBlockTest extends MigrateDrupalTestBase {
     $this->assertEqual('<h3>My custom block body</h3>', $block->body->value);
     $this->assertEqual('restricted_html', $block->body->format);
   }
+
 }
