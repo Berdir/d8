@@ -474,9 +474,13 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
       'rollback_action' => (int) $rollback_action,
       'hash' => $row->getHash(),
     );
-    $count = 1;
+    $count = 0;
     foreach ($destination_id_values as $dest_id) {
-      $fields['destid' . $count++] = $dest_id;
+      $fields['destid' . ++$count] = $dest_id;
+    }
+    if ($count != count($this->destinationIdFields())) {
+      $this->message->display(t('Could not save to map table due to missing destination id values'), 'error');
+      return;
     }
     if ($this->migration->get('trackLastImported')) {
       $fields['last_imported'] = time();
