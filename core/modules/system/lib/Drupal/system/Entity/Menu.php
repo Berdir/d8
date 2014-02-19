@@ -9,6 +9,7 @@ namespace Drupal\system\Entity;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Core\Entity\EntityStorageControllerInterface;
 use Drupal\system\MenuInterface;
 
 /**
