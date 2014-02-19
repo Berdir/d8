@@ -65,7 +65,7 @@ class PerComponentEntityFormDisplayTest extends MigrateTestCase {
 class TestPerComponentEntityFormDisplay extends PerComponentEntityFormDisplay {
   const MODE_NAME = 'form_mode';
   protected $testValues;
-  function __construct($entity) {
+  public function __construct($entity) {
     $this->entity = $entity;
   }
   protected function getEntity($entity_type, $bundle, $form_mode) {

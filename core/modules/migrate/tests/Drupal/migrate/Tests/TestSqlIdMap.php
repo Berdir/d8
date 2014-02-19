@@ -32,7 +32,7 @@ class TestSqlIdMap extends Sql implements \Iterator {
    * @param \Drupal\migrate\Entity\MigrationInterface $migration
    *   The migration to do.
    */
-  function __construct(Connection $database, array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration) {
+  public function __construct(Connection $database, array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration) {
     $this->database = $database;
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration);
   }

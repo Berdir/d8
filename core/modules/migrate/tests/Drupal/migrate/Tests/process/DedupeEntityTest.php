@@ -107,7 +107,7 @@ class DedupeEntityTest extends MigrateProcessTestCase {
 }
 
 class TestDedupeEntity extends DedupeEntity {
-  function setEntityQuery(QueryInterface $entity_query) {
+  public function setEntityQuery(QueryInterface $entity_query) {
     $this->entityQuery = $entity_query;
   }
 }

@@ -186,7 +186,7 @@ class Source implements \Iterator, \Countable {
    * @param \Drupal\migrate\Entity\MigrationInterface $migration
    * @param \Drupal\migrate\MigrateExecutable $migrate_executable
    */
-  function __construct(MigrationInterface $migration, MigrateExecutable $migrate_executable) {
+  public function __construct(MigrationInterface $migration, MigrateExecutable $migrate_executable) {
     $this->migration = $migration;
     $this->migrateExecutable = $migrate_executable;
     $configuration = $migration->get('source');

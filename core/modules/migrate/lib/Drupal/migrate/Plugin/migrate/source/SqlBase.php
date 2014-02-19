@@ -41,7 +41,7 @@ abstract class SqlBase extends SourcePluginBase {
   /**
    * @return \Drupal\Core\Database\Connection
    */
-  function __toString() {
+  public function __toString() {
     return (string) $this->query;
   }
 

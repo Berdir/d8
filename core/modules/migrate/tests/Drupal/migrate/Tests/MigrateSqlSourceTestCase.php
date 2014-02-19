@@ -125,7 +125,7 @@ abstract class MigrateSqlSourceTestCase extends MigrateTestCase {
 }
 
 class TestSource extends Source {
-  function setCache(CacheBackendInterface $cache) {
+  public function setCache(CacheBackendInterface $cache) {
     $this->cache = $cache;
   }
 }

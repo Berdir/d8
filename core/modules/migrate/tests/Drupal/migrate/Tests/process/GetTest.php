@@ -29,7 +29,7 @@ class GetTest extends MigrateProcessTestCase {
   /**
    * {@inheritdoc}
    */
-  function setUp() {
+  protected function setUp() {
     $this->plugin = new TestGet();
     parent::setUp();
   }
@@ -37,7 +37,7 @@ class GetTest extends MigrateProcessTestCase {
   /**
    * Tests the Get plugin when source is a string.
    */
-  function testTransformSourceString() {
+  public function testTransformSourceString() {
     $this->row->expects($this->once())
       ->method('getSourceProperty')
       ->with('test')
@@ -50,7 +50,7 @@ class GetTest extends MigrateProcessTestCase {
   /**
    * Tests the Get plugin when source is an array.
    */
-  function testTransformSourceArray() {
+  public function testTransformSourceArray() {
     $map = array(
       'test1' => 'source_value1',
       'test2' => 'source_value2',
@@ -66,7 +66,7 @@ class GetTest extends MigrateProcessTestCase {
   /**
    * Tests the Get plugin when source is a string pointing to destination.
    */
-  function testTransformSourceStringAt() {
+  public function testTransformSourceStringAt() {
     $this->row->expects($this->once())
       ->method('getSourceProperty')
       ->with('@test')
@@ -79,7 +79,7 @@ class GetTest extends MigrateProcessTestCase {
   /**
    * Tests the Get plugin when source is an array pointing to destination.
    */
-  function testTransformSourceArrayAt() {
+  public function testTransformSourceArrayAt() {
     $map = array(
       'test1' => 'source_value1',
       '@test2' => 'source_value2',
@@ -98,9 +98,9 @@ class GetTest extends MigrateProcessTestCase {
 namespace Drupal\migrate\Plugin\migrate\process;
 
 class TestGet extends Get {
-  function __construct() {
+  public function __construct() {
   }
-  function setSource($source) {
+  public function setSource($source) {
     $this->configuration['source'] = $source;
   }
 }

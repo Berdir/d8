@@ -36,7 +36,7 @@ abstract class LoadBase extends PluginBase implements MigrateLoadInterface {
    * @param \Drupal\migrate\Entity\MigrationInterface $migration
    *   The migration object.
    */
-  function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration) {
+  public function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->migration = $migration;
   }

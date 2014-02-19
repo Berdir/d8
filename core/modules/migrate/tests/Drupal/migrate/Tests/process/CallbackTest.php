@@ -55,7 +55,7 @@ class CallbackTest extends MigrateProcessTestCase {
 }
 
 class TestCallback extends Callback {
-  function __construct() {
+  public function __construct() {
   }
 
   public function setCallable($callable) {

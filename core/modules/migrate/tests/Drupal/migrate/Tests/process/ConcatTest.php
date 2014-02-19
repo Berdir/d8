@@ -62,7 +62,7 @@ class ConcatTest extends MigrateProcessTestCase {
 }
 
 class TestConcat extends Concat {
-  function __construct() {
+  public function __construct() {
   }
 
   public function setDelimiter($delimiter) {

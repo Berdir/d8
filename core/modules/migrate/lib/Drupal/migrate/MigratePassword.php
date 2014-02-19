@@ -34,7 +34,7 @@ class MigratePassword implements PasswordInterface {
    *
    * @param PasswordInterface $original_password
    */
-  function __construct(PasswordInterface $original_password) {
+  public function __construct(PasswordInterface $original_password) {
     $this->originalPassword = $original_password;
   }
 
