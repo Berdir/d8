@@ -34,6 +34,7 @@ class MigrateCommentTest extends MigrateDrupalTestBase {
     $id_mappings = array(
       'd6_filter_format' => array(array(array(1), array('plain_text'))),
       'd6_node' => array(array(array(1), array(1))),
+      'd6_user' => array(array(array(0), array(0))),
     );
     $this->prepareIdMappings($id_mappings);
 

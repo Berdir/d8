@@ -15,14 +15,14 @@ process:
       migration: d6_comment
   entity_id:
     plugin: migration
-    migration: drupal6_node
+    migration: d6_node
     source: nid
   entity_type: constants.node
   field_id: constants.field_id
   subject: subject
   uid:
     plugin: migration
-    migration: drupal6_user
+    migration: d6_user
     source: uid
   name: name
   mail: mail
@@ -41,4 +41,5 @@ destination:
   plugin: entity:comment
 dependencies:
   - d6_node
+  - d6_user
   - d6_filter_format
