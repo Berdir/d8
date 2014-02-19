@@ -22,6 +22,24 @@ class MigrateTestBase extends WebTestBase implements MigrateMessageInterface {
    */
   public $databaseDumpFiles = array();
 
+
+  /**
+   * TRUE to collect messages instead of displaying them.
+   *
+   * @var bool
+   */
+  protected $collectMessages = FALSE;
+
+  /**
+   * A two dimensional array of messages.
+   *
+   * The first key is the type of message, the second is just numeric. Values
+   * are the messages.
+   *
+   * @var array
+   */
+  protected $migrateMessages;
+
   public static $modules = array('migrate');
 
   /**
@@ -97,11 +115,27 @@ class MigrateTestBase extends WebTestBase implements MigrateMessageInterface {
    * {@inheritdoc}
    */
   public function display($message, $type = 'status') {
-    if ($type == 'status') {
-      $this->pass($message);
+    if ($this->collectMessages) {
+      $this->migrateMessages[$type][] = $message;
     }
     else {
-      $this->fail($message);
+      $this->assert($type == 'status', $message, 'migrate');
     }
   }
+
+  /**
+   * Start collecting messages and erase previous messages.
+   */
+  public function startCollectingMessages() {
+    $this->collectMessages = TRUE;
+    $this->migrateMessages = array();
+  }
+
+  /**
+   * Stop collecting messages.
+   */
+  public function stopCollectingMessages() {
+    $this->collectMessages = FALSE;
+  }
+
 }

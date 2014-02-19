@@ -33,3 +33,4 @@ destination:
   plugin: entity:node
 dependencies:
   - d6_node_type
+  - d6_filter_format
