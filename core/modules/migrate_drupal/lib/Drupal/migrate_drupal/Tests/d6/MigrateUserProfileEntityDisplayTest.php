@@ -7,7 +7,6 @@
 
 namespace Drupal\migrate_drupal\Tests\d6;
 
-use Drupal\migrate\MigrateMessage;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
@@ -21,7 +20,7 @@ class MigrateUserProfileEntityDisplayTest extends MigrateDrupalTestBase {
    *
    * @var array
    */
-  static $modules = array('link', 'options', 'node');
+  static $modules = array('link', 'options');
 
   /**
    * {@inheritdoc}
@@ -38,17 +37,6 @@ class MigrateUserProfileEntityDisplayTest extends MigrateDrupalTestBase {
    * Tests migration of user profile fields.
    */
   public function testUserProfileFields() {
-    // Add some id mappings for the dependant migrations.
-    $id_mappings = array(
-      'd6_field' => array(
-        array(array('fieldname'), array('fieldname')),
-      ),
-      'd6_field_instance' => array(
-        array(array('fieldname', 'page'), array('fieldname', 'page')),
-      ),
-    );
-    $this->prepareIdMappings($id_mappings);
-
     $migration = entity_load('migration', 'd6_user_profile_entity_display');
     $dumps = array(
       drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6UserProfileFields.php',

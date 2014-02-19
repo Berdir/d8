@@ -12,7 +12,7 @@ use Drupal\Core\Database\Connection;
 /**
  * Database dump for testing the upload migration.
  */
-class Drupal6Upload {
+class Drupal6UploadField {
 
   /**
    * @param \Drupal\Core\Database\Connection $database

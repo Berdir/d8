@@ -84,6 +84,7 @@ class MigrateTestBase extends WebTestBase implements MigrateMessageInterface {
     foreach ($id_mappings as $migration_id => $data) {
       $migration = $migrations[$migration_id];
       $id_map = $migration->getIdMap();
+      $id_map->setMessage($this);
       $source_ids = $migration->getSourcePlugin()->getIds();
       foreach ($data as $id_mapping) {
         $row = new Row(array_combine(array_keys($source_ids), $id_mapping[0]), $source_ids);

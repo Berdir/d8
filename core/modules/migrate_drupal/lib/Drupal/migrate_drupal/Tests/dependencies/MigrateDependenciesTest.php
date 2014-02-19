@@ -7,8 +7,6 @@
 
 namespace Drupal\migrate_drupal\Tests\dependencies;
 
-use Drupal\aggregator\Entity\Item;
-use Drupal\Core\Language\Language;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 

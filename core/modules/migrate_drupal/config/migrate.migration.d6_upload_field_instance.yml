@@ -11,5 +11,4 @@ process:
 destination:
   plugin: entity:field_instance
 dependencies:
-  - d6_field_instance
   - d6_upload_field

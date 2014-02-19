@@ -7,13 +7,12 @@
 
 namespace Drupal\migrate_drupal\Tests\d6;
 
-use Drupal\Core\Database\Database;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
 class MigrateUploadEntityFormDisplayTest extends MigrateDrupalTestBase {
 
-  static $modules = array('file');
+  static $modules = array('file', 'node');
 
   /**
    * {@inheritdoc}
@@ -32,14 +31,8 @@ class MigrateUploadEntityFormDisplayTest extends MigrateDrupalTestBase {
   public function testUploadEntityFormDisplay() {
 
     $id_mappings = array(
-      'd6_field' => array(
-        array(array('upload'), array('upload')),
-      ),
-      'd6_field_instance' => array(
-        array(array('page', 'fieldname'), array('page', 'fieldname')),
-      ),
       'd6_upload_field_instance' => array(
-        array(array(1), array('page')),
+        array(array(1), array('node', 'page', 'upload')),
       ),
     );
     $this->prepareIdMappings($id_mappings);

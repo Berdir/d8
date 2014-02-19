@@ -7,7 +7,6 @@
 
 namespace Drupal\migrate_drupal\Tests\d6;
 
-use Drupal\migrate\MigrateMessage;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
@@ -24,6 +23,7 @@ class MigrateFieldWidgetSettingsTest extends MigrateDrupalTestBase {
     'file',
     'image',
     'datetime',
+    'node',
   );
 
   /**
@@ -44,7 +44,7 @@ class MigrateFieldWidgetSettingsTest extends MigrateDrupalTestBase {
     // Add some id mappings for the dependant migrations.
     $id_mappings = array(
       'd6_field_instance' => array(
-        array(array('fieldname', 'page'), array('fieldname', 'page')),
+        array(array('fieldname', 'page'), array('node', 'fieldname', 'page')),
       ),
     );
     $this->prepareIdMappings($id_mappings);

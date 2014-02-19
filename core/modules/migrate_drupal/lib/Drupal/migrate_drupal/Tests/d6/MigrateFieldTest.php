@@ -8,12 +8,11 @@
 namespace Drupal\migrate_drupal\Tests\d6;
 
 use Drupal\migrate\MigrateExecutable;
-use Drupal\migrate\MigrateMessage;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
 class MigrateFieldTest extends MigrateDrupalTestBase {
 
-  public static $modules = array('number', 'email', 'telephone', 'link', 'file', 'image', 'datetime');
+  public static $modules = array('number', 'email', 'telephone', 'link', 'file', 'image', 'datetime', 'node');
 
   /**
    * {@inheritdoc}

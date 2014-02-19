@@ -15,7 +15,7 @@ use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
  */
 class MigrateCommentVariableField extends MigrateDrupalTestBase {
 
-  static $modules = array('comment');
+  static $modules = array('comment', 'node');
 
   /**
    * {@inheritdoc}
@@ -35,7 +35,7 @@ class MigrateCommentVariableField extends MigrateDrupalTestBase {
     // Add some id mappings for the dependant migrations.
     $id_mappings = array(
       'd6_field' => array(
-        array(array('fieldname'), array('fieldname')),
+        array(array('fieldname'), array('node', 'fieldname')),
       ),
     );
     $this->prepareIdMappings($id_mappings);

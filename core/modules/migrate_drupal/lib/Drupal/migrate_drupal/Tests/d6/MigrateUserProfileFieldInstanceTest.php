@@ -7,7 +7,6 @@
 
 namespace Drupal\migrate_drupal\Tests\d6;
 
-use Drupal\migrate\MigrateMessage;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
@@ -36,7 +35,7 @@ class MigrateUserProfileFieldInstanceTest extends MigrateDrupalTestBase {
     // Add some id mappings for the dependant migrations.
     $id_mappings = array(
       'd6_user_profile_field' => array(
-        array(array(1), array('fieldname')),
+        array(array(1), array('user', 'profile_color')),
       ),
     );
     $this->prepareIdMappings($id_mappings);

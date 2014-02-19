@@ -12,7 +12,7 @@ use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 /**
  * Tests node body migrated into an entity display, teaser mode.
  */
-class MigrateNodeTypeEntityDisplay extends MigrateDrupalTestBase {
+class MigrateNodeTypeEntityDisplayTest extends MigrateDrupalTestBase {
 
   /**
    * Modules to enable.
@@ -70,7 +70,7 @@ class MigrateNodeTypeEntityDisplay extends MigrateDrupalTestBase {
     // Add some id mappings for the dependant migrations.
     $id_mappings = array(
       'd6_field_instance' => array(
-        array(array('fieldname', 'page'), array('fieldname', 'page')),
+        array(array('fieldname', 'page'), array('node', 'fieldname', 'page')),
       ),
       'd6_node_type' => array(
         array(array('page'), array('page')),

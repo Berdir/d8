@@ -8,12 +8,11 @@
 namespace Drupal\migrate_drupal\Tests\d6;
 
 use Drupal\migrate\MigrateExecutable;
-use Drupal\migrate\MigrateMessage;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
 class MigrateVocabularyFieldInstanceTest extends MigrateDrupalTestBase {
 
-static $modules = array('taxonomy', 'field');
+static $modules = array('node', 'field', 'taxonomy');
 
   /**
    * {@inheritdoc}
@@ -33,12 +32,12 @@ static $modules = array('taxonomy', 'field');
 
     // Add some id mappings for the dependant migrations.
     $id_mappings = array(
-      'd6_field_instance' => array(
-        array(array('fieldname', 'page'), array('fieldname', 'page')),
-      ),
       'd6_taxonomy_vocabulary' => array(
         array(array(1), array('tags')),
       ),
+      'd6_vocabulary_field' => array(
+        array(array(1), array('node', 'tags')),
+      )
     );
     $this->prepareIdMappings($id_mappings);
 

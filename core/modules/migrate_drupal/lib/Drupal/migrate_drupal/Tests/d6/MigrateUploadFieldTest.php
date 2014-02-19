@@ -7,13 +7,12 @@
 
 namespace Drupal\migrate_drupal\Tests\d6;
 
-use Drupal\Core\Database\Database;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
-class MigrateUploadTest extends MigrateDrupalTestBase {
+class MigrateUploadFieldTest extends MigrateDrupalTestBase {
 
-  static $modules = array('file');
+  static $modules = array('file', 'node');
 
   /**
    * {@inheritdoc}
@@ -35,15 +34,12 @@ class MigrateUploadTest extends MigrateDrupalTestBase {
       'd6_node' => array(
         array(array(1), array(1)),
       ),
-      'd6_field' => array(
-        array(array(1), array('fieldname')),
-      ),
     );
     $this->prepareIdMappings($id_mappings);
 
     $migration = entity_load('migration', 'd6_upload_field');
     $dumps = array(
-      drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6Upload.php',
+      drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6UploadField.php',
     );
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, $this);

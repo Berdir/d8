@@ -362,13 +362,14 @@ class Migration extends ConfigEntityBase implements MigrationInterface, Requirem
     foreach ($this->dependencies as $dependency) {
       /** @var \Drupal\migrate\Entity\MigrationInterface $dependent_migration */
       $dependent_migration = entity_load('migration', $dependency);
-      // Make sure all migrations have source ids and fail otherwise.
+      // If the dependent source migration has no IDs then no mappings can
+      // be recorded thus it is impossible to see whether the migration ran.
       if (!$dependent_migration->getSourcePlugin()->getIds()) {
         throw new MigrateException(String::format("@dependency has no source ids", array('@dependency' => $dependency)));
       }
 
       // If the dependent migration has not processed any record, it means the
-      // dependency requirement is not met.
+      // dependency requirements are not met.
       if (!$dependent_migration->getIdMap()->processedCount()) {
         return FALSE;
       }

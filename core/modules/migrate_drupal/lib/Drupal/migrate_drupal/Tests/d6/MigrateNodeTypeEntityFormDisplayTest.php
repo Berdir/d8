@@ -7,7 +7,7 @@
 
 namespace Drupal\migrate_drupal\Tests\d6;
 
-class MigrateNodeTypeEntityFormDisplay extends MigrateNodeTypeEntityDisplay {
+class MigrateNodeTypeEntityFormDisplayTest extends MigrateNodeTypeEntityDisplayTest {
 
   /**
    * {@inheritdoc}

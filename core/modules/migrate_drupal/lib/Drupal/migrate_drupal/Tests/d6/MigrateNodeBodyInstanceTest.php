@@ -34,10 +34,10 @@ class MigrateNodeBodyInstanceTest extends MigrateDrupalTestBase {
     // Add some id mappings for the dependant migrations.
     $id_mappings = array(
       'd6_field' => array(
-        array(array('field_name'), array('field_name')),
+        array(array('field_name'), array('node', 'field_name')),
       ),
       'd6_field_instance' => array(
-        array(array('fieldname', 'page'), array('fieldname', 'page')),
+        array(array('field_name', 'page'), array('node', 'field_name', 'page')),
       ),
       'd6_node_type' => array(
         array(array('page'), array('page')),

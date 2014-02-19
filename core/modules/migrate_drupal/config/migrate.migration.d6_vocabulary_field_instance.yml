@@ -18,4 +18,4 @@ destination:
   plugin: entity:field_instance
 dependencies:
   - d6_taxonomy_vocabulary
-  - d6_field_instance
+  - d6_vocabulary_field

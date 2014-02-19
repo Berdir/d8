@@ -478,7 +478,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
     foreach ($destination_id_values as $dest_id) {
       $fields['destid' . ++$count] = $dest_id;
     }
-    if ($count != count($this->destinationIdFields())) {
+    if ($count && $count != count($this->destinationIdFields())) {
       $this->message->display(t('Could not save to map table due to missing destination id values'), 'error');
       return;
     }

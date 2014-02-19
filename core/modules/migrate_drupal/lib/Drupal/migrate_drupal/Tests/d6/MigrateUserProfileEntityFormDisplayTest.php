@@ -33,17 +33,6 @@ class MigrateUserProfileEntityFormDisplayTest extends MigrateDrupalTestBase {
    * Tests migration of user profile fields.
    */
   public function testUserProfileEntityFormDisplay() {
-    // Add some id mappings for the dependant migrations.
-    $id_mappings = array(
-      'd6_field' => array(
-        array(array('fieldname'), array('fieldname')),
-      ),
-      'd6_field_instance' => array(
-        array(array('fieldname', 'page'), array('fieldname', 'page')),
-      ),
-    );
-    $this->prepareIdMappings($id_mappings);
-
     $migration = entity_load('migration', 'd6_user_profile_entity_form_display');
     $dumps = array(
       drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6UserProfileFields.php',

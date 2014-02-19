@@ -21,5 +21,4 @@ process:
 destination:
   plugin: entity:field_entity
 dependencies:
-  - d6_field
   - d6_node

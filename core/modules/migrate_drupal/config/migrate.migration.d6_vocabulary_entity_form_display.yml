@@ -20,4 +20,5 @@ destination:
   plugin: component_entity_form_display
 dependencies:
   - d6_taxonomy_vocabulary
-  - d6_field_instance
+  - d6_vocabulary_field_instance
+

@@ -16,6 +16,8 @@ class Drupal6TaxonomyTerm {
    * @param \Drupal\Core\Database\Connection $database
    */
   public static function load(Connection $database) {
+    Drupal6DumpCommon::createSystem($database);
+    Drupal6DumpCommon::setModuleVersion($database, 'taxonomy', 6000);
     $database->schema()->createTable('vocabulary', array(
       'description' => 'Stores vocabulary information.',
       'fields' => array(

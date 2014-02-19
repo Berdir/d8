@@ -63,7 +63,7 @@ class MigrateCommentVariableDisplayBase extends MigrateDrupalTestBase {
     // Add some id mappings for the dependant migrations.
     $id_mappings = array(
       'd6_field_instance' => array(
-        array(array('fieldname', 'page'), array('fieldname', 'page')),
+        array(array('fieldname', 'page'), array('node', 'fieldname', 'page')),
       ),
     );
     $this->prepareIdMappings($id_mappings);

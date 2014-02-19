@@ -7,13 +7,12 @@
 
 namespace Drupal\migrate_drupal\Tests\d6;
 
-use Drupal\Core\Database\Database;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
 class MigrateUploadInstanceTest extends MigrateDrupalTestBase {
 
-  static $modules = array('file');
+  static $modules = array('file', 'node');
 
   /**
    * {@inheritdoc}
@@ -32,11 +31,8 @@ class MigrateUploadInstanceTest extends MigrateDrupalTestBase {
   public function testUploadFieldInstance() {
     // Add some node mappings to get past checkRequirements().
     $id_mappings = array(
-      'd6_field_instance' => array(
-        array(array('page', 'fieldname'), array('page', 'fieldname')),
-      ),
       'd6_upload_field' => array(
-        array(array(1), array('upload')),
+        array(array(1), array('node', 'upload')),
       ),
     );
     $this->prepareIdMappings($id_mappings);

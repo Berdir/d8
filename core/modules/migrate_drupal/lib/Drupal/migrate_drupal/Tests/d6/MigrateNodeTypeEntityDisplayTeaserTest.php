@@ -7,7 +7,7 @@
 
 namespace Drupal\migrate_drupal\Tests\d6;
 
-class MigrateNodeTypeEntityDisplayTeaser extends MigrateNodeTypeEntityDisplay {
+class MigrateNodeTypeEntityDisplayTeaserTest extends MigrateNodeTypeEntityDisplayTest {
 
   /**
    * Modules to enable.

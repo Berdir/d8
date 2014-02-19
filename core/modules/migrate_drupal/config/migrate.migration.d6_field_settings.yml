@@ -8,5 +8,3 @@ process:
 destination:
   plugin: config
   config_name: field.settings
-dependencies:
-  - d6_field
