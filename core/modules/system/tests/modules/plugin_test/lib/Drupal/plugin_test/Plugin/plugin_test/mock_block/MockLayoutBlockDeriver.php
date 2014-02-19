@@ -48,11 +48,6 @@ class MockLayoutBlockDeriver implements DerivativeInterface {
       'foo' => array(
         'label' => t('Layout Foo'),
       ) + $base_plugin_definition,
-      // This definition is not going to be used because layout:bar is defined
-      // as a base plugin.
-      'bar' => array(
-        'label' => t('Layout Bar Derivative'),
-      ) + $base_plugin_definition,
     );
 
     return $derivatives;
