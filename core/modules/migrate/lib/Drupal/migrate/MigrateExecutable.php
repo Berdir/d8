@@ -222,17 +222,9 @@ class MigrateExecutable {
     $id_map = $this->migration->getIdMap();
 
     // Knock off migration if the requirements haven't been met.
-    try {
-      if (!$this->migration->checkRequirements()) {
-        $this->message->display(
-          $this->t('Migration @id did not meet the requirements', array('@id' => $this->migration->id())), 'error');
-        return MigrationInterface::RESULT_FAILED;
-      }
-    }
-    catch (\Exception $e) {
+    if (!$this->migration->checkRequirements()) {
       $this->message->display(
-        $this->t('Migration failed while checking requirements, exception: !e',
-          array('!e' => $e->getMessage())), 'error');
+        $this->t('Migration @id did not meet the requirements', array('@id' => $this->migration->id())), 'error');
       return MigrationInterface::RESULT_FAILED;
     }
 

@@ -351,28 +351,33 @@ class Migration extends ConfigEntityBase implements MigrationInterface, Requirem
   public function checkRequirements() {
     // Check whether the current migration source and destination plugin
     // requirements are met or not.
-    if ($this->getSourcePlugin() instanceof RequirementsInterface && !$this->getSourcePlugin()->checkRequirements()) {
-      return FALSE;
-    }
-    if ($this->getDestinationPlugin() instanceof RequirementsInterface && !$this->getDestinationPlugin()->checkRequirements()) {
-      return FALSE;
-    }
-
-    // Check if the dependencies are in good shape.
-    foreach ($this->dependencies as $dependency) {
-      /** @var \Drupal\migrate\Entity\MigrationInterface $dependent_migration */
-      $dependent_migration = entity_load('migration', $dependency);
-      // If the dependent source migration has no IDs then no mappings can
-      // be recorded thus it is impossible to see whether the migration ran.
-      if (!$dependent_migration->getSourcePlugin()->getIds()) {
-        throw new MigrateException(String::format("@dependency has no source ids", array('@dependency' => $dependency)));
-      }
-
-      // If the dependent migration has not processed any record, it means the
-      // dependency requirements are not met.
-      if (!$dependent_migration->getIdMap()->processedCount()) {
+    try {
+      if ($this->getSourcePlugin() instanceof RequirementsInterface && !$this->getSourcePlugin()->checkRequirements()) {
         return FALSE;
       }
+      if ($this->getDestinationPlugin() instanceof RequirementsInterface && !$this->getDestinationPlugin()->checkRequirements()) {
+        return FALSE;
+      }
+
+      // Check if the dependencies are in good shape.
+      foreach ($this->dependencies as $dependency) {
+        /** @var \Drupal\migrate\Entity\MigrationInterface $dependent_migration */
+        $dependent_migration = entity_load('migration', $dependency);
+        // If the dependent source migration has no IDs then no mappings can
+        // be recorded thus it is impossible to see whether the migration ran.
+        if (!$dependent_migration->getSourcePlugin()->getIds()) {
+          return FALSE;
+        }
+
+        // If the dependent migration has not processed any record, it means the
+        // dependency requirements are not met.
+        if (!$dependent_migration->getIdMap()->processedCount()) {
+          return FALSE;
+        }
+      }
+    }
+    catch (\Exception $e) {
+      return FALSE;
     }
 
     return TRUE;
