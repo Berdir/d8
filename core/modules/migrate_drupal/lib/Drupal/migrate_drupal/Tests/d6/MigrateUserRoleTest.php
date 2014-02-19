@@ -12,6 +12,8 @@ use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
 class MigrateUserRoleTest extends MigrateDrupalTestBase {
 
+  static $modules = array('filter');
+
   /**
    * {@inheritdoc}
    */

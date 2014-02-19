@@ -8,11 +8,14 @@
 namespace Drupal\migrate_drupal\Tests\d6;
 
 use Drupal\migrate\MigrateExecutable;
-use Drupal\migrate\MigrateMessage;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
-use Drupal\Component\Utility\String;
 
 class MigrateFilterFormatTest extends MigrateDrupalTestBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  static $modules = array('filter');
 
   /**
    * {@inheritdoc}
