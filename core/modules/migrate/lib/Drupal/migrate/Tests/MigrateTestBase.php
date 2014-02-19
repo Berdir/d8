@@ -10,6 +10,7 @@ namespace Drupal\migrate\Tests;
 use Drupal\Core\Database\Database;
 use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\MigrateMessageInterface;
+use Drupal\migrate\Row;
 use Drupal\simpletest\WebTestBase;
 
 class MigrateTestBase extends WebTestBase implements MigrateMessageInterface {
@@ -81,29 +82,13 @@ class MigrateTestBase extends WebTestBase implements MigrateMessageInterface {
     /** @var \Drupal\migrate\Entity\MigrationInterface[] $migrations */
     $migrations = entity_load_multiple('migration', array_keys($id_mappings));
     foreach ($id_mappings as $migration_id => $data) {
-      $table_name = $migrations[$migration_id]->getIdMap()->mapTableName();
-      $source_id_count = count($data[0][0]);
-      $fields = array();
-      for ($i = 1; $i <= $source_id_count; $i++) {
-        $fields[] = "sourceid$i";
-      }
-      $destination_id_count = count($data[0][1]);
-      for ($i = 1; $i <= $destination_id_count; $i++) {
-        $fields[] = "destid$i";
-      }
-      $insert = \Drupal::database()->insert($table_name)->fields($fields);
-
+      $migration = $migrations[$migration_id];
+      $id_map = $migration->getIdMap();
+      $source_ids = $migration->getSourcePlugin()->getIds();
       foreach ($data as $id_mapping) {
-        $values = array();
-        foreach ($id_mapping[0] as $key => $source_id) {
-          $values['sourceid' . ($key +1 )] = $source_id;
-        }
-        foreach ($id_mapping[1] as $key => $destination_id) {
-          $values['destid' . ($key +1 )] = $destination_id;
-        }
-        $insert->values($values);
+        $row = new Row(array_combine(array_keys($source_ids), $id_mapping[0]), $source_ids);
+        $id_map->saveIdMapping($row, $id_mapping[1]);
       }
-      $insert->execute();
     }
   }
 
