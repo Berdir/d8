@@ -19,7 +19,7 @@ use Drupal\migrate\Plugin\RequirementsInterface;
  * The migration entity stores the information about a single migration, like
  * the source, process and destination plugins.
  *
- * @EntityType(
+ * @ConfigEntityType(
  *   id = "migration",
  *   label = @Translation("Migration"),
  *   module = "migrate",

@@ -110,7 +110,15 @@ function callback_batch_finished($success, $results, $operations) {
     $message = t("!count items were processed.", array(
       '!count' => count($results),
       ));
+<<<<<<< HEAD
     $message .= theme('item_list', array('items' => $results));
+=======
+    $list = array(
+      '#theme' => 'item_list',
+      '#items' => $results,
+    );
+    $message .= drupal_render($list);
+>>>>>>> upstream/8.x
     drupal_set_message($message);
   }
   else {

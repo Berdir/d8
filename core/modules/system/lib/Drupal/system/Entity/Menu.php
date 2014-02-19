@@ -7,17 +7,17 @@
 
 namespace Drupal\system\Entity;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\system\MenuInterface;
 
 /**
  * Defines the Menu configuration entity class.
  *
- * @EntityType(
+ * @ConfigEntityType(
  *   id = "menu",
  *   label = @Translation("Menu"),
  *   controllers = {
- *     "storage" = "Drupal\Core\Config\Entity\ConfigStorageController",
  *     "access" = "Drupal\system\MenuAccessController"
  *   },
  *   config_prefix = "system.menu",
@@ -87,6 +87,24 @@ class Menu extends ConfigEntityBase implements MenuInterface {
    */
   public function isLocked() {
     return (bool) $this->locked;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function postSave(EntityStorageControllerInterface $storage_controller, $update = TRUE) {
+    parent::postSave($storage_controller, $update);
+
+    Cache::invalidateTags(array('menu' => $this->id()));
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function postDelete(EntityStorageControllerInterface $storage_controller, array $entities) {
+    parent::postDelete($storage_controller, $entities);
+
+    Cache::invalidateTags(array('menu' => array_keys($entities)));
   }
 
 }

@@ -14,11 +14,10 @@ use Drupal\contact\CategoryInterface;
 /**
  * Defines the contact category entity.
  *
- * @EntityType(
+ * @ConfigEntityType(
  *   id = "contact_category",
  *   label = @Translation("Contact category"),
  *   controllers = {
- *     "storage" = "Drupal\contact\CategoryStorageController",
  *     "access" = "Drupal\contact\CategoryAccessController",
  *     "list" = "Drupal\contact\CategoryListController",
  *     "form" = {

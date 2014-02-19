@@ -16,12 +16,18 @@ use Drupal\entity\EntityDisplayBase;
  * Configuration entity that contains display options for all components of a
  * rendered entity in a given view mode.
  *
+<<<<<<< HEAD
  * @EntityType(
  *   id = "entity_view_display",
  *   label = @Translation("Entity view display"),
  *   controllers = {
  *     "storage" = "Drupal\Core\Config\Entity\ConfigStorageController"
  *   },
+=======
+ * @ConfigEntityType(
+ *   id = "entity_view_display",
+ *   label = @Translation("Entity view display"),
+>>>>>>> upstream/8.x
  *   config_prefix = "entity.view_display",
  *   entity_keys = {
  *     "id" = "id",
