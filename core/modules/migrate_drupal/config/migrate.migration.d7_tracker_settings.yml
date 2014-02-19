@@ -1,0 +1,10 @@
+id: d7_tracker_settings
+source:
+  plugin: drupal6_variable
+  variables:
+    - cron_index_limit
+process:
+  cron_index_limit: cron_index_limit
+destination:
+  plugin: config
+  config_name: tracker.settings
