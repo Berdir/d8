@@ -16,7 +16,7 @@ class MigrateNodeTestBase extends MigrateDrupalTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  public function setUp() {
     parent::setUp();
     $node_type = entity_create('node_type', array('type' => 'story'));
     $node_type->save();
