@@ -27,6 +27,9 @@ class VariableMultiRow extends Drupal6SqlBase {
     return drupal_map_assoc($this->configuration['variables']);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function prepareRow(Row $row) {
     if ($row->hasSourceProperty('value')) {
       $row->setSourceProperty('value', unserialize($row->getSourceProperty('value')));

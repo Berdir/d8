@@ -81,6 +81,9 @@ class CommentSourceTest extends MigrateSqlSourceTestCase {
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     foreach ($this->expectedResults as $k => $row) {
       $this->databaseContents['comments'][$k] = $row;

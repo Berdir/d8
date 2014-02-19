@@ -29,6 +29,9 @@ class CommentSourceWithHighwaterTest extends CommentSourceTest {
 
   const ORIGINAL_HIGHWATER = 1382255613;
 
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     $this->migrationConfiguration['highwaterProperty']['field'] = 'timestamp';
     array_shift($this->expectedResults);

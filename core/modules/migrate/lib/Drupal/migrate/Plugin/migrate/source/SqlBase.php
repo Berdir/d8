@@ -55,6 +55,9 @@ abstract class SqlBase extends SourcePluginBase {
     return $this->database;
   }
 
+  /**
+   * Wrapper for database select.
+   */
   protected function select($table, $alias = NULL, array $options = array()) {
     $options['fetch'] = \PDO::FETCH_ASSOC;
     return $this->getDatabase()->select($table, $alias, $options);

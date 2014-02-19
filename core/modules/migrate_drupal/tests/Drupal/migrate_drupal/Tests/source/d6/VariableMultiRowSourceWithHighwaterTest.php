@@ -27,6 +27,9 @@ class VariableMultiRowSourceWithHighwaterTest extends VariableMultiRowSourceTest
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     $this->migrationConfiguration['highwaterProperty']['field'] = 'test';
     parent::setup();

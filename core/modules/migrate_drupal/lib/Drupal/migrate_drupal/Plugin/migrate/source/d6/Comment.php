@@ -30,6 +30,9 @@ class Comment extends Drupal6SqlBase implements RequirementsInterface {
     return $query;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function prepareRow(Row $row, $keep = TRUE) {
     // In D6, status=0 means published, while in D8 means the opposite.
     // See https://drupal.org/node/237636

@@ -76,6 +76,11 @@ class MigrateTestBase extends WebTestBase implements MigrateMessageInterface {
     $this->loadDumps($files);
   }
 
+  /**
+   * Load dumps to be used.
+   *
+   * @fixme Better explanation.
+   */
   protected function loadDumps($files) {
     // Load the database from the portable PHP dump.
     // The files may be gzipped.

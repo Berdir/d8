@@ -31,6 +31,9 @@ class MigrateNodeConfigsTest extends MigrateDrupalTestBase {
     );
   }
 
+  /**
+   * Tests node settings.
+   */
   public function testNodeSettings() {
     $migration = entity_load('migration', 'd6_node_settings');
     $dumps = array(

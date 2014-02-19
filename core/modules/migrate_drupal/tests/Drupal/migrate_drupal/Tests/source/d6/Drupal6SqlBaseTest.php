@@ -144,6 +144,9 @@ use Drupal\migrate_drupal\Plugin\migrate\source\d6\Drupal6SqlBase;
  */
 class TestDrupal6SqlBase extends Drupal6SqlBase {
 
+  /**
+   * {@inheritdoc}
+   */
   public function fields() {
     return array(
       'filename' => t('The path of the primary file for this item.'),
@@ -159,6 +162,9 @@ class TestDrupal6SqlBase extends Drupal6SqlBase {
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function query() {
     $query = $this->database
       ->select('system', 's')
@@ -166,29 +172,54 @@ class TestDrupal6SqlBase extends Drupal6SqlBase {
     return $query;
   }
 
+  /**
+   * Tweaks Drupal6SqlBase to set a new database connection for tests.
+   *
+   * @param \Drupal\Core\Database\Connection
+   *   The new conection to use.
+   *
+   * @see \Drupal\migrate\Tests\MigrateSqlSourceTestCase
+   */
   public function setDatabase(Connection $database) {
     $this->database = $database;
   }
 
+  /**
+   * Tweaks Drupal6SqlBase to set a new module handler for tests.
+   *
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface
+   *   The new module handler to use.
+   *
+   * @see \Drupal\migrate\Tests\MigrateSqlSourceTestCase
+   */
   public function setModuleHandler(ModuleHandlerInterface $module_handler) {
     $this->moduleHandler = $module_handler;
   }
 
   /**
-   * Wrapper methods for testing protected methods.
+   * Wrapper method to test protected method moduleExists().
    */
   public function moduleExistsWrapper($module) {
     return parent::moduleExists($module);
   }
 
+  /**
+   * Wrapper method to test protected method getModuleSchemaVersion().
+   */
   public function getModuleSchemaVersionWrapper($module) {
     return parent::getModuleSchemaVersion($module);
   }
 
+  /**
+   * Wrapper method to test protected method variableGet().
+   */
   public function variableGetWrapper($name, $default) {
     return parent::variableGet($name, $default);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getIds() {
     return array();
   }

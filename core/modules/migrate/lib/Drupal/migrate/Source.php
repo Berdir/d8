@@ -121,14 +121,23 @@ class Source implements \Iterator, \Countable {
    */
   protected $highwaterProperty;
 
+  /**
+   * Getter for currentIds data member.
+   */
   public function getCurrentIds() {
     return $this->currentIds;
   }
 
+  /**
+   * Getter for numIgnored data member.
+   */
   public function getIgnored() {
     return $this->numIgnored;
   }
 
+  /**
+   * Getter for numProcessed data member.
+   */
   public function getProcessed() {
     return $this->numProcessed;
   }

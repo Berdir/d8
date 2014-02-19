@@ -47,6 +47,9 @@ class Block extends Drupal6SqlBase {
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function prepareRow(Row $row) {
     $module = $row->getSourceProperty('module');
     $delta = $row->getSourceProperty('delta');

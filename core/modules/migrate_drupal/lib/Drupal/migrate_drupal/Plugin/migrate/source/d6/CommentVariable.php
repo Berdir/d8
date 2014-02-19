@@ -60,7 +60,7 @@ class CommentVariable extends Drupal6SqlBase {
   }
 
   /**
-   * @return array
+   * {@inheritdoc}
    */
   public function fields() {
     return $this->commentPrefixes() + array(
@@ -68,6 +68,9 @@ class CommentVariable extends Drupal6SqlBase {
     );
   }
 
+  /**
+   * Comment related data for fields.
+   */
   protected function commentPrefixes() {
     return array(
       'comment' => $this->t('Default comment setting'),

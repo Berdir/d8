@@ -17,6 +17,9 @@ use Drupal\migrate\Row;
  */
 class UploadInstance extends Upload implements SourceEntityInterface {
 
+  /**
+   * {@inheritdoc}
+   */
   protected function runQuery() {
     $prefix = 'upload';
     $node_types = $this->getDatabase()->query('SELECT type FROM {node_type}')->fetchCol();
@@ -50,6 +53,9 @@ class UploadInstance extends Upload implements SourceEntityInterface {
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function query() {
     // Nothing needed here.
   }
