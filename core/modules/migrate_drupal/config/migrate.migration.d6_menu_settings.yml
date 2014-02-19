@@ -12,5 +12,3 @@ process:
 destination:
     plugin: config
     config_name: menu.settings
-dependencies:
-  - d6_menu

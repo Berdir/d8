@@ -21,6 +21,8 @@ class Drupal6MenuSettings {
    */
   public static function load(Connection $database) {
     Drupal6DumpCommon::createVariable($database);
+    Drupal6DumpCommon::createSystem(($database));
+    Drupal6DumpCommon::setModuleVersion($database, 'menu', 7000);
     $database->insert('variable')->fields(array(
       'name',
       'value',
