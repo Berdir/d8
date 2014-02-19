@@ -13,7 +13,7 @@ use Drupal\Core\Database\Database;
 
 class MigrateSearchPageTest extends MigrateDrupalTestBase {
 
-  static $modules = array('search');
+  static $modules = array('node', 'search');
 
   /**
    * {@inheritdoc}
