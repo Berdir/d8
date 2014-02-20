@@ -294,7 +294,7 @@ class NodeFormController extends ContentEntityFormController {
         array($this, 'validate'),
       ),
       '#submit' => array(
-        array($this, 'submit'),
+        array($this, 'submitForm'),
         array($this, 'preview'),
       ),
     );
@@ -342,17 +342,18 @@ class NodeFormController extends ContentEntityFormController {
   }
 
   /**
+   * {@inheritdoc}
+   *
    * Updates the node object by processing the submitted values.
    *
    * This function can be called by a "Next" button of a wizard to update the
    * form state's entity with the current step's values before proceeding to the
    * next step.
-   *
-   * Overrides Drupal\Core\Entity\EntityFormController::submit().
    */
-  public function submit(array $form, array &$form_state) {
+  public function submitForm(array &$form, array &$form_state) {
     // Build the node object from the submitted values.
-    $node = parent::submit($form, $form_state);
+    parent::submitForm($form, $form_state);
+    $node = $this->entity;
 
     // Save as a new revision if requested to do so.
     if (!empty($form_state['values']['revision'])) {
@@ -367,8 +368,6 @@ class NodeFormController extends ContentEntityFormController {
       $function = $module . '_node_submit';
       $function($node, $form, $form_state);
     }
-
-    return $node;
   }
 
   /**
@@ -438,7 +437,6 @@ class NodeFormController extends ContentEntityFormController {
     }
     return $entity;
   }
-
 
   /**
    * Overrides Drupal\Core\Entity\EntityFormController::save().

@@ -212,14 +212,14 @@ class ImageStyleEditForm extends ImageStyleFormBase {
   /**
    * {@inheritdoc}
    */
-  public function save(array $form, array &$form_state) {
+  public function submitForm(array &$form, array &$form_state) {
 
     // Update image effect weights.
     if (!empty($form_state['values']['effects'])) {
       $this->updateEffectWeights($form_state['values']['effects']);
     }
 
-    parent::save($form, $form_state);
+    parent::submitForm($form, $form_state);
     drupal_set_message($this->t('Changes to the style have been saved.'));
   }
 

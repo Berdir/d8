@@ -56,24 +56,28 @@ class ViewCloneFormController extends ViewFormControllerBase {
     $actions['submit'] = array(
       '#value' => $this->t('Clone'),
       '#submit' => array(
-        array($this, 'submit'),
+        array($this, 'submitForm'),
+        array($this, 'cloneView'),
       ),
     );
     return $actions;
   }
 
   /**
-   * {@inheritdoc}
+   * Form submission handler for the 'clone' action.
+   *
+   * @param array $form
+   *   An associative array containing the structure of the form.
+   * @param array $form_state
+   *   A reference to a keyed array containing the current state of the form.
    */
-  public function submit(array $form, array &$form_state) {
-    $original = parent::submit($form, $form_state);
-    $this->entity = $original->createDuplicate();
+  public function cloneView(array $form, array &$form_state) {
+    $this->entity = $this->entity->createDuplicate();
     $this->entity->set('id', $form_state['values']['id']);
     $this->entity->save();
 
     // Redirect the user to the view admin form.
     $form_state['redirect_route'] = $this->entity->urlInfo('edit-form');
-    return $this->entity;
   }
 
 }

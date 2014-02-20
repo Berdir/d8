@@ -40,7 +40,7 @@ class FeedItemsRemoveForm extends ContentEntityConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submit(array $form, array &$form_state) {
+  public function submitForm(array &$form, array &$form_state) {
     $this->entity->removeItems();
 
     $form_state['redirect_route']['route_name'] = 'aggregator.admin_overview';

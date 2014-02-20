@@ -70,7 +70,7 @@ class ShortcutSetFormController extends EntityFormController {
   }
 
   /**
-   * Overrides \Drupal\Core\Entity\EntityFormController::save().
+   * {@inheritdoc}
    */
   public function save(array $form, array &$form_state) {
     $entity = $this->entity;

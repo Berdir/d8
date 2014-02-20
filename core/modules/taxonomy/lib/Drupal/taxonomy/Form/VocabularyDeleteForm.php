@@ -55,7 +55,7 @@ class VocabularyDeleteForm extends EntityConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submit(array $form, array &$form_state) {
+  public function submitForm(array &$form, array &$form_state) {
     $this->entity->delete();
     drupal_set_message($this->t('Deleted vocabulary %name.', array('%name' => $this->entity->label())));
     watchdog('taxonomy', 'Deleted vocabulary %name.', array('%name' => $this->entity->label()), WATCHDOG_NOTICE);

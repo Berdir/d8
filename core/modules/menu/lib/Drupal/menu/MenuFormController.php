@@ -167,14 +167,14 @@ class MenuFormController extends EntityFormController {
     $actions['delete']['#access'] = !$this->entity->isNew() && $this->entity->access('delete');
 
     // Add the language configuration submit handler. This is needed because the
-    // submit button has custom submit handlers.
+    // save button has custom submit handlers.
     if ($this->moduleHandler->moduleExists('language')) {
       array_unshift($actions['submit']['#submit'],'language_configuration_element_submit');
       array_unshift($actions['submit']['#submit'], array($this, 'languageConfigurationSubmit'));
     }
     // We cannot leverage the regular submit handler definition because we have
     // button-specific ones here. Hence we need to explicitly set it for the
-    // submit action, otherwise it would be ignored.
+    // save action, otherwise it would be ignored.
     if ($this->moduleHandler->moduleExists('content_translation')) {
       array_unshift($actions['submit']['#submit'], 'content_translation_language_configuration_element_submit');
     }

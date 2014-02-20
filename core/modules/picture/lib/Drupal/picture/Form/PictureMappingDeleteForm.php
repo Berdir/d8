@@ -37,7 +37,7 @@ class PictureMappingDeleteForm extends EntityConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submit(array $form, array &$form_state) {
+  public function submitForm(array &$form, array &$form_state) {
     $this->entity->delete();
     drupal_set_message(t('Picture mapping %label has been deleted.', array('%label' => $this->entity->label())));
     watchdog('picture', 'Picture mapping %label has been deleted.', array('%label' => $this->entity->label()), WATCHDOG_NOTICE);

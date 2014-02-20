@@ -245,9 +245,7 @@ class ViewEditFormController extends ViewFormControllerBase {
   /**
    * {@inheritdoc}
    */
-  public function submit(array $form, array &$form_state) {
-    parent::submit($form, $form_state);
-
+  public function save(array $form, array &$form_state) {
     $view = $this->entity;
     $executable = $view->getExecutable();
 

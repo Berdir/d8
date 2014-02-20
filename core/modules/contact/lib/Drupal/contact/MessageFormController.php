@@ -119,7 +119,7 @@ class MessageFormController extends ContentEntityFormController {
         array($this, 'validate'),
       ),
       '#submit' => array(
-        array($this, 'submit'),
+        array($this, 'submitForm'),
         array($this, 'preview'),
       ),
     );
@@ -136,7 +136,7 @@ class MessageFormController extends ContentEntityFormController {
   }
 
   /**
-   * Overrides Drupal\Core\Entity\EntityFormController::save().
+   * {@inheritdoc}
    */
   public function save(array $form, array &$form_state) {
     global $user;

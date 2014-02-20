@@ -108,7 +108,7 @@ class SetCustomize extends EntityFormController {
         '#value' => t('Save changes'),
         '#access' => (bool) element_get_visible_children($form['shortcuts']['links']),
         '#submit' => array(
-          array($this, 'submit'),
+          array($this, 'submitForm'),
           array($this, 'save'),
         ),
       ),

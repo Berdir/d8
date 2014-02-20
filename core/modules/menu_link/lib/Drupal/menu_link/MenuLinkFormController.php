@@ -270,11 +270,12 @@ class MenuLinkFormController extends EntityFormController {
   }
 
   /**
-   * Overrides EntityFormController::submit().
+   * {@inheritdoc}
    */
-  public function submit(array $form, array &$form_state) {
+  public function submitForm(array &$form, array &$form_state) {
     // Build the menu link object from the submitted values.
-    $menu_link = parent::submit($form, $form_state);
+    parent::submitForm($form, $form_state);
+    $menu_link = $this->entity;
 
     // The value of "hidden" is the opposite of the value supplied by the
     // "enabled" checkbox.
@@ -283,8 +284,6 @@ class MenuLinkFormController extends EntityFormController {
 
     $menu_link->options['attributes']['title'] = $menu_link->description;
     list($menu_link->menu_name, $menu_link->plid) = explode(':', $menu_link->parent);
-
-    return $menu_link;
   }
 
   /**

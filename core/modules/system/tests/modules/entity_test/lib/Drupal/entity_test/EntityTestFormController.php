@@ -61,25 +61,16 @@ class EntityTestFormController extends ContentEntityFormController {
   }
 
   /**
-   * Overrides \Drupal\Core\Entity\EntityFormController::submit().
+   * {@inheritdoc}
    */
-  public function submit(array $form, array &$form_state) {
-    // Build the entity object from the submitted values.
-    $entity = parent::submit($form, $form_state);
+  public function save(array $form, array &$form_state) {
+    $entity = $this->entity;
 
     // Save as a new revision if requested to do so.
     if (!empty($form_state['values']['revision'])) {
       $entity->setNewRevision();
     }
 
-    return $entity;
-  }
-
-  /**
-   * Overrides Drupal\Core\Entity\EntityFormController::save().
-   */
-  public function save(array $form, array &$form_state) {
-    $entity = $this->entity;
     $is_new = $entity->isNew();
     $entity->save();
 

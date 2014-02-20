@@ -96,7 +96,7 @@ class MenuDeleteForm extends EntityConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submit(array $form, array &$form_state) {
+  public function submitForm(array &$form, array &$form_state) {
     $form_state['redirect_route']['route_name'] = 'menu.overview_page';
 
     // Locked menus may not be deleted.

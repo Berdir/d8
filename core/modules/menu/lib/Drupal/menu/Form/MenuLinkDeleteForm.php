@@ -36,7 +36,7 @@ class MenuLinkDeleteForm extends EntityConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submit(array $form, array &$form_state) {
+  public function submitForm(array &$form, array &$form_state) {
     menu_link_delete($this->entity->id());
     $t_args = array('%title' => $this->entity->link_title);
     drupal_set_message(t('The menu link %title has been deleted.', $t_args));

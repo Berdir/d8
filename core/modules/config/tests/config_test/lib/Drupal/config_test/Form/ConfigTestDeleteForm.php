@@ -40,7 +40,7 @@ class ConfigTestDeleteForm extends EntityConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submit(array $form, array &$form_state) {
+  public function submitForm(array &$form, array &$form_state) {
     $this->entity->delete();
     drupal_set_message(String::format('%label configuration has been deleted.', array('%label' => $this->entity->label())));
     $form_state['redirect_route']['route_name'] = 'config_test.list_page';

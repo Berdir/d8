@@ -35,12 +35,4 @@ class DateFormatEditForm extends DateFormatFormBase {
     return $actions;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function submit(array $form, array &$form_state) {
-    parent::submit($form, $form_state);
-    drupal_set_message(t('Custom date format updated.'));
-  }
-
 }

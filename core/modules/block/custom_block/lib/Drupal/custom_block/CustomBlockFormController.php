@@ -178,7 +178,7 @@ class CustomBlockFormController extends ContentEntityFormController {
   }
 
   /**
-   * Overrides \Drupal\Core\Entity\EntityFormController::submit().
+   * {@inheritdoc}
    *
    * Updates the custom block object by processing the submitted values.
    *
@@ -186,23 +186,15 @@ class CustomBlockFormController extends ContentEntityFormController {
    * form state's entity with the current step's values before proceeding to the
    * next step.
    */
-  public function submit(array $form, array &$form_state) {
-    // Build the block object from the submitted values.
-    $block = parent::submit($form, $form_state);
+  public function save(array $form, array &$form_state) {
+    /** @var \Drupal\custom_block\CustomBlockInterface $block */
+    $block = $this->entity;
 
     // Save as a new revision if requested to do so.
     if (!empty($form_state['values']['revision'])) {
       $block->setNewRevision();
     }
 
-    return $block;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function save(array $form, array &$form_state) {
-    $block = $this->entity;
     $insert = $block->isNew();
     $block->save();
     $watchdog_args = array('@type' => $block->bundle(), '%info' => $block->label());

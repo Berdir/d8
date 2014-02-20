@@ -102,7 +102,7 @@ class PictureMappingFormController extends EntityFormController {
           array($this, 'validate'),
         ),
         '#submit' => array(
-          array($this, 'submit'),
+          array($this, 'submitForm'),
           array($this, 'save'),
         ),
       ),
@@ -132,7 +132,7 @@ class PictureMappingFormController extends EntityFormController {
   }
 
   /**
-   * Overrides Drupal\Core\Entity\EntityFormController::save().
+   * {@inheritdoc}
    */
   public function save(array $form, array &$form_state) {
     $picture_mapping = $this->entity;

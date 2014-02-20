@@ -49,11 +49,9 @@ class EntityDisplayModeDeleteForm extends EntityConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submit(array $form, array &$form_state) {
-    parent::submit($form, $form_state);
-
+  public function submitForm(array &$form, array &$form_state) {
     $entity_type = $this->entity->getEntityType();
-    drupal_set_message(t('Deleted the %label @entity-type.', array('%label' => $this->entity->label(), '@entity-type' => $entity_type->getLowercaseLabel())));
+    drupal_set_message(t('Deleted the %label @entity-type.', array('%label' => $this->entity->label(), '@entity-type' => strtolower($entity_type->getLabel()))));
     $this->entity->delete();
     entity_info_cache_clear();
     $form_state['redirect_route']['route_name'] = 'entity.' . $this->entity->getEntityTypeId() . '_list';

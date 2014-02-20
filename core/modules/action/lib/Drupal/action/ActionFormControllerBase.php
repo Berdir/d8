@@ -133,13 +133,12 @@ abstract class ActionFormControllerBase extends EntityFormController {
   /**
    * {@inheritdoc}
    */
-  public function submit(array $form, array &$form_state) {
-    parent::submit($form, $form_state);
+  public function submitForm(array &$form, array &$form_state) {
+    parent::submitForm($form, $form_state);
 
     if ($this->plugin instanceof PluginFormInterface) {
       $this->plugin->submitConfigurationForm($form, $form_state);
     }
-    return $this->entity;
   }
 
   /**

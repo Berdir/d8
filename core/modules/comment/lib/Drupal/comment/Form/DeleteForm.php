@@ -92,7 +92,7 @@ class DeleteForm extends ContentEntityConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submit(array $form, array &$form_state) {
+  public function submitForm(array &$form, array &$form_state) {
     // Delete the comment and its replies.
     $this->entity->delete();
     drupal_set_message($this->t('The comment and all its replies have been deleted.'));

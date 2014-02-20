@@ -57,7 +57,7 @@ class TermDeleteForm extends ContentEntityConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submit(array $form, array &$form_state) {
+  public function submitForm(array &$form, array &$form_state) {
     $this->entity->delete();
     $storage_controller = $this->entityManager->getStorageController('taxonomy_vocabulary');
     $vocabulary = $storage_controller->load($this->entity->bundle());

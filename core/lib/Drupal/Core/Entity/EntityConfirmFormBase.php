@@ -74,13 +74,34 @@ abstract class EntityConfirmFormBase extends EntityFormController implements Con
    * {@inheritdoc}
    */
   protected function actions(array $form, array &$form_state) {
-    $actions = parent::actions($form, $form_state);
-    $actions['submit']['#value'] = $this->getConfirmText();
-    unset($actions['delete']);
-
-    // Prepare cancel link.
-    $actions['cancel'] = ConfirmFormHelper::buildCancelLink($this, $this->getRequest());
-    return $actions;
+    return array(
+      'submit' => array(
+        '#value' => $this->getConfirmText(),
+        '#validate' => array(
+          array($this, 'validate'),
+        ),
+        '#submit' => array(
+          array($this, 'submitForm'),
+        ),
+      ),
+      'cancel' => ConfirmFormHelper::buildCancelLink($this, $this->getRequest()),
+    );
   }
+
+  /**
+   * {@inheritdoc}
+   *
+   * The save method makes no sense on EntityConfirmFormBase. Form submissions
+   * should be processed by overriding the submitForm method.
+   */
+  public function save(array $form, array &$form_state) {}
+
+  /**
+   * {@inheritdoc}
+   *
+   * The delete method makes no sense on EntityConfirmFormBase. Form submissions
+   * should be processed by overriding the submitForm method.
+   */
+  public function delete(array $form, array &$form_state) {}
 
 }

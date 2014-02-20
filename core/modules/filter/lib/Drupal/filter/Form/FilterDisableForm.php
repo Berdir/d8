@@ -47,7 +47,7 @@ class FilterDisableForm extends EntityConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submit(array $form, array &$form_state) {
+  public function submitForm(array &$form, array &$form_state) {
     $this->entity->disable()->save();
     drupal_set_message(t('Disabled text format %format.', array('%format' => $this->entity->label())));
 

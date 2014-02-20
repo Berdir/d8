@@ -106,12 +106,6 @@ class EntityFormController extends FormBase implements EntityFormControllerInter
   }
 
   /**
-   * {@inheritdoc}
-   */
-  public function submitForm(array &$form, array &$form_state) {
-  }
-
-  /**
    * Initialize the form state and the entity before the first form build.
    */
   protected function init(array &$form_state) {
@@ -234,14 +228,16 @@ class EntityFormController extends FormBase implements EntityFormControllerInter
    */
   protected function actions(array $form, array &$form_state) {
     return array(
-      // @todo Rename the action key from submit to save.
+      // @todo Consider renaming the action key from submit to save. The impacts
+      //   are hard to predict. For example, see
+      //   language_configuration_element_process().
       'submit' => array(
         '#value' => $this->t('Save'),
         '#validate' => array(
           array($this, 'validate'),
         ),
         '#submit' => array(
-          array($this, 'submit'),
+          array($this, 'submitForm'),
           array($this, 'save'),
         ),
       ),
@@ -272,25 +268,30 @@ class EntityFormController extends FormBase implements EntityFormControllerInter
    * {@inheritdoc}
    *
    * This is the default entity object builder function. It is called before any
-   * other submit handler to build the new entity object to be passed to the
+   * other submit handler to build the new entity object to be used by the
    * following submit handlers. At this point of the form workflow the entity is
    * validated and the form state can be updated, this way the subsequently
-   * invoked handlers can retrieve a regular entity object to act on.
+   * invoked handlers can retrieve a regular entity object to act on. Generally
+   * this method should not be overridden unless the entity requires the same
+   * preparation for two actions, see \Drupal\comment\CommentFormController for
+   * an example with the save and preview actions.
    *
    * @param array $form
    *   An associative array containing the structure of the form.
    * @param array $form_state
    *   A reference to a keyed array containing the current state of the form.
    */
-  public function submit(array $form, array &$form_state) {
+  public function submitForm(array &$form, array &$form_state) {
     // Remove button and internal Form API values from submitted values.
     form_state_values_clean($form_state);
     $this->entity = $this->buildEntity($form, $form_state);
-    return $this->entity;
   }
 
   /**
    * Form submission handler for the 'save' action.
+   *
+   * Normally this method should be overridden to provide specific messages to
+   * the user and redirect the form after the entity has been saved.
    *
    * @param array $form
    *   An associative array containing the structure of the form.
@@ -298,7 +299,7 @@ class EntityFormController extends FormBase implements EntityFormControllerInter
    *   A reference to a keyed array containing the current state of the form.
    */
   public function save(array $form, array &$form_state) {
-    // @todo Perform common save operations.
+    $this->entity->save();
   }
 
   /**

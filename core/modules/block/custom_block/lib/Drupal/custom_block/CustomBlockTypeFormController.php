@@ -85,7 +85,7 @@ class CustomBlockTypeFormController extends EntityFormController {
   }
 
   /**
-   * Overrides \Drupal\Core\Entity\EntityFormController::save().
+   * {@inheritdoc}
    */
   public function save(array $form, array &$form_state) {
     $block_type = $this->entity;

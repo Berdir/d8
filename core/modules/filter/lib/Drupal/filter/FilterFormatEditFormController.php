@@ -31,10 +31,9 @@ class FilterFormatEditFormController extends FilterFormatFormControllerBase {
   /**
    * {@inheritdoc}
    */
-  public function submit(array $form, array &$form_state) {
-    parent::submit($form, $form_state);
+  public function submitForm(array &$form, array &$form_state) {
+    parent::submitForm($form, $form_state);
     drupal_set_message(t('The text format %format has been updated.', array('%format' => $this->entity->label())));
-    return $this->entity;
   }
 
 }

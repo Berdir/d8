@@ -200,12 +200,21 @@ abstract class DateFormatFormBase extends EntityFormController {
   /**
    * {@inheritdoc}
    */
-  public function submit(array $form, array &$form_state) {
-    $form_state['redirect_route']['route_name'] = 'system.date_format_list';
+  public function submitForm(array &$form, array &$form_state) {
     $form_state['values']['pattern'][$this->patternType] = trim($form_state['values']['date_format_pattern']);
+    parent::submitForm($form, $form_state);
+  }
 
-    parent::submit($form, $form_state);
-    $this->entity->save();
+  public function save(array $form, array &$form_state) {
+    $form_state['redirect_route']['route_name'] = 'system.date_format_list';
+    $form_state['redirect'] = 'admin/config/regional/date-time';
+    $status = $this->entity->save();
+    if ($status == SAVED_UPDATED) {
+      drupal_set_message(t('Custom date format updated.'));
+    }
+    else {
+      drupal_set_message(t('Custom date format added.'));
+    }
   }
 
 }
