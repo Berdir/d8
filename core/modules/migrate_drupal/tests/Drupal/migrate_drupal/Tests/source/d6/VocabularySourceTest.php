@@ -74,7 +74,7 @@ class VocabularySourceTest extends MigrateSqlSourceTestCase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  protected function setUp() {
     foreach ($this->expectedResults as $row) {
       foreach ($row['node_types'] as $type) {
         $this->databaseContents['vocabulary_node_types'][] = array(

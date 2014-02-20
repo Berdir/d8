@@ -45,7 +45,7 @@ class MigrateTestBase extends WebTestBase implements MigrateMessageInterface {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  protected function setUp() {
     parent::setUp();
     $connection_info = Database::getConnectionInfo('default');
     foreach ($connection_info as $target => $value) {
@@ -61,7 +61,7 @@ class MigrateTestBase extends WebTestBase implements MigrateMessageInterface {
   /**
    * {@inheritdoc}
    */
-  public function tearDown() {
+  protected function tearDown() {
     Database::removeConnection('migrate');
     parent::tearDown();
   }

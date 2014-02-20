@@ -29,7 +29,7 @@ class TermSourceWithVocabularyFilterTest extends TermSourceTest {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  protected function setUp() {
     $this->migrationConfiguration['source']['vocabulary'] = array(5);
     parent::setUp();
     $this->expectedResults = array_values(array_filter($this->expectedResults, function($result) {

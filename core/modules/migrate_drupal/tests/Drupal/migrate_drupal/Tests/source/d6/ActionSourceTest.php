@@ -78,7 +78,7 @@ class ActionSourceTest extends MigrateSqlSourceTestCase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  protected function setUp() {
     $this->databaseContents['actions'] = $this->expectedResults;
     parent::setUp();
   }

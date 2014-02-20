@@ -69,7 +69,7 @@ class AggregatorFeedSourceTest extends MigrateSqlSourceTestCase {
   /**
   * {@inheritdoc}
   */
-  public function setUp() {
+  protected function setUp() {
     foreach ($this->expectedResults as $k => $row) {
       $this->databaseContents['aggregator_feed'][$k] = $row;
     }

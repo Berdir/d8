@@ -94,7 +94,7 @@ class FieldInstancePerViewModeSourceTest extends MigrateSqlSourceTestCase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  protected function setUp() {
     foreach ($this->expectedResults as $k => $field_view_mode) {
       // These are stored as serialized strings.
       $field_view_mode['display_settings'] = serialize($field_view_mode['display_settings']);

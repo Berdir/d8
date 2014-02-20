@@ -77,7 +77,7 @@ class BlockSourceTest extends MigrateSqlSourceTestCase {
   /**
    * Prepopulate database contents.
    */
-  public function setUp() {
+  protected function setUp() {
     $this->databaseContents['blocks'] = $this->expectedResults;
     $this->databaseContents['blocks_roles'] = $this->expectedBlocksRoles;
     parent::setUp();

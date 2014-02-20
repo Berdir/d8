@@ -29,7 +29,7 @@ class CallbackTest extends MigrateProcessTestCase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  protected function setUp() {
     $this->plugin = new TestCallback();
     parent::setUp();
   }

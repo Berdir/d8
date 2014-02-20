@@ -108,7 +108,7 @@ class FilterFormatTest extends MigrateSqlSourceTestCase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  protected function setUp() {
     $fid = 1;
     foreach ($this->expectedResults as $k => $row) {
       $row['roles'] = ',' . implode(',', $row['roles']) . ',';

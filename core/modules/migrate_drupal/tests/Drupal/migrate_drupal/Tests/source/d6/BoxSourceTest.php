@@ -52,7 +52,7 @@ class BoxSourceTest extends MigrateSqlSourceTestCase {
   /**
    * Prepopulate contents with results.
    */
-  public function setUp() {
+  protected function setUp() {
     $this->databaseContents['boxes'] = $this->expectedResults;
     parent::setUp();
   }

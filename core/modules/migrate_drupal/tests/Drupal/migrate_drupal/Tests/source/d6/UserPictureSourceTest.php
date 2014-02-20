@@ -42,7 +42,7 @@ class UserPictureSourceTest extends MigrateSqlSourceTestCase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  protected function setUp() {
     $this->databaseContents['users'] = $this->expectedResults;
     parent::setUp();
   }

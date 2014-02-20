@@ -19,7 +19,7 @@ class MigrateTermNodeTestBase extends MigrateDrupalTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  protected function setUp() {
     parent::setUp();
     $vocabulary = entity_create('taxonomy_vocabulary', array(
       'vid' => 'test',

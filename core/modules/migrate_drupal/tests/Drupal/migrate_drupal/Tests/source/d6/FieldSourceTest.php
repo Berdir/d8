@@ -51,7 +51,7 @@ class FieldSourceTest extends MigrateSqlSourceTestCase {
   /**
    * Prepopulate contents with results.
    */
-  public function setUp() {
+  protected function setUp() {
     $this->expectedResults[0]['global_settings'] = array(
       'text_processing' => 0,
       'max_length' => '',

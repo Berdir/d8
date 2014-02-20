@@ -187,7 +187,7 @@ class NodeSourceTest extends MigrateSqlSourceTestCase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  protected function setUp() {
     foreach ($this->expectedResults as $k => $row) {
       foreach (array('nid', 'vid', 'title', 'uid', 'body', 'teaser', 'format') as $i => $field) {
         $this->databaseContents['node_revisions'][$k][$field] = $row[$field];

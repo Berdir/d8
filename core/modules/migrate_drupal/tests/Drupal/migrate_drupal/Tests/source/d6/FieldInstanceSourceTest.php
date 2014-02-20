@@ -54,7 +54,7 @@ class FieldInstanceSourceTest extends MigrateSqlSourceTestCase {
   /**
    * Prepopulate contents with results.
    */
-  public function setUp() {
+  protected function setUp() {
     $this->expectedResults[0]['widget_settings'] = array(
       'rows' => 5,
       'size' => 60,

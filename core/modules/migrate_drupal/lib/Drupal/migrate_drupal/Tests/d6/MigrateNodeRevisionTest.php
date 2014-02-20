@@ -25,7 +25,7 @@ class MigrateNodeRevisionTest extends MigrateNodeTestBase {
     );
   }
 
-  public function setUp() {
+  protected function setUp() {
     parent::setUp();
     $id_mappings = array(
       'd6_node' => array(

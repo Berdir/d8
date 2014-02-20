@@ -82,7 +82,7 @@ class UserSourceTest extends MigrateSqlSourceTestCase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  protected function setUp() {
     foreach ($this->expectedResults as $k => $row) {
       $this->databaseContents['users'][$k] = $row;
     }

@@ -76,7 +76,7 @@ class Drupal6SqlBaseTest extends MigrateTestCase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  protected function setUp() {
     $plugin = 'placeholder_id';
     $this->base = new TestDrupal6SqlBase($this->migrationConfiguration, $plugin, array(), $this->getMigration());
     $this->base->setDatabase($this->getDatabase($this->databaseContents));

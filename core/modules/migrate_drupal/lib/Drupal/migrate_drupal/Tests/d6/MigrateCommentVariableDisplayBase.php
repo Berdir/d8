@@ -36,7 +36,7 @@ class MigrateCommentVariableDisplayBase extends MigrateDrupalTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  protected function setUp() {
     parent::setUp();
     entity_create('field_entity', array(
       'entity_type' => 'node',

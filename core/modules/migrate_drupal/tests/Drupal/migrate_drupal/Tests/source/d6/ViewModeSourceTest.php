@@ -62,7 +62,7 @@ class ViewModeSourceTest extends MigrateSqlSourceTestCase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  protected function setUp() {
 
     $this->databaseContents['content_node_field_instance'][] = array(
       'display_settings' => serialize(array(

@@ -81,7 +81,7 @@ class RoleSourceTest extends MigrateSqlSourceTestCase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  protected function setUp() {
     foreach ($this->expectedResults as $row) {
       $this->databaseContents['permission'][] = array(
         'perm' => implode(', ', $row['permissions']),

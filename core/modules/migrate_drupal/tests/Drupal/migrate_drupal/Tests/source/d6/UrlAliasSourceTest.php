@@ -44,7 +44,7 @@ class UrlAliasSourceTest extends MigrateSqlSourceTestCase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  protected function setUp() {
     foreach ($this->expectedResults as $row) {
       $this->databaseContents['url_alias'][] = $row;
     }

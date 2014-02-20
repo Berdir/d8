@@ -85,7 +85,7 @@ class ProfileFieldsSourceTest extends MigrateSqlSourceTestCase {
   /**
    * Prepopulate contents with results.
    */
-  public function setUp() {
+  protected function setUp() {
     $this->databaseContents['profile_fields'] = $this->expectedResults;
     parent::setUp();
   }

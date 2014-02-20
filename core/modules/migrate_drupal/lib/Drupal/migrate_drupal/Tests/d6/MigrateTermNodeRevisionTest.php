@@ -28,7 +28,7 @@ class MigrateTermNodeRevisionTest extends MigrateTermNodeTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  protected function setUp() {
     parent::setUp();
     $id_mappings = array(
       'd6_node_revision' => array(

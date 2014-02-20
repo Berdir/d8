@@ -32,7 +32,7 @@ class CommentSourceWithHighwaterTest extends CommentSourceTest {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  protected function setUp() {
     $this->migrationConfiguration['highwaterProperty']['field'] = 'timestamp';
     array_shift($this->expectedResults);
     parent::setUp();

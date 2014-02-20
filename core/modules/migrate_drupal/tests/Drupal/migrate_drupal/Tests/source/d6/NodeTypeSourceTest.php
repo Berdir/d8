@@ -71,7 +71,7 @@ class NodeTypeSourceTest extends MigrateSqlSourceTestCase {
   /**
    * Prepopulate contents with results.
    */
-  public function setUp() {
+  protected function setUp() {
     $this->databaseContents['node_type'] = $this->expectedResults;
     parent::setUp();
   }

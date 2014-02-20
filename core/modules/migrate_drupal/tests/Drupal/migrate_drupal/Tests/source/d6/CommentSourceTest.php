@@ -84,7 +84,7 @@ class CommentSourceTest extends MigrateSqlSourceTestCase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  protected function setUp() {
     foreach ($this->expectedResults as $k => $row) {
       $this->databaseContents['comments'][$k] = $row;
       $this->databaseContents['comments'][$k]['status'] = 1 - $this->databaseContents['comments'][$k]['status'];

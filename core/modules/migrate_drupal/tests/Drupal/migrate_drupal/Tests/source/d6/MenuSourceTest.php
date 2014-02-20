@@ -62,7 +62,7 @@ class MenuSourceTest extends MigrateSqlSourceTestCase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  protected function setUp() {
     // This array stores the database.
     foreach ($this->expectedResults as $k => $row) {
       $this->databaseContents['menu_custom'][$k] = $row;

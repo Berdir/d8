@@ -68,7 +68,7 @@ class FileSourceTest extends MigrateSqlSourceTestCase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  protected function setUp() {
     $this->databaseContents['files'] = $this->expectedResults;
     parent::setUp();
   }

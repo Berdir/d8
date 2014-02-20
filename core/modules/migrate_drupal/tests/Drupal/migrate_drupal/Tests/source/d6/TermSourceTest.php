@@ -92,7 +92,7 @@ class TermSourceTest extends MigrateSqlSourceTestCase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  protected function setUp() {
     foreach ($this->expectedResults as $k => $row) {
       foreach ($row['parent'] as $parent) {
         $this->databaseContents['term_hierarchy'][] = array(

@@ -59,7 +59,7 @@ class ContactCategorySourceTest extends MigrateSqlSourceTestCase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  protected function setUp() {
     foreach ($this->expectedResults as $k => $row) {
       $this->databaseContents['contact'][$k] = $row;
     }
