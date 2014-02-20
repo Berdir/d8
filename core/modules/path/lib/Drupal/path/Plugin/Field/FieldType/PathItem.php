@@ -18,7 +18,8 @@ use Drupal\Core\TypedData\DataDefinition;
  *   id = "path",
  *   label = @Translation("Path"),
  *   description = @Translation("An entity field containing a path alias and related data."),
- *   configurable = FALSE
+ *   configurable = FALSE,
+ *   default_widget = "path"
  * )
  */
 class PathItem extends FieldItemBase {
