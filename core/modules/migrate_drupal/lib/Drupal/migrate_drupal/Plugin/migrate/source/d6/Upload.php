@@ -7,7 +7,7 @@
 
 namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
 
-use Drupal\migrate\Plugin\SourceEntityInterface;
+use Drupal\migrate\Plugin\RequirementsInterface;
 use Drupal\migrate\Row;
 
 /**
@@ -15,14 +15,34 @@ use Drupal\migrate\Row;
  *
  * @PluginID("drupal6_upload")
  */
-class Upload extends Drupal6SqlBase implements SourceEntityInterface {
+class Upload extends Drupal6SqlBase implements RequirementsInterface {
+
+  /**
+   * The join options between the node and the upload table.
+   */
+  const JOIN = 'n.vid = u.vid';
 
   /**
    * {@inheritdoc}
    */
   public function query() {
-    return $this->select('upload', 'u')
-      ->fields('u', array_keys($this->fields()));
+    $query = $this->select('upload', 'u')
+      ->distinct()
+      ->fields('u', array('nid', 'vid'));
+    $query->innerJoin('node', 'n', static::JOIN);
+    return $query;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function prepareRow(Row $row) {
+    $query = $this->select('upload', 'u')
+      ->fields('u', array('fid', 'description', 'list'))
+      ->condition('u.nid', $row->getSourceProperty('nid'))
+      ->orderBy('u.weight');
+    $query->innerJoin('node', 'n', static::JOIN);
+    $row->setSourceProperty('upload', $query->execute()->fetchAll());
   }
 
   /**
@@ -44,25 +64,16 @@ class Upload extends Drupal6SqlBase implements SourceEntityInterface {
    * {@inheritdoc}
    */
   public function getIds() {
-    return array(
-      'fid' => array(
-        'type' => 'integer',
-      ),
-    );
+    $ids['vid']['type'] = 'integer';
+    $ids['vid']['alias'] = 'u';
+    return $ids;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function bundleMigrationRequired() {
-    return FALSE;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function entityTypeId() {
-    return 'file';
+  public function checkRequirements() {
+    return $this->moduleExists('upload');
   }
 
 }

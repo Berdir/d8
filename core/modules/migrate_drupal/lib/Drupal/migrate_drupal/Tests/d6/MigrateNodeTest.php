@@ -26,6 +26,9 @@ class MigrateNodeTest extends MigrateNodeTestBase {
     );
   }
 
+  /**
+   * Test node migration from Drupal 6 to 8.
+   */
   public function testNode() {
     /** @var \Drupal\migrate\entity\Migration $migration */
     $migrations = entity_load_multiple('migration', array('d6_node:*'));
