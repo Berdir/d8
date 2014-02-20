@@ -25,7 +25,7 @@ class AggregatorItemSourceTest extends MigrateSqlSourceTestCase {
     // Leave it empty for now.
     'idlist' => array(),
     'source' => array(
-      'plugin' => 'drupal6_aggregator_item',
+      'plugin' => 'd6_aggregator_item',
     ),
   );
 

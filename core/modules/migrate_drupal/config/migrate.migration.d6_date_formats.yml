@@ -1,6 +1,6 @@
 id: d6_date_formats
 source:
-  plugin: drupal6_variable_multirow
+  plugin: d6_variable_multirow
   variables:
     - date_format_long
     - date_format_medium

@@ -13,7 +13,7 @@ use Drupal\migrate\Plugin\RequirementsInterface;
 /**
  * Drupal 6 profile fields source from database.
  *
- * @PluginID("drupal6_profile_field")
+ * @PluginID("d6_profile_field")
  */
 class ProfileField extends Drupal6SqlBase implements RequirementsInterface {
 

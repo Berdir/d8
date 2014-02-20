@@ -22,7 +22,7 @@ class UserPictureSourceTest extends MigrateSqlSourceTestCase {
     'id' => 'test_user_picture',
     'idlist' => array(),
     'source' => array(
-      'plugin' => 'drupal6_user_picture',
+      'plugin' => 'd6_user_picture',
     ),
   );
 

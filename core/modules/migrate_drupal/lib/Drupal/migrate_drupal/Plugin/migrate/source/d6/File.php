@@ -12,7 +12,7 @@ use Drupal\migrate\Row;
 /**
  * Drupal 6 file source from database.
  *
- * @PluginID("drupal6_file")
+ * @PluginID("d6_file")
  */
 class File extends Drupal6SqlBase {
 

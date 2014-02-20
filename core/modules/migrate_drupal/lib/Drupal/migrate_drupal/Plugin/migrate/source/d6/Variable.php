@@ -15,7 +15,7 @@ use Drupal\migrate\Entity\MigrationInterface;
  * This source class always returns a single row and as such is not a good
  * example for any normal source class returning multiple rows.
  *
- * @PluginID("drupal6_variable")
+ * @PluginID("d6_variable")
  */
 class Variable extends Drupal6SqlBase {
 

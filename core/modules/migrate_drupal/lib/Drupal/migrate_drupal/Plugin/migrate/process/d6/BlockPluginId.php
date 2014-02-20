@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * @MigrateProcessPlugin(
- *   id = "drupal6_block_plugin_id"
+ *   id = "d6_block_plugin_id"
  * )
  */
 class BlockPluginId extends ProcessPluginBase implements ContainerFactoryPluginInterface {

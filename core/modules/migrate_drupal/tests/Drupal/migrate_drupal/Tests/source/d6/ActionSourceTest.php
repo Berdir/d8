@@ -27,7 +27,7 @@ class ActionSourceTest extends MigrateSqlSourceTestCase {
     // Leave it empty for now.
     'idlist' => array(),
     'source' => array(
-      'plugin' => 'drupal6_action',
+      'plugin' => 'd6_action',
     ),
   );
 

@@ -11,7 +11,7 @@ use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\Plugin\migrate\load\LoadEntity;
 
 /**
- * @PluginID("drupal6_term_node")
+ * @PluginID("d6_term_node")
  */
 class LoadTermNode extends LoadEntity {
 

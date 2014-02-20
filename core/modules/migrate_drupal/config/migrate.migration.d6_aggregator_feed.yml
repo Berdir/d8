@@ -1,7 +1,7 @@
 id: d6_aggregator_feed
 
 source:
-  plugin: drupal6_aggregator_feed
+  plugin: d6_aggregator_feed
 
 process:
   fid: fid

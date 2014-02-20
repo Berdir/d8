@@ -10,7 +10,7 @@ namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
 /**
  * Source returning tids from the term_node table for the non-current revision.
  *
- * @PluginID("drupal6_term_node_revision")
+ * @PluginID("d6_term_node_revision")
  */
 class TermNodeRevision extends TermNode {
 

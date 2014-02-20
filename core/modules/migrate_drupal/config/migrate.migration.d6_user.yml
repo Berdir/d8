@@ -1,6 +1,6 @@
 id: d6_user
 source:
-  plugin: drupal6_user
+  plugin: d6_user
 load:
   plugin: drupal_entity
 process:

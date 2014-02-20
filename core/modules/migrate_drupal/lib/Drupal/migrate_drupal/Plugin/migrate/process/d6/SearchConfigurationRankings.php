@@ -15,7 +15,7 @@ use Drupal\migrate\Row;
  * Generate configuration rankings.
  *
  * @MigrateProcessPlugin(
- *   id = "drupal6_search_configuration_rankings"
+ *   id = "d6_search_configuration_rankings"
  * )
  */
 class SearchConfigurationRankings extends ProcessPluginBase {

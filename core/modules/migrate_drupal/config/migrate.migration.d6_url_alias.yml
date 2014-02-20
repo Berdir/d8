@@ -1,6 +1,6 @@
 id: d6_url_alias
 source:
-  plugin: drupal6_url_alias
+  plugin: d6_url_alias
 
 process:
   source: src

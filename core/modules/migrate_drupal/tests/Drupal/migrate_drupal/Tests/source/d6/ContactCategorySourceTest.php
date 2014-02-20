@@ -22,7 +22,7 @@ class ContactCategorySourceTest extends MigrateSqlSourceTestCase {
     'id' => 'test',
     'idlist' => array(),
     'source' => array(
-      'plugin' => 'drupal6_contact_category',
+      'plugin' => 'd6_contact_category',
     ),
   );
 

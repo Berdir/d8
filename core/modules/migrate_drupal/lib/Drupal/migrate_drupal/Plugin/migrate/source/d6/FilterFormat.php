@@ -13,7 +13,7 @@ use Drupal\migrate\Row;
 /**
  * Drupal 6 role source from database.
  *
- * @PluginID("drupal6_filter_format")
+ * @PluginID("d6_filter_format")
  */
 class FilterFormat extends Drupal6SqlBase {
 
@@ -63,7 +63,7 @@ class FilterFormat extends Drupal6SqlBase {
         'settings' => array(),
       );
       // Load the filter settings for the filter module, modules can use
-      // hook_migration_drupal6_filter_formats_prepare_row() to add theirs.
+      // hook_migration_d6_filter_formats_prepare_row() to add theirs.
       if ($raw_filter['module'] == 'filter') {
         if (!$delta) {
           if ($setting = $this->variableGet("allowed_html_$format", NULL)) {

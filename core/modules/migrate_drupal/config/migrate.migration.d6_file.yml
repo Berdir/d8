@@ -1,6 +1,6 @@
 id: d6_file
 source:
-  plugin: drupal6_file
+  plugin: d6_file
 process:
   filename: filename
   uri:

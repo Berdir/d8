@@ -30,7 +30,7 @@ class RoleSourceTest extends MigrateSqlSourceTestCase {
     // This needs to be the identifier of the actual key: cid for comment, nid
     // for node and so on.
     'source' => array(
-      'plugin' => 'drupal6_user_role',
+      'plugin' => 'd6_user_role',
     ),
   );
 

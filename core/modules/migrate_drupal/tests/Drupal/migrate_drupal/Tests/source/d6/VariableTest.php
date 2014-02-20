@@ -22,7 +22,7 @@ class VariableTest extends MigrateSqlSourceTestCase {
     'highwaterProperty' => array('field' => 'test'),
     'idlist' => array(),
     'source' => array(
-      'plugin' => 'drupal6_variable',
+      'plugin' => 'd6_variable',
       'variables' => array(
         'foo',
         'bar',

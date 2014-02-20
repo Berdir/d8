@@ -28,7 +28,7 @@ class ViewModeSourceTest extends MigrateSqlSourceTestCase {
     // Leave it empty for now.
     'idlist' => array(),
     'source' => array(
-      'plugin' => 'drupal6_field_instance_view_mode',
+      'plugin' => 'd6_field_instance_view_mode',
     ),
   );
 

@@ -13,7 +13,7 @@ use Drupal\migrate\Plugin\RequirementsInterface;
 /**
  * Drupal 6 menu source from database.
  *
- * @PluginID("drupal6_menu")
+ * @PluginID("d6_menu")
  */
 class Menu extends Drupal6SqlBase implements RequirementsInterface {
 

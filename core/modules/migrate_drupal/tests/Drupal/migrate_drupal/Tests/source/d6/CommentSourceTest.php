@@ -29,7 +29,7 @@ class CommentSourceTest extends MigrateSqlSourceTestCase {
     // This needs to be the identifier of the actual key: cid for comment, nid
     // for node and so on.
     'source' => array(
-      'plugin' => 'drupal6_comment',
+      'plugin' => 'd6_comment',
     ),
   );
 

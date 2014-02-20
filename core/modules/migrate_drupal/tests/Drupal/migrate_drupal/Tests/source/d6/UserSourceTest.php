@@ -22,7 +22,7 @@ class UserSourceTest extends MigrateSqlSourceTestCase {
     'id' => 'test',
     'idlist' => array(),
     'source' => array(
-      'plugin' => 'drupal6_user',
+      'plugin' => 'd6_user',
     ),
   );
 

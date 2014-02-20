@@ -1,6 +1,6 @@
 id: d6_aggregator_item
 source:
-  plugin: drupal6_aggregator_item
+  plugin: d6_aggregator_item
 process:
   iid: iid
   fid:

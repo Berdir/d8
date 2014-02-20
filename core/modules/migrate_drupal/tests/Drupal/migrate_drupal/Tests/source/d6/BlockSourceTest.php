@@ -27,7 +27,7 @@ class BlockSourceTest extends MigrateSqlSourceTestCase {
     'id' => 'test',
     'idlist' => array(),
     'source' => array(
-      'plugin' => 'drupal6_block',
+      'plugin' => 'd6_block',
     ),
   );
 

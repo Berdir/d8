@@ -15,7 +15,7 @@ use Drupal\migrate\Row;
 
 /**
  * @MigrateProcessPlugin(
- *   id = "drupal6_comment_pid"
+ *   id = "d6_comment_pid"
  * )
  */
 class CommentPid extends ProcessPluginBase {

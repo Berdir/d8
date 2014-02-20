@@ -1,6 +1,6 @@
 id: d6_filter_format
 source:
-  plugin: drupal6_filter_format
+  plugin: d6_filter_format
 process:
   format:
     -

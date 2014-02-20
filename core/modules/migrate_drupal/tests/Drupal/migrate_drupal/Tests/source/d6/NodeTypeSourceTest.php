@@ -27,7 +27,7 @@ class NodeTypeSourceTest extends MigrateSqlSourceTestCase {
     // Leave it empty for now.
     'idlist' => array(),
     'source' => array(
-      'plugin' => 'drupal6_nodetype',
+      'plugin' => 'd6_nodetype',
     ),
   );
 

@@ -13,7 +13,7 @@ use Drupal\migrate\Row;
 /**
  * A base class for field instances which all require the same data and fields.
  *
- * @PluginID("drupal6_view_mode")
+ * @PluginID("d6_view_mode")
  */
 class ViewMode extends ViewModeBase {
 

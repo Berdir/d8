@@ -22,7 +22,7 @@ class AggregatorFeedSourceTest extends MigrateSqlSourceTestCase {
     'id' => 'test',
     'idlist' => array(),
     'source' => array(
-      'plugin' => 'drupal6_aggregator_feed',
+      'plugin' => 'd6_aggregator_feed',
     ),
   );
 

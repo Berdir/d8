@@ -22,7 +22,7 @@ class UrlAliasSourceTest extends MigrateSqlSourceTestCase {
     'highwaterProperty' => array('field' => 'test'),
     'idlist' => array(),
     'source' => array(
-      'plugin' => 'drupal6_url_alias',
+      'plugin' => 'd6_url_alias',
     ),
   );
 

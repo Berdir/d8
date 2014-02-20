@@ -1,7 +1,7 @@
 id: d6_field_instance_widget_settings
 
 source:
-  plugin: drupal6_field_instance_per_form_display
+  plugin: d6_field_instance_per_form_display
   constants:
     entity_type: node
     form_mode: default

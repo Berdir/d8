@@ -1,6 +1,6 @@
 id: d6_user_profile_entity_display
 source:
-  plugin: drupal6_profile_field
+  plugin: d6_profile_field
   constants:
     entity_type: user
     bundle: user

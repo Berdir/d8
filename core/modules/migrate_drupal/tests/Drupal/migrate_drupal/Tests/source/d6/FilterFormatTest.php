@@ -27,7 +27,7 @@ class FilterFormatTest extends MigrateSqlSourceTestCase {
     'highwaterProperty' => array('field' => 'test'),
     'idlist' => array(),
     'source' => array(
-      'plugin' => 'drupal6_filter_formats',
+      'plugin' => 'd6_filter_formats',
     ),
   );
 

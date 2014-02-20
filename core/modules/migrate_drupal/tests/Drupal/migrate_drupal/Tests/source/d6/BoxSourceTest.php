@@ -28,7 +28,7 @@ class BoxSourceTest extends MigrateSqlSourceTestCase {
     // Leave it empty for now.
     'idlist' => array(),
     'source' => array(
-      'plugin' => 'drupal6_boxes',
+      'plugin' => 'd6_boxes',
     ),
   );
 

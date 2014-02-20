@@ -25,7 +25,7 @@ class VariableMultiRowSourceTest extends MigrateSqlSourceTestCase {
     'id' => 'test',
     'idlist' => array(),
     'source' => array(
-      'plugin' => 'drupal6_variable_multirow',
+      'plugin' => 'd6_variable_multirow',
       'variables' => array(
         'foo',
         'bar',

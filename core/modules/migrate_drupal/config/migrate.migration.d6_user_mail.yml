@@ -1,6 +1,6 @@
 id: d6_user_mail
 source:
-  plugin: drupal6_variable
+  plugin: d6_variable
   variables:
     - user_mail_status_activated_subject
     - user_mail_status_activated_body

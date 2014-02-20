@@ -1,6 +1,6 @@
 id: d6_block
 source:
-  plugin: drupal6_block
+  plugin: d6_block
 process:
   id:
     # We need something unique, so aggregator, aggregator_1 etc will do.
@@ -40,7 +40,7 @@ process:
           2: views_block:who_s_new-block_1
           3: views_block:who_s_online-who_s_online_block
     -
-      plugin: drupal6_block_plugin_id
+      plugin: d6_block_plugin_id
   region: region
   theme: theme
   label: title
@@ -49,7 +49,7 @@ process:
   'visibility.role.roles': roles
   weight: weight
   settings:
-    plugin: drupal6_block_settings
+    plugin: d6_block_settings
     source:
       - @plugin
       - delta

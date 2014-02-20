@@ -13,7 +13,7 @@ use Drupal\migrate\Plugin\RequirementsInterface;
 /**
  * Drupal 6 contact category source from database.
  *
- * @PluginID("drupal6_contact_category")
+ * @PluginID("d6_contact_category")
  */
 class ContactCategory extends Drupal6SqlBase implements RequirementsInterface {
 

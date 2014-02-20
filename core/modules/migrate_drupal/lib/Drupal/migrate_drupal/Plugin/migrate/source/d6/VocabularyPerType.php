@@ -14,7 +14,7 @@ use Drupal\migrate\Row;
 /**
  * Drupal 6 vocabularies source from database.
  *
- * @PluginID("drupal6_taxonomy_vocabulary_per_type")
+ * @PluginID("d6_taxonomy_vocabulary_per_type")
  */
 class VocabularyPerType extends Vocabulary implements RequirementsInterface {
 

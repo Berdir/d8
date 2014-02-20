@@ -13,7 +13,7 @@ use Drupal\migrate\Row;
 /**
  * Drupal 6 role source from database.
  *
- * @PluginID("drupal6_user_role")
+ * @PluginID("d6_user_role")
  */
 class Role extends Drupal6SqlBase {
 

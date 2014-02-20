@@ -27,7 +27,7 @@ class FieldInstanceSourceTest extends MigrateSqlSourceTestCase {
     // Leave it empty for now.
     'idlist' => array(),
     'source' => array(
-      'plugin' => 'drupal6_fieldinstance',
+      'plugin' => 'd6_fieldinstance',
     ),
   );
 

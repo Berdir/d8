@@ -1,7 +1,7 @@
 id: d6_field_instance
 
 source:
-  plugin: drupal6_field_instance
+  plugin: d6_field_instance
   constants:
     entity_type: node
 
@@ -14,7 +14,7 @@ process:
   required: required
   status: active
   settings:
-    plugin: drupal6_field_instance_settings
+    plugin: d6_field_instance_settings
     source:
       - widget_type
       - widget_settings
@@ -22,7 +22,7 @@ process:
 
   default_value_function: ''
   default_value:
-    plugin: drupal6_field_instance_defaults
+    plugin: d6_field_instance_defaults
     source:
       - widget_type
       - widget_settings

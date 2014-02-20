@@ -23,7 +23,7 @@ class TermSourceTest extends MigrateSqlSourceTestCase {
     'highwaterProperty' => array('field' => 'test'),
     'idlist' => array(),
     'source' => array(
-      'plugin' => 'drupal6_taxonomy_term',
+      'plugin' => 'd6_taxonomy_term',
     ),
   );
 

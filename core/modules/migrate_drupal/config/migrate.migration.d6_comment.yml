@@ -1,6 +1,6 @@
 id: d6_comment
 source:
-  plugin: drupal6_comment
+  plugin: d6_comment
   constants:
     field_id: node__comment
     entity_type: node
@@ -8,7 +8,7 @@ process:
   cid: cid
   pid:
     -
-      plugin: drupal6_comment_pid
+      plugin: d6_comment_pid
       source: pid
     -
       plugin: migration

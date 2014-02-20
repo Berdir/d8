@@ -1,10 +1,10 @@
 id: d6_term_node
 load:
-  plugin: drupal6_term_node
+  plugin: d6_term_node
   bundle_migration: d6_vocabulary_field
 
 source:
-  plugin: drupal6_term_node
+  plugin: d6_term_node
 
 process:
   nid: nid

@@ -1,6 +1,6 @@
 id: d6_dblog_settings
 source:
-  plugin: drupal6_variable
+  plugin: d6_variable
   variables:
     - dblog_row_limit
 process:

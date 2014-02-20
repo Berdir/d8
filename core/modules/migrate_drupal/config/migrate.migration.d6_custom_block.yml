@@ -1,6 +1,6 @@
 id: d6_custom_block
 source:
-  plugin: drupal6_box
+  plugin: d6_box
   constants:
     type: basic
 process:

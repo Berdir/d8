@@ -1,6 +1,6 @@
 id: d6_system_file
 source:
-  plugin: drupal6_variable
+  plugin: d6_variable
   variables:
     - file_directory_path
     - file_directory_temp

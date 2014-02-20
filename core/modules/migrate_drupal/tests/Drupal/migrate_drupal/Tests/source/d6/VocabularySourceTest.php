@@ -25,7 +25,7 @@ class VocabularySourceTest extends MigrateSqlSourceTestCase {
     // Leave it empty for now.
     'idlist' => array(),
     'source' => array(
-      'plugin' => 'drupal6_vocabulary',
+      'plugin' => 'd6_vocabulary',
     ),
   );
 

@@ -15,7 +15,7 @@ use Drupal\migrate\Row;
  *
  * @todo Support term_relation, term_synonym table if possible.
  *
- * @PluginID("drupal6_taxonomy_term")
+ * @PluginID("d6_taxonomy_term")
  */
 class Term extends Drupal6SqlBase implements RequirementsInterface {
 

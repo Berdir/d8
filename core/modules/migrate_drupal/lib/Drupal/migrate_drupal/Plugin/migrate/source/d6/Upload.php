@@ -13,7 +13,7 @@ use Drupal\migrate\Row;
 /**
  * Drupal 6 upload source from database.
  *
- * @PluginID("drupal6_upload")
+ * @PluginID("d6_upload")
  */
 class Upload extends Drupal6SqlBase implements RequirementsInterface {
 

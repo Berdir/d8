@@ -4,7 +4,7 @@ load:
   bundle_migration: d6_node_type
 
 source:
-  plugin: drupal6_node_revision
+  plugin: d6_node_revision
 
 process:
   nid: nid

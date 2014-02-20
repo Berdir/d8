@@ -12,7 +12,7 @@ use Drupal\migrate\Row;
 
 /**
  * @MigrateProcessPlugin(
- *   id = "drupal6_block_settings"
+ *   id = "d6_block_settings"
  * )
  */
 class BlockSettings extends ProcessPluginBase {
