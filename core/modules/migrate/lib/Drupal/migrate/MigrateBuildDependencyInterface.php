@@ -12,7 +12,7 @@ interface MigrateBuildDependencyInterface {
   /**
    * Builds a dependency tree for the migrations and set their order.
    *
-   * @param array $migrations
+   * @param \Drupal\migrate\Entity\MigrationInterface[] $migrations
    *   Array of loaded migrations with their declared dependencies.
    *
    * @return array

@@ -221,11 +221,11 @@ class Migration extends ConfigEntityBase implements MigrationInterface, Requirem
   public $limit = array();
 
   /**
-   * Migration dependencies that need to be run before the current one.
+   * Migration requirements that need to be run before the current one.
    *
    * @var array
    */
-  public $dependencies = array();
+  protected $requirements = array();
 
   /**
    * {@inheritdoc}
@@ -359,19 +359,19 @@ class Migration extends ConfigEntityBase implements MigrationInterface, Requirem
         return FALSE;
       }
 
+      /** @var \Drupal\migrate\Entity\MigrationInterface[] $required_migrations */
+      $required_migrations = entity_load_multiple('migration', $this->requirements);
       // Check if the dependencies are in good shape.
-      foreach ($this->dependencies as $dependency) {
-        /** @var \Drupal\migrate\Entity\MigrationInterface $dependent_migration */
-        $dependent_migration = entity_load('migration', $dependency);
+      foreach ($required_migrations as $required_migration) {
         // If the dependent source migration has no IDs then no mappings can
         // be recorded thus it is impossible to see whether the migration ran.
-        if (!$dependent_migration->getSourcePlugin()->getIds()) {
+        if (!$required_migration->getSourcePlugin()->getIds()) {
           return FALSE;
         }
 
         // If the dependent migration has not processed any record, it means the
         // dependency requirements are not met.
-        if (!$dependent_migration->getIdMap()->processedCount()) {
+        if (!$required_migration->getIdMap()->processedCount()) {
           return FALSE;
         }
       }

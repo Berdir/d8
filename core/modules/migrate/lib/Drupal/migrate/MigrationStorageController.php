@@ -95,11 +95,23 @@ class MigrationStorageController extends ConfigStorageController implements Migr
    */
   public function buildDependencyMigration(array $migrations) {
     $graph = array();
+    $requirements = array();
+    /** @var \Drupal\migrate\Entity\MigrationInterface $migration */
     foreach ($migrations as $migration) {
-      $graph[$migration->id]['edges'] = array();
+      $graph[$migration->id()]['edges'] = array();
       if (isset($migration->dependencies) && is_array($migration->dependencies)) {
         foreach ($migration->dependencies as $dependency) {
-          $graph[$migration->id]['edges'][$dependency] = $dependency;
+          if (is_string($dependency)) {
+            $requirements[$migration->id()][] = $dependency;
+          }
+          if (is_array($dependency)) {
+            list($dependency_string, $required) = $dependency;
+            $dependency = $dependency_string;
+            if ($required) {
+              $requirements[$migration->id()][] = $dependency;
+            }
+          }
+          $graph[$migration->id()]['edges'][$dependency] = $dependency;
         }
       }
     }
@@ -111,7 +123,7 @@ class MigrationStorageController extends ConfigStorageController implements Migr
       $weights[] = $graph[$migration_id]['weight'];
       // If we're including more depth dependencies, include them in the array
       // so we can throw more information on the requirements.
-      $migration->dependencies = $graph[$migration_id]['paths'];
+      $migration->requirements = $requirements[$migration->id()];
     }
 
     array_multisort($weights, SORT_DESC, SORT_NUMERIC, $migrations);
