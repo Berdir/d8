@@ -10,6 +10,9 @@ namespace Drupal\migrate_drupal\Tests\d6;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
+/**
+ * Test the upload field migration.
+ */
 class MigrateUploadFieldTest extends MigrateDrupalTestBase {
 
   static $modules = array('file', 'node');
@@ -26,17 +29,9 @@ class MigrateUploadFieldTest extends MigrateDrupalTestBase {
   }
 
   /**
-   * Test the field migration.
+   * Test the upload field migration.
    */
   public function testUpload() {
-    // Add some node mappings to get past checkRequirements().
-    $id_mappings = array(
-      'd6_node' => array(
-        array(array(1), array(1)),
-      ),
-    );
-    $this->prepareIdMappings($id_mappings);
-
     $migration = entity_load('migration', 'd6_upload_field');
     $dumps = array(
       drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6UploadField.php',

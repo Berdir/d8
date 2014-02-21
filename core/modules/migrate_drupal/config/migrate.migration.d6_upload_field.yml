@@ -1,26 +1,17 @@
 id: d6_upload_field
 source:
-  plugin: d6_upload
+  plugin: empty
   constants:
     entity_type: node
     type: file
-    id: node.upload
     name: upload
     cardinality: -1
     display_field: true
 process:
   entity_type: constants.entity_type
-  id: constants.id
   name: constants.name
   type: constants.type
-  nid:
-    plugin: migration
-    migration: d6_node
-    source:
-      - nid
   cardinality: constants.cardinality
   settings.display_field: constants.display_field
 destination:
   plugin: entity:field_entity
-dependencies:
-  - d6_node

@@ -7,9 +7,6 @@
 
 namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
 
-use Drupal\migrate\Plugin\SourceEntityInterface;
-use Drupal\migrate\Row;
-
 /**
  * Drupal 6 upload instance source from database.
  *
@@ -17,7 +14,7 @@ use Drupal\migrate\Row;
  *   id = "d6_upload_instance"
  * )
  */
-class UploadInstance extends Upload implements SourceEntityInterface {
+class UploadInstance extends Upload {
 
   /**
    * {@inheritdoc}
