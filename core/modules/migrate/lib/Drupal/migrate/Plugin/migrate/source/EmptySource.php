@@ -10,6 +10,8 @@ namespace Drupal\migrate\Plugin\migrate\source;
 /**
  * Source returning an empty row.
  *
+ * This is generally useful when needing to create a field using a migration..
+ *
  * @MigrateSource(
  *   id = "empty"
  * )

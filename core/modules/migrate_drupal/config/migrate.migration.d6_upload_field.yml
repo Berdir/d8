@@ -2,7 +2,7 @@ id: d6_upload_field
 source:
   # We do an empty source and a proper destination to have an idmap for
   # dependencies.
-  plugin: empty
+  plugin: d6_upload_field
   constants:
     entity_type: node
     type: file
