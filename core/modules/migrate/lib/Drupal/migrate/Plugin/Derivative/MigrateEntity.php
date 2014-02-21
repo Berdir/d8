@@ -67,6 +67,7 @@ class MigrateEntity implements ContainerDerivativeInterface {
       $this->derivatives[$entity_type] = array(
         'id' => "entity:$entity_type",
         'class' => $class,
+        'requirements_met' => 1,
       );
     }
     return $this->derivatives;

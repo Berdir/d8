@@ -45,7 +45,8 @@ class MigrateDestinationPluginManager extends MigratePluginManager {
   public function processDefinition(&$definition, $plugin_id) {
     // By setting requirements_met to something in the annotation, this
     // handling can be skipped.
-    if (!isset($definition['requirements_met'])) {
+    parent::processDefinition($definition, $plugin_id);
+    if ($definition['requirements_met'] === TRUE) {
       if (substr($plugin_id, 0, 7) == 'entity:' && !$this->entityManager->getDefinition(substr($plugin_id, 7))) {
         $definition['requirements_met'] = FALSE;
       }

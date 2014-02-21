@@ -11,8 +11,9 @@ namespace Drupal\migrate\Plugin\migrate\destination;
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\Plugin\MigrateDestinationInterface;
+use Drupal\migrate\Plugin\RequirementsInterface;
 
-abstract class DestinationBase extends PluginBase implements MigrateDestinationInterface {
+abstract class DestinationBase extends PluginBase implements MigrateDestinationInterface, RequirementsInterface {
 
   /**
    * The migration.
@@ -36,6 +37,13 @@ abstract class DestinationBase extends PluginBase implements MigrateDestinationI
   public function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->migration = $migration;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function checkRequirements() {
+    return $this->pluginDefinition['requirements_met'];
   }
 
   /**

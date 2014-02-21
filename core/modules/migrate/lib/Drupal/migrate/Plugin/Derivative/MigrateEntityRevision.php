@@ -65,6 +65,7 @@ class MigrateEntityRevision implements ContainerDerivativeInterface {
         $this->derivatives[$entity_type] = array(
           'id' => "entity_revision:$entity_type",
           'class' => 'Drupal\migrate\Plugin\migrate\destination\EntityRevision',
+          'requirements_met' => 1,
         );
       }
     }
