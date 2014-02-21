@@ -7,6 +7,7 @@
 
 namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
 use Drupal\migrate\Plugin\RequirementsInterface;
+use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
 
 /**
  * Drupal 6 feed source from database.
@@ -15,7 +16,7 @@ use Drupal\migrate\Plugin\RequirementsInterface;
  *   id = "d6_aggregator_feed"
  * )
  */
-class AggregatorFeed extends Drupal6SqlBase implements RequirementsInterface {
+class AggregatorFeed extends DrupalSqlBase implements RequirementsInterface {
 
   /**
    * {@inheritdoc}

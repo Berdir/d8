@@ -5,17 +5,17 @@
  * Contains \Drupal\migrate\Plugin\migrate\source\d6\Drupal6SqlBase.
  */
 
-namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
+namespace Drupal\migrate_drupal\Plugin\migrate\source;
 
 use Drupal\migrate\Plugin\migrate\source\SqlBase;
 
 /**
- * A base source class for Drupal 6 migrate sources.
+ * A base source class for Drupal migrate sources.
  *
  * Mainly to let children retrieve information from the origin system in an
  * easier way.
  */
-abstract class Drupal6SqlBase extends SqlBase {
+abstract class DrupalSqlBase extends SqlBase {
 
   /**
    * Retrieves all system data information from origin system.

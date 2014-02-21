@@ -9,6 +9,7 @@ namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
 
 use Drupal\migrate\Plugin\SourceEntityInterface;
 use Drupal\migrate\Row;
+use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
 
 /**
  * Drupal 6 user source from database.
@@ -17,7 +18,7 @@ use Drupal\migrate\Row;
  *   id = "d6_user"
  * )
  */
-class User extends Drupal6SqlBase implements SourceEntityInterface {
+class User extends DrupalSqlBase implements SourceEntityInterface {
 
   /**
    * {@inheritdoc}

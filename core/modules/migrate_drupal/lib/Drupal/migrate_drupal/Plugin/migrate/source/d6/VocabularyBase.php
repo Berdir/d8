@@ -10,11 +10,12 @@ namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
 use Drupal\migrate\Plugin\RequirementsInterface;
 
 use Drupal\migrate\Row;
+use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
 
 /**
  * Drupal 6 vocabularies source base.
  */
-abstract class VocabularyBase extends Drupal6SqlBase implements RequirementsInterface {
+abstract class VocabularyBase extends DrupalSqlBase implements RequirementsInterface {
 
   /**
    * {@inheritdoc}

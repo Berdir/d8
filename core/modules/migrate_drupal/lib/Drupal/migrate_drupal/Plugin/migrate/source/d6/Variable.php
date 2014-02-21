@@ -8,6 +8,7 @@
 namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
 
 use Drupal\migrate\Entity\MigrationInterface;
+use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
 
 /**
  * Drupal 6 variable source from database.
@@ -19,7 +20,7 @@ use Drupal\migrate\Entity\MigrationInterface;
  *   id = "d6_variable"
  * )
  */
-class Variable extends Drupal6SqlBase {
+class Variable extends DrupalSqlBase {
 
   /**
    * The variable names to fetch.

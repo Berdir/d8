@@ -9,6 +9,7 @@ namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
 
 
 use Drupal\migrate\Plugin\RequirementsInterface;
+use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
 
 /**
  * Drupal 6 menu source from database.
@@ -17,7 +18,7 @@ use Drupal\migrate\Plugin\RequirementsInterface;
  *   id = "d6_menu"
  * )
  */
-class Menu extends Drupal6SqlBase implements RequirementsInterface {
+class Menu extends DrupalSqlBase implements RequirementsInterface {
 
   /**
    * {@inheritdoc}

@@ -8,6 +8,7 @@
 namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
 
 use Drupal\migrate\Entity\MigrationInterface;
+use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
 
 /**
  * A base class for field instances which all require the same data and fields.
@@ -16,7 +17,7 @@ use Drupal\migrate\Entity\MigrationInterface;
  *   id = "d6_field_instance_per_form_display"
  * )
  */
-class FieldInstancePerFormDisplay extends Drupal6SqlBase {
+class FieldInstancePerFormDisplay extends DrupalSqlBase {
 
   /**
    * {@inheritdoc}

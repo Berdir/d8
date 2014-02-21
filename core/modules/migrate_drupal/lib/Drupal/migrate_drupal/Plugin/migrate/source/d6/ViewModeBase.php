@@ -9,11 +9,12 @@ namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
 
 use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\Row;
+use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
 
 /**
  * A base class for migrations that require view mode info.
  */
-abstract class ViewModeBase extends Drupal6SqlBase {
+abstract class ViewModeBase extends DrupalSqlBase {
 
 
   /**

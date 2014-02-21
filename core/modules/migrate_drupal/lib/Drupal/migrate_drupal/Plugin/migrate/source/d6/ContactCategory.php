@@ -8,6 +8,7 @@
 namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
 
 use Drupal\migrate\Plugin\RequirementsInterface;
+use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
 
 
 /**
@@ -17,7 +18,7 @@ use Drupal\migrate\Plugin\RequirementsInterface;
  *   id = "d6_contact_category"
  * )
  */
-class ContactCategory extends Drupal6SqlBase implements RequirementsInterface {
+class ContactCategory extends DrupalSqlBase implements RequirementsInterface {
 
   /**
    * {@inheritdoc}

@@ -8,6 +8,7 @@
 namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
 
 use Drupal\migrate\Row;
+use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
 
 /**
  * Drupal 6 Node types source from database.
@@ -16,7 +17,7 @@ use Drupal\migrate\Row;
  *   id = "d6_node_type"
  * )
  */
-class NodeType extends Drupal6SqlBase {
+class NodeType extends DrupalSqlBase {
 
   /**
    * The teaser length

@@ -10,6 +10,7 @@ namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
 use Drupal\migrate\Plugin\RequirementsInterface;
 use Drupal\migrate\Plugin\SourceEntityInterface;
 use Drupal\migrate\Row;
+use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
 
 /**
  * Source returning tids from the term_node table for the current revision.
@@ -18,7 +19,7 @@ use Drupal\migrate\Row;
  *   id = "d6_term_node"
  * )
  */
-class TermNode extends Drupal6SqlBase implements SourceEntityInterface, RequirementsInterface {
+class TermNode extends DrupalSqlBase implements SourceEntityInterface, RequirementsInterface {
 
     /**
    * The join options between the node and the term node table.

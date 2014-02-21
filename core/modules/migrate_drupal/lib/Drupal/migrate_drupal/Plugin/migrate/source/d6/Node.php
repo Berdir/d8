@@ -9,6 +9,7 @@ namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
 
 use Drupal\migrate\Plugin\SourceEntityInterface;
 use Drupal\migrate\Row;
+use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
 
 
 /**
@@ -18,7 +19,7 @@ use Drupal\migrate\Row;
  *   id = "d6_node"
  * )
  */
-class Node extends Drupal6SqlBase implements SourceEntityInterface {
+class Node extends DrupalSqlBase implements SourceEntityInterface {
 
   /**
    * The join options between the node and the node_revisions table.

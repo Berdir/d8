@@ -7,7 +7,7 @@
 
 namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
 
-use Drupal\migrate_drupal\Plugin\migrate\source\d6\Drupal6SqlBase;
+use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
 use Drupal\migrate\Row;
 
 /**
@@ -17,7 +17,7 @@ use Drupal\migrate\Row;
  *   id = "d6_filter_format"
  * )
  */
-class FilterFormat extends Drupal6SqlBase {
+class FilterFormat extends \Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase {
 
   /**
    * {@inheritdoc}
@@ -86,7 +86,7 @@ class FilterFormat extends Drupal6SqlBase {
     }
 
     $row->setSourceProperty('filters', $filters);
-    return parent::prepareRow($row);
+    return \Drupal\migrate_drupal\Plugin\migrate\source\parent::prepareRow($row);
   }
 
   /**

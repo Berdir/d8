@@ -8,6 +8,7 @@
 namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
 
 use Drupal\migrate\Row;
+use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
 
 /**
  * Drupal 6 file source from database.
@@ -16,7 +17,7 @@ use Drupal\migrate\Row;
  *   id = "d6_file"
  * )
  */
-class File extends Drupal6SqlBase {
+class File extends DrupalSqlBase {
 
   /**
    * The file directory path.

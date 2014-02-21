@@ -9,6 +9,7 @@ namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
 
 use Drupal\migrate\Plugin\RequirementsInterface;
 use Drupal\migrate\Row;
+use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
 
 /**
  * Drupal 6 taxonomy terms source from database.
@@ -19,7 +20,7 @@ use Drupal\migrate\Row;
  *   id = "d6_taxonomy_term"
  * )
  */
-class Term extends Drupal6SqlBase implements RequirementsInterface {
+class Term extends DrupalSqlBase implements RequirementsInterface {
 
   /**
    * {@inheritdoc}

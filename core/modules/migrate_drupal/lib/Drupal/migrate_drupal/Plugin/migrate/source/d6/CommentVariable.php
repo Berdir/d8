@@ -6,13 +6,14 @@
  */
 
 namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
+use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
 
 /**
  * @MigrateSource(
  *   id = "d6_comment_variable"
  * )
  */
-class CommentVariable extends Drupal6SqlBase {
+class CommentVariable extends DrupalSqlBase {
 
   /**
    * {@inheritdoc}

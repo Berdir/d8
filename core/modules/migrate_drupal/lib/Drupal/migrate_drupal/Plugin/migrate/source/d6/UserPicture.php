@@ -6,6 +6,7 @@
  */
 
 namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
+use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
 
 
 /**
@@ -17,7 +18,7 @@ namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
  *   id = "d6_user_picture"
  * )
  */
-class UserPicture extends Drupal6SqlBase {
+class UserPicture extends DrupalSqlBase {
 
   /**
    * {@inheritdoc}

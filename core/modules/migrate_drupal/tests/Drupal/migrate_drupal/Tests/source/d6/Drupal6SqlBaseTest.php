@@ -23,7 +23,7 @@ class Drupal6SqlBaseTest extends MigrateTestCase {
   );
 
   /**
-   * @var \Drupal\migrate_drupal\Plugin\migrate\source\d6\Drupal6SqlBase
+   * @var \Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase
    */
   protected $base;
 
@@ -137,12 +137,12 @@ namespace Drupal\migrate_drupal\Tests\source\d6;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\migrate_drupal\Plugin\migrate\source\d6\Drupal6SqlBase;
+use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
 
 /**
  * Extends the Drupal6SqlBase abstract class.
  */
-class TestDrupal6SqlBase extends Drupal6SqlBase {
+class TestDrupal6SqlBase extends \Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase {
 
   /**
    * {@inheritdoc}
