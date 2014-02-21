@@ -5,7 +5,6 @@
  * Contains \Drupal\migrate\Annotation\MigrateDestination.
  */
 
-
 namespace Drupal\migrate\Annotation;
 
 use Drupal\Component\Annotation\Plugin;
@@ -15,7 +14,7 @@ use Drupal\Component\Annotation\Plugin;
  *
  * @Annotation
  */
-class MigrateDestination extends Plugin {
+class MigrateSource extends Plugin {
 
   /**
    * A unique identifier for the process plugin.
@@ -25,12 +24,10 @@ class MigrateDestination extends Plugin {
   public $id;
 
   /**
-   * A class to make the plugin derivative aware.
+   * The module this plugin depends on.
    *
-   * @var string
-   *
-   * @see \Drupal\Component\Plugin\Discovery\DerivativeDiscoveryDecorator
+   * @var string|array
    */
-  public $derivative;
+  public $module = '';
 
 }

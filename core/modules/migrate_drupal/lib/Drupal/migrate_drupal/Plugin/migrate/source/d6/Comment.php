@@ -14,7 +14,7 @@ use Drupal\migrate\Row;
 /**
  * Drupal 6 comment source from database.
  *
- * @PluginID("d6_comment")
+ * @MigrateSource("d6_comment")
  */
 class Comment extends Drupal6SqlBase implements RequirementsInterface {
 

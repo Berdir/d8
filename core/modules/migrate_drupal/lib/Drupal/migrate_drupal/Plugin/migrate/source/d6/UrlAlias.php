@@ -10,7 +10,7 @@ namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
 /**
  * Drupal 6 url aliases source from database.
  *
- * @PluginID("d6_url_alias")
+ * @MigrateSource("d6_url_alias")
  */
 class UrlAlias extends Drupal6SqlBase {
 

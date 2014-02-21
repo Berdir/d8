@@ -13,7 +13,7 @@ use Drupal\migrate\Row;
 /**
  * Drupal 6 user source from database.
  *
- * @PluginID("d6_user")
+ * @MigrateSource("d6_user")
  */
 class User extends Drupal6SqlBase implements SourceEntityInterface {
 

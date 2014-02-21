@@ -8,7 +8,7 @@
 namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
 
 /**
- * @PluginID("d6_comment_variable")
+ * @MigrateSource("d6_comment_variable")
  */
 class CommentVariable extends Drupal6SqlBase {
 

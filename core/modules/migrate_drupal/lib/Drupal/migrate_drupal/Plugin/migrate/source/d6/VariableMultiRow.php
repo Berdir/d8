@@ -7,7 +7,7 @@ use Drupal\migrate\Row;
 /**
  * Drupal 6 multiple variables source from database.
  *
- * @PluginID("d6_variable_multirow")
+ * @MigrateSource("d6_variable_multirow")
  */
 class VariableMultiRow extends Drupal6SqlBase {
 

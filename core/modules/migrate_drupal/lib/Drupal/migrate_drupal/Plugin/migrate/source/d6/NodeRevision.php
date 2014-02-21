@@ -12,7 +12,7 @@ use Drupal\migrate\Plugin\RequirementsInterface;
 /**
  * Drupal 6 node revision source from database.
  *
- * @PluginID("d6_node_revision")
+ * @MigrateSource("d6_node_revision")
  */
 class NodeRevision extends Node {
 

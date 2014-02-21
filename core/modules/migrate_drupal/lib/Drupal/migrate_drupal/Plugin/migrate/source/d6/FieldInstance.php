@@ -14,7 +14,7 @@ use Drupal\migrate\Row;
 /**
  * Drupal 6 field instances source from database.
  *
- * @PluginID("d6_field_instance")
+ * @MigrateSource("d6_field_instance")
  */
 class FieldInstance extends Drupal6SqlBase implements RequirementsInterface {
 
