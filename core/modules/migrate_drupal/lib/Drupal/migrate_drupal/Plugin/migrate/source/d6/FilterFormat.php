@@ -13,7 +13,9 @@ use Drupal\migrate\Row;
 /**
  * Drupal 6 role source from database.
  *
- * @MigrateSource("d6_filter_format")
+ * @MigrateSource(
+ *   id = "d6_filter_format"
+ * )
  */
 class FilterFormat extends Drupal6SqlBase {
 

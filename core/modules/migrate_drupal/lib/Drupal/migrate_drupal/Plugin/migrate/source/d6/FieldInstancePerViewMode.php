@@ -12,7 +12,9 @@ use Drupal\migrate\Entity\MigrationInterface;
 /**
  * A base class for field instances which all require the same data and fields.
  *
- * @MigrateSource("d6_field_instance_per_view_mode")
+ * @MigrateSource(
+ *   id = "d6_field_instance_per_view_mode"
+ * )
  */
 class FieldInstancePerViewMode extends ViewModeBase {
 

@@ -13,7 +13,9 @@ use Drupal\migrate\Row;
 /**
  * Drupal 6 role source from database.
  *
- * @MigrateSource("d6_user_role")
+ * @MigrateSource(
+ *   id = "d6_user_role"
+ * )
  */
 class Role extends Drupal6SqlBase {
 

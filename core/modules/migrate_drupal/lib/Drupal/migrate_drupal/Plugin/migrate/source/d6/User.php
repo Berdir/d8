@@ -13,7 +13,9 @@ use Drupal\migrate\Row;
 /**
  * Drupal 6 user source from database.
  *
- * @MigrateSource("d6_user")
+ * @MigrateSource(
+ *   id = "d6_user"
+ * )
  */
 class User extends Drupal6SqlBase implements SourceEntityInterface {
 

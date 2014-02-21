@@ -13,7 +13,9 @@ use Drupal\migrate\Row;
 /**
  * Drupal 6 upload source from database.
  *
- * @MigrateSource("d6_upload")
+ * @MigrateSource(
+ *   id = "d6_upload"
+ * )
  */
 class Upload extends Drupal6SqlBase implements RequirementsInterface {
 

@@ -12,7 +12,9 @@ use Drupal\migrate\Entity\MigrationInterface;
 /**
  * A base class for field instances which all require the same data and fields.
  *
- * @MigrateSource("d6_field_instance_per_form_display")
+ * @MigrateSource(
+ *   id = "d6_field_instance_per_form_display"
+ * )
  */
 class FieldInstancePerFormDisplay extends Drupal6SqlBase {
 

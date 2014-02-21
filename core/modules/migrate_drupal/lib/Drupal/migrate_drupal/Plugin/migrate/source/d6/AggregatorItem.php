@@ -13,7 +13,9 @@ use Drupal\migrate\Plugin\RequirementsInterface;
 /**
  * Drupal 6 aggregator item source from database.
  *
- * @MigrateSource("d6_aggregator_item")
+ * @MigrateSource(
+ *   id = "d6_aggregator_item"
+ * )
  */
 class AggregatorItem extends Drupal6SqlBase implements RequirementsInterface {
 

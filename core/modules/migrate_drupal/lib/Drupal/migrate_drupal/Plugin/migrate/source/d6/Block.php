@@ -13,7 +13,9 @@ use Drupal\migrate\Row;
 /**
  * Drupal 6 block source from database.
  *
- * @MigrateSource("d6_block")
+ * @MigrateSource(
+ *   id = "d6_block"
+ * )
  */
 class Block extends Drupal6SqlBase {
 

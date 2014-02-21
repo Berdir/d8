@@ -14,7 +14,9 @@ use Drupal\migrate\Row;
 /**
  * Source returning tids from the term_node table for the current revision.
  *
- * @MigrateSource("d6_term_node")
+ * @MigrateSource(
+ *   id = "d6_term_node"
+ * )
  */
 class TermNode extends Drupal6SqlBase implements SourceEntityInterface, RequirementsInterface {
 

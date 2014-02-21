@@ -14,7 +14,9 @@ use Drupal\migrate\Row;
 /**
  * Drupal 6 node source from database.
  *
- * @MigrateSource("d6_node")
+ * @MigrateSource(
+ *   id = "d6_node"
+ * )
  */
 class Node extends Drupal6SqlBase implements SourceEntityInterface {
 

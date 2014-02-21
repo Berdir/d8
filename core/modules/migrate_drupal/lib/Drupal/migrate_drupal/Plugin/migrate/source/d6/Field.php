@@ -13,7 +13,9 @@ use Drupal\migrate\Row;
 /**
  * Drupal 6 field source from database.
  *
- * @MigrateSource("d6_field")
+ * @MigrateSource(
+ *   id = "d6_field"
+ * )
  */
 class Field extends Drupal6SqlBase implements RequirementsInterface {
 

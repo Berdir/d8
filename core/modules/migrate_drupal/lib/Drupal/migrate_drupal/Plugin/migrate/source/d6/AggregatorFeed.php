@@ -11,7 +11,9 @@ use Drupal\migrate\Plugin\RequirementsInterface;
 /**
  * Drupal 6 feed source from database.
  *
- * @MigrateSource("d6_aggregator_feed")
+ * @MigrateSource(
+ *   id = "d6_aggregator_feed"
+ * )
  */
 class AggregatorFeed extends Drupal6SqlBase implements RequirementsInterface {
 

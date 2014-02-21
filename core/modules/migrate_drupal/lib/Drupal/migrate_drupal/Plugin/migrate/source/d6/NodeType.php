@@ -12,7 +12,9 @@ use Drupal\migrate\Row;
 /**
  * Drupal 6 Node types source from database.
  *
- * @MigrateSource("d6_node_type")
+ * @MigrateSource(
+ *   id = "d6_node_type"
+ * )
  */
 class NodeType extends Drupal6SqlBase {
 
