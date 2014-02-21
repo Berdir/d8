@@ -24,6 +24,17 @@ class MigrateDestination extends Plugin {
   public $id;
 
   /**
+   * Whether requirements are met.
+   *
+   * If TRUE and a 'provider' key is present in the annotation then the
+   * default destination plugin manager will set this to FALSE if the
+   * provider (module/theme) doesn't exist.
+   *
+   * @var bool
+   */
+  public $requirements_met = TRUE;
+
+  /**
    * A class to make the plugin derivative aware.
    *
    * @var string

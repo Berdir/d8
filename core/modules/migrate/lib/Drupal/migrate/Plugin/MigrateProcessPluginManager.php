@@ -39,5 +39,4 @@ class MigrateProcessPluginManager extends MigratePluginManager {
     return $this->storage[$migration->id()][$plugin_id][$index];
   }
 
-
 }

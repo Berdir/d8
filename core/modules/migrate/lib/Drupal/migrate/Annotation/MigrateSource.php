@@ -24,10 +24,10 @@ class MigrateSource extends Plugin {
   public $id;
 
   /**
-   * The module this plugin depends on.
+   * Whether requirements are met.
    *
-   * @var string|array
+   * @var bool
    */
-  public $module = '';
+  public $requirements_met = TRUE;
 
 }

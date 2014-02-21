@@ -16,10 +16,11 @@ use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
  * Source returning tids from the term_node table for the current revision.
  *
  * @MigrateSource(
- *   id = "d6_term_node"
+ *   id = "d6_term_node",
+ *   source_provider = "taxonomy"
  * )
  */
-class TermNode extends DrupalSqlBase implements SourceEntityInterface, RequirementsInterface {
+class TermNode extends DrupalSqlBase implements SourceEntityInterface {
 
     /**
    * The join options between the node and the term node table.
@@ -62,13 +63,6 @@ class TermNode extends DrupalSqlBase implements SourceEntityInterface, Requireme
     $query->join('node', 'n', static::JOIN);
     $row->setSourceProperty('tid', $query->execute()->fetchCol());
     return parent::prepareRow($row);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function checkRequirements() {
-    return $this->moduleExists('taxonomy');
   }
 
   /**

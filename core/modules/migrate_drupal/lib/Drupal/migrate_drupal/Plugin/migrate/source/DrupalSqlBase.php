@@ -7,7 +7,11 @@
 
 namespace Drupal\migrate_drupal\Plugin\migrate\source;
 
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\Plugin\migrate\source\SqlBase;
+use Drupal\migrate\Plugin\RequirementsInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * A base source class for Drupal migrate sources.
@@ -15,31 +19,70 @@ use Drupal\migrate\Plugin\migrate\source\SqlBase;
  * Mainly to let children retrieve information from the origin system in an
  * easier way.
  */
-abstract class DrupalSqlBase extends SqlBase {
+abstract class DrupalSqlBase extends SqlBase implements ContainerFactoryPluginInterface, RequirementsInterface {
+
+   /**
+   * The contents of the system table.
+   *
+   * @var array
+   */
+  protected $systemData;
 
   /**
-   * Retrieves all system data information from origin system.
+   * If the source provider is missing.
    *
-   * @return array
-   *   List of system table information keyed by type and name.
+   * @var bool
    */
-  public function getSystemData() {
-    static $system_data;
-    if (isset($system_data)) {
-      return $system_data;
-    }
-    try {
-      $results = $this->select('system', 's')
-        ->fields('s')
-        ->execute();
-      foreach ($results as $result) {
-        $system_data[$result['type']][$result['name']] = $result;
+  protected $requirements = TRUE;
+
+  /**
+    * Retrieves all system data information from origin system.
+    *
+    * @return array
+    *   List of system table information keyed by type and name.
+    */
+   public function getSystemData() {
+    if (!isset($this->systemData)) {
+      $this->systemData = array();
+      try {
+        $results = $this->select('system', 's')
+          ->fields('s')
+          ->execute();
+        foreach ($results as $result) {
+          $this->systemData[$result['type']][$result['name']] = $result;
+        }
+      }
+      catch (\Exception $e) {
+        // The table might not exist for example in tests.
       }
     }
-    catch (\Exception $e) {
-      // The table might not exist for example in tests.
+    return $this->systemData;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration = NULL) {
+    $plugin = new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $migration
+    );
+    if ($plugin_definition['requirements_met'] === TRUE && isset($plugin_definition['source_provider']) && !$plugin->moduleExists($plugin_definition['source_provider'])) {
+      $plugin->checkRequirements(FALSE);
     }
-    return $system_data;
+    return $plugin;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function checkRequirements($new_value = NULL) {
+    if (isset($new_value)) {
+      $this->requirements = $new_value;
+    }
+    return $this->requirements;
   }
 
   /**
@@ -67,9 +110,8 @@ abstract class DrupalSqlBase extends SqlBase {
    *   TRUE if module is enabled on the origin system, FALSE if not.
    */
   protected function moduleExists($module) {
-
     $system_data = $this->getSystemData();
-    return isset($system_data['module'][$module]['status']) ? (bool) $system_data['module'][$module]['status'] : FALSE;
+    return !empty($system_data['module'][$module]['status']);
   }
 
   /**

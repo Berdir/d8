@@ -8,11 +8,13 @@
 namespace Drupal\migrate\Plugin;
 
 use Drupal\Component\Plugin\Factory\DefaultFactory;
+use Drupal\Component\Utility\String;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageManager;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\migrate\Entity\MigrationInterface;
+use Drupal\migrate\MigrateException;
 
 /**
  * Manages migrate plugins.
