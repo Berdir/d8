@@ -42,7 +42,7 @@ class MigrateUploadFieldTest extends MigrateDrupalTestBase {
 
     $field = entity_load('field_entity', 'node.upload');
     $this->assertEqual($field->id(), 'node.upload');
-    $this->assertEqual(array('node', 'upload'), $migration->getIdMap()->lookupDestinationID(array(1)));
+    $this->assertEqual(array('node', 'upload'), $migration->getIdMap()->lookupDestinationID(array('')));
   }
 
 }
