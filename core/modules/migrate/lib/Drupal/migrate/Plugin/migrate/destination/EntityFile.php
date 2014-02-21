@@ -14,7 +14,7 @@ use Drupal\migrate\Plugin\MigratePluginManager;
 use Drupal\migrate\Row;
 
 /**
- * @MigrateDestinationPlugin(
+ * @MigrateDestination(
  *   id = "entity:file"
  * )
  */

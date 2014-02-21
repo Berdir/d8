@@ -8,7 +8,7 @@
 namespace Drupal\migrate\Plugin\migrate\destination;
 
 /**
- * @MigrateDestinationPlugin(
+ * @MigrateDestination(
  *   id = "entity:view_mode"
  * )
  */

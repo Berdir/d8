@@ -16,7 +16,7 @@ use Drupal\migrate\Row;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * @MigrateDestinationPlugin(
+ * @MigrateDestination(
  *   id = "entity:comment"
  * )
  */

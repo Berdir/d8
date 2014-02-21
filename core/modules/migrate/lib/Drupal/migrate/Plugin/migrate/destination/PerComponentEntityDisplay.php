@@ -10,7 +10,7 @@ namespace Drupal\migrate\Plugin\migrate\destination;
 /**
  * This class imports one component of an entity display.
  *
- * @MigrateDestinationPlugin(
+ * @MigrateDestination(
  *   id = "component_entity_display"
  * )
  */

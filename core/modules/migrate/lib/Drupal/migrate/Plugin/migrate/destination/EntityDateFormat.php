@@ -10,7 +10,7 @@ namespace Drupal\migrate\Plugin\migrate\destination;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
- * @MigrateDestinationPlugin(
+ * @MigrateDestination(
  *   id = "entity:date_format"
  * )
  */

@@ -10,7 +10,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\migrate\Row;
 
 /**
- * @MigrateDestinationPlugin(
+ * @MigrateDestination(
  *   id = "entity:search_page"
  * )
  */

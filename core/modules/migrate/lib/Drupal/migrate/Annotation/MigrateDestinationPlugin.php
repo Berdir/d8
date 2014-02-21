@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Annotation\MigrateDestinationPlugin.
+ * Contains \Drupal\migrate\Annotation\MigrateDestination.
  */
 
 
@@ -15,7 +15,7 @@ use Drupal\Component\Annotation\Plugin;
  *
  * @Annotation
  */
-class MigrateDestinationPlugin extends Plugin {
+class MigrateDestination extends Plugin {
 
   /**
    * A unique identifier for the process plugin.

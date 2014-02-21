@@ -10,7 +10,7 @@ namespace Drupal\migrate\Plugin\migrate\destination;
 use Drupal\migrate\Row;
 
 /**
- * @MigrateDestinationPlugin(
+ * @MigrateDestination(
  *   id = "entity:field_instance"
  * )
  */

@@ -16,7 +16,7 @@ use Drupal\Core\Config\Config as ConfigObject;
 /**
  * Persist data to the config system.
  *
- * @MigrateDestinationPlugin(
+ * @MigrateDestination(
  *   id = "config"
  * )
  */

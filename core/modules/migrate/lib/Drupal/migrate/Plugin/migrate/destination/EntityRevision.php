@@ -11,7 +11,7 @@ use Drupal\migrate\MigrateException;
 use Drupal\migrate\Row;
 
 /**
- * @MigrateDestinationPlugin(
+ * @MigrateDestination(
  *   id = "entity_revision",
  *   derivative = "Drupal\migrate\Plugin\Derivative\MigrateEntityRevision"
  * )
