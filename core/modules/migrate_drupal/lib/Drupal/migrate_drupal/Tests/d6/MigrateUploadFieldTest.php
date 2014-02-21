@@ -33,10 +33,6 @@ class MigrateUploadFieldTest extends MigrateDrupalTestBase {
    */
   public function testUpload() {
     $migration = entity_load('migration', 'd6_upload_field');
-    $dumps = array(
-      drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6UploadField.php',
-    );
-    $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, $this);
     $executable->import();
 
