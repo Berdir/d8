@@ -69,8 +69,18 @@ abstract class DrupalSqlBase extends SqlBase implements ContainerFactoryPluginIn
       $plugin_definition,
       $migration
     );
-    if ($plugin_definition['requirements_met'] === TRUE && isset($plugin_definition['source_provider']) && !$plugin->moduleExists($plugin_definition['source_provider'])) {
-      $plugin->checkRequirements(FALSE);
+    /** @var \Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase $plugin */
+    if ($plugin_definition['requirements_met'] === TRUE) {
+      if (isset($plugin_definition['source_provider'])) {
+        if ($plugin->moduleExists($plugin_definition['source_provider'])) {
+          if (isset($plugin_definition['minimum_schema_version']) && !$plugin->getModuleSchemaVersion($plugin_definition['source_provider']) < $plugin_definition['minimum_schema_version']) {
+            $plugin->checkRequirements(FALSE);
+          }
+        }
+        else {
+          $plugin->checkRequirements(FALSE);
+        }
+      }
     }
     return $plugin;
   }
