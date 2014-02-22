@@ -90,8 +90,8 @@ class FilterFormat extends \Drupal\migrate_drupal\Plugin\migrate\source\DrupalSq
   }
 
   /**
-    * {@inheritdoc}
-    */
+   * {@inheritdoc}
+   */
   public function getIds() {
     $ids['format']['type'] = 'integer';
     return $ids;
