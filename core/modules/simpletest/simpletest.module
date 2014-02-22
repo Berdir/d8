@@ -554,7 +554,7 @@ function simpletest_classloader_register() {
     'profile',
   );
 
-  if ($cache = cache()->get($cid)) {
+  if ($cache = \Drupal::cache()->get($cid)) {
     $extensions = $cache->data;
   }
   else {
@@ -565,7 +565,7 @@ function simpletest_classloader_register() {
         $extensions[$type][$name] = $file->uri;
       }
     }
-    cache()->set($cid, $extensions);
+    \Drupal::cache()->set($cid, $extensions);
   }
 
   $classloader = drupal_classloader();
