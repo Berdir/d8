@@ -24,7 +24,7 @@ class UserPicture extends DrupalSqlBase {
    * {@inheritdoc}
    */
   public function query() {
-    $query = $this->database
+    $query = $this->getDatabase()
       ->select('users', 'u')
       ->condition('picture', '', '<>')
       ->fields('u', array('uid', 'access', 'picture'))

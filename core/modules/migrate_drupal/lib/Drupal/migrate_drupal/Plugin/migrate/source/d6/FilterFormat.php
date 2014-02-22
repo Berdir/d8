@@ -86,7 +86,7 @@ class FilterFormat extends \Drupal\migrate_drupal\Plugin\migrate\source\DrupalSq
     }
 
     $row->setSourceProperty('filters', $filters);
-    return \Drupal\migrate_drupal\Plugin\migrate\source\parent::prepareRow($row);
+    return parent::prepareRow($row);
   }
 
   /**

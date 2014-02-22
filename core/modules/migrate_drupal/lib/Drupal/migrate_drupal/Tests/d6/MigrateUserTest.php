@@ -16,7 +16,20 @@ use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
 class MigrateUserTest extends MigrateDrupalTestBase{
 
-  static $modules = array('link', 'options', 'datetime', 'number', 'text');
+  /**
+   * The modules to be enabled during the test.
+   *
+   * @var array
+   */
+  static $modules = array(
+    'link',
+    'options',
+    'datetime',
+    'number',
+    'text',
+    'file',
+    'image',
+  );
 
   /**
    * Storing user profile data keyed by $user->id().
@@ -40,6 +53,22 @@ class MigrateUserTest extends MigrateDrupalTestBase{
 
     // Populate static::$profileData.
     $this->setProfileData();
+
+    // Create the user profile field and instance.
+    entity_create('field_entity', array(
+      'entity_type' => 'user',
+      'name' => 'user_picture',
+      'type' => 'image',
+      'translatable' => '0',
+    ))->save();
+    entity_create('field_instance', array(
+      'label' => 'User Picture',
+      'description' => '',
+      'field_name' => 'user_picture',
+      'entity_type' => 'user',
+      'bundle' => 'user',
+      'required' => 0,
+    ))->save();
 
     // Load database dumps to provide source data.
     $path = drupal_get_path('module', 'migrate_drupal');
@@ -69,6 +98,11 @@ class MigrateUserTest extends MigrateDrupalTestBase{
     // Migrate user roles.
     $migration_role = entity_load('migration', 'd6_user_role');
     $executable = new MigrateExecutable($migration_role, $this);
+    $executable->import();
+
+    // Migrate user pictures.
+    $migration_user_picture = entity_load('migration', 'd6_user_picture_file');
+    $executable = new MigrateExecutable($migration_user_picture, $this);
     $executable->import();
 
     // Migrate users.
@@ -125,7 +159,9 @@ class MigrateUserTest extends MigrateDrupalTestBase{
         $this->assertEqual($user->{$name}->{$key}, $field[$key]);
       }
 
-      // @todo Test user picture.
+      // Test the user picture.
+      $file = file_load($user->user_picture->target_id);
+      $this->assertEqual($file->getFilename(), basename($source->picture));
 
       // Use the UI to check if the password has been salted and re-hashed to
       // conform the Drupal >= 7.

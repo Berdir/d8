@@ -1,0 +1,16 @@
+id: d6_user_picture_field
+source:
+  # We do an empty source and a proper destination to have an idmap for
+  # dependencies.
+  plugin: empty
+  constants:
+    entity_type: user
+    type: image
+    name: user_picture
+process:
+  entity_type: constants.entity_type
+  name: constants.name
+  type: constants.type
+  cardinality: constants.cardinality
+destination:
+  plugin: entity:field_entity
