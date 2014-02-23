@@ -155,7 +155,7 @@ class DerivativeDiscoveryDecorator implements DiscoveryInterface {
    *
    * @param string $base_plugin_id
    *   The base plugin id of the plugin.
-   * @param array $base_definition
+   * @param array|object $base_definition
    *   The base plugin definition to build derivatives.
    *
    * @return \Drupal\Component\Plugin\Derivative\DerivativeInterface|null
@@ -165,7 +165,7 @@ class DerivativeDiscoveryDecorator implements DiscoveryInterface {
 +   *   Thrown if the 'derivative' class specified in the plugin definition does
 +   *   not implement \Drupal\Component\Plugin\Derivative\DerivativeInterface.
    */
-  protected function getDerivativeFetcher($base_plugin_id, array $base_definition) {
+  protected function getDerivativeFetcher($base_plugin_id, $base_definition) {
     if (!isset($this->derivativeFetchers[$base_plugin_id])) {
       $this->derivativeFetchers[$base_plugin_id] = FALSE;
       $class = $this->getDerivativeClass($base_definition);
