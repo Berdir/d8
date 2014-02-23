@@ -8,6 +8,7 @@
 namespace Drupal\system\Tests\Cache;
 
 use Drupal\Core\Cache\MemoryBackend;
+use Drupal\Core\Cache\MemoryTag;
 
 /**
  * Tests MemoryBackend using GenericCacheBackendUnitTestBase.
@@ -29,6 +30,6 @@ class MemoryBackendUnitTest extends GenericCacheBackendUnitTestBase {
    *   A new MemoryBackend object.
    */
   protected function createCacheBackend($bin) {
-    return new MemoryBackend($bin);
+    return new MemoryBackend(new MemoryTag(), $bin);
   }
 }

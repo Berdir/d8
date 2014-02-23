@@ -23,7 +23,6 @@ class DatabaseBackend implements CacheBackendInterface {
    */
   protected $bin;
 
-
   /**
    * The database connection.
    *
@@ -32,21 +31,32 @@ class DatabaseBackend implements CacheBackendInterface {
   protected $connection;
 
   /**
+   * The cache tag service.
+   *
+   * @var \Drupal\Core\Cache\CacheTagInterface
+   */
+  protected $cacheTag;
+
+  /**
    * Constructs a DatabaseBackend object.
    *
    * @param \Drupal\Core\Database\Connection $connection
    *   The database connection.
+   * @param \Drupal\Core\Cache\CacheTagInterface
+   *   The cache tag service.
    * @param string $bin
    *   The cache bin for which the object is created.
    */
-  public function __construct(Connection $connection, $bin) {
+  public function __construct(Connection $connection, CacheTagInterface $cache_tag, $bin) {
     // All cache tables should be prefixed with 'cache_', except for the
     // default 'cache' bin.
     if ($bin != 'cache') {
       $bin = 'cache_' . $bin;
     }
     $this->bin = $bin;
+
     $this->connection = $connection;
+    $this->cacheTag = $cache_tag;
   }
 
   /**
@@ -109,19 +119,17 @@ class DatabaseBackend implements CacheBackendInterface {
 
     $cache->tags = $cache->tags ? explode(' ', $cache->tags) : array();
 
-    $checksum = $this->checksumTags($cache->tags);
+    // Check expire time.
+    $cache->valid = $time_valid = $cache->expire == Cache::PERMANENT || $cache->expire >= REQUEST_TIME;
 
-    // Check if deleteTags() has been called with any of the entry's tags.
-    if ($cache->checksum_deletions != $checksum['deletions']) {
+    $this->cacheTag->prepareGet($cache);
+    if ($cache->deleted) {
+      $this->delete($cache->cid);
       return FALSE;
     }
 
-    // Check expire time.
-    $cache->valid = $cache->expire == Cache::PERMANENT || $cache->expire >= REQUEST_TIME;
-
-    // Check if invalidateTags() has been called with any of the entry's tags.
-    if ($cache->checksum_invalidations != $checksum['invalidations']) {
-      $cache->valid = FALSE;
+    if ($time_valid && !$cache->valid) {
+      $this->invalidate($cache->cid);
     }
 
     if (!$allow_invalid && !$cache->valid) {
@@ -163,16 +171,8 @@ class DatabaseBackend implements CacheBackendInterface {
    * Actually set the cache.
    */
   protected function doSet($cid, $data, $expire, $tags) {
-    $flat_tags = $this->flattenTags($tags);
-    $deleted_tags = &drupal_static('Drupal\Core\Cache\DatabaseBackend::deletedTags', array());
-    // Remove tags that were already deleted during this request from the static
-    // cache so that another deletion for them will be correctly updated.
-    foreach ($flat_tags as $tag) {
-      if (isset($deleted_tags[$tag])) {
-        unset($deleted_tags[$tag]);
-      }
-    }
-    $checksum = $this->checksumTags($flat_tags);
+    $checksum = $this->cacheTag->checksumTags($tags, TRUE);
+    $flat_tags = $this->cacheTag->flattenTags($tags);
     $fields = array(
       'serialized' => 0,
       'created' => REQUEST_TIME,
@@ -227,32 +227,6 @@ class DatabaseBackend implements CacheBackendInterface {
   }
 
   /**
-   * Implements Drupal\Core\Cache\CacheBackendInterface::deleteTags().
-   */
-  public function deleteTags(array $tags) {
-    $tag_cache = &drupal_static('Drupal\Core\Cache\CacheBackendInterface::tagCache', array());
-    $deleted_tags = &drupal_static('Drupal\Core\Cache\DatabaseBackend::deletedTags', array());
-    foreach ($this->flattenTags($tags) as $tag) {
-      // Only delete tags once per request unless they are written again.
-      if (isset($deleted_tags[$tag])) {
-        continue;
-      }
-      $deleted_tags[$tag] = TRUE;
-      unset($tag_cache[$tag]);
-      try {
-        $this->connection->merge('cache_tags')
-          ->insertFields(array('deletions' => 1))
-          ->expression('deletions', 'deletions + 1')
-          ->key(array('tag' => $tag))
-          ->execute();
-      }
-      catch (\Exception $e) {
-        $this->catchException($e, 'cache_tags');
-      }
-    }
-  }
-
-  /**
    * Implements Drupal\Core\Cache\CacheBackendInterface::deleteAll().
    */
   public function deleteAll() {
@@ -296,26 +270,6 @@ class DatabaseBackend implements CacheBackendInterface {
   }
 
   /**
-   * Implements Drupal\Core\Cache\CacheBackendInterface::invalidateTags().
-   */
-  public function invalidateTags(array $tags) {
-    try {
-      $tag_cache = &drupal_static('Drupal\Core\Cache\CacheBackendInterface::tagCache', array());
-      foreach ($this->flattenTags($tags) as $tag) {
-        unset($tag_cache[$tag]);
-        $this->connection->merge('cache_tags')
-          ->insertFields(array('invalidations' => 1))
-          ->expression('invalidations', 'invalidations + 1')
-          ->key(array('tag' => $tag))
-          ->execute();
-      }
-    }
-    catch (\Exception $e) {
-      $this->catchException($e, 'cache_tags');
-    }
-  }
-
-  /**
    * Implements Drupal\Core\Cache\CacheBackendInterface::invalidateAll().
    */
   public function invalidateAll() {
@@ -344,70 +298,6 @@ class DatabaseBackend implements CacheBackendInterface {
       // If the table exists, the next garbage collection will clean up.
       // There is nothing to do.
     }
-  }
-
-  /**
-   * 'Flattens' a tags array into an array of strings.
-   *
-   * @param array $tags
-   *   Associative array of tags to flatten.
-   *
-   * @return array
-   *   An indexed array of flattened tag identifiers.
-   */
-  protected function flattenTags(array $tags) {
-    if (isset($tags[0])) {
-      return $tags;
-    }
-
-    $flat_tags = array();
-    foreach ($tags as $namespace => $values) {
-      if (is_array($values)) {
-        foreach ($values as $value) {
-          $flat_tags[] = "$namespace:$value";
-        }
-      }
-      else {
-        $flat_tags[] = "$namespace:$values";
-      }
-    }
-    return $flat_tags;
-  }
-
-  /**
-   * Returns the sum total of validations for a given set of tags.
-   *
-   * @param array $tags
-   *   Array of flat tags.
-   *
-   * @return int
-   *   Sum of all invalidations.
-   *
-   * @see \Drupal\Core\Cache\DatabaseBackend::flattenTags()
-   */
-  protected function checksumTags($flat_tags) {
-    $tag_cache = &drupal_static('Drupal\Core\Cache\CacheBackendInterface::tagCache', array());
-
-    $checksum = array(
-      'invalidations' => 0,
-      'deletions' => 0,
-    );
-
-    $query_tags = array_diff($flat_tags, array_keys($tag_cache));
-    if ($query_tags) {
-      $db_tags = $this->connection->query('SELECT tag, invalidations, deletions FROM {cache_tags} WHERE tag IN (:tags)', array(':tags' => $query_tags))->fetchAllAssoc('tag', \PDO::FETCH_ASSOC);
-      $tag_cache += $db_tags;
-
-      // Fill static cache with empty objects for tags not found in the database.
-      $tag_cache += array_fill_keys(array_diff($query_tags, array_keys($db_tags)), $checksum);
-    }
-
-    foreach ($flat_tags as $tag) {
-      $checksum['invalidations'] += $tag_cache[$tag]['invalidations'];
-      $checksum['deletions'] += $tag_cache[$tag]['deletions'];
-    }
-
-    return $checksum;
   }
 
   /**

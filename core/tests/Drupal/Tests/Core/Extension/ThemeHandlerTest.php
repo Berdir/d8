@@ -44,6 +44,13 @@ class ThemeHandlerTest extends UnitTestCase {
   protected $cacheBackend;
 
   /**
+   * The mocked cache tag service.
+   *
+   * @var \Drupal\Core\Cache\CacheTagInterface|\PHPUnit_Framework_MockObject_MockObject
+   */
+  protected $cacheTag;
+
+  /**
    * The mocked config factory.
    *
    * @var \Drupal\Core\Config\ConfigFactoryInterface|\PHPUnit_Framework_MockObject_MockObject
@@ -96,6 +103,7 @@ class ThemeHandlerTest extends UnitTestCase {
     $this->configFactory = $this->getConfigFactoryStub(array('system.theme' => array(), 'system.theme.disabled' => array()));
     $this->moduleHandler = $this->getMock('Drupal\Core\Extension\ModuleHandlerInterface');
     $this->cacheBackend = $this->getMock('Drupal\Core\Cache\CacheBackendInterface');
+    $this->cacheTag = $this->getMock('Drupal\Core\Cache\CacheTagInterface');
     $this->infoParser = $this->getMock('Drupal\Core\Extension\InfoParserInterface');
     $this->configInstaller = $this->getMock('Drupal\Core\Config\ConfigInstallerInterface');
     $this->routeBuilder = $this->getMockBuilder('Drupal\Core\Routing\RouteBuilder')
@@ -106,7 +114,7 @@ class ThemeHandlerTest extends UnitTestCase {
       ->getMock();
     $this->themeHandler = new TestThemeHandler($this->configFactory, $this->moduleHandler, $this->cacheBackend, $this->infoParser, $this->configInstaller, $this->routeBuilder, $this->systemListingInfo);
 
-    $this->getContainerWithCacheBins($this->cacheBackend);
+    $this->getContainerWithCacheTags($this->cacheTag);
   }
 
   /**

@@ -161,18 +161,23 @@ class DefaultPluginManagerTest extends UnitTestCase {
    */
   public function testCacheClearWithTags() {
     $cid = $this->randomName();
-    $cache_backend = $this->getMockBuilder('Drupal\Core\Cache\MemoryBackend')
+    $memory_tag = $this->getMockBuilder('Drupal\Core\Cache\MemoryTag')
       ->disableOriginalConstructor()
       ->getMock();
-    $cache_backend
+    $memory_tag
       ->expects($this->once())
       ->method('deleteTags')
       ->with(array('tag' => TRUE));
+
+    $cache_backend = $this->getMockBuilder('Drupal\Core\Cache\MemoryBackend')
+      ->setConstructorArgs(array($memory_tag))
+      ->disableOriginalConstructor()
+      ->getMock();
     $cache_backend
       ->expects($this->never())
       ->method('deleteMultiple');
 
-    $this->getContainerWithCacheBins($cache_backend);
+    $this->getContainerWithCacheTags($memory_tag);
 
     $language = new Language(array('id' => 'en'));
     $language_manager = $this->getMock('Drupal\Core\Language\LanguageManagerInterface');

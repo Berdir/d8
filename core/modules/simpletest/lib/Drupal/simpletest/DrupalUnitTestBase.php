@@ -222,7 +222,10 @@ abstract class DrupalUnitTestBase extends UnitTestBase {
     $this->container->setParameter('language.default_values', Language::$defaultValues);
 
     $container->register('lock', 'Drupal\Core\Lock\NullLockBackend');
-    $container->register('cache_factory', 'Drupal\Core\Cache\MemoryBackendFactory');
+    $this->settingsSet('cache', array('default' => 'cache.backend.memory'));
+    $this->settingsSet('cache_tag_service', 'cache.tag.memory');
+    $container->register('cache_factory', 'Drupal\Core\Cache\MemoryBackendFactory')
+      ->addArgument(new Reference('cache_tag_factory'));;
 
     $container
       ->register('config.storage', 'Drupal\Core\Config\FileStorage')

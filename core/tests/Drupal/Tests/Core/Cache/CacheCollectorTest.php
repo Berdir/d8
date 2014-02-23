@@ -27,6 +27,13 @@ class CacheCollectorTest extends UnitTestCase {
   protected $cache;
 
   /**
+   * The cache tag backend to use.
+   *
+   * @var \Drupal\Core\Cache\CacheTagInterface|\PHPUnit_Framework_MockObject_MockObject
+   */
+  protected $cacheTag;
+
+  /**
    * The lock backend that should be used.
    *
    * @var \PHPUnit_Framework_MockObject_MockObject
@@ -60,11 +67,12 @@ class CacheCollectorTest extends UnitTestCase {
    */
   protected function setUp() {
     $this->cache = $this->getMock('Drupal\Core\Cache\CacheBackendInterface');
+    $this->cacheTag = $this->getMock('Drupal\Core\Cache\CacheTagInterface');
     $this->lock = $this->getMock('Drupal\Core\Lock\LockBackendInterface');
     $this->cid = $this->randomName();
     $this->collector = new CacheCollectorHelper($this->cid, $this->cache, $this->lock);
 
-    $this->getContainerWithCacheBins($this->cache);
+    $this->getContainerWithCacheTags($this->cacheTag);
   }
 
 
@@ -387,7 +395,7 @@ class CacheCollectorTest extends UnitTestCase {
     $this->cache->expects($this->once())
       ->method('delete')
       ->with($this->cid);
-    $this->cache->expects($this->never())
+    $this->cacheTag->expects($this->never())
       ->method('deleteTags');
     $this->collector->clear();
     $this->assertEquals($value, $this->collector->get($key));
@@ -414,7 +422,7 @@ class CacheCollectorTest extends UnitTestCase {
     // Clear the collected cache using the tags, should call it again.
     $this->cache->expects($this->never())
       ->method('delete');
-    $this->cache->expects($this->once())
+    $this->cacheTag->expects($this->once())
       ->method('deleteTags')
       ->with($tags);
     $this->collector->clear();

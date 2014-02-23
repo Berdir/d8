@@ -6,7 +6,10 @@ services:
       - [setContainer, ['@service_container']]
   cache.backend.database:
     class: Drupal\Core\Cache\DatabaseBackendFactory
-    arguments: ['@database']
+    arguments: ['@database', '@cache_tag_factory']
+  cache.backend.memory:
+    class: Drupal\Core\Cache\MemoryBackendFactory
+    arguments: ['@cache_tag_factory']
   cache.bootstrap:
     class: Drupal\Core\Cache\CacheBackendInterface
     tags:
@@ -64,6 +67,22 @@ services:
     factory_method: get
     factory_service: cache_factory
     arguments: [path]
+  cache_tag_factory:
+    class: Drupal\Core\Cache\CacheTagFactory
+    arguments: ['@settings']
+    calls:
+      - [setContainer, ['@service_container']]
+  cache.tag.database:
+    class: Drupal\Core\Cache\DatabaseTag
+    arguments: ['@database']
+    tags:
+      - { name: cache.tag }
+      - { name: persist }
+  cache.tag.memory:
+    class: Drupal\Core\Cache\MemoryTag
+    tags:
+      - { name: cache.tag }
+      - { name: persist }
   config.cachedstorage.storage:
     class: Drupal\Core\Config\FileStorage
     factory_class: Drupal\Core\Config\FileStorageFactory

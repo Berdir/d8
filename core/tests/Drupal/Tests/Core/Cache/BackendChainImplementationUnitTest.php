@@ -10,6 +10,7 @@ namespace Drupal\Tests\Core\Cache;
 use Drupal\Core\Cache\BackendChain;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\MemoryBackend;
+use Drupal\Core\Cache\MemoryTag;
 use Drupal\Tests\UnitTestCase;
 
 /**
@@ -59,9 +60,10 @@ class BackendChainImplementationUnitTest extends UnitTestCase {
     parent::setUp();
 
     // Set up three memory backends to be used in the chain.
-    $this->firstBackend = new MemoryBackend('foo');
-    $this->secondBackend = new MemoryBackend('bar');
-    $this->thirdBackend = new MemoryBackend('baz');
+    $cache_tag = new MemoryTag();
+    $this->firstBackend = new MemoryBackend($cache_tag, 'foo');
+    $this->secondBackend = new MemoryBackend($cache_tag, 'bar');
+    $this->thirdBackend = new MemoryBackend($cache_tag, 'baz');
 
     // Set an initial fixed dataset for all testing. The next three data
     // collections will test two edge cases (last backend has the data, and
@@ -229,83 +231,6 @@ class BackendChainImplementationUnitTest extends UnitTestCase {
     $this->assertTrue($this->firstBackend->isEmpty(), 'First backend is empty after delete all.');
     $this->assertTrue($this->secondBackend->isEmpty(), 'Second backend is empty after delete all.');
     $this->assertTrue($this->thirdBackend->isEmpty(), 'Third backend is empty after delete all.');
-  }
-
-  /**
-   * Test that the delete tags operation is propagated to all backends
-   * in the chain.
-   */
-  public function testDeleteTagsPropagation() {
-    // Create two cache entries with the same tag and tag value.
-    $this->chain->set('test_cid_clear1', 'foo', Cache::PERMANENT, array('test_tag' => 2));
-    $this->chain->set('test_cid_clear2', 'foo', Cache::PERMANENT, array('test_tag' => 2));
-    $this->assertNotSame(FALSE, $this->firstBackend->get('test_cid_clear1')
-      && $this->firstBackend->get('test_cid_clear2')
-      && $this->secondBackend->get('test_cid_clear1')
-      && $this->secondBackend->get('test_cid_clear2')
-      && $this->thirdBackend->get('test_cid_clear1')
-      && $this->thirdBackend->get('test_cid_clear2'),
-      'Two cache items were created in all backends.');
-
-    // Invalidate test_tag of value 1. This should invalidate both entries.
-    $this->chain->deleteTags(array('test_tag' => 2));
-    $this->assertSame(FALSE, $this->firstBackend->get('test_cid_clear1')
-      && $this->firstBackend->get('test_cid_clear2')
-      && $this->secondBackend->get('test_cid_clear1')
-      && $this->secondBackend->get('test_cid_clear2')
-      && $this->thirdBackend->get('test_cid_clear1')
-      && $this->thirdBackend->get('test_cid_clear2'),
-      'Two caches removed from all backends after clearing a cache tag.');
-
-    // Create two cache entries with the same tag and an array tag value.
-    $this->chain->set('test_cid_clear1', 'foo', Cache::PERMANENT, array('test_tag' => array(1)));
-    $this->chain->set('test_cid_clear2', 'foo', Cache::PERMANENT, array('test_tag' => array(1)));
-    $this->assertNotSame(FALSE, $this->firstBackend->get('test_cid_clear1')
-      && $this->firstBackend->get('test_cid_clear2')
-      && $this->secondBackend->get('test_cid_clear1')
-      && $this->secondBackend->get('test_cid_clear2')
-      && $this->thirdBackend->get('test_cid_clear1')
-      && $this->thirdBackend->get('test_cid_clear2'),
-      'Two cache items were created in all backends.');
-
-    // Invalidate test_tag of value 1. This should invalidate both entries.
-    $this->chain->deleteTags(array('test_tag' => array(1)));
-    $this->assertSame(FALSE, $this->firstBackend->get('test_cid_clear1')
-      && $this->firstBackend->get('test_cid_clear2')
-      && $this->secondBackend->get('test_cid_clear1')
-      && $this->secondBackend->get('test_cid_clear2')
-      && $this->thirdBackend->get('test_cid_clear1')
-      && $this->thirdBackend->get('test_cid_clear2'),
-      'Two caches removed from all backends after clearing a cache tag.');
-
-    // Create three cache entries with a mix of tags and tag values.
-    $this->chain->set('test_cid_clear1', 'foo', Cache::PERMANENT, array('test_tag' => array(1)));
-    $this->chain->set('test_cid_clear2', 'foo', Cache::PERMANENT, array('test_tag' => array(2)));
-    $this->chain->set('test_cid_clear3', 'foo', Cache::PERMANENT, array('test_tag_foo' => array(3)));
-    $this->assertNotSame(FALSE, $this->firstBackend->get('test_cid_clear1')
-      && $this->firstBackend->get('test_cid_clear2')
-      && $this->firstBackend->get('test_cid_clear3')
-      && $this->secondBackend->get('test_cid_clear1')
-      && $this->secondBackend->get('test_cid_clear2')
-      && $this->secondBackend->get('test_cid_clear3')
-      && $this->thirdBackend->get('test_cid_clear1')
-      && $this->thirdBackend->get('test_cid_clear2')
-      && $this->thirdBackend->get('test_cid_clear3'),
-      'Three cached items were created in all backends.');
-
-    $this->chain->deleteTags(array('test_tag_foo' => array(3)));
-    $this->assertNotSame(FALSE, $this->firstBackend->get('test_cid_clear1')
-      && $this->firstBackend->get('test_cid_clear2')
-      && $this->secondBackend->get('test_cid_clear1')
-      && $this->secondBackend->get('test_cid_clear2')
-      && $this->thirdBackend->get('test_cid_clear1')
-      && $this->thirdBackend->get('test_cid_clear2'),
-      'Cached items not matching the tag were not cleared from any of the backends.');
-
-    $this->assertSame(FALSE, $this->firstBackend->get('test_cid_clear3')
-      && $this->secondBackend->get('test_cid_clear3')
-      && $this->thirdBackend->get('test_cid_clear3'),
-      'Cached item matching the tag was removed from all backends.');
   }
 
   /**

@@ -19,12 +19,20 @@ class DatabaseBackendFactory implements CacheFactoryInterface {
   protected $connection;
 
   /**
+   * The cache tag factory service.
+   *
+   * @var \Drupal\Core\Cache\CacheTagFactory
+   */
+  protected $cacheTagFactory;
+
+  /**
    * Constructs the DatabaseBackendFactory object.
    *
    * @param \Drupal\Core\Database\Connection $connection
    */
-  function __construct(Connection $connection) {
+  function __construct(Connection $connection, CacheTagFactory $cache_tag_factory) {
     $this->connection = $connection;
+    $this->cacheTagFactory = $cache_tag_factory;
   }
 
   /**
@@ -37,7 +45,7 @@ class DatabaseBackendFactory implements CacheFactoryInterface {
    *   The cache backend object for the specified cache bin.
    */
   function get($bin) {
-    return new DatabaseBackend($this->connection, $bin);
+    return new DatabaseBackend($this->connection, $this->cacheTagFactory->get(), $bin);
   }
 
 }

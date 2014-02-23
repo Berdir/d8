@@ -806,6 +806,10 @@ abstract class WebTestBase extends TestBase {
 
     // Execute the non-interactive installer.
     require_once DRUPAL_ROOT . '/core/includes/install.core.inc';
+    $this->settingsSet('cache', array('default' => 'cache.backend.memory'));
+    $this->settingsSet('cache_tag_service', 'cache.tag.memory');
+    $parameters = $this->installParameters();
+
     install_drupal($parameters);
 
     // Import new settings.php written by the installer.
@@ -1053,8 +1057,9 @@ abstract class WebTestBase extends TestBase {
    */
   protected function refreshVariables() {
     // Clear the tag cache.
-    drupal_static_reset('Drupal\Core\Cache\CacheBackendInterface::tagCache');
-    drupal_static_reset('Drupal\Core\Cache\DatabaseBackend::deletedTags');
+    $this->container->get('cache.tag.database')->clearCache();
+    drupal_static_reset('Drupal\Core\Cache\CacheTagInterface::tagCache');
+    drupal_static_reset('Drupal\Core\Cache\DatabaseTag::deletedTags');
 
     $this->container->get('config.factory')->reset();
     $this->container->get('state')->resetCache();

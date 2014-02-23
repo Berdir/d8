@@ -9,6 +9,7 @@ namespace Drupal\system\Tests\Plugin;
 
 use Drupal\Core\Cache\MemoryBackendFactory;
 use Drupal\Core\Cache\MemoryBackend;
+use Drupal\Core\Cache\MemoryTag;
 use Drupal\system\Tests\Plugin\Discovery\DiscoveryTestBase;
 use Drupal\Component\Plugin\Discovery\StaticDiscovery;
 use Drupal\Core\Plugin\Discovery\CacheDecorator;
@@ -47,7 +48,7 @@ class CacheDecoratorTest extends DiscoveryTestBase {
     // Use a non-db cache backend, so that we can use DiscoveryTestBase (which
     // extends UnitTestBase).
     // @todo switch to injecting the MemoryBackend http://drupal.org/node/1903346
-    \Drupal::getContainer()->set("cache.$this->cacheBin", new MemoryBackend($this->cacheBin));
+    \Drupal::getContainer()->set("cache.$this->cacheBin", new MemoryBackend(new MemoryTag(), $this->cacheBin));
 
     // Create discovery objects to test.
     $this->emptyDiscovery = new StaticDiscovery();

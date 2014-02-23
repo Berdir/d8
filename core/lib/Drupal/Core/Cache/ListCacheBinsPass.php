@@ -11,20 +11,20 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
 /**
- * Adds cache_bins parameter to the container.
+ * Adds cache_bins and cache_tags parameters to the container.
  */
 class ListCacheBinsPass implements CompilerPassInterface {
 
   /**
-   * Implements CompilerPassInterface::process().
-   *
-   * Collects the cache bins into the cache_bins parameter.
+   * {@inheritdoc}
    */
   public function process(ContainerBuilder $container) {
-    $cache_bins = array();
-    foreach ($container->findTaggedServiceIds('cache.bin') as $id => $attributes) {
-      $cache_bins[$id] = substr($id, strpos($id, '.') + 1);
+    foreach (array('cache.bin' => 'cache_bins', 'cache.tag' => 'cache_tags') as $name => $param) {
+      $params = array();
+      foreach ($container->findTaggedServiceIds($name) as $id => $attributes) {
+        $params[$id] = substr($id, strpos($id, '.') + 1);
+      }
+      $container->setParameter($param, $params);
     }
-    $container->setParameter('cache_bins', $cache_bins);
   }
 }

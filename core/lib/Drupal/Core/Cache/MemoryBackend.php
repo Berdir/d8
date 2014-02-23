@@ -24,12 +24,20 @@ class MemoryBackend implements CacheBackendInterface {
   protected $cache = array();
 
   /**
+   * The cache tag service.
+   *
+   * @var \Drupal\Core\Cache\CacheTagInterface
+   */
+  protected $cacheTag;
+
+  /**
    * Constructs a MemoryBackend object.
    *
    * @param string $bin
    *   The cache bin for which the object is created.
    */
-  public function __construct($bin) {
+  public function __construct(CacheTagInterface $cache_tag, $bin) {
+    $this->cacheTag = $cache_tag;
   }
 
   /**
@@ -83,7 +91,17 @@ class MemoryBackend implements CacheBackendInterface {
     }
 
     // Check expire time.
-    $cache->valid = $cache->expire == Cache::PERMANENT || $cache->expire >= REQUEST_TIME;
+    $cache->valid = $time_valid = $cache->expire == Cache::PERMANENT || $cache->expire >= REQUEST_TIME;
+
+    $this->cacheTag->prepareGet($cache);
+    if ($cache->deleted) {
+      $this->delete($cache->cid);
+      return FALSE;
+    }
+
+    if ($time_valid && !$cache->valid) {
+      $this->invalidate($cache->cid);
+    }
 
     if (!$allow_invalid && !$cache->valid) {
       return FALSE;
@@ -96,12 +114,15 @@ class MemoryBackend implements CacheBackendInterface {
    * Implements Drupal\Core\Cache\CacheBackendInterface::set().
    */
   public function set($cid, $data, $expire = Cache::PERMANENT, array $tags = array()) {
+    $checksum = $this->cacheTag->checksumTags($tags, TRUE);
     $this->cache[$cid] = (object) array(
       'cid' => $cid,
       'data' => $data,
       'created' => REQUEST_TIME,
       'expire' => $expire,
       'tags' => $this->flattenTags($tags),
+      'checksum_invalidations' => $checksum['invalidations'],
+      'checksum_deletions' => $checksum['deletions'],
     );
   }
 
@@ -117,18 +138,6 @@ class MemoryBackend implements CacheBackendInterface {
    */
   public function deleteMultiple(array $cids) {
     $this->cache = array_diff_key($this->cache, array_flip($cids));
-  }
-
-  /**
-   * Implements Drupal\Core\Cache\CacheBackendInterface::deleteTags().
-   */
-  public function deleteTags(array $tags) {
-    $flat_tags = $this->flattenTags($tags);
-    foreach ($this->cache as $cid => $item) {
-      if (array_intersect($flat_tags, $item->tags)) {
-        unset($this->cache[$cid]);
-      }
-    }
   }
 
   /**
@@ -153,18 +162,6 @@ class MemoryBackend implements CacheBackendInterface {
   public function invalidateMultiple(array $cids) {
     foreach ($cids as $cid) {
       $this->cache[$cid]->expire = REQUEST_TIME - 1;
-    }
-  }
-
-  /**
-   * Implements Drupal\Core\Cache\CacheBackendInterface::invalidateTags().
-   */
-  public function invalidateTags(array $tags) {
-    $flat_tags = $this->flattenTags($tags);
-    foreach ($this->cache as $cid => $item) {
-      if (array_intersect($flat_tags, $item->tags)) {
-        $this->cache[$cid]->expire = REQUEST_TIME - 1;
-      }
     }
   }
 

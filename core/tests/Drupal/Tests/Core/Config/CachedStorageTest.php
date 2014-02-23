@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\Core\Config;
 
+use Drupal\Core\Cache\MemoryTag;
 use Drupal\Tests\UnitTestCase;
 use Drupal\Core\Config\CachedStorage;
 use Drupal\Core\Cache\MemoryBackend;
@@ -51,7 +52,7 @@ class CachedStorageTest extends UnitTestCase {
     $storage->expects($this->never())->method('listAll');
 
     $response = array("$prefix." . $this->randomName(), "$prefix." . $this->randomName());
-    $cache = new MemoryBackend(__FUNCTION__);
+    $cache = new MemoryBackend(new MemoryTag(), __FUNCTION__);
     $cache->set('find:' . $prefix, $response);
     $cachedStorage = new CachedStorage($storage, $cache);
     $this->assertEquals($response, $cachedStorage->listAll($prefix));
@@ -75,7 +76,7 @@ class CachedStorageTest extends UnitTestCase {
     );
     $storage = $this->getMock('Drupal\Core\Config\StorageInterface');
     $storage->expects($this->never())->method('readMultiple');
-    $cache = new MemoryBackend(__FUNCTION__);
+    $cache = new MemoryBackend(new MemoryTag(), __FUNCTION__);
     foreach ($configCacheValues as $key => $value) {
       $cache->set($key, $value);
     }
@@ -102,7 +103,7 @@ class CachedStorageTest extends UnitTestCase {
         'foo' => 'bar',
       ),
     );
-    $cache = new MemoryBackend(__FUNCTION__);
+    $cache = new MemoryBackend(new MemoryTag(), __FUNCTION__);
     foreach ($configCacheValues as $key => $value) {
       $cache->set($key, $value);
     }
@@ -137,7 +138,7 @@ class CachedStorageTest extends UnitTestCase {
    */
   public function testReadNonExistentFileCacheMiss() {
     $name = 'config.does_not_exist';
-    $cache = new MemoryBackend(__FUNCTION__);
+    $cache = new MemoryBackend(new MemoryTag(), __FUNCTION__);
     $storage = $this->getMock('Drupal\Core\Config\StorageInterface');
     $storage->expects($this->once())
             ->method('read')
@@ -157,7 +158,7 @@ class CachedStorageTest extends UnitTestCase {
    */
   public function testReadNonExistentFileCached() {
     $name = 'config.does_not_exist';
-    $cache = new MemoryBackend(__FUNCTION__);
+    $cache = new MemoryBackend(new MemoryTag(), __FUNCTION__);
     $cache->set($name, FALSE);
 
     $storage = $this->getMock('Drupal\Core\Config\StorageInterface');

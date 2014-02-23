@@ -66,6 +66,13 @@ class EntityManagerTest extends UnitTestCase {
   protected $cache;
 
   /**
+   * The cache tag backend to use.
+   *
+   * @var \Drupal\Core\Cache\CacheTagInterface|\PHPUnit_Framework_MockObject_MockObject
+   */
+  protected $cacheTag;
+
+  /**
    * The language manager.
    *
    * @var \Drupal\Core\Language\LanguageManager|\PHPUnit_Framework_MockObject_MockObject
@@ -111,6 +118,8 @@ class EntityManagerTest extends UnitTestCase {
 
     $this->cache = $this->getMock('Drupal\Core\Cache\CacheBackendInterface');
 
+    $this->cacheTag = $this->getMock('Drupal\Core\Cache\CacheTagInterface');
+
     $this->languageManager = $this->getMockBuilder('Drupal\Core\Language\LanguageManager')
       ->disableOriginalConstructor()
       ->getMock();
@@ -122,7 +131,7 @@ class EntityManagerTest extends UnitTestCase {
 
     $this->formBuilder = $this->getMock('Drupal\Core\Form\FormBuilderInterface');
 
-    $this->container = $this->getContainerWithCacheBins($this->cache);
+    $this->container = $this->getContainerWithCacheTags($this->cacheTag);
 
     $this->discovery = $this->getMock('Drupal\Component\Plugin\Discovery\CachedDiscoveryInterface');
   }
@@ -609,7 +618,7 @@ class EntityManagerTest extends UnitTestCase {
    */
   public function testClearCachedFieldDefinitions() {
     $this->setUpEntityManager();
-    $this->cache->expects($this->once())
+    $this->cacheTag->expects($this->once())
       ->method('deleteTags')
       ->with(array('entity_field_info' => TRUE));
 

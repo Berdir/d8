@@ -382,6 +382,8 @@ function install_begin_request(&$install_state) {
       ->addArgument(new Reference('event_dispatcher'))
       ->addArgument(new Reference('config.typed'));
 
+    $container->register('cache.tag.memory', 'Drupal\Core\Cache\MemoryTag');
+
     // Register the 'language_manager' service.
     $container->register('language_manager', 'Drupal\Core\Language\LanguageManager')
       ->addArgument(new Reference('language.default'));
@@ -392,6 +394,7 @@ function install_begin_request(&$install_state) {
     foreach (array('bootstrap', 'config', 'cache', 'menu', 'page', 'path') as $bin) {
       $container
         ->register("cache.$bin", 'Drupal\Core\Cache\MemoryBackend')
+        ->addArgument(new Reference('cache.tag.memory'))
         ->addArgument($bin);
     }
 

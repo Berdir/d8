@@ -9,6 +9,7 @@ namespace Drupal\system\Tests\Cache;
 
 use Drupal\Core\Cache\BackendChain;
 use Drupal\Core\Cache\MemoryBackend;
+use Drupal\Core\Cache\MemoryTag;
 
 /**
  * Tests BackendChain using GenericCacheBackendUnitTestBase.
@@ -27,10 +28,11 @@ class BackendChainUnitTest extends GenericCacheBackendUnitTestBase {
     $chain = new BackendChain($bin);
 
     // We need to create some various backends in the chain.
+    $cache_tag = new MemoryTag();
     $chain
-      ->appendBackend(new MemoryBackend('foo'))
-      ->prependBackend(new MemoryBackend('bar'))
-      ->appendBackend(new MemoryBackend('baz'));
+      ->appendBackend(new MemoryBackend($cache_tag, 'foo'))
+      ->prependBackend(new MemoryBackend($cache_tag, 'bar'))
+      ->appendBackend(new MemoryBackend($cache_tag, 'baz'));
 
     return $chain;
   }

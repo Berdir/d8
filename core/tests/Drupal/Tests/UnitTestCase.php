@@ -10,6 +10,7 @@ namespace Drupal\Tests;
 use Drupal\Component\Utility\Random;
 use Drupal\Component\Utility\String;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Cache\CacheTagInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 
 /**
@@ -198,25 +199,24 @@ abstract class UnitTestCase extends \PHPUnit_Framework_TestCase {
   /**
    * Sets up a container with cache bins.
    *
-   * @param \Drupal\Core\Cache\CacheBackendInterface $backend
-   *   The cache backend to set up.
+   * @param \Drupal\Core\Cache\CacheTagInterface $backend
+   *   The cache tag to set up.
    *
    * @return \Symfony\Component\DependencyInjection\ContainerInterface|\PHPUnit_Framework_MockObject_MockObject
    *   The container with the cache bins set up.
    */
-  protected function getContainerWithCacheBins(CacheBackendInterface $backend) {
+  protected function getContainerWithCacheTags(CacheTagInterface $backend) {
     $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
     $container->expects($this->any())
       ->method('getParameter')
-      ->with('cache_bins')
-      ->will($this->returnValue(array('cache.test' => 'test')));
+      ->with('cache_tags')
+      ->will($this->returnValue(array('cache.tag.test' => 'test')));
     $container->expects($this->any())
       ->method('get')
-      ->with('cache.test')
+      ->with('cache.tag.test')
       ->will($this->returnValue($backend));
 
     \Drupal::setContainer($container);
     return $container;
   }
-
 }

@@ -143,7 +143,7 @@ class LocaleTranslationUiTest extends WebTestBase {
 
     // Reset the tag cache on the tester side in order to pick up the call to
     // Cache::deleteTags() on the tested side.
-    drupal_static_reset('Drupal\Core\Cache\CacheBackendInterface::tagCache');
+    $this->container->get('cache.tag.database')->clearCache();
 
     $this->assertTrue($name != $translation && t($name, array(), array('langcode' => $langcode)) == $translation, 't() works for non-English.');
     // Refresh the locale() cache to get fresh data from t() below. We are in

@@ -31,8 +31,8 @@ class Cache {
    *   The list of tags to delete cache items for.
    */
   public static function deleteTags(array $tags) {
-    foreach (static::getBins() as $cache_backend) {
-      $cache_backend->deleteTags($tags);
+    foreach (static::getTags() as $tag_service) {
+      $tag_service->deleteTags($tags);
     }
   }
 
@@ -50,16 +50,32 @@ class Cache {
    *   The list of tags to invalidate cache items for.
    */
   public static function invalidateTags(array $tags) {
-    foreach (static::getBins() as $cache_backend) {
-      $cache_backend->invalidateTags($tags);
+    foreach (static::getTags() as $tag_service) {
+      $tag_service->invalidateTags($tags);
     }
+  }
+
+  /**
+   * Gets all cache tag services.
+   *
+   * @return array
+   *  An array of cache tag objects keyed by service name.
+   */
+  public static function getTags() {
+    $tags = array();
+    $container = \Drupal::getContainer();
+    foreach ($container->getParameter('cache_tags') as $service_id => $tag) {
+      $tags[$tag] = $container->get($service_id);
+    }
+
+    return $tags;
   }
 
   /**
    * Gets all cache bin services.
    *
    * @return array
-   *  An array of cache backend objects keyed by cache bins.
+   *  An array of cache bin objects keyed by cache bin.
    */
   public static function getBins() {
     $bins = array();

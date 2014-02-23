@@ -13,6 +13,7 @@ use Drupal\Core\Entity\EntityStorageControllerInterface;
 use Drupal\field\FieldException;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\field\FieldInstanceInterface;
+use Drupal\field\Field as FieldInfo;
 
 /**
  * Defines the Field instance entity.
@@ -242,7 +243,7 @@ class FieldInstanceConfig extends ConfigEntityBase implements FieldInstanceInter
     // Field instances configuration is stored with a 'field_uuid' property
     // unambiguously identifying the field.
     if (isset($values['field_uuid'])) {
-      $field = field_info_field_by_id($values['field_uuid']);
+      $field =  FieldInfo::fieldInfo()->getFieldById($values['field_uuid']);
       if (!$field) {
         throw new FieldException(format_string('Attempt to create an instance of unknown field @uuid', array('@uuid' => $values['field_uuid'])));
       }

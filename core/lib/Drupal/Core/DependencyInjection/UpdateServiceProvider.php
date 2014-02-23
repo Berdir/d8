@@ -36,7 +36,8 @@ class UpdateServiceProvider implements ServiceProviderInterface, ServiceModifier
       $container->register('module_handler', 'Drupal\Core\Extension\UpdateModuleHandler')
         ->addArgument('%container.modules%');
       $container
-        ->register('cache_factory', 'Drupal\Core\Cache\MemoryBackendFactory');
+        ->register('cache_factory', 'Drupal\Core\Cache\MemoryBackendFactory')
+        ->addArgument(new Reference('cache_tag_factory'));
       $container
         ->register('router.builder', 'Drupal\Core\Routing\RouteBuilderStatic');
 

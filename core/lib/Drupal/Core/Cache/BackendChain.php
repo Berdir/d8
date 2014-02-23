@@ -148,15 +148,6 @@ class BackendChain implements CacheBackendInterface {
   }
 
   /**
-   * Implements Drupal\Core\Cache\CacheBackendInterface::deleteTags().
-   */
-  public function deleteTags(array $tags) {
-    foreach ($this->backends as $backend) {
-      $backend->deleteTags($tags);
-    }
-  }
-
-  /**
    * Implements Drupal\Core\Cache\CacheBackendInterface::deleteAll().
    */
   public function deleteAll() {
@@ -180,15 +171,6 @@ class BackendChain implements CacheBackendInterface {
   public function invalidateMultiple(array $cids) {
     foreach ($this->backends as $backend) {
       $backend->invalidateMultiple($cids);
-    }
-  }
-
-  /**
-   * Implements Drupal\Core\Cache\CacheBackendInterface::invalidateTags().
-   */
-  public function invalidateTags(array $tags) {
-    foreach ($this->backends as $backend) {
-      $backend->invalidateTags($tags);
     }
   }
 
