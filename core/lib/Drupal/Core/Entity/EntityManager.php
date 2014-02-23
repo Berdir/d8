@@ -103,7 +103,7 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
   public function __construct(\Traversable $namespaces, ContainerInterface $container, ModuleHandlerInterface $module_handler, CacheBackendInterface $cache, LanguageManager $language_manager, TranslationInterface $translation_manager) {
     parent::__construct('Entity', $namespaces, 'Drupal\Core\Entity\Annotation\EntityType');
 
-    $this->setCacheBackend($cache, $language_manager, 'entity_type:', array(array('entity_types' => TRUE)));
+    $this->setCacheBackend($cache, $language_manager, 'entity_type:', array('entity_types' => TRUE));
     $this->alterInfo($module_handler, 'entity_type');
 
     $this->translationManager = $translation_manager;
