@@ -1958,7 +1958,6 @@ function install_profile_modules(&$install_state) {
     'operations' => $operations,
     'title' => t('Installing @drupal', array('@drupal' => drupal_install_profile_distribution_name())),
     'error_message' => t('The installation has encountered an error.'),
-    'finished' => '_install_profile_modules_finished',
   );
   return $batch;
 }
@@ -2157,11 +2156,6 @@ function install_finished(&$install_state) {
   // Installation profiles are always loaded last.
   module_set_weight($profile, 1000);
 
-  // Flush all caches to ensure that any full bootstraps during the installer
-  // do not leave stale cached data, and that any content types or other items
-  // registered by the installation profile are registered correctly.
-  drupal_flush_all_caches();
-
   drupal_set_title(t('@drupal installation complete', array('@drupal' => drupal_install_profile_distribution_name())), PASS_THROUGH);
 
   $messages = drupal_set_message();
@@ -2199,15 +2193,6 @@ function _install_module_batch($module, $module_name, &$context) {
   \Drupal::moduleHandler()->install(array($module), FALSE);
   $context['results'][] = $module;
   $context['message'] = t('Installed %module module.', array('%module' => $module_name));
-}
-
-/**
- * 'Finished' callback for module installation batch.
- */
-function _install_profile_modules_finished($success, $results, $operations) {
-  // Flush all caches to complete the module installation process. Subsequent
-  // installation tasks will now have full access to the profile's modules.
-  drupal_flush_all_caches();
 }
 
 /**
