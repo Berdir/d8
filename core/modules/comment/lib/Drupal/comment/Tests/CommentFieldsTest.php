@@ -6,6 +6,7 @@
  */
 
 namespace Drupal\comment\Tests;
+use Drupal\field\Field;
 
 /**
  * Tests fields on comments.
@@ -77,6 +78,8 @@ class CommentFieldsTest extends CommentTestBase {
     if ($field = $this->container->get('field.info')->getField('node', 'comment_node_forum')) {
       $field->delete();
     }
+
+    Field::fieldInfo()->getField('comment', 'comment_body')->delete();
 
     // Purge field data now to allow comment module to be uninstalled once the
     // field has been deleted.

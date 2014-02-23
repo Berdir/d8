@@ -88,18 +88,6 @@ function forum_install() {
 }
 
 /**
- * Implements hook_module_preinstall().
- */
-function forum_module_preinstall($module) {
-  $list_boolean = \Drupal::service('plugin.manager.field.field_type')->getDefinition('list_boolean');
-  if (empty($list_boolean) && $module == 'forum') {
-    // Make sure that the list_boolean field type is available before our
-    // default config is installed.
-    field_info_cache_clear();
-  }
-}
-
-/**
  * Implements hook_uninstall().
  */
 function forum_uninstall() {
@@ -112,6 +100,10 @@ function forum_uninstall() {
   }
 
   if ($field = field_info_field('taxonomy_term', 'forum_container')) {
+    $field->delete();
+  }
+
+  if ($field = field_info_field('comment', 'comment_body')) {
     $field->delete();
   }
 
