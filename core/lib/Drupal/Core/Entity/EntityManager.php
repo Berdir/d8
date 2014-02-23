@@ -17,6 +17,7 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageManager;
 use Drupal\Core\Language\Language;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Plugin\Discovery\InfoHookDecorator;
 use Drupal\Core\StringTranslation\TranslationInterface;
@@ -95,12 +96,12 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
    *   The module handler.
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache
    *   The cache backend to use.
-   * @param \Drupal\Core\Language\LanguageManager $language_manager
+   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    *   The language manager.
    * @param \Drupal\Core\StringTranslation\TranslationInterface $translation_manager
    *   The string translationManager.
    */
-  public function __construct(\Traversable $namespaces, ContainerInterface $container, ModuleHandlerInterface $module_handler, CacheBackendInterface $cache, LanguageManager $language_manager, TranslationInterface $translation_manager) {
+  public function __construct(\Traversable $namespaces, ContainerInterface $container, ModuleHandlerInterface $module_handler, CacheBackendInterface $cache, LanguageManagerInterface $language_manager, TranslationInterface $translation_manager) {
     parent::__construct('Entity', $namespaces, 'Drupal\Core\Entity\Annotation\EntityType');
 
     $this->setCacheBackend($cache, $language_manager, 'entity_type:', array('entity_types' => TRUE));

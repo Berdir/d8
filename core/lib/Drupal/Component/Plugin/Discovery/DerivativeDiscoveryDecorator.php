@@ -191,7 +191,8 @@ class DerivativeDiscoveryDecorator implements DiscoveryInterface {
    */
   protected function getDerivativeClass($base_definition) {
     $class = NULL;
-    // @todo: Support derivatives for plugin definitions as classes?
+    // @todo: Support derivatives for plugin definitions as classes in
+    //   https://drupal.org/node/2168159.
     if (is_array($base_definition) && isset($base_definition['derivative'])) {
       $class = $base_definition['derivative'];
       if (!is_subclass_of($class, '\Drupal\Component\Plugin\Derivative\DerivativeInterface')) {
