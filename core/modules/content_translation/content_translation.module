@@ -144,9 +144,9 @@ function content_translation_entity_bundle_info_alter(&$bundles) {
 }
 
 /**
- * Implements hook_entity_field_info_alter().
+ * Implements hook_entity_base_field_info_alter().
  */
-function content_translation_entity_field_info_alter(&$fields, $entity_type_id) {
+function content_translation_entity_base_field_info_alter(&$fields, $entity_type_id) {
   $translation_settings = config('content_translation.settings')->get($entity_type_id);
 
   if ($translation_settings) {

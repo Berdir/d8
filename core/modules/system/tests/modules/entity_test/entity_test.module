@@ -73,9 +73,9 @@ function entity_test_entity_type_alter(array &$entity_types) {
 }
 
 /**
- * Implements hook_entity_field_info_alter().
+ * Implements hook_entity_base_field_info_alter().
  */
-function entity_test_entity_field_info_alter(&$fields, $entity_type_id) {
+function entity_test_entity_base_field_info_alter(&$fields, $entity_type_id) {
   if ($entity_type_id == 'entity_test_mulrev' && ($names = \Drupal::state()->get('entity_test.field_definitions.translatable'))) {
     foreach ($names as $name => $value) {
       $fields[$name]->setTranslatable($value);

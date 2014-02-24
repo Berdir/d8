@@ -774,7 +774,7 @@ class TestEntityManager extends EntityManager {
    */
   public function testClearEntityFieldInfo() {
     $this->baseFieldDefinitions = array();
-    $this->fieldDefinitions = array();
+    $this->baseFieldDefinitions = array();
     $this->fieldDefinitionsByBundle = array();
   }
 

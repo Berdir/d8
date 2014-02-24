@@ -659,7 +659,7 @@ function hook_entity_form_display_alter(\Drupal\Core\Entity\Display\EntityFormDi
 }
 
 /**
- * Define custom entity fields.
+ * Define custom entity base fields.
  *
  * @param string $entity_type_id
  *   The entity type for which to define entity fields.
@@ -667,13 +667,13 @@ function hook_entity_form_display_alter(\Drupal\Core\Entity\Display\EntityFormDi
  * @return \Drupal\Core\Field\FieldDefinitionInterface[]
  *   An array of field definitions.
  *
- * @see hook_entity_field_info_alter()
+ * @see hook_entity_base_field_info_alter()
  * @see hook_entity_field_info_by_bundle()
  * @see hook_entity_field_info_by_bundle_alter()
  * @see \Drupal\Core\Field\FieldDefinitionInterface
  * @see \Drupal\Core\Entity\EntityManagerInterface::getFieldDefinitions()
  */
-function hook_entity_field_info($entity_type_id) {
+function hook_entity_base_field_info($entity_type_id) {
   if ($entity_type_id == 'node') {
     $fields = array();
     $fields['mymodule_text'] = FieldDefinition::create('string')
@@ -687,18 +687,18 @@ function hook_entity_field_info($entity_type_id) {
 }
 
 /**
- * Alter defined entity fields.
+ * Alter defined entity base fields.
  *
  * @param \Drupal\Core\Field\FieldDefinitionInterface[] $fields
  *   An array of field definitions.
  * @param string $entity_type_id
  *   The entity type for which entity fields are defined.
  *
- * @see hook_entity_field_info()
+ * @see hook_entity_base_field_info()
  * @see hook_entity_field_info_by_bundle()
  * @see hook_entity_field_info_by_bundle_alter()
  */
-function hook_entity_field_info_alter(&$fields, $entity_type_id) {
+function hook_entity_base_field_info_alter(&$fields, $entity_type_id) {
   // Alter the mymodule_text field to use a custom class.
   if ($entity_type_id == 'node' && !empty($fields['mymodule_text'])) {
     $fields['mymodule_text']->setClass('\Drupal\anothermodule\EntityComputedText');
@@ -716,8 +716,8 @@ function hook_entity_field_info_alter(&$fields, $entity_type_id) {
  * @return \Drupal\Core\Field\FieldDefinitionInterface[]
  *   An array of field definitions.
  *
- * @see hook_entity_field_info()
- * @see hook_entity_field_info_alter()
+ * @see hook_entity_base_field_info()
+ * @see hook_entity_base_field_info_alter()
  * @see hook_entity_field_info_by_bundle_alter()
  * @see \Drupal\Core\Field\FieldDefinitionInterface
  * @see \Drupal\Core\Entity\EntityManagerInterface::getFieldDefinitions()
@@ -744,8 +744,8 @@ function hook_entity_field_info_by_bundle($entity_type_id, $bundle) {
  * @param string $bundle
  *   The name of the bundle to return field definitions for.
  *
- * @see hook_entity_field_info()
- * @see hook_entity_field_info_alter()
+ * @see hook_entity_base_field_info()
+ * @see hook_entity_base_field_info_alter()
  * @see hook_entity_field_info_by_bundle()
  */
 function hook_entity_field_info_by_bundle_alter(&$fields, $entity_type_id, $bundle) {

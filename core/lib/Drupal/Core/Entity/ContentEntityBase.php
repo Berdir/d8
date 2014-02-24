@@ -213,9 +213,7 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
    */
   public function getDataDefinition() {
     $definition = EntityDataDefinition::create($this->getEntityTypeId());
-    if ($this->bundle() != $this->getEntityTypeId()) {
-      $definition->setBundles(array($this->bundle()));
-    }
+    $definition->setBundles(array($this->bundle()));
     return $definition;
   }
 
