@@ -79,8 +79,6 @@ class CommentFieldsTest extends CommentTestBase {
       $field->delete();
     }
 
-    Field::fieldInfo()->getField('comment', 'comment_body')->delete();
-
     // Purge field data now to allow comment module to be uninstalled once the
     // field has been deleted.
     field_purge_batch(10);
