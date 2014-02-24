@@ -14,7 +14,7 @@ use Drupal\migrate_drupal\Tests\Dump\Drupal6User;
 use Drupal\migrate_drupal\Tests\Dump\Drupal6UserProfileFields;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
-class MigrateUserTest extends MigrateDrupalTestBase{
+class MigrateUserTest extends MigrateDrupalTestBase {
 
   /**
    * The modules to be enabled during the test.
@@ -32,13 +32,6 @@ class MigrateUserTest extends MigrateDrupalTestBase{
   );
 
   /**
-   * Storing user profile data keyed by $user->id().
-   *
-   * @var array
-   */
-  static $profileData = array();
-
-  /**
    * {@inheritdoc}
    */
   public static function getInfo() {
@@ -49,11 +42,11 @@ class MigrateUserTest extends MigrateDrupalTestBase{
     );
   }
 
-  public function testUser() {
-
-    // Populate static::$profileData.
-    $this->setProfileData();
-
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp() {
+    parent::setUp();
     // Create the user profile field and instance.
     entity_create('field_entity', array(
       'entity_type' => 'user',
@@ -70,6 +63,40 @@ class MigrateUserTest extends MigrateDrupalTestBase{
       'required' => 0,
     ))->save();
 
+    $file = entity_create('file', array(
+      'fid' => 1,
+      'uid' => 2,
+      'filename' => 'image-1.png',
+      'uri' => "public://picture-1.png",
+      'filemime' => 'image/png',
+      'created' => 1,
+      'changed' => 1,
+      'status' => FILE_STATUS_PERMANENT,
+    ));
+    $file->enforceIsNew();
+    file_put_contents($file->getFileUri(), file_get_contents('core/modules/simpletest/files/image-1.png'));
+    $file->save();
+
+    $file = entity_create('file', array(
+      'fid' => 2,
+      'uid' => 8,
+      'filename' => 'image-2.jpg',
+      'uri' => "public://picture-1.jpg",
+      'filemime' => 'image/jpeg',
+      'created' => 1,
+      'changed' => 1,
+      'status' => FILE_STATUS_PERMANENT,
+    ));
+    $file->enforceIsNew();
+    file_put_contents($file->getFileUri(), file_get_contents('core/modules/simpletest/files/image-2.jpg'));
+    $file->save();
+  }
+
+  /**
+   * Test the user migration.
+   */
+  public function testUser() {
+
     // Load database dumps to provide source data.
     $path = drupal_get_path('module', 'migrate_drupal');
     $dumps = array(
@@ -80,30 +107,26 @@ class MigrateUserTest extends MigrateDrupalTestBase{
     );
     $this->loadDumps($dumps);
 
-    // Migrate text formats first.
-    $migration_format = entity_load('migration', 'd6_filter_format');
-    $executable = new MigrateExecutable($migration_format, $this);
-    $executable->import();
+    $id_mappings = array(
+      'd6_filter_format' => array(
+        array(array(1), array('filtered_html')),
+        array(array(2), array('full_html')),
+        array(array(3), array('escape_html_filter')),
+      ),
+      'd6_user_role' => array(
+        array(array(1), array('anonymous user')),
+        array(array(2), array('authenticated user')),
+        array(array(3), array('migrate test role 1')),
+        array(array(4), array('migrate test role 2')),
+        array(array(5), array('migrate test role 3')),
+      ),
+      'd6_user_picture_file' => array(
+        array(array(2), array(1)),
+        array(array(8), array(2)),
+      ),
+    );
 
-    // Migrate user profile fields.
-    $migration_field = entity_load('migration', 'd6_user_profile_field');
-    $executable = new MigrateExecutable($migration_field, $this);
-    $executable->import();
-
-    // Migrate user profile field instances.
-    $migration_instance = entity_load('migration', 'd6_user_profile_field_instance');
-    $executable = new MigrateExecutable($migration_instance, $this);
-    $executable->import();
-
-    // Migrate user roles.
-    $migration_role = entity_load('migration', 'd6_user_role');
-    $executable = new MigrateExecutable($migration_role, $this);
-    $executable->import();
-
-    // Migrate user pictures.
-    $migration_user_picture = entity_load('migration', 'd6_user_picture_file');
-    $executable = new MigrateExecutable($migration_user_picture, $this);
-    $executable->import();
+    $this->prepareIdMappings($id_mappings);
 
     // Migrate users.
     $migration = entity_load('migration', 'd6_user:user');
@@ -125,18 +148,20 @@ class MigrateUserTest extends MigrateDrupalTestBase{
         ->execute()
         ->fetchCol();
       $roles = array(DRUPAL_AUTHENTICATED_RID);
-      foreach ($rids as $rid) {debug($rid);
+      $migration_role = entity_load('migration', 'd6_user_role');
+      foreach ($rids as $rid) {
         $role = $migration_role->getIdMap()->lookupDestinationId(array($rid));
         $roles[] = reset($role);
       }
+      // Get the user signature format.
+      $migration_format = entity_load('migration', 'd6_filter_format');
+      $signature_format = $migration_format->getIdMap()->lookupDestinationId(array($source->signature_format));
 
       $user = user_load($source->uid);
-
       $this->assertEqual($user->id(), $source->uid);
       $this->assertEqual($user->label(), $source->name);
       $this->assertEqual($user->getEmail(), $source->mail);
       $this->assertEqual($user->getSignature(), $source->signature);
-      $signature_format = $migration_format->getIdMap()->lookupDestinationId(array($source->signature_format));
       $this->assertEqual($user->getSignatureFormat(), reset($signature_format));
       $this->assertEqual($user->getCreatedTime(), $source->created);
       $this->assertEqual($user->getLastAccessedTime(), $source->access);
@@ -147,21 +172,17 @@ class MigrateUserTest extends MigrateDrupalTestBase{
       // user preferred language is not configured on the site. We just want to
       // test if the value was imported correctly.
       $this->assertEqual($user->preferred_langcode->value, $source->language);
-      $time_zone =  $source->expected_timezone ?: \Drupal::config('system.date')->get('timezone.default');
+      $time_zone = $source->expected_timezone ?: \Drupal::config('system.date')->get('timezone.default');
       $this->assertEqual($user->getTimeZone(), $time_zone);
       $this->assertEqual($user->getInitialEmail(), $source->init);
       $this->assertEqual($user->getRoles(), $roles);
 
-      // Test each profile field.
-      $profile = static::$profileData[$source->uid];
-      foreach ($profile as $name => $field) {
-        $key = key($field);
-        $this->assertEqual($user->{$name}->{$key}, $field[$key]);
+      // We have one empty picture in the data so don't try load that.
+      if (!empty($source->picture)) {
+        // Test the user picture.
+        $file = file_load($user->user_picture->target_id);
+        $this->assertEqual($file->getFilename(), basename($source->picture));
       }
-
-      // Test the user picture.
-      $file = file_load($user->user_picture->target_id);
-      $this->assertEqual($file->getFilename(), basename($source->picture));
 
       // Use the UI to check if the password has been salted and re-hashed to
       // conform the Drupal >= 7.
@@ -169,32 +190,6 @@ class MigrateUserTest extends MigrateDrupalTestBase{
       $this->drupalPostForm('user/login', $credentials, t('Log in'));
       $this->assertNoRaw(t('Sorry, unrecognized username or password. <a href="@password">Have you forgotten your password?</a>', array('@password' => url('user/password', array('query' => array('name' => $source->name))))));
       $this->drupalLogout();
-    }
-
-  }
-
-  /**
-   * Sets the user profile test data in an array keyed by user id.
-   */
-  protected function setProfileData() {
-    if (!static::$profileData) {
-      $fields = array();
-      foreach (Drupal6UserProfileFields::getData('profile_fields') as $row) {
-        $fields[(int) $row['fid']] = array(
-          'name' => $row['name'],
-          'type' => $row['type'],
-        );
-      }
-      static::$profileData = array();
-      foreach (Drupal6User::getData('profile_values') as $row) {
-        $fid = (int) $row['fid'];
-        $key = $fields[$fid]['type'] == 'url' ? 'url' : 'value';
-        if ($fields[$fid]['type'] == 'date') {
-          $date = unserialize($row['value']);
-          $row['value'] = date('Y-m-d', mktime(0, 0, 0, $date['month'], $date['day'], $date['year']));
-        }
-        static::$profileData[(int) $row['uid']][$fields[$fid]['name']] = array($key => $row['value']);
-      }
     }
   }
 

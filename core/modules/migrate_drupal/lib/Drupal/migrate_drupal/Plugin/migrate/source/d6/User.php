@@ -76,27 +76,6 @@ class User extends DrupalSqlBase implements SourceEntityInterface {
       }
     }
 
-    if ($this->moduleExists('profile')) {
-      // Find profile values for this row.
-      $query = $this->select('profile_values', 'pv', array('fetch' => \PDO::FETCH_ASSOC))
-        ->fields('pv', array('fid', 'value'));
-      $query->leftJoin('profile_fields', 'pf', 'pf.fid=pv.fid');
-      $query->fields('pf', array('name', 'type'));
-      $query->condition('uid', $row->getSourceProperty('uid'));
-      $results = $query->execute();
-
-      foreach ($results as $profile_value) {
-        // Check special case for date. We need unserialize.
-        if ($profile_value['type'] == 'date') {
-          $date = unserialize($profile_value['value']);
-          $date = date('Y-m-d', mktime(0, 0, 0, $date['month'], $date['day'], $date['year']));
-          $row->setSourceProperty($profile_value['name'], array('value' => $date));
-        }
-        else {
-          $row->setSourceProperty($profile_value['name'], array($profile_value['value']));
-        }
-      }
-    }
     return parent::prepareRow($row);
   }
 
