@@ -219,9 +219,9 @@ function path_form_taxonomy_term_form_alter(&$form, $form_state) {
 }
 
 /**
- * Implements hook_entity_field_info().
+ * Implements hook_entity_base_field_info().
  */
-function path_entity_field_info($entity_type_id) {
+function path_entity_base_field_info($entity_type_id) {
   if ($entity_type_id === 'taxonomy_term' || $entity_type_id === 'node') {
     $fields['path'] = FieldDefinition::create('path')
       ->setLabel(t('The path alias'))

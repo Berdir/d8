@@ -85,13 +85,6 @@ class EntityManager extends PluginManagerBase implements EntityManagerInterface 
   protected $baseFieldDefinitions;
 
   /**
-   * Static cache of field definitions excluding per-bundle fields.
-   *
-   * @var array
-   */
-  protected $fieldDefinitions;
-
-  /**
    * Static cache of field definitions per bundle and entity type.
    *
    * @var array
@@ -301,27 +294,59 @@ class EntityManager extends PluginManagerBase implements EntityManagerInterface 
   /**
    * {@inheritdoc}
    */
-  public function getFieldDefinitions($entity_type_id, $bundle = NULL) {
-    // If there's no bundle specified, only return fields that are not bundle
-    // specific.
-    if (!$bundle) {
-      // Check the static cache.
-      if (!isset($this->fieldDefinitions[$entity_type_id])) {
-        // Not prepared, try to load from cache.
-        $cid = 'entity_field_definitions:' . $entity_type_id . ':' . $this->languageManager->getCurrentLanguage()->id;
-        if ($cache = $this->cache->get($cid)) {
-          $this->fieldDefinitions[$entity_type_id] = $cache->data;
-        }
-        else {
-          // Rebuild the definitions and put it into the cache.
-          $this->fieldDefinitions[$entity_type_id] = $this->buildFieldDefinitions($entity_type_id, NULL);
-          $this->cache->set($cid, $this->fieldDefinitions[$entity_type_id], Cache::PERMANENT, array('entity_types' => TRUE, 'entity_field_info' => TRUE));
-         }
+  public function getBaseFieldDefinitions($entity_type_id) {
+    // Check the static cache.
+    if (!isset($this->baseFieldDefinitions[$entity_type_id])) {
+      // Not prepared, try to load from cache.
+      $cid = 'entity_field_definitions:' . $entity_type_id . ':' . $this->languageManager->getCurrentLanguage()->id;
+      if ($cache = $this->cache->get($cid)) {
+        $this->baseFieldDefinitions[$entity_type_id] = $cache->data;
+      }
+      else {
+        // Rebuild the definitions and put it into the cache.
+        $this->baseFieldDefinitions[$entity_type_id] = $this->buildBaseFieldDefinitions($entity_type_id);
+        $this->cache->set($cid, $this->baseFieldDefinitions[$entity_type_id], Cache::PERMANENT, array('entity_types' => TRUE, 'entity_field_info' => TRUE));
        }
-      return $this->fieldDefinitions[$entity_type_id];
+     }
+    return $this->baseFieldDefinitions[$entity_type_id];
+  }
+  /**
+   * Builds entity base field definitions.
+   *
+   * @param string $entity_type_id
+   *   The entity type ID to get field definitions for. Only entity types that
+   *   implement \Drupal\Core\Entity\ContentEntityInterface are supported.
+   *
+   * @return \Drupal\Core\Field\FieldDefinitionInterface[]
+   *   An array of entity field definitions, keyed by field name.
+   */
+  protected function buildBaseFieldDefinitions($entity_type_id) {
+    $class = $this->getDefinition($entity_type_id)->getClass();
+
+    $base_field_definitions = $class::baseFieldDefinitions($entity_type_id);
+
+    // Invoke hook.
+    $result = $this->moduleHandler->invokeAll('entity_base_field_info', array($entity_type_id));
+    $base_field_definitions = NestedArray::mergeDeep($base_field_definitions, $result);
+
+    // Automatically set the field name for non-configurable fields.
+    foreach ($base_field_definitions as $field_name => $base_field_definition) {
+      if ($base_field_definition instanceof FieldDefinition) {
+        $base_field_definition->setName($field_name);
+        $base_field_definition->setTargetEntityTypeId($entity_type_id);
+      }
     }
 
-    // We have a bundle, so get the field definitions for that specific bundle.
+    // Invoke alter hook.
+    $this->moduleHandler->alter('entity_base_field_info', $base_field_definitions, $entity_type_id);
+
+    return $base_field_definitions;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getFieldDefinitions($entity_type_id, $bundle) {
     if (!isset($this->fieldDefinitionsByBundle[$entity_type_id][$bundle])) {
       // Not prepared, try to load from cache.
       $cid = 'entity_field_definitions_bundle:' . $entity_type_id . ':' . $bundle . ':' . $this->languageManager->getCurrentLanguage()->id;
@@ -330,7 +355,7 @@ class EntityManager extends PluginManagerBase implements EntityManagerInterface 
       }
       else {
         // Rebuild the definitions and put it into the cache.
-        $this->fieldDefinitionsByBundle[$entity_type_id][$bundle] = $this->buildFieldDefinitions($entity_type_id, $bundle);
+        $this->fieldDefinitionsByBundle[$entity_type_id][$bundle] = $this->buildFieldDefinitionsByBundle($entity_type_id, $bundle);
         $this->cache->set($cid, $this->fieldDefinitionsByBundle[$entity_type_id][$bundle], Cache::PERMANENT, array('entity_types' => TRUE, 'entity_field_info' => TRUE));
       }
     }
@@ -344,55 +369,35 @@ class EntityManager extends PluginManagerBase implements EntityManagerInterface 
    *   The entity type ID to get field definitions for. Only entity types that
    *   implement \Drupal\Core\Entity\ContentEntityInterface are supported.
    * @param string $bundle
-   *   (optional) The entity bundle for which to get field definitions. If NULL
+   *   The entity bundle for which to get field definitions. If NULL
    *   is passed, no bundle-specific fields are included. Defaults to NULL.
    *
    * @return \Drupal\Core\Field\FieldDefinitionInterface[]
    *   An array of entity field definitions, keyed by field name.
    */
-  protected function buildFieldDefinitions($entity_type_id, $bundle = NULL) {
+  protected function buildFieldDefinitionsByBundle($entity_type_id, $bundle) {
+    $base_field_definitions = $this->getBaseFieldDefinitions($entity_type_id);
+
     $entity_type = $this->getDefinition($entity_type_id);
     $class = $entity_type->getClass();
 
-    // Build the base fields only once for all bundles.
-    if (empty($this->baseFieldDefinitions[$entity_type_id])) {
-      $base_definitions = $class::baseFieldDefinitions($entity_type_id);
+    // Allow the entity class to override the base fields.
+    $field_definitions = $class::baseFieldDefinitionsByBundle($entity_type_id, $bundle, $base_field_definitions) + $base_field_definitions;
 
-      // Invoke hooks.
-      $result = $this->moduleHandler->invokeAll($entity_type_id . '_field_info');
-      $base_definitions = NestedArray::mergeDeep($base_definitions, $result);
-      $result = $this->moduleHandler->invokeAll('entity_field_info', array($entity_type_id));
-      $base_definitions = NestedArray::mergeDeep($base_definitions, $result);
-
-      // Invoke alter hooks.
-      $hooks = array('entity_field_info', $entity_type_id . '_field_info');
-      $this->moduleHandler->alter($hooks, $base_definitions, $entity_type_id);
-
-      $this->baseFieldDefinitions[$entity_type_id] = $base_definitions;
-    }
-    $field_definitions = $this->baseFieldDefinitions[$entity_type_id];
-
-    // When we build fields for a specific bundle, allow the entity class to
-    // override the base fields.
-    if ($bundle) {
-      $field_definitions = $class::baseFieldDefinitionsByBundle($entity_type_id, $bundle, $field_definitions) + $field_definitions;
-
-      // Invoke 'per bundle' hooks.
-      $result = $this->moduleHandler->invokeAll($entity_type_id . '_field_info_by_bundle', array($bundle));
-      $field_definitions = NestedArray::mergeDeep($field_definitions, $result);
-      $result = $this->moduleHandler->invokeAll('entity_field_info_by_bundle', array($entity_type_id, $bundle));
-      $field_definitions = NestedArray::mergeDeep($field_definitions, $result);
-
-      // Invoke 'per bundle' alter hooks.
-      $hooks = array('entity_field_info_by_bundle', $entity_type_id . '_field_info_by_bundle');
-      $this->moduleHandler->alter($hooks, $field_definitions, $entity_type_id, $bundle);
-    }
+    // Invoke 'per bundle' hook.
+    $result = $this->moduleHandler->invokeAll('entity_field_info_by_bundle', array($entity_type_id, $bundle));
+    $field_definitions = NestedArray::mergeDeep($field_definitions, $result);
 
     // Automatically set the field name for non-configurable fields.
-    foreach ($base_definitions as $field_name => &$base_definition) {
-      $base_definition->setName($field_name);
-      $base_definition->setTargetEntityTypeId($entity_type_id);
+    foreach ($field_definitions as $field_name => $field_definition) {
+      if ($field_definition instanceof FieldDefinition) {
+        $field_definition->setName($field_name);
+        $field_definition->setTargetEntityTypeId($entity_type_id);
+      }
     }
+
+    // Invoke 'per bundle' alter hook.
+    $this->moduleHandler->alter('entity_field_info_by_bundle', $field_definitions, $entity_type_id, $bundle);
 
     // Ensure all basic fields are not defined as translatable.
     $keys = array_intersect_key(array_filter($entity_type->getKeys()), array_flip(array('id', 'revision', 'uuid', 'bundle')));
@@ -411,7 +416,6 @@ class EntityManager extends PluginManagerBase implements EntityManagerInterface 
    */
   public function clearCachedFieldDefinitions() {
     $this->baseFieldDefinitions = array();
-    $this->fieldDefinitions = array();
     $this->fieldDefinitionsByBundle = array();
     Cache::deleteTags(array('entity_field_info' => TRUE));
   }

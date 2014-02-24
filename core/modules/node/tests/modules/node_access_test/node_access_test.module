@@ -78,9 +78,9 @@ function node_access_test_permission() {
 }
 
 /**
- * Implements hook_entity_field_info().
+ * Implements hook_entity_base_field_info().
  */
-function node_access_test_entity_field_info($entity_type_id) {
+function node_access_test_entity_base_field_info($entity_type_id) {
   if ($entity_type_id === 'node') {
     $fields['private'] = FieldDefinition::create('boolean')
       ->setLabel(t('Private'))
