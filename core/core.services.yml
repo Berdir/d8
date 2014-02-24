@@ -219,7 +219,7 @@ services:
     class: Drupal\Core\Menu\ContextualLinkManager
     arguments: ['@controller_resolver', '@module_handler', '@cache.cache', '@language_manager', '@access_manager', '@current_user']
   plugin.cache_clearer:
-    class: Drupal\Core\Plugin\PluginCacheClearer
+    class: Drupal\Core\Plugin\CachedDiscoveryClearer
   request:
     class: Symfony\Component\HttpFoundation\Request
     synthetic: true

@@ -279,27 +279,6 @@ function field_modules_installed($modules) {
 }
 
 /**
- * Implements hook_module_preuninstall().
- */
-function field_module_preuninstall($module) {
-  $entity_type_ids = array();
-  $entity_types = \Drupal::entityManager()->getDefinitions();
-  foreach ($entity_types as $entity_type) {
-    if ($entity_type->getProvider() == $module) {
-      $entity_type_ids[] = $entity_type->id();
-    }
-  }
-  if ($entity_type_ids) {
-    $fields = \Drupal::entityQuery('field_instance_config')
-      ->condition('entity_type', $entity_type_ids)
-      ->execute();
-    if ($fields) {
-      throw new \Exception("If you don't eat yer meat, you can't have any pudding");
-    }
-  }
-}
-
-/**
  * Implements hook_modules_uninstalled().
  */
 function field_modules_uninstalled($modules) {

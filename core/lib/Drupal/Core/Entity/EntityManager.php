@@ -176,17 +176,6 @@ class EntityManager extends PluginManagerBase implements EntityManagerInterface 
   /**
    * {@inheritdoc}
    */
-  public function getDefinitionsByProvider() {
-    $grouped = array();
-    foreach ($this->getDefinitions() as $entity_type_id => $entity_type) {
-      $grouped[$entity_type->getProvider()][$entity_type_id] = $entity_type_id;
-    }
-    return $grouped;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function hasController($entity_type, $controller_type) {
     if ($definition = $this->getDefinition($entity_type)) {
       return $definition->hasControllerClass($controller_type);
