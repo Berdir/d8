@@ -321,6 +321,7 @@ class EntityManager extends PluginManagerBase implements EntityManagerInterface 
    *   An array of entity field definitions, keyed by field name.
    */
   protected function buildBaseFieldDefinitions($entity_type_id) {
+    $entity_type = $this->getDefinition($entity_type_id);
     $class = $this->getDefinition($entity_type_id)->getClass();
 
     $base_field_definitions = $class::baseFieldDefinitions($entity_type_id);
@@ -339,6 +340,15 @@ class EntityManager extends PluginManagerBase implements EntityManagerInterface 
 
     // Invoke alter hook.
     $this->moduleHandler->alter('entity_base_field_info', $base_field_definitions, $entity_type_id);
+
+    // Ensure all basic fields are not defined as translatable.
+    $keys = array_intersect_key(array_filter($entity_type->getKeys()), array_flip(array('id', 'revision', 'uuid', 'bundle')));
+    $untranslatable_fields = array_flip(array('langcode') + $keys);
+    foreach ($base_field_definitions as $field_name => $definition) {
+      if (isset($untranslatable_fields[$field_name]) && $definition->isTranslatable()) {
+        throw new \LogicException(String::format('The @field field cannot be translatable.', array('@field' => $definition->getLabel())));
+      }
+    }
 
     return $base_field_definitions;
   }
@@ -398,15 +408,6 @@ class EntityManager extends PluginManagerBase implements EntityManagerInterface 
 
     // Invoke 'per bundle' alter hook.
     $this->moduleHandler->alter('entity_field_info_by_bundle', $field_definitions, $entity_type_id, $bundle);
-
-    // Ensure all basic fields are not defined as translatable.
-    $keys = array_intersect_key(array_filter($entity_type->getKeys()), array_flip(array('id', 'revision', 'uuid', 'bundle')));
-    $untranslatable_fields = array_flip(array('langcode') + $keys);
-    foreach ($field_definitions as $field_name => $definition) {
-      if (isset($untranslatable_fields[$field_name]) && $definition->isTranslatable()) {
-        throw new \LogicException(String::format('The @field field cannot be translatable.', array('@field' => $definition->getLabel())));
-      }
-    }
 
     return $field_definitions;
   }
