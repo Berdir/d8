@@ -357,7 +357,7 @@ class EntityFieldTest extends EntityUnitTestBase  {
    */
   protected function checkIntrospection($entity_type) {
     // Test getting metadata upfront.
-    $definitions = \Drupal::entityManager()->getFieldDefinitions($entity_type);
+    $definitions = \Drupal::entityManager()->getFieldDefinitions($entity_type, $entity_type);
     $this->assertEqual($definitions['name']->getType(), 'string', $entity_type .': Name field found.');
     $this->assertEqual($definitions['user_id']->getType(), 'entity_reference', $entity_type .': User field found.');
     $this->assertEqual($definitions['field_test_text']->getType(), 'text', $entity_type .': Test-text-field field found.');

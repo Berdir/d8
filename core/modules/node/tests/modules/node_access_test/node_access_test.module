@@ -80,13 +80,13 @@ function node_access_test_permission() {
 /**
  * Implements hook_entity_field_info().
  */
-function node_access_test_entity_field_info($entity_type) {
-  if ($entity_type === 'node') {
-      $info['definitions']['private'] = FieldDefinition::create('boolean')
-        ->setLabel(t('Private'))
-        ->setComputed(TRUE);
+function node_access_test_entity_field_info($entity_type_id) {
+  if ($entity_type_id === 'node') {
+    $fields['private'] = FieldDefinition::create('boolean')
+      ->setLabel(t('Private'))
+      ->setComputed(TRUE);
 
-    return $info;
+    return $fields;
   }
 }
 
