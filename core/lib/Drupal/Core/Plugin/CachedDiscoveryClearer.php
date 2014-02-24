@@ -28,15 +28,8 @@ class CachedDiscoveryClearer {
    * @param \Drupal\Component\Plugin\PluginManagerInterface $cached_discovery
    *   An object that implements the cached discovery interface, typically a
    *   plugin manager.
-   *
-   * @throws \Drupal\Component\Plugin\Exception\PluginException
-   *   Thrown when the passed object does not implement the required
-   *   interface.
    */
   public function addCachedDiscovery(CachedDiscoveryInterface $cached_discovery) {
-    if (!$cached_discovery instanceof CachedDiscoveryInterface) {
-      throw new PluginException('The plugin manager does not implement the CachedDiscovery interface.');
-    }
     $this->cachedDiscoveries[] = $cached_discovery;
   }
 
