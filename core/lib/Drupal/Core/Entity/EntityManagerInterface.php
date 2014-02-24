@@ -245,4 +245,12 @@ interface EntityManagerInterface extends PluginManagerInterface {
    */
   public function getDefinitions();
 
+  /**
+   * Gets the definition of all entity types grouped by provider.
+   *
+   * @return \Drupal\Core\Entity\EntityTypeInterface[]
+   *   An array of entity type objects, keyed by provider of the entity type.
+   */
+  public function getDefinitionsByProvider();
+
 }
