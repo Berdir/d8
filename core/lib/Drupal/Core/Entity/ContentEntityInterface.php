@@ -50,6 +50,9 @@ interface ContentEntityInterface extends EntityInterface, RevisionableInterface,
    *   ->setLabel(t('Name'));
    * @endcode
    *
+   * If a defined field varies by bundle, see
+   * \Drupal\Core\Entity\ContentEntityInterface::baseFieldDefinitionsByBundle().
+   *
    * @param string $entity_type
    *   The entity type to return properties for. Useful when a single class is
    *   used for multiple, possibly dynamic entity types.
@@ -60,6 +63,30 @@ interface ContentEntityInterface extends EntityInterface, RevisionableInterface,
    * @see \Drupal\Core\Entity\EntityManagerInterface::getFieldDefinitions()
    */
   public static function baseFieldDefinitions($entity_type);
+
+  /**
+   * Defines or alters base field definitions for the given bundle.
+   *
+   * Any field definitions returned take precedence over the base fields defined
+   * for the entity type via
+   * \Drupal\Core\Entity\ContentEntityInterface::baseFieldDefinitions().
+   *
+   * @todo Provide a better DX for field overrides.
+   *
+   * @param string $entity_type
+   *   The entity type to return properties for. Useful when a single class is
+   *   used for multiple, possibly dynamic entity types.
+   * @param string $bundle
+   *   Name of the bundle for which the overrides should be applied.
+   * @param \Drupal\Core\Field\FieldDefinitionInterface[] $field_definitions
+   *   List of base fields for the given entity type.
+   *
+   * @return \Drupal\Core\Field\FieldDefinitionInterface[]
+   *   An array of field definitions, keyed by field name.
+   *
+   * @see \Drupal\Core\Entity\EntityManagerInterface::getFieldDefinitions()
+   */
+  public static function baseFieldDefinitionsByBundle($entity_type, $bundle, array $field_definitions);
 
   /**
    * Returns whether the entity has a field with the given name.

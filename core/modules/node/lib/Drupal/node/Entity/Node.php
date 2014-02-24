@@ -379,11 +379,8 @@ class Node extends ContentEntityBase implements NodeInterface {
       ->setDescription(t('The node language code.'));
 
     $fields['title'] = FieldDefinition::create('text')
-      // @todo Account for $node_type->title_label when per-bundle overrides are
-      //   possible - https://drupal.org/node/2114707.
       ->setLabel(t('Title'))
       ->setDescription(t('The title of this node, always treated as non-markup plain text.'))
-      ->setClass('\Drupal\node\NodeTitleItemList')
       ->setRequired(TRUE)
       ->setTranslatable(TRUE)
       ->setSettings(array(
@@ -449,6 +446,19 @@ class Node extends ContentEntityBase implements NodeInterface {
       ->setLabel(t('Log'))
       ->setDescription(t('The log entry explaining the changes in this revision.'));
 
+    return $fields;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function baseFieldDefinitionsByBundle($entity_type, $bundle, array $field_definitions) {
+    $node_type = node_type_load($bundle);
+    $fields = array();
+    if (isset($node_type->title_label)) {
+      $fields['title'] = clone $field_definitions['title'];
+      $fields['title']->setLabel($node_type->title_label);
+    }
     return $fields;
   }
 

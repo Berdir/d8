@@ -424,4 +424,13 @@ class TypedDataManager extends DefaultPluginManager {
 
     return $constraints;
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function clearCachedDefinitions() {
+    parent::clearCachedDefinitions();
+    $this->prototypes = array();
+  }
+
 }

@@ -474,54 +474,20 @@ class EntityManagerTest extends UnitTestCase {
 
     $expected = array('id' => $field_definition);
 
-    // @todo Investigate why this is 0 and 2, not 0/1 or 1/2.
     $this->cache->expects($this->at(0))
       ->method('get')
       ->with('entity_field_definitions:test_entity_type:en', FALSE)
       ->will($this->returnValue(FALSE));
+    $this->cache->expects($this->once())
+      ->method('set');
     $this->cache->expects($this->at(2))
       ->method('get')
       ->with('entity_field_definitions:test_entity_type:en', FALSE)
-      ->will($this->returnValue((object) array('data' => array('definitions' => $expected))));
-
-    $this->cache->expects($this->once())
-      ->method('set');
+      ->will($this->returnValue((object) array('data' => $expected)));
 
     $this->assertSame($expected, $this->entityManager->getFieldDefinitions('test_entity_type'));
     $this->entityManager->testClearEntityFieldInfo();
     $this->assertSame($expected, $this->entityManager->getFieldDefinitions('test_entity_type'));
-  }
-
-  /**
-   * Tests the getFieldDefinitions() method with bundle map.
-   *
-   * @covers ::getFieldDefinitions()
-   */
-  public function testGetFieldDefinitionsWithBundleMap() {
-    $field_definition = $this->setUpEntityWithFieldDefinition(TRUE);
-
-    $this->moduleHandler->expects($this->at(0))
-      ->method('invokeAll')
-      ->will($this->returnValue(array()));
-    $this->moduleHandler->expects($this->at(1))
-      ->method('invokeAll')
-      ->will($this->returnValue(array(
-          'bundle map' => array(
-            'test_entity_bundle' => array(
-              'custom_field',
-            ),
-          ),
-          'optional' => array(
-            'custom_field' => $field_definition,
-          ),
-        )));
-
-    $expected = array('id' => $field_definition);
-    $this->assertSame($expected, $this->entityManager->getFieldDefinitions('test_entity_type'));
-    $this->assertSame($expected, $this->entityManager->getFieldDefinitions('test_entity_type', 'test_entity_type'));
-
-    $expected['custom_field'] = $field_definition;
-    $this->assertSame($expected, $this->entityManager->getFieldDefinitions('test_entity_type', 'test_entity_bundle'));
   }
 
   /**
@@ -557,10 +523,10 @@ class EntityManagerTest extends UnitTestCase {
     $entity = $this->getMock('Drupal\Tests\Core\Entity\TestContentEntityInterface');
     $entity_class = get_class($entity);
 
-    $entity_type->expects($this->exactly(2))
+    $entity_type->expects($this->any())
       ->method('getClass')
       ->will($this->returnValue($entity_class));
-    $entity_type->expects($this->once())
+    $entity_type->expects($this->any())
       ->method('getKeys')
       ->will($this->returnValue(array()));
     $field_definition = $this->getMockBuilder('Drupal\Core\Field\FieldDefinition')
@@ -571,11 +537,14 @@ class EntityManagerTest extends UnitTestCase {
       ->will($this->returnValue(array(
         $field_definition_id => $field_definition,
       )));
+    $entity_class::staticExpects($this->any())
+      ->method('baseFieldDefinitionsByBundle')
+      ->will($this->returnValue(array()));
 
-    $this->moduleHandler->expects($this->once())
+    $this->moduleHandler->expects($this->any())
       ->method('alter');
     if (!$custom_invoke_all) {
-      $this->moduleHandler->expects($this->exactly(2))
+      $this->moduleHandler->expects($this->any())
         ->method('invokeAll')
         ->will($this->returnValue(array()));
     }
@@ -804,7 +773,9 @@ class TestEntityManager extends EntityManager {
    * Allows the $entityFieldInfo property to be cleared.
    */
   public function testClearEntityFieldInfo() {
-    $this->entityFieldInfo = NULL;
+    $this->baseFieldDefinitions = array();
+    $this->fieldDefinitions = array();
+    $this->fieldDefinitionsByBundle = array();
   }
 
 }
