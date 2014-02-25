@@ -151,9 +151,9 @@ class EditEntityFieldAccessCheckTest extends UnitTestCase {
     $request->attributes->set('entity_type', 'non_valid');
 
     $this->entityManager->expects($this->once())
-      ->method('getDefinition')
+      ->method('hasDefinition')
       ->with('non_valid')
-      ->will($this->returnValue(NULL));
+      ->will($this->returnValue(FALSE));
 
     $account = $this->getMock('Drupal\Core\Session\AccountInterface');
     $this->assertSame(AccessCheckInterface::KILL, $this->editAccessCheck->access($route, $request, $account));
@@ -169,9 +169,9 @@ class EditEntityFieldAccessCheckTest extends UnitTestCase {
     $request->attributes->set('entity', 1);
 
     $this->entityManager->expects($this->once())
-      ->method('getDefinition')
+      ->method('hasDefinition')
       ->with('entity_test')
-      ->will($this->returnValue(array('id' => 'entity_test')));
+      ->will($this->returnValue(TRUE));
 
     $this->entityStorageController->expects($this->once())
       ->method('load')

@@ -227,7 +227,7 @@ class ViewListController extends ConfigEntityListController implements EntityCon
   protected function getDisplaysList(EntityInterface $view) {
     $displays = array();
     foreach ($view->get('display') as $display) {
-      $definition = $this->displayManager->getDefinition($display['display_plugin']);
+      $definition = $this->displayManager->getDefinition($display['display_plugin'], FALSE);
       if (!empty($definition['admin'])) {
         $displays[$definition['admin']] = TRUE;
       }

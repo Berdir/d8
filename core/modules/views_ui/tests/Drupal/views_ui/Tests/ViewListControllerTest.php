@@ -37,41 +37,33 @@ class ViewListControllerTest extends UnitTestCase {
       ->disableOriginalConstructor()
       ->getMock();
 
+    $definitions['default'] = array(
+      'id' => 'default',
+      'title' => 'Master',
+      'theme' => 'views_view',
+      'no_ui' => TRUE,
+    );
+    $definitions['page'] = array(
+      'id' => 'page',
+      'title' => 'Page',
+      'uses_hook_menu' => TRUE,
+      'uses_route' => TRUE,
+      'contextual_links_locations' => array('page'),
+      'theme' => 'views_view',
+      'admin' => 'Page admin label',
+    );
+    $definitions['embed'] = array(
+      'id' => 'embed',
+      'title' => 'embed',
+      'theme' => 'views_view',
+      'admin' => 'Embed admin label',
+    );
     $display_manager->expects($this->any())
       ->method('getDefinition')
-      ->will($this->returnValueMap(array(
-        array(
-          'default',
-          array(
-            'id' => 'default',
-            'title' => 'Master',
-            'theme' => 'views_view',
-            'no_ui' => TRUE,
-          )
-        ),
-        array(
-          'page',
-          array(
-            'id' => 'page',
-            'title' => 'Page',
-            'uses_hook_menu' => TRUE,
-            'uses_route' => TRUE,
-            'contextual_links_locations' => array('page'),
-            'theme' => 'views_view',
-            'admin' => 'Page admin label',
-          )
-        ),
-        array(
-          'embed',
-          array(
-            'id' => 'embed',
-            'title' => 'embed',
-            'theme' => 'views_view',
-            'admin' => 'Embed admin label',
-          )
-        ),
-      )));
-
+      ->with($this->isType('string'), $this->isType('bool'))
+      ->will($this->returnCallback(function ($plugin_id) use ($definitions) {
+        return $definitions[$plugin_id];
+      }));
 
     $default_display = $this->getMock('Drupal\views\Plugin\views\display\DefaultDisplay',
       array('initDisplay'),

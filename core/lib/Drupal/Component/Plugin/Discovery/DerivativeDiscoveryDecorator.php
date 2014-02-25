@@ -15,7 +15,7 @@ use Drupal\Component\Plugin\Exception\InvalidDerivativeClassException;
  * Provides a decorator that allows the use of plugin derivatives for normal
  * implementations DiscoveryInterface.
  */
-class DerivativeDiscoveryDecorator implements DiscoveryInterface {
+class DerivativeDiscoveryDecorator extends DiscoveryBase {
 
   protected $derivativeFetchers = array();
   protected $decorated;
@@ -39,10 +39,15 @@ class DerivativeDiscoveryDecorator implements DiscoveryInterface {
    *   Thrown if the 'derivative' class specified in the plugin definition does
    *   not implement \Drupal\Component\Plugin\Derivative\DerivativeInterface.
    */
-  public function getDefinition($plugin_id) {
-    $plugin_definition = $this->decorated->getDefinition($plugin_id);
+  public function getDefinition($plugin_id, $exception_on_invalid = TRUE) {
+    // This check is only for derivative plugins that have explicitly provided
+    // an ID. This is not common, and can be expected to fail. Therefore, opt
+    // out of the thrown exception, which will be handled when checking the
+    // $base_plugin_id.
+    $plugin_definition = $this->decorated->getDefinition($plugin_id, FALSE);
+
     list($base_plugin_id, $derivative_id) = $this->decodePluginId($plugin_id);
-    $base_plugin_definition = $this->decorated->getDefinition($base_plugin_id);
+    $base_plugin_definition = $this->decorated->getDefinition($base_plugin_id, $exception_on_invalid);
     if ($base_plugin_definition) {
       $derivative_fetcher = $this->getDerivativeFetcher($base_plugin_id, $base_plugin_definition);
       if ($derivative_fetcher) {

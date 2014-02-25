@@ -8,6 +8,7 @@
 namespace Drupal\Component\Annotation\Plugin\Discovery;
 
 use Drupal\Component\Annotation\AnnotationInterface;
+use Drupal\Component\Plugin\Discovery\DiscoveryBase;
 use Drupal\Component\Plugin\Discovery\DiscoveryInterface;
 use Drupal\Component\Annotation\Reflection\MockFileFinder;
 use Doctrine\Common\Annotations\SimpleAnnotationReader;
@@ -17,7 +18,7 @@ use Doctrine\Common\Reflection\StaticReflectionParser;
 /**
  * Defines a discovery mechanism to find annotated plugins in PSR-0 namespaces.
  */
-class AnnotatedClassDiscovery implements DiscoveryInterface {
+class AnnotatedClassDiscovery extends DiscoveryBase implements DiscoveryInterface {
 
   /**
    * The namespaces within which to find plugin classes.
@@ -73,14 +74,6 @@ class AnnotatedClassDiscovery implements DiscoveryInterface {
       $this->annotationReader->addNamespace($namespace);
     }
     return $this->annotationReader;
-  }
-
-  /**
-   * Implements Drupal\Component\Plugin\Discovery\DiscoveryInterface::getDefinition().
-   */
-  public function getDefinition($plugin_id) {
-    $plugins = $this->getDefinitions();
-    return isset($plugins[$plugin_id]) ? $plugins[$plugin_id] : NULL;
   }
 
   /**

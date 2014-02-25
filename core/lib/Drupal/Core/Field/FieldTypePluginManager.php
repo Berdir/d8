@@ -65,7 +65,7 @@ class FieldTypePluginManager extends DefaultPluginManager implements FieldTypePl
    * {@inheritdoc}
    */
   public function getDefaultSettings($type) {
-    $info = $this->getDefinition($type);
+    $info = $this->getDefinition($type, FALSE);
     return isset($info['settings']) ? $info['settings'] : array();
   }
 
@@ -73,7 +73,7 @@ class FieldTypePluginManager extends DefaultPluginManager implements FieldTypePl
    * {@inheritdoc}
    */
   public function getDefaultInstanceSettings($type) {
-    $info = $this->getDefinition($type);
+    $info = $this->getDefinition($type, FALSE);
     return isset($info['instance_settings']) ? $info['instance_settings'] : array();
   }
 

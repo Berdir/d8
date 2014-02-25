@@ -65,7 +65,7 @@ class EditEntityFieldAccessCheck implements AccessInterface, EditEntityFieldAcce
     if (!is_object($entity = $request->attributes->get('entity'))) {
       $entity_id = $entity;
       $entity_type = $request->attributes->get('entity_type');
-      if (!$entity_type || !$this->entityManager->getDefinition($entity_type)) {
+      if (!$entity_type || !$this->entityManager->hasDefinition($entity_type)) {
         return FALSE;
       }
       $entity = $this->entityManager->getStorageController($entity_type)->load($entity_id);

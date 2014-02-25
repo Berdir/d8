@@ -113,7 +113,7 @@ class FormatterPluginManager extends DefaultPluginManager {
     // Switch back to default formatter if either:
     // - $type_info doesn't exist (the widget type is unknown),
     // - the field type is not allowed for the widget.
-    $definition = $this->getDefinition($configuration['type']);
+    $definition = $this->getDefinition($configuration['type'], FALSE);
     if (!isset($definition['class']) || !in_array($field_type, $definition['field_types'])) {
       // Grab the default widget for the field type.
       $field_type_definition = $this->fieldTypeManager->getDefinition($field_type);
@@ -196,7 +196,7 @@ class FormatterPluginManager extends DefaultPluginManager {
    *   definition, or an empty array if type or settings are undefined.
    */
   public function getDefaultSettings($type) {
-    $info = $this->getDefinition($type);
+    $info = $this->getDefinition($type, FALSE);
     return isset($info['settings']) ? $info['settings'] : array();
   }
 

@@ -326,7 +326,7 @@ class FieldConfig extends ConfigEntityBase implements FieldConfigInterface {
     }
 
     // Check that the field type is known.
-    $field_type = \Drupal::service('plugin.manager.field.field_type')->getDefinition($this->type);
+    $field_type = \Drupal::service('plugin.manager.field.field_type')->getDefinition($this->type, FALSE);
     if (!$field_type) {
       throw new FieldException(format_string('Attempt to create a field of unknown type %type.', array('%type' => $this->type)));
     }

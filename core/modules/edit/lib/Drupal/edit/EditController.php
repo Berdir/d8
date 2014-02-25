@@ -108,7 +108,7 @@ class EditController extends ControllerBase {
       list($entity_type, $entity_id, $field_name, $langcode, $view_mode) = explode('/', $field);
 
       // Load the entity.
-      if (!$entity_type || !$this->entityManager()->getDefinition($entity_type)) {
+      if (!$entity_type || !$this->entityManager()->hasDefinition($entity_type)) {
         throw new NotFoundHttpException();
       }
       $entity = $this->entityManager()->getStorageController($entity_type)->load($entity_id);

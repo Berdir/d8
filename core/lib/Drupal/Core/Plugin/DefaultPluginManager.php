@@ -8,6 +8,7 @@
 namespace Drupal\Core\Plugin;
 
 use Drupal\Component\Plugin\Discovery\CachedDiscoveryInterface;
+use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Plugin\Discovery\ContainerDerivativeDiscoveryDecorator;
 use Drupal\Component\Plugin\PluginManagerBase;
 use Drupal\Component\Plugin\PluginManagerInterface;
@@ -163,7 +164,9 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
   /**
    * {@inheritdoc}
    */
-  public function getDefinition($plugin_id) {
+  public function getDefinition($plugin_id, $exception_on_invalid = TRUE) {
+    // @todo When \Drupal\Component\Plugin\Discovery\DiscoveryCachedBase is
+    //   converted to a trait, use that and remove this implementation.
     // Fetch definitions if they're not loaded yet.
     if (!isset($this->definitions)) {
       $this->getDefinitions();
@@ -172,7 +175,11 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
     if (isset($this->definitions[$plugin_id])) {
       return $this->definitions[$plugin_id];
     }
-    return array();
+    elseif (!$exception_on_invalid) {
+      return NULL;
+    }
+
+    throw new PluginNotFoundException($plugin_id, sprintf('The "%s" plugin does not exist.', $plugin_id));
   }
 
   /**

@@ -91,8 +91,7 @@ function forum_install() {
  * Implements hook_module_preinstall().
  */
 function forum_module_preinstall($module) {
-  $list_boolean = \Drupal::service('plugin.manager.field.field_type')->getDefinition('list_boolean');
-  if (empty($list_boolean) && $module == 'forum') {
+  if ($module == 'forum' && !\Drupal::service('plugin.manager.field.field_type')->hasDefinition('list_boolean')) {
     // Make sure that the list_boolean field type is available before our
     // default config is installed.
     field_info_cache_clear();

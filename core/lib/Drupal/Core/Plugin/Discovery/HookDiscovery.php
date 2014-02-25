@@ -7,13 +7,14 @@
 
 namespace Drupal\Core\Plugin\Discovery;
 
+use Drupal\Component\Plugin\Discovery\DiscoveryBase;
 use Drupal\Component\Plugin\Discovery\DiscoveryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 
 /**
  * Provides a hook-based plugin discovery class.
  */
-class HookDiscovery implements DiscoveryInterface {
+class HookDiscovery extends DiscoveryBase implements DiscoveryInterface {
 
   /**
    * The name of the hook that will be implemented by this discovery instance.
@@ -41,14 +42,6 @@ class HookDiscovery implements DiscoveryInterface {
   function __construct(ModuleHandlerInterface $module_handler, $hook) {
     $this->moduleHandler = $module_handler;
     $this->hook = $hook;
-  }
-
-  /**
-   * Implements Drupal\Component\Plugin\Discovery\DicoveryInterface::getDefinition().
-   */
-  public function getDefinition($plugin_id) {
-    $plugins = $this->getDefinitions();
-    return isset($plugins[$plugin_id]) ? $plugins[$plugin_id] : NULL;
   }
 
   /**
