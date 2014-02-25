@@ -158,7 +158,7 @@ class MenuLinkStorageController extends DatabaseStorageController implements Men
 
       // Ignore slave server temporarily.
       db_ignore_slave();
-      unset($entity->original);
+      $entity->original = NULL;
 
       return $return;
     }

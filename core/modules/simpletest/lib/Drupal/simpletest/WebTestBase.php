@@ -289,9 +289,12 @@ abstract class WebTestBase extends TestBase {
       'format' => filter_default_format(),
     );
 
-    $node = entity_create('node', $settings);
+    $node = entity_create('node', array_diff_key($settings, array_flip(array('revision', 'body'))));
     if (!empty($settings['revision'])) {
       $node->setNewRevision();
+    }
+    if ($node->hasField('body')) {
+      $node->body = $settings['body'];
     }
     $node->save();
 
@@ -726,7 +729,7 @@ abstract class WebTestBase extends TestBase {
 
     if ($pass) {
       // @see WebTestBase::drupalUserIsLoggedIn()
-      unset($this->loggedInUser->session_id);
+      $this->loggedInUser->session_id = NULL;
       $this->loggedInUser = FALSE;
       $this->container->set('current_user', drupal_anonymous_user());
     }

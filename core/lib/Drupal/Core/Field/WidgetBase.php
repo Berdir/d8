@@ -259,7 +259,6 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface 
         'widget' => $this,
         'items' => $items,
         'delta' => $delta,
-        'default' => !empty($entity->field_ui_default_value),
       );
       \Drupal::moduleHandler()->alter(array('field_widget_form', 'field_widget_' . $this->getPluginId() . '_form'), $element, $form_state, $context);
     }

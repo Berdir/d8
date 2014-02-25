@@ -358,7 +358,6 @@ class NodeFormController extends ContentEntityFormController {
       $node->setRevisionAuthorId(\Drupal::currentUser()->id());
     }
 
-    $node->validated = TRUE;
     foreach (\Drupal::moduleHandler()->getImplementations('node_submit') as $module) {
       $function = $module . '_node_submit';
       $function($node, $form, $form_state);

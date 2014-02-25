@@ -605,7 +605,7 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
 
       // Ignore slave server temporarily.
       db_ignore_slave();
-      unset($entity->original);
+      $entity->original = NULL;
 
       return $return;
     }

@@ -35,6 +35,13 @@ use Drupal\user\UserInterface;
 class File extends ContentEntityBase implements FileInterface {
 
   /**
+   * @todo Remove this or document it.
+   *
+   * @var array
+   */
+  public $file_test;
+
+  /**
    * The plain data values of the contained properties.
    *
    * Define default values.

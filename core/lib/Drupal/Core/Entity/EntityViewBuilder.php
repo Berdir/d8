@@ -230,7 +230,7 @@ class EntityViewBuilder extends EntityControllerBase implements EntityController
 
       $build[$key] = $entity->content;
       // We don't need duplicate rendering info in $entity->content.
-      unset($entity->content);
+      $entity->content = NULL;
 
       $build[$key] += $this->getBuildDefaults($entity, $entity_view_mode, $langcode);
       $this->alterBuild($build[$key], $entity, $display, $entity_view_mode, $langcode);

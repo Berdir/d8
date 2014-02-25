@@ -60,6 +60,13 @@ class Comment extends ContentEntityBase implements CommentInterface {
   protected $threadLock = '';
 
   /**
+   * @todo Remove this or document it.
+   *
+   * @var array
+   */
+  public $rdf_data;
+
+  /**
    * {@inheritdoc}
    */
   public function id() {

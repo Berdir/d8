@@ -35,11 +35,76 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
   const TRANSLATION_CREATED = 2;
 
   /**
+   * @todo Remove this or document it.
+   *
+   * @var \Drupal\Core\Entity\ContentEntityInterface|null
+   */
+  public $original;
+
+  /**
+   * @todo Remove this or document it.
+   *
+   * @var array
+   */
+  public $content;
+
+  /**
+   * @todo Remove this or document it.
+   *
+   * @var array
+   */
+  public $translation;
+
+  /**
+   * @todo Remove this or document it.
+   *
+   * @var \Drupal\user\UserInterface
+   */
+  public $account;
+
+  /**
+   * @todo Remove this or document it.
+   *
+   * @var array
+   */
+  public $rss_elements;
+
+  /**
+   * @todo Remove this or document it.
+   *
+   * @var array
+   */
+  public $rss_namespaces;
+
+  /**
+   * @todo Remove this or document it.
+   *
+   * @var boolean
+   */
+  public $_field_view_prepared;
+
+  /**
+   * @todo Remove this or document it.
+   *
+   * @var \Drupal\views\ViewExecutable|null
+   */
+  public $view;
+
+  /**
+   * @todo Remove this or document it.
+   *
+   * @var bool
+   */
+  public $in_preview;
+
+  /**
    * Local cache holding the value of the bundle field.
    *
    * @var string
+   *
+   * @todo Make this protected.
    */
-  protected $bundle;
+  public $bundle;
 
   /**
    * The plain data values of the contained fields.
@@ -688,6 +753,7 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
     // @todo Consider converting these to ArrayObject.
     $translation->values = &$this->values;
     $translation->fields = &$this->fields;
+    $translation->translation = &$this->translation;
     $translation->translations = &$this->translations;
     $translation->enforceIsNew = &$this->enforceIsNew;
     $translation->translationInitialize = FALSE;
@@ -812,11 +878,8 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
 
   /**
    * Implements the magic method for getting object properties.
-   *
-   * @todo: A lot of code still uses non-fields (e.g. $entity->content in render
-   *   controllers) by reference. Clean that up.
    */
-  public function &__get($name) {
+  public function __get($name) {
     // If this is an entity field, handle it accordingly. We first check whether
     // a field object has been already created. If not, we create one.
     if (isset($this->fields[$name][$this->activeLangcode])) {
@@ -830,12 +893,9 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
       $return = $this->getTranslatedField($name, $this->activeLangcode);
       return $return;
     }
-    // Else directly read/write plain values. That way, non-field entity
-    // properties can always be accessed directly.
-    if (!isset($this->values[$name])) {
-      $this->values[$name] = NULL;
-    }
-    return $this->values[$name];
+    // Non-field properties are not supported.
+    $message = '(@name) is not a field.';
+    throw new \InvalidArgumentException(format_string($message, array('@name' => $name)));
   }
 
   /**
@@ -861,10 +921,10 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
     elseif ($name == 'translations') {
       $this->translations = $value;
     }
-    // Else directly read/write plain values. That way, fields not yet converted
-    // to the entity field API can always be directly accessed.
+    // Non-field properties are not supported.
     else {
-      $this->values[$name] = $value;
+      $message = '(@name) is not a field.';
+      throw new \InvalidArgumentException(format_string($message, array('@name' => $name)));
     }
   }
 
@@ -874,9 +934,6 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
   public function __isset($name) {
     if ($this->hasField($name)) {
       return $this->get($name)->getValue() !== NULL;
-    }
-    else {
-      return isset($this->values[$name]);
     }
   }
 
@@ -888,7 +945,8 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
       $this->get($name)->setValue(NULL);
     }
     else {
-      unset($this->values[$name]);
+      $message = '(@name) is not a field.';
+      throw new \InvalidArgumentException(format_string($message, array('@name' => $name)));
     }
   }
 

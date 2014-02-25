@@ -45,6 +45,13 @@ use Drupal\aggregator\FeedInterface;
 class Feed extends ContentEntityBase implements FeedInterface {
 
   /**
+   * @todo Remove this or document it.
+   *
+   * @var array
+   */
+  public $items;
+
+  /**
    * Implements Drupal\Core\Entity\EntityInterface::id().
    */
   public function id() {

@@ -374,7 +374,7 @@ class ConfigStorageController extends EntityStorageControllerBase implements Con
       $this->invokeHook('insert', $entity);
     }
 
-    unset($entity->original);
+    $entity->original = NULL;
 
     return $return;
   }

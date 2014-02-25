@@ -52,6 +52,41 @@ use Drupal\user\UserInterface;
 class User extends ContentEntityBase implements UserInterface {
 
   /**
+   * @todo Remove this or document it.
+   *
+   * @var string
+   */
+  public $user_cancel_method;
+
+  /**
+   * @todo Remove this or document it.
+   *
+   * @var bool
+   */
+  public $user_cancel_notify;
+
+  /**
+   * @todo Remove this or document it.
+   *
+   * @var string
+   */
+  public $password;
+
+  /**
+   * @todo Remove this or document it.
+   *
+   * @var string
+   */
+  public $pass_raw;
+
+  /**
+   * @todo Remove this or document it.
+   *
+   * @var string
+   */
+  public $session_id;
+
+  /**
    * {@inheritdoc}
    */
   public function id() {

@@ -97,7 +97,7 @@ class EntityReferenceEntityFormatter extends EntityReferenceFormatterBase {
 
       if (!empty($item->target_id)) {
         $entity = clone $item->entity;
-        unset($entity->content);
+        $entity->content = NULL;
         $elements[$delta] = entity_view($entity, $view_mode, $item->getLangcode());
 
         if (empty($links) && isset($result[$delta][$target_type][$item->target_id]['links'])) {

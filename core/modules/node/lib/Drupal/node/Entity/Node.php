@@ -62,6 +62,34 @@ use Drupal\user\UserInterface;
 class Node extends ContentEntityBase implements NodeInterface {
 
   /**
+   * @todo Remove this or document it.
+   *
+   * @var array
+   */
+  public $book;
+
+  /**
+   * @todo Remove this or document it.
+   *
+   * @var \Drupal\Core\Datetime\DrupalDateTime|string
+   */
+  public $date;
+
+  /**
+   * @todo Remove this or document it.
+   *
+   * @var string
+   */
+  public $name;
+
+  /**
+   * @todo Remove this or document it.
+   *
+   * @var \Drupal\menu_link\Entity\MenuLink
+   */
+  public $menu;
+
+  /**
    * Implements Drupal\Core\Entity\EntityInterface::id().
    */
   public function id() {
