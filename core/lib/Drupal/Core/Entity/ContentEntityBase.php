@@ -79,13 +79,6 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
   /**
    * @todo Remove this or document it.
    *
-   * @var boolean
-   */
-  public $_field_view_prepared;
-
-  /**
-   * @todo Remove this or document it.
-   *
    * @var \Drupal\views\ViewExecutable|null
    */
   public $view;
@@ -101,10 +94,8 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
    * Local cache holding the value of the bundle field.
    *
    * @var string
-   *
-   * @todo Make this protected.
    */
-  public $bundle;
+  protected $bundle;
 
   /**
    * The plain data values of the contained fields.
