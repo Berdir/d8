@@ -57,7 +57,7 @@ class ViewsHandlerManager extends DefaultPluginManager {
     $this->viewsData = $views_data;
     $this->handlerType = $handler_type;
     $this->defaults = array(
-      'plugin' => $handler_type,
+      'plugin_type' => $handler_type,
     );
   }
 
