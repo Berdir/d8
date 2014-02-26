@@ -1045,8 +1045,8 @@ abstract class TestBase {
     // Reset statics before the old container is replaced so that objects with a
     // __destruct() method still have access to it.
     // All static variables need to be reset before the database prefix is
-    // changed, since \Drupal\Core\Utility\CacheArray implementations attempt to
-    // write back to persistent caches when they are destructed.
+    // changed, since \Drupal\Core\Utility\CacheCollector implementations
+    // attempt to write back to persistent caches when they are destructed.
     // @todo: Remove once they have been converted to services.
     drupal_static_reset();
 
@@ -1082,8 +1082,8 @@ abstract class TestBase {
 
     // Change the database prefix.
     // All static variables need to be reset before the database prefix is
-    // changed, since \Drupal\Core\Utility\CacheArray implementations attempt to
-    // write back to persistent caches when they are destructed.
+    // changed, since \Drupal\Core\Utility\CacheCollector implementations
+    // attempt to write back to persistent caches when they are destructed.
     $this->changeDatabasePrefix();
 
     // Remove all configuration overrides.

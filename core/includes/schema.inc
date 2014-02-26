@@ -7,7 +7,6 @@
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Database\Database;
-use Drupal\Core\Utility\SchemaCache;
 
 /**
  * @addtogroup schemaapi
@@ -33,11 +32,8 @@ const SCHEMA_UNINSTALLED = -1;
 function drupal_get_schema($table = NULL, $rebuild = FALSE) {
   static $schema;
 
-  if ($rebuild || !isset($table)) {
+  if ($rebuild || !isset($schema)) {
     $schema = drupal_get_complete_schema($rebuild);
-  }
-  elseif (!isset($schema)) {
-    $schema = new SchemaCache();
   }
 
   if (!isset($table)) {
