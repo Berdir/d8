@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Tests\source\d6\TermTest.
+ * Contains \Drupal\migrate\Tests\source\d6\TermTestBase.
  */
 
 namespace Drupal\migrate_drupal\Tests\source\d6;

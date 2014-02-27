@@ -13,7 +13,7 @@ namespace Drupal\migrate_drupal\Tests\source\d6;
  * @group migrate_drupal
  * @group Drupal
  */
-class CommentSourceWithHighwaterTest extends CommentTest {
+class CommentSourceWithHighwaterTest extends CommentTestBase {
 
   /**
    * {@inheritdoc}
