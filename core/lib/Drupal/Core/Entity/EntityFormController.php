@@ -247,6 +247,7 @@ class EntityFormController extends FormBase implements EntityFormControllerInter
       ),
       'delete' => array(
         '#value' => $this->t('Delete'),
+        '#access' => $this->entity->access('delete'),
         // No need to validate the form when deleting the entity.
         '#submit' => array(
           array($this, 'delete'),
