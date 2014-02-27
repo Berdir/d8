@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\migrate_drupal\Tests\source\d6\VariableMultiRowTest.
+ * Contains \Drupal\migrate_drupal\Tests\source\VariableMultiRowTest.
  */
 
-namespace Drupal\migrate_drupal\Tests\source\d6;
+namespace Drupal\migrate_drupal\Tests\source;
 
 /**
  * Tests the Drupal 6 variable multirow source.

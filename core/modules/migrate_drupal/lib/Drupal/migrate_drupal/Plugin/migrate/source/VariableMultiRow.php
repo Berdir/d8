@@ -1,9 +1,8 @@
 <?php
 
-namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
+namespace Drupal\migrate_drupal\Plugin\migrate\source;
 
 use Drupal\migrate\Row;
-use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
 
 /**
  * Drupal 6 multiple variables source from database.
@@ -12,7 +11,7 @@ use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
  * variable.
  *
  * @MigrateSource(
- *   id = "d6_variable_multirow"
+ *   id = "variable_multirow"
  * )
  */
 class VariableMultiRow extends DrupalSqlBase {

@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Tests\source\d6\VariableMultiRowTestBase.
+ * Contains \Drupal\migrate\Tests\source\VariableMultiRowTestBase.
  */
 
-namespace Drupal\migrate_drupal\Tests\source\d6;
+namespace Drupal\migrate_drupal\Tests\source;
 
 use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
 
@@ -16,7 +16,7 @@ class VariableMultiRowTestBase extends MigrateSqlSourceTestCase {
 
   // The plugin system is not working during unit testing so the source plugin
   // class needs to be manually specified.
-  const PLUGIN_CLASS = 'Drupal\migrate_drupal\Plugin\migrate\source\d6\VariableMultiRow';
+  const PLUGIN_CLASS = 'Drupal\migrate_drupal\Plugin\migrate\source\VariableMultiRow';
 
   // The fake Migration configuration entity.
   protected $migrationConfiguration = array(
@@ -55,13 +55,12 @@ class VariableMultiRowTestBase extends MigrateSqlSourceTestCase {
   }
 }
 
-namespace Drupal\migrate_drupal\Tests\source\d6;
+namespace Drupal\migrate_drupal\Tests\source;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\migrate_drupal\Plugin\migrate\source\d6\VariableMultiRow;
 
-class TestVariableMultiRow extends VariableMultiRow {
+class TestVariableMultiRow extends \Drupal\migrate_drupal\Plugin\migrate\source\VariableMultiRow {
   public function setDatabase(Connection $database) {
     $this->database = $database;
   }

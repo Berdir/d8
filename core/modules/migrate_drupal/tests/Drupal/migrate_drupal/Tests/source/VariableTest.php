@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Tests\source\d6\VariableTest.
+ * Contains \Drupal\migrate\Tests\source\VariableTest.
  */
 
 namespace Drupal\migrate_drupal\Tests\source\d6;

@@ -2,12 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Tests\source\d6\VariableMultiRowSourceWithHighwaterTest.
+ * Contains \Drupal\migrate\Tests\source\VariableMultiRowSourceWithHighwaterTest.
  */
 
-namespace Drupal\migrate_drupal\Tests\source\d6;
-
-use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
+namespace Drupal\migrate_drupal\Tests\source;
 
 /**
  * Tests variable multirow source w/ highwater handling.
