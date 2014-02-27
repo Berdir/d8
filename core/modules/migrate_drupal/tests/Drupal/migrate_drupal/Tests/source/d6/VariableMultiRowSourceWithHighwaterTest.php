@@ -15,7 +15,7 @@ use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
  * @group migrate_drupal
  * @group Drupal
  */
-class VariableMultiRowSourceWithHighwaterTest extends VariableMultiRowTest {
+class VariableMultiRowSourceWithHighwaterTest extends VariableMultiRowTestBase {
 
   /**
    * {@inheritdoc}
