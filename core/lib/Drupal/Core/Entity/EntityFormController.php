@@ -196,11 +196,7 @@ class EntityFormController extends FormBase implements EntityFormControllerInter
   protected function actionsElement(array $form, array &$form_state) {
     $element = $this->actions($form, $form_state);
 
-    // We cannot delete an entity that has not been created yet.
-    if ($this->entity->isNew()) {
-      unset($element['delete']);
-    }
-    elseif (isset($element['delete'])) {
+    if (isset($element['delete'])) {
       // Move the delete action as last one, unless weights are explicitly
       // provided.
       $delete = $element['delete'];
@@ -247,7 +243,9 @@ class EntityFormController extends FormBase implements EntityFormControllerInter
       ),
       'delete' => array(
         '#value' => $this->t('Delete'),
-        '#access' => $this->entity->access('delete'),
+        // Only allow access to delete if the entity is not new and the user
+        // has the necessary permissions.
+        '#access' => !$this->entity->isNew() && $this->entity->access('delete'),
         // No need to validate the form when deleting the entity.
         '#submit' => array(
           array($this, 'delete'),
