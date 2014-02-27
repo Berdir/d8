@@ -23,7 +23,6 @@ interface MigrateSourceInterface extends \Countable, PluginInspectionInterface {
    */
   public function fields();
 
-
   /**
    * Returns the iterator that will yield the row arrays to be processed.
    *

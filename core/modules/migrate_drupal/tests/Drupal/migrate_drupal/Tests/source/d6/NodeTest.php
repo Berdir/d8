@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Tests\source\d6\NodeSourceTest.
+ * Contains \Drupal\migrate\Tests\source\d6\NodeTest.
  */
 
 namespace Drupal\migrate_drupal\Tests\source\d6;
@@ -10,11 +10,12 @@ namespace Drupal\migrate_drupal\Tests\source\d6;
 use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
 
 /**
- * Tests node migration from D6 to D8.
+ * Tests the Drupal 6 node source
  *
  * @group migrate_drupal
+ * @group Drupal
  */
-class NodeSourceTest extends MigrateSqlSourceTestCase {
+class NodeTest extends MigrateSqlSourceTestCase {
 
   const PLUGIN_CLASS = 'Drupal\migrate_drupal\Plugin\migrate\source\d6\Node';
 

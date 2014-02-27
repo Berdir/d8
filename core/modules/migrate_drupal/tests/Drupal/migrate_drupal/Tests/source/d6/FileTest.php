@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Tests\source\d6\FileSourceTest.
+ * Contains \Drupal\migrate\Tests\source\d6\FileTest.
  */
 
 namespace Drupal\migrate_drupal\Tests\source\d6;
@@ -10,11 +10,12 @@ namespace Drupal\migrate_drupal\Tests\source\d6;
 use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
 
 /**
- * Tests file migration from D6 to D8.
+ * Tests the Drupal 6 file source.
  *
  * @group migrate_drupal
+ * @group Drupal
  */
-class FileSourceTest extends MigrateSqlSourceTestCase {
+class FileTest extends MigrateSqlSourceTestCase {
 
   const PLUGIN_CLASS = 'Drupal\migrate_drupal\Plugin\migrate\source\d6\File';
   const BASE_TABLE = 'file';

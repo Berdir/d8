@@ -2,20 +2,20 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Tests\source\d6\BlockSourceTest.
+ * Contains \Drupal\migrate\Tests\source\d6\BlockTest.
  */
 
-namespace Drupal\migrate_drupal\Tests;
+namespace Drupal\migrate_drupal\Tests\source\d6;
 
 use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
 
 /**
- * Tests Boxes migration from D6 to D8.
+ * Tests the Drupal 6 block source.
  *
  * @group migrate_drupal
  * @group Drupal
  */
-class BlockSourceTest extends MigrateSqlSourceTestCase {
+class BlockTest extends MigrateSqlSourceTestCase {
 
   // The plugin system is not working during unit testing so the source plugin
   // class needs to be manually specified.

@@ -178,7 +178,7 @@ class TestDrupal6SqlBase extends \Drupal\migrate_drupal\Plugin\migrate\source\Dr
    * @param \Drupal\Core\Database\Connection
    *   The new conection to use.
    *
-   * @see \Drupal\migrate\Tests\MigrateSqlSourceTestCase
+   * @see \Drupal\migrate\Tests\MigrateSqlTestCase
    */
   public function setDatabase(Connection $database) {
     $this->database = $database;
@@ -190,7 +190,7 @@ class TestDrupal6SqlBase extends \Drupal\migrate_drupal\Plugin\migrate\source\Dr
    * @param \Drupal\Core\Extension\ModuleHandlerInterface
    *   The new module handler to use.
    *
-   * @see \Drupal\migrate\Tests\MigrateSqlSourceTestCase
+   * @see \Drupal\migrate\Tests\MigrateSqlTestCase
    */
   public function setModuleHandler(ModuleHandlerInterface $module_handler) {
     $this->moduleHandler = $module_handler;

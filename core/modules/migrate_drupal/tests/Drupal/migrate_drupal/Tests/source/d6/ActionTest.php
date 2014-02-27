@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Tests\source\d6\ActionSourceTest.
+ * Contains \Drupal\migrate\Tests\source\d6\ActionTest.
  */
 
 namespace Drupal\migrate_drupal\Tests\source\d6;
@@ -10,11 +10,12 @@ namespace Drupal\migrate_drupal\Tests\source\d6;
 use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
 
 /**
- * Tests action migration from D6 to D8.
+ * Tests Drupal action migration source.
  *
  * @group migrate_drupal
+ * @group Drupal
  */
-class ActionSourceTest extends MigrateSqlSourceTestCase {
+class ActionTest extends MigrateSqlSourceTestCase {
 
   // The plugin system is not working during unit testing so the source plugin
   // class needs to be manually specified.

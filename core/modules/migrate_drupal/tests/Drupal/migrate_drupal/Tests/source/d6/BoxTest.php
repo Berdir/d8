@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Tests\source\d6\BoxesSourceTest.
+ * Contains \Drupal\migrate\Tests\source\d6\BoxesTest.
  */
 
 namespace Drupal\migrate_drupal\Tests\source\d6;
@@ -10,12 +10,12 @@ namespace Drupal\migrate_drupal\Tests\source\d6;
 use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
 
 /**
- * Tests Boxes migration from D6 to D8.
+ * Tests the Drupal 6 box source.
  *
  * @group migrate_drupal
  * @group Drupal
  */
-class BoxSourceTest extends MigrateSqlSourceTestCase {
+class BoxTest extends MigrateSqlSourceTestCase {
 
   // The plugin system is not working during unit testing so the source plugin
   // class needs to be manually specified.

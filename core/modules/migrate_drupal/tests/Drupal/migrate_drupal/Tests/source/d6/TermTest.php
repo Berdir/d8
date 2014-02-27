@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Tests\source\d6\TermSourceTest.
+ * Contains \Drupal\migrate\Tests\source\d6\TermTest.
  */
 
 namespace Drupal\migrate_drupal\Tests\source\d6;
@@ -10,11 +10,12 @@ namespace Drupal\migrate_drupal\Tests\source\d6;
 use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
 
 /**
- * Tests taxonomy term migration from D6 to D8.
+ * Tests the Drupal 6 taxonomy term source.
  *
  * @group migrate_drupal
+ * @group Drupal
  */
-class TermSourceTest extends MigrateSqlSourceTestCase {
+class TermTest extends MigrateSqlSourceTestCase {
 
   const PLUGIN_CLASS = 'Drupal\migrate_drupal\Plugin\migrate\source\d6\Term';
 

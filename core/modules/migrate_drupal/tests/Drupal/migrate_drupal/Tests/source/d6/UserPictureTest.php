@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Tests\source\d6\UrlAliasSourceTest.
+ * Contains \Drupal\migrate\Tests\source\d6\UserPictureTest.
  */
 
 namespace Drupal\migrate_drupal\Tests\source\d6;
@@ -10,34 +10,33 @@ namespace Drupal\migrate_drupal\Tests\source\d6;
 use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
 
 /**
+ * Tests the Drupal 6 user picture source.
+ *
  * @group migrate_drupal
  * @group Drupal
  */
-class UrlAliasSourceTest extends MigrateSqlSourceTestCase {
+class UserPictureTest extends MigrateSqlSourceTestCase {
 
-  const PLUGIN_CLASS = 'Drupal\migrate_drupal\Plugin\migrate\source\d6\UrlAlias';
+  const PLUGIN_CLASS = 'Drupal\migrate_drupal\Plugin\migrate\source\d6\UserPicture';
 
   protected $migrationConfiguration = array(
-    'id' => 'test',
-    'highwaterProperty' => array('field' => 'test'),
+    'id' => 'test_user_picture',
     'idlist' => array(),
     'source' => array(
-      'plugin' => 'd6_url_alias',
+      'plugin' => 'd6_user_picture',
     ),
   );
 
   protected $expectedResults = array(
     array(
-      'pid' => 1,
-      'src' => 'node/1',
-      'dst' => 'test-article',
-      'language' => 'en',
+      'uid' => 1,
+      'access' => 1382835435,
+      'picture' => 'sites/default/files/pictures/picture-1.jpg',
     ),
     array(
-      'pid' => 2,
-      'src' => 'node/2',
-      'dst' => 'another-alias',
-      'language' => 'en',
+      'uid' => 2,
+      'access' => 1382835436,
+      'picture' => 'sites/default/files/pictures/picture-2.jpg',
     ),
   );
 
@@ -45,9 +44,7 @@ class UrlAliasSourceTest extends MigrateSqlSourceTestCase {
    * {@inheritdoc}
    */
   protected function setUp() {
-    foreach ($this->expectedResults as $row) {
-      $this->databaseContents['url_alias'][] = $row;
-    }
+    $this->databaseContents['users'] = $this->expectedResults;
     parent::setUp();
   }
 
@@ -56,8 +53,8 @@ class UrlAliasSourceTest extends MigrateSqlSourceTestCase {
    */
   public static function getInfo() {
     return array(
-      'name' => 'D6 url alias source functionality',
-      'description' => 'Tests the D6 url alias migrations.',
+      'name' => 'D6 user picture source functionality',
+      'description' => 'Tests D6 user picture source plugin.',
       'group' => 'Migrate Drupal',
     );
   }
@@ -68,9 +65,9 @@ namespace Drupal\migrate_drupal\Tests\source\d6;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\migrate_drupal\Plugin\migrate\source\d6\UrlAlias;
+use Drupal\migrate_drupal\Plugin\migrate\source\d6\UserPicture;
 
-class TestUrlAlias extends UrlAlias {
+class TestUserPicture extends UserPicture {
   public function setDatabase(Connection $database) {
     $this->database = $database;
   }

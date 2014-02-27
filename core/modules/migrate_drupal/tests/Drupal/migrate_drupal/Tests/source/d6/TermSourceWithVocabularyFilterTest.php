@@ -9,11 +9,12 @@ use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
 
 
 /**
- * Tests taxonomy term migration with vocabulary filter from D6 to D8.
+ * Tests the Drupal 6 taxonomy term source with vocabulary filter.
  *
  * @group migrate_drupal
+ * @group Drupal
  */
-class TermSourceWithVocabularyFilterTest extends TermSourceTest {
+class TermSourceWithVocabularyFilterTest extends TermTest {
 
   /**
    * {@inheritdoc}

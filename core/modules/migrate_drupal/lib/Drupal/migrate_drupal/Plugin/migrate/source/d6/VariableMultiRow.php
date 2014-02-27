@@ -8,6 +8,9 @@ use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
 /**
  * Drupal 6 multiple variables source from database.
  *
+ * Unlike the d6_variable source plugin, this one returns one row per
+ * variable.
+ *
  * @MigrateSource(
  *   id = "d6_variable_multirow"
  * )
@@ -27,15 +30,18 @@ class VariableMultiRow extends DrupalSqlBase {
    * {@inheritdoc}
    */
   public function fields() {
-    return drupal_map_assoc($this->configuration['variables']);
+    return array(
+      'name' => $this->t('Name'),
+      'value' => $this->t('Value'),
+    );
   }
 
   /**
    * {@inheritdoc}
    */
   public function prepareRow(Row $row) {
-    if ($row->hasSourceProperty('value')) {
-      $row->setSourceProperty('value', unserialize($row->getSourceProperty('value')));
+    if ($value = $row->getSourceProperty('value')) {
+      $row->setSourceProperty('value', unserialize($value));
     }
     return parent::prepareRow($row);
   }

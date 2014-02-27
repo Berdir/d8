@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Tests\source\d6\AggregatorItemSourceTest.
+ * Contains \Drupal\migrate\Tests\source\d6\AggregatorItemTest.
  */
 
 namespace Drupal\migrate_drupal\Tests\source\d6;
@@ -10,11 +10,12 @@ namespace Drupal\migrate_drupal\Tests\source\d6;
 use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
 
 /**
- * Tests aggregator item migration from D6 to D8.
+ * Tests the Drupal 6 aggregator item source.
  *
  * @group migrate_drupal
+ * @group Drupal
  */
-class AggregatorItemSourceTest extends MigrateSqlSourceTestCase {
+class AggregatorItemTest extends MigrateSqlSourceTestCase {
 
   const PLUGIN_CLASS = 'Drupal\migrate_drupal\Plugin\migrate\source\d6\AggregatorItem';
 

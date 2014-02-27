@@ -10,11 +10,12 @@ namespace Drupal\migrate_drupal\Tests\source\d6;
 use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
 
 /**
- * Tests variable multirow migration from D6 to D8 w/ highwater handling.
+ * Tests variable multirow source w/ highwater handling.
  *
  * @group migrate_drupal
+ * @group Drupal
  */
-class VariableMultiRowSourceWithHighwaterTest extends VariableMultiRowSourceTest {
+class VariableMultiRowSourceWithHighwaterTest extends VariableMultiRowTest {
 
   /**
    * {@inheritdoc}

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Tests\source\d6\NodeTypeSourceTest.
+ * Contains \Drupal\migrate\Tests\source\d6\NodeTypeTest.
  */
 
 namespace Drupal\migrate_drupal\Tests\source\d6;
@@ -10,11 +10,12 @@ namespace Drupal\migrate_drupal\Tests\source\d6;
 use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
 
 /**
- * Tests Node Types migration from D6 to D8.
+ * Tests the Drupal 6 node type source.
  *
  * @group migrate_drupal
+ * @group Drupal
  */
-class NodeTypeSourceTest extends MigrateSqlSourceTestCase {
+class NodeTypeTest extends MigrateSqlSourceTestCase {
 
   // The plugin system is not working during unit testing so the source plugin
   // class needs to be manually specified.

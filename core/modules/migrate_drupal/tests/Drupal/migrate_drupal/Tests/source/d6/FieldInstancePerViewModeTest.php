@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\migrate_drupal\Tests\source\d6\FieldInstancePerViewModeSourceTest.
+ * Contains \Drupal\migrate_drupal\Tests\source\d6\FieldInstancePerViewModeTest.
  */
 
 namespace Drupal\migrate_drupal\Tests\source\d6;
@@ -10,12 +10,12 @@ namespace Drupal\migrate_drupal\Tests\source\d6;
 use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
 
 /**
- * Tests per view mode sources from D6 to D8.
+ * Tests the Drupal 6 field instance per view mode source.
  *
  * @group migrate_drupal
  * @group Drupal
  */
-class FieldInstancePerViewModeSourceTest extends MigrateSqlSourceTestCase {
+class FieldInstancePerViewModeTest extends MigrateSqlSourceTestCase {
 
   // The plugin system is not working during unit testing so the source plugin
   // class needs to be manually specified.

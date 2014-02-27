@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Tests\source\d6\CommentSourceTest.
+ * Contains \Drupal\migrate\Tests\source\d6\CommentTest.
  */
 
 namespace Drupal\migrate_drupal\Tests\source\d6;
@@ -10,11 +10,12 @@ namespace Drupal\migrate_drupal\Tests\source\d6;
 use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
 
 /**
- * Tests comment migration from D6 to D8.
+ * Tests the Drupal 6 user source.
  *
  * @group migrate_drupal
+ * @group Drupal
  */
-class UserSourceTest extends MigrateSqlSourceTestCase {
+class UserTest extends MigrateSqlSourceTestCase {
 
   const PLUGIN_CLASS = 'Drupal\migrate_drupal\Plugin\migrate\source\d6\User';
 
