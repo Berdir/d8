@@ -612,27 +612,6 @@ class FieldInstanceConfig extends ConfigEntityBase implements FieldInstanceConfi
     return $this->bundle;
   }
 
-  /*
-   * Implements the magic __sleep() method.
-   *
-   * Using the Serialize interface and serialize() / unserialize() methods
-   * breaks entity forms in PHP 5.4.
-   * @todo Investigate in https://drupal.org/node/2074253.
-   */
-  public function __sleep() {
-    // Only serialize properties from getExportProperties().
-    return array_keys(array_intersect_key($this->getExportProperties(), get_object_vars($this)));
-  }
-
-  /**
-   * Implements the magic __wakeup() method.
-   */
-  public function __wakeup() {
-    // Run the values from getExportProperties() through __construct().
-    $values = array_intersect_key($this->getExportProperties(), get_object_vars($this));
-    $this->__construct($values);
-  }
-
   /**
    * {@inheritdoc}
    */

@@ -145,23 +145,4 @@ class EntityFormDisplay extends EntityDisplayBase implements EntityFormDisplayIn
     return $widget;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function __sleep() {
-    // Only store the definition, not external objects or derived data.
-    $keys = array_keys($this->getExportProperties());
-    $keys[] = 'entityTypeId';
-    return $keys;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function __wakeup() {
-    // Run the values from getExportProperties() through __construct().
-    $values = array_intersect_key($this->getExportProperties(), get_object_vars($this));
-    $this->__construct($values, $this->entityTypeId);
-  }
-
 }
