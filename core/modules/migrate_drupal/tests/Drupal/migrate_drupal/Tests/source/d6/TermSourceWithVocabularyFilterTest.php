@@ -14,7 +14,7 @@ use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
  * @group migrate_drupal
  * @group Drupal
  */
-class TermSourceWithVocabularyFilterTest extends TermTest {
+class TermSourceWithVocabularyFilterTest extends TermTestBase {
 
   /**
    * {@inheritdoc}
