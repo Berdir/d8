@@ -1,6 +1,6 @@
 id: d6_node_settings
 source:
-  plugin: d6_variable
+  plugin: variable
   variables:
     - node_admin_theme
 process:

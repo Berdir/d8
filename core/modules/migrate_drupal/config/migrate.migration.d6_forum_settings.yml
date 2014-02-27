@@ -1,6 +1,6 @@
 id: d6_forum_settings
 source:
-  plugin: d6_variable
+  plugin: variable
   variables:
     - forum_hot_topic
     - forum_per_page

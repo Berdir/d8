@@ -1,6 +1,6 @@
 id: d6_syslog_settings
 source:
-  plugin: d6_variable
+  plugin: variable
   variables:
     - syslog_identity
     - syslog_facility

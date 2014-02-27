@@ -1,6 +1,6 @@
 id: d6_system_maintenance
 source:
-  plugin: d6_variable
+  plugin: variable
   variables:
     - site_offline
     - site_offline_message

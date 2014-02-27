@@ -1,6 +1,6 @@
 id: d6_search_page
 source:
-  plugin: d6_variable
+  plugin: variable
   variables:
     - node_rank_comments
     - node_rank_promote

@@ -1,6 +1,6 @@
 id: d6_book_settings
 source:
-  plugin: d6_variable
+  plugin: variable
   variables:
     - book_child_type
     - book_block_mode

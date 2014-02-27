@@ -1,6 +1,6 @@
 id: d7_tracker_settings
 source:
-  plugin: d6_variable
+  plugin: variable
   variables:
     - cron_index_limit
 process:

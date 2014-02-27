@@ -1,6 +1,6 @@
 id: d6_action_settings
 source:
-  plugin: d6_variable
+  plugin: variable
   variables:
     - actions_max_stack
 process:

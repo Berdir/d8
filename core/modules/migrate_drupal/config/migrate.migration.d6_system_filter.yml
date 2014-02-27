@@ -1,6 +1,6 @@
 id: d6_system_filter
 source:
-  plugin: d6_variable
+  plugin: variable
   variables:
     - filter_allowed_protocols
 process:

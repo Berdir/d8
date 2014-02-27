@@ -1,6 +1,6 @@
 id: d6_contact_settings
 source:
-  plugin: d6_variable
+  plugin: variable
   variables:
     - contact_default_status
     - contact_hourly_threshold

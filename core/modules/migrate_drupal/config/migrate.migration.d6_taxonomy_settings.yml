@@ -1,6 +1,6 @@
 id: d6_taxonomy_settings
 source:
-  plugin: d6_variable
+  plugin: variable
   variables:
     - taxonomy_override_selector
     - taxonomy_terms_per_page_admin

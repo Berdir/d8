@@ -15,7 +15,7 @@ use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
  */
 class VariableTest extends MigrateSqlSourceTestCase {
 
-  const PLUGIN_CLASS = 'Drupal\migrate_drupal\Plugin\migrate\source\d6\Variable';
+  const PLUGIN_CLASS = 'Drupal\migrate_drupal\Plugin\migrate\source\Variable';
 
   protected $migrationConfiguration = array(
     'id' => 'test',
@@ -57,13 +57,12 @@ class VariableTest extends MigrateSqlSourceTestCase {
 
 }
 
-namespace Drupal\migrate_drupal\Tests\source\d6;
+namespace Drupal\migrate_drupal\Tests\source;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\migrate_drupal\Plugin\migrate\source\d6\Variable;
 
-class TestVariable extends Variable {
+class TestVariable extends \Drupal\migrate_drupal\Plugin\migrate\source\Variable {
   public function setDatabase(Connection $database) {
     $this->database = $database;
   }

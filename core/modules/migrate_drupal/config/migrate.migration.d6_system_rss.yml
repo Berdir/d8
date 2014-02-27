@@ -1,6 +1,6 @@
 id: d6_system_rss
 source:
-  plugin: d6_variable
+  plugin: variable
   variables:
     - feed_default_items
 process:

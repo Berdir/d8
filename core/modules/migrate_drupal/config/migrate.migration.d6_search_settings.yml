@@ -1,6 +1,6 @@
 id: d6_search_settings
 source:
-    plugin: d6_variable
+    plugin: variable
     variables:
         - minimum_word_size
         - overlap_cjk

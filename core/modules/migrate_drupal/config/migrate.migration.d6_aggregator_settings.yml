@@ -1,6 +1,6 @@
 id: d6_aggregator_settings
 source:
-  plugin: d6_variable
+  plugin: variable
   variables:
     - aggregator_fetcher
     - aggregator_parser

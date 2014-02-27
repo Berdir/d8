@@ -1,6 +1,6 @@
 id: d6_simpletest_settings
 source:
-  plugin: d6_variable
+  plugin: variable
   variables:
     - simpletest_clear_results
     - simpletest_httpauth_method

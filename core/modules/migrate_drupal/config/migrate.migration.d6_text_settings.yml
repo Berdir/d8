@@ -1,6 +1,6 @@
 id: d6_text_settings
 source:
-  plugin: d6_variable
+  plugin: variable
   variables:
     - teaser_length
 process:

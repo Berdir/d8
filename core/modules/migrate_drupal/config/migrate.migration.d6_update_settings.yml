@@ -1,6 +1,6 @@
 id: d6_update_settings
 source:
-  plugin: d6_variable
+  plugin: variable
   variables:
     - update_max_fetch_attempts
     - update_fetch_url

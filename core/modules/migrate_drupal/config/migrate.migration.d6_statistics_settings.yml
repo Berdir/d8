@@ -1,6 +1,6 @@
 id: d6_statistics_settings
 source:
-  plugin: d6_variable
+  plugin: variable
   variables:
     - statistics_enable_access_log
     - statistics_flush_accesslog_timer

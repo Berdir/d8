@@ -1,6 +1,6 @@
 id: d6_menu_settings
 source:
-    plugin: d6_variable
+    plugin: variable
     variables:
         - menu_primary_links_source
         - menu_secondary_links_source

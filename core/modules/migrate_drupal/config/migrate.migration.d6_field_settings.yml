@@ -1,6 +1,6 @@
 id: d6_field_settings
 source:
-  plugin: d6_variable
+  plugin: variable
   variables:
     - field_language_fallback
 process:
