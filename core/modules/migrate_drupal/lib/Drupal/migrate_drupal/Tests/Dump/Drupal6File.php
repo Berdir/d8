@@ -12,7 +12,7 @@ use Drupal\Core\Database\Connection;
 /**
  * Database dump for testing file migrations.
  */
-class Drupal6File {
+class Drupal6File extends Drupal6DumpBase {
 
   /**
    * Sample database schema and values.
@@ -20,9 +20,16 @@ class Drupal6File {
    * @param \Drupal\Core\Database\Connection $database
    *   The database connection.
    */
-  public static function load(Connection $database) {
+  public function __construct(Connection $database) {
+    $this->database = $database;
+  }
 
-    $database->schema()->createTable('files', array(
+   /**
+    * {@inheritdoc}
+    */
+  public function load() {
+
+    $this->createTable('files', array(
       'fields' => array(
         'fid' => array(
           'type' => 'serial',
@@ -88,7 +95,7 @@ class Drupal6File {
       'module' => 'system',
       'name' => 'files',
     ));
-    $database->insert('files')->fields(array(
+    $this->database->insert('files')->fields(array(
       'fid',
       'uid',
       'filename',

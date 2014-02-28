@@ -91,7 +91,7 @@ class MigrateTestBase extends WebTestBase implements MigrateMessageInterface {
       }
       preg_match('/^namespace (.*);$/m', file_get_contents($file), $matches);
       $class = $matches[1] . '\\' . basename($file, '.php');
-      $class::load(Database::getConnection('default', 'migrate'));
+      (new $class(Database::getConnection('default', 'migrate')))->load();
     }
   }
 

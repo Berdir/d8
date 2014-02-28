@@ -11,20 +11,20 @@ use Drupal\Core\Database\Connection;
 /**
  * Database dump for testing user role migration.
  */
-class Drupal6UserRole {
+class Drupal6UserRole extends Drupal6DumpBase {
 
-  /**
-   * @param \Drupal\Core\Database\Connection $database
-   */
-  public static function load(Connection $database) {
+   /**
+    * {@inheritdoc}
+    */
+  public function load() {
     foreach (static::getSchema() as $table => $schema) {
       // Create tables.
-      $database->schema()->createTable($table, $schema);
+      $this->createTable($table, $schema);
 
       // Insert data.
       $data = static::getData($table);
       if ($data) {
-        $query = $database->insert($table)->fields(array_keys($data[0]));
+        $query = $this->database->insert($table)->fields(array_keys($data[0]));
         foreach ($data as $record) {
           $query->values($record);
         }

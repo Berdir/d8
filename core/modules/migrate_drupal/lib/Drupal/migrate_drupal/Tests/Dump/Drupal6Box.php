@@ -9,13 +9,13 @@ namespace Drupal\migrate_drupal\Tests\Dump;
 
 use Drupal\Core\Database\Connection;
 
-class Drupal6Box {
+class Drupal6Box extends Drupal6DumpBase {
 
-  /**
-   * @param \Drupal\Core\Database\Connection $database
-   */
-  public static function load(Connection $database) {
-    $database->schema()->createTable('boxes', array(
+   /**
+    * {@inheritdoc}
+    */
+  public function load() {
+    $this->createTable('boxes', array(
       'description' => 'Stores contents of custom-made blocks.',
       'fields' => array(
         'bid' => array(
@@ -49,7 +49,7 @@ class Drupal6Box {
       'primary key' => array('bid'),
     ));
 
-    $database->insert('boxes')->fields(array(
+    $this->database->insert('boxes')->fields(array(
       'bid',
       'body',
       'info',

@@ -11,15 +11,15 @@ use Drupal\Core\Database\Connection;
 /**
  * Database dump for testing comment variables migration.
  */
-class Drupal6CommentVariable {
+class Drupal6CommentVariable extends Drupal6DumpBase {
 
 
-  /**
-   * @param \Drupal\Core\Database\Connection $database
-   */
-  public static function load(Connection $database) {
-    Drupal6DumpCommon::createVariable($database);
-    $database->schema()->createTable('node_type', array(
+   /**
+    * {@inheritdoc}
+    */
+  public function load() {
+    $this->createTable('variable');
+    $this->createTable('node_type', array(
       'fields' => array(
         'type' => array(
           'type' => 'varchar',
@@ -108,7 +108,7 @@ class Drupal6CommentVariable {
       'module' => 'node',
       'name' => 'node_type',
     ));
-    $database->insert('node_type')->fields(array(
+    $this->database->insert('node_type')->fields(array(
       'type',
       'name',
       'module',
@@ -157,7 +157,7 @@ class Drupal6CommentVariable {
       'orig_type' => 'story',
     ))
     ->execute();
-    $database->insert('variable')->fields(array(
+    $this->database->insert('variable')->fields(array(
       'name',
       'value',
     ))
@@ -234,8 +234,7 @@ class Drupal6CommentVariable {
       'value' => 's:1:"0";',
     ))
     ->execute();
-    Drupal6DumpCommon::createSystem($database);
-    Drupal6DumpCommon::setModuleVersion($database, 'comment', '6001');
+    $this->setModuleVersion('comment', '6001');
   }
 
 }

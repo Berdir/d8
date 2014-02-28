@@ -11,11 +11,18 @@ namespace Drupal\migrate_drupal\Tests\Dump;
 
 use Drupal\Core\Database\Connection;
 
-class Drupal6TermNode {
+class Drupal6TermNode extends Drupal6DumpBase {
 
-  public static function load(Connection $database) {
-    Drupal6DumpCommon::setModuleVersion($database, 'taxonomy', 6000);
-    $database->schema()->createTable('term_node', array(
+  public function __construct(Connection $database) {
+    $this->database = $database;
+  }
+
+   /**
+    * {@inheritdoc}
+    */
+  public function load() {
+    $this->setModuleVersion('taxonomy', 6000);
+    $this->createTable('term_node', array(
       'fields' => array(
         'nid' => array(
           'type' => 'int',
@@ -51,7 +58,7 @@ class Drupal6TermNode {
       'module' => 'taxonomy',
       'name' => 'term_node',
     ));
-    $database->insert('term_node')->fields(array(
+    $this->database->insert('term_node')->fields(array(
       'nid',
       'vid',
       'tid',
@@ -82,7 +89,7 @@ class Drupal6TermNode {
       'tid' => 3,
     ))
     ->execute();
-    $database->insert('node')->fields(array(
+    $this->database->insert('node')->fields(array(
       'nid',
       'vid',
       'type',

@@ -10,14 +10,21 @@ namespace Drupal\migrate_drupal\Tests\Dump;
 
 use Drupal\Core\Database\Connection;
 
-class Drupal6NodeRevision {
+class Drupal6NodeRevision extends Drupal6DumpBase {
 
   /**
    * @param \Drupal\Core\Database\Connection $database
    *   The connection object.
    */
-  public static function load(Connection $database) {
-    $database->insert('node_revisions')->fields(
+  public function __construct(Connection $database) {
+    $this->database = $database;
+  }
+
+   /**
+    * {@inheritdoc}
+    */
+  public function load() {
+    $this->database->insert('node_revisions')->fields(
       array(
         'nid',
         'vid',

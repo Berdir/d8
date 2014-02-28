@@ -11,13 +11,13 @@ use Drupal\Core\Database\Connection;
 /**
  * Database dump for testing feed migration.
  */
-class Drupal6AggregatorFeed {
+class Drupal6AggregatorFeed extends Drupal6DumpBase {
 
-  /**
-   * @param \Drupal\Core\Database\Connection $database
-   */
-  public static function load(Connection $database) {
-    $database->schema()->createTable('aggregator_feed', array(
+   /**
+    * {@inheritdoc}
+    */
+  public function load() {
+    $this->createTable('aggregator_feed', array(
       'description' => 'Stores feeds to be parsed by the aggregator.',
       'fields' => array(
         'fid' => array(
@@ -98,7 +98,7 @@ class Drupal6AggregatorFeed {
       ),
     ));
 
-    $database->insert('aggregator_feed')->fields(array(
+    $this->database->insert('aggregator_feed')->fields(array(
       'fid',
       'title',
       'url',
@@ -125,8 +125,7 @@ class Drupal6AggregatorFeed {
       'block' => 5,
     ))
     ->execute();
-    Drupal6DumpCommon::createSystem($database);
-    Drupal6DumpCommon::setModuleVersion($database, 'aggregator', 6001);
+    $this->setModuleVersion('aggregator', 6001);
   }
 
 }

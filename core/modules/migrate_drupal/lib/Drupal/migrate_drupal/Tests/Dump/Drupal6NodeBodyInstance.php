@@ -12,7 +12,7 @@ use Drupal\Core\Database\Connection;
 /**
  * Database dump for testing field.instance.node.*.body.yml migration.
  */
-class Drupal6NodeBodyInstance {
+class Drupal6NodeBodyInstance extends Drupal6DumpBase {
 
   /**
    * Sample database schema and values.
@@ -20,107 +20,17 @@ class Drupal6NodeBodyInstance {
    * @param \Drupal\Core\Database\Connection $database
    *   The database connection.
    */
-  public static function load(Connection $database) {
-    Drupal6DumpCommon::createVariable($database);
-    $database->schema()->createTable('node_type', array(
-      'fields' => array(
-        'type' => array(
-          'description' => 'The machine-readable name of this type.',
-          'type' => 'varchar',
-          'length' => 32,
-          'not null' => TRUE,
-        ),
-        'name' => array(
-          'description' => 'The human-readable name of this type.',
-          'type' => 'varchar',
-          'length' => 255,
-          'not null' => TRUE,
-          'default' => '',
-        ),
-        'module' => array(
-          'description' => 'The base string used to construct callbacks corresponding to this node type.',
-          'type' => 'varchar',
-          'length' => 255,
-          'not null' => TRUE,
-        ),
-        'description' => array(
-          'description' => 'A brief description of this type.',
-          'type' => 'text',
-          'not null' => TRUE,
-          'size' => 'medium',
-        ),
-        'help' => array(
-          'description' => 'Help information shown to the user when creating a {node} of this type.',
-          'type' => 'text',
-          'not null' => TRUE,
-          'size' => 'medium',
-        ),
-        'has_title' => array(
-          'description' => 'Boolean indicating whether this type uses the {node}.title field.',
-          'type' => 'int',
-          'unsigned' => TRUE,
-          'not null' => TRUE,
-          'size' => 'tiny',
-        ),
-        'title_label' => array(
-          'description' => 'The label displayed for the title field on the edit form.',
-          'type' => 'varchar',
-          'length' => 255,
-          'not null' => TRUE,
-          'default' => '',
-        ),
-        'has_body' => array(
-          'description' => 'Boolean indicating whether this type uses the {node_revisions}.body field.',
-          'type' => 'int',
-          'unsigned' => TRUE,
-          'not null' => TRUE,
-          'size' => 'tiny',
-        ),
-        'body_label' => array(
-          'description' => 'The label displayed for the body field on the edit form.',
-          'type' => 'varchar',
-          'length' => 255,
-          'not null' => TRUE,
-          'default' => '',
-        ),
-        'min_word_count' => array(
-          'description' => 'The minimum number of words the body must contain.',
-          'type' => 'int',
-          'unsigned' => TRUE,
-          'not null' => TRUE,
-          'size' => 'small',
-        ),
-        'custom' => array(
-          'description' => 'A boolean indicating whether this type is defined by a module (FALSE) or by a user via a module like the Content Construction Kit (TRUE).',
-          'type' => 'int',
-          'not null' => TRUE,
-          'default' => 0,
-          'size' => 'tiny',
-        ),
-        'modified' => array(
-          'description' => 'A boolean indicating whether this type has been modified by an administrator; currently not used in any way.',
-          'type' => 'int',
-          'not null' => TRUE,
-          'default' => 0,
-          'size' => 'tiny',
-        ),
-        'locked' => array(
-          'description' => 'A boolean indicating whether the administrator can change the machine name of this type.',
-          'type' => 'int',
-          'not null' => TRUE,
-          'default' => 0,
-          'size' => 'tiny',
-        ),
-        'orig_type' => array(
-          'description' => 'The original machine-readable name of this node type. This may be different from the current type name if the locked field is 0.',
-          'type' => 'varchar',
-          'length' => 255,
-          'not null' => TRUE,
-          'default' => '',
-        ),
-      ),
-    ));
-    $database->insert('node_type')->fields(array(
+  public function __construct(Connection $database) {
+    $this->database = $database;
+  }
+
+   /**
+    * {@inheritdoc}
+    */
+  public function load() {
+    $this->createTable('variable');
+    $this->createTable('node_type');
+    $this->database->insert('node_type')->fields(array(
       'type',
       'name',
       'module',
@@ -185,7 +95,7 @@ class Drupal6NodeBodyInstance {
       'orig_type' => '',
     ))
     ->execute();
-    $database->insert('variable')->fields(array(
+    $this->database->insert('variable')->fields(array(
       'name',
       'value',
     ))

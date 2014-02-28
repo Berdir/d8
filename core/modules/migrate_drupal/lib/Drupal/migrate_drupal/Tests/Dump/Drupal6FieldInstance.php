@@ -12,7 +12,7 @@ use Drupal\Core\Database\Connection;
 /**
  * Database dump for testing entity display migration.
  */
-class Drupal6FieldInstance {
+class Drupal6FieldInstance extends Drupal6DumpBase {
 
 
   /**
@@ -21,8 +21,15 @@ class Drupal6FieldInstance {
    * @param \Drupal\Core\Database\Connection $database
    *   The database object.
    */
-  public static function load(Connection $database) {
-    $database->schema()->createTable('content_node_field_instance', array(
+  public function __construct(Connection $database) {
+    $this->database = $database;
+  }
+
+   /**
+    * {@inheritdoc}
+    */
+  public function load() {
+    $this->createTable('content_node_field_instance', array(
       'description' => 'Table that contains field instance settings.',
       'fields' => array(
         'field_name' => array(
@@ -87,7 +94,7 @@ class Drupal6FieldInstance {
       'primary key' => array('field_name', 'type_name'),
     ));
 
-    $database->insert('content_node_field_instance')->fields(array(
+    $this->database->insert('content_node_field_instance')->fields(array(
       'field_name',
       'type_name',
       'weight',
@@ -595,7 +602,7 @@ class Drupal6FieldInstance {
     ->execute();
 
     // Create the field table.
-    $database->schema()->createTable('content_node_field', array(
+    $this->createTable('content_node_field', array(
       'description' => 'Table that contains field instance settings.',
       'fields' => array(
         'field_name' => array(
@@ -662,7 +669,7 @@ class Drupal6FieldInstance {
       'primary key' => array('field_name'),
     ));
 
-    $database->insert('content_node_field')->fields(array(
+    $this->database->insert('content_node_field')->fields(array(
       'field_name',
       'module',
       'type',
@@ -792,7 +799,7 @@ class Drupal6FieldInstance {
     ))
     ->execute();
 
-    $database->schema()->createTable('content_field_test_two', array(
+    $this->createTable('content_field_test_two', array(
       'description' => 'Table for field_test_two',
       'fields' => array(
         'vid' => array(
@@ -830,7 +837,7 @@ class Drupal6FieldInstance {
       ),
       'primary key' => array('vid', 'delta'),
     ));
-    $database->insert('content_field_test_two')->fields(array(
+    $this->database->insert('content_field_test_two')->fields(array(
       'vid',
       'nid',
       'field_test_two_value',
@@ -852,8 +859,7 @@ class Drupal6FieldInstance {
       'field_test_two_format' => 1,
     ))
     ->execute();
-    Drupal6DumpCommon::createSystem($database);
-    Drupal6DumpCommon::setModuleVersion($database, 'content', '6001');
+    $this->setModuleVersion('content', '6001');
 
   }
 

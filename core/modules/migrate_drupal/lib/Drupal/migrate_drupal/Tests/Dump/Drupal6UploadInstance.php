@@ -12,14 +12,21 @@ use Drupal\Core\Database\Connection;
 /**
  * Database dump for testing the upload migration.
  */
-class Drupal6UploadInstance {
+class Drupal6UploadInstance extends Drupal6DumpBase {
 
   /**
    * @param \Drupal\Core\Database\Connection $database
    *   The connection object.
    */
-  public static function load(Connection $database) {
-    $database->schema()->createTable('node_type', array(
+  public function __construct(Connection $database) {
+    $this->database = $database;
+  }
+
+   /**
+    * {@inheritdoc}
+    */
+  public function load() {
+    $this->createTable('node_type', array(
       'fields' => array(
         'type' => array(
           'type' => 'varchar',
@@ -108,7 +115,7 @@ class Drupal6UploadInstance {
       'module' => 'node',
       'name' => 'node_type',
     ));
-    $database->insert('node_type')->fields(array(
+    $this->database->insert('node_type')->fields(array(
       'type',
       'name',
       'module',
@@ -174,8 +181,8 @@ class Drupal6UploadInstance {
     ))
     ->execute();
 
-    Drupal6DumpCommon::createVariable($database);
-    $database->insert('variable')->fields(array(
+    $this->createTable('variable');
+    $this->database->insert('variable')->fields(array(
       'name',
       'value',
     ))

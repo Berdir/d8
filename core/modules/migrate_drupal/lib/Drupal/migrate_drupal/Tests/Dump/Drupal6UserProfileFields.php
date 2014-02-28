@@ -12,13 +12,13 @@ use Drupal\Core\Database\Connection;
 /**
  * Database dump for testing profile fields.
  */
-class Drupal6UserProfileFields {
+class Drupal6UserProfileFields extends Drupal6DumpBase {
 
-  /**
-   * @param \Drupal\Core\Database\Connection $database
-   */
-  public static function load(Connection $database) {
-    $database->schema()->createTable('profile_fields', array(
+   /**
+    * {@inheritdoc}
+    */
+  public function load() {
+    $this->createTable('profile_fields', array(
       'fields' => array(
         'fid' => array(
           'type' => 'serial',
@@ -109,14 +109,13 @@ class Drupal6UserProfileFields {
     // Insert data.
     $data = static::getData('profile_fields');
     if ($data) {
-      $query = $database->insert('profile_fields')->fields(array_keys($data[0]));
+      $query = $this->database->insert('profile_fields')->fields(array_keys($data[0]));
       foreach ($data as $record) {
         $query->values($record);
       }
       $query->execute();
     }
-    Drupal6DumpCommon::createSystem($database);
-    Drupal6DumpCommon::setModuleVersion($database, 'profile', 6001);
+    $this->setModuleVersion('profile', 6001);
   }
 
   /**

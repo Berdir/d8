@@ -11,13 +11,13 @@ use Drupal\Core\Database\Connection;
 /**
  * Database dump for testing contact category migration.
  */
-class Drupal6ContactCategory {
+class Drupal6ContactCategory extends Drupal6DumpBase {
 
-  /**
-   * @param \Drupal\Core\Database\Connection $database
-   */
-  public static function load(Connection $database) {
-    $database->schema()->createTable('contact', array(
+   /**
+    * {@inheritdoc}
+    */
+  public function load() {
+    $this->createTable('contact', array(
       'description' => 'Contact form category settings.',
       'fields' => array(
         'cid' => array(
@@ -68,7 +68,7 @@ class Drupal6ContactCategory {
         'list' => array('weight', 'category'),
       ),
     ));
-    $database->insert('contact')->fields(array('cid', 'category', 'recipients', 'reply', 'weight', 'selected'))
+    $this->database->insert('contact')->fields(array('cid', 'category', 'recipients', 'reply', 'weight', 'selected'))
       ->values(array(
         'cid' => '1',
         'category' => 'Website feedback',
@@ -78,7 +78,6 @@ class Drupal6ContactCategory {
         'selected' => '1',
       ))
       ->execute();
-    Drupal6DumpCommon::createSystem($database);
-    Drupal6DumpCommon::setModuleVersion($database, 'contact', '6001');
+    $this->setModuleVersion('contact', '6001');
   }
 }

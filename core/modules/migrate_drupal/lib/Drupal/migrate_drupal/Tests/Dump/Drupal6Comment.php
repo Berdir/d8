@@ -9,13 +9,13 @@ namespace Drupal\migrate_drupal\Tests\Dump;
 
 use Drupal\Core\Database\Connection;
 
-class Drupal6Comment {
+class Drupal6Comment extends Drupal6DumpBase {
 
-  /**
-   * @param \Drupal\Core\Database\Connection $database
-   */
-  public static function load(Connection $database) {
-    $database->schema()->createTable('comments', array(
+   /**
+    * {@inheritdoc}
+    */
+  public function load() {
+    $this->createTable('comments', array(
       'description' => 'Stores comments and associated data.',
       'fields' => array(
         'cid' => array(
@@ -115,7 +115,7 @@ class Drupal6Comment {
       ),
       'primary key' => array('cid'),
     ));
-    $database->insert('comments')->fields(array(
+    $this->database->insert('comments')->fields(array(
       'cid',
       'pid',
       'nid',
@@ -185,8 +185,7 @@ class Drupal6Comment {
       'homepage' => 'http://drupal.org',
     ))
     ->execute();
-    Drupal6DumpCommon::createSystem($database);
-    Drupal6DumpCommon::setModuleVersion($database, 'comment', '6001');
+    $this->setModuleVersion('comment', '6001');
   }
 
 }

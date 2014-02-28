@@ -11,15 +11,15 @@ use Drupal\Core\Database\Connection;
 /**
  * Database dump for testing search page migration.
  */
-class Drupal6SearchPage {
+class Drupal6SearchPage extends Drupal6DumpBase {
 
 
-  /**
-   * @param \Drupal\Core\Database\Connection $database
-   */
-  public static function load(Connection $database) {
-    Drupal6DumpCommon::createVariable($database);
-    $database->insert('variable')->fields(array(
+   /**
+    * {@inheritdoc}
+    */
+  public function load() {
+    $this->createTable('variable');
+    $this->database->insert('variable')->fields(array(
       'name',
       'value',
     ))

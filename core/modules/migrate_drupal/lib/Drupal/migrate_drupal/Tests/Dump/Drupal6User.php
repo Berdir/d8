@@ -12,22 +12,29 @@ use Drupal\Core\Database\Connection;
 /**
  * Database dump for testing the users migration.
  */
-class Drupal6User {
+class Drupal6User extends Drupal6DumpBase {
 
   /**
    * @param \Drupal\Core\Database\Connection $database
    *   The connection object.
    */
-  public static function load(Connection $database) {
+  public function __construct(Connection $database) {
+    $this->database = $database;
+  }
+
+   /**
+    * {@inheritdoc}
+    */
+  public function load() {
 
     foreach (static::getSchema() as $table => $schema) {
       // Create tables.
-      $database->schema()->createTable($table, $schema);
+      $this->createTable($table, $schema);
 
       // Insert data.
       $data = static::getData($table);
       if ($data) {
-        $query = $database->insert($table)->fields(array_keys($data[0]));
+        $query = $this->database->insert($table)->fields(array_keys($data[0]));
         foreach ($data as $record) {
           $query->values($record);
         }

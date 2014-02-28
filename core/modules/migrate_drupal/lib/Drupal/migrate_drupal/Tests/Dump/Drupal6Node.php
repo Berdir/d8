@@ -12,14 +12,21 @@ use Drupal\Core\Database\Connection;
 /**
  * Database dump for testing the node migration.
  */
-class Drupal6Node {
+class Drupal6Node extends Drupal6DumpBase {
 
   /**
    * @param \Drupal\Core\Database\Connection $database
    *   The connection object.
    */
-  public static function load(Connection $database) {
-    $database->schema()->createTable('node', array(
+  public function __construct(Connection $database) {
+    $this->database = $database;
+  }
+
+   /**
+    * {@inheritdoc}
+    */
+  public function load() {
+    $this->createTable('node', array(
       'description' => 'The base table for nodes.',
       'fields' => array(
         'nid' => array(
@@ -135,7 +142,7 @@ class Drupal6Node {
       ),
       'primary key' => array('nid'),
     ));
-    $database->insert('node')->fields(
+    $this->database->insert('node')->fields(
       array(
         'nid',
         'vid',
@@ -173,7 +180,7 @@ class Drupal6Node {
       ->execute();
 
 
-    $database->schema()->createTable('node_revisions', array(
+    $this->createTable('node_revisions', array(
       'description' => 'Stores information about each saved version of a {node}.',
       'fields' => array(
         'nid' => array(
@@ -240,7 +247,7 @@ class Drupal6Node {
       'primary key' => array('vid'),
     ));
 
-    $database->insert('node_revisions')->fields(
+    $this->database->insert('node_revisions')->fields(
       array(
         'nid',
         'vid',
@@ -265,7 +272,7 @@ class Drupal6Node {
       ))
       ->execute();
 
-    $database->schema()->createTable('content_type_story', array(
+    $this->createTable('content_type_story', array(
       'description' => 'The content type join table.',
       'fields' => array(
         'nid' => array(
@@ -292,7 +299,7 @@ class Drupal6Node {
       'primary key' => array('vid'),
     ));
 
-    $database->insert('content_type_story')->fields(
+    $this->database->insert('content_type_story')->fields(
       array(
         'nid',
         'vid',
@@ -304,7 +311,6 @@ class Drupal6Node {
         'field_test_value' => 'This is a text field',
       ))
       ->execute();
-    Drupal6DumpCommon::createSystem($database);
-    Drupal6DumpCommon::setModuleVersion($database, 'content', 6001);
+    $this->setModuleVersion('content', 6001);
   }
 }

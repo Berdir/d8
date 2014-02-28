@@ -11,14 +11,14 @@ use Drupal\Core\Database\Connection;
 /**
  * Database dump for testing filter format migration.
  */
-class Drupal6FilterFormat {
+class Drupal6FilterFormat extends Drupal6DumpBase {
 
 
-  /**
-   * @param \Drupal\Core\Database\Connection $database
-   */
-  public static function load(Connection $database) {
-    $database->schema()->createTable('filters', array(
+   /**
+    * {@inheritdoc}
+    */
+  public function load() {
+    $this->createTable('filters', array(
       'description' => 'Table that maps filters (HTML corrector) to input formats (Filtered HTML).',
       'fields' => array(
         'fid' => array(
@@ -62,7 +62,7 @@ class Drupal6FilterFormat {
         'list' => array('format', 'weight', 'module', 'delta'),
       ),
     ));
-    $database->schema()->createTable('filter_formats', array(
+    $this->createTable('filter_formats', array(
       'description' => 'Stores input formats: custom groupings of filters, such as Filtered HTML.',
       'fields' => array(
         'format' => array(
@@ -96,8 +96,8 @@ class Drupal6FilterFormat {
       'primary key' => array('format'),
       'unique keys' => array('name' => array('name')),
     ));
-    Drupal6DumpCommon::createVariable($database);
-    $database->insert('variable')->fields(array(
+    $this->createTable('variable');
+    $this->database->insert('variable')->fields(array(
       'name',
       'value',
     ))
@@ -118,7 +118,7 @@ class Drupal6FilterFormat {
       'value' => 's:2:"72";',
     ))
     ->execute();
-    $database->insert('filter_formats')->fields(array(
+    $this->database->insert('filter_formats')->fields(array(
       'format',
       'name',
       'roles',
@@ -144,7 +144,7 @@ class Drupal6FilterFormat {
     ))
     ->execute();
 
-    $database->insert('filters')->fields(array(
+    $this->database->insert('filters')->fields(array(
       'fid',
       'format',
       'module',

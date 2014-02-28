@@ -10,13 +10,13 @@ use Drupal\Core\Database\Connection;
 /**
  * Database dump for testing menu migration.
  */
-class Drupal6Menu {
+class Drupal6Menu extends Drupal6DumpBase {
 
-  /**
-   * @param \Drupal\Core\Database\Connection $database
-   */
-  public static function load(Connection $database) {
-    $database->schema()->createTable('menu_custom', array(
+   /**
+    * {@inheritdoc}
+    */
+  public function load() {
+    $this->createTable('menu_custom', array(
       'fields' => array(
         'menu_name' => array(
           'type' => 'varchar',
@@ -41,7 +41,7 @@ class Drupal6Menu {
       'module' => 'menu',
       'name' => 'menu_custom',
     ));
-    $database->insert('menu_custom')->fields(array('menu_name', 'title', 'description'))
+    $this->database->insert('menu_custom')->fields(array('menu_name', 'title', 'description'))
       ->values(array(
         'menu_name' => 'navigation',
         'title' => 'Navigation',
@@ -58,8 +58,7 @@ class Drupal6Menu {
         'description' => 'Secondary links are often used for pages like legal notices, contact details, and other secondary navigation items that play a lesser role than primary links',
       ))
       ->execute();
-    Drupal6DumpCommon::createSystem($database);
-    Drupal6DumpCommon::setModuleVersion($database, 'menu', '6001');
+    $this->setModuleVersion('menu', '6001');
   }
 
 }

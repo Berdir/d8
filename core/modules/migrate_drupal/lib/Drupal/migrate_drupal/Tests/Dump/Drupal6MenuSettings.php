@@ -12,18 +12,24 @@ use Drupal\Core\Database\Connection;
 /**
  * Database dump for testing menu.settings.yml migration.
  */
-class Drupal6MenuSettings {
+class Drupal6MenuSettings extends Drupal6DumpBase {
 
   /**
    * Sample database schema and values.
    *
    * @param \Drupal\Core\Database\Connection $database
    */
-  public static function load(Connection $database) {
-    Drupal6DumpCommon::createVariable($database);
-    Drupal6DumpCommon::createSystem(($database));
-    Drupal6DumpCommon::setModuleVersion($database, 'menu', 6000);
-    $database->insert('variable')->fields(array(
+  public function __construct(Connection $database) {
+    $this->database = $database;
+  }
+
+   /**
+    * {@inheritdoc}
+    */
+  public function load() {
+    $this->createTable('variable');
+    $this->setModuleVersion('menu', 6000);
+    $this->database->insert('variable')->fields(array(
       'name',
       'value',
     ))

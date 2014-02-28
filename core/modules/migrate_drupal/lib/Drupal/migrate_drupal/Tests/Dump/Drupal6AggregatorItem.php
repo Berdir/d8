@@ -11,13 +11,13 @@ use Drupal\Core\Database\Connection;
 /**
  * Database dump for testing aggregator item migration.
  */
-class Drupal6AggregatorItem {
+class Drupal6AggregatorItem extends Drupal6DumpBase {
 
-  /**
-   * @param \Drupal\Core\Database\Connection $database
-   */
-  public static function load(Connection $database) {
-    $database->schema()->createTable('aggregator_item', array(
+   /**
+    * {@inheritdoc}
+    */
+  public function load() {
+    $this->createTable('aggregator_item', array(
       'description' => 'Stores the individual items imported from feeds.',
       'fields' => array(
         'iid' => array(
@@ -74,7 +74,7 @@ class Drupal6AggregatorItem {
       'indexes' => array('fid' => array('fid')),
     ));
 
-    $database->insert('aggregator_item')->fields(array(
+    $this->database->insert('aggregator_item')->fields(array(
       'iid',
       'fid',
       'title',
@@ -96,8 +96,7 @@ class Drupal6AggregatorItem {
     ))
     ->execute();
 
-    Drupal6DumpCommon::createSystem($database);
-    Drupal6DumpCommon::setModuleVersion($database, 'aggregator', '6001');
+    $this->setModuleVersion('aggregator', '6001');
   }
 
 }

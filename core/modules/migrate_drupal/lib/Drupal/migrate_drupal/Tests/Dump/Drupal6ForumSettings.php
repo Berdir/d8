@@ -12,7 +12,7 @@ use Drupal\Core\Database\Connection;
 /**
  * Database dump for testing forum.site.yml migration.
  */
-class Drupal6ForumSettings {
+class Drupal6ForumSettings extends Drupal6DumpBase {
 
   /**
    * Sample database schema and values.
@@ -20,9 +20,16 @@ class Drupal6ForumSettings {
    * @param \Drupal\Core\Database\Connection $database
    *   The database connection.
    */
-  public static function load(Connection $database) {
-    Drupal6DumpCommon::createVariable($database);
-    $database->insert('variable')->fields(array(
+  public function __construct(Connection $database) {
+    $this->database = $database;
+  }
+
+   /**
+    * {@inheritdoc}
+    */
+  public function load() {
+    $this->createTable('variable');
+    $this->database->insert('variable')->fields(array(
       'name',
       'value',
     ))

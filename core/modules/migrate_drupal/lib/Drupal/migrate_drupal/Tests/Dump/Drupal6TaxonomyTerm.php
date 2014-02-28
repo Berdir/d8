@@ -10,15 +10,14 @@ use Drupal\Core\Database\Connection;
 /**
  * Database dump for testing taxonomy term migration.
  */
-class Drupal6TaxonomyTerm {
+class Drupal6TaxonomyTerm extends Drupal6DumpBase {
 
-  /**
-   * @param \Drupal\Core\Database\Connection $database
-   */
-  public static function load(Connection $database) {
-    Drupal6DumpCommon::createSystem($database);
-    Drupal6DumpCommon::setModuleVersion($database, 'taxonomy', 6000);
-    $database->schema()->createTable('vocabulary', array(
+   /**
+    * {@inheritdoc}
+    */
+  public function load() {
+    $this->setModuleVersion('taxonomy', 6000);
+    $this->createTable('vocabulary', array(
       'description' => 'Stores vocabulary information.',
       'fields' => array(
         'vid' => array(
@@ -108,7 +107,7 @@ class Drupal6TaxonomyTerm {
       ),
     ));
 
-    $database->schema()->createTable('term_data', array(
+    $this->createTable('term_data', array(
       'fields' => array(
         'tid' => array(
           'type' => 'serial',
@@ -157,7 +156,7 @@ class Drupal6TaxonomyTerm {
       'name' => 'term_data',
     ));
 
-    $database->schema()->createTable('term_hierarchy', array(
+    $this->createTable('term_hierarchy', array(
       'fields' => array(
         'tid' => array(
           'type' => 'int',
@@ -185,7 +184,7 @@ class Drupal6TaxonomyTerm {
       'name' => 'term_hierarchy',
     ));
 
-    $database->insert('vocabulary')->fields(array(
+    $this->database->insert('vocabulary')->fields(array(
       'vid',
       'name',
       'description',
@@ -239,7 +238,7 @@ class Drupal6TaxonomyTerm {
       ))
       ->execute();
 
-    $database->insert('term_data')->fields(array(
+    $this->database->insert('term_data')->fields(array(
       'tid',
       'vid',
       'name',
@@ -290,7 +289,7 @@ class Drupal6TaxonomyTerm {
       ))
       ->execute();
 
-    $database->insert('term_hierarchy')->fields(array(
+    $this->database->insert('term_hierarchy')->fields(array(
       'tid',
       'parent',
     ))

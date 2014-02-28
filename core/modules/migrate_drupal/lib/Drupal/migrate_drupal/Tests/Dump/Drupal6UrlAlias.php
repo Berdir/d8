@@ -11,14 +11,21 @@ use Drupal\Core\Database\Connection;
 /**
  * Database dump for testing url alias migrations.
  */
-class Drupal6UrlAlias {
+class Drupal6UrlAlias extends Drupal6DumpBase {
 
   /**
    * {@inheritdoc}
    */
-  public static function load(Connection $database) {
+  public function __construct(Connection $database) {
+    $this->database = $database;
+  }
 
-    $database->schema()->createTable('url_alias', array(
+   /**
+    * {@inheritdoc}
+    */
+  public function load() {
+
+    $this->createTable('url_alias', array(
       'description' => 'A list of URL aliases for Drupal paths; a user may visit either the source or destination path.',
       'fields' => array(
         'pid' => array(
@@ -60,7 +67,7 @@ class Drupal6UrlAlias {
       'indexes' => array('src_language_pid' => array('src', 'language', 'pid')),
     ));
 
-    $database->insert('url_alias')->fields(array(
+    $this->database->insert('url_alias')->fields(array(
       'pid',
       'src',
       'dst',

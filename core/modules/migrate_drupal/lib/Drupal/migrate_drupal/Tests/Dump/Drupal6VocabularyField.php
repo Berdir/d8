@@ -11,14 +11,21 @@ use Drupal\Core\Database\Connection;
 /**
  * Database dump for testing vocabulary to field migration.
  */
-class Drupal6VocabularyField {
+class Drupal6VocabularyField extends Drupal6DumpBase {
 
   /**
    * {@inheritdoc}
    */
-  public static function load(Connection $database) {
+  public function __construct(Connection $database) {
+    $this->database = $database;
+  }
 
-    $database->schema()->createTable('vocabulary', array(
+   /**
+    * {@inheritdoc}
+    */
+  public function load() {
+
+    $this->createTable('vocabulary', array(
       'fields' => array(
         'vid' => array(
           'type' => 'serial',
@@ -103,7 +110,7 @@ class Drupal6VocabularyField {
       'name' => 'vocabulary',
     ));
 
-    $database->insert('vocabulary')->fields(array(
+    $this->database->insert('vocabulary')->fields(array(
       'vid',
       'name',
       'description',
@@ -131,7 +138,7 @@ class Drupal6VocabularyField {
     ))->execute();
 
 
-    $database->schema()->createTable('vocabulary_node_types', array(
+    $this->createTable('vocabulary_node_types', array(
       'description' => 'Stores which node types vocabularies may be used with.',
       'fields' => array(
         'vid' => array(
@@ -155,7 +162,7 @@ class Drupal6VocabularyField {
       ),
     ));
 
-    $database->insert('vocabulary_node_types')->fields(array(
+    $this->database->insert('vocabulary_node_types')->fields(array(
       'vid',
       'type',
     ))
@@ -168,8 +175,7 @@ class Drupal6VocabularyField {
       'type' => 'page',
     ))
     ->execute();
-    Drupal6DumpCommon::createSystem($database);
-    Drupal6DumpCommon::setModuleVersion($database, 'taxonomy', 6001);
+    $this->setModuleVersion('taxonomy', 6001);
   }
 
 }

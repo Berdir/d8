@@ -9,13 +9,13 @@ namespace Drupal\migrate_drupal\Tests\Dump;
 
 use Drupal\Core\Database\Connection;
 
-class Drupal6Block {
+class Drupal6Block extends Drupal6DumpBase {
 
-  /**
-   * @param \Drupal\Core\Database\Connection $database
-   */
-  public static function load(Connection $database) {
-    $database->schema()->createTable('blocks', array(
+   /**
+    * {@inheritdoc}
+    */
+  public function load() {
+    $this->createTable('blocks', array(
       'fields' => array(
         'bid' => array(
           'type' => 'serial',
@@ -112,7 +112,7 @@ class Drupal6Block {
         ),
       ),
     ));
-    $database->schema()->createTable('blocks_roles', array(
+    $this->createTable('blocks_roles', array(
       'fields' => array(
         'module' => array(
           'type' => 'varchar',
@@ -143,7 +143,7 @@ class Drupal6Block {
       'module' => 'block',
       'name' => 'blocks_roles',
     ));
-    $database->insert('blocks')->fields(array(
+    $this->database->insert('blocks')->fields(array(
       'bid',
       'module',
       'delta',

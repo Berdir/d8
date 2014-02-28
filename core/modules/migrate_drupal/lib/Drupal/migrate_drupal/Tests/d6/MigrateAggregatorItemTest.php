@@ -10,7 +10,6 @@ namespace Drupal\migrate_drupal\Tests\d6;
 use Drupal\aggregator\Entity\Item;
 use Drupal\Core\Language\Language;
 use Drupal\migrate\MigrateExecutable;
-use Drupal\migrate_drupal\Tests\Dump\Drupal6DumpCommon;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
 class MigrateAggregatorItemTest extends MigrateDrupalTestBase {
