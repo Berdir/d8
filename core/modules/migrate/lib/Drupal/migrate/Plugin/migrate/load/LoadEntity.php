@@ -7,7 +7,6 @@
 
 namespace Drupal\migrate\Plugin\migrate\load;
 
-use Drupal\Component\Utility\MapArray;
 use Drupal\Component\Utility\String;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
 use Drupal\migrate\Entity\MigrationInterface;
@@ -70,8 +69,9 @@ class LoadEntity extends LoadBase {
       $values['source']['bundle'] = $id;
       /** @var \Drupal\migrate\Entity\MigrationInterface $migration */
       $migration = $storage_controller->create($values);
-      $fields = array_keys($migration->getSourcePlugin()->fields());
-      $migration->process += MapArray::copyValuesToKeys(array_diff($fields, $processed_destinations));;
+      $all_fields = array_keys($migration->getSourcePlugin()->fields());
+      $fields = array_diff($all_fields, $processed_destinations);
+      $migration->process += array_combine($all_fields, $all_fields);
       $this->additionalProcess($id, $migration);
       $migrations[$migration->id()] = $migration;
     }
