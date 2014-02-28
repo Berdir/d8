@@ -8,7 +8,6 @@
 namespace Drupal\migrate_drupal\Tests\d6;
 
 use Drupal\migrate\MigrateExecutable;
-use Drupal\migrate\MigrateMessage;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
 class MigrateVocabularyFieldTest extends MigrateDrupalTestBase {
