@@ -22,7 +22,10 @@ class Drupal6DumpBase {
   protected $database;
 
   /**
+   * Sample database schema and values.
+   *
    * @param \Drupal\Core\Database\Connection $database
+   *   The database connection.
    */
   public function __construct(Connection $database) {
     $this->database = $database;
