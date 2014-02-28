@@ -7,16 +7,14 @@
 
 namespace Drupal\migrate_drupal\Tests\Dump;
 
-use Drupal\Core\Database\Connection;
-
 /**
  * Database dump for testing profile fields.
  */
 class Drupal6UserProfileFields extends Drupal6DumpBase {
 
-   /**
-    * {@inheritdoc}
-    */
+  /**
+   * {@inheritdoc}
+   */
   public function load() {
     $this->createTable('profile_fields', array(
       'fields' => array(

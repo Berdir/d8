@@ -6,16 +6,14 @@
  */
 
 namespace Drupal\migrate_drupal\Tests\Dump;
-use Drupal\Core\Database\Connection;
-
 /**
  * Database dump for testing node type migration.
  */
 class Drupal6NodeType extends Drupal6DumpBase {
 
-   /**
-    * {@inheritdoc}
-    */
+  /**
+   * {@inheritdoc}
+   */
   public function load() {
     $this->createTable('node_type');
     $this->database->insert('node_type')->fields(

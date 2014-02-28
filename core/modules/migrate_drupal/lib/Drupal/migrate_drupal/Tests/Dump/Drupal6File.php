@@ -7,16 +7,14 @@
 
 namespace Drupal\migrate_drupal\Tests\Dump;
 
-use Drupal\Core\Database\Connection;
-
 /**
  * Database dump for testing file migrations.
  */
 class Drupal6File extends Drupal6DumpBase {
 
-   /**
-    * {@inheritdoc}
-    */
+  /**
+   * {@inheritdoc}
+   */
   public function load() {
 
     $this->createTable('files', array(

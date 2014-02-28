@@ -6,17 +6,15 @@
  */
 
 namespace Drupal\migrate_drupal\Tests\Dump;
-use Drupal\Core\Database\Connection;
-
 /**
  * Database dump for testing filter format migration.
  */
 class Drupal6FilterFormat extends Drupal6DumpBase {
 
 
-   /**
-    * {@inheritdoc}
-    */
+  /**
+   * {@inheritdoc}
+   */
   public function load() {
     $this->createTable('filters', array(
       'description' => 'Table that maps filters (HTML corrector) to input formats (Filtered HTML).',

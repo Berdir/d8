@@ -7,13 +7,11 @@
 
 namespace Drupal\migrate_drupal\Tests\Dump;
 
-use Drupal\Core\Database\Connection;
-
 class Drupal6Comment extends Drupal6DumpBase {
 
-   /**
-    * {@inheritdoc}
-    */
+  /**
+   * {@inheritdoc}
+   */
   public function load() {
     $this->createTable('comments', array(
       'description' => 'Stores comments and associated data.',

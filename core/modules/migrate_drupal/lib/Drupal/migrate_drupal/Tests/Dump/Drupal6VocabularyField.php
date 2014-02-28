@@ -6,8 +6,6 @@
 
 namespace Drupal\migrate_drupal\Tests\Dump;
 
-use Drupal\Core\Database\Connection;
-
 /**
  * Database dump for testing vocabulary to field migration.
  */
@@ -16,13 +14,6 @@ class Drupal6VocabularyField extends Drupal6DumpBase {
   /**
    * {@inheritdoc}
    */
-  public function __construct(Connection $database) {
-    $this->database = $database;
-  }
-
-   /**
-    * {@inheritdoc}
-    */
   public function load() {
 
     $this->createTable('vocabulary', array(
@@ -110,32 +101,20 @@ class Drupal6VocabularyField extends Drupal6DumpBase {
       'name' => 'vocabulary',
     ));
 
-    $this->database->insert('vocabulary')->fields(array(
-      'vid',
-      'name',
-      'description',
-      'help',
-      'relations',
-      'hierarchy',
-      'multiple',
-      'required',
-      'tags',
-      'module',
-      'weight',
-    ))
-    ->values(array(
-      'vid' => '1',
-      'name' => 'Tags',
-      'description' => 'Tags Vocabulary',
-      'help' => '',
-      'relations' => '1',
-      'hierarchy' => '0',
-      'multiple' => '0',
-      'required' => '0',
-      'tags' => '0',
-      'module' => 'taxonomy',
-      'weight' => '0',
-    ))->execute();
+    $this->database->merge('vocabulary')->key(array('vid' => 1))
+      ->fields(array(
+        'name' => 'Tags',
+        'description' => 'Tags Vocabulary',
+        'help' => '',
+        'relations' => '1',
+        'hierarchy' => '0',
+        'multiple' => '0',
+        'required' => '0',
+        'tags' => '0',
+        'module' => 'taxonomy',
+        'weight' => '0',
+      ))
+      ->execute();
 
 
     $this->createTable('vocabulary_node_types', array(

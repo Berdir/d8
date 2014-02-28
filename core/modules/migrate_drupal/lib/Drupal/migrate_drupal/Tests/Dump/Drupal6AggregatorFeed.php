@@ -6,16 +6,14 @@
  */
 
 namespace Drupal\migrate_drupal\Tests\Dump;
-use Drupal\Core\Database\Connection;
-
 /**
  * Database dump for testing feed migration.
  */
 class Drupal6AggregatorFeed extends Drupal6DumpBase {
 
-   /**
-    * {@inheritdoc}
-    */
+  /**
+   * {@inheritdoc}
+   */
   public function load() {
     $this->createTable('aggregator_feed', array(
       'description' => 'Stores feeds to be parsed by the aggregator.',

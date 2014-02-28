@@ -5,16 +5,14 @@
  */
 
 namespace Drupal\migrate_drupal\Tests\Dump;
-use Drupal\Core\Database\Connection;
-
 /**
  * Database dump for testing menu migration.
  */
 class Drupal6Menu extends Drupal6DumpBase {
 
-   /**
-    * {@inheritdoc}
-    */
+  /**
+   * {@inheritdoc}
+   */
   public function load() {
     $this->createTable('menu_custom', array(
       'fields' => array(

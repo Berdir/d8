@@ -6,17 +6,15 @@
  */
 
 namespace Drupal\migrate_drupal\Tests\Dump;
-use Drupal\Core\Database\Connection;
-
 /**
  * Database dump for testing search page migration.
  */
 class Drupal6SearchPage extends Drupal6DumpBase {
 
 
-   /**
-    * {@inheritdoc}
-    */
+  /**
+   * {@inheritdoc}
+   */
   public function load() {
     $this->createTable('variable');
     $this->database->insert('variable')->fields(array(

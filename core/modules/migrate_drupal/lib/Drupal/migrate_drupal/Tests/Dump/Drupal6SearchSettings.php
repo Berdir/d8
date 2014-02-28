@@ -7,26 +7,14 @@
 
 namespace Drupal\migrate_drupal\Tests\Dump;
 
-use Drupal\Core\Database\Connection;
-
 /**
  * Database dump for testing forum.site.yml migration.
  */
 class Drupal6SearchSettings extends Drupal6DumpBase {
 
   /**
-   * Mock the database schema and values.
-   *
-   * @param \Drupal\Core\Database\Connection $database
-   *   The mocked database connection.
+   * {@inheritdoc}
    */
-  public function __construct(Connection $database) {
-    $this->database = $database;
-  }
-
-   /**
-    * {@inheritdoc}
-    */
   public function load() {
     $this->createTable('variable');
     $this->database->insert('variable')->fields(array(

@@ -6,7 +6,6 @@
  */
 
 namespace Drupal\migrate_drupal\Tests\Dump;
-
 use Drupal\Core\Database\Connection;
 
 /**

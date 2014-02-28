@@ -7,16 +7,14 @@
 
 namespace Drupal\migrate_drupal\Tests\Dump;
 
-use Drupal\Core\Database\Connection;
-
 /**
  * Database dump for testing system.file.yml migration.
  */
 class Drupal6SystemFile extends Drupal6DumpBase {
 
-   /**
-    * {@inheritdoc}
-    */
+  /**
+   * {@inheritdoc}
+   */
   public function load() {
     $this->createTable('variable');
     $this->database->insert('variable')->fields(array(

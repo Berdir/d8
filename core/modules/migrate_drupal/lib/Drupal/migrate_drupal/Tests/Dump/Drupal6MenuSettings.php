@@ -7,25 +7,14 @@
 
 namespace Drupal\migrate_drupal\Tests\Dump;
 
-use Drupal\Core\Database\Connection;
-
 /**
  * Database dump for testing menu.settings.yml migration.
  */
 class Drupal6MenuSettings extends Drupal6DumpBase {
 
   /**
-   * Sample database schema and values.
-   *
-   * @param \Drupal\Core\Database\Connection $database
+   * {@inheritdoc}
    */
-  public function __construct(Connection $database) {
-    $this->database = $database;
-  }
-
-   /**
-    * {@inheritdoc}
-    */
   public function load() {
     $this->createTable('variable');
     $this->setModuleVersion('menu', 6000);

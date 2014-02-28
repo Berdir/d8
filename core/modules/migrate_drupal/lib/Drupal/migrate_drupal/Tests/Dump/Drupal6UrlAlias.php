@@ -6,8 +6,6 @@
 
 namespace Drupal\migrate_drupal\Tests\Dump;
 
-use Drupal\Core\Database\Connection;
-
 /**
  * Database dump for testing url alias migrations.
  */
@@ -16,15 +14,7 @@ class Drupal6UrlAlias extends Drupal6DumpBase {
   /**
    * {@inheritdoc}
    */
-  public function __construct(Connection $database) {
-    $this->database = $database;
-  }
-
-   /**
-    * {@inheritdoc}
-    */
   public function load() {
-
     $this->createTable('url_alias', array(
       'description' => 'A list of URL aliases for Drupal paths; a user may visit either the source or destination path.',
       'fields' => array(

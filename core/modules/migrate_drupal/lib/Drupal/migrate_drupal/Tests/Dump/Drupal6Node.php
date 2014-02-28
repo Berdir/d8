@@ -7,24 +7,14 @@
 
 namespace Drupal\migrate_drupal\Tests\Dump;
 
-use Drupal\Core\Database\Connection;
-
 /**
  * Database dump for testing the node migration.
  */
 class Drupal6Node extends Drupal6DumpBase {
 
   /**
-   * @param \Drupal\Core\Database\Connection $database
-   *   The connection object.
+   * {@inheritdoc}
    */
-  public function __construct(Connection $database) {
-    $this->database = $database;
-  }
-
-   /**
-    * {@inheritdoc}
-    */
   public function load() {
     $this->createTable('node', array(
       'description' => 'The base table for nodes.',

@@ -6,16 +6,14 @@
  */
 
 namespace Drupal\migrate_drupal\Tests\Dump;
-use Drupal\Core\Database\Connection;
-
 /**
  * Database dump for testing user role migration.
  */
 class Drupal6UserRole extends Drupal6DumpBase {
 
-   /**
-    * {@inheritdoc}
-    */
+  /**
+   * {@inheritdoc}
+   */
   public function load() {
     foreach (static::getSchema() as $table => $schema) {
       // Create tables.

@@ -6,17 +6,15 @@
  */
 
 namespace Drupal\migrate_drupal\Tests\Dump;
-use Drupal\Core\Database\Connection;
-
 /**
  * Database dump for testing comment variables migration.
  */
 class Drupal6CommentVariable extends Drupal6DumpBase {
 
 
-   /**
-    * {@inheritdoc}
-    */
+  /**
+   * {@inheritdoc}
+   */
   public function load() {
     $this->createTable('variable');
     $this->createTable('node_type', array(

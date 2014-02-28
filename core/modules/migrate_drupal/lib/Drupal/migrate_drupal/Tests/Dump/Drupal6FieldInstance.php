@@ -7,27 +7,14 @@
 
 namespace Drupal\migrate_drupal\Tests\Dump;
 
-use Drupal\Core\Database\Connection;
-
 /**
  * Database dump for testing entity display migration.
  */
 class Drupal6FieldInstance extends Drupal6DumpBase {
 
-
   /**
-   * Setup tables for the unit tests.
-   *
-   * @param \Drupal\Core\Database\Connection $database
-   *   The database object.
+   * {@inheritdoc}
    */
-  public function __construct(Connection $database) {
-    $this->database = $database;
-  }
-
-   /**
-    * {@inheritdoc}
-    */
   public function load() {
     $this->createTable('content_node_field_instance', array(
       'description' => 'Table that contains field instance settings.',

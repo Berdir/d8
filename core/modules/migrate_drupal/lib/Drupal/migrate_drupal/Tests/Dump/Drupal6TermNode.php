@@ -9,17 +9,11 @@
 namespace Drupal\migrate_drupal\Tests\Dump;
 
 
-use Drupal\Core\Database\Connection;
-
 class Drupal6TermNode extends Drupal6DumpBase {
 
-  public function __construct(Connection $database) {
-    $this->database = $database;
-  }
-
-   /**
-    * {@inheritdoc}
-    */
+  /**
+   * {@inheritdoc}
+   */
   public function load() {
     $this->setModuleVersion('taxonomy', 6000);
     $this->createTable('term_node', array(

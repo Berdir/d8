@@ -7,24 +7,14 @@
 
 namespace Drupal\migrate_drupal\Tests\Dump;
 
-use Drupal\Core\Database\Connection;
-
 /**
  * Database dump for testing the users migration.
  */
 class Drupal6User extends Drupal6DumpBase {
 
   /**
-   * @param \Drupal\Core\Database\Connection $database
-   *   The connection object.
+   * {@inheritdoc}
    */
-  public function __construct(Connection $database) {
-    $this->database = $database;
-  }
-
-   /**
-    * {@inheritdoc}
-    */
   public function load() {
 
     foreach (static::getSchema() as $table => $schema) {

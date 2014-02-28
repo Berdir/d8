@@ -46,7 +46,7 @@ class MigrateTextConfigsTest extends MigrateDrupalTestBase {
     $executable = new MigrateExecutable($migration, new MigrateMessage());
     $executable->import();
     $config = \Drupal::config('text.settings');
-    $this->assertIdentical($config->get('default_summary_length'), 600);
+    $this->assertIdentical($config->get('default_summary_length'), 456);
   }
 
 }

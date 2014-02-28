@@ -7,17 +7,11 @@
 
 namespace Drupal\migrate_drupal\Tests\Dump;
 
-use Drupal\Core\Database\Connection;
-
 class Drupal6Upload extends Drupal6DumpBase {
 
-  public function __construct(Connection $database) {
-    $this->database = $database;
-  }
-
-   /**
-    * {@inheritdoc}
-    */
+  /**
+   * {@inheritdoc}
+   */
   public function load() {
     $this->setModuleVersion('upload', 6000);
     $this->createTable('upload', array(
@@ -122,17 +116,12 @@ class Drupal6Upload extends Drupal6DumpBase {
     ))
     ->execute();
 
-    $this->database->insert('node')->fields(array(
-      'nid',
-      'vid',
-      'type',
-    ))
-    ->values(array(
-      'nid' => 2,
-      'vid' => 3,
-      'type' => 'story',
-    ))
-    ->execute();
+    $this->database->merge('node')->key(array('nid' => 2))
+      ->fields(array(
+        'vid' => 2,
+        'type' => 'story',
+      ))
+      ->execute();
   }
 
 }
