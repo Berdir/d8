@@ -28,12 +28,11 @@ use Drupal\language\LanguageInterface;
  *     }
  *   },
  *   admin_permission = "administer languages",
- *   config_prefix = "language.entity",
+ *   config_prefix = "entity",
  *   entity_keys = {
  *     "id" = "id",
  *     "label" = "label",
- *     "weight" = "weight",
- *     "uuid" = "uuid"
+ *     "weight" = "weight"
  *   },
  *   links = {
  *     "delete-form" = "language.delete",

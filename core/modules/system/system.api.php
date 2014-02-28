@@ -280,81 +280,6 @@ function hook_js_alter(&$javascript) {
 }
 
 /**
- * Registers JavaScript/CSS libraries associated with a module.
- *
- * Modules implementing this return an array of arrays. The key to each
- * sub-array is the machine readable name of the library. Each library may
- * contain the following items:
- *
- * - 'title': The human readable name of the library.
- * - 'website': The URL of the library's web site.
- * - 'version': A string specifying the version of the library; intentionally
- *   not a float because a version like "1.2.3" is not a valid float. Use PHP's
- *   version_compare() to compare different versions.
- * - 'js': An array of JavaScript elements; each element's key is used as $data
- *   argument, each element's value is used as $options array for
- *   _drupal_add_js(). To add library-specific (not module-specific) JavaScript
- *   settings, the key may be skipped, the value must specify
- *   'type' => 'setting', and the actual settings must be contained in a 'data'
- *   element of the value.
- * - 'css': Like 'js', an array of CSS elements passed to _drupal_add_css().
- * - 'dependencies': An array of libraries that are required for a library. Each
- *   element is an array listing the module and name of another library. Note
- *   that all dependencies for each dependent library will also be added when
- *   this library is added.
- *
- * Registered information for a library should contain re-usable data only.
- * Module- or implementation-specific data and integration logic should be added
- * separately.
- *
- * @return
- *   An array defining libraries associated with a module.
- *
- * @see system_library_info()
- * @see drupal_add_library()
- * @see drupal_get_library()
- */
-function hook_library_info() {
-  // Library One.
-  $libraries['library-1'] = array(
-    'title' => 'Library One',
-    'website' => 'http://example.com/library-1',
-    'version' => '1.2',
-    'js' => array(
-      drupal_get_path('module', 'my_module') . '/library-1.js' => array(),
-    ),
-    'css' => array(
-      drupal_get_path('module', 'my_module') . '/library-2.css' => array(
-        'type' => 'file',
-        'media' => 'screen',
-      ),
-    ),
-  );
-  // Library Two.
-  $libraries['library-2'] = array(
-    'title' => 'Library Two',
-    'website' => 'http://example.com/library-2',
-    'version' => '3.1-beta1',
-    'js' => array(
-      // JavaScript settings may use the 'data' key.
-      array(
-        'type' => 'setting',
-        'data' => array('library2' => TRUE),
-      ),
-    ),
-    'dependencies' => array(
-      // Require jQuery UI core by System module.
-      array('system', 'jquery.ui.core'),
-      // Require our other library.
-      array('my_module', 'library-1'),
-      // Require another library.
-      array('other_module', 'library-3'),
-    ),
-  );
-  return $libraries;
-}
-
-/**
  * Alters the JavaScript/CSS library registry.
  *
  * Allows certain, contributed modules to update libraries to newer versions
@@ -367,20 +292,71 @@ function hook_library_info() {
  *   name and passed by reference.
  * @param $module
  *   The name of the module that registered the libraries.
- *
- * @see hook_library_info()
  */
 function hook_library_info_alter(&$libraries, $module) {
   // Update Farbtastic to version 2.0.
-  if ($module == 'system' && isset($libraries['farbtastic'])) {
+  if ($module == 'core' && isset($libraries['jquery.farbtastic'])) {
     // Verify existing version is older than the one we are updating to.
-    if (version_compare($libraries['farbtastic']['version'], '2.0', '<')) {
+    if (version_compare($libraries['jquery.farbtastic']['version'], '2.0', '<')) {
       // Update the existing Farbtastic to version 2.0.
-      $libraries['farbtastic']['version'] = '2.0';
-      $libraries['farbtastic']['js'] = array(
-        drupal_get_path('module', 'farbtastic_update') . '/farbtastic-2.0.js' => array(),
+      $libraries['jquery.farbtastic']['version'] = '2.0';
+      // To accurately replace library files, the order of files and the options
+      // of each file have to be retained; e.g., like this:
+      $old_path = 'assets/vendor/farbtastic';
+      // Since the replaced library files are no longer located in a directory
+      // relative to the original extension, specify an absolute path (relative
+      // to DRUPAL_ROOT / base_path()) to the new location.
+      $new_path = '/' . drupal_get_path('module', 'farbtastic_update') . '/js';
+      $new_js = array();
+      $replacements = array(
+        $old_path . '/farbtastic.js' => $new_path . '/farbtastic-2.0.js',
       );
+      foreach ($libraries['jquery.farbtastic']['js'] as $source => $options) {
+        if (isset($replacements[$source])) {
+          $new_js[$replacements[$source]] = $options;
+        }
+        else {
+          $new_js[$source] = $options;
+        }
+      }
+      $libraries['jquery.farbtastic']['js'] = $new_js;
     }
+  }
+}
+
+/**
+ * Alters a JavaScript/CSS library before it is attached.
+ *
+ * Allows modules and themes to dynamically attach further assets to a library
+ * when it is added to the page; e.g., to add JavaScript settings.
+ *
+ * This hook is only invoked once per library and page.
+ *
+ * @param array $library
+ *   The JavaScript/CSS library that is being added.
+ * @param string $extension
+ *   The name of the extension that registered the library.
+ * @param string $name
+ *   The name of the library.
+ *
+ * @see drupal_add_library()
+ */
+function hook_library_alter(array &$library, $extension, $name) {
+  if ($extension == 'core' && $name == 'jquery.ui.datepicker') {
+    // Note: If the added assets do not depend on additional request-specific
+    // data supplied here, consider to statically register it directly via
+    // hook_library_info_alter() already.
+    $library['dependencies'][] = array('locale', 'drupal.locale.datepicker');
+
+    $language_interface = \Drupal::languageManager()->getCurrentLanguage();
+    $settings['jquery']['ui']['datepicker'] = array(
+      'isRTL' => $language_interface->direction == Language::DIRECTION_RTL,
+      'firstDay' => \Drupal::config('system.date')->get('first_day'),
+    );
+    $library['js'][] = array(
+      'type' => 'setting',
+      'data' => $settings,
+    );
   }
 }
 
@@ -454,38 +430,6 @@ function hook_page_build(&$page) {
       '#markup' => t('Acme, Inc. is not responsible for the contents of this sample code.'),
       '#weight' => 25,
     );
-  }
-}
-
-/**
- * Alter a menu router item right after it has been retrieved from the database or cache.
- *
- * This hook is invoked by menu_get_item() and allows for run-time alteration of router
- * information (page_callback, title, and so on) before it is translated and checked for
- * access. The passed-in $router_item is statically cached for the current request, so this
- * hook is only invoked once for any router item that is retrieved via menu_get_item().
- *
- * Usually, modules will only want to inspect the router item and conditionally
- * perform other actions (such as preparing a state for the current request).
- * Note that this hook is invoked for any router item that is retrieved by
- * menu_get_item(), which may or may not be called on the path itself, so implementations
- * should check the $path parameter if the alteration should fire for the current request
- * only.
- *
- * @param $router_item
- *   The menu router item for $path.
- * @param $path
- *   The originally passed path, for which $router_item is responsible.
- * @param $original_map
- *   The path argument map, as contained in $path.
- *
- * @see menu_get_item()
- */
-function hook_menu_get_item_alter(&$router_item, $path, $original_map) {
-  // When retrieving the router item for the current path...
-  if ($path == current_path()) {
-    // ...call a function that prepares something for this request.
-    mymodule_prepare_something();
   }
 }
 
@@ -1056,13 +1000,13 @@ function hook_mail_alter(&$message) {
  * A module may implement this hook in order to reorder the implementing
  * modules, which are otherwise ordered by the module's system weight.
  *
- * Note that hooks invoked using drupal_alter() can have multiple variations
- * (such as hook_form_alter() and hook_form_FORM_ID_alter()). drupal_alter()
- * will call all such variants defined by a single module in turn. For the
- * purposes of hook_module_implements_alter(), these variants are treated as
- * a single hook. Thus, to ensure that your implementation of
- * hook_form_FORM_ID_alter() is called at the right time, you will have to
- * change the order of hook_form_alter() implementation in
+ * Note that hooks invoked using \Drupal::moduleHandler->alter() can have
+ * multiple variations(such as hook_form_alter() and hook_form_FORM_ID_alter()).
+ * \Drupal::moduleHandler->alter() will call all such variants defined by a
+ * single module in turn. For the purposes of hook_module_implements_alter(),
+ * these variants are treated as a single hook. Thus, to ensure that your
+ * implementation of hook_form_FORM_ID_alter() is called at the right time,
+ * you will have to change the order of hook_form_alter() implementation in
  * hook_module_implements_alter().
  *
  * @param $implementations
@@ -1106,25 +1050,6 @@ function hook_module_implements_alter(&$implementations, $hook) {
 function hook_system_breadcrumb_alter(array &$breadcrumb, array $attributes, array $context) {
   // Add an item to the end of the breadcrumb.
   $breadcrumb[] = Drupal::l(t('Text'), 'example_route_name');
-}
-
-/**
- * Return additional themes provided by modules.
- *
- * Only use this hook for testing purposes. Use a hidden MYMODULE_test.module
- * to implement this hook. Testing themes should be hidden, too.
- *
- * This hook is invoked from _system_rebuild_theme_data() and allows modules to
- * register additional themes outside of the regular 'themes' directories of a
- * Drupal installation.
- *
- * @return
- *   An associative array. Each key is the system name of a theme and each value
- *   is the corresponding path to the theme's .info.yml file.
- */
-function hook_system_theme_info() {
-  $themes['mymodule_test_theme'] = drupal_get_path('module', 'mymodule') . '/mymodule_test_theme/mymodule_test_theme.info.yml';
-  return $themes;
 }
 
 /**
@@ -1444,7 +1369,7 @@ function hook_template_preprocess_default_variables_alter(&$variables) {
  */
 function hook_watchdog(array $log_entry) {
   global $base_url;
-  $language_interface = language(\Drupal\Core\Language\Language::TYPE_INTERFACE);
+  $language_interface = \Drupal::languageManager()->getCurrentLanguage();
 
   $severity_list = array(
     WATCHDOG_EMERGENCY     => t('Emergency'),
@@ -2613,6 +2538,19 @@ function hook_file_mimetype_mapping_alter(&$mapping) {
  */
 function hook_archiver_info_alter(&$info) {
   $info['tar']['extensions'][] = 'tgz';
+}
+
+/**
+ * Alter the list of mail backend plugin definitions.
+ *
+ * @param array $info
+ *   The mail backend plugin definitions to be altered.
+ *
+ * @see \Drupal\Core\Annotation\Mail
+ * @see \Drupal\Core\Mail\MailManager
+ */
+function hook_mail_backend_info_alter(&$info) {
+  unset($info['test_mail_collector']);
 }
 
 /**

@@ -98,7 +98,7 @@ class CommentFormController extends ContentEntityFormController {
     $is_admin = $comment->id() && $this->currentUser->hasPermission('administer comments');
 
     if (!$this->currentUser->isAuthenticated() && $anonymous_contact != COMMENT_ANONYMOUS_MAYNOT_CONTACT) {
-      $form['#attached']['library'][] = array('system', 'jquery.cookie');
+      $form['#attached']['library'][] = array('core', 'jquery.cookie');
       $form['#attributes']['class'][] = 'user-info-from-cookie';
     }
 
@@ -118,7 +118,6 @@ class CommentFormController extends ContentEntityFormController {
       $form['author'] += array(
         '#type' => 'details',
         '#title' => $this->t('Administration'),
-        '#collapsed' => TRUE,
       );
     }
 
@@ -226,7 +225,7 @@ class CommentFormController extends ContentEntityFormController {
     // Add internal comment properties.
     $original = $comment->getUntranslated();
     foreach (array('cid', 'pid', 'entity_id', 'entity_type', 'field_id', 'uid', 'langcode') as $key) {
-      $key_name = key($comment->$key->first()->getPropertyDefinitions());
+      $key_name = key($comment->$key->getFieldDefinition()->getPropertyDefinitions());
       $form[$key] = array('#type' => 'value', '#value' => $original->$key->{$key_name});
     }
 

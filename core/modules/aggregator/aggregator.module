@@ -5,7 +5,7 @@
  * Used to aggregate syndicated content (RSS, RDF, and Atom).
  */
 
-use Drupal\aggregator\Entity\Feed;
+use Drupal\aggregator\FeedInterface;
 use Drupal\Component\Plugin\Exception\PluginException;
 
 /**
@@ -85,48 +85,6 @@ function aggregator_theme() {
       'file' => 'aggregator.theme.inc',
     ),
   );
-}
-
-/**
- * Implements hook_menu().
- */
-function aggregator_menu() {
-  $items['admin/config/services/aggregator'] = array(
-    'title' => 'Feed aggregator',
-    'description' => "Configure which content your site aggregates from other sites, and how often it polls them.",
-    'route_name' => 'aggregator.admin_overview',
-    'weight' => 10,
-  );
-  $items['admin/config/services/aggregator/remove/%aggregator_feed'] = array(
-    'title' => 'Remove items',
-    'route_name' => 'aggregator.feed_items_delete',
-  );
-  $items['admin/config/services/aggregator/update/%aggregator_feed'] = array(
-    'title' => 'Update items',
-    'route_name' => 'aggregator.feed_refresh',
-  );
-  $items['aggregator'] = array(
-    'title' => 'Feed aggregator',
-    'weight' => 5,
-    'route_name' => 'aggregator.page_last',
-  );
-  $items['aggregator/sources'] = array(
-    'title' => 'Sources',
-    'route_name' => 'aggregator.sources',
-  );
-  $items['aggregator/sources/%aggregator_feed'] = array(
-    'route_name' => 'aggregator.feed_view',
-  );
-  $items['admin/config/services/aggregator/edit/feed/%aggregator_feed'] = array(
-    'title' => 'Edit feed',
-    'route_name' => 'aggregator.feed_edit',
-  );
-  $items['admin/config/services/aggregator/delete/feed/%aggregator_feed'] = array(
-    'title' => 'Delete feed',
-    'route_name' => 'aggregator.feed_delete',
-  );
-
-  return $items;
 }
 
 /**
@@ -211,10 +169,10 @@ function aggregator_queue_info() {
 /**
  * Checks a news feed for new items.
  *
- * @param \Drupal\aggregator\Entity\Feed $feed
+ * @param \Drupal\aggregator\FeedInterface $feed
  *   An object describing the feed to be refreshed.
  */
-function aggregator_refresh(Feed $feed) {
+function aggregator_refresh(FeedInterface $feed) {
   // Store feed URL to track changes.
   $feed_url = $feed->getUrl();
 
@@ -300,7 +258,7 @@ function aggregator_refresh(Feed $feed) {
  * @param int $fid
  *   The feed id.
  *
- * @return \Drupal\aggregator\Entity\Feed
+ * @return \Drupal\aggregator\FeedInterface
  *   An object describing the feed.
  */
 function aggregator_feed_load($fid) {

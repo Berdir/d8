@@ -83,10 +83,10 @@ class ViewEditFormController extends ViewFormControllerBase {
 
     $form['#tree'] = TRUE;
 
-    $form['#attached']['library'][] = array('system', 'jquery.ui.tabs');
-    $form['#attached']['library'][] = array('system', 'jquery.ui.dialog');
-    $form['#attached']['library'][] = array('system', 'drupal.states');
-    $form['#attached']['library'][] = array('system', 'drupal.tabledrag');
+    $form['#attached']['library'][] = array('core', 'jquery.ui.tabs');
+    $form['#attached']['library'][] = array('core', 'jquery.ui.dialog');
+    $form['#attached']['library'][] = array('core', 'drupal.states');
+    $form['#attached']['library'][] = array('core', 'drupal.tabledrag');
 
     if (!\Drupal::config('views.settings')->get('no_javascript')) {
       $form['#attached']['library'][] = array('views_ui', 'views_ui.admin');
@@ -225,6 +225,10 @@ class ViewEditFormController extends ViewFormControllerBase {
         array($this, 'cancel'),
       ),
     );
+    if ($this->entity->isLocked()) {
+      $actions['submit']['#access'] = FALSE;
+      $actions['cancel']['#access'] = FALSE;
+    }
     return $actions;
   }
 
@@ -235,6 +239,9 @@ class ViewEditFormController extends ViewFormControllerBase {
     parent::validate($form, $form_state);
 
     $view = $this->entity;
+    if ($view->isLocked()) {
+      $this->setFormError('', $form_state, $this->t('Changes cannot be made to a locked view.'));
+    }
     foreach ($view->getExecutable()->validate() as $display_errors) {
       foreach ($display_errors as $error) {
         $this->setFormError('', $form_state, $error);
@@ -494,7 +501,6 @@ class ViewEditFormController extends ViewFormControllerBase {
     $build['columns']['third'] = array(
       '#type' => 'details',
       '#title' => $this->t('Advanced'),
-      '#collapsed' => TRUE,
       '#theme_wrappers' => array('details'),
       '#attributes' => array(
         'class' => array(
@@ -503,11 +509,8 @@ class ViewEditFormController extends ViewFormControllerBase {
         ),
       ),
     );
-
     // Collapse the details by default.
-    if (\Drupal::config('views.settings')->get('ui.show.advanced_column')) {
-      $build['columns']['third']['#collapsed'] = FALSE;
-    }
+    $build['columns']['third']['#open'] = \Drupal::config('views.settings')->get('ui.show.advanced_column');
 
     // Each option (e.g. title, access, display as grid/table/list) fits into one
     // of several "buckets," or boxes (Format, Fields, Sort, and so on).

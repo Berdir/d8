@@ -8,7 +8,6 @@
 namespace Drupal\Component\Plugin;
 
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
-use Drupal\Component\Utility\MapArray;
 
 /**
  * Provides a default plugin bag for a plugin type.
@@ -63,7 +62,8 @@ class DefaultPluginBag extends PluginBag {
     $this->configurations = $configurations;
 
     if (!empty($configurations)) {
-      $this->instanceIDs = MapArray::copyValuesToKeys(array_keys($configurations));
+      $instance_ids = array_keys($configurations);
+      $this->instanceIDs = array_combine($instance_ids, $instance_ids);
       // Store the original order of the instance IDs for export.
       $this->originalOrder = $this->instanceIDs;
     }
@@ -101,11 +101,7 @@ class DefaultPluginBag extends PluginBag {
   }
 
   /**
-   * Returns the current configuration of all plugins in this bag.
-   *
-   * @return array
-   *   An associative array keyed by instance ID, whose values are up-to-date
-   *   plugin configurations.
+   * {@inheritdoc}
    */
   public function getConfiguration() {
     $instances = array();
@@ -132,6 +128,16 @@ class DefaultPluginBag extends PluginBag {
   /**
    * {@inheritdoc}
    */
+  public function setConfiguration($configuration) {
+    foreach ($configuration as $instance_id => $instance_configuration) {
+      $this->setInstanceConfiguration($instance_id, $instance_configuration);
+    }
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function setInstanceIds(array $instance_ids) {
     parent::setInstanceIds($instance_ids);
     // Ensure the new order matches the original order.
@@ -149,7 +155,7 @@ class DefaultPluginBag extends PluginBag {
    * @param array $configuration
    *   The plugin configuration to set.
    */
-  public function setConfiguration($instance_id, array $configuration) {
+  public function setInstanceConfiguration($instance_id, array $configuration) {
     $this->configurations[$instance_id] = $configuration;
     $instance = $this->get($instance_id);
     if ($instance instanceof ConfigurablePluginInterface) {

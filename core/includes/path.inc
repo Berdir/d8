@@ -160,7 +160,7 @@ function path_get_admin_paths() {
   $patterns = &drupal_static(__FUNCTION__);
   if (!isset($patterns)) {
     $paths = \Drupal::moduleHandler()->invokeAll('admin_paths');
-    drupal_alter('admin_paths', $paths);
+    \Drupal::moduleHandler()->alter('admin_paths', $paths);
     // Combine all admin paths into one array, and likewise for non-admin paths,
     // for easier handling.
     $patterns = array();
@@ -224,10 +224,6 @@ function drupal_valid_path($path, $dynamic_allowed = FALSE) {
       $route_name = $item['route_name'];
     }
   }
-  else {
-    $item = menu_get_item($path);
-    $route_name = $item['route_name'];
-  }
   // Check the new routing system.
   if (!empty($route_name)) {
     $map = array();
@@ -239,5 +235,5 @@ function drupal_valid_path($path, $dynamic_allowed = FALSE) {
     $item['access'] = menu_item_route_access($route, $path, $map, $request);
   }
   $menu_admin = FALSE;
-  return $item && $item['access'];
+  return !empty($item['access']);
 }

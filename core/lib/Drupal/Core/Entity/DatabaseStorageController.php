@@ -16,9 +16,9 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Uuid\Uuid;
 use Drupal\field\FieldInfo;
 use Drupal\field\FieldUpdateForbiddenException;
-use Drupal\field\FieldInterface;
-use Drupal\field\FieldInstanceInterface;
-use Drupal\field\Entity\Field;
+use Drupal\field\FieldConfigInterface;
+use Drupal\field\FieldInstanceConfigInterface;
+use Drupal\field\Entity\FieldConfig;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**

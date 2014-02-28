@@ -79,19 +79,6 @@ function statistics_node_links_alter(array &$node_links, NodeInterface $entity, 
 }
 
 /**
- * Implements hook_menu().
- */
-function statistics_menu() {
-  $items['admin/config/system/statistics'] = array(
-    'title' => 'Statistics',
-    'description' => 'Control details about what and how your site logs content statistics.',
-    'route_name' => 'statistics.settings',
-    'weight' => -15,
-  );
-  return $items;
-}
-
-/**
  * Implements hook_menu_link_defaults().
  */
 function statistics_menu_link_defaults() {
@@ -258,28 +245,6 @@ function statistics_preprocess_block(&$variables) {
   if ($variables['configuration']['module'] == 'statistics') {
     $variables['attributes']['role'] = 'navigation';
   }
-}
-
-/**
- * Implements hook_library_info().
- */
-function statistics_library_info() {
-  $libraries['drupal.statistics'] = array(
-    'title' => 'Statistics',
-    'version' => \Drupal::VERSION,
-    'js' => array(
-      drupal_get_path('module', 'statistics') . '/statistics.js' => array(
-        'scope' => 'footer'
-      ),
-    ),
-    'dependencies' => array(
-      array('system', 'jquery'),
-      array('system', 'drupal'),
-      array('system', 'drupalSettings'),
-    ),
-  );
-
-  return $libraries;
 }
 
 /**

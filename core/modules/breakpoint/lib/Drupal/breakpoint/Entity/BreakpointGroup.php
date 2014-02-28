@@ -18,11 +18,9 @@ use Drupal\breakpoint\InvalidBreakpointSourceTypeException;
  * @ConfigEntityType(
  *   id = "breakpoint_group",
  *   label = @Translation("Breakpoint group"),
- *   config_prefix = "breakpoint.breakpoint_group",
  *   entity_keys = {
  *     "id" = "id",
- *     "label" = "label",
- *     "uuid" = "uuid"
+ *     "label" = "label"
  *   }
  * )
  */

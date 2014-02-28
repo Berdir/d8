@@ -38,13 +38,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class ConfigStorageController extends EntityStorageControllerBase implements ConfigStorageControllerInterface {
 
   /**
-   * Name of the entity's UUID property.
-   *
-   * @var string
-   */
-  protected $uuidKey = 'uuid';
-
-  /**
    * The UUID service.
    *
    * @var \Drupal\Component\Uuid\UuidInterface
@@ -261,8 +254,8 @@ class ConfigStorageController extends EntityStorageControllerBase implements Con
     $entity->enforceIsNew();
 
     // Assign a new UUID if there is none yet.
-    if (!isset($entity->{$this->uuidKey})) {
-      $entity->{$this->uuidKey} = $this->uuidService->generate();
+    if (!$entity->uuid()) {
+      $entity->set('uuid', $this->uuidService->generate());
     }
     $entity->postCreate($this);
 
@@ -389,9 +382,9 @@ class ConfigStorageController extends EntityStorageControllerBase implements Con
    */
   protected function invokeHook($hook, EntityInterface $entity) {
     // Invoke the hook.
-    module_invoke_all($this->entityTypeId . '_' . $hook, $entity);
+    $this->moduleHandler->invokeAll($this->entityTypeId . '_' . $hook, array($entity));
     // Invoke the respective entity-level hook.
-    module_invoke_all('entity_' . $hook, $entity, $this->entityTypeId);
+    $this->moduleHandler->invokeAll('entity_' . $hook, array($entity, $this->entityTypeId));
   }
 
   /**

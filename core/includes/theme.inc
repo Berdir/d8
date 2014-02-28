@@ -12,12 +12,12 @@ use Drupal\Component\Utility\String;
 use Drupal\Component\Utility\Url;
 use Drupal\Core\Config\Config;
 use Drupal\Core\Language\Language;
+use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ExtensionNameLengthException;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Template\RenderWrapper;
 use Drupal\Core\Theme\ThemeSettings;
 use Drupal\Component\Utility\NestedArray;
-use Drupal\Component\Utility\MapArray;
 use Drupal\Core\Render\Element;
 
 /**
@@ -65,17 +65,20 @@ const RESPONSIVE_PRIORITY_LOW = 'priority-low';
 /**
  * Determines if a theme is available to use.
  *
- * @param $theme
+ * @param string|\Drupal\Core\Extension\Extension $theme
  *   Either the name of a theme or a full theme object.
  *
- * @return
+ * @return bool
  *   Boolean TRUE if the theme is enabled or is the site administration theme;
  *   FALSE otherwise.
  *
- * @deprecated Use \Drupal::service('access_check.theme')->checkAccess().
+ * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
+ *   Use \Drupal::service('access_check.theme')->checkAccess().
+ *
+ * @see \Drupal\Core\Theme\ThemeAccessCheck::checkAccess().
  */
 function drupal_theme_access($theme) {
-  if (is_object($theme)) {
+  if ($theme instanceof Extension) {
     $theme = $theme->name;
   }
   return \Drupal::service('access_check.theme')->checkAccess($theme);
@@ -118,19 +121,9 @@ function drupal_theme_initialize() {
  *
  * This function is useful to initialize a theme when no database is present.
  *
- * @param $theme
- *   An object with the following information:
- *     filename
- *       The .info.yml file for this theme. The 'path' to
- *       the theme will be in this file's directory. (Required)
- *     owner
- *       The path to the .theme file or the .engine file to load for
- *       the theme. (Required)
- *     stylesheet
- *       The primary stylesheet for the theme. (Optional)
- *     engine
- *       The name of theme engine to use. (Optional)
- * @param $base_theme
+ * @param \Drupal\Core\Extension\Extension $theme
+ *   The theme extension object.
+ * @param \Drupal\Core\Extension\Extension[] $base_theme
  *    An optional array of objects that represent the 'base theme' if the
  *    theme is meant to be derivative of another theme. It requires
  *    the same information as the $theme object. It should be in
@@ -362,7 +355,10 @@ function drupal_theme_rebuild() {
  *     names. This element is not set if there are no themes on the system that
  *     declare this theme as their base theme.
  *
- * @deprecated as of Drupal 8.0. Use \Drupal::service('theme_handler')->listInfo().
+ * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
+ *   Use \Drupal::service('theme_handler')->listInfo().
+ *
+ * @see \Drupal\Core\Extension\ThemeHandler::listInfo().
  */
 function list_themes($refresh = FALSE) {
   /** @var \Drupal\Core\Extension\ThemeHandler $theme_handler */
@@ -391,7 +387,10 @@ function list_themes($refresh = FALSE) {
  *   Returns an array of all of the theme's ancestors; the first element's value
  *   will be NULL if an error occurred.
  *
- * @deprecated as of Drupal 8.0. Use \Drupal::service('theme_handler')->getBaseThemes().
+ * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
+ *   Use \Drupal::service('theme_handler')->getBaseThemes().
+ *
+ * @see \Drupal\Core\Extension\ThemeHandler::getBaseThemes().
  */
 function drupal_find_base_themes($themes, $key) {
   return \Drupal::service('theme_handler')->getBaseThemes($themes, $key);
@@ -1089,7 +1088,10 @@ function theme_settings_convert_to_config(array $theme_settings, Config $config)
  * @param $theme_list
  *   An array of theme names.
  *
- * @deprecated as of Drupal 8.0. Use \Drupal::service('theme_handler')->enable().
+ * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
+ *   Use \Drupal::service('theme_handler')->enable().
+ *
+ * @see \Drupal\Core\Extension\ThemeHandler::enable().
  */
 function theme_enable($theme_list) {
   \Drupal::service('theme_handler')->enable($theme_list);
@@ -1101,7 +1103,10 @@ function theme_enable($theme_list) {
  * @param $theme_list
  *   An array of theme names.
  *
- * @deprecated as of Drupal 8.0. Use \Drupal::service('theme_handler')->disable().
+ * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
+ *   Use \Drupal::service('theme_handler')->disable().
+ *
+ * @see \Drupal\Core\Extension\ThemeHandler::disable().
  */
 function theme_disable($theme_list) {
   \Drupal::service('theme_handler')->disable($theme_list);
@@ -1276,10 +1281,11 @@ function template_preprocess_links(&$variables) {
       // Use the array key as class name.
       $li_attributes['class'][] = drupal_html_class($key);
 
+      $keys = array('title', 'href', 'route_name', 'route_parameters');
       $link_element = array(
         '#type' => 'link',
         '#title' => $link['title'],
-        '#options' => array_diff_key($link, MapArray::copyValuesToKeys(array('title', 'href', 'route_name', 'route_parameters'))),
+        '#options' => array_diff_key($link, array_combine($keys, $keys)),
         '#href' => $link['href'],
         '#route_name' => $link['route_name'],
         '#route_parameters' => $link['route_parameters'],
@@ -1575,7 +1581,7 @@ function theme_table($variables) {
 
   // Add sticky headers, if applicable.
   if (count($header) && $sticky) {
-    drupal_add_library('system', 'drupal.tableheader');
+    drupal_add_library('core', 'drupal.tableheader');
     // Add 'sticky-enabled' class to the table to identify it for JS.
     // This is needed to target tables constructed by this function.
     $attributes['class'][] = 'sticky-enabled';
@@ -1584,7 +1590,7 @@ function theme_table($variables) {
   // with the classes represented by the constants RESPONSIVE_PRIORITY_MEDIUM
   // and RESPONSIVE_PRIORITY_LOW, add the tableresponsive behaviors.
   if (count($header) && $responsive) {
-    drupal_add_library('system', 'drupal.tableresponsive');
+    drupal_add_library('core', 'drupal.tableresponsive');
     // Add 'responsive-enabled' class to the table to identify it for JS.
     // This is needed to target tables constructed by this function.
     $attributes['class'][] = 'responsive-enabled';
@@ -2016,7 +2022,7 @@ function _template_preprocess_default_variables() {
   }
 
   // Give modules a chance to alter the default template variables.
-  drupal_alter('template_preprocess_default_variables', $variables);
+  \Drupal::moduleHandler()->alter('template_preprocess_default_variables', $variables);
 
   return $variables;
 }
@@ -2142,7 +2148,7 @@ function template_preprocess_html(&$variables) {
     drupal_add_html_head($element, $name);
   }
 
-  drupal_add_library('system', 'html5shiv', TRUE);
+  drupal_add_library('core', 'html5shiv', TRUE);
 
   $variables['page_top'][] = array('#markup' => $page->getBodyTop());
   $variables['page_bottom'][] = array('#markup' => $page->getBodyBottom());
@@ -2176,7 +2182,7 @@ function template_preprocess_html(&$variables) {
  * @see drupal_render_page()
  */
 function template_preprocess_page(&$variables) {
-  $language_interface = language(Language::TYPE_INTERFACE);
+  $language_interface = \Drupal::languageManager()->getCurrentLanguage();
   $site_config = \Drupal::config('system.site');
 
   // Move some variables to the top level for themer convenience and template cleanliness.
@@ -2350,7 +2356,7 @@ function theme_get_suggestions($args, $base, $delimiter = '__') {
  * @see system_page_build()
  */
 function template_preprocess_maintenance_page(&$variables) {
-  $language_interface = language(Language::TYPE_INTERFACE);
+  $language_interface = \Drupal::languageManager()->getCurrentLanguage();
 
   // Initializes attributes which are specific to the html element.
   $variables['html_attributes'] = new Attribute;
@@ -2416,26 +2422,8 @@ function template_preprocess_maintenance_page(&$variables) {
 
   // These are usually added from system_page_build() except maintenance.css.
   // When the database is inactive it's not called so we add it here.
-  $default_css['library'][] = array('system', 'normalize');
-  $path = drupal_get_path('module', 'system');
-  // Adjust the weights to load these early.
-  $default_css['css'][$path . '/css/system.module.css'] = array(
-    'weight' => CSS_COMPONENT - 10,
-    'every_page' => TRUE,
-  );
-  $default_css['css'][$path . '/css/system.theme.css'] = array(
-    'weight' => CSS_SKIN - 10,
-    'every_page' => TRUE,
-  );
-  // Unlike regular pages, the admin.css is added for every maintenance page.
-  $default_css['css'][$path . '/css/system.admin.css'] = array(
-    'weight' => CSS_COMPONENT - 10,
-    'every_page' => TRUE,
-  );
-  $default_css['css'][$path . '/css/system.maintenance.css'] = array(
-    'weight' => CSS_COMPONENT - 10,
-    'every_page' => TRUE,
-  );
+  $default_css['library'][] = array('core', 'normalize');
+  $default_css['library'][] = array('system', 'maintenance');
   $attached = array('#attached' => $default_css);
   drupal_render($attached);
   $variables['messages'] = array(

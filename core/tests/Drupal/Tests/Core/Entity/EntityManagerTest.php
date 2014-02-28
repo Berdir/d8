@@ -106,7 +106,7 @@ class EntityManagerTest extends UnitTestCase {
     $this->moduleHandler = $this->getMock('Drupal\Core\Extension\ModuleHandlerInterface');
     $this->moduleHandler->expects($this->any())
       ->method('getImplementations')
-      ->with('entity_info')
+      ->with('entity_type_build')
       ->will($this->returnValue(array()));
 
     $this->cache = $this->getMock('Drupal\Core\Cache\CacheBackendInterface');
@@ -538,23 +538,6 @@ class EntityManagerTest extends UnitTestCase {
       ->will($this->returnValue(TRUE));
 
     $this->entityManager->getFieldDefinitions('test_entity_type');
-  }
-
-  /**
-   * Tests the getFieldDefinitionsByConstraints() method.
-   *
-   * @covers ::getFieldDefinitionsByConstraints()
-   */
-  public function testGetFieldDefinitionsByConstraints() {
-    $field_definition = $this->setUpEntityWithFieldDefinition();
-
-    $this->moduleHandler->expects($this->exactly(2))
-      ->method('invokeAll')
-      ->will($this->returnValue(array()));
-
-    $expected = array('id' => $field_definition);
-    $this->assertSame($expected, $this->entityManager->getFieldDefinitionsByConstraints('test_entity_type', array()));
-    $this->assertSame($expected, $this->entityManager->getFieldDefinitionsByConstraints('test_entity_type', array('Bundle' => 'test_entity_bundle')));
   }
 
   /**

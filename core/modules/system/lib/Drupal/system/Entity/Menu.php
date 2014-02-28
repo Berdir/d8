@@ -21,12 +21,10 @@ use Drupal\system\MenuInterface;
  *   controllers = {
  *     "access" = "Drupal\system\MenuAccessController"
  *   },
- *   config_prefix = "system.menu",
  *   admin_permission = "administer menu",
  *   entity_keys = {
  *     "id" = "id",
- *     "label" = "label",
- *     "uuid" = "uuid"
+ *     "label" = "label"
  *   }
  * )
  */

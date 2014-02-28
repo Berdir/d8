@@ -313,7 +313,7 @@ class CKEditor extends EditorBase implements ContainerFactoryPluginInterface {
     // be expensive to calculate all the time. The cache is cleared on core
     // upgrades which is the only situation the CKEditor file listing should
     // change.
-    $langcode_cache = cache('ckeditor.languages')->get('langcodes');
+    $langcode_cache = \Drupal::cache('ckeditor.languages')->get('langcodes');
     if (!empty($langcode_cache)) {
       $langcodes = $langcode_cache->data;
     }
@@ -325,7 +325,7 @@ class CKEditor extends EditorBase implements ContainerFactoryPluginInterface {
         $langcode = $language_file->getBasename('.js');
         $langcodes[$langcode] = $langcode;
       }
-      cache('ckeditor.languages')->set('langcodes', $langcodes);
+      \Drupal::cache('ckeditor.languages')->set('langcodes', $langcodes);
     }
 
     // Get language mapping if available to map to Drupal language codes.
@@ -405,7 +405,7 @@ class CKEditor extends EditorBase implements ContainerFactoryPluginInterface {
       drupal_get_path('module', 'ckeditor') . '/css/ckeditor-iframe.css',
       drupal_get_path('module', 'system') . '/css/system.module.css',
     );
-    drupal_alter('ckeditor_css', $css, $editor);
+    $this->moduleHandler->alter('ckeditor_css', $css, $editor);
     $css = array_merge($css, _ckeditor_theme_css());
     $css = array_map('file_create_url', $css);
 

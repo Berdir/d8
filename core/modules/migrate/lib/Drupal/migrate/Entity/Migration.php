@@ -26,12 +26,10 @@ use Drupal\migrate\Plugin\RequirementsInterface;
  *   controllers = {
  *     "storage" = "Drupal\migrate\MigrationStorageController"
  *   },
- *   config_prefix = "migrate.migration",
  *   entity_keys = {
  *     "id" = "id",
  *     "label" = "label",
- *     "weight" = "weight",
- *     "uuid" = "uuid"
+ *     "weight" = "weight"
  *   }
  * )
  */

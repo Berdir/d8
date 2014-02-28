@@ -151,7 +151,7 @@ services:
     arguments: [path_alias_whitelist, '@cache.cache', '@lock', '@state', '@database']
   path.alias_manager:
     class: Drupal\Core\Path\AliasManager
-    arguments: ['@database', '@path.alias_whitelist', '@language_manager']
+    arguments: ['@path.crud', '@path.alias_whitelist', '@language_manager']
   http_client_simpletest_subscriber:
     class: Drupal\Core\Http\Plugin\SimpletestHttpRequestSubscriber
   http_default_client:
@@ -212,7 +212,7 @@ services:
     arguments: ['@controller_resolver', '@request', '@router.route_provider', '@module_handler', '@cache.cache', '@language_manager', '@access_manager', '@current_user']
   plugin.manager.menu.local_task:
     class: Drupal\Core\Menu\LocalTaskManager
-    arguments: ['@controller_resolver', '@request', '@router.route_provider', '@module_handler', '@cache.cache', '@language_manager', '@access_manager', '@current_user']
+    arguments: ['@controller_resolver', '@request', '@router.route_provider', '@router.builder', '@module_handler', '@cache.cache', '@language_manager', '@access_manager', '@current_user']
   plugin.manager.menu.contextual_link:
     class: Drupal\Core\Menu\ContextualLinkManager
     arguments: ['@controller_resolver', '@module_handler', '@cache.cache', '@language_manager', '@access_manager', '@current_user']
@@ -302,6 +302,11 @@ services:
     calls:
       - [setContext, ['@router.request_context']]
       - [add, ['@router.dynamic']]
+  router.path_roots_subscriber:
+    class: Drupal\Core\EventSubscriber\PathRootsSubscriber
+    arguments: ['@state']
+    tags:
+      - { name: event_subscriber }
   entity.query:
     class: Drupal\Core\Entity\Query\QueryFactory
     arguments: ['@entity.manager']
@@ -582,9 +587,9 @@ services:
   flood:
     class: Drupal\Core\Flood\DatabaseBackend
     arguments: ['@database', '@request']
-  mail.factory:
-    class: Drupal\Core\Mail\MailFactory
-    arguments: ['@config.factory']
+  plugin.manager.mail:
+    class: Drupal\Core\Mail\MailManager
+    arguments: ['@container.namespaces', '@cache.cache', '@language_manager', '@module_handler', '@config.factory']
   plugin.manager.condition:
     class: Drupal\Core\Condition\ConditionManager
     parent: default_plugin_manager

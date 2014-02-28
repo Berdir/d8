@@ -8,7 +8,6 @@
 namespace Drupal\node;
 
 use Drupal\Core\Entity\EntityFormController;
-use Drupal\Component\Utility\MapArray;
 use Drupal\Component\Utility\String;
 
 /**
@@ -32,7 +31,8 @@ class NodeTypeFormController extends EntityFormController {
 
     $node_settings = $type->getModuleSettings('node');
     // Prepare node options to be used for 'checkboxes' form element.
-    $node_settings['options'] = MapArray::copyValuesToKeys(array_keys(array_filter($node_settings['options'])));
+    $keys = array_keys(array_filter($node_settings['options']));
+    $node_settings['options'] = array_combine($keys, $keys);
     $form['name'] = array(
       '#title' => t('Name'),
       '#type' => 'textfield',
@@ -74,6 +74,7 @@ class NodeTypeFormController extends EntityFormController {
       '#type' => 'details',
       '#title' => t('Submission form settings'),
       '#group' => 'additional_settings',
+      '#open' => TRUE,
     );
     $form['submission']['title_label'] = array(
       '#title' => t('Title field label'),
@@ -108,7 +109,6 @@ class NodeTypeFormController extends EntityFormController {
     $form['workflow'] = array(
       '#type' => 'details',
       '#title' => t('Publishing options'),
-      '#collapsed' => TRUE,
       '#group' => 'additional_settings',
     );
     $form['workflow']['options'] = array('#type' => 'checkboxes',
@@ -127,7 +127,6 @@ class NodeTypeFormController extends EntityFormController {
       $form['language'] = array(
         '#type' => 'details',
         '#title' => t('Language settings'),
-        '#collapsed' => TRUE,
         '#group' => 'additional_settings',
       );
 
@@ -144,7 +143,6 @@ class NodeTypeFormController extends EntityFormController {
     $form['display'] = array(
       '#type' => 'details',
       '#title' => t('Display settings'),
-      '#collapsed' => TRUE,
       '#group' => 'additional_settings',
     );
     $form['display']['submitted'] = array(

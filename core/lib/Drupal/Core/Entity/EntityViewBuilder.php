@@ -11,6 +11,7 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\TypedData\TranslatableInterface;
 use Drupal\entity\Entity\EntityViewDisplay;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -113,7 +114,7 @@ class EntityViewBuilder extends EntityControllerBase implements EntityController
     }
 
     // Invoke hook_entity_prepare_view().
-    module_invoke_all('entity_prepare_view', $this->entityTypeId, $entities, $displays, $view_mode);
+    \Drupal::moduleHandler()->invokeAll('entity_prepare_view', array($this->entityTypeId, $entities, $displays, $view_mode));
 
     // Let the displays build their render arrays.
     foreach ($entities_by_bundle as $bundle => $bundle_entities) {
@@ -147,7 +148,7 @@ class EntityViewBuilder extends EntityControllerBase implements EntityController
 
     // Cache the rendered output if permitted by the view mode and global entity
     // type configuration.
-    if ($this->isViewModeCacheable($view_mode) && !$entity->isNew() && !isset($entity->in_preview) && $this->entityType->isRenderCacheable()) {
+    if ($this->isViewModeCacheable($view_mode) && !$entity->isNew() && $entity->isDefaultRevision() && $this->entityType->isRenderCacheable()) {
       $return['#cache'] = array(
         'keys' => array('entity_view', $this->entityTypeId, $entity->id(), $view_mode),
         'granularity' => DRUPAL_CACHE_PER_ROLE,
@@ -157,6 +158,10 @@ class EntityViewBuilder extends EntityControllerBase implements EntityController
           $this->entityTypeId => array($entity->id()),
         ),
       );
+
+      if ($entity instanceof TranslatableInterface && count($entity->getTranslationLanguages()) > 1) {
+        $return['#cache']['keys'][] = $langcode;
+      }
     }
 
     return $return;
@@ -209,7 +214,7 @@ class EntityViewBuilder extends EntityControllerBase implements EntityController
 
       // Allow modules to change the view mode.
       $entity_view_mode = $view_mode;
-      drupal_alter('entity_view_mode', $entity_view_mode, $entity, $context);
+      $this->moduleHandler->alter('entity_view_mode', $entity_view_mode, $entity, $context);
       // Store entities for rendering by view_mode.
       $view_modes[$entity_view_mode][$entity->id()] = $entity;
     }
@@ -225,8 +230,8 @@ class EntityViewBuilder extends EntityControllerBase implements EntityController
     foreach ($entities as $key => $entity) {
       $entity_view_mode = isset($entity->content['#view_mode']) ? $entity->content['#view_mode'] : $view_mode;
       $display = $displays[$entity_view_mode][$entity->bundle()];
-      module_invoke_all($view_hook, $entity, $display, $entity_view_mode, $langcode);
-      module_invoke_all('entity_view', $entity, $display, $entity_view_mode, $langcode);
+      \Drupal::moduleHandler()->invokeAll($view_hook, array($entity, $display, $entity_view_mode, $langcode));
+      \Drupal::moduleHandler()->invokeAll('entity_view', array($entity, $display, $entity_view_mode, $langcode));
 
       $build[$key] = $entity->content;
       // We don't need duplicate rendering info in $entity->content.
@@ -248,7 +253,7 @@ class EntityViewBuilder extends EntityControllerBase implements EntityController
       $build[$key]['#weight'] = $weight++;
 
       // Allow modules to modify the render array.
-      drupal_alter(array($view_hook, 'entity_view'), $build[$key], $entity, $display);
+      $this->moduleHandler->alter(array($view_hook, 'entity_view'), $build[$key], $entity, $display);
     }
 
     return $build;

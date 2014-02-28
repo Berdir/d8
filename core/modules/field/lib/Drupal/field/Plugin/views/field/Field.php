@@ -7,7 +7,6 @@
 
 namespace Drupal\field\Plugin\views\field;
 
-use Drupal\Component\Utility\MapArray;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
@@ -43,7 +42,7 @@ class Field extends FieldPluginBase {
   /**
    * The field information as returned by field_info_field().
    *
-   * @var \Drupal\field\FieldInterface
+   * @var \Drupal\field\FieldConfigInterface
    */
   public $field_info;
 
@@ -414,7 +413,7 @@ class Field extends FieldPluginBase {
       $form['click_sort_column'] = array(
         '#type' => 'select',
         '#title' => t('Column used for click sorting'),
-        '#options' => drupal_map_assoc($column_names),
+        '#options' => array_combine($column_names, $column_names),
         '#default_value' => $this->options['click_sort_column'],
         '#description' => t('Used by Style: Table to determine the actual column to click sort the field on. The default is usually fine.'),
       );
@@ -478,7 +477,6 @@ class Field extends FieldPluginBase {
     $form['multiple_field_settings'] = array(
       '#type' => 'details',
       '#title' => t('Multiple field settings'),
-      '#collapsed' => TRUE,
       '#weight' => 5,
     );
 
@@ -501,7 +499,8 @@ class Field extends FieldPluginBase {
     }
     else {
       $type = 'select';
-      $options = drupal_map_assoc(range(1, $field->getCardinality()));
+      $range = range(1, $field->getCardinality());
+      $options = array_combine($range, $range);
       $size = 1;
     }
     $form['multi_type'] = array(
@@ -600,9 +599,10 @@ class Field extends FieldPluginBase {
     // With "field API" fields, the column target of the grouping function
     // and any additional grouping columns must be specified.
 
+    $field_columns = array_keys($this->field_info->getColumns());
     $group_columns = array(
       'entity_id' => t('Entity ID'),
-    ) + MapArray::copyValuesToKeys(array_keys($this->field_info->getColumns()), 'ucfirst');
+    ) + array_map('ucfirst', array_combine($field_columns, $field_columns));
 
     $form['group_column'] = array(
       '#type' => 'select',
@@ -612,8 +612,11 @@ class Field extends FieldPluginBase {
       '#options' => $group_columns,
     );
 
-    $options = MapArray::copyValuesToKeys(array('bundle', 'language', 'entity_type'), 'ucfirst');
-
+    $options = array(
+      'bundle' => 'Bundle',
+      'language' => 'Language',
+      'entity_type' => 'Entity_type',
+    );
     // Add on defined fields, noting that they're prefixed with the field name.
     $form['group_columns'] = array(
       '#type' => 'checkboxes',

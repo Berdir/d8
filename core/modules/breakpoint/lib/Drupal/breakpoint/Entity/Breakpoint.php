@@ -21,11 +21,9 @@ use Drupal\breakpoint\InvalidBreakpointMediaQueryException;
  * @ConfigEntityType(
  *   id = "breakpoint",
  *   label = @Translation("Breakpoint"),
- *   config_prefix = "breakpoint.breakpoint",
  *   entity_keys = {
  *     "id" = "id",
- *     "label" = "label",
- *     "uuid" = "uuid"
+ *     "label" = "label"
  *   }
  * )
  */

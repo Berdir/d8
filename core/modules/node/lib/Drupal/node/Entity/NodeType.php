@@ -29,12 +29,11 @@ use Drupal\node\NodeTypeInterface;
  *     "list" = "Drupal\node\NodeTypeListController",
  *   },
  *   admin_permission = "administer content types",
- *   config_prefix = "node.type",
+ *   config_prefix = "type",
  *   bundle_of = "node",
  *   entity_keys = {
  *     "id" = "type",
- *     "label" = "name",
- *     "uuid" = "uuid"
+ *     "label" = "name"
  *   },
  *   links = {
  *     "add-form" = "node.add",
@@ -196,6 +195,9 @@ class NodeType extends ConfigEntityBase implements NodeTypeInterface {
     else {
       // Invalidate the cache tag of the updated node type only.
       Cache::invalidateTags(array('node_type' => $this->id()));
+
+      // Invalidate the render cache for all nodes.
+      \Drupal::entityManager()->getViewBuilder('node')->resetCache();
     }
   }
 

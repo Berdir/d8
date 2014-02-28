@@ -13,7 +13,7 @@ use Drupal\Core\Database\Install\TaskException;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageManager;
 use Drupal\Core\StringTranslation\Translator\FileTranslation;
-
+use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
@@ -296,7 +296,6 @@ function install_begin_request(&$install_state) {
   require_once __DIR__ . '/install.inc';
   require_once __DIR__ . '/schema.inc';
   require_once __DIR__ . '/../../' . settings()->get('path_inc', 'core/includes/path.inc');
-  require_once __DIR__ . '/cache.inc';
   require_once __DIR__ . '/database.inc';
   require_once __DIR__ . '/form.inc';
   require_once __DIR__ . '/batch.inc';
@@ -495,7 +494,21 @@ function install_begin_request(&$install_state) {
     // Override the module list with a minimal set of modules.
     $module_handler->setModuleList(array('system' => 'core/modules/system/system.module'));
   }
-  $module_handler->load('system');
+  // After setting up a custom and finite module list in a custom low-level
+  // bootstrap like here, ensure to use ModuleHandler::loadAll() so that
+  // ModuleHandler::isLoaded() returns TRUE, since that is a condition being
+  // checked by other subsystems (e.g., the theme system).
+  $module_handler->loadAll();
+
+  // Add list of all available profiles to the installation state.
+  $listing = new ExtensionDiscovery();
+  $listing->setProfileDirectories(array());
+  $install_state['profiles'] += $listing->scan('profile');
+
+  // Prime drupal_get_filename()'s static cache.
+  foreach ($install_state['profiles'] as $name => $profile) {
+    drupal_get_filename('profile', $name, $profile->uri);
+  }
 
   // Prepare for themed output. We need to run this at the beginning of the
   // page request to avoid a different theme accidentally getting set. (We also
@@ -529,9 +542,6 @@ function install_begin_request(&$install_state) {
 
   // Modify the installation state as appropriate.
   $install_state['completed_task'] = $task;
-
-  // Add the list of available profiles to the installation state.
-  $install_state['profiles'] += drupal_system_listing('/^' . DRUPAL_PHP_FUNCTION_PATTERN . '\.profile$/', 'profiles');
 }
 
 /**
@@ -1255,17 +1265,14 @@ function install_settings_form_submit($form, &$form_state) {
     'value'    => $database,
     'required' => TRUE,
   );
-  $settings['drupal_hash_salt'] = (object) array(
-    'value'    => Crypt::randomStringHashed(55),
+  $settings['settings']['hash_salt'] = (object) array(
+    'value'    => Crypt::randomBytesBase64(55),
     'required' => TRUE,
   );
-
   // Remember the profile which was used.
-  $settings['settings'] = array(
-    'install_profile' => (object) array(
-      'value' => $install_state['parameters']['profile'],
-      'required' => TRUE,
-    ),
+  $settings['settings']['install_profile'] = (object) array(
+    'value' => $install_state['parameters']['profile'],
+    'required' => TRUE,
   );
 
   drupal_rewrite_settings($settings);
@@ -2082,7 +2089,7 @@ function install_configure_form($form, &$form_state, &$install_state) {
 
   $form['#attached']['library'][] = array('system', 'drupal.system');
   // Add JavaScript time zone detection.
-  $form['#attached']['library'][] = array('system', 'drupal.timezone');
+  $form['#attached']['library'][] = array('core', 'drupal.timezone');
   // We add these strings as settings because JavaScript translation does not
   // work during installation.
   $js = array('copyFieldValue' => array('edit-site-mail' => array('edit-account-mail')));
