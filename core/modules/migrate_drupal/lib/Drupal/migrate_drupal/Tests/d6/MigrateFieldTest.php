@@ -10,6 +10,9 @@ namespace Drupal\migrate_drupal\Tests\d6;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
+/**
+ * Test field migrations.
+ */
 class MigrateFieldTest extends MigrateDrupalTestBase {
 
   public static $modules = array('number', 'email', 'telephone', 'link', 'file', 'image', 'datetime', 'node');
@@ -25,6 +28,9 @@ class MigrateFieldTest extends MigrateDrupalTestBase {
     );
   }
 
+  /**
+   * Test field migrations.
+   */
   public function testFields() {
     /** @var \Drupal\migrate\entity\Migration $migration */
     $migration = entity_load('migration', 'd6_field');
@@ -58,18 +64,20 @@ class MigrateFieldTest extends MigrateDrupalTestBase {
     $field = entity_load('field_config', 'node.field_test_filefield');
     $this->assertEqual($field->type, "file", "Field type is file.");
 
-    // Image field.
+    /** @var \Drupal\field\Entity\FieldConfig $field */
     $field = entity_load('field_config', 'node.field_test_imagefield');
+    $this->assertEqual($field->type, "image", "Field type is image.");
     $expected = array(
       'column_groups' => array(
         'alt' => array('label' => 'Test alt'),
         'title' => array('label' => 'Test title'),
       ),
+      'target_type' => 'file',
       'uri_scheme' => 'public',
       'default_image' => array('fid' => '', 'alt' => '', 'title' => '', 'width' => '', 'height' => ''),
     );
-    $this->assertEqual($field->type, "image", "Field type is image.");
-    $this->assertEqual($field->settings, $expected, "Field type image settings are correct");
+    $this->assertFalse(array_diff_assoc($field->getSettings(), $expected));
+    $this->assertFalse(array_diff_assoc($expected, $field->getSettings()));
 
     // Phone field.
     $field = entity_load('field_config', 'node.field_test_phone');
