@@ -7,6 +7,7 @@
 
 namespace Drupal\migrate_drupal\Tests\d6;
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
@@ -67,17 +68,13 @@ class MigrateFieldTest extends MigrateDrupalTestBase {
     /** @var \Drupal\field\Entity\FieldConfig $field */
     $field = entity_load('field_config', 'node.field_test_imagefield');
     $this->assertEqual($field->type, "image", "Field type is image.");
-    $expected = array(
-      'column_groups' => array(
-        'alt' => array('label' => 'Test alt'),
-        'title' => array('label' => 'Test title'),
-      ),
-      'target_type' => 'file',
-      'uri_scheme' => 'public',
-      'default_image' => array('fid' => '', 'alt' => '', 'title' => '', 'width' => '', 'height' => ''),
-    );
-    $this->assertFalse(array_diff_assoc($field->getSettings(), $expected));
-    $this->assertFalse(array_diff_assoc($expected, $field->getSettings()));
+    $settings = $field->getSettings();
+    $this->assertEqual($settings['column_groups']['alt']['label'], 'Test alt');
+    $this->assertEqual($settings['column_groups']['title']['label'], 'Test title');
+    $this->assertEqual($settings['target_type'], 'file');
+    $this->assertEqual($settings['uri_scheme'], 'public');
+    $this->assertEqual($settings['default_image']['fid'], '');
+    $this->assertEqual(array_filter($settings['default_image']), array());
 
     // Phone field.
     $field = entity_load('field_config', 'node.field_test_phone');
