@@ -434,9 +434,11 @@ function book_children($book_link) {
 }
 
 /**
- * Implements hook_node_load().
+ * Implements hook_node_load_uncached().
+ *
+ * @todo: Use hook_node_load() and clear caches when changes happen.
  */
-function book_node_load($nodes) {
+function book_node_load_uncached($nodes) {
   $result = db_query("SELECT * FROM {book} b INNER JOIN {menu_links} ml ON b.mlid = ml.mlid WHERE b.nid IN (:nids)", array(':nids' =>  array_keys($nodes)), array('fetch' => PDO::FETCH_ASSOC));
   foreach ($result as $record) {
     $nodes[$record['nid']]->book = $record;

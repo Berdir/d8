@@ -9,6 +9,7 @@ namespace Drupal\custom_block\Entity;
 
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\FieldDefinition;
 use Drupal\custom_block\CustomBlockInterface;
 
@@ -73,13 +74,6 @@ class CustomBlock extends ContentEntityBase implements CustomBlockInterface {
     $duplicate->revision_id->value = NULL;
     $duplicate->id->value = NULL;
     return $duplicate;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getRevisionId() {
-    return $this->get('revision_id')->value;
   }
 
   /**
@@ -163,7 +157,7 @@ class CustomBlock extends ContentEntityBase implements CustomBlockInterface {
   /**
    * {@inheritdoc}
    */
-  public static function baseFieldDefinitions($entity_type) {
+  public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields['id'] = FieldDefinition::create('integer')
       ->setLabel(t('Custom block ID'))
       ->setDescription(t('The custom block ID.'))

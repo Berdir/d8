@@ -7,12 +7,12 @@
 
 namespace Drupal\Core\Entity;
 
+use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\Query\QueryInterface;
+use Drupal\Core\Field\PrepareCacheInterface;
 use Drupal\Core\Language\Language;
-use Drupal\Component\Utility\NestedArray;
-use Drupal\Component\Uuid\Uuid;
 use Drupal\field\FieldInfo;
 use Drupal\field\FieldUpdateForbiddenException;
 use Drupal\field\FieldConfigInterface;
@@ -65,7 +65,23 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
    *
    * @var boolean
    */
-  protected $cache;
+  protected $staticCache;
+
+  /**
+   * Whether this entity type should use the persistent cache.
+   *
+   * Set by entity info.
+   *
+   * @var boolean
+   */
+  protected $persistentCache;
+
+  /**
+   * Holds statically cached entities.
+   *
+   * @var array
+   */
+  protected $entities = array();
 
   /**
    * Active database connection.
@@ -82,13 +98,35 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
   protected $fieldInfo;
 
   /**
+   * Cache backend.
+   *
+   * @var \Drupal\Core\Cache\CacheBackendInterface
+   */
+  protected $cacheBackend;
+
+  /**
+   * The entity bundle key.
+   *
+   * @var string|bool
+   */
+  protected $bundleKey = FALSE;
+
+  /**
+   * Name of the entity class.
+   *
+   * @var string
+   */
+  protected $entityClass;
+
+  /**
    * {@inheritdoc}
    */
   public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type) {
     return new static(
       $entity_type,
       $container->get('database'),
-      $container->get('field.info')
+      $container->get('field.info'),
+      $container->get('cache.entity')
     );
   }
 
@@ -101,12 +139,19 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
    *   The database connection to be used.
    * @param \Drupal\field\FieldInfo $field_info
    *   The field info service.
+   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
+   *   Cache backend instance to use.
    */
-  public function __construct(EntityTypeInterface $entity_type, Connection $database, FieldInfo $field_info) {
+  public function __construct(EntityTypeInterface $entity_type, Connection $database, FieldInfo $field_info, CacheBackendInterface $cache) {
     parent::__construct($entity_type);
 
     $this->database = $database;
     $this->fieldInfo = $field_info;
+    $this->cacheBackend = $cache;
+
+    // Check if the entity type supports caching of loaded entities.
+    $this->staticCache = $this->entityType->isStaticallyCacheable();
+    $this->persistentCache = $this->entityType->isFieldDataCacheable();
 
     // Check if the entity type supports IDs.
     if ($this->entityType->hasKey('id')) {
@@ -137,60 +182,241 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
    * {@inheritdoc}
    */
   public function loadMultiple(array $ids = NULL) {
-    $entities = array();
-
     // Create a new variable which is either a prepared version of the $ids
     // array for later comparison with the entity cache, or FALSE if no $ids
     // were passed. The $ids array is reduced as items are loaded from cache,
     // and we need to know if it's empty for this reason to avoid querying the
     // database when all requested entities are loaded from cache.
     $passed_ids = !empty($ids) ? array_flip($ids) : FALSE;
+
     // Try to load entities from the static cache, if the entity type supports
-    // static caching.
-    if ($this->cache && $ids) {
-      $entities += $this->cacheGet($ids);
-      // If any entities were loaded, remove them from the ids still to load.
-      if ($passed_ids) {
-        $ids = array_keys(array_diff_key($passed_ids, $entities));
-      }
+    // static caching. This will remove ID's that were loaded from $ids.
+    $entities_from_static_cache = $this->getFromStaticCache($ids);
+
+    // Load remaining entities either from the persistent cache or storage.
+    $entities = $this->doLoadMultiple($ids);
+    $this->invokeLoadUncachedHook($entities);
+    $this->setStaticCache($entities);
+
+    $entities += $entities_from_static_cache;
+    return $this->ensureOrder($passed_ids, $entities);
+  }
+
+  /**
+   * Loads entities from persistent cache or storage.
+   *
+   * @param array $ids
+   *   List of entity IDs to load or NULL to load all.
+   *
+   * @return \Drupal\Core\Entity\ContentEntityInterface[]
+   *   Array of loaded entities.
+   */
+  protected function doLoadMultiple(array $ids = NULL) {
+    // There is nothing to do if $ids is an empty array.
+    if ($ids === array()) {
+      return array();
     }
 
-    // Load any remaining entities from the database. This is the case if $ids
-    // is set to NULL (so we load all entities) or if there are any ids left to
-    // load.
+    // Attempt to load entities from the persistent cache. This will remove ID's
+    // that were loaded from $ids.
+    $entities_from_cache = $this->getFromPersistentCache($ids);
+
+    // Load any remaining entities from the database.
+    $entities_from_storage = $this->getFromStorage($ids);
+    $this->setPersistentCache($entities_from_storage);
+
+    return $entities_from_cache + $entities_from_storage;
+  }
+
+  /**
+   * Gets entities from the storage.
+   *
+   * @param array|null $ids
+   *   If not empty, return entities that match these IDs. Return all entities
+   *   when NULL.
+   *
+   * @return \Drupal\Core\Entity\ContentEntityInterface[]
+   *   Array of entities from the entity cache.
+   */
+  protected function getFromStorage(array $ids = NULL) {
+    $entities = array();
+
     if ($ids === NULL || $ids) {
       // Build and execute the query.
       $query_result = $this->buildQuery($ids)->execute();
-      $queried_entities = $query_result->fetchAllAssoc($this->idKey);
+      $records = $query_result->fetchAllAssoc($this->idKey);
+
+      // Map the loaded records into entity objects and according fields.
+      if ($records) {
+        $entities = $this->mapFromStorageRecords($records);
+
+        // Attach field values.
+        if ($this->entityType->isFieldable()) {
+          $this->loadFieldItems($entities);
+        }
+      }
     }
 
     // Pass all entities loaded from the database through $this->postLoad(),
-    // which attaches fields (if supported by the entity type) and calls the
-    // entity type specific load callback, for example hook_node_load().
-    if (!empty($queried_entities)) {
-      $this->postLoad($queried_entities);
-      $entities += $queried_entities;
-    }
-
-    if ($this->cache) {
-      // Add entities to the cache.
-      if (!empty($queried_entities)) {
-        $this->cacheSet($queried_entities);
-      }
-    }
-
-    // Ensure that the returned array is ordered the same as the original
-    // $ids array if this was passed in and remove any invalid ids.
-    if ($passed_ids) {
-      // Remove any invalid ids from the array.
-      $passed_ids = array_intersect_key($passed_ids, $entities);
-      foreach ($entities as $entity) {
-        $passed_ids[$entity->id()] = $entity;
-      }
-      $entities = $passed_ids;
-    }
+    // to invoke the load hooks and postLoad() method on the entity class.
+    $this->postLoad($entities);
 
     return $entities;
+  }
+
+  /**
+   * Gets entities from the static cache.
+   *
+   * @param array &$ids
+   *   If not empty, return entities that match these IDs. ID's that were found
+   *   will be removed from the list.
+   *
+   * @return \Drupal\Core\Entity\ContentEntityInterface[]
+   *   Array of entities from the entity cache.
+   */
+  protected function getFromStaticCache(&$ids) {
+    $entities = array();
+
+    if ($this->staticCache && $ids) {
+      $entities = array();
+      // Load any available entities from the internal cache.
+      if (!empty($this->entities)) {
+        foreach ($ids as $index => $id) {
+          if (isset($this->entities[$id])) {
+            $entities[$id] = $this->entities[$id];
+            // Remove the ID from the list.
+            unset($ids[$index]);
+          }
+        }
+      }
+    }
+    return $entities;
+  }
+
+  /**
+   * Stores entities in the static entity cache.
+   *
+   * @param \Drupal\Core\Entity\ContentEntityInterface[] $entities
+   *   Entities to store in the cache.
+   */
+  protected function setStaticCache(array $entities) {
+    if ($this->staticCache) {
+      $this->entities += $entities;
+    }
+  }
+
+  /**
+   * Gets entities from the persistent cache.
+   *
+   * @param array &$ids
+   *   If not empty, return entities that match these IDs. ID's that were found
+   *   will be removed from the list.
+   *
+   * @return \Drupal\Core\Entity\ContentEntityInterface[]
+   *   Array of entities from the entity cache.
+   */
+  protected function getFromPersistentCache(&$ids) {
+    if (!$this->persistentCache || empty($ids)) {
+      return array();
+    }
+    $entities = array();
+    // Build the list of cache entries to retrieve.
+    $cids = array();
+    foreach ($ids as $id) {
+      $cids[] = $this->buildCacheId($id);
+    }
+    if ($cache = $this->cacheBackend->getMultiple($cids)) {
+      // Create entity objects based on the loaded values from the cache.
+      foreach ($ids as $index => $id) {
+        $cid = $this->buildCacheId($id);
+        if (isset($cache[$cid])) {
+          $values = $cache[$cid]->data['values'];
+          $translations = $cache[$cid]->data['translations'];
+          $bundle = $this->bundleKey ? $cache[$cid]->data['bundle'] : FALSE;
+          $entities[$id] = new $this->entityClass($values, $this->entityTypeId, $bundle, $translations);
+          unset($ids[$index]);
+        }
+      }
+    }
+    return $entities;
+  }
+
+  /**
+   * Stores entities in the persistent entity cache.
+   *
+   * @param \Drupal\Core\Entity\ContentEntityInterface[] $entities
+   *   Entities to store in the cache.
+   */
+  protected function setPersistentCache($entities) {
+    if (!$this->persistentCache) {
+      return;
+    }
+
+    foreach ($entities as $id => $entity) {
+      $data = array(
+        'id' => $entity->id(),
+        'bundle' => $entity->bundle(),
+        'translations' => array_keys($entity->getTranslationLanguages()),
+        'values' => $entity->getCacheData(),
+      );
+      $this->cacheBackend->set($this->buildCacheId($id), $data, CacheBackendInterface::CACHE_PERMANENT, array($this->entityTypeId . '_values' => TRUE));
+    }
+  }
+
+  /**
+   * Invokes hook_entity_load_uncached().
+   *
+   * @param \Drupal\Core\Entity\EntityInterface[] $entities
+   *   List of entities, keyed on the entity ID.
+   */
+  protected function invokeLoadUncachedHook(array &$entities) {
+    if (!empty($entities)) {
+      // Call hook_entity_load_uncached().
+      foreach ($this->moduleHandler()->getImplementations('entity_load_uncached') as $module) {
+        $function = $module . '_entity_load_uncached';
+        $function($entities, $this->entityTypeId);
+      }
+      // Call hook_TYPE_load_uncached().
+      foreach ($this->moduleHandler()->getImplementations($this->entityTypeId . '_load_uncached') as $module) {
+        $function = $module . '_' . $this->entityTypeId . '_load_uncached';
+        $function($entities);
+      }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function resetCache(array $ids = NULL) {
+    if ($ids) {
+      $cids = array();
+      foreach ($ids as $id) {
+        unset($this->entities[$id]);
+        $cids[] = $this->buildCacheId($id);
+      }
+      if ($this->persistentCache) {
+        $this->cacheBackend->deleteMultiple($cids);
+      }
+    }
+    else {
+      $this->entities = array();
+      if ($this->persistentCache) {
+        $this->cacheBackend->deleteTags(array($this->entityTypeId . '_values' => TRUE));
+      }
+    }
+  }
+
+  /**
+   * Returns the cache ID for the passed in entity ID.
+   *
+   * @param int $id
+   *   Entity ID for which the cache ID should be built.
+   *
+   * @return string
+   *   Cache ID that can be passed to the cache backend.
+   */
+  protected function buildCacheId($id) {
+    return "values:{$this->entityTypeId}:$id";
   }
 
   /**
@@ -268,7 +494,7 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
       }
 
       $data = $query->execute();
-      $field_definitions = \Drupal::entityManager()->getFieldDefinitions($this->entityTypeId);
+      $field_definitions = \Drupal::entityManager()->getBaseFieldDefinitions($this->entityTypeId);
       $translations = array();
       if ($this->revisionDataTable) {
         $data_column_names = array_flip(array_diff(drupal_schema_fields_sql($this->entityType->getRevisionDataTable()), drupal_schema_fields_sql($this->entityType->getBaseTable())));
@@ -321,15 +547,20 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
   public function loadRevision($revision_id) {
     // Build and execute the query.
     $query_result = $this->buildQuery(array(), $revision_id)->execute();
-    $queried_entities = $query_result->fetchAllAssoc($this->idKey);
+    if ($records = $query_result->fetchAllAssoc($this->idKey)) {
+      // Map the record to an entity.
+      $entities = $this->mapFromStorageRecords($records);
 
-    // Pass the loaded entities from the database through $this->postLoad(),
-    // which attaches fields (if supported by the entity type) and calls the
-    // entity type specific load callback, for example hook_node_load().
-    if (!empty($queried_entities)) {
-      $this->postLoad($queried_entities);
+      // Attach field values.
+      if ($this->entityType->isFieldable()) {
+        $this->loadFieldItems($entities);
+      }
+
+      // Pass all entities loaded from the database through $this->postLoad(),
+      // to invoke the load hooks and postLoad() method on the entity class.
+      $this->postLoad($entities);
+      return reset($entities);
     }
-    return reset($queried_entities);
   }
 
   /**
@@ -436,32 +667,6 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
     }
 
     return $query;
-  }
-
-  /**
-   * Attaches data to entities upon loading.
-   *
-   * This will attach fields, if the entity is fieldable. It calls
-   * hook_entity_load() for modules which need to add data to all entities.
-   * It also calls hook_TYPE_load() on the loaded entities. For example
-   * hook_node_load() or hook_user_load(). If your hook_TYPE_load()
-   * expects special parameters apart from the queried entities, you can set
-   * $this->hookLoadArguments prior to calling the method.
-   * See Drupal\node\NodeStorageController::attachLoad() for an example.
-   *
-   * @param $queried_entities
-   *   Associative array of query results, keyed on the entity ID.
-   */
-  protected function postLoad(array &$queried_entities) {
-    // Map the loaded records into entity objects and according fields.
-    $queried_entities = $this->mapFromStorageRecords($queried_entities);
-
-    // Attach field values.
-    if ($this->entityType->isFieldable()) {
-      $this->loadFieldItems($queried_entities);
-    }
-
-    parent::postLoad($queried_entities);
   }
 
   /**
@@ -771,9 +976,26 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
   }
 
   /**
-   * {@inheritdoc}
+   * Loads values of configurable fields for a group of entities.
+   *
+   * Loads all fields for each entity object in a group of a single entity type.
+   * The loaded field values are added directly to the entity objects.
+   *
+   * @param \Drupal\Core\Entity\ContentEntityInterface[] $entities
+   *   An array of entities keyed by entity ID.
    */
-  protected function doLoadFieldItems($entities, $age) {
+  protected function loadFieldItems(array $entities) {
+    if (empty($entities) || !$this->entityType->isFieldable()) {
+      return;
+    }
+
+    $age = static::FIELD_LOAD_CURRENT;
+    foreach ($entities as $entity) {
+      if (!$entity->isDefaultRevision()) {
+        $age = static::FIELD_LOAD_REVISION;
+        break;
+      }
+    }
     $load_current = $age == static::FIELD_LOAD_CURRENT;
 
     // Collect entities ids, bundles and languages.
@@ -840,9 +1062,14 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
   }
 
   /**
-   * {@inheritdoc}
+   * Saves values of configurable fields for an entity.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity.
+   * @param bool $update
+   *   TRUE if the entity is being updated, FALSE if it is being inserted.
    */
-  protected function doSaveFieldItems(EntityInterface $entity, $update) {
+  protected function saveFieldItems(EntityInterface $entity, $update = TRUE) {
     $vid = $entity->getRevisionId();
     $id = $entity->id();
     $bundle = $entity->bundle();
@@ -925,9 +1152,12 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
   }
 
   /**
-   * {@inheritdoc}
+   * Deletes values of configurable fields for all revisions of an entity.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity.
    */
-  protected function doDeleteFieldItems(EntityInterface $entity) {
+  protected function deleteFieldItems(EntityInterface $entity) {
     foreach ($this->fieldInfo->getBundleInstances($entity->getEntityTypeId(), $entity->bundle()) as $instance) {
       $field = $instance->getField();
       $table_name = static::_fieldTableName($field);
@@ -942,9 +1172,12 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
   }
 
   /**
-   * {@inheritdoc}
+   * Deletes values of configurable fields for a single revision of an entity.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity. It must have a revision ID.
    */
-  protected function doDeleteFieldItemsRevision(EntityInterface $entity) {
+  protected function deleteFieldItemsRevision(EntityInterface $entity) {
     $vid = $entity->getRevisionId();
     if (isset($vid)) {
       foreach ($this->fieldInfo->getBundleInstances($entity->getEntityTypeId(), $entity->bundle()) as $instance) {
@@ -1186,7 +1419,7 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
     $entity_type_id = $field->entity_type;
     $entity_manager = \Drupal::entityManager();
     $entity_type = $entity_manager->getDefinition($entity_type_id);
-    $definitions = $entity_manager->getFieldDefinitions($entity_type_id);
+    $definitions = $entity_manager->getBaseFieldDefinitions($entity_type_id);
 
     // Define the entity ID schema based on the field definitions.
     $id_definition = $definitions[$entity_type->getKey('id')];

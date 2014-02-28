@@ -7,6 +7,7 @@
 
 namespace Drupal\Core\Entity;
 
+use Drupal\Core\Field\PrepareCacheInterface;
 use Drupal\Core\TypedData\ComplexDataInterface;
 use Drupal\Core\TypedData\TranslatableInterface;
 
@@ -26,7 +27,7 @@ use Drupal\Core\TypedData\TranslatableInterface;
  * @see \Drupal\Core\TypedData\TypedDataManager
  * @see \Drupal\Core\Field\FieldItemListInterface
  */
-interface ContentEntityInterface extends EntityInterface, RevisionableInterface, TranslatableInterface, ComplexDataInterface {
+interface ContentEntityInterface extends EntityInterface, RevisionableInterface, TranslatableInterface, ComplexDataInterface, PrepareCacheInterface {
 
   /**
    * Marks the translation identified by the given language code as existing.
@@ -40,7 +41,7 @@ interface ContentEntityInterface extends EntityInterface, RevisionableInterface,
   public function initTranslation($langcode);
 
   /**
-   * Defines the base fields of the entity type.
+   * Provides base field definitions for an entity type.
    *
    * Implementations typically use the class \Drupal\Core\Field\FieldDefinition
    * for creating the field definitions; for example a 'name' field could be
@@ -50,16 +51,47 @@ interface ContentEntityInterface extends EntityInterface, RevisionableInterface,
    *   ->setLabel(t('Name'));
    * @endcode
    *
-   * @param string $entity_type
-   *   The entity type to return properties for. Useful when a single class is
-   *   used for multiple, possibly dynamic entity types.
+   * If some elements in a field definition need to vary by bundle, use
+   * fieldDefinitionsByBundle().
+   *
+   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   *   The entity type definition. Useful when a single class is used for multiple,
+   *   possibly dynamic entity types.
    *
    * @return \Drupal\Core\Field\FieldDefinitionInterface[]
-   *   An array of entity field definitions, keyed by field name.
+   *   An array of base field definitions for the entity type, keyed by field
+   *   name.
    *
    * @see \Drupal\Core\Entity\EntityManagerInterface::getFieldDefinitions()
+   * @see \Drupal\Core\Entity\ContentEntityInterface::fieldDefinitionsByBundle()
    */
-  public static function baseFieldDefinitions($entity_type);
+  public static function baseFieldDefinitions(EntityTypeInterface $entity_type);
+
+  /**
+   * Provides or alters field definitions for a specific bundle.
+   *
+   * The field definitions returned here for the bundle take precedence on the
+   * base field definitions specified by baseFieldDefinitions() for the entity
+   * type.
+   *
+   * @todo Provide a better DX for field overrides.
+   *   See https://drupal.org/node/2145115.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   *   The entity type definition. Useful when a single class is used for multiple,
+   *   possibly dynamic entity types.
+   * @param string $bundle
+   *   The bundle.
+   * @param \Drupal\Core\Field\FieldDefinitionInterface[] $base_field_definitions
+   *   The list of field definitions for the bundle.
+   *
+   * @return \Drupal\Core\Field\FieldDefinitionInterface[]
+   *   An array of field definitions for the bundle, keyed by field name.
+   *
+   * @see \Drupal\Core\Entity\EntityManagerInterface::getFieldDefinitions()
+   * @see \Drupal\Core\Entity\ContentEntityInterface::baseFieldDefinitions()
+   */
+  public static function fieldDefinitionsByBundle(EntityTypeInterface $entity_type, $bundle, array $base_field_definitions);
 
   /**
    * Returns whether the entity has a field with the given name.

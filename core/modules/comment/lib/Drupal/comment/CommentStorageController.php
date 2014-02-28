@@ -35,12 +35,12 @@ class CommentStorageController extends FieldableDatabaseStorageController implem
   /**
    * {@inheritdoc}
    */
-  protected function postLoad(array &$queried_entities) {
+  protected function mapFromStorageRecords(array $records) {
     // Prepare standard comment fields.
-    foreach ($queried_entities as &$record) {
+    foreach ($records as $record) {
       $record->name = $record->uid ? $record->registered_name : $record->name;
     }
-    parent::postLoad($queried_entities);
+    return parent::mapFromStorageRecords($records);
   }
 
   /**

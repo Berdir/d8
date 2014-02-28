@@ -160,17 +160,19 @@ abstract class EntityStorageControllerBase extends EntityControllerBase implemen
    *   Associative array of query results, keyed on the entity ID.
    */
   protected function postLoad(array &$queried_entities) {
-    $entity_class = $this->entityType->getClass();
-    $entity_class::postLoad($this, $queried_entities);
-    // Call hook_entity_load().
-    foreach ($this->moduleHandler()->getImplementations('entity_load') as $module) {
-      $function = $module . '_entity_load';
-      $function($queried_entities, $this->entityTypeId);
-    }
-    // Call hook_TYPE_load().
-    foreach ($this->moduleHandler()->getImplementations($this->entityTypeId . '_load') as $module) {
-      $function = $module . '_' . $this->entityTypeId . '_load';
-      $function($queried_entities);
+    if (!empty($queried_entities)) {
+      $entity_class = $this->entityType->getClass();
+      $entity_class::postLoad($this, $queried_entities);
+      // Call hook_entity_load().
+      foreach ($this->moduleHandler()->getImplementations('entity_load') as $module) {
+        $function = $module . '_entity_load';
+        $function($queried_entities, $this->entityTypeId);
+      }
+      // Call hook_TYPE_load().
+      foreach ($this->moduleHandler()->getImplementations($this->entityTypeId . '_load') as $module) {
+        $function = $module . '_' . $this->entityTypeId . '_load';
+        $function($queried_entities);
+      }
     }
   }
 
@@ -198,6 +200,31 @@ abstract class EntityStorageControllerBase extends EntityControllerBase implemen
     $this->buildPropertyQuery($entity_query, $values);
     $result = $entity_query->execute();
     return $result ? $this->loadMultiple($result) : array();
+  }
+
+  /**
+   * Ensures that entities are returned in the requested order.
+   *
+   * @param array|false $ordered_ids
+   *   Array with the originally requested IDs or FALSE.
+   * @param \Drupal\Core\Entity\EntityInterface $unordered_entities
+   *   List of entities for the requested IDs in unknown order.
+   *
+   * @return \Drupal\Core\Entity\EntityInterface
+   *   Array with the correctly ordered entities.
+   */
+  protected function ensureOrder($ordered_ids, $unordered_entities) {
+    // Ensure that the returned array is ordered the same as the original
+    // $ids array if this was passed in and remove any invalid ids.
+    if ($ordered_ids) {
+      // Remove any invalid ids from the array.
+      $ordered_entities = array_intersect_key($ordered_ids, $unordered_entities);
+      foreach ($unordered_entities as $entity) {
+        $ordered_entities[$entity->id()] = $entity;
+      }
+      return $ordered_entities;
+    }
+    return $unordered_entities;
   }
 
 }

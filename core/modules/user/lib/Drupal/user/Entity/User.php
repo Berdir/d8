@@ -10,6 +10,7 @@ namespace Drupal\user\Entity;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
 use Drupal\Core\Entity\EntityMalformedException;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\FieldDefinition;
 use Drupal\user\UserInterface;
 
@@ -50,13 +51,6 @@ use Drupal\user\UserInterface;
  * )
  */
 class User extends ContentEntityBase implements UserInterface {
-
-  /**
-   * {@inheritdoc}
-   */
-  public function id() {
-    return $this->get('uid')->value;
-  }
 
   /**
    * {@inheritdoc}
@@ -423,7 +417,7 @@ class User extends ContentEntityBase implements UserInterface {
   /**
    * {@inheritdoc}
    */
-  public static function baseFieldDefinitions($entity_type) {
+  public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields['uid'] = FieldDefinition::create('integer')
       ->setLabel(t('User ID'))
       ->setDescription(t('The user ID.'))

@@ -8,6 +8,7 @@
 namespace Drupal\aggregator\Entity;
 
 use Drupal\Core\Entity\ContentEntityBase;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\FieldDefinition;
 use Symfony\Component\DependencyInjection\Container;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
@@ -43,13 +44,6 @@ use Drupal\aggregator\FeedInterface;
  * )
  */
 class Feed extends ContentEntityBase implements FeedInterface {
-
-  /**
-   * Implements Drupal\Core\Entity\EntityInterface::id().
-   */
-  public function id() {
-    return $this->get('fid')->value;
-  }
 
   /**
    * Implements Drupal\Core\Entity\EntityInterface::label().
@@ -120,7 +114,7 @@ class Feed extends ContentEntityBase implements FeedInterface {
   /**
    * {@inheritdoc}
    */
-  public static function baseFieldDefinitions($entity_type) {
+  public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields['fid'] = FieldDefinition::create('integer')
       ->setLabel(t('Feed ID'))
       ->setDescription(t('The ID of the aggregator feed.'))

@@ -7,6 +7,7 @@
 
 namespace Drupal\entity_test\Entity;
 
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\FieldDefinition;
 use Drupal\entity_test\Entity\EntityTest;
 
@@ -30,7 +31,8 @@ use Drupal\entity_test\Entity\EntityTest;
  *     "id" = "id",
  *     "uuid" = "uuid",
  *     "revision" = "revision_id",
- *     "bundle" = "type"
+ *     "bundle" = "type",
+ *     "label" = "name",
  *   },
  *   links = {
  *     "canonical" = "entity_test.edit_entity_test_rev",
@@ -56,16 +58,9 @@ class EntityTestRev extends EntityTest {
   }
 
   /**
-   * Implements Drupal\Core\Entity\EntityInterface::getRevisionId().
-   */
-  public function getRevisionId() {
-    return $this->get('revision_id')->value;
-  }
-
-  /**
    * {@inheritdoc}
    */
-  public static function baseFieldDefinitions($entity_type) {
+  public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields = parent::baseFieldDefinitions($entity_type);
 
     $fields['revision_id'] = FieldDefinition::create('integer')

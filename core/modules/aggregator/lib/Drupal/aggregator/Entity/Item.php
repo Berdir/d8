@@ -10,6 +10,7 @@ namespace Drupal\aggregator\Entity;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
 use Drupal\aggregator\ItemInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\FieldDefinition;
 
 /**
@@ -33,13 +34,6 @@ use Drupal\Core\Field\FieldDefinition;
 class Item extends ContentEntityBase implements ItemInterface {
 
   /**
-   * Implements Drupal\Core\Entity\EntityInterface::id().
-   */
-  public function id() {
-    return $this->get('iid')->value;
-  }
-
-  /**
    * Implements Drupal\Core\Entity\EntityInterface::label().
    */
   public function label() {
@@ -60,7 +54,7 @@ class Item extends ContentEntityBase implements ItemInterface {
   /**
    * {@inheritdoc}
    */
-  public static function baseFieldDefinitions($entity_type) {
+  public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields['iid'] = FieldDefinition::create('integer')
       ->setLabel(t('Aggregator item ID'))
       ->setDescription(t('The ID of the feed item.'))

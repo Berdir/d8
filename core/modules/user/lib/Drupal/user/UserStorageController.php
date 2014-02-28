@@ -8,6 +8,7 @@
 namespace Drupal\user;
 
 use Drupal\Component\Uuid\UuidInterface;
+use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Password\PasswordInterface;
@@ -48,15 +49,15 @@ class UserStorageController extends FieldableDatabaseStorageController implement
    *   The database connection to be used.
    * @param \Drupal\field\FieldInfo $field_info
    *   The field info service.
-   * @param \Drupal\Component\Uuid\UuidInterface $uuid_service
-   *   The UUID Service.
+   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
+   *   Cache backend instance to use.
    * @param \Drupal\Core\Password\PasswordInterface $password
    *   The password hashing service.
    * @param \Drupal\user\UserDataInterface $user_data
    *   The user data service.
    */
-  public function __construct(EntityTypeInterface $entity_type, Connection $database, FieldInfo $field_info, UuidInterface $uuid_service, PasswordInterface $password, UserDataInterface $user_data) {
-    parent::__construct($entity_type, $database, $field_info, $uuid_service);
+  public function __construct(EntityTypeInterface $entity_type, Connection $database, FieldInfo $field_info, CacheBackendInterface $cache, PasswordInterface $password, UserDataInterface $user_data) {
+    parent::__construct($entity_type, $database, $field_info, $cache);
 
     $this->password = $password;
     $this->userData = $user_data;
@@ -70,7 +71,7 @@ class UserStorageController extends FieldableDatabaseStorageController implement
       $entity_type,
       $container->get('database'),
       $container->get('field.info'),
-      $container->get('uuid'),
+      $container->get('cache.entity'),
       $container->get('password'),
       $container->get('user.data')
     );
@@ -79,23 +80,20 @@ class UserStorageController extends FieldableDatabaseStorageController implement
   /**
    * {@inheritdoc}
    */
-  function postLoad(array &$queried_users) {
-    foreach ($queried_users as $key => $record) {
-      $queried_users[$key]->roles = array();
+  function mapFromStorageRecords(array $records) {
+    foreach ($records as $key => $record) {
+      $records[$key]->roles = array();
       if ($record->uid) {
-        $queried_users[$record->uid]->roles[] = DRUPAL_AUTHENTICATED_RID;
+        $records[$record->uid]->roles[] = DRUPAL_AUTHENTICATED_RID;
       }
       else {
-        $queried_users[$record->uid]->roles[] = DRUPAL_ANONYMOUS_RID;
+        $records[$record->uid]->roles[] = DRUPAL_ANONYMOUS_RID;
       }
     }
 
     // Add any additional roles from the database.
-    $this->addRoles($queried_users);
-
-    // Call the default postLoad() method. This will add fields and call
-    // hook_user_load().
-    parent::postLoad($queried_users);
+    $this->addRoles($records);
+    return parent::mapFromStorageRecords($records);
   }
 
   /**
@@ -152,6 +150,8 @@ class UserStorageController extends FieldableDatabaseStorageController implement
       ->fields(array('login' => $account->getLastLoginTime()))
       ->condition('uid', $account->id())
       ->execute();
+    // Ensure that the entity cache is cleared.
+    $this->resetCache(array($account->id()));
   }
 
 }

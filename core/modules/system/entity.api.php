@@ -266,14 +266,51 @@ function hook_entity_create(\Drupal\Core\Entity\EntityInterface $entity) {
  * This is a generic load hook called for all entity types loaded via the
  * entity API.
  *
- * @param array $entities
+ * The hook will not be invoked for entities loaded from the cache. Use
+ * hook_entity_load_uncached() if necessary.
+ *
+ * @param \Drupal\Core\Entity\EntityInterface[] $entities
  *   The entities keyed by entity ID.
  * @param string $entity_type_id
  *   The type of entities being loaded (i.e. node, user, comment).
  */
-function hook_entity_load($entities, $entity_type_id) {
+function hook_entity_load(array $entities, $entity_type_id) {
   foreach ($entities as $entity) {
     $entity->foo = mymodule_add_something($entity);
+  }
+}
+
+/**
+ * Act on entities when loaded from the storage or cache.
+ *
+ * Only use this hook if the result must not be cached.
+ *
+ * @param \Drupal\Core\Entity\EntityInterface[] $entities
+ *   The entities keyed by entity ID.
+ * @param string $entity_type
+ *   The type of entities being loaded (i.e. node, user, comment).
+ *
+ * @see hook_entity_load_uncached()
+ */
+function hook_entity_load_uncached(array $entities, $entity_type) {
+  foreach ($entities as $entity) {
+    $entity->foo = mymodule_add_something_uncached($entity);
+  }
+}
+
+/**
+ * Act on entities of the given type when loaded from the storage or cache.
+ *
+ * Only use this hook if the result must not be cached.
+ *
+ * @param \Drupal\Core\Entity\EntityInterface[] $entities
+ *   The entities keyed by entity ID.
+ *
+ * @see hook_entity_load_uncached()
+ */
+function hook_ENTITY_TYPE_load_uncached(array $entities) {
+  foreach ($entities as $entity) {
+    $entity->foo = mymodule_add_something_uncached($entity);
   }
 }
 
@@ -659,62 +696,101 @@ function hook_entity_form_display_alter(\Drupal\Core\Entity\Display\EntityFormDi
 }
 
 /**
- * Define custom entity fields.
+ * Provides custom base field definitions for a content entity type.
  *
- * @param string $entity_type_id
- *   The entity type for which to define entity fields.
+ * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+ *   The entity type definition.
  *
- * @return array
- *   An array of entity field information having the following optional entries:
- *   - definitions: An array of field definitions to add to all entities of this
- *     type, keyed by field name.
- *   - optional: An array of field definitions for optional entity fields, keyed
- *     by field name. Optional fields are fields that only exist for certain
- *     bundles of the entity type.
- *   - bundle map: An array keyed by bundle name, containing the names of
- *     optional fields that entities of this bundle have.
+ * @return \Drupal\Core\Field\FieldDefinitionInterface[]
+ *   An array of field definitions, keyed by field name.
  *
- * @see hook_entity_field_info_alter()
+ * @see hook_entity_base_field_info_alter()
+ * @see hook_entity_field_info_by_bundle()
+ * @see hook_entity_field_info_by_bundle_alter()
  * @see \Drupal\Core\Field\FieldDefinitionInterface
  * @see \Drupal\Core\Entity\EntityManagerInterface::getFieldDefinitions()
- * @see \Drupal\Core\TypedData\TypedDataManager::create()
  */
-function hook_entity_field_info($entity_type_id) {
-  if (mymodule_uses_entity_type($entity_type_id)) {
-    $info = array();
-    $info['definitions']['mymodule_text'] = FieldDefinition::create('string')
+function hook_entity_base_field_info(\Drupal\Core\Entity\EntityTypeInterface $entity_type) {
+  if ($entity_type->id() == 'node') {
+    $fields = array();
+    $fields['mymodule_text'] = FieldDefinition::create('string')
       ->setLabel(t('The text'))
       ->setDescription(t('A text property added by mymodule.'))
       ->setComputed(TRUE)
       ->setClass('\Drupal\mymodule\EntityComputedText');
 
-    if ($entity_type_id == 'node') {
-      // Add a property only to entities of the 'article' bundle.
-      $info['optional']['mymodule_text_more'] = FieldDefinition::create('string')
-        ->setLabel(t('More text'))
-        ->setComputed(TRUE)
-        ->setClass('\Drupal\mymodule\EntityComputedMoreText');
-
-      $info['bundle map']['article'][0] = 'mymodule_text_more';
-    }
-    return $info;
+    return $fields;
   }
 }
 
 /**
- * Alter defined entity fields.
+ * Alters base field definitions for a content entity type.
  *
- * @param array $info
- *   The entity field info array as returned by hook_entity_field_info().
- * @param string $entity_type_id
- *   The entity type for which entity fields are defined.
+ * @param \Drupal\Core\Field\FieldDefinitionInterface[] $fields
+ *   The array of base field definitions for the entity type.
+ * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+ *   The entity type definition.
  *
- * @see hook_entity_field_info()
+ * @see hook_entity_base_field_info()
+ * @see hook_entity_field_info_by_bundle()
+ * @see hook_entity_field_info_by_bundle_alter()
  */
-function hook_entity_field_info_alter(&$info, $entity_type_id) {
-  if (!empty($info['definitions']['mymodule_text'])) {
+function hook_entity_base_field_info_alter(&$fields, \Drupal\Core\Entity\EntityTypeInterface $entity_type) {
+  // Alter the mymodule_text field to use a custom class.
+  if ($entity_type->id() == 'node' && !empty($fields['mymodule_text'])) {
+    $fields['mymodule_text']->setClass('\Drupal\anothermodule\EntityComputedText');
+  }
+}
+
+/**
+ * Provides custom field definitions for a specific bundle within an entity type.
+ *
+ * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+ *   The entity type definition.
+ * @param string $bundle
+ *   The bundle.
+ * @param \Drupal\Core\Field\FieldDefinitionInterface[] $base_field_definitions
+ *   The list of field definitions for the bundle.
+ *
+ * @return \Drupal\Core\Field\FieldDefinitionInterface[]
+ *   An array of field definitions, keyed by field name.
+ *
+ * @see hook_entity_base_field_info()
+ * @see hook_entity_base_field_info_alter()
+ * @see hook_entity_field_info_by_bundle_alter()
+ * @see \Drupal\Core\Field\FieldDefinitionInterface
+ * @see \Drupal\Core\Entity\EntityManagerInterface::getFieldDefinitions()
+ */
+function hook_entity_field_info_by_bundle(\Drupal\Core\Entity\EntityTypeInterface $entity_type, $bundle, array $base_field_definitions) {
+  // Add a property only to nodes of the 'article' bundle.
+  if ($entity_type->id() == 'node' && $bundle == 'article') {
+    $fields = array();
+    $fields['mymodule_text_more'] = FieldDefinition::create('string')
+        ->setLabel(t('More text'))
+        ->setComputed(TRUE)
+        ->setClass('\Drupal\mymodule\EntityComputedMoreText');
+    return $fields;
+  }
+}
+
+/**
+ * Alters bundle-specific field definitions.
+ *
+ * @param \Drupal\Core\Field\FieldDefinitionInterface[] $fields
+ *   The array of field definitions for the entity type and bundle.
+ * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+ *   The entity type definition.
+ * @param string $bundle
+ *   The bundle.
+ *
+ * @see hook_entity_base_field_info()
+ * @see hook_entity_base_field_info_alter()
+ * @see hook_entity_field_info_by_bundle()
+ */
+function hook_entity_field_info_by_bundle_alter(&$fields, \Drupal\Core\Entity\EntityTypeInterface $entity_type, $bundle) {
+  if ($entity_type->id() == 'node' && $bundle == 'article' && !empty($fields['mymodule_text'])) {
     // Alter the mymodule_text field to use a custom class.
-    $info['definitions']['mymodule_text']->setClass('\Drupal\anothermodule\EntityComputedText');
+    $fields['mymodule_text']->setClass('\Drupal\anothermodule\EntityComputedText');
   }
 }
 
