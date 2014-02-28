@@ -71,7 +71,7 @@ class LoadEntity extends LoadBase {
       $migration = $storage_controller->create($values);
       $all_fields = array_keys($migration->getSourcePlugin()->fields());
       $fields = array_diff($all_fields, $processed_destinations);
-      $migration->process += array_combine($all_fields, $all_fields);
+      $migration->process += array_combine($fields, $fields);
       $this->additionalProcess($id, $migration);
       $migrations[$migration->id()] = $migration;
     }
