@@ -13,4 +13,4 @@ process:
   type: constants.type
   cardinality: constants.cardinality
 destination:
-  plugin: entity:field_entity
+  plugin: entity:field_config

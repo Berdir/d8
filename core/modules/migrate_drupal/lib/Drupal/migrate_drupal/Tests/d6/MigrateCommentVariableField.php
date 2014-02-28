@@ -52,7 +52,7 @@ class MigrateCommentVariableField extends MigrateDrupalTestBase {
     $executable = new MigrateExecutable($migration, $this);
     $executable->import();
 
-    $this->assertTrue(is_object(entity_load('field_entity', 'node.comment')));
+    $this->assertTrue(is_object(entity_load('field_config', 'node.comment')));
   }
 
 }

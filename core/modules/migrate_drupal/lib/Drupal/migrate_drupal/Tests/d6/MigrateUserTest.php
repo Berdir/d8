@@ -45,13 +45,13 @@ class MigrateUserTest extends MigrateDrupalTestBase {
   protected function setUp() {
     parent::setUp();
     // Create the user profile field and instance.
-    entity_create('field_entity', array(
+    entity_create('field_config', array(
       'entity_type' => 'user',
       'name' => 'user_picture',
       'type' => 'image',
       'translatable' => '0',
     ))->save();
-    entity_create('field_instance', array(
+    entity_create('field_instance_config', array(
       'label' => 'User Picture',
       'description' => '',
       'field_name' => 'user_picture',

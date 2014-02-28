@@ -36,7 +36,7 @@ class MigrateUserPictureInstanceTest extends MigrateDrupalTestBase {
       ),
     );
     $this->prepareIdMappings($id_mappings);
-    entity_create('field_entity', array(
+    entity_create('field_config', array(
       'entity_type' => 'user',
       'name' => 'user_picture',
       'type' => 'image',
@@ -47,7 +47,7 @@ class MigrateUserPictureInstanceTest extends MigrateDrupalTestBase {
     $executable = new MigrateExecutable($migration, $this);
     $executable->import();
 
-    $field = entity_load('field_instance', 'user.user.user_picture');
+    $field = entity_load('field_instance_config', 'user.user.user_picture');
     $settings = $field->getSettings();
     $this->assertEqual($settings['file_extensions'], 'png gif jpg jpeg');
     $this->assertEqual($settings['file_directory'], 'pictures');

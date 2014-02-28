@@ -48,7 +48,7 @@ static $modules = array('node', 'field', 'taxonomy');
       'vid' => 'tags',
     ))->save();
     // Create the field itself.
-    entity_create('field_entity', array(
+    entity_create('field_config', array(
       'entity_type' => 'node',
       'name' => 'tags',
       'type' => 'taxonomy_term_reference',
@@ -64,14 +64,14 @@ static $modules = array('node', 'field', 'taxonomy');
 
     // Test that the field exists.
     $field_id = 'node.article.tags';
-    $field = entity_load('field_instance', $field_id);
+    $field = entity_load('field_instance_config', $field_id);
     $this->assertEqual($field->id(), $field_id, 'Field instance exists on article bundle.');
     $settings = $field->getSettings();
     $this->assertEqual('tags', $settings['allowed_values'][0]['vocabulary'], "Vocabulary has correct settings.");
 
     // Test the page bundle as well.
     $field_id = 'node.page.tags';
-    $field = entity_load('field_instance', $field_id);
+    $field = entity_load('field_instance_config', $field_id);
     $this->assertEqual($field->id(), $field_id, 'Field instance exists on page bundle.');
     $settings = $field->getSettings();
     $this->assertEqual('tags', $settings['allowed_values'][0]['vocabulary'], "Vocabulary has correct settings.");

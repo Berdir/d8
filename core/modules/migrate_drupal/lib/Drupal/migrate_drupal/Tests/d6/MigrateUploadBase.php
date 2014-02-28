@@ -46,7 +46,7 @@ class MigrateUploadBase extends MigrateDrupalTestBase {
     $node_type->save();
 
     // Add a file field.
-    entity_create('field_entity', array(
+    entity_create('field_config', array(
       'name' => 'upload',
       'entity_type' => 'node',
       'type' => 'file',
@@ -55,7 +55,7 @@ class MigrateUploadBase extends MigrateDrupalTestBase {
         'display_field' => TRUE,
       ),
     ))->save();
-    entity_create('field_instance', array(
+    entity_create('field_instance_config', array(
       'field_name' => 'upload',
       'entity_type' => 'node',
       'bundle' => 'story',

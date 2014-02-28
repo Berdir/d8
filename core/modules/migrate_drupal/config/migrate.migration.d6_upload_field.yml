@@ -16,4 +16,4 @@ process:
   cardinality: constants.cardinality
   settings.display_field: constants.display_field
 destination:
-  plugin: entity:field_entity
+  plugin: entity:field_config

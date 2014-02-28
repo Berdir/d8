@@ -36,7 +36,7 @@ class MigrateUserPictureFieldTest extends MigrateDrupalTestBase {
     $executable = new MigrateExecutable($migration, $this);
     $executable->import();
 
-    $field = entity_load('field_entity', 'user.user_picture');
+    $field = entity_load('field_config', 'user.user_picture');
     $this->assertEqual($field->id(), 'user.user_picture');
     $this->assertEqual(array('user', 'user_picture'), $migration->getIdMap()->lookupDestinationID(array('')));
   }

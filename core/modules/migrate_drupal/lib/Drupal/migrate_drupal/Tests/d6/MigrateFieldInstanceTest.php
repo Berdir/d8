@@ -69,7 +69,7 @@ class MigrateFieldInstanceTest extends MigrateDrupalTestBase {
 
     $entity = entity_create('node', array('type' => 'story'));
     // Test a text field.
-    $field = entity_load('field_instance', 'node.story.field_test');
+    $field = entity_load('field_instance_config', 'node.story.field_test');
     $this->assertEqual($field->label(), 'Text Field', 'Field field_test label correct');
     $expected = array('max_length' => 255, 'text_processing' => 1);
     $this->assertEqual($field->getSettings(), $expected, 'Field field_test settings are correct.');
@@ -77,7 +77,7 @@ class MigrateFieldInstanceTest extends MigrateDrupalTestBase {
 
 
     // Test a number field.
-    $field = entity_load('field_instance', 'node.story.field_test_two');
+    $field = entity_load('field_instance_config', 'node.story.field_test_two');
     $this->assertEqual($field->label(), 'Integer Field');
     $expected = array(
       'min' => '10',
@@ -88,12 +88,12 @@ class MigrateFieldInstanceTest extends MigrateDrupalTestBase {
     $this->assertEqual($field->getSettings(), $expected, 'Field field_test_two settings are correct.');
 
     // Test email field.
-    $field = entity_load('field_instance', 'node.story.field_test_email');
+    $field = entity_load('field_instance_config', 'node.story.field_test_email');
     $this->assertEqual($field->label(), 'Email Field');
     $this->assertEqual('benjy@example.com', $entity->field_test_email->value, 'Field field_test_email default_value is correct.');
 
     // Test a filefield.
-    $field = entity_load('field_instance', 'node.story.field_test_filefield');
+    $field = entity_load('field_instance_config', 'node.story.field_test_filefield');
     $this->assertEqual($field->label(), 'File Field');
     $expected = array(
       'file_extensions' => 'txt pdf doc',
@@ -108,7 +108,7 @@ class MigrateFieldInstanceTest extends MigrateDrupalTestBase {
     $this->assertEqual($field->getSettings(), $expected, 'Field field_test_filefield settings are correct.');
 
     // Test a link field.
-    $field = entity_load('field_instance', 'node.story.field_test_link');
+    $field = entity_load('field_instance_config', 'node.story.field_test_link');
     $this->assertEqual($field->label(), 'Link Field');
     $expected = array('title' => 2);
     $this->assertEqual($field->getSettings(), $expected, 'Field field_test_link settings are correct.');
@@ -135,7 +135,7 @@ class MigrateFieldInstanceTest extends MigrateDrupalTestBase {
       'field_test_datetime' => 'datetime',
     );
     foreach ($fields as $name => $type) {
-      entity_create('field_entity', array(
+      entity_create('field_config', array(
         'name' => $name,
         'entity_type' => 'node',
         'type' => $type,

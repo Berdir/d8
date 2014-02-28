@@ -40,7 +40,7 @@ class MigrateUploadInstanceTest extends MigrateDrupalTestBase {
     foreach (array('page', 'story') as $type) {
       entity_create('node_type', array('type' => $type))->save();
     }
-    entity_create('field_entity', array(
+    entity_create('field_config', array(
       'entity_type' => 'node',
       'name' => 'upload',
       'type' => 'file',
@@ -55,18 +55,18 @@ class MigrateUploadInstanceTest extends MigrateDrupalTestBase {
     $executable = new MigrateExecutable($migration, $this);
     $executable->import();
 
-    $field = entity_load('field_instance', 'node.page.upload');
+    $field = entity_load('field_instance_config', 'node.page.upload');
     $settings = $field->getSettings();
     $this->assertEqual($field->id(), 'node.page.upload');
     $this->assertEqual($settings['file_extensions'], 'jpg jpeg gif png txt doc xls pdf ppt pps odt ods odp');
     $this->assertEqual($settings['max_filesize'], '1MB');
     $this->assertEqual($settings['description_field'], TRUE);
 
-    $field = entity_load('field_instance', 'node.story.upload');
+    $field = entity_load('field_instance_config', 'node.story.upload');
     $this->assertEqual($field->id(), 'node.story.upload');
 
     // Shouldn't exist.
-    $field = entity_load('field_instance', 'node.article.upload');
+    $field = entity_load('field_instance_config', 'node.article.upload');
     $this->assertTrue(is_null($field));
 
     $this->assertEqual(array('node', 'page', 'upload'), $migration->getIdMap()->lookupDestinationID(array('page')));

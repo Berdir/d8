@@ -9,7 +9,7 @@ namespace Drupal\migrate\Plugin\migrate\destination;
 
 /**
  * @MigrateDestination(
- *   id = "entity:field_entity"
+ *   id = "entity:field_config"
  * )
  */
 class EntityFieldEntity extends EntityConfigBase {

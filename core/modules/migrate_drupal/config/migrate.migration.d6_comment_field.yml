@@ -12,6 +12,6 @@ process:
   name: constants.name
   type: constants.type
 destination:
-  plugin: entity:field_entity
+  plugin: entity:field_config
 dependencies:
   - d6_field

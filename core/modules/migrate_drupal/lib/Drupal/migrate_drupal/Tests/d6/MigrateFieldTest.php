@@ -36,30 +36,30 @@ class MigrateFieldTest extends MigrateDrupalTestBase {
     $executable->import();
 
     // Text field.
-    $field = entity_load('field_entity', 'node.field_test');
+    $field = entity_load('field_config', 'node.field_test');
     $expected = array('max_length' => 255);
     $this->assertEqual($field->type, "text", "Field type is text.");
     $this->assertEqual($field->status, TRUE, "Status is TRUE");
     $this->assertEqual($field->settings, $expected, "Field type text settings are correct");
 
     // Integer field.
-    $field = entity_load('field_entity', 'node.field_test_two');
+    $field = entity_load('field_config', 'node.field_test_two');
     $this->assertEqual($field->type, "number_integer", "Field type is number_integer.");
 
     // Float field.
-    $field = entity_load('field_entity', 'node.field_test_three');
+    $field = entity_load('field_config', 'node.field_test_three');
     $this->assertEqual($field->type, "number_float", "Field type is number_float.");
 
     // Link field.
-    $field = entity_load('field_entity', 'node.field_test_link');
+    $field = entity_load('field_config', 'node.field_test_link');
     $this->assertEqual($field->type, "link", "Field type is link.");
 
     // File field.
-    $field = entity_load('field_entity', 'node.field_test_filefield');
+    $field = entity_load('field_config', 'node.field_test_filefield');
     $this->assertEqual($field->type, "file", "Field type is file.");
 
     // Image field.
-    $field = entity_load('field_entity', 'node.field_test_imagefield');
+    $field = entity_load('field_config', 'node.field_test_imagefield');
     $expected = array(
       'column_groups' => array(
         'alt' => array('label' => 'Test alt'),
@@ -72,11 +72,11 @@ class MigrateFieldTest extends MigrateDrupalTestBase {
     $this->assertEqual($field->settings, $expected, "Field type image settings are correct");
 
     // Phone field.
-    $field = entity_load('field_entity', 'node.field_test_phone');
+    $field = entity_load('field_config', 'node.field_test_phone');
     $this->assertEqual($field->type, "telephone", "Field type is telephone.");
 
     // Date field.
-    $field = entity_load('field_entity', 'node.field_test_datetime');
+    $field = entity_load('field_config', 'node.field_test_datetime');
     $this->assertEqual($field->type, "datetime", "Field type is datetime.");
     $this->assertEqual($field->status, FALSE, "Status is FALSE");
   }

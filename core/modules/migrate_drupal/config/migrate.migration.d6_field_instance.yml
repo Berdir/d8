@@ -28,7 +28,7 @@ process:
       - widget_settings
 
 destination:
-  plugin: entity:field_instance
+  plugin: entity:field_instance_config
 dependencies:
   - d6_node_type
   - d6_field

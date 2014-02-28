@@ -27,7 +27,7 @@ class MigrateTermNodeTestBase extends MigrateDrupalTestBase {
     $vocabulary->save();
     $node_type = entity_create('node_type', array('type' => 'story'));
     $node_type->save();
-    entity_create('field_entity', array(
+    entity_create('field_config', array(
       'name' => 'test',
       'entity_type' => 'node',
       'type' => 'taxonomy_term_reference',
@@ -41,7 +41,7 @@ class MigrateTermNodeTestBase extends MigrateDrupalTestBase {
         ),
       )
     ))->save();
-    entity_create('field_instance', array(
+    entity_create('field_instance_config', array(
       'field_name' => 'test',
       'entity_type' => 'node',
       'bundle' => 'story',

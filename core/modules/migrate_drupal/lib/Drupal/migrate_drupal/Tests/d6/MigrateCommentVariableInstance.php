@@ -46,7 +46,7 @@ class MigrateCommentVariableInstance extends MigrateDrupalTestBase {
     foreach (array('page', 'story') as $type) {
       entity_create('node_type', array('type' => $type))->save();
     }
-    entity_create('field_entity', array(
+    entity_create('field_config', array(
       'entity_type' => 'node',
         'name' => 'comment',
         'type' => 'comment',

@@ -34,7 +34,7 @@ process:
   field_type: constants.field_type
 
 destination:
-  plugin: entity:field_instance
+  plugin: entity:field_instance_config
 dependencies:
   - d6_node_type
   - d6_field

@@ -54,7 +54,7 @@ static $modules = array('taxonomy', 'field');
 
     // Test that the field exists.
     $field_id = 'node.tags';
-    $field = entity_load('field_entity', $field_id);
+    $field = entity_load('field_config', $field_id);
     $this->assertEqual($field->id(), $field_id);
     $settings = $field->getSettings();
     $this->assertEqual('tags', $settings['allowed_values'][0]['vocabulary'], "Vocabulary has correct settings.");

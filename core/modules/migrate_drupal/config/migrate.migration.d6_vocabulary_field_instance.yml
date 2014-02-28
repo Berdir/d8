@@ -15,7 +15,7 @@ process:
   'settings.allowed_values.0.vocabulary': @field_name
   'settings.allowed_values.0.parent': constants.parent
 destination:
-  plugin: entity:field_instance
+  plugin: entity:field_instance_config
 dependencies:
   - d6_taxonomy_vocabulary
   - d6_vocabulary_field

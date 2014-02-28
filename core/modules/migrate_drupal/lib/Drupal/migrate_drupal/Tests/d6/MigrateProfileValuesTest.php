@@ -46,38 +46,38 @@ class MigrateProfileValuesTest extends MigrateDrupalTestBase {
   protected function setUp() {
     parent::setUp();
     // Create some fields so the data gets stored.
-    entity_create('field_entity', array(
+    entity_create('field_config', array(
       'entity_type' => 'user',
       'name' => 'profile_color',
       'type' => 'text',
     ))->save();
-    entity_create('field_entity', array(
+    entity_create('field_config', array(
       'entity_type' => 'user',
       'name' => 'profile_biography',
       'type' => 'text_long',
     ))->save();
-    entity_create('field_entity', array(
+    entity_create('field_config', array(
       'entity_type' => 'user',
       'name' => 'profile_sell_address',
       'type' => 'list_integer',
     ))->save();
-    entity_create('field_entity', array(
+    entity_create('field_config', array(
       'entity_type' => 'user',
       'name' => 'profile_sold_to',
       'type' => 'list_text',
     ))->save();
-    entity_create('field_entity', array(
+    entity_create('field_config', array(
       'entity_type' => 'user',
       'name' => 'profile_bands',
       'type' => 'text',
       'cardinality' => -1,
     ))->save();
-    entity_create('field_entity', array(
+    entity_create('field_config', array(
       'entity_type' => 'user',
       'name' => 'profile_blog',
       'type' => 'link',
     ))->save();
-    entity_create('field_entity', array(
+    entity_create('field_config', array(
       'entity_type' => 'user',
       'name' => 'profile_birthdate',
       'type' => 'datetime',
@@ -85,7 +85,7 @@ class MigrateProfileValuesTest extends MigrateDrupalTestBase {
 
     // Create the field instances.
     foreach (Drupal6UserProfileFields::getData('profile_fields') as $field) {
-      entity_create('field_instance', array(
+      entity_create('field_instance_config', array(
         'label' => $field['title'],
         'description' => '',
         'field_name' => $field['name'],

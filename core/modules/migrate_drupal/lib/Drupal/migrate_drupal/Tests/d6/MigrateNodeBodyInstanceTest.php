@@ -45,7 +45,7 @@ class MigrateNodeBodyInstanceTest extends MigrateDrupalTestBase {
     );
     $this->prepareIdMappings($id_mappings);
 
-    $field = entity_create('field_entity', array(
+    $field = entity_create('field_config', array(
       'name' => 'body',
       'entity_type' => 'node',
       'type' => 'text_with_summary',
@@ -61,14 +61,14 @@ class MigrateNodeBodyInstanceTest extends MigrateDrupalTestBase {
     $executable->import();
 
     // Test that the body field instance is created for a content type.
-    $field = entity_load('field_instance', 'node.company.body');
+    $field = entity_load('field_instance_config', 'node.company.body');
     $this->assertEqual($field->label(), 'Description', 'Field body label correct');
     $expected = array('display_summary' => true, 'text_processing' => true);
     $this->assertEqual($field->getSettings(), $expected, 'Field body settings are correct.');
     $this->assertEqual(array(), $field->default_value, 'Field body default_value is correct.');
 
     // Test that the body field instance is created for a second content type.
-    $field = entity_load('field_instance', 'node.employee.body');
+    $field = entity_load('field_instance_config', 'node.employee.body');
     $this->assertEqual($field->label(), 'Bio', 'Field body label correct');
     $expected = array('display_summary' => true, 'text_processing' => true);
     $this->assertEqual($field->getSettings(), $expected, 'Field body settings are correct.');
@@ -76,7 +76,7 @@ class MigrateNodeBodyInstanceTest extends MigrateDrupalTestBase {
 
     // Test that the body field instance is skipped if the has_body is set to
     // false in the source.
-    $field = entity_load('field_instance', 'node.sponsor.body');
+    $field = entity_load('field_instance_config', 'node.sponsor.body');
     $this->assertNull($field, 'The body must not be created.');
 
     // Ensure Id map works.

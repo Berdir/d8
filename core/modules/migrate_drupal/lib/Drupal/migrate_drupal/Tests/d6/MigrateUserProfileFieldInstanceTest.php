@@ -50,37 +50,37 @@ class MigrateUserProfileFieldInstanceTest extends MigrateDrupalTestBase {
     $executable->import();
 
     // Migrated a text field.
-    $field = entity_load('field_instance', 'user.user.profile_color');
+    $field = entity_load('field_instance_config', 'user.user.profile_color');
     $this->assertEqual($field->label(), 'Favorite color');
     $this->assertEqual($field->getDescription(), 'List your favorite color');
 
     // Migrated a textarea.
-    $field = entity_load('field_instance', 'user.user.profile_biography');
+    $field = entity_load('field_instance_config', 'user.user.profile_biography');
     $this->assertEqual($field->label(), 'Biography');
     $this->assertEqual($field->getDescription(), 'Tell people a little bit about yourself');
 
     // Migrated checkbox field.
-    $field = entity_load('field_instance', 'user.user.profile_sell_address');
+    $field = entity_load('field_instance_config', 'user.user.profile_sell_address');
     $this->assertEqual($field->label(), 'Sell your e-mail address?');
     $this->assertEqual($field->getDescription(), "If you check this box, we'll sell your address to spammers to help line the pockets of our shareholders. Thanks!");
 
     // Migrated selection field.
-    $field = entity_load('field_instance', 'user.user.profile_sold_to');
+    $field = entity_load('field_instance_config', 'user.user.profile_sold_to');
     $this->assertEqual($field->label(), 'Sales Category');
     $this->assertEqual($field->getDescription(), "Select the sales categories to which this user's address was sold.");
 
     // Migrated list field.
-    $field = entity_load('field_instance', 'user.user.profile_bands');
+    $field = entity_load('field_instance_config', 'user.user.profile_bands');
     $this->assertEqual($field->label(), 'Favorite bands');
     $this->assertEqual($field->getDescription(), "Enter your favorite bands. When you've saved your profile, you'll be able to find other people with the same favorites.");
 
     // Migrated URL field.
-    $field = entity_load('field_instance', 'user.user.profile_blog');
+    $field = entity_load('field_instance_config', 'user.user.profile_blog');
     $this->assertEqual($field->label(), 'Your blog');
     $this->assertEqual($field->getDescription(), "Paste the full URL, including http://, of your personal blog.");
 
     // Migrated date field.
-    $field = entity_load('field_instance', 'user.user.profile_birthdate');
+    $field = entity_load('field_instance_config', 'user.user.profile_birthdate');
     $this->assertEqual($field->label(), 'Birthdate');
     $this->assertEqual($field->getDescription(), "Enter your birth date and we'll send you a coupon.");
   }
@@ -99,7 +99,7 @@ class MigrateUserProfileFieldInstanceTest extends MigrateDrupalTestBase {
       'profile_birthdate' => 'datetime',
     );
     foreach ($fields as $name => $type) {
-      entity_create('field_entity', array(
+      entity_create('field_config', array(
         'name' => $name,
         'entity_type' => 'user',
         'type' => $type,

@@ -12,6 +12,6 @@ process:
   field_name: name
   required: required
 destination:
-  plugin: entity:field_instance
+  plugin: entity:field_instance_config
 dependencies:
   - d6_user_profile_field

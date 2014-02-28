@@ -42,33 +42,33 @@ class MigrateUserProfileFieldTest extends MigrateDrupalTestBase {
     $executable->import();
 
     // Migrated a text field.
-    $field = entity_load('field_entity', 'user.profile_color');
+    $field = entity_load('field_config', 'user.profile_color');
     $this->assertEqual($field->type, 'text', 'Field type is text.');
     $this->assertEqual($field->cardinality, 1, 'Text field has correct cardinality');
 
     // Migrated a textarea.
-    $field = entity_load('field_entity', 'user.profile_biography');
+    $field = entity_load('field_config', 'user.profile_biography');
     $this->assertEqual($field->type, 'text_long', 'Field type is text_long.');
 
     // Migrated checkbox field.
-    $field = entity_load('field_entity', 'user.profile_sell_address');
+    $field = entity_load('field_config', 'user.profile_sell_address');
     $this->assertEqual($field->type, 'list_integer', 'Field type is list_integer.');
 
     // Migrated selection field.
-    $field = entity_load('field_entity', 'user.profile_sold_to');
+    $field = entity_load('field_config', 'user.profile_sold_to');
     $this->assertEqual($field->type, 'list_text', 'Field type is list_text.');
 
     // Migrated list field.
-    $field = entity_load('field_entity', 'user.profile_bands');
+    $field = entity_load('field_config', 'user.profile_bands');
     $this->assertEqual($field->type, 'text', 'Field type is text.');
     $this->assertEqual($field->cardinality, -1, 'List field has correct cardinality');
 
     // Migrated URL field.
-    $field = entity_load('field_entity', 'user.profile_blog');
+    $field = entity_load('field_config', 'user.profile_blog');
     $this->assertEqual($field->type, 'link', 'Field type is link.');
 
     // Migrated date field.
-    $field = entity_load('field_entity', 'user.profile_birthdate');
+    $field = entity_load('field_config', 'user.profile_birthdate');
     $this->assertEqual($field->type, 'datetime', 'Field type is datetime.');
   }
 

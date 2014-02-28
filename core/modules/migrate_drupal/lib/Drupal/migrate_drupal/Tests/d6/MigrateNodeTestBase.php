@@ -29,23 +29,23 @@ class MigrateNodeTestBase extends MigrateDrupalTestBase {
       ),
     );
     $this->prepareIdMappings($id_mappings);
-    entity_create('field_entity', array(
+    entity_create('field_config', array(
       'entity_type' => 'node',
       'name' => 'field_test',
       'type' => 'text',
     ))->save();
-    entity_create('field_instance', array(
+    entity_create('field_instance_config', array(
       'entity_type' => 'node',
       'field_name' => 'field_test',
       'bundle' => 'story',
     ))->save();
-    entity_create('field_entity', array(
+    entity_create('field_config', array(
       'entity_type' => 'node',
       'name' => 'field_test_two',
       'type' => 'integer',
       'cardinality' => -1,
     ))->save();
-    entity_create('field_instance', array(
+    entity_create('field_instance_config', array(
       'entity_type' => 'node',
       'field_name' => 'field_test_two',
       'bundle' => 'story',

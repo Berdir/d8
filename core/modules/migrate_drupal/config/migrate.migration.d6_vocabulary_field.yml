@@ -18,6 +18,6 @@ process:
   'settings.allowed_values.0.parent': constants.parent
   cardinality: constants.cardinality
 destination:
-  plugin: entity:field_entity
+  plugin: entity:field_config
 dependencies:
   - d6_taxonomy_vocabulary
