@@ -6,6 +6,7 @@
  */
 
 namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
+use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
 
 /**
  * Drupal 6 upload instance source from database.
@@ -14,7 +15,7 @@ namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
  *   id = "d6_upload_instance"
  * )
  */
-class UploadInstance extends Upload {
+class UploadInstance extends DrupalSqlBase {
 
   /**
    * {@inheritdoc}
@@ -63,4 +64,23 @@ class UploadInstance extends Upload {
   public function query() {
     // Nothing needed here.
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function checkRequirements() {
+    return $this->moduleExists('upload');
+  }
+
+  /**
+   * {@inheritdoc
+   */
+  public function fields() {
+    $fields = array(
+      'node_type' => $this->t('Node type'),
+      'max_filesize' => $this->t('Max filesize'),
+      'file_extensions' => $this->t('File extensions'),
+    );
+  }
+
 }

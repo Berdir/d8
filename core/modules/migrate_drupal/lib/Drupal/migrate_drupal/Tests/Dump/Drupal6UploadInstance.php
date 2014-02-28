@@ -16,6 +16,7 @@ class Drupal6UploadInstance extends Drupal6DumpBase {
    * {@inheritdoc}
    */
   public function load() {
+    $this->setModuleVersion('upload', 6000);
     $this->createTable('node_type');
     $this->database->merge('node_type')
       ->key(array('type' => 'page'))
