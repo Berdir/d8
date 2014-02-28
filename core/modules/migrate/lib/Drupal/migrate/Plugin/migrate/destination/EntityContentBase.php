@@ -17,6 +17,9 @@ use Drupal\migrate\Plugin\MigratePluginManager;
 use Drupal\migrate\Row;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * The destination class for all content entities lacking a specific class.
+ */
 class EntityContentBase extends Entity {
 
   /**
@@ -57,7 +60,7 @@ class EntityContentBase extends Entity {
    */
   public function import(Row $row, array $old_destination_id_values = array()) {
     if ($all_instances = $this->fieldInfo->getInstances($this->storageController->getEntityTypeId())) {
-      /** @var \Drupal\Field\Entity\FieldInstance[] $instances */
+      /** @var \Drupal\Field\Entity\FieldInstanceConfig [] $instances */
       $instances = array();
       if ($bundle_key = $this->getKey('bundle')) {
         $bundle = $row->getDestinationProperty($bundle_key);

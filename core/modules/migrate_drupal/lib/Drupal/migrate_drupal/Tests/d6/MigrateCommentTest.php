@@ -31,6 +31,13 @@ class MigrateCommentTest extends MigrateDrupalTestBase {
   }
 
   public function testComments() {
+    entity_create('node_type', array('type' => 'page'))->save();
+    $node = entity_create('node', array(
+      'type' => 'page',
+      'nid' => 1,
+    ));
+    $node->enforceIsNew();
+    $node->save();
     $id_mappings = array(
       'd6_filter_format' => array(array(array(1), array('plain_text'))),
       'd6_node' => array(array(array(1), array(1))),

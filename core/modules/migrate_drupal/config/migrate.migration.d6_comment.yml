@@ -17,7 +17,7 @@ process:
     plugin: migration
     migration: d6_node
     source: nid
-  entity_type: constants.node
+  entity_type: constants.entity_type
   field_id: constants.field_id
   subject: subject
   uid:
