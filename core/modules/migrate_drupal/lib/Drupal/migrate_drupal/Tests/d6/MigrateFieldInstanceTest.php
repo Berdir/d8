@@ -98,14 +98,16 @@ class MigrateFieldInstanceTest extends MigrateDrupalTestBase {
     $expected = array(
       'file_extensions' => 'txt pdf doc',
       'file_directory' => 'images',
-      'description_field' => '1',
+      'description_field' => TRUE,
       'max_filesize' => '200KB',
-      'display_field' => '',
-      'display_default' => '',
+      'target_type' => 'file',
+      'display_field' => FALSE,
+      'display_default' => FALSE,
       'uri_scheme' => 'public',
     );
-    $this->verbose(print_r(array($field, $field->getSettings(), $expected), 1));
-    $this->assertEqual($field->getSettings(), $expected, 'Field field_test_filefield settings are correct.');
+    // This is the only way to compare arrays.
+    $this->assertFalse(array_diff_assoc($field->getSettings(), $expected));
+    $this->assertFalse(array_diff_assoc($expected, $field->getSettings()));
 
     // Test a link field.
     $field = entity_load('field_instance_config', 'node.story.field_test_link');
