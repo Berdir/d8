@@ -14,6 +14,21 @@ use Drupal\Core\Field\ConfigFieldItemInterface;
 interface LinkItemInterface extends ConfigFieldItemInterface {
 
   /**
+   * Specifies whether the field supports only internal URLs.
+   */
+  const LINK_INTERNAL = 0x01;
+
+  /**
+   * Specifies whether the field supports only external URLs.
+   */
+  const LINK_EXTERNAL = 0x10;
+
+  /**
+   * Specifies whether the field supports both internal and external URLs.
+   */
+  const LINK_GENERIC = 0x11;
+
+  /**
    * Determines if a link is external.
    *
    * @return bool

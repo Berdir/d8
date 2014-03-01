@@ -22,7 +22,7 @@ use Drupal\link\LinkItemInterface;
  *   label = @Translation("Link"),
  *   description = @Translation("Stores a URL string, optional varchar link text, and optional blob of options to assemble a link."),
  *   instance_settings = {
- *     "url_type" = "2",
+ *     "url_type" = \Drupal\link\LinkItemInterface::LINK_GENERIC,
  *     "title" = "1"
  *   },
  *   default_widget = "link_default",
@@ -30,21 +30,6 @@ use Drupal\link\LinkItemInterface;
  * )
  */
 class LinkItem extends ConfigFieldItemBase implements LinkItemInterface {
-
-  /**
-   * Specifies whether the field supports only internal URLs.
-   */
-  const LINK_INTERNAL = 0;
-
-  /**
-   * Specifies whether the field supports only external URLs.
-   */
-  const LINK_EXTERNAL = 1;
-
-  /**
-   * Specifies whether the field supports both internal and external URLs.
-   */
-  const LINK_GENERIC = 2;
 
   /**
    * {@inheritdoc}
@@ -145,7 +130,7 @@ class LinkItem extends ConfigFieldItemBase implements LinkItemInterface {
    * {@inheritdoc}
    */
   public function preSave() {
-    // Trim any spaces around the URL and link text.
+    // Trim any spaces around the link text.
     $this->title = trim($this->title);
 
     // Split out the link 'query' and 'fragment' parts.

@@ -8,7 +8,7 @@
 namespace Drupal\link\Tests;
 
 use Drupal\Component\Utility\String;
-use Drupal\link\Plugin\Field\FieldType\LinkItem;
+use Drupal\link\LinkItemInterface;
 use Drupal\simpletest\WebTestBase;
 
 /**
@@ -80,7 +80,7 @@ class LinkFieldTest extends WebTestBase {
       'bundle' => 'entity_test',
       'settings' => array(
         'title' => DRUPAL_DISABLED,
-        'url_type' => LinkItem::LINK_GENERIC,
+        'url_type' => LinkItemInterface::LINK_GENERIC,
       ),
     ));
     $this->instance->save();
@@ -124,18 +124,18 @@ class LinkFieldTest extends WebTestBase {
       'non/existing/path'
     );
 
-    // Test external and internal URLs for 'url_type' = LinkItem::LINK_GENERIC.
+    // Test external and internal URLs for 'url_type' = LinkItemInterface::LINK_GENERIC.
     $this->assertValidEntries($field_name, $valid_external_entries + $valid_internal_entries);
     $this->assertInvalidEntries($field_name, $invalid_external_entries + $invalid_internal_entries);
 
-    // Test external URLs for 'url_type' = LinkItem::LINK_EXTERNAL.
-    $this->instance->settings['url_type'] = LinkItem::LINK_EXTERNAL;
+    // Test external URLs for 'url_type' = LinkItemInterface::LINK_EXTERNAL.
+    $this->instance->settings['url_type'] = LinkItemInterface::LINK_EXTERNAL;
     $this->instance->save();
     $this->assertValidEntries($field_name, $valid_external_entries);
     $this->assertInvalidEntries($field_name, $valid_internal_entries + $invalid_external_entries);
 
-    // Test external URLs for 'url_type' = LinkItem::LINK_INTERNAL.
-    $this->instance->settings['url_type'] = LinkItem::LINK_INTERNAL;
+    // Test external URLs for 'url_type' = LinkItemInterface::LINK_INTERNAL.
+    $this->instance->settings['url_type'] = LinkItemInterface::LINK_INTERNAL;
     $this->instance->save();
     $this->assertValidEntries($field_name, $valid_internal_entries);
     $this->assertInvalidEntries($field_name, $valid_external_entries + $invalid_internal_entries);

@@ -180,7 +180,7 @@ class LinkFormatter extends FormatterBase {
       $url->setOptions($options);
     }
     else {
-      $url = new Url($item->route_name, (array) $item->route_paramaters, (array) $options);
+      $url = new Url($item->route_name, (array) $item->route_parameters, (array) $options);
     }
 
     return $url;

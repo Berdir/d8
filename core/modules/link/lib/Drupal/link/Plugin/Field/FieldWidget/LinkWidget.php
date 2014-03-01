@@ -13,7 +13,7 @@ use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\ParamConverter\ParamNotConvertedException;
 use Drupal\Core\Routing\MatchingRouteNotFoundException;
 use Drupal\Core\Url;
-use Drupal\link\Plugin\Field\FieldType\LinkItem;
+use Drupal\link\LinkItemInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -54,22 +54,21 @@ class LinkWidget extends WidgetBase {
       '#required' => $element['#required'],
     );
 
-    // If the field is configured to allow only internal or both internal and
-    // external paths, it cannot use the 'url' form element and we have to do
-    // the validation ourselves.
-    if ($url_type != LinkItem::LINK_EXTERNAL) {
+    // If the field is configured to allows internal paths, it cannot use the
+    // 'url' form element and we have to do the validation ourselves.
+    if ($url_type & LinkItemInterface::LINK_INTERNAL) {
       $element['url']['#type'] = 'textfield';
       $element['#element_validate'][] = array($this, 'validateUrl');
     }
 
     // If the field is configured to allow only internal paths, add a useful
     // element prefix.
-    if ($url_type == LinkItem::LINK_INTERNAL) {
+    if ($url_type == LinkItemInterface::LINK_INTERNAL) {
       $element['url']['#field_prefix'] = \Drupal::url('<front>', array(), array('absolute' => TRUE));
     }
     // If the field is configured to allow both internal and external paths,
     // show a useful description.
-    elseif ($url_type == LinkItem::LINK_GENERIC) {
+    elseif ($url_type == LinkItemInterface::LINK_GENERIC) {
       $element['url']['#description'] = $this->t('This can be an internal Drupal path such as %add-node or an external URL such as %drupal. Enter %front to link to the front page.', array('%front' => '<front>', '%add-node' => 'node/add', '%drupal' => 'http://drupal.org'));
     }
 
@@ -178,15 +177,15 @@ class LinkWidget extends WidgetBase {
     $url_type = $this->getFieldSetting('url_type');
     $url_is_valid = TRUE;
 
-    // Validate only if the field type supports external and/or internal URLs.
-    if ($element['url']['#value'] !== '' && $url_type != LinkItem::LINK_EXTERNAL) {
+    // Validate only if the field type supports internal URLs.
+    if ($element['url']['#value'] !== '' && $url_type & LinkItemInterface::LINK_INTERNAL) {
       try {
         $url = Url::createFromPath($element['url']['#value']);
 
         if ($url->isExternal() && !UrlHelper::isValid($element['url']['#value'], TRUE)) {
           $url_is_valid = FALSE;
         }
-        elseif ($url->isExternal() && $url_type == LinkItem::LINK_INTERNAL) {
+        elseif ($url->isExternal() && $url_type == LinkItemInterface::LINK_INTERNAL) {
           $url_is_valid = FALSE;
         }
       }
