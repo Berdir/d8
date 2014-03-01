@@ -83,17 +83,6 @@ class Drupal6TermNode extends Drupal6DumpBase {
       'tid' => 3,
     ))
     ->execute();
-    $this->database->insert('node')->fields(array(
-      'nid',
-      'vid',
-      'type',
-    ))
-    ->values(array(
-      'nid' => 2,
-      'vid' => 3,
-      'type' => 'story',
-    ))
-    ->execute();
 
   }
 }
