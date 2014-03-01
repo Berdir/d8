@@ -132,8 +132,7 @@ class Drupal6Node extends Drupal6DumpBase {
       ),
       'primary key' => array('nid'),
     ));
-    $this->database->insert('node')->fields(
-      array(
+    $this->database->insert('node')->fields(array(
         'nid',
         'vid',
         'type',
@@ -167,9 +166,24 @@ class Drupal6Node extends Drupal6DumpBase {
         'tnid' => 0,
         'translate' => 0,
       ))
+      ->values(array(
+        'nid' => 2,
+        'vid' => 3,
+        'type' => 'story',
+        'language' => '',
+        'title' => 'Test title 2',
+        'uid' => 1,
+        'status' => 1,
+        'created' => 1388271197,
+        'changed' => 1390095701,
+        'comment' => 0,
+        'promote' => 0,
+        'moderate' => 0,
+        'sticky' => 0,
+        'tnid' => 0,
+        'translate' => 0,
+      ))
       ->execute();
-
-
     $this->createTable('node_revisions', array(
       'description' => 'Stores information about each saved version of a {node}.',
       'fields' => array(

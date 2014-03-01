@@ -115,13 +115,6 @@ class Drupal6Upload extends Drupal6DumpBase {
       'weight' => 1,
     ))
     ->execute();
-
-    $this->database->merge('node')->key(array('nid' => 2))
-      ->fields(array(
-        'vid' => 2,
-        'type' => 'story',
-      ))
-      ->execute();
   }
 
 }
