@@ -7,7 +7,6 @@
 
 namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
 
-use Drupal\migrate\Plugin\RequirementsInterface;
 use Drupal\migrate\Row;
 use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
 
@@ -15,10 +14,11 @@ use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
  * Drupal 6 upload source from database.
  *
  * @MigrateSource(
- *   id = "d6_upload"
+ *   id = "d6_upload",
+ *   source_provider = "upload"
  * )
  */
-class Upload extends DrupalSqlBase implements RequirementsInterface {
+class Upload extends DrupalSqlBase {
 
   /**
    * The join options between the node and the upload table.
@@ -62,7 +62,6 @@ class Upload extends DrupalSqlBase implements RequirementsInterface {
     );
   }
 
-
   /**
    * {@inheritdoc}
    */
@@ -71,12 +70,4 @@ class Upload extends DrupalSqlBase implements RequirementsInterface {
     $ids['vid']['alias'] = 'u';
     return $ids;
   }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function checkRequirements() {
-    return $this->moduleExists('upload');
-  }
-
 }

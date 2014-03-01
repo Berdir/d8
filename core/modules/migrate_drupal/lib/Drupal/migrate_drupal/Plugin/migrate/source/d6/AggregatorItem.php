@@ -7,7 +7,6 @@
 
 namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
 
-use Drupal\migrate\Plugin\RequirementsInterface;
 use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
 
 
@@ -15,10 +14,11 @@ use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
  * Drupal 6 aggregator item source from database.
  *
  * @MigrateSource(
- *   id = "d6_aggregator_item"
+ *   id = "d6_aggregator_item",
+ *   source_provider = "aggregator"
  * )
  */
-class AggregatorItem extends DrupalSqlBase implements RequirementsInterface {
+class AggregatorItem extends DrupalSqlBase {
 
   /**
    * {@inheritdoc}
@@ -50,16 +50,8 @@ class AggregatorItem extends DrupalSqlBase implements RequirementsInterface {
   /**
    * {@inheritdoc}
    */
-  public function checkRequirements() {
-    return $this->moduleExists('aggregator');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getIds() {
     $ids['iid']['type'] = 'integer';
     return $ids;
   }
-
 }

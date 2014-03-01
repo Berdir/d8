@@ -7,18 +7,17 @@
 
 namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
 
-use Drupal\migrate\Plugin\RequirementsInterface;
 use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
-
 
 /**
  * Drupal 6 profile fields source from database.
  *
  * @MigrateSource(
- *   id = "d6_profile_field"
+ *   id = "d6_profile_field",
+ *   source_provider = "profile"
  * )
  */
-class ProfileField extends DrupalSqlBase implements RequirementsInterface {
+class ProfileField extends DrupalSqlBase {
 
   /**
    * {@inheritdoc}
@@ -63,13 +62,6 @@ class ProfileField extends DrupalSqlBase implements RequirementsInterface {
       'autocomplete' => $this->t('Whether form auto-completion is enabled. (0 = disabled, 1 = enabled)'),
       'options' => $this->t('List of options to be used in a list selection field.'),
     );
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function checkRequirements() {
-    return $this->moduleExists('profile');
   }
 
   /**

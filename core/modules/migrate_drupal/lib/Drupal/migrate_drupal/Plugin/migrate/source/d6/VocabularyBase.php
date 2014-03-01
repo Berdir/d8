@@ -7,15 +7,13 @@
 
 namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
 
-use Drupal\migrate\Plugin\RequirementsInterface;
-
 use Drupal\migrate\Row;
 use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
 
 /**
  * Drupal 6 vocabularies source base.
  */
-abstract class VocabularyBase extends DrupalSqlBase implements RequirementsInterface {
+abstract class VocabularyBase extends DrupalSqlBase {
 
   /**
    * {@inheritdoc}
@@ -57,12 +55,4 @@ abstract class VocabularyBase extends DrupalSqlBase implements RequirementsInter
       'node_types' => $this->t('The names of the node types the vocabulary may be used with.'),
     );
   }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function checkRequirements() {
-    return $this->moduleExists('taxonomy');
-  }
-
 }

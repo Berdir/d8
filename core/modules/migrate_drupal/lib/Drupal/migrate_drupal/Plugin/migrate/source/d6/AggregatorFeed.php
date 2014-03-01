@@ -6,17 +6,18 @@
  */
 
 namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
-use Drupal\migrate\Plugin\RequirementsInterface;
+
 use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
 
 /**
  * Drupal 6 feed source from database.
  *
  * @MigrateSource(
- *   id = "d6_aggregator_feed"
+ *   id = "d6_aggregator_feed",
+ *   source_provider = "aggregator"
  * )
  */
-class AggregatorFeed extends DrupalSqlBase implements RequirementsInterface {
+class AggregatorFeed extends DrupalSqlBase {
 
   /**
    * {@inheritdoc}
@@ -54,17 +55,10 @@ class AggregatorFeed extends DrupalSqlBase implements RequirementsInterface {
       'link' => $this->t('Parent website of feed.'),
       'description' => $this->t('Parent website\'s description fo the feed.'),
       'image' => $this->t('An image representing the feed.'),
-      'etag' => $this->t('Entity tage HTTP response header.'),
+      'etag' => $this->t('Entity tag HTTP response header.'),
       'modified' => $this->t('When the feed was last modified.'),
       'block' => $this->t("Number of items to display in the feed's block."),
     );
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function checkRequirements() {
-    return $this->moduleExists('aggregator');
   }
 
   /**

@@ -7,7 +7,6 @@
 
 namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
 
-use Drupal\migrate\Plugin\RequirementsInterface;
 use Drupal\migrate\Plugin\SourceEntityInterface;
 use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
 use Drupal\migrate\Row;
@@ -17,10 +16,11 @@ use Drupal\migrate\Row;
  * Drupal 6 profile fields values source.
  *
  * @MigrateSource(
- *   id = "d6_profile_field_values"
+ *   id = "d6_profile_field_values",
+ *   source_provider = "profile"
  * )
  */
-class ProfileFieldValues extends DrupalSqlBase implements SourceEntityInterface, RequirementsInterface {
+class ProfileFieldValues extends DrupalSqlBase implements SourceEntityInterface {
 
   /**
    * {@inheritdoc}
@@ -88,13 +88,6 @@ class ProfileFieldValues extends DrupalSqlBase implements SourceEntityInterface,
   /**
    * {@inheritdoc}
    */
-  public function checkRequirements() {
-    return $this->moduleExists('profile');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getIds() {
     return array(
       'uid' => array(
@@ -117,5 +110,4 @@ class ProfileFieldValues extends DrupalSqlBase implements SourceEntityInterface,
   public function entityTypeId() {
     return 'user';
   }
-
 }

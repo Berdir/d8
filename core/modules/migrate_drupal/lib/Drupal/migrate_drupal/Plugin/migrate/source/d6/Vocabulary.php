@@ -7,18 +7,17 @@
 
 namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
 
-use Drupal\migrate\Plugin\RequirementsInterface;
-
 use Drupal\migrate\Row;
 
 /**
  * Drupal 6 vocabularies source from database.
  *
  * @MigrateSource(
- *   id = "d6_taxonomy_vocabulary"
+ *   id = "d6_taxonomy_vocabulary",
+ *   source_provider = "taxonomy"
  * )
  */
-class Vocabulary extends VocabularyBase implements RequirementsInterface {
+class Vocabulary extends VocabularyBase {
 
   /**
    * {@inheritdoc}
@@ -41,5 +40,4 @@ class Vocabulary extends VocabularyBase implements RequirementsInterface {
     $ids['vid']['type'] = 'integer';
     return $ids;
   }
-
 }

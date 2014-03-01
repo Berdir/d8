@@ -7,8 +7,6 @@
 
 namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
 
-use Drupal\migrate\Plugin\RequirementsInterface;
-
 use Drupal\migrate\Row;
 use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
 
@@ -16,10 +14,11 @@ use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
  * Drupal 6 field instances source from database.
  *
  * @MigrateSource(
- *   id = "d6_field_instance"
+ *   id = "d6_field_instance",
+ *   source_provider = "content"
  * )
  */
-class FieldInstance extends DrupalSqlBase implements RequirementsInterface {
+class FieldInstance extends DrupalSqlBase {
 
   /**
    * {@inheritdoc}
@@ -87,13 +86,6 @@ class FieldInstance extends DrupalSqlBase implements RequirementsInterface {
   /**
    * {@inheritdoc}
    */
-  public function checkRequirements() {
-    return $this->moduleExists('content') && $this->getModuleSchemaVersion('content') >= 6001;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getIds() {
     $ids = array(
       'field_name' => array(
@@ -106,5 +98,4 @@ class FieldInstance extends DrupalSqlBase implements RequirementsInterface {
     );
     return $ids;
   }
-
 }

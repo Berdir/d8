@@ -7,18 +7,17 @@
 
 namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
 
-
-use Drupal\migrate\Plugin\RequirementsInterface;
 use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
 
 /**
  * Drupal 6 menu source from database.
  *
  * @MigrateSource(
- *   id = "d6_menu"
+ *   id = "d6_menu",
+ *   source_provider = "menu"
  * )
  */
-class Menu extends DrupalSqlBase implements RequirementsInterface {
+class Menu extends DrupalSqlBase {
 
   /**
    * {@inheritdoc}
@@ -43,16 +42,8 @@ class Menu extends DrupalSqlBase implements RequirementsInterface {
   /**
    * {@inheritdoc}
    */
-  public function checkRequirements() {
-    return $this->moduleExists('menu');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getIds() {
     $ids['menu_name']['type'] = 'string';
     return $ids;
   }
 }
-

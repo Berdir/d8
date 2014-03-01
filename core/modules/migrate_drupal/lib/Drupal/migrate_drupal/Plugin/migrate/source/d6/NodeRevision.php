@@ -7,8 +7,6 @@
 
 namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
 
-use Drupal\migrate\Plugin\RequirementsInterface;
-
 /**
  * Drupal 6 node revision source from database.
  *
@@ -39,5 +37,4 @@ class NodeRevision extends Node {
     $ids['vid']['alias'] = 'nr';
     return $ids;
   }
-
 }

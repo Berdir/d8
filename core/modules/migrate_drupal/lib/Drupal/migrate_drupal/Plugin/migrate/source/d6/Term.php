@@ -7,7 +7,6 @@
 
 namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
 
-use Drupal\migrate\Plugin\RequirementsInterface;
 use Drupal\migrate\Row;
 use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
 
@@ -17,10 +16,11 @@ use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
  * @todo Support term_relation, term_synonym table if possible.
  *
  * @MigrateSource(
- *   id = "d6_taxonomy_term"
+ *   id = "d6_taxonomy_term",
+ *   source_provider = "taxonomy"
  * )
  */
-class Term extends DrupalSqlBase implements RequirementsInterface {
+class Term extends DrupalSqlBase {
 
   /**
    * {@inheritdoc}
@@ -69,16 +69,8 @@ class Term extends DrupalSqlBase implements RequirementsInterface {
   /**
    * {@inheritdoc}
    */
-  public function checkRequirements() {
-    return $this->moduleExists('taxonomy');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getIds() {
     $ids['tid']['type'] = 'integer';
     return $ids;
   }
-
 }

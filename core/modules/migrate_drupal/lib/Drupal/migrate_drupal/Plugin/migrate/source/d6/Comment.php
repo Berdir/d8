@@ -7,19 +7,18 @@
 
 namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
 
-use Drupal\migrate\Plugin\RequirementsInterface;
 use Drupal\migrate\Row;
 use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
-
 
 /**
  * Drupal 6 comment source from database.
  *
  * @MigrateSource(
- *   id = "d6_comment"
+ *   id = "d6_comment",
+ *   source_provider = "comment"
  * )
  */
-class Comment extends DrupalSqlBase implements RequirementsInterface {
+class Comment extends DrupalSqlBase {
 
   /**
    * {@inheritdoc}
@@ -42,7 +41,6 @@ class Comment extends DrupalSqlBase implements RequirementsInterface {
     $row->setSourceProperty('status', !$row->getSourceProperty('status'));
     return parent::prepareRow($row);
   }
-
 
   /**
    * {@inheritdoc}
@@ -70,16 +68,8 @@ class Comment extends DrupalSqlBase implements RequirementsInterface {
   /**
    * {@inheritdoc}
    */
-  public function checkRequirements() {
-    return $this->moduleExists('comment');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getIds() {
     $ids['cid']['type'] = 'integer';
     return $ids;
   }
-
 }
