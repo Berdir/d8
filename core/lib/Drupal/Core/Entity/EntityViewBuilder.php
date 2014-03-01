@@ -93,8 +93,10 @@ class EntityViewBuilder extends EntityControllerBase implements EntityController
   public function buildContent(array $entities, array $displays, $view_mode, $langcode = NULL) {
     $entities_by_bundle = array();
     foreach ($entities as $id => $entity) {
-      // Remove previously built content, if exists.
-      $entity->content = array(
+      if (empty($entity->content)) {
+        $entity->content = array();
+      }
+      $entity->content += array(
         '#view_mode' => $view_mode,
       );
       // Initialize the field item attributes for the fields being displayed.
@@ -195,11 +197,11 @@ class EntityViewBuilder extends EntityControllerBase implements EntityController
     $this->moduleHandler->alter('entity_view_mode', $view_mode, $entity, $context);
 
     // Get the corresponding display settings.
-    $display = EntityViewDisplay::collectRenderDisplays($entity, $view_mode);
+    $display = EntityViewDisplay::collectRenderDisplay($entity, $view_mode);
 
     // Build field renderables.
     $entity->content = $elements;
-    $this->buildContent(array($entity), array($bundle => $display), $view_mode, $langcode);
+    $this->buildContent(array($entity->id() => $entity), array($bundle => $display), $view_mode, $langcode);
     $view_mode = isset($entity->content['#view_mode']) ? $entity->content['#view_mode'] : $view_mode;
 
     $this->moduleHandler()->invokeAll($view_hook, array($entity, $display, $view_mode, $langcode));
