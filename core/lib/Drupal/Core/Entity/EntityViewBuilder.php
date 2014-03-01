@@ -13,6 +13,7 @@ use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\TypedData\TranslatableInterface;
 use Drupal\entity\Entity\EntityViewDisplay;
+use Drupal\Core\Render\Element;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -120,7 +121,9 @@ class EntityViewBuilder extends EntityControllerBase implements EntityController
     foreach ($entities_by_bundle as $bundle => $bundle_entities) {
       $build = $displays[$bundle]->buildMultiple($bundle_entities);
       foreach ($bundle_entities as $id => $entity) {
-        $entity->content += $build[$id];
+        $entity->content += array(
+          '#view_mode' => $view_mode,
+        ) + $build[$id];
       }
     }
   }
@@ -144,6 +147,7 @@ class EntityViewBuilder extends EntityControllerBase implements EntityController
       "#{$this->entityTypeId}" => $entity,
       '#view_mode' => $view_mode,
       '#langcode' => $langcode,
+      '#pre_render' => array(array($this, 'entityViewBuilderPreRender')),
     );
 
     // Cache the rendered output if permitted by the view mode and global entity
@@ -165,6 +169,64 @@ class EntityViewBuilder extends EntityControllerBase implements EntityController
     }
 
     return $return;
+  }
+
+  /**
+   * Performs pre-render tasks on an entity view.
+   *
+   * This function is assigned as a #pre_render callback in
+   * \Drupal\Core\Entity\EntityViewBuilder::getBuildDefaults().
+   *
+   * @param array $elements
+   *   A structured array containing build information and context for an
+   *   entity view.
+   *
+   * @see drupal_render()
+   */
+  public function entityViewBuilderPreRender(array $elements) {
+    $entity = $elements['#entity'];
+    $bundle = $entity->bundle();
+    $view_hook = "{$this->entityTypeId}_view";
+    $view_mode = $elements['#view_mode'];
+    $langcode = $elements['#langcode'];
+    $context = array('langcode' => $langcode);
+
+    // Allow modules to change the view mode.
+    $this->moduleHandler->alter('entity_view_mode', $view_mode, $entity, $context);
+
+    // Get the corresponding display settings.
+    $display = EntityViewDisplay::collectRenderDisplays($entity, $view_mode);
+
+    // Build field renderables.
+    $entity->content = $elements;
+    $this->buildContent(array($entity), array($bundle => $display), $view_mode, $langcode);
+    $view_mode = isset($entity->content['#view_mode']) ? $entity->content['#view_mode'] : $view_mode;
+
+    $this->moduleHandler()->invokeAll($view_hook, array($entity, $display, $view_mode, $langcode));
+    $this->moduleHandler()->invokeAll('entity_view', array($entity, $display, $view_mode, $langcode));
+
+    // Do not override $build = $elements because hook_view implementations
+    // are expected to add content, not alter it. For example, mymodule_view
+    // should not change the #theme key.
+    $build = $entity->content;
+    // We don't need duplicate rendering info in $entity->content.
+    unset($entity->content);
+
+    $this->alterBuild($build, $entity, $display, $view_mode, $langcode);
+
+    // Assign the weights configured in the display.
+    // @todo: Once https://drupal.org/node/1875974 provides the missing API,
+    //   only do it for 'extra fields', since other components have been taken
+    //   care of in EntityViewDisplay::buildMultiple().
+    foreach ($display->getComponents() as $name => $options) {
+      if (isset($build[$name])) {
+        $build[$name]['#weight'] = $options['weight'];
+      }
+    }
+
+    // Allow modules to modify the render array.
+    \Drupal::moduleHandler()->alter(array($view_hook, 'entity_view'), $build, $entity, $display);
+    return $build;
   }
 
   /**
@@ -202,58 +264,24 @@ class EntityViewBuilder extends EntityControllerBase implements EntityController
     }
 
     // Build the view modes and display objects.
-    $view_modes = array();
-    $context = array('langcode' => $langcode);
-    foreach ($entities as $key => $entity) {
-      $bundle = $entity->bundle();
+    $build = array('#sorted' => TRUE);
+    $weight = 0;
 
+    foreach ($entities as $key => $entity) {
       // Ensure that from now on we are dealing with the proper translation
       // object.
       $entity = $this->entityManager->getTranslationFromContext($entity, $langcode);
       $entities[$key] = $entity;
 
-      // Allow modules to change the view mode.
-      $entity_view_mode = $view_mode;
-      $this->moduleHandler->alter('entity_view_mode', $entity_view_mode, $entity, $context);
-      // Store entities for rendering by view_mode.
-      $view_modes[$entity_view_mode][$entity->id()] = $entity;
-    }
+      //$build[$key] = $entity->content;
+      $build[$key] = array(
+        '#entity' => $entity
+      );
 
-    foreach ($view_modes as $mode => $view_mode_entities) {
-      $displays[$mode] = EntityViewDisplay::collectRenderDisplays($view_mode_entities, $mode);
-      $this->buildContent($view_mode_entities, $displays[$mode], $mode, $langcode);
-    }
-
-    $view_hook = "{$this->entityTypeId}_view";
-    $build = array('#sorted' => TRUE);
-    $weight = 0;
-    foreach ($entities as $key => $entity) {
-      $entity_view_mode = isset($entity->content['#view_mode']) ? $entity->content['#view_mode'] : $view_mode;
-      $display = $displays[$entity_view_mode][$entity->bundle()];
-      \Drupal::moduleHandler()->invokeAll($view_hook, array($entity, $display, $entity_view_mode, $langcode));
-      \Drupal::moduleHandler()->invokeAll('entity_view', array($entity, $display, $entity_view_mode, $langcode));
-
-      $build[$key] = $entity->content;
-      // We don't need duplicate rendering info in $entity->content.
-      unset($entity->content);
-
-      $build[$key] += $this->getBuildDefaults($entity, $entity_view_mode, $langcode);
-      $this->alterBuild($build[$key], $entity, $display, $entity_view_mode, $langcode);
-
-      // Assign the weights configured in the display.
-      // @todo: Once https://drupal.org/node/1875974 provides the missing API,
-      //   only do it for 'extra fields', since other components have been taken
-      //   care of in EntityViewDisplay::buildMultiple().
-      foreach ($display->getComponents() as $name => $options) {
-        if (isset($build[$key][$name])) {
-          $build[$key][$name]['#weight'] = $options['weight'];
-        }
-      }
+      // Set defaults for #pre_render.
+      $build[$key] += $this->getBuildDefaults($entity, $view_mode, $langcode);
 
       $build[$key]['#weight'] = $weight++;
-
-      // Allow modules to modify the render array.
-      $this->moduleHandler->alter(array($view_hook, 'entity_view'), $build[$key], $entity, $display);
     }
 
     return $build;
