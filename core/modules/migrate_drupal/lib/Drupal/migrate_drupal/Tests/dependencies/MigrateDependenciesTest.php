@@ -39,14 +39,14 @@ class MigrateDependenciesTest extends MigrateDrupalTestBase {
     $migration_items = array('d6_comment', 'd6_filter_format', 'd6_node');
     $migrations = entity_load_multiple('migration', $migration_items);
     $expected_order = array('d6_filter_format', 'd6_node', 'd6_comment');
-    $this->assertEqual(array_keys($migrations), $expected_order, 'Migration dependencies order is correct.');
-    $expected_dependencies = array('d6_node', 'd6_node_type', 'd6_filter_format', 'd6_user');
+    $this->assertEqual(array_keys($migrations), $expected_order);
+    $expected_requirements = array('d6_node', 'd6_node_type', 'd6_filter_format', 'd6_user');
     // Migration dependencies for comment include dependencies for node
     // migration as well.
-    $actual_dependencies = $migrations['d6_comment']->dependencies;
-    $this->assertEqual(count($actual_dependencies), count($expected_dependencies));
-    foreach ($expected_dependencies as $dependency) {
-      $this->assertEqual($actual_dependencies[$dependency], $dependency);
+    $actual_requirements = $migrations['d6_comment']->get('requirements');
+    $this->assertEqual(count($actual_requirements), count($expected_requirements));
+    foreach ($expected_requirements as $requirement) {
+      $this->assertEqual($actual_requirements[$requirement], $requirement);
     }
   }
 

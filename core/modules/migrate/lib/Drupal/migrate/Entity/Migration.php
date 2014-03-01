@@ -219,11 +219,18 @@ class Migration extends ConfigEntityBase implements MigrationInterface, Requirem
   public $limit = array();
 
   /**
-   * Migration requirements that need to be run before the current one.
+   * These migrations must be already executed before this migration can run.
    *
    * @var array
    */
   protected $requirements = array();
+
+  /**
+   * These migrations, if ran at all, must be executed before this migration.
+   *
+   *@var array
+   */
+  public $dependencies = array();
 
   /**
    * {@inheritdoc}
