@@ -142,8 +142,7 @@ class ExternalUrlTest extends UnitTestCase {
    */
   public function testToArray(Url $url) {
     $expected = array(
-      'route_name' => '',
-      'route_parameters' => array(),
+      'path' => $this->path,
       'options' => array(),
     );
     $this->assertSame($expected, $url->toArray());
@@ -157,7 +156,7 @@ class ExternalUrlTest extends UnitTestCase {
    * @covers ::getRouteName()
    */
   public function testGetRouteName(Url $url) {
-    $this->assertSame('', $url->getRouteName());
+    $this->assertSame(NULL, $url->getRouteName());
   }
 
   /**

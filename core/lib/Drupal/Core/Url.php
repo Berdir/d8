@@ -169,7 +169,7 @@ class Url extends DependencySerialization {
     $this->path = $this->routeName;
 
     // Set empty route name and parameters.
-    $this->routeName = '';
+    $this->routeName = NULL;
     $this->routeParameters = array();
 
     return $this;
@@ -291,6 +291,15 @@ class Url extends DependencySerialization {
   }
 
   /**
+   * Returns the path of the URL if it is external.
+   *
+   * @return string
+   */
+  public function getPath() {
+    return $this->path;
+  }
+
+  /**
    * Sets the absolute value for this Url.
    *
    * @param bool $absolute
@@ -308,7 +317,7 @@ class Url extends DependencySerialization {
    */
   public function toString() {
     if ($this->isExternal()) {
-      return $this->urlGenerator()->generateFromPath($this->path, $this->getOptions());
+      return $this->urlGenerator()->generateFromPath($this->getPath(), $this->getOptions());
     }
 
     return $this->urlGenerator()->generateFromRoute($this->getRouteName(), $this->getRouteParameters(), $this->getOptions());
@@ -321,11 +330,19 @@ class Url extends DependencySerialization {
    *   An associative array containing all the properties of the route.
    */
   public function toArray() {
-    return array(
-      'route_name' => $this->getRouteName(),
-      'route_parameters' => $this->getRouteParameters(),
-      'options' => $this->getOptions(),
-    );
+    if ($this->external) {
+      return array(
+        'path' => $this->getPath(),
+        'options' => $this->getOptions(),
+      );
+    }
+    else {
+      return array(
+        'route_name' => $this->getRouteName(),
+        'route_parameters' => $this->getRouteParameters(),
+        'options' => $this->getOptions(),
+      );
+    }
   }
 
   /**
@@ -335,11 +352,19 @@ class Url extends DependencySerialization {
    *   An associative array suitable for a render array.
    */
   public function toRenderArray() {
-    return array(
-      '#route_name' => $this->getRouteName(),
-      '#route_parameters' => $this->getRouteParameters(),
-      '#options' => $this->getOptions(),
-    );
+    if ($this->external) {
+      return array(
+        '#href' => $this->getPath(),
+        '#options' => $this->getOptions(),
+      );
+    }
+    else {
+      return array(
+        '#route_name' => $this->getRouteName(),
+        '#route_parameters' => $this->getRouteParameters(),
+        '#options' => $this->getOptions(),
+      );
+    }
   }
 
   /**

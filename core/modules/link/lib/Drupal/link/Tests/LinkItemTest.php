@@ -58,7 +58,7 @@ class LinkItemTest extends FieldUnitTestBase {
     $class = $this->randomName();
     $entity->field_test->url = $url;
     $entity->field_test->title = $title;
-    $entity->field_test->first()->get('attributes')->set('class', $class);
+    $entity->field_test->first()->get('options')->set('attributes', array('class' => $class));
     $entity->name->value = $this->randomName();
     $entity->save();
 
@@ -71,7 +71,7 @@ class LinkItemTest extends FieldUnitTestBase {
     $this->assertEqual($entity->field_test[0]->url, $url);
     $this->assertEqual($entity->field_test->title, $title);
     $this->assertEqual($entity->field_test[0]->title, $title);
-    $this->assertEqual($entity->field_test->attributes['class'], $class);
+    $this->assertEqual($entity->field_test->options['attributes']['class'], $class);
 
     // Verify changing the field value.
     $new_url = 'http://drupal.org';
@@ -79,17 +79,17 @@ class LinkItemTest extends FieldUnitTestBase {
     $new_class = $this->randomName();
     $entity->field_test->url = $new_url;
     $entity->field_test->title = $new_title;
-    $entity->field_test->first()->get('attributes')->set('class', $new_class);
+    $entity->field_test->first()->get('options')->set('attributes', array('class' => $new_class));
     $this->assertEqual($entity->field_test->url, $new_url);
     $this->assertEqual($entity->field_test->title, $new_title);
-    $this->assertEqual($entity->field_test->attributes['class'], $new_class);
+    $this->assertEqual($entity->field_test->options['attributes']['class'], $new_class);
 
     // Read changed entity and assert changed values.
     $entity->save();
     $entity = entity_load('entity_test', $id);
     $this->assertEqual($entity->field_test->url, $new_url);
     $this->assertEqual($entity->field_test->title, $new_title);
-    $this->assertEqual($entity->field_test->attributes['class'], $new_class);
+    $this->assertEqual($entity->field_test->options['attributes']['class'], $new_class);
   }
 
 }

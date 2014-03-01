@@ -7,8 +7,14 @@
 
 namespace Drupal\link\Plugin\Field\FieldWidget;
 
+use Drupal\Component\Utility\Url as UrlHelper;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
+use Drupal\Core\ParamConverter\ParamNotConvertedException;
+use Drupal\Core\Routing\MatchingRouteNotFoundException;
+use Drupal\Core\Url;
+use Drupal\link\Plugin\Field\FieldType\LinkItem;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Plugin implementation of the 'link' widget.
@@ -31,17 +37,45 @@ class LinkWidget extends WidgetBase {
    * {@inheritdoc}
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, array &$form_state) {
+    $url_type = $this->getFieldSetting('url_type');
+
+    $default_url_value = NULL;
+    if (isset($items[$delta]->url)) {
+      $url = Url::createFromPath($items[$delta]->url);
+      $url->setOptions($items[$delta]->options);
+      $default_url_value = ltrim($url->toString(), '/');
+    }
     $element['url'] = array(
       '#type' => 'url',
-      '#title' => t('URL'),
+      '#title' => $this->t('URL'),
       '#placeholder' => $this->getSetting('placeholder_url'),
-      '#default_value' => isset($items[$delta]->url) ? $items[$delta]->url : NULL,
+      '#default_value' => $default_url_value,
       '#maxlength' => 2048,
       '#required' => $element['#required'],
     );
+
+    // If the field is configured to allow only internal or both internal and
+    // external paths, it cannot use the 'url' form element and we have to do
+    // the validation ourselves.
+    if ($url_type != LinkItem::LINK_EXTERNAL) {
+      $element['url']['#type'] = 'textfield';
+      $element['#element_validate'][] = array($this, 'validateUrl');
+    }
+
+    // If the field is configured to allow only internal paths, add a useful
+    // element prefix.
+    if ($url_type == LinkItem::LINK_INTERNAL) {
+      $element['url']['#field_prefix'] = \Drupal::url('<front>', array(), array('absolute' => TRUE));
+    }
+    // If the field is configured to allow both internal and external paths,
+    // show a useful description.
+    elseif ($url_type == LinkItem::LINK_GENERIC) {
+      $element['url']['#description'] = $this->t('This can be an internal Drupal path such as %add-node or an external URL such as %drupal. Enter %front to link to the front page.', array('%front' => '<front>', '%add-node' => 'node/add', '%drupal' => 'http://drupal.org'));
+    }
+
     $element['title'] = array(
       '#type' => 'textfield',
-      '#title' => t('Link text'),
+      '#title' => $this->t('Link text'),
       '#placeholder' => $this->getSetting('placeholder_title'),
       '#default_value' => isset($items[$delta]->title) ? $items[$delta]->title : NULL,
       '#maxlength' => 255,
@@ -52,7 +86,7 @@ class LinkWidget extends WidgetBase {
     // settings cannot be saved otherwise.
     $is_field_edit_form = ($element['#entity'] === NULL);
     if (!$is_field_edit_form && $this->getFieldSetting('title') == DRUPAL_REQUIRED) {
-      $element['#element_validate'] = array(array($this, 'validateTitle'));
+      $element['#element_validate'][] = array($this, 'validateTitle');
     }
 
     // Exposing the attributes array in the widget is left for alternate and more
@@ -60,7 +94,7 @@ class LinkWidget extends WidgetBase {
     $element['attributes'] = array(
       '#type' => 'value',
       '#tree' => TRUE,
-      '#value' => !empty($items[$delta]->attributes) ? $items[$delta]->attributes : array(),
+      '#value' => !empty($items[$delta]->options['attributes']) ? $items[$delta]->options['attributes'] : array(),
       '#attributes' => array('class' => array('link-field-widget-attributes')),
     );
 
@@ -83,15 +117,15 @@ class LinkWidget extends WidgetBase {
 
     $elements['placeholder_url'] = array(
       '#type' => 'textfield',
-      '#title' => t('Placeholder for URL'),
+      '#title' => $this->t('Placeholder for URL'),
       '#default_value' => $this->getSetting('placeholder_url'),
-      '#description' => t('Text that will be shown inside the field until a value is entered. This hint is usually a sample value or a brief description of the expected format.'),
+      '#description' => $this->t('Text that will be shown inside the field until a value is entered. This hint is usually a sample value or a brief description of the expected format.'),
     );
     $elements['placeholder_title'] = array(
       '#type' => 'textfield',
-      '#title' => t('Placeholder for link text'),
+      '#title' => $this->t('Placeholder for link text'),
       '#default_value' => $this->getSetting('placeholder_title'),
-      '#description' => t('Text that will be shown inside the field until a value is entered. This hint is usually a sample value or a brief description of the expected format.'),
+      '#description' => $this->t('Text that will be shown inside the field until a value is entered. This hint is usually a sample value or a brief description of the expected format.'),
       '#states' => array(
         'invisible' => array(
           ':input[name="instance[settings][title]"]' => array('value' => DRUPAL_DISABLED),
@@ -111,31 +145,91 @@ class LinkWidget extends WidgetBase {
     $placeholder_title = $this->getSetting('placeholder_title');
     $placeholder_url = $this->getSetting('placeholder_url');
     if (empty($placeholder_title) && empty($placeholder_url)) {
-      $summary[] = t('No placeholders');
+      $summary[] = $this->t('No placeholders');
     }
     else {
       if (!empty($placeholder_title)) {
-        $summary[] = t('Title placeholder: @placeholder_title', array('@placeholder_title' => $placeholder_title));
+        $summary[] = $this->t('Title placeholder: @placeholder_title', array('@placeholder_title' => $placeholder_title));
       }
       if (!empty($placeholder_url)) {
-        $summary[] = t('URL placeholder: @placeholder_url', array('@placeholder_url' => $placeholder_url));
+        $summary[] = $this->t('URL placeholder: @placeholder_url', array('@placeholder_url' => $placeholder_url));
       }
     }
 
     return $summary;
   }
 
-
   /**
-   * Form element validation handler for link_field_widget_form().
+   * Form element validation handler; Validates the title property.
    *
    * Conditionally requires the link title if a URL value was filled in.
    */
-  function validateTitle(&$element, &$form_state, $form) {
+  public function validateTitle(&$element, &$form_state, $form) {
     if ($element['url']['#value'] !== '' && $element['title']['#value'] === '') {
       $element['title']['#required'] = TRUE;
-      form_error($element['title'], $form_state, t('!name field is required.', array('!name' => $element['title']['#title'])));
+      \Drupal::formBuilder()->setError($element['title'], $form_state, $this->t('!name field is required.', array('!name' => $element['title']['#title'])));
     }
   }
-}
 
+  /**
+   * Form element validation handler; Validates the url property.
+   */
+  public function validateUrl(&$element, &$form_state, $form) {
+    $url_type = $this->getFieldSetting('url_type');
+    $url_is_valid = TRUE;
+
+    // Validate only if the field type supports external and/or internal URLs.
+    if ($element['url']['#value'] !== '' && $url_type != LinkItem::LINK_EXTERNAL) {
+      try {
+        $url = Url::createFromPath($element['url']['#value']);
+
+        if ($url->isExternal() && !UrlHelper::isValid($element['url']['#value'], TRUE)) {
+          $url_is_valid = FALSE;
+        }
+        elseif ($url->isExternal() && $url_type == LinkItem::LINK_INTERNAL) {
+          $url_is_valid = FALSE;
+        }
+      }
+      catch (NotFoundHttpException $e) {
+        $url_is_valid = FALSE;
+      }
+      catch (MatchingRouteNotFoundException $e) {
+        $url_is_valid = FALSE;
+      }
+      catch (ParamNotConvertedException $e) {
+        $url_is_valid = FALSE;
+      }
+    }
+
+    if (!$url_is_valid) {
+      \Drupal::formBuilder()->setError($element['url'], $form_state, $this->t('The URL %url is not valid.', array('%url' => $element['url']['#value'])));
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function massageFormValues(array $values, array $form, array &$form_state) {
+    foreach ($values as &$value) {
+      if (!empty($value['url'])) {
+        try {
+          $url = Url::createFromPath($value['url']);
+          $url->setOption('attributes', $value['attributes']);
+
+          $value += $url->toArray();
+        }
+        catch (NotFoundHttpException $e) {
+          // Nothing to do here, validateUrl() emits form validation errors.
+        }
+        catch (MatchingRouteNotFoundException $e) {
+          // Nothing to do here, validateUrl() emits form validation errors.
+        }
+        catch (ParamNotConvertedException $e) {
+          // Nothing to do here, validateUrl() emits form validation errors.
+        }
+      }
+    }
+    return $values;
+  }
+
+}
