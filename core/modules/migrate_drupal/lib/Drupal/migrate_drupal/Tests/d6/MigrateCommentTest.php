@@ -13,7 +13,7 @@ use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
 /**
- * Test the comment migration.
+ * Tests the Drupal 6 to Drupal 6 comment migration.
  */
 class MigrateCommentTest extends MigrateDrupalTestBase {
 
@@ -30,7 +30,12 @@ class MigrateCommentTest extends MigrateDrupalTestBase {
     );
   }
 
-  public function testComments() {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp() {
+    parent::setUp();
     entity_create('node_type', array('type' => 'page'))->save();
     $node = entity_create('node', array(
       'type' => 'page',
@@ -55,7 +60,12 @@ class MigrateCommentTest extends MigrateDrupalTestBase {
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, $this);
     $executable->import();
+  }
 
+  /**
+   * Tests the Drupal 6 to Drupal 6 comment migration.
+   */
+  public function testComments() {
     /** @var Comment $comment */
     $comment = entity_load('comment', 1);
     $this->assertEqual('The first comment.', $comment->subject->value);

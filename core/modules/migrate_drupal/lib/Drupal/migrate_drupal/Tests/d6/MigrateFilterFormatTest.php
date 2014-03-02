@@ -10,6 +10,9 @@ namespace Drupal\migrate_drupal\Tests\d6;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
+/**
+ * Tests the Drupal 6 filter format to Drupal 8 migration.
+ */
 class MigrateFilterFormatTest extends MigrateDrupalTestBase {
 
   /**
@@ -28,7 +31,12 @@ class MigrateFilterFormatTest extends MigrateDrupalTestBase {
     );
   }
 
-  public function testFilterFormat() {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp() {
+    parent::setUp();
     $migration = entity_load('migration', 'd6_filter_format');
     $dumps = array(
       drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6FilterFormat.php',
@@ -36,6 +44,12 @@ class MigrateFilterFormatTest extends MigrateDrupalTestBase {
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, $this);
     $executable->import();
+  }
+
+  /**
+   * Tests the Drupal 6 filter format to Drupal 8 migration.
+   */
+  public function testFilterFormat() {
     $filter_format = entity_load('filter_format', 'filtered_html');
 
     // Check filter status.

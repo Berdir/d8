@@ -9,7 +9,7 @@ use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 use Drupal\Core\Database\Database;
 
 /**
- * Tests migration of date formats.
+ * Tests the Drupal 6 date formats to Drupal 8 migration.
  */
 class MigrateDateFormatTest extends MigrateDrupalTestBase {
 
@@ -24,7 +24,11 @@ class MigrateDateFormatTest extends MigrateDrupalTestBase {
     );
   }
 
-  public function testDateFormats() {
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp() {
+    parent::setUp();
     /** @var \Drupal\migrate\entity\Migration $migration */
     $migration = entity_load('migration', 'd6_date_formats');
     $dumps = array(
@@ -33,7 +37,12 @@ class MigrateDateFormatTest extends MigrateDrupalTestBase {
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, new MigrateMessage());
     $executable->import();
+  }
 
+  /**
+   * Tests the Drupal 6 date formats to Drupal 8 migration.
+   */
+  public function testDateFormats() {
     $short_date_format = entity_load('date_format', 'short');
     $this->assertEqual('\S\H\O\R\T m/d/Y - H:i', $short_date_format->getPattern(DrupalDateTime::PHP));
 
@@ -49,7 +58,7 @@ class MigrateDateFormatTest extends MigrateDrupalTestBase {
       ->fields(array('value' => serialize('\S\H\O\R\T d/m/Y - H:i')))
       ->condition('name', 'date_format_short')
       ->execute();
-    db_truncate($migration->getIdMap()->mapTableName())->execute();
+    db_truncate(entity_load('migration', 'd6_date_formats')->getIdMap()->mapTableName())->execute();
     $migration = entity_load_unchanged('migration', 'd6_date_formats');
     $executable = new MigrateExecutable($migration, $this);
     $executable->import();

@@ -22,6 +22,7 @@ class MigrateDrupal6Test extends MigrateDrupalTestBase{
     'block',
     'book',
     'comment',
+    'contact',
     'custom_block',
     'menu',
     'node',
@@ -110,6 +111,12 @@ class MigrateDrupal6Test extends MigrateDrupalTestBase{
       'd6_aggregator_item',
       'd6_block',
       'd6_book_settings',
+      #'d6_comment',
+      'd6_contact_category',
+      'd6_contact_settings',
+      'd6_custom_block',
+      'd6_date_formats',
+      'd6_filter_format',
       'd6_menu',
     );
     $classes = array(
@@ -119,6 +126,12 @@ class MigrateDrupal6Test extends MigrateDrupalTestBase{
       __NAMESPACE__ . '\MigrateAggregatorItemTest',
       __NAMESPACE__ . '\MigrateBlockTest',
       __NAMESPACE__ . '\MigrateBookConfigsTest',
+      #__NAMESPACE__ . '\MigrateCommentTest',
+      __NAMESPACE__ . '\MigrateContactCategoryTest',
+      __NAMESPACE__ . '\MigrateContactConfigsTest',
+      __NAMESPACE__ . '\MigrateCustomBlockTest',
+      __NAMESPACE__ . '\MigrateDateFormatTest',
+      __NAMESPACE__ . '\MigrateFilterFormatTest',
       __NAMESPACE__ . '\MigrateMenuTest',
     );
     // Run every migration in the order specified by the storage controller.

@@ -13,7 +13,7 @@ use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
 /**
- * Test the custom block migration.
+ * Tests the Drupal 6 custom block to Drupal 8 migration.
  */
 class MigrateCustomBlockTest extends MigrateDrupalTestBase {
 
@@ -31,21 +31,15 @@ class MigrateCustomBlockTest extends MigrateDrupalTestBase {
   }
 
   /**
-   * Tests block migration.
+   * {@inheritdoc}
    */
-  public function testBlockMigration() {
-    $table_name = entity_load('migration', 'd6_filter_format')->getIdMap()->mapTableName();
-    // We need some sample data so we can use the Migration process plugin.
-    \Drupal::database()->insert($table_name)->fields(array(
-      'sourceid1',
-      'destid1',
-    ))
-    ->values(array(
-      'sourceid1' => 2,
-      'destid1' => 'restricted_html',
-    ))
-    ->execute();
-
+  public function setUp() {
+    parent::setUp();
+    $this->prepareIdMappings(array(
+      'd6_filter_format' => array(
+        array(array(2), array('full_html'))
+      )
+    ));
     /** @var \Drupal\migrate\entity\Migration $migration */
     $migration = entity_load('migration', 'd6_custom_block');
     $dumps = array(
@@ -54,7 +48,12 @@ class MigrateCustomBlockTest extends MigrateDrupalTestBase {
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, $this);
     $executable->import();
+  }
 
+  /**
+   * Tests the Drupal 6 custom block to Drupal 8 migration.
+   */
+  public function testBlockMigration() {
     /** @var CustomBlock $block */
     $block = entity_load('custom_block', 1);
     $this->assertEqual('My block 1', $block->label());
@@ -62,7 +61,7 @@ class MigrateCustomBlockTest extends MigrateDrupalTestBase {
     $this->assertTrue(REQUEST_TIME <= $block->getChangedTime() && $block->getChangedTime() <= time());
     $this->assertEqual(Language::LANGCODE_NOT_SPECIFIED, $block->language()->id);
     $this->assertEqual('<h3>My custom block body</h3>', $block->body->value);
-    $this->assertEqual('restricted_html', $block->body->format);
+    $this->assertEqual('full_html', $block->body->format);
   }
 
 }

@@ -13,7 +13,7 @@ use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 use Drupal\Core\Database\Database;
 
 /**
- * Test the Drupal 6 menu to Drupal 8 migration.
+ * Tests the Drupal 6 menu to Drupal 8 migration.
  */
 class MigrateMenuTest extends MigrateDrupalTestBase {
 
@@ -43,7 +43,7 @@ class MigrateMenuTest extends MigrateDrupalTestBase {
   }
 
   /**
-   * Test the Drupal 6 menu to Drupal 8 migration.
+   * Tests the Drupal 6 menu to Drupal 8 migration.
    */
   public function testMenu() {
     $navigation_menu = entity_load('menu', 'navigation');
