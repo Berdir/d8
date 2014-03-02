@@ -33,8 +33,8 @@ class InPlaceEditorManager extends DefaultPluginManager {
    *   The module handler to invoke the alter hook with.
    */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, LanguageManagerInterface $language_manager, ModuleHandlerInterface $module_handler) {
-    parent::__construct('Plugin/InPlaceEditor', $namespaces, 'Drupal\edit\Annotation\InPlaceEditor');
-    $this->alterInfo($module_handler, 'edit_editor');
+    parent::__construct('Plugin/InPlaceEditor', $namespaces, $module_handler, 'Drupal\edit\Annotation\InPlaceEditor');
+    $this->alterInfo('edit_editor');
     $this->setCacheBackend($cache_backend, $language_manager, 'edit:editor');
   }
 
