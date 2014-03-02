@@ -84,7 +84,7 @@ class Drupal6AggregatorItem extends Drupal6DumpBase {
     ))
     ->values(array(
       'iid' => 1,
-      'fid' => 1,
+      'fid' => 5,
       'title' => 'This (three) weeks in Drupal Core - January 10th 2014',
       'link' => 'https://groups.drupal.org/node/395218',
       'author' => 'larowlan',

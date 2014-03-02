@@ -12,6 +12,9 @@ use Drupal\Core\Language\Language;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
+/**
+ * Test Drupal 6 aggregator item migration to Drupal 8.
+ */
 class MigrateAggregatorItemTest extends MigrateDrupalTestBase {
 
   static $modules = array('aggregator');
@@ -27,12 +30,15 @@ class MigrateAggregatorItemTest extends MigrateDrupalTestBase {
     );
   }
 
-  public function testAggregatorItem() {
-
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp() {
+    parent::setUp();
     // Add some id mappings for the dependant migrations.
     $id_mappings = array(
       'd6_aggregator_feed' => array(
-        array(array(1), array(5)),
+        array(array(5), array(5)),
       ),
     );
     $this->prepareIdMappings($id_mappings);
@@ -47,7 +53,6 @@ class MigrateAggregatorItemTest extends MigrateDrupalTestBase {
     ));
     $entity->enforceIsNew();
     $entity->save();
-
     /** @var \Drupal\migrate\entity\Migration $migration */
     $migration = entity_load('migration', 'd6_aggregator_item');
     $path = drupal_get_path('module', 'migrate_drupal');
@@ -57,7 +62,12 @@ class MigrateAggregatorItemTest extends MigrateDrupalTestBase {
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, $this);
     $executable->import();
+  }
 
+  /**
+   * Test Drupal 6 aggregator item migration to Drupal 8.
+   */
+  public function testAggregatorItem() {
     /** @var Item $item */
     $item = entity_load('aggregator_item', 1);
     $this->assertEqual($item->id(), 1);

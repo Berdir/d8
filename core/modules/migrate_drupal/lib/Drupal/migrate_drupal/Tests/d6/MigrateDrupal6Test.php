@@ -16,7 +16,17 @@ use Drupal\simpletest\TestBase;
  */
 class MigrateDrupal6Test extends MigrateDrupalTestBase{
 
-  static $modules = array('action', 'aggregator');
+  static $modules = array(
+    'action',
+    'aggregator',
+    'block',
+    'book',
+    'comment',
+    'custom_block',
+    'menu',
+    'node',
+    'views',
+  );
 
   /**
    * {@inheritdoc}
@@ -95,19 +105,33 @@ class MigrateDrupal6Test extends MigrateDrupalTestBase{
     $this->loadDumps($dumps);
     $migrations = array(
       'd6_action_settings',
-      'd6_aggregator_settings'
+      'd6_aggregator_settings',
+      'd6_aggregator_feed',
+      'd6_aggregator_item',
+      'd6_block',
+      'd6_book_settings',
+      'd6_menu',
     );
     $classes = array(
       __NAMESPACE__ . '\MigrateActionConfigsTest',
       __NAMESPACE__ . '\MigrateAggregatorConfigsTest',
+      __NAMESPACE__ . '\MigrateAggregatorFeedTest',
+      __NAMESPACE__ . '\MigrateAggregatorItemTest',
+      __NAMESPACE__ . '\MigrateBlockTest',
+      __NAMESPACE__ . '\MigrateBookConfigsTest',
+      __NAMESPACE__ . '\MigrateMenuTest',
     );
+    // Run every migration in the order specified by the storage controller.
     foreach (entity_load_multiple('migration', $migrations) as $migration) {
       (new MigrateExecutable($migration, $this))->import();
     }
     foreach ($classes as $class) {
       $test_object = new $class($this->testId);
-      // run() does a lot of setup and tear down work which we don't need.
-      // So do a very slimmed version of run().
+      // run() does a lot of setup and tear down work which we don't need:
+      // it would setup a new database connection and wouldn't find the
+      // Drupal 6 dump. Also by skipping the setUp() methods there are no id
+      // mappings or entities prepared. The tests run against solely migrated
+      // data.
       foreach (get_class_methods($test_object) as $method) {
         if (strtolower(substr($method, 0, 4)) == 'test') {
           // Insert a fail record. This will be deleted on completion to ensure
@@ -119,6 +143,7 @@ class MigrateDrupal6Test extends MigrateDrupalTestBase{
             'function' => $class . '->' . $method . '()',
           );
           $completion_check_id = TestBase::insertAssert($this->testId, $class, FALSE, 'The test did not complete due to a fatal error.', 'Completion check', $caller);
+          // Run the test method.
           try {
             $test_object->$method();
           }
@@ -129,7 +154,7 @@ class MigrateDrupal6Test extends MigrateDrupalTestBase{
           TestBase::deleteAssert($completion_check_id);
         }
       }
-      // Add the pass/fail/exception/watchdog results.
+      // Add the pass/fail/exception/debug results.
       foreach ($this->results as $key => &$value) {
         $value += $test_object->results[$key];
       }

@@ -28,9 +28,10 @@ class MigrateAggregatorFeedTest extends MigrateDrupalTestBase {
   }
 
   /**
-   * Tests migration of aggregator feeds.
+   * {@inheritdoc}
    */
-  public function testAggregatorFeedImport() {
+  public function setUp() {
+    parent::setUp();
     $migration = entity_load('migration', 'd6_aggregator_feed');
     $dumps = array(
       drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6AggregatorFeed.php',
@@ -38,9 +39,14 @@ class MigrateAggregatorFeedTest extends MigrateDrupalTestBase {
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, $this);
     $executable->import();
+  }
 
+  /**
+   * Tests migration of aggregator feeds.
+   */
+  public function testAggregatorFeedImport() {
     /** @var Feed $feed */
-    $feed = entity_load('aggregator_feed', 1);
+    $feed = entity_load('aggregator_feed', 5);
     $this->assertNotNull($feed->uuid());
     $this->assertEqual($feed->title->value, 'Know Your Meme');
     $this->assertEqual($feed->language()->id, Language::LANGCODE_NOT_SPECIFIED);

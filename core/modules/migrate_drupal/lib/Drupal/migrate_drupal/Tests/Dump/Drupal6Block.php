@@ -306,21 +306,6 @@ class Drupal6Block extends Drupal6DumpBase {
       'title' => 'Static Block',
       'cache' => '-1'
     ))
-    ->values(array(
-      'bid' => '11',
-      'module' => 'menu',
-      'delta' => 'menu-test-menu',
-      'theme' => 'garland',
-      'status' => '0',
-      'weight' => '-2',
-      'region' => '',
-      'custom' => '0',
-      'throttle' => '0',
-      'visibility' => '0',
-      'pages' => '',
-      'title' => '',
-      'cache' => '-1'
-    ))
     ->execute();
   }
 }

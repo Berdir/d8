@@ -107,7 +107,7 @@ class MigrationStorageController extends ConfigStorageController implements Migr
             $requirement_graph[$migration->id()]['edges'][$dependency] = $dependency;
           }
           if (is_array($dependency)) {
-            list($dependency_string, $required) = $dependency;
+            list($dependency_string, $required) = each($dependency);
             $dependency = $dependency_string;
             if ($required) {
               $requirement_graph[$migration->id()]['edges'][$dependency] = $dependency;
@@ -133,7 +133,9 @@ class MigrationStorageController extends ConfigStorageController implements Migr
     foreach ($migrations as $migration_id => $migration) {
       // Populate a weights array to use with array_multisort later.
       $weights[] = $dependency_graph[$migration_id]['weight'];
-      $migration->set('requirements', $requirement_graph[$migration_id]['paths']);
+      if (!empty($requirement_graph[$migration_id]['paths'])) {
+        $migration->set('requirements', $requirement_graph[$migration_id]['paths']);
+      }
     }
     array_multisort($weights, SORT_DESC, SORT_NUMERIC, $migrations);
 

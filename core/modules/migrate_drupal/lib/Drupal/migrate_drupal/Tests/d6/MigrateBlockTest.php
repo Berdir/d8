@@ -40,11 +40,14 @@ class MigrateBlockTest extends MigrateDrupalTestBase {
     );
   }
 
-  public function testBlockMigration() {
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp() {
+    parent::setUp();
     $entities = array(
       entity_create('menu', array('id' => 'primary-links')),
       entity_create('menu', array('id' => 'secondary-links')),
-      entity_create('menu', array('id' => 'menu-test-menu')),
       entity_create('custom_block', array('id' => 1, 'type' => 'basic')),
     );
     foreach ($entities as $entity) {
@@ -60,7 +63,14 @@ class MigrateBlockTest extends MigrateDrupalTestBase {
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, $this);
     $executable->import();
+  }
+
+  /**
+   * Test the block settings migration.
+   */
+  public function testBlockMigration() {
     $blocks = entity_load_multiple('block');
     $this->assertTrue(count($blocks));
+    // @TODO add more asserts.
   }
 }

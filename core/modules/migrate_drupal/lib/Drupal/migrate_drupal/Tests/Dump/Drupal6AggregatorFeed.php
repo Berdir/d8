@@ -110,7 +110,7 @@ class Drupal6AggregatorFeed extends Drupal6DumpBase {
       'block',
     ))
     ->values(array(
-      'fid' => 1,
+      'fid' => 5,
       'title' => 'Know Your Meme',
       'url' => 'http://knowyourmeme.com/newsfeed.rss',
       'refresh' => 900,

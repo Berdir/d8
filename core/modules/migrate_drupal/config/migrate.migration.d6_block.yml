@@ -56,3 +56,5 @@ process:
       - settings
 destination:
   plugin: entity:block
+dependencies:
+  - d6_menu: false
