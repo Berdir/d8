@@ -28,11 +28,12 @@ class MigrateFieldFormatterSettingsTest extends MigrateDrupalTestBase {
     );
   }
 
-  /**
-   * Test that migrated entity display settings can be loaded using D8 API's.
-   */
-  public function testEntityDisplaySettings() {
 
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp() {
+    parent::setUp();
     // Add some id mappings for the dependant migrations.
     $id_mappings = array(
       'd6_view_modes' => array(
@@ -51,7 +52,12 @@ class MigrateFieldFormatterSettingsTest extends MigrateDrupalTestBase {
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, $this);
     $executable->import();
+  }
 
+  /**
+   * Test that migrated entity display settings can be loaded using D8 API's.
+   */
+  public function testEntityDisplaySettings() {
     // Run tests.
     $field_name = "field_test";
     $expected = array(
@@ -194,7 +200,7 @@ class MigrateFieldFormatterSettingsTest extends MigrateDrupalTestBase {
     $component = $display->getComponent('field_test_datetime');
     $this->assertEqual($component, $expected, "node.story.full field_test_datetime is of type date_default with correct settings.");
     // Test that our Id map has the correct data.
-    $this->assertEqual(array('node', 'story', 'teaser', 'field_test'), $migration->getIdMap()->lookupDestinationID(array('story', 'teaser', 'node', 'field_test')));
+    $this->assertEqual(array('node', 'story', 'teaser', 'field_test'), entity_load('migration', 'd6_field_formatter_settings')->getIdMap()->lookupDestinationID(array('story', 'teaser', 'node', 'field_test')));
   }
 
 }

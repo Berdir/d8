@@ -15,6 +15,16 @@ use Drupal\migrate\MigrateExecutable;
 class MigrateCommentVariableEntityDisplay extends MigrateCommentVariableDisplayBase {
 
   /**
+   * The migration to run.
+   */
+  const MIGRATION = 'd6_comment_entity_display';
+
+  /**
+   * The node types being used.
+   */
+  protected $types = array('page', 'story');
+
+  /**
    * {@inheritdoc}
    */
   public static function getInfo() {
@@ -29,12 +39,6 @@ class MigrateCommentVariableEntityDisplay extends MigrateCommentVariableDisplayB
    * Tests comment variables migrated into an entity display.
    */
   public function testCommentEntityDisplay() {
-    /** @var \Drupal\migrate\entity\Migration $migration */
-    $migration = entity_load('migration', 'd6_comment_entity_display');
-    $this->prepare($migration, $this->dumps);
-    $executable = new MigrateExecutable($migration, $this);
-    $executable->import();
-
     foreach ($this->types as $type) {
       $component = entity_get_display('node', $type, 'default')->getComponent('comment');
       $this->assertEqual($component['label'], 'hidden');

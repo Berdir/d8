@@ -8,8 +8,12 @@
 
 namespace Drupal\migrate_drupal\Tests\d6;
 
+use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
+/**
+ * Base class for Drupal 6 comment variables to Drupal 8 entity display tests.
+ */
 class MigrateCommentVariableDisplayBase extends MigrateDrupalTestBase {
 
   /**
@@ -31,7 +35,7 @@ class MigrateCommentVariableDisplayBase extends MigrateDrupalTestBase {
    *
    * @var array
    */
-  protected $types;
+  protected $types = array('page', 'story');
 
   /**
    * {@inheritdoc}
@@ -44,7 +48,6 @@ class MigrateCommentVariableDisplayBase extends MigrateDrupalTestBase {
       'type' => 'comment',
       'translatable' => '0',
     ))->save();
-    $this->types = array('page', 'story');
     foreach ($this->types as $type) {
       entity_create('node_type', array('type' => $type))->save();
       entity_create('field_instance_config', array(
@@ -59,14 +62,12 @@ class MigrateCommentVariableDisplayBase extends MigrateDrupalTestBase {
     $this->dumps = array(
       drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6CommentVariable.php',
     );
+    /** @var \Drupal\migrate\entity\Migration $migration */
+    $migration = entity_load('migration', static::MIGRATION);
+    $this->prepare($migration, $this->dumps);
+    $executable = new MigrateExecutable($migration, $this);
+    $executable->import();
 
-    // Add some id mappings for the dependant migrations.
-    $id_mappings = array(
-      'd6_field_instance' => array(
-        array(array('fieldname', 'page'), array('node', 'fieldname', 'page')),
-      ),
-    );
-    $this->prepareIdMappings($id_mappings);
   }
 
 }

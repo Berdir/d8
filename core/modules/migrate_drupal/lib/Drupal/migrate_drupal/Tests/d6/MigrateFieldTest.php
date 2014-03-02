@@ -7,12 +7,11 @@
 
 namespace Drupal\migrate_drupal\Tests\d6;
 
-use Drupal\Component\Utility\NestedArray;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
 /**
- * Test field migrations.
+ * Tests the Drupal 6 field to Drupal 8 migration.
  */
 class MigrateFieldTest extends MigrateDrupalTestBase {
 
@@ -30,9 +29,10 @@ class MigrateFieldTest extends MigrateDrupalTestBase {
   }
 
   /**
-   * Test field migrations.
+   * {@inheritdoc}
    */
-  public function testFields() {
+  public function setUp() {
+    parent::setUp();
     /** @var \Drupal\migrate\entity\Migration $migration */
     $migration = entity_load('migration', 'd6_field');
     $dumps = array(
@@ -41,7 +41,12 @@ class MigrateFieldTest extends MigrateDrupalTestBase {
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, $this);
     $executable->import();
+  }
 
+  /**
+   * Tests the Drupal 6 field to Drupal 8 migration.
+   */
+  public function testFields() {
     // Text field.
     $field = entity_load('field_config', 'node.field_test');
     $expected = array('max_length' => 255);

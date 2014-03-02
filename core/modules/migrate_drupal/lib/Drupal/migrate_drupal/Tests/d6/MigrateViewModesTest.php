@@ -10,6 +10,9 @@ namespace Drupal\migrate_drupal\Tests\d6;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
+/**
+ * Tests Drupal 6 view modes to Drupal 8 migration.
+ */
 class MigrateViewModesTest extends MigrateDrupalTestBase {
 
   /**
@@ -24,9 +27,10 @@ class MigrateViewModesTest extends MigrateDrupalTestBase {
   }
 
   /**
-   * Test that migrated view modes can be loaded using D8 API's.
+   * {@inheritdoc}
    */
-  public function testViewModes() {
+  public function setUp() {
+    parent::setUp();
     $migration = entity_load('migration', 'd6_view_modes');
     $dumps = array(
       drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6FieldInstance.php',
@@ -34,13 +38,18 @@ class MigrateViewModesTest extends MigrateDrupalTestBase {
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, $this);
     $executable->import();
+  }
 
+  /**
+   * Tests Drupal 6 view modes to Drupal 8 migration.
+   */
+  public function testViewModes() {
     // Test a new view mode.
     $view_mode = entity_load('view_mode', 'node.preview');
     $this->assertEqual(is_null($view_mode), FALSE, 'Preview view mode loaded.');
     $this->assertEqual($view_mode->label(), 'Preview', 'View mode has correct label.');
     // Test the Id Map.
-    $this->assertEqual(array('node', 'preview'), $migration->getIdMap()->lookupDestinationID(array(1)));
+    $this->assertEqual(array('node', 'preview'), entity_load('migration', 'd6_view_modes')->getIdMap()->lookupDestinationID(array(1)));
   }
 
 }

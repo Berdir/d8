@@ -17,5 +17,3 @@ process:
   bundle: node_type
 destination:
   plugin: component_entity_form_display
-dependencies:
-  - d6_field_instance

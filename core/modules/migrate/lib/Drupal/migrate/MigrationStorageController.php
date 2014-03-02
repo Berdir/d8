@@ -94,6 +94,12 @@ class MigrationStorageController extends ConfigStorageController implements Migr
    * {@inheritdoc}
    */
   public function buildDependencyMigration(array $migrations) {
+    // Dependencies defined in the migration storage controller can be soft
+    // dependencies: if a soft dependency does not run, the current migration
+    // is still OK to go. This is indicated by adding ": false" (without
+    // quotes) after the name of the dependency. Hard dependencies (default)
+    // are called requirements. Both hard and soft dependencies (if run at
+    // all) must run before the current one.
     $dependency_graph = array();
     $requirement_graph = array();
     $different = FALSE;

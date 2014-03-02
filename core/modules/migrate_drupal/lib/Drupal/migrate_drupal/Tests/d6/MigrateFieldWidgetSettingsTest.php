@@ -38,9 +38,10 @@ class MigrateFieldWidgetSettingsTest extends MigrateDrupalTestBase {
   }
 
   /**
-   * Test that migrated view modes can be loaded using D8 API's.
+   * {@inheritdoc}
    */
-  public function testWidgetSettings() {
+  public function setUp() {
+    parent::setUp();
     // Add some id mappings for the dependant migrations.
     $id_mappings = array(
       'd6_field_instance' => array(
@@ -56,6 +57,12 @@ class MigrateFieldWidgetSettingsTest extends MigrateDrupalTestBase {
     $executable = new MigrateExecutable($migration, $this);
     $executable->import();
 
+  }
+
+  /**
+   * Test that migrated view modes can be loaded using D8 API's.
+   */
+  public function testWidgetSettings() {
     // Test the config can be loaded.
     $form_display = entity_load('entity_form_display', 'node.story.default');
     $this->assertEqual(is_null($form_display), FALSE, "Form display node.story.default loaded with config.");
@@ -86,10 +93,9 @@ class MigrateFieldWidgetSettingsTest extends MigrateDrupalTestBase {
 
     // Link field.
     $component = $form_display->getComponent('field_test_link');
-    $expected['type'] = 'link_default';
-    $expected['weight'] = 5;
-    $expected['settings'] = array('placeholder_uri' => '', 'placeholder_title' => '');
-    $this->assertEqual($component, $expected, 'Link field settings are correct.');
+    $this->assertEqual($component['type'], 'link_default');
+    $this->assertEqual($component['weight'], 5);
+    $this->assertFalse(array_filter($component['settings']));
 
     // File field.
     $component = $form_display->getComponent('field_test_filefield');

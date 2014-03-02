@@ -14,6 +14,11 @@ use Drupal\migrate\MigrateExecutable;
 class MigrateCommentVariableEntityFormDisplay extends MigrateCommentVariableDisplayBase {
 
   /**
+   * The migration to run.
+   */
+  const MIGRATION = 'd6_comment_entity_form_display';
+
+  /**
    * {@inheritdoc}
    */
   public static function getInfo() {
@@ -27,13 +32,7 @@ class MigrateCommentVariableEntityFormDisplay extends MigrateCommentVariableDisp
   /**
    * Tests comment variables migrated into an entity display.
    */
-  public function testCommentEntityDisplay() {
-    /** @var \Drupal\migrate\entity\Migration $migration */
-    $migration = entity_load('migration', 'd6_comment_entity_form_display');
-    $this->prepare($migration, $this->dumps);
-    $executable = new MigrateExecutable($migration, $this);
-    $executable->import();
-
+  public function testCommentEntityFormDisplay() {
     foreach ($this->types as $type) {
       $component = entity_get_form_display('node', $type, 'default')->getComponent('comment');
       $this->assertEqual($component['type'], 'comment_default');

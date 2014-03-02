@@ -42,10 +42,11 @@ class MigrateFieldInstanceTest extends MigrateDrupalTestBase {
     );
   }
 
-  /*
-   * Tests migration of file variables to file.settings.yml.
+  /**
+   * {@inheritdoc}
    */
-  public function testFieldInstanceSettings() {
+  public function setUp() {
+    parent::setUp();
     // Add some id mappings for the dependant migrations.
     $id_mappings = array(
       'd6_field' => array(
@@ -67,6 +68,12 @@ class MigrateFieldInstanceTest extends MigrateDrupalTestBase {
     $executable = new MigrateExecutable($migration, $this);
     $executable->import();
 
+  }
+
+  /*
+   * Tests migration of file variables to file.settings.yml.
+   */
+  public function testFieldInstanceSettings() {
     $entity = entity_create('node', array('type' => 'story'));
     // Test a text field.
     $field = entity_load('field_instance_config', 'node.story.field_test');

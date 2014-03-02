@@ -29,16 +29,14 @@ class MigrateCommentVariableInstance extends MigrateDrupalTestBase {
   }
 
   /**
-   * Test the migrated field instance values.
+   * {@inheritdoc}
    */
-  public function testCommentFieldInstance() {
+  public function setUp() {
+    parent::setUp();
     // Add some id mappings for the dependant migrations.
     $id_mappings = array(
       'd6_comment_field' => array(
         array(array('page'), array('node', 'page')),
-      ),
-      'd6_field_instance' => array(
-        array(array('fieldname', 'page'), array('node', 'fieldname', 'page')),
       ),
     );
     $this->prepareIdMappings($id_mappings);
@@ -60,7 +58,12 @@ class MigrateCommentVariableInstance extends MigrateDrupalTestBase {
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, $this);
     $executable->import();
+  }
 
+  /**
+   * Test the migrated field instance values.
+   */
+  public function testCommentFieldInstance() {
     $node = entity_create('node', array('type' => 'page'));
     $this->assertEqual($node->comment->status, 0);
     $node = entity_create('node', array('type' => 'story'));

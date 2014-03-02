@@ -22,7 +22,9 @@ class EmptySource extends SourcePluginBase {
    * {@inheritdoc}
    */
   public function fields() {
-    return array();
+    return array(
+      'id' => t('ID'),
+    );
   }
 
   /**
