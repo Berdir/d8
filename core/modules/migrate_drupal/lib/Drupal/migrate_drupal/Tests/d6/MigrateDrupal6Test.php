@@ -7,12 +7,16 @@
 
 namespace Drupal\migrate_drupal\Tests\d6;
 
+use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
+use Drupal\simpletest\TestBase;
 
 /**
  * Test the complete Drupal 6 migration.
  */
 class MigrateDrupal6Test extends MigrateDrupalTestBase{
+
+  static $modules = array('action', 'aggregator');
 
   /**
    * {@inheritdoc}
@@ -89,6 +93,54 @@ class MigrateDrupal6Test extends MigrateDrupalTestBase{
       $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6VocabularyField.php',
     );
     $this->loadDumps($dumps);
+    $migrations = array(
+      'd6_action_settings',
+      'd6_aggregator_settings'
+    );
+    $classes = array(
+      __NAMESPACE__ . '\MigrateActionConfigsTest',
+      __NAMESPACE__ . '\MigrateAggregatorConfigsTest',
+    );
+    foreach (entity_load_multiple('migration', $migrations) as $migration) {
+      (new MigrateExecutable($migration, $this))->import();
+    }
+    foreach ($classes as $class) {
+      $test_object = new $class($this->testId);
+      // run() does a lot of setup and tear down work which we don't need.
+      // So do a very slimmed version of run().
+      foreach (get_class_methods($test_object) as $method) {
+        if (strtolower(substr($method, 0, 4)) == 'test') {
+          // Insert a fail record. This will be deleted on completion to ensure
+          // that testing completed.
+          $method_info = new \ReflectionMethod($class, $method);
+          $caller = array(
+            'file' => $method_info->getFileName(),
+            'line' => $method_info->getStartLine(),
+            'function' => $class . '->' . $method . '()',
+          );
+          $completion_check_id = TestBase::insertAssert($this->testId, $class, FALSE, 'The test did not complete due to a fatal error.', 'Completion check', $caller);
+          try {
+            $test_object->$method();
+          }
+          catch (\Exception $e) {
+            $this->exceptionHandler($e);
+          }
+          // Remove the completion check record.
+          TestBase::deleteAssert($completion_check_id);
+        }
+      }
+      // Add the pass/fail/exception/watchdog results.
+      foreach ($this->results as $key => &$value) {
+        $value += $test_object->results[$key];
+      }
+    }
+    // Move the results of every class under ours. This is solely for
+    // reporting, the filename will guide developers.
+    self::getDatabaseConnection()
+      ->update('simpletest')
+      ->fields(array('test_class' => get_class($this)))
+      ->condition('test_id', $this->testId)
+      ->execute();
   }
 
 }
