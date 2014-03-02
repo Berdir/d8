@@ -16,6 +16,11 @@ use Drupal\simpletest\TestBase;
  */
 class MigrateDrupal6Test extends MigrateDrupalTestBase{
 
+  /**
+   * Modules to enable.
+   *
+   * @var array
+   */
   static $modules = array(
     'action',
     'aggregator',
@@ -28,8 +33,10 @@ class MigrateDrupal6Test extends MigrateDrupalTestBase{
     'dblog',
     'email',
     'file',
+    'forum',
     'image',
     'link',
+    'locale',
     'menu',
     'node',
     'number',
@@ -134,8 +141,16 @@ class MigrateDrupal6Test extends MigrateDrupalTestBase{
       'd6_field_instance_widget_settings',
       'd6_field_settings',
       'd6_field_formatter_settings',
+      'd6_file_settings',
+      #'d6_file',
       'd6_filter_format',
+      'd6_forum_settings',
+      'd6_locale_settings',
+      'd6_menu_settings',
       'd6_menu',
+      'd6_node_body_field',
+      'd6_node_body_instance',
+      'd6_node_settings',
       'd6_node_type',
       'd6_view_modes',
     );
@@ -161,8 +176,15 @@ class MigrateDrupal6Test extends MigrateDrupalTestBase{
       __NAMESPACE__ . '\MigrateFieldInstanceTest',
       __NAMESPACE__ . '\MigrateFieldFormatterSettingsTest',
       __NAMESPACE__ . '\MigrateFieldWidgetSettingsTest',
+      __NAMESPACE__ . '\MigrateFileConfigsTest',
+      #__NAMESPACE__ . '\MigrateFileTest',
       __NAMESPACE__ . '\MigrateFilterFormatTest',
+      __NAMESPACE__ . '\MigrateForumConfigsTest',
+      __NAMESPACE__ . '\MigrateLocaleConfigsTest',
+      __NAMESPACE__ . '\MigrateMenuConfigsTest',
       __NAMESPACE__ . '\MigrateMenuTest',
+      __NAMESPACE__ . '\MigrateNodeBodyInstanceTest',
+      __NAMESPACE__ . '\MigrateNodeConfigsTest',
       __NAMESPACE__ . '\MigrateNodeTypeTest',
       __NAMESPACE__ . '\MigrateViewModesTest',
     );

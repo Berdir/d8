@@ -15,6 +15,11 @@ use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
  */
 class MigrateFieldTest extends MigrateDrupalTestBase {
 
+  /**
+   * Modules to enable.
+   *
+   * @var array
+   */
   public static $modules = array('number', 'email', 'telephone', 'link', 'file', 'image', 'datetime', 'node');
 
   /**

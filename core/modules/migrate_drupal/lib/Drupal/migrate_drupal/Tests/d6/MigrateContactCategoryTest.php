@@ -16,6 +16,11 @@ use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
  */
 class MigrateContactCategoryTest extends MigrateDrupalTestBase {
 
+  /**
+   * Modules to enable.
+   *
+   * @var array
+   */
   public static $modules = array('contact');
 
   /**

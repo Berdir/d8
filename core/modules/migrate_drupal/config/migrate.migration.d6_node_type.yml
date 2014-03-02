@@ -3,6 +3,7 @@ source:
   plugin: d6_node_type
   constants:
     preview: 1 # DRUPAL_OPTIONAL
+    create_body: false
 process:
   type: type
   name: name
@@ -14,5 +15,6 @@ process:
   preview: constants.preview
   submitted: submitted
   options: options
+  create_body: constants.create_body
 destination:
   plugin: entity:node_type

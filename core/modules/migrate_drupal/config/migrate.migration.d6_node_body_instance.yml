@@ -22,12 +22,8 @@ process:
   description: constants.description
   required: constants.required
   status:
-    -
-      plugin: flag_skipping_row
-      source: has_body
-    -
-      plugin: get
-      value: has_body
+    plugin: flag_skipping_row
+    source: has_body
   default_value_function: constants.default_value_function
   default_value: constants.default_value
   settings: constants.settings
@@ -36,6 +32,7 @@ process:
 destination:
   plugin: entity:field_instance_config
 dependencies:
+  - d6_node_body_field
   - d6_node_type
   - d6_field
   - d6_field_instance

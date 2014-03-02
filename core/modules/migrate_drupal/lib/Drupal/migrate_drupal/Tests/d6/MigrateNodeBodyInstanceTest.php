@@ -10,6 +10,9 @@ namespace Drupal\migrate_drupal\Tests\d6;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
+/**
+ * Tests the Drupal 6 body settings to Drupal 8 body field instance migration.
+ */
 class MigrateNodeBodyInstanceTest extends MigrateDrupalTestBase {
 
   /**
@@ -30,7 +33,11 @@ class MigrateNodeBodyInstanceTest extends MigrateDrupalTestBase {
     );
   }
 
-  public function testNodeBodyInstance() {
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp() {
+    parent::setUp();
     // Add some id mappings for the dependant migrations.
     $id_mappings = array(
       'd6_field' => array(
@@ -38,6 +45,9 @@ class MigrateNodeBodyInstanceTest extends MigrateDrupalTestBase {
       ),
       'd6_field_instance' => array(
         array(array('field_name', 'page'), array('node', 'field_name', 'page')),
+      ),
+      'd6_node_body' => array(
+        array(array(''), array('node', 'body'))
       ),
       'd6_node_type' => array(
         array(array('page'), array('page')),
@@ -59,7 +69,13 @@ class MigrateNodeBodyInstanceTest extends MigrateDrupalTestBase {
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, $this);
     $executable->import();
+  }
 
+  /**
+   * Tests the Drupal 6 body settings to Drupal 8 body field instance migration.
+   */
+  public function testNodeBodyInstance() {
+    $migration = entity_load('migration', 'd6_node_body_instance');
     // Test that the body field instance is created for a content type.
     $field = entity_load('field_instance_config', 'node.company.body');
     $this->assertEqual($field->label(), 'Description', 'Field body label correct');
@@ -77,7 +93,7 @@ class MigrateNodeBodyInstanceTest extends MigrateDrupalTestBase {
     // Test that the body field instance is skipped if the has_body is set to
     // false in the source.
     $field = entity_load('field_instance_config', 'node.sponsor.body');
-    $this->assertNull($field, 'The body must not be created.');
+    $this->assertFalse($field, 'The body must not be created.');
 
     // Ensure Id map works.
     $this->assertEqual(array('node', 'company', 'body'), $migration->getIdMap()->lookupDestinationID(array('company')));

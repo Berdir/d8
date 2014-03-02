@@ -10,8 +10,16 @@ namespace Drupal\migrate_drupal\Tests\d6;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
+/**
+ * Tests the Drupal 6 files to Drupal 8 migration.
+ */
 class MigrateFileTest extends MigrateDrupalTestBase {
 
+  /**
+   * Modules to enable.
+   *
+   * @var array
+   */
   public static $modules = array('file');
 
   /**
@@ -25,8 +33,10 @@ class MigrateFileTest extends MigrateDrupalTestBase {
     );
   }
 
+  /**
+   * Tests the Drupal 6 files to Drupal 8 migration.
+   */
   public function testFiles() {
-
     $path = drupal_get_path('module', 'migrate_drupal');
     $dumps = array(
       $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6File.php',
