@@ -40,7 +40,9 @@ class MigrateDrupal6Test extends MigrateDrupalTestBase{
     'menu',
     'node',
     'number',
+    'options',
     'telephone',
+    'text',
     'views',
   );
 
@@ -54,6 +56,21 @@ class MigrateDrupal6Test extends MigrateDrupalTestBase{
       'group' => 'Migrate Drupal',
     );
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function tearDown() {
+    // Move the results of every class under ours. This is solely for
+    // reporting, the filename will guide developers.
+    self::getDatabaseConnection()
+      ->update('simpletest')
+      ->fields(array('test_class' => get_class($this)))
+      ->condition('test_id', $this->testId)
+      ->execute();
+    parent::tearDown();
+  }
+
 
   /**
    * Test the complete Drupal 6 migration.
@@ -150,8 +167,17 @@ class MigrateDrupal6Test extends MigrateDrupalTestBase{
       'd6_menu',
       'd6_node_body_field',
       'd6_node_body_instance',
+      #'d6_node_revision:*',
+      'd6_node:*',
       'd6_node_settings',
       'd6_node_type',
+      'd6_user_picture_entity_display',
+      'd6_user_picture_entity_form_display',
+      'd6_user_picture_field_instance',
+      'd6_user_picture_field',
+      'd6_user_picture_file',
+      'd6_user_role',
+      'd6_user',
       'd6_view_modes',
     );
     $classes = array(
@@ -185,7 +211,16 @@ class MigrateDrupal6Test extends MigrateDrupalTestBase{
       __NAMESPACE__ . '\MigrateMenuTest',
       __NAMESPACE__ . '\MigrateNodeBodyInstanceTest',
       __NAMESPACE__ . '\MigrateNodeConfigsTest',
+      #__NAMESPACE__ . '\MigrateNodeRevisionTest',
+      __NAMESPACE__ . '\MigrateNodeTest',
       __NAMESPACE__ . '\MigrateNodeTypeTest',
+      __NAMESPACE__ . '\MigrateUserPictureEntityDisplayTest',
+      __NAMESPACE__ . '\MigrateUserPictureEntityFormDisplayTest',
+      __NAMESPACE__ . '\MigrateUserPictureFileTest',
+      __NAMESPACE__ . '\MigrateUserPictureFieldTest',
+      __NAMESPACE__ . '\MigrateUserPictureInstanceTest',
+      __NAMESPACE__ . '\MigrateUserRoleTest',
+      #__NAMESPACE__ . '\MigrateUserTest',
       __NAMESPACE__ . '\MigrateViewModesTest',
     );
     // Run every migration in the order specified by the storage controller.
@@ -226,13 +261,6 @@ class MigrateDrupal6Test extends MigrateDrupalTestBase{
         $value += $test_object->results[$key];
       }
     }
-    // Move the results of every class under ours. This is solely for
-    // reporting, the filename will guide developers.
-    self::getDatabaseConnection()
-      ->update('simpletest')
-      ->fields(array('test_class' => get_class($this)))
-      ->condition('test_id', $this->testId)
-      ->execute();
   }
 
 }

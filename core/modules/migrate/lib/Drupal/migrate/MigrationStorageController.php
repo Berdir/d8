@@ -58,7 +58,9 @@ class MigrationStorageController extends ConfigStorageController implements Migr
       $return = array();
       foreach ($entities as $entity_id => $entity) {
         if ($plugin = $entity->getLoadPlugin()) {
-          $return += $plugin->loadMultiple($this);
+          $new_entities = $plugin->loadMultiple($this);
+          $this->getDynamicIds($dynamic_ids, $new_entities);
+          $return += $new_entities;
         }
         else {
           $return[$entity_id] = $entity;
@@ -71,13 +73,31 @@ class MigrationStorageController extends ConfigStorageController implements Migr
         $entity = $entities[$base_id];
         if ($plugin = $entity->getLoadPlugin()) {
           unset($entities[$base_id]);
-          $entities += $plugin->loadMultiple($this, $sub_ids);
+          $new_entities = $plugin->loadMultiple($this, $sub_ids);
+          if (!isset($sub_ids)) {
+            unset($dynamic_ids[$base_id]);
+            $this->getDynamicIds($dynamic_ids, $new_entities);
+          }
+          $entities += $new_entities;
         }
       }
     }
 
     // Build an array of dependencies and set the order of the migrations.
-    return $this->buildDependencyMigration($entities);
+    return $this->buildDependencyMigration($entities, $dynamic_ids);
+  }
+
+  /**
+   * Extract the dynamic id mapping from entities loaded by plugin.
+   *
+   * @param array $dynamic_ids
+   * @param array $entities
+   */
+  protected function getDynamicIds(array &$dynamic_ids, array $entities) {
+    foreach (array_keys($entities) as $new_id) {
+      list($base_id, $sub_id) = explode(':', $new_id, 2);
+      $dynamic_ids[$base_id][] = $sub_id;
+    }
   }
 
   /**
@@ -93,7 +113,7 @@ class MigrationStorageController extends ConfigStorageController implements Migr
   /**
    * {@inheritdoc}
    */
-  public function buildDependencyMigration(array $migrations) {
+  public function buildDependencyMigration(array $migrations, array $dynamic_ids) {
     // Dependencies defined in the migration storage controller can be soft
     // dependencies: if a soft dependency does not run, the current migration
     // is still OK to go. This is indicated by adding ": false" (without
@@ -105,24 +125,25 @@ class MigrationStorageController extends ConfigStorageController implements Migr
     $different = FALSE;
     /** @var \Drupal\migrate\Entity\MigrationInterface $migration */
     foreach ($migrations as $migration) {
-      $requirements[$migration->id()] = array();
-      $dependency_graph[$migration->id()]['edges'] = array();
+      $id = $migration->id();
+      $requirements[$id] = array();
+      $dependency_graph[$id]['edges'] = array();
       if (isset($migration->dependencies) && is_array($migration->dependencies)) {
         foreach ($migration->dependencies as $dependency) {
-          if (is_string($dependency)) {
-            $requirement_graph[$migration->id()]['edges'][$dependency] = $dependency;
+          if (is_string($dependency) && !isset($dynamic_ids[$dependency])) {
+            $this->addDependency($requirement_graph, $id, $dependency, $dynamic_ids);
           }
           if (is_array($dependency)) {
             list($dependency_string, $required) = each($dependency);
             $dependency = $dependency_string;
             if ($required) {
-              $requirement_graph[$migration->id()]['edges'][$dependency] = $dependency;
+              $this->addDependency($requirement_graph, $id, $dependency, $dynamic_ids);
             }
             else {
               $different = TRUE;
             }
           }
-          $dependency_graph[$migration->id()]['edges'][$dependency] = $dependency;
+          $this->addDependency($dependency_graph, $id, $dependency, $dynamic_ids);
         }
       }
     }
@@ -146,6 +167,26 @@ class MigrationStorageController extends ConfigStorageController implements Migr
     array_multisort($weights, SORT_DESC, SORT_NUMERIC, $migrations);
 
     return $migrations;
+  }
+
+  /**
+   * Add one or more dependencies to a graph/
+   *
+   * @param array $graph
+   *   The graph so far.
+   * @param $id
+   *   The migration id.
+   * @param $dependency
+   *   The dependency string.
+   * @param $dynamic_ids
+   *   The dynamic id mapping.
+   */
+  protected function addDependency(array &$graph, $id, $dependency, $dynamic_ids) {
+    $dependencies = isset($dynamic_ids[$dependency]) ? $dynamic_ids[$dependency] : array($dependency);
+    if (!isset($graph[$id]['edges'])) {
+      $graph[$id]['edges'] = array();
+    }
+    $graph[$id]['edges'] += array_combine($dependencies, $dependencies);
   }
 
 }

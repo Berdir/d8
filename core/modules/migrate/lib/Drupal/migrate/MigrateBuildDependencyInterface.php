@@ -14,8 +14,11 @@ interface MigrateBuildDependencyInterface {
    *
    * @param \Drupal\migrate\Entity\MigrationInterface[] $migrations
    *   Array of loaded migrations with their declared dependencies.
+   * @param array $dynamic_ids
+   *   Keys are dynamic ids (for example node:*) values are a list of loaded
+   *   migration ids (for example node:page, node:article).
    *
    * @return array
    */
-  public function buildDependencyMigration(array $migrations);
+  public function buildDependencyMigration(array $migrations, array $dynamic_ids);
 }

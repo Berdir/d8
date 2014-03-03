@@ -27,9 +27,10 @@ class MigrateNodeTest extends MigrateNodeTestBase {
   }
 
   /**
-   * Test node migration from Drupal 6 to 8.
+   * {@inheritdoc}
    */
-  public function testNode() {
+  public function setUp() {
+    parent::setUp();
     /** @var \Drupal\migrate\entity\Migration $migration */
     $migrations = entity_load_multiple('migration', array('d6_node:*'));
     foreach ($migrations as $migration) {
@@ -39,11 +40,16 @@ class MigrateNodeTest extends MigrateNodeTestBase {
       // This is required for the second import below.
       db_truncate($migration->getIdMap()->mapTableName())->execute();
     }
+  }
 
+  /**
+   * Test node migration from Drupal 6 to 8.
+   */
+  public function testNode() {
     $node = node_load(1);
     $this->assertEqual($node->id(), 1, 'Node 1 loaded.');
     $this->assertEqual($node->body->value, 'test');
-    $this->assertEqual($node->body->format, 'restricted_html');
+    $this->assertEqual($node->body->format, 'filtered_html');
     $this->assertEqual($node->getType(), 'story', 'Node has the correct bundle.');
     $this->assertEqual($node->getTitle(), 'Test title', 'Node has the correct title.');
     $this->assertEqual($node->getCreatedTime(), 1388271197, 'Node has the correct created time.');

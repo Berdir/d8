@@ -34,7 +34,7 @@ class Drupal6NodeType extends Drupal6DumpBase {
         'orig_type',
       ))
       ->values(array(
-        'type' => 'migrate_test_page',
+        'type' => 'test_page',
         'name' => 'Migrate test page',
         'module' => 'node',
         'description' => "A <em>page</em>, similar in form to a <em>story</em>, is a simple method for creating and displaying information that rarely changes, such as an \"About us\" section of a website. By default, a <em>page</em> entry does not allow visitor comments and is not featured on the site's initial home page.",
@@ -50,7 +50,7 @@ class Drupal6NodeType extends Drupal6DumpBase {
         'orig_type' => 'page',
       ))
       ->values(array(
-        'type' => 'migrate_test_story',
+        'type' => 'test_story',
         'name' => 'Migrate test story',
         'module' => 'node',
         'description' => "A <em>story</em>, similar in form to a <em>page</em>, is ideal for creating and displaying content that informs or engages website visitors. Press releases, site announcements, and informal blog-like entries may all be created with a <em>story</em> entry. By default, a <em>story</em> entry is automatically featured on the site's initial home page, and provides the ability to post comments.",

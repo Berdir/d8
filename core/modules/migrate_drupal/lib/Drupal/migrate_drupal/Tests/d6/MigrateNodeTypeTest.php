@@ -52,9 +52,9 @@ class MigrateNodeTypeTest extends MigrateDrupalTestBase {
    */
   public function testNodeType() {
     $migration = entity_load('migration', 'd6_node_type');
-    // Test the migrate_test_page content type.
-    $node_type_page = entity_load('node_type', 'migrate_test_page');
-    $this->assertEqual($node_type_page->id(), 'migrate_test_page', 'Node type migrate_test_page loaded');
+    // Test the test_page content type.
+    $node_type_page = entity_load('node_type', 'test_page');
+    $this->assertEqual($node_type_page->id(), 'test_page', 'Node type test_page loaded');
     $expected = array(
       'options' => array(
         'status' => TRUE,
@@ -65,12 +65,12 @@ class MigrateNodeTypeTest extends MigrateDrupalTestBase {
       'preview' => 1,
       'submitted' => TRUE,
     );
-    $this->assertEqual($node_type_page->settings['node'], $expected, 'Node type migrate_test_page settings correct.');
-    $this->assertEqual(array('migrate_test_page'), $migration->getIdMap()->lookupDestinationID(array('migrate_test_page')));
+    $this->assertEqual($node_type_page->settings['node'], $expected, 'Node type test_page settings correct.');
+    $this->assertEqual(array('test_page'), $migration->getIdMap()->lookupDestinationID(array('test_page')));
 
-    // Test the migrate_test_story content type.
-    $node_type_story = entity_load('node_type', 'migrate_test_story');
-    $this->assertEqual($node_type_story->id(), 'migrate_test_story', 'Node type migrate_test_story loaded');
+    // Test the test_story content type.
+    $node_type_story = entity_load('node_type', 'test_story');
+    $this->assertEqual($node_type_story->id(), 'test_story', 'Node type test_story loaded');
     $expected = array(
       'options' => array(
         'status' => TRUE,
@@ -81,7 +81,7 @@ class MigrateNodeTypeTest extends MigrateDrupalTestBase {
       'preview' => 1,
       'submitted' => TRUE,
     );
-    $this->assertEqual($node_type_page->settings['node'], $expected, 'Node type migrate_test_page settings correct.');
-    $this->assertEqual(array('migrate_test_story'), $migration->getIdMap()->lookupDestinationID(array('migrate_test_story')));
+    $this->assertEqual($node_type_page->settings['node'], $expected, 'Node type test_page settings correct.');
+    $this->assertEqual(array('test_story'), $migration->getIdMap()->lookupDestinationID(array('test_story')));
   }
 }

@@ -12,3 +12,7 @@ destination:
   plugin: entity:user
 dependencies:
   - d6_user_profile_field_instance
+  - d6_user_profile_entity_display
+  - d6_user_profile_entity_form_display
+  - d6_user_profile_field_instance
+  - d6_user_profile_field

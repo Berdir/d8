@@ -25,6 +25,9 @@ class MigrateNodeRevisionTest extends MigrateNodeTestBase {
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp() {
     parent::setUp();
     $id_mappings = array(
@@ -45,12 +48,6 @@ class MigrateNodeRevisionTest extends MigrateNodeTestBase {
       $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6NodeRevision.php',
     );
     $this->loadDumps($dumps);
-  }
-
-  /**
-   * Test node revisions migration from Drupal 6 to 8.
-   */
-  public function testNodeRevision() {
     /** @var \Drupal\migrate\entity\Migration $migration */
     $migrations = entity_load_multiple('migration', array('d6_node_revision:*'));
     foreach ($migrations as $migration) {
@@ -60,7 +57,12 @@ class MigrateNodeRevisionTest extends MigrateNodeTestBase {
       // This is required for the second import below.
       db_truncate($migration->getIdMap()->mapTableName())->execute();
     }
+  }
 
+  /**
+   * Test node revisions migration from Drupal 6 to 8.
+   */
+  public function testNodeRevision() {
     $node = \Drupal::entityManager()->getStorageController('node')->loadRevision(2);
     $this->assertEqual($node->id(), 1, 'Node 1 loaded.');
     $this->assertEqual($node->getRevisionId(), 2, 'Node 1 revision 2loaded.');

@@ -87,12 +87,6 @@ class MigrateUserTest extends MigrateDrupalTestBase {
     $file->enforceIsNew();
     file_put_contents($file->getFileUri(), file_get_contents('core/modules/simpletest/files/image-2.jpg'));
     $file->save();
-  }
-
-  /**
-   * Test the user migration.
-   */
-  public function testUser() {
 
     // Load database dumps to provide source data.
     $path = drupal_get_path('module', 'migrate_drupal');
@@ -129,7 +123,12 @@ class MigrateUserTest extends MigrateDrupalTestBase {
     $migration = entity_load('migration', 'd6_user:user');
     $executable = new MigrateExecutable($migration, $this);
     $executable->import();
+  }
 
+  /**
+   * Test the user migration.
+   */
+  public function testUser() {
     $users = Database::getConnection('default', 'migrate')
       ->select('users', 'u')
       ->fields('u')

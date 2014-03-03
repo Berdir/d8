@@ -29,16 +29,22 @@ class MigrateUserPictureFieldTest extends MigrateDrupalTestBase {
   }
 
   /**
-   * Test the user picture field migration.
+   * {@inheritdoc}
    */
-  public function testUserPictureField() {
+  public function setUp() {
+    parent::setUp();
     $migration = entity_load('migration', 'd6_user_picture_field');
     $executable = new MigrateExecutable($migration, $this);
     $executable->import();
+  }
 
+  /**
+   * Test the user picture field migration.
+   */
+  public function testUserPictureField() {
     $field = entity_load('field_config', 'user.user_picture');
     $this->assertEqual($field->id(), 'user.user_picture');
-    $this->assertEqual(array('user', 'user_picture'), $migration->getIdMap()->lookupDestinationID(array('')));
+    $this->assertEqual(array('user', 'user_picture'), entity_load('migration', 'd6_user_picture_field')->getIdMap()->lookupDestinationID(array('')));
   }
 
 }

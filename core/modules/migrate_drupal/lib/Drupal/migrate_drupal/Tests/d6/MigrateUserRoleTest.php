@@ -26,9 +26,10 @@ class MigrateUserRoleTest extends MigrateDrupalTestBase {
   }
 
   /**
-   * Tests user role migration.
+   * {@inheritdoc}
    */
-  public function testUserRole() {
+  public function setUp() {
+    parent::setUp();
     // We need some sample data so we can use the Migration process plugin.
     $table_name = entity_load('migration', 'd6_filter_format')->getIdMap()->mapTableName();
     db_insert($table_name)->fields(array(
@@ -55,7 +56,14 @@ class MigrateUserRoleTest extends MigrateDrupalTestBase {
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, $this);
     $executable->import();
+  }
 
+  /**
+   * Tests user role migration.
+   */
+  public function testUserRole() {
+    /** @var \Drupal\migrate\entity\Migration $migration */
+    $migration = entity_load('migration', 'd6_user_role');
     $rid = 'anonymous';
     $anonymous = entity_load('user_role', $rid);
     $this->assertEqual($anonymous->id(), $rid);

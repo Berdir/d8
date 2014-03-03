@@ -24,7 +24,7 @@ class MigrateNodeTestBase extends MigrateDrupalTestBase {
     $id_mappings = array(
       'd6_node_type' => array(array(array('story'), array('story'))),
       'd6_filter_format' => array(
-        array(array(1), array('restricted_html')),
+        array(array(1), array('filtered_html')),
         array(array(2), array('full_html')),
       ),
     );

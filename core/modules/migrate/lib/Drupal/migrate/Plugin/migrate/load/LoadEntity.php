@@ -49,7 +49,11 @@ class LoadEntity extends LoadBase {
     if (isset($this->configuration['bundle_migration'])) {
       /** @var \Drupal\migrate\Entity\MigrationInterface $bundle_migration */
       $bundle_migration = $storage_controller->load($this->configuration['bundle_migration']);
-      $this->processIdMap($bundle_migration->getIdMap());
+      $source_id = array_keys($bundle_migration->getSourcePlugin()->getIds())[0];
+      $this->bundles = array();
+      foreach ($bundle_migration->getSourcePlugin()->getIterator() as $row) {
+        $this->bundles[] = $row[$source_id];
+      }
     }
     else {
       $this->bundles = array($this->migration->getSourcePlugin()->entityTypeId());
@@ -79,14 +83,12 @@ class LoadEntity extends LoadBase {
     return $migrations;
   }
 
-  protected function processIdMap($id_map) {
-    $this->bundles = array();
-    foreach ($id_map as $key => $row) {
-      $key = unserialize($key);
-      $this->bundles[] = $key['sourceid1'];
-    }
-  }
-
+  /**
+   * Allow child classes to process the migration just before returning it.
+   *
+   * @param $id
+   * @param MigrationInterface $migration
+   */
   protected function additionalProcess($id, MigrationInterface $migration) {
   }
 }
