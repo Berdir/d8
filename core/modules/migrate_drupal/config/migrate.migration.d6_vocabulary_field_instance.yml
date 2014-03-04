@@ -17,5 +17,4 @@ process:
 destination:
   plugin: entity:field_instance_config
 dependencies:
-  - d6_taxonomy_vocabulary
   - d6_vocabulary_field

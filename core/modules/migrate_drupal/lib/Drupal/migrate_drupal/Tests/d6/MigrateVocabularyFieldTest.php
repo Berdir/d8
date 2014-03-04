@@ -10,9 +10,17 @@ namespace Drupal\migrate_drupal\Tests\d6;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
+/**
+ * Tests the Drupal 6 vocabulary-node type association to Drupal 8 migration.
+ */
 class MigrateVocabularyFieldTest extends MigrateDrupalTestBase {
 
-static $modules = array('taxonomy', 'field');
+  /**
+   * The modules to be enabled during the test.
+   *
+   * @var array
+   */
+  static $modules = array('taxonomy', 'field');
 
   /**
    * {@inheritdoc}
@@ -26,9 +34,10 @@ static $modules = array('taxonomy', 'field');
   }
 
   /**
-   * Test the vocabulary field migration.
+   * {@inheritdoc}
    */
-  public function testVocabularyField() {
+  protected function setUp() {
+    parent::setUp();
 
     // Add some id mappings for the dependant migrations.
     $id_mappings = array(
@@ -51,14 +60,19 @@ static $modules = array('taxonomy', 'field');
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, $this);
     $executable->import();
+  }
 
-    // Test that the field exists.
+  /**
+   * Tests the Drupal 6 vocabulary-node type association to Drupal 8 migration.
+   */
+  public function testVocabularyField() {
+  // Test that the field exists.
     $field_id = 'node.tags';
     $field = entity_load('field_config', $field_id);
     $this->assertEqual($field->id(), $field_id);
     $settings = $field->getSettings();
     $this->assertEqual('tags', $settings['allowed_values'][0]['vocabulary'], "Vocabulary has correct settings.");
-    $this->assertEqual(array('node', 'tags'), $migration->getIdMap()->lookupDestinationID(array(1)), "Test IdMap");
+    $this->assertEqual(array('node', 'tags'), entity_load('migration', 'd6_vocabulary_field')->getIdMap()->lookupDestinationID(array(1)), "Test IdMap");
 
   }
 

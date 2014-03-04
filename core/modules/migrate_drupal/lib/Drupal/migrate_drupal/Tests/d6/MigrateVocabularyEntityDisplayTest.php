@@ -10,9 +10,17 @@ namespace Drupal\migrate_drupal\Tests\d6;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
+/**
+ * Tests the Drupal 6 vocabulary-node type association to Drupal 8 migration.
+ */
 class MigrateVocabularyEntityDisplayTest extends MigrateDrupalTestBase {
 
-static $modules = array('field', 'node', 'taxonomy');
+  /**
+   * The modules to be enabled during the test.
+   *
+   * @var array
+   */
+  static $modules = array('field', 'node', 'taxonomy');
 
   /**
    * {@inheritdoc}
@@ -26,10 +34,10 @@ static $modules = array('field', 'node', 'taxonomy');
   }
 
   /**
-   * Tests the vocabulary entity display migration.
+   * {@inheritdoc}
    */
-  public function testVocabularyEntityDisplay() {
-
+  protected function setUp() {
+    parent::setUp();
     // Add some id mappings for the dependant migrations.
     $id_mappings = array(
       'd6_taxonomy_vocabulary' => array(
@@ -48,13 +56,18 @@ static $modules = array('field', 'node', 'taxonomy');
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, $this);
     $executable->import();
+  }
 
+  /**
+   * Tests the Drupal 6 vocabulary-node type association to Drupal 8 migration.
+   */
+  public function testVocabularyEntityDisplay() {
     // Test that the field exists.
     $component = entity_get_display('node', 'page', 'default')->getComponent('tags');
     $this->assertEqual($component['type'], 'taxonomy_term_reference');
     $this->assertEqual($component['weight'], 20);
     // Test the Id map.
-    $this->assertEqual(array('node', 'article', 'default', 'tags'), $migration->getIdMap()->lookupDestinationID(array(1, 'article')));
+    $this->assertEqual(array('node', 'article', 'default', 'tags'), entity_load('migration', 'd6_vocabulary_entity_display')->getIdMap()->lookupDestinationID(array(1, 'article')));
   }
 
 }

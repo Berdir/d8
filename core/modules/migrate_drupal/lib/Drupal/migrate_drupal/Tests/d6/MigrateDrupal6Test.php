@@ -188,6 +188,7 @@ class MigrateDrupal6Test extends MigrateDrupalTestBase{
       'd6_taxonomy_vocabulary',
       #'d6_term_node_revision:*',
       'd6_term_node:*',
+      'd6_text_settings',
       'd6_user_profile_field_instance',
       'd6_user_profile_entity_display',
       'd6_user_profile_entity_form_display',
@@ -200,6 +201,10 @@ class MigrateDrupal6Test extends MigrateDrupalTestBase{
       'd6_user_role',
       'd6_user',
       'd6_view_modes',
+      'd6_vocabulary_entity_display',
+      'd6_vocabulary_entity_form_display',
+      'd6_vocabulary_field_instance',
+      'd6_vocabulary_field',
     );
     $classes = array(
       __NAMESPACE__ . '\MigrateActionConfigsTest',
@@ -250,6 +255,7 @@ class MigrateDrupal6Test extends MigrateDrupalTestBase{
       __NAMESPACE__ . '\MigrateTaxonomyVocabularyTest',
       #__NAMESPACE__ . '\MigrateTermNodeRevisionTest',
       __NAMESPACE__ . '\MigrateTermNodeTest',
+      __NAMESPACE__ . '\MigrateTextConfigsTest',
       __NAMESPACE__ . '\MigrateUserProfileEntityDisplayTest',
       __NAMESPACE__ . '\MigrateUserProfileEntityFormDisplayTest',
       __NAMESPACE__ . '\MigrateUserProfileFieldTest',
@@ -262,6 +268,10 @@ class MigrateDrupal6Test extends MigrateDrupalTestBase{
       __NAMESPACE__ . '\MigrateUserRoleTest',
       __NAMESPACE__ . '\MigrateUserTest',
       __NAMESPACE__ . '\MigrateViewModesTest',
+      __NAMESPACE__ . '\MigrateVocabularyEntityDisplayTest',
+      __NAMESPACE__ . '\MigrateVocabularyEntityFormDisplayTest',
+      __NAMESPACE__ . '\MigrateVocabularyFieldInstanceTest',
+      __NAMESPACE__ . '\MigrateVocabularyFieldTest',
     );
     // Run every migration in the order specified by the storage controller.
     foreach (entity_load_multiple('migration', $migrations) as $migration) {

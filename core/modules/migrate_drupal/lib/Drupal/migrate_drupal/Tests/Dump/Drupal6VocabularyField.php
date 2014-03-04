@@ -147,11 +147,11 @@ class Drupal6VocabularyField extends Drupal6DumpBase {
       'type',
     ))
     ->values(array(
-      'vid' => '1',
+      'vid' => '4',
       'type' => 'article',
     ))
     ->values(array(
-      'vid' => '1',
+      'vid' => '4',
       'type' => 'page',
     ))
     ->execute();
