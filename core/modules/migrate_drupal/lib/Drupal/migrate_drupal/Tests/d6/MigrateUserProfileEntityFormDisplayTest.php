@@ -7,7 +7,6 @@
 
 namespace Drupal\migrate_drupal\Tests\d6;
 
-use Drupal\migrate\MigrateMessage;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
@@ -30,9 +29,10 @@ class MigrateUserProfileEntityFormDisplayTest extends MigrateDrupalTestBase {
   }
 
   /**
-   * Tests migration of user profile fields.
+   * {@inheritdoc}
    */
-  public function testUserProfileEntityFormDisplay() {
+  protected function setUp() {
+    parent::setUp();
     $migration = entity_load('migration', 'd6_user_profile_entity_form_display');
     $dumps = array(
       drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6UserProfileFields.php',
@@ -40,7 +40,12 @@ class MigrateUserProfileEntityFormDisplayTest extends MigrateDrupalTestBase {
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, $this);
     $executable->import();
+  }
 
+  /**
+   * Tests migration of user profile fields.
+   */
+  public function testUserProfileEntityFormDisplay() {
     $display = entity_get_form_display('user', 'user', 'default');
 
     // Test a text field.

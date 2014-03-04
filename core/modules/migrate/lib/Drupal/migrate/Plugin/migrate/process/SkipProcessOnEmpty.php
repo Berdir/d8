@@ -2,23 +2,24 @@
 
 /**
  * @file
- * Contains \Drupal\migrate_drupal\Plugin\migrate\Process\d6\CommentPid.
+ * Contains \Drupal\migrate\Plugin\migrate\Process\d6\FlagSkipProcess.
  */
 
+namespace Drupal\migrate\Plugin\migrate\process;
 
-namespace Drupal\migrate_drupal\Plugin\migrate\Process\d6;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate\MigrateSkipProcessException;
 use Drupal\migrate\ProcessPluginBase;
 use Drupal\migrate\Row;
 
-
 /**
+ * If the value evaluates to false, skip further processing.
+ *
  * @MigrateProcessPlugin(
- *   id = "d6_comment_pid"
+ *   id = "skip_process_on_empty"
  * )
  */
-class CommentPid extends ProcessPluginBase {
+class SkipProcessOnEmpty extends ProcessPluginBase {
 
   /**
    * {@inheritdoc}

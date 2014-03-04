@@ -12,6 +12,9 @@ use Drupal\migrate_drupal\Tests\Dump\Drupal6User;
 use Drupal\migrate_drupal\Tests\Dump\Drupal6UserProfileFields;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
+/**
+ * Tests Drupal 6 profile values to Drupal 8 migration.
+ */
 class MigrateProfileValuesTest extends MigrateDrupalTestBase {
 
   /**
@@ -100,13 +103,6 @@ class MigrateProfileValuesTest extends MigrateDrupalTestBase {
       unset($u['uid']);
       entity_create('user', $u)->save();
     }
-  }
-
-  /**
-   * Test the user profile data migration.
-   */
-  public function testUserProfileValues() {
-
     // Add some id mappings for the dependant migrations.
     $id_mappings = array(
       'd6_user_profile_field_instance' => array(
@@ -132,7 +128,12 @@ class MigrateProfileValuesTest extends MigrateDrupalTestBase {
     $migration_format = entity_load('migration', 'd6_profile_values:user');
     $executable = new MigrateExecutable($migration_format, $this);
     $executable->import();
+  }
 
+  /**
+   * Tests Drupal 6 profile values to Drupal 8 migration.
+   */
+  public function testUserProfileValues() {
     $user = user_load(1);
     $this->assertFalse(is_null($user));
     $this->assertEqual($user->profile_color->value, 'red');
@@ -143,7 +144,6 @@ class MigrateProfileValuesTest extends MigrateDrupalTestBase {
     $this->assertEqual($user->profile_bands[1]->value, 'Eagles');
     $this->assertEqual($user->profile_blog->url, 'http://example.com/blog');
     $this->assertEqual($user->profile_birthdate->value, '1974-06-02');
-
   }
 
 }

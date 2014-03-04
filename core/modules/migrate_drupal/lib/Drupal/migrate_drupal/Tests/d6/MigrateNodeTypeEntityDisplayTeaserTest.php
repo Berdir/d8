@@ -7,6 +7,9 @@
 
 namespace Drupal\migrate_drupal\Tests\d6;
 
+/**
+ * Tests the Drupal 6 teaser settings to Drupal 8 entity display migration.
+ */
 class MigrateNodeTypeEntityDisplayTeaserTest extends MigrateNodeTypeEntityDisplayTest {
 
   /**
@@ -58,6 +61,13 @@ class MigrateNodeTypeEntityDisplayTeaserTest extends MigrateNodeTypeEntityDispla
       'description'  => 'Upgrade node body settings to entity.display.node.*.default.yml',
       'group' => 'Migrate Drupal',
     );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function testNodeTypeEntityDisplay() {
+    parent::testNodeTypeEntityDisplay();
   }
 
 }

@@ -29,9 +29,10 @@ class MigrateUserProfileFieldInstanceTest extends MigrateDrupalTestBase {
   }
 
   /**
-   * Tests migration of user profile fields.
+   * {@inheritdoc}
    */
-  public function testUserProfileFields() {
+  protected function setUp() {
+    parent::setUp();
     // Add some id mappings for the dependant migrations.
     $id_mappings = array(
       'd6_user_profile_field' => array(
@@ -49,6 +50,12 @@ class MigrateUserProfileFieldInstanceTest extends MigrateDrupalTestBase {
     $executable = new MigrateExecutable($migration, $this);
     $executable->import();
 
+  }
+
+  /**
+   * Tests migration of user profile fields.
+   */
+  public function testUserProfileFields() {
     // Migrated a text field.
     $field = entity_load('field_instance_config', 'user.user.profile_color');
     $this->assertEqual($field->label(), 'Favorite color');

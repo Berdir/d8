@@ -8,7 +8,7 @@ process:
   cid: cid
   pid:
     -
-      plugin: d6_comment_pid
+      plugin: skip_process_on_empty
       source: pid
     -
       plugin: migration
@@ -21,9 +21,12 @@ process:
   field_id: constants.field_id
   subject: subject
   uid:
-    plugin: migration
-    migration: d6_user
-    source: uid
+    -
+      plugin: skip_process_on_empty
+      source: uid
+    -
+      plugin: migration
+      migration: d6_user
   name: name
   mail: mail
   homepage: homepage

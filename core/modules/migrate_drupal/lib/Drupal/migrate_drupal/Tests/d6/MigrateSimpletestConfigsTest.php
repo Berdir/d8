@@ -35,9 +35,10 @@ class MigrateSimpletestConfigsTest extends MigrateDrupalTestBase {
   }
 
   /**
-   * Tests migration of simpletest variables to simpletest.settings.yml.
+   * {@inheritdoc}
    */
-  public function testSimpletestSettings() {
+  protected function setUp() {
+    parent::setUp();
     $migration = entity_load('migration', 'd6_simpletest_settings');
     $dumps = array(
       drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6SimpletestSettings.php',
@@ -45,6 +46,12 @@ class MigrateSimpletestConfigsTest extends MigrateDrupalTestBase {
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, new MigrateMessage());
     $executable->import();
+  }
+
+  /**
+   * Tests migration of simpletest variables to simpletest.settings.yml.
+   */
+  public function testSimpletestSettings() {
     $config = \Drupal::config('simpletest.settings');
     $this->assertIdentical($config->get('clear_results'), TRUE);
     $this->assertIdentical($config->get('httpauth.method'), CURLAUTH_BASIC);

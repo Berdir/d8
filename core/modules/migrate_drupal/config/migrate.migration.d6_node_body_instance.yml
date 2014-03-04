@@ -22,7 +22,7 @@ process:
   description: constants.description
   required: constants.required
   status:
-    plugin: flag_skipping_row
+    plugin: skip_row_on_empty
     source: has_body
   default_value_function: constants.default_value_function
   default_value: constants.default_value

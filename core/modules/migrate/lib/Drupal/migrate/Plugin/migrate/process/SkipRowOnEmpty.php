@@ -5,7 +5,7 @@
  * Contains \Drupal\migrate_drupal\Plugin\migrate\process\d6\FlagSkippingRow.
  */
 
-namespace Drupal\migrate_drupal\Plugin\migrate\Process\d6;
+namespace Drupal\migrate\Plugin\migrate\process;
 
 use Drupal\migrate\ProcessPluginBase;
 use Drupal\migrate\MigrateExecutable;
@@ -13,13 +13,13 @@ use Drupal\migrate\Row;
 use Drupal\migrate\MigrateSkipRowException;
 
 /**
- * If the source evaluates to false, we skip the current row.
+ * If the source evaluates to empty, we skip the current row.
  *
  * @MigrateProcessPlugin(
- *   id = "flag_skipping_row"
+ *   id = "skip_row_on_empty"
  * )
  */
-class FlagSkippingRow extends ProcessPluginBase {
+class SkipRowOnEmpty extends ProcessPluginBase {
 
   /**
    * {@inheritdoc}

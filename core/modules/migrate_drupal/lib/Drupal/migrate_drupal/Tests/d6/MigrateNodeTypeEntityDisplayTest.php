@@ -10,7 +10,7 @@ use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
 /**
- * Tests node body migrated into an entity display, teaser mode.
+ * Tests node body migrated into an entity display, default mode.
  */
 class MigrateNodeTypeEntityDisplayTest extends MigrateDrupalTestBase {
 
@@ -20,6 +20,13 @@ class MigrateNodeTypeEntityDisplayTest extends MigrateDrupalTestBase {
    * @var array
    */
   public static $modules = array('node');
+
+  /**
+   * The node types.
+   *
+   * @var array
+   */
+  protected $types = array('company', 'employee', 'sponsor');
 
   /**
    * The id of the migration being tested.
@@ -64,9 +71,10 @@ class MigrateNodeTypeEntityDisplayTest extends MigrateDrupalTestBase {
   }
 
   /**
-   * Test the node type entity display migration.
+   * {@inheritdoc}
    */
-  public function testNodeTypeEntityDisplay() {
+  public function setUp() {
+    parent::setUp();
     // Add some id mappings for the dependant migrations.
     $id_mappings = array(
       'd6_field_instance' => array(
@@ -78,8 +86,7 @@ class MigrateNodeTypeEntityDisplayTest extends MigrateDrupalTestBase {
     );
     $this->prepareIdMappings($id_mappings);
 
-    $types = array('company', 'employee', 'sponsor');
-    foreach ($types as $type) {
+    foreach ($this->types as $type) {
       entity_create('node_type', array('type' => $type))->save();
     }
     /** @var \Drupal\migrate\entity\Migration $migration */
@@ -90,15 +97,13 @@ class MigrateNodeTypeEntityDisplayTest extends MigrateDrupalTestBase {
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, $this);
     $executable->import();
-
-    $this->verifyExpected($types);
   }
 
   /**
-   * Verify expectations.
+   * Test the node type entity display migration.
    */
-  protected function verifyExpected($types) {
-    foreach ($types as $type) {
+  public function testNodeTypeEntityDisplay() {
+    foreach ($this->types as $type) {
       $component = entity_get_display('node', $type, $this->viewMode)->getComponent('body');
       foreach ($this->expectedComponent as $key => $value) {
         $this->assertEqual($component[$key], $value);

@@ -11,9 +11,12 @@ process:
   description: description
   weight: weight
   parent:
-    plugin: migration
-    migration: d6_taxonomy_term
-    source: parent
+    -
+      plugin: skip_process_on_empty
+      source: parent
+    -
+      plugin: migration
+      migration: d6_taxonomy_term
   changed: timestamp
 destination:
   plugin: entity:taxonomy_term

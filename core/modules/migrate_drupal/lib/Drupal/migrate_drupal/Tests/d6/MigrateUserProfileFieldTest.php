@@ -7,7 +7,6 @@
 
 namespace Drupal\migrate_drupal\Tests\d6;
 
-use Drupal\migrate\MigrateMessage;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
@@ -30,9 +29,10 @@ class MigrateUserProfileFieldTest extends MigrateDrupalTestBase {
   }
 
   /**
-   * Tests migration of user profile fields.
+   * {@inheritdoc}
    */
-  public function testUserProfileFields() {
+  protected function setUp() {
+    parent::setUp();
     $migration = entity_load('migration', 'd6_user_profile_field');
     $dumps = array(
       drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6UserProfileFields.php',
@@ -41,6 +41,12 @@ class MigrateUserProfileFieldTest extends MigrateDrupalTestBase {
     $executable = new MigrateExecutable($migration, $this);
     $executable->import();
 
+  }
+
+  /**
+   * Tests migration of user profile fields.
+   */
+  public function testUserProfileFields() {
     // Migrated a text field.
     $field = entity_load('field_config', 'user.profile_color');
     $this->assertEqual($field->type, 'text', 'Field type is text.');
