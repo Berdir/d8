@@ -1,8 +1,6 @@
 id: d6_user
 source:
   plugin: d6_user
-load:
-  plugin: drupal_entity
 process:
   uid: uid
   name: name
@@ -38,6 +36,4 @@ dependencies:
   - d6_user_role
   - d6_user_picture_entity_display
   - d6_user_picture_entity_form_display
-  - d6_user_picture_field_instance
-  - d6_user_picture_field
   - d6_user_picture_file

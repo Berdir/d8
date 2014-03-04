@@ -64,7 +64,7 @@ class MigrateUserTest extends MigrateDrupalTestBase {
     ))->save();
 
     $file = entity_create('file', array(
-      'fid' => 1,
+      'fid' => 2,
       'uid' => 2,
       'filename' => 'image-1.png',
       'uri' => "public://picture-1.png",
@@ -78,7 +78,7 @@ class MigrateUserTest extends MigrateDrupalTestBase {
     $file->save();
 
     $file = entity_create('file', array(
-      'fid' => 2,
+      'fid' => 8,
       'uid' => 8,
       'filename' => 'image-2.jpg',
       'uri' => "public://picture-1.jpg",
@@ -114,16 +114,22 @@ class MigrateUserTest extends MigrateDrupalTestBase {
         array(array(4), array('migrate test role 2')),
         array(array(5), array('migrate test role 3')),
       ),
+      'd6_user_picture_entity_display' => array(
+        array(array(1), array('user', 'user', 'default', 'user_picture')),
+      ),
+      'd6_user_picture_entity_form_display' => array(
+        array(array(1), array('user', 'user', 'default', 'user_picture')),
+      ),
       'd6_user_picture_file' => array(
-        array(array(1), array(1)),
         array(array(2), array(2)),
+        array(array(8), array(8)),
       ),
     );
 
     $this->prepareIdMappings($id_mappings);
 
     // Migrate users.
-    $migration = entity_load('migration', 'd6_user:user');
+    $migration = entity_load('migration', 'd6_user');
     $executable = new MigrateExecutable($migration, $this);
     $executable->import();
   }
