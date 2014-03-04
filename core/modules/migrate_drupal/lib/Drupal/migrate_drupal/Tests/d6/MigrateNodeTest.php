@@ -32,14 +32,12 @@ class MigrateNodeTest extends MigrateNodeTestBase {
   public function setUp() {
     parent::setUp();
     /** @var \Drupal\migrate\entity\Migration $migration */
-    $migrations = entity_load_multiple('migration', array('d6_node:*'));
-    foreach ($migrations as $migration) {
-      $executable = new MigrateExecutable($migration, $this);
-      $executable->import();
+    $migration = entity_load('migration', 'd6_node');
+    $executable = new MigrateExecutable($migration, $this);
+    $executable->import();
 
-      // This is required for the second import below.
-      db_truncate($migration->getIdMap()->mapTableName())->execute();
-    }
+    // This is required for the second import below.
+    db_truncate($migration->getIdMap()->mapTableName())->execute();
   }
 
   /**
@@ -55,12 +53,8 @@ class MigrateNodeTest extends MigrateNodeTestBase {
     $this->assertEqual($node->getCreatedTime(), 1388271197, 'Node has the correct created time.');
     $this->assertEqual($node->isSticky(), FALSE, 'Node has the correct sticky setting.');
     $this->assertEqual($node->getOwnerId(), 1, 'Node has the correct author id.');
-    $this->assertEqual($node->field_test->value, 'This is a text field', "Single field storage field is correct.");
 
-    $this->assertEqual($node->field_test_two->value, 10, 'Multi field storage field is correct');
-    $this->assertEqual($node->field_test_two[1]->value, 20, 'Multi field second value is correct.');
-
-//    //$this->assertEqual($node->getRevisionCreationTime(), 1390095701, 'Node has the correct revision timestamp.');
+    //$this->assertEqual($node->getRevisionCreationTime(), 1390095701, 'Node has the correct revision timestamp.');
 
     // Test that we can re-import using the EntityContentBase destination.
     $connection = Database::getConnection('default', 'migrate');
@@ -75,19 +69,16 @@ class MigrateNodeTest extends MigrateNodeTestBase {
       ->condition('delta', 1)
       ->execute();
 
-    $migrations = entity_load_multiple('migration', array('d6_node:*'), TRUE);
-    foreach ($migrations as $migration) {
-      $executable = new MigrateExecutable($migration, $this);
-      $executable->import();
-    }
+    /** @var \Drupal\migrate\entity\Migration $migration */
+    $migration = entity_load('migration', 'd6_node');
+    $executable = new MigrateExecutable($migration, $this);
+    $executable->import();
+
     $node = node_load(1);
     $this->assertEqual($node->getTitle(), 'New node title');
     // Test a multi-column fields are correctly upgraded.
     $this->assertEqual($node->body->value, 'test');
     $this->assertEqual($node->body->format, 'full_html');
-
-    $this->assertEqual($node->field_test_two->value, 10, 'Multi field storage field is correct');
-    $this->assertIdentical($node->field_test_two[1]->value, NULL, 'Multi field second value is deleted.');
   }
 
 }

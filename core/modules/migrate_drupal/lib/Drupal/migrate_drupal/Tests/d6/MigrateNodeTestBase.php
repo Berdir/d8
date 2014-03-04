@@ -21,6 +21,7 @@ class MigrateNodeTestBase extends MigrateDrupalTestBase {
     $node_type = entity_create('node_type', array('type' => 'story'));
     $node_type->save();
     node_add_body_field($node_type);
+
     $id_mappings = array(
       'd6_node_type' => array(array(array('story'), array('story'))),
       'd6_filter_format' => array(
@@ -29,27 +30,17 @@ class MigrateNodeTestBase extends MigrateDrupalTestBase {
       ),
     );
     $this->prepareIdMappings($id_mappings);
-    entity_create('field_config', array(
-      'entity_type' => 'node',
-      'name' => 'field_test',
-      'type' => 'text',
-    ))->save();
-    entity_create('field_instance_config', array(
-      'entity_type' => 'node',
-      'field_name' => 'field_test',
-      'bundle' => 'story',
-    ))->save();
-    entity_create('field_config', array(
-      'entity_type' => 'node',
-      'name' => 'field_test_two',
-      'type' => 'integer',
-      'cardinality' => -1,
-    ))->save();
-    entity_create('field_instance_config', array(
-      'entity_type' => 'node',
-      'field_name' => 'field_test_two',
-      'bundle' => 'story',
-    ))->save();
+
+    // Create a test node.
+    $node = entity_create('node', array(
+      'type' => 'story',
+      'nid' => 1,
+      'vid' => 1,
+    ));
+    $node->enforceIsNew();
+    $node->save();
+
+    // Load dumps.
     $path = drupal_get_path('module', 'migrate_drupal');
     $dumps = array(
       $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6Node.php',

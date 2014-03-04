@@ -36,27 +36,16 @@ class MigrateNodeRevisionTest extends MigrateNodeTestBase {
       ),
     );
     $this->prepareIdMappings($id_mappings);
-    $node = entity_create('node', array(
-      'type' => 'story',
-      'nid' => 1,
-      'vid' => 1,
-    ));
-    $node->enforceIsNew();
-    $node->save();
+
     $path = drupal_get_path('module', 'migrate_drupal');
     $dumps = array(
       $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6NodeRevision.php',
     );
     $this->loadDumps($dumps);
     /** @var \Drupal\migrate\entity\Migration $migration */
-    $migrations = entity_load_multiple('migration', array('d6_node_revision:*'));
-    foreach ($migrations as $migration) {
-      $executable = new MigrateExecutable($migration, $this);
-      $executable->import();
-
-      // This is required for the second import below.
-      db_truncate($migration->getIdMap()->mapTableName())->execute();
-    }
+    $migration = entity_load('migration', 'd6_node_revision');
+    $executable = new MigrateExecutable($migration, $this);
+    $executable->import();
   }
 
   /**

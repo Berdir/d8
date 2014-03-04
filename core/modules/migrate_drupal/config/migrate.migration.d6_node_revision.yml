@@ -1,11 +1,8 @@
 id: d6_node_revision
 load:
   plugin: drupal_entity
-  bundle_migration: d6_node_type
-
 source:
   plugin: d6_node_revision
-
 process:
   nid: nid
   type: type

@@ -1,0 +1,15 @@
+id: d6_cck_field_revision
+load:
+  plugin: drupal_entity
+  bundle_migration: d6_node_type
+source:
+  plugin: d6_cck_field_revision
+process:
+  nid:
+    plugin: migration
+    migration: d6_node
+    source: nid
+destination:
+  plugin: entity_revision:node
+dependencies:
+  - d6_cck_field_values
