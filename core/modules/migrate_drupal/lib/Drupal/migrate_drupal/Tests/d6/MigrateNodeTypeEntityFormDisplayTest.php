@@ -10,6 +10,13 @@ namespace Drupal\migrate_drupal\Tests\d6;
 class MigrateNodeTypeEntityFormDisplayTest extends MigrateNodeTypeEntityDisplayTest {
 
   /**
+   * The id of the migration being tested.
+   *
+   * @var string
+   */
+  protected $migrationId = 'd6_node_type_entity_form_display';
+
+  /**
    * {@inheritdoc}
    */
   public static function getInfo() {
