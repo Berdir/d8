@@ -10,8 +10,16 @@ namespace Drupal\migrate_drupal\Tests\d6;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
+/**
+ * Tests the Drupal 6 upload settings to Drupal 8 field instance migration.
+ */
 class MigrateUploadInstanceTest extends MigrateDrupalTestBase {
 
+  /**
+   * The modules to be enabled during the test.
+   *
+   * @var array
+   */
   static $modules = array('file', 'node');
 
   /**
@@ -26,9 +34,10 @@ class MigrateUploadInstanceTest extends MigrateDrupalTestBase {
   }
 
   /**
-   * Test the field instance migration.
+   * {@inheritdoc}
    */
-  public function testUploadFieldInstance() {
+  protected function setUp() {
+    parent::setUp();
     // Add some node mappings to get past checkRequirements().
     $id_mappings = array(
       'd6_upload_field' => array(
@@ -54,7 +63,12 @@ class MigrateUploadInstanceTest extends MigrateDrupalTestBase {
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, $this);
     $executable->import();
+  }
 
+  /**
+   * Tests the Drupal 6 upload settings to Drupal 8 field instance migration.
+   */
+  public function testUploadFieldInstance() {
     $field = entity_load('field_instance_config', 'node.page.upload');
     $settings = $field->getSettings();
     $this->assertEqual($field->id(), 'node.page.upload');
@@ -69,7 +83,7 @@ class MigrateUploadInstanceTest extends MigrateDrupalTestBase {
     $field = entity_load('field_instance_config', 'node.article.upload');
     $this->assertTrue(is_null($field));
 
-    $this->assertEqual(array('node', 'page', 'upload'), $migration->getIdMap()->lookupDestinationID(array('page')));
+    $this->assertEqual(array('node', 'page', 'upload'), entity_load('migration', 'd6_upload_field_instance')->getIdMap()->lookupDestinationID(array('page')));
   }
 
 }

@@ -14,7 +14,7 @@ use Drupal\simpletest\TestBase;
 /**
  * Test the complete Drupal 6 migration.
  */
-class MigrateDrupal6Test extends MigrateDrupalTestBase{
+class MigrateDrupal6Test extends MigrateDrupalTestBase {
 
   /**
    * Modules to enable.
@@ -47,6 +47,7 @@ class MigrateDrupal6Test extends MigrateDrupalTestBase{
     'taxonomy',
     'telephone',
     'text',
+    'update',
     'views',
   );
 
@@ -189,6 +190,14 @@ class MigrateDrupal6Test extends MigrateDrupalTestBase{
       #'d6_term_node_revision:*',
       'd6_term_node:*',
       'd6_text_settings',
+      'd6_update_settings',
+      'd6_upload_entity_display',
+      'd6_upload_entity_form_display',
+      'd6_upload_field',
+      'd6_upload_field_instance',
+      'd6_upload',
+      'd6_url_alias',
+      'd6_user_mail',
       'd6_user_profile_field_instance',
       'd6_user_profile_entity_display',
       'd6_user_profile_entity_form_display',
@@ -256,6 +265,14 @@ class MigrateDrupal6Test extends MigrateDrupalTestBase{
       #__NAMESPACE__ . '\MigrateTermNodeRevisionTest',
       __NAMESPACE__ . '\MigrateTermNodeTest',
       __NAMESPACE__ . '\MigrateTextConfigsTest',
+      __NAMESPACE__ . '\MigrateUpdateConfigsTest',
+      __NAMESPACE__ . '\MigrateUploadEntityDisplayTest',
+      __NAMESPACE__ . '\MigrateUploadEntityFormDisplayTest',
+      __NAMESPACE__ . '\MigrateUploadFieldTest',
+      __NAMESPACE__ . '\MigrateUploadInstanceTest',
+      __NAMESPACE__ . '\MigrateUploadTest',
+      __NAMESPACE__ . '\MigrateUrlAliasTest',
+      __NAMESPACE__ . '\MigrateUserConfigsTest',
       __NAMESPACE__ . '\MigrateUserProfileEntityDisplayTest',
       __NAMESPACE__ . '\MigrateUserProfileEntityFormDisplayTest',
       __NAMESPACE__ . '\MigrateUserProfileFieldTest',

@@ -11,6 +11,9 @@ use Drupal\Core\Database\Database;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
+/**
+ * Tests the Drupal6 user to Drupal 8 migration.
+ */
 class MigrateUserTest extends MigrateDrupalTestBase {
 
   /**
@@ -126,7 +129,7 @@ class MigrateUserTest extends MigrateDrupalTestBase {
   }
 
   /**
-   * Test the user migration.
+   * Tests the Drupal6 user to Drupal 8 migration.
    */
   public function testUser() {
     $users = Database::getConnection('default', 'migrate')

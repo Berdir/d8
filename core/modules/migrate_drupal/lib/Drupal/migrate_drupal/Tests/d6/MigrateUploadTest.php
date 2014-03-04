@@ -25,13 +25,20 @@ class MigrateUploadTest extends MigrateUploadBase {
   }
 
   /**
-   * Test upload migration from Drupal 6 to Drupal 8.
+   * {@inheritdoc}
    */
-  function testUpload() {
+  public function setUp() {
+    parent::setUp();
     /** @var \Drupal\migrate\entity\Migration $migration */
     $migration = entity_load('migration', 'd6_upload');
     $executable = new MigrateExecutable($migration, $this);
     $executable->import();
+  }
+
+  /**
+   * Test upload migration from Drupal 6 to Drupal 8.
+   */
+  function testUpload() {
     $nodes = node_load_multiple(array(1, 2), TRUE);
     $node = $nodes[1];
     $this->assertEqual(count($node->upload), 1);

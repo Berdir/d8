@@ -10,8 +10,16 @@ namespace Drupal\migrate_drupal\Tests\d6;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
+/**
+ * Tests the Drupal 6 upload settings to Drupal 8 entity form display migration.
+ */
 class MigrateUploadEntityFormDisplayTest extends MigrateDrupalTestBase {
 
+  /**
+   * The modules to be enabled during the test.
+   *
+   * @var array
+   */
   static $modules = array('file', 'node');
 
   /**
@@ -26,10 +34,10 @@ class MigrateUploadEntityFormDisplayTest extends MigrateDrupalTestBase {
   }
 
   /**
-   * Test the upload entity form display.
+   * {@inheritdoc}
    */
-  public function testUploadEntityFormDisplay() {
-
+  protected function setUp() {
+    parent::setUp();
     $id_mappings = array(
       'd6_upload_field_instance' => array(
         array(array(1), array('node', 'page', 'upload')),
@@ -45,6 +53,12 @@ class MigrateUploadEntityFormDisplayTest extends MigrateDrupalTestBase {
     $executable = new MigrateExecutable($migration, $this);
     $executable->import();
 
+  }
+
+  /**
+   * Tests the Drupal 6 upload settings to Drupal 8 entity form display migration.
+   */
+  public function testUploadEntityFormDisplay() {
     $display = entity_get_form_display('node', 'page', 'default');
     $component = $display->getComponent('upload');
     $this->assertEqual($component['type'], 'file_generic');
@@ -58,7 +72,7 @@ class MigrateUploadEntityFormDisplayTest extends MigrateDrupalTestBase {
     $component = $display->getComponent('upload');
     $this->assertTrue(is_null($component));
 
-    $this->assertEqual(array('node', 'page', 'default', 'upload'), $migration->getIdMap()->lookupDestinationID(array('page')));
+    $this->assertEqual(array('node', 'page', 'default', 'upload'), entity_load('migration', 'd6_upload_entity_form_display')->getIdMap()->lookupDestinationID(array('page')));
   }
 
 }

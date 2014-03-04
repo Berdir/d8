@@ -29,10 +29,10 @@ class MigrateUrlAliasTest extends MigrateDrupalTestBase {
   }
 
   /**
-   * Test the url alias migration.
+   * {@inheritdoc}
    */
-  public function testUrlAlias() {
-
+  protected function setUp() {
+    parent::setUp();
     $migration = entity_load('migration', 'd6_url_alias');
     $dumps = array(
       drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6UrlAlias.php',
@@ -40,7 +40,13 @@ class MigrateUrlAliasTest extends MigrateDrupalTestBase {
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, $this);
     $executable->import();
+  }
 
+  /**
+   * Test the url alias migration.
+   */
+  public function testUrlAlias() {
+    $migration = entity_load('migration', 'd6_url_alias');
     // Test that the field exists.
     $conditions = array(
       'source' => 'node/1',
