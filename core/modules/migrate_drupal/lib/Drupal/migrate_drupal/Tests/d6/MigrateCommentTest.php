@@ -44,7 +44,7 @@ class MigrateCommentTest extends MigrateDrupalTestBase {
     $node->enforceIsNew();
     $node->save();
     $id_mappings = array(
-      'd6_filter_format' => array(array(array(1), array('plain_text'))),
+      'd6_filter_format' => array(array(array(1), array('filtered_html'))),
       'd6_node' => array(array(array(1), array(1))),
       'd6_user' => array(array(array(0), array(0))),
     );
@@ -70,7 +70,7 @@ class MigrateCommentTest extends MigrateDrupalTestBase {
     $comment = entity_load('comment', 1);
     $this->assertEqual('The first comment.', $comment->subject->value);
     $this->assertEqual('The first comment body.', $comment->comment_body->value);
-    $this->assertEqual('plain_text', $comment->comment_body->format);
+    $this->assertEqual('filtered_html', $comment->comment_body->format);
     $this->assertEqual(0, $comment->pid->value);
     $this->assertEqual(1, $comment->entity_id->value);
     $this->assertEqual('node', $comment->entity_type->value);

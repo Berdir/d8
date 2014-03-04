@@ -12,7 +12,7 @@ use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 use Drupal\taxonomy\Entity\Term;
 
 /**
- * Tests migration of taxonomy terms.
+ * Tests the Drupal 6 taxonomy term to Drupal 8 migration.
  */
 class MigrateTaxonomyTermTest extends MigrateDrupalTestBase {
 
@@ -29,7 +29,11 @@ class MigrateTaxonomyTermTest extends MigrateDrupalTestBase {
     );
   }
 
-  public function testTaxonomyTerms() {
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp() {
+    parent::setUp();
     $this->prepareIdMappings(array(
       'd6_taxonomy_vocabulary' => array(
         array(array(1), array(1)),
@@ -46,7 +50,12 @@ class MigrateTaxonomyTermTest extends MigrateDrupalTestBase {
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, $this);
     $executable->import();
+  }
 
+  /**
+   * Tests the Drupal 6 taxonomy term to Drupal 8 migration.
+   */
+  public function testTaxonomyTerms() {
     $expected_results = array(
       '1' => array(
         'vid' => 1,

@@ -35,9 +35,10 @@ class MigrateSyslogConfigsTest extends MigrateDrupalTestBase {
   }
 
   /**
-   * Tests migration of syslog variables to syslog.settings.yml.
+   * {@inheritdoc}
    */
-  public function testSyslogSettings() {
+  protected function setUp() {
+    parent::setUp();
     $migration = entity_load('migration', 'd6_syslog_settings');
     $dumps = array(
       drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6SyslogSettings.php',
@@ -45,6 +46,12 @@ class MigrateSyslogConfigsTest extends MigrateDrupalTestBase {
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, new MigrateMessage());
     $executable->import();
+  }
+
+  /**
+   * Tests migration of syslog variables to syslog.settings.yml.
+   */
+  public function testSyslogSettings() {
     $config = \Drupal::config('syslog.settings');
     $this->assertIdentical($config->get('identity'), 'drupal');
     // @TODO: change this to integer once there's schema of this config.

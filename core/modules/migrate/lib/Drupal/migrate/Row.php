@@ -218,7 +218,7 @@ class Row {
    * For example calling setDestination('foo:bar', 'baz') results in
    * @code
    * $this->destination['foo']['bar'] = 'baz';
-   * $this->rawDestination['foo:bar'] = 'baz';
+   * $this->rawDestination['foo.bar'] = 'baz';
    *
    * @return array
    *   The raw destination values.

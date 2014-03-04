@@ -43,6 +43,8 @@ class MigrateDrupal6Test extends MigrateDrupalTestBase{
     'options',
     'search',
     'simpletest',
+    'syslog',
+    'taxonomy',
     'telephone',
     'text',
     'views',
@@ -180,6 +182,12 @@ class MigrateDrupal6Test extends MigrateDrupalTestBase{
       'd6_search_settings',
       'd6_simpletest_settings',
       'd6_statistics_settings',
+      'd6_syslog_settings',
+      'd6_taxonomy_settings',
+      'd6_taxonomy_term',
+      'd6_taxonomy_vocabulary',
+      #'d6_term_node_revision:*',
+      'd6_term_node:*',
       'd6_user_profile_field_instance',
       'd6_user_profile_entity_display',
       'd6_user_profile_entity_form_display',
@@ -234,6 +242,14 @@ class MigrateDrupal6Test extends MigrateDrupalTestBase{
       __NAMESPACE__ . '\MigrateSearchPageTest',
       __NAMESPACE__ . '\MigrateSimpletestConfigsTest',
       __NAMESPACE__ . '\MigrateStatisticsConfigsTest',
+      __NAMESPACE__ . '\MigrateSyslogConfigsTest',
+      # @TODO: this likely needs to be split into separate classes.
+      #__NAMESPACE__ . '\MigrateSystemConfigsTest',
+      __NAMESPACE__ . '\MigrateTaxonomyConfigsTest',
+      __NAMESPACE__ . '\MigrateTaxonomyTermTest',
+      __NAMESPACE__ . '\MigrateTaxonomyVocabularyTest',
+      #__NAMESPACE__ . '\MigrateTermNodeRevisionTest',
+      __NAMESPACE__ . '\MigrateTermNodeTest',
       __NAMESPACE__ . '\MigrateUserProfileEntityDisplayTest',
       __NAMESPACE__ . '\MigrateUserProfileEntityFormDisplayTest',
       __NAMESPACE__ . '\MigrateUserProfileFieldTest',
@@ -253,6 +269,8 @@ class MigrateDrupal6Test extends MigrateDrupalTestBase{
     }
     foreach ($classes as $class) {
       $test_object = new $class($this->testId);
+      $test_object->databasePrefix = $this->databasePrefix;
+      $test_object->container = $this->container;
       // run() does a lot of setup and tear down work which we don't need:
       // it would setup a new database connection and wouldn't find the
       // Drupal 6 dump. Also by skipping the setUp() methods there are no id

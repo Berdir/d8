@@ -10,7 +10,7 @@ namespace Drupal\migrate_drupal\Tests\d6;
 use Drupal\migrate\MigrateExecutable;
 
 /**
- * Tests migration of taxonomy terms.
+ * Tests the Drupal 6 term-node revision association to Drupal 8 migration.
  */
 class MigrateTermNodeRevisionTest extends MigrateTermNodeTestBase {
 
@@ -36,18 +36,18 @@ class MigrateTermNodeRevisionTest extends MigrateTermNodeTestBase {
       ),
     );
     $this->prepareIdMappings($id_mappings);
-  }
-
-  /**
-   * Test migrating taxonomy term node associations.
-   */
-  public function testTermRevisionNode() {
     /** @var \Drupal\migrate\entity\Migration $migration */
     $migrations = entity_load_multiple('migration', array('d6_term_node_revision:*'));
     foreach ($migrations as $migration) {
       $executable = new MigrateExecutable($migration, $this);
       $executable->import();
     }
+  }
+
+  /**
+   * Tests the Drupal 6 term-node revision association to Drupal 8 migration.
+   */
+  public function testTermRevisionNode() {
     $node = \Drupal::entityManager()->getStorageController('node')->loadRevision(2);
     $this->assertEqual(count($node->test), 2);
     $this->assertEqual($node->test[0]->value, 2);

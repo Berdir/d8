@@ -101,8 +101,9 @@ class Drupal6VocabularyField extends Drupal6DumpBase {
       'name' => 'vocabulary',
     ));
 
-    $this->database->merge('vocabulary')->key(array('vid' => 1))
+    $this->database->insert('vocabulary')
       ->fields(array(
+        'vid' => 4,
         'name' => 'Tags',
         'description' => 'Tags Vocabulary',
         'help' => '',
