@@ -27,10 +27,11 @@ process:
   user_picture:
     -
       plugin: skip_process_on_empty
-      source: uid
+      source: picture
     -
       plugin: migration
       migration: d6_user_picture_file
+      source: uid
 destination:
   plugin: entity:user
   md5_passwords: true
