@@ -34,5 +34,3 @@ destination:
 dependencies:
   - d6_node_body_field
   - d6_node_type
-  - d6_field
-  - d6_field_instance
