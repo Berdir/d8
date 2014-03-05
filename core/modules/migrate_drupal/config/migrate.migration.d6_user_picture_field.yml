@@ -7,6 +7,7 @@ source:
     entity_type: user
     type: image
     name: user_picture
+    cardinality: 1
 process:
   entity_type: constants.entity_type
   name: constants.name
