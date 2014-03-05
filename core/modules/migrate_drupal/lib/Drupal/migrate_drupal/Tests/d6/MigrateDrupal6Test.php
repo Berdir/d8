@@ -164,7 +164,7 @@ class MigrateDrupal6Test extends MigrateDrupalTestBase {
       'd6_field_settings',
       'd6_field_formatter_settings',
       'd6_file_settings',
-      #'d6_file',
+      'd6_file',
       'd6_filter_format',
       'd6_forum_settings',
       'd6_locale_settings',
@@ -294,6 +294,10 @@ class MigrateDrupal6Test extends MigrateDrupalTestBase {
     );
     // Run every migration in the order specified by the storage controller.
     foreach (entity_load_multiple('migration', $migrations) as $migration) {
+      /** @var \Drupal\migrate\Entity\MigrationInterface $migration */
+      if ($migration->getDestinationPlugin()->getPluginId() == 'entity:file') {
+        $migration->source['conf_path'] = 'core/modules/simpletest';
+      }
       (new MigrateExecutable($migration, $this))->import();
     }
     foreach ($classes as $class) {

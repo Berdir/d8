@@ -96,13 +96,34 @@ class Drupal6File extends Drupal6DumpBase {
     ->values(array(
       'fid' => '1',
       'uid' => '1',
-      'filename' => 'Image1.jpg',
+      'filename' => 'Image1.png',
+      'filepath' => 'core/modules/simpletest/files/image-1.png',
+      'filemime' => 'image/png',
+      'filesize' => '39325',
+      'status' => '1',
+      'timestamp' => '1388880660',
+    ))
+    ->values(array(
+      'fid' => '2',
+      'uid' => '1',
+      'filename' => 'Image2.jpg',
       'filepath' => 'core/modules/simpletest/files/image-2.jpg',
       'filemime' => 'image/jpeg',
       'filesize' => '1831',
       'status' => '1',
       'timestamp' => '1388880664',
-    ))->execute();
+    ))
+    ->values(array(
+      'fid' => '3',
+      'uid' => '1',
+      'filename' => 'Image-test.gif',
+      'filepath' => 'core/modules/simpletest/files/image-test.gif',
+      'filemime' => 'image/jpeg',
+      'filesize' => '183',
+      'status' => '1',
+      'timestamp' => '1388880668',
+    ))
+    ->execute();
   }
 
 }

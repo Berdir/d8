@@ -52,7 +52,7 @@ class MigrateFileTest extends MigrateDrupalTestBase {
     $file = entity_load('file', 1);
     $this->assertEqual($file->getFilename(), 'Image1.jpg');
     $this->assertEqual($file->getSize(), 1831);
-    $this->assertEqual($file->getFileUri(), 'public://image-2.jpg');
+    $this->assertEqual($file->getFileUri(), 'public://image-1.jpg');
     $this->assertEqual($file->getMimeType(), 'image/jpeg');
 
     // Test that we can re-import and also test with file_directory_path set.

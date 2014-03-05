@@ -25,9 +25,12 @@ process:
     migration: d6_filter_format
     source: signature_format
   user_picture:
-    plugin: migration
-    migration: d6_user_picture_file
-    source: uid
+    -
+      plugin: skip_process_on_empty
+      source: uid
+    -
+      plugin: migration
+      migration: d6_user_picture_file
 destination:
   plugin: entity:user
   md5_passwords: true
