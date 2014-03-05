@@ -182,8 +182,6 @@ class MigrateUserTest extends MigrateDrupalTestBase {
       $this->assertEqual($user->getInitialEmail(), $source->init);
       $this->assertEqual($user->getRoles(), $roles);
 
-      // @TODO: uncomment the two below.
-
       // We have one empty picture in the data so don't try load that.
       if (!empty($source->picture)) {
         // Test the user picture.

@@ -43,7 +43,6 @@ class MigrateDrupal6Test extends MigrateDrupalTestBase {
     'options',
     'search',
     'simpletest',
-    'syslog',
     'taxonomy',
     'telephone',
     'text',

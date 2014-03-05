@@ -1,19 +1,17 @@
-id: d6_node_body
+id: d6_node_body_field
 source:
   # We do an empty source and a proper destination to have an idmap for
   # dependencies.
   plugin: empty
   constants:
     entity_type: node
-    type: file
+    type: text_with_summary
     name: body
     cardinality: 1
-    display_field: true
 process:
   entity_type: constants.entity_type
   name: constants.name
   type: constants.type
   cardinality: constants.cardinality
-  settings.display_field: constants.display_field
 destination:
   plugin: entity:field_config

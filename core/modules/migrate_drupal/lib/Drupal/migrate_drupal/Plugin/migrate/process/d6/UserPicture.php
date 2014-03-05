@@ -8,7 +8,9 @@
 namespace Drupal\migrate_drupal\Plugin\migrate\Process\d6;
 
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\MigrateExecutable;
+use Drupal\migrate\Plugin\MigrateProcessInterface;
 use Drupal\migrate\ProcessPluginBase;
 use Drupal\migrate\Row;
 use Symfony\Component\DependencyInjection\ContainerInterface;
