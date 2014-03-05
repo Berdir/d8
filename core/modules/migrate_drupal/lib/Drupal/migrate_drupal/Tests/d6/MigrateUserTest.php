@@ -187,8 +187,8 @@ class MigrateUserTest extends MigrateDrupalTestBase {
       // We have one empty picture in the data so don't try load that.
       if (!empty($source->picture)) {
         // Test the user picture.
-        #$file = file_load($user->user_picture->target_id);
-        #$this->assertEqual($file->getFilename(), basename($source->picture));
+        $file = file_load($user->user_picture->target_id);
+        $this->assertEqual($file->getFilename(), basename($source->picture));
       }
 
       // Use the UI to check if the password has been salted and re-hashed to
