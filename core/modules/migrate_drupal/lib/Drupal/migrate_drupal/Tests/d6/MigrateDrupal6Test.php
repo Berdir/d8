@@ -238,7 +238,7 @@ class MigrateDrupal6Test extends MigrateDrupalTestBase {
       __NAMESPACE__ . '\MigrateFieldFormatterSettingsTest',
       __NAMESPACE__ . '\MigrateFieldWidgetSettingsTest',
       __NAMESPACE__ . '\MigrateFileConfigsTest',
-      #__NAMESPACE__ . '\MigrateFileTest',
+      __NAMESPACE__ . '\MigrateFileTest',
       __NAMESPACE__ . '\MigrateFilterFormatTest',
       __NAMESPACE__ . '\MigrateForumConfigsTest',
       __NAMESPACE__ . '\MigrateLocaleConfigsTest',
