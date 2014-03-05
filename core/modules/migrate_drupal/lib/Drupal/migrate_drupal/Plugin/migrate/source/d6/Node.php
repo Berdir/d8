@@ -81,6 +81,7 @@ class Node extends DrupalSqlBase implements SourceEntityInterface {
       'language' => $this->t('Language (fr, en, ...)'),
       'tnid' => $this->t('The translation set id for this node'),
     );
+    return $fields;
   }
 
   /**
