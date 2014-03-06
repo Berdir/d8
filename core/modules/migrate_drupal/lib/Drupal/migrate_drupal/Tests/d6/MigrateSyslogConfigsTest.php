@@ -55,6 +55,6 @@ class MigrateSyslogConfigsTest extends MigrateDrupalTestBase {
     $config = \Drupal::config('syslog.settings');
     $this->assertIdentical($config->get('identity'), 'drupal');
     // @TODO: change this to integer once there's schema of this config.
-    $this->assertIdentical($config->get('facility'), '128');
+    $this->assertIdentical($config->get('facility'), 128);
   }
 }
