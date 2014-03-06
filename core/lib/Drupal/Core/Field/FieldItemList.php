@@ -81,6 +81,20 @@ class FieldItemList extends ItemList implements FieldItemListInterface {
   /**
    * {@inheritdoc}
    */
+  public function getSettings() {
+    return $this->definition->getSettings();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSetting($setting_name) {
+    return $this->definition->getSetting($setting_name);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function filterEmptyItems() {
     if (isset($this->list)) {
       $this->list = array_values(array_filter($this->list, function($item) {
@@ -138,20 +152,6 @@ class FieldItemList extends ItemList implements FieldItemListInterface {
     if ($notify && isset($this->parent)) {
       $this->parent->onChange($this->name);
     }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getPropertyDefinition($name) {
-    return $this->first()->getPropertyDefinition($name);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getPropertyDefinitions() {
-    return $this->first()->getPropertyDefinitions();
   }
 
   /**
@@ -276,6 +276,14 @@ class FieldItemList extends ItemList implements FieldItemListInterface {
         $item->{$method}();
       }
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function view($display_options = array()) {
+    $view_builder = \Drupal::entityManager()->getViewBuilder($this->getEntity()->getEntityTypeId());
+    return $view_builder->viewField($this, $display_options);
   }
 
 }

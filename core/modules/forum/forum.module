@@ -6,6 +6,7 @@
  */
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Component\Utility\String;
 use Drupal\field\Field;
 
 /**
@@ -32,7 +33,7 @@ function forum_help($path, $arg) {
       $output .= '<dt>' . t('Setting up forum structure') . '</dt>';
       $output .= '<dd>' . t('Visit the <a href="!forums">Forums page</a> to set up containers and forums to hold your discussion topics.', array('!forums' => \Drupal::url('forum.overview'))) . '</dd>';
       $output .= '<dt>' . t('Starting a discussion') . '</dt>';
-      $output .= '<dd>' . t('The <a href="!create-topic">Forum topic</a> link on the <a href="!content-add">Add new content</a> page creates the first post of a new threaded discussion, or thread.', array('!create-topic' => \Drupal::url('node.add', array('node_type' => 'forum')), '!content-add' => \Drupal::url('node.add_page'))) . '</dd>';
+      $output .= '<dd>' . t('The <a href="!create-topic">Forum topic</a> link on the <a href="!content-add">Add content</a> page creates the first post of a new threaded discussion, or thread.', array('!create-topic' => \Drupal::url('node.add', array('node_type' => 'forum')), '!content-add' => \Drupal::url('node.add_page'))) . '</dd>';
       $output .= '<dt>' . t('Navigating in the Forum') . '</dt>';
       $output .= '<dd>' . t('Enabling the Forum module provides a default <em>Forums</em> menu item in the Tools menu that links to the <a href="!forums">Forums page</a>.', array('!forums' => \Drupal::url('forum.index'))) . '</dd>';
       $output .= '<dt>' . t('Moving forum topics') . '</dt>';
@@ -91,40 +92,6 @@ function forum_theme() {
       'render element' => 'form',
     ),
   );
-}
-
-/**
- * Implements hook_menu().
- */
-function forum_menu() {
-  $items['forum'] = array(
-    'title' => 'Forums',
-    'route_name' => 'forum.index',
-  );
-  $items['forum/%forum'] = array(
-    'title' => 'Forums',
-    'title callback' => 'entity_page_label',
-    'title arguments' => array(1),
-    'route_name' => 'forum.page',
-  );
-  $items['admin/structure/forum'] = array(
-    'title' => 'Forums',
-    'description' => 'Control forum hierarchy settings.',
-    'route_name' => 'forum.overview',
-  );
-  $items['admin/structure/forum/edit/container/%taxonomy_term'] = array(
-    'title' => 'Edit container',
-    'route_name' => 'forum.edit_container',
-  );
-  $items['admin/structure/forum/edit/forum/%taxonomy_term'] = array(
-    'title' => 'Edit forum',
-    'route_name' => 'forum.edit_forum',
-  );
-  $items['admin/structure/forum/delete/forum/%taxonomy_term'] = array(
-    'title' => 'Delete forum',
-    'route_name' => 'forum.delete',
-  );
-  return $items;
 }
 
 /**
@@ -203,12 +170,12 @@ function forum_menu_local_tasks(&$data, $route_name) {
 }
 
 /**
- * Implements hook_entity_info().
+ * Implements hook_entity_type_build().
  */
-function forum_entity_info(&$entity_info) {
-  /** @var $entity_info \Drupal\Core\Entity\EntityTypeInterface[] */
+function forum_entity_type_build(array &$entity_types) {
+  /** @var $entity_types \Drupal\Core\Entity\EntityTypeInterface[] */
   // Register forum specific form controllers.
-  $entity_info['taxonomy_term']
+  $entity_types['taxonomy_term']
     ->setFormClass('forum', 'Drupal\forum\Form\ForumFormController')
     ->setFormClass('container', 'Drupal\forum\Form\ContainerFormController')
     ->setLinkTemplate('forum-delete-form', 'forum.delete')
@@ -467,8 +434,8 @@ function forum_permission() {
  * $comment->save() calls hook_comment_publish() for all published comments.
  */
 function forum_comment_publish($comment) {
-  if ($comment->entity_type->value == 'node') {
-    \Drupal::service('forum_manager')->updateIndex($comment->entity_id->value);
+  if ($comment->getCommentedEntityTypeId() == 'node') {
+    \Drupal::service('forum_manager')->updateIndex($comment->getCommentedEntityId());
   }
 }
 
@@ -481,8 +448,8 @@ function forum_comment_publish($comment) {
 function forum_comment_update($comment) {
   // $comment->save() calls hook_comment_publish() for all published comments,
   // so we need to handle all other values here.
-  if (!$comment->status->value && $comment->entity_type->value == 'node') {
-    \Drupal::service('forum_manager')->updateIndex($comment->entity_id->value);
+  if (!$comment->isPublished() && $comment->getCommentedEntityTypeId() == 'node') {
+    \Drupal::service('forum_manager')->updateIndex($comment->getCommentedEntityId());
   }
 }
 
@@ -490,8 +457,8 @@ function forum_comment_update($comment) {
  * Implements hook_comment_unpublish().
  */
 function forum_comment_unpublish($comment) {
-  if ($comment->entity_type->value == 'node') {
-    \Drupal::service('forum_manager')->updateIndex($comment->entity_id->value);
+  if ($comment->getCommentedEntityTypeId() == 'node') {
+    \Drupal::service('forum_manager')->updateIndex($comment->getCommentedEntityId());
   }
 }
 
@@ -499,8 +466,8 @@ function forum_comment_unpublish($comment) {
  * Implements hook_comment_delete().
  */
 function forum_comment_delete($comment) {
-  if ($comment->entity_type->value == 'node') {
-    \Drupal::service('forum_manager')->updateIndex($comment->entity_id->value);
+  if ($comment->getCommentedEntityTypeId() == 'node') {
+    \Drupal::service('forum_manager')->updateIndex($comment->getCommentedEntityId());
   }
 }
 
@@ -686,7 +653,7 @@ function template_preprocess_forums(&$variables) {
         // them is a shadow copy.
         if ($variables['tid'] != $topic->forum_tid) {
           $variables['topics'][$id]->moved = TRUE;
-          $variables['topics'][$id]->title = check_plain($topic->getTitle());
+          $variables['topics'][$id]->title = String::checkPlain($topic->getTitle());
           $variables['topics'][$id]->message = l(t('This topic has been moved'), "forum/$topic->forum_tid");
         }
         else {
@@ -778,7 +745,7 @@ function template_preprocess_forum_list(&$variables) {
   foreach ($variables['forums'] as $id => $forum) {
     $variables['forums'][$id]->description = filter_xss_admin($forum->description->value);
     $variables['forums'][$id]->link = url("forum/" . $forum->id());
-    $variables['forums'][$id]->name = check_plain($forum->label());
+    $variables['forums'][$id]->name = String::checkPlain($forum->label());
     $variables['forums'][$id]->is_container = !empty($forum->forum_container->value);
     $variables['forums'][$id]->zebra = $row % 2 == 0 ? 'odd' : 'even';
     $row++;
@@ -888,21 +855,4 @@ function template_preprocess_forum_submitted(&$variables) {
  */
 function theme_forum_form(array $variables) {
   return drupal_render_children($variables['form']);
-}
-
-/**
- * Implements hook_library_info().
- *
- * Forum specific libraries.
- */
-function forum_library_info() {
-  $libraries['forum.index'] = array(
-    'title' => 'Forum index',
-    'version' => \Drupal::VERSION,
-    'css' => array(
-      drupal_get_path('module', 'forum') . '/css/forum.module.css' => array(),
-    ),
-  );
-
-  return $libraries;
 }

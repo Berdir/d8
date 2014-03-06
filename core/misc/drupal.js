@@ -1,3 +1,6 @@
+/**
+ * Base framework for Drupal-specific JavaScript, behaviors, and settings.
+ */
 window.Drupal = { behaviors: {}, locale: {} };
 
 // Class indicating that JS is enabled; used for styling purpose.
@@ -276,7 +279,8 @@ if (window.jQuery) {
 
     if (keys.length) {
       for (var i = 0; i < fragments.length; i++) {
-        fragments[i] = Drupal.stringReplace(fragments[i], args, keys);
+        // Process each fragment with a copy of remaining keys.
+        fragments[i] = Drupal.stringReplace(fragments[i], args, keys.slice(0));
       }
     }
 

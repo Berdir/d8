@@ -6,10 +6,11 @@ use Drupal\Component\Utility\Settings;
 use Drupal\Component\Utility\String;
 use Drupal\Component\Utility\Timer;
 use Drupal\Component\Utility\Unicode;
-use Drupal\Component\Utility\Url;
+use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Database\Database;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\Utility\Title;
 use Drupal\Core\Utility\Error;
 use Symfony\Component\ClassLoader\ApcClassLoader;
@@ -32,7 +33,7 @@ use Drupal\Core\Session\UserSession;
 /**
  * Minimum supported version of PHP.
  */
-const DRUPAL_MINIMUM_PHP = '5.3.10';
+const DRUPAL_MINIMUM_PHP = '5.4.2';
 
 /**
  * Minimum recommended value of PHP memory_limit.
@@ -453,13 +454,6 @@ function drupal_environment_initialize() {
   // sites/default/default.settings.php contains more runtime settings.
   // The .htaccess file contains settings that cannot be changed at runtime.
 
-  // Deny execution with enabled "magic quotes" (both GPC and runtime).
-  if (get_magic_quotes_gpc() || get_magic_quotes_runtime()) {
-    header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error');
-    print "PHP's 'magic_quotes_gpc' and 'magic_quotes_runtime' settings are not supported and must be disabled.";
-    exit;
-  }
-
   // Use session cookies, not transparent sessions that puts the session id in
   // the query string.
   ini_set('session.use_cookies', '1');
@@ -491,7 +485,7 @@ function drupal_valid_http_host($host) {
  */
 function drupal_settings_initialize() {
   // Export these settings.php variables to the global namespace.
-  global $base_url, $databases, $cookie_domain, $drupal_hash_salt, $config_directories, $config;
+  global $base_url, $databases, $cookie_domain, $config_directories, $config;
   $settings = array();
   $config = array();
 
@@ -655,7 +649,7 @@ function _drupal_request_initialize() {
 function drupal_get_filename($type, $name, $filename = NULL) {
   // The location of files will not change during the request, so do not use
   // drupal_static().
-  static $files = array(), $dirs = array();
+  static $files = array();
 
   // Profiles are converted into modules in system_rebuild_module_data().
   // @todo Remove false-exposure of profiles as modules.
@@ -667,72 +661,31 @@ function drupal_get_filename($type, $name, $filename = NULL) {
     $files[$type] = array();
   }
 
-  if (!empty($filename)) {
+  if (isset($filename)) {
     $files[$type][$name] = $filename;
   }
-  elseif (isset($files[$type][$name])) {
-    // nothing
-  }
-  else {
-    // Verify that we have an keyvalue service before using it. This is required
-    // because this function is called during installation.
-    // @todo Inject database connection into KeyValueStore\DatabaseStorage.
-    if (\Drupal::hasService('keyvalue') && function_exists('db_query')) {
-      if ($type == 'module') {
-        if (empty($files[$type])) {
-          $files[$type] = \Drupal::moduleHandler()->getModuleList();
-        }
-        if (isset($files[$type][$name])) {
-          return $files[$type][$name];
-        }
-      }
-      try {
-        $file_list = \Drupal::state()->get('system.' . $type . '.files');
-        if ($file_list && isset($file_list[$name]) && file_exists(DRUPAL_ROOT . '/' . $file_list[$name])) {
-          $files[$type][$name] = $file_list[$name];
-        }
-      }
-      catch (Exception $e) {
-        // The keyvalue service raised an exception because the backend might
-        // be down. We have a fallback for this case so we hide the error
-        // completely.
-      }
+  elseif (!isset($files[$type][$name])) {
+    // If the pathname of the requested extension is not known, try to retrieve
+    // the list of extension pathnames from various providers, checking faster
+    // providers first.
+    // Retrieve the current module list (derived from the service container).
+    if ($type == 'module' && \Drupal::hasService('module_handler')) {
+      $files[$type] += \Drupal::moduleHandler()->getModuleList();
     }
-    // Fallback to searching the filesystem if the database could not find the
-    // file or the file returned by the database is not found.
+    // If still unknown, retrieve the file list prepared in state by
+    // system_rebuild_module_data() and system_rebuild_theme_data().
+    if (!isset($files[$type][$name]) && \Drupal::hasService('state')) {
+      $files[$type] += \Drupal::state()->get('system.' . $type . '.files', array());
+    }
+    // If still unknown, perform a filesystem scan.
     if (!isset($files[$type][$name])) {
-      // We have consistent directory naming: modules, themes...
-      $dir = $type . 's';
-      if ($type == 'theme_engine') {
-        $dir = 'themes/engines';
-        $extension = 'engine';
+      $listing = new ExtensionDiscovery();
+      // Prevent an infinite recursion by this legacy function.
+      if ($original_type == 'profile') {
+        $listing->setProfileDirectories(array());
       }
-      elseif ($type == 'theme') {
-        $extension = 'info.yml';
-      }
-      // Profiles are converted into modules in system_rebuild_module_data().
-      // @todo Remove false-exposure of profiles as modules.
-      elseif ($original_type == 'profile') {
-        $dir = 'profiles';
-        $extension = 'profile';
-      }
-      else {
-        $extension = $type;
-      }
-
-      if (!isset($dirs[$dir][$extension])) {
-        $dirs[$dir][$extension] = TRUE;
-        if (!function_exists('drupal_system_listing')) {
-          require_once __DIR__ . '/common.inc';
-        }
-        // Scan the appropriate directories for all files with the requested
-        // extension, not just the file we are currently looking for. This
-        // prevents unnecessary scans from being repeated when this function is
-        // called more than once in the same page request.
-        $matches = drupal_system_listing("/^" . DRUPAL_PHP_FUNCTION_PATTERN . "\.$extension$/", $dir);
-        foreach ($matches as $matched_name => $file) {
-          $files[$type][$matched_name] = $file->uri;
-        }
+      foreach ($listing->scan($original_type) as $extension_name => $file) {
+        $files[$type][$extension_name] = $file->uri;
       }
     }
   }
@@ -827,7 +780,9 @@ function drupal_page_is_cacheable($allow_caching = NULL) {
  * @param $append
  *   Whether to append the value to an existing header or to replace it.
  *
- * @deprecated Header handling is being shifted to a Symfony response object.
+ * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
+ *   Use \Symfony\Component\HttpFoundation\Response->headers->set().
+ *   See https://drupal.org/node/2181523.
  */
 function drupal_add_http_header($name, $value, $append = FALSE) {
   // The headers as name/value pairs.
@@ -860,7 +815,9 @@ function drupal_add_http_header($name, $value, $append = FALSE) {
  *   A string containing the header value, or FALSE if the header has been set,
  *   or NULL if the header has not been set.
  *
- * @deprecated Header handling is being shifted to a Symfony response object.
+ * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
+ *   Use \Symfony\Component\HttpFoundation\Response->headers->get().
+ *   See https://drupal.org/node/2181523.
  */
 function drupal_get_http_header($name = NULL) {
   $headers = &drupal_static('drupal_http_headers', array());
@@ -879,7 +836,8 @@ function drupal_get_http_header($name = NULL) {
  * Header names are case-insensitive, but for maximum compatibility they should
  * follow "common form" (see RFC 2616, section 4.2).
  *
- * @deprecated Header handling is being shifted to a Symfony response object.
+ * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
+ *   See https://drupal.org/node/2181523.
  */
 function _drupal_set_preferred_header_name($name = NULL) {
   static $header_names = array();
@@ -902,7 +860,8 @@ function _drupal_set_preferred_header_name($name = NULL) {
  *   (optional) If TRUE and headers have already been sent, send only the
  *   specified headers.
  *
- * @deprecated Header handling is being shifted to a Symfony response object.
+ * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
+ *   See https://drupal.org/node/2181523.
  */
 function drupal_send_headers($default_headers = array(), $only_default = FALSE) {
   $headers_sent = &drupal_static(__FUNCTION__, FALSE);
@@ -958,7 +917,8 @@ function drupal_send_headers($default_headers = array(), $only_default = FALSE) 
  *
  * @see drupal_page_set_cache()
  *
- * @deprecated Header handling is being shifted to a Symfony response object.
+ * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
+ *   See https://drupal.org/node/2181523.
  */
 function drupal_page_header() {
   $headers_sent = &drupal_static(__FUNCTION__, FALSE);
@@ -1148,12 +1108,11 @@ function format_string($string, array $args = array()) {
 /**
  * Encodes special characters in a plain-text string for display as HTML.
  *
- * @see \Drupal\Component\Utility\String::checkPlain()
  * @see drupal_validate_utf8()
  * @ingroup sanitization
  *
- * @deprecated as of Drupal 8.0. Use
- *   Drupal\Component\Utility\String::checkPlain() directly instead.
+ * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
+ *   Use \Drupal\Component\Utility\String::checkPlain().
  */
 function check_plain($text) {
   return String::checkPlain($text);
@@ -1300,7 +1259,7 @@ function watchdog($type, $message, array $variables = NULL, $severity = WATCHDOG
 
   // It is possible that the error handling will itself trigger an error. In that case, we could
   // end up in an infinite loop. To avoid that, we implement a simple static semaphore.
-  if (!$in_error_state && function_exists('module_implements')) {
+  if (!$in_error_state && \Drupal::hasService('module_handler')) {
     $in_error_state = TRUE;
 
     // The user object may not exist in all conditions, so 0 is substituted if needed.
@@ -1662,10 +1621,13 @@ function drupal_get_user_timezone() {
  *   A salt based on information in settings.php, not in the database.
  */
 function drupal_get_hash_salt() {
-  global $drupal_hash_salt, $databases;
-  // If the $drupal_hash_salt variable is empty, a hash of the serialized
-  // database credentials is used as a fallback salt.
-  return empty($drupal_hash_salt) ? hash('sha256', serialize($databases)) : $drupal_hash_salt;
+  $hash_salt = settings()->get('hash_salt');
+  // This should never happen, as it breaks user logins and many other services.
+  // Therefore, explicitly notify the user (developer) by throwing an exception.
+  if (empty($hash_salt)) {
+    throw new \RuntimeException('Missing $settings[\'hash_salt\'] in settings.php.');
+  }
+  return $hash_salt;
 }
 
 /**
@@ -1752,9 +1714,6 @@ function _drupal_bootstrap_configuration() {
   // Detect string handling method.
   Unicode::check();
 
-  // Load the procedural configuration system helper functions.
-  require_once __DIR__ . '/config.inc';
-
   // Set the Drupal custom error handler. (requires \Drupal::config())
   set_error_handler('_drupal_error_handler');
   set_exception_handler('_drupal_exception_handler');
@@ -1788,7 +1747,6 @@ function _drupal_bootstrap_kernel() {
 function _drupal_bootstrap_page_cache() {
   global $user;
 
-  require_once __DIR__ . '/cache.inc';
   require_once __DIR__ . '/database.inc';
   // Check for a cache mode force from settings.php.
   if (settings()->get('page_cache_without_database')) {
@@ -1811,9 +1769,6 @@ function _drupal_bootstrap_page_cache() {
     if (is_object($cache)) {
       $response = new Response();
       $response->headers->set('X-Drupal-Cache', 'HIT');
-      // Restore the metadata cached with the page.
-      _current_path($cache->data['path']);
-      drupal_set_title($cache->data['title'], PASS_THROUGH);
       date_default_timezone_set(drupal_get_user_timezone());
 
       drupal_serve_page_from_cache($cache, $response, $request);
@@ -1843,8 +1798,8 @@ function drupal_get_bootstrap_phase() {
 /**
  * Returns the list of enabled modules.
  *
- * @deprecated as of Drupal 8.0. Use
- *   \Drupal::moduleHandler()->getModuleList().
+ * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
+ *   Use \Drupal::moduleHandler()->getModuleList().
  *
  * @see \Drupal\Core\Extension\ModuleHandler::getModuleList()
  */
@@ -1856,8 +1811,8 @@ function module_list() {
 /**
  * Determines which modules are implementing a hook.
  *
- * @deprecated as of Drupal 8.0. Use
- *   \Drupal::moduleHandler()->getImplementations($hook).
+ * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
+ *   Use \Drupal::moduleHandler()->getImplementations($hook).
  *
  * @see \Drupal\Core\Extension\ModuleHandler::getImplementations()
  */
@@ -1868,13 +1823,13 @@ function module_implements($hook) {
 /**
  * Invokes a hook in a particular module.
  *
- * All arguments are passed by value. Use drupal_alter() if you need to pass
- * arguments by reference.
+ * All arguments are passed by value. Use \Drupal::moduleHandler()->alter() if
+ * you need to pass arguments by reference.
  *
- * @deprecated as of Drupal 8.0. Use
+ * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0. Use
  *   \Drupal::moduleHandler()->invoke($module, $hook, $args = array()).
  *
- * @see drupal_alter()
+ * @see \Drupal\Core\Extension\ModuleHandler::alter()
  * @see \Drupal\Core\Extension\ModuleHandler::invoke()
  */
 function module_invoke($module, $hook) {
@@ -1887,27 +1842,27 @@ function module_invoke($module, $hook) {
 /**
  * Invokes a hook in all enabled modules that implement it.
  *
- * All arguments are passed by value. Use drupal_alter() if you need to pass
- * arguments by reference.
+ * All arguments are passed by value. Use \Drupal::moduleHandler()->alter() if
+ * you need to pass arguments by reference.
  *
- * @deprecated as of Drupal 8.0. Use
- *   \Drupal::moduleHandler()->invokeAll($hook).
+ * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
+ *   Use \Drupal::moduleHandler()->invokeAll($hook).
  *
- * @see drupal_alter()
+ * @see \Drupal\Core\Extension\ModuleHandler::alter()
  * @see \Drupal\Core\Extension\ModuleHandler::invokeAll()
  */
 function module_invoke_all($hook) {
   $args = func_get_args();
   // Remove $hook from the arguments.
-  array_shift($args);
+  unset($args[0]);
   return \Drupal::moduleHandler()->invokeAll($hook, $args);
 }
 
 /**
  * Passes alterable variables to specific hook_TYPE_alter() implementations.
  *
- * @deprecated as of Drupal 8.0. Use
- *   \Drupal::moduleHandler()->alter($hook).
+ * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
+ *   Use \Drupal::moduleHandler()->alter($hook).
  *
  * @see \Drupal\Core\Extension\ModuleHandler::alter()
  */
@@ -1918,8 +1873,8 @@ function drupal_alter($type, &$data, &$context1 = NULL, &$context2 = NULL) {
 /**
  * Determines whether a given module exists.
  *
- * @deprecated as of Drupal 8.0. Use
- *   \Drupal::moduleHandler()->moduleExists($module).
+ * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
+ *   Use \Drupal::moduleHandler()->moduleExists($module).
  *
  * @see \Drupal\Core\Extension\ModuleHandler::moduleExists()
  */
@@ -1930,8 +1885,8 @@ function module_exists($module) {
 /**
  * Determines whether a module implements a hook.
  *
- * @deprecated as of Drupal 8.0. Use
- *   \Drupal::moduleHandler()->implementsHook($module, $hook).
+ * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
+ *   Use \Drupal::moduleHandler()->implementsHook($module, $hook).
  *
  * @see \Drupal\Core\Extension\ModuleHandler::implementsHook()
  */
@@ -2016,7 +1971,7 @@ function drupal_generate_test_ua($prefix) {
     else {
       // Generate and save a new hash salt for a test run.
       // Consumed by drupal_valid_test_ua() before settings.php is loaded.
-      $private_key = Crypt::randomStringHashed(55);
+      $private_key = Crypt::randomBytesBase64(55);
       file_put_contents($key_file, $private_key);
     }
     // The file properties add more entropy not easily accessible to others.
@@ -2070,8 +2025,8 @@ function drupal_language_initialize() {
  * @param string $type
  *   The type of language object needed, e.g. Language::TYPE_INTERFACE.
  *
- * @deprecated as of Drupal 8.0. Use
- *   \Drupal::languageManager()->getCurrentLanguage().
+ * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
+ *   Use \Drupal::languageManager()->getCurrentLanguage().
  */
 function language($type) {
   return \Drupal::languageManager()->getCurrentLanguage($type);
@@ -2089,8 +2044,8 @@ function language($type) {
  *   An associative array of languages, keyed by the language code, ordered by
  *   weight ascending and name ascending.
  *
- * @deprecated as of Drupal 8.0. Use
- *   \Drupal::languageManager()->getLanguages() instead.
+ * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
+ *   Use \Drupal::languageManager()->getLanguages().
  */
 function language_list($flags = Language::STATE_CONFIGURABLE) {
   return \Drupal::languageManager()->getLanguages($flags);
@@ -2107,8 +2062,8 @@ function language_list($flags = Language::STATE_CONFIGURABLE) {
  *
  * @see \Drupal\Core\Language\LanguageManager::getLanguage()
  *
- * @deprecated as of Drupal 8.0. Use \Drupal::languageManager()->getLanguage()
- *   instead.
+ * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
+ *   Use \Drupal::languageManager()->getLanguage().
  */
 function language_load($langcode) {
   return \Drupal::languageManager()->getLanguage($langcode);
@@ -2120,8 +2075,10 @@ function language_load($langcode) {
  * @return \Drupal\Core\Language\Language
  *   A language object.
  *
- * @deprecated as of Drupal 8.0. Use
- *   \Drupal::languageManager()->getDefaultLanguage() instead.
+ * @see \Drupal\Core\Language\LanguageManager::getLanguage()
+ *
+ * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
+ *   Use \Drupal::languageManager()->getDefaultLanguage().
  */
 function language_default() {
   return \Drupal::languageManager()->getDefaultLanguage();
@@ -2458,7 +2415,7 @@ function drupal_static_reset($name = NULL) {
  * Detects whether the current script is running in a command-line environment.
  */
 function drupal_is_cli() {
-  return (!isset($_SERVER['SERVER_SOFTWARE']) && (php_sapi_name() == 'cli' || (is_numeric($_SERVER['argc']) && $_SERVER['argc'] > 0)));
+  return PHP_SAPI === 'cli';
 }
 
 /**
@@ -2498,7 +2455,8 @@ function &drupal_register_shutdown_function($callback = NULL) {
       register_shutdown_function('_drupal_shutdown_function');
     }
     $args = func_get_args();
-    array_shift($args);
+    // Remove $callback from the arguments.
+    unset($args[0]);
     // Save callback and arguments
     $callbacks[] = array('callback' => $callback, 'arguments' => $args);
   }
@@ -2567,68 +2525,13 @@ function drupal_check_memory_limit($required, $memory_limit = NULL) {
 }
 
 /**
- * @defgroup lock Locking mechanisms
- * @{
- * Functions to coordinate long-running operations across requests.
- *
- * In most environments, multiple Drupal page requests (a.k.a. threads or
- * processes) will execute in parallel. This leads to potential conflicts or
- * race conditions when two requests execute the same code at the same time. A
- * common example of this is a rebuild like menu_router_rebuild() where we
- * invoke many hook implementations to get and process data from all active
- * modules, and then delete the current data in the database to insert the new
- * afterwards.
- *
- * This is a cooperative, advisory lock system. Any long-running operation
- * that could potentially be attempted in parallel by multiple requests should
- * try to acquire a lock before proceeding. By obtaining a lock, one request
- * notifies any other requests that a specific operation is in progress which
- * must not be executed in parallel.
- *
- * To use this API, pick a unique name for the lock. A sensible choice is the
- * name of the function performing the operation. A very simple example use of
- * this API:
- * @code
- * function mymodule_long_operation() {
- *   if (lock()->acquire('mymodule_long_operation')) {
- *     // Do the long operation here.
- *     // ...
- *     lock()->release('mymodule_long_operation');
- *   }
- * }
- * @endcode
- *
- * If a function acquires a lock it should always release it when the
- * operation is complete by calling lock()->release(), as in the example.
- *
- * A function that has acquired a lock may attempt to renew a lock (extend the
- * duration of the lock) by calling lock()->acquire() again during the operation.
- * Failure to renew a lock is indicative that another request has acquired
- * the lock, and that the current operation may need to be aborted.
- *
- * If a function fails to acquire a lock it may either immediately return, or
- * it may call lock()->wait() if the rest of the current page request requires
- * that the operation in question be complete. After lock()->wait() returns,
- * the function may again attempt to acquire the lock, or may simply allow the
- * page request to proceed on the assumption that a parallel request completed
- * the operation.
- *
- * lock()->acquire() and lock()->wait() will automatically break (delete) a lock
- * whose duration has exceeded the timeout specified when it was acquired.
- */
-
-/**
  * Get locking layer instance.
  *
- * @deprecated Use \Drupal::lock() instead, or even better have the lock service
- *   injected into your object.
+ * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
+ *   Use \Drupal::lock().
  *
  * @return \Drupal\Core\Lock\LockBackendInterface
  */
 function lock() {
   return \Drupal::lock();
 }
-
-/**
- * @} End of "defgroup lock".
- */

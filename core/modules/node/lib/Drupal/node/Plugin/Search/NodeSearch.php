@@ -224,6 +224,10 @@ class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInter
       // Add the language code of the indexed item to the result of the query,
       // since the node will be rendered using the respective language.
       ->fields('i', array('langcode'))
+      // And since SearchQuery makes these into GROUP BY queries, if we add
+      // a field, for PostgreSQL we also need to make it an aggregate or a
+      // GROUP BY. In this case, we want GROUP BY.
+      ->groupBy('i.langcode')
       ->limit(10)
       ->execute();
 
@@ -375,14 +379,12 @@ class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInter
     $form['advanced'] = array(
       '#type' => 'details',
       '#title' => t('Advanced search'),
-      '#collapsed' => TRUE,
       '#attributes' => array('class' => array('search-advanced')),
       '#access' => $this->account && $this->account->hasPermission('use advanced search'),
     );
     $form['advanced']['keywords-fieldset'] = array(
       '#type' => 'fieldset',
       '#title' => t('Keywords'),
-      '#collapsible' => FALSE,
     );
     $form['advanced']['keywords'] = array(
       '#prefix' => '<div class="criterion">',
@@ -412,7 +414,6 @@ class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInter
     $form['advanced']['types-fieldset'] = array(
       '#type' => 'fieldset',
       '#title' => t('Types'),
-      '#collapsible' => FALSE,
     );
     $form['advanced']['types-fieldset']['type'] = array(
       '#type' => 'checkboxes',
@@ -439,8 +440,6 @@ class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInter
       $form['advanced']['lang-fieldset'] = array(
         '#type' => 'fieldset',
         '#title' => t('Languages'),
-        '#collapsible' => FALSE,
-        '#collapsed' => FALSE,
       );
       $form['advanced']['lang-fieldset']['language'] = array(
         '#type' => 'checkboxes',
@@ -552,6 +551,7 @@ class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInter
     $form['content_ranking'] = array(
       '#type' => 'details',
       '#title' => t('Content ranking'),
+      '#open' => TRUE,
     );
     $form['content_ranking']['#theme'] = 'node_search_admin';
     $form['content_ranking']['info'] = array(
@@ -559,7 +559,8 @@ class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInter
     );
 
     // Note: reversed to reflect that higher number = higher ranking.
-    $options = drupal_map_assoc(range(0, 10));
+    $range = range(0, 10);
+    $options = array_combine($range, $range);
     foreach ($this->getRankings() as $var => $values) {
       $form['content_ranking']['factors']["rankings_$var"] = array(
         '#title' => $values['title'],

@@ -7,8 +7,10 @@
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Drupal\Component\Utility\Crypt;
+use Drupal\Component\Utility\Settings;
 use Drupal\Core\Database\Database;
 use Drupal\Core\DrupalKernel;
+use Drupal\Core\Extension\ExtensionDiscovery;
 
 /**
  * Requirement severity -- Informational message only.
@@ -122,22 +124,17 @@ function drupal_detect_database_types() {
 }
 
 /**
- * Returns all supported database installer objects that are compiled into PHP.
+ * Returns all supported database driver installer objects.
  *
- * @return
- *  An array of database installer objects compiled into PHP.
+ * @return \Drupal\Core\Database\Install\Tasks[]
+ *   An array of available database driver installer objects.
  */
 function drupal_get_database_types() {
   $databases = array();
   $drivers = array();
 
-  // We define a driver as a directory in /core/includes/database that in turn
-  // contains a database.inc file. That allows us to drop in additional drivers
-  // without modifying the installer.
-  require_once __DIR__ . '/database.inc';
-  // Allow any valid PHP identifier.
-  // @see http://www.php.net/manual/en/language.variables.basics.php.
-  $mask = '/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/';
+  // The internal database driver name is any valid PHP identifier.
+  $mask = '/^' . DRUPAL_PHP_FUNCTION_PATTERN . '$/';
   $files = file_scan_directory(DRUPAL_ROOT . '/core/lib/Drupal/Core/Database/Driver', $mask, array('recurse' => FALSE));
   if (is_dir(DRUPAL_ROOT . '/drivers/lib/Drupal/Driver/Database')) {
     $files += file_scan_directory(DRUPAL_ROOT . '/drivers/lib/Drupal/Driver/Database/', $mask, array('recurse' => FALSE));
@@ -199,8 +196,14 @@ function drupal_rewrite_settings($settings = array(), $settings_file = NULL) {
   }
   // Build list of setting names and insert the values into the global namespace.
   $variable_names = array();
+  $settings_settings = array();
   foreach ($settings as $setting => $data) {
-    _drupal_rewrite_settings_global($GLOBALS[$setting], $data);
+    if ($setting != 'settings') {
+      _drupal_rewrite_settings_global($GLOBALS[$setting], $data);
+    }
+    else {
+      _drupal_rewrite_settings_global($settings_settings, $data);
+    }
     $variable_names['$'. $setting] = $setting;
   }
   $contents = file_get_contents(DRUPAL_ROOT . '/' . $settings_file);
@@ -306,6 +309,14 @@ function drupal_rewrite_settings($settings = array(), $settings_file = NULL) {
     // Write the new settings file.
     if (file_put_contents(DRUPAL_ROOT . '/' . $settings_file, $buffer) === FALSE) {
       throw new Exception(t('Failed to modify %settings. Verify the file permissions.', array('%settings' => $settings_file)));
+    }
+    else {
+      // In case any $settings variables were written, import them into the
+      // Settings singleton.
+      if (!empty($settings_settings)) {
+        $old_settings = settings()->getAll();
+        new Settings($settings_settings + $old_settings);
+      }
     }
   }
   else {
@@ -442,7 +453,7 @@ function drupal_install_config_directories() {
   // Add a randomized config directory name to settings.php, unless it was
   // manually defined in the existing already.
   if (empty($config_directories)) {
-    $config_directories_hash = Crypt::randomStringHashed(55);
+    $config_directories_hash = Crypt::randomBytesBase64(55);
     $settings['config_directories'] = array(
       CONFIG_ACTIVE_DIRECTORY => (object) array(
         'value' => conf_path() . '/files/config_' . $config_directories_hash . '/active',
@@ -569,15 +580,16 @@ function drupal_verify_profile($install_state) {
   }
   $info = $install_state['profile_info'];
 
-  // Get a list of modules that exist in Drupal's assorted subdirectories.
+  // Get the list of available modules for the selected installation profile.
+  $listing = new ExtensionDiscovery();
   $present_modules = array();
-  foreach (drupal_system_listing('/^' . DRUPAL_PHP_FUNCTION_PATTERN . '\.module$/', 'modules') as $present_module) {
+  foreach ($listing->scan('module') as $present_module) {
     $present_modules[] = $present_module->name;
   }
 
   // The installation profile is also a module, which needs to be installed
   // after all the other dependencies have been installed.
-  $present_modules[] = drupal_get_profile();
+  $present_modules[] = $profile;
 
   // Verify that all of the profile's required modules are present.
   $missing_modules = array_diff($info['dependencies'], $present_modules);
@@ -648,8 +660,9 @@ function drupal_install_system($install_state) {
     ->set('enabled.system', 0)
     ->save();
 
-  // Update the module list to include it.
+  // Update the module list to include it. Reboot the kernel too.
   \Drupal::moduleHandler()->setModuleList(array('system' => $system_path . '/system.module'));
+  $kernel->updateModules(array('system' => $system_path . '/system.module'));
 
   \Drupal::service('config.installer')->installDefaultConfig('module', 'system');
 
@@ -660,7 +673,7 @@ function drupal_install_system($install_state) {
       ->save();
   }
 
-  module_invoke('system', 'install');
+  \Drupal::moduleHandler()->invoke('system', 'install');
 }
 
 /**
@@ -856,8 +869,6 @@ function drupal_install_fix_file($file, $mask, $message = TRUE) {
   }
 
   // chmod() will work if the web server is running as owner of the file.
-  // If PHP safe_mode is enabled the currently executing script must also
-  // have the same owner.
   if (@chmod($file, $mod)) {
     return TRUE;
   }
@@ -960,9 +971,7 @@ function drupal_requirements_url($severity) {
 function drupal_check_profile($profile, array $install_state) {
   include_once __DIR__ . '/file.inc';
 
-  $profile_file = $install_state['profiles'][$profile]->uri;
-
-  if (!isset($profile) || !file_exists($profile_file)) {
+  if (!isset($profile) || !isset($install_state['profiles'][$profile])) {
     throw new Exception(install_no_profile_error());
   }
 
@@ -1012,7 +1021,7 @@ function drupal_requirements_severity(&$requirements) {
 function drupal_check_module($module) {
   module_load_install($module);
   // Check requirements
-  $requirements = module_invoke($module, 'requirements', 'install');
+  $requirements = \Drupal::moduleHandler()->invoke($module, 'requirements', array('install'));
   if (is_array($requirements) && drupal_requirements_severity($requirements) == REQUIREMENT_ERROR) {
     // Print any error messages
     foreach ($requirements as $requirement) {

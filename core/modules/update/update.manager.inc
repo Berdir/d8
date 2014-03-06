@@ -63,9 +63,9 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
  * @see update_menu()
  * @ingroup forms
  *
- * @deprecated Use \Drupal\update\Form\UpdateForm::reportUpdate(),
- *   \Drupal\update\Form\UpdateForm::moduleUpdate(), or
- *   \Drupal\update\Form\UpdateForm::moduleUpdate()
+ * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0. Use
+ *   \Drupal\update\Form\UpdateForm::reportUpdate() or
+ *   \Drupal\update\Form\UpdateForm::moduleUpdate().
  */
 function update_manager_update_form($form, $form_state = array(), $context) {
   if (!_update_manager_check_backends($form, 'update')) {
@@ -178,9 +178,9 @@ function update_manager_update_form($form, $form_state = array(), $context) {
 
     if ($needs_manual) {
       // There are no checkboxes in the 'Manual updates' table so it will be
-      // rendered by theme('table'), not theme('tableselect'). Since the data
+      // rendered by _theme('table'), not _theme('tableselect'). Since the data
       // formats are incompatible, we convert now to the format expected by
-      // theme('table').
+      // _theme('table').
       unset($entry['#weight']);
       $attributes = $entry['#attributes'];
       unset($entry['#attributes']);
@@ -512,9 +512,9 @@ function update_manager_update_ready_form_submit($form, &$form_state) {
  * @see update_menu()
  * @ingroup forms
  *
- * @deprecated Use \Drupal\update\Form\UpdateForm::reportInstall(),
- *   \Drupal\update\Form\UpdateForm::moduleInstall(), or
- *   \Drupal\update\Form\UpdateForm::moduleInstall()
+ * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0. Use
+ *   \Drupal\update\Form\UpdateForm::reportInstall() or
+ *   \Drupal\update\Form\UpdateForm::moduleInstall().
  */
 function update_manager_install_form($form, &$form_state, $context) {
   if (!_update_manager_check_backends($form, 'install')) {

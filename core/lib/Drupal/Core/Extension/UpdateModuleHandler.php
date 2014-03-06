@@ -24,7 +24,7 @@ class UpdateModuleHandler extends ModuleHandler {
     if (substr($hook, -6) === '_alter') {
       return array();
     }
-    // theme() is called during updates and fires hooks, so whitelist the
+    // _theme() is called during updates and fires hooks, so whitelist the
     // system module.
     if (substr($hook, 0, 6) == 'theme_') {
       return array('system');
@@ -46,10 +46,8 @@ class UpdateModuleHandler extends ModuleHandler {
       case 'stream_wrappers':
         return array('system');
 
-      // This is called during rebuild to find testing themes.
-      case 'system_theme_info':
       // Those are needed by user_access() to check access on update.php.
-      case 'entity_info':
+      case 'entity_type_build':
       case 'entity_load':
       case 'user_role_load':
         return array();

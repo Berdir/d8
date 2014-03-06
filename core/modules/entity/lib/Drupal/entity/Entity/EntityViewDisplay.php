@@ -9,22 +9,22 @@ namespace Drupal\entity\Entity;
 
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\entity\EntityDisplayBase;
 
 /**
  * Configuration entity that contains display options for all components of a
  * rendered entity in a given view mode.
  *
- * @EntityType(
+ * @ConfigEntityType(
  *   id = "entity_view_display",
  *   label = @Translation("Entity view display"),
  *   controllers = {
  *     "storage" = "Drupal\Core\Config\Entity\ConfigStorageController"
  *   },
- *   config_prefix = "entity.view_display",
+ *   config_prefix = "view_display",
  *   entity_keys = {
  *     "id" = "id",
- *     "uuid" = "uuid",
  *     "status" = "status"
  *   }
  * )
@@ -54,7 +54,7 @@ class EntityViewDisplay extends EntityDisplayBase implements EntityViewDisplayIn
    * party code to alter the display options held in the display before they are
    * used to generate render arrays.
    *
-   * @param \Drupal\Core\Entity\EntityInterface[] $entities
+   * @param \Drupal\Core\Entity\ContentEntityInterface[] $entities
    *   The entities being rendered. They should all be of the same entity type.
    * @param string $view_mode
    *   The view mode being rendered.
@@ -146,7 +146,7 @@ class EntityViewDisplay extends EntityDisplayBase implements EntityViewDisplayIn
    *
    * See the collectRenderDisplays() method for details.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
    *   The entity being rendered.
    * @param string $view_mode
    *   The view mode.
@@ -156,7 +156,7 @@ class EntityViewDisplay extends EntityDisplayBase implements EntityViewDisplayIn
    *
    * @see \Drupal\entity\Entity\EntityDisplay::collectRenderDisplays()
    */
-  public static function collectRenderDisplay($entity, $view_mode) {
+  public static function collectRenderDisplay(ContentEntityInterface $entity, $view_mode) {
     $displays = static::collectRenderDisplays(array($entity), $view_mode);
     return $displays[$entity->bundle()];
   }
@@ -195,6 +195,64 @@ class EntityViewDisplay extends EntityDisplayBase implements EntityViewDisplayIn
     // Persist the formatter object.
     $this->plugins[$field_name] = $formatter;
     return $formatter;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function build(ContentEntityInterface $entity) {
+    $build = $this->buildMultiple(array($entity));
+    return $build[0];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buildMultiple(array $entities) {
+    $build = array();
+    foreach ($entities as $key => $entity) {
+      $build[$key] = array();
+    }
+
+    // Run field formatters.
+    foreach ($this->getFieldDefinitions() as $field_name => $definition) {
+      if ($formatter = $this->getRenderer($field_name)) {
+        // Group items across all entities and pass them to the formatter's
+        // prepareView() method.
+        $grouped_items = array();
+        foreach ($entities as $id => $entity) {
+          $items = $entity->get($field_name);
+          $items->filterEmptyItems();
+          $grouped_items[$id] = $items;
+        }
+        $formatter->prepareView($grouped_items);
+
+        // Then let the formatter build the output for each entity.
+        foreach ($entities as $key => $entity) {
+          $items = $entity->get($field_name);
+          $build[$key] += $formatter->view($items);
+        }
+      }
+    }
+
+    foreach ($entities as $key => $entity) {
+      // Assign the configured weights.
+      foreach ($this->getComponents() as $name => $options) {
+        if (isset($build[$key][$name])) {
+          $build[$key][$name]['#weight'] = $options['weight'];
+        }
+      }
+
+      // Let other modules alter the renderable array.
+      $context = array(
+        'entity' => $entity,
+        'view_mode' => $this->originalMode,
+        'display' => $this,
+      );
+      \Drupal::moduleHandler()->alter('entity_display_build', $build[$key], $context);
+    }
+
+    return $build;
   }
 
 }

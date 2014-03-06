@@ -40,29 +40,20 @@ class DateTimeItem extends ConfigFieldItemBase implements PrepareCacheInterface 
   const DATETIME_TYPE_DATETIME = 'datetime';
 
   /**
-   * Field definitions of the contained properties.
-   *
-   * @var array
-   */
-  static $propertyDefinitions;
-
-  /**
    * {@inheritdoc}
    */
-  public function getPropertyDefinitions() {
-    if (!isset(static::$propertyDefinitions)) {
-      static::$propertyDefinitions['value'] = DataDefinition::create('datetime_iso8601')
-        ->setLabel(t('Date value'));
+  public static function propertyDefinitions(FieldDefinitionInterface $field_definition) {
+    $properties['value'] = DataDefinition::create('datetime_iso8601')
+      ->setLabel(t('Date value'));
 
-      static::$propertyDefinitions['date'] = DataDefinition::create('datetime_computed')
-        ->setLabel(t('Computed date'))
-        ->setDescription(t('The computed DateTime object.'))
-        ->setComputed(TRUE)
-        ->setClass('\Drupal\datetime\DateTimeComputed')
-        ->setSetting('date source', 'value');
-    }
+    $properties['date'] = DataDefinition::create('datetime_computed')
+      ->setLabel(t('Computed date'))
+      ->setDescription(t('The computed DateTime object.'))
+      ->setComputed(TRUE)
+      ->setClass('\Drupal\datetime\DateTimeComputed')
+      ->setSetting('date source', 'value');
 
-    return static::$propertyDefinitions;
+    return $properties;
   }
 
   /**
@@ -94,7 +85,7 @@ class DateTimeItem extends ConfigFieldItemBase implements PrepareCacheInterface 
       '#type' => 'select',
       '#title' => t('Date type'),
       '#description' => t('Choose the type of date to create.'),
-      '#default_value' => $this->getFieldSetting('datetime_type'),
+      '#default_value' => $this->getSetting('datetime_type'),
       '#options' => array(
         static::DATETIME_TYPE_DATETIME => t('Date and time'),
         static::DATETIME_TYPE_DATE => t('Date only'),

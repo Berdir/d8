@@ -164,6 +164,19 @@ class DatabaseBackend implements CacheBackendInterface {
    */
   protected function doSet($cid, $data, $expire, $tags) {
     $flat_tags = $this->flattenTags($tags);
+    $deleted_tags = &drupal_static('Drupal\Core\Cache\DatabaseBackend::deletedTags', array());
+    $invalidated_tags = &drupal_static('Drupal\Core\Cache\DatabaseBackend::invalidatedTags', array());
+    // Remove tags that were already deleted or invalidated during this request
+    // from the static caches so that another deletion or invalidation can
+    // occur.
+    foreach ($flat_tags as $tag) {
+      if (isset($deleted_tags[$tag])) {
+        unset($deleted_tags[$tag]);
+      }
+      if (isset($invalidated_tags[$tag])) {
+        unset($invalidated_tags[$tag]);
+      }
+    }
     $checksum = $this->checksumTags($flat_tags);
     $fields = array(
       'serialized' => 0,
@@ -183,7 +196,7 @@ class DatabaseBackend implements CacheBackendInterface {
     }
 
     $this->connection->merge($this->bin)
-      ->key(array('cid' => $cid))
+      ->key('cid', $cid)
       ->fields($fields)
       ->execute();
   }
@@ -223,13 +236,19 @@ class DatabaseBackend implements CacheBackendInterface {
    */
   public function deleteTags(array $tags) {
     $tag_cache = &drupal_static('Drupal\Core\Cache\CacheBackendInterface::tagCache', array());
+    $deleted_tags = &drupal_static('Drupal\Core\Cache\DatabaseBackend::deletedTags', array());
     foreach ($this->flattenTags($tags) as $tag) {
+      // Only delete tags once per request unless they are written again.
+      if (isset($deleted_tags[$tag])) {
+        continue;
+      }
+      $deleted_tags[$tag] = TRUE;
       unset($tag_cache[$tag]);
       try {
         $this->connection->merge('cache_tags')
           ->insertFields(array('deletions' => 1))
           ->expression('deletions', 'deletions + 1')
-          ->key(array('tag' => $tag))
+          ->key('tag', $tag)
           ->execute();
       }
       catch (\Exception $e) {
@@ -287,12 +306,18 @@ class DatabaseBackend implements CacheBackendInterface {
   public function invalidateTags(array $tags) {
     try {
       $tag_cache = &drupal_static('Drupal\Core\Cache\CacheBackendInterface::tagCache', array());
+      $invalidated_tags = &drupal_static('Drupal\Core\Cache\DatabaseBackend::invalidatedTags', array());
       foreach ($this->flattenTags($tags) as $tag) {
+        // Only invalidate tags once per request unless they are written again.
+        if (isset($invalidated_tags[$tag])) {
+          continue;
+        }
+        $invalidated_tags[$tag] = TRUE;
         unset($tag_cache[$tag]);
         $this->connection->merge('cache_tags')
           ->insertFields(array('invalidations' => 1))
           ->expression('invalidations', 'invalidations + 1')
-          ->key(array('tag' => $tag))
+          ->key('tag', $tag)
           ->execute();
       }
     }

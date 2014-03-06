@@ -48,7 +48,7 @@ class TextFieldTest extends WebTestBase {
   function testTextFieldValidation() {
     // Create a field with settings to validate.
     $max_length = 3;
-    $this->field = entity_create('field_entity', array(
+    $this->field = entity_create('field_config', array(
       'name' => drupal_strtolower($this->randomName()),
       'entity_type' => 'entity_test',
       'type' => 'text',
@@ -57,7 +57,7 @@ class TextFieldTest extends WebTestBase {
       )
     ));
     $this->field->save();
-    entity_create('field_instance', array(
+    entity_create('field_instance_config', array(
       'field_name' => $this->field->name,
       'entity_type' => 'entity_test',
       'bundle' => 'entity_test',
@@ -91,13 +91,13 @@ class TextFieldTest extends WebTestBase {
   function _testTextfieldWidgets($field_type, $widget_type) {
     // Setup a field and instance
     $this->field_name = drupal_strtolower($this->randomName());
-    $this->field = entity_create('field_entity', array(
+    $this->field = entity_create('field_config', array(
       'name' => $this->field_name,
       'entity_type' => 'entity_test',
       'type' => $field_type
     ));
     $this->field->save();
-    entity_create('field_instance', array(
+    entity_create('field_instance_config', array(
       'field_name' => $this->field_name,
       'entity_type' => 'entity_test',
       'bundle' => 'entity_test',
@@ -139,8 +139,8 @@ class TextFieldTest extends WebTestBase {
     // Display the entity.
     $entity = entity_load('entity_test', $id);
     $display = entity_get_display($entity->getEntityTypeId(), $entity->bundle(), 'full');
-    $entity->content = field_attach_view($entity, $display);
-    $this->drupalSetContent(drupal_render($entity->content));
+    $content = $display->build($entity);
+    $this->drupalSetContent(drupal_render($content));
     $this->assertText($value, 'Filtered tags are not displayed');
   }
 
@@ -158,13 +158,13 @@ class TextFieldTest extends WebTestBase {
   function _testTextfieldWidgetsFormatted($field_type, $widget_type) {
     // Setup a field and instance
     $this->field_name = drupal_strtolower($this->randomName());
-    $this->field = entity_create('field_entity', array(
+    $this->field = entity_create('field_config', array(
       'name' => $this->field_name,
       'entity_type' => 'entity_test',
       'type' => $field_type
     ));
     $this->field->save();
-    entity_create('field_instance', array(
+    entity_create('field_instance_config', array(
       'field_name' => $this->field_name,
       'entity_type' => 'entity_test',
       'bundle' => 'entity_test',
@@ -212,8 +212,8 @@ class TextFieldTest extends WebTestBase {
     // Display the entity.
     $entity = entity_load('entity_test', $id);
     $display = entity_get_display($entity->getEntityTypeId(), $entity->bundle(), 'full');
-    $entity->content = field_attach_view($entity, $display);
-    $this->content = drupal_render($entity->content);
+    $content = $display->build($entity);
+    $this->drupalSetContent(drupal_render($content));
     $this->assertNoRaw($value, 'HTML tags are not displayed.');
     $this->assertRaw(check_plain($value), 'Escaped HTML is displayed correctly.');
 
@@ -254,8 +254,8 @@ class TextFieldTest extends WebTestBase {
     $this->container->get('entity.manager')->getStorageController('entity_test')->resetCache(array($id));
     $entity = entity_load('entity_test', $id);
     $display = entity_get_display($entity->getEntityTypeId(), $entity->bundle(), 'full');
-    $entity->content = field_attach_view($entity, $display);
-    $this->content = drupal_render($entity->content);
+    $content = $display->build($entity);
+    $this->drupalSetContent(drupal_render($content));
     $this->assertRaw($value, 'Value is displayed unfiltered');
   }
 }

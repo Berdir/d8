@@ -35,23 +35,13 @@ use Drupal\Core\Field\ConfigFieldItemBase;
 class TestItem extends ConfigFieldItemBase implements PrepareCacheInterface {
 
   /**
-   * Property definitions of the contained properties.
-   *
-   * @see TestItem::getPropertyDefinitions()
-   *
-   * @var array
-   */
-  static $propertyDefinitions;
-
-  /**
    * {@inheritdoc}
    */
-  public function getPropertyDefinitions() {
-    if (!isset(static::$propertyDefinitions)) {
-      static::$propertyDefinitions['value'] = DataDefinition::create('integer')
-        ->setLabel(t('Test integer value'));
-    }
-    return static::$propertyDefinitions;
+  public static function propertyDefinitions(FieldDefinitionInterface $field_definition) {
+    $properties['value'] = DataDefinition::create('integer')
+      ->setLabel(t('Test integer value'));
+
+    return $properties;
   }
 
   /**
@@ -79,7 +69,7 @@ class TestItem extends ConfigFieldItemBase implements PrepareCacheInterface {
     $form['test_field_setting'] = array(
       '#type' => 'textfield',
       '#title' => t('Field test field setting'),
-      '#default_value' => $this->getFieldSetting('test_field_setting'),
+      '#default_value' => $this->getSetting('test_field_setting'),
       '#required' => FALSE,
       '#description' => t('A dummy form element to simulate field setting.'),
     );
@@ -94,7 +84,7 @@ class TestItem extends ConfigFieldItemBase implements PrepareCacheInterface {
     $form['test_instance_setting'] = array(
       '#type' => 'textfield',
       '#title' => t('Field test field instance setting'),
-      '#default_value' => $this->getFieldSetting('test_instance_setting'),
+      '#default_value' => $this->getSetting('test_instance_setting'),
       '#required' => FALSE,
       '#description' => t('A dummy form element to simulate field instance setting.'),
     );
@@ -109,7 +99,7 @@ class TestItem extends ConfigFieldItemBase implements PrepareCacheInterface {
     // To keep the test non-intrusive, only act for instances with the
     // 'test_cached_data' setting explicitly set to TRUE. Also don't add
     // anything on empty values.
-    if ($this->getFieldSetting('test_cached_data') && !$this->isEmpty()) {
+    if ($this->getSetting('test_cached_data') && !$this->isEmpty()) {
       // Set the additional value so that getValue() will return it.
       $this->additional_key = 'additional_value';
     }

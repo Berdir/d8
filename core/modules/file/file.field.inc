@@ -5,7 +5,8 @@
  * Field module functionality for the File module.
  */
 
-use Drupal\field\FieldInterface;
+use Drupal\Component\Utility\Html;
+use Drupal\field\FieldConfigInterface;
 
 /**
  * Implements hook_field_info_alter().
@@ -181,8 +182,8 @@ function theme_file_upload_help($variables) {
 
   $descriptions = array();
 
-  if (strlen($description)) {
-    $descriptions[] = _filter_htmlcorrector($description);
+  if (!empty($description)) {
+    $descriptions[] = Html::normalize($description);
   }
   if (isset($cardinality)) {
     if ($cardinality == -1) {
@@ -222,14 +223,14 @@ function theme_file_upload_help($variables) {
 /**
  * Determine whether a field references files stored in {file_managed}.
  *
- * @param Drupal\field\FieldInterface $field
+ * @param Drupal\field\FieldConfigInterface $field
  *   A field definition.
  *
  * @return
  *   The field column if the field references {file_managed}.fid, typically
  *   fid, FALSE if it doesn't.
  */
-function file_field_find_file_reference_column(FieldInterface $field) {
+function file_field_find_file_reference_column(FieldConfigInterface $field) {
   $schema = $field->getSchema();
   foreach ($schema['foreign keys'] as $data) {
     if ($data['table'] == 'file_managed') {

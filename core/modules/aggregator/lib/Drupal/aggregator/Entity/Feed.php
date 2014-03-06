@@ -8,6 +8,7 @@
 namespace Drupal\aggregator\Entity;
 
 use Drupal\Core\Entity\ContentEntityBase;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\FieldDefinition;
 use Symfony\Component\DependencyInjection\Container;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
@@ -16,7 +17,7 @@ use Drupal\aggregator\FeedInterface;
 /**
  * Defines the aggregator feed entity class.
  *
- * @EntityType(
+ * @ContentEntityType(
  *   id = "aggregator_feed",
  *   label = @Translation("Aggregator feed"),
  *   controllers = {
@@ -32,7 +33,6 @@ use Drupal\aggregator\FeedInterface;
  *     "canonical" = "aggregator.feed_view",
  *     "edit-form" = "aggregator.feed_configure",
  *     "delete-form" = "aggregator.feed_delete",
- *     "edit-form" = "aggregator.feed_configure",
  *   },
  *   base_table = "aggregator_feed",
  *   fieldable = TRUE,
@@ -121,7 +121,7 @@ class Feed extends ContentEntityBase implements FeedInterface {
   /**
    * {@inheritdoc}
    */
-  public static function baseFieldDefinitions($entity_type) {
+  public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields['fid'] = FieldDefinition::create('integer')
       ->setLabel(t('Feed ID'))
       ->setDescription(t('The ID of the aggregator feed.'))

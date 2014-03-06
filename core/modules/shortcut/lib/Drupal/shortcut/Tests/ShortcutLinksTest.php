@@ -68,18 +68,33 @@ class ShortcutLinksTest extends ShortcutTestBase {
   }
 
   /**
-   * Tests that the "add to shortcut" link changes to "remove shortcut".
+   * Tests that the "add to shortcut" and "remove from shortcut" links work.
    */
   public function testShortcutQuickLink() {
     theme_enable(array('seven'));
     \Drupal::config('system.theme')->set('admin', 'seven')->save();
     $this->container->get('config.factory')->get('node.settings')->set('use_admin_theme', '1')->save();
 
-    $shortcuts = $this->set->getShortcuts();
-    $shortcut = reset($shortcuts);
+    $this->drupalLogin($this->root_user);
+    $this->drupalGet('admin/config/system/cron');
 
-    $this->drupalGet($shortcut->path->value);
-    $this->assertRaw(t('Remove from %title shortcuts', array('%title' => $this->set->label())), '"Add to shortcuts" link properly switched to "Remove from shortcuts".');
+    // Test the "Add to shortcuts" link.
+    $this->clickLink('Add to Default shortcuts');
+    $this->assertText('Added a shortcut for Cron.');
+    $this->assertLink('Cron', 0, 'Shortcut link found on page');
+
+    $this->drupalGet('admin/structure');
+    $this->assertLink('Cron', 0, 'Shortcut link found on different page');
+
+    // Test the "Remove from shortcuts" link.
+    $this->clickLink('Cron');
+    $this->clickLink('Remove from Default shortcuts');
+    $this->drupalPostForm(NULL, array(), 'Delete');
+    $this->assertText('The shortcut Cron has been deleted.');
+    $this->assertNoLink('Cron', 'Shortcut link removed from page');
+
+    $this->drupalGet('admin/structure');
+    $this->assertNoLink('Cron', 'Shortcut link removed from different page');
   }
 
   /**
@@ -111,7 +126,7 @@ class ShortcutLinksTest extends ShortcutTestBase {
 
     $shortcuts = $set->getShortcuts();
     $shortcut = reset($shortcuts);
-    $this->drupalPostForm('admin/config/user-interface/shortcut/link/' . $shortcut->id(), array('title' => $shortcut->title->value, 'path' => $new_link_path), t('Save'));
+    $this->drupalPostForm('admin/config/user-interface/shortcut/link/' . $shortcut->id(), array('title' => $shortcut->getTitle(), 'path' => $new_link_path), t('Save'));
     $saved_set = shortcut_set_load($set->id());
     $paths = $this->getShortcutInformation($saved_set, 'path');
     $this->assertTrue(in_array($new_link_path, $paths), 'Shortcut path changed: ' . $new_link_path);

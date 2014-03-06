@@ -8,8 +8,7 @@
 namespace Drupal\language;
 
 use Drupal\Component\PhpStorage\PhpStorageFactory;
-use Drupal\Component\Utility\MapArray;
-use Drupal\Core\Config\ConfigFactory;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageDefault;
@@ -24,7 +23,7 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
   /**
    * The configuration storage service.
    *
-   * @var \Drupal\Core\Config\ConfigFactory
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
    */
   protected $configFactory;
 
@@ -94,12 +93,12 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
   /**
    * Constructs a new ConfigurableLanguageManager object.
    *
-   * @param \Drupal\Core\Config\ConfigFactory $config_factory
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The configuration storage service.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler service.
    */
-  public function __construct(LanguageDefault $default_language, ConfigFactory $config_factory, ModuleHandlerInterface $module_handler) {
+  public function __construct(LanguageDefault $default_language, ConfigFactoryInterface $config_factory, ModuleHandlerInterface $module_handler) {
     $this->defaultLanguage = $default_language;
     $this->configFactory = $config_factory;
     $this->moduleHandler = $module_handler;
@@ -323,7 +322,7 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
       // at the end.
       $candidates = array_keys($this->getLanguages());
       $candidates[] = Language::LANGCODE_NOT_SPECIFIED;
-      $candidates = MapArray::copyValuesToKeys($candidates);
+      $candidates = array_combine($candidates, $candidates);
 
       // The first candidate should always be the desired language if specified.
       if (!empty($langcode)) {

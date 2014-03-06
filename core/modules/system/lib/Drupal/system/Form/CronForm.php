@@ -7,7 +7,7 @@
 
 namespace Drupal\system\Form;
 
-use Drupal\Core\Config\ConfigFactory;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\CronInterface;
 use Drupal\Core\KeyValueStore\StateInterface;
 use Drupal\Core\Form\ConfigFormBase;
@@ -36,14 +36,14 @@ class CronForm extends ConfigFormBase {
   /**
    * Constructs a CronForm object.
    *
-   * @param \Drupal\Core\Config\ConfigFactory $config_factory
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The factory for configuration objects.
    * @param \Drupal\Core\KeyValueStore\StateInterface $state
    *   The state key value store.
    * @param \Drupal\Core\CronInterface $cron
    *   The cron service.
    */
-  public function __construct(ConfigFactory $config_factory, StateInterface $state, CronInterface $cron) {
+  public function __construct(ConfigFactoryInterface $config_factory, StateInterface $state, CronInterface $cron) {
     parent::__construct($config_factory);
     $this->state = $state;
     $this->cron = $cron;
@@ -94,13 +94,15 @@ class CronForm extends ConfigFormBase {
     $form['cron'] = array(
       '#title' => t('Cron settings'),
       '#type' => 'details',
+      '#open' => TRUE,
     );
+    $options = array(3600, 10800, 21600, 43200, 86400, 604800);
     $form['cron']['cron_safe_threshold'] = array(
       '#type' => 'select',
       '#title' => t('Run cron every'),
       '#description' => t('More information about setting up scheduled tasks can be found by <a href="@url">reading the cron tutorial on drupal.org</a>.', array('@url' => url('http://drupal.org/cron'))),
       '#default_value' => $config->get('threshold.autorun'),
-      '#options' => array(0 => t('Never')) + drupal_map_assoc(array(3600, 10800, 21600, 43200, 86400, 604800), 'format_interval'),
+      '#options' => array(0 => t('Never')) + array_map('format_interval', array_combine($options, $options)),
     );
 
     return parent::buildForm($form, $form_state);

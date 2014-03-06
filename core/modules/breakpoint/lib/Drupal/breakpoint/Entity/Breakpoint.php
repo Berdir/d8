@@ -18,17 +18,12 @@ use Drupal\breakpoint\InvalidBreakpointMediaQueryException;
 /**
  * Defines the Breakpoint entity.
  *
- * @EntityType(
+ * @ConfigEntityType(
  *   id = "breakpoint",
  *   label = @Translation("Breakpoint"),
- *   controllers = {
- *     "storage" = "Drupal\Core\Config\Entity\ConfigStorageController"
- *   },
- *   config_prefix = "breakpoint.breakpoint",
  *   entity_keys = {
  *     "id" = "id",
- *     "label" = "label",
- *     "uuid" = "uuid"
+ *     "label" = "label"
  *   }
  * )
  */

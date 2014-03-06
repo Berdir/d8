@@ -20,6 +20,7 @@ use Drupal\Core\Field\ConfigFieldItemInterface;
  *   label = @Translation("File"),
  *   description = @Translation("This field stores the ID of a file as an integer value."),
  *   settings = {
+ *     "target_type" = "file",
  *     "display_field" = "0",
  *     "display_default" = "0",
  *     "uri_scheme" = ""
@@ -36,15 +37,6 @@ use Drupal\Core\Field\ConfigFieldItemInterface;
  * )
  */
 class FileItem extends EntityReferenceItem implements ConfigFieldItemInterface {
-
-  /**
-   * Property definitions of the contained properties.
-   *
-   * @see FileItem::getPropertyDefinitions()
-   *
-   * @var array
-   */
-  static $propertyDefinitions;
 
   /**
    * {@inheritdoc}
@@ -87,19 +79,16 @@ class FileItem extends EntityReferenceItem implements ConfigFieldItemInterface {
   /**
    * {@inheritdoc}
    */
-  public function getPropertyDefinitions() {
-    $this->definition->setSetting('target_type', 'file');
+  public static function propertyDefinitions(FieldDefinitionInterface $field_definition) {
+    $properties = parent::propertyDefinitions($field_definition);
 
-    if (!isset(static::$propertyDefinitions)) {
-      static::$propertyDefinitions = parent::getPropertyDefinitions();
+    $properties['display'] = DataDefinition::create('boolean')
+      ->setLabel(t('Flag to control whether this file should be displayed when viewing content'));
 
-      static::$propertyDefinitions['display'] = DataDefinition::create('boolean')
-        ->setLabel(t('Flag to control whether this file should be displayed when viewing content'));
+    $properties['description'] = DataDefinition::create('string')
+      ->setLabel(t('A description of the file'));
 
-      static::$propertyDefinitions['description'] = DataDefinition::create('string')
-        ->setLabel(t('A description of the file'));
-    }
-    return static::$propertyDefinitions;
+    return $properties;
   }
 
   /**
@@ -113,13 +102,13 @@ class FileItem extends EntityReferenceItem implements ConfigFieldItemInterface {
     $element['display_field'] = array(
       '#type' => 'checkbox',
       '#title' => t('Enable <em>Display</em> field'),
-      '#default_value' => $this->getFieldSetting('display_field'),
+      '#default_value' => $this->getSetting('display_field'),
       '#description' => t('The display option allows users to choose if a file should be shown when viewing the content.'),
     );
     $element['display_default'] = array(
       '#type' => 'checkbox',
       '#title' => t('Files displayed by default'),
-      '#default_value' => $this->getFieldSetting('display_default'),
+      '#default_value' => $this->getSetting('display_default'),
       '#description' => t('This setting only has an effect if the display option is enabled.'),
       '#states' => array(
         'visible' => array(
@@ -136,7 +125,7 @@ class FileItem extends EntityReferenceItem implements ConfigFieldItemInterface {
       '#type' => 'radios',
       '#title' => t('Upload destination'),
       '#options' => $scheme_options,
-      '#default_value' => $this->getFieldSetting('uri_scheme'),
+      '#default_value' => $this->getSetting('uri_scheme'),
       '#description' => t('Select where the final files should be stored. Private file storage has significantly more overhead than public files, but allows restricted access to files within this field.'),
       '#disabled' => $has_data,
     );
@@ -149,7 +138,7 @@ class FileItem extends EntityReferenceItem implements ConfigFieldItemInterface {
    */
   public function instanceSettingsForm(array $form, array &$form_state) {
     $element = array();
-    $settings = $this->getFieldSettings();
+    $settings = $this->getSettings();
 
     $element['file_directory'] = array(
       '#type' => 'textfield',
@@ -194,13 +183,6 @@ class FileItem extends EntityReferenceItem implements ConfigFieldItemInterface {
     );
 
     return $element;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function isEmpty() {
-    return empty($this->target_id);
   }
 
   /**
@@ -270,7 +252,7 @@ class FileItem extends EntityReferenceItem implements ConfigFieldItemInterface {
    * @see token_replace()
    */
   public function getUploadLocation($data = array()) {
-    $settings = $this->getFieldSettings();
+    $settings = $this->getSettings();
     $destination = trim($settings['file_directory'], '/');
 
     // Replace tokens.
@@ -288,7 +270,7 @@ class FileItem extends EntityReferenceItem implements ConfigFieldItemInterface {
    */
   public function getUploadValidators() {
     $validators = array();
-    $settings = $this->getFieldSettings();
+    $settings = $this->getSettings();
 
     // Cap the upload size according to the PHP limit.
     $max_filesize = parse_size(file_upload_max_size());
@@ -314,7 +296,7 @@ class FileItem extends EntityReferenceItem implements ConfigFieldItemInterface {
    *   TRUE if the item should be displayed, FALSE if not.
    */
   public function isDisplayed() {
-    if ($this->getFieldSetting('display_field')) {
+    if ($this->getSetting('display_field')) {
       return (bool) $this->display;
     }
     return TRUE;

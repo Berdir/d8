@@ -8,6 +8,7 @@
 namespace Drupal\content_translation;
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Language\Language;
 
 /**
@@ -35,7 +36,7 @@ class ContentTranslationController implements ContentTranslationControllerInterf
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
    *   The info array of the given entity type.
    */
-  public function __construct($entity_type) {
+  public function __construct(EntityTypeInterface $entity_type) {
     $this->entityTypeId = $entity_type->id();
     $this->entityType = $entity_type;
   }
@@ -111,7 +112,6 @@ class ContentTranslationController implements ContentTranslationControllerInterf
       $form['source_langcode'] = array(
         '#type' => 'details',
         '#title' => t('Source language: @language', array('@language' => $languages[$source_langcode]->name)),
-        '#collapsed' => TRUE,
         '#tree' => TRUE,
         '#weight' => -100,
         '#multilingual' => TRUE,
@@ -181,7 +181,6 @@ class ContentTranslationController implements ContentTranslationControllerInterf
       $form['content_translation'] = array(
         '#type' => 'details',
         '#title' => t('Translation'),
-        '#collapsed' => TRUE,
         '#tree' => TRUE,
         '#weight' => 10,
         '#access' => $this->getTranslationAccess($entity, $source_langcode ? 'create' : 'update'),

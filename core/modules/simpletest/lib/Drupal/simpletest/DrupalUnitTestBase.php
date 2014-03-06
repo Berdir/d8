@@ -179,6 +179,7 @@ abstract class DrupalUnitTestBase extends UnitTestBase {
     // StreamWrapper APIs.
     // @todo Move StreamWrapper management into DrupalKernel.
     // @see https://drupal.org/node/2028109
+    $this->streamWrappers = array();
     // The public stream wrapper only depends on the file_public_path setting,
     // which is provided by UnitTestBase::setUp().
     $this->registerStreamWrapper('public', 'Drupal\Core\StreamWrapper\PublicStream');
@@ -197,8 +198,8 @@ abstract class DrupalUnitTestBase extends UnitTestBase {
     // of PHP core, which has to be maintained manually.
     // @todo Move StreamWrapper management into DrupalKernel.
     // @see https://drupal.org/node/2028109
-    foreach ($this->streamWrappers as $scheme) {
-      $this->unregisterStreamWrapper($scheme);
+    foreach ($this->streamWrappers as $scheme => $type) {
+      $this->unregisterStreamWrapper($scheme, $type);
     }
     parent::tearDown();
   }
@@ -222,7 +223,7 @@ abstract class DrupalUnitTestBase extends UnitTestBase {
     $this->container->setParameter('language.default_values', Language::$defaultValues);
 
     $container->register('lock', 'Drupal\Core\Lock\NullLockBackend');
-    $this->settingsSet('cache', array('default' => 'cache.backend.memory'));
+    $container->register('cache_factory', 'Drupal\Core\Cache\MemoryBackendFactory');
 
     $container
       ->register('config.storage', 'Drupal\Core\Config\FileStorage')
@@ -358,7 +359,7 @@ abstract class DrupalUnitTestBase extends UnitTestBase {
     // Update the kernel to make their services available.
     $this->kernel->updateModules($module_filenames, $module_filenames);
 
-    // Ensure isLoaded() is TRUE in order to make theme() work.
+    // Ensure isLoaded() is TRUE in order to make _theme() work.
     // Note that the kernel has rebuilt the container; this $module_handler is
     // no longer the $module_handler instance from above.
     $module_handler = $this->container->get('module_handler');
@@ -392,7 +393,7 @@ abstract class DrupalUnitTestBase extends UnitTestBase {
     // Update the kernel to remove their services.
     $this->kernel->updateModules($module_filenames, $module_filenames);
 
-    // Ensure isLoaded() is TRUE in order to make theme() work.
+    // Ensure isLoaded() is TRUE in order to make _theme() work.
     // Note that the kernel has rebuilt the container; this $module_handler is
     // no longer the $module_handler instance from above.
     $module_handler = $this->container->get('module_handler');
@@ -417,7 +418,7 @@ abstract class DrupalUnitTestBase extends UnitTestBase {
     if (isset($this->streamWrappers[$scheme])) {
       $this->unregisterStreamWrapper($scheme);
     }
-    $this->streamWrappers[$scheme] = $scheme;
+    $this->streamWrappers[$scheme] = $type;
     if (($type & STREAM_WRAPPERS_LOCAL) == STREAM_WRAPPERS_LOCAL) {
       stream_wrapper_register($scheme, $class);
     }
@@ -426,12 +427,14 @@ abstract class DrupalUnitTestBase extends UnitTestBase {
     }
     // @todo Revamp Drupal's stream wrapper API for D8.
     // @see https://drupal.org/node/2028109
-    $wrappers = &drupal_static('file_get_stream_wrappers');
-    $wrappers[$scheme] = array(
+    $wrappers = &drupal_static('file_get_stream_wrappers', array());
+    $wrappers[STREAM_WRAPPERS_ALL][$scheme] = array(
       'type' => $type,
       'class' => $class,
     );
-    $wrappers[STREAM_WRAPPERS_ALL] = $wrappers;
+    if (($type & STREAM_WRAPPERS_WRITE_VISIBLE) == STREAM_WRAPPERS_WRITE_VISIBLE) {
+      $wrappers[STREAM_WRAPPERS_WRITE_VISIBLE][$scheme] = $wrappers[STREAM_WRAPPERS_ALL][$scheme];
+    }
   }
 
   /**
@@ -442,15 +445,20 @@ abstract class DrupalUnitTestBase extends UnitTestBase {
    *
    * @param string $scheme
    *   The scheme to unregister.
+   * @param int $type
+   *   The Drupal Stream Wrapper API type of the scheme to unregister.
    */
-  protected function unregisterStreamWrapper($scheme) {
+  protected function unregisterStreamWrapper($scheme, $type) {
     stream_wrapper_unregister($scheme);
     unset($this->streamWrappers[$scheme]);
     // @todo Revamp Drupal's stream wrapper API for D8.
     // @see https://drupal.org/node/2028109
-    $wrappers = &drupal_static('file_get_stream_wrappers');
-    unset($wrappers[$scheme]);
-    unset($wrappers[STREAM_WRAPPERS_ALL][$scheme]);
+    $wrappers = &drupal_static('file_get_stream_wrappers', array());
+    foreach ($wrappers as $filter => $schemes) {
+      if (is_int($filter) && (($filter & $type) == $filter)) {
+        unset($wrappers[$filter][$scheme]);
+      }
+    }
   }
 
 }

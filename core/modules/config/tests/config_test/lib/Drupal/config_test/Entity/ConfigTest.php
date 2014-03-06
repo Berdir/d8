@@ -13,7 +13,7 @@ use Drupal\config_test\ConfigTestInterface;
 /**
  * Defines the ConfigTest configuration entity.
  *
- * @EntityType(
+ * @ConfigEntityType(
  *   id = "config_test",
  *   label = @Translation("Test configuration"),
  *   controllers = {
@@ -25,11 +25,10 @@ use Drupal\config_test\ConfigTestInterface;
  *     },
  *     "access" = "Drupal\config_test\ConfigTestAccessHandler"
  *   },
- *   config_prefix = "config_test.dynamic",
+ *   config_prefix = "dynamic",
  *   entity_keys = {
  *     "id" = "id",
  *     "label" = "label",
- *     "uuid" = "uuid",
  *     "status" = "status"
  *   },
  *   links = {

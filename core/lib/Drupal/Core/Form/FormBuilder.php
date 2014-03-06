@@ -10,7 +10,7 @@ namespace Drupal\Core\Form;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\Unicode;
-use Drupal\Component\Utility\Url as UrlHelper;
+use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\HttpKernel;
@@ -98,7 +98,6 @@ class FormBuilder implements FormBuilderInterface {
   /**
    * An array of known forms.
    *
-   * @see hook_forms()
    * @see self::retrieveForms()
    *
    * @var array
@@ -182,8 +181,8 @@ class FormBuilder implements FormBuilderInterface {
 
     $args = func_get_args();
     // Remove $form_arg from the arguments.
-    array_shift($args);
-    $form_state['build_info']['args'] = $args;
+    unset($args[0]);
+    $form_state['build_info']['args'] = array_values($args);
 
     $form_id = $this->getFormId($form_arg, $form_state);
     return $this->buildForm($form_id, $form_state);
@@ -330,7 +329,7 @@ class FormBuilder implements FormBuilderInterface {
       $form['#build_id'] = $old_form['#build_id'];
     }
     else {
-      $form['#build_id'] = 'form-' . Crypt::hashBase64(uniqid(mt_rand(), TRUE) . mt_rand());
+      $form['#build_id'] = 'form-' . Crypt::randomBytesBase64();
     }
 
     // #action defaults to request_uri(), but in case of Ajax and other partial
@@ -495,39 +494,6 @@ class FormBuilder implements FormBuilderInterface {
       $callback = array($form_state['build_info']['callback_object'], 'buildForm');
     }
 
-    // We first check to see if there is a valid form builder callback defined.
-    // If there is, we simply pass the arguments on to it to get the form.
-    if (!is_callable($callback)) {
-      // In cases where many form_ids need to share a central constructor
-      // function, such as the node editing form, modules can implement
-      // hook_forms(). It maps one or more form_ids to the correct constructor
-      // functions.
-      //
-      // We cache the results of that hook to save time, but that only works for
-      // modules that know all their form_ids in advance. (A module that adds a
-      // small 'rate this comment' form to each comment in a list would need a
-      // unique form_id for each one, for example.)
-      //
-      // So, we call the hook if $this->forms isn't yet populated, OR if it
-      // doesn't yet have an entry for the requested form_id.
-      if (!isset($this->forms) || !isset($this->forms[$form_id])) {
-        $this->forms = $this->moduleHandler->invokeAll('forms', array($form_id, $args));
-      }
-      $form_definition = $this->forms[$form_id];
-      if (isset($form_definition['callback arguments'])) {
-        $args = array_merge($form_definition['callback arguments'], $args);
-      }
-      if (isset($form_definition['callback'])) {
-        $callback = $form_definition['callback'];
-        $form_state['build_info']['base_form_id'] = $callback;
-      }
-      // In case $form_state['wrapper_callback'] is not defined already, we also
-      // allow hook_forms() to define one.
-      if (!isset($form_state['wrapper_callback']) && isset($form_definition['wrapper_callback'])) {
-        $form_state['wrapper_callback'] = $form_definition['wrapper_callback'];
-      }
-    }
-
     $form = array();
     // Assign a default CSS class name based on $form_id.
     // This happens here and not in self::prepareForm() in order to allow the
@@ -543,20 +509,6 @@ class FormBuilder implements FormBuilderInterface {
     // passed explicitly.
     $args = array_merge(array($form, &$form_state), $args);
 
-    // When the passed $form_state (not using self::getForm()) defines a
-    // 'wrapper_callback', then it requests to invoke a separate (wrapping) form
-    // builder function to pre-populate the $form array with form elements,
-    // which the actual form builder function ($callback) expects. This allows
-    // for pre-populating a form with common elements for certain forms, such as
-    // back/next/save buttons in multi-step form wizards. See self::buildForm().
-    if (isset($form_state['wrapper_callback'])) {
-      $form = call_user_func_array($form_state['wrapper_callback'], $args);
-      // Put the prepopulated $form into $args.
-      $args[0] = $form;
-    }
-
-    // If $callback was returned by a hook_forms() implementation, call it.
-    // Otherwise, call the function named after the form id.
     $form = call_user_func_array($callback, $args);
     // If the form returns some kind of response, deliver it.
     if ($form instanceof Response) {
@@ -720,7 +672,7 @@ class FormBuilder implements FormBuilderInterface {
     // @see self::buildForm()
     // @see self::rebuildForm()
     if (!isset($form['#build_id'])) {
-      $form['#build_id'] = 'form-' . Crypt::hashBase64(uniqid(mt_rand(), TRUE) . mt_rand());
+      $form['#build_id'] = 'form-' . Crypt::randomBytesBase64();
     }
     $form['form_build_id'] = array(
       '#type' => 'hidden',

@@ -7,6 +7,7 @@
 
 namespace Drupal\views;
 
+use Drupal\Core\DependencyInjection\DependencySerialization;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\views\Plugin\views\query\QueryPluginBase;
 use Drupal\views\ViewStorageInterface;
@@ -25,7 +26,7 @@ use Symfony\Component\HttpFoundation\Response;
  * An object to contain all of the data to generate a view, plus the member
  * functions to build the view query, execute the query and render the output.
  */
-class ViewExecutable {
+class ViewExecutable extends DependencySerialization {
 
   /**
    * The config entity in which the view is stored.
@@ -1511,28 +1512,6 @@ class ViewExecutable {
   }
 
   /**
-   * Called to get hook_menu() information from the view and the named display handler.
-   *
-   * @param $display_id
-   *   A display id.
-   * @param $callbacks
-   *   A menu callback array passed from views_menu_alter().
-   */
-  public function executeHookMenu($display_id = NULL, &$callbacks = array()) {
-    // Prepare the view with the information we have.
-
-    // This was probably already called, but it's good to be safe.
-    if (!$this->setDisplay($display_id)) {
-      return FALSE;
-    }
-
-    // Execute the view
-    if (isset($this->display_handler)) {
-      return $this->display_handler->executeHookMenu($callbacks);
-    }
-  }
-
-  /**
    * Returns default menu links from the view and the named display handler.
    *
    * @param string $display_id
@@ -2234,6 +2213,30 @@ class ViewExecutable {
     $themes[] = $hook;
 
     return $themes;
+  }
+
+  /**
+   * Determines if this view has form elements.
+   *
+   * @return bool
+   *   Returns TRUE if this view contains handlers with views form
+   *   implementations, FALSE otherwise.
+   */
+  public function hasFormElements() {
+    foreach ($this->field as $field) {
+      if (property_exists($field, 'views_form_callback') || method_exists($field, 'viewsForm')) {
+        return TRUE;
+      }
+    }
+    $area_handlers = array_merge(array_values($this->header), array_values($this->footer));
+    $empty = empty($this->result);
+    foreach ($area_handlers as $area) {
+      if (method_exists($area, 'viewsForm') && !$area->viewsFormEmpty($empty)) {
+        return TRUE;
+      }
+    }
+
+    return FALSE;
   }
 
 }

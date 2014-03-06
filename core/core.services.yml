@@ -7,8 +7,6 @@ services:
   cache.backend.database:
     class: Drupal\Core\Cache\DatabaseBackendFactory
     arguments: ['@database']
-  cache.backend.memory:
-    class: Drupal\Core\Cache\MemoryBackendFactory
   cache.bootstrap:
     class: Drupal\Core\Cache\CacheBackendInterface
     tags:
@@ -153,7 +151,7 @@ services:
     arguments: [path_alias_whitelist, '@cache.cache', '@lock', '@state', '@database']
   path.alias_manager:
     class: Drupal\Core\Path\AliasManager
-    arguments: ['@database', '@path.alias_whitelist', '@language_manager']
+    arguments: ['@path.crud', '@path.alias_whitelist', '@language_manager']
   http_client_simpletest_subscriber:
     class: Drupal\Core\Http\Plugin\SimpletestHttpRequestSubscriber
   http_default_client:
@@ -214,7 +212,7 @@ services:
     arguments: ['@controller_resolver', '@request', '@router.route_provider', '@module_handler', '@cache.cache', '@language_manager', '@access_manager', '@current_user']
   plugin.manager.menu.local_task:
     class: Drupal\Core\Menu\LocalTaskManager
-    arguments: ['@controller_resolver', '@request', '@router.route_provider', '@module_handler', '@cache.cache', '@language_manager', '@access_manager', '@current_user']
+    arguments: ['@controller_resolver', '@request', '@router.route_provider', '@router.builder', '@module_handler', '@cache.cache', '@language_manager', '@access_manager', '@current_user']
   plugin.manager.menu.contextual_link:
     class: Drupal\Core\Menu\ContextualLinkManager
     arguments: ['@controller_resolver', '@module_handler', '@cache.cache', '@language_manager', '@access_manager', '@current_user']
@@ -280,6 +278,11 @@ services:
     arguments: ['@database', '@router.builder']
     tags:
       - { name: event_subscriber }
+  router.route_preloader:
+    class: Drupal\Core\Routing\RoutePreloader
+    arguments: ['@router.route_provider', '@state', '@content_negotiation']
+    tags:
+      - { name: 'event_subscriber' }
   router.matcher.final_matcher:
     class: Drupal\Core\Routing\UrlMatcher
   router.matcher:
@@ -304,6 +307,11 @@ services:
     calls:
       - [setContext, ['@router.request_context']]
       - [add, ['@router.dynamic']]
+  router.path_roots_subscriber:
+    class: Drupal\Core\EventSubscriber\PathRootsSubscriber
+    arguments: ['@state']
+    tags:
+      - { name: event_subscriber }
   entity.query:
     class: Drupal\Core\Entity\Query\QueryFactory
     arguments: ['@entity.manager']
@@ -323,7 +331,7 @@ services:
     arguments: ['@router.dumper', '@lock', '@event_dispatcher', '@module_handler', '@controller_resolver', '@state']
   router.rebuild_subscriber:
     class: Drupal\Core\EventSubscriber\RouterRebuildSubscriber
-    arguments: ['@router.builder']
+    arguments: ['@router.builder', '@lock']
     tags:
       - { name: event_subscriber }
   path.alias_manager.cached:
@@ -331,7 +339,7 @@ services:
     arguments: ['@path.alias_manager', '@cache.path']
   path.crud:
     class: Drupal\Core\Path\Path
-    arguments: ['@database', '@path.alias_manager']
+    arguments: ['@database', '@module_handler']
 # The argument to the hashing service defined in services.yml, to the
 # constructor of PhpassHashedPassword is the log2 number of iterations for
 # password stretching.
@@ -584,9 +592,9 @@ services:
   flood:
     class: Drupal\Core\Flood\DatabaseBackend
     arguments: ['@database', '@request']
-  mail.factory:
-    class: Drupal\Core\Mail\MailFactory
-    arguments: ['@config.factory']
+  plugin.manager.mail:
+    class: Drupal\Core\Mail\MailManager
+    arguments: ['@container.namespaces', '@cache.cache', '@language_manager', '@module_handler', '@config.factory']
   plugin.manager.condition:
     class: Drupal\Core\Condition\ConditionManager
     parent: default_plugin_manager
@@ -602,7 +610,7 @@ services:
       - { name: event_subscriber }
   image.toolkit.manager:
     class: Drupal\Core\ImageToolkit\ImageToolkitManager
-    arguments: ['@container.namespaces', '@cache.cache', '@language_manager', '@config.factory']
+    arguments: ['@container.namespaces', '@cache.cache', '@language_manager', '@config.factory', '@module_handler']
   image.toolkit:
     class: Drupal\Core\ImageToolkit\ImageToolkitInterface
     factory_method: getDefaultToolkit

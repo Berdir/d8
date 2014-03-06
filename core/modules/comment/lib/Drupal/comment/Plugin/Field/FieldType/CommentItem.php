@@ -7,8 +7,8 @@
 
 namespace Drupal\comment\Plugin\Field\FieldType;
 
-use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\Field\ConfigFieldItemBase;
 
 /**
@@ -33,39 +33,31 @@ use Drupal\Core\Field\ConfigFieldItemBase;
 class CommentItem extends ConfigFieldItemBase {
 
   /**
-   * Definitions of the contained properties.
-   *
-   * @var array
-   */
-  public static $propertyDefinitions;
-
-  /**
    * {@inheritdoc}
    */
-  public function getPropertyDefinitions() {
-    if (!isset(static::$propertyDefinitions)) {
-      static::$propertyDefinitions['status'] = DataDefinition::create('integer')
-        ->setLabel(t('Comment status value'));
+  public static function propertyDefinitions(FieldDefinitionInterface $field_definition) {
+    $properties['status'] = DataDefinition::create('integer')
+      ->setLabel(t('Comment status value'));
 
-      static::$propertyDefinitions['cid'] = DataDefinition::create('integer')
-        ->setLabel(t('Last comment ID'));
+    $properties['cid'] = DataDefinition::create('integer')
+      ->setLabel(t('Last comment ID'));
 
-      static::$propertyDefinitions['last_comment_timestamp'] = DataDefinition::create('integer')
-        ->setLabel(t('Last comment timestamp'))
-        ->setDescription(t('The time that the last comment was created.'));
+    $properties['last_comment_timestamp'] = DataDefinition::create('integer')
+      ->setLabel(t('Last comment timestamp'))
+      ->setDescription(t('The time that the last comment was created.'));
 
-      static::$propertyDefinitions['last_comment_name'] = DataDefinition::create('string')
-        ->setLabel(t('Last comment name'))
-        ->setDescription(t('The name of the user posting the last comment.'));
+    $properties['last_comment_name'] = DataDefinition::create('string')
+      ->setLabel(t('Last comment name'))
+      ->setDescription(t('The name of the user posting the last comment.'));
 
-      static::$propertyDefinitions['last_comment_uid'] = DataDefinition::create('integer')
-        ->setLabel(t('Last comment user ID'));
+    $properties['last_comment_uid'] = DataDefinition::create('integer')
+      ->setLabel(t('Last comment user ID'));
 
-      static::$propertyDefinitions['comment_count'] = DataDefinition::create('integer')
-        ->setLabel(t('Number of comments'))
-        ->setDescription(t('The number of comments.'));
-    }
-    return static::$propertyDefinitions;
+    $properties['comment_count'] = DataDefinition::create('integer')
+      ->setLabel(t('Number of comments'))
+      ->setDescription(t('The number of comments.'));
+
+    return $properties;
   }
 
   /**
@@ -92,7 +84,7 @@ class CommentItem extends ConfigFieldItemBase {
   public function instanceSettingsForm(array $form, array &$form_state) {
     $element = array();
 
-    $settings = $this->getFieldSettings();
+    $settings = $this->getSettings();
 
     $entity_type = $this->getEntity()->getEntityTypeId();
     $field_name = $this->getFieldDefinition()->getName();
@@ -100,8 +92,7 @@ class CommentItem extends ConfigFieldItemBase {
     $element['comment'] = array(
       '#type' => 'details',
       '#title' => t('Comment form settings'),
-      '#collapsible' => TRUE,
-      '#collapsed' => FALSE,
+      '#open' => TRUE,
       '#bundle' => "{$entity_type}__{$field_name}",
       '#process' => array(array(get_class($this), 'processSettingsElement')),
       '#attributes' => array(

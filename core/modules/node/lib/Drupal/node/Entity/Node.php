@@ -9,6 +9,7 @@ namespace Drupal\node\Entity;
 
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\FieldDefinition;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Session\AccountInterface;
@@ -18,12 +19,11 @@ use Drupal\user\UserInterface;
 /**
  * Defines the node entity class.
  *
- * @EntityType(
+ * @ContentEntityType(
  *   id = "node",
  *   label = @Translation("Content"),
  *   bundle_label = @Translation("Content type"),
  *   controllers = {
- *     "storage" = "Drupal\Core\Entity\FieldableDatabaseStorageController",
  *     "view_builder" = "Drupal\node\NodeViewBuilder",
  *     "access" = "Drupal\node\NodeAccessHandler",
  *     "form" = {
@@ -41,7 +41,6 @@ use Drupal\user\UserInterface;
  *   uri_callback = "node_uri",
  *   fieldable = TRUE,
  *   translatable = TRUE,
- *   render_cache = FALSE,
  *   entity_keys = {
  *     "id" = "nid",
  *     "revision" = "vid",
@@ -353,7 +352,7 @@ class Node extends ContentEntityBase implements NodeInterface {
   /**
    * {@inheritdoc}
    */
-  public static function baseFieldDefinitions($entity_type) {
+  public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields['nid'] = FieldDefinition::create('integer')
       ->setLabel(t('Node ID'))
       ->setDescription(t('The node ID.'))
@@ -380,11 +379,8 @@ class Node extends ContentEntityBase implements NodeInterface {
       ->setDescription(t('The node language code.'));
 
     $fields['title'] = FieldDefinition::create('text')
-      // @todo Account for $node_type->title_label when per-bundle overrides are
-      //   possible - https://drupal.org/node/2114707.
       ->setLabel(t('Title'))
       ->setDescription(t('The title of this node, always treated as non-markup plain text.'))
-      ->setClass('\Drupal\node\NodeTitleItemList')
       ->setRequired(TRUE)
       ->setTranslatable(TRUE)
       ->setSettings(array(
@@ -450,6 +446,19 @@ class Node extends ContentEntityBase implements NodeInterface {
       ->setLabel(t('Log'))
       ->setDescription(t('The log entry explaining the changes in this revision.'));
 
+    return $fields;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function bundleFieldDefinitions(EntityTypeInterface $entity_type, $bundle, array $base_field_definitions) {
+    $node_type = node_type_load($bundle);
+    $fields = array();
+    if (isset($node_type->title_label)) {
+      $fields['title'] = clone $base_field_definitions['title'];
+      $fields['title']->setLabel($node_type->title_label);
+    }
     return $fields;
   }
 

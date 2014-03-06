@@ -15,11 +15,10 @@ use Drupal\language\LanguageInterface;
 /**
  * Defines the Language entity.
  *
- * @EntityType(
+ * @ConfigEntityType(
  *   id = "language_entity",
  *   label = @Translation("Language"),
  *   controllers = {
- *     "storage" = "Drupal\Core\Config\Entity\ConfigStorageController",
  *     "list" = "Drupal\language\LanguageListController",
  *     "access" = "Drupal\language\LanguageAccessHandler",
  *     "form" = {
@@ -29,12 +28,11 @@ use Drupal\language\LanguageInterface;
  *     }
  *   },
  *   admin_permission = "administer languages",
- *   config_prefix = "language.entity",
+ *   config_prefix = "entity",
  *   entity_keys = {
  *     "id" = "id",
  *     "label" = "label",
- *     "weight" = "weight",
- *     "uuid" = "uuid"
+ *     "weight" = "weight"
  *   },
  *   links = {
  *     "delete-form" = "language.delete",

@@ -13,11 +13,10 @@ use Drupal\picture\PictureMappingInterface;
 /**
  * Defines the Picture entity.
  *
- * @EntityType(
+ * @ConfigEntityType(
  *   id = "picture_mapping",
  *   label = @Translation("Picture mapping"),
  *   controllers = {
- *     "storage" = "Drupal\Core\Config\Entity\ConfigStorageController",
  *     "list" = "Drupal\picture\PictureMappingListController",
  *     "form" = {
  *       "edit" = "Drupal\picture\PictureMappingFormController",
@@ -28,11 +27,10 @@ use Drupal\picture\PictureMappingInterface;
  *   },
  *   list_path = "admin/config/media/picturemapping",
  *   admin_permission = "administer pictures",
- *   config_prefix = "picture.mappings",
+ *   config_prefix = "mappings",
  *   entity_keys = {
  *     "id" = "id",
- *     "label" = "label",
- *     "uuid" = "uuid"
+ *     "label" = "label"
  *   },
  *   links = {
  *     "edit-form" = "picture.mapping_page_edit",

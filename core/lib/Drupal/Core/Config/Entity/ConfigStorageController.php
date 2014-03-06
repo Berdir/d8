@@ -8,11 +8,11 @@
 namespace Drupal\Core\Config\Entity;
 
 use Drupal\Component\Utility\String;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Entity\EntityStorageControllerBase;
 use Drupal\Core\Config\Config;
-use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityStorageException;
@@ -38,13 +38,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class ConfigStorageController extends EntityStorageControllerBase implements ConfigStorageControllerInterface {
 
   /**
-   * Name of the entity's UUID property.
-   *
-   * @var string
-   */
-  protected $uuidKey = 'uuid';
-
-  /**
    * The UUID service.
    *
    * @var \Drupal\Component\Uuid\UuidInterface
@@ -61,7 +54,7 @@ class ConfigStorageController extends EntityStorageControllerBase implements Con
   /**
    * The config factory service.
    *
-   * @var \Drupal\Core\Config\ConfigFactory
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
    */
   protected $configFactory;
 
@@ -84,7 +77,7 @@ class ConfigStorageController extends EntityStorageControllerBase implements Con
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
    *   The entity type definition.
-   * @param \Drupal\Core\Config\ConfigFactory $config_factory
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory service.
    * @param \Drupal\Core\Config\StorageInterface $config_storage
    *   The config storage service.
@@ -93,7 +86,7 @@ class ConfigStorageController extends EntityStorageControllerBase implements Con
    * @param \Drupal\Component\Uuid\UuidInterface $uuid_service
    *   The UUID service.
    */
-  public function __construct(EntityTypeInterface $entity_type, ConfigFactory $config_factory, StorageInterface $config_storage, QueryFactory $entity_query_factory, UuidInterface $uuid_service) {
+  public function __construct(EntityTypeInterface $entity_type, ConfigFactoryInterface $config_factory, StorageInterface $config_storage, QueryFactory $entity_query_factory, UuidInterface $uuid_service) {
     parent::__construct($entity_type);
 
     $this->idKey = $this->entityType->getKey('id');
@@ -261,8 +254,8 @@ class ConfigStorageController extends EntityStorageControllerBase implements Con
     $entity->enforceIsNew();
 
     // Assign a new UUID if there is none yet.
-    if (!isset($entity->{$this->uuidKey})) {
-      $entity->{$this->uuidKey} = $this->uuidService->generate();
+    if (!$entity->uuid()) {
+      $entity->set('uuid', $this->uuidService->generate());
     }
     $entity->postCreate($this);
 
@@ -389,9 +382,9 @@ class ConfigStorageController extends EntityStorageControllerBase implements Con
    */
   protected function invokeHook($hook, EntityInterface $entity) {
     // Invoke the hook.
-    module_invoke_all($this->entityTypeId . '_' . $hook, $entity);
+    $this->moduleHandler->invokeAll($this->entityTypeId . '_' . $hook, array($entity));
     // Invoke the respective entity-level hook.
-    module_invoke_all('entity_' . $hook, $entity, $this->entityTypeId);
+    $this->moduleHandler->invokeAll('entity_' . $hook, array($entity, $this->entityTypeId));
   }
 
   /**

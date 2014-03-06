@@ -8,7 +8,7 @@
 namespace Drupal\comment;
 
 use Drupal\Component\Utility\String;
-use Drupal\Core\Config\ConfigFactory;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Routing\UrlGeneratorInterface;
@@ -79,14 +79,14 @@ class CommentManager implements CommentManagerInterface {
    *   The entity manager service.
    * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current user.
-   * @param \Drupal\Core\Config\ConfigFactory $config_factory
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory.
    * @param \Drupal\Core\StringTranslation\TranslationInterface $translation_manager
    *   The string translation service.
    * @param \Drupal\Core\Routing\UrlGeneratorInterface $url_generator
    *   The url generator service.
    */
-  public function __construct(FieldInfo $field_info, EntityManagerInterface $entity_manager, AccountInterface $current_user, ConfigFactory $config_factory, TranslationInterface $translation_manager, UrlGeneratorInterface $url_generator) {
+  public function __construct(FieldInfo $field_info, EntityManagerInterface $entity_manager, AccountInterface $current_user, ConfigFactoryInterface $config_factory, TranslationInterface $translation_manager, UrlGeneratorInterface $url_generator) {
     $this->fieldInfo = $field_info;
     $this->entityManager = $entity_manager;
     $this->currentUser = $current_user;
@@ -100,8 +100,8 @@ class CommentManager implements CommentManagerInterface {
    */
   public function getParentEntityUri(CommentInterface $comment) {
     return $this->entityManager
-      ->getStorageController($comment->entity_type->value)
-      ->load($comment->entity_id->value)
+      ->getStorageController($comment->getCommentedEntityTypeId())
+      ->load($comment->getCommentedEntityId())
       ->urlInfo();
   }
 
@@ -142,7 +142,7 @@ class CommentManager implements CommentManagerInterface {
     // Make sure the field doesn't already exist.
     if (!$this->fieldInfo->getField($entity_type, $field_name)) {
       // Add a default comment field for existing node comments.
-      $field = $this->entityManager->getStorageController('field_entity')->create(array(
+      $field = $this->entityManager->getStorageController('field_config')->create(array(
         'entity_type' => $entity_type,
         'name' => $field_name,
         'type' => 'comment',
@@ -153,7 +153,7 @@ class CommentManager implements CommentManagerInterface {
     }
     // Make sure the instance doesn't already exist.
     if (!$this->fieldInfo->getInstance($entity_type, $bundle, $field_name)) {
-      $instance = $this->entityManager->getStorageController('field_instance')->create(array(
+      $instance = $this->entityManager->getStorageController('field_instance_config')->create(array(
         'label' => 'Comment settings',
         'description' => '',
         'field_name' => $field_name,
@@ -197,9 +197,9 @@ class CommentManager implements CommentManagerInterface {
    */
   public function addBodyField($entity_type, $field_name) {
     // Create the field if needed.
-    $field = $this->entityManager->getStorageController('field_entity')->load('comment.comment_body');
+    $field = $this->entityManager->getStorageController('field_config')->load('comment.comment_body');
     if (!$field) {
-      $field = $this->entityManager->getStorageController('field_entity')->create(array(
+      $field = $this->entityManager->getStorageController('field_config')->create(array(
         'name' => 'comment_body',
         'type' => 'text_long',
         'entity_type' => 'comment',
@@ -209,11 +209,11 @@ class CommentManager implements CommentManagerInterface {
     // Create the instance if needed, field name defaults to 'comment'.
     $comment_bundle = $entity_type . '__' . $field_name;
     $field_instance = $this->entityManager
-      ->getStorageController('field_instance')
+      ->getStorageController('field_instance_config')
       ->load("comment.$comment_bundle.comment_body");
     if (!$field_instance) {
       // Attaches the body field by default.
-      $field_instance = $this->entityManager->getStorageController('field_instance')->create(array(
+      $field_instance = $this->entityManager->getStorageController('field_instance_config')->create(array(
         'field_name' => 'comment_body',
         'label' => 'Comment',
         'entity_type' => 'comment',

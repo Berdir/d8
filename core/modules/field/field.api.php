@@ -6,7 +6,7 @@
  */
 
 use Drupal\Component\Utility\NestedArray;
-use Drupal\field\FieldUpdateForbiddenException;
+use Drupal\field\FieldConfigUpdateForbiddenException;
 
 /**
  * Exposes "pseudo-field" components on fieldable entities.
@@ -19,7 +19,7 @@ use Drupal\field\FieldUpdateForbiddenException;
  * should expose them using this hook. The user-defined settings (weight,
  * visible) are automatically applied on rendered forms and displayed entities
  * in a #pre_render callback added by field_attach_form() and
- * field_attach_view().
+ * EntityViewBuilder::viewMultiple().
  *
  * @see hook_field_extra_fields_alter()
  *
@@ -318,7 +318,8 @@ function hook_field_formatter_info_alter(array &$info) {
  *   The language the field values are going to be entered in. If no language is
  *   provided the default site language will be used.
  *
- * @deprecated as of Drupal 8.0. Use the entity system instead.
+ * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
+ *   Use the entity system instead, see https://drupal.org/developing/api/entity
  */
 function hook_field_attach_form(\Drupal\Core\Entity\EntityInterface $entity, &$form, &$form_state, $langcode) {
   // Add a checkbox allowing a given field to be emptied.
@@ -346,7 +347,8 @@ function hook_field_attach_form(\Drupal\Core\Entity\EntityInterface $entity, &$f
  * @param $form_state
  *   An associative array containing the current state of the form.
  *
- * @deprecated as of Drupal 8.0. Use the entity system instead.
+ * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
+ *   Use the entity system instead, see https://drupal.org/developing/api/entity
  */
 function hook_field_attach_extract_form_values(\Drupal\Core\Entity\EntityInterface $entity, $form, &$form_state) {
   // Sample case of an 'Empty the field' checkbox added on the form, allowing
@@ -354,46 +356,6 @@ function hook_field_attach_extract_form_values(\Drupal\Core\Entity\EntityInterfa
   $values = NestedArray::getValue($form_state['values'], $form['#parents']);
   if (!empty($values['empty_field_foo'])) {
     unset($entity->field_foo);
-  }
-}
-
-/**
- * Perform alterations on field_attach_view() or field_view_field().
- *
- * This hook is invoked after the field module has performed the operation.
- *
- * @param $output
- *   The structured content array tree for all of the entity's fields.
- * @param $context
- *   An associative array containing:
- *   - entity: The entity with fields to render.
- *   - view_mode: View mode; for example, 'full' or 'teaser'.
- *   - display_options: Either a view mode string or an array of display
- *     options. If this hook is being invoked from field_attach_view(), the
- *     'display_options' element is set to the view mode string. If this hook
- *     is being invoked from field_view_field(), this element is set to the
- *     $display_options argument and the view_mode element is set to '_custom'.
- *     See field_view_field() for more information on what its $display_options
- *     argument contains.
- *   - langcode: The language code used for rendering.
- *
- * @deprecated as of Drupal 8.0. Use the entity system instead.
- */
-function hook_field_attach_view_alter(&$output, $context) {
-  // Append RDF term mappings on displayed taxonomy links.
-  foreach (element_children($output) as $field_name) {
-    $element = &$output[$field_name];
-    if ($element['#field_type'] == 'entity_reference' && $element['#formatter'] == 'entity_reference_label') {
-      foreach ($element['#items'] as $delta => $item) {
-        $term = $item->entity;
-        if (!empty($term->rdf_mapping['rdftype'])) {
-          $element[$delta]['#options']['attributes']['typeof'] = $term->rdf_mapping['rdftype'];
-        }
-        if (!empty($term->rdf_mapping['name']['predicates'])) {
-          $element[$delta]['#options']['attributes']['property'] = $term->rdf_mapping['name']['predicates'];
-        }
-      }
-    }
   }
 }
 
@@ -447,14 +409,14 @@ function hook_field_info_max_weight($entity_type, $bundle, $context, $context_mo
  * that cannot be updated.
  *
  * To forbid the update from occurring, throw a
- * Drupal\field\FieldUpdateForbiddenException.
+ * Drupal\field\FieldConfigUpdateForbiddenException.
  *
- * @param $field
+ * @param \Drupal\field\FieldConfigInterface $field
  *   The field as it will be post-update.
- * @param $prior_field
+ * @param \Drupal\field\FieldConfigInterface $prior_field
  *   The field as it is pre-update.
  */
-function hook_field_update_forbid($field, $prior_field) {
+function hook_field_config_update_forbid(\Drupal\field\FieldConfigInterface $field, \Drupal\field\FieldConfigInterface $prior_field) {
   // A 'list' field stores integer keys mapped to display values. If
   // the new field will have fewer values, and any data exists for the
   // abandoned keys, the field will have no way to display them. So,
@@ -469,7 +431,7 @@ function hook_field_update_forbid($field, $prior_field) {
       ->range(0, 1)
       ->execute();
     if ($found) {
-      throw new FieldUpdateForbiddenException("Cannot update a list field not to include keys with existing data");
+      throw new FieldConfigUpdateForbiddenException("Cannot update a list field not to include keys with existing data");
     }
   }
 }

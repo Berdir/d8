@@ -119,7 +119,7 @@ class BlockAccessHandler extends EntityAccessHandler implements EntityController
 
     // Language visibility settings.
     if (!empty($visibility['language']['langcodes']) && array_filter($visibility['language']['langcodes'])) {
-      if (empty($visibility['language']['langcodes'][language($visibility['language']['language_type'])->id])) {
+      if (empty($visibility['language']['langcodes'][\Drupal::languageManager()->getCurrentLanguage($visibility['language']['language_type'])->id])) {
         return FALSE;
       }
     }

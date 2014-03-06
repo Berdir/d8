@@ -14,8 +14,6 @@ use Drupal\Core\Plugin\DefaultPluginManager;
 
 /**
  * Plugin manager for 'field type' plugins.
- *
- * @todo Add FieldTypePluginManagerInterface in https://drupal.org/node/2175415.
  */
 class FieldTypePluginManager extends DefaultPluginManager implements FieldTypePluginManagerInterface {
 
@@ -41,8 +39,8 @@ class FieldTypePluginManager extends DefaultPluginManager implements FieldTypePl
    *   The module handler.
    */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, LanguageManager $language_manager, ModuleHandlerInterface $module_handler) {
-    parent::__construct('Plugin/Field/FieldType', $namespaces, 'Drupal\Core\Field\Annotation\FieldType');
-    $this->alterInfo($module_handler, 'field_info');
+    parent::__construct('Plugin/Field/FieldType', $namespaces, $module_handler, 'Drupal\Core\Field\Annotation\FieldType');
+    $this->alterInfo('field_info');
     $this->setCacheBackend($cache_backend, $language_manager, 'field_types_plugins');
   }
 

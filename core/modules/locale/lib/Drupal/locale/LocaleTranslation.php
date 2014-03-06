@@ -8,7 +8,7 @@
 namespace Drupal\locale;
 
 use Drupal\Core\Cache\CacheBackendInterface;
-use Drupal\Core\Config\ConfigFactory;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\DestructableInterface;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Lock\LockBackendAbstract;
@@ -35,7 +35,7 @@ class LocaleTranslation implements TranslatorInterface, DestructableInterface {
   /**
    * The configuration factory.
    *
-   * @var \Drupal\Core\Config\ConfigFactory
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
    */
   protected $configFactory;
 
@@ -63,6 +63,13 @@ class LocaleTranslation implements TranslatorInterface, DestructableInterface {
   protected $lock;
 
   /**
+   * The translate english configuration value.
+   *
+   * @var bool
+   */
+  protected $translateEnglish;
+
+  /**
    * Constructs a translator using a string storage.
    *
    * @param \Drupal\locale\StringStorageInterface $storage
@@ -71,10 +78,10 @@ class LocaleTranslation implements TranslatorInterface, DestructableInterface {
    *   The cache backend.
    * @param \Drupal\Core\Lock\LockBackendInterface $lock
    *   The lock backend.
-   * @param \Drupal\Core\Config\ConfigFactory $config_factory
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory.
    */
-  public function __construct(StringStorageInterface $storage, CacheBackendInterface $cache, LockBackendInterface $lock, ConfigFactory $config_factory) {
+  public function __construct(StringStorageInterface $storage, CacheBackendInterface $cache, LockBackendInterface $lock, ConfigFactoryInterface $config_factory) {
     $this->storage = $storage;
     $this->cache = $cache;
     $this->lock = $lock;
@@ -86,8 +93,7 @@ class LocaleTranslation implements TranslatorInterface, DestructableInterface {
    */
   public function getStringTranslation($langcode, $string, $context) {
     // If the language is not suitable for locale module, just return.
-    $translate_english = $this->configFactory->get('locale.settings')->get('translate_english');
-    if ($langcode == Language::LANGCODE_SYSTEM || ($langcode == 'en' && !$translate_english)) {
+    if ($langcode == Language::LANGCODE_SYSTEM || ($langcode == 'en' && !$this->canTranslateEnglish())) {
       return FALSE;
     }
     // Strings are cached by langcode, context and roles, using instances of the
@@ -100,9 +106,23 @@ class LocaleTranslation implements TranslatorInterface, DestructableInterface {
   }
 
   /**
+   * Gets translate english configuration value.
+   *
+   * @return bool
+   *   TRUE if english should be translated, FALSE if not.
+   */
+  protected function canTranslateEnglish() {
+    if (!isset($this->translateEnglish)) {
+      $this->translateEnglish = $this->configFactory->get('locale.settings')->get('translate_english');
+    }
+    return $this->translateEnglish;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function reset() {
+    unset($this->translateEnglish);
     $this->translations = array();
   }
 

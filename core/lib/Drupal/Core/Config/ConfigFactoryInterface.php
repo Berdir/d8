@@ -26,8 +26,7 @@ interface ConfigFactoryInterface {
    * @param bool $state
    *   TRUE if overrides should be applied, FALSE otherwise.
    *
-   * @return \Drupal\Core\Config\ConfigFactory
-   *   The config factory object.
+   * @return $this
    */
   public function setOverrideState($state);
 
@@ -59,7 +58,7 @@ interface ConfigFactoryInterface {
    * @param array $names
    *   List of names of configuration objects.
    *
-   * @return array
+   * @return \Drupal\Core\Config\Config[]
    *   List of successfully loaded configuration objects, keyed by name.
    */
   public function loadMultiple(array $names);
@@ -67,12 +66,11 @@ interface ConfigFactoryInterface {
   /**
    * Resets and re-initializes configuration objects. Internal use only.
    *
-   * @param string $name
+   * @param string|null $name
    *   (optional) The name of the configuration object to reset. If omitted, all
    *   configuration objects are reset.
    *
-   * @return \Drupal\Core\Config\ConfigFactory
-   *   The config factory object.
+   * @return $this
    */
   public function reset($name = NULL);
 
@@ -114,20 +112,18 @@ interface ConfigFactoryInterface {
   /**
    * Clears the config factory static cache.
    *
-   * @return \Drupal\Core\Config\ConfigFactory
-   *   The config factory object.
+   * @return $this
    */
   public function clearStaticCache();
 
   /**
    * Sets the language to be used in configuration overrides.
    *
-   * @param \Drupal\Core\Language\Language $language
+   * @param \Drupal\Core\Language\Language|null $language
    *   The language object to be set on the config factory. Used to override
    *   configuration by language.
    *
-   * @return \Drupal\Core\Config\ConfigFactory
-   *   The config factory object.
+   * @return $this
    */
   public function setLanguage(Language $language = NULL);
 
@@ -139,8 +135,7 @@ interface ConfigFactoryInterface {
    *   config factory to the site's default. The language can be used to
    *   override configuration data if language overrides are available.
    *
-   * @return \Drupal\Core\Config\ConfigFactory
-   *   The config factory object.
+   * @return $this
    */
   public function setLanguageFromDefault(LanguageDefault $language_default);
 

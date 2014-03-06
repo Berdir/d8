@@ -17,7 +17,7 @@ class MenuTest extends MenuWebTestBase {
    *
    * @var array
    */
-  public static $modules = array('block', 'contextual', 'help', 'path', 'test_page_test');
+  public static $modules = array('node', 'block', 'contextual', 'help', 'path', 'test_page_test');
 
   /**
    * A user with administration rights.
@@ -435,6 +435,28 @@ class MenuTest extends MenuWebTestBase {
   }
 
   /**
+   * Tests that menu items pointing to unpublished nodes are editable.
+   */
+  function testUnpublishedNodeMenuItem() {
+    $this->drupalLogin($this->drupalCreateUser(array('access administration pages', 'administer blocks', 'administer menu', 'create article content', 'bypass node access')));
+    // Create an unpublished node.
+    $node = $this->drupalCreateNode(array(
+      'type' => 'article',
+      'status' => NODE_NOT_PUBLISHED,
+    ));
+
+    $item = $this->addMenuLink(0, 'node/' . $node->id());
+    $this->modifyMenuLink($item);
+
+    // Test that a user with 'administer menu' but without 'bypass node access'
+    // cannot see the menu item.
+    $this->drupalLogout();
+    $this->drupalLogin($this->admin_user);
+    $this->drupalGet('admin/structure/menu/manage/' . $item['menu_name']);
+    $this->assertNoText($item['link_title'], "Menu link pointing to unpublished node is only visible to users with 'bypass node access' permission");
+  }
+
+  /**
    * Tests the contextual links on a menu block.
    */
   public function testBlockContextualLinks() {
@@ -454,6 +476,66 @@ class MenuTest extends MenuWebTestBase {
     $this->assertResponse(200);
     $json = drupal_json_decode($response);
     $this->assertIdentical($json[$id], '<ul class="contextual-links"><li class="block-configure"><a href="' . base_path() . 'admin/structure/block/manage/' . $block->id() . '">Configure block</a></li><li class="menu-edit"><a href="' . base_path() . 'admin/structure/menu/manage/tools">Edit menu</a></li></ul>');
+  }
+
+  /**
+   * Test that cache tags are properly set and bubbled up to the page cache.
+   *
+   * Ensures that invalidation of the "menu:<menu name>" cache tags works.
+   */
+  public function testMenuBlockPageCacheTags() {
+    // Enable page caching.
+    $config = \Drupal::config('system.performance');
+    $config->set('cache.page.use_internal', 1);
+    $config->set('cache.page.max_age', 300);
+    $config->save();
+
+    // Create a Llama menu, add a link to it and place the corresponding block.
+    $menu = entity_create('menu', array(
+      'id' => 'llama',
+      'label' => 'Llama',
+      'description' => 'Description text',
+    ));
+    $menu->save();
+    $menu_link = entity_create('menu_link', array(
+      'link_path' => '<front>',
+      'link_title' => 'Vicuña',
+      'menu_name' => 'llama',
+    ));
+    $menu_link->save();
+    $block = $this->drupalPlaceBlock('system_menu_block:llama', array('label' => 'Llama', 'module' => 'system', 'region' => 'footer'));
+
+    // Prime the page cache.
+    $this->drupalGet('test-page');
+    $this->assertEqual($this->drupalGetHeader('X-Drupal-Cache'), 'MISS');
+
+    // Verify a cache hit, but also the presence of the correct cache tags.
+    $this->drupalGet('test-page');
+    $this->assertEqual($this->drupalGetHeader('X-Drupal-Cache'), 'HIT');
+    $cid_parts = array(url('test-page', array('absolute' => TRUE)), 'html');
+    $cid = sha1(implode(':', $cid_parts));
+    $cache_entry = \Drupal::cache('page')->get($cid);
+    $this->assertIdentical($cache_entry->tags, array('content:1', 'menu:llama'));
+
+    // The "Llama" menu is modified.
+    $menu->label = 'Awesome llama';
+    $menu->save();
+
+    // Verify that after the modified menu, there is a cache miss.
+    $this->drupalGet('test-page');
+    $this->assertEqual($this->drupalGetHeader('X-Drupal-Cache'), 'MISS');
+
+    // Verify a cache hit.
+    $this->drupalGet('test-page');
+    $this->assertEqual($this->drupalGetHeader('X-Drupal-Cache'), 'HIT');
+
+    // A link in the "Llama" menu is modified.
+    $menu_link->link_title = 'Guanaco';
+    $menu_link->save();
+
+    // Verify that after the modified menu link, there is a cache miss.
+    $this->drupalGet('test-page');
+    $this->assertEqual($this->drupalGetHeader('X-Drupal-Cache'), 'MISS');
   }
 
   /**

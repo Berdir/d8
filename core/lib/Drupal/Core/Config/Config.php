@@ -11,6 +11,7 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\String;
 use Drupal\Core\Config\ConfigNameException;
 use Drupal\Core\Config\Schema\SchemaIncompleteException;
+use Drupal\Core\DependencyInjection\DependencySerialization;
 use Drupal\Core\TypedData\PrimitiveInterface;
 use Drupal\Core\TypedData\Type\FloatInterface;
 use Drupal\Core\TypedData\Type\IntegerInterface;
@@ -20,7 +21,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 /**
  * Defines the default configuration object.
  */
-class Config {
+class Config extends DependencySerialization {
 
   /**
    * The maximum length of a configuration object name.
@@ -74,7 +75,7 @@ class Config {
    *
    * @var array
    */
-  protected $originalData;
+  protected $originalData = array();
 
   /**
    * The current runtime data.
@@ -457,7 +458,7 @@ class Config {
 
     $this->storage->write($this->name, $this->data);
     $this->isNew = FALSE;
-    $this->notify('save');
+    $this->eventDispatcher->dispatch(ConfigEvents::SAVE, new ConfigCrudEvent($this));
     $this->originalData = $this->data;
     return $this;
   }
@@ -474,7 +475,7 @@ class Config {
     $this->storage->delete($this->name);
     $this->isNew = TRUE;
     $this->resetOverriddenData();
-    $this->notify('delete');
+    $this->eventDispatcher->dispatch(ConfigEvents::DELETE, new ConfigCrudEvent($this));
     $this->originalData = $this->data;
     return $this;
   }
@@ -487,16 +488,6 @@ class Config {
    */
   public function getStorage() {
     return $this->storage;
-  }
-
-  /**
-   * Dispatches a configuration event.
-   *
-   * @param string $config_event_name
-   *   The configuration event name.
-   */
-  protected function notify($config_event_name) {
-    $this->eventDispatcher->dispatch('config.' . $config_event_name, new ConfigEvent($this));
   }
 
   /**

@@ -14,16 +14,12 @@ use Drupal\rdf\RdfMappingInterface;
 /**
  * Config entity for working with RDF mappings.
  *
- * @EntityType(
+ * @ConfigEntityType(
  *   id = "rdf_mapping",
  *   label = @Translation("RDF mapping"),
- *   controllers = {
- *     "storage" = "Drupal\Core\Config\Entity\ConfigStorageController"
- *   },
- *   config_prefix = "rdf.mapping",
+ *   config_prefix = "mapping",
  *   entity_keys = {
- *     "id" = "id",
- *     "uuid" = "uuid"
+ *     "id" = "id"
  *   }
  * )
  */

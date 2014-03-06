@@ -72,7 +72,7 @@ abstract class AccountFormController extends ContentEntityFormController {
     $user = $this->currentUser();
     $config = \Drupal::config('user.settings');
 
-    $language_interface = language(Language::TYPE_INTERFACE);
+    $language_interface = \Drupal::languageManager()->getCurrentLanguage();
     $register = $account->isAnonymous();
     $admin = $user->hasPermission('administer users');
 
@@ -214,17 +214,24 @@ abstract class AccountFormController extends ContentEntityFormController {
     $form['signature_settings'] = array(
       '#type' => 'details',
       '#title' => $this->t('Signature settings'),
+      '#open' => TRUE,
       '#weight' => 1,
       '#access' => (!$register && $config->get('signatures')),
     );
-
-    $form['signature_settings']['signature'] = array(
-      '#type' => 'text_format',
-      '#title' => $this->t('Signature'),
-      '#default_value' => $account->getSignature(),
-      '#description' => $this->t('Your signature will be publicly displayed at the end of your comments.'),
-      '#format' => $account->getSignatureFormat(),
-    );
+    // While the details group will simply not be rendered if empty, the actual
+    // signature element cannot use #access, since #type 'text_format' is not
+    // available when Filter module is not installed. If the user account has an
+    // existing signature value and format, then the existing field values will
+    // just be re-saved to the database in case of an entity update.
+    if ($this->moduleHandler->moduleExists('filter')) {
+      $form['signature_settings']['signature'] = array(
+        '#type' => 'text_format',
+        '#title' => $this->t('Signature'),
+        '#default_value' => $account->getSignature(),
+        '#description' => $this->t('Your signature will be publicly displayed at the end of your comments.'),
+        '#format' => $account->getSignatureFormat(),
+      );
+    }
 
     $user_preferred_langcode = $register ? $language_interface->id : $account->getPreferredLangcode();
 
@@ -239,6 +246,7 @@ abstract class AccountFormController extends ContentEntityFormController {
     $form['language'] = array(
       '#type' => $this->languageManager->isMultilingual() ? 'details' : 'container',
       '#title' => $this->t('Language settings'),
+      '#open' => TRUE,
       // Display language selector when either creating a user on the admin
       // interface or editing a user account.
       '#access' => !$register || $user->hasPermission('administer users'),

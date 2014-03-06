@@ -182,12 +182,7 @@ class RouterTest extends WebTestBase {
 
   /**
    * Checks that an ajax request gets rendered as an Ajax response, by mime.
-   *
-   * @todo This test will not work until the Ajax enhancer is corrected. However,
-   *   that is dependent on fixes to the Ajax system. Re-enable this test once
-   *   http://drupal.org/node/1938980 is fixed.
    */
-  /*
   public function testControllerResolutionAjax() {
     // This will fail with a JSON parse error if the request is not routed to
     // The correct controller.
@@ -197,6 +192,13 @@ class RouterTest extends WebTestBase {
 
     $this->assertRaw('abcde', 'Correct body was found.');
   }
-  */
 
+  /**
+   * Tests that routes no longer exist for a module that has been uninstalled.
+   */
+  public function testRouterUninstall() {
+    \Drupal::moduleHandler()->uninstall(array('router_test'));
+    $route_count = \Drupal::database()->query('SELECT COUNT(*) FROM {router} WHERE provider = :provider', array(':provider' => 'router_test'))->fetchField();
+    $this->assertEqual(0, $route_count, 'All router_test routes have been removed on uninstall.');
+  }
 }

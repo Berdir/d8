@@ -15,11 +15,10 @@ use Drupal\system\DateFormatInterface;
 /**
  * Defines the Date Format configuration entity class.
  *
- * @EntityType(
+ * @ConfigEntityType(
  *   id = "date_format",
  *   label = @Translation("Date format"),
  *   controllers = {
- *     "storage" = "Drupal\Core\Config\Entity\ConfigStorageController",
  *     "access" = "Drupal\system\DateFormatAccessHandler",
  *     "list" = "Drupal\system\DateFormatListController",
  *     "form" = {
@@ -28,11 +27,9 @@ use Drupal\system\DateFormatInterface;
  *       "delete" = "Drupal\system\Form\DateFormatDeleteForm"
  *     }
  *   },
- *   config_prefix = "system.date_format",
  *   entity_keys = {
  *     "id" = "id",
- *     "label" = "label",
- *     "uuid" = "uuid"
+ *     "label" = "label"
  *   },
  *   admin_permission = "administer site configuration",
  *   links = {

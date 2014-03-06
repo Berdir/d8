@@ -10,6 +10,7 @@ namespace Drupal\simpletest;
 use Drupal\Component\Utility\Random;
 use Drupal\Core\Database\Database;
 use Drupal\Component\Utility\Settings;
+use Drupal\Component\Utility\String;
 use Drupal\Core\Config\ConfigImporter;
 use Drupal\Core\Config\StorageComparer;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
@@ -240,8 +241,9 @@ abstract class TestBase {
    *   TRUE is a synonym for 'pass', FALSE for 'fail'.
    * @param $message
    *   (optional) A message to display with the assertion. Do not translate
-   *   messages: use format_string() to embed variables in the message text, not
-   *   t(). If left blank, a default message will be displayed.
+   *   messages: use \Drupal\Component\Utility\String::format() to embed
+   *   variables in the message text, not t(). If left blank, a default message
+   *   will be displayed.
    * @param $group
    *   (optional) The group this message is in, which is displayed in a column
    *   in test output. Use 'Debug' to indicate this is debugging output. Do not
@@ -322,9 +324,9 @@ abstract class TestBase {
     }
 
     $caller += array(
-      'function' => t('Unknown'),
+      'function' => 'Unknown',
       'line' => 0,
-      'file' => t('Unknown'),
+      'file' => 'Unknown',
     );
 
     $assertion = array(
@@ -411,8 +413,9 @@ abstract class TestBase {
    *   The value on which the assertion is to be done.
    * @param $message
    *   (optional) A message to display with the assertion. Do not translate
-   *   messages: use format_string() to embed variables in the message text, not
-   *   t(). If left blank, a default message will be displayed.
+   *   messages: use \Drupal\Component\Utility\String::format() to embed
+   *   variables in the message text, not t(). If left blank, a default message
+   *   will be displayed.
    * @param $group
    *   (optional) The group this message is in, which is displayed in a column
    *   in test output. Use 'Debug' to indicate this is debugging output. Do not
@@ -423,7 +426,7 @@ abstract class TestBase {
    *   TRUE if the assertion succeeded, FALSE otherwise.
    */
   protected function assertTrue($value, $message = '', $group = 'Other') {
-    return $this->assert((bool) $value, $message ? $message : t('Value @value is TRUE.', array('@value' => var_export($value, TRUE))), $group);
+    return $this->assert((bool) $value, $message ? $message : String::format('Value @value is TRUE.', array('@value' => var_export($value, TRUE))), $group);
   }
 
   /**
@@ -435,8 +438,9 @@ abstract class TestBase {
    *   The value on which the assertion is to be done.
    * @param $message
    *   (optional) A message to display with the assertion. Do not translate
-   *   messages: use format_string() to embed variables in the message text, not
-   *   t(). If left blank, a default message will be displayed.
+   *   messages: use \Drupal\Component\Utility\String::format() to embed
+   *   variables in the message text, not t(). If left blank, a default message
+   *   will be displayed.
    * @param $group
    *   (optional) The group this message is in, which is displayed in a column
    *   in test output. Use 'Debug' to indicate this is debugging output. Do not
@@ -447,7 +451,7 @@ abstract class TestBase {
    *   TRUE if the assertion succeeded, FALSE otherwise.
    */
   protected function assertFalse($value, $message = '', $group = 'Other') {
-    return $this->assert(!$value, $message ? $message : t('Value @value is FALSE.', array('@value' => var_export($value, TRUE))), $group);
+    return $this->assert(!$value, $message ? $message : String::format('Value @value is FALSE.', array('@value' => var_export($value, TRUE))), $group);
   }
 
   /**
@@ -457,8 +461,9 @@ abstract class TestBase {
    *   The value on which the assertion is to be done.
    * @param $message
    *   (optional) A message to display with the assertion. Do not translate
-   *   messages: use format_string() to embed variables in the message text, not
-   *   t(). If left blank, a default message will be displayed.
+   *   messages: use \Drupal\Component\Utility\String::format() to embed
+   *   variables in the message text, not t(). If left blank, a default message
+   *   will be displayed.
    * @param $group
    *   (optional) The group this message is in, which is displayed in a column
    *   in test output. Use 'Debug' to indicate this is debugging output. Do not
@@ -469,7 +474,7 @@ abstract class TestBase {
    *   TRUE if the assertion succeeded, FALSE otherwise.
    */
   protected function assertNull($value, $message = '', $group = 'Other') {
-    return $this->assert(!isset($value), $message ? $message : t('Value @value is NULL.', array('@value' => var_export($value, TRUE))), $group);
+    return $this->assert(!isset($value), $message ? $message : String::format('Value @value is NULL.', array('@value' => var_export($value, TRUE))), $group);
   }
 
   /**
@@ -479,8 +484,9 @@ abstract class TestBase {
    *   The value on which the assertion is to be done.
    * @param $message
    *   (optional) A message to display with the assertion. Do not translate
-   *   messages: use format_string() to embed variables in the message text, not
-   *   t(). If left blank, a default message will be displayed.
+   *   messages: use \Drupal\Component\Utility\String::format() to embed
+   *   variables in the message text, not t(). If left blank, a default message
+   *   will be displayed.
    * @param $group
    *   (optional) The group this message is in, which is displayed in a column
    *   in test output. Use 'Debug' to indicate this is debugging output. Do not
@@ -491,7 +497,7 @@ abstract class TestBase {
    *   TRUE if the assertion succeeded, FALSE otherwise.
    */
   protected function assertNotNull($value, $message = '', $group = 'Other') {
-    return $this->assert(isset($value), $message ? $message : t('Value @value is not NULL.', array('@value' => var_export($value, TRUE))), $group);
+    return $this->assert(isset($value), $message ? $message : String::format('Value @value is not NULL.', array('@value' => var_export($value, TRUE))), $group);
   }
 
   /**
@@ -503,8 +509,9 @@ abstract class TestBase {
    *   The second value to check.
    * @param $message
    *   (optional) A message to display with the assertion. Do not translate
-   *   messages: use format_string() to embed variables in the message text, not
-   *   t(). If left blank, a default message will be displayed.
+   *   messages: use \Drupal\Component\Utility\String::format() to embed
+   *   variables in the message text, not t(). If left blank, a default message
+   *   will be displayed.
    * @param $group
    *   (optional) The group this message is in, which is displayed in a column
    *   in test output. Use 'Debug' to indicate this is debugging output. Do not
@@ -515,7 +522,7 @@ abstract class TestBase {
    *   TRUE if the assertion succeeded, FALSE otherwise.
    */
   protected function assertEqual($first, $second, $message = '', $group = 'Other') {
-    return $this->assert($first == $second, $message ? $message : t('Value @first is equal to value @second.', array('@first' => var_export($first, TRUE), '@second' => var_export($second, TRUE))), $group);
+    return $this->assert($first == $second, $message ? $message : String::format('Value @first is equal to value @second.', array('@first' => var_export($first, TRUE), '@second' => var_export($second, TRUE))), $group);
   }
 
   /**
@@ -527,8 +534,9 @@ abstract class TestBase {
    *   The second value to check.
    * @param $message
    *   (optional) A message to display with the assertion. Do not translate
-   *   messages: use format_string() to embed variables in the message text, not
-   *   t(). If left blank, a default message will be displayed.
+   *   messages: use \Drupal\Component\Utility\String::format() to embed
+   *   variables in the message text, not t(). If left blank, a default message
+   *   will be displayed.
    * @param $group
    *   (optional) The group this message is in, which is displayed in a column
    *   in test output. Use 'Debug' to indicate this is debugging output. Do not
@@ -539,7 +547,7 @@ abstract class TestBase {
    *   TRUE if the assertion succeeded, FALSE otherwise.
    */
   protected function assertNotEqual($first, $second, $message = '', $group = 'Other') {
-    return $this->assert($first != $second, $message ? $message : t('Value @first is not equal to value @second.', array('@first' => var_export($first, TRUE), '@second' => var_export($second, TRUE))), $group);
+    return $this->assert($first != $second, $message ? $message : String::format('Value @first is not equal to value @second.', array('@first' => var_export($first, TRUE), '@second' => var_export($second, TRUE))), $group);
   }
 
   /**
@@ -551,8 +559,9 @@ abstract class TestBase {
    *   The second value to check.
    * @param $message
    *   (optional) A message to display with the assertion. Do not translate
-   *   messages: use format_string() to embed variables in the message text, not
-   *   t(). If left blank, a default message will be displayed.
+   *   messages: use \Drupal\Component\Utility\String::format() to embed
+   *   variables in the message text, not t(). If left blank, a default message
+   *   will be displayed.
    * @param $group
    *   (optional) The group this message is in, which is displayed in a column
    *   in test output. Use 'Debug' to indicate this is debugging output. Do not
@@ -563,7 +572,7 @@ abstract class TestBase {
    *   TRUE if the assertion succeeded, FALSE otherwise.
    */
   protected function assertIdentical($first, $second, $message = '', $group = 'Other') {
-    return $this->assert($first === $second, $message ? $message : t('Value @first is identical to value @second.', array('@first' => var_export($first, TRUE), '@second' => var_export($second, TRUE))), $group);
+    return $this->assert($first === $second, $message ? $message : String::format('Value @first is identical to value @second.', array('@first' => var_export($first, TRUE), '@second' => var_export($second, TRUE))), $group);
   }
 
   /**
@@ -575,8 +584,9 @@ abstract class TestBase {
    *   The second value to check.
    * @param $message
    *   (optional) A message to display with the assertion. Do not translate
-   *   messages: use format_string() to embed variables in the message text, not
-   *   t(). If left blank, a default message will be displayed.
+   *   messages: use \Drupal\Component\Utility\String::format() to embed
+   *   variables in the message text, not t(). If left blank, a default message
+   *   will be displayed.
    * @param $group
    *   (optional) The group this message is in, which is displayed in a column
    *   in test output. Use 'Debug' to indicate this is debugging output. Do not
@@ -587,7 +597,7 @@ abstract class TestBase {
    *   TRUE if the assertion succeeded, FALSE otherwise.
    */
   protected function assertNotIdentical($first, $second, $message = '', $group = 'Other') {
-    return $this->assert($first !== $second, $message ? $message : t('Value @first is not identical to value @second.', array('@first' => var_export($first, TRUE), '@second' => var_export($second, TRUE))), $group);
+    return $this->assert($first !== $second, $message ? $message : String::format('Value @first is not identical to value @second.', array('@first' => var_export($first, TRUE), '@second' => var_export($second, TRUE))), $group);
   }
 
   /**
@@ -599,8 +609,9 @@ abstract class TestBase {
    *   The second object to check.
    * @param $message
    *   (optional) A message to display with the assertion. Do not translate
-   *   messages: use format_string() to embed variables in the message text, not
-   *   t(). If left blank, a default message will be displayed.
+   *   messages: use \Drupal\Component\Utility\String::format() to embed
+   *   variables in the message text, not t(). If left blank, a default message
+   *   will be displayed.
    * @param $group
    *   (optional) The group this message is in, which is displayed in a column
    *   in test output. Use 'Debug' to indicate this is debugging output. Do not
@@ -611,7 +622,7 @@ abstract class TestBase {
    *   TRUE if the assertion succeeded, FALSE otherwise.
    */
   protected function assertIdenticalObject($object1, $object2, $message = '', $group = 'Other') {
-    $message = $message ?: format_string('!object1 is identical to !object2', array(
+    $message = $message ?: String::format('!object1 is identical to !object2', array(
       '!object1' => var_export($object1, TRUE),
       '!object2' => var_export($object2, TRUE),
     ));
@@ -642,8 +653,9 @@ abstract class TestBase {
    *
    * @param $message
    *   (optional) A message to display with the assertion. Do not translate
-   *   messages: use format_string() to embed variables in the message text, not
-   *   t(). If left blank, a default message will be displayed.
+   *   messages: use \Drupal\Component\Utility\String::format() to embed
+   *   variables in the message text, not t(). If left blank, a default message
+   *   will be displayed.
    * @param $group
    *   (optional) The group this message is in, which is displayed in a column
    *   in test output. Use 'Debug' to indicate this is debugging output. Do not
@@ -662,8 +674,9 @@ abstract class TestBase {
    *
    * @param $message
    *   (optional) A message to display with the assertion. Do not translate
-   *   messages: use format_string() to embed variables in the message text, not
-   *   t(). If left blank, a default message will be displayed.
+   *   messages: use \Drupal\Component\Utility\String::format() to embed
+   *   variables in the message text, not t(). If left blank, a default message
+   *   will be displayed.
    * @param $group
    *   (optional) The group this message is in, which is displayed in a column
    *   in test output. Use 'Debug' to indicate this is debugging output. Do not
@@ -682,8 +695,9 @@ abstract class TestBase {
    *
    * @param $message
    *   (optional) A message to display with the assertion. Do not translate
-   *   messages: use format_string() to embed variables in the message text, not
-   *   t(). If left blank, a default message will be displayed.
+   *   messages: use \Drupal\Component\Utility\String::format() to embed
+   *   variables in the message text, not t(). If left blank, a default message
+   *   will be displayed.
    * @param $group
    *   (optional) The group this message is in, which is displayed in a column
    *   in test output. Use 'Debug' to indicate this is debugging output. Do not
@@ -728,7 +742,7 @@ abstract class TestBase {
       $url = $this->verboseDirectoryUrl . '/' . $this->verboseClassName . '-' . $this->verboseId . '.html';
       // Not using l() to avoid invoking the theme system, so that unit tests
       // can use verbose() as well.
-      $url = '<a href="' . $url . '" target="_blank">' . t('Verbose message') . '</a>';
+      $url = '<a href="' . $url . '" target="_blank">Verbose message</a>';
       $this->error($url, 'User notice');
     }
     $this->verboseId++;
@@ -747,10 +761,22 @@ abstract class TestBase {
    *   methods during debugging.
    */
   public function run(array $methods = array()) {
+    $class = get_class($this);
+
+    if ($missing_requirements = $this->checkRequirements()) {
+      $object_info = new \ReflectionObject($this);
+      $caller = array(
+        'file' => $object_info->getFileName(),
+      );
+      foreach ($missing_requirements as $missing_requirement) {
+        TestBase::insertAssert($this->testId, $class, FALSE, $missing_requirement, 'Requirements check', $caller);
+      }
+      return;
+    }
+
     TestServiceProvider::$currentTest = $this;
     $simpletest_config = \Drupal::config('simpletest.settings');
 
-    $class = get_class($this);
     // Unless preset from run-tests.sh, retrieve the current verbose setting.
     if (!isset($this->verbose)) {
       $this->verbose = $simpletest_config->get('verbose');
@@ -777,85 +803,76 @@ abstract class TestBase {
     set_error_handler(array($this, 'errorHandler'));
     // Iterate through all the methods in this class, unless a specific list of
     // methods to run was passed.
-    $class_methods = get_class_methods($class);
+    $test_methods = array_filter(get_class_methods($class), function ($method) {
+      return strpos($method, 'test') === 0;
+    });
     if ($methods) {
-      $class_methods = array_intersect($class_methods, $methods);
+      $test_methods = array_intersect($test_methods, $methods);
     }
-    $missing_requirements = $this->checkRequirements();
-    if (!empty($missing_requirements)) {
-      $missing_requirements_object = new \ReflectionObject($this);
+    if (defined("$class::SORT_METHODS")) {
+      sort($test_methods);
+    }
+    foreach ($test_methods as $method) {
+      // Insert a fail record. This will be deleted on completion to ensure
+      // that testing completed.
+      $method_info = new \ReflectionMethod($class, $method);
       $caller = array(
-        'file' => $missing_requirements_object->getFileName(),
+        'file' => $method_info->getFileName(),
+        'line' => $method_info->getStartLine(),
+        'function' => $class . '->' . $method . '()',
       );
-      foreach ($missing_requirements as $missing_requirement) {
-        TestBase::insertAssert($this->testId, $class, FALSE, $missing_requirement, 'Requirements check.', $caller);
+      $test_completion_check_id = TestBase::insertAssert($this->testId, $class, FALSE, 'The test did not complete due to a fatal error.', 'Completion check', $caller);
+
+      try {
+        $this->prepareEnvironment();
       }
+      catch (\Exception $e) {
+        $this->exceptionHandler($e);
+        // The prepareEnvironment() method isolates the test from the parent
+        // Drupal site by creating a random database prefix and test site
+        // directory. If this fails, a test would possibly operate in the
+        // parent site. Therefore, the entire test run for this test class
+        // has to be aborted.
+        // restoreEnvironment() cannot be called, because we do not know
+        // where exactly the environment setup failed.
+        break;
+      }
+
+      try {
+        $this->setUp();
+      }
+      catch (\Exception $e) {
+        $this->exceptionHandler($e);
+        // Abort if setUp() fails, since all test methods will fail.
+        // But ensure to clean up and restore the environment, since
+        // prepareEnvironment() succeeded.
+        $this->restoreEnvironment();
+        break;
+      }
+      try {
+        $this->$method();
+      }
+      catch (\Exception $e) {
+        $this->exceptionHandler($e);
+      }
+      try {
+        $this->tearDown();
+      }
+      catch (\Exception $e) {
+        $this->exceptionHandler($e);
+        // If a test fails to tear down, abort the entire test class, since
+        // it is likely that all tests will fail in the same way and a
+        // failure here only results in additional test artifacts that have
+        // to be manually deleted.
+        $this->restoreEnvironment();
+        break;
+      }
+
+      $this->restoreEnvironment();
+      // Remove the test method completion check record.
+      TestBase::deleteAssert($test_completion_check_id);
     }
-    else {
-      if (defined("$class::SORT_METHODS")) {
-        sort($class_methods);
-      }
-      foreach ($class_methods as $method) {
-        // If the current method starts with "test", run it - it's a test.
-        if (strtolower(substr($method, 0, 4)) == 'test') {
-          // Insert a fail record. This will be deleted on completion to ensure
-          // that testing completed.
-          $method_info = new \ReflectionMethod($class, $method);
-          $caller = array(
-            'file' => $method_info->getFileName(),
-            'line' => $method_info->getStartLine(),
-            'function' => $class . '->' . $method . '()',
-          );
-          $completion_check_id = TestBase::insertAssert($this->testId, $class, FALSE, t('The test did not complete due to a fatal error.'), 'Completion check', $caller);
-          try {
-            $this->prepareEnvironment();
-          }
-          catch (\Exception $e) {
-            $this->exceptionHandler($e);
-            // The prepareEnvironment() method isolates the test from the parent
-            // Drupal site by creating a random database prefix and test site
-            // directory. If this fails, a test would possibly operate in the
-            // parent site. Therefore, the entire test run for this test class
-            // has to be aborted.
-            // restoreEnvironment() cannot be called, because we do not know
-            // where exactly the environment setup failed.
-            break;
-          }
-          try {
-            $this->setUp();
-          }
-          catch (\Exception $e) {
-            $this->exceptionHandler($e);
-            // Abort if setUp() fails, since all test methods will fail.
-            // But ensure to clean up and restore the environment, since
-            // prepareEnvironment() succeeded.
-            $this->restoreEnvironment();
-            break;
-          }
-          try {
-            $this->$method();
-          }
-          catch (\Exception $e) {
-            $this->exceptionHandler($e);
-          }
-          try {
-            $this->tearDown();
-          }
-          catch (\Exception $e) {
-            $this->exceptionHandler($e);
-            // If a test fails to tear down, abort the entire test class, since
-            // it is likely that all tests will fail in the same way and a
-            // failure here only results in additional test artifacts that have
-            // to be manually deleted.
-            $this->restoreEnvironment();
-            break;
-          }
-          $this->restoreEnvironment();
-          // Remove the completion check record.
-          TestBase::deleteAssert($completion_check_id);
-        }
-      }
-    }
+
     TestServiceProvider::$currentTest = NULL;
     // Clear out the error messages and restore error handler.
     drupal_get_messages();
@@ -884,9 +901,14 @@ abstract class TestBase {
    * @see drupal_valid_test_ua()
    */
   private function prepareDatabasePrefix() {
-    $suffix = mt_rand(1000, 1000000);
-    $this->siteDirectory = 'sites/simpletest/' . $suffix;
-    $this->databasePrefix = 'simpletest' . $suffix;
+    // Ensure that the generated test site directory does not exist already,
+    // which may happen with a large amount of concurrent threads and
+    // long-running tests.
+    do {
+      $suffix = mt_rand(100000, 999999);
+      $this->siteDirectory = 'sites/simpletest/' . $suffix;
+      $this->databasePrefix = 'simpletest' . $suffix;
+    } while (is_dir(DRUPAL_ROOT . '/' . $this->siteDirectory));
 
     // As soon as the database prefix is set, the test might start to execute.
     // All assertions as well as the SimpleTest batch operations are associated
@@ -954,7 +976,7 @@ abstract class TestBase {
     // Create the database prefix for this test.
     $this->prepareDatabasePrefix();
 
-    $language_interface = language(Language::TYPE_INTERFACE);
+    $language_interface = \Drupal::languageManager()->getCurrentLanguage();
 
     // When running the test runner within a test, back up the original database
     // prefix.
@@ -963,6 +985,7 @@ abstract class TestBase {
     }
 
     // Backup current in-memory configuration.
+    $this->originalSite = conf_path();
     $this->originalSettings = settings()->getAll();
     $this->originalConfig = $GLOBALS['config'];
 
@@ -1022,12 +1045,7 @@ abstract class TestBase {
       stream_wrapper_unregister($scheme);
     }
 
-    // Reset statics before the old container is replaced so that objects with a
-    // __destruct() method still have access to it.
-    // All static variables need to be reset before the database prefix is
-    // changed, since \Drupal\Core\Utility\CacheArray implementations attempt to
-    // write back to persistent caches when they are destructed.
-    // @todo: Remove once they have been converted to services.
+    // Reset statics.
     drupal_static_reset();
 
     // Reset and create a new service container.
@@ -1061,9 +1079,6 @@ abstract class TestBase {
     ini_set('error_log', DRUPAL_ROOT . '/' . $this->siteDirectory . '/error.log');
 
     // Change the database prefix.
-    // All static variables need to be reset before the database prefix is
-    // changed, since \Drupal\Core\Utility\CacheArray implementations attempt to
-    // write back to persistent caches when they are destructed.
     $this->changeDatabasePrefix();
 
     // Remove all configuration overrides.
@@ -1138,10 +1153,14 @@ abstract class TestBase {
       $captured_emails = $state->get('system.test_mail_collector') ?: array();
       $emailCount = count($captured_emails);
       if ($emailCount) {
-        $message = format_plural($emailCount, '1 e-mail was sent during this test.', '@count e-mails were sent during this test.');
-        $this->pass($message, t('E-mail'));
+        $message = $emailCount == 1 ? '1 e-mail was sent during this test.' : $emailCount . ' e-mails were sent during this test.';
+        $this->pass($message, 'E-mail');
       }
     }
+
+    // Sleep for 50ms to allow shutdown functions and terminate events to
+    // complete. Further information: https://drupal.org/node/2194357.
+    usleep(50000);
 
     // Remove all prefixed tables.
     // @todo Connection prefix info is not normalized into an array.
@@ -1266,7 +1285,7 @@ abstract class TestBase {
     // message through \Drupal\Component\Utility\String::checkPlain().
     $decoded_exception = Error::decodeException($exception);
     unset($decoded_exception['backtrace']);
-    $message = format_string('%type: !message in %function (line %line of %file). <pre class="backtrace">!backtrace</pre>', $decoded_exception + array(
+    $message = String::format('%type: !message in %function (line %line of %file). <pre class="backtrace">!backtrace</pre>', $decoded_exception + array(
       '!backtrace' => Error::formatBacktrace($verbose_backtrace),
     ));
     $this->error($message, 'Uncaught exception', Error::getLastCaller($backtrace));
@@ -1326,7 +1345,9 @@ abstract class TestBase {
     }
 
     // Starting with a space means that length might not be what is expected.
-    if (preg_match('/^\s/', $string)) {
+    // Starting with an @ sign causes CURL to fail if used in conjunction with a
+    // file upload, see https://drupal.org/node/2174997.
+    if (preg_match('/^(\s|@)/', $string)) {
       return FALSE;
     }
 

@@ -8,7 +8,7 @@
 namespace Drupal\block;
 
 use Drupal\Core\Cache\Cache;
-use Drupal\Core\Config\ConfigFactory;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityFormController;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Entity\Query\QueryFactory;
@@ -53,7 +53,7 @@ class BlockFormController extends EntityFormController {
   /**
    * The config factory.
    *
-   * @var \Drupal\Core\Config\ConfigFactory
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
    */
   protected $configFactory;
 
@@ -66,10 +66,10 @@ class BlockFormController extends EntityFormController {
    *   The entity query factory.
    * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    *   The language manager.
-   * @param \Drupal\Core\Config\ConfigFactory $config_factory
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory.
    */
-  public function __construct(EntityManagerInterface $entity_manager, QueryFactory $entity_query_factory, LanguageManagerInterface $language_manager, ConfigFactory $config_factory) {
+  public function __construct(EntityManagerInterface $entity_manager, QueryFactory $entity_query_factory, LanguageManagerInterface $language_manager, ConfigFactoryInterface $config_factory) {
     $this->storageController = $entity_manager->getStorageController('block');
     $this->entityQueryFactory = $entity_query_factory;
     $this->languageManager = $language_manager;
@@ -93,6 +93,13 @@ class BlockFormController extends EntityFormController {
    */
   public function form(array $form, array &$form_state) {
     $entity = $this->entity;
+
+    // Store theme settings in $form_state for use below.
+    if (!$theme = $entity->get('theme')) {
+      $theme = $this->configFactory->get('system.theme')->get('default');
+    }
+    $form_state['block_theme'] = $theme;
+
     $form['#tree'] = TRUE;
     $form['settings'] = $entity->getPlugin()->buildConfigurationForm(array(), $form_state);
 
@@ -127,7 +134,6 @@ class BlockFormController extends EntityFormController {
     $form['visibility']['path'] = array(
       '#type' => 'details',
       '#title' => $this->t('Pages'),
-      '#collapsed' => TRUE,
       '#group' => 'visibility',
       '#weight' => 0,
     );
@@ -183,7 +189,6 @@ class BlockFormController extends EntityFormController {
       $form['visibility']['language'] = array(
         '#type' => 'details',
         '#title' => $this->t('Languages'),
-        '#collapsed' => TRUE,
         '#group' => 'visibility',
         '#weight' => 5,
       );
@@ -216,7 +221,6 @@ class BlockFormController extends EntityFormController {
     $form['visibility']['role'] = array(
       '#type' => 'details',
       '#title' => $this->t('Roles'),
-      '#collapsed' => TRUE,
       '#group' => 'visibility',
       '#weight' => 10,
     );
@@ -229,10 +233,10 @@ class BlockFormController extends EntityFormController {
     );
 
     // Theme settings.
-    if ($theme = $entity->get('theme')) {
+    if ($entity->get('theme')) {
       $form['theme'] = array(
         '#type' => 'value',
-        '#value' => $entity->get('theme'),
+        '#value' => $theme,
       );
     }
     else {
@@ -242,7 +246,6 @@ class BlockFormController extends EntityFormController {
           $theme_options[$theme_name] = $theme_info->info['name'];
         }
       }
-      $theme = $this->configFactory->get('system.theme')->get('default');
       $form['theme'] = array(
         '#type' => 'select',
         '#options' => $theme_options,
@@ -254,6 +257,7 @@ class BlockFormController extends EntityFormController {
         ),
       );
     }
+
     // Region settings.
     $form['region'] = array(
       '#type' => 'select',

@@ -9,6 +9,7 @@ namespace Drupal\taxonomy\Entity;
 
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\FieldDefinition;
 use Drupal\Core\Language\Language;
 use Drupal\Core\TypedData\DataDefinition;
@@ -17,7 +18,7 @@ use Drupal\taxonomy\TermInterface;
 /**
  * Defines the taxonomy term entity.
  *
- * @EntityType(
+ * @ContentEntityType(
  *   id = "taxonomy_term",
  *   label = @Translation("Taxonomy term"),
  *   bundle_label = @Translation("Vocabulary"),
@@ -197,7 +198,7 @@ class Term extends ContentEntityBase implements TermInterface {
   /**
    * {@inheritdoc}
    */
-  public static function baseFieldDefinitions($entity_type) {
+  public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields['tid'] = FieldDefinition::create('integer')
       ->setLabel(t('Term ID'))
       ->setDescription(t('The term ID.'))
@@ -208,11 +209,10 @@ class Term extends ContentEntityBase implements TermInterface {
       ->setDescription(t('The term UUID.'))
       ->setReadOnly(TRUE);
 
-    // @todo Convert this to an entity_reference field, see
-    //   https://drupal.org/node/2181593
-    $fields['vid'] = FieldDefinition::create('string')
-      ->setLabel(t('Vocabulary ID'))
-      ->setDescription(t('The ID of the vocabulary to which the term is assigned.'));
+    $fields['vid'] = FieldDefinition::create('entity_reference')
+      ->setLabel(t('Vocabulary'))
+      ->setDescription(t('The vocabulary to which the term is assigned.'))
+      ->setSetting('target_type', 'taxonomy_vocabulary');
 
     $fields['langcode'] = FieldDefinition::create('language')
       ->setLabel(t('Language code'))

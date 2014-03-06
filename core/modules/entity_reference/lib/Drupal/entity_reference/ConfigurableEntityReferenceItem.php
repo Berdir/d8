@@ -8,12 +8,12 @@
 namespace Drupal\entity_reference;
 
 use Drupal\Component\Utility\String;
+use Drupal\Core\Field\ConfigFieldItemInterface;
+use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\TypedData\AllowedValuesInterface;
 use Drupal\Core\TypedData\DataDefinition;
-use Drupal\Core\Field\FieldDefinitionInterface;
-use Drupal\Core\Field\ConfigEntityReferenceItemBase;
-use Drupal\Core\Field\ConfigFieldItemInterface;
 use Drupal\Core\Validation\Plugin\Validation\Constraint\AllowedValuesConstraint;
 
 /**
@@ -26,9 +26,8 @@ use Drupal\Core\Validation\Plugin\Validation\Constraint\AllowedValuesConstraint;
  *  - target_type: The entity type to reference.
  *
  * @see entity_reference_field_info_alter().
- *
  */
-class ConfigurableEntityReferenceItem extends ConfigEntityReferenceItemBase implements ConfigFieldItemInterface, AllowedValuesInterface {
+class ConfigurableEntityReferenceItem extends EntityReferenceItem implements ConfigFieldItemInterface, AllowedValuesInterface {
 
   /**
    * {@inheritdoc}
@@ -48,7 +47,7 @@ class ConfigurableEntityReferenceItem extends ConfigEntityReferenceItemBase impl
    * {@inheritdoc}
    */
   public function getSettableValues(AccountInterface $account = NULL) {
-    // Flatten options firstly, because Settable Options may contain group
+    // Flatten options first, because "settable options" may contain group
     // arrays.
     $flatten_options = \Drupal::formBuilder()->flattenOptions($this->getSettableOptions($account));
     return array_keys($flatten_options);
@@ -77,40 +76,25 @@ class ConfigurableEntityReferenceItem extends ConfigEntityReferenceItemBase impl
   }
 
   /**
-   * Definitions of the contained properties.
-   *
-   * @see ConfigurableEntityReferenceItem::getPropertyDefinitions()
-   *
-   * @var array
-   */
-  static $propertyDefinitions;
-
-  /**
    * {@inheritdoc}
    */
-  public function getPropertyDefinitions() {
-    $settings = $this->definition->getSettings();
+  public static function propertyDefinitions(FieldDefinitionInterface $field_definition) {
+    $settings = $field_definition->getSettings();
     $target_type = $settings['target_type'];
 
-    // Definitions vary by entity type and bundle, so key them accordingly.
-    $key = $target_type . ':';
-    $key .= isset($settings['target_bundle']) ? $settings['target_bundle'] : '';
+    // Call the parent to define the target_id and entity properties.
+    $properties = parent::propertyDefinitions($field_definition);
 
-    if (!isset(static::$propertyDefinitions[$key])) {
-      // Call the parent to define the target_id and entity properties.
-      parent::getPropertyDefinitions();
-
-      // Only add the revision ID property if the target entity type supports
-      // revisions.
-      $target_type_info = \Drupal::entityManager()->getDefinition($target_type);
-      if ($target_type_info->hasKey('revision') && $target_type_info->getRevisionTable()) {
-        static::$propertyDefinitions[$key]['revision_id'] = DataDefinition::create('integer')
-          ->setLabel(t('Revision ID'))
-          ->setConstraints(array('Range' => array('min' => 0)));
-      }
+    // Only add the revision ID property if the target entity type supports
+    // revisions.
+    $target_type_info = \Drupal::entityManager()->getDefinition($target_type);
+    if ($target_type_info->hasKey('revision') && $target_type_info->getRevisionTable()) {
+      $properties['revision_id'] = DataDefinition::create('integer')
+        ->setLabel(t('Revision ID'))
+        ->setConstraints(array('Range' => array('min' => 0)));
     }
 
-    return static::$propertyDefinitions[$key];
+    return $properties;
   }
 
   /**
@@ -159,7 +143,7 @@ class ConfigurableEntityReferenceItem extends ConfigEntityReferenceItemBase impl
       '#type' => 'select',
       '#title' => t('Type of item to reference'),
       '#options' => \Drupal::entityManager()->getEntityTypeLabels(),
-      '#default_value' => $this->getFieldSetting('target_type'),
+      '#default_value' => $this->getSetting('target_type'),
       '#required' => TRUE,
       '#disabled' => $has_data,
       '#size' => 1,
@@ -175,7 +159,7 @@ class ConfigurableEntityReferenceItem extends ConfigEntityReferenceItemBase impl
     $instance = $form_state['instance'];
 
     // Get all selection plugins for this entity type.
-    $selection_plugins = \Drupal::service('plugin.manager.entity_reference.selection')->getSelectionGroups($this->getFieldSetting('target_type'));
+    $selection_plugins = \Drupal::service('plugin.manager.entity_reference.selection')->getSelectionGroups($this->getSetting('target_type'));
     $handler_groups = array_keys($selection_plugins);
 
     $handlers = \Drupal::service('plugin.manager.entity_reference.selection')->getDefinitions();
@@ -202,6 +186,7 @@ class ConfigurableEntityReferenceItem extends ConfigEntityReferenceItemBase impl
     $form['handler'] = array(
       '#type' => 'details',
       '#title' => t('Reference type'),
+      '#open' => TRUE,
       '#tree' => TRUE,
       '#process' => array('_entity_reference_form_process_merge_parent'),
     );

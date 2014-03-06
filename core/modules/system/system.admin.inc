@@ -30,12 +30,6 @@ function system_theme_default() {
         ->set('default', $theme)
         ->save();
 
-      // Rebuild the menu. This duplicates the menu_router_rebuild() in
-      // theme_enable(). However, modules must know the current default theme in
-      // order to use this information in hook_menu() or hook_menu_alter()
-      // implementations, and saving the configuration before the theme_enable()
-      // could result in a race condition where the theme is default but not
-      // enabled.
       \Drupal::service('router.builder')->setRebuildNeeded();
 
       // The status message depends on whether an admin theme is currently in use:
@@ -125,36 +119,36 @@ function theme_admin_block($variables) {
 }
 
 /**
- * Returns HTML for the content of an administrative block.
+ * Prepares variables for administrative content block templates.
+ *
+ * Default template: admin-block-content.html.twig.
  *
  * @param $variables
  *   An associative array containing:
  *   - content: An array containing information about the block. Each element
  *     of the array represents an administrative menu item, and must at least
- *     contain the keys 'title', 'href', and 'localized_options', which are
+ *     contain the keys 'title', 'link_path', and 'localized_options', which are
  *     passed to l(). A 'description' key may also be provided.
  *
  * @ingroup themeable
  */
-function theme_admin_block_content($variables) {
-  $content = $variables['content'];
-  $output = '';
-
-  if (!empty($content)) {
-    $class = 'admin-list';
-    if ($compact = system_admin_compact_mode()) {
-      $class .= ' compact';
+function template_preprocess_admin_block_content(&$variables) {
+  if (!empty($variables['content'])) {
+    $compact = system_admin_compact_mode();
+    $variables['attributes'] = array('class' => array('admin-list'));
+    if ($compact) {
+      $variables['attributes']['class'][] = 'compact';
     }
-    $output .= '<dl class="' . $class . '">';
-    foreach ($content as $item) {
-      $output .= '<dt>' . l($item['title'], $item['link_path'], $item['localized_options']) . '</dt>';
+    foreach ($variables['content'] as $key => $item) {
+      $variables['content'][$key]['link'] = l($item['title'], $item['link_path'], $item['localized_options']);
       if (!$compact && isset($item['description'])) {
-        $output .= '<dd>' . filter_xss_admin($item['description']) . '</dd>';
+        $variables['content'][$key]['description'] = filter_xss_admin($item['description']);
+      }
+      else {
+        $variables['content'][$key]['description'] = FALSE;
       }
     }
-    $output .= '</dl>';
   }
-  return $output;
 }
 
 /**
@@ -391,7 +385,6 @@ function theme_system_modules_details($variables) {
       '#title' => '<span class="text"> ' . drupal_render($module['description']) . '</span>',
       '#attributes' => array('id' => $module['enable']['#id'] . '-description'),
       '#description' => $description,
-      '#collapsed' => TRUE,
     );
     $col4 = drupal_render($details);
     $row[] = array('class' => array('description', 'expand'), 'data' => $col4);

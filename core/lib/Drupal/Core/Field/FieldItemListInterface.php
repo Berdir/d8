@@ -61,6 +61,25 @@ interface FieldItemListInterface extends ListInterface, AccessibleInterface {
   public function getFieldDefinition();
 
   /**
+   * Returns the array of field settings.
+   *
+   * @return array
+   *   An array of key/value pairs.
+   */
+  public function getSettings();
+
+  /**
+   * Returns the value of a given field setting.
+   *
+   * @param string $setting_name
+   *   The setting name.
+   *
+   * @return mixed
+   *   The setting value.
+   */
+  public function getSetting($setting_name);
+
+  /**
    * Contains the default access logic of this field.
    *
    * See \Drupal\Core\Entity\EntityAccessHandlerInterface::fieldAccess() for
@@ -105,20 +124,6 @@ interface FieldItemListInterface extends ListInterface, AccessibleInterface {
   public function __unset($property_name);
 
   /**
-   * Gets the definition of a property of the first field item.
-   *
-   * @see \Drupal\Core\Field\FieldItemInterface::getPropertyDefinition()
-   */
-  public function getPropertyDefinition($name);
-
-  /**
-   * Gets an array of property definitions of the first field item.
-   *
-   * @see \Drupal\Core\Field\FieldItemInterface::getPropertyDefinitions()
-   */
-  public function getPropertyDefinitions();
-
-  /**
    * Defines custom presave behavior for field values.
    *
    * This method is called before either insert() or update() methods, and
@@ -158,5 +163,20 @@ interface FieldItemListInterface extends ListInterface, AccessibleInterface {
    * called for entity types that support revisioning.
    */
   public function deleteRevision();
+
+  /**
+   * Returns a renderable array for the field items.
+   *
+   * @param array $display_options
+   *   Can be either the name of a view mode, or an array of display settings.
+   *   See EntityViewBuilderInterface::viewField() for more information.
+   *
+   * @return array
+   *   A renderable array for the field values.
+   *
+   * @see \Drupal\Core\Entity\EntityViewBuilderInterface::viewField()
+   * @see \Drupal\Core\Field\FieldItemInterface::view()
+   */
+  public function view($display_options = array());
 
 }

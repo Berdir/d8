@@ -9,7 +9,7 @@ namespace Drupal\config_translation\Form;
 
 use Drupal\config_translation\ConfigMapperManagerInterface;
 use Drupal\Core\Config\Config;
-use Drupal\Core\Config\ConfigFactory;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\Schema\Element;
 use Drupal\Core\Config\TypedConfigManager;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -93,10 +93,10 @@ abstract class ConfigTranslationFormBase extends FormBase implements BaseFormIdI
    *   The translation storage object.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler to invoke the alter hook.
-   * @param \Drupal\Core\Config\ConfigFactory
+   * @param \Drupal\Core\Config\ConfigFactoryInterface
    *   The config factory.
    */
-  public function __construct(TypedConfigManager $typed_config_manager, ConfigMapperManagerInterface $config_mapper_manager, StringStorageInterface $locale_storage, ModuleHandlerInterface $module_handler, ConfigFactory $config_factory) {
+  public function __construct(TypedConfigManager $typed_config_manager, ConfigMapperManagerInterface $config_mapper_manager, StringStorageInterface $locale_storage, ModuleHandlerInterface $module_handler, ConfigFactoryInterface $config_factory) {
     $this->typedConfigManager = $typed_config_manager;
     $this->configMapperManager = $config_mapper_manager;
     $this->localeStorage = $locale_storage;
@@ -264,7 +264,7 @@ abstract class ConfigTranslationFormBase extends FormBase implements BaseFormIdI
     foreach ($schema as $key => $element) {
       // Make the specific element key, "$base_key.$key".
       $element_key = implode('.', array_filter(array($base_key, $key)));
-      $definition = $element->getDefinition() + array('label' => $this->t('N/A'));
+      $definition = $element->getDataDefinition() + array('label' => $this->t('N/A'));
       if ($element instanceof Element) {
         // Build sub-structure and include it with a wrapper in the form
         // if there are any translatable elements there.
@@ -293,13 +293,12 @@ abstract class ConfigTranslationFormBase extends FormBase implements BaseFormIdI
           $build[$key] = array(
             '#type' => 'details',
             '#title' => (!empty($title) ? (strip_tags($title) . ' ') : '') . $this->t($definition['label']),
-            '#collapsible' => TRUE,
-            '#collapsed' => $collapsed,
+            '#open' => !$collapsed,
           ) + $sub_build;
         }
       }
       else {
-        $definition = $element->getDefinition();
+        $definition = $element->getDataDefinition();
 
         // Invoke hook_config_translation_type_info_alter() implementations to
         // alter the configuration types.
