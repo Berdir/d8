@@ -38,6 +38,7 @@ class MigrateNodeTest extends MigrateNodeTestBase {
 
     // This is required for the second import below.
     db_truncate($migration->getIdMap()->mapTableName())->execute();
+    $this->standalone = TRUE;
   }
 
   /**
@@ -54,6 +55,11 @@ class MigrateNodeTest extends MigrateNodeTestBase {
     $this->assertEqual($node->isSticky(), FALSE);
     $this->assertEqual($node->getOwnerId(), 1);
     //$this->assertEqual($node->getRevisionCreationTime(), 1390095701, 'Node has the correct revision timestamp.');
+
+    // It is pointless to run the second half from MigrateDrupal6Test.
+    if (empty($this->standalone)) {
+      return;
+    }
 
     // Test that we can re-import using the EntityContentBase destination.
     $connection = Database::getConnection('default', 'migrate');
