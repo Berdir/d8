@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Plugin\migrate\destination\EntityDisplayBase.
+ * Contains \Drupal\migrate\Plugin\migrate\destination\ComponentEntityDisplayBase.
  */
 
 namespace Drupal\migrate\Plugin\migrate\destination;
@@ -55,7 +55,17 @@ abstract class ComponentEntityDisplayBase extends DestinationBase {
   }
 
   /**
+   * Get the entity.
+   *
+   * @param string $entity_type
+   *   The entity type to retrieve.
+   * @param string $bundle
+   *   The entity bundle.
+   * @param string $mode
+   *   The display mode.
+   *
    * @return \Drupal\Core\Entity\Display\EntityDisplayInterface
+   *   The entity display object.
    */
   protected abstract function getEntity($entity_type, $bundle, $mode);
 

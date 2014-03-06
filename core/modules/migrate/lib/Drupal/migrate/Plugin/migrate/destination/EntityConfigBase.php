@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Plugin\migrate\destination\EntityBaseConfig.
+ * Contains \Drupal\migrate\Plugin\migrate\destination\EntityConfigBase.
  */
 
 namespace Drupal\migrate\Plugin\migrate\destination;
@@ -62,8 +62,10 @@ class EntityConfigBase extends Entity {
   /**
    * Updates an entity with the contents of a row.
    *
-   * @param EntityInterface $entity
-   * @param Row $row
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity to update.
+   * @param \Drupal\migrate\Row $row
+   *   The row object to update from.
    */
   protected function updateEntity(EntityInterface $entity, Row $row) {
     foreach ($row->getRawDestination() as $property => $value) {
@@ -74,9 +76,12 @@ class EntityConfigBase extends Entity {
   /**
    * Updates a (possible nested) entity property with a value.
    *
-   * @param \Drupal\Core\Config\Entity\ConfigEntityInterface $entity
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The config entity.
    * @param array $parents
-   * @param $value
+   *   The array of parents.
+   * @param string|object $value
+   *   The value to update to.
    */
   protected function updateEntityProperty(EntityInterface $entity, array $parents, $value) {
     $top_key = array_shift($parents);

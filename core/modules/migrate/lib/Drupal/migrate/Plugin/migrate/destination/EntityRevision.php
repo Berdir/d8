@@ -6,6 +6,7 @@
  */
 
 namespace Drupal\migrate\Plugin\migrate\destination;
+
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\migrate\MigrateException;
 use Drupal\migrate\Row;
@@ -26,6 +27,15 @@ class EntityRevision extends EntityContentBase {
     return substr($plugin_id, 16);
   }
 
+  /**
+   * Get the entity.
+   *
+   * @param \Drupal\migrate\Row $row
+   *   The row object.
+   *
+   * @return \Drupal\Core\Entity\EntityInterface|false
+   *   The entity or false if it can not be created.
+   */
   protected function getEntity(Row $row) {
     $revision_id = $row->getDestinationProperty($this->getKey('revision'));
     if (!empty($revision_id) && ($entity = $this->storageController->loadRevision($revision_id))) {
@@ -44,7 +54,7 @@ class EntityRevision extends EntityContentBase {
       $entity = $this->storageController->create($values);
       $entity->enforceIsNew(FALSE);
       $entity->setNewRevision(TRUE);
-     }
+    }
     $entity->isDefaultRevision(FALSE);
     return $entity;
   }
@@ -67,4 +77,5 @@ class EntityRevision extends EntityContentBase {
     }
     throw new MigrateException('This entity type does not support revisions.');
   }
+
 }

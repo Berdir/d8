@@ -60,27 +60,46 @@ abstract class DestinationBase extends PluginBase implements MigrateDestinationI
     // TODO: Implement preRollback() method.
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function postImport() {
     // TODO: Implement postImport() method.
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function postRollback() {
     // TODO: Implement postRollback() method.
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function rollbackMultiple(array $destination_identifiers) {
     // TODO: Implement rollbackMultiple() method.
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getCreated() {
     // TODO: Implement getCreated() method.
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getUpdated() {
     // TODO: Implement getUpdated() method.
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function resetStats() {
     // TODO: Implement resetStats() method.
   }
+
 }
