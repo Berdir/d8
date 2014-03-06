@@ -115,7 +115,7 @@ class MigrateDrupal6Test extends MigrateDrupalTestBase {
       $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6StatisticsSettings.php',
       $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6SyslogSettings.php',
       $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6SystemCron.php',
-      $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6SystemFile.php',
+      #$path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6SystemFile.php',
       $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6SystemFilter.php',
       $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6SystemImageGd.php',
       $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6SystemImage.php',

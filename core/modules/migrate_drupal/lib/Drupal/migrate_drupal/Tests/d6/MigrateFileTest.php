@@ -34,12 +34,12 @@ class MigrateFileTest extends MigrateDrupalTestBase {
   }
 
   /**
-   * Tests the Drupal 6 files to Drupal 8 migration.
+   * {@inheritdoc}
    */
-  public function testFiles() {
-    $path = drupal_get_path('module', 'migrate_drupal');
+  protected function setUp() {
+    parent::setUp();
     $dumps = array(
-      $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6File.php',
+      drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6File.php',
     );
     /** @var \Drupal\migrate\entity\Migration $migration */
     $migration = entity_load('migration', 'd6_file');
@@ -47,19 +47,29 @@ class MigrateFileTest extends MigrateDrupalTestBase {
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, $this);
     $executable->import();
+    $this->standalone = TRUE;
+  }
 
+  /**
+   * Tests the Drupal 6 files to Drupal 8 migration.
+   */
+  public function testFiles() {
     /** @var \Drupal\file\FileInterface $file */
     $file = entity_load('file', 1);
     $this->assertEqual($file->getFilename(), 'Image1.jpg');
     $this->assertEqual($file->getSize(), 1831);
     $this->assertEqual($file->getFileUri(), 'public://image-1.jpg');
     $this->assertEqual($file->getMimeType(), 'image/jpeg');
+    // It is pointless to run the second half from MigrateDrupal6Test.
+    if (empty($this->standalone)) {
+      return;
+    }
 
     // Test that we can re-import and also test with file_directory_path set.
-    db_truncate($migration->getIdMap()->mapTableName())->execute();
+    db_truncate(entity_load('migration', 'd6_file')->getIdMap()->mapTableName())->execute();
     $migration = entity_load_unchanged('migration', 'd6_file');
     $dumps = array(
-      $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6SystemFile.php',
+      drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6SystemFile.php',
     );
     $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, $this);
