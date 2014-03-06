@@ -129,7 +129,7 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
   protected $isDefaultRevision = TRUE;
 
   /**
-   * Indicates whether this is an editable revision.
+   * Indicates whether the revision id should be kept on new revisions.
    *
    * @var bool
    */
