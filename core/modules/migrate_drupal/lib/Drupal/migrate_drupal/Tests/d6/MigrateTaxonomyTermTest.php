@@ -36,9 +36,9 @@ class MigrateTaxonomyTermTest extends MigrateDrupalTestBase {
     parent::setUp();
     $this->prepareIdMappings(array(
       'd6_taxonomy_vocabulary' => array(
-        array(array(1), array(1)),
-        array(array(2), array(2)),
-        array(array(3), array(3)),
+        array(array(1), array('vocabulary_1_i_0_')),
+        array(array(2), array('vocabulary_2_i_1_')),
+        array(array(3), array('vocabulary_3_i_2_')),
     )));
     /** @var \Drupal\migrate\entity\Migration $migration */
     $migration = entity_load('migration', 'd6_taxonomy_term');
@@ -58,29 +58,29 @@ class MigrateTaxonomyTermTest extends MigrateDrupalTestBase {
   public function testTaxonomyTerms() {
     $expected_results = array(
       '1' => array(
-        'vid' => 1,
+        'vid' => 'vocabulary_1_i_0_',
         'weight' => 0,
       ),
       '2' => array(
-        'vid' => 2,
+        'vid' => 'vocabulary_2_i_1_',
         'weight' => 3,
       ),
       '3' => array(
-        'vid' => 2,
+        'vid' => 'vocabulary_2_i_1_',
         'weight' => 4,
         'parent' => array(2),
       ),
       '4' => array(
-        'vid' => 3,
+        'vid' => 'vocabulary_3_i_2_',
         'weight' => 6,
       ),
       '5' => array(
-        'vid' => 3,
+        'vid' => 'vocabulary_3_i_2_',
         'weight' => 7,
         'parent' => array(4),
       ),
       '6' => array(
-        'vid' => 3,
+        'vid' => 'vocabulary_3_i_2_',
         'weight' => 8,
         'parent' => array(4, 5),
       ),
