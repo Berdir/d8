@@ -162,38 +162,47 @@ process:
             scale: 0
             decimal_separator: .
             thousand_separator: ','
+            prefix_suffix: true
           us_1:
             scale: 1
             decimal_separator: .
             thousand_separator: ','
+            prefix_suffix: true
           us_2:
             scale: 2
             decimal_separator: .
             thousand_separator: ','
+            prefix_suffix: true
           be_0:
             scale: 0
             decimal_separator: ','
             thousand_separator: .
+            prefix_suffix: true
           be_1:
             scale: 1
             decimal_separator: ','
             thousand_separator: .
+            prefix_suffix: true
           be_2:
             scale: 2
             decimal_separator: ','
             thousand_separator: .
+            prefix_suffix: true
           fr_0:
             scale: 0
             decimal_separator: ','
             thousand_separator: ' '
+            prefix_suffix: true
           fr_1:
             scale: 1
             decimal_separator: ','
             thousand_separator: ' '
+            prefix_suffix: true
           fr_2:
             scale: 2
             decimal_separator: ','
             thousand_separator: ' '
+            prefix_suffix: true
         link:
           default:
             trim_length: '80'
@@ -262,6 +271,9 @@ process:
             format: medium
           short:
             format: short
+        text:
+          trimmed:
+            trim_length: 600
     -
       plugin: field_formatter_settings_defaults
 

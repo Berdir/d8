@@ -42,6 +42,9 @@ class MigrateFieldFormatterSettingsTest extends MigrateDrupalTestBase {
         array(array('teaser'), array('node', 'teaser')),
         array(array('full'), array('node', 'full')),
       ),
+      'd6_field_instance' => array(
+        array(array('fieldname', 'page'), array('node', 'fieldname', 'page')),
+      ),
     );
     $this->prepareIdMappings($id_mappings);
 
@@ -64,7 +67,7 @@ class MigrateFieldFormatterSettingsTest extends MigrateDrupalTestBase {
       'weight' => 1,
       'label' => 'above',
       'type' => 'text_trimmed',
-      'settings' => array(),
+      'settings' => array('trim_length' => 600),
     );
 
     // Make sure we don't have the excluded print entity display.
@@ -84,6 +87,7 @@ class MigrateFieldFormatterSettingsTest extends MigrateDrupalTestBase {
 
     // Test the full format with text_default which comes from a static map.
     $expected['type'] = 'text_default';
+    $expected['settings'] = array();
     $display = entity_load('entity_view_display', 'node.story.full');
     $this->assertEqual($display->getComponent($field_name), $expected);
 
@@ -99,21 +103,22 @@ class MigrateFieldFormatterSettingsTest extends MigrateDrupalTestBase {
       'scale' => 0,
       'decimal_separator' => '.',
       'thousand_separator' => ',',
+      'prefix_suffix' => TRUE,
     );
     $component = $display->getComponent('field_test_two');
-    $this->assertEqual($component, $expected, "node.story.full field_test_two has correct number settings.");
+    $this->assertEqual($component, $expected);
     $expected['weight'] = 3;
     $expected['type'] = 'number_decimal';
     $expected['settings']['scale'] = 2;
     $component = $display->getComponent('field_test_three');
-    $this->assertEqual($component, $expected, "node.story.full has field_test_three correct number settings.");
+    $this->assertEqual($component, $expected);
 
     // Test the email field formatter settings are correct.
     $expected['weight'] = 4;
     $expected['type'] = 'email_mailto';
     $expected['settings'] = array();
     $component = $display->getComponent('field_test_email');
-    $this->assertEqual($component, $expected, "node.story.full field_test_email has correct email settings.");
+    $this->assertEqual($component, $expected);
 
     // Test the link field formatter settings.
     $expected['weight'] = 5;
