@@ -30,12 +30,6 @@ class MigrateNodeTestBase extends MigrateDrupalTestBase {
         array(array(1), array('filtered_html')),
         array(array(2), array('full_html')),
       ),
-      'd6_node_body_field' => array(
-        array(array(''), array('node', 'body')),
-      ),
-      'd6_node_body_instance' => array(
-        array(array('page'), array('node', 'body', 'page')),
-      ),
     );
     $this->prepareIdMappings($id_mappings);
 

@@ -28,9 +28,6 @@ destination:
   plugin: entity:node
 dependencies:
   - d6_filter_format
-  - d6_node_type_entity_display
-  - d6_node_type_entity_form_display
-  - d6_node_body_instance
   - d6_field_instance_widget_settings: false
   - d6_field_formatter_settings: false
   - d6_node_settings: false
