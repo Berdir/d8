@@ -56,10 +56,10 @@ class MigrateFileTest extends MigrateDrupalTestBase {
   public function testFiles() {
     /** @var \Drupal\file\FileInterface $file */
     $file = entity_load('file', 1);
-    $this->assertEqual($file->getFilename(), 'Image1.jpg');
-    $this->assertEqual($file->getSize(), 1831);
-    $this->assertEqual($file->getFileUri(), 'public://image-1.jpg');
-    $this->assertEqual($file->getMimeType(), 'image/jpeg');
+    $this->assertEqual($file->getFilename(), 'Image1.png');
+    $this->assertEqual($file->getSize(), 39325);
+    $this->assertEqual($file->getFileUri(), 'public://image-1.png');
+    $this->assertEqual($file->getMimeType(), 'image/png');
     // It is pointless to run the second half from MigrateDrupal6Test.
     if (empty($this->standalone)) {
       return;
