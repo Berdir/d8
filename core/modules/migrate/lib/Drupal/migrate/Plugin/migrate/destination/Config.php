@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- *   Provides Configuration Management destination plugin.
+ * Provides Configuration Management destination plugin.
  */
 
 namespace Drupal\migrate\Plugin\migrate\destination;
@@ -30,16 +30,27 @@ class Config extends DestinationBase implements ContainerFactoryPluginInterface 
   protected $config;
 
   /**
+   * Constructs a Config destination object.
+   *
    * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
+   *   The plugin ID for the plugin instance.
    * @param array $plugin_definition
-   * @param ConfigObject $config
+   *   The plugin implementation definition.
+   * @param \Drupal\migrate\Entity\MigrationInterface $migration
+   *   The migration entity.
+   * @param \Drupal\Core\Config\Config $config
+   *   The configuration object.
    */
   public function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration, ConfigObject $config) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration);
     $this->config = $config;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration = NULL) {
     return new static(
       $configuration,
@@ -61,7 +72,10 @@ class Config extends DestinationBase implements ContainerFactoryPluginInterface 
   }
 
   /**
+   * Throw an exception because config can not be rolled back.
+   *
    * @param array $destination_keys
+   *   The array of destination ids to roll back.
    *
    * @throws \Drupal\migrate\MigrateException
    */
@@ -82,4 +96,5 @@ class Config extends DestinationBase implements ContainerFactoryPluginInterface 
   public function getIds() {
     return array();
   }
+
 }
