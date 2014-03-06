@@ -15,6 +15,6 @@ process:
   preview: constants.preview
   submitted: submitted
   options: options
-  create_body: constants.create_body
+  create_body: has_body
 destination:
   plugin: entity:node_type

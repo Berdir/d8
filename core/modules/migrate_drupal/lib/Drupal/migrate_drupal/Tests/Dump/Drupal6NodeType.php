@@ -57,7 +57,7 @@ class Drupal6NodeType extends Drupal6DumpBase {
         'help' => '',
         'has_title' => 1,
         'title_label' => 'Title',
-        'has_body' => 1,
+        'has_body' => 0,
         'body_label' => 'Body',
         'min_word_count' => 0,
         'custom' => 1,

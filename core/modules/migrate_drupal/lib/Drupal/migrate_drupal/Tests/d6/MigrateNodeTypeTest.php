@@ -65,8 +65,13 @@ class MigrateNodeTypeTest extends MigrateDrupalTestBase {
       'preview' => 1,
       'submitted' => TRUE,
     );
+
     $this->assertEqual($node_type_page->settings['node'], $expected, 'Node type test_page settings correct.');
     $this->assertEqual(array('test_page'), $migration->getIdMap()->lookupDestinationID(array('test_page')));
+
+    // Test we have a body field.
+    $instance = field_info_instance('node', 'body', 'test_page');
+    $this->assertEqual($instance->getLabel(), 'Body', 'Body field was found.');
 
     // Test the test_story content type.
     $node_type_story = entity_load('node_type', 'test_story');
@@ -83,5 +88,9 @@ class MigrateNodeTypeTest extends MigrateDrupalTestBase {
     );
     $this->assertEqual($node_type_page->settings['node'], $expected, 'Node type test_page settings correct.');
     $this->assertEqual(array('test_story'), $migration->getIdMap()->lookupDestinationID(array('test_story')));
+
+    // Test we don't have a body field.
+    $instance = field_info_instance('node', 'body', 'test_story');
+    $this->assertEqual($instance, NULL, 'No body field found');
   }
 }
