@@ -4,7 +4,6 @@ source:
   constants:
     entity_type: node
     parent: 0
-
 process:
   entity_type: constants.entity_type
   bundle: type

@@ -6,7 +6,6 @@ source:
     type: taxonomy_term_reference
     parent: 0
     cardinality: -1
-
 process:
   entity_type: constants.entity_type
   type: constants.type

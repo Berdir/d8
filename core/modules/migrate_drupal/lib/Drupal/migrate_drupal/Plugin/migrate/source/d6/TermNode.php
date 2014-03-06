@@ -33,7 +33,8 @@ class TermNode extends DrupalSqlBase implements SourceEntityInterface {
     $query = $this->select('term_node', 'tn')
       // @todo: working, but not is there support for distinct() in FakeSelect?
       ->distinct()
-      ->fields('tn', array('nid', 'vid'));
+      ->fields('tn', array('nid', 'vid'))
+      ->fields('n', array('type'));
     // Because this is an inner join it enforces the current revision.
     $query->innerJoin('node', 'n', static::JOIN);
     return $query;
