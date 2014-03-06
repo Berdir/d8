@@ -14,3 +14,5 @@ process:
 destination:
   plugin: entity:file
   source_path_property: picture
+dependencies:
+  - d6_file: false

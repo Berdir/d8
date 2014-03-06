@@ -72,20 +72,20 @@ class MigrateFieldFormatterSettingsTest extends MigrateDrupalTestBase {
     $this->assertNull($display, "Print entity display not found.");
     // Can we load any entity display.
     $display = entity_load('entity_view_display', 'node.story.teaser');
-    $this->assertEqual($display->getComponent($field_name), $expected, "node.story.teaser formatter settings are the same.");
+    $this->assertEqual($display->getComponent($field_name), $expected);
 
     // Test migrate worked with multiple bundles.
     $display = entity_load('entity_view_display', 'node.article.teaser');
-    $this->assertEqual($display->getComponent($field_name), $expected, "node.article.teaser formatter settings are the same.");
+    $this->assertEqual($display->getComponent($field_name), $expected);
 
     // Test RSS because that has been converted from 4 to rss.
     $display = entity_load('entity_view_display', 'node.story.rss');
-    $this->assertEqual($display->getComponent($field_name), $expected, "node.story.rss, view mode converted to rss and settings are the same.");
+    $this->assertEqual($display->getComponent($field_name), $expected);
 
     // Test the full format with text_default which comes from a static map.
     $expected['type'] = 'text_default';
     $display = entity_load('entity_view_display', 'node.story.full');
-    $this->assertEqual($display->getComponent($field_name), $expected, "node.story.full formatter settings are the same.");
+    $this->assertEqual($display->getComponent($field_name), $expected);
 
     // Check that we can migrate multiple fields.
     $content = $display->get('content');
