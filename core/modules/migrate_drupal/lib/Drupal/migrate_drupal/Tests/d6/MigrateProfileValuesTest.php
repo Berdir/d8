@@ -100,18 +100,25 @@ class MigrateProfileValuesTest extends MigrateDrupalTestBase {
 
     // Create some users to migrate the profile data to.
     foreach (Drupal6User::getData('users') as $u) {
-      unset($u['uid']);
-      entity_create('user', $u)->save();
+      $user = entity_create('user', $u);
+      $user->enforceIsNew();
+      $user->save();
     }
     // Add some id mappings for the dependant migrations.
     $id_mappings = array(
       'd6_user_profile_field_instance' => array(
         array(array(1), array('user', 'user', 'fieldname')),
       ),
+      'd6_user_profile_entity_display' => array(
+        array(array(1), array('user', 'user', 'default', 'fieldname')),
+      ),
+      'd6_user_profile_entity_form_display' => array(
+        array(array(1), array('user', 'user', 'default', 'fieldname')),
+      ),
       'd6_user' => array(
-        array(array(2), array(1)),
-        array(array(8), array(2)),
-        array(array(15), array(3)),
+        array(array(2), array(2)),
+        array(array(8), array(8)),
+        array(array(15), array(15)),
       ),
     );
     $this->prepareIdMappings($id_mappings);
@@ -134,7 +141,7 @@ class MigrateProfileValuesTest extends MigrateDrupalTestBase {
    * Tests Drupal 6 profile values to Drupal 8 migration.
    */
   public function testUserProfileValues() {
-    $user = user_load(1);
+    $user = user_load(2);
     $this->assertFalse(is_null($user));
     $this->assertEqual($user->profile_color->value, 'red');
     $this->assertEqual($user->profile_biography->value, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam nulla sapien, congue nec risus ut, adipiscing aliquet felis. Maecenas quis justo vel nulla varius euismod. Quisque metus metus, cursus sit amet sem non, bibendum vehicula elit. Cras dui nisl, eleifend at iaculis vitae, lacinia ut felis. Nullam aliquam ligula volutpat nulla consectetur accumsan. Maecenas tincidunt molestie diam, a accumsan enim fringilla sit amet. Morbi a tincidunt tellus. Donec imperdiet scelerisque porta. Sed quis sem bibendum eros congue sodales. Vivamus vel fermentum est, at rutrum orci. Nunc consectetur purus ut dolor pulvinar, ut volutpat felis congue. Cras tincidunt odio sed neque sollicitudin, vehicula tempor metus scelerisque.');

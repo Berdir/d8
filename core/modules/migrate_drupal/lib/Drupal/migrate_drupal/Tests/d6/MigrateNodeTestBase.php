@@ -23,10 +23,18 @@ class MigrateNodeTestBase extends MigrateDrupalTestBase {
     node_add_body_field($node_type);
 
     $id_mappings = array(
-      'd6_node_type' => array(array(array('story'), array('story'))),
+      'd6_node_type' => array(
+        array(array('test_story'), array('story')),
+      ),
       'd6_filter_format' => array(
         array(array(1), array('filtered_html')),
         array(array(2), array('full_html')),
+      ),
+      'd6_node_body_field' => array(
+        array(array(''), array('node', 'body')),
+      ),
+      'd6_node_body_instance' => array(
+        array(array('page'), array('node', 'body', 'page')),
       ),
     );
     $this->prepareIdMappings($id_mappings);
@@ -44,6 +52,7 @@ class MigrateNodeTestBase extends MigrateDrupalTestBase {
     $path = drupal_get_path('module', 'migrate_drupal');
     $dumps = array(
       $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6Node.php',
+      $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6NodeType.php',
       $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6FieldInstance.php',
     );
     $this->loadDumps($dumps);

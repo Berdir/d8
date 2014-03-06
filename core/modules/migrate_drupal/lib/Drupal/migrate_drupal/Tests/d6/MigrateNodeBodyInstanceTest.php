@@ -47,7 +47,7 @@ class MigrateNodeBodyInstanceTest extends MigrateDrupalTestBase {
         array(array('field_name', 'page'), array('node', 'field_name', 'page')),
       ),
       'd6_node_body' => array(
-        array(array(''), array('node', 'body'))
+        array(array(''), array('node', 'body')),
       ),
       'd6_node_type' => array(
         array(array('page'), array('page')),

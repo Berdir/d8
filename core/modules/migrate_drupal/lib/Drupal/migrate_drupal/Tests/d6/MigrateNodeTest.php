@@ -51,9 +51,8 @@ class MigrateNodeTest extends MigrateNodeTestBase {
     $this->assertEqual($node->getType(), 'story', 'Node has the correct bundle.');
     $this->assertEqual($node->getTitle(), 'Test title', 'Node has the correct title.');
     $this->assertEqual($node->getCreatedTime(), 1388271197, 'Node has the correct created time.');
-    $this->assertEqual($node->isSticky(), FALSE, 'Node has the correct sticky setting.');
-    $this->assertEqual($node->getOwnerId(), 1, 'Node has the correct author id.');
-
+    $this->assertEqual($node->isSticky(), FALSE);
+    $this->assertEqual($node->getOwnerId(), 1);
     //$this->assertEqual($node->getRevisionCreationTime(), 1390095701, 'Node has the correct revision timestamp.');
 
     // Test that we can re-import using the EntityContentBase destination.
@@ -79,6 +78,7 @@ class MigrateNodeTest extends MigrateNodeTestBase {
     // Test a multi-column fields are correctly upgraded.
     $this->assertEqual($node->body->value, 'test');
     $this->assertEqual($node->body->format, 'full_html');
+
   }
 
 }

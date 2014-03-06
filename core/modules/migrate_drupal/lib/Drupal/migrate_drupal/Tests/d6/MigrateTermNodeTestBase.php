@@ -39,7 +39,7 @@ class MigrateTermNodeTestBase extends MigrateDrupalTestBase {
             'parent' => '0',
           ),
         ),
-      )
+      ),
     ))->save();
     entity_create('field_instance_config', array(
       'field_name' => 'test',
@@ -50,8 +50,14 @@ class MigrateTermNodeTestBase extends MigrateDrupalTestBase {
       'd6_taxonomy_vocabulary' => array(
         array(array(1), array(1)),
       ),
-      'd6_vocabulary_field' => array(
-        array(array(1), array('node', 'test')),
+      'd6_vocabulary_field_instance' => array(
+        array(array(1, 'page'), array('node', 'page', 'test')),
+      ),
+      'd6_vocabulary_entity_display' => array(
+        array(array(1, 'page'), array('node', 'page', 'default', 'test')),
+      ),
+      'd6_vocabulary_entity_form_display' => array(
+        array(array(1, 'page'), array('node', 'page', 'default', 'test')),
       ),
       'd6_node' => array(
         array(array(1), array(1)),
@@ -59,6 +65,7 @@ class MigrateTermNodeTestBase extends MigrateDrupalTestBase {
       ),
     );
     $this->prepareIdMappings($id_mappings);
+
     $vids = array(1, 2, 3);
     for ($i = 1; $i <= 2; $i++) {
       $node = entity_create('node', array(
@@ -75,10 +82,11 @@ class MigrateTermNodeTestBase extends MigrateDrupalTestBase {
         $node->save();
       }
     }
-    $path =drupal_get_path('module', 'migrate_drupal');
+    $path = drupal_get_path('module', 'migrate_drupal');
     $dumps = array(
       $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6Node.php',
       $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6TermNode.php',
+      $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6TaxonomyVocabulary.php',
     );
     $this->loadDumps($dumps);
   }
