@@ -831,7 +831,6 @@ function simpletest_script_reporter_display_results() {
           echo "--------------------------------------------------------------------------------\n";
         }
 
-if ($result->status != 'pass')
         simpletest_script_format_result($result);
       }
     }
