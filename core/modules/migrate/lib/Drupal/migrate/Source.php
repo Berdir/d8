@@ -150,11 +150,16 @@ class Source implements \Iterator, \Countable {
   }
 
   /**
+   * Get the source count.
+   *
    * Return a count of available source records, from the cache if appropriate.
    * Returns -1 if the source is not countable.
    *
-   * @param boolean $refresh
+   * @param bool $refresh
+   *   Whether or not to refresh the count.
+   *
    * @return int
+   *   The count.
    */
   public function count($refresh = FALSE) {
     if ($this->skipCount) {
@@ -176,12 +181,12 @@ class Source implements \Iterator, \Countable {
       // Caching is in play, first try to retrieve a cached count.
       $cache_object = $this->cache->get($this->cacheKey, 'cache');
       if (is_object($cache_object)) {
-        // Success
+        // Success.
         $count = $cache_object->data;
       }
       else {
         // No cached count, ask the derived class to count 'em up, and cache
-        // the result
+        // the result.
         $count = $source->count();
         $this->cache->set($this->cacheKey, $count, 'cache');
       }
@@ -193,7 +198,9 @@ class Source implements \Iterator, \Countable {
    * Class constructor.
    *
    * @param \Drupal\migrate\Entity\MigrationInterface $migration
+   *   The migration entity.
    * @param \Drupal\migrate\MigrateExecutable $migrate_executable
+   *   The migration executable.
    */
   public function __construct(MigrationInterface $migration, MigrateExecutable $migrate_executable) {
     $this->migration = $migration;
@@ -214,7 +221,10 @@ class Source implements \Iterator, \Countable {
   }
 
   /**
+   * Get the cache object.
+   *
    * @return \Drupal\Core\Cache\CacheBackendInterface
+   *   The cache object.
    */
   protected function getCache() {
     if (!isset($this->cache)) {
@@ -224,7 +234,10 @@ class Source implements \Iterator, \Countable {
   }
 
   /**
+   * Get the source iterator.
+   *
    * @return \Iterator
+   *   The source iterator.
    */
   protected function getIterator() {
     if (!isset($this->iterator)) {
@@ -241,23 +254,30 @@ class Source implements \Iterator, \Countable {
   }
 
   /**
-   * Implementation of Iterator::key - called when entering a loop iteration, returning
-   * the key of the current row. It must be a scalar - we will serialize
-   * to fulfill the requirement, but using getCurrentIds() is preferable.
+   * Get the iterator key.
+   *
+   * Implementation of Iterator::key - called when entering a loop iteration,
+   * returning the key of the current row. It must be a scalar - we will
+   * serialize to fulfill the requirement, but using getCurrentIds() is
+   * preferable.
    */
   public function key() {
     return serialize($this->currentIds);
   }
 
   /**
-   * Implementation of Iterator::valid() - called at the top of the loop, returning
-   * TRUE to process the loop and FALSE to terminate it
+   * Whether the iterator is currently valid.
+   *
+   * Implementation of Iterator::valid() - called at the top of the loop,
+   * returning TRUE to process the loop and FALSE to terminate it
    */
   public function valid() {
     return isset($this->currentRow);
   }
 
   /**
+   * Rewind the iterator.
+   *
    * Implementation of Iterator::rewind() - subclasses of MigrateSource should
    * implement performRewind() to do any class-specific setup for iterating
    * source records.
@@ -288,7 +308,7 @@ class Source implements \Iterator, \Countable {
       $this->getIterator()->next();
       $row = new Row($row_data, $this->migration->getSourcePlugin()->getIds(), $this->migration->get('destinationIds'));
 
-      // Populate the source key for this row
+      // Populate the source key for this row.
       $this->currentIds = $row->getSourceIdValues();
 
       // Pick up the existing map row, if any, unless getNextRow() did it.
@@ -317,7 +337,7 @@ class Source implements \Iterator, \Countable {
       }
       // 3. If the row is marked as needing update, pass it.
       elseif ($row->needsUpdate()) {
-        // Fall through
+        // Fall through.
       }
       // 4. At this point, we have a row which has previously been imported and
       //    not marked for update. If we're not using highwater marks, then we
@@ -356,22 +376,22 @@ class Source implements \Iterator, \Countable {
       // 6. So, we are using highwater marks. Take the row if its highwater
       //    field value is greater than the saved mark, otherwise skip it.
       else {
-        // Call prepareRow() here, in case the highwaterField needs preparation
+        // Call prepareRow() here, in case the highwaterField needs preparation.
         if ($this->prepareRow($row) !== FALSE) {
           if ($row->getSourceProperty($this->highwaterProperty['name']) > $this->originalHighwater) {
             $this->currentRow = $row;
             break;
           }
           else {
-            // Skip
+            // Skip.
             continue;
           }
         }
         $prepared = TRUE;
       }
 
-      // Allow the Migration to prepare this row. prepareRow() can return boolean
-      // FALSE to ignore this row.
+      // Allow the Migration to prepare this row. prepareRow() can return
+      // boolean FALSE to ignore this row.
       if (!$prepared) {
         if ($this->prepareRow($row) !== FALSE) {
           // Finally, we've got a keeper.
@@ -395,9 +415,13 @@ class Source implements \Iterator, \Countable {
    * Source classes should override this as necessary and manipulate $keep.
    *
    * @param \Drupal\migrate\Row $row
+   *   The row object.
+   *
+   * @return bool
+   *   TRUE if we're to process the row otherwise FALSE.
    */
   protected function prepareRow(Row $row) {
-    // We're explicitly skipping this row - keep track in the map table
+    // We're explicitly skipping this row - keep track in the map table.
     if (($result = $this->migration->getSourcePlugin()->prepareRow($row)) === FALSE) {
       // Make sure we replace any previous messages for this item with any
       // new ones.
@@ -421,4 +445,5 @@ class Source implements \Iterator, \Countable {
     $this->numProcessed++;
     return $result;
   }
+
 }

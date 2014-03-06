@@ -12,6 +12,8 @@ namespace Drupal\migrate\Plugin;
 interface SourceEntityInterface {
 
   /**
+   * Whether this migration has a bundle migration.
+   *
    * @return bool
    *   TRUE when the bundle_migration key is required.
    */
@@ -23,7 +25,8 @@ interface SourceEntityInterface {
    * This function is used when bundleMigrationRequired() is FALSE.
    *
    * @return string
+   *   The entity type id.
    */
-    public function entityTypeId();
+  public function entityTypeId();
 
 }

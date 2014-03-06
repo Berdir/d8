@@ -37,6 +37,7 @@ interface MigrateSourceInterface extends \Countable, PluginInspectionInterface {
    * Add additional data to the row.
    *
    * @param \Drupal\Migrate\Row $row
+   *   The row object.
    *
    * @return bool
    *   FALSE if this row needs to be skipped.
@@ -45,5 +46,12 @@ interface MigrateSourceInterface extends \Countable, PluginInspectionInterface {
 
   public function __toString();
 
+  /**
+   * Get the source ids.
+   *
+   * @return array
+   *   The source ids.
+   */
   public function getIds();
+
 }

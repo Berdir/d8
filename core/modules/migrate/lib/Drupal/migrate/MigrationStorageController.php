@@ -91,7 +91,9 @@ class MigrationStorageController extends ConfigStorageController implements Migr
    * Extract the dynamic id mapping from entities loaded by plugin.
    *
    * @param array $dynamic_ids
+   *   Get the dynamic migration ids.
    * @param array $entities
+   *   An array of entities.
    */
   protected function getDynamicIds(array &$dynamic_ids, array $entities) {
     foreach (array_keys($entities) as $new_id) {
@@ -170,15 +172,15 @@ class MigrationStorageController extends ConfigStorageController implements Migr
   }
 
   /**
-   * Add one or more dependencies to a graph/
+   * Add one or more dependencies to a graph.
    *
    * @param array $graph
    *   The graph so far.
-   * @param $id
+   * @param int $id
    *   The migration id.
-   * @param $dependency
+   * @param string $dependency
    *   The dependency string.
-   * @param $dynamic_ids
+   * @param array $dynamic_ids
    *   The dynamic id mapping.
    */
   protected function addDependency(array &$graph, $id, $dependency, $dynamic_ids) {

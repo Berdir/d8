@@ -305,6 +305,9 @@ class Row {
    * @param bool|null $new_value
    *   TRUE when the row is a stub. Omit to determine whether the row is a
    *   stub.
+   *
+   * @return mixed
+   *   The current stub value.
    */
   public function stub($new_value = NULL) {
     if (isset($new_value)) {
