@@ -42,7 +42,7 @@ class MigrateVocabularyFieldTest extends MigrateDrupalTestBase {
     // Add some id mappings for the dependant migrations.
     $id_mappings = array(
       'd6_taxonomy_vocabulary' => array(
-        array(array(1), array('tags')),
+        array(array(4), array('tags')),
       ),
     );
     $this->prepareIdMappings($id_mappings);
@@ -72,7 +72,7 @@ class MigrateVocabularyFieldTest extends MigrateDrupalTestBase {
     $this->assertEqual($field->id(), $field_id);
     $settings = $field->getSettings();
     $this->assertEqual('tags', $settings['allowed_values'][0]['vocabulary'], "Vocabulary has correct settings.");
-    $this->assertEqual(array('node', 'tags'), entity_load('migration', 'd6_vocabulary_field')->getIdMap()->lookupDestinationID(array(1)), "Test IdMap");
+    $this->assertEqual(array('node', 'tags'), entity_load('migration', 'd6_vocabulary_field')->getIdMap()->lookupDestinationID(array(4)), "Test IdMap");
 
   }
 

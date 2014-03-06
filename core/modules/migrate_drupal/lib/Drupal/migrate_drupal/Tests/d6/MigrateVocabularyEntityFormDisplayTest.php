@@ -42,10 +42,10 @@ class MigrateVocabularyEntityFormDisplayTest extends MigrateDrupalTestBase {
     // Add some id mappings for the dependant migrations.
     $id_mappings = array(
       'd6_taxonomy_vocabulary' => array(
-        array(array(1), array('tags')),
+        array(array(4), array('tags')),
       ),
       'd6_vocabulary_field_instance' => array(
-        array(array(1, 'page'), array('node', 'page', 'tags')),
+        array(array(4, 'page'), array('node', 'page', 'tags')),
       )
     );
     $this->prepareIdMappings($id_mappings);
@@ -69,7 +69,7 @@ class MigrateVocabularyEntityFormDisplayTest extends MigrateDrupalTestBase {
     $this->assertEqual($component['type'], 'taxonomy_term_reference');
     $this->assertEqual($component['weight'], 20);
     // Test the Id map.
-    $this->assertEqual(array('node', 'article', 'default', 'tags'), entity_load('migration', 'd6_vocabulary_entity_form_display')->getIdMap()->lookupDestinationID(array(1, 'article')));
+    $this->assertEqual(array('node', 'article', 'default', 'tags'), entity_load('migration', 'd6_vocabulary_entity_form_display')->getIdMap()->lookupDestinationID(array(4, 'article')));
   }
 
 }

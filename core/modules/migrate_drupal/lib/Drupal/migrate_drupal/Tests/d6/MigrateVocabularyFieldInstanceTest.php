@@ -41,10 +41,10 @@ class MigrateVocabularyFieldInstanceTest extends MigrateDrupalTestBase {
     // Add some id mappings for the dependant migrations.
     $id_mappings = array(
       'd6_taxonomy_vocabulary' => array(
-        array(array(1), array('tags')),
+        array(array(4), array('tags')),
       ),
       'd6_vocabulary_field' => array(
-        array(array(1), array('node', 'tags')),
+        array(array(4), array('node', 'tags')),
       )
     );
     $this->prepareIdMappings($id_mappings);
@@ -89,7 +89,7 @@ class MigrateVocabularyFieldInstanceTest extends MigrateDrupalTestBase {
     $settings = $field->getSettings();
     $this->assertEqual('tags', $settings['allowed_values'][0]['vocabulary'], "Vocabulary has correct settings.");
 
-    $this->assertEqual(array('node', 'article', 'tags'), entity_load('migration', 'd6_vocabulary_field_instance')->getIdMap()->lookupDestinationID(array(1, 'article')));
+    $this->assertEqual(array('node', 'article', 'tags'), entity_load('migration', 'd6_vocabulary_field_instance')->getIdMap()->lookupDestinationID(array(4, 'article')));
   }
 
 }
