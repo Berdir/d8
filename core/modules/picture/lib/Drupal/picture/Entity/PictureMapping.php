@@ -17,7 +17,7 @@ use Drupal\picture\PictureMappingInterface;
  *   id = "picture_mapping",
  *   label = @Translation("Picture mapping"),
  *   controllers = {
- *     "list" = "Drupal\picture\PictureMappingListController",
+ *     "list_builder" = "Drupal\picture\PictureMappingListBuilder",
  *     "form" = {
  *       "edit" = "Drupal\picture\PictureMappingFormController",
  *       "add" = "Drupal\picture\PictureMappingFormController",

@@ -22,7 +22,7 @@ use Drupal\migrate\Plugin\MigrateIdMapInterface;
  *   label = @Translation("Migration"),
  *   module = "migrate",
  *   controllers = {
- *     "list" = "Drupal\Core\Config\Entity\DraggableListController",
+ *     "list_builder" = "Drupal\Core\Config\Entity\DraggableListBuilder",
  *     "form" = {
  *       "add" = "Drupal\Core\Entity\EntityFormController",
  *       "edit" = "Drupal\Core\Entity\EntityFormController",
