@@ -115,7 +115,9 @@ class MigrateDrupal6Test extends MigrateDrupalTestBase {
       $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6StatisticsSettings.php',
       $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6SyslogSettings.php',
       $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6SystemCron.php',
-      #$path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6SystemFile.php',
+      // This dump contains the file directory path to the simpletest directory
+      // where the files are.
+      $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6SystemFile.php',
       $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6SystemFilter.php',
       $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6SystemImageGd.php',
       $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6SystemImage.php',
@@ -284,10 +286,6 @@ class MigrateDrupal6Test extends MigrateDrupalTestBase {
     );
     // Run every migration in the order specified by the storage controller.
     foreach (entity_load_multiple('migration', $migrations) as $migration) {
-      /** @var \Drupal\migrate\Entity\MigrationInterface $migration */
-      if ($migration->getDestinationPlugin()->getPluginId() == 'entity:file') {
-        $migration->source['conf_path'] = 'core/modules/simpletest';
-      }
       (new MigrateExecutable($migration, $this))->import();
     }
     foreach ($classes as $class) {
