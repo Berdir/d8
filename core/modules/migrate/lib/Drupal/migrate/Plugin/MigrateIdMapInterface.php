@@ -201,7 +201,7 @@ interface MigrateIdMapInterface extends \Iterator, PluginInspectionInterface {
    * Given a (possibly multi-field) source identifier value, return the
    * (possibly multi-field) destination identifier value it is mapped to.
    *
-   * @param array $destination_id_values
+   * @param array $source_id_values
    *   The source identifier values of the record.
    *
    * @return array
@@ -234,8 +234,9 @@ interface MigrateIdMapInterface extends \Iterator, PluginInspectionInterface {
   /**
    * Sets a specified record to be updated, if it exists.
    *
-   * @param $source_id_values
+   * @param array $source_id_values
    *   The source identifier values of the record.
    */
   public function setUpdate(array $source_id_values);
+
 }
