@@ -122,7 +122,7 @@ class EntityTypeTest extends UnitTestCase {
     $controller = $this->getTestControllerClass();
     $entity_type = $this->setUpEntityType(array(
       'controllers' => array(
-        'list' => $controller,
+        'list_builder' => $controller,
       ),
     ));
     $this->assertSame($controller, $entity_type->getListBuilderClass());
