@@ -129,6 +129,13 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
   protected $isDefaultRevision = TRUE;
 
   /**
+   * Indicates whether this is an editable revision.
+   *
+   * @var bool
+   */
+  protected $keepNewRevisionId = FALSE;
+
+  /**
    * Overrides Entity::__construct().
    */
   public function __construct(array $values, $entity_type, $bundle = FALSE, $translations = array()) {
@@ -182,6 +189,17 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
     $return = $this->isDefaultRevision;
     if (isset($new_value)) {
       $this->isDefaultRevision = (bool) $new_value;
+    }
+    return $return;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function keepNewRevisionId($new_value = NULL) {
+    $return = $this->keepNewRevisionId;
+    if (isset($new_value)) {
+      $this->keepNewRevisionId = $new_value;
     }
     return $return;
   }

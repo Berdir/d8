@@ -739,7 +739,7 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
 
     // When saving a new revision, set any existing revision ID to NULL so as to
     // ensure that a new revision will actually be created.
-    if ($entity->isNewRevision() && isset($record->{$this->revisionKey})) {
+    if ($entity->isNewRevision() && isset($record->{$this->revisionKey}) && !$entity->keepNewRevisionId()) {
       $record->{$this->revisionKey} = NULL;
     }
 
