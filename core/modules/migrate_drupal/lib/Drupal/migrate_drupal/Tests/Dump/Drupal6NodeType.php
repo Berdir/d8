@@ -67,6 +67,25 @@ class Drupal6NodeType extends Drupal6DumpBase {
       ))
       ->execute();
 
+    $this->database->merge('node_type')
+      ->key(array('type' => 'story'))
+      ->fields(array(
+        'name' => 'Story',
+        'module' => 'node',
+        'description' => "A <em>story</em>, similar in form to a <em>page</em>, is ideal for creating and displaying content that informs or engages website visitors. Press releases, site announcements, and informal blog-like entries may all be created with a <em>story</em> entry. By default, a <em>story</em> entry is automatically featured on the site's initial home page, and provides the ability to post comments.",
+        'help' => '',
+        'has_title' => '1',
+        'title_label' => 'Title',
+        'has_body' => '1',
+        'body_label' => 'Body',
+        'min_word_count' => '0',
+        'custom' => '1',
+        'modified' => '1',
+        'locked' => '0',
+        'orig_type' => 'story',
+      ))
+      ->execute();
+
     $this->createTable('variable');
     $this->database->insert('variable')->fields(array(
       'name',
