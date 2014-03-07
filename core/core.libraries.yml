@@ -251,6 +251,7 @@ drupal.tableselect:
   dependencies:
     - core/drupal
     - core/jquery
+    - core/jquery.once
 
 drupal.timezone:
   version: VERSION
@@ -258,6 +259,7 @@ drupal.timezone:
     misc/timezone.js: {}
   dependencies:
     - core/jquery
+    - core/jquery.once
     - core/drupal
 
 drupal.vertical-tabs:
@@ -270,6 +272,7 @@ drupal.vertical-tabs:
       misc/vertical-tabs.css: {}
   dependencies:
     - core/jquery
+    - core/jquery.once
     - core/drupal
     - core/drupalSettings
     - core/drupal.form
@@ -323,6 +326,18 @@ jquery.intrinsic:
     misc/jquery.intrinsic.js: {}
   dependencies:
     - core/jquery
+
+jquery.joyride:
+  remote: https://github.com/zurb/joyride
+  version: v2.0.3
+  js:
+    assets/vendor/jquery-joyride/jquery.joyride-2.0.3.js: {}
+  css:
+    component:
+      assets/vendor/jquery-joyride/joyride-2.0.3.css: { media: screen }
+  dependencies:
+    - core/jquery
+    - core/jquery.cookie
 
 jquery.once:
   remote: https://github.com/RobLoach/jquery-once
@@ -669,6 +684,16 @@ normalize:
   css:
     base:
       assets/vendor/normalize-css/normalize.css: { every_page: true, weight: -20 }
+
+picturefill:
+  remote: https://github.com/scottjehl/picturefill
+  # @todo Contribute upstream and/or replace with upstream version.
+  # @see https://drupal.org/node/1775530
+  version: VERSION
+  js:
+    assets/vendor/picturefill/picturefill.js: { weight: -10 }
+  dependencies:
+    - core/matchmedia
 
 underscore:
   remote: https://github.com/jashkenas/underscore

@@ -324,7 +324,7 @@ abstract class WebTestBase extends TestBase {
     );
     $type = entity_create('node_type', $values);
     $status = $type->save();
-    menu_router_rebuild();
+    \Drupal::service('router.builder')->rebuild();
 
     $this->assertEqual($status, SAVED_NEW, String::format('Created content type %type.', array('%type' => $type->id())));
 
@@ -337,9 +337,6 @@ abstract class WebTestBase extends TestBase {
 
   /**
    * Creates a block instance based on default settings.
-   *
-   * Note: Until this can be done programmatically, the active user account
-   * must have permission to administer blocks.
    *
    * @param string $plugin_id
    *   The plugin ID of the block type for this block instance.
@@ -3043,15 +3040,16 @@ abstract class WebTestBase extends TestBase {
           }
           elseif (isset($field->option)) {
             // Select element found.
-            if ($this->getSelectedItem($field) == $value) {
-              $found = TRUE;
-            }
-            else {
+            $selected = $this->getSelectedItem($field);
+            if ($selected === FALSE) {
               // No item selected so use first item.
               $items = $this->getAllOptions($field);
               if (!empty($items) && $items[0]['value'] == $value) {
                 $found = TRUE;
               }
+            }
+            elseif ($selected == $value) {
+              $found = TRUE;
             }
           }
           elseif ((string) $field == $value) {

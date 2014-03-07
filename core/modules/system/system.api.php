@@ -158,9 +158,8 @@ function hook_data_type_info_alter(&$data_types) {
  * @return
  *   An associative array where the key is the queue name and the value is
  *   again an associative array. Possible keys are:
- *   - 'worker callback': A PHP callable to call. It will be called
- *     with one argument, the item created via
- *     \Drupal\Core\Queue\QueueInterface::createItem().
+ *   - 'worker callback': A PHP callable to call that is an implementation of
+ *     callback_queue_worker().
  *   - 'cron': (optional) An associative array containing the optional key:
  *     - 'time': (optional) How much time Drupal cron should spend on calling
  *       this worker in seconds. Defaults to 15.
@@ -198,6 +197,28 @@ function hook_queue_info_alter(&$queues) {
   // This site has many feeds so let's spend 90 seconds on each cron run
   // updating feeds instead of the default 60.
   $queues['aggregator_feeds']['cron']['time'] = 90;
+}
+
+/**
+ * Work on a single queue item.
+ *
+ * Callback for hook_queue_info().
+ *
+ * @param $queue_item_data
+ *   The data that was passed to \Drupal\Core\Queue\QueueInterface::createItem()
+ *   when the item was queued.
+ *
+ * @throws \Exception
+ *   The worker callback may throw an exception to indicate there was a problem.
+ *   The cron process will log the exception, and leave the item in the queue to
+ *   be processed again later.
+ *
+ * @see \Drupal\Core\Cron::run()
+ */
+function callback_queue_worker($queue_item_data) {
+  $node = node_load($queue_item_data);
+  $node->title = 'Updated title';
+  $node->save();
 }
 
 /**
@@ -500,94 +521,6 @@ function hook_menu_link_defaults_alter(&$links) {
 }
 
 /**
- * Define links for menus.
- *
- * @section sec_menu_link Creating Menu Items
- * Menu item example of type MENU_NORMAL_ITEM:
- * @code
- * // Make "Foo settings" appear on the admin Config page
- * $items['admin/config/system/foo'] = array(
- *   'title' => 'Foo settings',
- *   'type' => MENU_NORMAL_ITEM,
- *   'route_name' => 'foo.settings'
- * );
- * @endcode
- *
- * @todo The section that used to be here about path argument substitution has
- *   been removed, but is still referred to in the return section. It needs to
- *   be added back in, or a corrected version of it.
- *
- * @return
- *   An array of menu items. Each menu item has a key corresponding to the
- *   Drupal path being registered. The corresponding array value is an
- *   associative array that may contain the following key-value pairs:
- *   - "title": Required. The untranslated title of the menu item.
- *   - "title callback": Function to generate the title; defaults to t().
- *     If you require only the raw string to be output, set this to FALSE.
- *   - "title arguments": Arguments to send to t() or your custom callback,
- *     with path component substitution as described above.
- *   - "description": The untranslated description of the menu item.
- *   - description callback: Function to generate the description; defaults to
- *     t(). If you require only the raw string to be output, set this to FALSE.
- *   - description arguments: Arguments to send to t() or your custom callback,
- *     with path component substitution as described above.
- *   - "weight": An integer that determines the relative position of items in
- *     the menu; higher-weighted items sink. Defaults to 0. Menu items with the
- *     same weight are ordered alphabetically.
- *   - "menu_name": Optional. Set this to a custom menu if you don't want your
- *     item to be placed in the default Tools menu.
- *   - "expanded": Optional. If set to TRUE, and if a menu link is provided for
- *     this menu item (as a result of other properties), then the menu link is
- *     always expanded, equivalent to its 'always expanded' checkbox being set
- *     in the UI.
- *   - "position": Position of the block ('left' or 'right') on the system
- *     administration page for this item.
- *   - "type": A bitmask of flags describing properties of the menu item.
- *     Many shortcut bitmasks are provided as constants in menu.inc:
- *     - MENU_NORMAL_ITEM: Normal menu items show up in the menu tree and can be
- *       moved/hidden by the administrator.
- *     - MENU_SUGGESTED_ITEM: Modules may "suggest" menu items that the
- *       administrator may enable.
- *     If the "type" element is omitted, MENU_NORMAL_ITEM is assumed.
- *   - "options": An array of options to be passed to l() when generating a link
- *     from this menu item.
- *
- * For a detailed usage example, see page_example.module.
- * For comprehensive documentation on the menu system, see
- * http://drupal.org/node/102338.
- *
- * @see menu
- */
-function hook_menu() {
-  $items['example'] = array(
-    'title' => 'Example Page',
-    'route_name' => 'example.page',
-  );
-  $items['example/feed'] = array(
-    'title' => 'Example RSS feed',
-    'route_name' => 'example.feed',
-  );
-
-  return $items;
-}
-
-/**
- * Alter the data being saved to the {menu_router} table after hook_menu is invoked.
- *
- * This hook is invoked by menu_router_build(). The menu definitions are passed
- * in by reference. Each element of the $items array is one item returned
- * by a module from hook_menu. Additional items may be added, or existing items
- * altered.
- *
- * @param $items
- *   Associative array of menu router definitions returned from hook_menu().
- */
-function hook_menu_alter(&$items) {
-  // Example - disable the page at node/add
-  $items['node/add']['access callback'] = FALSE;
-}
-
-/**
  * Alter tabs and actions displayed on the page before they are rendered.
  *
  * This hook is invoked by menu_local_tasks(). The system-determined tabs and
@@ -616,11 +549,11 @@ function hook_menu_local_tasks(&$data, $route_name) {
   $data['actions']['node/add'] = array(
     '#theme' => 'menu_local_action',
     '#link' => array(
-      'title' => t('Add new content'),
+      'title' => t('Add content'),
       'href' => 'node/add',
       'localized_options' => array(
         'attributes' => array(
-          'title' => t('Add new content'),
+          'title' => t('Add content'),
         ),
       ),
     ),
@@ -634,7 +567,7 @@ function hook_menu_local_tasks(&$data, $route_name) {
       'href' => 'node/add',
       'localized_options' => array(
         'attributes' => array(
-          'title' => t('Add new content'),
+          'title' => t('Add content'),
         ),
       ),
     ),
@@ -797,7 +730,7 @@ function hook_page_alter(&$page) {
   // Add help text to the user login block.
   $page['sidebar_first']['user_login']['help'] = array(
     '#weight' => -10,
-    '#markup' => t('To post comments or add new content, you first have to log in.'),
+    '#markup' => t('To post comments or add content, you first have to log in.'),
   );
 }
 
@@ -1523,11 +1456,6 @@ function hook_cache_flush() {
  * i.e., all previously cached data is known to be gone and every API in the
  * system is known to return current information, so your module can safely rely
  * on all available data to rebuild its own.
- *
- * The menu router is the only exception regarding rebuilt data; it is only
- * rebuilt after all hook_rebuild() implementations have been invoked. That
- * ensures that hook_menu() implementations and the final router rebuild can
- * rely on all data being returned by all modules.
  *
  * @see hook_cache_flush()
  * @see drupal_flush_all_caches()
@@ -2731,7 +2659,7 @@ function hook_tokens_alter(array &$replacements, array $context) {
     // Alter the [node:title] token, and replace it with the rendered content
     // of a field (field_title).
     if (isset($context['tokens']['title'])) {
-      $title = field_view_field($node, 'field_title', 'default', $langcode);
+      $title = $node->field_title->view('default');
       $replacements[$context['tokens']['title']] = drupal_render($title);
     }
   }

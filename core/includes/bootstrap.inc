@@ -6,7 +6,7 @@ use Drupal\Component\Utility\Settings;
 use Drupal\Component\Utility\String;
 use Drupal\Component\Utility\Timer;
 use Drupal\Component\Utility\Unicode;
-use Drupal\Component\Utility\Url;
+use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Database\Database;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
@@ -1714,9 +1714,6 @@ function _drupal_bootstrap_configuration() {
   // Detect string handling method.
   Unicode::check();
 
-  // Load the procedural configuration system helper functions.
-  require_once __DIR__ . '/config.inc';
-
   // Set the Drupal custom error handler. (requires \Drupal::config())
   set_error_handler('_drupal_error_handler');
   set_exception_handler('_drupal_exception_handler');
@@ -1772,9 +1769,6 @@ function _drupal_bootstrap_page_cache() {
     if (is_object($cache)) {
       $response = new Response();
       $response->headers->set('X-Drupal-Cache', 'HIT');
-      // Restore the metadata cached with the page.
-      _current_path($cache->data['path']);
-      drupal_set_title($cache->data['title'], PASS_THROUGH);
       date_default_timezone_set(drupal_get_user_timezone());
 
       drupal_serve_page_from_cache($cache, $response, $request);

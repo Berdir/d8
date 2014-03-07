@@ -278,6 +278,11 @@ services:
     arguments: ['@database', '@router.builder']
     tags:
       - { name: event_subscriber }
+  router.route_preloader:
+    class: Drupal\Core\Routing\RoutePreloader
+    arguments: ['@router.route_provider', '@state', '@content_negotiation']
+    tags:
+      - { name: 'event_subscriber' }
   router.matcher.final_matcher:
     class: Drupal\Core\Routing\UrlMatcher
   router.matcher:
@@ -326,7 +331,7 @@ services:
     arguments: ['@router.dumper', '@lock', '@event_dispatcher', '@module_handler', '@controller_resolver', '@state']
   router.rebuild_subscriber:
     class: Drupal\Core\EventSubscriber\RouterRebuildSubscriber
-    arguments: ['@router.builder']
+    arguments: ['@router.builder', '@lock']
     tags:
       - { name: event_subscriber }
   path.alias_manager.cached:
@@ -605,7 +610,7 @@ services:
       - { name: event_subscriber }
   image.toolkit.manager:
     class: Drupal\Core\ImageToolkit\ImageToolkitManager
-    arguments: ['@container.namespaces', '@cache.cache', '@language_manager', '@config.factory']
+    arguments: ['@container.namespaces', '@cache.cache', '@language_manager', '@config.factory', '@module_handler']
   image.toolkit:
     class: Drupal\Core\ImageToolkit\ImageToolkitInterface
     factory_method: getDefaultToolkit

@@ -45,11 +45,24 @@ class TypedDataManager extends DefaultPluginManager {
    */
   protected $prototypes = array();
 
+ /**
+  * Constructs a new TypedDataManager.
+  *
+  * @param \Traversable $namespaces
+  *   An object that implements \Traversable which contains the root paths
+  *   keyed by the corresponding namespace to look for plugin implementations.
+  * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
+  *   Cache backend instance to use.
+  * @param \Drupal\Core\Language\LanguageManager $language_manager
+  *   The language manager.
+  * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+  *   The module handler.
+  */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, LanguageManager $language_manager, ModuleHandlerInterface $module_handler) {
-    $this->alterInfo($module_handler, 'data_type_info');
+    $this->alterInfo('data_type_info');
     $this->setCacheBackend($cache_backend, $language_manager, 'typed_data_types_plugins');
 
-    parent::__construct('Plugin/DataType', $namespaces, 'Drupal\Core\TypedData\Annotation\DataType');
+    parent::__construct('Plugin/DataType', $namespaces, $module_handler, 'Drupal\Core\TypedData\Annotation\DataType');
   }
 
   /**
@@ -70,7 +83,7 @@ class TypedDataManager extends DefaultPluginManager {
    * @return \Drupal\Core\TypedData\TypedDataInterface
    *   The instantiated typed data object.
    */
-  public function createInstance($data_type, array $configuration) {
+  public function createInstance($data_type, array $configuration = array()) {
     $data_definition = $configuration['data_definition'];
     $type_definition = $this->getDefinition($data_type);
 
@@ -424,4 +437,13 @@ class TypedDataManager extends DefaultPluginManager {
 
     return $constraints;
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function clearCachedDefinitions() {
+    parent::clearCachedDefinitions();
+    $this->prototypes = array();
+  }
+
 }

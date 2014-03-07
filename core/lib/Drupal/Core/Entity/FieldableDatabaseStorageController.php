@@ -8,13 +8,10 @@
 namespace Drupal\Core\Entity;
 
 use Drupal\Core\Database\Connection;
-use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Core\Language\Language;
-use Drupal\Component\Utility\NestedArray;
-use Drupal\Component\Uuid\Uuid;
 use Drupal\field\FieldInfo;
-use Drupal\field\FieldUpdateForbiddenException;
+use Drupal\field\FieldConfigUpdateForbiddenException;
 use Drupal\field\FieldConfigInterface;
 use Drupal\field\FieldInstanceConfigInterface;
 use Drupal\field\Entity\FieldConfig;
@@ -268,7 +265,7 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
       }
 
       $data = $query->execute();
-      $field_definitions = \Drupal::entityManager()->getFieldDefinitions($this->entityTypeId);
+      $field_definitions = \Drupal::entityManager()->getBaseFieldDefinitions($this->entityTypeId);
       $translations = array();
       if ($this->revisionDataTable) {
         $data_column_names = array_flip(array_diff(drupal_schema_fields_sql($this->entityType->getRevisionDataTable()), drupal_schema_fields_sql($this->entityType->getBaseTable())));
@@ -1011,7 +1008,7 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
     }
     else {
       if ($field->getColumns() != $original->getColumns()) {
-        throw new FieldUpdateForbiddenException("The SQL storage cannot change the schema for an existing field with data.");
+        throw new FieldConfigUpdateForbiddenException("The SQL storage cannot change the schema for an existing field with data.");
       }
       // There is data, so there are no column changes. Drop all the prior
       // indexes and create all the new ones, except for all the priors that
@@ -1187,7 +1184,7 @@ class FieldableDatabaseStorageController extends FieldableEntityStorageControlle
     $entity_type_id = $field->entity_type;
     $entity_manager = \Drupal::entityManager();
     $entity_type = $entity_manager->getDefinition($entity_type_id);
-    $definitions = $entity_manager->getFieldDefinitions($entity_type_id);
+    $definitions = $entity_manager->getBaseFieldDefinitions($entity_type_id);
 
     // Define the entity ID schema based on the field definitions.
     $id_definition = $definitions[$entity_type->getKey('id')];

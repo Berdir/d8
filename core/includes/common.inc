@@ -7,7 +7,7 @@ use Drupal\Component\Utility\Settings;
 use Drupal\Component\Utility\SortArray;
 use Drupal\Component\Utility\String;
 use Drupal\Component\Utility\Tags;
-use Drupal\Component\Utility\Url;
+use Drupal\Component\Utility\UrlHelper;
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Language\Language;
@@ -97,7 +97,7 @@ const CSS_BASE = -200;
 const CSS_LAYOUT = -100;
 
 /**
- * The default weight for CSS rules that style design components (and their associated states and skins.)
+ * The default weight for CSS rules that style design components (and their associated states and themes.)
  */
 const CSS_COMPONENT = 0;
 
@@ -107,9 +107,9 @@ const CSS_COMPONENT = 0;
 const CSS_STATE = 100;
 
 /**
- * The default weight for CSS rules that style skins and are not included with components.
+ * The default weight for CSS rules that style themes and are not included with components.
  */
-const CSS_SKIN = 200;
+const CSS_THEME = 200;
 
 /**
  * The default group for JavaScript settings added to the page.
@@ -428,13 +428,13 @@ function drupal_get_feeds($delimiter = "\n") {
  *   An array containing query parameters, which can be used for url().
  *
  * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
- *   Use \Drupal\Component\Utility\Url::filterQueryParameters().
+ *   Use \Drupal\Component\Utility\UrlHelper::filterQueryParameters().
  */
 function drupal_get_query_parameters(array $query = NULL, array $exclude = array(), $parent = '') {
   if (!isset($query)) {
     $query = \Drupal::request()->query->all();
   }
-  return Url::filterQueryParameters($query, $exclude, $parent);
+  return UrlHelper::filterQueryParameters($query, $exclude, $parent);
 }
 
 /**
@@ -444,10 +444,10 @@ function drupal_get_query_parameters(array $query = NULL, array $exclude = array
  * @ingroup php_wrappers
  *
  * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
- *   Use \Drupal\Component\Utility\Url::buildQuery().
+ *   Use \Drupal\Component\Utility\UrlHelper::buildQuery().
  */
 function drupal_http_build_query(array $query, $parent = '') {
-  return Url::buildQuery($query, $parent);
+  return UrlHelper::buildQuery($query, $parent);
 }
 
 /**
@@ -478,7 +478,7 @@ function drupal_get_destination() {
   }
   else {
     $path = current_path();
-    $query = Url::buildQuery(Url::filterQueryParameters($query->all()));
+    $query = UrlHelper::buildQuery(UrlHelper::filterQueryParameters($query->all()));
     if ($query != '') {
       $path .= '?' . $query;
     }
@@ -521,10 +521,10 @@ function drupal_get_destination() {
  * @ingroup php_wrappers
  *
  * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
- *   Use \Drupal\Component\Utility\Url::parse().
+ *   Use \Drupal\Component\Utility\UrlHelper::parse().
  */
 function drupal_parse_url($url) {
-  return Url::parse($url);
+  return UrlHelper::parse($url);
 }
 
 /**
@@ -539,10 +539,10 @@ function drupal_parse_url($url) {
  *   The Drupal path to encode.
  *
  * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
- *   Use \Drupal\Component\Utility\Url::encodePath().
+ *   Use \Drupal\Component\Utility\UrlHelper::encodePath().
  */
 function drupal_encode_path($path) {
-  return Url::encodePath($path);
+  return UrlHelper::encodePath($path);
 }
 
 /**
@@ -555,10 +555,10 @@ function drupal_encode_path($path) {
  *   TRUE if the URL has the same domain and base path.
  *
  * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
- *   Use \Drupal\Component\Utility\Url::externalIsLocal().
+ *   Use \Drupal\Component\Utility\UrlHelper::externalIsLocal().
  */
 function _external_url_is_local($url) {
-  return Url::externalIsLocal($url, base_path());
+  return UrlHelper::externalIsLocal($url, base_path());
 }
 
 /**
@@ -612,13 +612,13 @@ function valid_email_address($mail) {
  * @return
  *   TRUE if the URL is in a valid format.
  *
- * @see \Drupal\Component\Utility\Url::isValid()
+ * @see \Drupal\Component\Utility\UrlHelper::isValid()
  *
  * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
- *   Use \Drupal\Component\Utility\Url::isValid().
+ *   Use \Drupal\Component\Utility\UrlHelper::isValid().
  */
 function valid_url($url, $absolute = FALSE) {
-  return Url::isValid($url, $absolute);
+  return UrlHelper::isValid($url, $absolute);
 }
 
 /**
@@ -647,13 +647,13 @@ function valid_url($url, $absolute = FALSE) {
  *   because Drupal\Core\Template\Attribute expects those values to be
  *   plain-text strings. To pass a filtered URI to
  *   Drupal\Core\Template\Attribute, call
- *   \Drupal\Component\Utility\Url::stripDangerousProtocols() instead.
+ *   \Drupal\Component\Utility\UrlHelper::stripDangerousProtocols() instead.
  *
- * @see \Drupal\Component\Utility\Url::stripDangerousProtocols()
+ * @see \Drupal\Component\Utility\UrlHelper::stripDangerousProtocols()
  * @see \Drupal\Component\Utility\String::checkPlain()
  */
 function check_url($uri) {
-  return String::checkPlain(Url::stripDangerousProtocols($uri));
+  return String::checkPlain(UrlHelper::stripDangerousProtocols($uri));
 }
 
 /**
@@ -719,10 +719,10 @@ function filter_xss($string, $allowed_tags = array('a', 'em', 'strong', 'cite', 
  * @return string
  *   Cleaned up and HTML-escaped version of $string.
  *
- * @see \Drupal\Component\Utility\Url::filterBadProtocol()
+ * @see \Drupal\Component\Utility\UrlHelper::filterBadProtocol()
  */
 function filter_xss_bad_protocol($string) {
-  return Url::filterBadProtocol($string);
+  return UrlHelper::filterBadProtocol($string);
 }
 
 /**
@@ -1107,7 +1107,7 @@ function url($path = NULL, array $options = array()) {
  *   Boolean TRUE or FALSE, where TRUE indicates an external path.
  */
 function url_is_external($path) {
-  return Url::isExternal($path);
+  return UrlHelper::isExternal($path);
 }
 
 /**
@@ -1457,9 +1457,9 @@ function drupal_add_html_head_link($attributes, $header = FALSE) {
  *     - CSS_BASE: Styles for HTML elements ("base" styles).
  *     - CSS_LAYOUT: Styles that layout a page.
  *     - CSS_COMPONENT: Styles for design components (and their associated
- *       states and skins.)
+ *       states and themes.)
  *     - CSS_STATE: Styles for states that are not included with components.
- *     - CSS_SKIN: Styles for skins that are not included with components.
+ *     - CSS_THEME: Styles for themes that are not included with components.
  *     The weight numbers follow the SMACSS convention of CSS categorization.
  *     See http://drupal.org/node/1887922
  *   - 'media': The media type for the stylesheet, e.g., all, print, screen.
@@ -2808,7 +2808,7 @@ function drupal_get_library($extension, $name = NULL) {
                 $options['weight'] = 0;
               }
               // Apply the corresponding weight defined by CSS_* constants.
-              $options['weight'] += constant('CSS_' . strtoupper($category == 'theme' ? 'skin' : $category));
+              $options['weight'] += constant('CSS_' . strtoupper($category));
               $library[$type][$source] = $options;
             }
             unset($library[$type][$category]);
@@ -3191,7 +3191,7 @@ function _drupal_bootstrap_code() {
     // of allowed protocols for these cases.
     $allowed_protocols = array('http', 'https');
   }
-  Url::setAllowedProtocols($allowed_protocols);
+  UrlHelper::setAllowedProtocols($allowed_protocols);
 }
 
 /**
@@ -3248,9 +3248,7 @@ function drupal_page_set_cache(Response $response, Request $request) {
     $cache = (object) array(
       'cid' => drupal_page_cache_get_cid($request),
       'data' => array(
-        'path' => $request->attributes->get('_system_path'),
         'body' => $response->getContent(),
-        'title' => drupal_get_title(),
         'headers' => array(),
         // We need to store whether page was compressed or not,
         // because by the time it is read, the configuration might change.
