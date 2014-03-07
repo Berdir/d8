@@ -5,7 +5,7 @@
  * Contains Drupal\migrate\Plugin\MigrateLoadInterface
  */
 
-namespace Drupal\migrate\Plugin;
+namespace Drupal\migrate_drupal\Plugin;
 
 use Drupal\Core\Entity\EntityStorageControllerInterface;
 

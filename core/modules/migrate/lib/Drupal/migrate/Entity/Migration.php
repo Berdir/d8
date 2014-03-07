@@ -105,20 +105,6 @@ class Migration extends ConfigEntityBase implements MigrationInterface, Requirem
   protected $destinationPlugin;
 
   /**
-   * The load plugin configuration, if any.
-   *
-   * @var array
-   */
-  public $load = array();
-
-  /**
-   * The load plugin.
-   *
-   * @var \Drupal\migrate\Plugin\MigrateLoadInterface|false
-   */
-  protected $loadPlugin = FALSE;
-
-  /**
    * The identifier map data.
    *
    * Used to initialize $idMapPlugin.
@@ -302,16 +288,6 @@ class Migration extends ConfigEntityBase implements MigrationInterface, Requirem
       $this->destinationPlugin = \Drupal::service('plugin.manager.migrate.destination')->createInstance($this->destination['plugin'], $this->destination, $this);
     }
     return $this->destinationPlugin;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getLoadPlugin() {
-    if ($this->load && !$this->loadPlugin) {
-      $this->loadPlugin = \Drupal::service('plugin.manager.migrate.load')->createInstance($this->load['plugin'], $this->load, $this);
-    }
-    return $this->loadPlugin;
   }
 
   /**

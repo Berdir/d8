@@ -12,7 +12,7 @@ use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate\MigrateMessage;
 use Drupal\migrate\Row;
-use Drupal\migrate\Plugin\migrate\load\LoadEntity;
+use Drupal\migrate_drupal\Plugin\migrate\load\LoadEntity;
 
 /**
  * @PluginID("d6_term_node")

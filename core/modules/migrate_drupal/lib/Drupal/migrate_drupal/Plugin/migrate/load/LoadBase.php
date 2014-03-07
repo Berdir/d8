@@ -5,11 +5,11 @@
  * Contains \Drupal\migrate\Plugin\load\LoadBase.
  */
 
-namespace Drupal\migrate\Plugin\migrate\load;
+namespace Drupal\migrate_drupal\Plugin\migrate\load;
 
 use Drupal\Core\Entity\EntityStorageControllerInterface;
 use Drupal\Core\Plugin\PluginBase;
-use Drupal\migrate\Plugin\MigrateLoadInterface;
+use Drupal\migrate_drupal\Plugin\MigrateLoadInterface;
 use Drupal\migrate\Entity\MigrationInterface;
 
 /**

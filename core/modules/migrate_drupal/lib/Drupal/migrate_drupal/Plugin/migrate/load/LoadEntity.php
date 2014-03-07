@@ -5,7 +5,7 @@
  * Contains \Drupal\migrate\Plugin\load\LoadEntity.
  */
 
-namespace Drupal\migrate\Plugin\migrate\load;
+namespace Drupal\migrate_drupal\Plugin\migrate\load;
 
 use Drupal\Component\Utility\String;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
@@ -60,21 +60,13 @@ class LoadEntity extends LoadBase {
     }
     $sub_ids_to_load = isset($sub_ids) ? array_intersect($this->bundles, $sub_ids) : $this->bundles;
     $migrations = array();
-    $processed_destinations = array_map(
-      function ($value) {
-        $parts = explode('.', $value, 2);
-        return $parts[0];
-      },
-      array_keys($this->migration->getProcessPlugins())
-    );
     foreach ($sub_ids_to_load as $id) {
       $values = $this->migration->getExportProperties();
       $values['id'] = $this->migration->id() . ':' . $id;
       $values['source']['bundle'] = $id;
       /** @var \Drupal\migrate\Entity\MigrationInterface $migration */
       $migration = $storage_controller->create($values);
-      $all_fields = array_keys($migration->getSourcePlugin()->fields());
-      $fields = array_diff($all_fields, $processed_destinations);
+      $fields = array_keys($migration->getSourcePlugin()->fields());
       $migration->process += array_combine($fields, $fields);
       $migrations[$migration->id()] = $migration;
     }
