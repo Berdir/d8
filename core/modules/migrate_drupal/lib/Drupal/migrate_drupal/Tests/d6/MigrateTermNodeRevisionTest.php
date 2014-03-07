@@ -31,6 +31,9 @@ class MigrateTermNodeRevisionTest extends MigrateTermNodeTestBase {
   protected function setUp() {
     parent::setUp();
     $id_mappings = array(
+      'd6_term_node' => array(
+        array(array(2), array(1)),
+      ),
       'd6_node_revision' => array(
         array(array(2), array(2)),
       ),
@@ -49,9 +52,9 @@ class MigrateTermNodeRevisionTest extends MigrateTermNodeTestBase {
    */
   public function testTermRevisionNode() {
     $node = \Drupal::entityManager()->getStorageController('node')->loadRevision(2);
-    $this->assertEqual(count($node->test), 2);
-    $this->assertEqual($node->test[0]->value, 2);
-    $this->assertEqual($node->test[1]->value, 4);
+    $this->assertEqual(count($node->vocabulary_3_i_2_), 2);
+    $this->assertEqual($node->vocabulary_3_i_2_[0]->value, 4);
+    $this->assertEqual($node->vocabulary_3_i_2_[1]->value, 5);
   }
 
 }

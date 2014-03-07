@@ -27,7 +27,7 @@ class MigrateTermNodeTestBase extends MigrateDrupalTestBase {
     $vocabulary->save();
     $node_type = entity_create('node_type', array('type' => 'story'));
     $node_type->save();
-    foreach (array('vocabulary_1_i_0_', 'vocabulary_2_i_1_') as $name) {
+    foreach (array('vocabulary_1_i_0_', 'vocabulary_2_i_1_', 'vocabulary_3_i_2_') as $name) {
       entity_create('field_config', array(
         'name' => $name,
         'entity_type' => 'node',

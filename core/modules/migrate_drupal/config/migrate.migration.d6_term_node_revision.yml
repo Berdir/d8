@@ -7,11 +7,11 @@ source:
   plugin: d6_term_node_revision
 
 process:
-  nid: nid
+  vid: vid
   # The actual field name is dynamic and will be added by the load plugin.
 
 destination:
   plugin: entity_revision:node
 dependencies:
-  - d6_vocabulary_field
+  - d6_term_node
   - d6_node_revision

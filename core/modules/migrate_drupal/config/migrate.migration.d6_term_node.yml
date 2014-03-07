@@ -13,7 +13,6 @@ process:
 destination:
   plugin: entity:node
 dependencies:
-  - d6_vocabulary_field_instance
   - d6_vocabulary_entity_display
   - d6_vocabulary_entity_form_display
   - d6_node

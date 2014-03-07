@@ -38,23 +38,17 @@ class EntityRevision extends EntityContentBase {
    */
   protected function getEntity(Row $row) {
     $revision_id = $row->getDestinationProperty($this->getKey('revision'));
-    if (!empty($revision_id) && ($entity = $this->storageController->loadRevision($revision_id))) {
-      $this->updateEntity($entity, $row);
+   if (!empty($revision_id) && ($entity = $this->storageController->loadRevision($revision_id))) {
       $entity->setNewRevision(FALSE);
     }
     else {
-      $values = $row->getDestination();
-      // Stubs might not have the bundle specified.
-      if ($row->stub()) {
-        $bundle_key = $this->getKey('bundle');
-        if ($bundle_key && !isset($values[$bundle_key])) {
-          $values[$bundle_key] = reset($this->bundles);
-        }
-      }
-      $entity = $this->storageController->create($values);
+      $entity_id = $row->getDestinationProperty($this->getKey('id'));
+      $entity = $this->storageController->load($entity_id);
       $entity->enforceIsNew(FALSE);
       $entity->setNewRevision(TRUE);
+      $entity->keepNewRevisionId(TRUE);
     }
+    $this->updateEntity($entity, $row);
     $entity->isDefaultRevision(FALSE);
     return $entity;
   }

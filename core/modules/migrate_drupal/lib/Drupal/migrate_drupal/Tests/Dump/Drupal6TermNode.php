@@ -65,7 +65,7 @@ class Drupal6TermNode extends Drupal6DumpBase {
     ->values(array(
       'nid' => 1,
       'vid' => 2,
-      'tid' => 2,
+      'tid' => 5,
     ))
     ->values(array(
       'nid' => 1,

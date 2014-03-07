@@ -155,6 +155,10 @@ class Drupal6VocabularyField extends Drupal6DumpBase {
       'type' => 'story',
     ))
     ->values(array(
+      'vid' => '3',
+      'type' => 'story',
+    ))
+    ->values(array(
       'vid' => '4',
       'type' => 'article',
     ))
