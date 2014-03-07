@@ -276,6 +276,7 @@ class MigrateDrupal6Test extends MigrateDrupalTestBase {
       __NAMESPACE__ . '\MigrateSystemRssTest',
       __NAMESPACE__ . '\MigrateSystemSiteTest',
       __NAMESPACE__ . '\MigrateSystemThemeTest',
+      __NAMESPACE__ . '\MigrateTaxonomyConfigsTest',
       __NAMESPACE__ . '\MigrateTaxonomyTermTest',
       __NAMESPACE__ . '\MigrateTaxonomyVocabularyTest',
       __NAMESPACE__ . '\MigrateTermNodeRevisionTest',
