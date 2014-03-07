@@ -2,22 +2,14 @@ id: d6_field
 
 source:
   plugin: d6_field
-
+  constants:
+    entity_type: node
+    langocde: und
 process:
-  entity_type:
-    plugin: default_value
-    default_value: node
-  id:
-    plugin: field_id_generator
-    source:
-      - @entity_type
-      - field_name
+  entity_type: constants.entity_type
   status: active
-  langcode:
-    plugin: default_value
-    default_value: und
+  langcode: constants.langcode
   name: field_name
-
   type:
     -
       plugin: static_map
@@ -68,7 +60,13 @@ process:
         int_phone: telephone
     -
       plugin: file_image_handler
-
+  cardinality:
+    plugin: static_map
+    bypass: true
+    source: multiple
+    map:
+      0: 1
+      1: -1
   settings:
     plugin: field_settings
     source:

@@ -8,7 +8,6 @@
 namespace Drupal\migrate_drupal\Tests\d6;
 
 use Drupal\migrate\MigrateExecutable;
-use Drupal\Core\Database\Database;
 
 /**
  * Test cck field revision migration from Drupal 6 to 8.
@@ -59,12 +58,6 @@ class MigrateCckFieldRevisionTest extends MigrateNodeTestBase {
       'field_name' => 'field_test_two',
       'bundle' => 'story',
     ))->save();
-  }
-
-  /**
-   * Test CCK revision migration from Drupal 6 to 8.
-   */
-  public function testCckFieldRevision() {
 
     // Add some id mappings for the dependant migrations.
     $id_mappings = array(
@@ -74,6 +67,9 @@ class MigrateCckFieldRevisionTest extends MigrateNodeTestBase {
       'd6_node' => array(
         array(array(1), array(1)),
         array(array(2), array(2)),
+      ),
+      'd6_node_revision' => array(
+        array(array(1), array(1)),
       ),
     );
     $this->prepareIdMappings($id_mappings);
@@ -88,7 +84,12 @@ class MigrateCckFieldRevisionTest extends MigrateNodeTestBase {
       $executable = new MigrateExecutable($migration, $this);
       $executable->import();
     }
+  }
 
+  /**
+   * Test CCK revision migration from Drupal 6 to 8.
+   */
+  public function testCckFieldRevision() {
     $node = \Drupal::entityManager()->getStorageController('node')->loadRevision(2);
     $this->assertEqual($node->id(), 1, 'Node 1 loaded.');
     $this->assertEqual($node->getRevisionId(), 2, 'Node 1 revision 2loaded.');

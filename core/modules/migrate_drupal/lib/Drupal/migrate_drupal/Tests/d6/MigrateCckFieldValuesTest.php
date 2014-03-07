@@ -8,7 +8,6 @@
 namespace Drupal\migrate_drupal\Tests\d6;
 
 use Drupal\migrate\MigrateExecutable;
-use Drupal\Core\Database\Database;
 
 /**
  * Test cck field migration from Drupal 6 to 8.
@@ -59,17 +58,14 @@ class MigrateCckFieldValuesTest extends MigrateNodeTestBase {
       'field_name' => 'field_test_two',
       'bundle' => 'story',
     ))->save();
-  }
-
-  /**
-   * Test CCK migration from Drupal 6 to 8.
-   */
-  public function testCckFields() {
 
     // Add some id mappings for the dependant migrations.
     $id_mappings = array(
-      'd6_field_instance' => array(
-        array(array('fieldname', 'page'), array('node', 'fieldname', 'page')),
+      'd6_field_formatter_settings' => array(
+        array(array('page', 'default', 'node', 'field_test'), array('node', 'page', 'default', 'field_test')),
+      ),
+      'd6_field_instance_widget_settings' => array(
+        array(array('page', 'field_test'), array('node', 'page', 'default', 'test')),
       ),
       'd6_node' => array(
         array(array(1), array(1)),
@@ -84,6 +80,12 @@ class MigrateCckFieldValuesTest extends MigrateNodeTestBase {
       $executable->import();
     }
 
+  }
+
+  /**
+   * Test CCK migration from Drupal 6 to 8.
+   */
+  public function testCckFields() {
     $node = node_load(1);
     $this->assertEqual($node->field_test->value, 'This is a text field', "Single field storage field is correct.");
     $this->assertEqual($node->field_test_two->value, 10, 'Multi field storage field is correct');

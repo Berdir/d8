@@ -5,11 +5,9 @@ load:
 source:
   plugin: d6_cck_field_revision
 process:
-  nid:
-    plugin: migration
-    migration: d6_node
-    source: nid
+  vid: vid
 destination:
   plugin: entity_revision:node
 dependencies:
   - d6_cck_field_values
+  - d6_node_revision
