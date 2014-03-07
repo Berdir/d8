@@ -77,11 +77,12 @@ class MigrateTestBase extends WebTestBase implements MigrateMessageInterface {
   }
 
   /**
-   * Load dumps to be used.
+   * Load Drupal 6 database dumps to be used.
    *
-   * @fixme Better explanation.
+   * @param string $method
+   *   The name of the method in the dump class to use. Defaults to load.
    */
-  protected function loadDumps($files) {
+  protected function loadDumps($files, $method = 'load') {
     // Load the database from the portable PHP dump.
     // The files may be gzipped.
     foreach ($files as $file) {
@@ -91,7 +92,7 @@ class MigrateTestBase extends WebTestBase implements MigrateMessageInterface {
       }
       preg_match('/^namespace (.*);$/m', file_get_contents($file), $matches);
       $class = $matches[1] . '\\' . basename($file, '.php');
-      (new $class(Database::getConnection('default', 'migrate')))->load();
+      (new $class(Database::getConnection('default', 'migrate')))->$method();
     }
   }
 

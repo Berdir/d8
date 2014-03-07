@@ -71,7 +71,7 @@ class MigrateFileTest extends MigrateDrupalTestBase {
     $dumps = array(
       drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6SystemFile.php',
     );
-    $this->prepare($migration, $dumps);
+    $this->loadDumps($dumps, 'loadMigrateFileStandalone');
     $executable = new MigrateExecutable($migration, $this);
     $executable->import();
 

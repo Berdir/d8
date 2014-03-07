@@ -33,4 +33,20 @@ class Drupal6SystemFile extends Drupal6DumpBase {
     ->execute();
   }
 
+  /**
+   * Dump for the standalone test in MigrateFileTest.
+   */
+  public function loadMigrateFileStandalone() {
+    $this->createTable('variable');
+    $this->database->insert('variable')->fields(array(
+      'name',
+      'value',
+    ))
+    ->values(array(
+      'name' => 'file_directory_path',
+      'value' => 's:10:"files/test";',
+    ))
+    ->execute();
+  }
+
 }
