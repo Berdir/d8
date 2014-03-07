@@ -286,10 +286,11 @@ class MigrateExecutable {
       if ($save) {
         try {
           $destination_id_values = $destination->import($row, $id_map->lookupDestinationId($this->sourceIdValues));
-          // @todo Handle the successful but no ID case like config,
-          //   https://drupal.org/node/2160835.
           if ($destination_id_values) {
-            $id_map->saveIdMapping($row, $destination_id_values, $this->sourceRowStatus, $this->rollbackAction);
+            // We do not save an idMap entry for config.
+            if ($destination_id_values !== TRUE) {
+              $id_map->saveIdMapping($row, $destination_id_values, $this->sourceRowStatus, $this->rollbackAction);
+            }
             $this->successesSinceFeedback++;
             $this->totalSuccesses++;
           }

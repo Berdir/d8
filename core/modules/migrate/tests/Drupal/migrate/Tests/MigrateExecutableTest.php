@@ -149,6 +149,56 @@ class MigrateExecutableTest extends MigrateTestCase {
   /**
    * Tests the import method with a valid row.
    */
+  public function testImportWithValidRowWithoutDestinationId() {
+    $source = $this->getMockSource();
+
+    $row = $this->getMockBuilder('Drupal\migrate\Row')
+      ->disableOriginalConstructor()
+      ->getMock();
+
+    $row->expects($this->once())
+      ->method('getSourceIdValues')
+      ->will($this->returnValue(array('id' => 'test')));
+
+    $this->idMap->expects($this->once())
+      ->method('lookupDestinationId')
+      ->with(array('id' => 'test'))
+      ->will($this->returnValue(array('test')));
+
+    $source->expects($this->once())
+      ->method('current')
+      ->will($this->returnValue($row));
+
+    $this->executable->setSource($source);
+
+    $this->migration->expects($this->once())
+      ->method('getProcessPlugins')
+      ->will($this->returnValue(array()));
+
+    $destination = $this->getMock('Drupal\migrate\Plugin\MigrateDestinationInterface');
+    $destination->expects($this->once())
+      ->method('import')
+      ->with($row, array('test'))
+      ->will($this->returnValue(TRUE));
+
+    $this->migration->expects($this->once())
+      ->method('getDestinationPlugin')
+      ->will($this->returnValue($destination));
+
+    $this->idMap->expects($this->never())
+      ->method('saveIdMapping');
+
+    $this->assertSame(MigrationInterface::RESULT_COMPLETED, $this->executable->import());
+
+    $this->assertSame(1, $this->executable->getSuccessesSinceFeedback());
+    $this->assertSame(1, $this->executable->getTotalSuccesses());
+    $this->assertSame(1, $this->executable->getTotalProcessed());
+    $this->assertSame(1, $this->executable->getProcessedSinceFeedback());
+  }
+
+  /**
+   * Tests the import method with a valid row.
+   */
   public function testImportWithValidRowNoDestinationValues() {
     $source = $this->getMockSource();
 

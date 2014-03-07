@@ -69,6 +69,7 @@ class Config extends DestinationBase implements ContainerFactoryPluginInterface 
       $this->config->set($key, $value);
     }
     $this->config->save();
+    return TRUE;
   }
 
   /**
