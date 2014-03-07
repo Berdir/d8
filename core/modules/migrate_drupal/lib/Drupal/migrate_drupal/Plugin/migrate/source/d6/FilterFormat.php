@@ -17,7 +17,7 @@ use Drupal\migrate\Row;
  *   id = "d6_filter_format"
  * )
  */
-class FilterFormat extends \Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase {
+class FilterFormat extends DrupalSqlBase {
 
   /**
    * {@inheritdoc}
