@@ -9,16 +9,18 @@ namespace Drupal\migrate_drupal\Plugin\migrate\load;
 
 use Drupal\Component\Utility\String;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
+use Drupal\Core\Plugin\PluginBase;
 use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\MigrateException;
 use Drupal\migrate\Plugin\SourceEntityInterface;
+use Drupal\migrate_drupal\Plugin\MigrateLoadInterface;
 
 /**
  * Base class for entity load plugins.
  *
  * @PluginID("drupal_entity")
  */
-class LoadEntity extends LoadBase {
+class LoadEntity extends PluginBase implements MigrateLoadInterface {
 
   /**
    * The list of bundles being loaded.
@@ -32,6 +34,7 @@ class LoadEntity extends LoadBase {
    */
   public function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration);
+    $this->migration = $migration;
     $source_plugin = $this->migration->getSourcePlugin();
     if (!$source_plugin instanceof SourceEntityInterface) {
       throw new MigrateException('Migrations with a load plugin using LoadEntity should have an entity as source.');
@@ -39,6 +42,14 @@ class LoadEntity extends LoadBase {
     if ($source_plugin->bundleMigrationRequired() && empty($configuration['bundle_migration'])) {
       throw new MigrateException(String::format('Source plugin @plugin requires the bundle_migration key to be set.', array('@plugin' => $source_plugin->getPluginId())));
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function load(EntityStorageControllerInterface $storage_controller, $sub_id) {
+    $entities = $this->loadMultiple($storage_controller, array($sub_id));
+    return isset($entities[$sub_id]) ? $entities[$sub_id] : FALSE;
   }
 
   /**

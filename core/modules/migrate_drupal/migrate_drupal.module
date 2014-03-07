@@ -1,0 +1,11 @@
+<?php
+
+/**
+ * Implements hook_entity_type_alter().
+ */
+function migrate_drupal_entity_type_alter(array &$entity_types) {
+  $controllers = $entity_types['migration']->get('controllers');
+  $controllers['storage'] = 'Drupal\migrate_drupal\MigrationStorageController';
+  $entity_types['migration']->set('controllers', $controllers);
+  $entity_types['migration']->set('class', 'Drupal\migrate_drupal\Entity\Migration');
+}

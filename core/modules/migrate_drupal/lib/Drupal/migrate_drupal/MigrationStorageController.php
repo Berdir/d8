@@ -7,16 +7,15 @@
 
 namespace Drupal\migrate_drupal;
 
-use Drupal\Component\Graph\Graph;
 use Drupal\Component\Utility\String;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
-use Drupal\migrate\MigrationStorageController as MigrateMigrationStorageController;
+use Drupal\migrate\MigrationStorageController as BaseMigrationStorageController;
 
 /**
  * Storage controller for migration entities.
  */
-class MigrationStorageController extends MigrateMigrationStorageController {
+class MigrationStorageController extends BaseMigrationStorageController {
 
   /**
    * {@inheritdoc}
@@ -51,13 +50,13 @@ class MigrationStorageController extends MigrateMigrationStorageController {
       $ids_to_load = NULL;
     }
 
-    /** @var \Drupal\migrate\Entity\MigrationInterface[] $entities */
+    /** @var \Drupal\migrate_drupal\Entity\MigrationInterface[] $entities */
     $entities = parent::loadMultiple($ids_to_load);
     if (!isset($ids)) {
       // Changing the array being foreach()'d is not a good idea.
       $return = array();
       foreach ($entities as $entity_id => $entity) {
-        if ($plugin = $this->getLoadPlugin($entity)) {
+        if ($plugin = $entity->getLoadPlugin()) {
           $new_entities = $plugin->loadMultiple($this);
           $this->getDynamicIds($dynamic_ids, $new_entities);
           $return += $new_entities;
@@ -71,7 +70,7 @@ class MigrationStorageController extends MigrateMigrationStorageController {
     else {
       foreach ($dynamic_ids as $base_id => $sub_ids) {
         $entity = $entities[$base_id];
-        if ($plugin = $this->getLoadPlugin($entity)) {
+        if ($plugin = $entity->getLoadPlugin()) {
           unset($entities[$base_id]);
           $new_entities = $plugin->loadMultiple($this, $sub_ids);
           if (!isset($sub_ids)) {
@@ -85,11 +84,6 @@ class MigrationStorageController extends MigrateMigrationStorageController {
 
     // Build an array of dependencies and set the order of the migrations.
     return $this->buildDependencyMigration($entities, $dynamic_ids);
-  }
-
-  protected function getLoadPlugin($entity) {
-    // @todo, inject this.
-    return \Drupal::service('plugin.manager.migrate.load')->createInstance($entity->load['plugin'], $entity->load, $entity);
   }
 
   /**

@@ -8,10 +8,7 @@
 namespace Drupal\migrate;
 
 use Drupal\Component\Graph\Graph;
-use Drupal\Component\Utility\String;
 use Drupal\Core\Config\Entity\ConfigStorageController;
-use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityStorageException;
 
 /**
  * Storage controller for migration entities.
