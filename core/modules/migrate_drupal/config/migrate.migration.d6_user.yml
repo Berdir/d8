@@ -35,4 +35,4 @@ dependencies:
   - d6_user_role
   - d6_user_picture_entity_display
   - d6_user_picture_entity_form_display
-  - d6_user_picture_file
+  - d6_user_picture_file: false
