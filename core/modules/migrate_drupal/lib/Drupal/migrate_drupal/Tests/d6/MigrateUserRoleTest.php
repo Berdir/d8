@@ -10,8 +10,16 @@ namespace Drupal\migrate_drupal\Tests\d6;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
+/**
+ * Tests the Drupal 6 user roles to Drupal 8 migration.
+ */
 class MigrateUserRoleTest extends MigrateDrupalTestBase {
 
+  /**
+   * The modules to be enabled during the test.
+   *
+   * @var array
+   */
   static $modules = array('filter');
 
   /**
@@ -31,20 +39,13 @@ class MigrateUserRoleTest extends MigrateDrupalTestBase {
   public function setUp() {
     parent::setUp();
     // We need some sample data so we can use the Migration process plugin.
-    $table_name = entity_load('migration', 'd6_filter_format')->getIdMap()->mapTableName();
-    db_insert($table_name)->fields(array(
-      'sourceid1',
-      'destid1',
-    ))
-    ->values(array(
-      'sourceid1' => 1,
-      'destid1' => 'filtered_html',
-    ))
-    ->values(array(
-      'sourceid1' => 2,
-      'destid1' => 'full_html',
-    ))
-    ->execute();
+    $id_mappings = array(
+      'd6_filter_format' => array(
+        array(array(1), array('filtered_html')),
+        array(array(2), array('full_html'))
+      ),
+    );
+    $this->prepareIdMappings($id_mappings);
 
     /** @var \Drupal\migrate\entity\Migration $migration */
     $migration = entity_load('migration', 'd6_user_role');
