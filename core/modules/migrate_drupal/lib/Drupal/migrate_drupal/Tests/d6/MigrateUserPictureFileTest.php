@@ -53,18 +53,22 @@ class MigrateUserPictureFileTest extends MigrateDrupalTestBase {
    * Tests the Drupal 6 user pictures to Drupal 8 migration.
    */
   public function testUserPictures() {
+    $file_ids = array();
+    foreach (entity_load('migration', 'd6_user_picture_file')->getIdMap() as $destination_ids) {
+      $file_ids[] = reset($destination_ids);
+    }
+    $files = entity_load_multiple('file', $file_ids);
     /** @var \Drupal\file\FileInterface $file */
-    $file = entity_load('file', 1);
-    $this->assertEqual($file->getFilename(), 'Image1.png');
-    $this->assertEqual($file->getFileUri(), 'public://image-1.png');
-    $this->assertEqual($file->getSize(), 39325);
-    $this->assertEqual($file->getMimeType(), 'image/png');
+    $file = array_shift($files);
+    $this->assertEqual($file->getFilename(), 'image-test.jpg');
+    $this->assertEqual($file->getFileUri(), 'public://image-test.jpg');
+    $this->assertEqual($file->getSize(), 1901);
+    $this->assertEqual($file->getMimeType(), 'image/jpeg');
 
-    $file = entity_load('file', 2);
-    $this->assertEqual($file->getFilename(), 'Image2.jpg');
-    $this->assertEqual($file->getFileUri(), 'public://image-2.jpg');
-
-    $this->assertEqual(array(4), entity_load('migration', 'd6_user_picture_file')->getIdMap()->lookupDestinationID(array(2)));
+    $file = array_shift($files);
+    $this->assertEqual($file->getFilename(), 'image-test.png');
+    $this->assertEqual($file->getFileUri(), 'public://image-test.png');
+    $this->assertFalse($files);
   }
 
 }
