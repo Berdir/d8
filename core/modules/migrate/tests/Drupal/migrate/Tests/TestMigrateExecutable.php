@@ -222,6 +222,26 @@ class TestMigrateExecutable extends MigrateExecutable {
   }
 
   /**
+   * Sets the memory threshold.
+   *
+   * @param float $threshold
+   *   The new threshold.
+   */
+  public function setMemoryThreshold($threshold) {
+    $this->memoryThreshold = $threshold;
+  }
+
+  /**
+   * Sets the time threshold.
+   *
+   * @param float $threshold
+   *   The new threshold.
+   */
+  public function setTimeThreshold($threshold) {
+    $this->timeThreshold = $threshold;
+  }
+
+  /**
    * {@inheritdoc}
    */
   protected function formatSize($size) {

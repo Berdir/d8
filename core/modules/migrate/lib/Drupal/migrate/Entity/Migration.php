@@ -167,16 +167,6 @@ class Migration extends ConfigEntityBase implements MigrationInterface, Requirem
   public $sourceRowStatus = MigrateIdMapInterface::STATUS_IMPORTED;
 
   /**
-   * The ratio of the memory limit at which an operation will be interrupted.
-   *
-   * Can be overridden by a Migration subclass if one would like to push the
-   * envelope. Defaults to 0.85.
-   *
-   * @var float
-   */
-  protected $memoryThreshold = 0.85;
-
-  /**
    * @var \Drupal\Core\KeyValueStore\KeyValueStoreInterface
    */
   protected $highwaterStorage;
@@ -185,23 +175,6 @@ class Migration extends ConfigEntityBase implements MigrationInterface, Requirem
    * @var bool
    */
   public $trackLastImported = FALSE;
-
-  /**
-   * The ratio of the time limit at which an operation will be interrupted.
-   *
-   * Can be overridden by a Migration subclass if one would like to push the
-   * envelope. Defaults to 0.9.
-   *
-   * @var float
-   */
-  public $timeThreshold = 0.90;
-
-  /**
-   * The time limit when executing the migration.
-   *
-   * @var array
-   */
-  public $limit = array();
 
   /**
    * These migrations must be already executed before this migration can run.

@@ -45,8 +45,6 @@ class MigrateExecutableTest extends MigrateTestCase {
 
   protected $migrationConfiguration = array(
     'id' => 'test',
-    'limit' => array('unit' => 'second', 'value' => 1),
-    'timeThreshold' => 0.9,
   );
 
   /**
@@ -70,6 +68,8 @@ class MigrateExecutableTest extends MigrateTestCase {
 
     $this->executable = new TestMigrateExecutable($this->migration, $this->message);
     $this->executable->setTranslationManager($this->getStringTranslationStub());
+    $this->executable->setTimeThreshold(0.1);
+    $this->executable->limit = array('unit' => 'second', 'value' => 1);
   }
 
   /**
@@ -323,10 +323,10 @@ class MigrateExecutableTest extends MigrateTestCase {
     $this->executable->setTimeElapsed(1);
     $this->assertTrue($this->executable->timeOptionExceeded());
     // Assert time limit not exceeded.
-    $this->migration->set('limit', array('unit' => 'seconds', 'value' => (REQUEST_TIME - 3600)));
+    $this->executable->limit = array('unit' => 'seconds', 'value' => (REQUEST_TIME - 3600));
     $this->assertFalse($this->executable->timeOptionExceeded());
     // Assert no time limit.
-    $this->migration->set('limit', array());
+    $this->executable->limit = array();
     $this->assertFalse($this->executable->timeOptionExceeded());
   }
 
@@ -335,19 +335,19 @@ class MigrateExecutableTest extends MigrateTestCase {
    */
   public function testGetTimeLimit() {
     // Assert time limit has a unit of one second (test configuration default).
-    $limit = $this->migration->get('limit');
+    $limit = $this->executable->limit;
     $this->assertArrayHasKey('unit', $limit);
     $this->assertSame('second', $limit['unit']);
     $this->assertSame($limit['value'], $this->executable->getTimeLimit());
     // Assert time limit has a unit of multiple seconds.
-    $this->migration->set('limit', array('unit' => 'seconds', 'value' => 30));
-    $limit = $this->migration->get('limit');
+    $this->executable->limit = array('unit' => 'seconds', 'value' => 30);
+    $limit = $this->executable->limit;
     $this->assertArrayHasKey('unit', $limit);
     $this->assertSame('seconds', $limit['unit']);
     $this->assertSame($limit['value'], $this->executable->getTimeLimit());
     // Assert no time limit.
-    $this->migration->set('limit', array());
-    $limit = $this->migration->get('limit');
+    $this->executable->limit = array();
+    $limit = $this->executable->limit;
     $this->assertArrayNotHasKey('unit', $limit);
     $this->assertArrayNotHasKey('value', $limit);
     $this->assertNull($this->executable->getTimeLimit());

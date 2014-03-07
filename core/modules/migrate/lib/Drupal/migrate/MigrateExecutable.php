@@ -86,6 +86,33 @@ class MigrateExecutable {
   protected $maxExecTime;
 
   /**
+   * The ratio of the memory limit at which an operation will be interrupted.
+   *
+   * Can be overridden by a Migration subclass if one would like to push the
+   * envelope. Defaults to 0.85.
+   *
+   * @var float
+   */
+  protected $memoryThreshold = 0.85;
+
+  /**
+   * The ratio of the time limit at which an operation will be interrupted.
+   *
+   * Can be overridden by a Migration subclass if one would like to push the
+   * envelope. Defaults to 0.9.
+   *
+   * @var float
+   */
+  public $timeThreshold = 0.90;
+
+  /**
+   * The time limit when executing the migration.
+   *
+   * @var array
+   */
+  public $limit = array();
+
+  /**
    * The configuration values of the source.
    *
    * @var array
@@ -424,7 +451,7 @@ class MigrateExecutable {
    *   The time limit, NULL if no limit or if the units were not in seconds.
    */
   public function getTimeLimit() {
-    $limit = $this->migration->get('limit');
+    $limit = $this->limit;
     if (isset($limit['unit']) && isset($limit['value']) && ($limit['unit'] == 'seconds' || $limit['unit'] == 'second')) {
       return $limit['value'];
     }
@@ -510,7 +537,7 @@ class MigrateExecutable {
   protected function memoryExceeded() {
     $usage = $this->getMemoryUsage();
     $pct_memory = $usage / $this->memoryLimit;
-    if (!$threshold = $this->migration->get('memoryThreshold')) {
+    if (!$threshold = $this->memoryThreshold) {
       return FALSE;
     }
     if ($pct_memory > $threshold) {
@@ -592,7 +619,7 @@ class MigrateExecutable {
    *   TRUE if the threshold is exceeded, FALSE if not.
    */
   protected function maxExecTimeExceeded() {
-    return $this->maxExecTime && (($this->getTimeElapsed() / $this->maxExecTime) > $this->migration->get('timeThreshold'));
+    return $this->maxExecTime && (($this->getTimeElapsed() / $this->maxExecTime) > $this->timeThreshold);
   }
 
   /**

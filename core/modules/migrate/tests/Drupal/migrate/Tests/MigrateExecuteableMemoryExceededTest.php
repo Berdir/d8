@@ -90,7 +90,7 @@ class MigrateExecuteableMemoryExceededTest extends MigrateTestCase {
   protected function runMemoryExceededTest($message, $memory_exceeded, $memory_usage_first = NULL, $memory_usage_second = NULL, $memory_limit = NULL) {
     $this->executable->setMemoryLimit($memory_limit ?: $this->memoryLimit);
     $this->executable->setMemoryUsage($memory_usage_first ?: $this->memoryLimit, $memory_usage_second ?: $this->memoryLimit);
-    $this->migration->set('memoryThreshold', 0.85);
+    $this->executable->setMemoryThreshold(0.85);
     if ($message) {
       $this->executable->message->expects($this->at(0))
         ->method('display')
