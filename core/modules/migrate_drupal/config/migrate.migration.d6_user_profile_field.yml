@@ -1,7 +1,4 @@
 id: d6_user_profile_field
-sourceIds:
-  fid:
-    type: integer
 source:
   plugin: d6_profile_field
   constants:
