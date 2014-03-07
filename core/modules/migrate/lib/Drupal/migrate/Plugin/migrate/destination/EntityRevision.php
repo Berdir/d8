@@ -36,9 +36,9 @@ class EntityRevision extends EntityContentBase {
    * @return \Drupal\Core\Entity\EntityInterface|false
    *   The entity or false if it can not be created.
    */
-  protected function getEntity(Row $row) {
-    $revision_id = $row->getDestinationProperty($this->getKey('revision'));
-   if (!empty($revision_id) && ($entity = $this->storageController->loadRevision($revision_id))) {
+  protected function getEntity(Row $row, array $old_destination_id_values) {
+    $revision_id = $old_destination_id_values ? reset($old_destination_id_values) : $row->getDestinationProperty($this->getKey('revision'));
+    if (!empty($revision_id) && ($entity = $this->storageController->loadRevision($revision_id))) {
       $entity->setNewRevision(FALSE);
     }
     else {

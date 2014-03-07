@@ -93,7 +93,7 @@ class EntityContentBase extends Entity {
         }
       }
     }
-    $entity = $this->getEntity($row);
+    $entity = $this->getEntity($row, $old_destination_id_values);
     return $this->save($entity, $old_destination_id_values);
   }
 

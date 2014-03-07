@@ -35,7 +35,7 @@ class EntityConfigBase extends Entity {
         $row->setDestinationProperty($id_key, $this->generateId($row, $id_keys));
       }
     }
-    $entity = $this->getEntity($row);
+    $entity = $this->getEntity($row, $old_destination_id_values);
     $entity->save();
     if (count($ids) > 1) {
       // This can only be a config entity, content entities have their id key
