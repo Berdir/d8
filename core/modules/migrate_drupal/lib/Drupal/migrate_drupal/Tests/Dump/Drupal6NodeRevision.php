@@ -37,17 +37,6 @@ class Drupal6NodeRevision extends Drupal6DumpBase {
         'timestamp' => 1390095701,
         'format' => 1,
       ))
-      ->values(array(
-        'nid' => 2,
-        'vid' => 3,
-        'uid' => 1,
-        'title' => 'Test title rev 3',
-        'body' => 'test rev 3',
-        'teaser' => 'test rev 3',
-        'log' => '',
-        'timestamp' => 1390095701,
-        'format' => 1,
-      ))
       ->execute();
   }
 }

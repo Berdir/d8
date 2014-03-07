@@ -27,29 +27,29 @@ class MigrateTermNodeTestBase extends MigrateDrupalTestBase {
     $vocabulary->save();
     $node_type = entity_create('node_type', array('type' => 'story'));
     $node_type->save();
-    entity_create('field_config', array(
-      'name' => 'test',
-      'entity_type' => 'node',
-      'type' => 'taxonomy_term_reference',
-      'cardinality' => -1,
-      'settings' => array(
-        'allowed_values' => array(
-          array(
-            'vocabulary' => $vocabulary->id(),
-            'parent' => '0',
+    foreach (array('vocabulary_1_i_0_', 'vocabulary_2_i_1_') as $name) {
+      entity_create('field_config', array(
+        'name' => $name,
+        'entity_type' => 'node',
+        'type' => 'taxonomy_term_reference',
+        'cardinality' => -1,
+        'settings' => array(
+          'allowed_values' => array(
+            array(
+              'vocabulary' => $vocabulary->id(),
+              'parent' => '0',
+            ),
           ),
         ),
-      ),
-    ))->save();
-    entity_create('field_instance_config', array(
-      'field_name' => 'test',
-      'entity_type' => 'node',
-      'bundle' => 'story',
-    ))->save();
+      ))->save();
+      entity_create('field_instance_config', array(
+        'field_name' => $name,
+        'entity_type' => 'node',
+        'bundle' => 'story',
+      ))->save();
+
+    }
     $id_mappings = array(
-      'd6_taxonomy_vocabulary' => array(
-        array(array(1), array(1)),
-      ),
       'd6_vocabulary_field_instance' => array(
         array(array(1, 'page'), array('node', 'page', 'test')),
       ),
@@ -86,6 +86,7 @@ class MigrateTermNodeTestBase extends MigrateDrupalTestBase {
     $dumps = array(
       $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6Node.php',
       $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6TermNode.php',
+      $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6TaxonomyTerm.php',
       $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6TaxonomyVocabulary.php',
     );
     $this->loadDumps($dumps);

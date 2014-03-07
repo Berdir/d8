@@ -36,6 +36,7 @@ class TermNode extends DrupalSqlBase implements SourceEntityInterface {
       ->fields('tn', array('nid', 'vid'))
       ->fields('n', array('type'));
     // Because this is an inner join it enforces the current revision.
+    $query->innerJoin('term_data', 'td', 'td.tid = tn.tid AND td.vid = :vid', array(':vid' => $this->configuration['vid']));
     $query->innerJoin('node', 'n', static::JOIN);
     return $query;
 
@@ -61,6 +62,7 @@ class TermNode extends DrupalSqlBase implements SourceEntityInterface {
       ->fields('tn', array('tid'))
       ->condition('n.nid', $row->getSourceProperty('nid'));
     $query->join('node', 'n', static::JOIN);
+    $query->innerJoin('term_data', 'td', 'td.tid = tn.tid AND td.vid = :vid', array(':vid' => $this->configuration['vid']));
     $row->setSourceProperty('tid', $query->execute()->fetchCol());
     return parent::prepareRow($row);
   }

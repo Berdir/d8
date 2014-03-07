@@ -12,7 +12,7 @@ namespace Drupal\migrate\Plugin\migrate\destination;
  *   id = "entity:field_config"
  * )
  */
-class EntityFieldEntity extends EntityConfigBase {
+class EntityFieldConfig extends EntityConfigBase {
 
   /**
    * {@inheritdoc}

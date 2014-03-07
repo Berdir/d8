@@ -1,7 +1,6 @@
 id: d6_term_node
 load:
   plugin: d6_term_node
-  bundle_migration: d6_vocabulary_field
 
 source:
   plugin: d6_term_node

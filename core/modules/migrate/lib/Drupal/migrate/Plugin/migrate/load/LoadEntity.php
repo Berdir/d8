@@ -76,19 +76,10 @@ class LoadEntity extends LoadBase {
       $all_fields = array_keys($migration->getSourcePlugin()->fields());
       $fields = array_diff($all_fields, $processed_destinations);
       $migration->process += array_combine($fields, $fields);
-      $this->additionalProcess($id, $migration);
       $migrations[$migration->id()] = $migration;
     }
 
     return $migrations;
   }
 
-  /**
-   * Allow child classes to process the migration just before returning it.
-   *
-   * @param $id
-   * @param MigrationInterface $migration
-   */
-  protected function additionalProcess($id, MigrationInterface $migration) {
-  }
 }
