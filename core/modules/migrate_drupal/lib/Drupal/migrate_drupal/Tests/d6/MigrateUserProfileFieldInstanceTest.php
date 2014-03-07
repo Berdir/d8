@@ -81,10 +81,12 @@ class MigrateUserProfileFieldInstanceTest extends MigrateDrupalTestBase {
     $this->assertEqual($field->label(), 'Favorite bands');
     $this->assertEqual($field->getDescription(), "Enter your favorite bands. When you've saved your profile, you'll be able to find other people with the same favorites.");
 
+/*
     // Migrated URL field.
     $field = entity_load('field_instance_config', 'user.user.profile_blog');
     $this->assertEqual($field->label(), 'Your blog');
     $this->assertEqual($field->getDescription(), "Paste the full URL, including http://, of your personal blog.");
+*/
 
     // Migrated date field.
     $field = entity_load('field_instance_config', 'user.user.profile_birthdate');

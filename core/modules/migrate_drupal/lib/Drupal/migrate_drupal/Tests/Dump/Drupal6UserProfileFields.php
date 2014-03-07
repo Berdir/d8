@@ -203,6 +203,7 @@ class Drupal6UserProfileFields extends Drupal6DumpBase {
           'autocomplete' => '1',
           'options' => '',
         ),
+/*
         array(
           'fid' => '13',
           'title' => 'Your blog',
@@ -218,6 +219,7 @@ class Drupal6UserProfileFields extends Drupal6DumpBase {
           'autocomplete' => '0',
           'options' => '',
         ),
+*/
         array(
           'fid' => '14',
           'title' => 'Birthdate',
