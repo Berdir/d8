@@ -7,7 +7,6 @@
 
 namespace Drupal\migrate_drupal\Tests\d6;
 
-use Drupal\migrate\MigrateMessage;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
@@ -44,7 +43,7 @@ class MigrateSyslogConfigsTest extends MigrateDrupalTestBase {
       drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6SyslogSettings.php',
     );
     $this->prepare($migration, $dumps);
-    $executable = new MigrateExecutable($migration, new MigrateMessage());
+    $executable = new MigrateExecutable($migration, $this);
     $executable->import();
   }
 
@@ -54,6 +53,6 @@ class MigrateSyslogConfigsTest extends MigrateDrupalTestBase {
   public function testSyslogSettings() {
     $config = \Drupal::config('syslog.settings');
     $this->assertIdentical($config->get('identity'), 'drupal');
-    $this->assertIdentical($config->get('facility'), 128);
+    $this->assertIdentical($config->get('facility'), '128');
   }
 }
