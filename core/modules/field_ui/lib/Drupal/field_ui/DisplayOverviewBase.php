@@ -300,6 +300,7 @@ abstract class DisplayOverviewBase extends OverviewBase {
 
     );
 
+    debug($display_options, $field_name);
     $field_row['plugin'] = array(
       'type' => array(
         '#type' => 'select',

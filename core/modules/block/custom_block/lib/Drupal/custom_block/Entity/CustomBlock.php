@@ -185,8 +185,18 @@ class CustomBlock extends ContentEntityBase implements CustomBlockInterface {
       ->setDescription(t('The custom block language code.'));
 
     $fields['info'] = FieldDefinition::create('string')
-      ->setLabel(t('Subject'))
-      ->setDescription(t('The custom block name.'));
+      ->setLabel(t('Block description'))
+      ->setDescription(t('A brief description of your block.'))
+      ->setDisplayOptions('view', array(
+        'label' => 'hidden',
+        'type' => 'string',
+        'weight' => -5,
+      ))
+      ->setDisplayOptions('form', array(
+        'type' => 'string',
+        'weight' => -5,
+      ))
+      ->setDisplayConfigurable('form', TRUE);
 
     $fields['type'] = FieldDefinition::create('entity_reference')
       ->setLabel(t('Block type'))

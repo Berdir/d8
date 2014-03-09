@@ -134,7 +134,12 @@ class Feed extends ContentEntityBase implements FeedInterface {
 
     $fields['title'] = FieldDefinition::create('string')
       ->setLabel(t('Title'))
-      ->setDescription(t('The title of the feed.'));
+      ->setDescription(t('The title of the feed.'))
+      ->setDisplayOptions('form', array(
+        'type' => 'string',
+        'weight' => -5,
+      ))
+      ->setDisplayConfigurable('form', TRUE);
 
     $fields['langcode'] = FieldDefinition::create('language')
       ->setLabel(t('Language code'))
@@ -164,7 +169,12 @@ class Feed extends ContentEntityBase implements FeedInterface {
 
     $fields['description'] = FieldDefinition::create('string')
       ->setLabel(t('Description'))
-      ->setDescription(t("The parent website's description that comes from the !description element in the feed.", array('!description' => '<description>')));
+      ->setDescription(t("The parent website's description that comes from the !description element in the feed.", array('!description' => '<description>')))
+      ->setDisplayOptions('form', array(
+        'type' => 'text_textfield',
+        'weight' => 0,
+      ))
+      ->setDisplayConfigurable('form', TRUE);
 
     $fields['image'] = FieldDefinition::create('uri')
       ->setLabel(t('Image'))

@@ -61,22 +61,6 @@ class TermFormController extends ContentEntityFormController {
     $form_state['taxonomy']['parent'] = $parent;
     $form_state['taxonomy']['vocabulary'] = $vocabulary;
 
-    $form['name'] = array(
-      '#type' => 'textfield',
-      '#title' => $this->t('Name'),
-      '#default_value' => $term->name->value,
-      '#maxlength' => 255,
-      '#required' => TRUE,
-      '#weight' => -5,
-    );
-
-    $form['description'] = array(
-      '#type' => 'text_format',
-      '#title' => $this->t('Description'),
-      '#default_value' => $term->description->value,
-      '#format' => $term->description->format,
-      '#weight' => 0,
-    );
     $language_configuration = $this->moduleHandler->moduleExists('language') ? language_get_default_configuration('taxonomy_term', $vocabulary->id()) : FALSE;
     $form['langcode'] = array(
       '#type' => 'language_select',
@@ -136,16 +120,6 @@ class TermFormController extends ContentEntityFormController {
       '#required' => TRUE,
     );
 
-    $form['vid'] = array(
-      '#type' => 'value',
-      '#value' => $vocabulary->id(),
-    );
-
-    $form['tid'] = array(
-      '#type' => 'value',
-      '#value' => $term->id(),
-    );
-
     if ($term->isNew()) {
       $form_state['redirect'] = current_path();
     }
@@ -173,12 +147,6 @@ class TermFormController extends ContentEntityFormController {
 
     // Prevent leading and trailing spaces in term names.
     $term->name->value = trim($term->name->value);
-
-    // Convert text_format field into values expected by
-    // \Drupal\Core\Entity\Entity::save() method.
-    $description = $form_state['values']['description'];
-    $term->description->value = $description['value'];
-    $term->description->format = $description['format'];
 
     // Assign parents with proper delta values starting from 0.
     $term->parent = array_keys($form_state['values']['parent']);

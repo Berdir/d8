@@ -96,16 +96,6 @@ class CustomBlockFormController extends ContentEntityFormController {
     // names.
     $form['#attributes']['class'][0] = drupal_html_class('block-' . $block->bundle() . '-form');
 
-    // Basic block information.
-    $form['info'] = array(
-      '#type' => 'textfield',
-      '#title' => $this->t('Block description'),
-      '#required' => TRUE,
-      '#default_value' => $block->label(),
-      '#weight' => -5,
-      '#description' => $this->t('A brief description of your block. Used on the <a href="@overview">Blocks administration page</a>.', array('@overview' => $this->url('block.admin_display'))),
-    );
-
     if ($this->moduleHandler->moduleExists('language')) {
       $language_configuration = language_get_default_configuration('custom_block', $block->bundle());
 

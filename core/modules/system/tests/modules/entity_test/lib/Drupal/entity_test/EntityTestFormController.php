@@ -21,16 +21,6 @@ class EntityTestFormController extends ContentEntityFormController {
     $form = parent::form($form, $form_state);
     $entity = $this->entity;
 
-    $form['name'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Name'),
-      '#default_value' => $entity->name->value,
-      '#size' => 60,
-      '#maxlength' => 128,
-      '#required' => TRUE,
-      '#weight' => -10,
-    );
-
     $form['user_id'] = array(
       '#type' => 'textfield',
       '#title' => 'UID',

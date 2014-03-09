@@ -27,15 +27,6 @@ class FeedFormController extends ContentEntityFormController {
     $period = array_map('format_interval', array_combine($intervals, $intervals));
     $period[AGGREGATOR_CLEAR_NEVER] = $this->t('Never');
 
-    $form['title'] = array(
-      '#type' => 'textfield',
-      '#title' => $this->t('Title'),
-      '#default_value' => $feed->label(),
-      '#maxlength' => 255,
-      '#description' => $this->t('The name of the feed (or the name of the website providing the feed).'),
-      '#required' => TRUE,
-    );
-
     $form['langcode'] = array(
       '#title' => $this->t('Language'),
       '#type' => 'language_select',
