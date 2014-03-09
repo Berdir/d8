@@ -88,6 +88,13 @@ class Migration extends ConfigEntityBase implements MigrationInterface, Requirem
   public $process;
 
   /**
+   * The cached process plugins.
+   *
+   * @var array
+   */
+  protected $processPlugins = array();
+
+  /**
    * The destination configuration, with at least a 'plugin' key.
    *
    * Used to initialize $destinationPlugin.
@@ -207,23 +214,25 @@ class Migration extends ConfigEntityBase implements MigrationInterface, Requirem
     if (!isset($process)) {
       $process = $this->process;
     }
-    $process_plugins = array();
-    foreach ($this->getProcessNormalized($process) as $property => $configurations) {
-      $process_plugins[$property] = array();
-      foreach ($configurations as $configuration) {
-        if (isset($configuration['source'])) {
-          $process_plugins[$property][] = \Drupal::service('plugin.manager.migrate.process')->createInstance('get', $configuration, $this);
-        }
-        // Get is already handled.
-        if ($configuration['plugin'] != 'get') {
-          $process_plugins[$property][] = \Drupal::service('plugin.manager.migrate.process')->createInstance($configuration['plugin'], $configuration, $this);
-        }
-        if (!$process_plugins[$property]) {
-          throw new MigrateException("Invalid process configuration for $property");
+    $index = serialize($process);
+    if (!isset($this->processPlugins[$index])) {
+      foreach ($this->getProcessNormalized($process) as $property => $configurations) {
+        $this->processPlugins[$index][$property] = array();
+        foreach ($configurations as $configuration) {
+          if (isset($configuration['source'])) {
+            $this->processPlugins[$index][$property][] = \Drupal::service('plugin.manager.migrate.process')->createInstance('get', $configuration, $this);
+          }
+          // Get is already handled.
+          if ($configuration['plugin'] != 'get') {
+            $this->processPlugins[$index][$property][] = \Drupal::service('plugin.manager.migrate.process')->createInstance($configuration['plugin'], $configuration, $this);
+          }
+          if (!$this->processPlugins[$index][$property]) {
+            throw new MigrateException("Invalid process configuration for $property");
+          }
         }
       }
     }
-    return $process_plugins;
+    return $this->processPlugins[$index];
   }
 
   /**
