@@ -313,7 +313,7 @@ class Migration extends ConfigEntityBase implements MigrationInterface, Requirem
       }
 
       /** @var \Drupal\migrate\Entity\MigrationInterface[] $required_migrations */
-      $required_migrations = entity_load_multiple('migration', $this->requirements);
+      $required_migrations = \Drupal::entityManager()->getStorageController('migration')->loadMultiple($this->requirements);
       // Check if the dependencies are in good shape.
       foreach ($required_migrations as $required_migration) {
         // If the dependent source migration has no IDs then no mappings can

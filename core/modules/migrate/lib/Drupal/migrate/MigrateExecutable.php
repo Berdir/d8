@@ -88,18 +88,12 @@ class MigrateExecutable {
   /**
    * The ratio of the memory limit at which an operation will be interrupted.
    *
-   * Can be overridden by a Migration subclass if one would like to push the
-   * envelope. Defaults to 0.85.
-   *
    * @var float
    */
   protected $memoryThreshold = 0.85;
 
   /**
    * The ratio of the time limit at which an operation will be interrupted.
-   *
-   * Can be overridden by a Migration subclass if one would like to push the
-   * envelope. Defaults to 0.9.
    *
    * @var float
    */

@@ -182,7 +182,7 @@ class Row {
    * @param array|string $property
    *   An array of properties on the destination.
    *
-   * @return boolean
+   * @return bool
    *   TRUE if the destination property exists.
    */
   public function hasDestinationProperty($property) {
@@ -219,6 +219,7 @@ class Row {
    * @code
    * $this->destination['foo']['bar'] = 'baz';
    * $this->rawDestination['foo.bar'] = 'baz';
+   * @encode
    *
    * @return array
    *   The raw destination values.

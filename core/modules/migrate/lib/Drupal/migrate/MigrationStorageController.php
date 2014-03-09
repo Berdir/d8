@@ -28,8 +28,8 @@ class MigrationStorageController extends ConfigStorageController implements Migr
     $dependency_graph = array();
     $requirement_graph = array();
     $different = FALSE;
-    /** @var \Drupal\migrate\Entity\MigrationInterface $migration */
     foreach ($migrations as $migration) {
+      /** @var \Drupal\migrate\Entity\MigrationInterface $migration */
       $id = $migration->id();
       $requirements[$id] = array();
       $dependency_graph[$id]['edges'] = array();

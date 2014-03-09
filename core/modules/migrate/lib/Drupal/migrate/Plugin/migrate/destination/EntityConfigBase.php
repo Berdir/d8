@@ -30,8 +30,10 @@ class EntityConfigBase extends Entity {
     $ids = $this->getIds();
     $id_key = $this->getKey('id');
     if (count($ids) > 1) {
+      // Ids is keyed by the key name so grab the keys.
       $id_keys = array_keys($ids);
       if (!$row->getDestinationProperty($id_key)) {
+        // Set the id into the destination in for form "val1.val2.val3".
         $row->setDestinationProperty($id_key, $this->generateId($row, $id_keys));
       }
     }
@@ -98,7 +100,7 @@ class EntityConfigBase extends Entity {
   /**
    * Generate an entity id.
    *
-   * @param Row $row
+   * @param \Drupal\migrate\Row $row
    *   The current row.
    * @param array $ids
    *   The destination ids.

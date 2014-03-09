@@ -1,10 +1,11 @@
 <?php
 /**
  * @file
- * Contains
+ * Contains \Drupal\migrate\Plugin\MigrateEntityDestinationFieldInterface
  */
 
 namespace Drupal\migrate\Plugin;
+
 use Drupal\field\Entity\FieldInstance;
 
 /**

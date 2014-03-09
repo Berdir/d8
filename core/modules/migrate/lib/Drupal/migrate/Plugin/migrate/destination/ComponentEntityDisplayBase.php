@@ -51,7 +51,7 @@ abstract class ComponentEntityDisplayBase extends DestinationBase {
    * {@inheritdoc}
    */
   public function fields(MigrationInterface $migration = NULL) {
-    // TODO: Implement fields() method.
+    // This is intentionally left empty.
   }
 
   /**

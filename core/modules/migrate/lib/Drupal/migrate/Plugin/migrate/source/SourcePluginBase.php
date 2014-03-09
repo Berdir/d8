@@ -35,8 +35,11 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
     $this->migration = $migration;
   }
 
-   /**
+  /**
+   * Get the module handler.
+   *
    * @return \Drupal\Core\Extension\ModuleHandlerInterface
+   *   The module handler.
    */
   protected function getModuleHandler() {
     if (!isset($this->moduleHandler)) {
@@ -49,10 +52,10 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
    * {@inheritdoc}
    */
   public function prepareRow(Row $row) {
-    $resultHook = $this->getModuleHandler()->invokeAll('migrate_prepare_row', array($row, $this, $this->migration));
-    $resultNamedHook = $this->getModuleHandler()->invokeAll('migrate_'. $this->migration->id() . '_prepare_row', array($row, $this, $this->migration));
+    $result_hook = $this->getModuleHandler()->invokeAll('migrate_prepare_row', array($row, $this, $this->migration));
+    $result_named_hook = $this->getModuleHandler()->invokeAll('migrate_'. $this->migration->id() . '_prepare_row', array($row, $this, $this->migration));
     // If any of the hooks returned false, we want to skip the row.
-    if (($resultHook && in_array(FALSE, $resultHook)) || ($resultNamedHook && in_array(FALSE, $resultNamedHook))) {
+    if (($result_hook && in_array(FALSE, $result_hook)) || ($result_named_hook && in_array(FALSE, $result_named_hook))) {
       return FALSE;
     }
   }

@@ -25,7 +25,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   id = "migration"
  * )
  */
-class Migration extends ProcessPluginBase implements  ContainerFactoryPluginInterface {
+class Migration extends ProcessPluginBase implements ContainerFactoryPluginInterface {
 
   /**
    * @var \Drupal\migrate\Plugin\MigratePluginManager

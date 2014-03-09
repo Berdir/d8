@@ -83,7 +83,7 @@ abstract class Entity extends DestinationBase implements ContainerFactoryPluginI
    * @throws \Drupal\migrate\MigrateException
    */
   protected static function getEntityType($plugin_id) {
-    // Remove entity:
+    // Remove entity.
     return substr($plugin_id, 7);
   }
 

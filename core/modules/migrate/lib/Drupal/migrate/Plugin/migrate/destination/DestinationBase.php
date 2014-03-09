@@ -50,35 +50,35 @@ abstract class DestinationBase extends PluginBase implements MigrateDestinationI
    * Modify the Row before it is imported.
    */
   public function preImport() {
-    // TODO: Implement preImport() method.
+    // By default we do nothing.
   }
 
   /**
    * Modify the Row before it is rolled back.
    */
   public function preRollback() {
-    // TODO: Implement preRollback() method.
+    // By default we do nothing.
   }
 
   /**
    * {@inheritdoc}
    */
   public function postImport() {
-    // TODO: Implement postImport() method.
+    // By default we do nothing.
   }
 
   /**
    * {@inheritdoc}
    */
   public function postRollback() {
-    // TODO: Implement postRollback() method.
+    // By default we do nothing.
   }
 
   /**
    * {@inheritdoc}
    */
   public function rollbackMultiple(array $destination_identifiers) {
-    // TODO: Implement rollbackMultiple() method.
+    // By default we do nothing.
   }
 
   /**

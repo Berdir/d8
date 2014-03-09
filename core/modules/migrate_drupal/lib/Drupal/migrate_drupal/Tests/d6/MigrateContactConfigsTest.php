@@ -49,7 +49,7 @@ class MigrateContactConfigsTest extends MigrateDrupalTestBase {
   }
 
   /**
-   * Tests migration of aggregator variables to aggregator.settings.yml.
+   * Tests migration of contact variables to contact.settings.yml.
    */
   public function testContactSettings() {
     $config = \Drupal::config('contact.settings');
