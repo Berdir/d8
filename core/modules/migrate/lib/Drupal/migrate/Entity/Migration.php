@@ -186,7 +186,7 @@ class Migration extends ConfigEntityBase implements MigrationInterface, Requirem
   /**
    * These migrations, if ran at all, must be executed before this migration.
    *
-   *@var array
+   * @var array
    */
   public $dependencies = array();
 
