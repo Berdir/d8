@@ -13,6 +13,7 @@ use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Language\LanguageManager;
+use Drupal\migrate\Entity\MigrationInterface;
 
 class MigrateDestinationPluginManager extends MigratePluginManager {
 
@@ -33,35 +34,21 @@ class MigrateDestinationPluginManager extends MigratePluginManager {
   /**
    * {@inheritdoc}
    */
-  public function __construct($type, \Traversable $namespaces, CacheBackendInterface $cache_backend, LanguageManager $language_manager, ModuleHandlerInterface $module_handler, ThemeHandlerInterface $theme_handler, EntityManagerInterface $entity_manager, $annotation = 'Drupal\migrate\Annotation\MigrateDestination') {
+  public function __construct($type, \Traversable $namespaces, CacheBackendInterface $cache_backend, LanguageManager $language_manager, ModuleHandlerInterface $module_handler, EntityManagerInterface $entity_manager, $annotation = 'Drupal\migrate\Annotation\MigrateDestination') {
     parent::__construct($type, $namespaces, $cache_backend, $language_manager, $module_handler, $annotation);
-    $this->themeHandler = $theme_handler;
     $this->entityManager = $entity_manager;
   }
 
   /**
    * {@inheritdoc}
+   *
+   * A specific createInstance method is necessary to pass the migration on.
    */
-  public function processDefinition(&$definition, $plugin_id) {
-    // By setting requirements_met to something in the annotation, this
-    // handling can be skipped.
-    parent::processDefinition($definition, $plugin_id);
-    if ($definition['requirements_met'] === TRUE) {
-      if (substr($plugin_id, 0, 7) == 'entity:' && !$this->entityManager->getDefinition(substr($plugin_id, 7))) {
-        $definition['requirements_met'] = FALSE;
-      }
-      elseif (isset($definition['destination_provider'])) {
-        if (!isset($this->providers)) {
-          $this->providers = $this->moduleHandler->getModuleList();
-          foreach ($this->themeHandler->listInfo() as $theme => $info) {
-            if ($info->status) {
-              $this->providers[$theme] = TRUE;
-            }
-          }
-        }
-        $definition['requirements_met'] = isset($this->providers[$definition['destination_provider']]);
-      }
+  public function createInstance($plugin_id, array $configuration = array(), MigrationInterface $migration = NULL) {
+    if (substr($plugin_id, 0, 7) == 'entity:' && !$this->entityManager->getDefinition(substr($plugin_id, 7), FALSE)) {
+      $plugin_id = 'null';
     }
+    return parent::createInstance($plugin_id, $configuration, $migration);
   }
 
 }
