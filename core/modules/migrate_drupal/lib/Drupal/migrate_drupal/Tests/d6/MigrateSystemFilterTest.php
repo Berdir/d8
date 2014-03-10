@@ -11,6 +11,9 @@ use Drupal\migrate\MigrateMessage;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
 
+/**
+ * Tests the Drupal 6 system filter variables to Drupal 8 system.filter config migration.
+ */
 class MigrateSystemFilterTest extends MigrateDrupalTestBase {
 
   /**
