@@ -29,15 +29,28 @@ class Variable extends DrupalSqlBase {
   protected $variables;
 
   /**
+   * @var array
+   */
+  protected $defaults = array();
+
+  /**
    * {@inheritdoc}
    */
   public function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration);
-    $this->variables = $this->configuration['variables'];
+    $variables = $this->configuration['variables'];
+    foreach ($variables as $variable) {
+      if (is_array($variable)) {
+        list($variable, $default) = each($variable);
+        $this->defaults[$variable] = $default;
+      }
+      $this->variables[] = $variable;
+    }
   }
 
   protected function runQuery() {
-    return new \ArrayIterator(array(array_map('unserialize', $this->prepareQuery()->execute()->fetchAllKeyed())));
+    $variables = array_map('unserialize', $this->prepareQuery()->execute()->fetchAllKeyed());
+    return new \ArrayIterator(array($variables + $this->defaults));
   }
 
   public function count() {

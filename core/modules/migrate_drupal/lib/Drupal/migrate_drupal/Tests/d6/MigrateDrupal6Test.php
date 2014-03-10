@@ -119,7 +119,6 @@ class MigrateDrupal6Test extends MigrateDrupalTestBase {
       // This dump contains the file directory path to the simpletest directory
       // where the files are.
       $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6SystemFile.php',
-      $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6SystemFilter.php',
       $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6SystemImageGd.php',
       $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6SystemImage.php',
       $path . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6SystemMaintenance.php',

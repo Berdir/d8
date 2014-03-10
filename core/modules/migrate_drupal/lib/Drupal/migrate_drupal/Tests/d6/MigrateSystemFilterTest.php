@@ -30,10 +30,6 @@ class MigrateSystemFilterTest extends MigrateDrupalTestBase {
   protected function setUp() {
     parent::setUp();
     $migration = entity_load('migration', 'd6_system_filter');
-    $dumps = array(
-      drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6SystemFilter.php',
-    );
-    $this->prepare($migration, $dumps);
     $executable = new MigrateExecutable($migration, new MigrateMessage());
     $executable->import();
   }
