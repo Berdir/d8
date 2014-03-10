@@ -57,7 +57,7 @@ class EntityContentBase extends Entity {
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration = NULL) {
-    $entity_type = static::getEntityType($plugin_id);
+    $entity_type = static::getEntityTypeId($plugin_id);
     return new static(
       $configuration,
       $plugin_id,

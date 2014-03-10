@@ -22,7 +22,7 @@ class EntityRevision extends EntityContentBase {
   /**
    * {@inheritdoc}
    */
-  protected static function getEntityType($plugin_id) {
+  protected static function getEntityTypeId($plugin_id) {
     // Remove entity_revision:
     return substr($plugin_id, 16);
   }

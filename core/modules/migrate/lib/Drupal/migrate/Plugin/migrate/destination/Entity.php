@@ -61,14 +61,14 @@ abstract class Entity extends DestinationBase implements ContainerFactoryPluginI
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration = NULL) {
-    $entity_type = static::getEntityType($plugin_id);
+    $entity_type_id = static::getEntityTypeId($plugin_id);
     return new static(
       $configuration,
       $plugin_id,
       $plugin_definition,
       $migration,
-      $container->get('entity.manager')->getStorageController($entity_type),
-      array_keys($container->get('entity.manager')->getBundleInfo($entity_type))
+      $container->get('entity.manager')->getStorageController($entity_type_id),
+      array_keys($container->get('entity.manager')->getBundleInfo($entity_type_id))
     );
   }
 
@@ -83,7 +83,7 @@ abstract class Entity extends DestinationBase implements ContainerFactoryPluginI
    * @throws \Drupal\migrate\MigrateException
    */
   protected static function getEntityType($plugin_id) {
-    // Remove entity.
+    // Remove "entity:"
     return substr($plugin_id, 7);
   }
 
