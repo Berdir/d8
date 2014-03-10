@@ -11,6 +11,7 @@ use Drupal\Core\Entity\EntityStorageControllerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\MigrateExecutable;
+use Drupal\migrate\MigrateSkipRowException;
 use Drupal\migrate\Plugin\MigratePluginManager;
 use Drupal\migrate\ProcessPluginBase;
 use Drupal\migrate\Row;
@@ -47,12 +48,13 @@ class BlockPluginId extends ProcessPluginBase implements ContainerFactoryPluginI
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration = NULL) {
+    $entity_manager = $container->get('entity.manager');
     return new static(
       $configuration,
       $plugin_id,
       $plugin_definition,
       $migration,
-      $container->get('entity.manager')->getStorageController('custom_block'),
+      $entity_manager->getDefinition('custom_block') ? $entity_manager->getStorageController('custom_block') : NULL,
       $container->get('plugin.manager.migrate.process')
     );
   }
@@ -78,14 +80,18 @@ class BlockPluginId extends ProcessPluginBase implements ContainerFactoryPluginI
           $value = "system_menu_block:$delta";
           break;
         case 'block':
-          $block_ids = $this->processPluginManager
-            ->createInstance('migration', array('migration' => 'd6_custom_block'), $this->migration)
-            ->transform($delta, $migrate_executable, $row, $destination_property);
-          $value = 'custom_block:' . $this->customBlockStorageController->load($block_ids[0])->uuid();
+          if ($this->customBlockStorageController) {
+            $block_ids = $this->processPluginManager
+              ->createInstance('migration', array('migration' => 'd6_custom_block'), $this->migration)
+              ->transform($delta, $migrate_executable, $row, $destination_property);
+            $value = 'custom_block:' . $this->customBlockStorageController->load($block_ids[0])->uuid();
+          }
+          else {
+            throw new MigrateSkipRowException();
+          }
           break;
         default:
-          // @TODO skip row.
-          // throw new MigrateSkipRowException();
+          throw new MigrateSkipRowException();
       }
     }
     return $value;
