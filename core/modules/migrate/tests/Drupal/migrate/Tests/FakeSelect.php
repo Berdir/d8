@@ -301,6 +301,9 @@ class FakeSelect extends Select {
    *   The condition group to check.
    * @param array $rows
    *   An array of rows excluding non-matching rows.
+   *
+   * @return \Drupal\migrate\Tests\ConditionResolver
+   *   The condition resolver object.
    */
   protected function resolveConditions(Condition $condition_group, array &$rows) {
     $fields_with_table = $this->fieldsWithTable;

@@ -235,7 +235,7 @@ class Row {
    *   The name of a property on the destination.
    *
    * @return mixed
-   *  The destination value.
+   *   The destination value.
    */
   public function getDestinationProperty($property) {
     return NestedArray::getValue($this->destination, explode('.', $property));

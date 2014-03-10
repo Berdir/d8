@@ -284,7 +284,10 @@ class Migration extends ConfigEntityBase implements MigrationInterface, Requirem
   }
 
   /**
+   * Get the highwater storage object.
+   *
    * @return \Drupal\Core\KeyValueStore\KeyValueStoreInterface
+   *   The storage object.
    */
   protected function getHighWaterStorage() {
     if (!isset($this->highwaterStorage)) {

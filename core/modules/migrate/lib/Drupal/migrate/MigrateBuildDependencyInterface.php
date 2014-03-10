@@ -19,6 +19,7 @@ interface MigrateBuildDependencyInterface {
    *   migration ids (for example node:page, node:article).
    *
    * @return array
+   *   An array of migrations.
    */
   public function buildDependencyMigration(array $migrations, array $dynamic_ids);
 }

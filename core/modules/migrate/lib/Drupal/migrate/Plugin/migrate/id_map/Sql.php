@@ -28,11 +28,18 @@ use Drupal\migrate\Row;
 class Sql extends PluginBase implements MigrateIdMapInterface {
 
   /**
-   * Names of tables created for tracking the migration.
+   * The migration map table name.
    *
    * @var string
    */
-  protected $mapTableName, $messageTableName;
+  protected $mapTableName;
+
+  /**
+   * The message table name.
+   *
+   * @var string
+   */
+  protected $messageTableName;
 
   /**
    * The migrate message.
@@ -175,6 +182,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
    * The name of the database map table.
    *
    * @return string
+   *   The map table name.
    */
   public function mapTableName() {
     $this->init();
@@ -185,6 +193,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
    * The name of the database message table.
    *
    * @return string
+   *   The message table name.
    */
   public function messageTableName() {
     $this->init();
@@ -192,7 +201,10 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
   }
 
   /**
+   * Get the fully qualified map table name.
+   *
    * @return string
+   *   The fully qualified map table name.
    */
   public function getQualifiedMapTableName() {
     $database = $this->getDatabase();
@@ -205,6 +217,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
    * Gets the database connection.
    *
    * @return \Drupal\Core\Database\Connection
+   *   The database connection object.
    */
   protected function getDatabase() {
     if (!isset($this->database)) {
@@ -222,11 +235,11 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
       $this->initialized = TRUE;
       // Default generated table names, limited to 63 characters.
       $machine_name = str_replace(':', '__', $this->migration->id());
-      $prefixLength = strlen($this->getDatabase()->tablePrefix()) ;
+      $prefix_length = strlen($this->getDatabase()->tablePrefix());
       $this->mapTableName = 'migrate_map_' . Unicode::strtolower($machine_name);
-      $this->mapTableName = Unicode::substr($this->mapTableName, 0, 63 - $prefixLength);
+      $this->mapTableName = Unicode::substr($this->mapTableName, 0, 63 - $prefix_length);
       $this->messageTableName = 'migrate_message_' . Unicode::strtolower($machine_name);
-      $this->messageTableName = Unicode::substr($this->messageTableName, 0, 63 - $prefixLength);
+      $this->messageTableName = Unicode::substr($this->messageTableName, 0, 63 - $prefix_length);
       $this->ensureTables();
     }
   }

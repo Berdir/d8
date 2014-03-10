@@ -75,7 +75,7 @@ class EntityContentBase extends Entity {
    */
   public function import(Row $row, array $old_destination_id_values = array()) {
     if ($all_instances = $this->fieldInfo->getInstances($this->storageController->getEntityTypeId())) {
-      /** @var \Drupal\Field\Entity\FieldInstanceConfig [] $instances */
+      /** @var \Drupal\Field\Entity\FieldInstanceConfig[] $instances */
       $instances = array();
       if ($bundle_key = $this->getKey('bundle')) {
         $bundle = $row->getDestinationProperty($bundle_key);

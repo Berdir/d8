@@ -32,7 +32,8 @@ class MigratePassword implements PasswordInterface {
   /**
    * Builds the replacement password service class.
    *
-   * @param PasswordInterface $original_password
+   * @param \Drupal\Core\Password\PasswordInterface $original_password
+   *   The password object.
    */
   public function __construct(PasswordInterface $original_password) {
     $this->originalPassword = $original_password;

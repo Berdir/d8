@@ -36,6 +36,8 @@ abstract class Entity extends DestinationBase implements ContainerFactoryPluginI
   protected $bundles;
 
   /**
+   * Construct a new entity.
+   *
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
@@ -73,9 +75,7 @@ abstract class Entity extends DestinationBase implements ContainerFactoryPluginI
   /**
    * Finds the entity type from configuration or plugin id.
    *
-   * @param $configuration
-   *   The plugin configuration.
-   * @param $plugin_id
+   * @param string $plugin_id
    *   The plugin id.
    *
    * @return string
@@ -97,9 +97,13 @@ abstract class Entity extends DestinationBase implements ContainerFactoryPluginI
   /**
    * Creates or loads an entity.
    *
-   * @param Row $row
+   * @param \Drupal\migrate\Row $row
+   *   The row object.
    * @param array $old_destination_id_values
+   *   The old destination ids.
+   *
    * @return \Drupal\Core\Entity\EntityInterface
+   *   The entity we're importing into.
    */
   protected function getEntity(Row $row, array $old_destination_id_values) {
     $entity_id = $old_destination_id_values ? reset($old_destination_id_values) : $row->getDestinationProperty($this->getKey('id'));

@@ -39,14 +39,20 @@ abstract class SqlBase extends SourcePluginBase {
   }
 
   /**
-   * @return \Drupal\Core\Database\Connection
+   * Print the query string when the object is used a string.
+   *
+   * @return string
+   *   The query string.
    */
   public function __toString() {
     return (string) $this->query;
   }
 
   /**
+   * Get the database connection object.
+   *
    * @return \Drupal\Core\Database\Connection
+   *   The database connection.
    */
   public function getDatabase() {
     if (!isset($this->database)) {

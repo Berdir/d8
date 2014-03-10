@@ -38,6 +38,9 @@ class EmptySource extends SourcePluginBase {
     return '';
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getIds() {
     $ids['id']['type'] = 'string';
     return $ids;

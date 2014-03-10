@@ -21,7 +21,7 @@ use Drupal\migrate\Row;
  */
 class DefaultValue extends ProcessPluginBase {
 
- /**
+  /**
    * {@inheritdoc}
    */
   public function transform($value, MigrateExecutable $migrate_executable, Row $row, $destination_property) {

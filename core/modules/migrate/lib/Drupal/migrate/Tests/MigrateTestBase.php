@@ -52,7 +52,7 @@ class MigrateTestBase extends WebTestBase implements MigrateMessageInterface {
       $connection_info[$target]['prefix'] = array(
         // Simpletest uses 7 character prefixes at most so this can't cause
         // collisions.
-        'default' => $value['prefix']['default'] .'0',
+        'default' => $value['prefix']['default'] . '0',
       );
     }
     Database::addConnectionInfo('migrate', 'default', $connection_info['default']);
@@ -67,10 +67,12 @@ class MigrateTestBase extends WebTestBase implements MigrateMessageInterface {
   }
 
   /**
-   * @param MigrationInterface $migration
-   * @param array $files
+   * Prepare the migration.
    *
-   * @return \Drupal\Core\Database\Connection
+   * @param \Drupal\migrate\Entity\MigrationInterface $migration
+   *   The migration object.
+   * @param array $files
+   *   An array of files.
    */
   protected function prepare(MigrationInterface $migration, array $files = array()) {
     $this->loadDumps($files);
@@ -79,6 +81,8 @@ class MigrateTestBase extends WebTestBase implements MigrateMessageInterface {
   /**
    * Load Drupal 6 database dumps to be used.
    *
+   * @param array $files
+   *   An array of files.
    * @param string $method
    *   The name of the method in the dump class to use. Defaults to load.
    */
@@ -97,6 +101,8 @@ class MigrateTestBase extends WebTestBase implements MigrateMessageInterface {
   }
 
   /**
+   * Prepare the id mappings.
+   *
    * @param array $id_mappings
    *   A list of id mappings keyed by migration ids. Each id mapping is a list
    *   of two arrays, the first are source ids and the second are destination

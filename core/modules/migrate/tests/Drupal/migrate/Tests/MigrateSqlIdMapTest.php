@@ -257,11 +257,11 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
       $id_map->saveMessage(array($key), $message, $expected_result['level']);
       $message_row = $this->database->select($id_map->messageTableName(), 'message')
                        ->fields('message')
-                       ->condition('level',$expected_result['level'])
-                       ->condition('message',$expected_result['message'])
+                       ->condition('level', $expected_result['level'])
+                       ->condition('message', $expected_result['message'])
                        ->execute()
                        ->fetchAssoc();
-    $this->assertEquals($expected_result['message'], $message_row['message'], 'Message from database was read.');
+      $this->assertEquals($expected_result['message'], $message_row['message'], 'Message from database was read.');
     }
 
     // Insert with default level.

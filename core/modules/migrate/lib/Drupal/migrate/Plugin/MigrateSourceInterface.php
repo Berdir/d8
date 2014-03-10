@@ -27,6 +27,7 @@ interface MigrateSourceInterface extends \Countable, PluginInspectionInterface {
    * Returns the iterator that will yield the row arrays to be processed.
    *
    * @return \Iterator
+   *   The iterator object.
    *
    * @throws \Exception
    *   Cannot obtain a valid iterator.

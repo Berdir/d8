@@ -56,4 +56,3 @@ class StaticMap extends ProcessPluginBase {
   }
 
 }
-

@@ -110,7 +110,7 @@ abstract class MigrateTestCase extends UnitTestCase {
   protected function retrievalAssertHelper($expected_value, $actual_value, $message) {
     if (is_array($expected_value)) {
       foreach ($expected_value as $k => $v) {
-        $this->retrievalAssertHelper($v, $actual_value[$k], $message . '['. $k . ']');
+        $this->retrievalAssertHelper($v, $actual_value[$k], $message . '[' . $k . ']');
       }
     }
     else {

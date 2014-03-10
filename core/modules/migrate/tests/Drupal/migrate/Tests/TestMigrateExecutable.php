@@ -109,7 +109,7 @@ class TestMigrateExecutable extends MigrateExecutable {
   /**
    * Allows access to protected processedSinceFeedback property.
    *
-   * @var int
+   * @return int
    *   The value of the protected property.
    */
   public function getProcessedSinceFeedback() {
