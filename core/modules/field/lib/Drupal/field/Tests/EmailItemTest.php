@@ -2,14 +2,13 @@
 
 /**
  * @file
- * Contains \Drupal\email\Tests\EmailItemTest.
+ * Contains \Drupal\field\Tests\EmailItemTest.
  */
 
-namespace Drupal\email\Tests;
+namespace Drupal\field\Tests;
 
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FieldItemInterface;
-use Drupal\field\Tests\FieldUnitTestBase;
 
 /**
  * Tests the new entity API for the email field type.

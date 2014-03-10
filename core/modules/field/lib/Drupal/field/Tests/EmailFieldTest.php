@@ -2,12 +2,11 @@
 
 /**
  * @file
- * Definition of Drupal\email\Tests\EmailFieldTest.
+ * Definition of Drupal\field\Tests\EmailFieldTest.
  */
 
-namespace Drupal\email\Tests;
+namespace Drupal\field\Tests;
 
-use Drupal\Core\Language\Language;
 use Drupal\simpletest\WebTestBase;
 
 /**
