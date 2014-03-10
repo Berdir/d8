@@ -11,6 +11,8 @@ namespace Drupal\migrate\Plugin\migrate\process;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\migrate\MigrateException;
+use Drupal\migrate\MigrateSkipRowException;
+use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\Plugin\MigratePluginManager;
 use Drupal\migrate\ProcessPluginBase;
 use Drupal\migrate\Entity\MigrationInterface;
@@ -123,15 +125,24 @@ class Migration extends ProcessPluginBase implements ContainerFactoryPluginInter
       $stub_row->stub(TRUE);
       // Do a normal migration with the stub row.
       $migrate_executable->processRow($stub_row, $process);
-      $destination_ids = $destination_plugin->import($stub_row);
-    }
-    if ($scalar) {
-      if (count($destination_ids) == 1) {
-        return reset($destination_ids);
+      $destination_ids = array();
+      try {
+        $destination_ids = $destination_plugin->import($stub_row);
       }
-      throw new MigrateException('Migration process plugin failed.');
+      catch (MigrateException $e) {
+      }
     }
-    return $destination_ids;
+    if ($destination_ids) {
+      if ($scalar) {
+        if (count($destination_ids) == 1) {
+          return reset($destination_ids);
+        }
+      }
+      else {
+        return $destination_ids;
+      }
+    }
+    throw new MigrateSkipRowException();
   }
 
 }

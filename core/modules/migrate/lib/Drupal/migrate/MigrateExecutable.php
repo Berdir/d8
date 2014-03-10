@@ -7,7 +7,6 @@
 
 namespace Drupal\migrate;
 
-use Drupal\Component\Utility\String;
 use Drupal\Core\Utility\Error;
 use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;

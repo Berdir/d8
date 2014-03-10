@@ -9,6 +9,7 @@ namespace Drupal\migrate\Plugin\migrate\destination;
 
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\migrate\MigrateException;
 use Drupal\migrate\Row;
 
 /**
@@ -27,6 +28,9 @@ class EntityConfigBase extends Entity {
    * {@inheritdoc}
    */
   public function import(Row $row, array $old_destination_id_values = array()) {
+    if ($row->stub()) {
+      throw new MigrateException('Config entities can not be stubbed.');
+    }
     $ids = $this->getIds();
     $id_key = $this->getKey('id');
     if (count($ids) > 1) {
