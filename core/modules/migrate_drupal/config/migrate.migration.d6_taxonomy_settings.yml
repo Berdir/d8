@@ -6,7 +6,15 @@ source:
     - taxonomy_terms_per_page_admin
 process:
   override_selector: taxonomy_override_selector
-  terms_per_page_admin: taxonomy_terms_per_page_admin
+  # this settings requires a default because it's not inserted into the d6
+  # database anywhere.
+  terms_per_page_admin:
+    -
+      plugin: get
+      source: taxonomy_terms_per_page_admin
+    -
+      plugin: default_value
+      default_value: 100
 destination:
   plugin: config
   config_name: taxonomy.settings
