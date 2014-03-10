@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\field\Tests\EmailFieldTest.
+ * Contains \Drupal\field\Tests\EmailFieldTest.
  */
 
 namespace Drupal\field\Tests;
