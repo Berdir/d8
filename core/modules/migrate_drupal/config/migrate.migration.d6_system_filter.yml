@@ -2,20 +2,7 @@ id: d6_system_filter
 source:
   plugin: variable
   variables:
-    - filter_allowed_protocols:
-      - http
-      - https
-      - ftp
-      - news
-      - nntp
-      - tel
-      - telnet
-      - mailto
-      - irc
-      - ssh
-      - sftp
-      - webcal
-      - rtsp
+    - filter_allowed_protocols
 process:
   protocols: filter_allowed_protocols
 destination:
