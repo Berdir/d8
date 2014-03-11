@@ -4,7 +4,7 @@ source:
   plugin: d6_field
   constants:
     entity_type: node
-    langocde: und
+    langcode: und
 process:
   entity_type: constants.entity_type
   status: active
