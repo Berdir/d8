@@ -31,7 +31,6 @@ use Drupal\entity\EntityFormModeInterface;
  *   id = "form_mode",
  *   label = @Translation("Form mode"),
  *   controllers = {
- *     "storage" = "Drupal\entity\EntityDisplayModeStorageController",
  *     "list" = "Drupal\entity\EntityFormModeListController",
  *     "form" = {
  *       "add" = "Drupal\entity\Form\EntityFormModeAddForm",

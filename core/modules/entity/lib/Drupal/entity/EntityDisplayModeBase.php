@@ -8,6 +8,7 @@
 namespace Drupal\entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Core\Entity\EntityStorageControllerInterface;
 
 /**
  * Base class for config entity types that hold settings for form and view modes.
@@ -73,6 +74,22 @@ abstract class EntityDisplayModeBase extends ConfigEntityBase implements EntityD
    */
   public function getTargetType() {
     return $this->targetEntityType;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function preSave(EntityStorageControllerInterface $storage_controller) {
+    parent::preSave($storage_controller);
+    \Drupal::entityManager()->clearCachedDefinitions();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function preDelete(EntityStorageControllerInterface $storage_controller, array $entities) {
+    parent::preDelete($storage_controller, $entities);
+    \Drupal::entityManager()->clearCachedDefinitions();
   }
 
 }
