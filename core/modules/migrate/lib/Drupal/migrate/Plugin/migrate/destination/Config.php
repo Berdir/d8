@@ -16,6 +16,9 @@ use Drupal\Core\Config\Config as ConfigObject;
 /**
  * Persist data to the config system.
  *
+ * When a property is NULL, the default is used unless the configuration option
+ * 'store null' is set to TRUE.
+ *
  * @MigrateDestination(
  *   id = "config"
  * )
@@ -66,7 +69,9 @@ class Config extends DestinationBase implements ContainerFactoryPluginInterface 
    */
   public function import(Row $row, array $old_destination_id_values = array()) {
     foreach ($row->getRawDestination() as $key => $value) {
-      $this->config->set($key, $value);
+      if (isset($value) || !empty($this->configuration['store null'])) {
+        $this->config->set($key, $value);
+      }
     }
     $this->config->save();
     return TRUE;
