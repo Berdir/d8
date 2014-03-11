@@ -48,7 +48,7 @@ class MigrateEntityRevision implements ContainerDerivativeInterface {
   /**
    * {@inheritdoc}
    */
-  public function getDerivativeDefinition($derivative_id, array $base_plugin_definition) {
+  public function getDerivativeDefinition($derivative_id, $base_plugin_definition) {
     if (!empty($this->derivatives) && !empty($this->derivatives[$derivative_id])) {
       return $this->derivatives[$derivative_id];
     }
@@ -59,7 +59,7 @@ class MigrateEntityRevision implements ContainerDerivativeInterface {
   /**
    * {@inheritdoc}
    */
-  public function getDerivativeDefinitions(array $base_plugin_definition) {
+  public function getDerivativeDefinitions($base_plugin_definition) {
     foreach ($this->entityDefinitions as $entity_type => $entity_info) {
       if ($entity_info->getKey('revision')) {
         $this->derivatives[$entity_type] = array(

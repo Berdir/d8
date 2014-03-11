@@ -48,7 +48,7 @@ class MigrateEntity implements ContainerDerivativeInterface {
   /**
    * {@inheritdoc}
    */
-  public function getDerivativeDefinition($derivative_id, array $base_plugin_definition) {
+  public function getDerivativeDefinition($derivative_id, $base_plugin_definition) {
     if (!empty($this->derivatives) && !empty($this->derivatives[$derivative_id])) {
       return $this->derivatives[$derivative_id];
     }
@@ -59,7 +59,7 @@ class MigrateEntity implements ContainerDerivativeInterface {
   /**
    * {@inheritdoc}
    */
-  public function getDerivativeDefinitions(array $base_plugin_definition) {
+  public function getDerivativeDefinitions($base_plugin_definition) {
     foreach ($this->entityDefinitions as $entity_type => $entity_info) {
       $class = is_subclass_of($entity_info->getClass(), 'Drupal\Core\Config\Entity\ConfigEntityInterface') ?
         'Drupal\migrate\Plugin\migrate\destination\EntityConfigBase' :
