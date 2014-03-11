@@ -55,8 +55,10 @@ class MigrateSimpletestConfigsTest extends MigrateDrupalTestBase {
     $config = \Drupal::config('simpletest.settings');
     $this->assertIdentical($config->get('clear_results'), TRUE);
     $this->assertIdentical($config->get('httpauth.method'), CURLAUTH_BASIC);
-    $this->assertIdentical($config->get('httpauth.password'), NULL);
-    $this->assertIdentical($config->get('httpauth.username'), NULL);
+    // NULL in the dump means defaults which is empty string. Same as omitting
+    // them.
+    $this->assertIdentical($config->get('httpauth.password'), '');
+    $this->assertIdentical($config->get('httpauth.username'), '');
     $this->assertIdentical($config->get('verbose'), TRUE);
   }
 }
