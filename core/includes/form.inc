@@ -9,6 +9,7 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\Number;
 use Drupal\Component\Utility\String;
 use Drupal\Component\Utility\UrlHelper;
+use Drupal\Component\Utility\Xss;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Template\Attribute;
@@ -876,7 +877,9 @@ function form_process_select($element) {
 }
 
 /**
- * Returns HTML for a select form element.
+ * Prepares variables for select element templates.
+ *
+ * Default template: select.html.twig.
  *
  * It is possible to group options together; to do this, change the format of
  * $options to an associative array in which the keys are group labels, and the
@@ -887,15 +890,14 @@ function form_process_select($element) {
  *   - element: An associative array containing the properties of the element.
  *     Properties used: #title, #value, #options, #description, #extra,
  *     #multiple, #required, #name, #attributes, #size.
- *
- * @ingroup themeable
  */
-function theme_select($variables) {
+function template_preprocess_select(&$variables) {
   $element = $variables['element'];
   element_set_attributes($element, array('id', 'name', 'size'));
   _form_set_attributes($element, array('form-select'));
 
-  return '<select' . new Attribute($element['#attributes']) . '>' . form_select_options($element) . '</select>';
+  $variables['attributes'] = $element['#attributes'];
+  $variables['options'] = form_select_options($element);
 }
 
 /**
@@ -1000,68 +1002,59 @@ function form_get_options($element, $key) {
 }
 
 /**
- * Returns HTML for a fieldset form element and its children.
+ * Prepares variables for fieldset element templates.
  *
- * @param $variables
+ * Default template: fieldset.html.twig.
+ *
+ * @param array $variables
  *   An associative array containing:
  *   - element: An associative array containing the properties of the element.
- *     Properties used: #attributes, #children, #description, #id,
- *     #title, #value.
- *
- * @ingroup themeable
+ *     Properties used: #attributes, #children, #description, #id, #title,
+ *     #value.
  */
-function theme_fieldset($variables) {
+function template_preprocess_fieldset(&$variables) {
   $element = $variables['element'];
   element_set_attributes($element, array('id'));
   _form_set_attributes($element, array('form-wrapper'));
-
-  $element['#attributes']['class'][] = 'form-item';
-
-  if (!empty($element['#description'])) {
-    $description_id = $element['#attributes']['id'] . '--description';
-    $element['#attributes']['aria-describedby'] = $description_id;
-  }
+  $variables['attributes'] = $element['#attributes'];
+  $variables['attributes']['class'][] = 'form-item';
 
   // If the element is required, a required marker is appended to the label.
-  // @see theme_form_element_label()
-  $required = '';
+  $variables['required'] = '';
   if (!empty($element['#required'])) {
-    $marker = array(
+    $variables['required'] = array(
       '#theme' => 'form_required_marker',
       '#element' => $element,
     );
-    $required = drupal_render($marker);
   }
 
+  $variables['prefix'] = isset($element['#field_prefix']) ? $element['#field_prefix'] : NULL;
+  $variables['suffix'] = isset($element['#field_suffix']) ? $element['#field_suffix'] : NULL;
+  $variables['children'] = $element['#children'];
+
+  // Build legend properties.
+  $variables['legend'] = array();
   $legend_attributes = array();
   if (isset($element['#title_display']) && $element['#title_display'] == 'invisible') {
     $legend_attributes['class'][] = 'visually-hidden';
   }
+  $variables['legend']['attributes'] = new Attribute($legend_attributes);
+  $variables['legend']['title'] = (isset($element['#title']) && $element['#title'] !== '') ? Xss::filterAdmin($element['#title']) : '';
 
-  $output = '<fieldset' . new Attribute($element['#attributes']) . '>';
-
-  if ((isset($element['#title']) && $element['#title'] !== '') || !empty($element['#required'])) {
-    // Always wrap fieldset legends in a SPAN for CSS positioning.
-    $output .= '<legend' . new Attribute($legend_attributes) . '><span class="fieldset-legend">';
-    $output .= t('!title!required', array('!title' => $element['#title'], '!required' => $required));
-    $output .= '</span></legend>';
-  }
-  $output .= '<div class="fieldset-wrapper">';
-
-  if (isset($element['#field_prefix'])) {
-    $output .= '<span class="field-prefix">' . $element['#field_prefix'] . '</span> ';
-  }
-  $output .= $element['#children'];
-  if (isset($element['#field_suffix'])) {
-    $output .= ' <span class="field-suffix">' . $element['#field_suffix'] . '</span>';
-  }
+  // Build description properties.
+  $variables['description'] = array();
   if (!empty($element['#description'])) {
-    $attributes = array('class' => 'description', 'id' => $description_id);
-    $output .= '<div' . new Attribute($attributes) . '>' . $element['#description'] . '</div>';
+    $description_id = $element['#attributes']['id'] . '--description';
+    $description_attributes = array(
+      'class' => 'description',
+      'id' => $description_id,
+    );
+    $variables['description']['attributes'] = new Attribute($description_attributes);
+    $variables['description']['content'] = $element['#description'];
+
+    // Add the description's id to the fieldset aria attributes.
+    $variables['attributes']['aria-describedby'] = $description_id;
   }
-  $output .= '</div>';
-  $output .= "</fieldset>\n";
-  return $output;
 }
 
 /**
@@ -1648,7 +1641,7 @@ function theme_tableselect($variables) {
     // checkboxes/radios in the first table column.
     if ($element['#js_select']) {
       // Add a "Select all" checkbox.
-      $table['#attached']['library'][] = array('core', 'drupal.tableselect');
+      $table['#attached']['library'][] = 'core/drupal.tableselect';
       array_unshift($header, array('class' => array('select-all')));
     }
     else {
@@ -1770,7 +1763,7 @@ function form_process_table($element, &$form_state) {
     // Add a "Select all" checkbox column to the header.
     // @todo D8: Rename into #select_all?
     if ($element['#js_select']) {
-      $element['#attached']['library'][] = array('core', 'drupal.tableselect');
+      $element['#attached']['library'][] = 'core/drupal.tableselect';
       array_unshift($element['#header'], array('class' => array('select-all')));
     }
     // Add an empty header column for radio buttons or when a "Select all"
@@ -1999,7 +1992,7 @@ function form_process_machine_name($element, &$form_state) {
       'langcode' => $language->id,
     ),
   );
-  $element['#attached']['library'][] = array('core', 'drupal.machine-name');
+  $element['#attached']['library'][] = 'core/drupal.machine-name';
   $element['#attached']['js'][] = $js_settings;
 
   return $element;
@@ -2092,7 +2085,7 @@ function form_pre_render_details($element) {
   _form_set_attributes($element, array('form-wrapper'));
 
   // Collapsible details.
-  $element['#attached']['library'][] = array('core', 'drupal.collapse');
+  $element['#attached']['library'][] = 'core/drupal.collapse';
   if (!empty($element['#open'])) {
     $element['#attributes']['open'] = 'open';
   }
@@ -2146,7 +2139,7 @@ function form_pre_render_group($element) {
 
   if (isset($element['#group'])) {
     // Contains form element summary functionalities.
-    $element['#attached']['library'][] = array('core', 'drupal.form');
+    $element['#attached']['library'][] = 'core/drupal.form';
 
     $group = $element['#group'];
     // If this element belongs to a group, but the group-holding element does
@@ -2195,7 +2188,7 @@ function form_process_vertical_tabs($element, &$form_state) {
     $element['#title_display'] = 'invisible';
   }
 
-  $element['#attached']['library'][] = array('core', 'drupal.vertical-tabs');
+  $element['#attached']['library'][] = 'core/drupal.vertical-tabs';
 
   // The JavaScript stores the currently selected tab in this hidden
   // field so that the active tab can be restored the next time the
@@ -2285,7 +2278,7 @@ function form_process_autocomplete($element, &$form_state) {
   }
   if ($access) {
     $element['#attributes']['class'][] = 'form-autocomplete';
-    $element['#attached']['library'][] = array('core', 'drupal.autocomplete');
+    $element['#attached']['library'][] = 'core/drupal.autocomplete';
     // Provide a data attribute for the JavaScript behavior to bind to.
     $element['#attributes']['data-autocomplete-path'] = $path;
   }
@@ -2679,16 +2672,16 @@ function form_pre_render_color($element) {
 }
 
 /**
- * Returns HTML for a form.
+ * Prepares variables for form templates.
+ *
+ * Default template: form.html.twig.
  *
  * @param $variables
  *   An associative array containing:
  *   - element: An associative array containing the properties of the element.
  *     Properties used: #action, #method, #attributes, #children
- *
- * @ingroup themeable
  */
-function theme_form($variables) {
+function template_preprocess_form(&$variables) {
   $element = $variables['element'];
   if (isset($element['#action'])) {
     $element['#attributes']['action'] = UrlHelper::stripDangerousProtocols($element['#action']);
@@ -2697,8 +2690,8 @@ function theme_form($variables) {
   if (empty($element['#attributes']['accept-charset'])) {
     $element['#attributes']['accept-charset'] = "UTF-8";
   }
-  // Anonymous DIV to satisfy XHTML compliance.
-  return '<form' . new Attribute($element['#attributes']) . '><div>' . $element['#children'] . '</div></form>';
+  $variables['attributes'] = $element['#attributes'];
+  $variables['children'] = $element['#children'];
 }
 
 /**

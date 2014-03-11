@@ -466,7 +466,7 @@ function check_markup($text, $format_id = NULL, $langcode = '', $cache = FALSE, 
  *   The expanded element.
  */
 function filter_process_format($element) {
-  global $user;
+  $user = \Drupal::currentUser();
 
   // Ensure that children appear as subkeys of this element.
   $element['#tree'] = TRUE;
@@ -501,7 +501,7 @@ function filter_process_format($element) {
   $element['value'] += element_info($element['#base_type']);
 
   // Turn original element into a text format wrapper.
-  $element['#attached']['library'][] = array('filter', 'drupal.filter');
+  $element['#attached']['library'][] = 'filter/drupal.filter';
 
   // Setup child container for the text format widget.
   $element['format'] = array(
@@ -639,9 +639,7 @@ function filter_form_access_denied($element) {
  *   - id: Filter ID.
  */
 function _filter_tips($format_id, $long = FALSE) {
-  global $user;
-
-  $formats = filter_formats($user);
+  $formats = filter_formats(\Drupal::currentUser());
 
   $tips = array();
 
@@ -1146,5 +1144,5 @@ function filter_filter_secure_image_alter(&$image) {
  * Implements hook_page_build().
  */
 function filter_page_build(&$page) {
-  $page['#attached']['library'][] = array('filter', 'caption');
+  $page['#attached']['library'][] = 'filter/caption';
 }

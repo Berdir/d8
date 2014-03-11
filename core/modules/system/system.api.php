@@ -362,12 +362,12 @@ function hook_library_info_alter(&$libraries, $module) {
  *
  * @see drupal_add_library()
  */
-function hook_library_alter(array &$library, $extension, $name) {
-  if ($extension == 'core' && $name == 'jquery.ui.datepicker') {
+function hook_library_alter(array &$library, $name) {
+  if ($name == 'core/jquery.ui.datepicker') {
     // Note: If the added assets do not depend on additional request-specific
     // data supplied here, consider to statically register it directly via
     // hook_library_info_alter() already.
-    $library['dependencies'][] = array('locale', 'drupal.locale.datepicker');
+    $library['dependencies'][] = 'locale/drupal.locale.datepicker';
 
     $language_interface = \Drupal::languageManager()->getCurrentLanguage();
     $settings['jquery']['ui']['datepicker'] = array(
@@ -436,7 +436,7 @@ function hook_page_build(&$page) {
   $path = drupal_get_path('module', 'foo');
   // Add JavaScript/CSS assets to all pages.
   // @see drupal_process_attached()
-  $page['#attached']['js'][$path . '/foo.css'] = array('every_page' => TRUE);
+  $page['#attached']['js'][$path . '/foo.js'] = array('every_page' => TRUE);
   $page['#attached']['css'][$path . '/foo.base.css'] = array('every_page' => TRUE);
   $page['#attached']['css'][$path . '/foo.theme.css'] = array('every_page' => TRUE);
 
@@ -2250,7 +2250,7 @@ function hook_uninstall() {
  * installer to pause and display a page to the user by returning any themed
  * output that should be displayed on that page (but see below for tasks that
  * use the form API or batch API; the return values of these task functions are
- * handled differently). You should also use drupal_set_title() within the task
+ * handled differently). You should also use #title within the task
  * callback function to set a custom page title. For some tasks, however, you
  * may want to simply do some processing and pass control to the next task
  * without ending the page request; to indicate this, simply do not send back

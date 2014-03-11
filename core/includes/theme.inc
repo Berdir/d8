@@ -88,7 +88,7 @@ function drupal_theme_access($theme) {
  * Initializes the theme system by loading the theme.
  */
 function drupal_theme_initialize() {
-  global $theme, $user, $theme_key;
+  global $theme, $theme_key;
 
   // If $theme is already set, assume the others are set, too, and do nothing
   if (isset($theme)) {
@@ -1525,7 +1525,7 @@ function theme_table($variables) {
 
   // Add sticky headers, if applicable.
   if (count($header) && $sticky) {
-    drupal_add_library('core', 'drupal.tableheader');
+    drupal_add_library('core/drupal.tableheader');
     // Add 'sticky-enabled' class to the table to identify it for JS.
     // This is needed to target tables constructed by this function.
     $attributes['class'][] = 'sticky-enabled';
@@ -1534,7 +1534,7 @@ function theme_table($variables) {
   // with the classes represented by the constants RESPONSIVE_PRIORITY_MEDIUM
   // and RESPONSIVE_PRIORITY_LOW, add the tableresponsive behaviors.
   if (count($header) && $responsive) {
-    drupal_add_library('core', 'drupal.tableresponsive');
+    drupal_add_library('core/drupal.tableresponsive');
     // Add 'responsive-enabled' class to the table to identify it for JS.
     // This is needed to target tables constructed by this function.
     $attributes['class'][] = 'responsive-enabled';
@@ -1693,8 +1693,7 @@ function theme_table($variables) {
  */
 function theme_mark($variables) {
   $type = $variables['status'];
-  global $user;
-  if ($user->isAuthenticated()) {
+  if (\Drupal::currentUser()->isAuthenticated()) {
     if ($type == MARK_NEW) {
       return ' <span class="marker">' . t('new') . '</span>';
     }
@@ -1824,20 +1823,16 @@ function theme_indentation($variables) {
 }
 
 /**
- * Returns HTML to wrap child elements in a container.
+ * Prepares variables for container templates.
  *
- * Used for grouped form items. Can also be used as a #theme_wrapper for any
- * renderable element, to surround it with a <div> and add attributes such as
- * classes or an HTML id.
+ * Default template: container.html.twig.
  *
- * @param $variables
+ * @param array $variables
  *   An associative array containing:
  *   - element: An associative array containing the properties of the element.
  *     Properties used: #id, #attributes, #children.
- *
- * @ingroup themeable
  */
-function theme_container($variables) {
+function template_preprocess_container(&$variables) {
   $element = $variables['element'];
   // Ensure #attributes is set.
   $element += array('#attributes' => array());
@@ -1852,7 +1847,8 @@ function theme_container($variables) {
     $element['#attributes']['class'][] = 'form-wrapper';
   }
 
-  return '<div' . new Attribute($element['#attributes']) . '>' . $element['#children'] . '</div>';
+  $variables['children'] = $element['#children'];
+  $variables['attributes'] = $element['#attributes'];
 }
 
 /**
@@ -2092,7 +2088,7 @@ function template_preprocess_html(&$variables) {
     drupal_add_html_head($element, $name);
   }
 
-  drupal_add_library('core', 'html5shiv', TRUE);
+  drupal_add_library('core/html5shiv', TRUE);
 
   $variables['page_top'][] = array('#markup' => $page->getBodyTop());
   $variables['page_bottom'][] = array('#markup' => $page->getBodyBottom());
@@ -2119,9 +2115,6 @@ function template_preprocess_html(&$variables) {
  *
  * Uses the arg() function to generate a series of page template suggestions
  * based on the current path.
- *
- * Any changes to variables in this preprocessor should also be changed inside
- * template_preprocess_maintenance_page() to keep all of them consistent.
  *
  * @see drupal_render_page()
  */
@@ -2366,8 +2359,8 @@ function template_preprocess_maintenance_page(&$variables) {
 
   // These are usually added from system_page_build() except maintenance.css.
   // When the database is inactive it's not called so we add it here.
-  $default_css['library'][] = array('core', 'normalize');
-  $default_css['library'][] = array('system', 'maintenance');
+  $default_css['library'][] = 'core/normalize';
+  $default_css['library'][] = 'system/maintenance';
   $attached = array('#attached' => $default_css);
   drupal_render($attached);
   $variables['messages'] = array(
@@ -2377,19 +2370,12 @@ function template_preprocess_maintenance_page(&$variables) {
 
   $variables['head_title_array']  = $head_title;
   $variables['head_title']        = implode(' | ', $head_title);
-  $variables['base_path']         = base_path();
   $variables['front_page']        = url();
-  $variables['breadcrumb']        = '';
-  $variables['feed_icons']        = '';
   $variables['help']              = '';
   $variables['language']          = $language_interface;
-  $variables['language']->dir     = $language_interface->direction ? 'rtl' : 'ltr';
   $variables['logo']              = theme_get_setting('logo.url');
-  $variables['main_menu']         = array();
-  $variables['secondary_menu']    = array();
   $variables['site_name']         = (theme_get_setting('features.name') ? String::checkPlain($site_name) : '');
   $variables['site_slogan']       = (theme_get_setting('features.slogan') ? filter_xss_admin($site_slogan) : '');
-  $variables['tabs']              = '';
 
   // Compile a list of classes that are going to be applied to the body element.
   $variables['attributes']['class'][] = 'maintenance-page';
@@ -2447,6 +2433,7 @@ function template_preprocess_maintenance_page(&$variables) {
  */
 function template_preprocess_install_page(&$variables) {
   template_preprocess_maintenance_page($variables);
+  $variables['attributes']['class'][] = 'install-page';
   // Override the site name that is displayed on the page, since Drupal is
   // still in the process of being installed.
   $variables['site_name'] = drupal_install_profile_distribution_name();
@@ -2561,7 +2548,7 @@ function drupal_common_theme() {
       'template' => 'maintenance-page',
     ),
     'install_page' => array(
-      'variables' => array('content' => NULL, 'show_messages' => TRUE),
+      'variables' => array('content' => NULL, 'show_messages' => TRUE, 'page' => array()),
       'template' => 'install-page',
     ),
     'task_list' => array(
@@ -2600,9 +2587,11 @@ function drupal_common_theme() {
     ),
     'select' => array(
       'render element' => 'element',
+      'template' => 'select',
     ),
     'fieldset' => array(
       'render element' => 'element',
+      'template' => 'fieldset',
     ),
     'details' => array(
       'render element' => 'element',
@@ -2619,6 +2608,7 @@ function drupal_common_theme() {
     ),
     'form' => array(
       'render element' => 'element',
+      'template' => 'form',
     ),
     'textarea' => array(
       'render element' => 'element',
@@ -2643,6 +2633,7 @@ function drupal_common_theme() {
     ),
     'container' => array(
       'render element' => 'element',
+      'template' => 'container',
     ),
   );
 }

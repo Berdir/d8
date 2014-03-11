@@ -84,7 +84,7 @@ class RenderElementTypesTest extends DrupalUnitTestBase {
           '#type' => 'container',
           '#markup' => 'foo',
         ),
-        'expected' => '<div>foo</div>',
+        'expected' => '<div>foo</div>' . "\n",
       ),
       // Container with a class.
       array(
@@ -96,7 +96,7 @@ class RenderElementTypesTest extends DrupalUnitTestBase {
             'class' => 'bar',
           ),
         ),
-        'expected' => '<div class="bar">foo</div>',
+        'expected' => '<div class="bar">foo</div>' . "\n",
       ),
       // Container with children.
       array(
@@ -107,7 +107,7 @@ class RenderElementTypesTest extends DrupalUnitTestBase {
             '#markup' => 'foo',
           ),
         ),
-        'expected' => '<div>foo</div>',
+        'expected' => '<div>foo</div>' . "\n",
       ),
     );
 
@@ -184,12 +184,11 @@ class RenderElementTypesTest extends DrupalUnitTestBase {
 
     // Build CSS links.
     drupal_static_reset('_drupal_add_css');
-    $path = drupal_get_path('module', 'system');
     $default_css = array(
       '#attached' => array(
         'library' => array(
-          array('core', 'normalize'),
-          array('system', 'maintenance'),
+          'core/normalize',
+          'system/maintenance',
         ),
       ),
     );
