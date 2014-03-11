@@ -30,7 +30,7 @@ class Drupal6StatisticsSettings extends Drupal6DumpBase {
       'value' => 'i:259200;',
     ))
     ->values(array(
-      'name' => 'statistics_count_content_view',
+      'name' => 'statistics_count_content_views',
       'value' => 'i:0;',
     ))
     ->values(array(
