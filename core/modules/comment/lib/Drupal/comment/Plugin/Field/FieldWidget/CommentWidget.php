@@ -29,7 +29,7 @@ class CommentWidget extends WidgetBase {
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, array &$form_state) {
     $field = $this->fieldDefinition;
-    $entity = $items->getParent();
+    $entity = $items->getEntity();
 
     // Get default value from the field instance.
     $field_default_values = $this->fieldDefinition->getDefaultValue($entity);

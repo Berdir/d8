@@ -26,7 +26,7 @@ use Drupal\Core\TypedData\TranslatableInterface;
  * @see \Drupal\Core\TypedData\TypedDataManager
  * @see \Drupal\Core\Field\FieldItemListInterface
  */
-interface ContentEntityInterface extends EntityInterface, RevisionableInterface, TranslatableInterface, ComplexDataInterface {
+interface ContentEntityInterface extends EntityInterface, RevisionableInterface, TranslatableInterface {
 
   /**
    * Marks the translation identified by the given language code as existing.
@@ -123,5 +123,70 @@ interface ContentEntityInterface extends EntityInterface, RevisionableInterface,
    * @see \Drupal\Core\Entity\EntityManagerInterface::getFieldDefinitions()
    */
   public function getFieldDefinitions();
+
+  /**
+   * Gets a field item list.
+   *
+   * @param $field_name
+   *   The name of the field to get; e.g., 'title' or 'name'.
+   *
+   * @throws \InvalidArgumentException
+   *   If an invalid field name is given.
+   *
+   * @return \Drupal\Core\Field\FieldItemListInterface
+   *   The field item list, containing the field items.
+   */
+  public function get($field_name);
+
+  /**
+   * Sets a field value.
+   *
+   * @param $field_name
+   *   The name of the property to set; e.g., 'title' or 'name'.
+   * @param $value
+   *   The value to set, or NULL to unset the field.
+   * @param bool $notify
+   *   (optional) Whether to notify the entity of the change. Defaults to
+   *   TRUE. If the update stems from the entity, set it to FALSE to avoid
+   *   being notified again.
+   *
+   * @throws \InvalidArgumentException
+   *   If the specified field does not exist.
+   *
+   * @return $this
+   */
+  public function set($field_name, $value, $notify = TRUE);
+
+  /**
+   * Gets an array of field item lists.
+   *
+   * @param bool $include_computed
+   *   If set to TRUE, computed fields are included. Defaults to FALSE.
+   *
+   * @return \Drupal\Core\Field\FieldItemListInterface[]
+   *   An array of field item lists implementing, keyed by field name.
+   */
+  public function getFields($include_computed = FALSE);
+
+  /**
+   * Gets an array of field values.
+   *
+   * Gets an array of plain field values including all non-computed
+   * properties.
+   *
+   * @return array
+   *   An array keyed by property name containing the property value.
+   */
+  public function getFieldValues();
+
+  /**
+   * React to changes to a child field.
+   *
+   * Note that this is invoked after any changes have been applied.
+   *
+   * @param $field_name
+   *   The name of the field which is changed.
+   */
+  public function onChange($field_name);
 
 }

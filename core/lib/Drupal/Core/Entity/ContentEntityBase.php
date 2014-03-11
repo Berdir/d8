@@ -9,6 +9,7 @@ namespace Drupal\Core\Entity;
 
 use Drupal\Component\Utility\String;
 use Drupal\Core\Entity\Plugin\DataType\EntityReference;
+use Drupal\Core\Entity\Plugin\DataType\EntityTypedDataWrapper;
 use Drupal\Core\Entity\TypedData\EntityDataDefinition;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Session\AccountInterface;
@@ -220,86 +221,9 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
   /**
    * {@inheritdoc}
    */
-  public function getValue() {
-    // @todo: This does not make much sense, so remove once TypedDataInterface
-    // is removed. See https://drupal.org/node/2002138.
-    return $this->getPropertyValues();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setValue($value, $notify = TRUE) {
-    // @todo: This does not make much sense, so remove once TypedDataInterface
-    // is removed. See https://drupal.org/node/2002138.
-    $this->setPropertyValues($value);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getString() {
-    return $this->label();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function validate() {
     // @todo: Add the typed data manager as proper dependency.
     return \Drupal::typedDataManager()->getValidator()->validate($this);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function applyDefaultValue($notify = TRUE) {
-    foreach ($this->getProperties() as $property) {
-      $property->applyDefaultValue(FALSE);
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getConstraints() {
-    return array();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getName() {
-    return NULL;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getRoot() {
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getPropertyPath() {
-    return '';
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getParent() {
-    return NULL;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setContext($name = NULL, TypedDataInterface $parent = NULL) {
-    // As entities are always the root of the tree of typed data, we do not need
-    // to set any parent or name.
   }
 
   /**
@@ -378,11 +302,11 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
   /**
    * {@inheritdoc}
    */
-  public function get($property_name) {
-    if (!isset($this->fields[$property_name][$this->activeLangcode])) {
-      return $this->getTranslatedField($property_name, $this->activeLangcode);
+  public function get($field_name) {
+    if (!isset($this->fields[$field_name][$this->activeLangcode])) {
+      return $this->getTranslatedField($field_name, $this->activeLangcode);
     }
-    return $this->fields[$property_name][$this->activeLangcode];
+    return $this->fields[$field_name][$this->activeLangcode];
   }
 
   /**
@@ -417,7 +341,8 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
         if (isset($this->values[$name][$langcode])) {
           $value = $this->values[$name][$langcode];
         }
-        $field = \Drupal::typedDataManager()->getPropertyInstance($this, $name, $value);
+        $wrapper = new EntityTypedDataWrapper($this);
+        $field = \Drupal::typedDataManager()->getPropertyInstance($wrapper, $name, $value);
         if ($default) {
           // $this->defaultLangcode might not be set if we are initializing the
           // default language code cache, in which case there is no valid
@@ -446,7 +371,7 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
   /**
    * {@inheritdoc}
    */
-  public function getProperties($include_computed = FALSE) {
+  public function getFields($include_computed = FALSE) {
     $properties = array();
     foreach ($this->getFieldDefinitions() as $name => $definition) {
       if ($include_computed || !$definition->isComputed()) {
@@ -460,7 +385,7 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
    * {@inheritdoc}
    */
   public function getIterator() {
-    return new \ArrayIterator($this->getProperties());
+    return new \ArrayIterator($this->getFields());
   }
 
   /**
@@ -491,36 +416,12 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
   /**
    * {@inheritdoc}
    */
-  public function getPropertyValues() {
+  public function getFieldValues() {
     $values = array();
-    foreach ($this->getProperties() as $name => $property) {
+    foreach ($this->getFields() as $name => $property) {
       $values[$name] = $property->getValue();
     }
     return $values;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setPropertyValues($values) {
-    foreach ($values as $name => $value) {
-      $this->get($name)->setValue($value);
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function isEmpty() {
-    if (!$this->isNew()) {
-      return FALSE;
-    }
-    foreach ($this->getProperties() as $property) {
-      if ($property->getValue() !== NULL) {
-        return FALSE;
-      }
-    }
-    return TRUE;
   }
 
   /**
@@ -782,15 +683,6 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
   }
 
   /**
-   * Overrides Entity::translations().
-   *
-   * @todo: Remove once Entity::translations() gets removed.
-   */
-  public function translations() {
-    return $this->getTranslationLanguages(FALSE);
-  }
-
-  /**
    * Updates the original values with the interim changes.
    */
   public function updateOriginalValues() {
@@ -970,7 +862,7 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
     $referenced_entities = array();
 
     // Gather a list of referenced entities.
-    foreach ($this->getProperties() as $field_items) {
+    foreach ($this->getFields() as $field_items) {
       foreach ($field_items as $field_item) {
         // Loop over all properties of a field item.
         foreach ($field_item->getProperties(TRUE) as $property) {

@@ -7,6 +7,7 @@
 
 namespace Drupal\Core\Field;
 
+use Drupal\Core\Entity\Plugin\DataType\EntityTypedDataWrapper;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
@@ -54,7 +55,7 @@ class FieldItemList extends ItemList implements FieldItemListInterface {
    * {@inheritdoc}
    */
   public function getEntity() {
-    return $this->getParent();
+    return $this->getParent() instanceof EntityTypedDataWrapper ? $this->getParent()->getEntity() : $this->getParent();
   }
 
   /**

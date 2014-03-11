@@ -24,8 +24,7 @@ class CommentFieldNameValue extends TypedData {
       if (!isset($this->parent)) {
         throw new InvalidArgumentException('Computed properties require context for computation.');
       }
-      $field = $this->parent->getParent();
-      $entity = $field->getParent();
+      $entity = $this->parent->getEntity();
       // Field id is of the form {entity_type}__{field_name}. We set the
       // optional limit param to explode() in case the user adds a field with __
       // in the name.
