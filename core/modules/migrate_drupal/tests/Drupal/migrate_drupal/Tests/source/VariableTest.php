@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Tests\source\VariableTest.
+ * Contains \Drupal\migrate_drupal\Tests\source\VariableTest.
  */
 
-namespace Drupal\migrate_drupal\Tests\source\d6;
+namespace Drupal\migrate_drupal\Tests\source;
 
 use Drupal\migrate\Tests\MigrateSqlSourceTestCase;
 
@@ -49,8 +49,8 @@ class VariableTest extends MigrateSqlSourceTestCase {
    */
   public static function getInfo() {
     return array(
-      'name' => 'D6 variable source functionality',
-      'description' => 'Tests D6 variable source plugin.',
+      'name' => 'Variable source functionality',
+      'description' => 'Tests variable source plugin.',
       'group' => 'Migrate Drupal',
     );
   }
