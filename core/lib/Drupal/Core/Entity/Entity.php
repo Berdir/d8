@@ -363,6 +363,52 @@ abstract class Entity implements EntityInterface {
   }
 
   /**
+   * Loads an entity.
+   *
+   * @param mixed $id
+   *   The id of the entity to load.
+   *
+   * @return static
+   *   The entity object or NULL if there is no entity with the given ID.
+   */
+  public static function load($id) {
+    $entities = static::loadMultiple(array($id));
+    return isset($entities[$id]) ? $entities[$id] : NULL;
+  }
+
+  /**
+   * Loads one or more entities.
+   *
+   * @param array $ids
+   *   An array of entity IDs, or NULL to load all entities.
+   *
+   * @return static[]
+   *   An array of entity objects indexed by their IDs.
+   */
+  public static function loadMultiple(array $ids = NULL) {
+    return \Drupal::entityManager()->getStorageController(static::getEntityTypeFromStaticClass())->loadMultiple($ids);
+  }
+
+  /**
+   * Tries to guess an entity type ID based on the class that is called.
+   *
+   * @return string
+   *   The entity type ID.
+   *
+   * @throws \RuntimeException
+   */
+  protected static function getEntityTypeFromStaticClass() {
+    $called_class = get_called_class();
+    foreach (\Drupal::entityManager()->getDefinitions() as $entity_type => $entity_info) {
+      if ($entity_info->getClass() == $called_class || $entity_info->isSubclassOf($called_class)) {
+        return $entity_type;
+      }
+    }
+
+    throw new \RuntimeException(sprintf('The %s class does not correspond to an entity type.', $called_class));
+  }
+
+  /**
    * Acts on an entity after it was saved or deleted.
    */
   protected function onSaveOrDelete() {
