@@ -205,7 +205,7 @@ class EntityTranslationTest extends EntityLanguageTestBase {
           'user_id' => array(0 => $uid),
         );
       }
-      $entity->getTranslation($langcode)->setPropertyValues($properties[$langcode]);
+      $entity->getTranslation($langcode)->setFieldValues($properties[$langcode]);
     }
     $entity->save();
 

@@ -43,8 +43,7 @@ class CommentFieldNameValue extends TypedData {
     if (isset($value)) {
       $this->field_name = $value;
       // Also set the field id.
-      $field = $this->parent->getParent();
-      $entity = $field->getParent();
+      $entity = $this->parent->getEntity();
       $entity->field_id = $entity->getCommentedEntityTypeId() . '__' . $value;
     }
   }

@@ -180,6 +180,16 @@ interface ContentEntityInterface extends EntityInterface, RevisionableInterface,
   public function getFieldValues();
 
   /**
+   * Sets field values.
+   *
+   * @param array $values
+   *   Array of values to set, keyed by field name.
+   *
+   * @return $this
+   */
+  public function setFieldValues(array $values);
+
+  /**
    * React to changes to a child field.
    *
    * Note that this is invoked after any changes have been applied.

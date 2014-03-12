@@ -223,7 +223,7 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
    */
   public function validate() {
     // @todo: Add the typed data manager as proper dependency.
-    return \Drupal::typedDataManager()->getValidator()->validate($this);
+    return \Drupal::typedDataManager()->getValidator()->validate(new EntityTypedDataWrapper($this));
   }
 
   /**
@@ -424,6 +424,14 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
     return $values;
   }
 
+  public function setFieldValues(array $values) {
+    $values = array();
+    foreach ($values as $name => $field_values) {
+      $this->set($name, $field_values);
+    }
+    return $this;
+  }
+
   /**
    * {@inheritdoc}
    */
@@ -504,8 +512,6 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
 
   /**
    * {@inheritdoc}
-   *
-   * @return \Drupal\Core\Entity\ContentEntityInterface
    */
   public function getTranslation($langcode) {
     // Ensure we always use the default language code when dealing with the
@@ -827,7 +833,7 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
         }
         foreach ($values as $langcode => $items) {
           $this->fields[$name][$langcode] = clone $items;
-          $this->fields[$name][$langcode]->setContext($name, $this);
+          $this->fields[$name][$langcode]->setContext($name, new EntityTypedDataWrapper($this));
         }
       }
 

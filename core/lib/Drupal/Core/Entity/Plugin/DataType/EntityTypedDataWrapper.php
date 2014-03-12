@@ -120,7 +120,7 @@ class EntityTypedDataWrapper implements \IteratorAggregate, ComplexDataInterface
    * {@inheritdoc}
    */
   public function getConstraints() {
-    // TODO: Implement getConstraints() method.
+    return array();
   }
 
   /**
