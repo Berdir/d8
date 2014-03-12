@@ -89,6 +89,9 @@ function custom_block_type_load($id) {
  *
  * @return \Drupal\custom_block\Entity\CustomBlock|null
  *   A CustomBlock object or NULL if the requested $id does not exist.
+ *
+ * @deprecated in Drupal 8.x-dev.
+ *   Use \Drupal\custom_block\Entity\CustomBlock::load() instead.
  */
 function custom_block_load($id) {
   return entity_load('custom_block', $id);

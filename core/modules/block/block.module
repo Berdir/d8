@@ -6,6 +6,7 @@
  */
 
 use Drupal\block\BlockInterface;
+use Drupal\block\Entity\Block;
 use Drupal\Component\Plugin\Exception\PluginException;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 
@@ -359,9 +360,12 @@ function block_list($region) {
  *
  * @return \Drupal\block\Entity\Block
  *   The loaded block object.
+ *
+ * @deprecated in Drupal 8.x-dev.
+ *   Use \Drupal\block\Entity\Block::load() instead.
  */
 function block_load($entity_id) {
-  return entity_load('block', $entity_id);
+  return Block::load($entity_id);
 }
 
 /**

@@ -8,6 +8,7 @@
 namespace Drupal\aggregator\Tests;
 
 use Drupal\Component\Utility\String;
+use Drupal\views\Entity\View;
 
 /**
  * Tests rendering functionality in the Aggregator module.
@@ -83,7 +84,7 @@ class AggregatorRenderingTest extends AggregatorTestBase {
   public function testFeedPage() {
     // Increase the number of items published in the rss.xml feed so we have
     // enough articles to test paging.
-    $view = entity_load('view', 'frontpage');
+    $view = View::load('frontpage');
     $display = &$view->getDisplay('feed_1');
     $display['display_options']['pager']['options']['items_per_page'] = 30;
     $view->save();

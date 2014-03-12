@@ -8,6 +8,7 @@
 namespace Drupal\action\Tests;
 
 use Drupal\simpletest\WebTestBase;
+use Drupal\system\Entity\Action;
 
 /**
  * Tests action uninstallation.
@@ -37,7 +38,8 @@ class ActionUninstallTest extends WebTestBase {
   public function testActionUninstall() {
     \Drupal::moduleHandler()->uninstall(array('action'));
 
-    $this->assertTrue(entity_load('action', 'user_block_user_action', TRUE), 'Configuration entity \'user_block_user_action\' still exists after uninstalling action module.' );
+    \Drupal::entityManager()->getStorageController('action')->resetCache();
+    $this->assertTrue(Action::load('user_block_user_action'), 'Configuration entity \'user_block_user_action\' still exists after uninstalling action module.' );
 
     $admin_user = $this->drupalCreateUser(array('administer users'));
     $this->drupalLogin($admin_user);

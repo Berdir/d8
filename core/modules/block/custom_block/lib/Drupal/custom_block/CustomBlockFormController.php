@@ -13,6 +13,7 @@ use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageManager;
+use Drupal\custom_block\Entity\CustomBlockType;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -73,7 +74,7 @@ class CustomBlockFormController extends ContentEntityFormController {
   protected function prepareEntity() {
     $block = $this->entity;
     // Set up default values, if required.
-    $block_type = entity_load('custom_block_type', $block->bundle());
+    $block_type = CustomBlockType::load($block->bundle());
     if (!$block->isNew()) {
       $block->setRevisionLog(NULL);
     }

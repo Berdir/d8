@@ -5,6 +5,7 @@
  * Used to aggregate syndicated content (RSS, RDF, and Atom).
  */
 
+use Drupal\aggregator\Entity\Feed;
 use Drupal\aggregator\FeedInterface;
 use Drupal\Component\Plugin\Exception\PluginException;
 
@@ -261,9 +262,12 @@ function aggregator_refresh(FeedInterface $feed) {
  *
  * @return \Drupal\aggregator\FeedInterface
  *   An object describing the feed.
+ *
+ * @deprecated in Drupal 8.x-dev.
+ *   Use \Drupal\aggregator\Entity\Feed::load() instead.
  */
 function aggregator_feed_load($fid) {
-  return entity_load('aggregator_feed', $fid);
+  return Feed::load($fid);
 }
 
 /**
