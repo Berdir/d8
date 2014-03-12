@@ -67,14 +67,9 @@ class EntityNormalizer extends NormalizerBase {
       }
     }
     else {
-      $properties = $entity->getProperties();
+      $properties = $entity->getFields();
     }
     foreach ($properties as $property) {
-      // In some cases, Entity API will return NULL array items. Ensure this is
-      // a real property and that it is not the internal id.
-      if (!is_object($property) || $property->getName() == 'id') {
-        continue;
-      }
       $normalized_property = $this->serializer->normalize($property, $format, $context);
       $normalized = NestedArray::mergeDeep($normalized, $normalized_property);
     }
