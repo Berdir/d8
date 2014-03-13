@@ -45,8 +45,8 @@ class LoadTermNode extends LoadEntity {
     foreach ($bundle_migration->getSourcePlugin()->getIterator() as $source_row) {
       $row = new Row($source_row, $source_row);
       $migrate_executable->processRow($row, $process);
-      $new_vid = $row->getDestinationProperty('vid');
       $old_vid = $source_row['vid'];
+      $new_vid = $row->getDestinationProperty('vid');
       $vid_map[$old_vid] = $new_vid;
     }
     foreach ($vid_map as $old_vid => $new_vid) {
