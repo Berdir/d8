@@ -45,7 +45,7 @@ interface TranslatableInterface {
    *   The language code of the translation to get or Language::LANGCODE_DEFAULT
    *   to get the data in default language.
    *
-   * @return \Drupal\Core\TypedData\TypedDataInterface
+   * @return $this
    *   A typed data object for the translated data.
    */
   public function getTranslation($langcode);
@@ -53,7 +53,7 @@ interface TranslatableInterface {
   /**
    * Returns the translatable object referring to the original language.
    *
-   * @return \Drupal\Core\TypedData\TranslatableInterface
+   * @return $this
    *   The translation object referring to the original language.
    */
   public function getUntranslated();
@@ -78,7 +78,7 @@ interface TranslatableInterface {
    *   (optional) An array of initial values to be assigned to the translatable
    *   fields. Defaults to none.
    *
-   * @return \Drupal\Core\TypedData\TranslatableInterface
+   * @return $this
    */
   public function addTranslation($langcode, array $values = array());
 

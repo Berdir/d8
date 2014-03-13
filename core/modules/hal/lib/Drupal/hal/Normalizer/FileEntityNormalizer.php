@@ -15,7 +15,7 @@ use Guzzle\Http\ClientInterface;
 /**
  * Converts the Drupal entity object structure to a HAL array structure.
  */
-class FileEntityNormalizer extends EntityNormalizer {
+class FileEntityNormalizer extends ContentEntityNormalizer {
 
   /**
    * The interface or class that this Normalizer supports.

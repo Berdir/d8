@@ -20,7 +20,7 @@ class UserUniqueValidator extends ConstraintValidator {
    */
   public function validate($value, Constraint $constraint) {
     $field = $this->context->getMetadata()->getTypedData()->getParent();
-    $uid = $field->getParent()->id();
+    $uid = $field->getEntity()->id();
 
     $value_taken = (bool) \Drupal::entityQuery('user')
       // The UID could be NULL, so we cast it to 0 in that case.

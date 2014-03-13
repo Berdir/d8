@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\hal\Normalizer\EntityNormalizer.
+ * Contains \Drupal\hal\Normalizer\ContentEntityNormalizer.
  */
 
 namespace Drupal\hal\Normalizer;
@@ -15,14 +15,14 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 /**
  * Converts the Drupal entity object structure to a HAL array structure.
  */
-class EntityNormalizer extends NormalizerBase {
+class ContentEntityNormalizer extends NormalizerBase {
 
   /**
    * The interface or class that this Normalizer supports.
    *
    * @var string
    */
-  protected $supportedInterfaceOrClass = 'Drupal\Core\Entity\EntityInterface';
+  protected $supportedInterfaceOrClass = 'Drupal\Core\Entity\ContentEntityInterface';
 
   /**
    * The hypermedia link manager.
@@ -32,7 +32,7 @@ class EntityNormalizer extends NormalizerBase {
   protected $linkManager;
 
   /**
-   * Constructs an EntityNormalizer object.
+   * Constructs an ContentEntityNormalizer object.
    *
    * @param \Drupal\rest\LinkManager\LinkManagerInterface $link_manager
    *   The hypermedia link manager.
@@ -61,16 +61,20 @@ class EntityNormalizer extends NormalizerBase {
     // If the properties to use were specified, only output those properties.
     // Otherwise, output all properties except internal ID.
     if (isset($context['included_fields'])) {
-      $properties = array();
-      foreach ($context['included_fields'] as $property_name) {
-        $properties[] = $entity->get($property_name);
+      $fields = array();
+      foreach ($context['included_fields'] as $field_name) {
+        $fields[] = $entity->get($field_name);
       }
     }
     else {
-      $properties = $entity->getFields();
+      $fields = $entity->getFields();
     }
-    foreach ($properties as $property) {
-      $normalized_property = $this->serializer->normalize($property, $format, $context);
+    foreach ($fields as $field) {
+      // Ignore the entity ID.
+      if ($field->getFieldDefinition()->getName() == $entity->getEntityType()->getKey('id')) {
+        continue;
+      }
+      $normalized_property = $this->serializer->normalize($field, $format, $context);
       $normalized = NestedArray::mergeDeep($normalized, $normalized_property);
     }
 

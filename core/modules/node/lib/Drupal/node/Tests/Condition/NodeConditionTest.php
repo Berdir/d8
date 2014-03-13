@@ -7,6 +7,7 @@
 
 namespace Drupal\node\Tests\Condition;
 
+use Drupal\Core\Entity\Plugin\DataType\EntityTypedDataWrapper;
 use Drupal\system\Tests\Entity\EntityUnitTestBase;
 
 /**
@@ -56,7 +57,7 @@ class NodeConditionTest extends EntityUnitTestBase {
     // of 'article' and set the context to the page type node.
     $condition = $manager->createInstance('node_type')
       ->setConfig('bundles', array('article'))
-      ->setContextValue('node', $page);
+      ->setContextValue('node', new EntityTypedDataWrapper($page));
     $this->assertFalse($condition->execute(), 'Page type nodes fail node type checks for articles.');
     // Check for the proper summary.
     $this->assertEqual('The node bundle is article', $condition->summary());
@@ -74,11 +75,11 @@ class NodeConditionTest extends EntityUnitTestBase {
     $this->assertEqual('The node bundle is page or article', $condition->summary());
 
     // Set the context to the article node.
-    $condition->setContextValue('node', $article);
+    $condition->setContextValue('node', new EntityTypedDataWrapper($article));
     $this->assertTrue($condition->execute(), 'Article type nodes pass node type checks for pages or articles');
 
     // Set the context to the test node.
-    $condition->setContextValue('node', $test);
+    $condition->setContextValue('node', new EntityTypedDataWrapper($test));
     $this->assertFalse($condition->execute(), 'Test type nodes pass node type checks for pages or articles');
 
     // Check a greater than 2 bundles summary scenario.
@@ -86,7 +87,7 @@ class NodeConditionTest extends EntityUnitTestBase {
     $this->assertEqual('The node bundle is page, article or test', $condition->summary());
 
     // Test Constructor injection.
-    $condition = $manager->createInstance('node_type', array('bundles' => array('article'), 'context' => array('node' => $article)));
+    $condition = $manager->createInstance('node_type', array('bundles' => array('article'), 'context' => array('node' => new EntityTypedDataWrapper($article))));
     $this->assertTrue($condition->execute(), 'Constructor injection of context and configuration working as anticipated.');
   }
 }

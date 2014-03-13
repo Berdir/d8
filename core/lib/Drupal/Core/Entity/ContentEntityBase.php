@@ -372,13 +372,13 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
    * {@inheritdoc}
    */
   public function getFields($include_computed = FALSE) {
-    $properties = array();
+    $fields = array();
     foreach ($this->getFieldDefinitions() as $name => $definition) {
       if ($include_computed || !$definition->isComputed()) {
-        $properties[$name] = $this->get($name);
+        $fields[$name] = $this->get($name);
       }
     }
-    return $properties;
+    return $fields;
   }
 
   /**

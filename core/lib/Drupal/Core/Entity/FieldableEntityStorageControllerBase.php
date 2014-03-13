@@ -8,6 +8,7 @@
 namespace Drupal\Core\Entity;
 
 use Drupal\Component\Utility\String;
+use Drupal\Core\Entity\Plugin\DataType\EntityTypedDataWrapper;
 use Drupal\Core\Field\PrepareCacheInterface;
 use Drupal\field\FieldConfigInterface;
 use Drupal\field\FieldInstanceConfigInterface;
@@ -341,7 +342,7 @@ abstract class FieldableEntityStorageControllerBase extends EntityStorageControl
    */
   public function onFieldItemsPurge(EntityInterface $entity, FieldInstanceConfigInterface $instance) {
     if ($values = $this->readFieldItemsToPurge($entity, $instance)) {
-      $items = \Drupal::typedDataManager()->create($instance, $values, $instance->getName(), $entity);
+      $items = \Drupal::typedDataManager()->create($instance, $values, $instance->getName(), new EntityTypedDataWrapper($entity));
       $items->delete();
     }
     $this->purgeFieldItems($entity, $instance);

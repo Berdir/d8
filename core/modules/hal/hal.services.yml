@@ -18,7 +18,7 @@ services:
       - { name: normalizer, priority: 20 }
     arguments: ['@entity.manager', '@http_default_client', '@rest.link_manager']
   serializer.normalizer.entity.hal:
-    class: Drupal\hal\Normalizer\EntityNormalizer
+    class: Drupal\hal\Normalizer\ContentEntityNormalizer
     arguments: ['@rest.link_manager']
     tags:
       - { name: normalizer, priority: 10 }

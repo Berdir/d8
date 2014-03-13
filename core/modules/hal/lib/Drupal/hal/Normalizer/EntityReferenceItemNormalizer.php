@@ -7,6 +7,7 @@
 
 namespace Drupal\hal\Normalizer;
 
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\rest\LinkManager\LinkManagerInterface;
 use Drupal\serialization\EntityResolver\EntityResolverInterface;
 use Drupal\serialization\EntityResolver\UuidReferenceInterface;
@@ -48,6 +49,18 @@ class EntityReferenceItemNormalizer extends FieldItemNormalizer implements UuidR
   public function __construct(LinkManagerInterface $link_manager, EntityResolverInterface $entity_Resolver) {
     $this->linkManager = $link_manager;
     $this->entityResolver = $entity_Resolver;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function supportsNormalization($data, $format = NULL) {
+    // Normalization is only supported if the referenced entity is a content
+    // entity.
+    if (parent::supportsNormalization($data, $format)) {
+      return $data->entity instanceof ContentEntityInterface;
+    }
+    return FALSE;
   }
 
   /**
