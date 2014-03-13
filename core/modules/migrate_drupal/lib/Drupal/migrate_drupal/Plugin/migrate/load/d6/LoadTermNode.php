@@ -36,11 +36,20 @@ class LoadTermNode extends LoadEntity {
     $migrate_executable = new MigrateExecutable($bundle_migration, new MigrateMessage());
     $process = array_intersect_key($bundle_migration->get('process'), $bundle_migration->getDestinationPlugin()->getIds());
     $migrations = array();
+    $vid_map = array();
+    foreach ($bundle_migration->getIdMap() as $key => $value) {
+      $old_vid = unserialize($key)['sourceid1'];
+      $new_vid = $value['destid1'];
+      $vid_map[$old_vid] = $new_vid;
+    }
     foreach ($bundle_migration->getSourcePlugin()->getIterator() as $source_row) {
       $row = new Row($source_row, $source_row);
       $migrate_executable->processRow($row, $process);
       $new_vid = $row->getDestinationProperty('vid');
       $old_vid = $source_row['vid'];
+      $vid_map[$old_vid] = $new_vid;
+    }
+    foreach ($vid_map as $old_vid => $new_vid) {
       $values = $this->migration->getExportProperties();
       $migration_id = $this->migration->id() . ':' . $old_vid;
       $values['id'] = $migration_id;
