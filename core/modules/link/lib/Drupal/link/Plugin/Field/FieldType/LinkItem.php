@@ -2,12 +2,12 @@
 
 /**
  * @file
- * Contains \Drupal\email\Plugin\Field\FieldType\LinkItem.
+ * Contains \Drupal\link\Plugin\Field\FieldType\LinkItem.
  */
 
 namespace Drupal\link\Plugin\Field\FieldType;
 
-use Drupal\Core\Field\ConfigFieldItemBase;
+use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\MapDataDefinition;
@@ -26,7 +26,7 @@ use Drupal\Core\TypedData\MapDataDefinition;
  *   default_formatter = "link"
  * )
  */
-class LinkItem extends ConfigFieldItemBase {
+class LinkItem extends FieldItemBase {
 
   /**
    * {@inheritdoc}

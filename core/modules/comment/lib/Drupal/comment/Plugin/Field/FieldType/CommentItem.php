@@ -9,7 +9,7 @@ namespace Drupal\comment\Plugin\Field\FieldType;
 
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\TypedData\DataDefinition;
-use Drupal\Core\Field\ConfigFieldItemBase;
+use Drupal\Core\Field\FieldItemBase;
 
 /**
  * Plugin implementation of the 'comment' field type.
@@ -18,6 +18,9 @@ use Drupal\Core\Field\ConfigFieldItemBase;
  *   id = "comment",
  *   label = @Translation("Comments"),
  *   description = @Translation("This field manages configuration and presentation of comments on an entity."),
+ *   settings = {
+ *     "description" = "",
+ *   },
  *   instance_settings = {
  *     "default_mode" = COMMENT_MODE_THREADED,
  *     "per_page" = 50,
@@ -30,7 +33,7 @@ use Drupal\Core\Field\ConfigFieldItemBase;
  *   default_formatter = "comment_default"
  * )
  */
-class CommentItem extends ConfigFieldItemBase {
+class CommentItem extends FieldItemBase implements CommentItemInterface {
 
   /**
    * {@inheritdoc}
@@ -99,7 +102,7 @@ class CommentItem extends ConfigFieldItemBase {
         'class' => array('comment-instance-settings-form'),
       ),
       '#attached' => array(
-        'library' => array(array('comment', 'drupal.comment')),
+        'library' => array('comment/drupal.comment'),
       ),
     );
     $element['comment']['default_mode'] = array(
@@ -167,8 +170,9 @@ class CommentItem extends ConfigFieldItemBase {
    * {@inheritdoc}
    */
   public function isEmpty() {
-    // There is always a value for this field, it is one of COMMENT_OPEN,
-    // COMMENT_CLOSED or COMMENT_HIDDEN.
+    // There is always a value for this field, it is one of
+    // CommentItemInterface::OPEN, CommentItemInterface::CLOSED or
+    // CommentItemInterface::HIDDEN.
     return FALSE;
   }
 
@@ -192,6 +196,21 @@ class CommentItem extends ConfigFieldItemBase {
         'content_translation'
       );
     }
+    return $element;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsForm(array $form, array &$form_state, $has_data) {
+    $element = array();
+
+    $element['description'] = array(
+      '#type' => 'textarea',
+      '#title' => t('Field description'),
+      '#description' => t('Describe this comment field. The text will be displayed on the <em>Comments Forms</em> page.'),
+      '#default_value' => $this->getSetting('description'),
+    );
     return $element;
   }
 

@@ -45,15 +45,6 @@ class FieldInstanceConfig extends ConfigEntityBase implements FieldInstanceConfi
   public $id;
 
   /**
-   * The instance UUID.
-   *
-   * This is assigned automatically when the instance is created.
-   *
-   * @var string
-   */
-  public $uuid;
-
-  /**
    * The name of the field attached to the bundle by this instance.
    *
    * @var string
@@ -240,8 +231,10 @@ class FieldInstanceConfig extends ConfigEntityBase implements FieldInstanceConfi
    */
   public function __construct(array $values, $entity_type = 'field_instance_config') {
     // Field instances configuration is stored with a 'field_uuid' property
-    // unambiguously identifying the field.
-    if (isset($values['field_uuid'])) {
+    // unambiguously identifying the field. We only take it into account if a
+    // 'uuid' entry is present too, so that leftover 'field_uuid' entries
+    // present in config files imported as "default module config" are ignored.
+    if (isset($values['field_uuid']) && isset($values['uuid'])) {
       $field = field_info_field_by_id($values['field_uuid']);
       if (!$field) {
         throw new FieldException(format_string('Attempt to create an instance of unknown field @uuid', array('@uuid' => $values['field_uuid'])));

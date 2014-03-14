@@ -82,7 +82,7 @@ function update_manager_update_form($form, $form_state = array(), $context) {
     return $form;
   }
 
-  $form['#attached']['library'][] = array('update', 'drupal.update.admin');
+  $form['#attached']['library'][] = 'update/drupal.update.admin';
 
   // This will be a nested array. The first key is the kind of project, which
   // can be either 'enabled', 'disabled', 'manual' (projects which require
@@ -267,7 +267,7 @@ function update_manager_update_form($form, $form_state = array(), $context) {
     $prefix = '<h2>' . t('Manual updates required') . '</h2>';
     $prefix .= '<p>' . t('Updates of Drupal core are not supported at this time.') . '</p>';
     $form['manual_updates'] = array(
-      '#theme' => 'table',
+      '#type' => 'table',
       '#header' => $headers,
       '#rows' => $projects['manual'],
       '#prefix' => $prefix,
