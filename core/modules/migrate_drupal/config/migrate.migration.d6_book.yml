@@ -1,0 +1,15 @@
+id: d6_book
+source:
+  plugin: d6_book
+process:
+  nid: nid
+  book.bid: bid
+  book.weight: weight
+  book.pid:
+    plugin: migration
+    migration: d6_book
+    source: plid
+destination:
+  plugin: entity:node
+dependencies:
+  - d6_node
