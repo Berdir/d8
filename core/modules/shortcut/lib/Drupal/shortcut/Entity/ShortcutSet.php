@@ -9,11 +9,10 @@ namespace Drupal\shortcut\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
-use Drupal\shortcut\ShortcutInterface;
 use Drupal\shortcut\ShortcutSetInterface;
 
 /**
- * Defines the Shortcut configuration entity.
+ * Defines the Shortcut set configuration entity.
  *
  * @ConfigEntityType(
  *   id = "shortcut_set",
@@ -50,13 +49,6 @@ class ShortcutSet extends ConfigEntityBase implements ShortcutSetInterface {
    * @var string
    */
   public $id;
-
-  /**
-   * The UUID for the configuration entity.
-   *
-   * @var string
-   */
-  public $uuid;
 
   /**
    * The human-readable name of the configuration entity.

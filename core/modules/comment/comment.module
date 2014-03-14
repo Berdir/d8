@@ -10,9 +10,10 @@
  * book page, user etc.
  */
 
-use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\comment\CommentInterface;
+use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
+use Drupal\Core\Entity\EntityChangedInterface;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\field\FieldInstanceConfigInterface;
 use Drupal\field\FieldConfigInterface;
@@ -54,21 +55,6 @@ const COMMENT_FORM_SEPARATE_PAGE = 0;
  * Comment form should be shown below post or list of comments.
  */
 const COMMENT_FORM_BELOW = 1;
-
-/**
- * Comments for this entity are hidden.
- */
-const COMMENT_HIDDEN = 0;
-
-/**
- * Comments for this entity are closed.
- */
-const COMMENT_CLOSED = 1;
-
-/**
- * Comments for this entity are open.
- */
-const COMMENT_OPEN = 2;
 
 /**
  * The time cutoff for comments marked as read for entity types other node.
@@ -240,7 +226,7 @@ function comment_field_instance_config_create(FieldInstanceConfigInterface $inst
     }
     $instance->default_value += array(array());
     $instance->default_value[0] += array(
-      'status' => COMMENT_OPEN,
+      'status' => CommentItemInterface::OPEN,
       'cid' => 0,
       'last_comment_timestamp' => 0,
       'last_comment_name' => '',
@@ -474,7 +460,7 @@ function comment_node_links_alter(array &$node_links, NodeInterface $node, array
           }
         }
         // Provide a link to new comment form.
-        if ($commenting_status == COMMENT_OPEN) {
+        if ($commenting_status == CommentItemInterface::OPEN) {
           $comment_form_location = $instance->getSetting('form_location');
           if (user_access('post comments')) {
             $links['comment-add'] = array(
@@ -505,7 +491,7 @@ function comment_node_links_alter(array &$node_links, NodeInterface $node, array
       else {
         // Node in other view modes: add a "post comment" link if the user is
         // allowed to post comments and if this node is allowing new comments.
-        if ($commenting_status == COMMENT_OPEN) {
+        if ($commenting_status == CommentItemInterface::OPEN) {
           $comment_form_location = $instance->getSetting('form_location');
           if (user_access('post comments')) {
             // Show the "post comment" link if the form is on another page, or
@@ -546,7 +532,7 @@ function comment_node_links_alter(array &$node_links, NodeInterface $node, array
         '#attributes' => array('class' => array('links', 'inline')),
       );
       if ($view_mode == 'teaser' && \Drupal::moduleHandler()->moduleExists('history') && \Drupal::currentUser()->isAuthenticated()) {
-        $node_links['comment__' . $field_name]['#attached']['library'][] = array('comment', 'drupal.node-new-comments-link');
+        $node_links['comment__' . $field_name]['#attached']['library'][] = 'comment/drupal.node-new-comments-link';
 
         // Embed the metadata for the "X new comments" link (if any) on this node.
         $node_links['comment__' . $field_name]['#post_render_cache']['history_attach_timestamp'] = array(
@@ -964,17 +950,25 @@ function comment_entity_insert(EntityInterface $entity) {
  * Implements hook_entity_predelete().
  */
 function comment_entity_predelete(EntityInterface $entity) {
-  $cids = db_select('comment', 'c')
-    ->fields('c', array('cid'))
-    ->condition('entity_id', $entity->id())
-    ->condition('entity_type', $entity->getEntityTypeId())
-    ->execute()
-    ->fetchCol();
-  entity_delete_multiple('comment', $cids);
-  db_delete('comment_entity_statistics')
-    ->condition('entity_id', $entity->id())
-    ->condition('entity_type', $entity->getEntityTypeId())
-    ->execute();
+  // Entities can have non-numeric IDs, but {comment} and
+  // {comment_entity_statistics} tables have integer columns for entity ID, and
+  // PostgreSQL throws exceptions if you attempt query conditions with
+  // mismatched types. So, we need to verify that the ID is numeric (even for an
+  // entity type that has an integer ID, $entity->id() might be a string
+  // containing a number), and then cast it to an integer when querying.
+  if ($entity->getEntityType()->isFieldable() && is_numeric($entity->id())) {
+    $cids = db_select('comment', 'c')
+      ->fields('c', array('cid'))
+      ->condition('entity_id', (int) $entity->id())
+      ->condition('entity_type', $entity->getEntityTypeId())
+      ->execute()
+      ->fetchCol();
+    entity_delete_multiple('comment', $cids);
+    db_delete('comment_entity_statistics')
+      ->condition('entity_id', (int) $entity->id())
+      ->condition('entity_type', $entity->getEntityTypeId())
+      ->execute();
+  }
 }
 
 /**
@@ -1054,8 +1048,8 @@ function comment_node_search_result(EntityInterface $node) {
     }
     // Do not make a string if comments are hidden.
     $status = $node->get($field_name)->status;
-    if (\Drupal::currentUser()->hasPermission('access comments') && $status != COMMENT_HIDDEN) {
-      if ($status == COMMENT_OPEN) {
+    if (\Drupal::currentUser()->hasPermission('access comments') && $status != CommentItemInterface::HIDDEN) {
+      if ($status == CommentItemInterface::OPEN) {
         // At least one comment field is open.
         $open = TRUE;
       }
@@ -1320,7 +1314,7 @@ function comment_preview(CommentInterface $comment, array &$form_state) {
     // the value back to its original state after the call to entity_view().
     $field_name = $comment->getFieldName();
     $original_status = $entity->get($field_name)->status;
-    $entity->get($field_name)->status = COMMENT_HIDDEN;
+    $entity->get($field_name)->status = CommentItemInterface::HIDDEN;
     $build = entity_view($entity, 'full');
     $entity->get($field_name)->status = $original_status;
   }

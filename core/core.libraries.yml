@@ -25,8 +25,7 @@ ckeditor:
 
 domready:
   remote: https://github.com/ded/domready
-  # @todo Stable release required for Drupal 8.0.
-  version: master
+  version: 1.0.4
   js:
     assets/vendor/domready/ready.min.js: { weight: -21 }
 
@@ -281,7 +280,7 @@ html5shiv:
   remote: https://github.com/aFarkas/html5shiv
   version: 3.6.2
   js:
-    assets/vendor/html5shiv/html5.js: { weight: -22, browsers: { IE: 'lte IE 8', '!IE': false } }
+    assets/vendor/html5shiv/html5.js: { every_page: true, weight: -22, browsers: { IE: 'lte IE 8', '!IE': false } }
 
 jquery:
   remote: https://github.com/jquery/jquery

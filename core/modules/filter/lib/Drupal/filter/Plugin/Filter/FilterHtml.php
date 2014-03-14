@@ -38,7 +38,7 @@ class FilterHtml extends FilterBase {
       '#description' => t('A list of HTML tags that can be used. JavaScript event attributes, JavaScript URLs, and CSS are always stripped.'),
       '#attached' => array(
         'library' => array(
-          array('filter', 'drupal.filter.filter_html.admin'),
+          'filter/drupal.filter.filter_html.admin',
         ),
       ),
     );
@@ -152,7 +152,7 @@ class FilterHtml extends FilterBase {
       }
     }
     $table = array(
-      '#theme' => 'table',
+      '#type' => 'table',
       '#header' => $header,
       '#rows' => $rows,
     );
@@ -177,7 +177,7 @@ class FilterHtml extends FilterBase {
       );
     }
     $table = array(
-      '#theme' => 'table',
+      '#type' => 'table',
       '#header' => $header,
       '#rows' => $rows,
     );

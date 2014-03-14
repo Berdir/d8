@@ -69,13 +69,6 @@ class ImageStyle extends ConfigEntityBase implements ImageStyleInterface, Entity
   public $label;
 
   /**
-   * The UUID for this entity.
-   *
-   * @var string
-   */
-  public $uuid;
-
-  /**
    * The array of image effects for this image style.
    *
    * @var array
@@ -285,7 +278,7 @@ class ImageStyle extends ConfigEntityBase implements ImageStyleInterface, Entity
     }
 
     $image = \Drupal::service('image.factory')->get($original_uri);
-    if (!$image->getResource()) {
+    if (!$image->isExisting()) {
       return FALSE;
     }
 

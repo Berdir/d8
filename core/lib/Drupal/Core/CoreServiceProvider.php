@@ -51,7 +51,6 @@ class CoreServiceProvider implements ServiceProviderInterface  {
     // during a subrequest).
     $container->addScope(new Scope('request'));
     $this->registerTwig($container);
-    $this->registerModuleHandler($container);
     $this->registerUuid($container);
 
     // Add the compiler pass that lets service providers modify existing
@@ -86,27 +85,6 @@ class CoreServiceProvider implements ServiceProviderInterface  {
   }
 
   /**
-   * Registers the module handler.
-   *
-   * As this is different during install, it needs to stay in PHP.
-   */
-  protected function registerModuleHandler(ContainerBuilder $container) {
-    // The ModuleHandler manages enabled modules and provides the ability to
-    // invoke hooks in all enabled modules.
-    if ($container->getParameter('kernel.environment') == 'install') {
-      // During installation we use the non-cached version.
-      $container->register('module_handler', 'Drupal\Core\Extension\ModuleHandler')
-        ->addArgument('%container.modules%');
-    }
-    else {
-      $container->register('module_handler', 'Drupal\Core\Extension\CachedModuleHandler')
-        ->addArgument('%container.modules%')
-        ->addArgument(new Reference('state'))
-        ->addArgument(new Reference('cache.bootstrap'));
-    }
-  }
-
-  /**
    * Registers Twig services.
    *
    * This method is public and static so that it can be reused in the installer.
@@ -125,7 +103,6 @@ class CoreServiceProvider implements ServiceProviderInterface  {
         // When in the installer, twig_cache must be FALSE until we know the
         // files folder is writable.
         'cache' => drupal_installation_attempted() ? FALSE : settings()->get('twig_cache', TRUE),
-        'base_template_class' => 'Drupal\Core\Template\TwigTemplate',
         // @todo Remove in followup issue
         // @see http://drupal.org/node/1712444.
         'autoescape' => FALSE,

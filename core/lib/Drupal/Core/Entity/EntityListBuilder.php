@@ -171,7 +171,7 @@ class EntityListBuilder extends EntityControllerBase implements EntityListBuilde
    */
   public function render() {
     $build = array(
-      '#theme' => 'table',
+      '#type' => 'table',
       '#header' => $this->buildHeader(),
       '#title' => $this->getTitle(),
       '#rows' => array(),
