@@ -18,7 +18,7 @@ use Drupal\Core\TypedData\DataDefinition;
  *   id = "float",
  *   label = @Translation("Float"),
  *   description = @Translation("An entity field containing an float value."),
- *   configurable = FALSE
+ *   no_ui = TRUE
  * )
  */
 class FloatItem extends FieldItemBase {

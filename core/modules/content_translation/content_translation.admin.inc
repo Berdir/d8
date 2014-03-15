@@ -102,7 +102,7 @@ function _content_translation_form_language_content_settings_form_alter(array &$
             // translation.
             // @todo Remove this special casing as soon as configurable and
             //   base field definitions are "unified".
-            if ($definition->isConfigurable() && ($field = FieldService::fieldInfo()->getField($entity_type_id, $field_name))) {
+            if ($field = FieldService::fieldInfo()->getField($entity_type_id, $field_name)) {
               $instance = FieldService::fieldInfo()->getInstance($entity_type_id, $bundle, $field_name);
               $form['settings'][$entity_type_id][$bundle]['fields'][$field_name] = array(
                 '#label' => $instance->getLabel(),

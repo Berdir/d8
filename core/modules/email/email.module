@@ -31,7 +31,7 @@ function email_help($path, $arg) {
  * Implements hook_field_info_alter().
  */
 function email_field_info_alter(&$info) {
-  $info['email']['configurable'] = TRUE;
+  $info['email']['no_ui'] = FALSE;
   $info['email']['default_widget'] = 'email_default';
   $info['email']['provider'] = 'email';
 }

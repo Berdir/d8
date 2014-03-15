@@ -18,7 +18,7 @@ use Drupal\Core\TypedData\DataDefinition;
  *   id = "integer",
  *   label = @Translation("Integer"),
  *   description = @Translation("An entity field containing an integer value."),
- *   configurable = FALSE
+ *   no_ui = TRUE
  * )
  */
 class IntegerItem extends FieldItemBase {

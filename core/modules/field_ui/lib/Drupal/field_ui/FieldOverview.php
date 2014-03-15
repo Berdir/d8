@@ -89,7 +89,7 @@ class FieldOverview extends OverviewBase {
 
     // Gather bundle information.
     $instances = field_info_instances($this->entity_type, $this->bundle);
-    $field_types = $this->fieldTypeManager->getConfigurableDefinitions();
+    $field_types = $this->fieldTypeManager->getUiDefinitions();
 
     // Field prefix.
     $field_prefix = \Drupal::config('field_ui.settings')->get('field_prefix');
@@ -180,10 +180,7 @@ class FieldOverview extends OverviewBase {
     // Gather valid field types.
     $field_type_options = array();
     foreach ($field_types as $name => $field_type) {
-      // Skip field types which should not be added via user interface.
-      if (empty($field_type['no_ui'])) {
-        $field_type_options[$name] = $field_type['label'];
-      }
+      $field_type_options[$name] = $field_type['label'];
     }
     asort($field_type_options);
 

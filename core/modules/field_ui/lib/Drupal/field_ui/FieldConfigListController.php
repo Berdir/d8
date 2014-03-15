@@ -63,7 +63,7 @@ class FieldConfigListController extends ConfigEntityListController {
     $this->entityManager = $entity_manager;
     $this->bundles = entity_get_bundles();
     $this->fieldTypeManager = $field_type_manager;
-    $this->fieldTypes = $this->fieldTypeManager->getConfigurableDefinitions();
+    $this->fieldTypes = $this->fieldTypeManager->getDefinitions();
   }
 
   /**
