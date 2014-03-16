@@ -68,7 +68,7 @@ class Book extends EntityContentBase {
       array_keys($entity_manager->getBundleInfo($entity_type_id)),
       $container->get('plugin.manager.migrate.entity_field'),
       $container->get('field.info'),
-      function () use ($container, $current_user, $save_session) { drupal_save_session($save_session); $container->set('current_user', $current_user); },
+      function () use ($container, $current_user, $save_session) { $container->set('current_user', $current_user); drupal_save_session($save_session); },
       function () use ($container, $superuser) { drupal_save_session(FALSE); $container->set('current_user', $superuser); }
     );
   }
