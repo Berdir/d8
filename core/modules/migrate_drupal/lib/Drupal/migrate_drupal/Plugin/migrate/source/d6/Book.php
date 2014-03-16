@@ -12,7 +12,7 @@ use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
  * Drupal 6 book source.
  *
  * @MigrateSource(
- *   id = "d6_node"
+ *   id = "d6_book"
  * )
  */
 class Book extends DrupalSqlBase {
@@ -23,7 +23,7 @@ class Book extends DrupalSqlBase {
   public function query() {
     $query = $this->select('book', 'b')->fields('b', array('nid', 'bid'));
     $query->join('menu_links', 'ml', 'b.mlid = ml.plid');
-    $ml_fields = array('mlid', 'plid', 'weight');
+    $ml_fields = array('mlid', 'plid', 'weight', 'has_children', 'depth');
     for ($i = 1; $i <= 9; $i++) {
       $field = "p$i";
       $ml_fields[] = $field;
