@@ -36,6 +36,7 @@ class Book extends EntityContentBase {
    * {@inheritdoc}
    */
   protected function updateEntity(EntityInterface $entity, Row $row) {
+    $entity->beingMigrated = TRUE;
     $entity->book = $row->getDestinationProperty('book');
   }
 
