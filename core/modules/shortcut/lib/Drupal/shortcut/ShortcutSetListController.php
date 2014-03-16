@@ -35,7 +35,7 @@ class ShortcutSetListController extends ConfigEntityListController {
 
     $operations['list'] = array(
       'title' => t('List links'),
-    ) + $entity->urlInfo('customize-form');
+    ) + $entity->urlInfo('customize-form')->toArray();
     return $operations;
   }
 

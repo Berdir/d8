@@ -182,7 +182,6 @@ class CommentAdminOverview extends FormBase {
     foreach ($comments as $comment) {
       /** @var $commented_entity \Drupal\Core\Entity\EntityInterface */
       $commented_entity = $commented_entities[$comment->getCommentedEntityTypeId()][$comment->getCommentedEntityId()];
-      $commented_entity_uri = $commented_entity->urlInfo();
       $username = array(
         '#theme' => 'username',
         '#account' => comment_prepare_author($comment),
@@ -212,21 +211,18 @@ class CommentAdminOverview extends FormBase {
           'data' => array(
             '#type' => 'link',
             '#title' => $commented_entity->label(),
-            '#route_name' => $commented_entity_uri['route_name'],
-            '#route_parameters' => $commented_entity_uri['route_parameters'],
-            '#options' => $commented_entity_uri['options'],
             '#access' => $commented_entity->access('view'),
-          ),
+          ) + $commented_entity->urlInfo()->toRenderArray(),
         ),
         'changed' => $this->date->format($comment->getChangedTime(), 'short'),
       );
-      $comment_uri = $comment->urlInfo();
+      $comment_uri_options = $comment->urlInfo()->getOptions();
       $links = array();
       $links['edit'] = array(
         'title' => $this->t('edit'),
         'route_name' => 'comment.edit_page',
         'route_parameters' => array('comment' => $comment->id()),
-        'options' => $comment_uri['options'],
+        'options' => $comment_uri_options,
         'query' => $destination,
       );
       if ($this->moduleHandler->invoke('content_translation', 'translate_access', array($comment))) {
@@ -234,7 +230,7 @@ class CommentAdminOverview extends FormBase {
           'title' => $this->t('translate'),
           'route_name' => 'content_translation.translation_overview_comment',
           'route_parameters' => array('comment' => $comment->id()),
-          'options' => $comment_uri['options'],
+          'options' => $comment_uri_options,
           'query' => $destination,
         );
       }

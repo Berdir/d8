@@ -48,7 +48,7 @@ class RoleListController extends DraggableListController {
       $operations['permissions'] = array(
         'title' => t('Edit permissions'),
         'weight' => 20,
-      ) + $entity->urlInfo('edit-permissions-form');
+      ) + $entity->urlInfo('edit-permissions-form')->toArray();
     }
     return $operations;
   }

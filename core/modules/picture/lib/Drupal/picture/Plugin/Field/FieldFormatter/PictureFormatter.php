@@ -116,9 +116,10 @@ class PictureFormatter extends ImageFormatterBase {
     $elements = array();
     // Check if the formatter involves a link.
     if ($this->getSetting('image_link') == 'content') {
-      $uri = $items->getEntity()->urlInfo();
+      $entity = $items->getEntity();
       // @todo Remove when theme_picture_formatter() has support for route name.
-      $uri['path'] = $items->getEntity()->getSystemPath();
+      $uri['path'] = $entity->getSystemPath();
+      $uri['options'] = $entity->urlInfo()->getOptions();
     }
     elseif ($this->getSetting('image_link') == 'file') {
       $link_file = TRUE;

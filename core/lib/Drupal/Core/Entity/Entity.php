@@ -7,8 +7,10 @@
 
 namespace Drupal\Core\Entity;
 
+use Drupal\Component\Utility\String;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Url;
 
 /**
  * Defines a base entity class.
@@ -35,13 +37,6 @@ abstract class Entity implements EntityInterface {
    * @var bool
    */
   protected $enforceIsNew;
-
-  /**
-   * The URL generator.
-   *
-   * @var \Drupal\Core\Routing\UrlGeneratorInterface
-   */
-  protected $urlGenerator;
 
   /**
    * Constructs an Entity object.
@@ -131,8 +126,7 @@ abstract class Entity implements EntityInterface {
 
     if (isset($link_templates[$rel])) {
       // If there is a template for the given relationship type, generate the path.
-      $uri['route_name'] = $link_templates[$rel];
-      $uri['route_parameters'] = $this->urlRouteParameters($rel);
+      $uri = new Url($link_templates[$rel], $this->urlRouteParameters($rel));
     }
     else {
       $bundle = $this->bundle();
@@ -153,14 +147,19 @@ abstract class Entity implements EntityInterface {
         $uri = $uri_callback($this);
       }
       else {
-        return array();
+        throw new \Exception(String::format('rel: @rel uri: @uri_callback entity_type: @entity_type', array(
+          '@rel' => $rel,
+          '@uri_callback' => isset($uri_callback) ? $uri_callback : '',
+          '@entity_type' => $this->getEntityTypeId(),
+        )));
       }
     }
 
     // Pass the entity data to url() so that alter functions do not need to
     // look up this entity again.
-    $uri['options']['entity_type'] = $this->getEntityTypeId();
-    $uri['options']['entity'] = $this;
+    $uri
+      ->setOption('entity_type', $this->getEntityTypeId())
+      ->setOption('entity', $this);
 
     return $uri;
   }
@@ -170,7 +169,7 @@ abstract class Entity implements EntityInterface {
    */
   public function getSystemPath($rel = 'canonical') {
     if ($uri = $this->urlInfo($rel)) {
-      return $this->urlGenerator()->getPathFromRoute($uri['route_name'], $uri['route_parameters']);
+      return $uri->getInternalPath();
     }
     return '';
   }
@@ -203,8 +202,9 @@ abstract class Entity implements EntityInterface {
       return '';
     }
 
-    $options += $uri['options'];
-    return $this->urlGenerator()->generateFromRoute($uri['route_name'], $uri['route_parameters'], $options);
+    $options += $uri->getOptions();
+    $uri->setOptions($options);
+    return $uri->toString();
   }
 
   /**
@@ -397,29 +397,6 @@ abstract class Entity implements EntityInterface {
     if ($bundle_of !== FALSE && $entity_manager->hasController($bundle_of, 'view_builder')) {
       $entity_manager->getViewBuilder($bundle_of)->resetCache();
     }
-  }
-
-  /**
-   * Wraps the URL generator.
-   *
-   * @return \Drupal\Core\Routing\UrlGeneratorInterface
-   *   The URL generator.
-   */
-  protected function urlGenerator() {
-    if (!$this->urlGenerator) {
-      $this->urlGenerator = \Drupal::urlGenerator();
-    }
-    return $this->urlGenerator;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function __sleep() {
-    // Don't serialize the url generator.
-    $this->urlGenerator = NULL;
-
-    return array_keys(get_object_vars($this));
   }
 
 }

@@ -40,11 +40,11 @@ class VocabularyListController extends DraggableListController {
     $operations['list'] = array(
       'title' => t('list terms'),
       'weight' => 0,
-    ) + $entity->urlInfo('overview-form');
+    ) + $entity->urlInfo('overview-form')->toArray();
     $operations['add'] = array(
       'title' => t('add terms'),
       'weight' => 10,
-    ) + $entity->urlInfo('add-form');
+    ) + $entity->urlInfo('add-form')->toArray();
     unset($operations['delete']);
 
     return $operations;

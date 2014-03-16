@@ -141,7 +141,7 @@ class ViewListController extends ConfigEntityListController implements EntityCon
       $operations['clone'] = array(
         'title' => $this->t('Clone'),
         'weight' => 15,
-      ) + $entity->urlInfo('clone');
+      ) + $entity->urlInfo('clone')->toArray();
     }
 
     // Add AJAX functionality to enable/disable operations.

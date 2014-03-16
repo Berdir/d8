@@ -205,8 +205,7 @@ class Comment extends ContentEntityBase implements CommentInterface {
   public function permalink() {
     $entity = $this->getCommentedEntity();
     $uri = $entity->urlInfo();
-    $uri['options'] = array('fragment' => 'comment-' . $this->id());
-
+    $uri->setOption('fragment', 'comment-' . $this->id());
     return $uri;
   }
 

@@ -98,13 +98,13 @@ class EntityListController extends EntityControllerBase implements EntityListCon
       $operations['edit'] = array(
         'title' => $this->t('Edit'),
         'weight' => 10,
-      ) + $entity->urlInfo('edit-form');
+      ) + $entity->urlInfo('edit-form')->toArray();
     }
     if ($entity->access('delete') && $entity->hasLinkTemplate('delete-form')) {
       $operations['delete'] = array(
         'title' => $this->t('Delete'),
         'weight' => 100,
-      ) + $entity->urlInfo('delete-form');
+      ) + $entity->urlInfo('delete-form')->toArray();
     }
 
     return $operations;
