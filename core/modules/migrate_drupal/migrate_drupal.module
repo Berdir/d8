@@ -1,4 +1,5 @@
 <?php
+use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Implements hook_entity_type_alter().
@@ -8,4 +9,25 @@ function migrate_drupal_entity_type_alter(array &$entity_types) {
   $entity_types['migration']
     ->setClass('Drupal\migrate_drupal\Entity\Migration')
     ->setControllerClass('storage', 'Drupal\migrate_drupal\MigrationStorageController');
+}
+
+/**
+ * Implements hook_module_implements_alter().
+ */
+function migrate_drupal_module_implements_alter(&$implementations, $hook) {
+  if ($hook == 'node_presave') {
+    unset($implementations['book']);
+  }
+}
+
+/**
+ * Implements hook_node_presave().
+ *
+ * This is a partial copy of book_node_presave().
+ */
+function migrate_drupal_node_presave(EntityInterface $node) {
+  // Make sure a new node gets a new menu link.
+  if ($node->isNew()) {
+    $node->book['nid'] = NULL;
+  }
 }

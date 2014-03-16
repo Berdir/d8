@@ -61,7 +61,7 @@ class MigrateBookTest extends MigrateDrupalTestBase {
   public function testBook() {
     $nodes = node_load_multiple(array(4, 5, 6, 7, 8));
     $tree = \Drupal::service('book.manager')->bookTreeAllData(4);
-    $this->assertTrue($tree);
+    $this->assertTrue($tree, 'tree loaded');
   }
 
 }
