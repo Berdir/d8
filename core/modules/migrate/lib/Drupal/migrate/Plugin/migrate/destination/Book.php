@@ -26,6 +26,20 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class Book extends EntityContentBase {
 
   /**
+   * A callable switching the current user to a node administrator.
+   *
+   * @var Callable
+   */
+  protected $setNodeAdmin;
+
+  /**
+   * A callable which resets the user as it was before $setNodeAdmin.
+   *
+   * @var Callable
+   */
+  protected $setCurrentUser;
+
+  /**
    * {@inheritdoc}
    * @param UserInterface $account
    *   A node administrator account.
