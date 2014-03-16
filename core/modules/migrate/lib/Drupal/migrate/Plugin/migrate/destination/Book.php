@@ -78,9 +78,10 @@ class Book extends EntityContentBase {
    */
   protected function save(ContentEntityInterface $entity, array $old_destination_id_values = array()) {
     // book_node_presave() enforces a new revision for book changes unless
-    // the current user is a node administrator.
+    // the current user is a node administrator so switch to one.
     call_user_func($this->setNodeAdmin);
     $return = parent::save($entity, $old_destination_id_values);
+    // Now switch back to the current user.
     call_user_func($this->setCurrentUser);
     return $return;
   }
