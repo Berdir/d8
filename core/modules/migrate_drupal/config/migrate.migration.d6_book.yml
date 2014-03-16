@@ -6,10 +6,13 @@ process:
   book.bid: bid
   book.weight: weight
   book.pid:
-    plugin: migration
-    migration: d6_book
-    source: plid
+    -
+      plugin: skip_process_on_empty
+      source: plid
+    -
+      plugin: migration
+      migration: d6_book
 destination:
-  plugin: entity:node
+  plugin: book
 dependencies:
   - d6_node

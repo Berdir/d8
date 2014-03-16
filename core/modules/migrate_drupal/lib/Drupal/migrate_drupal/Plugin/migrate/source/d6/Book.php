@@ -22,7 +22,7 @@ class Book extends DrupalSqlBase {
    */
   public function query() {
     $query = $this->select('book', 'b')->fields('b', array('nid', 'bid'));
-    $query->join('menu_links', 'ml', 'b.mlid = ml.plid');
+    $query->join('menu_links', 'ml', 'b.mlid = ml.mlid');
     $ml_fields = array('mlid', 'plid', 'weight', 'has_children', 'depth');
     for ($i = 1; $i <= 9; $i++) {
       $field = "p$i";
