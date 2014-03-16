@@ -10,7 +10,7 @@ namespace Drupal\Core\TypedData;
 /**
  * A typed data definition class for defining data based on defined data types.
  */
-class DataDefinition implements DataDefinitionInterface, \ArrayAccess {
+class DataDefinition implements DataDefinitionInterface {
 
   /**
    * The array holding values for all definition keys.
@@ -304,51 +304,6 @@ class DataDefinition implements DataDefinitionInterface, \ArrayAccess {
   public function addConstraint($constraint_name, $options = NULL) {
     $this->definition['constraints'][$constraint_name] = $options;
     return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   *
-   * This is for BC support only.
-   * @todo: Remove in https://drupal.org/node/1928868.
-   */
-  public function offsetExists($offset) {
-    // PHP's array access does not work correctly with isset(), so we have to
-    // bake isset() in here. See https://bugs.php.net/bug.php?id=41727.
-    return array_key_exists($offset, $this->definition) && isset($this->definition[$offset]);
-  }
-
-  /**
-   * {@inheritdoc}
-   *
-   * This is for BC support only.
-   * @todo: Remove in https://drupal.org/node/1928868.
-   */
-  public function &offsetGet($offset) {
-    if (!isset($this->definition[$offset])) {
-      $this->definition[$offset] = NULL;
-    }
-    return $this->definition[$offset];
-  }
-
-  /**
-   * {@inheritdoc}
-   *
-   * This is for BC support only.
-   * @todo: Remove in https://drupal.org/node/1928868.
-   */
-  public function offsetSet($offset, $value) {
-    $this->definition[$offset] = $value;
-  }
-
-  /**
-   * {@inheritdoc}
-   *
-   * This is for BC support only.
-   * @todo: Remove in https://drupal.org/node/1928868.
-   */
-  public function offsetUnset($offset) {
-    unset($this->definition[$offset]);
   }
 
   /**
