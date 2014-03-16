@@ -50,14 +50,6 @@ interface PluginSettingsInterface extends PluginInspectionInterface {
   public function getSetting($key);
 
   /**
-   * Returns the default settings for the plugin.
-   *
-   * @return array
-   *   The array of default setting values, keyed by setting names.
-   */
-  public function getDefaultSettings();
-
-  /**
    * Sets the settings for the plugin.
    *
    * @param array $settings

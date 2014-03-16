@@ -8,7 +8,6 @@
 namespace Drupal\Core\Field;
 
 use Drupal\Core\Plugin\PluginBase;
-use Drupal\Component\Plugin\Factory\DefaultFactory;
 
 /**
  * Base class for the Field API plugins.
@@ -71,20 +70,8 @@ abstract class PluginSettingsBase extends PluginBase implements PluginSettingsIn
    * Merges default settings values into $settings.
    */
   protected function mergeDefaults() {
-    $this->settings += $this->getDefaultSettings();
+    $this->settings += static::settings();
     $this->defaultSettingsMerged = TRUE;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getDefaultSettings() {
-    $definition = $this->getPluginDefinition();
-    if (!empty($plugin_definition['class'])) {
-      $plugin_class = DefaultFactory::getPluginClass($this->getPluginId(), $definition);
-      return $plugin_class::settings();
-    }
-    return array();
   }
 
   /**
