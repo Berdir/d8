@@ -17,16 +17,22 @@ namespace Drupal\entity_reference\Plugin\Field\FieldWidget;
  *   field_types = {
  *     "entity_reference"
  *   },
- *   settings = {
- *     "match_operator" = "CONTAINS",
- *     "size" = 60,
- *     "autocomplete_type" = "tags",
- *     "placeholder" = ""
- *   },
  *   multiple_values = TRUE
  * )
  */
 class AutocompleteTagsWidget extends AutocompleteWidgetBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function settings() {
+    $settings = parent::settings();
+    $settings['match_operator'] = 'CONTAINS';
+    $settings['size'] = '60';
+    $settings['autocomplete_type'] = 'tags';
+    $settings['placeholder'] = '';
+    return $settings;
+  }
 
   /**
    * {@inheritdoc}

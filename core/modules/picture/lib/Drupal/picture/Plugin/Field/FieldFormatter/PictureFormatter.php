@@ -18,15 +18,21 @@ use Drupal\image\Plugin\Field\FieldFormatter\ImageFormatterBase;
  *   label = @Translation("Picture"),
  *   field_types = {
  *     "image",
- *   },
- *   settings = {
- *     "picture_mapping" = "",
- *     "fallback_image_style" = "",
- *     "image_link" = "",
  *   }
  * )
  */
 class PictureFormatter extends ImageFormatterBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function settings() {
+    $settings = parent::settings();
+    $settings['picture_mapping'] = '';
+    $settings['fallback_image_style'] = '';
+    $settings['image_link'] = '';
+    return $settings;
+  }
 
   /**
    * {@inheritdoc}

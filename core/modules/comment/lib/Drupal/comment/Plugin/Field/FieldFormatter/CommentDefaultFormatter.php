@@ -29,13 +29,19 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   },
  *   edit = {
  *     "editor" = "disabled"
- *   },
- *   settings = {
- *     "pager_id" = 0
  *   }
  * )
  */
 class CommentDefaultFormatter extends FormatterBase implements ContainerFactoryPluginInterface {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function settings() {
+    $settings = parent::settings();
+    $settings['pager_id'] = 0;
+    return $settings;
+  }
 
   /**
    * The comment storage controller.

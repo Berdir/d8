@@ -225,10 +225,11 @@ class ManageDisplayTest extends FieldUiTestBase {
     $node = $this->drupalCreateNode($settings);
 
     // Gather expected output values with the various formatters.
-    $formatters = \Drupal::service('plugin.manager.field.formatter')->getDefinitions();
+    $field_test_default_settings = \Drupal::service('plugin.manager.field.formatter')->getDefaultSettings('field_test_default');
+    $field_test_with_prepare_view_settings = \Drupal::service('plugin.manager.field.formatter')->getDefaultSettings('field_test_with_prepare_view');
     $output = array(
-      'field_test_default' => $formatters['field_test_default']['settings']['test_formatter_setting'] . '|' . $value,
-      'field_test_with_prepare_view' => $formatters['field_test_with_prepare_view']['settings']['test_formatter_setting_additional'] . '|' . $value. '|' . ($value + 1),
+      'field_test_default' => $field_test_default_settings['test_formatter_setting'] . '|' . $value,
+      'field_test_with_prepare_view' => $field_test_with_prepare_view_settings['test_formatter_setting_additional'] . '|' . $value. '|' . ($value + 1),
     );
 
     // Check that the field is displayed with the default formatter in 'rss'

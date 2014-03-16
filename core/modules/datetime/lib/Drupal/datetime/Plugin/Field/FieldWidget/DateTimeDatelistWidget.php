@@ -18,15 +18,21 @@ use Drupal\datetime\Plugin\Field\FieldType\DateTimeItem;
  *   label = @Translation("Select list"),
  *   field_types = {
  *     "datetime"
- *   },
- *   settings = {
- *     "increment" = 15,
- *     "date_order" = "YMD",
- *     "time_type" = "24",
  *   }
  * )
  */
 class DateTimeDatelistWidget extends WidgetBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function settings() {
+    $settings = parent::settings();
+    $settings['increment'] = '15';
+    $settings['date_order'] = 'YMD';
+    $settings['time_type'] = '24';
+    return $settings;
+  }
 
   /**
    * {@inheritdoc}

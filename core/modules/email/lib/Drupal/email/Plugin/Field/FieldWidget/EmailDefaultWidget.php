@@ -18,13 +18,19 @@ use Drupal\Core\Field\WidgetBase;
  *   label = @Translation("E-mail"),
  *   field_types = {
  *     "email"
- *   },
- *   settings = {
- *     "placeholder" = ""
  *   }
  * )
  */
 class EmailDefaultWidget extends WidgetBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function settings() {
+    $settings = parent::settings();
+    $settings['placeholder'] = '';
+    return $settings;
+  }
 
   /**
    * {@inheritdoc}

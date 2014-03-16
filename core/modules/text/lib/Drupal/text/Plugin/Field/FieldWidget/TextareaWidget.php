@@ -19,14 +19,20 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
  *   label = @Translation("Text area (multiple rows)"),
  *   field_types = {
  *     "text_long"
- *   },
- *   settings = {
- *     "rows" = "5",
- *     "placeholder" = ""
  *   }
  * )
  */
 class TextareaWidget extends WidgetBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function settings() {
+    $settings = parent::settings();
+    $settings['rows'] = '5';
+    $settings['placeholder'] = '';
+    return $settings;
+  }
 
   /**
    * {@inheritdoc}

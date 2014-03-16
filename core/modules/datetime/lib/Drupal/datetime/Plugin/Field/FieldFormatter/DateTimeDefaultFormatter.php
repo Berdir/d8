@@ -24,13 +24,19 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   label = @Translation("Default"),
  *   field_types = {
  *     "datetime"
- *   },
- *   settings = {
- *     "format_type" = "medium",
  *   }
  * )
  */
 class DateTimeDefaultFormatter extends FormatterBase implements ContainerFactoryPluginInterface {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function settings() {
+    $settings = parent::settings();
+    $settings['format_type'] = 'medium';
+    return $settings;
+  }
 
   /**
    * The date service.

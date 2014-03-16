@@ -17,14 +17,20 @@ use Drupal\Core\Field\FieldItemListInterface;
  *   label = @Translation("Image"),
  *   field_types = {
  *     "image"
- *   },
- *   settings = {
- *     "image_style" = "",
- *     "image_link" = ""
  *   }
  * )
  */
 class ImageFormatter extends ImageFormatterBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function settings() {
+    $settings = parent::settings();
+    $settings['image_style'] = '';
+    $settings['image_link'] = '';
+    return $settings;
+  }
 
   /**
    * {@inheritdoc}

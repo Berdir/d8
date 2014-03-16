@@ -20,13 +20,19 @@ use Drupal\Core\Field\WidgetBase;
  *     "string",
  *     "email"
  *   },
- *   settings = {
- *     "size" = "60",
- *     "placeholder" = ""
- *   }
  * )
  */
 class StringWidget extends WidgetBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function settings() {
+    $settings = parent::settings();
+    $settings['size'] = '60';
+    $settings['placeholder'] = '';
+    return $settings;
+  }
 
   /**
    * {@inheritdoc}

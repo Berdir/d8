@@ -20,16 +20,22 @@ namespace Drupal\number\Plugin\Field\FieldFormatter;
  *   field_types = {
  *     "number_decimal",
  *     "number_float"
- *   },
- *   settings = {
- *     "thousand_separator" = "",
- *     "decimal_separator" = ".",
- *     "scale" = "2",
- *     "prefix_suffix" = "TRUE"
  *   }
  * )
  */
 class NumberDecimalFormatter extends DefaultNumberFormatter {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function settings() {
+    $settings = parent::settings();
+    $settings['thousand_separator'] = '';
+    $settings['decimal_separator'] = '.';
+    $settings['scale'] = 2;
+    $settings['prefix_suffix'] = TRUE;
+    return $settings;
+  }
 
   /**
    * {@inheritdoc}

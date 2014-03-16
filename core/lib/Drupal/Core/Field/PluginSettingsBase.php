@@ -8,6 +8,7 @@
 namespace Drupal\Core\Field;
 
 use Drupal\Core\Plugin\PluginBase;
+use Drupal\Component\Plugin\Factory\DefaultFactory;
 
 /**
  * Base class for the Field API plugins.
@@ -31,7 +32,21 @@ abstract class PluginSettingsBase extends PluginBase implements PluginSettingsIn
   protected $defaultSettingsMerged = FALSE;
 
   /**
-   * Implements Drupal\field\Plugin\PluginSettingsInterface::getSettings().
+   * {@inheritdoc}
+   */
+  public static function settings() {
+    return array();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function hasSettings() {
+    return !empty($this->settings);
+  }
+
+  /**
+   * {@inheritdoc}
    */
   public function getSettings() {
     // Merge defaults before returning the array.
@@ -42,7 +57,7 @@ abstract class PluginSettingsBase extends PluginBase implements PluginSettingsIn
   }
 
   /**
-   * Implements Drupal\field\Plugin\PluginSettingsInterface::getSetting().
+   * {@inheritdoc}
    */
   public function getSetting($key) {
     // Merge defaults if we have no value for the key.
@@ -61,15 +76,19 @@ abstract class PluginSettingsBase extends PluginBase implements PluginSettingsIn
   }
 
   /**
-   * Implements Drupal\field\Plugin\PluginSettingsInterface::getDefaultSettings().
+   * {@inheritdoc}
    */
   public function getDefaultSettings() {
     $definition = $this->getPluginDefinition();
-    return $definition['settings'];
+    if (!empty($plugin_definition['class'])) {
+      $plugin_class = DefaultFactory::getPluginClass($this->getPluginId(), $definition);
+      return $plugin_class::settings();
+    }
+    return array();
   }
 
   /**
-   * Implements Drupal\field\Plugin\PluginSettingsInterface::setSettings().
+   * {@inheritdoc}
    */
   public function setSettings(array $settings) {
     $this->settings = $settings;
@@ -78,7 +97,7 @@ abstract class PluginSettingsBase extends PluginBase implements PluginSettingsIn
   }
 
   /**
-   * Implements Drupal\field\Plugin\PluginSettingsInterface::setSetting().
+   * {@inheritdoc}
    */
   public function setSetting($key, $value) {
     $this->settings[$key] = $value;

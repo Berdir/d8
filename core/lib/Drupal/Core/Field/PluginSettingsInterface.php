@@ -15,6 +15,22 @@ use Drupal\Component\Plugin\PluginInspectionInterface;
 interface PluginSettingsInterface extends PluginInspectionInterface {
 
   /**
+   * Defines the default settings for this plugin.
+   *
+   * @return array
+   *   A list of default settings, keyed by the setting name.
+   */
+  public static function settings();
+
+  /**
+   * Returns whether this plugin defines settings.
+   *
+   * @return bool
+   *   TRUE if this plugin defines settings.
+   */
+  public function hasSettings();
+
+  /**
    * Returns the array of settings, including defaults for missing settings.
    *
    * @return array
@@ -48,7 +64,7 @@ interface PluginSettingsInterface extends PluginInspectionInterface {
    *   The array of settings, keyed by setting names. Missing settings will be
    *   assigned their default values.
    *
-   * @return \Drupal\field\Plugin\PluginSettingsInterface
+   * @return \Drupal\Core\Field\PluginSettingsInterface
    *   The plugin itself.
    */
   public function setSettings(array $settings);
@@ -61,7 +77,7 @@ interface PluginSettingsInterface extends PluginInspectionInterface {
    * @param mixed $value
    *   The setting value.
    *
-   * @return \Drupal\field\Plugin\PluginSettingsInterface
+   * @return \Drupal\Core\Field\PluginSettingsInterface
    *   The plugin itself.
    */
   public function setSetting($key, $value);

@@ -18,14 +18,19 @@ use Drupal\Core\Field\WidgetBase;
  *   label = @Translation("Telephone number"),
  *   field_types = {
  *     "telephone"
- *   },
- *   settings = {
- *     "placeholder" = ""
  *   }
  * )
  */
 class TelephoneDefaultWidget extends WidgetBase {
 
+  /**
+   * {@inheritdoc}
+   */
+  public static function settings() {
+    $settings = parent::settings();
+    $settings['placeholder'] = '';
+    return $settings;
+  }
 
   /**
    * {@inheritdoc}

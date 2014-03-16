@@ -20,13 +20,19 @@ use Drupal\Core\Field\FieldItemListInterface;
  *   field_types = {
  *     "test_field"
  *   },
- *   settings = {
- *     "test_formatter_setting_additional" = "dummy test string"
- *   },
  *   weight = 10
  * )
  */
 class TestFieldPrepareViewFormatter extends FormatterBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function settings() {
+    $settings = parent::settings();
+    $settings['test_formatter_setting_additional'] = 'dummy test string';
+    return $settings;
+  }
 
   /**
    * {@inheritdoc}
