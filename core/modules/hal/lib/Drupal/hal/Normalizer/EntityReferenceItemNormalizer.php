@@ -58,6 +58,12 @@ class EntityReferenceItemNormalizer extends FieldItemNormalizer implements UuidR
     /** @var $field_item \Drupal\Core\Field\FieldItemInterface */
     $target_entity = $field_item->get('entity')->getValue();
 
+    // If this is not a content entity, let the parent implementation handle it,
+    // only content entities are supported as embedded resources.
+    if (!($target_entity instanceof ContentEntityInterface)) {
+      return parent::normalize($field_item, $format, $context);
+    }
+
     // If the parent entity passed in a langcode, unset it before normalizing
     // the target entity. Otherwise, untranslatable fields of the target entity
     // will include the langcode.
@@ -67,10 +73,6 @@ class EntityReferenceItemNormalizer extends FieldItemNormalizer implements UuidR
 
     // Normalize the target entity.
     $embedded = $this->serializer->normalize($target_entity, $format, $context);
-    // @todo Config entities currently can not be serialized, skip them.
-    if (empty($embedded['_links']['self'])) {
-      return array();
-    }
     $link = $embedded['_links']['self'];
     // If the field is translatable, add the langcode to the link relation
     // object. This does not indicate the language of the target entity.

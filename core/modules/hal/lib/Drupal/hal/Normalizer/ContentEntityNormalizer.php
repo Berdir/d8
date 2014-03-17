@@ -67,11 +67,12 @@ class ContentEntityNormalizer extends NormalizerBase {
       }
     }
     else {
-      $fields = $entity->getFields();
+      $fields = $entity->getProperties();
     }
+    // Ignore the entity ID and revision ID.
+    $exclude = array($entity->getEntityType()->getKey('id'), $entity->getEntityType()->getKey('revision'));
     foreach ($fields as $field) {
-      // Ignore the entity ID.
-      if ($field->getFieldDefinition()->getName() == $entity->getEntityType()->getKey('id')) {
+      if (in_array($field->getFieldDefinition()->getName(), $exclude)) {
         continue;
       }
       $normalized_property = $this->serializer->normalize($field, $format, $context);
