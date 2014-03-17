@@ -402,6 +402,12 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
       if (!$definition) {
         throw new \InvalidArgumentException('Field ' . String::checkPlain($name) . ' is unknown.');
       }
+
+      // Check if the field uses a known field type.
+      if (!\Drupal::service('plugin.manager.field.field_type')->getDefinition($definition->getType())) {
+        throw new \InvalidArgumentException('Field type ' . String::checkPlain($definition->getType()) . ' for the field ' . String::checkPlain($name) . ' is unknown.');
+      }
+
       // Non-translatable fields are always stored with
       // Language::LANGCODE_DEFAULT as key.
 
