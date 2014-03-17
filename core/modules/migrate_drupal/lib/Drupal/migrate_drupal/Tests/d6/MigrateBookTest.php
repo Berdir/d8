@@ -60,8 +60,28 @@ class MigrateBookTest extends MigrateDrupalTestBase {
    */
   public function testBook() {
     $nodes = node_load_multiple(array(4, 5, 6, 7, 8));
+    $this->assertEqual($nodes[4]->book['bid'], 4);
+    $this->assertEqual($nodes[4]->book['pid'], 0);
+
+    $this->assertEqual($nodes[5]->book['bid'], 4);
+    $this->assertEqual($nodes[5]->book['pid'], 4);
+
+    $this->assertEqual($nodes[6]->book['bid'], 4);
+    $this->assertEqual($nodes[6]->book['pid'], 5);
+
+    $this->assertEqual($nodes[7]->book['bid'], 4);
+    $this->assertEqual($nodes[7]->book['pid'], 5);
+
+    $this->assertEqual($nodes[8]->book['bid'], 8);
+    $this->assertEqual($nodes[8]->book['pid'], 0);
+
     $tree = \Drupal::service('book.manager')->bookTreeAllData(4);
-    $this->assertTrue($tree, 'tree loaded');
+    $this->assertEqual($tree['49990  4']['link']['nid'], 4);
+    $this->assertEqual($tree['49990  4']['below']['50000  5']['link']['nid'], 5);
+    $this->assertEqual($tree['49990  4']['below']['50000  5']['below']['50000  6']['link']['nid'], 6);
+    $this->assertEqual($tree['49990  4']['below']['50000  5']['below']['50000  7']['link']['nid'], 7);
+    $this->assertIdentical($tree['49990  4']['below']['50000  5']['below']['50000  6']['below'], array());
+    $this->assertIdentical($tree['49990  4']['below']['50000  5']['below']['50000  7']['below'], array());
   }
 
 }
