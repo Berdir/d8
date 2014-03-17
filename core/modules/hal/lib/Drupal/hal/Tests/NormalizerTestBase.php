@@ -10,7 +10,7 @@ namespace Drupal\hal\Tests;
 use Drupal\Core\Cache\MemoryBackend;
 use Drupal\Core\Language\Language;
 use Drupal\hal\Encoder\JsonEncoder;
-use Drupal\hal\Normalizer\EntityNormalizer;
+use Drupal\hal\Normalizer\ContentEntityNormalizer;
 use Drupal\hal\Normalizer\EntityReferenceItemNormalizer;
 use Drupal\hal\Normalizer\FieldItemNormalizer;
 use Drupal\hal\Normalizer\FieldNormalizer;
@@ -124,7 +124,7 @@ abstract class NormalizerTestBase extends DrupalUnitTestBase {
 
     // Set up the mock serializer.
     $normalizers = array(
-      new EntityNormalizer($link_manager),
+      new ContentEntityNormalizer($link_manager),
       new EntityReferenceItemNormalizer($link_manager, new UuidResolver()),
       new FieldItemNormalizer(),
       new FieldNormalizer(),

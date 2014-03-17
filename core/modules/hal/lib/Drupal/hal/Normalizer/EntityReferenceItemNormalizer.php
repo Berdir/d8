@@ -7,6 +7,7 @@
 
 namespace Drupal\hal\Normalizer;
 
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\rest\LinkManager\LinkManagerInterface;
 use Drupal\serialization\EntityResolver\EntityResolverInterface;
 use Drupal\serialization\EntityResolver\UuidReferenceInterface;
@@ -66,6 +67,10 @@ class EntityReferenceItemNormalizer extends FieldItemNormalizer implements UuidR
 
     // Normalize the target entity.
     $embedded = $this->serializer->normalize($target_entity, $format, $context);
+    // @todo Config entities currently can not be serialized, skip them.
+    if (empty($embedded['_links']['self'])) {
+      return array();
+    }
     $link = $embedded['_links']['self'];
     // If the field is translatable, add the langcode to the link relation
     // object. This does not indicate the language of the target entity.
