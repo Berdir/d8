@@ -253,7 +253,7 @@ function comment_field_instance_config_update(FieldInstanceConfigInterface $inst
 function comment_field_config_delete(FieldConfigInterface $field) {
   if ($field->getType() == 'comment') {
     // Delete all fields and displays attached to the comment bundle.
-    entity_invoke_bundle_hook('delete', 'comment', $field->getName());
+    entity_invoke_bundle_hook('delete', 'comment', $field->entity_type . '__' . $field->getName());
   }
 }
 
@@ -950,17 +950,25 @@ function comment_entity_insert(EntityInterface $entity) {
  * Implements hook_entity_predelete().
  */
 function comment_entity_predelete(EntityInterface $entity) {
-  $cids = db_select('comment', 'c')
-    ->fields('c', array('cid'))
-    ->condition('entity_id', $entity->id())
-    ->condition('entity_type', $entity->getEntityTypeId())
-    ->execute()
-    ->fetchCol();
-  entity_delete_multiple('comment', $cids);
-  db_delete('comment_entity_statistics')
-    ->condition('entity_id', $entity->id())
-    ->condition('entity_type', $entity->getEntityTypeId())
-    ->execute();
+  // Entities can have non-numeric IDs, but {comment} and
+  // {comment_entity_statistics} tables have integer columns for entity ID, and
+  // PostgreSQL throws exceptions if you attempt query conditions with
+  // mismatched types. So, we need to verify that the ID is numeric (even for an
+  // entity type that has an integer ID, $entity->id() might be a string
+  // containing a number), and then cast it to an integer when querying.
+  if ($entity->getEntityType()->isFieldable() && is_numeric($entity->id())) {
+    $cids = db_select('comment', 'c')
+      ->fields('c', array('cid'))
+      ->condition('entity_id', (int) $entity->id())
+      ->condition('entity_type', $entity->getEntityTypeId())
+      ->execute()
+      ->fetchCol();
+    entity_delete_multiple('comment', $cids);
+    db_delete('comment_entity_statistics')
+      ->condition('entity_id', (int) $entity->id())
+      ->condition('entity_type', $entity->getEntityTypeId())
+      ->execute();
+  }
 }
 
 /**

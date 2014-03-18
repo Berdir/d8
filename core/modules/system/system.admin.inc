@@ -83,44 +83,6 @@ function _system_is_incompatible(&$incompatible, $files, Extension $file) {
 }
 
 /**
- * Returns HTML for an administrative block for display.
- *
- * @param $variables
- *   An associative array containing:
- *   - block: An array containing information about the block:
- *     - show: A Boolean whether to output the block. Defaults to FALSE.
- *     - title: The block's title.
- *     - content: (optional) Formatted content for the block.
- *     - description: (optional) Description of the block. Only output if
- *       'content' is not set.
- *
- * @ingroup themeable
- */
-function theme_admin_block($variables) {
-  $block = $variables['block'];
-  $output = '';
-
-  // Don't display the block if it has no content to display.
-  if (empty($block['show'])) {
-    return $output;
-  }
-
-  $output .= '<div class="admin-panel">';
-  if (!empty($block['title'])) {
-    $output .= '<h3>' . $block['title'] . '</h3>';
-  }
-  if (!empty($block['content'])) {
-    $output .= '<div class="body">' . render($block['content']) . '</div>';
-  }
-  else {
-    $output .= '<div class="description">' . $block['description'] . '</div>';
-  }
-  $output .= '</div>';
-
-  return $output;
-}
-
-/**
  * Prepares variables for administrative content block templates.
  *
  * Default template: admin-block-content.html.twig.
@@ -154,7 +116,9 @@ function template_preprocess_admin_block_content(&$variables) {
 }
 
 /**
- * Returns HTML for an administrative page.
+ * Prepares variables for administrative index page templates.
+ *
+ * Default template: admin-page.html.twig.
  *
  * @param $variables
  *   An associative array containing:
@@ -165,40 +129,24 @@ function template_preprocess_admin_block_content(&$variables) {
  *
  * @ingroup themeable
  */
-function theme_admin_page($variables) {
-  $blocks = $variables['blocks'];
-
+function template_preprocess_admin_page(&$variables) {
+  $variables['system_compact_link'] = array(
+    '#theme' => 'system_compact_link',
+  );
+  $variables['containers'] = array();
   $stripe = 0;
-  $container = array();
-
-  foreach ($blocks as $block) {
-    $admin_block = array(
-      '#theme' => 'admin_block',
-      '#block' => $block,
-    );
-    if ($block_output = drupal_render($admin_block)) {
+  foreach ($variables['blocks'] as $block) {
+    if (!empty($block['content']['#content'])) {
       if (empty($block['position'])) {
-        // perform automatic striping.
+        // Perform automatic striping.
         $block['position'] = ++$stripe % 2 ? 'left' : 'right';
       }
-      if (!isset($container[$block['position']])) {
-        $container[$block['position']] = '';
-      }
-      $container[$block['position']] .= $block_output;
+      $variables['containers'][$block['position']]['blocks'][] = array(
+        '#theme' => 'admin_block',
+        '#block' => $block,
+      );
     }
   }
-
-  $system_compact_link = array('#theme' => 'system_compact_link');
-  $output = '<div class="admin clearfix">';
-  $output .= drupal_render($system_compact_link);
-
-  foreach ($container as $id => $data) {
-    $output .= '<div class="' . $id . ' clearfix">';
-    $output .= $data;
-    $output .= '</div>';
-  }
-  $output .= '</div>';
-  return $output;
 }
 
 /**
@@ -231,7 +179,6 @@ function theme_system_admin_index($variables) {
       $block['title'] = $module;
       $block['content'] = drupal_render($admin_block_content);
       $block['description'] = t($description);
-      $block['show'] = TRUE;
 
       $admin_block = array(
         '#theme' => 'admin_block',
@@ -395,7 +342,7 @@ function theme_system_modules_details($variables) {
   }
 
   $table = array(
-    '#theme' => 'table',
+    '#type' => 'table',
     '#header' => $form['#header'],
     '#rows' => $rows,
   );
@@ -459,7 +406,7 @@ function theme_system_modules_uninstall($variables) {
   }
 
   $table = array(
-    '#theme' => 'table',
+    '#type' => 'table',
     '#header' => $header,
     '#rows' => $rows,
     '#empty' => t('No modules are available to uninstall.'),

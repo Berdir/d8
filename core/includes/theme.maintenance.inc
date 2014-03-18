@@ -34,7 +34,12 @@ function _drupal_maintenance_theme() {
 
   // Install and update pages are treated differently to prevent theming overrides.
   if (defined('MAINTENANCE_MODE') && (MAINTENANCE_MODE == 'install' || MAINTENANCE_MODE == 'update')) {
-    $custom_theme = settings()->get('maintenance_theme', 'seven');
+    if (drupal_installation_attempted()) {
+      $custom_theme = $GLOBALS['install_state']['theme'];
+    }
+    else {
+      $custom_theme = settings()->get('maintenance_theme', 'seven');
+    }
   }
   else {
     // The bootstrap was not complete. So we are operating in a crippled
@@ -67,9 +72,8 @@ function _drupal_maintenance_theme() {
 
   // Ensure that system.module is loaded.
   if (!function_exists('_system_rebuild_theme_data')) {
-    $module_list['system'] = 'core/modules/system/system.module';
     $module_handler = \Drupal::moduleHandler();
-    $module_handler->setModuleList($module_list);
+    $module_handler->addModule('system', 'core/modules/system');
     $module_handler->load('system');
   }
 

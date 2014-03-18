@@ -703,8 +703,6 @@ function filter_xss_admin($string) {
  *   valid UTF-8.
  *
  * @see \Drupal\Component\Utility\Xss::filter()
- *
- * @ingroup sanitization
  */
 function filter_xss($string, $allowed_tags = array('a', 'em', 'strong', 'cite', 'blockquote', 'code', 'ul', 'ol', 'li', 'dl', 'dt', 'dd')) {
   return Xss::filter($string, $allowed_tags);
@@ -2457,7 +2455,7 @@ function drupal_pre_render_scripts($elements) {
  *   FALSE if there were any missing library dependencies; TRUE if all library
  *   dependencies were met.
  *
- * @see drupal_add_library()
+ * @see _drupal_add_library()
  * @see _drupal_add_js()
  * @see _drupal_add_css()
  * @see drupal_render()
@@ -2473,7 +2471,7 @@ function drupal_process_attached($elements, $dependency_check = FALSE) {
   // Add the libraries first.
   $success = TRUE;
   foreach ($elements['#attached']['library'] as $library) {
-    if (drupal_add_library($library) === FALSE) {
+    if (_drupal_add_library($library) === FALSE) {
       $success = FALSE;
       // Exit if the dependency is missing.
       if ($dependency_check) {
@@ -2672,7 +2670,7 @@ function drupal_process_states(&$elements) {
  * @see drupal_get_library()
  * @see hook_library_info_alter()
  */
-function drupal_add_library($library_name, $every_page = NULL) {
+function _drupal_add_library($library_name, $every_page = NULL) {
   $added = &drupal_static(__FUNCTION__, array());
 
   list($extension, $name) = explode('/', $library_name, 2);
@@ -2731,7 +2729,7 @@ function drupal_add_library($library_name, $every_page = NULL) {
  *   or FALSE if it does not exist. If no $name was passed, an associative array
  *   of libraries registered by the module is returned (which may be empty).
  *
- * @see drupal_add_library()
+ * @see _drupal_add_library()
  * @see hook_library_info_alter()
  *
  * @todo The purpose of drupal_get_*() is completely different to other page
@@ -3894,6 +3892,12 @@ function drupal_render(&$elements, $is_recursive_call = FALSE) {
     drupal_process_states($elements);
   }
 
+  // Add additional libraries, CSS, JavaScript and other custom
+  // attached data associated with this element.
+  if (!empty($elements['#attached'])) {
+    drupal_process_attached($elements);
+  }
+
   // Get the children of the element, sorted by weight.
   $children = Element::children($elements, TRUE);
 
@@ -3937,12 +3941,6 @@ function drupal_render(&$elements, $is_recursive_call = FALSE) {
   // #children to be a single string as #children.
   if (!$theme_is_implemented && isset($elements['#markup'])) {
     $elements['#children'] = $elements['#markup'] . $elements['#children'];
-  }
-
-  // Add additional libraries, CSS, JavaScript an other custom
-  // attached data associated with this element.
-  if (!empty($elements['#attached'])) {
-    drupal_process_attached($elements);
   }
 
   // Let the theme functions in #theme_wrappers add markup around the rendered
@@ -3991,6 +3989,12 @@ function drupal_render(&$elements, $is_recursive_call = FALSE) {
   $prefix = isset($elements['#prefix']) ? $elements['#prefix'] : '';
   $suffix = isset($elements['#suffix']) ? $elements['#suffix'] : '';
   $elements['#markup'] = $prefix . $elements['#children'] . $suffix;
+
+  // Collect all cache tags. This allows the caller of drupal_render() to also
+  // access the complete list of cache tags.
+  if (!$is_recursive_call || isset($elements['#cache'])) {
+    $elements['#cache']['tags'] = drupal_render_collect_cache_tags($elements);
+  }
 
   // Cache the processed element if #cache is set.
   if (isset($elements['#cache'])) {
@@ -4198,10 +4202,14 @@ function drupal_render_cache_set(&$markup, array $elements) {
     $data['#post_render_cache'] = $elements['#post_render_cache'];
   }
 
+  // Persist cache tags associated with this element.
+  if (isset($elements['#cache']['tags'])) {
+    $data['#cache']['tags'] = $elements['#cache']['tags'];
+  }
+
   $bin = isset($elements['#cache']['bin']) ? $elements['#cache']['bin'] : 'cache';
   $expire = isset($elements['#cache']['expire']) ? $elements['#cache']['expire'] : Cache::PERMANENT;
-  $tags = drupal_render_collect_cache_tags($elements);
-  \Drupal::cache($bin)->set($cid, $data, $expire, $tags);
+  \Drupal::cache($bin)->set($cid, $data, $expire, $elements['#cache']['tags']);
 }
 
 /**
@@ -4946,9 +4954,9 @@ function drupal_flush_all_caches() {
   // sufficient, since the list of enabled modules might have been adjusted
   // above due to changed code.
   $files = array();
-  foreach ($module_data as $module => $data) {
-    if (isset($data->uri) && $data->status) {
-      $files[$module] = $data->uri;
+  foreach ($module_data as $name => $extension) {
+    if ($extension->status) {
+      $files[$name] = $extension;
     }
   }
   \Drupal::service('kernel')->updateModules($module_handler->getModuleList(), $files);
