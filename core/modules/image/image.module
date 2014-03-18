@@ -388,10 +388,6 @@ function image_filter_keyword($value, $current_pixels, $new_pixels) {
 function image_entity_presave(EntityInterface $entity) {
   $field = FALSE;
 
-  if ($entity->isSyncing()) {
-    return;
-  }
-
   $entity_type_id = $entity->getEntityTypeId();
   if ($entity_type_id == 'field_instance_config') {
     $field = $entity->getField();
@@ -401,6 +397,10 @@ function image_entity_presave(EntityInterface $entity) {
   }
   // Exit, if not saving an image field or image field instance entity.
   if (!$field || $field->type != 'image') {
+    return;
+  }
+
+  if ($field->isSyncing()) {
     return;
   }
 
