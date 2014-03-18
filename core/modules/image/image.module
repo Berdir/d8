@@ -387,6 +387,11 @@ function image_filter_keyword($value, $current_pixels, $new_pixels) {
  */
 function image_entity_presave(EntityInterface $entity) {
   $field = FALSE;
+
+  if ($entity->isSyncing()) {
+    return;
+  }
+
   $entity_type_id = $entity->getEntityTypeId();
   if ($entity_type_id == 'field_instance_config') {
     $field = $entity->getField();

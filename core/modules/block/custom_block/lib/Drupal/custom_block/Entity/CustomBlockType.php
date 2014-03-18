@@ -75,7 +75,7 @@ class CustomBlockType extends ConfigEntityBase implements CustomBlockTypeInterfa
   public function postSave(EntityStorageControllerInterface $storage_controller, $update = TRUE) {
     parent::postSave($storage_controller, $update);
 
-    if (!$update) {
+    if (!$update && !$this->isSyncing()) {
       entity_invoke_bundle_hook('create', 'custom_block', $this->id());
       if (!$this->isSyncing()) {
         custom_block_add_body_field($this->id);

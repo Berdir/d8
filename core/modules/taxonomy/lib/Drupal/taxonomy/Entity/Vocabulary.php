@@ -102,7 +102,7 @@ class Vocabulary extends ConfigEntityBase implements VocabularyInterface {
     if (!$update) {
       entity_invoke_bundle_hook('create', 'taxonomy_term', $this->id());
     }
-    elseif ($this->getOriginalId() != $this->id()) {
+    elseif ($this->getOriginalId() != $this->id() && !$this->isSyncing()) {
       // Reflect machine name changes in the definitions of existing 'taxonomy'
       // fields.
       $field_ids = array();
@@ -153,6 +153,13 @@ class Vocabulary extends ConfigEntityBase implements VocabularyInterface {
   public static function postDelete(EntityStorageControllerInterface $storage_controller, array $entities) {
     parent::postDelete($storage_controller, $entities);
 
+    // Reset caches.
+    $storage_controller->resetCache(array_keys($entities));
+
+    if (reset($entities)->isSyncing()) {
+      return;
+    }
+
     $vocabularies = array();
     foreach ($entities as $vocabulary) {
       $vocabularies[$vocabulary->id()] = $vocabulary->id();
@@ -180,8 +187,6 @@ class Vocabulary extends ConfigEntityBase implements VocabularyInterface {
         }
       }
     }
-    // Reset caches.
-    $storage_controller->resetCache(array_keys($vocabularies));
   }
 
 }

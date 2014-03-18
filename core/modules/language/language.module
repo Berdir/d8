@@ -640,7 +640,7 @@ function language_modules_uninstalled($modules) {
  * Implements hook_language_insert().
  */
 function language_language_insert($language) {
-  if (!empty($language->locked)) {
+  if (!empty($language->locked) || $language->isSyncing()) {
     return;
   }
 
