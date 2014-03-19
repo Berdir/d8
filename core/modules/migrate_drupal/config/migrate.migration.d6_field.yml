@@ -17,9 +17,9 @@ process:
       source:
         - type
       map:
-        number_integer: number_integer
-        number_decimal: number_float
-        number_float: number_float
+        number_integer: integer
+        number_decimal: decimal
+        number_float: float
         text: text
         email: email
         link: link
