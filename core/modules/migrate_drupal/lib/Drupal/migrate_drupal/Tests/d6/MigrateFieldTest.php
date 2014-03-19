@@ -20,7 +20,7 @@ class MigrateFieldTest extends MigrateDrupalTestBase {
    *
    * @var array
    */
-  public static $modules = array('number', 'email', 'telephone', 'link', 'file', 'image', 'datetime', 'node');
+  public static $modules = array('email', 'telephone', 'link', 'file', 'image', 'datetime', 'node');
 
   /**
    * {@inheritdoc}
@@ -61,11 +61,11 @@ class MigrateFieldTest extends MigrateDrupalTestBase {
 
     // Integer field.
     $field = entity_load('field_config', 'node.field_test_two');
-    $this->assertEqual($field->type, "number_integer", "Field type is number_integer.");
+    $this->assertEqual($field->type, "integer", "Field type is integer.");
 
     // Float field.
     $field = entity_load('field_config', 'node.field_test_three');
-    $this->assertEqual($field->type, "number_float", "Field type is number_float.");
+    $this->assertEqual($field->type, "float", "Field type is float.");
 
     // Link field.
     $field = entity_load('field_config', 'node.field_test_link');
