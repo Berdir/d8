@@ -122,10 +122,9 @@ class CckFieldValues extends DrupalSqlBase implements SourceEntityInterface {
       if ($field_info['multiple'] && !$field_info['db_storage']) {
         // Select the data.
         $table = "content_$field_name";
-        $field_index = $field_name . '_value';
         $data = $this
           ->select($table, 't')
-          ->fields('t', array('delta', $field_index))
+          ->fields('t', array('delta') + $field_info['columns'])
           ->condition('vid', $row->getSourceProperty('vid'))
           ->execute()
           ->fetchAllKeyed();
