@@ -29,7 +29,7 @@ use Drupal\taxonomy\VocabularyInterface;
  *   },
  *   admin_permission = "administer taxonomy",
  *   config_prefix = "vocabulary",
- *   bundle_of = "taxonomy_term",
+ *   bundle_of = "taxonomy.term",
  *   entity_keys = {
  *     "id" = "vid",
  *     "label" = "name",
@@ -100,7 +100,7 @@ class Vocabulary extends ConfigEntityBase implements VocabularyInterface {
     parent::postSave($storage_controller, $update);
 
     if (!$update) {
-      entity_invoke_bundle_hook('create', 'taxonomy_term', $this->id());
+      entity_invoke_bundle_hook('create', 'taxonomy.term', $this->id());
     }
     elseif ($this->getOriginalId() != $this->id()) {
       // Reflect machine name changes in the definitions of existing 'taxonomy'
@@ -132,7 +132,7 @@ class Vocabulary extends ConfigEntityBase implements VocabularyInterface {
         }
       }
       // Update bundles.
-      entity_invoke_bundle_hook('rename', 'taxonomy_term', $this->getOriginalId(), $this->id());
+      entity_invoke_bundle_hook('rename', 'taxonomy.term', $this->getOriginalId(), $this->id());
     }
     $storage_controller->resetCache($update ? array($this->getOriginalId()) : array());
   }
@@ -144,7 +144,7 @@ class Vocabulary extends ConfigEntityBase implements VocabularyInterface {
     parent::preDelete($storage_controller, $entities);
 
     // Only load terms without a parent, child terms will get deleted too.
-    entity_delete_multiple('taxonomy_term', $storage_controller->getToplevelTids(array_keys($entities)));
+    entity_delete_multiple('taxonomy.term', $storage_controller->getToplevelTids(array_keys($entities)));
   }
 
   /**

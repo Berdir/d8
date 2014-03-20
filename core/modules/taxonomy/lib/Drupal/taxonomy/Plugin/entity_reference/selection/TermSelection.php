@@ -18,7 +18,7 @@ use Drupal\entity_reference\Plugin\entity_reference\selection\SelectionBase;
  * @EntityReferenceSelection(
  *   id = "taxonomy_term_default",
  *   label = @Translation("Taxonomy Term selection"),
- *   entity_types = {"taxonomy_term"},
+ *   entity_types = {"taxonomy.term"},
  *   group = "default",
  *   weight = 1
  * )
@@ -59,7 +59,7 @@ class TermSelection extends SelectionBase {
 
     $options = array();
 
-    $bundles = entity_get_bundles('taxonomy_term');
+    $bundles = entity_get_bundles('taxonomy.term');
     $bundle_names = !empty($this->instance['settings']['handler_settings']['target_bundles']) ? $this->instance['settings']['handler_settings']['target_bundles'] : array_keys($bundles);
 
     foreach ($bundle_names as $bundle) {

@@ -95,7 +95,7 @@ class EntityFilteringThemeTest extends WebTestBase {
     $this->drupalLogin($this->user);
 
     // Create a test term.
-    $this->term = entity_create('taxonomy_term', array(
+    $this->term = entity_create('taxonomy.term', array(
       'name' => $this->xss_label,
       'vid' => 1,
     ));

@@ -130,7 +130,7 @@ abstract class TaxonomyTestBase extends ViewTestBase {
   protected function createTerm() {
     $filter_formats = filter_formats();
     $format = array_pop($filter_formats);
-    $term = entity_create('taxonomy_term', array(
+    $term = entity_create('taxonomy.term', array(
       'name' => $this->randomName(),
       'description' => $this->randomName(),
       // Use the first available text format.

@@ -452,7 +452,7 @@ class ForumManager extends DependencySerialization implements ForumManagerInterf
     }
 
     $vid = $this->configFactory->get('forum.settings')->get('vocabulary');
-    $index = $this->entityManager->getStorageController('taxonomy_term')->create(array(
+    $index = $this->entityManager->getStorageController('taxonomy.term')->create(array(
       'tid' => 0,
       'container' => 1,
       'parents' => array(),

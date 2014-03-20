@@ -32,7 +32,7 @@ class DefaultViewsTest extends ViewTestBase {
    */
   protected $viewArgMap = array(
     'backlinks' => array(1),
-    'taxonomy_term' => array(1),
+    'taxonomy.term' => array(1),
     'glossary' => array('all'),
   );
 
@@ -158,7 +158,7 @@ class DefaultViewsTest extends ViewTestBase {
   function createTerm($vocabulary) {
     $filter_formats = filter_formats();
     $format = array_pop($filter_formats);
-    $term = entity_create('taxonomy_term', array(
+    $term = entity_create('taxonomy.term', array(
       'name' => $this->randomName(),
       'description' => $this->randomName(),
       // Use the first available text format.

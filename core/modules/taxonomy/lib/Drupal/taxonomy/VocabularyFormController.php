@@ -68,10 +68,10 @@ class VocabularyFormController extends EntityFormController {
       $form['default_terms_language']['default_language'] = array(
         '#type' => 'language_configuration',
         '#entity_information' => array(
-          'entity_type' => 'taxonomy_term',
+          'entity_type' => 'taxonomy.term',
           'bundle' => $vocabulary->id(),
         ),
-        '#default_value' => language_get_default_configuration('taxonomy_term', $vocabulary->id()),
+        '#default_value' => language_get_default_configuration('taxonomy.term', $vocabulary->id()),
       );
     }
     // Set the hierarchy to "multiple parents" by default. This simplifies the
@@ -118,7 +118,7 @@ class VocabularyFormController extends EntityFormController {
     // Delete the old language settings for the vocabulary, if the machine name
     // is changed.
     if ($vocabulary && $vocabulary->id() && $vocabulary->id() != $form_state['values']['vid']) {
-      language_clear_default_configuration('taxonomy_term', $vocabulary->id());
+      language_clear_default_configuration('taxonomy.term', $vocabulary->id());
     }
     // Since the machine name is not known yet, and it can be changed anytime,
     // we have to also update the bundle property for the default language

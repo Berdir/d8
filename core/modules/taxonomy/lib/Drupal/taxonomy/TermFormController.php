@@ -77,7 +77,7 @@ class TermFormController extends ContentEntityFormController {
       '#format' => $term->getFormat(),
       '#weight' => 0,
     );
-    $language_configuration = $this->moduleHandler->moduleExists('language') ? language_get_default_configuration('taxonomy_term', $vocabulary->id()) : FALSE;
+    $language_configuration = $this->moduleHandler->moduleExists('language') ? language_get_default_configuration('taxonomy.term', $vocabulary->id()) : FALSE;
     $form['langcode'] = array(
       '#type' => 'language_select',
       '#title' => $this->t('Language'),

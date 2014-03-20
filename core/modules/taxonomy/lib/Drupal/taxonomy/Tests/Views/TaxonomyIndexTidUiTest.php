@@ -67,7 +67,7 @@ class TaxonomyIndexTidUiTest extends UITestBase {
     // - term 2.2
     for ($i = 0; $i < 3; $i++) {
       for ($j = 0; $j <= $i; $j++) {
-        $terms[$i][$j] = $term = entity_create('taxonomy_term', array(
+        $terms[$i][$j] = $term = entity_create('taxonomy.term', array(
           'vid' => 'tags',
           'name' => "Term $i.$j",
           'parent' => isset($terms[$i][0]) ? $terms[$i][0]->id() : 0,

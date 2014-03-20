@@ -80,7 +80,7 @@ function forum_views_data() {
       'allow empty' => TRUE,
     ),
     'relationship' => array(
-      'base' => 'taxonomy_term',
+      'base' => 'taxonomy.term',
       'base field' => 'tid',
       'label' => t('Term'),
     ),

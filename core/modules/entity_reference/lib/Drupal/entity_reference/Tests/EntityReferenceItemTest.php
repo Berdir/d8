@@ -62,7 +62,7 @@ class EntityReferenceItemTest extends FieldUnitTestBase {
     ));
     $this->vocabulary->save();
 
-    $this->term = entity_create('taxonomy_term', array(
+    $this->term = entity_create('taxonomy.term', array(
       'name' => $this->randomName(),
       'vid' => $this->vocabulary->id(),
       'langcode' => Language::LANGCODE_NOT_SPECIFIED,
@@ -70,7 +70,7 @@ class EntityReferenceItemTest extends FieldUnitTestBase {
     $this->term->save();
 
     // Use the util to create an instance.
-    entity_reference_create_instance('entity_test', 'entity_test', 'field_test_taxonomy_term', 'Test content entity reference', 'taxonomy_term');
+    entity_reference_create_instance('entity_test', 'entity_test', 'field_test_taxonomy_term', 'Test content entity reference', 'taxonomy.term');
     entity_reference_create_instance('entity_test', 'entity_test', 'field_test_taxonomy_vocabulary', 'Test config entity reference', 'taxonomy_vocabulary');
   }
 
@@ -99,11 +99,11 @@ class EntityReferenceItemTest extends FieldUnitTestBase {
     $entity->field_test_taxonomy_term->entity->setName($new_name);
     $entity->field_test_taxonomy_term->entity->save();
     // Verify it is the correct name.
-    $term = entity_load('taxonomy_term', $tid);
+    $term = entity_load('taxonomy.term', $tid);
     $this->assertEqual($term->getName(), $new_name);
 
     // Make sure the computed term reflects updates to the term id.
-    $term2 = entity_create('taxonomy_term', array(
+    $term2 = entity_create('taxonomy.term', array(
       'name' => $this->randomName(),
       'vid' => $this->term->bundle(),
       'langcode' => Language::LANGCODE_NOT_SPECIFIED,

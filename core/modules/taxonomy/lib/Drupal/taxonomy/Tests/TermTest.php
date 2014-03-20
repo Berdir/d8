@@ -90,7 +90,7 @@ class TermTest extends TaxonomyTestBase {
     $this->assertTrue(isset($parents[$term1->id()]), 'Parent found correctly.');
 
     // Load and save a term, confirming that parents are still set.
-    $term = entity_load('taxonomy_term', $term2->id());
+    $term = entity_load('taxonomy.term', $term2->id());
     $term->save();
     $parents = taxonomy_term_load_parents($term2->id());
     $this->assertTrue(isset($parents[$term1->id()]), 'Parent found correctly.');
@@ -489,7 +489,7 @@ class TermTest extends TaxonomyTestBase {
 
     // Create a new term in a different vocabulary with the same name.
     $new_vocabulary = $this->createVocabulary();
-    $new_term = entity_create('taxonomy_term', array(
+    $new_term = entity_create('taxonomy.term', array(
       'name' => $term->getName(),
       'vid' => $new_vocabulary->id(),
     ));

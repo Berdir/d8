@@ -1,7 +1,7 @@
-id: taxonomy_term.forums.forum_container
+id: taxonomy.term.forums.forum_container
 status: true
 langcode: en
-entity_type: taxonomy_term
+entity_type: taxonomy.term
 bundle: forums
 field_name: forum_container
 label: Container

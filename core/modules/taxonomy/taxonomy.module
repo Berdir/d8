@@ -117,7 +117,7 @@ function taxonomy_entity_bundle_info() {
   $bundles = array();
   foreach (taxonomy_vocabulary_get_names() as $id) {
     $config = \Drupal::config('taxonomy.vocabulary.' . $id);
-    $bundles['taxonomy_term'][$id]['label'] = $config->get('name');
+    $bundles['taxonomy.term'][$id]['label'] = $config->get('name');
   }
   return $bundles;
 }
@@ -129,7 +129,7 @@ function taxonomy_term_uri($term) {
   return array(
     'route_name' => 'taxonomy.term_page',
     'route_parameters' => array(
-      'taxonomy_term' => $term->id(),
+      'taxonomy.term' => $term->id(),
     ),
   );
 }
@@ -139,8 +139,8 @@ function taxonomy_term_uri($term) {
  */
 function taxonomy_field_extra_fields() {
   $return = array();
-  foreach (entity_get_bundles('taxonomy_term') as $bundle => $bundle_info) {
-    $return['taxonomy_term'][$bundle] = array(
+  foreach (entity_get_bundles('taxonomy.term') as $bundle => $bundle_info) {
+    $return['taxonomy.term'][$bundle] = array(
       'form' => array(
         'name' => array(
           'label' => t('Name'),
@@ -226,7 +226,7 @@ function taxonomy_select_nodes($tid, $pager = TRUE, $limit = FALSE, $order = arr
  */
 function taxonomy_theme() {
   return array(
-    'taxonomy_term' => array(
+    'taxonomy.term' => array(
       'render element' => 'elements',
       'template' => 'taxonomy-term',
     ),
@@ -327,7 +327,7 @@ function taxonomy_term_view(Term $term, $view_mode = 'full', $langcode = NULL) {
  * Constructs a drupal_render() style array from an array of loaded terms.
  *
  * @param array $terms
- *   An array of taxonomy terms as returned by entity_load_multiple('taxonomy_term').
+ *   An array of taxonomy terms as returned by entity_load_multiple('taxonomy.term').
  * @param string $view_mode
  *   View mode, e.g. 'full', 'teaser'...
  * @param string $langcode
@@ -401,8 +401,8 @@ function template_preprocess_taxonomy_term(&$variables) {
  */
 function taxonomy_term_is_page(Term $term) {
   $request = \Drupal::request();
-  if ($request->attributes->has('taxonomy_term')) {
-    $page_term = $request->attributes->get('taxonomy_term');
+  if ($request->attributes->has('taxonomy.term')) {
+    $page_term = $request->attributes->get('taxonomy.term');
     return $page_term->id() == $term->id();
   }
   return FALSE;
@@ -412,7 +412,7 @@ function taxonomy_term_is_page(Term $term) {
  * Clear all static cache variables for terms.
  */
 function taxonomy_terms_static_reset() {
-  \Drupal::entityManager()->getStorageController('taxonomy_term')->resetCache();
+  \Drupal::entityManager()->getStorageController('taxonomy.term')->resetCache();
 }
 
 /**
@@ -460,8 +460,8 @@ function taxonomy_term_load_parents($tid) {
   $parents = &drupal_static(__FUNCTION__, array());
 
   if ($tid && !isset($parents[$tid])) {
-    $tids = \Drupal::entityManager()->getStorageController('taxonomy_term')->loadParents($tid);
-    $parents[$tid] = entity_load_multiple('taxonomy_term', $tids);
+    $tids = \Drupal::entityManager()->getStorageController('taxonomy.term')->loadParents($tid);
+    $parents[$tid] = entity_load_multiple('taxonomy.term', $tids);
   }
 
   return isset($parents[$tid]) ? $parents[$tid] : array();
@@ -478,7 +478,7 @@ function taxonomy_term_load_parents_all($tid) {
   }
 
   $parents = array();
-  if ($term = entity_load('taxonomy_term', $tid)) {
+  if ($term = entity_load('taxonomy.term', $tid)) {
     $parents[] = $term;
     $n = 0;
     while ($parent = taxonomy_term_load_parents($parents[$n]->id())) {
@@ -508,8 +508,8 @@ function taxonomy_term_load_children($tid, $vid = NULL) {
   $children = &drupal_static(__FUNCTION__, array());
 
   if ($tid && !isset($children[$tid])) {
-    $tids = \Drupal::entityManager()->getStorageController('taxonomy_term')->loadChildren($tid);
-    $children[$tid] = entity_load_multiple('taxonomy_term', $tids);
+    $tids = \Drupal::entityManager()->getStorageController('taxonomy.term')->loadChildren($tid);
+    $children[$tid] = entity_load_multiple('taxonomy.term', $tids);
   }
 
   return isset($children[$tid]) ? $children[$tid] : array();
@@ -549,7 +549,7 @@ function taxonomy_get_tree($vid, $parent = 0, $max_depth = NULL, $load_entities 
     $parents[$vid] = array();
     $terms[$vid] = array();
 
-    $result = \Drupal::entityManager()->getStorageController('taxonomy_term')->loadTree($vid);
+    $result = \Drupal::entityManager()->getStorageController('taxonomy.term')->loadTree($vid);
 
     foreach ($result as $term) {
       $children[$vid][$term->parent][] = $term->tid;
@@ -561,7 +561,7 @@ function taxonomy_get_tree($vid, $parent = 0, $max_depth = NULL, $load_entities 
   // Load full entities, if necessary. The entity controller statically
   // caches the results.
   if ($load_entities) {
-    $term_entities = entity_load_multiple('taxonomy_term', array_keys($terms[$vid]));
+    $term_entities = entity_load_multiple('taxonomy.term', array_keys($terms[$vid]));
   }
 
   $max_depth = (!isset($max_depth)) ? count($children[$vid]) : $max_depth;
@@ -650,7 +650,7 @@ function taxonomy_term_load_multiple_by_name($name, $vocabulary = NULL) {
       return array();
     }
   }
-  return entity_load_multiple_by_properties('taxonomy_term', $values);
+  return entity_load_multiple_by_properties('taxonomy.term', $values);
 }
 
 /**
@@ -664,7 +664,7 @@ function taxonomy_term_load_multiple_by_name($name, $vocabulary = NULL) {
  * @see \Drupal\Core\Entity\Query\EntityQueryInterface
  *
  * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
- *   Use entity_load_multiple('taxonomy_term', $tids).
+ *   Use entity_load_multiple('taxonomy.term', $tids).
  *
  * @param array $tids
  *   (optional) An array of entity IDs. If omitted, all entities are loaded.
@@ -674,7 +674,7 @@ function taxonomy_term_load_multiple_by_name($name, $vocabulary = NULL) {
  *   found, an empty array is returned.
  */
 function taxonomy_term_load_multiple(array $tids = NULL) {
-  return entity_load_multiple('taxonomy_term', $tids);
+  return entity_load_multiple('taxonomy.term', $tids);
 }
 
 /**
@@ -720,7 +720,7 @@ function taxonomy_vocabulary_load($vid) {
  * Return the taxonomy term entity matching a term ID.
  *
  * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
- *   Use entity_load('taxonomy_term', $tid).
+ *   Use entity_load('taxonomy.term', $tid).
  *
  * @param $tid
  *   A term's ID
@@ -733,14 +733,14 @@ function taxonomy_term_load($tid) {
   if (!is_numeric($tid)) {
     return NULL;
   }
-  return entity_load('taxonomy_term', $tid);
+  return entity_load('taxonomy.term', $tid);
 }
 
 /**
  * Implements hook_file_download_access().
  */
 function taxonomy_file_download_access($field, EntityInterface $entity, FileInterface $file) {
-  if ($entity->getEntityTypeId() == 'taxonomy_term') {
+  if ($entity->getEntityTypeId() == 'taxonomy.term') {
     return $entity->access('view');
   }
 }

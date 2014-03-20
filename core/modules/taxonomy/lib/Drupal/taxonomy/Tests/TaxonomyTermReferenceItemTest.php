@@ -71,7 +71,7 @@ class TaxonomyTermReferenceItemTest extends FieldUnitTestBase {
       'field_name' => 'field_test_taxonomy',
       'bundle' => 'entity_test',
     ))->save();
-    $this->term = entity_create('taxonomy_term', array(
+    $this->term = entity_create('taxonomy.term', array(
       'name' => $this->randomName(),
       'vid' => $vocabulary->id(),
       'langcode' => Language::LANGCODE_NOT_SPECIFIED,
@@ -103,11 +103,11 @@ class TaxonomyTermReferenceItemTest extends FieldUnitTestBase {
     $entity->field_test_taxonomy->entity->setName($new_name);
     $entity->field_test_taxonomy->entity->save();
     // Verify it is the correct name.
-    $term = entity_load('taxonomy_term', $tid);
+    $term = entity_load('taxonomy.term', $tid);
     $this->assertEqual($term->getName(), $new_name, 'The name of the term was changed.');
 
     // Make sure the computed term reflects updates to the term id.
-    $term2 = entity_create('taxonomy_term', array(
+    $term2 = entity_create('taxonomy.term', array(
       'name' => $this->randomName(),
       'vid' => $this->term->getVocabularyId(),
       'langcode' => Language::LANGCODE_NOT_SPECIFIED,

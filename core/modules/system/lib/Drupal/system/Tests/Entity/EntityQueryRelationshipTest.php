@@ -96,7 +96,7 @@ class EntityQueryRelationshipTest extends EntityUnitTestBase  {
     ))->save();
     // Create two terms and also two accounts.
     for ($i = 0; $i <= 1; $i++) {
-      $term = entity_create('taxonomy_term', array(
+      $term = entity_create('taxonomy.term', array(
         'name' => $this->randomName(),
         'vid' => $vocabulary->id(),
       ));

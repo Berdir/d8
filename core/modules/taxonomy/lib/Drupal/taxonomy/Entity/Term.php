@@ -19,7 +19,7 @@ use Drupal\taxonomy\TermInterface;
  * Defines the taxonomy term entity.
  *
  * @ContentEntityType(
- *   id = "taxonomy_term",
+ *   id = "taxonomy.term",
  *   label = @Translation("Taxonomy term"),
  *   bundle_label = @Translation("Vocabulary"),
  *   controllers = {
@@ -86,7 +86,7 @@ class Term extends ContentEntityBase implements TermInterface {
     $storage_controller->deleteTermHierarchy(array_keys($entities));
 
     if (!empty($orphans)) {
-      entity_delete_multiple('taxonomy_term', $orphans);
+      entity_delete_multiple('taxonomy.term', $orphans);
     }
   }
 

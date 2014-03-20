@@ -79,7 +79,7 @@ class TaxonomyTermReferenceRdfaTest extends FieldRdfaTestBase {
       'bundle' => 'entity_test',
     ))->save();
 
-    $this->term = entity_create('taxonomy_term', array(
+    $this->term = entity_create('taxonomy.term', array(
       'name' => $this->randomName(),
       'vid' => $vocabulary->id(),
       'langcode' => Language::LANGCODE_NOT_SPECIFIED,

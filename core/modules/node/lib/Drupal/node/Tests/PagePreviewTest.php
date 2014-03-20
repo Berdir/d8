@@ -55,7 +55,7 @@ class PagePreviewTest extends NodeTestBase {
     $this->vocabulary = $vocabulary;
 
     // Add a term to the vocabulary.
-    $term = entity_create('taxonomy_term', array(
+    $term = entity_create('taxonomy.term', array(
       'name' => $this->randomName(),
       'description' => $this->randomName(),
       'vid' => $this->vocabulary->id(),

@@ -168,7 +168,7 @@ function taxonomy_tokens($type, $tokens, array $data = array(), array $options =
           break;
 
         case 'term-count':
-          $replacements[$original] = \Drupal::entityQuery('taxonomy_term')
+          $replacements[$original] = \Drupal::entityQuery('taxonomy.term')
             ->condition('vid', $vocabulary->id())
             ->addTag('vocabulary_term_count')
             ->count()
@@ -176,7 +176,7 @@ function taxonomy_tokens($type, $tokens, array $data = array(), array $options =
           break;
 
         case 'node-count':
-          $replacements[$original] = \Drupal::entityManager()->getStorageController('taxonomy_term')->nodeCount($vocabulary->id());
+          $replacements[$original] = \Drupal::entityManager()->getStorageController('taxonomy.term')->nodeCount($vocabulary->id());
           break;
       }
     }

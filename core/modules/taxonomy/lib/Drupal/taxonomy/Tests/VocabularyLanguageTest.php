@@ -96,7 +96,7 @@ class VocabularyLanguageTest extends TaxonomyTestBase {
     $this->assertResponse(200, 'The vocabulary has been created.');
 
     // Check that the language settings were saved.
-    $language_settings = language_get_default_configuration('taxonomy_term', $edit['vid']);
+    $language_settings = language_get_default_configuration('taxonomy.term', $edit['vid']);
     $this->assertEqual($language_settings['langcode'], 'bb', 'The langcode was saved.');
     $this->assertTrue($language_settings['language_show'], 'The visibility setting was saved.');
 
@@ -112,7 +112,7 @@ class VocabularyLanguageTest extends TaxonomyTestBase {
     $this->drupalPostForm('admin/structure/taxonomy/manage/' . $vid, $edit, t('Save'));
 
     // And check again the settings and also the interface.
-    $language_settings = language_get_default_configuration('taxonomy_term', $vid);
+    $language_settings = language_get_default_configuration('taxonomy.term', $vid);
     $this->assertEqual($language_settings['langcode'], 'aa', 'The langcode was saved.');
     $this->assertFalse($language_settings['language_show'], 'The visibility setting was saved.');
 
@@ -129,7 +129,7 @@ class VocabularyLanguageTest extends TaxonomyTestBase {
     $this->drupalPostForm('admin/structure/taxonomy/manage/' . $vid, $edit, t('Save'));
 
     // Check that we have the new settings.
-    $new_settings = language_get_default_configuration('taxonomy_term', $vid);
+    $new_settings = language_get_default_configuration('taxonomy.term', $vid);
     $this->assertEqual($new_settings['langcode'], 'authors_default', 'The langcode was saved.');
     $this->assertFalse($new_settings['language_show'], 'The new visibility setting was saved.');
   }

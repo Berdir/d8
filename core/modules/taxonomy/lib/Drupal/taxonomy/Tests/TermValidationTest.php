@@ -45,7 +45,7 @@ class TermValidationTest extends EntityUnitTestBase {
       'vid' => 'tags',
       'name' => 'Tags',
     ))->save();
-    $term = $this->entityManager->getStorageController('taxonomy_term')->create(array(
+    $term = $this->entityManager->getStorageController('taxonomy.term')->create(array(
       'name' => 'test',
       'vid' => 'tags',
     ));

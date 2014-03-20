@@ -66,7 +66,7 @@ class TaxonomyAutocompleteWidget extends WidgetBase {
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, array &$form_state) {
     $tags = array();
     foreach ($items as $item) {
-      $tags[] = isset($item->entity) ? $item->entity : entity_load('taxonomy_term', $item->target_id);
+      $tags[] = isset($item->entity) ? $item->entity : entity_load('taxonomy.term', $item->target_id);
     }
     $element += array(
       '#type' => 'textfield',
@@ -104,13 +104,13 @@ class TaxonomyAutocompleteWidget extends WidgetBase {
     foreach($values as $value) {
       // See if the term exists in the chosen vocabulary and return the tid;
       // otherwise, create a new term.
-      if ($possibilities = entity_load_multiple_by_properties('taxonomy_term', array('name' => trim($value), 'vid' => array_keys($vocabularies)))) {
+      if ($possibilities = entity_load_multiple_by_properties('taxonomy.term', array('name' => trim($value), 'vid' => array_keys($vocabularies)))) {
         $term = array_pop($possibilities);
         $item = array('target_id' => $term->id());
       }
       else {
         $vocabulary = reset($vocabularies);
-        $term = entity_create('taxonomy_term', array(
+        $term = entity_create('taxonomy.term', array(
           'vid' => $vocabulary->id(),
           'name' => $value,
         ));

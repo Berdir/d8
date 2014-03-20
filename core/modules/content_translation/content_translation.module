@@ -85,7 +85,7 @@ function content_translation_language_types_info_alter(array &$language_types) {
  * To make Content Translation automatically support an entity type some keys
  * may need to be defined, but none of them is required unless the entity path
  * is different from the usual /ENTITY_TYPE/{ENTITY_TYPE} pattern (for instance
- * "/taxonomy/term/{taxonomy_term}"), in which case at least the 'canonical' key
+ * "/taxonomy/term/{taxonomy.term}"), in which case at least the 'canonical' key
  * in the 'links' entity info property must be defined.
  *
  * Every entity type needs a translation controller to be translated. This can

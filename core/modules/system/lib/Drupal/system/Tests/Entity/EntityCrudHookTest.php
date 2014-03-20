@@ -353,7 +353,7 @@ class EntityCrudHookTest extends EntityUnitTestBase {
     $vocabulary->save();
     $_SESSION['entity_crud_hook_test'] = array();
 
-    $term = entity_create('taxonomy_term', array(
+    $term = entity_create('taxonomy.term', array(
       'vid' => $vocabulary->id(),
       'name' => 'Test term',
       'langcode' => Language::LANGCODE_NOT_SPECIFIED,
@@ -377,7 +377,7 @@ class EntityCrudHookTest extends EntityUnitTestBase {
     ));
 
     $_SESSION['entity_crud_hook_test'] = array();
-    $term = entity_load('taxonomy_term', $term->id());
+    $term = entity_load('taxonomy.term', $term->id());
 
     $this->assertHookMessageOrder(array(
       'entity_crud_hook_test_entity_load called for type taxonomy_term',

@@ -78,7 +78,7 @@ class Taxonomy extends FieldPluginBase {
   protected function renderLink($data, ResultRow $values) {
     $tid = $this->getValue($values, 'tid');
     if (!empty($this->options['link_to_taxonomy']) && !empty($tid) && $data !== NULL && $data !== '') {
-      $term = entity_create('taxonomy_term', array(
+      $term = entity_create('taxonomy.term', array(
         'tid' => $tid,
         'vid' => $this->getValue($values, 'vid'),
       ));

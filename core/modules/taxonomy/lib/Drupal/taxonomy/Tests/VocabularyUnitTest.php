@@ -147,12 +147,12 @@ class VocabularyUnitTest extends TaxonomyTestBase {
     // Add a field instance to the vocabulary.
     entity_create('field_config', array(
       'name' => 'field_test',
-      'entity_type' => 'taxonomy_term',
+      'entity_type' => 'taxonomy.term',
       'type' => 'test_field',
     ))->save();
     entity_create('field_instance_config', array(
       'field_name' => 'field_test',
-      'entity_type' => 'taxonomy_term',
+      'entity_type' => 'taxonomy.term',
       'bundle' => $this->vocabulary->id(),
     ))->save();
 
@@ -163,12 +163,12 @@ class VocabularyUnitTest extends TaxonomyTestBase {
     $this->vocabulary->save();
 
     // Check that entity bundles are properly updated.
-    $info = entity_get_bundles('taxonomy_term');
+    $info = entity_get_bundles('taxonomy.term');
     $this->assertFalse(isset($info[$old_name]), 'The old bundle name does not appear in entity_get_bundles().');
     $this->assertTrue(isset($info[$new_name]), 'The new bundle name appears in entity_get_bundles().');
 
     // Check that the field instance is still attached to the vocabulary.
-    $this->assertTrue(field_info_instance('taxonomy_term', 'field_test', $new_name), 'The bundle name was updated correctly.');
+    $this->assertTrue(field_info_instance('taxonomy.term', 'field_test', $new_name), 'The bundle name was updated correctly.');
   }
 
   /**
@@ -180,14 +180,14 @@ class VocabularyUnitTest extends TaxonomyTestBase {
     $this->field_name = drupal_strtolower($this->randomName() . '_field_name');
     $this->field_definition = array(
       'name' => $this->field_name,
-      'entity_type' => 'taxonomy_term',
+      'entity_type' => 'taxonomy.term',
       'type' => 'text',
       'cardinality' => 4
     );
     entity_create('field_config', $this->field_definition)->save();
     $this->instance_definition = array(
       'field_name' => $this->field_name,
-      'entity_type' => 'taxonomy_term',
+      'entity_type' => 'taxonomy.term',
       'bundle' => $this->vocabulary->id(),
       'label' => $this->randomName() . '_label',
     );

@@ -43,7 +43,7 @@ class TermTranslationUITest extends ContentTranslationUITest {
   }
 
   function setUp() {
-    $this->entityTypeId = 'taxonomy_term';
+    $this->entityTypeId = 'taxonomy.term';
     $this->bundle = 'tags';
     $this->name = $this->randomName();
     parent::setUp();
@@ -91,7 +91,7 @@ class TermTranslationUITest extends ContentTranslationUITest {
     // not have translations enabled.
     $rows = db_query('SELECT * FROM {content_translation}')->fetchAll();
     foreach ($rows as $row) {
-      $this->assertEqual('taxonomy_term', $row->entity_type, 'Row contains a taxonomy term.');
+      $this->assertEqual('taxonomy.term', $row->entity_type, 'Row contains a taxonomy term.');
     }
   }
 

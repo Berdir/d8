@@ -20,7 +20,7 @@ use Drupal\Core\TypedData\AllowedValuesInterface;
  *   label = @Translation("Term Reference"),
  *   description = @Translation("This field stores a reference to a taxonomy term."),
  *   settings = {
- *     "target_type" = "taxonomy_term",
+ *     "target_type" = "taxonomy.term",
  *     "options_list_callback" = NULL,
  *     "allowed_values" = {
  *       {

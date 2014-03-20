@@ -21,7 +21,7 @@ class SelectionBase extends DerivativeBase {
       'comment',
       'file',
       'node',
-      'taxonomy_term',
+      'taxonomy.term',
       'user'
     );
     foreach (\Drupal::entityManager()->getDefinitions() as $entity_type_id => $entity_type) {

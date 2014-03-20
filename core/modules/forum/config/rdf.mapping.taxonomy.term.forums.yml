@@ -1,8 +1,9 @@
-id: taxonomy_term.tags
-targetEntityType: taxonomy_term
-bundle: tags
+id: taxonomy.term.forums
+targetEntityType: taxonomy.term
+bundle: forums
 types:
-  - 'schema:Thing'
+  - 'sioc:Container'
+  - 'sioc:Forum'
 fieldMappings:
   name:
     properties:

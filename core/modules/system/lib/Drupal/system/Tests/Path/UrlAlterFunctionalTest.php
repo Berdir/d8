@@ -70,7 +70,7 @@ class UrlAlterFunctionalTest extends WebTestBase {
     $this->assertUrlOutboundAlter('forum', 'community');
     $forum_vid = \Drupal::config('forum.settings')->get('vocabulary');
     $term_name = $this->randomName();
-    $term = entity_create('taxonomy_term', array(
+    $term = entity_create('taxonomy.term', array(
       'name' => $term_name,
       'vid' => $forum_vid,
     ));

@@ -526,7 +526,7 @@ function rdf_preprocess_comment(&$variables) {
  */
 function rdf_preprocess_taxonomy_term(&$variables) {
   $term = $variables['term'];
-  $mapping = rdf_get_mapping('taxonomy_term', $term->bundle());
+  $mapping = rdf_get_mapping('taxonomy.term', $term->bundle());
   $bundle_mapping = $mapping->getPreparedBundleMapping();
   $name_field_mapping = $mapping->getPreparedFieldMapping('name');
   // Adds the RDF type of the term and the term name in a <meta> tag.

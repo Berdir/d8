@@ -21,21 +21,21 @@ class TermBreadcrumbBuilder extends BreadcrumbBuilderBase {
   public function applies(array $attributes) {
     return !empty($attributes[RouteObjectInterface::ROUTE_NAME])
     && ($attributes[RouteObjectInterface::ROUTE_NAME] == 'taxonomy.term_page')
-    && ($attributes['taxonomy_term'] instanceof TermInterface);
+    && ($attributes['taxonomy.term'] instanceof TermInterface);
   }
 
   /**
    * {@inheritdoc}
    */
   public function build(array $attributes) {
-    $term = $attributes['taxonomy_term'];
+    $term = $attributes['taxonomy.term'];
     // @todo This overrides any other possible breadcrumb and is a pure
     //   hard-coded presumption. Make this behavior configurable per
     //   vocabulary or term.
     $breadcrumb = array();
     while ($parents = taxonomy_term_load_parents($term->id())) {
       $term = array_shift($parents);
-      $breadcrumb[] = $this->l($term->getName(), 'taxonomy.term_page', array('taxonomy_term' => $term->id()));
+      $breadcrumb[] = $this->l($term->getName(), 'taxonomy.term_page', array('taxonomy.term' => $term->id()));
     }
     $breadcrumb[] = $this->l($this->t('Home'), '<front>');
     $breadcrumb = array_reverse($breadcrumb);

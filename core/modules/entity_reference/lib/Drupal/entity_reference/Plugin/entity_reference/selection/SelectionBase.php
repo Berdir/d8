@@ -78,7 +78,7 @@ class SelectionBase implements SelectionInterface {
       if ($target_type == 'node') {
         $target_bundles_title = t('Content types');
       }
-      elseif ($target_type == 'taxonomy_term') {
+      elseif ($target_type == 'taxonomy.term') {
         $target_bundles_title = t('Vocabularies');
       }
 

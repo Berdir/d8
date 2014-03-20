@@ -51,7 +51,7 @@ class ForumIntegrationTest extends ViewTestBase {
   public function testForumIntegration() {
     // Create a forum.
     $entity_manager = $this->container->get('entity.manager');
-    $term = $entity_manager->getStorageController('taxonomy_term')->create(array('vid' => 'forums'));
+    $term = $entity_manager->getStorageController('taxonomy.term')->create(array('vid' => 'forums'));
     $term->save();
 
     $comment_storage_controller = $entity_manager->getStorageController('comment');

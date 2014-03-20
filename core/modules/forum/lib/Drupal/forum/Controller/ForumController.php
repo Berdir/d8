@@ -63,7 +63,7 @@ class ForumController extends ControllerBase {
     return new static(
       $container->get('forum_manager'),
       $container->get('entity.manager')->getStorageController('taxonomy_vocabulary'),
-      $container->get('entity.manager')->getStorageController('taxonomy_term')
+      $container->get('entity.manager')->getStorageController('taxonomy.term')
     );
   }
 

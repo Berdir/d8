@@ -18,7 +18,7 @@ use Drupal\views\Plugin\views\argument_validator\Entity;
  * @ViewsArgumentValidator(
  *   id = "taxonomy_term_name",
  *   title = @Translation("Taxonomy term name"),
- *   entity_type = "taxonomy_term"
+ *   entity_type = "taxonomy.term"
  * )
  */
 class TermName extends Entity {
@@ -37,7 +37,7 @@ class TermName extends Entity {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $entity_manager);
     // Not handling exploding term names.
     $this->multipleCapable = FALSE;
-    $this->termStorageController = $entity_manager->getStorageController('taxonomy_term');
+    $this->termStorageController = $entity_manager->getStorageController('taxonomy.term');
   }
 
   /**

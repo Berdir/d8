@@ -12,23 +12,23 @@ taxonomy.term_add:
     _content: '\Drupal\taxonomy\Controller\TaxonomyController::addForm'
     _title: 'Add term'
   requirements:
-    _entity_create_access: 'taxonomy_term:{taxonomy_vocabulary}'
+    _entity_create_access: 'taxonomy.term:{taxonomy_vocabulary}'
 
 taxonomy.term_edit:
-  path: '/taxonomy/term/{taxonomy_term}/edit'
+  path: '/taxonomy/term/{taxonomy.term}/edit'
   defaults:
     _entity_form: 'taxonomy_term.default'
     _title: 'Edit term'
   requirements:
-    _entity_access: 'taxonomy_term.update'
+    _entity_access: 'taxonomy.term.update'
 
 taxonomy.term_delete:
-  path: '/taxonomy/term/{taxonomy_term}/delete'
+  path: '/taxonomy/term/{taxonomy.term}/delete'
   defaults:
-    _entity_form: 'taxonomy_term.delete'
+    _entity_form: 'taxonomy.term.delete'
     _title: 'Delete term'
   requirements:
-    _entity_access: 'taxonomy_term.delete'
+    _entity_access: 'taxonomy.term.delete'
 
 taxonomy.vocabulary_add:
   path: '/admin/structure/taxonomy/add'
@@ -84,19 +84,19 @@ taxonomy.overview_terms:
     _entity_access: 'taxonomy_vocabulary.view'
 
 taxonomy.term_page:
-  path: '/taxonomy/term/{taxonomy_term}'
+  path: '/taxonomy/term/{taxonomy.term}'
   defaults:
     _content: '\Drupal\taxonomy\Controller\TaxonomyController::termPage'
     _title: 'Taxonomy term'
     _title_callback: '\Drupal\taxonomy\Controller\TaxonomyController::termTitle'
   requirements:
-    _entity_access: 'taxonomy_term.view'
+    _entity_access: 'taxonomy.term.view'
 
 taxonomy.term_feed:
-  path: '/taxonomy/term/{taxonomy_term}/feed'
+  path: '/taxonomy/term/{taxonomy.term}/feed'
   defaults:
     _content: '\Drupal\taxonomy\Controller\TaxonomyController::termFeed'
     _title: 'Taxonomy term'
     _title_callback: '\Drupal\taxonomy\Controller\TaxonomyController::termTitle'
   requirements:
-    _entity_access: 'taxonomy_term.view'
+    _entity_access: 'taxonomy.term.view'

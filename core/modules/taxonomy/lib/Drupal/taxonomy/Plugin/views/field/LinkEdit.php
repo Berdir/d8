@@ -62,7 +62,7 @@ class LinkEdit extends FieldPluginBase {
       // Mock a term object for taxonomy_term_access(). Use machine name and
       // vid to ensure compatibility with vid based and machine name based
       // access checks. See http://drupal.org/node/995156
-      $term = entity_create('taxonomy_term', array(
+      $term = entity_create('taxonomy.term', array(
         'vid' => $values->{$this->aliases['vid']},
       ));
       if ($term->access('update')) {

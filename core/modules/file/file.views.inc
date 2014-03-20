@@ -226,7 +226,7 @@ function file_views_data() {
     'taxonomy_term_data' => array(
       'field' => 'id',
       'left_field' => 'tid',
-      'extra' => array(array('field' => 'type', 'value' => 'taxonomy_term')),
+      'extra' => array(array('field' => 'type', 'value' => 'taxonomy.term')),
     ),
     // Link ourself to the {taxonomy_vocabulary} table so we can provide taxonomy_vocabulary->file relationships.
     'taxonomy_vocabulary' => array(
@@ -347,7 +347,7 @@ function file_views_data() {
       'base' => 'taxonomy_term_data',
       'base field' => 'tid',
       'relationship field' => 'id',
-      'extra' => array(array('table' => 'file_usage', 'field' => 'type', 'operator' => '=', 'value' => 'taxonomy_term')),
+      'extra' => array(array('table' => 'file_usage', 'field' => 'type', 'operator' => '=', 'value' => 'taxonomy.term')),
     ),
   );
   $data['file_usage']['taxonomy_term_to_file'] = array(

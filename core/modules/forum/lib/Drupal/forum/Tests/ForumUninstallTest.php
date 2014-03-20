@@ -40,7 +40,7 @@ class ForumUninstallTest extends WebTestBase {
     $this->assertNotNull($field, 'The taxonomy_forums field exists.');
 
     // Create a taxonomy term.
-    $term = entity_create('taxonomy_term', array(
+    $term = entity_create('taxonomy.term', array(
       'name' => t('A term'),
       'langcode' => language_default()->id,
       'description' => '',

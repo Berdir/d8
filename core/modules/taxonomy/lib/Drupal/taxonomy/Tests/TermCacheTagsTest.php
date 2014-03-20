@@ -38,7 +38,7 @@ class TermCacheTagsTest extends EntityWithUriCacheTagsTestBase {
     $vocabulary->save();
 
     // Create a "Llama" taxonomy term.
-    $term = entity_create('taxonomy_term', array(
+    $term = entity_create('taxonomy.term', array(
       'name' => 'Llama',
       'vid' => $vocabulary->id(),
     ));

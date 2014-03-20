@@ -547,9 +547,9 @@ class ManageFieldsTest extends FieldUiTestBase {
     // Reset the fields info.
     field_info_cache_clear();
     // Check that the field instance was deleted.
-    $this->assertNull(field_info_instance('taxonomy_term', $this->field_name, 'tags'), 'Field instance was deleted.');
+    $this->assertNull(field_info_instance('taxonomy.term', $this->field_name, 'tags'), 'Field instance was deleted.');
     // Check that the field was deleted too.
-    $this->assertNull(field_info_field('taxonomy_term', $this->field_name), 'Field was deleted.');
+    $this->assertNull(field_info_field('taxonomy.term', $this->field_name), 'Field was deleted.');
   }
 
   /**

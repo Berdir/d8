@@ -16,7 +16,7 @@ use Drupal\views\Plugin\views\wizard\WizardPluginBase;
  *   id = "taxonomy_term",
  *   base_table = "taxonomy_term_data",
  *   title = @Translation("Taxonomy terms")
- * )
+ * )Entity
  */
 class TaxonomyTerm extends WizardPluginBase {
 

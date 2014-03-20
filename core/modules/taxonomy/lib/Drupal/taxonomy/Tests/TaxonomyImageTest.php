@@ -42,7 +42,7 @@ class TaxonomyImageTest extends TaxonomyTestBase {
 
     $this->vocabulary = $this->createVocabulary();
     // Add a field instance to the vocabulary.
-    $entity_type = 'taxonomy_term';
+    $entity_type = 'taxonomy.term';
     $name = 'field_test';
     entity_create('field_config', array(
       'name' => $name,
@@ -82,7 +82,7 @@ class TaxonomyImageTest extends TaxonomyTestBase {
     $edit['name'] = $this->randomName();
     $edit['files[field_test_0]'] = drupal_realpath($image->uri);
     $this->drupalPostForm('admin/structure/taxonomy/manage/' . $this->vocabulary->id()  . '/add', $edit, t('Save'));
-    $terms = entity_load_multiple_by_properties('taxonomy_term', array('name' => $edit['name']));
+    $terms = entity_load_multiple_by_properties('taxonomy.term', array('name' => $edit['name']));
     $term = reset($terms);
     $this->assertText(t('Created new term @name.', array('@name' => $term->getName())));
 

@@ -101,7 +101,7 @@ class ViewsTaxonomyAutocompleteTest extends ViewTestBase {
    *   The created taxonomy term.
    */
   protected function createTerm($name = NULL) {
-    $term = entity_create('taxonomy_term', array(
+    $term = entity_create('taxonomy.term', array(
       'name' => $name ?: $this->randomName(),
       'description' => $this->randomName(),
       'vid' => $this->vocabulary->id(),

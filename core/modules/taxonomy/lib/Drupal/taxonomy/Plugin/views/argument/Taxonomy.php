@@ -25,7 +25,7 @@ class Taxonomy extends Numeric {
   function title() {
     // There might be no valid argument.
     if ($this->argument) {
-      $term = entity_load('taxonomy_term', $this->argument);
+      $term = entity_load('taxonomy.term', $this->argument);
       if (!empty($term)) {
         return String::checkPlain($term->getName());
       }

@@ -35,7 +35,7 @@ function forum_install() {
     ))->save();
 
     // Create a default forum so forum posts can be created.
-    $term = entity_create('taxonomy_term', array(
+    $term = entity_create('taxonomy.term', array(
       'name' => t('General discussion'),
       'description' => '',
       'parent' => array(0),
@@ -97,7 +97,7 @@ function forum_uninstall() {
     $field->delete();
   }
 
-  if ($field = field_info_field('taxonomy_term', 'forum_container')) {
+  if ($field = field_info_field('taxonomy.term', 'forum_container')) {
     $field->delete();
   }
 

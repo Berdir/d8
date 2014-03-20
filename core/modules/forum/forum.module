@@ -122,7 +122,7 @@ function forum_menu_local_tasks(&$data, $route_name) {
   // Add action link to 'node/add/forum' on 'forum' sub-pages.
   if (in_array($route_name, array('forum.index', 'forum.page'))) {
     $request = \Drupal::request();
-    $forum_term = $request->attributes->get('taxonomy_term');
+    $forum_term = $request->attributes->get('taxonomy.term');
     $vid = \Drupal::config('forum.settings')->get('vocabulary');
     $links = array();
     // Loop through all bundles for forum taxonomy vocabulary field.
@@ -176,7 +176,7 @@ function forum_menu_local_tasks(&$data, $route_name) {
 function forum_entity_type_build(array &$entity_types) {
   /** @var $entity_types \Drupal\Core\Entity\EntityTypeInterface[] */
   // Register forum specific form controllers.
-  $entity_types['taxonomy_term']
+  $entity_types['taxonomy.term']
     ->setFormClass('forum', 'Drupal\forum\Form\ForumFormController')
     ->setFormClass('container', 'Drupal\forum\Form\ContainerFormController')
     ->setLinkTemplate('forum-delete-form', 'forum.delete')
@@ -189,8 +189,8 @@ function forum_entity_type_build(array &$entity_types) {
 function forum_entity_bundle_info_alter(&$bundles) {
   // Take over URI construction for taxonomy terms that are forums.
   if ($vid = \Drupal::config('forum.settings')->get('vocabulary')) {
-    if (isset($bundles['taxonomy_term'][$vid])) {
-      $bundles['taxonomy_term'][$vid]['uri_callback'] = 'forum_uri';
+    if (isset($bundles['taxonomy.term'][$vid])) {
+      $bundles['taxonomy.term'][$vid]['uri_callback'] = 'forum_uri';
     }
   }
 }
@@ -202,7 +202,7 @@ function forum_uri($forum) {
   return array(
     'route_name' => 'forum.page',
     'route_parameters' => array(
-      'taxonomy_term' => $forum->id(),
+      'taxonomy.term' => $forum->id(),
     ),
   );
 }
@@ -230,7 +230,7 @@ function forum_node_validate(EntityInterface $node, $form, &$form_state) {
           form_set_error('taxonomy_forums', $form_state, t('Select a forum.'));
           continue;
         }
-        $used = \Drupal::entityQuery('taxonomy_term')
+        $used = \Drupal::entityQuery('taxonomy.term')
           ->condition('tid', $term->id())
           ->condition('vid', $term->bundle())
           ->range(0, 1)

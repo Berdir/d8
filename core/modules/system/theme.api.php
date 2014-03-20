@@ -39,13 +39,13 @@
  * @section sec_theme_hooks Theme Hooks
  * Modules register theme hooks within a hook_theme()implementation and provide
  * a default implementation via a function named theme_HOOK(). For instance, to
- * theme a taxonomy term, the theme hook name is 'taxonomy_term'. If theming is
+ * theme a taxonomy term, the theme hook name is 'taxonomy.term'. If theming is
  * handled via a function then the corresponding function name is
  * theme_taxonomy_term(). If theming is handled via a template then the file
  * should be named according to the value of the 'template' key registered with
  * the theme hook (see hook_theme() for details). Default templates are
  * implemented with the Twig rendering engine and are named the same as the
- * theme hook, with underscores changed to hyphens, so for the 'taxonomy_term'
+ * theme hook, with underscores changed to hyphens, so for the 'taxonomy.term'
  * theme hook, the default template is 'taxonomy-term.html.twig'.
  *
  * @subsection sub_overriding_theme_hooks Overriding Theme Hooks
@@ -262,7 +262,7 @@ function hook_theme_suggestions_HOOK(array $variables) {
  * node and taxonomy term templates based on the user being logged in.
  * @code
  * function MYMODULE_theme_suggestions_alter(array &$suggestions, array $variables, $hook) {
- *   if (\Drupal::currentUser()->isAuthenticated() && in_array($hook, array('node', 'taxonomy_term'))) {
+ *   if (\Drupal::currentUser()->isAuthenticated() && in_array($hook, array('node', 'taxonomy.term'))) {
  *     $suggestions[] = $hook . '__' . 'logged_in';
  *   }
  * }

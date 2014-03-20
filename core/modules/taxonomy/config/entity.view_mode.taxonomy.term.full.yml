@@ -1,0 +1,5 @@
+id: taxonomy.term.full
+label: 'Taxonomy term page'
+status: false
+cache: true
+targetEntityType: taxonomy.term

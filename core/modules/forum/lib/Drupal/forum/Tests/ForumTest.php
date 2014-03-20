@@ -217,10 +217,10 @@ class ForumTest extends WebTestBase {
   function testAddOrphanTopic() {
     // Must remove forum topics to test creating orphan topics.
     $vid = \Drupal::config('forum.settings')->get('vocabulary');
-    $tids = \Drupal::entityQuery('taxonomy_term')
+    $tids = \Drupal::entityQuery('taxonomy.term')
       ->condition('vid', $vid)
       ->execute();
-    entity_delete_multiple('taxonomy_term', $tids);
+    entity_delete_multiple('taxonomy.term', $tids);
 
     // Create an orphan forum item.
     $edit = array();
@@ -395,7 +395,7 @@ class ForumTest extends WebTestBase {
     $parent_tid = db_query("SELECT t.parent FROM {taxonomy_term_hierarchy} t WHERE t.tid = :tid", array(':tid' => $tid))->fetchField();
     $this->assertTrue($parent == $parent_tid, 'The ' . $type . ' is linked to its container');
 
-    $forum = $this->container->get('entity.manager')->getStorageController('taxonomy_term')->load($tid);
+    $forum = $this->container->get('entity.manager')->getStorageController('taxonomy.term')->load($tid);
     $this->assertEqual(($type == 'forum container'), (bool) $forum->forum_container->value);
     return $term;
   }

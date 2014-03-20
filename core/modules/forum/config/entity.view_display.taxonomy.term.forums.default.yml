@@ -1,5 +1,5 @@
-id: taxonomy_term.forums.default
-targetEntityType: taxonomy_term
+id: taxonomy.term.forums.default
+targetEntityType: taxonomy.term
 bundle: forums
 mode: default
 status: true

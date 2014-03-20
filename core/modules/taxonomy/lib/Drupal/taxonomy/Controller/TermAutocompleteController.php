@@ -67,9 +67,9 @@ class TermAutocompleteController implements ContainerInjectionInterface {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('entity.query')->get('taxonomy_term'),
+      $container->get('entity.query')->get('taxonomy.term'),
       $container->get('field.info'),
-      $container->get('entity.manager')->getStorageController('taxonomy_term')
+      $container->get('entity.manager')->getStorageController('taxonomy.term')
     );
   }
 

@@ -1,5 +1,5 @@
 forum.delete:
-  path: '/admin/structure/forum/delete/forum/{taxonomy_term}'
+  path: '/admin/structure/forum/delete/forum/{taxonomy.term}'
   defaults:
     _form: '\Drupal\forum\Form\DeleteForm'
     _title: 'Delete forum'
@@ -23,7 +23,7 @@ forum.index:
     _permission: 'access content'
 
 forum.page:
-  path: '/forum/{taxonomy_term}'
+  path: '/forum/{taxonomy.term}'
   defaults:
     _content: '\Drupal\forum\Controller\ForumController::forumPage'
     _title_callback: '\Drupal\taxonomy\Controller\TaxonomyController::termTitle'
@@ -47,7 +47,7 @@ forum.add_forum:
     _permission: 'administer forums'
 
 forum.edit_container:
-  path: '/admin/structure/forum/edit/container/{taxonomy_term}'
+  path: '/admin/structure/forum/edit/container/{taxonomy.term}'
   defaults:
     _entity_form: 'taxonomy_term.container'
     _title: 'Edit container'
@@ -55,7 +55,7 @@ forum.edit_container:
     _permission: 'administer forums'
 
 forum.edit_forum:
-  path: '/admin/structure/forum/edit/forum/{taxonomy_term}'
+  path: '/admin/structure/forum/edit/forum/{taxonomy.term}'
   defaults:
     _entity_form: 'taxonomy_term.forum'
     _title: 'Edit forum'

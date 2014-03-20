@@ -38,7 +38,7 @@ class VocabularyResetForm extends EntityConfirmFormBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('entity.manager')->getStorageController('taxonomy_term')
+      $container->get('entity.manager')->getStorageController('taxonomy.term')
     );
   }
 

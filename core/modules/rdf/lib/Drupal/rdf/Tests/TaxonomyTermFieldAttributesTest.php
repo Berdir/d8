@@ -65,7 +65,7 @@ class TaxonomyTermFieldAttributesTest extends TaxonomyTestBase {
       ))
       ->save();
 
-    rdf_get_mapping('taxonomy_term', $this->vocabulary->id())
+    rdf_get_mapping('taxonomy.term', $this->vocabulary->id())
       ->setBundleMapping(array('types' => array('skos:Concept')))
       ->setFieldMapping('name', array('properties' => array('rdfs:label')))
       ->save();

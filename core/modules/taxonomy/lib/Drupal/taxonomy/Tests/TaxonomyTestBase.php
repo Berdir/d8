@@ -53,7 +53,7 @@ abstract class TaxonomyTestBase extends WebTestBase {
   function createTerm($vocabulary) {
     $filter_formats = filter_formats();
     $format = array_pop($filter_formats);
-    $term = entity_create('taxonomy_term', array(
+    $term = entity_create('taxonomy.term', array(
       'name' => $this->randomName(),
       'description' => array(
         'value' => $this->randomName(),

@@ -61,7 +61,7 @@ class ForumBreadcrumbBuilder extends BreadcrumbBuilderBase {
   public function applies(array $attributes) {
     return !empty($attributes[RouteObjectInterface::ROUTE_NAME])
     && (($attributes[RouteObjectInterface::ROUTE_NAME] == 'node.view' && isset($attributes['node']) && $this->forumManager->checkNodeType($attributes['node']))
-      || ($attributes[RouteObjectInterface::ROUTE_NAME] == 'forum.page' && isset($attributes['taxonomy_term']))
+      || ($attributes[RouteObjectInterface::ROUTE_NAME] == 'forum.page' && isset($attributes['taxonomy.term']))
     );
   }
 
@@ -73,7 +73,7 @@ class ForumBreadcrumbBuilder extends BreadcrumbBuilderBase {
       return $this->forumPostBreadcrumb($attributes['node']);
     }
     elseif ($attributes[RouteObjectInterface::ROUTE_NAME] == 'forum.page') {
-      return $this->forumTermBreadcrumb($attributes['taxonomy_term']);
+      return $this->forumTermBreadcrumb($attributes['taxonomy.term']);
     }
   }
 
@@ -88,7 +88,7 @@ class ForumBreadcrumbBuilder extends BreadcrumbBuilderBase {
     if ($parents = taxonomy_term_load_parents_all($node->forum_tid)) {
       $parents = array_reverse($parents);
       foreach ($parents as $parent) {
-        $breadcrumb[] = $this->l($parent->label(), 'forum.page', array('taxonomy_term' => $parent->id()));
+        $breadcrumb[] = $this->l($parent->label(), 'forum.page', array('taxonomy.term' => $parent->id()));
       }
     }
     return $breadcrumb;
@@ -109,7 +109,7 @@ class ForumBreadcrumbBuilder extends BreadcrumbBuilderBase {
     if ($term->parents) {
       foreach (array_reverse($term->parents) as $parent) {
         if ($parent->id() != $term->id()) {
-          $breadcrumb[] = $this->l($parent->label(), 'forum.page', array('taxonomy_term' => $parent->id()));
+          $breadcrumb[] = $this->l($parent->label(), 'forum.page', array('taxonomy.term' => $parent->id()));
         }
       }
     }
