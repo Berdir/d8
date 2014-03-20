@@ -7,8 +7,8 @@
 
 namespace Drupal\migrate_drupal\Plugin\migrate\process\d6;
 
-use Drupal\migrate\MigrateException;
 use Drupal\migrate\MigrateExecutable;
+use Drupal\migrate\MigrateSkipRowException;
 use Drupal\migrate\ProcessPluginBase;
 use Drupal\migrate\Row;
 
@@ -36,7 +36,7 @@ class FileImageHandler extends ProcessPluginBase {
         $value = $widget_type == "imagefield_widget" ? "image" : "file";
       }
       else {
-        throw new MigrateException(sprintf('Lookup failed for %s', $value));
+        throw new MigrateSkipRowException();
       }
     }
 
