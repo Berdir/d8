@@ -135,7 +135,7 @@ class FieldInstanceConfig extends ConfigEntityBase implements FieldInstanceConfi
    *
    * This property is overlooked if the $default_value_function is non-empty.
    *
-   * Example for a number_integer field:
+   * Example for a integer field:
    * @code
    * array(
    *   array('value' => 1),
@@ -361,6 +361,13 @@ class FieldInstanceConfig extends ConfigEntityBase implements FieldInstanceConfi
   public function postSave(EntityStorageControllerInterface $storage_controller, $update = TRUE) {
     // Clear the cache.
     field_cache_clear();
+
+    // Invalidate the render cache for all affected entities.
+    $entity_manager = \Drupal::entityManager();
+    $entity_type = $this->getTargetEntityTypeId();
+    if ($entity_manager->hasController($entity_type, 'view_builder')) {
+      $entity_manager->getViewBuilder($entity_type)->resetCache();
+    }
   }
 
   /**
