@@ -17,7 +17,7 @@ taxonomy.term_add:
 taxonomy.term_edit:
   path: '/taxonomy/term/{taxonomy.term}/edit'
   defaults:
-    _entity_form: 'taxonomy_term.default'
+    _entity_form: 'taxonomy.term.default'
     _title: 'Edit term'
   requirements:
     _entity_access: 'taxonomy.term.update'
