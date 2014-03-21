@@ -78,7 +78,7 @@ class LanguageConfigFactoryOverride implements LanguageConfigFactoryOverrideInte
     $data = array();
     $language_names = $this->getLanguageConfigNames($names);
     if ($language_names) {
-      $data = $this->storage->readMultiple($language_names);
+      $data = $this->storage->readMultiple(array_values($language_names));
       // Re-key the data array to use configuration names rather than override
       // names.
       $prefix_length = strlen(static::LANGUAGE_CONFIG_PREFIX . '.' . $this->language->id) + 1;
