@@ -50,10 +50,6 @@ class LanguageConfigFactoryOverride implements LanguageConfigFactoryOverrideInte
   /**
    * Constructs the LanguageConfigFactoryOverride object.
    *
-   * @param \Drupal\Core\Language\LanguageDefault $language_default
-   *   The default language service. This sets the initial language on the
-   *   config factory to the site's default. The language can be used to
-   *   override configuration data if language overrides are available.
    * @param \Drupal\Core\Config\StorageInterface $storage
    *   The configuration storage engine.
    * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
@@ -61,11 +57,7 @@ class LanguageConfigFactoryOverride implements LanguageConfigFactoryOverrideInte
    * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_config
    *   The typed configuration manager.
    */
-  public function __construct(LanguageDefault $language_default, StorageInterface $storage, EventDispatcherInterface $event_dispatcher, TypedConfigManagerInterface $typed_config) {
-    // Ensure that configuration can be localised if the site is monolingual
-    // but the Language module is enabled. This is the case for monolingual
-    // sites not in English.
-    $this->language = $language_default->get();
+  public function __construct(StorageInterface $storage, EventDispatcherInterface $event_dispatcher, TypedConfigManagerInterface $typed_config) {
     $this->storage = $storage;
     $this->eventDispatcher = $event_dispatcher;
     $this->typedConfigManager = $typed_config;
@@ -147,7 +139,7 @@ class LanguageConfigFactoryOverride implements LanguageConfigFactoryOverrideInte
    * {@inheritdoc}
    */
   public function getCacheSuffix() {
-    return $this->language->id;
+    return $this->language ? $this->language->id : NULL;
   }
 
   /**
@@ -162,6 +154,14 @@ class LanguageConfigFactoryOverride implements LanguageConfigFactoryOverrideInte
    */
   public function setLanguage(Language $language = NULL) {
     $this->language = $language;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setLanguageFromDefault(LanguageDefault $language_default = NULL) {
+    $this->language = $language_default ? $language_default->get() : NULL;
     return $this;
   }
 
