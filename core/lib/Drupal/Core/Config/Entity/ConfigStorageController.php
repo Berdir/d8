@@ -307,8 +307,7 @@ class ConfigStorageController extends EntityStorageControllerBase implements Con
     }
 
     if (!$config->isNew() && !isset($entity->original)) {
-      $this->resetCache(array($id));
-      $entity->original = $this->load($id);
+      $entity->original = $this->loadUnchanged($id);
     }
 
     // Build an ID if none is set.
@@ -328,7 +327,7 @@ class ConfigStorageController extends EntityStorageControllerBase implements Con
     }
 
     // Retrieve the desired properties and set them in config.
-    foreach ($entity->getExportProperties() as $key => $value) {
+    foreach ($entity->toArray() as $key => $value) {
       $config->set($key, $value);
     }
 
