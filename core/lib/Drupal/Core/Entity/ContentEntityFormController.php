@@ -7,7 +7,8 @@
 
 namespace Drupal\Core\Entity;
 
-use Drupal\Core\Language\Language;
+use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
+use Drupal\entity\Entity\EntityFormDisplay;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -15,7 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @see \Drupal\Core\ContentEntityBase
  */
-class ContentEntityFormController extends EntityFormController {
+class ContentEntityFormController extends EntityFormController implements ContentEntityFormControllerInterface {
 
   /**
    * The entity manager.
@@ -47,12 +48,7 @@ class ContentEntityFormController extends EntityFormController {
    * {@inheritdoc}
    */
   public function form(array $form, array &$form_state) {
-    $entity = $this->entity;
-    // @todo Exploit the Field API to generate the default widgets for the
-    // entity fields.
-    if ($entity->getEntityType()->isFieldable()) {
-      field_attach_form($entity, $form, $form_state, $this->getFormLangcode($form_state));
-    }
+    $this->getFormDisplay($form_state)->buildForm($this->entity, $form, $form_state);
 
     // Add a process callback so we can assign weights and hide extra fields.
     $form['#process'][] = array($this, 'processForm');
@@ -63,30 +59,39 @@ class ContentEntityFormController extends EntityFormController {
   /**
    * {@inheritdoc}
    */
+  public function processForm($element, $form_state, $form) {
+    parent::processForm($element, $form_state, $form);
+
+    $form_display = $this->getFormDisplay($form_state);
+
+    // Assign the weights configured in the form display.
+    // @todo: Once https://drupal.org/node/1875974 provides the missing API,
+    //   only do it for 'extra fields', since other components have been taken
+    //   care of in EntityViewDisplay::buildMultiple().
+    foreach ($form_display->getComponents() as $name => $options) {
+      if (isset($element[$name])) {
+        $element[$name]['#weight'] = $options['weight'];
+      }
+    }
+
+    // Hide extra fields.
+    $extra_fields = field_info_extra_fields($this->entity->getEntityTypeId(), $this->entity->bundle(), 'form');
+    foreach ($extra_fields as $extra_field => $info) {
+      if (!$form_display->getComponent($extra_field)) {
+        $element[$extra_field]['#access'] = FALSE;
+      }
+    }
+
+    return $element;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function validate(array $form, array &$form_state) {
     $this->updateFormLangcode($form_state);
     $entity = $this->buildEntity($form, $form_state);
-    $entity_type = $entity->getEntityTypeId();
-    $entity_langcode = $entity->language()->id;
-
-    $violations = array();
-    foreach ($entity as $field_name => $field) {
-      $field_violations = $field->validate();
-      if (count($field_violations)) {
-        $violations[$field_name] = $field_violations;
-      }
-    }
-
-    // Map errors back to form elements.
-    if ($violations) {
-      foreach ($violations as $field_name => $field_violations) {
-        $field_state = field_form_get_state($form['#parents'], $field_name, $form_state);
-        $field_state['constraint_violations'] = $field_violations;
-        field_form_set_state($form['#parents'], $field_name, $form_state, $field_state);
-      }
-
-      field_invoke_method('flagErrors', _field_invoke_widget_target($form_state['form_display']), $entity, $form, $form_state);
-    }
+    $this->getFormDisplay($form_state)->validateFormValues($entity, $form, $form_state);
 
     // @todo Remove this.
     // Execute legacy global validation handlers.
@@ -102,6 +107,10 @@ class ContentEntityFormController extends EntityFormController {
     // language.
     $langcode = $this->getFormLangcode($form_state);
     $this->entity = $this->entity->getTranslation($langcode);
+
+    $form_display = EntityFormDisplay::collectRenderDisplay($this->entity, $this->getOperation());
+    $this->setFormDisplay($form_display, $form_state);
+
     parent::init($form_state);
   }
 
@@ -130,35 +139,42 @@ class ContentEntityFormController extends EntityFormController {
    */
   public function buildEntity(array $form, array &$form_state) {
     $entity = clone $this->entity;
-    $entity_type_id = $entity->getEntityTypeId();
-    $entity_type = \Drupal::entityManager()->getDefinition($entity_type_id);
 
-    // @todo Exploit the Entity Field API to process the submitted field values.
-    // Copy top-level form values that are entity fields but not handled by
-    // field API without changing existing entity fields that are not being
-    // edited by this form. Values of fields handled by field API are copied
-    // by field_attach_extract_form_values() below.
-    $values_excluding_fields = $entity_type->isFieldable() ? array_diff_key($form_state['values'], field_info_instances($entity_type_id, $entity->bundle())) : $form_state['values'];
-    $definitions = $entity->getFieldDefinitions();
+    // First, extract values from widgets.
+    $extracted = $this->getFormDisplay($form_state)->extractFormValues($entity, $form, $form_state);
 
-    foreach ($values_excluding_fields as $key => $value) {
-      if (isset($definitions[$key])) {
-        $entity->$key = $value;
+    // Then extract the values of fields that are not rendered through widgets,
+    // by simply copying from top-level form values. This leaves the fields
+    // that are not being edited within this form untouched.
+    foreach ($form_state['values'] as $name => $values) {
+      if ($entity->hasField($name) && !isset($extracted[$name])) {
+        $entity->$name = $values;
       }
     }
 
     // Invoke all specified builders for copying form values to entity fields.
     if (isset($form['#entity_builders'])) {
       foreach ($form['#entity_builders'] as $function) {
-        call_user_func_array($function, array($entity_type_id, $entity, &$form, &$form_state));
+        call_user_func_array($function, array($entity->getEntityTypeId(), $entity, &$form, &$form_state));
       }
     }
 
-    // Invoke field API for copying field values.
-    if ($entity_type->isFieldable()) {
-      field_attach_extract_form_values($entity, $form, $form_state, array('langcode' => $this->getFormLangcode($form_state)));
-    }
     return $entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getFormDisplay(array $form_state) {
+    return isset($form_state['form_display']) ? $form_state['form_display'] : NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setFormDisplay(EntityFormDisplayInterface $form_display, array &$form_state) {
+    $form_state['form_display'] = $form_display;
+    return $this;
   }
 
 }
