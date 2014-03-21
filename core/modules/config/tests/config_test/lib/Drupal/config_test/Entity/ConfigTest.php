@@ -70,6 +70,13 @@ class ConfigTest extends ConfigEntityBase implements ConfigTestInterface {
   public $style;
 
   /**
+   * Test dependencies.
+   *
+   * @var array;
+   */
+  public $test_dependencies = array();
+
+  /**
    * A protected property of the configuration entity.
    *
    * @var string
@@ -77,10 +84,10 @@ class ConfigTest extends ConfigEntityBase implements ConfigTestInterface {
   protected $protected_property;
 
   /**
-   * Overrides \Drupal\Core\Config\Entity\ConfigEntityBase::getExportProperties();
+   * {@inheritdoc}
    */
-  public function getExportProperties() {
-    $properties = parent::getExportProperties();
+  public function toArray() {
+    $properties = parent::toArray();
     $protected_names = array(
       'protected_property',
     );
@@ -96,6 +103,18 @@ class ConfigTest extends ConfigEntityBase implements ConfigTestInterface {
   public static function sort($a, $b) {
     \Drupal::state()->set('config_entity_sort', TRUE);
     return parent::sort($a, $b);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function calculateDependencies() {
+    parent::calculateDependencies();
+    foreach ($this->test_dependencies as $type => $deps) {
+      foreach ($deps as $dep) {
+        $this->addDependency($type, $dep);
+      }
+    }
   }
 
 }

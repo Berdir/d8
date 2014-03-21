@@ -2127,8 +2127,8 @@ function _drupal_add_js($data = NULL, $options = NULL) {
           $current_path = current_path();
           $current_path_is_admin = FALSE;
           // The function path_is_admin() is not available on update.php pages.
-          if (!(defined('MAINTENANCE_MODE') && MAINTENANCE_MODE === 'update')) {
-            $current_path_is_admin = path_is_admin($current_path);
+          if (!(defined('MAINTENANCE_MODE'))) {
+            $current_path_is_admin = \Drupal::service('router.admin_context')->isAdminRoute();
           }
           $path = array(
             'basePath' => base_path(),
@@ -4838,31 +4838,6 @@ function watchdog_severity_levels() {
     WATCHDOG_INFO    => t('Info'),
     WATCHDOG_DEBUG   => t('Debug'),
   );
-}
-
-
-/**
- * Explodes a string of tags into an array.
- *
- * @see drupal_implode_tags()
- *
- * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
- *   Use \Drupal\Component\Utility\Tags::explode().
- */
-function drupal_explode_tags($tags) {
-  return Tags::explode($tags);
-}
-
-/**
- * Implodes an array of tags into a string.
- *
- * @see drupal_explode_tags()
- *
- * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
- *   Use \Drupal\Component\Utility\Tags::implode().
- */
-function drupal_implode_tags($tags) {
-  return Tags::implode($tags);
 }
 
 /**
