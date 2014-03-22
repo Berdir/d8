@@ -9,6 +9,7 @@ namespace Drupal\Tests\Core\Entity;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Tests\UnitTestCase;
+use Drupal\Core\Language\Language;
 
 /**
  * @coversDefaultClass \Drupal\Core\Entity\ContentEntityBase
@@ -74,6 +75,13 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
   protected $uuid;
 
   /**
+   * The entity ID.
+   *
+   * @var int
+   */
+  protected $id;
+
+  /**
    * {@inheritdoc}
    */
   public static function getInfo() {
@@ -88,7 +96,12 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
    * {@inheritdoc}
    */
   public function setUp() {
-    $values = array();
+    $this->id = 1;
+    $values = array(
+      'id' => $this->id,
+      'langcode' => 'en',
+      'uuid' => '3bb9ee60-bea5-4622-b89b-a63319d10b3a',
+    );
     $this->entityTypeId = $this->randomName();
     $this->bundle = $this->randomName();
 
@@ -114,13 +127,15 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
       ->disableOriginalConstructor()
       ->getMock();
 
+    $language = new Language(array('id' => 'en'));
     $this->languageManager = $this->getMock('\Drupal\Core\Language\LanguageManagerInterface');
     $this->languageManager->expects($this->any())
       ->method('getLanguages')
-      ->will($this->returnValue(array()));
+      ->will($this->returnValue(array('en' => $language)));
     $this->languageManager->expects($this->any())
       ->method('getLanguage')
-      ->will($this->returnValue(NULL));
+      ->with('en')
+      ->will($this->returnValue($language));
 
     $container = new ContainerBuilder();
     $container->set('entity.manager', $this->entityManager);
@@ -137,6 +152,8 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
    * @covers ::setNewRevision
    */
   public function testIsNewRevision() {
+    // Set up the entity type so that on the first call there is no revision key
+    // and on the second call there is one.
     $this->entityType->expects($this->at(0))
       ->method('hasKey')
       ->with('revision')
@@ -158,7 +175,7 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
   public function testIsDefaultRevision() {
     // The default value is TRUE.
     $this->assertTrue($this->entity->isDefaultRevision());
-    // We override the value, but it does not affect this call.
+    // Change the default revision, verify that the old value is returned.
     $this->assertTrue($this->entity->isDefaultRevision(FALSE));
     // The last call changed the return value for this call.
     $this->assertFalse($this->entity->isDefaultRevision());
@@ -168,6 +185,7 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
    * @covers ::getRevisionId
    */
   public function testGetRevisionId() {
+    // The default getRevisionId() implementation returns NULL.
     $this->assertNull($this->entity->getRevisionId());
   }
 

@@ -10,6 +10,7 @@ namespace Drupal\Tests\Core\Config\Entity;
 use Drupal\Component\Plugin\ConfigurablePluginInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Component\Plugin\PluginBase;
+use Drupal\Core\Language\Language;
 use Drupal\Tests\UnitTestCase;
 
 /**
@@ -62,13 +63,19 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
    */
   protected $provider;
 
-
   /**
    * The language manager.
    *
    * @var \Drupal\Core\Language\LanguageManagerInterface|\PHPUnit_Framework_MockObject_MockObject
    */
   protected $languageManager;
+
+  /**
+   * The entity ID.
+   *
+   * @var string
+   */
+  protected $id;
 
   /**
    * {@inheritdoc}
@@ -85,7 +92,12 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
    * {@inheritdoc}
    */
   public function setUp() {
-    $values = array();
+    $this->id = $this->randomName();
+    $values = array(
+      'id' => $this->id,
+      'langcode' => 'en',
+      'uuid' => '3bb9ee60-bea5-4622-b89b-a63319d10b3a',
+    );
     $this->entityTypeId = $this->randomName();
     $this->provider = $this->randomName();
     $this->entityType = $this->getMock('\Drupal\Core\Entity\EntityTypeInterface');
@@ -104,7 +116,8 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
     $this->languageManager = $this->getMock('\Drupal\Core\Language\LanguageManagerInterface');
     $this->languageManager->expects($this->any())
       ->method('getLanguage')
-      ->will($this->returnValue(NULL));
+      ->with('en')
+      ->will($this->returnValue(new Language(array('id' => 'en'))));
 
     $container = new ContainerBuilder();
     $container->set('entity.manager', $this->entityManager);
@@ -255,9 +268,11 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
    * @covers ::getOriginalId
    */
   public function testGetOriginalId() {
-    $id = $this->randomName();
-    $this->assertSame($this->entity, $this->entity->setOriginalId($id));
-    $this->assertSame($id, $this->entity->getOriginalId());
+    $new_id = $this->randomName();
+    $this->entity->set('id', $new_id);
+    $this->assertSame($this->id, $this->entity->getOriginalId());
+    $this->assertSame($this->entity, $this->entity->setOriginalId($new_id));
+    $this->assertSame($new_id, $this->entity->getOriginalId());
   }
 
   /**
@@ -276,9 +291,9 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
    * @covers ::get
    */
   public function testGet() {
-    $name = $this->randomName();
+    $name = 'id';
     $value = $this->randomName();
-    $this->assertNull($this->entity->get($name));
+    $this->assertSame($this->id, $this->entity->get($name));
     $this->assertSame($this->entity, $this->entity->set($name, $value));
     $this->assertSame($value, $this->entity->get($name));
   }
@@ -331,19 +346,33 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
    * @covers ::createDuplicate
    */
   public function testCreateDuplicate() {
-    $this->entityType->expects($this->once())
+    $this->entityType->expects($this->at(0))
       ->method('getKey')
       ->with('id')
       ->will($this->returnValue('id'));
 
-    $this->entity->setOriginalId('foo');
-    /** @var \Drupal\Core\Config\Entity\ConfigEntityInterface $duplicate */
+    $this->entityType->expects($this->at(1))
+      ->method('hasKey')
+      ->with('uuid')
+      ->will($this->returnValue(TRUE));
+
+    $this->entityType->expects($this->at(2))
+      ->method('getKey')
+      ->with('uuid')
+      ->will($this->returnValue('uuid'));
+
+    $new_uuid = '8607ef21-42bc-4913-978f-8c06207b0395';
+    $this->uuid->expects($this->once())
+      ->method('generate')
+      ->will($this->returnValue($new_uuid));
+
     $duplicate = $this->entity->createDuplicate();
     $this->assertInstanceOf('\Drupal\Core\Entity\Entity', $duplicate);
     $this->assertNotSame($this->entity, $duplicate);
     $this->assertNull($duplicate->id());
     $this->assertNull($duplicate->getOriginalId());
-    $this->assertNull($duplicate->uuid());
+    $this->assertNotEquals($this->entity->uuid(), $duplicate->uuid());
+    $this->assertSame($new_uuid, $duplicate->uuid());
   }
 
   /**
@@ -374,7 +403,7 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getExportProperties
+   * @covers ::toArray
    */
   public function testToArray() {
     $properties = $this->entity->toArray();

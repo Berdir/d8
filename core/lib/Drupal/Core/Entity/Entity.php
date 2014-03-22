@@ -24,13 +24,6 @@ abstract class Entity extends DependencySerialization implements EntityInterface
   public $langcode = Language::LANGCODE_NOT_SPECIFIED;
 
   /**
-   * The UUID generator.
-   *
-   * @var \Drupal\Component\Uuid\UuidInterface
-   */
-  protected $uuidGenerator;
-
-  /**
    * The entity type.
    *
    * @var string
@@ -50,13 +43,6 @@ abstract class Entity extends DependencySerialization implements EntityInterface
    * @var \Drupal\Core\Routing\UrlGeneratorInterface
    */
   protected $urlGenerator;
-
-  /**
-   * The language manager.
-   *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
-   */
-  protected $languageManager;
 
   /**
    * Constructs an Entity object.
@@ -99,11 +85,7 @@ abstract class Entity extends DependencySerialization implements EntityInterface
    * @return \Drupal\Component\Uuid\UuidInterface
    */
   protected function uuidGenerator() {
-    if (!$this->uuidGenerator) {
-      $this->uuidGenerator = \Drupal::service('uuid');
-    }
-
-    return $this->uuidGenerator;
+    return \Drupal::service('uuid');
   }
 
   /**
@@ -392,7 +374,6 @@ abstract class Entity extends DependencySerialization implements EntityInterface
    * {@inheritdoc}
    */
   public static function postDelete(EntityStorageControllerInterface $storage_controller, array $entities) {
-    /** @var self[] $entities */
     foreach ($entities as $entity) {
       $entity->onSaveOrDelete();
     }

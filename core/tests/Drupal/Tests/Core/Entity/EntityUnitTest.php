@@ -8,6 +8,7 @@
 namespace Drupal\Tests\Core\Entity;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Language\Language;
 use Drupal\Tests\UnitTestCase;
 
 /**
@@ -67,6 +68,13 @@ class EntityUnitTest extends UnitTestCase {
   protected $languageManager;
 
   /**
+   * The entity values.
+   *
+   * @var array
+   */
+  protected $values;
+
+  /**
    * {@inheritdoc}
    */
   public static function getInfo() {
@@ -81,7 +89,11 @@ class EntityUnitTest extends UnitTestCase {
    * {@inheritdoc}
    */
   public function setUp() {
-    $values = array();
+    $this->values = array(
+      'id' => 1,
+      'langcode' => 'en',
+      'uuid' => '3bb9ee60-bea5-4622-b89b-a63319d10b3a',
+    );
     $this->entityTypeId = $this->randomName();
 
     $this->entityType = $this->getMock('\Drupal\Core\Entity\EntityTypeInterface');
@@ -97,7 +109,8 @@ class EntityUnitTest extends UnitTestCase {
     $this->languageManager = $this->getMock('\Drupal\Core\Language\LanguageManagerInterface');
     $this->languageManager->expects($this->any())
       ->method('getLanguage')
-      ->will($this->returnValue(NULL));
+      ->with('en')
+      ->will($this->returnValue(new Language(array('id' => 'en'))));
 
     $container = new ContainerBuilder();
     $container->set('entity.manager', $this->entityManager);
@@ -106,45 +119,40 @@ class EntityUnitTest extends UnitTestCase {
 
     \Drupal::setContainer($container);
 
-    $this->entity = $this->getMockForAbstractClass('\Drupal\Core\Entity\Entity', array($values, $this->entityTypeId));
+    $this->entity = $this->getMockForAbstractClass('\Drupal\Core\Entity\Entity', array($this->values, $this->entityTypeId));
   }
 
   /**
    * @covers ::id
    */
   public function testId() {
-    // @todo How to test this?
-    $this->assertNull($this->entity->id());
+    $this->assertSame($this->values['id'], $this->entity->id());
   }
 
   /**
    * @covers ::uuid
    */
   public function testUuid() {
-    // @todo How to test this?
-    $this->assertNull($this->entity->uuid());
+    $this->assertSame($this->values['uuid'], $this->entity->uuid());
   }
 
   /**
    * @covers ::isNew
-   */
-  public function testIsNew() {
-    // @todo How to test this?
-    $this->assertInternalType('bool', $this->entity->isNew());
-  }
-
-  /**
    * @covers ::enforceIsNew
    */
-  public function testEnforceIsNew() {
+  public function testIsNew() {
+    // We provided an ID, so the entity is not new.
+    $this->assertFalse($this->entity->isNew());
+    // Force it to be new.
     $this->assertSame($this->entity, $this->entity->enforceIsNew());
+    $this->assertTrue($this->entity->isNew());
   }
 
   /**
    * @covers ::getEntityType
    */
   public function testGetEntityType() {
-    $this->assertInstanceOf('\Drupal\Core\Entity\EntityTypeInterface', $this->entity->getEntityType());
+    $this->assertSame($this->entityType, $this->entity->getEntityType());
   }
 
   /**
@@ -218,7 +226,7 @@ class EntityUnitTest extends UnitTestCase {
    * @covers ::language
    */
   public function testLanguage() {
-    $this->assertInstanceOf('\Drupal\Core\Language\Language', $this->entity->language());
+    $this->assertSame('en', $this->entity->language()->id);
   }
 
   /**

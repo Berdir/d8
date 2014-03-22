@@ -549,7 +549,7 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
     $language = NULL;
     if ($this->activeLangcode != Language::LANGCODE_DEFAULT) {
       if (!isset($this->languages[$this->activeLangcode])) {
-        $this->languages += $this->languageList(Language::STATE_ALL);
+        $this->languages += $this->languageManager()->getLanguages(Language::STATE_ALL);
       }
       $language = $this->languages[$this->activeLangcode];
     }
