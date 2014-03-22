@@ -333,6 +333,11 @@ abstract class Connection implements \Serializable {
   public function prepareQuery($query) {
     $query = $this->prefixTables($query);
 
+    if (!is_string($query)) {
+      var_dump(gettype($query));
+      debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+    }
+
     return $this->connection->prepare($query);
   }
 
