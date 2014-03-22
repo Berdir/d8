@@ -78,6 +78,7 @@ class MigrateTermNodeTestBase extends MigrateDrupalTestBase {
       if ($i == 1) {
         $node->vid->value = array_shift($vids);
         $node->enforceIsNew(FALSE);
+        $node->setNewRevision();
         $node->isDefaultRevision(FALSE);
         $node->save();
       }

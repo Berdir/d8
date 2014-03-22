@@ -54,21 +54,6 @@ interface RevisionableInterface {
   public function isDefaultRevision($new_value = NULL);
 
   /**
-   * Checks if this revision is editable.
-   *
-   * Editing revisions is very strongly discouraged.
-   *
-   * @param bool $new_value
-   *   (optional) A Boolean to (re)set the editable flag. DO NOT USE. This is
-   *   solely for migrate to use.
-   *
-   * @return bool
-   *   TRUE if the revision is editable, FALSE otherwise. Defaults to FALSE.
-   *   If $new_value was passed, the previous value is returned.
-   */
-  public function keepNewRevisionId($new_value = NULL);
-
-  /**
    * Acts on a revision before it gets saved.
    *
    * @param EntityStorageControllerInterface $storage_controller
