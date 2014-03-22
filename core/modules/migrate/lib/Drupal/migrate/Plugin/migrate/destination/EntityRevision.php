@@ -46,7 +46,6 @@ class EntityRevision extends EntityContentBase {
       $entity = $this->storageController->load($entity_id);
       $entity->enforceIsNew(FALSE);
       $entity->setNewRevision(TRUE);
-      $entity->keepNewRevisionId(TRUE);
     }
     $this->updateEntity($entity, $row);
     $entity->isDefaultRevision(FALSE);
