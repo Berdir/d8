@@ -69,7 +69,7 @@ services:
     factory_method: getActive
   config.manager:
     class: Drupal\Core\Config\ConfigManager
-    arguments: ['@entity.manager', '@config.factory', '@config.typed', '@string_translation']
+    arguments: ['@entity.manager', '@config.factory', '@config.typed', '@string_translation', '@config.storage']
   config.storage:
     class: Drupal\Core\Config\CachedStorage
     arguments: ['@config.cachedstorage.storage', '@cache.config']
@@ -276,6 +276,10 @@ services:
     class: Symfony\Component\Routing\RequestContext
     calls:
       - [fromRequest, ['@request']]
+  router.admin_context:
+    class: Drupal\Core\Routing\AdminContext
+    calls:
+      - [setRequest, ['@?request=']]
   router.route_provider:
     class: Drupal\Core\Routing\RouteProvider
     arguments: ['@database', '@router.builder']
@@ -352,8 +356,13 @@ services:
   password:
     class: Drupal\Core\Password\PhpassHashedPassword
     arguments: [16]
-  mime_type_matcher:
-    class: Drupal\Core\Routing\MimeTypeMatcher
+  accept_header_matcher:
+    class: Drupal\Core\Routing\AcceptHeaderMatcher
+    arguments: ['@content_negotiation']
+    tags:
+      - { name: route_filter }
+  content_type_header_matcher:
+    class: Drupal\Core\Routing\ContentTypeHeaderMatcher
     tags:
       - { name: route_filter }
   paramconverter_manager:
@@ -425,6 +434,10 @@ services:
       - { name: route_enhancer, priority: 10 }
   route_special_attributes_subscriber:
     class: Drupal\Core\EventSubscriber\SpecialAttributesRouteSubscriber
+    tags:
+      - { name: event_subscriber }
+  route_http_method_subscriber:
+    class: Drupal\Core\EventSubscriber\RouteMethodSubscriber
     tags:
       - { name: event_subscriber }
   controller.page:
