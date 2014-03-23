@@ -19,8 +19,8 @@ use Drupal\language\LanguageInterface;
  *   id = "language_entity",
  *   label = @Translation("Language"),
  *   controllers = {
- *     "list" = "Drupal\language\LanguageListController",
- *     "access" = "Drupal\language\LanguageAccessController",
+ *     "list_builder" = "Drupal\language\LanguageListBuilder",
+ *     "access" = "Drupal\language\LanguageAccessHandler",
  *     "form" = {
  *       "add" = "Drupal\language\Form\LanguageAddForm",
  *       "edit" = "Drupal\language\Form\LanguageEditForm",
