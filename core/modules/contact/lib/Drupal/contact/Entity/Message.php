@@ -20,7 +20,7 @@ use Drupal\Core\Field\FieldDefinition;
  *   label = @Translation("Contact message"),
  *   controllers = {
  *     "storage" = "Drupal\Core\Entity\FieldableNullStorageController",
- *     "view_builder" = "Drupal\contact\MessageViewBuilder",
+ *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "form" = {
  *       "default" = "Drupal\contact\MessageFormController"
  *     }
@@ -155,13 +155,37 @@ class Message extends ContentEntityBase implements MessageInterface {
       ->setLabel(t("The sender's email"))
       ->setDescription(t('The email of the person that is sending the contact message.'));
 
+    // The subject of the contact message.
     $fields['subject'] = FieldDefinition::create('string')
-      ->setLabel(t('The message subject'))
-      ->setDescription(t('The subject of the contact message.'));
+      ->setLabel(t('Subject'))
+      ->setRequired(TRUE)
+      ->setSettings(array(
+        'max_length' => 100,
+      ))
+      ->setDisplayOptions('form', array(
+        'type' => 'string',
+        'weight' => -10,
+      ))
+      ->setDisplayConfigurable('form', TRUE);
 
-    $fields['message'] = FieldDefinition::create('string')
-      ->setLabel(t('The message text'))
-      ->setDescription(t('The text of the contact message.'));
+    // The text of the contact message.
+    $fields['message'] = FieldDefinition::create('string_long')
+      ->setLabel(t('Message'))
+      ->setRequired(TRUE)
+      ->setDisplayOptions('form', array(
+        'type' => 'string_textarea',
+        'weight' => 0,
+        'settings' => array(
+          'rows' => 12,
+        ),
+      ))
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayOptions('view', array(
+        'type' => 'string',
+        'weight' => 0,
+        'label' => 'hidden',
+      ))
+      ->setDisplayConfigurable('view', TRUE);
 
     $fields['copy'] = FieldDefinition::create('boolean')
       ->setLabel(t('Copy'))
