@@ -20,7 +20,7 @@ use Drupal\language\LanguageInterface;
  *   label = @Translation("Language"),
  *   controllers = {
  *     "list" = "Drupal\language\LanguageListController",
- *     "access" = "Drupal\language\LanguageAccessHandler",
+ *     "access" = "Drupal\language\LanguageAccessController",
  *     "form" = {
  *       "add" = "Drupal\language\Form\LanguageAddForm",
  *       "edit" = "Drupal\language\Form\LanguageEditForm",
