@@ -72,7 +72,7 @@ class LoadEntity extends PluginBase implements MigrateLoadInterface {
     $sub_ids_to_load = isset($sub_ids) ? array_intersect($this->bundles, $sub_ids) : $this->bundles;
     $migrations = array();
     foreach ($sub_ids_to_load as $id) {
-      $values = $this->migration->getExportProperties();
+      $values = $this->migration->toArray();
       $values['id'] = $this->migration->id() . ':' . $id;
       $values['source']['bundle'] = $id;
       /** @var \Drupal\migrate\Entity\MigrationInterface $migration */

@@ -50,7 +50,7 @@ class LoadTermNode extends LoadEntity {
       $vid_map[$old_vid] = $new_vid;
     }
     foreach ($vid_map as $old_vid => $new_vid) {
-      $values = $this->migration->getExportProperties();
+      $values = $this->migration->toArray();
       $migration_id = $this->migration->id() . ':' . $old_vid;
       $values['id'] = $migration_id;
       $values['source']['vid'] = $old_vid;
