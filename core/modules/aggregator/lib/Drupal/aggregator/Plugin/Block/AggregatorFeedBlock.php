@@ -11,6 +11,8 @@ use Drupal\aggregator\FeedStorageControllerInterface;
 use Drupal\aggregator\ItemStorageControllerInterface;
 use Drupal\block\BlockBase;
 use Drupal\Core\Entity\Query\QueryInterface;
+use Drupal\Core\Database\Connection;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -27,16 +29,16 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class AggregatorFeedBlock extends BlockBase implements ContainerFactoryPluginInterface {
 
   /**
-   * The entity storage controller for feeds.
+   * The entity storage for feeds.
    *
-   * @var \Drupal\aggregator\FeedStorageControllerInterface
+   * @var \Drupal\aggregator\FeedStorageInterface
    */
   protected $feedStorage;
 
   /**
    * The entity storage controller for items.
    *
-   * @var \Drupal\aggregator\ItemStorageControllerInterface
+   * @var \Drupal\aggregator\ItemStorageInterface
    */
   protected $itemStorage;
 

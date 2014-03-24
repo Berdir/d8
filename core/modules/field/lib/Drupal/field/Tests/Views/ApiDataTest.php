@@ -6,7 +6,7 @@
  */
 
 namespace Drupal\field\Tests\Views;
-use Drupal\Core\Entity\FieldableDatabaseStorageController;
+use Drupal\Core\Entity\FieldableDatabaseEntityStorage;
 
 /**
  * Test the produced views_data.
@@ -62,8 +62,8 @@ class ApiDataTest extends FieldTestBase {
     // Check the table and the joins of the first field.
     // Attached to node only.
     $field = $this->fields[0];
-    $current_table = FieldableDatabaseStorageController::_fieldTableName($field);
-    $revision_table = FieldableDatabaseStorageController::_fieldRevisionTableName($field);
+    $current_table = FieldableDatabaseEntityStorage::_fieldTableName($field);
+    $revision_table = FieldableDatabaseEntityStorage::_fieldRevisionTableName($field);
     $data[$current_table] = $views_data->get($current_table);
     $data[$revision_table] = $views_data->get($revision_table);
 
