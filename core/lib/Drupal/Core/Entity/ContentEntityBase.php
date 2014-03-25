@@ -477,14 +477,7 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
   }
 
   /**
-   * Returns an array of all property values.
-   *
-   * Gets an array of plain property or field values, including only
-   * non-computed values. Note that the structure varies by entity type and
-   * bundle.
-   *
-   * @return array
-   *   An array of property values, keyed by property name.
+   * {@inheritdoc}
    */
   public function toArray() {
     $values = array();
