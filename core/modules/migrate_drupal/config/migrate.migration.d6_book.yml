@@ -14,5 +14,5 @@ process:
       migration: d6_book
 destination:
   plugin: book
-dependencies:
+migration_dependencies:
   - d6_node

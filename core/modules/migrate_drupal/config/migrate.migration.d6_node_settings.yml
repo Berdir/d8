@@ -8,5 +8,5 @@ process:
 destination:
   plugin: config
   config_name: node.settings
-dependencies:
+migration_dependencies:
   - d6_node_type

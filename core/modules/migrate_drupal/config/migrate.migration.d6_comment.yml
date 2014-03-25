@@ -42,7 +42,7 @@ process:
     source: format
 destination:
   plugin: entity:comment
-dependencies:
+migration_dependencies:
   - d6_node
   - d6_user
   - d6_filter_format

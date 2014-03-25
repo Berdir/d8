@@ -16,5 +16,5 @@ process:
   guid: guid
 destination:
   plugin: entity:aggregator_item
-dependencies:
+migration_dependencies:
   - d6_aggregator_feed

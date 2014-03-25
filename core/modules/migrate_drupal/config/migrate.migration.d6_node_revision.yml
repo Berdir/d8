@@ -27,5 +27,5 @@ process:
 
 destination:
   plugin: entity_revision:node
-dependencies:
+migration_dependencies:
   - d6_node

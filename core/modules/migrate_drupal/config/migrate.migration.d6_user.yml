@@ -30,7 +30,7 @@ process:
 destination:
   plugin: entity:user
   md5_passwords: true
-dependencies:
+migration_dependencies:
   - d6_filter_format
   - d6_user_role
   - d6_user_picture_entity_display

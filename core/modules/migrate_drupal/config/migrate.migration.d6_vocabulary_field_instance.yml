@@ -15,5 +15,5 @@ process:
   'settings.allowed_values.0.parent': constants.parent
 destination:
   plugin: entity:field_instance_config
-dependencies:
+migration_dependencies:
   - d6_vocabulary_field

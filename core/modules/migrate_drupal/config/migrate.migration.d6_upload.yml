@@ -18,6 +18,6 @@ process:
       description: description
 destination:
   plugin: entity:node
-dependencies:
+migration_dependencies:
   - d6_file
   - d6_node

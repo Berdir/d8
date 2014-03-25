@@ -18,5 +18,5 @@ process:
   cardinality: constants.cardinality
 destination:
   plugin: entity:field_config
-dependencies:
+migration_dependencies:
   - d6_taxonomy_vocabulary

@@ -13,5 +13,5 @@ process:
   required: required
 destination:
   plugin: entity:field_instance_config
-dependencies:
+migration_dependencies:
   - d6_user_profile_field

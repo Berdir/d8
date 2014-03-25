@@ -12,7 +12,7 @@ process:
 
 destination:
   plugin: entity:node
-dependencies:
+migration_dependencies:
   - d6_vocabulary_entity_display
   - d6_vocabulary_entity_form_display
   - d6_node

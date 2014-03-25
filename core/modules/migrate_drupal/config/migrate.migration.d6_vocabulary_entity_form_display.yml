@@ -18,5 +18,5 @@ process:
     source: vid
 destination:
   plugin: component_entity_form_display
-dependencies:
+migration_dependencies:
   - d6_vocabulary_field_instance

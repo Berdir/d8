@@ -11,7 +11,7 @@ process:
     source: nid
 destination:
   plugin: entity:node
-dependencies:
+migration_dependencies:
   - d6_node
   - d6_field_formatter_settings
   - d6_field_instance_widget_settings

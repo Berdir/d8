@@ -27,7 +27,7 @@ process:
 
 destination:
   plugin: entity:node
-dependencies:
+migration_dependencies:
   - d6_node_type
   - d6_filter_format
   - d6_field_instance_widget_settings: false
