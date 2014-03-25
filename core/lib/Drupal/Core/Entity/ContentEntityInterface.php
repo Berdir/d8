@@ -127,9 +127,8 @@ interface ContentEntityInterface extends EntityInterface, RevisionableInterface,
   /**
    * Returns an array of all field values.
    *
-   * Gets an array of plain property or field values, including only
-   * non-computed values. Note that the structure varies by entity type and
-   * bundle.
+   * Gets an array of plain field values, including only non-computed values.
+   * Note that the structure varies by entity type and bundle.
    *
    * @return array
    *   An array of field values, keyed by field name.
