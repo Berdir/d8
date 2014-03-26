@@ -11,11 +11,11 @@ use Drupal\Core\Entity\Query\QueryException;
 use Drupal\field\FieldInstanceConfigInterface;
 
 /**
- * Defines a null entity controller class.
+ * Defines a null entity storage.
  *
  * Used for content entity types that have no storage.
  */
-class FieldableNullStorage extends ContentEntityStorageBase {
+class ContentEntityNullStorage extends ContentEntityStorageBase {
 
   /**
    * {@inheritdoc}
