@@ -6,6 +6,20 @@ source:
     entity_type: node
 
 process:
+  # We skip field types that don't exist because they weren't migrated by the
+  # field migration.
+  field_type_exists:
+    -
+      plugin: migration
+      migration: d6_field
+      source:
+        - field_name
+    -
+      plugin: extract
+      index:
+        - 1
+    -
+      plugin: skip_row_on_empty
   entity_type: constants.entity_type
   field_name: field_name
   bundle: type_name

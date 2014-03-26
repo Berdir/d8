@@ -7,6 +7,20 @@ source:
     form_mode: default
 
 process:
+  # We skip field types that don't exist because they weren't migrated by the
+  # field migration.
+  field_type_exists:
+    -
+      plugin: migration
+      migration: d6_field
+      source:
+        - field_name
+    -
+      plugin: extract
+      index:
+        - 1
+    -
+      plugin: skip_row_on_empty
   bundle: type_name
   form_mode: constants.form_mode
   field_name: field_name
