@@ -490,8 +490,8 @@ function hook_node_create(\Drupal\node\NodeInterface $node) {
  *
  * This hook is invoked during node loading, which is handled by entity_load(),
  * via classes Drupal\node\NodeStorage and
- * Drupal\Core\Entity\DatabaseEntityStorage. After the node information and
- * field values are read from the database or the entity cache,
+ * Drupal\Core\Entity\ContentEntityDatabaseStorage. After the node information
+ * and field values are read from the database or the entity cache,
  * hook_entity_load() is invoked on all implementing modules, and finally
  * hook_node_load() is invoked on all implementing modules.
  *

@@ -15,15 +15,15 @@ use Drupal\Core\Database\Connection;
 use Drupal\field\FieldInfo;
 use Drupal\user\UserDataInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\Core\Entity\FieldableDatabaseEntityStorage;
+use Drupal\Core\Entity\ContentEntityDatabaseStorage;
 
 /**
  * Controller class for users.
  *
- * This extends the Drupal\Core\Entity\DatabaseEntityStorage class, adding
- * required special handling for user objects.
+ * This extends the Drupal\Core\Entity\ContentEntityDatabaseStorage class,
+ * adding required special handling for user objects.
  */
-class UserStorage extends FieldableDatabaseEntityStorage implements UserStorageInterface {
+class UserStorage extends ContentEntityDatabaseStorage implements UserStorageInterface {
 
   /**
    * Provides the password hashing service object.

@@ -8,14 +8,14 @@
 namespace Drupal\Core\Entity;
 
 /**
- * Defines a common interface for entity controller classes.
+ * Defines a common interface for entity storage classes.
  *
  * All entity controller classes specified via the "controllers['storage']" key
  * returned by \Drupal\Core\Entity\EntityManagerInterface or
  * hook_entity_type_alter() have to implement this interface.
  *
  * Most simple, SQL-based entity controllers will do better by extending
- * Drupal\Core\Entity\DatabaseEntityStorage instead of implementing this
+ * Drupal\Core\Entity\ContentEntityDatabaseStorage instead of implementing this
  * interface directly.
  */
 interface EntityStorageInterface {

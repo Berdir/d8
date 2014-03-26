@@ -136,7 +136,7 @@ interface EntityTypeInterface {
   /**
    * Indicates if the persistent cache of field data should be used.
    *
-   * @todo Used by FieldableEntityStorageBase only.
+   * @todo Used by ContentEntityStorageBase only.
    *
    * The persistent cache should usually only be disabled if a higher level
    * persistent cache is available for the entity type.
@@ -514,7 +514,7 @@ interface EntityTypeInterface {
   /**
    * Returns the name of the entity's base table.
    *
-   * @todo Used by DatabaseEntityStorage only.
+   * @todo Used by ContentEntityDatabaseStorage only.
    *
    * @return string|bool
    *   The name of the entity's base table, or FALSE if none exists.
@@ -544,7 +544,7 @@ interface EntityTypeInterface {
   /**
    * Returns the name of the entity's revision data table.
    *
-   * @todo Used by FieldableDatabaseEntityStorage only.
+   * @todo Used by ContentEntityDatabaseStorage only.
    *
    * @return string|bool
    *   The name of the entity type's revision data table.
@@ -554,7 +554,7 @@ interface EntityTypeInterface {
   /**
    * Returns the name of the entity's revision table.
    *
-   * @todo Used by FieldableDatabaseEntityStorage only.
+   * @todo Used by ContentEntityDatabaseStorage only.
    *
    * @return string|bool
    *   The name of the entity type's revision table.
@@ -564,7 +564,7 @@ interface EntityTypeInterface {
   /**
    * Returns the name of the entity's data table.
    *
-   * @todo Used by FieldableDatabaseEntityStorage only.
+   * @todo Used by ContentEntityDatabaseStorage only.
    *
    * @return string|bool
    *   The name of the entity type's data table.

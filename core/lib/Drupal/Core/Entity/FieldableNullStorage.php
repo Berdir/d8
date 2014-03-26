@@ -15,7 +15,7 @@ use Drupal\field\FieldInstanceConfigInterface;
  *
  * Used for content entity types that have no storage.
  */
-class FieldableNullStorage extends FieldableEntityStorageBase {
+class FieldableNullStorage extends ContentEntityStorageBase {
 
   /**
    * {@inheritdoc}

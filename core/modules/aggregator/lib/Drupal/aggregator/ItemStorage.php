@@ -9,17 +9,17 @@ namespace Drupal\aggregator;
 
 use Drupal\aggregator\Entity\Item;
 use Drupal\Core\Entity\Query\QueryInterface;
-use Drupal\Core\Entity\FieldableDatabaseEntityStorage;
+use Drupal\Core\Entity\ContentEntityDatabaseStorage;
 use Drupal\Core\Database\Query\PagerSelectExtender;
 use Drupal\Core\Database\Query\SelectInterface;
 
 /**
  * Controller class for aggregators items.
  *
- * This extends the Drupal\Core\Entity\DatabaseEntityStorage class, adding
- * required special handling for feed item entities.
+ * This extends the Drupal\Core\Entity\ContentEntityDatabaseStorage class,
+ * adding required special handling for feed item entities.
  */
-class ItemStorage extends FieldableDatabaseEntityStorage implements ItemStorageInterface {
+class ItemStorage extends ContentEntityDatabaseStorage implements ItemStorageInterface {
 
   /**
    * {@inheritdoc}

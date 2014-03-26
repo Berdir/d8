@@ -2,13 +2,13 @@
 
 /**
  * @file
- * Contains \Drupal\Tests\Core\Entity\FieldableDatabaseEntityStorageTest.
+ * Contains \Drupal\Tests\Core\Entity\ContentEntityDatabaseStorageTest.
  */
 
 namespace Drupal\Tests\Core\Entity;
 
 use Drupal\Core\Entity\EntityType;
-use Drupal\Core\Entity\FieldableDatabaseEntityStorage;
+use Drupal\Core\Entity\ContentEntityDatabaseStorage;
 use Drupal\Core\Field\FieldDefinition;
 use Drupal\Tests\UnitTestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -16,12 +16,12 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 /**
  * Tests the fieldable database storage.
  *
- * @see \Drupal\Core\Entity\FieldableDatabaseEntityStorage
+ * @see \Drupal\Core\Entity\ContentEntityDatabaseStorage
  *
  * @group Drupal
  * @group Entity
  */
-class FieldableDatabaseEntityStorageTest extends UnitTestCase {
+class ContentEntityDatabaseStorageTest extends UnitTestCase {
 
   /**
    * {@inheritdoc}
@@ -37,7 +37,7 @@ class FieldableDatabaseEntityStorageTest extends UnitTestCase {
   /**
    * Tests field SQL schema generation for an entity with a string identifier.
    *
-   * @see \Drupal\Core\Entity\Controller\FieldableDatabaseEntityStorage::_fieldSqlSchema()
+   * @see \Drupal\Core\Entity\Controller\ContentEntityDatabaseStorage::_fieldSqlSchema()
    */
   public function testFieldSqlSchemaForEntityWithStringIdentifier() {
     $field_type_manager = $this->getMock('Drupal\Core\Field\FieldTypePluginManagerInterface');
@@ -106,7 +106,7 @@ class FieldableDatabaseEntityStorageTest extends UnitTestCase {
       ->method('getSchema')
       ->will($this->returnValue($field_schema));
 
-    $schema = FieldableDatabaseEntityStorage::_fieldSqlSchema($field);
+    $schema = ContentEntityDatabaseStorage::_fieldSqlSchema($field);
 
     // Make sure that the entity_id schema field if of type varchar.
     $this->assertEquals($schema['test_entity__test_field']['fields']['entity_id']['type'], 'varchar');

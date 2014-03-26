@@ -7,7 +7,7 @@
 
 namespace Drupal\content_translation\Tests;
 
-use Drupal\Core\Entity\FieldableDatabaseEntityStorage;
+use Drupal\Core\Entity\ContentEntityDatabaseStorage;
 use Drupal\Core\Language\Language;
 use Drupal\simpletest\WebTestBase;
 
@@ -218,7 +218,7 @@ abstract class ContentTranslationTestBase extends WebTestBase {
       $entity_values[$bundle_key] = $bundle_name ?: $this->bundle;
     }
     $controller = $this->container->get('entity.manager')->getStorage($this->entityTypeId);
-    if (!($controller instanceof FieldableDatabaseEntityStorage)) {
+    if (!($controller instanceof ContentEntityDatabaseStorage)) {
       foreach ($values as $property => $value) {
         if (is_array($value)) {
           $entity_values[$property] = array($langcode => $value);

@@ -7,17 +7,17 @@
 
 namespace Drupal\menu_link;
 
-use Drupal\Core\Entity\DatabaseEntityStorage;
+use Drupal\Core\Entity\EntityDatabaseStorage;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
 
 /**
  * Controller class for menu links.
  *
- * This extends the Drupal\entity\DatabaseEntityStorage class, adding
+ * This extends the Drupal\entity\EntityDatabaseStorage class, adding
  * required special handling for menu_link entities.
  */
-class MenuLinkStorage extends DatabaseEntityStorage implements MenuLinkStorageInterface {
+class MenuLinkStorage extends EntityDatabaseStorage implements MenuLinkStorageInterface {
 
   /**
    * Indicates whether the delete operation should re-parent children items.
@@ -64,7 +64,7 @@ class MenuLinkStorage extends DatabaseEntityStorage implements MenuLinkStorageIn
         $entity->enforceIsNew();
       }
 
-      // Unlike the save() method from DatabaseEntityStorage, we invoke the
+      // Unlike the save() method from EntityDatabaseStorage, we invoke the
       // 'presave' hook first because we want to allow modules to alter the
       // entity before all the logic from our preSave() method.
       $this->invokeHook('presave', $entity);

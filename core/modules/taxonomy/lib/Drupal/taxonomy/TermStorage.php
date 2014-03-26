@@ -9,15 +9,15 @@ namespace Drupal\taxonomy;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Query\QueryInterface;
-use Drupal\Core\Entity\FieldableDatabaseEntityStorage;
+use Drupal\Core\Entity\ContentEntityDatabaseStorage;
 
 /**
  * Defines a Controller class for taxonomy terms.
  */
-class TermStorage extends FieldableDatabaseEntityStorage implements TermStorageInterface {
+class TermStorage extends ContentEntityDatabaseStorage implements TermStorageInterface {
 
   /**
-   * Overrides Drupal\Core\Entity\DatabaseEntityStorage::create().
+   * {@inheritdoc}
    *
    * @param array $values
    *   An array of values to set, keyed by property name. A value for the
@@ -33,7 +33,7 @@ class TermStorage extends FieldableDatabaseEntityStorage implements TermStorageI
   }
 
   /**
-   * Overrides Drupal\Core\Entity\DatabaseEntityStorage::buildPropertyQuery().
+   * {@inheritdoc}
    */
   protected function buildPropertyQuery(QueryInterface $entity_query, array $values) {
     if (isset($values['name'])) {
@@ -44,7 +44,7 @@ class TermStorage extends FieldableDatabaseEntityStorage implements TermStorageI
   }
 
   /**
-   * Overrides Drupal\Core\Entity\DatabaseEntityStorage::resetCache().
+   * {@inheritdoc}
    */
   public function resetCache(array $ids = NULL) {
     drupal_static_reset('taxonomy_term_count_nodes');

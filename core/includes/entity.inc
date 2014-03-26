@@ -138,7 +138,7 @@ function entity_get_view_modes($entity_type_id = NULL) {
  *
  * @see \Drupal\Core\Entity\EntityManagerInterface
  * @see \Drupal\Core\Entity\EntityStorageInterface
- * @see \Drupal\Core\Entity\DatabaseEntityStorage
+ * @see \Drupal\Core\Entity\ContentEntityDatabaseStorage
  * @see \Drupal\Core\Entity\Query\QueryInterface
  */
 function entity_load($entity_type, $id, $reset = FALSE) {
@@ -163,7 +163,7 @@ function entity_load($entity_type, $id, $reset = FALSE) {
  *
  * @see \Drupal\Core\Entity\EntityManagerInterface
  * @see \Drupal\Core\Entity\EntityStorageInterface
- * @see \Drupal\Core\Entity\DatabaseEntityStorage
+ * @see \Drupal\Core\Entity\ContentEntityDatabaseStorage
  */
 function entity_revision_load($entity_type, $revision_id) {
   return \Drupal::entityManager()
@@ -229,12 +229,13 @@ function entity_load_by_uuid($entity_type_id, $uuid, $reset = FALSE) {
  *
  * The actual loading is done through a class that has to implement the
  * Drupal\Core\Entity\EntityStorageInterface interface. By default,
- * Drupal\Core\Entity\DatabaseEntityStorage is used. Entity types can
- * specify that a different class should be used by setting the
+ * Drupal\Core\Entity\ContentEntityDatabaseStorage is used for content entities
+ * and Drupal\Core\Config\Entity\ConfigEntityStorage for config entities. Entity
+ * types can specify that a different class should be used by setting the
  * "controllers['storage']" key in the entity plugin annotation. These classes
  * can either implement the Drupal\Core\Entity\EntityStorageInterface
  * interface, or, most commonly, extend the
- * Drupal\Core\Entity\DatabaseEntityStorage class.
+ * Drupal\Core\Entity\ContentEntityDatabaseStorage class.
  * See Drupal\node\Entity\Node and Drupal\node\NodeStorage
  * for an example.
  *
@@ -250,7 +251,7 @@ function entity_load_by_uuid($entity_type_id, $uuid, $reset = FALSE) {
  *
  * @see \Drupal\Core\Entity\EntityManagerInterface
  * @see \Drupal\Core\Entity\EntityStorageInterface
- * @see \Drupal\Core\Entity\DatabaseEntityStorage
+ * @see \Drupal\Core\Entity\ContentEntityDatabaseStorage
  * @see \Drupal\Core\Entity\Query\QueryInterface
  */
 function entity_load_multiple($entity_type, array $ids = NULL, $reset = FALSE) {

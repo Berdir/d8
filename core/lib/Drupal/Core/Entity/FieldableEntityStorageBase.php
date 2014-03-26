@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\Core\Entity\FieldableEntityStorageBase.
+ * Contains \Drupal\Core\Entity\ContentEntityStorageBase.
  */
 
 namespace Drupal\Core\Entity;
@@ -13,7 +13,7 @@ use Drupal\field\FieldConfigInterface;
 use Drupal\field\FieldInstanceConfigInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-abstract class FieldableEntityStorageBase extends EntityStorageBase implements FieldableEntityStorageInterface {
+abstract class ContentEntityStorageBase extends EntityStorageBase implements ExtendableEntityStorageInterface {
 
   /**
    * The entity bundle key.
@@ -30,7 +30,7 @@ abstract class FieldableEntityStorageBase extends EntityStorageBase implements F
   protected $entityClass;
 
   /**
-   * Constructs a FieldableEntityStorageBase object.
+   * Constructs a ContentEntityStorageBase object.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
    *   The entity type definition.

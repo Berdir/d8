@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\Core\Entity\DatabaseEntityStorage.
+ * Contains \Drupal\Core\Entity\ContentEntityDatabaseStorage.
  */
 
 namespace Drupal\Core\Entity;
@@ -25,7 +25,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * This class can be used as-is by most simple entity types. Entity types
  * requiring special handling can extend the class.
  */
-class FieldableDatabaseEntityStorage extends FieldableEntityStorageBase {
+class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
 
   /**
    * Name of entity's revision database table field, if it supports revisions.
@@ -90,7 +90,7 @@ class FieldableDatabaseEntityStorage extends FieldableEntityStorageBase {
   }
 
   /**
-   * Constructs a DatabaseEntityStorage object.
+   * Constructs a ContentEntityDatabaseStorage object.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
    *   The entity type definition.

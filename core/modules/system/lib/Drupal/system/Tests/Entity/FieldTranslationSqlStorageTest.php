@@ -8,7 +8,7 @@
 namespace Drupal\system\Tests\Entity;
 
 use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\Core\Entity\FieldableDatabaseEntityStorage;
+use Drupal\Core\Entity\ContentEntityDatabaseStorage;
 use Drupal\Core\Language\Language;
 use Drupal\field\Field as FieldService;
 
@@ -93,8 +93,8 @@ class FieldTranslationSqlStorageTest extends EntityLanguageTestBase {
     foreach ($fields as $field_name) {
       $field = FieldService::fieldInfo()->getField($entity_type, $field_name);
       $tables = array(
-        FieldableDatabaseEntityStorage::_fieldTableName($field),
-        FieldableDatabaseEntityStorage::_fieldRevisionTableName($field),
+        ContentEntityDatabaseStorage::_fieldTableName($field),
+        ContentEntityDatabaseStorage::_fieldRevisionTableName($field),
       );
 
       foreach ($tables as $table) {

@@ -12,17 +12,17 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\field\FieldInfo;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\Core\Entity\FieldableDatabaseEntityStorage;
+use Drupal\Core\Entity\ContentEntityDatabaseStorage;
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\user\EntityOwnerInterface;
 
 /**
  * Defines the controller class for comments.
  *
- * This extends the Drupal\Core\Entity\DatabaseEntityStorage class, adding
- * required special handling for comment entities.
+ * This extends the Drupal\Core\Entity\ContentEntityDatabaseStorage class,
+ * adding required special handling for comment entities.
  */
-class CommentStorage extends FieldableDatabaseEntityStorage implements CommentStorageInterface {
+class CommentStorage extends ContentEntityDatabaseStorage implements CommentStorageInterface {
 
   /**
    * The comment statistics service.

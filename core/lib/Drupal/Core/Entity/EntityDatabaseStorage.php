@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\Core\Entity\DatabaseEntityStorage.
+ * Contains \Drupal\Core\Entity\EntityDatabaseStorage.
  */
 
 namespace Drupal\Core\Entity;
@@ -26,7 +26,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * This class only supports bare, non-content entities.
  */
-class DatabaseEntityStorage extends EntityStorageBase {
+class EntityDatabaseStorage extends EntityStorageBase {
 
   /**
    * The UUID service.
@@ -68,7 +68,7 @@ class DatabaseEntityStorage extends EntityStorageBase {
   }
 
   /**
-   * Constructs a DatabaseEntityStorage object.
+   * Constructs a EntityDatabaseStorage object.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
    *   The entity type definition.

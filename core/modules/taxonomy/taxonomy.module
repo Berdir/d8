@@ -6,7 +6,7 @@
  */
 
 use Drupal\Component\Utility\Tags;
-use Drupal\Core\Entity\FieldableDatabaseEntityStorage;
+use Drupal\Core\Entity\ContentEntityDatabaseStorage;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\file\FileInterface;
 use Drupal\node\Entity\Node;
@@ -824,7 +824,7 @@ function taxonomy_node_insert(EntityInterface $node) {
 function taxonomy_build_node_index($node) {
   // We maintain a denormalized table of term/node relationships, containing
   // only data for current, published nodes.
-  if (!\Drupal::config('taxonomy.settings')->get('maintain_index_table') || !(\Drupal::entityManager()->getStorage('node') instanceof FieldableDatabaseEntityStorage)) {
+  if (!\Drupal::config('taxonomy.settings')->get('maintain_index_table') || !(\Drupal::entityManager()->getStorage('node') instanceof ContentEntityDatabaseStorage)) {
     return;
   }
 

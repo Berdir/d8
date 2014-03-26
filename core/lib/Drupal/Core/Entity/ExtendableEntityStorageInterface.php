@@ -10,7 +10,7 @@ namespace Drupal\Core\Entity;
 use Drupal\field\FieldConfigInterface;
 use Drupal\field\FieldInstanceConfigInterface;
 
-interface FieldableEntityStorageInterface extends EntityStorageInterface {
+interface ExtendableEntityStorageInterface extends EntityStorageInterface {
 
   /**
    * Allows reaction to the creation of a configurable field.

@@ -8,15 +8,15 @@
 namespace Drupal\aggregator;
 
 use Drupal\aggregator\FeedInterface;
-use Drupal\Core\Entity\FieldableDatabaseEntityStorage;
+use Drupal\Core\Entity\ContentEntityDatabaseStorage;
 
 /**
  * Controller class for aggregator's feeds.
  *
- * This extends the Drupal\Core\Entity\DatabaseEntityStorage class, adding
- * required special handling for feed entities.
+ * This extends the Drupal\Core\Entity\ContentEntityDatabaseStorage class,
+ * adding required special handling for feed entities.
  */
-class FeedStorage extends FieldableDatabaseEntityStorage implements FeedStorageInterface {
+class FeedStorage extends ContentEntityDatabaseStorage implements FeedStorageInterface {
 
   /**
    * {@inheritdoc}

@@ -7,12 +7,12 @@
 
 namespace Drupal\file;
 
-use Drupal\Core\Entity\FieldableDatabaseEntityStorage;
+use Drupal\Core\Entity\ContentEntityDatabaseStorage;
 
 /**
  * File storage for files.
  */
-class FileStorage extends FieldableDatabaseEntityStorage implements FileStorageInterface {
+class FileStorage extends ContentEntityDatabaseStorage implements FileStorageInterface {
 
   /**
    * {@inheritdoc}

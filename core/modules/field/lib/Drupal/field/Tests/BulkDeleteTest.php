@@ -7,7 +7,7 @@
 
 namespace Drupal\field\Tests;
 
-use Drupal\Core\Entity\FieldableDatabaseEntityStorage;
+use Drupal\Core\Entity\ContentEntityDatabaseStorage;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\field\FieldConfigInterface;
 
@@ -186,9 +186,9 @@ class BulkDeleteTest extends FieldUnitTestBase {
     $this->assertEqual($instance->bundle, $bundle, 'The deleted instance is for the correct bundle');
 
     // Check that the actual stored content did not change during delete.
-    $schema = FieldableDatabaseEntityStorage::_fieldSqlSchema($field);
-    $table = FieldableDatabaseEntityStorage::_fieldTableName($field);
-    $column = FieldableDatabaseEntityStorage::_fieldColumnName($field, 'value');
+    $schema = ContentEntityDatabaseStorage::_fieldSqlSchema($field);
+    $table = ContentEntityDatabaseStorage::_fieldTableName($field);
+    $column = ContentEntityDatabaseStorage::_fieldColumnName($field, 'value');
     $result = db_select($table, 't')
       ->fields('t', array_keys($schema[$table]['fields']))
       ->execute();
