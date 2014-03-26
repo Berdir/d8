@@ -41,16 +41,6 @@ class PathBasedBreadcrumbBuilder extends BreadcrumbBuilderBase {
   protected $accessManager;
 
   /**
-<<<<<<< HEAD
-=======
-   * The menu storage.
-   *
-   * @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface
-   */
-  protected $menuStorage;
-
-  /**
->>>>>>> applied patch
    * The dynamic router service.
    *
    * @var \Symfony\Component\Routing\Matcher\RequestMatcherInterface
@@ -106,10 +96,6 @@ class PathBasedBreadcrumbBuilder extends BreadcrumbBuilderBase {
   public function __construct(Request $request, AccessManager $access_manager, RequestMatcherInterface $router, InboundPathProcessorInterface $path_processor, ConfigFactoryInterface $config_factory, TitleResolverInterface $title_resolver, AccountInterface $current_user) {
     $this->request = $request;
     $this->accessManager = $access_manager;
-<<<<<<< HEAD
-=======
-    $this->menuStorage = $entity_manager->getStorage('menu');
->>>>>>> applied patch
     $this->router = $router;
     $this->pathProcessor = $path_processor;
     $this->config = $config_factory->get('system.site');
