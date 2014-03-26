@@ -54,7 +54,7 @@ class MenuFormController extends EntityFormController {
    * @param \Drupal\Core\Entity\Query\QueryFactory $entity_query_factory
    *   The factory for entity queries.
    * @param \Drupal\menu_link\MenuLinkStorageInterface $menu_link_storage
-   *   The menu link storage controller.
+   *   The menu link storage.
    * @param \Drupal\menu_link\MenuTreeInterface $menu_tree
    *   The menu tree service.
    */

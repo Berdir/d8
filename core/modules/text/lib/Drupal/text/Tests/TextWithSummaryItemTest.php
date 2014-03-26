@@ -153,7 +153,7 @@ class TextWithSummaryItemTest extends FieldUnitTestBase {
         ),
       ),
     );
-    \Drupal::entityManager()->getStorageController($entity_type)->resetCache();
+    \Drupal::entityManager()->getStorage($entity_type)->resetCache();
     \Drupal::cache('entity')->set("values:$entity_type:" . $entity->id(), $data);
     $entity = entity_load($entity_type, $entity->id());
     $this->assertEqual($entity->summary_field->processed, 'Cached processed value');
