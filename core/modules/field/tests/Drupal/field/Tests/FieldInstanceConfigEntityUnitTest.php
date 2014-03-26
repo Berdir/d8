@@ -109,8 +109,8 @@ class FieldInstanceConfigEntityUnitTest extends UnitTestCase {
       ->method('getConfigDependencyName')
       ->will($this->returnValue('test.test_entity_type.id'));
 
-    $storage_controller = $this->getMock('\Drupal\Core\Config\Entity\ConfigEntityStorageInterface');
-    $storage_controller
+    $storage = $this->getMock('\Drupal\Core\Config\Entity\ConfigEntityStorageInterface');
+    $storage
       ->expects($this->any())
       ->method('load')
       ->with('test_bundle')
@@ -119,7 +119,7 @@ class FieldInstanceConfigEntityUnitTest extends UnitTestCase {
     $this->entityManager->expects($this->any())
       ->method('getStorage')
       ->with('bundle_entity_type')
-      ->will($this->returnValue($storage_controller));
+      ->will($this->returnValue($storage));
 
     $target_entity_type = $this->getMock('\Drupal\Core\Entity\EntityTypeInterface');
     $target_entity_type->expects($this->any())
