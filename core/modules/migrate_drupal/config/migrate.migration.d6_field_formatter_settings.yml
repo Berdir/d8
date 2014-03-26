@@ -32,13 +32,13 @@ process:
           text:
             default: text_default
             trimmed: text_trimmed
-          number_integer:
+          integer:
             default: number_integer
             us_0: number_integer
             be_0: number_integer
             fr_0: number_integer
             unformatted: number_unformatted
-          number_float:
+          float:
             default: number_decimal
             us_0: number_decimal
             us_1: number_decimal
@@ -50,7 +50,7 @@ process:
             fr_1: number_decimal
             fr_2: number_decimal
             unformatted: number_unformatted
-          number_decimal:
+          decimal:
             default: number_decimal
             us_0: number_decimal
             us_1: number_decimal

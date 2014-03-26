@@ -26,7 +26,6 @@ class MigrateProfileValuesTest extends MigrateDrupalTestBase {
     'link',
     'options',
     'datetime',
-    'number',
     'text',
     'file',
     'image',

@@ -21,8 +21,7 @@ class MigrateFieldWidgetSettingsTest extends MigrateDrupalTestBase {
    * @var array
    */
   public static $modules = array(
-    'number',
-    'email',
+    'field',
     'telephone',
     'link',
     'file',

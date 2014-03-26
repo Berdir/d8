@@ -15,7 +15,7 @@ use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
  */
 class MigrateUserProfileFieldInstanceTest extends MigrateDrupalTestBase {
 
-  static $modules = array('link', 'options', 'datetime', 'number', 'text');
+  static $modules = array('field', 'link', 'options', 'datetime', 'text');
 
   /**
    * {@inheritdoc}

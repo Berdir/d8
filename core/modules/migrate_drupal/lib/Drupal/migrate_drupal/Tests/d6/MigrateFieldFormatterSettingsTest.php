@@ -98,7 +98,7 @@ class MigrateFieldFormatterSettingsTest extends MigrateDrupalTestBase {
 
     // Test the number field formatter settings are correct.
     $expected['weight'] = 2;
-    $expected['type'] = 'number_integer';
+    $expected['type'] = 'integer';
     $expected['settings'] = array(
       'scale' => 0,
       'decimal_separator' => '.',

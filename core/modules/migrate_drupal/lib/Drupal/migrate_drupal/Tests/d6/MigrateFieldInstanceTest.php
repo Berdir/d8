@@ -21,14 +21,13 @@ class MigrateFieldInstanceTest extends MigrateDrupalTestBase {
    * @var array
    */
   public static $modules = array(
-    'number',
-    'email',
     'telephone',
     'link',
     'file',
     'image',
     'datetime',
     'node',
+    'field'
   );
 
   /**
@@ -131,8 +130,8 @@ class MigrateFieldInstanceTest extends MigrateDrupalTestBase {
   protected function createFields() {
     $fields = array(
       'field_test' => 'text',
-      'field_test_two' => 'number_integer',
-      'field_test_three' => 'number_float',
+      'field_test_two' => 'integer',
+      'field_test_three' => 'decimal',
       'field_test_email' => 'email',
       'field_test_link' => 'link',
       'field_test_filefield' => 'file',
