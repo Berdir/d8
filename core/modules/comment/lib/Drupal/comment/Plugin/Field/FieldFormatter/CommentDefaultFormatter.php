@@ -35,6 +35,15 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class CommentDefaultFormatter extends FormatterBase implements ContainerFactoryPluginInterface {
 
   /**
+   * {@inheritdoc}
+   */
+  public static function defaultSettings() {
+    return array(
+      'pager_id' => 0,
+    ) + parent::defaultSettings();
+  }
+
+  /**
    * The comment storage.
    *
    * @var \Drupal\comment\CommentStorageInterface
