@@ -33,15 +33,16 @@ class ConfigEntityTypeTest extends UnitTestCase {
    * Tests that we get an exception when the config prefix is too long.
    *
    * @expectedException \Drupal\Core\Config\ConfigPrefixLengthException
-   * @expectedExceptionMessage The extra_long_provider_name.long_random_configuration_prefix_so_that_go_over_the_limit12 config_prefix length is larger than the maximum limit of 83 characters
+   * @expectedExceptionMessage The extra_long_provider_name.long_random_configuration_prefix_so_that_go_over_the_limit1 config_prefix length is larger than the maximum limit of 83 characters
    * @covers ::getConfigPrefix()
    */
   public function testConfigPrefixLengthWithPrefixExceeds() {
-    // A config entity with a provider length of 24 and config_prefix length of 60
-    // (+1 for the .) results in a config length of 85, which is too long.
+    // A config entity with a provider length of 24 and config_prefix length of
+    // 59 (+1 for the .) results in a config length of 84, which is too long.
+    // Uses a manual string so that we know the thrown exception message.
     $config_entity = new ConfigEntityType(array(
       'provider' => 'extra_long_provider_name',
-      'config_prefix' => 'long_random_configuration_prefix_so_that_go_over_the_limit12',
+      'config_prefix' => 'long_random_configuration_prefix_so_that_go_over_the_limit1',
     ));
     $this->assertEmpty($config_entity->getConfigPrefix());
   }
@@ -50,15 +51,16 @@ class ConfigEntityTypeTest extends UnitTestCase {
    * Tests that we get an exception when the id is too long.
    *
    * @expectedException \Drupal\Core\Config\ConfigPrefixLengthException
-   * @expectedExceptionMessage The extra_long_provider_name.long_random_entity_id_so_that_we_will_go_over_the_limit12345 config_prefix length is larger than the maximum limit of 83 characters
+   * @expectedExceptionMessage The extra_long_provider_name.long_random_entity_id_so_that_we_will_go_over_the_limit1234 config_prefix length is larger than the maximum limit of 83 characters
    * @covers ::getConfigPrefix()
    */
   public function testConfigPrefixLengthWithIdExceeds() {
-    // A config entity with an provider length of 24 and id length of 60
-    // (+1 for the .) results in a config length of 85, which is too long.
+    // A config entity with an provider length of 24 and id length of 59
+    // (+1 for the .) results in a config length of 84, which is too long.
+    // Uses a manual string so that we know the thrown exception message.
     $config_entity = new ConfigEntityType(array(
       'provider' => 'extra_long_provider_name',
-      'id' => 'long_random_entity_id_so_that_we_will_go_over_the_limit12345',
+      'id' => 'long_random_entity_id_so_that_we_will_go_over_the_limit1234',
     ));
     $this->assertEmpty($config_entity->getConfigPrefix());
   }
@@ -69,8 +71,9 @@ class ConfigEntityTypeTest extends UnitTestCase {
    * @covers ::getConfigPrefix()
    */
   public function testConfigPrefixLengthWithPrefixValid() {
-    // A config entity with a provider length of 24 and config_prefix length of 58
-    // (+1 for the .) results in a config length of 83, which is right at the limit.
+    // A config entity with a provider length of 24 and config_prefix length of
+    // 58 (+1 for the .) results in a config length of 83, which is right at the
+    // limit.
     $entity_data = array(
       'provider' => $this->randomName(24),
       'config_prefix' => $this->randomName(58),
@@ -87,7 +90,8 @@ class ConfigEntityTypeTest extends UnitTestCase {
    */
   public function testConfigPrefixLengthWithIdValid() {
     // A config entity with an provider length of 24 and id length of 58
-    // (+1 for the .) results in a config length of 83, which is right at the limit.
+    // (+1 for the .) results in a config length of 83, which is right at the
+    // limit.
     $entity_data = array(
       'provider' => $this->randomName(24),
       'id' => $this->randomName(58),
