@@ -33,7 +33,7 @@ class ConfigEntityTypeTest extends UnitTestCase {
    * Tests that we get an exception when the config prefix is too long.
    *
    * @expectedException \Drupal\Core\Config\ConfigPrefixLengthException
-   * @expectedExceptionMessage The extra_long_provider_name.long_random_configuration_prefix_so_that_go_over_the_limit1 config_prefix length is larger than the maximum limit of 83 characters
+   * @expectedExceptionMessage The configuration file name prefix extra_long_provider_name.long_random_configuration_prefix_so_that_go_over_the_limit1 exceeds the maximum character limit of 83
    * @covers ::getConfigPrefix()
    */
   public function testConfigPrefixLengthWithPrefixExceeds() {
@@ -51,7 +51,7 @@ class ConfigEntityTypeTest extends UnitTestCase {
    * Tests that we get an exception when the id is too long.
    *
    * @expectedException \Drupal\Core\Config\ConfigPrefixLengthException
-   * @expectedExceptionMessage The extra_long_provider_name.long_random_entity_id_so_that_we_will_go_over_the_limit1234 config_prefix length is larger than the maximum limit of 83 characters
+   * @expectedExceptionMessage The configuration file name prefix extra_long_provider_name.long_random_entity_id_so_that_we_will_go_over_the_limit1234 exceeds the maximum character limit of 83
    * @covers ::getConfigPrefix()
    */
   public function testConfigPrefixLengthWithIdExceeds() {

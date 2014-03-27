@@ -17,6 +17,13 @@ use Drupal\Component\Utility\String;
 class ConfigEntityType extends EntityType {
 
   /**
+   * Length limit of the config prefix returned by getConfigPrefix().
+   *
+   * @see \Drupal\Core\Config\ConfigBase::MAX_NAME_LENGTH
+   */
+  const PREFIX_LENGTH = 83;
+
+  /**
    * Returns the config prefix used by the configuration entity type.
    *
    * @var string
@@ -48,10 +55,10 @@ class ConfigEntityType extends EntityType {
       $config_prefix = $this->provider . '.' . $this->id();
     }
 
-    if (strlen($config_prefix) > 83) {
-      throw new ConfigPrefixLengthException(String::format('The @config_prefix config_prefix length is larger than the maximum limit of @char_count characters', array(
+    if (strlen($config_prefix) > static::PREFIX_LENGTH) {
+      throw new ConfigPrefixLengthException(String::format('The configuration file name prefix @config_prefix exceeds the maximum character limit of @max_char', array(
         '@config_prefix' => $config_prefix,
-        '@char_count' => 83,
+        '@max_char' => static::PREFIX_LENGTH,
       )));
     }
     return $config_prefix;
