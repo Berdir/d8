@@ -16,6 +16,7 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Database\ConnectionNotDefinedException;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\Core\Session\UserSession;
 use Drupal\Core\StreamWrapper\PublicStream;
 use Drupal\Core\Datetime\DrupalDateTime;
@@ -207,7 +208,7 @@ abstract class WebTestBase extends TestBase {
    */
   function drupalGetNodeByTitle($title, $reset = FALSE) {
     if ($reset) {
-      \Drupal::entityManager()->getStorageController('node')->resetCache();
+      \Drupal::entityManager()->getStorage('node')->resetCache();
     }
     $nodes = entity_load_multiple_by_properties('node', array('title' => $title));
     // Load the first node returned from the database.
@@ -354,6 +355,7 @@ abstract class WebTestBase extends TestBase {
    *   - region: 'sidebar_first'.
    *   - theme: The default theme.
    *   - visibility: Empty array.
+   *   - cache: array('max_age' => 0).
    *
    * @return \Drupal\block\Entity\Block
    *   The block entity.
@@ -370,6 +372,9 @@ abstract class WebTestBase extends TestBase {
       'label' => $this->randomName(8),
       'visibility' => array(),
       'weight' => 0,
+      'cache' => array(
+        'max_age' => 0,
+      ),
     );
     foreach (array('region', 'id', 'theme', 'plugin', 'visibility', 'weight') as $key) {
       $values[$key] = $settings[$key];
@@ -724,7 +729,7 @@ abstract class WebTestBase extends TestBase {
       // @see WebTestBase::drupalUserIsLoggedIn()
       unset($this->loggedInUser->session_id);
       $this->loggedInUser = FALSE;
-      $this->container->set('current_user', drupal_anonymous_user());
+      $this->container->set('current_user', new AnonymousUserSession());
     }
   }
 

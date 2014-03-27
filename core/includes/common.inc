@@ -18,9 +18,11 @@ use Symfony\Component\Yaml\Exception\ParseException;
 use Drupal\Component\PhpStorage\PhpStorageFactory;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Datetime\DrupalDateTime;
+use Drupal\Core\EventSubscriber\HtmlViewSubscriber;
 use Drupal\Core\Routing\GeneratorNotInitializedException;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Session\AnonymousUserSession;
 
 /**
  * @file
@@ -132,78 +134,6 @@ const JS_DEFAULT = 0;
 const JS_THEME = 100;
 
 /**
- * @defgroup block_caching Block Caching
- * @{
- * Constants that define each block's caching state.
- *
- * Modules specify how their blocks can be cached in their hook_block_info()
- * implementations. Caching can be turned off (DRUPAL_NO_CACHE), managed by the
- * module declaring the block (DRUPAL_CACHE_CUSTOM), or managed by the core
- * Block module. If the Block module is managing the cache, you can specify that
- * the block is the same for every page and user (DRUPAL_CACHE_GLOBAL), or that
- * it can change depending on the page (DRUPAL_CACHE_PER_PAGE) or by user
- * (DRUPAL_CACHE_PER_ROLE or DRUPAL_CACHE_PER_USER). Page and user settings can
- * be combined with a bitwise-binary or operator; for example,
- * DRUPAL_CACHE_PER_ROLE | DRUPAL_CACHE_PER_PAGE means that the block can change
- * depending on the user role or page it is on.
- *
- * The block cache is cleared when the 'content' cache tag is invalidated,
- * following the same pattern as the page cache (node, comment, user, taxonomy
- * added or updated...).
- *
- * Note that user 1 is excluded from block caching.
- */
-
-/**
- * The block should not get cached.
- *
- * This setting should be used:
- * - For simple blocks (notably those that do not perform any db query), where
- *   querying the db cache would be more expensive than directly generating the
- *   content.
- * - For blocks that change too frequently.
- */
-const DRUPAL_NO_CACHE = -1;
-
-/**
- * The block is handling its own caching in its hook_block_view().
- *
- * This setting is useful when time based expiration is needed or a site uses a
- * node access which invalidates standard block cache.
- */
-const DRUPAL_CACHE_CUSTOM = -2;
-
-/**
- * The block or element can change depending on the user's roles.
- *
- * This is the default setting for blocks, used when the block does not specify
- * anything.
- */
-const DRUPAL_CACHE_PER_ROLE = 0x0001;
-
-/**
- * The block or element can change depending on the user.
- *
- * This setting can be resource-consuming for sites with large number of users,
- * and thus should only be used when DRUPAL_CACHE_PER_ROLE is not sufficient.
- */
-const DRUPAL_CACHE_PER_USER = 0x0002;
-
-/**
- * The block or element can change depending on the page being viewed.
- */
-const DRUPAL_CACHE_PER_PAGE = 0x0004;
-
-/**
- * The block or element is the same for every user and page that it is visible.
- */
-const DRUPAL_CACHE_GLOBAL = 0x0008;
-
-/**
- * @} End of "defgroup block_caching".
- */
-
-/**
  * The delimiter used to split plural strings.
  *
  * This is the ETX (End of text) character and is used as a minimal means to
@@ -279,7 +209,7 @@ function drupal_get_profile() {
     }
   }
   else {
-    $profile = settings()->get('install_profile') ?: 'standard';
+    $profile = Settings::get('install_profile') ?: 'standard';
   }
 
   return $profile;
@@ -568,7 +498,7 @@ function _external_url_is_local($url) {
  *   TRUE if a proxy should be used for this host.
  */
 function _drupal_http_use_proxy($host) {
-  $proxy_exceptions = settings()->get('proxy_exceptions', array('localhost', '127.0.0.1'));
+  $proxy_exceptions = Settings::get('proxy_exceptions', array('localhost', '127.0.0.1'));
   return !in_array(strtolower($host), $proxy_exceptions, TRUE);
 }
 
@@ -2143,7 +2073,12 @@ function _drupal_add_js($data = NULL, $options = NULL) {
             ksort($current_query);
             $path['currentQuery'] = (object) $current_query;
           }
-          $javascript['settings']['data'][] = array('path' => $path);
+          $javascript['settings']['data'][] = array(
+            'path' => $path,
+            'locale' => array(
+              'pluralDelimiter' => LOCALE_PLURAL_DELIMITER,
+            ),
+          );
         }
         // All JavaScript settings are placed in the header of the page with
         // the library weight so that inline scripts appear afterwards.
@@ -3149,11 +3084,11 @@ function drupal_valid_token($token, $value = '', $skip_anonymous = FALSE) {
  * Loads code for subsystems and modules, and registers stream wrappers.
  */
 function _drupal_bootstrap_code() {
-  require_once __DIR__ . '/../../' . settings()->get('path_inc', 'core/includes/path.inc');
+  require_once __DIR__ . '/../../' . Settings::get('path_inc', 'core/includes/path.inc');
   require_once __DIR__ . '/module.inc';
   require_once __DIR__ . '/theme.inc';
   require_once __DIR__ . '/pager.inc';
-  require_once __DIR__ . '/../../' . settings()->get('menu_inc', 'core/includes/menu.inc');
+  require_once __DIR__ . '/../../' . Settings::get('menu_inc', 'core/includes/menu.inc');
   require_once __DIR__ . '/tablesort.inc';
   require_once __DIR__ . '/file.inc';
   require_once __DIR__ . '/unicode.inc';
@@ -3241,7 +3176,7 @@ function drupal_page_set_cache(Response $response, Request $request) {
         // because by the time it is read, the configuration might change.
         'page_compressed' => $page_compressed,
       ),
-      'tags' => array('content' => TRUE) + drupal_cache_tags_page_get($response),
+      'tags' => HtmlViewSubscriber::convertHeaderToCacheTags($response->headers->get('X-Drupal-Cache-Tags')),
       'expire' => Cache::PERMANENT,
       'created' => REQUEST_TIME,
     );
@@ -3264,7 +3199,7 @@ function drupal_page_set_cache(Response $response, Request $request) {
       if ($page_compressed) {
         $cache->data['body'] = gzencode($cache->data['body'], 9, FORCE_GZIP);
       }
-      \Drupal::cache('page')->set($cache->cid, $cache->data, $cache->expire, $cache->tags);
+      \Drupal::cache('render')->set($cache->cid, $cache->data, $cache->expire, $cache->tags);
     }
     return $cache;
   }
@@ -3718,16 +3653,12 @@ function drupal_render_page($page) {
  *     associative array with one or several of the following keys:
  *     - 'keys': An array of one or more keys that identify the element. If
  *       'keys' is set, the cache ID is created automatically from these keys.
- *       See drupal_render_cid_create().
- *     - 'granularity' (optional): Define the cache granularity using binary
- *       combinations of the cache granularity constants, e.g.
- *       DRUPAL_CACHE_PER_USER to cache for each user separately or
- *       DRUPAL_CACHE_PER_PAGE | DRUPAL_CACHE_PER_ROLE to cache separately for
- *       each page and role. If not specified the element is cached globally for
- *       each theme and language.
+ *       Cache keys may either be static (just strings) or tokens (placeholders
+ *       that are converted to static keys by the @cache_contexts service,
+ *       depending on the request). See drupal_render_cid_create().
  *     - 'cid': Specify the cache ID directly. Either 'keys' or 'cid' is
- *       required. If 'cid' is set, 'keys' and 'granularity' are ignored. Use
- *       only if you have special requirements.
+ *       required. If 'cid' is set, 'keys' is ignored. Use only if you have
+ *       special requirements.
  *     - 'expire': Set to one of the cache lifetime constants.
  *     - 'bin': Specify a cache bin to cache the element in. Default is 'cache'.
  *   - If this element has #type defined and the default attributes for this
@@ -4149,7 +4080,7 @@ function drupal_render_cache_get(array $elements) {
   if (!\Drupal::request()->isMethodSafe() || !$cid = drupal_render_cid_create($elements)) {
     return FALSE;
   }
-  $bin = isset($elements['#cache']['bin']) ? $elements['#cache']['bin'] : 'cache';
+  $bin = isset($elements['#cache']['bin']) ? $elements['#cache']['bin'] : 'render';
 
   if (!empty($cid) && $cache = \Drupal::cache($bin)->get($cid)) {
     $cached_element = $cache->data;
@@ -4207,7 +4138,7 @@ function drupal_render_cache_set(&$markup, array $elements) {
     $data['#cache']['tags'] = $elements['#cache']['tags'];
   }
 
-  $bin = isset($elements['#cache']['bin']) ? $elements['#cache']['bin'] : 'cache';
+  $bin = isset($elements['#cache']['bin']) ? $elements['#cache']['bin'] : 'render';
   $expire = isset($elements['#cache']['expire']) ? $elements['#cache']['expire'] : Cache::PERMANENT;
   \Drupal::cache($bin)->set($cid, $data, $expire, $elements['#cache']['tags']);
 }
@@ -4494,117 +4425,10 @@ function drupal_render_collect_cache_tags($element, $tags = array()) {
 }
 
 /**
- * Return the cache tags that were stored during drupal_render_page().
- *
- * @param \Symfony\Component\HttpFoundation\Response $response
- *   The response object.
- * @return array
- *   An array of cache tags.
- *
- * @see \Drupal\Core\EventSubscriber\HtmlViewSubscriber::onHtmlPage()
- */
-function drupal_cache_tags_page_get(Response $response) {
-  if (($tags = $response->headers->get('cache_tags')) && $tags = unserialize($tags)) {
-    return $tags;
-  }
-  return array();
-}
-
-/**
- * Prepares an element for caching based on a query.
- *
- * This smart caching strategy saves Drupal from querying and rendering to HTML
- * when the underlying query is unchanged.
- *
- * Expensive queries should use the query builder to create the query and then
- * call this function. Executing the query and formatting results should happen
- * in a #pre_render callback.
- *
- * @param $query
- *   A select query object as returned by db_select().
- * @param $function
- *   The name of the function doing this caching. A _pre_render suffix will be
- *   added to this string and is also part of the cache key in
- *   drupal_render_cache_set() and drupal_render_cache_get().
- * @param $expire
- *   The cache expire time, passed eventually to \Drupal::cache()->set().
- * @param $granularity
- *   One or more granularity constants passed to drupal_render_cid_parts().
- *
- * @return
- *   A renderable array with the following keys and values:
- *   - #query: The passed-in $query.
- *   - #pre_render: $function with a _pre_render suffix.
- *   - #cache: An associative array prepared for drupal_render_cache_set().
- */
-function drupal_render_cache_by_query($query, $function, $expire = Cache::PERMANENT, $granularity = NULL) {
-  $cache_keys = array_merge(array($function), drupal_render_cid_parts($granularity));
-  $query->preExecute();
-  $cache_keys[] = hash('sha256', serialize(array((string) $query, $query->getArguments())));
-  return array(
-    '#query' => $query,
-    '#pre_render' => array($function . '_pre_render'),
-    '#cache' => array(
-      'keys' => $cache_keys,
-      'expire' => $expire,
-    ),
-  );
-}
-
-/**
- * Returns cache ID parts for building a cache ID.
- *
- * @param $granularity
- *   One or more cache granularity constants. For example, to cache separately
- *   for each user, use DRUPAL_CACHE_PER_USER. To cache separately for each
- *   page and role, use the expression:
- *   @code
- *   DRUPAL_CACHE_PER_PAGE | DRUPAL_CACHE_PER_ROLE
- *   @endcode
- *
- * @return
- *   An array of cache ID parts, always containing the active theme. If the
- *   locale module is enabled it also contains the active language. If
- *   $granularity was passed in, more parts are added.
- */
-function drupal_render_cid_parts($granularity = NULL) {
-  global $theme, $base_root;
-
-  $cid_parts[] = $theme;
-
-  // If we have only one language enabled we do not need it as cid part.
-  $language_manager = \Drupal::languageManager();
-  if ($language_manager->isMultilingual()) {
-    foreach ($language_manager->getLanguageTypes() as $type) {
-      $cid_parts[] = $language_manager->getCurrentLanguage($type)->id;
-    }
-  }
-
-  if (!empty($granularity)) {
-    // 'PER_ROLE' and 'PER_USER' are mutually exclusive. 'PER_USER' can be a
-    // resource drag for sites with many users, so when a module is being
-    // equivocal, we favor the less expensive 'PER_ROLE' pattern.
-    if ($granularity & DRUPAL_CACHE_PER_ROLE) {
-      $cid_parts[] = 'r.' . implode(',', \Drupal::currentUser()->getRoles());
-    }
-    elseif ($granularity & DRUPAL_CACHE_PER_USER) {
-      $cid_parts[] = 'u.' . \Drupal::currentUser()->id();
-    }
-
-    if ($granularity & DRUPAL_CACHE_PER_PAGE) {
-      $cid_parts[] = $base_root . request_uri();
-    }
-  }
-
-  return $cid_parts;
-}
-
-/**
  * Creates the cache ID for a renderable element.
  *
  * This creates the cache ID string, either by returning the #cache['cid']
- * property if present or by building the cache ID out of the #cache['keys']
- * and, optionally, the #cache['granularity'] properties.
+ * property if present or by building the cache ID out of the #cache['keys'].
  *
  * @param $elements
  *   A renderable array.
@@ -4617,56 +4441,14 @@ function drupal_render_cid_create($elements) {
     return $elements['#cache']['cid'];
   }
   elseif (isset($elements['#cache']['keys'])) {
-    $granularity = isset($elements['#cache']['granularity']) ? $elements['#cache']['granularity'] : NULL;
-    // Merge in additional cache ID parts based provided by drupal_render_cid_parts().
-    $cid_parts = array_merge($elements['#cache']['keys'], drupal_render_cid_parts($granularity));
-    return implode(':', $cid_parts);
+    // Cache keys may either be static (just strings) or tokens (placeholders
+    // that are converted to static keys by the @cache_contexts service,
+    // depending on the request).
+    $cache_contexts = \Drupal::service("cache_contexts");
+    $keys = $cache_contexts->convertTokensToKeys($elements['#cache']['keys']);
+    return implode(':', $keys);
   }
   return FALSE;
-}
-
-/**
- * Sorts a structured array by '#weight' property.
- *
- * Callback for uasort() within element_children().
- *
- * @param $a
- *   First item for comparison. The compared items should be associative arrays
- *   that optionally include a '#weight' key.
- * @param $b
- *   Second item for comparison.
- *
- * @return int
- *   The comparison result for uasort().
- *
- * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
- *   Use \Drupal\Component\Utility\SortArray::sortByWeightProperty().
- */
-function element_sort($a, $b) {
-  return SortArray::sortByWeightProperty($a, $b);
-}
-
-/**
- * Sorts a structured array by '#title' property.
- *
- * Callback for uasort() within:
- * - system_modules()
- * - theme_simpletest_test_table()
- *
- * @param $a
- *   First item for comparison. The compared items should be associative arrays
- *   that optionally include a '#title' key.
- * @param $b
- *   Second item for comparison.
- *
- * @return int
- *   The comparison result for uasort().
- *
- * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
- *   Use \Drupal\Component\Utility\SortArray::sortByTitleProperty().
- */
-function element_sort_by_title($a, $b) {
-  return SortArray::sortByTitleProperty($a, $b);
 }
 
 /**
@@ -4708,27 +4490,6 @@ function element_info($type) {
  */
 function element_info_property($type, $property_name, $default = NULL) {
   return (($info = element_info($type)) && array_key_exists($property_name, $info)) ? $info[$property_name] : $default;
-}
-
-/**
- * Sorts a structured array by 'title' key (no # prefix).
- *
- * Callback for uasort() within system_admin_index().
- *
- * @param $a
- *   First item for comparison. The compared items should be associative arrays
- *   that optionally include a 'title' key.
- * @param $b
- *   Second item for comparison.
- *
- * @return int
- *   The comparison result for uasort().
- *
- * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
- *   Use \Drupal\Component\Utility\SortArray::sortByTitleElement().
- */
-function drupal_sort_title($a, $b) {
-  return SortArray::sortByTitleElement($a, $b);
 }
 
 /**
@@ -4901,9 +4662,7 @@ function drupal_flush_all_caches() {
   // sufficient, since new extensions cannot have any primed caches yet.
   $module_handler->invokeAll('cache_flush');
   foreach (Cache::getBins() as $service_id => $cache_backend) {
-    if ($service_id != 'cache.menu') {
-      $cache_backend->deleteAll();
-    }
+    $cache_backend->deleteAll();
   }
 
   // Flush asset file caches.

@@ -134,8 +134,8 @@ function hook_entity_type_build(array &$entity_types) {
 function hook_entity_type_alter(array &$entity_types) {
   /** @var $entity_types \Drupal\Core\Entity\EntityTypeInterface[] */
   // Set the controller class for nodes to an alternate implementation of the
-  // Drupal\Core\Entity\EntityStorageControllerInterface interface.
-  $entity_types['node']->setStorageClass('Drupal\mymodule\MyCustomNodeStorageController');
+  // Drupal\Core\Entity\EntityStorageInterface interface.
+  $entity_types['node']->setStorageClass('Drupal\mymodule\MyCustomNodeStorage');
 }
 
 /**
@@ -144,7 +144,8 @@ function hook_entity_type_alter(array &$entity_types) {
  * @param array $view_modes
  *   An array of view modes, keyed first by entity type, then by view mode name.
  *
- * @see entity_get_view_modes()
+ * @see \Drupal\Core\Entity\EntityManagerInterface::getAllViewModes()
+ * @see \Drupal\Core\Entity\EntityManagerInterface::getViewModes()
  * @see hook_entity_view_mode_info()
  */
 function hook_entity_view_mode_info_alter(&$view_modes) {
@@ -619,8 +620,6 @@ function hook_entity_display_build_alter(&$build, $context) {
  *
  * @param \Drupal\Core\Entity\EntityInterface $entity
  *   The entity that is about to be shown on the form.
- * @param $form_display
- *   The current form display.
  * @param $operation
  *   The current operation.
  * @param array $form_state
@@ -628,7 +627,7 @@ function hook_entity_display_build_alter(&$build, $context) {
  *
  * @see \Drupal\Core\Entity\EntityFormController::prepareEntity()
  */
-function hook_entity_prepare_form(\Drupal\Core\Entity\EntityInterface $entity, $form_display, $operation, array &$form_state) {
+function hook_entity_prepare_form(\Drupal\Core\Entity\EntityInterface $entity, $operation, array &$form_state) {
   if ($operation == 'edit') {
     $entity->label->value = 'Altered label';
     $form_state['mymodule']['label_altered'] = TRUE;
@@ -760,7 +759,7 @@ function hook_entity_bundle_field_info_alter(&$fields, \Drupal\Core\Entity\Entit
  *
  * @param array $operations
  *   Operations array as returned by
- *   \Drupal\Core\Entity\EntityListControllerInterface::getOperations().
+ *   \Drupal\Core\Entity\EntityListBuilderInterface::getOperations().
  * @param \Drupal\Core\Entity\EntityInterface $entity
  *   The entity on which the linked operations will be performed.
  */

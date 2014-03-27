@@ -99,18 +99,18 @@ function forum_theme() {
  * Implements hook_menu_link_defaults().
  */
 function forum_menu_link_defaults() {
-  $items['forum'] = array(
+  $links['forum.index'] = array(
     'link_title' => 'Forums',
     'route_name' => 'forum.index',
     'menu_name' => 'tools',
   );
-  $items['forum.admin.overview'] = array(
+  $links['forum.overview'] = array(
     'link_title' => 'Forums',
-    'parent' => 'system.admin.structure',
+    'parent' => 'system.admin_structure',
     'description' => 'Control forum hierarchy settings.',
     'route_name' => 'forum.overview',
   );
-  return $items;
+  return $links;
 }
 
 /**
@@ -536,23 +536,6 @@ function forum_form_node_form_alter(&$form, &$form_state, $form_id) {
       $widget['#default_value'] = is_numeric($requested_forum_id) ? $requested_forum_id : '';
     }
   }
-}
-
-/**
- * Render API callback: Lists nodes based on the element's #query property.
- *
- * This function can be used as a #pre_render callback.
- *
- * @see \Drupal\forum\Plugin\block\block\NewTopicsBlock::build()
- * @see \Drupal\forum\Plugin\block\block\ActiveTopicsBlock::build()
- */
-function forum_block_view_pre_render($elements) {
-  $result = $elements['#query']->execute();
-  if ($node_title_list = node_title_list($result)) {
-    $elements['forum_list'] = $node_title_list;
-    $elements['forum_more'] = array('#theme' => 'more_link', '#url' => 'forum', '#title' => t('Read the latest forum topics.'));
-  }
-  return $elements;
 }
 
 /**

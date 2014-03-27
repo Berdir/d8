@@ -11,6 +11,8 @@
  * ability to install contributed modules and themes via an user interface.
  */
 
+use Drupal\Component\Utility\Settings;
+
 // These are internally used constants for this code, do not modify.
 
 /**
@@ -148,11 +150,11 @@ function update_page_build() {
  * Implements hook_menu_link_defaults().
  */
 function update_menu_link_defaults() {
-  $links['update.admin.reports.updates'] = array(
+  $links['update.status'] = array(
     'link_title' => 'Available updates',
     'description' => 'Get a status report about available updates for your installed modules and themes.',
     'route_name' => 'update.status',
-    'parent' => 'system.admin.reports',
+    'parent' => 'system.admin_reports',
     'weight' => -50,
   );
 
@@ -172,7 +174,7 @@ function update_menu_link_defaults() {
  * @see update_menu()
  */
 function update_manager_access() {
-  return settings()->get('allow_authorize_operations', TRUE) && user_access('administer software updates');
+  return Settings::get('allow_authorize_operations', TRUE) && user_access('administer software updates');
 }
 
 /**

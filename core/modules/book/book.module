@@ -151,13 +151,13 @@ function book_node_links_alter(array &$node_links, NodeInterface $node, array &$
  * Implements hook_menu_link_defaults().
  */
 function book_menu_link_defaults() {
-  $links['book.admin.outlines'] = array(
+  $links['book.admin'] = array(
     'link_title' => 'Books',
     'description' => "Manage your site's book outlines.",
-    'parent' => 'system.admin.structure',
+    'parent' => 'system.admin_structure',
     'route_name' => 'book.admin',
   );
-  $links['book'] = array(
+  $links['book.render'] = array(
     'link_title' => 'Books',
     'route_name' => 'book.render',
     // @todo what to do about MENU_SUGGESTED_ITEM, maybe specify no menu_name?
@@ -224,8 +224,13 @@ function book_form_node_form_alter(&$form, &$form_state, $form_id) {
  *
  * @todo: Remove this in favor of an entity field.
  */
-function book_node_builder($entity_type, $entity, &$form, &$form_state) {
+function book_node_builder($entity_type, NodeInterface $entity, &$form, &$form_state) {
   $entity->book = $form_state['values']['book'];
+
+  // Always save a revision for non-administrators.
+  if (!empty($entity->book['bid']) && !\Drupal::currentUser()->hasPermission('administer nodes')) {
+    $entity->setNewRevision();
+  }
 }
 
 /**
@@ -447,10 +452,6 @@ function book_node_view(EntityInterface $node, EntityViewDisplayInterface $displ
  * Implements hook_node_presave().
  */
 function book_node_presave(EntityInterface $node) {
-  // Always save a revision for non-administrators.
-  if (!empty($node->book['bid']) && !\Drupal::currentUser()->hasPermission('administer nodes')) {
-    $node->setNewRevision();
-  }
   // Make sure a new node gets a new menu link.
   if ($node->isNew()) {
     $node->book['nid'] = NULL;
@@ -499,7 +500,7 @@ function book_node_predelete(EntityInterface $node) {
 /**
  * Implements hook_node_prepare_form().
  */
-function book_node_prepare_form(NodeInterface $node, $form_display, $operation, array &$form_state) {
+function book_node_prepare_form(NodeInterface $node, $operation, array &$form_state) {
   // Get BookManager service
   $book_manager = \Drupal::service('book.manager');
 

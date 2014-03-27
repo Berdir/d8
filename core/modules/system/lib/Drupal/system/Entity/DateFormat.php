@@ -9,7 +9,7 @@ namespace Drupal\system\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Datetime\DrupalDateTime;
-use Drupal\Core\Entity\EntityStorageControllerInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\system\DateFormatInterface;
 
 /**
@@ -20,7 +20,7 @@ use Drupal\system\DateFormatInterface;
  *   label = @Translation("Date format"),
  *   controllers = {
  *     "access" = "Drupal\system\DateFormatAccessController",
- *     "list" = "Drupal\system\DateFormatListController",
+ *     "list_builder" = "Drupal\system\DateFormatListBuilder",
  *     "form" = {
  *       "add" = "Drupal\system\Form\DateFormatAddForm",
  *       "edit" = "Drupal\system\Form\DateFormatEditForm",

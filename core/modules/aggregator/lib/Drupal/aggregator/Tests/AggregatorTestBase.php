@@ -38,8 +38,7 @@ abstract class AggregatorTestBase extends WebTestBase {
   /**
    * Creates an aggregator feed.
    *
-   * This method simulates the form submission on path
-   * admin/config/services/aggregator/add/feed.
+   * This method simulates the form submission on path aggregator/sources/add.
    *
    * @param $feed_url
    *   (optional) If given, feed will be created with this URL, otherwise
@@ -54,7 +53,7 @@ abstract class AggregatorTestBase extends WebTestBase {
    */
   function createFeed($feed_url = NULL, array $edit = array()) {
     $edit = $this->getFeedEditArray($feed_url, $edit);
-    $this->drupalPostForm('admin/config/services/aggregator/add/feed', $edit, t('Save'));
+    $this->drupalPostForm('aggregator/sources/add', $edit, t('Save'));
     $this->assertRaw(t('The feed %name has been added.', array('%name' => $edit['title'])), format_string('The feed !name has been added.', array('!name' => $edit['title'])));
 
     $fid = db_query("SELECT fid FROM {aggregator_feed} WHERE title = :title AND url = :url", array(':title' => $edit['title'], ':url' => $edit['url']))->fetchField();
@@ -69,7 +68,7 @@ abstract class AggregatorTestBase extends WebTestBase {
    *   Feed object representing the feed.
    */
   function deleteFeed(FeedInterface $feed) {
-    $this->drupalPostForm('admin/config/services/aggregator/delete/feed/' . $feed->id(), array(), t('Delete'));
+    $this->drupalPostForm('aggregator/sources/' . $feed->id() . '/delete', array(), t('Delete'));
     $this->assertRaw(t('The feed %title has been deleted.', array('%title' => $feed->label())), 'Feed deleted successfully.');
   }
 
@@ -184,24 +183,24 @@ abstract class AggregatorTestBase extends WebTestBase {
    * @param \Drupal\aggregator\FeedInterface $feed
    *   Feed object representing the feed.
    */
-  function removeFeedItems(FeedInterface $feed) {
-    $this->drupalPostForm('admin/config/services/aggregator/remove/' . $feed->id(), array(), t('Remove items'));
-    $this->assertRaw(t('The news items from %title have been removed.', array('%title' => $feed->label())), 'Feed items removed.');
+  function deleteFeedItems(FeedInterface $feed) {
+    $this->drupalPostForm('admin/config/services/aggregator/delete/' . $feed->id(), array(), t('Delete items'));
+    $this->assertRaw(t('The news items from %title have been deleted.', array('%title' => $feed->label())), 'Feed items deleted.');
   }
 
   /**
-   * Adds and removes feed items and ensure that the count is zero.
+   * Adds and deletes feed items and ensure that the count is zero.
    *
    * @param \Drupal\aggregator\FeedInterface $feed
    *   Feed object representing the feed.
    * @param int $expected_count
    *   Expected number of feed items.
    */
-  function updateAndRemove(FeedInterface $feed, $expected_count) {
+  function updateAndDelete(FeedInterface $feed, $expected_count) {
     $this->updateFeedItems($feed, $expected_count);
     $count = db_query('SELECT COUNT(*) FROM {aggregator_item} WHERE fid = :fid', array(':fid' => $feed->id()))->fetchField();
     $this->assertTrue($count);
-    $this->removeFeedItems($feed);
+    $this->deleteFeedItems($feed);
     $count = db_query('SELECT COUNT(*) FROM {aggregator_item} WHERE fid = :fid', array(':fid' => $feed->id()))->fetchField();
     $this->assertTrue($count == 0);
   }

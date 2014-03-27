@@ -9,8 +9,7 @@ namespace Drupal\book\Form;
 
 use Drupal\book\BookManagerInterface;
 use Drupal\Component\Utility\Crypt;
-use Drupal\Core\Cache\CacheBackendInterface;
-use Drupal\Core\Entity\EntityStorageControllerInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\node\NodeInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -21,16 +20,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class BookAdminEditForm extends FormBase {
 
   /**
-   * The menu cache object for this controller.
+   * The node storage.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
-   */
-  protected $cache;
-
-  /**
-   * The node storage controller.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageControllerInterface
+   * @var \Drupal\Core\Entity\EntityStorageInterface
    */
   protected $nodeStorage;
 
@@ -44,15 +36,12 @@ class BookAdminEditForm extends FormBase {
   /**
    * Constructs a new BookAdminEditForm.
    *
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
-   *   The menu cache object to be used by this controller.
-   * @param \Drupal\Core\Entity\EntityStorageControllerInterface $node_storage
-   *   The custom block storage controller.
+   * @param \Drupal\Core\Entity\EntityStorageInterface $node_storage
+   *   The custom block storage.
    * @param \Drupal\book\BookManagerInterface $book_manager
    *   The book manager.
    */
-  public function __construct(CacheBackendInterface $cache, EntityStorageControllerInterface $node_storage, BookManagerInterface $book_manager) {
-    $this->cache = $cache;
+  public function __construct(EntityStorageInterface $node_storage, BookManagerInterface $book_manager) {
     $this->nodeStorage = $node_storage;
     $this->bookManager = $book_manager;
   }
@@ -63,8 +52,7 @@ class BookAdminEditForm extends FormBase {
   public static function create(ContainerInterface $container) {
     $entity_manager = $container->get('entity.manager');
     return new static(
-      $container->get('cache.menu'),
-      $entity_manager->getStorageController('node'),
+      $entity_manager->getStorage('node'),
       $container->get('book.manager')
     );
   }
@@ -109,8 +97,6 @@ class BookAdminEditForm extends FormBase {
     $order = array_flip(array_keys($form_state['input']['table']));
     $form['table'] = array_merge($order, $form['table']);
 
-    // Track updates.
-    $updated = FALSE;
     foreach (element_children($form['table']) as $key) {
       if ($form['table'][$key]['#item']) {
         $row = $form['table'][$key];
@@ -122,7 +108,6 @@ class BookAdminEditForm extends FormBase {
           $link['weight'] = $values['weight'];
           $link['pid'] = $values['pid'];
           $this->bookManager->saveBookLink($link, FALSE);
-          $updated = TRUE;
         }
 
         // Update the title if changed.
@@ -136,12 +121,6 @@ class BookAdminEditForm extends FormBase {
           watchdog('content', 'book: updated %title.', array('%title' => $node->label()), WATCHDOG_NOTICE, l($this->t('view'), 'node/' . $node->id()));
         }
       }
-    }
-    if ($updated) {
-      // Flush static and cache.
-      drupal_static_reset('book_menu_subtree_data');
-      $cid = 'book-links:subtree-cid:' . $form['#node']->book['nid'];
-      $this->cache->delete($cid);
     }
 
     drupal_set_message($this->t('Updated book %title.', array('%title' => $form['#node']->label())));

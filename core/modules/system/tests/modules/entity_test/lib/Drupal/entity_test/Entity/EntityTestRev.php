@@ -43,21 +43,6 @@ use Drupal\entity_test\Entity\EntityTest;
 class EntityTestRev extends EntityTest {
 
   /**
-   * The entity revision id.
-   *
-   * @var \Drupal\Core\Field\FieldItemListInterface
-   */
-  public $revision_id;
-
-  /**
-   * {@inheritdoc}
-   */
-  public function init() {
-    parent::init();
-    unset($this->revision_id);
-  }
-
-  /**
    * Implements Drupal\Core\Entity\EntityInterface::getRevisionId().
    */
   public function getRevisionId() {
@@ -74,6 +59,10 @@ class EntityTestRev extends EntityTest {
       ->setLabel(t('Revision ID'))
       ->setDescription(t('The version id of the test entity.'))
       ->setReadOnly(TRUE);
+
+    $fields['langcode']->setRevisionable(TRUE);
+    $fields['name']->setRevisionable(TRUE);
+    $fields['user_id']->setRevisionable(TRUE);
 
     return $fields;
   }

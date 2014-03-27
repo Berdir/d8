@@ -205,7 +205,10 @@ class EntityTranslationTest extends EntityLanguageTestBase {
           'user_id' => array(0 => $uid),
         );
       }
-      $entity->getTranslation($langcode)->setPropertyValues($properties[$langcode]);
+      $translation = $entity->getTranslation($langcode);
+      foreach ($properties[$langcode] as $field_name => $values) {
+        $translation->set($field_name, $values);
+      }
     }
     $entity->save();
 
@@ -292,7 +295,7 @@ class EntityTranslationTest extends EntityLanguageTestBase {
     $default_langcode = $this->langcodes[0];
     $langcode = $this->langcodes[1];
     $entity = $this->entityManager
-      ->getStorageController('entity_test_mul')
+      ->getStorage('entity_test_mul')
       ->create(array('name' => $this->randomName()));
 
     $entity->save();
@@ -432,7 +435,7 @@ class EntityTranslationTest extends EntityLanguageTestBase {
     // Check that per-language defaults are properly populated.
     $entity = $this->reloadEntity($entity);
     $instance_id = implode('.', array($entity->getEntityTypeId(), $entity->bundle(), $this->field_name));
-    $instance = $this->entityManager->getStorageController('field_instance_config')->load($instance_id);
+    $instance = $this->entityManager->getStorage('field_instance_config')->load($instance_id);
     $instance->default_value_function = 'entity_test_field_default_value';
     $instance->save();
     $translation = $entity->addTranslation($langcode2);
@@ -459,7 +462,7 @@ class EntityTranslationTest extends EntityLanguageTestBase {
     $langcode2 = $this->langcodes[2];
 
     $entity_type = 'entity_test_mul';
-    $controller = $this->entityManager->getStorageController($entity_type);
+    $controller = $this->entityManager->getStorage($entity_type);
     $entity = $controller->create(array('langcode' => $default_langcode) + $values[$default_langcode]);
     $entity->save();
 
@@ -547,7 +550,7 @@ class EntityTranslationTest extends EntityLanguageTestBase {
    */
   public function testLanguageChange() {
     $entity_type = 'entity_test_mul';
-    $controller = $this->entityManager->getStorageController($entity_type);
+    $controller = $this->entityManager->getStorage($entity_type);
     $langcode = $this->langcodes[0];
 
     // check that field languages match entity language regardless of field

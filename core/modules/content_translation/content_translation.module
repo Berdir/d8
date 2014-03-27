@@ -56,7 +56,6 @@ function content_translation_help($path, $arg) {
 function content_translation_module_implements_alter(&$implementations, $hook) {
   switch ($hook) {
     // Move some of our hook implementations to the end of the list.
-    case 'menu_alter':
     case 'entity_type_alter':
       $group = $implementations['content_translation'];
       unset($implementations['content_translation']);
@@ -180,61 +179,12 @@ function content_translation_entity_operation_alter(array &$operations, \Drupal\
 }
 
 /**
- * Implements hook_menu_alter().
- *
- * @todo Split this into route definition and menu link definition. See
- *   https://drupal.org/node/1987882 and https://drupal.org/node/2047633.
- */
-function content_translation_menu_alter(array &$items) {
-  // Check that the declared menu base paths are actually valid.
-  foreach (\Drupal::entityManager()->getDefinitions() as $entity_type_id => $entity_type) {
-    if (content_translation_enabled($entity_type_id)) {
-      $path = _content_translation_link_to_router_path($entity_type_id, $entity_type->getLinkTemplate('canonical'));
-
-      // If the base path is not defined we cannot provide the translation UI
-      // for this entity type. In some cases the actual base path might not have
-      // a menu loader associated, hence we need to check also for the plain "%"
-      // variant. See for instance comment_menu().
-      if (!isset($items[$path]) && !isset($items["$path/edit"])
-          && !isset($items[_content_translation_menu_strip_loaders($path)])) {
-        unset(
-          $items["$path/translations"],
-          $items["$path/translations/add/%language/%language"],
-          $items["$path/translations/delete/%language"]
-        );
-        $t_args = array('@entity_type' => $entity_type->getLabel() ?: $entity_type_id);
-        watchdog('content translation', 'The entities of type @entity_type do not define a valid base path: it will not be possible to translate them.', $t_args, WATCHDOG_WARNING);
-      }
-      else {
-        $edit_path = $path . '/edit';
-
-        if (isset($items[$edit_path])) {
-          // If the edit path is a default local task we need to find the parent
-          // item.
-          $edit_path_split = explode('/', $edit_path);
-          do {
-            $entity_form_item = &$items[implode('/', $edit_path_split)];
-            array_pop($edit_path_split);
-          }
-          while (!empty($entity_form_item['type']) && $entity_form_item['type'] == MENU_DEFAULT_LOCAL_TASK);
-
-          // Make the "Translate" tab follow the "Edit" one when possible.
-          if (isset($entity_form_item['weight'])) {
-            $items["$path/translations"]['weight'] = $entity_form_item['weight'] + 0.01;
-          }
-        }
-      }
-    }
-  }
-}
-
-/**
  * Implements hook_menu_link_defaults_alter().
  */
 function content_translation_menu_link_defaults_alter(array &$links) {
   // Clarify where translation settings are located.
-  $links['language.admin.language.content_settings_page']['link_title'] = 'Content language and translation';
-  $links['language.admin.language.content_settings_page']['description'] = 'Configure language and translation support for content.';
+  $links['language.content_settings_page']['link_title'] = 'Content language and translation';
+  $links['language.content_settings_page']['description'] = 'Configure language and translation support for content.';
 }
 
 /**
@@ -790,21 +740,19 @@ function content_translation_form_field_ui_field_instance_edit_form_alter(array 
 }
 
 /**
- * Implements hook_field_info_alter().
- */
-function content_translation_field_info_alter(&$info) {
-  foreach ($info as &$field_type_info) {
-    // By default no column has to be synchronized.
-    $field_type_info['settings'] += array('translation_sync' => FALSE);
-    // Synchronization can be enabled per instance.
-    $field_type_info['instance_settings'] += array('translation_sync' => FALSE);
-  }
-}
-
-/**
  * Implements hook_entity_presave().
  */
 function content_translation_entity_presave(EntityInterface $entity) {
+  // By default no column has to be synchronized.
+  // @todo Replace with own storage in https://drupal.org/node/2224761
+  if ($entity->getEntityTypeId() === 'field_config') {
+    $entity->settings += array('translation_sync' => FALSE);
+  }
+  // Synchronization can be enabled per instance.
+  // @todo Replace with own storage in https://drupal.org/node/2224761
+  if ($entity->getEntityTypeId() === 'field_instance_config') {
+    $entity->settings += array('translation_sync' => FALSE);
+  }
   if ($entity instanceof ContentEntityInterface && $entity->isTranslatable()) {
     // @todo Avoid using request attributes once translation metadata become
     //   regular fields.

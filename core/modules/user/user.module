@@ -4,6 +4,7 @@ use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Session\AnonymousUserSession;
 use \Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\file\Entity\File;
 use Drupal\user\Entity\User;
@@ -180,6 +181,7 @@ function user_attach_accounts(array $entities) {
   $uids = array_unique($uids);
   $accounts = user_load_multiple($uids);
   $anonymous = entity_create('user', array('uid' => 0));
+
   foreach ($entities as $id => $entity) {
     if (isset($accounts[$entity->getOwnerId()])) {
       $entities[$id]->setOwner($accounts[$entity->getOwnerId()]);
@@ -610,7 +612,7 @@ function user_template_preprocess_default_variables_alter(&$variables) {
  * check_plain() or filter_xss().
  */
 function template_preprocess_username(&$variables) {
-  $account = $variables['account'] ?: drupal_anonymous_user();
+  $account = $variables['account'] ?: new AnonymousUserSession();
 
   $variables['extra'] = '';
   $variables['uid'] = $account->id();
@@ -695,7 +697,7 @@ function theme_username($variables) {
  */
 function user_menu_link_defaults() {
   // Registration and login pages.
-  $links['user'] = array(
+  $links['user.page'] = array(
     'link_title' => 'My account',
     'weight' => -10,
     'route_name' => 'user.page',
@@ -710,7 +712,7 @@ function user_menu_link_defaults() {
   );
 
   // User listing pages.
-  $links['user.admin.people'] = array(
+  $links['user.admin_account'] = array(
     'link_title' => 'People',
     'route_name' => 'user.admin_account',
     'description' => 'Manage user accounts, roles, and permissions.',
@@ -719,18 +721,18 @@ function user_menu_link_defaults() {
   );
 
   // Administration pages.
-  $links['user.admin.config.people'] = array(
+  $links['user.admin_index'] = array(
    'link_title' => 'People',
    'route_name' => 'user.admin_index',
-   'parent' => 'system.admin.config',
+   'parent' => 'system.admin_config',
    'description' => 'Configure user accounts.',
    'position' => 'left',
    'weight' => -20,
   );
 
-  $links['user.admin.config.people.accounts'] = array(
+  $links['user.account_settings'] = array(
     'link_title' => 'Account settings',
-    'parent' => 'user.admin.config.people',
+    'parent' => 'user.admin_index',
     'description' => 'Configure default behavior of users, including registration requirements, e-mails, and fields.',
     'weight' => -10,
     'route_name' => 'user.account_settings',
@@ -747,7 +749,7 @@ function user_menu_link_presave(MenuLink $menu_link) {
   // for authenticated users. Authenticated users should see "My account", but
   // anonymous users should not see it at all. Therefore, invoke
   // user_menu_link_load() to conditionally hide the link.
-  if ($menu_link->machine_name == 'user' && $menu_link->module == 'system') {
+  if ($menu_link->machine_name == 'user.page' && $menu_link->module == 'system') {
     $menu_link->options['alter'] = TRUE;
   }
 }
@@ -768,7 +770,7 @@ function user_menu_breadcrumb_alter(&$active_trail, $item) {
  */
 function user_translated_menu_link_alter(MenuLink &$menu_link) {
   // Hide the "User account" link for anonymous users.
-  if ($menu_link->link_path == 'user' && $menu_link->module == 'system' && \Drupal::currentUser()->isAnonymous()) {
+  if ($menu_link->machine_name == 'user.page' && $menu_link->module == 'system' && \Drupal::currentUser()->isAnonymous()) {
     $menu_link->hidden = 1;
   }
 }
@@ -812,7 +814,7 @@ function user_login_finalize(UserInterface $account) {
   // This is also used to invalidate one-time login links.
   $account->setLastLoginTime(REQUEST_TIME);
   \Drupal::entityManager()
-    ->getStorageController('user')
+    ->getStorage('user')
     ->updateLastLoginTimestamp($account);
 
   // Regenerate the session ID to prevent against session fixation attacks.
@@ -1021,7 +1023,7 @@ function _user_cancel($edit, $account, $method) {
   // regenerate it because batch API uses the session ID, we will regenerate it
   // in _user_cancel_session_regenerate().
   if ($account->id() == $user->id()) {
-    $user = drupal_anonymous_user();
+    $user = new AnonymousUserSession();
   }
 
   // Clear the cache for anonymous users.
@@ -1169,13 +1171,13 @@ function user_view_multiple($accounts, $view_mode = 'full', $langcode = NULL) {
  */
 function user_mail($key, &$message, $params) {
   $token_service = \Drupal::token();
+  $language_manager = \Drupal::languageManager();
   $langcode = $message['langcode'];
   $variables = array('user' => $params['account']);
 
-  $original_language = \Drupal::configFactory()->getLanguage();
-
   $language = language_load($params['account']->getPreferredLangcode());
-  \Drupal::configFactory()->setLanguage($language);
+  $original_language = $language_manager->getConfigOverrideLanguage();
+  $language_manager->setConfigOverrideLanguage($language);
   $mail_config = \Drupal::config('user.mail');
 
    // We do not sanitize the token replacement, since the output of this
@@ -1184,7 +1186,8 @@ function user_mail($key, &$message, $params) {
   $message['subject'] .= $token_service->replace($mail_config->get($key . '.subject'), $variables, $token_options);
   $message['body'][] = $token_service->replace($mail_config->get($key . '.body'), $variables, $token_options);
 
-  \Drupal::configFactory()->setLanguage($original_language);
+  $language_manager->setConfigOverrideLanguage($original_language);
+
 }
 
 /**
@@ -1686,11 +1689,9 @@ function user_toolbar() {
       '#type' => 'link',
       '#title' => $user->getUsername(),
       '#href' => 'user',
-      '#options' => array(
-        'attributes' => array(
-          'title' => t('My account'),
-          'class' => array('toolbar-icon', 'toolbar-icon-user'),
-        ),
+      '#attributes' => array(
+        'title' => t('My account'),
+        'class' => array('toolbar-icon', 'toolbar-icon-user'),
       ),
     ),
     'tray' => array(

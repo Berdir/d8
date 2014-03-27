@@ -21,6 +21,7 @@ use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 use Drupal\Core\Template\Attribute;
 use Drupal\file\Entity\File;
+use Drupal\language\Entity\Language as LanguageEntity;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 
 /**
@@ -266,12 +267,12 @@ function node_title_list($result, $title = NULL) {
 /**
  * Determines the type of marker to be displayed for a given node.
  *
- * @param $nid
+ * @param int $nid
  *   Node ID whose history supplies the "last viewed" timestamp.
- * @param $timestamp
+ * @param int $timestamp
  *   Time which is compared against node's "last viewed" timestamp.
  *
- * @return
+ * @return int
  *   One of the MARK constants.
  */
 function node_mark($nid, $timestamp) {
@@ -298,7 +299,7 @@ function node_mark($nid, $timestamp) {
  *
  * This list can include types that are queued for addition or deletion.
  *
- * @return array
+ * @return \Drupal\node\NodeTypeInterface[]
  *   An array of node type entities, keyed by ID.
  *
  * @see node_type_load()
@@ -312,7 +313,7 @@ function node_type_get_types() {
  *
  * This list can include types that are queued for addition or deletion.
  *
- * @return array
+ * @return string[]
  *   An array of node type labels, keyed by the node type name.
  */
 function node_type_get_names() {
@@ -429,7 +430,7 @@ function node_add_body_field(NodeTypeInterface $type, $label = 'Body') {
 
     // The teaser view mode is created by the Standard profile and therefore
     // might not exist.
-    $view_modes = entity_get_view_modes('node');
+    $view_modes = \Drupal::entityManager()->getViewModes('node');
     if (isset($view_modes['teaser'])) {
       entity_get_display('node', $type->type, 'teaser')
         ->setComponent('body', array(
@@ -926,7 +927,7 @@ function _node_revision_access(NodeInterface $node, $op = 'view', $account = NUL
  * Implements hook_menu_link_defaults().
  */
 function node_menu_link_defaults() {
-  $links['node.admin.content'] = array(
+  $links['node.content_overview'] = array(
     'link_title' => 'Content',
     'route_name' => 'node.content_overview',
     'parent' => 'system.admin',
@@ -934,13 +935,13 @@ function node_menu_link_defaults() {
     'weight' => -10,
   );
 
-  $links['node.admin.structure.types'] = array(
+  $links['node.overview_types'] = array(
     'link_title' => 'Content types',
-    'parent' => 'system.admin.structure',
+    'parent' => 'system.admin_structure',
     'description' => 'Manage content types, including default status, front page promotion, comment settings, etc.',
     'route_name' => 'node.overview_types',
   );
-  $links['node.add'] = array(
+  $links['node.add_page'] = array(
     'link_title' => 'Add content',
     'route_name' => 'node.add_page',
   );
@@ -1810,13 +1811,13 @@ function node_file_download_access($field, EntityInterface $entity, File $file) 
 }
 
 /**
- * Implements hook_language_delete().
+ * Implements hook_ENTITY_TYPE_delete() for 'language_entity'.
  */
-function node_language_delete($language) {
+function node_language_entity_delete(LanguageEntity $language) {
   // On nodes with this language, unset the language.
   db_update('node_revision')
     ->fields(array('langcode' => ''))
-    ->condition('langcode', $language->id)
+    ->condition('langcode', $language->id())
     ->execute();
 }
 

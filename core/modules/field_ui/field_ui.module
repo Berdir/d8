@@ -56,11 +56,11 @@ function field_ui_help($path, $arg) {
  * Implements hook_menu_link_defaults().
  */
 function field_ui_menu_link_defaults() {
-  $links['field_ui.admin.reports.fields'] = array(
+  $links['field_ui.list'] = array(
     'link_title' => 'Field list',
     'description' => 'Overview of fields on all entity types.',
     'route_name' => 'field_ui.list',
-    'parent' => 'system.admin.reports',
+    'parent' => 'system.admin_reports',
   );
 
   return $links;
@@ -121,7 +121,7 @@ function field_ui_element_info() {
 function field_ui_entity_type_build(array &$entity_types) {
   /** @var $entity_types \Drupal\Core\Entity\EntityTypeInterface[] */
   $entity_types['field_instance_config']->setFormClass('delete', 'Drupal\field_ui\Form\FieldInstanceConfigDeleteForm');
-  $entity_types['field_config']->setListClass('Drupal\field_ui\FieldConfigListController');
+  $entity_types['field_config']->setListBuilderClass('Drupal\field_ui\FieldConfigListBuilder');
 
   foreach ($entity_types as $entity_type) {
     if ($bundle = $entity_type->getBundleOf()) {

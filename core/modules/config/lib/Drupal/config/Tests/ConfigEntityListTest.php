@@ -9,7 +9,7 @@ namespace Drupal\config\Tests;
 
 use Drupal\simpletest\WebTestBase;
 use Drupal\config_test\Entity\ConfigTest;
-use Drupal\Core\Entity\EntityStorageControllerInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
 
 /**
  * Tests the listing of configuration entities.
@@ -32,13 +32,13 @@ class ConfigEntityListTest extends WebTestBase {
   }
 
   /**
-   * Tests entity list controller methods.
+   * Tests entity list builder methods.
    */
   function testList() {
-    $controller = \Drupal::entityManager()->getListController('config_test');
+    $controller = \Drupal::entityManager()->getListBuilder('config_test');
 
-    // Test getStorageController() method.
-    $this->assertTrue($controller->getStorageController() instanceof EntityStorageControllerInterface, 'EntityStorageController instance in storage.');
+    // Test getStorage() method.
+    $this->assertTrue($controller->getStorage() instanceof EntityStorageInterface, 'EntityStorage instance in storage.');
 
     // Get a list of ConfigTest entities and confirm that it contains the
     // ConfigTest entity provided by the config_test module.
@@ -91,20 +91,20 @@ class ConfigEntityListTest extends WebTestBase {
     $actual_items = $controller->buildRow($entity);
     $this->assertIdentical($expected_items, $actual_items, 'Return value from buildRow matches expected.');
     // Test sorting.
-    $storage_controller = $controller->getStorageController();
-    $entity = $storage_controller->create(array(
+    $storage = $controller->getStorage();
+    $entity = $storage->create(array(
       'id' => 'alpha',
       'label' => 'Alpha',
       'weight' => 1,
     ));
     $entity->save();
-    $entity = $storage_controller->create(array(
+    $entity = $storage->create(array(
       'id' => 'omega',
       'label' => 'Omega',
       'weight' => 1,
     ));
     $entity->save();
-    $entity = $storage_controller->create(array(
+    $entity = $storage->create(array(
       'id' => 'beta',
       'label' => 'Beta',
       'weight' => 0,
@@ -116,7 +116,7 @@ class ConfigEntityListTest extends WebTestBase {
     // Test that config entities that do not support status, do not have
     // enable/disable operations.
     $controller = $this->container->get('entity.manager')
-      ->getListController('config_test_no_status');
+      ->getListBuilder('config_test_no_status');
 
     $list = $controller->load();
     $entity = $list['default'];

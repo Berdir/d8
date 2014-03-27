@@ -10,6 +10,7 @@ namespace Drupal\comment\Plugin\Field\FieldType;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\Field\FieldItemBase;
+use Drupal\Core\Session\AnonymousUserSession;
 
 /**
  * Plugin implementation of the 'comment' field type.
@@ -18,22 +19,34 @@ use Drupal\Core\Field\FieldItemBase;
  *   id = "comment",
  *   label = @Translation("Comments"),
  *   description = @Translation("This field manages configuration and presentation of comments on an entity."),
- *   settings = {
- *     "description" = "",
- *   },
- *   instance_settings = {
- *     "default_mode" = COMMENT_MODE_THREADED,
- *     "per_page" = 50,
- *     "form_location" = COMMENT_FORM_BELOW,
- *     "anonymous" = COMMENT_ANONYMOUS_MAYNOT_CONTACT,
- *     "subject" = 1,
- *     "preview" = DRUPAL_OPTIONAL,
- *   },
  *   default_widget = "comment_default",
  *   default_formatter = "comment_default"
  * )
  */
 class CommentItem extends FieldItemBase implements CommentItemInterface {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function defaultSettings() {
+    return array(
+      'description' => '',
+    ) + parent::defaultSettings();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function defaultInstanceSettings() {
+    return array(
+      'default_mode' => COMMENT_MODE_THREADED,
+      'per_page' => 50,
+      'form_location' => COMMENT_FORM_BELOW,
+      'anonymous' => COMMENT_ANONYMOUS_MAYNOT_CONTACT,
+      'subject' => 1,
+      'preview' => DRUPAL_OPTIONAL,
+    ) + parent::defaultInstanceSettings();
+  }
 
   /**
    * {@inheritdoc}
@@ -91,6 +104,7 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
 
     $entity_type = $this->getEntity()->getEntityTypeId();
     $field_name = $this->getFieldDefinition()->getName();
+    $anonymous_user = new AnonymousUserSession();
 
     $element['comment'] = array(
       '#type' => 'details',
@@ -126,7 +140,7 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
         COMMENT_ANONYMOUS_MAY_CONTACT => t('Anonymous posters may leave their contact information'),
         COMMENT_ANONYMOUS_MUST_CONTACT => t('Anonymous posters must leave their contact information'),
       ),
-      '#access' => drupal_anonymous_user()->hasPermission('post comments'),
+      '#access' => $anonymous_user->hasPermission('post comments'),
     );
     $element['comment']['subject'] = array(
       '#type' => 'checkbox',

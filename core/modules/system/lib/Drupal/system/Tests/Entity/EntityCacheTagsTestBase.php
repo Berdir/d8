@@ -82,11 +82,11 @@ abstract class EntityCacheTagsTestBase extends PageCacheTagsTestBase {
       ))->save();
 
       // Reload the entity now that a new field has been added to it.
-      $storage_controller = $this->container
+      $storage = $this->container
         ->get('entity.manager')
-        ->getStorageController($this->entity->getEntityTypeId());
-      $storage_controller->resetCache();
-      $this->entity = $storage_controller->load($this->entity->id());
+        ->getStorage($this->entity->getEntityTypeId());
+      $storage->resetCache();
+      $this->entity = $storage->load($this->entity->id());
     }
 
     // Create a referencing and a non-referencing entity.
@@ -237,7 +237,7 @@ abstract class EntityCacheTagsTestBase extends PageCacheTagsTestBase {
 
     // Also verify the existence of an entity render cache entry.
     $cid = 'entity_view:entity_test:' . $this->referencing_entity->id() . ':full:stark:r.anonymous';
-    $cache_entry = \Drupal::cache()->get($cid);
+    $cache_entry = \Drupal::cache('render')->get($cid);
     $this->assertIdentical($cache_entry->tags, $referencing_entity_cache_tags);
 
 
@@ -250,7 +250,7 @@ abstract class EntityCacheTagsTestBase extends PageCacheTagsTestBase {
 
     // Also verify the existence of an entity render cache entry.
     $cid = 'entity_view:entity_test:' . $this->non_referencing_entity->id() . ':full:stark:r.anonymous';
-    $cache_entry = \Drupal::cache()->get($cid);
+    $cache_entry = \Drupal::cache('render')->get($cid);
     $this->assertIdentical($cache_entry->tags, $non_referencing_entity_cache_tags);
 
 

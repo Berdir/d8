@@ -84,15 +84,15 @@ interface EntityManagerInterface extends PluginManagerInterface {
   public function getAdminRouteInfo($entity_type_id, $bundle);
 
   /**
-   * Creates a new storage controller instance.
+   * Creates a new storage instance.
    *
    * @param string $entity_type
-   *   The entity type for this storage controller.
+   *   The entity type for this storage.
    *
-   * @return \Drupal\Core\Entity\EntityStorageControllerInterface
-   *   A storage controller instance.
+   * @return \Drupal\Core\Entity\EntityStorageInterface
+   *   A storage instance.
    */
-  public function getStorageController($entity_type);
+  public function getStorage($entity_type);
 
   /**
    * Get the bundle info of all entity types.
@@ -119,15 +119,15 @@ interface EntityManagerInterface extends PluginManagerInterface {
   public function getViewBuilder($entity_type);
 
   /**
-   * Creates a new list controller instance.
+   * Creates a new entity list builder.
    *
    * @param string $entity_type
-   *   The entity type for this list controller.
+   *   The entity type for this list builder.
    *
-   * @return \Drupal\Core\Entity\EntityListControllerInterface
-   *   A list controller instance.
+   * @return \Drupal\Core\Entity\EntityListBuilderInterface
+   *   An entity list builder instance.
    */
-  public function getListController($entity_type);
+  public function getListBuilder($entity_type);
 
   /**
    * Creates a new form controller instance.
@@ -234,5 +234,69 @@ interface EntityManagerInterface extends PluginManagerInterface {
    *   An array of entity type objects.
    */
   public function getDefinitions();
+
+  /**
+   * Returns the entity view mode info for all entity types.
+   *
+   * @return array
+   *   The view mode info for all entity types.
+   */
+  public function getAllViewModes();
+
+  /**
+   * Returns the entity view mode info for a specific entity type.
+   *
+   * @param string $entity_type_id
+   *   The entity type whose view mode info should be returned.
+   *
+   * @return array
+   *   The view mode info for a specific entity type.
+   */
+  public function getViewModes($entity_type_id);
+
+  /**
+   * Returns the entity form mode info for all entity types.
+   *
+   * @return array
+   *   The form mode info for all entity types.
+   */
+  public function getAllFormModes();
+
+  /**
+   * Returns the entity form mode info for a specific entity type.
+   *
+   * @param string $entity_type_id
+   *   The entity type whose form mode info should be returned.
+   *
+   * @return array
+   *   The form mode info for a specific entity type.
+   */
+  public function getFormModes($entity_type_id);
+
+  /**
+   * Returns an array of view mode options.
+   *
+   * @param string $entity_type_id
+   *   The entity type whose view mode options should be returned.
+   * @param bool $include_disabled
+   *   Force to include disabled view modes. Defaults to FALSE.
+   *
+   * @return array
+   *   An array of view mode labels, keyed by the display mode ID.
+   */
+  public function getViewModeOptions($entity_type_id, $include_disabled = FALSE);
+
+  /**
+   * Returns an array of form mode options.
+   *
+   * @param string $entity_type_id
+   *   The entity type whose form mode options should be returned.
+   * @param bool $include_disabled
+   *   Force to include disabled form modes. Defaults to FALSE.
+   *
+   * @return array
+   *   An array of form mode labels, keyed by the display mode ID.
+   */
+  public function getFormModeOptions($entity_type_id, $include_disabled = FALSE);
 
 }
