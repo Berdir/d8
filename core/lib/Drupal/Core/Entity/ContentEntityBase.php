@@ -171,7 +171,7 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
   /**
    * {@inheritdoc}
    */
-  public function postCreate(EntityStorageControllerInterface $storage_controller) {
+  public function postCreate(EntityStorageInterface $storage_controller) {
     $this->newRevision = TRUE;
   }
 
