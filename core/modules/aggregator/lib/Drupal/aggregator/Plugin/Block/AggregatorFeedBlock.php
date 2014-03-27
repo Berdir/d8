@@ -36,7 +36,7 @@ class AggregatorFeedBlock extends BlockBase implements ContainerFactoryPluginInt
   protected $feedStorage;
 
   /**
-   * The entity storage controller for items.
+   * The entity storage for items.
    *
    * @var \Drupal\aggregator\ItemStorageInterface
    */
@@ -59,9 +59,9 @@ class AggregatorFeedBlock extends BlockBase implements ContainerFactoryPluginInt
    * @param array $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\aggregator\FeedStorageInterface $feed_storage
-   *   The entity storage controller for feeds.
+   *   The entity storage for feeds.
    * @param \Drupal\aggregator\ItemStorageInterface $item_storage
-   *   The entity storage controller for feed items.
+   *   The entity storage for feed items.
    * @param \Drupal\Core\Entity\Query\QueryInterface $item_query
    *   The entity query object for feed items.
    */

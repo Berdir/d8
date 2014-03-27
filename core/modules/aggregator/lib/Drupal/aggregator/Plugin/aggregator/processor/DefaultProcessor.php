@@ -45,7 +45,7 @@ class DefaultProcessor extends AggregatorPluginSettingsBase implements Processor
   protected $itemQuery;
 
   /**
-   * The entity storage controller for items.
+   * The entity storage for items.
    *
    * @var \Drupal\aggregator\ItemStorageInterface
    */
@@ -65,7 +65,7 @@ class DefaultProcessor extends AggregatorPluginSettingsBase implements Processor
    * @param \Drupal\Core\Entity\Query\QueryInterface $item_query
    *   The entity query object for feed items.
    * @param \Drupal\aggregator\ItemStorageInterface $item_storage
-   *   The entity storage controller for feed items.
+   *   The entity storage for feed items.
    */
   public function __construct(array $configuration, $plugin_id, array $plugin_definition, ConfigFactoryInterface $config, QueryInterface $item_query, ItemStorageInterface $item_storage) {
     $this->configFactory = $config;
