@@ -8,6 +8,8 @@
 namespace Drupal\Core\Config\Entity;
 
 use Drupal\Core\Entity\EntityType;
+use Drupal\Core\Config\ConfigPrefixLengthException;
+use Drupal\Component\Utility\String;
 
 /**
  * Provides an implementation of a config entity type and its metadata.
@@ -34,18 +36,25 @@ class ConfigEntityType extends EntityType {
    * {@inheritdoc}
    */
   public function getConfigPrefix() {
-    if (isset($this->config_prefix)) {
-      $config_prefix = $this->config_prefix;
-    }
-    else {
-      $config_prefix = $this->id();
-    }
     // Ensure that all configuration entities are prefixed by the module that
     // provides the configuration entity type. This ensures that default
     // configuration will be created as expected during module install and
     // dependencies can be calculated without the modules that provide the
     // entity types being installed.
-    return $this->provider . '.' . $config_prefix;
+    if (isset($this->config_prefix)) {
+      $config_prefix = $this->provider . '.' . $this->config_prefix;
+    }
+    else {
+      $config_prefix = $this->provider . '.' . $this->id();
+    }
+
+    if (strlen($config_prefix) > 83) {
+      throw new ConfigPrefixLengthException(String::format('The @config_prefix config_prefix length is larger than the maximum limit of @char_count characters', array(
+        '@config_prefix' => $config_prefix,
+        '@char_count' => 83,
+      )));
+    }
+    return $config_prefix;
   }
 
   /**
