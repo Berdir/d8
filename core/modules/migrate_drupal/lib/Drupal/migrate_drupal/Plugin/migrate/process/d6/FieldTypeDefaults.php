@@ -27,7 +27,7 @@ class FieldTypeDefaults extends ProcessPluginBase {
   public function transform($value, MigrateExecutable $migrate_executable, Row $row, $destination_property) {
     if (is_array($value)) {
       if ($row->getSourceProperty('module') == 'date') {
-        $value = 'date_default';
+        $value = 'datetime_default';
       }
       else {
         throw new MigrateException(sprintf('Lookup failed for %s', var_export($value, TRUE)));

@@ -46,13 +46,13 @@ process:
           text:
             default: text_default
             trimmed: text_trimmed
-          integer:
+          number_integer:
             default: number_integer
             us_0: number_integer
             be_0: number_integer
             fr_0: number_integer
             unformatted: number_unformatted
-          float:
+          number_float:
             default: number_decimal
             us_0: number_decimal
             us_1: number_decimal
@@ -64,7 +64,7 @@ process:
             fr_1: number_decimal
             fr_2: number_decimal
             unformatted: number_unformatted
-          decimal:
+          number_decimal:
             default: number_decimal
             us_0: number_decimal
             us_1: number_decimal
@@ -80,7 +80,7 @@ process:
             default: email_mailto
             spamspan: email_mailto
             contact: email_mailto
-            plain: text_plain
+            plain: string
           link:
             default: link
             plain: link
@@ -98,69 +98,69 @@ process:
             image_nodelink: image
             image_imagelink: image
           fr_phone:
-            default: text_plain
+            default: string
           be_phone:
-            default: text_plain
+            default: string
           it_phone:
-            default: text_plain
+            default: string
           el_phone:
-            default: text_plain
+            default: string
           ch_phone:
-            default: text_plain
+            default: string
           ca_phone:
-            default: text_plain
+            default: string
           cr_phone:
-            default: text_plain
+            default: string
           pa_phone:
-            default: text_plain
+            default: string
           gb_phone:
-            default: text_plain
+            default: string
           ru_phone:
-            default: text_plain
+            default: string
           ua_phone:
-            default: text_plain
+            default: string
           es_phone:
-            default: text_plain
+            default: string
           au_phone:
-            default: text_plain
+            default: string
           cs_phone:
-            default: text_plain
+            default: string
           hu_phone:
-            default: text_plain
+            default: string
           pl_phone:
-            default: text_plain
+            default: string
           nl_phone:
-            default: text_plain
+            default: string
           se_phone:
-            default: text_plain
+            default: string
           za_phone:
-            default: text_plain
+            default: string
           il_phone:
-            default: text_plain
+            default: string
           nz_phone:
-            default: text_plain
+            default: string
           br_phone:
-            default: text_plain
+            default: string
           cl_phone:
-            default: text_plain
+            default: string
           cn_phone:
-            default: text_plain
+            default: string
           hk_phone:
-            default: text_plain
+            default: string
           mo_phone:
-            default: text_plain
+            default: string
           ph_phone:
-            default: text_plain
+            default: string
           sg_phone:
-            default: text_plain
+            default: string
           jo_phone:
-            default: text_plain
+            default: string
           eg_phone:
-            default: text_plain
+            default: string
           pk_phone:
-            default: text_plain
+            default: string
           int_phone:
-            default: text_plain
+            default: string
       -
         plugin: field_type_defaults
   "options.settings":
