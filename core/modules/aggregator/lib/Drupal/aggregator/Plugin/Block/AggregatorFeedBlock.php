@@ -11,8 +11,6 @@ use Drupal\aggregator\FeedStorageInterface;
 use Drupal\aggregator\ItemStorageInterface;
 use Drupal\block\BlockBase;
 use Drupal\Core\Entity\Query\QueryInterface;
-use Drupal\Core\Database\Connection;
-use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;

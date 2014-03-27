@@ -10,11 +10,9 @@ namespace Drupal\comment;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\ContentEntityDatabaseStorage;
 use Drupal\field\FieldInfo;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\Core\Entity\ContentEntityDatabaseStorage;
-use Drupal\Core\Entity\EntityChangedInterface;
-use Drupal\user\EntityOwnerInterface;
 
 /**
  * Defines the controller class for comments.

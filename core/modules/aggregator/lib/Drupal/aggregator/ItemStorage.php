@@ -10,8 +10,6 @@ namespace Drupal\aggregator;
 use Drupal\aggregator\Entity\Item;
 use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Core\Entity\ContentEntityDatabaseStorage;
-use Drupal\Core\Database\Query\PagerSelectExtender;
-use Drupal\Core\Database\Query\SelectInterface;
 
 /**
  * Controller class for aggregators items.
