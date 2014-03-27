@@ -106,7 +106,7 @@ class AggregatorController extends ControllerBase {
    */
   public function adminOverview() {
     $entity_manager = $this->entityManager();
-    $feeds = $entity_manager->getStorageController('aggregator_feed')
+    $feeds = $entity_manager->getStorage('aggregator_feed')
       ->loadMultiple();
 
     $header = array($this->t('Title'), $this->t('Items'), $this->t('Last update'), $this->t('Next update'), $this->t('Operations'));
@@ -114,7 +114,7 @@ class AggregatorController extends ControllerBase {
     foreach ($feeds as $feed) {
       $row = array();
       $row[] = l($feed->label(), "aggregator/sources/" . $feed->id());
-      $row[] = format_plural($entity_manager->getStorageController('aggregator_item')->getItemCount($feed), '1 item', '@count items');
+      $row[] = format_plural($entity_manager->getStorage('aggregator_item')->getItemCount($feed), '1 item', '@count items');
       $last_checked = $feed->getLastCheckedTime();
       $refresh_rate = $feed->getRefreshRate();
       $row[] = ($last_checked ? $this->t('@time ago', array('@time' => format_interval(REQUEST_TIME - $last_checked))) : $this->t('never'));
@@ -224,7 +224,7 @@ class AggregatorController extends ControllerBase {
    */
   public function opmlPage() {
      $feeds = $this->entityManager()
-      ->getStorageController('aggregator_feed')
+      ->getStorage('aggregator_feed')
       ->loadMultiple();
 
     $feeds = $result->fetchAll();
