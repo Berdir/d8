@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\Core\Entity\ExtensibleEntityStorageInterface.
+ * Contains \Drupal\Core\Entity\FieldableEntityStorageInterface.
  */
 
 namespace Drupal\Core\Entity;
@@ -10,7 +10,7 @@ namespace Drupal\Core\Entity;
 use Drupal\field\FieldConfigInterface;
 use Drupal\field\FieldInstanceConfigInterface;
 
-interface ExtendableEntityStorageInterface extends EntityStorageInterface {
+interface FieldableEntityStorageInterface extends EntityStorageInterface {
 
   /**
    * Allows reaction to the creation of a configurable field.

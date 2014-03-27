@@ -13,7 +13,7 @@ use Drupal\field\FieldConfigInterface;
 use Drupal\field\FieldInstanceConfigInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-abstract class ContentEntityStorageBase extends EntityStorageBase implements ExtendableEntityStorageInterface {
+abstract class ContentEntityStorageBase extends EntityStorageBase implements FieldableEntityStorageInterface {
 
   /**
    * The entity bundle key.
