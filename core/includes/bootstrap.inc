@@ -1645,6 +1645,11 @@ function _drupal_bootstrap_page_cache() {
       // We are done.
       $response->prepare($request);
       $response->send();
+      $xhprof_data = xhprof_disable();
+      $xhprof_runs = new XHProfRuns_Default();
+      $namespace = 'd8';
+      $id = $xhprof_runs->save_run($xhprof_data, $namespace);
+      print "<a href='http://localhost/xhprof_html/?run=$id&sort=excl_wt&source=$namespace'>XHPROF</a>";
       exit;
     }
     else {
