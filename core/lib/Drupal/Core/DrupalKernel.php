@@ -403,33 +403,12 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       $this->moduleList = $this->newModuleList;
       unset($this->newModuleList);
     }
-    // Second, check if some other request -- for example on another web
-    // frontend or during the installer -- changed the list of enabled modules.
     if (isset($this->container)) {
       // All namespaces must be registered before we attempt to use any service
       // from the container.
-      $container_modules = $this->container->getParameter('container.modules');
-      $namespaces_before = $this->classLoader->getPrefixes();
       $this->registerNamespaces($this->container->getParameter('container.namespaces'));
-
-      // If 'container.modules' is wrong, the container must be rebuilt.
-      if (!isset($this->moduleList)) {
-        $this->moduleList = $this->container->get('config.factory')->get('system.module')->get('enabled');
-      }
-      if (array_keys($this->moduleList) !== array_keys($container_modules)) {
-        $persist = $this->getServicesToPersist();
-        unset($this->container);
-        // Revert the class loader to its prior state. However,
-        // registerNamespaces() performs a merge rather than replace, so to
-        // effectively remove erroneous registrations, we must replace them with
-        // empty arrays.
-        $namespaces_after = $this->classLoader->getPrefixes();
-        $namespaces_before += array_fill_keys(array_diff(array_keys($namespaces_after), array_keys($namespaces_before)), array());
-        $this->registerNamespaces($namespaces_before);
-      }
     }
-
-    if (!isset($this->container)) {
+    else {
       $this->container = $this->buildContainer();
       $this->persistServices($persist);
 
