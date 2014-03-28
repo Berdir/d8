@@ -85,6 +85,11 @@ services:
   config.installer:
     class: Drupal\Core\Config\ConfigInstaller
     arguments: ['@config.factory', '@config.storage', '@config.typed', '@config.manager', '@event_dispatcher']
+  config.cache_prime_subscriber:
+    class: Drupal\Core\Config\ConfigCachePrimeSubscriber
+    arguments: ['@config.factory']
+    tags:
+      - { name: event_subscriber }
   config.storage.staging:
     class: Drupal\Core\Config\FileStorage
     factory_class: Drupal\Core\Config\FileStorageFactory

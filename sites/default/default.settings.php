@@ -276,6 +276,14 @@ $settings['hash_salt'] = '';
 $settings['update_free_access'] = FALSE;
 
 /**
+ * Configuration object names to prime in cache.
+ *
+ * The configuration system will prime its cache with the configuration
+ * objects named in this array.
+ */
+# $settings['config_cache_prime_names'] = array();
+
+/**
  * Twig debugging:
  *
  * When debugging is enabled:
