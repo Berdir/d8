@@ -883,7 +883,7 @@ function drupal_serve_page_from_cache(stdClass $cache, Response $response, Reque
   // to that one particular client due to Vary: Cookie. Thus, do not set
   // max-age > 0, allowing the page to be cached by external proxies, when a
   // session cookie is present unless the Vary header has been replaced.
-  $max_age = !$request->cookies->has(session_name()) || isset($boot_headers['vary']) ? $cache->data->max_age : 0;
+  $max_age = !$request->cookies->has(session_name()) || isset($boot_headers['vary']) ? $cache->data['max_age'] : 0;
   // RFC 2616, section 14.21 says: 'To mark a response as "never expires," an
   // origin server sends an Expires date approximately one year from the time
   // the response is sent. HTTP/1.1 servers SHOULD NOT send Expires dates more
@@ -1638,7 +1638,7 @@ function _drupal_bootstrap_page_cache() {
       $response->headers->set('X-Drupal-Cache', 'HIT');
       // There is no user, so we do not need to check if there is a different
       // timezone.
-      date_default_timezone_set($cache->data->timezone);
+      date_default_timezone_set($cache->data['timezone']);
 
       drupal_serve_page_from_cache($cache, $response, $request);
 
