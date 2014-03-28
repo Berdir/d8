@@ -3165,7 +3165,8 @@ function drupal_page_set_cache(Response $response, Request $request) {
   if (drupal_page_is_cacheable()) {
 
     // Check if the current page may be compressed.
-    $page_compressed = \Drupal::config('system.performance')->get('response.gzip') && extension_loaded('zlib');
+    $config = \Drupal::config('system.performance');
+    $page_compressed = $config->get('response.gzip') && extension_loaded('zlib');
 
     $cache = (object) array(
       'cid' => drupal_page_cache_get_cid($request),
@@ -3175,6 +3176,8 @@ function drupal_page_set_cache(Response $response, Request $request) {
         // We need to store whether page was compressed or not,
         // because by the time it is read, the configuration might change.
         'page_compressed' => $page_compressed,
+        'timezone' => drupal_get_user_timezone(),
+        'max_age' => $config->get('cache.page.max_age'),
       ),
       'tags' => HtmlViewSubscriber::convertHeaderToCacheTags($response->headers->get('X-Drupal-Cache-Tags')),
       'expire' => Cache::PERMANENT,
