@@ -335,6 +335,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     // then reboot in order to refresh the serviceProvider list and container.
     if ($this->booted) {
       $this->booted = FALSE;
+      $this->storage()->delete($this->getClassName() . '.php');
       $this->boot();
     }
   }

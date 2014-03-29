@@ -7,6 +7,7 @@
 
 namespace Drupal\ckeditor\Tests;
 
+use Drupal\Component\PhpStorage\PhpStorageFactory;
 use Drupal\editor\Entity\Editor;
 use Drupal\simpletest\WebTestBase;
 
@@ -164,6 +165,7 @@ class CKEditorAdminTest extends WebTestBase {
     // CKEditor plugin — this should not affect the Editor config entity.
     \Drupal::moduleHandler()->install(array('ckeditor_test'));
     $this->rebuildContainer();
+    //PhpStorageFactory::get('service_container')->deleteAll();
     $this->container->get('plugin.manager.ckeditor.plugin')->clearCachedDefinitions();
     $this->drupalGet('admin/config/content/formats/manage/filtered_html');
     $ultra_llama_mode_checkbox = $this->xpath('//input[@type="checkbox" and @name="editor[settings][plugins][llama_contextual_and_button][ultra_llama_mode]" and not(@checked)]');
