@@ -11,7 +11,7 @@ use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\FieldDefinition;
 use Symfony\Component\DependencyInjection\Container;
-use Drupal\Core\Entity\EntityStorageControllerInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\aggregator\FeedInterface;
 
 /**
@@ -21,12 +21,12 @@ use Drupal\aggregator\FeedInterface;
  *   id = "aggregator_feed",
  *   label = @Translation("Aggregator feed"),
  *   controllers = {
- *     "storage" = "Drupal\aggregator\FeedStorageController",
+ *     "storage" = "Drupal\aggregator\FeedStorage",
  *     "view_builder" = "Drupal\aggregator\FeedViewBuilder",
  *     "form" = {
  *       "default" = "Drupal\aggregator\FeedFormController",
  *       "delete" = "Drupal\aggregator\Form\FeedDeleteForm",
- *       "remove_items" = "Drupal\aggregator\Form\FeedItemsRemoveForm",
+ *       "delete_items" = "Drupal\aggregator\Form\FeedItemsDeleteForm",
  *     }
  *   },
  *   links = {
@@ -62,11 +62,9 @@ class Feed extends ContentEntityBase implements FeedInterface {
   /**
    * {@inheritdoc}
    */
-  public function removeItems() {
-    $manager = \Drupal::service('plugin.manager.aggregator.processor');
-    foreach ($manager->getDefinitions() as $id => $definition) {
-      $manager->createInstance($id)->remove($this);
-    }
+  public function deleteItems() {
+    \Drupal::service('aggregator.items.importer')->delete($this);
+
     // Reset feed.
     $this->setLastCheckedTime(0);
     $this->setHash('');
@@ -80,7 +78,21 @@ class Feed extends ContentEntityBase implements FeedInterface {
   /**
    * {@inheritdoc}
    */
-  public static function preCreate(EntityStorageControllerInterface $storage_controller, array &$values) {
+  public function refreshItems() {
+    $success = \Drupal::service('aggregator.items.importer')->refresh($this);
+
+    // Regardless of successful or not, indicate that it has been checked.
+    $this->setLastCheckedTime(REQUEST_TIME);
+    $this->setQueuedTime(0);
+    $this->save();
+
+    return $success;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function preCreate(EntityStorageInterface $storage, array &$values) {
     $values += array(
       'link' => '',
       'description' => '',
@@ -91,20 +103,17 @@ class Feed extends ContentEntityBase implements FeedInterface {
   /**
    * {@inheritdoc}
    */
-  public static function preDelete(EntityStorageControllerInterface $storage_controller, array $entities) {
+  public static function preDelete(EntityStorageInterface $storage, array $entities) {
     foreach ($entities as $entity) {
-      // Notify processors to remove stored items.
-      $manager = \Drupal::service('plugin.manager.aggregator.processor');
-      foreach ($manager->getDefinitions() as $id => $definition) {
-        $manager->createInstance($id)->remove($entity);
-      }
+      // Notify processors to delete stored items.
+      \Drupal::service('aggregator.items.importer')->delete($entity);
     }
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function postDelete(EntityStorageControllerInterface $storage_controller, array $entities) {
+  public static function postDelete(EntityStorageInterface $storage, array $entities) {
     if (\Drupal::moduleHandler()->moduleExists('block')) {
       // Make sure there are no active blocks for these feeds.
       $ids = \Drupal::entityQuery('block')
@@ -112,7 +121,7 @@ class Feed extends ContentEntityBase implements FeedInterface {
         ->condition('settings.feed', array_keys($entities))
         ->execute();
       if ($ids) {
-        $block_storage = \Drupal::entityManager()->getStorageController('block');
+        $block_storage = \Drupal::entityManager()->getStorage('block');
         $block_storage->delete($block_storage->loadMultiple($ids));
       }
     }

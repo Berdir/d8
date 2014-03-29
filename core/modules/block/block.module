@@ -7,6 +7,7 @@
 
 use Drupal\block\BlockInterface;
 use Drupal\Component\Plugin\Exception\PluginException;
+use Drupal\language\Entity\Language;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 
 /**
@@ -93,20 +94,6 @@ function block_permission() {
 }
 
 /**
- * Implements hook_menu_link_defaults().
- */
-function block_menu_link_defaults() {
-  $links['block.admin.structure'] = array(
-    'link_title' => 'Block layout',
-    'parent' => 'system.admin.structure',
-    'description' => 'Configure what block content appears in your site\'s sidebars and other regions.',
-    'route_name' => 'block.admin_display',
-  );
-
-  return $links;
-}
-
-/**
  * Implements hook_page_build().
  *
  * Renders blocks into their regions.
@@ -170,7 +157,7 @@ function block_get_blocks_by_region($region) {
   $build = array();
   if ($list = block_list($region)) {
     foreach ($list as $key => $block) {
-      if ($block->access()) {
+      if ($block->access('view')) {
         $build[$key] = entity_view($block, 'block');
       }
     }
@@ -444,16 +431,16 @@ function block_menu_delete($menu) {
 }
 
 /**
- * Implements hook_language_delete().
+ * Implements hook_ENTITY_TYPE_delete() for 'language_entity'.
  *
  * Delete the potential block visibility settings of the deleted language.
  */
-function block_language_delete($language) {
+function block_language_entity_delete(Language $language) {
   // Remove the block visibility settings for the deleted language.
   foreach (entity_load_multiple('block') as $block) {
     $visibility = $block->get('visibility');
-    if (isset($visibility['language']['langcodes'][$language->id])) {
-      unset($visibility['language']['langcodes'][$language->id]);
+    if (isset($visibility['language']['langcodes'][$language->id()])) {
+      unset($visibility['language']['langcodes'][$language->id()]);
       $block->set('visibility', $visibility);
       $block->save();
     }

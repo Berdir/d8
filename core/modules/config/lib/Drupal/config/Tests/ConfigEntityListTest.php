@@ -9,7 +9,7 @@ namespace Drupal\config\Tests;
 
 use Drupal\simpletest\WebTestBase;
 use Drupal\config_test\Entity\ConfigTest;
-use Drupal\Core\Entity\EntityStorageControllerInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
 
 /**
  * Tests the listing of configuration entities.
@@ -37,8 +37,8 @@ class ConfigEntityListTest extends WebTestBase {
   function testList() {
     $controller = \Drupal::entityManager()->getListBuilder('config_test');
 
-    // Test getStorageController() method.
-    $this->assertTrue($controller->getStorageController() instanceof EntityStorageControllerInterface, 'EntityStorageController instance in storage.');
+    // Test getStorage() method.
+    $this->assertTrue($controller->getStorage() instanceof EntityStorageInterface, 'EntityStorage instance in storage.');
 
     // Get a list of ConfigTest entities and confirm that it contains the
     // ConfigTest entity provided by the config_test module.
@@ -54,15 +54,15 @@ class ConfigEntityListTest extends WebTestBase {
       'edit' => array (
         'title' => t('Edit'),
         'weight' => 10,
-      ) + $entity->urlInfo(),
+      ) + $entity->urlInfo()->toArray(),
       'disable' => array(
         'title' => t('Disable'),
         'weight' => 40,
-      ) + $entity->urlInfo('disable'),
+      ) + $entity->urlInfo('disable')->toArray(),
       'delete' => array (
         'title' => t('Delete'),
         'weight' => 100,
-      ) + $entity->urlInfo('delete-form'),
+      ) + $entity->urlInfo('delete-form')->toArray(),
     );
 
     $actual_operations = $controller->getOperations($entity);
@@ -91,20 +91,20 @@ class ConfigEntityListTest extends WebTestBase {
     $actual_items = $controller->buildRow($entity);
     $this->assertIdentical($expected_items, $actual_items, 'Return value from buildRow matches expected.');
     // Test sorting.
-    $storage_controller = $controller->getStorageController();
-    $entity = $storage_controller->create(array(
+    $storage = $controller->getStorage();
+    $entity = $storage->create(array(
       'id' => 'alpha',
       'label' => 'Alpha',
       'weight' => 1,
     ));
     $entity->save();
-    $entity = $storage_controller->create(array(
+    $entity = $storage->create(array(
       'id' => 'omega',
       'label' => 'Omega',
       'weight' => 1,
     ));
     $entity->save();
-    $entity = $storage_controller->create(array(
+    $entity = $storage->create(array(
       'id' => 'beta',
       'label' => 'Beta',
       'weight' => 0,
@@ -126,11 +126,11 @@ class ConfigEntityListTest extends WebTestBase {
       'edit' => array(
         'title' => t('Edit'),
         'weight' => 10,
-      ) + $entity->urlInfo(),
+      ) + $entity->urlInfo()->toArray(),
       'delete' => array(
         'title' => t('Delete'),
         'weight' => 100,
-      ) + $entity->urlInfo('delete-form'),
+      ) + $entity->urlInfo('delete-form')->toArray(),
     );
 
     $actual_operations = $controller->getOperations($entity);

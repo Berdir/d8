@@ -46,12 +46,9 @@ class EntityViewBuilder extends EntityControllerBase implements EntityController
   /**
    * The cache bin used to store the render cache.
    *
-   * @todo Defaults to 'cache' for now, until http://drupal.org/node/1194136 is
-   * fixed.
-   *
    * @var string
    */
-  protected $cacheBin = 'cache';
+  protected $cacheBin = 'render';
 
   /**
    * The language manager.
@@ -274,7 +271,8 @@ class EntityViewBuilder extends EntityControllerBase implements EntityController
    */
   public function resetCache(array $entities = NULL) {
     if (isset($entities)) {
-      $tags = array();
+      // Always invalidate the ENTITY_TYPE_list tag.
+      $tags = array($this->entityTypeId . '_list' => TRUE);
       foreach ($entities as $entity) {
         $id = $entity->id();
         $tags[$this->entityTypeId][$id] = $id;
@@ -362,7 +360,7 @@ class EntityViewBuilder extends EntityControllerBase implements EntityController
       // The 'default' is not an actual view mode.
       return TRUE;
     }
-    $view_modes_info = entity_get_view_modes($this->entityTypeId);
+    $view_modes_info = $this->entityManager->getViewModes($this->entityTypeId);
     return !empty($view_modes_info[$view_mode]['cache']);
   }
 

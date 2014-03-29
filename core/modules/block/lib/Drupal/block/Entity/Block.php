@@ -11,8 +11,9 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\block\BlockPluginBag;
 use Drupal\block\BlockInterface;
+use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Config\Entity\EntityWithPluginBagInterface;
-use Drupal\Core\Entity\EntityStorageControllerInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
 
 /**
  * Defines a Block configuration entity class.
@@ -150,8 +151,8 @@ class Block extends ConfigEntityBase implements BlockInterface, EntityWithPlugin
   /**
    * {@inheritdoc}
    */
-  public function postSave(EntityStorageControllerInterface $storage_controller, $update = TRUE) {
-    parent::postSave($storage_controller, $update);
+  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
+    parent::postSave($storage, $update);
 
     if ($update) {
       Cache::invalidateTags(array('block' => $this->id()));
@@ -167,8 +168,8 @@ class Block extends ConfigEntityBase implements BlockInterface, EntityWithPlugin
   /**
    * {@inheritdoc}
    */
-  public static function postDelete(EntityStorageControllerInterface $storage_controller, array $entities) {
-    parent::postDelete($storage_controller, $entities);
+  public static function postDelete(EntityStorageInterface $storage, array $entities) {
+    parent::postDelete($storage, $entities);
 
     Cache::invalidateTags(array('block' => array_keys($entities)));
   }
@@ -176,7 +177,7 @@ class Block extends ConfigEntityBase implements BlockInterface, EntityWithPlugin
   /**
    * Sorts active blocks by weight; sorts inactive blocks by name.
    */
-  public static function sort($a, $b) {
+  public static function sort(ConfigEntityInterface $a, ConfigEntityInterface $b) {
     // Separate enabled from disabled.
     $status = $b->get('status') - $a->get('status');
     if ($status) {

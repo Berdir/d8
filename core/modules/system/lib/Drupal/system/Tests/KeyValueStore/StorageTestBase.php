@@ -54,7 +54,7 @@ abstract class StorageTestBase extends UnitTestBase {
     $this->container->set('service_container', $this->container);
     $this->container->register('settings', 'Drupal\Component\Utility\Settings')
       ->setFactoryClass('Drupal\Component\Utility\Settings')
-      ->setFactoryMethod('getSingleton');
+      ->setFactoryMethod('getInstance');
     $this->container
       ->register('keyvalue', 'Drupal\Core\KeyValueStore\KeyValueFactory')
       ->addArgument(new Reference('service_container'))
@@ -203,6 +203,20 @@ abstract class StorageTestBase extends UnitTestBase {
     $this->assertIdenticalObject($this->objects[1], $stores[0]->get($key));
     // Verify that the other collection is still not affected.
     $this->assertFalse($stores[1]->get($key));
+  }
+
+  /**
+   * Tests the rename operation.
+   */
+  public function testRename() {
+    $stores = $this->createStorage();
+    $store = $stores[0];
+
+    $store->set('old', 'thing');
+    $this->assertIdentical($store->get('old'), 'thing');
+    $store->rename('old', 'new');
+    $this->assertIdentical($store->get('new'), 'thing');
+    $this->assertNull($store->get('old'));
   }
 
   /**

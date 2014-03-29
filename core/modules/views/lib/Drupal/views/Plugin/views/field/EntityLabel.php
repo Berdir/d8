@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Field handler to display entity label optionally linked to entity page.
  *
- * @PluginID("entity_label")
+ * @ViewsField("entity_label")
  */
 class EntityLabel extends FieldPluginBase {
 
@@ -131,7 +131,7 @@ class EntityLabel extends FieldPluginBase {
     }
 
     foreach ($entity_ids_per_type as $type => $ids) {
-      $this->loadedReferencers[$type] = $this->entityManager->getStorageController($type)->loadMultiple($ids);
+      $this->loadedReferencers[$type] = $this->entityManager->getStorage($type)->loadMultiple($ids);
     }
   }
 

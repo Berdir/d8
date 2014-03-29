@@ -8,8 +8,8 @@
  * API pattern.
  */
 
-use Drupal\Component\Utility\String;
 use Drupal\Core\Language\Language;
+use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\Response;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Database\Query\AlterableInterface;
@@ -21,7 +21,10 @@ use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 use Drupal\Core\Template\Attribute;
 use Drupal\file\Entity\File;
+use Drupal\language\Entity\Language as LanguageEntity;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
+use Drupal\block\Entity\Block;
+use Drupal\Core\Session\AccountInterface;
 
 /**
  * Denotes that the node is not published.
@@ -228,12 +231,9 @@ function node_entity_form_display_alter(EntityFormDisplayInterface $form_display
  *   An array with 'path' as the key and the path to the node as its value.
  */
 function node_uri(NodeInterface $node) {
-  return array(
-    'route_name' => 'node.view',
-    'route_parameters' => array(
-      'node' => $node->id(),
-    ),
-  );
+  return new Url('node.view', array(
+    'node' => $node->id(),
+  ));
 }
 
 /**
@@ -266,12 +266,12 @@ function node_title_list($result, $title = NULL) {
 /**
  * Determines the type of marker to be displayed for a given node.
  *
- * @param $nid
+ * @param int $nid
  *   Node ID whose history supplies the "last viewed" timestamp.
- * @param $timestamp
+ * @param int $timestamp
  *   Time which is compared against node's "last viewed" timestamp.
  *
- * @return
+ * @return int
  *   One of the MARK constants.
  */
 function node_mark($nid, $timestamp) {
@@ -298,7 +298,7 @@ function node_mark($nid, $timestamp) {
  *
  * This list can include types that are queued for addition or deletion.
  *
- * @return array
+ * @return \Drupal\node\NodeTypeInterface[]
  *   An array of node type entities, keyed by ID.
  *
  * @see node_type_load()
@@ -312,7 +312,7 @@ function node_type_get_types() {
  *
  * This list can include types that are queued for addition or deletion.
  *
- * @return array
+ * @return string[]
  *   An array of node type labels, keyed by the node type name.
  */
 function node_type_get_names() {
@@ -429,7 +429,7 @@ function node_add_body_field(NodeTypeInterface $type, $label = 'Body') {
 
     // The teaser view mode is created by the Standard profile and therefore
     // might not exist.
-    $view_modes = entity_get_view_modes('node');
+    $view_modes = \Drupal::entityManager()->getViewModes('node');
     if (isset($view_modes['teaser'])) {
       entity_get_display('node', $type->type, 'teaser')
         ->setComponent('body', array(
@@ -444,9 +444,9 @@ function node_add_body_field(NodeTypeInterface $type, $label = 'Body') {
 }
 
 /**
- * Implements hook_field_extra_fields().
+ * Implements hook_entity_extra_field_info().
  */
-function node_field_extra_fields() {
+function node_entity_extra_field_info() {
   $extra = array();
   $module_language_enabled = \Drupal::moduleHandler()->moduleExists('language');
   $description = t('Node module element');
@@ -644,7 +644,9 @@ function template_preprocess_node(&$variables) {
   );
   $variables['name'] = drupal_render($username);
 
-  $variables['node_url'] = $node->url();
+  $variables['node_url'] = $node->url('canonical', array(
+    'language' => $node->language(),
+  ));
   $variables['label'] = $variables['elements']['title'];
   unset($variables['elements']['title']);
   $variables['page'] = $variables['view_mode'] == 'full' && node_is_page($node);
@@ -923,31 +925,6 @@ function _node_revision_access(NodeInterface $node, $op = 'view', $account = NUL
 }
 
 /**
- * Implements hook_menu_link_defaults().
- */
-function node_menu_link_defaults() {
-  $links['node.admin.content'] = array(
-    'link_title' => 'Content',
-    'route_name' => 'node.content_overview',
-    'parent' => 'system.admin',
-    'description' => 'Find and manage content.',
-    'weight' => -10,
-  );
-
-  $links['node.admin.structure.types'] = array(
-    'link_title' => 'Content types',
-    'parent' => 'system.admin.structure',
-    'description' => 'Manage content types, including default status, front page promotion, comment settings, etc.',
-    'route_name' => 'node.overview_types',
-  );
-  $links['node.add'] = array(
-    'link_title' => 'Add content',
-    'route_name' => 'node.add_page',
-  );
-  return $links;
-}
-
-/**
  * Title callback: Displays the node's title.
  *
  * @param \Drupal\node\NodeInterface $node
@@ -1074,7 +1051,11 @@ function node_form_block_form_alter(&$form, &$form_state) {
  * Checks the content type specific visibility settings and removes the block
  * if the visibility conditions are not met.
  */
-function node_block_access($block) {
+function node_block_access(Block $block, $operation, AccountInterface $account, $langcode) {
+  // Only affect access when viewing the block.
+  if ($operation != 'view') {
+    return;
+  }
   $visibility = $block->get('visibility');
   if (!empty($visibility)) {
     if (!empty($visibility['node_type']['types'])) {
@@ -1810,13 +1791,13 @@ function node_file_download_access($field, EntityInterface $entity, File $file) 
 }
 
 /**
- * Implements hook_language_delete().
+ * Implements hook_ENTITY_TYPE_delete() for 'language_entity'.
  */
-function node_language_delete($language) {
+function node_language_entity_delete(LanguageEntity $language) {
   // On nodes with this language, unset the language.
   db_update('node_revision')
     ->fields(array('langcode' => ''))
-    ->condition('langcode', $language->id)
+    ->condition('langcode', $language->id())
     ->execute();
 }
 

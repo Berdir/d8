@@ -689,7 +689,7 @@ class ViewEditFormController extends ViewFormControllerBase {
         ),
         'clone' => array(
           'title' => $this->t('Clone view'),
-        ) + $view->urlInfo('clone'),
+        ) + $view->urlInfo('clone')->toArray(),
         'reorder' => array(
           'title' => $this->t('Reorder displays'),
           'href' => "admin/structure/views/nojs/reorder-displays/{$view->id()}/$display_id",
@@ -701,7 +701,7 @@ class ViewEditFormController extends ViewFormControllerBase {
     if ($view->access('delete')) {
       $element['extra_actions']['#links']['delete'] = array(
         'title' => $this->t('Delete view'),
-      ) + $view->urlInfo('delete-form');
+      ) + $view->urlInfo('delete-form')->toArray();
     }
 
     // Let other modules add additional links here.
@@ -911,7 +911,7 @@ class ViewEditFormController extends ViewFormControllerBase {
     $executable->setDisplay($display['id']);
     $executable->initStyle();
 
-    $types = $executable->viewsHandlerTypes();
+    $types = $executable->getHandlerTypes();
 
     $build = array(
       '#theme_wrappers' => array('views_ui_display_tab_bucket'),

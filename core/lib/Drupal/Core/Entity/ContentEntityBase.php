@@ -134,7 +134,7 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
   public function __construct(array $values, $entity_type, $bundle = FALSE, $translations = array()) {
     $this->entityTypeId = $entity_type;
     $this->bundle = $bundle ? $bundle : $this->entityTypeId;
-    $this->languages = language_list(Language::STATE_ALL);
+    $this->languages = $this->languageManager()->getLanguages(Language::STATE_ALL);
 
     foreach ($values as $key => $value) {
       // If the key matches an existing property set the value to the property
@@ -157,8 +157,15 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
         }
       }
     }
+  }
 
-    $this->init();
+  /**
+   * Returns the typed data manager.
+   *
+   * @return \Drupal\Core\TypedData\TypedDataManager
+   */
+  protected function typedDataManager() {
+    return \Drupal::typedDataManager();
   }
 
   /**
@@ -197,15 +204,14 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
    * {@inheritdoc}
    */
   public function isTranslatable() {
-    // @todo Inject the entity manager and retrieve bundle info from it.
-    $bundles = entity_get_bundles($this->entityTypeId);
+    $bundles = $this->entityManager()->getBundleInfo($this->entityTypeId);
     return !empty($bundles[$this->bundle()]['translatable']);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function preSaveRevision(EntityStorageControllerInterface $storage_controller, \stdClass $record) {
+  public function preSaveRevision(EntityStorageInterface $storage, \stdClass $record) {
   }
 
   /**
@@ -223,7 +229,7 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
   public function getValue() {
     // @todo: This does not make much sense, so remove once TypedDataInterface
     // is removed. See https://drupal.org/node/2002138.
-    return $this->getPropertyValues();
+    return $this->toArray();
   }
 
   /**
@@ -232,22 +238,23 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
   public function setValue($value, $notify = TRUE) {
     // @todo: This does not make much sense, so remove once TypedDataInterface
     // is removed. See https://drupal.org/node/2002138.
-    $this->setPropertyValues($value);
+    foreach ($value as $field_name => $field_value) {
+      $this->set($field_name, $field_value, $notify);
+    }
   }
 
   /**
    * {@inheritdoc}
    */
   public function getString() {
-    return $this->label();
+    return (string) $this->label();
   }
 
   /**
    * {@inheritdoc}
    */
   public function validate() {
-    // @todo: Add the typed data manager as proper dependency.
-    return \Drupal::typedDataManager()->getValidator()->validate($this);
+    return $this->typedDataManager()->getValidator()->validate($this);
   }
 
   /**
@@ -303,14 +310,6 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
   }
 
   /**
-   * Initialize the object. Invoked upon construction and wake up.
-   */
-  protected function init() {
-    // We unset all defined properties, so magic getters apply.
-    unset($this->langcode);
-  }
-
-  /**
    * Clear entity translation object cache to remove stale references.
    */
   protected function clearTranslationCache() {
@@ -333,18 +332,7 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
     $this->fieldDefinitions = NULL;
     $this->clearTranslationCache();
 
-    // Don't serialize the url generator.
-    $this->urlGenerator = NULL;
-
-    return array_keys(get_object_vars($this));
-  }
-
-
-  /**
-   * Magic __wakeup() implementation.
-   */
-  public function __wakeup() {
-    $this->init();
+    return parent::__sleep();
   }
 
   /**
@@ -393,7 +381,7 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
   protected function getTranslatedField($name, $langcode) {
     if ($this->translations[$this->activeLangcode]['status'] == static::TRANSLATION_REMOVED) {
       $message = 'The entity object refers to a removed translation (@langcode) and cannot be manipulated.';
-      throw new \InvalidArgumentException(format_string($message, array('@langcode' => $this->activeLangcode)));
+      throw new \InvalidArgumentException(String::format($message, array('@langcode' => $this->activeLangcode)));
     }
     // Populate $this->fields to speed-up further look-ups and to keep track of
     // fields objects, possibly holding changes to field values.
@@ -491,21 +479,12 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
   /**
    * {@inheritdoc}
    */
-  public function getPropertyValues() {
+  public function toArray() {
     $values = array();
     foreach ($this->getProperties() as $name => $property) {
       $values[$name] = $property->getValue();
     }
     return $values;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setPropertyValues($values) {
-    foreach ($values as $name => $value) {
-      $this->get($name)->setValue($value);
-    }
   }
 
   /**
@@ -526,13 +505,13 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
   /**
    * {@inheritdoc}
    */
-  public function access($operation = 'view', AccountInterface $account = NULL) {
+  public function access($operation, AccountInterface $account = NULL) {
     if ($operation == 'create') {
-      return \Drupal::entityManager()
+      return $this->entityManager()
         ->getAccessHandler($this->entityTypeId)
         ->createAccess($this->bundle(), $account);
     }
-    return \Drupal::entityManager()
+    return $this->entityManager()
       ->getAccessHandler($this->entityTypeId)
       ->access($this, $operation, $this->activeLangcode, $account);
   }
@@ -544,7 +523,7 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
     $language = NULL;
     if ($this->activeLangcode != Language::LANGCODE_DEFAULT) {
       if (!isset($this->languages[$this->activeLangcode])) {
-        $this->languages += language_list(Language::STATE_ALL);
+        $this->languages += $this->languageManager()->getLanguages(Language::STATE_ALL);
       }
       $language = $this->languages[$this->activeLangcode];
     }
@@ -594,7 +573,7 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
     if ($name == 'langcode') {
       $this->setDefaultLangcode();
       if (isset($this->translations[$this->defaultLangcode])) {
-        $message = format_string('A translation already exists for the specified language (@langcode).', array('@langcode' => $this->defaultLangcode));
+        $message = String::format('A translation already exists for the specified language (@langcode).', array('@langcode' => $this->defaultLangcode));
         throw new \InvalidArgumentException($message);
       }
       $this->updateFieldLangcodes($this->defaultLangcode);
@@ -643,7 +622,7 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
 
     if (empty($translation)) {
       $message = 'Invalid translation language (@langcode) specified.';
-      throw new \InvalidArgumentException(format_string($message, array('@langcode' => $langcode)));
+      throw new \InvalidArgumentException(String::format($message, array('@langcode' => $langcode)));
     }
 
     return $translation;
@@ -708,15 +687,15 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
   public function addTranslation($langcode, array $values = array()) {
     if (!isset($this->languages[$langcode]) || $this->hasTranslation($langcode)) {
       $message = 'Invalid translation language (@langcode) specified.';
-      throw new \InvalidArgumentException(format_string($message, array('@langcode' => $langcode)));
+      throw new \InvalidArgumentException(String::format($message, array('@langcode' => $langcode)));
     }
 
     // Instantiate a new empty entity so default values will be populated in the
     // specified language.
     $entity_type = $this->getEntityType();
     $default_values = array($entity_type->getKey('bundle') => $this->bundle, 'langcode' => $langcode);
-    $entity = \Drupal::entityManager()
-      ->getStorageController($this->getEntityTypeId())
+    $entity = $this->entityManager()
+      ->getStorage($this->getEntityTypeId())
       ->create($default_values);
 
     foreach ($entity as $name => $field) {
@@ -753,7 +732,7 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
     }
     else {
       $message = 'The specified translation (@langcode) cannot be removed.';
-      throw new \InvalidArgumentException(format_string($message, array('@langcode' => $langcode)));
+      throw new \InvalidArgumentException(String::format($message, array('@langcode' => $langcode)));
     }
   }
 
@@ -895,7 +874,7 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
   public function createDuplicate() {
     if ($this->translations[$this->activeLangcode]['status'] == static::TRANSLATION_REMOVED) {
       $message = 'The entity object refers to a removed translation (@langcode) and cannot be manipulated.';
-      throw new \InvalidArgumentException(format_string($message, array('@langcode' => $this->activeLangcode)));
+      throw new \InvalidArgumentException(String::format($message, array('@langcode' => $this->activeLangcode)));
     }
 
     $duplicate = clone $this;
@@ -904,8 +883,7 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
 
     // Check if the entity type supports UUIDs and generate a new one if so.
     if ($entity_type->hasKey('uuid')) {
-      // @todo Inject the UUID service into the Entity class once possible.
-      $duplicate->{$entity_type->getKey('uuid')}->value = \Drupal::service('uuid')->generate();
+      $duplicate->{$entity_type->getKey('uuid')}->value = $this->uuidGenerator()->generate();
     }
 
     // Check whether the entity type supports revisions and initialize it if so.
@@ -953,9 +931,8 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
   public function label() {
     $label = NULL;
     $entity_type = $this->getEntityType();
-    // @todo Convert to is_callable() and call_user_func().
-    if (($label_callback = $entity_type->getLabelCallback()) && function_exists($label_callback)) {
-      $label = $label_callback($this);
+    if (($label_callback = $entity_type->getLabelCallback()) && is_callable($label_callback)) {
+      $label = call_user_func($label_callback, $this);
     }
     elseif (($label_key = $entity_type->getKey('label')) && isset($this->{$label_key})) {
       $label = $this->{$label_key}->value;

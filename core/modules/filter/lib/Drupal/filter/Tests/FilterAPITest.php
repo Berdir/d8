@@ -7,6 +7,7 @@
 
 namespace Drupal\filter\Tests;
 
+use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\Core\TypedData\AllowedValuesInterface;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\filter\Plugin\DataType\FilterFormat;
@@ -205,8 +206,8 @@ class FilterAPITest extends EntityUnitTestBase {
     ));
 
     // Test with anonymous user.
-    $user = drupal_anonymous_user();
-    $this->container->set('current_user', $user);
+    $user = new AnonymousUserSession();
+    \Drupal::currentUser()->setAccount($user);
 
     $expected_available_options = array(
       'filtered_html' => 'Filtered HTML',
@@ -245,7 +246,7 @@ class FilterAPITest extends EntityUnitTestBase {
     $this->assertFilterFormatViolation($violations, 'filtered_html');
 
     // Set user with access to 'filtered_html' format.
-    $this->container->set('current_user', $filtered_html_user);
+    \Drupal::currentUser()->setAccount($filtered_html_user);
     $violations = $data->validate();
     $this->assertEqual(count($violations), 0, "No validation violation for accessible format 'filtered_html' found.");
 

@@ -1067,8 +1067,6 @@ function template_preprocess_fieldset(&$variables) {
  *   - element: An associative array containing the properties of the element.
  *     Properties used: #attributes, #children, #open,
  *     #description, #id, #title, #value, #optional.
- *
- * @ingroup themeable
  */
 function template_preprocess_details(&$variables) {
   $element = $variables['element'];
@@ -1116,30 +1114,30 @@ function form_pre_render_radio($element) {
 }
 
 /**
- * Returns HTML for a set of radio button form elements.
+ * Prepares variables for radios templates.
  *
- * @param $variables
+ * Default template: radios.html.twig.
+ *
+ * @param array $variables
  *   An associative array containing:
  *   - element: An associative array containing the properties of the element.
  *     Properties used: #title, #value, #options, #description, #required,
  *     #attributes, #children.
- *
- * @ingroup themeable
  */
-function theme_radios($variables) {
+function template_preprocess_radios(&$variables) {
   $element = $variables['element'];
-  $attributes = array();
+  $variables['attributes'] = array();
   if (isset($element['#id'])) {
-    $attributes['id'] = $element['#id'];
+    $variables['attributes']['id'] = $element['#id'];
   }
-  $attributes['class'] = 'form-radios';
+  $variables['attributes']['class'][] = 'form-radios';
   if (!empty($element['#attributes']['class'])) {
-    $attributes['class'] .= ' ' . implode(' ', $element['#attributes']['class']);
+    $variables['attributes']['class'] = array_merge($variables['attributes']['class'], $element['#attributes']['class']);
   }
   if (isset($element['#attributes']['title'])) {
-    $attributes['title'] = $element['#attributes']['title'];
+    $variables['attributes']['title'] = $element['#attributes']['title'];
   }
-  return '<div' . new Attribute($attributes) . '>' . (!empty($element['#children']) ? $element['#children'] : '') . '</div>';
+  $variables['children'] = $element['#children'];
 }
 
 /**
@@ -2291,8 +2289,6 @@ function form_process_autocomplete($element, &$form_state) {
  * @param array $variables
  *   An associative array containing:
  *   - element: An associative array containing the properties of the element.
- *
- * @ingroup themeable
  */
 function template_preprocess_input(&$variables) {
   $element = $variables['element'];
@@ -2849,8 +2845,6 @@ function form_process_file($element) {
  *   - element: An associative array containing the properties of the element.
  *     Properties used: #title, #title_display, #description, #id, #required,
  *     #children, #type, #name.
- *
- * @ingroup themeable
  */
 function template_preprocess_form_element(&$variables) {
   $element = &$variables['element'];

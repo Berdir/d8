@@ -53,34 +53,20 @@ services:
     factory_method: get
     factory_service: cache_factory
     arguments: [entity]
-  cache.field:
+  cache.render:
     class: Drupal\Core\Cache\CacheBackendInterface
     tags:
       - { name: cache.bin }
     factory_method: get
     factory_service: cache_factory
-    arguments: [field]
-  cache.menu:
+    arguments: [render]
+  cache.data:
     class: Drupal\Core\Cache\CacheBackendInterface
     tags:
       - { name: cache.bin }
     factory_method: get
     factory_service: cache_factory
-    arguments: [menu]
-  cache.page:
-    class: Drupal\Core\Cache\CacheBackendInterface
-    tags:
-      - { name: cache.bin }
-    factory_method: get
-    factory_service: cache_factory
-    arguments: [page]
-  cache.path:
-    class: Drupal\Core\Cache\CacheBackendInterface
-    tags:
-      - { name: cache.bin }
-    factory_method: get
-    factory_service: cache_factory
-    arguments: [path]
+    arguments: [data]
   config.cachedstorage.storage:
     class: Drupal\Core\Config\FileStorage
     factory_class: Drupal\Core\Config\FileStorageFactory
@@ -116,7 +102,7 @@ services:
     arguments: ['@config.storage', '@config.storage.schema', '@cache.config']
   cron:
     class: Drupal\Core\Cron
-    arguments: ['@module_handler', '@lock', '@queue', '@state']
+    arguments: ['@module_handler', '@lock', '@queue', '@state', '@current_user']
   database:
     class: Drupal\Core\Database\Connection
     factory_class: Drupal\Core\Database\Database
@@ -144,7 +130,7 @@ services:
   settings:
     class: Drupal\Component\Utility\Settings
     factory_class: Drupal\Component\Utility\Settings
-    factory_method: getSingleton
+    factory_method: getInstance
   state:
     class: Drupal\Core\KeyValueStore\State
     arguments: ['@keyvalue']
@@ -174,9 +160,7 @@ services:
       - [setUserAgent, ['Drupal (+http://drupal.org/)']]
   theme.negotiator:
     class: Drupal\Core\Theme\ThemeNegotiator
-    arguments: ['@access_check.theme']
-    calls:
-      - [setRequest, ['@request']]
+    arguments: ['@access_check.theme', '@request_stack']
   theme.negotiator.default:
     class: Drupal\Core\Theme\DefaultNegotiator
     arguments: ['@config.factory']
@@ -211,13 +195,13 @@ services:
     arguments: ['@entity.manager', '@form_builder']
   plugin.manager.field.field_type:
     class: Drupal\Core\Field\FieldTypePluginManager
-    arguments: ['@container.namespaces', '@cache.field', '@language_manager', '@module_handler']
+    arguments: ['@container.namespaces', '@cache.cache', '@language_manager', '@module_handler']
   plugin.manager.field.widget:
     class: Drupal\Core\Field\WidgetPluginManager
-    arguments: ['@container.namespaces', '@cache.field', '@module_handler', '@language_manager', '@plugin.manager.field.field_type']
+    arguments: ['@container.namespaces', '@cache.cache', '@module_handler', '@language_manager', '@plugin.manager.field.field_type']
   plugin.manager.field.formatter:
     class: Drupal\Core\Field\FormatterPluginManager
-    arguments: ['@container.namespaces', '@cache.field', '@module_handler', '@language_manager', '@plugin.manager.field.field_type']
+    arguments: ['@container.namespaces', '@cache.cache', '@module_handler', '@language_manager', '@plugin.manager.field.field_type']
   plugin.manager.archiver:
     class: Drupal\Core\Archiver\ArchiverManager
     parent: default_plugin_manager
@@ -232,7 +216,7 @@ services:
     arguments: ['@controller_resolver', '@request', '@router.route_provider', '@router.builder', '@module_handler', '@cache.cache', '@language_manager', '@access_manager', '@current_user']
   plugin.manager.menu.contextual_link:
     class: Drupal\Core\Menu\ContextualLinkManager
-    arguments: ['@controller_resolver', '@module_handler', '@cache.cache', '@language_manager', '@access_manager', '@current_user']
+    arguments: ['@controller_resolver', '@module_handler', '@cache.cache', '@language_manager', '@access_manager', '@current_user', '@request_stack']
   plugin.cache_clearer:
     class: Drupal\Core\Plugin\CachedDiscoveryClearer
   request:
@@ -300,7 +284,7 @@ services:
       - [setRequest, ['@?request=']]
   router.route_provider:
     class: Drupal\Core\Routing\RouteProvider
-    arguments: ['@database', '@router.builder']
+    arguments: ['@database', '@router.builder', '@state']
     tags:
       - { name: event_subscriber }
   router.route_preloader:
@@ -350,7 +334,7 @@ services:
     arguments: ['@database']
   router.dumper:
     class: Drupal\Core\Routing\MatcherDumper
-    arguments: ['@database']
+    arguments: ['@database', '@state']
   router.builder:
     class: Drupal\Core\Routing\RouteBuilder
     arguments: ['@router.dumper', '@lock', '@event_dispatcher', '@module_handler', '@controller_resolver', '@state']
@@ -361,7 +345,7 @@ services:
       - { name: event_subscriber }
   path.alias_manager.cached:
     class: Drupal\Core\CacheDecorator\AliasManagerCacheDecorator
-    arguments: ['@path.alias_manager', '@cache.path']
+    arguments: ['@path.alias_manager', '@cache.data']
   path.crud:
     class: Drupal\Core\Path\Path
     arguments: ['@database', '@module_handler']
@@ -424,32 +408,24 @@ services:
       - { name: event_subscriber }
   route_enhancer.authentication:
     class: Drupal\Core\Routing\Enhancer\AuthenticationEnhancer
-    calls:
-      - [setContainer, ['@service_container']]
     tags:
       - { name: route_enhancer, priority: 1000 }
-    arguments: ['@authentication']
-  route_enhancer.content_controller:
-    class: Drupal\Core\Routing\Enhancer\ContentControllerEnhancer
-    arguments: ['@content_negotiation']
-    tags:
-      - { name: route_enhancer, priority: 30 }
-  route_enhancer.ajax:
-    class: Drupal\Core\Routing\Enhancer\AjaxEnhancer
-    arguments: ['@content_negotiation']
-    tags:
-      - { name: route_enhancer, priority: 15 }
-      - { name: legacy_route_enhancer, priority: 15 }
+    arguments: ['@authentication', '@current_user']
   route_enhancer.entity:
     class: Drupal\Core\Entity\Enhancer\EntityRouteEnhancer
     arguments: ['@controller_resolver', '@entity.manager', '@form_builder']
     tags:
       - { name: route_enhancer, priority: 20 }
-  route_enhancer.form:
-    class: Drupal\Core\Routing\Enhancer\FormEnhancer
+  route_content_controller_subscriber:
+    class: Drupal\Core\EventSubscriber\ContentControllerSubscriber
+    arguments: ['@content_negotiation']
+    tags:
+      - { name: event_subscriber }
+  route_content_form_controller_subscriber:
+    class: Drupal\Core\EventSubscriber\ContentFormControllerSubscriber
     arguments: ['@service_container', '@controller_resolver', '@form_builder']
     tags:
-      - { name: route_enhancer, priority: 10 }
+      - { name: event_subscriber }
   route_special_attributes_subscriber:
     class: Drupal\Core\EventSubscriber\SpecialAttributesRouteSubscriber
     tags:
@@ -738,11 +714,10 @@ services:
       - { name: event_subscriber }
     arguments: ['@authentication']
   current_user:
-    class: Drupal\Core\Session\AccountInterface
-    factory_method: authenticate
-    factory_service: authentication
-    arguments: ['@request']
-    synchronized: true
+    class: Drupal\Core\Session\AccountProxy
+    arguments: ['@authentication']
+    calls:
+      - [setRequest, ['@?request=']]
   asset.css.collection_renderer:
     class: Drupal\Core\Asset\CssCollectionRenderer
     arguments: [ '@state' ]

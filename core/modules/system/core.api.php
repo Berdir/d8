@@ -9,23 +9,25 @@
  * @mainpage
  * Welcome to the Drupal API Documentation!
  *
- * This documentation is generated from specially-formatted comments embedded in
- * the Drupal source code. Here are some topics to get you started.
+ * This site is an API reference for Drupal, generated from comments embedded
+ * in the source code. More in-depth documentation can be found at
+ * https://drupal.org/developing/api.
+ *
+ * Here are some topics to help you get started developing with Drupal.
  *
  * @section essentials Essential background concepts
  *
  * - @link architecture Drupal's architecture @endlink
- * - @link extending Extending Drupal @endlink
  * - @link oo_conventions Object-oriented conventions used in Drupal @endlink
- * - @link best_practices Best practices @endlink
+ * - @link extending Extending Drupal @endlink
+ * - @link best_practices Security and best practices @endlink
  *
- * @section interfacing Interfacing with the outside world
+ * @section interface User interface
  *
  * - @link menu Routing, page controllers, and menu entries @endlink
  * - @link form_api Forms @endlink
  * - @link block_api Blocks @endlink
  * - @link ajax Ajax @endlink
- * - @link third_party Integrating third-party applications @endlink
  *
  * @section store_retrieve Storing and retrieving data
  *
@@ -36,19 +38,21 @@
  * - @link views_overview Views @endlink
  * - @link database Database abstraction layer @endlink
  *
- * @section utility Other essential APIs
+ * @section other_essentials Other essential APIs
  *
  * - @link i18n Internationalization @endlink
  * - @link cache Caching @endlink
+ * - @link utility Utility classes and functions @endlink
  * - @link user_api User accounts, permissions, and roles @endlink
  * - @link theme_render Theme system and render API @endlink
  * - @link migration Migration @endlink
  *
- * @section advanced Advanced topics
+ * @section additional Additional topics
  *
  * - @link container Services and the Dependency Injection Container @endlink
  * - @link typed_data Typed Data @endlink
  * - @link testing Automated tests @endlink
+ * - @link third_party Integrating third-party applications @endlink
  *
  * @section more_info Further information
  *
@@ -197,7 +201,6 @@
  *
  * Example:
  * @code
- * $cache = \Drupal::cache();
  * $cid = 'mymodule_example:' . \Drupal::languageManager()->getCurrentLanguage()->id();
  *
  * $data = NULL;
@@ -210,6 +213,12 @@
  * }
  * @endcode
  *
+ * Note the use of $data and $cache->data in the above example. Calls to
+ * \Drupal::cache()->get() return a record that contains the information stored
+ * by \Drupal::cache()->set() in the data property as well as additional meta
+ * information about the cached data. In order to make use of the cached data
+ * you can access it via $cache->data.
+ *
  * @section bins Cache bins
  *
  * Cache storage is separated into "bins", each containing various cache items.
@@ -218,9 +227,14 @@
  * When you request a cache object, you can specify the bin name in your call to
  * \Drupal::cache(). Alternatively, you can request a bin by getting service
  * "cache.nameofbin" from the container. The default bin is called "cache", with
- * service name "cache.cache".
+ * service name "cache.cache", it is used to store common and frequently used
+ * caches like plugin information.
  *
- * @todo: Document common cache bins in https://drupal.org/node/1194136
+ * Other common cache bins are the following:
+ *   - bootstrap: Small caches needed for the bootstrap on every request.
+ *   - render: Contains cached HTML strings like cached pages and blocks, can
+ *     grow to large size.
+ *   - data: Contains data that can vary by path or similar context.
  *
  * A module can define a cache bin by defining a service in its
  * modulename.services.yml file as follows (substituting the desired name for
@@ -292,16 +306,16 @@
  *
  * @section configuration Configuration
  *
- * Each cache bin can be configured separately; for instance, each bin can use a
- * different cache backend, such as APC or Memcache. The default backend stores
- * the cached data in the Drupal database.
+ * By default cached data is stored in the database. This can be configured
+ * though so that all cached data, or that of an individual cache bin, uses a
+ * different cache backend, such as APC or Memcache, for storage.
  *
  * In a settings.php file, you can override the class used for a particular
  * cache bin. For example, if your implementation of
  * \Drupal\Core\Cache\CacheBackendInterface was called MyCustomCache, the
- * following line would make Drupal use it for the 'cache_page' bin:
+ * following line would make Drupal use it for the 'cache_render' bin:
  * @code
- *  $settings['cache_classes']['cache_page'] = 'Drupal\full\namespace\to\MyCustomCache';
+ *  $settings['cache_classes']['cache_render'] = 'Drupal\full\namespace\to\MyCustomCache';
  * @endcode
  *
  * Additionally, you can register your cache implementation to be used by
@@ -461,5 +475,27 @@
  * - Usability: https://drupal.org/ui-standards
  * - Internationalization: @link i18n Internationalization topic @endlink
  * - Automated testing: @link testing Automated tests topic @endlink
+ * @}
+ */
+
+/**
+ * @defgroup utility Utility classes and functions
+ * @{
+ * Overview of utility classes and functions for developers.
+ *
+ * Drupal provides developers with a variety of utility functions that make it
+ * easier and more efficient to perform tasks that are either really common,
+ * tedious, or difficult. Utility functions help to reduce code duplication and
+ * should be used in place of one-off code whenever possible.
+ *
+ * @see common.inc
+ * @see file
+ * @see format
+ * @see mail.inc
+ * @see php_wrappers
+ * @see sanitization
+ * @see session.inc
+ * @see transliteration
+ * @see validation
  * @}
  */

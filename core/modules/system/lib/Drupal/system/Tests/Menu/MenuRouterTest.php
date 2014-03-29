@@ -10,7 +10,7 @@ namespace Drupal\system\Tests\Menu;
 use Drupal\simpletest\WebTestBase;
 
 /**
- * Tests menu router and hook_menu_link_defaults() functionality.
+ * Tests menu router and default menu link functionality.
  */
 class MenuRouterTest extends WebTestBase {
 
@@ -45,7 +45,7 @@ class MenuRouterTest extends WebTestBase {
   public static function getInfo() {
     return array(
       'name' => 'Menu router',
-      'description' => 'Tests menu router and hook_menu_link_defaults() functionality.',
+      'description' => 'Tests menu router and default menu links functionality.',
       'group' => 'Menu',
     );
   }
@@ -133,13 +133,11 @@ class MenuRouterTest extends WebTestBase {
     menu_link_maintain('menu_test', 'insert', 'menu_test_maintain/2', 'Menu link #2');
 
     // Move second link to the main-menu, to test caching later on.
-    db_update('menu_links')
-      ->fields(array('menu_name' => 'main'))
-      ->condition('link_title', 'Menu link #1-main')
-      ->condition('customized', 0)
-      ->condition('module', 'menu_test')
-      ->execute();
-    menu_cache_clear_all();
+    $menu_links_to_update = entity_load_multiple_by_properties('menu_link', array('link_title' => 'Menu link #1-main', 'customized' => 0, 'module' => 'menu_test'));
+    foreach ($menu_links_to_update as $menu_link) {
+      $menu_link->menu_name = 'main';
+      $menu_link->save();
+    }
 
     // Load front page.
     $this->drupalGet('');
@@ -167,7 +165,7 @@ class MenuRouterTest extends WebTestBase {
   }
 
   /**
-   * Tests for menu_name parameter for hook_menu_link_defaults().
+   * Tests for menu_name parameter for default menu links.
    */
   protected function doTestMenuName() {
     $admin_user = $this->drupalCreateUser(array('administer site configuration'));

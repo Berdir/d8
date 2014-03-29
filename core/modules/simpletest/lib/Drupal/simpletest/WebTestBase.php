@@ -16,6 +16,7 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Database\ConnectionNotDefinedException;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\Core\Session\UserSession;
 use Drupal\Core\StreamWrapper\PublicStream;
 use Drupal\Core\Datetime\DrupalDateTime;
@@ -207,7 +208,7 @@ abstract class WebTestBase extends TestBase {
    */
   function drupalGetNodeByTitle($title, $reset = FALSE) {
     if ($reset) {
-      \Drupal::entityManager()->getStorageController('node')->resetCache();
+      \Drupal::entityManager()->getStorage('node')->resetCache();
     }
     $nodes = entity_load_multiple_by_properties('node', array('title' => $title));
     // Load the first node returned from the database.
@@ -680,7 +681,7 @@ abstract class WebTestBase extends TestBase {
     $pass = $this->assert($this->drupalUserIsLoggedIn($account), format_string('User %name successfully logged in.', array('%name' => $account->getUsername())), 'User login');
     if ($pass) {
       $this->loggedInUser = $account;
-      $this->container->set('current_user', $account);
+      $this->container->get('current_user')->setAccount($account);
       // @todo Temporary workaround for not being able to use synchronized
       //   services in non dumped container.
       $this->container->get('access_subscriber')->setCurrentUser($account);
@@ -728,7 +729,7 @@ abstract class WebTestBase extends TestBase {
       // @see WebTestBase::drupalUserIsLoggedIn()
       unset($this->loggedInUser->session_id);
       $this->loggedInUser = FALSE;
-      $this->container->set('current_user', drupal_anonymous_user());
+      $this->container->get('current_user')->setAccount(new AnonymousUserSession());
     }
   }
 

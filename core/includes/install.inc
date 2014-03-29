@@ -211,6 +211,10 @@ function drupal_rewrite_settings($settings = array(), $settings_file = NULL) {
   }
   $contents = file_get_contents(DRUPAL_ROOT . '/' . $settings_file);
   if ($contents !== FALSE) {
+    // Initialize the contents for the settings.php file if it is empty.
+    if (trim($contents) === '') {
+      $contents = "<?php\n";
+    }
     // Step through each token in settings.php and replace any variables that
     // are in the passed-in array.
     $buffer = '';
@@ -317,7 +321,7 @@ function drupal_rewrite_settings($settings = array(), $settings_file = NULL) {
       // In case any $settings variables were written, import them into the
       // Settings singleton.
       if (!empty($settings_settings)) {
-        $old_settings = settings()->getAll();
+        $old_settings = Settings::getAll();
         new Settings($settings_settings + $old_settings);
       }
     }
@@ -1099,15 +1103,14 @@ function install_profile_info($profile, $langcode = 'en') {
     $profile_file = drupal_get_path('profile', $profile) . "/$profile.info.yml";
     $info = \Drupal::service('info_parser')->parse($profile_file);
     $info += $defaults;
-    $info['dependencies'] = array_unique(array_merge(
-      drupal_required_modules(),
-      $info['dependencies'],
-      ($langcode != 'en' && !empty($langcode) ? array('locale') : array()))
-    );
 
     // drupal_required_modules() includes the current profile as a dependency.
-    // Since a module can't depend on itself we remove that element of the array.
-    array_shift($info['dependencies']);
+    // Remove that dependency, since a module cannot depend on itself.
+    $required = array_diff(drupal_required_modules(), array($profile));
+
+    $locale = !empty($langcode) && $langcode != 'en' ? array('locale') : array();
+
+    $info['dependencies'] = array_unique(array_merge($required, $info['dependencies'], $locale));
 
     $cache[$profile] = $info;
   }

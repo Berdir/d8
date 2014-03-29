@@ -411,13 +411,27 @@ function hook_page_build(&$page) {
 }
 
 /**
- * Define links for menus.
+ * Alter links for menus.
+ *
+ * @param array $links
+ *   The link definitions to be altered.
  *
  * @return array
  *   An array of default menu links. Each link has a key that is the machine
- *   name, which must be unique. The corresponding array value is an
- *   associative array that may contain the following key-value pairs:
- *   - link_title: (required) The untranslated title of the menu item.
+ *   name, which must be unique. By default, use the route name as the
+ *   machine name. In cases where multiple links use the same route name, such
+ *   as two links to the same page in different menus, or two links using the
+ *   same route name but different route parameters, the suggested machine name
+ *   patten is the route name followed by a dot and a unique suffix. For
+ *   example, an additional logout link might have a machine name of
+ *   user.logout.navigation, and default links provided to edit the article and
+ *   page content types could use machine names node.type_edit.article and
+ *   node.type_edit.page. Since the machine name may be arbitrary, you should
+ *   never write code that assumes it is identical to the route name.
+ *
+ *   The value corresponding to each machine name key is an associative array
+ *   that may contain the following key-value pairs:
+ *   - title: (required) The untranslated title of the menu link.
  *   - description: The untranslated description of the link.
  *   - route_name: (optional) The route name to be used to build the path.
  *     Either a route_name or a link_path must be provided.
@@ -435,45 +449,13 @@ function hook_page_build(&$page) {
  *     this menu item (as a result of other properties), then the menu link is
  *     always expanded, equivalent to its 'always expanded' checkbox being set
  *     in the UI.
- *   - type: (optional) A bitmask of flags describing properties of the menu
- *     item. The following two bitmasks are provided as constants in menu.inc:
- *     - MENU_NORMAL_ITEM: Normal menu items show up in the menu tree and can be
- *       moved/hidden by the administrator.
- *     - MENU_SUGGESTED_ITEM: Modules may "suggest" menu items that the
- *       administrator may enable.
- *     If the "type" element is omitted, MENU_NORMAL_ITEM is assumed.
  *   - options: (optional) An array of options to be passed to l() when
  *     generating a link from this menu item.
- *
- * @see hook_menu_link_defaults_alter()
- */
-function hook_menu_link_defaults() {
-  $links['user'] = array(
-    'link_title' => 'My account',
-    'weight' => -10,
-    'route_name' => 'user.page',
-    'menu_name' => 'account',
-  );
-
-  $links['user.logout'] = array(
-    'link_title' => 'Log out',
-    'route_name' => 'user.logout',
-    'weight' => 10,
-    'menu_name' => 'account',
-  );
-
-  return $links;
-}
-
-/**
- * Alter links for menus.
- *
- * @see hook_menu_link_defaults()
  */
 function hook_menu_link_defaults_alter(&$links) {
   // Change the weight and title of the user.logout link.
   $links['user.logout']['weight'] = -10;
-  $links['user.logout']['link_title'] = t('Logout');
+  $links['user.logout']['title'] = 'Logout';
 }
 
 /**
@@ -609,7 +591,7 @@ function hook_contextual_links_alter(array &$links, $group, array $route_paramet
   if ($group == 'menu') {
     // Dynamically use the menu name for the title of the menu_edit contextual
     // link.
-    $menu = \Drupal::entityManager()->getStorageController('menu')->load($route_parameters['menu']);
+    $menu = \Drupal::entityManager()->getStorage('menu')->load($route_parameters['menu']);
     $links['menu_edit']['title'] = t('Edit menu: !label', array('!label' => $menu->label()));
   }
 }

@@ -31,13 +31,12 @@ use Drupal\Component\Utility\Xss;
  * - Entity hooks: Generic hooks for "entity" operations. These are always
  *   invoked on all modules.
  *
- * Here is a list of the node and entity hooks that are invoked, field
- * operations, and other steps that take place during node operations:
+ * Here is a list of the node and entity hooks that are invoked, and other
+ * steps that take place during node operations:
  * - Instantiating a new node:
  *   - hook_node_create() (all)
  *   - hook_entity_create() (all)
  * - Creating a new node (calling $node->save() on a new node):
- *   - field_attach_presave()
  *   - hook_node_presave() (all)
  *   - hook_entity_presave() (all)
  *   - Node and revision records are written to the database
@@ -46,7 +45,6 @@ use Drupal\Component\Utility\Xss;
  *   - hook_node_access_records() (all)
  *   - hook_node_access_records_alter() (all)
  * - Updating an existing node (calling $node->save() on an existing node):
- *   - field_attach_presave()
  *   - hook_node_presave() (all)
  *   - hook_entity_presave() (all)
  *   - Node and revision records are written to the database
@@ -91,7 +89,7 @@ use Drupal\Component\Utility\Xss;
  *   existing node, it will already be loaded; see the Loading section above):
  *   - hook_node_prepare_form() (all)
  *   - hook_entity_prepare_form() (all)
- *   - field_attach_form()
+ *   - @todo hook for EntityFormDisplay::buildForm()
  * - Validating a node during editing form submit (calling
  *   node_form_validate()):
  *   - hook_node_validate() (all)
@@ -491,9 +489,9 @@ function hook_node_create(\Drupal\node\NodeInterface $node) {
  * for all available nodes should be loaded in a single query where possible.
  *
  * This hook is invoked during node loading, which is handled by entity_load(),
- * via classes Drupal\node\NodeStorageController and
- * Drupal\Core\Entity\DatabaseStorageController. After the node information and
- * field values are read from the database or the entity cache,
+ * via classes Drupal\node\NodeStorage and
+ * Drupal\Core\Entity\ContentEntityDatabaseStorage. After the node information
+ * and field values are read from the database or the entity cache,
  * hook_entity_load() is invoked on all implementing modules, and finally
  * hook_node_load() is invoked on all implementing modules.
  *
@@ -598,8 +596,6 @@ function hook_node_access(\Drupal\node\NodeInterface $node, $op, $account, $lang
  *
  * @param \Drupal\node\NodeInterface $node
  *   The node that is about to be shown on the form.
- * @param $form_display
- *   The current form display.
  * @param $operation
  *   The current operation.
  * @param array $form_state
@@ -607,7 +603,7 @@ function hook_node_access(\Drupal\node\NodeInterface $node, $op, $account, $lang
  *
  * @ingroup node_api_hooks
  */
-function hook_node_prepare_form(\Drupal\node\NodeInterface $node, $form_display, $operation, array &$form_state) {
+function hook_node_prepare_form(\Drupal\node\NodeInterface $node, $operation, array &$form_state) {
   if (!isset($node->my_rating)) {
     $node->my_rating = \Drupal::config("my_rating_{$node->bundle()}")->get('enabled');
   }
@@ -801,7 +797,7 @@ function hook_node_submit(\Drupal\node\NodeInterface $node, $form, &$form_state)
 function hook_node_view(\Drupal\node\NodeInterface $node, \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display, $view_mode, $langcode) {
   // Only do the extra work if the component is configured to be displayed.
   // This assumes a 'mymodule_addition' extra field has been defined for the
-  // node type in hook_field_extra_fields().
+  // node type in hook_entity_extra_field_info().
   if ($display->getComponent('mymodule_addition')) {
     $node->content['mymodule_addition'] = array(
       '#markup' => mymodule_addition($node),

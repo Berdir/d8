@@ -10,7 +10,7 @@ services:
       - [setRequest, ['@?request=']]
   system.breadcrumb.default:
     class: Drupal\system\PathBasedBreadcrumbBuilder
-    arguments: ['@request', '@entity.manager', '@access_manager', '@router', '@path_processor_manager', '@config.factory',  '@title_resolver']
+    arguments: ['@request', '@access_manager', '@router', '@path_processor_manager', '@config.factory',  '@title_resolver', '@current_user']
     tags:
       - { name: breadcrumb_builder, priority: 0 }
   path_processor.files:
@@ -28,5 +28,10 @@ services:
       - { name: theme_negotiator, priority: 1000 }
   system.config_subscriber:
     class: Drupal\system\SystemConfigSubscriber
+    tags:
+      - { name: event_subscriber }
+  system.automatic_cron:
+    class: Drupal\system\EventSubscriber\AutomaticCron
+    arguments: ['@cron', '@config.factory', '@state']
     tags:
       - { name: event_subscriber }

@@ -29,7 +29,7 @@ class NodeAccessHandler extends EntityAccessHandler implements NodeAccessInterfa
   /**
    * The node grant storage.
    *
-   * @var \Drupal\node\NodeGrantStorageControllerInterface
+   * @var \Drupal\node\NodeGrantStorageInterface
    */
   protected $grantStorage;
 
