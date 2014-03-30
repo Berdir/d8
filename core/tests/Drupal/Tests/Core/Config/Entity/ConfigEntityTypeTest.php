@@ -30,6 +30,22 @@ class ConfigEntityTypeTest extends UnitTestCase {
     );
   }
 
+  /**
+   * Sets up a ConfigEntityType object for a given set of values.
+   *
+   * @param array $definition
+   *   An array of values to use for the ConfigEntityType.
+   *
+   * @return \Drupal\Core\Entity\EntityTypeInterface
+   */
+  protected function setUpConfigEntityType($definition) {
+    if (!isset($definition['id'])) {
+      $definition += array(
+        'id' => 'example_config_entity_type',
+      );
+    }
+    return new ConfigEntityType($definition);
+  }
 
   /**
    * Tests that we get an exception when the length of the config prefix that is
@@ -39,7 +55,7 @@ class ConfigEntityTypeTest extends UnitTestCase {
    * @covers ::getConfigPrefix()
    */
   public function testConfigPrefixLengthExceeds($entity_data, $exception, $message) {
-    $config_entity = new ConfigEntityType($entity_data);
+    $config_entity = $this->setUpConfigEntityType($entity_data);
     $this->setExpectedException($exception, $message);
     $this->assertEmpty($config_entity->getConfigPrefix());
   }
@@ -95,7 +111,7 @@ class ConfigEntityTypeTest extends UnitTestCase {
    * @covers ::getConfigPrefix()
    */
   public function testConfigPrefixLengthValid($entity_data) {
-    $config_entity = new ConfigEntityType($entity_data);
+    $config_entity = $this->setUpConfigEntityType($entity_data);
     if (isset($entity_data['config_prefix'])) {
       $expected_prefix = $entity_data['provider'] . '.' . $entity_data['config_prefix'];
     } else {
