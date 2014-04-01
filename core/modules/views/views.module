@@ -13,6 +13,7 @@ use Drupal\Component\Utility\String;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Database\Query\AlterableInterface;
 use Drupal\Core\Language\Language;
+use Drupal\Core\Render\Element;
 use Drupal\views\Plugin\Derivative\ViewsLocalTask;
 use Drupal\Core\Template\AttributeArray;
 use Drupal\views\ViewExecutable;
@@ -497,7 +498,8 @@ function views_add_contextual_links(&$render_element, $location, ViewExecutable 
 /**
  * Prepares a list of language names.
  *
- * This is a wrapper around language_list to return a plain key value array.
+ * This is a wrapper around \Drupal::languageManager()->getLanguages() to return
+ * a plain key value array.
  *
  * @param string $field
  *   The field of the language object which should be used as the value of the
@@ -513,7 +515,7 @@ function views_add_contextual_links(&$render_element, $location, ViewExecutable 
  * @see locale_language_list()
  */
 function views_language_list($field = 'name', $flags = Language::STATE_ALL) {
-  $languages = language_list($flags);
+  $languages = \Drupal::languageManager()->getLanguages($flags);
   $list = array();
   foreach ($languages as $language) {
     $list[$language->id] = ($field == 'name') ? t($language->name) : $language->$field;
@@ -901,7 +903,7 @@ function views_pre_render_views_form_views_form($element) {
   $element['output']['#markup'] = str_replace($search, $replace, $element['output']['#markup']);
 
   // Sort, render and add remaining form fields.
-  $children = element_children($element, TRUE);
+  $children = Element::children($element, TRUE);
   $element['#children'] = drupal_render_children($element, $children);
   return $element;
 }

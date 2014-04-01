@@ -14,6 +14,7 @@ use Drupal\comment\CommentInterface;
 use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Render\Element;
 use Drupal\Core\Url;
 use Drupal\field\FieldInstanceConfigInterface;
 use Drupal\field\FieldConfigInterface;
@@ -1001,7 +1002,7 @@ function comment_user_cancel($edit, $account, $method) {
     case 'user_cancel_block_unpublish':
       $comments = entity_load_multiple_by_properties('comment', array('uid' => $account->id()));
       foreach ($comments as $comment) {
-        $comment->setPublished(COMMENT_NOT_PUBLISHED);
+        $comment->setPublished(CommentInterface::NOT_PUBLISHED);
         $comment->save();
       }
       break;
@@ -1387,7 +1388,7 @@ function template_preprocess_comment(&$variables) {
   }
 
   // Helpful $content variable for templates.
-  foreach (element_children($variables['elements']) as $key) {
+  foreach (Element::children($variables['elements']) as $key) {
     $variables['content'][$key] = $variables['elements'][$key];
   }
 

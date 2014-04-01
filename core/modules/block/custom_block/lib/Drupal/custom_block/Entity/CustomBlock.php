@@ -158,7 +158,8 @@ class CustomBlock extends ContentEntityBase implements CustomBlockInterface {
     $fields['id'] = FieldDefinition::create('integer')
       ->setLabel(t('Custom block ID'))
       ->setDescription(t('The custom block ID.'))
-      ->setReadOnly(TRUE);
+      ->setReadOnly(TRUE)
+      ->setSetting('unsigned', TRUE);
 
     $fields['uuid'] = FieldDefinition::create('uuid')
       ->setLabel(t('UUID'))
@@ -168,16 +169,23 @@ class CustomBlock extends ContentEntityBase implements CustomBlockInterface {
     $fields['revision_id'] = FieldDefinition::create('integer')
       ->setLabel(t('Revision ID'))
       ->setDescription(t('The revision ID.'))
-      ->setReadOnly(TRUE);
+      ->setReadOnly(TRUE)
+      ->setSetting('unsigned', TRUE);
 
     $fields['langcode'] = FieldDefinition::create('language')
       ->setLabel(t('Language code'))
       ->setDescription(t('The custom block language code.'));
 
     $fields['info'] = FieldDefinition::create('string')
-      ->setLabel(t('Subject'))
-      ->setDescription(t('The custom block name.'))
-      ->setRevisionable(TRUE);
+      ->setLabel(t('Block description'))
+      ->setDescription(t('A brief description of your block.'))
+      ->setRevisionable(TRUE)
+      ->setRequired(TRUE)
+      ->setDisplayOptions('form', array(
+        'type' => 'string',
+        'weight' => -5,
+      ))
+      ->setDisplayConfigurable('form', TRUE);
 
     $fields['type'] = FieldDefinition::create('entity_reference')
       ->setLabel(t('Block type'))
