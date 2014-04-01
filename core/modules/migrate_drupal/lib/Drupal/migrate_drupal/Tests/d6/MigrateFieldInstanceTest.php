@@ -49,13 +49,28 @@ class MigrateFieldInstanceTest extends MigrateDrupalTestBase {
     // Add some id mappings for the dependant migrations.
     $id_mappings = array(
       'd6_field' => array(
-        array(array('field_name'), array('node', 'field_name')),
+        array(array('field_test'), array('node', 'field_test')),
+        array(array('field_test_two'), array('node', 'field_test_two')),
+        array(array('field_test_three'), array('node', 'field_test_three')),
+        array(array('field_test_email'), array('node', 'field_test_email')),
+        array(array('field_test_link'), array('node', 'field_test_link')),
+        array(array('field_test_filefield'), array('node', 'field_test_filefield')),
+        array(array('field_test_imagefield'), array('node', 'field_test_imagefield')),
+        array(array('field_test_phone'), array('node', 'field_test_phone')),
+        array(array('field_test_date'), array('node', 'field_test_date')),
+        array(array('field_test_datestamp'), array('node', 'field_test_datestamp')),
+        array(array('field_test_datetime'), array('node', 'field_test_datetime')),
       ),
       'd6_node_type' => array(
         array(array('page'), array('page')),
+        array(array('story'), array('story')),
+        array(array('article'), array('article')),
       ),
     );
     $this->prepareIdMappings($id_mappings);
+    entity_create('node_type', array('type' => 'page'))->save();
+    entity_create('node_type', array('type' => 'story'))->save();
+    entity_create('node_type', array('type' => 'article'))->save();
 
     $migration = entity_load('migration', 'd6_field_instance');
     $dumps = array(
@@ -109,6 +124,8 @@ class MigrateFieldInstanceTest extends MigrateDrupalTestBase {
       'display_field' => FALSE,
       'display_default' => FALSE,
       'uri_scheme' => 'public',
+      'handler' => 'default',
+      'target_bundle' => NULL,
     );
     // This is the only way to compare arrays.
     $this->assertFalse(array_diff_assoc($field->getSettings(), $expected));
