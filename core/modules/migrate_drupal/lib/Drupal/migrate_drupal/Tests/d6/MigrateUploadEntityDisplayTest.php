@@ -38,6 +38,11 @@ class MigrateUploadEntityDisplayTest extends MigrateDrupalTestBase {
    */
   protected function setUp() {
     parent::setUp();
+
+    entity_create('node_type', array('type' => 'article'))->save();
+    entity_create('node_type', array('type' => 'story'))->save();
+    entity_create('node_type', array('type' => 'page'))->save();
+
     $id_mappings = array(
       'd6_upload_field_instance' => array(
         array(array(1), array('node', 'page', 'upload')),
