@@ -9,6 +9,7 @@ namespace Drupal\migrate_drupal\Tests\d6;
 
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate_drupal\Tests\MigrateDrupalTestBase;
+use Drupal\link\LinkItemInterface;
 
 /**
  * Tests migration of field instances.
@@ -104,8 +105,9 @@ class MigrateFieldInstanceTest extends MigrateDrupalTestBase {
       'max' => '100',
       'prefix' => 'pref',
       'suffix' => 'suf',
+      'unsigned' => '',
     );
-    $this->assertEqual($field->getSettings(), $expected, 'Field field_test_two settings are correct.');
+    $this->assertEqual($field->getSettings(), $expected);
 
     // Test email field.
     $field = entity_load('field_instance_config', 'node.story.field_test_email');
@@ -134,8 +136,8 @@ class MigrateFieldInstanceTest extends MigrateDrupalTestBase {
     // Test a link field.
     $field = entity_load('field_instance_config', 'node.story.field_test_link');
     $this->assertEqual($field->label(), 'Link Field');
-    $expected = array('title' => 2);
-    $this->assertEqual($field->getSettings(), $expected, 'Field field_test_link settings are correct.');
+    $expected = array('title' => 2, 'link_type' => LinkItemInterface::LINK_GENERIC);
+    $this->assertEqual($field->getSettings(), $expected);
     $this->assertEqual('default link title', $entity->field_test_link->title, 'Field field_test_link default title is correct.');
     $this->assertEqual('http://drupal.org', $entity->field_test_link->url, 'Field field_test_link default title is correct.');
 
