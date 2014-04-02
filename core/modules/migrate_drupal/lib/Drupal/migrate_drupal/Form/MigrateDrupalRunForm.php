@@ -9,16 +9,16 @@ namespace Drupal\migrate_drupal\Form;
 
 use Drupal\Component\Utility\MapArray;
 use Drupal\Core\Database\Database;
-use Drupal\Core\Entity\EntityStorageControllerInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Form\FormBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class MigrateDrupalRunForm extends FormBase {
 
   /**
-   * @var \Drupal\Core\Entity\EntityStorageControllerInterface
+   * @var \Drupal\Core\Entity\EntityStorageInterface
    */
-  protected $storageController;
+  protected $storage;
 
   /**
    * {@inheritdoc}
@@ -35,7 +35,7 @@ class MigrateDrupalRunForm extends FormBase {
     // set of migrations.
     if (isset($form_state['database'])) {
       Database::addConnectionInfo('migrate', 'default', $form_state['database']);
-      $migrations = $this->storageController()->loadMultiple();
+      $migrations = $this->storage()->loadMultiple();
       $form['migrations'] = array(
         '#type' => 'checkboxes',
         '#options' => MapArray::copyValuesToKeys(array_keys($migrations)),
@@ -120,13 +120,13 @@ class MigrateDrupalRunForm extends FormBase {
   }
 
   /**
-   * @return EntityStorageControllerInterface
+   * @return EntityStorageInterface
    */
-  protected function storageController() {
-    if (!isset($this->storageController)) {
-      $this->storageController = \Drupal::entityManager()->getStorageController('migration');
+  protected function storage() {
+    if (!isset($this->storage)) {
+      $this->storage = \Drupal::entityManager()->getStorage('migration');
     }
-    return $this->storageController;
+    return $this->storage;
   }
 
   /**
@@ -136,7 +136,7 @@ class MigrateDrupalRunForm extends FormBase {
    */
   public function __sleep() {
     // This apparently contains a PDOStatement somewhere.
-    unset($this->storageController);
+    unset($this->storage);
     return parent::__sleep();
   }
 }

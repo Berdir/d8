@@ -51,7 +51,7 @@ class MigrateTermNodeRevisionTest extends MigrateTermNodeTestBase {
    * Tests the Drupal 6 term-node revision association to Drupal 8 migration.
    */
   public function testTermRevisionNode() {
-    $node = \Drupal::entityManager()->getStorageController('node')->loadRevision(2);
+    $node = \Drupal::entityManager()->getStorage('node')->loadRevision(2);
     $this->assertEqual(count($node->vocabulary_3_i_2_), 2);
     $this->assertEqual($node->vocabulary_3_i_2_[0]->value, 4);
     $this->assertEqual($node->vocabulary_3_i_2_[1]->value, 5);

@@ -7,7 +7,7 @@
 
 namespace Drupal\migrate_drupal\Plugin\migrate\Process\d6;
 
-use Drupal\Core\Entity\EntityStorageControllerInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\MigrateExecutable;
@@ -30,16 +30,16 @@ class BlockPluginId extends ProcessPluginBase implements ContainerFactoryPluginI
   protected $processPluginManager;
 
   /**
-   * @var \Drupal\Core\Entity\EntityStorageControllerInterface
+   * @var \Drupal\Core\Entity\EntityStorageInterface
    */
-  protected $customBlockStorageController;
+  protected $customBlockStorage;
 
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration, EntityStorageControllerInterface $storage_controller, MigratePluginManager $process_plugin_manager) {
+  public function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration, EntityStorageInterface $storage, MigratePluginManager $process_plugin_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->customBlockStorageController = $storage_controller;
+    $this->customBlockStorage = $storage;
     $this->migration = $migration;
     $this->processPluginManager = $process_plugin_manager;
   }
@@ -54,7 +54,7 @@ class BlockPluginId extends ProcessPluginBase implements ContainerFactoryPluginI
       $plugin_id,
       $plugin_definition,
       $migration,
-      $entity_manager->getDefinition('custom_block') ? $entity_manager->getStorageController('custom_block') : NULL,
+      $entity_manager->getDefinition('custom_block') ? $entity_manager->getStorage('custom_block') : NULL,
       $container->get('plugin.manager.migrate.process')
     );
   }
@@ -80,11 +80,11 @@ class BlockPluginId extends ProcessPluginBase implements ContainerFactoryPluginI
           $value = "system_menu_block:$delta";
           break;
         case 'block':
-          if ($this->customBlockStorageController) {
+          if ($this->customBlockStorage) {
             $block_ids = $this->processPluginManager
               ->createInstance('migration', array('migration' => 'd6_custom_block'), $this->migration)
               ->transform($delta, $migrate_executable, $row, $destination_property);
-            $value = 'custom_block:' . $this->customBlockStorageController->load($block_ids[0])->uuid();
+            $value = 'custom_block:' . $this->customBlockStorage->load($block_ids[0])->uuid();
           }
           else {
             throw new MigrateSkipRowException();

@@ -90,7 +90,7 @@ class MigrateCckFieldRevisionTest extends MigrateNodeTestBase {
    * Test CCK revision migration from Drupal 6 to 8.
    */
   public function testCckFieldRevision() {
-    $node = \Drupal::entityManager()->getStorageController('node')->loadRevision(2);
+    $node = \Drupal::entityManager()->getStorage('node')->loadRevision(2);
     $this->assertEqual($node->id(), 1, 'Node 1 loaded.');
     $this->assertEqual($node->getRevisionId(), 2, 'Node 1 revision 2loaded.');
   }

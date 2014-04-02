@@ -9,7 +9,6 @@ namespace Drupal\migrate\Plugin\migrate\destination;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityStorageControllerInterface;
 use Drupal\field\FieldInfo;
 use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\Plugin\MigratePluginManager;

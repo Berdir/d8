@@ -8,7 +8,7 @@
 namespace Drupal\migrate_drupal\Plugin\migrate\load;
 
 use Drupal\Component\Utility\String;
-use Drupal\Core\Entity\EntityStorageControllerInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\MigrateException;
@@ -47,19 +47,19 @@ class LoadEntity extends PluginBase implements MigrateLoadInterface {
   /**
    * {@inheritdoc}
    */
-  public function load(EntityStorageControllerInterface $storage_controller, $sub_id) {
-    $entities = $this->loadMultiple($storage_controller, array($sub_id));
+  public function load(EntityStorageInterface $storage, $sub_id) {
+    $entities = $this->loadMultiple($storage, array($sub_id));
     return isset($entities[$sub_id]) ? $entities[$sub_id] : FALSE;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function loadMultiple(EntityStorageControllerInterface $storage_controller, array $sub_ids = NULL) {
+  public function loadMultiple(EntityStorageInterface $storage, array $sub_ids = NULL) {
     // This entity type has no bundles ('user', 'feed', etc).
     if (isset($this->configuration['bundle_migration'])) {
       /** @var \Drupal\migrate\Entity\MigrationInterface $bundle_migration */
-      $bundle_migration = $storage_controller->load($this->configuration['bundle_migration']);
+      $bundle_migration = $storage->load($this->configuration['bundle_migration']);
       $source_id = array_keys($bundle_migration->getSourcePlugin()->getIds())[0];
       $this->bundles = array();
       foreach ($bundle_migration->getSourcePlugin()->getIterator() as $row) {
@@ -76,7 +76,7 @@ class LoadEntity extends PluginBase implements MigrateLoadInterface {
       $values['id'] = $this->migration->id() . ':' . $id;
       $values['source']['bundle'] = $id;
       /** @var \Drupal\migrate\Entity\MigrationInterface $migration */
-      $migration = $storage_controller->create($values);
+      $migration = $storage->create($values);
       $fields = array_keys($migration->getSourcePlugin()->fields());
       $migration->process += array_combine($fields, $fields);
       $migrations[$migration->id()] = $migration;

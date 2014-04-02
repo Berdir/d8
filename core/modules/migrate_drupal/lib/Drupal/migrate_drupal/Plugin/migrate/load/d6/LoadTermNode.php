@@ -7,7 +7,7 @@
 
 namespace Drupal\migrate_drupal\Plugin\migrate\load\d6;
 
-use Drupal\Core\Entity\EntityStorageControllerInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate\MigrateMessage;
@@ -30,9 +30,9 @@ class LoadTermNode extends LoadEntity {
   /**
    * {@inheritdoc}
    */
-  public function loadMultiple(EntityStorageControllerInterface $storage_controller, array $sub_ids = NULL) {
+  public function loadMultiple(EntityStorageInterface $storage, array $sub_ids = NULL) {
     /** @var \Drupal\migrate\Entity\MigrationInterface $bundle_migration */
-    $bundle_migration = $storage_controller->load('d6_taxonomy_vocabulary');
+    $bundle_migration = $storage->load('d6_taxonomy_vocabulary');
     $migrate_executable = new MigrateExecutable($bundle_migration, new MigrateMessage());
     $process = array_intersect_key($bundle_migration->get('process'), $bundle_migration->getDestinationPlugin()->getIds());
     $migrations = array();
@@ -55,7 +55,7 @@ class LoadTermNode extends LoadEntity {
       $values['id'] = $migration_id;
       $values['source']['vid'] = $old_vid;
       $values['process'][$new_vid] = 'tid';
-      $migrations[$migration_id] = $storage_controller->create($values);;
+      $migrations[$migration_id] = $storage->create($values);;
     }
 
     return $migrations;
