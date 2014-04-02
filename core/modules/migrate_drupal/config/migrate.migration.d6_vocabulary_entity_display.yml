@@ -6,7 +6,7 @@ source:
     view_mode: default
     options:
       label: hidden
-      type: taxonomy_term_reference
+      type: taxonomy_term_reference_link
       weight: 20
 
 process:
