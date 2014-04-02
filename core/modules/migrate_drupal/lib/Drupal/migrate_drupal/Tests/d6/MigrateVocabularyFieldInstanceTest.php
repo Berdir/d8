@@ -38,6 +38,11 @@ class MigrateVocabularyFieldInstanceTest extends MigrateDrupalTestBase {
    */
   protected function setUp() {
     parent::setUp();
+
+    entity_create('node_type', array('type' => 'page'))->save();
+    entity_create('node_type', array('type' => 'article'))->save();
+    entity_create('node_type', array('type' => 'story'))->save();
+
     // Add some id mappings for the dependant migrations.
     $id_mappings = array(
       'd6_taxonomy_vocabulary' => array(
