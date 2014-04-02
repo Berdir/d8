@@ -8,6 +8,7 @@
 use Drupal\Core\Language\Language;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\field\FieldInstanceConfigInterface;
 
 /**
  * Translations overview page callback.
@@ -37,7 +38,8 @@ function content_translation_overview(EntityInterface $entity) {
 
     // Determine whether the current entity is translatable.
     $translatable = FALSE;
-    foreach (field_info_instances($entity->getEntityTypeId(), $entity->bundle()) as $instance) {
+    $instances = \Drupal::entityManager()->getFieldDefinitions($entity->getEntityTypeId(), $entity->bundle());
+    foreach ($instances as $instance) {
       if ($instance->isTranslatable()) {
         $translatable = TRUE;
         break;

@@ -13,6 +13,8 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\entity_reference\Plugin\Type\Selection\SelectionInterface;
+use Drupal\field\Field;
+use Drupal\field\FieldInstanceConfigInterface;
 
 /**
  * Plugin implementation of the 'selection' entity_reference.
@@ -106,7 +108,10 @@ class SelectionBase implements SelectionInterface {
       // converted to the new Field API.
       $fields = drupal_schema_fields_sql($entity_type->getBaseTable());
       $fields = array_combine($fields, $fields);
-      foreach (field_info_instances($target_type) as $bundle_instances) {
+      foreach (array_keys($bundles) as $bundle) {
+        $bundle_instances = array_filter(\Drupal::entityManager()->getFieldDefinitions($target_type, $bundle), function ($field_definition) {
+          return $field_definition instanceof FieldInstanceConfigInterface;
+        });
         foreach ($bundle_instances as $instance_name => $instance) {
           foreach ($instance->getField()->getColumns() as $column_name => $column_info) {
             $fields[$instance_name . '.' . $column_name] = t('@label (@column)', array('@label' => $instance->getLabel(), '@column' => $column_name));
