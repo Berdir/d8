@@ -11,10 +11,7 @@ use Drupal\Core\Database\Query\AlterableInterface;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
-use Drupal\Component\Utility\NestedArray;
 use Drupal\entity_reference\Plugin\Type\Selection\SelectionInterface;
-use Drupal\field\Field;
-use Drupal\field\FieldInstanceConfigInterface;
 
 /**
  * Plugin implementation of the 'selection' entity_reference.

@@ -2,12 +2,10 @@
 
 /**
  * @file
- * Definition of Drupal\field\Tests\FieldAttachStorageTest.
+ * Contains \Drupal\field\Tests\FieldAttachStorageTest.
  */
 
 namespace Drupal\field\Tests;
-
-use Drupal\field\FieldInstanceConfigInterface;
 
 /**
  * Unit test class for storage-related field behavior.
@@ -148,10 +146,10 @@ class FieldAttachStorageTest extends FieldUnitTestBase {
     foreach ($bundles as $index => $bundle) {
       $entities[$index] = entity_create($entity_type, array('id' => $index, 'revision_id' => $index, 'type' => $bundle));
       $entity = clone($entities[$index]);
-      $instances = array_filter(\Drupal::entityManager()->getFieldDefinitions($entity_type, $bundle), function ($field_definition) {
-        return $field_definition instanceof FieldInstanceConfigInterface;
-      });
-      foreach ($instances as $field_name => $instance) {
+      foreach ($field_names as $field_name) {
+        if (!$entity->hasField($field_name)) {
+          continue;
+        }
         $values[$index][$field_name] = mt_rand(1, 127);
         $entity->$field_name->setValue(array('value' => $values[$index][$field_name]));
       }
@@ -164,10 +162,10 @@ class FieldAttachStorageTest extends FieldUnitTestBase {
     $controller->resetCache();
     $entities = $controller->loadMultiple();
     foreach ($entities as $index => $entity) {
-      $instances = array_filter(\Drupal::entityManager()->getFieldDefinitions($entity_type, $bundles[$index]), function ($field_definition) {
-        return $field_definition instanceof FieldInstanceConfigInterface;
-      });
-      foreach ($instances as $field_name => $instance) {
+      foreach ($field_names as $field_name) {
+        if (!$entity->hasField($field_name)) {
+          continue;
+        }
         // The field value loaded matches the one inserted.
         $this->assertEqual($entity->{$field_name}->value, $values[$index][$field_name], format_string('Entity %index: expected value was found.', array('%index' => $index)));
         // The value added in hook_field_load() is found.
