@@ -26,22 +26,27 @@ class ConfigDestinationTest extends UnitTestCase {
     $source = array(
       'test' => 'x',
     );
+    $migration = $this->getMockBuilder('Drupal\migrate\Entity\Migration')
+      ->disableOriginalConstructor()
+      ->getMock();
     $config = $this->getMockBuilder('Drupal\Core\Config\Config')
       ->disableOriginalConstructor()
       ->getMock();
-    $config->expects($this->once())
-      ->method('setData')
-      ->with($this->equalTo($source))
-      ->will($this->returnValue($config));
+    foreach ($source as $key => $val) {
+      $config->expects($this->once())
+        ->method('set')
+        ->with($this->equalTo($key), $this->equalTo($val))
+        ->will($this->returnValue($config));
+    }
     $config->expects($this->once())
       ->method('save');
     $row = $this->getMockBuilder('Drupal\migrate\Row')
       ->disableOriginalConstructor()
       ->getMock();
     $row->expects($this->once())
-      ->method('getDestination')
+      ->method('getRawDestination')
       ->will($this->returnValue($source));
-    $destination = new Config(array(), 'd8_config', array('pluginId' => 'd8_config'), $config);
+    $destination = new Config(array(), 'd8_config', array('pluginId' => 'd8_config'), $migration, $config);
     $destination->import($row);
   }
 
