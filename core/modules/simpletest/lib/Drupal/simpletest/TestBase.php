@@ -18,6 +18,8 @@ use Drupal\Core\Database\ConnectionNotDefinedException;
 use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Language\Language;
+use Drupal\Core\Session\AccountProxy;
+use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\Core\StreamWrapper\PublicStream;
 use Drupal\Core\Utility\Error;
 use Symfony\Component\HttpFoundation\Request;
@@ -1015,10 +1017,6 @@ abstract class TestBase {
     $this->originalContainer = clone \Drupal::getContainer();
     $this->originalLanguage = $language_interface;
     $this->originalConfigDirectories = $GLOBALS['config_directories'];
-    if (isset($GLOBALS['theme_key'])) {
-      $this->originalThemeKey = $GLOBALS['theme_key'];
-    }
-    $this->originalTheme = isset($GLOBALS['theme']) ? $GLOBALS['theme'] : NULL;
 
     // Save further contextual information.
     // Use the original files directory to avoid nesting it within an existing
@@ -1087,7 +1085,7 @@ abstract class TestBase {
 
     // Run all tests as a anonymous user by default, web tests will replace that
     // during the test set up.
-    $this->container->set('current_user', drupal_anonymous_user());
+    $this->container->set('current_user', new AnonymousUserSession());
 
     \Drupal::setContainer($this->container);
 
@@ -1097,6 +1095,10 @@ abstract class TestBase {
     unset($GLOBALS['conf']);
     unset($GLOBALS['theme_key']);
     unset($GLOBALS['theme']);
+    unset($GLOBALS['theme_info']);
+    unset($GLOBALS['base_theme_info']);
+    unset($GLOBALS['theme_engine']);
+    unset($GLOBALS['theme_path']);
 
     // Log fatal errors.
     ini_set('log_errors', 1);
@@ -1138,6 +1140,12 @@ abstract class TestBase {
   protected function rebuildContainer($environment = 'testing') {
     // Preserve the request object after the container rebuild.
     $request = \Drupal::request();
+    // When called from InstallerTestBase, the current container is the minimal
+    // container from TestBase::prepareEnvironment(), which does not contain a
+    // request stack.
+    if (\Drupal::getContainer()->initialized('request_stack')) {
+      $request_stack = \Drupal::service('request_stack');
+    }
 
     $this->kernel = new DrupalKernel($environment, drupal_classloader(), FALSE);
     $this->kernel->boot();
@@ -1146,7 +1154,13 @@ abstract class TestBase {
     $this->container = \Drupal::getContainer();
     // The current user is set in TestBase::prepareEnvironment().
     $this->container->set('request', $request);
-    $this->container->set('current_user', \Drupal::currentUser());
+    if (isset($request_stack)) {
+      $this->container->set('request_stack', $request_stack);
+    }
+    else {
+      $this->container->get('request_stack')->push($request);
+    }
+    $this->container->get('current_user')->setAccount(\Drupal::currentUser());
   }
 
   /**
@@ -1218,16 +1232,18 @@ abstract class TestBase {
     $connection_info = Database::getConnectionInfo('default');
     $databases['default']['default'] = $connection_info['default'];
 
-    // Restore original globals.
-    if (isset($this->originalThemeKey)) {
-      $GLOBALS['theme_key'] = $this->originalThemeKey;
-    }
-    $GLOBALS['theme'] = $this->originalTheme;
-
     // Reset all static variables.
     // All destructors of statically cached objects have been invoked above;
     // this second reset is guaranteed to reset everything to nothing.
     drupal_static_reset();
+
+    // Reset global theme variables.
+    unset($GLOBALS['theme_key']);
+    unset($GLOBALS['theme']);
+    unset($GLOBALS['theme_info']);
+    unset($GLOBALS['base_theme_info']);
+    unset($GLOBALS['theme_engine']);
+    unset($GLOBALS['theme_path']);
 
     // Restore original in-memory configuration.
     $GLOBALS['config'] = $this->originalConfig;

@@ -94,7 +94,15 @@ class ThemeHandlerTest extends UnitTestCase {
    * {@inheritdoc}
    */
   protected function setUp() {
-    $this->configFactory = $this->getConfigFactoryStub(array('system.theme' => array(), 'system.theme.disabled' => array()));
+    $this->configFactory = $this->getConfigFactoryStub(array(
+      'core.extension' => array(
+        'module' => array(),
+        'theme' => array(),
+        'disabled' => array(
+          'theme' => array(),
+        ),
+      ),
+    ));
     $this->moduleHandler = $this->getMock('Drupal\Core\Extension\ModuleHandlerInterface');
     $this->cacheBackend = $this->getMock('Drupal\Core\Cache\CacheBackendInterface');
     $this->infoParser = $this->getMock('Drupal\Core\Extension\InfoParserInterface');
@@ -128,21 +136,21 @@ class ThemeHandlerTest extends UnitTestCase {
   public function testEnableSingleTheme() {
     $theme_list = array('theme_test');
 
-    $this->configFactory->get('system.theme')
+    $this->configFactory->get('core.extension')
       ->expects($this->once())
       ->method('set')
-      ->with('enabled.theme_test', 0)
+      ->with('theme.theme_test', 0)
       ->will($this->returnSelf());
-    $this->configFactory->get('system.theme')
+    $this->configFactory->get('core.extension')
       ->expects($this->once())
       ->method('save');
 
-    $this->configFactory->get('system.theme.disabled')
+    $this->configFactory->get('core.extension')
       ->expects($this->once())
       ->method('clear')
-      ->with('theme_test')
+      ->with('disabled.theme.theme_test')
       ->will($this->returnSelf());
-    $this->configFactory->get('system.theme.disabled')
+    $this->configFactory->get('core.extension')
       ->expects($this->once())
       ->method('save');
 
@@ -172,12 +180,12 @@ class ThemeHandlerTest extends UnitTestCase {
    * @see \Drupal\Core\Extension\ThemeHandler::listInfo()
    */
   public function testEnableAndListInfo() {
-    $this->configFactory->get('system.theme')
+    $this->configFactory->get('core.extension')
       ->expects($this->exactly(2))
       ->method('set')
       ->will($this->returnSelf());
 
-    $this->configFactory->get('system.theme.disabled')
+    $this->configFactory->get('core.extension')
       ->expects($this->exactly(2))
       ->method('clear')
       ->will($this->returnSelf());
@@ -196,8 +204,8 @@ class ThemeHandlerTest extends UnitTestCase {
           'css/colors.css',
         ),
       ),
-      'scripts' => array(
-        'example' => 'theme.js',
+      'libraries' => array(
+        'example/theme',
       ),
       'engine' => 'twig',
       'base theme' => 'stark',
@@ -207,7 +215,7 @@ class ThemeHandlerTest extends UnitTestCase {
     $this->assertCount(1, $list_info);
 
     $this->assertEquals($this->themeHandler->systemList['bartik']->info['stylesheets'], $list_info['bartik']->stylesheets);
-    $this->assertEquals($this->themeHandler->systemList['bartik']->scripts, $list_info['bartik']->scripts);
+    $this->assertEquals($this->themeHandler->systemList['bartik']->libraries, $list_info['bartik']->libraries);
     $this->assertEquals('twig', $list_info['bartik']->engine);
     $this->assertEquals('stark', $list_info['bartik']->base_theme);
     $this->assertEquals(0, $list_info['bartik']->status);
@@ -219,7 +227,7 @@ class ThemeHandlerTest extends UnitTestCase {
           'style.css',
         ),
       ),
-      'scripts' => array(),
+      'libraries' => array(),
     );
     $this->themeHandler->systemList['seven']->status = 1;
 
@@ -274,7 +282,7 @@ class ThemeHandlerTest extends UnitTestCase {
     $this->assertEquals('twig', $info->prefix);
 
     $this->assertEquals('twig', $info->info['engine']);
-    $this->assertEquals(array(), $info->info['scripts']);
+    $this->assertEquals(array(), $info->info['libraries']);
 
     // Ensure that the css paths are set with the proper prefix.
     $this->assertEquals(array(
@@ -283,7 +291,6 @@ class ThemeHandlerTest extends UnitTestCase {
         'style.css' => DRUPAL_ROOT . '/core/themes/seven/style.css',
         'css/components/buttons.css' => DRUPAL_ROOT . '/core/themes/seven/css/components/buttons.css',
         'css/components/buttons.theme.css' => DRUPAL_ROOT . '/core/themes/seven/css/components/buttons.theme.css',
-        'dialog.theme.css' => DRUPAL_ROOT . '/core/themes/seven/dialog.theme.css',
       ),
     ), $info->info['stylesheets']);
     $this->assertEquals(DRUPAL_ROOT . '/core/themes/seven/screenshot.png', $info->info['screenshot']);

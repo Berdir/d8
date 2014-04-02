@@ -14,10 +14,12 @@ use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Entity\EntityStorageBase;
 use Drupal\Core\Config\Config;
 use Drupal\Core\Config\StorageInterface;
+use Drupal\Core\Config\Entity\Exception\ConfigEntityIdLengthException;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\Query\QueryFactory;
 use Drupal\Component\Uuid\UuidInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -36,6 +38,19 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   custom suffixes are not possible.
  */
 class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStorageInterface, ImportableEntityStorageInterface {
+
+  /**
+   * Length limit of the configuration entity ID.
+   *
+   * Most file systems limit a file name's length to 255 characters. In
+   * order to leave sufficient characters to construct a configuration prefix,
+   * the configuration entity ID is limited to 166 characters which
+   * leaves 83 characters for the configuration prefix. 5 characters are
+   * reserved for the file extension.
+   *
+   * @see \Drupal\Core\Config\ConfigBase::MAX_NAME_LENGTH
+   */
+  const MAX_ID_LENGTH = 166;
 
   /**
    * The UUID service.
@@ -66,6 +81,13 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
   protected $configStorage;
 
   /**
+   * The language manager.
+   *
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  protected $languageManager;
+
+  /**
    * Constructs a ConfigEntityStorage object.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
@@ -76,8 +98,10 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
    *   The config storage service.
    * @param \Drupal\Component\Uuid\UuidInterface $uuid_service
    *   The UUID service.
+   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   *   The language manager.
    */
-  public function __construct(EntityTypeInterface $entity_type, ConfigFactoryInterface $config_factory, StorageInterface $config_storage, UuidInterface $uuid_service) {
+  public function __construct(EntityTypeInterface $entity_type, ConfigFactoryInterface $config_factory, StorageInterface $config_storage, UuidInterface $uuid_service, LanguageManagerInterface $language_manager) {
     parent::__construct($entity_type);
 
     $this->idKey = $this->entityType->getKey('id');
@@ -86,6 +110,7 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
     $this->configFactory = $config_factory;
     $this->configStorage = $config_storage;
     $this->uuidService = $uuid_service;
+    $this->languageManager = $language_manager;
   }
 
   /**
@@ -96,7 +121,8 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
       $entity_type,
       $container->get('config.factory'),
       $container->get('config.storage'),
-      $container->get('uuid')
+      $container->get('uuid'),
+      $container->get('language_manager')
     );
   }
 
@@ -131,7 +157,7 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
       // Remove any invalid ids from the array.
       $passed_ids = array_intersect_key($passed_ids, $entities);
       foreach ($entities as $entity) {
-        $passed_ids[$entity->{$this->idKey}] = $entity;
+        $passed_ids[$entity->id()] = $entity;
       }
       $entities = $passed_ids;
     }
@@ -228,7 +254,7 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
     $class::preCreate($this, $values);
 
     // Set default language to site default if not provided.
-    $values += array('langcode' => language_default()->id);
+    $values += array('langcode' => $this->languageManager->getDefaultLanguage()->id);
 
     $entity = new $class($values, $this->entityTypeId);
     // Mark this entity as new, so isNew() returns TRUE. This does not check
@@ -310,9 +336,13 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
       $entity->original = $this->loadUnchanged($id);
     }
 
-    // Build an ID if none is set.
-    if (!isset($entity->{$this->idKey})) {
-      $entity->{$this->idKey} = $entity->id();
+    // Check the configuration entity ID length.
+    // @see \Drupal\Core\Config\Entity\ConfigEntityStorage::MAX_ID_LENGTH
+    if (strlen($entity->{$this->idKey}) > self::MAX_ID_LENGTH) {
+      throw new ConfigEntityIdLengthException(String::format('Configuration entity ID @id exceeds maximum allowed length of @length characters.', array(
+        '@id' => $entity->{$this->idKey},
+        '@length' => self::MAX_ID_LENGTH,
+      )));
     }
 
     $entity->preSave($this);
@@ -336,9 +366,6 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
       $config->save();
       $entity->postSave($this, TRUE);
       $this->invokeHook('update', $entity);
-
-      // Immediately update the original ID.
-      $entity->setOriginalId($entity->id());
     }
     else {
       $return = SAVED_NEW;
@@ -347,6 +374,11 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
       $entity->postSave($this, FALSE);
       $this->invokeHook('insert', $entity);
     }
+
+    // After saving, this is now the "original entity", and subsequent saves
+    // will be updates instead of inserts, and updates must always be able to
+    // correctly identify the original entity.
+    $entity->setOriginalId($entity->id());
 
     unset($entity->original);
 

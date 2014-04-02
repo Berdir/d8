@@ -199,8 +199,7 @@ class Comment extends ContentEntityBase implements CommentInterface {
   public function permalink() {
     $entity = $this->getCommentedEntity();
     $uri = $entity->urlInfo();
-    $uri['options'] = array('fragment' => 'comment-' . $this->id());
-
+    $uri->setOption('fragment', 'comment-' . $this->id());
     return $uri;
   }
 
@@ -211,7 +210,8 @@ class Comment extends ContentEntityBase implements CommentInterface {
     $fields['cid'] = FieldDefinition::create('integer')
       ->setLabel(t('Comment ID'))
       ->setDescription(t('The comment ID.'))
-      ->setReadOnly(TRUE);
+      ->setReadOnly(TRUE)
+      ->setSetting('unsigned', TRUE);
 
     $fields['uuid'] = FieldDefinition::create('uuid')
       ->setLabel(t('UUID'))

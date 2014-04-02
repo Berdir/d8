@@ -96,24 +96,6 @@ function forum_theme() {
 }
 
 /**
- * Implements hook_menu_link_defaults().
- */
-function forum_menu_link_defaults() {
-  $links['forum.index'] = array(
-    'link_title' => 'Forums',
-    'route_name' => 'forum.index',
-    'menu_name' => 'tools',
-  );
-  $links['forum.overview'] = array(
-    'link_title' => 'Forums',
-    'parent' => 'system.admin_structure',
-    'description' => 'Control forum hierarchy settings.',
-    'route_name' => 'forum.overview',
-  );
-  return $links;
-}
-
-/**
  * Implements hook_menu_local_tasks().
  */
 function forum_menu_local_tasks(&$data, $route_name) {
@@ -542,7 +524,7 @@ function forum_form_node_form_alter(&$form, &$form_state, $form_id) {
  * Implements hook_preprocess_HOOK() for block templates.
  */
 function forum_preprocess_block(&$variables) {
-  if ($variables['configuration']['module'] == 'forum') {
+  if ($variables['configuration']['provider'] == 'forum') {
     $variables['attributes']['role'] = 'navigation';
   }
 }

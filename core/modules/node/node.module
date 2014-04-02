@@ -8,8 +8,9 @@
  * API pattern.
  */
 
-use Drupal\Component\Utility\String;
 use Drupal\Core\Language\Language;
+use Drupal\Core\Render\Element;
+use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\Response;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Database\Query\AlterableInterface;
@@ -23,6 +24,8 @@ use Drupal\Core\Template\Attribute;
 use Drupal\file\Entity\File;
 use Drupal\language\Entity\Language as LanguageEntity;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
+use Drupal\block\Entity\Block;
+use Drupal\Core\Session\AccountInterface;
 
 /**
  * Denotes that the node is not published.
@@ -229,12 +232,9 @@ function node_entity_form_display_alter(EntityFormDisplayInterface $form_display
  *   An array with 'path' as the key and the path to the node as its value.
  */
 function node_uri(NodeInterface $node) {
-  return array(
-    'route_name' => 'node.view',
-    'route_parameters' => array(
-      'node' => $node->id(),
-    ),
-  );
+  return new Url('node.view', array(
+    'node' => $node->id(),
+  ));
 }
 
 /**
@@ -445,9 +445,9 @@ function node_add_body_field(NodeTypeInterface $type, $label = 'Body') {
 }
 
 /**
- * Implements hook_field_extra_fields().
+ * Implements hook_entity_extra_field_info().
  */
-function node_field_extra_fields() {
+function node_entity_extra_field_info() {
   $extra = array();
   $module_language_enabled = \Drupal::moduleHandler()->moduleExists('language');
   $description = t('Node module element');
@@ -592,7 +592,7 @@ function node_preprocess_html(&$variables) {
  * Implements hook_preprocess_HOOK() for block templates.
  */
 function node_preprocess_block(&$variables) {
-  if ($variables['configuration']['module'] == 'node') {
+  if ($variables['configuration']['provider'] == 'node') {
     switch ($variables['elements']['#plugin_id']) {
       case 'node_syndicate_block':
         $variables['attributes']['role'] = 'complementary';
@@ -645,14 +645,16 @@ function template_preprocess_node(&$variables) {
   );
   $variables['name'] = drupal_render($username);
 
-  $variables['node_url'] = $node->url();
+  $variables['node_url'] = $node->url('canonical', array(
+    'language' => $node->language(),
+  ));
   $variables['label'] = $variables['elements']['title'];
   unset($variables['elements']['title']);
   $variables['page'] = $variables['view_mode'] == 'full' && node_is_page($node);
 
   // Helpful $content variable for templates.
   $variables += array('content' => array());
-  foreach (element_children($variables['elements']) as $key) {
+  foreach (Element::children($variables['elements']) as $key) {
     $variables['content'][$key] = $variables['elements'][$key];
   }
 
@@ -877,7 +879,7 @@ function theme_node_search_admin($variables) {
   $output = drupal_render($form['info']);
 
   $header = array(t('Factor'), t('Influence'));
-  foreach (element_children($form['factors']) as $key) {
+  foreach (Element::children($form['factors']) as $key) {
     $row = array();
     $row[] = $form['factors'][$key]['#title'];
     $form['factors'][$key]['#title_display'] = 'invisible';
@@ -921,31 +923,6 @@ function _node_revision_access(NodeInterface $node, $op = 'view', $account = NUL
     $account = \Drupal::currentUser();
   }
   return \Drupal::service('access_check.node.revision')->checkAccess($node, $account, $op, $langcode);
-}
-
-/**
- * Implements hook_menu_link_defaults().
- */
-function node_menu_link_defaults() {
-  $links['node.content_overview'] = array(
-    'link_title' => 'Content',
-    'route_name' => 'node.content_overview',
-    'parent' => 'system.admin',
-    'description' => 'Find and manage content.',
-    'weight' => -10,
-  );
-
-  $links['node.overview_types'] = array(
-    'link_title' => 'Content types',
-    'parent' => 'system.admin_structure',
-    'description' => 'Manage content types, including default status, front page promotion, comment settings, etc.',
-    'route_name' => 'node.overview_types',
-  );
-  $links['node.add_page'] = array(
-    'link_title' => 'Add content',
-    'route_name' => 'node.add_page',
-  );
-  return $links;
 }
 
 /**
@@ -1075,7 +1052,11 @@ function node_form_block_form_alter(&$form, &$form_state) {
  * Checks the content type specific visibility settings and removes the block
  * if the visibility conditions are not met.
  */
-function node_block_access($block) {
+function node_block_access(Block $block, $operation, AccountInterface $account, $langcode) {
+  // Only affect access when viewing the block.
+  if ($operation != 'view') {
+    return;
+  }
   $visibility = $block->get('visibility');
   if (!empty($visibility)) {
     if (!empty($visibility['node_type']['types'])) {

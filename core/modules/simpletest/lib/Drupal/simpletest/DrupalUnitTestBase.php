@@ -55,7 +55,6 @@ abstract class DrupalUnitTestBase extends UnitTestBase {
 
   private $moduleFiles;
   private $themeFiles;
-  private $themeData;
 
   /**
    * The configuration directories for this test run.
@@ -96,7 +95,6 @@ abstract class DrupalUnitTestBase extends UnitTestBase {
     if (!isset($this->moduleFiles)) {
       $this->moduleFiles = \Drupal::state()->get('system.module.files') ?: array();
       $this->themeFiles = \Drupal::state()->get('system.theme.files') ?: array();
-      $this->themeData = \Drupal::state()->get('system.theme.data') ?: array();
     }
   }
 
@@ -139,19 +137,18 @@ abstract class DrupalUnitTestBase extends UnitTestBase {
 
     \Drupal::state()->set('system.module.files', $this->moduleFiles);
     \Drupal::state()->set('system.theme.files', $this->themeFiles);
-    \Drupal::state()->set('system.theme.data', $this->themeData);
 
     // Bootstrap the kernel.
     // No need to dump it; this test runs in-memory.
     $this->kernel = new DrupalKernel('unit_testing', drupal_classloader(), FALSE);
     $this->kernel->boot();
 
-    // Create a minimal system.module configuration object so that the list of
+    // Create a minimal core.extension configuration object so that the list of
     // enabled modules can be maintained allowing
     // \Drupal\Core\Config\ConfigInstaller::installDefaultConfig() to work.
     // Write directly to active storage to avoid early instantiation of
     // the event dispatcher which can prevent modules from registering events.
-    \Drupal::service('config.storage')->write('system.module', array('enabled' => array()));
+    \Drupal::service('config.storage')->write('core.extension', array('module' => array()));
 
     // Collect and set a fixed module list.
     $class = get_class($this);
@@ -349,14 +346,14 @@ abstract class DrupalUnitTestBase extends UnitTestBase {
     // Write directly to active storage to avoid early instantiation of
     // the event dispatcher which can prevent modules from registering events.
     $active_storage =  \Drupal::service('config.storage');
-    $system_config = $active_storage->read('system.module');
+    $extensions = $active_storage->read('core.extension');
 
     foreach ($modules as $module) {
       $module_handler->addModule($module, drupal_get_path('module', $module));
       // Maintain the list of enabled modules in configuration.
-      $system_config['enabled'][$module] = 0;
+      $extensions['module'][$module] = 0;
     }
-    $active_storage->write('system.module', $system_config);
+    $active_storage->write('core.extension', $extensions);
 
     // Update the kernel to make their services available.
     $module_filenames = $module_handler->getModuleList();
@@ -385,12 +382,12 @@ abstract class DrupalUnitTestBase extends UnitTestBase {
     // Unset the list of modules in the extension handler.
     $module_handler = $this->container->get('module_handler');
     $module_filenames = $module_handler->getModuleList();
-    $system_config = $this->container->get('config.factory')->get('system.module');
+    $extension_config = $this->container->get('config.factory')->get('core.extension');
     foreach ($modules as $module) {
       unset($module_filenames[$module]);
-      $system_config->clear('enabled.' . $module);
+      $extension_config->clear('module.' . $module);
     }
-    $system_config->save();
+    $extension_config->save();
     $module_handler->setModuleList($module_filenames);
     $module_handler->resetImplementations();
     // Update the kernel to remove their services.

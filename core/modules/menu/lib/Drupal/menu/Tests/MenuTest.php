@@ -464,7 +464,7 @@ class MenuTest extends MenuWebTestBase {
   public function testBlockContextualLinks() {
     $this->drupalLogin($this->drupalCreateUser(array('administer menu', 'access contextual links', 'administer blocks')));
     $this->addMenuLink();
-    $block = $this->drupalPlaceBlock('system_menu_block:tools', array('label' => 'Tools', 'module' => 'system'));
+    $block = $this->drupalPlaceBlock('system_menu_block:tools', array('label' => 'Tools', 'provider' => 'system'));
     $this->drupalGet('test-page');
 
     $id = 'block:block=' . $block->id() . ':|menu:menu=tools:';
@@ -781,8 +781,8 @@ class MenuTest extends MenuWebTestBase {
     // Retrieve menu link id of the Log out menu link, which will always be on
     // the front page.
     $query = \Drupal::entityQuery('menu_link')
-      ->condition('module', 'system')
-      ->condition('link_path', 'user/logout');
+      ->condition('module', 'user')
+      ->condition('machine_name', 'user.logout');
     $result = $query->execute();
     if (!empty($result)) {
       $mlid = reset($result);

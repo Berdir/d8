@@ -6,6 +6,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Session\AnonymousUserSession;
 use \Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Url;
 use Drupal\file\Entity\File;
 use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
@@ -156,12 +157,9 @@ function user_entity_bundle_info() {
  * Entity URI callback.
  */
 function user_uri($user) {
-  return array(
-    'route_name' => 'user.view',
-    'route_parameters' => array(
-      'user' => $user->id(),
-    ),
-  );
+  return new Url('user.view', array(
+    'user' => $user->id(),
+  ));
 }
 
 /**
@@ -205,9 +203,9 @@ function user_picture_enabled() {
 }
 
 /**
- * Implements hook_field_extra_fields().
+ * Implements hook_entity_extra_field_info().
  */
-function user_field_extra_fields() {
+function user_entity_extra_field_info() {
   $fields['user']['user']['form']['account'] = array(
     'label' => t('User name and password'),
     'description' => t('User module account form elements.'),
@@ -554,7 +552,7 @@ function user_validate_current_pass(&$form, &$form_state) {
  * Implements hook_preprocess_HOOK() for block templates.
  */
 function user_preprocess_block(&$variables) {
-  if ($variables['configuration']['module'] == 'user') {
+  if ($variables['configuration']['provider'] == 'user') {
     switch ($variables['elements']['#plugin_id']) {
       case 'user_login_block':
         $variables['attributes']['role'] = 'form';
@@ -693,55 +691,6 @@ function theme_username($variables) {
 }
 
 /**
- * Implements hook_menu_link_defaults().
- */
-function user_menu_link_defaults() {
-  // Registration and login pages.
-  $links['user.page'] = array(
-    'link_title' => 'My account',
-    'weight' => -10,
-    'route_name' => 'user.page',
-    'menu_name' => 'account',
-  );
-
-  $links['user.logout'] = array(
-    'link_title' => 'Log out',
-    'route_name' => 'user.logout',
-    'weight' => 10,
-    'menu_name' => 'account',
-  );
-
-  // User listing pages.
-  $links['user.admin_account'] = array(
-    'link_title' => 'People',
-    'route_name' => 'user.admin_account',
-    'description' => 'Manage user accounts, roles, and permissions.',
-    'parent' => 'system.admin',
-    'weight' => 4,
-  );
-
-  // Administration pages.
-  $links['user.admin_index'] = array(
-   'link_title' => 'People',
-   'route_name' => 'user.admin_index',
-   'parent' => 'system.admin_config',
-   'description' => 'Configure user accounts.',
-   'position' => 'left',
-   'weight' => -20,
-  );
-
-  $links['user.account_settings'] = array(
-    'link_title' => 'Account settings',
-    'parent' => 'user.admin_index',
-    'description' => 'Configure default behavior of users, including registration requirements, e-mails, and fields.',
-    'weight' => -10,
-    'route_name' => 'user.account_settings',
-  );
-
-  return $links;
-}
-
-/**
  * Implements hook_menu_link_presave().
  */
 function user_menu_link_presave(MenuLink $menu_link) {
@@ -749,7 +698,7 @@ function user_menu_link_presave(MenuLink $menu_link) {
   // for authenticated users. Authenticated users should see "My account", but
   // anonymous users should not see it at all. Therefore, invoke
   // user_menu_link_load() to conditionally hide the link.
-  if ($menu_link->machine_name == 'user.page' && $menu_link->module == 'system') {
+  if ($menu_link->machine_name == 'user.page') {
     $menu_link->options['alter'] = TRUE;
   }
 }
@@ -760,7 +709,7 @@ function user_menu_link_presave(MenuLink $menu_link) {
 function user_menu_breadcrumb_alter(&$active_trail, $item) {
   // Remove "My account" from the breadcrumb when $item is descendant-or-self
   // of system path user/%.
-  if (isset($active_trail[1]['module']) && $active_trail[1]['module'] == 'system' && $active_trail[1]['link_path'] == 'user' && strpos($item['path'], 'user/%') === 0) {
+  if (isset($active_trail[1]['module']) && $active_trail[1]['machine_name'] == 'user.page' && strpos($item['path'], 'user/%') === 0) {
     array_splice($active_trail, 1, 1);
   }
 }
@@ -770,7 +719,7 @@ function user_menu_breadcrumb_alter(&$active_trail, $item) {
  */
 function user_translated_menu_link_alter(MenuLink &$menu_link) {
   // Hide the "User account" link for anonymous users.
-  if ($menu_link->machine_name == 'user.page' && $menu_link->module == 'system' && \Drupal::currentUser()->isAnonymous()) {
+  if ($menu_link->machine_name == 'user.page' && \Drupal::currentUser()->isAnonymous()) {
     $menu_link->hidden = 1;
   }
 }
@@ -863,7 +812,7 @@ function user_user_logout($account) {
 function user_pass_reset_url($account, $options = array()) {
   $timestamp = REQUEST_TIME;
   $langcode = isset($options['langcode']) ? $options['langcode'] : $account->getPreferredLangcode();
-  $url_options = array('absolute' => TRUE, 'language' => language_load($langcode));
+  $url_options = array('absolute' => TRUE, 'language' => \Drupal::languageManager()->getLanguage($langcode));
   return url("user/reset/" . $account->id() . "/$timestamp/" . user_pass_rehash($account->getPassword(), $timestamp, $account->getLastLoginTime()), $url_options);
 }
 
@@ -891,7 +840,7 @@ function user_pass_reset_url($account, $options = array()) {
 function user_cancel_url($account, $options = array()) {
   $timestamp = REQUEST_TIME;
   $langcode = isset($options['langcode']) ? $options['langcode'] : $account->getPreferredLangcode();
-  $url_options = array('absolute' => TRUE, 'language' => language_load($langcode));
+  $url_options = array('absolute' => TRUE, 'language' => \Drupal::languageManager()->getLanguage($langcode));
   return url("user/" . $account->id() . "/cancel/confirm/$timestamp/" . user_pass_rehash($account->getPassword(), $timestamp, $account->getLastLoginTime()), $url_options);
 }
 
@@ -1175,7 +1124,7 @@ function user_mail($key, &$message, $params) {
   $langcode = $message['langcode'];
   $variables = array('user' => $params['account']);
 
-  $language = language_load($params['account']->getPreferredLangcode());
+  $language = \Drupal::languageManager()->getLanguage($params['account']->getPreferredLangcode());
   $original_language = $language_manager->getConfigOverrideLanguage();
   $language_manager->setConfigOverrideLanguage($language);
   $mail_config = \Drupal::config('user.mail');
@@ -1523,7 +1472,7 @@ function _user_mail_notify($op, $account, $langcode = NULL) {
     if ($op == 'register_pending_approval') {
       // If a user registered requiring admin approval, notify the admin, too.
       // We use the site default language for this.
-      drupal_mail('user', 'register_pending_approval_admin', $site_mail, language_default()->id, $params);
+      drupal_mail('user', 'register_pending_approval_admin', $site_mail, \Drupal::languageManager()->getDefaultLanguage()->id, $params);
     }
   }
   return empty($mail) ? NULL : $mail['result'];

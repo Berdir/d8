@@ -190,7 +190,7 @@ class Drupal {
   /**
    * Gets the current active user.
    *
-   * @return \Drupal\Core\Session\AccountInterface
+   * @return \Drupal\Core\Session\AccountProxyInterface
    */
   public static function currentUser() {
     return static::$container->get('current_user');
@@ -221,14 +221,14 @@ class Drupal {
    *
    * @param string $bin
    *   (optional) The cache bin for which the cache object should be returned,
-   *   defaults to 'cache'.
+   *   defaults to 'default'.
    *
    * @return \Drupal\Core\Cache\CacheBackendInterface
    *   The cache object associated with the specified bin.
    *
    * @ingroup cache
    */
-  public static function cache($bin = 'cache') {
+  public static function cache($bin = 'default') {
     return static::$container->get('cache.' . $bin);
   }
 

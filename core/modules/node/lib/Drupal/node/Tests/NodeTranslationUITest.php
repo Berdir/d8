@@ -114,7 +114,7 @@ class NodeTranslationUITest extends ContentTranslationUITest {
   protected function doTestPublishedStatus() {
     $entity = entity_load($this->entityTypeId, $this->entityId, TRUE);
     $path = $entity->getSystemPath('edit-form');
-    $languages = language_list();
+    $languages = $this->container->get('language_manager')->getLanguages();
 
     $actions = array(
       t('Save and keep published'),
@@ -145,7 +145,7 @@ class NodeTranslationUITest extends ContentTranslationUITest {
   protected function doTestAuthoringInfo() {
     $entity = entity_load($this->entityTypeId, $this->entityId, TRUE);
     $path = $entity->getSystemPath('edit-form');
-    $languages = language_list();
+    $languages = $this->container->get('language_manager')->getLanguages();
     $values = array();
 
     // Post different base field information for each translation.
@@ -271,6 +271,53 @@ class NodeTranslationUITest extends ContentTranslationUITest {
       $this->assertText($values[$langcode]['title'][0]['value']);
     }
 
+    // Need to check from the beginning, including the base_path, in the url
+    // since the pattern for the default language might be a substring of
+    // the strings for other languages.
+    $base_path = base_path();
+
+    // Check the frontpage for 'Read more' links to each translation.
+    // See also assertTaxonomyPage() in NodeAccessBaseTableTest.
+    $node_href = 'node/' . $node->id();
+    foreach ($this->langcodes as $langcode) {
+      $num_match_found = 0;
+      if ($langcode == 'en') {
+        // Site default language does not have langcode prefix in the URL.
+        $expected_href = $base_path . $node_href;
+      }
+      else {
+        $expected_href = $base_path . $langcode . '/' . $node_href;
+      }
+      $pattern = '|^' . $expected_href . '$|';
+      foreach ($this->xpath("//a[text()='Read more']") as $link) {
+        if (preg_match($pattern, (string) $link['href'], $matches) == TRUE) {
+          $num_match_found++;
+        }
+      }
+      $this->assertTrue($num_match_found == 1, 'There is 1 Read more link, ' . $expected_href . ', for the ' . $langcode . ' translation of a node on the frontpage. (Found ' . $num_match_found . '.)');
+    }
+
+    // Check the frontpage for 'Add new comment' links that include the
+    // language.
+    $comment_form_href = 'node/' . $node->id() . '#comment-form';
+    foreach ($this->langcodes as $langcode) {
+      $num_match_found = 0;
+      if ($langcode == 'en') {
+        // Site default language does not have langcode prefix in the URL.
+        $expected_href = $base_path . $comment_form_href;
+      }
+      else {
+        $expected_href = $base_path . $langcode . '/' . $comment_form_href;
+      }
+      $pattern = '|^' . $expected_href . '$|';
+      foreach ($this->xpath("//a[text()='Add new comment']") as $link) {
+        if (preg_match($pattern, (string) $link['href'], $matches) == TRUE) {
+          $num_match_found++;
+        }
+      }
+      $this->assertTrue($num_match_found == 1, 'There is 1 Add new comment link, ' . $expected_href . ', for the ' . $langcode . ' translation of a node on the frontpage. (Found ' . $num_match_found . '.)');
+    }
+
     // Test that the node page displays the correct translations.
     $this->doTestTranslations('node/' . $node->id(), $values);
   }
@@ -284,7 +331,7 @@ class NodeTranslationUITest extends ContentTranslationUITest {
    *   The translation values to be found.
    */
   protected function doTestTranslations($path, array $values) {
-    $languages = language_list();
+    $languages = $this->container->get('language_manager')->getLanguages();
     foreach ($this->langcodes as $langcode) {
       $this->drupalGet($path, array('language' => $languages[$langcode]));
       $this->assertText($values[$langcode]['title'][0]['value'], format_string('The %langcode node translation is correctly displayed.', array('%langcode' => $langcode)));

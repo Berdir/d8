@@ -7,6 +7,7 @@
 
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Render\Element;
 use Drupal\editor\Entity\Editor;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\EntityInterface;
@@ -44,7 +45,7 @@ function editor_help($path, $arg) {
  * of text editors.
  */
 function editor_menu_link_defaults_alter(array &$links) {
-  $links['filter.admin_overview']['link_title'] = 'Text formats and editors';
+  $links['filter.admin_overview']['title'] = 'Text formats and editors';
   $links['filter.admin_overview']['description'] = 'Configure how user-contributed content is filtered and formatted, as well as the text editor user interface (WYSIWYGs or toolbars).';
 }
 
@@ -76,7 +77,7 @@ function editor_form_filter_admin_overview_alter(&$form, $form_state) {
 
   // Then splice in the name of each text editor for each text format.
   $editors = \Drupal::service('plugin.manager.editor')->getDefinitions();
-  foreach (element_children($form['formats']) as $format_id) {
+  foreach (Element::children($form['formats']) as $format_id) {
     $editor = editor_load($format_id);
     $editor_name = ($editor && isset($editors[$editor->editor])) ? $editors[$editor->editor]['label'] : drupal_placeholder('—');
     $editor_column['editor'] = array('#markup' => $editor_name);

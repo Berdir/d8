@@ -13,6 +13,7 @@
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\block\BlockPluginInterface;
+use Drupal\Core\Render\Element;
 use Drupal\node\NodeTypeInterface;
 use Drupal\system\Entity\Menu;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -61,19 +62,6 @@ function menu_permission() {
       'title' => t('Administer menus and menu items'),
     ),
   );
-}
-
-/**
- * Implements hook_menu_link_defaults().
- */
-function menu_menu_link_defaults() {
-  $links['menu.overview_page'] = array(
-    'link_title' => 'Menus',
-    'description' => 'Add new menus to your site, edit existing menus, and rename and reorganize menu links.',
-    'route_name' => 'menu.overview_page',
-    'parent' => 'system.admin_structure',
-  );
-  return $links;
 }
 
 /**
@@ -308,7 +296,7 @@ function menu_block_view_system_menu_block_alter(array &$build, BlockPluginInter
   $menus = menu_list_system_menus();
   $menu_name = $block->getDerivativeId();
   if (isset($menus[$menu_name]) && isset($build['content'])) {
-    foreach (element_children($build['content']) as $key) {
+    foreach (Element::children($build['content']) as $key) {
       $build['#contextual_links']['menu'] = array(
         'route_parameters' => array('menu' => $build['content'][$key]['#original_link']['menu_name']),
       );
@@ -667,7 +655,7 @@ function menu_get_menus($all = TRUE) {
  * Implements hook_preprocess_HOOK() for block templates.
  */
 function menu_preprocess_block(&$variables) {
-  if ($variables['configuration']['module'] == 'menu') {
+  if ($variables['configuration']['provider'] == 'menu') {
     $variables['attributes']['role'] = 'navigation';
   }
 }

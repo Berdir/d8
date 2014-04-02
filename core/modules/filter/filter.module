@@ -9,6 +9,7 @@ use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\String;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Language\Language;
+use Drupal\Core\Render\Element;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Template\Attribute;
 use Drupal\filter\FilterFormatInterface;
@@ -92,26 +93,6 @@ function filter_element_info() {
     '#theme_wrappers' => array('text_format_wrapper'),
   );
   return $type;
-}
-
-/**
- * Implements hook_menu_link_defaults().
- */
-function filter_menu_link_defaults() {
-  $links['filter.tips_all'] = array(
-    'link_title' => 'Compose tips',
-    'type' => MENU_SUGGESTED_ITEM,
-    'route_name' => 'filter.tips_all',
-  );
-
-  $links['filter.admin_overview'] = array(
-    'link_title' => 'Text formats',
-    'parent' => 'system.admin_config_content',
-    'description' => 'Configure how content input by users is filtered, including allowed HTML tags. Also allows enabling of module-provided filters.',
-    'route_name' => 'filter.admin_overview',
-  );
-
-  return $links;
 }
 
 /**
@@ -491,7 +472,7 @@ function filter_process_format($element) {
   );
   // Move this element into sub-element 'value'.
   unset($element['value']);
-  foreach (element_properties($element) as $key) {
+  foreach (Element::properties($element) as $key) {
     if (!in_array($key, $blacklist)) {
       $element['value'][$key] = $element[$key];
     }
@@ -596,7 +577,7 @@ function filter_process_format($element) {
 
     // Hide the text format selector and any other child element (such as text
     // field's summary).
-    foreach (element_children($element) as $key) {
+    foreach (Element::children($element) as $key) {
       if ($key != 'value') {
         $element[$key]['#access'] = FALSE;
       }

@@ -127,8 +127,7 @@ class ThemeHandler implements ThemeHandlerInterface {
    */
   public function enable(array $theme_list) {
     $this->clearCssCache();
-    $theme_config = $this->configFactory->get('system.theme');
-    $disabled_themes = $this->configFactory->get('system.theme.disabled');
+    $extension_config = $this->configFactory->get('core.extension');
     foreach ($theme_list as $key) {
       // Throw an exception if the theme name is too long.
       if (strlen($key) > DRUPAL_EXTENSION_NAME_MAX_LENGTH) {
@@ -139,8 +138,10 @@ class ThemeHandler implements ThemeHandlerInterface {
       }
 
       // The value is not used; the weight is ignored for themes currently.
-      $theme_config->set("enabled.$key", 0)->save();
-      $disabled_themes->clear($key)->save();
+      $extension_config
+        ->set("theme.$key", 0)
+        ->clear("disabled.theme.$key")
+        ->save();
 
       // Refresh the theme list as installation of default configuration needs
       // an updated list to work.
@@ -159,25 +160,25 @@ class ThemeHandler implements ThemeHandlerInterface {
    * {@inheritdoc}
    */
   public function disable(array $theme_list) {
-    // Don't disable the default theme.
-    if ($pos = array_search($this->configFactory->get('system.theme')->get('default'), $theme_list) !== FALSE) {
-      unset($theme_list[$pos]);
-      if (empty($theme_list)) {
-        return;
-      }
+    // Don't disable the default or admin themes.
+    $theme_config = $this->configFactory->get('system.theme');
+    $default_theme = $theme_config->get('default');
+    $admin_theme = $theme_config->get('admin');
+    $theme_list = array_diff($theme_list, array($default_theme, $admin_theme));
+    if (empty($theme_list)) {
+      return;
     }
 
     $this->clearCssCache();
 
-    $theme_config = $this->configFactory->get('system.theme');
-    $disabled_themes = $this->configFactory->get('system.theme.disabled');
+    $extension_config = $this->configFactory->get('core.extension');
     foreach ($theme_list as $key) {
       // The value is not used; the weight is ignored for themes currently.
-      $theme_config->clear("enabled.$key");
-      $disabled_themes->set($key, 0);
+      $extension_config
+        ->clear("theme.$key")
+        ->set("disabled.theme.$key", 0);
     }
-    $theme_config->save();
-    $disabled_themes->save();
+    $extension_config->save();
 
     $this->reset();
     $this->resetSystem();
@@ -206,8 +207,8 @@ class ThemeHandler implements ThemeHandlerInterface {
             $theme->stylesheets[$media][$stylesheet] = $path;
           }
         }
-        foreach ($theme->info['scripts'] as $script => $path) {
-          $theme->scripts[$script] = $path;
+        foreach ($theme->info['libraries'] as $library => $name) {
+          $theme->libraries[$library] = $name;
         }
         if (isset($theme->info['engine'])) {
           $theme->engine = $theme->info['engine'];
@@ -265,7 +266,7 @@ class ThemeHandler implements ThemeHandlerInterface {
       'screenshot' => 'screenshot.png',
       'php' => DRUPAL_MINIMUM_PHP,
       'stylesheets' => array(),
-      'scripts' => array(),
+      'libraries' => array(),
     );
 
     $sub_themes = array();
@@ -294,10 +295,9 @@ class ThemeHandler implements ThemeHandlerInterface {
         $theme->prefix = $engines[$engine]->getName();
       }
 
-      // Prefix stylesheets, scripts, and screenshot with theme path.
+      // Prefix stylesheets and screenshot with theme path.
       $path = $theme->getPath();
       $theme->info['stylesheets'] = $this->themeInfoPrefixPath($theme->info['stylesheets'], $path);
-      $theme->info['scripts'] = $this->themeInfoPrefixPath($theme->info['scripts'], $path);
       if (!empty($theme->info['screenshot'])) {
         $theme->info['screenshot'] = $path . '/' . $theme->info['screenshot'];
       }
@@ -338,7 +338,7 @@ class ThemeHandler implements ThemeHandlerInterface {
    *
    * This helper function is mainly used to prefix all array values of an
    * .info.yml file property with a single given path (to the module or theme);
-   * e.g., to prefix all values of the 'stylesheets' or 'scripts' properties
+   * e.g., to prefix all values of the 'stylesheets' properties
    * with the file path to the defining module/theme.
    *
    * @param array $info

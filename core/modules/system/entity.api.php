@@ -5,8 +5,10 @@
  * Hooks provided the Entity module.
  */
 
+use Drupal\Component\Utility\String;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Field\FieldDefinition;
+use Drupal\Core\Render\Element;
 
 /**
  * @addtogroup hooks
@@ -355,7 +357,7 @@ function hook_entity_translation_insert(\Drupal\Core\Entity\EntityInterface $tra
  *   The original entity object.
  */
 function hook_entity_translation_delete(\Drupal\Core\Entity\EntityInterface $translation) {
-  $languages = language_list();
+  $languages = \Drupal::languageManager()->getLanguages();
   $variables = array(
     '@language' => $languages[$langcode]->name,
     '@label' => $entity->label(),
@@ -456,7 +458,7 @@ function hook_entity_query_alter(\Drupal\Core\Entity\Query\QueryInterface $query
 function hook_entity_view(\Drupal\Core\Entity\EntityInterface $entity, \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display, $view_mode, $langcode) {
   // Only do the extra work if the component is configured to be displayed.
   // This assumes a 'mymodule_addition' extra field has been defined for the
-  // entity bundle in hook_field_extra_fields().
+  // entity bundle in hook_entity_extra_field_info().
   if ($display->getComponent('mymodule_addition')) {
     $entity->content['mymodule_addition'] = array(
       '#markup' => mymodule_addition($entity),
@@ -524,7 +526,7 @@ function hook_entity_prepare_view($entity_type_id, array $entities, array $displ
   if (!empty($entities) && $entity_type_id == 'user') {
     // Only do the extra work if the component is configured to be
     // displayed. This assumes a 'mymodule_addition' extra field has been
-    // defined for the entity bundle in hook_field_extra_fields().
+    // defined for the entity bundle in hook_entity_extra_field_info().
     $ids = array();
     foreach ($entities as $id => $entity) {
       if ($displays[$entity->bundle()]->getComponent('mymodule_addition')) {
@@ -595,7 +597,7 @@ function hook_entity_view_display_alter(\Drupal\Core\Entity\Display\EntityViewDi
  */
 function hook_entity_display_build_alter(&$build, $context) {
   // Append RDF term mappings on displayed taxonomy links.
-  foreach (element_children($build) as $field_name) {
+  foreach (Element::children($build) as $field_name) {
     $element = &$build[$field_name];
     if ($element['#field_type'] == 'entity_reference' && $element['#formatter'] == 'entity_reference_label') {
       foreach ($element['#items'] as $delta => $item) {
@@ -767,7 +769,7 @@ function hook_entity_operation_alter(array &$operations, \Drupal\Core\Entity\Ent
   $operations['translate'] = array(
     'title' => t('Translate'),
     'weight' => 50,
-  ) + $entity->urlInfo('my-custom-link-template');
+  ) + $entity->urlInfo('my-custom-link-template')->toArray();
 }
 
 /**
@@ -819,6 +821,7 @@ function hook_entity_field_access($operation, \Drupal\Core\Field\FieldDefinition
  *     (\Drupal\Core\Field\FieldItemListInterface).
  */
 function hook_entity_field_access_alter(array &$grants, array $context) {
+  /** @var \Drupal\Core\Field\FieldDefinitionInterface $field_definition */
   $field_definition = $context['field_definition'];
   if ($field_definition->getName() == 'field_of_interest' && $grants['node'] === FALSE) {
     // Override node module's restriction to no opinion. We don't want to
@@ -827,5 +830,80 @@ function hook_entity_field_access_alter(array &$grants, array $context) {
     // module's grant to TRUE, because the grants of other modules should still
     // decide on their own if this field is accessible or not.
     $grants['node'] = NULL;
+  }
+}
+
+/**
+ * Exposes "pseudo-field" components on content entities.
+ *
+ * Field UI's "Manage fields" and "Manage display" pages let users re-order
+ * fields, but also non-field components. For nodes, these include elements
+ * exposed by modules through hook_form_alter(), for instance.
+ *
+ * Content entities or modules that want to have their components supported
+ * should expose them using this hook. The user-defined settings (weight,
+ * visible) are automatically applied when entities or entity forms are
+ * rendered.
+ *
+ * @see hook_entity_extra_field_info_alter()
+ *
+ * @return array
+ *   The array structure is identical to that of the return value of
+ *   \Drupal\Core\Entity\EntityManagerInterface::getExtraFields().
+ */
+function hook_entity_extra_field_info() {
+  $extra = array();
+  $module_language_enabled = \Drupal::moduleHandler()->moduleExists('language');
+  $description = t('Node module element');
+
+  foreach (node_type_get_types() as $bundle) {
+    if ($bundle->has_title) {
+      $extra['node'][$bundle->type]['form']['title'] = array(
+        'label' => String::checkPlain($bundle->title_label),
+        'description' => $description,
+        'weight' => -5,
+      );
+    }
+
+    // Add also the 'language' select if Language module is enabled and the
+    // bundle has multilingual support.
+    // Visibility of the ordering of the language selector is the same as on the
+    // node/add form.
+    if ($module_language_enabled) {
+      $configuration = language_get_default_configuration('node', $bundle->type);
+      if ($configuration['language_show']) {
+        $extra['node'][$bundle->type]['form']['language'] = array(
+          'label' => t('Language'),
+          'description' => $description,
+          'weight' => 0,
+        );
+      }
+    }
+    $extra['node'][$bundle->type]['display']['language'] = array(
+      'label' => t('Language'),
+      'description' => $description,
+      'weight' => 0,
+      'visible' => FALSE,
+    );
+  }
+
+  return $extra;
+}
+
+/**
+ * Alter "pseudo-field" components on content entities.
+ *
+ * @param array $info
+ *   The array structure is identical to that of the return value of
+ *   \Drupal\Core\Entity\EntityManagerInterface::getExtraFields().
+ *
+ * @see hook_entity_extra_field_info()
+ */
+function hook_entity_extra_field_info_alter(&$info) {
+  // Force node title to always be at the top of the list by default.
+  foreach (node_type_get_types() as $bundle) {
+    if (isset($info['node'][$bundle->type]['form']['title'])) {
+      $info['node'][$bundle->type]['form']['title']['weight'] = -20;
+    }
   }
 }

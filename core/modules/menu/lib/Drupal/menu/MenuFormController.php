@@ -11,6 +11,7 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\EntityFormController;
 use Drupal\Core\Entity\Query\QueryFactory;
 use Drupal\Core\Language\Language;
+use Drupal\Core\Render\Element;
 use Drupal\menu_link\MenuLinkStorageInterface;
 use Drupal\menu_link\MenuTreeInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -218,8 +219,7 @@ class MenuFormController extends EntityFormController {
 
     $status = $menu->save();
 
-    $uri = $menu->urlInfo();
-    $edit_link = \Drupal::l($this->t('Edit'), $uri['route_name'], $uri['route_parameters'], $uri['options']);
+    $edit_link = \Drupal::linkGenerator()->generateFromUrl($this->t('Edit'), $this->entity->urlInfo());
     if ($status == SAVED_UPDATED) {
       drupal_set_message(t('Menu %label has been updated.', array('%label' => $menu->label())));
       watchdog('menu', 'Menu %label has been updated.', array('%label' => $menu->label()), WATCHDOG_NOTICE, $edit_link);
@@ -303,7 +303,7 @@ class MenuFormController extends EntityFormController {
         if ($item['hidden']) {
           $form[$mlid]['title']['#markup'] .= ' (' . t('disabled') . ')';
         }
-        elseif ($item['link_path'] == 'user' && $item['module'] == 'system') {
+        elseif ($item['link_path'] == 'user' && $item['module'] == 'user') {
           $form[$mlid]['title']['#markup'] .= ' (' . t('logged in users only') . ')';
         }
 
@@ -388,7 +388,7 @@ class MenuFormController extends EntityFormController {
 
     $updated_items = array();
     $fields = array('weight', 'plid');
-    foreach (element_children($form) as $mlid) {
+    foreach (Element::children($form) as $mlid) {
       if (isset($form[$mlid]['#item'])) {
         $element = $form[$mlid];
         // Update any fields that have changed in this menu item.
