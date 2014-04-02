@@ -5,7 +5,7 @@ source:
     entity_type: node
     form_mode: default
     options:
-      type: taxonomy_term_reference
+      type: options_select
       weight: 20
 process:
   entity_type: constants.entity_type
