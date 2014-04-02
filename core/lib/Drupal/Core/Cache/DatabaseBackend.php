@@ -62,7 +62,10 @@ class DatabaseBackend implements CacheBackendInterface {
    * Implements Drupal\Core\Cache\CacheBackendInterface::getMultiple().
    */
   public function getMultiple(&$cids, $allow_invalid = FALSE) {
-    $actual_cids = array_values(array_map(array($this, 'ensureCidLength'), $cids));
+    $cid_mapping = array();
+    foreach ($cids as $cid) {
+      $cid_mapping[$this->ensureCidLength($cid)] = $cid;
+    }
     // When serving cached pages, the overhead of using ::select() was found
     // to add around 30% overhead to the request. Since $this->bin is a
     // variable, this means the call to ::query() here uses a concatenated
@@ -72,13 +75,15 @@ class DatabaseBackend implements CacheBackendInterface {
     // ::select() is a much smaller proportion of the request.
     $result = array();
     try {
-      $result = $this->connection->query('SELECT cid, data, created, expire, serialized, tags, checksum_invalidations, checksum_deletions FROM {' . $this->connection->escapeTable($this->bin) . '} WHERE cid IN (:cids)', array(':cids' => $actual_cids));
+      $result = $this->connection->query('SELECT cid, data, created, expire, serialized, tags, checksum_invalidations, checksum_deletions FROM {' . $this->connection->escapeTable($this->bin) . '} WHERE cid IN (:cids)', array(':cids' => array_keys($cid_mapping)));
     }
     catch (\Exception $e) {
       // Nothing to do.
     }
     $cache = array();
     foreach ($result as $item) {
+      // Map the cache ID back to the original.
+      $item->cid = $cid_mapping[$item->cid];
       $item = $this->prepareItem($item, $allow_invalid);
       if ($item) {
         $cache[$item->cid] = $item;
