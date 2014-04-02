@@ -1,4 +1,4 @@
-id: taxonomy_term.forum_container
+id: forum.forum_container
 status: true
 langcode: en
 name: forum_container
