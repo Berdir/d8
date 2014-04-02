@@ -159,6 +159,11 @@ abstract class GenericCacheBackendUnitTestBase extends DrupalUnitTestBase {
     $this->assertFalse($cached->valid, 'Item is marked as valid.');
     $this->assertEqual($cached->created, REQUEST_TIME, 'Created time is correct.');
     $this->assertEqual($cached->expire, REQUEST_TIME - 3, 'Expire time is correct.');
+
+    // Check with a long key.
+    $cid = str_repeat('a', 300);
+    $backend->set($cid, 'test');
+    $this->assertEqual('test', $backend->get($cid)->data);
   }
 
   /**
@@ -182,6 +187,11 @@ abstract class GenericCacheBackendUnitTestBase extends DrupalUnitTestBase {
 
     $backend->delete('test2');
     $this->assertIdentical(FALSE, $backend->get('test2'), "Backend does not contain data for cache id test2 after deletion.");
+
+    $long_cid = str_repeat('a', 300);
+    $backend->set($long_cid, 'test');
+    $backend->delete($long_cid);
+    $this->assertIdentical(FALSE, $backend->get($long_cid), "Backend does not contain data for long cache id after deletion.");
   }
 
   /**
@@ -219,6 +229,7 @@ abstract class GenericCacheBackendUnitTestBase extends DrupalUnitTestBase {
     $backend = $this->getCacheBackend();
 
     // Set numerous testing keys.
+    $long_cid = str_repeat('a', 300);
     $backend->set('test1', 1);
     $backend->set('test2', 3);
     $backend->set('test3', 5);
@@ -226,6 +237,7 @@ abstract class GenericCacheBackendUnitTestBase extends DrupalUnitTestBase {
     $backend->set('test5', 11);
     $backend->set('test6', 13);
     $backend->set('test7', 17);
+    $backend->set($long_cid, 300);
 
     // Mismatch order for harder testing.
     $reference = array(
@@ -293,6 +305,11 @@ abstract class GenericCacheBackendUnitTestBase extends DrupalUnitTestBase {
     $this->assertFalse(in_array('test2', $cids), "Existing cache id test2 is not in cids array.");
     $this->assertFalse(in_array('test7', $cids), "Existing cache id test7 is not in cids array.");
     $this->assertFalse(in_array('test19', $cids), "Added cache id test19 is not in cids array.");
+    // Test with a long $cid and non-numeric array key.
+    $cids = array('key:key' => $long_cid);
+    $return = $backend->getMultiple($cids);
+    $this->assertEqual(300, $return[$long_cid]->data);
+    $this->assertTrue(empty($cids));
   }
 
   /**

@@ -62,6 +62,7 @@ class DatabaseBackend implements CacheBackendInterface {
    * Implements Drupal\Core\Cache\CacheBackendInterface::getMultiple().
    */
   public function getMultiple(&$cids, $allow_invalid = FALSE) {
+    $actual_cids = array_values(array_map(array($this, 'ensureCidLength'), $cids));
     // When serving cached pages, the overhead of using ::select() was found
     // to add around 30% overhead to the request. Since $this->bin is a
     // variable, this means the call to ::query() here uses a concatenated
@@ -71,7 +72,7 @@ class DatabaseBackend implements CacheBackendInterface {
     // ::select() is a much smaller proportion of the request.
     $result = array();
     try {
-      $result = $this->connection->query('SELECT cid, data, created, expire, serialized, tags, checksum_invalidations, checksum_deletions FROM {' . $this->connection->escapeTable($this->bin) . '} WHERE cid IN (:cids)', array(':cids' => $cids));
+      $result = $this->connection->query('SELECT cid, data, created, expire, serialized, tags, checksum_invalidations, checksum_deletions FROM {' . $this->connection->escapeTable($this->bin) . '} WHERE cid IN (:cids)', array(':cids' => $actual_cids));
     }
     catch (\Exception $e) {
       // Nothing to do.
@@ -196,7 +197,7 @@ class DatabaseBackend implements CacheBackendInterface {
     }
 
     $this->connection->merge($this->bin)
-      ->key('cid', $cid)
+      ->key('cid', $this->ensureCidLength($cid))
       ->fields($fields)
       ->execute();
   }
@@ -212,6 +213,7 @@ class DatabaseBackend implements CacheBackendInterface {
    * Implements Drupal\Core\Cache\CacheBackendInterface::deleteMultiple().
    */
   public function deleteMultiple(array $cids) {
+    $cids = array_values(array_map(array($this, 'ensureCidLength'), $cids));
     try {
       // Delete in chunks when a large array is passed.
       do {
@@ -285,6 +287,7 @@ class DatabaseBackend implements CacheBackendInterface {
    * Implements Drupal\Core\Cache\CacheBackendInterface::invalideMultiple().
    */
   public function invalidateMultiple(array $cids) {
+    $cids = array_values(array_map(array($this, 'ensureCidLength'), $cids));
     try {
       // Update in chunks when a large array is passed.
       do {
@@ -492,6 +495,26 @@ class DatabaseBackend implements CacheBackendInterface {
     if ($this->connection->schema()->tableExists($table_name ?: $this->bin)) {
       throw $e;
     }
+  }
+
+  /**
+   * Ensures that cache IDs are valid.
+   *
+   * @param string $cid
+   *   The passed in cache ID.
+   *
+   * @return string
+   *   A cache ID that is at most 255 characters long.
+   */
+  protected function ensureCidLength($cid) {
+    // Nothing to do if the ID length is 255 characters or less.
+    if (strlen($cid) <= 255) {
+      return $cid;
+    }
+    // Return a string that uses as much as possible of the original cache ID
+    // with the hash appended.
+    $hash = hash('sha1', $cid);
+    return substr($cid, 0, 255 - strlen($hash)) . $hash;
   }
 
   /**
