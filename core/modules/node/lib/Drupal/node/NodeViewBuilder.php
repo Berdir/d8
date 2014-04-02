@@ -160,10 +160,6 @@ class NodeViewBuilder extends EntityViewBuilder {
         'metadata' => array('changed' => $entity->getChangedTime()),
       );
     }
-
-    // The node 'submitted' info is not rendered in a standard way (renderable
-    // array) so we have to add a cache tag manually.
-    $build['#cache']['tags']['user'][] = $entity->getOwnerId();
   }
 
 }

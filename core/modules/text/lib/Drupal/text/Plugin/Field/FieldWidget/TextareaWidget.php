@@ -18,7 +18,12 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
  *   id = "text_textarea",
  *   label = @Translation("Text area (multiple rows)"),
  *   field_types = {
- *     "text_long"
+ *     "text_long",
+ *     "string_long",
+ *   },
+ *   settings = {
+ *     "rows" = "5",
+ *     "placeholder" = ""
  *   }
  * )
  */

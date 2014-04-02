@@ -18,7 +18,8 @@ use Drupal\Core\TypedData\DataDefinition;
  *   id = "boolean",
  *   label = @Translation("Boolean"),
  *   description = @Translation("An entity field containing a boolean value."),
- *   no_ui = TRUE
+ *   no_ui = TRUE,
+ *   default_widget = "boolean",
  * )
  */
 class BooleanItem extends FieldItemBase {

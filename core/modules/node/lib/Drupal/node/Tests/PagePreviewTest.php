@@ -192,7 +192,7 @@ class PagePreviewTest extends NodeTestBase {
     $edit[$title_key] = $this->randomName(8);
     $edit[$body_key] = $this->randomName(16);
     $edit[$term_key] = $this->term->id();
-    $edit['log'] = $this->randomName(32);
+    $edit['log[0][value]'] = $this->randomName(32);
     $this->drupalPostForm('node/add/page', $edit, t('Preview'));
 
     // Check that the preview is displaying the title, body and term.
@@ -207,7 +207,7 @@ class PagePreviewTest extends NodeTestBase {
     $this->assertFieldByName($term_key, $edit[$term_key], 'Term field displayed.');
 
     // Check that the log field has the correct value.
-    $this->assertFieldByName('log', $edit['log'], 'Log field displayed.');
+    $this->assertFieldByName('log[0][value]', $edit['log[0][value]'], 'Log field displayed.');
   }
 
 }

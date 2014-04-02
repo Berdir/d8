@@ -215,7 +215,8 @@ function rdf_entity_prepare_view($entity_type, array $entities, array $displays)
       $field_mapping = $mapping->getPreparedFieldMapping($name);
       if ($field_mapping['properties']) {
         foreach ($entity->get($name) as $item) {
-          $item->_attributes += rdf_rdfa_attributes($field_mapping, $item->getValue());
+          $value = ($entity->getFieldDefinition($name)->isMultiple()) ? $item->getValue() : $entity->get($name)->value;
+          $item->_attributes += rdf_rdfa_attributes($field_mapping, $value);
         }
       }
     }

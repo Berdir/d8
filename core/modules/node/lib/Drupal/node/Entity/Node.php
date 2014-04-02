@@ -383,13 +383,25 @@ class Node extends ContentEntityBase implements NodeInterface {
 
     $fields['uid'] = FieldDefinition::create('entity_reference')
       ->setLabel(t('Author'))
-      ->setDescription(t('The user that is the node author.'))
+      ->setDescription(t('The user ID of the node author.'))
       ->setRevisionable(TRUE)
+      ->setTranslatable(TRUE)
       ->setSettings(array(
         'target_type' => 'user',
         'default_value' => 0,
       ))
-      ->setTranslatable(TRUE);
+      ->setDisplayOptions('view', array(
+        'label' => 'hidden',
+        'type' => 'author',
+        'weight' => 0,
+      ))
+      ->setDisplayOptions('form', array(
+        'type' => 'author_autocomplete',
+        'weight' => -1,
+        'settings' => array(
+          'route_name' => 'user.autocomplete',
+        ),
+      ));
 
     $fields['status'] = FieldDefinition::create('boolean')
       ->setLabel(t('Publishing status'))
@@ -398,10 +410,23 @@ class Node extends ContentEntityBase implements NodeInterface {
       ->setTranslatable(TRUE);
 
     $fields['created'] = FieldDefinition::create('created')
-      ->setLabel(t('Created'))
+      ->setLabel(t('Publication date'))
       ->setDescription(t('The time that the node was created.'))
       ->setRevisionable(TRUE)
-      ->setTranslatable(TRUE);
+      ->setTranslatable(TRUE)
+      ->setDisplayOptions('view', array(
+        'label' => 'hidden',
+        'type' => 'timestamp',
+        'weight' => 0,
+      ))
+      ->setDisplayOptions('form', array(
+        'type' => 'timestamp',
+        'weight' => 0,
+        'settings' => array(
+          'use_request_time_on_empty' => TRUE,
+        ),
+      ))
+      ->setDisplayConfigurable('form', TRUE);
 
     $fields['changed'] = FieldDefinition::create('changed')
       ->setLabel(t('Changed'))
@@ -410,16 +435,22 @@ class Node extends ContentEntityBase implements NodeInterface {
       ->setTranslatable(TRUE);
 
     $fields['promote'] = FieldDefinition::create('boolean')
-      ->setLabel(t('Promote'))
-      ->setDescription(t('A boolean indicating whether the node should be displayed on the front page.'))
+      ->setLabel(t('Promoted to front page'))
       ->setRevisionable(TRUE)
-      ->setTranslatable(TRUE);
+      ->setTranslatable(TRUE)
+      ->setDisplayOptions('form', array(
+        'type' => 'boolean',
+        'weight' => -1,
+      ));
 
     $fields['sticky'] = FieldDefinition::create('boolean')
-      ->setLabel(t('Sticky'))
-      ->setDescription(t('A boolean indicating whether the node should be displayed at the top of lists in which it appears.'))
+      ->setLabel(t('Sticky at top of lists'))
       ->setRevisionable(TRUE)
-      ->setTranslatable(TRUE);
+      ->setTranslatable(TRUE)
+      ->setDisplayOptions('form', array(
+        'type' => 'boolean',
+        'weight' => 0,
+      ));
 
     $fields['revision_timestamp'] = FieldDefinition::create('timestamp')
       ->setLabel(t('Revision timestamp'))
@@ -434,11 +465,18 @@ class Node extends ContentEntityBase implements NodeInterface {
       ->setQueryable(FALSE)
       ->setRevisionable(TRUE);
 
-    $fields['log'] = FieldDefinition::create('string')
-      ->setLabel(t('Log'))
-      ->setDescription(t('The log entry explaining the changes in this revision.'))
+    $fields['log'] = FieldDefinition::create('string_long')
+      ->setLabel(t('Revision log message'))
+      ->setDescription(t('Briefly describe the changes you have made.'))
       ->setRevisionable(TRUE)
-      ->setTranslatable(TRUE);
+      ->setTranslatable(TRUE)
+      ->setDisplayOptions('form', array(
+        'type' => 'text_textarea',
+        'weight' => 0,
+        'settings' => array(
+          'rows' => 4,
+        ),
+      ));
 
     return $fields;
   }

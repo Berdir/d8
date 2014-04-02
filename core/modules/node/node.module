@@ -175,6 +175,12 @@ function node_theme() {
     'field__node__title' => array(
       'base hook' => 'field',
     ),
+    'field__node__uid' => array(
+      'base hook' => 'field',
+    ),
+    'field__node__created' => array(
+      'base hook' => 'field',
+    ),
   );
 }
 
@@ -204,20 +210,6 @@ function node_entity_view_display_alter(EntityViewDisplayInterface $display, $co
           $display->setComponent($name, $options);
         }
       }
-    }
-  }
-}
-
-/**
- * Implements hook_entity_form_display_alter().
- */
-function node_entity_form_display_alter(EntityFormDisplayInterface $form_display, $context) {
-  if ($context['entity_type'] == 'node') {
-    $node_type = node_type_load($context['bundle']);
-    // @todo Reconsider when per-bundle overrides of field definitions are
-    //   possible - https://drupal.org/node/2114707.
-    if (!$node_type->has_title) {
-      $form_display->removeComponent('title');
     }
   }
 }
@@ -636,14 +628,9 @@ function template_preprocess_node(&$variables) {
   $variables['node'] = $variables['elements']['#node'];
   /** @var \Drupal\node\NodeInterface $node */
   $node = $variables['node'];
-
-  $variables['date'] = format_date($node->getCreatedTime());
-  $username = array(
-    '#theme' => 'username',
-    '#account' => $node->getOwner(),
-    '#link_options' => array('attributes' => array('rel' => 'author')),
-  );
-  $variables['name'] = drupal_render($username);
+  $variables['date'] = drupal_render($variables['elements']['created'], TRUE);
+  unset($variables['elements']['created']);
+  $variables['name'] = drupal_render($variables['elements']['uid'], TRUE);
 
   $variables['node_url'] = $node->url('canonical', array(
     'language' => $node->language(),
@@ -705,9 +692,9 @@ function template_preprocess_node(&$variables) {
 }
 
 /**
- * Returns HTML for the node title field.
+ * Returns HTML for the node 'title' field.
  *
- * This is an override of theme_field() for the node title field. See that
+ * This is an override of theme_field() for the node 'title' field. See that
  * function for documentation about its details and overrides.
  *
  * @param array $variables
@@ -718,6 +705,40 @@ function template_preprocess_node(&$variables) {
  * @ingroup themeable
  */
 function theme_field__node__title($variables) {
+  return '<span' . $variables['attributes'] . '>' . drupal_render($variables['items']) . '</span>';
+}
+
+/**
+ * Returns HTML for the node 'uid' field.
+ *
+ * This is an override of theme_field() for the node 'uid' field. See that
+ * function for documentation about its details and overrides.
+ *
+ * @param array $variables
+ *   An associative array. See theme_field() for details.
+ *
+ * @see theme_field()
+ *
+ * @ingroup themeable
+ */
+function theme_field__node__uid($variables) {
+  return '<span' . $variables['attributes'] . '>' . drupal_render($variables['items']) . '</span>';
+}
+
+/**
+ * Returns HTML for the node 'created' field.
+ *
+ * This is an override of theme_field() for the node 'created' field. See that
+ * function for documentation about its details and overrides.
+ *
+ * @param array $variables
+ *   An associative array. See theme_field() for details.
+ *
+ * @see theme_field()
+ *
+ * @ingroup themeable
+ */
+function theme_field__node__created($variables) {
   return '<span' . $variables['attributes'] . '>' . drupal_render($variables['items']) . '</span>';
 }
 
