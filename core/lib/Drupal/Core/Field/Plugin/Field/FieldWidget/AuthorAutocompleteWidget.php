@@ -33,7 +33,7 @@ class AuthorAutocompleteWidget extends RouteBasedAutocompleteWidget {
     $element = parent::formElement($items, $delta, $element, $form, $form_state);
 
     $entity = $element['#entity'];
-    $element['target_id']['#default_value'] = $entity->getOwnerId()? $entity->getOwner()->getUsername() : '';
+    $element['target_id']['#default_value'] = $entity->getOwner()? $entity->getOwner()->getUsername() : '';
 
     $user_config = \Drupal::config('user.settings');
     $element['target_id']['#description'] = $this->t('Leave blank for %anonymous.', array('%anonymous' => $user_config->get('anonymous')));

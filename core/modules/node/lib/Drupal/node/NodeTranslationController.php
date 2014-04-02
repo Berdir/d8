@@ -80,8 +80,9 @@ class NodeTranslationController extends ContentTranslationController {
       $translation['status'] = $form_controller->getEntity()->isPublished();
       // $form['content_translation']['name'] is the equivalent field
       // for translation author uid.
-      $translation['name'] = $form_state['values']['uid'];
-      $translation['created'] = $form_state['values']['created'];
+      $account = user_load($form_state['values']['uid'][0]['target_id']);
+      $translation['name'] = $account ? $account->getUsername() : '';
+      $translation['created'] = format_date($form_state['values']['created'][0]['value'], 'custom', 'Y-m-d H:i:s O');
     }
     parent::entityFormEntityBuild($entity_type, $entity, $form, $form_state);
   }
