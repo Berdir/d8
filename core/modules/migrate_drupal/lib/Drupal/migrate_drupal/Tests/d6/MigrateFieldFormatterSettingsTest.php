@@ -56,6 +56,19 @@ class MigrateFieldFormatterSettingsTest extends MigrateDrupalTestBase {
       'd6_field_instance' => array(
         array(array('fieldname', 'page'), array('node', 'fieldname', 'page')),
       ),
+      'd6_field' => array(
+        array(array('field_test'), array('node', 'field_test')),
+        array(array('field_test_two'), array('node', 'field_test_two')),
+        array(array('field_test_three'), array('node', 'field_test_three')),
+        array(array('field_test_email'), array('node', 'field_test_email')),
+        array(array('field_test_link'), array('node', 'field_test_link')),
+        array(array('field_test_filefield'), array('node', 'field_test_filefield')),
+        array(array('field_test_imagefield'), array('node', 'field_test_imagefield')),
+        array(array('field_test_phone'), array('node', 'field_test_phone')),
+        array(array('field_test_date'), array('node', 'field_test_date')),
+        array(array('field_test_datestamp'), array('node', 'field_test_datestamp')),
+        array(array('field_test_datetime'), array('node', 'field_test_datetime')),
+      ),
     );
     $this->prepareIdMappings($id_mappings);
 
