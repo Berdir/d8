@@ -17,3 +17,5 @@ process:
   bundle: node_type
 destination:
   plugin: component_entity_form_display
+migration_dependencies:
+  - d6_comment_field_instance
