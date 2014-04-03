@@ -194,40 +194,40 @@ class MigrateFieldFormatterSettingsTest extends MigrateDrupalTestBase {
     // Test date field.
     $expected['weight'] = 10;
     $expected['type'] = 'datetime_default';
-    $expected['settings'] = array('format' => 'fallback');
+    $expected['settings'] = array('format_type' => 'fallback');
     $component = $display->getComponent('field_test_date');
-    $this->assertEqual($component, $expected, "node.story.teaser field_test_date is of type datetime_default.");
+    $this->assertEqual($component, $expected);
     $display = entity_load('entity_view_display', 'node.story.full');
-    $expected['settings']['format'] = 'long';
+    $expected['settings']['format_type'] = 'long';
     $component = $display->getComponent('field_test_date');
-    $this->assertEqual($component, $expected, "node.story.full field_test_date is of type datetime_default with correct settings.");
+    $this->assertEqual($component, $expected);
 
     // Test date stamp field.
     $expected['weight'] = 11;
-    $expected['settings']['format'] = 'fallback';
+    $expected['settings']['format_type'] = 'fallback';
     $component = $display->getComponent('field_test_datestamp');
-    $this->assertEqual($component, $expected, "node.story.full field_test_datestamp is of type datetime_default with correct settings.");
+    $this->assertEqual($component, $expected);
     $display = entity_load('entity_view_display', 'node.story.teaser');
-    $expected['settings'] = array('format' => 'medium');
+    $expected['settings'] = array('format_type' => 'medium');
     $component = $display->getComponent('field_test_datestamp');
-    $this->assertEqual($component, $expected, "node.story.teaser field_test_datestamp is of type datetime_default.");
+    $this->assertEqual($component, $expected);
 
     // Test datetime field.
     $expected['weight'] = 12;
-    $expected['settings'] = array('format' => 'short');
+    $expected['settings'] = array('format_type' => 'short');
     $component = $display->getComponent('field_test_datetime');
-    $this->assertEqual($component, $expected, "node.story.teaser field_test_datetime is of type datetime_default.");
+    $this->assertEqual($component, $expected);
     $display = entity_load('entity_view_display', 'node.story.full');
-    $expected['settings']['format'] = 'fallback';
+    $expected['settings']['format_type'] = 'fallback';
     $component = $display->getComponent('field_test_datetime');
-    $this->assertEqual($component, $expected, "node.story.full field_test_datetime is of type datetime_default with correct settings.");
+    $this->assertEqual($component, $expected);
 
     // Test a date field with a random format which should be mapped
     // to datetime_default.
     $display = entity_load('entity_view_display', 'node.story.rss');
-    $expected['settings']['format'] = 'fallback';
+    $expected['settings']['format_type'] = 'fallback';
     $component = $display->getComponent('field_test_datetime');
-    $this->assertEqual($component, $expected, "node.story.full field_test_datetime is of type datetime_default with correct settings.");
+    $this->assertEqual($component, $expected);
     // Test that our Id map has the correct data.
     $this->assertEqual(array('node', 'story', 'teaser', 'field_test'), entity_load('migration', 'd6_field_formatter_settings')->getIdMap()->lookupDestinationID(array('story', 'teaser', 'node', 'field_test')));
   }

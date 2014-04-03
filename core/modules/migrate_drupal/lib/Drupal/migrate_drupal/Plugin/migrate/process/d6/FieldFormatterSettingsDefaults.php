@@ -29,7 +29,7 @@ class FieldFormatterSettingsDefaults extends ProcessPluginBase {
   public function transform($value, MigrateExecutable $migrate_executable, Row $row, $destination_property) {
     // If the 1 index is set then the map missed.
     if (isset($value[1])) {
-      $value = $row->getSourceProperty('module') == 'date' ? array('format' => 'fallback') : array();
+      $value = $row->getSourceProperty('module') == 'date' ? array('format_type' => 'fallback') : array();
     }
     return $value;
   }

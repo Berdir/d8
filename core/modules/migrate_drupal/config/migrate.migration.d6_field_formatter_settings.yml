@@ -276,15 +276,15 @@ process:
             image_link: file
         date:
           default:
-            format: fallback
+            format_type: fallback
           format_interval:
-            format: fallback
+            format_type: fallback
           long:
-            format: long
+            format_type: long
           medium:
-            format: medium
+            format_type: medium
           short:
-            format: short
+            format_type: short
         text:
           trimmed:
             trim_length: 600
