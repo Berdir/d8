@@ -7,14 +7,8 @@
 
 namespace Drupal\migrate\Plugin\migrate\destination;
 
-use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\field\FieldInfo;
-use Drupal\migrate\Entity\MigrationInterface;
-use Drupal\migrate\Plugin\MigratePluginManager;
 use Drupal\migrate\Row;
-use Drupal\user\UserInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * @MigrateDestination(
@@ -35,7 +29,6 @@ class Book extends EntityContentBase {
    * {@inheritdoc}
    */
   protected function updateEntity(EntityInterface $entity, Row $row) {
-    $entity->beingMigrated = TRUE;
     $entity->book = $row->getDestinationProperty('book');
   }
 
