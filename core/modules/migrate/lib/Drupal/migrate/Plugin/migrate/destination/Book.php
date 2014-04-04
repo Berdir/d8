@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Plugin\migrate\destination\EntityNodeBook.
+ * Contains \Drupal\migrate\Plugin\migrate\destination\Book.
  */
 
 namespace Drupal\migrate\Plugin\migrate\destination;
