@@ -180,7 +180,7 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
    */
   public function setNewRevision($value = TRUE) {
 
-    if (!$this->getEntityType()->getKey('revision')) {
+    if (!$this->getEntityType()->hasKey('revision')) {
       throw new \LogicException(String::format('Entity type @entity_type does support revisions.'));
     }
 
