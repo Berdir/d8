@@ -47,6 +47,8 @@ class MigrateCommentTest extends MigrateDrupalTestBase {
       'd6_filter_format' => array(array(array(1), array('filtered_html'))),
       'd6_node' => array(array(array(1), array(1))),
       'd6_user' => array(array(array(0), array(0))),
+      'd6_comment_entity_display' => array(array(array('page'), array('node', 'page', 'default', 'comment'))),
+      'd6_comment_entity_form_display' => array(array(array('page'), array('node', 'page', 'default', 'comment'))),
     );
     $this->prepareIdMappings($id_mappings);
 
