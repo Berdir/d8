@@ -62,6 +62,12 @@ class MigrateCommentVariableDisplayBase extends MigrateDrupalTestBase {
     $this->dumps = array(
       drupal_get_path('module', 'migrate_drupal') . '/lib/Drupal/migrate_drupal/Tests/Dump/Drupal6CommentVariable.php',
     );
+    $id_mappings = array(
+      'd6_comment_field_instance' => array(
+        array(array('page'), array('node', 'comment', 'page')),
+      ),
+    );
+    $this->prepareIdMappings($id_mappings);
     /** @var \Drupal\migrate\entity\Migration $migration */
     $migration = entity_load('migration', static::MIGRATION);
     $this->prepare($migration, $this->dumps);
