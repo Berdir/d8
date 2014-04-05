@@ -38,6 +38,9 @@ class MigrateCommentVariableInstance extends MigrateDrupalTestBase {
       'd6_comment_field' => array(
         array(array('page'), array('node', 'page')),
       ),
+      'd6_node_type' => array(
+        array(array('page'), array('page')),
+      ),
     );
     $this->prepareIdMappings($id_mappings);
 
