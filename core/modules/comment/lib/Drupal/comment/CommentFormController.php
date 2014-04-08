@@ -87,6 +87,9 @@ class CommentFormController extends ContentEntityFormController {
   public function form(array $form, array &$form_state) {
     /** @var \Drupal\comment\CommentInterface $comment */
     $comment = $this->entity;
+
+    $form = parent::form($form, $form_state, $comment);
+
     $entity = $this->entityManager->getStorage($comment->getCommentedEntityTypeId())->load($comment->getCommentedEntityId());
     $field_name = $comment->getFieldName();
     $instance = $this->fieldInfo->getInstance($entity->getEntityTypeId(), $entity->bundle(), $field_name);
@@ -209,13 +212,10 @@ class CommentFormController extends ContentEntityFormController {
       '#access' => $is_admin,
     );
 
-    $form['subject'] = array(
-      '#type' => 'textfield',
-      '#title' => $this->t('Subject'),
-      '#maxlength' => 64,
-      '#default_value' => $comment->getSubject(),
+    $form['subject'] += array(
       '#access' => $instance->getSetting('subject'),
     );
+    unset($form['subject']['widget'][0]['value']['#description']);
 
     // Used for conditional validation of author fields.
     $form['is_anonymous'] = array(
@@ -230,7 +230,7 @@ class CommentFormController extends ContentEntityFormController {
       $form[$key] = array('#type' => 'value', '#value' => $original->$key->{$key_name});
     }
 
-    return parent::form($form, $form_state, $comment);
+    return $form;
   }
 
   /**

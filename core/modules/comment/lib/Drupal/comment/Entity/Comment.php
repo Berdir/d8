@@ -235,7 +235,11 @@ class Comment extends ContentEntityBase implements CommentInterface {
     $fields['subject'] = FieldDefinition::create('string')
       ->setLabel(t('Subject'))
       ->setDescription(t('The comment title or subject.'))
-      ->setSetting('max_length', 64);
+      ->setSetting('max_length', 64)
+      ->setDisplayOptions('form', array(
+        'type' => 'string',
+        'weight' => 0,
+      ));
 
     $fields['uid'] = FieldDefinition::create('entity_reference')
       ->setLabel(t('User ID'))
