@@ -299,7 +299,7 @@ class ConfigTranslationUiTest extends WebTestBase {
 
       // Submit feedback.
       $edit = array(
-        'subject' => 'Test subject',
+        'subject[0][value]' => 'Test subject',
         'message' => 'Test message',
       );
       $this->drupalPostForm(NULL, $edit, t('Send message'));

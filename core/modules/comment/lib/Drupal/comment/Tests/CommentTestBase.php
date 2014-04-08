@@ -119,10 +119,10 @@ abstract class CommentTestBase extends WebTestBase {
     }
 
     if ($subject_mode == TRUE) {
-      $edit['subject'] = $subject;
+      $edit['subject[0][value]'] = $subject;
     }
     else {
-      $this->assertNoFieldByName('subject', '', 'Subject field not found.');
+      $this->assertNoFieldByName('subject[0][value]', '', 'Subject field not found.');
     }
 
     if ($contact !== NULL && is_array($contact)) {

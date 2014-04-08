@@ -168,7 +168,7 @@ class TrackerAttributesTest extends WebTestBase {
 
     // Adds new comment to ensure the tracker is updated accordingly.
     $comment = array(
-      'subject' => $this->randomName(),
+      'subject[0][value]' => $this->randomName(),
       'comment_body[0][value]' => $this->randomName(),
     );
     $this->drupalPostForm('comment/reply/node/' . $node->id() .'/comment', $comment, t('Save'));
