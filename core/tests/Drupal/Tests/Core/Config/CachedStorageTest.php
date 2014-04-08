@@ -99,6 +99,14 @@ class CachedStorageTest extends UnitTestCase {
         'foo' => 'bar',
       ),
     );
+    $configValues = array(
+      'foo.bar' => array(
+        'foo' => 'bar',
+      ),
+      'baz.back' => array(
+        'foo' => 'bar',
+      ),
+    );
     $storage = $this->getMock('Drupal\Core\Config\StorageInterface');
     $storage->expects($this->never())->method('readMultiple');
     $cache = new MemoryBackend(__FUNCTION__);
@@ -107,7 +115,7 @@ class CachedStorageTest extends UnitTestCase {
     }
     $cachedStorage = new CachedStorage($storage, $cache);
     $cachedStorage->setCachePrefix('prefix');
-    $this->assertEquals($configCacheValues, $cachedStorage->readMultiple($configNames));
+    $this->assertEquals($configValues, $cachedStorage->readMultiple($configNames));
   }
 
   /**
