@@ -8,6 +8,7 @@
 namespace Drupal\language\Config;
 
 use Drupal\Core\Config\Config;
+use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Language\Language;
@@ -22,7 +23,7 @@ class LanguageConfigFactoryOverride implements LanguageConfigFactoryOverrideInte
   /**
    * The configuration storage.
    *
-   * @var \Drupal\Core\Config\StorageInterface
+   * @var \Drupal\language\Config\LanguageOverrideStorageInterface
    */
   protected $storage;
 
@@ -50,14 +51,14 @@ class LanguageConfigFactoryOverride implements LanguageConfigFactoryOverrideInte
   /**
    * Constructs the LanguageConfigFactoryOverride object.
    *
-   * @param \Drupal\Core\Config\StorageInterface $storage
+   * @param \Drupal\language\Config\LanguageOverrideStorageInterface $storage
    *   The configuration storage engine.
    * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
    *   An event dispatcher instance to use for configuration events.
    * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_config
    *   The typed configuration manager.
    */
-  public function __construct(StorageInterface $storage, EventDispatcherInterface $event_dispatcher, TypedConfigManagerInterface $typed_config) {
+  public function __construct(LanguageOverrideStorageInterface $storage, EventDispatcherInterface $event_dispatcher, TypedConfigManagerInterface $typed_config) {
     $this->storage = $storage;
     $this->eventDispatcher = $event_dispatcher;
     $this->typedConfigManager = $typed_config;
@@ -67,72 +68,30 @@ class LanguageConfigFactoryOverride implements LanguageConfigFactoryOverrideInte
    * {@inheritdoc}
    */
   public function loadOverrides($names) {
-    $data = array();
-    $language_names = $this->getLanguageConfigNames($names);
-    if ($language_names) {
-      $data = $this->storage->readMultiple(array_values($language_names));
-      // Re-key the data array to use configuration names rather than override
-      // names.
-      $prefix_length = strlen(static::LANGUAGE_CONFIG_PREFIX . '.' . $this->language->id) + 1;
-      foreach ($data as $key => $value) {
-        unset($data[$key]);
-        $key = substr($key, $prefix_length);
-        $data[$key] = $value;
-      }
+    if ($this->language) {
+      return $this->storage->readMultiple($names);
     }
-    return $data;
+    return array();
   }
 
   /**
    * {@inheritdoc}
    */
   public function getOverride($langcode, $name) {
-    $override_name = $this->getLanguageConfigName($langcode, $name);
-    $overrides = $this->storage->read($override_name);
-    $config = new Config($override_name, $this->storage, $this->eventDispatcher, $this->typedConfigManager);
-    if (!empty($overrides)) {
-      $config->initWithData($overrides);
+    $storage = clone $this->storage;
+    $data = $storage->setLangcode($langcode)->read($name);
+    $override = new LanguageConfigOverride($name, $storage, $this->typedConfigManager);
+    if (!empty($data)) {
+      $override->initWithData($data);
     }
-    return $config;
+    return $override;
   }
 
   /**
-   * Generate a list of configuration names based on base names.
-   *
-   * @param array $names
-   *   List of configuration names.
-   *
-   * @return array
-   *   List of configuration names for language override files if applicable.
+   * {@inheritdoc}
    */
-  protected function getLanguageConfigNames(array $names) {
-    $language_names = array();
-    if (isset($this->language)) {
-      foreach ($names as $name) {
-        if ($language_name = $this->getLanguageConfigName($this->language->id, $name)) {
-          $language_names[$name] = $language_name;
-        }
-      }
-    }
-    return $language_names;
-  }
-
-  /**
-   * Get language override name for given language and configuration name.
-   *
-   * @param string $langcode
-   *   Language code.
-   * @param string $name
-   *   Configuration name.
-   *
-   * @return bool|string
-   *   Configuration name or FALSE if not applicable.
-   */
-  protected function getLanguageConfigName($langcode, $name) {
-     if (strpos($name, static::LANGUAGE_CONFIG_PREFIX) === 0) {
-      return FALSE;
-    }
-    return static::LANGUAGE_CONFIG_PREFIX . '.' . $langcode . '.' . $name;
+  public function getStorage() {
+    return $this->storage;
   }
 
   /**
@@ -154,6 +113,7 @@ class LanguageConfigFactoryOverride implements LanguageConfigFactoryOverrideInte
    */
   public function setLanguage(Language $language = NULL) {
     $this->language = $language;
+    $this->storage->setLangcode($this->language ? $this->language->id : NULL);
     return $this;
   }
 
@@ -162,7 +122,58 @@ class LanguageConfigFactoryOverride implements LanguageConfigFactoryOverrideInte
    */
   public function setLanguageFromDefault(LanguageDefault $language_default = NULL) {
     $this->language = $language_default ? $language_default->get() : NULL;
+    $this->storage->setLangcode($this->language->id);
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * @todo maybe this should be done somewhere else?
+   */
+  public function install($type, $name) {
+    // Work out if this extension provides default language overrides.
+    $config_dir = drupal_get_path($type, $name) . '/config/language';
+    if (is_dir($config_dir)) {
+      // List all the directories.
+      // \DirectoryIterator on Windows requires an absolute path.
+      $it  = new \DirectoryIterator(realpath($config_dir));
+      foreach ($it as $dir) {
+        if (!$dir->isDot() && $dir->isDir() ) {
+          $default_language_config = new FileStorage($dir->getPathname());
+          $this->storage->setLangcode($dir->getFilename());
+          foreach ($default_language_config->listAll() as $config_name) {
+            $data = $default_language_config->read($config_name);
+            $config = new LanguageConfigOverride($config_name, $this->storage, $this->typedConfigManager);
+            $config->setData($data)->save();
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * @todo maybe this should be done somewhere else?
+   */
+  public function uninstall($type, $name) {
+    // Can not use ConfigurableLanguageManager::getLanguages() since that would
+    // create a circular dependency.
+    $language_directory = config_get_config_directory() .'/language';
+    if (is_dir(($language_directory))) {
+      $it  = new \DirectoryIterator(realpath($language_directory));
+      foreach ($it as $dir) {
+        if (!$dir->isDot() && $dir->isDir() ) {
+          $this->storage->setLangcode($dir->getFilename());
+          $config_names = $this->storage->listAll($name . '.');
+          foreach ($config_names as $config_name) {
+            $config = new LanguageConfigOverride($config_name, $this->storage, $this->typedConfigManager);
+            $config->delete();
+          }
+        }
+      }
+    }
   }
 
 }

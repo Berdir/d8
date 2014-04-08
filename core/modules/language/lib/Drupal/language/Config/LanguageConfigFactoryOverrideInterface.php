@@ -62,4 +62,9 @@ interface LanguageConfigFactoryOverrideInterface extends ConfigFactoryOverrideIn
    */
   public function getOverride($langcode, $name);
 
+  /**
+   * Returns the storage instance.
+   */
+  public function getStorage();
+
 }

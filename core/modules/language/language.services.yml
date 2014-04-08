@@ -11,8 +11,20 @@ services:
     class: Drupal\language\EventSubscriber\ConfigSubscriber
     tags:
       - { name: event_subscriber }
+  language.cache_config:
+    class: Drupal\Core\Cache\CacheBackendInterface
+    tags:
+      - { name: cache.bin }
+    factory_method: get
+    factory_service: cache_factory
+    arguments: [language_config]
+  language.config_storage.file:
+    class: Drupal\language\Config\LanguageOverrideFileStorage
+  language.config_storage:
+    class: Drupal\language\Config\LanguageOverrideCachedStorage
+    arguments: ['@language.config_storage.file', '@language.cache_config']
   language.config_factory_override:
     class: Drupal\language\Config\LanguageConfigFactoryOverride
-    arguments: ['@config.storage', '@event_dispatcher', '@config.typed']
+    arguments: ['@language.config_storage', '@event_dispatcher', '@config.typed']
     tags:
       - { name: config.factory.override, priority: -254 }

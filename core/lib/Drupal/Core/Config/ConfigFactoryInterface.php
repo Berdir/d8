@@ -134,4 +134,11 @@ interface ConfigFactoryInterface {
    */
   public function addOverride(ConfigFactoryOverrideInterface $config_factory_override);
 
+  /**
+   * Get all added configuration factory override instances.
+   *
+   * @return ConfigFactoryOverrideInterface[]
+   *   The configuration factory override instances.
+   */
+  public function getOverrides();
 }

@@ -407,4 +407,13 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
     return $this->configFactoryOverride->getOverride($langcode, $name);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getLanguageOverrideStorage($langcode) {
+    // Clone the language override storage so a process could compare language
+    // overrides if it wanted to.
+    $storage = clone $this->configFactoryOverride->getStorage();
+    return $storage->setLangcode($langcode);
+  }
 }

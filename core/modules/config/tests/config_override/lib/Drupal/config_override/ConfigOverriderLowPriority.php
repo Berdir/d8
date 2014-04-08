@@ -41,5 +41,17 @@ class ConfigOverriderLowPriority implements ConfigFactoryOverrideInterface {
     return 'ConfigOverriderLowPriority';
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function install($type, $name) {
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function uninstall($type, $name) {
+  }
+
 }
 

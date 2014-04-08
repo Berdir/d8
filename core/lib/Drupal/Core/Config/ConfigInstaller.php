@@ -138,12 +138,12 @@ class ConfigInstaller implements ConfigInstallerInterface {
       // Remove configuration that already exists in the active storage.
       $sorted_config = array_diff($sorted_config, $this->activeStorage->listAll());
 
-      foreach ($sorted_config as $name) {
-        $new_config = new Config($name, $this->activeStorage, $this->eventDispatcher, $this->typedConfig);
-        if ($data[$name] !== FALSE) {
-          $new_config->setData($data[$name]);
+      foreach ($sorted_config as $config_name) {
+        $new_config = new Config($config_name, $this->activeStorage, $this->eventDispatcher, $this->typedConfig);
+        if ($data[$config_name] !== FALSE) {
+          $new_config->setData($data[$config_name]);
         }
-        if ($entity_type = $this->configManager->getEntityTypeIdByName($name)) {
+        if ($entity_type = $this->configManager->getEntityTypeIdByName($config_name)) {
 
           // If we are syncing do not create configuration entities. Pluggable
           // configuration entities can have dependencies on modules that are
@@ -159,8 +159,8 @@ class ConfigInstaller implements ConfigInstallerInterface {
             ->getStorage($entity_type);
           // It is possible that secondary writes can occur during configuration
           // creation. Updates of such configuration are allowed.
-          if ($this->activeStorage->exists($name)) {
-            $id = $entity_storage->getIDFromConfigName($name, $entity_storage->getEntityType()->getConfigPrefix());
+          if ($this->activeStorage->exists($config_name)) {
+            $id = $entity_storage->getIDFromConfigName($config_name, $entity_storage->getEntityType()->getConfigPrefix());
             $entity = $entity_storage->load($id);
             foreach ($new_config->get() as $property => $value) {
               $entity->set($property, $value);
@@ -179,6 +179,12 @@ class ConfigInstaller implements ConfigInstallerInterface {
       }
       $this->configFactory->setOverrideState($old_state);
     }
+
+    // Allow configuration factory overrides to respond to installation.
+    foreach ($this->configFactory->getOverrides() as $config_override) {
+      $config_override->install($type, $name);
+    }
+
     // Reset all the static caches and list caches.
     $this->configFactory->reset();
   }

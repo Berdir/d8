@@ -1,0 +1,26 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the language module.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function language_install() {
+  // Get all the existing modules that are enabled and install any language
+  // configuration.
+  $language_config_override = \Drupal::service('language.config_factory_override');
+  foreach (array_keys(\Drupal::moduleHandler()->getModuleList()) as $module) {
+    $language_config_override->install('module', $module);
+  }
+  /** @var \Drupal\Core\Extension\ThemeHandler $theme_handler */
+  $theme_handler = \Drupal::service('theme_handler');
+  foreach ($theme_handler->listInfo() as $theme) {
+    if ($theme->status) {
+      $language_config_override->install('theme', $theme->name);
+    }
+  }
+  \Drupal::configFactory()->reset();
+}

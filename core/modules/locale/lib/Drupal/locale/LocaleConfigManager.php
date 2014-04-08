@@ -230,9 +230,9 @@ class LocaleConfigManager extends TypedConfigManager {
    *   Language code to delete.
    */
   public function deleteLanguageTranslations($langcode) {
-    $locale_name = LanguageConfigFactoryOverrideInterface::LANGUAGE_CONFIG_PREFIX . '.' . $langcode . '.';
-    foreach ($this->configStorage->listAll($locale_name) as $name) {
-      $this->configStorage->delete($name);
+    $storage = $this->languageManager->getLanguageOverrideStorage($langcode);
+    foreach ($storage->listAll() as $name) {
+      $this->languageManager->getLanguageConfigOverride($langcode, $name)->delete();
     }
   }
 

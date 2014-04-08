@@ -156,6 +156,11 @@ class ConfigManager implements ConfigManagerInterface {
     foreach ($config_names as $config_name) {
       $this->configFactory->get($config_name)->delete();
     }
+    // Allow configuration factory overrides to respond to uninstallation.
+    foreach ($this->configFactory->getOverrides() as $config_override) {
+      $config_override->uninstall($type, $name);
+    }
+
     $schema_dir = drupal_get_path($type, $name) . '/config/schema';
     if (is_dir($schema_dir)) {
       // Refresh the schema cache if uninstalling an extension that provides

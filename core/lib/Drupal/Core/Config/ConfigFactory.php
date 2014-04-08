@@ -312,4 +312,11 @@ class ConfigFactory implements ConfigFactoryInterface, EventSubscriberInterface 
     $this->configFactoryOverrides[] = $config_factory_override;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getOverrides() {
+    return $this->configFactoryOverrides;
+  }
+
 }

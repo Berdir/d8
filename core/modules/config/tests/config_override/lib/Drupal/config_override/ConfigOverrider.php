@@ -40,5 +40,17 @@ class ConfigOverrider implements ConfigFactoryOverrideInterface {
     return 'ConfigOverrider';
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function install($type, $name) {
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function uninstall($type, $name) {
+  }
+
 }
 

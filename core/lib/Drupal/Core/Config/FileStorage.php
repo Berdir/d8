@@ -241,4 +241,14 @@ class FileStorage implements StorageInterface {
 
     return $success;
   }
+
+  /**
+   * Sets the filesystem path for configuration objects.
+   *
+   * @param string $directory
+   *   The filesystem path for configuration objects.
+   */
+  public function setDirectory($directory) {
+    $this->directory = $directory;
+  }
 }

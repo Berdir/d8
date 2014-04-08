@@ -84,6 +84,33 @@ class CachedStorageTest extends UnitTestCase {
   }
 
   /**
+   * Test that the cache prefix is used correctly.
+   */
+  public function testGetMultipleCachePrefix() {
+    $configNames = array(
+      'foo.bar',
+      'baz.back',
+    );
+    $configCacheValues = array(
+      'prefix:foo.bar' => array(
+        'foo' => 'bar',
+      ),
+      'prefix:baz.back' => array(
+        'foo' => 'bar',
+      ),
+    );
+    $storage = $this->getMock('Drupal\Core\Config\StorageInterface');
+    $storage->expects($this->never())->method('readMultiple');
+    $cache = new MemoryBackend(__FUNCTION__);
+    foreach ($configCacheValues as $key => $value) {
+      $cache->set($key, $value);
+    }
+    $cachedStorage = new CachedStorage($storage, $cache);
+    $cachedStorage->setCachePrefix('prefix');
+    $this->assertEquals($configCacheValues, $cachedStorage->readMultiple($configNames));
+  }
+
+  /**
    * Test fall through to file storage in CachedStorage::readMulitple().
    */
   public function testGetMultipleOnPartiallyPrimedCache() {
@@ -116,7 +143,7 @@ class CachedStorageTest extends UnitTestCase {
     $storage = $this->getMock('Drupal\Core\Config\StorageInterface');
     $storage->expects($this->once())
       ->method('readMultiple')
-      ->with(array(2 => $configNames[2], 4 => $configNames[4]))
+      ->with(array($configNames[2], $configNames[4]))
       ->will($this->returnValue($response));
 
     $cachedStorage = new CachedStorage($storage, $cache);

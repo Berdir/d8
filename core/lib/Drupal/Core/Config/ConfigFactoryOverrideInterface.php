@@ -32,4 +32,24 @@ interface ConfigFactoryOverrideInterface {
    */
   public function getCacheSuffix();
 
+  /**
+   * Reacts to default configuration installation during extension install.
+   *
+   * @param string $type
+   *   The type of extension being installed. Either 'module' or 'theme'.
+   * @param string $name
+   *   The name of the extension.
+   */
+  public function install($type, $name);
+
+  /**
+   * Reacts to configuration removal during extension uninstallation.
+   *
+   * @param string $type
+   *   The type of extension being uninstalled. Either 'module' or 'theme'.
+   * @param string $name
+   *   The name of the extension.
+   */
+  public function uninstall($type, $name);
+
 }

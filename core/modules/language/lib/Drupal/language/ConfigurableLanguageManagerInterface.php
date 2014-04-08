@@ -86,7 +86,7 @@ interface ConfigurableLanguageManagerInterface extends LanguageManagerInterface 
    * @param string $name
    *   The language configuration object name.
    *
-   * @return \Drupal\Core\Config\Config
+   * @return \Drupal\language\Config\LanguageConfigOverride
    *   The language config override object.
    */
   public function getLanguageConfigOverride($langcode, $name);
