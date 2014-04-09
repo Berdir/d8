@@ -212,9 +212,7 @@ class CommentFormController extends ContentEntityFormController {
       '#access' => $is_admin,
     );
 
-    $form['subject'] += array(
-      '#access' => $instance->getSetting('subject'),
-    );
+    $form['subject']['#access'] = $instance->getSetting('subject');
     unset($form['subject']['widget'][0]['value']['#description']);
 
     // Used for conditional validation of author fields.
