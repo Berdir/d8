@@ -1,4 +1,5 @@
 id: d6_aggregator_item
+label: Drupal 6 aggregator items
 source:
   plugin: d6_aggregator_item
 process:

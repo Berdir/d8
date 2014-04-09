@@ -1,4 +1,5 @@
 id: d6_node_revision
+label: Drupal 6 node revisions
 source:
   plugin: d6_node_revision
 process:

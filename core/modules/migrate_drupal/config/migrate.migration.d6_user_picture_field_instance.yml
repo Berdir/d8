@@ -1,4 +1,5 @@
 id: d6_user_picture_field_instance
+label: Drupal 6 user picture field instance configuration
 source:
   plugin: d6_user_picture_instance
   constants:

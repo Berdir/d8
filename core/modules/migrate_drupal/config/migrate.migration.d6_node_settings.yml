@@ -1,4 +1,5 @@
 id: d6_node_settings
+label: Drupal 6 node configuration
 source:
   plugin: variable
   variables:

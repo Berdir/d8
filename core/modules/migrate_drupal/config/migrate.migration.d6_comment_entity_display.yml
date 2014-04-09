@@ -1,4 +1,5 @@
 id: d6_comment_entity_display
+label: Drupal 6 comment display configuration
 source:
   plugin: d6_comment_variable
   constants:

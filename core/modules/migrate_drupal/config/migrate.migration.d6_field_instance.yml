@@ -1,5 +1,5 @@
 id: d6_field_instance
-
+label: Drupal 6 field instance configuration
 source:
   plugin: d6_field_instance
   constants:

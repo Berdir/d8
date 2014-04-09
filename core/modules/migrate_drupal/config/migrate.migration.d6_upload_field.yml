@@ -1,4 +1,5 @@
 id: d6_upload_field
+label: Drupal 6 upload field configuration
 source:
   # We do an empty source and a proper destination to have an idmap for
   # migration_dependencies.

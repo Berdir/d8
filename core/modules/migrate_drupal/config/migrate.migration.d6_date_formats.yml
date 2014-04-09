@@ -1,4 +1,5 @@
 id: d6_date_formats
+label: Drupal 6 date format configuration
 source:
   plugin: variable_multirow
   variables:

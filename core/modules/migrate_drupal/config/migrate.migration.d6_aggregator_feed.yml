@@ -1,4 +1,5 @@
 id: d6_aggregator_feed
+label: Drupal 6 aggregator feeds
 
 source:
   plugin: d6_aggregator_feed

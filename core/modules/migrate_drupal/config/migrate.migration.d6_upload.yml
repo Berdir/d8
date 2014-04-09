@@ -1,5 +1,5 @@
 id: d6_upload
-
+label: Drupal 6 file uploads
 source:
   plugin: d6_upload
 

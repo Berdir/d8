@@ -1,4 +1,5 @@
 id: d6_upload_field_instance
+label: Drupal 6 upload field instance configuration
 source:
   plugin: d6_upload_instance
   constants:

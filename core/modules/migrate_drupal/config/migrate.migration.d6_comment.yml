@@ -1,4 +1,5 @@
 id: d6_comment
+label: Drupal 6 comments
 source:
   plugin: d6_comment
   constants:

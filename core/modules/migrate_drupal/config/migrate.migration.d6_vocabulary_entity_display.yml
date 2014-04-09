@@ -1,4 +1,5 @@
 id: d6_vocabulary_entity_display
+label: Drupal 6 vocabulary display configuration
 source:
   plugin: d6_taxonomy_vocabulary_per_type
   constants:

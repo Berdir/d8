@@ -1,4 +1,5 @@
 id: d6_user_picture_file
+label: Drupal 6 user pictures
 source:
   plugin: d6_user_picture_file
   constants:

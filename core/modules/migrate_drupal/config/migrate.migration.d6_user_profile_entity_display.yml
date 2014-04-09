@@ -1,4 +1,5 @@
 id: d6_user_profile_entity_display
+label: Drupal 6 user profile display configuration
 source:
   plugin: d6_profile_field
   constants:

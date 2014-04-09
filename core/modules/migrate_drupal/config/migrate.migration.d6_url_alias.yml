@@ -1,4 +1,5 @@
 id: d6_url_alias
+label: Drupal 6 URL aliases
 source:
   plugin: d6_url_alias
 

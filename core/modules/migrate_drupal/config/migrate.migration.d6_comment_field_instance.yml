@@ -1,4 +1,5 @@
 id: d6_comment_field_instance
+label: Drupal 6 comment field instance configuration
 source:
   plugin: d6_comment_variable
   constants:

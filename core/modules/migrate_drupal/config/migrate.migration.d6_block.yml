@@ -1,4 +1,5 @@
 id: d6_block
+label: Drupal 6 blocks
 source:
   plugin: d6_block
 process:

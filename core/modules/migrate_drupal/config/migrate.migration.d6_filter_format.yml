@@ -1,4 +1,5 @@
 id: d6_filter_format
+label: Drupal 6 filter format configuration
 source:
   plugin: d6_filter_format
 process:

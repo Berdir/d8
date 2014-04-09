@@ -1,4 +1,5 @@
 id: d6_comment_field
+label: Drupal 6 comment field configuration
 source:
   plugin: d6_comment_variable
   constants:

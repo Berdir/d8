@@ -1,4 +1,5 @@
 id: d6_upload_entity_display
+label: Drupal 6 upload display configuration
 source:
   plugin: d6_upload_instance
   constants:

@@ -1,4 +1,5 @@
 id: d6_term_node
+label: Drupal 6 term/node relationships
 load:
   plugin: d6_term_node
 
