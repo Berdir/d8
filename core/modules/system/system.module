@@ -5,19 +5,13 @@
  * Configuration system that lets administrators modify the workings of the site.
  */
 
-use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ExtensionDiscovery;
-use Drupal\Core\Utility\ModuleInfo;
 use Drupal\block\BlockPluginInterface;
-use Drupal\menu_link\MenuLinkInterface;
 use Drupal\user\UserInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Request;
 use Guzzle\Http\Exception\BadResponseException;
 use Guzzle\Http\Exception\RequestException;
 
@@ -290,6 +284,7 @@ function system_element_info() {
   );
   $types['page'] = array(
     '#show_messages' => TRUE,
+    '#pre_render' => array('drupal_pre_render_page'),
     '#theme' => 'page',
     '#title' => '',
   );
@@ -1557,7 +1552,7 @@ function system_get_module_admin_tasks($module, array $info) {
  */
 function system_cron() {
   // Cleanup the flood.
-  \Drupal::service('flood')->garbageCollection();
+  \Drupal::flood()->garbageCollection();
 
   foreach (Cache::getBins() as $cache_backend) {
     $cache_backend->garbageCollection();

@@ -106,6 +106,13 @@ class ManageFieldsTest extends FieldUiTestBase {
     foreach (array('Add new field', 'Re-use existing field') as $element) {
       $this->assertText($element, format_string('"@element" was found.', array('@element' => $element)));
     }
+
+    // Assert entity operations for all field instances.
+    $result = $this->xpath('//ul[@class = "dropbutton"]/li/a');
+    $url = base_path() . "admin/structure/types/manage/$type/fields/node.$type.body";
+    $this->assertIdentical($url, (string) $result[0]['href']);
+    $this->assertIdentical("$url/field", (string) $result[1]['href']);
+    $this->assertIdentical("$url/delete", (string) $result[2]['href']);
   }
 
   /**

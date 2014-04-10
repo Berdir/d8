@@ -88,7 +88,7 @@ abstract class HandlerBase extends PluginBase {
   /**
    * Constructs a Handler object.
    */
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->is_handler = TRUE;
     $this->optional = !empty($configuration['optional']);
@@ -264,14 +264,9 @@ abstract class HandlerBase extends PluginBase {
       case 'lower':
         return drupal_strtolower($string);
       case 'ucfirst':
-        return drupal_strtoupper(drupal_substr($string, 0, 1)) . drupal_substr($string, 1);
+        return Unicode::ucfirst($string);
       case 'ucwords':
-        if (Unicode::getStatus() == Unicode::STATUS_MULTIBYTE) {
-          return mb_convert_case($string, MB_CASE_TITLE);
-        }
-        else {
-          return ucwords($string);
-        }
+        return Unicode::ucwords($string);
     }
   }
 

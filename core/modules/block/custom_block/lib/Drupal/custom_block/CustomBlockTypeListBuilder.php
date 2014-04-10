@@ -7,6 +7,7 @@
 
 namespace Drupal\custom_block;
 
+use Drupal\Component\Utility\Xss;
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
 
@@ -20,8 +21,8 @@ class CustomBlockTypeListBuilder extends ConfigEntityListBuilder {
   /**
    * {@inheritdoc}
    */
-  public function getOperations(EntityInterface $entity) {
-    $operations = parent::getOperations($entity);
+  public function getDefaultOperations(EntityInterface $entity) {
+    $operations = parent::getDefaultOperations($entity);
     // Place the edit operation after the operations added by field_ui.module
     // which have the weights 15, 20, 25.
     if (isset($operations['edit'])) {
@@ -44,7 +45,7 @@ class CustomBlockTypeListBuilder extends ConfigEntityListBuilder {
    */
   public function buildRow(EntityInterface $entity) {
     $row['type'] = \Drupal::linkGenerator()->generateFromUrl($entity->label(), $entity->urlInfo());
-    $row['description'] = filter_xss_admin($entity->description);
+    $row['description'] = Xss::filterAdmin($entity->description);
     return $row + parent::buildRow($entity);
   }
 

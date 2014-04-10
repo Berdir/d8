@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Yaml\Exception\ParseException;
-use Drupal\Component\PhpStorage\PhpStorageFactory;
+use Drupal\Core\PhpStorage\PhpStorageFactory;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\EventSubscriber\HtmlViewSubscriber;
@@ -193,8 +193,10 @@ function drupal_get_region_content($region = NULL, $delimiter = ' ') {
  * installation state. At all other times, the "install_profile" setting will be
  * available in settings.php.
  *
- * @return $profile
- *   The name of the installation profile.
+ * @return string|null $profile
+ *   The name of the installation profile or NULL if no installation profile is
+ *   currently active. This is the case for example during the first steps of
+ *   the installer or during unit tests.
  */
 function drupal_get_profile() {
   global $install_state;
@@ -205,11 +207,12 @@ function drupal_get_profile() {
       $profile = $install_state['parameters']['profile'];
     }
     else {
-      $profile = '';
+      $profile = NULL;
     }
   }
   else {
-    $profile = Settings::get('install_profile') ?: 'standard';
+    // Fall back to NULL, if there is no 'install_profile' setting.
+    $profile = Settings::get('install_profile');
   }
 
   return $profile;
@@ -1199,11 +1202,11 @@ function l($text, $path, array $options = array()) {
  * into script execution a call such as set_time_limit(20) is made, the
  * script will run for a total of 45 seconds before timing out.
  *
- * It also means that it is possible to decrease the total time limit if
- * the sum of the new time limit and the current time spent running the
- * script is inferior to the original time limit. It is inherent to the way
- * set_time_limit() works, it should rather be called with an appropriate
- * value every time you need to allocate a certain amount of time
+ * If the current time limit is not unlimited it is possible to decrease the
+ * total time limit if the sum of the new time limit and the current time spent
+ * running the script is inferior to the original time limit. It is inherent to
+ * the way set_time_limit() works, it should rather be called with an
+ * appropriate value every time you need to allocate a certain amount of time
  * to execute a task than only once at the beginning of the script.
  *
  * Before calling set_time_limit(), we check if this function is available
@@ -1220,7 +1223,11 @@ function l($text, $path, array $options = array()) {
  */
 function drupal_set_time_limit($time_limit) {
   if (function_exists('set_time_limit')) {
-    @set_time_limit($time_limit);
+    $current = ini_get('max_execution_time');
+    // Do not set time limit if it is currently unlimited.
+    if ($current != 0) {
+      @set_time_limit($time_limit);
+    }
   }
 }
 
@@ -2934,9 +2941,10 @@ function _drupal_bootstrap_code() {
   // Set the allowed protocols once we have the config available.
   $allowed_protocols = \Drupal::config('system.filter')->get('protocols');
   if (!isset($allowed_protocols)) {
-    // filter_xss_admin() is called by the installer and update.php, in which
-    // case the configuration may not exist (yet). Provide a minimal default set
-    // of allowed protocols for these cases.
+    // \Drupal\Component\Utility\UrlHelper::filterBadProtocol() is called by the
+    // installer and update.php, in which case the configuration may not exist
+    // (yet). Provide a minimal default set of allowed protocols for these
+    // cases.
     $allowed_protocols = array('http', 'https');
   }
   UrlHelper::setAllowedProtocols($allowed_protocols);

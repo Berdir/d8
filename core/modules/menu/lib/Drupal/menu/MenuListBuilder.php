@@ -7,6 +7,7 @@
 
 namespace Drupal\menu;
 
+use Drupal\Component\Utility\Xss;
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
 
@@ -38,15 +39,15 @@ class MenuListBuilder extends ConfigEntityListBuilder {
       'data' => $this->getLabel($entity),
       'class' => array('menu-label'),
     );
-    $row['description'] = filter_xss_admin($entity->description);
+    $row['description'] = Xss::filterAdmin($entity->description);
     return $row + parent::buildRow($entity);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getOperations(EntityInterface $entity) {
-    $operations = parent::getOperations($entity);
+  public function getDefaultOperations(EntityInterface $entity) {
+    $operations = parent::getDefaultOperations($entity);
 
     if (isset($operations['edit'])) {
       $operations['edit']['title'] = t('Edit menu');

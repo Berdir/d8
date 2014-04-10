@@ -5,6 +5,7 @@
  * Admin page callbacks for the system module.
  */
 
+use Drupal\Component\Utility\Xss;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Render\Element;
@@ -105,7 +106,7 @@ function template_preprocess_admin_block_content(&$variables) {
     foreach ($variables['content'] as $key => $item) {
       $variables['content'][$key]['link'] = l($item['title'], $item['link_path'], $item['localized_options']);
       if (!$compact && isset($item['description'])) {
-        $variables['content'][$key]['description'] = filter_xss_admin($item['description']);
+        $variables['content'][$key]['description'] = Xss::filterAdmin($item['description']);
       }
       else {
         $variables['content'][$key]['description'] = FALSE;
@@ -382,7 +383,7 @@ function theme_system_modules_uninstall($variables) {
     }
     $rows[] = array(
       array('data' => drupal_render($form['uninstall'][$module]), 'align' => 'center'),
-      '<strong><label for="' . $form['uninstall'][$module]['#id'] . '">' . drupal_render($form['modules'][$module]['name']) . '</label></strong>',
+      '<label for="' . $form['uninstall'][$module]['#id'] . '" class="module-name table-filter-text-source">' . drupal_render($form['modules'][$module]['name']) . '</label>',
       array('data' => drupal_render($form['modules'][$module]['description']) . $disabled_message, 'class' => array('description')),
     );
   }
@@ -393,7 +394,8 @@ function theme_system_modules_uninstall($variables) {
     '#rows' => $rows,
     '#empty' => t('No modules are available to uninstall.'),
   );
-  $output  = drupal_render($table);
+  $output = drupal_render($form['filters']);
+  $output .= drupal_render($table);
   $output .= drupal_render_children($form);
 
   return $output;

@@ -339,7 +339,7 @@ function user_load_by_name($name) {
  */
 function user_validate_name($name) {
   $definition = DataDefinition::create('string')
-    ->setConstraints(array('UserName' => array()));
+    ->addConstraint('UserName', array());
   $data = \Drupal::typedDataManager()->create($definition);
   $data->setValue($name);
   $violations = $data->validate();
@@ -607,7 +607,7 @@ function user_template_preprocess_default_variables_alter(&$variables) {
  *
  * Modules that make any changes to variables like 'name' or 'extra' must ensure
  * that the final string is safe to include directly in the output by using
- * check_plain() or filter_xss().
+ * check_plain() or \Drupal\Component\Utility\Xss::filter().
  */
 function template_preprocess_username(&$variables) {
   $account = $variables['account'] ?: new AnonymousUserSession();
