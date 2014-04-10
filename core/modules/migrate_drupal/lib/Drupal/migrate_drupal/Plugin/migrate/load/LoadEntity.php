@@ -75,11 +75,13 @@ class LoadEntity extends PluginBase implements MigrateLoadInterface {
       $values = $this->migration->toArray();
       $values['id'] = $this->migration->id() . ':' . $id;
       $values['source']['bundle'] = $id;
-      /** @var \Drupal\migrate\Entity\MigrationInterface $migration */
+      /** @var \Drupal\migrate_drupal\Entity\MigrationInterface $migration */
       $migration = $storage->create($values);
-      $fields = array_keys($migration->getSourcePlugin()->fields());
-      $migration->process += array_combine($fields, $fields);
-      $migrations[$migration->id()] = $migration;
+      if ($migration->getSourcePlugin()->checkRequirements()) {
+        $fields = array_keys($migration->getSourcePlugin()->fields());
+        $migration->process += array_combine($fields, $fields);
+        $migrations[$migration->id()] = $migration;
+      }
     }
 
     return $migrations;
