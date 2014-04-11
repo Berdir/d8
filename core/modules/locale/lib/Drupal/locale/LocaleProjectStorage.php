@@ -143,7 +143,7 @@ class LocaleProjectStorage implements LocaleProjectStorageInterface {
    */
   public function disableAll() {
     $projects = $this->keyValueStore->getAll();
-    foreach ($projects as $key) {
+    foreach (array_keys($projects) as $key) {
       $projects[$key]['status'] = 0;
       if (isset($cache[$key])) {
         $cache[$key] = $projects[$key];
