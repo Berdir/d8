@@ -56,7 +56,6 @@ class LoadEntity extends PluginBase implements MigrateLoadInterface {
    * {@inheritdoc}
    */
   public function loadMultiple(EntityStorageInterface $storage, array $sub_ids = NULL) {
-    // This entity type has no bundles ('user', 'feed', etc).
     if (isset($this->configuration['bundle_migration'])) {
       /** @var \Drupal\migrate\Entity\MigrationInterface $bundle_migration */
       $bundle_migration = $storage->load($this->configuration['bundle_migration']);
@@ -66,6 +65,7 @@ class LoadEntity extends PluginBase implements MigrateLoadInterface {
         $this->bundles[] = $row[$source_id];
       }
     }
+    // This entity type has no bundles ('user', 'feed', etc).
     else {
       $this->bundles = array($this->migration->getSourcePlugin()->entityTypeId());
     }
