@@ -65,8 +65,8 @@ class LoadEntity extends PluginBase implements MigrateLoadInterface {
         $this->bundles[] = $row[$source_id];
       }
     }
-    // This entity type has no bundles ('user', 'feed', etc).
     else {
+      // This entity type has no bundles ('user', 'feed', etc).
       $this->bundles = array($this->migration->getSourcePlugin()->entityTypeId());
     }
     $sub_ids_to_load = isset($sub_ids) ? array_intersect($this->bundles, $sub_ids) : $this->bundles;
