@@ -24,7 +24,7 @@ class MigrateBlockTest extends MigrateDrupalTestBase {
     'block',
     'views',
     'comment',
-    'menu',
+    'menu_ui',
     'custom_block',
     'node',
   );
