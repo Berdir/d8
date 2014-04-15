@@ -36,7 +36,7 @@ class MigrateDrupal6Test extends MigrateDrupalTestBase {
     'image',
     'link',
     'locale',
-    'menu',
+    'menu_ui',
     'node',
     'options',
     'search',
