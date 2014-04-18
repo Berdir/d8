@@ -54,10 +54,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Fie
   /**
    * {@inheritdoc}
    */
-  public function create(array $values = array()) {
-    $entity_class = $this->entityType->getClass();
-    $entity_class::preCreate($this, $values);
-
+  protected function doCreate($entity_class, array $values) {
     // We have to determine the bundle first.
     $bundle = FALSE;
     if ($this->bundleKey) {
@@ -83,12 +80,6 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Fie
     foreach ($values as $name => $value) {
       $entity->$name = $value;
     }
-    $entity->postCreate($this);
-
-    // Modules might need to add or change the data initially held by the new
-    // entity object, for instance to fill-in default values.
-    $this->invokeHook('create', $entity);
-
     return $entity;
   }
 
