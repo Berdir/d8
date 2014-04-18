@@ -20,14 +20,7 @@ abstract class EntityStorageBase extends EntityControllerBase implements EntityS
    *
    * @var array
    */
-  protected $entityCache = array();
-
-  /**
-   * Whether this entity type should use the static cache.
-   *
-   * @var boolean
-   */
-  protected $cache;
+  protected $entities = array();
 
   /**
    * Entity type ID for this controller instance.
@@ -60,6 +53,20 @@ abstract class EntityStorageBase extends EntityControllerBase implements EntityS
   protected $uuidKey;
 
   /**
+   * The UUID service.
+   *
+   * @var \Drupal\Component\Uuid\UuidInterface
+   */
+  protected $uuidService;
+
+  /**
+   * Name of the entity class.
+   *
+   * @var string
+   */
+  protected $entityClass;
+
+  /**
    * Constructs an EntityStorageBase instance.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
@@ -68,8 +75,8 @@ abstract class EntityStorageBase extends EntityControllerBase implements EntityS
   public function __construct(EntityTypeInterface $entity_type) {
     $this->entityTypeId = $entity_type->id();
     $this->entityType = $entity_type;
-    // Check if the entity type supports static caching of loaded entities.
-    $this->cache = $this->entityType->isStaticallyCacheable();
+    $this->idKey = $this->entityType->getKey('id');
+    $this->entityClass = $this->entityType->getClass();
   }
 
   /**
@@ -98,30 +105,30 @@ abstract class EntityStorageBase extends EntityControllerBase implements EntityS
    * {@inheritdoc}
    */
   public function resetCache(array $ids = NULL) {
-    if ($this->cache && isset($ids)) {
+    if ($this->entityType->isStaticallyCacheable() && isset($ids)) {
       foreach ($ids as $id) {
-        unset($this->entityCache[$id]);
+        unset($this->entities[$id]);
       }
     }
     else {
-      $this->entityCache = array();
+      $this->entities = array();
     }
   }
 
   /**
    * Gets entities from the static cache.
    *
-   * @param $ids
+   * @param array $ids
    *   If not empty, return entities that match these IDs.
    *
-   * @return
+   * @return \Drupal\Core\Entity\EntityInterface[]
    *   Array of entities from the entity cache.
    */
-  protected function cacheGet($ids) {
+  protected function getFromStaticCache(array $ids) {
     $entities = array();
     // Load any available entities from the internal cache.
-    if ($this->cache && !empty($this->entityCache)) {
-      $entities += array_intersect_key($this->entityCache, array_flip($ids));
+    if ($this->entityType->isStaticallyCacheable() && !empty($this->entities)) {
+      $entities += array_intersect_key($this->entities, array_flip($ids));
     }
     return $entities;
   }
@@ -129,12 +136,12 @@ abstract class EntityStorageBase extends EntityControllerBase implements EntityS
   /**
    * Stores entities in the static entity cache.
    *
-   * @param $entities
+   * @param \Drupal\Core\Entity\EntityInterface[] $entities
    *   Entities to store in the cache.
    */
-  protected function cacheSet($entities) {
-    if ($this->cache) {
-      $this->entityCache += $entities;
+  protected function setStaticCache(array $entities) {
+    if ($this->entityType->isStaticallyCacheable()) {
+      $this->entities += $entities;
     }
   }
 
@@ -158,16 +165,17 @@ abstract class EntityStorageBase extends EntityControllerBase implements EntityS
    * {@inheritdoc}
    */
   public function create(array $values = array()) {
-    $entity_class = $this->entityType->getClass();
+    $entity_class = $this->entityClass;
     $entity_class::preCreate($this, $values);
 
-    $entity = $this->doCreate($entity_class, $values);
+    // Assign a new UUID if there is none yet.
+    if ($this->uuidKey && $this->uuidService && !isset($values[$this->uuidKey])) {
+      $values[$this->uuidKey] = $this->uuidService->generate();
+    }
+
+    $entity = $this->doCreate($values);
     $entity->enforceIsNew();
 
-    // Assign a new UUID if there is none yet.
-    if ($this->uuidKey && !isset($entity->{$this->uuidKey})) {
-      $entity->{$this->uuidKey} = $this->uuidService->generate();
-    }
     $entity->postCreate($this);
 
     // Modules might need to add or change the data initially held by the new
@@ -180,15 +188,13 @@ abstract class EntityStorageBase extends EntityControllerBase implements EntityS
   /**
    * Performs storage-specific creation of entities.
    *
-   * @param string $entity_class
-   *   The name of the entity type class.
    * @param array $values
    *   An array of values to set, keyed by property name.
    *
    * @return \Drupal\Core\Entity\EntityInterface
    */
-  protected function doCreate($entity_class, array $values) {
-    return new $entity_class($values, $this->entityTypeId);
+  protected function doCreate(array $values) {
+    return new $this->entityClass($values, $this->entityTypeId);
   }
 
   /**
@@ -213,8 +219,8 @@ abstract class EntityStorageBase extends EntityControllerBase implements EntityS
     $passed_ids = !empty($ids) ? array_flip($ids) : FALSE;
     // Try to load entities from the static cache, if the entity type supports
     // static caching.
-    if ($this->cache && $ids) {
-      $entities += $this->cacheGet($ids);
+    if ($this->entityType->isStaticallyCacheable() && $ids) {
+      $entities += $this->getFromStaticCache($ids);
       // If any entities were loaded, remove them from the ids still to load.
       if ($passed_ids) {
         $ids = array_keys(array_diff_key($passed_ids, $entities));
@@ -225,7 +231,7 @@ abstract class EntityStorageBase extends EntityControllerBase implements EntityS
     // is set to NULL (so we load all entities) or if there are any ids left to
     // load.
     if ($ids === NULL || $ids) {
-      $queried_entities = $this->doLoad($ids);
+      $queried_entities = $this->doLoadMultiple($ids);
     }
 
     // Pass all entities loaded from the database through $this->postLoad(),
@@ -236,10 +242,10 @@ abstract class EntityStorageBase extends EntityControllerBase implements EntityS
       $entities += $queried_entities;
     }
 
-    if ($this->cache) {
+    if ($this->entityType->isStaticallyCacheable()) {
       // Add entities to the cache.
       if (!empty($queried_entities)) {
-        $this->cacheSet($queried_entities);
+        $this->setStaticCache($queried_entities);
       }
     }
 
@@ -263,31 +269,29 @@ abstract class EntityStorageBase extends EntityControllerBase implements EntityS
    * @param array|null $ids
    *   (optional) An array of entity IDs, or NULL to load all entities.
    *
-   * @return mixed[]
-   *   Associative array of query results, keyed on the entity ID.
+   * @return \Drupal\Core\Entity\EntityInterface[]
+   *   Associative array of entities, keyed on the entity ID.
    */
-  abstract protected function doLoad(array $ids = NULL);
+  abstract protected function doLoadMultiple(array $ids = NULL);
 
   /**
    * Attaches data to entities upon loading.
    *
-   * @param array $queried_entities
+   * @param array $entities
    *   Associative array of query results, keyed on the entity ID.
    */
-  protected function postLoad(array &$queried_entities) {
-    $queried_entities = $this->mapFromStorageRecords($queried_entities);
-
-    $entity_class = $this->entityType->getClass();
-    $entity_class::postLoad($this, $queried_entities);
+  protected function postLoad(array &$entities) {
+    $entity_class = $this->entityClass;
+    $entity_class::postLoad($this, $entities);
     // Call hook_entity_load().
     foreach ($this->moduleHandler()->getImplementations('entity_load') as $module) {
       $function = $module . '_entity_load';
-      $function($queried_entities, $this->entityTypeId);
+      $function($entities, $this->entityTypeId);
     }
     // Call hook_TYPE_load().
     foreach ($this->moduleHandler()->getImplementations($this->entityTypeId . '_load') as $module) {
       $function = $module . '_' . $this->entityTypeId . '_load';
-      $function($queried_entities);
+      $function($entities);
     }
   }
 
@@ -301,10 +305,9 @@ abstract class EntityStorageBase extends EntityControllerBase implements EntityS
    *   An array of entity objects implementing the EntityInterface.
    */
   protected function mapFromStorageRecords(array $records) {
-    $class = $this->entityType->getClass();
     $entities = array();
     foreach ($records as $record) {
-      $entity = new $class($record, $this->entityTypeId);
+      $entity = new $this->entityClass($record, $this->entityTypeId);
       $entities[$entity->id()] = $entity;
     }
     return $entities;
@@ -319,7 +322,7 @@ abstract class EntityStorageBase extends EntityControllerBase implements EntityS
       return;
     }
 
-    $entity_class = $this->entityType->getClass();
+    $entity_class = $this->entityClass;
     $entity_class::preDelete($this, $entities);
     foreach ($entities as $entity) {
       $this->invokeHook('predelete', $entity);

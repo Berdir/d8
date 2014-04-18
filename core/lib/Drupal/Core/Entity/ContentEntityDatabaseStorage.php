@@ -99,11 +99,6 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
     $this->database = $database;
     $this->fieldInfo = $field_info;
 
-    // Check if the entity type supports IDs.
-    if ($this->entityType->hasKey('id')) {
-      $this->idKey = $this->entityType->getKey('id');
-    }
-
     // Check if the entity type supports UUIDs.
     $this->uuidKey = $this->entityType->getKey('uuid');
 
@@ -127,12 +122,14 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
   /**
    * {@inheritdoc}
    */
-  protected function doLoad(array $ids = NULL) {
+  protected function doLoadMultiple(array $ids = NULL) {
     // Build and execute the query.
-    return $this
+    $records = $this
       ->buildQuery($ids)
       ->execute()
       ->fetchAllAssoc($this->idKey);
+
+    return $this->mapFromStorageRecords($records);
   }
 
   /**

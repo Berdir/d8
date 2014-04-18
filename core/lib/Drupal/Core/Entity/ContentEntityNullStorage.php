@@ -27,7 +27,7 @@ class ContentEntityNullStorage extends ContentEntityStorageBase {
   /**
    * {@inheritdoc}
    */
-  protected function doLoad(array $ids = NULL) {
+  protected function doLoadMultiple(array $ids = NULL) {
   }
 
   /**

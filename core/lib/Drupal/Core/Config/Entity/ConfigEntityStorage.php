@@ -54,13 +54,6 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
   const MAX_ID_LENGTH = 166;
 
   /**
-   * The UUID service.
-   *
-   * @var \Drupal\Component\Uuid\UuidInterface
-   */
-  protected $uuidService;
-
-  /**
    * {@inheritdoc}
    */
   protected $uuidKey = 'uuid';
@@ -110,7 +103,6 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
   public function __construct(EntityTypeInterface $entity_type, ConfigFactoryInterface $config_factory, StorageInterface $config_storage, UuidInterface $uuid_service, LanguageManagerInterface $language_manager) {
     parent::__construct($entity_type);
 
-    $this->idKey = $this->entityType->getKey('id');
     $this->statusKey = $this->entityType->getKey('status');
 
     $this->configFactory = $config_factory;
@@ -163,7 +155,7 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
   /**
    * {@inheritdoc}
    */
-  protected function doLoad(array $ids = NULL) {
+  protected function doLoadMultiple(array $ids = NULL) {
     $prefix = $this->getConfigPrefix();
 
     // Get the names of the configuration entities we are going to load.
@@ -179,20 +171,20 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
     }
 
     // Load all of the configuration entities.
-    $result = array();
+    $records = array();
     foreach ($this->configFactory->loadMultiple($names) as $config) {
-      $result[$config->get($this->idKey)] = $config->get();
+      $records[$config->get($this->idKey)] = $config->get();
     }
-    return $result;
+    return $this->mapFromStorageRecords($records);
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function doCreate($entity_class, array $values) {
+  protected function doCreate(array $values) {
     // Set default language to site default if not provided.
     $values += array('langcode' => $this->languageManager->getDefaultLanguage()->id);
-    $entity = new $entity_class($values, $this->entityTypeId);
+    $entity = new $this->entityClass($values, $this->entityTypeId);
 
     // Default status to enabled.
     if (!empty($this->statusKey) && !isset($entity->{$this->statusKey})) {

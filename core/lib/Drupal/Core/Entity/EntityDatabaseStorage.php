@@ -74,9 +74,6 @@ class EntityDatabaseStorage extends EntityStorageBase {
     $this->database = $database;
     $this->uuidService = $uuid_service;
 
-    // Check if the entity type supports IDs.
-    $this->idKey = $this->entityType->getKey('id');
-
     // Check if the entity type supports UUIDs.
     $this->uuidKey = $this->entityType->getKey('uuid');
   }
@@ -84,12 +81,14 @@ class EntityDatabaseStorage extends EntityStorageBase {
   /**
    * {@inheritdoc}
    */
-  protected function doLoad(array $ids = NULL) {
+  protected function doLoadMultiple(array $ids = NULL) {
     // Build and execute the query.
-    return $this
+    $records = $this
       ->buildQuery($ids)
       ->execute()
       ->fetchAllAssoc($this->idKey, \PDO::FETCH_ASSOC);
+
+    return $this->mapFromStorageRecords($records);
   }
 
   /**
@@ -107,32 +106,6 @@ class EntityDatabaseStorage extends EntityStorageBase {
   }
 
   /**
-   * {@inheritdoc}
-   */
-  public function loadByProperties(array $values = array()) {
-    // Build a query to fetch the entity IDs.
-    $entity_query = \Drupal::entityQuery($this->entityTypeId);
-    $this->buildPropertyQuery($entity_query, $values);
-    $result = $entity_query->execute();
-    return $result ? $this->loadMultiple($result) : array();
-  }
-
-  /**
-   * Builds an entity query.
-   *
-   * @param \Drupal\Core\Entity\Query\QueryInterface $entity_query
-   *   EntityQuery instance.
-   * @param array $values
-   *   An associative array of properties of the entity, where the keys are the
-   *   property names and the values are the values those properties must have.
-   */
-  protected function buildPropertyQuery(QueryInterface $entity_query, array $values) {
-    foreach ($values as $name => $value) {
-      $entity_query->condition($name, $value);
-    }
-  }
-
-  /**
    * Builds the query to load the entity.
    *
    * @param array|null $ids
@@ -141,7 +114,7 @@ class EntityDatabaseStorage extends EntityStorageBase {
    * @return \Drupal\Core\Database\Query\Select
    *   A SelectQuery object for loading the entity.
    */
-  protected function buildQuery($ids, $revision_id = FALSE) {
+  protected function buildQuery($ids) {
     $query = $this->database->select($this->entityType->getBaseTable(), 'base');
 
     $query->addTag($this->entityTypeId . '_load_multiple');
