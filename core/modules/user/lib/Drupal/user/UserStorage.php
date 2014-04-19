@@ -126,9 +126,11 @@ class UserStorage extends ContentEntityDatabaseStorage implements UserStorageInt
    * {@inheritdoc}
    */
   public function addRoles(array $users) {
-    $result = $this->database->query('SELECT rid, uid FROM {users_roles} WHERE uid IN (:uids)', array(':uids' => array_keys($users)));
-    foreach ($result as $record) {
-      $users[$record->uid]->roles[] = $record->rid;
+    if ($users) {
+      $result = $this->database->query('SELECT rid, uid FROM {users_roles} WHERE uid IN (:uids)', array(':uids' => array_keys($users)));
+      foreach ($result as $record) {
+        $users[$record->uid]->roles[] = $record->rid;
+      }
     }
   }
 

@@ -266,15 +266,14 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
   public function loadRevision($revision_id) {
     // Build and execute the query.
     $query_result = $this->buildQuery(array(), $revision_id)->execute();
-    $queried_entities = $query_result->fetchAllAssoc($this->idKey);
+    $records = $query_result->fetchAllAssoc($this->idKey);
 
-    // Pass the loaded entities from the database through $this->postLoad(),
-    // which attaches fields (if supported by the entity type) and calls the
-    // entity type specific load callback, for example hook_node_load().
-    if (!empty($queried_entities)) {
-      $this->postLoad($queried_entities);
+    if (!empty($records)) {
+      // Convert the raw records to entity objects.
+      $entities = $this->mapFromStorageRecords($records);
+      $this->postLoad($entities);
+      return reset($entities);
     }
-    return reset($queried_entities);
   }
 
   /**
