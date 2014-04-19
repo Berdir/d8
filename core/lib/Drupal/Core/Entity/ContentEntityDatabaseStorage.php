@@ -150,6 +150,10 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
    *   An array of entity objects implementing the EntityInterface.
    */
   protected function mapFromStorageRecords(array $records) {
+    if (!$records) {
+      return array();
+    }
+
     $entities = array();
     foreach ($records as $id => $record) {
       $entities[$id] = array();
