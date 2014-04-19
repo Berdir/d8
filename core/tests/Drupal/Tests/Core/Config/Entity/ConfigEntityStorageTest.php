@@ -130,6 +130,10 @@ class ConfigEntityStorageTest extends UnitTestCase {
     $this->entityType->expects($this->any())
       ->method('getConfigPrefix')
       ->will($this->returnValue('the_config_prefix'));
+    $this->entityType->expects($this->any())
+      ->method('getClass')
+      ->will($this->returnValue(get_class($this->getMockEntity())));
+
 
     $this->moduleHandler = $this->getMock('Drupal\Core\Extension\ModuleHandlerInterface');
 
@@ -176,10 +180,6 @@ class ConfigEntityStorageTest extends UnitTestCase {
    * @covers ::doCreate()
    */
   public function testCreateWithPredefinedUuid() {
-    $this->entityType->expects($this->atLeastOnce())
-      ->method('getClass')
-      ->will($this->returnValue(get_class($this->getMockEntity())));
-
     $this->cacheBackend->expects($this->never())
       ->method('invalidateTags');
 
@@ -205,10 +205,6 @@ class ConfigEntityStorageTest extends UnitTestCase {
    * @return \Drupal\Core\Entity\EntityInterface
    */
   public function testCreate() {
-    $this->entityType->expects($this->atLeastOnce())
-      ->method('getClass')
-      ->will($this->returnValue(get_class($this->getMockEntity())));
-
     $this->cacheBackend->expects($this->never())
       ->method('invalidateTags');
 
@@ -584,9 +580,6 @@ class ConfigEntityStorageTest extends UnitTestCase {
       ->will($this->returnValue(array('foo')));
 
     $entity = $this->getMockEntity(array('id' => 'foo'));
-    $this->entityType->expects($this->atLeastOnce())
-      ->method('getClass')
-      ->will($this->returnValue(get_class($entity)));
 
     $entity->set('uuid', 'baz');
     $this->entityStorage->save($entity);
@@ -596,7 +589,7 @@ class ConfigEntityStorageTest extends UnitTestCase {
    * @covers ::load()
    * @covers ::postLoad()
    * @covers ::mapFromStorageRecords()
-   * @covers ::doLoad()
+   * @covers ::doLoadMultiple()
    */
   public function testLoad() {
     $config_object = $this->getMockBuilder('Drupal\Core\Config\Config')
@@ -617,10 +610,6 @@ class ConfigEntityStorageTest extends UnitTestCase {
       ->method('getImplementations')
       ->will($this->returnValue(array()));
 
-    $this->entityType->expects($this->atLeastOnce())
-      ->method('getClass')
-      ->will($this->returnValue(get_class($this->getMockEntity())));
-
     $entity = $this->entityStorage->load('foo');
     $this->assertInstanceOf('Drupal\Core\Entity\EntityInterface', $entity);
     $this->assertSame('foo', $entity->id());
@@ -630,7 +619,7 @@ class ConfigEntityStorageTest extends UnitTestCase {
    * @covers ::loadMultiple()
    * @covers ::postLoad()
    * @covers ::mapFromStorageRecords()
-   * @covers ::doLoad()
+   * @covers ::doLoadMultiple()
    */
   public function testLoadMultipleAll() {
     $foo_config_object = $this->getMockBuilder('Drupal\Core\Config\Config')
@@ -660,10 +649,6 @@ class ConfigEntityStorageTest extends UnitTestCase {
       ->method('getImplementations')
       ->will($this->returnValue(array()));
 
-    $this->entityType->expects($this->atLeastOnce())
-      ->method('getClass')
-      ->will($this->returnValue(get_class($this->getMockEntity())));
-
     $entities = $this->entityStorage->loadMultiple();
     $expected['foo'] = 'foo';
     $expected['bar'] = 'bar';
@@ -678,7 +663,7 @@ class ConfigEntityStorageTest extends UnitTestCase {
    * @covers ::loadMultiple()
    * @covers ::postLoad()
    * @covers ::mapFromStorageRecords()
-   * @covers ::doLoad()
+   * @covers ::doLoadMultiple()
    */
   public function testLoadMultipleIds() {
     $config_object = $this->getMockBuilder('Drupal\Core\Config\Config')
@@ -698,9 +683,6 @@ class ConfigEntityStorageTest extends UnitTestCase {
     $this->moduleHandler->expects($this->exactly(2))
       ->method('getImplementations')
       ->will($this->returnValue(array()));
-    $this->entityType->expects($this->atLeastOnce())
-      ->method('getClass')
-      ->will($this->returnValue(get_class($this->getMockEntity())));
 
     $entities = $this->entityStorage->loadMultiple(array('foo'));
     foreach ($entities as $id => $entity) {
@@ -731,10 +713,6 @@ class ConfigEntityStorageTest extends UnitTestCase {
    * @covers ::doDelete()
    */
   public function testDelete() {
-    $this->entityType->expects($this->atLeastOnce())
-      ->method('getClass')
-      ->will($this->returnValue(get_class($this->getMockEntity())));
-
     $entities = array();
     $configs = array();
     $config_map = array();
