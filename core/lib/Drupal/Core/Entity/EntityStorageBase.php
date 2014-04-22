@@ -266,6 +266,10 @@ abstract class EntityStorageBase extends EntityControllerBase implements EntityS
   /**
    * Performs storage-specific loading of entities.
    *
+   * Override this method to add custom functionality directly after loading.
+   * This is always called, while self::postLoad() is only called when there are
+   * actual results.
+   *
    * @param array|null $ids
    *   (optional) An array of entity IDs, or NULL to load all entities.
    *
@@ -314,6 +318,18 @@ abstract class EntityStorageBase extends EntityControllerBase implements EntityS
   }
 
   /**
+   * Determines if this entity already exists in storage.
+   *
+   * @param int|string $id
+   *   The original entity ID.
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity being saved.
+   *
+   * @return bool
+   */
+  abstract protected function has($id, EntityInterface $entity);
+
+  /**
    * {@inheritdoc}
    */
   public function delete(array $entities) {
@@ -335,6 +351,14 @@ abstract class EntityStorageBase extends EntityControllerBase implements EntityS
       $this->invokeHook('delete', $entity);
     }
   }
+
+  /**
+   * Performs storage-specific entity deletion.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface[] $entities
+   *   An array of entity objects to delete.
+   */
+  abstract protected function doDelete($entities);
 
   /**
    * {@inheritdoc}
@@ -399,26 +423,6 @@ abstract class EntityStorageBase extends EntityControllerBase implements EntityS
    *   returns SAVED_NEW or SAVED_UPDATED, depending on the operation performed.
    */
   abstract protected function doSave($id, EntityInterface $entity);
-
-  /**
-   * Determines if this entity already exists in storage.
-   *
-   * @param int|string $id
-   *   The original entity ID.
-   * @param \Drupal\Core\Entity\EntityInterface $entity
-   *   The entity being saved.
-   *
-   * @return bool
-   */
-  abstract protected function has($id, EntityInterface $entity);
-
-  /**
-   * Performs storage-specific entity deletion.
-   *
-   * @param \Drupal\Core\Entity\EntityInterface[] $entities
-   *   An array of entity objects to delete.
-   */
-  abstract protected function doDelete($entities);
 
   /**
    * Builds an entity query.
