@@ -9,12 +9,11 @@ namespace Drupal\Core\Entity;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\Query\QueryInterface;
+use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Language\Language;
 use Drupal\field\FieldInfo;
 use Drupal\field\FieldConfigUpdateForbiddenException;
-use Drupal\field\FieldConfigInterface;
-use Drupal\field\FieldInstanceConfigInterface;
 use Drupal\field\Entity\FieldConfig;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -888,8 +887,8 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
   /**
    * {@inheritdoc}
    */
-  public function onFieldCreate(FieldConfigInterface $field) {
-    $schema = $this->_fieldSqlSchema($field);
+  public function onFieldCreate(FieldStorageDefinitionInterface $storage_definition) {
+    $schema = $this->_fieldSqlSchema($storage_definition);
     foreach ($schema as $name => $table) {
       $this->database->schema()->createTable($name, $table);
     }
@@ -898,10 +897,10 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
   /**
    * {@inheritdoc}
    */
-  public function onFieldUpdate(FieldConfigInterface $field) {
-    $original = $field->original;
+  public function onFieldUpdate(FieldStorageDefinitionInterface $storage_definition) {
+    $original = $storage_definition->original;
 
-    if (!$field->hasData()) {
+    if (!$storage_definition->hasData()) {
       // There is no data. Re-create the tables completely.
 
       if ($this->database->supportsTransactionalDDL()) {
@@ -915,7 +914,7 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
         foreach ($original_schema as $name => $table) {
           $this->database->schema()->dropTable($name, $table);
         }
-        $schema = $this->_fieldSqlSchema($field);
+        $schema = $this->_fieldSqlSchema($storage_definition);
         foreach ($schema as $name => $table) {
           $this->database->schema()->createTable($name, $table);
         }
@@ -937,7 +936,7 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
       }
     }
     else {
-      if ($field->getColumns() != $original->getColumns()) {
+      if ($storage_definition->getColumns() != $original->getColumns()) {
         throw new FieldConfigUpdateForbiddenException("The SQL storage cannot change the schema for an existing field with data.");
       }
       // There is data, so there are no column changes. Drop all the prior
@@ -946,33 +945,33 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
       $table = static::_fieldTableName($original);
       $revision_table = static::_fieldRevisionTableName($original);
 
-      $schema = $field->getSchema();
+      $schema = $storage_definition->getSchema();
       $original_schema = $original->getSchema();
 
       foreach ($original_schema['indexes'] as $name => $columns) {
         if (!isset($schema['indexes'][$name]) || $columns != $schema['indexes'][$name]) {
-          $real_name = static::_fieldIndexName($field, $name);
+          $real_name = static::_fieldIndexName($storage_definition, $name);
           $this->database->schema()->dropIndex($table, $real_name);
           $this->database->schema()->dropIndex($revision_table, $real_name);
         }
       }
-      $table = static::_fieldTableName($field);
-      $revision_table = static::_fieldRevisionTableName($field);
+      $table = static::_fieldTableName($storage_definition);
+      $revision_table = static::_fieldRevisionTableName($storage_definition);
       foreach ($schema['indexes'] as $name => $columns) {
         if (!isset($original_schema['indexes'][$name]) || $columns != $original_schema['indexes'][$name]) {
-          $real_name = static::_fieldIndexName($field, $name);
+          $real_name = static::_fieldIndexName($storage_definition, $name);
           $real_columns = array();
           foreach ($columns as $column_name) {
             // Indexes can be specified as either a column name or an array with
             // column name and length. Allow for either case.
             if (is_array($column_name)) {
               $real_columns[] = array(
-                static::_fieldColumnName($field, $column_name[0]),
+                static::_fieldColumnName($storage_definition, $column_name[0]),
                 $column_name[1],
               );
             }
             else {
-              $real_columns[] = static::_fieldColumnName($field, $column_name);
+              $real_columns[] = static::_fieldColumnName($storage_definition, $column_name);
             }
           }
           $this->database->schema()->addIndex($table, $real_name, $real_columns);
@@ -985,17 +984,17 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
   /**
    * {@inheritdoc}
    */
-  public function onFieldDelete(FieldConfigInterface $field) {
+  public function onFieldDelete(FieldStorageDefinitionInterface $storage_definition) {
     // Mark all data associated with the field for deletion.
-    $table = static::_fieldTableName($field);
-    $revision_table = static::_fieldRevisionTableName($field);
+    $table = static::_fieldTableName($storage_definition);
+    $revision_table = static::_fieldRevisionTableName($storage_definition);
     $this->database->update($table)
       ->fields(array('deleted' => 1))
       ->execute();
 
     // Move the table to a unique name while the table contents are being
     // deleted.
-    $deleted_field = clone $field;
+    $deleted_field = clone $storage_definition;
     $deleted_field->deleted = TRUE;
     $new_table = static::_fieldTableName($deleted_field);
     $revision_new_table = static::_fieldRevisionTableName($deleted_field);
@@ -1006,17 +1005,17 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
   /**
    * {@inheritdoc}
    */
-  public function onInstanceDelete(FieldInstanceConfigInterface $instance) {
-    $field = $instance->getField();
+  public function onInstanceDelete(FieldDefinitionInterface $field_definition) {
+    $field = $field_definition->getField();
     $table_name = static::_fieldTableName($field);
     $revision_name = static::_fieldRevisionTableName($field);
     $this->database->update($table_name)
       ->fields(array('deleted' => 1))
-      ->condition('bundle', $instance->bundle)
+      ->condition('bundle', $field_definition->bundle)
       ->execute();
     $this->database->update($revision_name)
       ->fields(array('deleted' => 1))
-      ->condition('bundle', $instance->bundle)
+      ->condition('bundle', $field_definition->bundle)
       ->execute();
   }
 
@@ -1046,8 +1045,8 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
   /**
    * {@inheritdoc}
    */
-  protected function readFieldItemsToPurge(EntityInterface $entity, FieldInstanceConfigInterface $instance) {
-    $field = $instance->getField();
+  protected function readFieldItemsToPurge(EntityInterface $entity, FieldDefinitionInterface $field_definition) {
+    $field = $field_definition->getField();
     $table_name = static::_fieldTableName($field);
     $query = $this->database->select($table_name, 't', array('fetch' => \PDO::FETCH_ASSOC))
       ->condition('entity_id', $entity->id())
@@ -1061,8 +1060,8 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
   /**
    * {@inheritdoc}
    */
-  public function purgeFieldItems(EntityInterface $entity, FieldInstanceConfigInterface $instance) {
-    $field = $instance->getField();
+  public function purgeFieldItems(EntityInterface $entity, FieldDefinitionInterface $field_definition) {
+    $field = $field_definition->getField();
     $table_name = static::_fieldTableName($field);
     $revision_name = static::_fieldRevisionTableName($field);
     $this->database->delete($table_name)
@@ -1076,9 +1075,9 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
   /**
    * {@inheritdoc}
    */
-  public function onFieldPurge(FieldConfigInterface $field) {
-    $table_name = static::_fieldTableName($field);
-    $revision_name = static::_fieldRevisionTableName($field);
+  public function onFieldPurge(FieldStorageDefinitionInterface $storage_definition) {
+    $table_name = static::_fieldTableName($storage_definition);
+    $revision_name = static::_fieldRevisionTableName($storage_definition);
     $this->database->schema()->dropTable($table_name);
     $this->database->schema()->dropTable($revision_name);
   }
@@ -1090,8 +1089,8 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
    * strongly discouraged. This function is not considered part of the public
    * API and modules relying on it might break even in minor releases.
    *
-   * @param \Drupal\field\FieldConfigInterface $field
-   *   The field object
+   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   *   The field storage definition.
    * @param array $schema
    *   The field schema array. Mandatory for upgrades, omit otherwise.
    *
@@ -1101,17 +1100,17 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
    *
    * @see hook_schema()
    */
-  public static function _fieldSqlSchema(FieldConfigInterface $field, array $schema = NULL) {
-    if ($field->deleted) {
-      $description_current = "Data storage for deleted field {$field->uuid()} ({$field->entity_type}, {$field->getName()}).";
-      $description_revision = "Revision archive storage for deleted field {$field->uuid()} ({$field->entity_type}, {$field->getName()}).";
+  public static function _fieldSqlSchema(FieldStorageDefinitionInterface $storage_definition, array $schema = NULL) {
+    if ($storage_definition->deleted) {
+      $description_current = "Data storage for deleted field {$storage_definition->uuid()} ({$storage_definition->getTargetEntityTypeId()}, {$storage_definition->getName()}).";
+      $description_revision = "Revision archive storage for deleted field {$storage_definition->uuid()} ({$storage_definition->getTargetEntityTypeId()}, {$storage_definition->getName()}).";
     }
     else {
-      $description_current = "Data storage for {$field->entity_type} field {$field->getName()}.";
-      $description_revision = "Revision archive storage for {$field->entity_type} field {$field->getName()}.";
+      $description_current = "Data storage for {$storage_definition->getTargetEntityTypeId()} field {$storage_definition->getName()}.";
+      $description_revision = "Revision archive storage for {$storage_definition->getTargetEntityTypeId()} field {$storage_definition->getName()}.";
     }
 
-    $entity_type_id = $field->entity_type;
+    $entity_type_id = $storage_definition->getTargetEntityTypeId();
     $entity_manager = \Drupal::entityManager();
     $entity_type = $entity_manager->getDefinition($entity_type_id);
     $definitions = $entity_manager->getBaseFieldDefinitions($entity_type_id);
@@ -1199,39 +1198,39 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
     );
 
     if (!$schema) {
-      $schema = $field->getSchema();
+      $schema = $storage_definition->getSchema();
     }
 
     // Add field columns.
     foreach ($schema['columns'] as $column_name => $attributes) {
-      $real_name = static::_fieldColumnName($field, $column_name);
+      $real_name = static::_fieldColumnName($storage_definition, $column_name);
       $current['fields'][$real_name] = $attributes;
     }
 
     // Add indexes.
     foreach ($schema['indexes'] as $index_name => $columns) {
-      $real_name = static::_fieldIndexName($field, $index_name);
+      $real_name = static::_fieldIndexName($storage_definition, $index_name);
       foreach ($columns as $column_name) {
         // Indexes can be specified as either a column name or an array with
         // column name and length. Allow for either case.
         if (is_array($column_name)) {
           $current['indexes'][$real_name][] = array(
-            static::_fieldColumnName($field, $column_name[0]),
+            static::_fieldColumnName($storage_definition, $column_name[0]),
             $column_name[1],
           );
         }
         else {
-          $current['indexes'][$real_name][] = static::_fieldColumnName($field, $column_name);
+          $current['indexes'][$real_name][] = static::_fieldColumnName($storage_definition, $column_name);
         }
       }
     }
 
     // Add foreign keys.
     foreach ($schema['foreign keys'] as $specifier => $specification) {
-      $real_name = static::_fieldIndexName($field, $specifier);
+      $real_name = static::_fieldIndexName($storage_definition, $specifier);
       $current['foreign keys'][$real_name]['table'] = $specification['table'];
       foreach ($specification['columns'] as $column_name => $referenced) {
-        $sql_storage_column = static::_fieldColumnName($field, $column_name);
+        $sql_storage_column = static::_fieldColumnName($storage_definition, $column_name);
         $current['foreign keys'][$real_name]['columns'][$sql_storage_column] = $referenced;
       }
     }
@@ -1244,8 +1243,8 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
     $revision['fields']['revision_id']['description'] = 'The entity revision id this data is attached to';
 
     return array(
-      static::_fieldTableName($field) => $current,
-      static::_fieldRevisionTableName($field) => $revision,
+      static::_fieldTableName($storage_definition) => $current,
+      static::_fieldRevisionTableName($storage_definition) => $revision,
     );
   }
 
@@ -1259,23 +1258,23 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
    * support. Always call entity_load() before using the data found in the
    * table.
    *
-   * @param \Drupal\field\FieldConfigInterface $field
-   *   The field object.
+   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   *   The field storage definition.
    *
    * @return string
    *   A string containing the generated name for the database table.
    *
    */
-  static public function _fieldTableName(FieldConfigInterface $field) {
-    if ($field->deleted) {
+  static public function _fieldTableName(FieldStorageDefinitionInterface $storage_definition) {
+    if ($storage_definition->deleted) {
       // When a field is a deleted, the table is renamed to
       // {field_deleted_data_FIELD_UUID}. To make sure we don't end up with
       // table names longer than 64 characters, we hash the uuid and return the
       // first 10 characters so we end up with a short unique ID.
-      return "field_deleted_data_" . substr(hash('sha256', $field->uuid()), 0, 10);
+      return "field_deleted_data_" . substr(hash('sha256', $storage_definition->uuid()), 0, 10);
     }
     else {
-      return static::_generateFieldTableName($field, FALSE);
+      return static::_generateFieldTableName($storage_definition, FALSE);
     }
   }
 
@@ -1289,22 +1288,22 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
    * support. Always call entity_load() before using the data found in the
    * table.
    *
-   * @param \Drupal\field\FieldConfigInterface $field
-   *   The field object.
+   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   *   The field storage definition.
    *
    * @return string
    *   A string containing the generated name for the database table.
    */
-  static public function _fieldRevisionTableName(FieldConfigInterface $field) {
-    if ($field->deleted) {
+  static public function _fieldRevisionTableName(FieldStorageDefinitionInterface $storage_definition) {
+    if ($storage_definition->deleted) {
       // When a field is a deleted, the table is renamed to
       // {field_deleted_revision_FIELD_UUID}. To make sure we don't end up with
       // table names longer than 64 characters, we hash the uuid and return the
       // first 10 characters so we end up with a short unique ID.
-      return "field_deleted_revision_" . substr(hash('sha256', $field->uuid()), 0, 10);
+      return "field_deleted_revision_" . substr(hash('sha256', $storage_definition->uuid()), 0, 10);
     }
     else {
-      return static::_generateFieldTableName($field, TRUE);
+      return static::_generateFieldTableName($storage_definition, TRUE);
     }
   }
 
@@ -1314,17 +1313,17 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
    * The method accounts for a maximum table name length of 64 characters, and
    * takes care of disambiguation.
    *
-   * @param \Drupal\field\FieldConfigInterface $field
-   *   The field object.
+   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   *   The field storage definition.
    * @param bool $revision
    *   TRUE for revision table, FALSE otherwise.
    *
    * @return string
    *   The final table name.
    */
-  static protected function _generateFieldTableName(FieldConfigInterface $field, $revision) {
+  static protected function _generateFieldTableName(FieldStorageDefinitionInterface $storage_definition, $revision) {
     $separator = $revision ? '_revision__' : '__';
-    $table_name = $field->entity_type . $separator .  $field->name;
+    $table_name = $storage_definition->getTargetEntityTypeId() . $separator .  $storage_definition->getName();
     // Limit the string to 48 characters, keeping a 16 characters margin for db
     // prefixes.
     if (strlen($table_name) > 48) {
@@ -1332,8 +1331,8 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
       // field UUID.
       $separator = $revision ? '_r__' : '__';
       // Truncate to the same length for the current and revision tables.
-      $entity_type = substr($field->entity_type, 0, 34);
-      $field_hash = substr(hash('sha256', $field->uuid), 0, 10);
+      $entity_type = substr($storage_definition->getTargetEntityTypeId(), 0, 34);
+      $field_hash = substr(hash('sha256', $storage_definition->uuid), 0, 10);
       $table_name = $entity_type . $separator . $field_hash;
     }
     return $table_name;
@@ -1346,8 +1345,8 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
    * strongly discouraged. This function is not considered part of the public
    * API and modules relying on it might break even in minor releases.
    *
-   * @param \Drupal\field\FieldConfigInterface $field
-   *   The field structure
+   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   *   The field storage definition.
    * @param string $index
    *   The name of the index.
    *
@@ -1355,8 +1354,8 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
    *   A string containing a generated index name for a field data table that is
    *   unique among all other fields.
    */
-  static public function _fieldIndexName(FieldConfigInterface $field, $index) {
-    return $field->getName() . '_' . $index;
+  static public function _fieldIndexName(FieldStorageDefinitionInterface $storage_definition, $index) {
+    return $storage_definition->getName() . '_' . $index;
   }
 
   /**
@@ -1369,8 +1368,8 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
    * support. Always call entity_load() before using the data found in the
    * table.
    *
-   * @param \Drupal\field\FieldConfigInterface $field
-   *   The field object.
+   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   *   The field storage definition.
    * @param string $column
    *   The name of the column.
    *
@@ -1378,8 +1377,8 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
    *   A string containing a generated column name for a field data table that is
    *   unique among all other fields.
    */
-  static public function _fieldColumnName(FieldConfigInterface $field, $column) {
-    return in_array($column, FieldConfig::getReservedColumns()) ? $column : $field->getName() . '_' . $column;
+  static public function _fieldColumnName(FieldStorageDefinitionInterface $storage_definition, $column) {
+    return in_array($column, FieldConfig::getReservedColumns()) ? $column : $storage_definition->getName() . '_' . $column;
   }
 
 }

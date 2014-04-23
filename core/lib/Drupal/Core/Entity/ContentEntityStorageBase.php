@@ -8,8 +8,9 @@
 namespace Drupal\Core\Entity;
 
 use Drupal\Component\Utility\String;
+use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Field\PrepareCacheInterface;
-use Drupal\field\FieldConfigInterface;
 use Drupal\field\FieldInstanceConfigInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -277,32 +278,32 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Fie
   /**
    * {@inheritdoc}
    */
-  public function onFieldCreate(FieldConfigInterface $field) { }
+  public function onFieldCreate(FieldStorageDefinitionInterface $storage_definition) { }
 
   /**
    * {@inheritdoc}
    */
-  public function onFieldUpdate(FieldConfigInterface $field) { }
+  public function onFieldUpdate(FieldStorageDefinitionInterface $storage_definition) { }
 
   /**
    * {@inheritdoc}
    */
-  public function onFieldDelete(FieldConfigInterface $field) { }
+  public function onFieldDelete(FieldStorageDefinitionInterface $storage_definition) { }
 
   /**
    * {@inheritdoc}
    */
-  public function onInstanceCreate(FieldInstanceConfigInterface $instance) { }
+  public function onInstanceCreate(FieldDefinitionInterface $field_definition) { }
 
   /**
    * {@inheritdoc}
    */
-  public function onInstanceUpdate(FieldInstanceConfigInterface $instance) { }
+  public function onInstanceUpdate(FieldDefinitionInterface $field_definition) { }
 
   /**
    * {@inheritdoc}
    */
-  public function onInstanceDelete(FieldInstanceConfigInterface $instance) { }
+  public function onInstanceDelete(FieldDefinitionInterface $field_definition) { }
 
   /**
    * {@inheritdoc}
@@ -322,12 +323,12 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Fie
   /**
    * {@inheritdoc}
    */
-  public function onFieldItemsPurge(EntityInterface $entity, FieldInstanceConfigInterface $instance) {
-    if ($values = $this->readFieldItemsToPurge($entity, $instance)) {
-      $items = \Drupal::typedDataManager()->create($instance, $values, $instance->getName(), $entity);
+  public function onFieldItemsPurge(EntityInterface $entity, FieldDefinitionInterface $field_definition) {
+    if ($values = $this->readFieldItemsToPurge($entity, $field_definition)) {
+      $items = \Drupal::typedDataManager()->create($field_definition, $values, $field_definition->getName(), $entity);
       $items->delete();
     }
-    $this->purgeFieldItems($entity, $instance);
+    $this->purgeFieldItems($entity, $field_definition);
   }
 
   /**
@@ -338,29 +339,29 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Fie
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity.
-   * @param \Drupal\field\FieldInstanceConfigInterface $instance
+   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
    *   The field instance.
    *
    * @return array
    *   The field values, in their canonical array format (numerically indexed
    *   array of items, each item being a property/value array).
    */
-  abstract protected function readFieldItemsToPurge(EntityInterface $entity, FieldInstanceConfigInterface $instance);
+  abstract protected function readFieldItemsToPurge(EntityInterface $entity, FieldDefinitionInterface $field_definition);
 
   /**
    * Removes field data from storage during purge.
    *
    * @param EntityInterface $entity
    *   The entity whose values are being purged.
-   * @param FieldInstanceConfigInterface $instance
+   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
    *   The field whose values are bing purged.
    */
-  abstract protected function purgeFieldItems(EntityInterface $entity, FieldInstanceConfigInterface $instance);
+  abstract protected function purgeFieldItems(EntityInterface $entity, FieldDefinitionInterface $field_definition);
 
   /**
    * {@inheritdoc}
    */
-  public function onFieldPurge(FieldConfigInterface $field) { }
+  public function onFieldPurge(FieldStorageDefinitionInterface $storage_definition) { }
 
   /**
    * Checks translation statuses and invoke the related hooks if needed.
