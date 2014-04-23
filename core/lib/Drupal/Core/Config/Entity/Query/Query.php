@@ -122,6 +122,7 @@ class Query extends QueryBase implements QueryInterface {
 
     // Search the conditions for restrictions on entity IDs.
     $ids = array();
+    $id_condition = NULL;
     if ($this->condition->getConjunction() == 'AND') {
       foreach ($this->condition->conditions() as $condition) {
         if (is_string($condition['field']) && $condition['field'] == $this->entityType->getKey('id')) {
@@ -131,6 +132,9 @@ class Query extends QueryBase implements QueryInterface {
           }
           elseif ($operator == 'IN') {
             $ids = $condition['value'];
+          }
+          else {
+            $id_condition = $condition;
           }
           // We stop at the first restricting condition on ID. In the (weird)
           // case where there are additional restricting conditions, results
@@ -151,7 +155,43 @@ class Query extends QueryBase implements QueryInterface {
     }
     // If no restrictions on IDs were found, we need to parse all records.
     else {
-      $names = $this->configStorage->listAll($prefix);
+      $all_names = $this->configStorage->listAll($prefix);
+      // In case we have an ID condition, try to filter down the list of config
+      // objects to load.
+      if ($id_condition) {
+      $names = array();
+      foreach ($all_names as $name) {
+        $id = substr($name, $prefix_length);
+        switch ($id_condition['operator']) {
+          case '<>':
+            if ($id != $id_condition['value']) {
+              $names[] = $name;
+            }
+            break;
+          case 'STARTS_WITH':
+            if (strpos($id, $id_condition['value']) === 0) {
+              $names[] = $name;
+            }
+            break;
+          case 'CONTAINS':
+            if (strpos($id, $id_condition['value']) !== FALSE) {
+              $names[] = $name;
+            }
+            break;
+          case 'ENDS_WITH':
+            if (strrpos($id, $id_condition['value']) === strlen($id) - strlen($id_condition['value'])) {
+              $names[] = $name;
+            }
+            break;
+          default:
+            $names[] = $name;
+            break;
+        }
+      }
+      }
+      else {
+        $names = $all_names;
+      }
     }
 
     // Load the corresponding records.
