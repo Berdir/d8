@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\shortcut\ShortcutSetFormController.
+ * Contains \Drupal\shortcut\ShortcutSetForm.
  */
 
 namespace Drupal\shortcut;

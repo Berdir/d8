@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\shortcut\ShortcutFormController.
+ * Contains \Drupal\shortcut\ShortcutForm.
  */
 
 namespace Drupal\shortcut;
@@ -48,7 +48,7 @@ class ShortcutForm extends ContentEntityForm {
   }
 
   /**
-   * Overrides EntityFormController::buildEntity().
+   * {@inheritdoc}
    */
   public function buildEntity(array $form, array &$form_state) {
     $entity = parent::buildEntity($form, $form_state);

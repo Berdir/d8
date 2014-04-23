@@ -77,7 +77,7 @@ class MenuForm extends EntityForm {
   }
 
   /**
-   * Overrides Drupal\Core\Entity\EntityFormController::form().
+   * {@inheritdoc}
    */
   public function form(array $form, array &$form_state) {
     $menu = $this->entity;
