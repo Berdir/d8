@@ -119,6 +119,11 @@ class ImageItemTest extends FieldUnitTestBase {
     $this->image->delete();
     $entity = entity_create('entity_test', array('mame' => $this->randomName()));
     $entity->save();
+
+    // Test image item properties.
+    $expected = array('target_id', 'entity', 'alt', 'title', 'width', 'height');
+    $properties = $entity->getFieldDefinition('image_test')->getPropertyDefinitions();
+    $this->assertEqual(array_keys($properties), $expected);
   }
 
 }
