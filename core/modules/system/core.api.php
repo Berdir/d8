@@ -31,8 +31,9 @@
  *
  * @section store_retrieve Storing and retrieving data
  *
- * - @link config_state Configuration and State systems @endlink
  * - @link entity_api Entities @endlink
+ * - @link config_api Configuration API @endlink
+ * - @link state_api State API @endlink
  * - @link field Fields @endlink
  * - @link node_overview Node system @endlink
  * - @link views_overview Views @endlink
@@ -88,22 +89,136 @@
  * @}
  */
 
+/**
+ * @defgroup state_api State API
+ * @{
+ * Information about the State API.
+ *
+ * The State API is one of several methods in Drupal for storing information.
+ * See @link architecture Drupal's architecture topic @endlink for an
+ * overview of the different types of information.
+ *
+ * The basic entry point into the State API is \Drupal::state(), which returns
+ * an object of class \Drupal\Core\State\StateInterface. This class has
+ * methods for storing and retrieving state information; each piece of state
+ * information is associated with a string-valued key. Example:
+ * @code
+ * // Get the state class.
+ * $state = \Drupal::state();
+ * // Find out when cron was last run; the key is 'system.cron_last'.
+ * $time = $state->get('system.cron_last');
+ * // Set the cron run time to the current request time.
+ * $state->set('system_cron_last', REQUEST_TIME);
+ * @endcode
+ *
+ * For more on the State API, see https://drupal.org/developing/api/8/state
+ * @}
+ */
 
 /**
- * @defgroup config_state Configuration and State Systems
+ * @defgroup config_api Configuration API
  * @{
- * Information about the Configuration system and the State system.
+ * Information about the Configuration API.
  *
- * @todo write this
+ * The Configuration API is one of several methods in Drupal for storing
+ * information. See @link architecture Drupal's architecture topic @endlink for
+ * an overview of the different types of information. The sections below have
+ * more information about the configuration API; see
+ * https://drupal.org/developing/api/8/configuration for more details.
  *
- * This topic needs to describe simple configuration, configuration entities,
- * and the state system, at least at an overview level, and link to more
- * information (either drupal.org or more detailed topics in the API docs).
+ * @section sec_storage Configuration storage
+ * In Drupal, the active configuration information can be stored in files or in
+ * the database. Module developers do not generally need to worry about which is
+ * in use on a particular site; they should use the configuration API to access
+ * the active configuration at run time, which will automatically use the
+ * correct storage. Configuration can be transferred between sites, imported,
+ * and exported using files.
  *
- * See https://drupal.org/node/1667894
+ * @section sec_yaml Configuration YAML files
+ * The file storage format for configuration information in Drupal is
+ * @link http://en.wikipedia.org/wiki/YAML YAML files. @endlink Configuration is
+ * divided into files, each containing a related set of configuration
+ * settings. Some modules will only have one configuration file containing all
+ * of the settings for the module; some will have several. The file name,
+ * without the .yml extension, corresponds to the name of the configuration
+ * object. (If the active configuration for a site is stored in the database,
+ * the logical separation of configuration into files still applies.)
  *
- * Additional documentation paragraphs need to be written, and functions,
- * classes, and interfaces need to be added to this topic.
+ * Each module needs to define its default configuration by putting
+ * configuration files in the config/install directory under the top-level
+ * module directory, so look there in most Core modules for examples. This is
+ * true regardless of whether a particular site is using the database or files
+ * for its active configuration storage.
+ *
+ * Each configuration file has a specific structure, which is expressed as a
+ * YAML-based configuration schema. The configuration schema details the
+ * structure of the configuration, its data types, and which of its values need
+ * to be translatable. Each module needs to define its configuration schema in
+ * files in the config/schema directory under the top-level module directory, so
+ * look there in most Core modules for examples.
+ *
+ * @section sec_simple Simple configuration
+ * The simple configuration API should be used for information that will always
+ * have exactly one copy or version. For instance, if your module has a
+ * setting that is either on or off, then this is only defined once, and it
+ * would be a Boolean-valued simple configuration setting.
+ *
+ * The first task in using the simple configuration API is to define the
+ * configuration file structure, file name, and schema of your settings (see
+ * @ref sec_yaml above). Once you have done that, you can retrieve the
+ * active configuration object that corresponds to configuration file
+ * mymodule.foo.yml with a call to:
+ * @code
+ * $config = \Drupal::config('mymodule.foo');
+ * @endcode
+ *
+ * This will be an object of class \Drupal\Core\Config\Config, which has methods
+ * for getting and setting configuration information.  For instance, if your
+ * YAML file structure looks like this:
+ * @code
+ * enabled: '0'
+ * bar:
+ *   baz: 'string1'
+ *   boo: 34
+ * @endcode
+ * you can make calls such as:
+ * @code
+ * // Get a single value.
+ * $enabled = $config->get('enabled');
+ * // Get an associative array.
+ * $bar = $config->get('bar');
+ * // Get one element of the array.
+ * $bar_baz = $config->get('bar.baz');
+ * // Update a value. Nesting works the same as get().
+ * $config->set('bar.baz', 'string2');
+ * // Nothing actually happens with set() until you call save().
+ * $config->save();
+ * @endcode
+ *
+ * @section sec_entity Configuration entities
+ * In contrast to the simple configuration settings described in the previous
+ * section, if your module allows users to create zero or more items (where
+ * "items" are things like content type definitions, view definitions, and the
+ * like), then you need to define a configuration entity type to store your
+ * configuration. Creating an entity type, loading entites, and querying them
+ * are outlined in the @link entity_api Entity API topic. @endlink Here are a
+ * few additional steps and notes specific to configuration entities:
+ * - For examples, look for classes that implement
+ *   \Drupal\Core\Config\Entity\ConfigEntityInterface -- one good example is
+ *   the \Drupal\user\Entity\Role entity type.
+ * - In the entity type annotation, you will need to define a 'config_prefix'
+ *   string. When Drupal stores a configuration item, it will be given a name
+ *   composed of your module name, your chosen config prefix, and the ID of
+ *   the individual item, separated by '.'. For example, in the Role entity,
+ *   the config prefix is 'role', so one configuration item might be named
+ *   user.role.anonymous, with configuration file user.role.anonymous.yml.
+ * - You will need to define the schema for your configuration in your
+ *   modulename.schema.yml file, with an entry for 'modulename.config_prefix.*'.
+ *   For example, for the Role entity, the file user.schema.yml has an entry
+ *   user.role.*; see @ref sec_yaml above for more information.
+ * - Your module may also provide a few configuration items to be installed by
+ *   default, by adding configuration files to the module's config/install
+ *   directory; see @ref sec_yaml above for more information.
  * @}
  */
 
@@ -112,14 +227,70 @@
  * @{
  * Describes how to define and manipulate content and configuration entities.
  *
- * @todo write this
+ * @todo Add an overview here, describing what an entity is, bundles, entity
+ *   types, etc. at an overview level. And link to more detailed documentation:
+ *   https://drupal.org/developing/api/entity
  *
- * Additional documentation paragraphs need to be written, and functions,
- * classes, and interfaces need to be added to this topic. Should describe
- * bundles, entity types, configuration vs. content entities, etc. at an
- * overview level. And link to more detailed documentation.
+ * @section types Types of entities
+ * Entities can be used to store content or configuration information. See the
+ * @link architecture Drupal's architecture topic @endlink for an overview of
+ * the different types of information, and the
+ * @link config_api Configuration API topic @endlink for more about the
+ * configuration API. Defining and manipulating content and configuration
+ * entities is very similar, and this is described in the sections below.
  *
- * See https://drupal.org/developing/api/entity
+ * @section define Defining an entity type
+ *
+ * @todo This section was written for Config entities. Add information about
+ *   content entities to each item, and add additional items that are relevant
+ *   to content entities, making sure to say they are not needed for config
+ *   entities, such as view page controllers, etc.
+ *
+ * Here are the steps to follow to define a new entity type:
+ * - Choose a unique machine name, or ID, for your entity type. This normally
+ *   starts with your module's machine name.
+ * - Define an interface for your entity's get/set methods, extending either
+ *   \Drupal\Core\Config\Entity\ConfigEntityInterface or [content entity
+ *   interface].
+ * - Define a class for your entity, implementing your interface and extending
+ *   either \Drupal\Core\Config\Entity\ConfigEntityBase or [content entity
+ *   class] , with annotation for \@ConfigEntityType or [content entity
+ *   annotation] in its documentation block.
+ * - The 'id' annotation gives the entity type ID, and the 'label' annotation
+ *   gives the human-readable name of the entity type.
+ * - The annotation will refer to several controller classes, which you will
+ *   also need to define:
+ *   - list_builder: Define a class that extends
+ *     \Drupal\Core\Config\Entity\ConfigEntityListBuilder or [content entity
+       list builder], to provide an administrative overview for your entities.
+ *   - add and edit forms, or default form: Define a class (or two) that
+ *     extend(s) \Drupal\Core\Entity\EntityFormController to provide add and
+ *     edit forms for your entities.
+ *   - delete form: Define a class that extends
+ *     \Drupal\Core\Entity\EntityConfirmFormBase to provide a delete
+ *     confirmation form for your entities.
+ *   - access: If your configuration entity has complex permissions, you might
+ *     need an access controller, implementing
+ *     \Drupal\Core\Entity\EntityAccessControllerInterface, but most entities
+ *     can just use the 'admin_permission' annotation instead.
+ *
+ * @section load_query Loading and querying entities
+ * To load entities, use the entity storage manager, which is a class
+ * implementing \Drupal\Core\Entity\EntityStorageInterface that you can
+ * retrieve with:
+ * @code
+ * $storage = \Drupal::entityManager()->getStorage('your_entity_type');
+ * @endcode
+ *
+ * To query to find entities to load, use an entity query, which is a class
+ * implementing \Drupal\Core\Entity\Query\QueryInterface that you can retrieve
+ * with:
+ * @code
+ * $storage = \Drupal::entityQuery('your_entity_type');
+ * @endcode
+ *
+ * @todo Add additional relevant classes and interfaces to this topic using
+ *   ingroup.
  * @}
  */
 
@@ -448,6 +619,30 @@
  * classes, and interfaces need to be added to this topic.
  *
  * Should include: modules, info.yml files, location of files, etc.
+ *
+ * @section Types of information in Drupal
+ * Drupal has several distinct types of information, each with its own methods
+ * for storage and retrieval:
+ * - Content: Information meant to be displayed on your site: articles, basic
+ *   pages, images, files, custom blocks, etc. Content is stored and accessed
+ *   using @link entity_api Entities @endlink.
+ * - Session: Information about individual users' interactions with the site,
+ *   such as whether they are logged in. This is really "state" information, but
+ *   it is not stored the same way so it's a separate type here. Session
+ *   information is managed ...
+ * - State: Information of a temporary nature, generally machine-generated and
+ *   not human-edited, about the current state of your site. Examples: the time
+ *   when Cron was last run, whether node access permissions need rebuilding,
+ *   etc. See @link state_api the State API topic @endlink for more information.
+ * - Configuration: Information about your site that is generally (or at least
+ *   can be) human-edited, but is not Content, and is meant to be relatively
+ *   permanent. Examples: the name of your site, the content types and views
+ *   you have defined, etc. See
+ *   @link config_api the Configuration API topic @endlink for more information.
+ *
+ * @todo Add something relevant to the list item about sessions.
+ * @todo Add some information about Settings, the key-value store in general,
+ *   and maybe the cache to this list (not sure if cache belongs here?).
  * @}
  */
 
