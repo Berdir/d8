@@ -37,9 +37,6 @@ class ActionManager extends DefaultPluginManager {
    */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, LanguageManager $language_manager, ModuleHandlerInterface $module_handler) {
     parent::__construct('Plugin/Action', $namespaces, $module_handler, 'Drupal\Core\Annotation\Action');
-    $this->discovery = new AnnotatedClassDiscovery('Plugin/Action', $namespaces, 'Drupal\Core\Annotation\Action');
-    $this->discovery = new AlterDecorator($this->discovery, 'action_info');
-
     $this->alterInfo('action_info');
     $this->setCacheBackend($cache_backend, $language_manager, 'action_info');
   }
