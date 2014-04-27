@@ -38,6 +38,7 @@ class FieldAttachOtherTest extends FieldUnitTestBase {
 
   public function setUp() {
     parent::setUp();
+    $this->installSchema('entity_test', array('entity_test_rev', 'entity_test_rev_revision'));
     $this->createFieldWithInstance();
   }
 
@@ -197,8 +198,8 @@ class FieldAttachOtherTest extends FieldUnitTestBase {
     $this->assertFalse(\Drupal::cache('entity')->get($cid), 'Non-cached: no cache entry on insert and load');
 
     // Cacheable entity type.
-    $entity_type = 'entity_test_cache';
-    $this->createFieldWithInstance('_2', 'entity_test_cache');
+    $entity_type = 'entity_test_rev';
+    $this->createFieldWithInstance('_2', $entity_type);
     entity_info_cache_clear();
 
     $entity_init = entity_create($entity_type, array(
@@ -225,10 +226,6 @@ class FieldAttachOtherTest extends FieldUnitTestBase {
 
     // Update with different values, and check that the cache entry is wiped.
     $values = $this->_generateTestFieldValues($this->field_2->getCardinality());
-    $entity = entity_create($entity_type, array(
-      'type' => $entity_type,
-      'id' => $entity->id(),
-    ));
     $entity->{$this->field_name_2} = $values;
     $entity->save();
     $this->assertFalse(\Drupal::cache('entity')->get($cid), 'Cached: no cache entry on update');
@@ -240,10 +237,6 @@ class FieldAttachOtherTest extends FieldUnitTestBase {
     $this->assertEqual($cache->data[$langcode][$this->field_name_2], $values, 'Cached: correct cache entry on load');
 
     // Create a new revision, and check that the cache entry is wiped.
-    $entity = entity_create($entity_type, array(
-      'type' => $entity_type,
-      'id' => $entity->id(),
-    ));
     $values = $this->_generateTestFieldValues($this->field_2->getCardinality());
     $entity->{$this->field_name_2} = $values;
     $entity->setNewRevision();

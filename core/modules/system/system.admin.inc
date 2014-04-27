@@ -5,56 +5,11 @@
  * Admin page callbacks for the system module.
  */
 
+use Drupal\Component\Utility\Xss;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Template\Attribute;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-
-/**
- * Menu callback; Set the default theme.
- */
-function system_theme_default() {
-  $request = \Drupal::request();
-  $theme = $request->get('theme');
-  if (!empty($theme)) {
-    // Get current list of themes.
-    $themes = list_themes();
-
-    // Check if the specified theme is one recognized by the system.
-    if (!empty($themes[$theme])) {
-      // Enable the theme if it is currently disabled.
-      if (empty($themes[$theme]->status)) {
-       theme_enable(array($theme));
-      }
-      // Set the default theme.
-      \Drupal::config('system.theme')
-        ->set('default', $theme)
-        ->save();
-
-      \Drupal::service('router.builder')->setRebuildNeeded();
-
-      // The status message depends on whether an admin theme is currently in use:
-      // a value of 0 means the admin theme is set to be the default theme.
-      $admin_theme = \Drupal::config('system.theme')->get('admin');
-      if ($admin_theme != 0 && $admin_theme != $theme) {
-        drupal_set_message(t('Please note that the administration theme is still set to the %admin_theme theme; consequently, the theme on this page remains unchanged. All non-administrative sections of the site, however, will show the selected %selected_theme theme by default.', array(
-          '%admin_theme' => $themes[$admin_theme]->info['name'],
-          '%selected_theme' => $themes[$theme]->info['name'],
-        )));
-      }
-      else {
-        drupal_set_message(t('%theme is now the default theme.', array('%theme' => $themes[$theme]->info['name'])));
-      }
-    }
-    else {
-      drupal_set_message(t('The %theme theme was not found.', array('%theme' => $theme)), 'error');
-    }
-    return new RedirectResponse(url('admin/appearance', array('absolute' => TRUE)));
-  }
-  throw new AccessDeniedHttpException();
-}
 
 /**
  * Recursively check compatibility.
@@ -105,7 +60,7 @@ function template_preprocess_admin_block_content(&$variables) {
     foreach ($variables['content'] as $key => $item) {
       $variables['content'][$key]['link'] = l($item['title'], $item['link_path'], $item['localized_options']);
       if (!$compact && isset($item['description'])) {
-        $variables['content'][$key]['description'] = filter_xss_admin($item['description']);
+        $variables['content'][$key]['description'] = Xss::filterAdmin($item['description']);
       }
       else {
         $variables['content'][$key]['description'] = FALSE;
@@ -333,7 +288,7 @@ function theme_system_modules_details($variables) {
     $col4 = drupal_render($details);
     $row[] = array('class' => array('description', 'expand'), 'data' => $col4);
 
-    $rows[] = $row;
+    $rows[] = $module['#attributes'] + array('data' => $row);
   }
 
   $table = array(
@@ -342,19 +297,6 @@ function theme_system_modules_details($variables) {
     '#rows' => $rows,
   );
   return drupal_render($table);
-}
-
-/**
- * Returns HTML for a message about incompatible modules.
- *
- * @param $variables
- *   An associative array containing:
- *   - message: The form array representing the currently disabled modules.
- *
- * @ingroup themeable
- */
-function theme_system_modules_incompatible($variables) {
-  return '<div class="incompatible">' . $variables['message'] . '</div>';
 }
 
 /**
@@ -395,7 +337,7 @@ function theme_system_modules_uninstall($variables) {
     }
     $rows[] = array(
       array('data' => drupal_render($form['uninstall'][$module]), 'align' => 'center'),
-      '<strong><label for="' . $form['uninstall'][$module]['#id'] . '">' . drupal_render($form['modules'][$module]['name']) . '</label></strong>',
+      '<label for="' . $form['uninstall'][$module]['#id'] . '" class="module-name table-filter-text-source">' . drupal_render($form['modules'][$module]['name']) . '</label>',
       array('data' => drupal_render($form['modules'][$module]['description']) . $disabled_message, 'class' => array('description')),
     );
   }
@@ -406,7 +348,8 @@ function theme_system_modules_uninstall($variables) {
     '#rows' => $rows,
     '#empty' => t('No modules are available to uninstall.'),
   );
-  $output  = drupal_render($table);
+  $output = drupal_render($form['filters']);
+  $output .= drupal_render($table);
   $output .= drupal_render_children($form);
 
   return $output;

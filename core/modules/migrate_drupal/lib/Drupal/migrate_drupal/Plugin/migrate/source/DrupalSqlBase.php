@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\migrate\Plugin\migrate\source\d6\Drupal6SqlBase.
+ * Contains \Drupal\migrate_drupal\Plugin\migrate\source\Drupal6SqlBase.
  */
 
 namespace Drupal\migrate_drupal\Plugin\migrate\source;
@@ -62,7 +62,7 @@ abstract class DrupalSqlBase extends SqlBase implements ContainerFactoryPluginIn
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration = NULL) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration = NULL) {
     $plugin = new static(
       $configuration,
       $plugin_id,

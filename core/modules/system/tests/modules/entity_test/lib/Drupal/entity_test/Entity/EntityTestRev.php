@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\entity_test\Entity\EntityTestRev.
+ * Contains \Drupal\entity_test\Entity\EntityTestRev.
  */
 
 namespace Drupal\entity_test\Entity;
@@ -20,9 +20,10 @@ use Drupal\entity_test\Entity\EntityTest;
  *   controllers = {
  *     "access" = "Drupal\entity_test\EntityTestAccessHandler",
  *     "form" = {
- *       "default" = "Drupal\entity_test\EntityTestFormController"
+ *       "default" = "Drupal\entity_test\EntityTestForm",
+ *       "delete" = "Drupal\entity_test\EntityTestDeleteForm"
  *     },
- *     "translation" = "Drupal\content_translation\ContentTranslationController"
+ *     "translation" = "Drupal\content_translation\ContentTranslationHandler"
  *   },
  *   base_table = "entity_test_rev",
  *   revision_table = "entity_test_rev_revision",
@@ -36,18 +37,12 @@ use Drupal\entity_test\Entity\EntityTest;
  *   },
  *   links = {
  *     "canonical" = "entity_test.edit_entity_test_rev",
+ *     "delete-form" = "entity_test.delete_entity_test_rev",
  *     "edit-form" = "entity_test.edit_entity_test_rev"
  *   }
  * )
  */
 class EntityTestRev extends EntityTest {
-
-  /**
-   * Implements Drupal\Core\Entity\EntityInterface::getRevisionId().
-   */
-  public function getRevisionId() {
-    return $this->get('revision_id')->value;
-  }
 
   /**
    * {@inheritdoc}

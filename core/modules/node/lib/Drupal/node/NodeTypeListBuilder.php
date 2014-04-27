@@ -31,7 +31,7 @@ class NodeTypeListBuilder extends ConfigEntityListBuilder {
   protected $urlGenerator;
 
   /**
-   * Constructs a NodeTypeFormController object.
+   * Constructs a NodeTypeForm object.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
    *   The entity type definition.
@@ -83,8 +83,8 @@ class NodeTypeListBuilder extends ConfigEntityListBuilder {
   /**
    * {@inheritdoc}
    */
-  public function getOperations(EntityInterface $entity) {
-    $operations = parent::getOperations($entity);
+  public function getDefaultOperations(EntityInterface $entity) {
+    $operations = parent::getDefaultOperations($entity);
     // Place the edit operation after the operations added by field_ui.module
     // which have the weights 15, 20, 25.
     if (isset($operations['edit'])) {

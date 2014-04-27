@@ -1,8 +1,11 @@
 <?php
+/**
+ * @file
+ * Functions that need to be loaded on every Drupal request.
+ */
 
 use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\NestedArray;
-use Drupal\Component\Utility\Settings;
 use Drupal\Component\Utility\String;
 use Drupal\Component\Utility\Timer;
 use Drupal\Component\Utility\Unicode;
@@ -11,6 +14,7 @@ use Drupal\Core\DrupalKernel;
 use Drupal\Core\Database\Database;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Extension\ExtensionDiscovery;
+use Drupal\Core\Site\Settings;
 use Drupal\Core\Utility\Title;
 use Drupal\Core\Utility\Error;
 use Symfony\Component\ClassLoader\ApcClassLoader;
@@ -24,11 +28,6 @@ use Drupal\Core\Language\Language;
 use Drupal\Core\Lock\DatabaseLockBackend;
 use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Core\Session\AnonymousUserSession;
-
-/**
- * @file
- * Functions that need to be loaded on every Drupal request.
- */
 
 /**
  * Minimum supported version of PHP.
@@ -560,9 +559,11 @@ function _drupal_request_initialize() {
  * the above, depending on where the module is located.
  *
  * @param $type
- *   The type of the item (theme, theme_engine, module, profile).
+ *   The type of the item; one of 'core', 'profile', 'module', 'theme', or
+ *   'theme_engine'.
  * @param $name
- *   The name of the item for which the filename is requested.
+ *   The name of the item for which the filename is requested. Ignored for
+ *   $type 'core'.
  * @param $filename
  *   The filename of the item if it is to be set explicitly rather
  *   than by consulting the database.
@@ -574,6 +575,14 @@ function drupal_get_filename($type, $name, $filename = NULL) {
   // The location of files will not change during the request, so do not use
   // drupal_static().
   static $files = array();
+
+  // Type 'core' only exists to simplify application-level logic; it always maps
+  // to the /core directory, whereas $name is ignored. It is only requested via
+  // drupal_get_path(). /core/core.info.yml does not exist, but is required
+  // since drupal_get_path() returns the dirname() of the returned pathname.
+  if ($type === 'core') {
+    return 'core/core.info.yml';
+  }
 
   // Profiles are converted into modules in system_rebuild_module_data().
   // @todo Remove false-exposure of profiles as modules.
@@ -1456,7 +1465,9 @@ function drupal_handle_request($test_only = FALSE) {
 
   // Create a request object from the HttpFoundation.
   $request = Request::createFromGlobals();
-  \Drupal::getContainer()->set('request', $request);
+  $container = \Drupal::getContainer();
+  $container->set('request', $request);
+  $container->get('request_stack')->push($request);
 
   drupal_bootstrap(DRUPAL_BOOTSTRAP_CODE);
 
@@ -1606,7 +1617,9 @@ function _drupal_bootstrap_kernel() {
     $kernel = new DrupalKernel('prod', drupal_classloader());
     $kernel->boot();
     $request = Request::createFromGlobals();
-    \Drupal::getContainer()->set('request', $request);
+    $container = \Drupal::getContainer();
+    $container->set('request', $request);
+    $container->get('request_stack')->push($request);
   }
 }
 
@@ -2111,7 +2124,10 @@ function drupal_classloader($class_loader = NULL) {
  */
 function drupal_classloader_register($name, $path) {
   $loader = drupal_classloader();
-  $loader->add('Drupal\\' . $name, DRUPAL_ROOT . '/' . $path . '/lib');
+  $loader->addPsr4('Drupal\\' . $name . '\\', array(
+    DRUPAL_ROOT . '/' . $path . '/lib/Drupal/' . $name,
+    DRUPAL_ROOT . '/' . $path . '/src',
+  ));
 }
 
 /**
@@ -2163,12 +2179,12 @@ function drupal_classloader_register($name, $path) {
  *
  * Example:
  * @code
- * function drupal_session_started($set = NULL) {
- *   static $session_started = FALSE;
- *   if (isset($set)) {
- *     $session_started = $set;
+ * function mymodule_log_stream_handle($new_handle = NULL) {
+ *   static $handle;
+ *   if (isset($new_handle)) {
+ *     $handle = $new_handle;
  *   }
- *   return $session_started && session_id();
+ *   return $handle;
  * }
  * @endcode
  *

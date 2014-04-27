@@ -37,9 +37,6 @@ interface MenuTreeInterface {
    * specified in calls to static::setPath(), the preferred link will be
    * overridden by the corresponding path returned by static::getPath().
    *
-   * Setting this path does not affect the main content; for that use
-   * menu_set_active_item() instead.
-   *
    * @param string $menu_name
    *   The name of the affected menu tree.
    * @param string $path
@@ -58,6 +55,17 @@ interface MenuTreeInterface {
    *   static::setPath(), NULL is returned.
    */
   public function getPath($menu_name);
+
+  /**
+   * Gets the active trail IDs of the specified menu tree.
+   *
+   * @param string $menu_name
+   *   The menu name of the requested tree.
+   *
+   * @return array
+   *   An array containing the active trail: a list of mlids.
+   */
+  public function getActiveTrailIds($menu_name);
 
   /**
    * Sorts and returns the built data representing a menu tree.

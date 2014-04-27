@@ -1293,29 +1293,30 @@ function form_pre_render_checkbox($element) {
 }
 
 /**
- * Returns HTML for a set of checkbox form elements.
+ * Prepares variables for checkboxes templates.
  *
- * @param $variables
+ * Default template: checkboxes.html.twig.
+ *
+ * @param array $variables
  *   An associative array containing:
  *   - element: An associative array containing the properties of the element.
  *     Properties used: #children, #attributes.
- *
- * @ingroup themeable
  */
-function theme_checkboxes($variables) {
+function template_preprocess_checkboxes(&$variables) {
   $element = $variables['element'];
-  $attributes = array();
+  $variables['attributes'] = array();
   if (isset($element['#id'])) {
-    $attributes['id'] = $element['#id'];
+    $variables['attributes']['id'] = $element['#id'];
   }
-  $attributes['class'][] = 'form-checkboxes';
+  $variables['attributes']['class'] = array();
+  $variables['attributes']['class'][] = 'form-checkboxes';
   if (!empty($element['#attributes']['class'])) {
-    $attributes['class'] = array_merge($attributes['class'], $element['#attributes']['class']);
+    $variables['attributes']['class'] = array_merge($variables['attributes']['class'], $element['#attributes']['class']);
   }
   if (isset($element['#attributes']['title'])) {
-    $attributes['title'] = $element['#attributes']['title'];
+    $variables['attributes']['title'] = $element['#attributes']['title'];
   }
-  return '<div' . new Attribute($attributes) . '>' . (!empty($element['#children']) ? $element['#children'] : '') . '</div>';
+  $variables['children'] = $element['#children'];
 }
 
 /**
@@ -2623,7 +2624,7 @@ function form_validate_url(&$element, &$form_state) {
   $value = trim($element['#value']);
   form_set_value($element, $value, $form_state);
 
-  if ($value !== '' && !valid_url($value, TRUE)) {
+  if ($value !== '' && !UrlHelper::isValid($value, TRUE)) {
     form_error($element, $form_state, t('The URL %url is not valid.', array('%url' => $value)));
   }
 }
@@ -2964,7 +2965,7 @@ function theme_form_element_label($variables) {
     $required = drupal_render($marker);
   }
 
-  $title = filter_xss_admin($element['#title']);
+  $title = Xss::filterAdmin($element['#title']);
 
   $attributes = array();
   // Style the label as class option to display inline with the element.
@@ -3062,9 +3063,10 @@ function _form_set_attributes(&$element, $class = array()) {
  * Note: if the batch 'title', 'init_message', 'progress_message', or
  * 'error_message' could contain any user input, it is the responsibility of
  * the code calling batch_set() to sanitize them first with a function like
- * \Drupal\Component\Utility\String::checkPlain() or filter_xss(). Furthermore,
- * if the batch operation returns any user input in the 'results' or 'message'
- * keys of $context, it must also sanitize them first.
+ * \Drupal\Component\Utility\String::checkPlain() or
+ * \Drupal\Component\Utility\Xss::filter(). Furthermore, if the batch operation
+ * returns any user input in the 'results' or 'message' keys of $context, it
+ * must also sanitize them first.
  *
  * Sample callback_batch_operation():
  * @code

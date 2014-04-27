@@ -110,9 +110,9 @@ function hook_ENTITY_TYPE_create_access(\Drupal\Core\Session\AccountInterface $a
  */
 function hook_entity_type_build(array &$entity_types) {
   /** @var $entity_types \Drupal\Core\Entity\EntityTypeInterface[] */
-  // Add a form controller for a custom node form without overriding the default
+  // Add a form for a custom node form without overriding the default
   // node form. To override the default node form, use hook_entity_type_alter().
-  $entity_types['node']->setFormClass('mymodule_foo', 'Drupal\mymodule\NodeFooFormController');
+  $entity_types['node']->setFormClass('mymodule_foo', 'Drupal\mymodule\NodeFooForm');
 }
 
 /**
@@ -627,7 +627,7 @@ function hook_entity_display_build_alter(&$build, $context) {
  * @param array $form_state
  *   An associative array containing the current state of the form.
  *
- * @see \Drupal\Core\Entity\EntityFormController::prepareEntity()
+ * @see \Drupal\Core\Entity\EntityForm::prepareEntity()
  */
 function hook_entity_prepare_form(\Drupal\Core\Entity\EntityInterface $entity, $operation, array &$form_state) {
   if ($operation == 'edit') {
@@ -707,6 +707,10 @@ function hook_entity_base_field_info_alter(&$fields, \Drupal\Core\Entity\EntityT
 /**
  * Provides field definitions for a specific bundle within an entity type.
  *
+ * Bundle fields either have to override an existing base field, or need to
+ * provide a field storage definition via hook_entity_field_storage_info()
+ * unless they are computed.
+ *
  * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
  *   The entity type definition.
  * @param string $bundle
@@ -719,6 +723,8 @@ function hook_entity_base_field_info_alter(&$fields, \Drupal\Core\Entity\EntityT
  *
  * @see hook_entity_base_field_info()
  * @see hook_entity_base_field_info_alter()
+ * @see hook_entity_field_storage_info()
+ * @see hook_entity_field_storage_info_alter()
  * @see hook_entity_bundle_field_info_alter()
  * @see \Drupal\Core\Field\FieldDefinitionInterface
  * @see \Drupal\Core\Entity\EntityManagerInterface::getFieldDefinitions()
@@ -757,6 +763,76 @@ function hook_entity_bundle_field_info_alter(&$fields, \Drupal\Core\Entity\Entit
 }
 
 /**
+ * Provides field storage definitions for a content entity type.
+ *
+ * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+ *   The entity type definition.
+ *
+ * @return \Drupal\Core\Field\FieldStorageDefinitionInterface[]
+ *   An array of field storage definitions, keyed by field name.
+ *
+ * @see hook_entity_field_storage_info_alter()
+ * @see \Drupal\Core\Field\FieldStorageDefinitionInterface
+ * @see \Drupal\Core\Entity\EntityManagerInterface::getFieldStorageDefinitions()
+ */
+function hook_entity_field_storage_info(\Drupal\Core\Entity\EntityTypeInterface $entity_type) {
+  // Expose storage definitions for all exposed bundle fields.
+  if ($entity_type->isFieldable()) {
+    // Query by filtering on the ID as this is more efficient than filtering
+    // on the entity_type property directly.
+    $ids = \Drupal::entityQuery('field_config')
+      ->condition('id', $entity_type->id() . '.', 'STARTS_WITH')
+      ->execute();
+
+    // Fetch all fields and key them by field name.
+    $field_configs = entity_load_multiple('field_config', $ids);
+    $result = array();
+    foreach ($field_configs as $field_config) {
+      $result[$field_config->getName()] = $field_config;
+    }
+    return $result;
+  }
+}
+
+/**
+ * Alters field storage definitions for a content entity type.
+ *
+ * @param \Drupal\Core\Field\FieldStorageDefinitionInterface[] $fields
+ *   The array of field storage definitions for the entity type.
+ * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+ *   The entity type definition.
+ *
+ * @see hook_entity_field_storage_info()
+ */
+function hook_entity_field_storage_info_alter(&$fields, \Drupal\Core\Entity\EntityTypeInterface $entity_type) {
+  // Alter the max_length setting.
+  if ($entity_type->id() == 'node' && !empty($fields['mymodule_text'])) {
+    $fields['mymodule_text']->setSetting('max_length', 128);
+  }
+}
+
+/**
+ * Declares entity operations.
+ *
+ * @param \Drupal\Core\Entity\EntityInterface $entity
+ *   The entity on which the linked operations will be performed.
+ *
+ * @return array
+ *   An operations array as returned by
+ *   \Drupal\Core\Entity\EntityListBuilderInterface::getOperations().
+ */
+function hook_entity_operation(\Drupal\Core\Entity\EntityInterface $entity) {
+  $operations = array();
+  $operations['translate'] = array(
+    'title' => t('Translate'),
+    'route_name' => 'foo_module.entity.translate',
+    'weight' => 50,
+  );
+
+  return $operations;
+}
+
+/**
  * Alter entity operations.
  *
  * @param array $operations
@@ -766,10 +842,11 @@ function hook_entity_bundle_field_info_alter(&$fields, \Drupal\Core\Entity\Entit
  *   The entity on which the linked operations will be performed.
  */
 function hook_entity_operation_alter(array &$operations, \Drupal\Core\Entity\EntityInterface $entity) {
-  $operations['translate'] = array(
-    'title' => t('Translate'),
-    'weight' => 50,
-  ) + $entity->urlInfo('my-custom-link-template')->toArray();
+  // Alter the title and weight.
+  $operations['translate']['title'] = t('Translate @entity_type', array(
+    '@entity_type' => $entity->getEntityTypeId(),
+  ));
+  $operations['translate']['weight'] = 99;
 }
 
 /**

@@ -7,7 +7,9 @@
 
 namespace Drupal\Core\Config\Entity;
 
+use Drupal\Component\Plugin\ConfigurablePluginInterface;
 use Drupal\Component\Utility\String;
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\Entity;
 use Drupal\Core\Config\ConfigDuplicateUUIDException;
 use Drupal\Core\Entity\EntityStorageInterface;
@@ -34,10 +36,6 @@ abstract class ConfigEntityBase extends Entity implements ConfigEntityInterface 
    *
    * This is needed when the entity utilizes a PluginBag, to dictate where the
    * plugin configuration should be stored.
-   *
-   * @todo Move this to a trait along with
-   *   \Drupal\Core\Config\Entity\EntityWithPluginBagInterface, and give it a
-   *   default value of 'configuration'.
    *
    * @var string
    */
@@ -113,7 +111,7 @@ abstract class ConfigEntityBase extends Entity implements ConfigEntityInterface 
   public function setOriginalId($id) {
     $this->originalId = $id;
 
-    return $this;
+    return parent::setOriginalId($id);
   }
 
   /**
@@ -138,8 +136,6 @@ abstract class ConfigEntityBase extends Entity implements ConfigEntityInterface 
    * {@inheritdoc}
    */
   public function set($property_name, $value) {
-    // @todo When \Drupal\Core\Config\Entity\EntityWithPluginBagInterface moves
-    //   to a trait, switch to class_uses() instead.
     if ($this instanceof EntityWithPluginBagInterface) {
       if ($property_name == $this->pluginConfigKey) {
         // If external code updates the settings, pass it along to the plugin.
@@ -163,6 +159,8 @@ abstract class ConfigEntityBase extends Entity implements ConfigEntityInterface 
    * {@inheritdoc}
    */
   public function disable() {
+    // An entity was disabled, invalidate its own cache tag.
+    Cache::invalidateTags(array($this->entityTypeId => array($this->id())));
     return $this->setStatus(FALSE);
   }
 
@@ -259,8 +257,6 @@ abstract class ConfigEntityBase extends Entity implements ConfigEntityInterface 
   public function preSave(EntityStorageInterface $storage) {
     parent::preSave($storage);
 
-    // @todo When \Drupal\Core\Config\Entity\EntityWithPluginBagInterface moves
-    //   to a trait, switch to class_uses() instead.
     if ($this instanceof EntityWithPluginBagInterface) {
       // Any changes to the plugin configuration must be saved to the entity's
       // copy as well.
@@ -310,6 +306,14 @@ abstract class ConfigEntityBase extends Entity implements ConfigEntityInterface 
       foreach($plugin_bag as $instance) {
         $definition = $instance->getPluginDefinition();
         $this->addDependency('module', $definition['provider']);
+        // Plugins can declare additional dependencies in their definition.
+        if (isset($definition['config_dependencies'])) {
+          $this->addDependencies($definition['config_dependencies']);
+        }
+        // If a plugin is configurable, calculate its dependencies.
+        if ($instance instanceof ConfigurablePluginInterface && $plugin_dependencies = $instance->calculateDependencies()) {
+          $this->addDependencies($plugin_dependencies);
+        }
       }
     }
     return $this->dependencies;
@@ -371,6 +375,31 @@ abstract class ConfigEntityBase extends Entity implements ConfigEntityInterface 
       sort($this->dependencies[$type], SORT_FLAG_CASE);
     }
     return $this;
+  }
+
+  /**
+   * Adds multiple dependencies.
+   *
+   * @param array $dependencies.
+   *   An array of dependencies keyed by the type of dependency. One example:
+   * @code
+   * array(
+   *   'module' => array(
+   *     'node',
+   *     'field',
+   *     'image'
+   *   ),
+   * );
+   * @endcode
+   *
+   * @see ::addDependency
+   */
+  protected function addDependencies(array $dependencies) {
+    foreach ($dependencies as $dependency_type => $list) {
+      foreach ($list as $name) {
+        $this->addDependency($dependency_type, $name);
+      }
+    }
   }
 
   /**

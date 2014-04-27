@@ -8,6 +8,7 @@
 use Drupal\block\BlockInterface;
 use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\language\Entity\Language;
+use Drupal\system\Entity\Menu;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 
 /**
@@ -61,7 +62,7 @@ function block_help($path, $arg) {
     }
     $themes = list_themes();
     $output = '<p>' . t('This page provides a drag-and-drop interface for adding a block to a region, and for controlling the order of blocks within regions. To add a block to a region, or to configure its specific title and visibility settings, click the block title under <em>Place blocks</em>. Since not all themes implement the same regions, or display regions in the same way, blocks are positioned on a per-theme basis. Remember that your changes will not be saved until you click the <em>Save blocks</em> button at the bottom of the page.') . '</p>';
-    $output .= '<p>' . l(t('Demonstrate block regions (@theme)', array('@theme' => $themes[$demo_theme]->info['name'])), 'admin/structure/block/demo/' . $demo_theme) . '</p>';
+    $output .= '<p>' . l(t('Demonstrate block regions (!theme)', array('!theme' => $themes[$demo_theme]->info['name'])), 'admin/structure/block/demo/' . $demo_theme) . '</p>';
     return $output;
   }
 }
@@ -330,7 +331,7 @@ function block_rebuild() {
 function block_theme_suggestions_block(array $variables) {
   $suggestions = array();
 
-  $suggestions[] = 'block__' . $variables['elements']['#configuration']['module'];
+  $suggestions[] = 'block__' . $variables['elements']['#configuration']['provider'];
   // Hyphens (-) and underscores (_) play a special role in theme suggestions.
   // Theme suggestions should only contain underscores, because within
   // drupal_find_theme_templates(), underscores are converted to hyphens to
@@ -392,7 +393,7 @@ function template_preprocess_block(&$variables) {
   }
 
   $variables['attributes']['class'][] = 'block';
-  $variables['attributes']['class'][] = drupal_html_class('block-' . $variables['configuration']['module']);
+  $variables['attributes']['class'][] = drupal_html_class('block-' . $variables['configuration']['provider']);
 
   // Add default class for block content.
   $variables['content_attributes']['class'][] = 'content';
@@ -422,10 +423,12 @@ function block_user_role_delete($role) {
 /**
  * Implements hook_menu_delete().
  */
-function block_menu_delete($menu) {
-  foreach (entity_load_multiple('block') as $block) {
-    if ($block->get('plugin') == 'system_menu_block:' . $menu->id()) {
-      $block->delete();
+function block_menu_delete(Menu $menu) {
+  if (!$menu->isSyncing()) {
+    foreach (entity_load_multiple('block') as $block) {
+      if ($block->get('plugin') == 'system_menu_block:' . $menu->id()) {
+        $block->delete();
+      }
     }
   }
 }

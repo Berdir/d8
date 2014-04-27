@@ -47,7 +47,7 @@ class VocabularyTest extends TaxonomyTestBase {
     // Edit the vocabulary.
     $this->drupalGet('admin/structure/taxonomy');
     $this->assertText($edit['name'], 'Vocabulary found in the vocabulary overview listing.');
-    $this->clickLink(t('edit vocabulary'));
+    $this->clickLink(t('Edit vocabulary'));
     $edit = array();
     $edit['name'] = $this->randomName();
     $this->drupalPostForm(NULL, $edit, t('Save'));
@@ -140,8 +140,8 @@ class VocabularyTest extends TaxonomyTestBase {
     $this->assertTrue($vocabulary, 'Vocabulary found.');
 
     // Delete the vocabulary.
-    $edit = array();
-    $this->drupalPostForm('admin/structure/taxonomy/manage/' . $vocabulary->id(), $edit, t('Delete'));
+    $this->drupalGet('admin/structure/taxonomy/manage/' . $vocabulary->id());
+    $this->clickLink(t('Delete'));
     $this->assertRaw(t('Are you sure you want to delete the vocabulary %name?', array('%name' => $vocabulary->name)), '[confirm deletion] Asks for confirmation.');
     $this->assertText(t('Deleting a vocabulary will delete all the terms in it. This action cannot be undone.'), '[confirm deletion] Inform that all terms will be deleted.');
 

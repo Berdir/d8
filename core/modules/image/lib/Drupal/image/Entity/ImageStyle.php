@@ -10,6 +10,7 @@ namespace Drupal\image\Entity;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Config\Entity\EntityWithPluginBagInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Routing\RequestHelper;
 use Drupal\image\ImageEffectBag;
 use Drupal\image\ImageEffectInterface;
 use Drupal\image\ImageStyleInterface;
@@ -105,7 +106,9 @@ class ImageStyle extends ConfigEntityBase implements ImageStyleInterface, Entity
         // The old image style name needs flushing after a rename.
         $this->original->flush();
         // Update field instance settings if necessary.
-        static::replaceImageStyle($this);
+        if (!$this->isSyncing()) {
+          static::replaceImageStyle($this);
+        }
       }
       else {
         // Flush image style when updating without changing the name.
@@ -126,7 +129,7 @@ class ImageStyle extends ConfigEntityBase implements ImageStyleInterface, Entity
       // Check whether field instance settings need to be updated.
       // In case no replacement style was specified, all image fields that are
       // using the deleted style are left in a broken state.
-      if ($new_id = $style->getReplacementID()) {
+      if (!$style->isSyncing() && $new_id = $style->getReplacementID()) {
         // The deleted ID is still set as originalID.
         $style->setName($new_id);
         static::replaceImageStyle($style);
@@ -206,7 +209,7 @@ class ImageStyle extends ConfigEntityBase implements ImageStyleInterface, Entity
       $clean_urls = TRUE;
       try {
         $request = \Drupal::request();
-        $clean_urls = $request->attributes->get('clean_urls');
+        $clean_urls = RequestHelper::isCleanUrl($request);
       }
       catch (ServiceNotFoundException $e) {
       }

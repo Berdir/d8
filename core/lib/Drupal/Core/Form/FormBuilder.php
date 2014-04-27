@@ -9,7 +9,6 @@ namespace Drupal\Core\Form;
 
 use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\NestedArray;
-use Drupal\Component\Utility\Settings;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Access\CsrfTokenGenerator;
@@ -18,6 +17,7 @@ use Drupal\Core\HttpKernel;
 use Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Routing\UrlGeneratorInterface;
+use Drupal\Core\Site\Settings;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Url;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -104,13 +104,6 @@ class FormBuilder implements FormBuilderInterface {
    * @var array
    */
   protected $forms;
-
-  /**
-   * An array of validated forms.
-   *
-   * @var array
-   */
-  protected $validatedForms = array();
 
   /**
    * An array of options used for recursive flattening.
@@ -301,9 +294,11 @@ class FormBuilder implements FormBuilderInterface {
         'files' => array(),
       ),
       'temporary' => array(),
+      'validation_complete' => FALSE,
       'submitted' => FALSE,
       'executed' => FALSE,
       'programmed' => FALSE,
+      'programmed_bypass_access_check' => TRUE,
       'cache'=> FALSE,
       'method' => 'post',
       'groups' => array(),
@@ -430,6 +425,7 @@ class FormBuilder implements FormBuilderInterface {
       'input',
       'method',
       'submit_handlers',
+      'validation_complete',
       'submitted',
       'executed',
       'validate_handlers',
@@ -805,7 +801,14 @@ class FormBuilder implements FormBuilderInterface {
    * {@inheritdoc}
    */
   public function validateForm($form_id, &$form, &$form_state) {
-    if (isset($this->validatedForms[$form_id]) && empty($form_state['must_validate'])) {
+    // If this form is flagged to always validate, ensure that previous runs of
+    // validation are ignored.
+    if (!empty($form_state['must_validate'])) {
+      $form_state['validation_complete'] = FALSE;
+    }
+
+    // If this form has completed validation, do not validate again.
+    if (!empty($form_state['validation_complete'])) {
       return;
     }
 
@@ -823,17 +826,14 @@ class FormBuilder implements FormBuilderInterface {
         // Stop here and don't run any further validation handlers, because they
         // could invoke non-safe operations which opens the door for CSRF
         // vulnerabilities.
-        $this->validatedForms[$form_id] = TRUE;
+        $this->finalizeValidation($form_id, $form, $form_state);
         return;
       }
     }
 
     // Recursively validate each form element.
     $this->doValidateForm($form, $form_state, $form_id);
-    // After validation, loop through and assign each element its errors.
-    $this->setElementErrorsFromFormState($form, $form_state);
-    // Mark this form as validated.
-    $this->validatedForms[$form_id] = TRUE;
+    $this->finalizeValidation($form_id, $form, $form_state);
 
     // If validation errors are limited then remove any non validated form values,
     // so that only values that passed validation are left for submit callbacks.
@@ -874,6 +874,23 @@ class FormBuilder implements FormBuilderInterface {
       }
       $form_state['values'] = $values;
     }
+  }
+
+  /**
+   * Finalizes validation.
+   *
+   * @param string $form_id
+   *   The unique string identifying the form.
+   * @param array $form
+   *   An associative array containing the structure of the form.
+   * @param array $form_state
+   *   An associative array containing the current state of the form.
+   */
+  protected function finalizeValidation($form_id, &$form, &$form_state) {
+    // After validation, loop through and assign each element its errors.
+    $this->setElementErrorsFromFormState($form, $form_state);
+    // Mark this form as validated.
+    $form_state['validation_complete'] = TRUE;
   }
 
   /**
@@ -1183,6 +1200,10 @@ class FormBuilder implements FormBuilderInterface {
    * {@inheritdoc}
    */
   public function setErrorByName($name, array &$form_state, $message = '') {
+    if (!empty($form_state['validation_complete'])) {
+      throw new \LogicException('Form errors cannot be set after form validation has finished.');
+    }
+
     if (!isset($form_state['errors'][$name])) {
       $record = TRUE;
       if (isset($form_state['limit_validation_errors'])) {
@@ -1511,7 +1532,7 @@ class FormBuilder implements FormBuilderInterface {
     // #access=FALSE on an element usually allow access for some users, so forms
     // submitted with self::submitForm() may bypass access restriction and be
     // treated as high-privilege users instead.
-    $process_input = empty($element['#disabled']) && ($form_state['programmed'] || ($form_state['process_input'] && (!isset($element['#access']) || $element['#access'])));
+    $process_input = empty($element['#disabled']) && (($form_state['programmed'] && $form_state['programmed_bypass_access_check']) || ($form_state['process_input'] && (!isset($element['#access']) || $element['#access'])));
 
     // Set the element's #value property.
     if (!isset($element['#value']) && !array_key_exists('#value', $element)) {

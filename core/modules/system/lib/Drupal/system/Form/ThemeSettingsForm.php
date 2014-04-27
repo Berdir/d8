@@ -324,7 +324,7 @@ class ThemeSettingsForm extends ConfigFormBase {
       $validators = array('file_validate_is_image' => array());
 
       // Check for a new uploaded logo.
-      $file = file_save_upload('logo_upload', $form_state, $validators, FALSE, 0);
+      $file = file_save_upload('logo_upload', $validators, FALSE, 0);
       if (isset($file)) {
         // File upload was attempted.
         if ($file) {
@@ -340,7 +340,7 @@ class ThemeSettingsForm extends ConfigFormBase {
       $validators = array('file_validate_extensions' => array('ico png gif jpg jpeg apng svg'));
 
       // Check for a new uploaded favicon.
-      $file = file_save_upload('favicon_upload', $form_state, $validators, FALSE, 0);
+      $file = file_save_upload('favicon_upload', $validators, FALSE, 0);
       if (isset($file)) {
         // File upload was attempted.
         if ($file) {
@@ -419,6 +419,16 @@ class ThemeSettingsForm extends ConfigFormBase {
 
     theme_settings_convert_to_config($values, $config)->save();
 
+    // Invalidate either the theme-specific cache tag or the global theme
+    // settings cache tag, depending on whose settings were actually changed.
+    if (isset($values['theme'])) {
+      Cache::invalidateTags(array('theme' => $values['theme']));
+    }
+    else {
+      Cache::invalidateTags(array('theme_global_settings' => TRUE));
+    }
+
+    // @todo Remove this in https://drupal.org/node/2124957.
     Cache::invalidateTags(array('content' => TRUE));
   }
 

@@ -9,7 +9,6 @@ namespace Drupal\simpletest;
 
 use Drupal\Component\Utility\Random;
 use Drupal\Core\Database\Database;
-use Drupal\Component\Utility\Settings;
 use Drupal\Component\Utility\String;
 use Drupal\Core\Config\ConfigImporter;
 use Drupal\Core\Config\StorageComparer;
@@ -20,6 +19,7 @@ use Drupal\Core\DrupalKernel;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Session\AccountProxy;
 use Drupal\Core\Session\AnonymousUserSession;
+use Drupal\Core\Site\Settings;
 use Drupal\Core\StreamWrapper\PublicStream;
 use Drupal\Core\Utility\Error;
 use Symfony\Component\HttpFoundation\Request;
@@ -1026,8 +1026,7 @@ abstract class TestBase {
     $this->originalUser = isset($user) ? clone $user : NULL;
 
     // Ensure that the current session is not changed by the new environment.
-    require_once DRUPAL_ROOT . '/' . Settings::get('session_inc', 'core/includes/session.inc');
-    drupal_save_session(FALSE);
+    \Drupal::service('session_manager')->disable();
 
     // Save and clean the shutdown callbacks array because it is static cached
     // and will be changed by the test run. Otherwise it will contain callbacks
@@ -1048,6 +1047,9 @@ abstract class TestBase {
     $this->translation_files_directory = $this->siteDirectory . '/translations';
 
     $this->generatedTestFiles = FALSE;
+
+    // Ensure the configImporter is refreshed for each test.
+    $this->configImporter = NULL;
 
     // Unregister all custom stream wrappers of the parent site.
     // Availability of Drupal stream wrappers varies by test base class:
@@ -1161,6 +1163,12 @@ abstract class TestBase {
       $this->container->get('request_stack')->push($request);
     }
     $this->container->get('current_user')->setAccount(\Drupal::currentUser());
+
+    // The request context is normally set by the router_listener from within
+    // its KernelEvents::REQUEST listener. In the simpletest parent site this
+    // event is not fired, therefore it is necessary to updated the request
+    // context manually here.
+    $this->container->get('router.request_context')->fromRequest($request);
   }
 
   /**
@@ -1268,7 +1276,7 @@ abstract class TestBase {
 
     // Restore original user session.
     $this->container->set('current_user', $this->originalUser);
-    drupal_save_session(TRUE);
+    \Drupal::service('session_manager')->enable();
   }
 
   /**
@@ -1341,7 +1349,7 @@ abstract class TestBase {
    * @param $value
    *   The value of the setting.
    *
-   * @see \Drupal\Component\Utility\Settings::get()
+   * @see \Drupal\Core\Site\Settings::get()
    */
   protected function settingsSet($name, $value) {
     $settings = Settings::getAll();
@@ -1526,7 +1534,10 @@ abstract class TestBase {
         $this->container->get('event_dispatcher'),
         $this->container->get('config.manager'),
         $this->container->get('lock'),
-        $this->container->get('config.typed')
+        $this->container->get('config.typed'),
+        $this->container->get('module_handler'),
+        $this->container->get('theme_handler'),
+        $this->container->get('string_translation')
       );
     }
     // Always recalculate the changelist when called.

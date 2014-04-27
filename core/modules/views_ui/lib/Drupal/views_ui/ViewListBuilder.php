@@ -135,8 +135,8 @@ class ViewListBuilder extends ConfigEntityListBuilder {
   /**
    * {@inheritdoc}
    */
-  public function getOperations(EntityInterface $entity) {
-    $operations = parent::getOperations($entity);
+  public function getDefaultOperations(EntityInterface $entity) {
+    $operations = parent::getDefaultOperations($entity);
 
     if ($entity->hasLinkTemplate('clone')) {
       $operations['clone'] = array(
@@ -167,7 +167,7 @@ class ViewListBuilder extends ConfigEntityListBuilder {
     $list['#type'] = 'container';
     $list['#attributes']['id'] = 'views-entity-list';
 
-    $list['#attached']['css'] = ViewFormControllerBase::getAdminCSS();
+    $list['#attached']['css'] = ViewFormBase::getAdminCSS();
     $list['#attached']['library'][] = 'core/drupal.ajax';
     $list['#attached']['library'][] = 'views_ui/views_ui.listing';
 

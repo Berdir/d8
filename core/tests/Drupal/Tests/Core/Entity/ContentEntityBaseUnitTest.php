@@ -8,6 +8,7 @@
 namespace Drupal\Tests\Core\Entity;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Field\FieldDefinition;
 use Drupal\Tests\UnitTestCase;
 use Drupal\Core\Language\Language;
 
@@ -61,6 +62,13 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
   protected $typedDataManager;
 
   /**
+   * The field type manager used for testing.
+   *
+   * @var \Drupal\Core\Field\FieldTypePluginManager|\PHPUnit_Framework_MockObject_MockObject
+   */
+  protected $fieldTypePluginManager;
+
+  /**
    * The language manager.
    *
    * @var \Drupal\Core\Language\LanguageManagerInterface|\PHPUnit_Framework_MockObject_MockObject
@@ -80,6 +88,13 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
    * @var int
    */
   protected $id;
+
+  /**
+   * Field definitions.
+   *
+   * @var \Drupal\Core\Field\FieldDefinition[]
+   */
+  protected $fieldDefinitions;
 
   /**
    * {@inheritdoc}
@@ -106,20 +121,18 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
     $this->bundle = $this->randomName();
 
     $this->entityType = $this->getMock('\Drupal\Core\Entity\EntityTypeInterface');
+    $this->entityType->expects($this->any())
+      ->method('getKeys')
+      ->will($this->returnValue(array(
+        'id' => 'id',
+        'uuid' => 'uuid',
+    )));
 
     $this->entityManager = $this->getMock('\Drupal\Core\Entity\EntityManagerInterface');
     $this->entityManager->expects($this->any())
       ->method('getDefinition')
       ->with($this->entityTypeId)
       ->will($this->returnValue($this->entityType));
-    $this->entityManager->expects($this->any())
-      ->method('getFieldDefinitions')
-      ->with($this->entityTypeId, $this->bundle)
-      ->will($this->returnValue(array(
-        'id' => array(
-          'type' => 'integer_field',
-        ),
-      )));
 
     $this->uuid = $this->getMock('\Drupal\Component\Uuid\UuidInterface');
 
@@ -137,13 +150,33 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
       ->with('en')
       ->will($this->returnValue($language));
 
+    $this->fieldTypePluginManager = $this->getMockBuilder('\Drupal\Core\Field\FieldTypePluginManager')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $this->fieldTypePluginManager->expects($this->any())
+      ->method('getDefaultSettings')
+      ->will($this->returnValue(array()));
+    $this->fieldTypePluginManager->expects($this->any())
+      ->method('getDefaultInstanceSettings')
+      ->will($this->returnValue(array()));
+
     $container = new ContainerBuilder();
     $container->set('entity.manager', $this->entityManager);
     $container->set('uuid', $this->uuid);
     $container->set('typed_data_manager', $this->typedDataManager);
     $container->set('language_manager', $this->languageManager);
+    $container->set('plugin.manager.field.field_type', $this->fieldTypePluginManager);
     \Drupal::setContainer($container);
 
+    $this->fieldDefinitions = array(
+      'id' => FieldDefinition::create('integer'),
+      'revision_id' => FieldDefinition::create('integer'),
+    );
+
+    $this->entityManager->expects($this->any())
+      ->method('getFieldDefinitions')
+      ->with($this->entityTypeId, $this->bundle)
+      ->will($this->returnValue($this->fieldDefinitions));
     $this->entity = $this->getMockForAbstractClass('\Drupal\Core\Entity\ContentEntityBase', array($values, $this->entityTypeId, $this->bundle));
   }
 
@@ -162,6 +195,39 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
       ->method('hasKey')
       ->with('revision')
       ->will($this->returnValue(TRUE));
+    $this->entityType->expects($this->at(2))
+      ->method('hasKey')
+      ->with('revision')
+      ->will($this->returnValue(TRUE));
+    $this->entityType->expects($this->at(3))
+      ->method('getKey')
+      ->with('revision')
+      ->will($this->returnValue('revision_id'));
+    $this->entityType->expects($this->at(4))
+      ->method('hasKey')
+      ->with('revision')
+      ->will($this->returnValue(TRUE));
+    $this->entityType->expects($this->at(5))
+      ->method('getKey')
+      ->with('revision')
+      ->will($this->returnValue('revision_id'));
+
+    $field_item_list = $this->getMockBuilder('\Drupal\Core\Field\FieldItemList')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $field_item = $this->getMockBuilder('\Drupal\Core\Field\FieldItemBase')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $field_item->staticExpects($this->once())
+      ->method('mainPropertyName')
+      ->will($this->returnValue('value'));
+
+    $this->typedDataManager->expects($this->any())
+      ->method('getPropertyInstance')
+      ->with($this->entity, 'revision_id', NULL)
+      ->will($this->returnValue($field_item_list));
+
+    $this->fieldDefinitions['revision_id']->getItemDefinition()->setClass(get_class($field_item));
 
     $this->assertFalse($this->entity->isNewRevision());
     $this->assertTrue($this->entity->isNewRevision());

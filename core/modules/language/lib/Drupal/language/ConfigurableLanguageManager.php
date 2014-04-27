@@ -7,7 +7,7 @@
 
 namespace Drupal\language;
 
-use Drupal\Component\PhpStorage\PhpStorageFactory;
+use Drupal\Core\PhpStorage\PhpStorageFactory;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\Language;
@@ -92,7 +92,7 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
   protected $initializing = FALSE;
 
   /**
-   * Rebuild the container to register services needed on multilingual sites.
+   * {@inheritdoc}
    */
   public static function rebuildServices() {
     PhpStorageFactory::get('service_container')->deleteAll();
@@ -278,8 +278,7 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
 
       // Retrieve the config storage to list available languages.
       $prefix = 'language.entity.';
-      $storage = $this->configFactory->get($prefix . Language::LANGCODE_NOT_SPECIFIED)->getStorage();
-      $config_ids = $storage->listAll($prefix);
+      $config_ids = $this->configFactory->listAll($prefix);
 
       // Instantiate languages from config objects.
       $weight = 0;
@@ -297,7 +296,7 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
       // Add locked languages, they will be filtered later if needed.
       $this->languages += $this->getDefaultLockedLanguages($weight);
 
-      // Sort the language list by weight.
+      // Sort the language list by weight then title.
       Language::sort($this->languages);
     }
 

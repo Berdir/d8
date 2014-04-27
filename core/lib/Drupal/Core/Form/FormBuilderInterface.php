@@ -164,6 +164,12 @@ interface FormBuilderInterface extends FormErrorInterface {
    *     likely to occur during Ajax operations.
    *   - programmed: If TRUE, the form was submitted programmatically, usually
    *     invoked via self::submitForm(). Defaults to FALSE.
+   *   - programmed_bypass_access_check: If TRUE, programmatic form submissions
+   *     are processed without taking #access into account. Set this to FALSE
+   *     when submitting a form programmatically with values that may have been
+   *     input by the user executing the current request; this will cause
+   *     #access to be respected as it would on a normal form submission.
+   *     Defaults to TRUE.
    *   - process_input: Boolean flag. TRUE signifies correct form submission.
    *     This is always TRUE for programmed forms coming from self::submitForm()
    *     (see 'programmed' key), or if the form_id coming from the
@@ -189,7 +195,7 @@ interface FormBuilderInterface extends FormErrorInterface {
    *     storage. The recommended way to ensure that the chosen key doesn't
    *     conflict with ones used by the Form API or other modules is to use the
    *     module name as the key name or a prefix for the key name. For example,
-   *     the entity form controller classes use $this->entity in entity forms,
+   *     the entity form classes use $this->entity in entity forms,
    *     or $form_state['controller']->getEntity() outside the controller, to
    *     store information about the entity being edited, and this information
    *     stays available across successive clicks of the "Preview" button (if

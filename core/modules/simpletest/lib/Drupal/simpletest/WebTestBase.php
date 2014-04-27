@@ -7,10 +7,11 @@
 
 namespace Drupal\simpletest;
 
+use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\Crypt;
-use Drupal\Component\Utility\Json;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\String;
+use Drupal\Component\Utility\Xss;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\ConnectionNotDefinedException;
@@ -172,6 +173,11 @@ abstract class WebTestBase extends TestBase {
    * The kernel used in this test.
    */
   protected $kernel;
+
+  /**
+   * The config directories used in this test.
+   */
+  protected $configDirectories = array();
 
   /**
    * Cookies to set on curl requests.
@@ -541,7 +547,7 @@ abstract class WebTestBase extends TestBase {
   }
 
   /**
-   * Internal helper function; Create a role with specified permissions.
+   * Creates a role with specified permissions.
    *
    * @param array $permissions
    *   Array of permission names to assign to role.
@@ -698,8 +704,8 @@ abstract class WebTestBase extends TestBase {
     if (!isset($account->session_id)) {
       return FALSE;
     }
-    // @see _drupal_session_read(). The session ID is hashed before being stored
-    // in the database.
+    // The session ID is hashed before being stored in the database.
+    // @see \Drupal\Core\Session\SessionHandler::read()
     return (bool) db_query("SELECT sid FROM {users} u INNER JOIN {sessions} s ON u.uid = s.uid WHERE s.sid = :sid", array(':sid' => Crypt::hashBase64($account->session_id)))->fetchField();
   }
 
@@ -2156,6 +2162,8 @@ abstract class WebTestBase extends TestBase {
         }
       }
     }
+    // An empty name means the value is not sent.
+    unset($post['']);
     return $submit_matches;
   }
 
@@ -2766,7 +2774,7 @@ abstract class WebTestBase extends TestBase {
    */
   protected function assertTextHelper($text, $message = '', $group, $not_exists) {
     if ($this->plainTextContent === FALSE) {
-      $this->plainTextContent = filter_xss($this->drupalGetContent(), array());
+      $this->plainTextContent = Xss::filter($this->drupalGetContent(), array());
     }
     if (!$message) {
       $message = !$not_exists ? String::format('"@text" found', array('@text' => $text)) : String::format('"@text" not found', array('@text' => $text));
@@ -2851,7 +2859,7 @@ abstract class WebTestBase extends TestBase {
    */
   protected function assertUniqueTextHelper($text, $message = '', $group, $be_unique) {
     if ($this->plainTextContent === FALSE) {
-      $this->plainTextContent = filter_xss($this->drupalGetContent(), array());
+      $this->plainTextContent = Xss::filter($this->drupalGetContent(), array());
     }
     if (!$message) {
       $message = '"' . $text . '"' . ($be_unique ? ' found only once' : ' found more than once');

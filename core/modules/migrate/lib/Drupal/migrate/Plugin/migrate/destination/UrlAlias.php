@@ -7,7 +7,7 @@
 
 namespace Drupal\migrate\Plugin\migrate\destination;
 
-use Drupal\Core\Path\PathInterface;
+use Drupal\Core\Path\AliasStorage;
 use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\Row;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -21,11 +21,11 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 class UrlAlias extends DestinationBase implements ContainerFactoryPluginInterface {
 
   /**
-   * The path crud service.
+   * The alias storage service.
    *
-   * @var \Drupal\Core\Path\PathInterface $path
+   * @var \Drupal\Core\Path\AliasStorage $aliasStorage
    */
-  protected $path;
+  protected $aliasStorage;
 
   /**
    * Constructs an entity destination plugin.
@@ -34,28 +34,28 @@ class UrlAlias extends DestinationBase implements ContainerFactoryPluginInterfac
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
    *   The plugin_id for the plugin instance.
-   * @param array $plugin_definition
+   * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param MigrationInterface $migration
    *   The migration.
-   * @param \Drupal\Core\Path\PathInterface $path
-   *   The path crud service.
+   * @param \Drupal\Core\Path\AliasStorage $alias_storage
+   *   The alias storage service.
    */
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration, PathInterface $path) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, AliasStorage $alias_storage) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration);
-    $this->path = $path;
+    $this->aliasStorage = $alias_storage;
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration = NULL) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration = NULL) {
     return new static(
       $configuration,
       $plugin_id,
       $plugin_definition,
       $migration,
-      $container->get('path.crud')
+      $container->get('path.alias_storage')
     );
   }
 
@@ -64,7 +64,7 @@ class UrlAlias extends DestinationBase implements ContainerFactoryPluginInterfac
    */
   public function import(Row $row, array $old_destination_id_values = array()) {
 
-    $path = $this->path->save(
+    $path = $this->aliasStorage->save(
       $row->getDestinationProperty('source'),
       $row->getDestinationProperty('alias'),
       $row->getDestinationProperty('langcode'),

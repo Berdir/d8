@@ -72,7 +72,7 @@ abstract class PluginBase extends ComponentPluginBase implements ContainerFactor
    */
   public $definition;
 
-   /**
+  /**
    * Denotes whether the plugin has an additional options form.
    *
    * @var bool
@@ -83,7 +83,7 @@ abstract class PluginBase extends ComponentPluginBase implements ContainerFactor
   /**
    * Constructs a Plugin object.
    */
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->definition = $plugin_definition + $configuration;
@@ -92,7 +92,7 @@ abstract class PluginBase extends ComponentPluginBase implements ContainerFactor
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, array $plugin_definition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static($configuration, $plugin_id, $plugin_definition);
   }
 
@@ -422,6 +422,18 @@ abstract class PluginBase extends ComponentPluginBase implements ContainerFactor
     }
 
     return $form;
+  }
+
+  /**
+   * Returns an array of module dependencies for this plugin.
+   *
+   * Dependencies are a list of module names, which might depend on the
+   * configuration.
+   *
+   * @return array
+   */
+  public function getDependencies() {
+    return array();
   }
 
 }

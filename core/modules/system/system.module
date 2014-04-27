@@ -5,26 +5,14 @@
  * Configuration system that lets administrators modify the workings of the site.
  */
 
-use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ExtensionDiscovery;
-use Drupal\Core\Utility\ModuleInfo;
 use Drupal\block\BlockPluginInterface;
-use Drupal\menu_link\MenuLinkInterface;
 use Drupal\user\UserInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Request;
-use Guzzle\Http\Exception\BadResponseException;
-use Guzzle\Http\Exception\RequestException;
-
-/**
- * Maximum age of temporary files in seconds.
- */
-const DRUPAL_MAXIMUM_TEMP_FILE_AGE = 21600;
+use GuzzleHttp\Exception\RequestException;
 
 /**
  * New users will be set to the default time zone at registration.
@@ -41,7 +29,7 @@ const DRUPAL_USER_TIMEZONE_EMPTY = 1;
  */
 const DRUPAL_USER_TIMEZONE_SELECT = 2;
 
- /**
+/**
  * Disabled option on forms and settings
  */
 const DRUPAL_DISABLED = 0;
@@ -181,10 +169,6 @@ function system_theme() {
       'render element' => 'form',
       'file' => 'system.admin.inc',
     ),
-    'system_modules_incompatible' => array(
-      'variables' => array('message' => NULL),
-      'file' => 'system.admin.inc',
-    ),
     'system_modules_uninstall' => array(
       'render element' => 'form',
       'file' => 'system.admin.inc',
@@ -294,6 +278,7 @@ function system_element_info() {
   );
   $types['page'] = array(
     '#show_messages' => TRUE,
+    '#pre_render' => array('drupal_pre_render_page'),
     '#theme' => 'page',
     '#title' => '',
   );
@@ -1287,7 +1272,7 @@ function system_rebuild_module_data() {
     $files = array();
     ksort($modules);
     // Add status, weight, and schema version.
-    $installed_modules = (array) \Drupal::config('system.module')->get('enabled');
+    $installed_modules = \Drupal::config('core.extension')->get('module') ?: array();
     foreach ($modules as $name => $module) {
       $module->weight = isset($installed_modules[$name]) ? $installed_modules[$name] : 0;
       $module->status = (int) isset($installed_modules[$name]);
@@ -1305,51 +1290,16 @@ function system_rebuild_module_data() {
 }
 
 /**
- * Helper function to scan and collect theme .info.yml data and their engines.
- *
- * @return \Drupal\Core\Extension\Extension[]
- *   An associative array of themes information.
- *
- * @see \Drupal\Core\Extension\ThemeHandlerInterface::rebuildThemeData()
- *
- * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
- *   Use \Drupal::service('theme_handler')->rebuildThemeData().
- */
-function _system_rebuild_theme_data() {
-  return \Drupal::service('theme_handler')->rebuildThemeData();
-}
-
-/**
  * Rebuild, save, and return data about all currently available themes.
  *
  * @return \Drupal\Core\Extension\Extension[]
  *   Array of all available themes and their data.
+ *
+ * @deprecated 8.x
+ *   Use \Drupal::service('theme_handler')->rebuildThemeData().
  */
 function system_rebuild_theme_data() {
-  $themes = _system_rebuild_theme_data();
-  ksort($themes);
-  // @todo This function has no business in determining/setting the status of
-  //   a theme, but various other functions expect it to return themes with a
-  //   $status property. system_list() stores the return value of this function
-  //   in state, and ensures to set/override the $status property for each theme
-  //   based on the current config. Remove this code when themes have a proper
-  //   installation status.
-  // @see http://drupal.org/node/1067408
-  $enabled_themes = (array) \Drupal::config('system.theme')->get('enabled');
-  $files = array();
-  foreach ($themes as $name => $theme) {
-    $theme->status = (int) isset($enabled_themes[$name]);
-    $files[$name] = $theme->getPathname();
-  }
-  // Replace last known theme data state.
-  // @todo Obsolete with proper installation status for themes.
-  \Drupal::state()->set('system.theme.data', $themes);
-
-  // Store filenames to allow system_list() and drupal_get_filename() to
-  // retrieve them without having to rebuild or scan the filesystem.
-  \Drupal::state()->set('system.theme.files', $files);
-
-  return $themes;
+  return \Drupal::service('theme_handler')->rebuildThemeData();
 }
 
 /**
@@ -1372,22 +1322,24 @@ function _system_default_theme_features() {
 /**
  * Get a list of available regions from a specified theme.
  *
- * @param $theme_key
- *   The name of a theme.
+ * @param \Drupal\Core\Extension\Extension|string $theme
+ *   A theme extension object, or the name of a theme.
  * @param $show
  *   Possible values: REGIONS_ALL or REGIONS_VISIBLE. Visible excludes hidden
  *   regions.
  * @return
  *   An array of regions in the form $region['name'] = 'description'.
  */
-function system_region_list($theme_key, $show = REGIONS_ALL) {
-  $themes = list_themes();
-  if (!isset($themes[$theme_key])) {
-    return array();
+function system_region_list($theme, $show = REGIONS_ALL) {
+  if (!$theme instanceof Extension) {
+    $themes = \Drupal::service('theme_handler')->listInfo();
+    if (!isset($themes[$theme])) {
+      return array();
+    }
+    $theme = $themes[$theme];
   }
-
   $list = array();
-  $info = $themes[$theme_key]->info;
+  $info = $theme->info;
   // If requested, suppress hidden regions. See block_admin_display_form().
   foreach ($info['regions'] as $name => $label) {
     if ($show == REGIONS_ALL || !isset($info['regions_hidden']) || !in_array($name, $info['regions_hidden'])) {
@@ -1501,7 +1453,7 @@ function system_get_module_admin_tasks($module, array $info) {
     if (isset($links[$machine_name])) {
       $task = $links[$machine_name];
       // The link description, either derived from 'description' in the default
-      // menu link or customized via menu module is used as title attribute.
+      // menu link or customized via Menu UI module is used as title attribute.
       if (!empty($task['localized_options']['attributes']['title'])) {
         $task['description'] = $task['localized_options']['attributes']['title'];
         unset($task['localized_options']['attributes']['title']);
@@ -1561,7 +1513,7 @@ function system_get_module_admin_tasks($module, array $info) {
  */
 function system_cron() {
   // Cleanup the flood.
-  \Drupal::service('flood')->garbageCollection();
+  \Drupal::flood()->garbageCollection();
 
   foreach (Cache::getBins() as $cache_backend) {
     $cache_backend->garbageCollection();
@@ -1686,14 +1638,8 @@ function system_retrieve_file($url, $destination = NULL, $managed = FALSE, $repl
   try {
     $data = \Drupal::httpClient()
       ->get($url)
-      ->send()
       ->getBody(TRUE);
     $local = $managed ? file_save_data($data, $path, $replace) : file_unmanaged_save_data($data, $path, $replace);
-  }
-  catch (BadResponseException $exception) {
-    $response = $exception->getResponse();
-    drupal_set_message(t('Failed to fetch file due to HTTP error "%error"', array('%error' => $response->getStatusCode() . ' ' . $response->getReasonPhrase())), 'error');
-    return FALSE;
   }
   catch (RequestException $exception) {
     drupal_set_message(t('Failed to fetch file due to error "%error"', array('%error' => $exception->getMessage())), 'error');

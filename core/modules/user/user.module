@@ -339,7 +339,7 @@ function user_load_by_name($name) {
  */
 function user_validate_name($name) {
   $definition = DataDefinition::create('string')
-    ->setConstraints(array('UserName' => array()));
+    ->addConstraint('UserName', array());
   $data = \Drupal::typedDataManager()->create($definition);
   $data->setValue($name);
   $violations = $data->validate();
@@ -527,7 +527,7 @@ function _user_language_selector_langcode_value($element, $input, &$form_state) 
 /**
  * Form validation handler for the current password on the user account form.
  *
- * @see AccountFormController::form()
+ * @see AccountForm::form()
  */
 function user_validate_current_pass(&$form, &$form_state) {
   $account = $form_state['user'];
@@ -552,7 +552,7 @@ function user_validate_current_pass(&$form, &$form_state) {
  * Implements hook_preprocess_HOOK() for block templates.
  */
 function user_preprocess_block(&$variables) {
-  if ($variables['configuration']['module'] == 'user') {
+  if ($variables['configuration']['provider'] == 'user') {
     switch ($variables['elements']['#plugin_id']) {
       case 'user_login_block':
         $variables['attributes']['role'] = 'form';
@@ -607,7 +607,7 @@ function user_template_preprocess_default_variables_alter(&$variables) {
  *
  * Modules that make any changes to variables like 'name' or 'extra' must ensure
  * that the final string is safe to include directly in the output by using
- * check_plain() or filter_xss().
+ * check_plain() or \Drupal\Component\Utility\Xss::filter().
  */
 function template_preprocess_username(&$variables) {
   $account = $variables['account'] ?: new AnonymousUserSession();
@@ -769,7 +769,7 @@ function user_login_finalize(UserInterface $account) {
   // Regenerate the session ID to prevent against session fixation attacks.
   // This is called before hook_user in case one of those functions fails
   // or incorrectly does a redirect which would leave the old session in place.
-  drupal_session_regenerate();
+  \Drupal::service('session_manager')->regenerate();
 
   \Drupal::moduleHandler()->invokeAll('user_login', array($account));
 }
@@ -828,7 +828,7 @@ function user_pass_reset_url($account, $options = array()) {
  * @param array $options
  *   (optional) A keyed array of settings. Supported options are:
  *   - langcode: A language code to be used when generating locale-sensitive
-  *    URLs. If langcode is NULL the users preferred language is used.
+ *     URLs. If langcode is NULL the users preferred language is used.
  *
  * @return
  *   A unique URL that may be used to confirm the cancellation of the user
@@ -987,7 +987,7 @@ function _user_cancel($edit, $account, $method) {
 function _user_cancel_session_regenerate() {
   // Regenerate the users session instead of calling session_destroy() as we
   // want to preserve any messages that might have been set.
-  drupal_session_regenerate();
+  \Drupal::service('session_manager')->regenerate();
 }
 
 /**
@@ -1412,7 +1412,7 @@ function theme_user_signature($variables) {
 
   if ($signature) {
     $output .= '<div class="clear">';
-    $output .= '<div>&mdash;</div>';
+    $output .= '<div>—</div>';
     $output .= $signature;
     $output .= '</div>';
   }

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\taxonomy\Entity\Term.
+ * Contains \Drupal\taxonomy\Entity\Term.
  */
 
 namespace Drupal\taxonomy\Entity;
@@ -27,10 +27,10 @@ use Drupal\taxonomy\TermInterface;
  *     "view_builder" = "Drupal\taxonomy\TermViewBuilder",
  *     "access" = "Drupal\taxonomy\TermAccessHandler",
  *     "form" = {
- *       "default" = "Drupal\taxonomy\TermFormController",
+ *       "default" = "Drupal\taxonomy\TermForm",
  *       "delete" = "Drupal\taxonomy\Form\TermDeleteForm"
  *     },
- *     "translation" = "Drupal\taxonomy\TermTranslationController"
+ *     "translation" = "Drupal\taxonomy\TermTranslationHandler"
  *   },
  *   base_table = "taxonomy_term_data",
  *   uri_callback = "taxonomy_term_uri",
@@ -53,13 +53,6 @@ use Drupal\taxonomy\TermInterface;
  * )
  */
 class Term extends ContentEntityBase implements TermInterface {
-
-  /**
-   * {@inheritdoc}
-   */
-  public function id() {
-    return $this->get('tid')->value;
-  }
 
   /**
    * {@inheritdoc}
@@ -122,7 +115,8 @@ class Term extends ContentEntityBase implements TermInterface {
     $fields['vid'] = FieldDefinition::create('entity_reference')
       ->setLabel(t('Vocabulary'))
       ->setDescription(t('The vocabulary to which the term is assigned.'))
-      ->setSetting('target_type', 'taxonomy_vocabulary');
+      ->setSetting('target_type', 'taxonomy_vocabulary')
+      ->setSetting('max_length', EntityTypeInterface::BUNDLE_MAX_LENGTH);
 
     $fields['langcode'] = FieldDefinition::create('language')
       ->setLabel(t('Language code'))

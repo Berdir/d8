@@ -8,6 +8,7 @@
  * API pattern.
  */
 
+use Drupal\Component\Utility\Xss;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Url;
@@ -137,12 +138,12 @@ function node_help($path, $arg) {
     case 'node/%/edit':
       $node = node_load($arg[1]);
       $type = node_type_load($node->bundle());
-      return (!empty($type->help) ? filter_xss_admin($type->help) : '');
+      return (!empty($type->help) ? Xss::filterAdmin($type->help) : '');
   }
 
   if ($arg[0] == 'node' && $arg[1] == 'add' && $arg[2]) {
     $type = node_type_load($arg[2]);
-    return (!empty($type->help) ? filter_xss_admin($type->help) : '');
+    return (!empty($type->help) ? Xss::filterAdmin($type->help) : '');
   }
 }
 
@@ -174,6 +175,7 @@ function node_theme() {
     ),
     'field__node__title' => array(
       'base hook' => 'field',
+      'template' => 'field--node--title',
     ),
   );
 }
@@ -592,7 +594,7 @@ function node_preprocess_html(&$variables) {
  * Implements hook_preprocess_HOOK() for block templates.
  */
 function node_preprocess_block(&$variables) {
-  if ($variables['configuration']['module'] == 'node') {
+  if ($variables['configuration']['provider'] == 'node') {
     switch ($variables['elements']['#plugin_id']) {
       case 'node_syndicate_block':
         $variables['attributes']['role'] = 'complementary';
@@ -702,23 +704,6 @@ function template_preprocess_node(&$variables) {
     $variables['attributes']['class'][] = 'preview';
   }
   $variables['content_attributes']['class'][] = 'content';
-}
-
-/**
- * Returns HTML for the node title field.
- *
- * This is an override of theme_field() for the node title field. See that
- * function for documentation about its details and overrides.
- *
- * @param array $variables
- *   An associative array. See theme_field() for details.
- *
- * @see theme_field()
- *
- * @ingroup themeable
- */
-function theme_field__node__title($variables) {
-  return '<span' . $variables['attributes'] . '>' . drupal_render($variables['items']) . '</span>';
 }
 
 /**
@@ -895,34 +880,6 @@ function theme_node_search_admin($variables) {
 
   $output .= drupal_render_children($form);
   return $output;
-}
-
-/**
- * Access callback: Checks node revision access.
- *
- * @param \Drupal\node\NodeInterface $node
- *   The node to check.
- * @param $op
- *   (optional) The specific operation being checked. Defaults to 'view.'
- * @param object $account
- *   (optional) A user object representing the user for whom the operation is
- *   to be performed. Determines access for a user other than the current user.
- *   Defaults to NULL.
- * @param $langcode
- *   (optional) Language code for the variant of the node. Different language
- *   variants might have different permissions associated. If NULL, the
- *   original langcode of the node is used. Defaults to NULL.
- *
- * @return
- *   TRUE if the operation may be performed, FALSE otherwise.
- *
- * @see node_menu()
- */
-function _node_revision_access(NodeInterface $node, $op = 'view', $account = NULL, $langcode = NULL) {
-  if ($account === NULL) {
-    $account = \Drupal::currentUser();
-  }
-  return \Drupal::service('access_check.node.revision')->checkAccess($node, $account, $op, $langcode);
 }
 
 /**
@@ -1433,22 +1390,16 @@ function node_permissions_get_configured_types() {
  * grants array by reference. This hook allows for complex business logic to be
  * applied when integrating multiple node access modules.
  *
- * @param $op
+ * @param string $op
  *   The operation that the user is trying to perform.
- * @param $account
- *   (optional) The user object for the user performing the operation. If
- *   omitted, the current user is used.  Defaults to NULL.
+ * @param \Drupal\Core\Session\AccountInterface $account
+ *   The account object for the user performing the operation.
  *
- * @return
+ * @return array
  *   An associative array in which the keys are realms, and the values are
  *   arrays of grants for those realms.
  */
-function node_access_grants($op, $account = NULL) {
-
-  if (!isset($account)) {
-    $account = \Drupal::currentUser();
-  }
-
+function node_access_grants($op, AccountInterface $account) {
   // Fetch node access grants from other modules.
   $grants = \Drupal::moduleHandler()->invokeAll('node_grants', array($account, $op));
   // Allow modules to alter the assigned grants.

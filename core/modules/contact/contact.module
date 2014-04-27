@@ -198,7 +198,7 @@ function contact_mail($key, &$message, $params) {
  *
  * Add the enable personal contact form to an individual user's account page.
  *
- * @see \Drupal\user\ProfileFormController::form()
+ * @see \Drupal\user\ProfileForm::form()
  */
 function contact_form_user_form_alter(&$form, &$form_state) {
   $form['contact'] = array(
@@ -208,7 +208,9 @@ function contact_form_user_form_alter(&$form, &$form_state) {
     '#weight' => 5,
   );
   $account = $form_state['controller']->getEntity();
-  $account_data = !\Drupal::currentUser()->isAnonymous() ? \Drupal::service('user.data')->get('contact', $account->id(), 'enabled') : NULL;
+  if (!\Drupal::currentUser()->isAnonymous() && $account->id()) {
+    $account_data = \Drupal::service('user.data')->get('contact', $account->id(), 'enabled');
+  }
   $form['contact']['contact'] = array(
     '#type' => 'checkbox',
     '#title' => t('Personal contact form'),

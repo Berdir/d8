@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\entity_test\Entity\EntityTestBaseFieldDisplay.
+ * Contains \Drupal\entity_test\Entity\EntityTestBaseFieldDisplay.
  */
 
 namespace Drupal\entity_test\Entity;
@@ -19,9 +19,9 @@ use Drupal\Core\Field\FieldDefinition;
  *   controllers = {
  *     "access" = "Drupal\entity_test\EntityTestAccessHandler",
  *     "form" = {
- *       "default" = "Drupal\entity_test\EntityTestFormController"
+ *       "default" = "Drupal\entity_test\EntityTestForm"
  *     },
- *     "translation" = "Drupal\content_translation\ContentTranslationController"
+ *     "translation" = "Drupal\content_translation\ContentTranslationHandler"
  *   },
  *   base_table = "entity_test",
  *   fieldable = TRUE,

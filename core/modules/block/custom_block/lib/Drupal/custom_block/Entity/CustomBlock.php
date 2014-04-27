@@ -25,12 +25,12 @@ use Drupal\custom_block\CustomBlockInterface;
  *     "list_builder" = "Drupal\custom_block\CustomBlockListBuilder",
  *     "view_builder" = "Drupal\custom_block\CustomBlockViewBuilder",
  *     "form" = {
- *       "add" = "Drupal\custom_block\CustomBlockFormController",
- *       "edit" = "Drupal\custom_block\CustomBlockFormController",
+ *       "add" = "Drupal\custom_block\CustomBlockForm",
+ *       "edit" = "Drupal\custom_block\CustomBlockForm",
  *       "delete" = "Drupal\custom_block\Form\CustomBlockDeleteForm",
- *       "default" = "Drupal\custom_block\CustomBlockFormController"
+ *       "default" = "Drupal\custom_block\CustomBlockForm"
  *     },
- *     "translation" = "Drupal\custom_block\CustomBlockTranslationController"
+ *     "translation" = "Drupal\custom_block\CustomBlockTranslationHandler"
  *   },
  *   admin_permission = "administer blocks",
  *   base_table = "custom_block",
@@ -74,13 +74,6 @@ class CustomBlock extends ContentEntityBase implements CustomBlockInterface {
     $duplicate->revision_id->value = NULL;
     $duplicate->id->value = NULL;
     return $duplicate;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getRevisionId() {
-    return $this->get('revision_id')->value;
   }
 
   /**
@@ -190,7 +183,8 @@ class CustomBlock extends ContentEntityBase implements CustomBlockInterface {
     $fields['type'] = FieldDefinition::create('entity_reference')
       ->setLabel(t('Block type'))
       ->setDescription(t('The block type.'))
-      ->setSetting('target_type', 'custom_block_type');
+      ->setSetting('target_type', 'custom_block_type')
+      ->setSetting('max_length', EntityTypeInterface::BUNDLE_MAX_LENGTH);
 
     $fields['log'] = FieldDefinition::create('string')
       ->setLabel(t('Revision log message'))

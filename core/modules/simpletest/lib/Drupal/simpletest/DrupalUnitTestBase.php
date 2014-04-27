@@ -13,7 +13,6 @@ use Drupal\Core\KeyValueStore\KeyValueMemoryFactory;
 use Drupal\Core\Language\Language;
 use Symfony\Component\DependencyInjection\Reference;
 use Drupal\Core\Database\Database;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -143,12 +142,16 @@ abstract class DrupalUnitTestBase extends UnitTestBase {
     $this->kernel = new DrupalKernel('unit_testing', drupal_classloader(), FALSE);
     $this->kernel->boot();
 
-    // Create a minimal system.module configuration object so that the list of
+    $request = Request::create('/');
+    $this->container->set('request', $request);
+    $this->container->get('request_stack')->push($request);
+
+    // Create a minimal core.extension configuration object so that the list of
     // enabled modules can be maintained allowing
     // \Drupal\Core\Config\ConfigInstaller::installDefaultConfig() to work.
     // Write directly to active storage to avoid early instantiation of
     // the event dispatcher which can prevent modules from registering events.
-    \Drupal::service('config.storage')->write('system.module', array('enabled' => array()));
+    \Drupal::service('config.storage')->write('core.extension', array('module' => array(), 'theme' => array()));
 
     // Collect and set a fixed module list.
     $class = get_class($this);
@@ -225,8 +228,9 @@ abstract class DrupalUnitTestBase extends UnitTestBase {
     $container->register('cache_factory', 'Drupal\Core\Cache\MemoryBackendFactory');
 
     $container
-      ->register('config.storage', 'Drupal\Core\Config\FileStorage')
-      ->addArgument($this->configDirectories[CONFIG_ACTIVE_DIRECTORY]);
+      ->register('config.storage.active', 'Drupal\Core\Config\DatabaseStorage')
+      ->addArgument(Database::getConnection())
+      ->addArgument('config');
 
     $this->settingsSet('keyvalue_default', 'keyvalue.memory');
     $container->set('keyvalue.memory', $this->keyValueFactory);
@@ -241,8 +245,8 @@ abstract class DrupalUnitTestBase extends UnitTestBase {
       // together here, it still might a keyvalue storage for anything using
       // \Drupal::state() -- that's why a memory service was added in the first
       // place.
-      $container->register('settings', 'Drupal\Component\Utility\Settings')
-        ->setFactoryClass('Drupal\Component\Utility\Settings')
+      $container->register('settings', 'Drupal\Core\Site\Settings')
+        ->setFactoryClass('Drupal\Core\Site\Settings')
         ->setFactoryMethod('getInstance');
 
       $container
@@ -250,7 +254,7 @@ abstract class DrupalUnitTestBase extends UnitTestBase {
         ->addArgument(new Reference('service_container'))
         ->addArgument(new Reference('settings'));
 
-      $container->register('state', 'Drupal\Core\KeyValueStore\State')
+      $container->register('state', 'Drupal\Core\State\State')
         ->addArgument(new Reference('keyvalue'));
     }
 
@@ -346,14 +350,14 @@ abstract class DrupalUnitTestBase extends UnitTestBase {
     // Write directly to active storage to avoid early instantiation of
     // the event dispatcher which can prevent modules from registering events.
     $active_storage =  \Drupal::service('config.storage');
-    $system_config = $active_storage->read('system.module');
+    $extensions = $active_storage->read('core.extension');
 
     foreach ($modules as $module) {
       $module_handler->addModule($module, drupal_get_path('module', $module));
       // Maintain the list of enabled modules in configuration.
-      $system_config['enabled'][$module] = 0;
+      $extensions['module'][$module] = 0;
     }
-    $active_storage->write('system.module', $system_config);
+    $active_storage->write('core.extension', $extensions);
 
     // Update the kernel to make their services available.
     $module_filenames = $module_handler->getModuleList();
@@ -382,12 +386,12 @@ abstract class DrupalUnitTestBase extends UnitTestBase {
     // Unset the list of modules in the extension handler.
     $module_handler = $this->container->get('module_handler');
     $module_filenames = $module_handler->getModuleList();
-    $system_config = $this->container->get('config.factory')->get('system.module');
+    $extension_config = $this->container->get('config.factory')->get('core.extension');
     foreach ($modules as $module) {
       unset($module_filenames[$module]);
-      $system_config->clear('enabled.' . $module);
+      $extension_config->clear('module.' . $module);
     }
-    $system_config->save();
+    $extension_config->save();
     $module_handler->setModuleList($module_filenames);
     $module_handler->resetImplementations();
     // Update the kernel to remove their services.

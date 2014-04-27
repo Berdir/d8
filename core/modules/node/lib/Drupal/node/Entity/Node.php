@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\node\Entity\Node.
+ * Contains \Drupal\node\Entity\Node.
  */
 
 namespace Drupal\node\Entity;
@@ -27,12 +27,12 @@ use Drupal\user\UserInterface;
  *     "view_builder" = "Drupal\node\NodeViewBuilder",
  *     "access" = "Drupal\node\NodeAccessHandler",
  *     "form" = {
- *       "default" = "Drupal\node\NodeFormController",
+ *       "default" = "Drupal\node\NodeForm",
  *       "delete" = "Drupal\node\Form\NodeDeleteForm",
- *       "edit" = "Drupal\node\NodeFormController"
+ *       "edit" = "Drupal\node\NodeForm"
  *     },
  *     "list_builder" = "Drupal\node\NodeListBuilder",
- *     "translation" = "Drupal\node\NodeTranslationController"
+ *     "translation" = "Drupal\node\NodeTranslationHandler"
  *   },
  *   base_table = "node",
  *   data_table = "node_field_data",
@@ -60,20 +60,6 @@ use Drupal\user\UserInterface;
  * )
  */
 class Node extends ContentEntityBase implements NodeInterface {
-
-  /**
-   * Implements Drupal\Core\Entity\EntityInterface::id().
-   */
-  public function id() {
-    return $this->get('nid')->value;
-  }
-
-  /**
-   * Overrides Drupal\Core\Entity\Entity::getRevisionId().
-   */
-  public function getRevisionId() {
-    return $this->get('vid')->value;
-  }
 
   /**
    * {@inheritdoc}
