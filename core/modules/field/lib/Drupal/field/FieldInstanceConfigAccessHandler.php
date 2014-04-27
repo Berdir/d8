@@ -12,7 +12,9 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Defines the access controller for the field instance entity type.
+ * Defines the access handler for the field instance entity type.
+ *
+ * @see \Drupal\field\Entity\FieldInstanceConfig
  */
 class FieldInstanceConfigAccessHandler extends EntityAccessHandler {
 
